@@ -1,4 +1,5 @@
 name: edu-plattform-mvp
+region: fra
 
 services:
   - name: frontend
@@ -7,4 +8,9 @@ services:
       repo: opencampus-sh/edu-plattform-mvp
       branch: main
       deploy_on_push: true
+    routes:
+      - path: /
     source_dir: frontend
+    http_port: 5000
+    instance_count: 1
+    instance_size_slug: basic-xxs

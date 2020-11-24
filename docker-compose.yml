@@ -1,9 +1,9 @@
-version: '3.8'
+version: "3.8"
 
 services:
   frontend:
     ports:
-      - 3000:3000
+      - 5000:5000
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -14,7 +14,7 @@ services:
     image: postgres:12
     restart: always
     volumes:
-    - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: postgrespassword
   graphql-engine:
