@@ -2,7 +2,7 @@ name: edu-plattform-mvp
 
 services:
   - name: frontend
-    environment_slug: nodejs
+    environment_slug: node-js
     github:
       repo: opencampus-sh/edu-plattform-mvp
       branch: main
