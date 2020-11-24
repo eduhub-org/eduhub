@@ -2,11 +2,9 @@ name: edu-plattform-mvp
 
 services:
   - name: frontend
-    environment_slug: node-js
+    dockerfile_path: Dockerfile
     github:
       repo: opencampus-sh/edu-plattform-mvp
       branch: main
       deploy_on_push: true
     source_dir: frontend
-    routes:
-      - path: /
