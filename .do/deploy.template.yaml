@@ -1,7 +1,8 @@
 spec:
   name: edu-plattform-mvp
   services:
-    - git:
+    - dockerfile_path: Dockerfile
+      git:
         branch: main
         repo_clone_url: https://github.com/opencampus-sh/edu-plattform-mvp.git
       name: edu-plattform-mvp

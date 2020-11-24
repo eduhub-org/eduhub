@@ -2,6 +2,7 @@ name: edu-plattform-mvp
 
 services:
   - name: frontend
+    dockerfile_path: Dockerfile
     github:
       repo: opencampus-sh/edu-plattform-mvp
       branch: main
