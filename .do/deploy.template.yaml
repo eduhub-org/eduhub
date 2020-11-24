@@ -1,9 +1,0 @@
-spec:
-  name: edu-plattform-mvp
-  services:
-    - dockerfile_path: frontend/Dockerfile
-      git:
-        branch: main
-        repo_clone_url: https://github.com/opencampus-sh/edu-plattform-mvp.git
-      name: edu-plattform-mvp
-      source_dir: frontend

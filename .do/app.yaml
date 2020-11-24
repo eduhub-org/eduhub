@@ -14,3 +14,11 @@ services:
     http_port: 5000
     instance_count: 1
     instance_size_slug: basic-xxs
+
+databases:
+  - name: db_dev
+    engine: PG
+    version: 12
+    production: false
+    db_name: edu-plattform-mvp-dev
+    db_user: edu-plattform-mvp-dev
