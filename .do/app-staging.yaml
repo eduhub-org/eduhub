@@ -1,4 +1,4 @@
-name: edu-plattform
+name: edu-plattform-staging
 region: fra
 
 services:
@@ -6,19 +6,19 @@ services:
     dockerfile_path: frontend/Dockerfile
     github:
       repo: opencampus-sh/edu-plattform
-      branch: main
+      branch: develop
       deploy_on_push: true
     routes:
       - path: /
     source_dir: frontend
     http_port: 5000
     instance_count: 1
-    instance_size_slug: basic-s
+    instance_size_slug: basic-xxs
 
 databases:
   - name: db
     engine: PG
     version: "12"
-    production: true
+    production: false
     db_name: db
     db_user: db
