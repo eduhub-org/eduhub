@@ -16,9 +16,9 @@ services:
     instance_size_slug: basic-xxs
 
 databases:
-  - name: db_dev
+  - name: db-dev
     engine: PG
-    version: 12
+    version: "12"
     production: false
-    db_name: edu-plattform-mvp-dev
-    db_user: edu-plattform-mvp-dev
+    db_name: db-dev
+    db_user: db-dev
