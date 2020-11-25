@@ -18,7 +18,7 @@ services:
     environment:
       POSTGRES_PASSWORD: postgrespassword
   graphql-engine:
-    image: hasura/graphql-engine:v1.3.3
+    image: hasura/graphql-engine:v1.3.3.cli-migrations-v2
     ports:
       - "8080:8080"
     depends_on:
@@ -27,7 +27,9 @@ services:
     environment:
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@db:5432/postgres
       ## enable the console served by server
-      HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "false" # set to "false" to disable console
+      HASURA_GRAPHQL_MIGRATIONS_DIR: "./backend/migrations"
+      HASURA_GRAPHQL_METADATA_DIR: "./backend/metadata"
       ## enable debugging mode. It is recommended to disable this in production
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
