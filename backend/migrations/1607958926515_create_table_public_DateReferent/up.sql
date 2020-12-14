@@ -1,0 +1,1 @@
+CREATE TABLE "public"."DateReferent"("Id" serial NOT NULL, "DateId" integer NOT NULL, "ReferentId" integer NOT NULL, PRIMARY KEY ("Id") , FOREIGN KEY ("DateId") REFERENCES "public"."Date"("Id") ON UPDATE restrict ON DELETE restrict, FOREIGN KEY ("ReferentId") REFERENCES "public"."Referent"("Id") ON UPDATE restrict ON DELETE restrict, UNIQUE ("Id"));

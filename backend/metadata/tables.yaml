@@ -1,3 +1,30 @@
 - table:
     schema: public
-    name: Kurs
+    name: Admin
+- table:
+    schema: public
+    name: Course
+- table:
+    schema: public
+    name: CourseInstructor
+- table:
+    schema: public
+    name: Date
+- table:
+    schema: public
+    name: DateReferent
+- table:
+    schema: public
+    name: Enrollment
+- table:
+    schema: public
+    name: Instructor
+- table:
+    schema: public
+    name: Participant
+- table:
+    schema: public
+    name: Referent
+- table:
+    schema: public
+    name: User
