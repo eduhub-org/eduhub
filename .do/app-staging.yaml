@@ -11,7 +11,7 @@ services:
     routes:
       - path: /
     source_dir: frontend
-    http_port: 5000
+    http_port: 25000
     instance_count: 1
     instance_size_slug: basic-xxs
 

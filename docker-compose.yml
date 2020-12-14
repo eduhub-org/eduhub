@@ -3,7 +3,7 @@ version: "3.8"
 services:
   frontend:
     ports:
-      - 5000:5000
+      - 25000:3000
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -35,5 +35,13 @@ services:
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       ## uncomment next line to set an admin secret
       # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+  keycloak:
+    image: jboss/keycloak
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+    ports:
+      - 28080:8080
+    restart: always
 volumes:
   db_data:
