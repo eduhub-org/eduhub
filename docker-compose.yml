@@ -36,7 +36,7 @@ services:
       POSTGRES_PASSWORD: postgrespassword
 
   keycloak:
-    image: jboss/keycloak:latest
+    build: ./keycloak
     ports:
       - 28080:8080
     depends_on:
