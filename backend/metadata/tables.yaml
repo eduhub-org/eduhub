@@ -1,9 +1,45 @@
 - table:
     schema: public
     name: Admin
+  object_relationships:
+  - name: Person
+    using:
+      foreign_key_constraint_on: UserId
+- table:
+    schema: public
+    name: Attendence
+  object_relationships:
+  - name: Person
+    using:
+      foreign_key_constraint_on: PersonId
+  - name: Session
+    using:
+      foreign_key_constraint_on: SessionId
 - table:
     schema: public
     name: Course
+  array_relationships:
+  - name: CourseInstructors
+    using:
+      foreign_key_constraint_on:
+        column: CourseId
+        table:
+          schema: public
+          name: CourseInstructor
+  - name: Enrollments
+    using:
+      foreign_key_constraint_on:
+        column: CourseId
+        table:
+          schema: public
+          name: Enrollment
+  - name: Sessions
+    using:
+      foreign_key_constraint_on:
+        column: CourseId
+        table:
+          schema: public
+          name: Session
 - table:
     schema: public
     name: CourseButtons
@@ -13,33 +49,197 @@
 - table:
     schema: public
     name: CourseInstructor
+  object_relationships:
+  - name: Course
+    using:
+      foreign_key_constraint_on: CourseId
+  - name: Instructor
+    using:
+      foreign_key_constraint_on: InstructorId
 - table:
     schema: public
     name: Enrollment
+  object_relationships:
+  - name: Course
+    using:
+      foreign_key_constraint_on: CourseId
+  - name: Participant
+    using:
+      foreign_key_constraint_on: ParticipantId
+  array_relationships:
+  - name: ProjectEnrollments
+    using:
+      foreign_key_constraint_on:
+        column: EnrollmentId
+        table:
+          schema: public
+          name: ProjectEnrollment
 - table:
     schema: public
     name: Event
 - table:
     schema: public
     name: Instructor
+  object_relationships:
+  - name: Person
+    using:
+      foreign_key_constraint_on: PersonId
+  array_relationships:
+  - name: CourseInstructors
+    using:
+      foreign_key_constraint_on:
+        column: InstructorId
+        table:
+          schema: public
+          name: CourseInstructor
+- table:
+    schema: public
+    name: Mail
+  object_relationships:
+  - name: Person
+    using:
+      foreign_key_constraint_on: Author
+  array_relationships:
+  - name: MailLogs
+    using:
+      foreign_key_constraint_on:
+        column: Mail
+        table:
+          schema: public
+          name: MailLog
+- table:
+    schema: public
+    name: MailLog
+  object_relationships:
+  - name: mailByMail
+    using:
+      foreign_key_constraint_on: Mail
 - table:
     schema: public
     name: Participant
+  object_relationships:
+  - name: Person
+    using:
+      foreign_key_constraint_on: PersonId
+  array_relationships:
+  - name: Enrollments
+    using:
+      foreign_key_constraint_on:
+        column: ParticipantId
+        table:
+          schema: public
+          name: Enrollment
 - table:
     schema: public
     name: Person
+  array_relationships:
+  - name: Admins
+    using:
+      foreign_key_constraint_on:
+        column: UserId
+        table:
+          schema: public
+          name: Admin
+  - name: Attendences
+    using:
+      foreign_key_constraint_on:
+        column: PersonId
+        table:
+          schema: public
+          name: Attendence
+  - name: Instructors
+    using:
+      foreign_key_constraint_on:
+        column: PersonId
+        table:
+          schema: public
+          name: Instructor
+  - name: Mails
+    using:
+      foreign_key_constraint_on:
+        column: Author
+        table:
+          schema: public
+          name: Mail
+  - name: Participants
+    using:
+      foreign_key_constraint_on:
+        column: PersonId
+        table:
+          schema: public
+          name: Participant
+  - name: Referents
+    using:
+      foreign_key_constraint_on:
+        column: PersonId
+        table:
+          schema: public
+          name: Referent
 - table:
     schema: public
     name: Project
+  array_relationships:
+  - name: ProjectEnrollments
+    using:
+      foreign_key_constraint_on:
+        column: ProjectId
+        table:
+          schema: public
+          name: ProjectEnrollment
 - table:
     schema: public
     name: ProjectEnrollment
+  object_relationships:
+  - name: Enrollment
+    using:
+      foreign_key_constraint_on: EnrollmentId
+  - name: Project
+    using:
+      foreign_key_constraint_on: ProjectId
 - table:
     schema: public
     name: Referent
+  object_relationships:
+  - name: Person
+    using:
+      foreign_key_constraint_on: PersonId
+  array_relationships:
+  - name: SessionReferents
+    using:
+      foreign_key_constraint_on:
+        column: ReferentId
+        table:
+          schema: public
+          name: SessionReferent
 - table:
     schema: public
     name: Session
+  object_relationships:
+  - name: Course
+    using:
+      foreign_key_constraint_on: CourseId
+  array_relationships:
+  - name: Attendences
+    using:
+      foreign_key_constraint_on:
+        column: SessionId
+        table:
+          schema: public
+          name: Attendence
+  - name: SessionReferents
+    using:
+      foreign_key_constraint_on:
+        column: SessionId
+        table:
+          schema: public
+          name: SessionReferent
 - table:
     schema: public
     name: SessionReferent
+  object_relationships:
+  - name: Referent
+    using:
+      foreign_key_constraint_on: ReferentId
+  - name: Session
+    using:
+      foreign_key_constraint_on: SessionId
