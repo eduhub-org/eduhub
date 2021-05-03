@@ -137,6 +137,7 @@ module.exports = {
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
     'arrow-parens': ['off', 'as-needed'],
     'complexity': 'off',
     'constructor-super': 'error',
