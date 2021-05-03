@@ -2,13 +2,14 @@ import Head from "next/head";
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
+import { Page } from "../components/Page";
 import styles from "../styles/Home.module.css";
 
 const Home: FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div className={styles.container}>
+    <Page>
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
@@ -32,7 +33,7 @@ const Home: FC = () => {
           <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
         </a>
       </footer>
-    </div>
+    </Page>
   );
 };
 
