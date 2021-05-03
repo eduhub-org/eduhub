@@ -3,11 +3,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  
 }
 
 .page {
   display: flex;
   min-height: 100vh;
   max-width: 1440px;
-  min-width: 1440px;
+  min-width: 100%;
+  flex-direction: column;
+  margin: 0 16px
+}
+
+@media (min-width: 1440px) {
+  .page {
+    min-width: 1440px;
+  }
 }

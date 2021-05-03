@@ -2,6 +2,7 @@ import Head from "next/head";
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
+import { Header } from "../components/Header";
 import { Page } from "../components/Page";
 import styles from "../styles/Home.module.css";
 
@@ -15,8 +16,8 @@ const Home: FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
+      <main>
+        <h1>
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
 

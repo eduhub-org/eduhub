@@ -1,5 +1,8 @@
 {
-  "header": {
-    "signin": "anmelden"
+  "loginButton": {
+    "title": "anmelden"
+  },
+  "registerButton": {
+    "title": "registrieren"
   }
 }
