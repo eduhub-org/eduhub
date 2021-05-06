@@ -1,0 +1,1 @@
+CREATE TABLE "public"."Instructor"("Id" serial NOT NULL, "UserId" integer NOT NULL, PRIMARY KEY ("Id") , FOREIGN KEY ("UserId") REFERENCES "public"."User"("Id") ON UPDATE restrict ON DELETE restrict, UNIQUE ("Id"));

@@ -1,0 +1,1 @@
+CREATE TABLE "public"."Attendence"("Id" serial NOT NULL, "SessionId" integer NOT NULL, "PersonId" integer NOT NULL, "Attending" boolean NOT NULL, PRIMARY KEY ("Id") , FOREIGN KEY ("SessionId") REFERENCES "public"."Session"("Id") ON UPDATE restrict ON DELETE restrict, FOREIGN KEY ("PersonId") REFERENCES "public"."Person"("Id") ON UPDATE restrict ON DELETE restrict);
