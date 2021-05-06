@@ -9,18 +9,6 @@ hasura console
 ```
 It will open the browser window and you can use it as usual.
 
-# Migrations
-You can load up existing Migrations via terminal from the project directory (../edu-playttform/backend/) to your local Hasura instance by running:
-```
-hasura migrate apply
-```
-
-# Metadata
-You can load up existing Metadata via terminal from the project directory (../edu-playttform/backend/) to your local Hasura instance by running:
-```
-hasura metadata apply
-```
-
 # Doku used
 ```
 https://hasura.io/docs/1.0/graphql/core/migrations/migrations-setup.html
