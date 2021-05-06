@@ -1,0 +1,1 @@
+CREATE TABLE "public"."MailLog"("Id" serial NOT NULL, "Mail" integer NOT NULL, "Timestamp" timestamptz NOT NULL DEFAULT now(), "SendStatus" integer NOT NULL, PRIMARY KEY ("Id") , FOREIGN KEY ("Mail") REFERENCES "public"."Mail"("Id") ON UPDATE restrict ON DELETE restrict);
