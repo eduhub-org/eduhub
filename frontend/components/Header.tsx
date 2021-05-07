@@ -6,23 +6,8 @@ import { RegisterButton } from "./RegisterButton";
 
 export const Header: FC = () => {
   return (
-    <header
-      style={{
-        width: "100%",
-        display: "flex",
-        padding: "16px 0",
-        // borderStyle: "solid",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          // borderStyle: "solid",
-          flex: 1,
-          flexDirection: "row",
-          display: "flex",
-        }}
-      >
+    <header className="flex w-full p-4">
+      <div className="flex w-full">
         <div>
           <Image
             src="/images/edu_logo.svg"
@@ -32,7 +17,7 @@ export const Header: FC = () => {
             priority
           />
         </div>
-        <div style={{ marginLeft: 12 }}>
+        <div className="ml-2">
           <Image
             src="/images/EDU_HUB_name.svg"
             alt="Edu Hub name"
