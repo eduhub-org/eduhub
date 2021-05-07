@@ -9,6 +9,9 @@ module.exports = {
         "edu-black": "#222222",
       },
     },
+    fontFamily: {
+      body: ["Space Grotesk", "sans-serif"],
+    },
   },
   variants: {
     extend: {},

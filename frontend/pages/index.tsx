@@ -3,7 +3,6 @@ import Head from "next/head";
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Header } from "../components/Header";
 import { Page } from "../components/Page";
 
 export const getStaticProps = async ({ locale }) => ({
