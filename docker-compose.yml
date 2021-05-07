@@ -3,35 +3,64 @@ version: "3.8"
 services:
   frontend:
     ports:
-      - 5000:5000
+      - 25000:5000
     build:
       context: ./frontend
       dockerfile: Dockerfile
     depends_on:
-      - "db"
-      - "graphql-engine"
-  db:
-    image: postgres:12
-    restart: always
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: postgrespassword
-  graphql-engine:
-    image: hasura/graphql-engine:v1.3.3
+      - hasura
+      - keycloak
+  
+  hasura:
+    image: hasura/graphql-engine:v1.3.3.cli-migrations-v2
     ports:
       - "8080:8080"
     depends_on:
-      - "db"
+      - db_hasura
+      - keycloak
     restart: always
     environment:
-      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@db:5432/postgres
-      ## enable the console served by server
-      HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
-      ## enable debugging mode. It is recommended to disable this in production
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@db_hasura:5432/postgres
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "false" # set to "false" to disable console
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       ## uncomment next line to set an admin secret
-      # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+      HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+      HASURA_GRAPHQL_JWT_SECRET: '{ "type": "RS256", "jwk_url": "http://keycloak:8080/auth/realms/master/protocol/openid-connect/certs" }'
+    volumes:
+      - ./backend/migrations:/hasura-migrations
+      - ./backend/metadata:/hasura-metadata
+
+  db_hasura:
+    image: postgres:12
+    volumes:
+      - db_hasura_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgrespassword
+
+  keycloak:
+    build: ./keycloak
+    ports:
+      - 28080:8080
+    depends_on:
+      - db_keycloak
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      DB_VENDOR: postgres
+      DB_ADDR: db_keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+
+  db_keycloak:
+    image: postgres:12
+    volumes:
+      - db_keycloak_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+
 volumes:
-  db_data:
+  db_hasura_data:
+  db_keycloak_data:

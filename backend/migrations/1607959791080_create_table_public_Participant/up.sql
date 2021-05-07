@@ -1,0 +1,1 @@
+CREATE TABLE "public"."Participant"("Id" serial NOT NULL, "UserId" integer NOT NULL, "Employment" text NOT NULL, "University" integer NOT NULL, "MatrikelNumber" text NOT NULL, "SurveyId" text NOT NULL, PRIMARY KEY ("Id") , FOREIGN KEY ("UserId") REFERENCES "public"."User"("Id") ON UPDATE restrict ON DELETE restrict, UNIQUE ("Id"));
