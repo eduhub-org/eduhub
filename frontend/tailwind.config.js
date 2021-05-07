@@ -4,7 +4,11 @@ module.exports = {
   plugins: [],
   purge: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        "edu-black": "#222222",
+      },
+    },
   },
   variants: {
     extend: {},
