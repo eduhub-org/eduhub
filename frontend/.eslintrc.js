@@ -22,6 +22,12 @@ module.exports = {
         "react/jsx-no-bind": "off",
       },
     },
+    {
+      files: ["*.js"],
+      rules: {
+        "@typescript-eslint/no-var-requires": "off",
+      },
+    },
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
