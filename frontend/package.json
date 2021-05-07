@@ -8,11 +8,10 @@
     "start": "next start -p 5000"
   },
   "dependencies": {
-    "i18next": "^20.2.2",
     "next": "^10.2.0",
+    "next-i18next": "^8.2.0",
     "react": "17.0.1",
-    "react-dom": "17.0.1",
-    "react-i18next": "^11.8.15"
+    "react-dom": "17.0.1"
   },
   "devDependencies": {
     "@types/node": "^15.0.1",

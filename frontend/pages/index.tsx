@@ -1,8 +1,15 @@
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Page } from "../components/Page";
+
+export const getStaticProps = async ({ locale }) => ({
+  props: {
+    ...(await serverSideTranslations(locale, ["common"])),
+  },
+});
 
 const Home: FC = () => {
   const { t } = useTranslation();
