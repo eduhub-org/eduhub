@@ -1,12 +1,15 @@
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
-export const RegisterButton: FC = (props) => {
+import { Button } from "./common/Button";
+import { OnlyDesktop } from "./common/OnlyDesktop";
+
+export const RegisterButton: FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="border-2 bg-edu-black border-edu-black rounded-full items-center hidden sm:flex">
-      <span className="mx-6 text-white">{t("registerButton.title")}</span>
-    </div>
+    <OnlyDesktop>
+      <Button filled>{t("registerButton.title")}</Button>
+    </OnlyDesktop>
   );
 };
