@@ -3,6 +3,7 @@ import { FC } from "react";
 
 import { LoginButton } from "./LoginButton";
 import { RegisterButton } from "./RegisterButton";
+import { OnlyDesktop } from "./common/OnlyDesktop";
 
 export const Header: FC = () => {
   return (
@@ -28,7 +29,11 @@ export const Header: FC = () => {
         </div>
       </div>
       <LoginButton />
-      <RegisterButton />
+      <div className="ml-3">
+        <OnlyDesktop>
+          <RegisterButton />
+        </OnlyDesktop>
+      </div>
     </header>
   );
 };
