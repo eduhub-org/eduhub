@@ -23,7 +23,19 @@ const Home: FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Page>
-        <div className="h-96 bg-[#F2991D]" />
+        <div className="flex flex-col bg-[#F2991D] px-3">
+          <span className="flex text-6xl sm:text-9xl mt-16 sm:mt-28">
+            {t("headline")}
+          </span>
+          <div className="flex justify-center mt-4 mb-6 sm:mb-20">
+            <span className="text-xl sm:text-5xl text-center">
+              {t("subheadline")}
+            </span>
+          </div>
+          <div className="flex justify-center mb-12">
+            <Button filled>{t("registerNow")}</Button>
+          </div>
+        </div>
         <h2 className="text-3xl font-semibold text-center mt-20">
           {t("findCourses")}
         </h2>
