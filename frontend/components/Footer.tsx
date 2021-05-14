@@ -5,7 +5,7 @@ export const Footer: FC = () => {
   return (
     <footer className="flex flex-col w-full p-6 bg-edu-black text-white">
       <h3>
-        <span className="text-2xl font-medium">EDU APP</span>
+        <span className="text-2xl font-medium">EDU HUB</span>
         <br />
         <span className="text-xl font-light">by opencampus</span>
       </h3>

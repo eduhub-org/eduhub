@@ -56,7 +56,7 @@ const Home: FC = () => {
               <h3 className="text-lg">{t("learnSubheadline")}</h3>
             </div>
           </div>
-          <div className="flex flex-1 justify-center">
+          <div className="flex flex-1 justify-center mt-8">
             <div className="flex justify-center items-center space-x-3">
               <LoginButton />
               <RegisterButton />
