@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start -p 5000",
     "lint": "eslint .",
-    "apollo:codegen": "apollo client:codegen --includes ./queries/**/*.ts --target typescript"
+    "apollo:codegen": "apollo client:codegen --includes ./queries/**/*.ts --tsFileExtension=\"d.ts\" --target typescript"
   },
   "dependencies": {
     "@apollo/client": "^3.3.18",
