@@ -1,3 +1,4 @@
+import { useQuery } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { FC } from "react";
@@ -8,6 +9,8 @@ import { Page } from "../components/Page";
 import { RegisterButton } from "../components/RegisterButton";
 import { Button } from "../components/common/Button";
 import { TileSlider } from "../components/course/TileSlider";
+import { CourseList } from "../queries/__generated__/CourseList";
+import { COURSE_LIST } from "../queries/courseList";
 
 export const getStaticProps = async ({ locale }) => ({
   props: {
@@ -17,6 +20,7 @@ export const getStaticProps = async ({ locale }) => ({
 
 const Home: FC = () => {
   const { t } = useTranslation("start-page");
+  const { data: courses, loading, error } = useQuery<CourseList>(COURSE_LIST);
 
   return (
     <>
@@ -42,7 +46,7 @@ const Home: FC = () => {
           {t("findCourses")}
         </h2>
         <div className="mt-11">
-          <TileSlider />
+          <TileSlider courses={courses?.Course ?? []} />
         </div>
         <div className="w-full flex justify-center mt-16 mb-24">
           <Button>{t("browse")}</Button>
