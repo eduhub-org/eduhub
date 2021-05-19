@@ -1,0 +1,1 @@
+CREATE TABLE "public"."AttendenceDocument"("Id" serial NOT NULL, "SessionId" integer NOT NULL, "Content" text NOT NULL, "Type" text NOT NULL, PRIMARY KEY ("Id") , FOREIGN KEY ("SessionId") REFERENCES "public"."Session"("Id") ON UPDATE restrict ON DELETE restrict, UNIQUE ("Id"));
