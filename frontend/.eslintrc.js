@@ -137,6 +137,7 @@ module.exports = {
     "@typescript-eslint/restrict-plus-operands": "error",
     "@typescript-eslint/type-annotation-spacing": "off",
     "arrow-parens": ["off", "as-needed"],
+    camelcase: "off",
     complexity: "off",
     "constructor-super": "error",
     curly: ["error", "multi-line"],

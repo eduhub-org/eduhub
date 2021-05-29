@@ -40,6 +40,27 @@
         table:
           schema: public
           name: Session
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - BookingDeadline
+      - City
+      - Cost
+      - CourseType
+      - DayOfTheWeek
+      - Description
+      - Difficulty
+      - Duration
+      - Ects
+      - Id
+      - Language
+      - MaxParticipants
+      - Name
+      - Semester
+      - ShortDescription
+      - TimeOfStart
+      filter: {}
 - table:
     schema: public
     name: CourseButtons
