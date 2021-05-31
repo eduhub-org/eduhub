@@ -17,6 +17,13 @@
       foreign_key_constraint_on: SessionId
 - table:
     schema: public
+    name: AttendenceDocument
+  object_relationships:
+  - name: Session
+    using:
+      foreign_key_constraint_on: SessionId
+- table:
+    schema: public
     name: Course
   array_relationships:
   - name: CourseInstructors
@@ -54,6 +61,7 @@
       - Duration
       - Ects
       - Id
+      - Image
       - Language
       - MaxParticipants
       - Name
@@ -240,6 +248,13 @@
     using:
       foreign_key_constraint_on: CourseId
   array_relationships:
+  - name: AttendenceDocuments
+    using:
+      foreign_key_constraint_on:
+        column: SessionId
+        table:
+          schema: public
+          name: AttendenceDocument
   - name: Attendences
     using:
       foreign_key_constraint_on:

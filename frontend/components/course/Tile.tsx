@@ -15,7 +15,7 @@ export const Tile: FC<IProps> = ({ course }) => {
         <div className="w-60 h-72 rounded-2xl overflow-hidden">
           <div className="h-1/2 bg-edu-black">
             <Image
-              src="https://picsum.photos/240/144"
+              src={course.Image ?? "https://picsum.photos/240/144"}
               alt="Edu Hub logo"
               width={240}
               height={144}

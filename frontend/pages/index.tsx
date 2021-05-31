@@ -13,7 +13,7 @@ import { TileSlider } from "../components/course/TileSlider";
 import { CourseList } from "../queries/__generated__/CourseList";
 import { COURSE_LIST } from "../queries/courseList";
 
-export const getStaticProps = async ({ locale }) => ({
+export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
     ...(await serverSideTranslations(locale, ["common", "start-page"])),
   },
