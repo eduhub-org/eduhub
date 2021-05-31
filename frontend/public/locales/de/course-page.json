@@ -1,3 +1,5 @@
 {
-  "applyNow": "jetzt bewerben"
+  "applyNow": "jetzt bewerben",
+  "courseIsFree": "Der Kurs ist kostenfrei",
+  "courseCosts": "Der Kurs kostet {{price}}"
 }

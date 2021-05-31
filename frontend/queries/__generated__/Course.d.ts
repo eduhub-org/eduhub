@@ -27,6 +27,7 @@ export interface Course_Course_by_pk {
   Description: string;
   Difficulty: number | null;
   Duration: number | null;
+  Ects: string;
   Id: number;
   Image: string | null;
   Language: string;

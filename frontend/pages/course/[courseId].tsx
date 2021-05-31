@@ -9,7 +9,10 @@ import { useTranslation } from "react-i18next";
 import { Page } from "../../components/Page";
 import { Button } from "../../components/common/Button";
 import { CourseContentInfos } from "../../components/course/CourseContentInfos";
+import { CourseEndTime } from "../../components/course/CourseEndTime";
 import { CourseMetaInfos } from "../../components/course/CourseMetaInfos";
+import { CourseStartTime } from "../../components/course/CourseStartTime";
+import { CourseWeekday } from "../../components/course/CourseWeekday";
 import { Course } from "../../queries/__generated__/Course";
 import { COURSE } from "../../queries/course";
 
@@ -32,8 +35,7 @@ export const getStaticPaths = async () => {
 const CoursePage: FC = () => {
   const router = useRouter();
   const { courseId } = router.query;
-  const { t } = useTranslation("course-page");
-  const { t: commonT } = useTranslation("common");
+  const { t, i18n } = useTranslation("course-page");
 
   const id = parseInt(courseId as string, 10);
 
@@ -46,12 +48,8 @@ const CoursePage: FC = () => {
   const course = courseData?.Course_by_pk;
 
   if (!course) {
-    return "Kurs nicht verfügbar";
+    return <div>Kurs nicht verfügbar</div>;
   }
-
-  console.log("kurs:", course);
-
-  const weekday = course.DayOfTheWeek ? commonT(course.DayOfTheWeek) : "";
 
   return (
     <div>
@@ -72,20 +70,29 @@ const CoursePage: FC = () => {
           <div className="flex my-10">
             <div className="flex flex-1 flex-col">
               <span className="text-xs">
-                {weekday} - {course.TimeOfStart} Montags 18:00 - 19:30
+                <CourseWeekday course={course} />{" "}
+                <CourseStartTime course={course} />
+                {" - "}
+                <CourseEndTime course={course} />
               </span>
               <span className="text-5xl">{course.Name}</span>
               <span className="text-2xl mt-2">{course.ShortDescription}</span>
             </div>
             <div className="flex flex-1 flex-col justify-center items-center max-w-sm">
               <Button filled>{t("applyNow")}</Button>
-              <span className="text-xs mt-4">bewerbungsfrist 4.5.2021</span>
+              <span className="text-xs mt-4">
+                bewerbungsfrist{" "}
+                {course.BookingDeadline.toLocaleDateString(i18n.languages, {
+                  month: "2-digit",
+                  day: "2-digit",
+                })}
+              </span>
             </div>
           </div>
           <div className="flex flex-col lg:flex-row mb-24">
             <CourseContentInfos course={course} />
             <div>
-              <CourseMetaInfos />
+              <CourseMetaInfos course={course} />
             </div>
           </div>
         </div>

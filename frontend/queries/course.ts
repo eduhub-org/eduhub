@@ -10,6 +10,7 @@ export const COURSE = gql`
       Description
       Difficulty
       Duration
+      Ects
       Id
       Image
       Language

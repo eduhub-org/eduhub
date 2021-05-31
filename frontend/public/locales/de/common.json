@@ -5,13 +5,18 @@
   "registerButton": {
     "title": "registrieren"
   },
-  "date": {
-    "Monday": "Montag",
-    "Tuesday": "Dienstag",
-    "Wednesday": "Montag",
-    "Thursday": "Donnerstag",
-    "Friday": "Freitag",
-    "Saturday": "Samstag",
-    "Sunday": "Sonntag"
-  }
+  "Monday": "Montag",
+  "Monday-short": "Mo",
+  "Tuesday": "Dienstag",
+  "Tuesday-short": "Di",
+  "Wednesday": "Mittwoch",
+  "Wednesday-short": "Mi",
+  "Thursday": "Donnerstag",
+  "Thursday-short": "Do",
+  "Friday": "Freitag",
+  "Friday-short": "Fr",
+  "Saturday": "Samstag",
+  "Saturday-short": "Sa",
+  "Sunday": "Sonntag",
+  "Sunday-short": "So"
 }
