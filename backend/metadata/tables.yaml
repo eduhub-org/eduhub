@@ -61,6 +61,7 @@
       - Duration
       - Ects
       - Id
+      - Image
       - Language
       - MaxParticipants
       - Name
