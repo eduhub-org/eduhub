@@ -4,5 +4,14 @@
   },
   "registerButton": {
     "title": "registrieren"
+  },
+  "date": {
+    "Monday": "Montag",
+    "Tuesday": "Dienstag",
+    "Wednesday": "Montag",
+    "Thursday": "Donnerstag",
+    "Friday": "Freitag",
+    "Saturday": "Samstag",
+    "Sunday": "Sonntag"
   }
 }
