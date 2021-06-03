@@ -67,6 +67,7 @@
       - Name
       - Semester
       - ShortDescription
+      - Status
       - TimeOfStart
       filter: {}
 - table:
@@ -85,6 +86,14 @@
   - name: Instructor
     using:
       foreign_key_constraint_on: InstructorId
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - CourseId
+      - Id
+      - InstructorId
+      filter: {}
 - table:
     schema: public
     name: Enrollment
@@ -121,6 +130,14 @@
         table:
           schema: public
           name: CourseInstructor
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Id
+      - PersonId
+      - WantsToContinue
+      filter: {}
 - table:
     schema: public
     name: Mail
@@ -204,6 +221,15 @@
         table:
           schema: public
           name: Referent
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Firstname
+      - Id
+      - Image
+      - Lastname
+      filter: {}
 - table:
     schema: public
     name: Project
@@ -269,6 +295,20 @@
         table:
           schema: public
           name: SessionReferent
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - CourseId
+      - Description
+      - Finish
+      - Id
+      - Location
+      - Start
+      - SurveyId
+      - SurveyType
+      - Title
+      filter: {}
 - table:
     schema: public
     name: SessionReferent
