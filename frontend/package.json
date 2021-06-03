@@ -6,21 +6,26 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start -p 5000",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "apollo:codegen": "apollo client:codegen --includes ./queries/**/*.ts --tsFileExtension=\"d.ts\" --target typescript"
   },
   "dependencies": {
-    "next": "^10.2.0",
+    "@apollo/client": "^3.3.18",
+    "graphql": "^15.5.0",
+    "next": "^10.2.3",
     "next-i18next": "^8.2.0",
     "react": "17.0.1",
     "react-dom": "17.0.1"
   },
   "devDependencies": {
+    "@types/graphql": "^14.5.0",
     "@types/node": "^15.0.1",
     "@types/react": "^17.0.4",
     "@types/react-dom": "^17.0.3",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/eslint-plugin-tslint": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
+    "apollo": "^2.33.2",
     "autoprefixer": "^10.2.5",
     "eslint": "^7.25.0",
     "eslint-config-prettier": "^8.3.0",
