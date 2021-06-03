@@ -7,15 +7,41 @@
 // GraphQL query operation: Course
 // ====================================================
 
+export interface Course_Course_by_pk_CourseInstructors_Instructor_Person {
+  __typename: "Person";
+  Firstname: string;
+  Image: string | null;
+  Lastname: string;
+  Id: number;
+}
+
+export interface Course_Course_by_pk_CourseInstructors_Instructor {
+  __typename: "Instructor";
+  /**
+   * An object relationship
+   */
+  Person: Course_Course_by_pk_CourseInstructors_Instructor_Person;
+  Description: string | null;
+  Qualification: string | null;
+  Id: number;
+}
+
+export interface Course_Course_by_pk_CourseInstructors {
+  __typename: "CourseInstructor";
+  /**
+   * An object relationship
+   */
+  Instructor: Course_Course_by_pk_CourseInstructors_Instructor;
+  Id: number;
+}
+
 export interface Course_Course_by_pk_Sessions {
   __typename: "Session";
+  Id: number;
   Description: string;
   Finish: any;
-  Id: number;
   Start: any;
   Title: string;
-  SurveyType: number | null;
-  SurveyId: string | null;
 }
 
 export interface Course_Course_by_pk {
@@ -26,21 +52,28 @@ export interface Course_Course_by_pk {
   DayOfTheWeek: string | null;
   Description: string;
   Difficulty: number | null;
-  Duration: number | null;
-  Ects: string;
   Id: number;
   Image: string | null;
   Language: string;
   MaxParticipants: number;
   Name: string;
   Semester: number;
+  ShortDescription: string;
+  TimeOfStart: any | null;
+  City: string;
+  Duration: number | null;
+  /**
+   * An array relationship
+   */
+  CourseInstructors: Course_Course_by_pk_CourseInstructors[];
+  Ects: string;
+  Status: number;
+  MaxMissedDates: number;
+  MaxProjectParticipants: number;
   /**
    * An array relationship
    */
   Sessions: Course_Course_by_pk_Sessions[];
-  ShortDescription: string;
-  Status: number;
-  TimeOfStart: any | null;
 }
 
 export interface Course {

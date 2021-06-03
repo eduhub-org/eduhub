@@ -13,17 +13,10 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
   return (
     <div className="flex flex-1 flex-col mx-6 sm:mr-12 mb-8 sm:mb-24">
       <span className="text-3xl font-semibold mt-24 mb-9">Du wirst lernen</span>
-      {/* <ul>
-        {learnings.map((learning, index) => (
-          <li key={index} className="check-list mb-4">
-            <span className="block text-sm sm:text-lg">{learning}</span>
-          </li>
-        ))}
-      </ul> */}
       <div dangerouslySetInnerHTML={{ __html: course.Description }} />
       <span className="text-3xl font-semibold mt-24 mb-9">Kursinhalte</span>
       <ul>
-        {course.Sessions.map(({ Start, Description }, index) => (
+        {course.Sessions.map(({ Start, Title }, index) => (
           <li key={index} className="flex mb-4">
             <div className="flex flex-col flex-shrink-0 mr-6">
               <span className="text-xs sm:text-sm font-semibold">
@@ -39,7 +32,7 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
                 })}
               </span>
             </div>
-            <span className="block text-sm sm:text-lg">{Description}</span>
+            <span className="block text-sm sm:text-lg">{Title}</span>
           </li>
         ))}
       </ul>

@@ -9,26 +9,41 @@ export const COURSE = gql`
       DayOfTheWeek
       Description
       Difficulty
-      Duration
-      Ects
       Id
       Image
       Language
       MaxParticipants
       Name
       Semester
+      ShortDescription
+      TimeOfStart
+      City
+      Duration
+      CourseInstructors {
+        Instructor {
+          Person {
+            Firstname
+            Image
+            Lastname
+            Id
+          }
+          Description
+          Qualification
+          Id
+        }
+        Id
+      }
+      Ects
+      Status
+      MaxMissedDates
+      MaxProjectParticipants
       Sessions {
+        Id
         Description
         Finish
-        Id
         Start
         Title
-        SurveyType
-        SurveyId
       }
-      ShortDescription
-      Status
-      TimeOfStart
     }
   }
 `;

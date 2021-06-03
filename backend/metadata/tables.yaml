@@ -63,7 +63,9 @@
       - Id
       - Image
       - Language
+      - MaxMissedDates
       - MaxParticipants
+      - MaxProjectParticipants
       - Name
       - Semester
       - ShortDescription
@@ -134,8 +136,10 @@
   - role: anonymous
     permission:
       columns:
+      - Description
       - Id
       - PersonId
+      - Qualification
       - WantsToContinue
       filter: {}
 - table:

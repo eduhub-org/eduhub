@@ -30,6 +30,18 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
 
   console.log("lang", course.Language);
 
+  const instructor =
+    course.CourseInstructors.length > 0
+      ? course.CourseInstructors[0].Instructor
+      : undefined;
+
+  const instructorName = `${instructor?.Person.Firstname ?? ""} ${
+    instructor?.Person.Lastname ?? ""
+  }`;
+  const instructorAvatar = instructor?.Person.Image ?? "";
+  const instructorQualification = instructor?.Qualification ?? "";
+  const instructorDescription = instructor?.Description ?? "";
+
   return (
     <div className="flex flex-1 flex-col justify-center items-center mx-6 lg:max-w-md bg-gray-100 p-12 sm:p-24">
       <div className="grid grid-cols-3 gap-x-8">
@@ -87,20 +99,20 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
       <div className="flex">
         <div className="flex flex-shrink-0 items-start mr-4">
           <Image
-            src="https://picsum.photos/68/68"
-            alt="Difficulty"
+            src={instructorAvatar}
+            alt="Image of the instructor"
             width={68}
             height={68}
             className="rounded-full overflow-hidden"
+            objectFit="cover"
           />
         </div>
         <div className="flex flex-col">
-          <span className="text-base mb-1">Kursleiter</span>
-          <span className="text-xs uppercase mb-4">Qualifikation oder so</span>
-          <span className="text-sm">
-            Hier steht eine Beschreibung über den Kursleiter in eine kurzen Satz
-            oder so. Das kann auch noch mehr Text sein...
+          <span className="text-base mb-1">{instructorName}</span>
+          <span className="text-xs uppercase mb-4">
+            {instructorQualification}
           </span>
+          <span className="text-sm">{instructorDescription}</span>
         </div>
       </div>
     </div>
