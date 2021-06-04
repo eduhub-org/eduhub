@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 
 import { Page } from "../../components/Page";
 import { Button } from "../../components/common/Button";
+import { PageBlock } from "../../components/common/PageBlock";
 import { CourseContentInfos } from "../../components/course/CourseContentInfos";
 import { CourseEndTime } from "../../components/course/CourseEndTime";
 import { CourseMetaInfos } from "../../components/course/CourseMetaInfos";
@@ -66,36 +67,38 @@ const CoursePage: FC = () => {
             height={620}
           />
         </div>
-        <div className="flex flex-col sm:mx-16">
-          <div className="flex my-10">
-            <div className="flex flex-1 flex-col">
-              <span className="text-xs">
-                <CourseWeekday course={course} />{" "}
-                <CourseStartTime course={course} />
-                {" - "}
-                <CourseEndTime course={course} />
-              </span>
-              <span className="text-5xl">{course.Name}</span>
-              <span className="text-2xl mt-2">{course.ShortDescription}</span>
+        <PageBlock>
+          <div className="flex flex-col">
+            <div className="flex my-10">
+              <div className="flex flex-1 flex-col">
+                <span className="text-xs">
+                  <CourseWeekday course={course} />{" "}
+                  <CourseStartTime course={course} />
+                  {" - "}
+                  <CourseEndTime course={course} />
+                </span>
+                <span className="text-5xl">{course.Name}</span>
+                <span className="text-2xl mt-2">{course.ShortDescription}</span>
+              </div>
+              <div className="flex flex-1 flex-col justify-center items-center max-w-sm">
+                <Button filled>{t("applyNow")}</Button>
+                <span className="text-xs mt-4">
+                  bewerbungsfrist{" "}
+                  {course.BookingDeadline.toLocaleDateString(i18n.languages, {
+                    month: "2-digit",
+                    day: "2-digit",
+                  })}
+                </span>
+              </div>
             </div>
-            <div className="flex flex-1 flex-col justify-center items-center max-w-sm">
-              <Button filled>{t("applyNow")}</Button>
-              <span className="text-xs mt-4">
-                bewerbungsfrist{" "}
-                {course.BookingDeadline.toLocaleDateString(i18n.languages, {
-                  month: "2-digit",
-                  day: "2-digit",
-                })}
-              </span>
+            <div className="flex flex-col lg:flex-row mb-24 space-x-6">
+              <CourseContentInfos course={course} />
+              <div>
+                <CourseMetaInfos course={course} />
+              </div>
             </div>
           </div>
-          <div className="flex flex-col lg:flex-row mb-24">
-            <CourseContentInfos course={course} />
-            <div>
-              <CourseMetaInfos course={course} />
-            </div>
-          </div>
-        </div>
+        </PageBlock>
       </Page>
     </div>
   );
