@@ -1,4 +1,4 @@
-import React from "react";
+import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
@@ -9,7 +9,7 @@ interface IProps {
   uppercased?: boolean;
 }
 
-export const CourseWeekday: React.FC<IProps> = ({
+export const CourseWeekday: FC<IProps> = ({
   course,
   short = false,
   uppercased = false,

@@ -1,18 +1,14 @@
 import { useQuery } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
-import Image from "next/image";
 import { useRouter } from "next/router";
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Page } from "../../components/Page";
-import { Button } from "../../components/common/Button";
-import { CourseContentInfos } from "../../components/course/CourseContentInfos";
-import { CourseEndTime } from "../../components/course/CourseEndTime";
-import { CourseMetaInfos } from "../../components/course/CourseMetaInfos";
-import { CourseStartTime } from "../../components/course/CourseStartTime";
-import { CourseWeekday } from "../../components/course/CourseWeekday";
+import { CoursePageDescriptionView } from "../../components/course/CoursePageDescriptionView";
+import { CoursePageStudentView } from "../../components/course/CoursePageStudentView";
+import { TabSelection } from "../../components/course/TabSelection";
 import { Course } from "../../queries/__generated__/Course";
 import { COURSE } from "../../queries/course";
 
@@ -34,10 +30,11 @@ export const getStaticPaths = async () => {
 
 const CoursePage: FC = () => {
   const router = useRouter();
-  const { courseId } = router.query;
+  const { courseId, tab: tabParam } = router.query;
   const { t, i18n } = useTranslation("course-page");
 
   const id = parseInt(courseId as string, 10);
+  const tab = typeof tabParam === "string" ? parseInt(tabParam, 10) : 0;
 
   const { data: courseData, loading, error } = useQuery<Course>(COURSE, {
     variables: {
@@ -58,44 +55,17 @@ const CoursePage: FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Page>
-        <div className="flex flex-col">
-          <Image
-            src={course.Image ?? "https://picsum.photos/1280/620"}
-            alt="Title image"
-            width={1280}
-            height={620}
+        <div className="py-4">
+          <TabSelection
+            currentTab={tab}
+            tabs={["zur Kursbeschreibung", "laufender Kurs"]}
           />
         </div>
-        <div className="flex flex-col sm:mx-16">
-          <div className="flex my-10">
-            <div className="flex flex-1 flex-col">
-              <span className="text-xs">
-                <CourseWeekday course={course} />{" "}
-                <CourseStartTime course={course} />
-                {" - "}
-                <CourseEndTime course={course} />
-              </span>
-              <span className="text-5xl">{course.Name}</span>
-              <span className="text-2xl mt-2">{course.ShortDescription}</span>
-            </div>
-            <div className="flex flex-1 flex-col justify-center items-center max-w-sm">
-              <Button filled>{t("applyNow")}</Button>
-              <span className="text-xs mt-4">
-                bewerbungsfrist{" "}
-                {course.BookingDeadline.toLocaleDateString(i18n.languages, {
-                  month: "2-digit",
-                  day: "2-digit",
-                })}
-              </span>
-            </div>
-          </div>
-          <div className="flex flex-col lg:flex-row mb-24">
-            <CourseContentInfos course={course} />
-            <div>
-              <CourseMetaInfos course={course} />
-            </div>
-          </div>
-        </div>
+        {tab === 0 ? (
+          <CoursePageDescriptionView course={course} />
+        ) : (
+          <CoursePageStudentView course={course} />
+        )}
       </Page>
     </div>
   );
