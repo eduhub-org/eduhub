@@ -1,6 +1,7 @@
 import { FC } from "react";
 
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
+import { BlockTitle } from "../common/BlockTitle";
 
 import { CourseEndTime } from "./CourseEndTime";
 import { CourseStartTime } from "./CourseStartTime";
@@ -18,7 +19,7 @@ export const CourseTitleSubTitleBlock: FC<IProps> = ({ course }) => {
         {" - "}
         <CourseEndTime course={course} />
       </span>
-      <span className="text-5xl">{course.Name}</span>
+      <BlockTitle>{course.Name}</BlockTitle>
       <span className="text-2xl mt-2">{course.ShortDescription}</span>
     </div>
   );

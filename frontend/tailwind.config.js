@@ -8,6 +8,7 @@ module.exports = {
       colors: {
         "edu-black": "#222222",
         "edu-green": "#00A398",
+        "edu-missed-yellow": "#F2991D66",
       },
     },
     fontFamily: {
