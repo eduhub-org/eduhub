@@ -43,7 +43,7 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
   const instructorDescription = instructor?.Description ?? "";
 
   return (
-    <div className="flex flex-1 flex-col justify-center items-center mx-6 lg:max-w-md bg-gray-100 p-12 sm:p-24">
+    <div className="flex flex-1 flex-col justify-center items-center lg:max-w-md bg-gray-100 p-12 sm:p-24">
       <div className="grid grid-cols-2 gap-x-8">
         {/* <div className="flex justify-center">
           <Image

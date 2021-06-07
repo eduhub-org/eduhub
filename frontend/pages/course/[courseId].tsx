@@ -6,6 +6,7 @@ import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Page } from "../../components/Page";
+import { PageBlock } from "../../components/common/PageBlock";
 import { CoursePageDescriptionView } from "../../components/course/CoursePageDescriptionView";
 import { CoursePageStudentView } from "../../components/course/CoursePageStudentView";
 import { TabSelection } from "../../components/course/TabSelection";
@@ -55,12 +56,14 @@ const CoursePage: FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Page>
-        <div className="py-4">
-          <TabSelection
-            currentTab={tab}
-            tabs={["zur Kursbeschreibung", "laufender Kurs"]}
-          />
-        </div>
+        <PageBlock>
+          <div className="py-4">
+            <TabSelection
+              currentTab={tab}
+              tabs={["zur Kursbeschreibung", "laufender Kurs"]}
+            />
+          </div>
+        </PageBlock>
         {tab === 0 ? (
           <CoursePageDescriptionView course={course} />
         ) : (
