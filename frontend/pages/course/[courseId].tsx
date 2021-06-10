@@ -68,7 +68,7 @@ const CoursePage: FC = () => {
             height={620}
           />
         </div>
-        <div className="flex flex-col space-y-24">
+        <div className="flex flex-col space-y-24 mt-10">
           <PageBlock>
             <ContentRow
               className="items-center"
