@@ -13,6 +13,7 @@ interface IProps {
 
 export const CourseMetaInfos: FC<IProps> = ({ course }) => {
   const { t, i18n } = useTranslation("course-page");
+  const { t: tLanguage } = useTranslation("common");
 
   const startTime = course.TimeOfStart.toLocaleTimeString(i18n.languages, {
     hour: "numeric",
@@ -86,7 +87,7 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
           {"Wo zur Hölle? Online?"}
         </span>
         <span className="text-sm mt-2 text-center">
-          {course.Language || "Pantomimisch"}
+          {tLanguage(course.Language || "de")}
         </span>
       </div>
       <span className="my-12 sm:my-24">
