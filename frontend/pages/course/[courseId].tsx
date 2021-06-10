@@ -87,7 +87,7 @@ const CoursePage: FC = () => {
                 </div>
               }
               rightBottom={
-                <div className="flex flex-1 flex-col justify-center items-center max-w-sm border-2">
+                <div className="flex flex-1 flex-col justify-center items-center max-w-sm">
                   <Button filled>{t("applyNow")}</Button>
                   <span className="text-xs mt-4">
                     bewerbungsfrist{" "}
