@@ -1,6 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
+import Link from "next/link";
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -12,7 +13,7 @@ import { TileSlider } from "../components/course/TileSlider";
 import { CourseList } from "../queries/__generated__/CourseList";
 import { COURSE_LIST } from "../queries/courseList";
 
-export const getStaticProps = async ({ locale }) => ({
+export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
     ...(await serverSideTranslations(locale, ["common", "start-page"])),
   },
@@ -39,7 +40,11 @@ const Home: FC = () => {
             </span>
           </div>
           <div className="flex justify-center mb-12">
-            <Button filled>{t("registerNow")}</Button>
+            <Link href="/register">
+              <a className="flex">
+                <Button filled>{t("registerNow")}</Button>
+              </a>
+            </Link>
           </div>
         </div>
         <h2 className="text-3xl font-semibold text-center mt-20">

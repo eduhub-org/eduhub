@@ -1,0 +1,10 @@
+{
+  "applicationDeadline": "Bewerbungsfrist",
+  "applyNow": "jetzt bewerben",
+  "courseIsFree": "Der Kurs ist kostenfrei",
+  "courseContent": "Kursinhalt",
+  "courseCosts": "Der Kurs kostet {{price}}",
+  "courseNotAvailable": "Kurs ist nicht verfügbar",
+  "ects": "ECTS",
+  "youWillLearn": "Du wirst lernen"
+}

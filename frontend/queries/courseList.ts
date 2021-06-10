@@ -11,6 +11,7 @@ export const COURSE_LIST = gql`
       Duration
       Ects
       Id
+      Image
       Language
       MaxParticipants
       Name

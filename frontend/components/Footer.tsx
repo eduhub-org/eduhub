@@ -16,22 +16,34 @@ export const Footer: FC = () => {
       <div className="flex justify-between items-center">
         <span className="text-sm font-light">© 2010 — 2021</span>
         <div className="flex items-center">
-          <div className="flex items-center">
-            <Image
-              src="/images/share/instagram-icon.svg"
-              alt="Instagram"
-              width={23}
-              height={23}
-            />
-          </div>
-          <div className="ml-6 sm:ml-20 sm:mr-10 flex items-center">
-            <Image
-              src="/images/share/facebook-icon.svg"
-              alt="Facebook"
-              width={23}
-              height={23}
-            />
-          </div>
+          <a
+            href="https://www.instagram.com/opencampus_sh/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div className="flex items-center">
+              <Image
+                src="/images/share/instagram-icon.svg"
+                alt="Instagram"
+                width={23}
+                height={23}
+              />
+            </div>
+          </a>
+          <a
+            href="https://de-de.facebook.com/opencampus.sh/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div className="ml-6 sm:ml-20 sm:mr-10 flex items-center">
+              <Image
+                src="/images/share/facebook-icon.svg"
+                alt="Facebook"
+                width={23}
+                height={23}
+              />
+            </div>
+          </a>
         </div>
       </div>
     </footer>

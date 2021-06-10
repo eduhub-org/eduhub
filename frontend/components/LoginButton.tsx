@@ -14,10 +14,4 @@ export const LoginButton: FC = () => {
       </a>
     </Link>
   );
-
-  // return (
-  //   <div className="flex border-2 border-edu-black rounded-full items-center sm:border-none">
-  //     <span className="mx-6">{t("loginButton.title")}</span>
-  //   </div>
-  // );
 };

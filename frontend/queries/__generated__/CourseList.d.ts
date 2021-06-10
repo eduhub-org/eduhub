@@ -17,6 +17,7 @@ export interface CourseList_Course {
   Duration: number | null;
   Ects: string;
   Id: number;
+  Image: string | null;
   Language: string;
   MaxParticipants: number;
   Name: string;
