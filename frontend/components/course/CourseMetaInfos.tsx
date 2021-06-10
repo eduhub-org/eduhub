@@ -62,33 +62,31 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
         {/* <span className="text-sm mt-2 text-center mb-12">
           {course.Difficulty}
         </span> */}
-        <div className="flex justify-center">
-          <Image
-            src="https://picsum.photos/36/36"
-            alt="Difficulty"
-            width={36}
-            height={36}
-            className="rounded-full overflow-hidden"
-          />
-        </div>
+        <span className="text-lg mt-2 text-center">{course.Ects}</span>
         <span className="text-sm mt-2 text-center mb-12">
           {startTime} - {endTime}
         </span>
+        <span className="text-sm mt-2 text-center">ECTS</span>
+        {/* <span className="text-sm mt-2 text-center mb-12"> h/Woche</span> */}
+        <div className="flex justify-center">
+          <Image
+            src="/images/course/pin.svg"
+            alt="Location"
+            width={32}
+            height={43}
+          />
+        </div>
+        <div className="flex justify-center">
+          <Image
+            src="/images/course/language.svg"
+            alt="Language"
+            width={47}
+            height={40}
+          />
+        </div>
         <span className="text-sm mt-2 text-center">
           {"Wo zur Hölle? Online?"}
         </span>
-        {/* <span className="text-sm mt-2 text-center mb-12"> h/Woche</span> */}
-        <span className="text-lg mt-2 text-center">{course.Ects}</span>
-        <div className="flex justify-center">
-          <Image
-            src="https://picsum.photos/36/36"
-            alt="Difficulty"
-            width={36}
-            height={36}
-            className="rounded-full overflow-hidden"
-          />
-        </div>
-        <span className="text-sm mt-2 text-center">ECTS</span>
         <span className="text-sm mt-2 text-center">
           {course.Language || "Pantomimisch"}
         </span>
