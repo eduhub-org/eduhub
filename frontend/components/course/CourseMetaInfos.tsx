@@ -12,7 +12,7 @@ interface IProps {
 }
 
 export const CourseMetaInfos: FC<IProps> = ({ course }) => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation("course-page");
 
   const startTime = course.TimeOfStart.toLocaleTimeString(i18n.languages, {
     hour: "numeric",
@@ -27,8 +27,6 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
         minute: "numeric",
       })
     : "";
-
-  console.log("lang", course.Language);
 
   const instructor =
     course.CourseInstructors.length > 0
@@ -66,7 +64,7 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
         <span className="text-sm mt-2 text-center mb-12">
           {startTime} - {endTime}
         </span>
-        <span className="text-sm mt-2 text-center">ECTS</span>
+        <span className="text-sm mt-2 text-center">{t("ects")}</span>
         {/* <span className="text-sm mt-2 text-center mb-12"> h/Woche</span> */}
         <div className="flex justify-center">
           <Image

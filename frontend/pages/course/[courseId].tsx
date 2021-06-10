@@ -50,7 +50,7 @@ const CoursePage: FC = () => {
   const course = courseData?.Course_by_pk;
 
   if (!course) {
-    return <div>Kurs nicht verfügbar</div>;
+    return <div>{t("courseNotAvailable")}</div>;
   }
 
   return (
@@ -90,7 +90,7 @@ const CoursePage: FC = () => {
                 <div className="flex flex-1 flex-col justify-center items-center max-w-sm">
                   <Button filled>{t("applyNow")}</Button>
                   <span className="text-xs mt-4">
-                    bewerbungsfrist{" "}
+                    {t("applicationDeadline")}{" "}
                     {course.BookingDeadline.toLocaleDateString(i18n.languages, {
                       month: "2-digit",
                       day: "2-digit",
