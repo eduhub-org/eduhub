@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 
 import { Page } from "../../components/Page";
 import { Button } from "../../components/common/Button";
+import { ContentRow } from "../../components/common/ContentRow";
 import { PageBlock } from "../../components/common/PageBlock";
 import { CourseContentInfos } from "../../components/course/CourseContentInfos";
 import { CourseEndTime } from "../../components/course/CourseEndTime";
@@ -67,38 +68,52 @@ const CoursePage: FC = () => {
             height={620}
           />
         </div>
-        <PageBlock>
-          <div className="flex flex-col">
-            <div className="flex my-10">
-              <div className="flex flex-1 flex-col">
-                <span className="text-xs">
-                  <CourseWeekday course={course} />{" "}
-                  <CourseStartTime course={course} />
-                  {" - "}
-                  <CourseEndTime course={course} />
-                </span>
-                <span className="text-5xl">{course.Name}</span>
-                <span className="text-2xl mt-2">{course.ShortDescription}</span>
-              </div>
-              <div className="flex flex-1 flex-col justify-center items-center max-w-sm">
-                <Button filled>{t("applyNow")}</Button>
-                <span className="text-xs mt-4">
-                  bewerbungsfrist{" "}
-                  {course.BookingDeadline.toLocaleDateString(i18n.languages, {
-                    month: "2-digit",
-                    day: "2-digit",
-                  })}
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-col lg:flex-row mb-24 space-x-6">
-              <CourseContentInfos course={course} />
-              <div>
+        <div className="flex flex-col space-y-24">
+          <PageBlock>
+            <ContentRow
+              className="items-center"
+              leftTop={
+                <div className="flex flex-1 flex-col">
+                  <span className="text-xs">
+                    <CourseWeekday course={course} />{" "}
+                    <CourseStartTime course={course} />
+                    {" - "}
+                    <CourseEndTime course={course} />
+                  </span>
+                  <span className="text-5xl">{course.Name}</span>
+                  <span className="text-2xl mt-2">
+                    {course.ShortDescription}
+                  </span>
+                </div>
+              }
+              rightBottom={
+                <div className="flex flex-1 flex-col justify-center items-center max-w-sm border-2">
+                  <Button filled>{t("applyNow")}</Button>
+                  <span className="text-xs mt-4">
+                    bewerbungsfrist{" "}
+                    {course.BookingDeadline.toLocaleDateString(i18n.languages, {
+                      month: "2-digit",
+                      day: "2-digit",
+                    })}
+                  </span>
+                </div>
+              }
+            />
+          </PageBlock>
+          <ContentRow
+            className="flex pb-24"
+            leftTop={
+              <PageBlock classname="flex-1">
+                <CourseContentInfos course={course} />
+              </PageBlock>
+            }
+            rightBottom={
+              <div className="pr-0 lg:pr-6 xl:pr-0">
                 <CourseMetaInfos course={course} />
               </div>
-            </div>
-          </div>
-        </PageBlock>
+            }
+          />
+        </div>
       </Page>
     </div>
   );
