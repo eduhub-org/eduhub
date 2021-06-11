@@ -72,6 +72,39 @@
       - Status
       - TimeOfStart
       filter: {}
+  - role: user
+    permission:
+      columns:
+      - Id
+      - Name
+      - Description
+      - Status
+      - Ects
+      - MaxParticipants
+      - Semester
+      - ShortDescription
+      - City
+      - Language
+      - BookingDeadline
+      - Cost
+      - TextOnCertificate
+      - DatesOnCertificate
+      - CertificatePossible
+      - AttendanceCertificatePossible
+      - OnlineCourses
+      - Projects
+      - MaxProjectParticipants
+      - ExternalProjectsAllowed
+      - MaxMissedDates
+      - Online_Hybrid_Offline
+      - OnlineCoursesAllowed
+      - ProjectsAllowed
+      - Difficulty
+      - DayOfTheWeek
+      - TimeOfStart
+      - Duration
+      - CourseType
+      filter: {}
 - table:
     schema: public
     name: CourseButtons
@@ -114,6 +147,30 @@
         table:
           schema: public
           name: ProjectEnrollment
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - Id
+      - CourseId
+      - ParticipantId
+      - Status
+      - MotivationLetter
+      - MotivationGrade
+      - WantsEcts
+      - Online
+      - ProjectTitle
+      - CertificateConfirmed
+      - WantsCertificate
+      - TypeOfProject
+      - OnlineCourseTitle
+      - CertificateOfParticipation
+      - UploadFile
+      - CertificateUrl
+      - CertificateOfParticipationUrl
+      filter:
+        ParticipantId:
+          _eq: X-Hasura-User-Id
 - table:
     schema: public
     name: Event
@@ -234,6 +291,21 @@
       - Image
       - Lastname
       filter: {}
+  - role: user
+    permission:
+      columns:
+      - AnonymId
+      - Email
+      - Employment
+      - Firstname
+      - Id
+      - Image
+      - Lastname
+      - LinkedInProfile
+      - Newsletter
+      filter:
+        Id:
+          _eq: X-Hasura-User-Id
 - table:
     schema: public
     name: Project
