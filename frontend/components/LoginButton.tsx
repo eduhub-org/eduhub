@@ -16,8 +16,9 @@ export const LoginButton: FC = () => {
     <div
       className="flex cursor-pointer"
       onClick={() => {
+        console.log("R", window.location.href);
         const url = keycloak?.createLoginUrl({
-          redirectUri: "http://localhost:3000/",
+          redirectUri: window.location.href,
         });
         console.log("url", url);
 
