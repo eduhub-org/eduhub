@@ -9,6 +9,7 @@ import { LoginButton } from "../components/LoginButton";
 import { Page } from "../components/Page";
 import { RegisterButton } from "../components/RegisterButton";
 import { Button } from "../components/common/Button";
+import { MyCourses } from "../components/course/MyCourses";
 import { TileSlider } from "../components/course/TileSlider";
 import { CourseList } from "../queries/__generated__/CourseList";
 import { COURSE_LIST } from "../queries/courseList";
@@ -47,6 +48,7 @@ const Home: FC = () => {
             </Link>
           </div>
         </div>
+        <MyCourses />
         <h2 className="text-3xl font-semibold text-center mt-20">
           {t("findCourses")}
         </h2>
