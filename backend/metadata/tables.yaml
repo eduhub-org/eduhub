@@ -15,6 +15,17 @@
   - name: Session
     using:
       foreign_key_constraint_on: SessionId
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - Attending
+      - Id
+      - PersonId
+      - SessionId
+      filter:
+        PersonId:
+          _eq: X-Hasura-User-Id
 - table:
     schema: public
     name: AttendenceDocument
@@ -168,9 +179,7 @@
       - UploadFile
       - CertificateUrl
       - CertificateOfParticipationUrl
-      filter:
-        ParticipantId:
-          _eq: X-Hasura-User-Id
+      filter: {}
 - table:
     schema: public
     name: Event
@@ -236,6 +245,17 @@
         table:
           schema: public
           name: Enrollment
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - Id
+      - PersonId
+      - University
+      - UNIRegistrationNumber
+      filter:
+        PersonId:
+          _eq: X-Hasura-User-Id
 - table:
     schema: public
     name: Person
@@ -373,6 +393,19 @@
           name: SessionReferent
   select_permissions:
   - role: anonymous
+    permission:
+      columns:
+      - CourseId
+      - Description
+      - Finish
+      - Id
+      - Location
+      - Start
+      - SurveyId
+      - SurveyType
+      - Title
+      filter: {}
+  - role: user
     permission:
       columns:
       - CourseId

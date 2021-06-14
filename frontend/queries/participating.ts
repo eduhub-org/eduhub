@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const PARTICIPATING = gql`
   query Participating($id: Int!) {
-    Person_by_pk {
+    Person_by_pk(Id: $id) {
       Participants {
         Enrollments {
           Course {

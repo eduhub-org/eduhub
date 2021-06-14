@@ -1,4 +1,6 @@
 import { useQuery } from "@apollo/client";
+import { useKeycloak } from "@react-keycloak/ssr";
+import { KeycloakInstance } from "keycloak-js";
 import { FC } from "react";
 
 import { useIsLoggedIn } from "../../hooks/authentication";
@@ -10,13 +12,24 @@ interface IProps {}
 
 export const MyCourses: FC<IProps> = () => {
   const isLoggedIn = useIsLoggedIn();
+
+  const { keycloak } = useKeycloak<KeycloakInstance>();
+
+  const token = keycloak?.token;
+
+  console.dir(token);
+
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem("token", token ?? "");
+  }
+
   const { data: courses, loading, error } = useQuery(PARTICIPATING, {
     variables: { id: 12 },
   });
 
-  console.log("c", courses);
+  console.log("c", courses, error);
 
-  if (!isLoggedIn || (courses?.Course?.length ?? 0) <= 0) return null;
+  if ((courses?.Course?.length ?? 0) <= 0) return null;
 
   return (
     <>
