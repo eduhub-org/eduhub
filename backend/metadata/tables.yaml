@@ -86,35 +86,36 @@
   - role: user
     permission:
       columns:
-      - Id
-      - Name
+      - AttendanceCertificatePossible
+      - BookingDeadline
+      - CertificatePossible
+      - City
+      - Cost
+      - CourseType
+      - DatesOnCertificate
+      - DayOfTheWeek
       - Description
-      - Status
+      - Difficulty
+      - Duration
       - Ects
+      - ExternalProjectsAllowed
+      - Id
+      - Image
+      - Language
+      - MaxMissedDates
       - MaxParticipants
+      - MaxProjectParticipants
+      - Name
+      - OnlineCourses
+      - OnlineCoursesAllowed
+      - Online_Hybrid_Offline
+      - Projects
+      - ProjectsAllowed
       - Semester
       - ShortDescription
-      - City
-      - Language
-      - BookingDeadline
-      - Cost
+      - Status
       - TextOnCertificate
-      - DatesOnCertificate
-      - CertificatePossible
-      - AttendanceCertificatePossible
-      - OnlineCourses
-      - Projects
-      - MaxProjectParticipants
-      - ExternalProjectsAllowed
-      - MaxMissedDates
-      - Online_Hybrid_Offline
-      - OnlineCoursesAllowed
-      - ProjectsAllowed
-      - Difficulty
-      - DayOfTheWeek
       - TimeOfStart
-      - Duration
-      - CourseType
       filter: {}
 - table:
     schema: public
@@ -138,6 +139,13 @@
       columns:
       - CourseId
       - Id
+      - InstructorId
+      filter: {}
+  - role: user
+    permission:
+      columns:
+      - Id
+      - CourseId
       - InstructorId
       filter: {}
 - table:
@@ -208,6 +216,15 @@
       - Qualification
       - WantsToContinue
       filter: {}
+  - role: user
+    permission:
+      columns:
+      - Id
+      - PersonId
+      - WantsToContinue
+      - Qualification
+      - Description
+      filter: {}
 - table:
     schema: public
     name: Mail
@@ -253,9 +270,7 @@
       - PersonId
       - University
       - UNIRegistrationNumber
-      filter:
-        PersonId:
-          _eq: X-Hasura-User-Id
+      filter: {}
 - table:
     schema: public
     name: Person
@@ -324,7 +339,7 @@
       - LinkedInProfile
       - Newsletter
       filter:
-        Id:
+        AuthId:
           _eq: X-Hasura-User-Id
 - table:
     schema: public

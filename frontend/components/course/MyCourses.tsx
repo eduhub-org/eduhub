@@ -23,19 +23,23 @@ export const MyCourses: FC<IProps> = () => {
     window.localStorage.setItem("token", token ?? "");
   }
 
-  const { data: courses, loading, error } = useQuery(PARTICIPATING, {
+  const { data, loading, error } = useQuery(PARTICIPATING, {
     variables: { id: 12 },
   });
 
-  console.log("c", courses, error);
+  console.log("d", data, error);
 
-  if ((courses?.Course?.length ?? 0) <= 0) return null;
+  const enrollments = data?.Person_by_pk?.Participants?.[0]?.Enrollments;
+  const courses = enrollments?.map((enrollment) => enrollment.Course) ?? [];
+  console.log("c", courses);
+
+  if ((courses.length ?? 0) <= 0) return null;
 
   return (
     <>
       <h2 className="text-3xl font-semibold text-center mt-20">Deine Kurse</h2>
       <div className="mt-11">
-        <TileSlider courses={courses?.Course ?? []} />
+        <TileSlider courses={courses ?? []} />
       </div>
     </>
   );
