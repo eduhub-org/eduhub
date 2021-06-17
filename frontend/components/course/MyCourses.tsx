@@ -1,11 +1,8 @@
-import { useQuery } from "@apollo/client";
-import { useKeycloak } from "@react-keycloak/ssr";
-import { KeycloakInstance } from "keycloak-js";
 import { FC } from "react";
 
 import { useAuthedQuery } from "../../hooks/authedQuery";
-import { useIsLoggedIn } from "../../hooks/authentication";
 import { PARTICIPATING } from "../../queries/participating";
+import { Button } from "../common/Button";
 
 import { TileSlider } from "./TileSlider";
 
@@ -22,7 +19,18 @@ export const MyCourses: FC<IProps> = () => {
   const courses = enrollments?.map((enrollment) => enrollment.Course) ?? [];
   console.log("c", courses);
 
-  if ((courses.length ?? 0) <= 0) return null;
+  if ((courses.length ?? 0) <= 0) {
+    return (
+      <div className="flex flex-col space-y-10 justify-center items-center">
+        <span className="text-xl font-bold">
+          Du hast noch keinen Kurs mit gemacht
+        </span>
+        <a href="#courses">
+          <Button filled>Kurse entdecken</Button>
+        </a>
+      </div>
+    );
+  }
 
   return (
     <>

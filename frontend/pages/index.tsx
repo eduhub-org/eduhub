@@ -50,9 +50,11 @@ const Home: FC = () => {
           </div>
         </div>
         <OnlyLoggedIn>
-          <MyCourses />
+          <div className="mt-11">
+            <MyCourses />
+          </div>
         </OnlyLoggedIn>
-        <h2 className="text-3xl font-semibold text-center mt-20">
+        <h2 id="courses" className="text-3xl font-semibold text-center mt-20">
           {t("findCourses")}
         </h2>
         <div className="mt-11">
