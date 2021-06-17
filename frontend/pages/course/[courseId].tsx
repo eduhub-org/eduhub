@@ -1,4 +1,6 @@
 import { useQuery } from "@apollo/client";
+import { useKeycloak } from "@react-keycloak/ssr";
+import { KeycloakInstance } from "keycloak-js";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -10,6 +12,7 @@ import { PageBlock } from "../../components/common/PageBlock";
 import { CoursePageDescriptionView } from "../../components/course/CoursePageDescriptionView";
 import { CoursePageStudentView } from "../../components/course/CoursePageStudentView";
 import { TabSelection } from "../../components/course/TabSelection";
+import { useIsLoggedIn } from "../../hooks/authentication";
 import { Course } from "../../queries/__generated__/Course";
 import { COURSE } from "../../queries/course";
 
@@ -33,9 +36,26 @@ const CoursePage: FC = () => {
   const router = useRouter();
   const { courseId, tab: tabParam } = router.query;
   const { t, i18n } = useTranslation("course-page");
+  const isLoggedIn = useIsLoggedIn();
 
   const id = parseInt(courseId as string, 10);
   const tab = typeof tabParam === "string" ? parseInt(tabParam, 10) : 0;
+
+  /// REMOVE FROM HERE ON
+  const { keycloak } = useKeycloak<KeycloakInstance>();
+
+  const token = keycloak?.token;
+
+  console.dir(token);
+
+  if (typeof window !== "undefined") {
+    if (token) {
+      window.localStorage.setItem("token", token);
+    } else {
+      window.localStorage.removeItem("token");
+    }
+  }
+  // UNTIL HERE
 
   const { data: courseData, loading, error } = useQuery<Course>(COURSE, {
     variables: {
@@ -55,21 +75,27 @@ const CoursePage: FC = () => {
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Page>
-        <PageBlock>
-          <div className="py-4">
-            <TabSelection
-              currentTab={tab}
-              tabs={["zur Kursbeschreibung", "laufender Kurs"]}
-            />
-          </div>
-        </PageBlock>
-        {tab === 0 ? (
+      {isLoggedIn ? (
+        <Page>
+          <PageBlock>
+            <div className="py-4">
+              <TabSelection
+                currentTab={tab}
+                tabs={["zur Kursbeschreibung", "laufender Kurs"]}
+              />
+            </div>
+          </PageBlock>
+          {tab === 0 ? (
+            <CoursePageDescriptionView course={course} />
+          ) : (
+            <CoursePageStudentView course={course} />
+          )}
+        </Page>
+      ) : (
+        <Page>
           <CoursePageDescriptionView course={course} />
-        ) : (
-          <CoursePageStudentView course={course} />
-        )}
-      </Page>
+        </Page>
+      )}
     </div>
   );
 };
