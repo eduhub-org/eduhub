@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: CourseList
+// GraphQL fragment: CourseFragment
 // ====================================================
 
-export interface CourseList_Course_CourseInstructors_Instructor_Person {
+export interface CourseFragment_CourseInstructors_Instructor_Person {
   __typename: "Person";
   Firstname: string;
   Image: string | null;
@@ -15,27 +15,27 @@ export interface CourseList_Course_CourseInstructors_Instructor_Person {
   Id: number;
 }
 
-export interface CourseList_Course_CourseInstructors_Instructor {
+export interface CourseFragment_CourseInstructors_Instructor {
   __typename: "Instructor";
   /**
    * An object relationship
    */
-  Person: CourseList_Course_CourseInstructors_Instructor_Person;
+  Person: CourseFragment_CourseInstructors_Instructor_Person;
   Description: string | null;
   Qualification: string | null;
   Id: number;
 }
 
-export interface CourseList_Course_CourseInstructors {
+export interface CourseFragment_CourseInstructors {
   __typename: "CourseInstructor";
   /**
    * An object relationship
    */
-  Instructor: CourseList_Course_CourseInstructors_Instructor;
+  Instructor: CourseFragment_CourseInstructors_Instructor;
   Id: number;
 }
 
-export interface CourseList_Course_Sessions {
+export interface CourseFragment_Sessions {
   __typename: "Session";
   Id: number;
   Description: string;
@@ -44,7 +44,7 @@ export interface CourseList_Course_Sessions {
   Title: string;
 }
 
-export interface CourseList_Course {
+export interface CourseFragment {
   __typename: "Course";
   BookingDeadline: any;
   Cost: string;
@@ -65,7 +65,7 @@ export interface CourseList_Course {
   /**
    * An array relationship
    */
-  CourseInstructors: CourseList_Course_CourseInstructors[];
+  CourseInstructors: CourseFragment_CourseInstructors[];
   Ects: string;
   Status: number;
   MaxMissedDates: number;
@@ -73,12 +73,5 @@ export interface CourseList_Course {
   /**
    * An array relationship
    */
-  Sessions: CourseList_Course_Sessions[];
-}
-
-export interface CourseList {
-  /**
-   * fetch data from the table: "Course"
-   */
-  Course: CourseList_Course[];
+  Sessions: CourseFragment_Sessions[];
 }

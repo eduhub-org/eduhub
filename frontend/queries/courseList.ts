@@ -1,23 +1,12 @@
 import { gql } from "@apollo/client";
 
+import { COURSE_FRAGMENT } from "./courseFragment";
+
 export const COURSE_LIST = gql`
+  ${COURSE_FRAGMENT}
   query CourseList {
     Course {
-      Cost
-      DayOfTheWeek
-      CourseType
-      Description
-      Difficulty
-      Duration
-      Ects
-      Id
-      Image
-      Language
-      MaxParticipants
-      Name
-      Semester
-      ShortDescription
-      TimeOfStart
+      ...CourseFragment
     }
   }
 `;
