@@ -1,6 +1,3 @@
-import { useQuery } from "@apollo/client";
-import { useKeycloak } from "@react-keycloak/ssr";
-import { KeycloakInstance } from "keycloak-js";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -12,6 +9,7 @@ import { PageBlock } from "../../components/common/PageBlock";
 import { CoursePageDescriptionView } from "../../components/course/CoursePageDescriptionView";
 import { CoursePageStudentView } from "../../components/course/CoursePageStudentView";
 import { TabSelection } from "../../components/course/TabSelection";
+import { useAuthedQuery } from "../../hooks/authedQuery";
 import { useIsLoggedIn } from "../../hooks/authentication";
 import { Course } from "../../queries/__generated__/Course";
 import { COURSE } from "../../queries/course";
@@ -41,23 +39,7 @@ const CoursePage: FC = () => {
   const id = parseInt(courseId as string, 10);
   const tab = typeof tabParam === "string" ? parseInt(tabParam, 10) : 0;
 
-  /// REMOVE FROM HERE ON
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-
-  const token = keycloak?.token;
-
-  console.dir(token);
-
-  if (typeof window !== "undefined") {
-    if (token) {
-      window.localStorage.setItem("token", token);
-    } else {
-      window.localStorage.removeItem("token");
-    }
-  }
-  // UNTIL HERE
-
-  const { data: courseData, loading, error } = useQuery<Course>(COURSE, {
+  const { data: courseData, loading, error } = useAuthedQuery<Course>(COURSE, {
     variables: {
       id,
     },
