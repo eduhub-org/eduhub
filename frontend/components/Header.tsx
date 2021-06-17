@@ -8,8 +8,8 @@ import { OnlyDesktop } from "./common/OnlyDesktop";
 export const Header: FC = () => {
   return (
     <header className="flex w-full p-4">
-      <div className="flex w-full">
-        <div>
+      <div className="flex w-full items-center">
+        <div className="flex items-center">
           <Image
             src="/images/edu_logo.svg"
             alt="Edu Hub logo"
@@ -18,7 +18,7 @@ export const Header: FC = () => {
             priority
           />
         </div>
-        <div className="ml-2">
+        <div className="flex items-center ml-2">
           <Image
             src="/images/EDU_HUB_name.svg"
             alt="Edu Hub name"
