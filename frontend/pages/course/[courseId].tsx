@@ -46,7 +46,7 @@ const CoursePage: FC = () => {
   const course = courseData?.Course_by_pk;
 
   if (!course) {
-    return <div>Kurs nicht verfügbar</div>;
+    return <div>{t("courseNotAvailable")}</div>;
   }
 
   return (

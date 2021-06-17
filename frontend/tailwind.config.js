@@ -17,6 +17,9 @@ module.exports = {
     listStyleType: {
       check: "{ list-style-image: url(img/iphone.png); }",
     },
+    minWidth: {
+      menu: "225px",
+    },
   },
   variants: {
     extend: {},

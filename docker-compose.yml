@@ -26,7 +26,7 @@ services:
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       ## uncomment next line to set an admin secret
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
-      HASURA_GRAPHQL_JWT_SECRET: '{ "type": "RS256", "jwk_url": "http://keycloak:8080/auth/realms/master/protocol/openid-connect/certs" }'
+      HASURA_GRAPHQL_JWT_SECRET: '{ "type": "RS256", "jwk_url": "http://keycloak:8080/auth/realms/edu-hub/protocol/openid-connect/certs" }'
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
     volumes:
       - ./backend/migrations:/hasura-migrations
@@ -52,6 +52,9 @@ services:
       DB_ADDR: db_keycloak
       DB_USER: keycloak
       DB_PASSWORD: password
+      KEYCLOAK_IMPORT: /realm.json
+    volumes:
+      - ./keycloak/staging-realm.json:/realm.json
 
   db_keycloak:
     image: postgres:12

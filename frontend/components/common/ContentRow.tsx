@@ -14,12 +14,12 @@ export const ContentRow: FC<IProps> = ({
   return (
     <div
       className={
-        "flex flex-col sm:flex-row space-x-0 space-y-24 sm:space-x-24 sm:space-y-0 " +
+        "flex flex-col lg:flex-row space-x-0 space-y-24 lg:space-x-6 lg:space-y-0 " +
         className
       }
     >
-      <div className="flex flex-1">{leftTop}</div>
-      <div className="flex flex-1">{rightBottom}</div>
+      {leftTop}
+      {rightBottom}
     </div>
   );
 };

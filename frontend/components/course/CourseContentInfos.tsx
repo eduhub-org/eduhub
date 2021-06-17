@@ -8,13 +8,15 @@ interface IProps {
 }
 
 export const CourseContentInfos: FC<IProps> = ({ course }) => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation("course-page");
 
   return (
-    <div className="flex flex-1 flex-col mb-8 sm:mb-24">
-      <span className="text-3xl font-semibold mt-24 mb-9">Du wirst lernen</span>
+    <div className="flex flex-1 flex-col">
+      <span className="text-3xl font-semibold mb-9">{t("youWillLearn")}</span>
       <div dangerouslySetInnerHTML={{ __html: course.Description }} />
-      <span className="text-3xl font-semibold mt-24 mb-9">Kursinhalte</span>
+      <span className="text-3xl font-semibold mt-24 mb-9">
+        {t("courseContent")}
+      </span>
       <ul>
         {course.Sessions.map(({ Start, Title }, index) => (
           <li key={index} className="flex mb-4">

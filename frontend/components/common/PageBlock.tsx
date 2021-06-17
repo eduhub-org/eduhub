@@ -1,5 +1,9 @@
-import { Children, FC } from "react";
+import { FC } from "react";
 
-export const PageBlock: FC = ({ children }) => {
-  return <div className="mx-6 xl:mx-0">{children}</div>;
+interface IProps {
+  classname?: string;
+}
+
+export const PageBlock: FC<IProps> = ({ children, classname }) => {
+  return <div className={`mx-6 xl:mx-0 ${classname}`}>{children}</div>;
 };
