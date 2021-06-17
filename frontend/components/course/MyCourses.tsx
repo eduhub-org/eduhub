@@ -3,6 +3,7 @@ import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance } from "keycloak-js";
 import { FC } from "react";
 
+import { useAuthedQuery } from "../../hooks/authedQuery";
 import { useIsLoggedIn } from "../../hooks/authentication";
 import { PARTICIPATING } from "../../queries/participating";
 
@@ -11,19 +12,7 @@ import { TileSlider } from "./TileSlider";
 interface IProps {}
 
 export const MyCourses: FC<IProps> = () => {
-  const isLoggedIn = useIsLoggedIn();
-
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-
-  const token = keycloak?.token;
-
-  console.dir(token);
-
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem("token", token ?? "");
-  }
-
-  const { data, loading, error } = useQuery(PARTICIPATING, {
+  const { data, loading, error } = useAuthedQuery(PARTICIPATING, {
     variables: { id: 12 },
   });
 
