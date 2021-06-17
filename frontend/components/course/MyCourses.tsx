@@ -1,6 +1,7 @@
 import { FC } from "react";
 
 import { useAuthedQuery } from "../../hooks/authedQuery";
+import { Participating } from "../../queries/__generated__/Participating";
 import { PARTICIPATING } from "../../queries/participating";
 import { Button } from "../common/Button";
 
@@ -9,15 +10,15 @@ import { TileSlider } from "./TileSlider";
 interface IProps {}
 
 export const MyCourses: FC<IProps> = () => {
-  const { data, loading, error } = useAuthedQuery(PARTICIPATING, {
-    variables: { id: 12 },
-  });
-
-  console.log("d", data, error);
+  const { data, loading, error } = useAuthedQuery<Participating>(
+    PARTICIPATING,
+    {
+      variables: { id: 12 },
+    }
+  );
 
   const enrollments = data?.Person_by_pk?.Participants?.[0]?.Enrollments;
   const courses = enrollments?.map((enrollment) => enrollment.Course) ?? [];
-  console.log("c", courses);
 
   if ((courses.length ?? 0) <= 0) {
     return (
