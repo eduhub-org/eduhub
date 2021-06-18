@@ -27,9 +27,11 @@ export const CourseApplicationModal: FC<IProps> = ({
       disableEnforceFocus
       disableBackdropClick={text.length > 0}
     >
-      <div className="m-16 rounded bg-white">
-        <div className="p-6 cursor-pointer" onClick={closeModal}>
-          <Image src="/images/common/x-calibur.svg" width={22} height={21} />
+      <div className="w-full sm:w-auto h-full sm:h-auto sm:m-16 sm:rounded bg-white">
+        <div className="flex">
+          <div className="flex p-6 cursor-pointer" onClick={closeModal}>
+            <Image src="/images/common/x-calibur.svg" width={22} height={21} />
+          </div>
         </div>
         <div className="flex flex-col mt-4 mx-20">
           <span className="text-base mb-2">{t("applicationFor")}</span>
