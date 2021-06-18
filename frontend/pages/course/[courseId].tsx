@@ -1,4 +1,3 @@
-import { useQuery } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import Image from "next/image";
@@ -7,20 +6,25 @@ import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Page } from "../../components/Page";
-import { Button } from "../../components/common/Button";
 import { ContentRow } from "../../components/common/ContentRow";
 import { PageBlock } from "../../components/common/PageBlock";
+import { ApplyButton } from "../../components/course/ApplyButton";
 import { CourseContentInfos } from "../../components/course/CourseContentInfos";
 import { CourseEndTime } from "../../components/course/CourseEndTime";
 import { CourseMetaInfos } from "../../components/course/CourseMetaInfos";
 import { CourseStartTime } from "../../components/course/CourseStartTime";
 import { CourseWeekday } from "../../components/course/CourseWeekday";
+import { useAuthedQuery } from "../../hooks/authedQuery";
 import { Course } from "../../queries/__generated__/Course";
 import { COURSE } from "../../queries/course";
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
-    ...(await serverSideTranslations(locale, ["common", "course-page"])),
+    ...(await serverSideTranslations(locale, [
+      "common",
+      "course-page",
+      "course-application",
+    ])),
   },
 });
 
@@ -41,7 +45,7 @@ const CoursePage: FC = () => {
 
   const id = parseInt(courseId as string, 10);
 
-  const { data: courseData, loading, error } = useQuery<Course>(COURSE, {
+  const { data: courseData, loading, error } = useAuthedQuery<Course>(COURSE, {
     variables: {
       id,
     },
@@ -88,7 +92,7 @@ const CoursePage: FC = () => {
               }
               rightBottom={
                 <div className="flex flex-1 flex-col justify-center items-center max-w-sm">
-                  <Button filled>{t("applyNow")}</Button>
+                  <ApplyButton course={course} />
                   <span className="text-xs mt-4">
                     {t("applicationDeadline")}{" "}
                     {course.BookingDeadline.toLocaleDateString(i18n.languages, {
