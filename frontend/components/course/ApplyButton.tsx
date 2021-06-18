@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
@@ -13,16 +13,22 @@ interface IProps {
 export const ApplyButton: FC<IProps> = ({ course }) => {
   const { t } = useTranslation("course-application");
   const [isModalVisible, setModalVisible] = useState(false);
+
+  const toggleModalVisibility = useCallback(
+    () => setModalVisible((currentlyVisible) => !currentlyVisible),
+    []
+  );
+  const hideModal = useCallback(() => setModalVisible(false), []);
   return (
     <>
       <div className="cursor-pointer">
-        <Button filled onClick={() => setModalVisible(!isModalVisible)}>
+        <Button filled onClick={toggleModalVisibility}>
           {t("applyNow")}
         </Button>
       </div>
       <CourseApplicationModal
         visible={isModalVisible}
-        closeModal={() => setModalVisible(false)}
+        closeModal={hideModal}
         course={course}
       />
     </>

@@ -2,7 +2,7 @@ import { Modal } from "@material-ui/core";
 import Fade from "@material-ui/core/Fade";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
-import { FC, useState } from "react";
+import { FC, useCallback, useState } from "react";
 
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
 import { Button } from "../common/Button";
@@ -20,6 +20,11 @@ export const CourseApplicationModal: FC<IProps> = ({
 }) => {
   const { t } = useTranslation("course-application");
   const [text, setText] = useState("");
+
+  const onChangeText = useCallback((event) => {
+    setText(event.target.value);
+  }, []);
+
   return (
     <Modal
       open={visible}
@@ -50,9 +55,7 @@ export const CourseApplicationModal: FC<IProps> = ({
             </span>
             <span className="font-semibold mt-12">{t("motivationalText")}</span>
             <textarea
-              onChange={(event) => {
-                setText(event.target.value);
-              }}
+              onChange={onChangeText}
               className="h-48 mt-3 bg-gray-100 focus:border-none"
               value={text}
               placeholder={t("motivationalTextPlaceholder")}
