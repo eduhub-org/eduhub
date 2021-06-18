@@ -11,13 +11,15 @@ interface IProps {
 }
 
 export const ApplyButton: FC<IProps> = ({ course }) => {
-  const { t } = useTranslation("apply-button");
+  const { t } = useTranslation("course-application");
   const [isModalVisible, setModalVisible] = useState(false);
   return (
     <>
-      <Button filled onClick={() => setModalVisible(!isModalVisible)}>
-        {t("applyNow")}
-      </Button>
+      <div className="cursor-pointer">
+        <Button filled onClick={() => setModalVisible(!isModalVisible)}>
+          {t("applyNow")}
+        </Button>
+      </div>
       <CourseApplicationModal
         visible={isModalVisible}
         closeModal={() => setModalVisible(false)}
