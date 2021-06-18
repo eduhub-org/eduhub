@@ -40,7 +40,7 @@ export const CourseApplicationModal: FC<IProps> = ({
               />
             </div>
           </div>
-          <div className="flex flex-col mt-4 mx-20">
+          <div className="flex flex-col mt-4 mx-6 sm:mx-20">
             <span className="text-base mb-2">{t("applicationFor")}</span>
             <span className="text-3xl font-semibold">{course.Name}</span>
             <span className="text-base">Anforderungen</span>
