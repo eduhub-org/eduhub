@@ -5,7 +5,7 @@ import { withStyles } from "@material-ui/core/styles";
 import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance } from "keycloak-js";
 import { useRouter } from "next/router";
-import { FC } from "react";
+import { FC, useCallback } from "react";
 
 interface IProps {
   anchorElement: HTMLElement;
@@ -33,9 +33,24 @@ const StyledMenu = withStyles({
   />
 ));
 
+const noop = () => {
+  /* does nothing, yeah */
+};
+
 export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
   const router = useRouter();
+
+  const hideMenu = useCallback(() => setVisible(false), [setVisible]);
+  const logout = useCallback(() => {
+    const url = keycloak?.createLogoutUrl({
+      redirectUri: window.location.href,
+    });
+
+    if (!url) return;
+    router.push(new URL(url));
+    setVisible(false);
+  }, [setVisible, router, keycloak]);
 
   return (
     <StyledMenu
@@ -43,24 +58,14 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       anchorEl={anchorElement}
       // keepMounted
       open={isVisible}
-      onClose={() => setVisible(false)}
+      onClose={hideMenu}
       TransitionComponent={Fade}
       className="min-w-full"
     >
-      <MenuItem onClick={() => {}}>
+      <MenuItem onClick={noop}>
         <span className="text-lg font-bold">Profile</span>
       </MenuItem>
-      <MenuItem
-        onClick={() => {
-          const url = keycloak?.createLogoutUrl({
-            redirectUri: window.location.href,
-          });
-
-          if (!url) return;
-          router.push(new URL(url));
-          setVisible(false);
-        }}
-      >
+      <MenuItem onClick={logout}>
         <span className="text-lg">Logout</span>
       </MenuItem>
     </StyledMenu>

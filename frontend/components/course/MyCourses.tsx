@@ -7,9 +7,7 @@ import { Button } from "../common/Button";
 
 import { TileSlider } from "./TileSlider";
 
-interface IProps {}
-
-export const MyCourses: FC<IProps> = () => {
+export const MyCourses: FC = () => {
   const { data, loading, error } = useAuthedQuery<Participating>(
     PARTICIPATING,
     {
