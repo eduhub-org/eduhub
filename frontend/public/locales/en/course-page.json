@@ -1,0 +1,10 @@
+{
+  "applicationDeadline": "application deadline",
+  "applyNow": "apply now",
+  "courseIsFree": "This course is for free",
+  "courseContent": "course content",
+  "courseCosts": "this course costs {{price}}",
+  "courseNotAvailable": "course not available anymore",
+  "ects": "ECTS",
+  "youWillLearn": "you will learn"
+}

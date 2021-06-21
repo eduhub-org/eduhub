@@ -4,5 +4,21 @@
   },
   "registerButton": {
     "title": "registrieren"
-  }
+  },
+  "Monday": "Montag",
+  "Monday-short": "Mo",
+  "Tuesday": "Dienstag",
+  "Tuesday-short": "Di",
+  "Wednesday": "Mittwoch",
+  "Wednesday-short": "Mi",
+  "Thursday": "Donnerstag",
+  "Thursday-short": "Do",
+  "Friday": "Freitag",
+  "Friday-short": "Fr",
+  "Saturday": "Samstag",
+  "Saturday-short": "Sa",
+  "Sunday": "Sonntag",
+  "Sunday-short": "So",
+  "de": "Deutsch",
+  "en": "Englisch"
 }
