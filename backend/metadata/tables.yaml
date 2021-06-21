@@ -87,6 +87,26 @@
       foreign_key_constraint_on: InstructorId
 - table:
     schema: public
+    name: CourseStatus
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
+- table:
+    schema: public
+    name: Employment
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
+- table:
+    schema: public
     name: Enrollment
   object_relationships:
   - name: Course
@@ -103,6 +123,16 @@
         table:
           schema: public
           name: ProjectEnrollment
+- table:
+    schema: public
+    name: EnrollmentStatus
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
 - table:
     schema: public
     name: Event
@@ -143,6 +173,26 @@
   - name: mailByMail
     using:
       foreign_key_constraint_on: Mail
+- table:
+    schema: public
+    name: MotivationGrade
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
+- table:
+    schema: public
+    name: OnlineHybridOffline
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
 - table:
     schema: public
     name: Participant
@@ -227,6 +277,16 @@
       foreign_key_constraint_on: ProjectId
 - table:
     schema: public
+    name: ProjectType
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
+- table:
+    schema: public
     name: Referent
   object_relationships:
   - name: Person
@@ -279,3 +339,23 @@
   - name: Session
     using:
       foreign_key_constraint_on: SessionId
+- table:
+    schema: public
+    name: SurveyType
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
+- table:
+    schema: public
+    name: University
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
