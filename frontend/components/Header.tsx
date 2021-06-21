@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { FC, MouseEvent, useState } from "react";
+import { FC, MouseEvent, useCallback, useState } from "react";
 
 import { useIsLoggedIn } from "../hooks/authentication";
 
@@ -14,12 +14,10 @@ export const Header: FC = () => {
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [menuAnchorElement, setMenuAnchorElement] = useState<HTMLElement>();
 
-  console.log("is logged in", isLoggedIn);
-
-  const openMenu = (event: MouseEvent<HTMLElement>) => {
+  const openMenu = useCallback((event: MouseEvent<HTMLElement>) => {
     setMenuAnchorElement(event.currentTarget);
     setMenuVisible(true);
-  };
+  }, []);
 
   return (
     <header className="flex w-full p-4">

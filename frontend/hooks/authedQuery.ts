@@ -8,7 +8,6 @@ export const useAuthedQuery: typeof useQuery = (query, options) => {
   const token = keycloak?.token;
 
   if (typeof window !== "undefined") {
-    console.log("token", token);
     if (token) {
       window.localStorage.setItem("token", token);
     } else {
