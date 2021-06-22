@@ -39,4 +39,3 @@ INSERT INTO public."Employment" ("Value", "Comment") VALUES ('RETIREE', '');
 INSERT INTO public."SurveyType" ("Value", "Comment") VALUES ('START', '');
 INSERT INTO public."SurveyType" ("Value", "Comment") VALUES ('END', '');
 INSERT INTO public."SurveyType" ("Value", "Comment") VALUES ('EXTERNAL', '');
-
