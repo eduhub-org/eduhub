@@ -68,50 +68,38 @@
       - CourseType
       - DayOfTheWeek
       - Description
-      - Difficulty
       - Duration
       - Ects
       - Id
       - Image
       - Language
-      - MaxMissedDates
       - MaxParticipants
-      - MaxProjectParticipants
       - Name
-      - Semester
+      - OnlineCourses
+      - SemesterId
       - ShortDescription
       - Status
+      - TextOnCertificate
       - TimeOfStart
       filter: {}
   - role: user
     permission:
       columns:
-      - AttendanceCertificatePossible
       - BookingDeadline
-      - CertificatePossible
       - City
       - Cost
       - CourseType
-      - DatesOnCertificate
       - DayOfTheWeek
       - Description
-      - Difficulty
       - Duration
       - Ects
-      - ExternalProjectsAllowed
       - Id
       - Image
       - Language
-      - MaxMissedDates
       - MaxParticipants
-      - MaxProjectParticipants
       - Name
       - OnlineCourses
-      - OnlineCoursesAllowed
-      - Online_Hybrid_Offline
-      - Projects
-      - ProjectsAllowed
-      - Semester
+      - SemesterId
       - ShortDescription
       - Status
       - TextOnCertificate
