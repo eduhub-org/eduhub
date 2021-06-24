@@ -68,50 +68,38 @@
       - CourseType
       - DayOfTheWeek
       - Description
-      - Difficulty
       - Duration
       - Ects
       - Id
       - Image
       - Language
-      - MaxMissedDates
       - MaxParticipants
-      - MaxProjectParticipants
       - Name
-      - Semester
+      - OnlineCourses
+      - SemesterId
       - ShortDescription
       - Status
+      - TextOnCertificate
       - TimeOfStart
       filter: {}
   - role: user
     permission:
       columns:
-      - AttendanceCertificatePossible
       - BookingDeadline
-      - CertificatePossible
       - City
       - Cost
       - CourseType
-      - DatesOnCertificate
       - DayOfTheWeek
       - Description
-      - Difficulty
       - Duration
       - Ects
-      - ExternalProjectsAllowed
       - Id
       - Image
       - Language
-      - MaxMissedDates
       - MaxParticipants
-      - MaxProjectParticipants
       - Name
       - OnlineCourses
-      - OnlineCoursesAllowed
-      - Online_Hybrid_Offline
-      - Projects
-      - ProjectsAllowed
-      - Semester
+      - SemesterId
       - ShortDescription
       - Status
       - TextOnCertificate
@@ -147,6 +135,28 @@
       - Id
       - CourseId
       - InstructorId
+      filter: {}
+- table:
+    schema: public
+    name: CourseStatus
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
+- table:
+    schema: public
+    name: Employment
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
       filter: {}
 - table:
     schema: public
@@ -187,6 +197,17 @@
       - UploadFile
       - CertificateUrl
       - CertificateOfParticipationUrl
+      filter: {}
+- table:
+    schema: public
+    name: EnrollmentStatus
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
       filter: {}
 - table:
     schema: public
@@ -247,6 +268,28 @@
   - name: mailByMail
     using:
       foreign_key_constraint_on: Mail
+- table:
+    schema: public
+    name: MotivationGrade
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
+- table:
+    schema: public
+    name: OnlineHybridOffline
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
 - table:
     schema: public
     name: Participant
@@ -364,6 +407,17 @@
       foreign_key_constraint_on: ProjectId
 - table:
     schema: public
+    name: ProjectType
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
+- table:
+    schema: public
     name: Referent
   object_relationships:
   - name: Person
@@ -377,6 +431,9 @@
         table:
           schema: public
           name: SessionReferent
+- table:
+    schema: public
+    name: Semester
 - table:
     schema: public
     name: Session
@@ -443,3 +500,25 @@
   - name: Session
     using:
       foreign_key_constraint_on: SessionId
+- table:
+    schema: public
+    name: SurveyType
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
+- table:
+    schema: public
+    name: University
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}

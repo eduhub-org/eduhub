@@ -1,0 +1,1 @@
+CREATE TABLE "public"."Semester"("Id" serial NOT NULL, "Name" text NOT NULL, "Start" date, "End" date, "ApplicationStart" date, "ApplicationEnd" date, "PerformanceRecordDeadline" date, "Visibility" boolean NOT NULL DEFAULT false, PRIMARY KEY ("Id") , UNIQUE ("Id"));
