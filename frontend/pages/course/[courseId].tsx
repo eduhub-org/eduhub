@@ -60,8 +60,6 @@ const CoursePage: FC = () => {
 
   const course = courseData?.Course_by_pk;
 
-  console.log("Course", course);
-
   if (!course) {
     return <div>{t("courseNotAvailable")}</div>;
   }

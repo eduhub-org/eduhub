@@ -10,16 +10,6 @@ export const useAuthedMutation: typeof useMutation = (
 
   const token = keycloak?.token;
 
-  // if (typeof window !== "undefined") {
-  //   if (token) {
-  //     window.localStorage.setItem("token", token);
-  //   } else {
-  //     window.localStorage.removeItem("token");
-  //   }
-  // }
-
-  console.log("Auche", token);
-
   const options = token
     ? {
         ...passedOptions,
