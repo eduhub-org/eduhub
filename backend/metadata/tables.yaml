@@ -47,31 +47,6 @@
         table:
           schema: public
           name: Session
-  select_permissions:
-  - role: anonymous
-    permission:
-      columns:
-      - BookingDeadline
-      - City
-      - Cost
-      - CourseType
-      - DayOfTheWeek
-      - Description
-      - Difficulty
-      - Duration
-      - Ects
-      - Id
-      - Image
-      - Language
-      - MaxMissedDates
-      - MaxParticipants
-      - MaxProjectParticipants
-      - Name
-      - Semester
-      - ShortDescription
-      - Status
-      - TimeOfStart
-      filter: {}
 - table:
     schema: public
     name: CourseButtons
@@ -98,6 +73,28 @@
       filter: {}
 - table:
     schema: public
+    name: CourseStatus
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
+- table:
+    schema: public
+    name: Employment
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
+- table:
+    schema: public
     name: Enrollment
   object_relationships:
   - name: Course
@@ -114,6 +111,17 @@
         table:
           schema: public
           name: ProjectEnrollment
+- table:
+    schema: public
+    name: EnrollmentStatus
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
 - table:
     schema: public
     name: Event
@@ -164,6 +172,28 @@
   - name: mailByMail
     using:
       foreign_key_constraint_on: Mail
+- table:
+    schema: public
+    name: MotivationGrade
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
+- table:
+    schema: public
+    name: OnlineHybridOffline
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
 - table:
     schema: public
     name: Participant
@@ -257,6 +287,17 @@
       foreign_key_constraint_on: ProjectId
 - table:
     schema: public
+    name: ProjectType
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
+- table:
+    schema: public
     name: Referent
   object_relationships:
   - name: Person
@@ -270,6 +311,9 @@
         table:
           schema: public
           name: SessionReferent
+- table:
+    schema: public
+    name: Semester
 - table:
     schema: public
     name: Session
@@ -323,3 +367,25 @@
   - name: Session
     using:
       foreign_key_constraint_on: SessionId
+- table:
+    schema: public
+    name: SurveyType
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
+- table:
+    schema: public
+    name: University
+  is_enum: true
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - Value
+      - Comment
+      filter: {}
