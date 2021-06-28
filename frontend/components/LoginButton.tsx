@@ -7,8 +7,7 @@ import { useTranslation } from "react-i18next";
 
 import { Button } from "./common/Button";
 
-export const LoginButton: FC = () => {
-  const { t } = useTranslation();
+export const useLogin = () => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
   const router = useRouter();
 
@@ -20,6 +19,14 @@ export const LoginButton: FC = () => {
     if (!url) return;
     router.push(new URL(url));
   }, [keycloak, router]);
+
+  return performLogin;
+};
+
+export const LoginButton: FC = () => {
+  const { t } = useTranslation();
+
+  const performLogin = useLogin();
 
   return <Button onClick={performLogin}>{t("loginButton.title")}</Button>;
 };

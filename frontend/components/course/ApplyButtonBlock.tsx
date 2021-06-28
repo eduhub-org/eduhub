@@ -6,14 +6,14 @@ import { Button } from "../common/Button";
 
 interface IProps {
   course: Course_Course_by_pk;
-  showModal: () => void;
+  onClickApply: () => void;
 }
 
-export const ApplyButtonBlock: FC<IProps> = ({ course, showModal }) => {
+export const ApplyButtonBlock: FC<IProps> = ({ course, onClickApply }) => {
   const { t, i18n } = useTranslation("course-page");
   return (
     <div className="flex flex-1 flex-col justify-center items-center">
-      <Button filled onClick={showModal}>
+      <Button filled onClick={onClickApply}>
         {t("applyNow")}
       </Button>
       <span className="text-xs mt-4">
