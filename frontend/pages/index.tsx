@@ -1,3 +1,4 @@
+import { useQuery } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import Link from "next/link";
@@ -12,7 +13,6 @@ import { OnlyLoggedIn } from "../components/common/OnlyLoggedIn";
 import { OnlyLoggedOut } from "../components/common/OnlyLoggedOut";
 import { MyCourses } from "../components/course/MyCourses";
 import { TileSlider } from "../components/course/TileSlider";
-import { useAuthedQuery } from "../hooks/authedQuery";
 import { CourseList } from "../queries/__generated__/CourseList";
 import { COURSE_LIST } from "../queries/courseList";
 
@@ -24,9 +24,7 @@ export const getStaticProps = async ({ locale }: { locale: string }) => ({
 
 const Home: FC = () => {
   const { t } = useTranslation("start-page");
-  const { data: courses, loading, error } = useAuthedQuery<CourseList>(
-    COURSE_LIST
-  );
+  const { data: courses, loading, error } = useQuery<CourseList>(COURSE_LIST);
 
   return (
     <>

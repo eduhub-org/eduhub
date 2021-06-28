@@ -1,3 +1,4 @@
+import { useMutation } from "@apollo/client";
 import { Modal } from "@material-ui/core";
 import Fade from "@material-ui/core/Fade";
 import { useTranslation } from "next-i18next";
@@ -5,6 +6,8 @@ import Image from "next/image";
 import { FC, useCallback, useState } from "react";
 
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
+import { InsertEnrollment } from "../../queries/__generated__/InsertEnrollment";
+import { INSERT_ENROLLMENT } from "../../queries/insertEnrollment";
 import { Button } from "../common/Button";
 
 interface IProps {
@@ -24,6 +27,18 @@ export const CourseApplicationModal: FC<IProps> = ({
   const onChangeText = useCallback((event) => {
     setText(event.target.value);
   }, []);
+
+  const [insertMutation] = useMutation<InsertEnrollment>(INSERT_ENROLLMENT);
+
+  const applyForCourse = () => {
+    insertMutation({
+      variables: {
+        courseId: course.Id,
+        participantId: 7061,
+        motivationLetter: text,
+      },
+    });
+  };
 
   return (
     <Modal
@@ -61,7 +76,9 @@ export const CourseApplicationModal: FC<IProps> = ({
               placeholder={t("motivationalTextPlaceholder")}
             />
             <div className="flex justify-center my-6">
-              <Button filled>{t("sendApplication")}</Button>
+              <Button filled onClick={applyForCourse}>
+                {t("sendApplication")}
+              </Button>
             </div>
           </div>
         </div>

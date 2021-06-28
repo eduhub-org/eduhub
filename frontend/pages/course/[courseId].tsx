@@ -1,3 +1,4 @@
+import { useQuery } from "@apollo/client";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import Image from "next/image";
@@ -8,13 +9,12 @@ import { useTranslation } from "react-i18next";
 import { Page } from "../../components/Page";
 import { ContentRow } from "../../components/common/ContentRow";
 import { PageBlock } from "../../components/common/PageBlock";
-import { ApplyButton } from "../../components/course/ApplyButton";
 import { CourseContentInfos } from "../../components/course/CourseContentInfos";
 import { CourseEndTime } from "../../components/course/CourseEndTime";
 import { CourseMetaInfos } from "../../components/course/CourseMetaInfos";
 import { CourseStartTime } from "../../components/course/CourseStartTime";
+import { CourseStatus } from "../../components/course/CourseStatus";
 import { CourseWeekday } from "../../components/course/CourseWeekday";
-import { useAuthedQuery } from "../../hooks/authedQuery";
 import { Course } from "../../queries/__generated__/Course";
 import { COURSE } from "../../queries/course";
 
@@ -41,17 +41,19 @@ export const getStaticPaths = async () => {
 const CoursePage: FC = () => {
   const router = useRouter();
   const { courseId } = router.query;
-  const { t, i18n } = useTranslation("course-page");
+  const { t } = useTranslation("course-page");
 
   const id = parseInt(courseId as string, 10);
 
-  const { data: courseData, loading, error } = useAuthedQuery<Course>(COURSE, {
+  const { data: courseData, loading, error } = useQuery<Course>(COURSE, {
     variables: {
       id,
     },
   });
 
   const course = courseData?.Course_by_pk;
+
+  console.log("Course", course);
 
   if (!course) {
     return <div>{t("courseNotAvailable")}</div>;
@@ -90,18 +92,7 @@ const CoursePage: FC = () => {
                   </span>
                 </div>
               }
-              rightBottom={
-                <div className="flex flex-1 flex-col justify-center items-center max-w-sm">
-                  <ApplyButton course={course} />
-                  <span className="text-xs mt-4">
-                    {t("applicationDeadline")}{" "}
-                    {course.BookingDeadline.toLocaleDateString(i18n.languages, {
-                      month: "2-digit",
-                      day: "2-digit",
-                    })}
-                  </span>
-                </div>
-              }
+              rightBottom={<CourseStatus course={course} />}
             />
           </PageBlock>
           <ContentRow

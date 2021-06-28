@@ -29,7 +29,7 @@ const authLink = setContext((_, { headers }) => {
 
 export const client = new ApolloClient({
   uri: process.env.GRAPHQL_URI ?? "http://localhost:8080/v1/graphql",
-  link: authLink.concat(httpLink),
+  link: httpLink,
   cache: new InMemoryCache({
     typePolicies: {
       Course: {

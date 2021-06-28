@@ -3,13 +3,13 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { EnrollmentStatus_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL fragment: CourseFragment
+// GraphQL query operation: MyCourses
 // ====================================================
 
-export interface CourseFragment_Sessions {
+export interface MyCourses_Enrollment_Course_Sessions {
   __typename: "Session";
   Id: number;
   Finish: any;
@@ -20,7 +20,7 @@ export interface CourseFragment_Sessions {
   Title: string;
 }
 
-export interface CourseFragment_CourseInstructors_Instructor_Person {
+export interface MyCourses_Enrollment_Course_CourseInstructors_Instructor_Person {
   __typename: "Person";
   Firstname: string;
   Image: string | null;
@@ -28,27 +28,27 @@ export interface CourseFragment_CourseInstructors_Instructor_Person {
   Lastname: string;
 }
 
-export interface CourseFragment_CourseInstructors_Instructor {
+export interface MyCourses_Enrollment_Course_CourseInstructors_Instructor {
   __typename: "Instructor";
   Id: number;
   /**
    * An object relationship
    */
-  Person: CourseFragment_CourseInstructors_Instructor_Person;
+  Person: MyCourses_Enrollment_Course_CourseInstructors_Instructor_Person;
   Qualification: string | null;
   Description: string | null;
 }
 
-export interface CourseFragment_CourseInstructors {
+export interface MyCourses_Enrollment_Course_CourseInstructors {
   __typename: "CourseInstructor";
   Id: number;
   /**
    * An object relationship
    */
-  Instructor: CourseFragment_CourseInstructors_Instructor;
+  Instructor: MyCourses_Enrollment_Course_CourseInstructors_Instructor;
 }
 
-export interface CourseFragment {
+export interface MyCourses_Enrollment_Course {
   __typename: "Course";
   Id: number;
   Ects: string;
@@ -71,9 +71,26 @@ export interface CourseFragment {
   /**
    * An array relationship
    */
-  Sessions: CourseFragment_Sessions[];
+  Sessions: MyCourses_Enrollment_Course_Sessions[];
   /**
    * An array relationship
    */
-  CourseInstructors: CourseFragment_CourseInstructors[];
+  CourseInstructors: MyCourses_Enrollment_Course_CourseInstructors[];
+}
+
+export interface MyCourses_Enrollment {
+  __typename: "Enrollment";
+  Id: number;
+  Status: EnrollmentStatus_enum;
+  /**
+   * An object relationship
+   */
+  Course: MyCourses_Enrollment_Course;
+}
+
+export interface MyCourses {
+  /**
+   * fetch data from the table: "Enrollment"
+   */
+  Enrollment: MyCourses_Enrollment[];
 }
