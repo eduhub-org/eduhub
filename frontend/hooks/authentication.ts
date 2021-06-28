@@ -4,5 +4,7 @@ import { KeycloakInstance } from "keycloak-js";
 export const useIsLoggedIn = (): boolean => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
 
-  return !!keycloak?.authenticated ?? false;
+  const token = keycloak?.token;
+
+  return (!!keycloak?.authenticated ?? false) && !!token;
 };

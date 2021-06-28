@@ -8,7 +8,7 @@ interface IProps {
 export const Button: FC<IProps> = ({ children, filled, onClick }) => {
   return (
     <span
-      className={`px-6 py-2 border-2 border-edu-black rounded-full items-center ${
+      className={`px-6 py-2 border-2 border-edu-black rounded-full items-center cursor-pointer select-none ${
         filled ? "bg-edu-black text-white" : "text-edu-black"
       }`}
       onClick={onClick}

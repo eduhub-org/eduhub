@@ -1,18 +1,23 @@
-import { useMutation } from "@apollo/client";
 import { Modal } from "@material-ui/core";
 import Fade from "@material-ui/core/Fade";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { FC, useCallback, useState } from "react";
 
+import { EnrollmentStatus_enum } from "../../__generated__/globalTypes";
+import { enrollmentStatusForCourse } from "../../helpers/courseHelpers";
+import { useAuthedMutation } from "../../hooks/authedMutation";
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
+import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
 import { InsertEnrollment } from "../../queries/__generated__/InsertEnrollment";
 import { INSERT_ENROLLMENT } from "../../queries/insertEnrollment";
-import { Button } from "../common/Button";
+
+import { CourseApplicationModalFormContent } from "./CourseApplicationModalFormContent";
+import { CourseApplicationModalSuccessContent } from "./CourseApplicationModalSuccessContent";
 
 interface IProps {
   closeModal: () => void;
-  course: Course_Course_by_pk;
+  course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk;
   visible: boolean;
 }
 
@@ -21,16 +26,18 @@ export const CourseApplicationModal: FC<IProps> = ({
   course,
   visible,
 }) => {
-  const { t } = useTranslation("course-application");
   const [text, setText] = useState("");
 
   const onChangeText = useCallback((event) => {
     setText(event.target.value);
   }, []);
 
-  const [insertMutation] = useMutation<InsertEnrollment>(INSERT_ENROLLMENT);
+  const [
+    insertMutation,
+    { data, loading, error },
+  ] = useAuthedMutation<InsertEnrollment>(INSERT_ENROLLMENT);
 
-  const applyForCourse = () => {
+  const applyForCourse = useCallback(() => {
     insertMutation({
       variables: {
         courseId: course.Id,
@@ -38,7 +45,9 @@ export const CourseApplicationModal: FC<IProps> = ({
         motivationLetter: text,
       },
     });
-  };
+  }, [course.Id, insertMutation, text]);
+
+  const status = enrollmentStatusForCourse(course);
 
   return (
     <Modal
@@ -61,25 +70,16 @@ export const CourseApplicationModal: FC<IProps> = ({
             </div>
           </div>
           <div className="flex flex-col mt-4 mx-6 sm:mx-20">
-            <span className="text-base mb-2">{t("applicationFor")}</span>
-            <span className="text-3xl font-semibold">{course.Name}</span>
-            <span className="text-base">Anforderungen</span>
-            <span className="text-sm">
-              Anforderungen Hier ein Text über die Anforderungen für den Kurs.
-              Wie lang ist der Text tatsächlich?
-            </span>
-            <span className="font-semibold mt-12">{t("motivationalText")}</span>
-            <textarea
-              onChange={onChangeText}
-              className="h-48 mt-3 bg-gray-100 focus:border-none"
-              value={text}
-              placeholder={t("motivationalTextPlaceholder")}
-            />
-            <div className="flex justify-center my-6">
-              <Button filled onClick={applyForCourse}>
-                {t("sendApplication")}
-              </Button>
-            </div>
+            {status === "NOT_APPLIED" ? (
+              <CourseApplicationModalFormContent
+                applyForCourse={applyForCourse}
+                course={course}
+                setText={onChangeText}
+                text={text}
+              />
+            ) : status === EnrollmentStatus_enum.APPLIED ? (
+              <CourseApplicationModalSuccessContent closeModal={closeModal} />
+            ) : null}
           </div>
         </div>
       </Fade>

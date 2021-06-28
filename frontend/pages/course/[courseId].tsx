@@ -15,8 +15,11 @@ import { CourseMetaInfos } from "../../components/course/CourseMetaInfos";
 import { CourseStartTime } from "../../components/course/CourseStartTime";
 import { CourseStatus } from "../../components/course/CourseStatus";
 import { CourseWeekday } from "../../components/course/CourseWeekday";
+import { useAuthedQuery } from "../../hooks/authedQuery";
+import { useIsLoggedIn } from "../../hooks/authentication";
 import { Course } from "../../queries/__generated__/Course";
 import { COURSE } from "../../queries/course";
+import { COURSE_WITH_ENROLLMENT } from "../../queries/courseWithEnrollment";
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
@@ -45,7 +48,11 @@ const CoursePage: FC = () => {
 
   const id = parseInt(courseId as string, 10);
 
-  const { data: courseData, loading, error } = useQuery<Course>(COURSE, {
+  const isLoggedIn = useIsLoggedIn();
+
+  const query = isLoggedIn ? COURSE_WITH_ENROLLMENT : COURSE;
+
+  const { data: courseData, loading, error } = useAuthedQuery<Course>(query, {
     variables: {
       id,
     },

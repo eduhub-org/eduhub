@@ -33,6 +33,7 @@ export const client = new ApolloClient({
   cache: new InMemoryCache({
     typePolicies: {
       Course: {
+        keyFields: ["Id"],
         fields: {
           BookingDeadline: {
             merge: (_, BookingDeadline) => {
@@ -45,6 +46,9 @@ export const client = new ApolloClient({
             },
           },
         },
+      },
+      Enrollment: {
+        keyFields: ["Id"],
       },
       Session: {
         fields: {

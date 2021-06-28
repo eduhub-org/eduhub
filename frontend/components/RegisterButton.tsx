@@ -21,8 +21,8 @@ export const RegisterButton: FC = () => {
   }, [keycloak, router]);
 
   return (
-    <div className="flex cursor-pointer" onClick={register}>
-      <Button filled>{t("registerButton.title")}</Button>
-    </div>
+    <Button filled onClick={register}>
+      {t("registerButton.title")}
+    </Button>
   );
 };

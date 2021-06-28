@@ -1,9 +1,11 @@
 import { gql } from "@apollo/client";
 
 import { COURSE_FRAGMENT } from "./courseFragment";
+import { ENROLLMENT_FRAGMENT } from "./enrollmentFragment";
 
 export const INSERT_ENROLLMENT = gql`
   ${COURSE_FRAGMENT}
+  ${ENROLLMENT_FRAGMENT}
   mutation InsertEnrollment(
     $participantId: Int!
     $courseId: Int!
@@ -19,19 +21,13 @@ export const INSERT_ENROLLMENT = gql`
     ) {
       affected_rows
       returning {
-        Id
+        ...EnrollmentFragment
         Course {
           ...CourseFragment
-        }
-        Participant {
-          Id
-          Person {
-            Id
-            Firstname
-            Lastname
+          Enrollments {
+            ...EnrollmentFragment
           }
         }
-        Status
       }
     }
   }

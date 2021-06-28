@@ -21,9 +21,5 @@ export const LoginButton: FC = () => {
     router.push(new URL(url));
   }, [keycloak, router]);
 
-  return (
-    <div className="flex cursor-pointer" onClick={performLogin}>
-      <Button>{t("loginButton.title")}</Button>
-    </div>
-  );
+  return <Button onClick={performLogin}>{t("loginButton.title")}</Button>;
 };
