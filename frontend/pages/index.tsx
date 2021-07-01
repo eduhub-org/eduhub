@@ -9,6 +9,9 @@ import { LoginButton } from "../components/LoginButton";
 import { Page } from "../components/Page";
 import { RegisterButton } from "../components/RegisterButton";
 import { Button } from "../components/common/Button";
+import { OnlyLoggedIn } from "../components/common/OnlyLoggedIn";
+import { OnlyLoggedOut } from "../components/common/OnlyLoggedOut";
+import { MyCourses } from "../components/course/MyCourses";
 import { TileSlider } from "../components/course/TileSlider";
 import { CourseList } from "../queries/__generated__/CourseList";
 import { COURSE_LIST } from "../queries/courseList";
@@ -39,15 +42,22 @@ const Home: FC = () => {
               {t("subheadline")}
             </span>
           </div>
-          <div className="flex justify-center mb-12">
-            <Link href="/register">
-              <a className="flex">
-                <Button filled>{t("registerNow")}</Button>
-              </a>
-            </Link>
-          </div>
+          <OnlyLoggedOut>
+            <div className="flex justify-center mb-12">
+              <Link href="/register">
+                <a className="flex">
+                  <Button filled>{t("registerNow")}</Button>
+                </a>
+              </Link>
+            </div>
+          </OnlyLoggedOut>
         </div>
-        <h2 className="text-3xl font-semibold text-center mt-20">
+        <OnlyLoggedIn>
+          <div className="mt-11">
+            <MyCourses />
+          </div>
+        </OnlyLoggedIn>
+        <h2 id="courses" className="text-3xl font-semibold text-center mt-20">
           {t("findCourses")}
         </h2>
         <div className="mt-11">
@@ -56,22 +66,24 @@ const Home: FC = () => {
         <div className="w-full flex justify-center mt-16 mb-24">
           <Button>{t("browse")}</Button>
         </div>
-        <div className="flex flex-col sm:flex-row mx-6 mt-6 mb-24 sm:mt-48">
-          <div className="flex flex-1 flex-col sm:items-center">
-            <div>
-              <h2 className="text-3xl font-semibold">
-                {t("continueLearning")}
-              </h2>
-              <h3 className="text-lg">{t("learnSubheadline")}</h3>
+        <OnlyLoggedOut>
+          <div className="flex flex-col sm:flex-row mx-6 mt-6 mb-24 sm:mt-48">
+            <div className="flex flex-1 flex-col sm:items-center">
+              <div>
+                <h2 className="text-3xl font-semibold">
+                  {t("continueLearning")}
+                </h2>
+                <h3 className="text-lg">{t("learnSubheadline")}</h3>
+              </div>
+            </div>
+            <div className="flex flex-1 justify-center mt-8">
+              <div className="flex justify-center items-center space-x-3">
+                <LoginButton />
+                <RegisterButton />
+              </div>
             </div>
           </div>
-          <div className="flex flex-1 justify-center mt-8">
-            <div className="flex justify-center items-center space-x-3">
-              <LoginButton />
-              <RegisterButton />
-            </div>
-          </div>
-        </div>
+        </OnlyLoggedOut>
       </Page>
     </>
   );

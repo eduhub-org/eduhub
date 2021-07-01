@@ -1,0 +1,38 @@
+import { FC } from "react";
+
+import { useAuthedQuery } from "../../hooks/authedQuery";
+import { MyCourses as MyCoursesType } from "../../queries/__generated__/MyCourses";
+import { MY_COURSES } from "../../queries/myCourses";
+import { Button } from "../common/Button";
+
+import { TileSlider } from "./TileSlider";
+
+export const MyCourses: FC = () => {
+  const { data, loading, error } = useAuthedQuery<MyCoursesType>(MY_COURSES);
+
+  const enrollments = data?.Enrollment ?? [];
+
+  const courses = enrollments?.map((enrollment) => enrollment.Course) ?? [];
+
+  if ((courses.length ?? 0) <= 0) {
+    return (
+      <div className="flex flex-col space-y-10 justify-center items-center">
+        <span className="text-xl font-bold">
+          Du hast noch keinen Kurs mit gemacht
+        </span>
+        <a href="#courses">
+          <Button filled>Kurse entdecken</Button>
+        </a>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <h2 className="text-3xl font-semibold text-center mt-20">Deine Kurse</h2>
+      <div className="mt-11">
+        <TileSlider courses={courses ?? []} />
+      </div>
+    </>
+  );
+};

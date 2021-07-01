@@ -47,6 +47,64 @@
         table:
           schema: public
           name: Session
+  select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+      - BookingDeadline
+      - City
+      - Cost
+      - CourseType
+      - DayOfTheWeek
+      - Description
+      - Duration
+      - Ects
+      - Id
+      - Image
+      - Language
+      - MaxParticipants
+      - Name
+      - OnlineCourses
+      - SemesterId
+      - ShortDescription
+      - Status
+      - TextOnCertificate
+      - TimeOfStart
+      filter: {}
+  - role: user
+    permission:
+      columns:
+      - AttendanceCertificatePossible
+      - BookingDeadline
+      - CertificatePossible
+      - City
+      - Cost
+      - CourseType
+      - DatesOnCertificate
+      - DayOfTheWeek
+      - Description
+      - Difficulty
+      - Duration
+      - Ects
+      - ExternalProjectsAllowed
+      - Id
+      - Image
+      - Language
+      - MaxMissedDates
+      - MaxParticipants
+      - MaxProjectParticipants
+      - Name
+      - OnlineCourses
+      - OnlineCoursesAllowed
+      - Online_Hybrid_Offline
+      - Projects
+      - ProjectsAllowed
+      - SemesterId
+      - ShortDescription
+      - Status
+      - TextOnCertificate
+      - TimeOfStart
+      filter: {}
 - table:
     schema: public
     name: CourseButtons
@@ -65,6 +123,13 @@
       foreign_key_constraint_on: InstructorId
   select_permissions:
   - role: anonymous
+    permission:
+      columns:
+      - CourseId
+      - Id
+      - InstructorId
+      filter: {}
+  - role: user
     permission:
       columns:
       - CourseId
@@ -111,6 +176,35 @@
         table:
           schema: public
           name: ProjectEnrollment
+  insert_permissions:
+  - role: user
+    permission:
+      check:
+        Participant:
+          Person:
+            AuthId:
+              _eq: X-Hasura-User-Id
+      columns:
+      - CourseId
+      - MotivationLetter
+      - ParticipantId
+      - WantsEcts
+      backend_only: false
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - CourseId
+      - Id
+      - MotivationLetter
+      - ParticipantId
+      - Status
+      - WantsEcts
+      filter:
+        Participant:
+          Person:
+            AuthId:
+              _eq: X-Hasura-User-Id
 - table:
     schema: public
     name: EnrollmentStatus
@@ -142,6 +236,15 @@
           name: CourseInstructor
   select_permissions:
   - role: anonymous
+    permission:
+      columns:
+      - Description
+      - Id
+      - PersonId
+      - Qualification
+      - WantsToContinue
+      filter: {}
+  - role: user
     permission:
       columns:
       - Description
@@ -209,6 +312,18 @@
         table:
           schema: public
           name: Enrollment
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - Id
+      - PersonId
+      - UNIRegistrationNumber
+      - University
+      filter:
+        Person:
+          AuthId:
+            _eq: X-Hasura-User-Id
 - table:
     schema: public
     name: Person
@@ -257,6 +372,14 @@
           name: Referent
   select_permissions:
   - role: anonymous
+    permission:
+      columns:
+      - Firstname
+      - Id
+      - Image
+      - Lastname
+      filter: {}
+  - role: user
     permission:
       columns:
       - Firstname
@@ -345,6 +468,19 @@
           name: SessionReferent
   select_permissions:
   - role: anonymous
+    permission:
+      columns:
+      - CourseId
+      - Description
+      - Finish
+      - Id
+      - Location
+      - Start
+      - SurveyId
+      - SurveyType
+      - Title
+      filter: {}
+  - role: user
     permission:
       columns:
       - CourseId

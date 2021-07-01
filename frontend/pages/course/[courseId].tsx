@@ -7,20 +7,27 @@ import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Page } from "../../components/Page";
-import { Button } from "../../components/common/Button";
 import { ContentRow } from "../../components/common/ContentRow";
 import { PageBlock } from "../../components/common/PageBlock";
 import { CourseContentInfos } from "../../components/course/CourseContentInfos";
 import { CourseEndTime } from "../../components/course/CourseEndTime";
 import { CourseMetaInfos } from "../../components/course/CourseMetaInfos";
 import { CourseStartTime } from "../../components/course/CourseStartTime";
+import { CourseStatus } from "../../components/course/CourseStatus";
 import { CourseWeekday } from "../../components/course/CourseWeekday";
+import { useAuthedQuery } from "../../hooks/authedQuery";
+import { useIsLoggedIn } from "../../hooks/authentication";
 import { Course } from "../../queries/__generated__/Course";
 import { COURSE } from "../../queries/course";
+import { COURSE_WITH_ENROLLMENT } from "../../queries/courseWithEnrollment";
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
-    ...(await serverSideTranslations(locale, ["common", "course-page"])),
+    ...(await serverSideTranslations(locale, [
+      "common",
+      "course-page",
+      "course-application",
+    ])),
   },
 });
 
@@ -37,11 +44,15 @@ export const getStaticPaths = async () => {
 const CoursePage: FC = () => {
   const router = useRouter();
   const { courseId } = router.query;
-  const { t, i18n } = useTranslation("course-page");
+  const { t } = useTranslation("course-page");
 
   const id = parseInt(courseId as string, 10);
 
-  const { data: courseData, loading, error } = useQuery<Course>(COURSE, {
+  const isLoggedIn = useIsLoggedIn();
+
+  const query = isLoggedIn ? COURSE_WITH_ENROLLMENT : COURSE;
+
+  const { data: courseData, loading, error } = useAuthedQuery<Course>(query, {
     variables: {
       id,
     },
@@ -86,18 +97,7 @@ const CoursePage: FC = () => {
                   </span>
                 </div>
               }
-              rightBottom={
-                <div className="flex flex-1 flex-col justify-center items-center max-w-sm">
-                  <Button filled>{t("applyNow")}</Button>
-                  <span className="text-xs mt-4">
-                    {t("applicationDeadline")}{" "}
-                    {course.BookingDeadline.toLocaleDateString(i18n.languages, {
-                      month: "2-digit",
-                      day: "2-digit",
-                    })}
-                  </span>
-                </div>
-              }
+              rightBottom={<CourseStatus course={course} />}
             />
           </PageBlock>
           <ContentRow
