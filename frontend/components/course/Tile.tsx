@@ -9,7 +9,6 @@ interface IProps {
 }
 
 export const Tile: FC<IProps> = ({ course }) => {
-  console.log("course", course);
   return (
     <Link href={`/course/${course.Id}`}>
       <a>
