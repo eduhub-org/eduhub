@@ -10,13 +10,11 @@ interface IProps {
 export const CourseStartTime: FC<IProps> = ({ course }) => {
   const { i18n } = useTranslation();
 
-  const startTime: string = course.TimeOfStart.toLocaleTimeString(
-    i18n.languages,
-    {
+  const startTime: string =
+    course.TimeOfStart?.toLocaleTimeString(i18n.languages, {
       hour: "numeric",
       minute: "numeric",
-    }
-  );
+    }) ?? "";
 
   return <>{startTime}</>;
 };

@@ -15,27 +15,29 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
   const { t, i18n } = useTranslation("course-page");
   const { t: tLanguage } = useTranslation("common");
 
-  const startTime = course.TimeOfStart.toLocaleTimeString(i18n.languages, {
-    hour: "numeric",
-    minute: "numeric",
-  });
-  const endTime = course.Duration
-    ? new Date(
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        course.TimeOfStart.getTime() + course.Duration * 60000
-      ).toLocaleTimeString(i18n.languages, {
-        hour: "numeric",
-        minute: "numeric",
-      })
-    : "";
+  const startTime =
+    course.TimeOfStart?.toLocaleTimeString(i18n.languages, {
+      hour: "numeric",
+      minute: "numeric",
+    }) ?? "";
+  const endTime =
+    course.Duration && course.TimeOfStart
+      ? new Date(
+          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+          course.TimeOfStart.getTime() + course.Duration * 60000
+        ).toLocaleTimeString(i18n.languages, {
+          hour: "numeric",
+          minute: "numeric",
+        })
+      : "";
 
   const instructor =
     course.CourseInstructors.length > 0
       ? course.CourseInstructors[0].Instructor
       : undefined;
 
-  const instructorName = `${instructor?.Person.Firstname ?? ""} ${
-    instructor?.Person.Lastname ?? ""
+  const instructorName = `${instructor?.Person?.Firstname ?? ""} ${
+    instructor?.Person?.Lastname ?? ""
   }`;
   const instructorAvatar = instructor?.Person.Image;
   const instructorQualification = instructor?.Qualification ?? "";

@@ -7,7 +7,6 @@ module.exports = {
         : "http://localhost:8080/v1/graphql",
       headers: {
         "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET ?? "",
-        "x-hasura-role": "user",
       },
     },
   },

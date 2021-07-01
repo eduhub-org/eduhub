@@ -2,46 +2,46 @@ import { gql } from "@apollo/client";
 
 export const COURSE_FRAGMENT = gql`
   fragment CourseFragment on Course {
-    BookingDeadline
-    Cost
-    CourseType
-    DayOfTheWeek
-    Description
-    Difficulty
     Id
+    Ects
+    Duration
+    Description
+    DayOfTheWeek
+    CourseType
+    Cost
+    City
+    BookingDeadline
     Image
     Language
     MaxParticipants
     Name
-    Semester
+    OnlineCourses
+    SemesterId
+    Status
     ShortDescription
     TimeOfStart
-    City
-    Duration
+    Sessions {
+      Id
+      Finish
+      CourseId
+      Description
+      Location
+      Start
+      Title
+    }
     CourseInstructors {
+      Id
       Instructor {
+        Id
         Person {
           Firstname
           Image
-          Lastname
           Id
+          Lastname
         }
-        Description
         Qualification
-        Id
+        Description
       }
-      Id
-    }
-    Ects
-    Status
-    MaxMissedDates
-    MaxProjectParticipants
-    Sessions {
-      Id
-      Description
-      Finish
-      Start
-      Title
     }
   }
 `;

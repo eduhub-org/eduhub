@@ -1,23 +1,17 @@
 import { FC } from "react";
 
 import { useAuthedQuery } from "../../hooks/authedQuery";
-import { Participating } from "../../queries/__generated__/Participating";
-import { PARTICIPATING } from "../../queries/participating";
+import { MyCourses as MyCoursesType } from "../../queries/__generated__/MyCourses";
+import { MY_COURSES } from "../../queries/myCourses";
 import { Button } from "../common/Button";
 
 import { TileSlider } from "./TileSlider";
 
-interface IProps {}
+export const MyCourses: FC = () => {
+  const { data, loading, error } = useAuthedQuery<MyCoursesType>(MY_COURSES);
 
-export const MyCourses: FC<IProps> = () => {
-  const { data, loading, error } = useAuthedQuery<Participating>(
-    PARTICIPATING,
-    {
-      variables: { id: 12 },
-    }
-  );
+  const enrollments = data?.Enrollment ?? [];
 
-  const enrollments = data?.Person_by_pk?.Participants?.[0]?.Enrollments;
   const courses = enrollments?.map((enrollment) => enrollment.Course) ?? [];
 
   if ((courses.length ?? 0) <= 0) {

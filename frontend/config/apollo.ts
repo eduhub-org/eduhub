@@ -29,10 +29,11 @@ const authLink = setContext((_, { headers }) => {
 
 export const client = new ApolloClient({
   uri: process.env.GRAPHQL_URI ?? "http://localhost:8080/v1/graphql",
-  link: authLink.concat(httpLink),
+  link: httpLink,
   cache: new InMemoryCache({
     typePolicies: {
       Course: {
+        keyFields: ["Id"],
         fields: {
           BookingDeadline: {
             merge: (_, BookingDeadline) => {
@@ -45,6 +46,9 @@ export const client = new ApolloClient({
             },
           },
         },
+      },
+      Enrollment: {
+        keyFields: ["Id"],
       },
       Session: {
         fields: {

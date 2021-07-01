@@ -13,10 +13,15 @@ import { useAuthedQuery } from "../../hooks/authedQuery";
 import { useIsLoggedIn } from "../../hooks/authentication";
 import { Course } from "../../queries/__generated__/Course";
 import { COURSE } from "../../queries/course";
+import { COURSE_WITH_ENROLLMENT } from "../../queries/courseWithEnrollment";
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
-    ...(await serverSideTranslations(locale, ["common", "course-page"])),
+    ...(await serverSideTranslations(locale, [
+      "common",
+      "course-page",
+      "course-application",
+    ])),
   },
 });
 
@@ -33,13 +38,16 @@ export const getStaticPaths = async () => {
 const CoursePage: FC = () => {
   const router = useRouter();
   const { courseId, tab: tabParam } = router.query;
-  const { t, i18n } = useTranslation("course-page");
-  const isLoggedIn = useIsLoggedIn();
+  const { t } = useTranslation("course-page");
 
   const id = parseInt(courseId as string, 10);
   const tab = typeof tabParam === "string" ? parseInt(tabParam, 10) : 0;
 
-  const { data: courseData, loading, error } = useAuthedQuery<Course>(COURSE, {
+  const isLoggedIn = useIsLoggedIn();
+
+  const query = isLoggedIn ? COURSE_WITH_ENROLLMENT : COURSE;
+
+  const { data: courseData, loading, error } = useAuthedQuery<Course>(query, {
     variables: {
       id,
     },

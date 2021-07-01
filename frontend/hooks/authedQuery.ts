@@ -2,19 +2,23 @@ import { useQuery } from "@apollo/client";
 import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance } from "keycloak-js";
 
-export const useAuthedQuery: typeof useQuery = (query, options) => {
+export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
 
   const token = keycloak?.token;
 
-  if (typeof window !== "undefined") {
-    console.log("token", token);
-    if (token) {
-      window.localStorage.setItem("token", token);
-    } else {
-      window.localStorage.removeItem("token");
-    }
-  }
+  const options = token
+    ? {
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          headers: {
+            ...passedOptions?.context?.headers,
+            Authorization: "Bearer " + token,
+          },
+        },
+      }
+    : passedOptions;
 
   return useQuery(query, options);
 };
