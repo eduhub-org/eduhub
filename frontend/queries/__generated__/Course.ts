@@ -61,6 +61,7 @@ export interface Course_Course_by_pk {
   BookingDeadline: any;
   Image: string | null;
   Language: string;
+  MaxMissedDates: number;
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;

@@ -61,6 +61,7 @@ export interface CourseFragment {
   BookingDeadline: any;
   Image: string | null;
   Language: string;
+  MaxMissedDates: number;
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;

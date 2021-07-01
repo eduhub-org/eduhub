@@ -13,6 +13,7 @@ export const COURSE_FRAGMENT = gql`
     BookingDeadline
     Image
     Language
+    MaxMissedDates
     MaxParticipants
     Name
     OnlineCourses
