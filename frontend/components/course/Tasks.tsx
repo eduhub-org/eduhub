@@ -11,7 +11,7 @@ interface IProps {
 export const Tasks: FC<IProps> = ({ course }) => {
   return (
     <div className="flex flex-col">
-      <BlockTitle>Tasks</BlockTitle>
+      <BlockTitle>Anforderungen</BlockTitle>
       <span className="text-lg mt-4">
         Um ein Leistungszertifikat für diesen Kurs zu erwerben, musst du
         zusätzlich zur ausreichenden Teilnahme einen der angebotenen

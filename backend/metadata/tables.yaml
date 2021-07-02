@@ -15,6 +15,18 @@
   - name: Session
     using:
       foreign_key_constraint_on: SessionId
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - Attending
+      - Id
+      - PersonId
+      - SessionId
+      filter:
+        Person:
+          AuthId:
+            _eq: X-Hasura-User-Id
 - table:
     schema: public
     name: AttendenceDocument

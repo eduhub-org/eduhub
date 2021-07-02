@@ -40,10 +40,12 @@ const CoursePage: FC = () => {
   const { courseId, tab: tabParam } = router.query;
   const { t } = useTranslation("course-page");
 
-  const id = parseInt(courseId as string, 10);
-  const tab = typeof tabParam === "string" ? parseInt(tabParam, 10) : 0;
-
   const isLoggedIn = useIsLoggedIn();
+
+  const id = parseInt(courseId as string, 10);
+  const defaultTab = isLoggedIn ? 1 : 0;
+  const tab =
+    typeof tabParam === "string" ? parseInt(tabParam, 10) : defaultTab;
 
   const query = isLoggedIn ? COURSE_WITH_ENROLLMENT : COURSE;
 

@@ -1,3 +1,5 @@
+import { useKeycloak } from "@react-keycloak/ssr";
+import { KeycloakInstance } from "keycloak-js";
 import { FC } from "react";
 
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
@@ -10,6 +12,8 @@ interface IProps {
 }
 
 export const Attendences: FC<IProps> = ({ course }) => {
+  const { keycloak } = useKeycloak<KeycloakInstance>();
+
   return (
     <div className="flex flex-col">
       <BlockTitle>Attendence</BlockTitle>
