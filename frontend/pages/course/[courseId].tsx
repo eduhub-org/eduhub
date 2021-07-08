@@ -4,11 +4,13 @@ import { useRouter } from "next/router";
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
+import { EnrollmentStatus_enum } from "../../__generated__/globalTypes";
 import { Page } from "../../components/Page";
 import { PageBlock } from "../../components/common/PageBlock";
 import { CoursePageDescriptionView } from "../../components/course/CoursePageDescriptionView";
 import { CoursePageStudentView } from "../../components/course/CoursePageStudentView";
 import { TabSelection } from "../../components/course/TabSelection";
+import { enrollmentStatusForCourse } from "../../helpers/courseHelpers";
 import { useAuthedQuery } from "../../hooks/authedQuery";
 import { useIsLoggedIn } from "../../hooks/authentication";
 import { Course } from "../../queries/__generated__/Course";
@@ -61,13 +63,18 @@ const CoursePage: FC = () => {
     return <div>{t("courseNotAvailable")}</div>;
   }
 
+  const isParticipating =
+    isLoggedIn &&
+    (enrollmentStatusForCourse(course) === EnrollmentStatus_enum.CONFIRMED ||
+      enrollmentStatusForCourse(course) === EnrollmentStatus_enum.COMPLETED);
+
   return (
     <div>
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {isLoggedIn ? (
+      {isParticipating ? (
         <Page>
           <PageBlock>
             <div className="py-4">
