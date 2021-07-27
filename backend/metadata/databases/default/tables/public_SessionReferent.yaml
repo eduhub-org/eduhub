@@ -1,0 +1,10 @@
+table:
+  name: SessionReferent
+  schema: public
+object_relationships:
+- name: Referent
+  using:
+    foreign_key_constraint_on: ReferentId
+- name: Session
+  using:
+    foreign_key_constraint_on: SessionId

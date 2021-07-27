@@ -1,0 +1,83 @@
+table:
+  name: Course
+  schema: public
+array_relationships:
+- name: CourseInstructors
+  using:
+    foreign_key_constraint_on:
+      column: CourseId
+      table:
+        name: CourseInstructor
+        schema: public
+- name: Enrollments
+  using:
+    foreign_key_constraint_on:
+      column: CourseId
+      table:
+        name: Enrollment
+        schema: public
+- name: Sessions
+  using:
+    foreign_key_constraint_on:
+      column: CourseId
+      table:
+        name: Session
+        schema: public
+select_permissions:
+- permission:
+    columns:
+    - BookingDeadline
+    - City
+    - Cost
+    - CourseType
+    - DayOfTheWeek
+    - Description
+    - Duration
+    - Ects
+    - Id
+    - Image
+    - Language
+    - MaxParticipants
+    - Name
+    - OnlineCourses
+    - SemesterId
+    - ShortDescription
+    - Status
+    - TextOnCertificate
+    - TimeOfStart
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - AttendanceCertificatePossible
+    - BookingDeadline
+    - CertificatePossible
+    - City
+    - Cost
+    - CourseType
+    - DatesOnCertificate
+    - DayOfTheWeek
+    - Description
+    - Difficulty
+    - Duration
+    - Ects
+    - ExternalProjectsAllowed
+    - Id
+    - Image
+    - Language
+    - MaxMissedDates
+    - MaxParticipants
+    - MaxProjectParticipants
+    - Name
+    - OnlineCourses
+    - OnlineCoursesAllowed
+    - Online_Hybrid_Offline
+    - Projects
+    - ProjectsAllowed
+    - SemesterId
+    - ShortDescription
+    - Status
+    - TextOnCertificate
+    - TimeOfStart
+    filter: {}
+  role: user

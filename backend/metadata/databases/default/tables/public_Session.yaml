@@ -1,0 +1,56 @@
+table:
+  name: Session
+  schema: public
+object_relationships:
+- name: Course
+  using:
+    foreign_key_constraint_on: CourseId
+array_relationships:
+- name: AttendenceDocuments
+  using:
+    foreign_key_constraint_on:
+      column: SessionId
+      table:
+        name: AttendenceDocument
+        schema: public
+- name: Attendences
+  using:
+    foreign_key_constraint_on:
+      column: SessionId
+      table:
+        name: Attendence
+        schema: public
+- name: SessionReferents
+  using:
+    foreign_key_constraint_on:
+      column: SessionId
+      table:
+        name: SessionReferent
+        schema: public
+select_permissions:
+- permission:
+    columns:
+    - CourseId
+    - Description
+    - Finish
+    - Id
+    - Location
+    - Start
+    - SurveyId
+    - SurveyType
+    - Title
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - CourseId
+    - Description
+    - Finish
+    - Id
+    - Location
+    - Start
+    - SurveyId
+    - SurveyType
+    - Title
+    filter: {}
+  role: user

@@ -1,0 +1,25 @@
+table:
+  name: CourseInstructor
+  schema: public
+object_relationships:
+- name: Course
+  using:
+    foreign_key_constraint_on: CourseId
+- name: Instructor
+  using:
+    foreign_key_constraint_on: InstructorId
+select_permissions:
+- permission:
+    columns:
+    - CourseId
+    - Id
+    - InstructorId
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - CourseId
+    - Id
+    - InstructorId
+    filter: {}
+  role: user
