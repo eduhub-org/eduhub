@@ -20,5 +20,14 @@ export const CourseEndTime: FC<IProps> = ({ course }) => {
       })
     : "";
 
-  return <>{endTime}</>;
+  if (!endTime) {
+    return null;
+  }
+
+  return (
+    <>
+      {" - "}
+      {endTime}
+    </>
+  );
 };

@@ -16,7 +16,6 @@ export const CourseTitleSubTitleBlock: FC<IProps> = ({ course }) => {
     <div className="flex flex-1 flex-col">
       <span className="text-xs">
         <CourseWeekday course={course} /> <CourseStartTime course={course} />
-        {" - "}
         <CourseEndTime course={course} />
       </span>
       <BlockTitle>{course.Name}</BlockTitle>
