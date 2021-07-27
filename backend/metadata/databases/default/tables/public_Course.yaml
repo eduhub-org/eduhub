@@ -37,6 +37,7 @@ select_permissions:
     - Id
     - Image
     - Language
+    - MaxMissedDates
     - MaxParticipants
     - Name
     - OnlineCourses
