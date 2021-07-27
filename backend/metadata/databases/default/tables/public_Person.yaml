@@ -1,0 +1,63 @@
+table:
+  name: Person
+  schema: public
+array_relationships:
+- name: Admins
+  using:
+    foreign_key_constraint_on:
+      column: UserId
+      table:
+        name: Admin
+        schema: public
+- name: Attendences
+  using:
+    foreign_key_constraint_on:
+      column: PersonId
+      table:
+        name: Attendence
+        schema: public
+- name: Instructors
+  using:
+    foreign_key_constraint_on:
+      column: PersonId
+      table:
+        name: Instructor
+        schema: public
+- name: Mails
+  using:
+    foreign_key_constraint_on:
+      column: Author
+      table:
+        name: Mail
+        schema: public
+- name: Participants
+  using:
+    foreign_key_constraint_on:
+      column: PersonId
+      table:
+        name: Participant
+        schema: public
+- name: Referents
+  using:
+    foreign_key_constraint_on:
+      column: PersonId
+      table:
+        name: Referent
+        schema: public
+select_permissions:
+- permission:
+    columns:
+    - Firstname
+    - Id
+    - Image
+    - Lastname
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - Firstname
+    - Id
+    - Image
+    - Lastname
+    filter: {}
+  role: user

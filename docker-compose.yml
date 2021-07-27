@@ -12,7 +12,7 @@ services:
       - keycloak
   
   hasura:
-    image: hasura/graphql-engine:v1.3.3.cli-migrations-v2
+    image: hasura/graphql-engine:v2.0.3.cli-migrations-v3
     ports:
       - "8080:8080"
     depends_on:

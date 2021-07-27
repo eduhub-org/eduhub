@@ -1,0 +1,11 @@
+table:
+  name: Project
+  schema: public
+array_relationships:
+- name: ProjectEnrollments
+  using:
+    foreign_key_constraint_on:
+      column: ProjectId
+      table:
+        name: ProjectEnrollment
+        schema: public
