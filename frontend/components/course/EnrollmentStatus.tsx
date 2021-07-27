@@ -1,3 +1,4 @@
+import { useTranslation } from "next-i18next";
 import { FC, useCallback, useState } from "react";
 
 import { EnrollmentStatus_enum } from "../../__generated__/globalTypes";
@@ -15,6 +16,7 @@ interface IProps {
 
 export const EnrollmentStatus: FC<IProps> = ({ course }) => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const { t } = useTranslation("course-application");
 
   const { data, loading, error } = useAuthedQuery<CourseWithEnrollment>(
     COURSE_WITH_ENROLLMENT,
@@ -40,10 +42,13 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
     switch (status) {
       case EnrollmentStatus_enum.APPLIED: {
         content = (
-          <span className="bg-gray-300 p-4">
-            Du hast dich für diesen Kurs bereits beworben! in Kürze wirst du
-            Rückmeldung dazu bekommen
-          </span>
+          <span className="bg-gray-300 p-4">{t("status.applied")}</span>
+        );
+        break;
+      }
+      case EnrollmentStatus_enum.REJECTED: {
+        content = (
+          <span className="bg-gray-300 p-4">{t("status.rejected")}</span>
         );
         break;
       }
