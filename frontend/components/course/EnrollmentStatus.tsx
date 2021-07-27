@@ -48,7 +48,7 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
         break;
       }
       default: {
-        content = <div>{status}</div>;
+        content = null;
       }
     }
   }

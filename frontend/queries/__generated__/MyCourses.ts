@@ -61,6 +61,7 @@ export interface MyCourses_Enrollment_Course {
   BookingDeadline: any;
   Image: string | null;
   Language: string;
+  MaxMissedDates: number;
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
