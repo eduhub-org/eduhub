@@ -80,7 +80,7 @@ const CoursePage: FC = () => {
             <div className="py-4">
               <TabSelection
                 currentTab={tab}
-                tabs={["zur Kursbeschreibung", "laufender Kurs"]}
+                tabs={[t("toCourseDescription"), t("currentCourse")]}
               />
             </div>
           </PageBlock>
