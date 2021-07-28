@@ -65,7 +65,8 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
         </span> */}
         <span className="text-lg mt-2 text-center">{course.Ects}</span>
         <span className="text-sm mt-2 text-center mb-12">
-          {startTime} - {endTime}
+          {startTime}
+          {endTime ? <span> - {endTime}</span> : ""}
         </span>
         <span className="text-sm mt-2 text-center">{t("ects")}</span>
         {/* <span className="text-sm mt-2 text-center mb-12"> h/Woche</span> */}
