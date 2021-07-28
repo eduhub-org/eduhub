@@ -1,3 +1,11 @@
 table:
   name: Semester
   schema: public
+array_relationships:
+- name: Courses
+  using:
+    foreign_key_constraint_on:
+      column: SemesterId
+      table:
+        name: Course
+        schema: public
