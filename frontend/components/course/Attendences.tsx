@@ -2,13 +2,13 @@ import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance } from "keycloak-js";
 import { FC } from "react";
 
-import { Course_Course_by_pk } from "../../queries/__generated__/Course";
+import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
 import { BlockTitle } from "../common/BlockTitle";
 
 import { AttendenceEntry } from "./AttendenceEntry";
 
 interface IProps {
-  course: Course_Course_by_pk;
+  course: CourseWithEnrollment_Course_by_pk;
 }
 
 export const Attendences: FC<IProps> = ({ course }) => {
@@ -24,11 +24,7 @@ export const Attendences: FC<IProps> = ({ course }) => {
       <div>
         <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3">
           {course.Sessions.map((session) => (
-            <AttendenceEntry
-              key={session.Id}
-              session={session}
-              attendence={null}
-            />
+            <AttendenceEntry key={session.Id} session={session} />
           ))}
         </div>
       </div>
