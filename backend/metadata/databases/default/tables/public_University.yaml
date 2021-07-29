@@ -2,6 +2,14 @@ table:
   name: University
   schema: public
 is_enum: true
+array_relationships:
+- name: Participants
+  using:
+    foreign_key_constraint_on:
+      column: University
+      table:
+        name: Participant
+        schema: public
 select_permissions:
 - permission:
     columns:

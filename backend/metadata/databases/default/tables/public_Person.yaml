@@ -1,6 +1,10 @@
 table:
   name: Person
   schema: public
+object_relationships:
+- name: employmentByEmployment
+  using:
+    foreign_key_constraint_on: Employment
 array_relationships:
 - name: Admins
   using:
@@ -26,7 +30,7 @@ array_relationships:
 - name: Mails
   using:
     foreign_key_constraint_on:
-      column: Author
+      column: Sender_id
       table:
         name: Mail
         schema: public

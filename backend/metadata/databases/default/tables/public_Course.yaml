@@ -1,6 +1,16 @@
 table:
   name: Course
   schema: public
+object_relationships:
+- name: CourseStatus
+  using:
+    foreign_key_constraint_on: Status
+- name: OnlineHybridOffline
+  using:
+    foreign_key_constraint_on: Online_Hybrid_Offline
+- name: Semester
+  using:
+    foreign_key_constraint_on: SemesterId
 array_relationships:
 - name: CourseInstructors
   using:

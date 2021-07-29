@@ -5,6 +5,9 @@ object_relationships:
 - name: Person
   using:
     foreign_key_constraint_on: PersonId
+- name: universityByUniversity
+  using:
+    foreign_key_constraint_on: University
 array_relationships:
 - name: Enrollments
   using:

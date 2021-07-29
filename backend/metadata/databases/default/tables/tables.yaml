@@ -12,7 +12,7 @@
 - "!include public_Event.yaml"
 - "!include public_Instructor.yaml"
 - "!include public_Mail.yaml"
-- "!include public_MailLog.yaml"
+- "!include public_MailTemplate.yaml"
 - "!include public_MotivationGrade.yaml"
 - "!include public_OnlineHybridOffline.yaml"
 - "!include public_Participant.yaml"

@@ -5,9 +5,18 @@ object_relationships:
 - name: Course
   using:
     foreign_key_constraint_on: CourseId
+- name: EnrollmentStatus
+  using:
+    foreign_key_constraint_on: Status
 - name: Participant
   using:
     foreign_key_constraint_on: ParticipantId
+- name: ProjectType
+  using:
+    foreign_key_constraint_on: TypeOfProject
+- name: motivationGradeByMotivationgrade
+  using:
+    foreign_key_constraint_on: MotivationGrade
 array_relationships:
 - name: ProjectEnrollments
   using:
@@ -45,14 +54,3 @@ select_permissions:
           AuthId:
             _eq: X-Hasura-User-Id
   role: user
-event_triggers:
-- definition:
-    enable_manual: false
-    insert:
-      columns: "*"
-  name: enrollment_mail
-  retry_conf:
-    interval_sec: 10
-    num_retries: 0
-    timeout_sec: 60
-  webhook: localhost:3001
