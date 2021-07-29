@@ -8,12 +8,12 @@ object_relationships:
 - name: EnrollmentStatus
   using:
     foreign_key_constraint_on: Status
-- name: Participant
-  using:
-    foreign_key_constraint_on: ParticipantId
 - name: ProjectType
   using:
     foreign_key_constraint_on: TypeOfProject
+- name: User
+  using:
+    foreign_key_constraint_on: UserId
 - name: motivationGradeByMotivationgrade
   using:
     foreign_key_constraint_on: MotivationGrade
@@ -29,14 +29,13 @@ insert_permissions:
 - permission:
     backend_only: false
     check:
-      Participant:
-        Person:
-          AuthId:
-            _eq: X-Hasura-User-Id
+      User:
+        AuthId:
+          _eq: X-Hasura-User-Id
     columns:
     - CourseId
     - MotivationLetter
-    - ParticipantId
+    - UserId
     - WantsEcts
   role: user
 select_permissions:
@@ -45,12 +44,11 @@ select_permissions:
     - CourseId
     - Id
     - MotivationLetter
-    - ParticipantId
+    - UserId
     - Status
     - WantsEcts
     filter:
-      Participant:
-        Person:
-          AuthId:
-            _eq: X-Hasura-User-Id
+      User:
+        AuthId:
+          _eq: X-Hasura-User-Id
   role: user

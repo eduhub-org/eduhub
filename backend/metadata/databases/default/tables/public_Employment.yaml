@@ -8,7 +8,7 @@ array_relationships:
     foreign_key_constraint_on:
       column: Employment
       table:
-        name: Person
+        name: User
         schema: public
 select_permissions:
 - permission:

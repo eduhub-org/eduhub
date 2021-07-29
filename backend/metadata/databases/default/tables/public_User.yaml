@@ -1,10 +1,13 @@
 table:
-  name: Person
+  name: User
   schema: public
 object_relationships:
 - name: employmentByEmployment
   using:
     foreign_key_constraint_on: Employment
+- name: universityByUniversity
+  using:
+    foreign_key_constraint_on: University
 array_relationships:
 - name: Admins
   using:
@@ -19,6 +22,13 @@ array_relationships:
       column: PersonId
       table:
         name: Attendence
+        schema: public
+- name: Enrollments
+  using:
+    foreign_key_constraint_on:
+      column: UserId
+      table:
+        name: Enrollment
         schema: public
 - name: Instructors
   using:

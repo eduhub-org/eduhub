@@ -8,14 +8,6 @@ object_relationships:
 - name: universityByUniversity
   using:
     foreign_key_constraint_on: University
-array_relationships:
-- name: Enrollments
-  using:
-    foreign_key_constraint_on:
-      column: ParticipantId
-      table:
-        name: Enrollment
-        schema: public
 select_permissions:
 - permission:
     columns:

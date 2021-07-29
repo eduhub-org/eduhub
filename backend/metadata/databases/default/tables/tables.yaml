@@ -15,8 +15,6 @@
 - "!include public_MailTemplate.yaml"
 - "!include public_MotivationGrade.yaml"
 - "!include public_OnlineHybridOffline.yaml"
-- "!include public_Participant.yaml"
-- "!include public_Person.yaml"
 - "!include public_Project.yaml"
 - "!include public_ProjectEnrollment.yaml"
 - "!include public_ProjectType.yaml"
@@ -26,3 +24,4 @@
 - "!include public_SessionReferent.yaml"
 - "!include public_SurveyType.yaml"
 - "!include public_University.yaml"
+- "!include public_User.yaml"
