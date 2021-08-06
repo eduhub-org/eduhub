@@ -3,13 +3,13 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { EnrollmentStatus_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { CourseStatus_enum, EnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL query operation: MyCourses
+// GraphQL query operation: CourseListWithEnrollments
 // ====================================================
 
-export interface MyCourses_Enrollment_Course_Sessions {
+export interface CourseListWithEnrollments_Course_Sessions {
   __typename: "Session";
   Id: number;
   Finish: any;
@@ -20,7 +20,7 @@ export interface MyCourses_Enrollment_Course_Sessions {
   Title: string;
 }
 
-export interface MyCourses_Enrollment_Course_CourseInstructors_Instructor_Person {
+export interface CourseListWithEnrollments_Course_CourseInstructors_Instructor_Person {
   __typename: "Person";
   Firstname: string;
   Image: string | null;
@@ -28,33 +28,33 @@ export interface MyCourses_Enrollment_Course_CourseInstructors_Instructor_Person
   Lastname: string;
 }
 
-export interface MyCourses_Enrollment_Course_CourseInstructors_Instructor {
+export interface CourseListWithEnrollments_Course_CourseInstructors_Instructor {
   __typename: "Instructor";
   Id: number;
   /**
    * An object relationship
    */
-  Person: MyCourses_Enrollment_Course_CourseInstructors_Instructor_Person;
+  Person: CourseListWithEnrollments_Course_CourseInstructors_Instructor_Person;
   Qualification: string | null;
   Description: string | null;
 }
 
-export interface MyCourses_Enrollment_Course_CourseInstructors {
+export interface CourseListWithEnrollments_Course_CourseInstructors {
   __typename: "CourseInstructor";
   Id: number;
   /**
    * An object relationship
    */
-  Instructor: MyCourses_Enrollment_Course_CourseInstructors_Instructor;
+  Instructor: CourseListWithEnrollments_Course_CourseInstructors_Instructor;
 }
 
-export interface MyCourses_Enrollment_Course_Enrollments {
+export interface CourseListWithEnrollments_Course_Enrollments {
   __typename: "Enrollment";
   Id: number;
   Status: EnrollmentStatus_enum;
 }
 
-export interface MyCourses_Enrollment_Course {
+export interface CourseListWithEnrollments_Course {
   __typename: "Course";
   Id: number;
   Ects: string;
@@ -78,30 +78,20 @@ export interface MyCourses_Enrollment_Course {
   /**
    * An array relationship
    */
-  Sessions: MyCourses_Enrollment_Course_Sessions[];
+  Sessions: CourseListWithEnrollments_Course_Sessions[];
   /**
    * An array relationship
    */
-  CourseInstructors: MyCourses_Enrollment_Course_CourseInstructors[];
+  CourseInstructors: CourseListWithEnrollments_Course_CourseInstructors[];
   /**
    * An array relationship
    */
-  Enrollments: MyCourses_Enrollment_Course_Enrollments[];
+  Enrollments: CourseListWithEnrollments_Course_Enrollments[];
 }
 
-export interface MyCourses_Enrollment {
-  __typename: "Enrollment";
-  Id: number;
-  Status: EnrollmentStatus_enum;
+export interface CourseListWithEnrollments {
   /**
-   * An object relationship
+   * fetch data from the table: "Course"
    */
-  Course: MyCourses_Enrollment_Course;
-}
-
-export interface MyCourses {
-  /**
-   * fetch data from the table: "Enrollment"
-   */
-  Enrollment: MyCourses_Enrollment[];
+  Course: CourseListWithEnrollments_Course[];
 }

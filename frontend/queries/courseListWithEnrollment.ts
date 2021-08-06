@@ -3,17 +3,14 @@ import { gql } from "@apollo/client";
 import { COURSE_FRAGMENT } from "./courseFragment";
 import { ENROLLMENT_FRAGMENT } from "./enrollmentFragment";
 
-export const MY_COURSES = gql`
+export const COURSE_LIST_WITH_ENROLLMENT = gql`
   ${COURSE_FRAGMENT}
   ${ENROLLMENT_FRAGMENT}
-  query MyCourses {
-    Enrollment {
-      ...EnrollmentFragment
-      Course {
-        ...CourseFragment
-        Enrollments {
-          ...EnrollmentFragment
-        }
+  query CourseListWithEnrollments {
+    Course {
+      ...CourseFragment
+      Enrollments {
+        ...EnrollmentFragment
       }
     }
   }

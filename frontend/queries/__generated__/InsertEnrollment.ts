@@ -102,11 +102,11 @@ export interface InsertEnrollment_insert_Enrollment_returning {
 export interface InsertEnrollment_insert_Enrollment {
   __typename: "Enrollment_mutation_response";
   /**
-   * number of affected rows by the mutation
+   * number of rows affected by the mutation
    */
   affected_rows: number;
   /**
-   * data of the affected rows by the mutation
+   * data from the rows affected by the mutation
    */
   returning: InsertEnrollment_insert_Enrollment_returning[];
 }
