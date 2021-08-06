@@ -2,10 +2,10 @@ import Image from "next/image";
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
+import { getWeekdayString } from "../../helpers/dateHelpers";
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
 
 import { CourseCost } from "./CourseCost";
-import { CourseWeekday } from "./CourseWeekday";
 
 interface IProps {
   course: Course_Course_by_pk;
@@ -55,7 +55,7 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
           />
         </div> */}
         <span className="text-lg mt-2 text-center">
-          <CourseWeekday course={course} short uppercased />
+          {getWeekdayString(course, tLanguage, true, true)}
         </span>
         {/* <span className="text-lg mt-2 text-center">
           {(course.Duration ?? 0) / 60}
