@@ -18,7 +18,7 @@ const colorForEnrollmentStatus = (
     status === EnrollmentStatus_enum.APPLIED ||
     status === EnrollmentStatus_enum.CONFIRMED
   ) {
-    return "bg-green-500";
+    return "bg-edu-course-current";
   }
   if (
     status === EnrollmentStatus_enum.REJECTED ||
@@ -27,7 +27,7 @@ const colorForEnrollmentStatus = (
     return "bg-gray-300";
   }
   if (status === EnrollmentStatus_enum.INVITED) {
-    return "bg-red-300";
+    return "bg-edu-course-invited";
   }
   return "";
 };
@@ -63,6 +63,19 @@ const CourseStatusIndicator: FC<{
 export const Tile: FC<IProps> = ({ course }) => {
   const enrollmentStatus = enrollmentStatusForCourse(course);
 
+  const semester = course.Semester;
+
+  const currentDate = new Date();
+  const isCurrentSemester =
+    !!semester &&
+    semester?.Start <= currentDate &&
+    currentDate <= semester?.End;
+
+  const highlightColor =
+    enrollmentStatus === EnrollmentStatus_enum.CONFIRMED && isCurrentSemester
+      ? "bg-edu-course-current"
+      : "bg-gray-100";
+
   return (
     <Link href={`/course/${course.Id}`}>
       <a>
@@ -77,7 +90,9 @@ export const Tile: FC<IProps> = ({ course }) => {
             />
             <CourseStatusIndicator enrollmentStatus={enrollmentStatus} />
           </div>
-          <div className="flex h-1/2 flex-col justify-between bg-gray-100 p-3">
+          <div
+            className={`flex h-1/2 flex-col justify-between ${highlightColor} p-3`}
+          >
             <span className="text-base">{course.Name}</span>
             <span className="text-xs uppercase">Kurs</span>
           </div>

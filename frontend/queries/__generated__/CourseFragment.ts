@@ -9,6 +9,17 @@ import { CourseStatus_enum } from "./../../__generated__/globalTypes";
 // GraphQL fragment: CourseFragment
 // ====================================================
 
+export interface CourseFragment_Semester {
+  __typename: "Semester";
+  ApplicationEnd: any | null;
+  ApplicationStart: any | null;
+  Id: number;
+  End: any | null;
+  Start: any | null;
+  Name: string;
+  PerformanceRecordDeadline: any | null;
+}
+
 export interface CourseFragment_Sessions {
   __typename: "Session";
   Id: number;
@@ -65,7 +76,10 @@ export interface CourseFragment {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  SemesterId: number | null;
+  /**
+   * An object relationship
+   */
+  Semester: CourseFragment_Semester | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeOfStart: any | null;
