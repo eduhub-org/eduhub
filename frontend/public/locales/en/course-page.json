@@ -1,10 +1,15 @@
 {
   "applicationDeadline": "application deadline",
   "applyNow": "apply now",
-  "courseIsFree": "This course is for free",
+  "attendence": "Attendence",
   "courseContent": "course content",
   "courseCosts": "this course costs {{price}}",
+  "courseIsFree": "This course is for free",
   "courseNotAvailable": "course not available anymore",
+  "currentCourse": "current course",
   "ects": "ECTS",
+  "maxMissedDates": "You may be absent on a maximum of one date",
+  "maxMissedDates_plural": "You may be absent on a maximum of {{count}} dates",
+  "toCourseDescription": "to course description",
   "youWillLearn": "you will learn"
 }
