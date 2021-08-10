@@ -1,6 +1,10 @@
 table:
   name: Course
   schema: public
+object_relationships:
+- name: Semester
+  using:
+    foreign_key_constraint_on: SemesterId
 array_relationships:
 - name: CourseInstructors
   using:

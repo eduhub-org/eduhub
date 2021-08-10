@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { FC, MouseEvent, useCallback, useState } from "react";
 
 import { useIsLoggedIn } from "../hooks/authentication";
@@ -22,24 +23,28 @@ export const Header: FC = () => {
   return (
     <header className="flex w-full p-4">
       <div className="flex w-full items-center">
-        <div className="flex items-center">
-          <Image
-            src="/images/edu_logo.svg"
-            alt="Edu Hub logo"
-            width={34}
-            height={34}
-            priority
-          />
-        </div>
-        <div className="flex items-center ml-2">
-          <Image
-            src="/images/EDU_HUB_name.svg"
-            alt="Edu Hub name"
-            width={46}
-            height={33}
-            priority
-          />
-        </div>
+        <Link href="/">
+          <div className="flex cursor-pointer">
+            <div className="flex items-center">
+              <Image
+                src="/images/edu_logo.svg"
+                alt="Edu Hub logo"
+                width={34}
+                height={34}
+                priority
+              />
+            </div>
+            <div className="flex items-center ml-2">
+              <Image
+                src="/images/EDU_HUB_name.svg"
+                alt="Edu Hub name"
+                width={46}
+                height={33}
+                priority
+              />
+            </div>
+          </div>
+        </Link>
       </div>
       {isLoggedIn ? (
         <div className="flex bg-blue-400">

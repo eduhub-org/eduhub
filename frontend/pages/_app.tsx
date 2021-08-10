@@ -13,7 +13,7 @@ import "../styles/globals.css";
 
 const keycloakCfg = {
   realm: "edu-hub",
-  url: "http://localhost:28080/auth",
+  url: process.env.NEXT_PUBLIC_AUTH_URL,
   clientId: "hasura",
 };
 

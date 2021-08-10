@@ -1,6 +1,5 @@
 import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance } from "keycloak-js";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { FC, useCallback } from "react";
 import { useTranslation } from "react-i18next";
