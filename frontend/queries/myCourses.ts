@@ -14,6 +14,15 @@ export const MY_COURSES = gql`
         Enrollments {
           ...EnrollmentFragment
         }
+        Semester {
+          ApplicationEnd
+          ApplicationStart
+          Id
+          End
+          Start
+          Name
+          PerformanceRecordDeadline
+        }
       }
     }
   }

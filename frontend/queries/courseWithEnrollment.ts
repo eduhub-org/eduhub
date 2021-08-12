@@ -12,6 +12,15 @@ export const COURSE_WITH_ENROLLMENT = gql`
       Enrollments {
         ...EnrollmentFragment
       }
+      Semester {
+        ApplicationEnd
+        ApplicationStart
+        Id
+        End
+        Start
+        Name
+        PerformanceRecordDeadline
+      }
     }
   }
 `;
