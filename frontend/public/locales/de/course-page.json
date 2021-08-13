@@ -10,6 +10,8 @@
   "ects": "ECTS",
   "maxMissedDates": "Du darfst an maximal einem Termin fehlen",
   "maxMissedDates_plural": "Du darfst an maximal {{count}} Terminen fehlen",
+  "openChat": "zum Chat",
+  "openVideoCall": "zum Meeting",
   "toCourseDescription": "zur Kursbeschreibung",
   "youWillLearn": "Du wirst lernen"
 }

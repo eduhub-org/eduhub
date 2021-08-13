@@ -69,6 +69,8 @@ export interface MyEnrollmentsForCourseQuery_Enrollment_Course {
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeOfStart: any | null;
+  LinkChat: string | null;
+  LinkVideoCall: string | null;
   /**
    * An array relationship
    */

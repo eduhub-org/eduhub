@@ -85,6 +85,8 @@ export interface CourseWithEnrollment_Course_by_pk {
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeOfStart: any | null;
+  LinkChat: string | null;
+  LinkVideoCall: string | null;
   /**
    * An array relationship
    */

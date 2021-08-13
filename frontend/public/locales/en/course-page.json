@@ -10,6 +10,8 @@
   "ects": "ECTS",
   "maxMissedDates": "You may be absent on a maximum of one date",
   "maxMissedDates_plural": "You may be absent on a maximum of {{count}} dates",
+  "openChat": "open chat",
+  "openVideoCall": "open meeting",
   "toCourseDescription": "to course description",
   "youWillLearn": "you will learn"
 }

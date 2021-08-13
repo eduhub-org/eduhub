@@ -24,6 +24,8 @@ export const COURSE_FRAGMENT = gql`
     Status
     ShortDescription
     TimeOfStart
+    LinkChat
+    LinkVideoCall
     Sessions {
       ...SessionFragment
     }
