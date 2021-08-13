@@ -21,7 +21,7 @@ export interface MyCourses_Enrollment_Course_Sessions {
 }
 
 export interface MyCourses_Enrollment_Course_CourseInstructors_Instructor_Person {
-  __typename: "Person";
+  __typename: "User";
   Firstname: string;
   Image: string | null;
   Id: number;
@@ -65,7 +65,7 @@ export interface MyCourses_Enrollment_Course {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  SemesterId: number | null;
+  ProgramId: number | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeOfStart: any | null;

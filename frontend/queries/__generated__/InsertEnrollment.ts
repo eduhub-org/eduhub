@@ -21,7 +21,7 @@ export interface InsertEnrollment_insert_Enrollment_returning_Course_Sessions {
 }
 
 export interface InsertEnrollment_insert_Enrollment_returning_Course_CourseInstructors_Instructor_Person {
-  __typename: "Person";
+  __typename: "User";
   Firstname: string;
   Image: string | null;
   Id: number;
@@ -71,7 +71,7 @@ export interface InsertEnrollment_insert_Enrollment_returning_Course {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  SemesterId: number | null;
+  ProgramId: number | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeOfStart: any | null;
@@ -102,11 +102,11 @@ export interface InsertEnrollment_insert_Enrollment_returning {
 export interface InsertEnrollment_insert_Enrollment {
   __typename: "Enrollment_mutation_response";
   /**
-   * number of affected rows by the mutation
+   * number of rows affected by the mutation
    */
   affected_rows: number;
   /**
-   * data of the affected rows by the mutation
+   * data from the rows affected by the mutation
    */
   returning: InsertEnrollment_insert_Enrollment_returning[];
 }
@@ -119,7 +119,7 @@ export interface InsertEnrollment {
 }
 
 export interface InsertEnrollmentVariables {
-  participantId: number;
+  userId: number;
   courseId: number;
   motivationLetter: string;
 }

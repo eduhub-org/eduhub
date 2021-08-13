@@ -21,7 +21,7 @@ export interface Course_Course_by_pk_Sessions {
 }
 
 export interface Course_Course_by_pk_CourseInstructors_Instructor_Person {
-  __typename: "Person";
+  __typename: "User";
   Firstname: string;
   Image: string | null;
   Id: number;
@@ -65,7 +65,7 @@ export interface Course_Course_by_pk {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  SemesterId: number | null;
+  ProgramId: number | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeOfStart: any | null;

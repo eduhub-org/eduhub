@@ -17,7 +17,7 @@ export const COURSE_FRAGMENT = gql`
     MaxParticipants
     Name
     OnlineCourses
-    SemesterId
+    ProgramId
     Status
     ShortDescription
     TimeOfStart
