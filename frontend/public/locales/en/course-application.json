@@ -7,7 +7,7 @@
   "sendApplication": "send application",
   "status": {
     "applied": "You already applied for this course and will get feedback in no time.",
-    "rejected": "Your application for this course got rejected. Deal with it."
+    "rejected": "You have declined the invitation to this course."
   },
   "successBody": "At latest one or two days after application closes you will get informed about your approval.",
   "successCloseButtonTitle": "Close",
