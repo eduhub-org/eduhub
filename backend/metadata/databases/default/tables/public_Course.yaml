@@ -2,96 +2,96 @@ table:
   name: Course
   schema: public
 object_relationships:
-  - name: CourseStatus
-    using:
-      foreign_key_constraint_on: Status
-  - name: Location
-    using:
-      foreign_key_constraint_on: LocationId
-  - name: OnlineHybridOffline
-    using:
-      foreign_key_constraint_on: Online_Hybrid_Offline
-  - name: Program
-    using:
-      foreign_key_constraint_on: ProgramId
+- name: CourseStatus
+  using:
+    foreign_key_constraint_on: Status
+- name: Location
+  using:
+    foreign_key_constraint_on: LocationId
+- name: OnlineHybridOffline
+  using:
+    foreign_key_constraint_on: Online_Hybrid_Offline
+- name: Program
+  using:
+    foreign_key_constraint_on: ProgramId
 array_relationships:
-  - name: CourseInstructors
-    using:
-      foreign_key_constraint_on:
-        column: CourseId
-        table:
-          name: CourseInstructor
-          schema: public
-  - name: Enrollments
-    using:
-      foreign_key_constraint_on:
-        column: CourseId
-        table:
-          name: Enrollment
-          schema: public
-  - name: Sessions
-    using:
-      foreign_key_constraint_on:
-        column: CourseId
-        table:
-          name: Session
-          schema: public
+- name: CourseInstructors
+  using:
+    foreign_key_constraint_on:
+      column: CourseId
+      table:
+        name: CourseInstructor
+        schema: public
+- name: Enrollments
+  using:
+    foreign_key_constraint_on:
+      column: CourseId
+      table:
+        name: Enrollment
+        schema: public
+- name: Sessions
+  using:
+    foreign_key_constraint_on:
+      column: CourseId
+      table:
+        name: Session
+        schema: public
 select_permissions:
-  - permission:
-      columns:
-        - BookingDeadline
-        - City
-        - Cost
-        - CourseType
-        - DayOfTheWeek
-        - Description
-        - Duration
-        - Ects
-        - Id
-        - Image
-        - Language
-        - MaxMissedDates
-        - MaxParticipants
-        - Name
-        - OnlineCourses
-        - ProgramId
-        - ShortDescription
-        - Status
-        - TextOnCertificate
-        - TimeOfStart
-      filter: {}
-    role: anonymous
-  - permission:
-      columns:
-        - AttendanceCertificatePossible
-        - BookingDeadline
-        - CertificatePossible
-        - City
-        - Cost
-        - CourseType
-        - DatesOnCertificate
-        - DayOfTheWeek
-        - Description
-        - Difficulty
-        - Duration
-        - Ects
-        - ExternalProjectsAllowed
-        - Id
-        - Image
-        - Language
-        - MaxMissedDates
-        - MaxParticipants
-        - MaxProjectParticipants
-        - Name
-        - OnlineCourses
-        - OnlineCoursesAllowed
-        - Online_Hybrid_Offline
-        - Projects
-        - ProjectsAllowed
-        - ProgramId
-        - ShortDescription
-        - Status
-        - TextOnCertificate
-        - TimeOfStart
-      filter: {}
-    role: user
+- permission:
+    columns:
+    - BookingDeadline
+    - City
+    - Cost
+    - CourseType
+    - DayOfTheWeek
+    - Description
+    - Duration
+    - Ects
+    - Id
+    - Image
+    - Language
+    - MaxMissedDates
+    - MaxParticipants
+    - Name
+    - OnlineCourses
+    - ProgramId
+    - ShortDescription
+    - Status
+    - TextOnCertificate
+    - TimeOfStart
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - AttendanceCertificatePossible
+    - BookingDeadline
+    - CertificatePossible
+    - City
+    - Cost
+    - CourseType
+    - DatesOnCertificate
+    - DayOfTheWeek
+    - Description
+    - Difficulty
+    - Duration
+    - Ects
+    - ExternalProjectsAllowed
+    - Id
+    - Image
+    - Language
+    - MaxMissedDates
+    - MaxParticipants
+    - MaxProjectParticipants
+    - Name
+    - OnlineCourses
+    - OnlineCoursesAllowed
+    - Online_Hybrid_Offline
+    - ProgramId
+    - Projects
+    - ProjectsAllowed
+    - ShortDescription
+    - Status
+    - TextOnCertificate
+    - TimeOfStart
+    filter: {}
+  role: user
