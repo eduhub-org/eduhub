@@ -13,7 +13,7 @@ export const RegisterButton: FC = () => {
 
   const register = useCallback(() => {
     const url = keycloak?.createRegisterUrl({
-      redirectUri: "http://localhost:3000/",
+      redirectUri: window.location.href,
     });
 
     if (!url) return;

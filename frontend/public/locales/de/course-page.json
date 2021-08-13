@@ -1,12 +1,15 @@
 {
   "applicationDeadline": "Bewerbungsfrist",
   "applyNow": "jetzt bewerben",
+  "attendence": "Attendence",
   "courseContent": "Kursinhalt",
   "courseCosts": "Der Kurs kostet {{price}}",
   "courseIsFree": "Der Kurs ist kostenfrei",
   "courseNotAvailable": "Kurs ist nicht verfügbar",
   "currentCourse": "laufender Kurs",
   "ects": "ECTS",
+  "maxMissedDates": "Du darfst an maximal einem Termin fehlen",
+  "maxMissedDates_plural": "Du darfst an maximal {{count}} Terminen fehlen",
   "toCourseDescription": "zur Kursbeschreibung",
   "youWillLearn": "Du wirst lernen"
 }

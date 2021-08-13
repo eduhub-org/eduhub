@@ -52,6 +52,7 @@ select_permissions:
   role: anonymous
 - permission:
     columns:
+    - AuthId
     - Firstname
     - Id
     - Image

@@ -1,25 +1,27 @@
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
+import { CourseWithEnrollment_Course_by_pk_Sessions } from "../../queries/__generated__/CourseWithEnrollment";
+
 interface IProps {
-  session: any;
-  attendence: any;
+  session: CourseWithEnrollment_Course_by_pk_Sessions;
 }
 
-export const AttendenceEntry: FC<IProps> = ({ attendence, session }) => {
+export const AttendenceEntry: FC<IProps> = ({ session }) => {
   const { i18n } = useTranslation();
 
-  const didParticipate = false;
-  const isInFuture = false;
-  const bgColor = isInFuture
-    ? "bg-gray-200"
-    : didParticipate
-    ? "bg-edu-green"
-    : "bg-edu-missed-yellow";
+  const didParticipate =
+    session.Attendences.length > 0 ? session.Attendences[0].Attending : null;
+  const bgColor =
+    didParticipate === null
+      ? "bg-gray-200"
+      : didParticipate
+      ? "bg-edu-green"
+      : "bg-edu-missed-yellow";
 
   const fontWeight = didParticipate ? "font-semibold" : "";
 
-  const textColor = !isInFuture && !didParticipate ? "text-gray-500" : "";
+  const textColor = didParticipate === false ? "text-gray-500" : "";
 
   return (
     <span

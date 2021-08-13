@@ -9,6 +9,12 @@ import { CourseStatus_enum, EnrollmentStatus_enum } from "./../../__generated__/
 // GraphQL query operation: CourseWithEnrollment
 // ====================================================
 
+export interface CourseWithEnrollment_Course_by_pk_Sessions_Attendences {
+  __typename: "Attendence";
+  Id: number;
+  Attending: boolean;
+}
+
 export interface CourseWithEnrollment_Course_by_pk_Sessions {
   __typename: "Session";
   Id: number;
@@ -18,6 +24,10 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions {
   Location: string;
   Start: any;
   Title: string;
+  /**
+   * An array relationship
+   */
+  Attendences: CourseWithEnrollment_Course_by_pk_Sessions_Attendences[];
 }
 
 export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor_Person {
@@ -98,4 +108,5 @@ export interface CourseWithEnrollment {
 
 export interface CourseWithEnrollmentVariables {
   id: number;
+  authId: any;
 }

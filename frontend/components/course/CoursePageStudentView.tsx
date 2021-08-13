@@ -1,6 +1,6 @@
 import { FC } from "react";
 
-import { Course_Course_by_pk } from "../../queries/__generated__/Course";
+import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
 import { Button } from "../common/Button";
 import { ContentRow } from "../common/ContentRow";
 import { PageBlock } from "../common/PageBlock";
@@ -11,7 +11,7 @@ import { Resources } from "./Resources";
 import { Tasks } from "./Tasks";
 
 interface IProps {
-  course: Course_Course_by_pk;
+  course: CourseWithEnrollment_Course_by_pk;
 }
 
 export const CoursePageStudentView: FC<IProps> = ({ course }) => {

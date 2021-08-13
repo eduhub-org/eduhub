@@ -2,20 +2,11 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { FC } from "react";
-import { useTranslation } from "react-i18next";
 
-import { EnrollmentStatus_enum } from "../../__generated__/globalTypes";
 import { Page } from "../../components/Page";
-import { PageBlock } from "../../components/common/PageBlock";
-import { CoursePageDescriptionView } from "../../components/course/CoursePageDescriptionView";
-import { CoursePageStudentView } from "../../components/course/CoursePageStudentView";
-import { TabSelection } from "../../components/course/TabSelection";
-import { enrollmentStatusForCourse } from "../../helpers/courseHelpers";
-import { useAuthedQuery } from "../../hooks/authedQuery";
+import AuthorizedCoursePage from "../../components/course/AuthorizedCoursePage";
+import UnauthorizedCoursePage from "../../components/course/UnauthorizedCoursePage";
 import { useIsLoggedIn } from "../../hooks/authentication";
-import { Course } from "../../queries/__generated__/Course";
-import { COURSE } from "../../queries/course";
-import { COURSE_WITH_ENROLLMENT } from "../../queries/courseWithEnrollment";
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
@@ -40,7 +31,6 @@ export const getStaticPaths = async () => {
 const CoursePage: FC = () => {
   const router = useRouter();
   const { courseId, tab: tabParam } = router.query;
-  const { t } = useTranslation("course-page");
 
   const isLoggedIn = useIsLoggedIn();
 
@@ -49,52 +39,19 @@ const CoursePage: FC = () => {
   const tab =
     typeof tabParam === "string" ? parseInt(tabParam, 10) : defaultTab;
 
-  const query = isLoggedIn ? COURSE_WITH_ENROLLMENT : COURSE;
-
-  const { data: courseData, loading, error } = useAuthedQuery<Course>(query, {
-    variables: {
-      id,
-    },
-  });
-
-  const course = courseData?.Course_by_pk;
-
-  if (!course) {
-    return <div>{t("courseNotAvailable")}</div>;
-  }
-
-  const isParticipating =
-    isLoggedIn &&
-    (enrollmentStatusForCourse(course) === EnrollmentStatus_enum.CONFIRMED ||
-      enrollmentStatusForCourse(course) === EnrollmentStatus_enum.COMPLETED);
-
   return (
     <div>
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {isParticipating ? (
-        <Page>
-          <PageBlock>
-            <div className="py-4">
-              <TabSelection
-                currentTab={tab}
-                tabs={[t("toCourseDescription"), t("currentCourse")]}
-              />
-            </div>
-          </PageBlock>
-          {tab === 0 ? (
-            <CoursePageDescriptionView course={course} />
-          ) : (
-            <CoursePageStudentView course={course} />
-          )}
-        </Page>
-      ) : (
-        <Page>
-          <CoursePageDescriptionView course={course} />
-        </Page>
-      )}
+      <Page>
+        {isLoggedIn ? (
+          <AuthorizedCoursePage id={id} tab={tab} />
+        ) : (
+          <UnauthorizedCoursePage id={id} />
+        )}
+      </Page>
     </div>
   );
 };
