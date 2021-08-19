@@ -1,0 +1,12 @@
+table:
+  name: LocationOptions
+  schema: public
+is_enum: true
+array_relationships:
+- name: Locations
+  using:
+    foreign_key_constraint_on:
+      column: LocationName
+      table:
+        name: Location
+        schema: public
