@@ -13,6 +13,7 @@
 - "!include public_Event.yaml"
 - "!include public_Instructor.yaml"
 - "!include public_Location.yaml"
+- "!include public_LocationOptions.yaml"
 - "!include public_Mail.yaml"
 - "!include public_MailTemplate.yaml"
 - "!include public_MotivationGrade.yaml"
