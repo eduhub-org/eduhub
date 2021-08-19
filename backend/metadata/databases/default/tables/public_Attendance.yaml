@@ -1,0 +1,16 @@
+table:
+  name: Attendance
+  schema: public
+object_relationships:
+- name: AttendanceSource
+  using:
+    foreign_key_constraint_on: Source
+- name: AttendanceStatus
+  using:
+    foreign_key_constraint_on: Status
+- name: Session
+  using:
+    foreign_key_constraint_on: SessionId
+- name: User
+  using:
+    foreign_key_constraint_on: UserId

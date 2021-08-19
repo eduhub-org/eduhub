@@ -1,12 +1,12 @@
 table:
-  name: PerformanceRating
+  name: AttendanceSource
   schema: public
 is_enum: true
 array_relationships:
-- name: Enrollments
+- name: Attendances
   using:
     foreign_key_constraint_on:
-      column: PerformanceRating
+      column: Source
       table:
-        name: Enrollment
+        name: Attendance
         schema: public
