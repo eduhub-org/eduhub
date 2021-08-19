@@ -18,6 +18,7 @@
 - "!include public_MailTemplate.yaml"
 - "!include public_MotivationRating.yaml"
 - "!include public_OnlineHybridOffline.yaml"
+- "!include public_PerformanceRating.yaml"
 - "!include public_Program.yaml"
 - "!include public_Project.yaml"
 - "!include public_ProjectEnrollment.yaml"
