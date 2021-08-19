@@ -5,3 +5,14 @@ object_relationships:
 - name: Person
   using:
     foreign_key_constraint_on: Sender_id
+event_triggers:
+- definition:
+    enable_manual: true
+    insert:
+      columns: "*"
+  name: Mail_Test
+  retry_conf:
+    interval_sec: 10
+    num_retries: 0
+    timeout_sec: 60
+  webhook: http://172.17.0.1:3000

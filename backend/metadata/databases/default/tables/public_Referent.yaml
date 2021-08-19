@@ -2,9 +2,9 @@ table:
   name: Referent
   schema: public
 object_relationships:
-- name: Person
+- name: User
   using:
-    foreign_key_constraint_on: PersonId
+    foreign_key_constraint_on: UserId
 array_relationships:
 - name: SessionReferents
   using:

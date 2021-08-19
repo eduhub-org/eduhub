@@ -2,6 +2,6 @@ table:
   name: Admin
   schema: public
 object_relationships:
-- name: Person
+- name: User
   using:
     foreign_key_constraint_on: UserId

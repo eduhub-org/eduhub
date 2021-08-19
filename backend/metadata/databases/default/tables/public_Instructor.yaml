@@ -2,9 +2,9 @@ table:
   name: Instructor
   schema: public
 object_relationships:
-- name: Person
+- name: User
   using:
-    foreign_key_constraint_on: PersonId
+    foreign_key_constraint_on: UserId
 array_relationships:
 - name: CourseInstructors
   using:
@@ -18,7 +18,7 @@ select_permissions:
     columns:
     - Description
     - Id
-    - PersonId
+    - UserId
     - Qualification
     - WantsToContinue
     filter: {}
@@ -27,7 +27,7 @@ select_permissions:
     columns:
     - Description
     - Id
-    - PersonId
+    - UserId
     - Qualification
     - WantsToContinue
     filter: {}

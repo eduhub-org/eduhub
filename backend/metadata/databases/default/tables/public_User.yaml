@@ -19,7 +19,7 @@ array_relationships:
 - name: Attendences
   using:
     foreign_key_constraint_on:
-      column: PersonId
+      column: UserId
       table:
         name: Attendence
         schema: public
@@ -33,7 +33,7 @@ array_relationships:
 - name: Instructors
   using:
     foreign_key_constraint_on:
-      column: PersonId
+      column: UserId
       table:
         name: Instructor
         schema: public
@@ -47,7 +47,7 @@ array_relationships:
 - name: Referents
   using:
     foreign_key_constraint_on:
-      column: PersonId
+      column: UserId
       table:
         name: Referent
         schema: public
@@ -62,7 +62,6 @@ select_permissions:
   role: anonymous
 - permission:
     columns:
-    - AuthId
     - Firstname
     - Id
     - Image
