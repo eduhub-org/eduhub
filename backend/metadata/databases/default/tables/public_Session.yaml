@@ -20,12 +20,12 @@ array_relationships:
       table:
         name: Attendence
         schema: public
-- name: SessionReferents
+- name: Speakers
   using:
     foreign_key_constraint_on:
       column: SessionId
       table:
-        name: SessionReferent
+        name: Speaker
         schema: public
 select_permissions:
 - permission:
@@ -38,7 +38,7 @@ select_permissions:
     - Start
     - SurveyId
     - SurveyType
-    - Title
+    - Name
     filter: {}
   role: anonymous
 - permission:
@@ -51,6 +51,6 @@ select_permissions:
     - Start
     - SurveyId
     - SurveyType
-    - Title
+    - Name
     filter: {}
   role: user
