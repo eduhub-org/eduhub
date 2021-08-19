@@ -9,17 +9,6 @@ import { EnrollmentStatus_enum, CourseStatus_enum } from "./../../__generated__/
 // GraphQL query operation: MyEnrollmentsForCourseQuery
 // ====================================================
 
-export interface MyEnrollmentsForCourseQuery_Enrollment_Course_Semester {
-  __typename: "Semester";
-  ApplicationEnd: any | null;
-  ApplicationStart: any | null;
-  Id: number;
-  End: any | null;
-  Start: any | null;
-  Name: string;
-  PerformanceRecordDeadline: any | null;
-}
-
 export interface MyEnrollmentsForCourseQuery_Enrollment_Course_Sessions {
   __typename: "Session";
   Id: number;
@@ -31,8 +20,8 @@ export interface MyEnrollmentsForCourseQuery_Enrollment_Course_Sessions {
   Title: string;
 }
 
-export interface MyEnrollmentsForCourseQuery_Enrollment_Course_CourseInstructors_Instructor_Person {
-  __typename: "Person";
+export interface MyEnrollmentsForCourseQuery_Enrollment_Course_CourseInstructors_Instructor_User {
+  __typename: "User";
   Firstname: string;
   Image: string | null;
   Id: number;
@@ -45,7 +34,7 @@ export interface MyEnrollmentsForCourseQuery_Enrollment_Course_CourseInstructors
   /**
    * An object relationship
    */
-  Person: MyEnrollmentsForCourseQuery_Enrollment_Course_CourseInstructors_Instructor_Person;
+  User: MyEnrollmentsForCourseQuery_Enrollment_Course_CourseInstructors_Instructor_User;
   Qualification: string | null;
   Description: string | null;
 }
@@ -76,10 +65,6 @@ export interface MyEnrollmentsForCourseQuery_Enrollment_Course {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  /**
-   * An object relationship
-   */
-  Semester: MyEnrollmentsForCourseQuery_Enrollment_Course_Semester | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeOfStart: any | null;

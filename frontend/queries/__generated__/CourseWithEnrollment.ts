@@ -9,15 +9,10 @@ import { CourseStatus_enum, EnrollmentStatus_enum } from "./../../__generated__/
 // GraphQL query operation: CourseWithEnrollment
 // ====================================================
 
-export interface CourseWithEnrollment_Course_by_pk_Semester {
-  __typename: "Semester";
-  ApplicationEnd: any | null;
-  ApplicationStart: any | null;
+export interface CourseWithEnrollment_Course_by_pk_Sessions_Attendences {
+  __typename: "Attendence";
   Id: number;
-  End: any | null;
-  Start: any | null;
-  Name: string;
-  PerformanceRecordDeadline: any | null;
+  Attending: boolean;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Sessions {
@@ -29,10 +24,14 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions {
   Location: string;
   Start: any;
   Title: string;
+  /**
+   * An array relationship
+   */
+  Attendences: CourseWithEnrollment_Course_by_pk_Sessions_Attendences[];
 }
 
-export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor_Person {
-  __typename: "Person";
+export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor_User {
+  __typename: "User";
   Firstname: string;
   Image: string | null;
   Id: number;
@@ -45,7 +44,7 @@ export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor 
   /**
    * An object relationship
    */
-  Person: CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor_Person;
+  User: CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor_User;
   Qualification: string | null;
   Description: string | null;
 }
@@ -65,6 +64,17 @@ export interface CourseWithEnrollment_Course_by_pk_Enrollments {
   Status: EnrollmentStatus_enum;
 }
 
+export interface CourseWithEnrollment_Course_by_pk_Program {
+  __typename: "Program";
+  ApplicationEnd: any | null;
+  ApplicationStart: any | null;
+  Id: number;
+  End: any | null;
+  Start: any | null;
+  Name: string;
+  PerformanceRecordDeadline: any | null;
+}
+
 export interface CourseWithEnrollment_Course_by_pk {
   __typename: "Course";
   Id: number;
@@ -82,10 +92,6 @@ export interface CourseWithEnrollment_Course_by_pk {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  /**
-   * An object relationship
-   */
-  Semester: CourseWithEnrollment_Course_by_pk_Semester | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeOfStart: any | null;
@@ -101,6 +107,10 @@ export interface CourseWithEnrollment_Course_by_pk {
    * An array relationship
    */
   Enrollments: CourseWithEnrollment_Course_by_pk_Enrollments[];
+  /**
+   * An object relationship
+   */
+  Program: CourseWithEnrollment_Course_by_pk_Program | null;
 }
 
 export interface CourseWithEnrollment {
@@ -112,4 +122,5 @@ export interface CourseWithEnrollment {
 
 export interface CourseWithEnrollmentVariables {
   id: number;
+  authId: any;
 }

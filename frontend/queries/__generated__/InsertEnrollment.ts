@@ -9,17 +9,6 @@ import { EnrollmentStatus_enum, CourseStatus_enum } from "./../../__generated__/
 // GraphQL mutation operation: InsertEnrollment
 // ====================================================
 
-export interface InsertEnrollment_insert_Enrollment_returning_Course_Semester {
-  __typename: "Semester";
-  ApplicationEnd: any | null;
-  ApplicationStart: any | null;
-  Id: number;
-  End: any | null;
-  Start: any | null;
-  Name: string;
-  PerformanceRecordDeadline: any | null;
-}
-
 export interface InsertEnrollment_insert_Enrollment_returning_Course_Sessions {
   __typename: "Session";
   Id: number;
@@ -31,8 +20,8 @@ export interface InsertEnrollment_insert_Enrollment_returning_Course_Sessions {
   Title: string;
 }
 
-export interface InsertEnrollment_insert_Enrollment_returning_Course_CourseInstructors_Instructor_Person {
-  __typename: "Person";
+export interface InsertEnrollment_insert_Enrollment_returning_Course_CourseInstructors_Instructor_User {
+  __typename: "User";
   Firstname: string;
   Image: string | null;
   Id: number;
@@ -45,7 +34,7 @@ export interface InsertEnrollment_insert_Enrollment_returning_Course_CourseInstr
   /**
    * An object relationship
    */
-  Person: InsertEnrollment_insert_Enrollment_returning_Course_CourseInstructors_Instructor_Person;
+  User: InsertEnrollment_insert_Enrollment_returning_Course_CourseInstructors_Instructor_User;
   Qualification: string | null;
   Description: string | null;
 }
@@ -82,10 +71,6 @@ export interface InsertEnrollment_insert_Enrollment_returning_Course {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  /**
-   * An object relationship
-   */
-  Semester: InsertEnrollment_insert_Enrollment_returning_Course_Semester | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeOfStart: any | null;
@@ -133,7 +118,7 @@ export interface InsertEnrollment {
 }
 
 export interface InsertEnrollmentVariables {
-  participantId: number;
+  userId: number;
   courseId: number;
   motivationLetter: string;
 }

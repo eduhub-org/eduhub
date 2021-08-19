@@ -9,17 +9,6 @@ import { CourseStatus_enum } from "./../../__generated__/globalTypes";
 // GraphQL query operation: CourseList
 // ====================================================
 
-export interface CourseList_Course_Semester {
-  __typename: "Semester";
-  ApplicationEnd: any | null;
-  ApplicationStart: any | null;
-  Id: number;
-  End: any | null;
-  Start: any | null;
-  Name: string;
-  PerformanceRecordDeadline: any | null;
-}
-
 export interface CourseList_Course_Sessions {
   __typename: "Session";
   Id: number;
@@ -31,8 +20,8 @@ export interface CourseList_Course_Sessions {
   Title: string;
 }
 
-export interface CourseList_Course_CourseInstructors_Instructor_Person {
-  __typename: "Person";
+export interface CourseList_Course_CourseInstructors_Instructor_User {
+  __typename: "User";
   Firstname: string;
   Image: string | null;
   Id: number;
@@ -45,7 +34,7 @@ export interface CourseList_Course_CourseInstructors_Instructor {
   /**
    * An object relationship
    */
-  Person: CourseList_Course_CourseInstructors_Instructor_Person;
+  User: CourseList_Course_CourseInstructors_Instructor_User;
   Qualification: string | null;
   Description: string | null;
 }
@@ -76,10 +65,6 @@ export interface CourseList_Course {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  /**
-   * An object relationship
-   */
-  Semester: CourseList_Course_Semester | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeOfStart: any | null;

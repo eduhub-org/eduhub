@@ -1,15 +1,18 @@
 import { Modal } from "@material-ui/core";
 import Fade from "@material-ui/core/Fade";
-import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { FC, useCallback, useState } from "react";
 
 import { EnrollmentStatus_enum } from "../../__generated__/globalTypes";
 import { enrollmentStatusForCourse } from "../../helpers/courseHelpers";
 import { useAuthedMutation } from "../../hooks/authedMutation";
+import { useUser } from "../../hooks/user";
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
 import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
-import { InsertEnrollment } from "../../queries/__generated__/InsertEnrollment";
+import {
+  InsertEnrollment,
+  InsertEnrollmentVariables,
+} from "../../queries/__generated__/InsertEnrollment";
 import { INSERT_ENROLLMENT } from "../../queries/insertEnrollment";
 
 import { CourseApplicationModalFormContent } from "./CourseApplicationModalFormContent";
@@ -27,25 +30,32 @@ export const CourseApplicationModal: FC<IProps> = ({
   visible,
 }) => {
   const [text, setText] = useState("");
+  const user = useUser();
 
   const onChangeText = useCallback((event) => {
     setText(event.target.value);
   }, []);
 
-  const [
-    insertMutation,
-    { data, loading, error },
-  ] = useAuthedMutation<InsertEnrollment>(INSERT_ENROLLMENT);
+  const [insertMutation, { data, loading, error }] = useAuthedMutation<
+    InsertEnrollment,
+    InsertEnrollmentVariables
+  >(INSERT_ENROLLMENT);
 
   const applyForCourse = useCallback(() => {
+    if (!user) {
+      // eslint-disable-next-line no-console
+      console.log("Missing user data.");
+      return;
+    }
+
     insertMutation({
       variables: {
         courseId: course.Id,
-        participantId: 7061,
+        userId: user?.Id,
         motivationLetter: text,
       },
     });
-  }, [course.Id, insertMutation, text]);
+  }, [course.Id, insertMutation, text, user]);
 
   const status = enrollmentStatusForCourse(course);
 

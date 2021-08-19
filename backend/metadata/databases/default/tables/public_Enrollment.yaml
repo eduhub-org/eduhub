@@ -5,9 +5,18 @@ object_relationships:
 - name: Course
   using:
     foreign_key_constraint_on: CourseId
-- name: Participant
+- name: EnrollmentStatus
   using:
-    foreign_key_constraint_on: ParticipantId
+    foreign_key_constraint_on: Status
+- name: ProjectType
+  using:
+    foreign_key_constraint_on: TypeOfProject
+- name: User
+  using:
+    foreign_key_constraint_on: UserId
+- name: motivationGradeByMotivationgrade
+  using:
+    foreign_key_constraint_on: MotivationGrade
 array_relationships:
 - name: ProjectEnrollments
   using:
@@ -20,14 +29,13 @@ insert_permissions:
 - permission:
     backend_only: false
     check:
-      Participant:
-        Person:
-          AuthId:
-            _eq: X-Hasura-User-Id
+      User:
+        AuthId:
+          _eq: X-Hasura-User-Id
     columns:
     - CourseId
     - MotivationLetter
-    - ParticipantId
+    - UserId
     - WantsEcts
   role: user
 select_permissions:
@@ -36,23 +44,11 @@ select_permissions:
     - CourseId
     - Id
     - MotivationLetter
-    - ParticipantId
+    - UserId
     - Status
     - WantsEcts
     filter:
-      Participant:
-        Person:
-          AuthId:
-            _eq: X-Hasura-User-Id
+      User:
+        AuthId:
+          _eq: X-Hasura-User-Id
   role: user
-event_triggers:
-- definition:
-    enable_manual: false
-    insert:
-      columns: "*"
-  name: enrollment_mail
-  retry_conf:
-    interval_sec: 10
-    num_retries: 0
-    timeout_sec: 60
-  webhook: localhost:3001

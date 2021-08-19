@@ -9,17 +9,6 @@ import { EnrollmentStatus_enum, CourseStatus_enum } from "./../../__generated__/
 // GraphQL query operation: MyCourses
 // ====================================================
 
-export interface MyCourses_Enrollment_Course_Semester {
-  __typename: "Semester";
-  ApplicationEnd: any | null;
-  ApplicationStart: any | null;
-  Id: number;
-  End: any | null;
-  Start: any | null;
-  Name: string;
-  PerformanceRecordDeadline: any | null;
-}
-
 export interface MyCourses_Enrollment_Course_Sessions {
   __typename: "Session";
   Id: number;
@@ -31,8 +20,8 @@ export interface MyCourses_Enrollment_Course_Sessions {
   Title: string;
 }
 
-export interface MyCourses_Enrollment_Course_CourseInstructors_Instructor_Person {
-  __typename: "Person";
+export interface MyCourses_Enrollment_Course_CourseInstructors_Instructor_User {
+  __typename: "User";
   Firstname: string;
   Image: string | null;
   Id: number;
@@ -45,7 +34,7 @@ export interface MyCourses_Enrollment_Course_CourseInstructors_Instructor {
   /**
    * An object relationship
    */
-  Person: MyCourses_Enrollment_Course_CourseInstructors_Instructor_Person;
+  User: MyCourses_Enrollment_Course_CourseInstructors_Instructor_User;
   Qualification: string | null;
   Description: string | null;
 }
@@ -65,6 +54,17 @@ export interface MyCourses_Enrollment_Course_Enrollments {
   Status: EnrollmentStatus_enum;
 }
 
+export interface MyCourses_Enrollment_Course_Program {
+  __typename: "Program";
+  ApplicationEnd: any | null;
+  ApplicationStart: any | null;
+  Id: number;
+  End: any | null;
+  Start: any | null;
+  Name: string;
+  PerformanceRecordDeadline: any | null;
+}
+
 export interface MyCourses_Enrollment_Course {
   __typename: "Course";
   Id: number;
@@ -82,10 +82,6 @@ export interface MyCourses_Enrollment_Course {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  /**
-   * An object relationship
-   */
-  Semester: MyCourses_Enrollment_Course_Semester | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeOfStart: any | null;
@@ -101,6 +97,10 @@ export interface MyCourses_Enrollment_Course {
    * An array relationship
    */
   Enrollments: MyCourses_Enrollment_Course_Enrollments[];
+  /**
+   * An object relationship
+   */
+  Program: MyCourses_Enrollment_Course_Program | null;
 }
 
 export interface MyCourses_Enrollment {

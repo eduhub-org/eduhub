@@ -1,6 +1,9 @@
 import { gql } from "@apollo/client";
 
+import { SESSION_FRAGMENT } from "./sessionFragement";
+
 export const COURSE_FRAGMENT = gql`
+  ${SESSION_FRAGMENT}
   fragment CourseFragment on Course {
     Id
     Ects
@@ -21,19 +24,13 @@ export const COURSE_FRAGMENT = gql`
     ShortDescription
     TimeOfStart
     Sessions {
-      Id
-      Finish
-      CourseId
-      Description
-      Location
-      Start
-      Title
+      ...SessionFragment
     }
     CourseInstructors {
       Id
       Instructor {
         Id
-        Person {
+        User {
           Firstname
           Image
           Id
