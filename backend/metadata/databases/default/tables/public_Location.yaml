@@ -2,10 +2,10 @@ table:
   name: Location
   schema: public
 array_relationships:
-- name: Courses
+- name: CourseLocations
   using:
     foreign_key_constraint_on:
       column: LocationId
       table:
-        name: Course
+        name: CourseLocation
         schema: public
