@@ -20,7 +20,7 @@ export interface MyEnrollmentsForCourseQuery_Enrollment_Course_Sessions {
   Title: string;
 }
 
-export interface MyEnrollmentsForCourseQuery_Enrollment_Course_CourseInstructors_Instructor_Person {
+export interface MyEnrollmentsForCourseQuery_Enrollment_Course_CourseInstructors_Instructor_User {
   __typename: "User";
   Firstname: string;
   Image: string | null;
@@ -34,7 +34,7 @@ export interface MyEnrollmentsForCourseQuery_Enrollment_Course_CourseInstructors
   /**
    * An object relationship
    */
-  Person: MyEnrollmentsForCourseQuery_Enrollment_Course_CourseInstructors_Instructor_Person;
+  User: MyEnrollmentsForCourseQuery_Enrollment_Course_CourseInstructors_Instructor_User;
   Qualification: string | null;
   Description: string | null;
 }

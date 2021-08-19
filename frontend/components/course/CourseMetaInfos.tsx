@@ -36,10 +36,10 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
       ? course.CourseInstructors[0].Instructor
       : undefined;
 
-  const instructorName = `${instructor?.Person?.Firstname ?? ""} ${
-    instructor?.Person?.Lastname ?? ""
+  const instructorName = `${instructor?.User?.Firstname ?? ""} ${
+    instructor?.User?.Lastname ?? ""
   }`;
-  const instructorAvatar = instructor?.Person.Image;
+  const instructorAvatar = instructor?.User.Image;
   const instructorQualification = instructor?.Qualification ?? "";
   const instructorDescription = instructor?.Description ?? "";
 
