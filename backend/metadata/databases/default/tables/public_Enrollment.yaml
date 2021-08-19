@@ -14,9 +14,9 @@ object_relationships:
 - name: User
   using:
     foreign_key_constraint_on: UserId
-- name: motivationGradeByMotivationgrade
+- name: motivationRatingByMotivationrating
   using:
-    foreign_key_constraint_on: MotivationGrade
+    foreign_key_constraint_on: MotivationRating
 array_relationships:
 - name: ProjectEnrollments
   using:
