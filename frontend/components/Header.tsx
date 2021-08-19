@@ -3,6 +3,7 @@ import Link from "next/link";
 import { FC, MouseEvent, useCallback, useState } from "react";
 
 import { useIsLoggedIn } from "../hooks/authentication";
+import { useUser } from "../hooks/user";
 
 import { LoginButton } from "./LoginButton";
 import { Menu } from "./Menu";
@@ -14,6 +15,8 @@ export const Header: FC = () => {
   const isLoggedIn = useIsLoggedIn();
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [menuAnchorElement, setMenuAnchorElement] = useState<HTMLElement>();
+
+  const user = useUser();
 
   const openMenu = useCallback((event: MouseEvent<HTMLElement>) => {
     setMenuAnchorElement(event.currentTarget);
@@ -49,7 +52,7 @@ export const Header: FC = () => {
       {isLoggedIn ? (
         <div className="flex bg-blue-400">
           <div className="cursor-pointer" onClick={openMenu}>
-            <Avatar imageUrl="" />
+            <Avatar imageUrl={user?.Image || "/images/common/mystery.svg"} />
           </div>
           {menuAnchorElement ? (
             <Menu

@@ -98,16 +98,14 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
       </span>
       <div className="flex">
         <div className="flex flex-shrink-0 items-start mr-4">
-          {instructorAvatar ? (
-            <Image
-              src={instructorAvatar}
-              alt="Image of the instructor"
-              width={68}
-              height={68}
-              className="rounded-full overflow-hidden"
-              objectFit="cover"
-            />
-          ) : null}
+          <Image
+            src={instructorAvatar ?? "/images/common/mystery.svg"}
+            alt="Image of the course instructor"
+            width={68}
+            height={68}
+            className="rounded-full overflow-hidden"
+            objectFit="cover"
+          />
         </div>
         <div className="flex flex-col">
           <span className="text-base mb-1">{instructorName}</span>
