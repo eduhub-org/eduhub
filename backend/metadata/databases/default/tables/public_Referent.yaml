@@ -11,5 +11,5 @@ array_relationships:
     foreign_key_constraint_on:
       column: ReferentId
       table:
-        name: SessionReferent
+        name: Speaker
         schema: public

@@ -24,7 +24,7 @@
 - "!include public_ProjectType.yaml"
 - "!include public_Referent.yaml"
 - "!include public_Session.yaml"
-- "!include public_SessionReferent.yaml"
+- "!include public_Speaker.yaml"
 - "!include public_SurveyType.yaml"
 - "!include public_University.yaml"
 - "!include public_User.yaml"
