@@ -7,7 +7,7 @@
   "sendApplication": "Bewerbung abschicken",
   "status": {
     "applied": "Du hast dich für diesen Kurs bereits beworben! in Kürze wirst du Rückmeldung dazu bekommen",
-    "rejected": "Leider wurde Deine Bewerbung auf diesen Kurs abgelehnt."
+    "rejected": "Du hast die Einladung zu diesem Kurs abgelehnt."
   },
   "successBody": "Spätestens ein bis zwei Tage nach Bewerbungsschluss wirst Du über Deine Zulassung informiert.",
   "successCloseButtonTitle": "Schließen",
