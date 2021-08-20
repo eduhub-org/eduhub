@@ -4,6 +4,7 @@ import { FC, MouseEvent, useCallback, useState } from "react";
 
 import { useIsLoggedIn } from "../hooks/authentication";
 import { useUser } from "../hooks/user";
+import mysteryImg from "../public/images/common/mystery.svg";
 
 import { LoginButton } from "./LoginButton";
 import { Menu } from "./Menu";
@@ -52,7 +53,7 @@ export const Header: FC = () => {
       {isLoggedIn ? (
         <div className="flex bg-blue-400">
           <div className="cursor-pointer" onClick={openMenu}>
-            <Avatar imageUrl={user?.Image || "/images/common/mystery.svg"} />
+            <Avatar imageUrl={user?.Image || mysteryImg} />
           </div>
           {menuAnchorElement ? (
             <Menu
