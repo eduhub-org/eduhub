@@ -9,17 +9,3 @@ array_relationships:
       table:
         name: Course
         schema: public
-select_permissions:
-- permission:
-    columns:
-    - ApplicationEnd
-    - ApplicationStart
-    - End
-    - Id
-    - Name
-    - PerformanceRecordDeadline
-    - Start
-    filter:
-      Visibility:
-        _eq: true
-  role: user

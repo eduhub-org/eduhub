@@ -50,6 +50,7 @@ export interface CourseListWithEnrollments_Course_CourseInstructors {
 
 export interface CourseListWithEnrollments_Course_Enrollments {
   __typename: "Enrollment";
+  ExpirationDate: any | null;
   Id: number;
   Status: EnrollmentStatus_enum;
 }

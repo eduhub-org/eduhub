@@ -47,6 +47,13 @@ export const client = new ApolloClient({
       },
       Enrollment: {
         keyFields: ["Id"],
+        fields: {
+          ExpirationDate: {
+            merge: (_, ExpirationDate) => {
+              return new Date(ExpirationDate);
+            },
+          },
+        },
       },
       Semester: {
         keyFields: ["Id"],

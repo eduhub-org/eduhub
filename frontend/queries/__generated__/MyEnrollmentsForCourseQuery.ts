@@ -80,6 +80,7 @@ export interface MyEnrollmentsForCourseQuery_Enrollment_Course {
 
 export interface MyEnrollmentsForCourseQuery_Enrollment {
   __typename: "Enrollment";
+  ExpirationDate: any | null;
   Id: number;
   Status: EnrollmentStatus_enum;
   /**

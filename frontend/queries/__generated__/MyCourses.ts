@@ -50,6 +50,7 @@ export interface MyCourses_Enrollment_Course_CourseInstructors {
 
 export interface MyCourses_Enrollment_Course_Enrollments {
   __typename: "Enrollment";
+  ExpirationDate: any | null;
   Id: number;
   Status: EnrollmentStatus_enum;
 }
@@ -105,6 +106,7 @@ export interface MyCourses_Enrollment_Course {
 
 export interface MyCourses_Enrollment {
   __typename: "Enrollment";
+  ExpirationDate: any | null;
   Id: number;
   Status: EnrollmentStatus_enum;
   /**

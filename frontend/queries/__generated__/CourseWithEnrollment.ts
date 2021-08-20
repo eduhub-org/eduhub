@@ -60,6 +60,7 @@ export interface CourseWithEnrollment_Course_by_pk_CourseInstructors {
 
 export interface CourseWithEnrollment_Course_by_pk_Enrollments {
   __typename: "Enrollment";
+  ExpirationDate: any | null;
   Id: number;
   Status: EnrollmentStatus_enum;
 }

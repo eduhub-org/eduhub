@@ -3,16 +3,22 @@ import Link from "next/link";
 import { FC } from "react";
 
 import { EnrollmentStatus_enum } from "../../__generated__/globalTypes";
-import { enrollmentStatusForCourse } from "../../helpers/courseHelpers";
+import {
+  enrollmentStatusForCourse,
+  hasEnrollments,
+  hasProgram,
+} from "../../helpers/courseHelpers";
 import { CourseList_Course } from "../../queries/__generated__/CourseList";
 import { CourseListWithEnrollments_Course } from "../../queries/__generated__/CourseListWithEnrollments";
+import { CourseWithEnrollment_Course_by_pk_Enrollments } from "../../queries/__generated__/CourseWithEnrollment";
 
 interface IProps {
   course: CourseList_Course | CourseListWithEnrollments_Course;
 }
 
 const colorForEnrollmentStatus = (
-  status: EnrollmentStatus_enum | "NOT_APPLIED"
+  status: EnrollmentStatus_enum | "NOT_APPLIED",
+  enrollment: CourseWithEnrollment_Course_by_pk_Enrollments | undefined
 ): string => {
   if (
     status === EnrollmentStatus_enum.APPLIED ||
@@ -27,15 +33,20 @@ const colorForEnrollmentStatus = (
     return "bg-gray-300";
   }
   if (status === EnrollmentStatus_enum.INVITED) {
-    return "bg-edu-course-invited";
+    if (enrollment && new Date() < enrollment.ExpirationDate) {
+      return "bg-edu-course-invited";
+    } else {
+      return "bg-gray-300";
+    }
   }
   return "";
 };
 
 const CourseStatusIndicator: FC<{
   enrollmentStatus: EnrollmentStatus_enum | "NOT_APPLIED";
-}> = ({ enrollmentStatus }) => {
-  const color = colorForEnrollmentStatus(enrollmentStatus);
+  enrollment: CourseWithEnrollment_Course_by_pk_Enrollments | undefined;
+}> = ({ enrollmentStatus, enrollment }) => {
+  const color = colorForEnrollmentStatus(enrollmentStatus, enrollment);
 
   if (enrollmentStatus === EnrollmentStatus_enum.COMPLETED) {
     return (
@@ -63,16 +74,20 @@ const CourseStatusIndicator: FC<{
 export const Tile: FC<IProps> = ({ course }) => {
   const enrollmentStatus = enrollmentStatusForCourse(course);
 
-  const semester = course.Semester;
+  const program = hasProgram(course) ? course.Program : undefined;
+  const enrollment =
+    hasEnrollments(course) && course.Enrollments.length === 1
+      ? course.Enrollments[0]
+      : undefined;
 
   const currentDate = new Date();
-  const isCurrentSemester =
-    !!semester &&
-    semester?.Start <= currentDate &&
-    currentDate <= semester?.End;
+  const isCurrentProgram =
+    !!program &&
+    program?.ApplicationStart <= currentDate &&
+    currentDate <= program?.PerformanceRecordDeadline;
 
   const highlightColor =
-    enrollmentStatus === EnrollmentStatus_enum.CONFIRMED && isCurrentSemester
+    enrollmentStatus === EnrollmentStatus_enum.CONFIRMED && isCurrentProgram
       ? "bg-edu-course-current"
       : "bg-gray-100";
 
@@ -88,7 +103,10 @@ export const Tile: FC<IProps> = ({ course }) => {
               height={144}
               priority
             />
-            <CourseStatusIndicator enrollmentStatus={enrollmentStatus} />
+            <CourseStatusIndicator
+              enrollmentStatus={enrollmentStatus}
+              enrollment={enrollment}
+            />
           </div>
           <div
             className={`flex h-1/2 flex-col justify-between ${highlightColor} p-3`}
