@@ -2,19 +2,19 @@ table:
   name: Attendence
   schema: public
 object_relationships:
-- name: Person
-  using:
-    foreign_key_constraint_on: PersonId
 - name: Session
   using:
     foreign_key_constraint_on: SessionId
+- name: User
+  using:
+    foreign_key_constraint_on: UserId
 select_permissions:
 - permission:
     columns:
     - Attending
     - Id
     filter:
-      Person:
+      User:
         AuthId:
           _eq: X-Hasura-User-Id
   role: user

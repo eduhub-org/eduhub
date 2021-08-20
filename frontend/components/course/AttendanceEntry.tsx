@@ -7,7 +7,7 @@ interface IProps {
   session: CourseWithEnrollment_Course_by_pk_Sessions;
 }
 
-export const AttendenceEntry: FC<IProps> = ({ session }) => {
+export const AttendanceEntry: FC<IProps> = ({ session }) => {
   const { i18n } = useTranslation();
 
   const didParticipate =

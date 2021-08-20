@@ -20,7 +20,7 @@ export interface CourseFragment_Sessions {
   Title: string;
 }
 
-export interface CourseFragment_CourseInstructors_Instructor_Person {
+export interface CourseFragment_CourseInstructors_Instructor_User {
   __typename: "User";
   Firstname: string;
   Image: string | null;
@@ -34,7 +34,7 @@ export interface CourseFragment_CourseInstructors_Instructor {
   /**
    * An object relationship
    */
-  Person: CourseFragment_CourseInstructors_Instructor_Person;
+  User: CourseFragment_CourseInstructors_Instructor_User;
   Qualification: string | null;
   Description: string | null;
 }

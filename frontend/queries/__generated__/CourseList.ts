@@ -20,7 +20,7 @@ export interface CourseList_Course_Sessions {
   Title: string;
 }
 
-export interface CourseList_Course_CourseInstructors_Instructor_Person {
+export interface CourseList_Course_CourseInstructors_Instructor_User {
   __typename: "User";
   Firstname: string;
   Image: string | null;
@@ -34,7 +34,7 @@ export interface CourseList_Course_CourseInstructors_Instructor {
   /**
    * An object relationship
    */
-  Person: CourseList_Course_CourseInstructors_Instructor_Person;
+  User: CourseList_Course_CourseInstructors_Instructor_User;
   Qualification: string | null;
   Description: string | null;
 }

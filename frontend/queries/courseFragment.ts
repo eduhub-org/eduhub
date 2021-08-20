@@ -31,7 +31,7 @@ export const COURSE_FRAGMENT = gql`
       Id
       Instructor {
         Id
-        Person {
+        User {
           Firstname
           Image
           Id
