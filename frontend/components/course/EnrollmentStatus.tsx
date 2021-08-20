@@ -47,6 +47,12 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
     const status = enrollments[0].Status;
 
     switch (status) {
+      case EnrollmentStatus_enum.ABORTED: {
+        content = (
+          <span className="bg-gray-300 p-4">{t("status.aborted")}</span>
+        );
+        break;
+      }
       case EnrollmentStatus_enum.APPLIED: {
         content = (
           <span className="bg-gray-300 p-4">{t("status.applied")}</span>

@@ -3,6 +3,9 @@ import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
 import { getWeekdayString } from "../../helpers/dateHelpers";
+import mysteryImg from "../../public/images/common/mystery.svg";
+import languageIcon from "../../public/images/course/language.svg";
+import pinIcon from "../../public/images/course/pin.svg";
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
 
 import { CourseCost } from "./CourseCost";
@@ -71,20 +74,10 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
         <span className="text-sm mt-2 text-center">{t("ects")}</span>
         {/* <span className="text-sm mt-2 text-center mb-12"> h/Woche</span> */}
         <div className="flex justify-center">
-          <Image
-            src="/images/course/pin.svg"
-            alt="Location"
-            width={32}
-            height={43}
-          />
+          <Image src={pinIcon} alt="Location" width={32} height={43} />
         </div>
         <div className="flex justify-center">
-          <Image
-            src="/images/course/language.svg"
-            alt="Language"
-            width={47}
-            height={40}
-          />
+          <Image src={languageIcon} alt="Language" width={47} height={40} />
         </div>
         <span className="text-sm mt-2 text-center">
           {"Wo zur Hölle? Online?"}
@@ -98,16 +91,14 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
       </span>
       <div className="flex">
         <div className="flex flex-shrink-0 items-start mr-4">
-          {instructorAvatar ? (
-            <Image
-              src={instructorAvatar}
-              alt="Image of the instructor"
-              width={68}
-              height={68}
-              className="rounded-full overflow-hidden"
-              objectFit="cover"
-            />
-          ) : null}
+          <Image
+            src={instructorAvatar || mysteryImg}
+            alt="Image of the course instructor"
+            width={68}
+            height={68}
+            className="rounded-full overflow-hidden"
+            objectFit="cover"
+          />
         </div>
         <div className="flex flex-col">
           <span className="text-base mb-1">{instructorName}</span>
