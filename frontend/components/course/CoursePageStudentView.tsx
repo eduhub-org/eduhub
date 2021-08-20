@@ -4,7 +4,7 @@ import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/C
 import { ContentRow } from "../common/ContentRow";
 import { PageBlock } from "../common/PageBlock";
 
-import { Attendences } from "./Attendences";
+import { Attendances } from "./Attendances";
 import { CourseTitleSubTitleBlock } from "./CourseTitleSubTitleBlock";
 import { Resources } from "./Resources";
 import { Tasks } from "./Tasks";
@@ -36,7 +36,7 @@ export const CoursePageStudentView: FC<IProps> = ({ course }) => {
           className="my-24"
           leftTop={
             <div className="flex flex-1">
-              <Attendences course={course} />
+              <Attendances course={course} />
             </div>
           }
           rightBottom={
