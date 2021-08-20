@@ -19,5 +19,7 @@ select_permissions:
     - Name
     - PerformanceRecordDeadline
     - Start
-    filter: {}
+    filter:
+      Visibility:
+        _eq: true
   role: user
