@@ -86,9 +86,9 @@ select_permissions:
     - OnlineCourses
     - OnlineCoursesAllowed
     - Online_Hybrid_Offline
-    - ProgramId
     - Projects
     - ProjectsAllowed
+    - ProgramId
     - ShortDescription
     - Status
     - TextOnCertificate
