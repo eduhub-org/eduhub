@@ -2,9 +2,18 @@ table:
   name: Course
   schema: public
 object_relationships:
-- name: Semester
+- name: CourseStatus
   using:
-    foreign_key_constraint_on: SemesterId
+    foreign_key_constraint_on: Status
+- name: Location
+  using:
+    foreign_key_constraint_on: LocationId
+- name: OnlineHybridOffline
+  using:
+    foreign_key_constraint_on: Online_Hybrid_Offline
+- name: Program
+  using:
+    foreign_key_constraint_on: ProgramId
 array_relationships:
 - name: CourseInstructors
   using:
@@ -45,7 +54,7 @@ select_permissions:
     - MaxParticipants
     - Name
     - OnlineCourses
-    - SemesterId
+    - ProgramId
     - ShortDescription
     - Status
     - TextOnCertificate
@@ -79,7 +88,7 @@ select_permissions:
     - Online_Hybrid_Offline
     - Projects
     - ProjectsAllowed
-    - SemesterId
+    - ProgramId
     - ShortDescription
     - Status
     - TextOnCertificate

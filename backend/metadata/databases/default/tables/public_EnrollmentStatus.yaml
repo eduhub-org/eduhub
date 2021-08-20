@@ -2,6 +2,14 @@ table:
   name: EnrollmentStatus
   schema: public
 is_enum: true
+array_relationships:
+- name: Enrollments
+  using:
+    foreign_key_constraint_on:
+      column: Status
+      table:
+        name: Enrollment
+        schema: public
 select_permissions:
 - permission:
     columns:

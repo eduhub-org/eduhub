@@ -2,6 +2,14 @@ table:
   name: CourseStatus
   schema: public
 is_enum: true
+array_relationships:
+- name: Courses
+  using:
+    foreign_key_constraint_on:
+      column: Status
+      table:
+        name: Course
+        schema: public
 select_permissions:
 - permission:
     columns:

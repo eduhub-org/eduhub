@@ -7,13 +7,13 @@ export const INSERT_ENROLLMENT = gql`
   ${COURSE_FRAGMENT}
   ${ENROLLMENT_FRAGMENT}
   mutation InsertEnrollment(
-    $participantId: Int!
+    $userId: Int!
     $courseId: Int!
     $motivationLetter: String!
   ) {
     insert_Enrollment(
       objects: {
-        ParticipantId: $participantId
+        UserId: $userId
         CourseId: $courseId
         MotivationLetter: $motivationLetter
         WantsEcts: false

@@ -20,8 +20,8 @@ export interface MyCourses_Enrollment_Course_Sessions {
   Title: string;
 }
 
-export interface MyCourses_Enrollment_Course_CourseInstructors_Instructor_Person {
-  __typename: "Person";
+export interface MyCourses_Enrollment_Course_CourseInstructors_Instructor_User {
+  __typename: "User";
   Firstname: string;
   Image: string | null;
   Id: number;
@@ -34,7 +34,7 @@ export interface MyCourses_Enrollment_Course_CourseInstructors_Instructor {
   /**
    * An object relationship
    */
-  Person: MyCourses_Enrollment_Course_CourseInstructors_Instructor_Person;
+  User: MyCourses_Enrollment_Course_CourseInstructors_Instructor_User;
   Qualification: string | null;
   Description: string | null;
 }
@@ -65,7 +65,7 @@ export interface MyCourses_Enrollment_Course {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  SemesterId: number | null;
+  ProgramId: number | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeOfStart: any | null;

@@ -20,7 +20,7 @@ export const COURSE_FRAGMENT = gql`
     MaxParticipants
     Name
     OnlineCourses
-    SemesterId
+    ProgramId
     Status
     ShortDescription
     TimeOfStart
@@ -31,7 +31,7 @@ export const COURSE_FRAGMENT = gql`
       Id
       Instructor {
         Id
-        Person {
+        User {
           Firstname
           Image
           Id

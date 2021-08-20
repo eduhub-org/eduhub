@@ -30,8 +30,8 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions {
   Attendences: CourseWithEnrollment_Course_by_pk_Sessions_Attendences[];
 }
 
-export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor_Person {
-  __typename: "Person";
+export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor_User {
+  __typename: "User";
   Firstname: string;
   Image: string | null;
   Id: number;
@@ -44,7 +44,7 @@ export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor 
   /**
    * An object relationship
    */
-  Person: CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor_Person;
+  User: CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor_User;
   Qualification: string | null;
   Description: string | null;
 }
@@ -81,7 +81,7 @@ export interface CourseWithEnrollment_Course_by_pk {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  SemesterId: number | null;
+  ProgramId: number | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeOfStart: any | null;

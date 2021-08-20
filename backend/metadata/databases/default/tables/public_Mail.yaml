@@ -4,12 +4,4 @@ table:
 object_relationships:
 - name: Person
   using:
-    foreign_key_constraint_on: Author
-array_relationships:
-- name: MailLogs
-  using:
-    foreign_key_constraint_on:
-      column: Mail
-      table:
-        name: MailLog
-        schema: public
+    foreign_key_constraint_on: Sender_id

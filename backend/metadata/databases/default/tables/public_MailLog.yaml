@@ -1,7 +1,0 @@
-table:
-  name: MailLog
-  schema: public
-object_relationships:
-- name: mailByMail
-  using:
-    foreign_key_constraint_on: Mail
