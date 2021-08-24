@@ -12,6 +12,13 @@ object_relationships:
   using:
     foreign_key_constraint_on: ProgramId
 array_relationships:
+- name: CourseAddresses
+  using:
+    foreign_key_constraint_on:
+      column: courseId
+      table:
+        name: CourseAddress
+        schema: public
 - name: CourseInstructors
   using:
     foreign_key_constraint_on:
@@ -22,7 +29,7 @@ array_relationships:
 - name: CourseLocations
   using:
     foreign_key_constraint_on:
-      column: CourseId
+      column: courseId
       table:
         name: CourseLocation
         schema: public
