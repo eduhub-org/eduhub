@@ -39,10 +39,10 @@ select_permissions:
     columns:
     - CourseId
     - Description
-    - Finish
+    - endDateTime
     - Id
     - Location
-    - Start
+    - startDateTime
     - SurveyId
     - SurveyType
     - Name
@@ -52,10 +52,10 @@ select_permissions:
     columns:
     - CourseId
     - Description
-    - Finish
+    - endDateTime
     - Id
     - Location
-    - Start
+    - startDateTime
     - SurveyId
     - SurveyType
     - Name
