@@ -16,7 +16,7 @@ export const COURSE_WITH_ENROLLMENT = gql`
       }
       Sessions {
         ...SessionFragment
-        Attendences(where: { Person: { AuthId: { _eq: $authId } } }) {
+        Attendences(where: { User: { AuthId: { _eq: $authId } } }) {
           Id
           Attending
         }

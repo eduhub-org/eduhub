@@ -10,6 +10,7 @@
 export interface User_User {
   __typename: "User";
   Id: number;
+  Image: string | null;
 }
 
 export interface User {
