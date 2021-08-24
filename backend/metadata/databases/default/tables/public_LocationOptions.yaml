@@ -6,7 +6,7 @@ array_relationships:
 - name: Locations
   using:
     foreign_key_constraint_on:
-      column: LocationName
+      column: Location
       table:
-        name: Location
+        name: CourseLocation
         schema: public

@@ -5,11 +5,3 @@ object_relationships:
 - name: LocationOption
   using:
     foreign_key_constraint_on: LocationName
-array_relationships:
-- name: CourseLocations
-  using:
-    foreign_key_constraint_on:
-      column: LocationId
-      table:
-        name: CourseLocation
-        schema: public
