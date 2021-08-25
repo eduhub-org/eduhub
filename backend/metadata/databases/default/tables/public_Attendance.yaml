@@ -14,3 +14,13 @@ object_relationships:
 - name: User
   using:
     foreign_key_constraint_on: UserId
+select_permissions:
+- permission:
+    columns:
+    - Id
+    - Status
+    filter:
+      User:
+        AuthId:
+          _eq: X-Hasura-User-Id
+  role: user
