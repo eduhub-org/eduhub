@@ -8,18 +8,16 @@ export const getWeekdayString = (
   short: boolean,
   uppercased: boolean
 ) => {
-  if (!course.DayOfTheWeek) return null;
+  if (!course.WeekDay) return null;
 
-  const weekday = short
-    ? t(`${course.DayOfTheWeek}-short`)
-    : t(course.DayOfTheWeek);
+  const weekday = short ? t(`${course.WeekDay}-short`) : t(course.WeekDay);
 
   return uppercased ? weekday.toUpperCase() : weekday;
 };
 
 export const getStartTimeString = (course: Course_Course_by_pk, i18n: I18n) => {
   const startTime: string =
-    course.TimeOfStart?.toLocaleTimeString(i18n.languages, {
+    course.TimeStart?.toLocaleTimeString(i18n.languages, {
       hour: "numeric",
       minute: "numeric",
     }) ?? "";
@@ -28,15 +26,11 @@ export const getStartTimeString = (course: Course_Course_by_pk, i18n: I18n) => {
 };
 
 export const getEndTimeString = (course: Course_Course_by_pk, i18n: I18n) => {
-  const endTime = course.Duration
-    ? new Date(
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        course.TimeOfStart.getTime() + course.Duration * 60000
-      ).toLocaleTimeString(i18n.languages, {
-        hour: "numeric",
-        minute: "numeric",
-      })
-    : "";
+  const endTime =
+    course.TimeEnd?.toLocaleTimeString(i18n.languages, {
+      hour: "numeric",
+      minute: "numeric",
+    }) ?? "";
 
   return endTime ?? null;
 };
