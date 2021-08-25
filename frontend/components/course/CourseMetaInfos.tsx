@@ -19,20 +19,15 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
   const { t: tLanguage } = useTranslation("common");
 
   const startTime =
-    course.TimeOfStart?.toLocaleTimeString(i18n.languages, {
+    course.TimeStart?.toLocaleTimeString(i18n.languages, {
       hour: "numeric",
       minute: "numeric",
     }) ?? "";
   const endTime =
-    course.Duration && course.TimeOfStart
-      ? new Date(
-          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-          course.TimeOfStart.getTime() + course.Duration * 60000
-        ).toLocaleTimeString(i18n.languages, {
-          hour: "numeric",
-          minute: "numeric",
-        })
-      : "";
+    course.TimeEnd?.toLocaleTimeString(i18n.languages, {
+      hour: "numeric",
+      minute: "numeric",
+    }) ?? "";
 
   const instructor =
     course.CourseInstructors.length > 0

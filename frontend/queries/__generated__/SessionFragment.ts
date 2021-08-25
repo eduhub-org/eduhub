@@ -10,10 +10,10 @@
 export interface SessionFragment {
   __typename: "Session";
   Id: number;
-  Finish: any;
+  endDateTime: any;
   CourseId: number;
   Description: string;
   Location: string;
-  Start: any;
-  Title: string;
+  startDateTime: any;
+  Name: string;
 }

@@ -3,27 +3,27 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseStatus_enum, EnrollmentStatus_enum } from "./../../__generated__/globalTypes";
+import { CourseStatus_enum, EnrollmentStatus_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseWithEnrollment
 // ====================================================
 
 export interface CourseWithEnrollment_Course_by_pk_Sessions_Attendences {
-  __typename: "Attendence";
+  __typename: "Attendance";
   Id: number;
-  Attending: boolean;
+  Status: AttendanceStatus_enum;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Sessions {
   __typename: "Session";
   Id: number;
-  Finish: any;
+  endDateTime: any;
   CourseId: number;
   Description: string;
   Location: string;
-  Start: any;
-  Title: string;
+  startDateTime: any;
+  Name: string;
   /**
    * An array relationship
    */
@@ -68,23 +68,23 @@ export interface CourseWithEnrollment_Course_by_pk {
   __typename: "Course";
   Id: number;
   Ects: string;
-  Duration: number | null;
   Description: string;
-  DayOfTheWeek: string | null;
+  WeekDay: string | null;
   CourseType: number | null;
   Cost: string;
   City: string;
-  BookingDeadline: any;
+  ApplicationEnd: any;
   Image: string | null;
   Language: string;
-  MaxMissedDates: number;
+  MaxMissedSessions: number;
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
   ProgramId: number | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
-  TimeOfStart: any | null;
+  TimeStart: any | null;
+  TimeEnd: any | null;
   /**
    * An array relationship
    */

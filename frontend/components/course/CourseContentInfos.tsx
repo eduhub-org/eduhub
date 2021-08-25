@@ -18,23 +18,23 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
         {t("courseContent")}
       </span>
       <ul>
-        {course.Sessions.map(({ Start, Title }, index) => (
+        {course.Sessions.map(({ startDateTime, Name }, index) => (
           <li key={index} className="flex mb-4">
             <div className="flex flex-col flex-shrink-0 mr-6">
               <span className="text-xs sm:text-sm font-semibold">
-                {Start?.toLocaleDateString(i18n.languages, {
+                {startDateTime?.toLocaleDateString(i18n.languages, {
                   month: "2-digit",
                   day: "2-digit",
                 }) ?? ""}
               </span>
               <span className="text-xs sm:text-sm">
-                {Start?.toLocaleTimeString(i18n.languages, {
+                {startDateTime?.toLocaleTimeString(i18n.languages, {
                   hour: "numeric",
                   minute: "numeric",
                 }) ?? ""}
               </span>
             </div>
-            <span className="block text-sm sm:text-lg">{Title}</span>
+            <span className="block text-sm sm:text-lg">{Name}</span>
           </li>
         ))}
       </ul>
