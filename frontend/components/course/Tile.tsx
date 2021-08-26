@@ -33,11 +33,14 @@ const colorForEnrollmentStatus = (
     return "bg-gray-300";
   }
   if (status === EnrollmentStatus_enum.INVITED) {
-    if (enrollment && new Date() < enrollment.ExpirationDate) {
+    if (
+      !enrollment?.ExpirationDate ||
+      (enrollment && new Date() < enrollment.ExpirationDate)
+    ) {
       return "bg-edu-course-invited";
     } else {
-     // invitation is expired
-     return "bg-gray-300";
+      // invitation is expired
+      return "bg-gray-300";
     }
   }
   return "";
