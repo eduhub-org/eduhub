@@ -45,10 +45,11 @@ select_permissions:
 - permission:
     columns:
     - CourseId
+    - ExpirationDate
     - Id
     - MotivationLetter
-    - UserId
     - Status
+    - UserId
     - WantsEcts
     filter:
       User:

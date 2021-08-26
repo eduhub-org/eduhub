@@ -3,19 +3,13 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseStatus_enum, EnrollmentStatus_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
+import { CourseStatus_enum, EnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL query operation: CourseWithEnrollment
+// GraphQL query operation: CourseListWithEnrollments
 // ====================================================
 
-export interface CourseWithEnrollment_Course_by_pk_Sessions_Attendances {
-  __typename: "Attendance";
-  Id: number;
-  Status: AttendanceStatus_enum;
-}
-
-export interface CourseWithEnrollment_Course_by_pk_Sessions {
+export interface CourseListWithEnrollments_Course_Sessions {
   __typename: "Session";
   Id: number;
   endDateTime: any;
@@ -24,13 +18,9 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions {
   Location: string;
   startDateTime: any;
   Name: string;
-  /**
-   * An array relationship
-   */
-  Attendances: CourseWithEnrollment_Course_by_pk_Sessions_Attendances[];
 }
 
-export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor_User {
+export interface CourseListWithEnrollments_Course_CourseInstructors_Instructor_User {
   __typename: "User";
   Firstname: string;
   Image: string | null;
@@ -38,34 +28,34 @@ export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor_
   Lastname: string;
 }
 
-export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor {
+export interface CourseListWithEnrollments_Course_CourseInstructors_Instructor {
   __typename: "Instructor";
   Id: number;
   /**
    * An object relationship
    */
-  User: CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor_User;
+  User: CourseListWithEnrollments_Course_CourseInstructors_Instructor_User;
   Qualification: string | null;
   Description: string | null;
 }
 
-export interface CourseWithEnrollment_Course_by_pk_CourseInstructors {
+export interface CourseListWithEnrollments_Course_CourseInstructors {
   __typename: "CourseInstructor";
   Id: number;
   /**
    * An object relationship
    */
-  Instructor: CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor;
+  Instructor: CourseListWithEnrollments_Course_CourseInstructors_Instructor;
 }
 
-export interface CourseWithEnrollment_Course_by_pk_Enrollments {
+export interface CourseListWithEnrollments_Course_Enrollments {
   __typename: "Enrollment";
   ExpirationDate: any | null;
   Id: number;
   Status: EnrollmentStatus_enum;
 }
 
-export interface CourseWithEnrollment_Course_by_pk_Program {
+export interface CourseListWithEnrollments_Course_Program {
   __typename: "Program";
   ApplicationEnd: any | null;
   ApplicationStart: any | null;
@@ -76,7 +66,7 @@ export interface CourseWithEnrollment_Course_by_pk_Program {
   PerformanceRecordDeadline: any | null;
 }
 
-export interface CourseWithEnrollment_Course_by_pk {
+export interface CourseListWithEnrollments_Course {
   __typename: "Course";
   Id: number;
   Ects: string;
@@ -99,29 +89,24 @@ export interface CourseWithEnrollment_Course_by_pk {
   /**
    * An array relationship
    */
-  Sessions: CourseWithEnrollment_Course_by_pk_Sessions[];
+  Sessions: CourseListWithEnrollments_Course_Sessions[];
   /**
    * An array relationship
    */
-  CourseInstructors: CourseWithEnrollment_Course_by_pk_CourseInstructors[];
+  CourseInstructors: CourseListWithEnrollments_Course_CourseInstructors[];
   /**
    * An array relationship
    */
-  Enrollments: CourseWithEnrollment_Course_by_pk_Enrollments[];
+  Enrollments: CourseListWithEnrollments_Course_Enrollments[];
   /**
    * An object relationship
    */
-  Program: CourseWithEnrollment_Course_by_pk_Program | null;
+  Program: CourseListWithEnrollments_Course_Program | null;
 }
 
-export interface CourseWithEnrollment {
+export interface CourseListWithEnrollments {
   /**
-   * fetch data from the table: "Course" using primary key columns
+   * fetch data from the table: "Course"
    */
-  Course_by_pk: CourseWithEnrollment_Course_by_pk | null;
-}
-
-export interface CourseWithEnrollmentVariables {
-  id: number;
-  authId: any;
+  Course: CourseListWithEnrollments_Course[];
 }

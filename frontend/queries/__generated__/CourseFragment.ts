@@ -64,7 +64,6 @@ export interface CourseFragment {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  ProgramId: number | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeStart: any | null;

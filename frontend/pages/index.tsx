@@ -13,8 +13,12 @@ import { OnlyLoggedIn } from "../components/common/OnlyLoggedIn";
 import { OnlyLoggedOut } from "../components/common/OnlyLoggedOut";
 import { MyCourses } from "../components/course/MyCourses";
 import { TileSlider } from "../components/course/TileSlider";
+import { useAuthedQuery } from "../hooks/authedQuery";
+import { useIsLoggedIn } from "../hooks/authentication";
 import { CourseList } from "../queries/__generated__/CourseList";
+import { CourseListWithEnrollments } from "../queries/__generated__/CourseListWithEnrollments";
 import { COURSE_LIST } from "../queries/courseList";
+import { COURSE_LIST_WITH_ENROLLMENT } from "../queries/courseListWithEnrollment";
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
@@ -24,7 +28,13 @@ export const getStaticProps = async ({ locale }: { locale: string }) => ({
 
 const Home: FC = () => {
   const { t } = useTranslation("start-page");
-  const { data: courses, loading, error } = useQuery<CourseList>(COURSE_LIST);
+
+  const isLoggedIn = useIsLoggedIn();
+
+  const query = isLoggedIn ? COURSE_LIST_WITH_ENROLLMENT : COURSE_LIST;
+  const { data: courses, loading, error } = useAuthedQuery<
+    CourseList | CourseListWithEnrollments
+  >(query);
 
   return (
     <>

@@ -48,6 +48,24 @@ export interface MyCourses_Enrollment_Course_CourseInstructors {
   Instructor: MyCourses_Enrollment_Course_CourseInstructors_Instructor;
 }
 
+export interface MyCourses_Enrollment_Course_Enrollments {
+  __typename: "Enrollment";
+  ExpirationDate: any | null;
+  Id: number;
+  Status: EnrollmentStatus_enum;
+}
+
+export interface MyCourses_Enrollment_Course_Program {
+  __typename: "Program";
+  ApplicationEnd: any | null;
+  ApplicationStart: any | null;
+  Id: number;
+  End: any | null;
+  Start: any | null;
+  Name: string;
+  PerformanceRecordDeadline: any | null;
+}
+
 export interface MyCourses_Enrollment_Course {
   __typename: "Course";
   Id: number;
@@ -64,7 +82,6 @@ export interface MyCourses_Enrollment_Course {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  ProgramId: number | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeStart: any | null;
@@ -77,10 +94,19 @@ export interface MyCourses_Enrollment_Course {
    * An array relationship
    */
   CourseInstructors: MyCourses_Enrollment_Course_CourseInstructors[];
+  /**
+   * An array relationship
+   */
+  Enrollments: MyCourses_Enrollment_Course_Enrollments[];
+  /**
+   * An object relationship
+   */
+  Program: MyCourses_Enrollment_Course_Program | null;
 }
 
 export interface MyCourses_Enrollment {
   __typename: "Enrollment";
+  ExpirationDate: any | null;
   Id: number;
   Status: EnrollmentStatus_enum;
   /**

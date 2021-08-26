@@ -64,7 +64,6 @@ export interface MyEnrollmentsForCourseQuery_Enrollment_Course {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  ProgramId: number | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeStart: any | null;
@@ -81,6 +80,7 @@ export interface MyEnrollmentsForCourseQuery_Enrollment_Course {
 
 export interface MyEnrollmentsForCourseQuery_Enrollment {
   __typename: "Enrollment";
+  ExpirationDate: any | null;
   Id: number;
   Status: EnrollmentStatus_enum;
   /**

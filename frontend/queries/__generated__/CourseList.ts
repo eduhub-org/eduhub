@@ -64,7 +64,6 @@ export interface CourseList_Course {
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  ProgramId: number | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
   TimeStart: any | null;
