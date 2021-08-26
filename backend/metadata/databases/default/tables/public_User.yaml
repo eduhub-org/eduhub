@@ -21,7 +21,7 @@ array_relationships:
     foreign_key_constraint_on:
       column: UserId
       table:
-        name: Attendence
+        name: Attendance
         schema: public
 - name: Enrollments
   using:

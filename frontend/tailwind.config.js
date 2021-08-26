@@ -7,6 +7,8 @@ module.exports = {
     extend: {
       colors: {
         "edu-black": "#222222",
+        "edu-course-current": "#A2EBA0",
+        "edu-course-invited": "#FFA665",
         "edu-green": "#00A398",
         "edu-missed-yellow": "#F2991D66",
       },

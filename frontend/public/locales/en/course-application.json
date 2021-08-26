@@ -6,6 +6,7 @@
   "motivationalTextPlaceholder": "what is so awesome about you",
   "sendApplication": "send application",
   "status": {
+    "aborted": "You did not complete this course successfully.",
     "applied": "You already applied for this course and will get feedback in no time.",
     "rejected": "You have declined the invitation to this course."
   },

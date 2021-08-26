@@ -1,7 +1,13 @@
 import { Course_Course_by_pk } from "../queries/__generated__/Course";
 import { CourseWithEnrollment_Course_by_pk } from "../queries/__generated__/CourseWithEnrollment";
 
-const hasEnrollments = (
+export const hasProgram = (
+  course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk
+): course is CourseWithEnrollment_Course_by_pk => {
+  return "Program" in course;
+};
+
+export const hasEnrollments = (
   course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk
 ): course is CourseWithEnrollment_Course_by_pk => {
   return "Enrollments" in course;

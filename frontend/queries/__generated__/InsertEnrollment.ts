@@ -12,12 +12,12 @@ import { EnrollmentStatus_enum, CourseStatus_enum } from "./../../__generated__/
 export interface InsertEnrollment_insert_Enrollment_returning_Course_Sessions {
   __typename: "Session";
   Id: number;
-  Finish: any;
+  endDateTime: any;
   CourseId: number;
   Description: string;
   Location: string;
-  Start: any;
-  Title: string;
+  startDateTime: any;
+  Name: string;
 }
 
 export interface InsertEnrollment_insert_Enrollment_returning_Course_CourseInstructors_Instructor_User {
@@ -50,6 +50,7 @@ export interface InsertEnrollment_insert_Enrollment_returning_Course_CourseInstr
 
 export interface InsertEnrollment_insert_Enrollment_returning_Course_Enrollments {
   __typename: "Enrollment";
+  ExpirationDate: any | null;
   Id: number;
   Status: EnrollmentStatus_enum;
 }
@@ -58,25 +59,24 @@ export interface InsertEnrollment_insert_Enrollment_returning_Course {
   __typename: "Course";
   Id: number;
   Ects: string;
-  Duration: number | null;
   Description: string;
-  DayOfTheWeek: string | null;
+  WeekDay: string | null;
   CourseType: number | null;
   Cost: string;
   City: string;
-  BookingDeadline: any;
+  ApplicationEnd: any;
   Image: string | null;
   Language: string;
-  MaxMissedDates: number;
+  MaxMissedSessions: number;
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  ProgramId: number | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
-  TimeOfStart: any | null;
   LinkChat: string | null;
   LinkVideoCall: string | null;
+  TimeStart: any | null;
+  TimeEnd: any | null;
   /**
    * An array relationship
    */
@@ -93,6 +93,7 @@ export interface InsertEnrollment_insert_Enrollment_returning_Course {
 
 export interface InsertEnrollment_insert_Enrollment_returning {
   __typename: "Enrollment";
+  ExpirationDate: any | null;
   Id: number;
   Status: EnrollmentStatus_enum;
   /**

@@ -12,12 +12,12 @@ import { EnrollmentStatus_enum, CourseStatus_enum } from "./../../__generated__/
 export interface MyEnrollmentsForCourseQuery_Enrollment_Course_Sessions {
   __typename: "Session";
   Id: number;
-  Finish: any;
+  endDateTime: any;
   CourseId: number;
   Description: string;
   Location: string;
-  Start: any;
-  Title: string;
+  startDateTime: any;
+  Name: string;
 }
 
 export interface MyEnrollmentsForCourseQuery_Enrollment_Course_CourseInstructors_Instructor_User {
@@ -52,25 +52,24 @@ export interface MyEnrollmentsForCourseQuery_Enrollment_Course {
   __typename: "Course";
   Id: number;
   Ects: string;
-  Duration: number | null;
   Description: string;
-  DayOfTheWeek: string | null;
+  WeekDay: string | null;
   CourseType: number | null;
   Cost: string;
   City: string;
-  BookingDeadline: any;
+  ApplicationEnd: any;
   Image: string | null;
   Language: string;
-  MaxMissedDates: number;
+  MaxMissedSessions: number;
   MaxParticipants: number;
   Name: string;
   OnlineCourses: string;
-  ProgramId: number | null;
   Status: CourseStatus_enum;
   ShortDescription: string;
-  TimeOfStart: any | null;
   LinkChat: string | null;
   LinkVideoCall: string | null;
+  TimeStart: any | null;
+  TimeEnd: any | null;
   /**
    * An array relationship
    */
@@ -83,6 +82,7 @@ export interface MyEnrollmentsForCourseQuery_Enrollment_Course {
 
 export interface MyEnrollmentsForCourseQuery_Enrollment {
   __typename: "Enrollment";
+  ExpirationDate: any | null;
   Id: number;
   Status: EnrollmentStatus_enum;
   /**

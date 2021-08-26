@@ -7,10 +7,18 @@
 // START Enums and Input Objects
 //==============================================================
 
+export enum AttendanceStatus_enum {
+  ATTENDED = "ATTENDED",
+  MISSED = "MISSED",
+  NO_INFO = "NO_INFO",
+}
+
 export enum CourseStatus_enum {
-  ACTIVE = "ACTIVE",
+  APPLICANTS_INVITED = "APPLICANTS_INVITED",
   DRAFT = "DRAFT",
-  FINISHED = "FINISHED",
+  PARTICIPANTS_RATED = "PARTICIPANTS_RATED",
+  READY_FOR_APPLICATION = "READY_FOR_APPLICATION",
+  READY_FOR_PUBLICATION = "READY_FOR_PUBLICATION",
 }
 
 export enum EnrollmentStatus_enum {

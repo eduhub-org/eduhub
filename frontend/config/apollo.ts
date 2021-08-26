@@ -33,31 +33,69 @@ export const client = new ApolloClient({
       Course: {
         keyFields: ["Id"],
         fields: {
-          BookingDeadline: {
-            merge: (_, BookingDeadline) => {
-              return new Date(BookingDeadline);
+          ApplicationEnd: {
+            merge: (_, ApplicationEnd) => {
+              return new Date(ApplicationEnd);
             },
           },
-          TimeOfStart: {
-            merge: (_, TimeOfStart) => {
-              return new Date(TimeOfStart);
+          TimeStart: {
+            merge: (_, TimeStart) => {
+              return new Date(TimeStart);
+            },
+          },
+          TimeEnd: {
+            merge: (_, TimeEnd) => {
+              return new Date(TimeEnd);
             },
           },
         },
       },
       Enrollment: {
         keyFields: ["Id"],
-      },
-      Session: {
         fields: {
+          ExpirationDate: {
+            merge: (_, ExpirationDate) => {
+              return new Date(ExpirationDate);
+            },
+          },
+        },
+      },
+      Semester: {
+        keyFields: ["Id"],
+        fields: {
+          ApplicationStart: {
+            merge: (_, Start) => {
+              return new Date(Start);
+            },
+          },
+          ApplicationEnd: {
+            merge: (_, Start) => {
+              return new Date(Start);
+            },
+          },
           Start: {
             merge: (_, Start) => {
               return new Date(Start);
             },
           },
-          Finish: {
+          End: {
             merge: (_, Start) => {
               return new Date(Start);
+            },
+          },
+        },
+      },
+      Session: {
+        keyFields: ["Id"],
+        fields: {
+          startDateTime: {
+            merge: (_, startDateTime) => {
+              return new Date(startDateTime);
+            },
+          },
+          endDateTime: {
+            merge: (_, endDateTime) => {
+              return new Date(endDateTime);
             },
           },
         },

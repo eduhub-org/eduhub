@@ -1,7 +1,0 @@
-table:
-  name: AttendenceDocument
-  schema: public
-object_relationships:
-- name: Session
-  using:
-    foreign_key_constraint_on: SessionId
