@@ -20,7 +20,7 @@ export const Attendances: FC<IProps> = ({ course }) => {
     <div className="flex flex-col">
       <BlockTitle>{t("attendance")}</BlockTitle>
       <span className="text-lg mb-4">
-        {t("MaxMissedSessions", { count: course.MaxMissedSessions })}
+        {t("maxMissedSessions", { count: course.MaxMissedSessions })}
       </span>
       <div>
         <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3">
