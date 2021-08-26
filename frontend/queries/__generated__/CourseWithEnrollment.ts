@@ -9,7 +9,7 @@ import { CourseStatus_enum, EnrollmentStatus_enum, AttendanceStatus_enum } from 
 // GraphQL query operation: CourseWithEnrollment
 // ====================================================
 
-export interface CourseWithEnrollment_Course_by_pk_Sessions_Attendences {
+export interface CourseWithEnrollment_Course_by_pk_Sessions_Attendances {
   __typename: "Attendance";
   Id: number;
   Status: AttendanceStatus_enum;
@@ -27,7 +27,7 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions {
   /**
    * An array relationship
    */
-  Attendences: CourseWithEnrollment_Course_by_pk_Sessions_Attendences[];
+  Attendances: CourseWithEnrollment_Course_by_pk_Sessions_Attendances[];
 }
 
 export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Instructor_User {
