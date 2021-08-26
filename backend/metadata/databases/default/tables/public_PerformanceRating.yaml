@@ -1,0 +1,12 @@
+table:
+  name: PerformanceRating
+  schema: public
+is_enum: true
+array_relationships:
+- name: Enrollments
+  using:
+    foreign_key_constraint_on:
+      column: PerformanceRating
+      table:
+        name: Enrollment
+        schema: public

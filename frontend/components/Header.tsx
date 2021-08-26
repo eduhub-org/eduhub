@@ -3,6 +3,10 @@ import Link from "next/link";
 import { FC, MouseEvent, useCallback, useState } from "react";
 
 import { useIsLoggedIn } from "../hooks/authentication";
+import { useUser } from "../hooks/user";
+import eduNameImg from "../public/images/EDU_HUB_name.svg";
+import mysteryImg from "../public/images/common/mystery.svg";
+import eduLogo from "../public/images/edu_logo.svg";
 
 import { LoginButton } from "./LoginButton";
 import { Menu } from "./Menu";
@@ -14,6 +18,8 @@ export const Header: FC = () => {
   const isLoggedIn = useIsLoggedIn();
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [menuAnchorElement, setMenuAnchorElement] = useState<HTMLElement>();
+
+  const user = useUser();
 
   const openMenu = useCallback((event: MouseEvent<HTMLElement>) => {
     setMenuAnchorElement(event.currentTarget);
@@ -27,7 +33,7 @@ export const Header: FC = () => {
           <div className="flex cursor-pointer">
             <div className="flex items-center">
               <Image
-                src="/images/edu_logo.svg"
+                src={eduLogo}
                 alt="Edu Hub logo"
                 width={34}
                 height={34}
@@ -36,7 +42,7 @@ export const Header: FC = () => {
             </div>
             <div className="flex items-center ml-2">
               <Image
-                src="/images/EDU_HUB_name.svg"
+                src={eduNameImg}
                 alt="Edu Hub name"
                 width={46}
                 height={33}
@@ -49,7 +55,7 @@ export const Header: FC = () => {
       {isLoggedIn ? (
         <div className="flex bg-blue-400">
           <div className="cursor-pointer" onClick={openMenu}>
-            <Avatar imageUrl="" />
+            <Avatar imageUrl={user?.Image || mysteryImg} />
           </div>
           {menuAnchorElement ? (
             <Menu

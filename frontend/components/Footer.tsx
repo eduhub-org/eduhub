@@ -1,6 +1,9 @@
 import Image from "next/image";
 import { FC } from "react";
 
+import facebookIcon from "../public/images/share/facebook-icon.svg";
+import instagramIcon from "../public/images/share/instagram-icon.svg";
+
 export const Footer: FC = () => {
   return (
     <footer className="flex flex-col w-full p-6 bg-edu-black text-white">
@@ -23,7 +26,7 @@ export const Footer: FC = () => {
           >
             <div className="flex items-center">
               <Image
-                src="/images/share/instagram-icon.svg"
+                src={instagramIcon}
                 alt="Instagram"
                 width={23}
                 height={23}
@@ -36,12 +39,7 @@ export const Footer: FC = () => {
             rel="noopener noreferrer"
           >
             <div className="ml-6 sm:ml-20 sm:mr-10 flex items-center">
-              <Image
-                src="/images/share/facebook-icon.svg"
-                alt="Facebook"
-                width={23}
-                height={23}
-              />
+              <Image src={facebookIcon} alt="Facebook" width={23} height={23} />
             </div>
           </a>
         </div>

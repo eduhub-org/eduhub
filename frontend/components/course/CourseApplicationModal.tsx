@@ -7,6 +7,7 @@ import { EnrollmentStatus_enum } from "../../__generated__/globalTypes";
 import { enrollmentStatusForCourse } from "../../helpers/courseHelpers";
 import { useAuthedMutation } from "../../hooks/authedMutation";
 import { useUser } from "../../hooks/user";
+import xIcon from "../../public/images/common/x-calibur.svg";
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
 import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
 import {
@@ -72,11 +73,7 @@ export const CourseApplicationModal: FC<IProps> = ({
         <div className="w-full sm:w-auto h-full sm:h-auto sm:m-16 sm:rounded bg-white">
           <div className="flex">
             <div className="flex p-6 cursor-pointer" onClick={closeModal}>
-              <Image
-                src="/images/common/x-calibur.svg"
-                width={22}
-                height={21}
-              />
+              <Image src={xIcon} width={22} height={21} />
             </div>
           </div>
           <div className="flex flex-col mt-4 mx-6 sm:mx-20">

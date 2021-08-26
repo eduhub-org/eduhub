@@ -5,9 +5,6 @@ object_relationships:
 - name: CourseStatus
   using:
     foreign_key_constraint_on: Status
-- name: Location
-  using:
-    foreign_key_constraint_on: LocationId
 - name: OnlineHybridOffline
   using:
     foreign_key_constraint_on: Online_Hybrid_Offline
@@ -15,12 +12,26 @@ object_relationships:
   using:
     foreign_key_constraint_on: ProgramId
 array_relationships:
+- name: CourseAddresses
+  using:
+    foreign_key_constraint_on:
+      column: courseId
+      table:
+        name: CourseAddress
+        schema: public
 - name: CourseInstructors
   using:
     foreign_key_constraint_on:
       column: CourseId
       table:
         name: CourseInstructor
+        schema: public
+- name: CourseLocations
+  using:
+    foreign_key_constraint_on:
+      column: courseId
+      table:
+        name: CourseLocation
         schema: public
 - name: Enrollments
   using:
@@ -39,18 +50,16 @@ array_relationships:
 select_permissions:
 - permission:
     columns:
-    - BookingDeadline
+    - ApplicationEnd
     - City
     - Cost
     - CourseType
-    - DayOfTheWeek
     - Description
-    - Duration
     - Ects
     - Id
     - Image
     - Language
-    - MaxMissedDates
+    - MaxMissedSessions
     - MaxParticipants
     - Name
     - OnlineCourses
@@ -58,42 +67,42 @@ select_permissions:
     - ShortDescription
     - Status
     - TextOnCertificate
-    - TimeOfStart
+    - TimeEnd
+    - TimeStart
+    - WeekDay
     filter: {}
   role: anonymous
 - permission:
     columns:
+    - ApplicationEnd
     - AttendanceCertificatePossible
-    - BookingDeadline
     - CertificatePossible
     - City
     - Cost
     - CourseType
     - DatesOnCertificate
-    - DayOfTheWeek
     - Description
     - Difficulty
-    - Duration
     - Ects
     - ExternalProjectsAllowed
     - Id
     - Image
     - Language
-    - LinkChat
-    - LinkVideoCall
-    - MaxMissedDates
+    - MaxMissedSessions
     - MaxParticipants
     - MaxProjectParticipants
     - Name
     - OnlineCourses
     - OnlineCoursesAllowed
     - Online_Hybrid_Offline
+    - ProgramId
     - Projects
     - ProjectsAllowed
-    - ProgramId
     - ShortDescription
     - Status
     - TextOnCertificate
-    - TimeOfStart
+    - TimeEnd
+    - TimeStart
+    - WeekDay
     filter: {}
   role: user
