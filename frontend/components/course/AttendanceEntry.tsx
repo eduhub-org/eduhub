@@ -14,7 +14,7 @@ export const AttendanceEntry: FC<IProps> = ({ session }) => {
   const { i18n } = useTranslation();
 
   const status =
-    session.Attendences.length > 0 ? session.Attendences[0].Status : NO_INFO;
+    session.Attendances.length > 0 ? session.Attendances[0].Status : NO_INFO;
   const bgColor =
     status === NO_INFO
       ? "bg-gray-200"
