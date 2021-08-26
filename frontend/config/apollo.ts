@@ -33,14 +33,19 @@ export const client = new ApolloClient({
       Course: {
         keyFields: ["Id"],
         fields: {
-          BookingDeadline: {
-            merge: (_, BookingDeadline) => {
-              return new Date(BookingDeadline);
+          ApplicationEnd: {
+            merge: (_, ApplicationEnd) => {
+              return new Date(ApplicationEnd);
             },
           },
-          TimeOfStart: {
-            merge: (_, TimeOfStart) => {
-              return new Date(TimeOfStart);
+          TimeStart: {
+            merge: (_, TimeStart) => {
+              return new Date(TimeStart);
+            },
+          },
+          TimeEnd: {
+            merge: (_, TimeEnd) => {
+              return new Date(TimeEnd);
             },
           },
         },
@@ -50,14 +55,14 @@ export const client = new ApolloClient({
       },
       Session: {
         fields: {
-          Start: {
-            merge: (_, Start) => {
-              return new Date(Start);
+          startDateTime: {
+            merge: (_, startDateTime) => {
+              return new Date(startDateTime);
             },
           },
-          Finish: {
-            merge: (_, Start) => {
-              return new Date(Start);
+          endDateTime: {
+            merge: (_, endDateTime) => {
+              return new Date(endDateTime);
             },
           },
         },

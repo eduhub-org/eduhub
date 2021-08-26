@@ -7,23 +7,23 @@ export const COURSE_FRAGMENT = gql`
   fragment CourseFragment on Course {
     Id
     Ects
-    Duration
     Description
-    DayOfTheWeek
+    WeekDay
     CourseType
     Cost
     City
-    BookingDeadline
+    ApplicationEnd
     Image
     Language
-    MaxMissedDates
+    MaxMissedSessions
     MaxParticipants
     Name
     OnlineCourses
     ProgramId
     Status
     ShortDescription
-    TimeOfStart
+    TimeStart
+    TimeEnd
     Sessions {
       ...SessionFragment
     }

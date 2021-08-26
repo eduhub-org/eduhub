@@ -1,0 +1,1 @@
+CREATE TABLE "public"."CourseLocation" ("Id" serial NOT NULL, "CourseId" integer NOT NULL, "LocationId" integer NOT NULL, PRIMARY KEY ("Id") , FOREIGN KEY ("CourseId") REFERENCES "public"."Course"("Id") ON UPDATE restrict ON DELETE restrict, FOREIGN KEY ("LocationId") REFERENCES "public"."Location"("Id") ON UPDATE restrict ON DELETE restrict);
