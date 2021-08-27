@@ -1,11 +1,11 @@
 import { useTranslation } from "next-i18next";
 import { FC, useCallback } from "react";
 
-import { Course_Course_by_pk } from "../../queries/__generated__/Course";
+import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
 import { Button } from "../common/Button";
 
 interface IProps {
-  course: Course_Course_by_pk;
+  course: CourseWithEnrollment_Course_by_pk;
 }
 
 export const Tools: FC<IProps> = ({ course }) => {

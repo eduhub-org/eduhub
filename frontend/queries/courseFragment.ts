@@ -21,8 +21,6 @@ export const COURSE_FRAGMENT = gql`
     OnlineCourses
     Status
     ShortDescription
-    LinkChat
-    LinkVideoCall
     TimeStart
     TimeEnd
     Sessions {

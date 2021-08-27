@@ -84,8 +84,6 @@ export interface MyCourses_Enrollment_Course {
   OnlineCourses: string;
   Status: CourseStatus_enum;
   ShortDescription: string;
-  LinkChat: string | null;
-  LinkVideoCall: string | null;
   TimeStart: any | null;
   TimeEnd: any | null;
   /**

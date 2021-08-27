@@ -73,8 +73,6 @@ export interface InsertEnrollment_insert_Enrollment_returning_Course {
   OnlineCourses: string;
   Status: CourseStatus_enum;
   ShortDescription: string;
-  LinkChat: string | null;
-  LinkVideoCall: string | null;
   TimeStart: any | null;
   TimeEnd: any | null;
   /**

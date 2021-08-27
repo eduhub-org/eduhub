@@ -66,8 +66,6 @@ export interface Course_Course_by_pk {
   OnlineCourses: string;
   Status: CourseStatus_enum;
   ShortDescription: string;
-  LinkChat: string | null;
-  LinkVideoCall: string | null;
   TimeStart: any | null;
   TimeEnd: any | null;
   /**
