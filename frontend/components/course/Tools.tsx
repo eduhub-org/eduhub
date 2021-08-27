@@ -1,5 +1,5 @@
 import { useTranslation } from "next-i18next";
-import { FC, useCallback } from "react";
+import { FC } from "react";
 
 import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
 import { Button } from "../common/Button";
@@ -11,31 +11,15 @@ interface IProps {
 export const Tools: FC<IProps> = ({ course }) => {
   const { t } = useTranslation("course-page");
 
-  const openChat = useCallback(() => {
-    if (!course.LinkChat) {
-      return;
-    }
-
-    window.open(course.LinkChat);
-  }, [course.LinkChat]);
-
-  const openVideoCall = useCallback(() => {
-    if (!course.LinkVideoCall) {
-      return;
-    }
-
-    window.open(course.LinkVideoCall);
-  }, [course.LinkVideoCall]);
-
   return (
     <div className="flex flex-1 gap-x-4">
       {course.LinkChat && (
-        <Button filled onClick={openChat}>
+        <Button as="a" filled href={course.LinkChat} target="_blank">
           {t("openChat")}
         </Button>
       )}
       {course.LinkVideoCall && (
-        <Button filled onClick={openVideoCall}>
+        <Button as="a" filled href={course.LinkVideoCall} target="_blank">
           {t("openVideoCall")}
         </Button>
       )}
