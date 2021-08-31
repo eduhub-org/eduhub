@@ -14,12 +14,24 @@ export const Tools: FC<IProps> = ({ course }) => {
   return (
     <div className="flex flex-1 gap-x-4">
       {course.LinkChat && (
-        <Button as="a" filled href={course.LinkChat} target="_blank">
+        <Button
+          as="a"
+          filled
+          href={course.LinkChat}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {t("openChat")}
         </Button>
       )}
       {course.LinkVideoCall && (
-        <Button as="a" filled href={course.LinkVideoCall} target="_blank">
+        <Button
+          as="a"
+          filled
+          href={course.LinkVideoCall}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {t("openVideoCall")}
         </Button>
       )}
