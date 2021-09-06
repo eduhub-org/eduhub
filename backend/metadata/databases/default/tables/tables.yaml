@@ -1,7 +1,7 @@
 - "!include public_Admin.yaml"
 - "!include public_Attendance.yaml"
-- "!include public_AttendanceDocument.yaml"
 - "!include public_AttendanceSource.yaml"
+- "!include public_AttendanceSourceData.yaml"
 - "!include public_AttendanceStatus.yaml"
 - "!include public_Course.yaml"
 - "!include public_CourseAddress.yaml"

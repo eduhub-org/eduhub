@@ -12,14 +12,14 @@ array_relationships:
 - name: Admins
   using:
     foreign_key_constraint_on:
-      column: UserId
+      column: userId
       table:
         name: Admin
         schema: public
 - name: Attendences
   using:
     foreign_key_constraint_on:
-      column: UserId
+      column: userId
       table:
         name: Attendance
         schema: public
