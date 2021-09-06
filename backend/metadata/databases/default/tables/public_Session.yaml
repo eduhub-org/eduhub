@@ -9,14 +9,14 @@ array_relationships:
 - name: AttendenceDocuments
   using:
     foreign_key_constraint_on:
-      column: SessionId
+      column: sessionId
       table:
-        name: AttendanceDocument
+        name: AttendanceSourceData
         schema: public
 - name: Attendences
   using:
     foreign_key_constraint_on:
-      column: SessionId
+      column: sessionId
       table:
         name: Attendance
         schema: public

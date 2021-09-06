@@ -1,0 +1,1 @@
+comment on TABLE "public"."AttendanceSourceData" is E'New rows are addes by a serverless function whenever the attendances for a session are checked. The table is not needed in the MVP case but would be beneficial for additional documentation at a later point in time.';
