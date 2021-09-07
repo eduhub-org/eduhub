@@ -2,9 +2,11 @@ FROM node:alpine
 
 RUN mkdir -p /opt/app
 RUN apk add --no-cache libc6-compat yarn
+
 ENV NODE_ENV production
-ENV PORT 25000
-EXPOSE 25000
+
+ENV PORT 5000
+EXPOSE 5000
 
 WORKDIR /opt/app
 

@@ -3,10 +3,12 @@ version: "3.8"
 services:
   frontend:
     ports:
-      - 25000:5000
+      - 5000:5000
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    environment:
+      NODE_ENV: development
     depends_on:
       - hasura
       - keycloak
