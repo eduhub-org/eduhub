@@ -4,34 +4,31 @@ table:
 object_relationships:
 - name: CourseStatus
   using:
-    foreign_key_constraint_on: Status
-- name: OnlineHybridOffline
-  using:
-    foreign_key_constraint_on: Online_Hybrid_Offline
+    foreign_key_constraint_on: status
 - name: Program
   using:
-    foreign_key_constraint_on: ProgramId
+    foreign_key_constraint_on: programId
 array_relationships:
 - name: CourseAddresses
   using:
     foreign_key_constraint_on:
       column: courseId
       table:
-        name: CourseAddress
+        name: CourseLocation
         schema: public
 - name: CourseInstructors
   using:
     foreign_key_constraint_on:
-      column: CourseId
+      column: courseId
       table:
         name: CourseInstructor
         schema: public
-- name: CourseLocations
+- name: CourseProjects
   using:
     foreign_key_constraint_on:
       column: courseId
       table:
-        name: CourseLocation
+        name: CourseProject
         schema: public
 - name: Enrollments
   using:
@@ -50,59 +47,40 @@ array_relationships:
 select_permissions:
 - permission:
     columns:
-    - ApplicationEnd
-    - City
-    - Cost
-    - CourseType
-    - Description
-    - Ects
-    - Id
-    - Image
-    - Language
-    - MaxMissedSessions
-    - MaxParticipants
-    - Name
-    - OnlineCourses
-    - ProgramId
-    - ShortDescription
-    - Status
-    - TextOnCertificate
-    - TimeEnd
-    - TimeStart
-    - WeekDay
+    - applicationEnd
+    - cost
+    - ects
+    - coverImage
+    - language
+    - maxMissedSessions
+    - onlineCourses
+    - programId
+    - tagline
+    - status
+    - endTime
+    - startTime
+    - weekDay
+    - id
+    - title
     filter: {}
   role: anonymous
 - permission:
     columns:
-    - ApplicationEnd
-    - AttendanceCertificatePossible
-    - CertificatePossible
-    - City
-    - Cost
-    - CourseType
-    - DatesOnCertificate
-    - Description
-    - Difficulty
-    - Ects
-    - ExternalProjectsAllowed
-    - Id
-    - Image
-    - Language
-    - MaxMissedSessions
-    - MaxParticipants
-    - MaxProjectParticipants
-    - Name
-    - OnlineCourses
-    - OnlineCoursesAllowed
-    - Online_Hybrid_Offline
-    - ProgramId
-    - Projects
-    - ProjectsAllowed
-    - ShortDescription
-    - Status
-    - TextOnCertificate
-    - TimeEnd
-    - TimeStart
-    - WeekDay
+    - coverImage
+    - programId
+    - endTime
+    - startTime
+    - applicationEnd
+    - attendanceCertificatePossible
+    - cost
+    - ects
+    - id
+    - language
+    - maxMissedSessions
+    - performanceCertificatePossible
+    - status
+    - tagline
+    - title
+    - weekDay
     filter: {}
   role: user

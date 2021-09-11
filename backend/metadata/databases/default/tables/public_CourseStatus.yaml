@@ -6,7 +6,7 @@ array_relationships:
 - name: Courses
   using:
     foreign_key_constraint_on:
-      column: Status
+      column: status
       table:
         name: Course
         schema: public
