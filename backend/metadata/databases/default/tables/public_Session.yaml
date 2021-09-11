@@ -34,30 +34,3 @@ array_relationships:
       table:
         name: Speaker
         schema: public
-select_permissions:
-- permission:
-    columns:
-    - CourseId
-    - Description
-    - endDateTime
-    - Id
-    - Location
-    - startDateTime
-    - SurveyId
-    - SurveyType
-    - Name
-    filter: {}
-  role: anonymous
-- permission:
-    columns:
-    - CourseId
-    - Description
-    - endDateTime
-    - Id
-    - Location
-    - startDateTime
-    - SurveyId
-    - SurveyType
-    - Name
-    filter: {}
-  role: user

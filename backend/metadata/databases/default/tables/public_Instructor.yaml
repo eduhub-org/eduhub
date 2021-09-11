@@ -9,7 +9,7 @@ array_relationships:
 - name: CourseInstructors
   using:
     foreign_key_constraint_on:
-      column: InstructorId
+      column: instructorId
       table:
         name: CourseInstructor
         schema: public

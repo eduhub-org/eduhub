@@ -2,6 +2,13 @@ table:
   name: Project
   schema: public
 array_relationships:
+- name: CourseProjects
+  using:
+    foreign_key_constraint_on:
+      column: projectId
+      table:
+        name: CourseProject
+        schema: public
 - name: ProjectEnrollments
   using:
     foreign_key_constraint_on:
