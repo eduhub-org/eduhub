@@ -40,7 +40,7 @@ array_relationships:
 - name: Sessions
   using:
     foreign_key_constraint_on:
-      column: CourseId
+      column: courseId
       table:
         name: Session
         schema: public
