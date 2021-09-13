@@ -6,7 +6,7 @@ object_relationships:
   using:
     manual_configuration:
       column_mapping:
-        source: Value
+        source: value
       insertion_order: null
       remote_table:
         name: AttendanceSource

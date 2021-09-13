@@ -1,0 +1,1 @@
+CREATE TABLE "public"."SessionSpeaker" ("id" serial NOT NULL, PRIMARY KEY ("id") , UNIQUE ("id"));COMMENT ON TABLE "public"."SessionSpeaker" IS E'A new session speaker is added as soon as an instructor selects an expert (or a user - which is then added to the expert table) as a speaker for a session.';

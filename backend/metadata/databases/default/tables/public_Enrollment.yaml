@@ -21,7 +21,7 @@ array_relationships:
 - name: ProjectEnrollments
   using:
     foreign_key_constraint_on:
-      column: EnrollmentId
+      column: enrollmentId
       table:
         name: ProjectEnrollment
         schema: public

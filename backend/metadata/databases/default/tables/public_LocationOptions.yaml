@@ -7,7 +7,7 @@ array_relationships:
   using:
     manual_configuration:
       column_mapping:
-        Value: locationOption
+        value: locationOption
       insertion_order: null
       remote_table:
         name: CourseLocation

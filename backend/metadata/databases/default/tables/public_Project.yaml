@@ -6,7 +6,7 @@ object_relationships:
   using:
     manual_configuration:
       column_mapping:
-        type: Value
+        type: value
       insertion_order: null
       remote_table:
         name: ProjectType
@@ -22,7 +22,7 @@ array_relationships:
 - name: ProjectEnrollments
   using:
     foreign_key_constraint_on:
-      column: ProjectId
+      column: projectId
       table:
         name: ProjectEnrollment
         schema: public

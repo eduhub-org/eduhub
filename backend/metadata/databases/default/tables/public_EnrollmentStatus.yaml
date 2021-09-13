@@ -13,7 +13,7 @@ array_relationships:
 select_permissions:
 - permission:
     columns:
-    - Value
-    - Comment
+    - value
+    - comment
     filter: {}
   role: anonymous

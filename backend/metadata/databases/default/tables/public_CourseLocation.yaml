@@ -9,7 +9,7 @@ object_relationships:
   using:
     manual_configuration:
       column_mapping:
-        locationOption: Value
+        locationOption: value
       insertion_order: null
       remote_table:
         name: LocationOptions
