@@ -26,23 +26,16 @@ array_relationships:
 - name: Enrollments
   using:
     foreign_key_constraint_on:
-      column: UserId
+      column: userId
       table:
         name: Enrollment
         schema: public
 - name: Instructors
   using:
     foreign_key_constraint_on:
-      column: UserId
+      column: userId
       table:
         name: Instructor
-        schema: public
-- name: Mails
-  using:
-    foreign_key_constraint_on:
-      column: Sender_id
-      table:
-        name: Mail
         schema: public
 - name: Referents
   using:

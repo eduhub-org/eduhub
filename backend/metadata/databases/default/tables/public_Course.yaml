@@ -9,19 +9,19 @@ object_relationships:
   using:
     foreign_key_constraint_on: programId
 array_relationships:
-- name: CourseAddresses
-  using:
-    foreign_key_constraint_on:
-      column: courseId
-      table:
-        name: CourseLocation
-        schema: public
 - name: CourseInstructors
   using:
     foreign_key_constraint_on:
       column: courseId
       table:
         name: CourseInstructor
+        schema: public
+- name: CourseLocations
+  using:
+    foreign_key_constraint_on:
+      column: courseId
+      table:
+        name: CourseLocation
         schema: public
 - name: CourseProjects
   using:
@@ -33,7 +33,7 @@ array_relationships:
 - name: Enrollments
   using:
     foreign_key_constraint_on:
-      column: CourseId
+      column: courseId
       table:
         name: Enrollment
         schema: public
@@ -49,19 +49,18 @@ select_permissions:
     columns:
     - applicationEnd
     - cost
-    - ects
     - coverImage
+    - ects
+    - endTime
+    - id
     - language
     - maxMissedSessions
-    - onlineCourses
     - programId
-    - tagline
-    - status
-    - endTime
     - startTime
-    - weekDay
-    - id
+    - status
+    - tagline
     - title
+    - weekDay
     filter: {}
   role: anonymous
 - permission:
@@ -77,7 +76,7 @@ select_permissions:
     - id
     - language
     - maxMissedSessions
-    - performanceCertificatePossible
+    - achievementCertificatePossible
     - status
     - tagline
     - title

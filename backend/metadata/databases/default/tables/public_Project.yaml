@@ -1,6 +1,16 @@
 table:
   name: Project
   schema: public
+object_relationships:
+- name: ProjectType
+  using:
+    manual_configuration:
+      column_mapping:
+        type: Value
+      insertion_order: null
+      remote_table:
+        name: ProjectType
+        schema: public
 array_relationships:
 - name: CourseProjects
   using:

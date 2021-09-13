@@ -6,7 +6,7 @@ array_relationships:
 - name: Enrollments
   using:
     foreign_key_constraint_on:
-      column: PerformanceRating
+      column: projectRating
       table:
         name: Enrollment
         schema: public

@@ -1,0 +1,1 @@
+comment on TABLE "public"."EnrollmentStatus" is E'A user\'s enrollment status for a given course. It is changed according to his acceptance to the course (or) not and depending on his participation success.';

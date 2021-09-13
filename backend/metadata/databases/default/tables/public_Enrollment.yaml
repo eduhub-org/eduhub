@@ -4,22 +4,19 @@ table:
 object_relationships:
 - name: Course
   using:
-    foreign_key_constraint_on: CourseId
+    foreign_key_constraint_on: courseId
 - name: EnrollmentStatus
   using:
-    foreign_key_constraint_on: Status
-- name: ProjectType
+    foreign_key_constraint_on: status
+- name: MotivationRating
   using:
-    foreign_key_constraint_on: TypeOfProject
+    foreign_key_constraint_on: motivationRating
 - name: User
   using:
-    foreign_key_constraint_on: UserId
-- name: motivationRatingByMotivationrating
-  using:
-    foreign_key_constraint_on: MotivationRating
+    foreign_key_constraint_on: userId
 - name: performanceRatingByPerformancerating
   using:
-    foreign_key_constraint_on: PerformanceRating
+    foreign_key_constraint_on: projectRating
 array_relationships:
 - name: ProjectEnrollments
   using:
@@ -36,20 +33,18 @@ insert_permissions:
         AuthId:
           _eq: X-Hasura-User-Id
     columns:
-    - CourseId
-    - MotivationLetter
-    - UserId
-    - WantsEcts
+    - courseId
+    - motivationLetter
+    - userId
   role: user
 select_permissions:
 - permission:
     columns:
-    - CourseId
-    - Id
-    - MotivationLetter
-    - UserId
-    - Status
-    - WantsEcts
+    - courseId
+    - id
+    - motivationLetter
+    - status
+    - userId
     filter:
       User:
         AuthId:
