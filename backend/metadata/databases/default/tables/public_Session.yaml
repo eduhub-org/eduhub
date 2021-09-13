@@ -4,7 +4,7 @@ table:
 object_relationships:
 - name: Course
   using:
-    foreign_key_constraint_on: CourseId
+    foreign_key_constraint_on: courseId
 array_relationships:
 - name: AttendenceDocuments
   using:
@@ -26,4 +26,11 @@ array_relationships:
       column: sessionId
       table:
         name: SessionAddress
+        schema: public
+- name: SessionSpeakers
+  using:
+    foreign_key_constraint_on:
+      column: sessionId
+      table:
+        name: SessionSpeaker
         schema: public

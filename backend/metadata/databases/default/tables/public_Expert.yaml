@@ -13,6 +13,13 @@ array_relationships:
       table:
         name: CourseInstructor
         schema: public
+- name: SessionSpeakers
+  using:
+    foreign_key_constraint_on:
+      column: expertId
+      table:
+        name: SessionSpeaker
+        schema: public
 select_permissions:
 - permission:
     columns:

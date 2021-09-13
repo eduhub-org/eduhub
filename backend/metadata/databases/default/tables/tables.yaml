@@ -11,7 +11,6 @@
 - "!include public_Employment.yaml"
 - "!include public_Enrollment.yaml"
 - "!include public_EnrollmentStatus.yaml"
-- "!include public_Event.yaml"
 - "!include public_Expert.yaml"
 - "!include public_LocationOptions.yaml"
 - "!include public_MailLog.yaml"
