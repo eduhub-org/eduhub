@@ -7,7 +7,7 @@ array_relationships:
   using:
     manual_configuration:
       column_mapping:
-        Value: source
+        value: source
       insertion_order: null
       remote_table:
         name: Attendance

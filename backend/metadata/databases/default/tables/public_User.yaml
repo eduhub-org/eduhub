@@ -35,14 +35,7 @@ array_relationships:
     foreign_key_constraint_on:
       column: userId
       table:
-        name: Instructor
-        schema: public
-- name: Referents
-  using:
-    foreign_key_constraint_on:
-      column: UserId
-      table:
-        name: Referent
+        name: Expert
         schema: public
 select_permissions:
 - permission:

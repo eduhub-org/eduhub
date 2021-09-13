@@ -1,0 +1,1 @@
+comment on TABLE "public"."CourseInstructor" is E'A new course instructor is added as soon as an admin selects an expert (or a user, which is then added to the expert table) as an instructor for a course.';

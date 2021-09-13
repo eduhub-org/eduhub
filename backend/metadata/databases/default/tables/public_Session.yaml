@@ -27,10 +27,3 @@ array_relationships:
       table:
         name: SessionAddress
         schema: public
-- name: Speakers
-  using:
-    foreign_key_constraint_on:
-      column: SessionId
-      table:
-        name: Speaker
-        schema: public

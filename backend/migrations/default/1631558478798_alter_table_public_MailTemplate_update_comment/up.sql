@@ -1,0 +1,1 @@
+comment on TABLE "public"."MailTemplate" is E'Mail templates to send users relevant information when certain conditions are met. The conditions are checked by a serverless function or are directly initiated by events in the frontend, which then also sends the mails.';
