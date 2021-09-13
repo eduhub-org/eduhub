@@ -4,7 +4,7 @@ table:
 object_relationships:
 - name: User
   using:
-    foreign_key_constraint_on: UserId
+    foreign_key_constraint_on: userId
 array_relationships:
 - name: CourseInstructors
   using:
@@ -16,19 +16,15 @@ array_relationships:
 select_permissions:
 - permission:
     columns:
-    - Description
-    - Id
-    - UserId
-    - Qualification
-    - WantsToContinue
+    - id
+    - userId
+    - description
     filter: {}
   role: anonymous
 - permission:
     columns:
-    - Description
-    - Id
-    - UserId
-    - Qualification
-    - WantsToContinue
+    - id
+    - userId
+    - description
     filter: {}
   role: user

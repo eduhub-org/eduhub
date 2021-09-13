@@ -3,12 +3,14 @@ table:
   schema: public
 is_enum: true
 array_relationships:
-- name: Enrollments
+- name: Projects
   using:
-    foreign_key_constraint_on:
-      column: TypeOfProject
-      table:
-        name: Enrollment
+    manual_configuration:
+      column_mapping:
+        Value: type
+      insertion_order: null
+      remote_table:
+        name: Project
         schema: public
 select_permissions:
 - permission:

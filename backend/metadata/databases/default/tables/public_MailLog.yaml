@@ -1,0 +1,13 @@
+table:
+  name: MailLog
+  schema: public
+object_relationships:
+- name: MailStatus
+  using:
+    manual_configuration:
+      column_mapping:
+        status: value
+      insertion_order: null
+      remote_table:
+        name: MailStatus
+        schema: public
