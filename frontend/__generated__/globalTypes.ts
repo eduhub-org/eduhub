@@ -10,15 +10,6 @@
 export enum AttendanceStatus_enum {
   ATTENDED = "ATTENDED",
   MISSED = "MISSED",
-  NO_INFO = "NO_INFO",
-}
-
-export enum CourseStatus_enum {
-  APPLICANTS_INVITED = "APPLICANTS_INVITED",
-  DRAFT = "DRAFT",
-  PARTICIPANTS_RATED = "PARTICIPANTS_RATED",
-  READY_FOR_APPLICATION = "READY_FOR_APPLICATION",
-  READY_FOR_PUBLICATION = "READY_FOR_PUBLICATION",
 }
 
 export enum EnrollmentStatus_enum {
@@ -26,8 +17,8 @@ export enum EnrollmentStatus_enum {
   APPLIED = "APPLIED",
   COMPLETED = "COMPLETED",
   CONFIRMED = "CONFIRMED",
+  EXPIRED = "EXPIRED",
   INVITED = "INVITED",
-  REJECTED = "REJECTED",
 }
 
 //==============================================================

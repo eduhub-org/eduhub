@@ -13,10 +13,9 @@ export const INSERT_ENROLLMENT = gql`
   ) {
     insert_Enrollment(
       objects: {
-        UserId: $userId
-        CourseId: $courseId
-        MotivationLetter: $motivationLetter
-        WantsEcts: false
+        userId: $userId
+        courseId: $courseId
+        motivationLetter: $motivationLetter
       }
     ) {
       affected_rows
