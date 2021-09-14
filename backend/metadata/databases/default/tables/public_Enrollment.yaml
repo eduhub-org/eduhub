@@ -30,7 +30,7 @@ insert_permissions:
     backend_only: false
     check:
       User:
-        AuthId:
+        authId:
           _eq: X-Hasura-User-Id
     columns:
     - courseId
@@ -47,6 +47,6 @@ select_permissions:
     - userId
     filter:
       User:
-        AuthId:
+        authId:
           _eq: X-Hasura-User-Id
   role: user

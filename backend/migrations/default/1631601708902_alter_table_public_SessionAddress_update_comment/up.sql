@@ -1,0 +1,1 @@
+comment on TABLE "public"."SessionAddress" is E'One or several addresses for a session. When a new course is added all sessions will initially get the default address given in the course table as an address.';
