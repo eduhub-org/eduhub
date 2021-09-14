@@ -11,8 +11,8 @@ export const CourseCost: FC<IProps> = ({ course }) => {
   const { t } = useTranslation("course-page");
 
   const cost =
-    course.Cost !== "0"
-      ? t("courseCosts", { price: course.Cost })
+    course.cost !== "0"
+      ? t("courseCosts", { price: course.cost })
       : t("courseIsFree");
 
   return <>{cost}</>;

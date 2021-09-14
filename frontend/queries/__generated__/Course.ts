@@ -100,7 +100,7 @@ export interface Course_Course_by_pk {
   /**
    * Heading of the the first course description field
    */
-  headingDescriptionField1: string | null;
+  headingDescriptionField1: string;
   /**
    * Content of the first course description field
    */

@@ -51,12 +51,12 @@ export const CourseApplicationModal: FC<IProps> = ({
 
     insertMutation({
       variables: {
-        courseId: course.Id,
-        userId: user?.Id,
+        courseId: course.id,
+        userId: user?.id,
         motivationLetter: text,
       },
     });
-  }, [course.Id, insertMutation, text, user]);
+  }, [course.id, insertMutation, text, user]);
 
   const status = enrollmentStatusForCourse(course);
 

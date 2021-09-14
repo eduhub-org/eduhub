@@ -13,12 +13,12 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
   return (
     <div className="flex flex-1 flex-col">
       <span className="text-3xl font-semibold mb-9">{t("youWillLearn")}</span>
-      <div dangerouslySetInnerHTML={{ __html: course.Description }} />
+      <div dangerouslySetInnerHTML={{ __html: course.headingDescriptionField1}} />
       <span className="text-3xl font-semibold mt-24 mb-9">
         {t("courseContent")}
       </span>
       <ul>
-        {course.Sessions.map(({ startDateTime, Name }, index) => (
+        {course.Sessions.map(({ startDateTime, title }, index) => (
           <li key={index} className="flex mb-4">
             <div className="flex flex-col flex-shrink-0 mr-6">
               <span className="text-xs sm:text-sm font-semibold">
@@ -34,7 +34,7 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
                 }) ?? ""}
               </span>
             </div>
-            <span className="block text-sm sm:text-lg">{Name}</span>
+            <span className="block text-sm sm:text-lg">{title}</span>
           </li>
         ))}
       </ul>
