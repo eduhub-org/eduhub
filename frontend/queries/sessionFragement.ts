@@ -2,12 +2,11 @@ import { gql } from "@apollo/client";
 
 export const SESSION_FRAGMENT = gql`
   fragment SessionFragment on Session {
-    Id
+    id
     endDateTime
-    CourseId
-    Description
-    Location
+    courseId
+    description
     startDateTime
-    Name
+    title
   }
 `;

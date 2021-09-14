@@ -11,6 +11,9 @@ import { EnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 export interface EnrollmentFragment {
   __typename: "Enrollment";
-  Id: number;
-  Status: EnrollmentStatus_enum;
+  id: number;
+  /**
+   * The user's current enrollment status to this course
+   */
+  status: EnrollmentStatus_enum;
 }
