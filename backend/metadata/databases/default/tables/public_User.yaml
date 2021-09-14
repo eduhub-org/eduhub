@@ -4,10 +4,10 @@ table:
 object_relationships:
 - name: employmentByEmployment
   using:
-    foreign_key_constraint_on: Employment
+    foreign_key_constraint_on: employment
 - name: universityByUniversity
   using:
-    foreign_key_constraint_on: University
+    foreign_key_constraint_on: university
 array_relationships:
 - name: Admins
   using:
@@ -40,18 +40,18 @@ array_relationships:
 select_permissions:
 - permission:
     columns:
-    - Firstname
-    - Id
-    - Image
-    - Lastname
+    - firstName
+    - id
+    - picture
+    - lastName
     filter: {}
   role: anonymous
 - permission:
     columns:
-    - AuthId
-    - Firstname
-    - Id
-    - Image
-    - Lastname
+    - authId
+    - firstName
+    - id
+    - picture
+    - lastName
     filter: {}
   role: user
