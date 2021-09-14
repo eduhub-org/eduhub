@@ -10,6 +10,7 @@
 export enum AttendanceStatus_enum {
   ATTENDED = "ATTENDED",
   MISSED = "MISSED",
+  NO_INFO = "NO_INFO",
 }
 
 export enum EnrollmentStatus_enum {

@@ -29,7 +29,7 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
     CourseWithEnrollmentVariables
   >(COURSE_WITH_ENROLLMENT, {
     variables: {
-      id: course.Id,
+      id: course.id,
       authId: keycloak?.subject,
     },
   });
@@ -44,7 +44,7 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
   if (!enrollments || enrollments.length !== 1) {
     content = <ApplyButtonBlock course={course} onClickApply={showModal} />;
   } else {
-    const status = enrollments[0].Status;
+    const status = enrollments[0].status;
 
     switch (status) {
       case EnrollmentStatus_enum.ABORTED: {
@@ -59,7 +59,7 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
         );
         break;
       }
-      case EnrollmentStatus_enum.REJECTED: {
+      case EnrollmentStatus_enum.EXPIRED: {
         content = (
           <span className="bg-gray-300 p-4">{t("status.rejected")}</span>
         );
