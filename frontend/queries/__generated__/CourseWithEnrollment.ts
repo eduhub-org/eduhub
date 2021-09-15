@@ -47,13 +47,30 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions {
   Attendences: CourseWithEnrollment_Course_by_pk_Sessions_Attendences[];
 }
 
+export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Expert_User {
+  __typename: "User";
+  /**
+   * The user's first name
+   */
+  firstName: string;
+  /**
+   * The user's profile picture
+   */
+  picture: string | null;
+  id: number;
+  /**
+   * The user's last name
+   */
+  lastName: string;
+}
+
 export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Expert {
   __typename: "Expert";
   id: number;
   /**
-   * The ID of the user that is instructor
+   * An object relationship
    */
-  userId: number;
+  User: CourseWithEnrollment_Course_by_pk_CourseInstructors_Expert_User;
   /**
    * A short description on the expert's background
    */
