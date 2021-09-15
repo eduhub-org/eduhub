@@ -2,10 +2,8 @@ import { gql } from "@apollo/client";
 
 export const ENROLLMENT_FRAGMENT = gql`
   fragment EnrollmentFragment on Enrollment {
-    expirationDate
+    invitationExpirationDate
     id
     status
-    Id
-    Status
   }
 `;

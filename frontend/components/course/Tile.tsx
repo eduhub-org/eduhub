@@ -27,15 +27,15 @@ const colorForEnrollmentStatus = (
     return "bg-edu-course-current";
   }
   if (
-    status === EnrollmentStatus_enum.REJECTED ||
+    status === EnrollmentStatus_enum.EXPIRED ||
     status === EnrollmentStatus_enum.ABORTED
   ) {
     return "bg-gray-300";
   }
   if (status === EnrollmentStatus_enum.INVITED) {
     if (
-      !enrollment?.ExpirationDate ||
-      (enrollment && new Date() < enrollment.ExpirationDate)
+      !enrollment?.invitationExpirationDate ||
+      (enrollment && new Date() < enrollment.invitationExpirationDate)
     ) {
       return "bg-edu-course-invited";
     } else {
@@ -87,8 +87,8 @@ export const Tile: FC<IProps> = ({ course }) => {
   const currentDate = new Date();
   const isCurrentProgram =
     !!program &&
-    program?.ApplicationStart <= currentDate &&
-    currentDate <= program?.PerformanceRecordDeadline;
+    program?.applicationStart <= currentDate &&
+    currentDate <= program?.projectRecordUploadDeadline;
 
   const highlightColor =
     enrollmentStatus === EnrollmentStatus_enum.CONFIRMED && isCurrentProgram

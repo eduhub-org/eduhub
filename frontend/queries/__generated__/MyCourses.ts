@@ -75,20 +75,44 @@ export interface MyCourses_Enrollment_Course_CourseInstructors {
 
 export interface MyCourses_Enrollment_Course_Enrollments {
   __typename: "Enrollment";
-  ExpirationDate: any | null;
-  Id: number;
-  Status: EnrollmentStatus_enum;
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
+  id: number;
+  /**
+   * The user's current enrollment status to this course
+   */
+  status: EnrollmentStatus_enum;
 }
 
 export interface MyCourses_Enrollment_Course_Program {
   __typename: "Program";
-  ApplicationEnd: any | null;
-  ApplicationStart: any | null;
-  Id: number;
-  End: any | null;
-  Start: any | null;
-  Name: string;
-  PerformanceRecordDeadline: any | null;
+  /**
+   * The default application deadline for a course. It can be changed on the course level.
+   */
+  defaultApplicationEnd: any | null;
+  /**
+   * The day the application for all courses of the program start.
+   */
+  applicationStart: any | null;
+  id: number;
+  /**
+   * The last day a course lecture can possibly be in this program.
+   */
+  lectureEnd: any | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * The deadline for the project record uploads.
+   */
+  projectRecordUploadDeadline: any | null;
 }
 
 export interface MyCourses_Enrollment_Course {
@@ -178,7 +202,10 @@ export interface MyCourses_Enrollment_Course {
 
 export interface MyCourses_Enrollment {
   __typename: "Enrollment";
-  expirationDate: any | null;
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
   id: number;
   /**
    * The user's current enrollment status to this course

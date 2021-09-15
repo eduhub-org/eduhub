@@ -152,7 +152,10 @@ export interface MyEnrollmentsForCourseQuery_Enrollment_Course {
 
 export interface MyEnrollmentsForCourseQuery_Enrollment {
   __typename: "Enrollment";
-  ExpirationDate: any | null;
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
   id: number;
   /**
    * The user's current enrollment status to this course

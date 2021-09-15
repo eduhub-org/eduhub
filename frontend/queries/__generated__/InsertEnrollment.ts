@@ -75,7 +75,10 @@ export interface InsertEnrollment_insert_Enrollment_returning_Course_CourseInstr
 
 export interface InsertEnrollment_insert_Enrollment_returning_Course_Enrollments {
   __typename: "Enrollment";
-  expirationDate: any | null;
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
   id: number;
   /**
    * The user's current enrollment status to this course
@@ -166,7 +169,10 @@ export interface InsertEnrollment_insert_Enrollment_returning_Course {
 
 export interface InsertEnrollment_insert_Enrollment_returning {
   __typename: "Enrollment";
-  ExpirationDate: any | null;
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
   id: number;
   /**
    * The user's current enrollment status to this course

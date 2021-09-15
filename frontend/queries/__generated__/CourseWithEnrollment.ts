@@ -88,8 +88,11 @@ export interface CourseWithEnrollment_Course_by_pk_CourseInstructors {
 
 export interface CourseWithEnrollment_Course_by_pk_Enrollments {
   __typename: "Enrollment";
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
   id: number;
-  expirationDate: any | null;
   /**
    * The user's current enrollment status to this course
    */
@@ -98,13 +101,31 @@ export interface CourseWithEnrollment_Course_by_pk_Enrollments {
 
 export interface CourseWithEnrollment_Course_by_pk_Program {
   __typename: "Program";
-  ApplicationEnd: any | null;
-  ApplicationStart: any | null;
-  Id: number;
-  End: any | null;
-  Start: any | null;
-  Name: string;
-  PerformanceRecordDeadline: any | null;
+  /**
+   * The default application deadline for a course. It can be changed on the course level.
+   */
+  defaultApplicationEnd: any | null;
+  /**
+   * The day the application for all courses of the program start.
+   */
+  applicationStart: any | null;
+  id: number;
+  /**
+   * The last day a course lecture can possibly be in this program.
+   */
+  lectureEnd: any | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * The deadline for the project record uploads.
+   */
+  projectRecordUploadDeadline: any | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk {
@@ -174,7 +195,6 @@ export interface CourseWithEnrollment_Course_by_pk {
    * The time the course ends each week.
    */
   endTime: any | null;
-
   /**
    * An array relationship
    */
