@@ -14,5 +14,5 @@ export const enrollmentStatusForCourse = (
     return "NOT_APPLIED";
   }
 
-  return course.Enrollments[0].Status;
+  return course.Enrollments[0].status;
 };

@@ -29,7 +29,7 @@ export const COURSE_FRAGMENT = gql`
       id
       Expert {
         id
-        userId {
+        User {
           firstName
           picture
           id

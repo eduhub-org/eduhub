@@ -8,16 +8,16 @@ export const getWeekdayString = (
   short: boolean,
   uppercased: boolean
 ) => {
-  if (!course.WeekDay) return null;
+  if (!course.weekDay) return null;
 
-  const weekday = short ? t(`${course.WeekDay}-short`) : t(course.WeekDay);
+  const weekday = short ? t(`${course.weekDay}-short`) : t(course.weekDay);
 
   return uppercased ? weekday.toUpperCase() : weekday;
 };
 
 export const getStartTimeString = (course: Course_Course_by_pk, i18n: I18n) => {
   const startTime: string =
-    course.TimeStart?.toLocaleTimeString(i18n.languages, {
+    course.startTime?.toLocaleTimeString(i18n.languages, {
       hour: "numeric",
       minute: "numeric",
     }) ?? "";
@@ -27,7 +27,7 @@ export const getStartTimeString = (course: Course_Course_by_pk, i18n: I18n) => {
 
 export const getEndTimeString = (course: Course_Course_by_pk, i18n: I18n) => {
   const endTime =
-    course.TimeEnd?.toLocaleTimeString(i18n.languages, {
+    course.endTime?.toLocaleTimeString(i18n.languages, {
       hour: "numeric",
       minute: "numeric",
     }) ?? "";
