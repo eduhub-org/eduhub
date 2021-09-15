@@ -152,6 +152,7 @@ export interface MyEnrollmentsForCourseQuery_Enrollment_Course {
 
 export interface MyEnrollmentsForCourseQuery_Enrollment {
   __typename: "Enrollment";
+  ExpirationDate: any | null;
   id: number;
   /**
    * The user's current enrollment status to this course

@@ -75,6 +75,7 @@ export interface InsertEnrollment_insert_Enrollment_returning_Course_CourseInstr
 
 export interface InsertEnrollment_insert_Enrollment_returning_Course_Enrollments {
   __typename: "Enrollment";
+  expirationDate: any | null;
   id: number;
   /**
    * The user's current enrollment status to this course
@@ -165,6 +166,7 @@ export interface InsertEnrollment_insert_Enrollment_returning_Course {
 
 export interface InsertEnrollment_insert_Enrollment_returning {
   __typename: "Enrollment";
+  ExpirationDate: any | null;
   id: number;
   /**
    * The user's current enrollment status to this course

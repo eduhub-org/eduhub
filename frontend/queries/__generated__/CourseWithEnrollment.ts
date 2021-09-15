@@ -9,7 +9,7 @@ import { EnrollmentStatus_enum, AttendanceStatus_enum } from "./../../__generate
 // GraphQL query operation: CourseWithEnrollment
 // ====================================================
 
-export interface CourseWithEnrollment_Course_by_pk_Sessions_Attendences {
+export interface CourseWithEnrollment_Course_by_pk_Sessions_Attendances {
   __typename: "Attendance";
   id: number;
   /**
@@ -44,7 +44,7 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions {
   /**
    * An array relationship
    */
-  Attendences: CourseWithEnrollment_Course_by_pk_Sessions_Attendences[];
+  Attendances: CourseWithEnrollment_Course_by_pk_Sessions_Attendances[];
 }
 
 export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Expert_User {
@@ -89,10 +89,22 @@ export interface CourseWithEnrollment_Course_by_pk_CourseInstructors {
 export interface CourseWithEnrollment_Course_by_pk_Enrollments {
   __typename: "Enrollment";
   id: number;
+  expirationDate: any | null;
   /**
    * The user's current enrollment status to this course
    */
   status: EnrollmentStatus_enum;
+}
+
+export interface CourseWithEnrollment_Course_by_pk_Program {
+  __typename: "Program";
+  ApplicationEnd: any | null;
+  ApplicationStart: any | null;
+  Id: number;
+  End: any | null;
+  Start: any | null;
+  Name: string;
+  PerformanceRecordDeadline: any | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk {
@@ -162,6 +174,7 @@ export interface CourseWithEnrollment_Course_by_pk {
    * The time the course ends each week.
    */
   endTime: any | null;
+
   /**
    * An array relationship
    */
@@ -174,6 +187,10 @@ export interface CourseWithEnrollment_Course_by_pk {
    * An array relationship
    */
   Enrollments: CourseWithEnrollment_Course_by_pk_Enrollments[];
+  /**
+   * An object relationship
+   */
+  Program: CourseWithEnrollment_Course_by_pk_Program | null;
 }
 
 export interface CourseWithEnrollment {

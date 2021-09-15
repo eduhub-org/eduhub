@@ -41,6 +41,7 @@ select_permissions:
 - permission:
     columns:
     - courseId
+    - expirationDate
     - id
     - motivationLetter
     - status
