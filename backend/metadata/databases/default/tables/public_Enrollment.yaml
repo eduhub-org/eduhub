@@ -14,9 +14,6 @@ object_relationships:
 - name: User
   using:
     foreign_key_constraint_on: userId
-- name: performanceRatingByPerformancerating
-  using:
-    foreign_key_constraint_on: projectRating
 array_relationships:
 - name: ProjectEnrollments
   using:
@@ -36,18 +33,4 @@ insert_permissions:
     - courseId
     - motivationLetter
     - userId
-  role: user
-select_permissions:
-- permission:
-    columns:
-    - courseId
-    - expirationDate
-    - id
-    - motivationLetter
-    - status
-    - userId
-    filter:
-      User:
-        authId:
-          _eq: X-Hasura-User-Id
   role: user
