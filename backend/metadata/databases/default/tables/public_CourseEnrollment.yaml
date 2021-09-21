@@ -1,0 +1,36 @@
+table:
+  name: CourseEnrollment
+  schema: public
+object_relationships:
+- name: Course
+  using:
+    foreign_key_constraint_on: courseId
+- name: CourseEnrollmentStatus
+  using:
+    foreign_key_constraint_on: status
+- name: MotivationRating
+  using:
+    foreign_key_constraint_on: motivationRating
+- name: User
+  using:
+    foreign_key_constraint_on: userId
+array_relationships:
+- name: ProjectEnrollments
+  using:
+    foreign_key_constraint_on:
+      column: enrollmentId
+      table:
+        name: ProjectEnrollment
+        schema: public
+insert_permissions:
+- permission:
+    backend_only: false
+    check:
+      User:
+        authId:
+          _eq: X-Hasura-User-Id
+    columns:
+    - courseId
+    - motivationLetter
+    - userId
+  role: user

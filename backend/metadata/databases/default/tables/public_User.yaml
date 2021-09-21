@@ -28,7 +28,7 @@ array_relationships:
     foreign_key_constraint_on:
       column: userId
       table:
-        name: Enrollment
+        name: CourseEnrollment
         schema: public
 - name: Instructors
   using:

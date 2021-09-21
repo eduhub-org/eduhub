@@ -8,7 +8,7 @@ array_relationships:
     foreign_key_constraint_on:
       column: motivationRating
       table:
-        name: Enrollment
+        name: CourseEnrollment
         schema: public
 select_permissions:
 - permission:

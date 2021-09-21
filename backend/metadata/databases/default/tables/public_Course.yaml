@@ -35,7 +35,7 @@ array_relationships:
     foreign_key_constraint_on:
       column: courseId
       table:
-        name: Enrollment
+        name: CourseEnrollment
         schema: public
 - name: Sessions
   using:
