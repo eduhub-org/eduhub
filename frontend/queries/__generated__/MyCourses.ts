@@ -3,13 +3,13 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { EnrollmentStatus_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: MyCourses
 // ====================================================
 
-export interface MyCourses_Enrollment_Course_Sessions {
+export interface MyCourses_CourseEnrollment_Course_Sessions {
   __typename: "Session";
   id: number;
   /**
@@ -34,7 +34,7 @@ export interface MyCourses_Enrollment_Course_Sessions {
   title: string;
 }
 
-export interface MyCourses_Enrollment_Course_CourseInstructors_Expert_User {
+export interface MyCourses_CourseEnrollment_Course_CourseInstructors_Expert_User {
   __typename: "User";
   /**
    * The user's first name
@@ -51,42 +51,42 @@ export interface MyCourses_Enrollment_Course_CourseInstructors_Expert_User {
   lastName: string;
 }
 
-export interface MyCourses_Enrollment_Course_CourseInstructors_Expert {
+export interface MyCourses_CourseEnrollment_Course_CourseInstructors_Expert {
   __typename: "Expert";
   id: number;
   /**
    * An object relationship
    */
-  User: MyCourses_Enrollment_Course_CourseInstructors_Expert_User;
+  User: MyCourses_CourseEnrollment_Course_CourseInstructors_Expert_User;
   /**
    * A short description on the expert's background
    */
   description: string | null;
 }
 
-export interface MyCourses_Enrollment_Course_CourseInstructors {
+export interface MyCourses_CourseEnrollment_Course_CourseInstructors {
   __typename: "CourseInstructor";
   id: number;
   /**
    * An object relationship
    */
-  Expert: MyCourses_Enrollment_Course_CourseInstructors_Expert;
+  Expert: MyCourses_CourseEnrollment_Course_CourseInstructors_Expert;
 }
 
-export interface MyCourses_Enrollment_Course_Enrollments {
-  __typename: "Enrollment";
+export interface MyCourses_CourseEnrollment_Course_CourseEnrollments {
+  __typename: "CourseEnrollment";
   /**
    * The last day a user can confirm his/her invitation to the given course
    */
   invitationExpirationDate: any | null;
   id: number;
   /**
-   * The user's current enrollment status to this course
+   * The users current enrollment status to this course
    */
-  status: EnrollmentStatus_enum;
+  status: CourseEnrollmentStatus_enum;
 }
 
-export interface MyCourses_Enrollment_Course_Program {
+export interface MyCourses_CourseEnrollment_Course_Program {
   __typename: "Program";
   /**
    * The default application deadline for a course. It can be changed on the course level.
@@ -115,7 +115,7 @@ export interface MyCourses_Enrollment_Course_Program {
   projectRecordUploadDeadline: any | null;
 }
 
-export interface MyCourses_Enrollment_Course {
+export interface MyCourses_CourseEnrollment_Course {
   __typename: "Course";
   id: number;
   /**
@@ -185,41 +185,41 @@ export interface MyCourses_Enrollment_Course {
   /**
    * An array relationship
    */
-  Sessions: MyCourses_Enrollment_Course_Sessions[];
+  Sessions: MyCourses_CourseEnrollment_Course_Sessions[];
   /**
    * An array relationship
    */
-  CourseInstructors: MyCourses_Enrollment_Course_CourseInstructors[];
+  CourseInstructors: MyCourses_CourseEnrollment_Course_CourseInstructors[];
   /**
    * An array relationship
    */
-  Enrollments: MyCourses_Enrollment_Course_Enrollments[];
+  CourseEnrollments: MyCourses_CourseEnrollment_Course_CourseEnrollments[];
   /**
    * An object relationship
    */
-  Program: MyCourses_Enrollment_Course_Program | null;
+  Program: MyCourses_CourseEnrollment_Course_Program | null;
 }
 
-export interface MyCourses_Enrollment {
-  __typename: "Enrollment";
+export interface MyCourses_CourseEnrollment {
+  __typename: "CourseEnrollment";
   /**
    * The last day a user can confirm his/her invitation to the given course
    */
   invitationExpirationDate: any | null;
   id: number;
   /**
-   * The user's current enrollment status to this course
+   * The users current enrollment status to this course
    */
-  status: EnrollmentStatus_enum;
+  status: CourseEnrollmentStatus_enum;
   /**
    * An object relationship
    */
-  Course: MyCourses_Enrollment_Course;
+  Course: MyCourses_CourseEnrollment_Course;
 }
 
 export interface MyCourses {
   /**
-   * fetch data from the table: "Enrollment"
+   * fetch data from the table: "CourseEnrollment"
    */
-  Enrollment: MyCourses_Enrollment[];
+  CourseEnrollment: MyCourses_CourseEnrollment[];
 }

@@ -12,5 +12,5 @@ object_relationships:
         locationOption: value
       insertion_order: null
       remote_table:
-        name: LocationOptions
+        name: LocationOption
         schema: public

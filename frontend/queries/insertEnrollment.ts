@@ -11,7 +11,7 @@ export const INSERT_ENROLLMENT = gql`
     $courseId: Int!
     $motivationLetter: String!
   ) {
-    insert_Enrollment(
+    insert_CourseEnrollment(
       objects: {
         userId: $userId
         courseId: $courseId
@@ -23,7 +23,7 @@ export const INSERT_ENROLLMENT = gql`
         ...EnrollmentFragment
         Course {
           ...CourseFragment
-          Enrollments {
+          CourseEnrollments {
             ...EnrollmentFragment
           }
         }

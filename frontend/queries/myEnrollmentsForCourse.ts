@@ -7,7 +7,7 @@ export const MY_ENROLLMENTS_FOR_COURSE = gql`
   ${COURSE_FRAGMENT}
   ${ENROLLMENT_FRAGMENT}
   query MyEnrollmentsForCourseQuery($courseId: Int!) {
-    Enrollment(where: { courseId: { _eq: $courseId } }) {
+    CourseEnrollment(where: { courseId: { _eq: $courseId } }) {
       ...EnrollmentFragment
       Course {
         ...CourseFragment

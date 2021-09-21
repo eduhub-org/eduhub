@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { EnrollmentStatus_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseWithEnrollment
@@ -86,17 +86,17 @@ export interface CourseWithEnrollment_Course_by_pk_CourseInstructors {
   Expert: CourseWithEnrollment_Course_by_pk_CourseInstructors_Expert;
 }
 
-export interface CourseWithEnrollment_Course_by_pk_Enrollments {
-  __typename: "Enrollment";
+export interface CourseWithEnrollment_Course_by_pk_CourseEnrollments {
+  __typename: "CourseEnrollment";
   /**
    * The last day a user can confirm his/her invitation to the given course
    */
   invitationExpirationDate: any | null;
   id: number;
   /**
-   * The user's current enrollment status to this course
+   * The users current enrollment status to this course
    */
-  status: EnrollmentStatus_enum;
+  status: CourseEnrollmentStatus_enum;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Program {
@@ -206,7 +206,7 @@ export interface CourseWithEnrollment_Course_by_pk {
   /**
    * An array relationship
    */
-  Enrollments: CourseWithEnrollment_Course_by_pk_Enrollments[];
+  CourseEnrollments: CourseWithEnrollment_Course_by_pk_CourseEnrollments[];
   /**
    * An object relationship
    */

@@ -1,0 +1,11 @@
+DELETE FROM "public"."University";
+INSERT INTO "public"."University"("value", "comment") VALUES (E'CAU_KIEL', E'Chtisian-Albrechts-Universität zu Kiel');
+INSERT INTO "public"."University"("value", "comment") VALUES (E'UNI_LUEBECK', E'Universität zu Lübeck');
+INSERT INTO "public"."University"("value", "comment") VALUES (E'UNI_FLENSBURG', E'Europa-Universität Flensburg');
+INSERT INTO "public"."University"("value", "comment") VALUES (E'FH_KIEL', E'Fachhochschule Kiel');
+INSERT INTO "public"."University"("value", "comment") VALUES (E'TH_LUEBECK', E'Technische Hochschule Lübeck');
+INSERT INTO "public"."University"("value", "comment") VALUES (E'FH_FLENSBURG', E'Hochschule Flensburg');
+INSERT INTO "public"."University"("value", "comment") VALUES (E'FH_WESTKUESTE', E'Fachhochschule Westküste');
+INSERT INTO "public"."University"("value", "comment") VALUES (E'DHSH', E'Duale Hochschule Schleswig-Holstein');
+INSERT INTO "public"."University"("value", "comment") VALUES (E'MUTHESIUS', E'Muthesius Kunsthochschule, Kiel');
+INSERT INTO "public"."University"("value", "comment") VALUES (E'OTHER', E'A university not listed here');

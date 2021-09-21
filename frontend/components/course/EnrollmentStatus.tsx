@@ -3,7 +3,7 @@ import { KeycloakInstance } from "keycloak-js";
 import { useTranslation } from "next-i18next";
 import { FC, useCallback, useState } from "react";
 
-import { EnrollmentStatus_enum } from "../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum } from "../../__generated__/globalTypes";
 import { useAuthedQuery } from "../../hooks/authedQuery";
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
 import {
@@ -37,7 +37,7 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
   const showModal = useCallback(() => setModalVisible(true), []);
   const hideModal = useCallback(() => setModalVisible(false), []);
 
-  const enrollments = data?.Course_by_pk?.Enrollments;
+  const enrollments = data?.Course_by_pk?.CourseEnrollments;
 
   let content = null;
 
@@ -47,19 +47,19 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
     const status = enrollments[0].status;
 
     switch (status) {
-      case EnrollmentStatus_enum.ABORTED: {
+      case CourseEnrollmentStatus_enum.ABORTED: {
         content = (
           <span className="bg-gray-300 p-4">{t("status.aborted")}</span>
         );
         break;
       }
-      case EnrollmentStatus_enum.APPLIED: {
+      case CourseEnrollmentStatus_enum.APPLIED: {
         content = (
           <span className="bg-gray-300 p-4">{t("status.applied")}</span>
         );
         break;
       }
-      case EnrollmentStatus_enum.EXPIRED: {
+      case CourseEnrollmentStatus_enum.EXPIRED: {
         content = (
           <span className="bg-gray-300 p-4">{t("status.rejected")}</span>
         );

@@ -9,6 +9,13 @@ object_relationships:
   using:
     foreign_key_constraint_on: programId
 array_relationships:
+- name: CourseEnrollments
+  using:
+    foreign_key_constraint_on:
+      column: courseId
+      table:
+        name: CourseEnrollment
+        schema: public
 - name: CourseInstructors
   using:
     foreign_key_constraint_on:
@@ -29,13 +36,6 @@ array_relationships:
       column: courseId
       table:
         name: CourseProject
-        schema: public
-- name: Enrollments
-  using:
-    foreign_key_constraint_on:
-      column: courseId
-      table:
-        name: CourseEnrollment
         schema: public
 - name: Sessions
   using:

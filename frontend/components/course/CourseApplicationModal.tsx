@@ -3,7 +3,7 @@ import Fade from "@material-ui/core/Fade";
 import Image from "next/image";
 import { FC, useCallback, useState } from "react";
 
-import { EnrollmentStatus_enum } from "../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum } from "../../__generated__/globalTypes";
 import { enrollmentStatusForCourse } from "../../helpers/courseHelpers";
 import { useAuthedMutation } from "../../hooks/authedMutation";
 import { useUser } from "../../hooks/user";
@@ -84,7 +84,7 @@ export const CourseApplicationModal: FC<IProps> = ({
                 setText={onChangeText}
                 text={text}
               />
-            ) : status === EnrollmentStatus_enum.APPLIED ? (
+            ) : status === CourseEnrollmentStatus_enum.APPLIED ? (
               <CourseApplicationModalSuccessContent closeModal={closeModal} />
             ) : null}
           </div>

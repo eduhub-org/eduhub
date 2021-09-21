@@ -13,13 +13,14 @@ export enum AttendanceStatus_enum {
   NO_INFO = "NO_INFO",
 }
 
-export enum EnrollmentStatus_enum {
+export enum CourseEnrollmentStatus_enum {
   ABORTED = "ABORTED",
   APPLIED = "APPLIED",
   COMPLETED = "COMPLETED",
   CONFIRMED = "CONFIRMED",
   EXPIRED = "EXPIRED",
   INVITED = "INVITED",
+  REJECTED = "REJECTED",
 }
 
 //==============================================================
