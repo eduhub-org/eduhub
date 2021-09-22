@@ -1,4 +1,4 @@
-INSERT INTO "public"."MotivationRating"("value", "comment") VALUES (E'UNRATED', E'The motivation letter has not been reviewed yet.');
-INSERT INTO "public"."MotivationRating"("value", "comment") VALUES (E'INVITE', E'The applicant shall be invited.');
-INSERT INTO "public"."MotivationRating"("value", "comment") VALUES (E'DECLINE', E'The application shall be declined.');
-INSERT INTO "public"."MotivationRating"("value", "comment") VALUES (E'REVIEW', E'The motivation letter shall be further reviewed.');
+UPDATE "public"."MotivationRating" SET comment = E'The motivation letter has not been reviewed yet.' WHERE value = E'UNRATED';
+UPDATE "public"."MotivationRating" SET comment = E'The applicant shall be invited.' WHERE value = E'INVITE';
+UPDATE "public"."MotivationRating" SET comment = E'The application shall be declined.' WHERE value = E'DECLINE';
+UPDATE "public"."MotivationRating" SET comment = E'The motivation letter shall be further reviewed.' WHERE value = E'REVIEW';
