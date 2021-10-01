@@ -29,4 +29,4 @@ select_permissions:
       User:
         authId:
           _eq: X-Hasura-User-Id
-  role: user
+  role: user_access

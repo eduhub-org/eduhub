@@ -1,0 +1,9 @@
+- role_name: instructor
+  role_set:
+  - user_access
+  - anonymous
+  - instructor_access
+- role_name: user
+  role_set:
+  - user_access
+  - anonymous

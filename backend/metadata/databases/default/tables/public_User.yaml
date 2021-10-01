@@ -54,4 +54,4 @@ select_permissions:
     - picture
     - lastName
     filter: {}
-  role: user
+  role: user_access

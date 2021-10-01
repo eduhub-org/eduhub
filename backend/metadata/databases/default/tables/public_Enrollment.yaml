@@ -33,4 +33,4 @@ insert_permissions:
     - courseId
     - motivationLetter
     - userId
-  role: user
+  role: user_access

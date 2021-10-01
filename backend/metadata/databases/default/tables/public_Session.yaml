@@ -34,3 +34,17 @@ array_relationships:
       table:
         name: SessionSpeaker
         schema: public
+insert_permissions:
+- permission:
+    backend_only: false
+    check: {}
+    columns:
+    - id
+    - title
+    - description
+    - startDateTime
+    - endDateTime
+    - courseId
+    - createdAt
+    - updatedAt
+  role: instructor_access
