@@ -15,7 +15,7 @@
     "@react-keycloak/ssr": "3.3.0",
     "cookie": "^0.4.1",
     "graphql": "^15.5.0",
-    "keycloak-js": "^13.0.0",
+    "keycloak-js": "^15.0.2",
     "next": "^10.2.3",
     "next-i18next": "^8.2.0",
     "next-images": "^1.8.1",
