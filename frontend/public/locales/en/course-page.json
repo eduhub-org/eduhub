@@ -8,8 +8,10 @@
   "courseNotAvailable": "course not available anymore",
   "currentCourse": "current course",
   "ects": "ECTS",
-  "MaxMissedSessions": "You may be absent on a maximum of one date",
-  "MaxMissedSessions_plural": "You may be absent on a maximum of {{count}} dates",
+  "maxMissedSessions": "You may be absent on a maximum of one date",
+  "maxMissedSessions_plural": "You may be absent on a maximum of {{count}} dates",
+  "openChat": "open chat",
+  "openVideoCall": "open meeting",
   "toCourseDescription": "to course description",
   "youWillLearn": "you will learn"
 }

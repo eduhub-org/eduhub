@@ -99,6 +99,15 @@ export interface CourseWithEnrollment_Course_by_pk_CourseEnrollments {
   status: CourseEnrollmentStatus_enum;
 }
 
+export interface CourseWithEnrollment_Course_by_pk_CourseLocations {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * HTTP address of the video conference for online participation (only provided if it is an online address)
+   */
+  link: string;
+}
+
 export interface CourseWithEnrollment_Course_by_pk_Program {
   __typename: "Program";
   /**
@@ -204,9 +213,17 @@ export interface CourseWithEnrollment_Course_by_pk {
    */
   CourseInstructors: CourseWithEnrollment_Course_by_pk_CourseInstructors[];
   /**
+   * The link to the chat of the course (e.g. a mattermost channel)
+   */
+  chatLink: string | null;
+  /**
    * An array relationship
    */
   CourseEnrollments: CourseWithEnrollment_Course_by_pk_CourseEnrollments[];
+  /**
+   * An array relationship
+   */
+  CourseLocations: CourseWithEnrollment_Course_by_pk_CourseLocations[];
   /**
    * An object relationship
    */
