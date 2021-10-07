@@ -13,6 +13,8 @@ export const COURSE_WITH_ENROLLMENT = gql`
   query CourseWithEnrollment($id: Int!, $authId: uuid!) {
     Course_by_pk(Id: $id) {
       ...CourseFragment
+      LinkChat
+      LinkVideoCall
       Enrollments {
         ...EnrollmentFragment
       }

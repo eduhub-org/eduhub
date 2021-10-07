@@ -88,6 +88,8 @@ select_permissions:
     - Id
     - Image
     - Language
+    - LinkChat
+    - LinkVideoCall
     - MaxMissedSessions
     - MaxParticipants
     - MaxProjectParticipants

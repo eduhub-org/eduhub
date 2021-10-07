@@ -104,6 +104,8 @@ export interface CourseWithEnrollment_Course_by_pk {
    * An array relationship
    */
   CourseInstructors: CourseWithEnrollment_Course_by_pk_CourseInstructors[];
+  LinkChat: string | null;
+  LinkVideoCall: string | null;
   /**
    * An array relationship
    */
