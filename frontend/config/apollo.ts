@@ -33,27 +33,27 @@ export const client = new ApolloClient({
       Course: {
         fields: {
           applicationEnd: {
-            merge: (_, ApplicationEnd) => {
-              return new Date(ApplicationEnd);
+            merge: (_, applicationEnd) => {
+              return new Date(applicationEnd);
             },
           },
           startTime: {
-            merge: (_, TimeStart) => {
-              return new Date(TimeStart);
+            merge: (_, startTime) => {
+              return new Date(startTime);
             },
           },
           endTime: {
-            merge: (_, TimeEnd) => {
-              return new Date(TimeEnd);
+            merge: (_, endTime) => {
+              return new Date(endTime);
             },
           },
         },
       },
-      Enrollment: {
+      CourseEnrollment: {
         fields: {
-          ExpirationDate: {
-            merge: (_, ExpirationDate) => {
-              return new Date(ExpirationDate);
+          invitationExpirationDate: {
+            merge: (_, invitationExpirationDate) => {
+              return new Date(invitationExpirationDate);
             },
           },
         },
@@ -61,13 +61,13 @@ export const client = new ApolloClient({
       Program: {
         fields: {
           applicationStart: {
-            merge: (_, Start) => {
-              return new Date(Start);
+            merge: (_, applicationStart) => {
+              return new Date(applicationStart);
             },
           },
           applicationEnd: {
-            merge: (_, Start) => {
-              return new Date(Start);
+            merge: (_, applicationEnd) => {
+              return new Date(applicationEnd);
             },
           },
           lectureStart: {
