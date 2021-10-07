@@ -48,10 +48,14 @@ select_permissions:
 - permission:
     columns:
     - applicationEnd
+    - contentDescriptionField1
+    - contentDescriptionField2
     - cost
     - coverImage
     - ects
     - endTime
+    - headingDescriptionField1
+    - headingDescriptionField2
     - id
     - language
     - maxMissedSessions
@@ -65,18 +69,22 @@ select_permissions:
   role: anonymous
 - permission:
     columns:
-    - coverImage
-    - programId
-    - endTime
-    - startTime
+    - achievementCertificatePossible
     - applicationEnd
     - attendanceCertificatePossible
+    - contentDescriptionField1
+    - contentDescriptionField2
     - cost
+    - coverImage
     - ects
+    - endTime
+    - headingDescriptionField1
+    - headingDescriptionField2
     - id
     - language
     - maxMissedSessions
-    - achievementCertificatePossible
+    - programId
+    - startTime
     - status
     - tagline
     - title

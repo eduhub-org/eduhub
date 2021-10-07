@@ -31,19 +31,18 @@ export const client = new ApolloClient({
   cache: new InMemoryCache({
     typePolicies: {
       Course: {
-        keyFields: ["Id"],
         fields: {
-          ApplicationEnd: {
+          applicationEnd: {
             merge: (_, ApplicationEnd) => {
               return new Date(ApplicationEnd);
             },
           },
-          TimeStart: {
+          startTime: {
             merge: (_, TimeStart) => {
               return new Date(TimeStart);
             },
           },
-          TimeEnd: {
+          endTime: {
             merge: (_, TimeEnd) => {
               return new Date(TimeEnd);
             },
@@ -51,7 +50,6 @@ export const client = new ApolloClient({
         },
       },
       Enrollment: {
-        keyFields: ["Id"],
         fields: {
           ExpirationDate: {
             merge: (_, ExpirationDate) => {
@@ -60,33 +58,31 @@ export const client = new ApolloClient({
           },
         },
       },
-      Semester: {
-        keyFields: ["Id"],
+      Program: {
         fields: {
-          ApplicationStart: {
+          applicationStart: {
             merge: (_, Start) => {
               return new Date(Start);
             },
           },
-          ApplicationEnd: {
+          applicationEnd: {
             merge: (_, Start) => {
               return new Date(Start);
             },
           },
-          Start: {
-            merge: (_, Start) => {
-              return new Date(Start);
+          lectureStart: {
+            merge: (_, lectureStart) => {
+              return new Date(lectureStart);
             },
           },
-          End: {
-            merge: (_, Start) => {
-              return new Date(Start);
+          lectureEnd: {
+            merge: (_, lectureEnd) => {
+              return new Date(lectureEnd);
             },
           },
         },
       },
       Session: {
-        keyFields: ["Id"],
         fields: {
           startDateTime: {
             merge: (_, startDateTime) => {
