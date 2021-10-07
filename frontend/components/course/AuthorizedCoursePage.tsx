@@ -35,7 +35,8 @@ const AuthorizedCoursePage: FC<{ id: number; tab: number }> = ({ id, tab }) => {
   }
 
   const isParticipating =
-    enrollmentStatusForCourse(course) === CourseEnrollmentStatus_enum.CONFIRMED ||
+    enrollmentStatusForCourse(course) ===
+      CourseEnrollmentStatus_enum.CONFIRMED ||
     enrollmentStatusForCourse(course) === CourseEnrollmentStatus_enum.COMPLETED;
 
   return (

@@ -91,7 +91,8 @@ export const Tile: FC<IProps> = ({ course }) => {
     currentDate <= program?.projectRecordUploadDeadline;
 
   const highlightColor =
-    enrollmentStatus === CourseEnrollmentStatus_enum.CONFIRMED && isCurrentProgram
+    enrollmentStatus === CourseEnrollmentStatus_enum.CONFIRMED &&
+    isCurrentProgram
       ? "bg-edu-course-current"
       : "bg-gray-100";
 

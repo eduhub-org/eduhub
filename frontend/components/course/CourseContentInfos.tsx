@@ -13,7 +13,9 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
   return (
     <div className="flex flex-1 flex-col">
       <span className="text-3xl font-semibold mb-9">{t("youWillLearn")}</span>
-      <div dangerouslySetInnerHTML={{ __html: course.headingDescriptionField1}} />
+      <div
+        dangerouslySetInnerHTML={{ __html: course.headingDescriptionField1 }}
+      />
       <span className="text-3xl font-semibold mt-24 mb-9">
         {t("courseContent")}
       </span>
