@@ -27,7 +27,7 @@ const colorForEnrollmentStatus = (
     return "bg-edu-course-current";
   }
   if (
-    status === CourseEnrollmentStatus_enum.EXPIRED ||
+    status === CourseEnrollmentStatus_enum.REJECTED ||
     status === CourseEnrollmentStatus_enum.ABORTED
   ) {
     return "bg-gray-300";

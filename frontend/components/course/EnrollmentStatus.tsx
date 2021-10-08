@@ -59,7 +59,7 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
         );
         break;
       }
-      case CourseEnrollmentStatus_enum.EXPIRED: {
+      case CourseEnrollmentStatus_enum.REJECTED: {
         content = (
           <span className="bg-gray-300 p-4">{t("status.rejected")}</span>
         );
