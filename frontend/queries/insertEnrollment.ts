@@ -11,12 +11,11 @@ export const INSERT_ENROLLMENT = gql`
     $courseId: Int!
     $motivationLetter: String!
   ) {
-    insert_Enrollment(
+    insert_CourseEnrollment(
       objects: {
-        UserId: $userId
-        CourseId: $courseId
-        MotivationLetter: $motivationLetter
-        WantsEcts: false
+        userId: $userId
+        courseId: $courseId
+        motivationLetter: $motivationLetter
       }
     ) {
       affected_rows
@@ -24,7 +23,7 @@ export const INSERT_ENROLLMENT = gql`
         ...EnrollmentFragment
         Course {
           ...CourseFragment
-          Enrollments {
+          CourseEnrollments {
             ...EnrollmentFragment
           }
         }

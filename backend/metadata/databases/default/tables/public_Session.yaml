@@ -4,19 +4,19 @@ table:
 object_relationships:
 - name: Course
   using:
-    foreign_key_constraint_on: CourseId
+    foreign_key_constraint_on: courseId
 array_relationships:
 - name: AttendanceDocuments
   using:
     foreign_key_constraint_on:
-      column: SessionId
+      column: sessionId
       table:
-        name: AttendanceDocument
+        name: AttendanceSourceData
         schema: public
 - name: Attendances
   using:
     foreign_key_constraint_on:
-      column: SessionId
+      column: sessionId
       table:
         name: Attendance
         schema: public
@@ -27,37 +27,31 @@ array_relationships:
       table:
         name: SessionAddress
         schema: public
-- name: Speakers
+- name: SessionSpeakers
   using:
     foreign_key_constraint_on:
-      column: SessionId
+      column: sessionId
       table:
-        name: Speaker
+        name: SessionSpeaker
         schema: public
 select_permissions:
 - permission:
     columns:
-    - CourseId
-    - Description
+    - courseId
+    - description
     - endDateTime
-    - Id
-    - Location
+    - id
     - startDateTime
-    - SurveyId
-    - SurveyType
-    - Name
+    - title
     filter: {}
   role: anonymous
 - permission:
     columns:
-    - CourseId
-    - Description
+    - courseId
+    - description
     - endDateTime
-    - Id
-    - Location
+    - id
     - startDateTime
-    - SurveyId
-    - SurveyType
-    - Name
+    - title
     filter: {}
   role: user

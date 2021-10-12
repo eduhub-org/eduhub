@@ -1,0 +1,16 @@
+table:
+  name: CourseDefaultAddresses
+  schema: public
+object_relationships:
+- name: Course
+  using:
+    foreign_key_constraint_on: courseId
+- name: LocationOption
+  using:
+    manual_configuration:
+      column_mapping:
+        location: Value
+      insertion_order: null
+      remote_table:
+        name: LocationOptions
+        schema: public

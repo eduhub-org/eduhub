@@ -11,7 +11,7 @@ export const COURSE_LIST_WITH_ENROLLMENT = gql`
   query CourseListWithEnrollments {
     Course {
       ...CourseFragment
-      Enrollments {
+      CourseEnrollments {
         ...EnrollmentFragment
       }
       Program {

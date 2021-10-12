@@ -3,105 +3,189 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { EnrollmentStatus_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: InsertEnrollment
 // ====================================================
 
-export interface InsertEnrollment_insert_Enrollment_returning_Course_Sessions {
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessions {
   __typename: "Session";
-  Id: number;
+  id: number;
+  /**
+   * The day and time of the end of the session
+   */
   endDateTime: any;
-  CourseId: number;
-  Description: string;
-  Location: string;
+  /**
+   * The ID of the course the session belongs to
+   */
+  courseId: number;
+  /**
+   * A description of the session
+   */
+  description: string;
+  /**
+   * The day and time of the start of the session
+   */
   startDateTime: any;
-  Name: string;
+  /**
+   * The title of the session
+   */
+  title: string;
 }
 
-export interface InsertEnrollment_insert_Enrollment_returning_Course_CourseInstructors_Instructor_User {
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors_Expert_User {
   __typename: "User";
-  Firstname: string;
-  Image: string | null;
-  Id: number;
-  Lastname: string;
+  /**
+   * The user's first name
+   */
+  firstName: string;
+  /**
+   * The user's profile picture
+   */
+  picture: string | null;
+  id: number;
+  /**
+   * The user's last name
+   */
+  lastName: string;
 }
 
-export interface InsertEnrollment_insert_Enrollment_returning_Course_CourseInstructors_Instructor {
-  __typename: "Instructor";
-  Id: number;
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors_Expert {
+  __typename: "Expert";
+  id: number;
   /**
    * An object relationship
    */
-  User: InsertEnrollment_insert_Enrollment_returning_Course_CourseInstructors_Instructor_User;
-  Qualification: string | null;
-  Description: string | null;
+  User: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors_Expert_User;
+  /**
+   * A short description on the expert's background
+   */
+  description: string | null;
 }
 
-export interface InsertEnrollment_insert_Enrollment_returning_Course_CourseInstructors {
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors {
   __typename: "CourseInstructor";
-  Id: number;
+  id: number;
   /**
    * An object relationship
    */
-  Instructor: InsertEnrollment_insert_Enrollment_returning_Course_CourseInstructors_Instructor;
+  Expert: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors_Expert;
 }
 
-export interface InsertEnrollment_insert_Enrollment_returning_Course_Enrollments {
-  __typename: "Enrollment";
-  ExpirationDate: any | null;
-  Id: number;
-  Status: EnrollmentStatus_enum;
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments {
+  __typename: "CourseEnrollment";
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
+  id: number;
+  /**
+   * The users current enrollment status to this course
+   */
+  status: CourseEnrollmentStatus_enum;
 }
 
-export interface InsertEnrollment_insert_Enrollment_returning_Course {
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
   __typename: "Course";
-  Id: number;
-  Ects: string;
-  Description: string;
-  WeekDay: string | null;
-  CourseType: number | null;
-  Cost: string;
-  City: string;
-  ApplicationEnd: any;
-  Image: string | null;
-  Language: string;
-  MaxMissedSessions: number;
-  MaxParticipants: number;
-  Name: string;
-  OnlineCourses: string;
-  Status: CourseStatus_enum;
-  ShortDescription: string;
-  TimeStart: any | null;
-  TimeEnd: any | null;
+  id: number;
+  /**
+   * The number of ECTS of the course (only editable by an admin user))
+   */
+  ects: string;
+  /**
+   * Shown below the title on the course page
+   */
+  tagline: string;
+  /**
+   * The day of the week the course takes place.
+   */
+  weekDay: string | null;
+  /**
+   * A text providing info about the costs of a participation.
+   */
+  cost: string;
+  /**
+   * Last day before applications are closed. (Set to the program's default value when the course is created.)
+   */
+  applicationEnd: any;
+  /**
+   * The cover image for the course
+   */
+  coverImage: string | null;
+  /**
+   * The language the course is given in.
+   */
+  language: string;
+  /**
+   * The maximum number of sessions a participant can miss while still receiving a certificate
+   */
+  maxMissedSessions: number;
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+  /**
+   * Id of the program to which the course belongs.
+   */
+  programId: number | null;
+  /**
+   * Heading of the the first course description field
+   */
+  headingDescriptionField1: string;
+  /**
+   * Content of the first course description field
+   */
+  contentDescriptionField1: string | null;
+  /**
+   * Heading of the the second course description field
+   */
+  headingDescriptionField2: string | null;
+  /**
+   * Content of the second course description field
+   */
+  contentDescriptionField2: string | null;
+  /**
+   * The time the course starts each week.
+   */
+  startTime: any | null;
+  /**
+   * The time the course ends each week.
+   */
+  endTime: any | null;
   /**
    * An array relationship
    */
-  Sessions: InsertEnrollment_insert_Enrollment_returning_Course_Sessions[];
+  Sessions: InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessions[];
   /**
    * An array relationship
    */
-  CourseInstructors: InsertEnrollment_insert_Enrollment_returning_Course_CourseInstructors[];
+  CourseInstructors: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors[];
   /**
    * An array relationship
    */
-  Enrollments: InsertEnrollment_insert_Enrollment_returning_Course_Enrollments[];
+  CourseEnrollments: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments[];
 }
 
-export interface InsertEnrollment_insert_Enrollment_returning {
-  __typename: "Enrollment";
-  ExpirationDate: any | null;
-  Id: number;
-  Status: EnrollmentStatus_enum;
+export interface InsertEnrollment_insert_CourseEnrollment_returning {
+  __typename: "CourseEnrollment";
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
+  id: number;
+  /**
+   * The users current enrollment status to this course
+   */
+  status: CourseEnrollmentStatus_enum;
   /**
    * An object relationship
    */
-  Course: InsertEnrollment_insert_Enrollment_returning_Course;
+  Course: InsertEnrollment_insert_CourseEnrollment_returning_Course;
 }
 
-export interface InsertEnrollment_insert_Enrollment {
-  __typename: "Enrollment_mutation_response";
+export interface InsertEnrollment_insert_CourseEnrollment {
+  __typename: "CourseEnrollment_mutation_response";
   /**
    * number of rows affected by the mutation
    */
@@ -109,14 +193,14 @@ export interface InsertEnrollment_insert_Enrollment {
   /**
    * data from the rows affected by the mutation
    */
-  returning: InsertEnrollment_insert_Enrollment_returning[];
+  returning: InsertEnrollment_insert_CourseEnrollment_returning[];
 }
 
 export interface InsertEnrollment {
   /**
-   * insert data into the table: "Enrollment"
+   * insert data into the table: "CourseEnrollment"
    */
-  insert_Enrollment: InsertEnrollment_insert_Enrollment | null;
+  insert_CourseEnrollment: InsertEnrollment_insert_CourseEnrollment | null;
 }
 
 export interface InsertEnrollmentVariables {

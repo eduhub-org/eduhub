@@ -1,0 +1,1 @@
+comment on TABLE "public"."Mail" is E'Whenever a new mail is to be sent a new row with the necessary information to send it is added. After sending it (done by a triggered serverless function) the send status is set or changed respectively...';

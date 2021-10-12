@@ -19,27 +19,26 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
   const { t: tLanguage } = useTranslation("common");
 
   const startTime =
-    course.TimeStart?.toLocaleTimeString(i18n.languages, {
+    course.startTime?.toLocaleTimeString(i18n.languages, {
       hour: "numeric",
       minute: "numeric",
     }) ?? "";
   const endTime =
-    course.TimeEnd?.toLocaleTimeString(i18n.languages, {
+    course.endTime?.toLocaleTimeString(i18n.languages, {
       hour: "numeric",
       minute: "numeric",
     }) ?? "";
 
   const instructor =
     course.CourseInstructors.length > 0
-      ? course.CourseInstructors[0].Instructor
+      ? course.CourseInstructors[0].Expert
       : undefined;
 
-  const instructorName = `${instructor?.User?.Firstname ?? ""} ${
-    instructor?.User?.Lastname ?? ""
+  const instructorName = `${instructor?.User?.firstName ?? ""} ${
+    instructor?.User?.lastName ?? ""
   }`;
-  const instructorAvatar = instructor?.User.Image;
-  const instructorQualification = instructor?.Qualification ?? "";
-  const instructorDescription = instructor?.Description ?? "";
+  const instructorAvatar = instructor?.User.picture;
+  const instructorDescription = instructor?.description ?? "";
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center lg:max-w-md bg-gray-100 p-12 sm:p-24">
@@ -61,7 +60,7 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
         {/* <span className="text-sm mt-2 text-center mb-12">
           {course.Difficulty}
         </span> */}
-        <span className="text-lg mt-2 text-center">{course.Ects}</span>
+        <span className="text-lg mt-2 text-center">{course.ects}</span>
         <span className="text-sm mt-2 text-center mb-12">
           {startTime}
           {endTime ? <span> - {endTime}</span> : ""}
@@ -78,7 +77,7 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
           {"Wo zur Hölle? Online?"}
         </span>
         <span className="text-sm mt-2 text-center">
-          {tLanguage(course.Language || "de")}
+          {tLanguage(course.language || "de")}
         </span>
       </div>
       <span className="my-12 sm:my-24">
@@ -97,9 +96,6 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
         </div>
         <div className="flex flex-col">
           <span className="text-base mb-1">{instructorName}</span>
-          <span className="text-xs uppercase mb-4">
-            {instructorQualification}
-          </span>
           <span className="text-sm">{instructorDescription}</span>
         </div>
       </div>

@@ -4,27 +4,21 @@ table:
 object_relationships:
 - name: Course
   using:
-    foreign_key_constraint_on: CourseId
+    foreign_key_constraint_on: courseId
 - name: EnrollmentStatus
   using:
-    foreign_key_constraint_on: Status
-- name: ProjectType
+    foreign_key_constraint_on: status
+- name: MotivationRating
   using:
-    foreign_key_constraint_on: TypeOfProject
+    foreign_key_constraint_on: motivationRating
 - name: User
   using:
-    foreign_key_constraint_on: UserId
-- name: motivationRatingByMotivationrating
-  using:
-    foreign_key_constraint_on: MotivationRating
-- name: performanceRatingByPerformancerating
-  using:
-    foreign_key_constraint_on: PerformanceRating
+    foreign_key_constraint_on: userId
 array_relationships:
 - name: ProjectEnrollments
   using:
     foreign_key_constraint_on:
-      column: EnrollmentId
+      column: enrollmentId
       table:
         name: ProjectEnrollment
         schema: public
@@ -33,26 +27,10 @@ insert_permissions:
     backend_only: false
     check:
       User:
-        AuthId:
+        authId:
           _eq: X-Hasura-User-Id
     columns:
-    - CourseId
-    - MotivationLetter
-    - UserId
-    - WantsEcts
-  role: user
-select_permissions:
-- permission:
-    columns:
-    - CourseId
-    - ExpirationDate
-    - Id
-    - MotivationLetter
-    - Status
-    - UserId
-    - WantsEcts
-    filter:
-      User:
-        AuthId:
-          _eq: X-Hasura-User-Id
+    - courseId
+    - motivationLetter
+    - userId
   role: user

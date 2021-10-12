@@ -55,7 +55,7 @@ export const Header: FC = () => {
       {isLoggedIn ? (
         <div className="flex bg-blue-400">
           <div className="cursor-pointer" onClick={openMenu}>
-            <Avatar imageUrl={user?.Image || mysteryImg} />
+            <Avatar imageUrl={user?.picture || mysteryImg} />
           </div>
           {menuAnchorElement ? (
             <Menu

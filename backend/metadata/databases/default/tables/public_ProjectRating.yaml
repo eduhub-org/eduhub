@@ -1,0 +1,14 @@
+table:
+  name: ProjectRating
+  schema: public
+is_enum: true
+array_relationships:
+- name: ProjectEnrollments
+  using:
+    manual_configuration:
+      column_mapping:
+        value: rating
+      insertion_order: null
+      remote_table:
+        name: ProjectEnrollment
+        schema: public

@@ -1,0 +1,1 @@
+comment on column "public"."Attendance"."userId" is E'The ID of the user for which the attendance was recorded (only provided if the recorded name was in accordance with the name of a user registered for the session)';

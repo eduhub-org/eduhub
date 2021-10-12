@@ -1,0 +1,10 @@
+table:
+  name: SessionSpeaker
+  schema: public
+object_relationships:
+- name: Expert
+  using:
+    foreign_key_constraint_on: expertId
+- name: Session
+  using:
+    foreign_key_constraint_on: sessionId

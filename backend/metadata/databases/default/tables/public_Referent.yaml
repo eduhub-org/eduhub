@@ -1,15 +1,3 @@
 table:
   name: Referent
   schema: public
-object_relationships:
-- name: User
-  using:
-    foreign_key_constraint_on: UserId
-array_relationships:
-- name: SessionReferents
-  using:
-    foreign_key_constraint_on:
-      column: ReferentId
-      table:
-        name: Speaker
-        schema: public

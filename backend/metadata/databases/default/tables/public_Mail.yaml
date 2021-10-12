@@ -1,7 +1,3 @@
 table:
   name: Mail
   schema: public
-object_relationships:
-- name: Person
-  using:
-    foreign_key_constraint_on: Sender_id

@@ -18,7 +18,7 @@ export const ApplyButtonBlock: FC<IProps> = ({ course, onClickApply }) => {
       </Button>
       <span className="text-xs mt-4">
         {t("applicationDeadline")}{" "}
-        {course.ApplicationEnd?.toLocaleDateString(i18n.languages, {
+        {course.applicationEnd?.toLocaleDateString(i18n.languages, {
           month: "2-digit",
           day: "2-digit",
         }) ?? ""}

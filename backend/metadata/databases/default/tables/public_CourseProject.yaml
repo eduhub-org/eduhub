@@ -1,0 +1,10 @@
+table:
+  name: CourseProject
+  schema: public
+object_relationships:
+- name: Course
+  using:
+    foreign_key_constraint_on: courseId
+- name: Project
+  using:
+    foreign_key_constraint_on: projectId

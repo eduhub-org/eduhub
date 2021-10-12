@@ -1,0 +1,1 @@
+comment on TABLE "public"."Program" is E'Admins can add new program, which are basically a set of courses with similar characteristics and a similar time frame. The table also includes default values for the courses, which might be adapted on the course level though.';

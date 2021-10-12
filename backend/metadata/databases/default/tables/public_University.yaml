@@ -6,14 +6,14 @@ array_relationships:
 - name: Users
   using:
     foreign_key_constraint_on:
-      column: University
+      column: university
       table:
         name: User
         schema: public
 select_permissions:
 - permission:
     columns:
-    - Value
-    - Comment
+    - value
+    - comment
     filter: {}
   role: anonymous
