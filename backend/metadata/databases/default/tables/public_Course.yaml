@@ -48,10 +48,14 @@ select_permissions:
 - permission:
     columns:
     - applicationEnd
+    - contentDescriptionField1
+    - contentDescriptionField2
     - cost
     - coverImage
     - ects
     - endTime
+    - headingDescriptionField1
+    - headingDescriptionField2
     - id
     - language
     - maxMissedSessions
@@ -63,4 +67,28 @@ select_permissions:
     - weekDay
     filter: {}
   role: anonymous
-
+- permission:
+    columns:
+    - achievementCertificatePossible
+    - applicationEnd
+    - attendanceCertificatePossible
+    - chatLink
+    - contentDescriptionField1
+    - contentDescriptionField2
+    - cost
+    - coverImage
+    - ects
+    - endTime
+    - headingDescriptionField1
+    - headingDescriptionField2
+    - id
+    - language
+    - maxMissedSessions
+    - programId
+    - startTime
+    - status
+    - tagline
+    - title
+    - weekDay
+    filter: {}
+  role: user_access

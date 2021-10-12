@@ -18,7 +18,6 @@ export enum CourseEnrollmentStatus_enum {
   APPLIED = "APPLIED",
   COMPLETED = "COMPLETED",
   CONFIRMED = "CONFIRMED",
-  EXPIRED = "EXPIRED",
   INVITED = "INVITED",
   REJECTED = "REJECTED",
 }

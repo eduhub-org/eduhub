@@ -14,3 +14,23 @@ object_relationships:
       remote_table:
         name: LocationOption
         schema: public
+select_permissions:
+- permission:
+    columns:
+    - courseId
+    - id
+    - latitude
+    - locationOption
+    - longitude
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - courseId
+    - id
+    - latitude
+    - link
+    - locationOption
+    - longitude
+    filter: {}
+  role: user

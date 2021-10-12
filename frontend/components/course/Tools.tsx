@@ -11,24 +11,28 @@ interface IProps {
 export const Tools: FC<IProps> = ({ course }) => {
   const { t } = useTranslation("course-page");
 
+  const videoLink = course.CourseLocations.find(
+    (courseLocation) => !!courseLocation.link
+  )?.link;
+
   return (
     <div className="flex flex-1 gap-x-4">
-      {course.LinkChat && (
+      {course.chatLink && (
         <Button
           as="a"
           filled
-          href={course.LinkChat}
+          href={course.chatLink}
           target="_blank"
           rel="noopener noreferrer"
         >
           {t("openChat")}
         </Button>
       )}
-      {course.LinkVideoCall && (
+      {videoLink && (
         <Button
           as="a"
           filled
-          href={course.LinkVideoCall}
+          href={videoLink}
           target="_blank"
           rel="noopener noreferrer"
         >

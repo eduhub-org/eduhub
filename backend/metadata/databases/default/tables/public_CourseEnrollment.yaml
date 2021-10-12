@@ -34,3 +34,20 @@ insert_permissions:
     - motivationLetter
     - userId
   role: user_access
+select_permissions:
+- permission:
+    columns:
+    - achievementCertificateURL
+    - attendanceCertificateURL
+    - courseId
+    - id
+    - invitationExpirationDate
+    - motivationLetter
+    - motivationRating
+    - status
+    - userId
+    filter:
+      User:
+        authId:
+          _eq: X-Hasura-User-Id
+  role: user_access

@@ -48,3 +48,24 @@ insert_permissions:
     - createdAt
     - updatedAt
   role: instructor_access
+select_permissions:
+- permission:
+    columns:
+    - courseId
+    - description
+    - endDateTime
+    - id
+    - startDateTime
+    - title
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - courseId
+    - description
+    - endDateTime
+    - id
+    - startDateTime
+    - title
+    filter: {}
+  role: user_access

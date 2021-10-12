@@ -35,19 +35,22 @@ const AuthorizedCoursePage: FC<{ id: number; tab: number }> = ({ id, tab }) => {
   }
 
   const isParticipating =
-    enrollmentStatusForCourse(course) === CourseEnrollmentStatus_enum.CONFIRMED ||
+    enrollmentStatusForCourse(course) ===
+      CourseEnrollmentStatus_enum.CONFIRMED ||
     enrollmentStatusForCourse(course) === CourseEnrollmentStatus_enum.COMPLETED;
 
   return (
     <>
-      <PageBlock>
-        <div className="py-4">
-          <TabSelection
-            currentTab={tab}
-            tabs={[t("toCourseDescription"), t("currentCourse")]}
-          />
-        </div>
-      </PageBlock>
+      {isParticipating ? (
+        <PageBlock>
+          <div className="py-4">
+            <TabSelection
+              currentTab={tab}
+              tabs={[t("toCourseDescription"), t("currentCourse")]}
+            />
+          </div>
+        </PageBlock>
+      ) : null}
       {tab === 0 || !isParticipating ? (
         <CoursePageDescriptionView course={course} />
       ) : (

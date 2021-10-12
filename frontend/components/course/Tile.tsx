@@ -27,7 +27,7 @@ const colorForEnrollmentStatus = (
     return "bg-edu-course-current";
   }
   if (
-    status === CourseEnrollmentStatus_enum.EXPIRED ||
+    status === CourseEnrollmentStatus_enum.REJECTED ||
     status === CourseEnrollmentStatus_enum.ABORTED
   ) {
     return "bg-gray-300";
@@ -91,7 +91,8 @@ export const Tile: FC<IProps> = ({ course }) => {
     currentDate <= program?.projectRecordUploadDeadline;
 
   const highlightColor =
-    enrollmentStatus === CourseEnrollmentStatus_enum.CONFIRMED && isCurrentProgram
+    enrollmentStatus === CourseEnrollmentStatus_enum.CONFIRMED &&
+    isCurrentProgram
       ? "bg-edu-course-current"
       : "bg-gray-100";
 
