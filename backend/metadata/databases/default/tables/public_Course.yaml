@@ -47,39 +47,55 @@ array_relationships:
 select_permissions:
 - permission:
     columns:
-    - applicationEnd
-    - cost
-    - coverImage
-    - ects
-    - endTime
-    - id
-    - language
-    - maxMissedSessions
-    - programId
-    - startTime
-    - status
-    - tagline
-    - title
-    - weekDay
+    - ApplicationEnd
+    - Cost
+    - CoverImage
+    - Ects
+    - EndTime
+    - Id
+    - Language
+    - MaxMissedSessions
+    - ProgramId
+    - StartTime
+    - Status
+    - Tagline
+    - Title
+    - WeekDay
     filter: {}
   role: anonymous
 - permission:
     columns:
-    - coverImage
-    - programId
-    - endTime
-    - startTime
-    - applicationEnd
-    - attendanceCertificatePossible
-    - cost
-    - ects
-    - id
-    - language
-    - maxMissedSessions
-    - achievementCertificatePossible
-    - status
-    - tagline
-    - title
-    - weekDay
+    - ApplicationEnd
+    - AttendanceCertificatePossible
+    - CertificatePossible
+    - City
+    - Cost
+    - CourseType
+    - DatesOnCertificate
+    - Description
+    - Difficulty
+    - Ects
+    - ExternalProjectsAllowed
+    - Id
+    - Image
+    - Language
+    - LinkChat
+    - LinkVideoCall
+    - MaxMissedSessions
+    - MaxParticipants
+    - MaxProjectParticipants
+    - Name
+    - OnlineCourses
+    - OnlineCoursesAllowed
+    - Online_Hybrid_Offline
+    - ProgramId
+    - Projects
+    - ProjectsAllowed
+    - ShortDescription
+    - Status
+    - TextOnCertificate
+    - TimeEnd
+    - TimeStart
+    - WeekDay
     filter: {}
   role: user_access
