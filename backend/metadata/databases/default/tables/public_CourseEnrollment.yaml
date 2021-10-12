@@ -51,3 +51,14 @@ select_permissions:
         authId:
           _eq: X-Hasura-User-Id
   role: user_access
+update_permissions:
+- permission:
+    check: {}
+    columns:
+    - achievementCertificateURL
+    - attendanceCertificateURL
+    - invitationExpirationDate
+    - motivationRating
+    - status
+    filter: {}
+  role: instructor_access

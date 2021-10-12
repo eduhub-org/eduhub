@@ -37,6 +37,29 @@ array_relationships:
       table:
         name: Expert
         schema: public
+insert_permissions:
+- permission:
+    backend_only: false
+    check:
+      authId:
+        _eq: X-Hasura-User-Id
+    columns:
+    - id
+    - created_at
+    - updated_at
+    - externalProfile
+    - anonymousId
+    - authId
+    - newsletterRegistration
+    - otherUniversity
+    - university
+    - employment
+    - email
+    - firstName
+    - lastName
+    - matriculationNumber
+    - picture
+  role: self_access
 select_permissions:
 - permission:
     columns:
@@ -49,9 +72,63 @@ select_permissions:
 - permission:
     columns:
     - authId
+    - created_at
+    - email
+    - employment
+    - externalProfile
+    - firstName
+    - id
+    - lastName
+    - matriculationNumber
+    - newsletterRegistration
+    - otherUniversity
+    - picture
+    - university
+    - updated_at
+    filter: {}
+  role: instructor_access
+- permission:
+    columns:
+    - anonymousId
+    - authId
+    - created_at
+    - employment
+    - externalProfile
+    - id
+    - matriculationNumber
+    - newsletterRegistration
+    - otherUniversity
+    - university
+    - updated_at
+    filter:
+      authId:
+        _eq: X-Hasura-User-Id
+  role: self_access
+- permission:
+    columns:
+    - authId
     - firstName
     - id
     - picture
     - lastName
     filter: {}
   role: user_access
+update_permissions:
+- permission:
+    check: null
+    columns:
+    - email
+    - employment
+    - externalProfile
+    - firstName
+    - lastName
+    - matriculationNumber
+    - newsletterRegistration
+    - otherUniversity
+    - picture
+    - university
+    - updated_at
+    filter:
+      authId:
+        _eq: X-Hasura-User-Id
+  role: self_access

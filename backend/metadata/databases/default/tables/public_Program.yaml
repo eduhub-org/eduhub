@@ -23,4 +23,4 @@ select_permissions:
     - startQuestionnaire
     - title
     filter: {}
-  role: user
+  role: user_access

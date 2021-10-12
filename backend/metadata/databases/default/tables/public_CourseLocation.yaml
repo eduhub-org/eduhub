@@ -33,4 +33,4 @@ select_permissions:
     - locationOption
     - longitude
     filter: {}
-  role: user
+  role: user_access
