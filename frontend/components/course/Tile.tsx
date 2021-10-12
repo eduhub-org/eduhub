@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FC } from "react";
 
-import { EnrollmentStatus_enum } from "../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum } from "../../__generated__/globalTypes";
 import {
   enrollmentStatusForCourse,
   hasEnrollments,
@@ -10,32 +10,32 @@ import {
 } from "../../helpers/courseHelpers";
 import { CourseList_Course } from "../../queries/__generated__/CourseList";
 import { CourseListWithEnrollments_Course } from "../../queries/__generated__/CourseListWithEnrollments";
-import { CourseWithEnrollment_Course_by_pk_Enrollments } from "../../queries/__generated__/CourseWithEnrollment";
+import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from "../../queries/__generated__/CourseWithEnrollment";
 
 interface IProps {
   course: CourseList_Course | CourseListWithEnrollments_Course;
 }
 
 const colorForEnrollmentStatus = (
-  status: EnrollmentStatus_enum | "NOT_APPLIED",
-  enrollment: CourseWithEnrollment_Course_by_pk_Enrollments | undefined
+  status: CourseEnrollmentStatus_enum | "NOT_APPLIED",
+  enrollment: CourseWithEnrollment_Course_by_pk_CourseEnrollments | undefined
 ): string => {
   if (
-    status === EnrollmentStatus_enum.APPLIED ||
-    status === EnrollmentStatus_enum.CONFIRMED
+    status === CourseEnrollmentStatus_enum.APPLIED ||
+    status === CourseEnrollmentStatus_enum.CONFIRMED
   ) {
     return "bg-edu-course-current";
   }
   if (
-    status === EnrollmentStatus_enum.REJECTED ||
-    status === EnrollmentStatus_enum.ABORTED
+    status === CourseEnrollmentStatus_enum.REJECTED ||
+    status === CourseEnrollmentStatus_enum.ABORTED
   ) {
     return "bg-gray-300";
   }
-  if (status === EnrollmentStatus_enum.INVITED) {
+  if (status === CourseEnrollmentStatus_enum.INVITED) {
     if (
-      !enrollment?.ExpirationDate ||
-      (enrollment && new Date() < enrollment.ExpirationDate)
+      !enrollment?.invitationExpirationDate ||
+      (enrollment && new Date() < enrollment.invitationExpirationDate)
     ) {
       return "bg-edu-course-invited";
     } else {
@@ -47,12 +47,12 @@ const colorForEnrollmentStatus = (
 };
 
 const CourseStatusIndicator: FC<{
-  enrollmentStatus: EnrollmentStatus_enum | "NOT_APPLIED";
-  enrollment: CourseWithEnrollment_Course_by_pk_Enrollments | undefined;
+  enrollmentStatus: CourseEnrollmentStatus_enum | "NOT_APPLIED";
+  enrollment: CourseWithEnrollment_Course_by_pk_CourseEnrollments | undefined;
 }> = ({ enrollmentStatus, enrollment }) => {
   const color = colorForEnrollmentStatus(enrollmentStatus, enrollment);
 
-  if (enrollmentStatus === EnrollmentStatus_enum.COMPLETED) {
+  if (enrollmentStatus === CourseEnrollmentStatus_enum.COMPLETED) {
     return (
       <div className="absolute top-0 right-3">
         <Image src="/images/course/completed_flag.svg" width={37} height={46} />
@@ -80,28 +80,29 @@ export const Tile: FC<IProps> = ({ course }) => {
 
   const program = hasProgram(course) ? course.Program : undefined;
   const enrollment =
-    hasEnrollments(course) && course.Enrollments.length === 1
-      ? course.Enrollments[0]
+    hasEnrollments(course) && course.CourseEnrollments.length === 1
+      ? course.CourseEnrollments[0]
       : undefined;
 
   const currentDate = new Date();
   const isCurrentProgram =
     !!program &&
-    program?.ApplicationStart <= currentDate &&
-    currentDate <= program?.PerformanceRecordDeadline;
+    program?.applicationStart <= currentDate &&
+    currentDate <= program?.projectRecordUploadDeadline;
 
   const highlightColor =
-    enrollmentStatus === EnrollmentStatus_enum.CONFIRMED && isCurrentProgram
+    enrollmentStatus === CourseEnrollmentStatus_enum.CONFIRMED &&
+    isCurrentProgram
       ? "bg-edu-course-current"
       : "bg-gray-100";
 
   return (
-    <Link href={`/course/${course.Id}`}>
+    <Link href={`/course/${course.id}`}>
       <a>
         <div className="relative w-60 h-72 rounded-2xl overflow-hidden">
           <div className="h-1/2 bg-edu-black">
             <Image
-              src={course.Image ?? "https://picsum.photos/240/144"}
+              src={course.coverImage ?? "https://picsum.photos/240/144"}
               alt="Edu Hub logo"
               width={240}
               height={144}
@@ -115,7 +116,7 @@ export const Tile: FC<IProps> = ({ course }) => {
           <div
             className={`flex h-1/2 flex-col justify-between ${highlightColor} p-3`}
           >
-            <span className="text-base">{course.Name}</span>
+            <span className="text-base">{course.title}</span>
             <span className="text-xs uppercase">Kurs</span>
           </div>
         </div>

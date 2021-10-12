@@ -31,62 +31,58 @@ export const client = new ApolloClient({
   cache: new InMemoryCache({
     typePolicies: {
       Course: {
-        keyFields: ["Id"],
         fields: {
-          ApplicationEnd: {
-            merge: (_, ApplicationEnd) => {
-              return new Date(ApplicationEnd);
+          applicationEnd: {
+            merge: (_, applicationEnd) => {
+              return new Date(applicationEnd);
             },
           },
-          TimeStart: {
-            merge: (_, TimeStart) => {
-              return new Date(TimeStart);
+          startTime: {
+            merge: (_, startTime) => {
+              return new Date(startTime);
             },
           },
-          TimeEnd: {
-            merge: (_, TimeEnd) => {
-              return new Date(TimeEnd);
+          endTime: {
+            merge: (_, endTime) => {
+              return new Date(endTime);
             },
           },
         },
       },
-      Enrollment: {
-        keyFields: ["Id"],
+      CourseEnrollment: {
         fields: {
-          ExpirationDate: {
-            merge: (_, ExpirationDate) => {
-              return new Date(ExpirationDate);
+          invitationExpirationDate: {
+            merge: (_, invitationExpirationDate) => {
+              return new Date(invitationExpirationDate);
             },
           },
         },
       },
-      Semester: {
-        keyFields: ["Id"],
+      Program: {
         fields: {
-          ApplicationStart: {
-            merge: (_, Start) => {
-              return new Date(Start);
+          applicationStart: {
+            merge: (_, applicationStart) => {
+              return new Date(applicationStart);
             },
           },
-          ApplicationEnd: {
-            merge: (_, Start) => {
-              return new Date(Start);
+          applicationEnd: {
+            merge: (_, applicationEnd) => {
+              return new Date(applicationEnd);
             },
           },
-          Start: {
-            merge: (_, Start) => {
-              return new Date(Start);
+          lectureStart: {
+            merge: (_, lectureStart) => {
+              return new Date(lectureStart);
             },
           },
-          End: {
-            merge: (_, Start) => {
-              return new Date(Start);
+          lectureEnd: {
+            merge: (_, lectureEnd) => {
+              return new Date(lectureEnd);
             },
           },
         },
       },
       Session: {
-        keyFields: ["Id"],
         fields: {
           startDateTime: {
             merge: (_, startDateTime) => {

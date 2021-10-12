@@ -5,39 +5,37 @@ import { SESSION_FRAGMENT } from "./sessionFragement";
 export const COURSE_FRAGMENT = gql`
   ${SESSION_FRAGMENT}
   fragment CourseFragment on Course {
-    Id
-    Ects
-    Description
-    WeekDay
-    CourseType
-    Cost
-    City
-    ApplicationEnd
-    Image
-    Language
-    MaxMissedSessions
-    MaxParticipants
-    Name
-    OnlineCourses
-    Status
-    ShortDescription
-    TimeStart
-    TimeEnd
+    id
+    ects
+    tagline
+    weekDay
+    cost
+    applicationEnd
+    coverImage
+    language
+    maxMissedSessions
+    title
+    programId
+    headingDescriptionField1
+    contentDescriptionField1
+    headingDescriptionField2
+    contentDescriptionField2
+    startTime
+    endTime
     Sessions {
       ...SessionFragment
     }
     CourseInstructors {
-      Id
-      Instructor {
-        Id
+      id
+      Expert {
+        id
         User {
-          Firstname
-          Image
-          Id
-          Lastname
+          firstName
+          picture
+          id
+          lastName
         }
-        Qualification
-        Description
+        description
       }
     }
   }

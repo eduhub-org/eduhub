@@ -4,7 +4,16 @@ table:
 object_relationships:
 - name: Enrollment
   using:
-    foreign_key_constraint_on: EnrollmentId
+    foreign_key_constraint_on: enrollmentId
 - name: Project
   using:
-    foreign_key_constraint_on: ProjectId
+    foreign_key_constraint_on: projectId
+- name: Rating
+  using:
+    manual_configuration:
+      column_mapping:
+        rating: value
+      insertion_order: null
+      remote_table:
+        name: ProjectRating
+        schema: public

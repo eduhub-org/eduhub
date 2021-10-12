@@ -16,9 +16,9 @@ export const hasEnrollments = (
 export const enrollmentStatusForCourse = (
   course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk
 ) => {
-  if (!hasEnrollments(course) || course.Enrollments.length !== 1) {
+  if (!hasEnrollments(course) || course.CourseEnrollments.length !== 1) {
     return "NOT_APPLIED";
   }
 
-  return course.Enrollments[0].Status;
+  return course.CourseEnrollments[0].status;
 };

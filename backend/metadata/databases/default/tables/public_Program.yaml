@@ -5,21 +5,22 @@ array_relationships:
 - name: Courses
   using:
     foreign_key_constraint_on:
-      column: ProgramId
+      column: programId
       table:
         name: Course
         schema: public
 select_permissions:
 - permission:
     columns:
-    - ApplicationEnd
-    - ApplicationStart
-    - End
-    - Id
-    - Name
-    - PerformanceRecordDeadline
-    - Start
-    filter:
-      Visibility:
-        _eq: true
+    - applicationStart
+    - defaultApplicationEnd
+    - defaultMaxMissedSessions
+    - id
+    - lectureEnd
+    - lectureStart
+    - projectRecordUploadDeadline
+    - shortTitle
+    - startQuestionnaire
+    - title
+    filter: {}
   role: user

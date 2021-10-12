@@ -5,8 +5,10 @@ is_enum: true
 array_relationships:
 - name: Locations
   using:
-    foreign_key_constraint_on:
-      column: Location
-      table:
+    manual_configuration:
+      column_mapping:
+        value: locationOption
+      insertion_order: null
+      remote_table:
         name: CourseLocation
         schema: public

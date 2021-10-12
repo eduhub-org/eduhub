@@ -22,7 +22,7 @@ export const CourseApplicationModalFormContent: FC<IProps> = ({
   return (
     <>
       <span className="text-base mb-2">{t("applicationFor")}</span>
-      <span className="text-3xl font-semibold">{course.Name}</span>
+      <span className="text-3xl font-semibold">{course.title}</span>
       <span className="text-base">Anforderungen</span>
       <span className="text-sm">
         Anforderungen Hier ein Text über die Anforderungen für den Kurs. Wie

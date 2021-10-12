@@ -1,0 +1,1 @@
+CREATE TABLE "public"."CourseProject" ("id" serial NOT NULL, "courseId" integer NOT NULL, "projectId" integer NOT NULL, PRIMARY KEY ("id") , FOREIGN KEY ("courseId") REFERENCES "public"."Course"("id") ON UPDATE restrict ON DELETE restrict);
