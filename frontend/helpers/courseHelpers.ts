@@ -10,7 +10,7 @@ export const hasProgram = (
 export const hasEnrollments = (
   course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk
 ): course is CourseWithEnrollment_Course_by_pk => {
-  return "Enrollments" in course;
+  return "CourseEnrollments" in course;
 };
 
 export const enrollmentStatusForCourse = (
