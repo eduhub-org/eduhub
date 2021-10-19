@@ -28,6 +28,8 @@ services:
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
       HASURA_GRAPHQL_JWT_SECRET: '{ "type": "RS256", "jwk_url": "http://keycloak:8080/auth/realms/edu-hub/protocol/openid-connect/certs" }'
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
+      HASURA_CLOUD_FUNCTION_SECRET: "${HASURA_CLOUD_FUNCTION_SECRET}"
+      CLOUD_FUNCTION_LINK: "https://europe-west3-edu-hub-staging.cloudfunctions.net"
     volumes:
       - ./backend/migrations:/hasura-migrations
       - ./backend/metadata:/hasura-metadata
