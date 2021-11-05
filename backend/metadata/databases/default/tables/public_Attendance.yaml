@@ -23,10 +23,17 @@ object_relationships:
 select_permissions:
 - permission:
     columns:
+    - endDateTime
     - id
+    - interruptionCount
+    - recordedName
+    - sessionId
+    - source
+    - startDateTime
     - status
+    - totalAttendanceTime
+    - userId
     filter:
-      User:
-        authId:
-          _eq: X-Hasura-User-Id
+      userId:
+        _eq: X-Hasura-User-Id
   role: user

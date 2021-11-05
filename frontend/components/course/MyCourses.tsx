@@ -10,7 +10,7 @@ import { TileSlider } from "./TileSlider";
 export const MyCourses: FC = () => {
   const { data, loading, error } = useAuthedQuery<MyCoursesType>(MY_COURSES);
 
-  const enrollments = data?.CourseEnrollment ?? [];
+  const enrollments = data?.User_by_pk?.CourseEnrollments ?? [];
 
   const courses = enrollments?.map((enrollment) => enrollment.Course) ?? [];
 

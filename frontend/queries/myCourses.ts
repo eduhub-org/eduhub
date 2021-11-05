@@ -8,16 +8,18 @@ export const MY_COURSES = gql`
   ${COURSE_FRAGMENT}
   ${ENROLLMENT_FRAGMENT}
   ${PROGRAM_FRAGMENT}
-  query MyCourses {
-    CourseEnrollment {
-      ...EnrollmentFragment
-      Course {
-        ...CourseFragment
-        CourseEnrollments {
-          ...EnrollmentFragment
-        }
-        Program {
-          ...ProgramFragment
+  query MyCourses($authId: uuid!) {
+    User_by_pk(id: $authId) {
+      CourseEnrollments {
+        ...EnrollmentFragment
+        Course {
+          ...CourseFragment
+          CourseEnrollments {
+            ...EnrollmentFragment
+          }
+          Program {
+            ...ProgramFragment
+          }
         }
       }
     }

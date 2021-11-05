@@ -1,10 +1,11 @@
 import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance } from "keycloak-js";
 import { useTranslation } from "next-i18next";
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 
 import { CourseEnrollmentStatus_enum } from "../../__generated__/globalTypes";
 import { useAuthedQuery } from "../../hooks/authedQuery";
+import { useUser } from "../../hooks/user";
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
 import {
   CourseWithEnrollment,
@@ -14,15 +15,21 @@ import { COURSE_WITH_ENROLLMENT } from "../../queries/courseWithEnrollment";
 
 import { ApplyButtonBlock } from "./ApplyButtonBlock";
 import { CourseApplicationModal } from "./CourseApplicationModal";
+import { UserInfoModal } from "./UserInfoModal";
 
 interface IProps {
   course: Course_Course_by_pk;
 }
 
 export const EnrollmentStatus: FC<IProps> = ({ course }) => {
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isUserInfoModalVisible, setUserInfoModalVisible] = useState(false);
+  const [isApplicationModalVisible, setApplicationModalVisible] = useState(
+    false
+  );
   const { t } = useTranslation("course-application");
   const { keycloak } = useKeycloak<KeycloakInstance>();
+
+  const user = useUser();
 
   const { data, loading, error } = useAuthedQuery<
     CourseWithEnrollment,
@@ -34,8 +41,28 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
     },
   });
 
-  const showModal = useCallback(() => setModalVisible(true), []);
-  const hideModal = useCallback(() => setModalVisible(false), []);
+  const showModal = useCallback(() => {
+    if (!user) {
+      setUserInfoModalVisible(true);
+    } else {
+      setApplicationModalVisible(true);
+    }
+  }, [user]);
+  const hideUserInfoModal = useCallback(
+    () => setUserInfoModalVisible(false),
+    []
+  );
+  const hideApplicationModal = useCallback(
+    () => setApplicationModalVisible(false),
+    []
+  );
+
+  useEffect(() => {
+    if (user && isUserInfoModalVisible) {
+      setUserInfoModalVisible(false);
+      setApplicationModalVisible(true);
+    }
+  }, [user, isUserInfoModalVisible]);
 
   const enrollments = data?.Course_by_pk?.CourseEnrollments;
 
@@ -74,9 +101,14 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
   return (
     <>
       {content}
+      <UserInfoModal
+        visible={isUserInfoModalVisible && !user}
+        closeModal={hideUserInfoModal}
+        course={course}
+      />
       <CourseApplicationModal
-        visible={isModalVisible}
-        closeModal={hideModal}
+        visible={isApplicationModalVisible}
+        closeModal={hideApplicationModal}
         course={course}
       />
     </>
