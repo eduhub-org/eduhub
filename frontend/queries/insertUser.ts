@@ -1,13 +1,18 @@
 import { gql } from "@apollo/client";
 
 export const INSERT_USER = gql`
-  mutation InsertUser($userId: uuid!) {
+  mutation InsertUser(
+    $userId: uuid!
+    $firstName: String!
+    $lastName: String!
+    $email: String!
+  ) {
     insert_User(
       objects: {
         id: $userId
-        lastName: "TestNachName"
-        firstName: "TestVorName"
-        email: "test@test.de"
+        lastName: $lastName
+        firstName: $firstName
+        email: $email
       }
     ) {
       affected_rows

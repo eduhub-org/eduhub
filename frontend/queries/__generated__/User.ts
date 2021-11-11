@@ -14,6 +14,18 @@ export interface User_User_by_pk {
    * The user's profile picture
    */
   picture: string | null;
+  /**
+   * The user's email address
+   */
+  email: string;
+  /**
+   * The user's first name
+   */
+  firstName: string;
+  /**
+   * The user's last name
+   */
+  lastName: string;
 }
 
 export interface User {

@@ -10,17 +10,12 @@ import xIcon from "../../public/images/common/x-calibur.svg";
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
 import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
 import {
-  InsertEnrollment,
-  InsertEnrollmentVariables,
-} from "../../queries/__generated__/InsertEnrollment";
-import {
   InsertUser,
   InsertUserVariables,
 } from "../../queries/__generated__/InsertUser";
-import { INSERT_ENROLLMENT } from "../../queries/insertEnrollment";
 import { INSERT_USER } from "../../queries/insertUser";
-import { USER } from "../../queries/user";
 import { Button } from "../common/Button";
+import { ModalContent } from "../common/ModalContent";
 
 interface IProps {
   closeModal: () => void;
@@ -29,17 +24,19 @@ interface IProps {
 }
 
 export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [mail, setMail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
   const [school, setSchool] = useState("");
   const [studentId, setStudentId] = useState("");
-  const [mailEditable, setMailEditable] = useState(true);
+  const [firstNameEditable, setFirstNameEditable] = useState(true);
+  const [lastNameEditable, setLastNameEditable] = useState(true);
+  const [emailEditable, setEmailEditable] = useState(true);
   const userId = useUserId();
   const profile = useKeycloakUserProfile();
 
-  const [insertUser, { data, loading, error }] = useAuthedMutation<
+  const [insertUser, { data, loading, error: insertError }] = useAuthedMutation<
     InsertUser,
     InsertUserVariables
   >(INSERT_USER);
@@ -54,19 +51,22 @@ export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
     insertUser({
       variables: {
         userId,
+        firstName,
+        lastName,
+        email,
       },
-      refetchQueries: [
-        "User", // Query name
-      ],
+      refetchQueries: ["User"],
     });
-  }, [userId, insertUser]);
+  }, [userId, firstName, lastName, email, insertUser]);
 
   useEffect(() => {
     if (profile) {
-      setFirstname(profile.firstName ?? "");
-      setLastname(profile.lastName ?? "");
-      setMail(profile.email ?? "");
-      setMailEditable(!profile.email);
+      setFirstName(profile.firstName ?? "");
+      setLastName(profile.lastName ?? "");
+      setEmail(profile.email ?? "");
+      setFirstNameEditable(!profile.firstName);
+      setLastNameEditable(!profile.lastName);
+      setEmailEditable(!profile.email);
       // setStatus(profile.status);
       // setSchool(profile.school);
       // setStudentId(profile.studentId);
@@ -83,7 +83,12 @@ export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
       closeAfterTransition
     >
       <Fade in={visible}>
-        <div className="w-full sm:w-auto h-full sm:h-auto sm:m-16 sm:rounded bg-edu-black p-8">
+        <ModalContent
+          closeModal={closeModal}
+          className="w-full sm:w-auto h-full sm:h-auto sm:m-16 sm:rounded bg-edu-black pb-8"
+          xIconColor="white"
+        >
+          {/* <div className="w-full sm:w-auto h-full sm:h-auto sm:m-16 sm:rounded bg-edu-black p-8"> */}
           {/* <div className="w-[50%] px-10 pt-24 pb-16 border-2 bg-edu-black"> */}
           <h1 className="pb-8 text-white">
             Bitte gib uns zunächst noch ein paar Informationen über dich.
@@ -92,21 +97,23 @@ export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
             <input
               className="flex border-b-2 border-white bg-edu-black text-white pl-4 pb-2 pt-8 w-full"
               placeholder="Vorname *"
-              value={firstname}
-              onChange={(e) => setFirstname(e.target.value)}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              disabled={!firstNameEditable}
             />
             <input
               className="flex border-b-2 border-white bg-edu-black text-white pl-4 pb-2 pt-8 w-full"
               placeholder="Nachname *"
-              value={lastname}
-              onChange={(e) => setLastname(e.target.value)}
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              disabled={!lastNameEditable}
             />
             <input
               className="flex border-b-2 border-white bg-edu-black text-white pl-4 pb-2 pt-8 w-full"
               placeholder="E-Mail *"
-              value={mail}
-              onChange={(e) => setMail(e.target.value)}
-              disabled={!mailEditable}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={!emailEditable}
             />
             <input
               className="flex border-b-2 border-white bg-edu-black text-white pl-4 pb-2 pt-8 w-full"
@@ -127,13 +134,19 @@ export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
               onChange={(e) => setStudentId(e.target.value)}
             />
           </div>
+          {insertError ? (
+            <div className="pt-8 text-red-500 text-center">
+              {insertError.graphQLErrors[0].message}
+            </div>
+          ) : null}
           <div className="flex justify-center pt-24">
-            <Button as="button" filled onClick={createUser}>
+            <Button as="button" onClick={createUser} filled inverted>
               Weiter
             </Button>
           </div>
           {/* </div> */}
-        </div>
+          {/* </div> */}
+        </ModalContent>
       </Fade>
     </Modal>
   );

@@ -31,6 +31,10 @@ export interface InsertUser_insert_User_returning {
 export interface InsertUser_insert_User {
   __typename: "User_mutation_response";
   /**
+   * number of rows affected by the mutation
+   */
+  affected_rows: number;
+  /**
    * data from the rows affected by the mutation
    */
   returning: InsertUser_insert_User_returning[];
@@ -45,4 +49,7 @@ export interface InsertUser {
 
 export interface InsertUserVariables {
   userId: any;
+  firstName: string;
+  lastName: string;
+  email: string;
 }

@@ -7,7 +7,7 @@ import { CourseEnrollmentStatus_enum } from "../../__generated__/globalTypes";
 import { enrollmentStatusForCourse } from "../../helpers/courseHelpers";
 import { useAuthedMutation } from "../../hooks/authedMutation";
 import { useUser, useUserId } from "../../hooks/user";
-import xIcon from "../../public/images/common/x-calibur.svg";
+import xIcon from "../../public/images/common/x-calibur-black.svg";
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
 import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
 import {
