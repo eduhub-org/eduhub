@@ -30,9 +30,6 @@ export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
   const [status, setStatus] = useState("");
   const [school, setSchool] = useState("");
   const [studentId, setStudentId] = useState("");
-  const [firstNameEditable, setFirstNameEditable] = useState(true);
-  const [lastNameEditable, setLastNameEditable] = useState(true);
-  const [emailEditable, setEmailEditable] = useState(true);
   const userId = useUserId();
   const profile = useKeycloakUserProfile();
 
@@ -64,9 +61,6 @@ export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
       setFirstName(profile.firstName ?? "");
       setLastName(profile.lastName ?? "");
       setEmail(profile.email ?? "");
-      setFirstNameEditable(!profile.firstName);
-      setLastNameEditable(!profile.lastName);
-      setEmailEditable(!profile.email);
       // setStatus(profile.status);
       // setSchool(profile.school);
       // setStudentId(profile.studentId);
@@ -99,21 +93,21 @@ export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
               placeholder="Vorname *"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              disabled={!firstNameEditable}
+              disabled
             />
             <input
               className="flex border-b-2 border-white bg-edu-black text-white pl-4 pb-2 pt-8 w-full"
               placeholder="Nachname *"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              disabled={!lastNameEditable}
+              disabled
             />
             <input
               className="flex border-b-2 border-white bg-edu-black text-white pl-4 pb-2 pt-8 w-full"
               placeholder="E-Mail *"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={!emailEditable}
+              disabled
             />
             <input
               className="flex border-b-2 border-white bg-edu-black text-white pl-4 pb-2 pt-8 w-full"
