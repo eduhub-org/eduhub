@@ -30,9 +30,7 @@ insert_permissions:
         _eq: X-Hasura-User-Id
     columns:
     - courseId
-    - invitationExpirationDate
     - motivationLetter
-    - motivationRating
     - userId
   role: user
 select_permissions:
@@ -42,9 +40,7 @@ select_permissions:
     - attendanceCertificateURL
     - courseId
     - id
-    - invitationExpirationDate
     - motivationLetter
-    - motivationRating
     - status
     - userId
     filter:
