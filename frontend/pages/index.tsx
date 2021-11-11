@@ -54,11 +54,7 @@ const Home: FC = () => {
           </div>
           <OnlyLoggedOut>
             <div className="flex justify-center mb-12">
-              <Link href="/register">
-                <a className="flex">
-                  <Button filled>{t("registerNow")}</Button>
-                </a>
-              </Link>
+              <RegisterButton>{t("registerNow")}</RegisterButton>
             </div>
           </OnlyLoggedOut>
         </div>

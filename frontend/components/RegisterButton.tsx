@@ -6,7 +6,11 @@ import { useTranslation } from "react-i18next";
 
 import { Button } from "./common/Button";
 
-export const RegisterButton: FC = () => {
+interface IProps {
+  children?: string;
+}
+
+export const RegisterButton: FC<IProps> = ({ children }) => {
   const { t } = useTranslation();
   const { keycloak } = useKeycloak<KeycloakInstance>();
   const router = useRouter();
@@ -22,7 +26,7 @@ export const RegisterButton: FC = () => {
 
   return (
     <Button filled onClick={register}>
-      {t("registerButton.title")}
+      {children ?? t("registerButton.title")}
     </Button>
   );
 };
