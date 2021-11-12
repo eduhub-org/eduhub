@@ -5,7 +5,7 @@ import { FC, useCallback, useEffect, useState } from "react";
 
 import { CourseEnrollmentStatus_enum } from "../../__generated__/globalTypes";
 import { useAuthedQuery } from "../../hooks/authedQuery";
-import { useUser } from "../../hooks/user";
+import { useUser, useUserId } from "../../hooks/user";
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
 import {
   CourseWithEnrollment,
@@ -27,9 +27,9 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
     false
   );
   const { t } = useTranslation("course-application");
-  const { keycloak } = useKeycloak<KeycloakInstance>();
 
   const user = useUser();
+  const userId = useUserId();
 
   const { data, loading, error } = useAuthedQuery<
     CourseWithEnrollment,
@@ -37,7 +37,7 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
   >(COURSE_WITH_ENROLLMENT, {
     variables: {
       id: course.id,
-      authId: keycloak?.subject,
+      userId,
     },
   });
 

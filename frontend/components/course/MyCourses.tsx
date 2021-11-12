@@ -1,6 +1,7 @@
 import { FC } from "react";
 
 import { useAuthedQuery } from "../../hooks/authedQuery";
+import { useUserId } from "../../hooks/user";
 import { MyCourses as MyCoursesType } from "../../queries/__generated__/MyCourses";
 import { MY_COURSES } from "../../queries/myCourses";
 import { Button } from "../common/Button";
@@ -8,7 +9,13 @@ import { Button } from "../common/Button";
 import { TileSlider } from "./TileSlider";
 
 export const MyCourses: FC = () => {
-  const { data, loading, error } = useAuthedQuery<MyCoursesType>(MY_COURSES);
+  const userId = useUserId();
+
+  const { data, loading, error } = useAuthedQuery<MyCoursesType>(MY_COURSES, {
+    variables: {
+      userId,
+    },
+  });
 
   const enrollments = data?.User_by_pk?.CourseEnrollments ?? [];
 

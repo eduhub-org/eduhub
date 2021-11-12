@@ -10,7 +10,7 @@ export const COURSE_WITH_ENROLLMENT = gql`
   ${ENROLLMENT_FRAGMENT}
   ${SESSION_FRAGMENT}
   ${PROGRAM_FRAGMENT}
-  query CourseWithEnrollment($id: Int!, $authId: uuid!) {
+  query CourseWithEnrollment($id: Int!, $userId: uuid!) {
     Course_by_pk(id: $id) {
       ...CourseFragment
       chatLink
@@ -27,7 +27,7 @@ export const COURSE_WITH_ENROLLMENT = gql`
       }
       Sessions {
         ...SessionFragment
-        Attendances(where: { User: { id: { _eq: $authId } } }) {
+        Attendances(where: { User: { id: { _eq: $userId } } }) {
           id
           status
         }

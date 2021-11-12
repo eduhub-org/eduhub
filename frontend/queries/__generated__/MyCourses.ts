@@ -233,5 +233,5 @@ export interface MyCourses {
 }
 
 export interface MyCoursesVariables {
-  authId: any;
+  userId: any;
 }

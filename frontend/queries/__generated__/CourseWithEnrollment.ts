@@ -239,5 +239,5 @@ export interface CourseWithEnrollment {
 
 export interface CourseWithEnrollmentVariables {
   id: number;
-  authId: any;
+  userId: any;
 }

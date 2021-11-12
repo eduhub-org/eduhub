@@ -36,5 +36,5 @@ export interface User {
 }
 
 export interface UserVariables {
-  authId: any;
+  userId: any;
 }

@@ -17,7 +17,7 @@ export const useUser = () => {
 
   const { data, loading, error } = useAuthedQuery<User>(USER, {
     variables: {
-      authId: keycloak?.subject,
+      userId: keycloak?.subject,
     },
     skip: !keycloak?.authenticated,
   });
