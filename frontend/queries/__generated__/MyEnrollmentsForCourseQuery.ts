@@ -44,7 +44,7 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseInstr
    * The user's profile picture
    */
   picture: string | null;
-  id: number;
+  id: any;
   /**
    * The user's last name
    */

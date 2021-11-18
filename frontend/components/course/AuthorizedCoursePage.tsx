@@ -10,12 +10,13 @@ import { CoursePageStudentView } from "../../components/course/CoursePageStudent
 import { TabSelection } from "../../components/course/TabSelection";
 import { enrollmentStatusForCourse } from "../../helpers/courseHelpers";
 import { useAuthedQuery } from "../../hooks/authedQuery";
+import { useUserId } from "../../hooks/user";
 import { CourseWithEnrollment } from "../../queries/__generated__/CourseWithEnrollment";
 import { COURSE_WITH_ENROLLMENT } from "../../queries/courseWithEnrollment";
 
 const AuthorizedCoursePage: FC<{ id: number; tab: number }> = ({ id, tab }) => {
   const { t } = useTranslation("course-page");
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const userId = useUserId();
 
   const {
     data: courseData,
@@ -24,7 +25,7 @@ const AuthorizedCoursePage: FC<{ id: number; tab: number }> = ({ id, tab }) => {
   } = useAuthedQuery<CourseWithEnrollment>(COURSE_WITH_ENROLLMENT, {
     variables: {
       id,
-      authId: keycloak?.subject,
+      userId,
     },
   });
 

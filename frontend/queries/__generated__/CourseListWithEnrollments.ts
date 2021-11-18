@@ -44,7 +44,7 @@ export interface CourseListWithEnrollments_Course_CourseInstructors_Expert_User 
    * The user's profile picture
    */
   picture: string | null;
-  id: number;
+  id: any;
   /**
    * The user's last name
    */

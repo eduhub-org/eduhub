@@ -1,0 +1,5 @@
+BEGIN;
+
+ALTER TABLE "Expert" ALTER COLUMN "userId" SET DATA TYPE UUID USING gen_random_uuid();
+
+COMMIT;

@@ -26,7 +26,6 @@ select_permissions:
     - id
     - status
     filter:
-      User:
-        authId:
-          _eq: X-Hasura-User-Id
+      userId:
+        _eq: X-Hasura-User-Id
   role: user
