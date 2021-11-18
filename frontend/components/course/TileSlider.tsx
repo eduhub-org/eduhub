@@ -13,7 +13,7 @@ export const TileSlider: FC<IProps> = ({ courses }) => {
     <div className="w-full overflow-x-scroll">
       <div className="flex w-min whitespace-nowrap px-4 sm:px-16 xl:px-0 space-x-4">
         {courses.map((course) => (
-          <div key={`${course.Id}`} className="whitespace-normal">
+          <div key={`${course.id}`} className="whitespace-normal">
             <Tile course={course} />
           </div>
         ))}

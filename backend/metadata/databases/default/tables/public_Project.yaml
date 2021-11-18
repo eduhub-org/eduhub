@@ -1,11 +1,28 @@
 table:
   name: Project
   schema: public
+object_relationships:
+- name: ProjectType
+  using:
+    manual_configuration:
+      column_mapping:
+        type: value
+      insertion_order: null
+      remote_table:
+        name: ProjectType
+        schema: public
 array_relationships:
+- name: CourseProjects
+  using:
+    foreign_key_constraint_on:
+      column: projectId
+      table:
+        name: CourseProject
+        schema: public
 - name: ProjectEnrollments
   using:
     foreign_key_constraint_on:
-      column: ProjectId
+      column: projectId
       table:
         name: ProjectEnrollment
         schema: public

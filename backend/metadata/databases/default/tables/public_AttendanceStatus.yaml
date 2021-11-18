@@ -6,7 +6,7 @@ array_relationships:
 - name: Attendances
   using:
     foreign_key_constraint_on:
-      column: Status
+      column: status
       table:
         name: Attendance
         schema: public

@@ -7,4 +7,30 @@ object_relationships:
     foreign_key_constraint_on: courseId
 - name: LocationOption
   using:
-    foreign_key_constraint_on: Location
+    manual_configuration:
+      column_mapping:
+        locationOption: value
+      insertion_order: null
+      remote_table:
+        name: LocationOption
+        schema: public
+select_permissions:
+- permission:
+    columns:
+    - courseId
+    - id
+    - latitude
+    - locationOption
+    - longitude
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - courseId
+    - id
+    - latitude
+    - link
+    - locationOption
+    - longitude
+    filter: {}
+  role: user

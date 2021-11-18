@@ -4,22 +4,22 @@ table:
 object_relationships:
 - name: Course
   using:
-    foreign_key_constraint_on: CourseId
-- name: Instructor
+    foreign_key_constraint_on: courseId
+- name: Expert
   using:
-    foreign_key_constraint_on: InstructorId
+    foreign_key_constraint_on: expertId
 select_permissions:
 - permission:
     columns:
-    - CourseId
-    - Id
-    - InstructorId
+    - courseId
+    - id
+    - expertId
     filter: {}
   role: anonymous
 - permission:
     columns:
-    - CourseId
-    - Id
-    - InstructorId
+    - courseId
+    - id
+    - expertId
     filter: {}
   role: user

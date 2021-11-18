@@ -3,7 +3,7 @@ import { KeycloakInstance } from "keycloak-js";
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
-import { EnrollmentStatus_enum } from "../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum } from "../../__generated__/globalTypes";
 import { PageBlock } from "../../components/common/PageBlock";
 import { CoursePageDescriptionView } from "../../components/course/CoursePageDescriptionView";
 import { CoursePageStudentView } from "../../components/course/CoursePageStudentView";
@@ -35,19 +35,22 @@ const AuthorizedCoursePage: FC<{ id: number; tab: number }> = ({ id, tab }) => {
   }
 
   const isParticipating =
-    enrollmentStatusForCourse(course) === EnrollmentStatus_enum.CONFIRMED ||
-    enrollmentStatusForCourse(course) === EnrollmentStatus_enum.COMPLETED;
+    enrollmentStatusForCourse(course) ===
+      CourseEnrollmentStatus_enum.CONFIRMED ||
+    enrollmentStatusForCourse(course) === CourseEnrollmentStatus_enum.COMPLETED;
 
   return (
     <>
-      <PageBlock>
-        <div className="py-4">
-          <TabSelection
-            currentTab={tab}
-            tabs={[t("toCourseDescription"), t("currentCourse")]}
-          />
-        </div>
-      </PageBlock>
+      {isParticipating ? (
+        <PageBlock>
+          <div className="py-4">
+            <TabSelection
+              currentTab={tab}
+              tabs={[t("toCourseDescription"), t("currentCourse")]}
+            />
+          </div>
+        </PageBlock>
+      ) : null}
       {tab === 0 || !isParticipating ? (
         <CoursePageDescriptionView course={course} />
       ) : (

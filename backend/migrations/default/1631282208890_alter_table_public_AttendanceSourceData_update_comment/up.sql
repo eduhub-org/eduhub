@@ -1,0 +1,1 @@
+comment on TABLE "public"."AttendanceSourceData" is E'New rows with links to the original source data files including the recorded names and times of attendance are added by the serverless function, which regularly checks the attendances. Storing the source data is mainly for backup purposes.';

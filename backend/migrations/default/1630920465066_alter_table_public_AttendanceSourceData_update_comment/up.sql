@@ -1,0 +1,1 @@
+comment on TABLE "public"."AttendanceSourceData" is E'New rows are addes by a serverless function, which stores the original data from the different sources via this table. It is a mainly for backup purposes.';

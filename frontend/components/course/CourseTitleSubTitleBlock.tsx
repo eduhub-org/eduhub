@@ -16,8 +16,8 @@ export const CourseTitleSubTitleBlock: FC<IProps> = ({ course }) => {
       <span className="text-xs">
         {getWeekdayStartAndEndString(course, i18n, t)}
       </span>
-      <BlockTitle>{course.Name}</BlockTitle>
-      <span className="text-2xl mt-2">{course.ShortDescription}</span>
+      <BlockTitle>{course.title}</BlockTitle>
+      <span className="text-2xl mt-2">{course.tagline}</span>
     </div>
   );
 };

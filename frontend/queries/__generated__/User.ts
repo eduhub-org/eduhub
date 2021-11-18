@@ -9,8 +9,11 @@
 
 export interface User_User {
   __typename: "User";
-  Id: number;
-  Image: string | null;
+  id: number;
+  /**
+   * The user's profile picture
+   */
+  picture: string | null;
 }
 
 export interface User {

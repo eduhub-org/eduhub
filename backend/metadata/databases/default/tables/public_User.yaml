@@ -4,68 +4,54 @@ table:
 object_relationships:
 - name: employmentByEmployment
   using:
-    foreign_key_constraint_on: Employment
+    foreign_key_constraint_on: employment
 - name: universityByUniversity
   using:
-    foreign_key_constraint_on: University
+    foreign_key_constraint_on: university
 array_relationships:
 - name: Admins
   using:
     foreign_key_constraint_on:
-      column: UserId
+      column: userId
       table:
         name: Admin
         schema: public
 - name: Attendences
   using:
     foreign_key_constraint_on:
-      column: UserId
+      column: userId
       table:
         name: Attendance
         schema: public
 - name: Enrollments
   using:
     foreign_key_constraint_on:
-      column: UserId
+      column: userId
       table:
-        name: Enrollment
+        name: CourseEnrollment
         schema: public
 - name: Instructors
   using:
     foreign_key_constraint_on:
-      column: UserId
+      column: userId
       table:
-        name: Instructor
-        schema: public
-- name: Mails
-  using:
-    foreign_key_constraint_on:
-      column: Sender_id
-      table:
-        name: Mail
-        schema: public
-- name: Referents
-  using:
-    foreign_key_constraint_on:
-      column: UserId
-      table:
-        name: Referent
+        name: Expert
         schema: public
 select_permissions:
 - permission:
     columns:
-    - Firstname
-    - Id
-    - Image
-    - Lastname
+    - firstName
+    - id
+    - picture
+    - lastName
     filter: {}
   role: anonymous
 - permission:
     columns:
-    - AuthId
-    - Firstname
-    - Id
-    - Image
-    - Lastname
+    - authId
+    - firstName
+    - id
+    - picture
+    - lastName
     filter: {}
   role: user

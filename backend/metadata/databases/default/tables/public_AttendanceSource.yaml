@@ -5,8 +5,10 @@ is_enum: true
 array_relationships:
 - name: Attendances
   using:
-    foreign_key_constraint_on:
-      column: Source
-      table:
+    manual_configuration:
+      column_mapping:
+        value: source
+      insertion_order: null
+      remote_table:
         name: Attendance
         schema: public

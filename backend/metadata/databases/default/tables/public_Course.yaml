@@ -4,25 +4,22 @@ table:
 object_relationships:
 - name: CourseStatus
   using:
-    foreign_key_constraint_on: Status
-- name: OnlineHybridOffline
-  using:
-    foreign_key_constraint_on: Online_Hybrid_Offline
+    foreign_key_constraint_on: status
 - name: Program
   using:
-    foreign_key_constraint_on: ProgramId
+    foreign_key_constraint_on: programId
 array_relationships:
-- name: CourseAddresses
+- name: CourseEnrollments
   using:
     foreign_key_constraint_on:
       column: courseId
       table:
-        name: CourseAddress
+        name: CourseEnrollment
         schema: public
 - name: CourseInstructors
   using:
     foreign_key_constraint_on:
-      column: CourseId
+      column: courseId
       table:
         name: CourseInstructor
         schema: public
@@ -33,76 +30,65 @@ array_relationships:
       table:
         name: CourseLocation
         schema: public
-- name: Enrollments
+- name: CourseProjects
   using:
     foreign_key_constraint_on:
-      column: CourseId
+      column: courseId
       table:
-        name: Enrollment
+        name: CourseProject
         schema: public
 - name: Sessions
   using:
     foreign_key_constraint_on:
-      column: CourseId
+      column: courseId
       table:
         name: Session
         schema: public
 select_permissions:
 - permission:
     columns:
-    - ApplicationEnd
-    - City
-    - Cost
-    - CourseType
-    - Description
-    - Ects
-    - Id
-    - Image
-    - Language
-    - MaxMissedSessions
-    - MaxParticipants
-    - Name
-    - OnlineCourses
-    - ProgramId
-    - ShortDescription
-    - Status
-    - TextOnCertificate
-    - TimeEnd
-    - TimeStart
-    - WeekDay
+    - applicationEnd
+    - contentDescriptionField1
+    - contentDescriptionField2
+    - cost
+    - coverImage
+    - ects
+    - endTime
+    - headingDescriptionField1
+    - headingDescriptionField2
+    - id
+    - language
+    - maxMissedSessions
+    - programId
+    - startTime
+    - status
+    - tagline
+    - title
+    - weekDay
     filter: {}
   role: anonymous
 - permission:
     columns:
-    - ApplicationEnd
-    - AttendanceCertificatePossible
-    - CertificatePossible
-    - City
-    - Cost
-    - CourseType
-    - DatesOnCertificate
-    - Description
-    - Difficulty
-    - Ects
-    - ExternalProjectsAllowed
-    - Id
-    - Image
-    - Language
-    - MaxMissedSessions
-    - MaxParticipants
-    - MaxProjectParticipants
-    - Name
-    - OnlineCourses
-    - OnlineCoursesAllowed
-    - Online_Hybrid_Offline
-    - ProgramId
-    - Projects
-    - ProjectsAllowed
-    - ShortDescription
-    - Status
-    - TextOnCertificate
-    - TimeEnd
-    - TimeStart
-    - WeekDay
+    - achievementCertificatePossible
+    - applicationEnd
+    - attendanceCertificatePossible
+    - chatLink
+    - contentDescriptionField1
+    - contentDescriptionField2
+    - cost
+    - coverImage
+    - ects
+    - endTime
+    - headingDescriptionField1
+    - headingDescriptionField2
+    - id
+    - language
+    - maxMissedSessions
+    - programId
+    - startTime
+    - status
+    - tagline
+    - title
+    - weekDay
     filter: {}
   role: user

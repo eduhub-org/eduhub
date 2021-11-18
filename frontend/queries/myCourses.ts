@@ -9,11 +9,11 @@ export const MY_COURSES = gql`
   ${ENROLLMENT_FRAGMENT}
   ${PROGRAM_FRAGMENT}
   query MyCourses {
-    Enrollment {
+    CourseEnrollment {
       ...EnrollmentFragment
       Course {
         ...CourseFragment
-        Enrollments {
+        CourseEnrollments {
           ...EnrollmentFragment
         }
         Program {
