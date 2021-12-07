@@ -1,0 +1,25 @@
+type Query {
+  loadFile (
+    path: String!
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveFile (
+    base64file: String!
+    filename: String!
+  ): UploadResult
+}
+
+type UploadResult {
+  link : String!
+}
+
+type Output {
+  link : String!
+}
+
+type loadFileOutput {
+  link : String!
+}
+
