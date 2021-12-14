@@ -57,7 +57,7 @@ export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Expert_User
    * The user's profile picture
    */
   picture: string | null;
-  id: number;
+  id: any;
   /**
    * The user's last name
    */
@@ -239,5 +239,5 @@ export interface CourseWithEnrollment {
 
 export interface CourseWithEnrollmentVariables {
   id: number;
-  authId: any;
+  userId: any;
 }

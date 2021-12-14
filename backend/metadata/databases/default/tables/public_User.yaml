@@ -16,21 +16,21 @@ array_relationships:
       table:
         name: Admin
         schema: public
-- name: Attendences
+- name: Attendances
   using:
     foreign_key_constraint_on:
       column: userId
       table:
         name: Attendance
         schema: public
-- name: Enrollments
+- name: CourseEnrollments
   using:
     foreign_key_constraint_on:
       column: userId
       table:
         name: CourseEnrollment
         schema: public
-- name: Instructors
+- name: Experts
   using:
     foreign_key_constraint_on:
       column: userId
@@ -41,24 +41,24 @@ insert_permissions:
 - permission:
     backend_only: false
     check:
-      authId:
+      id:
         _eq: X-Hasura-User-Id
     columns:
-    - id
     - created_at
     - updated_at
     - externalProfile
-    - anonymousId
-    - authId
-    - newsletterRegistration
-    - otherUniversity
-    - university
-    - employment
     - email
+    - employment
+    - anonymousId
     - firstName
+    - id
     - lastName
     - matriculationNumber
+    - newsletterRegistration
     - picture
+    - university
+    - otherUniversity
+    - employment
   role: self_access
 select_permissions:
 - permission:
@@ -101,16 +101,17 @@ select_permissions:
     - university
     - updated_at
     filter:
-      authId:
+      id:
         _eq: X-Hasura-User-Id
   role: self_access
 - permission:
     columns:
     - authId
+    - email
     - firstName
     - id
-    - picture
     - lastName
+    - picture
     filter: {}
   role: user_access
 update_permissions:
@@ -129,6 +130,6 @@ update_permissions:
     - university
     - updated_at
     filter:
-      authId:
+      id:
         _eq: X-Hasura-User-Id
   role: self_access

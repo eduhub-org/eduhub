@@ -69,7 +69,7 @@ select_permissions:
     - userId
     filter:
       User:
-        authId:
+        id:
           _eq: X-Hasura-User-Id
   role: self_access
 update_permissions:
@@ -84,3 +84,4 @@ update_permissions:
     - totalAttendanceTime
     filter: {}
   role: instructor_access
+

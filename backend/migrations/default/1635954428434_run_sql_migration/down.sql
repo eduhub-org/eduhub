@@ -1,0 +1,7 @@
+-- Could not auto-generate a down migration.
+-- Please write an appropriate down migration for the SQL below:
+-- BEGIN;
+--
+-- ALTER TABLE "Expert" ALTER COLUMN "userId" SET DATA TYPE UUID USING gen_random_uuid();
+--
+-- COMMIT;

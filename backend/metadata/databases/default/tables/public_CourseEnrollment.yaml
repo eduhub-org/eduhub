@@ -26,9 +26,8 @@ insert_permissions:
 - permission:
     backend_only: false
     check:
-      User:
-        authId:
-          _eq: X-Hasura-User-Id
+      userId:
+        _eq: X-Hasura-User-Id
     columns:
     - courseId
     - motivationLetter
@@ -43,12 +42,11 @@ select_permissions:
     - id
     - invitationExpirationDate
     - motivationLetter
-    - motivationRating
     - status
     - userId
     filter:
       User:
-        authId:
+        id:
           _eq: X-Hasura-User-Id
   role: user_access
 update_permissions:
@@ -62,3 +60,4 @@ update_permissions:
     - status
     filter: {}
   role: instructor_access
+
