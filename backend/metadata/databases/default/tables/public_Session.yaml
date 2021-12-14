@@ -59,13 +59,17 @@ select_permissions:
     - title
     filter: {}
   role: anonymous
+update_permissions:
 - permission:
+    check: null
     columns:
-    - courseId
     - description
     - endDateTime
-    - id
     - startDateTime
     - title
     filter: {}
-  role: user_access
+  role: instructor_access
+delete_permissions:
+- permission:
+    filter: {}
+  role: instructor_access

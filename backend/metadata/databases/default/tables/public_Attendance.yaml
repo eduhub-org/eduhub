@@ -84,4 +84,3 @@ update_permissions:
     - totalAttendanceTime
     filter: {}
   role: instructor_access
-

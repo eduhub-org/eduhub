@@ -15,11 +15,5 @@ select_permissions:
     - id
     - expertId
     filter: {}
+    limit: 10
   role: anonymous
-- permission:
-    columns:
-    - courseId
-    - id
-    - expertId
-    filter: {}
-  role: user_access

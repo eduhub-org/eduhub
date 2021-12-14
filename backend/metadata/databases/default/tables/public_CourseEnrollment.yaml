@@ -36,6 +36,21 @@ insert_permissions:
 select_permissions:
 - permission:
     columns:
+    - id
+    - courseId
+    - userId
+    - status
+    - motivationLetter
+    - motivationRating
+    - achievementCertificateURL
+    - attendanceCertificateURL
+    - createdAt
+    - updatedAt
+    - invitationExpirationDate
+    filter: {}
+  role: instructor_access
+- permission:
+    columns:
     - achievementCertificateURL
     - attendanceCertificateURL
     - courseId
@@ -60,4 +75,3 @@ update_permissions:
     - status
     filter: {}
   role: instructor_access
-

@@ -136,6 +136,6 @@ update_permissions:
       CourseInstructors:
         Expert:
           User:
-            authId:
+            id:
               _eq: X-Hasura-User-Id
   role: self_access

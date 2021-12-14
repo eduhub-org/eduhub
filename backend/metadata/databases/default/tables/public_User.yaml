@@ -68,10 +68,10 @@ select_permissions:
     - picture
     - lastName
     filter: {}
+    limit: 10
   role: anonymous
 - permission:
     columns:
-    - authId
     - created_at
     - email
     - employment
@@ -86,11 +86,10 @@ select_permissions:
     - university
     - updated_at
     filter: {}
+    limit: 100
   role: instructor_access
 - permission:
     columns:
-    - anonymousId
-    - authId
     - created_at
     - employment
     - externalProfile
@@ -103,16 +102,17 @@ select_permissions:
     filter:
       id:
         _eq: X-Hasura-User-Id
+    limit: 1
   role: self_access
 - permission:
     columns:
-    - authId
     - email
     - firstName
     - id
     - lastName
     - picture
     filter: {}
+    limit: 10
   role: user_access
 update_permissions:
 - permission:
