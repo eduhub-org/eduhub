@@ -58,6 +58,7 @@ services:
       KEYCLOAK_IMPORT: /realm.json
     volumes:
       - ./keycloak/staging-realm.json:/realm.json
+      - ./keycloak/imports:/imports
 
   db_keycloak:
     image: postgres:12
