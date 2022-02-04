@@ -55,9 +55,9 @@ services:
       DB_ADDR: db_keycloak
       DB_USER: keycloak
       DB_PASSWORD: password
-      KEYCLOAK_IMPORT: /realm.json
+      KEYCLOAK_IMPORT: /imports/edu-hub-realm.json
     volumes:
-      - ./keycloak/staging-realm.json:/realm.json
+      - ./keycloak/imports:/imports
 
   db_keycloak:
     image: postgres:12
