@@ -31,7 +31,7 @@ services:
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       ## uncomment next line to set an admin secret
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
-      HASURA_GRAPHQL_JWT_SECRET: '{ "type": "RS256", "jwk_url": "http://keycloak:8080/auth/realms/edu-hub/protocol/openid-connect/certs" }'
+      HASURA_GRAPHQL_JWT_SECRET: '{"type": "RS256", "key": "-----BEGIN CERTIFICATE-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjA2VMVrXYPs6+wRCq4Hh5eADoiKrBAV7KymVoO3JTWMM2QWe/HKLivToU9f3oTc66HZmY9pwTbpDf7OCI1XpzVMJAVnJDaw/LvcGynKc36geUFG8eBrgMIZoMo3E4OQvz+GNZ4rFQB20cTEWBn/F7TLZz3XOSFK0TUMV3GYTFT9AnS3mbkA1LBneqZn0t3o9QBjHXGvvhOYCuzQ3oXvmmPSAc7v/Vg7l77FNIgX5ckmBQ/62940dpmo1XFRXW9V0U+OU5NOqoQofXnD6XvOasviZgtJBqmN1pK8p8JVONJZEwuAafY/XqmsWyp3XAsHgWiZx3ipKTe8fTxLdcZplyQIDAQAB\n-----END CERTIFICATE-----"}'
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       HASURA_CLOUD_FUNCTION_SECRET: "${HASURA_CLOUD_FUNCTION_SECRET}"
       HASURA_BUCKET: "${HASURA_BUCKET}"
@@ -61,9 +61,9 @@ services:
       DB_ADDR: db_keycloak
       DB_USER: keycloak
       DB_PASSWORD: password
-      KEYCLOAK_IMPORT: /realm.json
+      KEYCLOAK_IMPORT: /imports/edu-hub-realm.json
     volumes:
-      - ./keycloak/staging-realm.json:/realm.json
+      - ./keycloak/imports:/imports
 
   db_keycloak:
     image: postgres:12

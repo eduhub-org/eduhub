@@ -33,7 +33,25 @@ Now you should be able to register a user and login.
 # Seed setup.
 
 Put your seed file into backend/seeds/default.
-Run `HASURA_GRAPHQL_ADMIN_SECRET=myadminsecretkey hasura seed apply`
+Run `HASURA_GRAPHQL_ADMIN_SECRET=myadminsecretkey hasura seed apply` in ./backend
 For this you need the hasura cli installed on your host system.
 
+# Keycloak seed
 
+Put your seed files into keycloak/imports/.
+
+Run `docker exec -it edu-hub_keycloak_1 /opt/jboss/keycloak/bin/standalone.sh -Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=import -Dkeycloak.migration.rovider=dir -Dkeycloak.migration.realmName=edu-hub -Dkeycloak.migration.dir=/imports`
+after docker-compose up.
+
+These do not setup the redirect URI or Web Origin, you still have to do that.
+
+# Keycloak hasura auth config seems incomplete
+
+I've not been able to figure exactly how to setup keycloak so I can fully login and see everything working completely.
+After importing the seeds you seem to still have to follow this kind of tutorial at least:
+https://github.com/janhapke/hasura-keycloak
+
+I also need to hard code the keycloak server key, as described in the end ot hat documentation. You might need to update the certificate there,
+it might change when the images are rebuild.
+
+That made it work mostly, though I still see some CORS issues. That is a wip point for the project.
