@@ -31,13 +31,13 @@
   "sslRequired" : "external",
   "registrationAllowed" : true,
   "registrationEmailAsUsername" : true,
-  "rememberMe" : false,
-  "verifyEmail" : false,
+  "rememberMe" : true,
+  "verifyEmail" : true,
   "loginWithEmailAllowed" : true,
   "duplicateEmailsAllowed" : false,
-  "resetPasswordAllowed" : false,
-  "editUsernameAllowed" : false,
-  "bruteForceProtected" : false,
+  "resetPasswordAllowed" : true,
+  "editUsernameAllowed" : true,
+  "bruteForceProtected" : true,
   "permanentLockout" : false,
   "maxFailureWaitSeconds" : 900,
   "minimumQuickLoginWaitSeconds" : 60,
@@ -504,6 +504,109 @@
     "nodeReRegistrationTimeout" : 0,
     "defaultClientScopes" : [ "web-origins", "roles", "profile", "email" ],
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
+  
+  }, {
+    "clientId": "edu-old",
+    "name": "edu-old",
+    "surrogateAuthRequired": false,
+    "enabled": true,
+    "alwaysDisplayInConsole": false,
+    "clientAuthenticatorType": "client-secret",
+    "redirectUris": [
+        "http://localhost:3000/*"
+    ],
+    "webOrigins": [
+        "*"
+    ],
+    "notBefore": 0,
+    "bearerOnly": false,
+    "consentRequired": false,
+    "standardFlowEnabled": true,
+    "implicitFlowEnabled": true,
+    "directAccessGrantsEnabled": true,
+    "serviceAccountsEnabled": true,
+    "authorizationServicesEnabled": true,
+    "publicClient": false,
+    "frontchannelLogout": false,
+    "protocol": "openid-connect",
+    "attributes": {
+        "saml.assertion.signature": "false",
+        "saml.force.post.binding": "false",
+        "saml.multivalued.roles": "false",
+        "saml.encrypt": "false",
+        "login_theme": "keycloak",
+        "saml.server.signature": "false",
+        "saml.server.signature.keyinfo.ext": "false",
+        "exclude.session.state.from.auth.response": "false",
+        "saml_force_name_id_format": "false",
+        "saml.client.signature": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "saml.authnstatement": "false",
+        "display.on.consent.screen": "false",
+        "saml.onetimeuse.condition": "false"
+    },
+    "authenticationFlowBindingOverrides": {},
+    "fullScopeAllowed": true,
+    "nodeReRegistrationTimeout": -1,
+    "protocolMappers": [
+        {
+            "name": "Client Host",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usersessionmodel-note-mapper",
+            "consentRequired": false,
+            "config": {
+                "user.session.note": "clientHost",
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "claim.name": "clientHost",
+                "jsonType.label": "String"
+            }
+        },
+        {
+            "name": "Client ID",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usersessionmodel-note-mapper",
+            "consentRequired": false,
+            "config": {
+                "user.session.note": "clientId",
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "claim.name": "clientId",
+                "jsonType.label": "String"
+            }
+        },
+        {
+            "name": "Client IP Address",
+            "protocol": "openid-connect",
+            "protocolMapper": "oidc-usersessionmodel-note-mapper",
+            "consentRequired": false,
+            "config": {
+                "user.session.note": "clientAddress",
+                "id.token.claim": "true",
+                "access.token.claim": "true",
+                "claim.name": "clientAddress",
+                "jsonType.label": "String"
+            }
+        }
+    ],
+    "defaultClientScopes": [
+        "web-origins",
+        "role_list",
+        "roles",
+        "profile",
+        "email"
+    ],
+    "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+    ],
+    "access": {
+        "view": true,
+        "configure": true,
+        "manage": true
+    }
   }, {
     "id" : "c4bb855a-ab27-4b23-a2ee-be55d7604a57",
     "clientId" : "hasura",
