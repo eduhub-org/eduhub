@@ -1,0 +1,41 @@
+.login-pf body {
+    background-image: none;
+    background-color: #E5E5E5;
+    height: 100%;
+}
+
+.card-pf {
+    margin: 0 auto;
+    box-shadow: var(--pf-global--BoxShadow--lg);
+    padding: 0 20px;
+    max-width: 500px;
+    border: 7px solid;
+    border-color: #0D888D; /* default - IE compatibility */
+}
+
+.btn-primary {
+  background-image: none;
+  background-color: #0D888D;
+  border-color: #0b7478;
+}
+
+.btn-primary:hover {
+  background-image: none;
+  background-color: #0b7478;
+}
+
+a {
+  color: #0D888D;
+}
+
+a:hover {
+  color: #0b7478;
+}
+
+.form-control:hover {
+  border-color: #0D888D;
+}
+
+.form-control:focus {
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(13,136,141,.6);
+}

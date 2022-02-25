@@ -12,7 +12,7 @@ services:
       - keycloak
   
   hasura:
-    image: hasura/graphql-engine:v2.0.3.cli-migrations-v3
+    image: hasura/graphql-engine:v2.2.0.cli-migrations-v3
     ports:
       - "8080:8080"
     depends_on:
@@ -58,6 +58,7 @@ services:
       KEYCLOAK_IMPORT: /imports/edu-hub-realm.json
     volumes:
       - ./keycloak/imports:/imports
+      - ./keycloak/themes/opencampus:/opt/jboss/keycloak/themes/opencampus
 
   db_keycloak:
     image: postgres:12
