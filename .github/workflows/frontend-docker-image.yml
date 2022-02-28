@@ -22,7 +22,7 @@ on:
 
 env:
   IMAGE_NAME: edu_hub_frontend
-  PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+  PROJECT_ID: "edu-hub-staging"
 
 jobs:
 
