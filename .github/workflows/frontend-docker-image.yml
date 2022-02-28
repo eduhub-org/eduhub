@@ -34,9 +34,11 @@ jobs:
         name: Check out
         uses: actions/checkout@v2
       - 
-        name: Initialize Google Cloud CLI
-        uses: google-github-actions/setup-gcloud@master
+        id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v0'
         with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           project_id: ${{ secrets.GCP_PROJECT }}
           export_default_credentials: true
@@ -45,7 +47,7 @@ jobs:
         run: docker build ./frontend --file ./frontend/Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
       -
         name: Authenticate with Google Cloud docker registry
-        run: GCP_PROJECT
+        run: gcloud auth configure-docker -q
       -
         name: Push Docker Image to Google Container Registry
         run: |
