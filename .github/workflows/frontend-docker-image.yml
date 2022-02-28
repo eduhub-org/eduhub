@@ -1,4 +1,4 @@
-name: Build and Publish Frontend Docker Image CI
+name: Build and Deploy Frontend Docker Image on Google Cloud
 
 on:   
   push:
