@@ -1,4 +1,12 @@
-# Start with docker-compose -f docker-compose-dev.yaml up -d
+# To make login work correctly you need to have an environment file called hasura_keycloak.env
+# which needs to contain the environment variable HASURA_GRAPHQL_JWT_SECRET which contains this value:
+# {"type": "RS256", "key": "-----BEGIN CERTIFICATE-----\nPUT_YOUR_PUBLIC_KEY_HERE\n-----END CERTIFICATE-----"}
+# The public key value is found in your keycloak instance, edu hub realm, keys, rs256 public key.
+# So make the file hasura_keycloak.env next to the docker-compose-dev.yml with this content:
+
+# To get the public key in the first run you might have to provide an empty environment file, then do docker-compose stop and docker-compose up again once you have the public key.
+
+# Then start with docker-compose -f docker-compose-dev.yml up -d
 
 version: "3.8"
 
@@ -24,6 +32,8 @@ services:
       - db_hasura
       - keycloak
     restart: always
+    env_file:
+      - hasura_keycloak.env
     environment:
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@db_hasura:5432/postgres
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
@@ -31,7 +41,7 @@ services:
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       ## uncomment next line to set an admin secret
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
-      HASURA_GRAPHQL_JWT_SECRET: '{"type": "RS256", "key": "-----BEGIN CERTIFICATE-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjA2VMVrXYPs6+wRCq4Hh5eADoiKrBAV7KymVoO3JTWMM2QWe/HKLivToU9f3oTc66HZmY9pwTbpDf7OCI1XpzVMJAVnJDaw/LvcGynKc36geUFG8eBrgMIZoMo3E4OQvz+GNZ4rFQB20cTEWBn/F7TLZz3XOSFK0TUMV3GYTFT9AnS3mbkA1LBneqZn0t3o9QBjHXGvvhOYCuzQ3oXvmmPSAc7v/Vg7l77FNIgX5ckmBQ/62940dpmo1XFRXW9V0U+OU5NOqoQofXnD6XvOasviZgtJBqmN1pK8p8JVONJZEwuAafY/XqmsWyp3XAsHgWiZx3ipKTe8fTxLdcZplyQIDAQAB\n-----END CERTIFICATE-----"}'
+      #HASURA_GRAPHQL_JWT_SECRET: '${HASURA_GRAPHQL_JWT_SECRET}'
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       HASURA_CLOUD_FUNCTION_SECRET: "${HASURA_CLOUD_FUNCTION_SECRET}"
       HASURA_BUCKET: "${HASURA_BUCKET}"
