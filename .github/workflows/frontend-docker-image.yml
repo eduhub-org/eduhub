@@ -6,12 +6,12 @@ on:
     branches:
       - main
       - develop
-      - seed
       - github-actions
     
     # only on changes in the frontend folder
     paths:
       - frontend/**
+      - .github/workflows/**
 
     # Publish `v1.2.3` tags as releases.
     tags:
