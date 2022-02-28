@@ -49,7 +49,7 @@ jobs:
       -
         name: Push Docker Image to Google Container Registry
         run: |
-          IMAGE_ID=eu.gcr.io/'${{ secrets.GCP_PROJECT}}'/$IMAGE_NAME
+          IMAGE_ID=eu.gcr.io/$PROJECT_ID/$IMAGE_NAME
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           # Strip git ref prefix from version
@@ -61,7 +61,7 @@ jobs:
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push eu.gcr.io/$secrets.GCP_PROJECT/$SERVICE_NAME:$GITHUB_SHA
+          docker push eu.gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA
         
   deploy:
     runs-on: ubuntu-latest
