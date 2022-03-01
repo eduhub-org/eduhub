@@ -40,7 +40,7 @@ jobs:
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
-          project_id: '${{ PROJECT_ID }}'
+          project_id: $PROJECT_ID
       -
         name: Build Docker image
         run: docker build ./frontend --file ./frontend/Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
