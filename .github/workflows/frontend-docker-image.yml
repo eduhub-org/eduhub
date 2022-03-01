@@ -68,7 +68,8 @@ jobs:
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v0
         with:
-          image: ghcr.io/edu-hub-project/edu_hub_frontend:develop
+          project_id: $PROJECT_ID
+          image: $IMAGE_ID:$VERSION
           service: frontend_service
           #credentials: ${{ secrets.GCP_SA_KEY }}
       - 
