@@ -26,7 +26,7 @@ env:
 
 jobs:
 
-  build:
+  build and deploy:
     if: "!contains(github.event.head_commit.message, 'skip ci')"
     runs-on: ubuntu-latest
 
@@ -39,8 +39,8 @@ jobs:
         name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v0'
         with:
-          credentials_json: $secrets.GCP_SA_KEY
-          project_id: $PROJECT_ID
+          credentials_json: '$secrets.GCP_SA_KEY'
+          project_id: '$PROJECT_ID'
       -
         name: Build Docker image
         run: docker build ./frontend --file ./frontend/Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
@@ -64,11 +64,6 @@ jobs:
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           echo PUSH_IMAGE=eu.gcr.io/$PROJECT_ID/$IMAGE_NAME:$GITHUB_SHA
           docker push eu.gcr.io/$PROJECT_ID/$IMAGE_NAME:$GITHUB_SHA
-        
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
       - 
         name: Deploy to Cloud Run
         id: deploy
@@ -76,7 +71,7 @@ jobs:
         with:
           image: ghcr.io/edu-hub-project/edu_hub_frontend:develop
           service: frontend_service
-          credentials: ${{ secrets.GCP_SA_KEY }}
+          #credentials: ${{ secrets.GCP_SA_KEY }}
       - 
         name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
