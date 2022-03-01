@@ -22,6 +22,7 @@ on:
 
 env:
   IMAGE_NAME: edu_hub_frontend
+  # Project ID given on Google
   PROJECT_ID: edu-hub-staging
 
 jobs:
@@ -68,10 +69,10 @@ jobs:
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v0
         with:
-          project_id: $PROJECT_ID
+          project_id: edu-hub-staging
           image: $IMAGE_ID:$VERSION
           service: frontend_service
-          #credentials: ${{ secrets.GCP_SA_KEY }}
+          credentials: ${{ secrets.GCP_SA_KEY }}
       - 
         name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
