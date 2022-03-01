@@ -4,6 +4,14 @@
     height: 100%;
 }
 
+.pf-c-form-control {
+  border-color: #0D888D;
+}
+
+.pf-c-form-control:hover {
+  border-color: #0D888D;
+}
+
 .card-pf {
     margin: 0 auto;
     box-shadow: var(--pf-global--BoxShadow--lg);
@@ -13,13 +21,13 @@
     border-color: #0D888D; /* default - IE compatibility */
 }
 
-.btn-primary {
+.pf-c-button.pf-m-primary {
   background-image: none;
   background-color: #0D888D;
   border-color: #0b7478;
 }
 
-.btn-primary:hover {
+.pf-c-button.pf-m-primary:hover {
   background-image: none;
   background-color: #0b7478;
 }
@@ -32,10 +40,7 @@ a:hover {
   color: #0b7478;
 }
 
-.form-control:hover {
-  border-color: #0D888D;
+.edu-title {
+  color:black;
 }
 
-.form-control:focus {
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(13,136,141,.6);
-}
