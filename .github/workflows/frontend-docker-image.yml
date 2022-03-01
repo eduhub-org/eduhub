@@ -46,10 +46,13 @@ jobs:
         name: Build Docker image
         run: docker build ./frontend --file ./frontend/Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
       -
-        name: Authenticate with Google Cloud docker registry
-        run: gcloud auth configure-docker -q
-      -
-        name: Push Docker Image to Google Container Registry
+        name: Login to Google Artifact registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.CGP_STAGING_REGION }}-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.GAR_JSON_KEY }}      -
+        name: Push Docker Image to Google Artifact Registry
         run: |
           IMAGE_ID=eu.gcr.io/$PROJECT_ID/$IMAGE_NAME
           # Change all uppercase to lowercase
@@ -72,7 +75,6 @@ jobs:
           project_id: edu-hub-staging
           image: $IMAGE_ID:$VERSION
           service: frontend
-          credentials: ${{ secrets.GCP_SA_KEY }}
       - 
         name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
