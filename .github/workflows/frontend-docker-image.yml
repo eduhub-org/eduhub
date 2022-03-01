@@ -51,7 +51,8 @@ jobs:
         with:
           registry: ${{ secrets.CGP_STAGING_REGION }}-docker.pkg.dev
           username: _json_key
-          password: ${{ secrets.GAR_JSON_KEY }}      -
+          password: ${{ secrets.GAR_JSON_KEY }}      
+      -
         name: Push Docker Image to Google Artifact Registry
         run: |
           IMAGE_ID=eu.gcr.io/$PROJECT_ID/$IMAGE_NAME
