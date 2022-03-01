@@ -71,7 +71,7 @@ jobs:
         with:
           project_id: edu-hub-staging
           image: $IMAGE_ID:$VERSION
-          service: frontend_service
+          service: frontend
           credentials: ${{ secrets.GCP_SA_KEY }}
       - 
         name: Show Output
