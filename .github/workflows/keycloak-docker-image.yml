@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - 
-        name: Check out
+        name: Check Out the Repository Branch
         uses: actions/checkout@v2
       - 
         name: Authenticate to Google Cloud
@@ -70,7 +70,7 @@ jobs:
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v0
         with:
-          project_id: $PROJECT_ID
+          project_id: edu-hub-production
           image: $IMAGE_ID:$VERSION
           service: keycloak
       - 
