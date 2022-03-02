@@ -6,7 +6,7 @@ on:
     branches:
       - main
       - develop
-      - github-actions
+
     
     # only on changes in the frontend folder
     paths:
@@ -47,7 +47,7 @@ jobs:
         name: Build Docker image
         run: docker build ./frontend --file ./frontend/Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
       -
-        name: Authenticate with Google Cloud Artifact registry
+        name: Authenticate with Google Cloud Artifact Registry
         run: gcloud auth configure-docker europe-west1-docker-docker.pkg.dev --quiet
       -
         name: Push Docker Image to Google Artifact Registry

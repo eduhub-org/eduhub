@@ -2,14 +2,15 @@ name: Build and Deploy Frontend Docker Image on Google Cloud
 
 on:   
   push:
-    # Run only on changes in the following branches
+    # Publish `main` as Docker `latest` image.
     branches:
       - main
-      - github-actions
+      - develop
+
     
-    # Run only on changes in the following folder
+    # only on changes in the backend folder
     paths:
-      - keycloak/**
+      - backend/**
       - .github/workflows/**
 
     # Publish `v1.2.3` tags as releases.
@@ -20,9 +21,8 @@ on:
   pull_request:
 
 env:
-  # Name for the docker image
-  IMAGE_NAME: edu_hub_keycloak
-  # ID of the project in Google in which the image will be stored and deployed
+  IMAGE_NAME: edu_hub_backend
+  # Project ID given on Google
   PROJECT_ID: edu-hub-production
 
 jobs:
@@ -45,7 +45,7 @@ jobs:
           project_id: $PROJECT_ID
       -
         name: Build Docker image
-        run: docker build ./keycloak --file ./keycloak/Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
+        run: docker build ./frontend --file ./frontend/Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
       -
         name: Authenticate with Google Cloud Artifact Registry
         run: gcloud auth configure-docker europe-west1-docker-docker.pkg.dev --quiet
@@ -72,7 +72,7 @@ jobs:
         with:
           project_id: edu-hub-staging
           image: $IMAGE_ID:$VERSION
-          service: keycloak
+          service: frontend
       - 
         name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
