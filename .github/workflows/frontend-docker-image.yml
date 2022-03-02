@@ -52,11 +52,11 @@ jobs:
       -
         name: Push Docker Image to Google Artifact Registry
         run: |
-          IMAGE_ID = '${{ secrets.GCP_REGION }}-docker.pkg.dev'/$PROJECT_ID/$IMAGE_NAME
+          IMAGE_ID=europe-west1-docker.pkg.dev/$PROJECT_ID/$IMAGE_NAME
           # Change all uppercase to lowercase
-          IMAGE_ID = $(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           # Strip git ref prefix from version
-          VERSION = $(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
           # Use Docker `latest` tag convention
