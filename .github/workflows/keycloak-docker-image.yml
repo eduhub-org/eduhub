@@ -70,7 +70,7 @@ jobs:
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v0
         with:
-          project_id: edu-hub-staging
+          project_id: $PROJECT_ID
           image: $IMAGE_ID:$VERSION
           service: keycloak
       - 
