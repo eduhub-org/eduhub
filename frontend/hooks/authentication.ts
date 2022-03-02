@@ -8,3 +8,8 @@ export const useIsLoggedIn = (): boolean => {
 
   return (!!keycloak?.authenticated ?? false) && !!token;
 };
+
+export const useIsAdmin = () => {
+  const { keycloak } = useKeycloak<KeycloakInstance>();
+  return keycloak?.resourceAccess?.hasura?.roles?.includes("admin") ?? false;
+}

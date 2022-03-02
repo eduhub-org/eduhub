@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-export const PROGRAM_FRAGMENT = gql`
+export const USER_PROGRAM_FRAGMENT = gql`
   fragment ProgramFragment on Program {
     defaultApplicationEnd
     applicationStart
@@ -10,4 +10,26 @@ export const PROGRAM_FRAGMENT = gql`
     title
     projectRecordUploadDeadline
   }
+`;
+
+export const ADMIN_PROGRAM_FRAGMENT = gql`
+fragment AdminProgramFragment on Program {
+  id
+  applicationStart
+  attendanceCertificateTemplateURL
+  closingQuestionnaire
+  defaultApplicationEnd
+  defaultMaxMissedSessions
+  lectureEnd
+  lectureStart
+  participationCertificateTemplateURL
+  projectRecordUploadDeadline
+  shortTitle
+  speakerQuestionnaire
+  startQuestionnaire
+  title
+  visibility
+  visibilityAchievementCertificate
+  visibilityParticipationCertificate
+}
 `;
