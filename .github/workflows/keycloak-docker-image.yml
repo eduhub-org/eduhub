@@ -52,7 +52,7 @@ jobs:
       -
         name: Push Docker Image to Google Artifact Registry
         run: |
-          IMAGE_ID=europe-west1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME
+          IMAGE_ID=europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/$IMAGE_NAME
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           # Strip git ref prefix from version
