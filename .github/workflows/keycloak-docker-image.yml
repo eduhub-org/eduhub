@@ -48,11 +48,11 @@ jobs:
         run: docker build ./keycloak --file ./keycloak/Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
       -
         name: Authenticate with Google Cloud Artifact Registry
-        run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+        run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
       -
         name: Push Docker Image to Google Artifact Registry
         run: |
-          IMAGE_ID=europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repo/$IMAGE_NAME
+          IMAGE_ID=${{ secrets.GCP_REGION }}-docker.pkg.dev/$PROJECT_ID/docker-repo/$IMAGE_NAME
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           # Strip git ref prefix from version
