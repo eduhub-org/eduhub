@@ -15,7 +15,7 @@ const Searchbar: FC<IProps> = ({ placeholder }) => {
                 <button className="flex items-center justify-center px-4 border-r">
                     <MdSearch size={26}/>
                 </button>
-                <input type="text" className="px-4 py-2 w-80" placeholder={placeholder} />
+                <input type="text" className="px-4 py-2" placeholder={placeholder} />
             </div>
         </div>
     )

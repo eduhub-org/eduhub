@@ -1,7 +1,6 @@
 import Head from 'next/head';
-import { FC, useState } from 'react';
-import AuthorizedCoursePage from '../../components/course/AuthorizedCoursePage';
-import UnauthorizedCoursePage from '../../components/course/UnauthorizedCoursePage';
+import { useRouter } from 'next/router';
+import { FC } from 'react';
 import CourseListContainer from '../../components/courses/CousrseListContainer';
 import { Page } from '../../components/Page';
 import { useAuthedQuery } from '../../hooks/authedQuery';
@@ -13,12 +12,11 @@ import { CourseListWithEnrollments } from '../../queries/__generated__/CourseLis
 
 
 const Courses: FC = () => {
-    const router = useState();
     const isLoggedIn = useIsLoggedIn();
     const query = isLoggedIn ? COURSE_LIST_WITH_ENROLLMENT : COURSE_LIST;
     const { data: courses, loading, error } = useAuthedQuery<
-    CourseList | CourseListWithEnrollments
-  >(query);
+        CourseList | CourseListWithEnrollments
+    >(query);
 
     return (
         <div>

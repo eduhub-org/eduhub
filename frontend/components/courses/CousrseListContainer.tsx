@@ -1,5 +1,6 @@
 import { FC } from "react";
 import { CourseList_Course } from "../../queries/__generated__/CourseList";
+import Nav, { TabList } from "../common/Nav";
 import Searchbar from "../common/Searchbar";
 import CourseOneRow from "./CourseOneRow";
 
@@ -26,6 +27,34 @@ const semesters: string[] = [
     "All"
 ]
 
+const Tabs: TabList[] = [
+    {
+        id: "SOSE21",
+        isSelected: true,
+        tabTitle: "SOSE21"
+    },
+    {
+        id: "WINSE21",
+        isSelected: false,
+        tabTitle: "WINSE21"
+    },
+    {
+        id: "SOSE20",
+        isSelected: false,
+        tabTitle: "SOSE20"
+    },
+    {
+        id: "WINSE20",
+        isSelected: false,
+        tabTitle: "WINSE20"
+    },
+    {
+        id: "",
+        isSelected: false,
+        tabTitle: "All"
+    }
+]
+
 const CourseListContainer: FC<IProps> = ({ courses }) => {
 
     const thStyle = "";
@@ -35,7 +64,9 @@ const CourseListContainer: FC<IProps> = ({ courses }) => {
     const tabStyle = (semester: string) => {
         return semester == selectedTab ? 'py-2 px-8 bg-indigo-100 text-indigo-700 rounded-full' : 'py-2 px-8 text-gray-600 hover:text-indigo-700 hover:bg-indigo-100 rounded-full';
     }
-
+    const handleTabClick = (tab: TabList) => {
+        tab.isSelected = !tab.isSelected;
+    }
     return (
         <div className="sm:px-0 w-full">
             <div className="px-4 md:px-10 py-4 md:py-7">
@@ -45,7 +76,8 @@ const CourseListContainer: FC<IProps> = ({ courses }) => {
             </div>
             <div className="bg-white py-4 md:py-7 px-4 md:px-8 xl:px-10">
                 <div className="sm:flex items-center justify-between">
-                    <div className="flex items-center">
+                    <Nav tabs={Tabs} onTabClick={handleTabClick}></Nav>
+                    {/* <div className="flex items-center">
                         {
                             semesters.map(semester => {
                                 return (
@@ -57,7 +89,7 @@ const CourseListContainer: FC<IProps> = ({ courses }) => {
                                 );
                             })
                         }
-                    </div>
+                    </div> */}
                     <Searchbar placeholder="Text in Title"></Searchbar>
                 </div>
                 <div className="bg-white py-4 flex justify-end">
