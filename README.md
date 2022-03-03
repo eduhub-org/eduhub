@@ -1,3 +1,16 @@
+## Endpoints:
+
+1. Frontend: `localhost:25000`
+
+2. Hasura(GraphQL server): `localhost:8080` 
+    
+    - secret `myadminsecretkey`
+
+3. Keycloak(User management portal): `localhost:28080`
+
+    - login as `admin`/`admin`.
+---
+
 # Overview
 
 | Docker        | Image                           | Ports                             |
@@ -9,48 +22,104 @@
 
 # Development Setup
 
-There is a docker-compose-dev.yml which you can use to start edu-hub with some settings for development.
+1. Install docker if not installed. You can use the script file to install docker.
 
-Run `docker-compose -f docker-compose-dev.yaml up -d` to start
-all the containers as necessary. The frontend container will not yet do anything,
-but it will mount `./frontend` as a volume and open it as the working directory `/opt/app`.
+        sh docker_install.sh
+
+1. Install docker-compose (atlest version 1.29.2). Follow the [link](https://docs.docker.com/compose/install/) to install.
+
+1. Create an empty file in edu-hub root directory called `hasura_keycloak.env`
+    
+        touch hasura_keycloak.env
+
+1. There is a docker-compose-dev.yml which you can use to start edu-hub with some settings for development. Run the following command to start all the containers as necessary. The frontend container will not yet do anything, but it will mount `./frontend` as a volume and open it as the working directory `/opt/app`.
+
+        sudo docker-compose -f docker-compose-dev.yml up -d
 
 
 ## Database seed setup.
 
-Put your seed file into backend/seeds/default.
-Run `HASURA_GRAPHQL_ADMIN_SECRET=myadminsecretkey hasura seed apply` in ./backend
-For this you need the hasura cli installed on your host system.
+1. Install hasura-cli (if not exists)
+
+        npm install --global hasura-cli
+
+1. Run the following command inside `./backend`. Before runing the command put your seed file into backend/seeds/default.
+
+        HASURA_GRAPHQL_ADMIN_SECRET=myadminsecretkey hasura seed apply
+
 
 ## Keycloak seed
 
-Put your seed files into keycloak/imports/.
+1. Put your seed files into keycloak/imports/.
+2. Run the following command:
 
-Run `docker exec -it edu-hub_keycloak_1 /opt/jboss/keycloak/bin/standalone.sh -Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=import -Dkeycloak.migration.rovider=dir -Dkeycloak.migration.realmName=edu-hub -Dkeycloak.migration.dir=/imports`
-after docker-compose up.
+        sudo docker exec -it edu-hub_keycloak_1 /opt/jboss/keycloak/bin/standalone.sh -Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=import -Dkeycloak.migration.rovider=dir -Dkeycloak.migration.realmName=edu-hub -Dkeycloak.migration.dir=/imports
+1. In this step initial setup is done. You should have your docker images running. Check the docker images status with:
+
+        sudo docker ps
 
 Once the import is completed you can close this process.
 
-Somehow the keycloak setup with hasura just don't work and hasura will not accept the jwt produced by keycloak, unless the certificate is hardcoded into the environment
-properties in docker-compose-dev.yml.
-For this purpose create a file hasura_keycloak.env and fill it with this content:
-`HASURA_GRAPHQL_JWT_SECRET={"type": "RS256", "key": "-----BEGIN CERTIFICATE-----\nPUT_YOUR_PUBLIC_KEY_HERE\n-----END CERTIFICATE-----"}`
+## HASURA_GRAPHQL_JWT_SECRET setup
+Somehow the keycloak setup with hasura just don't work and hasura will not accept the jwt produced by keycloak, unless the certificate is hardcoded into the environment properties in docker-compose-dev.yml.
 
-You need to find the public rs256 key of your keycloak instance in its admin panel: edu hub realm -> keys -> rs256 public key.
-The file hasura_keycloak.env is in .gitignore to allow every developer to have a different value in it.
+1. Copy the public key from admin panel: 
+    
+    - http://localhost:28080/
+    - Navigate to `Administration Console -> Realm Settings -> Keys -> Active -> Public key (in the row RS256)`
+    - Copy the key from popup
+1. Add copied key in file `hasura_keycloak.env`
+    - Open the file (create if not exists, inside project root directory)
+    - Add the following content inside the file
+
+          HASURA_GRAPHQL_JWT_SECRET={"type": "RS256", "key": "-----BEGIN CERTIFICATE-----\nPUT_YOUR_PUBLIC_KEY_HERE\n-----END CERTIFICATE-----"}
+
+    - Replace `PUT_YOUR_PUBLIC_KEY_HERE` with the copied key from step 1.
+    - The file hasura_keycloak.env is in .gitignore to allow every developer to have a different value in it.
 
 ## Create an account in keycloak.
 
-You can create your own account in keycloak, make sure to add the role "user": edu hub realm -> users -> add new.
-Then search your user and the hasura role "user". Maybe later we might also need to add an extra role "admin"?!
+1. Add a role `admin` (If not exist)
+    
+    - Click `Add Role` (Clients -> hasura -> Roles -> Add Role)
+    - Role Name: `admin`
+    - Save
+2. Add user (Users -> Add user)
+3. Reset Password
+    - Search user in `Users`
+    - Click the user
+    - Reset password (Credentials tab)
+4. Role Mapping
+    - Role Mapping tab (Users -> Role Mapping)
+    - Client Roles: (hasura)
+    - Assigned Roles from Availeable roles
 
-## Yarn dev for hot-reloading development
+## Start/Stop
 
-After you ran `docker-compose up` open a shell in the frontend container via `docker exec -it edu-hub_frontend_1 /bin/sh`. You can then run `yarn` to install dependencies and `yarn dev` to start the
-development server.
+1. Docker Images
 
-Now you can modify code in this project and it should automatically reload changes.
+   List of Docker Images: 
+    - edu-hub_frontend_1
+    - edu-hub_hasura_1
+    - edu-hub_keycloak_1
+    - edu-hub_db_hasura_1
+    - edu-hub_db_keycloak_1
+   
+   Stop/Start the the images together.
+   
+        sudo docker-compose stop
+        sudo docker-compose start
 
-Access the website in development under `http://localhost:25000/`.
-Further you can access the hasura console under `http://localhost:8080/` with the secret `myadminsecretkey`.
-Keycloak configs can be configured via `http://localhost:28080/auth/admin/` and login as `admin`/`admin`.
+2. `Hot reloading` of the frontend docker image 
+
+    - Open a docker shell for the  `edu-hub_frontend_1` image via the following command
+
+         sudo docker exec -it edu-hub_frontend_1 /bin/sh
+    - Install `yarn` ( if not installed) 
+
+          /opt/app # yarn
+    - Run the Frontend with `hot reloading`
+
+          /opt/app # yarn dev 
+
+    - Now you can modify code in this project and it should automatically reload changes.

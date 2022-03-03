@@ -7,6 +7,7 @@ import { useUser } from "../hooks/user";
 import eduNameImg from "../public/images/EDU_HUB_name.svg";
 import mysteryImg from "../public/images/common/mystery.svg";
 import eduLogo from "../public/images/edu_logo.svg";
+import coursesLogo from '../public/images/course/online-course.svg';
 
 import { LoginButton } from "./LoginButton";
 import { Menu } from "./Menu";
@@ -53,17 +54,24 @@ export const Header: FC = () => {
         </Link>
       </div>
       {isLoggedIn ? (
-        <div className="flex bg-blue-400">
-          <div className="cursor-pointer" onClick={openMenu}>
-            <Avatar imageUrl={user?.picture || mysteryImg} />
+        <div className="flex">
+          <Link href="/courses">
+            <div className="mr-3 cursor-pointer">
+              <Avatar imageUrl={coursesLogo} />
+            </div>
+          </Link>
+          <div className="flex bg-blue-400">
+            <div className="cursor-pointer" onClick={openMenu}>
+              <Avatar imageUrl={user?.picture || mysteryImg} />
+            </div>
+            {menuAnchorElement ? (
+              <Menu
+                isVisible={isMenuVisible}
+                setVisible={setMenuVisible}
+                anchorElement={menuAnchorElement}
+              />
+            ) : null}
           </div>
-          {menuAnchorElement ? (
-            <Menu
-              isVisible={isMenuVisible}
-              setVisible={setMenuVisible}
-              anchorElement={menuAnchorElement}
-            />
-          ) : null}
         </div>
       ) : null}
       {isLoggedIn ? null : (
