@@ -36,6 +36,11 @@ const Home: FC = () => {
     CourseList | CourseListWithEnrollments
   >(query);
 
+  if (error) {
+    console.log("got error in query for courses!", error);
+  }
+  
+
   return (
     <>
       <Head>

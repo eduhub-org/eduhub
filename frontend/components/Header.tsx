@@ -9,6 +9,7 @@ import mysteryImg from "../public/images/common/mystery.svg";
 import eduLogo from "../public/images/edu_logo.svg";
 import coursesLogo from '../public/images/course/online-course.svg';
 
+import { OnlyAdmin } from "./common/OnlyLoggedIn";
 import { LoginButton } from "./LoginButton";
 import { Menu } from "./Menu";
 import { RegisterButton } from "./RegisterButton";
@@ -50,6 +51,15 @@ export const Header: FC = () => {
                 priority
               />
             </div>
+            <OnlyDesktop>
+              <OnlyAdmin>
+              <div className="flex items-center ml-2">
+                <Link href="/programs">
+                  <a>Programme</a>
+                </Link>
+              </div>
+              </OnlyAdmin>
+            </OnlyDesktop>
           </div>
         </Link>
       </div>

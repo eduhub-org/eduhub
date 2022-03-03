@@ -70,6 +70,11 @@ export const client = new ApolloClient({
               return new Date(applicationEnd);
             },
           },
+          defaultApplicationEnd: {
+            merge: (_, defaultApplicationEnd) => {
+              return new Date(defaultApplicationEnd);
+            },
+          },
           lectureStart: {
             merge: (_, lectureStart) => {
               return new Date(lectureStart);
@@ -80,6 +85,11 @@ export const client = new ApolloClient({
               return new Date(lectureEnd);
             },
           },
+          projectRecordUploadDeadline: {
+            merge: (_, projectRecordUploadDeadline) => {
+              return new Date(projectRecordUploadDeadline);
+            }
+          }
         },
       },
       Session: {
