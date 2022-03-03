@@ -49,7 +49,7 @@ const CourseListContainer: FC<IProps> = ({ courses }) => {
                         {
                             semesters.map(semester => {
                                 return (
-                                    <a className="rounded-full focus:outline-none focus:ring-2  focus:bg-indigo-50 focus:ring-indigo-800 mr-2" href=" javascript:void(0)">
+                                    <a key={semester} className="rounded-full focus:outline-none focus:ring-2  focus:bg-indigo-50 focus:ring-indigo-800 mr-2">
                                         <div className={tabStyle(semester)}>
                                             <p>{semester}</p>
                                         </div>
@@ -72,7 +72,7 @@ const CourseListContainer: FC<IProps> = ({ courses }) => {
                                 {
                                     tableHeaders.map(text => {
                                         return (
-                                            <th className={`${thStyle}`}>
+                                            <th key={text} className={`${thStyle}`}>
                                                 <p className={thTextStyle}>{text}</p>
                                             </th>
                                         )
