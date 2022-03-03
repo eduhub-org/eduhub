@@ -62,34 +62,40 @@ export const client = new ApolloClient({
         fields: {
           applicationStart: {
             merge: (_, applicationStart) => {
-              return new Date(applicationStart);
+              return applicationStart != null
+                ? new Date(applicationStart)
+                : null;
             },
           },
           applicationEnd: {
             merge: (_, applicationEnd) => {
-              return new Date(applicationEnd);
+              return applicationEnd != null ? new Date(applicationEnd) : null;
             },
           },
           defaultApplicationEnd: {
             merge: (_, defaultApplicationEnd) => {
-              return new Date(defaultApplicationEnd);
+              return defaultApplicationEnd != null
+                ? new Date(defaultApplicationEnd)
+                : null;
             },
           },
           lectureStart: {
             merge: (_, lectureStart) => {
-              return new Date(lectureStart);
+              return lectureStart != null ? new Date(lectureStart) : null;
             },
           },
           lectureEnd: {
             merge: (_, lectureEnd) => {
-              return new Date(lectureEnd);
+              return lectureEnd != null ? new Date(lectureEnd) : null;
             },
           },
           projectRecordUploadDeadline: {
             merge: (_, projectRecordUploadDeadline) => {
-              return new Date(projectRecordUploadDeadline);
-            }
-          }
+              return projectRecordUploadDeadline != null
+                ? new Date(projectRecordUploadDeadline)
+                : null;
+            },
+          },
         },
       },
       Session: {

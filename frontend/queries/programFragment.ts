@@ -13,23 +13,23 @@ export const USER_PROGRAM_FRAGMENT = gql`
 `;
 
 export const ADMIN_PROGRAM_FRAGMENT = gql`
-fragment AdminProgramFragment on Program {
-  id
-  applicationStart
-  attendanceCertificateTemplateURL
-  closingQuestionnaire
-  defaultApplicationEnd
-  defaultMaxMissedSessions
-  lectureEnd
-  lectureStart
-  participationCertificateTemplateURL
-  projectRecordUploadDeadline
-  shortTitle
-  speakerQuestionnaire
-  startQuestionnaire
-  title
-  visibility
-  visibilityAchievementCertificate
-  visibilityParticipationCertificate
-}
+  fragment AdminProgramFragment on Program {
+    id
+    applicationStart
+    attendanceCertificateTemplateURL
+    closingQuestionnaire
+    defaultApplicationEnd
+    defaultMaxMissedSessions
+    lectureEnd
+    lectureStart
+    participationCertificateTemplateURL
+    projectRecordUploadDeadline
+    shortTitle
+    speakerQuestionnaire
+    startQuestionnaire
+    title
+    visibility
+    visibilityAchievementCertificate
+    visibilityParticipationCertificate
+  }
 `;

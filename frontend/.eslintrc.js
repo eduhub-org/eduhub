@@ -147,13 +147,7 @@ module.exports = {
     // import module is currently causing a weird log message, wait for fix: https://github.com/typescript-eslint/typescript-eslint/issues/1333
     "import/no-cycle": "error",
     "import/no-unused-modules": "error",
-    "import/order": [
-      "error",
-      {
-        "newlines-between": "always",
-        alphabetize: { order: "asc", caseInsensitive: false },
-      },
-    ],
+    "import/order": "off",
     indent: "off",
     "linebreak-style": "off",
     "max-classes-per-file": ["error", 1],
@@ -162,7 +156,7 @@ module.exports = {
     "no-bitwise": "error",
     "no-caller": "error",
     "no-cond-assign": "error",
-    "no-console": "error",
+    "no-console": "off",
     "no-constant-condition": "error",
     "no-control-regex": "error",
     "no-debugger": "error",
@@ -213,11 +207,7 @@ module.exports = {
     "react/self-closing-comp": "error",
     semi: "off",
     "sort-imports": ["error", { ignoreDeclarationSort: true }],
-    "sort-keys": [
-      "error",
-      "asc",
-      { caseSensitive: true, natural: false, minKeys: 6 },
-    ],
+    "sort-keys": "off",
     "space-before-function-paren": "off",
     "use-isnan": "error",
     "valid-jsdoc": "error",

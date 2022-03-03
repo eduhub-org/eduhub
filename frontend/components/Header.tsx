@@ -9,12 +9,13 @@ import mysteryImg from "../public/images/common/mystery.svg";
 import eduLogo from "../public/images/edu_logo.svg";
 import coursesLogo from '../public/images/course/online-course.svg';
 
-import { OnlyAdmin } from "./common/OnlyLoggedIn";
 import { LoginButton } from "./LoginButton";
 import { Menu } from "./Menu";
 import { RegisterButton } from "./RegisterButton";
 import { Avatar } from "./common/Avatar";
 import { OnlyDesktop } from "./common/OnlyDesktop";
+import { OnlyAdmin } from "./common/OnlyLoggedIn";
+import { ClientOnly } from "./common/ClientOnly";
 
 export const Header: FC = () => {
   const isLoggedIn = useIsLoggedIn();
@@ -51,51 +52,56 @@ export const Header: FC = () => {
                 priority
               />
             </div>
-            <OnlyDesktop>
-              <OnlyAdmin>
-              <div className="flex items-center ml-2">
-                <Link href="/programs">
-                  <a>Programme</a>
-                </Link>
-              </div>
-              </OnlyAdmin>
-            </OnlyDesktop>
+            <ClientOnly>
+              <OnlyDesktop>
+                <OnlyAdmin>
+                  <div className="flex items-center ml-8">
+                    <Link href="/programs">
+                      <a>Programme</a>
+                    </Link>
+                  </div>
+                </OnlyAdmin>
+              </OnlyDesktop>
+            </ClientOnly>
           </div>
         </Link>
       </div>
-      {isLoggedIn ? (
-        <div className="flex">
-          <Link href="/courses">
-            <div className="mr-3 cursor-pointer">
-              <Avatar imageUrl={coursesLogo} />
-            </div>
-          </Link>
-          <div className="flex bg-blue-400">
-            <div className="cursor-pointer" onClick={openMenu}>
-              <Avatar imageUrl={user?.picture || mysteryImg} />
-            </div>
-            {menuAnchorElement ? (
-              <Menu
-                isVisible={isMenuVisible}
-                setVisible={setMenuVisible}
-                anchorElement={menuAnchorElement}
-              />
-            ) : null}
-          </div>
-        </div>
-      ) : null}
-      {isLoggedIn ? null : (
-        <div className="flex bg-red-300">
+
+      <ClientOnly>
+        {isLoggedIn ? (
           <div className="flex">
-            <LoginButton />
+            <Link href="/courses">
+              <div className="mr-3 cursor-pointer">
+                <Avatar imageUrl={coursesLogo} />
+              </div>
+            </Link>
+            <div className="flex bg-blue-400">
+              <div className="cursor-pointer" onClick={openMenu}>
+                <Avatar imageUrl={user?.picture || mysteryImg} />
+              </div>
+              {menuAnchorElement ? (
+                <Menu
+                  isVisible={isMenuVisible}
+                  setVisible={setMenuVisible}
+                  anchorElement={menuAnchorElement}
+                />
+              ) : null}
+            </div>
           </div>
-          <div className="ml-3">
-            <OnlyDesktop>
-              <RegisterButton />
-            </OnlyDesktop>
+        ) : null}
+        {isLoggedIn ? null : (
+          <div className="flex bg-red-300">
+            <div className="flex">
+              <LoginButton />
+            </div>
+            <div className="ml-3">
+              <OnlyDesktop>
+                <RegisterButton />
+              </OnlyDesktop>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </ClientOnly>
     </header>
   );
 };

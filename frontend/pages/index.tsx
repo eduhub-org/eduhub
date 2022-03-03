@@ -19,6 +19,7 @@ import { CourseList } from "../queries/__generated__/CourseList";
 import { CourseListWithEnrollments } from "../queries/__generated__/CourseListWithEnrollments";
 import { COURSE_LIST } from "../queries/courseList";
 import { COURSE_LIST_WITH_ENROLLMENT } from "../queries/courseListWithEnrollment";
+import { ClientOnly } from "../components/common/ClientOnly";
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
@@ -39,7 +40,6 @@ const Home: FC = () => {
   if (error) {
     console.log("got error in query for courses!", error);
   }
-  
 
   return (
     <>
@@ -57,48 +57,52 @@ const Home: FC = () => {
               {t("subheadline")}
             </span>
           </div>
+          <ClientOnly>
+            <OnlyLoggedOut>
+              <div className="flex justify-center mb-12">
+                <Link href="/register">
+                  <a className="flex">
+                    <Button filled>{t("registerNow")}</Button>
+                  </a>
+                </Link>
+              </div>
+            </OnlyLoggedOut>
+          </ClientOnly>
+        </div>
+        <ClientOnly>
+          <OnlyLoggedIn>
+            <div className="mt-11">
+              <MyCourses />
+            </div>
+          </OnlyLoggedIn>
+          <h2 id="courses" className="text-3xl font-semibold text-center mt-20">
+            {t("findCourses")}
+          </h2>
+          <div className="mt-11">
+            <TileSlider courses={courses?.Course ?? []} />
+          </div>
+          <div className="w-full flex justify-center mt-16 mb-24">
+            <Button>{t("browse")}</Button>
+          </div>
           <OnlyLoggedOut>
-            <div className="flex justify-center mb-12">
-              <Link href="/register">
-                <a className="flex">
-                  <Button filled>{t("registerNow")}</Button>
-                </a>
-              </Link>
+            <div className="flex flex-col sm:flex-row mx-6 mt-6 mb-24 sm:mt-48">
+              <div className="flex flex-1 flex-col sm:items-center">
+                <div>
+                  <h2 className="text-3xl font-semibold">
+                    {t("continueLearning")}
+                  </h2>
+                  <h3 className="text-lg">{t("learnSubheadline")}</h3>
+                </div>
+              </div>
+              <div className="flex flex-1 justify-center mt-8">
+                <div className="flex justify-center items-center space-x-3">
+                  <LoginButton />
+                  <RegisterButton />
+                </div>
+              </div>
             </div>
           </OnlyLoggedOut>
-        </div>
-        <OnlyLoggedIn>
-          <div className="mt-11">
-            <MyCourses />
-          </div>
-        </OnlyLoggedIn>
-        <h2 id="courses" className="text-3xl font-semibold text-center mt-20">
-          {t("findCourses")}
-        </h2>
-        <div className="mt-11">
-          <TileSlider courses={courses?.Course ?? []} />
-        </div>
-        <div className="w-full flex justify-center mt-16 mb-24">
-          <Button>{t("browse")}</Button>
-        </div>
-        <OnlyLoggedOut>
-          <div className="flex flex-col sm:flex-row mx-6 mt-6 mb-24 sm:mt-48">
-            <div className="flex flex-1 flex-col sm:items-center">
-              <div>
-                <h2 className="text-3xl font-semibold">
-                  {t("continueLearning")}
-                </h2>
-                <h3 className="text-lg">{t("learnSubheadline")}</h3>
-              </div>
-            </div>
-            <div className="flex flex-1 justify-center mt-8">
-              <div className="flex justify-center items-center space-x-3">
-                <LoginButton />
-                <RegisterButton />
-              </div>
-            </div>
-          </div>
-        </OnlyLoggedOut>
+        </ClientOnly>
       </Page>
     </>
   );

@@ -22,7 +22,7 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
     : passedOptions;
 
   return useQuery(query, options);
-}
+};
 
 export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
