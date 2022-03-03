@@ -8,7 +8,7 @@ export const OnlyLoggedIn: FC = ({ children }) => {
   const isLoggedIn = useIsLoggedIn();
   const { keycloak } = useKeycloak<KeycloakInstance>();
 
-  console.log(keycloak);
+  // console.log(keycloak);
 
   const token = keycloak?.token;
 
@@ -17,40 +17,44 @@ export const OnlyLoggedIn: FC = ({ children }) => {
   return <>{children}</>;
 };
 
-export const OnlyNotAdmin: FC = ({children}) => {
+export const OnlyNotAdmin: FC = ({ children }) => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
   if (!keycloak?.resourceAccess?.hasura?.roles?.includes("admin")) {
     return <>{children}</>;
   } else {
     return null;
   }
-}
+};
 
-export const OnlyNotInstructor: FC = ({children}) => {
+export const OnlyNotInstructor: FC = ({ children }) => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
-  if (keycloak?.resourceAccess?.hasura?.roles?.includes("instructor_access") || 
-    keycloak?.resourceAccess?.hasura?.roles?.includes("admin")) {
+  if (
+    keycloak?.resourceAccess?.hasura?.roles?.includes("instructor_access") ||
+    keycloak?.resourceAccess?.hasura?.roles?.includes("admin")
+  ) {
     return null;
   } else {
     return <>{children}</>;
   }
-}
+};
 
 export const OnlyAdmin: FC = ({ children }) => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
   if (keycloak?.resourceAccess?.hasura?.roles?.includes("admin")) {
-    return <>{children}</>
+    return <>{children}</>;
   } else {
     return null;
   }
-}
+};
 
 export const OnlyInstructor: FC = ({ children }) => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
-  if (keycloak?.resourceAccess?.hasura?.roles?.includes("instructor_access") || 
-    keycloak?.resourceAccess?.hasura?.roles?.includes("admin")) {
-    return <>{children}</>
+  if (
+    keycloak?.resourceAccess?.hasura?.roles?.includes("instructor_access") ||
+    keycloak?.resourceAccess?.hasura?.roles?.includes("admin")
+  ) {
+    return <>{children}</>;
   } else {
     return null;
   }
-}
+};

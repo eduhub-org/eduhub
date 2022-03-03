@@ -12,4 +12,4 @@ export const useIsLoggedIn = (): boolean => {
 export const useIsAdmin = () => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
   return keycloak?.resourceAccess?.hasura?.roles?.includes("admin") ?? false;
-}
+};
