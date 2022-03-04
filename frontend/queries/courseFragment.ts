@@ -40,3 +40,27 @@ export const COURSE_FRAGMENT = gql`
     }
   }
 `;
+
+export const ADMIN_COURSE_FRAGMENT = gql`
+  ${SESSION_FRAGMENT}
+  fragment CourseFragment on Course {
+    id
+    title
+    status
+    ects
+    programId
+    CourseInstructors {
+      id
+      Expert {
+        id
+        User {
+          firstName
+          picture
+          id
+          lastName
+        }
+        description
+      }
+    }
+  }
+`;
