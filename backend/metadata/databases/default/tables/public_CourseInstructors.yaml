@@ -22,4 +22,4 @@ select_permissions:
     - Id
     - InstructorId
     filter: {}
-  role: user
+  role: user_access

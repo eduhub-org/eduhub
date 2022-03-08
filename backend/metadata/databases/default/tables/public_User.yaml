@@ -44,8 +44,12 @@ insert_permissions:
       id:
         _eq: X-Hasura-User-Id
     columns:
+    - created_at
+    - updated_at
+    - externalProfile
     - email
     - employment
+    - anonymousId
     - firstName
     - id
     - lastName
@@ -53,7 +57,9 @@ insert_permissions:
     - newsletterRegistration
     - picture
     - university
-  role: user
+    - otherUniversity
+    - employment
+  role: self_access
 select_permissions:
 - permission:
     columns:
@@ -62,7 +68,42 @@ select_permissions:
     - picture
     - lastName
     filter: {}
+    limit: 10
   role: anonymous
+- permission:
+    columns:
+    - created_at
+    - email
+    - employment
+    - externalProfile
+    - firstName
+    - id
+    - lastName
+    - matriculationNumber
+    - newsletterRegistration
+    - otherUniversity
+    - picture
+    - university
+    - updated_at
+    filter: {}
+    limit: 100
+  role: instructor_access
+- permission:
+    columns:
+    - created_at
+    - employment
+    - externalProfile
+    - id
+    - matriculationNumber
+    - newsletterRegistration
+    - otherUniversity
+    - university
+    - updated_at
+    filter:
+      id:
+        _eq: X-Hasura-User-Id
+    limit: 1
+  role: self_access
 - permission:
     columns:
     - email
@@ -71,4 +112,24 @@ select_permissions:
     - lastName
     - picture
     filter: {}
-  role: user
+    limit: 10
+  role: user_access
+update_permissions:
+- permission:
+    check: null
+    columns:
+    - email
+    - employment
+    - externalProfile
+    - firstName
+    - lastName
+    - matriculationNumber
+    - newsletterRegistration
+    - otherUniversity
+    - picture
+    - university
+    - updated_at
+    filter:
+      id:
+        _eq: X-Hasura-User-Id
+  role: self_access

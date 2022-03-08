@@ -81,6 +81,32 @@ select_permissions:
     - endTime
     - headingDescriptionField1
     - headingDescriptionField2
+    - language
+    - learningGoals
+    - maxMissedSessions
+    - programId
+    - startTime
+    - status
+    - tagline
+    - title
+    - visibility
+    - weekDay
+    filter: {}
+  role: instructor_access
+- permission:
+    columns:
+    - achievementCertificatePossible
+    - applicationEnd
+    - attendanceCertificatePossible
+    - chatLink
+    - contentDescriptionField1
+    - contentDescriptionField2
+    - cost
+    - coverImage
+    - ects
+    - endTime
+    - headingDescriptionField1
+    - headingDescriptionField2
     - id
     - language
     - maxMissedSessions
@@ -91,4 +117,25 @@ select_permissions:
     - title
     - weekDay
     filter: {}
-  role: user
+  role: user_access
+update_permissions:
+- permission:
+    check: null
+    columns:
+    - contentDescriptionField1
+    - contentDescriptionField2
+    - coverImage
+    - headingDescriptionField1
+    - headingDescriptionField2
+    - language
+    - learningGoals
+    - maxMissedSessions
+    - startTime
+    - tagline
+    filter:
+      CourseInstructors:
+        Expert:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+  role: self_access

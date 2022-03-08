@@ -34,6 +34,20 @@ array_relationships:
       table:
         name: SessionSpeaker
         schema: public
+insert_permissions:
+- permission:
+    backend_only: false
+    check: {}
+    columns:
+    - id
+    - title
+    - description
+    - startDateTime
+    - endDateTime
+    - courseId
+    - createdAt
+    - updatedAt
+  role: instructor_access
 select_permissions:
 - permission:
     columns:
@@ -45,13 +59,17 @@ select_permissions:
     - title
     filter: {}
   role: anonymous
+update_permissions:
 - permission:
+    check: null
     columns:
-    - courseId
     - description
     - endDateTime
-    - id
     - startDateTime
     - title
     filter: {}
-  role: user
+  role: instructor_access
+delete_permissions:
+- permission:
+    filter: {}
+  role: instructor_access
