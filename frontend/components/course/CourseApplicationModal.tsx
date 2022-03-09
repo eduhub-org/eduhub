@@ -6,8 +6,8 @@ import { FC, useCallback, useState } from "react";
 import { CourseEnrollmentStatus_enum } from "../../__generated__/globalTypes";
 import { enrollmentStatusForCourse } from "../../helpers/courseHelpers";
 import { useAuthedMutation } from "../../hooks/authedMutation";
-import { useUser } from "../../hooks/user";
-import xIcon from "../../public/images/common/x-calibur.svg";
+import { useUser, useUserId } from "../../hooks/user";
+import xIcon from "../../public/images/common/x-calibur-black.svg";
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
 import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
 import {
@@ -31,7 +31,7 @@ export const CourseApplicationModal: FC<IProps> = ({
   visible,
 }) => {
   const [text, setText] = useState("");
-  const user = useUser();
+  const userId = useUserId();
 
   const onChangeText = useCallback((event) => {
     setText(event.target.value);
@@ -43,7 +43,7 @@ export const CourseApplicationModal: FC<IProps> = ({
   >(INSERT_ENROLLMENT);
 
   const applyForCourse = useCallback(() => {
-    if (!user) {
+    if (!userId) {
       // eslint-disable-next-line no-console
       console.log("Missing user data.");
       return;
@@ -52,11 +52,11 @@ export const CourseApplicationModal: FC<IProps> = ({
     insertMutation({
       variables: {
         courseId: course.id,
-        userId: user?.id,
+        userId,
         motivationLetter: text,
       },
     });
-  }, [course.id, insertMutation, text, user]);
+  }, [course.id, insertMutation, text, userId]);
 
   const status = enrollmentStatusForCourse(course);
 

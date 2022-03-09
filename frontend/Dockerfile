@@ -1,4 +1,5 @@
-FROM node:alpine
+# Fixed version to node 16, as node 17 is not supported by some dependencies
+FROM node:16-alpine
 
 RUN mkdir -p /opt/app
 RUN apk add --no-cache libc6-compat yarn

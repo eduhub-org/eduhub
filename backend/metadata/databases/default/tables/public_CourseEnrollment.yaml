@@ -26,15 +26,29 @@ insert_permissions:
 - permission:
     backend_only: false
     check:
-      User:
-        authId:
-          _eq: X-Hasura-User-Id
+      userId:
+        _eq: X-Hasura-User-Id
     columns:
     - courseId
     - motivationLetter
     - userId
-  role: user
+  role: user_access
 select_permissions:
+- permission:
+    columns:
+    - id
+    - courseId
+    - userId
+    - status
+    - motivationLetter
+    - motivationRating
+    - achievementCertificateURL
+    - attendanceCertificateURL
+    - createdAt
+    - updatedAt
+    - invitationExpirationDate
+    filter: {}
+  role: instructor_access
 - permission:
     columns:
     - achievementCertificateURL
@@ -43,11 +57,21 @@ select_permissions:
     - id
     - invitationExpirationDate
     - motivationLetter
-    - motivationRating
     - status
     - userId
     filter:
       User:
-        authId:
+        id:
           _eq: X-Hasura-User-Id
-  role: user
+  role: user_access
+update_permissions:
+- permission:
+    check: {}
+    columns:
+    - achievementCertificateURL
+    - attendanceCertificateURL
+    - invitationExpirationDate
+    - motivationRating
+    - status
+    filter: {}
+  role: instructor_access

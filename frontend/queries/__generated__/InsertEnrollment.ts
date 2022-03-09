@@ -44,7 +44,7 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
    * The user's profile picture
    */
   picture: string | null;
-  id: number;
+  id: any;
   /**
    * The user's last name
    */
@@ -204,7 +204,7 @@ export interface InsertEnrollment {
 }
 
 export interface InsertEnrollmentVariables {
-  userId: number;
+  userId: any;
   courseId: number;
   motivationLetter: string;
 }

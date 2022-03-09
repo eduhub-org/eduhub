@@ -20,13 +20,67 @@ object_relationships:
 - name: User
   using:
     foreign_key_constraint_on: userId
+insert_permissions:
+- permission:
+    backend_only: false
+    check: {}
+    columns:
+    - id
+    - createdAt
+    - updatedAt
+    - totalAttendanceTime
+    - status
+    - interruptionCount
+    - endDateTime
+    - startDateTime
+    - sessionId
+    - userId
+    - recordedName
+    - source
+  role: instructor_access
 select_permissions:
 - permission:
     columns:
     - id
+    - createdAt
+    - updatedAt
+    - totalAttendanceTime
     - status
+    - interruptionCount
+    - endDateTime
+    - startDateTime
+    - sessionId
+    - userId
+    - recordedName
+    - source
+    filter: {}
+  role: instructor_access
+- permission:
+    columns:
+    - createdAt
+    - endDateTime
+    - id
+    - recordedName
+    - sessionId
+    - source
+    - startDateTime
+    - status
+    - updatedAt
+    - userId
     filter:
       User:
-        authId:
+        id:
           _eq: X-Hasura-User-Id
-  role: user
+  role: self_access
+update_permissions:
+- permission:
+    check: {}
+    columns:
+    - endDateTime
+    - recordedName
+    - source
+    - startDateTime
+    - status
+    - totalAttendanceTime
+    filter: {}
+  role: instructor_access

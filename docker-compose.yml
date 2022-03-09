@@ -28,7 +28,9 @@ services:
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
       HASURA_GRAPHQL_JWT_SECRET: '{ "type": "RS256", "jwk_url": "http://keycloak:8080/auth/realms/edu-hub/protocol/openid-connect/certs" }'
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
+      HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: inherited_roles
       HASURA_CLOUD_FUNCTION_SECRET: "${HASURA_CLOUD_FUNCTION_SECRET}"
+      HASURA_BUCKET: "${HASURA_BUCKET}"
       CLOUD_FUNCTION_LINK: "https://europe-west3-edu-hub-staging.cloudfunctions.net"
     volumes:
       - ./backend/migrations:/hasura-migrations
@@ -54,9 +56,9 @@ services:
       DB_ADDR: db_keycloak
       DB_USER: keycloak
       DB_PASSWORD: password
-      KEYCLOAK_IMPORT: /realm.json
+      KEYCLOAK_IMPORT: /imports/edu-hub-realm.json
     volumes:
-      - ./keycloak/staging-realm.json:/realm.json
+      - ./keycloak/imports:/imports
 
   db_keycloak:
     image: postgres:12

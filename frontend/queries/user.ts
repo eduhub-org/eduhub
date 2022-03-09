@@ -1,10 +1,13 @@
 import { gql } from "@apollo/client";
 
 export const USER = gql`
-  query User($authId: uuid!) {
-    User(where: { authId: { _eq: $authId } }) {
+  query User($userId: uuid!) {
+    User_by_pk(id: $userId) {
       id
       picture
+      email
+      firstName
+      lastName
     }
   }
 `;
