@@ -133,3 +133,17 @@ update_permissions:
       id:
         _eq: X-Hasura-User-Id
   role: self_access
+event_triggers:
+- definition:
+    enable_manual: false
+    update:
+      columns:
+      - email
+      - firstName
+      - lastName
+  name: updateKeycloakProfile
+  retry_conf:
+    interval_sec: 10
+    num_retries: 0
+    timeout_sec: 60
+  webhook: "{{CLOUD_FUNCTION_LINK}}/updateKeycloakProfile"
