@@ -141,6 +141,9 @@ event_triggers:
       - email
       - firstName
       - lastName
+  headers:
+  - name: secret
+    value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   name: updateKeycloakProfile
   retry_conf:
     interval_sec: 10
