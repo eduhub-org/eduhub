@@ -43,12 +43,30 @@ export const COURSE_FRAGMENT = gql`
 
 export const ADMIN_COURSE_FRAGMENT = gql`
   ${SESSION_FRAGMENT}
-  fragment CourseFragment on Course {
+  fragment AdminCourseFragment on Course {
     id
-    title
-    status
     ects
+    tagline
+    weekDay
+    cost
+    applicationEnd
+    coverImage
+    language
+    maxMissedSessions
+    title
     programId
+    headingDescriptionField1
+    contentDescriptionField1
+    headingDescriptionField2
+    contentDescriptionField2
+    startTime
+    endTime
+    status
+    Program {
+      id
+      title
+      shortTitle
+    }
     CourseInstructors {
       id
       Expert {

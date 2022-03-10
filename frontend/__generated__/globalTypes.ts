@@ -22,6 +22,14 @@ export enum CourseEnrollmentStatus_enum {
   REJECTED = "REJECTED",
 }
 
+export enum CourseStatus_enum {
+  APPLICANTS_INVITED = "APPLICANTS_INVITED",
+  DRAFT = "DRAFT",
+  PARTICIPANTS_RATED = "PARTICIPANTS_RATED",
+  READY_FOR_APPLICATION = "READY_FOR_APPLICATION",
+  READY_FOR_PUBLICATION = "READY_FOR_PUBLICATION",
+}
+
 //==============================================================
 // END Enums and Input Objects
 //==============================================================

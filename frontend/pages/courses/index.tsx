@@ -1,20 +1,27 @@
 import Head from "next/head";
-import { FC } from "react";
+import { FC, useState } from "react";
 import CourseOneRow from "../../components/courses/CourseOneRow";
 import CourseListHeader from "../../components/courses/HeaderOptions";
 import { Page } from "../../components/Page";
 import { useAuthedQuery } from "../../hooks/authedQuery";
-import { useIsLoggedIn } from "../../hooks/authentication";
-import { ADMIN_COURSE_LIST, COURSE_LIST } from "../../queries/courseList";
-import { COURSE_LIST_WITH_ENROLLMENT } from "../../queries/courseListWithEnrollment";
-import { CourseList } from "../../queries/__generated__/CourseList";
-import { CourseListWithEnrollments } from "../../queries/__generated__/CourseListWithEnrollments";
+import { COURSE_INSTRUCTOR_LIST } from "../../queries/courseInstructorList";
+import { ADMIN_COURSE_LIST } from "../../queries/courseList";
+import { PROGRAM_LIST } from "../../queries/programList";
+import { AdminCourseList } from "../../queries/__generated__/AdminCourseList";
 
 const Courses: FC = () => {
-  // Constants
+  const result = useAuthedQuery<AdminCourseList>(ADMIN_COURSE_LIST);
+
+  if (result.loading) {
+    return (
+      <Head>
+        <title> Loading courses!</title>
+      </Head>
+    );
+  }
+
   const thTextStyle =
     "flex justify-start ml-5 text-base font-medium leading-none text-gray-700 uppercase";
-  const isLoggedIn = useIsLoggedIn();
   const tableHeaders: string[] = [
     "Off.",
     "Title",
@@ -24,18 +31,6 @@ const Courses: FC = () => {
     "Program",
     "Status",
   ];
-  const semesters: string[] = ["SOSE21", "WINSE21", "SOSE20", "WINSE20", "All"];
-  const { data: courses, loading, error } = useAuthedQuery<CourseList>(
-    ADMIN_COURSE_LIST
-  );
-
-  if (!courses) {
-    return (
-      <Head>
-        <title>No courses!</title>
-      </Head>
-    );
-  }
 
   return (
     <div>
@@ -44,7 +39,7 @@ const Courses: FC = () => {
       </Head>
       <Page>
         <div className="sm:px-0 w-full">
-          <CourseListHeader semesters={semesters} />
+          <CourseListHeader />
           <div className="overflow-x-auto">
             <table className="w-full whitespace-nowrap">
               <thead>
@@ -59,7 +54,7 @@ const Courses: FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {courses.Course.map((course) => (
+                {result.data?.Course.map((course) => (
                   <CourseOneRow key={course.id} course={course} />
                 ))}
               </tbody>

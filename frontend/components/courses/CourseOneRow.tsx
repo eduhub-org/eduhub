@@ -1,8 +1,9 @@
 import { FC } from "react";
 import { CourseList_Course } from "../../queries/__generated__/CourseList";
 import { MdKeyboardArrowDown } from "react-icons/md";
+import { AdminCourseList_Course } from "../../queries/__generated__/AdminCourseList";
 interface IProps {
-  course: CourseList_Course;
+  course: AdminCourseList_Course;
 }
 const CourseOneRow: FC<IProps> = ({ course }) => {
   return (
@@ -27,7 +28,13 @@ const CourseOneRow: FC<IProps> = ({ course }) => {
         <td className="ml-5">
           <div className="flex items-start">
             <p className="text-sm leading-none text-gray-600 ml-5">
-              Vorname Name
+              {course.CourseInstructors.map((instructor) => {
+                return (
+                  instructor.Expert.User.firstName +
+                  " " +
+                  (instructor.Expert.User.firstName ?? "</br>")
+                );
+              })}
             </p>
           </div>
         </td>
@@ -41,18 +48,22 @@ const CourseOneRow: FC<IProps> = ({ course }) => {
         <td>
           <div>
             <p className="text-sm leading-none text-gray-600 ml-5">
-              15 / 11 / 6
+              {course.status}
             </p>
           </div>
         </td>
         <td>
           <div className="flex items-center">
-            <p className="text-sm leading-none text-gray-600 ml-5">SS2020</p>
+            <p className="text-sm leading-none text-gray-600 ml-5">
+              {course.Program?.shortTitle ?? "-"}
+            </p>
           </div>
         </td>
         <td>
           <div className="flex items-center mt-2 mb-2">
-            <p className="text-sm leading-none text-gray-600 ml-5">20%</p>
+            <p className="text-sm leading-none text-gray-600 ml-5">
+              {course.endTime ? new Date(course.endTime).toDateString() : ""}
+            </p>
             <div className="flex px-5 items-center">
               <button
                 className="focus:ring-2 rounded-md focus:outline-none"

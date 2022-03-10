@@ -12,6 +12,7 @@ module.exports = {
         "edu-green": "#00A398",
         "edu-missed-yellow": "#F2991D66",
         "edu-course-list": "#F2F2F2",
+        "edu-modal-bg-color": "#222222",
       },
     },
     fontFamily: {

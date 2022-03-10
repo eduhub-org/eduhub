@@ -13,9 +13,9 @@ export const COURSE_LIST = gql`
 
 export const ADMIN_COURSE_LIST = gql`
   ${ADMIN_COURSE_FRAGMENT}
-  query CourseList {
+  query AdminCourseList {
     Course {
-      ...CourseFragment
+      ...AdminCourseFragment
     }
   }
 `;
