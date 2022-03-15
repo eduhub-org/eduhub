@@ -7,6 +7,9 @@ export const PROGRAM_LIST = gql`
   query ProgramList {
     Program {
       ...AdminProgramFragment
+      Courses {
+        id
+      }
     }
   }
 `;

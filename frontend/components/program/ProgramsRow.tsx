@@ -4,12 +4,14 @@ import { ChangeEvent, FC, useCallback } from "react";
 import DatePicker from "react-datepicker";
 import { DebounceInput } from "react-debounce-input";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { MdCheckBox, MdCheckBoxOutlineBlank, MdDelete } from "react-icons/md";
+import { MdCheckBox, MdCheckBoxOutlineBlank, MdDelete, MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
 import { ProgramList_Program } from "../../queries/__generated__/ProgramList";
+import EhDebounceInput from "../common/EhDebounceInput";
 
 interface ProgramsRowProps {
   program: ProgramList_Program;
   openProgramId: number;
+  canDelete: boolean;
   onSetVisibility: (p: ProgramList_Program, isVisible: boolean) => any;
   onSetTitle: (p: ProgramList_Program, title: string) => any;
   onSetShortTitle: (p: ProgramList_Program, shortTitle: string) => any;
@@ -18,6 +20,11 @@ interface ProgramsRowProps {
   onSetLectureStart: (p: ProgramList_Program, start: Date | null) => any;
   onSetLectureEnd: (p: ProgramList_Program, end: Date | null) => any;
   onSetUploadData: (p: ProgramList_Program, d: Date | null) => any;
+  onSetStartQuestionaire: (p: ProgramList_Program, link: string) => any;
+  onSetSpeakerQuestionaire: (p: ProgramList_Program, link: string) => any;
+  onSetClosingQuestionaire: (p: ProgramList_Program, link: string) => any;
+  onSetVisibilityParticipationCertificate: (p: ProgramList_Program, isVisible: boolean) => any;
+  onSetVisiblityAchievementCertificate: (p: ProgramList_Program, isVisible: boolean) => any;
   onDelete: (p: ProgramList_Program) => any;
   onOpenProgram: (p: ProgramList_Program) => any;
 }
@@ -25,6 +32,7 @@ interface ProgramsRowProps {
 export const ProgramsRow: FC<ProgramsRowProps> = ({
   program,
   openProgramId,
+  canDelete,
   onSetApplicationEnd,
   onDelete,
   onOpenProgram,
@@ -35,21 +43,55 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   onSetTitle,
   onSetUploadData,
   onSetVisibility,
+  onSetStartQuestionaire,
+  onSetSpeakerQuestionaire,
+  onSetClosingQuestionaire,
+  onSetVisibilityParticipationCertificate,
+  onSetVisiblityAchievementCertificate
 }) => {
+  const handleToggleVisibilityParticipationCertificate = useCallback(() => {
+    onSetVisibilityParticipationCertificate(program, !program.visibilityParticipationCertificate);
+  }, [program, onSetVisibilityParticipationCertificate]);
+
+  const handleToggleVisibilityAchievementCertificate = useCallback(() => {
+    onSetVisiblityAchievementCertificate(program, !program.visibilityAchievementCertificate);
+  }, [program, onSetVisiblityAchievementCertificate]);
+
   const handleToggleVisibility = useCallback(() => {
     onSetVisibility(program, !program.visibility);
   }, [program, onSetVisibility]);
 
+  const handleSetStartQuestionaire = useCallback(
+    (value: string) => {
+      onSetStartQuestionaire(program, value);
+    },
+    [program, onSetStartQuestionaire]
+  );
+
+  const handleSetSpeakerQuestionaire = useCallback(
+    (value: string) => {
+      onSetSpeakerQuestionaire(program, value);
+    },
+    [program, onSetSpeakerQuestionaire]
+  );
+
+  const handleSetClosingQuestionaire = useCallback(
+    (value: string) => {
+      onSetClosingQuestionaire(program, value);
+    },
+    [program, onSetClosingQuestionaire]
+  );
+
   const handleSetTitle = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      onSetTitle(program, event.target.value);
+    (value: string) => {
+      onSetTitle(program, value);
     },
     [program, onSetTitle]
   );
 
   const handleSetShortTitle = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      onSetShortTitle(program, event.target.value);
+    (value: string) => {
+      onSetShortTitle(program, value);
     },
     [program, onSetShortTitle]
   );
@@ -109,20 +151,18 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         </div>
 
         <div className="col-span-2">
-          <DebounceInput
-            className="w-full bg-gray-100"
-            debounceTimeout={1000}
-            value={program.title}
-            onChange={handleSetTitle}
+          <EhDebounceInput 
+            placeholder="Programmtitel setzen"
+            onChangeHandler={handleSetTitle}
+            inputText={program.title}
           />
         </div>
 
         <div>
-          <DebounceInput
-            className="w-full bg-gray-100"
-            debounceTimeout={1000}
-            value={program.shortTitle ?? ""}
-            onChange={handleSetShortTitle}
+          <EhDebounceInput 
+            placeholder="Kurztitel setzen"
+            onChangeHandler={handleSetShortTitle}
+            inputText={program.shortTitle ?? ""}
           />
         </div>
 
@@ -182,15 +222,74 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
             </IconButton>
           </div>
 
-          <div>
+          {canDelete && <div>
             <IconButton onClick={handleDeleteProgram}>
               <MdDelete size="0.75em" />
             </IconButton>
-          </div>
+          </div>}
         </div>
       </div>
 
-      {program.id === openProgramId && <div>TEST Opened a program!</div>}
+      {program.id === openProgramId && <div className="mb-1">
+
+        <div className="grid grid-cols-3 bg-gray-100 p-10">
+          <div className="p-3">
+            <span>Link Start-Evaluation</span><br/>
+            <EhDebounceInput 
+              placeholder="URL eintragen"
+              onChangeHandler={handleSetStartQuestionaire}
+              inputText={program.startQuestionnaire || ""}
+            />
+          </div>
+          <div className="p-3">
+            <span>Link Speaker-Evaluation</span><br/>
+            <EhDebounceInput 
+            placeholder="URL eintragen"
+            onChangeHandler={handleSetSpeakerQuestionaire}
+            inputText={program.speakerQuestionnaire || ""}
+            />
+          </div>
+          <div className="p-3">
+            <span>Link Abschluss-Evaluation</span><br/>
+            <EhDebounceInput 
+              placeholder="URL eintragen"
+              onChangeHandler={handleSetClosingQuestionaire}
+              inputText={program.closingQuestionnaire || ""}
+            />
+          </div>
+
+          <div className="p-3">
+            template teilnahmenachweis <br/>
+            todo
+          </div>
+          <div className="p-3">
+            template leistungszertifiat <br/>
+            todo
+          </div>
+          <div className="p-3">
+            Bescheinigungen einblenden:
+            <div className="grid grid-cols-10">
+              <div className="cursor-pointer" onClick={handleToggleVisibilityParticipationCertificate}>
+              {program.visibilityParticipationCertificate && <MdCheckBox size="1.5em" />}
+              {!program.visibilityParticipationCertificate && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
+              </div>
+              <div className="col-span-9">
+              Teilnahmenachweis
+              </div>
+            </div>
+            <div className="grid grid-cols-10">
+              <div className="cursor-pointer" onClick={handleToggleVisibilityAchievementCertificate}>
+              {program.visibilityAchievementCertificate && <MdCheckBox size="1.5em" />}
+              {!program.visibilityAchievementCertificate && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
+              </div>
+              <div className="col-span-9">
+              Leistungszertifikat
+              </div>
+            </div>
+          </div>
+        </div>
+
+        </div>}
     </div>
   );
 };

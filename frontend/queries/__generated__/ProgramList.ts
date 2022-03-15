@@ -7,6 +7,11 @@
 // GraphQL query operation: ProgramList
 // ====================================================
 
+export interface ProgramList_Program_Courses {
+  __typename: "Course";
+  id: number;
+}
+
 export interface ProgramList_Program {
   __typename: "Program";
   id: number;
@@ -74,6 +79,10 @@ export interface ProgramList_Program {
    * Sets the participation certificates for all courses of htis program to be visible for the recipients.
    */
   visibilityParticipationCertificate: boolean | null;
+  /**
+   * An array relationship
+   */
+  Courses: ProgramList_Program_Courses[];
 }
 
 export interface ProgramList {

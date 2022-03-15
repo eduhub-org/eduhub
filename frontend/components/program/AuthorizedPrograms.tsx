@@ -31,14 +31,19 @@ import {
 import {
   DELETE_PROGRAM,
   INSERT_PROGRAM,
+  UPDATE_ClOSING_QUESTIONAIRE,
+  UPDATE_PROGRAM_ACHIEVEMENT_CERT_VISIBLE,
   UPDATE_PROGRAM_APPLICATION_END,
   UPDATE_PROGRAM_APPLICATION_START,
   UPDATE_PROGRAM_LECTURE_END,
   UPDATE_PROGRAM_LECTURE_START,
+  UPDATE_PROGRAM_PARTICIPATION_CERT_VISIBLE,
   UPDATE_PROGRAM_SHORT_TITLE,
   UPDATE_PROGRAM_TITLE,
   UPDATE_PROGRAM_UPLOAD_DEADLINE,
   UPDATE_PROGRAM_VISIBILITY,
+  UPDATE_SPEAKER_QUESTIONAIRE,
+  UPDATE_START_QUESTIONAIRE,
 } from "../../queries/updateProgram";
 import {
   UpdateProgramTitle,
@@ -69,7 +74,7 @@ import {
   UpdateProgramUploadDeadlineVariables,
 } from "../../queries/__generated__/UpdateProgramUploadDeadline";
 
-import { Button, IconButton } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 
 import {
   InsertProgram,
@@ -80,6 +85,11 @@ import {
   DeleteProgramVariables,
 } from "../../queries/__generated__/DeleteProgram";
 import { ProgramsRow } from "./ProgramsRow";
+import { UpdateProgramStartQuestionaire, UpdateProgramStartQuestionaireVariables } from "../../queries/__generated__/UpdateProgramStartQuestionaire";
+import { UpdateProgramSpeakerQuestionaire } from "../../queries/__generated__/UpdateProgramSpeakerQuestionaire";
+import { UpdateProgramClosingQuestionaire, UpdateProgramClosingQuestionaireVariables } from "../../queries/__generated__/UpdateProgramClosingQuestionaire";
+import { UpdateProgramAchievementCertVisible, UpdateProgramAchievementCertVisibleVariables } from "../../queries/__generated__/UpdateProgramAchievementCertVisible";
+import { UpdateProgramParticipationCertVisible, UpdateProgramParticipationCertVisibleVariables } from "../../queries/__generated__/UpdateProgramParticipationCertVisible";
 
 export const AuthorizedPrograms: FC = () => {
   const qResult = useAdminQuery<ProgramList>(PROGRAM_LIST);
@@ -92,6 +102,7 @@ export const AuthorizedPrograms: FC = () => {
   ps.sort((a, b) => {
     return b.id - a.id;
   });
+
   const programs = ps;
 
   const [openProgram, setOpenProgram] = useState(-1);
@@ -279,6 +290,94 @@ export const AuthorizedPrograms: FC = () => {
     [qResult, updateUploadDeadline]
   );
 
+  const [updateStartQuestionaire] = useAdminMutation<
+      UpdateProgramStartQuestionaire,
+      UpdateProgramStartQuestionaireVariables
+    >(UPDATE_START_QUESTIONAIRE);
+  
+  const handleStartQuestionaire = useCallback(
+    async (p: ProgramList_Program, link: string) => {
+      await updateStartQuestionaire({
+        variables: {
+          programId: p.id,
+          questionaire: link
+        }
+      });
+      qResult.refetch();
+    },
+    [qResult, updateStartQuestionaire]
+  );
+
+  const [updateSpeakerQuestionaire] = useAdminMutation<
+    UpdateProgramSpeakerQuestionaire,
+    UpdateProgramStartQuestionaireVariables
+  >(UPDATE_SPEAKER_QUESTIONAIRE);
+
+  const handleSpeakerQuestionaire = useCallback(
+    async (p: ProgramList_Program, link: string) => {
+      await updateSpeakerQuestionaire({
+        variables: {
+          programId: p.id,
+          questionaire: link
+        }
+      });
+      qResult.refetch();
+    },
+    [qResult, updateSpeakerQuestionaire]
+  );
+
+  const [updateClosingQuestionaire] = useAdminMutation<
+      UpdateProgramClosingQuestionaire,
+      UpdateProgramClosingQuestionaireVariables
+    >(UPDATE_ClOSING_QUESTIONAIRE);
+  const handleClosingQuestionaire = useCallback(
+    async (p: ProgramList_Program, link: string) => {
+      await updateClosingQuestionaire({
+        variables: {
+          programId: p.id,
+          questionaire: link
+        }
+      });
+      qResult.refetch();
+    },
+    [qResult, updateClosingQuestionaire]
+  );
+
+  const [updateProgramAchievementCertVisible] = useAdminMutation<
+    UpdateProgramAchievementCertVisible,
+    UpdateProgramAchievementCertVisibleVariables
+  >(UPDATE_PROGRAM_ACHIEVEMENT_CERT_VISIBLE);
+  const handleProgramAchivementCertVisible = useCallback(
+    async (p: ProgramList_Program, isVisible: boolean) => {
+      await updateProgramAchievementCertVisible({
+        variables: {
+          programId: p.id,
+          isVisible
+        }
+      });
+      qResult.refetch();
+    },
+    [qResult, updateProgramAchievementCertVisible]
+  );
+
+  const [updateProgramParticipationCertVisible] = useAdminMutation<
+    UpdateProgramParticipationCertVisible,
+    UpdateProgramParticipationCertVisibleVariables
+  >(UPDATE_PROGRAM_PARTICIPATION_CERT_VISIBLE);
+  const handleProgramParticipationCertVisible = useCallback(
+    async (p: ProgramList_Program, isVisible: boolean) => {
+      await updateProgramParticipationCertVisible({
+        variables: {
+          programId: p.id,
+          isVisible
+        }
+      });
+      qResult.refetch();
+    },
+    [qResult, updateProgramParticipationCertVisible]
+  );
+
+
   const [
     activeDialogProgram,
     setActiveDialogProgram,
@@ -380,6 +479,7 @@ export const AuthorizedPrograms: FC = () => {
             <ProgramsRow
               key={v.id}
               program={v}
+              canDelete={v.Courses.length === 0}
               openProgramId={openProgram}
               onSetVisibility={handleToggleVisibility}
               onSetTitle={handleProgramTitle}
@@ -391,6 +491,11 @@ export const AuthorizedPrograms: FC = () => {
               onSetUploadData={handleUploadDeadline}
               onDelete={handleDelete}
               onOpenProgram={handleOpenProgram}
+              onSetStartQuestionaire={handleStartQuestionaire}
+              onSetClosingQuestionaire={handleClosingQuestionaire}
+              onSetSpeakerQuestionaire={handleSpeakerQuestionaire}
+              onSetVisibilityParticipationCertificate={handleProgramParticipationCertVisible}
+              onSetVisiblityAchievementCertificate={handleProgramAchivementCertVisible}
             />
           ))}
         <div className="flex justify-end mt-12 mb-12">
@@ -414,8 +519,6 @@ export const AuthorizedPrograms: FC = () => {
       <QuestionConfirmationDialog
         question={`Möchtest du das Programm "${activeDialogProgram?.title}" wirklich löschen?`}
         confirmationText={"Löschen"}
-        // TODO: This should only be allowed if there are no more courses in the program?!
-        // or set the right cascades properties in the database?
         onClose={handleConfirmDeleteProgramClose}
         open={confirmDeleteProgramOpen}
       />
