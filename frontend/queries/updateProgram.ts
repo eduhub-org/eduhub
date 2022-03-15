@@ -127,7 +127,10 @@ export const UPDATE_PROGRAM_UPLOAD_DEADLINE = gql`
 `;
 
 export const UPDATE_START_QUESTIONAIRE = gql`
-  mutation UpdateProgramStartQuestionaire($programId: Int!, $questionaire: String!) {
+  mutation UpdateProgramStartQuestionaire(
+    $programId: Int!
+    $questionaire: String!
+  ) {
     update_Program_by_pk(
       pk_columns: { id: $programId }
       _set: { startQuestionnaire: $questionaire }
@@ -138,7 +141,10 @@ export const UPDATE_START_QUESTIONAIRE = gql`
 `;
 
 export const UPDATE_SPEAKER_QUESTIONAIRE = gql`
-  mutation UpdateProgramSpeakerQuestionaire($programId: Int!, $questionaire: String!) {
+  mutation UpdateProgramSpeakerQuestionaire(
+    $programId: Int!
+    $questionaire: String!
+  ) {
     update_Program_by_pk(
       pk_columns: { id: $programId }
       _set: { speakerQuestionnaire: $questionaire }
@@ -149,7 +155,10 @@ export const UPDATE_SPEAKER_QUESTIONAIRE = gql`
 `;
 
 export const UPDATE_ClOSING_QUESTIONAIRE = gql`
-  mutation UpdateProgramClosingQuestionaire($programId: Int!, $questionaire: String!) {
+  mutation UpdateProgramClosingQuestionaire(
+    $programId: Int!
+    $questionaire: String!
+  ) {
     update_Program_by_pk(
       pk_columns: { id: $programId }
       _set: { closingQuestionnaire: $questionaire }
@@ -160,7 +169,10 @@ export const UPDATE_ClOSING_QUESTIONAIRE = gql`
 `;
 
 export const UPDATE_PROGRAM_ACHIEVEMENT_CERT_VISIBLE = gql`
-  mutation UpdateProgramAchievementCertVisible($programId: Int!, $isVisible: Boolean!) {
+  mutation UpdateProgramAchievementCertVisible(
+    $programId: Int!
+    $isVisible: Boolean!
+  ) {
     update_Program_by_pk(
       pk_columns: { id: $programId }
       _set: { visibilityAchievementCertificate: $isVisible }
@@ -171,7 +183,10 @@ export const UPDATE_PROGRAM_ACHIEVEMENT_CERT_VISIBLE = gql`
 `;
 
 export const UPDATE_PROGRAM_PARTICIPATION_CERT_VISIBLE = gql`
-  mutation UpdateProgramParticipationCertVisible($programId: Int!, $isVisible: Boolean!) {
+  mutation UpdateProgramParticipationCertVisible(
+    $programId: Int!
+    $isVisible: Boolean!
+  ) {
     update_Program_by_pk(
       pk_columns: { id: $programId }
       _set: { visibilityParticipationCertificate: $isVisible }

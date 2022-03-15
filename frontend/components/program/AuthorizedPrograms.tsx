@@ -85,11 +85,23 @@ import {
   DeleteProgramVariables,
 } from "../../queries/__generated__/DeleteProgram";
 import { ProgramsRow } from "./ProgramsRow";
-import { UpdateProgramStartQuestionaire, UpdateProgramStartQuestionaireVariables } from "../../queries/__generated__/UpdateProgramStartQuestionaire";
+import {
+  UpdateProgramStartQuestionaire,
+  UpdateProgramStartQuestionaireVariables,
+} from "../../queries/__generated__/UpdateProgramStartQuestionaire";
 import { UpdateProgramSpeakerQuestionaire } from "../../queries/__generated__/UpdateProgramSpeakerQuestionaire";
-import { UpdateProgramClosingQuestionaire, UpdateProgramClosingQuestionaireVariables } from "../../queries/__generated__/UpdateProgramClosingQuestionaire";
-import { UpdateProgramAchievementCertVisible, UpdateProgramAchievementCertVisibleVariables } from "../../queries/__generated__/UpdateProgramAchievementCertVisible";
-import { UpdateProgramParticipationCertVisible, UpdateProgramParticipationCertVisibleVariables } from "../../queries/__generated__/UpdateProgramParticipationCertVisible";
+import {
+  UpdateProgramClosingQuestionaire,
+  UpdateProgramClosingQuestionaireVariables,
+} from "../../queries/__generated__/UpdateProgramClosingQuestionaire";
+import {
+  UpdateProgramAchievementCertVisible,
+  UpdateProgramAchievementCertVisibleVariables,
+} from "../../queries/__generated__/UpdateProgramAchievementCertVisible";
+import {
+  UpdateProgramParticipationCertVisible,
+  UpdateProgramParticipationCertVisibleVariables,
+} from "../../queries/__generated__/UpdateProgramParticipationCertVisible";
 
 export const AuthorizedPrograms: FC = () => {
   const qResult = useAdminQuery<ProgramList>(PROGRAM_LIST);
@@ -291,17 +303,17 @@ export const AuthorizedPrograms: FC = () => {
   );
 
   const [updateStartQuestionaire] = useAdminMutation<
-      UpdateProgramStartQuestionaire,
-      UpdateProgramStartQuestionaireVariables
-    >(UPDATE_START_QUESTIONAIRE);
-  
+    UpdateProgramStartQuestionaire,
+    UpdateProgramStartQuestionaireVariables
+  >(UPDATE_START_QUESTIONAIRE);
+
   const handleStartQuestionaire = useCallback(
     async (p: ProgramList_Program, link: string) => {
       await updateStartQuestionaire({
         variables: {
           programId: p.id,
-          questionaire: link
-        }
+          questionaire: link,
+        },
       });
       qResult.refetch();
     },
@@ -318,8 +330,8 @@ export const AuthorizedPrograms: FC = () => {
       await updateSpeakerQuestionaire({
         variables: {
           programId: p.id,
-          questionaire: link
-        }
+          questionaire: link,
+        },
       });
       qResult.refetch();
     },
@@ -327,16 +339,16 @@ export const AuthorizedPrograms: FC = () => {
   );
 
   const [updateClosingQuestionaire] = useAdminMutation<
-      UpdateProgramClosingQuestionaire,
-      UpdateProgramClosingQuestionaireVariables
-    >(UPDATE_ClOSING_QUESTIONAIRE);
+    UpdateProgramClosingQuestionaire,
+    UpdateProgramClosingQuestionaireVariables
+  >(UPDATE_ClOSING_QUESTIONAIRE);
   const handleClosingQuestionaire = useCallback(
     async (p: ProgramList_Program, link: string) => {
       await updateClosingQuestionaire({
         variables: {
           programId: p.id,
-          questionaire: link
-        }
+          questionaire: link,
+        },
       });
       qResult.refetch();
     },
@@ -352,8 +364,8 @@ export const AuthorizedPrograms: FC = () => {
       await updateProgramAchievementCertVisible({
         variables: {
           programId: p.id,
-          isVisible
-        }
+          isVisible,
+        },
       });
       qResult.refetch();
     },
@@ -369,14 +381,13 @@ export const AuthorizedPrograms: FC = () => {
       await updateProgramParticipationCertVisible({
         variables: {
           programId: p.id,
-          isVisible
-        }
+          isVisible,
+        },
       });
       qResult.refetch();
     },
     [qResult, updateProgramParticipationCertVisible]
   );
-
 
   const [
     activeDialogProgram,
@@ -494,8 +505,12 @@ export const AuthorizedPrograms: FC = () => {
               onSetStartQuestionaire={handleStartQuestionaire}
               onSetClosingQuestionaire={handleClosingQuestionaire}
               onSetSpeakerQuestionaire={handleSpeakerQuestionaire}
-              onSetVisibilityParticipationCertificate={handleProgramParticipationCertVisible}
-              onSetVisiblityAchievementCertificate={handleProgramAchivementCertVisible}
+              onSetVisibilityParticipationCertificate={
+                handleProgramParticipationCertVisible
+              }
+              onSetVisiblityAchievementCertificate={
+                handleProgramAchivementCertVisible
+              }
             />
           ))}
         <div className="flex justify-end mt-12 mb-12">

@@ -4,7 +4,12 @@ import { ChangeEvent, FC, useCallback } from "react";
 import DatePicker from "react-datepicker";
 import { DebounceInput } from "react-debounce-input";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { MdCheckBox, MdCheckBoxOutlineBlank, MdDelete, MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
+import {
+  MdCheckBox,
+  MdCheckBoxOutlineBlank,
+  MdDelete,
+  MdOutlineCheckBoxOutlineBlank,
+} from "react-icons/md";
 import { ProgramList_Program } from "../../queries/__generated__/ProgramList";
 import EhDebounceInput from "../common/EhDebounceInput";
 
@@ -23,8 +28,14 @@ interface ProgramsRowProps {
   onSetStartQuestionaire: (p: ProgramList_Program, link: string) => any;
   onSetSpeakerQuestionaire: (p: ProgramList_Program, link: string) => any;
   onSetClosingQuestionaire: (p: ProgramList_Program, link: string) => any;
-  onSetVisibilityParticipationCertificate: (p: ProgramList_Program, isVisible: boolean) => any;
-  onSetVisiblityAchievementCertificate: (p: ProgramList_Program, isVisible: boolean) => any;
+  onSetVisibilityParticipationCertificate: (
+    p: ProgramList_Program,
+    isVisible: boolean
+  ) => any;
+  onSetVisiblityAchievementCertificate: (
+    p: ProgramList_Program,
+    isVisible: boolean
+  ) => any;
   onDelete: (p: ProgramList_Program) => any;
   onOpenProgram: (p: ProgramList_Program) => any;
 }
@@ -47,14 +58,20 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   onSetSpeakerQuestionaire,
   onSetClosingQuestionaire,
   onSetVisibilityParticipationCertificate,
-  onSetVisiblityAchievementCertificate
+  onSetVisiblityAchievementCertificate,
 }) => {
   const handleToggleVisibilityParticipationCertificate = useCallback(() => {
-    onSetVisibilityParticipationCertificate(program, !program.visibilityParticipationCertificate);
+    onSetVisibilityParticipationCertificate(
+      program,
+      !program.visibilityParticipationCertificate
+    );
   }, [program, onSetVisibilityParticipationCertificate]);
 
   const handleToggleVisibilityAchievementCertificate = useCallback(() => {
-    onSetVisiblityAchievementCertificate(program, !program.visibilityAchievementCertificate);
+    onSetVisiblityAchievementCertificate(
+      program,
+      !program.visibilityAchievementCertificate
+    );
   }, [program, onSetVisiblityAchievementCertificate]);
 
   const handleToggleVisibility = useCallback(() => {
@@ -151,7 +168,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         </div>
 
         <div className="col-span-2">
-          <EhDebounceInput 
+          <EhDebounceInput
             placeholder="Programmtitel setzen"
             onChangeHandler={handleSetTitle}
             inputText={program.title}
@@ -159,7 +176,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         </div>
 
         <div>
-          <EhDebounceInput 
+          <EhDebounceInput
             placeholder="Kurztitel setzen"
             onChangeHandler={handleSetShortTitle}
             inputText={program.shortTitle ?? ""}
@@ -222,74 +239,89 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
             </IconButton>
           </div>
 
-          {canDelete && <div>
-            <IconButton onClick={handleDeleteProgram}>
-              <MdDelete size="0.75em" />
-            </IconButton>
-          </div>}
+          {canDelete && (
+            <div>
+              <IconButton onClick={handleDeleteProgram}>
+                <MdDelete size="0.75em" />
+              </IconButton>
+            </div>
+          )}
         </div>
       </div>
 
-      {program.id === openProgramId && <div className="mb-1">
-
-        <div className="grid grid-cols-3 bg-gray-100 p-10">
-          <div className="p-3">
-            <span>Link Start-Evaluation</span><br/>
-            <EhDebounceInput 
-              placeholder="URL eintragen"
-              onChangeHandler={handleSetStartQuestionaire}
-              inputText={program.startQuestionnaire || ""}
-            />
-          </div>
-          <div className="p-3">
-            <span>Link Speaker-Evaluation</span><br/>
-            <EhDebounceInput 
-            placeholder="URL eintragen"
-            onChangeHandler={handleSetSpeakerQuestionaire}
-            inputText={program.speakerQuestionnaire || ""}
-            />
-          </div>
-          <div className="p-3">
-            <span>Link Abschluss-Evaluation</span><br/>
-            <EhDebounceInput 
-              placeholder="URL eintragen"
-              onChangeHandler={handleSetClosingQuestionaire}
-              inputText={program.closingQuestionnaire || ""}
-            />
-          </div>
-
-          <div className="p-3">
-            template teilnahmenachweis <br/>
-            todo
-          </div>
-          <div className="p-3">
-            template leistungszertifiat <br/>
-            todo
-          </div>
-          <div className="p-3">
-            Bescheinigungen einblenden:
-            <div className="grid grid-cols-10">
-              <div className="cursor-pointer" onClick={handleToggleVisibilityParticipationCertificate}>
-              {program.visibilityParticipationCertificate && <MdCheckBox size="1.5em" />}
-              {!program.visibilityParticipationCertificate && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
-              </div>
-              <div className="col-span-9">
-              Teilnahmenachweis
-              </div>
+      {program.id === openProgramId && (
+        <div className="mb-1">
+          <div className="grid grid-cols-3 bg-gray-100 p-10">
+            <div className="p-3">
+              <span>Link Start-Evaluation</span>
+              <br />
+              <EhDebounceInput
+                placeholder="URL eintragen"
+                onChangeHandler={handleSetStartQuestionaire}
+                inputText={program.startQuestionnaire || ""}
+              />
             </div>
-            <div className="grid grid-cols-10">
-              <div className="cursor-pointer" onClick={handleToggleVisibilityAchievementCertificate}>
-              {program.visibilityAchievementCertificate && <MdCheckBox size="1.5em" />}
-              {!program.visibilityAchievementCertificate && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
+            <div className="p-3">
+              <span>Link Speaker-Evaluation</span>
+              <br />
+              <EhDebounceInput
+                placeholder="URL eintragen"
+                onChangeHandler={handleSetSpeakerQuestionaire}
+                inputText={program.speakerQuestionnaire || ""}
+              />
+            </div>
+            <div className="p-3">
+              <span>Link Abschluss-Evaluation</span>
+              <br />
+              <EhDebounceInput
+                placeholder="URL eintragen"
+                onChangeHandler={handleSetClosingQuestionaire}
+                inputText={program.closingQuestionnaire || ""}
+              />
+            </div>
+
+            <div className="p-3">
+              template teilnahmenachweis <br />
+              todo
+            </div>
+            <div className="p-3">
+              template leistungszertifiat <br />
+              todo
+            </div>
+            <div className="p-3">
+              Bescheinigungen einblenden:
+              <div className="grid grid-cols-10">
+                <div
+                  className="cursor-pointer"
+                  onClick={handleToggleVisibilityParticipationCertificate}
+                >
+                  {program.visibilityParticipationCertificate && (
+                    <MdCheckBox size="1.5em" />
+                  )}
+                  {!program.visibilityParticipationCertificate && (
+                    <MdOutlineCheckBoxOutlineBlank size="1.5em" />
+                  )}
+                </div>
+                <div className="col-span-9">Teilnahmenachweis</div>
               </div>
-              <div className="col-span-9">
-              Leistungszertifikat
+              <div className="grid grid-cols-10">
+                <div
+                  className="cursor-pointer"
+                  onClick={handleToggleVisibilityAchievementCertificate}
+                >
+                  {program.visibilityAchievementCertificate && (
+                    <MdCheckBox size="1.5em" />
+                  )}
+                  {!program.visibilityAchievementCertificate && (
+                    <MdOutlineCheckBoxOutlineBlank size="1.5em" />
+                  )}
+                </div>
+                <div className="col-span-9">Leistungszertifikat</div>
               </div>
             </div>
           </div>
         </div>
-
-        </div>}
+      )}
     </div>
   );
 };
