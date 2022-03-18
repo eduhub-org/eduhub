@@ -32,13 +32,14 @@ export interface InsertCourse {
 }
 
 export interface InsertCourseVariables {
-  title: string;
-  today: any;
-  instructorID: string;
-  program: string;
-  ects: string;
-  tagline: string;
-  language: string;
   achievementCertificatePossible: boolean;
+  attendanceCertificatePossible: boolean;
+  applicationEnd: any;
+  ects: string;
   headingDescriptionField1: string;
+  language: string;
+  maxMissedSessions: number;
+  programId: number;
+  tagline: string;
+  title: string;
 }

@@ -2,33 +2,43 @@ import { gql } from "@apollo/client";
 
 export const INSERT_A_COURSE = gql`
   mutation InsertCourse(
-    $title: String!
-    $today: date!
-    $instructorID: String!
-    $program: String!
-    $ects: String!
-    $tagline: String!
-    $language: String!
     $achievementCertificatePossible: Boolean!
+    $attendanceCertificatePossible: Boolean!
+    $applicationEnd: date!
+    $ects: String!
     $headingDescriptionField1: String!
+    $language: String!
+    $maxMissedSessions: Int!
+    $programId: Int!
+    $tagline: String!
+    $title: String!
   ) {
     insert_Course(
       objects: {
-        title: $title
-        ects: $ects
-        tagline: $tagline
-        language: $language
-        applicationEnd: $today
-        defaultApplicationEnd: $today
-        projectRecordUploadDeadline: $today
         achievementCertificatePossible: $achievementCertificatePossible
+        attendanceCertificatePossible: $attendanceCertificatePossible
+        applicationEnd: $applicationEnd
+        ects: $ects
         headingDescriptionField1: $headingDescriptionField1
+        language: $language
+        maxMissedSessions: $maxMissedSessions
+        programId: $programId
+        tagline: $tagline
+        title: $title
       }
     ) {
       affected_rows
       returning {
         id
       }
+    }
+  }
+`;
+
+export const DELETE_A_COURSE = gql`
+  mutation DeleteCourseByPk($id: Int!) {
+    delete_Course_by_pk(id: $id) {
+      id
     }
   }
 `;

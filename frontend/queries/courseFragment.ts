@@ -67,7 +67,7 @@ export const ADMIN_COURSE_FRAGMENT = gql`
       title
       shortTitle
     }
-    CourseInstructors {
+    CourseInstructors(order_by: { id: desc }) {
       id
       Expert {
         id

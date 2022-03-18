@@ -114,7 +114,7 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
 
     - Open a docker shell for the  `edu-hub_frontend_1` image via the following command
 
-         sudo docker exec -it edu-hub_frontend_1 /bin/sh
+            sudo docker exec -it edu-hub_frontend_1 /bin/sh
     - Install `yarn` ( if not installed) 
 
           /opt/app # yarn
