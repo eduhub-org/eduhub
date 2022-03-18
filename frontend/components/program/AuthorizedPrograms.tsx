@@ -102,6 +102,8 @@ import {
   UpdateProgramParticipationCertVisible,
   UpdateProgramParticipationCertVisibleVariables,
 } from "../../queries/__generated__/UpdateProgramParticipationCertVisible";
+import { SaveAFile, SaveAFileVariables } from "../../queries/__generated__/SaveAFile";
+import { SAVE_FILE } from "../../queries/actions";
 
 export const AuthorizedPrograms: FC = () => {
   const qResult = useAdminQuery<ProgramList>(PROGRAM_LIST);
@@ -118,6 +120,23 @@ export const AuthorizedPrograms: FC = () => {
   const programs = ps;
 
   const [openProgram, setOpenProgram] = useState(-1);
+
+  const [saveFile, saveFileStatus] = useAdminMutation<SaveAFile, SaveAFileVariables>(SAVE_FILE);
+
+  console.log(saveFileStatus);
+
+  const saveTestFile = useCallback(async () => {
+    const helloWorld = "SGVsbG8gV29ybGQ=";
+    const fileName = "hello.txt";
+    const response = await saveFile({
+      variables: {
+        base64file: helloWorld,
+        fileName
+      }
+    });
+    
+    console.log(response);
+  }, [saveFile, saveFileStatus]);
 
   const [insertProgram] = useAdminMutation<
     InsertProgram,
@@ -467,6 +486,7 @@ export const AuthorizedPrograms: FC = () => {
       <PageBlock>
         <div className="flex flex-row mb-12">
           <h1 className="text-4xl font-bold">Programme</h1>
+          <Button onClick={saveTestFile}>test file upload!</Button>
         </div>
         <div className="flex justify-end mb-12">
           <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />}>

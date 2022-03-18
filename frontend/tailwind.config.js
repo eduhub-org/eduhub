@@ -7,9 +7,11 @@ module.exports = {
     extend: {
       colors: {
         "edu-black": "#222222",
+        "edu-light-gray": "#F2F2F2",
         "edu-course-current": "#A2EBA0",
         "edu-course-invited": "#FFA665",
         "edu-green": "#00A398",
+        "edu-confirmed": "#A2EBA0",
         "edu-missed-yellow": "#F2991D66",
         "edu-course-list": "#F2F2F2",
         "edu-modal-bg-color": "#222222",

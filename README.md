@@ -107,6 +107,7 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
    
    Stop/Start the the images together.
    
+        First start: sudo docker-compose -f docker-compose-dev.yml up -d
         sudo docker-compose stop
         sudo docker-compose start
 
@@ -115,7 +116,7 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
     - Open a docker shell for the  `edu-hub_frontend_1` image via the following command
 
          sudo docker exec -it edu-hub_frontend_1 /bin/sh
-    - Install `yarn` ( if not installed) 
+    - Install dependencies via `yarn` (if not installed previously) 
 
           /opt/app # yarn
     - Run the Frontend with `hot reloading`

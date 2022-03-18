@@ -35,6 +35,7 @@ services:
     env_file:
       - hasura_keycloak.env
     environment:
+      HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: "inherited_roles"
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@db_hasura:5432/postgres
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
       HASURA_GRAPHQL_DEV_MODE: "true"
