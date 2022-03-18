@@ -32,8 +32,23 @@ insert_permissions:
     - courseId
     - motivationLetter
     - userId
-  role: user
+  role: user_access
 select_permissions:
+- permission:
+    columns:
+    - id
+    - courseId
+    - userId
+    - status
+    - motivationLetter
+    - motivationRating
+    - achievementCertificateURL
+    - attendanceCertificateURL
+    - createdAt
+    - updatedAt
+    - invitationExpirationDate
+    filter: {}
+  role: instructor_access
 - permission:
     columns:
     - achievementCertificateURL
@@ -45,6 +60,18 @@ select_permissions:
     - status
     - userId
     filter:
-      userId:
-        _eq: X-Hasura-User-Id
-  role: user
+      User:
+        id:
+          _eq: X-Hasura-User-Id
+  role: user_access
+update_permissions:
+- permission:
+    check: {}
+    columns:
+    - achievementCertificateURL
+    - attendanceCertificateURL
+    - invitationExpirationDate
+    - motivationRating
+    - status
+    filter: {}
+  role: instructor_access

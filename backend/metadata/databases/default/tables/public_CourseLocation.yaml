@@ -23,6 +23,7 @@ select_permissions:
     - locationOption
     - longitude
     filter: {}
+    limit: 10
   role: anonymous
 - permission:
     columns:
@@ -33,4 +34,5 @@ select_permissions:
     - locationOption
     - longitude
     filter: {}
-  role: user
+    limit: 10
+  role: user_access

@@ -10,3 +10,10 @@ array_relationships:
       table:
         name: Attendance
         schema: public
+select_permissions:
+- permission:
+    columns:
+    - comment
+    - value
+    filter: {}
+  role: anonymous

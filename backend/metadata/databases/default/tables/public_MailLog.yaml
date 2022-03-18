@@ -11,3 +11,17 @@ object_relationships:
       remote_table:
         name: MailStatus
         schema: public
+event_triggers:
+- definition:
+    enable_manual: true
+    insert:
+      columns: "*"
+  headers:
+  - name: secret
+    value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  name: send_mail
+  retry_conf:
+    interval_sec: 10
+    num_retries: 0
+    timeout_sec: 60
+  webhook: "{{CLOUD_FUNCTION_LINK}}/sendMail"

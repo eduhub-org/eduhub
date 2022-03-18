@@ -12,3 +12,10 @@ array_relationships:
       remote_table:
         name: ProjectEnrollment
         schema: public
+select_permissions:
+- permission:
+    columns:
+    - value
+    - comment
+    filter: {}
+  role: anonymous

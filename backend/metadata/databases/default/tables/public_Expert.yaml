@@ -27,11 +27,11 @@ select_permissions:
     - userId
     - description
     filter: {}
+    limit: 10
   role: anonymous
 - permission:
     columns:
-    - id
-    - userId
     - description
+    - userId
     filter: {}
-  role: user
+  role: instructor_access
