@@ -124,25 +124,25 @@ export const AuthorizedPrograms: FC = () => {
 
   const [openProgram, setOpenProgram] = useState(-1);
 
-  const [saveFile, saveFileStatus] = useAdminMutation<
-    SaveAFile,
-    SaveAFileVariables
-  >(SAVE_FILE);
+  // const [saveFile, saveFileStatus] = useAdminMutation<
+  //   SaveAFile,
+  //   SaveAFileVariables
+  // >(SAVE_FILE);
 
-  console.log(saveFileStatus);
+  // console.log(saveFileStatus);
 
-  const saveTestFile = useCallback(async () => {
-    const helloWorld = "SGVsbG8gV29ybGQ=";
-    const fileName = "hello.txt";
-    const response = await saveFile({
-      variables: {
-        base64file: helloWorld,
-        fileName,
-      },
-    });
+  // const saveTestFile = useCallback(async () => {
+  //   const helloWorld = "aGFjaw==";
+  //   const fileName = "hello.txt";
+  //   const response = await saveFile({
+  //     variables: {
+  //       base64file: helloWorld,
+  //       fileName,
+  //     },
+  //   });
 
-    console.log(response);
-  }, [saveFile]);
+  //   console.log(response);
+  // }, [saveFile]);
 
   const [insertProgram] = useAdminMutation<
     InsertProgram,
@@ -492,7 +492,6 @@ export const AuthorizedPrograms: FC = () => {
       <PageBlock>
         <div className="flex flex-row mb-12">
           <h1 className="text-4xl font-bold">Programme</h1>
-          <Button onClick={saveTestFile}>test file upload!</Button>
         </div>
         <div className="flex justify-end mb-12">
           <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />}>
