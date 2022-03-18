@@ -14,7 +14,6 @@ export const COURSE = gql`
 
 // Query to get all data on a course that is necessary for the manage course page
 export const MANAGED_COURSE = gql`
-
   ${ADMIN_COURSE_FRAGMENT}
   ${ENROLLMENT_FRAGMENT}
 
@@ -26,5 +25,4 @@ export const MANAGED_COURSE = gql`
       }
     }
   }
-
 `;

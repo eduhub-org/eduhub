@@ -102,7 +102,10 @@ import {
   UpdateProgramParticipationCertVisible,
   UpdateProgramParticipationCertVisibleVariables,
 } from "../../queries/__generated__/UpdateProgramParticipationCertVisible";
-import { SaveAFile, SaveAFileVariables } from "../../queries/__generated__/SaveAFile";
+import {
+  SaveAFile,
+  SaveAFileVariables,
+} from "../../queries/__generated__/SaveAFile";
 import { SAVE_FILE } from "../../queries/actions";
 
 export const AuthorizedPrograms: FC = () => {
@@ -121,7 +124,10 @@ export const AuthorizedPrograms: FC = () => {
 
   const [openProgram, setOpenProgram] = useState(-1);
 
-  const [saveFile, saveFileStatus] = useAdminMutation<SaveAFile, SaveAFileVariables>(SAVE_FILE);
+  const [saveFile, saveFileStatus] = useAdminMutation<
+    SaveAFile,
+    SaveAFileVariables
+  >(SAVE_FILE);
 
   console.log(saveFileStatus);
 
@@ -131,12 +137,12 @@ export const AuthorizedPrograms: FC = () => {
     const response = await saveFile({
       variables: {
         base64file: helloWorld,
-        fileName
-      }
+        fileName,
+      },
     });
-    
+
     console.log(response);
-  }, [saveFile, saveFileStatus]);
+  }, [saveFile]);
 
   const [insertProgram] = useAdminMutation<
     InsertProgram,
