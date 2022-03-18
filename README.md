@@ -26,11 +26,15 @@
 
         sh docker_install.sh
 
+1. It is recommended you setup rootless docker commands, so you dont need to sudo docker.
+
 1. Install docker-compose (atlest version 1.29.2). Follow the [link](https://docs.docker.com/compose/install/) to install.
 
 1. Create an empty file in edu-hub root directory called `hasura_keycloak.env`
     
         touch hasura_keycloak.env
+
+1. Fill the hasura_keycloak.env with the HASURA_CLOUD_FUNCTION_SECRET and HASURA_BUCKET. These are private values not part of the public github, you need to ask somebody in the know about them, or use your own cloud functions servers.
 
 1. There is a docker-compose-dev.yml which you can use to start edu-hub with some settings for development. Run the following command to start all the containers as necessary. The frontend container will not yet do anything, but it will mount `./frontend` as a volume and open it as the working directory `/opt/app`.
 
@@ -76,23 +80,26 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
 
     - Replace `PUT_YOUR_PUBLIC_KEY_HERE` with the copied key from step 1.
     - The file hasura_keycloak.env is in .gitignore to allow every developer to have a different value in it.
+1. docker-compose stop
+1. docker-compose start
 
 ## Create an account in keycloak.
 
-1. Add a role `admin` (If not exist)
+1. Add a role `admin` and `instructor` (If not exist)
     
     - Click `Add Role` (Clients -> hasura -> Roles -> Add Role)
     - Role Name: `admin`
     - Save
+    - Do the same for `instructor`
 2. Add user (Users -> Add user)
 3. Reset Password
     - Search user in `Users`
     - Click the user
-    - Reset password (Credentials tab)
+    - Reset password (Credentials tab, disable `temporary`)
 4. Role Mapping
     - Role Mapping tab (Users -> Role Mapping)
     - Client Roles: (hasura)
-    - Assigned Roles from Availeable roles
+    - Assigned Roles from Availeable roles: `user`, `admin` and `instructor`.
 
 ## Start/Stop
 
@@ -110,6 +117,8 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
         First start: sudo docker-compose -f docker-compose-dev.yml up -d
         sudo docker-compose stop
         sudo docker-compose start
+
+    You can track logs with docker-compose logs -f
 
 2. `Hot reloading` of the frontend docker image 
 
