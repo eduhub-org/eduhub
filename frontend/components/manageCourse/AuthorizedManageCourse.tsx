@@ -1,8 +1,6 @@
 import { FC, useCallback, useState } from "react";
 import { useInstructorQuery } from "../../hooks/authedQuery";
-import {
-  MANAGED_COURSE, UPDATE_COURSE_STATUS,
-} from "../../queries/course";
+import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from "../../queries/course";
 import {
   ManagedCourse,
   ManagedCourseVariables,
@@ -13,8 +11,14 @@ import { PageBlock } from "../common/PageBlock";
 import { Button as OldButton } from "../common/Button";
 import { DescriptionTab } from "./DescriptionTab";
 import { QuestionConfirmationDialog } from "../common/QuestionConfirmationDialog";
-import { useAdminMutation, useInstructorMutation } from "../../hooks/authedMutation";
-import { UpdateCourseStatus, UpdateCourseStatusVariables } from "../../queries/__generated__/UpdateCourseStatus";
+import {
+  useAdminMutation,
+  useInstructorMutation,
+} from "../../hooks/authedMutation";
+import {
+  UpdateCourseStatus,
+  UpdateCourseStatusVariables,
+} from "../../queries/__generated__/UpdateCourseStatus";
 import { AlertMessageDialog } from "../common/AlertMessageDialog";
 
 interface Props {
@@ -66,16 +70,18 @@ const canUpgradeStatus = (course: ManagedCourse_Course_by_pk) => {
   const isFilled = (x: string | null) => x != null && x.length > 0;
 
   if (course.status === "DRAFT") {
-    return isFilled(course.learningGoals) &&
+    return (
+      isFilled(course.learningGoals) &&
       isFilled(course.headingDescriptionField1) &&
       isFilled(course.headingDescriptionField2) &&
       isFilled(course.contentDescriptionField1) &&
       isFilled(course.contentDescriptionField2) &&
-      course.CourseLocations.length > 0;
+      course.CourseLocations.length > 0
+    );
   } else {
     return false;
   }
-}
+};
 
 const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
   switch (course.status) {
@@ -88,7 +94,7 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
     default:
       return course.status;
   }
-}
+};
 
 /**
  *
@@ -162,28 +168,37 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
     } else {
       setCantUpgradeOpen(true);
     }
-  }, [course, canUpgradeStatus, setConfirmUpgradeStatusOpen]);
+  }, [course, setConfirmUpgradeStatusOpen]);
   // TODO use instructor mutation once that works!
   const [updateCourseStatusMutation] = useAdminMutation<
     UpdateCourseStatus,
     UpdateCourseStatusVariables
   >(UPDATE_COURSE_STATUS);
-  const handleUpgradeStatus = useCallback(async (confirmAnswer: boolean) => {
-    setConfirmUpgradeStatusOpen(false);
-    if (course != null && confirmAnswer) {
-      const nextStatus = getNextCourseStatus(course);
-      if (nextStatus !== course.status) {
-        setOpenTabIndex(openTabIndex + 1);
-      }
-      await updateCourseStatusMutation({
-        variables: {
-          courseId: course.id,
-          status: nextStatus as any
+  const handleUpgradeStatus = useCallback(
+    async (confirmAnswer: boolean) => {
+      setConfirmUpgradeStatusOpen(false);
+      if (course != null && confirmAnswer) {
+        const nextStatus = getNextCourseStatus(course);
+        if (nextStatus !== course.status) {
+          setOpenTabIndex(openTabIndex + 1);
         }
-      });
-      qResult.refetch();
-    }
-  }, [setConfirmUpgradeStatusOpen, course, getNextCourseStatus, updateCourseStatusMutation, qResult]);
+        await updateCourseStatusMutation({
+          variables: {
+            courseId: course.id,
+            status: nextStatus as any,
+          },
+        });
+        qResult.refetch();
+      }
+    },
+    [
+      setConfirmUpgradeStatusOpen,
+      course,
+      updateCourseStatusMutation,
+      qResult,
+      openTabIndex,
+    ]
+  );
 
   if (course == null) {
     return <div>Kurs {courseId} wurde nicht gefunden!</div>;
@@ -243,13 +258,21 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
             </div>
           </div>
 
-          {openTabIndex === 0 && <DescriptionTab course={course} qResult={qResult} />}
+          {openTabIndex === 0 && (
+            <DescriptionTab course={course} qResult={qResult} />
+          )}
 
-          {openTabIndex === maxAllowedTab && <div className="flex justify-end mb-16">
-            <OldButton onClick={handleRequestUpgradeStatus} as="button" filled={true}>
-              Weiter
-            </OldButton>
-          </div>}
+          {openTabIndex === maxAllowedTab && (
+            <div className="flex justify-end mb-16">
+              <OldButton
+                onClick={handleRequestUpgradeStatus}
+                as="button"
+                filled={true}
+              >
+                Weiter
+              </OldButton>
+            </div>
+          )}
         </>
       </PageBlock>
       <QuestionConfirmationDialog

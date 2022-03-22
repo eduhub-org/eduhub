@@ -204,7 +204,7 @@ export const UPDATE_COURSE_STATUS = gql`
   mutation UpdateCourseStatus($courseId: Int!, $status: CourseStatus_enum!) {
     update_Course_by_pk(
       pk_columns: { id: $courseId }
-      _set: { status: $status  }
+      _set: { status: $status }
     ) {
       id
     }

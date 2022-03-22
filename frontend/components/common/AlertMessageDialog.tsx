@@ -15,7 +15,7 @@ export const AlertMessageDialog: FC<AlertProps> = ({
   alert,
   confirmationText,
   open,
-  onClose
+  onClose,
 }) => {
   const handleClose = useCallback(() => onClose(), [onClose]);
 
@@ -33,7 +33,7 @@ export const AlertMessageDialog: FC<AlertProps> = ({
       <div className="m-16">
         <div className="mb-8">{alert}</div>
         <div className="grid grid-cols-2">
-          <div></div>
+          <div />
           <div className="flex justify-end">
             <Button filled onClick={handleClose}>
               {confirmationText}
