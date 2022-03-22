@@ -1,4 +1,4 @@
-name: Build and Deploy Frontend Docker Image on Google Cloud
+name: Build and Deploy Keycloak Docker Image on Google Cloud
 
 on:   
   push:
