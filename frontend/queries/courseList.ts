@@ -11,10 +11,30 @@ export const COURSE_LIST = gql`
   }
 `;
 
-export const ADMIN_COURSE_LIST = gql`
+/**
+ *
+ * shortTitle: {} means null
+ *
+ * We have to carefull here:
+ *
+ * $programShortTitle/ $title = "%%" or %something%
+ *
+ */
+export const COURSE_LIST_WITH_FILTER = gql`
   ${ADMIN_COURSE_FRAGMENT}
-  query AdminCourseList {
-    Course {
+  query CourseListWithFilter(
+    $courseTitle: String!
+    $programShortTitle: String!
+  ) {
+    Course(
+      order_by: { id: desc }
+      where: {
+        _and: [
+          { title: { _ilike: $courseTitle } }
+          { Program: { _or: [{ shortTitle: { _ilike: $programShortTitle } }] } }
+        ]
+      }
+    ) {
       ...AdminCourseFragment
     }
   }

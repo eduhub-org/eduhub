@@ -6,10 +6,10 @@
 import { CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL query operation: AdminCourseList
+// GraphQL query operation: CourseListWithFilter
 // ====================================================
 
-export interface AdminCourseList_Course_Program {
+export interface CourseListWithFilter_Course_Program {
   __typename: "Program";
   id: number;
   /**
@@ -22,7 +22,7 @@ export interface AdminCourseList_Course_Program {
   shortTitle: string | null;
 }
 
-export interface AdminCourseList_Course_CourseInstructors_Expert_User {
+export interface CourseListWithFilter_Course_CourseInstructors_Expert_User {
   __typename: "User";
   /**
    * The user's first name
@@ -39,29 +39,29 @@ export interface AdminCourseList_Course_CourseInstructors_Expert_User {
   lastName: string;
 }
 
-export interface AdminCourseList_Course_CourseInstructors_Expert {
+export interface CourseListWithFilter_Course_CourseInstructors_Expert {
   __typename: "Expert";
   id: number;
   /**
    * An object relationship
    */
-  User: AdminCourseList_Course_CourseInstructors_Expert_User;
+  User: CourseListWithFilter_Course_CourseInstructors_Expert_User;
   /**
    * A short description on the expert's background
    */
   description: string | null;
 }
 
-export interface AdminCourseList_Course_CourseInstructors {
+export interface CourseListWithFilter_Course_CourseInstructors {
   __typename: "CourseInstructor";
   id: number;
   /**
    * An object relationship
    */
-  Expert: AdminCourseList_Course_CourseInstructors_Expert;
+  Expert: CourseListWithFilter_Course_CourseInstructors_Expert;
 }
 
-export interface AdminCourseList_Course {
+export interface CourseListWithFilter_Course {
   __typename: "Course";
   id: number;
   /**
@@ -139,16 +139,21 @@ export interface AdminCourseList_Course {
   /**
    * An object relationship
    */
-  Program: AdminCourseList_Course_Program | null;
+  Program: CourseListWithFilter_Course_Program | null;
   /**
    * An array relationship
    */
-  CourseInstructors: AdminCourseList_Course_CourseInstructors[];
+  CourseInstructors: CourseListWithFilter_Course_CourseInstructors[];
 }
 
-export interface AdminCourseList {
+export interface CourseListWithFilter {
   /**
    * fetch data from the table: "Course"
    */
-  Course: AdminCourseList_Course[];
+  Course: CourseListWithFilter_Course[];
+}
+
+export interface CourseListWithFilterVariables {
+  courseTitle: string;
+  programShortTitle: string;
 }
