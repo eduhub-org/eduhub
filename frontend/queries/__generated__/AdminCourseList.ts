@@ -133,6 +133,10 @@ export interface AdminCourseList_Course {
    */
   status: CourseStatus_enum;
   /**
+   * An array of texts including the learning goals for the course
+   */
+  learningGoals: string | null;
+  /**
    * An object relationship
    */
   Program: AdminCourseList_Course_Program | null;

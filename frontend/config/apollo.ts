@@ -37,16 +37,6 @@ export const client = new ApolloClient({
               return new Date(applicationEnd);
             },
           },
-          startTime: {
-            merge: (_, startTime) => {
-              return new Date(startTime);
-            },
-          },
-          endTime: {
-            merge: (_, endTime) => {
-              return new Date(endTime);
-            },
-          },
         },
       },
       CourseEnrollment: {

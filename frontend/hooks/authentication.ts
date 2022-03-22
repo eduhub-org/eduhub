@@ -13,3 +13,10 @@ export const useIsAdmin = () => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
   return keycloak?.resourceAccess?.hasura?.roles?.includes("admin") ?? false;
 };
+
+export const useIsInstructor = () => {
+  const { keycloak } = useKeycloak<KeycloakInstance>();
+  return (
+    keycloak?.resourceAccess?.hasura?.roles?.includes("instructor") ?? false
+  );
+};

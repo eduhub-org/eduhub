@@ -62,6 +62,7 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     startTime
     endTime
     status
+    learningGoals
     Program {
       id
       title

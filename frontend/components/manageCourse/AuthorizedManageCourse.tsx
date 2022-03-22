@@ -1,6 +1,8 @@
 import { FC, useCallback, useState } from "react";
-import { useAdminQuery } from "../../hooks/authedQuery";
-import { MANAGED_COURSE } from "../../queries/course";
+import { useInstructorQuery } from "../../hooks/authedQuery";
+import {
+  MANAGED_COURSE, UPDATE_COURSE_STATUS,
+} from "../../queries/course";
 import {
   ManagedCourse,
   ManagedCourseVariables,
@@ -8,6 +10,12 @@ import {
 } from "../../queries/__generated__/ManagedCourse";
 import { CourseStatus_enum } from "../../__generated__/globalTypes";
 import { PageBlock } from "../common/PageBlock";
+import { Button as OldButton } from "../common/Button";
+import { DescriptionTab } from "./DescriptionTab";
+import { QuestionConfirmationDialog } from "../common/QuestionConfirmationDialog";
+import { useAdminMutation, useInstructorMutation } from "../../hooks/authedMutation";
+import { UpdateCourseStatus, UpdateCourseStatusVariables } from "../../queries/__generated__/UpdateCourseStatus";
+import { AlertMessageDialog } from "../common/AlertMessageDialog";
 
 interface Props {
   courseId: number;
@@ -43,12 +51,44 @@ const determineTabClasses = (
     return "bg-edu-black text-white";
   }
 
-  if (tabIndex <= maxAllowedTab) {
+  if (tabIndex < maxAllowedTab) {
     return "bg-edu-confirmed cursor-pointer";
+  }
+
+  if (tabIndex === maxAllowedTab) {
+    return "bg-edu-dark-gray cursor-pointer";
   }
 
   return "bg-edu-light-gray";
 };
+
+const canUpgradeStatus = (course: ManagedCourse_Course_by_pk) => {
+  const isFilled = (x: string | null) => x != null && x.length > 0;
+
+  if (course.status === "DRAFT") {
+    return isFilled(course.learningGoals) &&
+      isFilled(course.headingDescriptionField1) &&
+      isFilled(course.headingDescriptionField2) &&
+      isFilled(course.contentDescriptionField1) &&
+      isFilled(course.contentDescriptionField2) &&
+      course.CourseLocations.length > 0;
+  } else {
+    return false;
+  }
+}
+
+const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
+  switch (course.status) {
+    case "DRAFT":
+      return "READY_FOR_PUBLICATION";
+    case "READY_FOR_PUBLICATION":
+      return "READY_FOR_APPLICATION";
+    case "READY_FOR_APPLICATION":
+      return "APPLICANTS_INVITED";
+    default:
+      return course.status;
+  }
+}
 
 /**
  *
@@ -65,7 +105,7 @@ const determineTabClasses = (
  * @returns {any} the component
  */
 export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
-  const qResult = useAdminQuery<ManagedCourse, ManagedCourseVariables>(
+  const qResult = useInstructorQuery<ManagedCourse, ManagedCourseVariables>(
     MANAGED_COURSE,
     {
       variables: {
@@ -109,9 +149,46 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
     }
   }, [setOpenTabIndex, maxAllowedTab]);
 
+  const [isCantUpgradeOpen, setCantUpgradeOpen] = useState(false);
+  const handleCloseCantUpgrade = useCallback(() => {
+    setCantUpgradeOpen(false);
+  }, [setCantUpgradeOpen]);
+  const [isConfirmUpgradeStatusOpen, setConfirmUpgradeStatusOpen] = useState(
+    false
+  );
+  const handleRequestUpgradeStatus = useCallback(() => {
+    if (course != null && canUpgradeStatus(course)) {
+      setConfirmUpgradeStatusOpen(true);
+    } else {
+      setCantUpgradeOpen(true);
+    }
+  }, [course, canUpgradeStatus, setConfirmUpgradeStatusOpen]);
+  // TODO use instructor mutation once that works!
+  const [updateCourseStatusMutation] = useAdminMutation<
+    UpdateCourseStatus,
+    UpdateCourseStatusVariables
+  >(UPDATE_COURSE_STATUS);
+  const handleUpgradeStatus = useCallback(async (confirmAnswer: boolean) => {
+    setConfirmUpgradeStatusOpen(false);
+    if (course != null && confirmAnswer) {
+      const nextStatus = getNextCourseStatus(course);
+      if (nextStatus !== course.status) {
+        setOpenTabIndex(openTabIndex + 1);
+      }
+      await updateCourseStatusMutation({
+        variables: {
+          courseId: course.id,
+          status: nextStatus as any
+        }
+      });
+      qResult.refetch();
+    }
+  }, [setConfirmUpgradeStatusOpen, course, getNextCourseStatus, updateCourseStatusMutation, qResult]);
+
   if (course == null) {
     return <div>Kurs {courseId} wurde nicht gefunden!</div>;
   }
+
   return (
     <>
       <PageBlock>
@@ -166,12 +243,27 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 ">
-            <div>Kurzbeschreibung (max. 200 Zeichen)</div>
-            <div>Lernziele (max. 500 Zeichen)</div>
-          </div>
+          {openTabIndex === 0 && <DescriptionTab course={course} qResult={qResult} />}
+
+          {openTabIndex === maxAllowedTab && <div className="flex justify-end mb-16">
+            <OldButton onClick={handleRequestUpgradeStatus} as="button" filled={true}>
+              Weiter
+            </OldButton>
+          </div>}
         </>
       </PageBlock>
+      <QuestionConfirmationDialog
+        question={`Möchtest du den Kurs in den nächsten Status schieben?`}
+        confirmationText={"Status hochsetzen"}
+        onClose={handleUpgradeStatus}
+        open={isConfirmUpgradeStatusOpen}
+      />
+      <AlertMessageDialog
+        alert={`Bitte alle Felder ausfüllen bevor der Kurs in den nächsten Status gesetzt wird!`}
+        confirmationText={"OK"}
+        onClose={handleCloseCantUpgrade}
+        open={isCantUpgradeOpen}
+      />
     </>
   );
 };

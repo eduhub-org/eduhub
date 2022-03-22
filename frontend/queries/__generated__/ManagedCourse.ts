@@ -74,6 +74,19 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
   status: CourseEnrollmentStatus_enum;
 }
 
+export interface ManagedCourse_Course_by_pk_CourseLocations {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * HTTP address of the video conference for online participation (only provided if it is an online address)
+   */
+  link: string;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: string | null;
+}
+
 export interface ManagedCourse_Course_by_pk {
   __typename: "Course";
   id: number;
@@ -146,6 +159,10 @@ export interface ManagedCourse_Course_by_pk {
    */
   status: CourseStatus_enum;
   /**
+   * An array of texts including the learning goals for the course
+   */
+  learningGoals: string | null;
+  /**
    * An object relationship
    */
   Program: ManagedCourse_Course_by_pk_Program | null;
@@ -157,6 +174,10 @@ export interface ManagedCourse_Course_by_pk {
    * An array relationship
    */
   CourseEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[];
+  /**
+   * An array relationship
+   */
+  CourseLocations: ManagedCourse_Course_by_pk_CourseLocations[];
 }
 
 export interface ManagedCourse {

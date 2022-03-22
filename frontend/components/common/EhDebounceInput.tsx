@@ -5,6 +5,7 @@ interface IPros {
   placeholder: string;
   debounceTime?: number;
   inputText?: string;
+  textArea?: boolean;
   onChangeHandler: (value: string) => any;
 }
 
@@ -12,6 +13,7 @@ const EhDebounceInput: FC<IPros> = ({
   placeholder,
   debounceTime,
   inputText,
+  textArea,
   onChangeHandler,
 }) => {
   const handOnchange = useCallback(
@@ -30,6 +32,8 @@ const EhDebounceInput: FC<IPros> = ({
             w-full
             border-b border-solid border-gray-300
             focus:border-blue-600 focus:outline-none"
+      element={textArea ? "textarea" : "input"}
+      forceNotifyByEnter={!textArea}
       debounceTimeout={debounceTime ?? 1000}
       value={inputText ?? ""}
       onChange={handOnchange}
