@@ -63,6 +63,10 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     endTime
     status
     learningGoals
+    visibility
+    achievementCertificatePossible
+    attendanceCertificatePossible
+    chatLink
     Program {
       id
       title
