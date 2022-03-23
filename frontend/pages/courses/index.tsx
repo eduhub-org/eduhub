@@ -19,8 +19,8 @@ const Courses: FC = () => {
     ADMIN_PROGRAM_LIST
   ); // Load Program list from db
 
-  if(programListRequest.error) {
-    console.log(programListRequest)
+  if (programListRequest.error) {
+    console.log(programListRequest);
   }
   const ps = [...(programListRequest?.data?.Program || [])];
   if (programListRequest.loading) {

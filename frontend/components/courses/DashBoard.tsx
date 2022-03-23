@@ -3,7 +3,10 @@ import { FC, useCallback, useState } from "react";
 import { useAdminMutation } from "../../hooks/authedMutation";
 import { useAdminQuery, useAuthedQuery } from "../../hooks/authedQuery";
 import { COURSE_LIST_WITH_FILTER } from "../../queries/courseList";
-import { DELETE_A_COURSE, UPDATE_COURSE_PROPERTY } from "../../queries/mutateCourse";
+import {
+  DELETE_A_COURSE,
+  UPDATE_COURSE_PROPERTY,
+} from "../../queries/mutateCourse";
 import {
   CourseListWithFilter,
   CourseListWithFilterVariables,
@@ -14,7 +17,10 @@ import {
   DeleteCourseByPkVariables,
 } from "../../queries/__generated__/DeleteCourseByPk";
 import { ProgramListNoCourse_Program } from "../../queries/__generated__/ProgramListNoCourse";
-import { UpdateCourseByPk, UpdateCourseByPkVariables } from "../../queries/__generated__/UpdateCourseByPk";
+import {
+  UpdateCourseByPk,
+  UpdateCourseByPkVariables,
+} from "../../queries/__generated__/UpdateCourseByPk";
 import EhAddButton from "../common/EhAddButton";
 import ModalControl from "../common/ModalController";
 import { Page } from "../Page";
@@ -49,7 +55,6 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
     DeleteCourseByPkVariables
   >(DELETE_A_COURSE);
 
-
   /* #region callbacks */
 
   // Database Call
@@ -65,7 +70,7 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
   });
 
   if (courseListRequest.error) {
-    console.log(courseListRequest)
+    console.log(courseListRequest);
   }
 
   const courses: CourseListWithFilter_Course[] = [
@@ -79,14 +84,13 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
   });
 
   const handleRefetchRequest = useCallback(() => {
-    setCourseFilter(prev => {
+    setCourseFilter((prev) => {
       courseListRequest.refetch({
         courseTitle: convertToILikeFilter(prev.courseTitle),
         programShortTitle: convertToILikeFilter(prev.programShortTitle),
       });
       return prev;
-    })
-
+    });
   }, [setCourseFilter, courseListRequest]);
 
   const [showModal, setShowModal] = useState(false);
@@ -172,7 +176,6 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
       courseFilter.courseTitle,
     ]
   );
-
 
   /* #endregion */
   return (

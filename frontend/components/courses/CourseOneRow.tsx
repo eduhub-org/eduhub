@@ -1,11 +1,17 @@
-import { Button, IconButton } from "@material-ui/core";
-import { countReset } from "console";
-import { ChangeEvent, FC, useCallback, useState } from "react";
-import { MdCheckBox, MdCheckBoxOutlineBlank, MdDelete, MdKeyboardArrowDown, MdKeyboardArrowUp, MdRemove } from "react-icons/md";
+import { IconButton } from "@material-ui/core";
+import { FC, useCallback, useState } from "react";
+import {
+  MdDelete,
+  MdKeyboardArrowDown,
+  MdKeyboardArrowUp,
+} from "react-icons/md";
 import { useAdminMutation } from "../../hooks/authedMutation";
 import { UPDATE_COURSE_PROPERTY } from "../../queries/mutateCourse";
 import { CourseListWithFilter_Course } from "../../queries/__generated__/CourseListWithFilter";
-import { UpdateCourseByPk, UpdateCourseByPkVariables } from "../../queries/__generated__/UpdateCourseByPk";
+import {
+  UpdateCourseByPk,
+  UpdateCourseByPkVariables,
+} from "../../queries/__generated__/UpdateCourseByPk";
 import { CourseStatus_enum } from "../../__generated__/globalTypes";
 import EhCheckBox from "../common/EhCheckbox";
 import CourseDetails from "./CourseDetails";
@@ -13,48 +19,51 @@ import CourseDetails from "./CourseDetails";
 interface IProps {
   course: CourseListWithFilter_Course;
   handleDelete: (id: number) => void;
-  refetchCourseList: () => void
+  refetchCourseList: () => void;
 }
 
 const makeFullName = (firstName: string, lastName: string) =>
   `${firstName} ${lastName}`;
 
-  /*  APPLICANTS_INVITED = "APPLICANTS_INVITED",
+/*  APPLICANTS_INVITED = "APPLICANTS_INVITED",
   DRAFT = "DRAFT",
   PARTICIPANTS_RATED = "PARTICIPANTS_RATED",
   READY_FOR_APPLICATION = "READY_FOR_APPLICATION",
   READY_FOR_PUBLICATION = "READY_FOR_PUBLICATION",
   */
-  const courseStatuEnumToNumber = (status: string) => {
-    switch(status) {
-      case CourseStatus_enum.APPLICANTS_INVITED:
-        return 1;
-      case CourseStatus_enum.DRAFT:
-        return 2;
-      case CourseStatus_enum.PARTICIPANTS_RATED:
-        return 3;
-      case CourseStatus_enum.READY_FOR_APPLICATION:
-        return 4;
-      case CourseStatus_enum.READY_FOR_PUBLICATION:
-        return 5;
-      default:
-        return 0;
-    }
+const courseStatuEnumToNumber = (status: string) => {
+  switch (status) {
+    case CourseStatus_enum.APPLICANTS_INVITED:
+      return 1;
+    case CourseStatus_enum.DRAFT:
+      return 2;
+    case CourseStatus_enum.PARTICIPANTS_RATED:
+      return 3;
+    case CourseStatus_enum.READY_FOR_APPLICATION:
+      return 4;
+    case CourseStatus_enum.READY_FOR_PUBLICATION:
+      return 5;
+    default:
+      return 0;
   }
+};
 
 // EINGELADEN/ BESTÄTIGT/ UNBEWERTET and BEWERB = sum of (EINGELADEN/ BESTÄTIGT/ UNBEWERTET)
 // related with courseEnrollment table
 // STATUS is related with Cousre - status
 // OFF is related with Course Visibility
 
-
-
-const CourseOneRow: FC<IProps> = ({ course, handleDelete , refetchCourseList}) => {
+const CourseOneRow: FC<IProps> = ({
+  course,
+  handleDelete,
+  refetchCourseList,
+}) => {
   const [showDetails, setShowDetails] = useState(false);
 
   const [updateCourse] = useAdminMutation<
     UpdateCourseByPk,
-    UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY)
+    UpdateCourseByPkVariables
+  >(UPDATE_COURSE_PROPERTY);
 
   const onClickDelete = useCallback(() => {
     handleDelete(course.id);
@@ -65,16 +74,14 @@ const CourseOneRow: FC<IProps> = ({ course, handleDelete , refetchCourseList}) =
   }, [setShowDetails]);
 
   const onChangeVisivity = useCallback(async () => {
-    console.log(course.visibility, course.id)
     await updateCourse({
       variables: {
         id: course.id,
-        visibility: !course.visibility
-      }
-    })
+        visibility: !course.visibility,
+      },
+    });
     refetchCourseList();
-    // course.visibility course.visibility = !course.visibility;
-  }, [refetchCourseList, updateCourse]);
+  }, [refetchCourseList, updateCourse, course]);
 
   return (
     <>
@@ -82,8 +89,7 @@ const CourseOneRow: FC<IProps> = ({ course, handleDelete , refetchCourseList}) =
         <td className="bg-edu-course-list">
           <div className="ml-5">
             <div onClick={onChangeVisivity}>
-              <EhCheckBox checked={course.visibility ?? false}
-              />
+              <EhCheckBox checked={course.visibility ?? false} />
             </div>
           </div>
         </td>
@@ -128,9 +134,7 @@ const CourseOneRow: FC<IProps> = ({ course, handleDelete , refetchCourseList}) =
         <td className="bg-edu-course-list">
           <div className="flex items-center mt-2 mb-2">
             <p className="text-sm leading-none text-gray-600 ml-5">
-              {
-                courseStatuEnumToNumber(course.status)
-              }
+              {courseStatuEnumToNumber(course.status)}
             </p>
             <div className="flex px-3 items-center">
               <button
@@ -138,12 +142,11 @@ const CourseOneRow: FC<IProps> = ({ course, handleDelete , refetchCourseList}) =
                 role="button"
                 aria-label="option"
               >
-                {
-                  showDetails ?
-                    <MdKeyboardArrowUp size={26} onClick={handleArrowClick} />
-                    : <MdKeyboardArrowDown size={26} onClick={handleArrowClick} />
-                }
-
+                {showDetails ? (
+                  <MdKeyboardArrowUp size={26} onClick={handleArrowClick} />
+                ) : (
+                  <MdKeyboardArrowDown size={26} onClick={handleArrowClick} />
+                )}
               </button>
             </div>
           </div>
