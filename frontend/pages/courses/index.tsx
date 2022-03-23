@@ -25,6 +25,9 @@ const Courses: FC = () => {
   if (ps.length <= 0) {
     return (
       <div>
+        <Head>
+          <title>No available course !</title>
+        </Head>
         <Page>
           <h1> No Programs</h1>
         </Page>
