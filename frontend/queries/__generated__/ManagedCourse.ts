@@ -232,6 +232,22 @@ export interface ManagedCourse_Course_by_pk {
    */
   learningGoals: string | null;
   /**
+   * The value decides whether the course is visible for users or anoymous persons.
+   */
+  visibility: boolean | null;
+  /**
+   * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
+   */
+  achievementCertificatePossible: boolean;
+  /**
+   * Indicates whether participants will get a certificate showing the list of attendances (only issued if the did not miss then maxMissedCourses)
+   */
+  attendanceCertificatePossible: boolean;
+  /**
+   * The link to the chat of the course (e.g. a mattermost channel)
+   */
+  chatLink: string | null;
+  /**
    * An object relationship
    */
   Program: ManagedCourse_Course_by_pk_Program | null;

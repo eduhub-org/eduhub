@@ -1,9 +1,12 @@
 import Head from "next/head";
 import { FC, useCallback, useState } from "react";
 import { useAdminMutation } from "../../hooks/authedMutation";
-import { useAuthedQuery } from "../../hooks/authedQuery";
+import { useAdminQuery, useAuthedQuery } from "../../hooks/authedQuery";
 import { COURSE_LIST_WITH_FILTER } from "../../queries/courseList";
-import { DELETE_A_COURSE } from "../../queries/mutateCourse";
+import {
+  DELETE_A_COURSE,
+  UPDATE_COURSE_PROPERTY,
+} from "../../queries/mutateCourse";
 import {
   CourseListWithFilter,
   CourseListWithFilterVariables,
@@ -14,6 +17,10 @@ import {
   DeleteCourseByPkVariables,
 } from "../../queries/__generated__/DeleteCourseByPk";
 import { ProgramListNoCourse_Program } from "../../queries/__generated__/ProgramListNoCourse";
+import {
+  UpdateCourseByPk,
+  UpdateCourseByPkVariables,
+} from "../../queries/__generated__/UpdateCourseByPk";
 import EhAddButton from "../common/EhAddButton";
 import ModalControl from "../common/ModalController";
 import { Page } from "../Page";
@@ -47,10 +54,11 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
     DeleteCourseByPk,
     DeleteCourseByPkVariables
   >(DELETE_A_COURSE);
+
   /* #region callbacks */
 
   // Database Call
-  const courseListRequest = useAuthedQuery<
+  const courseListRequest = useAdminQuery<
     CourseListWithFilter,
     CourseListWithFilterVariables
   >(COURSE_LIST_WITH_FILTER, {
@@ -61,6 +69,10 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
     },
   });
 
+  if (courseListRequest.error) {
+    console.log(courseListRequest);
+  }
+
   const courses: CourseListWithFilter_Course[] = [
     ...(courseListRequest.data?.Course ?? []),
   ];
@@ -70,6 +82,17 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
     courseTitle: "",
     programShortTitle: defaultProgram,
   });
+
+  const handleRefetchRequest = useCallback(() => {
+    setCourseFilter((prev) => {
+      courseListRequest.refetch({
+        courseTitle: convertToILikeFilter(prev.courseTitle),
+        programShortTitle: convertToILikeFilter(prev.programShortTitle),
+      });
+      return prev;
+    });
+  }, [setCourseFilter, courseListRequest]);
+
   const [showModal, setShowModal] = useState(false);
   const openModalControl = useCallback(() => {
     setShowModal(!showModal);
@@ -182,9 +205,8 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
                     return (
                       <th key={text}>
                         <p
-                          className="
-                                                    flex justify-start ml-5text-base f
-                                                    ont-medium leading-none text-gray-700 uppercase"
+                          className="flex justify-start ml-5text-base 
+                          font-medium leading-none text-gray-700 uppercase"
                         >
                           {text}
                         </p>
@@ -199,6 +221,7 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
                     key={course.id}
                     course={course}
                     handleDelete={handleDelete}
+                    refetchCourseList={handleRefetchRequest}
                   />
                 ))}
               </tbody>
