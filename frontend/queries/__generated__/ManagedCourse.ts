@@ -87,6 +87,75 @@ export interface ManagedCourse_Course_by_pk_CourseLocations {
   locationOption: string | null;
 }
 
+export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses {
+  __typename: "SessionAddress";
+  id: number;
+  /**
+   * The link to a video conference call (if it is an online location)
+   */
+  link: string | null;
+}
+
+export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User {
+  __typename: "User";
+  id: any;
+  /**
+   * The user's first name
+   */
+  firstName: string;
+  /**
+   * The user's last name
+   */
+  lastName: string;
+}
+
+export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert {
+  __typename: "Expert";
+  id: number;
+  /**
+   * An object relationship
+   */
+  User: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User;
+}
+
+export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers {
+  __typename: "SessionSpeaker";
+  id: number;
+  /**
+   * An object relationship
+   */
+  Expert: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert;
+}
+
+export interface ManagedCourse_Course_by_pk_Sessions {
+  __typename: "Session";
+  id: number;
+  /**
+   * The title of the session
+   */
+  title: string;
+  /**
+   * A description of the session
+   */
+  description: string;
+  /**
+   * The day and time of the start of the session
+   */
+  startDateTime: any;
+  /**
+   * The day and time of the end of the session
+   */
+  endDateTime: any;
+  /**
+   * An array relationship
+   */
+  SessionAddresses: ManagedCourse_Course_by_pk_Sessions_SessionAddresses[];
+  /**
+   * An array relationship
+   */
+  SessionSpeakers: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers[];
+}
+
 export interface ManagedCourse_Course_by_pk {
   __typename: "Course";
   id: number;
@@ -178,6 +247,10 @@ export interface ManagedCourse_Course_by_pk {
    * An array relationship
    */
   CourseLocations: ManagedCourse_Course_by_pk_CourseLocations[];
+  /**
+   * An array relationship
+   */
+  Sessions: ManagedCourse_Course_by_pk_Sessions[];
 }
 
 export interface ManagedCourse {

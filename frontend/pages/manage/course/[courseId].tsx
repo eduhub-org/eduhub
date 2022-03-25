@@ -38,9 +38,7 @@ const ManageCoursePage: FC = () => {
         {isInstructor ? (
           <AuthorizedManageCourse courseId={Number(courseId)} />
         ) : (
-          <div>
-            You do not have the necessary rights to manage course {courseId}!
-          </div>
+          <div>Waiting for authentication!</div>
         )}
       </Page>
     </>

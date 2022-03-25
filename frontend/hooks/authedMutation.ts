@@ -155,8 +155,8 @@ export const useUpdateCallback2 = <QueryType, QueryVariables>(
   role: "admin" | "instructor",
   pkField: keyof QueryVariables,
   updateField: keyof QueryVariables,
-  pkMapper: (event: any) => any,
-  eventMapper: (event: any) => any,
+  pkMapper: (pKSource: any) => any,
+  eventMapper: (event: any, pkSource: any) => any,
   mainQueryResult: QueryResult<any, any>
 ) => {
   const [mutation] = useRoleMutation<QueryType, QueryVariables>(query, {
@@ -167,7 +167,7 @@ export const useUpdateCallback2 = <QueryType, QueryVariables>(
   const callback = useCallback(
     async (pk, event) => {
       const pkValue = pkMapper(pk);
-      const updatedValue = eventMapper(event);
+      const updatedValue = eventMapper(event, pk);
       await mutation({
         variables: {
           [pkField]: pkValue,

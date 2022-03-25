@@ -1,5 +1,5 @@
 import { FC, useCallback, useState } from "react";
-import { useInstructorQuery } from "../../hooks/authedQuery";
+import { useAdminQuery, useInstructorQuery } from "../../hooks/authedQuery";
 import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from "../../queries/course";
 import {
   ManagedCourse,
@@ -20,6 +20,7 @@ import {
   UpdateCourseStatusVariables,
 } from "../../queries/__generated__/UpdateCourseStatus";
 import { AlertMessageDialog } from "../common/AlertMessageDialog";
+import { SessionsTab } from "./SessionsTab";
 
 interface Props {
   courseId: number;
@@ -111,7 +112,7 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  * @returns {any} the component
  */
 export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
-  const qResult = useInstructorQuery<ManagedCourse, ManagedCourseVariables>(
+  const qResult = useAdminQuery<ManagedCourse, ManagedCourseVariables>(
     MANAGED_COURSE,
     {
       variables: {
@@ -258,9 +259,13 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
             </div>
           </div>
 
-          {openTabIndex === 0 && (
-            <DescriptionTab course={course} qResult={qResult} />
-          )}
+          {
+            openTabIndex === 0 && <DescriptionTab course={course} qResult={qResult} />
+          }
+
+          {
+            openTabIndex === 1 && <SessionsTab course={course} qResult={qResult} />
+          }
 
           {openTabIndex === maxAllowedTab && (
             <div className="flex justify-end mb-16">

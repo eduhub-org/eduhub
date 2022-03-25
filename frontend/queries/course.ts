@@ -28,8 +28,97 @@ export const MANAGED_COURSE = gql`
         link
         locationOption
       }
+      Sessions {
+        id
+        title
+        description
+        startDateTime
+        endDateTime
+        SessionAddresses {
+          id
+          link
+        }
+        SessionSpeakers {
+          id
+          Expert {
+            id
+            User {
+              id
+              firstName
+              lastName
+            }
+          }
+        }
+      }
     }
   }
+`;
+
+export const INSERT_NEW_SESSION = gql`
+  mutation InsertCourseSession($courseId: Int!, $startTime: timestamptz!, $endTime: timestamptz!) {
+    insert_Session(
+      objects: {
+        courseId: $courseId
+        title: ""
+        startDateTime: $startTime
+        endDateTime: $endTime
+        description: ""
+      }
+    ) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`;
+
+export const DELETE_SESSION = gql`
+  mutation DeleteCourseSession($sessionId: Int!) {
+    delete_Session_by_pk(id: $sessionId) {
+      id
+    }
+  }
+`;
+
+
+export const UPDATE_SESSION_TITLE = gql`
+  mutation UpdateSessionTitle($sessionId: Int!, $title: String!) {
+    update_Session_by_pk(
+      pk_columns: { id: $sessionId }
+      _set: {
+        title: $title
+      }
+    ) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_SESSION_START_TIME = gql`
+mutation UpdateSessionStartTime($sessionId: Int!, $startTime: timestamptz!) {
+  update_Session_by_pk(
+    pk_columns: { id: $sessionId }
+    _set: {
+      startDateTime: $startTime
+    }
+  ) {
+    id
+  }
+}
+`;
+
+export const UPDATE_SESSION_END_TIME = gql`
+mutation UpdateSessionEndTime($sessionId: Int!, $endTime: timestamptz!) {
+  update_Session_by_pk(
+    pk_columns: { id: $sessionId }
+    _set: {
+      endDateTime: $endTime
+    }
+  ) {
+    id
+  }
+}
 `;
 
 export const LOCATION_OPTIONS = gql`
