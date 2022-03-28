@@ -2,7 +2,7 @@ import { IconButton } from "@material-ui/core";
 import { ChangeEvent, FC, useCallback } from "react";
 
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"
+import "react-datepicker/dist/react-datepicker.css";
 import { DebounceInput } from "react-debounce-input";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import {

@@ -6,7 +6,7 @@ module.exports = {
   theme: {
     extend: {
       gridTemplateColumns: {
-        "32": 'repeat(32, minmax(0, 1fr))'
+        32: "repeat(32, minmax(0, 1fr))",
       },
       colors: {
         "edu-black": "#222222",
@@ -19,7 +19,7 @@ module.exports = {
         "edu-missed-yellow": "#F2991D66",
         "edu-course-list": "#F2F2F2",
         "edu-modal-bg-color": "#222222",
-        "edu-tag-color": "#C4C4C4"
+        "edu-tag-color": "#C4C4C4",
       },
     },
     fontFamily: {

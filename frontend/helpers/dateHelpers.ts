@@ -38,7 +38,7 @@ export const getStartTimeString = (course: Course_Course_by_pk, i18n: I18n) => {
 };
 
 export const getEndTimeString = (course: Course_Course_by_pk, i18n: I18n) => {
-    return "";
+  return "";
 };
 
 export const getWeekdayStartAndEndString = (

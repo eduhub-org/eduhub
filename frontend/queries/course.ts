@@ -55,7 +55,11 @@ export const MANAGED_COURSE = gql`
 `;
 
 export const INSERT_NEW_SESSION = gql`
-  mutation InsertCourseSession($courseId: Int!, $startTime: timestamptz!, $endTime: timestamptz!) {
+  mutation InsertCourseSession(
+    $courseId: Int!
+    $startTime: timestamptz!
+    $endTime: timestamptz!
+  ) {
     insert_Session(
       objects: {
         courseId: $courseId
@@ -81,14 +85,11 @@ export const DELETE_SESSION = gql`
   }
 `;
 
-
 export const UPDATE_SESSION_TITLE = gql`
   mutation UpdateSessionTitle($sessionId: Int!, $title: String!) {
     update_Session_by_pk(
       pk_columns: { id: $sessionId }
-      _set: {
-        title: $title
-      }
+      _set: { title: $title }
     ) {
       id
     }
@@ -96,29 +97,72 @@ export const UPDATE_SESSION_TITLE = gql`
 `;
 
 export const UPDATE_SESSION_START_TIME = gql`
-mutation UpdateSessionStartTime($sessionId: Int!, $startTime: timestamptz!) {
-  update_Session_by_pk(
-    pk_columns: { id: $sessionId }
-    _set: {
-      startDateTime: $startTime
+  mutation UpdateSessionStartTime($sessionId: Int!, $startTime: timestamptz!) {
+    update_Session_by_pk(
+      pk_columns: { id: $sessionId }
+      _set: { startDateTime: $startTime }
+    ) {
+      id
     }
-  ) {
-    id
   }
-}
 `;
 
 export const UPDATE_SESSION_END_TIME = gql`
-mutation UpdateSessionEndTime($sessionId: Int!, $endTime: timestamptz!) {
-  update_Session_by_pk(
-    pk_columns: { id: $sessionId }
-    _set: {
-      endDateTime: $endTime
+  mutation UpdateSessionEndTime($sessionId: Int!, $endTime: timestamptz!) {
+    update_Session_by_pk(
+      pk_columns: { id: $sessionId }
+      _set: { endDateTime: $endTime }
+    ) {
+      id
     }
-  ) {
-    id
   }
-}
+`;
+
+export const INSERT_NEW_SESSION_SPEAKER = gql`
+  mutation InsertNewSessionSpeaker($sessionId: Int!, $expertId: Int!) {
+    insert_SessionSpeaker(
+      objects: { sessionId: $sessionId, expertId: $expertId }
+    ) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`;
+
+export const DELETE_SESSION_SPEAKER = gql`
+  mutation DeleteSessionSpeaker($speakerId: Int!) {
+    delete_SessionSpeaker_by_pk(id: $speakerId) {
+      id
+    }
+  }
+`;
+
+export const INSERT_NEW_SESSION_LOCATION = gql`
+  mutation InsertSessionLocation($sessionId: Int!, $link: String!) {
+    insert_SessionAddress(
+      objects: {
+        sessionId: $sessionId
+        latitude: ""
+        longitude: ""
+        link: $link
+      }
+    ) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`;
+
+export const DELETE_SESSION_LOCATION = gql`
+  mutation DeleteCourseSessionLocation($addressId: Int!) {
+    delete_SessionAddress_by_pk(id: $addressId) {
+      id
+    }
+  }
 `;
 
 export const LOCATION_OPTIONS = gql`

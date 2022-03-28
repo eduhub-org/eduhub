@@ -10,7 +10,7 @@ import { CourseStatus_enum } from "../../__generated__/globalTypes";
 import { PageBlock } from "../common/PageBlock";
 import { Button as OldButton } from "../common/Button";
 import { DescriptionTab } from "./DescriptionTab";
-import { QuestionConfirmationDialog } from "../common/QuestionConfirmationDialog";
+import { QuestionConfirmationDialog } from "../common/dialogs/QuestionConfirmationDialog";
 import {
   useAdminMutation,
   useInstructorMutation,
@@ -19,7 +19,7 @@ import {
   UpdateCourseStatus,
   UpdateCourseStatusVariables,
 } from "../../queries/__generated__/UpdateCourseStatus";
-import { AlertMessageDialog } from "../common/AlertMessageDialog";
+import { AlertMessageDialog } from "../common/dialogs/AlertMessageDialog";
 import { SessionsTab } from "./SessionsTab";
 
 interface Props {
@@ -78,6 +78,20 @@ const canUpgradeStatus = (course: ManagedCourse_Course_by_pk) => {
       isFilled(course.contentDescriptionField1) &&
       isFilled(course.contentDescriptionField2) &&
       course.CourseLocations.length > 0
+    );
+  } else if (course.status === "READY_FOR_PUBLICATION") {
+    return (
+      course.Sessions.length > 0 &&
+      course.Sessions.every(
+        (session) =>
+          session.startDateTime != null &&
+          session.endDateTime != null &&
+          isFilled(session.title) &&
+          session.title !== course.title &&
+          session.SessionAddresses.length > 0
+      ) &&
+      new Set(course.Sessions.map((s) => s.title)).size ===
+        course.Sessions.length
     );
   } else {
     return false;
@@ -259,13 +273,13 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
             </div>
           </div>
 
-          {
-            openTabIndex === 0 && <DescriptionTab course={course} qResult={qResult} />
-          }
+          {openTabIndex === 0 && (
+            <DescriptionTab course={course} qResult={qResult} />
+          )}
 
-          {
-            openTabIndex === 1 && <SessionsTab course={course} qResult={qResult} />
-          }
+          {openTabIndex === 1 && (
+            <SessionsTab course={course} qResult={qResult} />
+          )}
 
           {openTabIndex === maxAllowedTab && (
             <div className="flex justify-end mb-16">
