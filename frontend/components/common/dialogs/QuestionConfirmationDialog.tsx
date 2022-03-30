@@ -2,7 +2,7 @@ import { Dialog, DialogTitle } from "@material-ui/core";
 import { FC, useCallback } from "react";
 import { MdClose } from "react-icons/md";
 
-import { Button } from "../common/Button";
+import { Button } from "../../common/Button";
 
 interface QuestionProps {
   question: string;

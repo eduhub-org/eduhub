@@ -16,23 +16,29 @@ export const getWeekdayString = (
 };
 
 export const getStartTimeString = (course: Course_Course_by_pk, i18n: I18n) => {
-  const startTime: string =
-    course.startTime?.toLocaleTimeString(i18n.languages, {
-      hour: "numeric",
-      minute: "numeric",
-    }) ?? "";
+  // TODO timetz handling is unclear
+  return "";
+  //   if (course.startTime == null) {
+  //     return "";
+  //   }
 
-  return startTime;
+  //   const now = new Date();
+  //   const todayStr = now.toISOString().split("T")[0];
+  //   const str = todayStr + "T" + course.startTime;
+  //   console.log(str);
+  //   const timeDate = new Date(str);
+
+  //   const startTime: string =
+  //     timeDate.toLocaleTimeString(i18n.languages, {
+  //       hour: "numeric",
+  //       minute: "numeric",
+  //     }) ?? "";
+
+  //   return startTime;
 };
 
 export const getEndTimeString = (course: Course_Course_by_pk, i18n: I18n) => {
-  const endTime =
-    course.endTime?.toLocaleTimeString(i18n.languages, {
-      hour: "numeric",
-      minute: "numeric",
-    }) ?? "";
-
-  return endTime ?? null;
+  return "";
 };
 
 export const getWeekdayStartAndEndString = (

@@ -14,7 +14,7 @@ import {
 import { Page } from "../../components/Page";
 import { OnlyAdmin, OnlyNotAdmin } from "../../components/common/OnlyLoggedIn";
 import { PageBlock } from "../../components/common/PageBlock";
-import { QuestionConfirmationDialog } from "../../components/common/QuestionConfirmationDialog";
+import { QuestionConfirmationDialog } from "../../components/common/dialogs/QuestionConfirmationDialog";
 import { useAdminMutation } from "../../hooks/authedMutation";
 import { useAdminQuery } from "../../hooks/authedQuery";
 
