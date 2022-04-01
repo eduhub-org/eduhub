@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: ProgramListNoCourse
+// GraphQL query operation: Programs
 // ====================================================
 
-export interface ProgramListNoCourse_Program {
+export interface Programs_Program {
   __typename: "Program";
   id: number;
   /**
@@ -76,9 +76,9 @@ export interface ProgramListNoCourse_Program {
   visibilityParticipationCertificate: boolean | null;
 }
 
-export interface ProgramListNoCourse {
+export interface Programs {
   /**
    * fetch data from the table: "Program"
    */
-  Program: ProgramListNoCourse_Program[];
+  Program: Programs_Program[];
 }
