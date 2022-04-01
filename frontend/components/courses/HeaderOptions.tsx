@@ -1,17 +1,17 @@
 import { FC, useCallback, useEffect, useState } from "react";
-import { ProgramListNoCourse_Program } from "../../queries/__generated__/ProgramListNoCourse";
+import { Programs_Program } from "../../queries/__generated__/Programs";
 import { SelectOption } from "../../types/UIComponents";
 import Searchbar from "../common/Searchbar";
 import SingleNavItem from "../common/SingleNavItem";
 
 interface IProps {
-  programs: ProgramListNoCourse_Program[];
+  programs: Programs_Program[];
   onClickTab: (tabId: string) => void;
   onSearch: (searchText: string) => void;
   selectedSemester: string;
 }
 
-const CourseListHeader: FC<IProps> = ({
+const HeaderOptions: FC<IProps> = ({
   programs,
   onClickTab,
   onSearch,
@@ -83,4 +83,4 @@ const CourseListHeader: FC<IProps> = ({
   );
 };
 
-export default CourseListHeader;
+export default HeaderOptions;

@@ -16,7 +16,7 @@ import {
   InsertCourseInstructor,
   InsertCourseInstructorVariables,
 } from "../../queries/__generated__/InsertCourseInstructor";
-import { ProgramListNoCourse_Program } from "../../queries/__generated__/ProgramListNoCourse";
+import { Programs_Program } from "../../queries/__generated__/Programs";
 import { SelectOption } from "../../types/UIComponents";
 import EhButton from "../common/EhButton";
 import EhDebounceInput from "../common/EhDebounceInput";
@@ -47,7 +47,7 @@ const ShortByFirstName = (
 
 /* #region local interfaces */
 interface IProps {
-  programs: ProgramListNoCourse_Program[];
+  programs: Programs_Program[];
   onSavedCourse: (success: boolean) => void;
 }
 /* #endregion */

@@ -56,11 +56,8 @@ here 'visivility' is a database column
 */
 
 export const UPDATE_COURSE_PROPERTY = gql`
-  mutation UpdateCourseByPk($id: Int!, $visibility: Boolean!) {
-    update_Course_by_pk(
-      pk_columns: { id: $id }
-      _set: { visibility: $visibility }
-    ) {
+  mutation UpdateCourseByPk($id: Int!, $changes: Course_set_input) {
+    update_Course_by_pk(pk_columns: { id: $id }, _set: $changes) {
       id
     }
   }

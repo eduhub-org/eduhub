@@ -46,23 +46,11 @@ export const ADMIN_COURSE_FRAGMENT = gql`
   fragment AdminCourseFragment on Course {
     id
     ects
-    tagline
-    weekDay
-    cost
-    applicationEnd
     coverImage
     language
-    maxMissedSessions
     title
     programId
-    headingDescriptionField1
-    contentDescriptionField1
-    headingDescriptionField2
-    contentDescriptionField2
-    startTime
-    endTime
     status
-    learningGoals
     visibility
     achievementCertificatePossible
     attendanceCertificatePossible
@@ -78,11 +66,15 @@ export const ADMIN_COURSE_FRAGMENT = gql`
         id
         User {
           firstName
-          picture
           id
           lastName
         }
-        description
+      }
+    }
+    CourseEnrollments {
+      id
+      CourseEnrollmentStatus {
+        value
       }
     }
   }
