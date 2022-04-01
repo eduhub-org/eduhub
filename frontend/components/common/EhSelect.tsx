@@ -20,7 +20,8 @@ const EhSelect: FC<IPros> = ({
     [onChangeHandler]
   );
 
-  const selectStyle = `form-select appearance-none
+  const selectStyle = `form-select 
+    appearance
     block
     w-full
     px-3

@@ -28,10 +28,6 @@ export interface ManagedCourse_Course_by_pk_CourseInstructors_Expert_User {
    * The user's first name
    */
   firstName: string;
-  /**
-   * The user's profile picture
-   */
-  picture: string | null;
   id: any;
   /**
    * The user's last name
@@ -46,10 +42,6 @@ export interface ManagedCourse_Course_by_pk_CourseInstructors_Expert {
    * An object relationship
    */
   User: ManagedCourse_Course_by_pk_CourseInstructors_Expert_User;
-  /**
-   * A short description on the expert's background
-   */
-  description: string | null;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseInstructors {
@@ -61,13 +53,22 @@ export interface ManagedCourse_Course_by_pk_CourseInstructors {
   Expert: ManagedCourse_Course_by_pk_CourseInstructors_Expert;
 }
 
+export interface ManagedCourse_Course_by_pk_CourseEnrollments_CourseEnrollmentStatus {
+  __typename: "CourseEnrollmentStatus";
+  value: string;
+}
+
 export interface ManagedCourse_Course_by_pk_CourseEnrollments {
   __typename: "CourseEnrollment";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseEnrollmentStatus: ManagedCourse_Course_by_pk_CourseEnrollments_CourseEnrollmentStatus;
   /**
    * The last day a user can confirm his/her invitation to the given course
    */
   invitationExpirationDate: any | null;
-  id: number;
   /**
    * The users current enrollment status to this course
    */
@@ -164,22 +165,6 @@ export interface ManagedCourse_Course_by_pk {
    */
   ects: string;
   /**
-   * Shown below the title on the course page
-   */
-  tagline: string;
-  /**
-   * The day of the week the course takes place.
-   */
-  weekDay: string | null;
-  /**
-   * A text providing info about the costs of a participation.
-   */
-  cost: string;
-  /**
-   * Last day before applications are closed. (Set to the program's default value when the course is created.)
-   */
-  applicationEnd: any;
-  /**
    * The cover image for the course
    */
   coverImage: string | null;
@@ -187,10 +172,6 @@ export interface ManagedCourse_Course_by_pk {
    * The language the course is given in.
    */
   language: string;
-  /**
-   * The maximum number of sessions a participant can miss while still receiving a certificate
-   */
-  maxMissedSessions: number;
   /**
    * The title of the course (only editable by an admin user)
    */
@@ -200,37 +181,9 @@ export interface ManagedCourse_Course_by_pk {
    */
   programId: number | null;
   /**
-   * Heading of the the first course description field
-   */
-  headingDescriptionField1: string;
-  /**
-   * Content of the first course description field
-   */
-  contentDescriptionField1: string | null;
-  /**
-   * Heading of the the second course description field
-   */
-  headingDescriptionField2: string | null;
-  /**
-   * Content of the second course description field
-   */
-  contentDescriptionField2: string | null;
-  /**
-   * The time the course starts each week.
-   */
-  startTime: any | null;
-  /**
-   * The time the course ends each week.
-   */
-  endTime: any | null;
-  /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
-  /**
-   * An array of texts including the learning goals for the course
-   */
-  learningGoals: string | null;
   /**
    * The value decides whether the course is visible for users or anoymous persons.
    */

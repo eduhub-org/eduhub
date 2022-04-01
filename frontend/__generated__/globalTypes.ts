@@ -30,6 +30,37 @@ export enum CourseStatus_enum {
   READY_FOR_PUBLICATION = "READY_FOR_PUBLICATION",
 }
 
+/**
+ * input type for updating data in table "Course"
+ */
+export interface Course_set_input {
+  achievementCertificatePossible?: boolean | null;
+  applicationEnd?: any | null;
+  attendanceCertificatePossible?: boolean | null;
+  chatLink?: string | null;
+  contentDescriptionField1?: string | null;
+  contentDescriptionField2?: string | null;
+  cost?: string | null;
+  coverImage?: string | null;
+  createdAt?: any | null;
+  ects?: string | null;
+  endTime?: any | null;
+  headingDescriptionField1?: string | null;
+  headingDescriptionField2?: string | null;
+  id?: number | null;
+  language?: string | null;
+  learningGoals?: string | null;
+  maxMissedSessions?: number | null;
+  programId?: number | null;
+  startTime?: any | null;
+  status?: CourseStatus_enum | null;
+  tagline?: string | null;
+  title?: string | null;
+  updatedAt?: any | null;
+  visibility?: boolean | null;
+  weekDay?: string | null;
+}
+
 //==============================================================
 // END Enums and Input Objects
 //==============================================================
