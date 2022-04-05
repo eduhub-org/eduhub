@@ -2,6 +2,18 @@ import { I18n, TFunction } from "next-i18next";
 
 import { Course_Course_by_pk } from "../queries/__generated__/Course";
 
+const format2Digits = (n: number) => {
+  return `${n < 10 ? "0" : ""}${n}`;
+};
+
+export const displayDate = (date: Date | null) => {
+  if (date == null) {
+    return "";
+  }
+
+  return format2Digits(date.getDate()) + "." + format2Digits(date.getMonth() + 1) + "." + date.getFullYear();
+}
+
 export const getWeekdayString = (
   course: Course_Course_by_pk,
   t: TFunction,

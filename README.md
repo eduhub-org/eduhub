@@ -124,13 +124,8 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
 
     - Open a docker shell for the  `edu-hub_frontend_1` image via the following command
 
-<<<<<<< HEAD
          sudo docker exec -it edu-hub_frontend_1 /bin/sh
     - Install dependencies via `yarn` (if not installed previously) 
-=======
-            sudo docker exec -it edu-hub_frontend_1 /bin/sh
-    - Install `yarn` ( if not installed) 
->>>>>>> graphql-hasura
 
           /opt/app # yarn
     - Run the Frontend with `hot reloading`

@@ -44,6 +44,8 @@ const copyDateTime = (target: Date, source: Date) => {
 
 interface IProps {
   session: ManagedCourse_Course_by_pk_Sessions | null;
+  lectureStart: Date,
+  lectureEnd: Date,
   qResult: QueryResult<any, any>;
   onDelete: (pk: number) => any;
   onSetStartDate: (
@@ -64,6 +66,8 @@ interface IProps {
 
 export const SessionRow: FC<IProps> = ({
   session,
+  lectureStart,
+  lectureEnd,
   qResult,
   onDelete,
   onSetStartDate,
@@ -251,6 +255,8 @@ export const SessionRow: FC<IProps> = ({
         {session && (
           <div className="col-span-4 m-2">
             <DatePicker
+              minDate={lectureStart}
+              maxDate={lectureEnd}
               dateFormat={"dd/MM/yyy"}
               className="w-full bg-edu-light-gray"
               selected={session.startDateTime}

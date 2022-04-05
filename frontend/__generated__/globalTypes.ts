@@ -30,6 +30,13 @@ export enum CourseStatus_enum {
   READY_FOR_PUBLICATION = "READY_FOR_PUBLICATION",
 }
 
+export enum MotivationRating_enum {
+  DECLINE = "DECLINE",
+  INVITE = "INVITE",
+  REVIEW = "REVIEW",
+  UNRATED = "UNRATED",
+}
+
 //==============================================================
 // END Enums and Input Objects
 //==============================================================
