@@ -54,7 +54,9 @@ export const client = new ApolloClient({
         fields: {
           invitationExpirationDate: {
             merge: (_, invitationExpirationDate) => {
-              return invitationExpirationDate != null ? new Date(invitationExpirationDate) : null;
+              return invitationExpirationDate != null
+                ? new Date(invitationExpirationDate)
+                : null;
             },
           },
         },

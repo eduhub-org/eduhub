@@ -11,8 +11,10 @@ export const displayDate = (date: Date | null) => {
     return "";
   }
 
-  return format2Digits(date.getDate()) + "." + format2Digits(date.getMonth() + 1) + "." + date.getFullYear();
-}
+  return `${format2Digits(date.getDate())}.${format2Digits(
+    date.getMonth() + 1
+  )}.${date.getFullYear()}`;
+};
 
 export const getWeekdayString = (
   course: Course_Course_by_pk,

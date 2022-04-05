@@ -30,7 +30,6 @@ export const MANAGED_COURSE = gql`
           firstName
           lastName
           email
-          
         }
       }
       CourseLocations {

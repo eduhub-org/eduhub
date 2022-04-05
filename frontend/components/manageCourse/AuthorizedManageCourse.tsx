@@ -95,7 +95,9 @@ const canUpgradeStatus = (course: ManagedCourse_Course_by_pk) => {
         course.Sessions.length
     );
   } else if (course.status === "READY_FOR_APPLICATION") {
-    return course.CourseEnrollments.find(e => e.status === "CONFIRMED") != null;
+    return (
+      course.CourseEnrollments.find((e) => e.status === "CONFIRMED") != null
+    );
   } else {
     return false;
   }

@@ -44,8 +44,8 @@ const copyDateTime = (target: Date, source: Date) => {
 
 interface IProps {
   session: ManagedCourse_Course_by_pk_Sessions | null;
-  lectureStart: Date,
-  lectureEnd: Date,
+  lectureStart: Date;
+  lectureEnd: Date;
   qResult: QueryResult<any, any>;
   onDelete: (pk: number) => any;
   onSetStartDate: (
