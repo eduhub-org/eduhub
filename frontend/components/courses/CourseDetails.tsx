@@ -10,6 +10,12 @@ import {
   UpdateCourseByPk,
   UpdateCourseByPkVariables,
 } from "../../queries/__generated__/UpdateCourseByPk";
+import EhTagEditTag from "../common/EhTagEditTag";
+import {
+  DeleteCourseInstructor,
+  DeleteCourseInstructorVariables,
+} from "../../queries/__generated__/DeleteCourseInstructor";
+import { DELETE_COURSE_INSRTRUCTOR } from "../../queries/mutateCourseInstructor";
 
 const makeFullName = (firstName: string, lastName: string) =>
   `${firstName} ${lastName}`;
@@ -25,6 +31,11 @@ const CourseDetails: FC<IPros> = ({ course, refetchCourseList }) => {
     UpdateCourseByPkVariables
   >(UPDATE_COURSE_PROPERTY);
 
+  const [deleteInstructorAPI] = useAdminMutation<
+    DeleteCourseInstructor,
+    DeleteCourseInstructorVariables
+  >(DELETE_COURSE_INSRTRUCTOR);
+
   const updateCourse = (input: Course_set_input) => async () => {
     const response = await updateCourseQuery({
       variables: {
@@ -38,12 +49,32 @@ const CourseDetails: FC<IPros> = ({ course, refetchCourseList }) => {
     }
   };
 
+  /* #region Callbacks */
+
+  const deleteInstructorFromACourse = useCallback(
+    async (id: number) => {
+      const response = await deleteInstructorAPI({
+        variables: {
+          courseId: course.id,
+          expertId: id,
+        },
+      });
+
+      if (response.errors) {
+        return;
+      }
+      refetchCourseList();
+    },
+    [deleteInstructorAPI, refetchCourseList, course]
+  );
+  /** #endregion */
+
   return (
     <>
       <tr className="bg-edu-course-list">
         <td className="ml-5" colSpan={1} />
         <td className="ml-5 content-start my-8" colSpan={1}>
-          <div className="bg-white p-2 mr-5 h-32 justify-end">
+          <div className="bg-white p-2 mr-5 h-32 justify-end mb-2">
             <Button
               className="absolute b-0 r-0"
               endIcon={<MdUploadFile />}
@@ -54,25 +85,38 @@ const CourseDetails: FC<IPros> = ({ course, refetchCourseList }) => {
             </Button>
           </div>
         </td>
-        <td className="ml-5" colSpan={1}>
-          {course.CourseInstructors.map((courseIn) => (
-            <p key={courseIn.Expert.User.id}>
-              {makeFullName(
-                courseIn.Expert.User.firstName,
-                courseIn.Expert.User.lastName
-              )}
-            </p>
-          ))}
+        <td className="inline-block align-top pb-2" colSpan={1}>
+          <div className="flex flex-col space-y-1">
+            {
+              // Show the all instructors but first one
+              course.CourseInstructors.map(
+                (courseIn, index) =>
+                  index > 0 && (
+                    <EhTagEditTag
+                      key={`${course.id}-${courseIn.Expert.id}-${index}`}
+                      requestDeleteTag={deleteInstructorFromACourse}
+                      tag={{
+                        display: makeFullName(
+                          courseIn.Expert.User.firstName,
+                          courseIn.Expert.User.lastName ?? ""
+                        ),
+                        id: courseIn.Expert.id,
+                      }}
+                    />
+                  )
+              )
+            }
+          </div>
         </td>
         <td className="ml-10" colSpan={4}>
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col space-y-2 mb-2">
             {course.chatLink && (
               <div>
                 <label htmlFor="" className="uppercase">
                   {" "}
                   Live Chat{" "}
                 </label>
-                <p className="bg-white w-3/5 p-2 text-ellipsis overflow-hidden ...">
+                <p className="bg-white w-3/5 p-2 text-ellipsis overflow-hidden">
                   {
                     <a className="" href={course.chatLink}>
                       {course.chatLink}

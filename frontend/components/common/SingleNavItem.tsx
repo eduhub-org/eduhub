@@ -2,16 +2,16 @@ import { FC, useCallback } from "react";
 
 interface IPros {
   title: string;
-  id: string;
-  selected: string;
-  onClickCallback: (p: string) => any;
+  id: number;
+  selected: number;
+  onClickCallback: (p: number) => any;
 }
 
 const SingleNavItem: FC<IPros> = ({ title, selected, id, onClickCallback }) => {
   const tabStyle = () => {
     return selected === id
-      ? "py-2 px-10 bg-indigo-100 text-indigo-700 rounded-full"
-      : "py-2 px-10 text-gray-600 hover:text-indigo-700 hover:bg-indigo-100 rounded-full";
+      ? "bg-blue-400 py-2 px-10 text-white hover:text-gray-300 rounded-full focus:outline-none m-1"
+      : "py-2 px-10 hover:text-indigo-700 hover:bg-blue-100 rounded-full focus:outline-none m-1";
   };
 
   const tabClickCallback = useCallback(() => {
@@ -19,19 +19,9 @@ const SingleNavItem: FC<IPros> = ({ title, selected, id, onClickCallback }) => {
   }, [id, onClickCallback]); // [title, selected, onClickCallback] : useCallback is basically a memoized function. It needs to know all references to variables the lambda has
 
   return (
-    <div
-      onClick={tabClickCallback}
-      className="rounded-full 
-    focus:outline-none 
-    focus:ring-2  
-    focus:bg-indigo-50 
-    focus:ring-indigo-800 
-    mr-2"
-    >
-      <div className={tabStyle()}>
-        <p>{title}</p>
-      </div>
-    </div>
+    <button onClick={tabClickCallback} className={tabStyle()}>
+      {title}
+    </button>
   );
 };
 
