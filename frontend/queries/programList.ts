@@ -16,7 +16,7 @@ export const PROGRAM_LIST = gql`
 
 export const ADMIN_PROGRAM_LIST = gql`
   ${ADMIN_PROGRAM_FRAGMENT}
-  query ProgramListNoCourse {
+  query Programs {
     Program(order_by: { id: desc }) {
       ...AdminProgramFragment
     }

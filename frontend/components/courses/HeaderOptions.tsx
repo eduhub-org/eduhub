@@ -1,25 +1,27 @@
 import { FC, useCallback, useEffect, useState } from "react";
-import { ProgramListNoCourse_Program } from "../../queries/__generated__/ProgramListNoCourse";
+import { Programs_Program } from "../../queries/__generated__/Programs";
 import { SelectOption } from "../../types/UIComponents";
 import Searchbar from "../common/Searchbar";
 import SingleNavItem from "../common/SingleNavItem";
 
 interface IProps {
-  programs: ProgramListNoCourse_Program[];
-  onClickTab: (tabId: string) => void;
+  programs: Programs_Program[];
+  onClickTab: (tabId: number) => void;
   onSearch: (searchText: string) => void;
-  selectedSemester: string;
+  selectedProgramId: number;
+  previousSearchedTitle: string;
 }
 
-const CourseListHeader: FC<IProps> = ({
+const HeaderOptions: FC<IProps> = ({
   programs,
   onClickTab,
   onSearch,
-  selectedSemester,
+  selectedProgramId,
+  previousSearchedTitle,
 }) => {
   // Constants
   const ps: SelectOption[] = programs.map((program) => ({
-    value: program.shortTitle ? program.shortTitle.toString() : "",
+    key: program.id,
     label: program.shortTitle ?? program.title,
   }));
 
@@ -27,16 +29,15 @@ const CourseListHeader: FC<IProps> = ({
   const semestersForTabMenu: SelectOption[] =
     ps.length > 3 ? ps.slice(0, 3) : ps;
   semestersForTabMenu.push({
-    value: "", // id is null for all
+    key: -1, // id is null for all
     label: "All",
   });
 
-  const [searchedTitle, setSearchedTitle] = useState("");
+  const [searchedTitle, setSearchedTitle] = useState(previousSearchedTitle);
 
   /* #region Callbacks */
   const handleTabClick = useCallback(
-    (tabID) => {
-      // setSelectedTab(tabID);
+    (tabID: number) => {
       onClickTab(tabID);
     },
     [onClickTab]
@@ -64,11 +65,11 @@ const CourseListHeader: FC<IProps> = ({
           <div className="flex items-center">
             {semestersForTabMenu.map((tab) => (
               <SingleNavItem
-                key={tab.value}
-                id={tab.value}
+                key={tab.key}
+                id={tab.key}
                 title={tab.label}
                 onClickCallback={handleTabClick}
-                selected={selectedSemester}
+                selected={selectedProgramId}
               />
             ))}
           </div>
@@ -83,4 +84,4 @@ const CourseListHeader: FC<IProps> = ({
   );
 };
 
-export default CourseListHeader;
+export default HeaderOptions;

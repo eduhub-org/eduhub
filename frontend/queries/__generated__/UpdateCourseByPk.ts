@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { Course_set_input } from "./../../__generated__/globalTypes";
+
 // ====================================================
 // GraphQL mutation operation: UpdateCourseByPk
 // ====================================================
@@ -21,5 +23,5 @@ export interface UpdateCourseByPk {
 
 export interface UpdateCourseByPkVariables {
   id: number;
-  visibility: boolean;
+  changes?: Course_set_input | null;
 }

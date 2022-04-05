@@ -30,6 +30,13 @@ export const client = new ApolloClient({
   link: httpLink,
   cache: new InMemoryCache({
     typePolicies: {
+      Query: {
+        fields: {
+          Course: {
+            merge: (_, incoming) => incoming,
+          },
+        },
+      },
       Course: {
         fields: {
           applicationEnd: {
@@ -37,8 +44,12 @@ export const client = new ApolloClient({
               return new Date(applicationEnd);
             },
           },
+          CourseInstructors: {
+            merge: (_, incoming) => incoming,
+          },
         },
       },
+
       CourseEnrollment: {
         fields: {
           invitationExpirationDate: {

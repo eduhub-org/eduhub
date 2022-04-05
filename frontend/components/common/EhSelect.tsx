@@ -4,9 +4,22 @@ import { SelectOption } from "../../types/UIComponents";
 interface IPros {
   placeholder?: string;
   options: SelectOption[];
-  onChangeHandler: (value: string) => any;
-  value?: string;
+  onChangeHandler: (value: number) => any;
+  value?: number;
 }
+
+const distinctOptions = (list: SelectOption[]) => {
+  const flags = [];
+  const output = [];
+  const l = list.length;
+  let i;
+  for (i = 0; i < l; i++) {
+    if (flags[list[i].key]) continue;
+    flags[list[i].key] = true;
+    output.push(list[i]);
+  }
+  return output;
+};
 const EhSelect: FC<IPros> = ({
   placeholder,
   options,
@@ -15,12 +28,14 @@ const EhSelect: FC<IPros> = ({
 }) => {
   const onSelectChanged = useCallback(
     (event) => {
-      onChangeHandler(event.target.value);
+      onChangeHandler(parseInt(event.target.value, 10));
     },
     [onChangeHandler]
   );
 
-  const selectStyle = `form-select appearance-none
+  options = distinctOptions(options);
+  const selectStyle = `form-select 
+    appearance
     block
     w-full
     px-3
@@ -37,10 +52,10 @@ const EhSelect: FC<IPros> = ({
       className={selectStyle}
       aria-label={placeholder ?? ""}
       onChange={onSelectChanged}
-      value={value ?? ""}
+      value={value}
     >
       {options.map((option, index) => (
-        <option key={`${option.value}-${index}`} value={option.value}>
+        <option key={option.key} value={option.key}>
           {option.label}
         </option>
       ))}

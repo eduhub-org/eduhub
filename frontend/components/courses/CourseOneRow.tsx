@@ -8,22 +8,33 @@ import {
 import { useAdminMutation } from "../../hooks/authedMutation";
 import { UPDATE_COURSE_PROPERTY } from "../../queries/mutateCourse";
 import { CourseListWithFilter_Course } from "../../queries/__generated__/CourseListWithFilter";
+import { Programs_Program } from "../../queries/__generated__/Programs";
 import {
   UpdateCourseByPk,
   UpdateCourseByPkVariables,
 } from "../../queries/__generated__/UpdateCourseByPk";
-import { CourseStatus_enum } from "../../__generated__/globalTypes";
+import { SelectOption } from "../../types/UIComponents";
+import {
+  CourseEnrollmentStatus_enum,
+  CourseStatus_enum,
+} from "../../__generated__/globalTypes";
 import EhCheckBox from "../common/EhCheckbox";
+import EhSelect from "../common/EhSelect";
 import CourseDetails from "./CourseDetails";
+import InstructorInARow from "./InstructorInARow";
+
+/* #region Local Interfaces */
+interface EntrollmentStatusCount {
+  [key: string]: number;
+}
 
 interface IProps {
   course: CourseListWithFilter_Course;
   handleDelete: (id: number) => void;
   refetchCourseList: () => void;
+  programs: Programs_Program[];
 }
-
-const makeFullName = (firstName: string, lastName: string) =>
-  `${firstName} ${lastName}`;
+/* #endregion */
 
 /*  APPLICANTS_INVITED = "APPLICANTS_INVITED",
   DRAFT = "DRAFT",
@@ -57,14 +68,21 @@ const CourseOneRow: FC<IProps> = ({
   course,
   handleDelete,
   refetchCourseList,
+  programs,
 }) => {
   const [showDetails, setShowDetails] = useState(false);
+
+  const semesters: SelectOption[] = programs.map((program) => ({
+    key: program.id,
+    label: program.shortTitle ?? program.title,
+  }));
 
   const [updateCourse] = useAdminMutation<
     UpdateCourseByPk,
     UpdateCourseByPkVariables
   >(UPDATE_COURSE_PROPERTY);
 
+  /* #region callbacks */
   const onClickDelete = useCallback(() => {
     handleDelete(course.id);
   }, [handleDelete, course.id]);
@@ -77,11 +95,64 @@ const CourseOneRow: FC<IProps> = ({
     await updateCourse({
       variables: {
         id: course.id,
-        visibility: !course.visibility,
+        changes: {
+          visibility: !course.visibility,
+        },
       },
     });
     refetchCourseList();
   }, [refetchCourseList, updateCourse, course]);
+
+  const onSemesterChange = useCallback(
+    async (id: number) => {
+      const response = await updateCourse({
+        variables: {
+          id: course.id,
+          changes: {
+            programId: id,
+          },
+        },
+      });
+
+      if (!response.errors) {
+        refetchCourseList();
+      }
+    },
+    [refetchCourseList, course.id, updateCourse]
+  );
+
+  /* #endregion */
+
+  // EINGELADEN/ BESTÄTIGT/ UNBEWERTET
+  // TODO: Which feilds ??
+  const makeInvitedConfirmedUnratedField = () => {
+    const statusRecordsWithSum: EntrollmentStatusCount = {};
+    course.CourseEnrollments.forEach((courseEn) => {
+      statusRecordsWithSum[
+        courseEn.CourseEnrollmentStatus.value
+      ] = statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value]
+        ? statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] + 1
+        : 1;
+    });
+    return `${statusRecordsWithSum[CourseEnrollmentStatus_enum.INVITED] ?? 0}/${
+      statusRecordsWithSum[CourseEnrollmentStatus_enum.CONFIRMED] ?? 0
+    }/${course.AppliedAndUnratedCount.aggregate?.count}`;
+  };
+
+  const makeCompetitionField = () => {
+    const statusRecordsWithSum: EntrollmentStatusCount = {};
+    course.CourseEnrollments.forEach((courseEn) => {
+      statusRecordsWithSum[
+        courseEn.CourseEnrollmentStatus.value
+      ] = statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value]
+        ? statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] + 1
+        : 1;
+    });
+    return Object.keys(statusRecordsWithSum).reduce(
+      (sum, key) => sum + statusRecordsWithSum[key],
+      0
+    );
+  };
 
   return (
     <>
@@ -95,43 +166,40 @@ const CourseOneRow: FC<IProps> = ({
         </td>
         <td className="bg-edu-course-list">
           <div className="flex items-center justify-start ml-5 max-w-xs break-words">
-            <p className="text-gray-700 break-words">{course.title}</p>
+            <p className="text-gray-700 truncate ...">{course.title}</p>
           </div>
         </td>
         <td className="bg-edu-course-list ml-5">
-          <div className="flex items-start">
-            <p className="text-sm leading-none text-gray-600 ml-5">
-              {course.CourseInstructors.map((instructor) => {
-                return makeFullName(
-                  instructor.Expert.User.firstName,
-                  instructor.Expert.User.lastName ?? " "
-                );
-              })}
-            </p>
-          </div>
+          <InstructorInARow course={course} refetchData={refetchCourseList} />
         </td>
         <td className="bg-edu-course-list">
+          {/* KURSLEITUNG */}
           <div>
             <p className="text-sm leading-none text-gray-600 ml-5">
-              {course.ects}
+              {makeCompetitionField()}
             </p>
           </div>
         </td>
         <td className="bg-edu-course-list">
+          {/* EINGELADEN/ BESTÄTIGT/ UNBEWERTET */}
           <div>
             <p className="text-sm leading-none text-gray-600 ml-5">
-              {course.status}
+              {makeInvitedConfirmedUnratedField()}
             </p>
           </div>
         </td>
         <td className="bg-edu-course-list">
-          <div className="flex items-center">
-            <p className="text-sm leading-none text-gray-600 ml-5">
-              {course.Program?.shortTitle ?? "-"}
-            </p>
+          {/* Program */}
+          <div className="flex items-center space-x-2">
+            <EhSelect
+              value={course.Program ? course.Program.id : 0}
+              onChangeHandler={onSemesterChange}
+              options={semesters}
+            />
           </div>
         </td>
         <td className="bg-edu-course-list">
+          {/* Status */}
           <div className="flex items-center mt-2 mb-2">
             <p className="text-sm leading-none text-gray-600 ml-5">
               {courseStatuEnumToNumber(course.status)}
@@ -152,13 +220,16 @@ const CourseOneRow: FC<IProps> = ({
           </div>
         </td>
         <td>
+          {/* Delete button */}
           <IconButton onClick={onClickDelete}>
             <MdDelete size={24} />
           </IconButton>
         </td>
       </tr>
-      <tr className="h-1" />
-      {showDetails && <CourseDetails course={course} />}
+      <tr className={showDetails ? "h-0" : "h-1"} />
+      {showDetails && (
+        <CourseDetails course={course} refetchCourseList={refetchCourseList} />
+      )}
     </>
   );
 };
