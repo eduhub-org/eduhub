@@ -57,13 +57,7 @@ const CourseListUI: FC<IProps> = ({ programs, courses, refetchCourseList }) => {
               {tableHeaders.map((text) => {
                 return (
                   <th key={text}>
-                    <p
-                      className="flex justify-start
-                                            ml-5text-base
-                                            font-medium 
-                                            leading-none 
-                                            text-gray-700 uppercase"
-                    >
+                    <p className="flex justify-start ml-5text-base font-medium leading-none text-gray-700 uppercase">
                       {text}
                     </p>
                   </th>

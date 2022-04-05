@@ -9,19 +9,45 @@ import {
 import { Programs_Program } from "../../queries/__generated__/Programs";
 import CourseListHeader from "./CourseListHeader";
 import CourseListUI from "./CourseListUI";
+import Loading from "./Loading";
 
 const convertToILikeFilter = (input: string) => `%${input}%`;
+
+const createWhereClauseForCourse = (courseTitle: string, programId: number) => {
+  if (courseTitle.trim().length === 0 && programId < 0) {
+    return {
+      whereAndClause: [],
+    };
+  }
+  if (courseTitle.trim().length === 0 && programId >= 0) {
+    return {
+      whereAndClause: [{ programId: { _eq: programId } }],
+    };
+  }
+  if (courseTitle.trim().length > 0 && programId < 0) {
+    return {
+      whereAndClause: [
+        { title: { _ilike: convertToILikeFilter(courseTitle) } },
+      ],
+    };
+  }
+  return {
+    whereAndClause: [
+      { title: { _ilike: convertToILikeFilter(courseTitle) } },
+      { programId: { _eq: programId } },
+    ],
+  };
+};
 
 interface IProps {
   programs: Programs_Program[];
 }
 const CoursesDashBoard: FC<IProps> = ({ programs }) => {
-  const defaultProgram =
-    programs.length > 0 && programs[0].shortTitle ? programs[0].shortTitle : "";
+  const defaultProgram = programs[0].id;
   // State variables
   const [courseFilter, setCourseFilter] = useState({
     courseTitle: "",
-    programShortTitle: defaultProgram,
+    programId: defaultProgram,
   });
 
   const courseListRequest = useAdminQuery<
@@ -30,8 +56,7 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
   >(COURSE_LIST_WITH_FILTER, {
     // variables: courseFilter, // state variable not rendering instantly
     variables: {
-      courseTitle: convertToILikeFilter(""),
-      programShortTitle: convertToILikeFilter(defaultProgram),
+      whereAndClause: [{ programId: { _eq: defaultProgram } }],
     },
   });
 
@@ -46,22 +71,20 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
   /* #region callbacks */
   const handleRefetchRequest = useCallback(() => {
     setCourseFilter((prev) => {
-      courseListRequest.refetch({
-        courseTitle: convertToILikeFilter(prev.courseTitle),
-        programShortTitle: convertToILikeFilter(prev.programShortTitle),
-      });
+      courseListRequest.refetch(
+        createWhereClauseForCourse(prev.courseTitle, prev.programId)
+      );
       return prev;
     });
   }, [setCourseFilter, courseListRequest]);
 
   const handleSemesterTabClick = useCallback(
-    (tabID: string) => {
+    (tabID: number) => {
       setCourseFilter((prev) => {
-        courseListRequest.refetch({
-          courseTitle: convertToILikeFilter(prev.courseTitle),
-          programShortTitle: convertToILikeFilter(tabID.trim()),
-        });
-        return { ...prev, programShortTitle: tabID.trim() };
+        courseListRequest.refetch(
+          createWhereClauseForCourse(prev.courseTitle, tabID)
+        );
+        return { ...prev, programId: tabID };
       });
     },
     [setCourseFilter, courseListRequest]
@@ -70,20 +93,22 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
   const handleSearchInCourseTitle = useCallback(
     (searchedText: string) => {
       setCourseFilter((prev) => {
-        courseListRequest.refetch({
-          courseTitle: convertToILikeFilter(searchedText),
-          programShortTitle: convertToILikeFilter(prev.programShortTitle),
-        });
+        courseListRequest.refetch(
+          createWhereClauseForCourse(searchedText, prev.programId)
+        );
         return { ...prev, courseTitle: searchedText };
       });
     },
     [setCourseFilter, courseListRequest]
   );
 
+  if (courseListRequest.loading) {
+    return <Loading />;
+  }
   /* #endregion */
   return (
     <div>
-      <div className="sm:px-0 w-full">
+      <div className="w-full">
         <CourseListHeader
           programs={programs}
           filterOptions={courseFilter}

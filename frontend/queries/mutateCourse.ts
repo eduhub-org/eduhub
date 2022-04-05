@@ -44,11 +44,11 @@ export const DELETE_A_COURSE = gql`
 `;
 
 /* 
-We have to pass setObject 
+We have to pass "changes" 
 
 Example:
 
-$setObject = {
+$changes = {
   visivility: true,
 }
 

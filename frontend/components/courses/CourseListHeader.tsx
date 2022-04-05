@@ -3,14 +3,14 @@ import { Programs_Program } from "../../queries/__generated__/Programs";
 import { CourseListFilterOptions } from "../../types/UIComponents";
 import EhAddButton from "../common/EhAddButton";
 import ModalControl from "../common/ModalController";
-import AddCourseForm from "./AddCourseForm";
+import AddCourseDataLoaderUI from "./AddCourseDataLoaderUI";
 import HeaderOptions from "./HeaderOptions";
 
 interface IProps {
   programs: Programs_Program[];
   refetchCourseList: () => void;
   filterOptions: CourseListFilterOptions;
-  onTabClicked: (tab: string) => void;
+  onTabClicked: (tab: number) => void;
   onSearchTitle: (text: string) => void;
 }
 
@@ -23,16 +23,17 @@ const CourseListHeader: FC<IProps> = ({
 }) => {
   const ADD_COURSE = "Add Course";
   const titleOfAddCourseUI = "Kurs hinzufügen";
+
   // State variables
   const [showModal, setShowModal] = useState(false);
 
   /* #region callbacks */
-  const handleSemesterTabClick = useCallback(
-    (tabID: string) => {
-      onTabClicked(tabID);
-    },
-    [onTabClicked]
-  );
+  // const handleSemesterTabClick = useCallback(
+  //   (tabID: number) => {
+  //     onTabClicked(tabID);
+  //   },
+  //   [onTabClicked]
+  // );
 
   const handleSearchInCourseTitle = useCallback(
     (searchedText: string) => {
@@ -52,24 +53,20 @@ const CourseListHeader: FC<IProps> = ({
     [setShowModal]
   );
 
-  const onSavedCourseCallback = useCallback(
-    (onsuccess: boolean) => {
-      if (onsuccess) {
-        refetchCourseList();
-      }
-      setShowModal(false);
-    },
-    [setShowModal, refetchCourseList]
-  );
+  const onSavedCourseCallback = useCallback(() => {
+    refetchCourseList();
+    setShowModal(false);
+  }, [setShowModal, refetchCourseList]);
   /* #endregion */
 
   return (
     <>
       <HeaderOptions
         programs={programs}
-        onClickTab={handleSemesterTabClick}
+        onClickTab={onTabClicked}
         onSearch={handleSearchInCourseTitle}
-        selectedSemester={filterOptions.programShortTitle}
+        selectedProgramId={filterOptions.programId}
+        previousSearchedTitle={filterOptions.courseTitle}
       />
       <div className="bg-white py-4 flex justify-end">
         <EhAddButton buttonClickCallBack={openModalControl} text={ADD_COURSE} />
@@ -79,9 +76,9 @@ const CourseListHeader: FC<IProps> = ({
         onClose={onCloseAddCourseWindow}
         showModal={showModal}
       >
-        <AddCourseForm
+        <AddCourseDataLoaderUI
           programs={programs}
-          onSavedCourse={onSavedCourseCallback}
+          refetchCourseList={onSavedCourseCallback}
         />
       </ModalControl>
     </>

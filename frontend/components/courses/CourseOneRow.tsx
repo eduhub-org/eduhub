@@ -21,6 +21,12 @@ import {
 import EhCheckBox from "../common/EhCheckbox";
 import EhSelect from "../common/EhSelect";
 import CourseDetails from "./CourseDetails";
+import InstructorInARow from "./InstructorInARow";
+
+/* #region Local Interfaces */
+interface EntrollmentStatusCount {
+  [key: string]: number;
+}
 
 interface IProps {
   course: CourseListWithFilter_Course;
@@ -28,13 +34,7 @@ interface IProps {
   refetchCourseList: () => void;
   programs: Programs_Program[];
 }
-
-interface EntrollmentStatusCount {
-  [key: string]: number;
-}
-
-const makeFullName = (firstName: string, lastName: string) =>
-  `${firstName} ${lastName}`;
+/* #endregion */
 
 /*  APPLICANTS_INVITED = "APPLICANTS_INVITED",
   DRAFT = "DRAFT",
@@ -73,7 +73,7 @@ const CourseOneRow: FC<IProps> = ({
   const [showDetails, setShowDetails] = useState(false);
 
   const semesters: SelectOption[] = programs.map((program) => ({
-    value: program.id.toString(),
+    key: program.id,
     label: program.shortTitle ?? program.title,
   }));
 
@@ -82,6 +82,7 @@ const CourseOneRow: FC<IProps> = ({
     UpdateCourseByPkVariables
   >(UPDATE_COURSE_PROPERTY);
 
+  /* #region callbacks */
   const onClickDelete = useCallback(() => {
     handleDelete(course.id);
   }, [handleDelete, course.id]);
@@ -103,12 +104,12 @@ const CourseOneRow: FC<IProps> = ({
   }, [refetchCourseList, updateCourse, course]);
 
   const onSemesterChange = useCallback(
-    async (id: string) => {
+    async (id: number) => {
       const response = await updateCourse({
         variables: {
           id: course.id,
           changes: {
-            programId: parseInt(id, 10),
+            programId: id,
           },
         },
       });
@@ -119,6 +120,8 @@ const CourseOneRow: FC<IProps> = ({
     },
     [refetchCourseList, course.id, updateCourse]
   );
+
+  /* #endregion */
 
   // EINGELADEN/ BESTÄTIGT/ UNBEWERTET
   // TODO: Which feilds ??
@@ -131,9 +134,9 @@ const CourseOneRow: FC<IProps> = ({
         ? statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] + 1
         : 1;
     });
-    return `${statusRecordsWithSum[CourseEnrollmentStatus_enum.APPLIED] ?? 0}/${
+    return `${statusRecordsWithSum[CourseEnrollmentStatus_enum.INVITED] ?? 0}/${
       statusRecordsWithSum[CourseEnrollmentStatus_enum.CONFIRMED] ?? 0
-    }/${statusRecordsWithSum[CourseEnrollmentStatus_enum.ABORTED] ?? 0}`;
+    }/${course.AppliedAndUnratedCount.aggregate?.count}`;
   };
 
   const makeCompetitionField = () => {
@@ -167,16 +170,7 @@ const CourseOneRow: FC<IProps> = ({
           </div>
         </td>
         <td className="bg-edu-course-list ml-5">
-          <div className="flex items-start">
-            <p className="text-sm leading-none text-gray-600 ml-5">
-              {course.CourseInstructors.map((instructor) => {
-                return makeFullName(
-                  instructor.Expert.User.firstName,
-                  instructor.Expert.User.lastName ?? " "
-                );
-              })}
-            </p>
-          </div>
+          <InstructorInARow course={course} refetchData={refetchCourseList} />
         </td>
         <td className="bg-edu-course-list">
           {/* KURSLEITUNG */}
@@ -198,7 +192,7 @@ const CourseOneRow: FC<IProps> = ({
           {/* Program */}
           <div className="flex items-center space-x-2">
             <EhSelect
-              value={course.Program ? course.Program.id.toString() : ""}
+              value={course.Program ? course.Program.id : 0}
               onChangeHandler={onSemesterChange}
               options={semesters}
             />
@@ -232,7 +226,7 @@ const CourseOneRow: FC<IProps> = ({
           </IconButton>
         </td>
       </tr>
-      <tr className="h-1" />
+      <tr className={showDetails ? "h-0" : "h-1"} />
       {showDetails && (
         <CourseDetails course={course} refetchCourseList={refetchCourseList} />
       )}

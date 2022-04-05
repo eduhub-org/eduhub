@@ -17,24 +17,14 @@ export const COURSE_LIST = gql`
  *
  * We have to carefull here:
  *
- * $programShortTitle/ $title = "%%" or %something%
+ * $courseTitle = "%%" or %something%
  *
  */
+
 export const COURSE_LIST_WITH_FILTER = gql`
   ${ADMIN_COURSE_FRAGMENT}
-  query CourseListWithFilter(
-    $courseTitle: String!
-    $programShortTitle: String!
-  ) {
-    Course(
-      order_by: { id: desc }
-      where: {
-        _and: [
-          { title: { _ilike: $courseTitle } }
-          { Program: { _or: [{ shortTitle: { _ilike: $programShortTitle } }] } }
-        ]
-      }
-    ) {
+  query CourseListWithFilter($whereAndClause: [Course_bool_exp!]) {
+    Course(order_by: { id: desc }, where: { _and: $whereAndClause }) {
       ...AdminCourseFragment
     }
   }

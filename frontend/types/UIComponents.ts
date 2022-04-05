@@ -1,9 +1,9 @@
 export interface SelectOption {
-  value: string;
+  key: number;
   label: string;
 }
 
 export interface CourseListFilterOptions {
   courseTitle: string;
-  programShortTitle: string;
+  programId: number;
 }
