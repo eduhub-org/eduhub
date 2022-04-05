@@ -75,6 +75,16 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
   status: CourseEnrollmentStatus_enum;
 }
 
+export interface ManagedCourse_Course_by_pk_AppliedAndUnratedCount_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface ManagedCourse_Course_by_pk_AppliedAndUnratedCount {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: ManagedCourse_Course_by_pk_AppliedAndUnratedCount_aggregate | null;
+}
+
 export interface ManagedCourse_Course_by_pk_CourseLocations {
   __typename: "CourseLocation";
   id: number;
@@ -212,6 +222,10 @@ export interface ManagedCourse_Course_by_pk {
    * An array relationship
    */
   CourseEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[];
+  /**
+   * An aggregate relationship
+   */
+  AppliedAndUnratedCount: ManagedCourse_Course_by_pk_AppliedAndUnratedCount;
   /**
    * An array relationship
    */

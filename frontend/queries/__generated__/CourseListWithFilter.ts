@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { Course_bool_exp, CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseListWithFilter
@@ -67,6 +67,16 @@ export interface CourseListWithFilter_Course_CourseEnrollments {
   CourseEnrollmentStatus: CourseListWithFilter_Course_CourseEnrollments_CourseEnrollmentStatus;
 }
 
+export interface CourseListWithFilter_Course_AppliedAndUnratedCount_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface CourseListWithFilter_Course_AppliedAndUnratedCount {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: CourseListWithFilter_Course_AppliedAndUnratedCount_aggregate | null;
+}
+
 export interface CourseListWithFilter_Course {
   __typename: "Course";
   id: number;
@@ -122,6 +132,10 @@ export interface CourseListWithFilter_Course {
    * An array relationship
    */
   CourseEnrollments: CourseListWithFilter_Course_CourseEnrollments[];
+  /**
+   * An aggregate relationship
+   */
+  AppliedAndUnratedCount: CourseListWithFilter_Course_AppliedAndUnratedCount;
 }
 
 export interface CourseListWithFilter {
@@ -132,6 +146,5 @@ export interface CourseListWithFilter {
 }
 
 export interface CourseListWithFilterVariables {
-  courseTitle: string;
-  programShortTitle: string;
+  whereAndClause?: Course_bool_exp[] | null;
 }

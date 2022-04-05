@@ -67,6 +67,16 @@ export interface AdminCourseFragment_CourseEnrollments {
   CourseEnrollmentStatus: AdminCourseFragment_CourseEnrollments_CourseEnrollmentStatus;
 }
 
+export interface AdminCourseFragment_AppliedAndUnratedCount_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface AdminCourseFragment_AppliedAndUnratedCount {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: AdminCourseFragment_AppliedAndUnratedCount_aggregate | null;
+}
+
 export interface AdminCourseFragment {
   __typename: "Course";
   id: number;
@@ -122,4 +132,8 @@ export interface AdminCourseFragment {
    * An array relationship
    */
   CourseEnrollments: AdminCourseFragment_CourseEnrollments[];
+  /**
+   * An aggregate relationship
+   */
+  AppliedAndUnratedCount: AdminCourseFragment_AppliedAndUnratedCount;
 }
