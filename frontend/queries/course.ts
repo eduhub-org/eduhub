@@ -15,13 +15,22 @@ export const COURSE = gql`
 // Query to get all data on a course that is necessary for the manage course page
 export const MANAGED_COURSE = gql`
   ${ADMIN_COURSE_FRAGMENT}
-  ${ENROLLMENT_FRAGMENT}
 
   query ManagedCourse($id: Int!) {
     Course_by_pk(id: $id) {
       ...AdminCourseFragment
       CourseEnrollments {
-        ...EnrollmentFragment
+        invitationExpirationDate
+        id
+        status
+        motivationLetter
+        motivationRating
+        User {
+          id
+          firstName
+          lastName
+          email
+        }
       }
       CourseLocations {
         id

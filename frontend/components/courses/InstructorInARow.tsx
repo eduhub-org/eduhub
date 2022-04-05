@@ -110,7 +110,9 @@ const InstructorInARow: FC<IProps> = ({ course, refetchData }) => {
         setOpenInstructorDialog(false);
         return;
       }
-      if (course.CourseInstructors.some((expert) => expert.Expert.id === expertId)) {
+      if (
+        course.CourseInstructors.some((expert) => expert.Expert.id === expertId)
+      ) {
         setOpenInstructorDialog(false);
         return;
       }

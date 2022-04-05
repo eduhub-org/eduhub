@@ -7,6 +7,7 @@ module.exports = {
     extend: {
       gridTemplateColumns: {
         32: "repeat(32, minmax(0, 1fr))",
+        24: "repeat(24, minmax(0, 1fr))",
       },
       colors: {
         "edu-black": "#222222",

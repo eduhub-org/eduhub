@@ -20,6 +20,14 @@ export interface CourseListWithFilter_Course_Program {
    * The 6 letter short title for the program.
    */
   shortTitle: string | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
+  /**
+   * The last day a course lecture can possibly be in this program.
+   */
+  lectureEnd: any | null;
 }
 
 export interface CourseListWithFilter_Course_CourseInstructors_Expert_User {

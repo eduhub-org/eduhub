@@ -21,6 +21,7 @@ import {
 } from "../../queries/__generated__/UpdateCourseStatus";
 import { AlertMessageDialog } from "../common/dialogs/AlertMessageDialog";
 import { SessionsTab } from "./SessionsTab";
+import { ApplicationTab } from "./ApplicationTab";
 
 interface Props {
   courseId: number;
@@ -92,6 +93,10 @@ const canUpgradeStatus = (course: ManagedCourse_Course_by_pk) => {
       ) &&
       new Set(course.Sessions.map((s) => s.title)).size ===
         course.Sessions.length
+    );
+  } else if (course.status === "READY_FOR_APPLICATION") {
+    return (
+      course.CourseEnrollments.find((e) => e.status === "CONFIRMED") != null
     );
   } else {
     return false;
@@ -279,6 +284,10 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
 
           {openTabIndex === 1 && (
             <SessionsTab course={course} qResult={qResult} />
+          )}
+
+          {openTabIndex === 2 && (
+            <ApplicationTab course={course} qResult={qResult} />
           )}
 
           {openTabIndex === maxAllowedTab && (

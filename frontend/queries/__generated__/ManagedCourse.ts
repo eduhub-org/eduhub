@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseStatus_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
+import { CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourse
@@ -20,6 +20,14 @@ export interface ManagedCourse_Course_by_pk_Program {
    * The 6 letter short title for the program.
    */
   shortTitle: string | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
+  /**
+   * The last day a course lecture can possibly be in this program.
+   */
+  lectureEnd: any | null;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseInstructors_Expert_User {
@@ -58,6 +66,23 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_CourseEnrollmentSt
   value: string;
 }
 
+export interface ManagedCourse_Course_by_pk_CourseEnrollments_User {
+  __typename: "User";
+  id: any;
+  /**
+   * The user's first name
+   */
+  firstName: string;
+  /**
+   * The user's last name
+   */
+  lastName: string;
+  /**
+   * The user's email address
+   */
+  email: string;
+}
+
 export interface ManagedCourse_Course_by_pk_CourseEnrollments {
   __typename: "CourseEnrollment";
   id: number;
@@ -73,6 +98,18 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
    * The users current enrollment status to this course
    */
   status: CourseEnrollmentStatus_enum;
+  /**
+   * The text of the user's motivation letter
+   */
+  motivationLetter: string;
+  /**
+   * Rating that the user's motivation letter received from the course instructor
+   */
+  motivationRating: MotivationRating_enum;
+  /**
+   * An object relationship
+   */
+  User: ManagedCourse_Course_by_pk_CourseEnrollments_User;
 }
 
 export interface ManagedCourse_Course_by_pk_AppliedAndUnratedCount_aggregate {

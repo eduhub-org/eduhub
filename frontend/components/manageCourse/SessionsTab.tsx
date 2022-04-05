@@ -210,6 +210,8 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           onSetTitle={setSessionTitle}
           onDeleteSpeaker={deleteSessionSpeaker}
           onDeleteLocation={deleteSessionLocation}
+          lectureStart={course.Program?.lectureStart}
+          lectureEnd={course.Program?.lectureEnd}
           session={null}
           qResult={qResult}
         />
@@ -223,6 +225,8 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           onSetTitle={setSessionTitle}
           onDeleteLocation={deleteSessionLocation}
           onDeleteSpeaker={deleteSessionSpeaker}
+          lectureStart={course.Program?.lectureStart}
+          lectureEnd={course.Program?.lectureEnd}
           key={session.id}
           session={session}
           qResult={qResult}
