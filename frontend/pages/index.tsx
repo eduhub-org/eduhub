@@ -82,7 +82,11 @@ const Home: FC = () => {
             <TileSlider courses={courses?.Course ?? []} />
           </div>
           <div className="w-full flex justify-center mt-16 mb-24">
-            <Button>{t("browse")}</Button>
+            <Link href="/courses/admin">
+              <a className="flex">
+                <Button>{t("browse")}</Button>
+              </a>
+            </Link>
           </div>
           <OnlyLoggedOut>
             <div className="flex flex-col sm:flex-row mx-6 mt-6 mb-24 sm:mt-48">

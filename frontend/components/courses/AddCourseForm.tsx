@@ -2,14 +2,15 @@ import { FC, useCallback, useState } from "react";
 import { useAdminMutation } from "../../hooks/authedMutation";
 import { INSERT_A_COURSE } from "../../queries/mutateCourse";
 import { INSERT_A_COURSEINSTRUCTOR } from "../../queries/mutateCourseInstructor";
-import {
-  InsertCourse,
-  InsertCourseVariables,
-} from "../../queries/__generated__/InsertCourse";
+
 import {
   InsertCourseInstructor,
   InsertCourseInstructorVariables,
 } from "../../queries/__generated__/InsertCourseInstructor";
+import {
+  InsertSingleCourse,
+  InsertSingleCourseVariables,
+} from "../../queries/__generated__/InsertSingleCourse";
 import { SelectOption } from "../../types/UIComponents";
 import EhButton from "../common/EhButton";
 import EhDebounceInput from "../common/EhDebounceInput";
@@ -26,9 +27,10 @@ const AddCourseForm: FC<IProps> = ({
   refetchContactList,
 }) => {
   /* #region Mutation endpoints */
-  const [insertACourse] = useAdminMutation<InsertCourse, InsertCourseVariables>(
-    INSERT_A_COURSE
-  );
+  const [insertACourse] = useAdminMutation<
+    InsertSingleCourse,
+    InsertSingleCourseVariables
+  >(INSERT_A_COURSE);
   const [insertCourseInstructor] = useAdminMutation<
     InsertCourseInstructor,
     InsertCourseInstructorVariables
@@ -52,26 +54,28 @@ const AddCourseForm: FC<IProps> = ({
       today.setHours(0);
       const response = await insertACourse({
         variables: {
-          achievementCertificatePossible: false,
-          attendanceCertificatePossible: false,
-          applicationEnd: today,
-          ects: "5.0",
-          headingDescriptionField1: "",
-          language: "English",
-          maxMissedSessions: 3,
-          programId,
-          tagline: "",
-          title: courseTitle,
+          course: {
+            achievementCertificatePossible: false,
+            attendanceCertificatePossible: false,
+            applicationEnd: today,
+            ects: "5.0",
+            headingDescriptionField1: "",
+            language: "English",
+            maxMissedSessions: 3,
+            programId,
+            tagline: "",
+            title: courseTitle,
+          },
         },
       });
 
-      if (response.errors || !response.data?.insert_Course) {
+      if (response.errors || !response.data?.insert_Course_one?.id) {
         console.log(response.errors);
         return;
       }
       const res = await insertCourseInstructor({
         variables: {
-          courseId: response.data.insert_Course.returning[0].id,
+          courseId: response.data?.insert_Course_one?.id,
           expertId: instructorID,
         },
       });

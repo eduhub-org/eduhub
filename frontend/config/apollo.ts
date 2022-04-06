@@ -47,6 +47,9 @@ export const client = new ApolloClient({
           CourseInstructors: {
             merge: (_, incoming) => incoming,
           },
+          CourseEnrollments: {
+            merge: (_, incoming) => incoming,
+          },
         },
       },
 

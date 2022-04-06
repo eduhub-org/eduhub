@@ -1,36 +1,9 @@
 import { gql } from "@apollo/client";
 
 export const INSERT_A_COURSE = gql`
-  mutation InsertCourse(
-    $achievementCertificatePossible: Boolean!
-    $attendanceCertificatePossible: Boolean!
-    $applicationEnd: date!
-    $ects: String!
-    $headingDescriptionField1: String!
-    $language: String!
-    $maxMissedSessions: Int!
-    $programId: Int!
-    $tagline: String!
-    $title: String!
-  ) {
-    insert_Course(
-      objects: {
-        achievementCertificatePossible: $achievementCertificatePossible
-        attendanceCertificatePossible: $attendanceCertificatePossible
-        applicationEnd: $applicationEnd
-        ects: $ects
-        headingDescriptionField1: $headingDescriptionField1
-        language: $language
-        maxMissedSessions: $maxMissedSessions
-        programId: $programId
-        tagline: $tagline
-        title: $title
-      }
-    ) {
-      affected_rows
-      returning {
-        id
-      }
+  mutation InsertSingleCourse($course: Course_insert_input!) {
+    insert_Course_one(object: $course) {
+      id
     }
   }
 `;
@@ -44,14 +17,10 @@ export const DELETE_A_COURSE = gql`
 `;
 
 /* 
-We have to pass "changes" 
-
-Example:
-
-$changes = {
+Be carefull about key property, It has to be same as a colum name of a "Course" table,
+Example: changes = {
   visivility: true,
 }
-
 here 'visivility' is a database column
 */
 
