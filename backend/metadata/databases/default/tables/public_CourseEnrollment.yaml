@@ -44,8 +44,8 @@ select_permissions:
     - motivationRating
     - achievementCertificateURL
     - attendanceCertificateURL
-    - createdAt
-    - updatedAt
+    - created_at
+    - updated_at
     - invitationExpirationDate
     filter: {}
   role: instructor_access

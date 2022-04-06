@@ -45,8 +45,8 @@ insert_permissions:
     - startDateTime
     - endDateTime
     - courseId
-    - createdAt
-    - updatedAt
+    - created_at
+    - updated_at
   role: instructor_access
 select_permissions:
 - permission:
