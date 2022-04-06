@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: Programs
+// GraphQL fragment: ProgramFragmentMinimumProperties
 // ====================================================
 
-export interface Programs_Program {
+export interface ProgramFragmentMinimumProperties {
   __typename: "Program";
   id: number;
   /**
@@ -18,11 +18,4 @@ export interface Programs_Program {
    * The title of the program
    */
   title: string;
-}
-
-export interface Programs {
-  /**
-   * fetch data from the table: "Program"
-   */
-  Program: Programs_Program[];
 }

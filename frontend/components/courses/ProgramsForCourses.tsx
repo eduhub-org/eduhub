@@ -1,12 +1,14 @@
 import { FC, useState } from "react";
 import { useAdminQuery } from "../../hooks/authedQuery";
-import { ADMIN_PROGRAM_LIST } from "../../queries/programList";
+import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from "../../queries/programList";
 import { Programs } from "../../queries/__generated__/Programs";
 import CoursesDashBoard from "./DashBoard";
 import Loading from "./Loading";
 
 const ProgramsForCourses: FC = () => {
-  const programListRequest = useAdminQuery<Programs>(ADMIN_PROGRAM_LIST); // Load Program list from db
+  const programListRequest = useAdminQuery<Programs>(
+    PROGRAMS_WITH_MINIMUM_PROPERTIES
+  ); // Load Program list from db
 
   if (programListRequest.error) {
     console.log(programListRequest.error);

@@ -3,7 +3,7 @@ import Head from "next/head";
 import { FC } from "react";
 import ProgramsForCourses from "../../components/courses/ProgramsForCourses";
 import { Page } from "../../components/Page";
-import { useIsAdmin } from "../../hooks/authentication";
+import { useIsAdmin, useIsLoggedIn } from "../../hooks/authentication";
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
@@ -13,12 +13,13 @@ export const getStaticProps = async ({ locale }: { locale: string }) => ({
 
 const Index: FC = () => {
   const isAdmin = useIsAdmin();
+  const isLoggedIn = useIsLoggedIn();
   return (
     <>
       <Head>
         <title>Courses: opencampus.sh Edu Hub </title>
       </Head>
-      <Page>{isAdmin && <ProgramsForCourses />}</Page>
+      <Page>{isLoggedIn && isAdmin && <ProgramsForCourses />}</Page>
     </>
   );
 };

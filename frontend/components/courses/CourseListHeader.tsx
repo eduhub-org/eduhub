@@ -28,12 +28,6 @@ const CourseListHeader: FC<IProps> = ({
   const [showModal, setShowModal] = useState(false);
 
   /* #region callbacks */
-  // const handleSemesterTabClick = useCallback(
-  //   (tabID: number) => {
-  //     onTabClicked(tabID);
-  //   },
-  //   [onTabClicked]
-  // );
 
   const handleSearchInCourseTitle = useCallback(
     (searchedText: string) => {

@@ -24,7 +24,7 @@ module.exports = {
       },
     },
     fontFamily: {
-      body: ["Space Grotesk", "sans-serif"],
+      body: ['"Space Grotesk"', '"sans-serif"'],
     },
     listStyleType: {
       check: "{ list-style-image: url(img/iphone.png); }",
