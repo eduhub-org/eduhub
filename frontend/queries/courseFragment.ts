@@ -55,6 +55,14 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     achievementCertificatePossible
     attendanceCertificatePossible
     chatLink
+    learningGoals
+    headingDescriptionField1
+    headingDescriptionField2
+    contentDescriptionField1
+    contentDescriptionField2
+    weekDay
+    startTime
+    endTime
     Program {
       id
       title

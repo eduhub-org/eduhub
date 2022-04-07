@@ -248,6 +248,38 @@ export interface ManagedCourse_Course_by_pk {
    */
   chatLink: string | null;
   /**
+   * An array of texts including the learning goals for the course
+   */
+  learningGoals: string | null;
+  /**
+   * Heading of the the first course description field
+   */
+  headingDescriptionField1: string;
+  /**
+   * Heading of the the second course description field
+   */
+  headingDescriptionField2: string | null;
+  /**
+   * Content of the first course description field
+   */
+  contentDescriptionField1: string | null;
+  /**
+   * Content of the second course description field
+   */
+  contentDescriptionField2: string | null;
+  /**
+   * The day of the week the course takes place.
+   */
+  weekDay: string | null;
+  /**
+   * The time the course starts each week.
+   */
+  startTime: any | null;
+  /**
+   * The time the course ends each week.
+   */
+  endTime: any | null;
+  /**
    * An object relationship
    */
   Program: ManagedCourse_Course_by_pk_Program | null;
