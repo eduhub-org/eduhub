@@ -29,3 +29,15 @@ export const COURSE_LIST_WITH_FILTER = gql`
     }
   }
 `;
+
+export const COURSE_LIST_FOR_SINGLE_INSTRUCTOR = gql`
+  ${COURSE_FRAGMENT}
+  query CoursesSingleInstructor($expertId: Int!) {
+    Course(
+      order_by: { id: desc }
+      where: { CourseInstructors: { expertId: { _eq: $expertId } } }
+    ) {
+      ...CourseFragment
+    }
+  }
+`;

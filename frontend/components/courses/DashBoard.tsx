@@ -49,7 +49,6 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
     courseTitle: "",
     programId: defaultProgram,
   });
-
   const courseListRequest = useAdminQuery<
     CourseListWithFilter,
     CourseListWithFilterVariables
@@ -102,9 +101,6 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
     [setCourseFilter, courseListRequest]
   );
 
-  if (courseListRequest.loading) {
-    return <Loading />;
-  }
   /* #endregion */
   return (
     <div>
@@ -116,12 +112,16 @@ const CoursesDashBoard: FC<IProps> = ({ programs }) => {
           onTabClicked={handleSemesterTabClick}
           refetchCourseList={handleRefetchRequest}
         />
-        {courses.length > 0 && (
-          <CourseListUI
-            courses={courses}
-            programs={programs}
-            refetchCourseList={handleRefetchRequest}
-          />
+        {courseListRequest.loading ? (
+          <Loading />
+        ) : (
+          courses.length > 0 && (
+            <CourseListUI
+              courses={courses}
+              programs={programs}
+              refetchCourseList={handleRefetchRequest}
+            />
+          )
         )}
       </div>
     </div>

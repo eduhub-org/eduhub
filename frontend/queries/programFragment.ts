@@ -33,3 +33,11 @@ export const ADMIN_PROGRAM_FRAGMENT = gql`
     visibilityParticipationCertificate
   }
 `;
+
+export const PROGRAM_FRAGMENT_MINIMUM_PROPERTIES = gql`
+  fragment ProgramFragmentMinimumProperties on Program {
+    id
+    shortTitle
+    title
+  }
+`;
