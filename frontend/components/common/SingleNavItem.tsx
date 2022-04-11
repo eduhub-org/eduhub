@@ -8,18 +8,21 @@ interface IPros {
 }
 
 const SingleNavItem: FC<IPros> = ({ title, selected, id, onClickCallback }) => {
-  const tabStyle = () => {
-    return selected === id
-      ? "bg-blue-400 py-2 px-10 text-white hover:text-gray-300 rounded-full focus:outline-none m-1"
-      : "py-2 px-10 hover:text-indigo-700 hover:bg-blue-100 rounded-full focus:outline-none m-1";
-  };
-
   const tabClickCallback = useCallback(() => {
     onClickCallback(id);
-  }, [id, onClickCallback]); // [title, selected, onClickCallback] : useCallback is basically a memoized function. It needs to know all references to variables the lambda has
+  }, [id, onClickCallback]);
 
   return (
-    <button onClick={tabClickCallback} className={tabStyle()}>
+    <button
+      onClick={tabClickCallback}
+      className={`
+    border-b-2 border-solid hover:border-black
+    mr-6
+    last:mr-0
+    px-5
+    focus:outline-none
+    ${selected === id ? "border-black font-bold" : "border-white"}`}
+    >
       {title}
     </button>
   );

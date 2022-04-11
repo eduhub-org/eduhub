@@ -1,6 +1,10 @@
 import { TFunction } from "next-i18next";
 import { FC, useCallback, useState } from "react";
-import { SelectOption } from "../../../types/UIComponents";
+import {
+  SelectOption,
+  StaticComponentProperty,
+} from "../../../types/UIComponents";
+import CommonPageHeader from "../../common/CommonPageHeader";
 import CourseList from "./CourseList";
 import Sidebar from "./Sidebar";
 
@@ -9,19 +13,19 @@ interface IProps {
 }
 const Dashboard: FC<IProps> = ({ t }) => {
   // TODO: Come up with Valid Category
-  const sidebarItems: SelectOption[] = [
-    { key: 0, label: "All Programs" },
-    { key: 1, label: "Tech" },
-    { key: 2, label: "Business" },
-    { key: 3, label: "Creative" },
-    { key: 4, label: "Programmieren" },
+  const sidebarItems: StaticComponentProperty[] = [
+    { key: 0, label: "All Programs", selected: true },
+    { key: 1, label: "Tech", selected: false },
+    { key: 2, label: "Business", selected: false },
+    { key: 3, label: "Creative", selected: false },
+    { key: 4, label: "Programmieren", selected: false },
   ];
 
   const [selected, setSelected] = useState(sidebarItems[0]);
 
   /* #region Callbacks */
   const handleMenuClick = useCallback(
-    (key: SelectOption) => {
+    (key: StaticComponentProperty) => {
       setSelected(key);
     },
     [setSelected]
@@ -30,22 +34,15 @@ const Dashboard: FC<IProps> = ({ t }) => {
 
   return (
     <>
-      <div className="pt-10">
-        <p className="text-base sm:text-lg lg:text-3xl leading-normal text-edu-modal-bg-color">
-          {t("headline")}
-        </p>
-      </div>
-      <div className="flex flex-row py-10">
-        <div className="w-3/12 min-h-[50vh]">
+      <CommonPageHeader headline={t("headline")} />
+      <div className="flex flex-row py-5 space-x-5">
+        <div className="w-3/12 flex">
           <Sidebar
             handleMenuSelection={handleMenuClick}
-            selectedItem={selected}
             sidebarItems={sidebarItems}
           />
         </div>
-        <div className="w-9/12 p-4">
-          {<CourseList selectedOption={selected} />}
-        </div>
+        <div className="w-9/12">{<CourseList selectedOption={selected} />}</div>
       </div>
     </>
   );

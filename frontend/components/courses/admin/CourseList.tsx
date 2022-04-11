@@ -6,12 +6,12 @@ import {
   CoursesSingleInstructorVariables,
   CoursesSingleInstructor_Course,
 } from "../../../queries/__generated__/CoursesSingleInstructor";
-import { SelectOption } from "../../../types/UIComponents";
+import { StaticComponentProperty } from "../../../types/UIComponents";
 import { Tile } from "../../course/Tile";
 import Loading from "../Loading";
 
 interface IProps {
-  selectedOption: SelectOption;
+  selectedOption: StaticComponentProperty;
 }
 const CourseList: FC<IProps> = ({ selectedOption }) => {
   let courses: CoursesSingleInstructor_Course[] = [];

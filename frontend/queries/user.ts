@@ -70,3 +70,24 @@ export const USER_SELECTION_TWO_PARAMS = gql`
     }
   }
 `;
+
+export const USERS_BY_LAST_NAME = gql`
+  query UesrsByLastName($limit: Int!, $offset: Int!, $filter: User_bool_exp!) {
+    User_aggregate(where: $filter) {
+      aggregate {
+        count
+      }
+    }
+    User(
+      order_by: { lastName: asc }
+      where: $filter
+      limit: $limit
+      offset: $offset
+    ) {
+      id
+      firstName
+      lastName
+      email
+    }
+  }
+`;

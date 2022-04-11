@@ -16,6 +16,7 @@ const EhAddButton: FC<IProps> = ({ text, buttonClickCallBack, buttonSize }) => {
   return (
     <Button
       onClick={buttonClickCallBack}
+      className="focus:outline-none"
       size={buttonSize || "medium"}
       startIcon={<MdAddCircle />}
     >
