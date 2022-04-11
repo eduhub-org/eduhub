@@ -53,6 +53,7 @@ const EhSelect: FC<IPros> = ({
       aria-label={placeholder ?? ""}
       onChange={onSelectChanged}
       value={value}
+      placeholder={placeholder ?? ""}
     >
       {options.map((option, index) => (
         <option key={option.key} value={option.key}>

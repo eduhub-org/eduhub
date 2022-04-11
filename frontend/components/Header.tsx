@@ -16,6 +16,7 @@ import { Avatar } from "./common/Avatar";
 import { OnlyDesktop } from "./common/OnlyDesktop";
 import { OnlyAdmin } from "./common/OnlyLoggedIn";
 import { ClientOnly } from "./common/ClientOnly";
+import { MdManageAccounts } from "react-icons/md";
 
 export const Header: FC = () => {
   const isLoggedIn = useIsLoggedIn();
@@ -30,7 +31,7 @@ export const Header: FC = () => {
   }, []);
 
   return (
-    <header className="flex w-full p-4">
+    <header className="flex w-full py-4">
       <div className="flex w-full items-center">
         <Link href="/">
           <div className="flex cursor-pointer">
@@ -73,6 +74,11 @@ export const Header: FC = () => {
             <Link href="/courses">
               <div className="mr-3 cursor-pointer">
                 <Avatar imageUrl={coursesLogo} />
+              </div>
+            </Link>
+            <Link href="/users">
+              <div className="mr-3 cursor-pointer">
+                <MdManageAccounts size={40} />
               </div>
             </Link>
             <div className="flex bg-blue-400">

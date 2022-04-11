@@ -1,27 +1,24 @@
 import { FC, useCallback } from "react";
-import { Button } from "./Button";
 
 interface IProps {
   buttonText: string;
+  disabled?: boolean;
   onClickCallback: () => void;
 }
 
-const EhButton: FC<IProps> = ({ buttonText, onClickCallback }) => {
+const EhButton: FC<IProps> = ({ buttonText, onClickCallback, disabled }) => {
   const handleOnclick = useCallback(() => {
     onClickCallback();
   }, [onClickCallback]);
 
   return (
-    // <button
-    //   className="rounded-full
-    //                 bg-gray-300
-    //                 text-black
-    //                 pt-2 pb-2 pl-10 pr-10"
-    //   onClick={handleOnclick}
-    // >
-    //   {buttonText}
-    // </button>
-    <Button onClick={handleOnclick}>{buttonText}</Button>
+    <button
+      onClick={handleOnclick}
+      disabled={disabled ?? false}
+      className="rounded-full py-2 px-4 border-2 border-black hover:border-indigo-300"
+    >
+      {buttonText}
+    </button>
   );
 };
 

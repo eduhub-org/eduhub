@@ -1,6 +1,7 @@
 import { FC, useCallback, useState } from "react";
 import { Programs_Program } from "../../queries/__generated__/Programs";
 import { CourseListFilterOptions } from "../../types/UIComponents";
+import CommonPageHeader from "../common/CommonPageHeader";
 import EhAddButton from "../common/EhAddButton";
 import ModalControl from "../common/ModalController";
 import AddCourseDataLoaderUI from "./AddCourseDataLoaderUI";
@@ -55,6 +56,7 @@ const CourseListHeader: FC<IProps> = ({
 
   return (
     <>
+      <CommonPageHeader headline={"Kurse"} />
       <HeaderOptions
         programs={programs}
         onClickTab={onTabClicked}
