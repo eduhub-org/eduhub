@@ -11,10 +11,7 @@ import { PageBlock } from "../common/PageBlock";
 import { Button as OldButton } from "../common/Button";
 import { DescriptionTab } from "./DescriptionTab";
 import { QuestionConfirmationDialog } from "../common/dialogs/QuestionConfirmationDialog";
-import {
-  useAdminMutation,
-  useInstructorMutation,
-} from "../../hooks/authedMutation";
+import { useAdminMutation } from "../../hooks/authedMutation";
 import {
   UpdateCourseStatus,
   UpdateCourseStatusVariables,
@@ -22,6 +19,7 @@ import {
 import { AlertMessageDialog } from "../common/dialogs/AlertMessageDialog";
 import { SessionsTab } from "./SessionsTab";
 import { ApplicationTab } from "./ApplicationTab";
+import ManageCourseEnrollment from "./ManageCourseEnrollment";
 
 interface Props {
   courseId: number;
@@ -143,8 +141,6 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
   if (qResult.error) {
     console.log("query managed course error!", qResult.error);
   }
-
-  console.log(qResult.data);
 
   const course: ManagedCourse_Course_by_pk | null =
     qResult.data?.Course_by_pk || null;
@@ -289,6 +285,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
           {openTabIndex === 2 && (
             <ApplicationTab course={course} qResult={qResult} />
           )}
+          {openTabIndex === 3 && <ManageCourseEnrollment courseId={courseId} />}
 
           {openTabIndex === maxAllowedTab && (
             <div className="flex justify-end mb-16">
