@@ -1,8 +1,9 @@
 import { FC } from "react";
 import { GoPrimitiveDot } from "react-icons/go";
+export type DOT_COLORS = "GREY" | "GREEN" | "ORANGE" | "RED";
 
 interface IProps {
-  color: "GREY" | "GREEN" | "ORANGE" | "RED";
+  color: DOT_COLORS;
   size?: "DEFAULT" | "LARGE";
   className?: string;
   onClick?: () => void;

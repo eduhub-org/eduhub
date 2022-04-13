@@ -5,10 +5,15 @@ import { Page } from "../../../components/Page";
 import { useRouter } from "next/router";
 import { useIsAdmin, useIsInstructor } from "../../../hooks/authentication";
 import { AuthorizedManageCourse } from "../../../components/manageCourse/AuthorizedManageCourse";
+import { useTranslation } from "next-i18next";
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
-    ...(await serverSideTranslations(locale, ["common"])),
+    ...(await serverSideTranslations(locale, [
+      "common",
+      "user-common",
+      "manage-course",
+    ])),
   },
 });
 
@@ -25,7 +30,6 @@ export const getStaticPaths = async () => {
 const ManageCoursePage: FC = () => {
   const router = useRouter();
   const { courseId, tab: tabParam } = router.query;
-
   const isInstructor = useIsInstructor();
 
   return (

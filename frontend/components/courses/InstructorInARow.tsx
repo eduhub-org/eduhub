@@ -53,12 +53,6 @@ const InstructorInARow: FC<IProps> = ({ course, refetchData }) => {
 
   /* # endregion */
 
-  const isAlreadExistExpert = (expertId: number) => {
-    return course.CourseInstructors.some(
-      (expert) => expert.Expert.id === expertId
-    );
-  };
-
   /* #region Callbacks */
   const addInstructorDialogOpener = useCallback(async () => {
     setOpenInstructorDialog(true);

@@ -804,6 +804,24 @@ export interface Attendance_on_conflict {
 }
 
 /**
+ * input type for updating data in table "Attendance"
+ */
+export interface Attendance_set_input {
+  createdAt?: any | null;
+  endDateTime?: any | null;
+  id?: number | null;
+  interruptionCount?: number | null;
+  recordedName?: string | null;
+  sessionId?: number | null;
+  source?: string | null;
+  startDateTime?: any | null;
+  status?: AttendanceStatus_enum | null;
+  totalAttendanceTime?: number | null;
+  updatedAt?: any | null;
+  userId?: any | null;
+}
+
+/**
  * Boolean expression to compare columns of type "Boolean". All fields are combined with logical 'AND'.
  */
 export interface Boolean_comparison_exp {
