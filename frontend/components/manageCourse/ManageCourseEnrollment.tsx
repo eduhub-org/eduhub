@@ -6,20 +6,18 @@ import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 import { useAdminMutation } from "../../hooks/authedMutation";
 import { useAdminQuery } from "../../hooks/authedQuery";
 import {
-  COURSE_ENROLLMENT_BY_COURSE_ID,
   INSERT_SINGLE_ATTENDENCE,
   UPDATE_ATTENDENCE,
 } from "../../queries/courseEnrollment";
 import {
-  CourseEnrollmentByCourseID,
-  CourseEnrollmentByCourseIDVariables,
-  CourseEnrollmentByCourseID_Course_by_pk_CourseEnrollments,
-  CourseEnrollmentByCourseID_Course_by_pk_Sessions,
-} from "../../queries/__generated__/CourseEnrollmentByCourseID";
-import {
   InsertSingleAttendence,
   InsertSingleAttendenceVariables,
 } from "../../queries/__generated__/InsertSingleAttendence";
+import {
+  ManagedCourse_Course_by_pk,
+  ManagedCourse_Course_by_pk_CourseEnrollments,
+  ManagedCourse_Course_by_pk_Sessions,
+} from "../../queries/__generated__/ManagedCourse";
 
 import {
   UpdateSingleAttendenceByPk,
@@ -28,34 +26,15 @@ import {
 import { StaticComponentProperty } from "../../types/UIComponents";
 import { AttendanceStatus_enum } from "../../__generated__/globalTypes";
 import { DOT_COLORS, EhDot } from "../common/dots";
-import Loading from "../courses/Loading";
 
 interface IProps {
-  courseId: number;
+  course: ManagedCourse_Course_by_pk;
+  qResult: QueryResult<any, any>;
 }
-const ManageCourseEnrollment: FC<IProps> = ({ courseId }) => {
-  // const courseEnrollments = qResult.data?.Course_by_pk?.CourseEnrollments || [];
-  const courseEnrollmentRequest = useAdminQuery<
-    CourseEnrollmentByCourseID,
-    CourseEnrollmentByCourseIDVariables
-  >(COURSE_ENROLLMENT_BY_COURSE_ID, {
-    variables: {
-      courseId,
-    },
-  });
-  if (courseEnrollmentRequest.error) {
-    console.log(courseEnrollmentRequest.error);
-  }
+const ManageCourseEnrollment: FC<IProps> = ({ course, qResult }) => {
   return (
     <>
-      {courseEnrollmentRequest.loading ? (
-        <Loading />
-      ) : (courseEnrollmentRequest.data?.Course_by_pk?.CourseEnrollments || [])
-          .length > 0 ? (
-        <EnrollmentList courseEnrollmentRequest={courseEnrollmentRequest} />
-      ) : (
-        <></>
-      )}
+      <EnrollmentList course={course} qResult={qResult} />
     </>
   );
 };
@@ -64,15 +43,11 @@ export default ManageCourseEnrollment;
 
 /* #region Course Enrollment List */
 interface IPropsEnrollmentList {
-  courseEnrollmentRequest: QueryResult<
-    CourseEnrollmentByCourseID,
-    CourseEnrollmentByCourseIDVariables
-  >;
+  course: ManagedCourse_Course_by_pk;
+  qResult: QueryResult<any, any>;
 }
 
-const EnrollmentList: FC<IPropsEnrollmentList> = ({
-  courseEnrollmentRequest,
-}) => {
+const EnrollmentList: FC<IPropsEnrollmentList> = ({ course, qResult }) => {
   const { t } = useTranslation(["user-common", "manage-course"]);
 
   const tableHeaders: StaticComponentProperty[] = [
@@ -82,9 +57,8 @@ const EnrollmentList: FC<IPropsEnrollmentList> = ({
     { key: 3, label: t("manage-course:certificateAchievement") },
   ];
 
-  const enrollmentList =
-    courseEnrollmentRequest.data?.Course_by_pk?.CourseEnrollments || [];
-  const sessions = courseEnrollmentRequest.data?.Course_by_pk?.Sessions || [];
+  const enrollmentList = course.CourseEnrollments || [];
+  const sessions = course.Sessions || [];
 
   return (
     <div className="overflow-x-auto transition-[height] w-full pb-10">
@@ -109,11 +83,8 @@ const EnrollmentList: FC<IPropsEnrollmentList> = ({
               enrollment={ce}
               sessions={sessions}
               userId={ce.User.id}
-              courseEnrollmentRequest={courseEnrollmentRequest}
-              maxMissedSessions={
-                courseEnrollmentRequest.data?.Course_by_pk?.maxMissedSessions ||
-                0
-              }
+              qResult={qResult}
+              maxMissedSessions={course.maxMissedSessions}
             />
           ))}
         </tbody>
@@ -126,7 +97,7 @@ const EnrollmentList: FC<IPropsEnrollmentList> = ({
 
 interface IDotData {
   color: DOT_COLORS;
-  session: CourseEnrollmentByCourseID_Course_by_pk_Sessions;
+  session: ManagedCourse_Course_by_pk_Sessions;
 }
 
 const pStyle = "text-gray-700 truncate";
@@ -135,19 +106,16 @@ const tdStyple = "font-medium bg-edu-course-list py-2 px-10 ";
 /* #region OneCourseEnrollmentRow */
 
 interface IPropsOneRow {
-  enrollment: CourseEnrollmentByCourseID_Course_by_pk_CourseEnrollments;
-  sessions: CourseEnrollmentByCourseID_Course_by_pk_Sessions[];
-  courseEnrollmentRequest: QueryResult<
-    CourseEnrollmentByCourseID,
-    CourseEnrollmentByCourseIDVariables
-  >;
+  enrollment: ManagedCourse_Course_by_pk_CourseEnrollments;
+  sessions: ManagedCourse_Course_by_pk_Sessions[];
+  qResult: QueryResult<any, any>;
   userId: string;
   maxMissedSessions: number;
 }
 const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
   enrollment,
   sessions,
-  courseEnrollmentRequest,
+  qResult,
   userId,
   maxMissedSessions,
 }) => {
@@ -179,24 +147,23 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
    * @param  {AttendanceStatus_enum} previousStatus Previous attendence status
    * @returns {AttendanceStatus_enum} Returns an AttendanceStatus_enum
    */
-  const udateAttendenceStatus = (previousStatus: AttendanceStatus_enum) => {
+  const updateAttendenceStatus = (previousStatus: AttendanceStatus_enum) => {
     if (previousStatus === AttendanceStatus_enum.ATTENDED) {
       return AttendanceStatus_enum.MISSED;
     }
     if (previousStatus === AttendanceStatus_enum.MISSED) {
-      return AttendanceStatus_enum.ATTENDED;
+      return AttendanceStatus_enum.NO_INFO;
     }
     // TODO: no information for NO_INFO
-    // if (session.title === AttendanceStatus_enum.NO_INFO) return AttendanceStatus_enum.ATTENDED;
     return AttendanceStatus_enum.ATTENDED;
   };
 
   // TODO: AttendanceSource_enum not Creating as "globalTypes" ??
   const handleDotClick = useCallback(
-    async (session: CourseEnrollmentByCourseID_Course_by_pk_Sessions) => {
+    async (session: ManagedCourse_Course_by_pk_Sessions) => {
       const obj = attendenceRecordBySession[session.id];
       if (obj) {
-        const udpatedStatus: AttendanceStatus_enum = udateAttendenceStatus(
+        const udpatedStatus: AttendanceStatus_enum = updateAttendenceStatus(
           obj.status
         );
         const response = await udpateAnAttendence({
@@ -211,7 +178,7 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
           console.log("Update Error: ", response.errors);
           return;
         }
-        courseEnrollmentRequest.refetch();
+        qResult.refetch();
         return;
       }
 
@@ -230,11 +197,11 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
         console.log("Error: ", response.errors);
         return;
       }
-      courseEnrollmentRequest.refetch();
+      qResult.refetch();
     },
     [
       attendenceRecordBySession,
-      courseEnrollmentRequest,
+      qResult,
       insertAttendence,
       udpateAnAttendence,
       userId,
@@ -254,7 +221,7 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
    * @param {CourseEnrollmentByCourseID_Course_by_pk_Sessions} sn Database object
    * @returns {DOT_COLORS} ("GREY" | "GREEN" | "ORANGE" | "RED")
    */
-  const dotColor = (sn: CourseEnrollmentByCourseID_Course_by_pk_Sessions) => {
+  const dotColor = (sn: ManagedCourse_Course_by_pk_Sessions) => {
     if (enrollment.User.Attendances.length === 0) return "GREY";
     const index = enrollment.User.Attendances.findIndex(
       (ob) => ob.Session.id === sn.id
@@ -273,7 +240,8 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
   }));
   const attendedSessionCount = () => {
     const result = dotsData.reduce(
-      (prev, current) => prev + (current.color === "GREEN" ? 1 : 0),
+      (prev, current) =>
+        prev + (current.color === "GREEN" || current.color === "GREY" ? 1 : 0),
       0
     );
     return result;
@@ -343,7 +311,7 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
 
 /* #endregion */
 interface IPropsShowDetails {
-  enrollment: CourseEnrollmentByCourseID_Course_by_pk_CourseEnrollments;
+  enrollment: ManagedCourse_Course_by_pk_CourseEnrollments;
 }
 const ShowDetails: FC<IPropsShowDetails> = ({ enrollment }) => {
   return (
@@ -362,10 +330,8 @@ const ShowDetails: FC<IPropsShowDetails> = ({ enrollment }) => {
 /* #region IEhDotProps With Extra callback */
 interface IEhDotProps {
   dotData: IDotData;
-  handleDotClick: (
-    session: CourseEnrollmentByCourseID_Course_by_pk_Sessions
-  ) => void;
-  session: CourseEnrollmentByCourseID_Course_by_pk_Sessions;
+  handleDotClick: (session: ManagedCourse_Course_by_pk_Sessions) => void;
+  session: ManagedCourse_Course_by_pk_Sessions;
 }
 const EhDotWithCallBack: FC<IEhDotProps> = ({
   dotData,

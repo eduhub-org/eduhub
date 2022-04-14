@@ -48,6 +48,7 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     ects
     coverImage
     language
+    maxMissedSessions
     title
     programId
     status

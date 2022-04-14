@@ -101,6 +101,10 @@ export interface CourseListWithFilter_Course {
    */
   language: string;
   /**
+   * The maximum number of sessions a participant can miss while still receiving a certificate
+   */
+  maxMissedSessions: number;
+  /**
    * The title of the course (only editable by an admin user)
    */
   title: string;

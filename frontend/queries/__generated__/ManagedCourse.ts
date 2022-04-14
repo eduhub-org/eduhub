@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum } from "./../../__generated__/globalTypes";
+import { CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourse
@@ -66,6 +66,24 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_CourseEnrollmentSt
   value: string;
 }
 
+export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances_Session {
+  __typename: "Session";
+  id: number;
+}
+
+export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances {
+  __typename: "Attendance";
+  id: number;
+  /**
+   * The attendance status: MISSED for a user registered for the session but not recorded (or recognized), otherwise ATTENDED
+   */
+  status: AttendanceStatus_enum;
+  /**
+   * An object relationship
+   */
+  Session: ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances_Session;
+}
+
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User {
   __typename: "User";
   id: any;
@@ -81,6 +99,10 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_User {
    * The user's email address
    */
   email: string;
+  /**
+   * An array relationship
+   */
+  Attendances: ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances[];
 }
 
 export interface ManagedCourse_Course_by_pk_CourseEnrollments {
@@ -219,6 +241,10 @@ export interface ManagedCourse_Course_by_pk {
    * The language the course is given in.
    */
   language: string;
+  /**
+   * The maximum number of sessions a participant can miss while still receiving a certificate
+   */
+  maxMissedSessions: number;
   /**
    * The title of the course (only editable by an admin user)
    */

@@ -1,36 +1,36 @@
 import { gql } from "@apollo/client";
 
-export const COURSE_ENROLLMENT_BY_COURSE_ID = gql`
-  query CourseEnrollmentByCourseID($courseId: Int!) {
-    Course_by_pk(id: $courseId) {
-      id
-      maxMissedSessions
-      CourseEnrollments(
-        order_by: { User: { lastName: asc } }
-        where: { courseId: { _eq: $courseId } }
-      ) {
-        id
-        User {
-          id
-          firstName
-          lastName
-          email
-          Attendances(where: { Session: { courseId: { _eq: $courseId } } }) {
-            id
-            status
-            Session {
-              id
-            }
-          }
-        }
-      }
-      Sessions {
-        id
-        title
-      }
-    }
-  }
-`;
+// export const COURSE_ENROLLMENT_BY_COURSE_ID = gql`
+//   query CourseEnrollmentByCourseID($courseId: Int!) {
+//     Course_by_pk(id: $courseId) {
+//       id
+//       maxMissedSessions
+//       CourseEnrollments(
+//         order_by: { User: { lastName: asc } }
+//         where: { courseId: { _eq: $courseId } }
+//       ) {
+//         id
+//         User {
+//           id
+//           firstName
+//           lastName
+//           email
+//           Attendances(where: { Session: { courseId: { _eq: $courseId } } }) {
+//             id
+//             status
+//             Session {
+//               id
+//             }
+//           }
+//         }
+//       }
+//       Sessions {
+//         id
+//         title
+//       }
+//     }
+//   }
+// `;
 
 export const INSERT_SINGLE_ATTENDENCE = gql`
   mutation InsertSingleAttendence($input: Attendance_insert_input!) {

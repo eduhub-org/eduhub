@@ -30,6 +30,13 @@ export const MANAGED_COURSE = gql`
           firstName
           lastName
           email
+          Attendances(where: { Session: { courseId: { _eq: $id } } }) {
+            id
+            status
+            Session {
+              id
+            }
+          }
         }
       }
       CourseLocations {

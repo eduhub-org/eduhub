@@ -285,7 +285,9 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
           {openTabIndex === 2 && (
             <ApplicationTab course={course} qResult={qResult} />
           )}
-          {openTabIndex === 3 && <ManageCourseEnrollment courseId={courseId} />}
+          {openTabIndex === 3 && (
+            <ManageCourseEnrollment course={course} qResult={qResult} />
+          )}
 
           {openTabIndex === maxAllowedTab && (
             <div className="flex justify-end mb-16">
