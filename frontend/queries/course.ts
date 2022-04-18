@@ -1,7 +1,9 @@
 import { gql } from "@apollo/client";
 
 import { ADMIN_COURSE_FRAGMENT, COURSE_FRAGMENT } from "./courseFragment";
-import { ENROLLMENT_FRAGMENT } from "./enrollmentFragment";
+import { ADMIN_ENROLLMENT_FRAGMENT } from "./enrollmentFragment";
+import { ADMIN_SESSION_FRAGMENT } from "./sessionFragement";
+import { USER_FRAGMENT } from "./userFragment";
 
 export const COURSE = gql`
   ${COURSE_FRAGMENT}
@@ -15,21 +17,16 @@ export const COURSE = gql`
 // Query to get all data on a course that is necessary for the manage course page
 export const MANAGED_COURSE = gql`
   ${ADMIN_COURSE_FRAGMENT}
-
+  ${ADMIN_ENROLLMENT_FRAGMENT}
+  ${ADMIN_SESSION_FRAGMENT}
+  ${USER_FRAGMENT}
   query ManagedCourse($id: Int!) {
     Course_by_pk(id: $id) {
       ...AdminCourseFragment
       CourseEnrollments {
-        invitationExpirationDate
-        id
-        status
-        motivationLetter
-        motivationRating
+        ...AdminEnrollmentFragment
         User {
-          id
-          firstName
-          lastName
-          email
+          ...UserFragment
           Attendances(where: { Session: { courseId: { _eq: $id } } }) {
             id
             status
@@ -45,26 +42,7 @@ export const MANAGED_COURSE = gql`
         locationOption
       }
       Sessions {
-        id
-        title
-        description
-        startDateTime
-        endDateTime
-        SessionAddresses {
-          id
-          link
-        }
-        SessionSpeakers {
-          id
-          Expert {
-            id
-            User {
-              id
-              firstName
-              lastName
-            }
-          }
-        }
+        ...AdminSessionFragment
       }
     }
   }

@@ -1,11 +1,17 @@
 import { gql } from "@apollo/client";
 
 import { ADMIN_COURSE_FRAGMENT, COURSE_FRAGMENT } from "./courseFragment";
+import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from "./programFragment";
 
 export const COURSE_LIST = gql`
   ${COURSE_FRAGMENT}
-  query CourseList {
-    Course {
+  query CourseList(
+    $where: Course_bool_exp! = {}
+    ) {
+    Course(
+      order_by: { id: desc }, 
+      where: $where
+      ) {
       ...CourseFragment
     }
   }
@@ -21,23 +27,46 @@ export const COURSE_LIST = gql`
  *
  */
 
-export const COURSE_LIST_WITH_FILTER = gql`
+export const ADMIN_COURSE_LIST = gql`
   ${ADMIN_COURSE_FRAGMENT}
-  query CourseListWithFilter($whereAndClause: [Course_bool_exp!]) {
-    Course(order_by: { id: desc }, where: { _and: $whereAndClause }) {
-      ...AdminCourseFragment
-    }
-  }
-`;
-
-export const COURSE_LIST_FOR_SINGLE_INSTRUCTOR = gql`
-  ${COURSE_FRAGMENT}
-  query CoursesSingleInstructor($expertId: Int!) {
+  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
+  query AdminCourseList(
+    $where: Course_bool_exp! = {}, 
+    $limit: Int = null, 
+    $offset: Int = 0) {
     Course(
-      order_by: { id: desc }
-      where: { CourseInstructors: { expertId: { _eq: $expertId } } }
-    ) {
-      ...CourseFragment
+      order_by: { id: desc }, 
+      where: $where
+      limit: $limit
+      offset: $offset
+      ) {
+      ...AdminCourseFragment
+      Program {
+        ...ProgramFragmentMinimumProperties
+      }
+      CourseEnrollments {
+        id
+        CourseEnrollmentStatus {
+          value
+        }
+      }
+      AppliedAndUnratedCount: CourseEnrollments_aggregate(
+        where: {
+          _and: [
+            { CourseEnrollmentStatus: { value: { _eq: "APPLIED" } } }
+            { MotivationRating: { value: { _eq: "UNRATED" } } }
+          ]
+        }
+      ) {
+        aggregate {
+          count
+        }
+      }
+    }
+    Course_aggregate(where: $where) {
+      aggregate {
+        count
+      }
     }
   }
 `;

@@ -1,11 +1,7 @@
 import { FC } from "react";
 import { useAdminQuery } from "../../../hooks/authedQuery";
-import { COURSE_LIST_FOR_SINGLE_INSTRUCTOR } from "../../../queries/courseList";
-import {
-  CoursesSingleInstructor,
-  CoursesSingleInstructorVariables,
-  CoursesSingleInstructor_Course,
-} from "../../../queries/__generated__/CoursesSingleInstructor";
+import { COURSE_LIST } from "../../../queries/courseList";
+import { AdminCourseList, AdminCourseListVariables, AdminCourseList_Course } from "../../../queries/__generated__/AdminCourseList";
 import { StaticComponentProperty } from "../../../types/UIComponents";
 import { Tile } from "../../course/Tile";
 import Loading from "../Loading";
@@ -14,15 +10,15 @@ interface IProps {
   selectedOption: StaticComponentProperty;
 }
 const CourseList: FC<IProps> = ({ selectedOption }) => {
-  let courses: CoursesSingleInstructor_Course[] = [];
+  let courses: AdminCourseList_Course[] = [];
   /* #region DB APIs */
   // TODO: Please Come up with valid instructor ID
   const courseListRequest = useAdminQuery<
-    CoursesSingleInstructor,
-    CoursesSingleInstructorVariables
-  >(COURSE_LIST_FOR_SINGLE_INSTRUCTOR, {
+    AdminCourseList,
+    AdminCourseListVariables
+  >(COURSE_LIST, {
     variables: {
-      expertId: 159,
+      where: { CourseInstructors: { expertId: { _eq: 159 } } }
     },
   });
   /* #endregion */
