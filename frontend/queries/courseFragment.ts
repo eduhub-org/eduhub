@@ -1,9 +1,11 @@
 import { gql } from "@apollo/client";
+import { COURSE_INSTRUCTOR_FRAGMENT } from "./courseInstructorFragment";
 
 import { SESSION_FRAGMENT } from "./sessionFragement";
 
 export const COURSE_FRAGMENT = gql`
   ${SESSION_FRAGMENT}
+  ${COURSE_INSTRUCTOR_FRAGMENT}
   fragment CourseFragment on Course {
     id
     ects
@@ -25,80 +27,21 @@ export const COURSE_FRAGMENT = gql`
     Sessions {
       ...SessionFragment
     }
-    CourseInstructors {
-      id
-      Expert {
-        id
-        User {
-          firstName
-          picture
-          id
-          lastName
-        }
-        description
-      }
+    CourseInstructors(order_by: { id: desc }) {
+      ...CourseInstructorFragment
     }
   }
 `;
 
 export const ADMIN_COURSE_FRAGMENT = gql`
-  ${SESSION_FRAGMENT}
+  ${COURSE_FRAGMENT}
   fragment AdminCourseFragment on Course {
-    id
-    ects
-    coverImage
-    language
-    maxMissedSessions
-    title
-    programId
+    ...CourseFragment
     status
     visibility
     achievementCertificatePossible
     attendanceCertificatePossible
     chatLink
     learningGoals
-    headingDescriptionField1
-    headingDescriptionField2
-    contentDescriptionField1
-    contentDescriptionField2
-    weekDay
-    startTime
-    endTime
-    Program {
-      id
-      title
-      shortTitle
-      lectureStart
-      lectureEnd
-    }
-    CourseInstructors(order_by: { id: desc }) {
-      id
-      Expert {
-        id
-        User {
-          firstName
-          id
-          lastName
-        }
-      }
-    }
-    CourseEnrollments {
-      id
-      CourseEnrollmentStatus {
-        value
-      }
-    }
-    AppliedAndUnratedCount: CourseEnrollments_aggregate(
-      where: {
-        _and: [
-          { CourseEnrollmentStatus: { value: { _eq: "APPLIED" } } }
-          { MotivationRating: { value: { _eq: "UNRATED" } } }
-        ]
-      }
-    ) {
-      aggregate {
-        count
-      }
-    }
   }
 `;

@@ -1,47 +1,105 @@
+import { QueryResult } from "@apollo/client";
 import { FC, useCallback, useState } from "react";
 import { useAdminMutation } from "../../hooks/authedMutation";
+import { useAdminQuery } from "../../hooks/authedQuery";
+import { COURSE_INSTRUCTOR_LIST } from "../../queries/courseInstructorList";
 import { INSERT_A_COURSE } from "../../queries/mutateCourse";
-import { INSERT_A_COURSEINSTRUCTOR } from "../../queries/mutateCourseInstructor";
-
 import {
-  InsertCourseInstructor,
-  InsertCourseInstructorVariables,
-} from "../../queries/__generated__/InsertCourseInstructor";
+  CourseInstructorList,
+  CourseInstructorList_CourseInstructor,
+} from "../../queries/__generated__/CourseInstructorList";
 import {
   InsertSingleCourse,
   InsertSingleCourseVariables,
 } from "../../queries/__generated__/InsertSingleCourse";
+import { Programs_Program } from "../../queries/__generated__/Programs";
 import { SelectOption } from "../../types/UIComponents";
 import EhButton from "../common/EhButton";
 import EhDebounceInput from "../common/EhDebounceInput";
 import EhSelect from "../common/EhSelect";
 
+const makeFullName = (instructor: CourseInstructorList_CourseInstructor) => {
+  return (
+    instructor.Expert.User.firstName + " " + instructor.Expert.User.lastName
+  );
+};
+
 interface IProps {
-  programs: SelectOption[];
-  instructors: SelectOption[];
-  refetchContactList: () => void;
+  programs: Programs_Program[];
+  defaultProgramId: number;
+  closeModalHandler: (refetch: boolean) => void;
 }
 const AddCourseForm: FC<IProps> = ({
   programs,
-  instructors,
-  refetchContactList,
+  defaultProgramId,
+  closeModalHandler,
 }) => {
-  /* #region Mutation endpoints */
-  const [insertACourse] = useAdminMutation<
-    InsertSingleCourse,
-    InsertSingleCourseVariables
-  >(INSERT_A_COURSE);
-  const [insertCourseInstructor] = useAdminMutation<
-    InsertCourseInstructor,
-    InsertCourseInstructorVariables
-  >(INSERT_A_COURSEINSTRUCTOR);
+  // DB request
+  const instructorListRequest = useAdminQuery<CourseInstructorList>(
+    COURSE_INSTRUCTOR_LIST
+  ); // Load Instructor list from db
+  const courseInstructors = [
+    ...(instructorListRequest.data?.CourseInstructor || []),
+  ].sort((a, b) =>
+    a.Expert.User.lastName.localeCompare(b.Expert.User.lastName)
+  );
 
+  if (instructorListRequest.error) {
+    console.log(instructorListRequest.error);
+  }
+
+  const instructorList: SelectOption[] = courseInstructors.map(
+    (instructor) => ({
+      key: instructor.Expert.id,
+      label: makeFullName(instructor),
+    })
+  );
+  if (instructorListRequest.loading) {
+    return <h2>Loading</h2>;
+  }
+  return (
+    <>
+      {instructorList.length > 0 && (
+        <Form
+          defaultProgramId={defaultProgramId}
+          instructorList={instructorList}
+          programs={programs}
+          closeModalHandler={closeModalHandler}
+        />
+      )}
+    </>
+  );
+};
+export default AddCourseForm;
+
+interface IAddCourseProps extends IProps {
+  instructorList: SelectOption[];
+}
+const Form: FC<IAddCourseProps> = ({
+  programs,
+  instructorList,
+  defaultProgramId,
+  closeModalHandler,
+}) => {
+  const semesters: SelectOption[] = programs.map((p) => {
+    return {
+      key: p.id,
+      label: p.shortTitle ?? p.title,
+    };
+  });
+  /* #region Mutation endpoints */
+  const [
+    insertACourse,
+    { data, loading, error: insertError },
+  ] = useAdminMutation<InsertSingleCourse, InsertSingleCourseVariables>(
+    INSERT_A_COURSE
+  );
   /* #endregion */
 
   /* #region state variables */
   const [courseTitle, setCourseTitle] = useState("");
-  const [programId, setprogramId] = useState(programs[0].key);
-  const [instructorID, setInstructorId] = useState(instructors[0].key);
+  const [programId, setprogramId] = useState(defaultProgramId);
+  const [instructorID, setInstructorId] = useState(instructorList[0].key);
   /* #endregion */
 
   /* #region  Handler with CallBack */
@@ -65,32 +123,23 @@ const AddCourseForm: FC<IProps> = ({
             programId,
             tagline: "",
             title: courseTitle,
+            CourseInstructors: {
+              data: [
+                {
+                  expertId: instructorID,
+                },
+              ],
+            },
           },
         },
       });
-
       if (response.errors || !response.data?.insert_Course_one?.id) {
         console.log(response.errors);
         return;
       }
-      const res = await insertCourseInstructor({
-        variables: {
-          courseId: response.data?.insert_Course_one?.id,
-          expertId: instructorID,
-        },
-      });
-      if (res.errors) return;
-
-      refetchContactList();
+      closeModalHandler(true);
     }
-  }, [
-    insertACourse,
-    courseTitle,
-    instructorID,
-    programId,
-    insertCourseInstructor,
-    refetchContactList,
-  ]);
+  }, [insertACourse, courseTitle, instructorID, programId, closeModalHandler]);
 
   const onChangeTitle = useCallback(
     (value) => {
@@ -116,11 +165,17 @@ const AddCourseForm: FC<IProps> = ({
 
   return (
     <div className="p-20 flex flex-col space-y-10">
+      {insertError ? (
+        <div className="pt-8 text-red-500">
+          {insertError.graphQLErrors[0].message}
+        </div>
+      ) : null}
       <div>
         <div className="flex flex-col">
           <EhDebounceInput
             inputText={courseTitle}
             onChangeHandler={onChangeTitle}
+            debounceTime={0}
             placeholder="Titel des Kurses eingeben*"
           />
         </div>
@@ -135,7 +190,7 @@ const AddCourseForm: FC<IProps> = ({
           <EhSelect
             value={instructorID}
             onChangeHandler={handleInstructorOnchange}
-            options={instructors}
+            options={instructorList}
           />
         </div>
       </div>
@@ -153,7 +208,7 @@ const AddCourseForm: FC<IProps> = ({
             <EhSelect
               value={programId}
               onChangeHandler={handleProgramOnchange}
-              options={programs}
+              options={semesters}
             />
           </div>
         </div>
@@ -169,5 +224,3 @@ const AddCourseForm: FC<IProps> = ({
     </div>
   );
 };
-
-export default AddCourseForm;

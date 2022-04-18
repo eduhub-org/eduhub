@@ -61,6 +61,11 @@ export const Header: FC = () => {
                       <a>Programme</a>
                     </Link>
                   </div>
+                  <div className="flex items-center ml-8">
+                    <Link href="/manage/course/217">
+                      <a>Manage Course 217</a>
+                    </Link>
+                  </div>
                 </OnlyAdmin>
               </OnlyDesktop>
             </ClientOnly>

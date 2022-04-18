@@ -1,10 +1,8 @@
 import { QueryResult } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import { title } from "process";
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 import { useAdminMutation } from "../../hooks/authedMutation";
-import { useAdminQuery } from "../../hooks/authedQuery";
 import {
   INSERT_SINGLE_ATTENDENCE,
   UPDATE_ATTENDENCE,
@@ -57,7 +55,10 @@ const EnrollmentList: FC<IPropsEnrollmentList> = ({ course, qResult }) => {
     { key: 3, label: t("manage-course:certificateAchievement") },
   ];
 
-  const enrollmentList = course.CourseEnrollments || [];
+  const enrollmentList = [...course.CourseEnrollments || []].sort(
+    (a, b) => a.User.lastName.localeCompare(b.User.lastName)
+  )
+
   const sessions = course.Sessions || [];
 
   return (
@@ -67,7 +68,7 @@ const EnrollmentList: FC<IPropsEnrollmentList> = ({ course, qResult }) => {
           <tr className="focus:outline-none h-16 ">
             {tableHeaders.map((component) => {
               return (
-                <th key={component.key} className="py-2 px-10">
+                <th key={component.key} className="py-2 px-5">
                   <p className="flex justify-start font-medium text-gray-700 uppercase">
                     {component.label}
                   </p>
@@ -101,7 +102,7 @@ interface IDotData {
 }
 
 const pStyle = "text-gray-700 truncate";
-const tdStyple = "font-medium bg-edu-course-list py-2 px-10 ";
+const tdStyple = "font-medium bg-edu-course-list py-2 px-5";
 
 /* #region OneCourseEnrollmentRow */
 
@@ -223,14 +224,10 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
    */
   const dotColor = (sn: ManagedCourse_Course_by_pk_Sessions) => {
     if (enrollment.User.Attendances.length === 0) return "GREY";
-    const index = enrollment.User.Attendances.findIndex(
-      (ob) => ob.Session.id === sn.id
-    );
-    if (index < 0) return "GREY";
-    const attendance = enrollment.User.Attendances[index];
+    const attendance = attendenceRecordBySession[sn.id];
+    if (!attendance) return "GREY";
     if (attendance.status === AttendanceStatus_enum.MISSED) return "RED";
     if (attendance.status === AttendanceStatus_enum.ATTENDED) return "GREEN";
-    // if (attendance.status === AttendanceStatus_enum.NO_INFO)  // TODO: not specified in github document
     return "GREY";
   };
 

@@ -13,5 +13,19 @@
   "openChat": "open chat",
   "openVideoCall": "open meeting",
   "toCourseDescription": "to course description",
-  "youWillLearn": "you will learn"
+  "youWillLearn": "you will learn",
+  "coursesPageTitle": "Courses: opencampus.sh Edu Hub",
+  "coursesHeadline": "Kurse",
+  "courseSearchPlaceholder": "Search in title",
+  "addCourseText": "Add Course",
+  "addCourseFormTitle": "Kurs hinzufügen",
+  "tableHeaderOff": "Off.",
+  "tableHeaderTitle": "Title",
+  "tableHeaderInstructor": "Kursleitung",
+  "tableHeaderBewerb": "Bewerb",
+  "tableHeaderEingeladenOptions": "Eingeladen/ Bestätigt/ Unbewertet",
+  "tableHeaderProgram": "Program",
+  "tableHeaderStatus": "Status",
+  "paginationText": "Page {{currentPage}} of {{totalPage}}" 
+
 }

@@ -1,10 +1,6 @@
 import { FC, useCallback, useState } from "react";
-import {
-  SelectOption,
-  StaticComponentProperty,
-} from "../../../types/UIComponents";
+import { StaticComponentProperty } from "../../../types/UIComponents";
 import EhMenuItem from "../../common/EhMenuItem";
-import SidebarMenuItem from "./SidebarMenueItem";
 
 interface IProps {
   sidebarItems: StaticComponentProperty[];

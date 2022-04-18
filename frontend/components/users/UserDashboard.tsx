@@ -11,7 +11,6 @@ interface IProps {
 const UserDashboard: FC<IProps> = ({ t }) => {
   const menuItems: StaticComponentProperty[] = [
     { key: -1, label: t("all"), selected: true },
-    { key: 2, label: "SS20", selected: false },
   ];
   const [searchText, setSearchText] = useState("");
 
