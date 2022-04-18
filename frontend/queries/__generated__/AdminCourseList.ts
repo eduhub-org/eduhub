@@ -3,13 +3,13 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { Course_bool_exp, CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL fragment: AdminCourseFragment
+// GraphQL query operation: AdminCourseList
 // ====================================================
 
-export interface AdminCourseFragment_Sessions {
+export interface AdminCourseList_Course_Sessions {
   __typename: "Session";
   id: number;
   /**
@@ -34,7 +34,7 @@ export interface AdminCourseFragment_Sessions {
   title: string;
 }
 
-export interface AdminCourseFragment_CourseInstructors_Expert_User {
+export interface AdminCourseList_Course_CourseInstructors_Expert_User {
   __typename: "User";
   /**
    * The user's first name
@@ -51,29 +51,66 @@ export interface AdminCourseFragment_CourseInstructors_Expert_User {
   lastName: string;
 }
 
-export interface AdminCourseFragment_CourseInstructors_Expert {
+export interface AdminCourseList_Course_CourseInstructors_Expert {
   __typename: "Expert";
   id: number;
   /**
    * An object relationship
    */
-  User: AdminCourseFragment_CourseInstructors_Expert_User;
+  User: AdminCourseList_Course_CourseInstructors_Expert_User;
   /**
    * A short description on the expert's background
    */
   description: string | null;
 }
 
-export interface AdminCourseFragment_CourseInstructors {
+export interface AdminCourseList_Course_CourseInstructors {
   __typename: "CourseInstructor";
   id: number;
   /**
    * An object relationship
    */
-  Expert: AdminCourseFragment_CourseInstructors_Expert;
+  Expert: AdminCourseList_Course_CourseInstructors_Expert;
 }
 
-export interface AdminCourseFragment {
+export interface AdminCourseList_Course_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The title of the program
+   */
+  title: string;
+}
+
+export interface AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus {
+  __typename: "CourseEnrollmentStatus";
+  value: string;
+}
+
+export interface AdminCourseList_Course_CourseEnrollments {
+  __typename: "CourseEnrollment";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseEnrollmentStatus: AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus;
+}
+
+export interface AdminCourseList_Course_AppliedAndUnratedCount_aggregate {
+  __typename: "CourseEnrollment_aggregate_fields";
+  count: number;
+}
+
+export interface AdminCourseList_Course_AppliedAndUnratedCount {
+  __typename: "CourseEnrollment_aggregate";
+  aggregate: AdminCourseList_Course_AppliedAndUnratedCount_aggregate | null;
+}
+
+export interface AdminCourseList_Course {
   __typename: "Course";
   id: number;
   /**
@@ -143,11 +180,11 @@ export interface AdminCourseFragment {
   /**
    * An array relationship
    */
-  Sessions: AdminCourseFragment_Sessions[];
+  Sessions: AdminCourseList_Course_Sessions[];
   /**
    * An array relationship
    */
-  CourseInstructors: AdminCourseFragment_CourseInstructors[];
+  CourseInstructors: AdminCourseList_Course_CourseInstructors[];
   /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
@@ -172,4 +209,43 @@ export interface AdminCourseFragment {
    * An array of texts including the learning goals for the course
    */
   learningGoals: string | null;
+  /**
+   * An object relationship
+   */
+  Program: AdminCourseList_Course_Program | null;
+  /**
+   * An array relationship
+   */
+  CourseEnrollments: AdminCourseList_Course_CourseEnrollments[];
+  /**
+   * An aggregate relationship
+   */
+  AppliedAndUnratedCount: AdminCourseList_Course_AppliedAndUnratedCount;
+}
+
+export interface AdminCourseList_Course_aggregate_aggregate {
+  __typename: "Course_aggregate_fields";
+  count: number;
+}
+
+export interface AdminCourseList_Course_aggregate {
+  __typename: "Course_aggregate";
+  aggregate: AdminCourseList_Course_aggregate_aggregate | null;
+}
+
+export interface AdminCourseList {
+  /**
+   * fetch data from the table: "Course"
+   */
+  Course: AdminCourseList_Course[];
+  /**
+   * fetch aggregated fields from the table: "Course"
+   */
+  Course_aggregate: AdminCourseList_Course_aggregate;
+}
+
+export interface AdminCourseListVariables {
+  where: Course_bool_exp;
+  limit?: number | null;
+  offset?: number | null;
 }

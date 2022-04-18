@@ -9,25 +9,85 @@ import { CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, 
 // GraphQL query operation: ManagedCourse
 // ====================================================
 
-export interface ManagedCourse_Course_by_pk_Program {
-  __typename: "Program";
+export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses {
+  __typename: "SessionAddress";
   id: number;
   /**
-   * The title of the program
+   * The link to a video conference call (if it is an online location)
+   */
+  link: string | null;
+}
+
+export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User {
+  __typename: "User";
+  id: any;
+  /**
+   * The user's first name
+   */
+  firstName: string;
+  /**
+   * The user's last name
+   */
+  lastName: string;
+  /**
+   * The user's email address
+   */
+  email: string;
+  /**
+   * The user's profile picture
+   */
+  picture: string | null;
+}
+
+export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert {
+  __typename: "Expert";
+  id: number;
+  /**
+   * An object relationship
+   */
+  User: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User;
+}
+
+export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers {
+  __typename: "SessionSpeaker";
+  id: number;
+  /**
+   * An object relationship
+   */
+  Expert: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert;
+}
+
+export interface ManagedCourse_Course_by_pk_Sessions {
+  __typename: "Session";
+  id: number;
+  /**
+   * The day and time of the end of the session
+   */
+  endDateTime: any;
+  /**
+   * The ID of the course the session belongs to
+   */
+  courseId: number;
+  /**
+   * A description of the session
+   */
+  description: string;
+  /**
+   * The day and time of the start of the session
+   */
+  startDateTime: any;
+  /**
+   * The title of the session
    */
   title: string;
   /**
-   * The 6 letter short title for the program.
+   * An array relationship
    */
-  shortTitle: string | null;
+  SessionAddresses: ManagedCourse_Course_by_pk_Sessions_SessionAddresses[];
   /**
-   * The first day a course lecture can possibly be in this program.
+   * An array relationship
    */
-  lectureStart: any | null;
-  /**
-   * The last day a course lecture can possibly be in this program.
-   */
-  lectureEnd: any | null;
+  SessionSpeakers: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers[];
 }
 
 export interface ManagedCourse_Course_by_pk_CourseInstructors_Expert_User {
@@ -36,6 +96,10 @@ export interface ManagedCourse_Course_by_pk_CourseInstructors_Expert_User {
    * The user's first name
    */
   firstName: string;
+  /**
+   * The user's profile picture
+   */
+  picture: string | null;
   id: any;
   /**
    * The user's last name
@@ -50,6 +114,10 @@ export interface ManagedCourse_Course_by_pk_CourseInstructors_Expert {
    * An object relationship
    */
   User: ManagedCourse_Course_by_pk_CourseInstructors_Expert_User;
+  /**
+   * A short description on the expert's background
+   */
+  description: string | null;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseInstructors {
@@ -59,11 +127,6 @@ export interface ManagedCourse_Course_by_pk_CourseInstructors {
    * An object relationship
    */
   Expert: ManagedCourse_Course_by_pk_CourseInstructors_Expert;
-}
-
-export interface ManagedCourse_Course_by_pk_CourseEnrollments_CourseEnrollmentStatus {
-  __typename: "CourseEnrollmentStatus";
-  value: string;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances_Session {
@@ -100,6 +163,10 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_User {
    */
   email: string;
   /**
+   * The user's profile picture
+   */
+  picture: string | null;
+  /**
    * An array relationship
    */
   Attendances: ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances[];
@@ -107,15 +174,11 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_User {
 
 export interface ManagedCourse_Course_by_pk_CourseEnrollments {
   __typename: "CourseEnrollment";
-  id: number;
-  /**
-   * An object relationship
-   */
-  CourseEnrollmentStatus: ManagedCourse_Course_by_pk_CourseEnrollments_CourseEnrollmentStatus;
   /**
    * The last day a user can confirm his/her invitation to the given course
    */
   invitationExpirationDate: any | null;
+  id: number;
   /**
    * The users current enrollment status to this course
    */
@@ -134,16 +197,6 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
   User: ManagedCourse_Course_by_pk_CourseEnrollments_User;
 }
 
-export interface ManagedCourse_Course_by_pk_AppliedAndUnratedCount_aggregate {
-  __typename: "CourseEnrollment_aggregate_fields";
-  count: number;
-}
-
-export interface ManagedCourse_Course_by_pk_AppliedAndUnratedCount {
-  __typename: "CourseEnrollment_aggregate";
-  aggregate: ManagedCourse_Course_by_pk_AppliedAndUnratedCount_aggregate | null;
-}
-
 export interface ManagedCourse_Course_by_pk_CourseLocations {
   __typename: "CourseLocation";
   id: number;
@@ -157,75 +210,6 @@ export interface ManagedCourse_Course_by_pk_CourseLocations {
   locationOption: string | null;
 }
 
-export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses {
-  __typename: "SessionAddress";
-  id: number;
-  /**
-   * The link to a video conference call (if it is an online location)
-   */
-  link: string | null;
-}
-
-export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User {
-  __typename: "User";
-  id: any;
-  /**
-   * The user's first name
-   */
-  firstName: string;
-  /**
-   * The user's last name
-   */
-  lastName: string;
-}
-
-export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert {
-  __typename: "Expert";
-  id: number;
-  /**
-   * An object relationship
-   */
-  User: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User;
-}
-
-export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers {
-  __typename: "SessionSpeaker";
-  id: number;
-  /**
-   * An object relationship
-   */
-  Expert: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert;
-}
-
-export interface ManagedCourse_Course_by_pk_Sessions {
-  __typename: "Session";
-  id: number;
-  /**
-   * The title of the session
-   */
-  title: string;
-  /**
-   * A description of the session
-   */
-  description: string;
-  /**
-   * The day and time of the start of the session
-   */
-  startDateTime: any;
-  /**
-   * The day and time of the end of the session
-   */
-  endDateTime: any;
-  /**
-   * An array relationship
-   */
-  SessionAddresses: ManagedCourse_Course_by_pk_Sessions_SessionAddresses[];
-  /**
-   * An array relationship
-   */
-  SessionSpeakers: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers[];
-}
-
 export interface ManagedCourse_Course_by_pk {
   __typename: "Course";
   id: number;
@@ -233,6 +217,22 @@ export interface ManagedCourse_Course_by_pk {
    * The number of ECTS of the course (only editable by an admin user))
    */
   ects: string;
+  /**
+   * Shown below the title on the course page
+   */
+  tagline: string;
+  /**
+   * The day of the week the course takes place.
+   */
+  weekDay: string | null;
+  /**
+   * A text providing info about the costs of a participation.
+   */
+  cost: string;
+  /**
+   * Last day before applications are closed. (Set to the program's default value when the course is created.)
+   */
+  applicationEnd: any;
   /**
    * The cover image for the course
    */
@@ -253,6 +253,38 @@ export interface ManagedCourse_Course_by_pk {
    * Id of the program to which the course belongs.
    */
   programId: number | null;
+  /**
+   * Heading of the the first course description field
+   */
+  headingDescriptionField1: string;
+  /**
+   * Content of the first course description field
+   */
+  contentDescriptionField1: string | null;
+  /**
+   * Heading of the the second course description field
+   */
+  headingDescriptionField2: string | null;
+  /**
+   * Content of the second course description field
+   */
+  contentDescriptionField2: string | null;
+  /**
+   * The time the course starts each week.
+   */
+  startTime: any | null;
+  /**
+   * The time the course ends each week.
+   */
+  endTime: any | null;
+  /**
+   * An array relationship
+   */
+  Sessions: ManagedCourse_Course_by_pk_Sessions[];
+  /**
+   * An array relationship
+   */
+  CourseInstructors: ManagedCourse_Course_by_pk_CourseInstructors[];
   /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
@@ -278,57 +310,13 @@ export interface ManagedCourse_Course_by_pk {
    */
   learningGoals: string | null;
   /**
-   * Heading of the the first course description field
-   */
-  headingDescriptionField1: string;
-  /**
-   * Heading of the the second course description field
-   */
-  headingDescriptionField2: string | null;
-  /**
-   * Content of the first course description field
-   */
-  contentDescriptionField1: string | null;
-  /**
-   * Content of the second course description field
-   */
-  contentDescriptionField2: string | null;
-  /**
-   * The day of the week the course takes place.
-   */
-  weekDay: string | null;
-  /**
-   * The time the course starts each week.
-   */
-  startTime: any | null;
-  /**
-   * The time the course ends each week.
-   */
-  endTime: any | null;
-  /**
-   * An object relationship
-   */
-  Program: ManagedCourse_Course_by_pk_Program | null;
-  /**
-   * An array relationship
-   */
-  CourseInstructors: ManagedCourse_Course_by_pk_CourseInstructors[];
-  /**
    * An array relationship
    */
   CourseEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[];
   /**
-   * An aggregate relationship
-   */
-  AppliedAndUnratedCount: ManagedCourse_Course_by_pk_AppliedAndUnratedCount;
-  /**
    * An array relationship
    */
   CourseLocations: ManagedCourse_Course_by_pk_CourseLocations[];
-  /**
-   * An array relationship
-   */
-  Sessions: ManagedCourse_Course_by_pk_Sessions[];
 }
 
 export interface ManagedCourse {
