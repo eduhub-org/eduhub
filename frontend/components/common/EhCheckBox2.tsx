@@ -6,7 +6,7 @@ interface IProps {
   property: StaticComponentProperty;
   onClickHandler: (property: StaticComponentProperty) => void;
 }
-const EhCheckBox: FC<IProps> = ({ property, onClickHandler }) => {
+const EhCheckBox2: FC<IProps> = ({ property, onClickHandler }) => {
   return (
     <div
       className="flex flex-row space-x-1 cursor-pointer"
@@ -28,4 +28,4 @@ const EhCheckBox: FC<IProps> = ({ property, onClickHandler }) => {
     </div>
   );
 };
-export default EhCheckBox;
+export default EhCheckBox2;

@@ -59,7 +59,7 @@ const CoursesHeader: FC<IProps> = ({
         courseListRequest={courseListRequest}
         updateFilter={updateFilter}
       />
-      <div className="bg-white py-4 flex justify-end">
+      <div className="bg-white pb-10 flex justify-end">
         <EhAddButton
           buttonClickCallBack={openModalControl}
           text={t("addCourseText")}
@@ -82,7 +82,10 @@ const CoursesHeader: FC<IProps> = ({
 export default CoursesHeader;
 
 const convertToILikeFilter = (input: string) => `%${input}%`;
-const createWhereClauseForCourse = (courseTitle: string, programId: number): Course_bool_exp => {
+const createWhereClauseForCourse = (
+  courseTitle: string,
+  programId: number
+): Course_bool_exp => {
   if (courseTitle.trim().length === 0 && programId < 0) {
     return {};
   }
@@ -93,11 +96,11 @@ const createWhereClauseForCourse = (courseTitle: string, programId: number): Cou
     return { title: { _ilike: convertToILikeFilter(courseTitle) } };
   }
   return {
-    "_and":[
+    _and: [
       { title: { _ilike: convertToILikeFilter(courseTitle) } },
       { programId: { _eq: programId } },
-    ]
-  } 
+    ],
+  };
 };
 
 interface IMenubarProps extends IProps {

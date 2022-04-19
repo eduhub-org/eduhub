@@ -2,14 +2,17 @@ import { TFunction } from "next-i18next";
 import { FC, useCallback, useState } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 import { QUERY_LIMIT } from "../../pages/courses";
-import { AdminCourseListVariables, AdminCourseList_Course } from "../../queries/__generated__/AdminCourseList";
+import {
+  AdminCourseListVariables,
+  AdminCourseList_Course,
+} from "../../queries/__generated__/AdminCourseList";
 import { Programs_Program } from "../../queries/__generated__/Programs";
 import SingleCourseRow from "./SingleCourseRow";
 
 interface IProps {
   t: TFunction;
   programs: Programs_Program[];
-  courseListRequest: any,
+  courseListRequest: any;
   updateFilter: (newState: AdminCourseListVariables) => void;
 }
 const CourseListTable: FC<IProps> = ({
@@ -35,9 +38,6 @@ const CourseListTable: FC<IProps> = ({
   }, [courseListRequest]);
 
   const count = courseListRequest.data?.Course_aggregate?.aggregate?.count || 0;
-  // console.log("count=>", count)
-  // console.log(courseListRequest.variables)
-
   return (
     <>
       <div className="flex flex-col space-y-10">

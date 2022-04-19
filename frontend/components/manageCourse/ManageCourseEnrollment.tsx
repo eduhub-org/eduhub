@@ -55,11 +55,10 @@ const EnrollmentList: FC<IPropsEnrollmentList> = ({ course, qResult }) => {
     { key: 3, label: t("manage-course:certificateAchievement") },
   ];
 
-  const enrollmentList = [...course.CourseEnrollments || []].sort(
-    (a, b) => a.User.lastName.localeCompare(b.User.lastName)
-  )
-
-  const sessions = course.Sessions || [];
+  const enrollmentList = [...(course.CourseEnrollments || [])].sort((a, b) =>
+    a.User.lastName.localeCompare(b.User.lastName)
+  );
+  const sessions = [...(course.Sessions || [])];
 
   return (
     <div className="overflow-x-auto transition-[height] w-full pb-10">
@@ -102,7 +101,7 @@ interface IDotData {
 }
 
 const pStyle = "text-gray-700 truncate";
-const tdStyple = "font-medium bg-edu-course-list py-2 px-5";
+const tdStyple = "pl-5";
 
 /* #region OneCourseEnrollmentRow */
 
@@ -251,7 +250,7 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
 
   return (
     <>
-      <tr>
+      <tr className="font-medium bg-edu-course-list h-12">
         <td className={tdStyple}>
           <p className={pStyle}>{enrollment.User.firstName}</p>
         </td>

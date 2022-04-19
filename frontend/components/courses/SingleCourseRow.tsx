@@ -18,7 +18,7 @@ import {
   INSERT_A_COURSEINSTRUCTOR,
 } from "../../queries/mutateCourseInstructor";
 import { INSERT_EXPERT } from "../../queries/user";
-import { CourseListWithFilter_Course } from "../../queries/__generated__/CourseListWithFilter";
+import { AdminCourseList_Course } from "../../queries/__generated__/AdminCourseList";
 import {
   DeleteCourseByPk,
   DeleteCourseByPkVariables,
@@ -87,7 +87,7 @@ const courseStatuEnumToNumber = (status: string) => {
 // OFF is related with Course Visibility
 
 interface IPropsCourseOneRow {
-  course: CourseListWithFilter_Course;
+  course: AdminCourseList_Course;
   t: TFunction;
   programs: Programs_Program[];
   refetchCourses: () => void;
@@ -208,10 +208,10 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
     );
   };
   const pClass = "text-gray-700 truncate font-medium max-w-xs";
-  const tdClass = "bg-edu-course-list px-5";
+  const tdClass = "pl-5";
   return (
     <>
-      <tr>
+      <tr className="font-medium bg-edu-course-list h-12">
         <td className={tdClass}>
           <div onClick={onChangeVisivity}>
             <EhCheckBox checked={course.visibility ?? false} />
@@ -220,7 +220,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
         <td className={tdClass}>
           <p className={pClass}>{course.title}</p>
         </td>
-        <td className={tdClass}>
+        <td className={`${tdClass}`}>
           <InstructorColumn
             t={t}
             course={course}
@@ -246,7 +246,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
         </td>
         <td className={tdClass}>
           {/* Status */}
-          <div className="flex mt-2 mb-2">
+          <div className="flex">
             <p className={pClass}>{courseStatuEnumToNumber(course.status)}</p>
             <div className="flex px-3 items-center">
               <button
@@ -263,10 +263,10 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
             </div>
           </div>
         </td>
-        <td>
+        <td className="bg-white">
           {/* Delete button */}
-          <IconButton onClick={onClickDelete}>
-            <MdDelete size={24} />
+          <IconButton onClick={onClickDelete} size="small">
+            <MdDelete />
           </IconButton>
         </td>
       </tr>

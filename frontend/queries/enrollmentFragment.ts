@@ -8,7 +8,6 @@ export const ENROLLMENT_FRAGMENT = gql`
   }
 `;
 
-
 export const ADMIN_ENROLLMENT_FRAGMENT = gql`
   ${ENROLLMENT_FRAGMENT}
   fragment AdminEnrollmentFragment on CourseEnrollment {

@@ -21,7 +21,7 @@ const EhTagEditTag: FC<IProps> = ({ tag, requestDeleteTag }) => {
       className="grid grid-cols-12 rounded-full bg-edu-tag-color p-1 last:mb-0"
       key={tag.id}
     >
-      <div className="mx-2 col-span-10 truncate">{tag.display}</div>
+      <p className="mx-2 col-span-10 truncate">{tag.display}</p>
       <div
         onClick={handleDelete}
         className="col-span-2 text-white cursor-pointer text-center"

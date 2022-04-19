@@ -4,11 +4,19 @@ import Head from "next/head";
 import { FC, useCallback, useState } from "react";
 import { Page } from "../../components/Page";
 import { useIsInstructor, useIsLoggedIn } from "../../hooks/authentication";
-import CourseList from "../../components/courses/admin/CourseList";
-import Sidebar from "../../components/courses/admin/Sidebar";
 import CommonPageHeader from "../../components/common/CommonPageHeader";
 import { StaticComponentProperty } from "../../types/UIComponents";
 import { TFunction } from "next-i18next";
+import {
+  AdminCourseList,
+  AdminCourseListVariables,
+  AdminCourseList_Course,
+} from "../../queries/__generated__/AdminCourseList";
+import { useAdminQuery } from "../../hooks/authedQuery";
+import { COURSE_LIST } from "../../queries/courseList";
+import Loading from "../../components/courses/Loading";
+import { Tile } from "../../components/course/Tile";
+import EhMenuItem from "../../components/common/EhMenuItem";
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
@@ -23,7 +31,11 @@ const Admin: FC = () => {
   return (
     <>
       <Head>{<title>{t("pageTitle")}</title>}</Head>
-      <Page>{isLoggedIn && isInstructor && <Dashboard t={t} />}</Page>
+      <Page>
+        <div className="min-h-[77vh]">
+          {isLoggedIn && isInstructor && <Dashboard t={t} />}
+        </div>
+      </Page>
     </>
   );
 };
@@ -42,7 +54,6 @@ const Dashboard: FC<IProps> = ({ t }) => {
     { key: 3, label: "Creative", selected: false },
     { key: 4, label: "Programmieren", selected: false },
   ];
-
   const [selected, setSelected] = useState(sidebarItems[0]);
 
   /* #region Callbacks */
@@ -64,8 +75,100 @@ const Dashboard: FC<IProps> = ({ t }) => {
             sidebarItems={sidebarItems}
           />
         </div>
-        <div className="w-9/12">{<CourseList selectedOption={selected} />}</div>
+        <div className="w-9/12">{<Courses selectedOption={selected} />}</div>
       </div>
     </>
+  );
+};
+
+interface ICoursesProps {
+  selectedOption: StaticComponentProperty;
+}
+const Courses: FC<ICoursesProps> = ({ selectedOption }) => {
+  let courses: AdminCourseList_Course[] = [];
+  /* #region DB APIs */
+  // TODO: Please Come up with valid instructor ID
+  const courseListRequest = useAdminQuery<
+    AdminCourseList,
+    AdminCourseListVariables
+  >(COURSE_LIST, {
+    variables: {
+      where: { CourseInstructors: { expertId: { _eq: 159 } } },
+    },
+  });
+  /* #endregion */
+
+  if (courseListRequest.loading) {
+    return <Loading />;
+  }
+
+  if (courseListRequest.error) {
+    console.log(courseListRequest.error);
+    return <></>;
+  }
+
+  if (courseListRequest.data?.Course) {
+    courses = courseListRequest.data?.Course;
+  }
+
+  return (
+    <>
+      <div>
+        <p className="text-base sm:text-lg lg:text-2xl leading-normal text-edu-modal-bg-color">
+          {/* {t('pageTitle')} */}
+          {selectedOption.label}
+        </p>
+      </div>
+      <div className="grid grid-cols-3 gap-5 py-10">
+        {courses.map((course) => (
+          // TODO: Url of single course
+          <div key={`${course.id}`} className="whitespace-normal">
+            <Tile course={course} />
+          </div>
+        ))}
+      </div>
+    </>
+  );
+};
+
+interface ISidebarProps {
+  sidebarItems: StaticComponentProperty[];
+  handleMenuSelection: (obj: StaticComponentProperty) => void;
+}
+const Sidebar: FC<ISidebarProps> = ({ sidebarItems, handleMenuSelection }) => {
+  const [menuItems, setMenuItems] = useState(sidebarItems);
+
+  const updateMenuBar = useCallback(
+    (selected: StaticComponentProperty) => {
+      const newItems = menuItems.map((item) => {
+        if (selected.key === item.key) return { ...item, selected: true };
+        return { ...item, selected: false };
+      });
+      setMenuItems(newItems);
+    },
+    [setMenuItems, menuItems]
+  );
+
+  /* #region CallBacks */
+
+  const handleClickOnMenu = useCallback(
+    (option: StaticComponentProperty) => {
+      updateMenuBar(option);
+      handleMenuSelection(option);
+    },
+    [handleMenuSelection, updateMenuBar]
+  );
+  /* #endregion */
+
+  return (
+    <div className="flex flex-col flex-start space-y-5">
+      {menuItems.map((option) => (
+        <EhMenuItem
+          key={option.key}
+          property={option}
+          onClickCallback={handleClickOnMenu}
+        />
+      ))}
+    </div>
   );
 };

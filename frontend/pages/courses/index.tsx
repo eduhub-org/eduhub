@@ -10,7 +10,10 @@ import { useAdminQuery } from "../../hooks/authedQuery";
 import { useIsAdmin, useIsLoggedIn } from "../../hooks/authentication";
 import { ADMIN_COURSE_LIST } from "../../queries/courseList";
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from "../../queries/programList";
-import { AdminCourseList, AdminCourseListVariables } from "../../queries/__generated__/AdminCourseList";
+import {
+  AdminCourseList,
+  AdminCourseListVariables,
+} from "../../queries/__generated__/AdminCourseList";
 import {
   Programs,
   Programs_Program,
@@ -31,14 +34,18 @@ const Index: FC = () => {
       <Head>
         <title>{t("coursesPageTitle")}</title>
       </Head>
-      <Page>{isLoggedIn && isAdmin && <CoursesDashBoard />}</Page>
+      <Page>
+        <div className="min-h-[77vh]">
+          {isLoggedIn && isAdmin && <CoursesDashBoard />}
+        </div>
+      </Page>
     </>
   );
 };
 
 export default Index;
 
-export const QUERY_LIMIT = 20;
+export const QUERY_LIMIT = 15;
 
 const CoursesDashBoard: FC = () => {
   const programListRequest = useAdminQuery<Programs>(

@@ -2,11 +2,10 @@ import { TFunction } from "next-i18next";
 import { FC, useCallback, useEffect, useState } from "react";
 import {
   SelectComponentProperty,
-  SelectOption,
   StaticComponentProperty,
 } from "../../types/UIComponents";
 import EhButton from "../common/EhButton";
-import EhCheckBox from "../common/EhCheckBox2";
+import EhCheckBox2 from "../common/EhCheckBox2";
 import EhPassword from "../common/EhPassword";
 import { useAdminQuery } from "../../hooks/authedQuery";
 import {
@@ -20,7 +19,6 @@ import {
   EmplomentByValue,
   EmplomentByValue_Employment,
 } from "../../queries/__generated__/EmplomentByValue";
-import UserSelect from "./UserSelect";
 import { useAdminMutation } from "../../hooks/authedMutation";
 import {
   InsertSingleUser,
@@ -282,7 +280,7 @@ const AddUserForm: FC<IPropsFrom> = ({
                 [setStudentId]
               )}
             />
-            <EhCheckBox
+            <EhCheckBox2
               onClickHandler={onAdministratorCheck}
               property={adminCheckBox}
             />
@@ -297,5 +295,51 @@ const AddUserForm: FC<IPropsFrom> = ({
         </div>
       </div>
     </>
+  );
+};
+
+interface IProsSelect {
+  componentProperty: SelectComponentProperty;
+  selelectedValue: any;
+}
+
+const UserSelect: FC<IProsSelect> = ({
+  componentProperty,
+  selelectedValue,
+}) => {
+  const onSelectChanged = useCallback(
+    (event) => {
+      componentProperty.onChangeHandler(
+        componentProperty.componentID,
+        event.target.value
+      );
+    },
+    [componentProperty]
+  );
+
+  const selectStyle = `form-select 
+    appearance
+    block
+    w-full
+    px-3
+    font-normal
+    bg-transparent
+    transition
+    ease-in-out
+    border-b border-solid border-gray-300
+    m-0
+    focus:text-black focus:bg-white focus:border-blue-600 focus:outline-none`;
+  return (
+    <select
+      className={selectStyle}
+      onChange={onSelectChanged}
+      value={selelectedValue ?? ""}
+    >
+      {componentProperty.options.map((option, index) => (
+        <option key={option.value} value={option.value}>
+          {option.comment}
+        </option>
+      ))}
+    </select>
   );
 };

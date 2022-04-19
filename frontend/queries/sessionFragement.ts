@@ -32,4 +32,3 @@ export const ADMIN_SESSION_FRAGMENT = gql`
     }
   }
 `;
-

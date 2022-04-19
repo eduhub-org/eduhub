@@ -5,13 +5,8 @@ import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from "./programFragment";
 
 export const COURSE_LIST = gql`
   ${COURSE_FRAGMENT}
-  query CourseList(
-    $where: Course_bool_exp! = {}
-    ) {
-    Course(
-      order_by: { id: desc }, 
-      where: $where
-      ) {
+  query CourseList($where: Course_bool_exp! = {}) {
+    Course(order_by: { id: desc }, where: $where) {
       ...CourseFragment
     }
   }
@@ -31,15 +26,16 @@ export const ADMIN_COURSE_LIST = gql`
   ${ADMIN_COURSE_FRAGMENT}
   ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
   query AdminCourseList(
-    $where: Course_bool_exp! = {}, 
-    $limit: Int = null, 
-    $offset: Int = 0) {
+    $where: Course_bool_exp! = {}
+    $limit: Int = null
+    $offset: Int = 0
+  ) {
     Course(
-      order_by: { id: desc }, 
+      order_by: { id: desc }
       where: $where
       limit: $limit
       offset: $offset
-      ) {
+    ) {
       ...AdminCourseFragment
       Program {
         ...ProgramFragmentMinimumProperties
