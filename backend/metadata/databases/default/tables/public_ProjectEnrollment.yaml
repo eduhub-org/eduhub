@@ -17,6 +17,39 @@ object_relationships:
       remote_table:
         name: ProjectRating
         schema: public
+insert_permissions:
+- permission:
+    backend_only: false
+    check:
+      Enrollment:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+    columns:
+    - enrollmentId
+    - id
+    - projectId
+    - rating
+    - recordURL
+  role: instructor_access
+- permission:
+    backend_only: false
+    check:
+      Enrollment:
+        Course:
+          CourseEnrollments:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+    columns:
+    - enrollmentId
+    - id
+    - projectId
+    - recordURL
+  role: user_access
 select_permissions:
 - permission:
     columns:
@@ -29,8 +62,10 @@ select_permissions:
   role: instructor_access
 - permission:
     columns:
-    - enrollmentId
     - id
+    - created_at
+    - updated_at
+    - enrollmentId
     - projectId
     - rating
     - recordURL
@@ -39,4 +74,15 @@ select_permissions:
         User:
           id:
             _eq: X-Hasura-User-Id
-  role: self_access
+  role: user_access
+update_permissions:
+- permission:
+    check: null
+    columns:
+    - recordURL
+    filter:
+      Enrollment:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
+  role: user_access

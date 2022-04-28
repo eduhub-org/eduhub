@@ -26,12 +26,18 @@ select_permissions:
     - id
     - userId
     - description
+    - created_at
+    - updated_at
     filter: {}
     limit: 10
   role: anonymous
+update_permissions:
 - permission:
+    check: null
     columns:
     - description
-    - userId
-    filter: {}
-  role: instructor_access
+    filter:
+      User:
+        id:
+          _eq: X-Hasura-User-Id
+  role: user_access
