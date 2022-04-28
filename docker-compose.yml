@@ -3,16 +3,19 @@ version: "3.8"
 services:
   frontend:
     ports:
-      - 25000:5000
+      - "25000:5000"
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-dev
+    command: tail -F anything
+    volumes:
+      - ./frontend:/opt/app
     depends_on:
       - hasura
       - keycloak
   
   hasura:
-    image: hasura/graphql-engine:v2.0.3.cli-migrations-v3
+    image: hasura/graphql-engine:v2.2.0.cli-migrations-v3
     ports:
       - "8080:8080"
     depends_on:
@@ -26,7 +29,7 @@ services:
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       ## uncomment next line to set an admin secret
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
-      HASURA_GRAPHQL_JWT_SECRET: '{ "type": "RS256", "jwk_url": "http://keycloak:8080/auth/realms/edu-hub/protocol/openid-connect/certs" }'
+      HASURA_GRAPHQL_JWT_SECRET: '{"type": "RS256", "key": "-----BEGIN CERTIFICATE-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjA2VMVrXYPs6+wRCq4Hh5eADoiKrBAV7KymVoO3JTWMM2QWe/HKLivToU9f3oTc66HZmY9pwTbpDf7OCI1XpzVMJAVnJDaw/LvcGynKc36geUFG8eBrgMIZoMo3E4OQvz+GNZ4rFQB20cTEWBn/F7TLZz3XOSFK0TUMV3GYTFT9AnS3mbkA1LBneqZn0t3o9QBjHXGvvhOYCuzQ3oXvmmPSAc7v/Vg7l77FNIgX5ckmBQ/62940dpmo1XFRXW9V0U+OU5NOqoQofXnD6XvOasviZgtJBqmN1pK8p8JVONJZEwuAafY/XqmsWyp3XAsHgWiZx3ipKTe8fTxLdcZplyQIDAQAB\n-----END CERTIFICATE-----"}'
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: inherited_roles
       HASURA_CLOUD_FUNCTION_SECRET: "${HASURA_CLOUD_FUNCTION_SECRET}"
@@ -35,6 +38,7 @@ services:
     volumes:
       - ./backend/migrations:/hasura-migrations
       - ./backend/metadata:/hasura-metadata
+      - ./backend/seeds:/hasura-seeds
 
   db_hasura:
     image: postgres:12
