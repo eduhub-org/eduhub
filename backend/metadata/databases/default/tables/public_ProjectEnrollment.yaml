@@ -20,14 +20,7 @@ object_relationships:
 insert_permissions:
 - permission:
     backend_only: false
-    check:
-      Enrollment:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
+    check: {}
     columns:
     - enrollmentId
     - id
