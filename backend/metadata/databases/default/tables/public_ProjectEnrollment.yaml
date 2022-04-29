@@ -20,16 +20,6 @@ object_relationships:
 insert_permissions:
 - permission:
     backend_only: false
-    check: {}
-    columns:
-    - enrollmentId
-    - id
-    - projectId
-    - rating
-    - recordURL
-  role: instructor_access
-- permission:
-    backend_only: false
     check:
       Enrollment:
         Course:
