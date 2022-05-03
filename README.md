@@ -36,9 +36,9 @@
 
 1. Fill the hasura_keycloak.env with the HASURA_CLOUD_FUNCTION_SECRET and HASURA_BUCKET. These are private values not part of the public github, you need to ask somebody in the know about them, or use your own cloud functions servers.
 
-1. There is a docker-compose-dev.yml which you can use to start edu-hub with some settings for development. Run the following command to start all the containers as necessary. The frontend container will not yet do anything, but it will mount `./frontend` as a volume and open it as the working directory `/opt/app`.
+1. There is a docker-compose.yml which you can use to start edu-hub with some settings for development. Run the following command to start all the containers as necessary. The frontend container will not yet do anything, but it will mount `./frontend` as a volume and open it as the working directory `/opt/app`.
 
-        sudo docker-compose -f docker-compose-dev.yml up -d
+        sudo docker-compose -f docker-compose.yml up -d
 
 
 ## Database seed setup.
@@ -65,7 +65,7 @@
 Once the import is completed you can close this process.
 
 ## HASURA_GRAPHQL_JWT_SECRET setup
-Somehow the keycloak setup with hasura just don't work and hasura will not accept the jwt produced by keycloak, unless the certificate is hardcoded into the environment properties in docker-compose-dev.yml.
+Somehow the keycloak setup with hasura just don't work and hasura will not accept the jwt produced by keycloak, unless the certificate is hardcoded into the environment properties in docker-compose.yml.
 
 1. Copy the public key from admin panel: 
     
@@ -114,7 +114,7 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
    
    Stop/Start the the images together.
    
-        First start: sudo docker-compose -f docker-compose-dev.yml up -d
+        First start: sudo docker-compose -f docker-compose.yml up -d
         sudo docker-compose stop
         sudo docker-compose start
 
@@ -133,3 +133,5 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
           /opt/app # yarn dev 
 
     - Now you can modify code in this project and it should automatically reload changes.
+    
+That made it work mostly, though I still see some CORS issues. That is a wip point for the project.

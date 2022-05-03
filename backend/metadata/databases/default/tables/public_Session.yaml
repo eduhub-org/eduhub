@@ -37,26 +37,32 @@ array_relationships:
 insert_permissions:
 - permission:
     backend_only: false
-    check: {}
+    check:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
     columns:
-    - id
-    - title
-    - description
-    - startDateTime
-    - endDateTime
     - courseId
-    - createdAt
-    - updatedAt
+    - description
+    - endDateTime
+    - id
+    - startDateTime
+    - title
   role: instructor_access
 select_permissions:
 - permission:
     columns:
     - courseId
+    - created_at
     - description
     - endDateTime
     - id
     - startDateTime
     - title
+    - updated_at
     filter: {}
   role: anonymous
 update_permissions:
@@ -67,9 +73,21 @@ update_permissions:
     - endDateTime
     - startDateTime
     - title
-    filter: {}
+    filter:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
   role: instructor_access
 delete_permissions:
 - permission:
-    filter: {}
+    filter:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
   role: instructor_access

@@ -11,7 +11,13 @@ object_relationships:
 insert_permissions:
 - permission:
     backend_only: false
-    check: {}
+    check:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
     columns:
     - courseId
     - id
@@ -20,19 +26,45 @@ insert_permissions:
 select_permissions:
 - permission:
     columns:
+    - id
+    - created_at
+    - updated_at
     - courseId
+    - projectId
+    filter:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+  role: instructor_access
+- permission:
+    columns:
+    - courseId
+    - created_at
     - id
     - projectId
-    filter: {}
-    limit: 20
+    - updated_at
+    filter:
+      Course:
+        CourseEnrollments:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
   role: user_access
 update_permissions:
 - permission:
     check: null
     columns:
     - courseId
-    - projectId
-    filter: {}
+    filter:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
   role: instructor_access
 delete_permissions:
 - permission:
