@@ -17,8 +17,8 @@ USER root
 COPY ./gcsfuse.repo /etc/yum.repos.d/
 RUN microdnf update -y && microdnf install -y gcsfuse && microdnf clean all
 
-USER keycloak
 COPY ./start.sh /opt/keycloak/bin/start.sh
 RUN chmod +x /opt/keycloak/bin/start.sh
 
+USER keycloak
 ENTRYPOINT ["/opt/keycloak/bin/start.sh", "start"]
