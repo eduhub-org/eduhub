@@ -1,40 +1,57 @@
+# To make login work correctly you need to have an environment file called hasura_keycloak.env
+# which needs to contain the environment variable HASURA_GRAPHQL_JWT_SECRET which contains this value:
+# {"type": "RS256", "key": "-----BEGIN CERTIFICATE-----\nPUT_YOUR_PUBLIC_KEY_HERE\n-----END CERTIFICATE-----"}
+# The public key value is found in your keycloak instance, edu hub realm, keys, rs256 public key.
+# So make the file hasura_keycloak.env next to the docker-compose-dev.yml with this content:
+
+# To get the public key in the first run you might have to provide an empty environment file, then do docker-compose stop and docker-compose up again once you have the public key.
+
+# Then start with docker-compose -f docker-compose-dev.yml up -d
+
 version: "3.8"
 
 services:
   frontend:
     ports:
-      - 25000:5000
+      - "25000:5000"
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-dev
+    command: tail -F anything
+    volumes:
+      - ./frontend:/opt/app
     depends_on:
       - hasura
       - keycloak
   
   hasura:
-    image: hasura/graphql-engine:v2.0.3.cli-migrations-v3
+    image: hasura/graphql-engine:v2.2.0.cli-migrations-v3
     ports:
       - "8080:8080"
     depends_on:
       - db_hasura
       - keycloak
     restart: always
+    env_file:
+      - hasura_keycloak.env
     environment:
+      HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: "inherited_roles"
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@db_hasura:5432/postgres
-      HASURA_GRAPHQL_ENABLE_CONSOLE: "false" # set to "false" to disable console
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       ## uncomment next line to set an admin secret
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
-      HASURA_GRAPHQL_JWT_SECRET: '{ "type": "RS256", "jwk_url": "http://keycloak:8080/auth/realms/edu-hub/protocol/openid-connect/certs" }'
+      #HASURA_GRAPHQL_JWT_SECRET: '${HASURA_GRAPHQL_JWT_SECRET}'
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
-      HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: inherited_roles
-      HASURA_CLOUD_FUNCTION_SECRET: "${HASURA_CLOUD_FUNCTION_SECRET}"
-      HASURA_BUCKET: "${HASURA_BUCKET}"
+      # These two are now part of the hasura_keycloak.env file used during development. It's in gitignore, as it contains passwords and values that are unique to each developer.
+      #HASURA_CLOUD_FUNCTION_SECRET: "${HASURA_CLOUD_FUNCTION_SECRET}"
+      #HASURA_BUCKET: "${HASURA_BUCKET}"
       CLOUD_FUNCTION_LINK: "https://europe-west3-edu-hub-staging.cloudfunctions.net"
     volumes:
       - ./backend/migrations:/hasura-migrations
       - ./backend/metadata:/hasura-metadata
+      - ./backend/seeds:/hasura-seeds
 
   db_hasura:
     image: postgres:12
