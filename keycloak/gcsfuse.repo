@@ -1,0 +1,6 @@
+[gcsfuse]
+name = gcsfuse
+baseurl = https://packages.cloud.google.com/yum/repos/gcsfuse-el7-x86_64
+enabled = 1
+gpgkey = file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+gpgcheck = 0
