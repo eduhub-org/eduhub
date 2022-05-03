@@ -20,5 +20,8 @@ RUN microdnf update -y && microdnf install -y gcsfuse && microdnf clean all
 COPY ./start.sh /opt/keycloak/bin/start.sh
 RUN chmod +x /opt/keycloak/bin/start.sh
 
+RUN mkdir -p /mnt/bucket
+RUN chown keycloak:root /mnt/bucket
+
 USER keycloak
 ENTRYPOINT ["/opt/keycloak/bin/start.sh", "start"]
