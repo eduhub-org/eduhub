@@ -5,5 +5,6 @@
 echo "Mounting GCS Fuse."
 gcsfuse --foreground -o rw,allow_other -file-mode=777 -dir-mode=777 --debug_gcs --debug_fuse --debug_http --debug_fs --debug_mutex --implicit-dirs edu-hub-production-keycloak-seeds /mnt/bucket
 echo "Mounting completed."
+ls -lart /dev/fuse
 
 /opt/keycloak/bin/kc.sh import --dir "/mnt/bucket"
