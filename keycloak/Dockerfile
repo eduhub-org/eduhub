@@ -23,7 +23,10 @@ RUN chmod +x /opt/keycloak/bin/start.sh
 RUN mkdir -p /mnt/bucket
 RUN chown keycloak:root /mnt/bucket
 RUN chmod 777 /mnt/bucket
-RUN ls -lart /dev/fuse
+RUN mkdir /dev/fuse
+RUN chown keycloak:root /dev/fuse
+RUN chmod 777 /dev/fuse
+
 
 USER keycloak
 ENTRYPOINT ["/opt/keycloak/bin/start.sh", "start"]
