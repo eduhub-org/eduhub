@@ -23,6 +23,7 @@ RUN chmod +x /opt/keycloak/bin/start.sh
 RUN mkdir -p /mnt/bucket
 RUN chown keycloak:root /mnt/bucket
 RUN chmod 777 /mnt/bucket
+RUN echo "edu-hub-production-keycloak-seeds /mnt/bucket gcsfuse rw,noauto,user" >> /etc/fstab
 
 USER keycloak
 ENTRYPOINT ["/opt/keycloak/bin/start.sh", "start"]
