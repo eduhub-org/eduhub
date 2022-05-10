@@ -21,7 +21,7 @@ COPY ./start.sh /opt/keycloak/bin/start.sh
 RUN chmod +x /opt/keycloak/bin/start.sh
 
 RUN mkdir -p /mnt/bucket
-RUN chown keycloak:root /mnt/bucket
+RUN chown keycloak:fuse /mnt/bucket
 RUN chmod 777 /mnt/bucket
 
 USER keycloak
