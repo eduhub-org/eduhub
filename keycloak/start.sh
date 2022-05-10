@@ -7,5 +7,3 @@ gcsfuse --debug_gcs --debug_fuse edu-hub-production-keycloak-seeds /mnt/bucket
 echo "Mounting completed."
 
 /opt/keycloak/bin/kc.sh import --dir "/mnt/bucket"
-
-/opt/keycloak/bin/kc.sh
