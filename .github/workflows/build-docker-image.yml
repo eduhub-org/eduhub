@@ -65,6 +65,14 @@ jobs:
           echo VERSION=$VERSION
           docker tag ${{ inputs.IMAGE_NAME }} $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+      #-
+        #name: Deploy to Cloud Run
+        #id: deploy
+        #uses: google-github-actions/deploy-cloudrun@v0
+        #with:
+          #project_id: ${{ inputs.PROJECT_ID }}
+          #image: ${{ inputs.IMAGE_NAME }}:$VERSION
+          #service: keycloak
       - 
         name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
