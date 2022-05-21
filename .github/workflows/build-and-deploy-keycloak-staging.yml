@@ -4,12 +4,11 @@ on:
     # Run only on changes in the following branches
     branches:
       - staging
-      - github-actions
     
     # Run only on changes in the following folder
     paths:
       - keycloak/**
-      - .github/workflows/**
+      #- .github/workflows/**
 
     # Publish `v1.2.3` tags as releases.
     tags:
