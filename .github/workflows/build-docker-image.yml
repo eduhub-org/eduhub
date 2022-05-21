@@ -4,11 +4,17 @@ on:
   workflow_call:
     inputs:
       # Name for the docker image
-      IMAGE_NAME: string
+      IMAGE_NAME: 
+        required: true
+        type: string
       # ID of the project in Google in which the image will be stored and deployed
-      PROJECT_ID: string
+      PROJECT_ID:
+        required: true
+        type: string
       # Folder with the Dockerfile that is used for creating the image
-      DOCKERFILE_FOLDER: string
+      DOCKERFILE_FOLDER:
+        required: true
+        type: string
 
 
 jobs:

@@ -26,7 +26,7 @@ jobs:
       # Name for the docker image
       IMAGE_NAME: edu_hub_keycloak
       # ID of the project in Google in which the image will be stored and deployed
-      PROJECT_ID: edu-hub-production
+      PROJECT_ID: edu-hub-staging
       # Folder with the Dockerfile that is used for creating the image
       DOCKERFILE_FOLDER: keycloak
     secrets: inherit
