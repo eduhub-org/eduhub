@@ -25,6 +25,8 @@ jobs:
     with:
       # Name for the docker image
       IMAGE_NAME: edu_hub_keycloak
+      # Name of the branch that triggered the workflow run
+      BRANCH: ${{ github.ref }}
       # ID of the project in Google in which the image will be stored and deployed
       PROJECT_ID: edu-hub-production
       # Folder with the Dockerfile that is used for creating the image

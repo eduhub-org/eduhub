@@ -7,6 +7,10 @@ on:
       IMAGE_NAME: 
         required: true
         type: string
+      # Name of the branch that triggered the workflow run
+      BRANCH:
+        required: true
+        type: string
       # ID of the project in Google in which the image will be stored and deployed
       PROJECT_ID:
         required: true
@@ -26,7 +30,6 @@ jobs:
 
   build-and-deploy:
     name: Building a Docker Image and Storing it in the Artifact Registry
-    if: "!contains(github.event.head_commit.message, 'skip ci')"
     runs-on: ubuntu-latest
 
     steps:
@@ -53,9 +56,9 @@ jobs:
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo ${{ inputs.IMAGE_NAME }} | tr '[A-Z]' '[a-z]')
           # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          VERSION=$(echo "${{ inputs.BRANCH }}" | sed -e 's,.*/\(.*\),\1,')
           # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          [[ "${{ inputs.BRANCH }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
           # Use Docker `latest` tag convention
           [ "$VERSION" == "main" ] && VERSION=latest
           echo IMAGE_ID=${{ inputs.IMAGE_NAME }}
