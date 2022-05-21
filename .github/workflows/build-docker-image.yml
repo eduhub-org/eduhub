@@ -54,7 +54,7 @@ jobs:
         run: |
           IMAGE_ID=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/docker-repo/${{ inputs.IMAGE_NAME }}
           # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          #IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           # Strip git ref prefix from version
           VERSION=$(echo "${{ inputs.BRANCH }}" | sed -e 's,.*/\(.*\),\1,')
           # Strip "v" prefix from tag name
