@@ -1,0 +1,57 @@
+name: Build and Store a Docker Image in the Artifact Registry
+
+on:
+  workflow_call:
+    inputs:
+      # Name for the docker image
+      IMAGE_NAME: string
+      # ID of the project in Google in which the image will be stored and deployed
+      PROJECT_ID: string
+      # Folder with the Dockerfile that is used for creating the image
+      DOCKERFILE_FOLDER: string
+
+
+jobs:
+
+  build-and-deploy:
+    name: Building a Docker Image and Storing it in the Artifact Registry
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+    runs-on: ubuntu-latest
+
+    steps:
+      - 
+        name: Check Out the Repository Branch
+        uses: actions/checkout@v2
+      - 
+        name: Authenticate to Google Cloud
+        id: 'auth'  
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
+          project_id: ${{ inputs.PROJECT_ID }}
+      -
+        name: Build Docker image
+        run: docker build ./${{ inputs.DOCKERFILE_FOLDER }} --file ./${{ inputs.DOCKERFILE_FOLDER }}/Dockerfile --tag ${{ inputs.IMAGE_NAME }} --label "runnumber=${GITHUB_RUN_ID}"
+      -
+        name: Authenticate with Google Cloud Artifact Registry
+        run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+      -
+        name: Push Docker Image to Google Artifact Registry
+        run: |
+          IMAGE_ID=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/docker-repo/${{ inputs.IMAGE_NAME }}
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo ${{ inputs.IMAGE_NAME }} | tr '[A-Z]' '[a-z]')
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "main" ] && VERSION=latest
+          echo IMAGE_ID=${{ inputs.IMAGE_NAME }}
+          echo VERSION=$VERSION
+          docker tag ${{ inputs.IMAGE_NAME }} ${{ inputs.IMAGE_NAME }}:$VERSION
+          docker push ${{ inputs.IMAGE_NAME }}:$VERSION
+      - 
+        name: Show Output
+        run: echo ${{ steps.deploy.outputs.url }}
+        
