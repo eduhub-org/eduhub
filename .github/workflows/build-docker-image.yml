@@ -15,6 +15,12 @@ on:
       DOCKERFILE_FOLDER:
         required: true
         type: string
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY:
+        required: true
+        type: string
+      GCP_REGION:
+        required: true
 
 
 jobs:

@@ -29,4 +29,6 @@ jobs:
       PROJECT_ID: edu-hub-production
       # Folder with the Dockerfile that is used for creating the image
       DOCKERFILE_FOLDER: keycloak
-    secrets: inherit
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}
