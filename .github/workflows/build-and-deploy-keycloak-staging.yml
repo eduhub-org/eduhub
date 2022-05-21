@@ -21,7 +21,7 @@ jobs:
 
   build-keycloak:
     name: Build the Keycloak Docker Image
-    uses: edu-hub-project/edu-hub/.github/workflows/build-docker-image.yml@github-actions
+    uses: ./.github/workflows/build-docker-image.yml
     with:
       # Name for the docker image
       IMAGE_NAME: edu_hub_keycloak
