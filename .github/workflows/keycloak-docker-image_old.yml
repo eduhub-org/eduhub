@@ -5,7 +5,7 @@ on:
     # Run only on changes in the following branches
     branches:
       - main
-      #- github-actions
+      - github-actions
     
     # Run only on changes in the following folder
     paths:
