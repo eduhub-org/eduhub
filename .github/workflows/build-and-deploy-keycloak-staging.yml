@@ -20,8 +20,8 @@ on:
 
 jobs:
 
-  build-keycloak:
-    name: Build the Keycloak Docker Image
+  build:
+    name: Build the Docker Image
     uses: ./.github/workflows/build-docker-image.yml
     with:
       # Folder with the Dockerfile that is used for creating the image

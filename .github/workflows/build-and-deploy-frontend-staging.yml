@@ -1,10 +1,10 @@
-name: Build and Deploy Keycloak Docker Image for the Staging Environment
+name: Build and Deploy Frontend Docker Image for the Staging Environment
 on:   
   push:
     # Run only on changes in the following branches
     branches:
       - staging
-      - github-actions
+      #- github-actions
     
     # Run only on changes in the following folder
     paths:
@@ -20,8 +20,8 @@ on:
 
 jobs:
 
-  build-keycloak:
-    name: Build the Keycloak Docker Image
+  build:
+    name: Build the Docker Image
     uses: ./.github/workflows/build-docker-image.yml
     with:
       # Folder with the Dockerfile that is used for creating the image
