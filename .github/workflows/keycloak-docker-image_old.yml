@@ -24,6 +24,7 @@ env:
   IMAGE_NAME: edu_hub_keycloak
   # ID of the project in Google in which the image will be stored and deployed
   PROJECT_ID: edu-hub-production
+  DOCKERFILE_FOLDER: keycloak
 
 jobs:
 
@@ -45,7 +46,7 @@ jobs:
           project_id: $PROJECT_ID
       -
         name: Build Docker image
-        run: docker build ./keycloak --file ./keycloak/Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
+        run: docker build ./$DOCKERFILE_FOLDER --file ./$DOCKERFILE_FOLDER/Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
       -
         name: Authenticate with Google Cloud Artifact Registry
         run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
@@ -65,14 +66,14 @@ jobs:
           echo VERSION=$VERSION
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
-      - 
-        name: Deploy to Cloud Run
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v0
-        with:
-          project_id: edu-hub-production
-          image: $IMAGE_ID:$VERSION
-          service: keycloak
+      #- 
+        #name: Deploy to Cloud Run
+        #id: deploy
+        #uses: google-github-actions/deploy-cloudrun@v0
+        #with:
+          #project_id: edu-hub-production
+          #image: $IMAGE_ID:$VERSION
+          #service: keycloak
       - 
         name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
