@@ -130,7 +130,6 @@ update_permissions:
     - language
     - learningGoals
     - maxMissedSessions
-    - startTime
     - tagline
     filter:
       CourseInstructors:

@@ -26,8 +26,8 @@ insert_permissions:
     check: {}
     columns:
     - id
-    - createdAt
-    - updatedAt
+    - created_at
+    - updated_at
     - totalAttendanceTime
     - status
     - interruptionCount
@@ -42,8 +42,8 @@ select_permissions:
 - permission:
     columns:
     - id
-    - createdAt
-    - updatedAt
+    - created_at
+    - updated_at
     - totalAttendanceTime
     - status
     - interruptionCount
@@ -57,7 +57,7 @@ select_permissions:
   role: instructor_access
 - permission:
     columns:
-    - createdAt
+    - created_at
     - endDateTime
     - id
     - recordedName
@@ -65,7 +65,7 @@ select_permissions:
     - source
     - startDateTime
     - status
-    - updatedAt
+    - updated_at
     - userId
     filter:
       User:

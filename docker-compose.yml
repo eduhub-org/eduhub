@@ -3,10 +3,14 @@ version: "3.8"
 services:
   frontend:
     ports:
-      - 25000:5000
+      - "25000:5000"
     build:
       context: ./frontend
+<<<<<<< HEAD
       dockerfile: Dockerfile
+=======
+      dockerfile: Dockerfile-dev
+>>>>>>> develop
     command: tail -F anything
     volumes:
       - ./frontend:/opt/app
