@@ -6,11 +6,7 @@ services:
       - "25000:5000"
     build:
       context: ./frontend
-<<<<<<< HEAD
-      dockerfile: Dockerfile
-=======
       dockerfile: Dockerfile-dev
->>>>>>> develop
     command: tail -F anything
     volumes:
       - ./frontend:/opt/app
