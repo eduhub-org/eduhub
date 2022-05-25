@@ -1,0 +1,79 @@
+name: Build and Store a Docker Image in the Artifact Registry
+
+on:
+  workflow_call:
+    inputs:
+      # Name for the docker image
+      IMAGE_NAME: 
+        required: true
+        type: string
+      # Name of the branch that triggered the workflow run
+      BRANCH:
+        required: true
+        type: string
+      # ID of the project in Google in which the image will be stored and deployed
+      PROJECT_ID:
+        required: true
+        type: string
+      # Folder with the Dockerfile that is used for creating the image
+      DOCKERFILE_FOLDER:
+        required: true
+        type: string
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY:
+        required: true
+      GCP_REGION:
+        required: true
+
+
+jobs:
+
+  build-and-deploy:
+    name: Building a Docker Image and Storing it in the Artifact Registry
+    runs-on: ubuntu-latest
+
+    steps:
+      - 
+        name: Check Out the Repository Branch
+        uses: actions/checkout@v2
+      - 
+        name: Authenticate to Google Cloud
+        id: 'auth'  
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          project_id: ${{ inputs.PROJECT_ID }}
+      -
+        name: Build Docker image
+        run: docker build ./${{ inputs.DOCKERFILE_FOLDER }} --file ./${{ inputs.DOCKERFILE_FOLDER }}/Dockerfile --tag ${{ inputs.IMAGE_NAME }} --label "runnumber=${GITHUB_RUN_ID}"
+      -
+        name: Authenticate with Google Cloud Artifact Registry
+        run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+      -
+        name: Push Docker Image to Google Artifact Registry
+        run: |
+          IMAGE_ID=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/docker-repo/${{ inputs.IMAGE_NAME }}
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ inputs.BRANCH }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ inputs.BRANCH }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "main" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag ${{ inputs.IMAGE_NAME }} $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+      #-
+        #name: Deploy to Cloud Run
+        #id: deploy
+        #uses: google-github-actions/deploy-cloudrun@v0
+        #with:
+          #project_id: ${{ inputs.PROJECT_ID }}
+          #image: ${{ inputs.IMAGE_NAME }}:$VERSION
+          #service: keycloak
+      - 
+        name: Show Output
+        run: echo ${{ steps.deploy.outputs.url }}
+        

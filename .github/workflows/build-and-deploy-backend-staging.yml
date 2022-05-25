@@ -1,0 +1,36 @@
+name: Build and Deploy Backend Docker Image for the Staging Environment
+on:   
+  push:
+    # Run only on changes in the following branches
+    branches:
+      - staging
+    
+    # Run only on changes in the following folder
+    paths:
+      - backend/**
+      #- .github/workflows/**
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+  # Run tests for any PRs.
+  pull_request:
+
+jobs:
+
+  build:
+    name: Build the Docker Image
+    uses: ./.github/workflows/build-docker-image.yml
+    with:
+      # Folder with the Dockerfile that is used for creating the image
+      DOCKERFILE_FOLDER: backend
+      # Name for the docker image
+      IMAGE_NAME: edu_hub_backend
+      # Name of the branch that triggered the workflow run
+      BRANCH: ${{ github.ref }}
+      # ID of the project in Google in which the image will be stored and deployed
+      PROJECT_ID: edu-hub-staging
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY_STAGING }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}

@@ -20,24 +20,6 @@ object_relationships:
 - name: User
   using:
     foreign_key_constraint_on: userId
-insert_permissions:
-- permission:
-    backend_only: false
-    check: {}
-    columns:
-    - id
-    - created_at
-    - updated_at
-    - totalAttendanceTime
-    - status
-    - interruptionCount
-    - endDateTime
-    - startDateTime
-    - sessionId
-    - userId
-    - recordedName
-    - source
-  role: instructor_access
 select_permissions:
 - permission:
     columns:
@@ -53,34 +35,51 @@ select_permissions:
     - userId
     - recordedName
     - source
-    filter: {}
+    filter:
+      Session:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
   role: instructor_access
 - permission:
     columns:
-    - created_at
-    - endDateTime
     - id
-    - recordedName
-    - sessionId
-    - source
-    - startDateTime
-    - status
+    - created_at
     - updated_at
+    - totalAttendanceTime
+    - status
+    - interruptionCount
+    - endDateTime
+    - startDateTime
+    - sessionId
     - userId
+    - recordedName
+    - source
     filter:
       User:
         id:
           _eq: X-Hasura-User-Id
-  role: self_access
+  role: user_access
 update_permissions:
 - permission:
     check: {}
     columns:
     - endDateTime
+    - interruptionCount
     - recordedName
     - source
     - startDateTime
     - status
     - totalAttendanceTime
-    filter: {}
+    filter:
+      Session:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
   role: instructor_access

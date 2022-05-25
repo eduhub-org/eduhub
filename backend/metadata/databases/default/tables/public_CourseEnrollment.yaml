@@ -25,12 +25,11 @@ array_relationships:
 insert_permissions:
 - permission:
     backend_only: false
-    check:
-      userId:
-        _eq: X-Hasura-User-Id
+    check: {}
     columns:
     - courseId
     - motivationLetter
+    - status
     - userId
   role: user_access
 select_permissions:
@@ -47,7 +46,13 @@ select_permissions:
     - created_at
     - updated_at
     - invitationExpirationDate
-    filter: {}
+    filter:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
   role: instructor_access
 - permission:
     columns:
@@ -68,10 +73,14 @@ update_permissions:
 - permission:
     check: {}
     columns:
-    - achievementCertificateURL
-    - attendanceCertificateURL
     - invitationExpirationDate
     - motivationRating
     - status
-    filter: {}
+    filter:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
   role: instructor_access

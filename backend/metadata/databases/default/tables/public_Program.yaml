@@ -12,6 +12,17 @@ array_relationships:
 select_permissions:
 - permission:
     columns:
+    - applicationStart
+    - id
+    - lectureEnd
+    - lectureStart
+    - projectRecordUploadDeadline
+    - shortTitle
+    - title
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
     - id
     - title
     - lectureStart
@@ -31,18 +42,3 @@ select_permissions:
     - defaultMaxMissedSessions
     filter: {}
   role: instructor_access
-- permission:
-    columns:
-    - applicationStart
-    - defaultApplicationEnd
-    - defaultMaxMissedSessions
-    - id
-    - lectureEnd
-    - lectureStart
-    - projectRecordUploadDeadline
-    - shortTitle
-    - startQuestionnaire
-    - title
-    filter: {}
-    limit: 20
-  role: user_access
