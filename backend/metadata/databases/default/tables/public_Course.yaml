@@ -47,7 +47,9 @@ array_relationships:
 select_permissions:
 - permission:
     columns:
+    - achievementCertificatePossible
     - applicationEnd
+    - attendanceCertificatePossible
     - contentDescriptionField1
     - contentDescriptionField2
     - cost
@@ -58,10 +60,11 @@ select_permissions:
     - headingDescriptionField2
     - id
     - language
+    - learningGoals
     - maxMissedSessions
+    - maxParticipants
     - programId
     - startTime
-    - status
     - tagline
     - title
     - weekDay
@@ -81,9 +84,11 @@ select_permissions:
     - endTime
     - headingDescriptionField1
     - headingDescriptionField2
+    - id
     - language
     - learningGoals
     - maxMissedSessions
+    - maxParticipants
     - programId
     - startTime
     - status
@@ -91,32 +96,11 @@ select_permissions:
     - title
     - visibility
     - weekDay
-    filter: {}
-  role: instructor_access
-- permission:
-    columns:
-    - achievementCertificatePossible
-    - applicationEnd
-    - attendanceCertificatePossible
-    - chatLink
-    - contentDescriptionField1
-    - contentDescriptionField2
-    - cost
-    - coverImage
-    - ects
-    - endTime
-    - headingDescriptionField1
-    - headingDescriptionField2
-    - id
-    - language
-    - maxMissedSessions
-    - programId
-    - startTime
-    - status
-    - tagline
-    - title
-    - weekDay
-    filter: {}
+    filter:
+      CourseEnrollments:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
   role: user_access
 update_permissions:
 - permission:
@@ -124,17 +108,20 @@ update_permissions:
     columns:
     - contentDescriptionField1
     - contentDescriptionField2
-    - coverImage
+    - endTime
     - headingDescriptionField1
     - headingDescriptionField2
     - language
     - learningGoals
     - maxMissedSessions
+    - maxParticipants
+    - startTime
     - tagline
+    - weekDay
     filter:
       CourseInstructors:
         Expert:
           User:
             id:
               _eq: X-Hasura-User-Id
-  role: self_access
+  role: instructor_access

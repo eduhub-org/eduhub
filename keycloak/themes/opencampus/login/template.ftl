@@ -37,10 +37,24 @@
 </head>
 
 <body class="${properties.kcBodyClass!}">
+<div class="academy_header_guest">
+  <nav class="navbar navbar-light navbar-expand-md p-0">
+    <img class="navbar-brand m-2 brand-logo" src="https://edu.opencampus.sh/assets/logo_black-124468c0c12d91dcf10efe2c112729889dcb334019ac5d05030dad58311662c8.png">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="true" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse p-2" id="navbarNav">
+      <ul class="navbar-nav mr-auto ml-auto mt-2 mt-lg-0">
+        <span class="nav-link"><h2>edu.opencampus.sh</h2></span>
+      </ul>
+      <div class="my-2 my-lg-0 navbar-nav" >
+      </div>
+    </div>
+  </nav>
+</div>
 <div class="${properties.kcLoginClass!}">
     <div id="kc-header" class="${properties.kcHeaderClass!}">
-        <div id="kc-header-wrapper"
-             class="${properties.kcHeaderWrapperClass!} edu-title">OPENCAMPUS.SH</div>
+
     </div>
     <div class="${properties.kcFormCardClass!}">
         <header class="${properties.kcFormHeaderClass!}">

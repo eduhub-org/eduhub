@@ -11,7 +11,14 @@ object_relationships:
 insert_permissions:
 - permission:
     backend_only: false
-    check: {}
+    check:
+      Session:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
     columns:
     - expertId
     - sessionId
@@ -19,20 +26,36 @@ insert_permissions:
 select_permissions:
 - permission:
     columns:
+    - id
+    - created_at
+    - updated_at
     - expertId
     - sessionId
     filter: {}
-    limit: 20
-  role: user_access
+  role: anonymous
 update_permissions:
 - permission:
     check: null
     columns:
     - expertId
     - sessionId
-    filter: {}
+    filter:
+      Session:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
   role: instructor_access
 delete_permissions:
 - permission:
-    filter: {}
+    filter:
+      Session:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
   role: instructor_access
