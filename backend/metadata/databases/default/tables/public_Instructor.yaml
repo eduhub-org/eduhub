@@ -27,4 +27,4 @@ select_permissions:
     - userId
     - description
     filter: {}
-  role: user
+  role: user_access

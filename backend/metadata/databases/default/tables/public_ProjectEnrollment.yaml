@@ -17,3 +17,26 @@ object_relationships:
       remote_table:
         name: ProjectRating
         schema: public
+select_permissions:
+- permission:
+    columns:
+    - enrollmentId
+    - id
+    - projectId
+    - rating
+    - recordURL
+    filter: {}
+  role: instructor_access
+- permission:
+    columns:
+    - enrollmentId
+    - id
+    - projectId
+    - rating
+    - recordURL
+    filter:
+      Enrollment:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
+  role: self_access

@@ -9,9 +9,9 @@
 
 # Development Setup
 
-There is a docker-compose-dev.yml which you can use to start edu-hub with some settings for development.
+There is a docker-compose.yml which you can use to start edu-hub with some settings for development.
 
-Run `docker-compose -f docker-compose-dev.yaml up -d` to start
+Run `docker-compose -f docker-compose.yaml up -d` to start
 all the containers as necessary. The frontend container will not yet do anything,
 but it will mount `./frontend` as a volume and open it as the working directory `/opt/app`.
 
