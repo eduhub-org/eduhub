@@ -3,7 +3,16 @@
 
 name: TSC and Linting
 
-on: [push, pull_request]
+on:   
+  push:
+    # Run only on changes in the following folder
+    paths:
+      - frontend/**
+  pull_request:
+    # Run only on changes in the following folder
+    paths:
+      - frontend/**
+
 
 jobs:
   build:
