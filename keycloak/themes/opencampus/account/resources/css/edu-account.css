@@ -1,0 +1,27 @@
+.form-control {
+  border-color: #0D888D;
+}
+
+.form-control:hover {
+  border-color: #0D888D;
+}
+
+.btn-primary {
+  background-image: none;
+  background-color: #0D888D;
+  border-color: #0b7478;
+}
+
+.btn-primary:hover {
+  background-image: none;
+  background-color: #0b7478;
+}
+
+a {
+  color: #0D888D;
+}
+
+a:hover {
+  color: #0b7478;
+}
+
