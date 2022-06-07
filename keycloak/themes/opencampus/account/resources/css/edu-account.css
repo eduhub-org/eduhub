@@ -25,3 +25,62 @@ a:hover {
   color: #0b7478;
 }
 
+.academy_header_guest .navbar {
+    background-color: #f8f9fa;
+    height: 9em;
+}
+
+.academy_header_guest h2 {
+    font-size: 1.75em;
+    font-weight: 700;
+}
+
+.academy_header_guest .nav-link {
+    font-size: 22px;
+    margin-right:1em;
+    color: black !important;
+}
+
+.academy_header_guest .nav-link-dropdown {
+    font-size: 22px;
+    color: black !important;
+}
+
+.academy_header_guest .navbar-brand {
+    height: unset;
+}
+
+.academy_header_guest .dropdown-menu {
+    background-color: $sec_one;
+    padding: 0;
+    position: absolute;
+    top: 100%;
+    right: 0;
+}
+
+.academy_header_guest .dropdown-item {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+}
+
+.academy_header_guest .navbar-collapse {
+    background-color: #f8f9fa;
+    z-index: 2;
+}
+
+.academy_header_guest .img-circle {
+    border-radius: 40px;
+    height: 45px;
+    width: 45px;
+}
+
+.academy_header_guest .brand-logo {
+    max-height: 6.5em;
+    padding: 0.5em;
+}
+
+.academy_header_guest .navbar-toggler {
+    font-size: 30px;
+    color: black;
+    border: none;
+}
