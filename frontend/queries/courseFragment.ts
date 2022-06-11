@@ -43,5 +43,12 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     attendanceCertificatePossible
     chatLink
     learningGoals
+    Program {
+      id
+      title
+      shortTitle
+      lectureStart
+      lectureEnd
+    }
   }
 `;

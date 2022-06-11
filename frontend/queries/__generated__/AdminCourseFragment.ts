@@ -73,6 +73,27 @@ export interface AdminCourseFragment_CourseInstructors {
   Expert: AdminCourseFragment_CourseInstructors_Expert;
 }
 
+export interface AdminCourseFragment_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
+  /**
+   * The last day a course lecture can possibly be in this program.
+   */
+  lectureEnd: any | null;
+}
+
 export interface AdminCourseFragment {
   __typename: "Course";
   id: number;
@@ -172,4 +193,8 @@ export interface AdminCourseFragment {
    * An array of texts including the learning goals for the course
    */
   learningGoals: string | null;
+  /**
+   * An object relationship
+   */
+  Program: AdminCourseFragment_Program | null;
 }

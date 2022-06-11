@@ -18,9 +18,9 @@ export enum Admin_constraint {
  * update columns of table "Admin"
  */
 export enum Admin_update_column {
-  createdAt = "createdAt",
+  created_at = "created_at",
   id = "id",
-  updatedAt = "updatedAt",
+  updated_at = "updated_at",
   userId = "userId",
 }
 
@@ -36,11 +36,11 @@ export enum AttendanceSourceData_constraint {
  */
 export enum AttendanceSourceData_update_column {
   URL = "URL",
-  createdAt = "createdAt",
+  created_at = "created_at",
   id = "id",
   sessionId = "sessionId",
   source = "source",
-  updatedAt = "updatedAt",
+  updated_at = "updated_at",
 }
 
 /**
@@ -90,7 +90,7 @@ export enum Attendance_constraint {
  * update columns of table "Attendance"
  */
 export enum Attendance_update_column {
-  createdAt = "createdAt",
+  created_at = "created_at",
   endDateTime = "endDateTime",
   id = "id",
   interruptionCount = "interruptionCount",
@@ -100,7 +100,7 @@ export enum Attendance_update_column {
   startDateTime = "startDateTime",
   status = "status",
   totalAttendanceTime = "totalAttendanceTime",
-  updatedAt = "updatedAt",
+  updated_at = "updated_at",
   userId = "userId",
 }
 
@@ -142,13 +142,13 @@ export enum CourseEnrollment_update_column {
   achievementCertificateURL = "achievementCertificateURL",
   attendanceCertificateURL = "attendanceCertificateURL",
   courseId = "courseId",
-  createdAt = "createdAt",
+  created_at = "created_at",
   id = "id",
   invitationExpirationDate = "invitationExpirationDate",
   motivationLetter = "motivationLetter",
   motivationRating = "motivationRating",
   status = "status",
-  updatedAt = "updatedAt",
+  updated_at = "updated_at",
   userId = "userId",
 }
 
@@ -164,10 +164,10 @@ export enum CourseInstructor_constraint {
  */
 export enum CourseInstructor_update_column {
   courseId = "courseId",
-  createdAt = "createdAt",
+  created_at = "created_at",
   expertId = "expertId",
   id = "id",
-  updatedAt = "updatedAt",
+  updated_at = "updated_at",
 }
 
 /**
@@ -182,13 +182,13 @@ export enum CourseLocation_constraint {
  */
 export enum CourseLocation_update_column {
   courseId = "courseId",
-  createdAt = "createdAt",
+  created_at = "created_at",
   id = "id",
   latitude = "latitude",
   link = "link",
   locationOption = "locationOption",
   longitude = "longitude",
-  updatedAt = "updatedAt",
+  updated_at = "updated_at",
 }
 
 /**
@@ -203,10 +203,10 @@ export enum CourseProject_constraint {
  */
 export enum CourseProject_update_column {
   courseId = "courseId",
-  createdAt = "createdAt",
+  created_at = "created_at",
   id = "id",
   projectId = "projectId",
-  updatedAt = "updatedAt",
+  updated_at = "updated_at",
 }
 
 /**
@@ -251,7 +251,7 @@ export enum Course_update_column {
   contentDescriptionField2 = "contentDescriptionField2",
   cost = "cost",
   coverImage = "coverImage",
-  createdAt = "createdAt",
+  created_at = "created_at",
   ects = "ects",
   endTime = "endTime",
   headingDescriptionField1 = "headingDescriptionField1",
@@ -260,12 +260,13 @@ export enum Course_update_column {
   language = "language",
   learningGoals = "learningGoals",
   maxMissedSessions = "maxMissedSessions",
+  maxParticipants = "maxParticipants",
   programId = "programId",
   startTime = "startTime",
   status = "status",
   tagline = "tagline",
   title = "title",
-  updatedAt = "updatedAt",
+  updated_at = "updated_at",
   visibility = "visibility",
   weekDay = "weekDay",
 }
@@ -306,10 +307,10 @@ export enum Expert_constraint {
  * update columns of table "Expert"
  */
 export enum Expert_update_column {
-  createdAt = "createdAt",
+  created_at = "created_at",
   description = "description",
   id = "id",
-  updatedAt = "updatedAt",
+  updated_at = "updated_at",
   userId = "userId",
 }
 
@@ -391,13 +392,13 @@ export enum ProjectEnrollment_constraint {
  * update columns of table "ProjectEnrollment"
  */
 export enum ProjectEnrollment_update_column {
-  createdAt = "createdAt",
+  created_at = "created_at",
   enrollmentId = "enrollmentId",
   id = "id",
   projectId = "projectId",
   rating = "rating",
   recordURL = "recordURL",
-  updatedAt = "updatedAt",
+  updated_at = "updated_at",
 }
 
 /**
@@ -441,12 +442,12 @@ export enum Project_constraint {
  * update columns of table "Project"
  */
 export enum Project_update_column {
-  createdAt = "createdAt",
+  created_at = "created_at",
   description = "description",
   id = "id",
   title = "title",
   type = "type",
-  updatedAt = "updatedAt",
+  updated_at = "updated_at",
 }
 
 /**
@@ -460,13 +461,13 @@ export enum SessionAddress_constraint {
  * update columns of table "SessionAddress"
  */
 export enum SessionAddress_update_column {
-  createdAt = "createdAt",
+  created_at = "created_at",
   id = "id",
   latitude = "latitude",
   link = "link",
   longitude = "longitude",
   sessionId = "sessionId",
-  updatedAt = "updatedAt",
+  updated_at = "updated_at",
 }
 
 /**
@@ -480,11 +481,11 @@ export enum SessionSpeaker_constraint {
  * update columns of table "SessionSpeaker"
  */
 export enum SessionSpeaker_update_column {
-  createdAt = "createdAt",
+  created_at = "created_at",
   expertId = "expertId",
   id = "id",
   sessionId = "sessionId",
-  updatedAt = "updatedAt",
+  updated_at = "updated_at",
 }
 
 /**
@@ -499,13 +500,13 @@ export enum Session_constraint {
  */
 export enum Session_update_column {
   courseId = "courseId",
-  createdAt = "createdAt",
+  created_at = "created_at",
   description = "description",
   endDateTime = "endDateTime",
   id = "id",
   startDateTime = "startDateTime",
   title = "title",
-  updatedAt = "updatedAt",
+  updated_at = "updated_at",
 }
 
 /**
@@ -580,9 +581,9 @@ export interface Admin_bool_exp {
   _and?: Admin_bool_exp[] | null;
   _not?: Admin_bool_exp | null;
   _or?: Admin_bool_exp[] | null;
-  createdAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
-  updatedAt?: timestamptz_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
   userId?: uuid_comparison_exp | null;
 }
 
@@ -591,14 +592,14 @@ export interface Admin_bool_exp {
  */
 export interface Admin_insert_input {
   User?: User_obj_rel_insert_input | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   id?: number | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
   userId?: any | null;
 }
 
 /**
- * on conflict condition type for table "Admin"
+ * on_conflict condition type for table "Admin"
  */
 export interface Admin_on_conflict {
   constraint: Admin_constraint;
@@ -623,11 +624,11 @@ export interface AttendanceSourceData_bool_exp {
   _and?: AttendanceSourceData_bool_exp[] | null;
   _not?: AttendanceSourceData_bool_exp | null;
   _or?: AttendanceSourceData_bool_exp[] | null;
-  createdAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   sessionId?: Int_comparison_exp | null;
   source?: String_comparison_exp | null;
-  updatedAt?: timestamptz_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
 }
 
 /**
@@ -636,15 +637,15 @@ export interface AttendanceSourceData_bool_exp {
 export interface AttendanceSourceData_insert_input {
   Session?: Session_obj_rel_insert_input | null;
   URL?: string | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   id?: number | null;
   sessionId?: number | null;
   source?: string | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
 }
 
 /**
- * on conflict condition type for table "AttendanceSourceData"
+ * on_conflict condition type for table "AttendanceSourceData"
  */
 export interface AttendanceSourceData_on_conflict {
   constraint: AttendanceSourceData_constraint;
@@ -682,7 +683,7 @@ export interface AttendanceSource_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "AttendanceSource"
+ * on_conflict condition type for table "AttendanceSource"
  */
 export interface AttendanceSource_on_conflict {
   constraint: AttendanceSource_constraint;
@@ -731,7 +732,7 @@ export interface AttendanceStatus_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "AttendanceStatus"
+ * on_conflict condition type for table "AttendanceStatus"
  */
 export interface AttendanceStatus_on_conflict {
   constraint: AttendanceStatus_constraint;
@@ -758,7 +759,7 @@ export interface Attendance_bool_exp {
   _and?: Attendance_bool_exp[] | null;
   _not?: Attendance_bool_exp | null;
   _or?: Attendance_bool_exp[] | null;
-  createdAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
   endDateTime?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   interruptionCount?: Int_comparison_exp | null;
@@ -768,7 +769,7 @@ export interface Attendance_bool_exp {
   startDateTime?: timestamptz_comparison_exp | null;
   status?: AttendanceStatus_enum_comparison_exp | null;
   totalAttendanceTime?: Int_comparison_exp | null;
-  updatedAt?: timestamptz_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
   userId?: uuid_comparison_exp | null;
 }
 
@@ -780,7 +781,7 @@ export interface Attendance_insert_input {
   AttendanceStatus?: AttendanceStatus_obj_rel_insert_input | null;
   Session?: Session_obj_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   endDateTime?: any | null;
   id?: number | null;
   interruptionCount?: number | null;
@@ -790,12 +791,12 @@ export interface Attendance_insert_input {
   startDateTime?: any | null;
   status?: AttendanceStatus_enum | null;
   totalAttendanceTime?: number | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
   userId?: any | null;
 }
 
 /**
- * on conflict condition type for table "Attendance"
+ * on_conflict condition type for table "Attendance"
  */
 export interface Attendance_on_conflict {
   constraint: Attendance_constraint;
@@ -807,7 +808,7 @@ export interface Attendance_on_conflict {
  * input type for updating data in table "Attendance"
  */
 export interface Attendance_set_input {
-  createdAt?: any | null;
+  created_at?: any | null;
   endDateTime?: any | null;
   id?: number | null;
   interruptionCount?: number | null;
@@ -817,7 +818,7 @@ export interface Attendance_set_input {
   startDateTime?: any | null;
   status?: AttendanceStatus_enum | null;
   totalAttendanceTime?: number | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
   userId?: any | null;
 }
 
@@ -877,7 +878,7 @@ export interface CourseEnrollmentStatus_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "CourseEnrollmentStatus"
+ * on_conflict condition type for table "CourseEnrollmentStatus"
  */
 export interface CourseEnrollmentStatus_on_conflict {
   constraint: CourseEnrollmentStatus_constraint;
@@ -908,13 +909,13 @@ export interface CourseEnrollment_bool_exp {
   achievementCertificateURL?: String_comparison_exp | null;
   attendanceCertificateURL?: String_comparison_exp | null;
   courseId?: Int_comparison_exp | null;
-  createdAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   invitationExpirationDate?: date_comparison_exp | null;
   motivationLetter?: String_comparison_exp | null;
   motivationRating?: MotivationRating_enum_comparison_exp | null;
   status?: CourseEnrollmentStatus_enum_comparison_exp | null;
-  updatedAt?: timestamptz_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
   userId?: uuid_comparison_exp | null;
 }
 
@@ -930,13 +931,13 @@ export interface CourseEnrollment_insert_input {
   achievementCertificateURL?: string | null;
   attendanceCertificateURL?: string | null;
   courseId?: number | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   id?: number | null;
   invitationExpirationDate?: any | null;
   motivationLetter?: string | null;
   motivationRating?: MotivationRating_enum | null;
   status?: CourseEnrollmentStatus_enum | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
   userId?: any | null;
 }
 
@@ -949,7 +950,7 @@ export interface CourseEnrollment_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "CourseEnrollment"
+ * on_conflict condition type for table "CourseEnrollment"
  */
 export interface CourseEnrollment_on_conflict {
   constraint: CourseEnrollment_constraint;
@@ -975,10 +976,10 @@ export interface CourseInstructor_bool_exp {
   _not?: CourseInstructor_bool_exp | null;
   _or?: CourseInstructor_bool_exp[] | null;
   courseId?: Int_comparison_exp | null;
-  createdAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
   expertId?: Int_comparison_exp | null;
   id?: Int_comparison_exp | null;
-  updatedAt?: timestamptz_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
 }
 
 /**
@@ -988,14 +989,14 @@ export interface CourseInstructor_insert_input {
   Course?: Course_obj_rel_insert_input | null;
   Expert?: Expert_obj_rel_insert_input | null;
   courseId?: number | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   expertId?: number | null;
   id?: number | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
 }
 
 /**
- * on conflict condition type for table "CourseInstructor"
+ * on_conflict condition type for table "CourseInstructor"
  */
 export interface CourseInstructor_on_conflict {
   constraint: CourseInstructor_constraint;
@@ -1021,13 +1022,13 @@ export interface CourseLocation_bool_exp {
   _not?: CourseLocation_bool_exp | null;
   _or?: CourseLocation_bool_exp[] | null;
   courseId?: Int_comparison_exp | null;
-  createdAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   latitude?: String_comparison_exp | null;
   link?: String_comparison_exp | null;
   locationOption?: String_comparison_exp | null;
   longitude?: String_comparison_exp | null;
-  updatedAt?: timestamptz_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
 }
 
 /**
@@ -1037,17 +1038,17 @@ export interface CourseLocation_insert_input {
   Course?: Course_obj_rel_insert_input | null;
   LocationOption?: LocationOption_obj_rel_insert_input | null;
   courseId?: number | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   id?: number | null;
   latitude?: string | null;
   link?: string | null;
   locationOption?: string | null;
   longitude?: string | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
 }
 
 /**
- * on conflict condition type for table "CourseLocation"
+ * on_conflict condition type for table "CourseLocation"
  */
 export interface CourseLocation_on_conflict {
   constraint: CourseLocation_constraint;
@@ -1073,10 +1074,10 @@ export interface CourseProject_bool_exp {
   _not?: CourseProject_bool_exp | null;
   _or?: CourseProject_bool_exp[] | null;
   courseId?: Int_comparison_exp | null;
-  createdAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   projectId?: Int_comparison_exp | null;
-  updatedAt?: timestamptz_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
 }
 
 /**
@@ -1086,14 +1087,14 @@ export interface CourseProject_insert_input {
   Course?: Course_obj_rel_insert_input | null;
   Project?: Project_obj_rel_insert_input | null;
   courseId?: number | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   id?: number | null;
   projectId?: number | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
 }
 
 /**
- * on conflict condition type for table "CourseProject"
+ * on_conflict condition type for table "CourseProject"
  */
 export interface CourseProject_on_conflict {
   constraint: CourseProject_constraint;
@@ -1142,7 +1143,7 @@ export interface CourseStatus_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "CourseStatus"
+ * on_conflict condition type for table "CourseStatus"
  */
 export interface CourseStatus_on_conflict {
   constraint: CourseStatus_constraint;
@@ -1180,21 +1181,22 @@ export interface Course_bool_exp {
   contentDescriptionField2?: String_comparison_exp | null;
   cost?: String_comparison_exp | null;
   coverImage?: String_comparison_exp | null;
-  createdAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
   ects?: String_comparison_exp | null;
-  endTime?: timetz_comparison_exp | null;
+  endTime?: timestamptz_comparison_exp | null;
   headingDescriptionField1?: String_comparison_exp | null;
   headingDescriptionField2?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   language?: String_comparison_exp | null;
   learningGoals?: String_comparison_exp | null;
   maxMissedSessions?: Int_comparison_exp | null;
+  maxParticipants?: Int_comparison_exp | null;
   programId?: Int_comparison_exp | null;
-  startTime?: timetz_comparison_exp | null;
+  startTime?: timestamptz_comparison_exp | null;
   status?: CourseStatus_enum_comparison_exp | null;
   tagline?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
-  updatedAt?: timestamptz_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
   visibility?: Boolean_comparison_exp | null;
   weekDay?: String_comparison_exp | null;
 }
@@ -1218,7 +1220,7 @@ export interface Course_insert_input {
   contentDescriptionField2?: string | null;
   cost?: string | null;
   coverImage?: string | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   ects?: string | null;
   endTime?: any | null;
   headingDescriptionField1?: string | null;
@@ -1227,12 +1229,13 @@ export interface Course_insert_input {
   language?: string | null;
   learningGoals?: string | null;
   maxMissedSessions?: number | null;
+  maxParticipants?: number | null;
   programId?: number | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
   tagline?: string | null;
   title?: string | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
   visibility?: boolean | null;
   weekDay?: string | null;
 }
@@ -1246,7 +1249,7 @@ export interface Course_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "Course"
+ * on_conflict condition type for table "Course"
  */
 export interface Course_on_conflict {
   constraint: Course_constraint;
@@ -1266,7 +1269,7 @@ export interface Course_set_input {
   contentDescriptionField2?: string | null;
   cost?: string | null;
   coverImage?: string | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   ects?: string | null;
   endTime?: any | null;
   headingDescriptionField1?: string | null;
@@ -1275,12 +1278,13 @@ export interface Course_set_input {
   language?: string | null;
   learningGoals?: string | null;
   maxMissedSessions?: number | null;
+  maxParticipants?: number | null;
   programId?: number | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
   tagline?: string | null;
   title?: string | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
   visibility?: boolean | null;
   weekDay?: string | null;
 }
@@ -1326,7 +1330,7 @@ export interface Employment_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "Employment"
+ * on_conflict condition type for table "Employment"
  */
 export interface Employment_on_conflict {
   constraint: Employment_constraint;
@@ -1352,10 +1356,10 @@ export interface Expert_bool_exp {
   _and?: Expert_bool_exp[] | null;
   _not?: Expert_bool_exp | null;
   _or?: Expert_bool_exp[] | null;
-  createdAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
   description?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
-  updatedAt?: timestamptz_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
   userId?: uuid_comparison_exp | null;
 }
 
@@ -1366,10 +1370,10 @@ export interface Expert_insert_input {
   CourseInstructors?: CourseInstructor_arr_rel_insert_input | null;
   SessionSpeakers?: SessionSpeaker_arr_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   description?: string | null;
   id?: number | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
   userId?: any | null;
 }
 
@@ -1382,7 +1386,7 @@ export interface Expert_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "Expert"
+ * on_conflict condition type for table "Expert"
  */
 export interface Expert_on_conflict {
   constraint: Expert_constraint;
@@ -1435,7 +1439,7 @@ export interface LocationOption_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "LocationOption"
+ * on_conflict condition type for table "LocationOption"
  */
 export interface LocationOption_on_conflict {
   constraint: LocationOption_constraint;
@@ -1484,7 +1488,7 @@ export interface MotivationRating_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "MotivationRating"
+ * on_conflict condition type for table "MotivationRating"
  */
 export interface MotivationRating_on_conflict {
   constraint: MotivationRating_constraint;
@@ -1552,7 +1556,7 @@ export interface Program_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "Program"
+ * on_conflict condition type for table "Program"
  */
 export interface Program_on_conflict {
   constraint: Program_constraint;
@@ -1578,13 +1582,13 @@ export interface ProjectEnrollment_bool_exp {
   _and?: ProjectEnrollment_bool_exp[] | null;
   _not?: ProjectEnrollment_bool_exp | null;
   _or?: ProjectEnrollment_bool_exp[] | null;
-  createdAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
   enrollmentId?: Int_comparison_exp | null;
   id?: Int_comparison_exp | null;
   projectId?: Int_comparison_exp | null;
   rating?: String_comparison_exp | null;
   recordURL?: String_comparison_exp | null;
-  updatedAt?: timestamptz_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
 }
 
 /**
@@ -1594,17 +1598,17 @@ export interface ProjectEnrollment_insert_input {
   Enrollment?: CourseEnrollment_obj_rel_insert_input | null;
   Project?: Project_obj_rel_insert_input | null;
   Rating?: ProjectRating_obj_rel_insert_input | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   enrollmentId?: number | null;
   id?: number | null;
   projectId?: number | null;
   rating?: string | null;
   recordURL?: string | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
 }
 
 /**
- * on conflict condition type for table "ProjectEnrollment"
+ * on_conflict condition type for table "ProjectEnrollment"
  */
 export interface ProjectEnrollment_on_conflict {
   constraint: ProjectEnrollment_constraint;
@@ -1642,7 +1646,7 @@ export interface ProjectRating_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "ProjectRating"
+ * on_conflict condition type for table "ProjectRating"
  */
 export interface ProjectRating_on_conflict {
   constraint: ProjectRating_constraint;
@@ -1680,7 +1684,7 @@ export interface ProjectType_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "ProjectType"
+ * on_conflict condition type for table "ProjectType"
  */
 export interface ProjectType_on_conflict {
   constraint: ProjectType_constraint;
@@ -1706,12 +1710,12 @@ export interface Project_bool_exp {
   _and?: Project_bool_exp[] | null;
   _not?: Project_bool_exp | null;
   _or?: Project_bool_exp[] | null;
-  createdAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
   description?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   title?: String_comparison_exp | null;
   type?: String_comparison_exp | null;
-  updatedAt?: timestamptz_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
 }
 
 /**
@@ -1721,12 +1725,12 @@ export interface Project_insert_input {
   CourseProjects?: CourseProject_arr_rel_insert_input | null;
   ProjectEnrollments?: ProjectEnrollment_arr_rel_insert_input | null;
   ProjectType?: ProjectType_obj_rel_insert_input | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   description?: string | null;
   id?: number | null;
   title?: string | null;
   type?: string | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
 }
 
 /**
@@ -1738,7 +1742,7 @@ export interface Project_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "Project"
+ * on_conflict condition type for table "Project"
  */
 export interface Project_on_conflict {
   constraint: Project_constraint;
@@ -1762,13 +1766,13 @@ export interface SessionAddress_bool_exp {
   _and?: SessionAddress_bool_exp[] | null;
   _not?: SessionAddress_bool_exp | null;
   _or?: SessionAddress_bool_exp[] | null;
-  createdAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   latitude?: String_comparison_exp | null;
   link?: String_comparison_exp | null;
   longitude?: String_comparison_exp | null;
   sessionId?: Int_comparison_exp | null;
-  updatedAt?: timestamptz_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
 }
 
 /**
@@ -1776,17 +1780,17 @@ export interface SessionAddress_bool_exp {
  */
 export interface SessionAddress_insert_input {
   Session?: Session_obj_rel_insert_input | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   id?: number | null;
   latitude?: string | null;
   link?: string | null;
   longitude?: string | null;
   sessionId?: number | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
 }
 
 /**
- * on conflict condition type for table "SessionAddress"
+ * on_conflict condition type for table "SessionAddress"
  */
 export interface SessionAddress_on_conflict {
   constraint: SessionAddress_constraint;
@@ -1811,11 +1815,11 @@ export interface SessionSpeaker_bool_exp {
   _and?: SessionSpeaker_bool_exp[] | null;
   _not?: SessionSpeaker_bool_exp | null;
   _or?: SessionSpeaker_bool_exp[] | null;
-  createdAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
   expertId?: Int_comparison_exp | null;
   id?: Int_comparison_exp | null;
   sessionId?: Int_comparison_exp | null;
-  updatedAt?: timestamptz_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
 }
 
 /**
@@ -1824,15 +1828,15 @@ export interface SessionSpeaker_bool_exp {
 export interface SessionSpeaker_insert_input {
   Expert?: Expert_obj_rel_insert_input | null;
   Session?: Session_obj_rel_insert_input | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   expertId?: number | null;
   id?: number | null;
   sessionId?: number | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
 }
 
 /**
- * on conflict condition type for table "SessionSpeaker"
+ * on_conflict condition type for table "SessionSpeaker"
  */
 export interface SessionSpeaker_on_conflict {
   constraint: SessionSpeaker_constraint;
@@ -1861,13 +1865,13 @@ export interface Session_bool_exp {
   _not?: Session_bool_exp | null;
   _or?: Session_bool_exp[] | null;
   courseId?: Int_comparison_exp | null;
-  createdAt?: timestamptz_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
   description?: String_comparison_exp | null;
   endDateTime?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   startDateTime?: timestamptz_comparison_exp | null;
   title?: String_comparison_exp | null;
-  updatedAt?: timestamptz_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
 }
 
 /**
@@ -1880,13 +1884,13 @@ export interface Session_insert_input {
   SessionAddresses?: SessionAddress_arr_rel_insert_input | null;
   SessionSpeakers?: SessionSpeaker_arr_rel_insert_input | null;
   courseId?: number | null;
-  createdAt?: any | null;
+  created_at?: any | null;
   description?: string | null;
   endDateTime?: any | null;
   id?: number | null;
   startDateTime?: any | null;
   title?: string | null;
-  updatedAt?: any | null;
+  updated_at?: any | null;
 }
 
 /**
@@ -1898,7 +1902,7 @@ export interface Session_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "Session"
+ * on_conflict condition type for table "Session"
  */
 export interface Session_on_conflict {
   constraint: Session_constraint;
@@ -1972,7 +1976,7 @@ export interface University_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "University"
+ * on_conflict condition type for table "University"
  */
 export interface University_on_conflict {
   constraint: University_constraint;
@@ -2052,7 +2056,7 @@ export interface User_obj_rel_insert_input {
 }
 
 /**
- * on conflict condition type for table "User"
+ * on_conflict condition type for table "User"
  */
 export interface User_on_conflict {
   constraint: User_constraint;
@@ -2079,21 +2083,6 @@ export interface date_comparison_exp {
  * Boolean expression to compare columns of type "timestamptz". All fields are combined with logical 'AND'.
  */
 export interface timestamptz_comparison_exp {
-  _eq?: any | null;
-  _gt?: any | null;
-  _gte?: any | null;
-  _in?: any[] | null;
-  _is_null?: boolean | null;
-  _lt?: any | null;
-  _lte?: any | null;
-  _neq?: any | null;
-  _nin?: any[] | null;
-}
-
-/**
- * Boolean expression to compare columns of type "timetz". All fields are combined with logical 'AND'.
- */
-export interface timetz_comparison_exp {
   _eq?: any | null;
   _gt?: any | null;
   _gte?: any | null;

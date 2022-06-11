@@ -129,6 +129,27 @@ export interface ManagedCourse_Course_by_pk_CourseInstructors {
   Expert: ManagedCourse_Course_by_pk_CourseInstructors_Expert;
 }
 
+export interface ManagedCourse_Course_by_pk_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
+  /**
+   * The last day a course lecture can possibly be in this program.
+   */
+  lectureEnd: any | null;
+}
+
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances_Session {
   __typename: "Session";
   id: number;
@@ -309,6 +330,10 @@ export interface ManagedCourse_Course_by_pk {
    * An array of texts including the learning goals for the course
    */
   learningGoals: string | null;
+  /**
+   * An object relationship
+   */
+  Program: ManagedCourse_Course_by_pk_Program | null;
   /**
    * An array relationship
    */
