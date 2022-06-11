@@ -327,6 +327,17 @@ export const UPDATE_COURSE_LEARNING_GOALS = gql`
   }
 `;
 
+export const UPDATE_COURSE_TAGLINE = gql`
+  mutation UpdateCourseTagline($courseId: Int!, $tagline: String!) {
+    update_Course_by_pk(
+      pk_columns: { id: $courseId }
+      _set: { tagline: $tagline }
+    ) {
+      id
+    }
+  }
+`;
+
 export const UPDATE_COURSE_STATUS = gql`
   mutation UpdateCourseStatus($courseId: Int!, $status: CourseStatus_enum!) {
     update_Course_by_pk(

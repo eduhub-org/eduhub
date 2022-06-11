@@ -5,6 +5,7 @@ import {
   eventTargetValueMapper,
   identityEventMapper,
   pickIdPkMapper,
+  useAdminMutation,
   useDeleteCallback,
   useUpdateCallback,
   useUpdateCallback2,
@@ -24,6 +25,7 @@ import {
   UPDATE_COURSE_LOCATION_LINK,
   UPDATE_COURSE_LOCATION_OPTION,
   UPDATE_COURSE_START_TIME,
+  UPDATE_COURSE_TAGLINE,
   UPDATE_COURSE_WEEKDAY,
 } from "../../queries/course";
 import {
@@ -86,6 +88,9 @@ import EhTimeSelect, {
 import { LocationSelectionRow } from "./LocationSelectionRow";
 import { Button } from "@material-ui/core";
 import { MdAddCircle } from "react-icons/md";
+import { UpdateCourseByPk, UpdateCourseByPkVariables } from "../../queries/__generated__/UpdateCourseByPk";
+import { UPDATE_COURSE_PROPERTY } from "../../queries/mutateCourse";
+import { UpdateCourseTagline, UpdateCourseTaglineVariables } from "../../queries/__generated__/UpdateCourseTagline";
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -308,6 +313,17 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     qResult
   );
 
+  const updateTagline = useUpdateCallback<
+    UpdateCourseTagline,
+    UpdateCourseTaglineVariables
+  >(UPDATE_COURSE_TAGLINE,
+    currentUpdateRole,
+    "courseId",
+    "tagline",
+    course?.id,
+    eventTargetValueMapper,
+    qResult);
+
   const courseLocations = [...course.CourseLocations];
   courseLocations.sort((a, b) => a.id - b.id);
 
@@ -319,13 +335,13 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       </div>
       <div className="grid grid-cols-2 mb-8">
         <DebounceInput
-          maxLength={10}
+          maxLength={200}
           debounceTimeout={1000}
           className="h-64 mr-3 ml-3 bg-edu-light-gray"
-          onChange={noop}
+          onChange={updateTagline}
           forceNotifyByEnter={false}
           element={"textarea"}
-          value={"It seems there is no database field for this?!"}
+          value={course.tagline}
         />
         <DebounceInput
           maxLength={500}
