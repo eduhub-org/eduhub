@@ -339,7 +339,10 @@ export const UPDATE_COURSE_TAGLINE = gql`
 `;
 
 export const UPDATE_COURSE_MAX_PARTICIPANTS = gql`
-  mutation UpdateCourseMaxParticipants($courseId: Int!, $maxParticipants: Int!) {
+  mutation UpdateCourseMaxParticipants(
+    $courseId: Int!
+    $maxParticipants: Int!
+  ) {
     update_Course_by_pk(
       pk_columns: { id: $courseId }
       _set: { maxParticipants: $maxParticipants }
@@ -348,7 +351,6 @@ export const UPDATE_COURSE_MAX_PARTICIPANTS = gql`
     }
   }
 `;
-
 
 export const UPDATE_COURSE_STATUS = gql`
   mutation UpdateCourseStatus($courseId: Int!, $status: CourseStatus_enum!) {

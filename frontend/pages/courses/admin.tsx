@@ -56,10 +56,7 @@ const Dashboard: FC<IProps> = ({ t }) => {
   );
 };
 
-interface ICoursesProps {
-  
-}
-const Courses: FC<ICoursesProps> = ({  }) => {
+const Courses: FC = () => {
   let courses: AdminCourseList_Course[] = [];
   /* #region DB APIs */
   // TODO: Please Come up with valid instructor ID
