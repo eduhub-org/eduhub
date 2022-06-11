@@ -2,6 +2,7 @@ import { QueryResult } from "@apollo/client";
 import { FC } from "react";
 import { DebounceInput } from "react-debounce-input";
 import {
+  eventTargetNumberMapper,
   eventTargetValueMapper,
   identityEventMapper,
   pickIdPkMapper,
@@ -24,6 +25,7 @@ import {
   UPDATE_COURSE_LEARNING_GOALS,
   UPDATE_COURSE_LOCATION_LINK,
   UPDATE_COURSE_LOCATION_OPTION,
+  UPDATE_COURSE_MAX_PARTICIPANTS,
   UPDATE_COURSE_START_TIME,
   UPDATE_COURSE_TAGLINE,
   UPDATE_COURSE_WEEKDAY,
@@ -97,6 +99,7 @@ import {
   UpdateCourseTagline,
   UpdateCourseTaglineVariables,
 } from "../../queries/__generated__/UpdateCourseTagline";
+import { UpdateCourseMaxParticipants, UpdateCourseMaxParticipantsVariables } from "../../queries/__generated__/UpdateCourseMaxParticipants";
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -332,6 +335,19 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     qResult
   );
 
+    const updateMaxParticipants = useUpdateCallback<
+      UpdateCourseMaxParticipants,
+      UpdateCourseMaxParticipantsVariables
+    >(
+      UPDATE_COURSE_MAX_PARTICIPANTS,
+      currentUpdateRole,
+      "courseId",
+      "maxParticipants",
+      course?.id,
+      eventTargetNumberMapper,
+      qResult
+    );
+
   const courseLocations = [...course.CourseLocations];
   courseLocations.sort((a, b) => a.id - b.id);
 
@@ -470,10 +486,13 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           <div className="mr-3 ml-3">
             <div>Max. Teil. Anzahl</div>
             <div>
-              {/*
-                                        Field is missing in the database?!
-                                    */}
-              <input className="w-full h-8 bg-edu-light-gray" type="number" />
+
+              <DebounceInput type="number"
+              className="w-full h-8 bg-edu-light-gray"
+              debounceTimeout={1000}
+              onChange={updateMaxParticipants}
+              value={course.maxParticipants || 0}
+              />
             </div>
           </div>
         </div>

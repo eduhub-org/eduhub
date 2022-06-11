@@ -112,6 +112,7 @@ export const useAuthedMutation: typeof useMutation = (
 
 export const identityEventMapper = (x: any) => x;
 export const eventTargetValueMapper = (x: any) => x.target.value;
+export const eventTargetNumberMapper = (x: any) => Number(x.target.value);
 export const pickIdPkMapper = (x: any) => x.id;
 
 // use to reduce boilerplate involving all the use*Mutation, then useCallback with that mutation

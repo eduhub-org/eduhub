@@ -18,6 +18,7 @@ export const COURSE_FRAGMENT = gql`
     maxMissedSessions
     title
     programId
+    maxParticipants
     headingDescriptionField1
     contentDescriptionField1
     headingDescriptionField2
