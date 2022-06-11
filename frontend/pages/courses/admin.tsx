@@ -46,45 +46,20 @@ interface IProps {
   t: TFunction;
 }
 const Dashboard: FC<IProps> = ({ t }) => {
-  // TODO: Come up with Valid Category
-  const sidebarItems: StaticComponentProperty[] = [
-    { key: 0, label: "All Programs", selected: true },
-    { key: 1, label: "Tech", selected: false },
-    { key: 2, label: "Business", selected: false },
-    { key: 3, label: "Creative", selected: false },
-    { key: 4, label: "Programmieren", selected: false },
-  ];
-  const [selected, setSelected] = useState(sidebarItems[0]);
-
-  /* #region Callbacks */
-  const handleMenuClick = useCallback(
-    (key: StaticComponentProperty) => {
-      setSelected(key);
-    },
-    [setSelected]
-  );
-  /* #endregion */
-
   return (
     <>
       <CommonPageHeader headline={t("headline")} />
       <div className="flex flex-row py-5 space-x-5">
-        <div className="w-3/12 flex">
-          <Sidebar
-            handleMenuSelection={handleMenuClick}
-            sidebarItems={sidebarItems}
-          />
-        </div>
-        <div className="w-9/12">{<Courses selectedOption={selected} />}</div>
+        <div className="w-9/12">{<Courses />}</div>
       </div>
     </>
   );
 };
 
 interface ICoursesProps {
-  selectedOption: StaticComponentProperty;
+  
 }
-const Courses: FC<ICoursesProps> = ({ selectedOption }) => {
+const Courses: FC<ICoursesProps> = ({  }) => {
   let courses: AdminCourseList_Course[] = [];
   /* #region DB APIs */
   // TODO: Please Come up with valid instructor ID
@@ -113,12 +88,6 @@ const Courses: FC<ICoursesProps> = ({ selectedOption }) => {
 
   return (
     <>
-      <div>
-        <p className="text-base sm:text-lg lg:text-2xl leading-normal text-edu-modal-bg-color">
-          {/* {t('pageTitle')} */}
-          {selectedOption.label}
-        </p>
-      </div>
       <div className="grid grid-cols-3 gap-5 py-10">
         {courses.map((course) => (
           // TODO: Url of single course
