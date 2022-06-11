@@ -88,9 +88,15 @@ import EhTimeSelect, {
 import { LocationSelectionRow } from "./LocationSelectionRow";
 import { Button } from "@material-ui/core";
 import { MdAddCircle } from "react-icons/md";
-import { UpdateCourseByPk, UpdateCourseByPkVariables } from "../../queries/__generated__/UpdateCourseByPk";
+import {
+  UpdateCourseByPk,
+  UpdateCourseByPkVariables,
+} from "../../queries/__generated__/UpdateCourseByPk";
 import { UPDATE_COURSE_PROPERTY } from "../../queries/mutateCourse";
-import { UpdateCourseTagline, UpdateCourseTaglineVariables } from "../../queries/__generated__/UpdateCourseTagline";
+import {
+  UpdateCourseTagline,
+  UpdateCourseTaglineVariables,
+} from "../../queries/__generated__/UpdateCourseTagline";
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -316,13 +322,15 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const updateTagline = useUpdateCallback<
     UpdateCourseTagline,
     UpdateCourseTaglineVariables
-  >(UPDATE_COURSE_TAGLINE,
+  >(
+    UPDATE_COURSE_TAGLINE,
     currentUpdateRole,
     "courseId",
     "tagline",
     course?.id,
     eventTargetValueMapper,
-    qResult);
+    qResult
+  );
 
   const courseLocations = [...course.CourseLocations];
   courseLocations.sort((a, b) => a.id - b.id);
