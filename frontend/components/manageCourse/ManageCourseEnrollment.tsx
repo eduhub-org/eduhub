@@ -212,7 +212,6 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
     setShowDetails((prev) => !prev);
   }, [setShowDetails]);
 
-  // TODO: No enum called "UNRATED" in database. and No suggestion for "NO_INFO"
   /**
    * For each existing session in the course a circle is shown,
    * depending on the participant's attendance for each session the circle is green

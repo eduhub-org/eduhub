@@ -289,7 +289,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
             <ManageCourseEnrollment course={course} qResult={qResult} />
           )}
 
-          {openTabIndex === maxAllowedTab && (
+          {openTabIndex === maxAllowedTab && openTabIndex < 3 && (
             <div className="flex justify-end mb-16">
               <OldButton
                 onClick={handleRequestUpgradeStatus}
@@ -298,6 +298,12 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
               >
                 Weiter
               </OldButton>
+            </div>
+          )}
+
+          {maxAllowedTab === 3 && (
+            <div className="flex justify-end mb-16">
+              <OldButton filled={true}>Zertifikate generieren</OldButton>
             </div>
           )}
         </>
