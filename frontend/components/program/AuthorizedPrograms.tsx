@@ -106,7 +106,11 @@ import {
   SaveAFile,
   SaveAFileVariables,
 } from "../../queries/__generated__/SaveAFile";
-import { SAVE_FILE } from "../../queries/actions";
+import { LOAD_FILE, SAVE_FILE } from "../../queries/actions";
+import {
+  LoadAFile,
+  LoadAFileVariables,
+} from "../../queries/__generated__/LoadAFile";
 
 export const AuthorizedPrograms: FC = () => {
   const qResult = useAdminQuery<ProgramList>(PROGRAM_LIST);
@@ -124,25 +128,33 @@ export const AuthorizedPrograms: FC = () => {
 
   const [openProgram, setOpenProgram] = useState(-1);
 
-  // const [saveFile, saveFileStatus] = useAdminMutation<
-  //   SaveAFile,
-  //   SaveAFileVariables
-  // >(SAVE_FILE);
+  const [saveFile, saveFileStatus] = useAdminMutation<
+    SaveAFile,
+    SaveAFileVariables
+  >(SAVE_FILE);
 
-  // console.log(saveFileStatus);
+  console.log(saveFileStatus);
 
-  // const saveTestFile = useCallback(async () => {
-  //   const helloWorld = "aGFjaw==";
-  //   const fileName = "hello.txt";
-  //   const response = await saveFile({
-  //     variables: {
-  //       base64file: helloWorld,
-  //       fileName,
-  //     },
-  //   });
+  const saveTestFile = useCallback(async () => {
+    const helloWorld = "aGFjaw==";
+    const fileName = "public/hello.txt";
+    const response = await saveFile({
+      variables: {
+        base64file: helloWorld,
+        fileName,
+      },
+    });
 
-  //   console.log(response);
-  // }, [saveFile]);
+    console.log(response);
+  }, [saveFile]);
+
+  const lResult = useAdminQuery<LoadAFile, LoadAFileVariables>(LOAD_FILE, {
+    variables: {
+      path: "f9cc072c-4a93-449e-b7c3-0a4d9c1fe6c",
+    },
+  });
+
+  console.log(lResult);
 
   const [insertProgram] = useAdminMutation<
     InsertProgram,
@@ -497,6 +509,8 @@ export const AuthorizedPrograms: FC = () => {
           <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />}>
             Programm hinzufügen
           </Button>
+
+          <Button onClick={saveTestFile}>Test save file</Button>
         </div>
         <div className="grid grid-cols-10">
           <div>Veröff.</div>
@@ -515,6 +529,7 @@ export const AuthorizedPrograms: FC = () => {
             <ProgramsRow
               key={v.id}
               program={v}
+              qResult={qResult}
               canDelete={v.Courses.length === 0}
               openProgramId={openProgram}
               onSetVisibility={handleToggleVisibility}

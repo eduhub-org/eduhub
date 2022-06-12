@@ -1,5 +1,6 @@
+import { QueryResult } from "@apollo/client";
 import { IconButton } from "@material-ui/core";
-import { ChangeEvent, FC, useCallback } from "react";
+import { ChangeEvent, FC, MutableRefObject, useCallback, useRef } from "react";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -10,14 +11,42 @@ import {
   MdCheckBoxOutlineBlank,
   MdDelete,
   MdOutlineCheckBoxOutlineBlank,
+  MdUpload,
 } from "react-icons/md";
+import {
+  buildAchivementTemplatePath,
+  buildParticipationPath,
+  buildParticipationTemplatePath,
+  parseFileUploadEvent,
+} from "../../helpers/filehandling";
+import { useAdminMutation } from "../../hooks/authedMutation";
+import { SAVE_FILE } from "../../queries/actions";
+import {
+  UPDATE_ACHIEVEMENT_TEMPLATE,
+  UPDATE_PARTICIPATION_TEMPLATE,
+} from "../../queries/updateProgram";
 import { ProgramList_Program } from "../../queries/__generated__/ProgramList";
+import {
+  SaveAFile,
+  SaveAFileVariables,
+} from "../../queries/__generated__/SaveAFile";
+import {
+  UpdateProgramAchievementTemplate,
+  UpdateProgramAchievementTemplateVariables,
+} from "../../queries/__generated__/UpdateProgramAchievementTemplate";
+import { UpdateProgramParticipationCertVisible } from "../../queries/__generated__/UpdateProgramParticipationCertVisible";
+import {
+  UpdateProgramParticipationTemplate,
+  UpdateProgramParticipationTemplateVariables,
+} from "../../queries/__generated__/UpdateProgramParticipationTemplate";
+import { UpdateProgramTitleVariables } from "../../queries/__generated__/UpdateProgramTitle";
 import EhDebounceInput from "../common/EhDebounceInput";
 
 interface ProgramsRowProps {
   program: ProgramList_Program;
   openProgramId: number;
   canDelete: boolean;
+  qResult: QueryResult<any>;
   onSetVisibility: (p: ProgramList_Program, isVisible: boolean) => any;
   onSetTitle: (p: ProgramList_Program, title: string) => any;
   onSetShortTitle: (p: ProgramList_Program, shortTitle: string) => any;
@@ -45,6 +74,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   program,
   openProgramId,
   canDelete,
+  qResult,
   onSetApplicationEnd,
   onDelete,
   onOpenProgram,
@@ -156,6 +186,81 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   const handleDeleteProgram = useCallback(() => {
     onDelete(program);
   }, [program, onDelete]);
+
+  const templateUploadInputRef: MutableRefObject<any> = useRef(null);
+  const handleUploadTemplateParticipationClick = useCallback(() => {
+    templateUploadInputRef.current?.click();
+  }, [templateUploadInputRef]);
+
+  const [saveFile] = useAdminMutation<SaveAFile, SaveAFileVariables>(SAVE_FILE);
+
+  const [updateParticipationTemplate] = useAdminMutation<
+    UpdateProgramParticipationTemplate,
+    UpdateProgramParticipationTemplateVariables
+  >(UPDATE_PARTICIPATION_TEMPLATE);
+
+  const handleTemplateParticipationUploadEvent = useCallback(
+    async (event: any) => {
+      const ufile = await parseFileUploadEvent(event);
+
+      if (ufile != null) {
+        const url = buildParticipationTemplatePath(program.id, ufile.name);
+
+        await saveFile({
+          variables: {
+            base64file: ufile.data,
+            fileName: url,
+          },
+        });
+
+        await updateParticipationTemplate({
+          variables: {
+            programId: program.id,
+            templatePath: url,
+          },
+        });
+
+        qResult.refetch();
+      }
+    },
+    [saveFile, qResult, updateParticipationTemplate, program]
+  );
+
+  const templateAchivementUploadRef: MutableRefObject<any> = useRef(null);
+  const handleUploadAchivementTemplateClick = useCallback(() => {
+    templateAchivementUploadRef.current?.click();
+  }, [templateAchivementUploadRef]);
+
+  const [updateAchievementTemplate] = useAdminMutation<
+    UpdateProgramAchievementTemplate,
+    UpdateProgramAchievementTemplateVariables
+  >(UPDATE_ACHIEVEMENT_TEMPLATE);
+
+  const handleTemplateAchivementUploadEvent = useCallback(
+    async (event: any) => {
+      const ufile = await parseFileUploadEvent(event);
+      if (ufile != null) {
+        const url = buildAchivementTemplatePath(program.id, ufile.name);
+
+        await saveFile({
+          variables: {
+            base64file: ufile.data,
+            fileName: url,
+          },
+        });
+
+        await updateAchievementTemplate({
+          variables: {
+            programId: program.id,
+            templatePath: url,
+          },
+        });
+
+        qResult.refetch();
+      }
+    },
+    [saveFile, qResult, updateAchievementTemplate, program]
+  );
 
   return (
     <div>
@@ -282,12 +387,38 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
             </div>
 
             <div className="p-3">
-              template teilnahmenachweis <br />
-              todo
+              Template Teilnahmenachweis
+              <IconButton onClick={handleUploadTemplateParticipationClick}>
+                <MdUpload size="0.75em" />
+              </IconButton>
+              <br />
+              <div className="w-80 truncate">
+                {program.participationCertificateTemplateURL ||
+                  "Noch kein Template hochgeladen"}
+              </div>
+              <input
+                ref={templateUploadInputRef}
+                onChange={handleTemplateParticipationUploadEvent}
+                className="hidden"
+                type="file"
+              />
             </div>
             <div className="p-3">
-              template leistungszertifiat <br />
-              todo
+              Template Leistungszertifiat
+              <IconButton onClick={handleUploadAchivementTemplateClick}>
+                <MdUpload size="0.75em" />
+              </IconButton>
+              <br />
+              <div className="w-80 truncate">
+                {program.attendanceCertificateTemplateURL ||
+                  "Noch kein Template hochgeladen"}
+              </div>
+              <input
+                ref={templateAchivementUploadRef}
+                onChange={handleTemplateAchivementUploadEvent}
+                className="hidden"
+                type="file"
+              />
             </div>
             <div className="p-3">
               Bescheinigungen einblenden:

@@ -65,6 +65,34 @@ export const UPDATE_PROGRAM_SHORT_TITLE = gql`
   }
 `;
 
+export const UPDATE_PARTICIPATION_TEMPLATE = gql`
+  mutation UpdateProgramParticipationTemplate(
+    $programId: Int!
+    $templatePath: String!
+  ) {
+    update_Program_by_pk(
+      pk_columns: { id: $programId }
+      _set: { participationCertificateTemplateURL: $templatePath }
+    ) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_ACHIEVEMENT_TEMPLATE = gql`
+  mutation UpdateProgramAchievementTemplate(
+    $programId: Int!
+    $templatePath: String!
+  ) {
+    update_Program_by_pk(
+      pk_columns: { id: $programId }
+      _set: { attendanceCertificateTemplateURL: $templatePath }
+    ) {
+      id
+    }
+  }
+`;
+
 export const UPDATE_PROGRAM_APPLICATION_START = gql`
   mutation UpdateProgramApplicationStart(
     $programId: Int!
