@@ -20,7 +20,11 @@ import EhMenuItem from "../../components/common/EhMenuItem";
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
-    ...(await serverSideTranslations(locale, ["course-admin-page"])),
+    ...(await serverSideTranslations(locale, [
+      "course-admin-page",
+      "common",
+      "user-common",
+    ])),
   },
 });
 

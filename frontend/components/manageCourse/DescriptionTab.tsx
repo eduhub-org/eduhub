@@ -84,9 +84,7 @@ import {
   UpdateCourseWeekday,
   UpdateCourseWeekdayVariables,
 } from "../../queries/__generated__/UpdateCourseWeekday";
-import EhTimeSelect, {
-  extractLocalTimeFromTimeTz,
-} from "../common/EhTimeSelect";
+import EhTimeSelect, { formatTime } from "../common/EhTimeSelect";
 import { LocationSelectionRow } from "./LocationSelectionRow";
 import { Button } from "@material-ui/core";
 import { MdAddCircle } from "react-icons/md";
@@ -125,17 +123,12 @@ const getLegacyLanguage = (legacy: string | null) => {
   }
 };
 
-const prepTimeTz = (timeString: string) => {
-  const offset = new Date().getTimezoneOffset() / 60;
-  const offsetNegative = offset < 0;
-  const absOffset = Math.abs(offset);
-  let offSetString = `${absOffset < 10 ? "0" : ""}${absOffset}`;
-  if (offsetNegative) {
-    offSetString = "-" + offSetString;
-  }
-  const timetz = timeString + offSetString + ":00";
-  console.log(timeString + " => " + timetz);
-  return timetz;
+const prepDateTimeUpdate = (timeString: string) => {
+  const now = new Date();
+  const [hourS, minS] = timeString.split(":");
+  now.setHours(Number(hourS));
+  now.setMinutes(Number(minS));
+  return now.toISOString();
 };
 
 const constantOnlineMapper = () => "ONLINE";
@@ -217,7 +210,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     "courseId",
     "startTime",
     course?.id,
-    prepTimeTz,
+    prepDateTimeUpdate,
     qResult
   );
 
@@ -230,7 +223,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     "courseId",
     "endTime",
     course?.id,
-    prepTimeTz,
+    prepDateTimeUpdate,
     qResult
   );
 
@@ -453,7 +446,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
               <div>Startzeit</div>
               <div>
                 <EhTimeSelect
-                  value={extractLocalTimeFromTimeTz(course.startTime)}
+                  value={formatTime(course.startTime)}
                   className="h-8 w-full bg-edu-light-gray"
                   onChange={updateCourseStartTime}
                 />
@@ -463,7 +456,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
               <div>Endzeit</div>
               <div>
                 <EhTimeSelect
-                  value={extractLocalTimeFromTimeTz(course.endTime)}
+                  value={formatTime(course.endTime)}
                   className="h-8 w-full bg-edu-light-gray"
                   onChange={updateCourseEndTime}
                 />

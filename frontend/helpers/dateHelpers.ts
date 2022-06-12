@@ -29,30 +29,25 @@ export const getWeekdayString = (
   return uppercased ? weekday.toUpperCase() : weekday;
 };
 
+const formatTimeString = (ts: any, i18n: I18n) => {
+  if (ts == null) {
+    return "";
+  }
+
+  return (
+    new Date(ts).toLocaleTimeString(i18n.languages, {
+      hour: "numeric",
+      minute: "numeric",
+    }) ?? ""
+  );
+};
+
 export const getStartTimeString = (course: Course_Course_by_pk, i18n: I18n) => {
-  // TODO timetz handling is unclear
-  return "";
-  //   if (course.startTime == null) {
-  //     return "";
-  //   }
-
-  //   const now = new Date();
-  //   const todayStr = now.toISOString().split("T")[0];
-  //   const str = todayStr + "T" + course.startTime;
-  //   console.log(str);
-  //   const timeDate = new Date(str);
-
-  //   const startTime: string =
-  //     timeDate.toLocaleTimeString(i18n.languages, {
-  //       hour: "numeric",
-  //       minute: "numeric",
-  //     }) ?? "";
-
-  //   return startTime;
+  return formatTimeString(course.startTime, i18n);
 };
 
 export const getEndTimeString = (course: Course_Course_by_pk, i18n: I18n) => {
-  return "";
+  return formatTimeString(course.endTime, i18n);
 };
 
 export const getWeekdayStartAndEndString = (

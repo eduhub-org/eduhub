@@ -44,6 +44,16 @@ export const client = new ApolloClient({
               return new Date(applicationEnd);
             },
           },
+          startTime: {
+            merge: (_, val) => {
+              return val != null ? new Date(val) : null;
+            },
+          },
+          endTime: {
+            merge: (_, val) => {
+              return val != null ? new Date(val) : null;
+            },
+          },
           CourseInstructors: {
             merge: (_, incoming) => incoming,
           },
