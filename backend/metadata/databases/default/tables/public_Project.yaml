@@ -29,7 +29,14 @@ array_relationships:
 insert_permissions:
 - permission:
     backend_only: false
-    check: {}
+    check:
+      CourseProjects:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
     columns:
     - description
     - id
@@ -39,10 +46,25 @@ insert_permissions:
 select_permissions:
 - permission:
     columns:
-    - description
     - id
-    - title
+    - created_at
+    - updated_at
+    - description
     - type
+    - title
     filter: {}
     limit: 50
   role: user_access
+update_permissions:
+- permission:
+    check: null
+    columns: []
+    filter:
+      CourseProjects:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+  role: instructor_access

@@ -11,9 +11,11 @@ object_relationships:
 select_permissions:
 - permission:
     columns:
-    - courseId
     - id
+    - courseId
     - expertId
+    - created_at
+    - updated_at
     filter: {}
     limit: 10
   role: anonymous

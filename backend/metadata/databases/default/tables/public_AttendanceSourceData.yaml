@@ -8,9 +8,18 @@ object_relationships:
 select_permissions:
 - permission:
     columns:
-    - URL
     - id
-    - sessionId
+    - URL
+    - created_at
+    - updated_at
     - source
-    filter: {}
+    - sessionId
+    filter:
+      Session:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
   role: instructor_access
