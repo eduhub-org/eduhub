@@ -15,41 +15,41 @@ on:
 
 jobs:
 
-  build-keycloak:
-    name: Build Docker Image for Keycloak and save to the Google Docker repo
-    uses: ./.github/workflows/build-docker-image.yml
-    with:
-      # Folder with the Dockerfile that is used for creating the image
-      DOCKERFILE_FOLDER: keycloak
-      # Name for the docker image
-      IMAGE_NAME: keycloak
-      # Name of the branch that triggered the workflow run
-      BRANCH: ${{ github.ref_name }}
-      # ID of the project in Google in which the image will be stored and deployed
-      PROJECT_ID: eduhub-staging-new
-    secrets:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
-      GCP_REGION: ${{ secrets.GCP_REGION }}
+  # build-keycloak:
+  #   name: Build Docker Image for Keycloak and save to the Google Docker repo
+  #   uses: ./.github/workflows/build-docker-image.yml
+  #   with:
+  #     # Folder with the Dockerfile that is used for creating the image
+  #     DOCKERFILE_FOLDER: keycloak
+  #     # Name for the docker image
+  #     IMAGE_NAME: keycloak
+  #     # Name of the branch that triggered the workflow run
+  #     BRANCH: ${{ github.ref_name }}
+  #     # ID of the project in Google in which the image will be stored and deployed
+  #     PROJECT_ID: eduhub-staging-new
+  #   secrets:
+  #     GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
+  #     GCP_REGION: ${{ secrets.GCP_REGION }}
 
-  build-backend:
-    name: Build Docker Image for Keycloak and save to the Google Docker repo
-    uses: ./.github/workflows/build-docker-image.yml
-    with:
-      # Folder with the Dockerfile that is used for creating the image
-      DOCKERFILE_FOLDER: backend
-      # Name for the docker image
-      IMAGE_NAME: backend
-      # Name of the branch that triggered the workflow run
-      BRANCH: ${{ github.ref_name }}
-      # ID of the project in Google in which the image will be stored and deployed
-      PROJECT_ID: eduhub-staging-new
-    secrets:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
-      GCP_REGION: ${{ secrets.GCP_REGION }}
+  # build-backend:
+  #   name: Build Docker Image for Backend and save to the Google Docker repo
+  #   uses: ./.github/workflows/build-docker-image.yml
+  #   with:
+  #     # Folder with the Dockerfile that is used for creating the image
+  #     DOCKERFILE_FOLDER: backend
+  #     # Name for the docker image
+  #     IMAGE_NAME: backend
+  #     # Name of the branch that triggered the workflow run
+  #     BRANCH: ${{ github.ref_name }}
+  #     # ID of the project in Google in which the image will be stored and deployed
+  #     PROJECT_ID: eduhub-staging-new
+  #   secrets:
+  #     GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
+  #     GCP_REGION: ${{ secrets.GCP_REGION }}
 
   deploy-application:
     name: "Deploy application infrastructure with Docker images of above"
-    needs: [build-keycloak, build-backend]
+    #needs: [build-keycloak, build-backend]
     runs-on: ubuntu-latest
     env:
       TF_WORKSPACE: eduhub-application-staging
@@ -82,7 +82,7 @@ jobs:
       - name: Terraform Plan
         id: plan
         #if: github.event_name == 'pull_request'
-        run: terraform plan -no-color -input=false
+        run: terraform plan -detailed-exitcode -no-color -input=false
         continue-on-error: true
 
       - uses: actions/github-script@v6
@@ -114,11 +114,15 @@ jobs:
               body: output
             })
 
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
+      - name: Check for Plan Failure
+        if: steps.plan.outputs.exitcode == 1
         run: exit 1
 
+      #- name: Terraform Plan Status
+      #  if: steps.plan.outcome == 'failure'
+      #  run: exit 1
+
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.plan.outputs.exitcode == 2
         run: terraform apply -auto-approve -input=false
 
