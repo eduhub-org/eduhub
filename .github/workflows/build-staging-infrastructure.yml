@@ -28,7 +28,7 @@ jobs:
       # ID of the project in Google in which the image will be stored and deployed
       PROJECT_ID: eduhub-staging-new
     secrets:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY_STAGING }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
 
