@@ -28,7 +28,7 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   deploy:
-    names: "Deploy application infrastructure with Docker images of above"
+    name: "Deploy application infrastructure with Docker images of above"
     needs: build
     runs-on: ubuntu-latest
     env:
