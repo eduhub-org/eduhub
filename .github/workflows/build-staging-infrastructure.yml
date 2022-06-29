@@ -17,7 +17,7 @@ jobs:
 
   build:
     name: "Build Docker and Store all Docker Images for the Applications"
-    uses: ./.github/workflows/build-docker-image.yml
+    uses: ./.github/workflows/build-branch-images.yml
     with:
       # Name of the branch that triggered the workflow run
       BRANCH: ${{ github.ref_name }}
