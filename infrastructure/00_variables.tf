@@ -2,10 +2,10 @@
 # Definition of the used Terraform variables
 #####
 
-variable "GOOGLE_CREDENTIALS" {
+/* variable "GOOGLE_CREDENTIALS" {
   description = "JSON key of the service account 'terraform_eduhub created' created for the given project"
 }
-
+ */
 # main
 variable "project_id" {
   description = "The id of the Google Cloud project that is created"
