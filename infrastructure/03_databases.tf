@@ -48,10 +48,10 @@ resource "google_secret_manager_secret" "keycloak_db_pw" {
 # Set a value for the password of the Keycloak database user in the above created variable
 resource "google_secret_manager_secret_version" "keycloak_db_pw" {
   provider    = google-beta
-  secret      = google_secret_manager_secret.secret_keycloak_db_pw.name
+  secret      = google_secret_manager_secret.keycloak_db_pw.name
   secret_data = var.keycloak_db_pw
 }
-# Grant the defined service account member IAM permissions to access the secret with the password for the Keycloak database
+# Grant the defined service account member permission to access the secret with the password for the Keycloak database
 resource "google_secret_manager_secret_iam_member" "keycloak_db_pw" {
   secret_id  = google_secret_manager_secret.keycloak_db_pw.id
   role       = "roles/secretmanager.secretAccessor"
@@ -67,12 +67,12 @@ resource "google_secret_manager_secret_iam_member" "keycloak_db_pw" {
 # Create an SQL database for Hasura inside the created SQL instance
 resource "google_sql_database" "hasura" {
   name     = var.hasura_db_name
-  instance = google_sql_database_instance.hasura_db_instance.name
+  instance = google_sql_database_instance.default.name
 }
 # Create an SQL User on the above created Hasura database.
 resource "google_sql_user" "hasura" {
   name     = var.hasura_db_user
-  instance = google_sql_database_instance.hasura_db_instance.name
+  instance = google_sql_database_instance.default.name
   password = var.hasura_db_pw
 }
 # Create a secret for the URL of the Hasura database in the Google secret manager 
@@ -84,8 +84,8 @@ resource "google_secret_manager_secret" "hasura_db_url" {
   }
 }
 # Create a new version of the secret for the URL to the Hasura database based on the user and password created for the Hasura database
-resource "google_secret_manager_secret_version" "secret_hasura_db_url_version_data" {
+resource "google_secret_manager_secret_version" "hasura_db_url" {
   provider    = google-beta
-  secret      = google_secret_manager_secret.secret_hasura_db_url.name
+  secret      = google_secret_manager_secret.hasura_db_url.name
   secret_data = "postgres://${var.hasura_db_user}:${var.hasura_db_pw}@${google_sql_database_instance.hasura_db_instance.private_address}:5432/${var.hasura_db_name}"
 }
