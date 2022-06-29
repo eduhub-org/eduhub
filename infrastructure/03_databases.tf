@@ -87,5 +87,5 @@ resource "google_secret_manager_secret" "hasura_db_url" {
 resource "google_secret_manager_secret_version" "hasura_db_url" {
   provider    = google-beta
   secret      = google_secret_manager_secret.hasura_db_url.name
-  secret_data = "postgres://${var.hasura_db_user}:${var.hasura_db_pw}@${google_sql_database_instance.hasura_db_instance.private_address}:5432/${var.hasura_db_name}"
+  secret_data = "postgres://${var.hasura_db_user}:${var.hasura_db_pw}@${google_sql_database_instance.default.private_address}:5432/${var.hasura_db_name}"
 }
