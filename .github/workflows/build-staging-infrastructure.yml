@@ -30,7 +30,7 @@ jobs:
       # Name of the branch that triggered the workflow run
       BRANCH: ${{ github.ref_name }}
       # ID of the project in Google in which the image will be stored and deployed
-      PROJECT_ID: ${{ PROJECT_ID }}
+      PROJECT_ID: ${{ env.PROJECT_ID }}
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -46,7 +46,7 @@ jobs:
       # Name of the branch that triggered the workflow run
       BRANCH: ${{ github.ref_name }}
       # ID of the project in Google in which the image will be stored and deployed
-      PROJECT_ID: ${{ PROJECT_ID }}
+      PROJECT_ID: ${{ env.PROJECT_ID }}
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -62,7 +62,7 @@ jobs:
       # Name of the branch that triggered the workflow run
       BRANCH: ${{ github.ref_name }}
       # ID of the project in Google in which the image will be stored and deployed
-      PROJECT_ID: ${{ PROJECT_ID }}
+      PROJECT_ID: ${{ env.PROJECT_ID }}
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
