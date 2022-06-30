@@ -30,7 +30,7 @@ jobs:
       # Name of the branch that triggered the workflow run
       BRANCH: ${{ github.ref_name }}
       # ID of the project in Google in which the image will be stored and deployed
-      PROJECT_ID: $PROJECT_ID
+      PROJECT_ID: ${{ PROJECT_ID }}
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -46,13 +46,13 @@ jobs:
       # Name of the branch that triggered the workflow run
       BRANCH: ${{ github.ref_name }}
       # ID of the project in Google in which the image will be stored and deployed
-      PROJECT_ID: $PROJECT_ID
+      PROJECT_ID: ${{ PROJECT_ID }}
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build-frontend:
-    name: Build Docker Image for Backend and save to the Google Docker repo
+    name: Build Docker Image for Frontend and save to the Google Docker repo
     uses: ./.github/workflows/build-docker-image.yml
     with:
       # Folder with the Dockerfile that is used for creating the image
@@ -62,7 +62,7 @@ jobs:
       # Name of the branch that triggered the workflow run
       BRANCH: ${{ github.ref_name }}
       # ID of the project in Google in which the image will be stored and deployed
-      PROJECT_ID: $PROJECT_ID
+      PROJECT_ID: ${{ PROJECT_ID }}
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
