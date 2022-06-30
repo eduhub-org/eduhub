@@ -25,8 +25,12 @@ variable "url_mask" {
   description = "Url mask specifying the group of backend endpoints that will be used for the load balancer"
   type        = string
 }
-variable "keycloak_domain" {
-  description = "Domain for the Keycloak application"
+variable "keycloak_service_name" {
+  description = "Name for the service of the Keycloak application"
+  type        = string
+}
+variable "hasura_service_name" {
+  description = "Name for the service of the Hasura application"
   type        = string
 }
 
@@ -60,27 +64,35 @@ variable "hasura_db_pw" {
   type        = string
 }
 
-/*
-# storage
-variable "storage_bucket_name" {}
-
 # keycloak
-variable "keycloak_user" {}
-variable "keycloak_pw" {}
-variable "keycloak_domain" {}
-variable "docker_image_keycloak" {}
+variable "keycloak_user" {
+  description = "User for the Keycloak console"
+  type        = string
+}
+variable "keycloak_pw" {
+  description = "Password for the Keycloak console"
+  type        = string
+}
+variable "docker_image_keycloak" {
+  description = "URL of the keycloak docker image for the staging environment"
+  type        = string
+  default     = "europe-west1-docker.pkg.dev/eduhub-staging-new/docker-repo/edu_hub_keycloak:latest"
+}
+
 
 # hasura
-variable "hasura_graphql_admin" {}
-variable "hasura_domain" {}
-variable "docker_image_hasura" {}
-variable "hasura_cloud_function_link" {}
+variable "hasura_graphql_admin_key" {
+  description = "Admin key for the Hasura GraphQL API"
+  type        = string
+}
 variable "hasura_graphql_enable_console" {
-  default = "false"
+  description = "Boolean to enable the Hasura console"
+  type        = string
+  default     = "false"
 }
 variable "hasura_graphql_dev_mode" {
-  default = "false"
+  description = "Boolean to enable the GraphQL developer mode for Hasura"
+  type        = string
+  default     = "false"
 }
 
-variable "frontend_service_domain" {}
- */

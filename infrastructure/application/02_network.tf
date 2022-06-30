@@ -38,6 +38,18 @@ resource "google_vpc_access_connector" "default" {
   machine_type   = "f1-micro"
 }
 
+# Create a network endpoint group (NEG) for the load balancer defined below
+resource "google_compute_region_network_endpoint_group" "default" {
+  provider              = google-beta
+  name                  = "serverless-neg"
+  network_endpoint_type = "SERVERLESS"
+  region                = var.region
+  cloud_run {
+    #service  = module.keycloak_service.service_name
+    url_mask = var.url_mask
+  }
+}
+
 # create Cloud HTTP(S) Load Balancer with Serverless Network Endpoint Groups (NEGs)
 # and place serverless services from Cloud Run, Cloud Functions and App Engine behind a Cloud Load Balancer
 module "lb-http" {
@@ -48,7 +60,7 @@ module "lb-http" {
 
   # Create Google-managed SSL certificates for the specified domains. 
   ssl                             = "true"
-  managed_ssl_certificate_domains = [var.keycloak_domain]
+  managed_ssl_certificate_domains = ["${var.keycloak_service_name}.opencampus.sh"]
   use_ssl_certificates            = "false"
   https_redirect                  = "true"
 
@@ -78,13 +90,3 @@ module "lb-http" {
   }
 }
 
-resource "google_compute_region_network_endpoint_group" "default" {
-  provider              = google-beta
-  name                  = "serverless-neg"
-  network_endpoint_type = "SERVERLESS"
-  region                = var.region
-  cloud_run {
-    #service  = module.keycloak_service.service_name
-    url_mask = var.url_mask
-  }
-}

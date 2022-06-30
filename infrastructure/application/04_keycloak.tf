@@ -3,30 +3,29 @@
 #####
 
 # Create a secret for the password of the Keycloak console in the Google secret manager 
-resource "google_secret_manager_secret" "secret_keycloak_pw" {
+resource "google_secret_manager_secret" "keycloak_pw" {
   provider  = google-beta
-  secret_id = "keycloak_pw"
+  secret_id = "keycloak-pw"
   replication {
     automatic = true
   }
 }
-# Create a new version for the password to Keycloak console setting it to the password
-# given in the corresonding Terraform variable
-resource "google_secret_manager_secret_version" "secret_keycloak_pw_version_data" {
+# Set the password for the Keycloak console
+resource "google_secret_manager_secret_version" "keycloak_pw" {
   provider    = google-beta
-  secret      = google_secret_manager_secret.secret_keycloak_pw.name
+  secret      = google_secret_manager_secret.keycloak_pw.name
   secret_data = var.keycloak_pw
 }
 # Grant the defined service account member the IAM permissions to access the secrect with the password for the Keycloak console
-resource "google_secret_manager_secret_iam_member" "secret_keycloak_pw_access" {
-  secret_id  = google_secret_manager_secret.secret_keycloak_pw.id
+resource "google_secret_manager_secret_iam_member" "keycloak_pw" {
+  secret_id  = google_secret_manager_secret.keycloak_pw.id
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
-  depends_on = [google_secret_manager_secret.secret_keycloak_pw]
+  depends_on = [google_secret_manager_secret.keycloak_pw]
 }
 
-# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the Cloud Rund service for keycloak
-resource "google_cloud_run_service_iam_policy" "keycloak_service_policy_noauth" {
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the Cloud Run service for keycloak
+resource "google_cloud_run_service_iam_policy" "keycloak_noauth_invoker" {
   location    = module.keycloak_service.location
   project     = module.keycloak_service.project_id
   service     = module.keycloak_service.service_name
@@ -68,7 +67,7 @@ module "keycloak_service" {
   service_name = "keycloak"
   project_id   = var.project_id
   location     = var.region
-  image        = var.docker_image_keycloak
+  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/keycloak:latest"
 
   service_annotations = {
     "run.googleapis.com/client-name"    = "terraform"
@@ -80,7 +79,7 @@ module "keycloak_service" {
     "run.googleapis.com/client-name"           = "cloud-console"
     "autoscaling.knative.dev/minScale"         = "0"
     "run.googleapis.com/vpc-access-egress"     = "private-ranges-only"
-    "run.googleapis.com/cloudsql-instances"    = google_sql_database_instance.keycloak_db_instance.connection_name
+    "run.googleapis.com/cloudsql-instances"    = google_sql_database_instance.default.connection_name
     "run.googleapis.com/execution-environment" = "gen2"
     "autoscaling.knative.dev/maxScale"         = "1"
     "run.googleapis.com/vpc-access-connector"  = google_vpc_access_connector.default.id
@@ -88,7 +87,7 @@ module "keycloak_service" {
   env_vars = [
     {
       name  = "KC_DB_URL"
-      value = "jdbc:postgresql://${google_sql_database_instance.keycloak_db_instance.private_address}/keycloak"
+      value = "jdbc:postgresql://${google_sql_database_instance.default.private_ip_address}/keycloak"
     },
     {
       name  = "KEYCLOAK_ADMIN"
@@ -104,7 +103,7 @@ module "keycloak_service" {
     },
     {
       name  = "KC_HOSTNAME"
-      value = var.keycloak_domain
+      value = "${var.keycloak_service_name}.opencampus.sh"
     },
     {
       name  = "KC_PROXY"
@@ -122,7 +121,7 @@ module "keycloak_service" {
         {
           secret_key_ref = {
             key  = "latest"
-            name = google_secret_manager_secret.secret_keycloak_pw.secret_id
+            name = google_secret_manager_secret.keycloak_pw.secret_id
           }
         }
       ]
@@ -133,7 +132,7 @@ module "keycloak_service" {
         {
           secret_key_ref = {
             key  = "latest"
-            name = google_secret_manager_secret.secret_keycloak_db_pw.secret_id
+            name = google_secret_manager_secret.keycloak_db_pw.secret_id
           }
         }
       ]
