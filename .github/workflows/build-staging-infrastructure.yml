@@ -13,46 +13,64 @@ on:
   # Run tests for any PRs.
   pull_request:
 
+env:
+  PROJECT_ID: eduhub-staging-new
+  TF_WORKSPACE: eduhub-application-staging
+
 jobs:
 
-  # build-keycloak:
-  #   name: Build Docker Image for Keycloak and save to the Google Docker repo
-  #   uses: ./.github/workflows/build-docker-image.yml
-  #   with:
-  #     # Folder with the Dockerfile that is used for creating the image
-  #     DOCKERFILE_FOLDER: keycloak
-  #     # Name for the docker image
-  #     IMAGE_NAME: keycloak
-  #     # Name of the branch that triggered the workflow run
-  #     BRANCH: ${{ github.ref_name }}
-  #     # ID of the project in Google in which the image will be stored and deployed
-  #     PROJECT_ID: eduhub-staging-new
-  #   secrets:
-  #     GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
-  #     GCP_REGION: ${{ secrets.GCP_REGION }}
+  build-keycloak:
+    name: Build Docker Image for Keycloak and save to the Google Docker repo
+    uses: ./.github/workflows/build-docker-image.yml
+    with:
+      # Folder with the Dockerfile that is used for creating the image
+      DOCKERFILE_FOLDER: keycloak
+      # Name for the docker image
+      IMAGE_NAME: keycloak
+      # Name of the branch that triggered the workflow run
+      BRANCH: ${{ github.ref_name }}
+      # ID of the project in Google in which the image will be stored and deployed
+      PROJECT_ID: $PROJECT_ID
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}
 
-  # build-backend:
-  #   name: Build Docker Image for Backend and save to the Google Docker repo
-  #   uses: ./.github/workflows/build-docker-image.yml
-  #   with:
-  #     # Folder with the Dockerfile that is used for creating the image
-  #     DOCKERFILE_FOLDER: backend
-  #     # Name for the docker image
-  #     IMAGE_NAME: backend
-  #     # Name of the branch that triggered the workflow run
-  #     BRANCH: ${{ github.ref_name }}
-  #     # ID of the project in Google in which the image will be stored and deployed
-  #     PROJECT_ID: eduhub-staging-new
-  #   secrets:
-  #     GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
-  #     GCP_REGION: ${{ secrets.GCP_REGION }}
+  build-backend:
+    name: Build Docker Image for Backend and save to the Google Docker repo
+    uses: ./.github/workflows/build-docker-image.yml
+    with:
+      # Folder with the Dockerfile that is used for creating the image
+      DOCKERFILE_FOLDER: backend
+      # Name for the docker image
+      IMAGE_NAME: backend
+      # Name of the branch that triggered the workflow run
+      BRANCH: ${{ github.ref_name }}
+      # ID of the project in Google in which the image will be stored and deployed
+      PROJECT_ID: $PROJECT_ID
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}
+
+  build-frontend:
+    name: Build Docker Image for Backend and save to the Google Docker repo
+    uses: ./.github/workflows/build-docker-image.yml
+    with:
+      # Folder with the Dockerfile that is used for creating the image
+      DOCKERFILE_FOLDER: frontend
+      # Name for the docker image
+      IMAGE_NAME: frontend
+      # Name of the branch that triggered the workflow run
+      BRANCH: ${{ github.ref_name }}
+      # ID of the project in Google in which the image will be stored and deployed
+      PROJECT_ID: $PROJECT_ID
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}
 
   deploy-application:
     name: "Deploy application infrastructure with Docker images of above"
     #needs: [build-keycloak, build-backend]
     runs-on: ubuntu-latest
-    env:
-      TF_WORKSPACE: eduhub-application-staging
     defaults:
       run:
         working-directory: ./infrastructure
