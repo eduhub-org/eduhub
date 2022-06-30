@@ -30,10 +30,9 @@ variable "keycloak_domain" {
   type        = string
 }
 
-/*
 # databases
 variable "dbi_tier" {
-  description = "Domain for the Keycloak application"
+  description = "Tier for the database instance"
   type        = string
   default     = "db-f1-micro"
 }
@@ -42,11 +41,26 @@ variable "dbi_availability" {
   type        = string
   default     = "REGIONAL"
 }
-variable "keycloak_db_user" {}
-variable "keycloak_db_pw" {}
-variable "hasura_db_user" {}
-variable "hasura_db_pw" {}
+variable "keycloak_db_user" {
+  description = "Name for the user of the Keycloak database"
+  type        = string
+  default     = "admin"
+}
+variable "keycloak_db_pw" {
+  description = "Password for the user of the Keycloak database"
+  type        = string
+}
+variable "hasura_db_user" {
+  description = "Name for the user of the Hasura database"
+  type        = string
+  default     = "admin"
+}
+variable "hasura_db_pw" {
+  description = "Password for the user of the Hasura database"
+  type        = string
+}
 
+/*
 # storage
 variable "storage_bucket_name" {}
 

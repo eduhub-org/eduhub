@@ -8,7 +8,7 @@ terraform {
     organization = "opencampus"
     hostname     = "app.terraform.io" # Optional; defaults to app.terraform.io
 
-    # "workspaces" is defined via the environment variable "TF_WORKSPACE"
+    # "workspaces" must be defined via an environment variable named "TF_WORKSPACE"
   }
   required_providers {
     google = {

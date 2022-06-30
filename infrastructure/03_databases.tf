@@ -14,9 +14,6 @@ resource "google_sql_database_instance" "default" {
       # ipv4_enabled = "false"
       private_network = google_compute_network.private.id
     }
-    lifecycle {
-      prevent_destroy = true
-    }
   }
   # ? deletion_protection = "false"
 }
@@ -28,7 +25,7 @@ resource "google_sql_database_instance" "default" {
 
 # Create an SQL database for Keycloak inside the created SQL instance
 resource "google_sql_database" "keycloak" {
-  name     = var.keycloak_db_name
+  name     = "keycloak"
   instance = google_sql_database_instance.default.name
 }
 # Create an SQL User on the above created Keycloak database.
@@ -66,7 +63,7 @@ resource "google_secret_manager_secret_iam_member" "keycloak_db_pw" {
 
 # Create an SQL database for Hasura inside the created SQL instance
 resource "google_sql_database" "hasura" {
-  name     = var.hasura_db_name
+  name     = "hasura"
   instance = google_sql_database_instance.default.name
 }
 # Create an SQL User on the above created Hasura database.
@@ -87,5 +84,5 @@ resource "google_secret_manager_secret" "hasura_db_url" {
 resource "google_secret_manager_secret_version" "hasura_db_url" {
   provider    = google-beta
   secret      = google_secret_manager_secret.hasura_db_url.name
-  secret_data = "postgres://${var.hasura_db_user}:${var.hasura_db_pw}@${google_sql_database_instance.default.private_address}:5432/${var.hasura_db_name}"
+  secret_data = "postgres://${var.hasura_db_user}:${var.hasura_db_pw}@${google_sql_database_instance.default.private_ip_address}:5432/${google_sql_database.hasura.name}"
 }
