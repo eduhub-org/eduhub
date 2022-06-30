@@ -69,7 +69,7 @@ jobs:
 
   deploy-application:
     name: "Deploy application infrastructure with Docker images of above"
-    #needs: [build-keycloak, build-backend]
+    needs: [build-keycloak, build-backend, build-frontend]
     runs-on: ubuntu-latest
     defaults:
       run:
