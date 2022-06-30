@@ -19,6 +19,12 @@ on:
       DOCKERFILE_FOLDER:
         required: true
         type: string
+      NEXT_PUBLIC_API_URL:
+        required: false
+        type: string
+      NEXT_PUBLIC_AUTH_URL:
+        required: false
+        type: string
     secrets:
       GCP_SERVICE_ACCOUNT_KEY:
         required: true
@@ -31,6 +37,9 @@ jobs:
   build:
     name: Building a Docker Image and Storing it in the Artifact Registry
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_API_URL: ${{ inputs.NEXT_PUBLIC_API_URL }}
+      NEXT_PUBLIC_AUTH_URL: ${{ inputs.NEXT_PUBLIC_AUTH_URL }}
 
     steps:
       - 
