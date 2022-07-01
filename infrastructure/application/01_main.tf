@@ -19,6 +19,11 @@ terraform {
       source  = "hashicorp/google-beta"
       version = "3.67.0"
     }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 3.0"
+    }
+
   }
 }
 
@@ -32,6 +37,11 @@ provider "google-beta" {
   project = var.project_id
   region  = var.region
   zone    = var.zone
+}
+# Define basic settings to access Clouflaire
+provider "cloudflare" {
+  email   = var.cloudflare_email
+  api_key = var.cloudflare_api_key
 }
 
 #####

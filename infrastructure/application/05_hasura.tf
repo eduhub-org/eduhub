@@ -60,13 +60,13 @@ resource "google_cloud_run_service_iam_policy" "hasura_noauth_invoker" {
 # Define the Google Cloud Run service for Hasura
 resource "google_cloud_run_service" "hasura" {
   provider = google-beta
-  name     = "hasura"
+  name     = var.hasura_service_name
   location = var.region
 
   template {
     spec {
       containers {
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:latest"
+        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:integration-of-terraform-and-github"
         env {
           name  = "HASURA_GRAPHQL_ENABLE_CONSOLE"
           value = var.hasura_graphql_enable_console

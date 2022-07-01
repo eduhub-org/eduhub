@@ -19,6 +19,15 @@ variable "zone" {
   description = "The zone for resources associated with the Google Cloud project"
   type        = string
 }
+variable "cloudflare_email" {
+  description = "Email for the user to access Cloudflare"
+  type        = string
+}
+variable "cloudflare_api_key" {
+  description = "API key for the user to access Cloudflare"
+  type        = string
+}
+
 
 # network
 variable "url_mask" {
@@ -33,6 +42,11 @@ variable "hasura_service_name" {
   description = "Name for the service of the Hasura application"
   type        = string
 }
+variable "cloudflare_zone_id" {
+  description = "The DNS zone ID a record in Cloudflaire will be added to"
+  type        = string
+}
+
 
 # databases
 variable "dbi_tier" {
@@ -72,11 +86,6 @@ variable "keycloak_user" {
 variable "keycloak_pw" {
   description = "Password for the Keycloak console"
   type        = string
-}
-variable "docker_image_keycloak" {
-  description = "URL of the keycloak docker image for the staging environment"
-  type        = string
-  default     = "europe-west1-docker.pkg.dev/eduhub-staging-new/docker-repo/edu_hub_keycloak:latest"
 }
 
 

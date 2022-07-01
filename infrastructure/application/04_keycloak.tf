@@ -64,10 +64,10 @@ module "keycloak_service" {
   version = "~> 0.2.0"
 
   # Required variables
-  service_name = "keycloak"
+  service_name = var.keycloak_service_name
   project_id   = var.project_id
   location     = var.region
-  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/keycloak:latest"
+  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/keycloak:integration-of-terraform-and-github"
 
   service_annotations = {
     "run.googleapis.com/client-name"    = "terraform"

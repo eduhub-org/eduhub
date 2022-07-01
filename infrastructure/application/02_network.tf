@@ -38,6 +38,11 @@ resource "google_vpc_access_connector" "default" {
   machine_type   = "f1-micro"
 }
 
+
+###############################################################################
+# Creation of the Load Balancer
+#####
+
 # Create a network endpoint group (NEG) for the load balancer defined below
 resource "google_compute_region_network_endpoint_group" "default" {
   provider              = google-beta
@@ -60,9 +65,10 @@ module "lb-http" {
 
   # Create Google-managed SSL certificates for the specified domains. 
   ssl                             = "true"
-  managed_ssl_certificate_domains = ["${var.keycloak_service_name}.opencampus.sh"]
+  managed_ssl_certificate_domains = ["${var.keycloak_service_name}.opencampus.sh", "${var.hasura_service_name}.opencampus.sh"]
   use_ssl_certificates            = "false"
   https_redirect                  = "true"
+  random_certificate_suffix       = "true"
 
   backends = {
     default = {
@@ -90,3 +96,23 @@ module "lb-http" {
   }
 }
 
+
+###############################################################################
+# Setting the Domains for the Applications using Cloudflaire as a Provider
+#####
+
+# Add a domain record for the Keycloak service
+resource "cloudflare_record" "keycloak" {
+  zone_id = var.cloudflare_zone_id
+  name    = var.keycloak_service_name
+  type    = "A"
+  value   = module.lb-http.external_ip
+}
+
+# Add a domain record for the Hasura service
+resource "cloudflare_record" "hasura" {
+  zone_id = var.cloudflare_zone_id
+  name    = var.hasura_service_name
+  type    = "A"
+  value   = module.lb-http.external_ip
+}
