@@ -57,9 +57,21 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
+  zip-and-store-cloud-functions:
+    name: Zip and Store Cloud Functions
+    uses: ./.github/workflows/zip-and-store-cloud-functions.yml
+    with:
+      PROJECT_ID: eduhub-staging-new
+      CLOUD_FUNCTION_FOLDER: functions
+      BUCKET_NAME: eduhub-staging-new
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}
+
+
   deploy-application:
     name: "Deploy Application Infrastructure"
-    needs: [build-keycloak, build-backend, build-frontend]
+    needs: [build-keycloak, build-backend, build-frontend, zip-and-store-cloud-functions]
     runs-on: ubuntu-latest
     defaults:
       run:

@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       # Name of the cloud function (and of the folder in which it is defined)
-      CLOUD_FUNCTION_NAME: 
+      CLOUD_FUNCTION_FOLDER: 
         required: true
         type: string
       # Name of the Google storage bucket in which the archive will be stored
@@ -34,13 +34,33 @@ jobs:
       - name: Check Out the Repository Branch
         uses: actions/checkout@v2
 
-      - name: Zip Cloud Function Folder
+      - name: Zip Archive for loadFile
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          path: './functions/${{ inputs.CLOUD_FUNCTION_NAME }}'
-          filename: './functions/${{ inputs.CLOUD_FUNCTION_NAME }}.zip'
-          exclusions: '*.git* /*node_modules/* .editorconfig'
+          path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadFile'
+          filename: './functions_tmp/loadFile.zip'
+
+      - name: Zip Archive for saveFile
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveFile'
+          filename: './functions_tmp/saveFile.zip'
+
+      - name: Zip Archive for sendFile
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendFile'
+          filename: './functions_tmp/sendFile.zip'
+
+      - name: Zip Archive for updateKeycloakProfile
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateKeycloakProfile'
+          filename: './functions_tmp/updateKeycloakProfile.zip'
 
       - name: Authenticate to Google Cloud
         id: 'auth'
@@ -49,12 +69,12 @@ jobs:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
           project_id: ${{ inputs.PROJECT_ID }}
 
-      - name: Upload Archive to Google Cloud
-        id: 'upload-file'
+      - name: Upload Archives to Google Cloud
+        id: 'upload-archives'
         uses: 'google-github-actions/upload-cloud-storage@v0'
         with:
-          path: './functions/${{ inputs.CLOUD_FUNCTION_NAME }}.zip'
-          destination: '${{ inputs.BUCKET_NAME }}/cloud-functions/${{ inputs.CLOUD_FUNCTION_NAME }}.zip'
+          path: './functions_tmp'
+          destination: '${{ inputs.BUCKET_NAME }}/cloud-functions'
       - 
         name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
