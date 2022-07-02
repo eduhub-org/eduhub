@@ -13,12 +13,13 @@ on:
   # Run tests for any PRs.
   pull_request:
 
-zip-and-store-load_file:
+jobs:
+  zip-and-store-load_file:
     name: Zip and Store load_file Functions
     uses: ./.github/workflows/zip-and-store-cloud-function.yml
     with:
       PROJECT_ID: eduhub-staging-new
-      CLOUD_FUNCTION_FOLDER: keycloak
+      CLOUD_FUNCTION_NAME: loadFile
       BUCKET_NAME: eduhub-staging-new
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}

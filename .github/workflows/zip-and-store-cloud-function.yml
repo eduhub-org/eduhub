@@ -7,8 +7,8 @@ on:
       PROJECT_ID:
         required: true
         type: string
-      # Folder in which the cloud fuction is defined
-      CLOUD_FUNCTION_FOLDER: 
+      # Name of the cloud function (and of the folder in which it is defined)
+      CLOUD_FUNCTION_NAME: 
         required: true
         type: string
       # Name of the Google storage bucket in which the archive will be stored

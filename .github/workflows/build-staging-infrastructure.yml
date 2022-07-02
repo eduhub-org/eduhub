@@ -21,7 +21,7 @@ jobs:
 
   build-keycloak:
     name: Build and Store Keycloak Docker Image in Google Docker Repo
-    uses: ./.github/workflows/build-docker-image.yml
+    uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: keycloak
       IMAGE_NAME: keycloak
@@ -33,7 +33,7 @@ jobs:
 
   build-backend:
     name: Build and Store Backend Docker Image in Google Docker Repo
-    uses: ./.github/workflows/build-docker-image.yml
+    uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: backend
       IMAGE_NAME: backend
@@ -45,7 +45,7 @@ jobs:
 
   build-frontend:
     name: Build and Store Frontend Docker Image in Google Docker Repo
-    uses: ./.github/workflows/build-docker-image.yml
+    uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: frontend
       IMAGE_NAME: frontend
