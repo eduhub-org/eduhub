@@ -48,11 +48,11 @@ jobs:
           path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveFile'
           filename: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveFile.zip'
 
-      - name: Zip Archive for sendFile
+      - name: Zip Archive for sendMail
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendFile'
+          path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendMail'
           filename: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendFile.zip'
 
       - name: Zip Archive for updateKeycloakProfile
