@@ -3,7 +3,7 @@
 #####
 
 /* variable "GOOGLE_CREDENTIALS" {
-  description = "JSON key of the service account 'terraform_eduhub created' created for the given project"
+  description = "JSON key of the service account 'terraform created' created for the given project"
 }
  */
 # main

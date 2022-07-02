@@ -22,5 +22,5 @@ jobs:
       CLOUD_FUNCTION_NAME: loadFile
       BUCKET_NAME: eduhub-staging-new
     secrets:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}

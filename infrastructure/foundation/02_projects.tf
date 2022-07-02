@@ -16,47 +16,47 @@ resource "google_project" "eduhub" {
 }
 
 # Create a seperate service account to use with terraform within the created project
-resource "google_service_account" "terraform_eduhub" {
-  account_id   = "terraform-eduhub"
-  display_name = "Terraform service account for this project"
+resource "google_service_account" "terraform" {
+  account_id   = "terraform"
+  display_name = "Terraform Service Account"
 }
 
 # Provide the created terraform service account with the permission to edit the above created project
 resource "google_project_iam_member" "editor" {
   project = google_project.eduhub.id
   role    = "roles/editor"
-  member  = "serviceAccount:${google_service_account.terraform_eduhub.email}"
+  member  = "serviceAccount:${google_service_account.terraform.email}"
 }
 # Provide the created terraform service account with the permission to edit the above created project
 resource "google_project_iam_member" "owner" {
   project = google_project.eduhub.id
   role    = "roles/owner"
-  member  = "serviceAccount:${google_service_account.terraform_eduhub.email}"
+  member  = "serviceAccount:${google_service_account.terraform.email}"
 }
 
 # Provide the created terraform service account with the permission to manage the IAM of the project
 resource "google_service_account_iam_member" "token_creator" {
-  service_account_id = google_service_account.terraform_eduhub.name
+  service_account_id = google_service_account.terraform.name
   role               = "roles/iam.serviceAccountTokenCreator"
-  member             = "serviceAccount:${google_service_account.terraform_eduhub.email}"
+  member             = "serviceAccount:${google_service_account.terraform.email}"
 }
 
 # Provide the created terraform service account with the permission to manage the IAM of the project
 resource "google_service_account_iam_member" "project_iam_admin" {
-  service_account_id = google_service_account.terraform_eduhub.name
+  service_account_id = google_service_account.terraform.name
   role               = "roles/iam.serviceAccountAdmin"
-  member             = "serviceAccount:${google_service_account.terraform_eduhub.email}"
+  member             = "serviceAccount:${google_service_account.terraform.email}"
 }
 # Provide the created terraform service account with the permission to manage the IAM of the project
 resource "google_service_account_iam_member" "storage_iam_admin" {
-  service_account_id = google_service_account.terraform_eduhub.name
+  service_account_id = google_service_account.terraform.name
   role               = "roles/iam.serviceAccountAdmin"
-  member             = "serviceAccount:${google_service_account.terraform_eduhub.email}"
+  member             = "serviceAccount:${google_service_account.terraform.email}"
 }
 
 # Provide a given user with the permission to generate a JSON key for the above created terraform service account
 resource "google_service_account_iam_member" "project_iam_key_admin" {
-  service_account_id = google_service_account.terraform_eduhub.name
+  service_account_id = google_service_account.terraform.name
   role               = "roles/iam.serviceAccountKeyAdmin"
   member             = "user:${var.key_generation_user}"
 }

@@ -8,15 +8,9 @@ resource "google_storage_bucket" "main" {
   location = var.region
 }
 
-# Create a Google service account to manage the storage bucket.
-resource "google_service_account" "storage_bucket" {
-  account_id   = "storage-bucket"
-  display_name = "Storage Bucket Service Account"
-}
-
-# Apply the above created IAM policy to the storage bucket replacing any currently existing
+# Give the github service account admin permission on the Google Storage bucket
 resource "google_storage_bucket_iam_member" "admin" {
   bucket = google_storage_bucket.main.name
   role   = "roles/storage.objectAdmin"
-  member = "serviceAccount:${google_service_account.storage_bucket.email}"
+  member = "serviceAccount:${google_service_account.github.email}"
 }
