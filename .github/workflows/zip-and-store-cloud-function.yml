@@ -38,7 +38,7 @@ jobs:
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          path: './functions/${{ CLOUD_FUNCTION_NAME }}'
+          path: './functions/${{ inputs.CLOUD_FUNCTION_NAME }}'
           filename: './functions/${{ inputs.CLOUD_FUNCTION_NAME }}.zip'
           exclusions: '*.git* /*node_modules/* .editorconfig'
 
