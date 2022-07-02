@@ -38,29 +38,29 @@ jobs:
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadFile'
-          filename: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadFile.zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadFile'
+          filename: '../loadFile.zip'
 
       - name: Zip Archive for saveFile
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveFile'
-          filename: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveFile.zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveFile'
+          filename: '../saveFile.zip'
 
       - name: Zip Archive for sendMail
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendMail'
-          filename: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendFile.zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendMail'
+          filename: '../sendMail.zip'
 
       - name: Zip Archive for updateKeycloakProfile
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateKeycloakProfile'
-          filename: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateKeycloakProfile.zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateKeycloakProfile'
+          filename: '../updateKeycloakProfile.zip'
 
       - name: Authenticate to Google Cloud
         id: 'auth'
