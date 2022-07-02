@@ -42,6 +42,10 @@ variable "hasura_service_name" {
   description = "Name for the service of the Hasura application"
   type        = string
 }
+variable "frontend_service_name" {
+  description = "Name for the service of the Hasura application"
+  type        = string
+}
 variable "cloudflare_zone_id" {
   description = "The DNS zone ID a record in Cloudflaire will be added to"
   type        = string

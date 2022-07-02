@@ -10,7 +10,7 @@ resource "google_secret_manager_secret" "cloud_functions" {
     automatic = true
   }
 }
-# Grant the compute engine service account permissions to access clouf functions secret 
+# Grant the compute engine service account permissions to access cloud functions secret 
 resource "google_secret_manager_secret_iam_member" "cloud_functions" {
   secret_id  = google_secret_manager_secret.cloud_functions.id
   role       = "roles/secretmanager.secretAccessor"

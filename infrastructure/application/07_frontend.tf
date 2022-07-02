@@ -1,13 +1,23 @@
-resource "google_cloud_run_service" "frontend_service" {
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the Frontend service
+resource "google_cloud_run_service_iam_policy" "frontend_noauth_invoker" {
+  location = google_cloud_run_service.frontend.location
+  project  = google_cloud_run_service.frontend.project
+  service  = google_cloud_run_service.frontend.name
+
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+
+# Define the Google Cloud Run service for the Frontend
+resource "google_cloud_run_service" "frontend" {
   provider = google-beta
 
-  name     = "frontend"
+  name     = var.frontend_service_name
   location = var.region
 
   template {
     spec {
       containers {
-        image = "${var.docker_region}-docker.pkg.dev/edu-hub-staging/docker-repo/frontend:latest"
+        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/frontend:integration-of-terraform-and-github"
         ports {
           name           = "http1"
           container_port = 5000
@@ -18,7 +28,7 @@ resource "google_cloud_run_service" "frontend_service" {
         # }
         env {
           name  = "GRAPHQL_URI"
-          value = "${google_cloud_run_service.hasura_service.status[0].url}/v1/graphql"
+          value = "${google_cloud_run_service.hasura.status[0].url}/v1/graphql"
         }
         # env {
         #   name = "NEXT_PUBLIC_AUTH_URL"
@@ -28,7 +38,7 @@ resource "google_cloud_run_service" "frontend_service" {
           name = "HASURA_ADMIN_SECRET"
           value_from {
             secret_key_ref {
-              name = google_secret_manager_secret.secret_hasura_admin_secret.secret_id
+              name = google_secret_manager_secret.hasura_graphql_admin_key.secret_id
               key  = "latest"
             }
           }
@@ -65,13 +75,5 @@ resource "google_cloud_run_service" "frontend_service" {
   }
 
   autogenerate_revision_name = true
-  depends_on                 = [google_secret_manager_secret_version.secret_hasura_admin_secret_version_data]
-}
-
-resource "google_cloud_run_service_iam_policy" "frontend_service_policy_noauth" {
-  location = google_cloud_run_service.frontend_service.location
-  project  = google_cloud_run_service.frontend_service.project
-  service  = google_cloud_run_service.frontend_service.name
-
-  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+  depends_on                 = [google_secret_manager_secret_version.hasura_graphql_admin_key]
 }
