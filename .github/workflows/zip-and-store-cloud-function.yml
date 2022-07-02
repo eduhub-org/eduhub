@@ -1,0 +1,61 @@
+name: Build and Store a Docker Image in the Artifact Registry
+
+on:
+  workflow_call:
+    inputs:
+      # ID of the project in Google in which the image will be stored and deployed
+      PROJECT_ID:
+        required: true
+        type: string
+      # Folder in which the cloud fuction is defined
+      CLOUD_FUNCTION_FOLDER: 
+        required: true
+        type: string
+      # Name of the Google storage bucket in which the archive will be stored
+      BUCKET_NAME:
+        required: true
+        type: string
+      
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY:
+        required: true
+      GCP_REGION:
+        required: true
+
+
+jobs:
+
+  zip-and-store:
+    name: Zip and Store Cloud Function in Google Storage Bucket
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Check Out the Repository Branch
+        uses: actions/checkout@v2
+
+      - name: Zip Cloud Function Folder
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          path: './functions/${{ CLOUD_FUNCTION_FOLDER }}'
+          filename: './functions/${{ inputs.CLOUD_FUNCTION_FOLDER }}.zip'
+          exclusions: '*.git* /*node_modules/* .editorconfig'
+
+      - name: Authenticate to Google Cloud
+        id: 'auth'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          project_id: ${{ inputs.PROJECT_ID }}
+
+      - name: Upload Archive to Google Cloud
+        id: 'upload-file'
+        uses: 'google-github-actions/upload-cloud-storage@v0'
+        with:
+          path: './functions/${{ inputs.CLOUD_FUNCTION_FOLDER }}.zip'
+          destination: '${{ inputs.BUCKET_NAME }}/cloud-functions/${{ inputs.CLOUD_FUNCTION_FOLDER }}.zip'
+      - 
+        name: Show Output
+        run: echo ${{ steps.deploy.outputs.url }}
+        

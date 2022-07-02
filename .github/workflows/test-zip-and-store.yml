@@ -1,0 +1,25 @@
+name: Zip and Store Cloud Functions
+on:   
+  push:
+    # Run only on changes in the following branches
+    branches:
+      - staging
+      - feature/integration-of-terraform-and-github
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+  # Run tests for any PRs.
+  pull_request:
+
+zip-and-store-load_file:
+    name: Zip and Store load_file Functions
+    uses: ./.github/workflows/zip-and-store-cloud-function.yml
+    with:
+      PROJECT_ID: eduhub-staging-new
+      CLOUD_FUNCTION_FOLDER: keycloak
+      BUCKET_NAME: eduhub-staging-new
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_DOCKER_REPO_STAGING }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}
