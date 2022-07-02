@@ -38,8 +38,8 @@ jobs:
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          path: './functions/${{ CLOUD_FUNCTION_FOLDER }}'
-          filename: './functions/${{ inputs.CLOUD_FUNCTION_FOLDER }}.zip'
+          path: './functions/${{ CLOUD_FUNCTION_NAME }}'
+          filename: './functions/${{ inputs.CLOUD_FUNCTION_NAME }}.zip'
           exclusions: '*.git* /*node_modules/* .editorconfig'
 
       - name: Authenticate to Google Cloud
@@ -53,8 +53,8 @@ jobs:
         id: 'upload-file'
         uses: 'google-github-actions/upload-cloud-storage@v0'
         with:
-          path: './functions/${{ inputs.CLOUD_FUNCTION_FOLDER }}.zip'
-          destination: '${{ inputs.BUCKET_NAME }}/cloud-functions/${{ inputs.CLOUD_FUNCTION_FOLDER }}.zip'
+          path: './functions/${{ inputs.CLOUD_FUNCTION_NAME }}.zip'
+          destination: '${{ inputs.BUCKET_NAME }}/cloud-functions/${{ inputs.CLOUD_FUNCTION_NAME }}.zip'
       - 
         name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
