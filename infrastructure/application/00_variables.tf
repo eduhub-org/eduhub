@@ -98,6 +98,10 @@ variable "hasura_graphql_admin_key" {
   description = "Admin key for the Hasura GraphQL API"
   type        = string
 }
+variable "hasura_cloud_function_secret" {
+  description = "Hasura secret for cloud functions"
+  type        = string
+}
 variable "hasura_graphql_enable_console" {
   description = "Boolean to enable the Hasura console"
   type        = string
@@ -107,5 +111,10 @@ variable "hasura_graphql_dev_mode" {
   description = "Boolean to enable the GraphQL developer mode for Hasura"
   type        = string
   default     = "false"
+}
+variable "hasura_memory_limit" {
+  description = "Memory limit for Hasura cloud run service"
+  type        = string
+  default     = "1024M"
 }
 

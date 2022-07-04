@@ -3,19 +3,25 @@
 #####
 
 # Create a variable for the access to the Google Cloud functions in the Google secret manager 
-resource "google_secret_manager_secret" "cloud_functions" {
+resource "google_secret_manager_secret" "cloud_function" {
   provider  = google-beta
-  secret_id = "cloud-functions"
+  secret_id = "cloud-function"
   replication {
     automatic = true
   }
 }
+# Set the password for the Hasura cloud function secret
+resource "google_secret_manager_secret_version" "cloud_function" {
+  provider    = google-beta
+  secret      = google_secret_manager_secret.cloud_function.name
+  secret_data = var.hasura_cloud_function_secret
+}
 # Grant the compute engine service account permissions to access cloud functions secret 
-resource "google_secret_manager_secret_iam_member" "cloud_functions" {
-  secret_id  = google_secret_manager_secret.cloud_functions.id
+resource "google_secret_manager_secret_iam_member" "cloud_function" {
+  secret_id  = google_secret_manager_secret.cloud_function.id
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
-  depends_on = [google_secret_manager_secret.cloud_functions]
+  depends_on = [google_secret_manager_secret.cloud_function]
 }
 
 # Create a variable for the password of the Hasura graphql admin 
@@ -66,7 +72,13 @@ resource "google_cloud_run_service" "hasura" {
   template {
     spec {
       containers {
+
         image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:integration-of-terraform-and-github"
+        resources {
+          limits = {
+            memory = var.hasura_memory_limit
+          }
+        }
         env {
           name  = "HASURA_GRAPHQL_ENABLE_CONSOLE"
           value = var.hasura_graphql_enable_console
@@ -117,15 +129,15 @@ resource "google_cloud_run_service" "hasura" {
             }
           }
         }
-        # env {
-        #   name = "HASURA_CLOUD_FUNCTION_SECRET"
-        #   value_from {
-        #     secret_key_ref {
-        #       name = google_secret_manager_secret.cloud_functions.secret_id
-        #       key  = "latest"
-        #     }
-        #   }
-        # }
+        env {
+          name = "HASURA_CLOUD_FUNCTION_SECRET"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.cloud_function.secret_id
+              key  = "latest"
+            }
+          }
+        }
       }
     }
 
@@ -153,6 +165,6 @@ resource "google_cloud_run_service" "hasura" {
   }
 
   autogenerate_revision_name = true
-  depends_on                 = [google_secret_manager_secret_version.hasura_db_url, google_secret_manager_secret_version.hasura_graphql_admin_key, google_vpc_access_connector.default, google_secret_manager_secret_iam_member.hasura_db_url, google_secret_manager_secret_iam_member.hasura_graphql_admin_key, google_secret_manager_secret_iam_member.cloud_functions]
+  depends_on                 = [google_secret_manager_secret_version.hasura_db_url, google_secret_manager_secret_version.hasura_graphql_admin_key, google_vpc_access_connector.default, google_secret_manager_secret_iam_member.hasura_db_url, google_secret_manager_secret_iam_member.hasura_graphql_admin_key, google_secret_manager_secret_iam_member.cloud_function]
 }
 
