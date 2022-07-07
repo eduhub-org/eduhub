@@ -1,4 +1,4 @@
-name: Build Keycloak Docker Image for the Staging Environment
+name: Setup Staging Environment
 on:   
   push:
     # Run only on changes in the following branches
