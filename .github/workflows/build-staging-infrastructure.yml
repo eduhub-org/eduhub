@@ -4,7 +4,6 @@ on:
     # Run only on changes in the following branches
     branches:
       - staging
-      - feature/integration-of-terraform-and-github
 
     # Publish `v1.2.3` tags as releases.
     tags:
@@ -14,7 +13,6 @@ on:
   pull_request:
 
 env:
-  PROJECT_ID: eduhub-staging-new
   TF_WORKSPACE: eduhub-application-staging
 
 jobs:
