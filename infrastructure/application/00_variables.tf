@@ -83,6 +83,11 @@ variable "hasura_db_pw" {
 }
 
 # keycloak
+variable "keycloak_image_version" {
+  description = "Version for the Keycloak docker image"
+  type        = string
+  default     = "latest"
+}
 variable "keycloak_user" {
   description = "User for the Keycloak console"
   type        = string
@@ -94,6 +99,11 @@ variable "keycloak_pw" {
 
 
 # hasura
+variable "backend_image_version" {
+  description = "Version for the Backend docker image"
+  type        = string
+  default     = "latest"
+}
 variable "hasura_graphql_admin_key" {
   description = "Admin key for the Hasura GraphQL API"
   type        = string
@@ -118,3 +128,9 @@ variable "hasura_memory_limit" {
   default     = "1024M"
 }
 
+# Frontend
+variable "frontend_image_version" {
+  description = "Version for the Frontend docker image"
+  type        = string
+  default     = "latest"
+}

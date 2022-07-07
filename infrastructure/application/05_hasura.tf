@@ -73,7 +73,7 @@ resource "google_cloud_run_service" "hasura" {
     spec {
       containers {
 
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:integration-of-terraform-and-github"
+        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:${var.backend_image_version}"
         resources {
           limits = {
             memory = var.hasura_memory_limit
