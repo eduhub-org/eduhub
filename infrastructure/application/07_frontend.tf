@@ -17,23 +17,23 @@ resource "google_cloud_run_service" "frontend" {
   template {
     spec {
       containers {
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/frontend:integration-of-terraform-and-github"
+        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/frontend:${var.frontend_image_version}"
         ports {
           name           = "http1"
           container_port = 5000
         }
-        # env {
-        #   name = "NEXT_PUBLIC_API_URL"
-        #   value = "${google_cloud_run_service.hasura_service.status[0].url}/v1/graphql"
-        # }
+        env {
+          name  = "NEXT_PUBLIC_API_URL"
+          value = "https://${var.hasura_service_name}.opencampus.sh/v1/graphql"
+        }
         env {
           name  = "GRAPHQL_URI"
-          value = "${google_cloud_run_service.hasura.status[0].url}/v1/graphql"
+          value = "https://${var.hasura_service_name}.opencampus.sh/v1/graphql"
         }
-        # env {
-        #   name = "NEXT_PUBLIC_AUTH_URL"
-        #   value = "${google_cloud_run_service.keycloak_service.status[0].url}/auth"
-        # }
+        env {
+          name  = "NEXT_PUBLIC_AUTH_URL"
+          value = "https://${var.keycloak_service_name}.opencampus.sh"
+        }
         env {
           name = "HASURA_ADMIN_SECRET"
           value_from {
@@ -47,10 +47,10 @@ resource "google_cloud_run_service" "frontend" {
           name  = "NODE_ENV"
           value = "production"
         }
-        # env {
-        #   name = "STORAGE_BUCKET_URL"
-        #   value = "${google_cloud_run_service.keycloak_service.status[0].url}/auth"
-        # }
+        env {
+          name  = "STORAGE_BUCKET_URL"
+          value = "https://storage.googleapis.com/storage/v1/${var.project_id}"
+        }
       }
     }
 
