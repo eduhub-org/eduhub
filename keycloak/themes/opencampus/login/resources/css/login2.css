@@ -1,0 +1,105 @@
+.academy_header_guest .navbar {
+    background-color: #f8f9fa;
+    height: 6em;
+}
+
+.academy_header_guest h2 {
+    font-size: 1.75em;
+    font-weight: 700;
+}
+
+.academy_header_guest .nav-link {
+    font-size: 22px;
+    color: black !important;
+}
+
+.academy_header_guest .nav-link-dropdown {
+    font-size: 22px;
+    color: black !important;
+}
+
+.academy_header_guest .navbar-brand {
+    height: unset;
+}
+
+.academy_header_guest .dropdown-menu {
+    background-color: $sec_one;
+    padding: 0;
+    position: absolute;
+    top: 100%;
+    right: 0;
+}
+
+.academy_header_guest .dropdown-item {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+}
+
+.academy_header_guest .navbar-collapse {
+    background-color: #f8f9fa;
+    z-index: 2;
+}
+
+.academy_header_guest .img-circle {
+    border-radius: 40px;
+    height: 45px;
+    width: 45px;
+}
+
+.academy_header_guest .brand-logo {
+    max-height: 4.5em;
+    padding: 0.5em;
+}
+
+.academy_header_guest .navbar-toggler {
+    font-size: 30px;
+    color: black;
+    border: none;
+}
+
+.login-pf body {
+    background-image: none;
+    background-color: #E5E5E5;
+    height: 100%;
+}
+
+.pf-c-form-control {
+  border-color: #0D888D;
+}
+
+.pf-c-form-control:hover {
+  border-color: #0D888D;
+}
+
+.card-pf {
+    margin: 0 auto;
+    box-shadow: var(--pf-global--BoxShadow--lg);
+    padding: 0 20px;
+    max-width: 500px;
+    border: 7px solid;
+    border-color: #0D888D; /* default - IE compatibility */
+}
+
+.pf-c-button.pf-m-primary {
+  background-image: none;
+  background-color: #0D888D;
+  border-color: #0b7478;
+}
+
+.pf-c-button.pf-m-primary:hover {
+  background-image: none;
+  background-color: #0b7478;
+}
+
+a {
+  color: #0D888D;
+}
+
+a:hover {
+  color: #0b7478;
+}
+
+.edu-title {
+  color:black;
+}
+

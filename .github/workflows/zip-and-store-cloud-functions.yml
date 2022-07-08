@@ -1,0 +1,84 @@
+name: Build and Store a Docker Image in the Artifact Registry
+
+on:
+  workflow_call:
+    inputs:
+      # ID of the project in Google in which the image will be stored and deployed
+      PROJECT_ID:
+        required: true
+        type: string
+      # Name of the cloud function (and of the folder in which it is defined)
+      CLOUD_FUNCTION_FOLDER: 
+        required: true
+        type: string
+      # Name of the Google storage bucket in which the archive will be stored
+      BUCKET_NAME:
+        required: true
+        type: string
+      
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY:
+        required: true
+      GCP_REGION:
+        required: true
+
+
+jobs:
+
+  zip-and-store:
+    name: Zip and Store Cloud Function in Google Storage Bucket
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Check Out the Repository Branch
+        uses: actions/checkout@v2
+
+      - name: Zip Archive for loadFile
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadFile'
+          filename: '../loadFile.zip'
+
+      - name: Zip Archive for saveFile
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveFile'
+          filename: '../saveFile.zip'
+
+      - name: Zip Archive for sendMail
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendMail'
+          filename: '../sendMail.zip'
+
+      - name: Zip Archive for updateKeycloakProfile
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateKeycloakProfile'
+          filename: '../updateKeycloakProfile.zip'
+
+      - name: Authenticate to Google Cloud
+        id: 'auth'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          project_id: ${{ inputs.PROJECT_ID }}
+
+      - name: Upload Archives to Google Cloud
+        id: 'upload-archives'
+        uses: 'google-github-actions/upload-cloud-storage@v0'
+        with:
+          path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}'
+          destination: '${{ inputs.BUCKET_NAME }}/cloud-functions'
+          glob: '*.zip'
+          parent: false
+
+      - 
+        name: Show Output
+        run: echo ${{ steps.deploy.outputs.url }}
+        
