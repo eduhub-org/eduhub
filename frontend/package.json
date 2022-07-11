@@ -20,9 +20,17 @@
     "next-i18next": "^8.2.0",
     "next-images": "^1.8.1",
     "react": "17.0.1",
-    "react-dom": "17.0.1"
+    "react-dom": "17.0.1",
+    "react-datepicker": "^4.7.0",
+    "react-icons": "^4.3.1",
+    "react-debounce-input": "^3.2.5",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/uuid": "^8.3.4",
+    "@types/react-time-picker": "^4.0.2",
+    "@types/react-icons": "^3.0.0",
+    "@types/react-datepicker": "^4.3.4",
     "@types/cookie": "^0.4.0",
     "@types/graphql": "^14.5.0",
     "@types/node": "^15.0.1",
