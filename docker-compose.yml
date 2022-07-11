@@ -1,3 +1,19 @@
+# This docker-compose file is meant for local development!
+
+# To make login work correctly you need to have an environment file called hasura_keycloak.env
+# which needs to contain the environment variable HASURA_GRAPHQL_JWT_SECRET which contains this value:
+# {"type": "RS256", "key": "-----BEGIN CERTIFICATE-----\nPUT_YOUR_PUBLIC_KEY_HERE\n-----END CERTIFICATE-----"}
+# The public key value is found in your keycloak instance, edu hub realm, keys, rs256 public key.
+# So make the file hasura_keycloak.env next to the docker-compose.yml with this content:
+
+# To get the public key in the first run you might have to provide an empty environment file, then do docker-compose stop and docker-compose up again once you have the public key.
+
+# Then start with docker-compose up -d
+
+# For the frontend you additionally need a frontend.env file that defines STORAGE_BUCKET_URL
+
+# The Hasura console is disabled, you need to start it via CLI instead
+
 version: "3.8"
 
 services:
@@ -8,8 +24,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile-dev
     command: tail -F anything
-    environment:
-      STORAGE_BUCKET_URL: "${STORAGE_BUCKET_URL}"
+    env_file:
+      - frontend.env
     volumes:
       - ./frontend:/opt/app
     depends_on:
@@ -24,18 +40,17 @@ services:
       - db_hasura
       - keycloak
     restart: always
+    env_file:
+      - hasura_keycloak.env
     environment:
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@db_hasura:5432/postgres
-      HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "false" # set to "false" to disable console
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       ## uncomment next line to set an admin secret
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
-      HASURA_GRAPHQL_JWT_SECRET: '{"type": "RS256", "key": "-----BEGIN CERTIFICATE-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjA2VMVrXYPs6+wRCq4Hh5eADoiKrBAV7KymVoO3JTWMM2QWe/HKLivToU9f3oTc66HZmY9pwTbpDf7OCI1XpzVMJAVnJDaw/LvcGynKc36geUFG8eBrgMIZoMo3E4OQvz+GNZ4rFQB20cTEWBn/F7TLZz3XOSFK0TUMV3GYTFT9AnS3mbkA1LBneqZn0t3o9QBjHXGvvhOYCuzQ3oXvmmPSAc7v/Vg7l77FNIgX5ckmBQ/62940dpmo1XFRXW9V0U+OU5NOqoQofXnD6XvOasviZgtJBqmN1pK8p8JVONJZEwuAafY/XqmsWyp3XAsHgWiZx3ipKTe8fTxLdcZplyQIDAQAB\n-----END CERTIFICATE-----"}'
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: inherited_roles
-      HASURA_CLOUD_FUNCTION_SECRET: "${HASURA_CLOUD_FUNCTION_SECRET}"
-      HASURA_BUCKET: "${HASURA_BUCKET}"
       CLOUD_FUNCTION_LINK: "https://europe-west3-edu-hub-staging.cloudfunctions.net"
     volumes:
       - ./backend/migrations:/hasura-migrations
@@ -55,31 +70,32 @@ services:
       dockerfile: Dockerfile-dev
     ports:
       - 28080:8080
-    depends_on:
-      - db_keycloak
+    #depends_on:
+    #  - db_keycloak
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_DB: postgres
-      KC_DB_URL: "jdbc:postgresql://${db_keycloak}/keycloak"
-      KC_DB_USERNAME: keycloak
-      KC_DB_PASSWORD: password
-      KC_HTTP_ENABLED: "true"
+      #KC_DB: postgres
+      #KC_DB_URL: "jdbc:postgresql://${db_keycloak}/keycloak"
+      #KC_DB_USERNAME: keycloak
+      #KC_DB_PASSWORD: password
+      #KC_HTTP_ENABLED: "true"
       #KEYCLOAK_IMPORT: /imports/edu-hub-realm.json
     volumes:
       - ./keycloak/imports:/imports
       - ./keycloak/themes/opencampus:/opt/keycloak/themes/opencampus
       - ./keycloak/disable-theme-cache.cli:/opt/keycloak/startup-scripts/disable-theme-cache.cli
 
-  db_keycloak:
-    image: postgres:12
-    volumes:
-      - db_keycloak_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: keycloak
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: password
+  # keycloak comes with h2 embedded, that is enough for development
+  # db_keycloak:
+  #   image: postgres:12
+  #   volumes:
+  #     - db_keycloak_data:/var/lib/postgresql/data
+  #   environment:
+  #     POSTGRES_DB: keycloak
+  #     POSTGRES_USER: keycloak
+  #     POSTGRES_PASSWORD: password
 
 volumes:
   db_hasura_data:
-  db_keycloak_data:
+  # db_keycloak_data:

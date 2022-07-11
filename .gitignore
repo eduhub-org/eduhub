@@ -1,2 +1,6 @@
 # misc
 .DS_Store
+
+
+hasura_keycloak.env
+frontend.env
