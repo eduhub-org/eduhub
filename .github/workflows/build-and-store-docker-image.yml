@@ -19,6 +19,12 @@ on:
       DOCKERFILE_FOLDER:
         required: true
         type: string
+      NEXT_PUBLIC_API_URL:
+        required: false
+        type: string
+      NEXT_PUBLIC_AUTH_URL:
+        required: false
+        type: string
     secrets:
       GCP_SERVICE_ACCOUNT_KEY:
         required: true
@@ -28,9 +34,12 @@ on:
 
 jobs:
 
-  build-and-deploy:
-    name: Building a Docker Image and Storing it in the Artifact Registry
+  build-and-store:
+    name: Build and Store Docker Image in the Artifact Registry
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_API_URL: ${{ inputs.NEXT_PUBLIC_API_URL }}
+      NEXT_PUBLIC_AUTH_URL: ${{ inputs.NEXT_PUBLIC_AUTH_URL }}
 
     steps:
       - 
@@ -38,19 +47,21 @@ jobs:
         uses: actions/checkout@v2
       - 
         name: Authenticate to Google Cloud
-        id: 'auth'  
+        id: 'auth'
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
           project_id: ${{ inputs.PROJECT_ID }}
       -
         name: Build Docker image
+        if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/production'
         run: docker build ./${{ inputs.DOCKERFILE_FOLDER }} --file ./${{ inputs.DOCKERFILE_FOLDER }}/Dockerfile --tag ${{ inputs.IMAGE_NAME }} --label "runnumber=${GITHUB_RUN_ID}"
       -
         name: Authenticate with Google Cloud Artifact Registry
         run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
       -
         name: Push Docker Image to Google Artifact Registry
+        if: (github.ref == 'refs/heads/staging'  || github.ref == 'refs/heads/production') && github.event_name == 'push'
         run: |
           IMAGE_ID=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/docker-repo/${{ inputs.IMAGE_NAME }}
           # Change all uppercase to lowercase
@@ -60,19 +71,11 @@ jobs:
           # Strip "v" prefix from tag name
           [[ "${{ inputs.BRANCH }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
           # Use Docker `latest` tag convention
-          [ "$VERSION" == "main" ] && VERSION=latest
+          [ "$VERSION" == "production" ] && VERSION=latest
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
           docker tag ${{ inputs.IMAGE_NAME }} $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
-      #-
-        #name: Deploy to Cloud Run
-        #id: deploy
-        #uses: google-github-actions/deploy-cloudrun@v0
-        #with:
-          #project_id: ${{ inputs.PROJECT_ID }}
-          #image: ${{ inputs.IMAGE_NAME }}:$VERSION
-          #service: keycloak
       - 
         name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
