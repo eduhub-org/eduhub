@@ -11,7 +11,10 @@ import { PageBlock } from "../common/PageBlock";
 import { Button as OldButton } from "../common/Button";
 import { DescriptionTab } from "./DescriptionTab";
 import { QuestionConfirmationDialog } from "../common/dialogs/QuestionConfirmationDialog";
-import { useAdminMutation } from "../../hooks/authedMutation";
+import {
+  useAdminMutation,
+  useInstructorMutation,
+} from "../../hooks/authedMutation";
 import {
   UpdateCourseStatus,
   UpdateCourseStatusVariables,
@@ -185,8 +188,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
       setCantUpgradeOpen(true);
     }
   }, [course, setConfirmUpgradeStatusOpen]);
-  // TODO use instructor mutation once that works!
-  const [updateCourseStatusMutation] = useAdminMutation<
+  const [updateCourseStatusMutation] = useInstructorMutation<
     UpdateCourseStatus,
     UpdateCourseStatusVariables
   >(UPDATE_COURSE_STATUS);

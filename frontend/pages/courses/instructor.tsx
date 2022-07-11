@@ -12,7 +12,7 @@ import {
   AdminCourseListVariables,
   AdminCourseList_Course,
 } from "../../queries/__generated__/AdminCourseList";
-import { useAdminQuery } from "../../hooks/authedQuery";
+import { useAdminQuery, useInstructorQuery } from "../../hooks/authedQuery";
 import { COURSE_LIST } from "../../queries/courseList";
 import Loading from "../../components/courses/Loading";
 import { Tile } from "../../components/course/Tile";
@@ -63,12 +63,14 @@ const Dashboard: FC<IProps> = ({ t }) => {
 const Courses: FC = () => {
   let courses: AdminCourseList_Course[] = [];
   /* #region DB APIs */
-  // TODO: Please Come up with valid instructor ID
-  const courseListRequest = useAdminQuery<
+  const courseListRequest = useInstructorQuery<
     AdminCourseList,
     AdminCourseListVariables
   >(COURSE_LIST, {
     variables: {
+      // TODO somehow we need to get the expert id of the currently logged in user
+      // no idea how to get that from keycloak, for me the keycloak sync does not work locally,
+      // so my user does not have an expert id at all
       where: { CourseInstructors: { expertId: { _eq: 159 } } },
     },
   });
@@ -91,7 +93,6 @@ const Courses: FC = () => {
     <>
       <div className="grid grid-cols-3 gap-5 py-10">
         {courses.map((course) => (
-          // TODO: Url of single course
           <div key={`${course.id}`} className="whitespace-normal">
             <Tile course={course} />
           </div>

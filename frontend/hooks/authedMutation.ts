@@ -51,7 +51,7 @@ export const useInstructorMutation: typeof useMutation = (
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            "x-hasura-role": "instructor",
+            "x-hasura-role": "instructor_access",
             Authorization: "Bearer " + token,
           },
         },
@@ -119,7 +119,7 @@ export const pickIdPkMapper = (x: any) => x.id;
 // to update a single field
 export const useUpdateCallback = <QueryType, QueryVariables>(
   query: DocumentNode,
-  role: "admin" | "instructor",
+  role: "admin" | "instructor_access",
   pkField: keyof QueryVariables,
   updateField: keyof QueryVariables,
   updatePK: any,
@@ -153,7 +153,7 @@ export const useUpdateCallback = <QueryType, QueryVariables>(
 // one for the primary key and one for the updated value
 export const useUpdateCallback2 = <QueryType, QueryVariables>(
   query: DocumentNode,
-  role: "admin" | "instructor",
+  role: "admin" | "instructor_access",
   pkField: keyof QueryVariables,
   updateField: keyof QueryVariables,
   pkMapper: (pKSource: any) => any,
@@ -184,7 +184,7 @@ export const useUpdateCallback2 = <QueryType, QueryVariables>(
 
 export const useDeleteCallback = <QueryType, QueryVariables>(
   query: DocumentNode,
-  role: "admin" | "instructor",
+  role: "admin" | "instructor_access",
   pkField: keyof QueryVariables,
   pkMapper: (event: any) => any,
   mainQueryResult: QueryResult<any, any>

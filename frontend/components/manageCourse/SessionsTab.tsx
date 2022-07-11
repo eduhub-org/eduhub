@@ -64,8 +64,7 @@ interface IProps {
 }
 
 export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
-  // TODO
-  const userRole = "admin";
+  const userRole = "instructor_access";
 
   const courseSessions = useMemo(() => {
     const result = [...course.Sessions];

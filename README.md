@@ -2,12 +2,10 @@
 
 1. Frontend: `localhost:25000`
 
-2. Hasura(GraphQL server): `localhost:8080` 
-    
-    - secret `myadminsecretkey`
+2. Hasura(GraphQL server): `localhost:9695` 
+    - You need to start this via the CLI: "hasura console" in ./backend
 
 3. Keycloak(User management portal): `localhost:28080`
-
     - login as `admin`/`admin`.
 ---
 
@@ -36,9 +34,13 @@
 
 1. Fill the hasura_keycloak.env with the HASURA_CLOUD_FUNCTION_SECRET and HASURA_BUCKET. These are private values not part of the public github, you need to ask somebody in the know about them, or use your own cloud functions servers.
 
+1. Create an empty file in edu-hub root directory called frontend.env
+
+1. Fill frontend.env with STORAGE_BUCKET_URL="..." You need to get the right value for this from opencampus or cclausen
+
 1. There is a docker-compose.yml which you can use to start edu-hub with some settings for development. Run the following command to start all the containers as necessary. The frontend container will not yet do anything, but it will mount `./frontend` as a volume and open it as the working directory `/opt/app`.
 
-        sudo docker-compose -f docker-compose.yml up -d
+        docker-compose up
 
 
 ## Database seed setup.
@@ -51,18 +53,17 @@
 
         HASURA_GRAPHQL_ADMIN_SECRET=myadminsecretkey hasura seed apply
 
+1. To start the hasura console run "hasura console" in `./backend`
 
 ## Keycloak seed
 
 1. Put your seed files into keycloak/imports/.
+    You might need to remove some or most of the user-jsons, as for me they caused some public key duplicate error. For development you don't really need all of the users anyway.
 2. Run the following command:
 
-        sudo docker exec -it edu-hub_keycloak_1 /opt/jboss/keycloak/bin/standalone.sh -Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=import -Dkeycloak.migration.rovider=dir -Dkeycloak.migration.realmName=edu-hub -Dkeycloak.migration.dir=/imports
-1. In this step initial setup is done. You should have your docker images running. Check the docker images status with:
+    docker exec -it edu-hub_keycloak_1 /opt/keycloak/bin/kc.sh import --realm edu-hub --dir "/imports"
 
-        sudo docker ps
-
-Once the import is completed you can close this process.
+1. it will error out with address in use in the end, which is fine
 
 ## HASURA_GRAPHQL_JWT_SECRET setup
 Somehow the keycloak setup with hasura just don't work and hasura will not accept the jwt produced by keycloak, unless the certificate is hardcoded into the environment properties in docker-compose.yml.
@@ -85,12 +86,12 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
 
 ## Create an account in keycloak.
 
-1. Add a role `admin` and `instructor` (If not exist)
+1. Add a role `admin`, `instructor_access` and `user_access` (If not exist)
     
     - Click `Add Role` (Clients -> hasura -> Roles -> Add Role)
     - Role Name: `admin`
     - Save
-    - Do the same for `instructor`
+    - Do the same for the other roles.
 2. Add user (Users -> Add user)
 3. Reset Password
     - Search user in `Users`
@@ -99,7 +100,7 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
 4. Role Mapping
     - Role Mapping tab (Users -> Role Mapping)
     - Client Roles: (hasura)
-    - Assigned Roles from Availeable roles: `user`, `admin` and `instructor`.
+    - Assigned all the roles.
 
 ## Start/Stop
 

@@ -178,7 +178,6 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   /* #endregion */
 
   // EINGELADEN/ BESTÄTIGT/ UNBEWERTET
-  // TODO: Which feilds ??
   const makeInvitedConfirmedUnratedField = () => {
     const statusRecordsWithSum: EntrollmentStatusCount = {};
     course.CourseEnrollments.forEach((courseEn) => {

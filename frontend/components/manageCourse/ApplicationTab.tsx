@@ -65,8 +65,7 @@ const now7 = new Date();
 now7.setDate(now7.getDate() + 7);
 
 export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
-  // TODO roles! This should probably be the instructor
-  const userRole = "admin";
+  const userRole = "instructor_access";
 
   const [selectedEnrollments, setSelectedEnrollments] = useState(
     [] as number[]

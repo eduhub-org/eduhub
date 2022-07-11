@@ -154,11 +154,9 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
     if (previousStatus === AttendanceStatus_enum.MISSED) {
       return AttendanceStatus_enum.NO_INFO;
     }
-    // TODO: no information for NO_INFO
     return AttendanceStatus_enum.ATTENDED;
   };
 
-  // TODO: AttendanceSource_enum not Creating as "globalTypes" ??
   const handleDotClick = useCallback(
     async (session: ManagedCourse_Course_by_pk_Sessions) => {
       const obj = attendenceRecordBySession[session.id];
@@ -188,7 +186,7 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
           input: {
             status: AttendanceStatus_enum.ATTENDED,
             sessionId: session.id,
-            source: "INSTRUCTOR", // TODO , create AttendanceSource_enum as "globalTypes" ??
+            source: "INSTRUCTOR",
             userId,
           },
         },
@@ -282,7 +280,7 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
         <td className={tdStyple}>
           <div className="flex space-x-2 flex-row">
             <div>
-              <p className={pStyle}> {"//TODO: no PerformanceRating"} </p>
+              <p className={pStyle}> {"PerformanceRating?"} </p>
             </div>
             <button
               className="focus:ring-2 rounded-md focus:outline-none"

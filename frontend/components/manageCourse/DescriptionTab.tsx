@@ -134,8 +134,7 @@ const prepDateTimeUpdate = (timeString: string) => {
 const constantOnlineMapper = () => "ONLINE";
 
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
-  // TODO set to instructor once that works
-  const currentUpdateRole = "admin";
+  const currentUpdateRole = "instructor_access";
 
   const queryKnownLocationOptions = useInstructorQuery<LocationOptionsKnown>(
     LOCATION_OPTIONS

@@ -232,7 +232,6 @@ const TableContent: FC<ITableContentProps> = ({ t, users }) => {
     { key: 0, label: t("firstName") },
     { key: 1, label: t("lastName") },
     { key: 2, label: t("email") },
-    { key: 3, label: t("regDate") },
   ];
   return (
     <div className="overflow-x-auto transition-[height] w-full">
@@ -280,9 +279,6 @@ const UserOneRow: FC<IPropsUser> = ({ user }) => {
         </td>
         <td className={tdStyple}>
           <p className={pStyle}>{user.email}</p>
-        </td>
-        <td className={tdStyple}>
-          <p className={pStyle}> {"//TODO"} </p>
         </td>
       </tr>
       <tr className="h-1" />

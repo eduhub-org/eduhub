@@ -53,22 +53,6 @@ export const Header: FC = () => {
                 priority
               />
             </div>
-            <ClientOnly>
-              <OnlyDesktop>
-                <OnlyAdmin>
-                  <div className="flex items-center ml-8">
-                    <Link href="/programs">
-                      <a>Programme</a>
-                    </Link>
-                  </div>
-                  <div className="flex items-center ml-8">
-                    <Link href="/manage/course/217">
-                      <a>Manage Course 217</a>
-                    </Link>
-                  </div>
-                </OnlyAdmin>
-              </OnlyDesktop>
-            </ClientOnly>
           </div>
         </Link>
       </div>
@@ -76,16 +60,6 @@ export const Header: FC = () => {
       <ClientOnly>
         {isLoggedIn ? (
           <div className="flex">
-            <Link href="/courses">
-              <div className="mr-3 cursor-pointer">
-                <Avatar imageUrl={coursesLogo} />
-              </div>
-            </Link>
-            <Link href="/users">
-              <div className="mr-3 cursor-pointer">
-                <MdManageAccounts size={40} />
-              </div>
-            </Link>
             <div className="flex bg-blue-400">
               <div className="cursor-pointer" onClick={openMenu}>
                 <Avatar imageUrl={user?.picture || mysteryImg} />

@@ -36,7 +36,7 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            "x-hasura-role": "instructor",
+            "x-hasura-role": "instructor_access",
             Authorization: "Bearer " + token,
           },
         },
@@ -58,6 +58,7 @@ export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
+            "x-hasura-role": "admin",
             Authorization: "Bearer " + token,
           },
         },
