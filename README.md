@@ -1,3 +1,10 @@
+## rent-a-scientist
+
+Rent a scientist has its own frontend, it works against the same hasura based backend as the normal edu-hub frontend.
+The rent a scientist frontend is located in the directory rent-a-scientist, it is basically a copy of frontend with all unnecessary parts removed.
+
+Start docker-compose -f rent-a-scientist-compose.yml to develop on it!
+
 ## Endpoints:
 
 1. Frontend: `localhost:25000`
