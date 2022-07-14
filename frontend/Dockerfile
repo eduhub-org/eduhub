@@ -7,6 +7,9 @@ RUN apk add --no-cache libc6-compat yarn
 ENV PORT 25000
 EXPOSE 25000
 
+ENV NEXT_PUBLIC_AUTH_URL=$NEXT_PUBLIC_AUTH_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 WORKDIR /opt/app
 
 COPY package.json /opt/app
