@@ -7,8 +7,8 @@ RUN apk add --no-cache libc6-compat yarn
 ENV PORT 25000
 EXPOSE 25000
 
-ENV NEXT_PUBLIC_AUTH_URL=$NEXT_PUBLIC_AUTH_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_AUTH_URL="https://keycloak-staging.opencampus.sh"
+ENV NEXT_PUBLIC_API_URL="https://hasura-staging.opencampus.sh/v1/graphql"
 
 WORKDIR /opt/app
 
