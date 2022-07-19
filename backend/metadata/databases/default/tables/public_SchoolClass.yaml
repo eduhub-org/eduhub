@@ -1,0 +1,29 @@
+table:
+  name: SchoolClass
+  schema: public
+object_relationships:
+- name: School
+  using:
+    foreign_key_constraint_on: schoolId
+- name: Teacher
+  using:
+    foreign_key_constraint_on: teacherId
+array_relationships:
+- name: SchoolClassRequests
+  using:
+    foreign_key_constraint_on:
+      column: classId
+      table:
+        name: SchoolClassRequest
+        schema: public
+select_permissions:
+- permission:
+    columns:
+    - grade
+    - id
+    - studensCount
+    - teacherId
+    - name
+    - schoolId
+    filter: {}
+  role: instructor_access

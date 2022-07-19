@@ -1,0 +1,20 @@
+table:
+  name: SchoolClassRequest
+  schema: public
+object_relationships:
+- name: SchoolClass
+  using:
+    foreign_key_constraint_on: classId
+- name: ScientistOffer
+  using:
+    foreign_key_constraint_on: offerId
+select_permissions:
+- permission:
+    columns:
+    - id
+    - classId
+    - offerId
+    - possibleDays
+    - assigned_day
+    filter: {}
+  role: instructor_access

@@ -11,7 +11,7 @@ module.exports = {
       },
       colors: {
         "rsa-black": "#222222",
-        "rsa-background": "green"
+        "rsa-background": "green",
       },
     },
     fontFamily: {

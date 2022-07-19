@@ -1,0 +1,22 @@
+table:
+  name: OfferCategoryRelation
+  schema: public
+select_permissions:
+- permission:
+    columns:
+    - categoryId
+    - offerId
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - offerId
+    - categoryId
+    filter: {}
+  role: instructor_access
+- permission:
+    columns:
+    - categoryId
+    - offerId
+    filter: {}
+  role: user_access

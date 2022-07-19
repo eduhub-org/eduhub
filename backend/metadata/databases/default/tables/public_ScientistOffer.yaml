@@ -1,0 +1,107 @@
+table:
+  name: ScientistOffer
+  schema: public
+object_relationships:
+- name: Program
+  using:
+    foreign_key_constraint_on: programId
+array_relationships:
+- name: SchoolClassRequests
+  using:
+    foreign_key_constraint_on:
+      column: offerId
+      table:
+        name: SchoolClassRequest
+        schema: public
+- name: ScientistOfferRelations
+  using:
+    foreign_key_constraint_on:
+      column: offerId
+      table:
+        name: ScientistOfferRelation
+        schema: public
+select_permissions:
+- permission:
+    columns:
+    - categories
+    - possibleDays
+    - possibleLocations
+    - timeWindow
+    - id
+    - maxDeployments
+    - maximumGrade
+    - minimumGrade
+    - programId
+    - classPreparation
+    - contactEmail
+    - contactName
+    - contactPhone
+    - description
+    - duration
+    - equipmentRequired
+    - extraComment
+    - format
+    - institutionLogo
+    - institutionName
+    - researchSubject
+    - roomRequirements
+    - subjectComment
+    - title
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - id
+    - format
+    - minimumGrade
+    - maximumGrade
+    - possibleDays
+    - timeWindow
+    - maxDeployments
+    - possibleLocations
+    - equipmentRequired
+    - roomRequirements
+    - title
+    - description
+    - duration
+    - extraComment
+    - subjectComment
+    - programId
+    - classPreparation
+    - institutionName
+    - institutionLogo
+    - categories
+    - contactEmail
+    - contactPhone
+    - contactName
+    - researchSubject
+    filter: {}
+  role: instructor_access
+- permission:
+    columns:
+    - categories
+    - possibleDays
+    - possibleLocations
+    - timeWindow
+    - id
+    - maxDeployments
+    - maximumGrade
+    - minimumGrade
+    - programId
+    - classPreparation
+    - contactEmail
+    - contactName
+    - contactPhone
+    - description
+    - duration
+    - equipmentRequired
+    - extraComment
+    - format
+    - institutionLogo
+    - institutionName
+    - researchSubject
+    - roomRequirements
+    - subjectComment
+    - title
+    filter: {}
+  role: user_access

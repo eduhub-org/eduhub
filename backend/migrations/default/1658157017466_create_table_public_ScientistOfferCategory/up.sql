@@ -1,0 +1,1 @@
+CREATE TABLE "public"."ScientistOfferCategory" ("id" serial NOT NULL, "name" text NOT NULL, PRIMARY KEY ("id") );COMMENT ON TABLE "public"."ScientistOfferCategory" IS E'a single category available in rent-a-scientist';

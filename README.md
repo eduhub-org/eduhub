@@ -141,5 +141,3 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
           /opt/app # yarn dev 
 
     - Now you can modify code in this project and it should automatically reload changes.
-    
-That made it work mostly, though I still see some CORS issues. That is a wip point for the project.
