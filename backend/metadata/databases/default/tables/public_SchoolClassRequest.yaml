@@ -10,6 +10,14 @@ object_relationships:
     foreign_key_constraint_on: offerId
 select_permissions:
 - permission:
+    allow_aggregations: true
+    columns:
+    - id
+    - offerId
+    filter: {}
+  role: anonymous
+- permission:
+    allow_aggregations: true
     columns:
     - id
     - classId

@@ -965,24 +965,6 @@ export interface Attendance_on_conflict {
 }
 
 /**
- * input type for updating data in table "Attendance"
- */
-export interface Attendance_set_input {
-  created_at?: any | null;
-  endDateTime?: any | null;
-  id?: number | null;
-  interruptionCount?: number | null;
-  recordedName?: string | null;
-  sessionId?: number | null;
-  source?: string | null;
-  startDateTime?: any | null;
-  status?: AttendanceStatus_enum | null;
-  totalAttendanceTime?: number | null;
-  updated_at?: any | null;
-  userId?: any | null;
-}
-
-/**
  * Boolean expression to compare columns of type "Boolean". All fields are combined with logical 'AND'.
  */
 export interface Boolean_comparison_exp {
@@ -1415,38 +1397,6 @@ export interface Course_on_conflict {
   constraint: Course_constraint;
   update_columns: Course_update_column[];
   where?: Course_bool_exp | null;
-}
-
-/**
- * input type for updating data in table "Course"
- */
-export interface Course_set_input {
-  achievementCertificatePossible?: boolean | null;
-  applicationEnd?: any | null;
-  attendanceCertificatePossible?: boolean | null;
-  chatLink?: string | null;
-  contentDescriptionField1?: string | null;
-  contentDescriptionField2?: string | null;
-  cost?: string | null;
-  coverImage?: string | null;
-  created_at?: any | null;
-  ects?: string | null;
-  endTime?: any | null;
-  headingDescriptionField1?: string | null;
-  headingDescriptionField2?: string | null;
-  id?: number | null;
-  language?: string | null;
-  learningGoals?: string | null;
-  maxMissedSessions?: number | null;
-  maxParticipants?: number | null;
-  programId?: number | null;
-  startTime?: any | null;
-  status?: CourseStatus_enum | null;
-  tagline?: string | null;
-  title?: string | null;
-  updated_at?: any | null;
-  visibility?: boolean | null;
-  weekDay?: string | null;
 }
 
 /**

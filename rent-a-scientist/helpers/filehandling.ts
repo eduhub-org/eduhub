@@ -44,6 +44,7 @@ export const parseCsvFileUploadEvent = async (
       if (fileTxt != null) {
         const parsed = Papa.parse(fileTxt, {
           header: true,
+          transformHeader: h => h.trim()
         });
 
         return parsed.data;
@@ -51,8 +52,8 @@ export const parseCsvFileUploadEvent = async (
         return null;
       }
     } finally {
-      if (event.srcElement && event.srcElement.value) {
-        event.srcElement.value = null;
+      if (event.nativeEvent.srcElement && event.nativeEvent.srcElement.value) {
+        event.nativeEvent.srcElement.value = null;
       }
     }
   }

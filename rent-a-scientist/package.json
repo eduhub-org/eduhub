@@ -25,9 +25,11 @@
     "react-icons": "^4.3.1",
     "react-debounce-input": "^3.2.5",
     "uuid": "^8.3.2",
-    "papaparse": "^5.3.2"
+    "papaparse": "^5.3.2",
+    "react-select": "^5.4.0"
   },
   "devDependencies": {
+    "@types/react-select": "^5.0.1",
     "@types/papaparse": "^5.3.2",
     "@types/uuid": "^8.3.4",
     "@types/react-time-picker": "^4.0.2",
