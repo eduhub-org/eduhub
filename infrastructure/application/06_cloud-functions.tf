@@ -169,7 +169,7 @@ data "google_storage_bucket_object" "update_from_keycloak" {
   bucket = var.project_id
 }
 # Create cloud function
-resource "google_cloudfunctions2_function" "update_keycloak_profile" {
+resource "google_cloudfunctions2_function" "update_from_keycloak" {
   provider    = google-beta
   location    = var.region
   name        = "update-from-keycloak"
