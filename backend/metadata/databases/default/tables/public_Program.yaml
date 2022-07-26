@@ -1,44 +1,44 @@
 table:
-  name: Program
   schema: public
+  name: Program
 array_relationships:
-- name: Courses
-  using:
-    foreign_key_constraint_on:
-      column: programId
-      table:
-        name: Course
-        schema: public
+  - name: Courses
+    using:
+      foreign_key_constraint_on:
+        column: programId
+        table:
+          schema: public
+          name: Course
 select_permissions:
-- permission:
-    columns:
-    - applicationStart
-    - id
-    - lectureEnd
-    - lectureStart
-    - projectRecordUploadDeadline
-    - shortTitle
-    - title
-    filter: {}
-  role: anonymous
-- permission:
-    columns:
-    - id
-    - title
-    - lectureStart
-    - lectureEnd
-    - applicationStart
-    - defaultApplicationEnd
-    - projectRecordUploadDeadline
-    - visibility
-    - startQuestionnaire
-    - speakerQuestionnaire
-    - closingQuestionnaire
-    - visibilityParticipationCertificate
-    - visibilityAchievementCertificate
-    - attendanceCertificateTemplateURL
-    - participationCertificateTemplateURL
-    - shortTitle
-    - defaultMaxMissedSessions
-    filter: {}
-  role: instructor_access
+  - role: anonymous
+    permission:
+      columns:
+        - applicationStart
+        - id
+        - lectureEnd
+        - lectureStart
+        - projectRecordUploadDeadline
+        - shortTitle
+        - title
+      filter: {}
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - title
+        - lectureStart
+        - lectureEnd
+        - applicationStart
+        - defaultApplicationEnd
+        - projectRecordUploadDeadline
+        - visibility
+        - startQuestionnaire
+        - speakerQuestionnaire
+        - closingQuestionnaire
+        - visibilityParticipationCertificate
+        - visibilityAchievementCertificate
+        - attendanceCertificateTemplateURL
+        - participationCertificateTemplateURL
+        - shortTitle
+        - defaultMaxMissedSessions
+      filter: {}

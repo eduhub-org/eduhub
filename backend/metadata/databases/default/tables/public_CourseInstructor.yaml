@@ -1,21 +1,21 @@
 table:
-  name: CourseInstructor
   schema: public
+  name: CourseInstructor
 object_relationships:
-- name: Course
-  using:
-    foreign_key_constraint_on: courseId
-- name: Expert
-  using:
-    foreign_key_constraint_on: expertId
+  - name: Course
+    using:
+      foreign_key_constraint_on: courseId
+  - name: Expert
+    using:
+      foreign_key_constraint_on: expertId
 select_permissions:
-- permission:
-    columns:
-    - id
-    - courseId
-    - expertId
-    - created_at
-    - updated_at
-    filter: {}
-    limit: 10
-  role: anonymous
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - courseId
+        - expertId
+        - created_at
+        - updated_at
+      filter: {}
+      limit: 10
