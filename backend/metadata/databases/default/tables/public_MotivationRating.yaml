@@ -1,19 +1,19 @@
 table:
-  name: MotivationRating
   schema: public
+  name: MotivationRating
 is_enum: true
 array_relationships:
-- name: Enrollments
-  using:
-    foreign_key_constraint_on:
-      column: motivationRating
-      table:
-        name: CourseEnrollment
-        schema: public
+  - name: Enrollments
+    using:
+      foreign_key_constraint_on:
+        column: motivationRating
+        table:
+          schema: public
+          name: CourseEnrollment
 select_permissions:
-- permission:
-    columns:
-    - value
-    - comment
-    filter: {}
-  role: anonymous
+  - role: anonymous
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}
