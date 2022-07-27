@@ -3,8 +3,6 @@ const KcAdminClient = require('@keycloak/keycloak-admin-client').default;
 
 const { createClient } = require('graphqurl');
 
-app.use(bodyParser.json());
-
 exports.updateFromKeycloak = async (req, res) => {
    
    if (process.env.HASURA_CLOUD_FUNCTION_SECRET == req.headers.secret) {
