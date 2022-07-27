@@ -184,6 +184,7 @@ resource "google_cloudfunctions2_function" "update_from_keycloak" {
       KEYCLOAK_URL                 = "https:\\${var.keycloak_service_name}.opencampus.sh"
       KEYCLOAK_PW                  = var.keycloak_pw
       HASURA_ENDPOINT              = "https:\\${var.hasura_service_name}.opencampus.sh/v1/graphql"
+      HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
     }
     source {
       storage_source {
