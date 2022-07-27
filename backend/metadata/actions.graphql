@@ -13,8 +13,7 @@ type Mutation {
 
 type Mutation {
   updateFromKeycloak(
-    access_key: String!
-    userid: String!
+    userid: ID!
   ): result
 }
 
