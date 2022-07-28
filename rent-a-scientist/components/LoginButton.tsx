@@ -34,6 +34,26 @@ export const useLogout = () => {
   return logout;
 };
 
+export const RegisterButton: FC = () => {
+  const isLoggedIn = useIsLoggedIn();
+  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const router = useRouter();
+
+  const register = useCallback(() => {
+    const url = keycloak?.createRegisterUrl({
+      redirectUri: window.location.href,
+    });
+
+    if (!url) return;
+    router.push(new URL(url));
+  }, [keycloak, router]);
+
+  return <>
+    {!isLoggedIn && <Button onClick={register}>Registrieren</Button>}
+  </>;
+
+};
+
 export const LoginButton: FC = () => {
   const isLoggedIn = useIsLoggedIn();
   const performLogin = useLogin();

@@ -13,6 +13,7 @@ import { GradeSelector } from "./GradeSelector";
 import { OfferDisplay } from "./OfferDisplay";
 import { RegistrationSelection } from "./RegistrationSelection";
 import { SchoolSelector } from "./SchoolSelector";
+import { useRouter } from 'next/router';
 
 interface IProps {
   className?: string
@@ -123,6 +124,19 @@ export const OffersSearch: FC<IProps> = ({
     return selectedGrade > 0 && selectedSchool !== undefined;
   }, [selectedSchool, selectedGrade]);
 
+  const router = useRouter();
+
+  const handleRegister = useCallback(() => {
+    sessionStorage.setItem("pendingRequest", JSON.stringify({
+      offers: selectedOffers,
+      school: selectedSchool,
+      grade: selectedGrade,
+      now: new Date().toISOString()
+    }));
+
+    router.push("/register");
+  }, [selectedOffers, selectedSchool, selectedGrade, router]);
+
   return <div className={className}>
 
     <h1 className="mt-4 text-2xl font-bold">Schule und Klassenstufe</h1>
@@ -147,6 +161,7 @@ export const OffersSearch: FC<IProps> = ({
 
       <div className="mb-4 mt-4 pl-5">
         <span className="mr-4">Wählen Sie im ersten Schritt Schule und Klassenstufe aus.</span>
+
         <Button onClick={handleFinishSchoolGradeSelection} disabled={!schoolAndGradeSelected} variant="outlined">
           Weiter
         </Button>
@@ -177,6 +192,7 @@ export const OffersSearch: FC<IProps> = ({
           selectedOffers={selectedOffersList}
           className="mb-2"
           onClickRemove={handleRemoveSelection}
+          onClickRegister={handleRegister}
         />
 
         <h1 className="mt-4 text-2xl font-bold">Kursoptionen für Ihre Klasse</h1>

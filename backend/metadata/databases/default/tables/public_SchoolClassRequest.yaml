@@ -17,12 +17,13 @@ select_permissions:
     filter: {}
   role: anonymous
 - permission:
-    allow_aggregations: true
     columns:
-    - id
-    - classId
-    - offerId
     - possibleDays
     - assigned_day
+    - classId
+    - id
+    - offerId
+    - commentGeneral
+    - commentTime
     filter: {}
   role: instructor_access
