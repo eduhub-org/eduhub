@@ -11,6 +11,12 @@ type Mutation {
   ): UploadResult
 }
 
+type Mutation {
+  updateFromKeycloak(
+    userid: ID!
+  ): result
+}
+
 type UploadResult {
   link: String!
 }
@@ -21,5 +27,9 @@ type Output {
 
 type loadFileOutput {
   link: String!
+}
+
+type result {
+  result: String!
 }
 
