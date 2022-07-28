@@ -1,8 +1,28 @@
+import { gql, useMutation } from "@apollo/client";
 import { useKeycloak } from "@react-keycloak/ssr";
-import { KeycloakInstance } from "keycloak-js";
+import { KeycloakInstance, KeycloakTokenParsed } from "keycloak-js";
+import { useEffect } from "react";
+
+
+const UPDATE_USER = gql`
+  mutation update_User($id: ID!) {
+    updateFromKeycloak(userid: $id)
+  }
+`;
 
 export const useIsLoggedIn = (): boolean => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
+  const [updateUser, { data, error }] = useMutation(UPDATE_USER);
+
+  useEffect(() => {
+    if (keycloak !== undefined) {
+      keycloak.onAuthSuccess = () => {
+        const parsedToken: KeycloakTokenParsed | undefined = keycloak?.tokenParsed;
+        console.log("call updateUser backend function", parsedToken?.sub);
+        updateUser({ variables: { id: parsedToken?.sub} });
+      }
+    }
+  },[]); 
 
   const token = keycloak?.token;
 

@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: Program
+  schema: public
 array_relationships:
 - name: Courses
   using:
@@ -24,35 +24,35 @@ array_relationships:
         name: ScientistOffer
         schema: public
 select_permissions:
-  - role: anonymous
-    permission:
-      columns:
-        - applicationStart
-        - id
-        - lectureEnd
-        - lectureStart
-        - projectRecordUploadDeadline
-        - shortTitle
-        - title
-      filter: {}
-  - role: instructor_access
-    permission:
-      columns:
-        - id
-        - title
-        - lectureStart
-        - lectureEnd
-        - applicationStart
-        - defaultApplicationEnd
-        - projectRecordUploadDeadline
-        - visibility
-        - startQuestionnaire
-        - speakerQuestionnaire
-        - closingQuestionnaire
-        - visibilityParticipationCertificate
-        - visibilityAchievementCertificate
-        - attendanceCertificateTemplateURL
-        - participationCertificateTemplateURL
-        - shortTitle
-        - defaultMaxMissedSessions
-      filter: {}
+- permission:
+    columns:
+    - applicationStart
+    - id
+    - lectureEnd
+    - lectureStart
+    - projectRecordUploadDeadline
+    - shortTitle
+    - title
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - id
+    - title
+    - lectureStart
+    - lectureEnd
+    - applicationStart
+    - defaultApplicationEnd
+    - projectRecordUploadDeadline
+    - visibility
+    - startQuestionnaire
+    - speakerQuestionnaire
+    - closingQuestionnaire
+    - visibilityParticipationCertificate
+    - visibilityAchievementCertificate
+    - attendanceCertificateTemplateURL
+    - participationCertificateTemplateURL
+    - shortTitle
+    - defaultMaxMissedSessions
+    filter: {}
+  role: instructor_access

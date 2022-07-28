@@ -14,6 +14,7 @@ import { OfferDisplay } from "./OfferDisplay";
 import { RegistrationSelection } from "./RegistrationSelection";
 import { SchoolSelector } from "./SchoolSelector";
 import { useRouter } from 'next/router';
+import { useRasConfig } from "../hooks/ras";
 
 interface IProps {
   className?: string
@@ -27,20 +28,7 @@ export const OffersSearch: FC<IProps> = ({
   className
 }) => {
 
-  const qConfig = useQuery<QueryRSAConfig>(QUERY_RSA_CONFIG);
-
-  const rsaConfig = useMemo(() => {
-    const pid = qConfig?.data?.RentAScientistConfig_by_pk?.program_id || -1;
-    const lstart = qConfig?.data?.RentAScientistConfig_by_pk?.Program.lectureStart;
-    const lend = qConfig?.data?.RentAScientistConfig_by_pk?.Program.lectureEnd;
-    const result: RSAConfig = {
-      programId: pid,
-      start: lstart,
-      end: lend
-    };
-    console.log("rsa config", result);
-    return result;
-  }, [qConfig]);
+  const rsaConfig = useRasConfig();
 
   const qOffers = useQuery<AllScientistOffers>(ALL_OFFERS);
   const allOffers = useMemo(() => {

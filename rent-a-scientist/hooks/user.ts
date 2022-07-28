@@ -2,8 +2,6 @@ import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance } from "keycloak-js";
 import { useState } from "react";
 
-import { useAuthedQuery } from "./authedQuery";
-
 export const useUserId = () => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
 

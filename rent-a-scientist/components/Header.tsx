@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FC, useMemo } from "react";
 
-import appLogo from "../public/images/logo_wzk_300x340.png";
+import header from "../public/static/header.jpg";
 import { QUERY_RSA_CONFIG } from "../queries/ras_config";
 import { QueryRSAConfig } from "../queries/__generated__/QueryRSAConfig";
 import { ClientOnly } from "./common/ClientOnly";
@@ -35,38 +35,33 @@ export const Header: FC = () => {
   }, [qConfig]);
 
   return (
-    <header className="flex w-full py-4">
+    <header className="relative">
+      <div className="absolute bottom-5 right-5 z-50">
+        <ClientOnly>
+          <LoginButton></LoginButton>
+        </ClientOnly>
+      </div>
+
+      <div className="absolute hidden bottom-6 z-50 right-96 lg:block">
+        <span className="text-2xl text-rsa-green">
+        {dateString}
+        </span>
+      </div>
+
       <div className="flex w-full items-center">
         <Link href="/">
           <div className="flex cursor-pointer">
             <div className="flex items-center">
-              <Image
-                src={appLogo}
-                alt="Rent-A-Scientist Logo"
-                width={1.5 * 150}
-                height={1.5 * 170}
-                priority
-              />
+            <Image src={header}
+              alt="Rent-A-Scientist Header Logo"
+              width={1280}
+              height={364}
+              priority />
             </div>
           </div>
         </Link>
-
-        <div className="flex flex-col bg-rsa-green px-3 w-full xl:h-48 h-36">
-          <div className="flex xl:text-4xl xl:mt-16 mt-4">
-            Rent-A-Scientist
-          </div>
-          <div className="flex justify-center">
-            <span className="text-xl text-center">
-              {dateString}
-            </span>
-          </div>
-          <div>
-          <ClientOnly>
-          <LoginButton />
-        </ClientOnly>
-          </div>
-        </div>
       </div>
     </header>
   );
 };
+

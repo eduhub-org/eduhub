@@ -16,6 +16,22 @@ array_relationships:
       table:
         name: SchoolClassRequest
         schema: public
+insert_permissions:
+- permission:
+    backend_only: false
+    check:
+      Teacher:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
+    columns:
+    - grade
+    - id
+    - studensCount
+    - teacherId
+    - name
+    - schoolId
+  role: user_access
 select_permissions:
 - permission:
     columns:
@@ -25,5 +41,26 @@ select_permissions:
     - teacherId
     - name
     - schoolId
-    filter: {}
-  role: instructor_access
+    filter:
+      Teacher:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
+  role: user_access
+update_permissions:
+- permission:
+    check:
+      Teacher:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
+    columns:
+    - grade
+    - name
+    - studensCount
+    filter:
+      Teacher:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
+  role: user_access

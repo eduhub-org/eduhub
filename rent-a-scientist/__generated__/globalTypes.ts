@@ -478,6 +478,8 @@ export enum SchoolClassRequest_constraint {
 export enum SchoolClassRequest_update_column {
   assigned_day = "assigned_day",
   classId = "classId",
+  commentGeneral = "commentGeneral",
+  commentTime = "commentTime",
   id = "id",
   offerId = "offerId",
   possibleDays = "possibleDays",
@@ -656,17 +658,15 @@ export enum Session_update_column {
  */
 export enum Teacher_constraint {
   Teacher_pkey = "Teacher_pkey",
+  Teacher_userId_key = "Teacher_userId_key",
 }
 
 /**
  * update columns of table "Teacher"
  */
 export enum Teacher_update_column {
-  email = "email",
-  forename = "forename",
   id = "id",
-  schoolId = "schoolId",
-  surname = "surname",
+  userId = "userId",
 }
 
 /**
@@ -1921,6 +1921,8 @@ export interface SchoolClassRequest_bool_exp {
   _or?: SchoolClassRequest_bool_exp[] | null;
   assigned_day?: Int_comparison_exp | null;
   classId?: Int_comparison_exp | null;
+  commentGeneral?: String_comparison_exp | null;
+  commentTime?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   offerId?: Int_comparison_exp | null;
   possibleDays?: _int4_comparison_exp | null;
@@ -1934,6 +1936,8 @@ export interface SchoolClassRequest_insert_input {
   ScientistOffer?: ScientistOffer_obj_rel_insert_input | null;
   assigned_day?: number | null;
   classId?: number | null;
+  commentGeneral?: string | null;
+  commentTime?: string | null;
   id?: number | null;
   offerId?: number | null;
   possibleDays?: any | null;
@@ -2011,7 +2015,6 @@ export interface SchoolClass_on_conflict {
  */
 export interface School_bool_exp {
   SchoolClasses?: SchoolClass_bool_exp | null;
-  Teachers?: Teacher_bool_exp | null;
   _and?: School_bool_exp[] | null;
   _not?: School_bool_exp | null;
   _or?: School_bool_exp[] | null;
@@ -2029,7 +2032,6 @@ export interface School_bool_exp {
  */
 export interface School_insert_input {
   SchoolClasses?: SchoolClass_arr_rel_insert_input | null;
-  Teachers?: Teacher_arr_rel_insert_input | null;
   city?: string | null;
   district?: string | null;
   dstnr?: string | null;
@@ -2420,40 +2422,26 @@ export interface String_comparison_exp {
 }
 
 /**
- * input type for inserting array relation for remote table "Teacher"
- */
-export interface Teacher_arr_rel_insert_input {
-  data: Teacher_insert_input[];
-  on_conflict?: Teacher_on_conflict | null;
-}
-
-/**
  * Boolean expression to filter rows from the table "Teacher". All fields are combined with a logical 'AND'.
  */
 export interface Teacher_bool_exp {
-  School?: School_bool_exp | null;
   SchoolClasses?: SchoolClass_bool_exp | null;
+  User?: User_bool_exp | null;
   _and?: Teacher_bool_exp[] | null;
   _not?: Teacher_bool_exp | null;
   _or?: Teacher_bool_exp[] | null;
-  email?: String_comparison_exp | null;
-  forename?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
-  schoolId?: String_comparison_exp | null;
-  surname?: String_comparison_exp | null;
+  userId?: uuid_comparison_exp | null;
 }
 
 /**
  * input type for inserting data into table "Teacher"
  */
 export interface Teacher_insert_input {
-  School?: School_obj_rel_insert_input | null;
   SchoolClasses?: SchoolClass_arr_rel_insert_input | null;
-  email?: string | null;
-  forename?: string | null;
+  User?: User_obj_rel_insert_input | null;
   id?: number | null;
-  schoolId?: string | null;
-  surname?: string | null;
+  userId?: any | null;
 }
 
 /**

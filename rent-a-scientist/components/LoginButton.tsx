@@ -1,9 +1,9 @@
+import { Button } from "@material-ui/core";
 import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance } from "keycloak-js";
 import { useRouter } from "next/router";
 import { FC, useCallback } from "react";
 import { useIsLoggedIn } from "../hooks/authentication";
-import { Button } from "./common/Button";
 
 export const useLogin = () => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
@@ -49,10 +49,11 @@ export const RegisterButton: FC = () => {
   }, [keycloak, router]);
 
   return <>
-    {!isLoggedIn && <Button onClick={register}>Registrieren</Button>}
+    {!isLoggedIn && <Button variant="contained" onClick={register}>Registrieren</Button>}
   </>;
 
 };
+
 
 export const LoginButton: FC = () => {
   const isLoggedIn = useIsLoggedIn();
@@ -61,8 +62,8 @@ export const LoginButton: FC = () => {
 
   return (
     <>
-      {!isLoggedIn && <Button onClick={performLogin}>Anmelden</Button>}
-      {isLoggedIn && <Button onClick={performLogout}>Abmelden</Button>}
+      {!isLoggedIn && <Button variant="contained" onClick={performLogin}>Anmelden</Button>}
+      {isLoggedIn && <Button variant="contained" onClick={performLogout}>Abmelden</Button>}
     </>
   );
 };

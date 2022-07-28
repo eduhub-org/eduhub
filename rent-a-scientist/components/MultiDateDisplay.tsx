@@ -3,7 +3,8 @@ import Select from "react-select";
 
 interface IProps {
     days: number[],
-    startDate: Date
+    startDate: Date,
+    disabled?: boolean
 }
 
 const rangeGroups = (indices: number[]) => {
@@ -50,13 +51,27 @@ const rangeFormat = (range: number[], startDate: Date) => {
     }
 }
 
-export const MultiDateDisplay: FC<IProps> = ({
+export const MultiDatePureDisplay: FC<IProps> = ({
     days, startDate
 }) => {
     const ranges = rangeGroups(days).map(range => rangeFormat(range, startDate));
+    return <>
+    {ranges.join(", ")}
+    </>
+
+}
+
+export const MultiDateDisplay: FC<IProps> = ({
+    days, startDate
+}) => {
     return <div>
         <span className="font-bold">Mögliche Einsatztage: {" "}</span>
-        <span>{ranges.join(", ")}</span>
+        <span>
+            <MultiDatePureDisplay 
+                days={days}
+                startDate={startDate}
+            />
+        </span>
     </div>
 
 };
@@ -73,6 +88,7 @@ export const MultiDateSelector: FC<MultiDaySelectorProps> = ({
     days, startDate,
     selectedDays, onSelectDays,
     instanceId, id,
+    disabled,
     className
 }) => {
 
@@ -94,6 +110,7 @@ export const MultiDateSelector: FC<MultiDaySelectorProps> = ({
 
     return <>
         <Select 
+            isDisabled={disabled}
             placeholder="Tage auswählen für Anmeldung"
             options={options}
             instanceId={instanceId}

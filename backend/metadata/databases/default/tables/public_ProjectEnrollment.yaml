@@ -1,71 +1,71 @@
 table:
-  schema: public
   name: ProjectEnrollment
+  schema: public
 object_relationships:
-  - name: Enrollment
-    using:
-      foreign_key_constraint_on: enrollmentId
-  - name: Project
-    using:
-      foreign_key_constraint_on: projectId
-  - name: Rating
-    using:
-      manual_configuration:
-        remote_table:
-          schema: public
-          name: ProjectRating
-        insertion_order: null
-        column_mapping:
-          rating: value
+- name: Enrollment
+  using:
+    foreign_key_constraint_on: enrollmentId
+- name: Project
+  using:
+    foreign_key_constraint_on: projectId
+- name: Rating
+  using:
+    manual_configuration:
+      column_mapping:
+        rating: value
+      insertion_order: null
+      remote_table:
+        name: ProjectRating
+        schema: public
 insert_permissions:
-  - role: user_access
-    permission:
-      check:
-        Enrollment:
-          Course:
-            CourseEnrollments:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-      columns:
-        - enrollmentId
-        - id
-        - projectId
-        - recordURL
-      backend_only: false
+- permission:
+    backend_only: false
+    check:
+      Enrollment:
+        Course:
+          CourseEnrollments:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+    columns:
+    - enrollmentId
+    - id
+    - projectId
+    - recordURL
+  role: user_access
 select_permissions:
-  - role: instructor_access
-    permission:
-      columns:
-        - enrollmentId
-        - id
-        - projectId
-        - rating
-        - recordURL
-      filter: {}
-  - role: user_access
-    permission:
-      columns:
-        - id
-        - created_at
-        - updated_at
-        - enrollmentId
-        - projectId
-        - rating
-        - recordURL
-      filter:
-        Enrollment:
-          User:
-            id:
-              _eq: X-Hasura-User-Id
+- permission:
+    columns:
+    - enrollmentId
+    - id
+    - projectId
+    - rating
+    - recordURL
+    filter: {}
+  role: instructor_access
+- permission:
+    columns:
+    - id
+    - created_at
+    - updated_at
+    - enrollmentId
+    - projectId
+    - rating
+    - recordURL
+    filter:
+      Enrollment:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
+  role: user_access
 update_permissions:
-  - role: user_access
-    permission:
-      columns:
-        - recordURL
-      filter:
-        Enrollment:
-          User:
-            id:
-              _eq: X-Hasura-User-Id
-      check: null
+- permission:
+    check: null
+    columns:
+    - recordURL
+    filter:
+      Enrollment:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
+  role: user_access

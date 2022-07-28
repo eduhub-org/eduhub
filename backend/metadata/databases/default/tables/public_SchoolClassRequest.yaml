@@ -8,6 +8,24 @@ object_relationships:
 - name: ScientistOffer
   using:
     foreign_key_constraint_on: offerId
+insert_permissions:
+- permission:
+    backend_only: false
+    check:
+      SchoolClass:
+        Teacher:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+    columns:
+    - possibleDays
+    - assigned_day
+    - classId
+    - id
+    - offerId
+    - commentGeneral
+    - commentTime
+  role: user_access
 select_permissions:
 - permission:
     allow_aggregations: true
@@ -25,5 +43,30 @@ select_permissions:
     - offerId
     - commentGeneral
     - commentTime
-    filter: {}
-  role: instructor_access
+    filter:
+      SchoolClass:
+        Teacher:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+  role: user_access
+update_permissions:
+- permission:
+    check:
+      SchoolClass:
+        Teacher:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+    columns:
+    - assigned_day
+    - commentGeneral
+    - commentTime
+    - possibleDays
+    filter:
+      SchoolClass:
+        Teacher:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+  role: user_access

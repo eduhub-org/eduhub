@@ -2,9 +2,9 @@ table:
   name: Teacher
   schema: public
 object_relationships:
-- name: School
+- name: User
   using:
-    foreign_key_constraint_on: schoolId
+    foreign_key_constraint_on: userId
 array_relationships:
 - name: SchoolClasses
   using:
@@ -13,13 +13,24 @@ array_relationships:
       table:
         name: SchoolClass
         schema: public
+insert_permissions:
+- permission:
+    backend_only: false
+    check:
+      User:
+        id:
+          _eq: X-Hasura-User-Id
+    columns:
+    - id
+    - userId
+  role: user_access
 select_permissions:
 - permission:
     columns:
     - id
-    - email
-    - forename
-    - schoolId
-    - surname
-    filter: {}
-  role: instructor_access
+    - userId
+    filter:
+      User:
+        id:
+          _eq: X-Hasura-User-Id
+  role: user_access
