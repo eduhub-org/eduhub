@@ -1,35 +1,48 @@
 actions:
-- name: loadFile
-  definition:
-    kind: ""
-    handler: '{{CLOUD_FUNCTION_LINK}}/loadFile'
-    headers:
-    - name: secret
-      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-    - name: bucket
-      value_from_env: HASURA_BUCKET
-  permissions:
-  - role: instructor_access
-  - role: user_access
-  - role: anonymous
-- name: saveFile
-  definition:
-    kind: asynchronous
-    handler: '{{CLOUD_FUNCTION_LINK}}/saveFile'
-    forward_client_headers: true
-    headers:
-    - name: secret
-      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-    - name: bucket
-      value_from_env: HASURA_BUCKET
-  permissions:
-  - role: instructor_access
-  - role: user_access
+  - name: loadFile
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK}}/loadFile'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+    permissions:
+      - role: instructor_access
+      - role: user_access
+      - role: anonymous
+  - name: saveFile
+    definition:
+      kind: asynchronous
+      handler: '{{CLOUD_FUNCTION_LINK}}/saveFile'
+      forward_client_headers: true
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+    permissions:
+      - role: instructor_access
+      - role: user_access
+  - name: updateFromKeycloak
+    definition:
+      kind: asynchronous
+      handler: '{{CLOUD_FUNCTION_LINK}}/updateFromKeycloak'
+      forward_client_headers: true
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    permissions:
+      - role: instructor_access
+      - role: user_access
+      - role: anonymous
 custom_types:
   enums: []
   input_objects: []
   objects:
-  - name: UploadResult
-  - name: Output
-  - name: loadFileOutput
+    - name: UploadResult
+    - name: Output
+    - name: loadFileOutput
+    - name: result
   scalars: []
