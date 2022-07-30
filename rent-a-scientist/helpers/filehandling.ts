@@ -44,7 +44,7 @@ export const parseCsvFileUploadEvent = async (
       if (fileTxt != null) {
         const parsed = Papa.parse(fileTxt, {
           header: true,
-          transformHeader: h => h.trim()
+          transformHeader: (h) => h.trim(),
         });
 
         return parsed.data;

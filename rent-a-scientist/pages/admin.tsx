@@ -310,9 +310,7 @@ const ProgramsPage: FC = () => {
     offerCsvUploadRef.current?.click();
   }, [offerCsvUploadRef]);
 
-  const configQuery = useAuthedQuery<QueryRSAConfig>(
-    QUERY_RSA_CONFIG
-  );
+  const configQuery = useAuthedQuery<QueryRSAConfig>(QUERY_RSA_CONFIG);
 
   const allScientistsQuery = useQuery<AllScientists>(ALL_SCIENTISTS);
 

@@ -61,7 +61,7 @@ export const OFFER_BY_ID = gql`
       ...ScientistOfferComment
     }
   }
-`
+`;
 
 export const ALL_SCHOOLS = gql`
   query AllSchols {

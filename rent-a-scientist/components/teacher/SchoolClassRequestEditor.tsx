@@ -5,94 +5,133 @@ import { ScientistOfferById } from "../../queries/__generated__/ScientistOfferBy
 import { MultiDatePureDisplay, MultiDateSelector } from "../MultiDateDisplay";
 
 interface IProps {
+  requestId: number;
+  offerId: number;
+  startDate: Date;
+  days: number[];
+  assignedDay: number | null;
 
-    requestId: number,
-    offerId: number,
-    startDate: Date,
-    days: number[],
+  disabled?: boolean;
 
-    disabled?: boolean,
+  commentTime?: string;
+  onChangeCommentTime?: (offerId: number, commentTime: string) => any;
 
-    commentTime?: string,
-    onChangeCommentTime?: (offerId: number, commentTime: string) => any,
-    
-    commentGeneral?: string,
-    onChangeCommentGeneral?: (offerId: number, commentGeneral: string) => any,
+  commentGeneral?: string;
+  onChangeCommentGeneral?: (offerId: number, commentGeneral: string) => any;
 
-    className?: string
+  className?: string;
 }
 
 export const SchoolClassRequestEditor: FC<IProps> = ({
+  assignedDay,
+  requestId,
+  offerId,
+  days,
+  disabled,
+  startDate,
+  commentTime,
+  onChangeCommentTime,
+  commentGeneral,
+  onChangeCommentGeneral,
 
-    requestId,
-    offerId,
-    days,
-    disabled,
-    startDate,
-    commentTime,
-    onChangeCommentTime,
-    commentGeneral,
-    onChangeCommentGeneral,
-
-    className
-
+  className,
 }) => {
+  const displayedOffer = useQuery<ScientistOfferById>(OFFER_BY_ID, {
+    variables: {
+      id: offerId,
+    },
+  });
 
-    const displayedOffer = useQuery<ScientistOfferById>(OFFER_BY_ID, {
-        variables: {
-            id: offerId
-        }
-    });
+  const displayedName = useMemo(() => {
+    if (
+      !displayedOffer.loading &&
+      displayedOffer.data != null &&
+      displayedOffer.data.ScientistOffer_by_pk != null
+    ) {
+      return displayedOffer.data.ScientistOffer_by_pk.title;
+    } else {
+      return "";
+    }
+  }, [displayedOffer]);
 
-    const displayedName = useMemo(() => {
-        if (!displayedOffer.loading && displayedOffer.data != null && displayedOffer.data.ScientistOffer_by_pk != null) {
-            return displayedOffer.data.ScientistOffer_by_pk.title;
-        } else {
-            return "";
-        }
-    }, [displayedOffer]);
+  const handleSelectCommentTime = useCallback(
+    (event) => {
+      const newComment = event.target.value;
+      if (onChangeCommentTime != null) {
+        onChangeCommentTime(offerId, newComment);
+      }
+    },
+    [onChangeCommentTime, offerId]
+  );
 
-    const handleSelectCommentTime = useCallback(event => {
-        const newComment = event.target.value;
-        if (onChangeCommentTime != null) {
-            onChangeCommentTime(offerId, newComment);
-        }
-    }, [onChangeCommentTime, offerId]);
+  const handleSelectCommentGeneral = useCallback(
+    (event) => {
+      const newComment = event.target.value;
+      if (onChangeCommentGeneral != null) {
+        onChangeCommentGeneral(offerId, newComment);
+      }
+    },
+    [onChangeCommentGeneral, offerId]
+  );
 
-    const handleSelectCommentGeneral = useCallback(event => {
-        const newComment = event.target.value;
-        if (onChangeCommentGeneral != null) {
-            onChangeCommentGeneral(offerId, newComment);
-        }
-    }, [onChangeCommentGeneral, offerId]);
+  const assignedDayArray = useMemo(
+    () => (assignedDay != null ? [assignedDay] : []),
+    [assignedDay]
+  );
 
-    return <div className={className || ""}>
-        
-        <div className="flex gap-3">
+  return (
+    <div className={className || ""}>
+      <div className="flex gap-3">
+        <div className="w-1/2 truncate font-bold" title={displayedName}>
+          {displayedName}
+        </div>
 
-            <div className="w-1/2 truncate font-bold" title={displayedName}>
-                {displayedName}
-            </div>
-
-            <div className="w-1/2">
-                <MultiDatePureDisplay
-                    days={days}
+        {assignedDay == null && (
+          <div className="w-1/2">
+            Gewünschte Tage:{" "}
+            <MultiDatePureDisplay days={days} startDate={startDate} />
+          </div>
+        )}
+        {assignedDay != null && (
+          <div className="w-1/2">
+            {assignedDay === -1 && (
+              <div>Leider konnte dieser Wunsch nicht erfüllt werden.</div>
+            )}
+            {assignedDay !== -1 && (
+              <div>
+                Der Wissenschaftler wurde Ihnen am{" "}
+                <span className="font-bold">
+                  <MultiDatePureDisplay
+                    days={assignedDayArray}
                     startDate={startDate}
-                />
-            </div>
+                  />
+                </span>{" "}
+                zugewiesen.
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
-        </div>
+      <div className="flex gap-3 mt-2">
+        <div>Kommentar Zeitraum</div>
+        <input
+          disabled={disabled}
+          className="w-96 border border-black"
+          type="text"
+          value={commentTime || ""}
+          onChange={handleSelectCommentTime}
+        />
 
-        <div className="flex gap-3 mt-2">
-            <div>Kommentar Zeitraum</div>
-            <input disabled={disabled} className="w-96 border border-black" type="text" value={commentTime || ""} onChange={handleSelectCommentTime} />
-
-            <div>Nachricht</div>
-            <input disabled={disabled} className="border flex-grow border-black" type="text" value={commentGeneral || ""} onChange={handleSelectCommentGeneral} />
-        </div>
-
-
+        <div>Nachricht</div>
+        <input
+          disabled={disabled}
+          className="border flex-grow border-black"
+          type="text"
+          value={commentGeneral || ""}
+          onChange={handleSelectCommentGeneral}
+        />
+      </div>
     </div>
-
-
-}
+  );
+};

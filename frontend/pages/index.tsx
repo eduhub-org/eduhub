@@ -60,7 +60,7 @@ const Home: FC = () => {
           <ClientOnly>
             <OnlyLoggedOut>
               <div className="flex justify-center mb-12">
-                <Link href="/register">
+                <Link href="/myrequests">
                   <a className="flex">
                     <Button filled>{t("registerNow")}</Button>
                   </a>

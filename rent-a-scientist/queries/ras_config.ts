@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 
 export interface RSAConfig {
-  programId: number,
-  start: Date,
-  end: Date
+  programId: number;
+  start: Date;
+  end: Date;
 }
 
 export const QUERY_RSA_CONFIG = gql`

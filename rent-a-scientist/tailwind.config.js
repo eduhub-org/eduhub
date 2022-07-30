@@ -13,7 +13,7 @@ module.exports = {
         "rsa-black": "#222222",
         "rsa-background": "rgb(149, 193, 31)",
         "rsa-green": "rgb(149, 193, 31)",
-        "rsa-blue": "rgb(0, 63, 103)"
+        "rsa-blue": "rgb(0, 63, 103)",
       },
     },
     fontFamily: {

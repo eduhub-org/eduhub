@@ -3,7 +3,6 @@ import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance, KeycloakTokenParsed } from "keycloak-js";
 import { useEffect } from "react";
 
-
 const UPDATE_USER = gql`
   mutation update_User($id: ID!) {
     updateFromKeycloak(userid: $id)
@@ -17,12 +16,13 @@ export const useIsLoggedIn = (): boolean => {
   useEffect(() => {
     if (keycloak !== undefined) {
       keycloak.onAuthSuccess = () => {
-        const parsedToken: KeycloakTokenParsed | undefined = keycloak?.tokenParsed;
+        const parsedToken: KeycloakTokenParsed | undefined =
+          keycloak?.tokenParsed;
         console.log("call updateUser backend function", parsedToken?.sub);
-        updateUser({ variables: { id: parsedToken?.sub} });
-      }
+        updateUser({ variables: { id: parsedToken?.sub } });
+      };
     }
-  },[]); 
+  }, [keycloak, updateUser]);
 
   const token = keycloak?.token;
 

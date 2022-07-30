@@ -48,12 +48,16 @@ export const RegisterButton: FC = () => {
     router.push(new URL(url));
   }, [keycloak, router]);
 
-  return <>
-    {!isLoggedIn && <Button variant="contained" onClick={register}>Registrieren</Button>}
-  </>;
-
+  return (
+    <>
+      {!isLoggedIn && (
+        <Button variant="contained" onClick={register}>
+          Registrieren
+        </Button>
+      )}
+    </>
+  );
 };
-
 
 export const LoginButton: FC = () => {
   const isLoggedIn = useIsLoggedIn();
@@ -62,8 +66,16 @@ export const LoginButton: FC = () => {
 
   return (
     <>
-      {!isLoggedIn && <Button variant="contained" onClick={performLogin}>Anmelden</Button>}
-      {isLoggedIn && <Button variant="contained" onClick={performLogout}>Abmelden</Button>}
+      {!isLoggedIn && (
+        <Button variant="contained" onClick={performLogin}>
+          Anmelden
+        </Button>
+      )}
+      {isLoggedIn && (
+        <Button variant="contained" onClick={performLogout}>
+          Abmelden
+        </Button>
+      )}
     </>
   );
 };

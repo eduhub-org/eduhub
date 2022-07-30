@@ -64,3 +64,11 @@ update_permissions:
           id:
             _eq: X-Hasura-User-Id
   role: user_access
+delete_permissions:
+- permission:
+    filter:
+      Teacher:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
+  role: user_access

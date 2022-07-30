@@ -8,12 +8,12 @@ interface IProps {
   maximumSelections?: number;
   onClickRegister?: (offers: AllScientistOffers_ScientistOffer[]) => any;
   onClickRemove?: (offer: AllScientistOffers_ScientistOffer) => any;
-  className?: string
+  className?: string;
 }
 
 interface RegLineProps {
-  offer: AllScientistOffers_ScientistOffer,
-  onClickRemove?: (offer: AllScientistOffers_ScientistOffer) => any,
+  offer: AllScientistOffers_ScientistOffer;
+  onClickRemove?: (offer: AllScientistOffers_ScientistOffer) => any;
 }
 
 export const RegistrationLine: FC<RegLineProps> = ({
@@ -26,19 +26,27 @@ export const RegistrationLine: FC<RegLineProps> = ({
     }
   }, [onClickRemove, offer]);
 
-  return <div title={offer.description} className="w-full truncate">
-    <span onClick={handleRemove} className="text-red-600 cursor-pointer" title="Entfernen">X</span> {" -"} {offer.title}
-  </div>
-}
+  return (
+    <div title={offer.description} className="w-full truncate">
+      <span
+        onClick={handleRemove}
+        className="text-red-600 cursor-pointer"
+        title="Entfernen"
+      >
+        X
+      </span>{" "}
+      {" -"} {offer.title}
+    </div>
+  );
+};
 
 export const RegistrationSelection: FC<IProps> = ({
   selectedOffers,
   maximumSelections,
   onClickRegister,
   onClickRemove,
-  className
+  className,
 }) => {
-
   const offers = useMemo(() => {
     return selectedOffers || [];
   }, [selectedOffers]);
@@ -52,42 +60,53 @@ export const RegistrationSelection: FC<IProps> = ({
   }, [offers, maxiSelections]);
 
   const handleRegister = useCallback(() => {
-
     if (onClickRegister) {
       onClickRegister(offers);
     }
-
   }, [onClickRegister, offers]);
 
-  const handleRemove = useCallback((offer: AllScientistOffers_ScientistOffer) => {
-    if (onClickRemove) {
-      onClickRemove(offer);
-    }
-  }, [onClickRemove]);
+  const handleRemove = useCallback(
+    (offer: AllScientistOffers_ScientistOffer) => {
+      if (onClickRemove) {
+        onClickRemove(offer);
+      }
+    },
+    [onClickRemove]
+  );
 
-  return <div className={className}>
-    <div>Gewählt: <span className={canNotRegister ? "text-red-600" : ""}>{offers.length} / {maxiSelections}</span> </div>
-
-    <div className="lg:grid grid-cols-4">
-
-      <div className="h-32 col-span-3 overflow-auto">
-        {offers.map((offer) => <RegistrationLine onClickRemove={handleRemove} offer={offer} key={offer.id} />)}
+  return (
+    <div className={className}>
+      <div>
+        Gewählt:{" "}
+        <span className={canNotRegister ? "text-red-600" : ""}>
+          {offers.length} / {maxiSelections}
+        </span>{" "}
       </div>
 
-      <div className="grid-cols-1">
-
-        <div>
-          Maximal {maxiSelections} Optionen wählen.
+      <div className="lg:grid grid-cols-4">
+        <div className="h-32 col-span-3 overflow-auto">
+          {offers.map((offer) => (
+            <RegistrationLine
+              onClickRemove={handleRemove}
+              offer={offer}
+              key={offer.id}
+            />
+          ))}
         </div>
 
-        <Button className="w-full" variant="outlined" disabled={canNotRegister} onClick={handleRegister}>
-          Anmelden
-        </Button>
+        <div className="grid-cols-1">
+          <div>Maximal {maxiSelections} Optionen wählen.</div>
 
+          <Button
+            className="w-full"
+            variant="outlined"
+            disabled={canNotRegister}
+            onClick={handleRegister}
+          >
+            Anmelden
+          </Button>
+        </div>
       </div>
-
-
-    </div>  
-
-  </div>;
+    </div>
+  );
 };

@@ -3,19 +3,19 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { SchoolClass_insert_input } from "./../../__generated__/globalTypes";
+import { SchoolClassRequest_insert_input } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: InsertClassRequests
 // ====================================================
 
-export interface InsertClassRequests_insert_SchoolClass_returning {
-  __typename: "SchoolClass";
+export interface InsertClassRequests_insert_SchoolClassRequest_returning {
+  __typename: "SchoolClassRequest";
   id: number;
 }
 
-export interface InsertClassRequests_insert_SchoolClass {
-  __typename: "SchoolClass_mutation_response";
+export interface InsertClassRequests_insert_SchoolClassRequest {
+  __typename: "SchoolClassRequest_mutation_response";
   /**
    * number of rows affected by the mutation
    */
@@ -23,16 +23,16 @@ export interface InsertClassRequests_insert_SchoolClass {
   /**
    * data from the rows affected by the mutation
    */
-  returning: InsertClassRequests_insert_SchoolClass_returning[];
+  returning: InsertClassRequests_insert_SchoolClassRequest_returning[];
 }
 
 export interface InsertClassRequests {
   /**
-   * insert data into the table: "SchoolClass"
+   * insert data into the table: "SchoolClassRequest"
    */
-  insert_SchoolClass: InsertClassRequests_insert_SchoolClass | null;
+  insert_SchoolClassRequest: InsertClassRequests_insert_SchoolClassRequest | null;
 }
 
 export interface InsertClassRequestsVariables {
-  inputs: SchoolClass_insert_input[];
+  inputs: SchoolClassRequest_insert_input[];
 }
