@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { FC } from "react";
 import { ClientOnly } from "./common/ClientOnly";
-import { OnlyAdmin, OnlyLoggedIn } from "./common/OnlyLoggedIn";
+import { OnlyAdmin } from "./common/OnlyLoggedIn";
 
 export const Footer: FC = () => {
   return (
@@ -11,6 +11,7 @@ export const Footer: FC = () => {
 
         <ClientOnly>
           <OnlyAdmin>
+            <Link href="/matching">Matchingbereich</Link>
             <Link href="/admin">Adminbereich</Link>
           </OnlyAdmin>
         </ClientOnly>

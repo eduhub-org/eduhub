@@ -12,11 +12,16 @@ insert_permissions:
 - permission:
     backend_only: false
     check:
-      SchoolClass:
-        Teacher:
-          User:
-            id:
-              _eq: X-Hasura-User-Id
+      _and:
+      - SchoolClass:
+          Teacher:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+      - ScientistOffer:
+          Program:
+            visibility:
+              _eq: true
     columns:
     - possibleDays
     - assigned_day

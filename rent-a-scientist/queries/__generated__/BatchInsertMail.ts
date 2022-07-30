@@ -3,16 +3,18 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { MailLog_insert_input } from "./../../__generated__/globalTypes";
+
 // ====================================================
-// GraphQL mutation operation: InsertMailLog
+// GraphQL mutation operation: BatchInsertMail
 // ====================================================
 
-export interface InsertMailLog_insert_MailLog_returning {
+export interface BatchInsertMail_insert_MailLog_returning {
   __typename: "MailLog";
   id: number;
 }
 
-export interface InsertMailLog_insert_MailLog {
+export interface BatchInsertMail_insert_MailLog {
   __typename: "MailLog_mutation_response";
   /**
    * number of rows affected by the mutation
@@ -21,22 +23,16 @@ export interface InsertMailLog_insert_MailLog {
   /**
    * data from the rows affected by the mutation
    */
-  returning: InsertMailLog_insert_MailLog_returning[];
+  returning: BatchInsertMail_insert_MailLog_returning[];
 }
 
-export interface InsertMailLog {
+export interface BatchInsertMail {
   /**
    * insert data into the table: "MailLog"
    */
-  insert_MailLog: InsertMailLog_insert_MailLog | null;
+  insert_MailLog: BatchInsertMail_insert_MailLog | null;
 }
 
-export interface InsertMailLogVariables {
-  subject: string;
-  content: string;
-  from: string;
-  cc?: string | null;
-  bcc?: string | null;
-  to: string;
-  status: string;
+export interface BatchInsertMailVariables {
+  objects: MailLog_insert_input[];
 }

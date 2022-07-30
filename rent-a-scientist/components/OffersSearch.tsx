@@ -228,14 +228,24 @@ export const OffersSearch: FC<IProps> = ({ className }) => {
             </div>
           </div>
 
-          <h1 className="mt-4 text-2xl font-bold">Kursauswahlstatus</h1>
+          {rsaConfig.visibility && (
+            <>
+              <h1 className="mt-4 text-2xl font-bold">Kursauswahlstatus</h1>
+              <RegistrationSelection
+                selectedOffers={selectedOffersList}
+                className="mb-2"
+                onClickRemove={handleRemoveSelection}
+                onClickRegister={handleRegister}
+              />
+            </>
+          )}
 
-          <RegistrationSelection
-            selectedOffers={selectedOffersList}
-            className="mb-2"
-            onClickRemove={handleRemoveSelection}
-            onClickRegister={handleRegister}
-          />
+          {!rsaConfig.visibility && (
+            <div className="mt-4 text-xl font-bold">
+              Leider ist die Anmeldephase vorbei. Sie können hier aber weiterhin
+              die Angebote einsehen
+            </div>
+          )}
 
           <h1 className="mt-4 text-2xl font-bold">
             Kursoptionen für Ihre Klasse

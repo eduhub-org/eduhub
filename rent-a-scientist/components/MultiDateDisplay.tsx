@@ -30,7 +30,7 @@ const rangeGroups = (indices: number[]) => {
     }, [] as number[][]);
 };
 
-const dayFormat = (dnum: number, startDate: Date) => {
+export const dayFormat = (dnum: number, startDate: Date) => {
   const doffset = dnum - 1;
   const dayDate = new Date(startDate);
   dayDate.setDate(startDate.getDate() + doffset);

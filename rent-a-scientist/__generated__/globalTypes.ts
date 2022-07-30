@@ -330,6 +330,45 @@ export enum LocationOption_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "MailLog"
+ */
+export enum MailLog_constraint {
+  Mail_pkey = "Mail_pkey",
+}
+
+/**
+ * update columns of table "MailLog"
+ */
+export enum MailLog_update_column {
+  bcc = "bcc",
+  cc = "cc",
+  content = "content",
+  created_at = "created_at",
+  from = "from",
+  id = "id",
+  status = "status",
+  subject = "subject",
+  templateId = "templateId",
+  to = "to",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "MailStatus"
+ */
+export enum MailStatus_constraint {
+  MailStatus_pkey = "MailStatus_pkey",
+}
+
+/**
+ * update columns of table "MailStatus"
+ */
+export enum MailStatus_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
  * unique or primary key constraints on table "MotivationRating"
  */
 export enum MotivationRating_constraint {
@@ -462,7 +501,9 @@ export enum RentAScientistConfig_constraint {
  */
 export enum RentAScientistConfig_update_column {
   id = "id",
+  mailFrom = "mailFrom",
   program_id = "program_id",
+  test_operation = "test_operation",
 }
 
 /**
@@ -1558,6 +1599,100 @@ export interface LocationOption_on_conflict {
 }
 
 /**
+ * input type for inserting array relation for remote table "MailLog"
+ */
+export interface MailLog_arr_rel_insert_input {
+  data: MailLog_insert_input[];
+  on_conflict?: MailLog_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "MailLog". All fields are combined with a logical 'AND'.
+ */
+export interface MailLog_bool_exp {
+  MailStatus?: MailStatus_bool_exp | null;
+  _and?: MailLog_bool_exp[] | null;
+  _not?: MailLog_bool_exp | null;
+  _or?: MailLog_bool_exp[] | null;
+  bcc?: String_comparison_exp | null;
+  cc?: String_comparison_exp | null;
+  content?: String_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  from?: String_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  status?: String_comparison_exp | null;
+  subject?: String_comparison_exp | null;
+  templateId?: Int_comparison_exp | null;
+  to?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "MailLog"
+ */
+export interface MailLog_insert_input {
+  MailStatus?: MailStatus_obj_rel_insert_input | null;
+  bcc?: string | null;
+  cc?: string | null;
+  content?: string | null;
+  created_at?: any | null;
+  from?: string | null;
+  id?: number | null;
+  status?: string | null;
+  subject?: string | null;
+  templateId?: number | null;
+  to?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * on_conflict condition type for table "MailLog"
+ */
+export interface MailLog_on_conflict {
+  constraint: MailLog_constraint;
+  update_columns: MailLog_update_column[];
+  where?: MailLog_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "MailStatus". All fields are combined with a logical 'AND'.
+ */
+export interface MailStatus_bool_exp {
+  MailLogs?: MailLog_bool_exp | null;
+  _and?: MailStatus_bool_exp[] | null;
+  _not?: MailStatus_bool_exp | null;
+  _or?: MailStatus_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "MailStatus"
+ */
+export interface MailStatus_insert_input {
+  MailLogs?: MailLog_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "MailStatus"
+ */
+export interface MailStatus_obj_rel_insert_input {
+  data: MailStatus_insert_input;
+  on_conflict?: MailStatus_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "MailStatus"
+ */
+export interface MailStatus_on_conflict {
+  constraint: MailStatus_constraint;
+  update_columns: MailStatus_update_column[];
+  where?: MailStatus_bool_exp | null;
+}
+
+/**
  * Boolean expression to filter rows from the table "MotivationRating". All fields are combined with a logical 'AND'.
  */
 export interface MotivationRating_bool_exp {
@@ -1881,7 +2016,9 @@ export interface RentAScientistConfig_bool_exp {
   _not?: RentAScientistConfig_bool_exp | null;
   _or?: RentAScientistConfig_bool_exp[] | null;
   id?: Int_comparison_exp | null;
+  mailFrom?: String_comparison_exp | null;
   program_id?: Int_comparison_exp | null;
+  test_operation?: Boolean_comparison_exp | null;
 }
 
 /**
@@ -1890,7 +2027,9 @@ export interface RentAScientistConfig_bool_exp {
 export interface RentAScientistConfig_insert_input {
   Program?: Program_obj_rel_insert_input | null;
   id?: number | null;
+  mailFrom?: string | null;
   program_id?: number | null;
+  test_operation?: boolean | null;
 }
 
 /**

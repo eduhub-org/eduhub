@@ -30,6 +30,9 @@ export interface MyRequests_SchoolClassRequest {
   id: number;
   offerId: number;
   possibleDays: any;
+  /**
+   * Needs to be one of the possibleDays values to be valid. -1 is used as value to indicate rejection.
+   */
   assigned_day: number | null;
   commentTime: string | null;
   commentGeneral: string | null;

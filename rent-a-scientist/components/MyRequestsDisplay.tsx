@@ -4,6 +4,7 @@ import { FC, useCallback, useMemo } from "react";
 import { IoMdTrash } from "react-icons/io";
 import { useRoleMutation } from "../hooks/authedMutation";
 import { useUserQuery } from "../hooks/authedQuery";
+import { useRasConfig } from "../hooks/ras";
 import { DELETE_SCHOOL_CLASS, MY_REQUESTS } from "../queries/ras_teacher";
 import {
   DeleteSchoolClassById,
@@ -21,11 +22,13 @@ import {
 interface SingleElementProps {
   requestSummary: SchoolClassRequestSummary;
   onTrash: (summary: SchoolClassRequestSummary) => any;
+  allowTrash: boolean;
 }
 
 export const MyRequestsDisplaySingleElement: FC<SingleElementProps> = ({
   requestSummary,
   onTrash,
+  allowTrash,
 }) => {
   const handleTrash = useCallback(() => {
     onTrash(requestSummary);
@@ -38,11 +41,13 @@ export const MyRequestsDisplaySingleElement: FC<SingleElementProps> = ({
           Anmeldung Nr. 2022{requestSummary.schoolClassId}
         </div>
 
-        <div>
-          <IconButton className="" onClick={handleTrash}>
-            <IoMdTrash />
-          </IconButton>
-        </div>
+        {allowTrash && (
+          <div>
+            <IconButton className="" onClick={handleTrash}>
+              <IoMdTrash />
+            </IconButton>
+          </div>
+        )}
       </div>
 
       <SchoolClassRequestsSummary requestSummary={requestSummary} />
@@ -63,6 +68,8 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
       role: "user_access",
     },
   });
+
+  const rsaConfig = useRasConfig();
 
   const myRequestsQuery = useUserQuery<MyRequests>(MY_REQUESTS);
 
@@ -123,7 +130,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
 
   const handleTrash = useCallback(
     async (summary: SchoolClassRequestSummary) => {
-      if (confirm("Wirklich die Klasse wieder abmelden?")) { // eslint-disable-line
+      if (rsaConfig.visibility && confirm("Wirklich die Klasse wieder abmelden?")) { // eslint-disable-line
         await deleteSchoolClass({
           variables: {
             id: summary.schoolClassId,
@@ -132,7 +139,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
         myRequestsQuery.refetch();
       }
     },
-    [deleteSchoolClass, myRequestsQuery]
+    [deleteSchoolClass, myRequestsQuery, rsaConfig]
   );
 
   return (
@@ -144,7 +151,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
         Anmeldungsnummer kontaktieren. <br />
         Um weitere Schulklassen anzumelden klicken Sie bitte{" "}
         <Link href="/">
-            <a className="underline">hier</a>
+          <a className="underline">hier</a>
         </Link>
         .
       </div>
@@ -157,6 +164,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
                 key={r.requestId}
                 requestSummary={r}
                 onTrash={handleTrash}
+                allowTrash={rsaConfig.visibility}
               />
             ))}
           </div>

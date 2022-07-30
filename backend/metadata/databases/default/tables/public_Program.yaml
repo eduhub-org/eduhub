@@ -33,6 +33,7 @@ select_permissions:
     - projectRecordUploadDeadline
     - shortTitle
     - title
+    - visibility
     filter: {}
   role: anonymous
 - permission:
