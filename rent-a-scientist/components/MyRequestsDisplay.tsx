@@ -144,7 +144,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
         Anmeldungsnummer kontaktieren. <br />
         Um weitere Schulklassen anzumelden klicken Sie bitte{" "}
         <Link href="/">
-          <a>hier</a>
+            <a className="underline">hier</a>
         </Link>
         .
       </div>
