@@ -5,8 +5,8 @@ export interface RSAConfig {
   start: Date;
   end: Date;
   visibility: boolean;
-  test_operation: boolean,
-  fromMail?: string
+  test_operation: boolean;
+  fromMail?: string;
 }
 
 export const QUERY_RSA_CONFIG = gql`

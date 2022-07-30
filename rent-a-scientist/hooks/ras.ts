@@ -17,8 +17,9 @@ export const useRasConfig = () => {
       end: lend || new Date(),
       visibility:
         qConfig?.data?.RentAScientistConfig_by_pk?.Program.visibility || false,
-      test_operation: qConfig?.data?.RentAScientistConfig_by_pk?.test_operation !== false,
-      fromMail: qConfig.data?.RentAScientistConfig_by_pk?.mailFrom || undefined
+      test_operation:
+        qConfig?.data?.RentAScientistConfig_by_pk?.test_operation !== false,
+      fromMail: qConfig.data?.RentAScientistConfig_by_pk?.mailFrom || undefined,
     };
     console.log("rsa config", result);
     return result;

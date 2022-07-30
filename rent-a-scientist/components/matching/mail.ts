@@ -1,10 +1,13 @@
 export interface MailDescription {
   subject: string;
   content: string;
-  to: string,
+  to: string;
 }
 
-export const createRejectScientist = (contactName: string, contactMail: string) => {
+export const createRejectScientist = (
+  contactName: string,
+  contactMail: string
+) => {
   const result: MailDescription = {
     to: contactMail,
     subject:
@@ -45,7 +48,8 @@ export interface ScientistSingleAcceptedInfo {
 }
 
 export const createAcceptScientist = (
-  contactName: string, contactMail: string,
+  contactName: string,
+  contactMail: string,
   acceptedDays: ScientistSingleAcceptedInfo[]
 ) => {
   const result: MailDescription = {
@@ -147,7 +151,12 @@ Ihr Rent-a-Scientist Team
   return result;
 };
 
-export const createRejectSchool = (contactName: string, contactMail: string, className: string, grade: number) => {
+export const createRejectSchool = (
+  contactName: string,
+  contactMail: string,
+  className: string,
+  grade: number
+) => {
   const result: MailDescription = {
     subject: "Rent-a-Scientist: Leider wurde kein Wissenschaftler gefunden",
     to: contactMail,

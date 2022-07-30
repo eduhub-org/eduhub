@@ -86,13 +86,12 @@ export const ALL_REQUESTS = gql`
 `;
 
 export const SCIENTIST_MAILS_INFO = gql`
-
   query ScientistMailInfos($pid: Int!) {
-    ScientistOffer(where: {Program: {id: { _eq: $pid }}}) {
+    ScientistOffer(where: { Program: { id: { _eq: $pid } } }) {
       id
       contactName
       contactEmail
-      
+
       SchoolClassRequests {
         id
         assigned_day
@@ -125,17 +124,13 @@ export const SCIENTIST_MAILS_INFO = gql`
       }
     }
   }
-
 `;
 
 export const SCHOOLS_MAILS_INFO = gql`
-
   query SchoolsMailsInfo($pid: Int!) {
-
-    SchoolClassRequest(where: {
-      ScientistOffer: {Program: {id: { _eq: $pid }}}
-    }) {
-
+    SchoolClassRequest(
+      where: { ScientistOffer: { Program: { id: { _eq: $pid } } } }
+    ) {
       id
       SchoolClass {
         id
@@ -163,7 +158,5 @@ export const SCHOOLS_MAILS_INFO = gql`
         timeWindow
       }
     }
-
   }
-
 `;

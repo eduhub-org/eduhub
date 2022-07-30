@@ -9,25 +9,26 @@ interface IProps {
 }
 
 const umlautMap: any = {
-  '\u00dc': 'UE',
-  '\u00c4': 'AE',
-  '\u00d6': 'OE',
-  '\u00fc': 'ue',
-  '\u00e4': 'ae',
-  '\u00f6': 'oe',
-  '\u00df': 'ss',
-}
+  Ü: "UE",
+  Ä: "AE",
+  Ö: "OE",
+  ü: "ue",
+  ä: "ae",
+  ö: "oe",
+  ß: "ss",
+};
 
-function replaceUmlaute(str: string) {
+const replaceUmlaute = (str: string) => {
   return str
     .replace(/[\u00dc|\u00c4|\u00d6][a-z]/g, (a) => {
       const big = umlautMap[a.slice(0, 1)];
       return big.charAt(0) + big.charAt(1).toLowerCase() + a.slice(1);
     })
-    .replace(new RegExp('['+Object.keys(umlautMap).join('|')+']',"g"),
+    .replace(
+      new RegExp("[" + Object.keys(umlautMap).join("|") + "]", "g"),
       (a) => umlautMap[a]
     );
-}
+};
 
 export const ScientistAvatar: FC<IProps> = ({
   scientist,
@@ -39,7 +40,14 @@ export const ScientistAvatar: FC<IProps> = ({
     <div className={className}>
       <div className="flex">
         <img
-          src={"/static/pics/" + replaceUmlaute(scientist.image?.trim().toLocaleLowerCase() || "99_wissenschaftzukunft") + ".jpg"}
+          src={
+            "/static/pics/" +
+            replaceUmlaute(
+              scientist.image?.trim().toLocaleLowerCase() ||
+                "99_wissenschaftzukunft"
+            ) +
+            ".jpg"
+          }
           width={130}
           height={130}
           className="w-[100px] h-[100px] lg:w-[140px] lg:h-[140px]"
