@@ -55,6 +55,20 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
+  build-rent-a-scientist-frontend:
+    name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
+    uses: ./.github/workflows/build-and-store-docker-image.yml
+    with:
+      DOCKERFILE_FOLDER: rent-a-scientist
+      IMAGE_NAME: rent-a-scientist
+      BRANCH: ${{ github.ref_name }}
+      PROJECT_ID: eduhub-staging-new
+      NEXT_PUBLIC_API_URL: 'https://hasura-staging.opencampus.sh/v1/graphql'
+      NEXT_PUBLIC_AUTH_URL: 'https://keycloak-staging.opencampus.sh'
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}
+
   zip-and-store-cloud-functions:
     name: Zip and Store Cloud Functions
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
