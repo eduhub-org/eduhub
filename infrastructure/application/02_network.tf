@@ -124,3 +124,11 @@ resource "cloudflare_record" "frontend" {
   type    = "A"
   value   = module.lb-http.external_ip
 }
+
+# Add a domain record for the Hasura service
+resource "cloudflare_record" "rent_a_scientist" {
+  zone_id = var.cloudflare_zone_id
+  name    = var.rent_a_scientist_service_name
+  type    = "A"
+  value   = module.lb-http.external_ip
+}

@@ -43,7 +43,11 @@ variable "hasura_service_name" {
   type        = string
 }
 variable "frontend_service_name" {
-  description = "Name for the service of the Hasura application"
+  description = "Name for the service of the edu frontend application"
+  type        = string
+}
+variable "rent_a_scientist_service_name" {
+  description = "Name for the service of the Rent-a-Scientist frontend application"
   type        = string
 }
 variable "cloudflare_zone_id" {
@@ -131,6 +135,13 @@ variable "hasura_memory_limit" {
 # Frontend
 variable "frontend_image_version" {
   description = "Version for the Frontend docker image"
+  type        = string
+  default     = "latest"
+}
+
+# Rent-A-Scientist
+variable "rent_a-scientist_image_version" {
+  description = "Version for the Rent-a-Scientist frontend docker image"
   type        = string
   default     = "latest"
 }
