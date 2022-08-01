@@ -1,8 +1,8 @@
 # Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the Frontend service
-resource "google_cloud_run_service_iam_policy" "frontend_noauth_invoker" {
-  location = google_cloud_run_service.frontend.location
-  project  = google_cloud_run_service.frontend.project
-  service  = google_cloud_run_service.frontend.name
+resource "google_cloud_run_service_iam_policy" "rent_a_scientist_noauth_invoker" {
+  location = google_cloud_run_service.rent_a_scientist.location
+  project  = google_cloud_run_service.rent_a_scientist.project
+  service  = google_cloud_run_service.rent_a_scientist.name
 
   policy_data = data.google_iam_policy.noauth_invoker.policy_data
 }

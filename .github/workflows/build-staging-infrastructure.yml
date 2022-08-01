@@ -83,7 +83,7 @@ jobs:
 
   deploy-application:
     name: "Deploy Application Infrastructure"
-    needs: [build-keycloak, build-backend, build-frontend, zip-and-store-cloud-functions]
+    needs: [build-keycloak, build-backend, build-frontend, build-rent-a-scientist-frontend, zip-and-store-cloud-functions]
     runs-on: ubuntu-latest
     defaults:
       run:
