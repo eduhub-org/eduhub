@@ -140,7 +140,7 @@ variable "frontend_image_version" {
 }
 
 # Rent-A-Scientist
-variable "rent_a-scientist_image_version" {
+variable "rent_a_scientist_image_version" {
   description = "Version for the Rent-a-Scientist frontend docker image"
   type        = string
   default     = "latest"
