@@ -134,7 +134,7 @@ module.exports = {
     "@typescript-eslint/prefer-for-of": "error",
     "@typescript-eslint/prefer-function-type": "error",
     "@typescript-eslint/prefer-namespace-keyword": "error",
-    "@typescript-eslint/restrict-plus-operands": "error",
+    "@typescript-eslint/restrict-plus-operands": "off",
     "@typescript-eslint/type-annotation-spacing": "off",
     "arrow-parens": ["off", "as-needed"],
     camelcase: "off",

@@ -1,43 +1,43 @@
 table:
-  schema: public
   name: Expert
+  schema: public
 object_relationships:
-  - name: User
-    using:
-      foreign_key_constraint_on: userId
+- name: User
+  using:
+    foreign_key_constraint_on: userId
 array_relationships:
-  - name: CourseInstructors
-    using:
-      foreign_key_constraint_on:
-        column: expertId
-        table:
-          schema: public
-          name: CourseInstructor
-  - name: SessionSpeakers
-    using:
-      foreign_key_constraint_on:
-        column: expertId
-        table:
-          schema: public
-          name: SessionSpeaker
+- name: CourseInstructors
+  using:
+    foreign_key_constraint_on:
+      column: expertId
+      table:
+        name: CourseInstructor
+        schema: public
+- name: SessionSpeakers
+  using:
+    foreign_key_constraint_on:
+      column: expertId
+      table:
+        name: SessionSpeaker
+        schema: public
 select_permissions:
-  - role: anonymous
-    permission:
-      columns:
-        - id
-        - userId
-        - description
-        - created_at
-        - updated_at
-      filter: {}
-      limit: 10
+- permission:
+    columns:
+    - id
+    - userId
+    - description
+    - created_at
+    - updated_at
+    filter: {}
+    limit: 10
+  role: anonymous
 update_permissions:
-  - role: user_access
-    permission:
-      columns:
-        - description
-      filter:
-        User:
-          id:
-            _eq: X-Hasura-User-Id
-      check: null
+- permission:
+    check: null
+    columns:
+    - description
+    filter:
+      User:
+        id:
+          _eq: X-Hasura-User-Id
+  role: user_access

@@ -1,0 +1,1 @@
+CREATE TABLE "public"."Teacher" ("id" serial NOT NULL, "forename" text NOT NULL, "surname" text NOT NULL, "email" text NOT NULL, "schoolId" text NOT NULL, PRIMARY KEY ("id") , FOREIGN KEY ("schoolId") REFERENCES "public"."School"("dstnr") ON UPDATE cascade ON DELETE cascade);COMMENT ON TABLE "public"."Teacher" IS E'a teacher that has enrolled into rent-a-scientist';

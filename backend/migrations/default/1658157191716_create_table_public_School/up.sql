@@ -1,0 +1,1 @@
+CREATE TABLE "public"."School" ("dstnr" text NOT NULL, "name" text NOT NULL, "schoolType" Text NOT NULL, "district" Text NOT NULL, "street" Text NOT NULL, "postalCode" Text NOT NULL, "city" Text NOT NULL, PRIMARY KEY ("dstnr") );COMMENT ON TABLE "public"."School" IS E'all the schools that exist in Schleswig Holstein. dstnr is the primary key: "Dienstnummer"';

@@ -1,0 +1,22 @@
+table:
+  name: ScientistOfferCategory
+  schema: public
+select_permissions:
+- permission:
+    columns:
+    - id
+    - name
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - id
+    - name
+    filter: {}
+  role: instructor_access
+- permission:
+    columns:
+    - id
+    - name
+    filter: {}
+  role: user_access

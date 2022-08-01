@@ -1,19 +1,19 @@
 table:
-  schema: public
   name: Employment
+  schema: public
 is_enum: true
 array_relationships:
-  - name: Users
-    using:
-      foreign_key_constraint_on:
-        column: employment
-        table:
-          schema: public
-          name: User
+- name: Users
+  using:
+    foreign_key_constraint_on:
+      column: employment
+      table:
+        name: User
+        schema: public
 select_permissions:
-  - role: anonymous
-    permission:
-      columns:
-        - value
-        - comment
-      filter: {}
+- permission:
+    columns:
+    - value
+    - comment
+    filter: {}
+  role: anonymous

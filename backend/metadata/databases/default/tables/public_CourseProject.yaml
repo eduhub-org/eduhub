@@ -1,72 +1,72 @@
 table:
-  schema: public
   name: CourseProject
+  schema: public
 object_relationships:
-  - name: Course
-    using:
-      foreign_key_constraint_on: courseId
-  - name: Project
-    using:
-      foreign_key_constraint_on: projectId
+- name: Course
+  using:
+    foreign_key_constraint_on: courseId
+- name: Project
+  using:
+    foreign_key_constraint_on: projectId
 insert_permissions:
-  - role: instructor_access
-    permission:
-      check:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-      columns:
-        - courseId
-        - id
-        - projectId
-      backend_only: false
-select_permissions:
-  - role: instructor_access
-    permission:
-      columns:
-        - id
-        - created_at
-        - updated_at
-        - courseId
-        - projectId
-      filter:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-  - role: user_access
-    permission:
-      columns:
-        - courseId
-        - created_at
-        - id
-        - projectId
-        - updated_at
-      filter:
-        Course:
-          CourseEnrollments:
+- permission:
+    backend_only: false
+    check:
+      Course:
+        CourseInstructors:
+          Expert:
             User:
               id:
                 _eq: X-Hasura-User-Id
+    columns:
+    - courseId
+    - id
+    - projectId
+  role: instructor_access
+select_permissions:
+- permission:
+    columns:
+    - id
+    - created_at
+    - updated_at
+    - courseId
+    - projectId
+    filter:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+  role: instructor_access
+- permission:
+    columns:
+    - courseId
+    - created_at
+    - id
+    - projectId
+    - updated_at
+    filter:
+      Course:
+        CourseEnrollments:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+  role: user_access
 update_permissions:
-  - role: instructor_access
-    permission:
-      columns:
-        - courseId
-      filter:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-      check: null
+- permission:
+    check: null
+    columns:
+    - courseId
+    filter:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+  role: instructor_access
 delete_permissions:
-  - role: instructor_access
-    permission:
-      filter: {}
+- permission:
+    filter: {}
+  role: instructor_access
