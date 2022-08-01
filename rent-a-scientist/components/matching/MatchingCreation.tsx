@@ -409,7 +409,7 @@ export const MatchingCreation: FC = () => {
 
     if (!missedData) {
       const bccemail = prompt( // eslint-disable-line
-        "Welche E-Mail soll für bcc verwendet werden? Nach dieser Eingabe wird das Matching finalisiert!"
+        "Welche E-Mail soll für bcc verwendet werden? Nach dieser Eingabe wird das Matching finalisiert und die Anmeldung für weitere Schulen abgeschaltet!"
       );
 
       if (bccemail !== undefined && bccemail !== null && bccemail.length > 0) {
