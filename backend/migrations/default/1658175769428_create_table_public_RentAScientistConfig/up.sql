@@ -1,0 +1,1 @@
+CREATE TABLE "public"."RentAScientistConfig" ("id" serial NOT NULL, "program_id" integer NOT NULL, PRIMARY KEY ("id") , FOREIGN KEY ("program_id") REFERENCES "public"."Program"("id") ON UPDATE cascade ON DELETE cascade);COMMENT ON TABLE "public"."RentAScientistConfig" IS E'table configures rent-a-scientist: Which program to use? Needs to be switched once a year...';

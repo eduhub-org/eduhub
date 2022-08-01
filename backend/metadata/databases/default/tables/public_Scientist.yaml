@@ -1,0 +1,39 @@
+table:
+  name: Scientist
+  schema: public
+array_relationships:
+- name: ScientistOfferRelations
+  using:
+    foreign_key_constraint_on:
+      column: scientistId
+      table:
+        name: ScientistOfferRelation
+        schema: public
+select_permissions:
+- permission:
+    columns:
+    - id
+    - forename
+    - image
+    - surname
+    - title
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - id
+    - forename
+    - image
+    - surname
+    - title
+    filter: {}
+  role: instructor_access
+- permission:
+    columns:
+    - id
+    - forename
+    - image
+    - surname
+    - title
+    filter: {}
+  role: user_access

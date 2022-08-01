@@ -1,93 +1,93 @@
 table:
-  schema: public
   name: Session
+  schema: public
 object_relationships:
-  - name: Course
-    using:
-      foreign_key_constraint_on: courseId
+- name: Course
+  using:
+    foreign_key_constraint_on: courseId
 array_relationships:
-  - name: AttendanceDocuments
-    using:
-      foreign_key_constraint_on:
-        column: sessionId
-        table:
-          schema: public
-          name: AttendanceSourceData
-  - name: Attendances
-    using:
-      foreign_key_constraint_on:
-        column: sessionId
-        table:
-          schema: public
-          name: Attendance
-  - name: SessionAddresses
-    using:
-      foreign_key_constraint_on:
-        column: sessionId
-        table:
-          schema: public
-          name: SessionAddress
-  - name: SessionSpeakers
-    using:
-      foreign_key_constraint_on:
-        column: sessionId
-        table:
-          schema: public
-          name: SessionSpeaker
+- name: AttendanceDocuments
+  using:
+    foreign_key_constraint_on:
+      column: sessionId
+      table:
+        name: AttendanceSourceData
+        schema: public
+- name: Attendances
+  using:
+    foreign_key_constraint_on:
+      column: sessionId
+      table:
+        name: Attendance
+        schema: public
+- name: SessionAddresses
+  using:
+    foreign_key_constraint_on:
+      column: sessionId
+      table:
+        name: SessionAddress
+        schema: public
+- name: SessionSpeakers
+  using:
+    foreign_key_constraint_on:
+      column: sessionId
+      table:
+        name: SessionSpeaker
+        schema: public
 insert_permissions:
-  - role: instructor_access
-    permission:
-      check:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-      columns:
-        - courseId
-        - description
-        - endDateTime
-        - id
-        - startDateTime
-        - title
-      backend_only: false
+- permission:
+    backend_only: false
+    check:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+    columns:
+    - courseId
+    - description
+    - endDateTime
+    - id
+    - startDateTime
+    - title
+  role: instructor_access
 select_permissions:
-  - role: anonymous
-    permission:
-      columns:
-        - courseId
-        - created_at
-        - description
-        - endDateTime
-        - id
-        - startDateTime
-        - title
-        - updated_at
-      filter: {}
+- permission:
+    columns:
+    - courseId
+    - created_at
+    - description
+    - endDateTime
+    - id
+    - startDateTime
+    - title
+    - updated_at
+    filter: {}
+  role: anonymous
 update_permissions:
-  - role: instructor_access
-    permission:
-      columns:
-        - description
-        - endDateTime
-        - startDateTime
-        - title
-      filter:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-      check: null
+- permission:
+    check: null
+    columns:
+    - description
+    - endDateTime
+    - startDateTime
+    - title
+    filter:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+  role: instructor_access
 delete_permissions:
-  - role: instructor_access
-    permission:
-      filter:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
+- permission:
+    filter:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+  role: instructor_access

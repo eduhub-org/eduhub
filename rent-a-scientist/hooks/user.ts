@@ -2,31 +2,10 @@ import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance } from "keycloak-js";
 import { useState } from "react";
 
-import { User } from "../queries/__generated__/User";
-import { USER } from "../queries/user";
-
-import { useAuthedQuery } from "./authedQuery";
-
 export const useUserId = () => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
 
   return keycloak?.subject;
-};
-export const useUser = () => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-
-  const { data, loading, error } = useAuthedQuery<User>(USER, {
-    variables: {
-      userId: keycloak?.subject,
-    },
-    skip: !keycloak?.authenticated,
-  });
-
-  if (data?.User_by_pk) {
-    return data.User_by_pk;
-  } else {
-    return undefined;
-  }
 };
 
 interface IUserProfile {

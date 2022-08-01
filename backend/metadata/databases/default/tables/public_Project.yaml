@@ -1,70 +1,70 @@
 table:
-  schema: public
   name: Project
+  schema: public
 object_relationships:
-  - name: ProjectType
-    using:
-      manual_configuration:
-        remote_table:
-          schema: public
-          name: ProjectType
-        insertion_order: null
-        column_mapping:
-          type: value
+- name: ProjectType
+  using:
+    manual_configuration:
+      column_mapping:
+        type: value
+      insertion_order: null
+      remote_table:
+        name: ProjectType
+        schema: public
 array_relationships:
-  - name: CourseProjects
-    using:
-      foreign_key_constraint_on:
-        column: projectId
-        table:
-          schema: public
-          name: CourseProject
-  - name: ProjectEnrollments
-    using:
-      foreign_key_constraint_on:
-        column: projectId
-        table:
-          schema: public
-          name: ProjectEnrollment
+- name: CourseProjects
+  using:
+    foreign_key_constraint_on:
+      column: projectId
+      table:
+        name: CourseProject
+        schema: public
+- name: ProjectEnrollments
+  using:
+    foreign_key_constraint_on:
+      column: projectId
+      table:
+        name: ProjectEnrollment
+        schema: public
 insert_permissions:
-  - role: instructor_access
-    permission:
-      check:
-        CourseProjects:
-          Course:
-            CourseInstructors:
-              Expert:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
-      columns:
-        - description
-        - id
-        - title
-        - type
-      backend_only: false
+- permission:
+    backend_only: false
+    check:
+      CourseProjects:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+    columns:
+    - description
+    - id
+    - title
+    - type
+  role: instructor_access
 select_permissions:
-  - role: user_access
-    permission:
-      columns:
-        - id
-        - created_at
-        - updated_at
-        - description
-        - type
-        - title
-      filter: {}
-      limit: 50
+- permission:
+    columns:
+    - id
+    - created_at
+    - updated_at
+    - description
+    - type
+    - title
+    filter: {}
+    limit: 50
+  role: user_access
 update_permissions:
-  - role: instructor_access
-    permission:
-      columns: []
-      filter:
-        CourseProjects:
-          Course:
-            CourseInstructors:
-              Expert:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
-      check: null
+- permission:
+    check: null
+    columns: []
+    filter:
+      CourseProjects:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+  role: instructor_access
