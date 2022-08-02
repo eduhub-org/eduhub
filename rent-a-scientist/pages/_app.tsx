@@ -17,6 +17,8 @@ const keycloakCfg = {
   clientId: "hasura",
 };
 
+console.log("Will use keycloakCfg", keycloakCfg);
+
 interface InitialProps {
   cookies: unknown;
 }
