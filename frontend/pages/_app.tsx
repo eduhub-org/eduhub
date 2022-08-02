@@ -1,8 +1,7 @@
 import { IncomingMessage } from "http";
 
 import { ApolloProvider } from "@apollo/client";
-import { SSRCookies, SSRKeycloakProvider } from "@react-keycloak/ssr";
-import cookie from "cookie";
+import { SessionProvider } from "next-auth/react";
 import { appWithTranslation } from "next-i18next";
 import type { AppContext, AppProps } from "next/app";
 import { FC } from "react";
@@ -25,29 +24,12 @@ const MyApp: FC<AppProps & InitialProps> & {
   getInitialProps: (ctx: AppContext) => Promise<Record<string, unknown>>;
 } = ({ Component, pageProps, cookies }) => {
   return (
-    <SSRKeycloakProvider
-      keycloakConfig={keycloakCfg}
-      persistor={SSRCookies(cookies)}
-    >
+    <SessionProvider session={pageProps.session}>
       <ApolloProvider client={client}>
         <Component {...pageProps} />
       </ApolloProvider>
-    </SSRKeycloakProvider>
+    </SessionProvider>
   );
-};
-
-const parseCookies = (req?: IncomingMessage) => {
-  if (!req || !req.headers) {
-    return {};
-  }
-  return cookie.parse(req.headers.cookie || "");
-};
-
-MyApp.getInitialProps = async (context: AppContext) => {
-  // Extract cookies from AppContext
-  return {
-    cookies: parseCookies(context?.ctx?.req),
-  };
 };
 
 // @ts-expect-error Typing does not work correctly here because of getInitialProps

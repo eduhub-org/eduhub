@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:17.0.0 as builder
+FROM quay.io/keycloak/keycloak:19.0 as builder
 
 ENV KC_METRICS_ENABLED=true
 ENV KC_FEATURES=token-exchange
@@ -8,7 +8,7 @@ COPY ./themes/opencampus /opt/keycloak/themes/opencampus
 COPY ./imports/edu-hub-realm.json /opt/keycloak/data/import
 RUN /opt/keycloak/bin/kc.sh build
 
-FROM quay.io/keycloak/keycloak:17.0.0
+FROM quay.io/keycloak/keycloak:19.0
 COPY --from=builder /opt/keycloak/lib/quarkus/ /opt/keycloak/lib/quarkus/
 COPY ./libs/keycloak-bcrypt-1.5.0.jar /opt/keycloak/providers/
 COPY ./themes/opencampus /opt/keycloak/themes/opencampus

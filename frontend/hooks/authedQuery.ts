@@ -1,9 +1,9 @@
 import { useQuery } from "@apollo/client";
 import { useKeycloak } from "@react-keycloak/ssr";
-import { KeycloakInstance } from "keycloak-js";
+import Keycloak from "keycloak-js";
 
 export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { keycloak } = useKeycloak<Keycloak>();
 
   const token = keycloak?.token;
 
@@ -25,7 +25,7 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
 };
 
 export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { keycloak } = useKeycloak<Keycloak>();
 
   const token = keycloak?.token;
 
@@ -47,7 +47,7 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
 };
 
 export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { keycloak } = useKeycloak<Keycloak>();
 
   const token = keycloak?.token;
 
