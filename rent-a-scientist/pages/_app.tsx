@@ -17,8 +17,6 @@ const keycloakCfg = {
   clientId: "hasura",
 };
 
-console.log("Will use keycloakCfg", keycloakCfg);
-
 interface InitialProps {
   cookies: unknown;
 }
@@ -26,6 +24,9 @@ interface InitialProps {
 const MyApp: FC<AppProps & InitialProps> & {
   getInitialProps: (ctx: AppContext) => Promise<Record<string, unknown>>;
 } = ({ Component, pageProps, cookies }) => {
+
+  console.log("Will use keycloakCfg", keycloakCfg);
+
   return (
     <SSRKeycloakProvider
       keycloakConfig={keycloakCfg}
