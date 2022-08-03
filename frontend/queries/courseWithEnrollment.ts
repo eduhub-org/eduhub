@@ -2,14 +2,14 @@ import { gql } from "@apollo/client";
 
 import { COURSE_FRAGMENT } from "./courseFragment";
 import { ENROLLMENT_FRAGMENT } from "./enrollmentFragment";
-import { PROGRAM_FRAGMENT } from "./programFragment";
+import { USER_PROGRAM_FRAGMENT } from "./programFragment";
 import { SESSION_FRAGMENT } from "./sessionFragement";
 
 export const COURSE_WITH_ENROLLMENT = gql`
   ${COURSE_FRAGMENT}
   ${ENROLLMENT_FRAGMENT}
   ${SESSION_FRAGMENT}
-  ${PROGRAM_FRAGMENT}
+  ${USER_PROGRAM_FRAGMENT}
   query CourseWithEnrollment($id: Int!, $userId: uuid!) {
     Course_by_pk(id: $id) {
       ...CourseFragment

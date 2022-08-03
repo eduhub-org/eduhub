@@ -4,8 +4,10 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { withStyles } from "@material-ui/core/styles";
 import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance } from "keycloak-js";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { FC, useCallback } from "react";
+import { useIsAdmin, useIsInstructor } from "../hooks/authentication";
 
 interface IProps {
   anchorElement: HTMLElement;
@@ -52,6 +54,13 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
     setVisible(false);
   }, [setVisible, router, keycloak]);
 
+  const closeMenu = useCallback(() => {
+    setVisible(false);
+  }, [setVisible]);
+
+  const isAdmin = useIsAdmin();
+  const isInstructor = useIsInstructor();
+
   return (
     <StyledMenu
       id="fade-menu"
@@ -62,11 +71,40 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       TransitionComponent={Fade}
       className="min-w-full"
     >
-      <MenuItem onClick={noop}>
-        <span className="text-lg font-bold">Profile</span>
-      </MenuItem>
+      {isAdmin && (
+        <MenuItem onClick={closeMenu}>
+          <Link href="/profiles">
+            <span className="w-full text-lg">Profile</span>
+          </Link>
+        </MenuItem>
+      )}
+
+      {isAdmin && (
+        <MenuItem onClick={closeMenu}>
+          <Link href="/programs">
+            <span className="w-full text-lg">Programme</span>
+          </Link>
+        </MenuItem>
+      )}
+
+      {isInstructor && (
+        <MenuItem onClick={closeMenu}>
+          <Link href="/courses/instructor">
+            <span className="w-full text-lg">Kurse (Instruktor)</span>
+          </Link>
+        </MenuItem>
+      )}
+
+      {isAdmin && (
+        <MenuItem onClick={closeMenu}>
+          <Link href="/courses">
+            <span className="w-full text-lg">Kurse (Admin)</span>
+          </Link>
+        </MenuItem>
+      )}
+
       <MenuItem onClick={logout}>
-        <span className="text-lg">Logout</span>
+        <span className="w-full text-lg">Logout</span>
       </MenuItem>
     </StyledMenu>
   );

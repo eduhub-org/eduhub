@@ -1,25 +1,35 @@
 type Query {
-  loadFile (
+  loadFile(
     path: String!
   ): loadFileOutput
 }
 
 type Mutation {
-  saveFile (
+  saveFile(
     base64file: String!
     filename: String!
   ): UploadResult
 }
 
+type Mutation {
+  updateFromKeycloak(
+    userid: ID!
+  ): result
+}
+
 type UploadResult {
-  link : String!
+  link: String!
 }
 
 type Output {
-  link : String!
+  link: String!
 }
 
 type loadFileOutput {
-  link : String!
+  link: String!
+}
+
+type result {
+  result: String!
 }
 

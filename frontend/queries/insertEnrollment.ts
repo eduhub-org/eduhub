@@ -31,3 +31,28 @@ export const INSERT_ENROLLMENT = gql`
     }
   }
 `;
+
+export const UPDATE_ENROLLMENT_RATING = gql`
+  mutation UpdateEnrollmentRating(
+    $enrollmentId: Int!
+    $rating: MotivationRating_enum!
+  ) {
+    update_CourseEnrollment_by_pk(
+      pk_columns: { id: $enrollmentId }
+      _set: { motivationRating: $rating }
+    ) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_ENROLLMENT_FOR_INVITE = gql`
+  mutation UpdateEnrollmentForInvite($enrollmentId: Int!, $expire: date!) {
+    update_CourseEnrollment_by_pk(
+      pk_columns: { id: $enrollmentId }
+      _set: { invitationExpirationDate: $expire, status: INVITED }
+    ) {
+      id
+    }
+  }
+`;

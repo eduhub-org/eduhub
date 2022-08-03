@@ -159,6 +159,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course {
    */
   programId: number | null;
   /**
+   * The number of maximum participants in the course.
+   */
+  maxParticipants: number | null;
+  /**
    * Heading of the the first course description field
    */
   headingDescriptionField1: string;

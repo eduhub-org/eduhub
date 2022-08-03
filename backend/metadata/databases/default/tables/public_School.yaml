@@ -1,0 +1,45 @@
+table:
+  name: School
+  schema: public
+array_relationships:
+- name: SchoolClasses
+  using:
+    foreign_key_constraint_on:
+      column: schoolId
+      table:
+        name: SchoolClass
+        schema: public
+select_permissions:
+- permission:
+    columns:
+    - city
+    - district
+    - dstnr
+    - name
+    - postalCode
+    - schoolType
+    - street
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - city
+    - district
+    - dstnr
+    - name
+    - postalCode
+    - schoolType
+    - street
+    filter: {}
+  role: instructor_access
+- permission:
+    columns:
+    - city
+    - district
+    - dstnr
+    - name
+    - postalCode
+    - schoolType
+    - street
+    filter: {}
+  role: user_access

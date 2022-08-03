@@ -11,6 +11,7 @@ import {
 import { CourseList_Course } from "../../queries/__generated__/CourseList";
 import { CourseListWithEnrollments_Course } from "../../queries/__generated__/CourseListWithEnrollments";
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from "../../queries/__generated__/CourseWithEnrollment";
+import { useIsInstructor } from "../../hooks/authentication";
 
 interface IProps {
   course: CourseList_Course | CourseListWithEnrollments_Course;
@@ -96,8 +97,14 @@ export const Tile: FC<IProps> = ({ course }) => {
       ? "bg-edu-course-current"
       : "bg-gray-100";
 
+  const isInstructor = useIsInstructor();
+
   return (
-    <Link href={`/course/${course.id}`}>
+    <Link
+      href={
+        isInstructor ? `/manage/course/${course.id}` : `/course/${course.id}`
+      }
+    >
       <a>
         <div className="relative w-60 h-72 rounded-2xl overflow-hidden">
           <div className="h-1/2 bg-edu-black">

@@ -2,7 +2,11 @@ import Image from "next/image";
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
-import { getWeekdayString } from "../../helpers/dateHelpers";
+import {
+  getEndTimeString,
+  getStartTimeString,
+  getWeekdayString,
+} from "../../helpers/dateHelpers";
 import mysteryImg from "../../public/images/common/mystery.svg";
 import languageIcon from "../../public/images/course/language.svg";
 import pinIcon from "../../public/images/course/pin.svg";
@@ -18,16 +22,8 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
   const { t, i18n } = useTranslation("course-page");
   const { t: tLanguage } = useTranslation("common");
 
-  const startTime =
-    course.startTime?.toLocaleTimeString(i18n.languages, {
-      hour: "numeric",
-      minute: "numeric",
-    }) ?? "";
-  const endTime =
-    course.endTime?.toLocaleTimeString(i18n.languages, {
-      hour: "numeric",
-      minute: "numeric",
-    }) ?? "";
+  const startTime = getStartTimeString(course, i18n);
+  const endTime = getEndTimeString(course, i18n);
 
   const instructor =
     course.CourseInstructors.length > 0

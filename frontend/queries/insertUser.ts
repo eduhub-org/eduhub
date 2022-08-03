@@ -26,3 +26,15 @@ export const INSERT_USER = gql`
     }
   }
 `;
+
+export const INSERT_A_USER = gql`
+  mutation InsertSingleUser($user: User_insert_input!) {
+    insert_User_one(object: $user) {
+      id
+      picture
+      email
+      firstName
+      lastName
+    }
+  }
+`;

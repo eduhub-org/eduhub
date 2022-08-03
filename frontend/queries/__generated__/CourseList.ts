@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { Course_bool_exp } from "./../../__generated__/globalTypes";
+
 // ====================================================
 // GraphQL query operation: CourseList
 // ====================================================
@@ -115,6 +117,10 @@ export interface CourseList_Course {
    */
   programId: number | null;
   /**
+   * The number of maximum participants in the course.
+   */
+  maxParticipants: number | null;
+  /**
    * Heading of the the first course description field
    */
   headingDescriptionField1: string;
@@ -153,4 +159,8 @@ export interface CourseList {
    * fetch data from the table: "Course"
    */
   Course: CourseList_Course[];
+}
+
+export interface CourseListVariables {
+  where: Course_bool_exp;
 }

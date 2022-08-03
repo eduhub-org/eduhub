@@ -25,6 +25,18 @@ actions:
   permissions:
   - role: instructor_access
   - role: user_access
+- name: updateFromKeycloak
+  definition:
+    kind: asynchronous
+    handler: '{{CLOUD_FUNCTION_LINK}}/updateFromKeycloak'
+    forward_client_headers: true
+    headers:
+    - name: secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  permissions:
+  - role: instructor_access
+  - role: user_access
+  - role: anonymous
 custom_types:
   enums: []
   input_objects: []
@@ -32,4 +44,5 @@ custom_types:
   - name: UploadResult
   - name: Output
   - name: loadFileOutput
+  - name: result
   scalars: []
