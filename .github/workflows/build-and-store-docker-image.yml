@@ -55,7 +55,7 @@ jobs:
       -
         name: Build Docker image
         if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/production'
-        run: docker build ./${{ inputs.DOCKERFILE_FOLDER }} --file ./${{ inputs.DOCKERFILE_FOLDER }}/Dockerfile --tag ${{ inputs.IMAGE_NAME }} --label "runnumber=${GITHUB_RUN_ID}" --build-arg NEXT_PUBLIC_API_URL=${{ inputs.NEXT_PUBLIC_API_URL }} --build-arg NEXT_PUBLIC_AUTH_URL=${{ inputs.NEXT_PUBLIC_AUTH_URL }}
+        run: docker build ./${{ inputs.DOCKERFILE_FOLDER }} --file ./${{ inputs.DOCKERFILE_FOLDER }}/Dockerfile --tag ${{ inputs.IMAGE_NAME }} --label "runnumber=${GITHUB_RUN_ID}"
       -
         name: Authenticate with Google Cloud Artifact Registry
         run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
