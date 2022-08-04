@@ -20,6 +20,7 @@ env:
 jobs:
 
   build-keycloak:
+    if: github.event_name == 'pull_request'
     name: Build and Store Keycloak Docker Image in Google Docker Repo
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
@@ -32,6 +33,7 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build-backend:
+    if: github.event_name == 'pull_request'
     name: Build and Store Backend Docker Image in Google Docker Repo
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
@@ -44,6 +46,7 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build-frontend:
+    if: github.event_name == 'pull_request'
     name: Build and Store Frontend Docker Image in Google Docker Repo
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
@@ -58,6 +61,7 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build-rent-a-scientist-frontend:
+    if: github.event_name == 'pull_request'
     name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
@@ -72,6 +76,7 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   zip-and-store-cloud-functions:
+    if: github.event_name == 'pull_request'
     name: Zip and Store Cloud Functions
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
     with:
