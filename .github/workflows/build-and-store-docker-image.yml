@@ -35,6 +35,8 @@ on:
 jobs:
 
   build-and-store:
+    if: github.event_name == 'pull_request'
+    
     name: Build and Store Docker Image in the Artifact Registry
     runs-on: ubuntu-latest
     env:
