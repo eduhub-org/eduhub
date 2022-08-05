@@ -2,8 +2,8 @@ import Fade from "@material-ui/core/Fade";
 import MaterialMenu, { MenuProps } from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import { withStyles } from "@material-ui/core/styles";
-import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance } from "keycloak-js";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FC, useCallback } from "react";
@@ -40,19 +40,7 @@ const noop = () => {
 };
 
 export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-  const router = useRouter();
-
   const hideMenu = useCallback(() => setVisible(false), [setVisible]);
-  const logout = useCallback(() => {
-    const url = keycloak?.createLogoutUrl({
-      redirectUri: window.location.href,
-    });
-
-    if (!url) return;
-    router.push(new URL(url));
-    setVisible(false);
-  }, [setVisible, router, keycloak]);
 
   const closeMenu = useCallback(() => {
     setVisible(false);
@@ -103,7 +91,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
-      <MenuItem onClick={logout}>
+      <MenuItem onClick={() => signOut()}>
         <span className="w-full text-lg">Logout</span>
       </MenuItem>
     </StyledMenu>

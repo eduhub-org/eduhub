@@ -8,21 +8,17 @@ import { Button } from "./common/Button";
 
 export const RegisterButton: FC = () => {
   const { t } = useTranslation();
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-  const router = useRouter();
+  // const { keycloak } = useKeycloak<KeycloakInstance>();
+  // const router = useRouter();
 
-  const register = useCallback(() => {
-    const url = keycloak?.createRegisterUrl({
-      redirectUri: window.location.href,
-    });
+  // const register = useCallback(() => {
+  //   const url = keycloak?.createRegisterUrl({
+  //     redirectUri: window.location.href,
+  //   });
 
-    if (!url) return;
-    router.push(new URL(url));
-  }, [keycloak, router]);
+  //   if (!url) return;
+  //   router.push(new URL(url));
+  // }, [keycloak, router]);
 
-  return (
-    <Button filled onClick={register}>
-      {t("registerButton.title")}
-    </Button>
-  );
+  return <Button filled>{t("registerButton.title")}</Button>;
 };

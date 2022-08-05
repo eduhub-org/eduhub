@@ -1,13 +1,12 @@
 import { useQuery } from "@apollo/client";
-import { useKeycloak } from "@react-keycloak/ssr";
 import Keycloak from "keycloak-js";
+import { useSession } from "next-auth/react";
 
 export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
-  const { keycloak } = useKeycloak<Keycloak>();
+  const { data } = useSession();
+  const { accessToken } = data;
 
-  const token = keycloak?.token;
-
-  const options = token
+  const options = accessToken
     ? {
         ...passedOptions,
         context: {
@@ -15,7 +14,7 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
           headers: {
             ...passedOptions?.context?.headers,
             "x-hasura-role": "admin",
-            Authorization: "Bearer " + token,
+            Authorization: "Bearer " + accessToken,
           },
         },
       }
@@ -25,11 +24,10 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
 };
 
 export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
-  const { keycloak } = useKeycloak<Keycloak>();
+  const { data } = useSession();
+  const { accessToken } = data;
 
-  const token = keycloak?.token;
-
-  const options = token
+  const options = accessToken
     ? {
         ...passedOptions,
         context: {
@@ -37,7 +35,7 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
           headers: {
             ...passedOptions?.context?.headers,
             "x-hasura-role": "instructor_access",
-            Authorization: "Bearer " + token,
+            Authorization: "Bearer " + accessToken,
           },
         },
       }
@@ -47,11 +45,10 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
 };
 
 export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
-  const { keycloak } = useKeycloak<Keycloak>();
+  const { data } = useSession();
+  const { accessToken } = data;
 
-  const token = keycloak?.token;
-
-  const options = token
+  const options = accessToken
     ? {
         ...passedOptions,
         context: {
@@ -59,7 +56,7 @@ export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
           headers: {
             ...passedOptions?.context?.headers,
             "x-hasura-role": "admin",
-            Authorization: "Bearer " + token,
+            Authorization: "Bearer " + accessToken,
           },
         },
       }

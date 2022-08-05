@@ -29,4 +29,20 @@ export default NextAuth({
       issuer: `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub`,
     }),
   ],
+  callbacks: {
+    jwt: async ({ token, account }) => {
+      // Persist the OAuth access_token to the token right after signin
+      if (account) {
+        console.log(account, token);
+        token.accessToken = account.access_token;
+      }
+      return token;
+    },
+    session: async ({ session, token, user }) => {
+      // Send properties to the client, like an access_token from a provider.
+      console.log(session, token);
+      session.accessToken = token.accessToken;
+      return session;
+    },
+  },
 });
