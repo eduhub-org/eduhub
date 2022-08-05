@@ -180,7 +180,7 @@ resource "google_cloudfunctions2_function" "update_from_keycloak" {
     entry_point = "updateFromKeycloak"
     environment_variables = {
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
-      LEYCLOAK_USER                = var.keycloak_user
+      KEYCLOAK_USER                = var.keycloak_user
       KEYCLOAK_URL                 = "https:\\${var.keycloak_service_name}.opencampus.sh"
       KEYCLOAK_PW                  = var.keycloak_pw
       HASURA_ENDPOINT              = "https:\\${var.hasura_service_name}.opencampus.sh/v1/graphql"
