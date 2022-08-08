@@ -78,12 +78,13 @@ resource "google_cloudfunctions2_function" "save_file" {
   name        = "save-file"
   description = "Loads a file from Google Cloud Storage"
 
+  environment_variables = {
+    HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+  }
+
   build_config {
     runtime     = "nodejs14"
     entry_point = "saveFile"
-    environment_variables = {
-      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
-    }
     source {
       storage_source {
         bucket = var.project_id
@@ -121,12 +122,13 @@ resource "google_cloudfunctions2_function" "send_mail" {
   name        = "send-mail"
   description = "Loads a file from Google Cloud Storage"
 
+  environment_variables = {
+    HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+  }
+
   build_config {
     runtime     = "nodejs14"
     entry_point = "sendMail"
-    environment_variables = {
-      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
-    }
     source {
       storage_source {
         bucket = var.project_id
@@ -164,15 +166,16 @@ resource "google_cloudfunctions2_function" "update_keycloak_profile" {
   name        = "update-keycloak-profile"
   description = "Updates the Keycloak profile on changes in Hasura"
 
+  environment_variables = {
+    HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+    LEYCLOAK_USER                = var.keycloak_user
+    KEYCLOAK_URL                 = "https:\\${var.keycloak_service_name}.opencampus.sh"
+    KEYCLOAK_PW                  = var.keycloak_pw
+  }
+
   build_config {
     runtime     = "nodejs14"
     entry_point = "updateKeycloakProfile"
-    environment_variables = {
-      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
-      LEYCLOAK_USER                = var.keycloak_user
-      KEYCLOAK_URL                 = "https:\\${var.keycloak_service_name}.opencampus.sh"
-      KEYCLOAK_PW                  = var.keycloak_pw
-    }
     source {
       storage_source {
         bucket = var.project_id
@@ -210,17 +213,18 @@ resource "google_cloudfunctions2_function" "update_from_keycloak" {
   name        = "update-from-keycloak"
   description = "Looks up keycloak user of given uuid and creates new hasura user if necessary or updates existing"
 
+  environment_variables = {
+    HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+    KEYCLOAK_USER                = var.keycloak_user
+    KEYCLOAK_URL                 = "https:\\${var.keycloak_service_name}.opencampus.sh"
+    KEYCLOAK_PW                  = var.keycloak_pw
+    HASURA_ENDPOINT              = "https:\\${var.hasura_service_name}.opencampus.sh/v1/graphql"
+    HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
+  }
+
   build_config {
     runtime     = "nodejs14"
     entry_point = "updateFromKeycloak"
-    environment_variables = {
-      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
-      KEYCLOAK_USER                = var.keycloak_user
-      KEYCLOAK_URL                 = "https:\\${var.keycloak_service_name}.opencampus.sh"
-      KEYCLOAK_PW                  = var.keycloak_pw
-      HASURA_ENDPOINT              = "https:\\${var.hasura_service_name}.opencampus.sh/v1/graphql"
-      HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
-    }
     source {
       storage_source {
         bucket = var.project_id
