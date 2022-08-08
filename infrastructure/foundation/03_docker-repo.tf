@@ -10,7 +10,7 @@ resource "google_artifact_registry_repository" "docker_repo" {
   format        = "DOCKER"
 }
 
-
+# Provide the Terraform service account with admin rights to the docker repository
 resource "google_artifact_registry_repository_iam_member" "terraform" {
   provider   = google-beta
   location   = google_artifact_registry_repository.docker_repo.location
@@ -18,6 +18,16 @@ resource "google_artifact_registry_repository_iam_member" "terraform" {
   role       = "roles/artifactregistry.repoAdmin"
   member     = "serviceAccount:${google_service_account.terraform.email}"
 }
+
+# Provide any user with reading rights for the docker repository
+resource "google_artifact_registry_repository_iam_member" "no_auth_reader" {
+  provider   = google-beta
+  location   = google_artifact_registry_repository.docker_repo.location
+  repository = google_artifact_registry_repository.docker_repo.name
+  role       = "roles/artifactregistry.reader"
+  member     = "allUsers"
+}
+
 
 # Create of a Google Cloud service account mainly to be used by GitHub to store the docker images
 # for the different applications

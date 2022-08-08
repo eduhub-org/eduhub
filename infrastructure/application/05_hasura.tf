@@ -77,6 +77,7 @@ resource "google_cloud_run_service" "hasura" {
         resources {
           limits = {
             memory = var.hasura_memory_limit
+            cpu    = "1000m"
           }
         }
         env {
@@ -104,8 +105,20 @@ resource "google_cloud_run_service" "hasura" {
           value = "storage-bucket"
         }
         env {
-          name  = "CLOUD_FUNCTION_LINK"
-          value = "https://${var.region}-${var.project_id}.cloudfunctions.net"
+          name  = "CLOUD_FUNCTION_LINK_LOAD_FILE"
+          value = google_cloudfunctions2_function.load_file.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_FILE"
+          value = google_cloudfunctions2_function.save_file.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK"
+          value = google_cloudfunctions2_function.update_from_keycloak.service_config[0].uri
+        }
+        env {
+          name = "CLOUD_FUNCTION_LINK_SEND_MAIL"
+          value = google_cloudfunctions2_function.send_mail.service_config[0].uri
         }
         env {
           name  = "HASURA_GRAPHQL_JWT_SECRET"
