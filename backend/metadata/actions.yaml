@@ -2,7 +2,7 @@ actions:
   - name: loadFile
     definition:
       kind: ""
-      handler: https://load-file-qvthfbr3za-ew.a.run.app
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_FILE}}'
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -15,7 +15,7 @@ actions:
   - name: saveFile
     definition:
       kind: asynchronous
-      handler: https://save-file-qvthfbr3za-ew.a.run.app
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_FILE}}'
       forward_client_headers: true
       headers:
         - name: secret
@@ -28,7 +28,7 @@ actions:
   - name: updateFromKeycloak
     definition:
       kind: asynchronous
-      handler: https://update-from-keycloak-qvthfbr3za-ew.a.run.app/
+      handler: '{{CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK}}'
       forward_client_headers: true
       headers:
         - name: secret
