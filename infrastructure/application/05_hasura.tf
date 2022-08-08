@@ -117,6 +117,10 @@ resource "google_cloud_run_service" "hasura" {
           value = google_cloudfunctions2_function.update_from_keycloak.service_config[0].uri
         }
         env {
+          name = "CLOUD_FUNCTION_LINK_SEND_MAIL"
+          value = google_cloudfunctions2_function.send_mail.https_trigger_url
+        }
+        env {
           name  = "HASURA_GRAPHQL_JWT_SECRET"
           value = "{ \"type\": \"RS256\", \"jwk_url\": \"https://${var.keycloak_service_name}.opencampus.sh/realms/edu-hub/protocol/openid-connect/certs\" }"
         }
