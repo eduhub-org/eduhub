@@ -118,7 +118,7 @@ resource "google_cloud_run_service" "hasura" {
         }
         env {
           name = "CLOUD_FUNCTION_LINK_SEND_MAIL"
-          value = google_cloudfunctions2_function.send_mail.https_trigger_url
+          value = google_cloudfunctions2_function.send_mail.service_config[0].uri
         }
         env {
           name  = "HASURA_GRAPHQL_JWT_SECRET"
