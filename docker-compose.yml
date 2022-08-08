@@ -51,7 +51,10 @@ services:
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: inherited_roles
-      CLOUD_FUNCTION_LINK: "https://europe-west3-edu-hub-staging.cloudfunctions.net"
+      CLOUD_FUNCTION_LINK_LOAD_FILE: "https://load-file-qvthfbr3za-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SAVE_FILE: "https://save-file-qvthfbr3za-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK: "https://update-from-keycloak-qvthfbr3za-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SEND_MAIL: "https://send-mail-qvthfbr3za-ew.a.run.app" 
     volumes:
       - ./backend/migrations:/hasura-migrations
       - ./backend/metadata:/hasura-metadata
