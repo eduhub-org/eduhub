@@ -24,7 +24,6 @@ interface InitialProps {
 const MyApp: FC<AppProps & InitialProps> & {
   getInitialProps: (ctx: AppContext) => Promise<Record<string, unknown>>;
 } = ({ Component, pageProps, cookies }) => {
-
   console.log("Will use keycloakCfg", keycloakCfg);
 
   return (
