@@ -106,15 +106,19 @@ resource "google_cloud_run_service" "hasura" {
         }
         env {
           name  = "CLOUD_FUNCTION_LINK_LOAD_FILE"
-          value = google_cloudfunctions2_function.load_file.https_trigger_url
+          value = google_cloudfunctions2_function.load_file.service_config[0].uri
         }
         env {
           name  = "CLOUD_FUNCTION_LINK_SAVE_FILE"
-          value = google_cloudfunctions2_function.save_file.https_trigger_url
+          value = google_cloudfunctions2_function.save_file.service_config[0].uri
         }
         env {
           name  = "CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK"
-          value = google_cloudfunctions2_function.update_from_keycloak.https_trigger_url
+          value = google_cloudfunctions2_function.update_from_keycloak.service_config[0].uri
+        }
+        env {
+          name = "CLOUD_FUNCTION_LINK_SEND_MAIL"
+          value = google_cloudfunctions2_function.send_mail.https_trigger_url
         }
         env {
           name  = "HASURA_GRAPHQL_JWT_SECRET"
