@@ -26,16 +26,16 @@ on:
         required: false
         type: string
       # ID of the used Terraform Cloud workspace
-      TF_WORKSPACE_ID:
-        required: true
-        type: string
+      #TF_WORKSPACE_ID:
+      #  required: true
+      #  type: string
     secrets:
       GCP_SERVICE_ACCOUNT_KEY:
         required: true
       GCP_REGION:
         required: true
-      TF_API_TOKEN:
-        required: true
+      #TF_API_TOKEN:
+      #  required: true
 
 jobs:
 
