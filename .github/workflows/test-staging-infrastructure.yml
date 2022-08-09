@@ -19,7 +19,6 @@ env:
 jobs:
 
   save-commit-sha:  
-    if: github.event_name == 'pull_request'
     name: Save SHA of current commit in Terraform Cloud
     runs-on: ubuntu-latest
     steps:
