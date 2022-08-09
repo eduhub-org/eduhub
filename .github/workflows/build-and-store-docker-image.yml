@@ -94,9 +94,9 @@ jobs:
           curl \
           --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
           --header "Content-Type: application/vnd.api+json" \
-          --request POST \
-          --data "{ \"data\": { \"id\":\"${{ inputs.TF_VAR_ID_COMMIT_SHA }}\", \"attributes\": { \"value\":\"mars\", }, \"type\":\"vars\" }}" \
-          https://app.terraform.io/api/v2/workspaces/${{ inputs.TF_WORKSPACE_ID }}/vars
+          --request PATCH \
+          --data "{ \"data\": { \"id\":\"${{ inputs.TF_VAR_ID_COMMIT_SHA }}\", \"attributes\": { \"value\":\"mars\" }, \"type\":\"vars\" }}" \
+          https://app.terraform.io/api/v2/workspaces/${{ inputs.TF_WORKSPACE_ID }}/vars/${{ inputs.TF_VAR_ID_COMMIT_SHA }}
       - 
         name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
