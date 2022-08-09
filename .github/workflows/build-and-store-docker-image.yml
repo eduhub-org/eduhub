@@ -91,7 +91,7 @@ jobs:
           --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
           --header "Content-Type: application/vnd.api+json" \
           --request POST \
-          --data "{ \"data\": {\"type\": \"vars\", \"attributes\": {\"key\": \"some_key\", \"value\": \"some_value\", \"description\": \"some description\", \"category\": \"terraform\", \"hcl\": false, \"sensitive\": false }, \"relationships\": { \"workspace\": {\"data\": {\"id\": \"${{ inputs.TF_WORKSPACE_ID }}\", \"type\": \"workspaces\"} } } } }" \
+          --data "{ \"data\": {\"type\": \"vars\", \"attributes\": {\"${{ inputs.IMAGE_NAME }}_SHA\": \"some_key\", \"value\": \"some_value\", \"Git commit SHA of the current Docker image\": \"some description\", \"category\": \"terraform\", \"hcl\": false, \"sensitive\": false }, \"relationships\": { \"workspace\": {\"data\": {\"id\": \"${{ inputs.TF_WORKSPACE_ID }}\", \"type\": \"workspaces\"} } } } }" \
           https://app.terraform.io/api/v2/vars
       - 
         name: Show Output
