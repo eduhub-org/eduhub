@@ -15,7 +15,9 @@ on:
       - staging
 
 env:
+  PROJECT_ID: eduhub-staging-new
   TF_WORKSPACE: eduhub-application-staging
+  TF_WORKSPACE_ID: ws-wVwkztBCRbphphYw
 
 jobs:
 
@@ -26,7 +28,8 @@ jobs:
       DOCKERFILE_FOLDER: backend
       IMAGE_NAME: backend
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: eduhub-staging-new
+      PROJECT_ID: $PROJECT_ID
+      TF_WORKSPACE_ID: $TF_WORKSPACE_ID
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
