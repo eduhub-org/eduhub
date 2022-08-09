@@ -29,7 +29,7 @@ jobs:
       IMAGE_NAME: backend
       BRANCH: ${{ github.ref_name }}
       PROJECT_ID: $PROJECT_ID
-      TF_WORKSPACE_ID: $TF_WORKSPACE_ID
+      TF_WORKSPACE_ID: $ {{ env.TF_WORKSPACE_ID }}
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
