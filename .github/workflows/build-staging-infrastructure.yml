@@ -16,6 +16,7 @@ on:
 
 env:
   TF_WORKSPACE: eduhub-application-staging
+  TF_WORKSPACE_ID: ws-wVwkztBCRbphphYw
 
 jobs:
 
