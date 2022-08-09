@@ -153,7 +153,7 @@ export const useUpdateCallback = <QueryType, QueryVariables>(
 // one for the primary key and one for the updated value
 export const useUpdateCallback2 = <QueryType, QueryVariables>(
   query: DocumentNode,
-  role: "admin" | "instructor
+  role: "admin" | "instructor",
   pkField: keyof QueryVariables,
   updateField: keyof QueryVariables,
   pkMapper: (pKSource: any) => any,
