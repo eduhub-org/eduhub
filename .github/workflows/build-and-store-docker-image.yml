@@ -31,7 +31,6 @@ on:
       GCP_REGION:
         required: true
 
-
 jobs:
 
   build-and-store:
@@ -80,7 +79,7 @@ jobs:
         name: Save GitHub-SHA of the image in Terraform Cloud variable
         run: |
           curl \
-          --header "Authorization: Bearer $TF_TOKEN" \
+          --header "Authorization: Bearer $TF_API_TOKEN" \
           --header "Content-Type: application/vnd.api+json" \
           --request POST \
           --data "{ \"data\": {\"type\": \"vars\", \"attributes\": {\"key\": \"some_key\", \"value\": \"some_value\", \"description\": \"some description\", \"category\": \"terraform\", \"hcl\": false, \"sensitive\": false }, \"relationships\": { \"workspace\": {\"data\": {\"id\": \"ws-wVwkztBCRbphphYw\", \"type\": \"workspaces\"} } } } }" \
