@@ -83,7 +83,7 @@ jobs:
       #     docker push $IMAGE_ID:$(git rev-parse --short "$GITHUB_SHA")
       # -
         name: Check input values
-        run: echo ${{ inputs.TF_WORKSPACE_ID }}
+        run: echo $inputs.TF_WORKSPACE_ID
       -
         name: Save GitHub-SHA of the image in Terraform Cloud variable
         run: |
