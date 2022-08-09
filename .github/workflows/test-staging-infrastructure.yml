@@ -30,4 +30,5 @@ jobs:
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
+      TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
 
