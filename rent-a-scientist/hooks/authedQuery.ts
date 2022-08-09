@@ -9,16 +9,16 @@ export const useUserQuery: typeof useQuery = (query, passedOptions) => {
 
   const options = token
     ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions?.context,
-          headers: {
-            ...passedOptions?.context?.headers,
-            "x-hasura-role": "user_access",
-            Authorization: "Bearer " + token,
-          },
+      ...passedOptions,
+      context: {
+        ...passedOptions?.context,
+        headers: {
+          ...passedOptions?.context?.headers,
+          "x-hasura-role": "user",
+          Authorization: "Bearer " + token,
         },
-      }
+      },
+    }
     : passedOptions;
 
   return useQuery(query, options);
@@ -31,16 +31,16 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
 
   const options = token
     ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions?.context,
-          headers: {
-            ...passedOptions?.context?.headers,
-            "x-hasura-role": "admin",
-            Authorization: "Bearer " + token,
-          },
+      ...passedOptions,
+      context: {
+        ...passedOptions?.context,
+        headers: {
+          ...passedOptions?.context?.headers,
+          "x-hasura-role": "admin",
+          Authorization: "Bearer " + token,
         },
-      }
+      },
+    }
     : passedOptions;
 
   return useQuery(query, options);
@@ -53,16 +53,16 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
 
   const options = token
     ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions?.context,
-          headers: {
-            ...passedOptions?.context?.headers,
-            "x-hasura-role": "instructor_access",
-            Authorization: "Bearer " + token,
-          },
+      ...passedOptions,
+      context: {
+        ...passedOptions?.context,
+        headers: {
+          ...passedOptions?.context?.headers,
+          "x-hasura-role": "instructor",
+          Authorization: "Bearer " + token,
         },
-      }
+      },
+    }
     : passedOptions;
 
   return useQuery(query, options);
@@ -75,16 +75,16 @@ export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
 
   const options = token
     ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions?.context,
-          headers: {
-            ...passedOptions?.context?.headers,
-            "x-hasura-role": "admin",
-            Authorization: "Bearer " + token,
-          },
+      ...passedOptions,
+      context: {
+        ...passedOptions?.context,
+        headers: {
+          ...passedOptions?.context?.headers,
+          "x-hasura-role": "admin",
+          Authorization: "Bearer " + token,
         },
-      }
+      },
+    }
     : passedOptions;
 
   return useQuery(query, options);
