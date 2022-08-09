@@ -25,20 +25,10 @@ on:
       NEXT_PUBLIC_AUTH_URL:
         required: false
         type: string
-      # ID of the used Terraform Cloud workspace
-      TF_WORKSPACE_ID:
-        required: true
-        type: string
-      # ID of the Terraform Cloud variable including the current commit SHA
-      TF_VAR_ID_COMMIT_SHA:
-        required: true
-        type: string
     secrets:
       GCP_SERVICE_ACCOUNT_KEY:
         required: true
       GCP_REGION:
-        required: true
-      TF_API_TOKEN:
         required: true
 
 jobs:
@@ -54,49 +44,37 @@ jobs:
       - 
         name: Check Out the Repository Branch
         uses: actions/checkout@v2
-      # - 
-      #   name: Authenticate to Google Cloud
-      #   id: 'auth'
-      #   uses: 'google-github-actions/auth@v0'
-      #   with:
-      #     credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-      #     project_id: ${{ inputs.PROJECT_ID }}
-      # -
-      #   name: Build Docker image
-      #   run: docker build ./${{ inputs.DOCKERFILE_FOLDER }} --file ./${{ inputs.DOCKERFILE_FOLDER }}/Dockerfile --tag ${{ inputs.IMAGE_NAME }} --label "runnumber=${GITHUB_RUN_ID}" --build-arg NEXT_PUBLIC_API_URL=${{ inputs.NEXT_PUBLIC_API_URL }} --build-arg NEXT_PUBLIC_AUTH_URL=${{ inputs.NEXT_PUBLIC_AUTH_URL }}
-      # -
-      #   name: Authenticate with Google Cloud Artifact Registry
-      #   run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
-      # -
-      #   name: Push Docker Image to Google Artifact Registry
-      #   run: |
-      #     IMAGE_ID=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/docker-repo/${{ inputs.IMAGE_NAME }}
-      #     # Change all uppercase to lowercase
-      #     IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-      #     # Strip git ref prefix from version
-      #     VERSION=$(echo "${{ inputs.BRANCH }}" | sed -e 's,.*/\(.*\),\1,')
-      #     # Strip "v" prefix from tag name
-      #     [[ "${{ inputs.BRANCH }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-      #     # Use Docker `latest` tag convention
-      #     [ "$VERSION" == "production" ] && VERSION=latest
-      #     echo IMAGE_ID=$IMAGE_ID
-      #     echo VERSION=$VERSION
-      #     docker tag ${{ inputs.IMAGE_NAME }} $IMAGE_ID:$VERSION
-      #     docker tag ${{ inputs.IMAGE_NAME }} $IMAGE_ID:$(git rev-parse --short "$GITHUB_SHA")
-      #     docker push $IMAGE_ID:$VERSION
-      #     docker push $IMAGE_ID:$(git rev-parse --short "$GITHUB_SHA")
+      - 
+        name: Authenticate to Google Cloud
+        id: 'auth'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          project_id: ${{ inputs.PROJECT_ID }}
       -
-        name: Check input values
-        run: echo ${{ inputs.TF_WORKSPACE_ID }}
+        name: Build Docker image
+        run: docker build ./${{ inputs.DOCKERFILE_FOLDER }} --file ./${{ inputs.DOCKERFILE_FOLDER }}/Dockerfile --tag ${{ inputs.IMAGE_NAME }} --label "runnumber=${GITHUB_RUN_ID}" --build-arg NEXT_PUBLIC_API_URL=${{ inputs.NEXT_PUBLIC_API_URL }} --build-arg NEXT_PUBLIC_AUTH_URL=${{ inputs.NEXT_PUBLIC_AUTH_URL }}
       -
-        name: Save GitHub-SHA of the image in Terraform Cloud variable
+        name: Authenticate with Google Cloud Artifact Registry
+        run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+      -
+        name: Push Docker Image to Google Artifact Registry
         run: |
-          curl \
-          --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
-          --header "Content-Type: application/vnd.api+json" \
-          --request PATCH \
-          --data "{ \"data\": { \"id\":\"${{ inputs.TF_VAR_ID_COMMIT_SHA }}\", \"attributes\": { \"value\":\"mars\" }, \"type\":\"vars\" }}" \
-          https://app.terraform.io/api/v2/workspaces/${{ inputs.TF_WORKSPACE_ID }}/vars/${{ inputs.TF_VAR_ID_COMMIT_SHA }}
+          IMAGE_ID=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/docker-repo/${{ inputs.IMAGE_NAME }}
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ inputs.BRANCH }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ inputs.BRANCH }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "production" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag ${{ inputs.IMAGE_NAME }} $IMAGE_ID:$VERSION
+          docker tag ${{ inputs.IMAGE_NAME }} $IMAGE_ID:$GITHUB_SHA
+          docker push $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$GITHUB_SHA
       - 
         name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
