@@ -73,7 +73,18 @@ jobs:
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
           docker tag ${{ inputs.IMAGE_NAME }} $IMAGE_ID:$VERSION
+          docker tag ${{ inputs.IMAGE_NAME }} $IMAGE_ID:$(git rev-parse --short "$GITHUB_SHA")
           docker push $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$(git rev-parse --short "$GITHUB_SHA")
+      -
+        name: Save GitHub-SHA of the image in Terraform Cloud variable
+        run: |
+        curl \
+          --header "Authorization: Bearer $TF_TOKEN" \
+          --header "Content-Type: application/vnd.api+json" \
+          --request POST \
+          --data { "data": {"type":"vars", "attributes": {"key":"${{ inputs.IMAGE_NAME }}", "value":"some_value", "description":"SHA of the current ${{ inputs.IMAGE_NAME }} docker image", "category":"terraform", "hcl":false, "sensitive":false} } } \
+          https://app.terraform.io/api/v2/workspaces/<<workspace>>/vars        
       - 
         name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
