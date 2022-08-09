@@ -82,13 +82,16 @@ jobs:
       #     docker push $IMAGE_ID:$VERSION
       #     docker push $IMAGE_ID:$(git rev-parse --short "$GITHUB_SHA")
       # -
+        name: Check input values
+        run: echo ${{ inputs.TF_WORKSPACE_ID }}
+      -
         name: Save GitHub-SHA of the image in Terraform Cloud variable
         run: |
           curl \
           --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
           --header "Content-Type: application/vnd.api+json" \
           --request POST \
-          --data "{ \"data\": {\"type\": \"vars\", \"attributes\": {\"key\": \"some_key\", \"value\": \"some_value\", \"description\": \"some description\", \"category\": \"terraform\", \"hcl\": false, \"sensitive\": false }, \"relationships\": { \"workspace\": {\"data\": {\"id\": \"$inputs.TF_WORKSPACE_ID\", \"type\": \"workspaces\"} } } } }" \
+          --data "{ \"data\": {\"type\": \"vars\", \"attributes\": {\"key\": \"some_key\", \"value\": \"some_value\", \"description\": \"some description\", \"category\": \"terraform\", \"hcl\": false, \"sensitive\": false }, \"relationships\": { \"workspace\": {\"data\": {\"id\": \"${{ inputs.TF_WORKSPACE_ID }}\", \"type\": \"workspaces\"} } } } }" \
           https://app.terraform.io/api/v2/vars
       - 
         name: Show Output
