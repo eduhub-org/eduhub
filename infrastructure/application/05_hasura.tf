@@ -117,7 +117,7 @@ resource "google_cloud_run_service" "hasura" {
           value = google_cloudfunctions2_function.update_from_keycloak.service_config[0].uri
         }
         env {
-          name = "CLOUD_FUNCTION_LINK_SEND_MAIL"
+          name  = "CLOUD_FUNCTION_LINK_SEND_MAIL"
           value = google_cloudfunctions2_function.send_mail.service_config[0].uri
         }
         env {
