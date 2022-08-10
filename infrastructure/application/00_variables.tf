@@ -110,6 +110,14 @@ variable "hasura_cloud_function_secret" {
   description = "Hasura secret for cloud functions"
   type        = string
 }
+variable "hasura_mail_pw" {
+  description = "Hasura secret for cloud functions"
+  type        = string
+}
+variable "hasura_mail_user" {
+  description = "Hasura secret for cloud functions"
+  type        = string
+}
 variable "hasura_graphql_enable_console" {
   description = "Boolean to enable the Hasura console"
   type        = string
