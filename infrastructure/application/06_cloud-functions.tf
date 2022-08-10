@@ -125,6 +125,8 @@ resource "google_cloudfunctions2_function" "send_mail" {
   service_config {
     environment_variables = {
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+      HASURA_MAIL_PW = var.hasura_mail_pw #8K/n8*tstdx
+      HASURA_MAIL_USER = var.hasura_mail_user noreply@edu.opencampus.sh
     }
     max_instance_count = 1
     available_memory   = "256M"
