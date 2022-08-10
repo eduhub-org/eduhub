@@ -22,15 +22,15 @@ export const useRoleMutation: typeof useMutation = (
 
   const options = token
     ? {
-      ...passedOptions,
-      context: {
-        ...passedOptions?.context,
-        headers: {
-          "x-hasura-role": `${passedRole}`,
-          Authorization: "Bearer " + token,
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          headers: {
+            "x-hasura-role": `${passedRole}`,
+            Authorization: "Bearer " + token,
+          },
         },
-      },
-    }
+      }
     : passedOptions;
 
   return useMutation(mutation, options);
@@ -46,16 +46,16 @@ export const useInstructorMutation: typeof useMutation = (
 
   const options = token
     ? {
-      ...passedOptions,
-      context: {
-        ...passedOptions?.context,
-        headers: {
-          ...passedOptions?.context?.headers,
-          "x-hasura-role": "instructor",
-          Authorization: "Bearer " + token,
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          headers: {
+            ...passedOptions?.context?.headers,
+            "x-hasura-role": "instructor",
+            Authorization: "Bearer " + token,
+          },
         },
-      },
-    }
+      }
     : passedOptions;
 
   return useMutation(mutation, options);
@@ -71,16 +71,16 @@ export const useAdminMutation: typeof useMutation = (
 
   const options = token
     ? {
-      ...passedOptions,
-      context: {
-        ...passedOptions?.context,
-        headers: {
-          ...passedOptions?.context?.headers,
-          "x-hasura-role": "admin",
-          Authorization: "Bearer " + token,
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          headers: {
+            ...passedOptions?.context?.headers,
+            "x-hasura-role": "admin",
+            Authorization: "Bearer " + token,
+          },
         },
-      },
-    }
+      }
     : passedOptions;
 
   return useMutation(mutation, options);
@@ -96,15 +96,15 @@ export const useAuthedMutation: typeof useMutation = (
 
   const options = token
     ? {
-      ...passedOptions,
-      context: {
-        ...passedOptions?.context,
-        headers: {
-          ...passedOptions?.context?.headers,
-          Authorization: "Bearer " + token,
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          headers: {
+            ...passedOptions?.context?.headers,
+            Authorization: "Bearer " + token,
+          },
         },
-      },
-    }
+      }
     : passedOptions;
 
   return useMutation(mutation, options);

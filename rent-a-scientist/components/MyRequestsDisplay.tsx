@@ -82,7 +82,9 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
     if (data == null) return null;
 
     const byClassId: Record<string, MyRequests_SchoolClassRequest[]> = {};
-    for (const qr of data.SchoolClassRequest.filter(scr => scr.SchoolClass !== null && scr.SchoolClass !== undefined)) {
+    for (const qr of data.SchoolClassRequest.filter(
+      (scr) => scr.SchoolClass !== null && scr.SchoolClass !== undefined
+    )) {
       const pre = byClassId[qr.SchoolClass.id] || [];
       pre.push(qr);
       byClassId[qr.SchoolClass.id] = pre;
