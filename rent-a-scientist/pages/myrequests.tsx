@@ -96,7 +96,7 @@ const RegisterPage: FC = () => {
     InsertMyTeacherVariables
   >(INSERT_MY_TEACHER, {
     context: {
-      role: "user_access",
+      role: "user",
     },
   });
 
@@ -105,7 +105,7 @@ const RegisterPage: FC = () => {
     InsertSchoolClassVariables
   >(INSERT_SCHOOL_CLASS, {
     context: {
-      role: "user_access",
+      role: "user",
     },
   });
 
@@ -114,7 +114,7 @@ const RegisterPage: FC = () => {
     InsertClassRequestsVariables
   >(INSERT_CLASS_REQUESTS, {
     context: {
-      role: "user_access",
+      role: "user",
     },
   });
 
@@ -124,7 +124,10 @@ const RegisterPage: FC = () => {
     if (!myTeacher.loading && myUserId != null) {
       const me = myTeacher.data?.Teacher;
       if (me != null && me.length == 0) { // eslint-disable-line
-        console.log("try to insert my teacher object");
+        console.log(
+          "try to insert my teacher object, had no teacher object",
+          myTeacher
+        );
         insertMyTeacher({
           variables: {
             myUserId,
@@ -138,7 +141,7 @@ const RegisterPage: FC = () => {
             console.log("teacher insertion error", error);
           });
       } else {
-        console.log("There already is a teacher object for me!");
+        console.log("There already is a teacher object for me!", me);
       }
     }
   }, [myTeacher.data, myUserId, insertMyTeacher, myTeacher]);

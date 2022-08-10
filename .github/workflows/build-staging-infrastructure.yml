@@ -16,8 +16,27 @@ on:
 
 env:
   TF_WORKSPACE: eduhub-application-staging
+  TF_WORKSPACE_ID: ws-wVwkztBCRbphphYw
+  TF_VAR_ID_COMMIT_SHA: var-sSiBMg7YBPL7NcFh
 
 jobs:
+
+  save-commit-sha:  
+    name: Save SHA of current commit in Terraform Cloud
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Check Out the Repository Branch
+        uses: actions/checkout@v2
+      -
+        name: Save commit SHA in Terraform Cloud variable
+        run: |
+          curl \
+          --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+          --header "Content-Type: application/vnd.api+json" \
+          --request PATCH \
+          --data "{ \"data\": { \"id\":\"$TF_VAR_ID_COMMIT_SHA\", \"attributes\": { \"value\":\"$(git rev-parse --short "$GITHUB_SHA")\" }, \"type\":\"vars\" }}" \
+          https://app.terraform.io/api/v2/workspaces/$TF_WORKSPACE_ID/vars/$TF_VAR_ID_COMMIT_SHA
 
   build-keycloak:
     name: Build and Store Keycloak Docker Image in Google Docker Repo
@@ -85,7 +104,7 @@ jobs:
 
   deploy-application:
     name: "Deploy Application Infrastructure"
-    needs: [build-keycloak, build-backend, build-frontend, build-rent-a-scientist-frontend, zip-and-store-cloud-functions]
+    needs: [build-keycloak, build-backend, build-frontend, build-rent-a-scientist-frontend, zip-and-store-cloud-functions, save-commit-sha]
     runs-on: ubuntu-latest
     defaults:
       run:

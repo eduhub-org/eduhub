@@ -22,15 +22,15 @@ export const useRoleMutation: typeof useMutation = (
 
   const options = token
     ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions?.context,
-          headers: {
-            "x-hasura-role": `${passedRole}`,
-            Authorization: "Bearer " + token,
-          },
+      ...passedOptions,
+      context: {
+        ...passedOptions?.context,
+        headers: {
+          "x-hasura-role": `${passedRole}`,
+          Authorization: "Bearer " + token,
         },
-      }
+      },
+    }
     : passedOptions;
 
   return useMutation(mutation, options);
@@ -46,16 +46,16 @@ export const useInstructorMutation: typeof useMutation = (
 
   const options = token
     ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions?.context,
-          headers: {
-            ...passedOptions?.context?.headers,
-            "x-hasura-role": "instructor_access",
-            Authorization: "Bearer " + token,
-          },
+      ...passedOptions,
+      context: {
+        ...passedOptions?.context,
+        headers: {
+          ...passedOptions?.context?.headers,
+          "x-hasura-role": "instructor",
+          Authorization: "Bearer " + token,
         },
-      }
+      },
+    }
     : passedOptions;
 
   return useMutation(mutation, options);
@@ -71,16 +71,16 @@ export const useAdminMutation: typeof useMutation = (
 
   const options = token
     ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions?.context,
-          headers: {
-            ...passedOptions?.context?.headers,
-            "x-hasura-role": "admin",
-            Authorization: "Bearer " + token,
-          },
+      ...passedOptions,
+      context: {
+        ...passedOptions?.context,
+        headers: {
+          ...passedOptions?.context?.headers,
+          "x-hasura-role": "admin",
+          Authorization: "Bearer " + token,
         },
-      }
+      },
+    }
     : passedOptions;
 
   return useMutation(mutation, options);
@@ -96,15 +96,15 @@ export const useAuthedMutation: typeof useMutation = (
 
   const options = token
     ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions?.context,
-          headers: {
-            ...passedOptions?.context?.headers,
-            Authorization: "Bearer " + token,
-          },
+      ...passedOptions,
+      context: {
+        ...passedOptions?.context,
+        headers: {
+          ...passedOptions?.context?.headers,
+          Authorization: "Bearer " + token,
         },
-      }
+      },
+    }
     : passedOptions;
 
   return useMutation(mutation, options);
@@ -119,7 +119,7 @@ export const pickIdPkMapper = (x: any) => x.id;
 // to update a single field
 export const useUpdateCallback = <QueryType, QueryVariables>(
   query: DocumentNode,
-  role: "admin" | "instructor_access",
+  role: "admin" | "instructor",
   pkField: keyof QueryVariables,
   updateField: keyof QueryVariables,
   updatePK: any,
@@ -153,7 +153,7 @@ export const useUpdateCallback = <QueryType, QueryVariables>(
 // one for the primary key and one for the updated value
 export const useUpdateCallback2 = <QueryType, QueryVariables>(
   query: DocumentNode,
-  role: "admin" | "instructor_access",
+  role: "admin" | "instructor",
   pkField: keyof QueryVariables,
   updateField: keyof QueryVariables,
   pkMapper: (pKSource: any) => any,
@@ -184,7 +184,7 @@ export const useUpdateCallback2 = <QueryType, QueryVariables>(
 
 export const useDeleteCallback = <QueryType, QueryVariables>(
   query: DocumentNode,
-  role: "admin" | "instructor_access",
+  role: "admin" | "instructor",
   pkField: keyof QueryVariables,
   pkMapper: (event: any) => any,
   mainQueryResult: QueryResult<any, any>
