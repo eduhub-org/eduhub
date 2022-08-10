@@ -17,7 +17,7 @@ resource "google_cloud_run_service" "frontend" {
   template {
     spec {
       containers {
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/frontend:${var.frontend_image_version}"
+        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/frontend:${var.commit_sha}"
         ports {
           name           = "http1"
           container_port = 5000

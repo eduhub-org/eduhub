@@ -25,17 +25,11 @@ on:
       NEXT_PUBLIC_AUTH_URL:
         required: false
         type: string
-      # ID of the used Terraform Cloud workspace
-      #TF_WORKSPACE_ID:
-      #  required: true
-      #  type: string
     secrets:
       GCP_SERVICE_ACCOUNT_KEY:
         required: true
       GCP_REGION:
         required: true
-      #TF_API_TOKEN:
-      #  required: true
 
 jobs:
 
@@ -81,18 +75,6 @@ jobs:
           docker tag ${{ inputs.IMAGE_NAME }} $IMAGE_ID:$(git rev-parse --short "$GITHUB_SHA")
           docker push $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$(git rev-parse --short "$GITHUB_SHA")
-      # -
-      #   name: Check input values
-      #   run: echo ${{ inputs.TF_WORKSPACE_ID }}
-      # -
-      #   name: Save GitHub-SHA of the image in Terraform Cloud variable
-      #   run: |
-      #     curl \
-      #     --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
-      #     --header "Content-Type: application/vnd.api+json" \
-      #     --request POST \
-      #     --data "{ \"data\": { \"type\":\"vars\", \"attributes\": { \"key\":\"commit_sha\", \"value\":\"some_value\", \"description\":\"Current Git commit SHA\", \"category\":\"terraform\", \"hcl\":false, \"sensitive\":false } } }" \
-      #     https://app.terraform.io/api/v2/workspaces/${{ inputs.TF_WORKSPACE_ID }}/vars
       - 
         name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
