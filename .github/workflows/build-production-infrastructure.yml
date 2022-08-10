@@ -140,7 +140,6 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        if: github.event_name == 'pull_request'
         run: terraform plan -detailed-exitcode -no-color -input=false
         continue-on-error: true
 
