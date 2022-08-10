@@ -32,7 +32,7 @@ jobs:
           --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
           --header "Content-Type: application/vnd.api+json" \
           --request PATCH \
-          --data "{ \"data\": { \"id\":\"$TF_VAR_ID_COMMIT_SHA\", \"attributes\": { \"value\":\"$GITHUB_SHA\" }, \"type\":\"vars\" }}" \
+          --data "{ \"data\": { \"id\":\"$TF_VAR_ID_COMMIT_SHA\", \"attributes\": { \"value\":\"$(git rev-parse --short "$GITHUB_SHA")\" }, \"type\":\"vars\" }}" \
           https://app.terraform.io/api/v2/workspaces/$TF_WORKSPACE_ID/vars/$TF_VAR_ID_COMMIT_SHA
 
 

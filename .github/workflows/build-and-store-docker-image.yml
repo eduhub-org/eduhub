@@ -74,7 +74,7 @@ jobs:
           docker tag ${{ inputs.IMAGE_NAME }} $IMAGE_ID:$VERSION
           docker tag ${{ inputs.IMAGE_NAME }} $IMAGE_ID:$GITHUB_SHA
           docker push $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$GITHUB_SHA
+          docker push $IMAGE_ID:$(git rev-parse --short "$GITHUB_SHA")
       - 
         name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
