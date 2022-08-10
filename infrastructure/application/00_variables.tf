@@ -87,6 +87,10 @@ variable "hasura_db_pw" {
 }
 
 # keycloak
+variable "commit_sha" {
+  description = "SHA of the current git commit (used as tag for all docker images)"
+  type        = string
+}
 variable "keycloak_image_version" {
   description = "Version for the Keycloak docker image"
   type        = string
