@@ -96,7 +96,7 @@ const RegisterPage: FC = () => {
     InsertMyTeacherVariables
   >(INSERT_MY_TEACHER, {
     context: {
-      role: "user_access",
+      role: "user",
     },
   });
 
@@ -105,7 +105,7 @@ const RegisterPage: FC = () => {
     InsertSchoolClassVariables
   >(INSERT_SCHOOL_CLASS, {
     context: {
-      role: "user_access",
+      role: "user",
     },
   });
 
@@ -114,7 +114,7 @@ const RegisterPage: FC = () => {
     InsertClassRequestsVariables
   >(INSERT_CLASS_REQUESTS, {
     context: {
-      role: "user_access",
+      role: "user",
     },
   });
 

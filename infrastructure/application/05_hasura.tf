@@ -73,7 +73,7 @@ resource "google_cloud_run_service" "hasura" {
     spec {
       containers {
 
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:${var.backend_image_version}"
+        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:${var.commit_sha}"
         resources {
           limits = {
             memory = var.hasura_memory_limit

@@ -29,7 +29,7 @@ export const OnlyNotAdmin: FC = ({ children }) => {
 export const OnlyNotInstructor: FC = ({ children }) => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
   if (
-    keycloak?.resourceAccess?.hasura?.roles?.includes("instructor_access") ||
+    keycloak?.resourceAccess?.hasura?.roles?.includes("instructor") ||
     keycloak?.resourceAccess?.hasura?.roles?.includes("admin")
   ) {
     return null;

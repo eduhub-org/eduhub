@@ -16,8 +16,28 @@ on:
 
 env:
   TF_WORKSPACE: eduhub-application-production
+  TF_WORKSPACE_ID: ws-wzFdRXijjGbir9z6
+  TF_VAR_ID_COMMIT_SHA: var-sSiBMg7YBPL7NcFh
 
 jobs:
+
+  save-commit-sha:  
+    if: github.event_name == 'pull_request'
+    name: Save SHA of current commit in Terraform Cloud
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Check Out the Repository Branch
+        uses: actions/checkout@v2
+      -
+        name: Save commit SHA in Terraform Cloud variable
+        run: |
+          curl \
+          --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+          --header "Content-Type: application/vnd.api+json" \
+          --request PATCH \
+          --data "{ \"data\": { \"id\":\"$TF_VAR_ID_COMMIT_SHA\", \"attributes\": { \"value\":\"$(git rev-parse --short "$GITHUB_SHA")\" }, \"type\":\"vars\" }}" \
+          https://app.terraform.io/api/v2/workspaces/$TF_WORKSPACE_ID/vars/$TF_VAR_ID_COMMIT_SHA
 
   build-keycloak:
     if: github.event_name == 'pull_request'

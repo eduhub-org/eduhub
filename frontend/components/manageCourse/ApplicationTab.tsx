@@ -65,7 +65,7 @@ const now7 = new Date();
 now7.setDate(now7.getDate() + 7);
 
 export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
-  const userRole = "instructor_access";
+  const userRole = "instructor";
 
   const [selectedEnrollments, setSelectedEnrollments] = useState(
     [] as number[]

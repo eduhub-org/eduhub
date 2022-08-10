@@ -65,7 +65,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
     DeleteSchoolClassByIdVariables
   >(DELETE_SCHOOL_CLASS, {
     context: {
-      role: "user_access",
+      role: "user",
     },
   });
 
