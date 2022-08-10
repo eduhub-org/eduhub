@@ -59,6 +59,7 @@ export const SchoolClassRequestsSummary: FC<IProps> = ({
     <>
       <div className={className}>
         <SchoolClassEditor
+          className="mb-10"
           name={requestSummary.schoolClassName}
           grade={requestSummary.grade}
           studentsCount={requestSummary.studentsCount}
@@ -68,7 +69,7 @@ export const SchoolClassRequestsSummary: FC<IProps> = ({
 
         {offerList.map((oentry) => (
           <SchoolClassRequestEditor
-            className="mb-3"
+            className="mb-5"
             key={oentry.id}
             days={oentry.days}
             offerId={oentry.id}

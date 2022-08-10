@@ -81,43 +81,49 @@ export const SchoolClassRequestEditor: FC<IProps> = ({
 
   return (
     <div className={className || ""}>
-      <div className="flex gap-3">
-        <div className="w-1/2 truncate font-bold" title={displayedName}>
+      <div className="flex gap-3 flex-col lg:flex-row">
+        <div
+          className="w-full lg:w-1/2 truncate font-bold"
+          title={displayedName}
+        >
           {displayedName}
         </div>
 
-        {assignedDay == null && (
-          <div className="w-1/2">
-            Gewünschte Tage:{" "}
-            <MultiDatePureDisplay days={days} startDate={startDate} />
-          </div>
-        )}
-        {assignedDay != null && (
-          <div className="w-1/2">
-            {assignedDay === -1 && (
-              <div>Leider konnte dieser Wunsch nicht erfüllt werden.</div>
-            )}
-            {assignedDay !== -1 && (
-              <div>
-                Der Wissenschaftler wurde Ihnen am{" "}
-                <span className="font-bold">
-                  <MultiDatePureDisplay
-                    days={assignedDayArray}
-                    startDate={startDate}
-                  />
-                </span>{" "}
-                zugewiesen.
-              </div>
-            )}
-          </div>
-        )}
+        <div className="w-full lg:w-1/2">
+          {assignedDay == null && (
+            <>
+              Gewünschte Tage:{" "}
+              <MultiDatePureDisplay days={days} startDate={startDate} />
+            </>
+          )}
+
+          {assignedDay != null && (
+            <>
+              {assignedDay === -1 && (
+                <div>Leider konnte dieser Wunsch nicht erfüllt werden.</div>
+              )}
+              {assignedDay !== -1 && (
+                <div>
+                  Der Wissenschaftler wurde Ihnen am{" "}
+                  <span className="font-bold">
+                    <MultiDatePureDisplay
+                      days={assignedDayArray}
+                      startDate={startDate}
+                    />
+                  </span>{" "}
+                  zugewiesen.
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
-      <div className="flex gap-3 mt-2">
+      <div className="flex gap-3 mt-2 flex-col lg:flex-row">
         <div>Kommentar Zeitraum</div>
         <input
           disabled={disabled}
-          className="w-96 border border-black"
+          className="w-full lg:w-96 border border-black"
           type="text"
           value={commentTime || ""}
           onChange={handleSelectCommentTime}
@@ -126,7 +132,7 @@ export const SchoolClassRequestEditor: FC<IProps> = ({
         <div>Nachricht</div>
         <input
           disabled={disabled}
-          className="border flex-grow border-black"
+          className="w-full border flex-grow border-black"
           type="text"
           value={commentGeneral || ""}
           onChange={handleSelectCommentGeneral}
