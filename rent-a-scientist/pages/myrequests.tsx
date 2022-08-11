@@ -1,3 +1,4 @@
+import { useMutation } from "@apollo/client";
 import { Button } from "@material-ui/core";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
@@ -15,6 +16,7 @@ import {
 } from "../components/teacher/SchoolClassRequestsSummary";
 import { useRoleMutation } from "../hooks/authedMutation";
 import { useUserQuery } from "../hooks/authedQuery";
+import { UPDATE_USER } from "../hooks/authentication";
 import { useRasConfig } from "../hooks/ras";
 import { useKeycloakUserProfile, useUserId } from "../hooks/user";
 import { RSAConfig } from "../queries/ras_config";
@@ -76,8 +78,12 @@ const getPendingRequestSummary = (rsaConfig: RSAConfig) => {
   return result;
 };
 
+
+
 const RegisterPage: FC = () => {
   const rsaConfig = useRasConfig();
+
+  const [updateUser, { data, error }] = useMutation(UPDATE_USER);
 
   const pendingRequest = getPendingRequest();
 
@@ -128,18 +134,24 @@ const RegisterPage: FC = () => {
           "try to insert my teacher object, had no teacher object",
           myTeacher
         );
-        insertMyTeacher({
-          variables: {
-            myUserId,
-          },
-        })
-          .then((resp) => {
-            console.log("inserted teacher!", resp);
-            myTeacher.refetch();
+
+        // there is a race condition against the other updateUser call ...
+        updateUser({ variables: { id: myUserId } }).finally(async () => {
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          insertMyTeacher({
+            variables: {
+              myUserId,
+            },
           })
-          .catch((error) => {
-            console.log("teacher insertion error", error);
-          });
+            .then((resp) => {
+              console.log("inserted teacher!", resp);
+              myTeacher.refetch();
+            })
+            .catch((error) => {
+              console.log("teacher insertion error", error);
+            });
+        });
       } else {
         console.log("There already is a teacher object for me!", me);
       }
