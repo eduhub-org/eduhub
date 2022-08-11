@@ -46,8 +46,8 @@ export const getStaticProps = async ({ locale }: { locale: string }) => ({
 });
 
 const getPendingRequest = () => {
-  if (typeof sessionStorage !== "undefined") { // eslint-disable-line
-    return JSON.parse(sessionStorage.getItem("pendingRequest") || "null"); // eslint-disable-line
+  if (typeof localStorage !== "undefined") { // eslint-disable-line
+    return JSON.parse(localStorage.getItem("pendingRequest") || "null"); // eslint-disable-line
   } else {
     return null;
   }
@@ -262,7 +262,7 @@ const RegisterPage: FC = () => {
           },
         });
 
-        sessionStorage.removeItem("pendingRequest"); // eslint-disable-line
+        localStorage.removeItem("pendingRequest"); // eslint-disable-line
         // reload the page so the MyRequestsDisplay shows the newest entries, cant access its refetch from here...
         window.location.reload();
       }
