@@ -85,6 +85,8 @@ const RegisterPage: FC = () => {
 
   const [updateUser, { data, error }] = useMutation(UPDATE_USER);
 
+  console.log("updateUser", new Date().toISOString(), data, error);
+
   const pendingRequest = getPendingRequest();
 
   const keyCloakProfile = useKeycloakUserProfile();
@@ -132,25 +134,38 @@ const RegisterPage: FC = () => {
       if (me != null && me.length == 0) { // eslint-disable-line
         console.log(
           "try to insert my teacher object, had no teacher object",
-          myTeacher
+          myTeacher,
+          new Date().toISOString()
         );
 
         // there is a race condition against the other updateUser call ...
-        updateUser({ variables: { id: myUserId } }).finally(async () => {
-          await new Promise(resolve => setTimeout(resolve, 500));
+        updateUser({ variables: { id: myUserId } }).finally(() => {
+          
+          console.log("update user seems to be completed now?!", new Date().toISOString());
 
-          insertMyTeacher({
-            variables: {
-              myUserId,
-            },
-          })
-            .then((resp) => {
-              console.log("inserted teacher!", resp);
-              myTeacher.refetch();
+          setTimeout(() => {
+            console.log("1s has passed, insertMyTeacher!", new Date().toISOString());
+            insertMyTeacher({
+              variables: {
+                myUserId,
+              },
             })
-            .catch((error) => {
-              console.log("teacher insertion error", error);
-            });
+              .then((resp) => {
+                console.log("inserted teacher!", resp);
+                myTeacher.refetch();
+              })
+              .catch((error) => {
+                console.log("teacher insertion error", new Date().toISOString(), error);
+
+                if (error.message != null && error.message.indexOf != null && error.message.indexOf("Teacher_userId_fkey") !== -1) {
+                  setTimeout(() => {
+                    console.log("do a full page reload out of desparation due to the race condition problem...", new Date().toISOString());
+                    location.reload();
+                  }, 3000);
+                }
+
+              });
+          }, 500);
         });
       } else {
         console.log("There already is a teacher object for me!", me);
