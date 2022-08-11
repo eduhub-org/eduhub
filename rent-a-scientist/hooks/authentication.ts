@@ -3,7 +3,7 @@ import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance, KeycloakTokenParsed } from "keycloak-js";
 import { useEffect } from "react";
 
-const UPDATE_USER = gql`
+export const UPDATE_USER = gql`
   mutation update_User($id: ID!) {
     updateFromKeycloak(userid: $id)
   }
