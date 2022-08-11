@@ -14,9 +14,28 @@ resource "google_sql_database_instance" "default" {
       # ipv4_enabled = "false"
       private_network = google_compute_network.private.id
     }
+    backup_configuration {
+      point_in_time_recovery_enabled = "true"
+    }
   }
   # ? deletion_protection = "false"
 }
+
+###############################################################################
+# Create a Replica database instance for production
+#####
+
+resource "google_sql_database_instance" "replica" {
+  database_version     = "POSTGRES_13"
+  master_instance_name = "default-dbi"
+  settings {
+    tier = var.dbi_tier
+    backup_configuration {
+      point_in_time_recovery_enabled = "true"
+    }
+  }
+}
+
 
 
 ###############################################################################
