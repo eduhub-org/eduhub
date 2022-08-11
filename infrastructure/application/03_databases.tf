@@ -14,15 +14,11 @@ resource "google_sql_database_instance" "default" {
       # ipv4_enabled = "false"
       private_network = google_compute_network.private.id
     }
-    backup_configuration {
-      point_in_time_recovery_enabled = "true"
-    }
   }
-  # ? deletion_protection = "false"
 }
 
 ###############################################################################
-# Create a Replica database instance for production
+# Create a Replica database instance
 #####
 
 resource "google_sql_database_instance" "replica" {
@@ -30,10 +26,8 @@ resource "google_sql_database_instance" "replica" {
   master_instance_name = "default-dbi"
   settings {
     tier = var.dbi_tier
-    backup_configuration {
-      point_in_time_recovery_enabled = "true"
-    }
   }
+  deletion_protection = "false"
 }
 
 
