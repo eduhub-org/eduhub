@@ -15,8 +15,21 @@ resource "google_sql_database_instance" "default" {
       private_network = google_compute_network.private.id
     }
   }
-  # ? deletion_protection = "false"
 }
+
+###############################################################################
+# Create a Replica database instance
+#####
+
+resource "google_sql_database_instance" "replica" {
+  database_version     = "POSTGRES_13"
+  master_instance_name = "default-dbi"
+  settings {
+    tier = var.dbi_tier
+  }
+  deletion_protection = "false"
+}
+
 
 
 ###############################################################################
