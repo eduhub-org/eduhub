@@ -46,7 +46,7 @@ export const SchoolClassEditor: FC<IProps> = ({
   return (
     <>
       <div className={className || ""}>
-        <div className="flex gap-3 mb-3">
+        <div className="flex gap-3 mb-3 flex-col lg:flex-row">
           <span>Klassenbezeichner</span>
           <input
             className="border border-black"
