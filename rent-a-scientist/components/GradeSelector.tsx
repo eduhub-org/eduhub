@@ -56,6 +56,7 @@ export const GradeSelector: FC<IProps> = ({
         placeholder={"Klassenstufe wählen"}
         instanceId={instanceId}
         id={id}
+        isSearchable={false}
         options={options}
       />
     </>
