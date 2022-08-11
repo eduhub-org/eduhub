@@ -154,7 +154,7 @@ export const OffersSearch: FC<IProps> = ({ className }) => {
   const router = useRouter();
 
   const handleRegister = useCallback(() => {
-    sessionStorage.setItem( // eslint-disable-line
+    localStorage.setItem( // eslint-disable-line
       "pendingRequest",
       JSON.stringify({
         offers: selectedOffers,
