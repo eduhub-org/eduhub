@@ -67,8 +67,9 @@ const getPendingRequestSummary = (rsaConfig: RSAConfig) => {
     startDate: rsaConfig.start,
     offerTimeComments: "",
     offerGeneralComments: "",
+    contact: "",
     schoolClassName: "",
-    studentsCount: 25,
+    studentsCount: 0,
     offers: pendingRequest.offers,
     schoolDstNr: pendingRequest.school.dstnr,
     schoolClassId: -1,
@@ -247,10 +248,32 @@ const RegisterPage: FC = () => {
     [pendingRequestSummary, setPendingRequestSummary]
   );
 
+    const handleUpdateContact = useCallback(
+      (contact: string) => {
+        if (pendingRequestSummary != null) {
+          setPendingRequestSummary({
+            ...pendingRequestSummary,
+            contact
+          })
+        }
+      },
+      [pendingRequestSummary, setPendingRequestSummary]
+    );
+
   const handleStorePendingRequest = useCallback(async () => {
     const myTeacherId = myTeacher.data?.Teacher[0].id;
 
     if (pendingRequestSummary != null && myTeacherId != null) {
+      if (pendingRequestSummary.contact === null || pendingRequestSummary.contact === undefined || pendingRequestSummary.contact.length === 0) {
+        alert("Bitte tragen Sie eine Kontakttelefonnummer ein!"); // eslint-disable-line
+        return;
+      }
+
+      if (pendingRequestSummary.studentsCount === null || pendingRequestSummary.studentsCount === undefined || pendingRequestSummary.studentsCount === 0) {
+        alert("Bitte tragen Sie die Klassengröße ein!");
+        return;
+      }
+
       console.log("Store these requests", pendingRequestSummary);
 
       const insertClassResult = await insertSchoolClass({
@@ -260,6 +283,7 @@ const RegisterPage: FC = () => {
             schoolId: pendingRequestSummary.schoolDstNr,
             teacherId: myTeacherId,
             grade: pendingRequestSummary.grade,
+            contact: pendingRequestSummary.contact,
             studensCount: pendingRequestSummary.studentsCount,
           },
         },
@@ -347,6 +371,7 @@ const RegisterPage: FC = () => {
                   onUpdateTimeComment={handleUpdateTimeComment}
                   onUpdateSchoolClassName={handleUpdateSchoolClassName}
                   onUpdateStudentsCount={handleUpdateStudentsCount}
+                  onUpdateContact={handleUpdateContact}
                   className="m-2"
                 />
 

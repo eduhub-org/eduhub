@@ -115,6 +115,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
         schoolClassName: schoolClass.name,
         startDate,
         schoolDstNr: schoolClass.School.dstnr,
+        contact: schoolClass.contact || "",
         offers,
         offerGeneralComments,
         offerTimeComments,
