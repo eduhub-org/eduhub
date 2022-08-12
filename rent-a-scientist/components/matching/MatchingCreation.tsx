@@ -505,6 +505,7 @@ export const MatchingCreation: FC = () => {
                 cname,
                 srequest.SchoolClass.Teacher.User.email,
                 {
+                  classGrade: srequest.SchoolClass.grade+"",
                   className: srequest.SchoolClass.name,
                   contactEmail: srequest.ScientistOffer.contactEmail || "",
                   contactPhone: srequest.ScientistOffer.contactPhone || "",

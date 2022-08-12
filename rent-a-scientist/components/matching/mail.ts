@@ -47,7 +47,7 @@ export const createRejectScientist = (
   const result: MailDescription = {
     to: contactMail,
     subject:
-      "Rent-a-Scientist: Leider hat sich keine Schulklasse für ihre Angebot gefunden",
+      "Rent-a-Scientist Rückmeldung",
     content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
 
@@ -91,11 +91,11 @@ export const createAcceptScientist = (
   const result: MailDescription = {
     to: contactMail,
     subject:
-      "Rent-a-Scientist: Es haben sich Schulklassen für ihr Angebot gefunden",
+      "Rent-a-Scientist Rückmeldung",
     content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
 vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2022 eine Schulunterrichtsstunde anzubieten.
-Wir freuen uns sehr, Ihnen mitteilen zu können, dass Sie angefragt wurden, wie folgt
+Wir freuen uns sehr, Ihnen mitteilen zu können, dass Sie wie folgt angefragt wurden
 
 ${acceptedDays
   .map(
@@ -145,6 +145,7 @@ export interface SchoolAcceptedInfo {
   day: string;
   time: string;
   className: string;
+  classGrade: string;
 }
 
 export const createAcceptSchool = (
@@ -153,12 +154,12 @@ export const createAcceptSchool = (
   info: SchoolAcceptedInfo
 ) => {
   const result: MailDescription = {
-    subject: "Rent-a-Scientist: Ein Wissenschaftler wurde für Sie gefunden",
+    subject: "Rent-a-Scientist Rückmeldung",
     to: contactMail,
     content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
 
-vielen Dank, dass Sie sich mit der Schulklasse ${info.className} im Rahmen von Rent-a-Scientist für den Besuch einer Wissenschaftlerin bzw. eines Wissenschaftlers an Ihrer Schule beworben haben. Wir freuen uns sehr, Ihnen mitteilen zu können, dass wir Ihnen eine Ihrer Wunsch-Unterrichtsstunden für die Woche vom 26.09. bis zum 30.09. bestätigen können:
+vielen Dank, dass Sie sich mit der Schulklasse ${info.classGrade}${info.className} im Rahmen von Rent-a-Scientist für den Besuch einer Wissenschaftlerin bzw. eines Wissenschaftlers an Ihrer Schule beworben haben. Wir freuen uns sehr, Ihnen mitteilen zu können, dass wir Ihnen eine Ihrer Wunsch-Unterrichtsstunden für die Woche vom 26.09. bis zum 30.09. bestätigen können:
 
 Wissenschaftler*in: ${info.scientist}
 
@@ -194,7 +195,7 @@ export const createRejectSchool = (
   grade: number
 ) => {
   const result: MailDescription = {
-    subject: "Rent-a-Scientist: Leider wurde kein Wissenschaftler gefunden",
+    subject: "Rent-a-Scientist Rückmeldung",
     to: contactMail,
     content: htmlMailWithContent(`
         
