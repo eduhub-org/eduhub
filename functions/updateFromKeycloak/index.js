@@ -70,7 +70,7 @@ exports.updateFromKeycloak = async (req, res) => {
       }
       
       return res.json({
-        
+        result: "updateFromKeycloak function finished"
       });
     }
   }
