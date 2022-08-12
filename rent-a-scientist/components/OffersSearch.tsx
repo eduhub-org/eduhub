@@ -169,6 +169,8 @@ export const OffersSearch: FC<IProps> = ({ className }) => {
 
   return (
     <div className={className}>
+      <h1 className="mt-4 text-3xl font-bold">Anmeldung</h1>
+
       <h1 className="mt-4 text-2xl font-bold">Schule und Klassenstufe</h1>
 
       {!finishedSchoolGradeSelection && (
