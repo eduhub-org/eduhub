@@ -321,6 +321,7 @@ const RegisterPage: FC = () => {
         });
 
         localStorage.removeItem("pendingRequest"); // eslint-disable-line
+        alert("Ihre Anmeldung war erfolgreich"); // eslint-disable-line
         // reload the page so the MyRequestsDisplay shows the newest entries, cant access its refetch from here...
         window.location.reload();
       }
@@ -360,8 +361,8 @@ const RegisterPage: FC = () => {
                 <div className="mb-10">
                   Bitte geben Sie Klassengröße und Klassenbezeichner (a, b, ...)
                   an. <br />
-                  Sie können außerdem ein kurzes Kommentar bezüglich des besten
-                  Zeitraums und eine kurze Nachricht für den Wissenschaftler
+                  Sie können außerdem einen kurzen Kommentar bezüglich des besten
+                  Zeitraums und eine kurze Nachricht für den*die Wissenschaftler*in
                   angeben.
                 </div>
 
