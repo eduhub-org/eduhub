@@ -319,8 +319,7 @@ const RegisterPage: FC = () => {
           <OnlyLoggedOut>
             <div className="m-4">
               <div className="m-4">
-                Bitte erstellen Sie einen Account und kehren Sie zurück um sich
-                mit Ihrer Auswahl anzumelden.
+                Bitte erstellen Sie einen Account. Nach der Registrierung können Sie dann mit Ihrer Auswahl weiterarbeiten.
                 <br />
                 Falls Sie schon einen Account haben melden Sie sich an.
               </div>
