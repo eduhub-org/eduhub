@@ -5,7 +5,9 @@ import { useEffect } from "react";
 
 export const UPDATE_USER = gql`
   mutation update_User($id: ID!) {
-    updateFromKeycloak(userid: $id)
+    updateFromKeycloak(userid: $id) {
+      result
+    }
   }
 `;
 
