@@ -537,6 +537,7 @@ export enum SchoolClass_constraint {
  * update columns of table "SchoolClass"
  */
 export enum SchoolClass_update_column {
+  contact = "contact",
   grade = "grade",
   id = "id",
   name = "name",
@@ -2109,6 +2110,7 @@ export interface SchoolClass_bool_exp {
   _and?: SchoolClass_bool_exp[] | null;
   _not?: SchoolClass_bool_exp | null;
   _or?: SchoolClass_bool_exp[] | null;
+  contact?: String_comparison_exp | null;
   grade?: Int_comparison_exp | null;
   id?: Int_comparison_exp | null;
   name?: String_comparison_exp | null;
@@ -2124,6 +2126,7 @@ export interface SchoolClass_insert_input {
   School?: School_obj_rel_insert_input | null;
   SchoolClassRequests?: SchoolClassRequest_arr_rel_insert_input | null;
   Teacher?: Teacher_obj_rel_insert_input | null;
+  contact?: string | null;
   grade?: number | null;
   id?: number | null;
   name?: string | null;
