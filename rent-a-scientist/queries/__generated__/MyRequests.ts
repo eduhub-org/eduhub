@@ -19,6 +19,7 @@ export interface MyRequests_SchoolClassRequest_SchoolClass {
   name: string;
   studensCount: number;
   grade: number;
+  contact: string | null;
   /**
    * An object relationship
    */

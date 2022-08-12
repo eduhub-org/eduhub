@@ -37,6 +37,7 @@ export interface SchoolsMailsInfo_SchoolClassRequest_SchoolClass {
   id: number;
   name: string;
   grade: number;
+  contact: string | null;
   /**
    * An object relationship
    */

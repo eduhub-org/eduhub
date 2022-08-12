@@ -47,6 +47,7 @@ export interface ScientistMailInfos_ScientistOffer_SchoolClassRequests_SchoolCla
   id: number;
   grade: number;
   studensCount: number;
+  contact: string | null;
   /**
    * An object relationship
    */
