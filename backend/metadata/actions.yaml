@@ -27,7 +27,7 @@ actions:
       - role: user_access
   - name: updateFromKeycloak
     definition:
-      kind: asynchronous
+      kind: synchronous
       handler: '{{CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK}}'
       forward_client_headers: true
       headers:

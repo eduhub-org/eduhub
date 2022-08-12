@@ -8,7 +8,9 @@ import { Button } from "./common/Button";
 
 const UPDATE_USER = gql`
   mutation update_User($id: ID!) {
-    updateFromKeycloak(userid: $id)
+    updateFromKeycloak(userid: $id) {
+      result
+    }
   }
 `;
 
