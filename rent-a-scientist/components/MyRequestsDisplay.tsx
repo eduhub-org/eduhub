@@ -150,7 +150,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
       <div className="m-4">
         Hier werden Ihre bereits angemeldeten Klassen aufgelistet. Falls
         gewünscht, können Sie die Anmeldungen auch zurücknehmen. <br />
-        Haben Sie Fragen zu einer Anmeldungl, können Sie uns unter Angabe der
+        Haben Sie Fragen zu einer Anmeldung, können Sie uns unter Angabe der
         Anmeldungsnummer kontaktieren. <br />
         Um weitere Schulklassen anzumelden, klicken Sie bitte{" "}
         <Link href="/">
