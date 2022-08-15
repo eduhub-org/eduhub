@@ -102,7 +102,7 @@ resource "google_cloud_run_service" "hasura" {
         }
         env {
           name  = "HASURA_BUCKET"
-          value = "storage-bucket"
+          value = var.project_id
         }
         env {
           name  = "CLOUD_FUNCTION_LINK_LOAD_FILE"
