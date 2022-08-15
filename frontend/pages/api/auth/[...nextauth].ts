@@ -24,17 +24,18 @@ export default NextAuth({
   providers: [
     KeycloakProvider({
       clientId: "hasura",
-      clientSecret: "OvxfdDXRVRVVS7MLkkM8cgr41ilPPE8J",
+      clientSecret: "WWzGeFLQdDQZmVUaiJJwJuV5HrbXGEKc",
       authorization: `${process.env.NEXT_PUBLIC_AUTH_URL}/auth`,
       issuer: `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub`,
     }),
   ],
   callbacks: {
-    jwt: async ({ token, account }) => {
+    jwt: async ({ token, account, user, profile }) => {
       // Persist the OAuth access_token to the token right after signin
-      if (account) {
+      if (account && profile) {
         console.log(account, token);
         token.accessToken = account.access_token;
+        token.profile = profile;
       }
       return token;
     },
@@ -42,6 +43,8 @@ export default NextAuth({
       // Send properties to the client, like an access_token from a provider.
       console.log(session, token);
       session.accessToken = token.accessToken;
+      session.user = user;
+      session.profile = token.profile;
       return session;
     },
   },

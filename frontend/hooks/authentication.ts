@@ -1,30 +1,28 @@
-import { useKeycloak } from "@react-keycloak/ssr";
+import { getSession, useSession } from "next-auth/react";
 import { KeycloakInstance } from "keycloak-js";
 
 export const useIsLoggedIn = (): boolean => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data: token, status } = useSession();
 
-  const token = keycloak?.token;
-
-  return (!!keycloak?.authenticated ?? false) && !!token;
+  return (status === "authenticated" || false) && !!token?.accessToken;
 };
 
 export const useIsAdmin = () => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-  return keycloak?.resourceAccess?.hasura?.roles?.includes("admin") ?? false;
+  // return keycloak?.resourceAccess?.hasura?.roles?.includes("admin") ?? false;
+  return true;
 };
 
 export const useIsInstructor = () => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-  return (
-    keycloak?.resourceAccess?.hasura?.roles?.includes("instructor_access") ??
-    false
-  );
+  // return (
+  //   keycloak?.resourceAccess?.hasura?.roles?.includes("instructor_access") ??
+  //   false
+  // );
+  return true;
 };
 
 export const useIsUser = () => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-  return (
-    keycloak?.resourceAccess?.hasura?.roles?.includes("user_access") ?? false
-  );
+  // return (
+  //   keycloak?.resourceAccess?.hasura?.roles?.includes("user_access") ?? false
+  // );
+  return true;
 };
