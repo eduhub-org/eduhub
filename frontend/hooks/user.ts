@@ -1,5 +1,4 @@
-import { useKeycloak } from "@react-keycloak/ssr";
-import { KeycloakInstance } from "keycloak-js";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 
 import { User } from "../queries/__generated__/User";
@@ -8,18 +7,20 @@ import { USER } from "../queries/user";
 import { useAuthedQuery } from "./authedQuery";
 
 export const useUserId = () => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data: sessionData } = useSession();
+  const profile = sessionData?.profile;
 
-  return keycloak?.subject;
+  return profile?.sub;
 };
 export const useUser = () => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data: sessionData } = useSession();
+  const profile = sessionData?.profile;
 
   const { data, loading, error } = useAuthedQuery<User>(USER, {
     variables: {
-      userId: keycloak?.subject,
+      userId: profile?.subject,
     },
-    skip: !keycloak?.authenticated,
+    skip: sessionData?.status !== "authenticated",
   });
 
   if (data?.User_by_pk) {
@@ -38,18 +39,29 @@ interface IUserProfile {
 }
 
 export const useKeycloakUserProfile = (): IUserProfile | undefined => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data: sessionData } = useSession();
+  const keycloakProfile = sessionData?.profile;
   const [profile, setProfile] = useState<IUserProfile>();
 
+  // if (!profile) {
+  //   keycloak?.loadUserProfile?.().then((data) => {
+  //     setProfile({
+  //       email: data.email,
+  //       firstName: data.firstName,
+  //       lastName: data.lastName,
+  //       username: data.username,
+  //       emailVerified: data.emailVerified ?? false,
+  //     });
+  //   });
+  // }
+
   if (!profile) {
-    keycloak?.loadUserProfile?.().then((data) => {
-      setProfile({
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        username: data.username,
-        emailVerified: data.emailVerified ?? false,
-      });
+    setProfile({
+      email: keycloakProfile.email,
+      firstName: keycloakProfile.firstName,
+      lastName: keycloakProfile.lastName,
+      username: keycloakProfile.username,
+      emailVerified: keycloakProfile.emailVerified ?? false,
     });
   }
 

@@ -19,6 +19,7 @@ import { CourseListWithEnrollments } from "../queries/__generated__/CourseListWi
 import { COURSE_LIST } from "../queries/courseList";
 import { COURSE_LIST_WITH_ENROLLMENT } from "../queries/courseListWithEnrollment";
 import { ClientOnly } from "../components/common/ClientOnly";
+import { useSession } from "next-auth/react";
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
@@ -28,6 +29,8 @@ export const getStaticProps = async ({ locale }: { locale: string }) => ({
 
 const Home: FC = () => {
   const { t } = useTranslation("start-page");
+  const { data: sessionData } = useSession();
+  console.log(sessionData);
 
   const isLoggedIn = useIsLoggedIn();
 

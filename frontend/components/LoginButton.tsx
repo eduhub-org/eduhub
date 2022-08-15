@@ -28,5 +28,7 @@ export const LoginButton: FC = () => {
 
   const { t } = useTranslation();
 
-  return <Button onClick={() => signIn()}>{t("loginButton.title")}</Button>;
+  return (
+    <Button onClick={() => signIn("keycloak")}>{t("loginButton.title")}</Button>
+  );
 };

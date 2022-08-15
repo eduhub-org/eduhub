@@ -1,10 +1,9 @@
 import { useQuery } from "@apollo/client";
-import Keycloak from "keycloak-js";
 import { useSession } from "next-auth/react";
 
 export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
   const { data } = useSession();
-  const { accessToken } = data;
+  const accessToken = data?.accessToken;
 
   const options = accessToken
     ? {
@@ -14,7 +13,7 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
           headers: {
             ...passedOptions?.context?.headers,
             "x-hasura-role": "admin",
-            Authorization: "Bearer " + accessToken,
+            Authorization: `Bearer ${accessToken}`,
           },
         },
       }
@@ -25,7 +24,7 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
 
 export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
   const { data } = useSession();
-  const { accessToken } = data;
+  const accessToken = data?.accessToken;
 
   const options = accessToken
     ? {
@@ -34,8 +33,8 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            "x-hasura-role": "instructor_access",
-            Authorization: "Bearer " + accessToken,
+            "x-hasura-role": "instructor",
+            Authorization: `Bearer ${accessToken}`,
           },
         },
       }
@@ -46,7 +45,7 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
 
 export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
   const { data } = useSession();
-  const { accessToken } = data;
+  const accessToken = data?.accessToken;
 
   const options = accessToken
     ? {
@@ -55,8 +54,8 @@ export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            "x-hasura-role": "admin",
-            Authorization: "Bearer " + accessToken,
+            "x-hasura-role": "user",
+            Authorization: `Bearer ${accessToken}`,
           },
         },
       }
