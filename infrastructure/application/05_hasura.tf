@@ -102,7 +102,7 @@ resource "google_cloud_run_service" "hasura" {
         }
         env {
           name  = "HASURA_BUCKET"
-          value = "storage-bucket"
+          value = var.project_id
         }
         env {
           name  = "CLOUD_FUNCTION_LINK_LOAD_FILE"
@@ -156,7 +156,7 @@ resource "google_cloud_run_service" "hasura" {
 
     metadata {
       annotations = {
-        "autoscaling.knative.dev/minScale"        = "0"
+        "autoscaling.knative.dev/minScale"        = "1"
         "autoscaling.knative.dev/maxScale"        = "1"
         "run.googleapis.com/vpc-access-connector" = "vpc-lan-con"
         "run.googleapis.com/vpc-access-egress"    = "private-ranges-only"
