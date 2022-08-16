@@ -57,7 +57,7 @@ const getPendingRequest = () => {
 
 const getPendingRequestSummary = (rsaConfig: RSAConfig) => {
   const pendingRequest = getPendingRequest();
-  if (pendingRequest == null || rsaConfig.start == null) {
+  if (pendingRequest == null || !rsaConfig.dateLoaded) {
     return null;
   }
 

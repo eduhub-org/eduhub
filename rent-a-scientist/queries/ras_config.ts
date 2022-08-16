@@ -4,6 +4,7 @@ export interface RSAConfig {
   programId: number;
   start: Date;
   end: Date;
+  dateLoaded: boolean;
   visibility: boolean;
   test_operation: boolean;
   fromMail?: string;
