@@ -128,8 +128,8 @@ resource "google_cloudfunctions2_function" "send_mail" {
       HASURA_MAIL_PW               = var.hasura_mail_pw
       HASURA_MAIL_USER             = var.hasura_mail_user
     }
-    max_instance_count = 10
-    available_memory   = "512M"
+    max_instance_count = 30
+    available_memory   = "256M"
     timeout_seconds    = 60
   }
 }
