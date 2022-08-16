@@ -458,7 +458,7 @@ export const MatchingCreation: FC = () => {
                   as.SchoolClass.Teacher.User.firstName,
                   as.SchoolClass.Teacher.User.lastName,
                   as.SchoolClass.Teacher.User.email,
-                  as.SchoolClass.contact || ""
+                  as.SchoolClass.contact || "",
                 ].join(" "),
                 day: dayFormat(as.assigned_day, rsaConfig.start),
                 grade: as.SchoolClass.grade,
@@ -505,7 +505,7 @@ export const MatchingCreation: FC = () => {
                 cname,
                 srequest.SchoolClass.Teacher.User.email,
                 {
-                  classGrade: srequest.SchoolClass.grade+"",
+                  classGrade: srequest.SchoolClass.grade + "",
                   className: srequest.SchoolClass.name,
                   contactEmail: srequest.ScientistOffer.contactEmail || "",
                   contactPhone: srequest.ScientistOffer.contactPhone || "",

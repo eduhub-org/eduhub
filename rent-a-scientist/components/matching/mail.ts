@@ -46,8 +46,7 @@ export const createRejectScientist = (
 ) => {
   const result: MailDescription = {
     to: contactMail,
-    subject:
-      "Rent-a-Scientist Rückmeldung",
+    subject: "Rent-a-Scientist Rückmeldung",
     content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
 
@@ -90,8 +89,7 @@ export const createAcceptScientist = (
 ) => {
   const result: MailDescription = {
     to: contactMail,
-    subject:
-      "Rent-a-Scientist Rückmeldung",
+    subject: "Rent-a-Scientist Rückmeldung",
     content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
 vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2022 eine Schulunterrichtsstunde anzubieten.

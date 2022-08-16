@@ -5,7 +5,7 @@ interface IProps {
   onChangeName?: (name: string) => any;
 
   grade?: number;
-  
+
   contact?: string;
   onChangeContact?: (contact: string) => any;
 
@@ -49,15 +49,15 @@ export const SchoolClassEditor: FC<IProps> = ({
     [onChangeStudentsCount]
   );
 
-    const handleSelectContact = useCallback(
-      (event) => {
-        const newContact = event.target.value;
-        if (onChangeContact != null) {
-          onChangeContact(newContact)
-        }
-      },
-      [onChangeContact]
-    );
+  const handleSelectContact = useCallback(
+    (event) => {
+      const newContact = event.target.value;
+      if (onChangeContact != null) {
+        onChangeContact(newContact);
+      }
+    },
+    [onChangeContact]
+  );
 
   return (
     <>
@@ -84,7 +84,7 @@ export const SchoolClassEditor: FC<IProps> = ({
         </div>
         <div className="flex gap-3 mb-3 flex-col lg:flex-row">
           <span className="w-36">Kontakt (Telefon)</span>
-          <input 
+          <input
             className="border border-black"
             type="text"
             value={contact || ""}

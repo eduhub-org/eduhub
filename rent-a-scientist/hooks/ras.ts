@@ -15,6 +15,7 @@ export const useRasConfig = () => {
       programId: pid,
       start: lstart || new Date(),
       end: lend || new Date(),
+      dateLoaded: lstart !== null && lstart !== undefined,
       visibility:
         qConfig?.data?.RentAScientistConfig_by_pk?.Program.visibility || false,
       test_operation:

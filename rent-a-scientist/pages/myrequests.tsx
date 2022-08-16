@@ -57,7 +57,7 @@ const getPendingRequest = () => {
 
 const getPendingRequestSummary = (rsaConfig: RSAConfig) => {
   const pendingRequest = getPendingRequest();
-  if (pendingRequest == null || rsaConfig.start == null) {
+  if (pendingRequest == null || !rsaConfig.dateLoaded) {
     return null;
   }
 
@@ -248,29 +248,37 @@ const RegisterPage: FC = () => {
     [pendingRequestSummary, setPendingRequestSummary]
   );
 
-    const handleUpdateContact = useCallback(
-      (contact: string) => {
-        if (pendingRequestSummary != null) {
-          setPendingRequestSummary({
-            ...pendingRequestSummary,
-            contact
-          })
-        }
-      },
-      [pendingRequestSummary, setPendingRequestSummary]
-    );
+  const handleUpdateContact = useCallback(
+    (contact: string) => {
+      if (pendingRequestSummary != null) {
+        setPendingRequestSummary({
+          ...pendingRequestSummary,
+          contact,
+        });
+      }
+    },
+    [pendingRequestSummary, setPendingRequestSummary]
+  );
 
   const handleStorePendingRequest = useCallback(async () => {
     const myTeacherId = myTeacher.data?.Teacher[0].id;
 
     if (pendingRequestSummary != null && myTeacherId != null) {
-      if (pendingRequestSummary.contact === null || pendingRequestSummary.contact === undefined || pendingRequestSummary.contact.length === 0) {
+      if (
+        pendingRequestSummary.contact === null ||
+        pendingRequestSummary.contact === undefined ||
+        pendingRequestSummary.contact.length === 0
+      ) {
         alert("Bitte tragen Sie eine Kontakttelefonnummer ein!"); // eslint-disable-line
         return;
       }
 
-      if (pendingRequestSummary.studentsCount === null || pendingRequestSummary.studentsCount === undefined || pendingRequestSummary.studentsCount === 0) {
-        alert("Bitte tragen Sie die Klassengröße ein!");
+      if (
+        pendingRequestSummary.studentsCount === null ||
+        pendingRequestSummary.studentsCount === undefined ||
+        pendingRequestSummary.studentsCount === 0
+      ) {
+        alert("Bitte tragen Sie die Klassengröße ein!"); //eslint-disable-line
         return;
       }
 
@@ -344,7 +352,8 @@ const RegisterPage: FC = () => {
           <OnlyLoggedOut>
             <div className="m-4">
               <div className="m-4">
-                Bitte erstellen Sie einen Account. Nach der Registrierung können Sie dann mit Ihrer Auswahl weiterarbeiten.
+                Bitte erstellen Sie einen Account. Nach der Registrierung können
+                Sie dann mit Ihrer Auswahl weiterarbeiten.
                 <br />
                 Falls Sie schon einen Account haben melden Sie sich an.
               </div>
@@ -361,9 +370,9 @@ const RegisterPage: FC = () => {
                 <div className="mb-10">
                   Bitte geben Sie Klassengröße und Klassenbezeichner (a, b, ...)
                   an. <br />
-                  Sie können außerdem einen kurzen Kommentar bezüglich des besten
-                  Zeitraums und eine kurze Nachricht für den*die Wissenschaftler*in
-                  angeben.
+                  Sie können außerdem einen kurzen Kommentar bezüglich des
+                  besten Zeitraums und eine kurze Nachricht für den*die
+                  Wissenschaftler*in angeben.
                 </div>
 
                 <SchoolClassRequestsSummary
