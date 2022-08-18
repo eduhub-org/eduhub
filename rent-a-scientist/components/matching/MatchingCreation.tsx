@@ -79,14 +79,30 @@ interface AssignmentResult {
   offerId: number;
 }
 
+function shuffle<T>(array: T[]) {
+  let currentIndex = array.length,  randomIndex;
+
+  // While there remain elements to shuffle.
+  while (currentIndex != 0) {
+
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
+
 const solveMatching = (
   offers: CourseOffer[],
   requests: ClassRequest[],
   forceAssignments: AssignmentResult[]
 ) => {
-  // you could shuffle to get some other solution
-  // offers = _.shuffle(offers);
-  // requests = _.shuffle(requests);
+  requests = shuffle(requests);
 
   const variables: any = {};
   const ints: any = {};
@@ -351,6 +367,21 @@ export const MatchingCreation: FC = () => {
     return result;
   }, [matchings, requestsRecords]);
 
+  const matchingCounts = useMemo(() => {
+    const classes = new Set();
+    const offers = new Set();
+
+    for (const match of (matchings || [])) {
+      classes.add(match.classId);
+      offers.add(match.offerId);
+    }
+
+    return {
+      classCount: classes.size,
+      offerCount: offers.size
+    };
+  }, [matchings]);
+
   const [hideProgramById] = useAdminMutation<
     HideProgramById,
     HideProgramByIdVariables
@@ -603,7 +634,7 @@ export const MatchingCreation: FC = () => {
 
       {matchings !== null && (
         <>
-          <div className="text-xl font-bold mt-6">Matchingvorschau</div>
+          <div className="text-xl font-bold mt-6">Matchingvorschau zwischen {matchingCounts.classCount} Klassen und {matchingCounts.offerCount} Angeboten</div>
           <table className="w-full mt-4">
             <tbody>
               <tr>
