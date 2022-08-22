@@ -1,6 +1,5 @@
 import { QueryResult, useMutation } from "@apollo/client";
-import { useKeycloak } from "@react-keycloak/ssr";
-import { KeycloakInstance } from "keycloak-js";
+import { useSession } from "next-auth/react";
 import { useCallback } from "react";
 import { DocumentNode } from "graphql";
 
@@ -8,9 +7,8 @@ export const useRoleMutation: typeof useMutation = (
   mutation,
   passedOptions
 ) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-
-  const token = keycloak?.token;
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
 
   const passedRole = passedOptions?.context?.role;
 
@@ -20,14 +18,14 @@ export const useRoleMutation: typeof useMutation = (
     );
   }
 
-  const options = token
+  const options = accessToken
     ? {
         ...passedOptions,
         context: {
           ...passedOptions?.context,
           headers: {
             "x-hasura-role": `${passedRole}`,
-            Authorization: "Bearer " + token,
+            Authorization: "Bearer " + accessToken,
           },
         },
       }
@@ -40,19 +38,18 @@ export const useInstructorMutation: typeof useMutation = (
   mutation,
   passedOptions
 ) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
 
-  const token = keycloak?.token;
-
-  const options = token
+  const options = accessToken
     ? {
         ...passedOptions,
         context: {
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            "x-hasura-role": "instructor_access",
-            Authorization: "Bearer " + token,
+            "x-hasura-role": "instructor",
+            Authorization: "Bearer " + accessToken,
           },
         },
       }
@@ -65,11 +62,10 @@ export const useAdminMutation: typeof useMutation = (
   mutation,
   passedOptions
 ) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
 
-  const token = keycloak?.token;
-
-  const options = token
+  const options = accessToken
     ? {
         ...passedOptions,
         context: {
@@ -77,7 +73,7 @@ export const useAdminMutation: typeof useMutation = (
           headers: {
             ...passedOptions?.context?.headers,
             "x-hasura-role": "admin",
-            Authorization: "Bearer " + token,
+            Authorization: "Bearer " + accessToken,
           },
         },
       }
@@ -90,18 +86,17 @@ export const useAuthedMutation: typeof useMutation = (
   mutation,
   passedOptions
 ) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
 
-  const token = keycloak?.token;
-
-  const options = token
+  const options = accessToken
     ? {
         ...passedOptions,
         context: {
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            Authorization: "Bearer " + token,
+            Authorization: "Bearer " + accessToken,
           },
         },
       }
@@ -119,7 +114,7 @@ export const pickIdPkMapper = (x: any) => x.id;
 // to update a single field
 export const useUpdateCallback = <QueryType, QueryVariables>(
   query: DocumentNode,
-  role: "admin" | "instructor_access",
+  role: "admin" | "instructor",
   pkField: keyof QueryVariables,
   updateField: keyof QueryVariables,
   updatePK: any,
@@ -153,7 +148,7 @@ export const useUpdateCallback = <QueryType, QueryVariables>(
 // one for the primary key and one for the updated value
 export const useUpdateCallback2 = <QueryType, QueryVariables>(
   query: DocumentNode,
-  role: "admin" | "instructor_access",
+  role: "admin" | "instructor",
   pkField: keyof QueryVariables,
   updateField: keyof QueryVariables,
   pkMapper: (pKSource: any) => any,
@@ -184,7 +179,7 @@ export const useUpdateCallback2 = <QueryType, QueryVariables>(
 
 export const useDeleteCallback = <QueryType, QueryVariables>(
   query: DocumentNode,
-  role: "admin" | "instructor_access",
+  role: "admin" | "instructor",
   pkField: keyof QueryVariables,
   pkMapper: (event: any) => any,
   mainQueryResult: QueryResult<any, any>
