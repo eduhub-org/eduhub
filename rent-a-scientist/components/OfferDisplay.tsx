@@ -114,15 +114,20 @@ export const OfferDisplay: FC<IProps> = ({
             />
 
             {config.visibility && (
-              <MultiDateSelector
-                days={offer.possibleDays}
-                startDate={config.start}
-                instanceId={idBase + "-instance"}
-                id={idBase + "-id"}
-                className="mt-4"
-                selectedDays={selectedDays}
-                onSelectDays={handleSelectDays}
-              />
+              <>
+                <div className="mt-2 relative top-3">
+                  Mehrfachauswahl möglich
+                </div>
+                <MultiDateSelector
+                  days={offer.possibleDays}
+                  startDate={config.start}
+                  instanceId={idBase + "-instance"}
+                  id={idBase + "-id"}
+                  className="mt-4"
+                  selectedDays={selectedDays}
+                  onSelectDays={handleSelectDays}
+                />
+              </>
             )}
           </div>
         </div>

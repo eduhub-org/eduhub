@@ -1,103 +1,103 @@
 table:
-  schema: public
   name: User
+  schema: public
 object_relationships:
-  - name: employmentByEmployment
-    using:
-      foreign_key_constraint_on: employment
-  - name: universityByUniversity
-    using:
-      foreign_key_constraint_on: university
+- name: employmentByEmployment
+  using:
+    foreign_key_constraint_on: employment
+- name: universityByUniversity
+  using:
+    foreign_key_constraint_on: university
 array_relationships:
-  - name: Admins
-    using:
-      foreign_key_constraint_on:
-        column: userId
-        table:
-          schema: public
-          name: Admin
-  - name: Attendances
-    using:
-      foreign_key_constraint_on:
-        column: userId
-        table:
-          schema: public
-          name: Attendance
-  - name: CourseEnrollments
-    using:
-      foreign_key_constraint_on:
-        column: userId
-        table:
-          schema: public
-          name: CourseEnrollment
-  - name: Experts
-    using:
-      foreign_key_constraint_on:
-        column: userId
-        table:
-          schema: public
-          name: Expert
+- name: Admins
+  using:
+    foreign_key_constraint_on:
+      column: userId
+      table:
+        name: Admin
+        schema: public
+- name: Attendances
+  using:
+    foreign_key_constraint_on:
+      column: userId
+      table:
+        name: Attendance
+        schema: public
+- name: CourseEnrollments
+  using:
+    foreign_key_constraint_on:
+      column: userId
+      table:
+        name: CourseEnrollment
+        schema: public
+- name: Experts
+  using:
+    foreign_key_constraint_on:
+      column: userId
+      table:
+        name: Expert
+        schema: public
 select_permissions:
-  - role: anonymous
-    permission:
-      columns:
-        - firstName
-        - id
-        - picture
-        - lastName
-      filter: {}
-      limit: 10
-  - role: instructor_access
-    permission:
-      columns:
-        - created_at
-        - email
-        - employment
-        - externalProfile
-        - firstName
-        - id
-        - lastName
-        - matriculationNumber
-        - newsletterRegistration
-        - otherUniversity
-        - picture
-        - university
-        - updated_at
-      filter: {}
-      limit: 100
-  - role: user_access
-    permission:
-      columns:
-        - email
-        - employment
-        - externalProfile
-        - firstName
-        - id
-        - lastName
-        - matriculationNumber
-        - newsletterRegistration
-        - otherUniversity
-        - picture
-        - university
-      filter:
-        id:
-          _eq: X-Hasura-User-Id
-      limit: 10
+- permission:
+    columns:
+    - firstName
+    - id
+    - picture
+    - lastName
+    filter: {}
+    limit: 10
+  role: anonymous
+- permission:
+    columns:
+    - created_at
+    - email
+    - employment
+    - externalProfile
+    - firstName
+    - id
+    - lastName
+    - matriculationNumber
+    - newsletterRegistration
+    - otherUniversity
+    - picture
+    - university
+    - updated_at
+    filter: {}
+    limit: 100
+  role: instructor_access
+- permission:
+    columns:
+    - email
+    - employment
+    - externalProfile
+    - firstName
+    - id
+    - lastName
+    - matriculationNumber
+    - newsletterRegistration
+    - otherUniversity
+    - picture
+    - university
+    filter:
+      id:
+        _eq: X-Hasura-User-Id
+    limit: 10
+  role: user_access
 update_permissions:
-  - role: user_access
-    permission:
-      columns:
-        - email
-        - employment
-        - externalProfile
-        - firstName
-        - lastName
-        - matriculationNumber
-        - newsletterRegistration
-        - otherUniversity
-        - picture
-        - university
-      filter:
-        id:
-          _eq: X-Hasura-User-Id
-      check: null
+- permission:
+    check: null
+    columns:
+    - email
+    - employment
+    - externalProfile
+    - firstName
+    - lastName
+    - matriculationNumber
+    - newsletterRegistration
+    - otherUniversity
+    - picture
+    - university
+    filter:
+      id:
+        _eq: X-Hasura-User-Id
+  role: user_access
