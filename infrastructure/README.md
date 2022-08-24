@@ -43,8 +43,20 @@ It might be that "terraform apply" runs into an error on the first run. Simply r
 	2. TF_API_TOKEN
 		- Log into Terraform Cloud and genarate a user access token.
 		- Add the token as value to the secret.
-	3. TF_WORKSPACE
-	4. GCP_SERVICE_ACCOUNT_KEY
+	3. TF_WORKSPACE_PRODUCTION
+		- The title of the application workspace you define above.
+	4. TF_WORKSPACE_ID_PRODUCTION
+	   - The value of the variable is provided in Terraform Cloud under the title of the corresponding workspace.
+	5. TF_VAR_ID_COMMIT_SHA_PRODUCTION
+		- The value for this variable is only displayed by conducting an API call to Terraform cloud. The format of the corresponding CURL command is as follows:
+		```
+		curl \
+		--header "Authorization: Bearer $TF_API_TOKEN" \
+		--header "Content-Type: application/vnd.api+json" \
+		"https://app.terraform.io/api/v2/workspaces/$TF_WORKSPACE_ID/vars"
+		```
+		`TF_API_TOKEN` and `TF_WORKSPACE` must be set as corresponding environment variables in your local console.
+
 
 The Terraform apply command for the workspace application is initiated by a GitHub action. In order to do so, it needs to be connected to the specific workspace and also to the git branch, which will trigger the Terraform apply.
 
