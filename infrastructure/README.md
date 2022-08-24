@@ -46,7 +46,9 @@ It might be that "terraform apply" runs into an error on the first run. Simply r
 	3. TF_WORKSPACE_PRODUCTION
 		- The title of the application workspace you define above.
 	4. TF_WORKSPACE_ID_PRODUCTION
-	   - The value of the variable is provided in Terraform Cloud under the title of the corresponding workspace.
+		- The value is provided in Terraform Cloud under the title of the corresponding workspace.
+	5. PROJECT_ID_PRODUCTION
+		- The value must be the same as given in the Terraform Cloud workspaces.
 	5. TF_VAR_ID_COMMIT_SHA_PRODUCTION
 		- The value for this variable is only displayed by conducting an API call to Terraform cloud. The format of the corresponding CURL command is as follows:
 		```
