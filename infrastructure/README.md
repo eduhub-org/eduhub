@@ -1,6 +1,6 @@
 # Deploying the Application on Google Cloud
 
-The process to setup the infrastructure and deploy the application consists of the following main parts:
+To setup the infrastructure and deploy the EduHub applications, the following main parts are needed:
 
 - two terraform workspaces connected to two folders with terraform scripts that manage the infrastructure (and partially also the deployment of the application)
 - different yml files for GitHub actions that are triggered on pull requests to deploy new versions of the application on merges from pull requests
@@ -16,39 +16,39 @@ A prerequisite to use the given infrastructure code is access to a [Google Cloud
 
 For the creation of the infrastructure, two Terrform Cloud workspaces need to be created. The first includes the variable settings to initialize the project on Google Cloud and is only run once at the very beginning. The second includes the variable settings to deploy the different applications and is run after each Pull-Request on the branch that is defined in a corresponding GitHub-Action.
 
-The overall steps to setup the application are the following:
+The steps to setup the application are the following:
 
-(1) Create a Terraform Cloud workspace named "eduhub-foundation" choosing the "CLI-driven workflow", and define all variables described in the terraform file provided [here](https://github.com/edu-hub-project/application/blob/develop/infrastructure/foundation/00_variables.tf).
+1. Create a Terraform Cloud workspace named "eduhub-foundation" choosing the "CLI-driven workflow", and define all variables described in the terraform file provided [here](https://github.com/edu-hub-project/application/blob/develop/infrastructure/foundation/00_variables.tf).
 
-(2) Next, install Terraform on your local computer, and authorize it for you Terraform Cloud account (see the instruction [here](https://learn.hashicorp.com/tutorials/terraform/install-cli)).
+2. Next, install Terraform on your local computer, and authorize it for you Terraform Cloud account (see the instruction [here](https://learn.hashicorp.com/tutorials/terraform/install-cli)).
 
-(3) Connect your local Terraform to the foundation workspace by setting an environment variable "TF_WORKSPACE" to the name of the workspace (e.g.: "export TF_WORKSPACE=eduhub-foundation" for Linux).
+3. Connect your local Terraform to the foundation workspace by setting an environment variable "TF_WORKSPACE" to the name of the workspace (e.g.: "export TF_WORKSPACE=eduhub-foundation" for Linux).
 
-(4) Run Terraform apply via your local console: "terraform apply"
+4. Run Terraform apply via your local console: "terraform apply"
 It might be that "terraform apply" runs into an error on the first run. Simply run it a second time, and it will successfully run through.
 
-(5) Create a Terraform Cloud workspace named "eduhub-application" choosing the "CLI-driven workflow", and define all variables described in the terraform file provided [here](https://github.com/edu-hub-project/application/blob/develop/infrastructure/application/00_variables.tf).
-Considering the variable GOOGLE_CREDENTIALS:
+5. Create a Terraform Cloud workspace named "eduhub-application" choosing the "CLI-driven workflow", and define all variables described in the terraform file provided [here](https://github.com/edu-hub-project/application/blob/develop/infrastructure/application/00_variables.tf).
+	Considering the variable GOOGLE_CREDENTIALS:
 	- Log into Google Cloud with the Google user provided in the foundation workspace under the variable "key_generation_user".
 	- Generate a JSON key for the Terraform service account created in the project with the project_id provided in the foundation workspace.
 	- remove all new line characters in the downloaded JSON key and set the key as (sensitive) value for the variable.
-Considering the variable "commit_sha":
+	Considering the variable "commit_sha":
 	- You don't need to provide a value here. It will be set during a GitHub action and serves to differentiate different Docker image versions by the GitHub commit SHA.
 
-(6) Add the following variables as secrets to your GitHub repository including the EduHub code:
-	(1) GCP_SERVICE_ACCOUNT_KEY
+6. Add the following variables as secrets to your GitHub repository including the EduHub code:
+	1. GCP_SERVICE_ACCOUNT_KEY
 		- Log into Google Cloud with the Google user provided in the foundation workspace under the variable "key_generation_user".
 		- Generate a JSON key for the GitHub service account created in the project with the project_id provided in the foundation workspace.
 		- Add the JSON key as value to the secret
-	(2) TF_API_TOKEN
+	2. TF_API_TOKEN
 		- Log into Terraform Cloud and genarate a user access token.
 		- Add the token as value to the secret.
-	(3) TF_WORKSPACE
-	(4) GCP_SERVICE_ACCOUNT_KEY
+	3. TF_WORKSPACE
+	4. GCP_SERVICE_ACCOUNT_KEY
 
 The Terraform apply command for the workspace application is initiated by a GitHub action. In order to do so, it needs to be connected to the specific workspace and also to the git branch, which will trigger the Terraform apply.
 
-(7) Adapt GitHub action:
+7. Adapt GitHub action:
 	- Under .github/workflows create a copy of "build-production-infrastructure.yml" and rename it to something in the pattern of "build-<branch>-infrastructure.yml"
 	- replace all references to the GCP_SERVICE_ACCOUNT_KEY and PROJECT_ID, and the TF_WORKSPACE variable to the coresponding values
 	- Go to Terraform cloud to get the workspace variable id and set env variable TF_WORKSPAVE_ID in the action correspondingly
