@@ -1,0 +1,145 @@
+name: Setup Production Environment
+on:   
+  push:
+    # Run only on changes in the following branches
+    branches:
+      - chore/clean-github-actions
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+  pull_request:
+    # Run tests for PRs.
+    branches:
+      - chore/clean-github-actions
+
+
+jobs:
+  environment: staging-kc19
+
+  save-commit-sha:  
+    name: Save SHA of current commit in Terraform Cloud
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Check Out the Repository Branch
+        uses: actions/checkout@v2
+      -
+        name: Save commit SHA in Terraform Cloud variable
+        run: |
+          curl \
+          --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
+          --header "Content-Type: application/vnd.api+json" \
+          --request PATCH \
+          --data "{ \"data\": { \"id\":\"$TF_VAR_ID_COMMIT_SHA\", \"attributes\": { \"value\":\"$(git rev-parse --short "$GITHUB_SHA")\" }, \"type\":\"vars\" }}" \
+          https://app.terraform.io/api/v2/workspaces/$TF_WORKSPACE_ID/vars/$TF_VAR_ID_COMMIT_SHA
+
+  build-keycloak:
+    name: Build and Store Keycloak Docker Image in Google Docker Repo
+    uses: ./.github/workflows/build-and-store-docker-image.yml
+    with:
+      DOCKERFILE_FOLDER: keycloak
+      IMAGE_NAME: keycloak
+      BRANCH: ${{ github.ref_name }}
+      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}
+
+  build-backend:
+    name: Build and Store Backend Docker Image in Google Docker Repo
+    uses: ./.github/workflows/build-and-store-docker-image.yml
+    with:
+      DOCKERFILE_FOLDER: backend
+      IMAGE_NAME: backend
+      BRANCH: ${{ github.ref_name }}
+      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}
+
+  build-frontend:
+    name: Build and Store Frontend Docker Image in Google Docker Repo
+    uses: ./.github/workflows/build-and-store-docker-image.yml
+    with:
+      DOCKERFILE_FOLDER: frontend
+      IMAGE_NAME: frontend
+      BRANCH: ${{ github.ref_name }}
+      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      NEXT_PUBLIC_API_URL: 'https://hasura.opencampus.sh/v1/graphql'
+      NEXT_PUBLIC_AUTH_URL: 'https://keycloak.opencampus.sh'
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}
+
+  build-rent-a-scientist-frontend:
+    name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
+    uses: ./.github/workflows/build-and-store-docker-image.yml
+    with:
+      DOCKERFILE_FOLDER: rent-a-scientist
+      IMAGE_NAME: rent-a-scientist
+      BRANCH: ${{ github.ref_name }}
+      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      NEXT_PUBLIC_API_URL: 'https://hasura.opencampus.sh/v1/graphql'
+      NEXT_PUBLIC_AUTH_URL: 'https://keycloak.opencampus.sh'
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}
+
+  zip-and-store-cloud-functions:
+    name: Zip and Store Cloud Functions
+    uses: ./.github/workflows/zip-and-store-cloud-functions.yml
+    with:
+      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      CLOUD_FUNCTION_FOLDER: functions
+      BUCKET_NAME: ${{ secrets.PROJECT_ID }}
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}
+
+
+  deploy-application:
+    name: "Deploy Application Infrastructure"
+    needs: [build-keycloak, build-backend, build-frontend, build-rent-a-scientist-frontend, zip-and-store-cloud-functions, save-commit-sha]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infrastructure/application
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.2.3
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+      
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -detailed-exitcode -no-color -input=false
+        continue-on-error: true
+
+      - name: Check for Plan Failure
+        if: steps.plan.outputs.exitcode == 1
+        run: exit 1
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/production' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
+
