@@ -28,10 +28,11 @@ The steps to setup the application are the following:
 It might be that "terraform apply" runs into an error on the first run. Simply run it a second time, and it will successfully run through.
 
 5. Create a Terraform Cloud workspace named "eduhub-application" choosing the "CLI-driven workflow", and define all variables described in the terraform file provided [here](https://github.com/edu-hub-project/application/blob/develop/infrastructure/application/00_variables.tf).
-	Considering the variable GOOGLE_CREDENTIALS:
+	Considering the variable "GOOGLE_CREDENTIALS":
 	- Log into Google Cloud with the Google user provided in the foundation workspace under the variable "key_generation_user".
 	- Generate a JSON key for the Terraform service account created in the project with the project_id provided in the foundation workspace.
-	- remove all new line characters in the downloaded JSON key and set the key as (sensitive) value for the variable.
+	- remove all new line characters in the downloaded JSON key
+	- Set the key as value and select environment variable and sensitive for the variable.
 	Considering the variable "commit_sha":
 	- You don't need to provide a value here. It will be set during a GitHub action and serves to differentiate different Docker image versions by the GitHub commit SHA.
 
