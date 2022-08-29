@@ -8,6 +8,9 @@ resource "google_artifact_registry_repository" "docker_repo" {
   location      = var.region
   repository_id = "docker-repo"
   format        = "DOCKER"
+  depends_on = [
+    google_project.eduhub
+  ]
 }
 
 # Provide the Terraform service account with admin rights to the docker repository

@@ -6,6 +6,9 @@
 resource "google_storage_bucket" "main" {
   name     = var.project_id
   location = var.region
+  depends_on = [
+    google_project.eduhub
+  ]
 }
 
 # Give the github service account admin permission on the Google Storage bucket
