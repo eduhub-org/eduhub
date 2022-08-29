@@ -21,27 +21,27 @@ resource "google_service_account" "terraform" {
   display_name = "Terraform Service Account"
 }
 
-# Provide the created terraform service account with the permission to edit the above created project
+# Provide the created terraform service account with the edit permissions on the created project
 resource "google_project_iam_member" "editor" {
   project = google_project.eduhub.id
   role    = "roles/editor"
   member  = "serviceAccount:${google_service_account.terraform.email}"
 }
-# Provide the created terraform service account with the permission to edit the above created project
+# Provide the created terraform service account with owner permissions to the created project
 resource "google_project_iam_member" "owner" {
   project = google_project.eduhub.id
   role    = "roles/owner"
   member  = "serviceAccount:${google_service_account.terraform.email}"
 }
 
-# Provide the created terraform service account with the permission to manage the IAM of the project
+# Provide the created terraform service account with the permission to create tokens for IAM members
 resource "google_service_account_iam_member" "token_creator" {
   service_account_id = google_service_account.terraform.name
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "serviceAccount:${google_service_account.terraform.email}"
 }
 
-# Provide the created terraform service account with the permission to manage the IAM of the project
+# Provide the created terraform service account with admin permissions on the IAM of the project
 resource "google_service_account_iam_member" "project_iam_admin" {
   service_account_id = google_service_account.terraform.name
   role               = "roles/iam.serviceAccountAdmin"
