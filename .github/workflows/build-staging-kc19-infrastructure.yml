@@ -96,7 +96,6 @@ jobs:
     with:
       ENVIRONMENT: "staging-kc19"
       CLOUD_FUNCTION_FOLDER: functions
-      BUCKET_NAME: ${{ secrets.PROJECT_ID }}
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
