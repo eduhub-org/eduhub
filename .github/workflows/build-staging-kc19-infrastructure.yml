@@ -57,7 +57,7 @@ jobs:
       DOCKERFILE_FOLDER: backend
       IMAGE_NAME: backend
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      ENVIRONMENT: "staging-kc19"
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -69,7 +69,7 @@ jobs:
       DOCKERFILE_FOLDER: frontend
       IMAGE_NAME: frontend
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      ENVIRONMENT: "staging-kc19"
       NEXT_PUBLIC_API_URL: 'https://hasura.opencampus.sh/v1/graphql'
       NEXT_PUBLIC_AUTH_URL: 'https://keycloak.opencampus.sh'
     secrets:
@@ -83,7 +83,7 @@ jobs:
       DOCKERFILE_FOLDER: rent-a-scientist
       IMAGE_NAME: rent-a-scientist
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      ENVIRONMENT: "staging-kc19"
       NEXT_PUBLIC_API_URL: 'https://hasura.opencampus.sh/v1/graphql'
       NEXT_PUBLIC_AUTH_URL: 'https://keycloak.opencampus.sh'
     secrets:
@@ -94,7 +94,7 @@ jobs:
     name: Zip and Store Cloud Functions
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
     with:
-      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      ENVIRONMENT: "staging-kc19"
       CLOUD_FUNCTION_FOLDER: functions
       BUCKET_NAME: ${{ secrets.PROJECT_ID }}
     secrets:
@@ -106,6 +106,7 @@ jobs:
     name: "Deploy Application Infrastructure"
     needs: [build-keycloak, build-backend, build-frontend, build-rent-a-scientist-frontend, zip-and-store-cloud-functions, save-commit-sha]
     runs-on: ubuntu-latest
+    environment: $ENVIRONMENT
     defaults:
       run:
         working-directory: ./infrastructure/application
