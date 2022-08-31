@@ -28,6 +28,7 @@ jobs:
   zip-and-store:
     name: Zip and Store Cloud Function in Google Storage Bucket
     runs-on: ubuntu-latest
+    environment: ${{ inputs.ENVIRONMENT }}
 
     steps:
 
