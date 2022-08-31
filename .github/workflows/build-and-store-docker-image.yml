@@ -12,8 +12,8 @@ on:
         required: true
         type: string
       # ID of the project in Google in which the image will be stored and deployed
-      PROJECT_ID:
-        required: true
+      ENVIRONMENT:
+        required: false
         type: string
       # Folder with the Dockerfile that is used for creating the image
       DOCKERFILE_FOLDER:
@@ -36,6 +36,7 @@ jobs:
   build-and-store:
     name: Build and Store Docker Image in the Artifact Registry
     runs-on: ubuntu-latest
+    environment: ${{ inputs.ENVIRONMENT }}
     env:
       NEXT_PUBLIC_API_URL: ${{ inputs.NEXT_PUBLIC_API_URL }}
       NEXT_PUBLIC_AUTH_URL: ${{ inputs.NEXT_PUBLIC_AUTH_URL }}
