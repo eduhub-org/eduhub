@@ -45,7 +45,7 @@ jobs:
       DOCKERFILE_FOLDER: keycloak
       IMAGE_NAME: keycloak
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      PROJECT_ID: "staging-kc19"
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
