@@ -14,13 +14,16 @@ on:
     branches:
       - chore/clean-github-actions
 
+env: 
+  ENVIRONMENT: staging-kc19
+
 
 jobs:
-  environment: staging-kc19
 
   save-commit-sha:  
     name: Save SHA of current commit in Terraform Cloud
     runs-on: ubuntu-latest
+    environment: $ENVIRONMENT
     steps:
       -
         name: Check Out the Repository Branch
