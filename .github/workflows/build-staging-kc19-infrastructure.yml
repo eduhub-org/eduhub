@@ -73,7 +73,7 @@ jobs:
       DOCKERFILE_FOLDER: backend
       IMAGE_NAME: backend
       BRANCH: ${{ github.ref_name }}
-      ENVIRONMENT: "staging-kc19"
+      PROJECT_ID: ${{needs.project_id.outputs.value}}
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -85,7 +85,7 @@ jobs:
       DOCKERFILE_FOLDER: frontend
       IMAGE_NAME: frontend
       BRANCH: ${{ github.ref_name }}
-      ENVIRONMENT: "staging-kc19"
+      PROJECT_ID: ${{needs.project_id.outputs.value}}
       NEXT_PUBLIC_API_URL: 'https://hasura.opencampus.sh/v1/graphql'
       NEXT_PUBLIC_AUTH_URL: 'https://keycloak.opencampus.sh'
     secrets:
@@ -99,7 +99,7 @@ jobs:
       DOCKERFILE_FOLDER: rent-a-scientist
       IMAGE_NAME: rent-a-scientist
       BRANCH: ${{ github.ref_name }}
-      ENVIRONMENT: "staging-kc19"
+      PROJECT_ID: ${{needs.project_id.outputs.value}}
       NEXT_PUBLIC_API_URL: 'https://hasura.opencampus.sh/v1/graphql'
       NEXT_PUBLIC_AUTH_URL: 'https://keycloak.opencampus.sh'
     secrets:
