@@ -51,7 +51,7 @@ jobs:
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          project_id: ${{ inputs.PROJECT_ID }}
+          project_id: ${{ secrets.PROJECT_ID }}
       -
         name: Build Docker image
         run: docker build ./${{ inputs.DOCKERFILE_FOLDER }} --file ./${{ inputs.DOCKERFILE_FOLDER }}/Dockerfile --tag ${{ inputs.IMAGE_NAME }} --label "runnumber=${GITHUB_RUN_ID}" --build-arg NEXT_PUBLIC_API_URL=${{ inputs.NEXT_PUBLIC_API_URL }} --build-arg NEXT_PUBLIC_AUTH_URL=${{ inputs.NEXT_PUBLIC_AUTH_URL }}

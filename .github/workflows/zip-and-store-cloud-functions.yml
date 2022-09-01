@@ -39,35 +39,35 @@ jobs:
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadFile'
+          directory: './${{ secrets.CLOUD_FUNCTION_FOLDER }}/loadFile'
           filename: '../loadFile.zip'
 
       - name: Zip Archive for saveFile
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveFile'
+          directory: './${{ secrets.CLOUD_FUNCTION_FOLDER }}/saveFile'
           filename: '../saveFile.zip'
 
       - name: Zip Archive for sendMail
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendMail'
+          directory: './${{ secrets.CLOUD_FUNCTION_FOLDER }}/sendMail'
           filename: '../sendMail.zip'
 
       - name: Zip Archive for updateKeycloakProfile
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateKeycloakProfile'
+          directory: './${{ secrets.CLOUD_FUNCTION_FOLDER }}/updateKeycloakProfile'
           filename: '../updateKeycloakProfile.zip'
           
       - name: Zip Archive for updateFromKeycloak
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateFromKeycloak'
+          directory: './${{ secrets.CLOUD_FUNCTION_FOLDER }}/updateFromKeycloak'
           filename: '../updateFromKeycloak.zip'
 
       - name: Authenticate to Google Cloud
@@ -82,7 +82,7 @@ jobs:
         uses: 'google-github-actions/upload-cloud-storage@v0'
         with:
           path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}'
-          destination: '${{ $PROJECT_ID }}/cloud-functions'
+          destination: '${{ secrets.PROJECT_ID }}/cloud-functions'
           glob: '*.zip'
           parent: false
 
