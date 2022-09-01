@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       # ID of the project in Google in which the image will be stored and deployed
-      ENVIRONMENT:
+      PROJECT_ID:
         required: true
         type: string
       # Name of the cloud function (and of the folder in which it is defined)
@@ -28,7 +28,6 @@ jobs:
   zip-and-store:
     name: Zip and Store Cloud Function in Google Storage Bucket
     runs-on: ubuntu-latest
-    environment: ${{ inputs.ENVIRONMENT }}
 
     steps:
 
@@ -39,35 +38,35 @@ jobs:
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          directory: './${{ secrets.CLOUD_FUNCTION_FOLDER }}/loadFile'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadFile'
           filename: '../loadFile.zip'
 
       - name: Zip Archive for saveFile
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          directory: './${{ secrets.CLOUD_FUNCTION_FOLDER }}/saveFile'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveFile'
           filename: '../saveFile.zip'
 
       - name: Zip Archive for sendMail
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          directory: './${{ secrets.CLOUD_FUNCTION_FOLDER }}/sendMail'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendMail'
           filename: '../sendMail.zip'
 
       - name: Zip Archive for updateKeycloakProfile
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          directory: './${{ secrets.CLOUD_FUNCTION_FOLDER }}/updateKeycloakProfile'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateKeycloakProfile'
           filename: '../updateKeycloakProfile.zip'
           
       - name: Zip Archive for updateFromKeycloak
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          directory: './${{ secrets.CLOUD_FUNCTION_FOLDER }}/updateFromKeycloak'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateFromKeycloak'
           filename: '../updateFromKeycloak.zip'
 
       - name: Authenticate to Google Cloud
@@ -75,14 +74,14 @@ jobs:
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          project_id: ${{ secrets.PROJECT_ID }}
+          project_id: ${{ inputs.PROJECT_ID }}
 
       - name: Upload Archives to Google Cloud
         id: 'upload-archives'
         uses: 'google-github-actions/upload-cloud-storage@v0'
         with:
           path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}'
-          destination: '${{ secrets.PROJECT_ID }}/cloud-functions'
+          destination: '${{ inputs.BUCKET_NAME }}/cloud-functions'
           glob: '*.zip'
           parent: false
 
