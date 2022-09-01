@@ -110,7 +110,7 @@ jobs:
     name: Zip and Store Cloud Functions
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
     with:
-      ENVIRONMENT: "staging-kc19"
+      PROJECT_ID: ${{needs.project_id.outputs.value}}
       CLOUD_FUNCTION_FOLDER: functions
       BUCKET_NAME: "staging-kc19"
     secrets:
