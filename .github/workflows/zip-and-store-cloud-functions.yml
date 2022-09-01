@@ -75,7 +75,7 @@ jobs:
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          project_id: ${{ $PROJECT_ID }}
+          project_id: ${{ secrets.PROJECT_ID }}
 
       - name: Upload Archives to Google Cloud
         id: 'upload-archives'
