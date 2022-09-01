@@ -1,4 +1,4 @@
-import NextAuth, { DefaultSession } from "next-auth";
+import NextAuth, { DefaultSession, Profile } from "next-auth";
 
 declare module "next-auth" {
   /**
@@ -23,5 +23,6 @@ declare module "next-auth/jwt" {
   interface JWT {
     /** OpenID ID Token */
     accessToken?: string;
+    profile?: Profile;
   }
 }

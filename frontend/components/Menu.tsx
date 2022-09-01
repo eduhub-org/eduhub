@@ -2,7 +2,6 @@ import Fade from "@material-ui/core/Fade";
 import MaterialMenu, { MenuProps } from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import { withStyles } from "@material-ui/core/styles";
-import { KeycloakInstance } from "keycloak-js";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";

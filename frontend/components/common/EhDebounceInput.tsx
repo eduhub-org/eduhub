@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react";
+import { ChangeEvent, FC, useCallback } from "react";
 import { DebounceInput } from "react-debounce-input";
 
 interface IPros {
@@ -17,7 +17,7 @@ const EhDebounceInput: FC<IPros> = ({
   onChangeHandler,
 }) => {
   const handOnchange = useCallback(
-    (event) => {
+    (event: ChangeEvent<HTMLInputElement>) => {
       onChangeHandler(event.target.value);
     },
     [onChangeHandler]

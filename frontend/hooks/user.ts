@@ -1,5 +1,6 @@
+import { KeycloakInstance } from "keycloak-js";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { User } from "../queries/__generated__/User";
 import { USER } from "../queries/user";
@@ -7,20 +8,18 @@ import { USER } from "../queries/user";
 import { useAuthedQuery } from "./authedQuery";
 
 export const useUserId = () => {
-  const { data: sessionData } = useSession();
-  const profile = sessionData?.profile;
+  const { data } = useSession();
 
-  return profile?.sub;
+  return data?.profile?.sub;
 };
 export const useUser = () => {
-  const { data: sessionData } = useSession();
-  const profile = sessionData?.profile;
+  const { data: session } = useSession();
 
   const { data, loading, error } = useAuthedQuery<User>(USER, {
     variables: {
-      userId: profile?.subject,
+      userId: session?.profile?.sub,
     },
-    skip: sessionData?.status !== "authenticated",
+    skip: !session,
   });
 
   if (data?.User_by_pk) {
@@ -39,31 +38,29 @@ interface IUserProfile {
 }
 
 export const useKeycloakUserProfile = (): IUserProfile | undefined => {
-  const { data: sessionData } = useSession();
-  const keycloakProfile = sessionData?.profile;
+  const { data: session } = useSession();
   const [profile, setProfile] = useState<IUserProfile>();
+  const url = `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account`;
 
-  // if (!profile) {
-  //   keycloak?.loadUserProfile?.().then((data) => {
-  //     setProfile({
-  //       email: data.email,
-  //       firstName: data.firstName,
-  //       lastName: data.lastName,
-  //       username: data.username,
-  //       emailVerified: data.emailVerified ?? false,
-  //     });
-  //   });
-  // }
-
-  if (!profile) {
-    setProfile({
-      email: keycloakProfile.email,
-      firstName: keycloakProfile.firstName,
-      lastName: keycloakProfile.lastName,
-      username: keycloakProfile.username,
-      emailVerified: keycloakProfile.emailVerified ?? false,
-    });
-  }
+  useEffect(() => {
+    fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: `bearer ${session?.accessToken}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setProfile({
+          email: data.email,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          username: data.username,
+          emailVerified: data.emailVerified ?? false,
+        });
+      });
+  });
 
   return profile;
 };
