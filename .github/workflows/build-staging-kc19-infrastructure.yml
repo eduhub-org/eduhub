@@ -26,7 +26,7 @@ jobs:
     steps:
     -  
       id: project_id
-      run: echo "::set-output name=value::${{env.PROJECT_ID}}"
+      run: echo "::set-output name=value::${{ secrets.PROJECT_ID }}"
     - 
       id: step2
       run: echo "::set-output name=test::world"
