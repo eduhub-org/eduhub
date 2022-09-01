@@ -20,13 +20,15 @@ jobs:
   get-env-variables:
     runs-on: ubuntu-latest
     environment: staging-kc19
+    env:
+      project_id: ${{ secrets.PROJECT_ID }}
     outputs:
       project_id: ${{ steps.project_id.outputs.test }}
       output2: ${{ steps.step2.outputs.test }}
     steps:
     -  
       id: project_id
-      run: echo "::set-output name=value::${{ secrets.PROJECT_ID }}"
+      run: echo "::set-output name=value::${{ env.project_id }}"
     - 
       id: step2
       run: echo "::set-output name=test::world"
