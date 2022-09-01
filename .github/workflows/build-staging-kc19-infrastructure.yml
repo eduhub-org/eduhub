@@ -14,22 +14,19 @@ on:
     branches:
       - chore/clean-github-actions
 
-env: 
-  ENVIRONMENT: staging-kc19
-
 
 jobs:
 
   get-env-variables:
     runs-on: ubuntu-latest
-    environment: $ENVIRONMENT
+    environment: staging-kc19
     outputs:
       project_id: ${{ steps.project_id.outputs.test }}
       output2: ${{ steps.step2.outputs.test }}
     steps:
     -  
       id: project_id
-      run: echo "::set-output name=value::$PROJECT_ID"
+      run: echo "::set-output name=value::${{env.PROJECT_ID}}"
     - 
       id: step2
       run: echo "::set-output name=test::world"
@@ -112,7 +109,7 @@ jobs:
     with:
       PROJECT_ID: ${{needs.project_id.outputs.value}}
       CLOUD_FUNCTION_FOLDER: functions
-      BUCKET_NAME: "staging-kc19"
+      BUCKET_NAME: ${{needs.project_id.outputs.value}}
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
