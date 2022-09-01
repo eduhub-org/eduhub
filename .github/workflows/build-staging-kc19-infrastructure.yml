@@ -20,6 +20,21 @@ env:
 
 jobs:
 
+  get-env-variables:
+    runs-on: ubuntu-latest
+    environment: $ENVIRONMENT
+    outputs:
+      project_id: ${{ steps.project_id.outputs.test }}
+      output2: ${{ steps.step2.outputs.test }}
+    steps:
+    -  
+      id: project_id
+      run: echo "::set-output name=value::${{ $PROJECT_ID }}"
+    - 
+      id: step2
+      run: echo "::set-output name=test::world"
+
+
   save-commit-sha:  
     name: Save SHA of current commit in Terraform Cloud
     runs-on: ubuntu-latest
@@ -40,12 +55,13 @@ jobs:
 
   build-keycloak:
     name: Build and Store Keycloak Docker Image in Google Docker Repo
+    needs: [get-env-variables]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: keycloak
       IMAGE_NAME: keycloak
       BRANCH: ${{ github.ref_name }}
-      ENVIRONMENT: "staging-kc19"
+      PROJECT_ID: ${{needs.project_id.outputs.value}}
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
