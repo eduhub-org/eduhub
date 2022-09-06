@@ -1,4 +1,4 @@
-name: Setup Production Environment
+name: Setup Staging Environment
 on:   
   push:
     # Run only on changes in the following branches
@@ -14,30 +14,16 @@ on:
     branches:
       - chore/clean-github-actions
 
+env:
+  TF_WORKSPACE: eduhub-application-staging-kc19
+  TF_WORKSPACE_ID: ws-P6XZL8sDuaTcCnGp
+  TF_VAR_ID_COMMIT_SHA: var-o696kyE2AWvjRUVk
 
 jobs:
-
-  get-env-variables:
-    runs-on: ubuntu-latest
-    environment: staging-kc19
-    env:
-      project_id: ${{ secrets.PROJECT_ID }}
-    outputs:
-      project_id: ${{ steps.project_id.outputs.test }}
-      output2: ${{ steps.step2.outputs.test }}
-    steps:
-    -  
-      id: project_id
-      run: echo "::set-output name=value::${{ env.project_id }}"
-    - 
-      id: step2
-      run: echo "::set-output name=test::world"
-
 
   save-commit-sha:  
     name: Save SHA of current commit in Terraform Cloud
     runs-on: ubuntu-latest
-    environment: $ENVIRONMENT
     steps:
       -
         name: Check Out the Repository Branch
@@ -54,15 +40,14 @@ jobs:
 
   build-keycloak:
     name: Build and Store Keycloak Docker Image in Google Docker Repo
-    needs: [get-env-variables]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: keycloak
       IMAGE_NAME: keycloak
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: ${{needs.project_id.outputs.value}}
+      PROJECT_ID:  eduhub-staging-kc19 
     secrets:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KC19_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build-backend:
@@ -72,9 +57,9 @@ jobs:
       DOCKERFILE_FOLDER: backend
       IMAGE_NAME: backend
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: ${{needs.project_id.outputs.value}}
+      PROJECT_ID:  eduhub-staging-kc19 
     secrets:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KC19_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build-frontend:
@@ -84,11 +69,11 @@ jobs:
       DOCKERFILE_FOLDER: frontend
       IMAGE_NAME: frontend
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: ${{needs.project_id.outputs.value}}
-      NEXT_PUBLIC_API_URL: 'https://hasura.opencampus.sh/v1/graphql'
-      NEXT_PUBLIC_AUTH_URL: 'https://keycloak.opencampus.sh'
+      PROJECT_ID:  eduhub-staging-kc19 
+      NEXT_PUBLIC_API_URL: 'https://hasura-staging-kc19.opencampus.sh/v1/graphql'
+      NEXT_PUBLIC_AUTH_URL: 'https://keycloak-staging-kc19.opencampus.sh'
     secrets:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KC19_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build-rent-a-scientist-frontend:
@@ -98,22 +83,22 @@ jobs:
       DOCKERFILE_FOLDER: rent-a-scientist
       IMAGE_NAME: rent-a-scientist
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: ${{needs.project_id.outputs.value}}
-      NEXT_PUBLIC_API_URL: 'https://hasura.opencampus.sh/v1/graphql'
-      NEXT_PUBLIC_AUTH_URL: 'https://keycloak.opencampus.sh'
+      PROJECT_ID:  eduhub-staging-kc19 
+      NEXT_PUBLIC_API_URL: 'https://hasura-staging-kc19.opencampus.sh/v1/graphql'
+      NEXT_PUBLIC_AUTH_URL: 'https://keycloak-staging-kc19.opencampus.sh'
     secrets:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KC19_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   zip-and-store-cloud-functions:
     name: Zip and Store Cloud Functions
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
     with:
-      PROJECT_ID: ${{needs.project_id.outputs.value}}
+      PROJECT_ID:  eduhub-staging-kc19 
       CLOUD_FUNCTION_FOLDER: functions
-      BUCKET_NAME: ${{needs.project_id.outputs.value}}
+      BUCKET_NAME:  eduhub-staging-kc19 
     secrets:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KC19_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
 
@@ -121,7 +106,6 @@ jobs:
     name: "Deploy Application Infrastructure"
     needs: [build-keycloak, build-backend, build-frontend, build-rent-a-scientist-frontend, zip-and-store-cloud-functions, save-commit-sha]
     runs-on: ubuntu-latest
-    environment: $ENVIRONMENT
     defaults:
       run:
         working-directory: ./infrastructure/application
@@ -159,6 +143,6 @@ jobs:
         run: exit 1
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/production' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false
 
