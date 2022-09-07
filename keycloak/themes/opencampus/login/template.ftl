@@ -45,7 +45,7 @@
     </button>
     <div class="collapse navbar-collapse p-2" id="navbarNav">
       <ul class="navbar-nav mr-auto ml-auto mt-2 mt-lg-0">
-        <span class="nav-link"><h2>edu.opencampus.sh</h2></span>
+        <span class="nav-link"><h2>opencampus.sh</h2></span>
       </ul>
       <div class="my-2 my-lg-0 navbar-nav" >
       </div>
