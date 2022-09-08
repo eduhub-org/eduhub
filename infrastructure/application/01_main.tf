@@ -52,10 +52,6 @@ provider "cloudflare" {
 data "google_project" "eduhub" {
 }
 
-# Retrieve default service account for this project
-data "google_compute_default_service_account" "default" {
-}
-
 # Retrieve the Google IAM policy that allows anyone on the Internet to invoke/run the 
 # cloud run module this IAM policy is applied to
 data "google_iam_policy" "noauth_invoker" {

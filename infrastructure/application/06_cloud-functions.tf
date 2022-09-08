@@ -2,14 +2,6 @@
 # Create Google Cloud Function Services
 #####
 
-# Grant the compute engine service account permission to create access tokens
-# (needed for the loadFile and saveFile cloud functions)
-resource "google_service_account_iam_member" "token_creator" {
-  service_account_id = data.google_compute_default_service_account.default.name
-  role               = "roles/iam.serviceAccountTokenCreator"
-  member             = "serviceAccount:data.google_compute_default_service_account.default.email"
-}
-
 
 ###############################################################################
 # Create Google cloud function for loadFile
