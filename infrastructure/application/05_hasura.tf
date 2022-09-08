@@ -20,7 +20,7 @@ resource "google_secret_manager_secret_version" "cloud_function" {
 resource "google_secret_manager_secret_iam_member" "cloud_function" {
   secret_id  = google_secret_manager_secret.cloud_function.id
   role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
+  member     = "serviceAccount:data.google_compute_default_service_account.default.email"
   depends_on = [google_secret_manager_secret.cloud_function]
 }
 
@@ -42,7 +42,7 @@ resource "google_secret_manager_secret_version" "hasura_graphql_admin_key" {
 resource "google_secret_manager_secret_iam_member" "hasura_db_url" {
   secret_id  = google_secret_manager_secret.hasura_db_url.id
   role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
+  member     = "serviceAccount:data.google_compute_default_service_account.default.email"
   depends_on = [google_secret_manager_secret.hasura_db_url]
 }
 
@@ -50,11 +50,11 @@ resource "google_secret_manager_secret_iam_member" "hasura_db_url" {
 resource "google_secret_manager_secret_iam_member" "hasura_graphql_admin_key" {
   secret_id  = google_secret_manager_secret.hasura_graphql_admin_key.id
   role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
+  member     = "serviceAccount:data.google_compute_default_service_account.default.email"
   depends_on = [google_secret_manager_secret.hasura_graphql_admin_key]
 }
 
-# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the Cloud Rund service for Hasura
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the Cloud Run service for Hasura
 resource "google_cloud_run_service_iam_policy" "hasura_noauth_invoker" {
   location = google_cloud_run_service.hasura.location
   project  = google_cloud_run_service.hasura.project

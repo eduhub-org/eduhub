@@ -2,6 +2,14 @@
 # Create Google Cloud Function Services
 #####
 
+# Grant the compute engine service account permission to create access tokens
+# (needed for the loadFile and saveFile cloud functions)
+resource "google_service_account_iam_member" "token_creator" {
+  service_account_id = data.google_compute_default_service_account.default.name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:data.google_compute_default_service_account.default.email"
+}
+
 
 ###############################################################################
 # Create Google cloud function for loadFile
@@ -128,7 +136,7 @@ resource "google_cloudfunctions2_function" "send_mail" {
       HASURA_MAIL_PW               = var.hasura_mail_pw
       HASURA_MAIL_USER             = var.hasura_mail_user
     }
-    max_instance_count = 30
+    max_instance_count = 50
     available_memory   = "256M"
     timeout_seconds    = 60
   }
