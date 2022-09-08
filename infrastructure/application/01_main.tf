@@ -62,4 +62,3 @@ data "google_iam_policy" "noauth_invoker" {
     ]
   }
 }
-

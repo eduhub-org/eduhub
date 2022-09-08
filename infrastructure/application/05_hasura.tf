@@ -54,7 +54,7 @@ resource "google_secret_manager_secret_iam_member" "hasura_graphql_admin_key" {
   depends_on = [google_secret_manager_secret.hasura_graphql_admin_key]
 }
 
-# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the Cloud Rund service for Hasura
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the Cloud Run service for Hasura
 resource "google_cloud_run_service_iam_policy" "hasura_noauth_invoker" {
   location = google_cloud_run_service.hasura.location
   project  = google_cloud_run_service.hasura.project
