@@ -309,6 +309,7 @@ export const MatchingCreation: FC = () => {
       days: nd.possibleDays,
     }));
 
+    console.log("Version 2022-09-08 12:50");
     console.log("build solver input data", offers, requests);
 
     const forcedAssignments: AssignmentResult[] = forcedAssignmentsTxt
