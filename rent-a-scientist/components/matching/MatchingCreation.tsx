@@ -60,6 +60,7 @@ import {
   BatchInsertMail,
   BatchInsertMailVariables,
 } from "../../queries/__generated__/BatchInsertMail";
+import { match } from "assert";
 
 interface CourseOffer {
   days: number[];
@@ -308,6 +309,7 @@ export const MatchingCreation: FC = () => {
       days: nd.possibleDays,
     }));
 
+    console.log("Version 2022-09-08 12:50");
     console.log("build solver input data", offers, requests);
 
     const forcedAssignments: AssignmentResult[] = forcedAssignmentsTxt
@@ -418,6 +420,7 @@ export const MatchingCreation: FC = () => {
     const classes = new Set();
     const offers = new Set();
 
+
     for (const match of matchings || []) {
       classes.add(match.classId);
       offers.add(match.offerId);
@@ -512,6 +515,13 @@ export const MatchingCreation: FC = () => {
 
         const mails: MailDescription[] = [];
 
+        const counts = {
+          acceptedScientists: 0,
+          acceptedSchools: 0,
+          rejectedScientists: 0,
+          rejectedSchools: 0
+        };
+
         for (const so of scientistMails.data.ScientistOffer) {
           if (!so.contactName || !so.contactEmail) {
             continue;
@@ -547,61 +557,74 @@ export const MatchingCreation: FC = () => {
               };
               return ssai;
             });
+            counts.acceptedScientists++;
             mails.push(
               createAcceptScientist(so.contactName, so.contactEmail, infos)
             );
           } else {
+            counts.rejectedScientists++;
             mails.push(createRejectScientist(so.contactName, so.contactEmail));
           }
         }
 
-        const acceptedRequestByClass: Record<
+        const requestsByClass: Record<
           number,
-          SchoolsMailsInfo_SchoolClassRequest
+          SchoolsMailsInfo_SchoolClassRequest[]
         > = {};
 
         for (const smail of schoolsMails.data.SchoolClassRequest) {
-          const prev = acceptedRequestByClass[smail.SchoolClass.id];
-          if (
-            prev === null ||
-            prev === undefined ||
-            prev.assigned_day === null ||
-            prev.assigned_day === undefined ||
-            prev.assigned_day === -1
-          ) {
-            acceptedRequestByClass[smail.SchoolClass.id] = smail;
-          }
+          const prev = requestsByClass[smail.SchoolClass.id] || [];
+          prev.push(smail);
+          requestsByClass[smail.SchoolClass.id] = prev;
         }
 
-        for (const srequest of Object.values(acceptedRequestByClass)) {
-          const cname =
-            srequest.SchoolClass.Teacher.User.firstName +
-            " " +
-            srequest.SchoolClass.Teacher.User.lastName;
-          if (srequest.assigned_day !== null && srequest.assigned_day > 0) {
-            mails.push(
-              createAcceptSchool(
-                cname,
-                srequest.SchoolClass.Teacher.User.email,
-                {
-                  classGrade: srequest.SchoolClass.grade + "",
-                  className: srequest.SchoolClass.name,
-                  contactEmail: srequest.ScientistOffer.contactEmail || "",
-                  contactPhone: srequest.ScientistOffer.contactPhone || "",
-                  day: dayFormat(srequest.assigned_day, rsaConfig.start),
-                  scientist: srequest.ScientistOffer.contactName || "",
-                  time: srequest.ScientistOffer.timeWindow.join(", "),
-                  topic: srequest.ScientistOffer.title,
-                }
-              )
-            );
-          } else {
+        for (const requests of Object.values(requestsByClass)) {
+
+          const acceptedRequests = requests.filter(smail => smail !== null && smail !== undefined && smail.assigned_day !== null && smail.assigned_day !== undefined && smail.assigned_day > 0);
+
+          if (acceptedRequests.length > 0) {
+
+            for (const aRequest of acceptedRequests) {
+              if (aRequest.assigned_day === null) {
+                continue;
+              }
+              const cname =
+                aRequest.SchoolClass.Teacher.User.firstName +
+                " " +
+                aRequest.SchoolClass.Teacher.User.lastName;
+
+              counts.acceptedSchools++;
+              mails.push(
+                createAcceptSchool(
+                  cname,
+                  aRequest.SchoolClass.Teacher.User.email,
+                  {
+                    classGrade: aRequest.SchoolClass.grade + "",
+                    className: aRequest.SchoolClass.name,
+                    contactEmail: aRequest.ScientistOffer.contactEmail || "",
+                    contactPhone: aRequest.ScientistOffer.contactPhone || "",
+                    day: dayFormat(aRequest.assigned_day, rsaConfig.start),
+                    scientist: aRequest.ScientistOffer.contactName || "",
+                    time: aRequest.ScientistOffer.timeWindow.join(", "),
+                    topic: aRequest.ScientistOffer.title,
+                  }
+                )
+              );
+            }
+
+          } else if (requests.length > 0) {
+            const anyRequest = requests[0];
+            const cname =
+              anyRequest.SchoolClass.Teacher.User.firstName +
+              " " +
+              anyRequest.SchoolClass.Teacher.User.lastName;
+            counts.rejectedSchools++;
             mails.push(
               createRejectSchool(
                 cname,
-                srequest.SchoolClass.Teacher.User.email,
-                srequest.SchoolClass.name,
-                srequest.SchoolClass.grade
+                anyRequest.SchoolClass.Teacher.User.email,
+                anyRequest.SchoolClass.name,
+                anyRequest.SchoolClass.grade
               )
             );
           }
@@ -616,6 +639,7 @@ export const MatchingCreation: FC = () => {
         }));
 
         console.log("emails", mailInserts);
+        console.log("email counts", counts);
 
         await batchInsertMails({
           variables: {
