@@ -17,10 +17,17 @@ exports.loadFile = async (req, res) => {
     
     const file = bucket.file(path);
     
-    const link = await file.getSignedUrl({
-      action: 'read',
-      expires: new Date(Date.now() + 1000 * 60 * 5)
-    });
+    const isPublic = await file.isPublic();
+    
+    if (isPublic[0] == true) {
+      const link = await file.publicUrl();
+    } else {
+      const link = await file.getSignedUrl({
+        action: 'read',
+        expires: new Date(Date.now() + 1000 * 60 * 5)
+      });
+    }
+    
     
     return res.json({
       link: link

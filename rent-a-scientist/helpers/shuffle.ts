@@ -20,7 +20,10 @@ export const shuffle = <T>(array: T[]) => {
 
 // Shuffle "a bit", by splitting the array into small subarrays and shuffling those subarrays.
 export const shuffleSlices = <T>(array: T[]) => {
-  const slicesSize = 8;
+  const slicesSize = Math.min(
+    3 + Math.ceil(Math.random() * 7),
+    Math.ceil(array.length / 4) + 1
+  );
   const slicesCount = Math.ceil(array.length / slicesSize);
   const result: T[] = [];
   for (let i = 0; i < slicesCount; i++) {
