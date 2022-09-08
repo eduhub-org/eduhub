@@ -14,7 +14,7 @@ exports.saveFile = async (req, res) => {
   if (process.env.HASURA_CLOUD_FUNCTION_SECRET == req.headers.secret) {
     const content = req.body.input.base64file;
     const filename = req.body.input.filename;
-    
+    const isPublic = filename.startsWith("public");
     const bucket = storage.bucket(req.headers.bucket);
     const path = util.format(
       `${filename}`
@@ -25,10 +25,17 @@ exports.saveFile = async (req, res) => {
     
     await file.save(fileBuffer);
     
-    const link = await file.getSignedUrl({
-      action: 'read',
-      expires: new Date(Date.now() + 1000 * 60 * 5)
-    });
+    let link = "";
+    if (isPublic == true) {
+      await file.makePublic();
+      link = await file.publicUrl();
+    } else {
+      link = await file.getSignedUrl({
+        action: 'read',
+        expires: new Date(Date.now() + 1000 * 60 * 5)
+      });
+    }
+    
     
     return res.json({
       link: link
