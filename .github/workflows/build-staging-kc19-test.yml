@@ -1,0 +1,26 @@
+name: Setup Staging Environment
+on:   
+  push:
+    branches:
+      - chore/clean-github-actions
+
+env:
+  TF_WORKSPACE: eduhub-application-staging-kc19
+  TF_WORKSPACE_ID: ws-P6XZL8sDuaTcCnGp
+  TF_VAR_ID_COMMIT_SHA: var-o696kyE2AWvjRUVk
+  PROJECT_ID: eduhub-staging-kc19
+
+jobs:
+
+  zip-and-store-cloud-functions:
+    name: Zip and Store Cloud Functions
+    uses: ./.github/workflows/zip-and-store-cloud-functions.yml
+    with:
+      PROJECT_ID:  ${{ PROJECT_ID }}
+      CLOUD_FUNCTION_FOLDER: functions
+      BUCKET_NAME:  ${{ PROJECT_ID }}
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KC19_KEY }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}
+
+
