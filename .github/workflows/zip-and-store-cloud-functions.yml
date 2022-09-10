@@ -41,14 +41,14 @@ jobs:
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-          project_id: ${{ secrets.PROJECT_ID }}
+          project_id: ${{ env.PROJECT_ID }}
 
       - name: Upload Archives to Google Cloud
         id: 'upload-archives'
         uses: 'google-github-actions/upload-cloud-storage@v0'
         with:
           path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}'
-          destination: '${{ secrets.PROJECT_ID }}/cloud-functions'
+          destination: '${{ env.PROJECT_ID }}/cloud-functions'
           glob: '*.zip'
           parent: false
 
