@@ -13,7 +13,6 @@ env:
 jobs:
   zip-and-store-cloud-functions:
     name: Zip and Store Cloud Functions
-    environment: staging-kc19
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
     with:
       CLOUD_FUNCTION_FOLDER: functions

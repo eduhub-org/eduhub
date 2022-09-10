@@ -18,6 +18,8 @@ on:
 jobs:
 
   zip-and-store:
+    environment: staging-kc19
+
     name: Zip and Store Cloud Function in Google Storage Bucket
     runs-on: ubuntu-latest
 
