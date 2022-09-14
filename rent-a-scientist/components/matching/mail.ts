@@ -111,8 +111,8 @@ vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2022 eine Sch
 Wir freuen uns sehr, Ihnen mitteilen zu können, dass Sie wie folgt angefragt wurden
 
 ${acceptedDays
-        .map(
-          (a) => `
+  .map(
+    (a) => `
 
 Ort: ${a.postalCode} ${a.city} ${a.street}
 
@@ -129,8 +129,8 @@ Kommentar: ${a.commentGeneral}
 Kontakt: ${a.contact}
 
     `
-        )
-        .join("\n\n")}
+  )
+  .join("\n\n")}
 
 Die Schule wird sich mit Ihnen in Verbindung setzen, um die weiteren Details abzusprechen. 
 

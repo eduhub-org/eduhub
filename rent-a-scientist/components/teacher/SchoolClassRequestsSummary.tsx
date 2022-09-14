@@ -15,6 +15,7 @@ export interface SchoolClassRequestSummary {
   schoolDstNr: string;
   schoolClassId: number;
   assignedDays: Record<number, number>;
+  contactInfos: Record<number, string>;
 }
 
 interface IProps {
@@ -47,6 +48,7 @@ export const SchoolClassRequestsSummary: FC<IProps> = ({
 
   const offerList = Object.keys(requestSummary.offers).map((okey) => {
     const oid = Number(okey);
+    const assignedDay = requestSummary.assignedDays[oid] || null;
     return {
       id: oid,
       requestId: requestSummary.requestId,
@@ -55,7 +57,14 @@ export const SchoolClassRequestsSummary: FC<IProps> = ({
       disabled: renderDisabled,
       commentTime: requestSummary.offerTimeComments[oid] || "",
       commentGeneral: requestSummary.offerGeneralComments[oid] || "",
-      assignedDay: requestSummary.assignedDays[oid] || null,
+      assignedDay,
+      contactInfo:
+        assignedDay !== null &&
+        assignedDay !== -1 &&
+        assignedDay > 0 &&
+        assignedDay < 6
+          ? requestSummary.contactInfos[oid]
+          : "",
     };
   });
 
@@ -87,6 +96,7 @@ export const SchoolClassRequestsSummary: FC<IProps> = ({
             onChangeCommentGeneral={onUpdateGeneralComment}
             onChangeCommentTime={onUpdateTimeComment}
             assignedDay={oentry.assignedDay}
+            contactInfo={oentry.contactInfo}
           />
         ))}
       </div>

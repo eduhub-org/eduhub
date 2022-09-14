@@ -60,7 +60,6 @@ import {
   BatchInsertMail,
   BatchInsertMailVariables,
 } from "../../queries/__generated__/BatchInsertMail";
-import { match } from "assert";
 
 interface CourseOffer {
   days: number[];
@@ -104,7 +103,7 @@ const solveMatching = (
   offers: CourseOffer[],
   requests: ClassRequest[],
   forceAssignments: AssignmentResult[],
-  maxAssignmentsPerClass: number,
+  maxAssignmentsPerClass: number
 ) => {
   requests = shuffle(requests);
 
@@ -137,8 +136,8 @@ const solveMatching = (
       variables[vname] = {
         points: 10000, // this way the 10ks are the bonses taken, the smaller part of the result score will be the number of matches
         ["c" + request.classId + "bonus"]: -1,
-        [vname]: 1
-      }
+        [vname]: 1,
+      };
 
       ints[vname] = 1;
     }
@@ -151,7 +150,6 @@ const solveMatching = (
 
   const constraints: any = {};
   for (const offer of offers) {
-
     // constraint for each offer-maxDays!
     constraints["o" + offer.id + "capacity"] = { max: offer.maxDays };
 
@@ -177,7 +175,6 @@ const solveMatching = (
       min: 1,
     };
   }
-
 
   for (const cid of Object.keys(cids)) {
     // constraint: prevent taking the bonus points for a class that has not at least one request assigned to it
@@ -205,7 +202,9 @@ const solveMatching = (
   console.log("solution", solution);
 
   if (solution.feasible) {
-    const allPossibleAssignments = Object.keys(variables).filter(x => !x.includes("-bonus-"));
+    const allPossibleAssignments = Object.keys(variables).filter(
+      (x) => !x.includes("-bonus-")
+    );
 
     const resultAssignments: AssignmentResult[] = [];
 
@@ -333,7 +332,12 @@ export const MatchingCreation: FC = () => {
 
     console.log("Forced assignments are", forcedAssignments);
 
-    const solution = solveMatching(offers, requests, forcedAssignments, maxPerClass);
+    const solution = solveMatching(
+      offers,
+      requests,
+      forcedAssignments,
+      maxPerClass
+    );
 
     solution?.sort((a, b) => a.day - b.day);
 
@@ -420,7 +424,6 @@ export const MatchingCreation: FC = () => {
     const classes = new Set();
     const offers = new Set();
 
-
     for (const match of matchings || []) {
       classes.add(match.classId);
       offers.add(match.offerId);
@@ -429,7 +432,7 @@ export const MatchingCreation: FC = () => {
     return {
       classCount: classes.size,
       offerCount: offers.size,
-      matchingsCount: (matchings || []).length
+      matchingsCount: (matchings || []).length,
     };
   }, [matchings]);
 
@@ -519,7 +522,7 @@ export const MatchingCreation: FC = () => {
           acceptedScientists: 0,
           acceptedSchools: 0,
           rejectedScientists: 0,
-          rejectedSchools: 0
+          rejectedSchools: 0,
         };
 
         for (const so of scientistMails.data.ScientistOffer) {
@@ -579,11 +582,16 @@ export const MatchingCreation: FC = () => {
         }
 
         for (const requests of Object.values(requestsByClass)) {
-
-          const acceptedRequests = requests.filter(smail => smail !== null && smail !== undefined && smail.assigned_day !== null && smail.assigned_day !== undefined && smail.assigned_day > 0);
+          const acceptedRequests = requests.filter(
+            (smail) =>
+              smail !== null &&
+              smail !== undefined &&
+              smail.assigned_day !== null &&
+              smail.assigned_day !== undefined &&
+              smail.assigned_day > 0
+          );
 
           if (acceptedRequests.length > 0) {
-
             for (const aRequest of acceptedRequests) {
               if (aRequest.assigned_day === null) {
                 continue;
@@ -611,7 +619,6 @@ export const MatchingCreation: FC = () => {
                 )
               );
             }
-
           } else if (requests.length > 0) {
             const anyRequest = requests[0];
             const cname =
@@ -666,7 +673,7 @@ export const MatchingCreation: FC = () => {
   ]);
 
   const handleChangeMaxPerClass = useCallback(
-    event => {
+    (event) => {
       const newCount = Number(event.target.value);
       setMaxPerClass(newCount);
     },
@@ -700,10 +707,16 @@ export const MatchingCreation: FC = () => {
         <div>
           <Button variant="contained" onClick={runMatching}>
             Erzeuge Matchingvorschau
-          </Button>
-
-          {" "}Maximale Anzahl Vorträge pro Klasse: {" "}
-          <input className="border border-black" type="number" min={1} max={5} value={maxPerClass} onChange={handleChangeMaxPerClass} />
+          </Button>{" "}
+          Maximale Anzahl Vorträge pro Klasse:{" "}
+          <input
+            className="border border-black"
+            type="number"
+            min={1}
+            max={5}
+            value={maxPerClass}
+            onChange={handleChangeMaxPerClass}
+          />
         </div>
 
         <div>
@@ -718,8 +731,9 @@ export const MatchingCreation: FC = () => {
       {matchings !== null && (
         <>
           <div className="text-xl font-bold mt-6">
-            Vorschau {matchingCounts.matchingsCount} Vorträge zwischen {matchingCounts.classCount} Klassen und{" "}
-            {matchingCounts.offerCount} Angeboten
+            Vorschau {matchingCounts.matchingsCount} Vorträge zwischen{" "}
+            {matchingCounts.classCount} Klassen und {matchingCounts.offerCount}{" "}
+            Angeboten
           </div>
           <table className="w-full mt-4">
             <tbody>
@@ -734,7 +748,10 @@ export const MatchingCreation: FC = () => {
               </tr>
 
               {matchingTableData.map((td) => (
-                <MatchingTableRow key={td.offerId + "/" + td.classId + "/" + td.day} {...td} />
+                <MatchingTableRow
+                  key={td.offerId + "/" + td.classId + "/" + td.day}
+                  {...td}
+                />
               ))}
             </tbody>
           </table>
