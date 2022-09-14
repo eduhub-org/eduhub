@@ -47,6 +47,7 @@ export const ALL_REQUESTS = gql`
         id
         name
         studensCount
+        contact
         grade
         School {
           dstnr

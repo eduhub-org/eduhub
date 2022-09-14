@@ -48,6 +48,7 @@ export interface AllRequests_SchoolClassRequest_SchoolClass {
   id: number;
   name: string;
   studensCount: number;
+  contact: string | null;
   grade: number;
   /**
    * An object relationship
