@@ -10,6 +10,7 @@ interface IProps {
   startDate: Date;
   days: number[];
   assignedDay: number | null;
+  contactInfo: string;
 
   disabled?: boolean;
 
@@ -33,7 +34,7 @@ export const SchoolClassRequestEditor: FC<IProps> = ({
   onChangeCommentTime,
   commentGeneral,
   onChangeCommentGeneral,
-
+  contactInfo,
   className,
 }) => {
   const displayedOffer = useQuery<ScientistOfferById>(OFFER_BY_ID, {
@@ -111,7 +112,8 @@ export const SchoolClassRequestEditor: FC<IProps> = ({
                       startDate={startDate}
                     />
                   </span>{" "}
-                  zugewiesen.
+                  zugewiesen. <br />
+                  Ihr Kontakt ist {contactInfo}
                 </div>
               )}
             </>
