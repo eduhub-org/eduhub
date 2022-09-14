@@ -15,7 +15,7 @@ export interface SchoolClassRequestSummary {
   schoolDstNr: string;
   schoolClassId: number;
   assignedDays: Record<number, number>;
-  contactInfos: Record<number, string>
+  contactInfos: Record<number, string>;
 }
 
 interface IProps {
@@ -58,7 +58,13 @@ export const SchoolClassRequestsSummary: FC<IProps> = ({
       commentTime: requestSummary.offerTimeComments[oid] || "",
       commentGeneral: requestSummary.offerGeneralComments[oid] || "",
       assignedDay,
-      contactInfo: assignedDay !== null && assignedDay !== -1 && assignedDay > 0 && assignedDay < 6 ? requestSummary.contactInfos[oid] : "",
+      contactInfo:
+        assignedDay !== null &&
+        assignedDay !== -1 &&
+        assignedDay > 0 &&
+        assignedDay < 6
+          ? requestSummary.contactInfos[oid]
+          : "",
     };
   });
 

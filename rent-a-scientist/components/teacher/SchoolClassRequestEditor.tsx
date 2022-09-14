@@ -10,7 +10,7 @@ interface IProps {
   startDate: Date;
   days: number[];
   assignedDay: number | null;
-  contactInfo: string,
+  contactInfo: string;
 
   disabled?: boolean;
 

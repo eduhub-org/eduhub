@@ -109,7 +109,12 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
           assignedDays[r.offerId] = r.assigned_day;
         }
 
-        contactInfos[r.offerId] = r.ScientistOffer.contactName + ", E-Mail: " + r.ScientistOffer.contactEmail + ", Tel.:  " + r.ScientistOffer.contactPhone;
+        contactInfos[r.offerId] =
+          r.ScientistOffer.contactName +
+          ", E-Mail: " +
+          r.ScientistOffer.contactEmail +
+          ", Tel.:  " +
+          r.ScientistOffer.contactPhone;
       }
 
       const summary: SchoolClassRequestSummary = {
@@ -125,7 +130,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
         offerTimeComments,
         schoolClassId: schoolClass.id,
         assignedDays,
-        contactInfos
+        contactInfos,
       };
 
       return summary;
