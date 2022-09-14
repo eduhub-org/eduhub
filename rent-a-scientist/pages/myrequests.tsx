@@ -74,6 +74,7 @@ const getPendingRequestSummary = (rsaConfig: RSAConfig) => {
     schoolDstNr: pendingRequest.school.dstnr,
     schoolClassId: -1,
     assignedDays: {},
+    contactInfos: {},
   };
 
   return result;
