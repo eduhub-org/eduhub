@@ -1,0 +1,10 @@
+table:
+  schema: public
+  name: AchievementRecordType
+is_enum: true
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - value
+      filter: {}

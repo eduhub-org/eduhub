@@ -1,0 +1,96 @@
+table:
+  schema: public
+  name: AchievementOption
+array_relationships:
+  - name: AchievementOptionCourses
+    using:
+      foreign_key_constraint_on:
+        column: achievementOptionId
+        table:
+          schema: public
+          name: AchievementOptionCourse
+  - name: AchievementOptionMentors
+    using:
+      foreign_key_constraint_on:
+        column: achievementOptionId
+        table:
+          schema: public
+          name: AchievementOptionMentor
+insert_permissions:
+  - role: instructor_access
+    permission:
+      check:
+        AchievementOptionCourses:
+          Course:
+            CourseInstructors:
+              Expert:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+      columns:
+        - id
+        - description
+        - documentationTemplateUrl
+        - evaluationScriptUrl
+        - title
+        - type
+        - created_at
+        - updated_at
+      backend_only: false
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - description
+        - documentationTemplateUrl
+        - evaluationScriptUrl
+        - title
+        - type
+        - created_at
+        - updated_at
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - title
+        - description
+        - type
+        - documentationTemplateUrl
+        - evaluationScriptUrl
+        - created_at
+        - updated_at
+      filter: {}
+update_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - description
+        - documentationTemplateUrl
+        - evaluationScriptUrl
+        - title
+        - type
+        - created_at
+        - updated_at
+      filter:
+        AchievementOptionCourses:
+          Course:
+            CourseInstructors:
+              Expert:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+      check: null
+delete_permissions:
+  - role: instructor_access
+    permission:
+      filter:
+        AchievementOptionCourses:
+          Course:
+            CourseInstructors:
+              Expert:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id

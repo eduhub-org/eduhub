@@ -1,0 +1,20 @@
+table:
+  schema: public
+  name: AchievementRecordAuthor
+object_relationships:
+  - name: AchievementRecord
+    using:
+      foreign_key_constraint_on: achievementRecordId
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - achievementRecordId
+        - id
+        - created_at
+        - updated_at
+        - userId
+      filter: {}
