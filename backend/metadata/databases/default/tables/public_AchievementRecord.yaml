@@ -14,27 +14,6 @@ array_relationships:
           schema: public
           name: AchievementRecordAuthor
 insert_permissions:
-  - role: instructor_access
-    permission:
-      check:
-        _or:
-          - AchievementOption:
-              AchievementOptionCourses:
-                Course:
-                  CourseInstructors:
-                    Expert:
-                      User:
-                        id:
-                          _eq: X-Hasura-User-Id
-          - AchievementOption:
-              AchievementOptionMentors:
-                Expert:
-                  User:
-                    id:
-                      _eq: X-Hasura-User-Id
-      columns:
-        - rating
-      backend_only: false
   - role: user_access
     permission:
       check: {}
