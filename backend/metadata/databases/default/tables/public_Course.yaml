@@ -1,127 +1,127 @@
 table:
-  name: Course
   schema: public
+  name: Course
 object_relationships:
-- name: CourseStatus
-  using:
-    foreign_key_constraint_on: status
-- name: Program
-  using:
-    foreign_key_constraint_on: programId
+  - name: CourseStatus
+    using:
+      foreign_key_constraint_on: status
+  - name: Program
+    using:
+      foreign_key_constraint_on: programId
 array_relationships:
-- name: CourseEnrollments
-  using:
-    foreign_key_constraint_on:
-      column: courseId
-      table:
-        name: CourseEnrollment
-        schema: public
-- name: CourseInstructors
-  using:
-    foreign_key_constraint_on:
-      column: courseId
-      table:
-        name: CourseInstructor
-        schema: public
-- name: CourseLocations
-  using:
-    foreign_key_constraint_on:
-      column: courseId
-      table:
-        name: CourseLocation
-        schema: public
-- name: CourseProjects
-  using:
-    foreign_key_constraint_on:
-      column: courseId
-      table:
-        name: CourseProject
-        schema: public
-- name: Sessions
-  using:
-    foreign_key_constraint_on:
-      column: courseId
-      table:
-        name: Session
-        schema: public
+  - name: AchievementOptionCourses
+    using:
+      foreign_key_constraint_on:
+        column: courseId
+        table:
+          schema: public
+          name: AchievementOptionCourse
+  - name: CourseEnrollments
+    using:
+      foreign_key_constraint_on:
+        column: courseId
+        table:
+          schema: public
+          name: CourseEnrollment
+  - name: CourseInstructors
+    using:
+      foreign_key_constraint_on:
+        column: courseId
+        table:
+          schema: public
+          name: CourseInstructor
+  - name: CourseLocations
+    using:
+      foreign_key_constraint_on:
+        column: courseId
+        table:
+          schema: public
+          name: CourseLocation
+  - name: Sessions
+    using:
+      foreign_key_constraint_on:
+        column: courseId
+        table:
+          schema: public
+          name: Session
 select_permissions:
-- permission:
-    columns:
-    - achievementCertificatePossible
-    - applicationEnd
-    - attendanceCertificatePossible
-    - contentDescriptionField1
-    - contentDescriptionField2
-    - cost
-    - coverImage
-    - ects
-    - endTime
-    - headingDescriptionField1
-    - headingDescriptionField2
-    - id
-    - language
-    - learningGoals
-    - maxMissedSessions
-    - maxParticipants
-    - programId
-    - startTime
-    - tagline
-    - title
-    - weekDay
-    filter: {}
-  role: anonymous
-- permission:
-    columns:
-    - achievementCertificatePossible
-    - applicationEnd
-    - attendanceCertificatePossible
-    - chatLink
-    - contentDescriptionField1
-    - contentDescriptionField2
-    - cost
-    - coverImage
-    - ects
-    - endTime
-    - headingDescriptionField1
-    - headingDescriptionField2
-    - id
-    - language
-    - learningGoals
-    - maxMissedSessions
-    - maxParticipants
-    - programId
-    - startTime
-    - status
-    - tagline
-    - title
-    - visibility
-    - weekDay
-    filter:
-      CourseEnrollments:
-        User:
-          id:
-            _eq: X-Hasura-User-Id
-  role: user_access
-update_permissions:
-- permission:
-    check: null
-    columns:
-    - contentDescriptionField1
-    - contentDescriptionField2
-    - endTime
-    - headingDescriptionField1
-    - headingDescriptionField2
-    - language
-    - learningGoals
-    - maxMissedSessions
-    - maxParticipants
-    - startTime
-    - tagline
-    - weekDay
-    filter:
-      CourseInstructors:
-        Expert:
+  - role: anonymous
+    permission:
+      columns:
+        - achievementCertificatePossible
+        - applicationEnd
+        - attendanceCertificatePossible
+        - contentDescriptionField1
+        - contentDescriptionField2
+        - cost
+        - coverImage
+        - ects
+        - endTime
+        - headingDescriptionField1
+        - headingDescriptionField2
+        - id
+        - language
+        - learningGoals
+        - maxMissedSessions
+        - maxParticipants
+        - programId
+        - startTime
+        - tagline
+        - title
+        - weekDay
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - achievementCertificatePossible
+        - applicationEnd
+        - attendanceCertificatePossible
+        - chatLink
+        - contentDescriptionField1
+        - contentDescriptionField2
+        - cost
+        - coverImage
+        - ects
+        - endTime
+        - headingDescriptionField1
+        - headingDescriptionField2
+        - id
+        - language
+        - learningGoals
+        - maxMissedSessions
+        - maxParticipants
+        - programId
+        - startTime
+        - status
+        - tagline
+        - title
+        - visibility
+        - weekDay
+      filter:
+        CourseEnrollments:
           User:
             id:
               _eq: X-Hasura-User-Id
-  role: instructor_access
+update_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - contentDescriptionField1
+        - contentDescriptionField2
+        - endTime
+        - headingDescriptionField1
+        - headingDescriptionField2
+        - language
+        - learningGoals
+        - maxMissedSessions
+        - maxParticipants
+        - startTime
+        - tagline
+        - weekDay
+      filter:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+      check: null

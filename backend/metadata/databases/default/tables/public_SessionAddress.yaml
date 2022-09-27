@@ -1,64 +1,64 @@
 table:
-  name: SessionAddress
   schema: public
+  name: SessionAddress
 object_relationships:
-- name: Session
-  using:
-    foreign_key_constraint_on: sessionId
+  - name: Session
+    using:
+      foreign_key_constraint_on: sessionId
 insert_permissions:
-- permission:
-    backend_only: false
-    check:
-      Session:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-    columns:
-    - id
-    - latitude
-    - link
-    - longitude
-    - sessionId
-  role: instructor_access
+  - role: instructor_access
+    permission:
+      check:
+        Session:
+          Course:
+            CourseInstructors:
+              Expert:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+      columns:
+        - id
+        - latitude
+        - link
+        - longitude
+        - sessionId
+      backend_only: false
 select_permissions:
-- permission:
-    columns:
-    - id
-    - created_at
-    - updated_at
-    - sessionId
-    - latitude
-    - link
-    - longitude
-    filter: {}
-  role: anonymous
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - created_at
+        - updated_at
+        - sessionId
+        - latitude
+        - link
+        - longitude
+      filter: {}
 update_permissions:
-- permission:
-    check: null
-    columns:
-    - latitude
-    - link
-    - longitude
-    filter:
-      Session:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-  role: instructor_access
+  - role: instructor_access
+    permission:
+      columns:
+        - latitude
+        - link
+        - longitude
+      filter:
+        Session:
+          Course:
+            CourseInstructors:
+              Expert:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+      check: null
 delete_permissions:
-- permission:
-    filter:
-      Session:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-  role: instructor_access
+  - role: instructor_access
+    permission:
+      filter:
+        Session:
+          Course:
+            CourseInstructors:
+              Expert:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
