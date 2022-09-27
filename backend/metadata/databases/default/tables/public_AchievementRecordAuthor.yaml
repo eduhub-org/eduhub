@@ -8,6 +8,17 @@ object_relationships:
   - name: User
     using:
       foreign_key_constraint_on: userId
+insert_permissions:
+  - role: user_access
+    permission:
+      check: {}
+      columns:
+        - achievementRecordId
+        - created_at
+        - id
+        - updated_at
+        - userId
+      backend_only: false
 select_permissions:
   - role: anonymous
     permission:

@@ -12,22 +12,20 @@ insert_permissions:
   - role: instructor_access
     permission:
       check:
-        _or:
-          - AchievementOption:
-              AchievementOptionCourses:
-                Course:
-                  CourseInstructors:
-                    Expert:
-                      User:
-                        id:
-                          _eq: X-Hasura-User-Id
-          - AchievementOption:
-              AchievementOptionMentors:
+        AchievementOption:
+          AchievementOptionCourses:
+            Course:
+              CourseInstructors:
                 Expert:
                   User:
                     id:
                       _eq: X-Hasura-User-Id
-      columns: []
+      columns:
+        - achievementOptionId
+        - expertId
+        - id
+        - created_at
+        - updated_at
       backend_only: false
 select_permissions:
   - role: anonymous
@@ -44,17 +42,10 @@ update_permissions:
     permission:
       columns: []
       filter:
-        _or:
-          - AchievementOption:
-              AchievementOptionCourses:
-                Course:
-                  CourseInstructors:
-                    Expert:
-                      User:
-                        id:
-                          _eq: X-Hasura-User-Id
-          - AchievementOption:
-              AchievementOptionMentors:
+        AchievementOption:
+          AchievementOptionCourses:
+            Course:
+              CourseInstructors:
                 Expert:
                   User:
                     id:
@@ -64,17 +55,10 @@ delete_permissions:
   - role: instructor_access
     permission:
       filter:
-        _or:
-          - AchievementOption:
-              AchievementOptionCourses:
-                Course:
-                  CourseInstructors:
-                    Expert:
-                      User:
-                        id:
-                          _eq: X-Hasura-User-Id
-          - AchievementOption:
-              AchievementOptionMentors:
+        AchievementOption:
+          AchievementOptionCourses:
+            Course:
+              CourseInstructors:
                 Expert:
                   User:
                     id:

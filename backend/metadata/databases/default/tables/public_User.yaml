@@ -9,6 +9,13 @@ object_relationships:
     using:
       foreign_key_constraint_on: university
 array_relationships:
+  - name: AchievementRecordAuthors
+    using:
+      foreign_key_constraint_on:
+        column: userId
+        table:
+          schema: public
+          name: AchievementRecordAuthor
   - name: Admins
     using:
       foreign_key_constraint_on:

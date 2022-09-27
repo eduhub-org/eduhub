@@ -5,6 +5,9 @@ object_relationships:
   - name: AchievementOption
     using:
       foreign_key_constraint_on: AchievementOptionId
+  - name: AchievementRecordRating
+    using:
+      foreign_key_constraint_on: rating
 array_relationships:
   - name: AchievementRecordAuthors
     using:
@@ -69,7 +72,11 @@ select_permissions:
         - coverImageUrl
         - description
         - rating
-      filter: {}
+      filter:
+        AchievementRecordAuthors:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
 update_permissions:
   - role: instructor_access
     permission:
@@ -91,19 +98,4 @@ update_permissions:
                   User:
                     id:
                       _eq: X-Hasura-User-Id
-      check:
-        _or:
-          - AchievementOption:
-              AchievementOptionCourses:
-                Course:
-                  CourseInstructors:
-                    Expert:
-                      User:
-                        id:
-                          _eq: X-Hasura-User-Id
-          - AchievementOption:
-              AchievementOptionMentors:
-                Expert:
-                  User:
-                    id:
-                      _eq: X-Hasura-User-Id
+      check: {}

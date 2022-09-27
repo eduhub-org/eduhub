@@ -1,6 +1,10 @@
 table:
   schema: public
   name: AchievementOption
+object_relationships:
+  - name: AchievementRecordType
+    using:
+      foreign_key_constraint_on: recordType
 array_relationships:
   - name: AchievementOptionCourses
     using:
@@ -16,13 +20,26 @@ array_relationships:
         table:
           schema: public
           name: AchievementOptionMentor
+  - name: AchievementRecords
+    using:
+      foreign_key_constraint_on:
+        column: AchievementOptionId
+        table:
+          schema: public
+          name: AchievementRecord
 insert_permissions:
   - role: instructor_access
     permission:
       check:
-        AchievementOptionCourses:
-          Course:
-            CourseInstructors:
+        _or:
+          - AchievementOptionCourses:
+              Course:
+                CourseInstructors:
+                  Expert:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
+          - AchievementOptionMentors:
               Expert:
                 User:
                   id:
@@ -33,7 +50,7 @@ insert_permissions:
         - documentationTemplateUrl
         - evaluationScriptUrl
         - title
-        - type
+        - recordType
         - created_at
         - updated_at
       backend_only: false
@@ -46,7 +63,7 @@ select_permissions:
         - documentationTemplateUrl
         - evaluationScriptUrl
         - title
-        - type
+        - recordType
         - created_at
         - updated_at
       filter: {}
@@ -56,7 +73,7 @@ select_permissions:
         - id
         - title
         - description
-        - type
+        - recordType
         - documentationTemplateUrl
         - evaluationScriptUrl
         - created_at
@@ -71,13 +88,19 @@ update_permissions:
         - documentationTemplateUrl
         - evaluationScriptUrl
         - title
-        - type
+        - recordType
         - created_at
         - updated_at
       filter:
-        AchievementOptionCourses:
-          Course:
-            CourseInstructors:
+        _or:
+          - AchievementOptionCourses:
+              Course:
+                CourseInstructors:
+                  Expert:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
+          - AchievementOptionMentors:
               Expert:
                 User:
                   id:
@@ -87,9 +110,15 @@ delete_permissions:
   - role: instructor_access
     permission:
       filter:
-        AchievementOptionCourses:
-          Course:
-            CourseInstructors:
+        _or:
+          - AchievementOptionCourses:
+              Course:
+                CourseInstructors:
+                  Expert:
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
+          - AchievementOptionMentors:
               Expert:
                 User:
                   id:

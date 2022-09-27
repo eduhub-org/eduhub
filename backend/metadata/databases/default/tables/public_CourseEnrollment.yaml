@@ -14,14 +14,6 @@ object_relationships:
   - name: User
     using:
       foreign_key_constraint_on: userId
-array_relationships:
-  - name: ProjectEnrollments
-    using:
-      foreign_key_constraint_on:
-        column: enrollmentId
-        table:
-          schema: public
-          name: ProjectEnrollment
 insert_permissions:
   - role: user_access
     permission:
