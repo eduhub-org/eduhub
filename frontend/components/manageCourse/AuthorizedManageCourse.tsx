@@ -23,6 +23,7 @@ import { AlertMessageDialog } from "../common/dialogs/AlertMessageDialog";
 import { SessionsTab } from "./SessionsTab";
 import { ApplicationTab } from "./ApplicationTab";
 import ManageCourseEnrollment from "./ManageCourseEnrollment";
+import ProjectResultsUpload from "../course/ProjectResultsUpload";
 
 interface Props {
   courseId: number;
@@ -322,6 +323,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
         onClose={handleCloseCantUpgrade}
         open={isCantUpgradeOpen}
       />
+      <ProjectResultsUpload />
     </>
   );
 };

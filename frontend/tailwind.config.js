@@ -21,6 +21,7 @@ module.exports = {
         "edu-course-list": "#F2F2F2",
         "edu-modal-bg-color": "#222222",
         "edu-tag-color": "#C4C4C4",
+        "edu-row-color": "#E5E5E5",
       },
     },
     fontFamily: {
