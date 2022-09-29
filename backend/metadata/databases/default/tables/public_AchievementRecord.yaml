@@ -22,7 +22,9 @@ insert_permissions:
       check: {}
       columns:
         - coverImageUrl
+        - csvResults
         - description
+        - documentationUrl
         - id
         - uploadUserId
       backend_only: false
@@ -33,6 +35,7 @@ select_permissions:
         - AchievementOptionId
         - coverImageUrl
         - description
+        - documentationUrl
         - id
         - score
       filter: {}
@@ -40,12 +43,14 @@ select_permissions:
     permission:
       columns:
         - AchievementOptionId
-        - id
-        - uploadUserId
-        - score
         - coverImageUrl
+        - csvResults
         - description
+        - documentationUrl
+        - id
         - rating
+        - score
+        - uploadUserId
       filter:
         _or:
           - AchievementOption:
@@ -66,12 +71,14 @@ select_permissions:
     permission:
       columns:
         - AchievementOptionId
-        - id
-        - uploadUserId
-        - score
         - coverImageUrl
+        - csvResults
         - description
+        - documentationUrl
+        - id
         - rating
+        - score
+        - uploadUserId
       filter:
         AchievementRecordAuthors:
           User:
