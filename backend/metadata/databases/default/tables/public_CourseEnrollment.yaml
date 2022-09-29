@@ -1,86 +1,78 @@
 table:
-  name: CourseEnrollment
   schema: public
+  name: CourseEnrollment
 object_relationships:
-- name: Course
-  using:
-    foreign_key_constraint_on: courseId
-- name: CourseEnrollmentStatus
-  using:
-    foreign_key_constraint_on: status
-- name: MotivationRating
-  using:
-    foreign_key_constraint_on: motivationRating
-- name: User
-  using:
-    foreign_key_constraint_on: userId
-array_relationships:
-- name: ProjectEnrollments
-  using:
-    foreign_key_constraint_on:
-      column: enrollmentId
-      table:
-        name: ProjectEnrollment
-        schema: public
+  - name: Course
+    using:
+      foreign_key_constraint_on: courseId
+  - name: CourseEnrollmentStatus
+    using:
+      foreign_key_constraint_on: status
+  - name: MotivationRating
+    using:
+      foreign_key_constraint_on: motivationRating
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
 insert_permissions:
-- permission:
-    backend_only: false
-    check: {}
-    columns:
-    - courseId
-    - motivationLetter
-    - status
-    - userId
-  role: user_access
+  - role: user_access
+    permission:
+      check: {}
+      columns:
+        - courseId
+        - motivationLetter
+        - status
+        - userId
+      backend_only: false
 select_permissions:
-- permission:
-    columns:
-    - id
-    - courseId
-    - userId
-    - status
-    - motivationLetter
-    - motivationRating
-    - achievementCertificateURL
-    - attendanceCertificateURL
-    - created_at
-    - updated_at
-    - invitationExpirationDate
-    filter:
-      Course:
-        CourseInstructors:
-          Expert:
-            User:
-              id:
-                _eq: X-Hasura-User-Id
-  role: instructor_access
-- permission:
-    columns:
-    - achievementCertificateURL
-    - attendanceCertificateURL
-    - courseId
-    - id
-    - invitationExpirationDate
-    - motivationLetter
-    - status
-    - userId
-    filter:
-      User:
-        id:
-          _eq: X-Hasura-User-Id
-  role: user_access
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - courseId
+        - userId
+        - status
+        - motivationLetter
+        - motivationRating
+        - achievementCertificateURL
+        - attendanceCertificateURL
+        - created_at
+        - updated_at
+        - invitationExpirationDate
+      filter:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+  - role: user_access
+    permission:
+      columns:
+        - achievementCertificateURL
+        - attendanceCertificateURL
+        - courseId
+        - id
+        - invitationExpirationDate
+        - motivationLetter
+        - status
+        - userId
+      filter:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
 update_permissions:
-- permission:
-    check: {}
-    columns:
-    - invitationExpirationDate
-    - motivationRating
-    - status
-    filter:
-      Course:
-        CourseInstructors:
-          Expert:
-            User:
-              id:
-                _eq: X-Hasura-User-Id
-  role: instructor_access
+  - role: instructor_access
+    permission:
+      columns:
+        - invitationExpirationDate
+        - motivationRating
+        - status
+      filter:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+      check: {}
