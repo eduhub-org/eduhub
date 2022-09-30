@@ -1,14 +1,14 @@
 table:
-  schema: public
   name: MailStatus
+  schema: public
 is_enum: true
 array_relationships:
-  - name: MailLogs
-    using:
-      manual_configuration:
-        remote_table:
-          schema: public
-          name: MailLog
-        insertion_order: null
-        column_mapping:
-          value: id
+- name: MailLogs
+  using:
+    manual_configuration:
+      column_mapping:
+        value: id
+      insertion_order: null
+      remote_table:
+        name: MailLog
+        schema: public

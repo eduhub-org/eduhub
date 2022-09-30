@@ -1,59 +1,59 @@
 table:
-  schema: public
   name: Program
+  schema: public
 array_relationships:
-  - name: Courses
-    using:
-      foreign_key_constraint_on:
-        column: programId
-        table:
-          schema: public
-          name: Course
-  - name: RentAScientistConfigs
-    using:
-      foreign_key_constraint_on:
-        column: program_id
-        table:
-          schema: public
-          name: RentAScientistConfig
-  - name: ScientistOffers
-    using:
-      foreign_key_constraint_on:
-        column: programId
-        table:
-          schema: public
-          name: ScientistOffer
+- name: Courses
+  using:
+    foreign_key_constraint_on:
+      column: programId
+      table:
+        name: Course
+        schema: public
+- name: RentAScientistConfigs
+  using:
+    foreign_key_constraint_on:
+      column: program_id
+      table:
+        name: RentAScientistConfig
+        schema: public
+- name: ScientistOffers
+  using:
+    foreign_key_constraint_on:
+      column: programId
+      table:
+        name: ScientistOffer
+        schema: public
 select_permissions:
-  - role: anonymous
-    permission:
-      columns:
-        - applicationStart
-        - id
-        - lectureEnd
-        - lectureStart
-        - projectRecordUploadDeadline
-        - shortTitle
-        - title
-        - visibility
-      filter: {}
-  - role: instructor_access
-    permission:
-      columns:
-        - id
-        - title
-        - lectureStart
-        - lectureEnd
-        - applicationStart
-        - defaultApplicationEnd
-        - projectRecordUploadDeadline
-        - visibility
-        - startQuestionnaire
-        - speakerQuestionnaire
-        - closingQuestionnaire
-        - visibilityParticipationCertificate
-        - visibilityAchievementCertificate
-        - attendanceCertificateTemplateURL
-        - participationCertificateTemplateURL
-        - shortTitle
-        - defaultMaxMissedSessions
-      filter: {}
+- permission:
+    columns:
+    - applicationStart
+    - id
+    - lectureEnd
+    - lectureStart
+    - projectRecordUploadDeadline
+    - shortTitle
+    - title
+    - visibility
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - id
+    - title
+    - lectureStart
+    - lectureEnd
+    - applicationStart
+    - defaultApplicationEnd
+    - projectRecordUploadDeadline
+    - visibility
+    - startQuestionnaire
+    - speakerQuestionnaire
+    - closingQuestionnaire
+    - visibilityParticipationCertificate
+    - visibilityAchievementCertificate
+    - attendanceCertificateTemplateURL
+    - participationCertificateTemplateURL
+    - shortTitle
+    - defaultMaxMissedSessions
+    filter: {}
+  role: instructor_access

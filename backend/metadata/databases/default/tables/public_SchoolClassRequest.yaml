@@ -1,86 +1,86 @@
 table:
-  schema: public
   name: SchoolClassRequest
+  schema: public
 object_relationships:
-  - name: SchoolClass
-    using:
-      foreign_key_constraint_on: classId
-  - name: ScientistOffer
-    using:
-      foreign_key_constraint_on: offerId
+- name: SchoolClass
+  using:
+    foreign_key_constraint_on: classId
+- name: ScientistOffer
+  using:
+    foreign_key_constraint_on: offerId
 insert_permissions:
-  - role: user_access
-    permission:
-      check:
-        _and:
-          - SchoolClass:
-              Teacher:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
-          - ScientistOffer:
-              Program:
-                visibility:
-                  _eq: true
-      columns:
-        - possibleDays
-        - assigned_day
-        - classId
-        - id
-        - offerId
-        - commentGeneral
-        - commentTime
-      backend_only: false
+- permission:
+    backend_only: false
+    check:
+      _and:
+      - SchoolClass:
+          Teacher:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+      - ScientistOffer:
+          Program:
+            visibility:
+              _eq: true
+    columns:
+    - possibleDays
+    - assigned_day
+    - classId
+    - id
+    - offerId
+    - commentGeneral
+    - commentTime
+  role: user_access
 select_permissions:
-  - role: anonymous
-    permission:
-      columns:
-        - id
-        - offerId
-      filter: {}
-      allow_aggregations: true
-  - role: user_access
-    permission:
-      columns:
-        - possibleDays
-        - assigned_day
-        - classId
-        - id
-        - offerId
-        - commentGeneral
-        - commentTime
-      filter:
-        SchoolClass:
-          Teacher:
-            User:
-              id:
-                _eq: X-Hasura-User-Id
+- permission:
+    allow_aggregations: true
+    columns:
+    - id
+    - offerId
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - possibleDays
+    - assigned_day
+    - classId
+    - id
+    - offerId
+    - commentGeneral
+    - commentTime
+    filter:
+      SchoolClass:
+        Teacher:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+  role: user_access
 update_permissions:
-  - role: user_access
-    permission:
-      columns:
-        - assigned_day
-        - commentGeneral
-        - commentTime
-        - possibleDays
-      filter:
-        SchoolClass:
-          Teacher:
-            User:
-              id:
-                _eq: X-Hasura-User-Id
-      check:
-        SchoolClass:
-          Teacher:
-            User:
-              id:
-                _eq: X-Hasura-User-Id
+- permission:
+    check:
+      SchoolClass:
+        Teacher:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+    columns:
+    - assigned_day
+    - commentGeneral
+    - commentTime
+    - possibleDays
+    filter:
+      SchoolClass:
+        Teacher:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+  role: user_access
 delete_permissions:
-  - role: user_access
-    permission:
-      filter:
-        SchoolClass:
-          Teacher:
-            User:
-              id:
-                _eq: X-Hasura-User-Id
+- permission:
+    filter:
+      SchoolClass:
+        Teacher:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+  role: user_access

@@ -1,108 +1,108 @@
 table:
-  schema: public
   name: ScientistOffer
+  schema: public
 object_relationships:
-  - name: Program
-    using:
-      foreign_key_constraint_on: programId
+- name: Program
+  using:
+    foreign_key_constraint_on: programId
 array_relationships:
-  - name: SchoolClassRequests
-    using:
-      foreign_key_constraint_on:
-        column: offerId
-        table:
-          schema: public
-          name: SchoolClassRequest
-  - name: ScientistOfferRelations
-    using:
-      foreign_key_constraint_on:
-        column: offerId
-        table:
-          schema: public
-          name: ScientistOfferRelation
+- name: SchoolClassRequests
+  using:
+    foreign_key_constraint_on:
+      column: offerId
+      table:
+        name: SchoolClassRequest
+        schema: public
+- name: ScientistOfferRelations
+  using:
+    foreign_key_constraint_on:
+      column: offerId
+      table:
+        name: ScientistOfferRelation
+        schema: public
 select_permissions:
-  - role: anonymous
-    permission:
-      columns:
-        - categories
-        - possibleDays
-        - possibleLocations
-        - timeWindow
-        - id
-        - maxDeployments
-        - maximumGrade
-        - minimumGrade
-        - programId
-        - classPreparation
-        - contactEmail
-        - contactName
-        - contactPhone
-        - description
-        - duration
-        - equipmentRequired
-        - extraComment
-        - format
-        - institutionLogo
-        - institutionName
-        - researchSubject
-        - roomRequirements
-        - subjectComment
-        - title
-      filter: {}
-      allow_aggregations: true
-  - role: instructor_access
-    permission:
-      columns:
-        - id
-        - format
-        - minimumGrade
-        - maximumGrade
-        - possibleDays
-        - timeWindow
-        - maxDeployments
-        - possibleLocations
-        - equipmentRequired
-        - roomRequirements
-        - title
-        - description
-        - duration
-        - extraComment
-        - subjectComment
-        - programId
-        - classPreparation
-        - institutionName
-        - institutionLogo
-        - categories
-        - contactEmail
-        - contactPhone
-        - contactName
-        - researchSubject
-      filter: {}
-  - role: user_access
-    permission:
-      columns:
-        - categories
-        - possibleDays
-        - possibleLocations
-        - timeWindow
-        - id
-        - maxDeployments
-        - maximumGrade
-        - minimumGrade
-        - programId
-        - classPreparation
-        - contactEmail
-        - contactName
-        - contactPhone
-        - description
-        - duration
-        - equipmentRequired
-        - extraComment
-        - format
-        - institutionLogo
-        - institutionName
-        - researchSubject
-        - roomRequirements
-        - subjectComment
-        - title
-      filter: {}
+- permission:
+    allow_aggregations: true
+    columns:
+    - categories
+    - possibleDays
+    - possibleLocations
+    - timeWindow
+    - id
+    - maxDeployments
+    - maximumGrade
+    - minimumGrade
+    - programId
+    - classPreparation
+    - contactEmail
+    - contactName
+    - contactPhone
+    - description
+    - duration
+    - equipmentRequired
+    - extraComment
+    - format
+    - institutionLogo
+    - institutionName
+    - researchSubject
+    - roomRequirements
+    - subjectComment
+    - title
+    filter: {}
+  role: anonymous
+- permission:
+    columns:
+    - id
+    - format
+    - minimumGrade
+    - maximumGrade
+    - possibleDays
+    - timeWindow
+    - maxDeployments
+    - possibleLocations
+    - equipmentRequired
+    - roomRequirements
+    - title
+    - description
+    - duration
+    - extraComment
+    - subjectComment
+    - programId
+    - classPreparation
+    - institutionName
+    - institutionLogo
+    - categories
+    - contactEmail
+    - contactPhone
+    - contactName
+    - researchSubject
+    filter: {}
+  role: instructor_access
+- permission:
+    columns:
+    - categories
+    - possibleDays
+    - possibleLocations
+    - timeWindow
+    - id
+    - maxDeployments
+    - maximumGrade
+    - minimumGrade
+    - programId
+    - classPreparation
+    - contactEmail
+    - contactName
+    - contactPhone
+    - description
+    - duration
+    - equipmentRequired
+    - extraComment
+    - format
+    - institutionLogo
+    - institutionName
+    - researchSubject
+    - roomRequirements
+    - subjectComment
+    - title
+    filter: {}
+  role: user_access

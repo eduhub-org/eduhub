@@ -1,75 +1,75 @@
 table:
-  schema: public
   name: CourseLocation
+  schema: public
 object_relationships:
-  - name: Course
-    using:
-      foreign_key_constraint_on: courseId
-  - name: LocationOption
-    using:
-      manual_configuration:
-        remote_table:
-          schema: public
-          name: LocationOption
-        insertion_order: null
-        column_mapping:
-          locationOption: value
+- name: Course
+  using:
+    foreign_key_constraint_on: courseId
+- name: LocationOption
+  using:
+    manual_configuration:
+      column_mapping:
+        locationOption: value
+      insertion_order: null
+      remote_table:
+        name: LocationOption
+        schema: public
 insert_permissions:
-  - role: instructor_access
-    permission:
-      check:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-      columns:
-        - courseId
-        - id
-        - latitude
-        - link
-        - locationOption
-        - longitude
-      backend_only: false
+- permission:
+    backend_only: false
+    check:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+    columns:
+    - courseId
+    - id
+    - latitude
+    - link
+    - locationOption
+    - longitude
+  role: instructor_access
 select_permissions:
-  - role: anonymous
-    permission:
-      columns:
-        - courseId
-        - id
-        - latitude
-        - locationOption
-        - longitude
-      filter: {}
-      limit: 10
-  - role: user_access
-    permission:
-      columns:
-        - courseId
-        - created_at
-        - id
-        - latitude
-        - link
-        - locationOption
-        - longitude
-        - updated_at
-      filter: {}
-      limit: 10
+- permission:
+    columns:
+    - courseId
+    - id
+    - latitude
+    - locationOption
+    - longitude
+    filter: {}
+    limit: 10
+  role: anonymous
+- permission:
+    columns:
+    - courseId
+    - created_at
+    - id
+    - latitude
+    - link
+    - locationOption
+    - longitude
+    - updated_at
+    filter: {}
+    limit: 10
+  role: user_access
 update_permissions:
-  - role: instructor_access
-    permission:
-      columns:
-        - courseId
-        - latitude
-        - link
-        - locationOption
-        - longitude
-      filter:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-      check: null
+- permission:
+    check: null
+    columns:
+    - courseId
+    - latitude
+    - link
+    - locationOption
+    - longitude
+    filter:
+      Course:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+  role: instructor_access
