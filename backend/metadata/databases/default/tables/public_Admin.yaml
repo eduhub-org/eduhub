@@ -1,7 +1,7 @@
 table:
-  name: Admin
   schema: public
+  name: Admin
 object_relationships:
-- name: User
-  using:
-    foreign_key_constraint_on: userId
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
