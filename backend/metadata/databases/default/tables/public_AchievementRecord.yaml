@@ -4,7 +4,7 @@ table:
 object_relationships:
   - name: AchievementOption
     using:
-      foreign_key_constraint_on: AchievementOptionId
+      foreign_key_constraint_on: achievementOptionId
   - name: AchievementRecordRating
     using:
       foreign_key_constraint_on: rating
@@ -32,7 +32,7 @@ select_permissions:
   - role: anonymous
     permission:
       columns:
-        - AchievementOptionId
+        - achievementOptionId
         - coverImageUrl
         - description
         - documentationUrl
@@ -42,7 +42,7 @@ select_permissions:
   - role: instructor_access
     permission:
       columns:
-        - AchievementOptionId
+        - achievementOptionId
         - coverImageUrl
         - csvResults
         - description
@@ -70,7 +70,7 @@ select_permissions:
   - role: user_access
     permission:
       columns:
-        - AchievementOptionId
+        - achievementOptionId
         - coverImageUrl
         - csvResults
         - description
