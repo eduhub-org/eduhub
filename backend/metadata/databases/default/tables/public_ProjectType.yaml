@@ -1,21 +1,11 @@
 table:
-  name: ProjectType
   schema: public
+  name: ProjectType
 is_enum: true
-array_relationships:
-- name: Projects
-  using:
-    manual_configuration:
-      column_mapping:
-        value: type
-      insertion_order: null
-      remote_table:
-        name: Project
-        schema: public
 select_permissions:
-- permission:
-    columns:
-    - value
-    - comment
-    filter: {}
-  role: anonymous
+  - role: anonymous
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}

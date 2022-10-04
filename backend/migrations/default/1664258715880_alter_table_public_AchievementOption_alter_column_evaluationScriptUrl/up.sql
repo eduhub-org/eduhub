@@ -1,0 +1,1 @@
+comment on column "public"."AchievementOption"."evaluationScriptUrl" is E'If the record tye is "DOCUMENTATION_AND_CSV" an URL to a python script can be provided that returns a score for uploaded csv data.';

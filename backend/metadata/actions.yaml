@@ -101,6 +101,9 @@ actions:
     definition:
       kind: synchronous
       handler: '{{CLOUD_FUNCTION_LINK_SAVE_USER_PROFILE_IMAGE}}'
+      - role: instructor_access
+      - role: user_access
+      - role: anonymous
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -134,4 +137,6 @@ custom_types:
     - name: AchievementCertificateTemplateLink
     - name: ParticipationCertificateLink
     - name: ParticipationCertificateTemplateLink
+    - name: UploadResult
+    - name: Output
   scalars: []

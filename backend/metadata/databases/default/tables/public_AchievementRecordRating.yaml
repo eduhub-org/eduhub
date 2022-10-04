@@ -1,0 +1,19 @@
+table:
+  schema: public
+  name: AchievementRecordRating
+is_enum: true
+array_relationships:
+  - name: AchievementRecords
+    using:
+      foreign_key_constraint_on:
+        column: rating
+        table:
+          schema: public
+          name: AchievementRecord
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}
