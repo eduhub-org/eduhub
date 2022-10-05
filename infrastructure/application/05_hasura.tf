@@ -105,12 +105,12 @@ resource "google_cloud_run_service" "hasura" {
           value = var.project_id
         }
         env {
-          name  = "CLOUD_FUNCTION_LINK_LOAD_FILE"
-          value = google_cloudfunctions2_function.load_file.service_config[0].uri
+          name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE"
+          value = google_cloudfunctions2_function.load_achievement_certificate.service_config[0].uri
         }
         env {
-          name  = "CLOUD_FUNCTION_LINK_SAVE_FILE"
-          value = google_cloudfunctions2_function.save_file.service_config[0].uri
+          name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE"
+          value = google_cloudfunctions2_function.save_achievement_certificate.service_config[0].uri
         }
         env {
           name  = "CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK"
