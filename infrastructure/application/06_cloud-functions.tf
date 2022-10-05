@@ -22,7 +22,7 @@ data "google_storage_bucket_object" "load_achievement_certificate" {
 resource "google_cloudfunctions2_function" "load_achievement_certificate" {
   provider    = google-beta
   location    = var.region
-  name        = "load_achievement_certificate"
+  name        = "load-achievement-certificate"
   description = "Loads a file from Google Cloud Storage"
 
   build_config {
@@ -65,7 +65,7 @@ data "google_storage_bucket_object" "load_achievement_certificate_template" {
 resource "google_cloudfunctions2_function" "load_achievement_certificate_template" {
   provider    = google-beta
   location    = var.region
-  name        = "load_achievement_certificate_template"
+  name        = "load-achievement-certificate-template"
   description = "Loads a file from Google Cloud Storage"
 
   build_config {
@@ -108,7 +108,7 @@ data "google_storage_bucket_object" "load_participation_certificate" {
 resource "google_cloudfunctions2_function" "load_participation_certificate" {
   provider    = google-beta
   location    = var.region
-  name        = "load_participation_certificate"
+  name        = "load-participation-certificate"
   description = "Loads a file from Google Cloud Storage"
 
   build_config {
@@ -151,7 +151,7 @@ data "google_storage_bucket_object" "load_participation_certificate_template" {
 resource "google_cloudfunctions2_function" "load_participation_certificate_template" {
   provider    = google-beta
   location    = var.region
-  name        = "load_participation_certificate_template"
+  name        = "load-participation-certificate-template"
   description = "Loads a file from Google Cloud Storage"
 
   build_config {
@@ -194,7 +194,7 @@ data "google_storage_bucket_object" "save_achievement_certificate" {
 resource "google_cloudfunctions2_function" "save_achievement_certificate" {
   provider    = google-beta
   location    = var.region
-  name        = "save_achievement_certificate"
+  name        = "save-achievement-certificate"
   description = "Loads a file from Google Cloud Storage"
 
   build_config {
@@ -207,6 +207,15 @@ resource "google_cloudfunctions2_function" "save_achievement_certificate" {
       }
     }
   }
+  service_config {
+    environment_variables = {
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+    }
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 60
+  }
+}
 
 ###############################################################################
 # Create Google cloud function for saveAchievementCertificateTemplate
@@ -227,7 +236,7 @@ data "google_storage_bucket_object" "save_achievement_certificate_template" {
 resource "google_cloudfunctions2_function" "save_achievement_certificate_template" {
   provider    = google-beta
   location    = var.region
-  name        = "save_achievement_certificate_template"
+  name        = "save-achievement-certificate-template"
   description = "Loads a file from Google Cloud Storage"
 
   build_config {
@@ -270,7 +279,7 @@ data "google_storage_bucket_object" "save_achievement_record_cover_image" {
 resource "google_cloudfunctions2_function" "save_achievement_record_cover_image" {
   provider    = google-beta
   location    = var.region
-  name        = "save_achievement_record_cover_image"
+  name        = "save-achievement-record-cover-image"
   description = "Loads a file from Google Cloud Storage"
 
   build_config {
@@ -313,7 +322,7 @@ data "google_storage_bucket_object" "save_course_image" {
 resource "google_cloudfunctions2_function" "save_course_image" {
   provider    = google-beta
   location    = var.region
-  name        = "save_course_image"
+  name        = "save-course-image"
   description = "Loads a file from Google Cloud Storage"
 
   build_config {
@@ -356,7 +365,7 @@ data "google_storage_bucket_object" "save_participation_certificate" {
 resource "google_cloudfunctions2_function" "save_participation_certificate" {
   provider    = google-beta
   location    = var.region
-  name        = "save_participation_certificate"
+  name        = "save-participation-certificate"
   description = "Loads a file from Google Cloud Storage"
 
   build_config {
@@ -399,7 +408,7 @@ data "google_storage_bucket_object" "save_participation_certificate_template" {
 resource "google_cloudfunctions2_function" "save_participation_certificate_template" {
   provider    = google-beta
   location    = var.region
-  name        = "save_participation_certificate_template"
+  name        = "save-participation-certificate-template"
   description = "Loads a file from Google Cloud Storage"
 
   build_config {
@@ -442,7 +451,7 @@ data "google_storage_bucket_object" "save_user_profile_image" {
 resource "google_cloudfunctions2_function" "save_user_profile_image" {
   provider    = google-beta
   location    = var.region
-  name        = "save_user_profile_image"
+  name        = "save-user-profile-image"
   description = "Loads a file from Google Cloud Storage"
 
   build_config {
