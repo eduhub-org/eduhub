@@ -34,19 +34,97 @@ jobs:
       - name: Check Out the Repository Branch
         uses: actions/checkout@v2
 
-      - name: Zip Archive for loadFile
-        uses: thedoctor0/zip-release@main
-        with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadFile'
-          filename: '../loadFile.zip'
+      - 
+        name: Copy module to functions
+        run: |
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificate/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificateTemplate/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadParticipationCertificate/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadParticipationCertificateTemplate/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificate/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificateTemplate/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordCoverImage/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveCourseImage/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveParticipationCertificate/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveParticipationCertificateTemplate/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveUserProfileImage/lib/'
 
-      - name: Zip Archive for saveFile
+      - name: Zip Archive for loadAchievementCertificate
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveFile'
-          filename: '../saveFile.zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificate'
+          filename: '../loadAchievementCertificate.zip'
+
+      - name: Zip Archive for loadAchievementCertificateTemplate
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificateTemplate'
+          filename: '../loadAchievementCertificateTemplate.zip'
+
+      - name: Zip Archive for loadParticipationCertificate
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadParticipationCertificate'
+          filename: '../loadParticipationCertificate.zip'
+          
+      - name: Zip Archive for loadParticipationCertificateTemplate
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadParticipationCertificateTemplate'
+          filename: '../loadParticipationCertificateTemplate.zip'
+
+      - name: Zip Archive for saveAchievementCertificate
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificate'
+          filename: '../saveAchievementCertificate.zip'
+          
+      - name: Zip Archive for saveAchievementCertificateTemplate
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificateTemplate'
+          filename: '../saveAchievementCertificateTemplate.zip'
+
+      - name: Zip Archive for saveAchievementRecordCoverImage
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordCoverImage'
+          filename: '../saveAchievementRecordCoverImage.zip'
+
+      - name: Zip Archive for saveCourseImage
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveCourseImage'
+          filename: '../saveCourseImage.zip'
+
+      - name: Zip Archive for saveParticipationCertificate
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveParticipationCertificate'
+          filename: '../saveParticipationCertificate.zip'
+          
+      - name: Zip Archive for saveParticipationCertificateTemplate
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveParticipationCertificateTemplate'
+          filename: '../saveParticipationCertificateTemplate.zip'
+          
+      - name: Zip Archive for saveUserProfileImage
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveUserProfileImage'
+          filename: '../saveUserProfileImage.zip'
 
       - name: Zip Archive for sendMail
         uses: thedoctor0/zip-release@main

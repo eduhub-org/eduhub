@@ -1,19 +1,19 @@
 table:
-  name: CourseStatus
   schema: public
+  name: CourseStatus
 is_enum: true
 array_relationships:
-- name: Courses
-  using:
-    foreign_key_constraint_on:
-      column: status
-      table:
-        name: Course
-        schema: public
+  - name: Courses
+    using:
+      foreign_key_constraint_on:
+        column: status
+        table:
+          schema: public
+          name: Course
 select_permissions:
-- permission:
-    columns:
-    - value
-    - comment
-    filter: {}
-  role: anonymous
+  - role: anonymous
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}

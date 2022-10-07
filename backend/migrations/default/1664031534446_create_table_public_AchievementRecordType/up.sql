@@ -1,0 +1,1 @@
+CREATE TABLE "public"."AchievementRecordType" ("value" text NOT NULL, PRIMARY KEY ("value") );COMMENT ON TABLE "public"."AchievementRecordType" IS E'Possible types for the records of achievement options.';

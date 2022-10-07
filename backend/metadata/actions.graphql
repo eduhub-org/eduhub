@@ -1,14 +1,81 @@
 type Query {
-  loadFile(
+  loadAchievementCertificate(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
+  loadAchievementCertificateTemplate(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
+  loadParticipationCertificate(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
+  loadparticipationCertificateTemplate(
     path: String!
   ): loadFileOutput
 }
 
 type Mutation {
-  saveFile(
+  saveAchievementCertificate(
+    base64file: String!
+    courseid: String!
+    userid: String!
+  ): AchievementCertificateLink
+}
+
+type Mutation {
+  saveAchievementCertificateTemplate(
     base64file: String!
     filename: String!
-  ): UploadResult
+    programid: String!
+  ): AchievementCertificateTemplateLink
+}
+
+type Mutation {
+  saveAchievementRecordCoverImage(
+    base64file: String!
+    filename: String!
+    achievementRecordId: String!
+  ): AchievementRecordCoverImageLink
+}
+
+type Mutation {
+  saveCourseImage(
+    base64file: String!
+    filename: String!
+    courseid: String!
+  ): CourseImageLink
+}
+
+type Mutation {
+  saveParticipationCertificate(
+    base64file: String!
+    courseid: String!
+    userid: String!
+  ): ParticipationCertificateLink
+}
+
+type Mutation {
+  saveParticipationCertificateTemplate(
+    base64file: String!
+    filename: String!
+    programid: String!
+  ): ParticipationCertificateTemplateLink
+}
+
+type Mutation {
+  saveUserProfileImage(
+    base64file: String!
+    filename: String!
+    courseid: String!
+  ): UserImageLink
 }
 
 type Mutation {
@@ -17,19 +84,47 @@ type Mutation {
   ): result
 }
 
-type UploadResult {
-  link: String!
-}
-
-type Output {
-  link: String!
-}
-
 type loadFileOutput {
   link: String!
 }
 
 type result {
   result: String!
+}
+
+type AchievementRecordCoverImageLink {
+  link: String!
+}
+
+type AchievementCertificateLink {
+  link: String!
+}
+
+type CourseImageLink {
+  link: String!
+}
+
+type UserImageLink {
+  link: String!
+}
+
+type AchievementCertificateTemplateLink {
+  link: String!
+}
+
+type ParticipationCertificateLink {
+  link: String!
+}
+
+type ParticipationCertificateTemplateLink {
+  link: String!
+}
+
+type UploadResult {
+  link: String!
+}
+
+type Output {
+  link: String!
 }
 

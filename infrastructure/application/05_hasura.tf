@@ -105,12 +105,48 @@ resource "google_cloud_run_service" "hasura" {
           value = var.project_id
         }
         env {
-          name  = "CLOUD_FUNCTION_LINK_LOAD_FILE"
-          value = google_cloudfunctions2_function.load_file.service_config[0].uri
+          name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE"
+          value = google_cloudfunctions2_function.load_achievement_certificate.service_config[0].uri
         }
         env {
-          name  = "CLOUD_FUNCTION_LINK_SAVE_FILE"
-          value = google_cloudfunctions2_function.save_file.service_config[0].uri
+          name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE"
+          value = google_cloudfunctions2_function.save_achievement_certificate.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE_TEMPLATE"
+          value = google_cloudfunctions2_function.load_achievement_certificate_template.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE"
+          value = google_cloudfunctions2_function.save_achievement_certificate_template.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE"
+          value = google_cloudfunctions2_function.load_participation_certificate.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE"
+          value = google_cloudfunctions2_function.save_participation_certificate.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE_TEMPLATE"
+          value = google_cloudfunctions2_function.load_participation_certificate_template.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE"
+          value = google_cloudfunctions2_function.save_participation_certificate_template.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE"
+          value = google_cloudfunctions2_function.save_achievement_record_cover_image.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_COURSE_IMAGE"
+          value = google_cloudfunctions2_function.save_course_image.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_USER_PROFILE_IMAGE"
+          value = google_cloudfunctions2_function.save_user_profile_image.service_config[0].uri
         }
         env {
           name  = "CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK"
