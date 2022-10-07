@@ -43,7 +43,7 @@ jobs:
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadParticipationCertificateTemplate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificateTemplate/lib/'
-          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievmentRecordCoverImage/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordCoverImage/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveCourseImage/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveParticipationCertificate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveParticipationCertificateTemplate/lib/'
@@ -91,12 +91,12 @@ jobs:
           directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificateTemplate'
           filename: '../saveAchievementCertificateTemplate.zip'
 
-      - name: Zip Archive for saveAchievmentRecordCoverImage
+      - name: Zip Archive for saveAchievementRecordCoverImage
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievmentRecordCoverImage'
-          filename: '../saveAchievmentRecordCoverImage.zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordCoverImage'
+          filename: '../saveAchievementRecordCoverImage.zip'
 
       - name: Zip Archive for saveCourseImage
         uses: thedoctor0/zip-release@main

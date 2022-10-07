@@ -23,7 +23,7 @@ resource "google_cloudfunctions2_function" "load_achievement_certificate" {
   provider    = google-beta
   location    = var.region
   name        = "load-achievement-certificate"
-  description = "Loads a file from Google Cloud Storage"
+  description = "Loads an achievement certificate from Google Cloud Storage"
 
   build_config {
     runtime     = "nodejs16"
@@ -66,7 +66,7 @@ resource "google_cloudfunctions2_function" "load_achievement_certificate_templat
   provider    = google-beta
   location    = var.region
   name        = "load-achievement-certificate-template"
-  description = "Loads a file from Google Cloud Storage"
+  description = "Loads an achivement certificate template (each program has its own) from Google Cloud Storage"
 
   build_config {
     runtime     = "nodejs16"
@@ -109,7 +109,7 @@ resource "google_cloudfunctions2_function" "load_participation_certificate" {
   provider    = google-beta
   location    = var.region
   name        = "load-participation-certificate"
-  description = "Loads a file from Google Cloud Storage"
+  description = "Loads a participation certificate from Google Cloud Storage"
 
   build_config {
     runtime     = "nodejs16"
@@ -152,7 +152,7 @@ resource "google_cloudfunctions2_function" "load_participation_certificate_templ
   provider    = google-beta
   location    = var.region
   name        = "load-participation-certificate-template"
-  description = "Loads a file from Google Cloud Storage"
+  description = "Loads a participation certificate template (each program has its own) from Google Cloud Storage"
 
   build_config {
     runtime     = "nodejs16"
@@ -195,7 +195,7 @@ resource "google_cloudfunctions2_function" "save_achievement_certificate" {
   provider    = google-beta
   location    = var.region
   name        = "save-achievement-certificate"
-  description = "Loads a file from Google Cloud Storage"
+  description = "Save an created achievement certificate to Google Cloud Storage"
 
   build_config {
     runtime     = "nodejs16"
@@ -237,7 +237,7 @@ resource "google_cloudfunctions2_function" "save_achievement_certificate_templat
   provider    = google-beta
   location    = var.region
   name        = "save-achievement-certificate-template"
-  description = "Loads a file from Google Cloud Storage"
+  description = "Save an achievement certificate template (each program has its own) to Google Cloud Storage"
 
   build_config {
     runtime     = "nodejs16"
@@ -272,7 +272,7 @@ resource "google_cloud_run_service_iam_policy" "save_achievement_record_cover_im
 }
 # Retrieve data object with zipped scource code
 data "google_storage_bucket_object" "save_achievement_record_cover_image" {
-  name   = "cloud-functions/saveAchievmentRecordCoverImage.zip"
+  name   = "cloud-functions/saveAchievementRecordCoverImage.zip"
   bucket = var.project_id
 }
 # Create cloud function
@@ -280,7 +280,7 @@ resource "google_cloudfunctions2_function" "save_achievement_record_cover_image"
   provider    = google-beta
   location    = var.region
   name        = "save-achievement-record-cover-image"
-  description = "Loads a file from Google Cloud Storage"
+  description = "Save the cover image of an achievement record to Google Cloud Storage"
 
   build_config {
     runtime     = "nodejs16"
@@ -300,6 +300,10 @@ resource "google_cloudfunctions2_function" "save_achievement_record_cover_image"
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+  }
+
+  lifecycle {
+    create_before_destroy = false
   }
 }
 
@@ -323,7 +327,7 @@ resource "google_cloudfunctions2_function" "save_course_image" {
   provider    = google-beta
   location    = var.region
   name        = "save-course-image"
-  description = "Loads a file from Google Cloud Storage"
+  description = "Save the cover image of a course to Google Cloud Storage"
 
   build_config {
     runtime     = "nodejs16"
@@ -366,7 +370,7 @@ resource "google_cloudfunctions2_function" "save_participation_certificate" {
   provider    = google-beta
   location    = var.region
   name        = "save-participation-certificate"
-  description = "Loads a file from Google Cloud Storage"
+  description = "Saves a created participation certificate to Google Cloud Storage"
 
   build_config {
     runtime     = "nodejs16"
@@ -409,7 +413,7 @@ resource "google_cloudfunctions2_function" "save_participation_certificate_templ
   provider    = google-beta
   location    = var.region
   name        = "save-participation-certificate-template"
-  description = "Loads a file from Google Cloud Storage"
+  description = "Saves a participation certificate template (each program has its own)) to Google Cloud Storage"
 
   build_config {
     runtime     = "nodejs16"
@@ -452,7 +456,7 @@ resource "google_cloudfunctions2_function" "save_user_profile_image" {
   provider    = google-beta
   location    = var.region
   name        = "save-user-profile-image"
-  description = "Loads a file from Google Cloud Storage"
+  description = "Saves a user profile image to Google Cloud Storage"
 
   build_config {
     runtime     = "nodejs16"
@@ -495,7 +499,7 @@ resource "google_cloudfunctions2_function" "send_mail" {
   provider    = google-beta
   location    = var.region
   name        = "send-mail"
-  description = "Loads a file from Google Cloud Storage"
+  description = "Sends an email as defined in the Hasura mail log table"
 
   build_config {
     runtime     = "nodejs14"
