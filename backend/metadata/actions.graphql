@@ -11,6 +11,12 @@ type Query {
 }
 
 type Query {
+  loadAchievementRecordDocumentation(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
   loadParticipationCertificate(
     path: String!
   ): loadFileOutput
@@ -47,6 +53,14 @@ type Mutation {
 }
 
 type Mutation {
+  saveAchievementRecordDocumentation(
+    base64file: String!
+    filename: String!
+    achievementRecordId: String!
+  ): AchievementRecordDocumentationLink
+}
+
+type Mutation {
   saveCourseImage(
     base64file: String!
     filename: String!
@@ -74,7 +88,7 @@ type Mutation {
   saveUserProfileImage(
     base64file: String!
     filename: String!
-    courseid: String!
+    userid: String!
   ): UserImageLink
 }
 
@@ -125,6 +139,10 @@ type UploadResult {
 }
 
 type Output {
+  link: String!
+}
+
+type AchievementRecordDocumentationLink {
   link: String!
 }
 

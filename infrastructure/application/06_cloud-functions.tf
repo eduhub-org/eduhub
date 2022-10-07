@@ -90,6 +90,49 @@ resource "google_cloudfunctions2_function" "load_achievement_certificate_templat
 }
 
 ###############################################################################
+# Create Google cloud function for loadAchievementRecordDocumentation
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "load_achievement_record_documentation_noauth_invoker" {
+  location    = google_cloudfunctions2_function.load_achievement_record_documentation.location
+  project     = google_cloudfunctions2_function.load_achievement_record_documentation.project
+  service     = google_cloudfunctions2_function.load_achievement_record_documentation.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "load_achievement_record_documentation" {
+  name   = "cloud-functions/loadAchievementRecordDocumentation.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "load_achievement_record_documentation" {
+  provider    = google-beta
+  location    = var.region
+  name        = "load-achievement-record-documentation"
+  description = "Loads an achivement record documentation file from Google Cloud Storage"
+
+  build_config {
+    runtime     = "nodejs16"
+    entry_point = "loadAchievementRecordDocumentation"
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.load_achievement_record_documentation.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+    }
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 60
+  }
+}
+
+###############################################################################
 # Create Google cloud function for loadParticipationCertificate
 #####
 # Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
@@ -290,6 +333,53 @@ resource "google_cloudfunctions2_function" "save_achievement_record_cover_image"
       storage_source {
         bucket = var.project_id
         object = data.google_storage_bucket_object.save_achievement_record_cover_image.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+    }
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 60
+  }
+
+  lifecycle {
+    create_before_destroy = false
+  }
+}
+
+###############################################################################
+# Create Google cloud function for saveAchievementRecordDocumentation
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "save_achievement_record_documentation_noauth_invoker" {
+  location    = google_cloudfunctions2_function.save_achievement_record_documentation.location
+  project     = google_cloudfunctions2_function.save_achievement_record_documentation.project
+  service     = google_cloudfunctions2_function.save_achievement_record_documentation.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "save_achievement_record_documentation" {
+  name   = "cloud-functions/saveAchievementRecordDocumentation.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "save_achievement_record_documentation" {
+  provider    = google-beta
+  location    = var.region
+  name        = "save-achievement-record-documentation"
+  description = "Save the documentation file of an achievement record to Google Cloud Storage"
+
+  build_config {
+    runtime     = "nodejs16"
+    entry_point = "saveAchievementRecordDocumentation"
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.save_achievement_record_documentation.name
       }
     }
   }

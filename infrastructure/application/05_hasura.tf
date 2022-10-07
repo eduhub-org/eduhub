@@ -117,6 +117,10 @@ resource "google_cloud_run_service" "hasura" {
           value = google_cloudfunctions2_function.load_achievement_certificate_template.service_config[0].uri
         }
         env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION"
+          value = google_cloudfunctions2_function.save_achievement_record_documentation.service_config[0].uri
+        }
+        env {
           name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE"
           value = google_cloudfunctions2_function.save_achievement_certificate_template.service_config[0].uri
         }
@@ -139,6 +143,10 @@ resource "google_cloud_run_service" "hasura" {
         env {
           name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE"
           value = google_cloudfunctions2_function.save_achievement_record_cover_image.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION"
+          value = google_cloudfunctions2_function.save_achievement_record_documentation.service_config[0].uri
         }
         env {
           name  = "CLOUD_FUNCTION_LINK_SAVE_COURSE_IMAGE"

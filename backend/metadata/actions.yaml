@@ -19,6 +19,15 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+  - name: loadAchievementRecordDocumentation
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
   - name: loadParticipationCertificate
     definition:
       kind: ""
@@ -68,6 +77,15 @@ actions:
           value_from_env: HASURA_BUCKET
     permissions:
       - role: user_access
+  - name: saveAchievementRecordDocumentation
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
   - name: saveCourseImage
     definition:
       kind: synchronous
@@ -136,4 +154,5 @@ custom_types:
     - name: ParticipationCertificateTemplateLink
     - name: UploadResult
     - name: Output
+    - name: AchievementRecordDocumentationLink
   scalars: []
