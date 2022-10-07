@@ -73,8 +73,8 @@ actions:
       kind: synchronous
       handler: '{{CLOUD_FUNCTION_LINK_SAVE_COURSE_IMAGE}}'
       headers:
-        - value: EFA955835F07A2CE182F2A8BB15C8833
-          name: secret
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
     permissions:
@@ -101,14 +101,11 @@ actions:
     definition:
       kind: synchronous
       handler: '{{CLOUD_FUNCTION_LINK_SAVE_USER_PROFILE_IMAGE}}'
-      - role: instructor_access
-      - role: user_access
-      - role: anonymous
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
-          value_from_env: HASURA_BUCKET
+        - value: HASURA_BUCKET
+          name: bucket
     permissions:
       - role: instructor_access
       - role: user_access

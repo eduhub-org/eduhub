@@ -74,7 +74,7 @@ type Mutation {
   saveUserProfileImage(
     base64file: String!
     filename: String!
-    userid: String!
+    courseid: String!
   ): UserImageLink
 }
 
@@ -117,6 +117,14 @@ type ParticipationCertificateLink {
 }
 
 type ParticipationCertificateTemplateLink {
+  link: String!
+}
+
+type UploadResult {
+  link: String!
+}
+
+type Output {
   link: String!
 }
 
