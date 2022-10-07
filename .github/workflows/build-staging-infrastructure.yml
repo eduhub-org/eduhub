@@ -3,7 +3,7 @@ on:
   push:
     # Run only on changes in the following branches
     branches:
-      - develop
+      - staging
 
     # Publish `v1.2.3` tags as releases.
     tags:
@@ -12,7 +12,7 @@ on:
   pull_request:
     # Run tests for PRs.
     branches:
-      - develop
+      - staging
 
 env:
   TF_WORKSPACE: eduhub-application-staging
