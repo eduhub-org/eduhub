@@ -207,6 +207,7 @@ resource "google_cloudfunctions2_function" "save_achievement_certificate" {
       }
     }
   }
+
   service_config {
     environment_variables = {
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
@@ -261,7 +262,7 @@ resource "google_cloudfunctions2_function" "save_achievement_certificate_templat
 }
 
 ###############################################################################
-# Create Google cloud function for saveAchievmentRecordCoverImage
+# Create Google cloud function for saveAchievementRecordCoverImage
 #####
 # Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
 resource "google_cloud_run_service_iam_policy" "save_achievement_record_cover_image_noauth_invoker" {
@@ -284,7 +285,7 @@ resource "google_cloudfunctions2_function" "save_achievement_record_cover_image"
 
   build_config {
     runtime     = "nodejs16"
-    entry_point = "saveAchievmentRecordCoverImage"
+    entry_point = "saveAchievementRecordCoverImage"
     source {
       storage_source {
         bucket = var.project_id
