@@ -1,3 +1,4 @@
+import { useMutation } from "@apollo/client";
 import { Button } from "@material-ui/core";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
@@ -15,6 +16,7 @@ import {
 } from "../components/teacher/SchoolClassRequestsSummary";
 import { useRoleMutation } from "../hooks/authedMutation";
 import { useUserQuery } from "../hooks/authedQuery";
+import { UPDATE_USER } from "../hooks/authentication";
 import { useRasConfig } from "../hooks/ras";
 import { useKeycloakUserProfile, useUserId } from "../hooks/user";
 import { RSAConfig } from "../queries/ras_config";
@@ -46,8 +48,8 @@ export const getStaticProps = async ({ locale }: { locale: string }) => ({
 });
 
 const getPendingRequest = () => {
-  if (typeof sessionStorage !== "undefined") { // eslint-disable-line
-    return JSON.parse(sessionStorage.getItem("pendingRequest") || "null"); // eslint-disable-line
+  if (typeof localStorage !== "undefined") { // eslint-disable-line
+    return JSON.parse(localStorage.getItem("pendingRequest") || "null"); // eslint-disable-line
   } else {
     return null;
   }
@@ -55,7 +57,7 @@ const getPendingRequest = () => {
 
 const getPendingRequestSummary = (rsaConfig: RSAConfig) => {
   const pendingRequest = getPendingRequest();
-  if (pendingRequest == null || rsaConfig.start == null) {
+  if (pendingRequest == null || !rsaConfig.dateLoaded) {
     return null;
   }
 
@@ -65,12 +67,14 @@ const getPendingRequestSummary = (rsaConfig: RSAConfig) => {
     startDate: rsaConfig.start,
     offerTimeComments: "",
     offerGeneralComments: "",
+    contact: "",
     schoolClassName: "",
-    studentsCount: 25,
+    studentsCount: 0,
     offers: pendingRequest.offers,
     schoolDstNr: pendingRequest.school.dstnr,
     schoolClassId: -1,
     assignedDays: {},
+    contactInfos: {},
   };
 
   return result;
@@ -78,6 +82,10 @@ const getPendingRequestSummary = (rsaConfig: RSAConfig) => {
 
 const RegisterPage: FC = () => {
   const rsaConfig = useRasConfig();
+
+  const [updateUser, { data, error }] = useMutation(UPDATE_USER);
+
+  console.log("updateUser", new Date().toISOString(), data, error);
 
   const pendingRequest = getPendingRequest();
 
@@ -96,7 +104,7 @@ const RegisterPage: FC = () => {
     InsertMyTeacherVariables
   >(INSERT_MY_TEACHER, {
     context: {
-      role: "user_access",
+      role: "user",
     },
   });
 
@@ -105,7 +113,7 @@ const RegisterPage: FC = () => {
     InsertSchoolClassVariables
   >(INSERT_SCHOOL_CLASS, {
     context: {
-      role: "user_access",
+      role: "user",
     },
   });
 
@@ -114,7 +122,7 @@ const RegisterPage: FC = () => {
     InsertClassRequestsVariables
   >(INSERT_CLASS_REQUESTS, {
     context: {
-      role: "user_access",
+      role: "user",
     },
   });
 
@@ -124,24 +132,55 @@ const RegisterPage: FC = () => {
     if (!myTeacher.loading && myUserId != null) {
       const me = myTeacher.data?.Teacher;
       if (me != null && me.length == 0) { // eslint-disable-line
-        console.log("try to insert my teacher object");
-        insertMyTeacher({
-          variables: {
-            myUserId,
-          },
-        })
-          .then((resp) => {
-            console.log("inserted teacher!", resp);
-            myTeacher.refetch();
+        console.log(
+          "try to insert my teacher object, had no teacher object",
+          myTeacher,
+          new Date().toISOString()
+        );
+
+        // there is a race condition against the other updateUser call ...
+        updateUser({ variables: { id: myUserId } }).finally(() => {
+          console.log(
+            "update user seems to be completed now?!",
+            new Date().toISOString()
+          );
+          console.log("insertMyTeacher!", new Date().toISOString());
+          insertMyTeacher({
+            variables: {
+              myUserId,
+            },
           })
-          .catch((error) => {
-            console.log("teacher insertion error", error);
-          });
+            .then((resp) => {
+              console.log("inserted teacher!", resp);
+              myTeacher.refetch();
+            })
+            .catch((cerror) => {
+              console.log(
+                "teacher insertion error",
+                new Date().toISOString(),
+                cerror
+              );
+
+              if (
+                cerror.message != null &&
+                cerror.message.indexOf != null &&
+                cerror.message.indexOf("Teacher_userId_fkey") !== -1
+              ) {
+                setTimeout(() => {
+                  console.log(
+                    "do a full page reload out of desparation due to the race condition problem...",
+                    new Date().toISOString()
+                  );
+                  location.reload(); //eslint-disable-line
+                }, 3000);
+              }
+            });
+        });
       } else {
-        console.log("There already is a teacher object for me!");
+        console.log("There already is a teacher object for me!", me);
       }
     }
-  }, [myTeacher.data, myUserId, insertMyTeacher, myTeacher]);
+  }, [myTeacher.data, myUserId, insertMyTeacher, myTeacher, updateUser]);
 
   console.log("keycloak profile is", keyCloakProfile);
 
@@ -210,10 +249,40 @@ const RegisterPage: FC = () => {
     [pendingRequestSummary, setPendingRequestSummary]
   );
 
+  const handleUpdateContact = useCallback(
+    (contact: string) => {
+      if (pendingRequestSummary != null) {
+        setPendingRequestSummary({
+          ...pendingRequestSummary,
+          contact,
+        });
+      }
+    },
+    [pendingRequestSummary, setPendingRequestSummary]
+  );
+
   const handleStorePendingRequest = useCallback(async () => {
     const myTeacherId = myTeacher.data?.Teacher[0].id;
 
     if (pendingRequestSummary != null && myTeacherId != null) {
+      if (
+        pendingRequestSummary.contact === null ||
+        pendingRequestSummary.contact === undefined ||
+        pendingRequestSummary.contact.length === 0
+      ) {
+        alert("Bitte tragen Sie eine Kontakttelefonnummer ein!"); // eslint-disable-line
+        return;
+      }
+
+      if (
+        pendingRequestSummary.studentsCount === null ||
+        pendingRequestSummary.studentsCount === undefined ||
+        pendingRequestSummary.studentsCount === 0
+      ) {
+        alert("Bitte tragen Sie die Klassengröße ein!"); //eslint-disable-line
+        return;
+      }
+
       console.log("Store these requests", pendingRequestSummary);
 
       const insertClassResult = await insertSchoolClass({
@@ -223,6 +292,7 @@ const RegisterPage: FC = () => {
             schoolId: pendingRequestSummary.schoolDstNr,
             teacherId: myTeacherId,
             grade: pendingRequestSummary.grade,
+            contact: pendingRequestSummary.contact,
             studensCount: pendingRequestSummary.studentsCount,
           },
         },
@@ -259,7 +329,8 @@ const RegisterPage: FC = () => {
           },
         });
 
-        sessionStorage.removeItem("pendingRequest"); // eslint-disable-line
+        localStorage.removeItem("pendingRequest"); // eslint-disable-line
+        alert("Ihre Anmeldung war erfolgreich"); // eslint-disable-line
         // reload the page so the MyRequestsDisplay shows the newest entries, cant access its refetch from here...
         window.location.reload();
       }
@@ -282,8 +353,8 @@ const RegisterPage: FC = () => {
           <OnlyLoggedOut>
             <div className="m-4">
               <div className="m-4">
-                Bitte erstellen Sie einen Account und kehren Sie zurück um sich
-                mit Ihrer Auswahl anzumelden.
+                Bitte erstellen Sie einen Account. Nach der Registrierung können
+                Sie dann mit Ihrer Auswahl weiterarbeiten.
                 <br />
                 Falls Sie schon einen Account haben melden Sie sich an.
               </div>
@@ -300,9 +371,9 @@ const RegisterPage: FC = () => {
                 <div className="mb-10">
                   Bitte geben Sie Klassengröße und Klassenbezeichner (a, b, ...)
                   an. <br />
-                  Sie können außerdem ein kurzes Kommentar bezüglich des besten
-                  Zeitraums und eine kurze Nachricht für den Wissenschaftler
-                  angeben.
+                  Sie können außerdem einen kurzen Kommentar bezüglich des
+                  besten Zeitraums und eine kurze Nachricht für den*die
+                  Wissenschaftler*in angeben.
                 </div>
 
                 <SchoolClassRequestsSummary
@@ -311,6 +382,7 @@ const RegisterPage: FC = () => {
                   onUpdateTimeComment={handleUpdateTimeComment}
                   onUpdateSchoolClassName={handleUpdateSchoolClassName}
                   onUpdateStudentsCount={handleUpdateStudentsCount}
+                  onUpdateContact={handleUpdateContact}
                   className="m-2"
                 />
 

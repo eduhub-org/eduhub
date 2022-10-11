@@ -25,6 +25,7 @@ export const CategorySelector: FC<IProps> = ({
       value: c,
       label: c,
     }));
+    os.sort((a, b) => a.label.localeCompare(b.label));
     return os;
   }, [forOffers]);
 
@@ -55,6 +56,7 @@ export const CategorySelector: FC<IProps> = ({
         isMulti={true}
         value={values}
         onChange={handleSelect}
+        isSearchable={false}
       />
     </>
   );

@@ -121,6 +121,7 @@ export const MultiDateSelector: FC<MultiDaySelectorProps> = ({
         placeholder="Tage auswählen für Anmeldung"
         options={options}
         instanceId={instanceId}
+        isSearchable={false}
         id={id}
         isMulti={true}
         value={values}

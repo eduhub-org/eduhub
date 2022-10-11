@@ -54,7 +54,7 @@ resource "google_secret_manager_secret_iam_member" "hasura_graphql_admin_key" {
   depends_on = [google_secret_manager_secret.hasura_graphql_admin_key]
 }
 
-# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the Cloud Rund service for Hasura
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the Cloud Run service for Hasura
 resource "google_cloud_run_service_iam_policy" "hasura_noauth_invoker" {
   location = google_cloud_run_service.hasura.location
   project  = google_cloud_run_service.hasura.project
@@ -73,10 +73,11 @@ resource "google_cloud_run_service" "hasura" {
     spec {
       containers {
 
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:${var.backend_image_version}"
+        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:${var.commit_sha}"
         resources {
           limits = {
             memory = var.hasura_memory_limit
+            cpu    = "1000m"
           }
         }
         env {
@@ -101,11 +102,67 @@ resource "google_cloud_run_service" "hasura" {
         }
         env {
           name  = "HASURA_BUCKET"
-          value = "storage-bucket"
+          value = var.project_id
         }
         env {
-          name  = "CLOUD_FUNCTION_LINK"
-          value = "https://${var.region}-${var.project_id}.cloudfunctions.net"
+          name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE"
+          value = google_cloudfunctions2_function.load_achievement_certificate.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE"
+          value = google_cloudfunctions2_function.save_achievement_certificate.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE_TEMPLATE"
+          value = google_cloudfunctions2_function.load_achievement_certificate_template.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION"
+          value = google_cloudfunctions2_function.save_achievement_record_documentation.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE"
+          value = google_cloudfunctions2_function.save_achievement_certificate_template.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE"
+          value = google_cloudfunctions2_function.load_participation_certificate.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE"
+          value = google_cloudfunctions2_function.save_participation_certificate.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE_TEMPLATE"
+          value = google_cloudfunctions2_function.load_participation_certificate_template.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE"
+          value = google_cloudfunctions2_function.save_participation_certificate_template.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE"
+          value = google_cloudfunctions2_function.save_achievement_record_cover_image.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION"
+          value = google_cloudfunctions2_function.save_achievement_record_documentation.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_COURSE_IMAGE"
+          value = google_cloudfunctions2_function.save_course_image.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SAVE_USER_PROFILE_IMAGE"
+          value = google_cloudfunctions2_function.save_user_profile_image.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK"
+          value = google_cloudfunctions2_function.update_from_keycloak.service_config[0].uri
+        }
+        env {
+          name  = "CLOUD_FUNCTION_LINK_SEND_MAIL"
+          value = google_cloudfunctions2_function.send_mail.service_config[0].uri
         }
         env {
           name  = "HASURA_GRAPHQL_JWT_SECRET"
@@ -143,7 +200,7 @@ resource "google_cloud_run_service" "hasura" {
 
     metadata {
       annotations = {
-        "autoscaling.knative.dev/minScale"        = "0"
+        "autoscaling.knative.dev/minScale"        = "1"
         "autoscaling.knative.dev/maxScale"        = "1"
         "run.googleapis.com/vpc-access-connector" = "vpc-lan-con"
         "run.googleapis.com/vpc-access-egress"    = "private-ranges-only"

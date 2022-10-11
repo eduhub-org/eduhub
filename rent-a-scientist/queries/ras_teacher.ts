@@ -61,10 +61,16 @@ export const MY_REQUESTS = gql`
         name
         studensCount
         grade
+        contact
         School {
           dstnr
           name
         }
+      }
+      ScientistOffer {
+        contactEmail
+        contactPhone
+        contactName
       }
     }
   }

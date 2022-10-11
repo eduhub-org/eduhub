@@ -12,6 +12,7 @@ exports.sendMail = async (req, res) => {
     const subject = req.body.event.data.new.subject;
     const text = req.body.event.data.new.content;
     const to = req.body.event.data.new.to;
+    const replyTo = req.body.event.data.new.replyTo;
     const from = process.env.HASURA_MAIL_USER;
     const from_pw = process.env.HASURA_MAIL_PW;
     const cc = req.body.event.data.new.cc;
@@ -32,13 +33,20 @@ exports.sendMail = async (req, res) => {
       from: from, 
       to: to,
       cc: cc,
-      bcc: bcc,
+      bcc: "sent-mail@edu.opencampus.sh," + bcc,
+      replyTo: replyTo,
       subject: subject, 
       text: text, 
-      html: text, 
+      html: text,
+      dsn: {
+        id: to,
+        return: 'headers',
+        notify: ['failure', 'delay', 'success'],
+        recipient: 'sent-mail@edu.opencampus.sh'
+      },
     });
 
-    console.log("Message sent: %s", info.messageId);
+    console.log("Message sent: " + to + " id:" + info.messageId);
     
     
     return res.json({

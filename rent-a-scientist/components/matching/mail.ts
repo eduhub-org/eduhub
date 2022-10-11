@@ -4,15 +4,50 @@ export interface MailDescription {
   to: string;
 }
 
+const htmlMailWithContent = (content: string) => {
+  return `<!DOCTYPE html>
+  <html lang="de" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta name="x-apple-disable-message-reformatting">
+      <title></title>
+      <!--[if mso]>
+      <noscript>
+          <xml>
+              <o:OfficeDocumentSettings>
+                  <o:PixelsPerInch>96</o:PixelsPerInch>
+              </o:OfficeDocumentSettings>
+          </xml>
+      </noscript>
+      <![endif]-->
+      <style>
+          table, td, div, h1, p {font-family: Arial, sans-serif;}
+          table, td {border:0px solid #000000 !important;}
+      </style>
+  </head>
+  <body style="margin:0;padding:0;">
+
+      <table role="presentation" style="width:600px;border-collapse:collapse;border:0px solid #cccccc;border-spacing:0;text-align:left;">
+          <tr>
+              <td style="padding:5px;">
+              ${content.replaceAll("\n", "<br/>")}
+              </td>
+          </tr>
+      </table>
+  </body>
+  </html>
+  `;
+};
+
 export const createRejectScientist = (
   contactName: string,
   contactMail: string
 ) => {
   const result: MailDescription = {
     to: contactMail,
-    subject:
-      "Rent-a-Scientist: Leider hat sich keine Schulklasse für ihre Angebot gefunden",
-    content: `
+    subject: "Rent-a-Scientist Rückmeldung",
+    content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
 
 vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2022 eine Schulunterrichtsstunde anzubieten.
@@ -25,7 +60,22 @@ Sollten Sie noch Fragen oder Feedback haben, sind wir Ihnen für eine Nachricht 
 
 Nochmals vielen Dank & herzliche Grüße
 Ihr Rent-a-Scientist Team
-        `,
+
+KielRegion GmbH 
+Wissenschaftspark Kiel 
+Neufeldtstraße 6 
+24118 Kiel 
+
+E-Mail: fdw@kielregion.de
+Web: www.kielregion.de
+
+Aufsichtsratsvorsitzender: Lutz Schlünsen
+Geschäftsführerin: Ulrike Schrabback-Wielatt
+Amtsgericht Kiel, HRB 10353 KI
+Steuernummer: 19 294 31504 Finanzamt Kiel Nord 
+Umsatzsteuer Ident Nr. DE 262 929 911
+
+        `),
   };
 
   return result;
@@ -54,12 +104,11 @@ export const createAcceptScientist = (
 ) => {
   const result: MailDescription = {
     to: contactMail,
-    subject:
-      "Rent-a-Scientist: Es haben sich Schulklassen für ihr Angebot gefunden",
-    content: `
+    subject: "Rent-a-Scientist Rückmeldung",
+    content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
 vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2022 eine Schulunterrichtsstunde anzubieten.
-Wir freuen uns sehr, Ihnen mitteilen zu können, dass Sie angefragt wurden, wie folgt
+Wir freuen uns sehr, Ihnen mitteilen zu können, dass Sie wie folgt angefragt wurden
 
 ${acceptedDays
   .map(
@@ -95,7 +144,24 @@ Wir danken Ihnen ganz herzlich für Ihr Engagement und wünschen viel Spaß mit 
 
 Mit den besten Grüßen
 Ihr Rent-a-Scientist Team
-        `,
+
+
+KielRegion GmbH 
+Wissenschaftspark Kiel 
+Neufeldtstraße 6 
+24118 Kiel 
+
+E-Mail: fdw@kielregion.de
+Web: www.kielregion.de
+
+Aufsichtsratsvorsitzender: Lutz Schlünsen
+Geschäftsführerin: Ulrike Schrabback-Wielatt
+Amtsgericht Kiel, HRB 10353 KI
+Steuernummer: 19 294 31504 Finanzamt Kiel Nord 
+Umsatzsteuer Ident Nr. DE 262 929 911
+
+
+        `),
   };
 
   return result;
@@ -109,6 +175,7 @@ export interface SchoolAcceptedInfo {
   day: string;
   time: string;
   className: string;
+  classGrade: string;
 }
 
 export const createAcceptSchool = (
@@ -117,12 +184,12 @@ export const createAcceptSchool = (
   info: SchoolAcceptedInfo
 ) => {
   const result: MailDescription = {
-    subject: "Rent-a-Scientist: Ein Wissenschaftler wurde für Sie gefunden",
+    subject: "Rent-a-Scientist Rückmeldung",
     to: contactMail,
-    content: `
+    content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
 
-vielen Dank, dass Sie sich mit der Schulklasse ${info.className} im Rahmen von Rent-a-Scientist für den Besuch einer Wissenschaftlerin bzw. eines Wissenschaftlers an Ihrer Schule beworben haben. Wir freuen uns sehr, Ihnen mitteilen zu können, dass wir Ihnen eine Ihrer Wunsch-Unterrichtsstunden für die Woche vom 26.09. bis zum 30.09. bestätigen können:
+vielen Dank, dass Sie sich mit der Schulklasse ${info.classGrade}${info.className} im Rahmen von Rent-a-Scientist für den Besuch einer Wissenschaftlerin bzw. eines Wissenschaftlers an Ihrer Schule beworben haben. Wir freuen uns sehr, Ihnen mitteilen zu können, dass wir Ihnen eine Ihrer Wunsch-Unterrichtsstunden für die Woche vom 26.09. bis zum 30.09. bestätigen können:
 
 Wissenschaftler*in: ${info.scientist}
 
@@ -145,7 +212,23 @@ Wir wünschen Ihnen, Ihrer Klasse und Ihrem Gast eine hoffentlich spannende und 
 
 Mit den besten Grüßen
 Ihr Rent-a-Scientist Team
-        `,
+
+KielRegion GmbH 
+Wissenschaftspark Kiel 
+Neufeldtstraße 6 
+24118 Kiel 
+
+E-Mail: fdw@kielregion.de
+Web: www.kielregion.de
+
+Aufsichtsratsvorsitzender: Lutz Schlünsen
+Geschäftsführerin: Ulrike Schrabback-Wielatt
+Amtsgericht Kiel, HRB 10353 KI
+Steuernummer: 19 294 31504 Finanzamt Kiel Nord 
+Umsatzsteuer Ident Nr. DE 262 929 911
+
+
+        `),
   };
 
   return result;
@@ -158,22 +241,43 @@ export const createRejectSchool = (
   grade: number
 ) => {
   const result: MailDescription = {
-    subject: "Rent-a-Scientist: Leider wurde kein Wissenschaftler gefunden",
+    subject: "Rent-a-Scientist Rückmeldung",
     to: contactMail,
-    content: `
+    content: htmlMailWithContent(`
         
 Sehr geehrte*r ${contactName},
 
 vielen Dank für Ihre Anfrage im Rahmen unseres Schulprogramms Rent-a-Scientist.
 
-Aufgrund der extrem großen Nachfrage, die uns erreicht hat, müssen wir Ihnen leider  mitteilen, dass wir Ihrer Klasse ${grade} ${className} keine*n Wissenschaftler*in in der Woche vom 26.09. bis zum 30.09. zuteilen konnten.
+Aufgrund der extrem großen Nachfrage, die uns erreicht hat, müssen wir Ihnen leider mitteilen, dass wir Ihnen keine*n Wissenschaftler*in in der Woche vom 26.09. bis zum 30.09. zuteilen konnten.
 
-Zur Entschädigung möchten wir Ihnen aber anbieten, im Nachgang eine*n Ihrer angefragten Wissenschaftler*innen zu kontaktieren und zu fragen, ob er bzw. sie bereit wäre, einen individuellen Termin mit Ihnen zu vereinbaren. Sollten Sie daran Interesse haben, freuen wir uns über eine kurze Rückmeldung.
+Zur Entschädigung möchten wir Ihnen aber anbieten, im Nachgang eine*n Ihrer angefragten Wissenschaftler*innen zu kontaktieren und zu fragen, ob er*sie bereit wäre, einen individuellen Termin mit Ihnen zu vereinbaren. Sollten Sie daran Interesse haben, freuen wir uns über eine kurze Rückmeldung. 
+
+Wir möchten darauf hinweisen, dass einige Angebote von Wissenschaftler*innen über 80 Anfragen erhalten haben. Daher können wir auch im Nachgang leider nicht garantieren, dass Ihre Priorität nicht bereits von einer anderen Lehrkraft angefragt wurde und daher nicht mehr zur Verfügung steht. 
+
 Sollten Sie noch Fragen oder Feedback haben, danken wir Ihnen für eine Nachricht an die E-Mail-Adresse fdw@kielregion.de.
 
 Vielen Dank für Ihre Teilnahme und herzliche Grüße
+
 Ihr Rent-a-Scientist Team
-        `,
+
+
+KielRegion GmbH 
+Wissenschaftspark Kiel
+Neufeldtstraße 6
+24118 Kiel
+  
+E-Mail: fdw@kielregion.de 
+Web: www.kielregion.de 
+  
+Aufsichtsratsvorsitzender: Lutz Schlünsen
+Geschäftsführerin: Ulrike Schrabback-Wielatt
+Amtsgericht Kiel, HRB 10353 KI 
+Steuernummer: 19 294 31504 Finanzamt Kiel Nord 
+Umsatzsteuer Ident Nr. DE 262 929 911
+
+
+        `),
   };
 
   return result;

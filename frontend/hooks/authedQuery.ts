@@ -23,8 +23,7 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
 };
 
 export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
-  const { data } = useSession();
-  const accessToken = data?.accessToken;
+  const { keycloak } = useKeycloak<KeycloakInstance>();
 
   const options = accessToken
     ? {

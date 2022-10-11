@@ -4,6 +4,8 @@
 
 # Definition of the Terraform Cloud project
 terraform {
+  required_version = "1.2.3"
+
   cloud {
     organization = "opencampus"
     hostname     = "app.terraform.io" # Optional; defaults to app.terraform.io
@@ -13,11 +15,11 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "4.27.0"
+      version = "4.31.0"
     }
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = "4.27.0"
+      version = "4.31.0"
     }
     cloudflare = {
       source  = "cloudflare/cloudflare"
@@ -60,4 +62,3 @@ data "google_iam_policy" "noauth_invoker" {
     ]
   }
 }
-

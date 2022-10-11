@@ -47,6 +47,7 @@ export const ALL_REQUESTS = gql`
         id
         name
         studensCount
+        contact
         grade
         School {
           dstnr
@@ -102,6 +103,7 @@ export const SCIENTIST_MAILS_INFO = gql`
           id
           grade
           studensCount
+          contact
 
           School {
             dstnr
@@ -136,6 +138,7 @@ export const SCHOOLS_MAILS_INFO = gql`
         id
         name
         grade
+        contact
 
         Teacher {
           id

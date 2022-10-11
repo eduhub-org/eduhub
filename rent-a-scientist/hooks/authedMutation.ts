@@ -51,7 +51,7 @@ export const useInstructorMutation: typeof useMutation = (
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            "x-hasura-role": "instructor_access",
+            "x-hasura-role": "instructor",
             Authorization: "Bearer " + token,
           },
         },

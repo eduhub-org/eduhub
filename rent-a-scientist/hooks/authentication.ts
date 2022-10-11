@@ -3,9 +3,11 @@ import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance, KeycloakTokenParsed } from "keycloak-js";
 import { useEffect } from "react";
 
-const UPDATE_USER = gql`
+export const UPDATE_USER = gql`
   mutation update_User($id: ID!) {
-    updateFromKeycloak(userid: $id)
+    updateFromKeycloak(userid: $id) {
+      result
+    }
   }
 `;
 
@@ -37,14 +39,11 @@ export const useIsAdmin = () => {
 export const useIsInstructor = () => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
   return (
-    keycloak?.resourceAccess?.hasura?.roles?.includes("instructor_access") ??
-    false
+    keycloak?.resourceAccess?.hasura?.roles?.includes("instructor") ?? false
   );
 };
 
 export const useIsUser = () => {
   const { keycloak } = useKeycloak<KeycloakInstance>();
-  return (
-    keycloak?.resourceAccess?.hasura?.roles?.includes("user_access") ?? false
-  );
+  return keycloak?.resourceAccess?.hasura?.roles?.includes("user") ?? false;
 };

@@ -6,6 +6,9 @@ interface IProps {
 
   grade?: number;
 
+  contact?: string;
+  onChangeContact?: (contact: string) => any;
+
   studentsCount?: number;
   onChangeStudentsCount?: (studensCount: number) => any;
 
@@ -18,6 +21,9 @@ export const SchoolClassEditor: FC<IProps> = ({
   grade,
   studentsCount,
   onChangeStudentsCount,
+
+  contact,
+  onChangeContact,
 
   className,
 }) => {
@@ -43,11 +49,21 @@ export const SchoolClassEditor: FC<IProps> = ({
     [onChangeStudentsCount]
   );
 
+  const handleSelectContact = useCallback(
+    (event) => {
+      const newContact = event.target.value;
+      if (onChangeContact != null) {
+        onChangeContact(newContact);
+      }
+    },
+    [onChangeContact]
+  );
+
   return (
     <>
       <div className={className || ""}>
-        <div className="flex gap-3 mb-3">
-          <span>Klassenbezeichner</span>
+        <div className="flex gap-3 mb-1 flex-col lg:flex-row">
+          <span className="w-36">Klassenbezeichner</span>
           <input
             className="border border-black"
             type="text"
@@ -64,6 +80,16 @@ export const SchoolClassEditor: FC<IProps> = ({
             max={100}
             value={studentsCount}
             onChange={handleSelectStudentsCount}
+          />
+        </div>
+        <div className="flex gap-3 mb-3 flex-col lg:flex-row">
+          <span className="w-36">Kontakt (Telefon)</span>
+          <input
+            className="border border-black"
+            type="text"
+            value={contact || ""}
+            disabled={renderDisabled}
+            onChange={handleSelectContact}
           />
         </div>
       </div>

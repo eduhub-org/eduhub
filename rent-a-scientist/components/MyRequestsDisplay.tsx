@@ -65,7 +65,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
     DeleteSchoolClassByIdVariables
   >(DELETE_SCHOOL_CLASS, {
     context: {
-      role: "user_access",
+      role: "user",
     },
   });
 
@@ -73,7 +73,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
 
   const myRequestsQuery = useUserQuery<MyRequests>(MY_REQUESTS);
 
-  console.log("myRequests", myRequestsQuery);
+  // console.log("myRequests", myRequestsQuery);
 
   const myRequests = useMemo(() => {
     if (startDate == null) return null;
@@ -82,7 +82,10 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
     if (data == null) return null;
 
     const byClassId: Record<string, MyRequests_SchoolClassRequest[]> = {};
-    for (const qr of data.SchoolClassRequest) {
+
+    for (const qr of data.SchoolClassRequest.filter(
+      (scr) => scr.SchoolClass !== null && scr.SchoolClass !== undefined
+    )) {
       const pre = byClassId[qr.SchoolClass.id] || [];
       pre.push(qr);
       byClassId[qr.SchoolClass.id] = pre;
@@ -96,6 +99,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
       const offerGeneralComments: Record<number, string> = {};
       const offerTimeComments: Record<number, string> = {};
       const assignedDays: Record<number, number> = {};
+      const contactInfos: Record<number, string> = {};
 
       for (const r of reqsByClass) {
         offers[r.offerId] = r.possibleDays;
@@ -104,6 +108,13 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
         if (r.assigned_day != null) {
           assignedDays[r.offerId] = r.assigned_day;
         }
+
+        contactInfos[r.offerId] =
+          r.ScientistOffer.contactName +
+          ", E-Mail: " +
+          r.ScientistOffer.contactEmail +
+          ", Tel.:  " +
+          r.ScientistOffer.contactPhone;
       }
 
       const summary: SchoolClassRequestSummary = {
@@ -113,11 +124,13 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
         schoolClassName: schoolClass.name,
         startDate,
         schoolDstNr: schoolClass.School.dstnr,
+        contact: schoolClass.contact || "",
         offers,
         offerGeneralComments,
         offerTimeComments,
         schoolClassId: schoolClass.id,
         assignedDays,
+        contactInfos,
       };
 
       return summary;
@@ -145,11 +158,11 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
   return (
     <>
       <div className="m-4">
-        Hier werden ihre bereits angemeldeten Klassen aufgelistet. Falls
-        gewünscht können Sie die Anmeldungen auch zurücknehmen. <br />
-        Haben Sie Fragen zu einer Anmeldung können Sie uns unter Angabe der
+        Hier werden Ihre bereits angemeldeten Klassen aufgelistet. Falls
+        gewünscht, können Sie die Anmeldungen auch zurücknehmen. <br />
+        Haben Sie Fragen zu einer Anmeldung, können Sie uns unter Angabe der
         Anmeldungsnummer kontaktieren. <br />
-        Um weitere Schulklassen anzumelden klicken Sie bitte{" "}
+        Um weitere Schulklassen anzumelden, klicken Sie bitte{" "}
         <Link href="/">
           <a className="underline">hier</a>
         </Link>

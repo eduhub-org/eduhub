@@ -67,7 +67,14 @@ module "keycloak_service" {
   service_name = var.keycloak_service_name
   project_id   = var.project_id
   location     = var.region
-  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/keycloak:${var.keycloak_image_version}"
+  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/keycloak:${var.commit_sha}"
+
+  limits = {
+    cpu    = "1000m"
+    memory = "2Gi"
+  }
+
+  container_concurrency = "80"
 
   service_annotations = {
     "run.googleapis.com/client-name"    = "terraform"
@@ -138,8 +145,4 @@ module "keycloak_service" {
       ]
     }
   ]
-  limits = {
-    cpu    = "1000m"
-    memory = "2Gi"
-  }
 }

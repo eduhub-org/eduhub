@@ -7,9 +7,7 @@ terraform {
     organization = "opencampus"
     hostname     = "app.terraform.io" # Optional; defaults to app.terraform.io
 
-    workspaces {
-      tags = ["staging"]
-    }
+    # "workspaces" must be defined via an environment variable named "TF_WORKSPACE"
   }
   required_providers {
     google = {

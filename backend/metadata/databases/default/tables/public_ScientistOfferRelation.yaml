@@ -1,29 +1,29 @@
 table:
-  name: ScientistOfferRelation
   schema: public
+  name: ScientistOfferRelation
 object_relationships:
-- name: Scientist
-  using:
-    foreign_key_constraint_on: scientistId
-- name: ScientistOffer
-  using:
-    foreign_key_constraint_on: offerId
+  - name: Scientist
+    using:
+      foreign_key_constraint_on: scientistId
+  - name: ScientistOffer
+    using:
+      foreign_key_constraint_on: offerId
 select_permissions:
-- permission:
-    columns:
-    - offerId
-    - scientistId
-    filter: {}
-  role: anonymous
-- permission:
-    columns:
-    - offerId
-    - scientistId
-    filter: {}
-  role: instructor_access
-- permission:
-    columns:
-    - offerId
-    - scientistId
-    filter: {}
-  role: user_access
+  - role: anonymous
+    permission:
+      columns:
+        - offerId
+        - scientistId
+      filter: {}
+  - role: instructor_access
+    permission:
+      columns:
+        - offerId
+        - scientistId
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - offerId
+        - scientistId
+      filter: {}
