@@ -22,6 +22,7 @@ resource "google_sql_database_instance" "default" {
 #####
 
 resource "google_sql_database_instance" "replica" {
+  count                = var.dbi_create_replica
   database_version     = "POSTGRES_13"
   master_instance_name = "default-dbi"
   settings {

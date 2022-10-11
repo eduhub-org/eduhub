@@ -67,6 +67,11 @@ variable "dbi_availability" {
   type        = string
   default     = "REGIONAL"
 }
+variable "dbi_create_replica" {
+  description = "Create a replica database"
+  type        = bool
+  default     = "false"
+}
 variable "keycloak_db_user" {
   description = "Name for the user of the Keycloak database"
   type        = string
