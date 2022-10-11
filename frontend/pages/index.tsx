@@ -9,6 +9,7 @@ import { LoginButton } from "../components/LoginButton";
 import { Page } from "../components/Page";
 import { RegisterButton } from "../components/RegisterButton";
 import { Button } from "../components/common/Button";
+import { OnlyLoggedIn } from "../components/common/OnlyLoggedIn";
 import { OnlyLoggedOut } from "../components/common/OnlyLoggedOut";
 import { MyCourses } from "../components/course/MyCourses";
 import { TileSlider } from "../components/course/TileSlider";
@@ -74,11 +75,11 @@ const Home: FC = () => {
           </ClientOnly>
         </div>
         <ClientOnly>
-          {/* <OnlyLoggedIn> */}
+          <OnlyLoggedIn>
           <div className="mt-11">
             <MyCourses />
           </div>
-          {/* </OnlyLoggedIn> */}
+          </OnlyLoggedIn>
           <h2 id="courses" className="text-3xl font-semibold text-center mt-20">
             {t("findCourses")}
           </h2>

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, ReactElement } from "react";
 
 import {
   useIsLoggedIn,
@@ -6,7 +6,11 @@ import {
   useIsInstructor,
 } from "../../hooks/authentication";
 
-export const OnlyLoggedIn: FC = ({ children }) => {
+type TProps = {
+  children?: ReactElement;
+};
+
+export const OnlyLoggedIn: FC<TProps> = ({ children }: TProps) => {
   const isLoggedIn = useIsLoggedIn();
 
   if (!isLoggedIn) return null;
@@ -14,7 +18,7 @@ export const OnlyLoggedIn: FC = ({ children }) => {
   return <>{children}</>;
 };
 
-export const OnlyNotAdmin: FC = ({ children }) => {
+export const OnlyNotAdmin: FC<TProps> = ({ children }: TProps) => {
   const isLoggedIn = useIsLoggedIn();
   const isAdmin = useIsAdmin();
   if (!isAdmin && isLoggedIn) {
@@ -24,7 +28,7 @@ export const OnlyNotAdmin: FC = ({ children }) => {
   }
 };
 
-export const OnlyNotInstructor: FC = ({ children }) => {
+export const OnlyNotInstructor: FC<TProps> = ({ children }: TProps) => {
   const isLoggedIn = useIsLoggedIn();
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
@@ -38,7 +42,7 @@ export const OnlyNotInstructor: FC = ({ children }) => {
   }
 };
 
-export const OnlyAdmin: FC = ({ children }) => {
+export const OnlyAdmin: FC<TProps> = ({ children }: TProps) => {
   const isLoggedIn = useIsLoggedIn();
   const isAdmin = useIsAdmin();
   if (isLoggedIn && isAdmin) {
@@ -48,7 +52,7 @@ export const OnlyAdmin: FC = ({ children }) => {
   }
 };
 
-export const OnlyInstructor: FC = ({ children }) => {
+export const OnlyInstructor: FC<TProps> = ({ children }: TProps) => {
   const isLoggedIn = useIsLoggedIn();
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
