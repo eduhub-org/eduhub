@@ -16,6 +16,7 @@ import {
 } from "../../queries/__generated__/ManagedCourse";
 import { MotivationRating_enum } from "../../__generated__/globalTypes";
 import { EhDot, greenDot, greyDot, orangeDot, redDot } from "../common/dots";
+import { OnlyAdmin } from "../common/OnlyLoggedIn";
 
 interface IProps {
   enrollment: ManagedCourse_Course_by_pk_CourseEnrollments | null;
@@ -184,7 +185,7 @@ export const ApplicationRow: FC<IProps> = ({
             </div>
 
             <div className="col-span-1 text-center">
-              {/* <OnlyAdmin> */}
+              <OnlyAdmin>
               <div className="cursor-pointer" onClick={handleToggleRowSelected}>
                 {isRowSelected && (
                   <MdCheckBox className="inline" size="1.25em" />
@@ -196,7 +197,7 @@ export const ApplicationRow: FC<IProps> = ({
                   />
                 )}
               </div>
-              {/* </OnlyAdmin> */}
+              </OnlyAdmin>
             </div>
           </div>
           {isRowOpen && (

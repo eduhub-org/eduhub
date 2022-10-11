@@ -20,6 +20,7 @@ interface InitialProps {
   cookies: unknown;
 }
 
+// @ts-expect-error Typing does not work correctly here because of getInitialProps
 const MyApp: FC<AppProps & InitialProps> & {
   getInitialProps: (ctx: AppContext) => Promise<Record<string, unknown>>;
 } = ({ Component, pageProps, cookies }) => {
@@ -32,5 +33,4 @@ const MyApp: FC<AppProps & InitialProps> & {
   );
 };
 
-// @ts-expect-error Typing does not work correctly here because of getInitialProps
 export default appWithTranslation(MyApp);
