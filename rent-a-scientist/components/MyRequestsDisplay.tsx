@@ -73,7 +73,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
 
   const myRequestsQuery = useUserQuery<MyRequests>(MY_REQUESTS);
 
-  console.log("myRequests", myRequestsQuery);
+  // console.log("myRequests", myRequestsQuery);
 
   const myRequests = useMemo(() => {
     if (startDate == null) return null;
@@ -82,6 +82,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
     if (data == null) return null;
 
     const byClassId: Record<string, MyRequests_SchoolClassRequest[]> = {};
+
     for (const qr of data.SchoolClassRequest.filter(
       (scr) => scr.SchoolClass !== null && scr.SchoolClass !== undefined
     )) {
@@ -98,6 +99,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
       const offerGeneralComments: Record<number, string> = {};
       const offerTimeComments: Record<number, string> = {};
       const assignedDays: Record<number, number> = {};
+      const contactInfos: Record<number, string> = {};
 
       for (const r of reqsByClass) {
         offers[r.offerId] = r.possibleDays;
@@ -106,6 +108,13 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
         if (r.assigned_day != null) {
           assignedDays[r.offerId] = r.assigned_day;
         }
+
+        contactInfos[r.offerId] =
+          r.ScientistOffer.contactName +
+          ", E-Mail: " +
+          r.ScientistOffer.contactEmail +
+          ", Tel.:  " +
+          r.ScientistOffer.contactPhone;
       }
 
       const summary: SchoolClassRequestSummary = {
@@ -121,6 +130,7 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
         offerTimeComments,
         schoolClassId: schoolClass.id,
         assignedDays,
+        contactInfos,
       };
 
       return summary;

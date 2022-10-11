@@ -1,6 +1,5 @@
 import { QueryResult, useMutation } from "@apollo/client";
-import { useKeycloak } from "@react-keycloak/ssr";
-import { KeycloakInstance } from "keycloak-js";
+import { useSession } from "next-auth/react";
 import { useCallback } from "react";
 import { DocumentNode } from "graphql";
 
@@ -8,9 +7,8 @@ export const useRoleMutation: typeof useMutation = (
   mutation,
   passedOptions
 ) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-
-  const token = keycloak?.token;
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
 
   const passedRole = passedOptions?.context?.role;
 
@@ -20,17 +18,17 @@ export const useRoleMutation: typeof useMutation = (
     );
   }
 
-  const options = token
+  const options = accessToken
     ? {
-      ...passedOptions,
-      context: {
-        ...passedOptions?.context,
-        headers: {
-          "x-hasura-role": `${passedRole}`,
-          Authorization: "Bearer " + token,
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          headers: {
+            "x-hasura-role": `${passedRole}`,
+            Authorization: "Bearer " + accessToken,
+          },
         },
-      },
-    }
+      }
     : passedOptions;
 
   return useMutation(mutation, options);
@@ -40,22 +38,21 @@ export const useInstructorMutation: typeof useMutation = (
   mutation,
   passedOptions
 ) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
 
-  const token = keycloak?.token;
-
-  const options = token
+  const options = accessToken
     ? {
-      ...passedOptions,
-      context: {
-        ...passedOptions?.context,
-        headers: {
-          ...passedOptions?.context?.headers,
-          "x-hasura-role": "instructor",
-          Authorization: "Bearer " + token,
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          headers: {
+            ...passedOptions?.context?.headers,
+            "x-hasura-role": "instructor",
+            Authorization: "Bearer " + accessToken,
+          },
         },
-      },
-    }
+      }
     : passedOptions;
 
   return useMutation(mutation, options);
@@ -65,22 +62,21 @@ export const useAdminMutation: typeof useMutation = (
   mutation,
   passedOptions
 ) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
 
-  const token = keycloak?.token;
-
-  const options = token
+  const options = accessToken
     ? {
-      ...passedOptions,
-      context: {
-        ...passedOptions?.context,
-        headers: {
-          ...passedOptions?.context?.headers,
-          "x-hasura-role": "admin",
-          Authorization: "Bearer " + token,
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          headers: {
+            ...passedOptions?.context?.headers,
+            "x-hasura-role": "admin",
+            Authorization: "Bearer " + accessToken,
+          },
         },
-      },
-    }
+      }
     : passedOptions;
 
   return useMutation(mutation, options);
@@ -90,21 +86,20 @@ export const useAuthedMutation: typeof useMutation = (
   mutation,
   passedOptions
 ) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
 
-  const token = keycloak?.token;
-
-  const options = token
+  const options = accessToken
     ? {
-      ...passedOptions,
-      context: {
-        ...passedOptions?.context,
-        headers: {
-          ...passedOptions?.context?.headers,
-          Authorization: "Bearer " + token,
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          headers: {
+            ...passedOptions?.context?.headers,
+            Authorization: "Bearer " + accessToken,
+          },
         },
-      },
-    }
+      }
     : passedOptions;
 
   return useMutation(mutation, options);

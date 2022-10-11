@@ -141,6 +141,7 @@ const Pagination: FC<IPageProps> = ({
           />
         )}
         <p className="font-medium">
+          {/* @ts-ignore */}
           {t("paginationText", { currentPage: current_page, totalPage: pages })}
         </p>
 

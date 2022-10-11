@@ -154,6 +154,35 @@ export const OffersSearch: FC<IProps> = ({ className }) => {
   const router = useRouter();
 
   const handleRegister = useCallback(() => {
+    const sortedCopy = [...filteredOffers];
+    sortedCopy.sort(
+      (a, b) =>
+        (a.RequestsCount.aggregate?.count || 0) -
+        (b.RequestsCount.aggregate?.count || 0)
+    );
+
+    if (Object.keys(selectedOffers).length < 5 && sortedCopy.length >= 8) {
+      let hasGoodRequest = false;
+      for (const oKey of Object.keys(selectedOffers)) {
+        const idx = sortedCopy.findIndex((x) => x.id === Number(oKey));
+        if (idx < sortedCopy.length / 2) {
+          hasGoodRequest = true;
+          break;
+        }
+      }
+
+      if (!hasGoodRequest) {
+        const doItAnyway = confirm( // eslint-disable-line
+          "Sie haben weniger als 5 Angebote ausgewählt und die Nachfrage nach diesen Angeboten ist bereits sehr hoch.\nUm Ihre Chancen zu erhöhen wählen Sie die maximale Anzahl von 5 Angeboten aus.\nWirklich nicht noch weitere Angebote auswählen?"
+        );
+        if (!doItAnyway) {
+          return;
+        }
+      }
+    }
+
+    console.log("Register", selectedOffers);
+
     localStorage.setItem( // eslint-disable-line
       "pendingRequest",
       JSON.stringify({
@@ -165,7 +194,7 @@ export const OffersSearch: FC<IProps> = ({ className }) => {
     );
 
     router.push("/myrequests");
-  }, [selectedOffers, selectedSchool, selectedGrade, router]);
+  }, [filteredOffers, selectedOffers, selectedSchool, selectedGrade, router]);
 
   return (
     <div className={className}>

@@ -1,19 +1,19 @@
 table:
-  name: AttendanceStatus
   schema: public
+  name: AttendanceStatus
 is_enum: true
 array_relationships:
-- name: Attendances
-  using:
-    foreign_key_constraint_on:
-      column: status
-      table:
-        name: Attendance
-        schema: public
+  - name: Attendances
+    using:
+      foreign_key_constraint_on:
+        column: status
+        table:
+          schema: public
+          name: Attendance
 select_permissions:
-- permission:
-    columns:
-    - comment
-    - value
-    filter: {}
-  role: anonymous
+  - role: anonymous
+    permission:
+      columns:
+        - comment
+        - value
+      filter: {}

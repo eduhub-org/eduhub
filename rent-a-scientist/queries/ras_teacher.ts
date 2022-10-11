@@ -67,6 +67,11 @@ export const MY_REQUESTS = gql`
           name
         }
       }
+      ScientistOffer {
+        contactEmail
+        contactPhone
+        contactName
+      }
     }
   }
 `;

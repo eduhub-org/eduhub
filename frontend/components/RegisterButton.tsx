@@ -1,5 +1,3 @@
-import { useKeycloak } from "@react-keycloak/ssr";
-import { KeycloakInstance } from "keycloak-js";
 import { useRouter } from "next/router";
 import { FC, useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -8,20 +6,21 @@ import { Button } from "./common/Button";
 
 export const RegisterButton: FC = () => {
   const { t } = useTranslation();
-  const { keycloak } = useKeycloak<KeycloakInstance>();
   const router = useRouter();
 
   const register = useCallback(() => {
-    const url = keycloak?.createRegisterUrl({
-      redirectUri: window.location.href,
-    });
+    const url = `${
+      process.env.NEXT_PUBLIC_AUTH_URL
+    }/realms/edu-hub/protocol/openid-connect/registrations?client_id=hasura&redirect_uri=${encodeURIComponent(
+      window.location.href
+    )}&response_type=code`;
 
     if (!url) return;
     router.push(new URL(url));
-  }, [keycloak, router]);
+  }, [router]);
 
   return (
-    <Button filled onClick={register}>
+    <Button onClick={register} filled>
       {t("registerButton.title")}
     </Button>
   );

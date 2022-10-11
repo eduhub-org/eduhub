@@ -46,8 +46,7 @@ export const createRejectScientist = (
 ) => {
   const result: MailDescription = {
     to: contactMail,
-    subject:
-      "Rent-a-Scientist Rückmeldung",
+    subject: "Rent-a-Scientist Rückmeldung",
     content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
 
@@ -61,6 +60,21 @@ Sollten Sie noch Fragen oder Feedback haben, sind wir Ihnen für eine Nachricht 
 
 Nochmals vielen Dank & herzliche Grüße
 Ihr Rent-a-Scientist Team
+
+KielRegion GmbH 
+Wissenschaftspark Kiel 
+Neufeldtstraße 6 
+24118 Kiel 
+
+E-Mail: fdw@kielregion.de
+Web: www.kielregion.de
+
+Aufsichtsratsvorsitzender: Lutz Schlünsen
+Geschäftsführerin: Ulrike Schrabback-Wielatt
+Amtsgericht Kiel, HRB 10353 KI
+Steuernummer: 19 294 31504 Finanzamt Kiel Nord 
+Umsatzsteuer Ident Nr. DE 262 929 911
+
         `),
   };
 
@@ -90,8 +104,7 @@ export const createAcceptScientist = (
 ) => {
   const result: MailDescription = {
     to: contactMail,
-    subject:
-      "Rent-a-Scientist Rückmeldung",
+    subject: "Rent-a-Scientist Rückmeldung",
     content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
 vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2022 eine Schulunterrichtsstunde anzubieten.
@@ -131,6 +144,23 @@ Wir danken Ihnen ganz herzlich für Ihr Engagement und wünschen viel Spaß mit 
 
 Mit den besten Grüßen
 Ihr Rent-a-Scientist Team
+
+
+KielRegion GmbH 
+Wissenschaftspark Kiel 
+Neufeldtstraße 6 
+24118 Kiel 
+
+E-Mail: fdw@kielregion.de
+Web: www.kielregion.de
+
+Aufsichtsratsvorsitzender: Lutz Schlünsen
+Geschäftsführerin: Ulrike Schrabback-Wielatt
+Amtsgericht Kiel, HRB 10353 KI
+Steuernummer: 19 294 31504 Finanzamt Kiel Nord 
+Umsatzsteuer Ident Nr. DE 262 929 911
+
+
         `),
   };
 
@@ -182,6 +212,22 @@ Wir wünschen Ihnen, Ihrer Klasse und Ihrem Gast eine hoffentlich spannende und 
 
 Mit den besten Grüßen
 Ihr Rent-a-Scientist Team
+
+KielRegion GmbH 
+Wissenschaftspark Kiel 
+Neufeldtstraße 6 
+24118 Kiel 
+
+E-Mail: fdw@kielregion.de
+Web: www.kielregion.de
+
+Aufsichtsratsvorsitzender: Lutz Schlünsen
+Geschäftsführerin: Ulrike Schrabback-Wielatt
+Amtsgericht Kiel, HRB 10353 KI
+Steuernummer: 19 294 31504 Finanzamt Kiel Nord 
+Umsatzsteuer Ident Nr. DE 262 929 911
+
+
         `),
   };
 
@@ -203,13 +249,34 @@ Sehr geehrte*r ${contactName},
 
 vielen Dank für Ihre Anfrage im Rahmen unseres Schulprogramms Rent-a-Scientist.
 
-Aufgrund der extrem großen Nachfrage, die uns erreicht hat, müssen wir Ihnen leider  mitteilen, dass wir Ihrer Klasse ${grade} ${className} keine*n Wissenschaftler*in in der Woche vom 26.09. bis zum 30.09. zuteilen konnten.
+Aufgrund der extrem großen Nachfrage, die uns erreicht hat, müssen wir Ihnen leider mitteilen, dass wir Ihnen keine*n Wissenschaftler*in in der Woche vom 26.09. bis zum 30.09. zuteilen konnten.
 
-Zur Entschädigung möchten wir Ihnen aber anbieten, im Nachgang eine*n Ihrer angefragten Wissenschaftler*innen zu kontaktieren und zu fragen, ob er bzw. sie bereit wäre, einen individuellen Termin mit Ihnen zu vereinbaren. Sollten Sie daran Interesse haben, freuen wir uns über eine kurze Rückmeldung.
+Zur Entschädigung möchten wir Ihnen aber anbieten, im Nachgang eine*n Ihrer angefragten Wissenschaftler*innen zu kontaktieren und zu fragen, ob er*sie bereit wäre, einen individuellen Termin mit Ihnen zu vereinbaren. Sollten Sie daran Interesse haben, freuen wir uns über eine kurze Rückmeldung. 
+
+Wir möchten darauf hinweisen, dass einige Angebote von Wissenschaftler*innen über 80 Anfragen erhalten haben. Daher können wir auch im Nachgang leider nicht garantieren, dass Ihre Priorität nicht bereits von einer anderen Lehrkraft angefragt wurde und daher nicht mehr zur Verfügung steht. 
+
 Sollten Sie noch Fragen oder Feedback haben, danken wir Ihnen für eine Nachricht an die E-Mail-Adresse fdw@kielregion.de.
 
 Vielen Dank für Ihre Teilnahme und herzliche Grüße
+
 Ihr Rent-a-Scientist Team
+
+
+KielRegion GmbH 
+Wissenschaftspark Kiel
+Neufeldtstraße 6
+24118 Kiel
+  
+E-Mail: fdw@kielregion.de 
+Web: www.kielregion.de 
+  
+Aufsichtsratsvorsitzender: Lutz Schlünsen
+Geschäftsführerin: Ulrike Schrabback-Wielatt
+Amtsgericht Kiel, HRB 10353 KI 
+Steuernummer: 19 294 31504 Finanzamt Kiel Nord 
+Umsatzsteuer Ident Nr. DE 262 929 911
+
+
         `),
   };
 

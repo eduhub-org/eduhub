@@ -1,5 +1,3 @@
-import { useKeycloak } from "@react-keycloak/ssr";
-import { KeycloakInstance } from "keycloak-js";
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -13,7 +11,11 @@ const UnauthorizedCoursePage: FC<{ id: number }> = ({ id }) => {
   const { t } = useTranslation("course-page");
   const userId = useUserId();
 
-  const { data: courseData, loading, error } = useAuthedQuery<Course>(COURSE, {
+  const {
+    data: courseData,
+    loading,
+    error,
+  } = useAuthedQuery<Course>(COURSE, {
     variables: {
       id,
       userId,

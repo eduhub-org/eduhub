@@ -26,6 +26,13 @@ export interface MyRequests_SchoolClassRequest_SchoolClass {
   School: MyRequests_SchoolClassRequest_SchoolClass_School;
 }
 
+export interface MyRequests_SchoolClassRequest_ScientistOffer {
+  __typename: "ScientistOffer";
+  contactEmail: string | null;
+  contactPhone: string | null;
+  contactName: string | null;
+}
+
 export interface MyRequests_SchoolClassRequest {
   __typename: "SchoolClassRequest";
   id: number;
@@ -41,6 +48,10 @@ export interface MyRequests_SchoolClassRequest {
    * An object relationship
    */
   SchoolClass: MyRequests_SchoolClassRequest_SchoolClass;
+  /**
+   * An object relationship
+   */
+  ScientistOffer: MyRequests_SchoolClassRequest_ScientistOffer;
 }
 
 export interface MyRequests {

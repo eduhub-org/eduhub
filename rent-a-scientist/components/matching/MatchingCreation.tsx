@@ -79,40 +79,93 @@ interface AssignmentResult {
   offerId: number;
 }
 
+function shuffle<T>(array: T[]) { //eslint-disable-line
+  let currentIndex = array.length;
+  let randomIndex;
+
+  // While there remain elements to shuffle.
+  while (currentIndex !== 0) {
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex],
+      array[currentIndex],
+    ];
+  }
+
+  return array;
+}
+
 const solveMatching = (
   offers: CourseOffer[],
   requests: ClassRequest[],
-  forceAssignments: AssignmentResult[]
+  forceAssignments: AssignmentResult[],
+  maxAssignmentsPerClass: number
 ) => {
-  // you could shuffle to get some other solution
-  // offers = _.shuffle(offers);
-  // requests = _.shuffle(requests);
+  requests = shuffle(requests);
 
   const variables: any = {};
   const ints: any = {};
+
+  const seenClasses = new Set<number>();
+
   for (const request of requests) {
     for (const rday of request.days) {
       const vname = "c" + request.classId + "o" + request.offerId + "d" + rday;
       variables[vname] = {
-        matches: 1,
+        points: 1,
         ["o" + request.offerId + "capacity"]: 1,
         ["o" + request.offerId + "d" + rday]: 1,
-        ["class" + request.classId + "capacity"]: 1,
+        ["c" + request.classId + "bonus"]: 1,
+        ["c" + request.classId + "o" + request.offerId]: 1,
+        ["c" + request.classId + "d" + rday]: 1,
+        ["c" + request.classId + "capacity"]: 1,
         [vname]: 1,
       };
+
+      ints[vname] = 1;
+    }
+
+    if (!seenClasses.has(request.classId)) {
+      seenClasses.add(request.classId);
+
+      const vname = "c-bonus-" + request.classId;
+      variables[vname] = {
+        points: 10000, // this way the 10ks are the bonses taken, the smaller part of the result score will be the number of matches
+        ["c" + request.classId + "bonus"]: -1,
+        [vname]: 1,
+      };
+
       ints[vname] = 1;
     }
   }
 
-  // constraints for each offer-maxDays!
-  // constraints for each offer-day to prevent assignment of more than 1 class per day
-  // constraints for each class: should only get exactly one assignment
+  const cids: any = {};
+  for (const cid of requests.map((r) => r.classId)) {
+    cids[cid] = true;
+  }
 
   const constraints: any = {};
   for (const offer of offers) {
+    // constraint for each offer-maxDays!
     constraints["o" + offer.id + "capacity"] = { max: offer.maxDays };
+
     for (const oday of offer.days) {
+      // constraints for each offer-day to prevent assignment of more than 1 class per day
       constraints["o" + offer.id + "d" + oday] = { max: 1 };
+    }
+
+    for (const cid of Object.keys(cids)) {
+      // constraint for each class: should not get the same assignment twice
+      constraints["c" + cid + "o" + offer.id] = { max: 1 };
+
+      // constraint for each class: only one offer assigned per day
+      for (let i = 1; i <= 5; i++) {
+        constraints["c" + cid + "d" + i] = { max: 1 };
+      }
     }
   }
 
@@ -123,17 +176,19 @@ const solveMatching = (
     };
   }
 
-  const cids: any = {};
-  for (const cid of requests.map((r) => r.classId)) {
-    cids[cid] = true;
-  }
-
   for (const cid of Object.keys(cids)) {
-    constraints["class" + cid + "capacity"] = { max: 1 };
+    // constraint: prevent taking the bonus points for a class that has not at least one request assigned to it
+    constraints["c" + cid + "bonus"] = { min: 0 };
+
+    // constaint: limit number of maximum assignments the classes can get at most
+    constraints["c" + cid + "capacity"] = { max: maxAssignmentsPerClass };
+
+    // constraint: every class bonus can only be given once
+    constraints["c-bonus-" + cid] = { max: 1 };
   }
 
   const model: any = {
-    optimize: "matches",
+    optimize: "points",
     opType: "max",
     constraints,
     variables,
@@ -147,7 +202,10 @@ const solveMatching = (
   console.log("solution", solution);
 
   if (solution.feasible) {
-    const allPossibleAssignments = Object.keys(variables);
+    const allPossibleAssignments = Object.keys(variables).filter(
+      (x) => !x.includes("-bonus-")
+    );
+
     const resultAssignments: AssignmentResult[] = [];
 
     for (const possibleAssignment of allPossibleAssignments) {
@@ -219,6 +277,8 @@ export const MatchingCreation: FC = () => {
 
   const [forcedAssignmentsTxt, setForcedAssignmentsTxt] = useState("");
 
+  const [maxPerClass, setMaxPerClass] = useState<number>(1);
+
   const [matchings, setMatchings] = useState<AssignmentResult[] | null>(null);
 
   const runMatching = useCallback(async () => {
@@ -233,6 +293,7 @@ export const MatchingCreation: FC = () => {
 
     for (const nd of newData) {
       if (!hasOfferIds.has(nd.ScientistOffer.id)) {
+        hasOfferIds.add(nd.ScientistOffer.id);
         offers.push({
           id: nd.ScientistOffer.id,
           days: nd.ScientistOffer.possibleDays,
@@ -247,6 +308,7 @@ export const MatchingCreation: FC = () => {
       days: nd.possibleDays,
     }));
 
+    console.log("Version 2022-09-08 12:50");
     console.log("build solver input data", offers, requests);
 
     const forcedAssignments: AssignmentResult[] = forcedAssignmentsTxt
@@ -270,7 +332,14 @@ export const MatchingCreation: FC = () => {
 
     console.log("Forced assignments are", forcedAssignments);
 
-    const solution = solveMatching(offers, requests, forcedAssignments);
+    const solution = solveMatching(
+      offers,
+      requests,
+      forcedAssignments,
+      maxPerClass
+    );
+
+    solution?.sort((a, b) => a.day - b.day);
 
     console.log(solution);
 
@@ -279,7 +348,7 @@ export const MatchingCreation: FC = () => {
     }
 
     setMatchings(solution);
-  }, [allRequests, forcedAssignmentsTxt, setMatchings, rsaConfig]);
+  }, [maxPerClass, allRequests, forcedAssignmentsTxt, setMatchings, rsaConfig]);
 
   const handleSetFATxt = useCallback(
     (event) => {
@@ -350,6 +419,22 @@ export const MatchingCreation: FC = () => {
 
     return result;
   }, [matchings, requestsRecords]);
+
+  const matchingCounts = useMemo(() => {
+    const classes = new Set();
+    const offers = new Set();
+
+    for (const match of matchings || []) {
+      classes.add(match.classId);
+      offers.add(match.offerId);
+    }
+
+    return {
+      classCount: classes.size,
+      offerCount: offers.size,
+      matchingsCount: (matchings || []).length,
+    };
+  }, [matchings]);
 
   const [hideProgramById] = useAdminMutation<
     HideProgramById,
@@ -433,6 +518,13 @@ export const MatchingCreation: FC = () => {
 
         const mails: MailDescription[] = [];
 
+        const counts = {
+          acceptedScientists: 0,
+          acceptedSchools: 0,
+          rejectedScientists: 0,
+          rejectedSchools: 0,
+        };
+
         for (const so of scientistMails.data.ScientistOffer) {
           if (!so.contactName || !so.contactEmail) {
             continue;
@@ -458,7 +550,7 @@ export const MatchingCreation: FC = () => {
                   as.SchoolClass.Teacher.User.firstName,
                   as.SchoolClass.Teacher.User.lastName,
                   as.SchoolClass.Teacher.User.email,
-                  as.SchoolClass.contact || ""
+                  as.SchoolClass.contact || "",
                 ].join(" "),
                 day: dayFormat(as.assigned_day, rsaConfig.start),
                 grade: as.SchoolClass.grade,
@@ -468,61 +560,78 @@ export const MatchingCreation: FC = () => {
               };
               return ssai;
             });
+            counts.acceptedScientists++;
             mails.push(
               createAcceptScientist(so.contactName, so.contactEmail, infos)
             );
           } else {
+            counts.rejectedScientists++;
             mails.push(createRejectScientist(so.contactName, so.contactEmail));
           }
         }
 
-        const acceptedRequestByClass: Record<
+        const requestsByClass: Record<
           number,
-          SchoolsMailsInfo_SchoolClassRequest
+          SchoolsMailsInfo_SchoolClassRequest[]
         > = {};
 
         for (const smail of schoolsMails.data.SchoolClassRequest) {
-          const prev = acceptedRequestByClass[smail.SchoolClass.id];
-          if (
-            prev === null ||
-            prev === undefined ||
-            prev.assigned_day === null ||
-            prev.assigned_day === undefined ||
-            prev.assigned_day === -1
-          ) {
-            acceptedRequestByClass[smail.SchoolClass.id] = smail;
-          }
+          const prev = requestsByClass[smail.SchoolClass.id] || [];
+          prev.push(smail);
+          requestsByClass[smail.SchoolClass.id] = prev;
         }
 
-        for (const srequest of Object.values(acceptedRequestByClass)) {
-          const cname =
-            srequest.SchoolClass.Teacher.User.firstName +
-            " " +
-            srequest.SchoolClass.Teacher.User.lastName;
-          if (srequest.assigned_day !== null && srequest.assigned_day > 0) {
-            mails.push(
-              createAcceptSchool(
-                cname,
-                srequest.SchoolClass.Teacher.User.email,
-                {
-                  classGrade: srequest.SchoolClass.grade+"",
-                  className: srequest.SchoolClass.name,
-                  contactEmail: srequest.ScientistOffer.contactEmail || "",
-                  contactPhone: srequest.ScientistOffer.contactPhone || "",
-                  day: dayFormat(srequest.assigned_day, rsaConfig.start),
-                  scientist: srequest.ScientistOffer.contactName || "",
-                  time: srequest.ScientistOffer.timeWindow.join(", "),
-                  topic: srequest.ScientistOffer.title,
-                }
-              )
-            );
-          } else {
+        for (const requests of Object.values(requestsByClass)) {
+          const acceptedRequests = requests.filter(
+            (smail) =>
+              smail !== null &&
+              smail !== undefined &&
+              smail.assigned_day !== null &&
+              smail.assigned_day !== undefined &&
+              smail.assigned_day > 0
+          );
+
+          if (acceptedRequests.length > 0) {
+            for (const aRequest of acceptedRequests) {
+              if (aRequest.assigned_day === null) {
+                continue;
+              }
+              const cname =
+                aRequest.SchoolClass.Teacher.User.firstName +
+                " " +
+                aRequest.SchoolClass.Teacher.User.lastName;
+
+              counts.acceptedSchools++;
+              mails.push(
+                createAcceptSchool(
+                  cname,
+                  aRequest.SchoolClass.Teacher.User.email,
+                  {
+                    classGrade: aRequest.SchoolClass.grade + "",
+                    className: aRequest.SchoolClass.name,
+                    contactEmail: aRequest.ScientistOffer.contactEmail || "",
+                    contactPhone: aRequest.ScientistOffer.contactPhone || "",
+                    day: dayFormat(aRequest.assigned_day, rsaConfig.start),
+                    scientist: aRequest.ScientistOffer.contactName || "",
+                    time: aRequest.ScientistOffer.timeWindow.join(", "),
+                    topic: aRequest.ScientistOffer.title,
+                  }
+                )
+              );
+            }
+          } else if (requests.length > 0) {
+            const anyRequest = requests[0];
+            const cname =
+              anyRequest.SchoolClass.Teacher.User.firstName +
+              " " +
+              anyRequest.SchoolClass.Teacher.User.lastName;
+            counts.rejectedSchools++;
             mails.push(
               createRejectSchool(
                 cname,
-                srequest.SchoolClass.Teacher.User.email,
-                srequest.SchoolClass.name,
-                srequest.SchoolClass.grade
+                anyRequest.SchoolClass.Teacher.User.email,
+                anyRequest.SchoolClass.name,
+                anyRequest.SchoolClass.grade
               )
             );
           }
@@ -537,6 +646,7 @@ export const MatchingCreation: FC = () => {
         }));
 
         console.log("emails", mailInserts);
+        console.log("email counts", counts);
 
         await batchInsertMails({
           variables: {
@@ -549,7 +659,7 @@ export const MatchingCreation: FC = () => {
         }, 500);
       }
     } else {
-            alert("Es gibt ein technisches Problem"); // eslint-disable-line
+      alert("Es gibt ein technisches Problem"); // eslint-disable-line
     }
   }, [
     hideProgramById,
@@ -561,6 +671,14 @@ export const MatchingCreation: FC = () => {
     scientistMailsInfo,
     batchInsertMails,
   ]);
+
+  const handleChangeMaxPerClass = useCallback(
+    (event) => {
+      const newCount = Number(event.target.value);
+      setMaxPerClass(newCount);
+    },
+    [setMaxPerClass]
+  );
 
   return (
     <>
@@ -589,7 +707,16 @@ export const MatchingCreation: FC = () => {
         <div>
           <Button variant="contained" onClick={runMatching}>
             Erzeuge Matchingvorschau
-          </Button>
+          </Button>{" "}
+          Maximale Anzahl Vorträge pro Klasse:{" "}
+          <input
+            className="border border-black"
+            type="number"
+            min={1}
+            max={5}
+            value={maxPerClass}
+            onChange={handleChangeMaxPerClass}
+          />
         </div>
 
         <div>
@@ -603,7 +730,11 @@ export const MatchingCreation: FC = () => {
 
       {matchings !== null && (
         <>
-          <div className="text-xl font-bold mt-6">Matchingvorschau</div>
+          <div className="text-xl font-bold mt-6">
+            Vorschau {matchingCounts.matchingsCount} Vorträge zwischen{" "}
+            {matchingCounts.classCount} Klassen und {matchingCounts.offerCount}{" "}
+            Angeboten
+          </div>
           <table className="w-full mt-4">
             <tbody>
               <tr>
@@ -617,7 +748,10 @@ export const MatchingCreation: FC = () => {
               </tr>
 
               {matchingTableData.map((td) => (
-                <MatchingTableRow key={td.offerId + "/" + td.classId} {...td} />
+                <MatchingTableRow
+                  key={td.offerId + "/" + td.classId + "/" + td.day}
+                  {...td}
+                />
               ))}
             </tbody>
           </table>
