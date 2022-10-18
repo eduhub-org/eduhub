@@ -33,7 +33,7 @@ export default NextAuth({
     jwt: async ({ token, account, user, profile }) => {
       // Persist the OAuth access_token to the token right after signin
       if (account && profile) {
-        console.log(account, token);
+        // console.log(account, token);
         token.accessToken = account.access_token;
         token.profile = profile;
       }

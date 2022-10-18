@@ -10,12 +10,6 @@ import { client } from "../config/apollo";
 
 import "../styles/globals.css";
 
-const keycloakCfg = {
-  realm: "edu-hub",
-  url: process.env.NEXT_PUBLIC_AUTH_URL,
-  clientId: "hasura",
-};
-
 interface InitialProps {
   cookies: unknown;
 }

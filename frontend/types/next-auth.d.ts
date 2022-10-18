@@ -15,6 +15,11 @@ declare module "next-auth" {
       "x-hasura-default-role"?: string;
       "x-hasura-user-id"?: string;
     };
+    email: string | undefined;
+    given_name: string | undefined;
+    family_name: string | undefined;
+    preferred_username: string | undefined;
+    email_verified: boolean;
   }
 }
 
