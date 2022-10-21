@@ -86,6 +86,18 @@ export const buildAchivementTemplatePath = (
   return [programId, "achivement_certificate_template", fileName].join("/");
 };
 
+export const buildAchievementDocumentationTemplatePath = (
+  archiveOptionId: number
+) => {
+  return [archiveOptionId, "documentation_template"].join("/");
+};
+
+export const buildAchievementEvaluationScriptTemplatePath = (
+  archiveOptionId: number
+) => {
+  return [archiveOptionId, "evaluation_script"].join("/");
+};
+
 export const parseFileUploadEvent = async (
   event: any
 ): Promise<UploadFile | null> => {

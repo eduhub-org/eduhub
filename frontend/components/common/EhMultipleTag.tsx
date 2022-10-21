@@ -1,7 +1,7 @@
 import { IconButton } from "@material-ui/core";
 import { FC } from "react";
 import { IoMdAddCircle } from "react-icons/io";
-import EhTagEditTag, { TagElement } from "./EhTagEditTag";
+import EhTag, { TagElement } from "./EhTag";
 
 interface IProps {
   tags: TagElement[];
@@ -9,16 +9,16 @@ interface IProps {
   requestDeleteTag: (id: number) => void;
 }
 
-const EhTagEdit: FC<IProps> = ({ tags, requestAddTag, requestDeleteTag }) => {
+const EhMultipleTag: FC<IProps> = ({
+  tags,
+  requestAddTag,
+  requestDeleteTag,
+}) => {
   return (
     <div className="grid grid-cols-12">
       <div className="col-span-10">
         {tags.map((tag) => (
-          <EhTagEditTag
-            key={tag.id}
-            requestDeleteTag={requestDeleteTag}
-            tag={tag}
-          />
+          <EhTag key={tag.id} requestDeleteTag={requestDeleteTag} tag={tag} />
         ))}
       </div>
       <div className="col-span-2">
@@ -34,4 +34,4 @@ const EhTagEdit: FC<IProps> = ({ tags, requestAddTag, requestDeleteTag }) => {
   );
 };
 
-export default EhTagEdit;
+export default EhMultipleTag;

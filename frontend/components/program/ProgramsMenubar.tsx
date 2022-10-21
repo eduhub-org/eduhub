@@ -19,17 +19,18 @@ export const ProgramsMenubar: FC<IMenubarProps> = ({
   // We will just show latest Three and all, Ignore the Unknown id (0)
   const customPrograms =
     programs.length > maxMenuCount ? programs.slice(0, maxMenuCount) : programs;
+  customPrograms.push({
+    id: allTabId,
+    shortTitle: "All",
+    title: "All",
+    __typename: "Program",
+  });
   const semesters: StaticComponentProperty[] = customPrograms.map((p) => {
     return {
       key: p.id,
       label: p.shortTitle ?? p.title,
       selected: p.id === defaultProgramId,
     };
-  });
-  semesters.push({
-    key: allTabId,
-    label: "All",
-    selected: false,
   });
 
   const [menuItems, setMenuItems] = useState(semesters);

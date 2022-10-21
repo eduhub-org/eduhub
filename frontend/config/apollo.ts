@@ -35,6 +35,12 @@ export const client = new ApolloClient({
           Course: {
             merge: (_, incoming) => incoming,
           },
+          AchievementOption: {
+            merge: (_, incoming) => incoming,
+          },
+          AchievementOptionCourse: {
+            merge: (_, incoming) => incoming,
+          },
         },
       },
       Course: {
@@ -58,6 +64,16 @@ export const client = new ApolloClient({
             merge: (_, incoming) => incoming,
           },
           CourseEnrollments: {
+            merge: (_, incoming) => incoming,
+          },
+        },
+      },
+      AchievementOption: {
+        fields: {
+          AchievementOptionCourses: {
+            merge: (_, incoming) => incoming,
+          },
+          AchievementOptionMentors: {
             merge: (_, incoming) => incoming,
           },
         },
@@ -125,6 +141,13 @@ export const client = new ApolloClient({
             merge: (_, endDateTime) => {
               return new Date(endDateTime);
             },
+          },
+        },
+      },
+      Expert: {
+        fields: {
+          User: {
+            merge: (_, incoming) => incoming,
           },
         },
       },

@@ -8,6 +8,143 @@
 //==============================================================
 
 /**
+ * unique or primary key constraints on table "AchievementOptionCourse"
+ */
+export enum AchievementOptionCourse_constraint {
+  AchievementOptionCourse_pkey = "AchievementOptionCourse_pkey",
+}
+
+/**
+ * update columns of table "AchievementOptionCourse"
+ */
+export enum AchievementOptionCourse_update_column {
+  achievementOptionId = "achievementOptionId",
+  courseId = "courseId",
+  created_at = "created_at",
+  id = "id",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "AchievementOptionMentor"
+ */
+export enum AchievementOptionMentor_constraint {
+  AchievementOptionMentor_pkey = "AchievementOptionMentor_pkey",
+}
+
+/**
+ * update columns of table "AchievementOptionMentor"
+ */
+export enum AchievementOptionMentor_update_column {
+  achievementOptionId = "achievementOptionId",
+  created_at = "created_at",
+  expertId = "expertId",
+  id = "id",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "AchievementOption"
+ */
+export enum AchievementOption_constraint {
+  AchievementOption_pkey = "AchievementOption_pkey",
+}
+
+/**
+ * update columns of table "AchievementOption"
+ */
+export enum AchievementOption_update_column {
+  created_at = "created_at",
+  description = "description",
+  documentationTemplateUrl = "documentationTemplateUrl",
+  evaluationScriptUrl = "evaluationScriptUrl",
+  id = "id",
+  recordType = "recordType",
+  title = "title",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "AchievementRecordAuthor"
+ */
+export enum AchievementRecordAuthor_constraint {
+  AchievementRecordAuthor_pkey = "AchievementRecordAuthor_pkey",
+}
+
+/**
+ * update columns of table "AchievementRecordAuthor"
+ */
+export enum AchievementRecordAuthor_update_column {
+  achievementRecordId = "achievementRecordId",
+  created_at = "created_at",
+  id = "id",
+  updated_at = "updated_at",
+  userId = "userId",
+}
+
+/**
+ * unique or primary key constraints on table "AchievementRecordRating"
+ */
+export enum AchievementRecordRating_constraint {
+  PerformanceRating_pkey = "PerformanceRating_pkey",
+}
+
+export enum AchievementRecordRating_enum {
+  FAILED = "FAILED",
+  PASSED = "PASSED",
+  UNRATED = "UNRATED",
+}
+
+/**
+ * update columns of table "AchievementRecordRating"
+ */
+export enum AchievementRecordRating_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
+ * unique or primary key constraints on table "AchievementRecordType"
+ */
+export enum AchievementRecordType_constraint {
+  AchievementRecordType_pkey = "AchievementRecordType_pkey",
+}
+
+export enum AchievementRecordType_enum {
+  DOCUMENTATION = "DOCUMENTATION",
+  DOCUMENTATION_AND_CSV = "DOCUMENTATION_AND_CSV",
+  ONLINE = "ONLINE",
+}
+
+/**
+ * update columns of table "AchievementRecordType"
+ */
+export enum AchievementRecordType_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
+ * unique or primary key constraints on table "AchievementRecord"
+ */
+export enum AchievementRecord_constraint {
+  AchievementRecord_pkey = "AchievementRecord_pkey",
+}
+
+/**
+ * update columns of table "AchievementRecord"
+ */
+export enum AchievementRecord_update_column {
+  AchievementOptionId = "AchievementOptionId",
+  coverImageUrl = "coverImageUrl",
+  description = "description",
+  id = "id",
+  rating = "rating",
+  score = "score",
+  uploadUserId = "uploadUserId",
+}
+
+/**
  * unique or primary key constraints on table "Admin"
  */
 export enum Admin_constraint {
@@ -192,24 +329,6 @@ export enum CourseLocation_update_column {
 }
 
 /**
- * unique or primary key constraints on table "CourseProject"
- */
-export enum CourseProject_constraint {
-  CourseProject_pkey = "CourseProject_pkey",
-}
-
-/**
- * update columns of table "CourseProject"
- */
-export enum CourseProject_update_column {
-  courseId = "courseId",
-  created_at = "created_at",
-  id = "id",
-  projectId = "projectId",
-  updated_at = "updated_at",
-}
-
-/**
  * unique or primary key constraints on table "CourseStatus"
  */
 export enum CourseStatus_constraint {
@@ -382,72 +501,150 @@ export enum Program_update_column {
 }
 
 /**
- * unique or primary key constraints on table "ProjectEnrollment"
+ * unique or primary key constraints on table "RentAScientistConfig"
  */
-export enum ProjectEnrollment_constraint {
-  ProjectEnrollment_pkey = "ProjectEnrollment_pkey",
+export enum RentAScientistConfig_constraint {
+  RentAScientistConfig_pkey = "RentAScientistConfig_pkey",
 }
 
 /**
- * update columns of table "ProjectEnrollment"
+ * update columns of table "RentAScientistConfig"
  */
-export enum ProjectEnrollment_update_column {
-  created_at = "created_at",
-  enrollmentId = "enrollmentId",
+export enum RentAScientistConfig_update_column {
   id = "id",
-  projectId = "projectId",
-  rating = "rating",
-  recordURL = "recordURL",
-  updated_at = "updated_at",
+  mailFrom = "mailFrom",
+  program_id = "program_id",
+  test_operation = "test_operation",
 }
 
 /**
- * unique or primary key constraints on table "ProjectRating"
+ * unique or primary key constraints on table "SchoolClassRequest"
  */
-export enum ProjectRating_constraint {
-  PerformanceRating_pkey = "PerformanceRating_pkey",
+export enum SchoolClassRequest_constraint {
+  SchoolClassRequest_pkey = "SchoolClassRequest_pkey",
 }
 
 /**
- * update columns of table "ProjectRating"
+ * update columns of table "SchoolClassRequest"
  */
-export enum ProjectRating_update_column {
-  comment = "comment",
-  value = "value",
+export enum SchoolClassRequest_update_column {
+  assigned_day = "assigned_day",
+  classId = "classId",
+  commentGeneral = "commentGeneral",
+  commentTime = "commentTime",
+  id = "id",
+  offerId = "offerId",
+  possibleDays = "possibleDays",
 }
 
 /**
- * unique or primary key constraints on table "ProjectType"
+ * unique or primary key constraints on table "SchoolClass"
  */
-export enum ProjectType_constraint {
-  ProjectType_pkey = "ProjectType_pkey",
+export enum SchoolClass_constraint {
+  SchoolClass_pkey = "SchoolClass_pkey",
 }
 
 /**
- * update columns of table "ProjectType"
+ * update columns of table "SchoolClass"
  */
-export enum ProjectType_update_column {
-  comment = "comment",
-  value = "value",
+export enum SchoolClass_update_column {
+  contact = "contact",
+  grade = "grade",
+  id = "id",
+  name = "name",
+  schoolId = "schoolId",
+  studensCount = "studensCount",
+  teacherId = "teacherId",
 }
 
 /**
- * unique or primary key constraints on table "Project"
+ * unique or primary key constraints on table "School"
  */
-export enum Project_constraint {
-  Project_pkey = "Project_pkey",
+export enum School_constraint {
+  School_pkey = "School_pkey",
 }
 
 /**
- * update columns of table "Project"
+ * update columns of table "School"
  */
-export enum Project_update_column {
-  created_at = "created_at",
+export enum School_update_column {
+  city = "city",
+  district = "district",
+  dstnr = "dstnr",
+  name = "name",
+  postalCode = "postalCode",
+  schoolType = "schoolType",
+  street = "street",
+}
+
+/**
+ * unique or primary key constraints on table "ScientistOfferRelation"
+ */
+export enum ScientistOfferRelation_constraint {
+  ScientistOfferRelation_pkey = "ScientistOfferRelation_pkey",
+}
+
+/**
+ * update columns of table "ScientistOfferRelation"
+ */
+export enum ScientistOfferRelation_update_column {
+  offerId = "offerId",
+  scientistId = "scientistId",
+}
+
+/**
+ * unique or primary key constraints on table "ScientistOffer"
+ */
+export enum ScientistOffer_constraint {
+  ScientistOffer_pkey = "ScientistOffer_pkey",
+}
+
+/**
+ * update columns of table "ScientistOffer"
+ */
+export enum ScientistOffer_update_column {
+  categories = "categories",
+  classPreparation = "classPreparation",
+  contactEmail = "contactEmail",
+  contactName = "contactName",
+  contactPhone = "contactPhone",
   description = "description",
+  duration = "duration",
+  equipmentRequired = "equipmentRequired",
+  extraComment = "extraComment",
+  format = "format",
   id = "id",
+  institutionLogo = "institutionLogo",
+  institutionName = "institutionName",
+  maxDeployments = "maxDeployments",
+  maximumGrade = "maximumGrade",
+  minimumGrade = "minimumGrade",
+  possibleDays = "possibleDays",
+  possibleLocations = "possibleLocations",
+  programId = "programId",
+  researchSubject = "researchSubject",
+  roomRequirements = "roomRequirements",
+  subjectComment = "subjectComment",
+  timeWindow = "timeWindow",
   title = "title",
-  type = "type",
-  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "Scientist"
+ */
+export enum Scientist_constraint {
+  Scientist_pkey = "Scientist_pkey",
+}
+
+/**
+ * update columns of table "Scientist"
+ */
+export enum Scientist_update_column {
+  forename = "forename",
+  id = "id",
+  image = "image",
+  surname = "surname",
+  title = "title",
 }
 
 /**
@@ -510,6 +707,22 @@ export enum Session_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "Teacher"
+ */
+export enum Teacher_constraint {
+  Teacher_pkey = "Teacher_pkey",
+  Teacher_userId_key = "Teacher_userId_key",
+}
+
+/**
+ * update columns of table "Teacher"
+ */
+export enum Teacher_update_column {
+  id = "id",
+  userId = "userId",
+}
+
+/**
  * unique or primary key constraints on table "University"
  */
 export enum University_constraint {
@@ -563,6 +776,402 @@ export enum User_update_column {
   picture = "picture",
   university = "university",
   updated_at = "updated_at",
+}
+
+/**
+ * input type for inserting array relation for remote table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_arr_rel_insert_input {
+  data: AchievementOptionCourse_insert_input[];
+  on_conflict?: AchievementOptionCourse_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "AchievementOptionCourse". All fields are combined with a logical 'AND'.
+ */
+export interface AchievementOptionCourse_bool_exp {
+  AchievementOption?: AchievementOption_bool_exp | null;
+  Course?: Course_bool_exp | null;
+  _and?: AchievementOptionCourse_bool_exp[] | null;
+  _not?: AchievementOptionCourse_bool_exp | null;
+  _or?: AchievementOptionCourse_bool_exp[] | null;
+  achievementOptionId?: Int_comparison_exp | null;
+  courseId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_insert_input {
+  AchievementOption?: AchievementOption_obj_rel_insert_input | null;
+  Course?: Course_obj_rel_insert_input | null;
+  achievementOptionId?: number | null;
+  courseId?: number | null;
+  created_at?: any | null;
+  id?: number | null;
+  updated_at?: any | null;
+}
+
+/**
+ * on_conflict condition type for table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_on_conflict {
+  constraint: AchievementOptionCourse_constraint;
+  update_columns: AchievementOptionCourse_update_column[];
+  where?: AchievementOptionCourse_bool_exp | null;
+}
+
+/**
+ * input type for updating data in table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_set_input {
+  achievementOptionId?: number | null;
+  courseId?: number | null;
+  created_at?: any | null;
+  id?: number | null;
+  updated_at?: any | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_arr_rel_insert_input {
+  data: AchievementOptionMentor_insert_input[];
+  on_conflict?: AchievementOptionMentor_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "AchievementOptionMentor". All fields are combined with a logical 'AND'.
+ */
+export interface AchievementOptionMentor_bool_exp {
+  AchievementOption?: AchievementOption_bool_exp | null;
+  Expert?: Expert_bool_exp | null;
+  _and?: AchievementOptionMentor_bool_exp[] | null;
+  _not?: AchievementOptionMentor_bool_exp | null;
+  _or?: AchievementOptionMentor_bool_exp[] | null;
+  achievementOptionId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  expertId?: Int_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_insert_input {
+  AchievementOption?: AchievementOption_obj_rel_insert_input | null;
+  Expert?: Expert_obj_rel_insert_input | null;
+  achievementOptionId?: number | null;
+  created_at?: any | null;
+  expertId?: number | null;
+  id?: number | null;
+  updated_at?: any | null;
+}
+
+/**
+ * on_conflict condition type for table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_on_conflict {
+  constraint: AchievementOptionMentor_constraint;
+  update_columns: AchievementOptionMentor_update_column[];
+  where?: AchievementOptionMentor_bool_exp | null;
+}
+
+/**
+ * input type for updating data in table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_set_input {
+  achievementOptionId?: number | null;
+  created_at?: any | null;
+  expertId?: number | null;
+  id?: number | null;
+  updated_at?: any | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "AchievementOption"
+ */
+export interface AchievementOption_arr_rel_insert_input {
+  data: AchievementOption_insert_input[];
+  on_conflict?: AchievementOption_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "AchievementOption". All fields are combined with a logical 'AND'.
+ */
+export interface AchievementOption_bool_exp {
+  AchievementOptionCourses?: AchievementOptionCourse_bool_exp | null;
+  AchievementOptionMentors?: AchievementOptionMentor_bool_exp | null;
+  AchievementRecordType?: AchievementRecordType_bool_exp | null;
+  AchievementRecords?: AchievementRecord_bool_exp | null;
+  _and?: AchievementOption_bool_exp[] | null;
+  _not?: AchievementOption_bool_exp | null;
+  _or?: AchievementOption_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  description?: String_comparison_exp | null;
+  documentationTemplateUrl?: String_comparison_exp | null;
+  evaluationScriptUrl?: String_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  recordType?: AchievementRecordType_enum_comparison_exp | null;
+  title?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "AchievementOption"
+ */
+export interface AchievementOption_insert_input {
+  AchievementOptionCourses?: AchievementOptionCourse_arr_rel_insert_input | null;
+  AchievementOptionMentors?: AchievementOptionMentor_arr_rel_insert_input | null;
+  AchievementRecordType?: AchievementRecordType_obj_rel_insert_input | null;
+  AchievementRecords?: AchievementRecord_arr_rel_insert_input | null;
+  created_at?: any | null;
+  description?: string | null;
+  documentationTemplateUrl?: string | null;
+  evaluationScriptUrl?: string | null;
+  id?: number | null;
+  recordType?: AchievementRecordType_enum | null;
+  title?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "AchievementOption"
+ */
+export interface AchievementOption_obj_rel_insert_input {
+  data: AchievementOption_insert_input;
+  on_conflict?: AchievementOption_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "AchievementOption"
+ */
+export interface AchievementOption_on_conflict {
+  constraint: AchievementOption_constraint;
+  update_columns: AchievementOption_update_column[];
+  where?: AchievementOption_bool_exp | null;
+}
+
+/**
+ * input type for updating data in table "AchievementOption"
+ */
+export interface AchievementOption_set_input {
+  created_at?: any | null;
+  description?: string | null;
+  documentationTemplateUrl?: string | null;
+  evaluationScriptUrl?: string | null;
+  id?: number | null;
+  recordType?: AchievementRecordType_enum | null;
+  title?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "AchievementRecordAuthor"
+ */
+export interface AchievementRecordAuthor_arr_rel_insert_input {
+  data: AchievementRecordAuthor_insert_input[];
+  on_conflict?: AchievementRecordAuthor_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "AchievementRecordAuthor". All fields are combined with a logical 'AND'.
+ */
+export interface AchievementRecordAuthor_bool_exp {
+  AchievementRecord?: AchievementRecord_bool_exp | null;
+  User?: User_bool_exp | null;
+  _and?: AchievementRecordAuthor_bool_exp[] | null;
+  _not?: AchievementRecordAuthor_bool_exp | null;
+  _or?: AchievementRecordAuthor_bool_exp[] | null;
+  achievementRecordId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+  userId?: uuid_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "AchievementRecordAuthor"
+ */
+export interface AchievementRecordAuthor_insert_input {
+  AchievementRecord?: AchievementRecord_obj_rel_insert_input | null;
+  User?: User_obj_rel_insert_input | null;
+  achievementRecordId?: number | null;
+  created_at?: any | null;
+  id?: number | null;
+  updated_at?: any | null;
+  userId?: any | null;
+}
+
+/**
+ * on_conflict condition type for table "AchievementRecordAuthor"
+ */
+export interface AchievementRecordAuthor_on_conflict {
+  constraint: AchievementRecordAuthor_constraint;
+  update_columns: AchievementRecordAuthor_update_column[];
+  where?: AchievementRecordAuthor_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "AchievementRecordRating". All fields are combined with a logical 'AND'.
+ */
+export interface AchievementRecordRating_bool_exp {
+  AchievementRecords?: AchievementRecord_bool_exp | null;
+  _and?: AchievementRecordRating_bool_exp[] | null;
+  _not?: AchievementRecordRating_bool_exp | null;
+  _or?: AchievementRecordRating_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "AchievementRecordRating_enum". All fields are combined with logical 'AND'.
+ */
+export interface AchievementRecordRating_enum_comparison_exp {
+  _eq?: AchievementRecordRating_enum | null;
+  _in?: AchievementRecordRating_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: AchievementRecordRating_enum | null;
+  _nin?: AchievementRecordRating_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "AchievementRecordRating"
+ */
+export interface AchievementRecordRating_insert_input {
+  AchievementRecords?: AchievementRecord_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "AchievementRecordRating"
+ */
+export interface AchievementRecordRating_obj_rel_insert_input {
+  data: AchievementRecordRating_insert_input;
+  on_conflict?: AchievementRecordRating_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "AchievementRecordRating"
+ */
+export interface AchievementRecordRating_on_conflict {
+  constraint: AchievementRecordRating_constraint;
+  update_columns: AchievementRecordRating_update_column[];
+  where?: AchievementRecordRating_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "AchievementRecordType". All fields are combined with a logical 'AND'.
+ */
+export interface AchievementRecordType_bool_exp {
+  AchievementOptions?: AchievementOption_bool_exp | null;
+  _and?: AchievementRecordType_bool_exp[] | null;
+  _not?: AchievementRecordType_bool_exp | null;
+  _or?: AchievementRecordType_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "AchievementRecordType_enum". All fields are combined with logical 'AND'.
+ */
+export interface AchievementRecordType_enum_comparison_exp {
+  _eq?: AchievementRecordType_enum | null;
+  _in?: AchievementRecordType_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: AchievementRecordType_enum | null;
+  _nin?: AchievementRecordType_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "AchievementRecordType"
+ */
+export interface AchievementRecordType_insert_input {
+  AchievementOptions?: AchievementOption_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "AchievementRecordType"
+ */
+export interface AchievementRecordType_obj_rel_insert_input {
+  data: AchievementRecordType_insert_input;
+  on_conflict?: AchievementRecordType_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "AchievementRecordType"
+ */
+export interface AchievementRecordType_on_conflict {
+  constraint: AchievementRecordType_constraint;
+  update_columns: AchievementRecordType_update_column[];
+  where?: AchievementRecordType_bool_exp | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "AchievementRecord"
+ */
+export interface AchievementRecord_arr_rel_insert_input {
+  data: AchievementRecord_insert_input[];
+  on_conflict?: AchievementRecord_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "AchievementRecord". All fields are combined with a logical 'AND'.
+ */
+export interface AchievementRecord_bool_exp {
+  AchievementOption?: AchievementOption_bool_exp | null;
+  AchievementOptionId?: Int_comparison_exp | null;
+  AchievementRecordAuthors?: AchievementRecordAuthor_bool_exp | null;
+  AchievementRecordRating?: AchievementRecordRating_bool_exp | null;
+  _and?: AchievementRecord_bool_exp[] | null;
+  _not?: AchievementRecord_bool_exp | null;
+  _or?: AchievementRecord_bool_exp[] | null;
+  coverImageUrl?: String_comparison_exp | null;
+  description?: String_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  rating?: AchievementRecordRating_enum_comparison_exp | null;
+  score?: numeric_comparison_exp | null;
+  uploadUserId?: Int_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "AchievementRecord"
+ */
+export interface AchievementRecord_insert_input {
+  AchievementOption?: AchievementOption_obj_rel_insert_input | null;
+  AchievementOptionId?: number | null;
+  AchievementRecordAuthors?: AchievementRecordAuthor_arr_rel_insert_input | null;
+  AchievementRecordRating?: AchievementRecordRating_obj_rel_insert_input | null;
+  coverImageUrl?: string | null;
+  description?: string | null;
+  id?: number | null;
+  rating?: AchievementRecordRating_enum | null;
+  score?: any | null;
+  uploadUserId?: number | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "AchievementRecord"
+ */
+export interface AchievementRecord_obj_rel_insert_input {
+  data: AchievementRecord_insert_input;
+  on_conflict?: AchievementRecord_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "AchievementRecord"
+ */
+export interface AchievementRecord_on_conflict {
+  constraint: AchievementRecord_constraint;
+  update_columns: AchievementRecord_update_column[];
+  where?: AchievementRecord_bool_exp | null;
 }
 
 /**
@@ -901,7 +1510,6 @@ export interface CourseEnrollment_bool_exp {
   Course?: Course_bool_exp | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_bool_exp | null;
   MotivationRating?: MotivationRating_bool_exp | null;
-  ProjectEnrollments?: ProjectEnrollment_bool_exp | null;
   User?: User_bool_exp | null;
   _and?: CourseEnrollment_bool_exp[] | null;
   _not?: CourseEnrollment_bool_exp | null;
@@ -926,7 +1534,6 @@ export interface CourseEnrollment_insert_input {
   Course?: Course_obj_rel_insert_input | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_obj_rel_insert_input | null;
   MotivationRating?: MotivationRating_obj_rel_insert_input | null;
-  ProjectEnrollments?: ProjectEnrollment_arr_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
   achievementCertificateURL?: string | null;
   attendanceCertificateURL?: string | null;
@@ -939,14 +1546,6 @@ export interface CourseEnrollment_insert_input {
   status?: CourseEnrollmentStatus_enum | null;
   updated_at?: any | null;
   userId?: any | null;
-}
-
-/**
- * input type for inserting object relation for remote table "CourseEnrollment"
- */
-export interface CourseEnrollment_obj_rel_insert_input {
-  data: CourseEnrollment_insert_input;
-  on_conflict?: CourseEnrollment_on_conflict | null;
 }
 
 /**
@@ -1057,52 +1656,6 @@ export interface CourseLocation_on_conflict {
 }
 
 /**
- * input type for inserting array relation for remote table "CourseProject"
- */
-export interface CourseProject_arr_rel_insert_input {
-  data: CourseProject_insert_input[];
-  on_conflict?: CourseProject_on_conflict | null;
-}
-
-/**
- * Boolean expression to filter rows from the table "CourseProject". All fields are combined with a logical 'AND'.
- */
-export interface CourseProject_bool_exp {
-  Course?: Course_bool_exp | null;
-  Project?: Project_bool_exp | null;
-  _and?: CourseProject_bool_exp[] | null;
-  _not?: CourseProject_bool_exp | null;
-  _or?: CourseProject_bool_exp[] | null;
-  courseId?: Int_comparison_exp | null;
-  created_at?: timestamptz_comparison_exp | null;
-  id?: Int_comparison_exp | null;
-  projectId?: Int_comparison_exp | null;
-  updated_at?: timestamptz_comparison_exp | null;
-}
-
-/**
- * input type for inserting data into table "CourseProject"
- */
-export interface CourseProject_insert_input {
-  Course?: Course_obj_rel_insert_input | null;
-  Project?: Project_obj_rel_insert_input | null;
-  courseId?: number | null;
-  created_at?: any | null;
-  id?: number | null;
-  projectId?: number | null;
-  updated_at?: any | null;
-}
-
-/**
- * on_conflict condition type for table "CourseProject"
- */
-export interface CourseProject_on_conflict {
-  constraint: CourseProject_constraint;
-  update_columns: CourseProject_update_column[];
-  where?: CourseProject_bool_exp | null;
-}
-
-/**
  * Boolean expression to filter rows from the table "CourseStatus". All fields are combined with a logical 'AND'.
  */
 export interface CourseStatus_bool_exp {
@@ -1163,10 +1716,10 @@ export interface Course_arr_rel_insert_input {
  * Boolean expression to filter rows from the table "Course". All fields are combined with a logical 'AND'.
  */
 export interface Course_bool_exp {
+  AchievementOptionCourses?: AchievementOptionCourse_bool_exp | null;
   CourseEnrollments?: CourseEnrollment_bool_exp | null;
   CourseInstructors?: CourseInstructor_bool_exp | null;
   CourseLocations?: CourseLocation_bool_exp | null;
-  CourseProjects?: CourseProject_bool_exp | null;
   CourseStatus?: CourseStatus_bool_exp | null;
   Program?: Program_bool_exp | null;
   Sessions?: Session_bool_exp | null;
@@ -1205,10 +1758,10 @@ export interface Course_bool_exp {
  * input type for inserting data into table "Course"
  */
 export interface Course_insert_input {
+  AchievementOptionCourses?: AchievementOptionCourse_arr_rel_insert_input | null;
   CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
   CourseInstructors?: CourseInstructor_arr_rel_insert_input | null;
   CourseLocations?: CourseLocation_arr_rel_insert_input | null;
-  CourseProjects?: CourseProject_arr_rel_insert_input | null;
   CourseStatus?: CourseStatus_obj_rel_insert_input | null;
   Program?: Program_obj_rel_insert_input | null;
   Sessions?: Session_arr_rel_insert_input | null;
@@ -1350,6 +1903,7 @@ export interface Expert_arr_rel_insert_input {
  * Boolean expression to filter rows from the table "Expert". All fields are combined with a logical 'AND'.
  */
 export interface Expert_bool_exp {
+  AchievementOptionMentors?: AchievementOptionMentor_bool_exp | null;
   CourseInstructors?: CourseInstructor_bool_exp | null;
   SessionSpeakers?: SessionSpeaker_bool_exp | null;
   User?: User_bool_exp | null;
@@ -1367,6 +1921,7 @@ export interface Expert_bool_exp {
  * input type for inserting data into table "Expert"
  */
 export interface Expert_insert_input {
+  AchievementOptionMentors?: AchievementOptionMentor_arr_rel_insert_input | null;
   CourseInstructors?: CourseInstructor_arr_rel_insert_input | null;
   SessionSpeakers?: SessionSpeaker_arr_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
@@ -1501,6 +2056,8 @@ export interface MotivationRating_on_conflict {
  */
 export interface Program_bool_exp {
   Courses?: Course_bool_exp | null;
+  RentAScientistConfigs?: RentAScientistConfig_bool_exp | null;
+  ScientistOffers?: ScientistOffer_bool_exp | null;
   _and?: Program_bool_exp[] | null;
   _not?: Program_bool_exp | null;
   _or?: Program_bool_exp[] | null;
@@ -1528,6 +2085,8 @@ export interface Program_bool_exp {
  */
 export interface Program_insert_input {
   Courses?: Course_arr_rel_insert_input | null;
+  RentAScientistConfigs?: RentAScientistConfig_arr_rel_insert_input | null;
+  ScientistOffers?: ScientistOffer_arr_rel_insert_input | null;
   applicationStart?: any | null;
   attendanceCertificateTemplateURL?: string | null;
   closingQuestionnaire?: string | null;
@@ -1565,189 +2124,381 @@ export interface Program_on_conflict {
 }
 
 /**
- * input type for inserting array relation for remote table "ProjectEnrollment"
+ * input type for inserting array relation for remote table "RentAScientistConfig"
  */
-export interface ProjectEnrollment_arr_rel_insert_input {
-  data: ProjectEnrollment_insert_input[];
-  on_conflict?: ProjectEnrollment_on_conflict | null;
+export interface RentAScientistConfig_arr_rel_insert_input {
+  data: RentAScientistConfig_insert_input[];
+  on_conflict?: RentAScientistConfig_on_conflict | null;
 }
 
 /**
- * Boolean expression to filter rows from the table "ProjectEnrollment". All fields are combined with a logical 'AND'.
+ * Boolean expression to filter rows from the table "RentAScientistConfig". All fields are combined with a logical 'AND'.
  */
-export interface ProjectEnrollment_bool_exp {
-  Enrollment?: CourseEnrollment_bool_exp | null;
-  Project?: Project_bool_exp | null;
-  Rating?: ProjectRating_bool_exp | null;
-  _and?: ProjectEnrollment_bool_exp[] | null;
-  _not?: ProjectEnrollment_bool_exp | null;
-  _or?: ProjectEnrollment_bool_exp[] | null;
-  created_at?: timestamptz_comparison_exp | null;
-  enrollmentId?: Int_comparison_exp | null;
+export interface RentAScientistConfig_bool_exp {
+  Program?: Program_bool_exp | null;
+  _and?: RentAScientistConfig_bool_exp[] | null;
+  _not?: RentAScientistConfig_bool_exp | null;
+  _or?: RentAScientistConfig_bool_exp[] | null;
   id?: Int_comparison_exp | null;
-  projectId?: Int_comparison_exp | null;
-  rating?: String_comparison_exp | null;
-  recordURL?: String_comparison_exp | null;
-  updated_at?: timestamptz_comparison_exp | null;
+  mailFrom?: String_comparison_exp | null;
+  program_id?: Int_comparison_exp | null;
+  test_operation?: Boolean_comparison_exp | null;
 }
 
 /**
- * input type for inserting data into table "ProjectEnrollment"
+ * input type for inserting data into table "RentAScientistConfig"
  */
-export interface ProjectEnrollment_insert_input {
-  Enrollment?: CourseEnrollment_obj_rel_insert_input | null;
-  Project?: Project_obj_rel_insert_input | null;
-  Rating?: ProjectRating_obj_rel_insert_input | null;
-  created_at?: any | null;
-  enrollmentId?: number | null;
+export interface RentAScientistConfig_insert_input {
+  Program?: Program_obj_rel_insert_input | null;
   id?: number | null;
-  projectId?: number | null;
-  rating?: string | null;
-  recordURL?: string | null;
-  updated_at?: any | null;
+  mailFrom?: string | null;
+  program_id?: number | null;
+  test_operation?: boolean | null;
 }
 
 /**
- * on_conflict condition type for table "ProjectEnrollment"
+ * on_conflict condition type for table "RentAScientistConfig"
  */
-export interface ProjectEnrollment_on_conflict {
-  constraint: ProjectEnrollment_constraint;
-  update_columns: ProjectEnrollment_update_column[];
-  where?: ProjectEnrollment_bool_exp | null;
+export interface RentAScientistConfig_on_conflict {
+  constraint: RentAScientistConfig_constraint;
+  update_columns: RentAScientistConfig_update_column[];
+  where?: RentAScientistConfig_bool_exp | null;
 }
 
 /**
- * Boolean expression to filter rows from the table "ProjectRating". All fields are combined with a logical 'AND'.
+ * input type for inserting array relation for remote table "SchoolClassRequest"
  */
-export interface ProjectRating_bool_exp {
-  ProjectEnrollments?: ProjectEnrollment_bool_exp | null;
-  _and?: ProjectRating_bool_exp[] | null;
-  _not?: ProjectRating_bool_exp | null;
-  _or?: ProjectRating_bool_exp[] | null;
-  comment?: String_comparison_exp | null;
-  value?: String_comparison_exp | null;
+export interface SchoolClassRequest_arr_rel_insert_input {
+  data: SchoolClassRequest_insert_input[];
+  on_conflict?: SchoolClassRequest_on_conflict | null;
 }
 
 /**
- * input type for inserting data into table "ProjectRating"
+ * Boolean expression to filter rows from the table "SchoolClassRequest". All fields are combined with a logical 'AND'.
  */
-export interface ProjectRating_insert_input {
-  ProjectEnrollments?: ProjectEnrollment_arr_rel_insert_input | null;
-  comment?: string | null;
-  value?: string | null;
+export interface SchoolClassRequest_bool_exp {
+  SchoolClass?: SchoolClass_bool_exp | null;
+  ScientistOffer?: ScientistOffer_bool_exp | null;
+  _and?: SchoolClassRequest_bool_exp[] | null;
+  _not?: SchoolClassRequest_bool_exp | null;
+  _or?: SchoolClassRequest_bool_exp[] | null;
+  assigned_day?: Int_comparison_exp | null;
+  classId?: Int_comparison_exp | null;
+  commentGeneral?: String_comparison_exp | null;
+  commentTime?: String_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  offerId?: Int_comparison_exp | null;
+  possibleDays?: _int4_comparison_exp | null;
 }
 
 /**
- * input type for inserting object relation for remote table "ProjectRating"
+ * input type for inserting data into table "SchoolClassRequest"
  */
-export interface ProjectRating_obj_rel_insert_input {
-  data: ProjectRating_insert_input;
-  on_conflict?: ProjectRating_on_conflict | null;
+export interface SchoolClassRequest_insert_input {
+  SchoolClass?: SchoolClass_obj_rel_insert_input | null;
+  ScientistOffer?: ScientistOffer_obj_rel_insert_input | null;
+  assigned_day?: number | null;
+  classId?: number | null;
+  commentGeneral?: string | null;
+  commentTime?: string | null;
+  id?: number | null;
+  offerId?: number | null;
+  possibleDays?: any | null;
 }
 
 /**
- * on_conflict condition type for table "ProjectRating"
+ * on_conflict condition type for table "SchoolClassRequest"
  */
-export interface ProjectRating_on_conflict {
-  constraint: ProjectRating_constraint;
-  update_columns: ProjectRating_update_column[];
-  where?: ProjectRating_bool_exp | null;
+export interface SchoolClassRequest_on_conflict {
+  constraint: SchoolClassRequest_constraint;
+  update_columns: SchoolClassRequest_update_column[];
+  where?: SchoolClassRequest_bool_exp | null;
 }
 
 /**
- * Boolean expression to filter rows from the table "ProjectType". All fields are combined with a logical 'AND'.
+ * input type for inserting array relation for remote table "SchoolClass"
  */
-export interface ProjectType_bool_exp {
-  Projects?: Project_bool_exp | null;
-  _and?: ProjectType_bool_exp[] | null;
-  _not?: ProjectType_bool_exp | null;
-  _or?: ProjectType_bool_exp[] | null;
-  comment?: String_comparison_exp | null;
-  value?: String_comparison_exp | null;
+export interface SchoolClass_arr_rel_insert_input {
+  data: SchoolClass_insert_input[];
+  on_conflict?: SchoolClass_on_conflict | null;
 }
 
 /**
- * input type for inserting data into table "ProjectType"
+ * Boolean expression to filter rows from the table "SchoolClass". All fields are combined with a logical 'AND'.
  */
-export interface ProjectType_insert_input {
-  Projects?: Project_arr_rel_insert_input | null;
-  comment?: string | null;
-  value?: string | null;
+export interface SchoolClass_bool_exp {
+  School?: School_bool_exp | null;
+  SchoolClassRequests?: SchoolClassRequest_bool_exp | null;
+  Teacher?: Teacher_bool_exp | null;
+  _and?: SchoolClass_bool_exp[] | null;
+  _not?: SchoolClass_bool_exp | null;
+  _or?: SchoolClass_bool_exp[] | null;
+  contact?: String_comparison_exp | null;
+  grade?: Int_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  name?: String_comparison_exp | null;
+  schoolId?: String_comparison_exp | null;
+  studensCount?: Int_comparison_exp | null;
+  teacherId?: Int_comparison_exp | null;
 }
 
 /**
- * input type for inserting object relation for remote table "ProjectType"
+ * input type for inserting data into table "SchoolClass"
  */
-export interface ProjectType_obj_rel_insert_input {
-  data: ProjectType_insert_input;
-  on_conflict?: ProjectType_on_conflict | null;
+export interface SchoolClass_insert_input {
+  School?: School_obj_rel_insert_input | null;
+  SchoolClassRequests?: SchoolClassRequest_arr_rel_insert_input | null;
+  Teacher?: Teacher_obj_rel_insert_input | null;
+  contact?: string | null;
+  grade?: number | null;
+  id?: number | null;
+  name?: string | null;
+  schoolId?: string | null;
+  studensCount?: number | null;
+  teacherId?: number | null;
 }
 
 /**
- * on_conflict condition type for table "ProjectType"
+ * input type for inserting object relation for remote table "SchoolClass"
  */
-export interface ProjectType_on_conflict {
-  constraint: ProjectType_constraint;
-  update_columns: ProjectType_update_column[];
-  where?: ProjectType_bool_exp | null;
+export interface SchoolClass_obj_rel_insert_input {
+  data: SchoolClass_insert_input;
+  on_conflict?: SchoolClass_on_conflict | null;
 }
 
 /**
- * input type for inserting array relation for remote table "Project"
+ * on_conflict condition type for table "SchoolClass"
  */
-export interface Project_arr_rel_insert_input {
-  data: Project_insert_input[];
-  on_conflict?: Project_on_conflict | null;
+export interface SchoolClass_on_conflict {
+  constraint: SchoolClass_constraint;
+  update_columns: SchoolClass_update_column[];
+  where?: SchoolClass_bool_exp | null;
 }
 
 /**
- * Boolean expression to filter rows from the table "Project". All fields are combined with a logical 'AND'.
+ * Boolean expression to filter rows from the table "School". All fields are combined with a logical 'AND'.
  */
-export interface Project_bool_exp {
-  CourseProjects?: CourseProject_bool_exp | null;
-  ProjectEnrollments?: ProjectEnrollment_bool_exp | null;
-  ProjectType?: ProjectType_bool_exp | null;
-  _and?: Project_bool_exp[] | null;
-  _not?: Project_bool_exp | null;
-  _or?: Project_bool_exp[] | null;
-  created_at?: timestamptz_comparison_exp | null;
+export interface School_bool_exp {
+  SchoolClasses?: SchoolClass_bool_exp | null;
+  _and?: School_bool_exp[] | null;
+  _not?: School_bool_exp | null;
+  _or?: School_bool_exp[] | null;
+  city?: String_comparison_exp | null;
+  district?: String_comparison_exp | null;
+  dstnr?: String_comparison_exp | null;
+  name?: String_comparison_exp | null;
+  postalCode?: String_comparison_exp | null;
+  schoolType?: String_comparison_exp | null;
+  street?: String_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "School"
+ */
+export interface School_insert_input {
+  SchoolClasses?: SchoolClass_arr_rel_insert_input | null;
+  city?: string | null;
+  district?: string | null;
+  dstnr?: string | null;
+  name?: string | null;
+  postalCode?: string | null;
+  schoolType?: string | null;
+  street?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "School"
+ */
+export interface School_obj_rel_insert_input {
+  data: School_insert_input;
+  on_conflict?: School_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "School"
+ */
+export interface School_on_conflict {
+  constraint: School_constraint;
+  update_columns: School_update_column[];
+  where?: School_bool_exp | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "ScientistOfferRelation"
+ */
+export interface ScientistOfferRelation_arr_rel_insert_input {
+  data: ScientistOfferRelation_insert_input[];
+  on_conflict?: ScientistOfferRelation_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "ScientistOfferRelation". All fields are combined with a logical 'AND'.
+ */
+export interface ScientistOfferRelation_bool_exp {
+  Scientist?: Scientist_bool_exp | null;
+  ScientistOffer?: ScientistOffer_bool_exp | null;
+  _and?: ScientistOfferRelation_bool_exp[] | null;
+  _not?: ScientistOfferRelation_bool_exp | null;
+  _or?: ScientistOfferRelation_bool_exp[] | null;
+  offerId?: Int_comparison_exp | null;
+  scientistId?: Int_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "ScientistOfferRelation"
+ */
+export interface ScientistOfferRelation_insert_input {
+  Scientist?: Scientist_obj_rel_insert_input | null;
+  ScientistOffer?: ScientistOffer_obj_rel_insert_input | null;
+  offerId?: number | null;
+  scientistId?: number | null;
+}
+
+/**
+ * on_conflict condition type for table "ScientistOfferRelation"
+ */
+export interface ScientistOfferRelation_on_conflict {
+  constraint: ScientistOfferRelation_constraint;
+  update_columns: ScientistOfferRelation_update_column[];
+  where?: ScientistOfferRelation_bool_exp | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "ScientistOffer"
+ */
+export interface ScientistOffer_arr_rel_insert_input {
+  data: ScientistOffer_insert_input[];
+  on_conflict?: ScientistOffer_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "ScientistOffer". All fields are combined with a logical 'AND'.
+ */
+export interface ScientistOffer_bool_exp {
+  Program?: Program_bool_exp | null;
+  SchoolClassRequests?: SchoolClassRequest_bool_exp | null;
+  ScientistOfferRelations?: ScientistOfferRelation_bool_exp | null;
+  _and?: ScientistOffer_bool_exp[] | null;
+  _not?: ScientistOffer_bool_exp | null;
+  _or?: ScientistOffer_bool_exp[] | null;
+  categories?: _text_comparison_exp | null;
+  classPreparation?: String_comparison_exp | null;
+  contactEmail?: String_comparison_exp | null;
+  contactName?: String_comparison_exp | null;
+  contactPhone?: String_comparison_exp | null;
   description?: String_comparison_exp | null;
+  duration?: String_comparison_exp | null;
+  equipmentRequired?: String_comparison_exp | null;
+  extraComment?: String_comparison_exp | null;
+  format?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  institutionLogo?: String_comparison_exp | null;
+  institutionName?: String_comparison_exp | null;
+  maxDeployments?: Int_comparison_exp | null;
+  maximumGrade?: Int_comparison_exp | null;
+  minimumGrade?: Int_comparison_exp | null;
+  possibleDays?: _int4_comparison_exp | null;
+  possibleLocations?: _text_comparison_exp | null;
+  programId?: Int_comparison_exp | null;
+  researchSubject?: String_comparison_exp | null;
+  roomRequirements?: String_comparison_exp | null;
+  subjectComment?: String_comparison_exp | null;
+  timeWindow?: _text_comparison_exp | null;
   title?: String_comparison_exp | null;
-  type?: String_comparison_exp | null;
-  updated_at?: timestamptz_comparison_exp | null;
 }
 
 /**
- * input type for inserting data into table "Project"
+ * input type for inserting data into table "ScientistOffer"
  */
-export interface Project_insert_input {
-  CourseProjects?: CourseProject_arr_rel_insert_input | null;
-  ProjectEnrollments?: ProjectEnrollment_arr_rel_insert_input | null;
-  ProjectType?: ProjectType_obj_rel_insert_input | null;
-  created_at?: any | null;
+export interface ScientistOffer_insert_input {
+  Program?: Program_obj_rel_insert_input | null;
+  SchoolClassRequests?: SchoolClassRequest_arr_rel_insert_input | null;
+  ScientistOfferRelations?: ScientistOfferRelation_arr_rel_insert_input | null;
+  categories?: any | null;
+  classPreparation?: string | null;
+  contactEmail?: string | null;
+  contactName?: string | null;
+  contactPhone?: string | null;
   description?: string | null;
+  duration?: string | null;
+  equipmentRequired?: string | null;
+  extraComment?: string | null;
+  format?: string | null;
   id?: number | null;
+  institutionLogo?: string | null;
+  institutionName?: string | null;
+  maxDeployments?: number | null;
+  maximumGrade?: number | null;
+  minimumGrade?: number | null;
+  possibleDays?: any | null;
+  possibleLocations?: any | null;
+  programId?: number | null;
+  researchSubject?: string | null;
+  roomRequirements?: string | null;
+  subjectComment?: string | null;
+  timeWindow?: any | null;
   title?: string | null;
-  type?: string | null;
-  updated_at?: any | null;
 }
 
 /**
- * input type for inserting object relation for remote table "Project"
+ * input type for inserting object relation for remote table "ScientistOffer"
  */
-export interface Project_obj_rel_insert_input {
-  data: Project_insert_input;
-  on_conflict?: Project_on_conflict | null;
+export interface ScientistOffer_obj_rel_insert_input {
+  data: ScientistOffer_insert_input;
+  on_conflict?: ScientistOffer_on_conflict | null;
 }
 
 /**
- * on_conflict condition type for table "Project"
+ * on_conflict condition type for table "ScientistOffer"
  */
-export interface Project_on_conflict {
-  constraint: Project_constraint;
-  update_columns: Project_update_column[];
-  where?: Project_bool_exp | null;
+export interface ScientistOffer_on_conflict {
+  constraint: ScientistOffer_constraint;
+  update_columns: ScientistOffer_update_column[];
+  where?: ScientistOffer_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "Scientist". All fields are combined with a logical 'AND'.
+ */
+export interface Scientist_bool_exp {
+  ScientistOfferRelations?: ScientistOfferRelation_bool_exp | null;
+  _and?: Scientist_bool_exp[] | null;
+  _not?: Scientist_bool_exp | null;
+  _or?: Scientist_bool_exp[] | null;
+  forename?: String_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  image?: String_comparison_exp | null;
+  surname?: String_comparison_exp | null;
+  title?: String_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "Scientist"
+ */
+export interface Scientist_insert_input {
+  ScientistOfferRelations?: ScientistOfferRelation_arr_rel_insert_input | null;
+  forename?: string | null;
+  id?: number | null;
+  image?: string | null;
+  surname?: string | null;
+  title?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "Scientist"
+ */
+export interface Scientist_obj_rel_insert_input {
+  data: Scientist_insert_input;
+  on_conflict?: Scientist_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "Scientist"
+ */
+export interface Scientist_on_conflict {
+  constraint: Scientist_constraint;
+  update_columns: Scientist_update_column[];
+  where?: Scientist_bool_exp | null;
 }
 
 /**
@@ -1936,6 +2687,46 @@ export interface String_comparison_exp {
 }
 
 /**
+ * Boolean expression to filter rows from the table "Teacher". All fields are combined with a logical 'AND'.
+ */
+export interface Teacher_bool_exp {
+  SchoolClasses?: SchoolClass_bool_exp | null;
+  User?: User_bool_exp | null;
+  _and?: Teacher_bool_exp[] | null;
+  _not?: Teacher_bool_exp | null;
+  _or?: Teacher_bool_exp[] | null;
+  id?: Int_comparison_exp | null;
+  userId?: uuid_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "Teacher"
+ */
+export interface Teacher_insert_input {
+  SchoolClasses?: SchoolClass_arr_rel_insert_input | null;
+  User?: User_obj_rel_insert_input | null;
+  id?: number | null;
+  userId?: any | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "Teacher"
+ */
+export interface Teacher_obj_rel_insert_input {
+  data: Teacher_insert_input;
+  on_conflict?: Teacher_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "Teacher"
+ */
+export interface Teacher_on_conflict {
+  constraint: Teacher_constraint;
+  update_columns: Teacher_update_column[];
+  where?: Teacher_bool_exp | null;
+}
+
+/**
  * Boolean expression to filter rows from the table "University". All fields are combined with a logical 'AND'.
  */
 export interface University_bool_exp {
@@ -1996,6 +2787,7 @@ export interface User_arr_rel_insert_input {
  * Boolean expression to filter rows from the table "User". All fields are combined with a logical 'AND'.
  */
 export interface User_bool_exp {
+  AchievementRecordAuthors?: AchievementRecordAuthor_bool_exp | null;
   Admins?: Admin_bool_exp | null;
   Attendances?: Attendance_bool_exp | null;
   CourseEnrollments?: CourseEnrollment_bool_exp | null;
@@ -2025,6 +2817,7 @@ export interface User_bool_exp {
  * input type for inserting data into table "User"
  */
 export interface User_insert_input {
+  AchievementRecordAuthors?: AchievementRecordAuthor_arr_rel_insert_input | null;
   Admins?: Admin_arr_rel_insert_input | null;
   Attendances?: Attendance_arr_rel_insert_input | null;
   CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
@@ -2065,9 +2858,54 @@ export interface User_on_conflict {
 }
 
 /**
+ * Boolean expression to compare columns of type "_int4". All fields are combined with logical 'AND'.
+ */
+export interface _int4_comparison_exp {
+  _eq?: any | null;
+  _gt?: any | null;
+  _gte?: any | null;
+  _in?: any[] | null;
+  _is_null?: boolean | null;
+  _lt?: any | null;
+  _lte?: any | null;
+  _neq?: any | null;
+  _nin?: any[] | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "_text". All fields are combined with logical 'AND'.
+ */
+export interface _text_comparison_exp {
+  _eq?: any | null;
+  _gt?: any | null;
+  _gte?: any | null;
+  _in?: any[] | null;
+  _is_null?: boolean | null;
+  _lt?: any | null;
+  _lte?: any | null;
+  _neq?: any | null;
+  _nin?: any[] | null;
+}
+
+/**
  * Boolean expression to compare columns of type "date". All fields are combined with logical 'AND'.
  */
 export interface date_comparison_exp {
+  _eq?: any | null;
+  _gt?: any | null;
+  _gte?: any | null;
+  _in?: any[] | null;
+  _is_null?: boolean | null;
+  _lt?: any | null;
+  _lte?: any | null;
+  _neq?: any | null;
+  _nin?: any[] | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "numeric". All fields are combined with logical 'AND'.
+ */
+export interface numeric_comparison_exp {
   _eq?: any | null;
   _gt?: any | null;
   _gte?: any | null;

@@ -50,7 +50,7 @@ import {
 import { SelectUserDialog } from "../common/dialogs/SelectUserDialog";
 import EhCheckBox from "../common/EhCheckbox";
 import EhSelect from "../common/EhSelect";
-import EhTagEditTag from "../common/EhTagEditTag";
+import EhTag from "../common/EhTag";
 
 /* #region Local Interfaces */
 interface EntrollmentStatusCount {
@@ -359,7 +359,7 @@ const CourseDetails: FC<IPropsCourseOneRow> = ({ course, refetchCourses }) => {
               course.CourseInstructors.map(
                 (courseIn, index) =>
                   index > 0 && (
-                    <EhTagEditTag
+                    <EhTag
                       key={`${course.id}-${courseIn.Expert.id}-${index}`}
                       requestDeleteTag={deleteInstructorFromACourse}
                       tag={{
@@ -531,7 +531,7 @@ const InstructorColumn: FC<IPropsCourseOneRow> = ({
       {
         // we need to show just one instructore in main ui
         course.CourseInstructors.length > 0 && (
-          <EhTagEditTag
+          <EhTag
             key={`${course.id}-${course.CourseInstructors[0].Expert.id}`}
             requestDeleteTag={deleteInstructorFromACourse}
             tag={{

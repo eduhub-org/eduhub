@@ -7,8 +7,8 @@ interface IPros {
   debounceTime?: number;
   inputText?: string;
   textArea?: boolean;
-  bg?: string;
   disabled?: boolean;
+  autoFocus?: boolean;
   onChangeHandler?: (value: string) => any;
 }
 const EhInputWithTitle: FC<IPros> = ({
@@ -18,6 +18,7 @@ const EhInputWithTitle: FC<IPros> = ({
   inputText,
   textArea,
   disabled,
+  autoFocus,
   onChangeHandler,
 }) => {
   const handOnchange = useCallback(
@@ -31,12 +32,12 @@ const EhInputWithTitle: FC<IPros> = ({
       <p>{label}</p>
       <DebounceInput
         className={`h-12
-            pl-2
+            px-2
             bg-white
             transition
             ease-in-out
             w-full
-            border-none border-solid border-gray-300
+            border border-solid border-gray-300
             focus:border-none focus:outline-none`}
         element={textArea ? "textarea" : "input"}
         forceNotifyByEnter={!textArea}
@@ -45,6 +46,7 @@ const EhInputWithTitle: FC<IPros> = ({
         onChange={handOnchange}
         placeholder={placeholder}
         disabled={disabled}
+        autoFocus={autoFocus ?? false}
       />
     </div>
   );

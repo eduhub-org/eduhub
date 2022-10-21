@@ -7,6 +7,7 @@ interface IProps {
   searchText: string;
   onChangeCallback: (text: string) => any;
   debounceTime?: number;
+  autoFocus?: boolean;
 }
 
 const Searchbar: FC<IProps> = ({
@@ -14,6 +15,7 @@ const Searchbar: FC<IProps> = ({
   searchText,
   debounceTime,
   onChangeCallback,
+  autoFocus,
 }) => {
   const onChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -34,6 +36,7 @@ const Searchbar: FC<IProps> = ({
           value={searchText ?? ""}
           onChange={onChange}
           placeholder={placeholder}
+          autoFocus={autoFocus ?? false}
         />
       </div>
     </div>

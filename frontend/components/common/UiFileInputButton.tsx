@@ -1,37 +1,50 @@
-import { useRef } from "react";
+import { ChangeEvent, FC, useCallback, useRef } from "react";
 import { MdUploadFile } from "react-icons/md";
+import { parseFileUploadEvent } from "../../helpers/filehandling";
+import { useAdminMutation } from "../../hooks/authedMutation";
+import { SAVE_FILE } from "../../queries/actions";
+import {
+  SaveAFile,
+  SaveAFileVariables,
+} from "../../queries/__generated__/SaveAFile";
 
 export interface IPropsUpload {
   acceptedFileTypes?: string;
   allowMultipleFiles?: boolean;
   label: string;
-  onChange: (formData: FormData, fileName: string) => void;
+  onUploadComplete: (finalUrl: string, fileName: string) => void;
   uploadFileName: string;
+  templatePath: string;
 }
 
-export const UiFileInputButton: React.FC<IPropsUpload> = (props) => {
+export const UiFileInputButton: FC<IPropsUpload> = (props) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
 
-  const onClickHandler = () => {
+  const onClickHandler = useCallback(() => {
     fileInputRef.current?.click();
-  };
+  }, []);
+  const [saveFile] = useAdminMutation<SaveAFile, SaveAFileVariables>(SAVE_FILE);
 
-  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files?.length) {
-      return;
-    }
+  const handleFileUploadToServer = useCallback(
+    async (event: ChangeEvent<HTMLInputElement>) => {
+      const ufile = await parseFileUploadEvent(event);
 
-    const formData = new FormData();
+      if (ufile != null) {
+        const url = [props.templatePath, ufile.name].join("/");
 
-    Array.from(event.target.files).forEach((file) => {
-      formData.append(event.target.name, file);
-    });
+        await saveFile({
+          variables: {
+            base64file: ufile.data,
+            fileName: url,
+          },
+        });
 
-    props.onChange(formData, event.target.files[0].name);
-
-    formRef.current?.reset();
-  };
+        props.onUploadComplete(url, ufile.name);
+      }
+    },
+    [saveFile, props]
+  );
 
   return (
     <form ref={formRef}>
@@ -47,7 +60,7 @@ export const UiFileInputButton: React.FC<IPropsUpload> = (props) => {
         accept={props.acceptedFileTypes}
         multiple={props.allowMultipleFiles}
         name={props.uploadFileName}
-        onChange={onChangeHandler}
+        onChange={handleFileUploadToServer}
         ref={fileInputRef}
         style={{ display: "none" }}
         type="file"

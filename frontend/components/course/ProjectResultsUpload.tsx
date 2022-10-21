@@ -1,6 +1,18 @@
-import { FC, useCallback, useReducer, useState } from "react";
+import {
+  ChangeEvent,
+  FC,
+  useCallback,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { Button } from "../common/Button";
 import ModalControl from "../common/ModalController";
+
+import EhDebounceInput from "../common/EhDebounceInput";
+import { MdAddCircleOutline } from "react-icons/md";
+import EhTag from "../common/EhTag";
+import EhSelectForEnum from "../common/EhSelectForEnum";
 
 const ProjectResultsUpload: FC = () => {
   const [showModal, setShowModal] = useState(false);
@@ -8,10 +20,18 @@ const ProjectResultsUpload: FC = () => {
     setShowModal(false);
   }, []);
 
-  const chooseAndAchieveMent = useCallback(() => {}, []);
   const upload = useCallback(() => {
     setShowModal(true);
   }, []);
+  const achievementOptions: string[] = [
+    "DOCUMENTATION_AND_CSV",
+    "DOCUMENTATION",
+  ];
+
+  const onchangeAchievementRecord = useCallback((selected: string) => {
+    console.log(selected);
+  }, []);
+
   return (
     <>
       <div className="flex flex-col space-y-1 itmes-start py-2">
@@ -20,9 +40,13 @@ const ProjectResultsUpload: FC = () => {
           Den Leistungsnachweis musst Du bis spätestens zum 16.02.2021
           hochgeladen haben.
         </p>
-        <Button onClick={chooseAndAchieveMent} as="button" filled={false}>
+        {/* <Button onClick={chooseAndAchieveMent} as="button" filled={false}>
           Wähle einen Leistungsnachweis ↓
-        </Button>
+        </Button> */}
+        <EhSelectForEnum
+          onChange={onchangeAchievementRecord}
+          options={achievementOptions}
+        />
         <Button onClick={upload} as="button" filled={true}>
           ↑ Nachweis hochladen
         </Button>
@@ -88,6 +112,15 @@ const Content: FC = () => {
   const save = useCallback(() => {
     console.log("save");
   }, []);
+
+  const onDescriptionChange = useCallback(
+    (value: string) =>
+      dispatch({
+        type: "description",
+        value,
+      }),
+    [dispatch]
+  );
   return (
     <>
       <div className="flex flex-col space-y-2 w-full pb-5">
@@ -123,19 +156,19 @@ const Content: FC = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-1">
-                  <EhTagEditTag
+                  <EhTag
                     requestDeleteTag={requestDeleteTag}
                     tag={{ display: "Faiz Ahmed", id: 1 }}
                   />
-                  <EhTagEditTag
+                  <EhTag
                     requestDeleteTag={requestDeleteTag}
                     tag={{ display: "Faiz Ahmed", id: 1 }}
                   />
-                  <EhTagEditTag
+                  <EhTag
                     requestDeleteTag={requestDeleteTag}
                     tag={{ display: "Faiz Ahmed", id: 1 }}
                   />
-                  <EhTagEditTag
+                  <EhTag
                     requestDeleteTag={requestDeleteTag}
                     tag={{ display: "Faiz Ahmed", id: 1 }}
                   />
@@ -147,12 +180,7 @@ const Content: FC = () => {
               <div className="w-4/6">
                 <EhDebounceInput
                   textArea={true}
-                  onChangeHandler={(value: string) =>
-                    dispatch({
-                      type: "description",
-                      value,
-                    })
-                  }
+                  onChangeHandler={onDescriptionChange}
                   placeholder="Write the description"
                   inputText={state.description}
                 />
@@ -194,11 +222,6 @@ const Content: FC = () => {
   );
 };
 
-import { useRef } from "react";
-import EhDebounceInput from "../common/EhDebounceInput";
-import { MdAddCircleOutline } from "react-icons/md";
-import EhTagEditTag from "../common/EhTagEditTag";
-
 export interface IPropsUpload {
   acceptedFileTypes?: string;
   allowMultipleFiles?: boolean;
@@ -208,29 +231,32 @@ export interface IPropsUpload {
   placeholder?: string;
 }
 
-const UploadUI: React.FC<IPropsUpload> = (props) => {
+const UploadUI: FC<IPropsUpload> = (props) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
 
-  const onClickHandler = () => {
+  const onClickHandler = useCallback(() => {
     fileInputRef.current?.click();
-  };
+  }, [fileInputRef]);
 
-  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files?.length) {
-      return;
-    }
+  const onChangeHandler = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      if (!event.target.files?.length) {
+        return;
+      }
 
-    const formData = new FormData();
+      const formData = new FormData();
 
-    Array.from(event.target.files).forEach((file) => {
-      formData.append(event.target.name, file);
-    });
+      Array.from(event.target.files).forEach((file) => {
+        formData.append(event.target.name, file);
+      });
 
-    props.onChange(formData, event.target.files[0].name);
+      props.onChange(formData, event.target.files[0].name);
 
-    formRef.current?.reset();
-  };
+      formRef.current?.reset();
+    },
+    [props, formRef]
+  );
 
   return (
     <form ref={formRef}>

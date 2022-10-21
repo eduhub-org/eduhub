@@ -4,7 +4,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import EhTimeSelect, { formatTime } from "../common/EhTimeSelect";
 import { DebounceInput } from "react-debounce-input";
-import EhTagEdit from "../common/EhTagEdit";
 import { IconButton } from "@material-ui/core";
 import { MdDelete } from "react-icons/md";
 import {
@@ -32,6 +31,7 @@ import {
   InsertNewSessionSpeaker,
   InsertNewSessionSpeakerVariables,
 } from "../../queries/__generated__/InsertNewSessionSpeaker";
+import EhMultipleTag from "../common/EhMultipleTag";
 
 const copyDateTime = (target: Date, source: Date) => {
   target = new Date(target);
@@ -318,7 +318,7 @@ export const SessionRow: FC<IProps> = ({
           )}
           {session && (
             <div className="m-2">
-              <EhTagEdit
+              <EhMultipleTag
                 requestAddTag={openAddressAdd}
                 requestDeleteTag={handleDeleteLocation}
                 tags={adressTags}
@@ -334,7 +334,7 @@ export const SessionRow: FC<IProps> = ({
           )}
           {session && (
             <div className="m-2">
-              <EhTagEdit
+              <EhMultipleTag
                 requestAddTag={openAddSpeaker}
                 requestDeleteTag={handleDeleteSpeaker}
                 tags={speakerTags}

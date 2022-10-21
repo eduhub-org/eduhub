@@ -172,8 +172,8 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
 
 1.  Eslint (from scripts in package.json)
 
-        npm run lint
+        yarn lint --fix
 
 1.  Apollo Codegenerator (from scripts in package.json)
 
-        npm run apollo:codegen
+        yarn apollo:codegen
