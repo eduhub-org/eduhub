@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { AchievementOption_bool_exp, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
+import { AchievementOption_bool_exp, AchievementOption_order_by, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: AchievementOptionList
@@ -120,4 +120,5 @@ export interface AchievementOptionListVariables {
   where: AchievementOption_bool_exp;
   limit?: number | null;
   offset?: number | null;
+  orderBy?: AchievementOption_order_by | null;
 }

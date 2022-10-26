@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { AchievementOptionCourse_bool_exp } from "./../../__generated__/globalTypes";
+import { AchievementOptionCourse_bool_exp, AchievementOptionCourse_order_by, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: AchievementOptionCourses
@@ -15,6 +15,11 @@ export interface AchievementOptionCourses_AchievementOptionCourse_AchievementOpt
    * Title of an offered achievement option
    */
   title: string;
+  /**
+   * Type of the achivement record that must be uploaded for this option
+   */
+  recordType: AchievementRecordType_enum;
+  created_at: any | null;
 }
 
 export interface AchievementOptionCourses_AchievementOptionCourse {
@@ -32,6 +37,7 @@ export interface AchievementOptionCourses_AchievementOptionCourse {
    * ID of an achievement option that can be selected for a given course
    */
   achievementOptionId: number;
+  created_at: any;
 }
 
 export interface AchievementOptionCourses {
@@ -42,7 +48,8 @@ export interface AchievementOptionCourses {
 }
 
 export interface AchievementOptionCoursesVariables {
-  where: AchievementOptionCourse_bool_exp;
+  where?: AchievementOptionCourse_bool_exp | null;
   limit?: number | null;
   offset?: number | null;
+  orderByAchievementOptionCourse?: AchievementOptionCourse_order_by | null;
 }

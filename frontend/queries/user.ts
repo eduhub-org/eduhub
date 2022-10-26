@@ -91,3 +91,35 @@ export const USERS_BY_LAST_NAME = gql`
     }
   }
 `;
+
+/**
+ * Order by default lastName
+ */
+export const USERS_WITH_EXPERT_ID = gql`
+  query UsersWithExpertId(
+    $userOrderBy: User_order_by = { lastName: asc }
+    $limit: Int = null
+    $offset: Int = 0
+    $where: User_bool_exp = {}
+  ) {
+    User_aggregate(where: $where) {
+      aggregate {
+        count
+      }
+    }
+    User(
+      order_by: [$userOrderBy]
+      where: $where
+      limit: $limit
+      offset: $offset
+    ) {
+      id
+      firstName
+      lastName
+      email
+      Experts {
+        id
+      }
+    }
+  }
+`;

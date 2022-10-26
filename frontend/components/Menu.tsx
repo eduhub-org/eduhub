@@ -94,15 +94,6 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
           </Link>
         </MenuItem>
       )}
-
-      {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link href="/achievements">
-            <span className="w-full text-lg">Achievements (Admin)</span>
-          </Link>
-        </MenuItem>
-      )}
-
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link href="/courses">
@@ -110,7 +101,20 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
           </Link>
         </MenuItem>
       )}
-
+      {isInstructor && (
+        <MenuItem onClick={closeMenu}>
+          <Link href="/achievements">
+            <span className="w-full text-lg">Achievements (Instruktor)</span>
+          </Link>
+        </MenuItem>
+      )}
+      {isAdmin && (
+        <MenuItem onClick={closeMenu}>
+          <Link href="/achievements">
+            <span className="w-full text-lg">Achievements (Admin)</span>
+          </Link>
+        </MenuItem>
+      )}
       <MenuItem onClick={logout}>
         <span className="w-full text-lg">Logout</span>
       </MenuItem>

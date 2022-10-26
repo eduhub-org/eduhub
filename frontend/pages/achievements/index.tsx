@@ -23,7 +23,11 @@ import { ProgramsMenubar } from "../../components/program/ProgramsMenubar";
 import { makeFullName } from "../../helpers/util";
 import { useAdminMutation } from "../../hooks/authedMutation";
 import { useAdminQuery, useAuthedQuery } from "../../hooks/authedQuery";
-import { useIsAdmin, useIsLoggedIn } from "../../hooks/authentication";
+import {
+  useIsAdmin,
+  useIsInstructor,
+  useIsLoggedIn,
+} from "../../hooks/authentication";
 import {
   ACHIEVEMENT_OPTIONS,
   ACHIEVEMENT_RECORD_TYPES,
@@ -32,6 +36,7 @@ import { ADMIN_COURSE_LIST } from "../../queries/courseList";
 import { EXPERT_LIST } from "../../queries/expert";
 import { DELETE_AN_ACHIEVEMENT_OPTION } from "../../queries/mutateAchievement";
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from "../../queries/programList";
+import { USERS_WITH_EXPERT_ID } from "../../queries/user";
 import {
   AchievementOptionList,
   AchievementOptionListVariables,
@@ -48,14 +53,14 @@ import {
   DeleteAnAchievementOptionVariables,
 } from "../../queries/__generated__/DeleteAnAchievementOption";
 import {
-  ExpertList,
-  ExpertListVariables,
-  ExpertList_Expert,
-} from "../../queries/__generated__/ExpertList";
-import {
   Programs,
   Programs_Program,
 } from "../../queries/__generated__/Programs";
+import {
+  UsersWithExpertId,
+  UsersWithExpertIdVariables,
+  UsersWithExpertId_User,
+} from "../../queries/__generated__/UsersWithExpertId";
 import { StaticComponentProperty } from "../../types/UIComponents";
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
@@ -69,10 +74,27 @@ export const getStaticProps = async ({ locale }: { locale: string }) => ({
 });
 export const QUERY_LIMIT = 15;
 
+interface IContext {
+  achievementRTypes: string[];
+  refetchAchievementOptions?: () => void;
+  isAdmin: boolean;
+  isInstructor: boolean;
+  userDetails?: UsersWithExpertId_User | undefined;
+  course?: AdminCourseList_Course;
+  programID: number;
+  setProgramID: (id: number) => void;
+}
+
+const AchievementContext = createContext({} as IContext);
+
 const Achievements: FC = () => {
   const isAdmin = useIsAdmin();
   const isLoggedIn = useIsLoggedIn();
+  const isInstructor = useIsInstructor();
   const { t } = useTranslation("achievements-page");
+  const header = isAdmin
+    ? "Achievement Administration"
+    : "Administration Leistungsnachweise";
   return (
     <>
       <Head>
@@ -80,8 +102,8 @@ const Achievements: FC = () => {
       </Head>
       <Page>
         <div className="min-h-[77vh]">
-          <CommonPageHeader headline={t("page-header")} />
-          {isLoggedIn && isAdmin && <DashBoard />}
+          <CommonPageHeader headline={header} />
+          {isLoggedIn && (isAdmin || isInstructor) && <DashBoard />}
         </div>
       </Page>
     </>
@@ -95,98 +117,55 @@ const achievementOptions: string[] = [
   "DOCUMENTATION_AND_CSV",
 ];
 
-interface IContext {
-  programs: Programs_Program[];
-  achievementRTypes: string[];
-  onOffsetChange: (offset: number) => void;
-  achievements: AchievementOptionList_AchievementOption[] | [];
-  refetch?: () => void;
-  course?: AdminCourseList_Course;
-}
-
 const DashBoard: FC = () => {
-  const programsRequest = useAdminQuery<Programs>(
-    PROGRAMS_WITH_MINIMUM_PROPERTIES
+  const defaultProgram = -1; // All tab
+
+  const router = useRouter();
+
+  const [currentProgramId, setCurrentProgramId] = useState(defaultProgram);
+  const courseID: number = parseInt(router.query.courseId as string, 10); // {"courseId": 0}
+  let course: AdminCourseList_Course | undefined;
+
+  const courseList = useAdminQuery<AdminCourseList, AdminCourseListVariables>(
+    ADMIN_COURSE_LIST,
+    {
+      variables: {
+        where: {
+          id: { _eq: courseID },
+        },
+      },
+      skip: courseID <= 0,
+    }
   );
+  const c = [...(courseList.data?.Course || [])];
+  if (c.length > 0) {
+    course = c[0];
+  }
+  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const currentExpert = useAuthedQuery<
+    UsersWithExpertId,
+    UsersWithExpertIdVariables
+  >(USERS_WITH_EXPERT_ID, {
+    variables: {
+      where: {
+        id: { _eq: keycloak?.subject },
+      },
+    },
+    skip: !keycloak,
+  });
+
   const achievementRecordTypes = useAdminQuery<AchievementRecordTypes>(
     ACHIEVEMENT_RECORD_TYPES
   );
 
-  if (programsRequest.error) {
-    console.log(programsRequest.error);
+  if (achievementRecordTypes.error) {
+    console.log(achievementRecordTypes.error);
   }
-  if (programsRequest.loading || achievementRecordTypes.loading) {
-    return <Loading />;
-  }
-
-  const art = [
-    ...(achievementRecordTypes?.data?.AchievementRecordType.map(
-      (record) => record.value
-    ) || achievementOptions),
-  ];
-  const ps = [...(programsRequest?.data?.Program || [])];
-
-  return (
-    <>{ps.length > 0 && <Content programs={ps} achievementRTypes={art} />}</>
-  );
-};
-
-// Start Content
-
-const AchievementContext = createContext({} as IContext);
-
-interface IProps {
-  programs: Programs_Program[];
-  achievementRTypes: string[];
-}
-const Content: FC<IProps> = (props) => {
-  const defaultProgram = -1; // All tab
-  const router = useRouter();
-
-  const [currentProgramId, setCurrentProgramId] = useState(defaultProgram);
-  const [offset, setOffset] = useState(0);
-  let course: AdminCourseList_Course | undefined;
-
-  if ("courseId" in router.query) {
-    const courseID = router.query["courseId"] || 0;
-    const courseList = useAdminQuery<AdminCourseList, AdminCourseListVariables>(
-      ADMIN_COURSE_LIST,
-      {
-        variables: {
-          where: {
-            id: { _eq: courseID as number },
-          },
-        },
-      }
-    );
-
-    const c = [...(courseList.data?.Course || [])];
-    if (c.length > 0) {
-      course = c[0];
-    }
-  }
-  // const { keycloak } = useKeycloak<KeycloakInstance>();
-  // const currentExpert = useAuthedQuery<ExpertList, ExpertListVariables>(
-  //   EXPERT_LIST,
-  //   {
-  //     variables: {
-  //       where: {
-  //         User: { id: { _eq: keycloak?.subject } },
-  //       },
-  //     },
-  //     skip: !keycloak,
-  //   }
-  // );
-
-  // if (currentExpert.data) console.log(keycloak?.subject);
-
   const achievementsRequest = useAdminQuery<
     AchievementOptionList,
     AchievementOptionListVariables
   >(ACHIEVEMENT_OPTIONS, {
     variables: {
-      limit: QUERY_LIMIT,
-      offset,
       where:
         currentProgramId > -1
           ? {
@@ -206,89 +185,115 @@ const Content: FC<IProps> = (props) => {
     achievementsRequest.refetch();
   }, [achievementsRequest]);
 
-  const [showNewAchievementView, setShowNewAchievementView] = useState(false);
+  const aoptions = [...(achievementsRequest.data?.AchievementOption || [])];
+  const provider: IContext = {
+    achievementRTypes: [
+      ...(achievementRecordTypes?.data?.AchievementRecordType.map(
+        (v) => v.value
+      ) || achievementOptions),
+    ],
+    refetchAchievementOptions: refetch,
+    course: course ?? undefined,
+    programID: -1,
+    setProgramID: setCurrentProgramId,
+    isAdmin: useIsAdmin(),
+    isInstructor: useIsInstructor(),
+    userDetails: currentExpert.data ? currentExpert.data?.User[0] : undefined,
+  };
 
+  return (
+    <>
+      <AchievementContext.Provider value={provider}>
+        <Content options={aoptions} />
+      </AchievementContext.Provider>
+    </>
+  );
+};
+
+// Start Content
+
+interface IPropsContent {
+  options: AchievementOptionList_AchievementOption[];
+}
+const Content: FC<IPropsContent> = ({ options }) => {
+  const context = useContext(AchievementContext);
+  const [showNewAchievementView, setShowNewAchievementView] = useState(false);
   const onProgramFilterChange = useCallback(
     (menu: StaticComponentProperty) => {
-      console.log(menu.key);
-      setCurrentProgramId(menu.key);
+      context.setProgramID(menu.key);
     },
-    [setCurrentProgramId]
-  );
-
-  const onOffsetChange = useCallback(
-    (os: number) => {
-      setOffset(os);
-    },
-    [setOffset]
+    [context]
   );
 
   const onSuccessAddEdit = useCallback(
     (success: boolean) => {
-      if (success) refetch();
+      if (success && context.refetchAchievementOptions) {
+        context.refetchAchievementOptions();
+      }
       setShowNewAchievementView(false);
     },
-    [refetch, setShowNewAchievementView]
+    [context, setShowNewAchievementView]
   );
 
+  const programsRequest = useAdminQuery<Programs>(
+    PROGRAMS_WITH_MINIMUM_PROPERTIES
+  );
+
+  if (programsRequest.error) {
+    console.log(programsRequest.error);
+  }
+  if (programsRequest.loading) {
+    <Loading />;
+  }
   const addNewAchievement = useCallback(() => {
     setShowNewAchievementView(!showNewAchievementView);
   }, [setShowNewAchievementView, showNewAchievementView]);
 
-  const achievements = [...(achievementsRequest.data?.AchievementOption || [])];
-
-  const provider: IContext = {
-    achievementRTypes: props.achievementRTypes,
-    onOffsetChange,
-    programs: props.programs,
-    achievements,
-    refetch,
-    course: course ?? undefined,
-  };
   return (
-    <AchievementContext.Provider value={provider}>
-      <div className="w-full">
-        <div className="flex justify-between mb-5">
+    <div className="w-full">
+      <div className="flex justify-between mb-5">
+        {!programsRequest.loading && !programsRequest.error && (
           <ProgramsMenubar
-            programs={props.programs}
-            defaultProgramId={defaultProgram}
+            programs={[...(programsRequest?.data?.Program || [])]}
+            defaultProgramId={context.programID}
             onTabClicked={onProgramFilterChange}
           />
+        )}
+      </div>
+      <div className="flex flex-col space-y-1">
+        <div className="flex justify-end">
+          <EhAddButton
+            buttonClickCallBack={addNewAchievement}
+            text="Neuen  hinzufügen"
+          />
         </div>
-        <div className="flex flex-col space-y-1">
+        <AchievementList options={options} />
+        {showNewAchievementView && (
+          <div className="flex bg-edu-light-gray py-5">
+            <AddEditAchievementOption
+              achievementRecordTypes={context.achievementRTypes}
+              onSuccess={onSuccessAddEdit}
+              course={context.course}
+              userDetails={context.userDetails}
+            />
+          </div>
+        )}
+        {achievementOptions.length > 0 && (
           <div className="flex justify-end">
             <EhAddButton
               buttonClickCallBack={addNewAchievement}
               text="Neuen  hinzufügen"
             />
           </div>
-          <AchievementList />
-          {showNewAchievementView && (
-            <div className="flex bg-edu-light-gray py-5">
-              <AddEditAchievementOption
-                achievementRecordTypes={achievementOptions}
-                onSuccess={onSuccessAddEdit}
-                course={course}
-              />
-            </div>
-          )}
-          {achievements.length > 0 && (
-            <div className="flex justify-end">
-              <EhAddButton
-                buttonClickCallBack={addNewAchievement}
-                text="Neuen  hinzufügen"
-              />
-            </div>
-          )}
-        </div>
+        )}
       </div>
-    </AchievementContext.Provider>
+    </div>
   );
 };
 
 // Start AchievementList
 const ml = "ml-[20px]";
-const AchievementList: FC = () => {
+const AchievementList: FC<IPropsContent> = ({ options }) => {
   const context = useContext(AchievementContext);
   const { t } = useTranslation("course-page");
   const thClass = "font-medium text-gray-700 uppercase";
@@ -310,11 +315,9 @@ const AchievementList: FC = () => {
           </tr>
         </thead>
         <tbody>
-          {context.achievements.map(
-            (ac: AchievementOptionList_AchievementOption, index) => (
-              <AchievementRow key={`listData-${index}`} acop={ac} />
-            )
-          )}
+          {options.map((ac: AchievementOptionList_AchievementOption, index) => (
+            <AchievementRow key={`listData-${index}`} acop={ac} />
+          ))}
         </tbody>
       </table>
     </>
@@ -337,8 +340,8 @@ const AchievementRow: FC<IPropsForARow> = (props) => {
 
   const onSuccessAddEdit = useCallback(
     (success: boolean) => {
-      if (success && context.refetch) {
-        context.refetch();
+      if (success && context.refetchAchievementOptions) {
+        context.refetchAchievementOptions();
       }
     },
     [context]
@@ -439,6 +442,7 @@ const AchievementRow: FC<IPropsForARow> = (props) => {
                 achievementRecordTypes={context.achievementRTypes}
                 onSuccess={onSuccessAddEdit}
                 achievementOption={props.acop}
+                userDetails={context.userDetails}
               />
             </div>
           </td>

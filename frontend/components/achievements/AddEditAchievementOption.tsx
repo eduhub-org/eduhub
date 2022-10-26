@@ -57,6 +57,7 @@ import TagWithTwoText from "../common/TagWithTwoText";
 import { UiFileInputButton } from "../common/UiFileInputButton";
 import CourseListDialog from "../courses/CoureListDialog";
 import EhTag from "../common/EhTag";
+import { UsersWithExpertId_User } from "../../queries/__generated__/UsersWithExpertId";
 
 /* #region Local intefaces */
 interface IProps {
@@ -64,6 +65,7 @@ interface IProps {
   onSuccess: (success: boolean) => void;
   achievementOption?: AchievementOptionList_AchievementOption;
   course?: AdminCourseList_Course;
+  userDetails: UsersWithExpertId_User | undefined;
 }
 
 interface TempAchievementOptionMentor {
@@ -147,7 +149,16 @@ const AddEditAchievementOption: FC<IProps> = (props) => {
       showCourseListDialog: false,
       showMentorDialog: false,
       recordType: props.achievementRecordTypes[0],
-      experts: [],
+      experts: props.userDetails
+        ? props.userDetails.Experts.length > 0
+          ? new Array({
+              expertId: props.userDetails.Experts[0].id,
+              firstName: props.userDetails.firstName,
+              lastName: props.userDetails.lastName,
+              id: props.userDetails.Experts[0].id,
+            } as TempAchievementOptionMentor)
+          : []
+        : [],
       courses: props.course
         ? new Array({
             courseId: props.course.id,

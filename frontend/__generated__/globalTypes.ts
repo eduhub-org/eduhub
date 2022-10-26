@@ -779,11 +779,49 @@ export enum User_update_column {
 }
 
 /**
+ * column ordering options
+ */
+export enum order_by {
+  asc = "asc",
+  asc_nulls_first = "asc_nulls_first",
+  asc_nulls_last = "asc_nulls_last",
+  desc = "desc",
+  desc_nulls_first = "desc_nulls_first",
+  desc_nulls_last = "desc_nulls_last",
+}
+
+/**
+ * order by aggregate values of table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_aggregate_order_by {
+  avg?: AchievementOptionCourse_avg_order_by | null;
+  count?: order_by | null;
+  max?: AchievementOptionCourse_max_order_by | null;
+  min?: AchievementOptionCourse_min_order_by | null;
+  stddev?: AchievementOptionCourse_stddev_order_by | null;
+  stddev_pop?: AchievementOptionCourse_stddev_pop_order_by | null;
+  stddev_samp?: AchievementOptionCourse_stddev_samp_order_by | null;
+  sum?: AchievementOptionCourse_sum_order_by | null;
+  var_pop?: AchievementOptionCourse_var_pop_order_by | null;
+  var_samp?: AchievementOptionCourse_var_samp_order_by | null;
+  variance?: AchievementOptionCourse_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "AchievementOptionCourse"
  */
 export interface AchievementOptionCourse_arr_rel_insert_input {
   data: AchievementOptionCourse_insert_input[];
   on_conflict?: AchievementOptionCourse_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_avg_order_by {
+  achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
+  id?: order_by | null;
 }
 
 /**
@@ -816,12 +854,47 @@ export interface AchievementOptionCourse_insert_input {
 }
 
 /**
+ * order by max() on columns of table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_max_order_by {
+  achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_min_order_by {
+  achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
  * on_conflict condition type for table "AchievementOptionCourse"
  */
 export interface AchievementOptionCourse_on_conflict {
   constraint: AchievementOptionCourse_constraint;
   update_columns: AchievementOptionCourse_update_column[];
   where?: AchievementOptionCourse_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "AchievementOptionCourse".
+ */
+export interface AchievementOptionCourse_order_by {
+  AchievementOption?: AchievementOption_order_by | null;
+  Course?: Course_order_by | null;
+  achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
 }
 
 /**
@@ -836,11 +909,100 @@ export interface AchievementOptionCourse_set_input {
 }
 
 /**
+ * order by stddev() on columns of table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_stddev_order_by {
+  achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_stddev_pop_order_by {
+  achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_stddev_samp_order_by {
+  achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_sum_order_by {
+  achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_var_pop_order_by {
+  achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_var_samp_order_by {
+  achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "AchievementOptionCourse"
+ */
+export interface AchievementOptionCourse_variance_order_by {
+  achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by aggregate values of table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_aggregate_order_by {
+  avg?: AchievementOptionMentor_avg_order_by | null;
+  count?: order_by | null;
+  max?: AchievementOptionMentor_max_order_by | null;
+  min?: AchievementOptionMentor_min_order_by | null;
+  stddev?: AchievementOptionMentor_stddev_order_by | null;
+  stddev_pop?: AchievementOptionMentor_stddev_pop_order_by | null;
+  stddev_samp?: AchievementOptionMentor_stddev_samp_order_by | null;
+  sum?: AchievementOptionMentor_sum_order_by | null;
+  var_pop?: AchievementOptionMentor_var_pop_order_by | null;
+  var_samp?: AchievementOptionMentor_var_samp_order_by | null;
+  variance?: AchievementOptionMentor_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "AchievementOptionMentor"
  */
 export interface AchievementOptionMentor_arr_rel_insert_input {
   data: AchievementOptionMentor_insert_input[];
   on_conflict?: AchievementOptionMentor_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_avg_order_by {
+  achievementOptionId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
 }
 
 /**
@@ -873,6 +1035,28 @@ export interface AchievementOptionMentor_insert_input {
 }
 
 /**
+ * order by max() on columns of table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_max_order_by {
+  achievementOptionId?: order_by | null;
+  created_at?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_min_order_by {
+  achievementOptionId?: order_by | null;
+  created_at?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
  * on_conflict condition type for table "AchievementOptionMentor"
  */
 export interface AchievementOptionMentor_on_conflict {
@@ -893,11 +1077,98 @@ export interface AchievementOptionMentor_set_input {
 }
 
 /**
+ * order by stddev() on columns of table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_stddev_order_by {
+  achievementOptionId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_stddev_pop_order_by {
+  achievementOptionId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_stddev_samp_order_by {
+  achievementOptionId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_sum_order_by {
+  achievementOptionId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_var_pop_order_by {
+  achievementOptionId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_var_samp_order_by {
+  achievementOptionId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "AchievementOptionMentor"
+ */
+export interface AchievementOptionMentor_variance_order_by {
+  achievementOptionId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by aggregate values of table "AchievementOption"
+ */
+export interface AchievementOption_aggregate_order_by {
+  avg?: AchievementOption_avg_order_by | null;
+  count?: order_by | null;
+  max?: AchievementOption_max_order_by | null;
+  min?: AchievementOption_min_order_by | null;
+  stddev?: AchievementOption_stddev_order_by | null;
+  stddev_pop?: AchievementOption_stddev_pop_order_by | null;
+  stddev_samp?: AchievementOption_stddev_samp_order_by | null;
+  sum?: AchievementOption_sum_order_by | null;
+  var_pop?: AchievementOption_var_pop_order_by | null;
+  var_samp?: AchievementOption_var_samp_order_by | null;
+  variance?: AchievementOption_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "AchievementOption"
  */
 export interface AchievementOption_arr_rel_insert_input {
   data: AchievementOption_insert_input[];
   on_conflict?: AchievementOption_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "AchievementOption"
+ */
+export interface AchievementOption_avg_order_by {
+  id?: order_by | null;
 }
 
 /**
@@ -940,6 +1211,32 @@ export interface AchievementOption_insert_input {
 }
 
 /**
+ * order by max() on columns of table "AchievementOption"
+ */
+export interface AchievementOption_max_order_by {
+  created_at?: order_by | null;
+  description?: order_by | null;
+  documentationTemplateUrl?: order_by | null;
+  evaluationScriptUrl?: order_by | null;
+  id?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "AchievementOption"
+ */
+export interface AchievementOption_min_order_by {
+  created_at?: order_by | null;
+  description?: order_by | null;
+  documentationTemplateUrl?: order_by | null;
+  evaluationScriptUrl?: order_by | null;
+  id?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
  * input type for inserting object relation for remote table "AchievementOption"
  */
 export interface AchievementOption_obj_rel_insert_input {
@@ -957,6 +1254,24 @@ export interface AchievementOption_on_conflict {
 }
 
 /**
+ * Ordering options when selecting data from "AchievementOption".
+ */
+export interface AchievementOption_order_by {
+  AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_order_by | null;
+  AchievementOptionMentors_aggregate?: AchievementOptionMentor_aggregate_order_by | null;
+  AchievementRecordType?: AchievementRecordType_order_by | null;
+  AchievementRecords_aggregate?: AchievementRecord_aggregate_order_by | null;
+  created_at?: order_by | null;
+  description?: order_by | null;
+  documentationTemplateUrl?: order_by | null;
+  evaluationScriptUrl?: order_by | null;
+  id?: order_by | null;
+  recordType?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
  * input type for updating data in table "AchievementOption"
  */
 export interface AchievementOption_set_input {
@@ -971,11 +1286,85 @@ export interface AchievementOption_set_input {
 }
 
 /**
+ * order by stddev() on columns of table "AchievementOption"
+ */
+export interface AchievementOption_stddev_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "AchievementOption"
+ */
+export interface AchievementOption_stddev_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "AchievementOption"
+ */
+export interface AchievementOption_stddev_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "AchievementOption"
+ */
+export interface AchievementOption_sum_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "AchievementOption"
+ */
+export interface AchievementOption_var_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "AchievementOption"
+ */
+export interface AchievementOption_var_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "AchievementOption"
+ */
+export interface AchievementOption_variance_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by aggregate values of table "AchievementRecordAuthor"
+ */
+export interface AchievementRecordAuthor_aggregate_order_by {
+  avg?: AchievementRecordAuthor_avg_order_by | null;
+  count?: order_by | null;
+  max?: AchievementRecordAuthor_max_order_by | null;
+  min?: AchievementRecordAuthor_min_order_by | null;
+  stddev?: AchievementRecordAuthor_stddev_order_by | null;
+  stddev_pop?: AchievementRecordAuthor_stddev_pop_order_by | null;
+  stddev_samp?: AchievementRecordAuthor_stddev_samp_order_by | null;
+  sum?: AchievementRecordAuthor_sum_order_by | null;
+  var_pop?: AchievementRecordAuthor_var_pop_order_by | null;
+  var_samp?: AchievementRecordAuthor_var_samp_order_by | null;
+  variance?: AchievementRecordAuthor_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "AchievementRecordAuthor"
  */
 export interface AchievementRecordAuthor_arr_rel_insert_input {
   data: AchievementRecordAuthor_insert_input[];
   on_conflict?: AchievementRecordAuthor_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "AchievementRecordAuthor"
+ */
+export interface AchievementRecordAuthor_avg_order_by {
+  achievementRecordId?: order_by | null;
+  id?: order_by | null;
 }
 
 /**
@@ -1008,12 +1397,90 @@ export interface AchievementRecordAuthor_insert_input {
 }
 
 /**
+ * order by max() on columns of table "AchievementRecordAuthor"
+ */
+export interface AchievementRecordAuthor_max_order_by {
+  achievementRecordId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "AchievementRecordAuthor"
+ */
+export interface AchievementRecordAuthor_min_order_by {
+  achievementRecordId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+/**
  * on_conflict condition type for table "AchievementRecordAuthor"
  */
 export interface AchievementRecordAuthor_on_conflict {
   constraint: AchievementRecordAuthor_constraint;
   update_columns: AchievementRecordAuthor_update_column[];
   where?: AchievementRecordAuthor_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "AchievementRecordAuthor"
+ */
+export interface AchievementRecordAuthor_stddev_order_by {
+  achievementRecordId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "AchievementRecordAuthor"
+ */
+export interface AchievementRecordAuthor_stddev_pop_order_by {
+  achievementRecordId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "AchievementRecordAuthor"
+ */
+export interface AchievementRecordAuthor_stddev_samp_order_by {
+  achievementRecordId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "AchievementRecordAuthor"
+ */
+export interface AchievementRecordAuthor_sum_order_by {
+  achievementRecordId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "AchievementRecordAuthor"
+ */
+export interface AchievementRecordAuthor_var_pop_order_by {
+  achievementRecordId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "AchievementRecordAuthor"
+ */
+export interface AchievementRecordAuthor_var_samp_order_by {
+  achievementRecordId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "AchievementRecordAuthor"
+ */
+export interface AchievementRecordAuthor_variance_order_by {
+  achievementRecordId?: order_by | null;
+  id?: order_by | null;
 }
 
 /**
@@ -1115,11 +1582,47 @@ export interface AchievementRecordType_on_conflict {
 }
 
 /**
+ * Ordering options when selecting data from "AchievementRecordType".
+ */
+export interface AchievementRecordType_order_by {
+  AchievementOptions_aggregate?: AchievementOption_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
+/**
+ * order by aggregate values of table "AchievementRecord"
+ */
+export interface AchievementRecord_aggregate_order_by {
+  avg?: AchievementRecord_avg_order_by | null;
+  count?: order_by | null;
+  max?: AchievementRecord_max_order_by | null;
+  min?: AchievementRecord_min_order_by | null;
+  stddev?: AchievementRecord_stddev_order_by | null;
+  stddev_pop?: AchievementRecord_stddev_pop_order_by | null;
+  stddev_samp?: AchievementRecord_stddev_samp_order_by | null;
+  sum?: AchievementRecord_sum_order_by | null;
+  var_pop?: AchievementRecord_var_pop_order_by | null;
+  var_samp?: AchievementRecord_var_samp_order_by | null;
+  variance?: AchievementRecord_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "AchievementRecord"
  */
 export interface AchievementRecord_arr_rel_insert_input {
   data: AchievementRecord_insert_input[];
   on_conflict?: AchievementRecord_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "AchievementRecord"
+ */
+export interface AchievementRecord_avg_order_by {
+  AchievementOptionId?: order_by | null;
+  id?: order_by | null;
+  score?: order_by | null;
+  uploadUserId?: order_by | null;
 }
 
 /**
@@ -1158,6 +1661,30 @@ export interface AchievementRecord_insert_input {
 }
 
 /**
+ * order by max() on columns of table "AchievementRecord"
+ */
+export interface AchievementRecord_max_order_by {
+  AchievementOptionId?: order_by | null;
+  coverImageUrl?: order_by | null;
+  description?: order_by | null;
+  id?: order_by | null;
+  score?: order_by | null;
+  uploadUserId?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "AchievementRecord"
+ */
+export interface AchievementRecord_min_order_by {
+  AchievementOptionId?: order_by | null;
+  coverImageUrl?: order_by | null;
+  description?: order_by | null;
+  id?: order_by | null;
+  score?: order_by | null;
+  uploadUserId?: order_by | null;
+}
+
+/**
  * input type for inserting object relation for remote table "AchievementRecord"
  */
 export interface AchievementRecord_obj_rel_insert_input {
@@ -1175,11 +1702,105 @@ export interface AchievementRecord_on_conflict {
 }
 
 /**
+ * order by stddev() on columns of table "AchievementRecord"
+ */
+export interface AchievementRecord_stddev_order_by {
+  AchievementOptionId?: order_by | null;
+  id?: order_by | null;
+  score?: order_by | null;
+  uploadUserId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "AchievementRecord"
+ */
+export interface AchievementRecord_stddev_pop_order_by {
+  AchievementOptionId?: order_by | null;
+  id?: order_by | null;
+  score?: order_by | null;
+  uploadUserId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "AchievementRecord"
+ */
+export interface AchievementRecord_stddev_samp_order_by {
+  AchievementOptionId?: order_by | null;
+  id?: order_by | null;
+  score?: order_by | null;
+  uploadUserId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "AchievementRecord"
+ */
+export interface AchievementRecord_sum_order_by {
+  AchievementOptionId?: order_by | null;
+  id?: order_by | null;
+  score?: order_by | null;
+  uploadUserId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "AchievementRecord"
+ */
+export interface AchievementRecord_var_pop_order_by {
+  AchievementOptionId?: order_by | null;
+  id?: order_by | null;
+  score?: order_by | null;
+  uploadUserId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "AchievementRecord"
+ */
+export interface AchievementRecord_var_samp_order_by {
+  AchievementOptionId?: order_by | null;
+  id?: order_by | null;
+  score?: order_by | null;
+  uploadUserId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "AchievementRecord"
+ */
+export interface AchievementRecord_variance_order_by {
+  AchievementOptionId?: order_by | null;
+  id?: order_by | null;
+  score?: order_by | null;
+  uploadUserId?: order_by | null;
+}
+
+/**
+ * order by aggregate values of table "Admin"
+ */
+export interface Admin_aggregate_order_by {
+  avg?: Admin_avg_order_by | null;
+  count?: order_by | null;
+  max?: Admin_max_order_by | null;
+  min?: Admin_min_order_by | null;
+  stddev?: Admin_stddev_order_by | null;
+  stddev_pop?: Admin_stddev_pop_order_by | null;
+  stddev_samp?: Admin_stddev_samp_order_by | null;
+  sum?: Admin_sum_order_by | null;
+  var_pop?: Admin_var_pop_order_by | null;
+  var_samp?: Admin_var_samp_order_by | null;
+  variance?: Admin_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "Admin"
  */
 export interface Admin_arr_rel_insert_input {
   data: Admin_insert_input[];
   on_conflict?: Admin_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "Admin"
+ */
+export interface Admin_avg_order_by {
+  id?: order_by | null;
 }
 
 /**
@@ -1208,12 +1829,81 @@ export interface Admin_insert_input {
 }
 
 /**
+ * order by max() on columns of table "Admin"
+ */
+export interface Admin_max_order_by {
+  created_at?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "Admin"
+ */
+export interface Admin_min_order_by {
+  created_at?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+/**
  * on_conflict condition type for table "Admin"
  */
 export interface Admin_on_conflict {
   constraint: Admin_constraint;
   update_columns: Admin_update_column[];
   where?: Admin_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "Admin"
+ */
+export interface Admin_stddev_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "Admin"
+ */
+export interface Admin_stddev_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "Admin"
+ */
+export interface Admin_stddev_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "Admin"
+ */
+export interface Admin_sum_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "Admin"
+ */
+export interface Admin_var_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "Admin"
+ */
+export interface Admin_var_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "Admin"
+ */
+export interface Admin_variance_order_by {
+  id?: order_by | null;
 }
 
 /**
@@ -1350,11 +2040,38 @@ export interface AttendanceStatus_on_conflict {
 }
 
 /**
+ * order by aggregate values of table "Attendance"
+ */
+export interface Attendance_aggregate_order_by {
+  avg?: Attendance_avg_order_by | null;
+  count?: order_by | null;
+  max?: Attendance_max_order_by | null;
+  min?: Attendance_min_order_by | null;
+  stddev?: Attendance_stddev_order_by | null;
+  stddev_pop?: Attendance_stddev_pop_order_by | null;
+  stddev_samp?: Attendance_stddev_samp_order_by | null;
+  sum?: Attendance_sum_order_by | null;
+  var_pop?: Attendance_var_pop_order_by | null;
+  var_samp?: Attendance_var_samp_order_by | null;
+  variance?: Attendance_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "Attendance"
  */
 export interface Attendance_arr_rel_insert_input {
   data: Attendance_insert_input[];
   on_conflict?: Attendance_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "Attendance"
+ */
+export interface Attendance_avg_order_by {
+  id?: order_by | null;
+  interruptionCount?: order_by | null;
+  sessionId?: order_by | null;
+  totalAttendanceTime?: order_by | null;
 }
 
 /**
@@ -1405,6 +2122,40 @@ export interface Attendance_insert_input {
 }
 
 /**
+ * order by max() on columns of table "Attendance"
+ */
+export interface Attendance_max_order_by {
+  created_at?: order_by | null;
+  endDateTime?: order_by | null;
+  id?: order_by | null;
+  interruptionCount?: order_by | null;
+  recordedName?: order_by | null;
+  sessionId?: order_by | null;
+  source?: order_by | null;
+  startDateTime?: order_by | null;
+  totalAttendanceTime?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "Attendance"
+ */
+export interface Attendance_min_order_by {
+  created_at?: order_by | null;
+  endDateTime?: order_by | null;
+  id?: order_by | null;
+  interruptionCount?: order_by | null;
+  recordedName?: order_by | null;
+  sessionId?: order_by | null;
+  source?: order_by | null;
+  startDateTime?: order_by | null;
+  totalAttendanceTime?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+/**
  * on_conflict condition type for table "Attendance"
  */
 export interface Attendance_on_conflict {
@@ -1429,6 +2180,76 @@ export interface Attendance_set_input {
   totalAttendanceTime?: number | null;
   updated_at?: any | null;
   userId?: any | null;
+}
+
+/**
+ * order by stddev() on columns of table "Attendance"
+ */
+export interface Attendance_stddev_order_by {
+  id?: order_by | null;
+  interruptionCount?: order_by | null;
+  sessionId?: order_by | null;
+  totalAttendanceTime?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "Attendance"
+ */
+export interface Attendance_stddev_pop_order_by {
+  id?: order_by | null;
+  interruptionCount?: order_by | null;
+  sessionId?: order_by | null;
+  totalAttendanceTime?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "Attendance"
+ */
+export interface Attendance_stddev_samp_order_by {
+  id?: order_by | null;
+  interruptionCount?: order_by | null;
+  sessionId?: order_by | null;
+  totalAttendanceTime?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "Attendance"
+ */
+export interface Attendance_sum_order_by {
+  id?: order_by | null;
+  interruptionCount?: order_by | null;
+  sessionId?: order_by | null;
+  totalAttendanceTime?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "Attendance"
+ */
+export interface Attendance_var_pop_order_by {
+  id?: order_by | null;
+  interruptionCount?: order_by | null;
+  sessionId?: order_by | null;
+  totalAttendanceTime?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "Attendance"
+ */
+export interface Attendance_var_samp_order_by {
+  id?: order_by | null;
+  interruptionCount?: order_by | null;
+  sessionId?: order_by | null;
+  totalAttendanceTime?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "Attendance"
+ */
+export interface Attendance_variance_order_by {
+  id?: order_by | null;
+  interruptionCount?: order_by | null;
+  sessionId?: order_by | null;
+  totalAttendanceTime?: order_by | null;
 }
 
 /**
@@ -1496,11 +2317,36 @@ export interface CourseEnrollmentStatus_on_conflict {
 }
 
 /**
+ * order by aggregate values of table "CourseEnrollment"
+ */
+export interface CourseEnrollment_aggregate_order_by {
+  avg?: CourseEnrollment_avg_order_by | null;
+  count?: order_by | null;
+  max?: CourseEnrollment_max_order_by | null;
+  min?: CourseEnrollment_min_order_by | null;
+  stddev?: CourseEnrollment_stddev_order_by | null;
+  stddev_pop?: CourseEnrollment_stddev_pop_order_by | null;
+  stddev_samp?: CourseEnrollment_stddev_samp_order_by | null;
+  sum?: CourseEnrollment_sum_order_by | null;
+  var_pop?: CourseEnrollment_var_pop_order_by | null;
+  var_samp?: CourseEnrollment_var_samp_order_by | null;
+  variance?: CourseEnrollment_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "CourseEnrollment"
  */
 export interface CourseEnrollment_arr_rel_insert_input {
   data: CourseEnrollment_insert_input[];
   on_conflict?: CourseEnrollment_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "CourseEnrollment"
+ */
+export interface CourseEnrollment_avg_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
 }
 
 /**
@@ -1549,6 +2395,36 @@ export interface CourseEnrollment_insert_input {
 }
 
 /**
+ * order by max() on columns of table "CourseEnrollment"
+ */
+export interface CourseEnrollment_max_order_by {
+  achievementCertificateURL?: order_by | null;
+  attendanceCertificateURL?: order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  invitationExpirationDate?: order_by | null;
+  motivationLetter?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "CourseEnrollment"
+ */
+export interface CourseEnrollment_min_order_by {
+  achievementCertificateURL?: order_by | null;
+  attendanceCertificateURL?: order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  invitationExpirationDate?: order_by | null;
+  motivationLetter?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+/**
  * on_conflict condition type for table "CourseEnrollment"
  */
 export interface CourseEnrollment_on_conflict {
@@ -1558,11 +2434,93 @@ export interface CourseEnrollment_on_conflict {
 }
 
 /**
+ * order by stddev() on columns of table "CourseEnrollment"
+ */
+export interface CourseEnrollment_stddev_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "CourseEnrollment"
+ */
+export interface CourseEnrollment_stddev_pop_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "CourseEnrollment"
+ */
+export interface CourseEnrollment_stddev_samp_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "CourseEnrollment"
+ */
+export interface CourseEnrollment_sum_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "CourseEnrollment"
+ */
+export interface CourseEnrollment_var_pop_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "CourseEnrollment"
+ */
+export interface CourseEnrollment_var_samp_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "CourseEnrollment"
+ */
+export interface CourseEnrollment_variance_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by aggregate values of table "CourseInstructor"
+ */
+export interface CourseInstructor_aggregate_order_by {
+  avg?: CourseInstructor_avg_order_by | null;
+  count?: order_by | null;
+  max?: CourseInstructor_max_order_by | null;
+  min?: CourseInstructor_min_order_by | null;
+  stddev?: CourseInstructor_stddev_order_by | null;
+  stddev_pop?: CourseInstructor_stddev_pop_order_by | null;
+  stddev_samp?: CourseInstructor_stddev_samp_order_by | null;
+  sum?: CourseInstructor_sum_order_by | null;
+  var_pop?: CourseInstructor_var_pop_order_by | null;
+  var_samp?: CourseInstructor_var_samp_order_by | null;
+  variance?: CourseInstructor_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "CourseInstructor"
  */
 export interface CourseInstructor_arr_rel_insert_input {
   data: CourseInstructor_insert_input[];
   on_conflict?: CourseInstructor_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "CourseInstructor"
+ */
+export interface CourseInstructor_avg_order_by {
+  courseId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
 }
 
 /**
@@ -1595,6 +2553,28 @@ export interface CourseInstructor_insert_input {
 }
 
 /**
+ * order by max() on columns of table "CourseInstructor"
+ */
+export interface CourseInstructor_max_order_by {
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "CourseInstructor"
+ */
+export interface CourseInstructor_min_order_by {
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
  * on_conflict condition type for table "CourseInstructor"
  */
 export interface CourseInstructor_on_conflict {
@@ -1604,11 +2584,99 @@ export interface CourseInstructor_on_conflict {
 }
 
 /**
+ * order by stddev() on columns of table "CourseInstructor"
+ */
+export interface CourseInstructor_stddev_order_by {
+  courseId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "CourseInstructor"
+ */
+export interface CourseInstructor_stddev_pop_order_by {
+  courseId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "CourseInstructor"
+ */
+export interface CourseInstructor_stddev_samp_order_by {
+  courseId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "CourseInstructor"
+ */
+export interface CourseInstructor_sum_order_by {
+  courseId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "CourseInstructor"
+ */
+export interface CourseInstructor_var_pop_order_by {
+  courseId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "CourseInstructor"
+ */
+export interface CourseInstructor_var_samp_order_by {
+  courseId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "CourseInstructor"
+ */
+export interface CourseInstructor_variance_order_by {
+  courseId?: order_by | null;
+  expertId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by aggregate values of table "CourseLocation"
+ */
+export interface CourseLocation_aggregate_order_by {
+  avg?: CourseLocation_avg_order_by | null;
+  count?: order_by | null;
+  max?: CourseLocation_max_order_by | null;
+  min?: CourseLocation_min_order_by | null;
+  stddev?: CourseLocation_stddev_order_by | null;
+  stddev_pop?: CourseLocation_stddev_pop_order_by | null;
+  stddev_samp?: CourseLocation_stddev_samp_order_by | null;
+  sum?: CourseLocation_sum_order_by | null;
+  var_pop?: CourseLocation_var_pop_order_by | null;
+  var_samp?: CourseLocation_var_samp_order_by | null;
+  variance?: CourseLocation_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "CourseLocation"
  */
 export interface CourseLocation_arr_rel_insert_input {
   data: CourseLocation_insert_input[];
   on_conflict?: CourseLocation_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "CourseLocation"
+ */
+export interface CourseLocation_avg_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
 }
 
 /**
@@ -1647,12 +2715,96 @@ export interface CourseLocation_insert_input {
 }
 
 /**
+ * order by max() on columns of table "CourseLocation"
+ */
+export interface CourseLocation_max_order_by {
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  latitude?: order_by | null;
+  link?: order_by | null;
+  locationOption?: order_by | null;
+  longitude?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "CourseLocation"
+ */
+export interface CourseLocation_min_order_by {
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  latitude?: order_by | null;
+  link?: order_by | null;
+  locationOption?: order_by | null;
+  longitude?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
  * on_conflict condition type for table "CourseLocation"
  */
 export interface CourseLocation_on_conflict {
   constraint: CourseLocation_constraint;
   update_columns: CourseLocation_update_column[];
   where?: CourseLocation_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "CourseLocation"
+ */
+export interface CourseLocation_stddev_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "CourseLocation"
+ */
+export interface CourseLocation_stddev_pop_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "CourseLocation"
+ */
+export interface CourseLocation_stddev_samp_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "CourseLocation"
+ */
+export interface CourseLocation_sum_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "CourseLocation"
+ */
+export interface CourseLocation_var_pop_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "CourseLocation"
+ */
+export interface CourseLocation_var_samp_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "CourseLocation"
+ */
+export interface CourseLocation_variance_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
 }
 
 /**
@@ -1705,11 +2857,47 @@ export interface CourseStatus_on_conflict {
 }
 
 /**
+ * Ordering options when selecting data from "CourseStatus".
+ */
+export interface CourseStatus_order_by {
+  Courses_aggregate?: Course_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
+/**
+ * order by aggregate values of table "Course"
+ */
+export interface Course_aggregate_order_by {
+  avg?: Course_avg_order_by | null;
+  count?: order_by | null;
+  max?: Course_max_order_by | null;
+  min?: Course_min_order_by | null;
+  stddev?: Course_stddev_order_by | null;
+  stddev_pop?: Course_stddev_pop_order_by | null;
+  stddev_samp?: Course_stddev_samp_order_by | null;
+  sum?: Course_sum_order_by | null;
+  var_pop?: Course_var_pop_order_by | null;
+  var_samp?: Course_var_samp_order_by | null;
+  variance?: Course_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "Course"
  */
 export interface Course_arr_rel_insert_input {
   data: Course_insert_input[];
   on_conflict?: Course_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "Course"
+ */
+export interface Course_avg_order_by {
+  id?: order_by | null;
+  maxMissedSessions?: order_by | null;
+  maxParticipants?: order_by | null;
+  programId?: order_by | null;
 }
 
 /**
@@ -1794,6 +2982,62 @@ export interface Course_insert_input {
 }
 
 /**
+ * order by max() on columns of table "Course"
+ */
+export interface Course_max_order_by {
+  applicationEnd?: order_by | null;
+  chatLink?: order_by | null;
+  contentDescriptionField1?: order_by | null;
+  contentDescriptionField2?: order_by | null;
+  cost?: order_by | null;
+  coverImage?: order_by | null;
+  created_at?: order_by | null;
+  ects?: order_by | null;
+  endTime?: order_by | null;
+  headingDescriptionField1?: order_by | null;
+  headingDescriptionField2?: order_by | null;
+  id?: order_by | null;
+  language?: order_by | null;
+  learningGoals?: order_by | null;
+  maxMissedSessions?: order_by | null;
+  maxParticipants?: order_by | null;
+  programId?: order_by | null;
+  startTime?: order_by | null;
+  tagline?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+  weekDay?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "Course"
+ */
+export interface Course_min_order_by {
+  applicationEnd?: order_by | null;
+  chatLink?: order_by | null;
+  contentDescriptionField1?: order_by | null;
+  contentDescriptionField2?: order_by | null;
+  cost?: order_by | null;
+  coverImage?: order_by | null;
+  created_at?: order_by | null;
+  ects?: order_by | null;
+  endTime?: order_by | null;
+  headingDescriptionField1?: order_by | null;
+  headingDescriptionField2?: order_by | null;
+  id?: order_by | null;
+  language?: order_by | null;
+  learningGoals?: order_by | null;
+  maxMissedSessions?: order_by | null;
+  maxParticipants?: order_by | null;
+  programId?: order_by | null;
+  startTime?: order_by | null;
+  tagline?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+  weekDay?: order_by | null;
+}
+
+/**
  * input type for inserting object relation for remote table "Course"
  */
 export interface Course_obj_rel_insert_input {
@@ -1808,6 +3052,45 @@ export interface Course_on_conflict {
   constraint: Course_constraint;
   update_columns: Course_update_column[];
   where?: Course_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "Course".
+ */
+export interface Course_order_by {
+  AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_order_by | null;
+  CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
+  CourseInstructors_aggregate?: CourseInstructor_aggregate_order_by | null;
+  CourseLocations_aggregate?: CourseLocation_aggregate_order_by | null;
+  CourseStatus?: CourseStatus_order_by | null;
+  Program?: Program_order_by | null;
+  Sessions_aggregate?: Session_aggregate_order_by | null;
+  achievementCertificatePossible?: order_by | null;
+  applicationEnd?: order_by | null;
+  attendanceCertificatePossible?: order_by | null;
+  chatLink?: order_by | null;
+  contentDescriptionField1?: order_by | null;
+  contentDescriptionField2?: order_by | null;
+  cost?: order_by | null;
+  coverImage?: order_by | null;
+  created_at?: order_by | null;
+  ects?: order_by | null;
+  endTime?: order_by | null;
+  headingDescriptionField1?: order_by | null;
+  headingDescriptionField2?: order_by | null;
+  id?: order_by | null;
+  language?: order_by | null;
+  learningGoals?: order_by | null;
+  maxMissedSessions?: order_by | null;
+  maxParticipants?: order_by | null;
+  programId?: order_by | null;
+  startTime?: order_by | null;
+  status?: order_by | null;
+  tagline?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+  visibility?: order_by | null;
+  weekDay?: order_by | null;
 }
 
 /**
@@ -1840,6 +3123,76 @@ export interface Course_set_input {
   updated_at?: any | null;
   visibility?: boolean | null;
   weekDay?: string | null;
+}
+
+/**
+ * order by stddev() on columns of table "Course"
+ */
+export interface Course_stddev_order_by {
+  id?: order_by | null;
+  maxMissedSessions?: order_by | null;
+  maxParticipants?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "Course"
+ */
+export interface Course_stddev_pop_order_by {
+  id?: order_by | null;
+  maxMissedSessions?: order_by | null;
+  maxParticipants?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "Course"
+ */
+export interface Course_stddev_samp_order_by {
+  id?: order_by | null;
+  maxMissedSessions?: order_by | null;
+  maxParticipants?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "Course"
+ */
+export interface Course_sum_order_by {
+  id?: order_by | null;
+  maxMissedSessions?: order_by | null;
+  maxParticipants?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "Course"
+ */
+export interface Course_var_pop_order_by {
+  id?: order_by | null;
+  maxMissedSessions?: order_by | null;
+  maxParticipants?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "Course"
+ */
+export interface Course_var_samp_order_by {
+  id?: order_by | null;
+  maxMissedSessions?: order_by | null;
+  maxParticipants?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "Course"
+ */
+export interface Course_variance_order_by {
+  id?: order_by | null;
+  maxMissedSessions?: order_by | null;
+  maxParticipants?: order_by | null;
+  programId?: order_by | null;
 }
 
 /**
@@ -1892,11 +3245,44 @@ export interface Employment_on_conflict {
 }
 
 /**
+ * Ordering options when selecting data from "Employment".
+ */
+export interface Employment_order_by {
+  Users_aggregate?: User_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
+/**
+ * order by aggregate values of table "Expert"
+ */
+export interface Expert_aggregate_order_by {
+  avg?: Expert_avg_order_by | null;
+  count?: order_by | null;
+  max?: Expert_max_order_by | null;
+  min?: Expert_min_order_by | null;
+  stddev?: Expert_stddev_order_by | null;
+  stddev_pop?: Expert_stddev_pop_order_by | null;
+  stddev_samp?: Expert_stddev_samp_order_by | null;
+  sum?: Expert_sum_order_by | null;
+  var_pop?: Expert_var_pop_order_by | null;
+  var_samp?: Expert_var_samp_order_by | null;
+  variance?: Expert_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "Expert"
  */
 export interface Expert_arr_rel_insert_input {
   data: Expert_insert_input[];
   on_conflict?: Expert_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "Expert"
+ */
+export interface Expert_avg_order_by {
+  id?: order_by | null;
 }
 
 /**
@@ -1933,6 +3319,28 @@ export interface Expert_insert_input {
 }
 
 /**
+ * order by max() on columns of table "Expert"
+ */
+export interface Expert_max_order_by {
+  created_at?: order_by | null;
+  description?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "Expert"
+ */
+export interface Expert_min_order_by {
+  created_at?: order_by | null;
+  description?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+/**
  * input type for inserting object relation for remote table "Expert"
  */
 export interface Expert_obj_rel_insert_input {
@@ -1947,6 +3355,55 @@ export interface Expert_on_conflict {
   constraint: Expert_constraint;
   update_columns: Expert_update_column[];
   where?: Expert_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "Expert"
+ */
+export interface Expert_stddev_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "Expert"
+ */
+export interface Expert_stddev_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "Expert"
+ */
+export interface Expert_stddev_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "Expert"
+ */
+export interface Expert_sum_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "Expert"
+ */
+export interface Expert_var_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "Expert"
+ */
+export interface Expert_var_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "Expert"
+ */
+export interface Expert_variance_order_by {
+  id?: order_by | null;
 }
 
 /**
@@ -2124,11 +3581,62 @@ export interface Program_on_conflict {
 }
 
 /**
+ * Ordering options when selecting data from "Program".
+ */
+export interface Program_order_by {
+  Courses_aggregate?: Course_aggregate_order_by | null;
+  RentAScientistConfigs_aggregate?: RentAScientistConfig_aggregate_order_by | null;
+  ScientistOffers_aggregate?: ScientistOffer_aggregate_order_by | null;
+  applicationStart?: order_by | null;
+  attendanceCertificateTemplateURL?: order_by | null;
+  closingQuestionnaire?: order_by | null;
+  defaultApplicationEnd?: order_by | null;
+  defaultMaxMissedSessions?: order_by | null;
+  id?: order_by | null;
+  lectureEnd?: order_by | null;
+  lectureStart?: order_by | null;
+  participationCertificateTemplateURL?: order_by | null;
+  projectRecordUploadDeadline?: order_by | null;
+  shortTitle?: order_by | null;
+  speakerQuestionnaire?: order_by | null;
+  startQuestionnaire?: order_by | null;
+  title?: order_by | null;
+  visibility?: order_by | null;
+  visibilityAchievementCertificate?: order_by | null;
+  visibilityParticipationCertificate?: order_by | null;
+}
+
+/**
+ * order by aggregate values of table "RentAScientistConfig"
+ */
+export interface RentAScientistConfig_aggregate_order_by {
+  avg?: RentAScientistConfig_avg_order_by | null;
+  count?: order_by | null;
+  max?: RentAScientistConfig_max_order_by | null;
+  min?: RentAScientistConfig_min_order_by | null;
+  stddev?: RentAScientistConfig_stddev_order_by | null;
+  stddev_pop?: RentAScientistConfig_stddev_pop_order_by | null;
+  stddev_samp?: RentAScientistConfig_stddev_samp_order_by | null;
+  sum?: RentAScientistConfig_sum_order_by | null;
+  var_pop?: RentAScientistConfig_var_pop_order_by | null;
+  var_samp?: RentAScientistConfig_var_samp_order_by | null;
+  variance?: RentAScientistConfig_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "RentAScientistConfig"
  */
 export interface RentAScientistConfig_arr_rel_insert_input {
   data: RentAScientistConfig_insert_input[];
   on_conflict?: RentAScientistConfig_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "RentAScientistConfig"
+ */
+export interface RentAScientistConfig_avg_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
 }
 
 /**
@@ -2157,12 +3665,86 @@ export interface RentAScientistConfig_insert_input {
 }
 
 /**
+ * order by max() on columns of table "RentAScientistConfig"
+ */
+export interface RentAScientistConfig_max_order_by {
+  id?: order_by | null;
+  mailFrom?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "RentAScientistConfig"
+ */
+export interface RentAScientistConfig_min_order_by {
+  id?: order_by | null;
+  mailFrom?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
  * on_conflict condition type for table "RentAScientistConfig"
  */
 export interface RentAScientistConfig_on_conflict {
   constraint: RentAScientistConfig_constraint;
   update_columns: RentAScientistConfig_update_column[];
   where?: RentAScientistConfig_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "RentAScientistConfig"
+ */
+export interface RentAScientistConfig_stddev_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "RentAScientistConfig"
+ */
+export interface RentAScientistConfig_stddev_pop_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "RentAScientistConfig"
+ */
+export interface RentAScientistConfig_stddev_samp_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "RentAScientistConfig"
+ */
+export interface RentAScientistConfig_sum_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "RentAScientistConfig"
+ */
+export interface RentAScientistConfig_var_pop_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "RentAScientistConfig"
+ */
+export interface RentAScientistConfig_var_samp_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "RentAScientistConfig"
+ */
+export interface RentAScientistConfig_variance_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
 }
 
 /**
@@ -2364,11 +3946,39 @@ export interface ScientistOfferRelation_on_conflict {
 }
 
 /**
+ * order by aggregate values of table "ScientistOffer"
+ */
+export interface ScientistOffer_aggregate_order_by {
+  avg?: ScientistOffer_avg_order_by | null;
+  count?: order_by | null;
+  max?: ScientistOffer_max_order_by | null;
+  min?: ScientistOffer_min_order_by | null;
+  stddev?: ScientistOffer_stddev_order_by | null;
+  stddev_pop?: ScientistOffer_stddev_pop_order_by | null;
+  stddev_samp?: ScientistOffer_stddev_samp_order_by | null;
+  sum?: ScientistOffer_sum_order_by | null;
+  var_pop?: ScientistOffer_var_pop_order_by | null;
+  var_samp?: ScientistOffer_var_samp_order_by | null;
+  variance?: ScientistOffer_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "ScientistOffer"
  */
 export interface ScientistOffer_arr_rel_insert_input {
   data: ScientistOffer_insert_input[];
   on_conflict?: ScientistOffer_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "ScientistOffer"
+ */
+export interface ScientistOffer_avg_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
 }
 
 /**
@@ -2441,6 +4051,58 @@ export interface ScientistOffer_insert_input {
 }
 
 /**
+ * order by max() on columns of table "ScientistOffer"
+ */
+export interface ScientistOffer_max_order_by {
+  classPreparation?: order_by | null;
+  contactEmail?: order_by | null;
+  contactName?: order_by | null;
+  contactPhone?: order_by | null;
+  description?: order_by | null;
+  duration?: order_by | null;
+  equipmentRequired?: order_by | null;
+  extraComment?: order_by | null;
+  format?: order_by | null;
+  id?: order_by | null;
+  institutionLogo?: order_by | null;
+  institutionName?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+  researchSubject?: order_by | null;
+  roomRequirements?: order_by | null;
+  subjectComment?: order_by | null;
+  title?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "ScientistOffer"
+ */
+export interface ScientistOffer_min_order_by {
+  classPreparation?: order_by | null;
+  contactEmail?: order_by | null;
+  contactName?: order_by | null;
+  contactPhone?: order_by | null;
+  description?: order_by | null;
+  duration?: order_by | null;
+  equipmentRequired?: order_by | null;
+  extraComment?: order_by | null;
+  format?: order_by | null;
+  id?: order_by | null;
+  institutionLogo?: order_by | null;
+  institutionName?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+  researchSubject?: order_by | null;
+  roomRequirements?: order_by | null;
+  subjectComment?: order_by | null;
+  title?: order_by | null;
+}
+
+/**
  * input type for inserting object relation for remote table "ScientistOffer"
  */
 export interface ScientistOffer_obj_rel_insert_input {
@@ -2455,6 +4117,83 @@ export interface ScientistOffer_on_conflict {
   constraint: ScientistOffer_constraint;
   update_columns: ScientistOffer_update_column[];
   where?: ScientistOffer_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "ScientistOffer"
+ */
+export interface ScientistOffer_stddev_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "ScientistOffer"
+ */
+export interface ScientistOffer_stddev_pop_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "ScientistOffer"
+ */
+export interface ScientistOffer_stddev_samp_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "ScientistOffer"
+ */
+export interface ScientistOffer_sum_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "ScientistOffer"
+ */
+export interface ScientistOffer_var_pop_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "ScientistOffer"
+ */
+export interface ScientistOffer_var_samp_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "ScientistOffer"
+ */
+export interface ScientistOffer_variance_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
 }
 
 /**
@@ -2596,11 +4335,36 @@ export interface SessionSpeaker_on_conflict {
 }
 
 /**
+ * order by aggregate values of table "Session"
+ */
+export interface Session_aggregate_order_by {
+  avg?: Session_avg_order_by | null;
+  count?: order_by | null;
+  max?: Session_max_order_by | null;
+  min?: Session_min_order_by | null;
+  stddev?: Session_stddev_order_by | null;
+  stddev_pop?: Session_stddev_pop_order_by | null;
+  stddev_samp?: Session_stddev_samp_order_by | null;
+  sum?: Session_sum_order_by | null;
+  var_pop?: Session_var_pop_order_by | null;
+  var_samp?: Session_var_samp_order_by | null;
+  variance?: Session_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "Session"
  */
 export interface Session_arr_rel_insert_input {
   data: Session_insert_input[];
   on_conflict?: Session_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "Session"
+ */
+export interface Session_avg_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
 }
 
 /**
@@ -2645,6 +4409,34 @@ export interface Session_insert_input {
 }
 
 /**
+ * order by max() on columns of table "Session"
+ */
+export interface Session_max_order_by {
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  description?: order_by | null;
+  endDateTime?: order_by | null;
+  id?: order_by | null;
+  startDateTime?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "Session"
+ */
+export interface Session_min_order_by {
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  description?: order_by | null;
+  endDateTime?: order_by | null;
+  id?: order_by | null;
+  startDateTime?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
  * input type for inserting object relation for remote table "Session"
  */
 export interface Session_obj_rel_insert_input {
@@ -2659,6 +4451,62 @@ export interface Session_on_conflict {
   constraint: Session_constraint;
   update_columns: Session_update_column[];
   where?: Session_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "Session"
+ */
+export interface Session_stddev_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "Session"
+ */
+export interface Session_stddev_pop_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "Session"
+ */
+export interface Session_stddev_samp_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "Session"
+ */
+export interface Session_sum_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "Session"
+ */
+export interface Session_var_pop_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "Session"
+ */
+export interface Session_var_samp_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "Session"
+ */
+export interface Session_variance_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
 }
 
 /**
@@ -2776,6 +4624,24 @@ export interface University_on_conflict {
 }
 
 /**
+ * Ordering options when selecting data from "University".
+ */
+export interface University_order_by {
+  Users_aggregate?: User_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
+/**
+ * order by aggregate values of table "User"
+ */
+export interface User_aggregate_order_by {
+  count?: order_by | null;
+  max?: User_max_order_by | null;
+  min?: User_min_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "User"
  */
 export interface User_arr_rel_insert_input {
@@ -2841,6 +4707,40 @@ export interface User_insert_input {
 }
 
 /**
+ * order by max() on columns of table "User"
+ */
+export interface User_max_order_by {
+  anonymousId?: order_by | null;
+  created_at?: order_by | null;
+  email?: order_by | null;
+  externalProfile?: order_by | null;
+  firstName?: order_by | null;
+  id?: order_by | null;
+  lastName?: order_by | null;
+  matriculationNumber?: order_by | null;
+  otherUniversity?: order_by | null;
+  picture?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "User"
+ */
+export interface User_min_order_by {
+  anonymousId?: order_by | null;
+  created_at?: order_by | null;
+  email?: order_by | null;
+  externalProfile?: order_by | null;
+  firstName?: order_by | null;
+  id?: order_by | null;
+  lastName?: order_by | null;
+  matriculationNumber?: order_by | null;
+  otherUniversity?: order_by | null;
+  picture?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
  * input type for inserting object relation for remote table "User"
  */
 export interface User_obj_rel_insert_input {
@@ -2855,6 +4755,33 @@ export interface User_on_conflict {
   constraint: User_constraint;
   update_columns: User_update_column[];
   where?: User_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "User".
+ */
+export interface User_order_by {
+  AchievementRecordAuthors_aggregate?: AchievementRecordAuthor_aggregate_order_by | null;
+  Admins_aggregate?: Admin_aggregate_order_by | null;
+  Attendances_aggregate?: Attendance_aggregate_order_by | null;
+  CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
+  Experts_aggregate?: Expert_aggregate_order_by | null;
+  anonymousId?: order_by | null;
+  created_at?: order_by | null;
+  email?: order_by | null;
+  employment?: order_by | null;
+  employmentByEmployment?: Employment_order_by | null;
+  externalProfile?: order_by | null;
+  firstName?: order_by | null;
+  id?: order_by | null;
+  lastName?: order_by | null;
+  matriculationNumber?: order_by | null;
+  newsletterRegistration?: order_by | null;
+  otherUniversity?: order_by | null;
+  picture?: order_by | null;
+  university?: order_by | null;
+  universityByUniversity?: University_order_by | null;
+  updated_at?: order_by | null;
 }
 
 /**

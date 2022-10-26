@@ -24,6 +24,8 @@ import { SessionsTab } from "./SessionsTab";
 import { ApplicationTab } from "./ApplicationTab";
 import ManageCourseEnrollment from "./ManageCourseEnrollment";
 import ProjectResultsUpload from "../course/ProjectResultsUpload";
+import { ContentRow } from "../common/ContentRow";
+import { BlockTitle } from "../common/BlockTitle";
 
 interface Props {
   courseId: number;
@@ -323,7 +325,22 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
         onClose={handleCloseCantUpgrade}
         open={isCantUpgradeOpen}
       />
-      <ProjectResultsUpload />
+
+      <ContentRow
+        className="my-24"
+        leftTop={
+          <div className="flex flex-1">
+            <BlockTitle>Anwesenheit</BlockTitle>
+          </div>
+        }
+        rightBottom={
+          <div className="flex flex-1">
+            {course.achievementCertificatePossible && (
+              <ProjectResultsUpload course={course} />
+            )}
+          </div>
+        }
+      />
     </>
   );
 };

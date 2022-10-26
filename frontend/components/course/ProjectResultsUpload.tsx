@@ -1,6 +1,7 @@
 import {
   ChangeEvent,
   FC,
+  MouseEvent,
   useCallback,
   useReducer,
   useRef,
@@ -13,47 +14,127 @@ import EhDebounceInput from "../common/EhDebounceInput";
 import { MdAddCircleOutline } from "react-icons/md";
 import EhTag from "../common/EhTag";
 import EhSelectForEnum from "../common/EhSelectForEnum";
+import { BlockTitle } from "../common/BlockTitle";
+import { ManagedCourse_Course_by_pk } from "../../queries/__generated__/ManagedCourse";
+import AchievementOptionDropDown from "../achievements/AchievementOptionDropDown";
+import { useAdminQuery } from "../../hooks/authedQuery";
+import {
+  AchievementOptionCourses,
+  AchievementOptionCoursesVariables,
+  AchievementOptionCourses_AchievementOptionCourse,
+} from "../../queries/__generated__/AchievementOptionCourses";
+import { ACHIEVEMENT_OPTION_COURSES } from "../../queries/achievementOptionCourse";
 
-const ProjectResultsUpload: FC = () => {
+interface IProps {
+  course: ManagedCourse_Course_by_pk | null;
+}
+const ProjectResultsUpload: FC<IProps> = (props) => {
   const [showModal, setShowModal] = useState(false);
-  const close = useCallback((show: boolean) => {
-    setShowModal(false);
-  }, []);
+  const close = useCallback(
+    (show: boolean) => {
+      setShowModal(false);
+    },
+    [setShowModal]
+  );
 
   const upload = useCallback(() => {
     setShowModal(true);
-  }, []);
-  const achievementOptions: string[] = [
-    "DOCUMENTATION_AND_CSV",
-    "DOCUMENTATION",
-  ];
+  }, [setShowModal]);
 
-  const onchangeAchievementRecord = useCallback((selected: string) => {
-    console.log(selected);
-  }, []);
+  const [
+    isVisibleAchievementOptions,
+    setAchievementOptionVisibility,
+  ] = useState(false);
+  const [
+    archiveOptionsAnchorElement,
+    setAnchorElement,
+  ] = useState<HTMLElement>();
+
+  const onAchivementOptionDropdown = useCallback(
+    (event: MouseEvent<HTMLElement>) => {
+      setAnchorElement(event.currentTarget);
+      setAchievementOptionVisibility(true);
+    },
+    [setAnchorElement, setAchievementOptionVisibility]
+  );
+
+  const onItemSelectedFromDropdown = useCallback(
+    (item: AchievementOptionCourses_AchievementOptionCourse) => {
+      console.log(item);
+    },
+    []
+  );
+  const achievementOptionCourseRequest = useAdminQuery<
+    AchievementOptionCourses,
+    AchievementOptionCoursesVariables
+  >(ACHIEVEMENT_OPTION_COURSES, {
+    variables: {
+      where:
+        props.course && props.course.id
+          ? {
+              courseId: { _eq: props.course.id },
+            }
+          : {},
+    },
+  });
+
+  const aCourseList = [
+    ...(achievementOptionCourseRequest.data?.AchievementOptionCourse || []),
+  ];
 
   return (
     <>
-      <div className="flex flex-col space-y-1 itmes-start py-2">
-        <h1>Leistungsnachweis</h1>
-        <p>
+      <div className="flex flex-col space-y-3 itmes-start">
+        <BlockTitle>Leistungsnachweis</BlockTitle>
+        <span className="text-lg mt-6">
           Den Leistungsnachweis musst Du bis spätestens zum 16.02.2021
           hochgeladen haben.
-        </p>
+        </span>
         {/* <Button onClick={chooseAndAchieveMent} as="button" filled={false}>
           Wähle einen Leistungsnachweis ↓
         </Button> */}
-        <EhSelectForEnum
+
+        <div className="flex mt-10 mb-4">
+          {!achievementOptionCourseRequest.loading && aCourseList.length > 0 && (
+            <div onClick={onAchivementOptionDropdown}>
+              <Button>Wähle einen Leistungsnachweis ↓ </Button>
+            </div>
+          )}
+
+          {isVisibleAchievementOptions && (
+            <AchievementOptionDropDown
+              anchorElement={archiveOptionsAnchorElement}
+              isVisible={isVisibleAchievementOptions}
+              setVisible={setAchievementOptionVisibility}
+              courseAchievementOptions={aCourseList}
+              callback={onItemSelectedFromDropdown}
+            />
+          )}
+        </div>
+        <div className="flex">
+          <Button filled onClick={upload}>
+            ↑ Nachweis hochladen
+          </Button>
+        </div>
+        {/* <EhSelectForEnum
           onChange={onchangeAchievementRecord}
           options={achievementOptions}
-        />
-        <Button onClick={upload} as="button" filled={true}>
+        /> */}
+        {/* <Button onClick={upload} as="button" filled={true}>
           ↑ Nachweis hochladen
-        </Button>
+        </Button> */}
+        <div>
+          <p>
+            Der letzte Nachweis mit Dir als Autor wurde am 12.03.2021 um 21.44
+            Uhr von Brigitte Mustermann hochgeladen.
+          </p>
+        </div>
       </div>
-      <ModalControl showModal={showModal} onClose={close}>
-        <Content />
-      </ModalControl>
+      {showModal && (
+        <ModalControl showModal={showModal} onClose={close}>
+          <Content />
+        </ModalControl>
+      )}
     </>
   );
 };

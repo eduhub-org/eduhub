@@ -15,9 +15,10 @@ export const ACHIEVEMENT_OPTIONS = gql`
     $where: AchievementOption_bool_exp! = {}
     $limit: Int = null
     $offset: Int = 0
+    $orderBy: AchievementOption_order_by = { id: desc }
   ) {
     AchievementOption(
-      order_by: { id: desc }
+      order_by: [$orderBy]
       where: $where
       limit: $limit
       offset: $offset
