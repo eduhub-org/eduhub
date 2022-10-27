@@ -19,11 +19,10 @@ version: "3.8"
 services:
   frontend:
     ports:
-      - "25000:5000"
+      - "5000:5000"
     build:
       context: ./frontend
       dockerfile: Dockerfile-dev
-    command: tail -F anything
     env_file:
       - frontend.env
     volumes:
@@ -51,22 +50,22 @@ services:
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: inherited_roles
-      HASURA_BUCKET: "eduhub-staging-new"
-      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE: "https://load-achievement-certificate-qvthfbr3za-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE_TEMPLATE: "https://load-achievement-certificate-template-qvthfbr3za-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE: "https://load-participation-certificate-qvthfbr3za-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE_TEMPLATE: "https://load-participation-certificate-template-qvthfbr3za-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION: ""
-      CLOUD_FUNCTION_LINK_SAVE_COURSE_IMAGE: "https://save-course-image-qvthfbr3za-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_USER_PROFILE_IMAGE: "https://save-user-profile-image-qvthfbr3za-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE: "https://save-achievement-record-cover-image-qvthfbr3za-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION: ""
-      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE: "https://save-achievement-certificate-qvthfbr3za-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE: "https://save-achievement-certificate-template-qvthfbr3za-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE: "https://save-participation-certificate-qvthfbr3za-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE: "https://save-participation-template-certificate-qvthfbr3za-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK: "https://update-from-keycloak-qvthfbr3za-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SEND_MAIL: "https://send-mail-qvthfbr3za-ew.a.run.app" 
+      HASURA_BUCKET: "eduhub-staging-kc19"
+      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE: "https://load-achievement-certificate-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE_TEMPLATE: "https://load-achievement-certificate-template-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE: "https://load-participation-certificate-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE_TEMPLATE: "https://save-achievement-certificate-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION: "https://save-achievement-record-documentation-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SAVE_COURSE_IMAGE: "https://save-course-image-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SAVE_USER_PROFILE_IMAGE: "https://save-user-profile-image-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE: "https://save-achievement-record-cover-image-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION: "https://load-achievement-record-documentation-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE: "https://save-achievement-certificate-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE: "https://save-achievement-certificate-template-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE: "https://save-participation-certificate-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE: "https://save-participation-certificate-template-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK: "https://update-from-keycloak-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SEND_MAIL: "https://send-mail-szeuw2n5qa-ew.a.run.app"
     volumes:
       - ./backend/migrations:/hasura-migrations
       - ./backend/metadata:/hasura-metadata
@@ -80,7 +79,7 @@ services:
       POSTGRES_PASSWORD: postgrespassword
 
   keycloak:
-    build: 
+    build:
       context: ./keycloak/
       dockerfile: Dockerfile-dev
     ports:
@@ -103,7 +102,6 @@ services:
       - ./keycloak/imports:/imports
       - ./keycloak/themes/opencampus:/opt/keycloak/themes/opencampus
       - ./keycloak/disable-theme-cache.cli:/opt/keycloak/startup-scripts/disable-theme-cache.cli
-
   # keycloak comes with h2 embedded, that is enough for development
   # db_keycloak:
   #   image: postgres:12
@@ -115,5 +113,4 @@ services:
   #     POSTGRES_PASSWORD: password
 
 volumes:
-  db_hasura_data:
-  # db_keycloak_data:
+  db_hasura_data: # db_keycloak_data:
