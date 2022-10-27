@@ -24,7 +24,6 @@ insert_permissions:
         - coverImageUrl
         - description
         - id
-        - uploadUserId
       backend_only: false
 select_permissions:
   - role: anonymous

@@ -550,11 +550,13 @@ const InstructorColumn: FC<IPropsCourseOneRow> = ({
           onClick={addInstructorDialogOpener}
         />
       </div>
-      <SelectUserDialog
-        onClose={addInstructorHandler}
-        open={openInstructorDialog}
-        title={"Add Instructor"}
-      />
+      {openInstructorDialog && (
+        <SelectUserDialog
+          onClose={addInstructorHandler}
+          open={openInstructorDialog}
+          title={"Add Instructor"}
+        />
+      )}
     </div>
   );
 };

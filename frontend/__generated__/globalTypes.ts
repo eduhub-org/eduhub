@@ -1428,6 +1428,19 @@ export interface AchievementRecordAuthor_on_conflict {
 }
 
 /**
+ * Ordering options when selecting data from "AchievementRecordAuthor".
+ */
+export interface AchievementRecordAuthor_order_by {
+  AchievementRecord?: AchievementRecord_order_by | null;
+  User?: User_order_by | null;
+  achievementRecordId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+/**
  * order by stddev() on columns of table "AchievementRecordAuthor"
  */
 export interface AchievementRecordAuthor_stddev_order_by {
@@ -1530,6 +1543,15 @@ export interface AchievementRecordRating_on_conflict {
   constraint: AchievementRecordRating_constraint;
   update_columns: AchievementRecordRating_update_column[];
   where?: AchievementRecordRating_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "AchievementRecordRating".
+ */
+export interface AchievementRecordRating_order_by {
+  AchievementRecords_aggregate?: AchievementRecord_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
 }
 
 /**
@@ -1699,6 +1721,35 @@ export interface AchievementRecord_on_conflict {
   constraint: AchievementRecord_constraint;
   update_columns: AchievementRecord_update_column[];
   where?: AchievementRecord_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "AchievementRecord".
+ */
+export interface AchievementRecord_order_by {
+  AchievementOption?: AchievementOption_order_by | null;
+  AchievementOptionId?: order_by | null;
+  AchievementRecordAuthors_aggregate?: AchievementRecordAuthor_aggregate_order_by | null;
+  AchievementRecordRating?: AchievementRecordRating_order_by | null;
+  coverImageUrl?: order_by | null;
+  description?: order_by | null;
+  id?: order_by | null;
+  rating?: order_by | null;
+  score?: order_by | null;
+  uploadUserId?: order_by | null;
+}
+
+/**
+ * input type for updating data in table "AchievementRecord"
+ */
+export interface AchievementRecord_set_input {
+  AchievementOptionId?: number | null;
+  coverImageUrl?: string | null;
+  description?: string | null;
+  id?: number | null;
+  rating?: AchievementRecordRating_enum | null;
+  score?: any | null;
+  uploadUserId?: number | null;
 }
 
 /**

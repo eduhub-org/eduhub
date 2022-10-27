@@ -2,7 +2,9 @@ import {
   ChangeEvent,
   FC,
   MouseEvent,
+  createContext,
   useCallback,
+  useContext,
   useReducer,
   useRef,
   useState,
@@ -11,9 +13,8 @@ import { Button } from "../common/Button";
 import ModalControl from "../common/ModalController";
 
 import EhDebounceInput from "../common/EhDebounceInput";
-import { MdAddCircleOutline } from "react-icons/md";
+import { MdAddCircleOutline, MdTitle } from "react-icons/md";
 import EhTag from "../common/EhTag";
-import EhSelectForEnum from "../common/EhSelectForEnum";
 import { BlockTitle } from "../common/BlockTitle";
 import { ManagedCourse_Course_by_pk } from "../../queries/__generated__/ManagedCourse";
 import AchievementOptionDropDown from "../achievements/AchievementOptionDropDown";
@@ -24,18 +25,44 @@ import {
   AchievementOptionCourses_AchievementOptionCourse,
 } from "../../queries/__generated__/AchievementOptionCourses";
 import { ACHIEVEMENT_OPTION_COURSES } from "../../queries/achievementOptionCourse";
+import { ContentRow } from "../common/ContentRow";
+import { AchievementRecordType_enum } from "../../__generated__/globalTypes";
+import {
+  IUserProfile,
+  useKeycloakUserProfile,
+  useUserId,
+} from "../../hooks/user";
+import { Fade, Modal } from "@material-ui/core";
+import { ModalContent } from "../common/ModalContent";
+import { SelectUserDialog } from "../common/dialogs/SelectUserDialog";
+import { UserForSelection1_User } from "../../queries/__generated__/UserForSelection1";
+import EhTagStingId from "../common/EhTagStingId";
+import { makeFullName } from "../../helpers/util";
+
+interface IContext {
+  record: AchievementOptionCourses_AchievementOptionCourse;
+  course: ManagedCourse_Course_by_pk;
+  userId: string | undefined;
+  userProfile: IUserProfile | undefined;
+}
+
+const ProjectResutlUploadContext = createContext({} as IContext);
 
 interface IProps {
-  course: ManagedCourse_Course_by_pk | null;
+  course: ManagedCourse_Course_by_pk;
 }
 const ProjectResultsUpload: FC<IProps> = (props) => {
+  const userId = useUserId();
+  const profile = useKeycloakUserProfile();
+
   const [showModal, setShowModal] = useState(false);
-  const close = useCallback(
-    (show: boolean) => {
-      setShowModal(false);
-    },
-    [setShowModal]
+  const [record, setRecord] = useState(
+    {} as AchievementOptionCourses_AchievementOptionCourse
   );
+
+  const close = useCallback(() => {
+    setShowModal(false);
+  }, [setShowModal]);
 
   const upload = useCallback(() => {
     setShowModal(true);
@@ -60,9 +87,9 @@ const ProjectResultsUpload: FC<IProps> = (props) => {
 
   const onItemSelectedFromDropdown = useCallback(
     (item: AchievementOptionCourses_AchievementOptionCourse) => {
-      console.log(item);
+      setRecord(item);
     },
-    []
+    [setRecord]
   );
   const achievementOptionCourseRequest = useAdminQuery<
     AchievementOptionCourses,
@@ -82,18 +109,21 @@ const ProjectResultsUpload: FC<IProps> = (props) => {
     ...(achievementOptionCourseRequest.data?.AchievementOptionCourse || []),
   ];
 
+  const providerValue: IContext = {
+    course: props.course,
+    record,
+    userProfile: profile,
+    userId,
+  };
+
   return (
-    <>
+    <ProjectResutlUploadContext.Provider value={providerValue}>
       <div className="flex flex-col space-y-3 itmes-start">
         <BlockTitle>Leistungsnachweis</BlockTitle>
         <span className="text-lg mt-6">
           Den Leistungsnachweis musst Du bis spätestens zum 16.02.2021
           hochgeladen haben.
         </span>
-        {/* <Button onClick={chooseAndAchieveMent} as="button" filled={false}>
-          Wähle einen Leistungsnachweis ↓
-        </Button> */}
-
         <div className="flex mt-10 mb-4">
           {!achievementOptionCourseRequest.loading && aCourseList.length > 0 && (
             <div onClick={onAchivementOptionDropdown}>
@@ -111,52 +141,78 @@ const ProjectResultsUpload: FC<IProps> = (props) => {
             />
           )}
         </div>
-        <div className="flex">
-          <Button filled onClick={upload}>
-            ↑ Nachweis hochladen
-          </Button>
-        </div>
-        {/* <EhSelectForEnum
-          onChange={onchangeAchievementRecord}
-          options={achievementOptions}
-        /> */}
-        {/* <Button onClick={upload} as="button" filled={true}>
-          ↑ Nachweis hochladen
-        </Button> */}
-        <div>
-          <p>
-            Der letzte Nachweis mit Dir als Autor wurde am 12.03.2021 um 21.44
-            Uhr von Brigitte Mustermann hochgeladen.
-          </p>
-        </div>
+        {record.id && (
+          <div className="flex">
+            <Button filled onClick={upload}>
+              ↑ Nachweis hochladen
+            </Button>
+          </div>
+        )}
+        {record.id && (
+          <div>
+            <p>
+              Der letzte Nachweis mit Dir als Autor wurde am 12.03.2021 um 21.44
+              Uhr von Brigitte Mustermann hochgeladen.
+            </p>
+          </div>
+        )}
       </div>
       {showModal && (
         <ModalControl showModal={showModal} onClose={close}>
           <Content />
         </ModalControl>
+        // <Modal
+        //   open={showModal}
+        //   onClose={close}
+        //   className="flex justify-center items-center border-none"
+        //   disableEnforceFocus
+        //   disableBackdropClick={false}
+        //   closeAfterTransition
+        // >
+        //   <Fade in={showModal}>
+        //     <ModalContent
+        //       closeModal={close}
+        //       className="w-full sm:w-auto h-full sm:h-auto sm:m-16 sm:rounded bg-edu-black pb-8"
+        //       xIconColor="white"
+        //     >
+        //       <Content />
+        //     </ModalContent>
+        //   </Fade>
+        // </Modal>
       )}
-    </>
+    </ProjectResutlUploadContext.Provider>
   );
 };
 
 export default ProjectResultsUpload;
-
+interface TempUser {
+  id: string; // uuid
+  firstName: string;
+  lastName: string;
+}
 interface State {
+  achievementRecordTableId: number;
   imageName: string;
   zipFileName: string;
   csvFileName: string;
   description: string;
+  authors: TempUser[];
 }
 interface Type {
   type: string;
   value: any;
 }
+
 const Content: FC = () => {
+  const context = useContext(ProjectResutlUploadContext);
+  const [visibleAuthorList, setVisibleAuthorList] = useState(false);
   const initialState: State = {
+    achievementRecordTableId: -1,
     imageName: "",
     zipFileName: "",
     csvFileName: "",
     description: "",
+    authors: [],
   };
 
   const reducer = (state: State = initialState, action: Type) => {
@@ -186,9 +242,17 @@ const Content: FC = () => {
     [dispatch]
   );
 
-  const requestDeleteTag = useCallback((id: number) => {
-    console.log(id);
-  }, []);
+  const requestDeleteTag = useCallback(
+    (id: string) => {
+      if (state.authors.find((u) => u.id === id)) {
+        dispatch({
+          type: "authors",
+          value: state.authors.filter((user) => user.id !== id),
+        });
+      }
+    },
+    [state, dispatch]
+  );
 
   const save = useCallback(() => {
     console.log("save");
@@ -202,57 +266,86 @@ const Content: FC = () => {
       }),
     [dispatch]
   );
+
+  const onCloseAuthorList = useCallback(
+    (close: boolean, user: UserForSelection1_User | null) => {
+      if (user) {
+        if (!state.authors.find((u) => u.id === user.id)) {
+          dispatch({
+            type: "authors",
+            value: [
+              ...state.authors,
+              {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+              } as TempUser,
+            ],
+          });
+        }
+      }
+      setVisibleAuthorList(false);
+    },
+    [setVisibleAuthorList, state, dispatch]
+  );
+
   return (
     <>
       <div className="flex flex-col space-y-2 w-full pb-5">
-        <div className="flex flex-row ">
-          <h1 className="w-1/2">Nachweis hochladen</h1>
-          <p className="text-right w-1/2">
-            Einführung in Data Science und maschinelles Lernen
-          </p>
-        </div>
-        <div className="px-8 flex flex-col space-y-5">
+        {visibleAuthorList && (
+          <SelectUserDialog
+            onClose={onCloseAuthorList}
+            open={visibleAuthorList}
+            title="Autoren"
+          />
+        )}
+        <ContentRow
+          leftTop={<h1 className="w-1/2">Nachweis hochladen</h1>}
+          rightBottom={
+            <p className="text-right w-1/2">{context.course.title}</p>
+          }
+        />
+        <div className="px-8 flex flex-col space-y-5 pt-5">
           <div className="">
             <p className="">UMSATZVORHERSAGE FÜR EINE BÄCKEREIFILIALE</p>
           </div>
           <div className="flex flex-col space-y-2">
-            <div className="flex flex-row space-x-1">
-              <p className="w-2/6">Titlebild</p>
-              <div className="w-4/6">
-                <UploadUI
-                  bottomText="Optimal ist eine Größe von XXX x XXX Pixel."
-                  onChange={uploadTitleBild}
-                  uploadFileName={state.imageName}
-                  acceptedFileTypes=".png, .jpg"
-                  placeholder="Chose an image(.png, .jpg)"
-                />
+            {context.record.AchievementOption.recordType ===
+              AchievementRecordType_enum.DOCUMENTATION && (
+              <div className="flex flex-row space-x-1">
+                <p className="w-2/6">Titlebild</p>
+                <div className="w-4/6">
+                  <UploadUI
+                    bottomText="Optimal ist eine Größe von XXX x XXX Pixel."
+                    onChange={uploadTitleBild}
+                    uploadFileName={state.imageName}
+                    acceptedFileTypes=".png"
+                    placeholder="Cover image (.png)"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="flex flex-row space-x-1">
               <p className="w-2/6">Autoren</p>
               <div className="w-4/6 flex felx-row">
                 <div className="items-center pt-1 pr-3">
-                  <MdAddCircleOutline size="1.4em" />
+                  <MdAddCircleOutline
+                    className="cursor-pointer"
+                    onClick={() => setVisibleAuthorList(true)}
+                    size="1.4em"
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-1">
-                  <EhTag
-                    requestDeleteTag={requestDeleteTag}
-                    tag={{ display: "Faiz Ahmed", id: 1 }}
-                  />
-                  <EhTag
-                    requestDeleteTag={requestDeleteTag}
-                    tag={{ display: "Faiz Ahmed", id: 1 }}
-                  />
-                  <EhTag
-                    requestDeleteTag={requestDeleteTag}
-                    tag={{ display: "Faiz Ahmed", id: 1 }}
-                  />
-                  <EhTag
-                    requestDeleteTag={requestDeleteTag}
-                    tag={{ display: "Faiz Ahmed", id: 1 }}
-                  />
+                  {state.authors.map((user, index) => (
+                    <EhTagStingId
+                      key={`achievement-authors-${index}`}
+                      requestDeleteTag={requestDeleteTag}
+                      id={user.id}
+                      title={makeFullName(user.firstName, user.lastName)}
+                    />
+                  ))}
                 </div>
               </div>
             </div>
@@ -267,30 +360,37 @@ const Content: FC = () => {
                 />
               </div>
             </div>
-            <div className="flex flex-row space-x-1">
-              <p className="w-2/6">Dokumentation</p>
-              <div className="w-4/6">
-                <UploadUI
-                  bottomText="Benutze diese Vorlage zum Hochladen der Dokumentation!"
-                  onChange={uploadDocumentationsZip}
-                  uploadFileName={state.zipFileName}
-                  acceptedFileTypes=".zip"
-                  placeholder=".zip"
-                />
+
+            {context.record.AchievementOption.recordType ===
+              AchievementRecordType_enum.DOCUMENTATION && (
+              <div className="flex flex-row space-x-1">
+                <p className="w-2/6">Dokumentation</p>
+                <div className="w-4/6">
+                  <UploadUI
+                    bottomText="Benutze diese Vorlage zum Hochladen der Dokumentation!"
+                    onChange={uploadDocumentationsZip}
+                    uploadFileName={state.zipFileName}
+                    acceptedFileTypes=".zip"
+                    placeholder=".zip"
+                  />
+                </div>
               </div>
-            </div>
-            <div className="flex flex-row space-x-1">
-              <p className="w-2/6">CSV Ergebnisse</p>
-              <div className="w-4/6">
-                <UploadUI
-                  bottomText="Benutze diese Vorlage zum Hochladen der CSV-Ergebnisse!"
-                  onChange={uploadResultCsv}
-                  uploadFileName={state.csvFileName}
-                  acceptedFileTypes=".csv"
-                  placeholder=".csv"
-                />
+            )}
+            {context.record.AchievementOption.recordType ===
+              AchievementRecordType_enum.DOCUMENTATION_AND_CSV && (
+              <div className="flex flex-row space-x-1">
+                <p className="w-2/6">CSV Ergebnisse</p>
+                <div className="w-4/6">
+                  <UploadUI
+                    bottomText="Benutze diese Vorlage zum Hochladen der CSV-Ergebnisse!"
+                    onChange={uploadResultCsv}
+                    uploadFileName={state.csvFileName}
+                    acceptedFileTypes=".csv"
+                    placeholder=".csv"
+                  />
+                </div>
               </div>
-            </div>
+            )}
             <div className="flex justify-center items-center">
               <Button onClick={save} as="button" filled={false}>
                 Hochladen
@@ -342,7 +442,7 @@ const UploadUI: FC<IPropsUpload> = (props) => {
   return (
     <form ref={formRef}>
       <div className="flex-col items-right" onClick={onClickHandler}>
-        <div className="border-b border-b-2 border-gray-400 flex flex-row cursor-pointer">
+        <div className="border-b border-b-1 border-gray-400 flex flex-row cursor-pointer">
           <input
             placeholder={props.placeholder ?? ""}
             type="text"

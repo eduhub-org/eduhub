@@ -53,13 +53,7 @@ export const AchievementOptionDropDown: FC<IProps> = ({
     },
     [setVisible, callback]
   );
-  const onclick = useCallback(
-    (event: any) => {
-      console.log(event);
-      setVisible(false);
-    },
-    [setVisible]
-  );
+
   return (
     <StyledMenu
       id="fade-menu"
