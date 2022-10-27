@@ -65,7 +65,7 @@ variable "dbi_tier" {
 variable "dbi_availability" {
   description = "Availablity of the database instance"
   type        = string
-  default     = "REGIONAL"
+  default     = "ZONAL"
 }
 variable "dbi_create_replica" {
   description = "Create a replica database"

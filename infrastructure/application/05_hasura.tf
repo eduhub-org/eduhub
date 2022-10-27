@@ -82,8 +82,8 @@ module "hasura_service" {
   container_concurrency = "80"
 
   service_annotations = {
-    "run.googleapis.com/client-name"  = "terraform"
-    "run.googleapis.com/launch-stage" = "BETA"
+    "run.googleapis.com/client-name" = "terraform"
+    #"run.googleapis.com/launch-stage" = "BETA"
     #"run.googleapis.com/ingress"        = "internal-and-cloud-load-balancing"
     #"run.googleapis.com/ingress-status" = "internal-and-cloud-load-balancing"
   }
@@ -106,7 +106,7 @@ module "hasura_service" {
     },
     {
       name  = "HASURA_GRAPHQL_MIGRATIONS_SERVER_TIMEOUT"
-      value = 120
+      value = 60
     },
     {
       name  = "HASURA_GRAPHQL_DEV_MODE"
@@ -141,8 +141,8 @@ module "hasura_service" {
       value = google_cloudfunctions2_function.load_achievement_certificate_template.service_config[0].uri
     },
     {
-      name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION"
-      value = google_cloudfunctions2_function.save_achievement_record_documentation.service_config[0].uri
+      name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION"
+      value = google_cloudfunctions2_function.load_achievement_record_documentation.service_config[0].uri
     },
     {
       name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE"
@@ -190,7 +190,7 @@ module "hasura_service" {
     },
     {
       name  = "HASURA_GRAPHQL_JWT_SECRET"
-      value = "{ \"type\": \"RS256\", \"jwk_url\": \"https://${var.keycloak_service_name},.opencampus.sh/realms/edu-hub/protocol/openid-connect/certs\" },"
+      value = "{ \"type\": \"RS256\", \"jwk_url\": \"https://${var.keycloak_service_name}.opencampus.sh/realms/edu-hub/protocol/openid-connect/certs\" }"
     }
   ]
   env_secret_vars = [
