@@ -1,5 +1,5 @@
 {
-  "name": "loadFile",
+  "name": "loadAchievementRecordDocumentation",
   "version": "0.0.1",
   "dependencies": {
     "body-parser": "1.19.0",

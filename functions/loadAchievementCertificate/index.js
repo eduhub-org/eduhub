@@ -2,6 +2,8 @@ const bodyParser = require("body-parser");
 const {Storage} = require('@google-cloud/storage');
 const util = require('util');
 
+const { loadFromBucket } = require("./lib/eduHub.js");
+
 const storage = new Storage();
 
 /**
@@ -10,24 +12,12 @@ const storage = new Storage();
  * @param {!express:Request} req HTTP request context.
  * @param {!express:Response} res HTTP response context.
  */
-exports.loadFile = async (req, res) => {
+exports.loadAchievementCertificate = async (req, res) => {
   if (process.env.HASURA_CLOUD_FUNCTION_SECRET == req.headers.secret) {
     const path = req.body.input.path;
     const bucket = storage.bucket(req.headers.bucket);
     
-    const file = bucket.file(path);
-    
-    const isPublic = await file.isPublic();
-    
-    if (isPublic[0] == true) {
-      const link = await file.publicUrl();
-    } else {
-      const link = await file.getSignedUrl({
-        action: 'read',
-        expires: new Date(Date.now() + 1000 * 60 * 5)
-      });
-    }
-    
+    const link = await loadFromBucket(path, bucket); 
     
     return res.json({
       link: link

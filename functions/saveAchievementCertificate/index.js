@@ -2,6 +2,8 @@ const bodyParser = require("body-parser");
 const {Storage} = require('@google-cloud/storage');
 const util = require('util');
 
+const { saveToBucket } = require("./lib/eduHub.js");
+
 const storage = new Storage();
 
 /**
@@ -10,32 +12,17 @@ const storage = new Storage();
  * @param {!express:Request} req HTTP request context.
  * @param {!express:Response} res HTTP response context.
  */
-exports.saveFile = async (req, res) => {
+exports.saveAchievementCertificate = async (req, res) => {
   if (process.env.HASURA_CLOUD_FUNCTION_SECRET == req.headers.secret) {
     const content = req.body.input.base64file;
-    const filename = req.body.input.filename;
-    const isPublic = filename.startsWith("public");
+    const courseid = req.body.input.courseid;
+    const userid = req.body.input.userid;
+    const isPublic = false;
     const bucket = storage.bucket(req.headers.bucket);
-    const path = util.format(
-      `${filename}`
-    );
     
-    const file = bucket.file(filename);
-    const fileBuffer = new Buffer(content, 'base64');
+    const path = `userid_${userid}/courseid_${courseid}/achievement_certificate_course_${courseid}.pdf`;
     
-    await file.save(fileBuffer);
-    
-    let link = "";
-    if (isPublic == true) {
-      await file.makePublic();
-      link = await file.publicUrl();
-    } else {
-      link = await file.getSignedUrl({
-        action: 'read',
-        expires: new Date(Date.now() + 1000 * 60 * 5)
-      });
-    }
-    
+    const link = await saveToBucket(path, bucket, content, isPublic);
     
     return res.json({
       link: link

@@ -4,7 +4,7 @@ table:
 object_relationships:
   - name: AchievementOption
     using:
-      foreign_key_constraint_on: AchievementOptionId
+      foreign_key_constraint_on: achievementOptionId
   - name: AchievementRecordRating
     using:
       foreign_key_constraint_on: rating
@@ -22,29 +22,34 @@ insert_permissions:
       check: {}
       columns:
         - coverImageUrl
+        - csvResults
         - description
+        - documentationUrl
         - id
       backend_only: false
 select_permissions:
   - role: anonymous
     permission:
       columns:
-        - AchievementOptionId
+        - achievementOptionId
         - coverImageUrl
         - description
+        - documentationUrl
         - id
         - score
       filter: {}
   - role: instructor_access
     permission:
       columns:
-        - AchievementOptionId
-        - id
-        - uploadUserId
-        - score
+        - achievementOptionId
         - coverImageUrl
+        - csvResults
         - description
+        - documentationUrl
+        - id
         - rating
+        - score
+        - uploadUserId
       filter:
         _or:
           - AchievementOption:
@@ -64,13 +69,15 @@ select_permissions:
   - role: user_access
     permission:
       columns:
-        - AchievementOptionId
-        - id
-        - uploadUserId
-        - score
+        - achievementOptionId
         - coverImageUrl
+        - csvResults
         - description
+        - documentationUrl
+        - id
         - rating
+        - score
+        - uploadUserId
       filter:
         AchievementRecordAuthors:
           User:
