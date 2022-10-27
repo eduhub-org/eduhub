@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { FC, useCallback } from "react";
 import { useIsAdmin, useIsInstructor } from "../hooks/authentication";
+import {postLogout} from "../helpers/auth";
 
 interface IProps {
   anchorElement: HTMLElement;
@@ -96,7 +97,13 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
-      <MenuItem onClick={() => signOut()}>
+      <MenuItem
+        onClick={() => {
+          postLogout("/api/auth/logout").then(() =>
+            signOut()
+          );
+        }}
+      >
         <span className="w-full text-lg">Logout</span>
       </MenuItem>
     </StyledMenu>

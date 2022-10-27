@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
 import type { JWT } from "next-auth/jwt";
+import jwt from "next-auth/jwt";
 import type { Account, Awaitable, Session, User } from "next-auth/core/types";
 
 interface JWTData {
@@ -27,13 +28,16 @@ export default NextAuth({
       clientSecret: "WWzGeFLQdDQZmVUaiJJwJuV5HrbXGEKc",
       authorization: `${process.env.NEXT_PUBLIC_AUTH_URL}/auth`,
       issuer: `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub`,
+      idToken: true,
     }),
   ],
   callbacks: {
     jwt: async ({ token, account, user, profile }) => {
       // Persist the OAuth access_token to the token right after signin
+      console.log("idTOken", token);
       if (account && profile) {
         // console.log(account, token);
+        token.idToken = account.id_token;
         token.accessToken = account.access_token;
         token.profile = profile;
       }
@@ -45,7 +49,6 @@ export default NextAuth({
       session.accessToken = token.accessToken;
       session.user = user;
       session.profile = token.profile;
-      console.log(session);
       return session;
     },
   },
