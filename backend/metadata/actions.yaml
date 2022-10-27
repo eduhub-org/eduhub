@@ -1,8 +1,95 @@
 actions:
-  - name: loadFile
+  - name: loadAchievementCertificate
     definition:
       kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_LOAD_FILE}}'
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+    permissions:
+      - role: user_access
+  - name: loadAchievementCertificateTemplate
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE_TEMPLATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: loadAchievementRecordDocumentation
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: loadParticipationCertificate
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+    permissions:
+      - role: user_access
+  - name: loadparticipationCertificateTemplate
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE_TEMPLATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: saveAchievementCertificate
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: saveAchievementCertificateTemplate
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: saveAchievementRecordCoverImage
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+    permissions:
+      - role: user_access
+  - name: saveAchievementRecordDocumentation
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: saveCourseImage
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_COURSE_IMAGE}}'
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -10,18 +97,33 @@ actions:
           value_from_env: HASURA_BUCKET
     permissions:
       - role: instructor_access
-      - role: user_access
-      - role: anonymous
-  - name: saveFile
+  - name: saveParticipationCertificate
     definition:
-      kind: asynchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_FILE}}'
-      forward_client_headers: true
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE}}'
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+  - name: saveParticipationCertificateTemplate
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: saveUserProfileImage
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_USER_PROFILE_IMAGE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - value: HASURA_BUCKET
+          name: bucket
     permissions:
       - role: instructor_access
       - role: user_access
@@ -41,8 +143,16 @@ custom_types:
   enums: []
   input_objects: []
   objects:
-    - name: UploadResult
-    - name: Output
     - name: loadFileOutput
     - name: result
+    - name: AchievementRecordCoverImageLink
+    - name: AchievementCertificateLink
+    - name: CourseImageLink
+    - name: UserImageLink
+    - name: AchievementCertificateTemplateLink
+    - name: ParticipationCertificateLink
+    - name: ParticipationCertificateTemplateLink
+    - name: UploadResult
+    - name: Output
+    - name: AchievementRecordDocumentationLink
   scalars: []
