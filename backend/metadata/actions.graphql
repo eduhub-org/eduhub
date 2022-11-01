@@ -31,7 +31,7 @@ type Query {
 type Mutation {
   saveAchievementCertificate(
     base64file: String!
-    courseid: String!
+    courseid: Int!
     userid: String!
   ): AchievementCertificateLink
 }
@@ -40,7 +40,7 @@ type Mutation {
   saveAchievementCertificateTemplate(
     base64file: String!
     filename: String!
-    programid: String!
+    programid: Int!
   ): AchievementCertificateTemplateLink
 }
 
@@ -48,7 +48,7 @@ type Mutation {
   saveAchievementRecordCoverImage(
     base64file: String!
     filename: String!
-    achievementRecordId: String!
+    achievementRecordId: Int!
   ): AchievementRecordCoverImageLink
 }
 
@@ -56,7 +56,7 @@ type Mutation {
   saveAchievementRecordDocumentation(
     base64file: String!
     filename: String!
-    achievementRecordId: String!
+    achievementRecordId: Int!
   ): AchievementRecordDocumentationLink
 }
 
@@ -64,14 +64,14 @@ type Mutation {
   saveCourseImage(
     base64file: String!
     filename: String!
-    courseid: String!
+    courseid: Int!
   ): CourseImageLink
 }
 
 type Mutation {
   saveParticipationCertificate(
     base64file: String!
-    courseid: String!
+    courseid: Int!
     userid: String!
   ): ParticipationCertificateLink
 }
@@ -80,7 +80,7 @@ type Mutation {
   saveParticipationCertificateTemplate(
     base64file: String!
     filename: String!
-    programid: String!
+    programid: Int!
   ): ParticipationCertificateTemplateLink
 }
 

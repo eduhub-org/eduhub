@@ -122,8 +122,8 @@ actions:
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - value: HASURA_BUCKET
-          name: bucket
+        - name: bucket
+          value_from_env: HASURA_BUCKET
     permissions:
       - role: instructor_access
       - role: user_access
