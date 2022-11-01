@@ -11,6 +11,18 @@ type Query {
 }
 
 type Query {
+  loadAchievementOptionDocumentationTemplate(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
+  loadAchievementOptionEvaluationScript(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
   loadAchievementRecordDocumentation(
     path: String!
   ): loadFileOutput
@@ -33,7 +45,7 @@ type Mutation {
     base64file: String!
     courseid: Int!
     userid: String!
-  ): AchievementCertificateLink
+  ): loadFileOutput
 }
 
 type Mutation {
@@ -41,7 +53,21 @@ type Mutation {
     base64file: String!
     filename: String!
     programid: Int!
-  ): AchievementCertificateTemplateLink
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveAchievementOptionDocumentationTemplate(
+    base64file: String!
+    courseid: Int!
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveAchievementOptionEvaluationScript(
+    base64file: String!
+    courseid: Int!
+  ): loadFileOutput
 }
 
 type Mutation {
@@ -49,7 +75,7 @@ type Mutation {
     base64file: String!
     filename: String!
     achievementRecordId: Int!
-  ): AchievementRecordCoverImageLink
+  ): loadFileOutput
 }
 
 type Mutation {
@@ -57,7 +83,7 @@ type Mutation {
     base64file: String!
     filename: String!
     achievementRecordId: Int!
-  ): AchievementRecordDocumentationLink
+  ): loadFileOutput
 }
 
 type Mutation {
@@ -65,7 +91,7 @@ type Mutation {
     base64file: String!
     filename: String!
     courseid: Int!
-  ): CourseImageLink
+  ): loadFileOutput
 }
 
 type Mutation {
@@ -73,7 +99,7 @@ type Mutation {
     base64file: String!
     courseid: Int!
     userid: String!
-  ): ParticipationCertificateLink
+  ): loadFileOutput
 }
 
 type Mutation {
@@ -81,7 +107,7 @@ type Mutation {
     base64file: String!
     filename: String!
     programid: Int!
-  ): ParticipationCertificateTemplateLink
+  ): loadFileOutput
 }
 
 type Mutation {
@@ -89,7 +115,7 @@ type Mutation {
     base64file: String!
     filename: String!
     userid: String!
-  ): UserImageLink
+  ): loadFileOutput
 }
 
 type Mutation {
@@ -104,45 +130,5 @@ type loadFileOutput {
 
 type result {
   result: String!
-}
-
-type AchievementRecordCoverImageLink {
-  link: String!
-}
-
-type AchievementCertificateLink {
-  link: String!
-}
-
-type CourseImageLink {
-  link: String!
-}
-
-type UserImageLink {
-  link: String!
-}
-
-type AchievementCertificateTemplateLink {
-  link: String!
-}
-
-type ParticipationCertificateLink {
-  link: String!
-}
-
-type ParticipationCertificateTemplateLink {
-  link: String!
-}
-
-type UploadResult {
-  link: String!
-}
-
-type Output {
-  link: String!
-}
-
-type AchievementRecordDocumentationLink {
-  link: String!
 }
 
