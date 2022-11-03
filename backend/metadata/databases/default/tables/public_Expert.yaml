@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: Expert
+  schema: public
 object_relationships:
   - name: User
     using:
@@ -11,22 +11,22 @@ array_relationships:
       foreign_key_constraint_on:
         column: expertId
         table:
-          schema: public
           name: AchievementOptionMentor
+          schema: public
   - name: CourseInstructors
     using:
       foreign_key_constraint_on:
         column: expertId
         table:
-          schema: public
           name: CourseInstructor
+          schema: public
   - name: SessionSpeakers
     using:
       foreign_key_constraint_on:
         column: expertId
         table:
-          schema: public
           name: SessionSpeaker
+          schema: public
 select_permissions:
   - role: anonymous
     permission:

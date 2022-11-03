@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: Admin
+  schema: public
 object_relationships:
   - name: User
     using:

@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: AchievementRecord
+  schema: public
 object_relationships:
   - name: AchievementOption
     using:
@@ -14,8 +14,8 @@ array_relationships:
       foreign_key_constraint_on:
         column: achievementRecordId
         table:
-          schema: public
           name: AchievementRecordAuthor
+          schema: public
 insert_permissions:
   - role: user_access
     permission:
@@ -27,7 +27,6 @@ insert_permissions:
         - documentationUrl
         - id
         - uploadUserId
-      backend_only: false
 select_permissions:
   - role: anonymous
     permission:

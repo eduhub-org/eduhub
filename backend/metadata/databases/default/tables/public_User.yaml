@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: User
+  schema: public
 object_relationships:
   - name: employmentByEmployment
     using:
@@ -14,36 +14,36 @@ array_relationships:
       foreign_key_constraint_on:
         column: userId
         table:
-          schema: public
           name: AchievementRecordAuthor
+          schema: public
   - name: Admins
     using:
       foreign_key_constraint_on:
         column: userId
         table:
-          schema: public
           name: Admin
+          schema: public
   - name: Attendances
     using:
       foreign_key_constraint_on:
         column: userId
         table:
-          schema: public
           name: Attendance
+          schema: public
   - name: CourseEnrollments
     using:
       foreign_key_constraint_on:
         column: userId
         table:
-          schema: public
           name: CourseEnrollment
+          schema: public
   - name: Experts
     using:
       foreign_key_constraint_on:
         column: userId
         table:
-          schema: public
           name: Expert
+          schema: public
 select_permissions:
   - role: anonymous
     permission:

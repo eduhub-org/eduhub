@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: AchievementOption
+  schema: public
 object_relationships:
   - name: AchievementRecordType
     using:
@@ -11,22 +11,22 @@ array_relationships:
       foreign_key_constraint_on:
         column: achievementOptionId
         table:
-          schema: public
           name: AchievementOptionCourse
+          schema: public
   - name: AchievementOptionMentors
     using:
       foreign_key_constraint_on:
         column: achievementOptionId
         table:
-          schema: public
           name: AchievementOptionMentor
+          schema: public
   - name: AchievementRecords
     using:
       foreign_key_constraint_on:
         column: achievementOptionId
         table:
-          schema: public
           name: AchievementRecord
+          schema: public
 insert_permissions:
   - role: instructor_access
     permission:
@@ -53,7 +53,6 @@ insert_permissions:
         - recordType
         - created_at
         - updated_at
-      backend_only: false
 select_permissions:
   - role: anonymous
     permission:
@@ -109,6 +108,7 @@ update_permissions:
 delete_permissions:
   - role: instructor_access
     permission:
+      backend_only: false
       filter:
         _or:
           - AchievementOptionCourses:

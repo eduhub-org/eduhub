@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: MotivationRating
+  schema: public
 is_enum: true
 array_relationships:
   - name: Enrollments
@@ -8,8 +8,8 @@ array_relationships:
       foreign_key_constraint_on:
         column: motivationRating
         table:
-          schema: public
           name: CourseEnrollment
+          schema: public
 select_permissions:
   - role: anonymous
     permission:

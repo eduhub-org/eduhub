@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: AchievementRecordAuthor
+  schema: public
 object_relationships:
   - name: AchievementRecord
     using:
@@ -18,7 +18,6 @@ insert_permissions:
         - id
         - updated_at
         - userId
-      backend_only: false
 select_permissions:
   - role: anonymous
     permission:
