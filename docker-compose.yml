@@ -50,6 +50,7 @@ services:
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: inherited_roles
+
       HASURA_BUCKET: "eduhub-staging-kc19"
       CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE: "https://load-achievement-certificate-szeuw2n5qa-ew.a.run.app"
       CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE_TEMPLATE: "https://load-achievement-certificate-template-szeuw2n5qa-ew.a.run.app"
@@ -66,6 +67,12 @@ services:
       CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE: "https://save-participation-certificate-template-szeuw2n5qa-ew.a.run.app"
       CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK: "https://update-from-keycloak-szeuw2n5qa-ew.a.run.app"
       CLOUD_FUNCTION_LINK_SEND_MAIL: "https://send-mail-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE: ""
+      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: ""
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: ""
+      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: ""
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: ""
+
     volumes:
       - ./backend/migrations:/hasura-migrations
       - ./backend/metadata:/hasura-metadata

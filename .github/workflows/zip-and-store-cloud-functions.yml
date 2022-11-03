@@ -50,6 +50,10 @@ jobs:
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveParticipationCertificate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveParticipationCertificateTemplate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveUserProfileImage/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementOptionEvaluationScript/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementOptionDocumentationTemplate/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionDocumentationTemplate/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionEvaluationScript/lib/'
 
       - name: Zip Archive for loadAchievementCertificate
         uses: thedoctor0/zip-release@main
@@ -162,6 +166,48 @@ jobs:
           type: 'zip'
           directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateFromKeycloak'
           filename: '../updateFromKeycloak.zip'
+          
+      - name: Zip Archive for saveAchievementOptionEvaluationScript
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionEvaluationScript'
+          filename: '../saveAchievementOptionEvaluationScript.zip'
+          
+      - name: Zip Archive for loadAchievementOptionEvaluationScript
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementOptionEvaluationScript'
+          filename: '../loadAchievementOptionEvaluationScript.zip'
+
+      - name: Zip Archive for saveAchievementOptionDocumentationTemplate
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionDocumentationTemplate'
+          filename: '../saveAchievementOptionDocumentationTemplate.zip'
+          
+      - name: Zip Archive for loadAchievementOptionDocumentationTemplate
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementOptionDocumentationTemplate'
+          filename: '../loadAchievementOptionDocumentationTemplate.zip'
+          
+      - name: Zip Archive for saveAchievementRecordDocumentation
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordDocumentation'
+          filename: '../saveAchievementRecordDocumentation.zip'
+          
+      - name: Zip Archive for loadAchievementRecordDocumentation
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementRecordDocumentation'
+          filename: '../loadAchievementRecordDocumentation.zip'
 
       - name: Authenticate to Google Cloud
         id: 'auth'
