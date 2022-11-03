@@ -7,6 +7,7 @@ import {
 } from "../../queries/__generated__/ManagedCourse";
 import { ApplicationRow } from "./ApplicationRow";
 import { greenDot, greyDot, orangeDot, redDot } from "../common/dots";
+import { OnlyAdmin } from "../common/OnlyLoggedIn";
 import {
   identityEventMapper,
   pickIdPkMapper,
@@ -23,7 +24,6 @@ import {
   UPDATE_ENROLLMENT_RATING,
 } from "../../queries/insertEnrollment";
 import { Button as OldButton } from "../common/Button";
-import { OnlyAdmin } from "../common/OnlyLoggedIn";
 import { Dialog, DialogTitle } from "@material-ui/core";
 import { MdClose } from "react-icons/md";
 import DatePicker from "react-datepicker";
@@ -241,11 +241,11 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
         <div className="mt-6 mb-3">{infoDots}</div>
 
         <OnlyAdmin>
-          <div className="flex justify-end mb-6">
-            <OldButton onClick={handleOpenInviteDialog}>
-              Einladungen verschicken
-            </OldButton>
-          </div>
+        <div className="flex justify-end mb-6">
+          <OldButton onClick={handleOpenInviteDialog}>
+            Einladungen verschicken
+          </OldButton>
+        </div>
         </OnlyAdmin>
       </div>
 
@@ -267,6 +267,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
           <div className="grid grid-cols-2 h-64">
             <div className="mr-3">Ablaufdatum für Einladung:</div>
             <div className="ml-3">
+              {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
               <DatePicker
                 dateFormat={"dd/MM/yyyy"}
                 selected={inviteExpireDate}

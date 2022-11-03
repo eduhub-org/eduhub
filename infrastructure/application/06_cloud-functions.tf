@@ -43,6 +43,8 @@ resource "google_cloudfunctions2_function" "load_achievement_certificate" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -86,6 +88,8 @@ resource "google_cloudfunctions2_function" "load_achievement_certificate_templat
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -129,6 +133,8 @@ resource "google_cloudfunctions2_function" "load_achievement_record_documentatio
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -172,6 +178,8 @@ resource "google_cloudfunctions2_function" "load_participation_certificate" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -215,6 +223,7 @@ resource "google_cloudfunctions2_function" "load_participation_certificate_templ
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
   }
 }
 
@@ -258,6 +267,8 @@ resource "google_cloudfunctions2_function" "save_achievement_certificate" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -301,6 +312,8 @@ resource "google_cloudfunctions2_function" "save_achievement_certificate_templat
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -344,6 +357,8 @@ resource "google_cloudfunctions2_function" "save_achievement_record_cover_image"
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 
   lifecycle {
@@ -391,6 +406,8 @@ resource "google_cloudfunctions2_function" "save_achievement_record_documentatio
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 
   lifecycle {
@@ -438,6 +455,8 @@ resource "google_cloudfunctions2_function" "save_course_image" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -481,6 +500,8 @@ resource "google_cloudfunctions2_function" "save_participation_certificate" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -524,6 +545,8 @@ resource "google_cloudfunctions2_function" "save_participation_certificate_templ
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -567,6 +590,183 @@ resource "google_cloudfunctions2_function" "save_user_profile_image" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+  }
+}
+
+###############################################################################
+# Create Google cloud function for loadAchievementOptionDocumentationTemplate
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "load_achievement_option_documentation_template_noauth_invoker" {
+  location    = google_cloudfunctions2_function.load_achievement_option_documentation_template.location
+  project     = google_cloudfunctions2_function.load_achievement_option_documentation_template.project
+  service     = google_cloudfunctions2_function.load_achievement_option_documentation_template.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "load_achievement_option_documentation_template" {
+  name   = "cloud-functions/loadAchievementOptionDocumentationTemplate.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "load_achievement_option_documentation_template" {
+  provider    = google-beta
+  location    = var.region
+  name        = "load-achievement-option-documentation-template"
+  description = "Loads an achievement option documentation template from Google Cloud Storage"
+
+  build_config {
+    runtime     = "nodejs16"
+    entry_point = "loadAchievementOptionDocumentationTemplate"
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.load_achievement_option_documentation_template.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+    }
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+  }
+}
+
+###############################################################################
+# Create Google cloud function for saveAchievementOptionEvaluationScript
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "save_achievement_option_evaluation_script_noauth_invoker" {
+  location    = google_cloudfunctions2_function.save_achievement_option_evaluation_script.location
+  project     = google_cloudfunctions2_function.save_achievement_option_evaluation_script.project
+  service     = google_cloudfunctions2_function.save_achievement_option_evaluation_script.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "save_achievement_option_evaluation_script" {
+  name   = "cloud-functions/saveAchievementOptionEvaluationScript.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "save_achievement_option_evaluation_script" {
+  provider    = google-beta
+  location    = var.region
+  name        = "save-achievement-option-evaluation-script"
+  description = "Saves an achievement option evaluation script to Google Cloud Storage"
+
+  build_config {
+    runtime     = "nodejs16"
+    entry_point = "saveAchievementOptionEvaluationScript"
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.save_achievement_option_evaluation_script.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+    }
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+  }
+}
+
+###############################################################################
+# Create Google cloud function for loadAchievementOptionEvaluationScript
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "load_achievement_option_evaluation_script_noauth_invoker" {
+  location    = google_cloudfunctions2_function.load_achievement_option_evaluation_script.location
+  project     = google_cloudfunctions2_function.load_achievement_option_evaluation_script.project
+  service     = google_cloudfunctions2_function.load_achievement_option_evaluation_script.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "load_achievement_option_evaluation_script" {
+  name   = "cloud-functions/loadAchievementOptionEvaluationScript.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "load_achievement_option_evaluation_script" {
+  provider    = google-beta
+  location    = var.region
+  name        = "load-achievement-option-evaluation-script"
+  description = "Loads an achievement option evaluation script from Google Cloud Storage"
+
+  build_config {
+    runtime     = "nodejs16"
+    entry_point = "loadAchievementOptionEvaluationScript"
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.load_achievement_option_evaluation_script.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+    }
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+  }
+}
+
+###############################################################################
+# Create Google cloud function for saveAchievementOptionDocumentationTemplate
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "save_achievement_option_documentation_template_noauth_invoker" {
+  location    = google_cloudfunctions2_function.save_achievement_option_documentation_template.location
+  project     = google_cloudfunctions2_function.save_achievement_option_documentation_template.project
+  service     = google_cloudfunctions2_function.save_achievement_option_documentation_template.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "save_achievement_option_documentation_template" {
+  name   = "cloud-functions/saveAchievementOptionDocumentationTemplate.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "save_achievement_option_documentation_template" {
+  provider    = google-beta
+  location    = var.region
+  name        = "save-achievement-option-documentation-template"
+  description = "Saves an achievement option documentation template to Google Cloud Storage"
+
+  build_config {
+    runtime     = "nodejs16"
+    entry_point = "saveAchievementOptionDocumentationTemplate"
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.save_achievement_option_documentation_template.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+    }
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
   }
 }
 
@@ -612,6 +812,7 @@ resource "google_cloudfunctions2_function" "send_mail" {
     max_instance_count = 50
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
   }
 }
 
@@ -658,6 +859,7 @@ resource "google_cloudfunctions2_function" "update_keycloak_profile" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
   }
 }
 
@@ -706,5 +908,6 @@ resource "google_cloudfunctions2_function" "update_from_keycloak" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
   }
 }
