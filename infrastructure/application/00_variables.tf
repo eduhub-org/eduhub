@@ -72,6 +72,12 @@ variable "dbi_create_replica" {
   type        = bool
   default     = "false"
 }
+variable "dbi_max_connections" {
+  # Needs to be higher then the standard setting to allow the startup of hasura
+  description = "Define allowed maximum number of connections"
+  type        = number
+  default     = 200
+}
 variable "keycloak_db_user" {
   description = "Name for the user of the Keycloak database"
   type        = string

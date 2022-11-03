@@ -12,7 +12,7 @@ resource "google_sql_database_instance" "default" {
     availability_type = var.dbi_availability
     database_flags {
       name  = "max_connections"
-      value = 250
+      value = var.dbi_max_connections
     }
     backup_configuration {
       point_in_time_recovery_enabled = false
