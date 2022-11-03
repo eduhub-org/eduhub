@@ -180,6 +180,20 @@ jobs:
           type: 'zip'
           directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementOptionDocumentationTemplate'
           filename: '../loadAchievementOptionDocumentationTemplate.zip'
+          
+      - name: Zip Archive for saveAchievementRecordDocumentation
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordDocumentation'
+          filename: '../saveAchievementRecordDocumentation.zip'
+          
+      - name: Zip Archive for loadAchievementRecordDocumentation
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementRecordDocumentation'
+          filename: '../loadAchievementRecordDocumentation.zip'
 
       - name: Authenticate to Google Cloud
         id: 'auth'
