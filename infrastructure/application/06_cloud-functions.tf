@@ -43,6 +43,8 @@ resource "google_cloudfunctions2_function" "load_achievement_certificate" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -86,6 +88,8 @@ resource "google_cloudfunctions2_function" "load_achievement_certificate_templat
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -129,6 +133,8 @@ resource "google_cloudfunctions2_function" "load_achievement_record_documentatio
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -172,6 +178,8 @@ resource "google_cloudfunctions2_function" "load_participation_certificate" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -215,6 +223,7 @@ resource "google_cloudfunctions2_function" "load_participation_certificate_templ
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
   }
 }
 
@@ -258,6 +267,8 @@ resource "google_cloudfunctions2_function" "save_achievement_certificate" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -301,6 +312,8 @@ resource "google_cloudfunctions2_function" "save_achievement_certificate_templat
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -344,6 +357,8 @@ resource "google_cloudfunctions2_function" "save_achievement_record_cover_image"
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 
   lifecycle {
@@ -391,6 +406,8 @@ resource "google_cloudfunctions2_function" "save_achievement_record_documentatio
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 
   lifecycle {
@@ -438,6 +455,8 @@ resource "google_cloudfunctions2_function" "save_course_image" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -481,6 +500,8 @@ resource "google_cloudfunctions2_function" "save_participation_certificate" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -524,6 +545,8 @@ resource "google_cloudfunctions2_function" "save_participation_certificate_templ
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
   }
 }
 
@@ -567,6 +590,7 @@ resource "google_cloudfunctions2_function" "save_user_profile_image" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
   }
 }
 
@@ -610,6 +634,7 @@ resource "google_cloudfunctions2_function" "load_achievement_option_documentatio
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
   }
 }
 
@@ -653,6 +678,7 @@ resource "google_cloudfunctions2_function" "save_achievement_option_evaluation_s
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
   }
 }
 
@@ -696,6 +722,7 @@ resource "google_cloudfunctions2_function" "load_achievement_option_evaluation_s
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
   }
 }
 
@@ -739,6 +766,7 @@ resource "google_cloudfunctions2_function" "save_achievement_option_documentatio
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
   }
 }
 
@@ -784,6 +812,7 @@ resource "google_cloudfunctions2_function" "send_mail" {
     max_instance_count = 50
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
   }
 }
 
@@ -830,6 +859,7 @@ resource "google_cloudfunctions2_function" "update_keycloak_profile" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
   }
 }
 
@@ -878,5 +908,6 @@ resource "google_cloudfunctions2_function" "update_from_keycloak" {
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
   }
 }

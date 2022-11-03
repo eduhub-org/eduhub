@@ -1,5 +1,11 @@
-import { FC } from "react";
+import { FC, ReactElement } from "react";
 
-export const OnlyDesktop: FC = ({ children }) => {
+type OnlyDesktopProps = {
+  children?: ReactElement;
+};
+
+export const OnlyDesktop: FC<OnlyDesktopProps> = ({
+  children,
+}: OnlyDesktopProps) => {
   return <div className="flex sm:hidden">{children}</div>;
 };

@@ -54,6 +54,11 @@ variable "cloudflare_zone_id" {
   description = "The DNS zone ID a record in Cloudflaire will be added to"
   type        = string
 }
+variable "cloud_function_ingress_settings" {
+  description = "Controls what traffic can reach the cloud functions"
+  type        = string
+  default     = "ALLOW_INTERNAL_ONLY"
+}
 
 
 # databases
@@ -65,7 +70,18 @@ variable "dbi_tier" {
 variable "dbi_availability" {
   description = "Availablity of the database instance"
   type        = string
-  default     = "REGIONAL"
+  default     = "ZONAL"
+}
+variable "dbi_create_replica" {
+  description = "Create a replica database"
+  type        = bool
+  default     = "false"
+}
+variable "dbi_max_connections" {
+  # Needs to be higher then the standard setting to allow the startup of hasura
+  description = "Define allowed maximum number of connections"
+  type        = number
+  default     = 250
 }
 variable "keycloak_db_user" {
   description = "Name for the user of the Keycloak database"

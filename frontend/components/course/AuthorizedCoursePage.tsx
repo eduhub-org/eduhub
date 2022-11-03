@@ -1,5 +1,3 @@
-import { useKeycloak } from "@react-keycloak/ssr";
-import { KeycloakInstance } from "keycloak-js";
 import { FC } from "react";
 import { useTranslation } from "react-i18next";
 

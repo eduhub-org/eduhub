@@ -1,4 +1,3 @@
-import { useKeycloak } from "@react-keycloak/ssr";
 import { KeycloakInstance } from "keycloak-js";
 import { useTranslation } from "next-i18next";
 import { FC, useCallback, useEffect, useState } from "react";
@@ -23,9 +22,8 @@ interface IProps {
 
 export const EnrollmentStatus: FC<IProps> = ({ course }) => {
   const [isUserInfoModalVisible, setUserInfoModalVisible] = useState(false);
-  const [isApplicationModalVisible, setApplicationModalVisible] = useState(
-    false
-  );
+  const [isApplicationModalVisible, setApplicationModalVisible] =
+    useState(false);
   const { t } = useTranslation("course-application");
 
   const user = useUser();

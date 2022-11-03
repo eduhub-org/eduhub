@@ -1,5 +1,5 @@
 import { IconButton } from "@material-ui/core";
-import { FC, useCallback } from "react";
+import { FC, useCallback, ChangeEvent } from "react";
 import { DebounceInput } from "react-debounce-input";
 import { MdDelete } from "react-icons/md";
 import { ManagedCourse_Course_by_pk_CourseLocations } from "../../queries/__generated__/ManagedCourse";
@@ -23,7 +23,7 @@ export const LocationSelectionRow: FC<IProps> = ({
   onDelete,
 }) => {
   const handleSetOption = useCallback(
-    (event) => {
+    (event: ChangeEvent<HTMLSelectElement>) => {
       if (location != null) {
         onSetOption(location, event.target.value);
       }
@@ -32,7 +32,7 @@ export const LocationSelectionRow: FC<IProps> = ({
   );
 
   const handleSetLink = useCallback(
-    (event) => {
+    (event: ChangeEvent<HTMLInputElement>) => {
       if (location != null) {
         onSetLink(location, event.target.value);
       }

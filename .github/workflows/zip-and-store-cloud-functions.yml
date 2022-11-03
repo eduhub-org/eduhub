@@ -69,6 +69,13 @@ jobs:
           directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificateTemplate'
           filename: '../loadAchievementCertificateTemplate.zip'
 
+      - name: Zip Archive for loadAchievementRecordDocumentation
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementRecordDocumentation'
+          filename: '../loadAchievementRecordDocumentation.zip'
+          
       - name: Zip Archive for loadParticipationCertificate
         uses: thedoctor0/zip-release@main
         with:
@@ -97,6 +104,13 @@ jobs:
           directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificateTemplate'
           filename: '../saveAchievementCertificateTemplate.zip'
 
+      - name: Zip Archive for saveAchievementRecordDocumentation
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordDocumentation'
+          filename: '../saveAchievementRecordDocumentation.zip'
+          
       - name: Zip Archive for saveAchievementRecordCoverImage
         uses: thedoctor0/zip-release@main
         with:
