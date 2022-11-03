@@ -1,17 +1,17 @@
 table:
-  schema: public
   name: AttendanceSource
+  schema: public
 is_enum: true
 array_relationships:
   - name: Attendances
     using:
       manual_configuration:
-        remote_table:
-          schema: public
-          name: Attendance
-        insertion_order: null
         column_mapping:
           value: source
+        insertion_order: null
+        remote_table:
+          name: Attendance
+          schema: public
 select_permissions:
   - role: anonymous
     permission:

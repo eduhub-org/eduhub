@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: AchievementOptionMentor
+  schema: public
 object_relationships:
   - name: AchievementOption
     using:
@@ -8,6 +8,9 @@ object_relationships:
   - name: Expert
     using:
       foreign_key_constraint_on: expertId
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
 insert_permissions:
   - role: instructor_access
     permission:
@@ -26,7 +29,6 @@ insert_permissions:
         - id
         - created_at
         - updated_at
-      backend_only: false
 select_permissions:
   - role: anonymous
     permission:
@@ -54,6 +56,7 @@ update_permissions:
 delete_permissions:
   - role: instructor_access
     permission:
+      backend_only: false
       filter:
         AchievementOption:
           AchievementOptionCourses:
