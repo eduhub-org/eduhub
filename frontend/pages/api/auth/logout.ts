@@ -1,42 +1,16 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
-import Cors from "cors";
-
-const cors = Cors({
-  methods: ["POST", "GET", "HEAD"],
-  origin: "*",
-});
-
-// Helper method to wait for a middleware to execute before continuing
-// And to throw an error when an error happens in a middleware
-function runMiddleware(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  fn: Function
-) {
-  return new Promise((resolve, reject) => {
-    fn(req, res, (result: any) => {
-      if (result instanceof Error) {
-        return reject(result);
-      }
-
-      return resolve(result);
-    });
-  });
-}
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  await runMiddleware(req, res, cors);
-
   try {
     const token = await getToken({ req });
 
     if (!token && process.env.NEXTAUTH_URL) {
       console.warn(
-        "No JWT token found when calling /federated-logout endpoint,"
+        "No JWT token found when calling /logout endpoint,"
       );
       return res.redirect(307, process.env.NEXTAUTH_URL);
     }
@@ -54,10 +28,11 @@ export default async function handler(
           process.env.NEXTAUTH_URL || "http://localhost:5000",
         ],
       ]);
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      return res.redirect(307, `${endsessionURL}?${endsessionParams}`);
+      return res
+        .status(200)
+        .json(JSON.stringify({ url: `${endsessionURL}?${endsessionParams}` }));
     }
-    throw new Error("Something went wrong - see federated-logout");
+    throw new Error("Something went wrong - see logout");
   } catch (error) {
     console.error(error);
   }
