@@ -11,6 +11,24 @@ type Query {
 }
 
 type Query {
+  loadAchievementOptionDocumentationTemplate(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
+  loadAchievementOptionEvaluationScript(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
+  loadAchievementRecordDocumentation(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
   loadParticipationCertificate(
     path: String!
   ): loadFileOutput
@@ -25,57 +43,79 @@ type Query {
 type Mutation {
   saveAchievementCertificate(
     base64file: String!
-    courseid: String!
+    courseid: Int!
     userid: String!
-  ): AchievementCertificateLink
+  ): loadFileOutput
 }
 
 type Mutation {
   saveAchievementCertificateTemplate(
     base64file: String!
     filename: String!
-    programid: String!
-  ): AchievementCertificateTemplateLink
+    programid: Int!
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveAchievementOptionDocumentationTemplate(
+    base64file: String!
+    courseid: Int!
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveAchievementOptionEvaluationScript(
+    base64file: String!
+    courseid: Int!
+  ): loadFileOutput
 }
 
 type Mutation {
   saveAchievementRecordCoverImage(
     base64file: String!
     filename: String!
-    achievementRecordId: String!
-  ): AchievementRecordCoverImageLink
+    achievementRecordId: Int!
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveAchievementRecordDocumentation(
+    base64file: String!
+    filename: String!
+    achievementRecordId: Int!
+  ): loadFileOutput
 }
 
 type Mutation {
   saveCourseImage(
     base64file: String!
     filename: String!
-    courseid: String!
-  ): CourseImageLink
+    courseid: Int!
+  ): loadFileOutput
 }
 
 type Mutation {
   saveParticipationCertificate(
     base64file: String!
-    courseid: String!
+    courseid: Int!
     userid: String!
-  ): ParticipationCertificateLink
+  ): loadFileOutput
 }
 
 type Mutation {
   saveParticipationCertificateTemplate(
     base64file: String!
     filename: String!
-    programid: String!
-  ): ParticipationCertificateTemplateLink
+    programid: Int!
+  ): loadFileOutput
 }
 
 type Mutation {
   saveUserProfileImage(
     base64file: String!
     filename: String!
-    courseid: String!
-  ): UserImageLink
+    userid: String!
+  ): loadFileOutput
 }
 
 type Mutation {
@@ -90,41 +130,5 @@ type loadFileOutput {
 
 type result {
   result: String!
-}
-
-type AchievementRecordCoverImageLink {
-  link: String!
-}
-
-type AchievementCertificateLink {
-  link: String!
-}
-
-type CourseImageLink {
-  link: String!
-}
-
-type UserImageLink {
-  link: String!
-}
-
-type AchievementCertificateTemplateLink {
-  link: String!
-}
-
-type ParticipationCertificateLink {
-  link: String!
-}
-
-type ParticipationCertificateTemplateLink {
-  link: String!
-}
-
-type UploadResult {
-  link: String!
-}
-
-type Output {
-  link: String!
 }
 

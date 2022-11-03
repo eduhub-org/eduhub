@@ -1,7 +1,7 @@
 import { Modal } from "@material-ui/core";
 import Fade from "@material-ui/core/Fade";
 import Image from "next/image";
-import { FC, useCallback, useState } from "react";
+import { ChangeEvent, FC, useCallback, useState } from "react";
 
 import { CourseEnrollmentStatus_enum } from "../../__generated__/globalTypes";
 import { enrollmentStatusForCourse } from "../../helpers/courseHelpers";
@@ -33,7 +33,7 @@ export const CourseApplicationModal: FC<IProps> = ({
   const [text, setText] = useState("");
   const userId = useUserId();
 
-  const onChangeText = useCallback((event) => {
+  const onChangeText = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setText(event.target.value);
   }, []);
 

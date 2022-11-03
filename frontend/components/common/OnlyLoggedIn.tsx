@@ -1,36 +1,40 @@
-import { useKeycloak } from "@react-keycloak/ssr";
-import { KeycloakInstance } from "keycloak-js";
-import { FC } from "react";
+import { FC, ReactElement } from "react";
 
-import { useIsLoggedIn } from "../../hooks/authentication";
+import {
+  useIsLoggedIn,
+  useIsAdmin,
+  useIsInstructor,
+} from "../../hooks/authentication";
 
-export const OnlyLoggedIn: FC = ({ children }) => {
+type TProps = {
+  children?: ReactElement;
+};
+
+export const OnlyLoggedIn: FC<TProps> = ({ children }: TProps) => {
   const isLoggedIn = useIsLoggedIn();
-  const { keycloak } = useKeycloak<KeycloakInstance>();
 
-  // console.log(keycloak);
-
-  const token = keycloak?.token;
-
-  if (!isLoggedIn || !token) return null;
+  if (!isLoggedIn) return null;
 
   return <>{children}</>;
 };
 
-export const OnlyNotAdmin: FC = ({ children }) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-  if (!keycloak?.resourceAccess?.hasura?.roles?.includes("admin")) {
+export const OnlyNotAdmin: FC<TProps> = ({ children }: TProps) => {
+  const isLoggedIn = useIsLoggedIn();
+  const isAdmin = useIsAdmin();
+  if (!isAdmin && isLoggedIn) {
     return <>{children}</>;
   } else {
     return null;
   }
 };
 
-export const OnlyNotInstructor: FC = ({ children }) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-  if (
-    keycloak?.resourceAccess?.hasura?.roles?.includes("instructor") ||
-    keycloak?.resourceAccess?.hasura?.roles?.includes("admin")
+export const OnlyNotInstructor: FC<TProps> = ({ children }: TProps) => {
+  const isLoggedIn = useIsLoggedIn();
+  const isAdmin = useIsAdmin();
+  const isInstructor = useIsInstructor();
+  if (isLoggedIn && (
+    isInstructor ||
+    isAdmin )
   ) {
     return null;
   } else {
@@ -38,21 +42,21 @@ export const OnlyNotInstructor: FC = ({ children }) => {
   }
 };
 
-export const OnlyAdmin: FC = ({ children }) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-  if (keycloak?.resourceAccess?.hasura?.roles?.includes("admin")) {
+export const OnlyAdmin: FC<TProps> = ({ children }: TProps) => {
+  const isLoggedIn = useIsLoggedIn();
+  const isAdmin = useIsAdmin();
+  if (isLoggedIn && isAdmin) {
     return <>{children}</>;
   } else {
     return null;
   }
 };
 
-export const OnlyInstructor: FC = ({ children }) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-  if (
-    keycloak?.resourceAccess?.hasura?.roles?.includes("instructor") ||
-    keycloak?.resourceAccess?.hasura?.roles?.includes("admin")
-  ) {
+export const OnlyInstructor: FC<TProps> = ({ children }: TProps) => {
+  const isLoggedIn = useIsLoggedIn();
+  const isAdmin = useIsAdmin();
+  const isInstructor = useIsInstructor();
+  if (isLoggedIn && (isInstructor || isAdmin)) {
     return <>{children}</>;
   } else {
     return null;

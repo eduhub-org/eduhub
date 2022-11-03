@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from "@material-ui/core";
-import { FC, useCallback, useState } from "react";
+import { ChangeEvent, FC, useCallback, useState } from "react";
 import { MdClose } from "react-icons/md";
 import { useAdminQuery } from "../../../hooks/authedQuery";
 import {
@@ -45,7 +45,7 @@ const getSearchVars = (searchValue: string) => {
 export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
   const [searchValue, setSearchValue] = useState("");
   const handleNewInput = useCallback(
-    (event) => {
+    (event: ChangeEvent<HTMLInputElement>) => {
       setSearchValue(event.target.value);
     },
     [setSearchValue]

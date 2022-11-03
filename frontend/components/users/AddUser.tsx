@@ -1,5 +1,5 @@
 import { TFunction } from "next-i18next";
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState, ChangeEvent } from "react";
 import {
   SelectComponentProperty,
   StaticComponentProperty,
@@ -208,14 +208,23 @@ const AddUserForm: FC<IPropsFrom> = ({
         ) : null}
         <div className="grid grid-cols-12 gap-5">
           <div className="flex flex-col space-y-5 col-span-5">
+            {/* @ts-ignore: https://github.com/i18next/react-i18next/issues/1543 */}
             <span> {t("firstName")} </span>
+            {/* @ts-ignore */}
             <span> {t("lastName")} </span>
+            {/* @ts-ignore */}
             <span> {t("email")} </span>
+            {/* @ts-ignore */}
             <span> {t("password")} </span>
+            {/* @ts-ignore */}
             <span> {t("employmentStatus")} </span>
+            {/* @ts-ignore */}
             <span> {t("university")} </span>
+            {/* @ts-ignore */}
             <span> {t("nameOfUniversity")} </span>
+            {/* @ts-ignore */}
             <span> {t("matriculationNumber")} </span>
+            {/* @ts-ignore */}
             <span> {t("administrator")} </span>
           </div>
           <div className="flex flex-col space-y-5 col-span-7">
@@ -223,24 +232,27 @@ const AddUserForm: FC<IPropsFrom> = ({
               className={inputBoxClass}
               placeholder={`${t("firstName")}*`}
               value={firstName}
-              onChange={useCallback((e) => setFirstName(e.target.value), [
-                setFirstName,
-              ])}
+              onChange={useCallback(
+                (e: ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value),
+                [setFirstName]
+              )}
             />
             <input
               className={inputBoxClass}
               placeholder={`${t("lastName")}*`}
               value={lastName}
-              onChange={useCallback((e) => setLastName(e.target.value), [
-                setLastName,
-              ])}
+              onChange={useCallback(
+                (e: ChangeEvent<HTMLInputElement>) => setLastName(e.target.value),
+                [setLastName]
+              )}
             />
             <input
               className={inputBoxClass}
               value={email}
-              onChange={useCallback((e) => setEmail(e.target.value), [
-                setEmail,
-              ])}
+              onChange={useCallback(
+                (e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
+                [setEmail]
+              )}
               placeholder={`${t("email")}*`}
             />
             <EhPassword
@@ -264,9 +276,10 @@ const AddUserForm: FC<IPropsFrom> = ({
               value={schoolName}
               placeholder={`${t("nameOfUniversity")}*`}
               disabled={school !== University_enum.OTHER}
-              onChange={useCallback((e) => setSchoolName(e.target.value), [
-                setSchoolName,
-              ])}
+              onChange={useCallback(
+                (e: ChangeEvent<HTMLInputElement>) => setSchoolName(e.target.value),
+                [setSchoolName]
+              )}
             />
 
             <input
@@ -274,7 +287,7 @@ const AddUserForm: FC<IPropsFrom> = ({
               value={studentId}
               placeholder={`${t("matriculationNumber")}*`}
               onChange={useCallback(
-                (e) => {
+                (e: ChangeEvent<HTMLInputElement>) => {
                   setStudentId(e.target.value);
                 },
                 [setStudentId]
@@ -308,7 +321,7 @@ const UserSelect: FC<IProsSelect> = ({
   selelectedValue,
 }) => {
   const onSelectChanged = useCallback(
-    (event) => {
+    (event: ChangeEvent<HTMLSelectElement>) => {
       componentProperty.onChangeHandler(
         componentProperty.componentID,
         event.target.value

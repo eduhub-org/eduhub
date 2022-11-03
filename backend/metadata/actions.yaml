@@ -19,6 +19,33 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+  - name: loadAchievementOptionDocumentationTemplate
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: loadAchievementOptionEvaluationScript
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: ' HASURA_BUCKET'
+  - name: loadAchievementRecordDocumentation
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
   - name: loadParticipationCertificate
     definition:
       kind: ""
@@ -57,6 +84,24 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+  - name: saveAchievementOptionDocumentationTemplate
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE}}'
+      headers:
+        - name: secert
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: saveAchievementOptionEvaluationScript
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: hasura
+          value_from_env: HASURA_BUCKET
   - name: saveAchievementRecordCoverImage
     definition:
       kind: synchronous
@@ -68,6 +113,15 @@ actions:
           value_from_env: HASURA_BUCKET
     permissions:
       - role: user_access
+  - name: saveAchievementRecordDocumentation
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
   - name: saveCourseImage
     definition:
       kind: synchronous
@@ -104,8 +158,8 @@ actions:
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - value: HASURA_BUCKET
-          name: bucket
+        - name: bucket
+          value_from_env: HASURA_BUCKET
     permissions:
       - role: instructor_access
       - role: user_access
@@ -127,13 +181,4 @@ custom_types:
   objects:
     - name: loadFileOutput
     - name: result
-    - name: AchievementRecordCoverImageLink
-    - name: AchievementCertificateLink
-    - name: CourseImageLink
-    - name: UserImageLink
-    - name: AchievementCertificateTemplateLink
-    - name: ParticipationCertificateLink
-    - name: ParticipationCertificateTemplateLink
-    - name: UploadResult
-    - name: Output
   scalars: []
