@@ -102,11 +102,8 @@ import {
   UpdateProgramParticipationCertVisible,
   UpdateProgramParticipationCertVisibleVariables,
 } from "../../queries/__generated__/UpdateProgramParticipationCertVisible";
-import {
-  SaveAFile,
-  SaveAFileVariables,
-} from "../../queries/__generated__/SaveAFile";
-import { LOAD_FILE, SAVE_FILE } from "../../queries/actions";
+
+import { LOAD_FILE } from "../../queries/actions";
 import {
   LoadAFile,
   LoadAFileVariables,
@@ -128,25 +125,25 @@ export const AuthorizedPrograms: FC = () => {
 
   const [openProgram, setOpenProgram] = useState(-1);
 
-  const [saveFile, saveFileStatus] = useAdminMutation<
-    SaveAFile,
-    SaveAFileVariables
-  >(SAVE_FILE);
+  // const [saveFile, saveFileStatus] = useAdminMutation<
+  //   SaveAFile,
+  //   SaveAFileVariables
+  // >(SAVE_FILE);
 
-  console.log(saveFileStatus);
+  // console.log(saveFileStatus);
 
   const saveTestFile = useCallback(async () => {
-    const helloWorld = "aGFjaw==";
-    const fileName = "public/hello.txt";
-    const response = await saveFile({
-      variables: {
-        base64file: helloWorld,
-        fileName,
-      },
-    });
+    // const helloWorld = "aGFjaw==";
+    // const fileName = "public/hello.txt";
+    // const response = await saveFile({
+    //   variables: {
+    //     base64file: helloWorld,
+    //     fileName,
+    //   },
+    // });
 
-    console.log(response);
-  }, [saveFile]);
+    console.log("saveTestFile");
+  }, []);
 
   const lResult = useAdminQuery<LoadAFile, LoadAFileVariables>(LOAD_FILE, {
     variables: {

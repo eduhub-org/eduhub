@@ -29,6 +29,11 @@ import {
   useIsLoggedIn,
 } from "../../hooks/authentication";
 import {
+  IUserProfile,
+  useKeycloakUserProfile,
+  useUserId,
+} from "../../hooks/user";
+import {
   ACHIEVEMENT_OPTIONS,
   ACHIEVEMENT_RECORD_TYPES,
 } from "../../queries/achievement";
@@ -79,13 +84,14 @@ interface IContext {
   refetchAchievementOptions?: () => void;
   isAdmin: boolean;
   isInstructor: boolean;
-  userDetails?: UsersWithExpertId_User | undefined;
   course?: AdminCourseList_Course;
   programID: number;
   setProgramID: (id: number) => void;
+  userId: string | undefined;
+  userProfile: IUserProfile | undefined;
 }
 
-const AchievementContext = createContext({} as IContext);
+export const AchievementContext = createContext({} as IContext);
 
 const Achievements: FC = () => {
   const isAdmin = useIsAdmin();
@@ -121,7 +127,8 @@ const DashBoard: FC = () => {
   const defaultProgram = -1; // All tab
 
   const router = useRouter();
-
+  const userId = useUserId();
+  const profile = useKeycloakUserProfile();
   const [currentProgramId, setCurrentProgramId] = useState(defaultProgram);
   const courseID: number = parseInt(router.query.courseId as string, 10); // {"courseId": 0}
   let course: AdminCourseList_Course | undefined;
@@ -141,18 +148,18 @@ const DashBoard: FC = () => {
   if (c.length > 0) {
     course = c[0];
   }
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-  const currentExpert = useAuthedQuery<
-    UsersWithExpertId,
-    UsersWithExpertIdVariables
-  >(USERS_WITH_EXPERT_ID, {
-    variables: {
-      where: {
-        id: { _eq: keycloak?.subject },
-      },
-    },
-    skip: !keycloak,
-  });
+  // const { keycloak } = useKeycloak<KeycloakInstance>();
+  // const currentExpert = useAuthedQuery<
+  //   UsersWithExpertId,
+  //   UsersWithExpertIdVariables
+  // >(USERS_WITH_EXPERT_ID, {
+  //   variables: {
+  //     where: {
+  //       id: { _eq: keycloak?.subject },
+  //     },
+  //   },
+  //   skip: !keycloak,
+  // });
 
   const achievementRecordTypes = useAdminQuery<AchievementRecordTypes>(
     ACHIEVEMENT_RECORD_TYPES
@@ -198,7 +205,8 @@ const DashBoard: FC = () => {
     setProgramID: setCurrentProgramId,
     isAdmin: useIsAdmin(),
     isInstructor: useIsInstructor(),
-    userDetails: currentExpert.data ? currentExpert.data?.User[0] : undefined,
+    userProfile: profile,
+    userId,
   };
 
   return (
@@ -270,12 +278,12 @@ const Content: FC<IPropsContent> = ({ options }) => {
         <AchievementList options={options} />
         {showNewAchievementView && (
           <div className="flex bg-edu-light-gray py-5">
-            <AddEditAchievementOption
+            {/* <AddEditAchievementOption
               achievementRecordTypes={context.achievementRTypes}
               onSuccess={onSuccessAddEdit}
               course={context.course}
               userDetails={context.userDetails}
-            />
+            /> */}
           </div>
         )}
         {achievementOptions.length > 0 && (
@@ -438,12 +446,12 @@ const AchievementRow: FC<IPropsForARow> = (props) => {
         <tr>
           <td colSpan={3}>
             <div className="flex bg-edu-light-gray pt-5">
-              <AddEditAchievementOption
+              {/* <AddEditAchievementOption
                 achievementRecordTypes={context.achievementRTypes}
                 onSuccess={onSuccessAddEdit}
                 achievementOption={props.acop}
                 userDetails={context.userDetails}
-              />
+              /> */}
             </div>
           </td>
         </tr>

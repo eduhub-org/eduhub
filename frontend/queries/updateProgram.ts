@@ -65,7 +65,7 @@ export const UPDATE_PROGRAM_SHORT_TITLE = gql`
   }
 `;
 
-export const UPDATE_PARTICIPATION_TEMPLATE = gql`
+export const UPDATE_PARTICIPATION_CERTIFICATE_TEMPLATE = gql`
   mutation UpdateProgramParticipationTemplate(
     $programId: Int!
     $templatePath: String!
@@ -79,7 +79,7 @@ export const UPDATE_PARTICIPATION_TEMPLATE = gql`
   }
 `;
 
-export const UPDATE_ACHIEVEMENT_TEMPLATE = gql`
+export const UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE = gql`
   mutation UpdateProgramAchievementTemplate(
     $programId: Int!
     $templatePath: String!

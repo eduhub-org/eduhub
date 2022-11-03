@@ -13,33 +13,34 @@ import {
   MdOutlineCheckBoxOutlineBlank,
   MdUpload,
 } from "react-icons/md";
-import {
-  buildAchivementTemplatePath,
-  buildParticipationPath,
-  buildParticipationTemplatePath,
-  parseFileUploadEvent,
-} from "../../helpers/filehandling";
+import { parseFileUploadEvent } from "../../helpers/filehandling";
 import { useAdminMutation } from "../../hooks/authedMutation";
-import { SAVE_FILE } from "../../queries/actions";
 import {
-  UPDATE_ACHIEVEMENT_TEMPLATE,
-  UPDATE_PARTICIPATION_TEMPLATE,
+  SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
+  SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE,
+} from "../../queries/actions";
+import {
+  UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
+  UPDATE_PARTICIPATION_CERTIFICATE_TEMPLATE,
 } from "../../queries/updateProgram";
 import { ProgramList_Program } from "../../queries/__generated__/ProgramList";
 import {
-  SaveAFile,
-  SaveAFileVariables,
-} from "../../queries/__generated__/SaveAFile";
+  SaveAchievementCertificateTemplate,
+  SaveAchievementCertificateTemplateVariables,
+} from "../../queries/__generated__/SaveAchievementCertificateTemplate";
+import {
+  SaveParticipationCertificateTemplate,
+  SaveParticipationCertificateTemplateVariables,
+} from "../../queries/__generated__/SaveParticipationCertificateTemplate";
+
 import {
   UpdateProgramAchievementTemplate,
   UpdateProgramAchievementTemplateVariables,
 } from "../../queries/__generated__/UpdateProgramAchievementTemplate";
-import { UpdateProgramParticipationCertVisible } from "../../queries/__generated__/UpdateProgramParticipationCertVisible";
 import {
   UpdateProgramParticipationTemplate,
   UpdateProgramParticipationTemplateVariables,
 } from "../../queries/__generated__/UpdateProgramParticipationTemplate";
-import { UpdateProgramTitleVariables } from "../../queries/__generated__/UpdateProgramTitle";
 import EhDebounceInput from "../common/EhDebounceInput";
 
 interface ProgramsRowProps {
@@ -192,38 +193,47 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
     templateUploadInputRef.current?.click();
   }, [templateUploadInputRef]);
 
-  const [saveFile] = useAdminMutation<SaveAFile, SaveAFileVariables>(SAVE_FILE);
+  const [saveParticipationCertificateTemplate] = useAdminMutation<
+    SaveParticipationCertificateTemplate,
+    SaveParticipationCertificateTemplateVariables
+  >(SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE);
 
   const [updateParticipationTemplate] = useAdminMutation<
     UpdateProgramParticipationTemplate,
     UpdateProgramParticipationTemplateVariables
-  >(UPDATE_PARTICIPATION_TEMPLATE);
+  >(UPDATE_PARTICIPATION_CERTIFICATE_TEMPLATE);
 
   const handleTemplateParticipationUploadEvent = useCallback(
     async (event: any) => {
       const ufile = await parseFileUploadEvent(event);
 
       if (ufile != null) {
-        const url = buildParticipationTemplatePath(program.id, ufile.name);
-
-        await saveFile({
+        const respone = await saveParticipationCertificateTemplate({
           variables: {
-            base64file: ufile.data,
-            fileName: url,
-          },
-        });
-
-        await updateParticipationTemplate({
-          variables: {
+            base64File: ufile.data,
+            fileName: ufile.name,
             programId: program.id,
-            templatePath: url,
           },
         });
+        if (respone.data?.saveParticipationCertificateTemplate?.link) {
+          await updateParticipationTemplate({
+            variables: {
+              programId: program.id,
+              templatePath:
+                respone.data?.saveParticipationCertificateTemplate?.link,
+            },
+          });
 
-        qResult.refetch();
+          qResult.refetch();
+        }
       }
     },
-    [saveFile, qResult, updateParticipationTemplate, program]
+    [
+      saveParticipationCertificateTemplate,
+      qResult,
+      updateParticipationTemplate,
+      program,
+    ]
   );
 
   const templateAchivementUploadRef: MutableRefObject<any> = useRef(null);
@@ -231,35 +241,47 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
     templateAchivementUploadRef.current?.click();
   }, [templateAchivementUploadRef]);
 
-  const [updateAchievementTemplate] = useAdminMutation<
+  const [saveAchievementCertificateTemplate] = useAdminMutation<
+    SaveAchievementCertificateTemplate,
+    SaveAchievementCertificateTemplateVariables
+  >(SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE);
+
+  const [updateAchievementCertificationTemplate] = useAdminMutation<
     UpdateProgramAchievementTemplate,
     UpdateProgramAchievementTemplateVariables
-  >(UPDATE_ACHIEVEMENT_TEMPLATE);
+  >(UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE);
 
   const handleTemplateAchivementUploadEvent = useCallback(
     async (event: any) => {
       const ufile = await parseFileUploadEvent(event);
       if (ufile != null) {
-        const url = buildAchivementTemplatePath(program.id, ufile.name);
-
-        await saveFile({
+        const response = await saveAchievementCertificateTemplate({
           variables: {
-            base64file: ufile.data,
-            fileName: url,
-          },
-        });
-
-        await updateAchievementTemplate({
-          variables: {
+            base64File: ufile.data,
+            fileName: ufile.name,
             programId: program.id,
-            templatePath: url,
           },
         });
 
-        qResult.refetch();
+        if (response.data?.saveAchievementCertificateTemplate?.link) {
+          await updateAchievementCertificationTemplate({
+            variables: {
+              programId: program.id,
+              templatePath:
+                response.data?.saveAchievementCertificateTemplate?.link,
+            },
+          });
+
+          qResult.refetch();
+        }
       }
     },
-    [saveFile, qResult, updateAchievementTemplate, program]
+    [
+      saveAchievementCertificateTemplate,
+      qResult,
+      updateAchievementCertificationTemplate,
+      program,
+    ]
   );
 
   return (

@@ -1,20 +1,12 @@
 import { ChangeEvent, FC, useCallback, useRef } from "react";
 import { MdUploadFile } from "react-icons/md";
-import { parseFileUploadEvent } from "../../helpers/filehandling";
-import { useAdminMutation } from "../../hooks/authedMutation";
-import { SAVE_FILE } from "../../queries/actions";
-import {
-  SaveAFile,
-  SaveAFileVariables,
-} from "../../queries/__generated__/SaveAFile";
+import { parseFileUploadEvent, UploadFile } from "../../helpers/filehandling";
 
 export interface IPropsUpload {
   acceptedFileTypes?: string;
   allowMultipleFiles?: boolean;
   label: string;
-  onUploadComplete: (finalUrl: string, fileName: string) => void;
-  uploadFileName: string;
-  templatePath: string;
+  onFileChoosed: (file: UploadFile | null) => void;
 }
 
 export const UiFileInputButton: FC<IPropsUpload> = (props) => {
@@ -24,26 +16,13 @@ export const UiFileInputButton: FC<IPropsUpload> = (props) => {
   const onClickHandler = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
-  const [saveFile] = useAdminMutation<SaveAFile, SaveAFileVariables>(SAVE_FILE);
 
   const handleFileUploadToServer = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
       const ufile = await parseFileUploadEvent(event);
-
-      if (ufile != null) {
-        const url = [props.templatePath, ufile.name].join("/");
-
-        await saveFile({
-          variables: {
-            base64file: ufile.data,
-            fileName: url,
-          },
-        });
-
-        props.onUploadComplete(url, ufile.name);
-      }
+      props.onFileChoosed(ufile);
     },
-    [saveFile, props]
+    [props]
   );
 
   return (
@@ -59,7 +38,6 @@ export const UiFileInputButton: FC<IPropsUpload> = (props) => {
       <input
         accept={props.acceptedFileTypes}
         multiple={props.allowMultipleFiles}
-        name={props.uploadFileName}
         onChange={handleFileUploadToServer}
         ref={fileInputRef}
         style={{ display: "none" }}

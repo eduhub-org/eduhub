@@ -7,13 +7,13 @@
 // GraphQL query operation: LoadAFile
 // ====================================================
 
-export interface LoadAFile_loadFile {
+export interface LoadAFile_loadAchievementCertificate {
   __typename: "loadFileOutput";
   link: string;
 }
 
 export interface LoadAFile {
-  loadFile: LoadAFile_loadFile | null;
+  loadAchievementCertificate: LoadAFile_loadAchievementCertificate | null;
 }
 
 export interface LoadAFileVariables {

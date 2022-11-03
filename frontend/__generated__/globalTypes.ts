@@ -55,11 +55,13 @@ export enum AchievementOption_constraint {
  */
 export enum AchievementOption_update_column {
   created_at = "created_at",
+  csvTemplateUrl = "csvTemplateUrl",
   description = "description",
   documentationTemplateUrl = "documentationTemplateUrl",
   evaluationScriptUrl = "evaluationScriptUrl",
   id = "id",
   recordType = "recordType",
+  showScoreAuthors = "showScoreAuthors",
   title = "title",
   updated_at = "updated_at",
 }
@@ -135,12 +137,17 @@ export enum AchievementRecord_constraint {
  * update columns of table "AchievementRecord"
  */
 export enum AchievementRecord_update_column {
-  AchievementOptionId = "AchievementOptionId",
+  achievementOptionId = "achievementOptionId",
   coverImageUrl = "coverImageUrl",
+  created_at = "created_at",
+  csvResults = "csvResults",
   description = "description",
+  documentationUrl = "documentationUrl",
+  evaluationScriptUrl = "evaluationScriptUrl",
   id = "id",
   rating = "rating",
   score = "score",
+  updated_at = "updated_at",
   uploadUserId = "uploadUserId",
 }
 
@@ -1183,11 +1190,13 @@ export interface AchievementOption_bool_exp {
   _not?: AchievementOption_bool_exp | null;
   _or?: AchievementOption_bool_exp[] | null;
   created_at?: timestamptz_comparison_exp | null;
+  csvTemplateUrl?: String_comparison_exp | null;
   description?: String_comparison_exp | null;
   documentationTemplateUrl?: String_comparison_exp | null;
   evaluationScriptUrl?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   recordType?: AchievementRecordType_enum_comparison_exp | null;
+  showScoreAuthors?: Boolean_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
@@ -1201,11 +1210,13 @@ export interface AchievementOption_insert_input {
   AchievementRecordType?: AchievementRecordType_obj_rel_insert_input | null;
   AchievementRecords?: AchievementRecord_arr_rel_insert_input | null;
   created_at?: any | null;
+  csvTemplateUrl?: string | null;
   description?: string | null;
   documentationTemplateUrl?: string | null;
   evaluationScriptUrl?: string | null;
   id?: number | null;
   recordType?: AchievementRecordType_enum | null;
+  showScoreAuthors?: boolean | null;
   title?: string | null;
   updated_at?: any | null;
 }
@@ -1215,6 +1226,7 @@ export interface AchievementOption_insert_input {
  */
 export interface AchievementOption_max_order_by {
   created_at?: order_by | null;
+  csvTemplateUrl?: order_by | null;
   description?: order_by | null;
   documentationTemplateUrl?: order_by | null;
   evaluationScriptUrl?: order_by | null;
@@ -1228,6 +1240,7 @@ export interface AchievementOption_max_order_by {
  */
 export interface AchievementOption_min_order_by {
   created_at?: order_by | null;
+  csvTemplateUrl?: order_by | null;
   description?: order_by | null;
   documentationTemplateUrl?: order_by | null;
   evaluationScriptUrl?: order_by | null;
@@ -1262,11 +1275,13 @@ export interface AchievementOption_order_by {
   AchievementRecordType?: AchievementRecordType_order_by | null;
   AchievementRecords_aggregate?: AchievementRecord_aggregate_order_by | null;
   created_at?: order_by | null;
+  csvTemplateUrl?: order_by | null;
   description?: order_by | null;
   documentationTemplateUrl?: order_by | null;
   evaluationScriptUrl?: order_by | null;
   id?: order_by | null;
   recordType?: order_by | null;
+  showScoreAuthors?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
 }
@@ -1276,11 +1291,13 @@ export interface AchievementOption_order_by {
  */
 export interface AchievementOption_set_input {
   created_at?: any | null;
+  csvTemplateUrl?: string | null;
   description?: string | null;
   documentationTemplateUrl?: string | null;
   evaluationScriptUrl?: string | null;
   id?: number | null;
   recordType?: AchievementRecordType_enum | null;
+  showScoreAuthors?: boolean | null;
   title?: string | null;
   updated_at?: any | null;
 }
@@ -1641,7 +1658,7 @@ export interface AchievementRecord_arr_rel_insert_input {
  * order by avg() on columns of table "AchievementRecord"
  */
 export interface AchievementRecord_avg_order_by {
-  AchievementOptionId?: order_by | null;
+  achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
   uploadUserId?: order_by | null;
@@ -1652,17 +1669,22 @@ export interface AchievementRecord_avg_order_by {
  */
 export interface AchievementRecord_bool_exp {
   AchievementOption?: AchievementOption_bool_exp | null;
-  AchievementOptionId?: Int_comparison_exp | null;
   AchievementRecordAuthors?: AchievementRecordAuthor_bool_exp | null;
   AchievementRecordRating?: AchievementRecordRating_bool_exp | null;
   _and?: AchievementRecord_bool_exp[] | null;
   _not?: AchievementRecord_bool_exp | null;
   _or?: AchievementRecord_bool_exp[] | null;
+  achievementOptionId?: Int_comparison_exp | null;
   coverImageUrl?: String_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  csvResults?: String_comparison_exp | null;
   description?: String_comparison_exp | null;
+  documentationUrl?: String_comparison_exp | null;
+  evaluationScriptUrl?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   rating?: AchievementRecordRating_enum_comparison_exp | null;
   score?: numeric_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
   uploadUserId?: Int_comparison_exp | null;
 }
 
@@ -1671,14 +1693,19 @@ export interface AchievementRecord_bool_exp {
  */
 export interface AchievementRecord_insert_input {
   AchievementOption?: AchievementOption_obj_rel_insert_input | null;
-  AchievementOptionId?: number | null;
   AchievementRecordAuthors?: AchievementRecordAuthor_arr_rel_insert_input | null;
   AchievementRecordRating?: AchievementRecordRating_obj_rel_insert_input | null;
+  achievementOptionId?: number | null;
   coverImageUrl?: string | null;
+  created_at?: any | null;
+  csvResults?: string | null;
   description?: string | null;
+  documentationUrl?: string | null;
+  evaluationScriptUrl?: string | null;
   id?: number | null;
   rating?: AchievementRecordRating_enum | null;
   score?: any | null;
+  updated_at?: any | null;
   uploadUserId?: number | null;
 }
 
@@ -1686,11 +1713,16 @@ export interface AchievementRecord_insert_input {
  * order by max() on columns of table "AchievementRecord"
  */
 export interface AchievementRecord_max_order_by {
-  AchievementOptionId?: order_by | null;
+  achievementOptionId?: order_by | null;
   coverImageUrl?: order_by | null;
+  created_at?: order_by | null;
+  csvResults?: order_by | null;
   description?: order_by | null;
+  documentationUrl?: order_by | null;
+  evaluationScriptUrl?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
+  updated_at?: order_by | null;
   uploadUserId?: order_by | null;
 }
 
@@ -1698,11 +1730,16 @@ export interface AchievementRecord_max_order_by {
  * order by min() on columns of table "AchievementRecord"
  */
 export interface AchievementRecord_min_order_by {
-  AchievementOptionId?: order_by | null;
+  achievementOptionId?: order_by | null;
   coverImageUrl?: order_by | null;
+  created_at?: order_by | null;
+  csvResults?: order_by | null;
   description?: order_by | null;
+  documentationUrl?: order_by | null;
+  evaluationScriptUrl?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
+  updated_at?: order_by | null;
   uploadUserId?: order_by | null;
 }
 
@@ -1728,14 +1765,19 @@ export interface AchievementRecord_on_conflict {
  */
 export interface AchievementRecord_order_by {
   AchievementOption?: AchievementOption_order_by | null;
-  AchievementOptionId?: order_by | null;
   AchievementRecordAuthors_aggregate?: AchievementRecordAuthor_aggregate_order_by | null;
   AchievementRecordRating?: AchievementRecordRating_order_by | null;
+  achievementOptionId?: order_by | null;
   coverImageUrl?: order_by | null;
+  created_at?: order_by | null;
+  csvResults?: order_by | null;
   description?: order_by | null;
+  documentationUrl?: order_by | null;
+  evaluationScriptUrl?: order_by | null;
   id?: order_by | null;
   rating?: order_by | null;
   score?: order_by | null;
+  updated_at?: order_by | null;
   uploadUserId?: order_by | null;
 }
 
@@ -1743,12 +1785,17 @@ export interface AchievementRecord_order_by {
  * input type for updating data in table "AchievementRecord"
  */
 export interface AchievementRecord_set_input {
-  AchievementOptionId?: number | null;
+  achievementOptionId?: number | null;
   coverImageUrl?: string | null;
+  created_at?: any | null;
+  csvResults?: string | null;
   description?: string | null;
+  documentationUrl?: string | null;
+  evaluationScriptUrl?: string | null;
   id?: number | null;
   rating?: AchievementRecordRating_enum | null;
   score?: any | null;
+  updated_at?: any | null;
   uploadUserId?: number | null;
 }
 
@@ -1756,7 +1803,7 @@ export interface AchievementRecord_set_input {
  * order by stddev() on columns of table "AchievementRecord"
  */
 export interface AchievementRecord_stddev_order_by {
-  AchievementOptionId?: order_by | null;
+  achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
   uploadUserId?: order_by | null;
@@ -1766,7 +1813,7 @@ export interface AchievementRecord_stddev_order_by {
  * order by stddev_pop() on columns of table "AchievementRecord"
  */
 export interface AchievementRecord_stddev_pop_order_by {
-  AchievementOptionId?: order_by | null;
+  achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
   uploadUserId?: order_by | null;
@@ -1776,7 +1823,7 @@ export interface AchievementRecord_stddev_pop_order_by {
  * order by stddev_samp() on columns of table "AchievementRecord"
  */
 export interface AchievementRecord_stddev_samp_order_by {
-  AchievementOptionId?: order_by | null;
+  achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
   uploadUserId?: order_by | null;
@@ -1786,7 +1833,7 @@ export interface AchievementRecord_stddev_samp_order_by {
  * order by sum() on columns of table "AchievementRecord"
  */
 export interface AchievementRecord_sum_order_by {
-  AchievementOptionId?: order_by | null;
+  achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
   uploadUserId?: order_by | null;
@@ -1796,7 +1843,7 @@ export interface AchievementRecord_sum_order_by {
  * order by var_pop() on columns of table "AchievementRecord"
  */
 export interface AchievementRecord_var_pop_order_by {
-  AchievementOptionId?: order_by | null;
+  achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
   uploadUserId?: order_by | null;
@@ -1806,7 +1853,7 @@ export interface AchievementRecord_var_pop_order_by {
  * order by var_samp() on columns of table "AchievementRecord"
  */
 export interface AchievementRecord_var_samp_order_by {
-  AchievementOptionId?: order_by | null;
+  achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
   uploadUserId?: order_by | null;
@@ -1816,7 +1863,7 @@ export interface AchievementRecord_var_samp_order_by {
  * order by variance() on columns of table "AchievementRecord"
  */
 export interface AchievementRecord_variance_order_by {
-  AchievementOptionId?: order_by | null;
+  achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
   uploadUserId?: order_by | null;

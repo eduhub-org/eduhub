@@ -7,6 +7,7 @@ import {
 import {
   buildAchievementDocumentationTemplatePath,
   buildAchievementEvaluationScriptTemplatePath,
+  UploadFile,
 } from "../../helpers/filehandling";
 import { makeFullName } from "../../helpers/util";
 import { useAdminMutation } from "../../hooks/authedMutation";
@@ -58,6 +59,18 @@ import { UiFileInputButton } from "../common/UiFileInputButton";
 import CourseListDialog from "../courses/CoureListDialog";
 import EhTag from "../common/EhTag";
 import { UsersWithExpertId_User } from "../../queries/__generated__/UsersWithExpertId";
+import {
+  SaveAchievementOptionDocumentationTemplate,
+  SaveAchievementOptionDocumentationTemplateVariables,
+} from "../../queries/__generated__/SaveAchievementOptionDocumentationTemplate";
+import {
+  SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE,
+  SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT,
+} from "../../queries/actions";
+import {
+  SaveAchievementOptionEvaluationScript,
+  SaveAchievementOptionEvaluationScriptVariables,
+} from "../../queries/__generated__/SaveAchievementOptionEvaluationScript";
 
 /* #region Local intefaces */
 interface IProps {
@@ -175,6 +188,9 @@ const AddEditAchievementOption: FC<IProps> = (props) => {
   };
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  // Do  not need UI rerender for this constants
+  // let uploadFileDoc: UploadFile = null;
+  // let uploadFileDocCSV: UploadFile =
   /* #region Database Operations */
 
   const [insertAnAchievement] = useAdminMutation<
@@ -393,6 +409,58 @@ const AddEditAchievementOption: FC<IProps> = (props) => {
 
   /* #endregion */
 
+  /* #region Serverless functions */
+
+  const [uploadAchOptDocTempAPI] = useAdminMutation<
+    SaveAchievementOptionDocumentationTemplate,
+    SaveAchievementOptionDocumentationTemplateVariables
+  >(SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE);
+
+  const [uploadAchOptEvltnScriptAPI] = useAdminMutation<
+    SaveAchievementOptionEvaluationScript,
+    SaveAchievementOptionEvaluationScriptVariables
+  >(SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT);
+
+  /* #endregion */
+
+  /* #region Helper methods*/
+
+  const uploadAAchievementOptDocFile = async (
+    uFile: UploadFile,
+    courseId: number
+  ) => {
+    const response = await uploadAchOptDocTempAPI({
+      variables: {
+        base64File: uFile.data,
+        courseId,
+      },
+    });
+    if (response.errors) {
+      console.log(response.errors);
+      return null;
+    }
+
+    return response.data?.saveAchievementOptionDocumentationTemplate?.link;
+  };
+
+  const uploadAchievementOptEvalutionScript = async (
+    uFile: UploadFile,
+    courseId: number
+  ) => {
+    const response = await uploadAchOptEvltnScriptAPI({
+      variables: {
+        base64File: uFile.data,
+        courseId,
+      },
+    });
+    if (response.errors) {
+      return null;
+    }
+    return response.data?.saveAchievementOptionEvaluationScript?.link;
+  };
+
+  /* #endregion */
+
   /* #region callbacks */
   const showAddMentorDialog = useCallback(() => {
     dispatch({ key: "showMentorDialog", value: true });
@@ -435,38 +503,46 @@ const AddEditAchievementOption: FC<IProps> = (props) => {
     [dispatch, queryUpdateAchievementOptions]
   );
 
-  const documentationTamplateUrlUpload = useCallback(
-    async (uploadedUnderUrl: string, fileName: string) => {
-      await queryUpdateAchievementOptions({
-        key: "documentationTemplateUrl",
-        value: uploadedUnderUrl,
-      });
-      dispatch({ key: "documentationTemplateName", value: fileName });
-      dispatch({ key: "documentationTemplateUrl", value: uploadedUnderUrl });
+  const onChoosedAchievementOptionDocumentationTemplate = useCallback(
+    async (fileUpload: UploadFile | null) => {
+      if (fileUpload) {
+        dispatch({ key: "documentationTemplateName", value: fileUpload.name });
+        if (state.id) {
+          // We will directly upload and update the database
+        }
+
+        // dispatch({ key: "documentationTemplateUrl", value: uploadedUnderUrl });
+      }
     },
     [dispatch, queryUpdateAchievementOptions]
   );
 
-  const documentationTemplateCSVUrlUpload = useCallback(
-    async (uploadedUnderUrl: string, fileName: string) => {
-      await queryUpdateAchievementOptions({
-        key: "documentationTemplateUrl",
-        value: uploadedUnderUrl,
-      });
-      dispatch({ key: "documentationTemplateName", value: fileName });
-      dispatch({ key: "documentationTemplateUrl", value: uploadedUnderUrl });
+  const onChoosedAchievementOptionDocumentationTemplateForCSV = useCallback(
+    async (fileUpload: UploadFile | null) => {
+      if (fileUpload) {
+        dispatch({ key: "documentationTemplateName", value: fileUpload.name });
+        // await queryUpdateAchievementOptions({
+        //   key: "documentationTemplateUrl",
+        //   value: uploadedUnderUrl,
+        // });
+        // dispatch({ key: "documentationTemplateUrl", value: uploadedUnderUrl });
+      }
     },
     [dispatch, queryUpdateAchievementOptions]
   );
 
-  const evaluationScriptUrlUpload = useCallback(
-    async (uploadedUnderUrl: string, fileName: string) => {
-      await queryUpdateAchievementOptions({
-        key: "evaluationScriptUrl",
-        value: uploadedUnderUrl,
-      });
-      dispatch({ key: "evaluationScriptName", value: fileName });
-      dispatch({ key: "evaluationScriptUrl", value: uploadedUnderUrl });
+  const onChoosedEvaluationScriptFile = useCallback(
+    async (fileUpload: UploadFile | null) => {
+      if (fileUpload) {
+        dispatch({ key: "evaluationScriptName", value: fileUpload.name });
+        if (state.id) {
+        }
+        // await queryUpdateAchievementOptions({
+        //   key: "evaluationScriptUrl",
+        //   value: uploadedUnderUrl,
+        // });
+        // dispatch({ key: "evaluationScriptUrl", value: uploadedUnderUrl });
+      }
     },
     [dispatch, queryUpdateAchievementOptions]
   );
@@ -700,13 +776,11 @@ const AddEditAchievementOption: FC<IProps> = (props) => {
                 />
                 <div className="pt-6 pl-1">
                   <UiFileInputButton
-                    onUploadComplete={documentationTamplateUrlUpload}
                     label="Dokumentationsvorlage(.doc)*"
-                    uploadFileName="template.doc"
                     acceptedFileTypes=".doc"
-                    templatePath={buildAchievementDocumentationTemplatePath(
-                      state.id
-                    )}
+                    onFileChoosed={
+                      onChoosedAchievementOptionDocumentationTemplate
+                    }
                   />
                 </div>
               </div>
@@ -722,13 +796,11 @@ const AddEditAchievementOption: FC<IProps> = (props) => {
                   />
                   <div className="pt-6 pl-1">
                     <UiFileInputButton
-                      onUploadComplete={documentationTemplateCSVUrlUpload}
                       label="Dokumentationsvorlage CSV(.doc)"
-                      uploadFileName="template.doc"
                       acceptedFileTypes=".doc"
-                      templatePath={buildAchievementDocumentationTemplatePath(
-                        state.id
-                      )}
+                      onFileChoosed={
+                        onChoosedAchievementOptionDocumentationTemplateForCSV
+                      }
                     />
                   </div>
                 </div>
@@ -744,13 +816,9 @@ const AddEditAchievementOption: FC<IProps> = (props) => {
                       />
                       <div className="pt-6 pl-1">
                         <UiFileInputButton
-                          onUploadComplete={evaluationScriptUrlUpload}
                           label="Auswertungsskript"
-                          uploadFileName="evluation.py"
                           acceptedFileTypes=".py"
-                          templatePath={buildAchievementEvaluationScriptTemplatePath(
-                            state.id
-                          )}
+                          onFileChoosed={onChoosedEvaluationScriptFile}
                         />
                       </div>
                     </div>
