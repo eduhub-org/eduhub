@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: SessionSpeaker
+  schema: public
 object_relationships:
   - name: Expert
     using:
@@ -22,7 +22,6 @@ insert_permissions:
       columns:
         - expertId
         - sessionId
-      backend_only: false
 select_permissions:
   - role: anonymous
     permission:
@@ -51,6 +50,7 @@ update_permissions:
 delete_permissions:
   - role: instructor_access
     permission:
+      backend_only: false
       filter:
         Session:
           Course:

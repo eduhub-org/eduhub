@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: CourseInstructor
+  schema: public
 object_relationships:
   - name: Course
     using:
