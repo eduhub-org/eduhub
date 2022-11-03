@@ -83,8 +83,8 @@ module "hasura_service" {
 
   service_annotations = {
     "run.googleapis.com/client-name" = "terraform"
+    "run.googleapis.com/ingress"     = "all"
     #"run.googleapis.com/launch-stage" = "BETA"
-    #"run.googleapis.com/ingress"        = "internal-and-cloud-load-balancing"
     #"run.googleapis.com/ingress-status" = "internal-and-cloud-load-balancing"
   }
   template_annotations = {
