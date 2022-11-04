@@ -1,5 +1,5 @@
 name: Setup Staging Environment
-on:   
+on:
   push:
     # Run only on changes in the following branches
     branches:
@@ -21,16 +21,13 @@ env:
   PROJECT_ID: eduhub-staging-kc19
 
 jobs:
-
-  save-commit-sha:  
+  save-commit-sha:
     name: Save SHA of current commit in Terraform Cloud
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Check Out the Repository Branch
+      - name: Check Out the Repository Branch
         uses: actions/checkout@v2
-      -
-        name: Save commit SHA in Terraform Cloud variable
+      - name: Save commit SHA in Terraform Cloud variable
         run: |
           curl \
           --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
@@ -46,7 +43,7 @@ jobs:
       DOCKERFILE_FOLDER: keycloak
       IMAGE_NAME: keycloak
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID:  eduhub-staging-kc19
+      PROJECT_ID: eduhub-staging-kc19
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KC19_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -58,7 +55,7 @@ jobs:
       DOCKERFILE_FOLDER: backend
       IMAGE_NAME: backend
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID:  eduhub-staging-kc19 
+      PROJECT_ID: eduhub-staging-kc19
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KC19_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -70,9 +67,9 @@ jobs:
       DOCKERFILE_FOLDER: frontend
       IMAGE_NAME: frontend
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID:  eduhub-staging-kc19 
-      NEXT_PUBLIC_API_URL: 'https://hasura-staging-kc19.opencampus.sh/v1/graphql'
-      NEXT_PUBLIC_AUTH_URL: 'https://keycloak-staging-kc19.opencampus.sh'
+      PROJECT_ID: eduhub-staging-kc19
+      NEXT_PUBLIC_API_URL: "https://hasura-staging-kc19.opencampus.sh/v1/graphql"
+      NEXT_PUBLIC_AUTH_URL: "https://keycloak-staging-kc19.opencampus.sh"
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KC19_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -84,9 +81,9 @@ jobs:
       DOCKERFILE_FOLDER: rent-a-scientist
       IMAGE_NAME: rent-a-scientist
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID:  eduhub-staging-kc19 
-      NEXT_PUBLIC_API_URL: 'https://hasura-staging-kc19.opencampus.sh/v1/graphql'
-      NEXT_PUBLIC_AUTH_URL: 'https://keycloak-staging-kc19.opencampus.sh'
+      PROJECT_ID: eduhub-staging-kc19
+      NEXT_PUBLIC_API_URL: "https://hasura-staging-kc19.opencampus.sh/v1/graphql"
+      NEXT_PUBLIC_AUTH_URL: "https://keycloak-staging-kc19.opencampus.sh"
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KC19_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -95,23 +92,29 @@ jobs:
     name: Zip and Store Cloud Functions
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
     with:
-      PROJECT_ID:  eduhub-staging-kc19 
+      PROJECT_ID: eduhub-staging-kc19
       CLOUD_FUNCTION_FOLDER: functions
-      BUCKET_NAME:  eduhub-staging-kc19 
+      BUCKET_NAME: eduhub-staging-kc19
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KC19_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
-
   deploy-application:
     name: "Deploy Application Infrastructure"
-    needs: [build-keycloak, build-backend, build-frontend, build-rent-a-scientist-frontend, zip-and-store-cloud-functions, save-commit-sha]
+    needs:
+      [
+        build-keycloak,
+        build-backend,
+        build-frontend,
+        build-rent-a-scientist-frontend,
+        zip-and-store-cloud-functions,
+        save-commit-sha,
+      ]
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./infrastructure/application
     steps:
-
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -128,7 +131,7 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-      
+
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
@@ -144,5 +147,5 @@ jobs:
         run: exit 1
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/staging-kc19' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false
