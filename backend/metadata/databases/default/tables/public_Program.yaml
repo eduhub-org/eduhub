@@ -31,7 +31,7 @@ select_permissions:
         - id
         - lectureEnd
         - lectureStart
-        - projectRecordUploadDeadline
+        - achievementRecordUploadDeadline
         - shortTitle
         - title
         - visibility
@@ -45,7 +45,7 @@ select_permissions:
         - lectureEnd
         - applicationStart
         - defaultApplicationEnd
-        - projectRecordUploadDeadline
+        - achievementRecordUploadDeadline
         - visibility
         - startQuestionnaire
         - speakerQuestionnaire

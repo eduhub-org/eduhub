@@ -62,10 +62,9 @@ select_permissions:
                           _eq: X-Hasura-User-Id
           - AchievementOption:
               AchievementOptionMentors:
-                Expert:
-                  User:
-                    id:
-                      _eq: X-Hasura-User-Id
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
   - role: user_access
     permission:
       columns:
@@ -100,8 +99,7 @@ update_permissions:
                           _eq: X-Hasura-User-Id
           - AchievementOption:
               AchievementOptionMentors:
-                Expert:
-                  User:
-                    id:
-                      _eq: X-Hasura-User-Id
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
       check: {}
