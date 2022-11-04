@@ -145,6 +145,14 @@ module "hasura_service" {
       value = google_cloudfunctions2_function.load_achievement_record_documentation.service_config[0].uri
     },
     {
+      name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT"
+      value = google_cloudfunctions2_function.load_achievement_option_evaluation_script.service_config[0].uri
+    },
+    {
+      name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE"
+      value = google_cloudfunctions2_function.load_achievement_option_documentation_template.service_config[0].uri
+    },
+    {
       name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE"
       value = google_cloudfunctions2_function.save_achievement_certificate_template.service_config[0].uri
     },
@@ -171,6 +179,14 @@ module "hasura_service" {
     {
       name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION"
       value = google_cloudfunctions2_function.save_achievement_record_documentation.service_config[0].uri
+    },
+    {
+      name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT"
+      value = google_cloudfunctions2_function.save_achievement_option_evaluation_script.service_config[0].uri
+    },
+    {
+      name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE"
+      value = google_cloudfunctions2_function.save_achievement_option_documentation_template.service_config[0].uri
     },
     {
       name  = "CLOUD_FUNCTION_LINK_SAVE_COURSE_IMAGE"
