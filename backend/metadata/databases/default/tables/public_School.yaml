@@ -1,14 +1,14 @@
 table:
-  schema: public
   name: School
+  schema: public
 array_relationships:
   - name: SchoolClasses
     using:
       foreign_key_constraint_on:
         column: schoolId
         table:
-          schema: public
           name: SchoolClass
+          schema: public
 select_permissions:
   - role: anonymous
     permission:

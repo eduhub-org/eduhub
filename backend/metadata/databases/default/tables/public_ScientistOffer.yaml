@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: ScientistOffer
+  schema: public
 object_relationships:
   - name: Program
     using:
@@ -11,15 +11,15 @@ array_relationships:
       foreign_key_constraint_on:
         column: offerId
         table:
-          schema: public
           name: SchoolClassRequest
+          schema: public
   - name: ScientistOfferRelations
     using:
       foreign_key_constraint_on:
         column: offerId
         table:
-          schema: public
           name: ScientistOfferRelation
+          schema: public
 select_permissions:
   - role: anonymous
     permission:

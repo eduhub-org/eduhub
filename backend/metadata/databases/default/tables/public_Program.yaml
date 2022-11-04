@@ -1,28 +1,28 @@
 table:
-  schema: public
   name: Program
+  schema: public
 array_relationships:
   - name: Courses
     using:
       foreign_key_constraint_on:
         column: programId
         table:
-          schema: public
           name: Course
+          schema: public
   - name: RentAScientistConfigs
     using:
       foreign_key_constraint_on:
         column: program_id
         table:
-          schema: public
           name: RentAScientistConfig
+          schema: public
   - name: ScientistOffers
     using:
       foreign_key_constraint_on:
         column: programId
         table:
-          schema: public
           name: ScientistOffer
+          schema: public
 select_permissions:
   - role: anonymous
     permission:
@@ -31,7 +31,7 @@ select_permissions:
         - id
         - lectureEnd
         - lectureStart
-        - projectRecordUploadDeadline
+        - achievementRecordUploadDeadline
         - shortTitle
         - title
         - visibility
@@ -45,7 +45,7 @@ select_permissions:
         - lectureEnd
         - applicationStart
         - defaultApplicationEnd
-        - projectRecordUploadDeadline
+        - achievementRecordUploadDeadline
         - visibility
         - startQuestionnaire
         - speakerQuestionnaire

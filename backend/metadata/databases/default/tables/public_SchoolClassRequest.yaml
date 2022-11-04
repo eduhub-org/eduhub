@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: SchoolClassRequest
+  schema: public
 object_relationships:
   - name: SchoolClass
     using:
@@ -30,7 +30,6 @@ insert_permissions:
         - offerId
         - commentGeneral
         - commentTime
-      backend_only: false
 select_permissions:
   - role: anonymous
     permission:
@@ -78,6 +77,7 @@ update_permissions:
 delete_permissions:
   - role: user_access
     permission:
+      backend_only: false
       filter:
         SchoolClass:
           Teacher:

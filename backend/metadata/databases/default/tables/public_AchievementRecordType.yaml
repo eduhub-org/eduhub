@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: AchievementRecordType
+  schema: public
 is_enum: true
 array_relationships:
   - name: AchievementOptions
@@ -8,8 +8,8 @@ array_relationships:
       foreign_key_constraint_on:
         column: recordType
         table:
-          schema: public
           name: AchievementOption
+          schema: public
 select_permissions:
   - role: anonymous
     permission:

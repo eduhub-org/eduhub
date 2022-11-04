@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: CourseEnrollment
+  schema: public
 object_relationships:
   - name: Course
     using:
@@ -23,7 +23,6 @@ insert_permissions:
         - motivationLetter
         - status
         - userId
-      backend_only: false
 select_permissions:
   - role: instructor_access
     permission:

@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: RentAScientistConfig
+  schema: public
 object_relationships:
   - name: Program
     using:
