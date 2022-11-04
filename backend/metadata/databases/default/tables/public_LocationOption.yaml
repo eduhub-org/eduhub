@@ -1,17 +1,17 @@
 table:
-  schema: public
   name: LocationOption
+  schema: public
 is_enum: true
 array_relationships:
   - name: Locations
     using:
       manual_configuration:
-        remote_table:
-          schema: public
-          name: CourseLocation
-        insertion_order: null
         column_mapping:
           value: locationOption
+        insertion_order: null
+        remote_table:
+          name: CourseLocation
+          schema: public
 select_permissions:
   - role: anonymous
     permission:

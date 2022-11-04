@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: SchoolClass
+  schema: public
 object_relationships:
   - name: School
     using:
@@ -14,8 +14,8 @@ array_relationships:
       foreign_key_constraint_on:
         column: classId
         table:
-          schema: public
           name: SchoolClassRequest
+          schema: public
 insert_permissions:
   - role: user_access
     permission:
@@ -32,7 +32,6 @@ insert_permissions:
         - schoolId
         - studensCount
         - teacherId
-      backend_only: false
 select_permissions:
   - role: user_access
     permission:
@@ -70,6 +69,7 @@ update_permissions:
 delete_permissions:
   - role: user_access
     permission:
+      backend_only: false
       filter:
         Teacher:
           User:

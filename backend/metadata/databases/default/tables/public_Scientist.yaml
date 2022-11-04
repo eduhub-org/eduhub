@@ -1,14 +1,14 @@
 table:
-  schema: public
   name: Scientist
+  schema: public
 array_relationships:
   - name: ScientistOfferRelations
     using:
       foreign_key_constraint_on:
         column: scientistId
         table:
-          schema: public
           name: ScientistOfferRelation
+          schema: public
 select_permissions:
   - role: anonymous
     permission:

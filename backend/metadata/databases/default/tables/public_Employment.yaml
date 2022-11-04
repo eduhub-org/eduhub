@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: Employment
+  schema: public
 is_enum: true
 array_relationships:
   - name: Users
@@ -8,8 +8,8 @@ array_relationships:
       foreign_key_constraint_on:
         column: employment
         table:
-          schema: public
           name: User
+          schema: public
 select_permissions:
   - role: anonymous
     permission:
