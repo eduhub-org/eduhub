@@ -52,10 +52,20 @@ export const UPDATE_AN_ACHIEVEMENT_OPTION_COURSE = gql`
   }
 `;
 
-export const DELETE_AN_ACHIEVEMENT_OPTION_COURSE = gql`
+export const DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK = gql`
   mutation DeleteAnAchievementOptionCourse($id: Int!) {
     delete_AchievementOptionCourse_by_pk(id: $id) {
       id
+    }
+  }
+`;
+
+export const DELETE_AN_ACHIEVEMENT_OPTION_COURSE = gql`
+  mutation DeleteAnAchievementOptionCourseWithWhere(
+    $where: AchievementOptionCourse_bool_exp! = {}
+  ) {
+    delete_AchievementOptionCourse(where: $where) {
+      affected_rows
     }
   }
 `;
@@ -86,10 +96,20 @@ export const UPDATE_AN_ACHIEVEMENT_OPTION_MENTOR = gql`
   }
 `;
 
-export const DELETE_AN_ACHIEVEMENT_OPTION_MENTOR = gql`
+export const DELETE_AN_ACHIEVEMENT_OPTION_MENTOR_BY_PK = gql`
   mutation DeleteAnAchievementOptionMentor($id: Int!) {
     delete_AchievementOptionMentor_by_pk(id: $id) {
       id
+    }
+  }
+`;
+
+export const DELETE_AN_ACHIEVEMENT_OPTION_MENTOR = gql`
+  mutation DeleteAnAchievementOptionMentorWithWhere(
+    $where: AchievementOptionMentor_bool_exp! = {}
+  ) {
+    delete_AchievementOptionMentor(where: $where) {
+      affected_rows
     }
   }
 `;

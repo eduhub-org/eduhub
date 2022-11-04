@@ -254,6 +254,10 @@ const Content: FC = () => {
     [state, dispatch]
   );
 
+  const makeAuthorListVisible = useCallback(() => {
+    setVisibleAuthorList(true);
+  }, [setVisibleAuthorList]);
+
   const save = useCallback(() => {
     console.log("save");
   }, []);
@@ -332,7 +336,7 @@ const Content: FC = () => {
                 <div className="items-center pt-1 pr-3">
                   <MdAddCircleOutline
                     className="cursor-pointer"
-                    onClick={() => setVisibleAuthorList(true)}
+                    onClick={makeAuthorListVisible}
                     size="1.4em"
                   />
                 </div>

@@ -1,6 +1,6 @@
 import { ChangeEvent, FC, useCallback, useRef } from "react";
 import { MdUploadFile } from "react-icons/md";
-import { parseFileUploadEvent, UploadFile } from "../../helpers/filehandling";
+import { UploadFile, parseFileUploadEvent } from "../../helpers/filehandling";
 
 export interface IPropsUpload {
   acceptedFileTypes?: string;

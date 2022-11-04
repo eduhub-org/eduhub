@@ -1,7 +1,7 @@
 import { FC, useCallback } from "react";
 
 export interface TagElement {
-  id: number;
+  id: number | undefined;
   display: string;
 }
 
@@ -12,7 +12,7 @@ interface IProps {
 
 const EhTag: FC<IProps> = ({ tag, requestDeleteTag }) => {
   const handleDelete = useCallback(() => {
-    if (requestDeleteTag) requestDeleteTag(tag.id);
+    if (requestDeleteTag && tag.id) requestDeleteTag(tag.id);
   }, [tag, requestDeleteTag]);
 
   return (
@@ -22,7 +22,7 @@ const EhTag: FC<IProps> = ({ tag, requestDeleteTag }) => {
       key={tag.id}
     >
       <p className="truncate">{tag.display}</p>
-      {requestDeleteTag && (
+      {requestDeleteTag && tag.id && (
         <div
           onClick={handleDelete}
           className="text-white cursor-pointer text-center ml-2"

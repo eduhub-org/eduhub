@@ -1,106 +1,120 @@
-import { Checkbox } from "@material-ui/core";
-import { FC, useCallback, useContext, useReducer } from "react";
-import { MdAddCircle } from "react-icons/md";
+import { FC, useCallback, useContext } from "react";
 import { useAdminMutation } from "../../hooks/authedMutation";
-import { AchievementContext } from "../../pages/achievements";
+import { UploadFileTypes } from "../../helpers/achievement";
 import { INSERT_AN_ACHIEVEMENT_OPTION } from "../../queries/mutateAchievement";
-import { InsertAnAchievementOption, InsertAnAchievementOptionVariables } from "../../queries/__generated__/InsertAnAchievementOption";
-import { AchievementOption_set_input, AchievementRecordType_enum } from "../../__generated__/globalTypes";
-import { Button } from "../common/Button";
-import ExpertsDialog from "../common/dialogs/ExpertsDialog";
-import EhInputWithTitle from "../common/EhInputWithTitle";
-import EhSelectForEnum from "../common/EhSelectForEnum";
-import TagWithTwoText from "../common/TagWithTwoText";
-import { UiFileInputButton } from "../common/UiFileInputButton";
-import { IAddEditAchievementTempData } from "./AddEditComponent";
-
-interface TempAchievementOptionMentor {
-  id: number; // Table ID of AchievementOptionMentor
-  expertId: number;
-  firstName: string;
-  lastName: string;
-}
-interface TempAchievementOptionCourse {
-  id: number; // Table ID of AchievementOptionCourse
-  courseId: number;
-  title: string;
-  programShortName: string;
-}
-export interface IData extends AchievementOption_set_input {
-  showMentorDialog: boolean;
-  showCourseListDialog: boolean;
-  documentationTemplateName: string;
-  evaluationScriptName: string;
-  experts: TempAchievementOptionMentor[];
-  courses: TempAchievementOptionCourse[];
-}
+import {
+  InsertAnAchievementOption,
+  InsertAnAchievementOptionVariables,
+} from "../../queries/__generated__/InsertAnAchievementOption";
+import { AchievementRecordType_enum } from "../../__generated__/globalTypes";
+import { AchievementContext } from "./AchievementOptionDashboard";
+import AddEditAchievementOptionComponent, {
+  IDataToManipulate,
+  TempAchievementOptionCourse,
+  TempAchievementOptionMentor,
+} from "./AddEditAchievementOptionComponent";
 
 interface IProps {
-  initialState: IData;
+  onSuccess: (success: boolean) => void;
 }
 
-const AddAchievemenOption: FC<IProps> = ({ initialState }) => {
+const AddAchievemenOption: FC<IProps> = ({ onSuccess }) => {
+  const context = useContext(AchievementContext);
+  const profile = context.userProfile;
+  /* #region Database and ServerLess Fuctions Declarations */
   const [insertAnAchievement] = useAdminMutation<
     InsertAnAchievementOption,
     InsertAnAchievementOptionVariables
   >(INSERT_AN_ACHIEVEMENT_OPTION);
+  /* #endregion */
 
-//   const queryInsertANewAchievementOption = useCallback(async () => {
-//     try {
-//       const response = await insertAnAchievement({
-//         variables: {
-//           data: {
-//             title: state.title,
-//             description: state.description,
-//             /**
-//              * While inserting now evaluationScriptUrl file will be uploaded. Since this field is mandatory, I have to add this file as empty string.
-//              * The reason for not uploading the file is we do not have "archiveOptionId" to make the url "<archiveOptionId>/evaluation_script/file-name"
-//              */
-//             evaluationScriptUrl: state.evaluationScriptUrl,
-//             /**
-//              * While inserting now documentationTemplateUrl file will be uploaded. Since this field is "mandatory", I have to add this file as empty string.
-//              * The reason for not uploading the file is we do not have "archiveOptionId" to make the url "<archiveOptionId>/documentation_template/file-name"
-//              */
-//             documentationTemplateUrl: state.documentationTemplateUrl,
-//             recordType: state.recordType as AchievementRecordType_enum,
-//             AchievementOptionCourses: {
-//               data: state.courses.map((c) => ({ courseId: c.courseId })),
-//             },
-//             AchievementOptionMentors: {
-//               data: state.experts.map((e) => ({ expertId: e.expertId })),
-//             },
-//           },
-//         },
-//       });
+  const onSave = useCallback(
+    async (data: IDataToManipulate) => {
+      try {
+        const response = await insertAnAchievement({
+          variables: {
+            data: {
+              title: data.title,
+              description: data.description,
+              evaluationScriptUrl: "", // This field is also mendatory while insert
+              documentationTemplateUrl: "", // This field is also mendatory while insert
+              recordType: data.recordType as AchievementRecordType_enum,
+              AchievementOptionCourses: {
+                data: data.courses.map((c) => ({ courseId: c.courseId })),
+              },
+              AchievementOptionMentors: {
+                data: data.experts.map((e) => ({ expertId: e.userId })), // We need to change this field
+              },
+            },
+          },
+        });
 
-//       if (response.errors) {
-//         console.log("Adding failed!");
-//         if (props.onSuccess) props.onSuccess(false);
-//       } else {
-//         if (props.onSuccess) {
-//           props.onSuccess(true);
-//           return true;
-//         }
-//       }
-//     } catch (error) {
-//       console.log(error);
-//     }
-//     return false;
-//   }, [state, props, insertAnAchievement]);
+        if (
+          !response.errors &&
+          response.data?.insert_AchievementOption_one?.id
+        ) {
+          const id = response.data.insert_AchievementOption_one.id;
+          if (
+            data.documentTemplateFile &&
+            data.documentTemplateFile.data &&
+            data.documentTemplateFile.data.trim().length > 0
+          ) {
+            await context.uploadFile(
+              data.documentTemplateFile,
+              id,
+              UploadFileTypes.SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE
+            );
+          }
 
+          if (
+            data.evalutionScriptFile &&
+            data.evalutionScriptFile.data &&
+            data.evalutionScriptFile.data.trim().length > 0
+          ) {
+            await context.uploadFile(
+              data.evalutionScriptFile,
+              id,
+              UploadFileTypes.SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT
+            );
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
 
+      onSuccess(true);
+    },
+    [onSuccess, context, insertAnAchievement]
+  );
 
-
-  const context = useContext(AchievementContext);
-
-  const data: IAddEditAchievementTempData = {
-    initialState: {
-       
-    } 
-
-  }
+  const data: IDataToManipulate = {
+    achievementOptionId: null,
+    title: null,
+    description: null,
+    documentationTemplateUrl: null,
+    evaluationScriptUrl: null,
+    recordType: context.achievementRTypes[0] as AchievementRecordType_enum,
+    experts: profile
+      ? new Array({
+          userId: 364, // will be deleted later
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+        } as TempAchievementOptionMentor)
+      : [],
+    courses: context.course
+      ? new Array({
+          courseId: context.course.id,
+          id: context.course.id,
+          title: context.course.title,
+          programShortName: context.course.Program?.shortTitle,
+        } as TempAchievementOptionCourse)
+      : [],
+  };
   return (
-    
+    <AddEditAchievementOptionComponent
+      defaultData={data}
+      onSaveCallBack={onSave}
+    />
   );
 };
 

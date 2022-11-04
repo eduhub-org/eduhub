@@ -1,4 +1,3 @@
-import { Button } from "@material-ui/core";
 import { FC, useCallback, useContext, useReducer, useState } from "react";
 import {
   MdAddCircle,
@@ -7,10 +6,11 @@ import {
 } from "react-icons/md";
 import { UploadFile } from "../../helpers/filehandling";
 import { makeFullName } from "../../helpers/util";
-import { AchievementContext } from "../../pages/achievements";
+import { AchievementKeys, IPayload } from "../../helpers/achievement";
 import { AdminCourseList_Course } from "../../queries/__generated__/AdminCourseList";
 import { ExpertList_Expert } from "../../queries/__generated__/ExpertList";
-import { AchievementOption_set_input } from "../../__generated__/globalTypes";
+import { AchievementRecordType_enum } from "../../__generated__/globalTypes";
+import { Button } from "../common/Button";
 import ExpertsDialog from "../common/dialogs/ExpertsDialog";
 import EhInputWithTitle from "../common/EhInputWithTitle";
 import EhSelectForEnum from "../common/EhSelectForEnum";
@@ -18,47 +18,56 @@ import EhTag from "../common/EhTag";
 import TagWithTwoText from "../common/TagWithTwoText";
 import { UiFileInputButton } from "../common/UiFileInputButton";
 import CourseListDialog from "../courses/CoureListDialog";
+import { AchievementContext } from "./AchievementOptionDashboard";
 
-interface TempAchievementOptionMentor {
-  id: number; // Table ID of AchievementOptionMentor
-  expertId: number;
+export interface TempAchievementOptionMentor {
+  userId: number; // Table ID of Expert
   firstName: string;
   lastName: string;
 }
-interface TempAchievementOptionCourse {
-  id: number; // Table ID of AchievementOptionCourse
-  courseId: number;
+export interface TempAchievementOptionCourse {
+  courseId?: number; // Table ID of Course
   title: string;
   programShortName: string;
 }
-interface IData extends AchievementOption_set_input {
+export interface IDataToManipulate {
+  achievementOptionId: number | null;
+  description: string | null;
+  documentationTemplateUrl: string | null;
+  evaluationScriptUrl: string | null;
+  recordType: AchievementRecordType_enum | null;
+  title: string | null;
   experts: TempAchievementOptionMentor[];
   courses: TempAchievementOptionCourse[];
+  documentTemplateFile?: UploadFile;
+  evalutionScriptFile?: UploadFile;
 }
 
-interface IPayload {
-  key: string;
-  value: any;
-}
-
-interface IState extends IData {
+interface IState extends IDataToManipulate {
   showMentorDialog: boolean;
   showCourseListDialog: boolean;
   documentationTemplateName: string;
   evaluationScriptName: string;
 }
 interface IPropsAddEditAchievementTempData {
-  defaultData: IData;
-  onSaveCallBack?: (data: IData) => void;
-  onPropertyChanged?: (property: IPayload) => Promise<boolean>;
-  addAchievementMentorHandler?: (user: ExpertList_Expert) => void;
-  onAddCourseHandler?: (course: AdminCourseList_Course) => void;
-  onDeleteAMentor?: (tableIDOfAchievementOptionMentor: number) => void;
-  onDeleteACourse?: (tableIDOfAchievementOptionCourse: number) => void;
-  queryAddAchievementOptionCourse?: (courseId: number) => Promise<number>;
+  defaultData: IDataToManipulate;
+
+  /**
+   *  Mendatory if you want to add a new achievement option
+   */
+  onSaveCallBack?: (data: IDataToManipulate) => void;
+
+  /**
+   * Mendatory field if you want to Edit an Achievement option
+   */
+  onPropertyChanged?: (id: number, property: IPayload) => Promise<number>;
 }
 
-const AddEditComponent: FC<IPropsAddEditAchievementTempData> = (props) => {
+const AddEditAchievementOptionComponent: FC<IPropsAddEditAchievementTempData> = (
+  props
+) => {
+  const context = useContext(AchievementContext);
+
   const initialState: IState = {
     ...props.defaultData,
     showMentorDialog: false,
@@ -92,21 +101,24 @@ const AddEditComponent: FC<IPropsAddEditAchievementTempData> = (props) => {
 
   const onChangeTitle = useCallback(
     async (value: string) => {
-      //   await queryUpdateAchievementOptions({ key: "title", value });
       const newPayLoad = { key: "title", value };
       dispatch(newPayLoad);
-      if (props.onPropertyChanged) props.onPropertyChanged(newPayLoad);
+      if (props.onPropertyChanged && state.achievementOptionId) {
+        await props.onPropertyChanged(state.achievementOptionId, newPayLoad);
+      }
     },
-    [dispatch]
+    [dispatch, props, state.achievementOptionId]
   );
 
   const onChangeDescription = useCallback(
     async (value: string) => {
-      const newPayLoad = { key: "description", value };
+      const newPayLoad = { key: AchievementKeys.DESCRIPTION, value };
       dispatch(newPayLoad);
-      if (props.onPropertyChanged) props.onPropertyChanged(newPayLoad);
+      if (props.onPropertyChanged && state.achievementOptionId) {
+        await props.onPropertyChanged(state.achievementOptionId, newPayLoad);
+      }
     },
-    [dispatch]
+    [dispatch, props, state.achievementOptionId]
   );
 
   const checkBoxBottom = useCallback(async (result: ChangeResult) => {
@@ -115,77 +127,102 @@ const AddEditComponent: FC<IPropsAddEditAchievementTempData> = (props) => {
 
   const onRecordTypeChanged = useCallback(
     async (value: string) => {
-      const newPayLoad = { key: "recordType", value };
-      dispatch({ key: "documentationTemplateName", value: "" });
+      const newPayLoad = { key: AchievementKeys.RECORD_TYPE, value };
       dispatch(newPayLoad);
-      if (props.onPropertyChanged) await props.onPropertyChanged(newPayLoad);
+      if (props.onPropertyChanged && state.achievementOptionId) {
+        await props.onPropertyChanged(state.achievementOptionId, newPayLoad);
+      } // While editing
     },
-    [dispatch]
+    [dispatch, props, state.achievementOptionId]
   );
 
   const onChoosedAchievementOptionDocumentationTemplate = useCallback(
     async (fileUpload: UploadFile | null) => {
       if (fileUpload) {
         dispatch({ key: "documentationTemplateName", value: fileUpload.name });
-        if (props.onPropertyChanged)
-          props.onPropertyChanged({
-            key: "documentTemplateFile",
+        if (props.onPropertyChanged && state.achievementOptionId) {
+          // While editing
+          await props.onPropertyChanged(state.achievementOptionId, {
+            key: AchievementKeys.DOCUMENT_TEMPLATE_FILE,
             value: fileUpload,
           });
+        } else {
+          dispatch({
+            key: AchievementKeys.DOCUMENT_TEMPLATE_FILE,
+            value: fileUpload,
+          });
+        }
       }
     },
-    [dispatch, props]
+    [dispatch, props, state.achievementOptionId]
   );
 
   const onChoosedAchievementOptionDocumentationTemplateForCSV = useCallback(
     async (fileUpload: UploadFile | null) => {
       if (fileUpload) {
         dispatch({ key: "documentationTemplateName", value: fileUpload.name });
-        if (props.onPropertyChanged)
-          props.onPropertyChanged({
-            key: "documentTemplateFileCSV",
+        if (props.onPropertyChanged && state.achievementOptionId) {
+          // While editing
+          await props.onPropertyChanged(state.achievementOptionId, {
+            key: AchievementKeys.DOCUMENT_TEMPLATE_FILE,
             value: fileUpload,
           });
+        } else {
+          dispatch({
+            key: AchievementKeys.DOCUMENT_TEMPLATE_FILE,
+            value: fileUpload,
+          });
+        }
       }
     },
-    [dispatch, props]
+    [dispatch, props, state.achievementOptionId]
   );
 
   const onChoosedEvaluationScriptFile = useCallback(
     async (fileUpload: UploadFile | null) => {
       if (fileUpload) {
         dispatch({ key: "evaluationScriptName", value: fileUpload.name });
-        if (props.onPropertyChanged)
-          props.onPropertyChanged({
-            key: "evalutionScriptFile",
+        if (props.onPropertyChanged && state.achievementOptionId) {
+          await props.onPropertyChanged(state.achievementOptionId, {
+            key: AchievementKeys.EVALUTION_SCRIPT_FILE,
             value: fileUpload,
           });
+        } else {
+          dispatch({
+            key: AchievementKeys.EVALUTION_SCRIPT_FILE,
+            value: fileUpload,
+          });
+        }
       }
     },
-    [dispatch, props]
+    [dispatch, props, state.achievementOptionId]
   );
 
   const addAchievementMentorHandler = useCallback(
-    async (confirmed: boolean, user: ExpertList_Expert | null) => {
-      if (user && !state.experts.find((u) => u.expertId === user.id)) {
-        let response = !props.onPropertyChanged
-          ? true
-          : await props.onPropertyChanged({
-              key: "addAMentor",
-              value: user.id, // expert ID
-            });
-        if (response) {
-          const newMentor: TempAchievementOptionMentor = {
-            id: user.id,
-            expertId: user.id,
-            firstName: user.User.firstName,
-            lastName: user.User.lastName,
-          };
-          dispatch({
-            key: "experts",
-            value: [...state.experts, newMentor],
-          });
+    async (confirmed: boolean, expert: ExpertList_Expert | null) => {
+      if (expert && !state.experts.find((u) => u.userId === expert.id)) {
+        if (state.achievementOptionId && props.onPropertyChanged) {
+          // Update in Database first
+          const response = await props.onPropertyChanged(
+            state.achievementOptionId,
+            {
+              key: AchievementKeys.ADD_A_MENTOR,
+              value: expert.id,
+            }
+          );
+          if (response <= 0) {
+            return;
+          }
         }
+        const newMentor: TempAchievementOptionMentor = {
+          userId: expert.id,
+          firstName: expert.User.firstName,
+          lastName: expert.User.lastName,
+        };
+        dispatch({
+          key: "experts",
+          value: [...state.experts, newMentor],
+        });
       }
       dispatch({ key: "showMentorDialog", value: false });
     },
@@ -196,25 +233,25 @@ const AddEditComponent: FC<IPropsAddEditAchievementTempData> = (props) => {
     async (confirm: boolean, course: AdminCourseList_Course | null) => {
       // course.id is courseID, since it is from the table Course
       if (course && !state.courses.find((c) => c.courseId === course.id)) {
-        let response = !props.onPropertyChanged
-          ? true
-          : await props.onPropertyChanged({
-              key: "addACourse",
+        if (state.achievementOptionId && props.onPropertyChanged) {
+          const newTableId = await props.onPropertyChanged(
+            state.achievementOptionId,
+            {
+              key: AchievementKeys.ADD_A_COURSE,
               value: course.id,
-            });
-
-        if (response) {
-          const newCourse: TempAchievementOptionCourse = {
-            id: course.id,
-            courseId: course.id,
-            programShortName: course.Program?.shortTitle ?? "",
-            title: course.title,
-          };
-          dispatch({
-            key: "courses",
-            value: [...state.courses, newCourse],
-          });
+            }
+          );
+          if (newTableId <= 0) return;
         }
+        const newCourse: TempAchievementOptionCourse = {
+          courseId: course.id,
+          programShortName: course.Program?.shortTitle ?? "",
+          title: course.title,
+        };
+        dispatch({
+          key: "courses",
+          value: [...state.courses, newCourse],
+        });
       }
       dispatch({ key: "showCourseListDialog", value: false });
     },
@@ -222,54 +259,51 @@ const AddEditComponent: FC<IPropsAddEditAchievementTempData> = (props) => {
   );
 
   const onDeleteAMentor = useCallback(
-    async (tableIDOfAchievementOptionMentor: number) => {
-      if (
-        state.experts.find((u) => u.id === tableIDOfAchievementOptionMentor)
-      ) {
-        const success = !props.onPropertyChanged
-          ? true
-          : await props.onPropertyChanged({
-              key: "deleteAMentor",
-              value: tableIDOfAchievementOptionMentor,
-            });
-        if (success) {
-          // delete from local state
-          dispatch({
-            key: "experts",
-            value: [
-              ...state.experts.filter(
-                (e) => e.id !== tableIDOfAchievementOptionMentor
-              ),
-            ],
-          });
+    async (userIdFromUserTable: number) => {
+      if (state.experts.find((u) => u.userId === userIdFromUserTable)) {
+        if (state.achievementOptionId && props.onPropertyChanged) {
+          const deletedId = await props.onPropertyChanged(
+            state.achievementOptionId,
+            {
+              key: AchievementKeys.DELETE_A_MENTOR,
+              value: userIdFromUserTable,
+            }
+          );
+          if (deletedId <= 0) return;
         }
+        dispatch({
+          key: "experts",
+          value: [
+            ...state.experts.filter((e) => e.userId !== userIdFromUserTable),
+          ],
+        });
       }
     },
     [props, state, dispatch]
   );
 
   const onDeleteACourse = useCallback(
-    async (tableIDOfAchievementOptionCourse: number) => {
-      if (
-        state.courses.find((c) => c.id === tableIDOfAchievementOptionCourse)
-      ) {
-        const success = !props.onPropertyChanged
-          ? true
-          : await props.onPropertyChanged({
-              key: "deleteACourse",
-              value: tableIDOfAchievementOptionCourse,
-            });
-        if (success) {
-          // delete from local state
-          dispatch({
-            key: "courses",
-            value: [
-              ...state.courses.filter(
-                (c) => c.id !== tableIDOfAchievementOptionCourse
-              ),
-            ],
-          });
+    async (courseIdFromCourseTable: number) => {
+      if (state.courses.find((c) => c.courseId === courseIdFromCourseTable)) {
+        if (state.achievementOptionId && props.onPropertyChanged) {
+          const deletedId = await props.onPropertyChanged(
+            state.achievementOptionId,
+            {
+              key: AchievementKeys.DELETE_A_COURSE,
+              value: courseIdFromCourseTable,
+            }
+          );
+          if (deletedId <= 0) return;
         }
+
+        dispatch({
+          key: "courses",
+          value: [
+            ...state.courses.filter(
+              (c) => c.courseId !== courseIdFromCourseTable
+            ),
+          ],
+        });
       }
     },
     [props, state, dispatch]
@@ -283,7 +317,8 @@ const AddEditComponent: FC<IPropsAddEditAchievementTempData> = (props) => {
 
   /* #endregion */
 
-  const context = useContext(AchievementContext);
+  /* #region UI */
+
   return (
     <>
       {state.showMentorDialog && (
@@ -317,7 +352,7 @@ const AddEditComponent: FC<IPropsAddEditAchievementTempData> = (props) => {
                     key={`mentors-${index}`}
                     tag={{
                       display: makeFullName(e.firstName, e.lastName),
-                      id: e.id,
+                      id: e.userId ?? undefined,
                     }}
                     requestDeleteTag={onDeleteAMentor}
                   />
@@ -342,7 +377,7 @@ const AddEditComponent: FC<IPropsAddEditAchievementTempData> = (props) => {
                       textLeft={course.title}
                       textRight={course.programShortName}
                       onRemoveClick={onDeleteACourse}
-                      id={course.id}
+                      id={course.courseId}
                     />
                   ))}
                 </div>
@@ -376,7 +411,7 @@ const AddEditComponent: FC<IPropsAddEditAchievementTempData> = (props) => {
                   bg={"white"}
                 />
               </div>
-              {!state.id &&
+              {!state.achievementOptionId &&
                 state.title &&
                 state.title.trim().length > 0 &&
                 state.description &&
@@ -397,7 +432,7 @@ const AddEditComponent: FC<IPropsAddEditAchievementTempData> = (props) => {
                 <div className="pt-6 pl-1">
                   <UiFileInputButton
                     label="Dokumentationsvorlage(.doc)*"
-                    acceptedFileTypes=".doc"
+                    acceptedFileTypes=".doc, .docx"
                     onFileChoosed={
                       onChoosedAchievementOptionDocumentationTemplate
                     }
@@ -417,7 +452,7 @@ const AddEditComponent: FC<IPropsAddEditAchievementTempData> = (props) => {
                   <div className="pt-6 pl-1">
                     <UiFileInputButton
                       label="Dokumentationsvorlage CSV(.doc)"
-                      acceptedFileTypes=".doc"
+                      acceptedFileTypes=".doc, .docx"
                       onFileChoosed={
                         onChoosedAchievementOptionDocumentationTemplateForCSV
                       }
@@ -459,9 +494,10 @@ const AddEditComponent: FC<IPropsAddEditAchievementTempData> = (props) => {
       </div>
     </>
   );
+  /* #endregion */
 };
 
-export default AddEditComponent;
+export default AddEditAchievementOptionComponent;
 
 /* #region Checkbox UI */
 interface ChangeResult {
