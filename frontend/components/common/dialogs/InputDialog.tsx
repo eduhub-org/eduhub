@@ -1,5 +1,5 @@
 import { Dialog, DialogTitle } from "@material-ui/core";
-import { FC, useCallback, useState } from "react";
+import { ChangeEvent, FC, useCallback, useState } from "react";
 import { MdClose } from "react-icons/md";
 import { Button } from "../../common/Button";
 
@@ -29,7 +29,7 @@ export const InputDialog: FC<IProps> = ({
     setCurrentValue("");
   }, [onClose, currentValue]);
   const handleNewInput = useCallback(
-    (event) => {
+    (event: ChangeEvent<HTMLInputElement>) => {
       setCurrentValue(event.target.value);
     },
     [setCurrentValue]

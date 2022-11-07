@@ -3,17 +3,17 @@ table:
   schema: public
 is_enum: true
 array_relationships:
-- name: Users
-  using:
-    foreign_key_constraint_on:
-      column: employment
-      table:
-        name: User
-        schema: public
+  - name: Users
+    using:
+      foreign_key_constraint_on:
+        column: employment
+        table:
+          name: User
+          schema: public
 select_permissions:
-- permission:
-    columns:
-    - value
-    - comment
-    filter: {}
-  role: anonymous
+  - role: anonymous
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}

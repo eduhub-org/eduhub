@@ -1,0 +1,64 @@
+table:
+  name: AchievementOptionMentor
+  schema: public
+object_relationships:
+  - name: AchievementOption
+    using:
+      foreign_key_constraint_on: achievementOptionId
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
+insert_permissions:
+  - role: instructor_access
+    permission:
+      check:
+        AchievementOption:
+          AchievementOptionCourses:
+            Course:
+              CourseInstructors:
+                Expert:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+      columns:
+        - achievementOptionId
+        - id
+        - created_at
+        - updated_at
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - achievementOptionId
+        - userId
+        - id
+        - created_at
+        - updated_at
+      filter: {}
+update_permissions:
+  - role: instructor_access
+    permission:
+      columns: []
+      filter:
+        AchievementOption:
+          AchievementOptionCourses:
+            Course:
+              CourseInstructors:
+                Expert:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+      check: null
+delete_permissions:
+  - role: instructor_access
+    permission:
+      backend_only: false
+      filter:
+        AchievementOption:
+          AchievementOptionCourses:
+            Course:
+              CourseInstructors:
+                Expert:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id

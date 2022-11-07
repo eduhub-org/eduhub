@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from "react";
+import { ChangeEvent, FC, useCallback, useMemo } from "react";
 
 interface IProps {
   value?: string;
@@ -34,9 +34,10 @@ for (let i = 0; i < 24 * 4; i++) {
 
 // I tried to use react-time-picker, but it doesnt work with next.js due to global css imports from node_modules
 const EhTimeSelect: FC<IProps> = ({ value, onChange, className }) => {
-  const onChangeEvent = useCallback((event) => onChange(event.target.value), [
-    onChange,
-  ]);
+  const onChangeEvent = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => onChange(event.target.value),
+    [onChange]
+  );
 
   return (
     <select

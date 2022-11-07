@@ -136,9 +136,8 @@ const constantOnlineMapper = () => "ONLINE";
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const currentUpdateRole = "instructor";
 
-  const queryKnownLocationOptions = useInstructorQuery<LocationOptionsKnown>(
-    LOCATION_OPTIONS
-  );
+  const queryKnownLocationOptions =
+    useInstructorQuery<LocationOptionsKnown>(LOCATION_OPTIONS);
   if (queryKnownLocationOptions.error) {
     console.log(
       "query known location options error",

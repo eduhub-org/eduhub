@@ -2,31 +2,31 @@ table:
   name: RentAScientistConfig
   schema: public
 object_relationships:
-- name: Program
-  using:
-    foreign_key_constraint_on: program_id
+  - name: Program
+    using:
+      foreign_key_constraint_on: program_id
 select_permissions:
-- permission:
-    columns:
-    - id
-    - mailFrom
-    - program_id
-    - test_operation
-    filter: {}
-  role: anonymous
-- permission:
-    columns:
-    - id
-    - mailFrom
-    - program_id
-    - test_operation
-    filter: {}
-  role: instructor_access
-- permission:
-    columns:
-    - id
-    - mailFrom
-    - program_id
-    - test_operation
-    filter: {}
-  role: user_access
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - mailFrom
+        - program_id
+        - test_operation
+      filter: {}
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - mailFrom
+        - program_id
+        - test_operation
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - mailFrom
+        - program_id
+        - test_operation
+      filter: {}

@@ -2,84 +2,84 @@ table:
   name: Attendance
   schema: public
 object_relationships:
-- name: AttendanceSource
-  using:
-    manual_configuration:
-      column_mapping:
-        source: value
-      insertion_order: null
-      remote_table:
-        name: AttendanceSource
-        schema: public
-- name: AttendanceStatus
-  using:
-    foreign_key_constraint_on: status
-- name: Session
-  using:
-    foreign_key_constraint_on: sessionId
-- name: User
-  using:
-    foreign_key_constraint_on: userId
+  - name: AttendanceSource
+    using:
+      manual_configuration:
+        column_mapping:
+          source: value
+        insertion_order: null
+        remote_table:
+          name: AttendanceSource
+          schema: public
+  - name: AttendanceStatus
+    using:
+      foreign_key_constraint_on: status
+  - name: Session
+    using:
+      foreign_key_constraint_on: sessionId
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
 select_permissions:
-- permission:
-    columns:
-    - id
-    - created_at
-    - updated_at
-    - totalAttendanceTime
-    - status
-    - interruptionCount
-    - endDateTime
-    - startDateTime
-    - sessionId
-    - userId
-    - recordedName
-    - source
-    filter:
-      Session:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-  role: instructor_access
-- permission:
-    columns:
-    - id
-    - created_at
-    - updated_at
-    - totalAttendanceTime
-    - status
-    - interruptionCount
-    - endDateTime
-    - startDateTime
-    - sessionId
-    - userId
-    - recordedName
-    - source
-    filter:
-      User:
-        id:
-          _eq: X-Hasura-User-Id
-  role: user_access
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - created_at
+        - updated_at
+        - totalAttendanceTime
+        - status
+        - interruptionCount
+        - endDateTime
+        - startDateTime
+        - sessionId
+        - userId
+        - recordedName
+        - source
+      filter:
+        Session:
+          Course:
+            CourseInstructors:
+              Expert:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - created_at
+        - updated_at
+        - totalAttendanceTime
+        - status
+        - interruptionCount
+        - endDateTime
+        - startDateTime
+        - sessionId
+        - userId
+        - recordedName
+        - source
+      filter:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
 update_permissions:
-- permission:
-    check: {}
-    columns:
-    - endDateTime
-    - interruptionCount
-    - recordedName
-    - source
-    - startDateTime
-    - status
-    - totalAttendanceTime
-    filter:
-      Session:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-  role: instructor_access
+  - role: instructor_access
+    permission:
+      columns:
+        - endDateTime
+        - interruptionCount
+        - recordedName
+        - source
+        - startDateTime
+        - status
+        - totalAttendanceTime
+      filter:
+        Session:
+          Course:
+            CourseInstructors:
+              Expert:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+      check: {}

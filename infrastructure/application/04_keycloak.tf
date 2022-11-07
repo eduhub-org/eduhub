@@ -77,8 +77,8 @@ module "keycloak_service" {
   container_concurrency = "80"
 
   service_annotations = {
-    "run.googleapis.com/client-name"    = "terraform"
-    "run.googleapis.com/launch-stage"   = "BETA"
+    "run.googleapis.com/client-name" = "terraform"
+    #"run.googleapis.com/launch-stage"   = "BETA"
     "run.googleapis.com/ingress"        = "internal-and-cloud-load-balancing"
     "run.googleapis.com/ingress-status" = "internal-and-cloud-load-balancing"
   }

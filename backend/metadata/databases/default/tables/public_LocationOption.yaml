@@ -3,19 +3,19 @@ table:
   schema: public
 is_enum: true
 array_relationships:
-- name: Locations
-  using:
-    manual_configuration:
-      column_mapping:
-        value: locationOption
-      insertion_order: null
-      remote_table:
-        name: CourseLocation
-        schema: public
+  - name: Locations
+    using:
+      manual_configuration:
+        column_mapping:
+          value: locationOption
+        insertion_order: null
+        remote_table:
+          name: CourseLocation
+          schema: public
 select_permissions:
-- permission:
-    columns:
-    - value
-    - comment
-    filter: {}
-  role: anonymous
+  - role: anonymous
+    permission:
+      columns:
+        - value
+        - comment
+      filter: {}

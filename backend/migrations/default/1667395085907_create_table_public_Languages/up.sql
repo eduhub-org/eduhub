@@ -1,0 +1,1 @@
+CREATE TABLE "public"."Languages" ("value" text NOT NULL, "comment" text, PRIMARY KEY ("value") , UNIQUE ("value"));COMMENT ON TABLE "public"."Languages" IS E'Available languages to select from, e.g., to set the primary instruction language of a course.';

@@ -1,28 +1,127 @@
 type Query {
-  loadFile(
+  loadAchievementCertificate(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
+  loadAchievementCertificateTemplate(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
+  loadAchievementOptionDocumentationTemplate(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
+  loadAchievementOptionEvaluationScript(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
+  loadAchievementRecordDocumentation(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
+  loadParticipationCertificate(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
+  loadparticipationCertificateTemplate(
     path: String!
   ): loadFileOutput
 }
 
 type Mutation {
-  saveFile(
+  saveAchievementCertificate(
+    base64file: String!
+    courseid: Int!
+    userid: String!
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveAchievementCertificateTemplate(
     base64file: String!
     filename: String!
-  ): UploadResult
+    programid: Int!
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveAchievementOptionDocumentationTemplate(
+    base64file: String!
+    courseid: Int!
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveAchievementOptionEvaluationScript(
+    base64file: String!
+    courseid: Int!
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveAchievementRecordCoverImage(
+    base64file: String!
+    filename: String!
+    achievementRecordId: Int!
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveAchievementRecordDocumentation(
+    base64file: String!
+    filename: String!
+    achievementRecordId: Int!
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveCourseImage(
+    base64file: String!
+    filename: String!
+    courseid: Int!
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveParticipationCertificate(
+    base64file: String!
+    courseid: Int!
+    userid: String!
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveParticipationCertificateTemplate(
+    base64file: String!
+    filename: String!
+    programid: Int!
+  ): loadFileOutput
+}
+
+type Mutation {
+  saveUserProfileImage(
+    base64file: String!
+    filename: String!
+    userid: String!
+  ): loadFileOutput
 }
 
 type Mutation {
   updateFromKeycloak(
     userid: ID!
   ): result
-}
-
-type UploadResult {
-  link: String!
-}
-
-type Output {
-  link: String!
 }
 
 type loadFileOutput {

@@ -10,26 +10,22 @@ resource "google_sql_database_instance" "default" {
   settings {
     tier              = var.dbi_tier
     availability_type = var.dbi_availability
+    database_flags {
+      name  = "max_connections"
+      value = var.dbi_max_connections
+    }
+    backup_configuration {
+      point_in_time_recovery_enabled = false
+      backup_retention_settings {
+        retained_backups = 30
+      }
+    }
     ip_configuration {
       # ipv4_enabled = "false"
       private_network = google_compute_network.private.id
     }
   }
 }
-
-###############################################################################
-# Create a Replica database instance
-#####
-
-resource "google_sql_database_instance" "replica" {
-  database_version     = "POSTGRES_13"
-  master_instance_name = "default-dbi"
-  settings {
-    tier = var.dbi_tier
-  }
-  deletion_protection = "false"
-}
-
 
 
 ###############################################################################

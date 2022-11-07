@@ -1,48 +1,184 @@
 actions:
-- name: loadFile
-  definition:
-    kind: ""
-    handler: '{{CLOUD_FUNCTION_LINK_LOAD_FILE}}'
-    headers:
-    - name: secret
-      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-    - name: bucket
-      value_from_env: HASURA_BUCKET
-  permissions:
-  - role: instructor_access
-  - role: user_access
-  - role: anonymous
-- name: saveFile
-  definition:
-    kind: asynchronous
-    handler: '{{CLOUD_FUNCTION_LINK_SAVE_FILE}}'
-    forward_client_headers: true
-    headers:
-    - name: secret
-      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-    - name: bucket
-      value_from_env: HASURA_BUCKET
-  permissions:
-  - role: instructor_access
-  - role: user_access
-- name: updateFromKeycloak
-  definition:
-    kind: synchronous
-    handler: '{{CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK}}'
-    forward_client_headers: true
-    headers:
-    - name: secret
-      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-  permissions:
-  - role: instructor_access
-  - role: user_access
-  - role: anonymous
+  - name: loadAchievementCertificate
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+    permissions:
+      - role: user_access
+  - name: loadAchievementCertificateTemplate
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE_TEMPLATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: loadAchievementOptionDocumentationTemplate
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: loadAchievementOptionEvaluationScript
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: ' HASURA_BUCKET'
+  - name: loadAchievementRecordDocumentation
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: loadParticipationCertificate
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+    permissions:
+      - role: user_access
+  - name: loadparticipationCertificateTemplate
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE_TEMPLATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: saveAchievementCertificate
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: saveAchievementCertificateTemplate
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: saveAchievementOptionDocumentationTemplate
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE}}'
+      headers:
+        - name: secert
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: saveAchievementOptionEvaluationScript
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: hasura
+          value_from_env: HASURA_BUCKET
+  - name: saveAchievementRecordCoverImage
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+    permissions:
+      - role: user_access
+  - name: saveAchievementRecordDocumentation
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: saveCourseImage
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_COURSE_IMAGE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+    permissions:
+      - role: instructor_access
+  - name: saveParticipationCertificate
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: saveParticipationCertificateTemplate
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+  - name: saveUserProfileImage
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_SAVE_USER_PROFILE_IMAGE}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+    permissions:
+      - role: instructor_access
+      - role: user_access
+  - name: updateFromKeycloak
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK}}'
+      forward_client_headers: true
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    permissions:
+      - role: instructor_access
+      - role: user_access
+      - role: anonymous
 custom_types:
   enums: []
   input_objects: []
   objects:
-  - name: UploadResult
-  - name: Output
-  - name: loadFileOutput
-  - name: result
+    - name: loadFileOutput
+    - name: result
   scalars: []

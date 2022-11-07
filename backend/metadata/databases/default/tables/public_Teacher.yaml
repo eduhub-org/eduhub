@@ -2,35 +2,34 @@ table:
   name: Teacher
   schema: public
 object_relationships:
-- name: User
-  using:
-    foreign_key_constraint_on: userId
+  - name: User
+    using:
+      foreign_key_constraint_on: userId
 array_relationships:
-- name: SchoolClasses
-  using:
-    foreign_key_constraint_on:
-      column: teacherId
-      table:
-        name: SchoolClass
-        schema: public
+  - name: SchoolClasses
+    using:
+      foreign_key_constraint_on:
+        column: teacherId
+        table:
+          name: SchoolClass
+          schema: public
 insert_permissions:
-- permission:
-    backend_only: false
-    check:
-      User:
-        id:
-          _eq: X-Hasura-User-Id
-    columns:
-    - id
-    - userId
-  role: user_access
+  - role: user_access
+    permission:
+      check:
+        User:
+          id:
+            _eq: X-Hasura-User-Id
+      columns:
+        - id
+        - userId
 select_permissions:
-- permission:
-    columns:
-    - id
-    - userId
-    filter:
-      User:
-        id:
-          _eq: X-Hasura-User-Id
-  role: user_access
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - userId
+      filter:
+        User:
+          id:
+            _eq: X-Hasura-User-Id

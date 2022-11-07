@@ -1,5 +1,3 @@
-import { useKeycloak } from "@react-keycloak/ssr";
-import { KeycloakInstance } from "keycloak-js";
 import { useTranslation } from "next-i18next";
 import { FC } from "react";
 
@@ -13,7 +11,6 @@ interface IProps {
 }
 
 export const Attendances: FC<IProps> = ({ course }) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
   const { t } = useTranslation("course-page");
 
   return (

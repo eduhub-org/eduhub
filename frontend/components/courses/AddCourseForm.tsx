@@ -1,5 +1,5 @@
 import { QueryResult } from "@apollo/client";
-import { FC, useCallback, useState } from "react";
+import { ChangeEvent, FC, useCallback, useState } from "react";
 import { useAdminMutation } from "../../hooks/authedMutation";
 import { useAdminQuery } from "../../hooks/authedQuery";
 import { COURSE_INSTRUCTOR_LIST } from "../../queries/courseInstructorList";
@@ -88,12 +88,10 @@ const Form: FC<IAddCourseProps> = ({
     };
   });
   /* #region Mutation endpoints */
-  const [
-    insertACourse,
-    { data, loading, error: insertError },
-  ] = useAdminMutation<InsertSingleCourse, InsertSingleCourseVariables>(
-    INSERT_A_COURSE
-  );
+  const [insertACourse, { data, loading, error: insertError }] =
+    useAdminMutation<InsertSingleCourse, InsertSingleCourseVariables>(
+      INSERT_A_COURSE
+    );
   /* #endregion */
 
   /* #region state variables */
@@ -142,7 +140,7 @@ const Form: FC<IAddCourseProps> = ({
   }, [insertACourse, courseTitle, instructorID, programId, closeModalHandler]);
 
   const onChangeTitle = useCallback(
-    (value) => {
+    (value: string) => {
       setCourseTitle(value);
     },
     [setCourseTitle]

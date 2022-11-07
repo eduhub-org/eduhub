@@ -1,8 +1,14 @@
-import { FC } from "react";
+import { FC, ReactElement } from "react";
 
 import { useIsLoggedIn } from "../../hooks/authentication";
 
-export const OnlyLoggedOut: FC = ({ children }) => {
+type OnlyLoggedOutProps = {
+  children?: ReactElement;
+};
+
+export const OnlyLoggedOut: FC<OnlyLoggedOutProps> = ({
+  children,
+}: OnlyLoggedOutProps) => {
   const isLoggedIn = useIsLoggedIn();
 
   if (isLoggedIn) return null;

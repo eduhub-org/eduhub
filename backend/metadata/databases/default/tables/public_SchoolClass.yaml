@@ -2,76 +2,76 @@ table:
   name: SchoolClass
   schema: public
 object_relationships:
-- name: School
-  using:
-    foreign_key_constraint_on: schoolId
-- name: Teacher
-  using:
-    foreign_key_constraint_on: teacherId
+  - name: School
+    using:
+      foreign_key_constraint_on: schoolId
+  - name: Teacher
+    using:
+      foreign_key_constraint_on: teacherId
 array_relationships:
-- name: SchoolClassRequests
-  using:
-    foreign_key_constraint_on:
-      column: classId
-      table:
-        name: SchoolClassRequest
-        schema: public
+  - name: SchoolClassRequests
+    using:
+      foreign_key_constraint_on:
+        column: classId
+        table:
+          name: SchoolClassRequest
+          schema: public
 insert_permissions:
-- permission:
-    backend_only: false
-    check:
-      Teacher:
-        User:
-          id:
-            _eq: X-Hasura-User-Id
-    columns:
-    - contact
-    - grade
-    - id
-    - name
-    - schoolId
-    - studensCount
-    - teacherId
-  role: user_access
+  - role: user_access
+    permission:
+      check:
+        Teacher:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+      columns:
+        - contact
+        - grade
+        - id
+        - name
+        - schoolId
+        - studensCount
+        - teacherId
 select_permissions:
-- permission:
-    columns:
-    - contact
-    - grade
-    - id
-    - name
-    - schoolId
-    - studensCount
-    - teacherId
-    filter:
-      Teacher:
-        User:
-          id:
-            _eq: X-Hasura-User-Id
-  role: user_access
+  - role: user_access
+    permission:
+      columns:
+        - contact
+        - grade
+        - id
+        - name
+        - schoolId
+        - studensCount
+        - teacherId
+      filter:
+        Teacher:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
 update_permissions:
-- permission:
-    check:
-      Teacher:
-        User:
-          id:
-            _eq: X-Hasura-User-Id
-    columns:
-    - contact
-    - grade
-    - name
-    - studensCount
-    filter:
-      Teacher:
-        User:
-          id:
-            _eq: X-Hasura-User-Id
-  role: user_access
+  - role: user_access
+    permission:
+      columns:
+        - contact
+        - grade
+        - name
+        - studensCount
+      filter:
+        Teacher:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+      check:
+        Teacher:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
 delete_permissions:
-- permission:
-    filter:
-      Teacher:
-        User:
-          id:
-            _eq: X-Hasura-User-Id
-  role: user_access
+  - role: user_access
+    permission:
+      backend_only: false
+      filter:
+        Teacher:
+          User:
+            id:
+              _eq: X-Hasura-User-Id

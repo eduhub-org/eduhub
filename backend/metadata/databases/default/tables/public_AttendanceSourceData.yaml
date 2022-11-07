@@ -2,24 +2,24 @@ table:
   name: AttendanceSourceData
   schema: public
 object_relationships:
-- name: Session
-  using:
-    foreign_key_constraint_on: sessionId
+  - name: Session
+    using:
+      foreign_key_constraint_on: sessionId
 select_permissions:
-- permission:
-    columns:
-    - id
-    - URL
-    - created_at
-    - updated_at
-    - source
-    - sessionId
-    filter:
-      Session:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
-  role: instructor_access
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - URL
+        - created_at
+        - updated_at
+        - source
+        - sessionId
+      filter:
+        Session:
+          Course:
+            CourseInstructors:
+              Expert:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id

@@ -35,7 +35,7 @@ const formatTimeString = (ts: any, i18n: I18n) => {
   }
 
   return (
-    new Date(ts).toLocaleTimeString(i18n.languages, {
+    new Date(ts).toLocaleTimeString(i18n.languages as string[], {
       hour: "numeric",
       minute: "numeric",
     }) ?? ""

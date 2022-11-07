@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react";
+import { ChangeEvent, FC, useCallback } from "react";
 import { SelectOption } from "../../types/UIComponents";
 
 interface IPros {
@@ -27,7 +27,7 @@ const EhSelect: FC<IPros> = ({
   onChangeHandler,
 }) => {
   const onSelectChanged = useCallback(
-    (event) => {
+    (event: ChangeEvent<HTMLSelectElement>) => {
       onChangeHandler(parseInt(event.target.value, 10));
     },
     [onChangeHandler]

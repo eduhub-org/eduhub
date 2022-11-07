@@ -1,0 +1,84 @@
+table:
+  name: AchievementOptionCourse
+  schema: public
+object_relationships:
+  - name: AchievementOption
+    using:
+      foreign_key_constraint_on: achievementOptionId
+  - name: Course
+    using:
+      foreign_key_constraint_on: courseId
+insert_permissions:
+  - role: instructor_access
+    permission:
+      check:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+      columns:
+        - achievementOptionId
+        - courseId
+        - created_at
+        - id
+        - updated_at
+select_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - achievementOptionId
+        - courseId
+        - id
+        - created_at
+        - updated_at
+      filter:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+  - role: user_access
+    permission:
+      columns:
+        - achievementOptionId
+        - courseId
+        - created_at
+        - id
+        - updated_at
+      filter:
+        Course:
+          CourseEnrollments:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+update_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - achievementOptionId
+        - courseId
+        - created_at
+        - id
+        - updated_at
+      filter:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+      check: null
+delete_permissions:
+  - role: instructor_access
+    permission:
+      backend_only: false
+      filter:
+        Course:
+          CourseInstructors:
+            Expert:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id

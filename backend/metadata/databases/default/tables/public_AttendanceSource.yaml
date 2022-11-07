@@ -3,19 +3,19 @@ table:
   schema: public
 is_enum: true
 array_relationships:
-- name: Attendances
-  using:
-    manual_configuration:
-      column_mapping:
-        value: source
-      insertion_order: null
-      remote_table:
-        name: Attendance
-        schema: public
+  - name: Attendances
+    using:
+      manual_configuration:
+        column_mapping:
+          value: source
+        insertion_order: null
+        remote_table:
+          name: Attendance
+          schema: public
 select_permissions:
-- permission:
-    columns:
-    - comment
-    - value
-    filter: {}
-  role: anonymous
+  - role: anonymous
+    permission:
+      columns:
+        - comment
+        - value
+      filter: {}

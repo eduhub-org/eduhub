@@ -2,26 +2,26 @@ table:
   name: MailLog
   schema: public
 object_relationships:
-- name: MailStatus
-  using:
-    manual_configuration:
-      column_mapping:
-        status: value
-      insertion_order: null
-      remote_table:
-        name: MailStatus
-        schema: public
+  - name: MailStatus
+    using:
+      manual_configuration:
+        column_mapping:
+          status: value
+        insertion_order: null
+        remote_table:
+          name: MailStatus
+          schema: public
 event_triggers:
-- definition:
-    enable_manual: true
-    insert:
-      columns: "*"
-  headers:
-  - name: secret
-    value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-  name: send_mail
-  retry_conf:
-    interval_sec: 10
-    num_retries: 0
-    timeout_sec: 60
-  webhook_from_env: CLOUD_FUNCTION_LINK_SEND_MAIL
+  - name: send_mail
+    definition:
+      enable_manual: true
+      insert:
+        columns: '*'
+    retry_conf:
+      interval_sec: 10
+      num_retries: 0
+      timeout_sec: 60
+    webhook_from_env: CLOUD_FUNCTION_LINK_SEND_MAIL
+    headers:
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET

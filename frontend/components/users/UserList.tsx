@@ -183,7 +183,7 @@ const Header: FC<IHeaderProps> = ({
   }, [setShowAddUserForm]);
 
   const handleCancleOfAddUserForm = useCallback(
-    (success) => {
+    (success: boolean) => {
       setShowAddUserForm(false);
       if (success) {
         // refetch userlist
@@ -342,6 +342,7 @@ const Pagination: FC<IPaginationProps> = ({
           />
         )}
         <p className="font-medium">
+          {/* @ts-ignore: https://github.com/i18next/react-i18next/issues/1543 */}
           {t("paginationText", { currentPage: current_page, totalPage: pages })}
         </p>
 

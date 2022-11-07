@@ -1,0 +1,23 @@
+{
+  "title": "Users: Edu-hub",
+  "headline": "User",
+  "userSearchPlaceHolder": "Search?",
+  "addUserButtonText": "Add new user",
+  "courseInstructor": "Course Instructor",
+  "addUserFormTitle": "Profile Update",
+  "admin": "Admin",
+  "speaker": "Speaker",
+  "all": "All",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "email": "Email",
+  "password": "Password",
+  "employmentStatus": "Employment Status",
+  "university": "University",
+  "nameOfUniversity": "Name of University",
+  "matriculationNumber": "Matriculation number",
+  "administrator": "Administrator",
+  "save": "Save",
+  "regDate": "Reg. Date",
+  "paginationText": "Page {{currentPage}} of {{totalPage}}"
+}

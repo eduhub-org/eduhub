@@ -1,0 +1,19 @@
+table:
+  name: AchievementRecordType
+  schema: public
+is_enum: true
+array_relationships:
+  - name: AchievementOptions
+    using:
+      foreign_key_constraint_on:
+        column: recordType
+        table:
+          name: AchievementOption
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - comment
+        - value
+      filter: {}
