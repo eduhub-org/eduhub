@@ -8,12 +8,12 @@ import {
 } from "../../queries/__generated__/InsertAnAchievementOption";
 import { AchievementRecordType_enum } from "../../__generated__/globalTypes";
 import { AchievementContext } from "./AchievementOptionDashboard";
-import AddEditAchievementOptionComponent, {
+import {
   IDataToManipulate,
   TempAchievementOptionCourse,
   TempAchievementOptionMentor,
-} from "./AddEditAchievementOptionComponent";
-
+} from "../../helpers/achievement";
+import AddEditAchievementOptionComponent from "./AddEditAchievementOptionComponent";
 interface IProps {
   onSuccess: (success: boolean) => void;
 }
