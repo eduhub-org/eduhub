@@ -7,7 +7,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { FC, useCallback } from "react";
 import { useIsAdmin, useIsInstructor } from "../hooks/authentication";
-import {postLogout} from "../helpers/auth";
 
 interface IProps {
   anchorElement: HTMLElement;
