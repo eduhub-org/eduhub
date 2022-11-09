@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: Session
+  schema: public
 object_relationships:
   - name: Course
     using:
@@ -11,29 +11,29 @@ array_relationships:
       foreign_key_constraint_on:
         column: sessionId
         table:
-          schema: public
           name: AttendanceSourceData
+          schema: public
   - name: Attendances
     using:
       foreign_key_constraint_on:
         column: sessionId
         table:
-          schema: public
           name: Attendance
+          schema: public
   - name: SessionAddresses
     using:
       foreign_key_constraint_on:
         column: sessionId
         table:
-          schema: public
           name: SessionAddress
+          schema: public
   - name: SessionSpeakers
     using:
       foreign_key_constraint_on:
         column: sessionId
         table:
-          schema: public
           name: SessionSpeaker
+          schema: public
 insert_permissions:
   - role: instructor_access
     permission:
@@ -51,7 +51,6 @@ insert_permissions:
         - id
         - startDateTime
         - title
-      backend_only: false
 select_permissions:
   - role: anonymous
     permission:
@@ -84,6 +83,7 @@ update_permissions:
 delete_permissions:
   - role: instructor_access
     permission:
+      backend_only: false
       filter:
         Course:
           CourseInstructors:

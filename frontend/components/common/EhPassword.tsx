@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import { ChangeEvent, FC, useCallback, useState } from "react";
 import { TextBoxProperties } from "../../types/UIComponents";
 
 interface IPropsPassword {
@@ -7,7 +7,7 @@ interface IPropsPassword {
 const EhPassword: FC<IPropsPassword> = ({ property }) => {
   const [show, setShow] = useState(false);
   const handOnchange = useCallback(
-    (event) => {
+    (event: ChangeEvent<HTMLInputElement>) => {
       property.onChangeHandler(property.key, event.target.value);
     },
     [property]

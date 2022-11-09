@@ -1,27 +1,37 @@
-import { useKeycloak } from "@react-keycloak/ssr";
+import { getSession, useSession } from "next-auth/react";
 import { KeycloakInstance } from "keycloak-js";
 
 export const useIsLoggedIn = (): boolean => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data: sessionData, status } = useSession();
 
-  const token = keycloak?.token;
+  console.log("status", status, "token", sessionData?.accessToken);
 
-  return (!!keycloak?.authenticated ?? false) && !!token;
+  return (status === "authenticated" || false) && !!sessionData?.accessToken;
 };
 
 export const useIsAdmin = () => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-  return keycloak?.resourceAccess?.hasura?.roles?.includes("admin") ?? false;
+  const { data: sessionData } = useSession();
+  return (
+    sessionData?.profile?.["https://hasura.io/jwt/claims"]?.[
+      "x-hasura-allowed-roles"
+    ]?.includes("admin") ?? false
+  );
 };
 
 export const useIsInstructor = () => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data: sessionData } = useSession();
   return (
-    keycloak?.resourceAccess?.hasura?.roles?.includes("instructor") ?? false
+    sessionData?.profile?.["https://hasura.io/jwt/claims"]?.[
+      "x-hasura-allowed-roles"
+    ]?.includes("instructor") ?? false
   );
 };
 
 export const useIsUser = () => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-  return keycloak?.resourceAccess?.hasura?.roles?.includes("user") ?? false;
+  const { data: sessionData } = useSession();
+  return (
+    sessionData?.profile?.["https://hasura.io/jwt/claims"]?.[
+      "x-hasura-allowed-roles"
+    ]?.includes("user") ?? false
+  );
 };

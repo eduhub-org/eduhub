@@ -312,6 +312,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         </div>
 
         <div>
+          {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
             className="w-full bg-gray-100"
             dateFormat={"dd/MM/yyyy"}
@@ -321,6 +322,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         </div>
 
         <div>
+          {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
             dateFormat={"dd/MM/yyyy"}
             className="w-full bg-gray-100"
@@ -330,6 +332,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         </div>
 
         <div>
+          {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
             dateFormat={"dd/MM/yyyy"}
             className="w-full bg-gray-100"
@@ -339,6 +342,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         </div>
 
         <div>
+          {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
             dateFormat={"dd/MM/yyyy"}
             className="w-full bg-gray-100"
@@ -348,6 +352,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         </div>
 
         <div>
+          {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
             dateFormat={"dd/MM/yyyy"}
             className="w-full bg-gray-100"

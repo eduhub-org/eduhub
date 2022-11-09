@@ -1,13 +1,13 @@
 table:
-  schema: public
   name: AchievementOptionMentor
+  schema: public
 object_relationships:
   - name: AchievementOption
     using:
       foreign_key_constraint_on: achievementOptionId
-  - name: Expert
+  - name: User
     using:
-      foreign_key_constraint_on: expertId
+      foreign_key_constraint_on: userId
 insert_permissions:
   - role: instructor_access
     permission:
@@ -22,17 +22,15 @@ insert_permissions:
                       _eq: X-Hasura-User-Id
       columns:
         - achievementOptionId
-        - expertId
         - id
         - created_at
         - updated_at
-      backend_only: false
 select_permissions:
   - role: anonymous
     permission:
       columns:
         - achievementOptionId
-        - expertId
+        - userId
         - id
         - created_at
         - updated_at
@@ -54,6 +52,7 @@ update_permissions:
 delete_permissions:
   - role: instructor_access
     permission:
+      backend_only: false
       filter:
         AchievementOption:
           AchievementOptionCourses:

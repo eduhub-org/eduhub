@@ -14,7 +14,6 @@ import { Menu } from "./Menu";
 import { RegisterButton } from "./RegisterButton";
 import { Avatar } from "./common/Avatar";
 import { OnlyDesktop } from "./common/OnlyDesktop";
-import { OnlyAdmin } from "./common/OnlyLoggedIn";
 import { ClientOnly } from "./common/ClientOnly";
 import { MdManageAccounts } from "react-icons/md";
 

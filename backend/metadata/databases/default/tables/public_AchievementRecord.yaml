@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: AchievementRecord
+  schema: public
 object_relationships:
   - name: AchievementOption
     using:
@@ -14,8 +14,8 @@ array_relationships:
       foreign_key_constraint_on:
         column: achievementRecordId
         table:
-          schema: public
           name: AchievementRecordAuthor
+          schema: public
 insert_permissions:
   - role: user_access
     permission:
@@ -26,7 +26,11 @@ insert_permissions:
         - description
         - documentationUrl
         - id
+<<<<<<< HEAD
       backend_only: false
+=======
+        - uploadUserId
+>>>>>>> 1e3857d20ba10d5e4d47b812b327cf0fb7d5382c
 select_permissions:
   - role: anonymous
     permission:
@@ -62,10 +66,9 @@ select_permissions:
                           _eq: X-Hasura-User-Id
           - AchievementOption:
               AchievementOptionMentors:
-                Expert:
-                  User:
-                    id:
-                      _eq: X-Hasura-User-Id
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
   - role: user_access
     permission:
       columns:
@@ -100,8 +103,7 @@ update_permissions:
                           _eq: X-Hasura-User-Id
           - AchievementOption:
               AchievementOptionMentors:
-                Expert:
-                  User:
-                    id:
-                      _eq: X-Hasura-User-Id
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
       check: {}

@@ -12,7 +12,6 @@ import {
 } from "react-icons/md";
 
 import { Page } from "../../components/Page";
-import { OnlyAdmin, OnlyNotAdmin } from "../../components/common/OnlyLoggedIn";
 import { PageBlock } from "../../components/common/PageBlock";
 import { QuestionConfirmationDialog } from "../../components/common/dialogs/QuestionConfirmationDialog";
 import { useAdminMutation } from "../../hooks/authedMutation";
@@ -423,10 +422,8 @@ export const AuthorizedPrograms: FC = () => {
     [qResult, updateProgramParticipationCertVisible]
   );
 
-  const [
-    activeDialogProgram,
-    setActiveDialogProgram,
-  ] = useState<ProgramList_Program | null>(null);
+  const [activeDialogProgram, setActiveDialogProgram] =
+    useState<ProgramList_Program | null>(null);
 
   const [confirmMakeVisibleOpen, setConfirmMakeVisibleOpen] = useState(false);
   const handleMakeVisibleDialogClose = useCallback(
@@ -439,9 +436,8 @@ export const AuthorizedPrograms: FC = () => {
     [activeDialogProgram, setProgramVisibility, setConfirmMakeVisibleOpen]
   );
 
-  const [confirmMakeInvisibleOpen, setConfirmMakeInvisibleOpen] = useState(
-    false
-  );
+  const [confirmMakeInvisibleOpen, setConfirmMakeInvisibleOpen] =
+    useState(false);
   const handleMakeInvisibleDialogClose = useCallback(
     (confirm: boolean) => {
       if (confirm && activeDialogProgram != null) {
@@ -452,9 +448,8 @@ export const AuthorizedPrograms: FC = () => {
     [activeDialogProgram, setProgramVisibility, setConfirmMakeInvisibleOpen]
   );
 
-  const [confirmDeleteProgramOpen, setConfirmDeleteProgramOpen] = useState(
-    false
-  );
+  const [confirmDeleteProgramOpen, setConfirmDeleteProgramOpen] =
+    useState(false);
   const handleConfirmDeleteProgramClose = useCallback(
     (confirm: boolean) => {
       if (confirm && activeDialogProgram != null) {

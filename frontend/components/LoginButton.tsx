@@ -1,4 +1,4 @@
-import { useKeycloak } from "@react-keycloak/ssr";
+import { signIn } from "next-auth/react";
 import { KeycloakInstance, KeycloakTokenParsed } from "keycloak-js";
 import { useRouter } from "next/router";
 import { FC, useCallback, useEffect } from "react";
@@ -14,37 +14,23 @@ const UPDATE_USER = gql`
   }
 `;
 
-export const useLogin = () => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-  const router = useRouter();
-  const performLogin = useCallback(() => {
-    const url = keycloak?.createLoginUrl({
-      redirectUri: window.location.href,
-    });
-    if (!url) return;
-
-    router.push(new URL(url));
-  }, [keycloak, router]);
-
-  return performLogin;
-};
 export const LoginButton: FC = () => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
-  const [updateUser, { data, error }] = useMutation(UPDATE_USER);
+  // const [updateUser, { data, error }] = useMutation(UPDATE_USER);
 
-  useEffect(() => {
-    if (keycloak !== undefined) {
-      keycloak.onAuthSuccess = () => {
-        const parsedToken: KeycloakTokenParsed | undefined =
-          keycloak?.tokenParsed;
+  // useEffect(() => {
+  //   if (keycloak !== undefined) {
+  //     keycloak.onAuthSuccess = () => {
+  //       const parsedToken: KeycloakTokenParsed | undefined =
+  //         keycloak?.tokenParsed;
 
-        updateUser({ variables: { id: parsedToken?.sub } });
-      };
-    }
-  }, [keycloak, updateUser]);
+  //       updateUser({ variables: { id: parsedToken?.sub } });
+  //     };
+  //   }
+  // }, []);
 
   const { t } = useTranslation();
-  const performLogin = useLogin();
 
-  return <Button onClick={performLogin}>{t("loginButton.title")}</Button>;
+  return (
+    <Button onClick={() => signIn("keycloak")}>{t("loginButton.title")}</Button>
+  );
 };

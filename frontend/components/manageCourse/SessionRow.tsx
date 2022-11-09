@@ -254,6 +254,7 @@ export const SessionRow: FC<IProps> = ({
 
         {session && (
           <div className="col-span-4 m-2">
+            {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
             <DatePicker
               minDate={lectureStart}
               maxDate={lectureEnd}

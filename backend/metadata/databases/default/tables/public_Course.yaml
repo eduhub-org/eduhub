@@ -1,6 +1,6 @@
 table:
-  schema: public
   name: Course
+  schema: public
 object_relationships:
   - name: CourseStatus
     using:
@@ -14,36 +14,36 @@ array_relationships:
       foreign_key_constraint_on:
         column: courseId
         table:
-          schema: public
           name: AchievementOptionCourse
+          schema: public
   - name: CourseEnrollments
     using:
       foreign_key_constraint_on:
         column: courseId
         table:
-          schema: public
           name: CourseEnrollment
+          schema: public
   - name: CourseInstructors
     using:
       foreign_key_constraint_on:
         column: courseId
         table:
-          schema: public
           name: CourseInstructor
+          schema: public
   - name: CourseLocations
     using:
       foreign_key_constraint_on:
         column: courseId
         table:
-          schema: public
           name: CourseLocation
+          schema: public
   - name: Sessions
     using:
       foreign_key_constraint_on:
         column: courseId
         table:
-          schema: public
           name: Session
+          schema: public
 select_permissions:
   - role: anonymous
     permission:

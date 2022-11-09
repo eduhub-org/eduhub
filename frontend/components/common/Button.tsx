@@ -1,4 +1,4 @@
-import { AnchorHTMLAttributes, FC } from "react";
+import { AnchorHTMLAttributes, FC, ReactNode } from "react";
 
 type Props =
   | ({
@@ -11,6 +11,7 @@ type Props =
       filled?: boolean;
       inverted?: boolean;
       onClick?: () => void;
+      children?: ReactNode;
     };
 
 export const Button: FC<Props> = (props) => {

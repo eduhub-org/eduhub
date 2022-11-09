@@ -1,6 +1,7 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 
 interface IProps {
+  children?: ReactNode;
   classname?: string;
 }
 

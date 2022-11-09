@@ -1,6 +1,5 @@
 import { QueryResult, useMutation } from "@apollo/client";
-import { useKeycloak } from "@react-keycloak/ssr";
-import { KeycloakInstance } from "keycloak-js";
+import { useSession } from "next-auth/react";
 import { useCallback } from "react";
 import { DocumentNode } from "graphql";
 
@@ -8,10 +7,10 @@ export const useRoleMutation: typeof useMutation = (
   mutation,
   passedOptions
 ) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
 
-  const token = keycloak?.token;
-
+  // @ts-ignore
   const passedRole = passedOptions?.context?.role;
 
   if (passedRole == null) {
@@ -20,19 +19,20 @@ export const useRoleMutation: typeof useMutation = (
     );
   }
 
-  const options = token
+  const options = accessToken
     ? {
         ...passedOptions,
         context: {
           ...passedOptions?.context,
           headers: {
             "x-hasura-role": `${passedRole}`,
-            Authorization: "Bearer " + token,
+            Authorization: "Bearer " + accessToken,
           },
         },
       }
     : passedOptions;
 
+  // @ts-ignore
   return useMutation(mutation, options);
 };
 
@@ -40,24 +40,25 @@ export const useInstructorMutation: typeof useMutation = (
   mutation,
   passedOptions
 ) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
 
-  const token = keycloak?.token;
-
-  const options = token
+  const options = accessToken
     ? {
         ...passedOptions,
         context: {
           ...passedOptions?.context,
           headers: {
+            // @ts-ignore
             ...passedOptions?.context?.headers,
             "x-hasura-role": "instructor",
-            Authorization: "Bearer " + token,
+            Authorization: "Bearer " + accessToken,
           },
         },
       }
     : passedOptions;
 
+  // @ts-ignore
   return useMutation(mutation, options);
 };
 
@@ -65,24 +66,25 @@ export const useAdminMutation: typeof useMutation = (
   mutation,
   passedOptions
 ) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
 
-  const token = keycloak?.token;
-
-  const options = token
+  const options = accessToken
     ? {
         ...passedOptions,
         context: {
           ...passedOptions?.context,
           headers: {
+            // @ts-ignore
             ...passedOptions?.context?.headers,
             "x-hasura-role": "admin",
-            Authorization: "Bearer " + token,
+            Authorization: "Bearer " + accessToken,
           },
         },
       }
     : passedOptions;
 
+  // @ts-ignore
   return useMutation(mutation, options);
 };
 
@@ -90,23 +92,24 @@ export const useAuthedMutation: typeof useMutation = (
   mutation,
   passedOptions
 ) => {
-  const { keycloak } = useKeycloak<KeycloakInstance>();
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
 
-  const token = keycloak?.token;
-
-  const options = token
+  const options = accessToken
     ? {
         ...passedOptions,
         context: {
           ...passedOptions?.context,
           headers: {
+            // @ts-ignore
             ...passedOptions?.context?.headers,
-            Authorization: "Bearer " + token,
+            Authorization: "Bearer " + accessToken,
           },
         },
       }
     : passedOptions;
 
+  // @ts-ignore
   return useMutation(mutation, options);
 };
 
@@ -132,7 +135,7 @@ export const useUpdateCallback = <QueryType, QueryVariables>(
     },
   });
   const callback = useCallback(
-    async (event) => {
+    async (event: any) => {
       const updatedValue = eventMapper(event);
       if (updatePK != null) {
         await mutation({
@@ -166,7 +169,7 @@ export const useUpdateCallback2 = <QueryType, QueryVariables>(
     },
   });
   const callback = useCallback(
-    async (pk, event) => {
+    async (pk: any, event: any) => {
       const pkValue = pkMapper(pk);
       const updatedValue = eventMapper(event, pk);
       await mutation({
@@ -195,7 +198,7 @@ export const useDeleteCallback = <QueryType, QueryVariables>(
     },
   });
   const callback = useCallback(
-    async (pk) => {
+    async (pk: any) => {
       const pkValue = pkMapper(pk);
       await mutation({
         variables: {
