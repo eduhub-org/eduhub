@@ -4,12 +4,17 @@ import {
   MdCheckBox,
   MdCheckBoxOutlineBlank,
 } from "react-icons/md";
+import {
+  AchievementKeys,
+  IDataToManipulate,
+  IPayload,
+  TempAchievementOptionCourse,
+  TempAchievementOptionMentor,
+} from "../../helpers/achievement";
 import { UploadFile } from "../../helpers/filehandling";
 import { makeFullName } from "../../helpers/util";
-import { AchievementKeys, IPayload } from "../../helpers/achievement";
 import { AdminCourseList_Course } from "../../queries/__generated__/AdminCourseList";
 import { ExpertList_Expert } from "../../queries/__generated__/ExpertList";
-import { AchievementRecordType_enum } from "../../__generated__/globalTypes";
 import { Button } from "../common/Button";
 import ExpertsDialog from "../common/dialogs/ExpertsDialog";
 import EhInputWithTitle from "../common/EhInputWithTitle";
@@ -19,29 +24,6 @@ import TagWithTwoText from "../common/TagWithTwoText";
 import { UiFileInputButton } from "../common/UiFileInputButton";
 import CourseListDialog from "../courses/CoureListDialog";
 import { AchievementContext } from "./AchievementOptionDashboard";
-
-export interface TempAchievementOptionMentor {
-  userId: number; // Table ID of Expert
-  firstName: string;
-  lastName: string;
-}
-export interface TempAchievementOptionCourse {
-  courseId?: number; // Table ID of Course
-  title: string;
-  programShortName: string;
-}
-export interface IDataToManipulate {
-  achievementOptionId: number | null;
-  description: string | null;
-  documentationTemplateUrl: string | null;
-  evaluationScriptUrl: string | null;
-  recordType: AchievementRecordType_enum | null;
-  title: string | null;
-  experts: TempAchievementOptionMentor[];
-  courses: TempAchievementOptionCourse[];
-  documentTemplateFile?: UploadFile;
-  evalutionScriptFile?: UploadFile;
-}
 
 interface IState extends IDataToManipulate {
   showMentorDialog: boolean;
@@ -60,7 +42,7 @@ interface IPropsAddEditAchievementTempData {
   /**
    * Mendatory field if you want to Edit an Achievement option
    */
-  onPropertyChanged?: (id: number, property: IPayload) => Promise<number>;
+  onPropertyChanged?: (id: number, property: IPayload) => Promise<boolean>;
 }
 
 const AddEditAchievementOptionComponent: FC<IPropsAddEditAchievementTempData> = (
@@ -210,9 +192,7 @@ const AddEditAchievementOptionComponent: FC<IPropsAddEditAchievementTempData> = 
               value: expert.id,
             }
           );
-          if (response <= 0) {
-            return;
-          }
+          if (!response) return;
         }
         const newMentor: TempAchievementOptionMentor = {
           userId: expert.id,
@@ -234,14 +214,14 @@ const AddEditAchievementOptionComponent: FC<IPropsAddEditAchievementTempData> = 
       // course.id is courseID, since it is from the table Course
       if (course && !state.courses.find((c) => c.courseId === course.id)) {
         if (state.achievementOptionId && props.onPropertyChanged) {
-          const newTableId = await props.onPropertyChanged(
+          const response = await props.onPropertyChanged(
             state.achievementOptionId,
             {
               key: AchievementKeys.ADD_A_COURSE,
               value: course.id,
             }
           );
-          if (newTableId <= 0) return;
+          if (!response) return;
         }
         const newCourse: TempAchievementOptionCourse = {
           courseId: course.id,
@@ -262,14 +242,14 @@ const AddEditAchievementOptionComponent: FC<IPropsAddEditAchievementTempData> = 
     async (userIdFromUserTable: number) => {
       if (state.experts.find((u) => u.userId === userIdFromUserTable)) {
         if (state.achievementOptionId && props.onPropertyChanged) {
-          const deletedId = await props.onPropertyChanged(
+          const response = await props.onPropertyChanged(
             state.achievementOptionId,
             {
               key: AchievementKeys.DELETE_A_MENTOR,
               value: userIdFromUserTable,
             }
           );
-          if (deletedId <= 0) return;
+          if (!response) return;
         }
         dispatch({
           key: "experts",
@@ -286,14 +266,14 @@ const AddEditAchievementOptionComponent: FC<IPropsAddEditAchievementTempData> = 
     async (courseIdFromCourseTable: number) => {
       if (state.courses.find((c) => c.courseId === courseIdFromCourseTable)) {
         if (state.achievementOptionId && props.onPropertyChanged) {
-          const deletedId = await props.onPropertyChanged(
+          const resposne = await props.onPropertyChanged(
             state.achievementOptionId,
             {
               key: AchievementKeys.DELETE_A_COURSE,
               value: courseIdFromCourseTable,
             }
           );
-          if (deletedId <= 0) return;
+          if (!resposne) return;
         }
 
         dispatch({

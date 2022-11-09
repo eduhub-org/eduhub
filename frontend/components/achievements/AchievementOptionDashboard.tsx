@@ -1,17 +1,17 @@
 import { IconButton } from "@material-ui/core";
 import { useTranslation } from "next-i18next";
-import { FC, createContext, useCallback, useContext, useState } from "react";
+import { createContext, FC, useCallback, useContext, useState } from "react";
 import {
   MdDelete,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
 } from "react-icons/md";
+import { IPayload, UploadFileTypes } from "../../helpers/achievement";
 import { UploadFile } from "../../helpers/filehandling";
 import { makeFullName } from "../../helpers/util";
 import { useAdminMutation } from "../../hooks/authedMutation";
 import { useAdminQuery } from "../../hooks/authedQuery";
 import { IUserProfile } from "../../hooks/user";
-import { IPayload, UploadFileTypes } from "../../helpers/achievement";
 import { ACHIEVEMENT_OPTIONS } from "../../queries/achievement";
 import {
   SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE,
@@ -122,7 +122,7 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
       id: number,
       payLoad: IPayload,
       onSuccess?: (sucsse: boolean) => void
-    ) => {
+    ): Promise<boolean> => {
       try {
         const response = await updateAchievement({
           variables: {
@@ -165,7 +165,7 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
     file: UploadFile,
     achievementOptionId: number,
     type: string
-  ) => {
+  ): Promise<string | undefined> => {
     let link: string | undefined;
     console.log(file, type);
     try {

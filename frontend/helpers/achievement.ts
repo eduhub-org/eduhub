@@ -1,8 +1,40 @@
+import { AchievementRecordType_enum } from "../__generated__/globalTypes";
+import { UploadFile } from "./filehandling";
+
 export const QUERY_LIMIT = 100;
+
+export interface TempAchievementOptionMentor {
+  userId: number; // Table ID of Expert
+  firstName: string;
+  lastName: string;
+}
+export interface TempAchievementOptionCourse {
+  courseId?: number; // Table ID of Course
+  title: string;
+  programShortName: string;
+}
+export interface IDataToManipulate {
+  achievementOptionId: number | null;
+  description: string | null;
+  documentationTemplateUrl: string | null;
+  evaluationScriptUrl: string | null;
+  recordType: AchievementRecordType_enum | null;
+  title: string | null;
+  experts: TempAchievementOptionMentor[];
+  courses: TempAchievementOptionCourse[];
+  documentTemplateFile?: UploadFile;
+  evalutionScriptFile?: UploadFile;
+}
 
 export interface IPayload {
   key: string;
-  value: any;
+  value:
+    | number
+    | string
+    | boolean
+    | UploadFile
+    | TempAchievementOptionMentor[]
+    | TempAchievementOptionCourse[];
 }
 
 export const DefaultAchievementOptions: string[] = [

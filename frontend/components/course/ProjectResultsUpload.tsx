@@ -13,8 +13,7 @@ import { Button } from "../common/Button";
 import ModalControl from "../common/ModalController";
 
 import EhDebounceInput from "../common/EhDebounceInput";
-import { MdAddCircleOutline, MdTitle } from "react-icons/md";
-import EhTag from "../common/EhTag";
+import { MdAddCircleOutline } from "react-icons/md";
 import { BlockTitle } from "../common/BlockTitle";
 import { ManagedCourse_Course_by_pk } from "../../queries/__generated__/ManagedCourse";
 import AchievementOptionDropDown from "../achievements/AchievementOptionDropDown";
@@ -32,8 +31,6 @@ import {
   useKeycloakUserProfile,
   useUserId,
 } from "../../hooks/user";
-import { Fade, Modal } from "@material-ui/core";
-import { ModalContent } from "../common/ModalContent";
 import { SelectUserDialog } from "../common/dialogs/SelectUserDialog";
 import { UserForSelection1_User } from "../../queries/__generated__/UserForSelection1";
 import EhTagStingId from "../common/EhTagStingId";

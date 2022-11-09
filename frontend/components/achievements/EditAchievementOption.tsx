@@ -2,11 +2,6 @@ import { FC, useCallback, useContext } from "react";
 import { useAdminMutation } from "../../hooks/authedMutation";
 import { AchievementOptionList_AchievementOption } from "../../queries/__generated__/AchievementOptionList";
 import { AchievementContext } from "./AchievementOptionDashboard";
-import AddEditAchievementOptionComponent, {
-  IDataToManipulate,
-  TempAchievementOptionCourse,
-  TempAchievementOptionMentor,
-} from "./AddEditAchievementOptionComponent";
 import {
   InsertAnAchievementOptionCourse,
   InsertAnAchievementOptionCourseVariables,
@@ -31,9 +26,14 @@ import {
 } from "../../queries/__generated__/DeleteAnAchievementOptionMentorWithWhere";
 import {
   AchievementKeys,
+  IDataToManipulate,
   IPayload,
+  TempAchievementOptionCourse,
+  TempAchievementOptionMentor,
   UploadFileTypes,
 } from "../../helpers/achievement";
+import { UploadFile } from "../../helpers/filehandling";
+import AddEditAchievementOptionComponent from "./AddEditAchievementOptionComponent";
 
 interface IProps {
   onSuccess: (success: boolean) => void;
@@ -186,7 +186,10 @@ const EditAchievementOption: FC<IProps> = (props) => {
   /* #endregion */
 
   const onPropertyChanged = useCallback(
-    async (achievementOptionId: number, payload: IPayload) => {
+    async (
+      achievementOptionId: number,
+      payload: IPayload
+    ): Promise<boolean> => {
       try {
         switch (payload.key) {
           case AchievementKeys.TITLE:
@@ -197,48 +200,52 @@ const EditAchievementOption: FC<IProps> = (props) => {
               payload,
               props.onSuccess
             );
-            return success ? 1 : 0;
+            return success;
           }
           case AchievementKeys.ADD_A_MENTOR:
-            return await queryAddAchievementOptionMentors(
+            const insertedID = await queryAddAchievementOptionMentors(
               achievementOptionId,
-              payload.value
+              payload.value as number
             );
+            return insertedID > 0;
           case AchievementKeys.ADD_A_COURSE:
-            return await queryAddAchievementOptionCourse(
+            const addedId = await queryAddAchievementOptionCourse(
               achievementOptionId,
-              payload.value
+              payload.value as number
             );
+            return addedId > 0;
           case AchievementKeys.DELETE_A_MENTOR:
-            return await queryDeleteAnAchievementMentorFromDB(
+            const delId = await queryDeleteAnAchievementMentorFromDB(
               achievementOptionId,
-              payload.value
+              payload.value as number
             );
+            return delId > 0;
           case AchievementKeys.DELETE_A_COURSE:
-            return await queryDeleteAnAchievementCourseFromDB(
+            const deletedId = await queryDeleteAnAchievementCourseFromDB(
               achievementOptionId,
-              payload.value
+              payload.value as number
             );
+            return deletedId > 0;
           case AchievementKeys.DOCUMENT_TEMPLATE_FILE: {
             const uploadedResponse = await context.uploadFile(
-              payload.value,
+              payload.value as UploadFile,
               achievementOptionId,
               UploadFileTypes.SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE
             );
-            return uploadedResponse ? 1 : 0;
+            return uploadedResponse ? true : false;
           }
           case AchievementKeys.EVALUTION_SCRIPT_FILE: {
             const uploadScriptFile = await context.uploadFile(
-              payload.value,
+              payload.value as UploadFile,
               achievementOptionId,
               UploadFileTypes.SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT
             );
-            return uploadScriptFile ? 1 : 0;
+            return uploadScriptFile ? true : false;
           }
         }
       } catch (error) {}
 
-      return 0;
+      return false;
     },
     [
       props,
