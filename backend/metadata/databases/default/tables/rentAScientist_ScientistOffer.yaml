@@ -1,6 +1,6 @@
 table:
   name: ScientistOffer
-  schema: public
+  schema: rentAScientist
 object_relationships:
   - name: Program
     using:
@@ -19,7 +19,7 @@ array_relationships:
         column: offerId
         table:
           name: ScientistOfferRelation
-          schema: public
+          schema: rentAScientist
 select_permissions:
   - role: anonymous
     permission:

@@ -15,14 +15,14 @@ array_relationships:
         column: program_id
         table:
           name: RentAScientistConfig
-          schema: public
+          schema: rentAScientist
   - name: ScientistOffers
     using:
       foreign_key_constraint_on:
         column: programId
         table:
           name: ScientistOffer
-          schema: public
+          schema: rentAScientist
 select_permissions:
   - role: anonymous
     permission:
