@@ -31,7 +31,6 @@ export const TabSelection: FC<IProps> = ({ currentTab, tabs }) => {
       <div className={`w-full sm:w-auto grid ${cols} gap-x-4`}>
         {tabs.map((tab, index) => (
           <Link key={tab} href={`?tab=${index}`}>
-            <a>
               <div
                 className={`flex flex-1 p-3 ${
                   currentTab === index ? "bg-edu-green" : "bg-gray-100"
@@ -41,7 +40,6 @@ export const TabSelection: FC<IProps> = ({ currentTab, tabs }) => {
                   {tab}
                 </span>
               </div>
-            </a>
           </Link>
         ))}
       </div>
