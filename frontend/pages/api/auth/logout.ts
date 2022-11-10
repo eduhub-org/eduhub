@@ -1,23 +1,19 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getToken } from "next-auth/jwt";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const token = await getToken({ req });
 
     if (!token && process.env.NEXTAUTH_URL) {
-      console.warn(
-        "No JWT token found when calling /logout endpoint,"
-      );
+      console.warn("No JWT token found when calling /logout endpoint,");
       return res.redirect(307, process.env.NEXTAUTH_URL);
     }
-    if (token && !token.idToken)
+    if (token && !token.idToken) {
       throw new Error(
         "Without an id_token the user won't be redirected back from the IdP after logout."
       );
+    }
 
     if (token && token.idToken && process.env.NEXT_PUBLIC_AUTH_URL) {
       const endsessionURL = `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/protocol/openid-connect/logout`;
@@ -36,4 +32,6 @@ export default async function handler(
   } catch (error) {
     console.error(error);
   }
-}
+};
+
+export default handler;

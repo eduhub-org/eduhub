@@ -1,8 +1,9 @@
 module.exports = {
-  darkMode: false, // or 'media' or 'class'
-  mode: "jit",
   plugins: [],
-  purge: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     extend: {
       gridTemplateColumns: {

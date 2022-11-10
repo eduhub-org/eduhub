@@ -58,8 +58,8 @@ export default NextAuth({
     }),
   ],
   callbacks: {
-    signIn: async ({account}) => {
-      if (account.access_token) {
+    signIn: async ({ account }) => {
+      if (account && account.access_token) {
         await updateUser(account.access_token, account.providerAccountId);
       }
       return true;

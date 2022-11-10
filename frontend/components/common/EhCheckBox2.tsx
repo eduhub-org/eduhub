@@ -10,10 +10,10 @@ const EhCheckBox2: FC<IProps> = ({ property, onClickHandler }) => {
   return (
     <div
       className="flex flex-row space-x-1 cursor-pointer"
-      onClick={useCallback(() => onClickHandler(property), [
-        onClickHandler,
-        property,
-      ])}
+      onClick={useCallback(
+        () => onClickHandler(property),
+        [onClickHandler, property]
+      )}
     >
       {property.selected ? (
         <MdCheckBox size="1.5em" />

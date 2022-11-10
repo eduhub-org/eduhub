@@ -25,6 +25,7 @@ export const ModalContent: FC<IProps> = ({
             src={xIconColor === "black" ? xIconBlack : xIconWhite}
             width={22}
             height={21}
+            alt="close icon"
           />
         </div>
       </div>
