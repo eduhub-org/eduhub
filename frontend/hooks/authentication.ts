@@ -4,8 +4,6 @@ import { KeycloakInstance } from "keycloak-js";
 export const useIsLoggedIn = (): boolean => {
   const { data: sessionData, status } = useSession();
 
-  console.log("status", status, "token", sessionData?.accessToken);
-
   return (status === "authenticated" || false) && !!sessionData?.accessToken;
 };
 
