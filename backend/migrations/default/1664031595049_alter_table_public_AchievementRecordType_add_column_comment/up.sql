@@ -1,2 +1,2 @@
-alter table "public"."AchievementRecordType" add column "comment" text
+alter table "public"."AchievementRecordType" add column IF NOT EXISTS "comment" text
  null;
