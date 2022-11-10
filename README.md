@@ -177,3 +177,7 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
 1.  Apollo Codegenerator (from scripts in package.json)
 
         yarn apollo:codegen
+
+1.  Load data to docker (file name: busybox.tar.gz)
+
+        docker load < busybox.tar.gz

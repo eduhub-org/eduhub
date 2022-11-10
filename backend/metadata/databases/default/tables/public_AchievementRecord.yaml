@@ -26,11 +26,7 @@ insert_permissions:
         - description
         - documentationUrl
         - id
-<<<<<<< HEAD
-      backend_only: false
-=======
         - uploadUserId
->>>>>>> 1e3857d20ba10d5e4d47b812b327cf0fb7d5382c
 select_permissions:
   - role: anonymous
     permission:

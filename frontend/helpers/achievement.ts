@@ -4,7 +4,7 @@ import { UploadFile } from "./filehandling";
 export const QUERY_LIMIT = 100;
 
 export interface TempAchievementOptionMentor {
-  userId: number; // Table ID of Expert
+  userId: string; //
   firstName: string;
   lastName: string;
 }
@@ -20,7 +20,7 @@ export interface IDataToManipulate {
   evaluationScriptUrl: string | null;
   recordType: AchievementRecordType_enum | null;
   title: string | null;
-  experts: TempAchievementOptionMentor[];
+  mentors: TempAchievementOptionMentor[];
   courses: TempAchievementOptionCourse[];
   documentTemplateFile?: UploadFile;
   evalutionScriptFile?: UploadFile;

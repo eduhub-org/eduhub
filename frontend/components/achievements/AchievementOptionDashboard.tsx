@@ -408,18 +408,18 @@ const AchievementRow: FC<IPropsForARow> = (props) => {
         <td className={tdClass}>
           {/* Mentoren */}
           <div className={`${ml} flex items-center space-x-2`}>
-            {props.acop.AchievementOptionMentors.length > 0 && (
-              <EhTag
-                tag={{
-                  display: makeFullName(
-                    props.acop.AchievementOptionMentors[0].Expert.User
-                      .firstName,
-                    props.acop.AchievementOptionMentors[0].Expert.User.lastName
-                  ),
-                  id: props.acop.AchievementOptionMentors[0].id,
-                }}
-              />
-            )}
+            {props.acop.AchievementOptionMentors.length > 0 &&
+              props.acop.AchievementOptionMentors[0].User && (
+                <EhTag
+                  tag={{
+                    display: makeFullName(
+                      props.acop.AchievementOptionMentors[0].User.firstName,
+                      props.acop.AchievementOptionMentors[0].User.lastName
+                    ),
+                    id: props.acop.AchievementOptionMentors[0].id,
+                  }}
+                />
+              )}
             {/* <MdAddCircle
                 className="cursor-pointer inline-block align-middle stroke-cyan-500"
                 onClick={handleArrowClick}

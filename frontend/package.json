@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@types/cookie": "^0.5.1",
-    "@types/node": "^18.6.3",
+    "@types/node": "^16.16.0",
     "@types/react": "^18.0.18",
     "@types/react-datepicker": "^4.4.2",
     "@types/react-dom": "^18.0.6",

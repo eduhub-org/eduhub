@@ -8,7 +8,7 @@ export const USER_PROGRAM_FRAGMENT = gql`
     lectureEnd
     lectureStart
     title
-    projectRecordUploadDeadline
+    achievementRecordUploadDeadline
   }
 `;
 
@@ -23,7 +23,7 @@ export const ADMIN_PROGRAM_FRAGMENT = gql`
     lectureEnd
     lectureStart
     participationCertificateTemplateURL
-    projectRecordUploadDeadline
+    achievementRecordUploadDeadline
     shortTitle
     speakerQuestionnaire
     startQuestionnaire

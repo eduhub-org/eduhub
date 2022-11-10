@@ -65,7 +65,7 @@ services:
       POSTGRES_PASSWORD: postgrespassword
 
   keycloak:
-    build: 
+    build:
       context: ./keycloak/
       dockerfile: Dockerfile-dev
     ports:

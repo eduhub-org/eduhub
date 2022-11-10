@@ -23,6 +23,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile-dev
+    command: tail -F anything
     env_file:
       - frontend.env
     volumes:

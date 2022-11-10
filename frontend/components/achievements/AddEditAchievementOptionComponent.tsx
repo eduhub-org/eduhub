@@ -15,14 +15,17 @@ import { UploadFile } from "../../helpers/filehandling";
 import { makeFullName } from "../../helpers/util";
 import { AdminCourseList_Course } from "../../queries/__generated__/AdminCourseList";
 import { ExpertList_Expert } from "../../queries/__generated__/ExpertList";
+import { UserForSelection1_User } from "../../queries/__generated__/UserForSelection1";
 import { Button } from "../common/Button";
-import ExpertsDialog from "../common/dialogs/ExpertsDialog";
+import { SelectUserDialog } from "../common/dialogs/SelectUserDialog";
 import EhInputWithTitle from "../common/EhInputWithTitle";
 import EhSelectForEnum from "../common/EhSelectForEnum";
 import EhTag from "../common/EhTag";
+import EhTagStingId from "../common/EhTagStingId";
 import TagWithTwoText from "../common/TagWithTwoText";
 import { UiFileInputButton } from "../common/UiFileInputButton";
 import CourseListDialog from "../courses/CoureListDialog";
+import UserList from "../users/UserList";
 import { AchievementContext } from "./AchievementOptionDashboard";
 
 interface IState extends IDataToManipulate {
@@ -181,27 +184,27 @@ const AddEditAchievementOptionComponent: FC<IPropsAddEditAchievementTempData> = 
   );
 
   const addAchievementMentorHandler = useCallback(
-    async (confirmed: boolean, expert: ExpertList_Expert | null) => {
-      if (expert && !state.experts.find((u) => u.userId === expert.id)) {
+    async (confirmed: boolean, user: UserForSelection1_User | null) => {
+      if (user && !state.mentors.find((u) => u.userId === user.id)) {
         if (state.achievementOptionId && props.onPropertyChanged) {
           // Update in Database first
           const response = await props.onPropertyChanged(
             state.achievementOptionId,
             {
               key: AchievementKeys.ADD_A_MENTOR,
-              value: expert.id,
+              value: user.id,
             }
           );
           if (!response) return;
         }
         const newMentor: TempAchievementOptionMentor = {
-          userId: expert.id,
-          firstName: expert.User.firstName,
-          lastName: expert.User.lastName,
+          userId: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
         };
         dispatch({
-          key: "experts",
-          value: [...state.experts, newMentor],
+          key: "mentors",
+          value: [...state.mentors, newMentor],
         });
       }
       dispatch({ key: "showMentorDialog", value: false });
@@ -239,8 +242,8 @@ const AddEditAchievementOptionComponent: FC<IPropsAddEditAchievementTempData> = 
   );
 
   const onDeleteAMentor = useCallback(
-    async (userIdFromUserTable: number) => {
-      if (state.experts.find((u) => u.userId === userIdFromUserTable)) {
+    async (userIdFromUserTable: string) => {
+      if (state.mentors.find((u) => u.userId === userIdFromUserTable)) {
         if (state.achievementOptionId && props.onPropertyChanged) {
           const response = await props.onPropertyChanged(
             state.achievementOptionId,
@@ -252,9 +255,9 @@ const AddEditAchievementOptionComponent: FC<IPropsAddEditAchievementTempData> = 
           if (!response) return;
         }
         dispatch({
-          key: "experts",
+          key: "mentors",
           value: [
-            ...state.experts.filter((e) => e.userId !== userIdFromUserTable),
+            ...state.mentors.filter((e) => e.userId !== userIdFromUserTable),
           ],
         });
       }
@@ -302,7 +305,7 @@ const AddEditAchievementOptionComponent: FC<IPropsAddEditAchievementTempData> = 
   return (
     <>
       {state.showMentorDialog && (
-        <ExpertsDialog
+        <SelectUserDialog
           onClose={addAchievementMentorHandler}
           open={state.showMentorDialog}
           title={"Mentoren"}
@@ -327,13 +330,11 @@ const AddEditAchievementOptionComponent: FC<IPropsAddEditAchievementTempData> = 
           <div>
             <div className="flex space-x-2 mt-7 justify-center">
               <div className="grid gap-2">
-                {state.experts.map((e, index) => (
-                  <EhTag
+                {state.mentors.map((e, index) => (
+                  <EhTagStingId
                     key={`mentors-${index}`}
-                    tag={{
-                      display: makeFullName(e.firstName, e.lastName),
-                      id: e.userId ?? undefined,
-                    }}
+                    title={makeFullName(e.firstName, e.lastName)}
+                    id={e.userId ?? undefined}
                     requestDeleteTag={onDeleteAMentor}
                   />
                 ))}

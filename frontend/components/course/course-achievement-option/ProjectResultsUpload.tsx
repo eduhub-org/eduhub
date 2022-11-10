@@ -1,187 +1,54 @@
 import {
   ChangeEvent,
   FC,
-  MouseEvent,
-  createContext,
   useCallback,
   useContext,
   useReducer,
   useRef,
   useState,
 } from "react";
-import { Button } from "../common/Button";
-import ModalControl from "../common/ModalController";
+import { Button } from "../../common/Button";
 
-import EhDebounceInput from "../common/EhDebounceInput";
 import { MdAddCircleOutline } from "react-icons/md";
-import { BlockTitle } from "../common/BlockTitle";
-import { ManagedCourse_Course_by_pk } from "../../queries/__generated__/ManagedCourse";
-import AchievementOptionDropDown from "../achievements/AchievementOptionDropDown";
-import { useAdminQuery } from "../../hooks/authedQuery";
 import {
-  AchievementOptionCourses,
-  AchievementOptionCoursesVariables,
-  AchievementOptionCourses_AchievementOptionCourse,
-} from "../../queries/__generated__/AchievementOptionCourses";
-import { ACHIEVEMENT_OPTION_COURSES } from "../../queries/achievementOptionCourse";
-import { ContentRow } from "../common/ContentRow";
-import { AchievementRecordType_enum } from "../../__generated__/globalTypes";
+  parseFileUploadEvent,
+  UploadFile,
+} from "../../../helpers/filehandling";
+import { makeFullName } from "../../../helpers/util";
+import { useAdminMutation } from "../../../hooks/authedMutation";
 import {
-  IUserProfile,
-  useKeycloakUserProfile,
-  useUserId,
-} from "../../hooks/user";
-import { SelectUserDialog } from "../common/dialogs/SelectUserDialog";
-import { UserForSelection1_User } from "../../queries/__generated__/UserForSelection1";
-import EhTagStingId from "../common/EhTagStingId";
-import { makeFullName } from "../../helpers/util";
+  INSERT_AN_ACHIEVEMENT_RECORD,
+  UPDATE_AN_ACHIEVEMENT_RECORD,
+} from "../../../queries/achievementRecord";
+import {
+  SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE,
+  SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION,
+} from "../../../queries/actions";
+import { AchievementOptionCourses_AchievementOptionCourse } from "../../../queries/__generated__/AchievementOptionCourses";
+import {
+  InsertAnAchievementRecord,
+  InsertAnAchievementRecordVariables,
+} from "../../../queries/__generated__/InsertAnAchievementRecord";
+import {
+  SaveAchievementRecordCoverImage,
+  SaveAchievementRecordCoverImageVariables,
+} from "../../../queries/__generated__/SaveAchievementRecordCoverImage";
+import {
+  SaveAchievementRecordDocumentation,
+  SaveAchievementRecordDocumentationVariables,
+} from "../../../queries/__generated__/SaveAchievementRecordDocumentation";
+import {
+  UpdateAchievementRecordByPk,
+  UpdateAchievementRecordByPkVariables,
+} from "../../../queries/__generated__/UpdateAchievementRecordByPk";
+import { UserForSelection1_User } from "../../../queries/__generated__/UserForSelection1";
+import { AchievementRecordType_enum } from "../../../__generated__/globalTypes";
+import { ContentRow } from "../../common/ContentRow";
+import { SelectUserDialog } from "../../common/dialogs/SelectUserDialog";
+import EhDebounceInput from "../../common/EhDebounceInput";
+import EhTagStingId from "../../common/EhTagStingId";
+import { ProjectResutlUploadContext } from "./CourseAchievementOption";
 
-interface IContext {
-  record: AchievementOptionCourses_AchievementOptionCourse;
-  course: ManagedCourse_Course_by_pk;
-  userId: string | undefined;
-  userProfile: IUserProfile | undefined;
-}
-
-const ProjectResutlUploadContext = createContext({} as IContext);
-
-interface IProps {
-  course: ManagedCourse_Course_by_pk;
-}
-const ProjectResultsUpload: FC<IProps> = (props) => {
-  const userId = useUserId();
-  const profile = useKeycloakUserProfile();
-
-  const [showModal, setShowModal] = useState(false);
-  const [record, setRecord] = useState(
-    {} as AchievementOptionCourses_AchievementOptionCourse
-  );
-
-  const close = useCallback(() => {
-    setShowModal(false);
-  }, [setShowModal]);
-
-  const upload = useCallback(() => {
-    setShowModal(true);
-  }, [setShowModal]);
-
-  const [
-    isVisibleAchievementOptions,
-    setAchievementOptionVisibility,
-  ] = useState(false);
-  const [
-    archiveOptionsAnchorElement,
-    setAnchorElement,
-  ] = useState<HTMLElement>();
-
-  const onAchivementOptionDropdown = useCallback(
-    (event: MouseEvent<HTMLElement>) => {
-      setAnchorElement(event.currentTarget);
-      setAchievementOptionVisibility(true);
-    },
-    [setAnchorElement, setAchievementOptionVisibility]
-  );
-
-  const onItemSelectedFromDropdown = useCallback(
-    (item: AchievementOptionCourses_AchievementOptionCourse) => {
-      setRecord(item);
-    },
-    [setRecord]
-  );
-  const achievementOptionCourseRequest = useAdminQuery<
-    AchievementOptionCourses,
-    AchievementOptionCoursesVariables
-  >(ACHIEVEMENT_OPTION_COURSES, {
-    variables: {
-      where:
-        props.course && props.course.id
-          ? {
-              courseId: { _eq: props.course.id },
-            }
-          : {},
-    },
-  });
-
-  const aCourseList = [
-    ...(achievementOptionCourseRequest.data?.AchievementOptionCourse || []),
-  ];
-
-  const providerValue: IContext = {
-    course: props.course,
-    record,
-    userProfile: profile,
-    userId,
-  };
-
-  return (
-    <ProjectResutlUploadContext.Provider value={providerValue}>
-      <div className="flex flex-col space-y-3 itmes-start">
-        <BlockTitle>Leistungsnachweis</BlockTitle>
-        <span className="text-lg mt-6">
-          Den Leistungsnachweis musst Du bis spätestens zum 16.02.2021
-          hochgeladen haben.
-        </span>
-        <div className="flex mt-10 mb-4">
-          {!achievementOptionCourseRequest.loading && aCourseList.length > 0 && (
-            <div onClick={onAchivementOptionDropdown}>
-              <Button>Wähle einen Leistungsnachweis ↓ </Button>
-            </div>
-          )}
-
-          {isVisibleAchievementOptions && (
-            <AchievementOptionDropDown
-              anchorElement={archiveOptionsAnchorElement}
-              isVisible={isVisibleAchievementOptions}
-              setVisible={setAchievementOptionVisibility}
-              courseAchievementOptions={aCourseList}
-              callback={onItemSelectedFromDropdown}
-            />
-          )}
-        </div>
-        {record.id && (
-          <div className="flex">
-            <Button filled onClick={upload}>
-              ↑ Nachweis hochladen
-            </Button>
-          </div>
-        )}
-        {record.id && (
-          <div>
-            <p>
-              Der letzte Nachweis mit Dir als Autor wurde am 12.03.2021 um 21.44
-              Uhr von Brigitte Mustermann hochgeladen.
-            </p>
-          </div>
-        )}
-      </div>
-      {showModal && (
-        <ModalControl showModal={showModal} onClose={close}>
-          <Content />
-        </ModalControl>
-        // <Modal
-        //   open={showModal}
-        //   onClose={close}
-        //   className="flex justify-center items-center border-none"
-        //   disableEnforceFocus
-        //   disableBackdropClick={false}
-        //   closeAfterTransition
-        // >
-        //   <Fade in={showModal}>
-        //     <ModalContent
-        //       closeModal={close}
-        //       className="w-full sm:w-auto h-full sm:h-auto sm:m-16 sm:rounded bg-edu-black pb-8"
-        //       xIconColor="white"
-        //     >
-        //       <Content />
-        //     </ModalContent>
-        //   </Fade>
-        // </Modal>
-      )}
-    </ProjectResutlUploadContext.Provider>
-  );
-};
-
-export default ProjectResultsUpload;
 interface TempUser {
   id: string; // uuid
   firstName: string;
@@ -194,14 +61,22 @@ interface State {
   csvFileName: string;
   description: string;
   authors: TempUser[];
-}
-interface Type {
-  type: string;
-  value: any;
+  coverImageFile?: UploadFile;
+  documentationZipFile?: UploadFile;
+  csvResultFile?: UploadFile;
 }
 
-const Content: FC = () => {
+interface Type {
+  type: string;
+  value: string | TempUser[] | UploadFile;
+}
+
+interface IProps {
+  achievementOptionCourse: AchievementOptionCourses_AchievementOptionCourse;
+}
+const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
   const context = useContext(ProjectResutlUploadContext);
+  const achievementOptionId = achievementOptionCourse.achievementOptionId;
   const [visibleAuthorList, setVisibleAuthorList] = useState(false);
   const initialState: State = {
     achievementRecordTableId: -1,
@@ -218,23 +93,48 @@ const Content: FC = () => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  /* #region database */
+  const [insertAnAchievementRecordAPI] = useAdminMutation<
+    InsertAnAchievementRecord,
+    InsertAnAchievementRecordVariables
+  >(INSERT_AN_ACHIEVEMENT_RECORD);
+
+  const [udpateAnAchievementRecordAPI] = useAdminMutation<
+    UpdateAchievementRecordByPk,
+    UpdateAchievementRecordByPkVariables
+  >(UPDATE_AN_ACHIEVEMENT_RECORD);
+
+  const [saveAchievementRecordCoverImage] = useAdminMutation<
+    SaveAchievementRecordCoverImage,
+    SaveAchievementRecordCoverImageVariables
+  >(SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE);
+
+  const [saveAchievementRecordDocumentation] = useAdminMutation<
+    SaveAchievementRecordDocumentation,
+    SaveAchievementRecordDocumentationVariables
+  >(SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION);
+  /* #endregion */
+
   const uploadTitleBild = useCallback(
-    (formData: FormData, name: string) => {
-      dispatch({ type: "imageName", value: name });
+    (file: UploadFile) => {
+      dispatch({ type: "imageName", value: file.name });
+      dispatch({ type: "coverImageFile", value: file });
     },
     [dispatch]
   );
 
   const uploadDocumentationsZip = useCallback(
-    (formData: FormData, name: string) => {
-      dispatch({ type: "zipFileName", value: name });
+    (file: UploadFile) => {
+      dispatch({ type: "zipFileName", value: file.name });
+      dispatch({ type: "documentationZipFile", value: file });
     },
     [dispatch]
   );
 
   const uploadResultCsv = useCallback(
-    (formData: FormData, name: string) => {
-      dispatch({ type: "csvFileName", value: name });
+    (file: UploadFile) => {
+      dispatch({ type: "csvFileName", value: file.name });
+      dispatch({ type: "csvResultFile", value: file });
     },
     [dispatch]
   );
@@ -255,9 +155,86 @@ const Content: FC = () => {
     setVisibleAuthorList(true);
   }, [setVisibleAuthorList]);
 
-  const save = useCallback(() => {
+  const save = useCallback(async () => {
     console.log("save");
-  }, []);
+    try {
+      const result = await insertAnAchievementRecordAPI({
+        variables: {
+          insertInput: {
+            uploadUserId: context.userId,
+            achievementOptionId,
+            description: state.description,
+            AchievementRecordAuthors: {
+              data: state.authors.map((a) => ({ userId: a.id })),
+            },
+          },
+        },
+      });
+      if (result.errors || !result.data?.insert_AchievementRecord_one?.id) {
+        return;
+      }
+
+      const achievementRecordId = result.data.insert_AchievementRecord_one.id;
+      if (achievementRecordId <= 0) return;
+      if (state.csvResultFile) {
+        await udpateAnAchievementRecordAPI({
+          variables: {
+            id: achievementRecordId,
+            setInput: {
+              csvResults: state.coverImageFile?.data,
+            },
+          },
+        });
+      }
+
+      if (state.coverImageFile) {
+        const saveResult = await saveAchievementRecordCoverImage({
+          variables: {
+            achievementRecordId,
+            base64File: state.coverImageFile.data,
+            fileName: state.coverImageFile.name,
+          },
+        });
+        if (saveResult.data?.saveAchievementRecordCoverImage?.link) {
+          await udpateAnAchievementRecordAPI({
+            variables: {
+              id: achievementRecordId,
+              setInput: {
+                coverImageUrl:
+                  saveResult.data.saveAchievementRecordCoverImage.link,
+              },
+            },
+          });
+        }
+      }
+      if (!state.documentationZipFile) return;
+      const uploadResult = await saveAchievementRecordDocumentation({
+        variables: {
+          achievementRecordId,
+          base64File: state.documentationZipFile.data,
+          fileName: state.documentationZipFile.name,
+        },
+      });
+      if (!uploadResult.data?.saveAchievementRecordDocumentation?.link) return;
+      await udpateAnAchievementRecordAPI({
+        variables: {
+          id: achievementRecordId,
+          setInput: {
+            documentationUrl:
+              uploadResult.data.saveAchievementRecordDocumentation.link,
+          },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }, [
+    insertAnAchievementRecordAPI,
+    udpateAnAchievementRecordAPI,
+    state,
+    saveAchievementRecordCoverImage,
+    saveAchievementRecordDocumentation,
+  ]);
 
   const onDescriptionChange = useCallback(
     (value: string) =>
@@ -308,17 +285,19 @@ const Content: FC = () => {
         />
         <div className="px-8 flex flex-col space-y-5 pt-5">
           <div className="">
-            <p className="">UMSATZVORHERSAGE FÜR EINE BÄCKEREIFILIALE</p>
+            <p className="uppercase">
+              {achievementOptionCourse.AchievementOption.title}
+            </p>
           </div>
           <div className="flex flex-col space-y-2">
-            {context.record.AchievementOption.recordType ===
+            {achievementOptionCourse.AchievementOption.recordType ===
               AchievementRecordType_enum.DOCUMENTATION && (
               <div className="flex flex-row space-x-1">
                 <p className="w-2/6">Titlebild</p>
                 <div className="w-4/6">
                   <UploadUI
                     bottomText="Optimal ist eine Größe von XXX x XXX Pixel."
-                    onChange={uploadTitleBild}
+                    onFileChoosed={uploadTitleBild}
                     uploadFileName={state.imageName}
                     acceptedFileTypes=".png"
                     placeholder="Cover image (.png)"
@@ -362,14 +341,14 @@ const Content: FC = () => {
               </div>
             </div>
 
-            {context.record.AchievementOption.recordType ===
+            {achievementOptionCourse.AchievementOption.recordType ===
               AchievementRecordType_enum.DOCUMENTATION && (
               <div className="flex flex-row space-x-1">
                 <p className="w-2/6">Dokumentation</p>
                 <div className="w-4/6">
                   <UploadUI
                     bottomText="Benutze diese Vorlage zum Hochladen der Dokumentation!"
-                    onChange={uploadDocumentationsZip}
+                    onFileChoosed={uploadDocumentationsZip}
                     uploadFileName={state.zipFileName}
                     acceptedFileTypes=".zip"
                     placeholder=".zip"
@@ -377,14 +356,14 @@ const Content: FC = () => {
                 </div>
               </div>
             )}
-            {context.record.AchievementOption.recordType ===
+            {achievementOptionCourse.AchievementOption.recordType ===
               AchievementRecordType_enum.DOCUMENTATION_AND_CSV && (
               <div className="flex flex-row space-x-1">
                 <p className="w-2/6">CSV Ergebnisse</p>
                 <div className="w-4/6">
                   <UploadUI
                     bottomText="Benutze diese Vorlage zum Hochladen der CSV-Ergebnisse!"
-                    onChange={uploadResultCsv}
+                    onFileChoosed={uploadResultCsv}
                     uploadFileName={state.csvFileName}
                     acceptedFileTypes=".csv"
                     placeholder=".csv"
@@ -403,14 +382,14 @@ const Content: FC = () => {
     </>
   );
 };
-
+export default ProjectResultsUpload;
 export interface IPropsUpload {
   acceptedFileTypes?: string;
   allowMultipleFiles?: boolean;
   bottomText: string;
-  onChange: (formData: FormData, fileName: string) => void;
   uploadFileName: string;
   placeholder?: string;
+  onFileChoosed: (file: UploadFile) => void;
 }
 
 const UploadUI: FC<IPropsUpload> = (props) => {
@@ -422,22 +401,11 @@ const UploadUI: FC<IPropsUpload> = (props) => {
   }, [fileInputRef]);
 
   const onChangeHandler = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      if (!event.target.files?.length) {
-        return;
-      }
-
-      const formData = new FormData();
-
-      Array.from(event.target.files).forEach((file) => {
-        formData.append(event.target.name, file);
-      });
-
-      props.onChange(formData, event.target.files[0].name);
-
-      formRef.current?.reset();
+    async (event: ChangeEvent<HTMLInputElement>) => {
+      const ufile = await parseFileUploadEvent(event);
+      if (ufile) props.onFileChoosed(ufile);
     },
-    [props, formRef]
+    [props]
   );
 
   return (

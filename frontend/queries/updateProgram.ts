@@ -8,7 +8,7 @@ export const INSERT_PROGRAM = gql`
         lectureEnd: $today
         applicationStart: $today
         defaultApplicationEnd: $today
-        projectRecordUploadDeadline: $today
+        achievementRecordUploadDeadline: $today
         title: $title
         visibility: false
         visibilityParticipationCertificate: false
@@ -147,7 +147,7 @@ export const UPDATE_PROGRAM_UPLOAD_DEADLINE = gql`
   mutation UpdateProgramUploadDeadline($programId: Int!, $deadline: date!) {
     update_Program_by_pk(
       pk_columns: { id: $programId }
-      _set: { projectRecordUploadDeadline: $deadline }
+      _set: { achievementRecordUploadDeadline: $deadline }
     ) {
       id
     }

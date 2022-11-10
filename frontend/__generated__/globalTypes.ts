@@ -38,9 +38,9 @@ export enum AchievementOptionMentor_constraint {
 export enum AchievementOptionMentor_update_column {
   achievementOptionId = "achievementOptionId",
   created_at = "created_at",
-  expertId = "expertId",
   id = "id",
   updated_at = "updated_at",
+  userId = "userId",
 }
 
 /**
@@ -488,6 +488,7 @@ export enum Program_constraint {
  * update columns of table "Program"
  */
 export enum Program_update_column {
+  achievementRecordUploadDeadline = "achievementRecordUploadDeadline",
   applicationStart = "applicationStart",
   attendanceCertificateTemplateURL = "attendanceCertificateTemplateURL",
   closingQuestionnaire = "closingQuestionnaire",
@@ -497,7 +498,6 @@ export enum Program_update_column {
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
   participationCertificateTemplateURL = "participationCertificateTemplateURL",
-  projectRecordUploadDeadline = "projectRecordUploadDeadline",
   shortTitle = "shortTitle",
   speakerQuestionnaire = "speakerQuestionnaire",
   startQuestionnaire = "startQuestionnaire",
@@ -1008,7 +1008,6 @@ export interface AchievementOptionMentor_arr_rel_insert_input {
  */
 export interface AchievementOptionMentor_avg_order_by {
   achievementOptionId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1017,15 +1016,15 @@ export interface AchievementOptionMentor_avg_order_by {
  */
 export interface AchievementOptionMentor_bool_exp {
   AchievementOption?: AchievementOption_bool_exp | null;
-  Expert?: Expert_bool_exp | null;
+  User?: User_bool_exp | null;
   _and?: AchievementOptionMentor_bool_exp[] | null;
   _not?: AchievementOptionMentor_bool_exp | null;
   _or?: AchievementOptionMentor_bool_exp[] | null;
   achievementOptionId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
-  expertId?: Int_comparison_exp | null;
   id?: Int_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
+  userId?: uuid_comparison_exp | null;
 }
 
 /**
@@ -1033,12 +1032,12 @@ export interface AchievementOptionMentor_bool_exp {
  */
 export interface AchievementOptionMentor_insert_input {
   AchievementOption?: AchievementOption_obj_rel_insert_input | null;
-  Expert?: Expert_obj_rel_insert_input | null;
+  User?: User_obj_rel_insert_input | null;
   achievementOptionId?: number | null;
   created_at?: any | null;
-  expertId?: number | null;
   id?: number | null;
   updated_at?: any | null;
+  userId?: any | null;
 }
 
 /**
@@ -1047,9 +1046,9 @@ export interface AchievementOptionMentor_insert_input {
 export interface AchievementOptionMentor_max_order_by {
   achievementOptionId?: order_by | null;
   created_at?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
   updated_at?: order_by | null;
+  userId?: order_by | null;
 }
 
 /**
@@ -1058,9 +1057,9 @@ export interface AchievementOptionMentor_max_order_by {
 export interface AchievementOptionMentor_min_order_by {
   achievementOptionId?: order_by | null;
   created_at?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
   updated_at?: order_by | null;
+  userId?: order_by | null;
 }
 
 /**
@@ -1078,9 +1077,9 @@ export interface AchievementOptionMentor_on_conflict {
 export interface AchievementOptionMentor_set_input {
   achievementOptionId?: number | null;
   created_at?: any | null;
-  expertId?: number | null;
   id?: number | null;
   updated_at?: any | null;
+  userId?: any | null;
 }
 
 /**
@@ -1088,7 +1087,6 @@ export interface AchievementOptionMentor_set_input {
  */
 export interface AchievementOptionMentor_stddev_order_by {
   achievementOptionId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1097,7 +1095,6 @@ export interface AchievementOptionMentor_stddev_order_by {
  */
 export interface AchievementOptionMentor_stddev_pop_order_by {
   achievementOptionId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1106,7 +1103,6 @@ export interface AchievementOptionMentor_stddev_pop_order_by {
  */
 export interface AchievementOptionMentor_stddev_samp_order_by {
   achievementOptionId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1115,7 +1111,6 @@ export interface AchievementOptionMentor_stddev_samp_order_by {
  */
 export interface AchievementOptionMentor_sum_order_by {
   achievementOptionId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1124,7 +1119,6 @@ export interface AchievementOptionMentor_sum_order_by {
  */
 export interface AchievementOptionMentor_var_pop_order_by {
   achievementOptionId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1133,7 +1127,6 @@ export interface AchievementOptionMentor_var_pop_order_by {
  */
 export interface AchievementOptionMentor_var_samp_order_by {
   achievementOptionId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1142,7 +1135,6 @@ export interface AchievementOptionMentor_var_samp_order_by {
  */
 export interface AchievementOptionMentor_variance_order_by {
   achievementOptionId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1661,7 +1653,6 @@ export interface AchievementRecord_avg_order_by {
   achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
-  uploadUserId?: order_by | null;
 }
 
 /**
@@ -1685,7 +1676,7 @@ export interface AchievementRecord_bool_exp {
   rating?: AchievementRecordRating_enum_comparison_exp | null;
   score?: numeric_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
-  uploadUserId?: Int_comparison_exp | null;
+  uploadUserId?: uuid_comparison_exp | null;
 }
 
 /**
@@ -1706,7 +1697,7 @@ export interface AchievementRecord_insert_input {
   rating?: AchievementRecordRating_enum | null;
   score?: any | null;
   updated_at?: any | null;
-  uploadUserId?: number | null;
+  uploadUserId?: any | null;
 }
 
 /**
@@ -1796,7 +1787,7 @@ export interface AchievementRecord_set_input {
   rating?: AchievementRecordRating_enum | null;
   score?: any | null;
   updated_at?: any | null;
-  uploadUserId?: number | null;
+  uploadUserId?: any | null;
 }
 
 /**
@@ -1806,7 +1797,6 @@ export interface AchievementRecord_stddev_order_by {
   achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
-  uploadUserId?: order_by | null;
 }
 
 /**
@@ -1816,7 +1806,6 @@ export interface AchievementRecord_stddev_pop_order_by {
   achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
-  uploadUserId?: order_by | null;
 }
 
 /**
@@ -1826,7 +1815,6 @@ export interface AchievementRecord_stddev_samp_order_by {
   achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
-  uploadUserId?: order_by | null;
 }
 
 /**
@@ -1836,7 +1824,6 @@ export interface AchievementRecord_sum_order_by {
   achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
-  uploadUserId?: order_by | null;
 }
 
 /**
@@ -1846,7 +1833,6 @@ export interface AchievementRecord_var_pop_order_by {
   achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
-  uploadUserId?: order_by | null;
 }
 
 /**
@@ -1856,7 +1842,6 @@ export interface AchievementRecord_var_samp_order_by {
   achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
-  uploadUserId?: order_by | null;
 }
 
 /**
@@ -1866,7 +1851,6 @@ export interface AchievementRecord_variance_order_by {
   achievementOptionId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
-  uploadUserId?: order_by | null;
 }
 
 /**
@@ -3387,7 +3371,6 @@ export interface Expert_avg_order_by {
  * Boolean expression to filter rows from the table "Expert". All fields are combined with a logical 'AND'.
  */
 export interface Expert_bool_exp {
-  AchievementOptionMentors?: AchievementOptionMentor_bool_exp | null;
   CourseInstructors?: CourseInstructor_bool_exp | null;
   SessionSpeakers?: SessionSpeaker_bool_exp | null;
   User?: User_bool_exp | null;
@@ -3405,7 +3388,6 @@ export interface Expert_bool_exp {
  * input type for inserting data into table "Expert"
  */
 export interface Expert_insert_input {
-  AchievementOptionMentors?: AchievementOptionMentor_arr_rel_insert_input | null;
   CourseInstructors?: CourseInstructor_arr_rel_insert_input | null;
   SessionSpeakers?: SessionSpeaker_arr_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
@@ -3616,6 +3598,7 @@ export interface Program_bool_exp {
   _and?: Program_bool_exp[] | null;
   _not?: Program_bool_exp | null;
   _or?: Program_bool_exp[] | null;
+  achievementRecordUploadDeadline?: date_comparison_exp | null;
   applicationStart?: date_comparison_exp | null;
   attendanceCertificateTemplateURL?: String_comparison_exp | null;
   closingQuestionnaire?: String_comparison_exp | null;
@@ -3625,7 +3608,6 @@ export interface Program_bool_exp {
   lectureEnd?: date_comparison_exp | null;
   lectureStart?: date_comparison_exp | null;
   participationCertificateTemplateURL?: String_comparison_exp | null;
-  projectRecordUploadDeadline?: date_comparison_exp | null;
   shortTitle?: String_comparison_exp | null;
   speakerQuestionnaire?: String_comparison_exp | null;
   startQuestionnaire?: String_comparison_exp | null;
@@ -3642,6 +3624,7 @@ export interface Program_insert_input {
   Courses?: Course_arr_rel_insert_input | null;
   RentAScientistConfigs?: RentAScientistConfig_arr_rel_insert_input | null;
   ScientistOffers?: ScientistOffer_arr_rel_insert_input | null;
+  achievementRecordUploadDeadline?: any | null;
   applicationStart?: any | null;
   attendanceCertificateTemplateURL?: string | null;
   closingQuestionnaire?: string | null;
@@ -3651,7 +3634,6 @@ export interface Program_insert_input {
   lectureEnd?: any | null;
   lectureStart?: any | null;
   participationCertificateTemplateURL?: string | null;
-  projectRecordUploadDeadline?: any | null;
   shortTitle?: string | null;
   speakerQuestionnaire?: string | null;
   startQuestionnaire?: string | null;
@@ -3685,6 +3667,7 @@ export interface Program_order_by {
   Courses_aggregate?: Course_aggregate_order_by | null;
   RentAScientistConfigs_aggregate?: RentAScientistConfig_aggregate_order_by | null;
   ScientistOffers_aggregate?: ScientistOffer_aggregate_order_by | null;
+  achievementRecordUploadDeadline?: order_by | null;
   applicationStart?: order_by | null;
   attendanceCertificateTemplateURL?: order_by | null;
   closingQuestionnaire?: order_by | null;
@@ -3694,7 +3677,6 @@ export interface Program_order_by {
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
   participationCertificateTemplateURL?: order_by | null;
-  projectRecordUploadDeadline?: order_by | null;
   shortTitle?: order_by | null;
   speakerQuestionnaire?: order_by | null;
   startQuestionnaire?: order_by | null;

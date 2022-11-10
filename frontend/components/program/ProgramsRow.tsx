@@ -356,7 +356,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
           <DatePicker
             dateFormat={"dd/MM/yyyy"}
             className="w-full bg-gray-100"
-            selected={program.projectRecordUploadDeadline || new Date()}
+            selected={program.achievementRecordUploadDeadline || new Date()}
             onChange={handleSetUploadData}
           />
         </div>

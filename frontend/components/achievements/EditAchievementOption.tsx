@@ -49,13 +49,13 @@ const EditAchievementOption: FC<IProps> = (props) => {
   >(INSERT_AN_ACHIEVEMENT_OPTION_MENTOR);
 
   const queryAddAchievementOptionMentors = useCallback(
-    async (achievementOptionId: number, expertId: number) => {
+    async (achievementOptionId: number, userId: string) => {
       try {
         const response = await insertAnAchievementOptionMentor({
           variables: {
             data: {
               achievementOptionId,
-              expertId,
+              userId,
             },
           },
         });
@@ -112,7 +112,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
   >(DELETE_AN_ACHIEVEMENT_OPTION_MENTOR);
 
   const queryDeleteAnAchievementMentorFromDB = useCallback(
-    async (achievementOptionId: number, expertId: number) => {
+    async (achievementOptionId: number, userId: string) => {
       try {
         const response = await deleteMentorQuery({
           variables: {
@@ -122,7 +122,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
                   achievementOptionId: { _eq: achievementOptionId },
                 },
                 {
-                  expertId: { _eq: expertId },
+                  userId: { _eq: userId },
                 },
               ],
             },
@@ -205,7 +205,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
           case AchievementKeys.ADD_A_MENTOR:
             const insertedID = await queryAddAchievementOptionMentors(
               achievementOptionId,
-              payload.value as number
+              payload.value as string
             );
             return insertedID > 0;
           case AchievementKeys.ADD_A_COURSE:
@@ -217,7 +217,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
           case AchievementKeys.DELETE_A_MENTOR:
             const delId = await queryDeleteAnAchievementMentorFromDB(
               achievementOptionId,
-              payload.value as number
+              payload.value as string
             );
             return delId > 0;
           case AchievementKeys.DELETE_A_COURSE:
@@ -265,12 +265,12 @@ const EditAchievementOption: FC<IProps> = (props) => {
     documentationTemplateUrl: ao.documentationTemplateUrl,
     evaluationScriptUrl: ao.evaluationScriptUrl,
     recordType: ao.recordType,
-    experts: ao.AchievementOptionMentors.map(
+    mentors: ao.AchievementOptionMentors.map(
       (m) =>
         ({
-          userId: m.expertId,
-          firstName: m.Expert.User.firstName,
-          lastName: m.Expert.User.lastName,
+          userId: m.userId,
+          firstName: m.User?.firstName,
+          lastName: m.User?.lastName,
         } as TempAchievementOptionMentor)
     ),
     courses: ao.AchievementOptionCourses.map(

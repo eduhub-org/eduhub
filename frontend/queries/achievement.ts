@@ -36,13 +36,10 @@ export const ACHIEVEMENT_OPTIONS = gql`
       }
       AchievementOptionMentors {
         id
-        expertId
-        Expert {
-          User {
-            firstName
-            lastName
-            id
-          }
+        userId
+        User {
+          firstName
+          lastName
         }
       }
     }

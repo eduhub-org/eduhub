@@ -19,6 +19,7 @@ export const ACHIEVEMENT_RECORD_LIST = gql`
         id
         userId
       }
+      created_at
     }
   }
 `;

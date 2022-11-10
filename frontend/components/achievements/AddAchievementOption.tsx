@@ -43,7 +43,7 @@ const AddAchievemenOption: FC<IProps> = ({ onSuccess }) => {
                 data: data.courses.map((c) => ({ courseId: c.courseId })),
               },
               AchievementOptionMentors: {
-                data: data.experts.map((e) => ({ expertId: e.userId })), // We need to change this field
+                data: data.mentors.map((e) => ({ userId: e.userId })), // We need to change this field
               },
             },
           },
@@ -94,9 +94,9 @@ const AddAchievemenOption: FC<IProps> = ({ onSuccess }) => {
     documentationTemplateUrl: null,
     evaluationScriptUrl: null,
     recordType: context.achievementRTypes[0] as AchievementRecordType_enum,
-    experts: profile
+    mentors: profile
       ? new Array({
-          userId: 364, // will be deleted later
+          userId: context.userId,
           firstName: profile.firstName,
           lastName: profile.lastName,
         } as TempAchievementOptionMentor)
