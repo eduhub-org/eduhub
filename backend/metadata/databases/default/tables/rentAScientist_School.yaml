@@ -1,0 +1,45 @@
+table:
+  name: School
+  schema: rentAScientist
+array_relationships:
+  - name: SchoolClasses
+    using:
+      foreign_key_constraint_on:
+        column: schoolId
+        table:
+          name: SchoolClass
+          schema: rentAScientist
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - city
+        - district
+        - dstnr
+        - name
+        - postalCode
+        - schoolType
+        - street
+      filter: {}
+  - role: instructor_access
+    permission:
+      columns:
+        - city
+        - district
+        - dstnr
+        - name
+        - postalCode
+        - schoolType
+        - street
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - city
+        - district
+        - dstnr
+        - name
+        - postalCode
+        - schoolType
+        - street
+      filter: {}

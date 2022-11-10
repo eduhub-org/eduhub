@@ -31,7 +31,6 @@ export const getStaticProps = async ({ locale }: { locale: string }) => ({
 const Home: FC = () => {
   const { t } = useTranslation("start-page");
   const { data: sessionData } = useSession();
-  console.log(sessionData);
 
   const isLoggedIn = useIsLoggedIn();
 
