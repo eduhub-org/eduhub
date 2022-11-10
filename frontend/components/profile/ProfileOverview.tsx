@@ -1,7 +1,7 @@
 import { FC } from "react";
 
-interface IProps {}
-const ProfileOverview: FC<IProps> = () => {
+// interface IProps {}
+const ProfileOverview: FC = () => {
   return <div>Test</div>;
 };
 

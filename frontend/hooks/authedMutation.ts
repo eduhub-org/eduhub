@@ -1,7 +1,4 @@
-import {
-  QueryResult,
-  useMutation
-} from "@apollo/client";
+import { QueryResult, useMutation } from "@apollo/client";
 import { useSession } from "next-auth/react";
 import { useCallback } from "react";
 import { DocumentNode } from "graphql";

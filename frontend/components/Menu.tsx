@@ -50,7 +50,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
   const router = useRouter();
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     // Fetch Keycloak Logout URL
     const res = await fetch("/api/auth/logout");
     const jsonPayload = await res?.json();
@@ -61,8 +61,8 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
     // Logging user out on keycloak and redirecting back to app
     router.push(url);
-  };
-  
+  }, [router]);
+
   return (
     <StyledMenu
       id="fade-menu"

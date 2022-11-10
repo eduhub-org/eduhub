@@ -56,7 +56,12 @@ const CourseStatusIndicator: FC<{
   if (enrollmentStatus === CourseEnrollmentStatus_enum.COMPLETED) {
     return (
       <div className="absolute top-0 right-3">
-        <Image src="/images/course/completed_flag.svg" width={37} height={46} />
+        <Image
+          src="/images/course/completed_flag.svg"
+          width={37}
+          height={46}
+          alt="completed flag"
+        />
       </div>
     );
   }
