@@ -1,11 +1,19 @@
 import { AnchorHTMLAttributes, FC, ReactNode } from "react";
+import Link, { LinkProps } from "next/link";
 
 type Props =
   | ({
       as: "a";
       filled?: boolean;
       inverted?: boolean;
+      children?: ReactNode;
     } & AnchorHTMLAttributes<HTMLAnchorElement>)
+  | ({
+      as: "link";
+      filled?: boolean;
+      inverted?: boolean;
+      children?: ReactNode;
+    } & LinkProps)
   | {
       as?: "button";
       filled?: boolean;
@@ -29,6 +37,15 @@ export const Button: FC<Props> = (props) => {
       <a className={className} {...rest}>
         {props.children}
       </a>
+    );
+  }
+
+  if (props.as === "link") {
+    const { as, filled, ...rest } = props;
+    return (
+      <Link className={className} {...rest}>
+        {props.children}
+      </Link>
     );
   }
 

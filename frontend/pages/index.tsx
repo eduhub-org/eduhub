@@ -31,7 +31,6 @@ export const getStaticProps = async ({ locale }: { locale: string }) => ({
 const Home: FC = () => {
   const { t } = useTranslation("start-page");
   const { data: sessionData } = useSession();
-  console.log(sessionData);
 
   const isLoggedIn = useIsLoggedIn();
 
@@ -65,20 +64,18 @@ const Home: FC = () => {
           <ClientOnly>
             <OnlyLoggedOut>
               <div className="flex justify-center mb-12">
-                <Link href="/myrequests">
-                  <a className="flex">
-                    <Button filled>{t("registerNow")}</Button>
-                  </a>
-                </Link>
+                <Button href="/myrequests" as="link" filled>
+                  {t("registerNow")}
+                </Button>
               </div>
             </OnlyLoggedOut>
           </ClientOnly>
         </div>
         <ClientOnly>
           <OnlyLoggedIn>
-          <div className="mt-11">
-            <MyCourses />
-          </div>
+            <div className="mt-11">
+              <MyCourses />
+            </div>
           </OnlyLoggedIn>
           <h2 id="courses" className="text-3xl font-semibold text-center mt-20">
             {t("findCourses")}
@@ -87,11 +84,9 @@ const Home: FC = () => {
             <TileSlider courses={courses?.Course ?? []} />
           </div>
           <div className="w-full flex justify-center mt-16 mb-24">
-            <Link href="/courses/admin">
-              <a className="flex">
-                <Button>{t("browse")}</Button>
-              </a>
-            </Link>
+            <Button href="/courses/admin" as="link">
+              {t("browse")}
+            </Button>
           </div>
           <OnlyLoggedOut>
             <div className="flex flex-col sm:flex-row mx-6 mt-6 mb-24 sm:mt-48">

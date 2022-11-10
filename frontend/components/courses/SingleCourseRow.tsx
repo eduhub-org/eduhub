@@ -181,11 +181,10 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   const makeInvitedConfirmedUnratedField = () => {
     const statusRecordsWithSum: EntrollmentStatusCount = {};
     course.CourseEnrollments.forEach((courseEn) => {
-      statusRecordsWithSum[
-        courseEn.CourseEnrollmentStatus.value
-      ] = statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value]
-        ? statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] + 1
-        : 1;
+      statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] =
+        statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value]
+          ? statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] + 1
+          : 1;
     });
     return `${statusRecordsWithSum[CourseEnrollmentStatus_enum.INVITED] ?? 0}/${
       statusRecordsWithSum[CourseEnrollmentStatus_enum.CONFIRMED] ?? 0
@@ -195,11 +194,10 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   const makeCompetitionField = () => {
     const statusRecordsWithSum: EntrollmentStatusCount = {};
     course.CourseEnrollments.forEach((courseEn) => {
-      statusRecordsWithSum[
-        courseEn.CourseEnrollmentStatus.value
-      ] = statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value]
-        ? statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] + 1
-        : 1;
+      statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] =
+        statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value]
+          ? statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] + 1
+          : 1;
     });
     return Object.keys(statusRecordsWithSum).reduce(
       (sum, key) => sum + statusRecordsWithSum[key],
@@ -399,7 +397,8 @@ const CourseDetails: FC<IPropsCourseOneRow> = ({ course, refetchCourses }) => {
             <div className="flex flex-col space-y-2 w-1/3">
               <div
                 onClick={updateCourse({
-                  attendanceCertificatePossible: !course.attendanceCertificatePossible,
+                  attendanceCertificatePossible:
+                    !course.attendanceCertificatePossible,
                 })}
               >
                 <EhCheckBox
@@ -409,7 +408,8 @@ const CourseDetails: FC<IPropsCourseOneRow> = ({ course, refetchCourses }) => {
               </div>
               <div
                 onClick={updateCourse({
-                  achievementCertificatePossible: !course.achievementCertificatePossible,
+                  achievementCertificatePossible:
+                    !course.achievementCertificatePossible,
                 })}
               >
                 <EhCheckBox

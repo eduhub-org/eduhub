@@ -1,6 +1,5 @@
-import { KeycloakInstance } from "keycloak-js";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { Profile } from "next-auth";
 
 import { User } from "../queries/__generated__/User";
 import { USER } from "../queries/user";
@@ -39,28 +38,16 @@ export interface IUserProfile {
 
 export const useKeycloakUserProfile = (): IUserProfile | undefined => {
   const { data: session } = useSession();
-  const [profile, setProfile] = useState<IUserProfile>();
-  const url = `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account`;
 
-  useEffect(() => {
-    fetch(url, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        Authorization: `bearer ${session?.accessToken}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setProfile({
-          email: data.email,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          username: data.username,
-          emailVerified: data.emailVerified ?? false,
-        });
-      });
-  });
+  const profile = session?.profile;
 
-  return profile;
+  if (!profile) return undefined;
+
+  return {
+    email: profile.email,
+    firstName: profile.given_name,
+    lastName: profile.family_name,
+    username: profile.preferred_username,
+    emailVerified: profile.email_verified,
+  };
 };

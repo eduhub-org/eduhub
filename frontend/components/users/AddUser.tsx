@@ -1,5 +1,5 @@
 import { TFunction } from "next-i18next";
-import { FC, useCallback, useEffect, useState, ChangeEvent } from "react";
+import { ChangeEvent, FC, useCallback, useEffect, useState } from "react";
 import {
   SelectComponentProperty,
   StaticComponentProperty,
@@ -45,9 +45,8 @@ const UniversityAndEmploymentStatusLoader: FC<IProps> = ({
   t,
   handleCancel,
 }) => {
-  const unersityListRequest = useAdminQuery<UnversityByComment>(
-    UNIVERSITY_LIST
-  );
+  const unersityListRequest =
+    useAdminQuery<UnversityByComment>(UNIVERSITY_LIST);
 
   if (unersityListRequest.error) {
     console.log(unersityListRequest.error);
@@ -233,7 +232,8 @@ const AddUserForm: FC<IPropsFrom> = ({
               placeholder={`${t("firstName")}*`}
               value={firstName}
               onChange={useCallback(
-                (e: ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value),
+                (e: ChangeEvent<HTMLInputElement>) =>
+                  setFirstName(e.target.value),
                 [setFirstName]
               )}
             />
@@ -242,7 +242,8 @@ const AddUserForm: FC<IPropsFrom> = ({
               placeholder={`${t("lastName")}*`}
               value={lastName}
               onChange={useCallback(
-                (e: ChangeEvent<HTMLInputElement>) => setLastName(e.target.value),
+                (e: ChangeEvent<HTMLInputElement>) =>
+                  setLastName(e.target.value),
                 [setLastName]
               )}
             />
@@ -277,7 +278,8 @@ const AddUserForm: FC<IPropsFrom> = ({
               placeholder={`${t("nameOfUniversity")}*`}
               disabled={school !== University_enum.OTHER}
               onChange={useCallback(
-                (e: ChangeEvent<HTMLInputElement>) => setSchoolName(e.target.value),
+                (e: ChangeEvent<HTMLInputElement>) =>
+                  setSchoolName(e.target.value),
                 [setSchoolName]
               )}
             />

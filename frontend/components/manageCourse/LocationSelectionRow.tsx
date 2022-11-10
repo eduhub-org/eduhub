@@ -1,5 +1,5 @@
 import { IconButton } from "@material-ui/core";
-import { FC, useCallback, ChangeEvent } from "react";
+import { ChangeEvent, FC, useCallback } from "react";
 import { DebounceInput } from "react-debounce-input";
 import { MdDelete } from "react-icons/md";
 import { ManagedCourse_Course_by_pk_CourseLocations } from "../../queries/__generated__/ManagedCourse";
