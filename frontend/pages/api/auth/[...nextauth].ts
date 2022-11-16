@@ -1,25 +1,10 @@
 import NextAuth from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
-import type { JWT } from "next-auth/jwt";
-import type { Account, Awaitable, Session, User } from "next-auth/core/types";
 import { GraphQLClient, gql } from "graphql-request";
+import axios from "axios";
 
-interface JWTData {
-  token: JWT;
-  user?: User;
-  account?: Account;
-}
-
-interface SessionData {
-  session: Session;
-  token: JWT;
-  user?: User;
-}
-
-interface LogoutMessage {
-  session: Session;
-  token: JWT;
-}
+import type { JWT } from "next-auth/jwt";
+import type { IKeycloakRefreshTokenApiResponse } from "./keycloakRefreshToken";
 
 const UPDATE_USER = gql`
   mutation update_User($id: ID!) {
@@ -47,11 +32,41 @@ const updateUser = async (accessToken: string, userId: string) => {
   }
 };
 
+const refreshAccessToken = async (token: JWT) => {
+  try {
+    const refreshedTokens = await axios.post<IKeycloakRefreshTokenApiResponse>(
+      `${process.env.NEXTAUTH_URL}/api/auth/keycloakRefreshToken`,
+      {
+        refreshToken: token?.refreshToken,
+      }
+    );
+
+    if (refreshedTokens.status !== 200) {
+      throw refreshedTokens;
+    }
+
+    return {
+      ...token,
+      accessToken: refreshedTokens.data.access_token,
+      accessTokenExpired: Date.now() + refreshedTokens.data.expires_in * 1000,
+      refreshToken: refreshedTokens.data.refresh_token ?? token.refreshToken,
+      refreshTokenExpired:
+        Date.now() + refreshedTokens.data.refresh_expires_in * 1000,
+    };
+  } catch (e) {
+    console.error(e);
+    return {
+      ...token,
+      error: "RefreshAccessTokenError",
+    };
+  }
+};
+
 export default NextAuth({
   providers: [
     KeycloakProvider({
       clientId: "hasura",
-      clientSecret: "OI8lPZDMKq15kcmeb5li4mFUH4qXBJxU",
+      clientSecret: process.env.CLIENT_SECRET!,
       authorization: `${process.env.NEXT_PUBLIC_AUTH_URL}/auth`,
       issuer: `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub`,
       idToken: true,
@@ -64,15 +79,25 @@ export default NextAuth({
       }
       return true;
     },
-    jwt: async ({ token, account, user, profile }) => {
+    jwt: async ({ token, account, profile }) => {
       // Persist the OAuth access_token to the token right after signin
       if (account && profile) {
-        // console.log(account, token);
         token.idToken = account.id_token;
         token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+        token.accessTokenExpired = account.expires_at! * 1000;
+        token.refreshTokenExpired =
+          Date.now() + account.refresh_expires_in * 1000;
         token.profile = profile;
       }
-      return token;
+
+      // Return previous token if the access token has not expired yet
+      if (Date.now() < token.accessTokenExpired) {
+        return token;
+      }
+
+      // Access token has expired, try to update it
+      return refreshAccessToken(token);
     },
     session: async ({ session, token, user }) => {
       // Send properties to the client, like an access_token from a provider.
