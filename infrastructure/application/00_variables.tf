@@ -151,5 +151,8 @@ variable "hasura_memory_limit" {
 }
 
 # Frontend
-
 # Rent-A-Scientist
+variable "nextauth_secret" {
+  description = "Used to encrypt the NextAuth.js JWT, and to hash email verification tokens. This is the default value for the secret option in NextAuth and Middleware."
+  type        = string
+}
