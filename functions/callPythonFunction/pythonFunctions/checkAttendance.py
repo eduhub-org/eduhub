@@ -4,7 +4,7 @@ from authlib.jose import jwt
 import json
 import yaml
 import logging
-import api
+#import api
 import pandas as pd
 from flask import escape
 from flask import jsonify
@@ -12,8 +12,6 @@ from flask import jsonify
 
 edu = EduHub()
 res = edu.get_participants_from_session(21)
-
-
 
 
 def get_zoom_attendances(arguments_json):
