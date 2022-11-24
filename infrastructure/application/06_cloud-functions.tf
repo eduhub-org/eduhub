@@ -864,6 +864,53 @@ resource "google_cloudfunctions2_function" "update_keycloak_profile" {
 }
 
 ###############################################################################
+# Create Google cloud function for addKeycloakRole
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "add_keycloak_role_noauth_invoker" {
+  location    = google_cloudfunctions2_function.add_keycloak_role.location
+  project     = google_cloudfunctions2_function.add_keycloak_role.project
+  service     = google_cloudfunctions2_function.add_keycloak_role.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "add_keycloak_role" {
+  name   = "cloud-functions/addKeycloakRole.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "add_keycloak_role" {
+  provider    = google-beta
+  location    = var.region
+  name        = "add-keycloak-role"
+  description = "Adds role mapping for given role for keycloak hasura client"
+
+  build_config {
+    runtime     = "nodejs14"
+    entry_point = "addKeycloakRole"
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.add_keycloak_role.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+      KEYCLOAK_USER                = var.keycloak_user
+      KEYCLOAK_URL                 = "https://${var.keycloak_service_name}.opencampus.sh"
+      KEYCLOAK_PW                  = var.keycloak_pw
+    }
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+  }
+}
+
+###############################################################################
 # Create Google cloud function for updateFromKeycloak
 #####
 # Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
