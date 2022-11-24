@@ -1,0 +1,1 @@
+CREATE TABLE "public"."SessionAddressType" ("value" text, "comment" text NOT NULL, PRIMARY KEY ("value") , UNIQUE ("value"));COMMENT ON TABLE "public"."SessionAddressType" IS E'Types defining the format of the address that is provided for a session';
