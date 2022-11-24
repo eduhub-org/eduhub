@@ -27,9 +27,9 @@ export const MyCourses: FC = () => {
         <span className="text-xl font-bold">
           Du hast noch keinen Kurs mit gemacht
         </span>
-        <a href="#courses">
-          <Button filled>Kurse entdecken</Button>
-        </a>
+        <Button as="a" href="#courses" filled>
+          Kurse entdecken
+        </Button>
       </div>
     );
   }

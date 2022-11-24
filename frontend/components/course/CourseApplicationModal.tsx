@@ -73,7 +73,7 @@ export const CourseApplicationModal: FC<IProps> = ({
         <div className="w-full sm:w-auto h-full sm:h-auto sm:m-16 sm:rounded bg-white">
           <div className="flex">
             <div className="flex p-6 cursor-pointer" onClick={closeModal}>
-              <Image src={xIcon} width={22} height={21} />
+              <Image src={xIcon} width={22} height={21} alt="close icon" />
             </div>
           </div>
           <div className="flex flex-col mt-4 mx-6 sm:mx-20">

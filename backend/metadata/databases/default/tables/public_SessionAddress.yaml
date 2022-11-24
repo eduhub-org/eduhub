@@ -5,6 +5,9 @@ object_relationships:
   - name: Session
     using:
       foreign_key_constraint_on: sessionId
+  - name: SessionAddressType
+    using:
+      foreign_key_constraint_on: type
 insert_permissions:
   - role: instructor_access
     permission:

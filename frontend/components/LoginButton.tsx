@@ -5,10 +5,10 @@ import { FC, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "./common/Button";
 
+const signInHandler = () => signIn("keycloak");
+
 export const LoginButton: FC = () => {
   const { t } = useTranslation();
 
-  return (
-    <Button onClick={() => signIn("keycloak")}>{t("loginButton.title")}</Button>
-  );
+  return <Button onClick={signInHandler}>{t("loginButton.title")}</Button>;
 };

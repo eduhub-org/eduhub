@@ -50,7 +50,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
   const router = useRouter();
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     // Fetch Keycloak Logout URL
     const res = await fetch("/api/auth/logout");
     const jsonPayload = await res?.json();
@@ -61,8 +61,8 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
     // Logging user out on keycloak and redirecting back to app
     router.push(url);
-  };
-  
+  }, [router]);
+
   return (
     <StyledMenu
       id="fade-menu"
@@ -75,46 +75,46 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
     >
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link href="/user-management">
-            <span className="w-full text-lg">User Management</span>
+          <Link className="w-full text-lg" href="/user-management">
+            User Management
           </Link>
         </MenuItem>
       )}
 
       <MenuItem onClick={closeMenu}>
-        <Link href="/profile">
-          <span className="w-full text-lg">Profil</span>
+        <Link className="w-full text-lg" href="/profile">
+          Profil
         </Link>
       </MenuItem>
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link href="/programs">
-            <span className="w-full text-lg">Programme</span>
+          <Link className="w-full text-lg" href="/programs">
+            Programme
           </Link>
         </MenuItem>
       )}
 
       {isInstructor && (
         <MenuItem onClick={closeMenu}>
-          <Link href="/courses/instructor">
-            <span className="w-full text-lg">Kurse (Instruktor)</span>
+          <Link className="w-full text-lg" href="/courses/instructor">
+            Kurse (Instruktor)
           </Link>
         </MenuItem>
       )}
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link href="/courses">
-            <span className="w-full text-lg">Kurse (Admin)</span>
+          <Link className="w-full text-lg" href="/courses">
+            Kurse (Admin)
           </Link>
         </MenuItem>
       )}
 
-      <MenuItem
-        onClick={logout}
-      >
-        <span className="w-full text-lg">Logout</span>
+      <MenuItem>
+        <button onClick={logout} className="w-full text-lg text-left">
+          Logout
+        </button>
       </MenuItem>
     </StyledMenu>
   );

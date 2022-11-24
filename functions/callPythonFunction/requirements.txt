@@ -1,0 +1,6 @@
+# These packages are automatically installed
+# Run this locally via: python -m pip install -r requirements.txt
+requests
+pyyaml
+Authlib
+flask

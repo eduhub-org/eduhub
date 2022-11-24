@@ -208,6 +208,13 @@ jobs:
           type: 'zip'
           directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementRecordDocumentation'
           filename: '../loadAchievementRecordDocumentation.zip'
+          
+      - name: Zip Archive for addKeycloakRole
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/addKeycloakRole'
+          filename: '../addKeycloakRole.zip'
 
       - name: Authenticate to Google Cloud
         id: 'auth'

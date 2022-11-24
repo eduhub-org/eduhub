@@ -1,9 +1,9 @@
 import { FC, ReactElement } from "react";
 
 import {
-  useIsLoggedIn,
   useIsAdmin,
   useIsInstructor,
+  useIsLoggedIn,
 } from "../../hooks/authentication";
 
 type TProps = {
@@ -32,10 +32,7 @@ export const OnlyNotInstructor: FC<TProps> = ({ children }: TProps) => {
   const isLoggedIn = useIsLoggedIn();
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
-  if (isLoggedIn && (
-    isInstructor ||
-    isAdmin )
-  ) {
+  if (isLoggedIn && (isInstructor || isAdmin)) {
     return null;
   } else {
     return <>{children}</>;

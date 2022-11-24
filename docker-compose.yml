@@ -67,11 +67,11 @@ services:
       CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE: "https://save-participation-certificate-template-szeuw2n5qa-ew.a.run.app"
       CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK: "https://update-from-keycloak-szeuw2n5qa-ew.a.run.app"
       CLOUD_FUNCTION_LINK_SEND_MAIL: "https://send-mail-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE: ""
-      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: ""
-      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: ""
-      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: ""
-      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: ""
+      CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE: "https://add-keycloak-role-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: "https://load-achievement-option-documentation-template-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: "https://save-achievement-option-documentation-template-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "https://load-achievement-option-evaluation-script-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "https://save-achievement-option.evaluation-script-szeuw2n5qa-ew.a.run.app"
 
     volumes:
       - ./backend/migrations:/hasura-migrations
