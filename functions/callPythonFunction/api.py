@@ -33,6 +33,10 @@ class EduHub:
         self.headers["x-hasura-admin-secret"] = self.hasura_admin_secret
         self.headers["content-type"] = 'application/json'
 
+    def to_datetime(self, date_time):
+        hasura_format = '%Y-%m-%dT%H:%M:%SZ'
+        return pd.to_datetime(date_time, format=hasura_format)
+
     def send_query(self, query, variables):
         self.set_headers()
         logging.info(
@@ -46,23 +50,35 @@ class EduHub:
 
     def get_sessions_without_attendance_check(self):
         variables = {}
-        query = """query($session_id: Int) {
-            CourseEnrollment(where: {Course: {Sessions: {id: {_eq: $session_id}}}}) {
-                User {
-                    firstName
-                    lastName
-                    email
+        query = """query {
+            Session(where: {attendanceData: {_is_null: true}}) {
+                id
+                SessionAddresses {
+                    link
+                    latitude
+                    longitude
                 }
+                startDateTime
+                endDateTime
             }
         }"""
         result = self.send_query(query, variables)
-        result_list = result['data']['CourseEnrollment']
-        unnested = []
-        unnested.append([item['User'] for item in result_list])
-        return pd.DataFrame(unnested[0], columns=['firstName', 'lastName', 'email'])
+        if result.get('data') is None:
+            return f'{result}'
+        result_list = result['data']['Session']
+        unnested_list = []
+        unnested_list.append([[item['id'], item['SessionAddresses']]
+                              for item in result_list])
+        sessions_df = pd.DataFrame(unnested[0], columns=[
+                                   'id', 'link', 'latitude', 'longitude', 'startDateTime', 'endDateTime'])
+        sessions_df['startDateTime'] = self.to_datetime(
+            sessions_df['startDateTime'])
+        sessions_df['endDateTime'] = self.to_datetime(
+            sessions_df['endDateTime'])
+        return sessions_df
 
     def get_participants_from_session(self, session_id):
-        variables = {'session_id': session_id}
+        variables = {'session_id': f'{session_id}'}
         query = """query($session_id: Int) {
             CourseEnrollment(where: {Course: {Sessions: {id: {_eq: $session_id}}}}) {
                 User {
@@ -74,12 +90,33 @@ class EduHub:
         }"""
         result = self.send_query(query, variables)
         result_list = result['data']['CourseEnrollment']
-        unnested = []
-        unnested.append([item['User'] for item in result_list])
-        return pd.DataFrame(unnested[0], columns=['firstName', 'lastName', 'email'])
+        unnested_list = []
+        unnested_list.append([item['User'] for item in result_list])
+        return pd.DataFrame(unnested_list[0], columns=['firstName', 'lastName', 'email'])
 
     def get_participants_from_course(self, course_id):
         variables = {'course_id': course_id}
+        query = """query($course_id: Int) {
+            CourseEnrollment(where: {courseId: {_eq: $course_id}}) {
+                User {
+                    firstName
+                    lastName
+                    email
+                }
+            }
+        }"""
+        return self.send_query(query, variables)
+
+    def mutate_attendance(self, participant_attendance):
+        variables = {}
+        query = """query($course_id: Int) {
+            return self.send_query(query, variables)
+
+    def mutate_session_attendanceData(self, session_id, attendance_data):
+
+        variables = {'session': f'{session_id}',
+                     'attendance_data': f'{attendance_data}'}
+        # variables = {'session': f'{session_id}', 'attendance_data[?]': f'{attendance_data[?]}'}
         query = """query($course_id: Int) {
             CourseEnrollment(where: {courseId: {_eq: $course_id}}) {
                 User {
@@ -116,6 +153,10 @@ class Zoom:
     def get_jwt_token(self):
         return self.jwt_token
 
+    def to_datetime(self, date_time):
+        zoom_format = '%Y-%m-%dT%H:%M:%SZ'
+        return pd.to_datetime(date_time, format=zoom_format)
+
     def generate_jwt_token(self) -> bytes:
         if self.api_key is None or self.api_secret is None:
             return 'Error: No API key or secret defined in the environment variables'
@@ -150,6 +191,43 @@ class Zoom:
                                             headers={"Authorization": f"Bearer {self.jwt_token.decode('utf-8')}"})
         return r
 
+    def format_zoom_attendances(self, session_participants):
+        attendances = pd.DataFrame(
+            session_participants, columns=['name', 'email', 'join_time', 'leave_time', 'duration'])
+        attendances.rename(
+            columns={'join_time': 'joinDateTime', 'leave_time': 'leaveDateTime'}, inplace=True)
+        attendances['duration'] = attendances.groupby(
+            ['name']).transform('sum')['duration']
+        attendances['interruptionCount'] = attendances.groupby(
+            ['name']).transform('count')['duration']
+        attendances = attendances.drop_duplicates('name')
+        return attendances
+
+    def get_meeting_id(self, meeting_url):
+        """It removes the http part at the beginning and password or addon part in the end of the meeting_id"""
+        if meeting_url[:4] == 'http' or meeting_url.find('/j/') > 0:
+            meeting_url = meeting_url.split('/j/')[1]
+        if meeting_url.find('?') > 0:
+            meeting_url = meeting_url[:meeting_url.index('?')]
+        return meeting_url
+
+    def get_session_attendance(self, meeting_url):
+        logging.info(f"Getting online attendances from Zoom")
+        meeting_id = self.get_meeting_id(meeting_url)
+        # gets the particpations for the last occuring meeting under the given url
+        zoom_session = self.get_last_meeting_session(meeting_id)
+        if zoom_session.status_code != 200:
+            return f"Error: Zoom API answered with {zoom_session} \n\nFull Text: {zoom_session.text}"
+        logging.info(f"Zoom API response: {zoom_session}")
+        logging.info(f"Zoom API response text: {zoom_session.text}")
+        zoom_session = json.loads(zoom_session.text)
+        if zoom_session.get('participants') is None:
+            return f"Report has no participants. Are you sure the meeting id is correct?\nReport:\n{zoom_session.text}"
+        zoom_attendances = self.format_zoom_attendances(
+            zoom_session['participants'])
+        logging.info("participants:", zoom_attendances)
+        return zoom_attendances
+
 
 # version 13/10/2021
 class LimeSurvey:
@@ -177,6 +255,10 @@ class LimeSurvey:
     def set_key(self, s_key):
         self.s_key = s_key
 
+    def to_datetime(self, date_time):
+        limesurvey_format = '%Y-%m-%d %H:%M:%S'
+        return pd.to_datetime(date_time, format=limesurvey_format)
+
     def create_lms_request(self, payload):
         req = urllib.request.Request(
             url=self.url, data=json.dumps(payload).encode("utf-8"))
@@ -203,7 +285,7 @@ class LimeSurvey:
             e = sys.exc_info()[0]
             print("<p>Error: %s</p>" % e)
 
-    def get_answers(self):
+    def get_responses(self):
         func_name = "export_responses"
         payload = {'method': func_name,
                    'params': [self.s_key, self.sID, 'json'],
@@ -211,9 +293,13 @@ class LimeSurvey:
         req = self.create_lms_request(payload)
         try:
             f = urllib.request.urlopen(req)
-            answersb64 = f.read()
-            ans_j = json.loads(answersb64)
-            return base64.b64decode(ans_j['result'])
+
+            request_json = json.loads(f.read())
+            result_base64 = request_json['result']
+            result_json = json.loads(base64.b64decode(result_base64))
+            response_df = self.format_responses(result_json['responses'])
+            return(response_df)
+
         except:
             e = sys.exc_info()[0]
             print("<p>Error: %s</p>" % e)
@@ -235,12 +321,21 @@ class LimeSurvey:
             e = sys.exc_info()[0]
             print("<p>Error: %s</p>" % e)
 
-    def clean_responses(self, json_response: str):
+    def format_responses(self, response_list):
+        unnested_responses = []
+        for i, resp in enumerate(response_list):
+            for d_key in resp.keys():
+                resp_data = resp[d_key]  # so it is encapsulated
+                unnested_responses.append(resp_data)
+        response_df = pd.DataFrame(unnested_responses, columns=list(
+            list(response_list[0].items())[0][1].keys()))
+        return response_df
+
+    def clean_responses(self, response_json):
         """remove empty and non valid responses."""
         valid_responses = []
-        resp_list = json.loads(json_response)['responses']
-        logging.info(f"Got {len(resp_list)} responses")
-        for i, resp in enumerate(resp_list):
+        logging.info(f"Got {len(response_json)} responses")
+        for i, resp in enumerate(response_json):
             # resp is a dict
             for d_key in resp.keys():
                 resp_data = resp[d_key]  # so it is encapsulated
@@ -257,7 +352,7 @@ class LimeSurvey:
     def filter_attendances_by_time(self, attendances, start_datetime: str, end_datetime: str):
         """
         It returns only the responses within the given time range.
-        Times should be strings in Zoom format, timestamptz %Y-%m-%dT%H:%M:%SZ.
+        Times should be strings in Zoom format, timestamptz % Y-%m-%dT % H: % M: % SZ.
         """
         format_zoom = '%Y-%m-%dT%H:%M:%SZ'
         start_datetime = datetime.strptime(start_datetime, format_zoom)
@@ -268,9 +363,9 @@ class LimeSurvey:
         start_timerange_allowed = start_datetime + timedelta(hours=1)
         end_timerange_allowed = end_datetime + timedelta(hours=3)
         filtered_resp = []
+        format_survey = '%Y-%m-%d %H:%M:%S'
         for attendance in attendances:
             joinDateTime = attendance['joinDateTime']
-            format_survey = '%Y-%m-%d %H:%M:%S'
             join_datetime = datetime.strptime(joinDateTime, format_survey)
             if join_datetime.date() == start_datetime.date():
                 if join_datetime.time() > start_timerange_allowed.time() and join_datetime.time() < end_timerange_allowed.time():
