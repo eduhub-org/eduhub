@@ -44,6 +44,15 @@ resource "google_cloud_run_service" "rent_a_scientist" {
           }
         }
         env {
+          name = "NEXTAUTH_SECRET"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.nextauth_secret.secret_id
+              key  = "latest"
+            }
+          }
+        }
+        env {
           name  = "NODE_ENV"
           value = "production"
         }

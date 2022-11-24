@@ -7,6 +7,28 @@ resource "google_cloud_run_service_iam_policy" "frontend_noauth_invoker" {
   policy_data = data.google_iam_policy.noauth_invoker.policy_data
 }
 
+# Create a variable for the NextAuth secret 
+resource "google_secret_manager_secret" "nextauth_secret" {
+  provider  = google-beta
+  secret_id = "nextauth-secret"
+  replication {
+    automatic = true
+  }
+}
+# Set the password of the NextAuth secret
+resource "google_secret_manager_secret_version" "nextauth_secret" {
+  provider    = google-beta
+  secret      = google_secret_manager_secret.nextauth_secret.name
+  secret_data = var.nextauth_secret
+}
+# Grant the compute engine service account permissions to access the secrect for the Hasura graphql admin
+resource "google_secret_manager_secret_iam_member" "nextauth_secret" {
+  secret_id  = google_secret_manager_secret.nextauth_secret.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.nextauth_secret]
+}
+
 # Define the Google Cloud Run service for the Frontend
 resource "google_cloud_run_service" "frontend" {
   provider = google-beta
@@ -39,6 +61,15 @@ resource "google_cloud_run_service" "frontend" {
           value_from {
             secret_key_ref {
               name = google_secret_manager_secret.hasura_graphql_admin_key.secret_id
+              key  = "latest"
+            }
+          }
+        }
+        env {
+          name = "NEXTAUTH_SECRET"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.nextauth_secret.secret_id
               key  = "latest"
             }
           }
