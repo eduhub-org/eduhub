@@ -27,7 +27,7 @@ resource "google_cloudfunctions2_function" "call_python_function" {
 
   build_config {
     runtime     = "python38"
-    entry_point = "callPythonFunction"
+    entry_point = "call_python_function"
     source {
       storage_source {
         bucket = var.project_id

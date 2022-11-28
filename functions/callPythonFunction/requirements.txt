@@ -7,7 +7,6 @@ Authlib
 flask
 python-Levenshtein
 fuzzywuzzy
-logging
 time
 typing
 authlib
