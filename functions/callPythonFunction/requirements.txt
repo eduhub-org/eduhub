@@ -1,8 +1,18 @@
 # These packages are automatically installed
 # Run this locally via: python -m pip install -r requirements.txt
+pandas
 requests
 pyyaml
 Authlib
 flask
 python-Levenshtein
 fuzzywuzzy
+logging
+time
+typing
+authlib
+urllib
+base64
+datetime
+sys
+os
