@@ -4,6 +4,59 @@
 
 
 ###############################################################################
+# Create Google cloud function for callPythonFunction
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "call_python_function_noauth_invoker" {
+  location    = google_cloudfunctions2_function.call_python_function.location
+  project     = google_cloudfunctions2_function.call_python_function.project
+  service     = google_cloudfunctions2_function.call_python_function.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "call_python_function" {
+  name   = "cloud-functions/callPythonFunction.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "call_python_function" {
+  provider    = google-beta
+  location    = var.region
+  name        = "call-python-function"
+  description = "Calls a Python function povided in the corresponding function folder"
+
+  build_config {
+    runtime     = "python38"
+    entry_point = "callPythonFunction"
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.call_python_function.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      HASURA_SERVICE_NAME          = var.hasura_service_name
+      HASURA_GRAPHQL_ADMIN_KEY     = var.hasura_graphql_admin_key
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+      ZOOM_API_KEY                 = var.zoom_api_key
+      ZOOM_API_SECRET              = var.zoom_api_key
+      LMS_URL                      = var.lms_user
+      LMS_USER                     = var.lms_user
+      LMS_PASSWORD                 = var.lms_password
+      LMS_ATTENDANCE_SURVEY_ID     = var.lms_attendance_survey_id
+    }
+    max_instance_count = 500
+    available_memory   = "256M"
+    timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
+  }
+}
+
+###############################################################################
 # Create Google cloud function for loadAchievementCertificate
 #####
 # Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function

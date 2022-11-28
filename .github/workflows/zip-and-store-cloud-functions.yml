@@ -8,34 +8,30 @@ on:
         required: true
         type: string
       # Name of the cloud function (and of the folder in which it is defined)
-      CLOUD_FUNCTION_FOLDER: 
+      CLOUD_FUNCTION_FOLDER:
         required: true
         type: string
       # Name of the Google storage bucket in which the archive will be stored
       BUCKET_NAME:
         required: true
         type: string
-      
+
     secrets:
       GCP_SERVICE_ACCOUNT_KEY:
         required: true
       GCP_REGION:
         required: true
 
-
 jobs:
-
   zip-and-store:
     name: Zip and Store Cloud Function in Google Storage Bucket
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Check Out the Repository Branch
         uses: actions/checkout@v2
 
-      - 
-        name: Copy module to functions
+      - name: Copy module to functions
         run: |
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificateTemplate/lib/'
@@ -55,184 +51,189 @@ jobs:
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionDocumentationTemplate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionEvaluationScript/lib/'
 
+      - name: Zip Archive for callPythonFunction
+        uses: thedoctor0/zip-release@main
+        with:
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/callPythonFunction"
+          filename: "../callPythonFunction.zip"
+
       - name: Zip Archive for loadAchievementCertificate
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificate'
-          filename: '../loadAchievementCertificate.zip'
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificate"
+          filename: "../loadAchievementCertificate.zip"
 
       - name: Zip Archive for loadAchievementCertificateTemplate
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificateTemplate'
-          filename: '../loadAchievementCertificateTemplate.zip'
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificateTemplate"
+          filename: "../loadAchievementCertificateTemplate.zip"
 
       - name: Zip Archive for loadAchievementRecordDocumentation
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementRecordDocumentation'
-          filename: '../loadAchievementRecordDocumentation.zip'
-          
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementRecordDocumentation"
+          filename: "../loadAchievementRecordDocumentation.zip"
+
       - name: Zip Archive for loadParticipationCertificate
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadParticipationCertificate'
-          filename: '../loadParticipationCertificate.zip'
-          
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadParticipationCertificate"
+          filename: "../loadParticipationCertificate.zip"
+
       - name: Zip Archive for loadParticipationCertificateTemplate
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadParticipationCertificateTemplate'
-          filename: '../loadParticipationCertificateTemplate.zip'
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadParticipationCertificateTemplate"
+          filename: "../loadParticipationCertificateTemplate.zip"
 
       - name: Zip Archive for saveAchievementCertificate
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificate'
-          filename: '../saveAchievementCertificate.zip'
-          
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificate"
+          filename: "../saveAchievementCertificate.zip"
+
       - name: Zip Archive for saveAchievementCertificateTemplate
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificateTemplate'
-          filename: '../saveAchievementCertificateTemplate.zip'
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificateTemplate"
+          filename: "../saveAchievementCertificateTemplate.zip"
 
       - name: Zip Archive for saveAchievementRecordDocumentation
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordDocumentation'
-          filename: '../saveAchievementRecordDocumentation.zip'
-          
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordDocumentation"
+          filename: "../saveAchievementRecordDocumentation.zip"
+
       - name: Zip Archive for saveAchievementRecordCoverImage
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordCoverImage'
-          filename: '../saveAchievementRecordCoverImage.zip'
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordCoverImage"
+          filename: "../saveAchievementRecordCoverImage.zip"
 
       - name: Zip Archive for saveCourseImage
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveCourseImage'
-          filename: '../saveCourseImage.zip'
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveCourseImage"
+          filename: "../saveCourseImage.zip"
 
       - name: Zip Archive for saveParticipationCertificate
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveParticipationCertificate'
-          filename: '../saveParticipationCertificate.zip'
-          
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveParticipationCertificate"
+          filename: "../saveParticipationCertificate.zip"
+
       - name: Zip Archive for saveParticipationCertificateTemplate
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveParticipationCertificateTemplate'
-          filename: '../saveParticipationCertificateTemplate.zip'
-          
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveParticipationCertificateTemplate"
+          filename: "../saveParticipationCertificateTemplate.zip"
+
       - name: Zip Archive for saveUserProfileImage
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveUserProfileImage'
-          filename: '../saveUserProfileImage.zip'
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveUserProfileImage"
+          filename: "../saveUserProfileImage.zip"
 
       - name: Zip Archive for sendMail
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendMail'
-          filename: '../sendMail.zip'
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendMail"
+          filename: "../sendMail.zip"
 
       - name: Zip Archive for updateKeycloakProfile
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateKeycloakProfile'
-          filename: '../updateKeycloakProfile.zip'
-          
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateKeycloakProfile"
+          filename: "../updateKeycloakProfile.zip"
+
       - name: Zip Archive for updateFromKeycloak
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateFromKeycloak'
-          filename: '../updateFromKeycloak.zip'
-          
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateFromKeycloak"
+          filename: "../updateFromKeycloak.zip"
+
       - name: Zip Archive for saveAchievementOptionEvaluationScript
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionEvaluationScript'
-          filename: '../saveAchievementOptionEvaluationScript.zip'
-          
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionEvaluationScript"
+          filename: "../saveAchievementOptionEvaluationScript.zip"
+
       - name: Zip Archive for loadAchievementOptionEvaluationScript
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementOptionEvaluationScript'
-          filename: '../loadAchievementOptionEvaluationScript.zip'
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementOptionEvaluationScript"
+          filename: "../loadAchievementOptionEvaluationScript.zip"
 
       - name: Zip Archive for saveAchievementOptionDocumentationTemplate
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionDocumentationTemplate'
-          filename: '../saveAchievementOptionDocumentationTemplate.zip'
-          
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionDocumentationTemplate"
+          filename: "../saveAchievementOptionDocumentationTemplate.zip"
+
       - name: Zip Archive for loadAchievementOptionDocumentationTemplate
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementOptionDocumentationTemplate'
-          filename: '../loadAchievementOptionDocumentationTemplate.zip'
-          
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementOptionDocumentationTemplate"
+          filename: "../loadAchievementOptionDocumentationTemplate.zip"
+
       - name: Zip Archive for saveAchievementRecordDocumentation
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordDocumentation'
-          filename: '../saveAchievementRecordDocumentation.zip'
-          
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordDocumentation"
+          filename: "../saveAchievementRecordDocumentation.zip"
+
       - name: Zip Archive for loadAchievementRecordDocumentation
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementRecordDocumentation'
-          filename: '../loadAchievementRecordDocumentation.zip'
-          
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementRecordDocumentation"
+          filename: "../loadAchievementRecordDocumentation.zip"
+
       - name: Zip Archive for addKeycloakRole
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: './${{ inputs.CLOUD_FUNCTION_FOLDER }}/addKeycloakRole'
-          filename: '../addKeycloakRole.zip'
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/addKeycloakRole"
+          filename: "../addKeycloakRole.zip"
 
       - name: Authenticate to Google Cloud
-        id: 'auth'
-        uses: 'google-github-actions/auth@v0'
+        id: "auth"
+        uses: "google-github-actions/auth@v0"
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
           project_id: ${{ inputs.PROJECT_ID }}
 
       - name: Upload Archives to Google Cloud
-        id: 'upload-archives'
-        uses: 'google-github-actions/upload-cloud-storage@v0'
+        id: "upload-archives"
+        uses: "google-github-actions/upload-cloud-storage@v0"
         with:
-          path: './${{ inputs.CLOUD_FUNCTION_FOLDER }}'
-          destination: '${{ inputs.BUCKET_NAME }}/cloud-functions'
-          glob: '*.zip'
+          path: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}"
+          destination: "${{ inputs.BUCKET_NAME }}/cloud-functions"
+          glob: "*.zip"
           parent: false
 
-      - 
-        name: Show Output
+      - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
-        

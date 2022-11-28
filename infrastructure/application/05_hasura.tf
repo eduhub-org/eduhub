@@ -129,6 +129,14 @@ module "hasura_service" {
       value = var.project_id
     },
     {
+      name  = "CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNTION"
+      value = google_cloudfunctions2_function.call_python_function.service_config[0].uri
+    },
+    {
+      name  = "CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE"
+      value = google_cloudfunctions2_function.add_keycloak_role.service_config[0].uri
+    },
+    {
       name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE"
       value = google_cloudfunctions2_function.load_achievement_certificate.service_config[0].uri
     },

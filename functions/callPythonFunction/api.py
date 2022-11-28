@@ -35,7 +35,9 @@ class EduHub:
 
     def to_datetime(self, date_time):
         hasura_format = '%Y-%m-%dT%H:%M:%SZ'
-        return pd.to_datetime(date_time, format=hasura_format)
+        hasura_timezone = 'UTC'
+        reference_timezone = 'Europe/Berlin'
+        return pd.to_datetime(date_time, format=hasura_format).dt.tz_localize(hasura_timezone).dt.tz_convert(reference_timezone)
 
     def send_query(self, query, variables):
         self.set_headers()
@@ -64,12 +66,12 @@ class EduHub:
         }"""
         result = self.send_query(query, variables)
         if result.get('data') is None:
-            return f'{result}'
+            return logging.error(f'{result}')
         result_list = result['data']['Session']
         unnested_list = []
         unnested_list.append([[item['id'], item['SessionAddresses']]
                               for item in result_list])
-        sessions_df = pd.DataFrame(unnested[0], columns=[
+        sessions_df = pd.DataFrame(unnested_list[0], columns=[
                                    'id', 'link', 'latitude', 'longitude', 'startDateTime', 'endDateTime'])
         sessions_df['startDateTime'] = self.to_datetime(
             sessions_df['startDateTime'])
@@ -77,11 +79,32 @@ class EduHub:
             sessions_df['endDateTime'])
         return sessions_df
 
-    def get_participants_from_session(self, session_id):
+    def get_course_participants_from_session_id(self, session_id):
         variables = {'session_id': f'{session_id}'}
         query = """query($session_id: Int) {
             CourseEnrollment(where: {Course: {Sessions: {id: {_eq: $session_id}}}}) {
                 User {
+                    id
+                    firstName
+                    lastName
+                    email
+                }
+            }
+        }"""
+        result = self.send_query(query, variables)
+        if result.get('data') is None:
+            return logging.error(f'{result}')
+        result_list = result['data']['CourseEnrollment']
+        unnested_list = []
+        unnested_list.append([item['User'] for item in result_list])
+        return pd.DataFrame(unnested_list[0], columns=['id', 'firstName', 'lastName', 'email'])
+
+    def get_participants_from_course(self, course_id):
+        variables = {'course_id': course_id}
+        query = """query($course_id: Int) {
+            CourseEnrollment(where: {courseId: {_eq: $course_id}}) {
+                User {
+                    id
                     firstName
                     lastName
                     email
@@ -92,41 +115,58 @@ class EduHub:
         result_list = result['data']['CourseEnrollment']
         unnested_list = []
         unnested_list.append([item['User'] for item in result_list])
-        return pd.DataFrame(unnested_list[0], columns=['firstName', 'lastName', 'email'])
+        return pd.DataFrame(unnested_list[0], columns=['id', 'firstName', 'lastName', 'email'])
 
-    def get_participants_from_course(self, course_id):
-        variables = {'course_id': course_id}
-        query = """query($course_id: Int) {
-            CourseEnrollment(where: {courseId: {_eq: $course_id}}) {
-                User {
-                    firstName
-                    lastName
-                    email
+    def insert_attendance(self, course_participant_attendance):
+        variables = {'leaveDateTime': course_participant_attendance.get('leaveDateTime').iloc[0], 'interruptionCount': course_participant_attendance.get('interruptionCount').iloc[0],
+                     'recordedName': course_participant_attendance.get('recordedName').iloc[0], 'sessionId': course_participant_attendance.get('sessionId').iloc[0],
+                     'source': course_participant_attendance.get('source').iloc[0], 'joinDateTime': course_participant_attendance.get('joinDateTime').iloc[0],
+                     'status': course_participant_attendance.get('status').iloc[0], 'totalAttendanceTime': course_participant_attendance.get('duration').iloc[0],
+                     'userId': course_participant_attendance.get('userId').iloc[0]}
+        mutation = """mutation($leaveDateTime: timestamptz, $interruptionCount: Int, $recordedName: String,
+                               $sessionId: Int, $source: String, $joinDateTime: timestamptz, $status: AttendanceStatus_enum,
+                               $totalAttendanceTime: Int, $userId: uuid) {
+            insert_Attendance(objects: {endDateTime: $leaveDateTime, interruptionCount: $interruptionCount,
+            recordedName: $recordedName, sessionId: $sessionId, source: $source, startDateTime: $joinDateTime,
+            status: $status, totalAttendanceTime: $totalAttendanceTime, userId: $userId}) {
+                returning {
+                    id
+                    created_at
+                    endDateTime
+                    interruptionCount
+                    recordedName
+                    sessionId
+                    source
+                    startDateTime
+                    status
+                    totalAttendanceTime
+                    updated_at
+                    userId
                 }
             }
         }"""
-        return self.send_query(query, variables)
+        return self.send_query(mutation, variables)
 
-    def mutate_attendance(self, participant_attendance):
-        variables = {}
-        query = """query($course_id: Int) {
-            return self.send_query(query, variables)
-
-    def mutate_session_attendanceData(self, session_id, attendance_data):
-
-        variables = {'session': f'{session_id}',
-                     'attendance_data': f'{attendance_data}'}
-        # variables = {'session': f'{session_id}', 'attendance_data[?]': f'{attendance_data[?]}'}
-        query = """query($course_id: Int) {
-            CourseEnrollment(where: {courseId: {_eq: $course_id}}) {
-                User {
-                    firstName
-                    lastName
-                    email
+    def update_session_attendanceData(self, attendance_data):
+        variables = {
+            'sessionId': int(attendance_data['sessionId'][0]), 'attendanceData': attendance_data.to_json()}
+        mutation = """mutation($sessionId: Int, $attendanceData: String) {
+            update_Session(where: {id: {_eq: $sessionId}}, _set: {attendanceData: $attendanceData}) {
+                affected_rows
+                returning {
+                    attendanceData
+                    courseId
+                    created_at
+                    description
+                    endDateTime
+                    id
+                    startDateTime
+                    title
+                    updated_at
                 }
             }
         }"""
-        return self.send_query(query, variables)
+        return self.send_query(mutation, variables)
 
 
 class Zoom:
@@ -155,7 +195,9 @@ class Zoom:
 
     def to_datetime(self, date_time):
         zoom_format = '%Y-%m-%dT%H:%M:%SZ'
-        return pd.to_datetime(date_time, format=zoom_format)
+        zoom_timezone = 'UTC'
+        reference_timezone = 'Europe/Berlin'
+        return pd.to_datetime(date_time, format=zoom_format).dt.tz_localize(zoom_timezone).dt.tz_convert(reference_timezone)
 
     def generate_jwt_token(self) -> bytes:
         if self.api_key is None or self.api_secret is None:
@@ -205,10 +247,10 @@ class Zoom:
 
     def get_meeting_id(self, meeting_url):
         """It removes the http part at the beginning and password or addon part in the end of the meeting_id"""
-        if meeting_url[:4] == 'http' or meeting_url.find('/j/') > 0:
+        if meeting_url[: 4] == 'http' or meeting_url.find('/j/') > 0:
             meeting_url = meeting_url.split('/j/')[1]
         if meeting_url.find('?') > 0:
-            meeting_url = meeting_url[:meeting_url.index('?')]
+            meeting_url = meeting_url[: meeting_url.index('?')]
         return meeting_url
 
     def get_session_attendance(self, meeting_url):
@@ -225,7 +267,6 @@ class Zoom:
             return f"Report has no participants. Are you sure the meeting id is correct?\nReport:\n{zoom_session.text}"
         zoom_attendances = self.format_zoom_attendances(
             zoom_session['participants'])
-        logging.info("participants:", zoom_attendances)
         return zoom_attendances
 
 
@@ -257,7 +298,9 @@ class LimeSurvey:
 
     def to_datetime(self, date_time):
         limesurvey_format = '%Y-%m-%d %H:%M:%S'
-        return pd.to_datetime(date_time, format=limesurvey_format)
+        limesurvey_timezone = 'UTC'
+        reference_timezone = 'Europe/Berlin'
+        return pd.to_datetime(date_time, format=limesurvey_format).dt.tz_localize(limesurvey_timezone).dt.tz_convert(reference_timezone)
 
     def create_lms_request(self, payload):
         req = urllib.request.Request(

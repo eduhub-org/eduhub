@@ -156,3 +156,29 @@ variable "nextauth_secret" {
   description = "Used to encrypt the NextAuth.js JWT, and to hash email verification tokens. This is the default value for the secret option in NextAuth and Middleware."
   type        = string
 }
+
+# API Access
+variable "zoom_api_key" {
+  description = "Key identifier to the registered access the Zoom API"
+  type        = string
+}
+variable "zoom_api_secret" {
+  description = "Secret to the the Zoom API access with the given key identifier"
+  type        = string
+}
+variable "lms_url" {
+  description = "URL to the LimeSurvey instance"
+  type        = string
+}
+variable "lms_user" {
+  description = "User that is used to access the API"
+  type        = string
+}
+variable "lms_password" {
+  description = "Password for the API user"
+  type        = string
+}
+variable "lms_attendance_survey_id" {
+  description = "ID of the survey which is used to collect the attendance data"
+  type        = string
+}
