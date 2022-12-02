@@ -24,6 +24,7 @@ def checkAttendance(arguments_json):
         Ids of the sessions for which the attendances were checked
     """
 
+    # The function should only be executed in production
     if arguments_json['environment'] != 'production':
         return f'Function is only executed in `production` mode.'
 
