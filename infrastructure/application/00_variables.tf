@@ -157,6 +157,12 @@ variable "nextauth_secret" {
   type        = string
 }
 
+# Serverless Functions
+variable "environment" {
+  description = "Should typically be a value of either `production` or `staging` to possibly change the behaviour of as serverless function depending on the environment."
+  type        = string
+}
+
 # API Access
 variable "zoom_api_key" {
   description = "Key identifier to the registered access the Zoom API"
