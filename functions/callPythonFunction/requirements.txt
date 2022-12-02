@@ -7,7 +7,6 @@ Authlib
 flask
 python-Levenshtein
 fuzzywuzzy
-time
 typing
 authlib
 urllib
