@@ -9,8 +9,4 @@ python-Levenshtein
 fuzzywuzzy
 typing
 authlib
-urllib
-base64
 datetime
-sys
-os
