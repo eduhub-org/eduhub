@@ -33,7 +33,7 @@ resource "google_secret_manager_secret_iam_member" "nextauth_secret" {
 resource "google_cloud_run_service" "frontend" {
   provider = google-beta
 
-  name     = var.frontend_service_name
+  name     = local.frontend_service_name
   location = var.region
 
   template {
@@ -46,15 +46,15 @@ resource "google_cloud_run_service" "frontend" {
         }
         env {
           name  = "NEXT_PUBLIC_API_URL"
-          value = "https://${var.hasura_service_name}.opencampus.sh/v1/graphql"
+          value = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
         }
         env {
           name  = "GRAPHQL_URI"
-          value = "https://${var.hasura_service_name}.opencampus.sh/v1/graphql"
+          value = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
         }
         env {
           name  = "NEXT_PUBLIC_AUTH_URL"
-          value = "https://${var.keycloak_service_name}.opencampus.sh"
+          value = "https://${local.keycloak_service_name}.opencampus.sh"
         }
         env {
           name = "HASURA_ADMIN_SECRET"

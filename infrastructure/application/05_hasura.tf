@@ -69,7 +69,7 @@ module "hasura_service" {
   version = "~> 0.2.0"
 
   # Required variables
-  service_name = var.hasura_service_name
+  service_name = local.hasura_service_name
   project_id   = var.project_id
   location     = var.region
   image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:${var.commit_sha}"
@@ -214,7 +214,7 @@ module "hasura_service" {
     },
     {
       name  = "HASURA_GRAPHQL_JWT_SECRET"
-      value = "{ \"type\": \"RS256\", \"jwk_url\": \"https://${var.keycloak_service_name}.opencampus.sh/realms/edu-hub/protocol/openid-connect/certs\" }"
+      value = "{ \"type\": \"RS256\", \"jwk_url\": \"https://${local.keycloak_service_name}.opencampus.sh/realms/edu-hub/protocol/openid-connect/certs\" }"
     }
   ]
   env_secret_vars = [
