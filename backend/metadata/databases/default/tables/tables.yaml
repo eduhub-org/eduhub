@@ -17,6 +17,7 @@
 - "!include public_CourseStatus.yaml"
 - "!include public_Employment.yaml"
 - "!include public_Expert.yaml"
+- "!include public_Language.yaml"
 - "!include public_LocationOption.yaml"
 - "!include public_MailLog.yaml"
 - "!include public_MailStatus.yaml"
