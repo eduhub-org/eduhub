@@ -178,9 +178,8 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
   const handleCloseCantUpgrade = useCallback(() => {
     setCantUpgradeOpen(false);
   }, [setCantUpgradeOpen]);
-  const [isConfirmUpgradeStatusOpen, setConfirmUpgradeStatusOpen] = useState(
-    false
-  );
+  const [isConfirmUpgradeStatusOpen, setConfirmUpgradeStatusOpen] =
+    useState(false);
   const handleRequestUpgradeStatus = useCallback(() => {
     if (course != null && canUpgradeStatus(course)) {
       setConfirmUpgradeStatusOpen(true);

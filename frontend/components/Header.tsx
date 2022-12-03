@@ -59,7 +59,7 @@ export const Header: FC = () => {
       <ClientOnly>
         {isLoggedIn ? (
           <div className="flex">
-            <div className="flex bg-blue-400">
+            <div className="flex">
               <div className="cursor-pointer" onClick={openMenu}>
                 <Avatar imageUrl={user?.picture || mysteryImg} />
               </div>

@@ -186,17 +186,20 @@ export const ApplicationRow: FC<IProps> = ({
 
             <div className="col-span-1 text-center">
               <OnlyAdmin>
-              <div className="cursor-pointer" onClick={handleToggleRowSelected}>
-                {isRowSelected && (
-                  <MdCheckBox className="inline" size="1.25em" />
-                )}
-                {!isRowSelected && (
-                  <MdOutlineCheckBoxOutlineBlank
-                    className="inline"
-                    size="1.25em"
-                  />
-                )}
-              </div>
+                <div
+                  className="cursor-pointer"
+                  onClick={handleToggleRowSelected}
+                >
+                  {isRowSelected && (
+                    <MdCheckBox className="inline" size="1.25em" />
+                  )}
+                  {!isRowSelected && (
+                    <MdOutlineCheckBoxOutlineBlank
+                      className="inline"
+                      size="1.25em"
+                    />
+                  )}
+                </div>
               </OnlyAdmin>
             </div>
           </div>

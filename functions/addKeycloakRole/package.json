@@ -1,0 +1,11 @@
+{
+  "name": "addKeycloakRole",
+  "version": "0.0.1",
+  "type": "module",
+  "dependencies": {
+    "@keycloak/keycloak-admin-client": "20.0.0",
+    "body-parser": "1.19.0",
+    "node-fetch": "2.6.0",
+    "graphqurl": "1.0.1"
+  }
+}

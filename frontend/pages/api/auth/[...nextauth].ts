@@ -1,51 +1,109 @@
 import NextAuth from "next-auth";
 import KeycloakProvider from "next-auth/providers/keycloak";
+import { GraphQLClient, gql } from "graphql-request";
+import axios from "axios";
+
 import type { JWT } from "next-auth/jwt";
-import type { Account, Awaitable, Session, User } from "next-auth/core/types";
+import type { IKeycloakRefreshTokenApiResponse } from "./keycloakRefreshToken";
 
-interface JWTData {
-  token: JWT;
-  user?: User;
-  account?: Account;
-}
+const UPDATE_USER = gql`
+  mutation update_User($id: ID!) {
+    updateFromKeycloak(userid: $id) {
+      result
+    }
+  }
+`;
 
-interface SessionData {
-  session: Session;
-  token: JWT;
-  user?: User;
-}
+const updateUser = async (accessToken: string, userId: string) => {
+  try {
+    const graphQLClient = new GraphQLClient(
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/v1/graphql",
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "x-hasura-role": "user",
+        },
+      }
+    );
 
-interface LogoutMessage {
-  session: Session;
-  token: JWT;
-}
+    const data = await graphQLClient.request(UPDATE_USER, { id: userId });
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const refreshAccessToken = async (token: JWT) => {
+  try {
+    const refreshedTokens = await axios.post<IKeycloakRefreshTokenApiResponse>(
+      `${process.env.NEXTAUTH_URL}/api/auth/keycloakRefreshToken`,
+      {
+        refreshToken: token?.refreshToken,
+      }
+    );
+
+    if (refreshedTokens.status !== 200) {
+      throw refreshedTokens;
+    }
+
+    return {
+      ...token,
+      accessToken: refreshedTokens.data.access_token,
+      accessTokenExpired: Date.now() + refreshedTokens.data.expires_in * 1000,
+      refreshToken: refreshedTokens.data.refresh_token ?? token.refreshToken,
+      refreshTokenExpired:
+        Date.now() + refreshedTokens.data.refresh_expires_in * 1000,
+    };
+  } catch (e) {
+    console.error(e);
+    return {
+      ...token,
+      error: "RefreshAccessTokenError",
+    };
+  }
+};
 
 export default NextAuth({
   providers: [
     KeycloakProvider({
       clientId: "hasura",
-      clientSecret: "WWzGeFLQdDQZmVUaiJJwJuV5HrbXGEKc",
+      clientSecret: process.env.CLIENT_SECRET!,
       authorization: `${process.env.NEXT_PUBLIC_AUTH_URL}/auth`,
       issuer: `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub`,
+      idToken: true,
     }),
   ],
   callbacks: {
-    jwt: async ({ token, account, user, profile }) => {
+    signIn: async ({ account }) => {
+      if (account && account.access_token) {
+        await updateUser(account.access_token, account.providerAccountId);
+      }
+      return true;
+    },
+    jwt: async ({ token, account, profile }) => {
       // Persist the OAuth access_token to the token right after signin
       if (account && profile) {
-        console.log(account, token);
+        token.idToken = account.id_token;
         token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+        token.accessTokenExpired = account.expires_at! * 1000;
+        token.refreshTokenExpired =
+          Date.now() + account.refresh_expires_in * 1000;
         token.profile = profile;
       }
-      return token;
+
+      // Return previous token if the access token has not expired yet
+      if (Date.now() < token.accessTokenExpired) {
+        return token;
+      }
+
+      // Access token has expired, try to update it
+      return refreshAccessToken(token);
     },
     session: async ({ session, token, user }) => {
       // Send properties to the client, like an access_token from a provider.
-      console.log(session, token);
       session.accessToken = token.accessToken;
       session.user = user;
       session.profile = token.profile;
-      console.log(session);
       return session;
     },
   },

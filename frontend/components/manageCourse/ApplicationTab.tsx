@@ -241,11 +241,11 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
         <div className="mt-6 mb-3">{infoDots}</div>
 
         <OnlyAdmin>
-        <div className="flex justify-end mb-6">
-          <OldButton onClick={handleOpenInviteDialog}>
-            Einladungen verschicken
-          </OldButton>
-        </div>
+          <div className="flex justify-end mb-6">
+            <OldButton onClick={handleOpenInviteDialog}>
+              Einladungen verschicken
+            </OldButton>
+          </div>
         </OnlyAdmin>
       </div>
 

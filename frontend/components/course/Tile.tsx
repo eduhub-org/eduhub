@@ -56,7 +56,12 @@ const CourseStatusIndicator: FC<{
   if (enrollmentStatus === CourseEnrollmentStatus_enum.COMPLETED) {
     return (
       <div className="absolute top-0 right-3">
-        <Image src="/images/course/completed_flag.svg" width={37} height={46} />
+        <Image
+          src="/images/course/completed_flag.svg"
+          width={37}
+          height={46}
+          alt="completed flag"
+        />
       </div>
     );
   }
@@ -105,29 +110,27 @@ export const Tile: FC<IProps> = ({ course }) => {
         isInstructor ? `/manage/course/${course.id}` : `/course/${course.id}`
       }
     >
-      <a>
-        <div className="relative w-60 h-72 rounded-2xl overflow-hidden">
-          <div className="h-1/2 bg-edu-black">
-            <Image
-              src={course.coverImage ?? "https://picsum.photos/240/144"}
-              alt="Edu Hub logo"
-              width={240}
-              height={144}
-              priority
-            />
-            <CourseStatusIndicator
-              enrollmentStatus={enrollmentStatus}
-              enrollment={enrollment}
-            />
-          </div>
-          <div
-            className={`flex h-1/2 flex-col justify-between ${highlightColor} p-3`}
-          >
-            <span className="text-base">{course.title}</span>
-            <span className="text-xs uppercase">Kurs</span>
-          </div>
+      <div className="relative w-60 h-72 rounded-2xl overflow-hidden">
+        <div className="h-1/2 bg-edu-black">
+          <Image
+            src={course.coverImage ?? "https://picsum.photos/240/144"}
+            alt="Edu Hub logo"
+            width={240}
+            height={144}
+            priority
+          />
+          <CourseStatusIndicator
+            enrollmentStatus={enrollmentStatus}
+            enrollment={enrollment}
+          />
         </div>
-      </a>
+        <div
+          className={`flex h-1/2 flex-col justify-between ${highlightColor} p-3`}
+        >
+          <span className="text-base">{course.title}</span>
+          <span className="text-xs uppercase">Kurs</span>
+        </div>
+      </div>
     </Link>
   );
 };

@@ -1,0 +1,86 @@
+table:
+  name: SchoolClassRequest
+  schema: rentAScientist
+object_relationships:
+  - name: SchoolClass
+    using:
+      foreign_key_constraint_on: classId
+  - name: ScientistOffer
+    using:
+      foreign_key_constraint_on: offerId
+insert_permissions:
+  - role: user_access
+    permission:
+      check:
+        _and:
+          - SchoolClass:
+              Teacher:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+          - ScientistOffer:
+              Program:
+                visibility:
+                  _eq: true
+      columns:
+        - possibleDays
+        - assigned_day
+        - classId
+        - id
+        - offerId
+        - commentGeneral
+        - commentTime
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - offerId
+      filter: {}
+      allow_aggregations: true
+  - role: user_access
+    permission:
+      columns:
+        - possibleDays
+        - assigned_day
+        - classId
+        - id
+        - offerId
+        - commentGeneral
+        - commentTime
+      filter:
+        SchoolClass:
+          Teacher:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+update_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - assigned_day
+        - commentGeneral
+        - commentTime
+        - possibleDays
+      filter:
+        SchoolClass:
+          Teacher:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+      check:
+        SchoolClass:
+          Teacher:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+delete_permissions:
+  - role: user_access
+    permission:
+      backend_only: false
+      filter:
+        SchoolClass:
+          Teacher:
+            User:
+              id:
+                _eq: X-Hasura-User-Id

@@ -67,11 +67,11 @@ services:
       CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE: "https://save-participation-certificate-template-szeuw2n5qa-ew.a.run.app"
       CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK: "https://update-from-keycloak-szeuw2n5qa-ew.a.run.app"
       CLOUD_FUNCTION_LINK_SEND_MAIL: "https://send-mail-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE: ""
-      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: ""
-      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: ""
-      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: ""
-      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: ""
+      CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE: "https://add-keycloak-role-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: "https://load-achievement-option-documentation-template-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: "https://save-achievement-option-documentation-template-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "https://load-achievement-option-evaluation-script-szeuw2n5qa-ew.a.run.app"
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "https://save-achievement-option.evaluation-script-szeuw2n5qa-ew.a.run.app"
 
     volumes:
       - ./backend/migrations:/hasura-migrations
@@ -91,16 +91,16 @@ services:
       dockerfile: Dockerfile-dev
     ports:
       - 28080:8080
-    #depends_on:
-    #  - db_keycloak
+    depends_on:
+     - db_keycloak
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      #KC_DB: postgres
-      #KC_DB_VENDOR: postgres
-      #KC_DB_URL: 
-      #KC_DB_USERNAME: keycloak
-      #KC_DB_PASSWORD: 
+      KC_DB: postgres
+      KC_DB_VENDOR: postgres
+      KC_DB_URL: "jdbc:postgresql://db_keycloak:5432/keycloak"
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password 
       #KC_HOSTNAME: localhost
       KC_HOSTNAME_STRICT: "false"
       #KC_HTTP_ENABLED: "true"
@@ -109,15 +109,16 @@ services:
       - ./keycloak/imports:/imports
       - ./keycloak/themes/opencampus:/opt/keycloak/themes/opencampus
       - ./keycloak/disable-theme-cache.cli:/opt/keycloak/startup-scripts/disable-theme-cache.cli
-  # keycloak comes with h2 embedded, that is enough for development
-  # db_keycloak:
-  #   image: postgres:12
-  #   volumes:
-  #     - db_keycloak_data:/var/lib/postgresql/data
-  #   environment:
-  #     POSTGRES_DB: keycloak
-  #     POSTGRES_USER: keycloak
-  #     POSTGRES_PASSWORD: password
+
+  db_keycloak:
+    image: postgres:12
+    volumes:
+      - db_keycloak_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
 
 volumes:
-  db_hasura_data: # db_keycloak_data:
+  db_hasura_data:
+  db_keycloak_data:

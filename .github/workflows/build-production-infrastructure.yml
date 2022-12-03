@@ -1,5 +1,5 @@
 name: Setup Production Environment
-on:   
+on:
   push:
     # Run only on changes in the following branches
     branches:
@@ -20,16 +20,13 @@ env:
   TF_VAR_ID_COMMIT_SHA: var-KUDdKLtdQGzJ8WnB
 
 jobs:
-
-  save-commit-sha:  
+  save-commit-sha:
     name: Save SHA of current commit in Terraform Cloud
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Check Out the Repository Branch
-        uses: actions/checkout@v2
-      -
-        name: Save commit SHA in Terraform Cloud variable
+      - name: Check Out the Repository Branch
+        uses: actions/checkout@v3
+      - name: Save commit SHA in Terraform Cloud variable
         run: |
           curl \
           --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
@@ -70,8 +67,8 @@ jobs:
       IMAGE_NAME: frontend
       BRANCH: ${{ github.ref_name }}
       PROJECT_ID: eduhub-production
-      NEXT_PUBLIC_API_URL: 'https://hasura.opencampus.sh/v1/graphql'
-      NEXT_PUBLIC_AUTH_URL: 'https://keycloak.opencampus.sh'
+      NEXT_PUBLIC_API_URL: "https://hasura.opencampus.sh/v1/graphql"
+      NEXT_PUBLIC_AUTH_URL: "https://keycloak.opencampus.sh"
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -84,8 +81,8 @@ jobs:
       IMAGE_NAME: rent-a-scientist
       BRANCH: ${{ github.ref_name }}
       PROJECT_ID: eduhub-production
-      NEXT_PUBLIC_API_URL: 'https://hasura.opencampus.sh/v1/graphql'
-      NEXT_PUBLIC_AUTH_URL: 'https://keycloak.opencampus.sh'
+      NEXT_PUBLIC_API_URL: "https://hasura.opencampus.sh/v1/graphql"
+      NEXT_PUBLIC_AUTH_URL: "https://keycloak.opencampus.sh"
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -101,16 +98,22 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
-
   deploy-application:
     name: "Deploy Application Infrastructure"
-    needs: [build-keycloak, build-backend, build-frontend, build-rent-a-scientist-frontend, zip-and-store-cloud-functions, save-commit-sha]
+    needs:
+      [
+        build-keycloak,
+        build-backend,
+        build-frontend,
+        build-rent-a-scientist-frontend,
+        zip-and-store-cloud-functions,
+        save-commit-sha,
+      ]
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./infrastructure/application
     steps:
-
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -126,7 +129,7 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-      
+
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
@@ -144,4 +147,3 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/production' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false
-
