@@ -31,8 +31,10 @@ tasks:
       echo 'init script'
       touch frontend.env
       echo 'STORAGE_BUCKET_URL="https://..."' >> hasura_keycloak.env
-
+      docker compose up -d
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
 ports:
-  - port: 3000
+  - port: 9695
+    onOpen: open-preview
+  - port: 9695
     onOpen: open-preview
