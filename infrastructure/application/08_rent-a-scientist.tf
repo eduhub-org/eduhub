@@ -11,7 +11,7 @@ resource "google_cloud_run_service_iam_policy" "rent_a_scientist_noauth_invoker"
 resource "google_cloud_run_service" "rent_a_scientist" {
   provider = google-beta
 
-  name     = var.rent_a_scientist_service_name
+  name     = local.rent_a_scientist_service_name
   location = var.region
 
   template {
@@ -24,21 +24,30 @@ resource "google_cloud_run_service" "rent_a_scientist" {
         }
         env {
           name  = "NEXT_PUBLIC_API_URL"
-          value = "https://${var.hasura_service_name}.opencampus.sh/v1/graphql"
+          value = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
         }
         env {
           name  = "GRAPHQL_URI"
-          value = "https://${var.hasura_service_name}.opencampus.sh/v1/graphql"
+          value = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
         }
         env {
           name  = "NEXT_PUBLIC_AUTH_URL"
-          value = "https://${var.keycloak_service_name}.opencampus.sh"
+          value = "https://${local.keycloak_service_name}.opencampus.sh"
         }
         env {
           name = "HASURA_ADMIN_SECRET"
           value_from {
             secret_key_ref {
               name = google_secret_manager_secret.hasura_graphql_admin_key.secret_id
+              key  = "latest"
+            }
+          }
+        }
+        env {
+          name = "NEXTAUTH_SECRET"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.nextauth_secret.secret_id
               key  = "latest"
             }
           }

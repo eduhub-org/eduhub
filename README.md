@@ -29,10 +29,15 @@ Start docker-compose -f rent-a-scientist-compose.yml to develop on it!
 
 Follow the steps below to start your devlopment.
 
-# Step 1: Files and Config
+1.  Install docker if not installed. You can use the script file to install docker.
 
 1.  Create two files in eud-hup root directory.
 
+1.  It is recommended you setup rootless docker commands, so you dont need to sudo docker.
+
+1.  Install docker-compose (atlest version 1.29.2). Follow the [link](https://docs.docker.com/compose/install/) to install.
+
+1.  create local config files
     touch hasura_keycloak.env
     touch frontend.env
 
@@ -53,6 +58,8 @@ Follow the steps below to start your devlopment.
 
 1.  Ask for the conent of the folder `backend/seeds/default` and put them.
 1.  Also need the conent of the folder `keycloak/imports/`
+
+1.  There is a docker-compose.yml which you can use to start edu-hub with some settings for development. Run the following command to start all the containers as necessary. The frontend container will not yet do anything, but it will mount `./frontend` as a volume and open it as the working directory `/opt/app`.
 
 # Step 2: Environment Setup
 
@@ -79,9 +86,17 @@ Follow the steps below to start your devlopment.
         $ cd backend
         $ HASURA_GRAPHQL_ADMIN_SECRET=myadminsecretkey hasura seed apply
 
+## Database seed setup.
+
+1.  Install hasura-cli (if not exists)
+
+        npm install --global hasura-cli
+
+1.  Run the following command inside `./backend`. Before runing the command put your seed file into backend/seeds/default.
+
 1.  Check hasura is running by following command.
 
-        hasura console
+1.  To start the hasura console run "hasura console" in `./backend`
 
 1.  Keycloak imports: (it will error out with address in use in the end, which is fine)
 
@@ -90,6 +105,14 @@ Follow the steps below to start your devlopment.
     - If you get following error. Delete all **edu_hub** images from docker (`docker image rm image-name`) and run docker (`docker-compose up`) images again. [Help!](https://www.digitalocean.com/community/tutorials/how-to-remove-docker-images-containers-and-volumes)
 
       _OCI runtime exec failed: exec failed: unable to start container process: exec: "/opt/keycloak/bin/kc.sh": stat /opt/keycloak/bin/kc.sh: no such file or directory: unknown_
+
+1.  Put your seed files into keycloak/imports/.
+    You might need to remove some or most of the user-jsons, as for me they caused some public key duplicate error. For development you don't really need all of the users anyway.
+1.  Run the following command:
+
+    docker exec -it eduhub-keycloak_1 /opt/keycloak/bin/kc.sh import --dir "/imports"
+
+1.  it will error out with address in use in the end, which is fine
 
 ## HASURA_GRAPHQL_JWT_SECRET setup
 
@@ -111,8 +134,8 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
     - Replace `PUT_YOUR_PUBLIC_KEY_HERE` with the copied key from step 1.
     - The file hasura_keycloak.env is in .gitignore to allow every developer to have a different value in it.
 
-1.  docker-compose down
-1.  docker-compose up
+1.  docker-compose stop
+1.  docker-compose start
 
 ## Create an account in keycloak.
 
@@ -143,6 +166,7 @@ Somehow the keycloak setup with hasura just don't work and hasura will not accep
     - edu-hub_hasura_1
     - edu-hub_keycloak_1
     - edu-hub_db_hasura_1
+    - edu-hub_db_keycloak_1
 
     Stop/Start the the images together.
 

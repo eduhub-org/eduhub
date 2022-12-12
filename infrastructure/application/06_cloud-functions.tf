@@ -4,6 +4,59 @@
 
 
 ###############################################################################
+# Create Google cloud function for callPythonFunction
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "call_python_function_noauth_invoker" {
+  location    = google_cloudfunctions2_function.call_python_function.location
+  project     = google_cloudfunctions2_function.call_python_function.project
+  service     = google_cloudfunctions2_function.call_python_function.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "call_python_function" {
+  name   = "cloud-functions/callPythonFunction.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "call_python_function" {
+  provider    = google-beta
+  location    = var.region
+  name        = "call-python-function"
+  description = "Calls a Python function povided in the corresponding function folder"
+
+  build_config {
+    runtime     = "python38"
+    entry_point = "call_python_function"
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.call_python_function.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      HASURA_SERVICE_NAME          = local.hasura_service_name
+      HASURA_GRAPHQL_ADMIN_KEY     = var.hasura_graphql_admin_key
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+      ZOOM_API_KEY                 = var.zoom_api_key
+      ZOOM_API_SECRET              = var.zoom_api_key
+      LMS_URL                      = var.lms_user
+      LMS_USER                     = var.lms_user
+      LMS_PASSWORD                 = var.lms_password
+      LMS_ATTENDANCE_SURVEY_ID     = var.lms_attendance_survey_id
+    }
+    max_instance_count = 500
+    available_memory   = "256M"
+    timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+
+  }
+}
+
+###############################################################################
 # Create Google cloud function for loadAchievementCertificate
 #####
 # Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
@@ -853,7 +906,54 @@ resource "google_cloudfunctions2_function" "update_keycloak_profile" {
     environment_variables = {
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
       LEYCLOAK_USER                = var.keycloak_user
-      KEYCLOAK_URL                 = "https://${var.keycloak_service_name}.opencampus.sh"
+      KEYCLOAK_URL                 = "https://${local.keycloak_service_name}.opencampus.sh"
+      KEYCLOAK_PW                  = var.keycloak_pw
+    }
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+  }
+}
+
+###############################################################################
+# Create Google cloud function for addKeycloakRole
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "add_keycloak_role_noauth_invoker" {
+  location    = google_cloudfunctions2_function.add_keycloak_role.location
+  project     = google_cloudfunctions2_function.add_keycloak_role.project
+  service     = google_cloudfunctions2_function.add_keycloak_role.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "add_keycloak_role" {
+  name   = "cloud-functions/addKeycloakRole.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "add_keycloak_role" {
+  provider    = google-beta
+  location    = var.region
+  name        = "add-keycloak-role"
+  description = "Adds role mapping for given role for keycloak hasura client"
+
+  build_config {
+    runtime     = "nodejs14"
+    entry_point = "addKeycloakRole"
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.add_keycloak_role.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+      KEYCLOAK_USER                = var.keycloak_user
+      KEYCLOAK_URL                 = "https://${local.keycloak_service_name}.opencampus.sh"
       KEYCLOAK_PW                  = var.keycloak_pw
     }
     max_instance_count = 1
@@ -900,9 +1000,9 @@ resource "google_cloudfunctions2_function" "update_from_keycloak" {
     environment_variables = {
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
       KEYCLOAK_USER                = var.keycloak_user
-      KEYCLOAK_URL                 = "https://${var.keycloak_service_name}.opencampus.sh"
+      KEYCLOAK_URL                 = "https://${local.keycloak_service_name}.opencampus.sh"
       KEYCLOAK_PW                  = var.keycloak_pw
-      HASURA_ENDPOINT              = "https://${var.hasura_service_name}.opencampus.sh/v1/graphql"
+      HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
       HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
     }
     max_instance_count = 1
