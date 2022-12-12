@@ -38,20 +38,20 @@ resource "google_secret_manager_secret_version" "hasura_graphql_admin_key" {
   secret      = google_secret_manager_secret.hasura_graphql_admin_key.name
   secret_data = var.hasura_graphql_admin_key
 }
-# Grant the compute engine service account permissions to access the secrect for the Hasura graphql admin
-resource "google_secret_manager_secret_iam_member" "hasura_db_url" {
-  secret_id  = google_secret_manager_secret.hasura_db_url.id
-  role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
-  depends_on = [google_secret_manager_secret.hasura_db_url]
-}
-
-# Grant the compute engine service account permissions to access the secret for Hasura db url
+# Grant the compute engine service account permissions to access the secret for the Hasura graphql admin
 resource "google_secret_manager_secret_iam_member" "hasura_graphql_admin_key" {
   secret_id  = google_secret_manager_secret.hasura_graphql_admin_key.id
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
   depends_on = [google_secret_manager_secret.hasura_graphql_admin_key]
+}
+
+# Grant the compute engine service account permissions to access the secrect for Hasura db url
+resource "google_secret_manager_secret_iam_member" "hasura_db_url" {
+  secret_id  = google_secret_manager_secret.hasura_db_url.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.hasura_db_url]
 }
 
 # Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the Cloud Run service for Hasura
@@ -69,7 +69,7 @@ module "hasura_service" {
   version = "~> 0.2.0"
 
   # Required variables
-  service_name = var.hasura_service_name
+  service_name = local.hasura_service_name
   project_id   = var.project_id
   location     = var.region
   image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:${var.commit_sha}"
@@ -127,6 +127,14 @@ module "hasura_service" {
     {
       name  = "HASURA_BUCKET"
       value = var.project_id
+    },
+    {
+      name  = "CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNTION"
+      value = google_cloudfunctions2_function.call_python_function.service_config[0].uri
+    },
+    {
+      name  = "CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE"
+      value = google_cloudfunctions2_function.add_keycloak_role.service_config[0].uri
     },
     {
       name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE"
@@ -206,7 +214,7 @@ module "hasura_service" {
     },
     {
       name  = "HASURA_GRAPHQL_JWT_SECRET"
-      value = "{ \"type\": \"RS256\", \"jwk_url\": \"https://${var.keycloak_service_name}.opencampus.sh/realms/edu-hub/protocol/openid-connect/certs\" }"
+      value = "{ \"type\": \"RS256\", \"jwk_url\": \"https://${local.keycloak_service_name}.opencampus.sh/realms/edu-hub/protocol/openid-connect/certs\" }"
     }
   ]
   env_secret_vars = [

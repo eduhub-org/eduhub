@@ -1,7 +1,18 @@
 ###############################################################################
 # Definition of the used Terraform variables
-#####
+######
+# Local Variables
+###
+locals {
+  keycloak_service_name         = "${var.keycloak_service_name_root}${var.service_name_extension}"
+  hasura_service_name           = "${var.hasura_service_name_root}${var.service_name_extension}"
+  eduhub_service_name           = "${var.eduhub_service_name_root}${var.service_name_extension}"
+  rent_a_scientist_service_name = "${var.rent_a_scientist_service_name_root}${var.service_name_extension}"
+}
 
+######
+# Cloud Variables
+###
 /* variable "GOOGLE_CREDENTIALS" {
   description = "JSON key of the service account 'terraform created' created for the given project"
 }
@@ -34,21 +45,26 @@ variable "url_mask" {
   description = "Url mask specifying the group of backend endpoints that will be used for the load balancer"
   type        = string
 }
-variable "keycloak_service_name" {
+variable "keycloak_service_name_root" {
   description = "Name for the service of the Keycloak application"
   type        = string
 }
-variable "hasura_service_name" {
+variable "hasura_service_name_root" {
   description = "Name for the service of the Hasura application"
   type        = string
 }
-variable "frontend_service_name" {
+variable "eduhub_service_name_root" {
   description = "Name for the service of the edu frontend application"
   type        = string
 }
-variable "rent_a_scientist_service_name" {
+variable "rent_a_scientist_service_name_root" {
   description = "Name for the service of the Rent-a-Scientist frontend application"
   type        = string
+}
+variable "service_name_extension" {
+  description = "Name extension for the services not run in production but in other environments"
+  type        = string
+  default     = ""
 }
 variable "cloudflare_zone_id" {
   description = "The DNS zone ID a record in Cloudflaire will be added to"
@@ -151,5 +167,40 @@ variable "hasura_memory_limit" {
 }
 
 # Frontend
-
 # Rent-A-Scientist
+variable "nextauth_secret" {
+  description = "Used to encrypt the NextAuth.js JWT, and to hash email verification tokens. This is the default value for the secret option in NextAuth and Middleware."
+  type        = string
+}
+
+# Serverless Functions
+variable "environment" {
+  description = "Should typically be a value of either `production` or `staging` to possibly change the behaviour of as serverless function depending on the environment."
+  type        = string
+}
+
+# API Access
+variable "zoom_api_key" {
+  description = "Key identifier to the registered access the Zoom API"
+  type        = string
+}
+variable "zoom_api_secret" {
+  description = "Secret to the the Zoom API access with the given key identifier"
+  type        = string
+}
+variable "lms_url" {
+  description = "URL to the LimeSurvey instance"
+  type        = string
+}
+variable "lms_user" {
+  description = "User that is used to access the API"
+  type        = string
+}
+variable "lms_password" {
+  description = "Password for the API user"
+  type        = string
+}
+variable "lms_attendance_survey_id" {
+  description = "ID of the survey which is used to collect the attendance data"
+  type        = string
+}
