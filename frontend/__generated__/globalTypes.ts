@@ -115,7 +115,6 @@ export enum AchievementRecordType_constraint {
 export enum AchievementRecordType_enum {
   DOCUMENTATION = "DOCUMENTATION",
   DOCUMENTATION_AND_CSV = "DOCUMENTATION_AND_CSV",
-  ONLINE = "ONLINE",
 }
 
 /**
@@ -166,25 +165,6 @@ export enum Admin_update_column {
   id = "id",
   updated_at = "updated_at",
   userId = "userId",
-}
-
-/**
- * unique or primary key constraints on table "AttendanceSourceData"
- */
-export enum AttendanceSourceData_constraint {
-  AttendenceDocument_pkey = "AttendenceDocument_pkey",
-}
-
-/**
- * update columns of table "AttendanceSourceData"
- */
-export enum AttendanceSourceData_update_column {
-  URL = "URL",
-  created_at = "created_at",
-  id = "id",
-  sessionId = "sessionId",
-  source = "source",
-  updated_at = "updated_at",
 }
 
 /**
@@ -508,150 +488,23 @@ export enum Program_update_column {
 }
 
 /**
- * unique or primary key constraints on table "RentAScientistConfig"
+ * unique or primary key constraints on table "SessionAddressType"
  */
-export enum RentAScientistConfig_constraint {
-  RentAScientistConfig_pkey = "RentAScientistConfig_pkey",
+export enum SessionAddressType_constraint {
+  SessionAddressType_pkey = "SessionAddressType_pkey",
+}
+
+export enum SessionAddressType_enum {
+  FREETEXT_ADDRESS = "FREETEXT_ADDRESS",
+  URL = "URL",
 }
 
 /**
- * update columns of table "RentAScientistConfig"
+ * update columns of table "SessionAddressType"
  */
-export enum RentAScientistConfig_update_column {
-  id = "id",
-  mailFrom = "mailFrom",
-  program_id = "program_id",
-  test_operation = "test_operation",
-}
-
-/**
- * unique or primary key constraints on table "SchoolClassRequest"
- */
-export enum SchoolClassRequest_constraint {
-  SchoolClassRequest_pkey = "SchoolClassRequest_pkey",
-}
-
-/**
- * update columns of table "SchoolClassRequest"
- */
-export enum SchoolClassRequest_update_column {
-  assigned_day = "assigned_day",
-  classId = "classId",
-  commentGeneral = "commentGeneral",
-  commentTime = "commentTime",
-  id = "id",
-  offerId = "offerId",
-  possibleDays = "possibleDays",
-}
-
-/**
- * unique or primary key constraints on table "SchoolClass"
- */
-export enum SchoolClass_constraint {
-  SchoolClass_pkey = "SchoolClass_pkey",
-}
-
-/**
- * update columns of table "SchoolClass"
- */
-export enum SchoolClass_update_column {
-  contact = "contact",
-  grade = "grade",
-  id = "id",
-  name = "name",
-  schoolId = "schoolId",
-  studensCount = "studensCount",
-  teacherId = "teacherId",
-}
-
-/**
- * unique or primary key constraints on table "School"
- */
-export enum School_constraint {
-  School_pkey = "School_pkey",
-}
-
-/**
- * update columns of table "School"
- */
-export enum School_update_column {
-  city = "city",
-  district = "district",
-  dstnr = "dstnr",
-  name = "name",
-  postalCode = "postalCode",
-  schoolType = "schoolType",
-  street = "street",
-}
-
-/**
- * unique or primary key constraints on table "ScientistOfferRelation"
- */
-export enum ScientistOfferRelation_constraint {
-  ScientistOfferRelation_pkey = "ScientistOfferRelation_pkey",
-}
-
-/**
- * update columns of table "ScientistOfferRelation"
- */
-export enum ScientistOfferRelation_update_column {
-  offerId = "offerId",
-  scientistId = "scientistId",
-}
-
-/**
- * unique or primary key constraints on table "ScientistOffer"
- */
-export enum ScientistOffer_constraint {
-  ScientistOffer_pkey = "ScientistOffer_pkey",
-}
-
-/**
- * update columns of table "ScientistOffer"
- */
-export enum ScientistOffer_update_column {
-  categories = "categories",
-  classPreparation = "classPreparation",
-  contactEmail = "contactEmail",
-  contactName = "contactName",
-  contactPhone = "contactPhone",
-  description = "description",
-  duration = "duration",
-  equipmentRequired = "equipmentRequired",
-  extraComment = "extraComment",
-  format = "format",
-  id = "id",
-  institutionLogo = "institutionLogo",
-  institutionName = "institutionName",
-  maxDeployments = "maxDeployments",
-  maximumGrade = "maximumGrade",
-  minimumGrade = "minimumGrade",
-  possibleDays = "possibleDays",
-  possibleLocations = "possibleLocations",
-  programId = "programId",
-  researchSubject = "researchSubject",
-  roomRequirements = "roomRequirements",
-  subjectComment = "subjectComment",
-  timeWindow = "timeWindow",
-  title = "title",
-}
-
-/**
- * unique or primary key constraints on table "Scientist"
- */
-export enum Scientist_constraint {
-  Scientist_pkey = "Scientist_pkey",
-}
-
-/**
- * update columns of table "Scientist"
- */
-export enum Scientist_update_column {
-  forename = "forename",
-  id = "id",
-  image = "image",
-  surname = "surname",
-  title = "title",
+export enum SessionAddressType_update_column {
+  comment = "comment",
+  value = "value",
 }
 
 /**
@@ -665,12 +518,14 @@ export enum SessionAddress_constraint {
  * update columns of table "SessionAddress"
  */
 export enum SessionAddress_update_column {
+  address = "address",
   created_at = "created_at",
   id = "id",
   latitude = "latitude",
   link = "link",
   longitude = "longitude",
   sessionId = "sessionId",
+  type = "type",
   updated_at = "updated_at",
 }
 
@@ -703,6 +558,7 @@ export enum Session_constraint {
  * update columns of table "Session"
  */
 export enum Session_update_column {
+  attendanceData = "attendanceData",
   courseId = "courseId",
   created_at = "created_at",
   description = "description",
@@ -711,22 +567,6 @@ export enum Session_update_column {
   startDateTime = "startDateTime",
   title = "title",
   updated_at = "updated_at",
-}
-
-/**
- * unique or primary key constraints on table "Teacher"
- */
-export enum Teacher_constraint {
-  Teacher_pkey = "Teacher_pkey",
-  Teacher_userId_key = "Teacher_userId_key",
-}
-
-/**
- * update columns of table "Teacher"
- */
-export enum Teacher_update_column {
-  id = "id",
-  userId = "userId",
 }
 
 /**
@@ -795,6 +635,169 @@ export enum order_by {
   desc = "desc",
   desc_nulls_first = "desc_nulls_first",
   desc_nulls_last = "desc_nulls_last",
+}
+
+/**
+ * unique or primary key constraints on table "rentAScientist.RentAScientistConfig"
+ */
+export enum rentAScientist_RentAScientistConfig_constraint {
+  RentAScientistConfig_pkey = "RentAScientistConfig_pkey",
+}
+
+/**
+ * update columns of table "rentAScientist.RentAScientistConfig"
+ */
+export enum rentAScientist_RentAScientistConfig_update_column {
+  id = "id",
+  mailFrom = "mailFrom",
+  program_id = "program_id",
+  test_operation = "test_operation",
+}
+
+/**
+ * unique or primary key constraints on table "rentAScientist.SchoolClassRequest"
+ */
+export enum rentAScientist_SchoolClassRequest_constraint {
+  SchoolClassRequest_pkey = "SchoolClassRequest_pkey",
+}
+
+/**
+ * update columns of table "rentAScientist.SchoolClassRequest"
+ */
+export enum rentAScientist_SchoolClassRequest_update_column {
+  assigned_day = "assigned_day",
+  classId = "classId",
+  commentGeneral = "commentGeneral",
+  commentTime = "commentTime",
+  id = "id",
+  offerId = "offerId",
+  possibleDays = "possibleDays",
+}
+
+/**
+ * unique or primary key constraints on table "rentAScientist.SchoolClass"
+ */
+export enum rentAScientist_SchoolClass_constraint {
+  SchoolClass_pkey = "SchoolClass_pkey",
+}
+
+/**
+ * update columns of table "rentAScientist.SchoolClass"
+ */
+export enum rentAScientist_SchoolClass_update_column {
+  contact = "contact",
+  grade = "grade",
+  id = "id",
+  name = "name",
+  schoolId = "schoolId",
+  studensCount = "studensCount",
+  teacherId = "teacherId",
+}
+
+/**
+ * unique or primary key constraints on table "rentAScientist.School"
+ */
+export enum rentAScientist_School_constraint {
+  School_pkey = "School_pkey",
+}
+
+/**
+ * update columns of table "rentAScientist.School"
+ */
+export enum rentAScientist_School_update_column {
+  city = "city",
+  district = "district",
+  dstnr = "dstnr",
+  name = "name",
+  postalCode = "postalCode",
+  schoolType = "schoolType",
+  street = "street",
+}
+
+/**
+ * unique or primary key constraints on table "rentAScientist.ScientistOfferRelation"
+ */
+export enum rentAScientist_ScientistOfferRelation_constraint {
+  ScientistOfferRelation_pkey = "ScientistOfferRelation_pkey",
+}
+
+/**
+ * update columns of table "rentAScientist.ScientistOfferRelation"
+ */
+export enum rentAScientist_ScientistOfferRelation_update_column {
+  offerId = "offerId",
+  scientistId = "scientistId",
+}
+
+/**
+ * unique or primary key constraints on table "rentAScientist.ScientistOffer"
+ */
+export enum rentAScientist_ScientistOffer_constraint {
+  ScientistOffer_pkey = "ScientistOffer_pkey",
+}
+
+/**
+ * update columns of table "rentAScientist.ScientistOffer"
+ */
+export enum rentAScientist_ScientistOffer_update_column {
+  categories = "categories",
+  classPreparation = "classPreparation",
+  contactEmail = "contactEmail",
+  contactName = "contactName",
+  contactPhone = "contactPhone",
+  description = "description",
+  duration = "duration",
+  equipmentRequired = "equipmentRequired",
+  extraComment = "extraComment",
+  format = "format",
+  id = "id",
+  institutionLogo = "institutionLogo",
+  institutionName = "institutionName",
+  maxDeployments = "maxDeployments",
+  maximumGrade = "maximumGrade",
+  minimumGrade = "minimumGrade",
+  possibleDays = "possibleDays",
+  possibleLocations = "possibleLocations",
+  programId = "programId",
+  researchSubject = "researchSubject",
+  roomRequirements = "roomRequirements",
+  subjectComment = "subjectComment",
+  timeWindow = "timeWindow",
+  title = "title",
+}
+
+/**
+ * unique or primary key constraints on table "rentAScientist.Scientist"
+ */
+export enum rentAScientist_Scientist_constraint {
+  Scientist_pkey = "Scientist_pkey",
+}
+
+/**
+ * update columns of table "rentAScientist.Scientist"
+ */
+export enum rentAScientist_Scientist_update_column {
+  forename = "forename",
+  id = "id",
+  image = "image",
+  surname = "surname",
+  title = "title",
+}
+
+/**
+ * unique or primary key constraints on table "rentAScientist.Teacher"
+ */
+export enum rentAScientist_Teacher_constraint {
+  Teacher_pkey = "Teacher_pkey",
+  Teacher_userId_key = "Teacher_userId_key",
+}
+
+/**
+ * update columns of table "rentAScientist.Teacher"
+ */
+export enum rentAScientist_Teacher_update_column {
+  id = "id",
+  userId = "userId",
 }
 
 /**
@@ -1986,52 +1989,6 @@ export interface Admin_var_samp_order_by {
  */
 export interface Admin_variance_order_by {
   id?: order_by | null;
-}
-
-/**
- * input type for inserting array relation for remote table "AttendanceSourceData"
- */
-export interface AttendanceSourceData_arr_rel_insert_input {
-  data: AttendanceSourceData_insert_input[];
-  on_conflict?: AttendanceSourceData_on_conflict | null;
-}
-
-/**
- * Boolean expression to filter rows from the table "AttendanceSourceData". All fields are combined with a logical 'AND'.
- */
-export interface AttendanceSourceData_bool_exp {
-  Session?: Session_bool_exp | null;
-  URL?: String_comparison_exp | null;
-  _and?: AttendanceSourceData_bool_exp[] | null;
-  _not?: AttendanceSourceData_bool_exp | null;
-  _or?: AttendanceSourceData_bool_exp[] | null;
-  created_at?: timestamptz_comparison_exp | null;
-  id?: Int_comparison_exp | null;
-  sessionId?: Int_comparison_exp | null;
-  source?: String_comparison_exp | null;
-  updated_at?: timestamptz_comparison_exp | null;
-}
-
-/**
- * input type for inserting data into table "AttendanceSourceData"
- */
-export interface AttendanceSourceData_insert_input {
-  Session?: Session_obj_rel_insert_input | null;
-  URL?: string | null;
-  created_at?: any | null;
-  id?: number | null;
-  sessionId?: number | null;
-  source?: string | null;
-  updated_at?: any | null;
-}
-
-/**
- * on_conflict condition type for table "AttendanceSourceData"
- */
-export interface AttendanceSourceData_on_conflict {
-  constraint: AttendanceSourceData_constraint;
-  update_columns: AttendanceSourceData_update_column[];
-  where?: AttendanceSourceData_bool_exp | null;
 }
 
 /**
@@ -3593,8 +3550,8 @@ export interface MotivationRating_on_conflict {
  */
 export interface Program_bool_exp {
   Courses?: Course_bool_exp | null;
-  RentAScientistConfigs?: RentAScientistConfig_bool_exp | null;
-  ScientistOffers?: ScientistOffer_bool_exp | null;
+  RentAScientistConfigs?: rentAScientist_RentAScientistConfig_bool_exp | null;
+  ScientistOffers?: rentAScientist_ScientistOffer_bool_exp | null;
   _and?: Program_bool_exp[] | null;
   _not?: Program_bool_exp | null;
   _or?: Program_bool_exp[] | null;
@@ -3622,8 +3579,8 @@ export interface Program_bool_exp {
  */
 export interface Program_insert_input {
   Courses?: Course_arr_rel_insert_input | null;
-  RentAScientistConfigs?: RentAScientistConfig_arr_rel_insert_input | null;
-  ScientistOffers?: ScientistOffer_arr_rel_insert_input | null;
+  RentAScientistConfigs?: rentAScientist_RentAScientistConfig_arr_rel_insert_input | null;
+  ScientistOffers?: rentAScientist_ScientistOffer_arr_rel_insert_input | null;
   achievementRecordUploadDeadline?: any | null;
   applicationStart?: any | null;
   attendanceCertificateTemplateURL?: string | null;
@@ -3665,8 +3622,8 @@ export interface Program_on_conflict {
  */
 export interface Program_order_by {
   Courses_aggregate?: Course_aggregate_order_by | null;
-  RentAScientistConfigs_aggregate?: RentAScientistConfig_aggregate_order_by | null;
-  ScientistOffers_aggregate?: ScientistOffer_aggregate_order_by | null;
+  RentAScientistConfigs_aggregate?: rentAScientist_RentAScientistConfig_aggregate_order_by | null;
+  ScientistOffers_aggregate?: rentAScientist_ScientistOffer_aggregate_order_by | null;
   achievementRecordUploadDeadline?: order_by | null;
   applicationStart?: order_by | null;
   attendanceCertificateTemplateURL?: order_by | null;
@@ -3687,637 +3644,52 @@ export interface Program_order_by {
 }
 
 /**
- * order by aggregate values of table "RentAScientistConfig"
+ * Boolean expression to filter rows from the table "SessionAddressType". All fields are combined with a logical 'AND'.
  */
-export interface RentAScientistConfig_aggregate_order_by {
-  avg?: RentAScientistConfig_avg_order_by | null;
-  count?: order_by | null;
-  max?: RentAScientistConfig_max_order_by | null;
-  min?: RentAScientistConfig_min_order_by | null;
-  stddev?: RentAScientistConfig_stddev_order_by | null;
-  stddev_pop?: RentAScientistConfig_stddev_pop_order_by | null;
-  stddev_samp?: RentAScientistConfig_stddev_samp_order_by | null;
-  sum?: RentAScientistConfig_sum_order_by | null;
-  var_pop?: RentAScientistConfig_var_pop_order_by | null;
-  var_samp?: RentAScientistConfig_var_samp_order_by | null;
-  variance?: RentAScientistConfig_variance_order_by | null;
+export interface SessionAddressType_bool_exp {
+  SessionAddresses?: SessionAddress_bool_exp | null;
+  _and?: SessionAddressType_bool_exp[] | null;
+  _not?: SessionAddressType_bool_exp | null;
+  _or?: SessionAddressType_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
 }
 
 /**
- * input type for inserting array relation for remote table "RentAScientistConfig"
+ * Boolean expression to compare columns of type "SessionAddressType_enum". All fields are combined with logical 'AND'.
  */
-export interface RentAScientistConfig_arr_rel_insert_input {
-  data: RentAScientistConfig_insert_input[];
-  on_conflict?: RentAScientistConfig_on_conflict | null;
+export interface SessionAddressType_enum_comparison_exp {
+  _eq?: SessionAddressType_enum | null;
+  _in?: SessionAddressType_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: SessionAddressType_enum | null;
+  _nin?: SessionAddressType_enum[] | null;
 }
 
 /**
- * order by avg() on columns of table "RentAScientistConfig"
+ * input type for inserting data into table "SessionAddressType"
  */
-export interface RentAScientistConfig_avg_order_by {
-  id?: order_by | null;
-  program_id?: order_by | null;
+export interface SessionAddressType_insert_input {
+  SessionAddresses?: SessionAddress_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
 }
 
 /**
- * Boolean expression to filter rows from the table "RentAScientistConfig". All fields are combined with a logical 'AND'.
+ * input type for inserting object relation for remote table "SessionAddressType"
  */
-export interface RentAScientistConfig_bool_exp {
-  Program?: Program_bool_exp | null;
-  _and?: RentAScientistConfig_bool_exp[] | null;
-  _not?: RentAScientistConfig_bool_exp | null;
-  _or?: RentAScientistConfig_bool_exp[] | null;
-  id?: Int_comparison_exp | null;
-  mailFrom?: String_comparison_exp | null;
-  program_id?: Int_comparison_exp | null;
-  test_operation?: Boolean_comparison_exp | null;
+export interface SessionAddressType_obj_rel_insert_input {
+  data: SessionAddressType_insert_input;
+  on_conflict?: SessionAddressType_on_conflict | null;
 }
 
 /**
- * input type for inserting data into table "RentAScientistConfig"
+ * on_conflict condition type for table "SessionAddressType"
  */
-export interface RentAScientistConfig_insert_input {
-  Program?: Program_obj_rel_insert_input | null;
-  id?: number | null;
-  mailFrom?: string | null;
-  program_id?: number | null;
-  test_operation?: boolean | null;
-}
-
-/**
- * order by max() on columns of table "RentAScientistConfig"
- */
-export interface RentAScientistConfig_max_order_by {
-  id?: order_by | null;
-  mailFrom?: order_by | null;
-  program_id?: order_by | null;
-}
-
-/**
- * order by min() on columns of table "RentAScientistConfig"
- */
-export interface RentAScientistConfig_min_order_by {
-  id?: order_by | null;
-  mailFrom?: order_by | null;
-  program_id?: order_by | null;
-}
-
-/**
- * on_conflict condition type for table "RentAScientistConfig"
- */
-export interface RentAScientistConfig_on_conflict {
-  constraint: RentAScientistConfig_constraint;
-  update_columns: RentAScientistConfig_update_column[];
-  where?: RentAScientistConfig_bool_exp | null;
-}
-
-/**
- * order by stddev() on columns of table "RentAScientistConfig"
- */
-export interface RentAScientistConfig_stddev_order_by {
-  id?: order_by | null;
-  program_id?: order_by | null;
-}
-
-/**
- * order by stddev_pop() on columns of table "RentAScientistConfig"
- */
-export interface RentAScientistConfig_stddev_pop_order_by {
-  id?: order_by | null;
-  program_id?: order_by | null;
-}
-
-/**
- * order by stddev_samp() on columns of table "RentAScientistConfig"
- */
-export interface RentAScientistConfig_stddev_samp_order_by {
-  id?: order_by | null;
-  program_id?: order_by | null;
-}
-
-/**
- * order by sum() on columns of table "RentAScientistConfig"
- */
-export interface RentAScientistConfig_sum_order_by {
-  id?: order_by | null;
-  program_id?: order_by | null;
-}
-
-/**
- * order by var_pop() on columns of table "RentAScientistConfig"
- */
-export interface RentAScientistConfig_var_pop_order_by {
-  id?: order_by | null;
-  program_id?: order_by | null;
-}
-
-/**
- * order by var_samp() on columns of table "RentAScientistConfig"
- */
-export interface RentAScientistConfig_var_samp_order_by {
-  id?: order_by | null;
-  program_id?: order_by | null;
-}
-
-/**
- * order by variance() on columns of table "RentAScientistConfig"
- */
-export interface RentAScientistConfig_variance_order_by {
-  id?: order_by | null;
-  program_id?: order_by | null;
-}
-
-/**
- * input type for inserting array relation for remote table "SchoolClassRequest"
- */
-export interface SchoolClassRequest_arr_rel_insert_input {
-  data: SchoolClassRequest_insert_input[];
-  on_conflict?: SchoolClassRequest_on_conflict | null;
-}
-
-/**
- * Boolean expression to filter rows from the table "SchoolClassRequest". All fields are combined with a logical 'AND'.
- */
-export interface SchoolClassRequest_bool_exp {
-  SchoolClass?: SchoolClass_bool_exp | null;
-  ScientistOffer?: ScientistOffer_bool_exp | null;
-  _and?: SchoolClassRequest_bool_exp[] | null;
-  _not?: SchoolClassRequest_bool_exp | null;
-  _or?: SchoolClassRequest_bool_exp[] | null;
-  assigned_day?: Int_comparison_exp | null;
-  classId?: Int_comparison_exp | null;
-  commentGeneral?: String_comparison_exp | null;
-  commentTime?: String_comparison_exp | null;
-  id?: Int_comparison_exp | null;
-  offerId?: Int_comparison_exp | null;
-  possibleDays?: _int4_comparison_exp | null;
-}
-
-/**
- * input type for inserting data into table "SchoolClassRequest"
- */
-export interface SchoolClassRequest_insert_input {
-  SchoolClass?: SchoolClass_obj_rel_insert_input | null;
-  ScientistOffer?: ScientistOffer_obj_rel_insert_input | null;
-  assigned_day?: number | null;
-  classId?: number | null;
-  commentGeneral?: string | null;
-  commentTime?: string | null;
-  id?: number | null;
-  offerId?: number | null;
-  possibleDays?: any | null;
-}
-
-/**
- * on_conflict condition type for table "SchoolClassRequest"
- */
-export interface SchoolClassRequest_on_conflict {
-  constraint: SchoolClassRequest_constraint;
-  update_columns: SchoolClassRequest_update_column[];
-  where?: SchoolClassRequest_bool_exp | null;
-}
-
-/**
- * input type for inserting array relation for remote table "SchoolClass"
- */
-export interface SchoolClass_arr_rel_insert_input {
-  data: SchoolClass_insert_input[];
-  on_conflict?: SchoolClass_on_conflict | null;
-}
-
-/**
- * Boolean expression to filter rows from the table "SchoolClass". All fields are combined with a logical 'AND'.
- */
-export interface SchoolClass_bool_exp {
-  School?: School_bool_exp | null;
-  SchoolClassRequests?: SchoolClassRequest_bool_exp | null;
-  Teacher?: Teacher_bool_exp | null;
-  _and?: SchoolClass_bool_exp[] | null;
-  _not?: SchoolClass_bool_exp | null;
-  _or?: SchoolClass_bool_exp[] | null;
-  contact?: String_comparison_exp | null;
-  grade?: Int_comparison_exp | null;
-  id?: Int_comparison_exp | null;
-  name?: String_comparison_exp | null;
-  schoolId?: String_comparison_exp | null;
-  studensCount?: Int_comparison_exp | null;
-  teacherId?: Int_comparison_exp | null;
-}
-
-/**
- * input type for inserting data into table "SchoolClass"
- */
-export interface SchoolClass_insert_input {
-  School?: School_obj_rel_insert_input | null;
-  SchoolClassRequests?: SchoolClassRequest_arr_rel_insert_input | null;
-  Teacher?: Teacher_obj_rel_insert_input | null;
-  contact?: string | null;
-  grade?: number | null;
-  id?: number | null;
-  name?: string | null;
-  schoolId?: string | null;
-  studensCount?: number | null;
-  teacherId?: number | null;
-}
-
-/**
- * input type for inserting object relation for remote table "SchoolClass"
- */
-export interface SchoolClass_obj_rel_insert_input {
-  data: SchoolClass_insert_input;
-  on_conflict?: SchoolClass_on_conflict | null;
-}
-
-/**
- * on_conflict condition type for table "SchoolClass"
- */
-export interface SchoolClass_on_conflict {
-  constraint: SchoolClass_constraint;
-  update_columns: SchoolClass_update_column[];
-  where?: SchoolClass_bool_exp | null;
-}
-
-/**
- * Boolean expression to filter rows from the table "School". All fields are combined with a logical 'AND'.
- */
-export interface School_bool_exp {
-  SchoolClasses?: SchoolClass_bool_exp | null;
-  _and?: School_bool_exp[] | null;
-  _not?: School_bool_exp | null;
-  _or?: School_bool_exp[] | null;
-  city?: String_comparison_exp | null;
-  district?: String_comparison_exp | null;
-  dstnr?: String_comparison_exp | null;
-  name?: String_comparison_exp | null;
-  postalCode?: String_comparison_exp | null;
-  schoolType?: String_comparison_exp | null;
-  street?: String_comparison_exp | null;
-}
-
-/**
- * input type for inserting data into table "School"
- */
-export interface School_insert_input {
-  SchoolClasses?: SchoolClass_arr_rel_insert_input | null;
-  city?: string | null;
-  district?: string | null;
-  dstnr?: string | null;
-  name?: string | null;
-  postalCode?: string | null;
-  schoolType?: string | null;
-  street?: string | null;
-}
-
-/**
- * input type for inserting object relation for remote table "School"
- */
-export interface School_obj_rel_insert_input {
-  data: School_insert_input;
-  on_conflict?: School_on_conflict | null;
-}
-
-/**
- * on_conflict condition type for table "School"
- */
-export interface School_on_conflict {
-  constraint: School_constraint;
-  update_columns: School_update_column[];
-  where?: School_bool_exp | null;
-}
-
-/**
- * input type for inserting array relation for remote table "ScientistOfferRelation"
- */
-export interface ScientistOfferRelation_arr_rel_insert_input {
-  data: ScientistOfferRelation_insert_input[];
-  on_conflict?: ScientistOfferRelation_on_conflict | null;
-}
-
-/**
- * Boolean expression to filter rows from the table "ScientistOfferRelation". All fields are combined with a logical 'AND'.
- */
-export interface ScientistOfferRelation_bool_exp {
-  Scientist?: Scientist_bool_exp | null;
-  ScientistOffer?: ScientistOffer_bool_exp | null;
-  _and?: ScientistOfferRelation_bool_exp[] | null;
-  _not?: ScientistOfferRelation_bool_exp | null;
-  _or?: ScientistOfferRelation_bool_exp[] | null;
-  offerId?: Int_comparison_exp | null;
-  scientistId?: Int_comparison_exp | null;
-}
-
-/**
- * input type for inserting data into table "ScientistOfferRelation"
- */
-export interface ScientistOfferRelation_insert_input {
-  Scientist?: Scientist_obj_rel_insert_input | null;
-  ScientistOffer?: ScientistOffer_obj_rel_insert_input | null;
-  offerId?: number | null;
-  scientistId?: number | null;
-}
-
-/**
- * on_conflict condition type for table "ScientistOfferRelation"
- */
-export interface ScientistOfferRelation_on_conflict {
-  constraint: ScientistOfferRelation_constraint;
-  update_columns: ScientistOfferRelation_update_column[];
-  where?: ScientistOfferRelation_bool_exp | null;
-}
-
-/**
- * order by aggregate values of table "ScientistOffer"
- */
-export interface ScientistOffer_aggregate_order_by {
-  avg?: ScientistOffer_avg_order_by | null;
-  count?: order_by | null;
-  max?: ScientistOffer_max_order_by | null;
-  min?: ScientistOffer_min_order_by | null;
-  stddev?: ScientistOffer_stddev_order_by | null;
-  stddev_pop?: ScientistOffer_stddev_pop_order_by | null;
-  stddev_samp?: ScientistOffer_stddev_samp_order_by | null;
-  sum?: ScientistOffer_sum_order_by | null;
-  var_pop?: ScientistOffer_var_pop_order_by | null;
-  var_samp?: ScientistOffer_var_samp_order_by | null;
-  variance?: ScientistOffer_variance_order_by | null;
-}
-
-/**
- * input type for inserting array relation for remote table "ScientistOffer"
- */
-export interface ScientistOffer_arr_rel_insert_input {
-  data: ScientistOffer_insert_input[];
-  on_conflict?: ScientistOffer_on_conflict | null;
-}
-
-/**
- * order by avg() on columns of table "ScientistOffer"
- */
-export interface ScientistOffer_avg_order_by {
-  id?: order_by | null;
-  maxDeployments?: order_by | null;
-  maximumGrade?: order_by | null;
-  minimumGrade?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * Boolean expression to filter rows from the table "ScientistOffer". All fields are combined with a logical 'AND'.
- */
-export interface ScientistOffer_bool_exp {
-  Program?: Program_bool_exp | null;
-  SchoolClassRequests?: SchoolClassRequest_bool_exp | null;
-  ScientistOfferRelations?: ScientistOfferRelation_bool_exp | null;
-  _and?: ScientistOffer_bool_exp[] | null;
-  _not?: ScientistOffer_bool_exp | null;
-  _or?: ScientistOffer_bool_exp[] | null;
-  categories?: _text_comparison_exp | null;
-  classPreparation?: String_comparison_exp | null;
-  contactEmail?: String_comparison_exp | null;
-  contactName?: String_comparison_exp | null;
-  contactPhone?: String_comparison_exp | null;
-  description?: String_comparison_exp | null;
-  duration?: String_comparison_exp | null;
-  equipmentRequired?: String_comparison_exp | null;
-  extraComment?: String_comparison_exp | null;
-  format?: String_comparison_exp | null;
-  id?: Int_comparison_exp | null;
-  institutionLogo?: String_comparison_exp | null;
-  institutionName?: String_comparison_exp | null;
-  maxDeployments?: Int_comparison_exp | null;
-  maximumGrade?: Int_comparison_exp | null;
-  minimumGrade?: Int_comparison_exp | null;
-  possibleDays?: _int4_comparison_exp | null;
-  possibleLocations?: _text_comparison_exp | null;
-  programId?: Int_comparison_exp | null;
-  researchSubject?: String_comparison_exp | null;
-  roomRequirements?: String_comparison_exp | null;
-  subjectComment?: String_comparison_exp | null;
-  timeWindow?: _text_comparison_exp | null;
-  title?: String_comparison_exp | null;
-}
-
-/**
- * input type for inserting data into table "ScientistOffer"
- */
-export interface ScientistOffer_insert_input {
-  Program?: Program_obj_rel_insert_input | null;
-  SchoolClassRequests?: SchoolClassRequest_arr_rel_insert_input | null;
-  ScientistOfferRelations?: ScientistOfferRelation_arr_rel_insert_input | null;
-  categories?: any | null;
-  classPreparation?: string | null;
-  contactEmail?: string | null;
-  contactName?: string | null;
-  contactPhone?: string | null;
-  description?: string | null;
-  duration?: string | null;
-  equipmentRequired?: string | null;
-  extraComment?: string | null;
-  format?: string | null;
-  id?: number | null;
-  institutionLogo?: string | null;
-  institutionName?: string | null;
-  maxDeployments?: number | null;
-  maximumGrade?: number | null;
-  minimumGrade?: number | null;
-  possibleDays?: any | null;
-  possibleLocations?: any | null;
-  programId?: number | null;
-  researchSubject?: string | null;
-  roomRequirements?: string | null;
-  subjectComment?: string | null;
-  timeWindow?: any | null;
-  title?: string | null;
-}
-
-/**
- * order by max() on columns of table "ScientistOffer"
- */
-export interface ScientistOffer_max_order_by {
-  classPreparation?: order_by | null;
-  contactEmail?: order_by | null;
-  contactName?: order_by | null;
-  contactPhone?: order_by | null;
-  description?: order_by | null;
-  duration?: order_by | null;
-  equipmentRequired?: order_by | null;
-  extraComment?: order_by | null;
-  format?: order_by | null;
-  id?: order_by | null;
-  institutionLogo?: order_by | null;
-  institutionName?: order_by | null;
-  maxDeployments?: order_by | null;
-  maximumGrade?: order_by | null;
-  minimumGrade?: order_by | null;
-  programId?: order_by | null;
-  researchSubject?: order_by | null;
-  roomRequirements?: order_by | null;
-  subjectComment?: order_by | null;
-  title?: order_by | null;
-}
-
-/**
- * order by min() on columns of table "ScientistOffer"
- */
-export interface ScientistOffer_min_order_by {
-  classPreparation?: order_by | null;
-  contactEmail?: order_by | null;
-  contactName?: order_by | null;
-  contactPhone?: order_by | null;
-  description?: order_by | null;
-  duration?: order_by | null;
-  equipmentRequired?: order_by | null;
-  extraComment?: order_by | null;
-  format?: order_by | null;
-  id?: order_by | null;
-  institutionLogo?: order_by | null;
-  institutionName?: order_by | null;
-  maxDeployments?: order_by | null;
-  maximumGrade?: order_by | null;
-  minimumGrade?: order_by | null;
-  programId?: order_by | null;
-  researchSubject?: order_by | null;
-  roomRequirements?: order_by | null;
-  subjectComment?: order_by | null;
-  title?: order_by | null;
-}
-
-/**
- * input type for inserting object relation for remote table "ScientistOffer"
- */
-export interface ScientistOffer_obj_rel_insert_input {
-  data: ScientistOffer_insert_input;
-  on_conflict?: ScientistOffer_on_conflict | null;
-}
-
-/**
- * on_conflict condition type for table "ScientistOffer"
- */
-export interface ScientistOffer_on_conflict {
-  constraint: ScientistOffer_constraint;
-  update_columns: ScientistOffer_update_column[];
-  where?: ScientistOffer_bool_exp | null;
-}
-
-/**
- * order by stddev() on columns of table "ScientistOffer"
- */
-export interface ScientistOffer_stddev_order_by {
-  id?: order_by | null;
-  maxDeployments?: order_by | null;
-  maximumGrade?: order_by | null;
-  minimumGrade?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * order by stddev_pop() on columns of table "ScientistOffer"
- */
-export interface ScientistOffer_stddev_pop_order_by {
-  id?: order_by | null;
-  maxDeployments?: order_by | null;
-  maximumGrade?: order_by | null;
-  minimumGrade?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * order by stddev_samp() on columns of table "ScientistOffer"
- */
-export interface ScientistOffer_stddev_samp_order_by {
-  id?: order_by | null;
-  maxDeployments?: order_by | null;
-  maximumGrade?: order_by | null;
-  minimumGrade?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * order by sum() on columns of table "ScientistOffer"
- */
-export interface ScientistOffer_sum_order_by {
-  id?: order_by | null;
-  maxDeployments?: order_by | null;
-  maximumGrade?: order_by | null;
-  minimumGrade?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * order by var_pop() on columns of table "ScientistOffer"
- */
-export interface ScientistOffer_var_pop_order_by {
-  id?: order_by | null;
-  maxDeployments?: order_by | null;
-  maximumGrade?: order_by | null;
-  minimumGrade?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * order by var_samp() on columns of table "ScientistOffer"
- */
-export interface ScientistOffer_var_samp_order_by {
-  id?: order_by | null;
-  maxDeployments?: order_by | null;
-  maximumGrade?: order_by | null;
-  minimumGrade?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * order by variance() on columns of table "ScientistOffer"
- */
-export interface ScientistOffer_variance_order_by {
-  id?: order_by | null;
-  maxDeployments?: order_by | null;
-  maximumGrade?: order_by | null;
-  minimumGrade?: order_by | null;
-  programId?: order_by | null;
-}
-
-/**
- * Boolean expression to filter rows from the table "Scientist". All fields are combined with a logical 'AND'.
- */
-export interface Scientist_bool_exp {
-  ScientistOfferRelations?: ScientistOfferRelation_bool_exp | null;
-  _and?: Scientist_bool_exp[] | null;
-  _not?: Scientist_bool_exp | null;
-  _or?: Scientist_bool_exp[] | null;
-  forename?: String_comparison_exp | null;
-  id?: Int_comparison_exp | null;
-  image?: String_comparison_exp | null;
-  surname?: String_comparison_exp | null;
-  title?: String_comparison_exp | null;
-}
-
-/**
- * input type for inserting data into table "Scientist"
- */
-export interface Scientist_insert_input {
-  ScientistOfferRelations?: ScientistOfferRelation_arr_rel_insert_input | null;
-  forename?: string | null;
-  id?: number | null;
-  image?: string | null;
-  surname?: string | null;
-  title?: string | null;
-}
-
-/**
- * input type for inserting object relation for remote table "Scientist"
- */
-export interface Scientist_obj_rel_insert_input {
-  data: Scientist_insert_input;
-  on_conflict?: Scientist_on_conflict | null;
-}
-
-/**
- * on_conflict condition type for table "Scientist"
- */
-export interface Scientist_on_conflict {
-  constraint: Scientist_constraint;
-  update_columns: Scientist_update_column[];
-  where?: Scientist_bool_exp | null;
+export interface SessionAddressType_on_conflict {
+  constraint: SessionAddressType_constraint;
+  update_columns: SessionAddressType_update_column[];
+  where?: SessionAddressType_bool_exp | null;
 }
 
 /**
@@ -4333,15 +3705,18 @@ export interface SessionAddress_arr_rel_insert_input {
  */
 export interface SessionAddress_bool_exp {
   Session?: Session_bool_exp | null;
+  SessionAddressType?: SessionAddressType_bool_exp | null;
   _and?: SessionAddress_bool_exp[] | null;
   _not?: SessionAddress_bool_exp | null;
   _or?: SessionAddress_bool_exp[] | null;
+  address?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   latitude?: String_comparison_exp | null;
   link?: String_comparison_exp | null;
   longitude?: String_comparison_exp | null;
   sessionId?: Int_comparison_exp | null;
+  type?: SessionAddressType_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
 
@@ -4350,12 +3725,15 @@ export interface SessionAddress_bool_exp {
  */
 export interface SessionAddress_insert_input {
   Session?: Session_obj_rel_insert_input | null;
+  SessionAddressType?: SessionAddressType_obj_rel_insert_input | null;
+  address?: string | null;
   created_at?: any | null;
   id?: number | null;
   latitude?: string | null;
   link?: string | null;
   longitude?: string | null;
   sessionId?: number | null;
+  type?: SessionAddressType_enum | null;
   updated_at?: any | null;
 }
 
@@ -4451,7 +3829,6 @@ export interface Session_avg_order_by {
  * Boolean expression to filter rows from the table "Session". All fields are combined with a logical 'AND'.
  */
 export interface Session_bool_exp {
-  AttendanceDocuments?: AttendanceSourceData_bool_exp | null;
   Attendances?: Attendance_bool_exp | null;
   Course?: Course_bool_exp | null;
   SessionAddresses?: SessionAddress_bool_exp | null;
@@ -4459,6 +3836,7 @@ export interface Session_bool_exp {
   _and?: Session_bool_exp[] | null;
   _not?: Session_bool_exp | null;
   _or?: Session_bool_exp[] | null;
+  attendanceData?: String_comparison_exp | null;
   courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   description?: String_comparison_exp | null;
@@ -4473,11 +3851,11 @@ export interface Session_bool_exp {
  * input type for inserting data into table "Session"
  */
 export interface Session_insert_input {
-  AttendanceDocuments?: AttendanceSourceData_arr_rel_insert_input | null;
   Attendances?: Attendance_arr_rel_insert_input | null;
   Course?: Course_obj_rel_insert_input | null;
   SessionAddresses?: SessionAddress_arr_rel_insert_input | null;
   SessionSpeakers?: SessionSpeaker_arr_rel_insert_input | null;
+  attendanceData?: string | null;
   courseId?: number | null;
   created_at?: any | null;
   description?: string | null;
@@ -4492,6 +3870,7 @@ export interface Session_insert_input {
  * order by max() on columns of table "Session"
  */
 export interface Session_max_order_by {
+  attendanceData?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
   description?: order_by | null;
@@ -4506,6 +3885,7 @@ export interface Session_max_order_by {
  * order by min() on columns of table "Session"
  */
 export interface Session_min_order_by {
+  attendanceData?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
   description?: order_by | null;
@@ -4615,46 +3995,6 @@ export interface String_comparison_exp {
 }
 
 /**
- * Boolean expression to filter rows from the table "Teacher". All fields are combined with a logical 'AND'.
- */
-export interface Teacher_bool_exp {
-  SchoolClasses?: SchoolClass_bool_exp | null;
-  User?: User_bool_exp | null;
-  _and?: Teacher_bool_exp[] | null;
-  _not?: Teacher_bool_exp | null;
-  _or?: Teacher_bool_exp[] | null;
-  id?: Int_comparison_exp | null;
-  userId?: uuid_comparison_exp | null;
-}
-
-/**
- * input type for inserting data into table "Teacher"
- */
-export interface Teacher_insert_input {
-  SchoolClasses?: SchoolClass_arr_rel_insert_input | null;
-  User?: User_obj_rel_insert_input | null;
-  id?: number | null;
-  userId?: any | null;
-}
-
-/**
- * input type for inserting object relation for remote table "Teacher"
- */
-export interface Teacher_obj_rel_insert_input {
-  data: Teacher_insert_input;
-  on_conflict?: Teacher_on_conflict | null;
-}
-
-/**
- * on_conflict condition type for table "Teacher"
- */
-export interface Teacher_on_conflict {
-  constraint: Teacher_constraint;
-  update_columns: Teacher_update_column[];
-  where?: Teacher_bool_exp | null;
-}
-
-/**
  * Boolean expression to filter rows from the table "University". All fields are combined with a logical 'AND'.
  */
 export interface University_bool_exp {
@@ -4733,6 +4073,7 @@ export interface User_arr_rel_insert_input {
  * Boolean expression to filter rows from the table "User". All fields are combined with a logical 'AND'.
  */
 export interface User_bool_exp {
+  AchievementOptionMentors?: AchievementOptionMentor_bool_exp | null;
   AchievementRecordAuthors?: AchievementRecordAuthor_bool_exp | null;
   Admins?: Admin_bool_exp | null;
   Attendances?: Attendance_bool_exp | null;
@@ -4763,6 +4104,7 @@ export interface User_bool_exp {
  * input type for inserting data into table "User"
  */
 export interface User_insert_input {
+  AchievementOptionMentors?: AchievementOptionMentor_arr_rel_insert_input | null;
   AchievementRecordAuthors?: AchievementRecordAuthor_arr_rel_insert_input | null;
   Admins?: Admin_arr_rel_insert_input | null;
   Attendances?: Attendance_arr_rel_insert_input | null;
@@ -4841,6 +4183,7 @@ export interface User_on_conflict {
  * Ordering options when selecting data from "User".
  */
 export interface User_order_by {
+  AchievementOptionMentors_aggregate?: AchievementOptionMentor_aggregate_order_by | null;
   AchievementRecordAuthors_aggregate?: AchievementRecordAuthor_aggregate_order_by | null;
   Admins_aggregate?: Admin_aggregate_order_by | null;
   Attendances_aggregate?: Attendance_aggregate_order_by | null;
@@ -4922,6 +4265,680 @@ export interface numeric_comparison_exp {
   _lte?: any | null;
   _neq?: any | null;
   _nin?: any[] | null;
+}
+
+/**
+ * order by aggregate values of table "rentAScientist.RentAScientistConfig"
+ */
+export interface rentAScientist_RentAScientistConfig_aggregate_order_by {
+  avg?: rentAScientist_RentAScientistConfig_avg_order_by | null;
+  count?: order_by | null;
+  max?: rentAScientist_RentAScientistConfig_max_order_by | null;
+  min?: rentAScientist_RentAScientistConfig_min_order_by | null;
+  stddev?: rentAScientist_RentAScientistConfig_stddev_order_by | null;
+  stddev_pop?: rentAScientist_RentAScientistConfig_stddev_pop_order_by | null;
+  stddev_samp?: rentAScientist_RentAScientistConfig_stddev_samp_order_by | null;
+  sum?: rentAScientist_RentAScientistConfig_sum_order_by | null;
+  var_pop?: rentAScientist_RentAScientistConfig_var_pop_order_by | null;
+  var_samp?: rentAScientist_RentAScientistConfig_var_samp_order_by | null;
+  variance?: rentAScientist_RentAScientistConfig_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "rentAScientist.RentAScientistConfig"
+ */
+export interface rentAScientist_RentAScientistConfig_arr_rel_insert_input {
+  data: rentAScientist_RentAScientistConfig_insert_input[];
+  on_conflict?: rentAScientist_RentAScientistConfig_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "rentAScientist.RentAScientistConfig"
+ */
+export interface rentAScientist_RentAScientistConfig_avg_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "rentAScientist.RentAScientistConfig". All fields are combined with a logical 'AND'.
+ */
+export interface rentAScientist_RentAScientistConfig_bool_exp {
+  Program?: Program_bool_exp | null;
+  _and?: rentAScientist_RentAScientistConfig_bool_exp[] | null;
+  _not?: rentAScientist_RentAScientistConfig_bool_exp | null;
+  _or?: rentAScientist_RentAScientistConfig_bool_exp[] | null;
+  id?: Int_comparison_exp | null;
+  mailFrom?: String_comparison_exp | null;
+  program_id?: Int_comparison_exp | null;
+  test_operation?: Boolean_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "rentAScientist.RentAScientistConfig"
+ */
+export interface rentAScientist_RentAScientistConfig_insert_input {
+  Program?: Program_obj_rel_insert_input | null;
+  id?: number | null;
+  mailFrom?: string | null;
+  program_id?: number | null;
+  test_operation?: boolean | null;
+}
+
+/**
+ * order by max() on columns of table "rentAScientist.RentAScientistConfig"
+ */
+export interface rentAScientist_RentAScientistConfig_max_order_by {
+  id?: order_by | null;
+  mailFrom?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "rentAScientist.RentAScientistConfig"
+ */
+export interface rentAScientist_RentAScientistConfig_min_order_by {
+  id?: order_by | null;
+  mailFrom?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "rentAScientist.RentAScientistConfig"
+ */
+export interface rentAScientist_RentAScientistConfig_on_conflict {
+  constraint: rentAScientist_RentAScientistConfig_constraint;
+  update_columns: rentAScientist_RentAScientistConfig_update_column[];
+  where?: rentAScientist_RentAScientistConfig_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "rentAScientist.RentAScientistConfig"
+ */
+export interface rentAScientist_RentAScientistConfig_stddev_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "rentAScientist.RentAScientistConfig"
+ */
+export interface rentAScientist_RentAScientistConfig_stddev_pop_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "rentAScientist.RentAScientistConfig"
+ */
+export interface rentAScientist_RentAScientistConfig_stddev_samp_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "rentAScientist.RentAScientistConfig"
+ */
+export interface rentAScientist_RentAScientistConfig_sum_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "rentAScientist.RentAScientistConfig"
+ */
+export interface rentAScientist_RentAScientistConfig_var_pop_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "rentAScientist.RentAScientistConfig"
+ */
+export interface rentAScientist_RentAScientistConfig_var_samp_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "rentAScientist.RentAScientistConfig"
+ */
+export interface rentAScientist_RentAScientistConfig_variance_order_by {
+  id?: order_by | null;
+  program_id?: order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "rentAScientist.SchoolClassRequest"
+ */
+export interface rentAScientist_SchoolClassRequest_arr_rel_insert_input {
+  data: rentAScientist_SchoolClassRequest_insert_input[];
+  on_conflict?: rentAScientist_SchoolClassRequest_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "rentAScientist.SchoolClassRequest". All fields are combined with a logical 'AND'.
+ */
+export interface rentAScientist_SchoolClassRequest_bool_exp {
+  SchoolClass?: rentAScientist_SchoolClass_bool_exp | null;
+  ScientistOffer?: rentAScientist_ScientistOffer_bool_exp | null;
+  _and?: rentAScientist_SchoolClassRequest_bool_exp[] | null;
+  _not?: rentAScientist_SchoolClassRequest_bool_exp | null;
+  _or?: rentAScientist_SchoolClassRequest_bool_exp[] | null;
+  assigned_day?: Int_comparison_exp | null;
+  classId?: Int_comparison_exp | null;
+  commentGeneral?: String_comparison_exp | null;
+  commentTime?: String_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  offerId?: Int_comparison_exp | null;
+  possibleDays?: _int4_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "rentAScientist.SchoolClassRequest"
+ */
+export interface rentAScientist_SchoolClassRequest_insert_input {
+  SchoolClass?: rentAScientist_SchoolClass_obj_rel_insert_input | null;
+  ScientistOffer?: rentAScientist_ScientistOffer_obj_rel_insert_input | null;
+  assigned_day?: number | null;
+  classId?: number | null;
+  commentGeneral?: string | null;
+  commentTime?: string | null;
+  id?: number | null;
+  offerId?: number | null;
+  possibleDays?: any | null;
+}
+
+/**
+ * on_conflict condition type for table "rentAScientist.SchoolClassRequest"
+ */
+export interface rentAScientist_SchoolClassRequest_on_conflict {
+  constraint: rentAScientist_SchoolClassRequest_constraint;
+  update_columns: rentAScientist_SchoolClassRequest_update_column[];
+  where?: rentAScientist_SchoolClassRequest_bool_exp | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "rentAScientist.SchoolClass"
+ */
+export interface rentAScientist_SchoolClass_arr_rel_insert_input {
+  data: rentAScientist_SchoolClass_insert_input[];
+  on_conflict?: rentAScientist_SchoolClass_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "rentAScientist.SchoolClass". All fields are combined with a logical 'AND'.
+ */
+export interface rentAScientist_SchoolClass_bool_exp {
+  School?: rentAScientist_School_bool_exp | null;
+  SchoolClassRequests?: rentAScientist_SchoolClassRequest_bool_exp | null;
+  Teacher?: rentAScientist_Teacher_bool_exp | null;
+  _and?: rentAScientist_SchoolClass_bool_exp[] | null;
+  _not?: rentAScientist_SchoolClass_bool_exp | null;
+  _or?: rentAScientist_SchoolClass_bool_exp[] | null;
+  contact?: String_comparison_exp | null;
+  grade?: Int_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  name?: String_comparison_exp | null;
+  schoolId?: String_comparison_exp | null;
+  studensCount?: Int_comparison_exp | null;
+  teacherId?: Int_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "rentAScientist.SchoolClass"
+ */
+export interface rentAScientist_SchoolClass_insert_input {
+  School?: rentAScientist_School_obj_rel_insert_input | null;
+  SchoolClassRequests?: rentAScientist_SchoolClassRequest_arr_rel_insert_input | null;
+  Teacher?: rentAScientist_Teacher_obj_rel_insert_input | null;
+  contact?: string | null;
+  grade?: number | null;
+  id?: number | null;
+  name?: string | null;
+  schoolId?: string | null;
+  studensCount?: number | null;
+  teacherId?: number | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "rentAScientist.SchoolClass"
+ */
+export interface rentAScientist_SchoolClass_obj_rel_insert_input {
+  data: rentAScientist_SchoolClass_insert_input;
+  on_conflict?: rentAScientist_SchoolClass_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "rentAScientist.SchoolClass"
+ */
+export interface rentAScientist_SchoolClass_on_conflict {
+  constraint: rentAScientist_SchoolClass_constraint;
+  update_columns: rentAScientist_SchoolClass_update_column[];
+  where?: rentAScientist_SchoolClass_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "rentAScientist.School". All fields are combined with a logical 'AND'.
+ */
+export interface rentAScientist_School_bool_exp {
+  SchoolClasses?: rentAScientist_SchoolClass_bool_exp | null;
+  _and?: rentAScientist_School_bool_exp[] | null;
+  _not?: rentAScientist_School_bool_exp | null;
+  _or?: rentAScientist_School_bool_exp[] | null;
+  city?: String_comparison_exp | null;
+  district?: String_comparison_exp | null;
+  dstnr?: String_comparison_exp | null;
+  name?: String_comparison_exp | null;
+  postalCode?: String_comparison_exp | null;
+  schoolType?: String_comparison_exp | null;
+  street?: String_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "rentAScientist.School"
+ */
+export interface rentAScientist_School_insert_input {
+  SchoolClasses?: rentAScientist_SchoolClass_arr_rel_insert_input | null;
+  city?: string | null;
+  district?: string | null;
+  dstnr?: string | null;
+  name?: string | null;
+  postalCode?: string | null;
+  schoolType?: string | null;
+  street?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "rentAScientist.School"
+ */
+export interface rentAScientist_School_obj_rel_insert_input {
+  data: rentAScientist_School_insert_input;
+  on_conflict?: rentAScientist_School_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "rentAScientist.School"
+ */
+export interface rentAScientist_School_on_conflict {
+  constraint: rentAScientist_School_constraint;
+  update_columns: rentAScientist_School_update_column[];
+  where?: rentAScientist_School_bool_exp | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "rentAScientist.ScientistOfferRelation"
+ */
+export interface rentAScientist_ScientistOfferRelation_arr_rel_insert_input {
+  data: rentAScientist_ScientistOfferRelation_insert_input[];
+  on_conflict?: rentAScientist_ScientistOfferRelation_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "rentAScientist.ScientistOfferRelation". All fields are combined with a logical 'AND'.
+ */
+export interface rentAScientist_ScientistOfferRelation_bool_exp {
+  Scientist?: rentAScientist_Scientist_bool_exp | null;
+  ScientistOffer?: rentAScientist_ScientistOffer_bool_exp | null;
+  _and?: rentAScientist_ScientistOfferRelation_bool_exp[] | null;
+  _not?: rentAScientist_ScientistOfferRelation_bool_exp | null;
+  _or?: rentAScientist_ScientistOfferRelation_bool_exp[] | null;
+  offerId?: Int_comparison_exp | null;
+  scientistId?: Int_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "rentAScientist.ScientistOfferRelation"
+ */
+export interface rentAScientist_ScientistOfferRelation_insert_input {
+  Scientist?: rentAScientist_Scientist_obj_rel_insert_input | null;
+  ScientistOffer?: rentAScientist_ScientistOffer_obj_rel_insert_input | null;
+  offerId?: number | null;
+  scientistId?: number | null;
+}
+
+/**
+ * on_conflict condition type for table "rentAScientist.ScientistOfferRelation"
+ */
+export interface rentAScientist_ScientistOfferRelation_on_conflict {
+  constraint: rentAScientist_ScientistOfferRelation_constraint;
+  update_columns: rentAScientist_ScientistOfferRelation_update_column[];
+  where?: rentAScientist_ScientistOfferRelation_bool_exp | null;
+}
+
+/**
+ * order by aggregate values of table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_aggregate_order_by {
+  avg?: rentAScientist_ScientistOffer_avg_order_by | null;
+  count?: order_by | null;
+  max?: rentAScientist_ScientistOffer_max_order_by | null;
+  min?: rentAScientist_ScientistOffer_min_order_by | null;
+  stddev?: rentAScientist_ScientistOffer_stddev_order_by | null;
+  stddev_pop?: rentAScientist_ScientistOffer_stddev_pop_order_by | null;
+  stddev_samp?: rentAScientist_ScientistOffer_stddev_samp_order_by | null;
+  sum?: rentAScientist_ScientistOffer_sum_order_by | null;
+  var_pop?: rentAScientist_ScientistOffer_var_pop_order_by | null;
+  var_samp?: rentAScientist_ScientistOffer_var_samp_order_by | null;
+  variance?: rentAScientist_ScientistOffer_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_arr_rel_insert_input {
+  data: rentAScientist_ScientistOffer_insert_input[];
+  on_conflict?: rentAScientist_ScientistOffer_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_avg_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "rentAScientist.ScientistOffer". All fields are combined with a logical 'AND'.
+ */
+export interface rentAScientist_ScientistOffer_bool_exp {
+  Program?: Program_bool_exp | null;
+  SchoolClassRequests?: rentAScientist_SchoolClassRequest_bool_exp | null;
+  ScientistOfferRelations?: rentAScientist_ScientistOfferRelation_bool_exp | null;
+  _and?: rentAScientist_ScientistOffer_bool_exp[] | null;
+  _not?: rentAScientist_ScientistOffer_bool_exp | null;
+  _or?: rentAScientist_ScientistOffer_bool_exp[] | null;
+  categories?: _text_comparison_exp | null;
+  classPreparation?: String_comparison_exp | null;
+  contactEmail?: String_comparison_exp | null;
+  contactName?: String_comparison_exp | null;
+  contactPhone?: String_comparison_exp | null;
+  description?: String_comparison_exp | null;
+  duration?: String_comparison_exp | null;
+  equipmentRequired?: String_comparison_exp | null;
+  extraComment?: String_comparison_exp | null;
+  format?: String_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  institutionLogo?: String_comparison_exp | null;
+  institutionName?: String_comparison_exp | null;
+  maxDeployments?: Int_comparison_exp | null;
+  maximumGrade?: Int_comparison_exp | null;
+  minimumGrade?: Int_comparison_exp | null;
+  possibleDays?: _int4_comparison_exp | null;
+  possibleLocations?: _text_comparison_exp | null;
+  programId?: Int_comparison_exp | null;
+  researchSubject?: String_comparison_exp | null;
+  roomRequirements?: String_comparison_exp | null;
+  subjectComment?: String_comparison_exp | null;
+  timeWindow?: _text_comparison_exp | null;
+  title?: String_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_insert_input {
+  Program?: Program_obj_rel_insert_input | null;
+  SchoolClassRequests?: rentAScientist_SchoolClassRequest_arr_rel_insert_input | null;
+  ScientistOfferRelations?: rentAScientist_ScientistOfferRelation_arr_rel_insert_input | null;
+  categories?: any | null;
+  classPreparation?: string | null;
+  contactEmail?: string | null;
+  contactName?: string | null;
+  contactPhone?: string | null;
+  description?: string | null;
+  duration?: string | null;
+  equipmentRequired?: string | null;
+  extraComment?: string | null;
+  format?: string | null;
+  id?: number | null;
+  institutionLogo?: string | null;
+  institutionName?: string | null;
+  maxDeployments?: number | null;
+  maximumGrade?: number | null;
+  minimumGrade?: number | null;
+  possibleDays?: any | null;
+  possibleLocations?: any | null;
+  programId?: number | null;
+  researchSubject?: string | null;
+  roomRequirements?: string | null;
+  subjectComment?: string | null;
+  timeWindow?: any | null;
+  title?: string | null;
+}
+
+/**
+ * order by max() on columns of table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_max_order_by {
+  classPreparation?: order_by | null;
+  contactEmail?: order_by | null;
+  contactName?: order_by | null;
+  contactPhone?: order_by | null;
+  description?: order_by | null;
+  duration?: order_by | null;
+  equipmentRequired?: order_by | null;
+  extraComment?: order_by | null;
+  format?: order_by | null;
+  id?: order_by | null;
+  institutionLogo?: order_by | null;
+  institutionName?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+  researchSubject?: order_by | null;
+  roomRequirements?: order_by | null;
+  subjectComment?: order_by | null;
+  title?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_min_order_by {
+  classPreparation?: order_by | null;
+  contactEmail?: order_by | null;
+  contactName?: order_by | null;
+  contactPhone?: order_by | null;
+  description?: order_by | null;
+  duration?: order_by | null;
+  equipmentRequired?: order_by | null;
+  extraComment?: order_by | null;
+  format?: order_by | null;
+  id?: order_by | null;
+  institutionLogo?: order_by | null;
+  institutionName?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+  researchSubject?: order_by | null;
+  roomRequirements?: order_by | null;
+  subjectComment?: order_by | null;
+  title?: order_by | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_obj_rel_insert_input {
+  data: rentAScientist_ScientistOffer_insert_input;
+  on_conflict?: rentAScientist_ScientistOffer_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_on_conflict {
+  constraint: rentAScientist_ScientistOffer_constraint;
+  update_columns: rentAScientist_ScientistOffer_update_column[];
+  where?: rentAScientist_ScientistOffer_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_stddev_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_stddev_pop_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_stddev_samp_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_sum_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_var_pop_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_var_samp_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "rentAScientist.ScientistOffer"
+ */
+export interface rentAScientist_ScientistOffer_variance_order_by {
+  id?: order_by | null;
+  maxDeployments?: order_by | null;
+  maximumGrade?: order_by | null;
+  minimumGrade?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "rentAScientist.Scientist". All fields are combined with a logical 'AND'.
+ */
+export interface rentAScientist_Scientist_bool_exp {
+  ScientistOfferRelations?: rentAScientist_ScientistOfferRelation_bool_exp | null;
+  _and?: rentAScientist_Scientist_bool_exp[] | null;
+  _not?: rentAScientist_Scientist_bool_exp | null;
+  _or?: rentAScientist_Scientist_bool_exp[] | null;
+  forename?: String_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  image?: String_comparison_exp | null;
+  surname?: String_comparison_exp | null;
+  title?: String_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "rentAScientist.Scientist"
+ */
+export interface rentAScientist_Scientist_insert_input {
+  ScientistOfferRelations?: rentAScientist_ScientistOfferRelation_arr_rel_insert_input | null;
+  forename?: string | null;
+  id?: number | null;
+  image?: string | null;
+  surname?: string | null;
+  title?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "rentAScientist.Scientist"
+ */
+export interface rentAScientist_Scientist_obj_rel_insert_input {
+  data: rentAScientist_Scientist_insert_input;
+  on_conflict?: rentAScientist_Scientist_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "rentAScientist.Scientist"
+ */
+export interface rentAScientist_Scientist_on_conflict {
+  constraint: rentAScientist_Scientist_constraint;
+  update_columns: rentAScientist_Scientist_update_column[];
+  where?: rentAScientist_Scientist_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "rentAScientist.Teacher". All fields are combined with a logical 'AND'.
+ */
+export interface rentAScientist_Teacher_bool_exp {
+  SchoolClasses?: rentAScientist_SchoolClass_bool_exp | null;
+  User?: User_bool_exp | null;
+  _and?: rentAScientist_Teacher_bool_exp[] | null;
+  _not?: rentAScientist_Teacher_bool_exp | null;
+  _or?: rentAScientist_Teacher_bool_exp[] | null;
+  id?: Int_comparison_exp | null;
+  userId?: uuid_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "rentAScientist.Teacher"
+ */
+export interface rentAScientist_Teacher_insert_input {
+  SchoolClasses?: rentAScientist_SchoolClass_arr_rel_insert_input | null;
+  User?: User_obj_rel_insert_input | null;
+  id?: number | null;
+  userId?: any | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "rentAScientist.Teacher"
+ */
+export interface rentAScientist_Teacher_obj_rel_insert_input {
+  data: rentAScientist_Teacher_insert_input;
+  on_conflict?: rentAScientist_Teacher_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "rentAScientist.Teacher"
+ */
+export interface rentAScientist_Teacher_on_conflict {
+  constraint: rentAScientist_Teacher_constraint;
+  update_columns: rentAScientist_Teacher_update_column[];
+  where?: rentAScientist_Teacher_bool_exp | null;
 }
 
 /**

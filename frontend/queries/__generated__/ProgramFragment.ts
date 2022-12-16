@@ -31,7 +31,7 @@ export interface ProgramFragment {
    */
   title: string;
   /**
-   * The deadline for the project record uploads.
+   * The deadline for the achievement record uploads.
    */
-  projectRecordUploadDeadline: any | null;
+  achievementRecordUploadDeadline: any | null;
 }

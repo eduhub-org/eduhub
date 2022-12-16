@@ -23,6 +23,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile-dev
+    # uncomment this to disable automatic yarn dev on frontend startup
     #command: tail -F anything
     env_file:
       - frontend.env
@@ -39,7 +40,6 @@ services:
     depends_on:
       - db_hasura
       - keycloak
-    restart: always
     env_file:
       - hasura_keycloak.env
     environment:

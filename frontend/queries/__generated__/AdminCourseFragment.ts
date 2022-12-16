@@ -124,7 +124,7 @@ export interface AdminCourseFragment {
   /**
    * The language the course is given in.
    */
-  language: string;
+  language: string | null;
   /**
    * The maximum number of sessions a participant can miss while still receiving a certificate
    */

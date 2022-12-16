@@ -48,9 +48,9 @@ export interface ProgramList_Program {
    */
   participationCertificateTemplateURL: string | null;
   /**
-   * The deadline for the project record uploads.
+   * The deadline for the achievement record uploads.
    */
-  projectRecordUploadDeadline: any | null;
+  achievementRecordUploadDeadline: any | null;
   /**
    * The 6 letter short title for the program.
    */

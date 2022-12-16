@@ -110,9 +110,9 @@ export interface CourseListWithEnrollments_Course_Program {
    */
   title: string;
   /**
-   * The deadline for the project record uploads.
+   * The deadline for the achievement record uploads.
    */
-  projectRecordUploadDeadline: any | null;
+  achievementRecordUploadDeadline: any | null;
 }
 
 export interface CourseListWithEnrollments_Course {
@@ -145,7 +145,7 @@ export interface CourseListWithEnrollments_Course {
   /**
    * The language the course is given in.
    */
-  language: string;
+  language: string | null;
   /**
    * The maximum number of sessions a participant can miss while still receiving a certificate
    */
