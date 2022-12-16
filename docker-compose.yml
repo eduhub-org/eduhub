@@ -23,7 +23,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile-dev
-    command: tail -F anything
+    #command: tail -F anything
     env_file:
       - frontend.env
     volumes:
@@ -51,6 +51,7 @@ services:
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: inherited_roles
+      HASURA_GRAPHQL_JWT_SECRET: '{"jwk_url": "http://keycloak:8080/realms/edu-hub/protocol/openid-connect/certs"}'
 
       HASURA_BUCKET: "eduhub-staging-kc19"
       CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE: "https://load-achievement-certificate-szeuw2n5qa-ew.a.run.app"
@@ -92,34 +93,14 @@ services:
       dockerfile: Dockerfile-dev
     ports:
       - 28080:8080
-    depends_on:
-     - db_keycloak
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_DB: postgres
-      KC_DB_VENDOR: postgres
-      KC_DB_URL: "jdbc:postgresql://db_keycloak:5432/keycloak"
-      KC_DB_USERNAME: keycloak
-      KC_DB_PASSWORD: password 
-      #KC_HOSTNAME: localhost
       KC_HOSTNAME_STRICT: "false"
-      #KC_HTTP_ENABLED: "true"
-      #KEYCLOAK_IMPORT: /imports/edu-hub-realm.json
     volumes:
-      - ./keycloak/imports:/imports
+      - ./keycloak/imports-dev:/opt/keycloak/data/import
       - ./keycloak/themes/opencampus:/opt/keycloak/themes/opencampus
       - ./keycloak/disable-theme-cache.cli:/opt/keycloak/startup-scripts/disable-theme-cache.cli
 
-  db_keycloak:
-    image: postgres:12
-    volumes:
-      - db_keycloak_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: keycloak
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: password
-
 volumes:
   db_hasura_data:
-  db_keycloak_data:

@@ -52,14 +52,8 @@ Follow the steps below to start your devlopment.
         CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK=""
         CLOUD_FUNCTION_LINK_SEND_MAIL=""
 
-1.  Ask for the configs of for the file `frontend.env`. Content looks like following:
-
-        STORAGE_BUCKET_URL=""
-
-1.  Ask for the conent of the folder `backend/seeds/default` and put them.
-1.  Also need the conent of the folder `keycloak/imports/`
-
-1.  There is a docker-compose.yml which you can use to start edu-hub with some settings for development. Run the following command to start all the containers as necessary. The frontend container will not yet do anything, but it will mount `./frontend` as a volume and open it as the working directory `/opt/app`.
+1.  Ask for the content of the folder `backend/seeds/default` and put them.
+1.  Also need the content of the folder `keycloak/imports/`
 
 # Step 2: Environment Setup
 
@@ -67,9 +61,7 @@ Follow the steps below to start your devlopment.
 
         sh docker_install.sh
 
-1.  [Mangae docker as non-root user](https://docs.docker.com/engine/install/linux-postinstall/)
-
-1.  Install docker-compose (atlest version 1.29.2). Follow the [link](https://docs.docker.com/compose/install/) to install.
+1.  [Manage docker as non-root user](https://docs.docker.com/engine/install/linux-postinstall/)
 
 1.  There is a docker-compose.yml which you can use to start edu-hub with some settings for development. Run the following command to start all the containers as necessary. The frontend container will not yet do anything, but it will mount `./frontend` as a volume and open it as the working directory `/opt/app`. Run the command below.
 

@@ -1,5 +1,4 @@
-import { getSession, useSession } from "next-auth/react";
-import { KeycloakInstance } from "keycloak-js";
+import { useSession } from "next-auth/react";
 
 export const useIsLoggedIn = (): boolean => {
   const { data: sessionData, status } = useSession();
