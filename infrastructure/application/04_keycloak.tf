@@ -64,7 +64,7 @@ module "keycloak_service" {
   version = "~> 0.2.0"
 
   # Required variables
-  service_name = var.keycloak_service_name
+  service_name = local.keycloak_service_name
   project_id   = var.project_id
   location     = var.region
   image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/keycloak:${var.commit_sha}"
@@ -110,7 +110,7 @@ module "keycloak_service" {
     },
     {
       name  = "KC_HOSTNAME"
-      value = "${var.keycloak_service_name}.opencampus.sh"
+      value = "${local.keycloak_service_name}.opencampus.sh"
     },
     {
       name  = "KC_PROXY"

@@ -38,7 +38,7 @@ resource "google_cloudfunctions2_function" "call_python_function" {
 
   service_config {
     environment_variables = {
-      HASURA_SERVICE_NAME          = var.hasura_service_name
+      HASURA_SERVICE_NAME          = local.hasura_service_name
       HASURA_GRAPHQL_ADMIN_KEY     = var.hasura_graphql_admin_key
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
       ZOOM_API_KEY                 = var.zoom_api_key
@@ -906,7 +906,7 @@ resource "google_cloudfunctions2_function" "update_keycloak_profile" {
     environment_variables = {
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
       LEYCLOAK_USER                = var.keycloak_user
-      KEYCLOAK_URL                 = "https://${var.keycloak_service_name}.opencampus.sh"
+      KEYCLOAK_URL                 = "https://${local.keycloak_service_name}.opencampus.sh"
       KEYCLOAK_PW                  = var.keycloak_pw
     }
     max_instance_count = 1
@@ -953,7 +953,7 @@ resource "google_cloudfunctions2_function" "add_keycloak_role" {
     environment_variables = {
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
       KEYCLOAK_USER                = var.keycloak_user
-      KEYCLOAK_URL                 = "https://${var.keycloak_service_name}.opencampus.sh"
+      KEYCLOAK_URL                 = "https://${local.keycloak_service_name}.opencampus.sh"
       KEYCLOAK_PW                  = var.keycloak_pw
     }
     max_instance_count = 1
@@ -1000,9 +1000,9 @@ resource "google_cloudfunctions2_function" "update_from_keycloak" {
     environment_variables = {
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
       KEYCLOAK_USER                = var.keycloak_user
-      KEYCLOAK_URL                 = "https://${var.keycloak_service_name}.opencampus.sh"
+      KEYCLOAK_URL                 = "https://${local.keycloak_service_name}.opencampus.sh"
       KEYCLOAK_PW                  = var.keycloak_pw
-      HASURA_ENDPOINT              = "https://${var.hasura_service_name}.opencampus.sh/v1/graphql"
+      HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
       HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
     }
     max_instance_count = 1

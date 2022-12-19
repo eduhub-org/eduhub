@@ -1,7 +1,18 @@
 ###############################################################################
 # Definition of the used Terraform variables
-#####
+######
+# Local Variables
+###
+locals {
+  keycloak_service_name         = "${var.keycloak_service_name_root}${var.service_name_extension}"
+  hasura_service_name           = "${var.hasura_service_name_root}${var.service_name_extension}"
+  eduhub_service_name           = "${var.eduhub_service_name_root}${var.service_name_extension}"
+  rent_a_scientist_service_name = "${var.rent_a_scientist_service_name_root}${var.service_name_extension}"
+}
 
+######
+# Cloud Variables
+###
 /* variable "GOOGLE_CREDENTIALS" {
   description = "JSON key of the service account 'terraform created' created for the given project"
 }
@@ -34,21 +45,26 @@ variable "url_mask" {
   description = "Url mask specifying the group of backend endpoints that will be used for the load balancer"
   type        = string
 }
-variable "keycloak_service_name" {
+variable "keycloak_service_name_root" {
   description = "Name for the service of the Keycloak application"
   type        = string
 }
-variable "hasura_service_name" {
+variable "hasura_service_name_root" {
   description = "Name for the service of the Hasura application"
   type        = string
 }
-variable "frontend_service_name" {
+variable "eduhub_service_name_root" {
   description = "Name for the service of the edu frontend application"
   type        = string
 }
-variable "rent_a_scientist_service_name" {
+variable "rent_a_scientist_service_name_root" {
   description = "Name for the service of the Rent-a-Scientist frontend application"
   type        = string
+}
+variable "service_name_extension" {
+  description = "Name extension for the services not run in production but in other environments"
+  type        = string
+  default     = ""
 }
 variable "cloudflare_zone_id" {
   description = "The DNS zone ID a record in Cloudflaire will be added to"
