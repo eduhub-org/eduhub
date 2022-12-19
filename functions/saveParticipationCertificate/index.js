@@ -1,10 +1,6 @@
-const bodyParser = require("body-parser");
-const {Storage} = require('@google-cloud/storage');
-const util = require('util');
-
-const { saveToBucket } = require("./lib/eduHub.js");
-
-const storage = new Storage();
+const { Storage } = require("@google-cloud/storage");
+const { buildCloudStorage } = require("../lib/cloud-storage");
+const storage = buildCloudStorage(Storage);
 
 /**
  * Responds to any HTTP request.
@@ -18,18 +14,22 @@ exports.saveParticipationCertificate = async (req, res) => {
     const courseid = req.body.input.courseid;
     const userid = req.body.input.userid;
     const isPublic = false;
-    const bucket = storage.bucket(req.headers.bucket);
-    
+
     const path = `userid_${userid}/courseid_${courseid}/participation_certificate_course_${courseid}.pdf`;
-    
-    const link = await saveToBucket(path, bucket, content, isPublic);
-    
+
+    const link = await storage.saveToBucket(
+      path,
+      req.headers.bucket,
+      content,
+      isPublic
+    );
+
     return res.json({
-      link: link
+      link: link,
     });
   } else {
     return res.json({
-      link: "error"
+      link: "error",
     });
   }
 };

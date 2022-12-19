@@ -94,11 +94,11 @@ export const Tile: FC<IProps> = ({ course }) => {
   const isCurrentProgram =
     !!program &&
     program?.applicationStart <= currentDate &&
-    currentDate <= program?.projectRecordUploadDeadline;
+    currentDate <= program?.achievementRecordUploadDeadline;
 
   const highlightColor =
     enrollmentStatus === CourseEnrollmentStatus_enum.CONFIRMED &&
-    isCurrentProgram
+      isCurrentProgram
       ? "bg-edu-course-current"
       : "bg-gray-100";
 
@@ -112,12 +112,12 @@ export const Tile: FC<IProps> = ({ course }) => {
     >
       <div className="relative w-60 h-72 rounded-2xl overflow-hidden">
         <div className="h-1/2 bg-edu-black">
-          <Image
+          <img
             src={course.coverImage ?? "https://picsum.photos/240/144"}
             alt="Edu Hub logo"
             width={240}
             height={144}
-            priority
+            className="h-36 w-60"
           />
           <CourseStatusIndicator
             enrollmentStatus={enrollmentStatus}

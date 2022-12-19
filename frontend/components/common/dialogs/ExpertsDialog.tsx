@@ -43,7 +43,7 @@ const ExpertsDialog: FC<IProps> = (props) => {
   });
 
   const handleNewInput = useCallback(
-    (value) => {
+    (value: string) => {
       setSearchValue(value);
     },
     [setSearchValue]

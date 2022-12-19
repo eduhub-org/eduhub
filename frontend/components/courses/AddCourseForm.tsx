@@ -59,13 +59,15 @@ const AddCourseForm: FC<IProps> = ({
   }
   return (
     <>
-      {instructorList.length > 0 && (
+      {instructorList.length > 0 ? (
         <Form
           defaultProgramId={defaultProgramId}
           instructorList={instructorList}
           programs={programs}
           closeModalHandler={closeModalHandler}
         />
+      ) : (
+        <div>Es gibt keine Instruktoren!</div>
       )}
     </>
   );

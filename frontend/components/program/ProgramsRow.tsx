@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { QueryResult } from "@apollo/client";
 import { IconButton } from "@material-ui/core";
 import { ChangeEvent, FC, MutableRefObject, useCallback, useRef } from "react";
@@ -283,6 +284,8 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
       program,
     ]
   );
+
+  console.log(program);
 
   return (
     <div>

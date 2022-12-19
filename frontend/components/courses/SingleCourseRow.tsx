@@ -1,14 +1,16 @@
 import { Button, IconButton } from "@material-ui/core";
 import { TFunction } from "next-i18next";
-import { FC, useCallback, useState } from "react";
+import { FC, MutableRefObject, useCallback, useRef, useState } from "react";
 import {
   MdAddCircle,
   MdDelete,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
+  MdUpload,
   MdUploadFile,
 } from "react-icons/md";
 import { useAdminMutation } from "../../hooks/authedMutation";
+import { SAVE_COURSE_IMAGE } from "../../queries/actions";
 import {
   DELETE_A_COURSE,
   UPDATE_COURSE_PROPERTY,
@@ -36,6 +38,7 @@ import {
   InsertExpertVariables,
 } from "../../queries/__generated__/InsertExpert";
 import { Programs_Program } from "../../queries/__generated__/Programs";
+import { SaveCourseImage, SaveCourseImageVariables } from "../../queries/__generated__/SaveCourseImage";
 import {
   UpdateCourseByPk,
   UpdateCourseByPkVariables,
@@ -51,6 +54,7 @@ import { SelectUserDialog } from "../common/dialogs/SelectUserDialog";
 import EhCheckBox from "../common/EhCheckbox";
 import EhSelect from "../common/EhSelect";
 import EhTag from "../common/EhTag";
+import { parseFileUploadEvent } from "../../helpers/filehandling";
 
 /* #region Local Interfaces */
 interface EntrollmentStatusCount {
@@ -186,9 +190,8 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
           ? statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] + 1
           : 1;
     });
-    return `${statusRecordsWithSum[CourseEnrollmentStatus_enum.INVITED] ?? 0}/${
-      statusRecordsWithSum[CourseEnrollmentStatus_enum.CONFIRMED] ?? 0
-    }/${course.AppliedAndUnratedCount.aggregate?.count}`;
+    return `${statusRecordsWithSum[CourseEnrollmentStatus_enum.INVITED] ?? 0}/${statusRecordsWithSum[CourseEnrollmentStatus_enum.CONFIRMED] ?? 0
+      }/${course.AppliedAndUnratedCount.aggregate?.count}`;
   };
 
   const makeCompetitionField = () => {
@@ -334,21 +337,66 @@ const CourseDetails: FC<IPropsCourseOneRow> = ({ course, refetchCourses }) => {
   );
   /** #endregion */
 
+  const imageUploadRef: MutableRefObject<any> = useRef(null);
+  const handleImageUploadClick = useCallback(() => {
+    imageUploadRef.current?.click();
+  }, [imageUploadRef]);
+
+  const [saveCourseImage, saveCourseImageStatus] = useAdminMutation<
+    SaveCourseImage,
+    SaveCourseImageVariables
+  >(SAVE_COURSE_IMAGE);
+
+  const handleUploadCourseImageEvent = useCallback(
+    async (event: any) => {
+      const ufile = await parseFileUploadEvent(event);
+
+      if (ufile != null) {
+        const result = await saveCourseImage({
+          variables: {
+            base64File: ufile.data,
+            fileName: ufile.name,
+            courseId: course.id,
+          },
+        });
+        console.log(result);
+        const coverImage = result.data?.saveCourseImage?.link;
+        if (coverImage != null) {
+          await updateCourseQuery({
+            variables: {
+              id: course.id,
+              changes: {
+                coverImage: result.data?.saveCourseImage?.link,
+              },
+            },
+          });
+          refetchCourses();
+        }
+      }
+    },
+    [saveCourseImage, course.id, updateCourseQuery, refetchCourses]
+  );
+
   return (
     <>
       <tr className="bg-edu-course-list">
         <td className="" colSpan={1} />
         <td className="px-5 content-start my-8" colSpan={1}>
           <div className="bg-white p-2 mr-5 h-32 justify-end mb-2">
-            <Button
-              className="absolute b-0 r-0"
-              endIcon={<MdUploadFile />}
-              variant="outlined"
-            >
-              {""}
-              Upload
-            </Button>
+            <IconButton onClick={handleImageUploadClick}>
+              <MdUpload size="0.75em" />
+            </IconButton>
+
+            {course.coverImage != null && (
+              <img width="100px" height="100px" src={course.coverImage} />
+            )}
           </div>
+          <input
+            ref={imageUploadRef}
+            onChange={handleUploadCourseImageEvent}
+            className="hidden"
+            type="file"
+          />
         </td>
         <td className="px-5 inline-block align-top pb-2" colSpan={1}>
           <div className="flex flex-col space-y-1">

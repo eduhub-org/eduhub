@@ -410,7 +410,7 @@ export enum Program_update_column {
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
   participationCertificateTemplateURL = "participationCertificateTemplateURL",
-  projectRecordUploadDeadline = "projectRecordUploadDeadline",
+  achievementRecordUploadDeadline = "achievementRecordUploadDeadline",
   shortTitle = "shortTitle",
   speakerQuestionnaire = "speakerQuestionnaire",
   startQuestionnaire = "startQuestionnaire",
@@ -1761,7 +1761,7 @@ export interface Program_bool_exp {
   lectureEnd?: date_comparison_exp | null;
   lectureStart?: date_comparison_exp | null;
   participationCertificateTemplateURL?: String_comparison_exp | null;
-  projectRecordUploadDeadline?: date_comparison_exp | null;
+  achievementRecordUploadDeadline?: date_comparison_exp | null;
   shortTitle?: String_comparison_exp | null;
   speakerQuestionnaire?: String_comparison_exp | null;
   startQuestionnaire?: String_comparison_exp | null;
@@ -1787,7 +1787,7 @@ export interface Program_insert_input {
   lectureEnd?: any | null;
   lectureStart?: any | null;
   participationCertificateTemplateURL?: string | null;
-  projectRecordUploadDeadline?: any | null;
+  achievementRecordUploadDeadline?: any | null;
   shortTitle?: string | null;
   speakerQuestionnaire?: string | null;
   startQuestionnaire?: string | null;
