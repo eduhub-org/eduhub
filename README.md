@@ -26,6 +26,8 @@ Initial development of the full docker based development environment happened on
 - `docker-compose start` to start the dev environment after a stop
 - `docker-compose down -v` to bring down the dev environment and delete all local data
 - `docker exec -it edu-hub_frontend_1 /bin/sh` to run a shell inside a given container
+- `docker-compose logs -f` to show all logs
+- `docker logs container_name -f` to show the logs of a specific container. Get container names from `docker ps -a`
 
 ## Ports
 
@@ -47,8 +49,6 @@ There are a few helpful scripts in **./bin**.
 
 ## Technical details
 
-- You can look at the logs of the running containers with `docker-compose logs -f`, or of a specific container with `docker logs edu-hub_functions_1 -f`
-- If you just want to stop the containers and continue where you left off later use `docker-compose stop/start`, down would delete all local data!
 - The hasura log is spammed by the JWK update, which happens once a second. This is correct hasura behavior for this setup.
 
 ## Updating the setup
