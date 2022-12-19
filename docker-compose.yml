@@ -4,6 +4,20 @@
 version: "3.8"
 
 services:
+  frontend-nx:
+    ports:
+      - "5001:5001"
+      - "5002:5002"
+    build:
+      context: ./frontend-nx
+      dockerfile: Dockerfile-dev
+    #command: tail -F anything
+    volumes:
+      - ./frontend-nx:/opt/app
+    depends_on:
+      - hasura
+      - keycloak
+
   frontend:
     ports:
       - "5000:5000"
