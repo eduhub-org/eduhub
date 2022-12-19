@@ -1,8 +1,8 @@
-# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the Frontend service
-resource "google_cloud_run_service_iam_policy" "frontend_noauth_invoker" {
-  location = google_cloud_run_service.frontend.location
-  project  = google_cloud_run_service.frontend.project
-  service  = google_cloud_run_service.frontend.name
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the EduHub frontend service
+resource "google_cloud_run_service_iam_policy" "eduhub_noauth_invoker" {
+  location = google_cloud_run_service.eduhub.location
+  project  = google_cloud_run_service.eduhub.project
+  service  = google_cloud_run_service.eduhub.name
 
   policy_data = data.google_iam_policy.noauth_invoker.policy_data
 }
@@ -29,11 +29,11 @@ resource "google_secret_manager_secret_iam_member" "nextauth_secret" {
   depends_on = [google_secret_manager_secret.nextauth_secret]
 }
 
-# Define the Google Cloud Run service for the Frontend
-resource "google_cloud_run_service" "frontend" {
+# Define the Google Cloud Run service for the EduHub frontend
+resource "google_cloud_run_service" "eduhub" {
   provider = google-beta
 
-  name     = local.frontend_service_name
+  name     = local.eduhub_service_name
   location = var.region
 
   template {

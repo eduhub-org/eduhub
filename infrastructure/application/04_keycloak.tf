@@ -110,7 +110,7 @@ module "keycloak_service" {
     },
     {
       name  = "KC_HOSTNAME"
-      value = local.keycloak_service_name.opencampus.sh
+      value = "${local.keycloak_service_name}.opencampus.sh"
     },
     {
       name  = "KC_PROXY"
