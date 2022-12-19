@@ -50,6 +50,7 @@ There are a few helpful scripts in **./bin**.
 ## Technical details
 
 - The hasura log is spammed by the JWK update, which happens once a second. This is correct hasura behavior for this setup.
+- The serverless functions watch their own code, so if it is changed the function is automatically rebuild
 
 ## Updating the setup
 

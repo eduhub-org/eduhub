@@ -1,18 +1,5 @@
 # This docker-compose file is meant for local development!
-
-# To make login work correctly you need to have an environment file called hasura_keycloak.env
-# which needs to contain the environment variable HASURA_GRAPHQL_JWT_SECRET which contains this value:
-# {"type": "RS256", "key": "-----BEGIN CERTIFICATE-----\nPUT_YOUR_PUBLIC_KEY_HERE\n-----END CERTIFICATE-----"}
-# The public key value is found in your keycloak instance, edu hub realm, keys, rs256 public key.
-# So make the file hasura_keycloak.env next to the docker-compose.yml with this content:
-
-# To get the public key in the first run you might have to provide an empty environment file, then do docker-compose stop and docker-compose up again once you have the public key.
-
-# Then start with docker-compose up -d
-
-# For the frontend you additionally need a frontend.env file that defines STORAGE_BUCKET_URL
-
-# The Hasura console is disabled, you need to start it via CLI instead
+# See readme.md
 
 version: "3.8"
 
@@ -25,8 +12,6 @@ services:
       dockerfile: Dockerfile-dev
     # uncomment this to disable automatic yarn dev on frontend startup
     #command: tail -F anything
-    env_file:
-      - frontend.env
     volumes:
       - ./frontend:/opt/app
     depends_on:
@@ -61,15 +46,12 @@ services:
     depends_on:
       - db_hasura
       - keycloak
-    env_file:
-      - hasura_keycloak.env
     environment:
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@db_hasura:5432/postgres
       HASURA_GRAPHQL_ENABLE_CONSOLE: "false" # set to "false" to disable console, the console has to run on the host for some technical reasons, it is very hard to get it to run from inside the container: https://github.com/hasura/graphql-engine/issues/2824
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
-      ## uncomment next line to set an admin secret
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: inherited_roles
