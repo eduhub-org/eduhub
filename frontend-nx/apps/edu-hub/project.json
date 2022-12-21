@@ -56,6 +56,17 @@
       "options": {
         "lintFilePatterns": ["apps/edu-hub/**/*.{ts,tsx,js,jsx}"]
       }
+    },
+    "apollo": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": [
+          "rm -rf queries/__generated__/*",
+          "../../node_modules/apollo/bin/run client:codegen --includes ./queries/**/*.ts --target typescript"
+        ],
+        "cwd": "apps/edu-hub",
+        "parallel": false
+      }
     }
   },
   "tags": []
