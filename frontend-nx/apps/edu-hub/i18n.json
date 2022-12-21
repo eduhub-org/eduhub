@@ -1,0 +1,18 @@
+{
+  "locales": ["en", "de"],
+  "defaultLocale": "de",
+  "pages": {
+    "*": [
+      "common",
+      "achievements-page",
+      "course-admin-page",
+      "course-application",
+      "course-page",
+      "manage-course",
+      "start-page",
+      "user-common",
+      "users"
+    ]
+  },
+  "defaultNS": "common"
+}

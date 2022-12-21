@@ -10,7 +10,7 @@ services:
     build:
       context: ./frontend-nx
       dockerfile: Dockerfile-dev
-    #command: tail -F anything
+    command: tail -F anything
     volumes:
       - ./frontend-nx:/opt/app
     depends_on:

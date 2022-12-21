@@ -71,12 +71,17 @@ There are a few helpful scripts in **./bin**.
 
 # Talk to Steffen
 
-- Problem with the nextauth callbacks: never called?
-- users management is not really fully implemented, I think it is missing the ability to make a person instructor or admin? Can user creation even work at all from here? It's not like we can pass the password through hasura to keycloak?! Is user creation a necessary feature here? Why not create in keycloak? Normal students will register via keycloak as well, after all? Why do it differently for admins/instructors? Just let roles be set via eduhub?
-- updateKeycloakProfile is not added to hasura, updateFromKeycloak does not insert the necessary entry into the admin table to make eduhub understand a user is an admin
+X Problem with the nextauth callbacks: never called?
+
+X users management is not really fully implemented, I think it is missing the ability to make a person instructor or admin? Can user creation even work at all from here? It's not like we can pass the password through hasura to keycloak?! Is user creation a necessary feature here? Why not create in keycloak? Normal students will register via keycloak as well, after all? Why do it differently for admins/instructors? Just let roles be set via eduhub?
+X updateKeycloakProfile is not added to hasura, updateFromKeycloak does not insert the necessary entry into the admin table to make eduhub understand a user is an admin
+
 - require("../lib/eduHub.js") & other code changes in the functions necessary to make them work local
+
 - Why python serverless functions?
-- How are course invitations accepted anyway? I cant find a UI for that at all.
+
+* How are course invitations accepted anyway? I cant find a UI for that at all.
+
 - Problem with loadFromBucket: What path is input exactly? The full path produced by saveFromBucket would not work, as it is a full URL, not just a filename. The load\* serverless functions however seem to not contain the knowledge to build filepaths again...
 
 # Talk to Faiz

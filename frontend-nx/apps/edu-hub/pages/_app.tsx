@@ -1,18 +1,27 @@
-import { AppProps } from 'next/app';
-import Head from 'next/head';
-import '../styles/globals.css';
+import { ApolloProvider } from "@apollo/client";
+import { SessionProvider } from "next-auth/react";
+import type { AppContext, AppProps } from "next/app";
+import { FC } from "react";
 
-function CustomApp({ Component, pageProps }: AppProps) {
-  return (
-    <>
-      <Head>
-        <title>Welcome to edu-hub!</title>
-      </Head>
-      <main className="app">
-        <Component {...pageProps} />
-      </main>
-    </>
-  );
+import { client } from "../config/apollo";
+
+import "../styles/globals.css";
+
+interface InitialProps {
+  cookies: unknown;
 }
 
-export default CustomApp;
+// @ts-expect-error Typing does not work correctly here because of getInitialProps
+const MyApp: FC<AppProps & InitialProps> & {
+  getInitialProps: (ctx: AppContext) => Promise<Record<string, unknown>>;
+} = ({ Component, pageProps, cookies }) => {
+  return (
+    <SessionProvider session={pageProps.session}>
+      <ApolloProvider client={client}>
+        <Component {...pageProps} />
+      </ApolloProvider>
+    </SessionProvider>
+  );
+};
+
+export default MyApp;
