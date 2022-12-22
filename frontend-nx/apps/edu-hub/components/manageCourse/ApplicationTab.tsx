@@ -3,7 +3,6 @@ import { FC, useCallback, useMemo, useState } from "react";
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_CourseEnrollments,
-  ManagedCourse_Course_by_pk_CourseEnrollments_User,
 } from "../../queries/__generated__/ManagedCourse";
 import { ApplicationRow } from "./ApplicationRow";
 import { greenDot, greyDot, orangeDot, redDot } from "../common/dots";
@@ -267,7 +266,6 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
           <div className="grid grid-cols-2 h-64">
             <div className="mr-3">Ablaufdatum für Einladung:</div>
             <div className="ml-3">
-              {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
               <DatePicker
                 dateFormat={"dd/MM/yyyy"}
                 selected={inviteExpireDate}

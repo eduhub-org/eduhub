@@ -7,7 +7,6 @@ import {
   pickIdPkMapper,
   useAdminMutation,
   useDeleteCallback,
-  useUpdateCallback,
   useUpdateCallback2,
 } from "../../hooks/authedMutation";
 import {
@@ -26,7 +25,6 @@ import {
 } from "../../queries/__generated__/InsertCourseSession";
 import {
   ManagedCourse_Course_by_pk,
-  ManagedCourse_Course_by_pk_Sessions,
 } from "../../queries/__generated__/ManagedCourse";
 import { SessionRow } from "./SessionRow";
 import {

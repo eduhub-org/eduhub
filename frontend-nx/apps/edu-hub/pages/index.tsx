@@ -1,6 +1,5 @@
-import { gql } from "@apollo/client";
 import Head from "next/head";
-import { FC, useState } from "react";
+import { FC } from "react";
 import useTranslation from 'next-translate/useTranslation';
 
 import { LoginButton } from "../components/LoginButton";
@@ -18,22 +17,6 @@ import { CourseListWithEnrollments } from "../queries/__generated__/CourseListWi
 import { COURSE_LIST } from "../queries/courseList";
 import { COURSE_LIST_WITH_ENROLLMENT } from "../queries/courseListWithEnrollment";
 import { ClientOnly } from "../components/common/ClientOnly";
-import { useAuthedMutation } from "../hooks/authedMutation";
-import { useUserId } from "../hooks/user";
-
-// export const getStaticProps = async ({ locale }: { locale: string }) => ({
-//   props: {
-//     ...(await serverSideTranslations(locale, ["common", "start-page"])),
-//   },
-// });
-
-const UPDATE_USER = gql`
-  mutation update_User($id: ID!) {
-    updateFromKeycloak(userid: $id) {
-      result
-    }
-  }
-`;
 
 const Home: FC = () => {
   const { t } = useTranslation("start-page");
@@ -48,20 +31,6 @@ const Home: FC = () => {
 
   if (error) {
     console.log("got error in query for courses!", error);
-  }
-
-  const userId = useUserId();
-  const uu = useAuthedMutation(UPDATE_USER);
-  const [calledUpdate, setCalledUpdate] = useState(false);
-
-  if (userId != null && !calledUpdate) {
-    setCalledUpdate(true);
-    const uur = uu[0]({
-      variables: {
-        id: userId,
-      },
-    });
-    console.log(uur);
   }
 
   return (

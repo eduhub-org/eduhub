@@ -17,15 +17,6 @@ import { Tile } from "../../components/course/Tile";
 import EhMenuItem from "../../components/common/EhMenuItem";
 import { useUserId } from "../../hooks/user";
 
-// export const getStaticProps = async ({ locale }: { locale: string }) => ({
-//   props: {
-//     ...(await serverSideTranslations(locale, [
-//       "course-admin-page",
-//       "common",
-//       "user-common",
-//     ])),
-//   },
-// });
 
 const Admin: FC = () => {
   const isLoggedIn = useIsLoggedIn();
@@ -104,7 +95,7 @@ interface ISidebarProps {
   sidebarItems: StaticComponentProperty[];
   handleMenuSelection: (obj: StaticComponentProperty) => void;
 }
-const Sidebar: FC<ISidebarProps> = ({ sidebarItems, handleMenuSelection }) => {
+export const Sidebar: FC<ISidebarProps> = ({ sidebarItems, handleMenuSelection }) => {
   const [menuItems, setMenuItems] = useState(sidebarItems);
 
   const updateMenuBar = useCallback(

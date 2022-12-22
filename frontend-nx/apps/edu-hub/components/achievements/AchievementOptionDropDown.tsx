@@ -3,7 +3,7 @@ import Fade from "@material-ui/core/Fade";
 import MaterialMenu, { MenuProps } from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import { withStyles } from "@material-ui/core/styles";
-import React, { FC, createElement, forwardRef, useCallback } from "react";
+import React, { FC, createElement, useCallback } from "react";
 import { AchievementOptionCourses_AchievementOptionCourse } from "../../queries/__generated__/AchievementOptionCourses";
 
 interface IProps {
@@ -33,10 +33,6 @@ const StyledMenu = withStyles({
     {...props}
   />
 ));
-
-const noop = () => {
-  /* does nothing, yeah */
-};
 
 export const AchievementOptionDropDown: FC<IProps> = ({
   anchorElement,
@@ -76,7 +72,6 @@ export const AchievementOptionDropDown: FC<IProps> = ({
 };
 
 export default AchievementOptionDropDown;
-const ref = React.createRef();
 interface IPropsSingleItem {
   callback: (data: AchievementOptionCourses_AchievementOptionCourse) => void;
   item: AchievementOptionCourses_AchievementOptionCourse;

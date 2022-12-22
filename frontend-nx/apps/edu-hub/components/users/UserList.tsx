@@ -1,5 +1,5 @@
 import { QueryResult } from "@apollo/client";
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 import { useAdminQuery } from "../../hooks/authedQuery";
 import { USERS_BY_LAST_NAME } from "../../queries/user";
@@ -341,7 +341,6 @@ const Pagination: FC<IPaginationProps> = ({
           />
         )}
         <p className="font-medium">
-          {/* @ts-ignore: https://github.com/i18next/react-i18next/issues/1543 */}
           {t("paginationText", { currentPage: current_page, totalPage: pages })}
         </p>
 

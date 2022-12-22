@@ -1,5 +1,4 @@
-import { QueryResult } from "@apollo/client";
-import { ChangeEvent, FC, useCallback, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { useAdminMutation } from "../../hooks/authedMutation";
 import { useAdminQuery } from "../../hooks/authedQuery";
 import { COURSE_INSTRUCTOR_LIST } from "../../queries/courseInstructorList";
@@ -90,7 +89,7 @@ const Form: FC<IAddCourseProps> = ({
     };
   });
   /* #region Mutation endpoints */
-  const [insertACourse, { data, loading, error: insertError }] =
+  const [insertACourse, { error: insertError }] =
     useAdminMutation<InsertSingleCourse, InsertSingleCourseVariables>(
       INSERT_A_COURSE
     );

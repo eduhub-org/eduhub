@@ -14,12 +14,8 @@ import { ACHIEVEMENT_OPTION_COURSES } from "../../../queries/achievementOptionCo
 import { BlockTitle } from "../../common/BlockTitle";
 import ModalControl from "../../common/ModalController";
 import ProjectResultsUpload from "./ProjectResultsUpload";
+
 import {
-  AchievementRecordAuthorList,
-  AchievementRecordAuthorListVariables,
-} from "../../../queries/__generated__/AchievementRecordAuthorList";
-import {
-  ACHIEVEMENT_RECORD_AUTHOR_LIST,
   ACHIEVEMENT_RECORD_LIST,
 } from "../../../queries/achievementRecord";
 import {
@@ -60,8 +56,8 @@ const CourseAchievementOption: FC<IProps> = ({ course }) => {
       where:
         course && course.id
           ? {
-              courseId: { _eq: course.id },
-            }
+            courseId: { _eq: course.id },
+          }
           : {},
     },
   });

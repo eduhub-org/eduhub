@@ -241,9 +241,8 @@ export const SessionRow: FC<IProps> = ({
   return (
     <div>
       <div
-        className={`grid grid-cols-32 mb-1 ${
-          session != null ? "bg-edu-light-gray" : ""
-        }`}
+        className={`grid grid-cols-32 mb-1 ${session != null ? "bg-edu-light-gray" : ""
+          }`}
       >
         {!session && (
           <div className="mr-3 ml-3 col-span-4">
@@ -254,7 +253,6 @@ export const SessionRow: FC<IProps> = ({
 
         {session && (
           <div className="col-span-4 m-2">
-            {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
             <DatePicker
               minDate={lectureStart}
               maxDate={lectureEnd}

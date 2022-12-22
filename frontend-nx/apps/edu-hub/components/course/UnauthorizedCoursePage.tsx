@@ -13,8 +13,6 @@ const UnauthorizedCoursePage: FC<{ id: number }> = ({ id }) => {
 
   const {
     data: courseData,
-    loading,
-    error,
   } = useAuthedQuery<Course>(COURSE, {
     variables: {
       id,

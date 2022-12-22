@@ -1,10 +1,10 @@
-import NextAuth from "next-auth";
-import KeycloakProvider from "next-auth/providers/keycloak";
-import { GraphQLClient, gql } from "graphql-request";
-import axios from "axios";
+import NextAuth from 'next-auth';
+import KeycloakProvider from 'next-auth/providers/keycloak';
+import { GraphQLClient, gql } from 'graphql-request';
+import axios from 'axios';
 
-import type { JWT } from "next-auth/jwt";
-import type { IKeycloakRefreshTokenApiResponse } from "./keycloakRefreshToken";
+import type { JWT } from 'next-auth/jwt';
+import type { IKeycloakRefreshTokenApiResponse } from './keycloakRefreshToken';
 
 const UPDATE_USER = gql`
   mutation update_User($id: ID!) {
@@ -16,18 +16,19 @@ const UPDATE_USER = gql`
 
 export const updateUser = async (accessToken: string, userId: string) => {
   try {
+    console.log('Trying to update user on hasura based on keycloak:', userId);
     const graphQLClient = new GraphQLClient(
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/v1/graphql",
+      process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/v1/graphql',
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "x-hasura-role": "user",
+          'x-hasura-role': 'user',
         },
       }
     );
 
     const data = await graphQLClient.request(UPDATE_USER, { id: userId });
-    console.log("Update user result", data);
+    console.log('Update user result', data);
   } catch (e) {
     console.error(e);
   }
@@ -58,7 +59,7 @@ const refreshAccessToken = async (token: JWT) => {
     console.error(e);
     return {
       ...token,
-      error: "RefreshAccessTokenError",
+      error: 'RefreshAccessTokenError',
     };
   }
 };
@@ -66,24 +67,15 @@ const refreshAccessToken = async (token: JWT) => {
 export default NextAuth({
   providers: [
     KeycloakProvider({
-      clientId: "hasura",
+      clientId: 'hasura',
       clientSecret:
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         process.env.CLIENT_SECRET || process.env.NEXT_AUTH_CLIENT_SECRET!,
       authorization: `${process.env.NEXT_PUBLIC_AUTH_URL}/auth`,
       issuer: `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub`,
       idToken: true,
     }),
   ],
-  events: {
-    signIn: ({ account }) => {
-      console.log("signin event!");
-      if (account && account.access_token) {
-        updateUser(account.access_token, account.providerAccountId).catch(
-          console.log.bind(console)
-        );
-      }
-    },
-  },
   callbacks: {
     signIn: async ({ account }) => {
       if (account && account.access_token) {
@@ -97,6 +89,7 @@ export default NextAuth({
         token.idToken = account.id_token;
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         token.accessTokenExpired = account.expires_at! * 1000;
         token.refreshTokenExpired =
           Date.now() + account.refresh_expires_in * 1000;

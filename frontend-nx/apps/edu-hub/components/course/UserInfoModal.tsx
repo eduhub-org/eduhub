@@ -1,12 +1,10 @@
 /* eslint-disable react/jsx-no-bind */
 import { Modal } from "@material-ui/core";
 import Fade from "@material-ui/core/Fade";
-import Image from "next/image";
 import { FC, useCallback, useEffect, useState } from "react";
 
 import { useAuthedMutation } from "../../hooks/authedMutation";
-import { useKeycloakUserProfile, useUser, useUserId } from "../../hooks/user";
-import xIcon from "../../public/images/common/x-calibur.svg";
+import { useKeycloakUserProfile, useUserId } from "../../hooks/user";
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
 import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
 import {
@@ -33,7 +31,7 @@ export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
   const userId = useUserId();
   const profile = useKeycloakUserProfile();
 
-  const [insertUser, { data, loading, error: insertError }] = useAuthedMutation<
+  const [insertUser, { error: insertError }] = useAuthedMutation<
     InsertUser,
     InsertUserVariables
   >(INSERT_USER);

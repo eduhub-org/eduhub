@@ -1,4 +1,3 @@
-import { KeycloakInstance } from "keycloak-js";
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useEffect, useState } from "react";
 
@@ -29,7 +28,7 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
   const user = useUser();
   const userId = useUserId();
 
-  const { data, loading, error } = useAuthedQuery<
+  const { data } = useAuthedQuery<
     CourseWithEnrollment,
     CourseWithEnrollmentVariables
   >(COURSE_WITH_ENROLLMENT, {

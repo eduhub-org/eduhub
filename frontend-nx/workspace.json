@@ -2,6 +2,7 @@
   "$schema": "./node_modules/nx/schemas/workspace-schema.json",
   "version": 2,
   "projects": {
-    "edu-hub": "apps/edu-hub"
+    "edu-hub": "apps/edu-hub",
+    "rent-a-scientist": "apps/rent-a-scientist"
   }
 }

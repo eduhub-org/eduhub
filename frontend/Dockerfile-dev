@@ -1,4 +1,5 @@
 # Fixed version to node 16, as node 17 is not supported by some dependencies
+
 FROM node:16-alpine
 
 RUN apk add --no-cache libc6-compat yarn socat
@@ -9,7 +10,5 @@ WORKDIR /opt/app
 
 ENV PORT 25000
 EXPOSE 25000
-
-RUN yarn --frozen-lockfile
 
 CMD [ "sh", "dev.sh" ]

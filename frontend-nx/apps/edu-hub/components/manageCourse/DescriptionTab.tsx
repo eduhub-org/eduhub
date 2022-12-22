@@ -6,7 +6,6 @@ import {
   eventTargetValueMapper,
   identityEventMapper,
   pickIdPkMapper,
-  useAdminMutation,
   useDeleteCallback,
   useUpdateCallback,
   useUpdateCallback2,
@@ -89,11 +88,6 @@ import { LocationSelectionRow } from "./LocationSelectionRow";
 import { Button } from "@material-ui/core";
 import { MdAddCircle } from "react-icons/md";
 import {
-  UpdateCourseByPk,
-  UpdateCourseByPkVariables,
-} from "../../queries/__generated__/UpdateCourseByPk";
-import { UPDATE_COURSE_PROPERTY } from "../../queries/mutateCourse";
-import {
   UpdateCourseTagline,
   UpdateCourseTaglineVariables,
 } from "../../queries/__generated__/UpdateCourseTagline";
@@ -106,10 +100,6 @@ interface IProps {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
 }
-
-const noop = () => {
-  console.log("Noop!");
-};
 
 const getLegacyLanguage = (legacy: string | null) => {
   if (legacy == null) {

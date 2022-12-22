@@ -7,7 +7,6 @@ import { useUser } from "../hooks/user";
 import eduNameImg from "../public/images/EDU_HUB_name.svg";
 import mysteryImg from "../public/images/common/mystery.svg";
 import eduLogo from "../public/images/edu_logo.svg";
-import coursesLogo from "../public/images/course/online-course.svg";
 
 import { LoginButton } from "./LoginButton";
 import { Menu } from "./Menu";
@@ -15,7 +14,6 @@ import { RegisterButton } from "./RegisterButton";
 import { Avatar } from "./common/Avatar";
 import { OnlyDesktop } from "./common/OnlyDesktop";
 import { ClientOnly } from "./common/ClientOnly";
-import { MdManageAccounts } from "react-icons/md";
 
 export const Header: FC = () => {
   const isLoggedIn = useIsLoggedIn();

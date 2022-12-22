@@ -14,18 +14,15 @@ import {
 import { UploadFile } from "../../helpers/filehandling";
 import { makeFullName } from "../../helpers/util";
 import { AdminCourseList_Course } from "../../queries/__generated__/AdminCourseList";
-import { ExpertList_Expert } from "../../queries/__generated__/ExpertList";
 import { UserForSelection1_User } from "../../queries/__generated__/UserForSelection1";
 import { Button } from "../common/Button";
 import { SelectUserDialog } from "../common/dialogs/SelectUserDialog";
 import EhInputWithTitle from "../common/EhInputWithTitle";
 import EhSelectForEnum from "../common/EhSelectForEnum";
-import EhTag from "../common/EhTag";
 import EhTagStingId from "../common/EhTagStingId";
 import TagWithTwoText from "../common/TagWithTwoText";
 import { UiFileInputButton } from "../common/UiFileInputButton";
 import CourseListDialog from "../courses/CoureListDialog";
-import UserList from "../users/UserList";
 import { AchievementContext } from "./AchievementOptionDashboard";
 
 interface IState extends IDataToManipulate {
@@ -59,13 +56,13 @@ const AddEditAchievementOptionComponent: FC<IPropsAddEditAchievementTempData> = 
     showCourseListDialog: false,
     documentationTemplateName:
       props.defaultData.documentationTemplateUrl &&
-      props.defaultData.documentationTemplateUrl?.trim().length > 0
+        props.defaultData.documentationTemplateUrl?.trim().length > 0
         ? props.defaultData.documentationTemplateUrl.split("/")[2]
         : "",
     evaluationScriptName:
       props.defaultData.documentationTemplateUrl &&
-      props.defaultData.evaluationScriptUrl &&
-      props.defaultData.evaluationScriptUrl.trim().length > 0
+        props.defaultData.evaluationScriptUrl &&
+        props.defaultData.evaluationScriptUrl.trim().length > 0
         ? props.defaultData.evaluationScriptUrl.split("/")[2]
         : "",
   };

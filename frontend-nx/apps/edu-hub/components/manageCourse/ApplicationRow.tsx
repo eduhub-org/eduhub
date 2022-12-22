@@ -5,14 +5,12 @@ import {
   IoIosArrowDown,
   IoIosArrowUp,
   IoIosCheckmarkCircle,
-  IoIosCheckmarkCircleOutline,
   IoIosCloseCircle,
 } from "react-icons/io";
 import { MdCheckBox, MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
 import { displayDate } from "../../helpers/dateHelpers";
 import {
   ManagedCourse_Course_by_pk_CourseEnrollments,
-  ManagedCourse_Course_by_pk_CourseEnrollments_User,
 } from "../../queries/__generated__/ManagedCourse";
 import { MotivationRating_enum } from "../../__generated__/globalTypes";
 import { EhDot, greenDot, greyDot, orangeDot, redDot } from "../common/dots";
@@ -102,9 +100,8 @@ export const ApplicationRow: FC<IProps> = ({
         <>
           {" "}
           <div
-            className={`grid grid-cols-24 bg-edu-light-gray ${
-              isRowOpen ? "" : "mb-1"
-            }`}
+            className={`grid grid-cols-24 bg-edu-light-gray ${isRowOpen ? "" : "mb-1"
+              }`}
           >
             <div className="mr-3 ml-3 col-span-3">
               {enrollment.User.firstName}
@@ -140,13 +137,13 @@ export const ApplicationRow: FC<IProps> = ({
               )}
               {(enrollment.status === "CONFIRMED" ||
                 enrollment.status === "COMPLETED") && (
-                <IoIosCheckmarkCircle
-                  className="inline"
-                  title="Einladung bestätigt"
-                  color="lightgreen"
-                  size="1.5em"
-                />
-              )}
+                  <IoIosCheckmarkCircle
+                    className="inline"
+                    title="Einladung bestätigt"
+                    color="lightgreen"
+                    size="1.5em"
+                  />
+                )}
               {enrollment.status === "ABORTED" && (
                 <IoIosCheckmarkCircle
                   title="Abgebrochen"

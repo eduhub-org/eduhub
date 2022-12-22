@@ -3,7 +3,10 @@ import { FC } from "react";
 import useTranslation from 'next-translate/useTranslation';
 import { Button } from "./common/Button";
 
-const signInHandler = () => signIn("keycloak");
+const signInHandler = () => {
+  console.log("signIN!");
+  return signIn("keycloak")
+};
 
 export const LoginButton: FC = () => {
   const { t } = useTranslation("common");

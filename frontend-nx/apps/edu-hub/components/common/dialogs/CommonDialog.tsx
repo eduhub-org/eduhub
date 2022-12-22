@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from "@material-ui/core";
-import { FC, ReactNode, useCallback, useState } from "react";
+import { FC, ReactNode, useCallback } from "react";
 import { MdClose } from "react-icons/md";
 import { Button } from "../Button";
 

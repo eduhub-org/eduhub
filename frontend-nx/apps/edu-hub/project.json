@@ -54,7 +54,10 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/edu-hub/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": [
+          "apps/edu-hub/**/*.{ts,tsx,js,jsx}",
+          "!apps/edu-hub/.next"
+        ]
       }
     },
     "apollo": {

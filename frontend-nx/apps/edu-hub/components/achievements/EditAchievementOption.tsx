@@ -203,29 +203,25 @@ const EditAchievementOption: FC<IProps> = (props) => {
             return success;
           }
           case AchievementKeys.ADD_A_MENTOR:
-            const insertedID = await queryAddAchievementOptionMentors(
+            return (await queryAddAchievementOptionMentors(
               achievementOptionId,
               payload.value as string
-            );
-            return insertedID > 0;
+            )) > 0;
           case AchievementKeys.ADD_A_COURSE:
-            const addedId = await queryAddAchievementOptionCourse(
+            return (await queryAddAchievementOptionCourse(
               achievementOptionId,
               payload.value as number
-            );
-            return addedId > 0;
+            )) > 0;
           case AchievementKeys.DELETE_A_MENTOR:
-            const delId = await queryDeleteAnAchievementMentorFromDB(
+            return (await queryDeleteAnAchievementMentorFromDB(
               achievementOptionId,
               payload.value as string
-            );
-            return delId > 0;
+            )) > 0;
           case AchievementKeys.DELETE_A_COURSE:
-            const deletedId = await queryDeleteAnAchievementCourseFromDB(
+            return (await queryDeleteAnAchievementCourseFromDB(
               achievementOptionId,
               payload.value as number
-            );
-            return deletedId > 0;
+            )) > 0;
           case AchievementKeys.DOCUMENT_TEMPLATE_FILE: {
             const uploadedResponse = await context.uploadFile(
               payload.value as UploadFile,
@@ -243,7 +239,9 @@ const EditAchievementOption: FC<IProps> = (props) => {
             return uploadScriptFile ? true : false;
           }
         }
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
 
       return false;
     },
@@ -267,20 +265,20 @@ const EditAchievementOption: FC<IProps> = (props) => {
     recordType: ao.recordType,
     mentors: ao.AchievementOptionMentors.map(
       (m) =>
-        ({
-          userId: m.userId,
-          firstName: m.User?.firstName,
-          lastName: m.User?.lastName,
-        } as TempAchievementOptionMentor)
+      ({
+        userId: m.userId,
+        firstName: m.User?.firstName,
+        lastName: m.User?.lastName,
+      } as TempAchievementOptionMentor)
     ),
     courses: ao.AchievementOptionCourses.map(
       (c) =>
-        ({
-          id: c.id,
-          courseId: c.courseId,
-          programShortName: c.Course.Program ? c.Course.Program.shortTitle : "",
-          title: c.Course.title,
-        } as TempAchievementOptionCourse)
+      ({
+        id: c.id,
+        courseId: c.courseId,
+        programShortName: c.Course.Program ? c.Course.Program.shortTitle : "",
+        title: c.Course.title,
+      } as TempAchievementOptionCourse)
     ),
   };
   return (

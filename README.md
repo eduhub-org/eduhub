@@ -50,6 +50,7 @@ There are a few helpful scripts.
 
 - The hasura log is spammed by the JWK update, which happens once a second. This is correct hasura behavior for this setup.
 - The serverless functions watch their own code, so if it is changed the function is automatically rebuild
+- When adding new projects [this bug workaround](https://github.com/nrwl/nx/issues/9017#issuecomment-1140066503) has to be used!
 
 ## Updating the setup
 
@@ -83,6 +84,14 @@ X updateKeycloakProfile is not added to hasura, updateFromKeycloak does not inse
 
 - Problem with loadFromBucket: What path is input exactly? The full path produced by saveFromBucket would not work, as it is a full URL, not just a filename. The load\* serverless functions however seem to not contain the knowledge to build filepaths again...
 
+# Todos Steffen
+
+- Rent-a-Scientist hasura access is broken because of the schema changes. I've tried a little to fix it, but could not get it to work. Somehow all the graphql definitions have to be modified for it to access the right schema in the database. Either move back the tables to the public schema or figure out how to correctly modify the GraphQL in rent-a-scientist. I've excluded rent-a-scientist from the apollo rebuild script for now for this reason.
+- Fix production builds
+- Once production builds work: Delete ./frontend, ./rent-a-scientist, remove the old frontend config from the docker-compose.yml file, only leave the new frontend-nx.
+- Make sure nobody has pending pushes that change anything in ./frontend, since deleting that will cause ugly merge conflicts
+- Fix the linter commands used in .github, the new ones likely should be "npx nx run edu-hub:lint", "npx nx run rent-a-scientist:lint"
+
 # Talk to Faiz
 
 - What is that "Anwesenheit und the CourseAchievement stuff in the instructor course manage page AuthorizedManageCourse
@@ -91,3 +100,8 @@ X updateKeycloakProfile is not added to hasura, updateFromKeycloak does not inse
 - setup i18n for en/de, I will do the translation
 - fix template-upload to show an link to the file instead
 - the certificates generation button should only be displayed in the last instructor course manage tab
+
+// TODO continue:
+// merge changes opencampus made...
+// move some shared code into libraries to show how multiple frontend apps profit from the monorepo and how code reusage can work in the future
+// document the monorepo and make a pull request with a todo list for Steffen regarding production deployment

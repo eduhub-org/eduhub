@@ -18,8 +18,6 @@ const AuthorizedCoursePage: FC<{ id: number; tab: number }> = ({ id, tab }) => {
 
   const {
     data: courseData,
-    loading,
-    error,
   } = useAuthedQuery<CourseWithEnrollment>(COURSE_WITH_ENROLLMENT, {
     variables: {
       id,

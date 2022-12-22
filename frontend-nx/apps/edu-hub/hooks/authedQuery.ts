@@ -1,5 +1,5 @@
-import { useQuery } from "@apollo/client";
-import { useSession } from "next-auth/react";
+import { useQuery } from '@apollo/client';
+import { useSession } from 'next-auth/react';
 
 export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
   const { data } = useSession();
@@ -12,7 +12,7 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            "x-hasura-role": "admin",
+            'x-hasura-role': 'admin',
             Authorization: `Bearer ${accessToken}`,
           },
         },
@@ -33,7 +33,7 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            "x-hasura-role": "instructor",
+            'x-hasura-role': 'instructor',
             Authorization: `Bearer ${accessToken}`,
           },
         },
@@ -54,7 +54,7 @@ export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            "x-hasura-role": "user",
+            'x-hasura-role': 'user',
             Authorization: `Bearer ${accessToken}`,
           },
         },

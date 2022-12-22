@@ -206,23 +206,14 @@ const AddUserForm: FC<IPropsFrom> = ({
         ) : null}
         <div className="grid grid-cols-12 gap-5">
           <div className="flex flex-col space-y-5 col-span-5">
-            {/* @ts-ignore: https://github.com/i18next/react-i18next/issues/1543 */}
             <span> {t("firstName")} </span>
-            {/* @ts-ignore */}
             <span> {t("lastName")} </span>
-            {/* @ts-ignore */}
             <span> {t("email")} </span>
-            {/* @ts-ignore */}
             <span> {t("password")} </span>
-            {/* @ts-ignore */}
             <span> {t("employmentStatus")} </span>
-            {/* @ts-ignore */}
             <span> {t("university")} </span>
-            {/* @ts-ignore */}
             <span> {t("nameOfUniversity")} </span>
-            {/* @ts-ignore */}
             <span> {t("matriculationNumber")} </span>
-            {/* @ts-ignore */}
             <span> {t("administrator")} </span>
           </div>
           <div className="flex flex-col space-y-5 col-span-7">

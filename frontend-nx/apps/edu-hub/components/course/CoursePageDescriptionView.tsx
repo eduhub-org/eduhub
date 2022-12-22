@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { FC } from "react";
 
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";

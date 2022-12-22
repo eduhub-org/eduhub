@@ -1,4 +1,4 @@
-// https://github.com/nrwl/nx/issues/9017#issuecomment-1140066503
+// do not remove this https://github.com/nrwl/nx/issues/9017#issuecomment-1140066503
 import path from 'path';
 path.resolve('./next.config.js');
 
@@ -21,12 +21,6 @@ import {
   Programs,
   Programs_Program,
 } from "../../queries/__generated__/Programs";
-
-// export const getStaticProps = async ({ locale }: { locale: string }) => ({
-//   props: {
-//     ...(await serverSideTranslations(locale, ["common", "course-page"])),
-//   },
-// });
 
 const Index: FC = () => {
   const isAdmin = useIsAdmin();

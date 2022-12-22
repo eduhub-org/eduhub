@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, useCallback, useMemo } from "react";
+import { ChangeEvent, FC, useCallback } from "react";
 
 interface IProps {
   value?: string;
