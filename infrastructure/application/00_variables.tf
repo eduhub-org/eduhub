@@ -172,6 +172,10 @@ variable "nextauth_secret" {
   description = "Used to encrypt the NextAuth.js JWT, and to hash email verification tokens. This is the default value for the secret option in NextAuth and Middleware."
   type        = string
 }
+variable "keycloak_hasura_client_secret" {
+  description = "Used to authenticate login requests from the hasura client."
+  type        = string
+}
 
 # Serverless Functions
 variable "environment" {
