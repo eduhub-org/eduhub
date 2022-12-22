@@ -195,13 +195,13 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
             fileName: state.coverImageFile.name,
           },
         });
-        if (saveResult.data?.saveAchievementRecordCoverImage?.link) {
+        if (saveResult.data?.saveAchievementRecordCoverImage?.google_link) {
           await udpateAnAchievementRecordAPI({
             variables: {
               id: achievementRecordId,
               setInput: {
                 coverImageUrl:
-                  saveResult.data.saveAchievementRecordCoverImage.link,
+                  saveResult.data.saveAchievementRecordCoverImage.google_link,
               },
             },
           });
@@ -215,13 +215,13 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
           fileName: state.documentationZipFile.name,
         },
       });
-      if (!uploadResult.data?.saveAchievementRecordDocumentation?.link) return;
+      if (!uploadResult.data?.saveAchievementRecordDocumentation?.google_link) return;
       await udpateAnAchievementRecordAPI({
         variables: {
           id: achievementRecordId,
           setInput: {
             documentationUrl:
-              uploadResult.data.saveAchievementRecordDocumentation.link,
+              uploadResult.data.saveAchievementRecordDocumentation.google_link,
           },
         },
       });
@@ -292,19 +292,19 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
           <div className="flex flex-col space-y-2">
             {achievementOptionCourse.AchievementOption.recordType ===
               AchievementRecordType_enum.DOCUMENTATION && (
-              <div className="flex flex-row space-x-1">
-                <p className="w-2/6">Titlebild</p>
-                <div className="w-4/6">
-                  <UploadUI
-                    bottomText="Optimal ist eine Größe von XXX x XXX Pixel."
-                    onFileChoosed={uploadTitleBild}
-                    uploadFileName={state.imageName}
-                    acceptedFileTypes=".png"
-                    placeholder="Cover image (.png)"
-                  />
+                <div className="flex flex-row space-x-1">
+                  <p className="w-2/6">Titlebild</p>
+                  <div className="w-4/6">
+                    <UploadUI
+                      bottomText="Optimal ist eine Größe von XXX x XXX Pixel."
+                      onFileChoosed={uploadTitleBild}
+                      uploadFileName={state.imageName}
+                      acceptedFileTypes=".png"
+                      placeholder="Cover image (.png)"
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             <div className="flex flex-row space-x-1">
               <p className="w-2/6">Autoren</p>
@@ -343,34 +343,34 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
 
             {achievementOptionCourse.AchievementOption.recordType ===
               AchievementRecordType_enum.DOCUMENTATION && (
-              <div className="flex flex-row space-x-1">
-                <p className="w-2/6">Dokumentation</p>
-                <div className="w-4/6">
-                  <UploadUI
-                    bottomText="Benutze diese Vorlage zum Hochladen der Dokumentation!"
-                    onFileChoosed={uploadDocumentationsZip}
-                    uploadFileName={state.zipFileName}
-                    acceptedFileTypes=".zip"
-                    placeholder=".zip"
-                  />
+                <div className="flex flex-row space-x-1">
+                  <p className="w-2/6">Dokumentation</p>
+                  <div className="w-4/6">
+                    <UploadUI
+                      bottomText="Benutze diese Vorlage zum Hochladen der Dokumentation!"
+                      onFileChoosed={uploadDocumentationsZip}
+                      uploadFileName={state.zipFileName}
+                      acceptedFileTypes=".zip"
+                      placeholder=".zip"
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
             {achievementOptionCourse.AchievementOption.recordType ===
               AchievementRecordType_enum.DOCUMENTATION_AND_CSV && (
-              <div className="flex flex-row space-x-1">
-                <p className="w-2/6">CSV Ergebnisse</p>
-                <div className="w-4/6">
-                  <UploadUI
-                    bottomText="Benutze diese Vorlage zum Hochladen der CSV-Ergebnisse!"
-                    onFileChoosed={uploadResultCsv}
-                    uploadFileName={state.csvFileName}
-                    acceptedFileTypes=".csv"
-                    placeholder=".csv"
-                  />
+                <div className="flex flex-row space-x-1">
+                  <p className="w-2/6">CSV Ergebnisse</p>
+                  <div className="w-4/6">
+                    <UploadUI
+                      bottomText="Benutze diese Vorlage zum Hochladen der CSV-Ergebnisse!"
+                      onFileChoosed={uploadResultCsv}
+                      uploadFileName={state.csvFileName}
+                      acceptedFileTypes=".csv"
+                      placeholder=".csv"
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
             <div className="flex justify-center items-center">
               <Button onClick={save} as="button" filled={false}>
                 Hochladen

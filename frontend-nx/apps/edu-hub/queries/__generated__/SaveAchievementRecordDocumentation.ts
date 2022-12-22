@@ -8,8 +8,9 @@
 // ====================================================
 
 export interface SaveAchievementRecordDocumentation_saveAchievementRecordDocumentation {
-  __typename: "loadFileOutput";
-  link: string;
+  __typename: "saveFileOutput";
+  google_link: string;
+  path: string;
 }
 
 export interface SaveAchievementRecordDocumentation {

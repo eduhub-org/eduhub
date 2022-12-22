@@ -68,8 +68,10 @@ export default NextAuth({
     KeycloakProvider({
       clientId: 'hasura',
       clientSecret:
+        process.env.KEYCLOAK_HASURA_CLIENT_SECRET ||
+        process.env.CLIENT_SECRET ||
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        process.env.CLIENT_SECRET || process.env.NEXT_AUTH_CLIENT_SECRET!,
+        process.env.NEXT_AUTH_CLIENT_SECRET!,
       authorization: `${process.env.NEXT_PUBLIC_AUTH_URL}/auth`,
       issuer: `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub`,
       idToken: true,

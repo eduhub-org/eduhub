@@ -22,7 +22,7 @@ const EhInputWithTitle: FC<IPros> = ({
   onChangeHandler,
 }) => {
   const handOnchange = useCallback(
-    (event) => {
+    (event: any) => {
       if (onChangeHandler) onChangeHandler(event.target.value);
     },
     [onChangeHandler]

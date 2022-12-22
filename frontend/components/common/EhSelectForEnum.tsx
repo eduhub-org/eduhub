@@ -16,7 +16,7 @@ const EhSelectForEnum: FC<IProsSelect> = ({
   onChange,
 }) => {
   const onSelectChanged = useCallback(
-    (event) => {
+    (event: any) => {
       onChange(event.target.value);
     },
     [onChange]

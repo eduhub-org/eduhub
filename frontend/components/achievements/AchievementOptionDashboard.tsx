@@ -94,14 +94,14 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
       where:
         currentProgramId > -1
           ? {
-              AchievementOptionCourses: {
-                Course: {
-                  Program: {
-                    id: { _eq: currentProgramId },
-                  },
+            AchievementOptionCourses: {
+              Course: {
+                Program: {
+                  id: { _eq: currentProgramId },
                 },
               },
-            }
+            },
+          }
           : {},
     },
   });
@@ -180,10 +180,10 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
 
           if (
             response.data &&
-            response.data.saveAchievementOptionDocumentationTemplate?.link
+            response.data.saveAchievementOptionDocumentationTemplate?.google_link
           ) {
             const url =
-              response.data.saveAchievementOptionDocumentationTemplate.link;
+              response.data.saveAchievementOptionDocumentationTemplate.google_link;
             const dbResponse = await queryUpdateAchievementOptions(
               achievementOptionId,
               {
@@ -205,10 +205,10 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
           });
           if (
             res2.data &&
-            res2.data.saveAchievementOptionEvaluationScript?.link
+            res2.data.saveAchievementOptionEvaluationScript?.google_link
           ) {
             const url =
-              res2.data && res2.data.saveAchievementOptionEvaluationScript.link;
+              res2.data && res2.data.saveAchievementOptionEvaluationScript.google_link;
             const dbResponse = await queryUpdateAchievementOptions(
               achievementOptionId,
               {

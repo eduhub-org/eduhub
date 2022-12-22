@@ -39,7 +39,7 @@ const CourseListDialog: FC<IProps> = (props) => {
   });
 
   const handleNewInput = useCallback(
-    (value) => {
+    (value: any) => {
       setSearchValue(value);
     },
     [setSearchValue]

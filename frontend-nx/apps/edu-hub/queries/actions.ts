@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 // I am pretty sure the current loadFile/saveFile implementation is still broken,
 // I can't get it to work at all
@@ -22,7 +22,8 @@ export const SAVE_ACHIEVEMENT_CERTIFICATE = gql`
       courseid: $courseId
       userid: $userId
     ) {
-      link
+      google_link
+      path
     }
   }
 `;
@@ -38,7 +39,8 @@ export const SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE = gql`
       filename: $fileName
       programid: $programId
     ) {
-      link
+      google_link
+      path
     }
   }
 `;
@@ -52,7 +54,8 @@ export const SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE = gql`
       base64file: $base64File
       courseid: $courseId
     ) {
-      link
+      google_link
+      path
     }
   }
 `;
@@ -66,7 +69,8 @@ export const SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT = gql`
       base64file: $base64File
       courseid: $courseId
     ) {
-      link
+      google_link
+      path
     }
   }
 `;
@@ -82,7 +86,8 @@ export const SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE = gql`
       filename: $fileName
       achievementRecordId: $achievementRecordId
     ) {
-      link
+      google_link
+      path
     }
   }
 `;
@@ -98,7 +103,8 @@ export const SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION = gql`
       filename: $fileName
       achievementRecordId: $achievementRecordId
     ) {
-      link
+      google_link
+      path
     }
   }
 `;
@@ -114,7 +120,8 @@ export const SAVE_COURSE_IMAGE = gql`
       filename: $fileName
       courseid: $courseId
     ) {
-      link
+      google_link
+      path
     }
   }
 `;
@@ -129,7 +136,8 @@ export const SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE = gql`
       filename: $fileName
       programid: $programId
     ) {
-      link
+      google_link
+      path
     }
   }
 `;

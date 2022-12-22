@@ -101,7 +101,6 @@ X updateKeycloakProfile is not added to hasura, updateFromKeycloak does not inse
 - the certificates generation button should only be displayed in the last instructor course manage tab
 
 // TODO continue:
-// merge changes opencampus made...
-// Fix the linter commands used in .github, the new ones likely should be "npx nx run edu-hub:lint", "npx nx run rent-a-scientist:lint"
+// Fix the linter commands used in .github, the new ones likely should be "npx nx run edu-hub:lint", "npx nx run rent-a-scientist:lint", "npx nx run edu-hub:build", "npx nx run rent-a-scientist:build"
 // move some shared code into libraries to show how multiple frontend apps profit from the monorepo and how code reusage can work in the future
 // document the monorepo and make a pull request with a todo list for Steffen regarding production deployment

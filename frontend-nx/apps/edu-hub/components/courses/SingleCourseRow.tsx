@@ -358,13 +358,13 @@ const CourseDetails: FC<IPropsCourseOneRow> = ({ course, refetchCourses }) => {
           },
         });
         console.log(result);
-        const coverImage = result.data?.saveCourseImage?.link;
+        const coverImage = result.data?.saveCourseImage?.google_link;
         if (coverImage != null) {
           await updateCourseQuery({
             variables: {
               id: course.id,
               changes: {
-                coverImage: result.data?.saveCourseImage?.link,
+                coverImage: result.data?.saveCourseImage?.google_link,
               },
             },
           });

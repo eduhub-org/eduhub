@@ -8,8 +8,9 @@
 // ====================================================
 
 export interface SaveParticipationCertificateTemplate_saveParticipationCertificateTemplate {
-  __typename: "loadFileOutput";
-  link: string;
+  __typename: "saveFileOutput";
+  google_link: string;
+  path: string;
 }
 
 export interface SaveParticipationCertificateTemplate {

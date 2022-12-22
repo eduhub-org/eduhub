@@ -11,8 +11,8 @@ services:
     build:
       context: ./frontend-nx
       dockerfile: Dockerfile-dev
-    command: tail -F anything
-    #command: sh dev.sh
+    # uncomment this to disable automatic yarn dev on frontend startup
+    # command: tail -F anything
     volumes:
       - ./frontend-nx:/opt/app
     depends_on:

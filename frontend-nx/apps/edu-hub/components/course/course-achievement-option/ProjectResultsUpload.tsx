@@ -195,13 +195,13 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
             fileName: state.coverImageFile.name,
           },
         });
-        if (saveResult.data?.saveAchievementRecordCoverImage?.link) {
+        if (saveResult.data?.saveAchievementRecordCoverImage?.google_link) {
           await udpateAnAchievementRecordAPI({
             variables: {
               id: achievementRecordId,
               setInput: {
                 coverImageUrl:
-                  saveResult.data.saveAchievementRecordCoverImage.link,
+                  saveResult.data.saveAchievementRecordCoverImage.google_link,
               },
             },
           });
@@ -215,13 +215,13 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
           fileName: state.documentationZipFile.name,
         },
       });
-      if (!uploadResult.data?.saveAchievementRecordDocumentation?.link) return;
+      if (!uploadResult.data?.saveAchievementRecordDocumentation?.google_link) return;
       await udpateAnAchievementRecordAPI({
         variables: {
           id: achievementRecordId,
           setInput: {
             documentationUrl:
-              uploadResult.data.saveAchievementRecordDocumentation.link,
+              uploadResult.data.saveAchievementRecordDocumentation.google_link,
           },
         },
       });
