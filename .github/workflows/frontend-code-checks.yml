@@ -7,11 +7,11 @@ on:
   push:
     # Run only on changes in the following folder
     paths:
-      - frontend/**
+      - frontend-nx/**
   pull_request:
     # Run only on changes in the following folder
     paths:
-      - frontend/**
+      - frontend-nx/**
 
 jobs:
   build:
@@ -32,13 +32,21 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install yarn dependencies
-        working-directory: frontend
+        working-directory: frontend-nx
         run: yarn
 
-      - name: Type check
-        working-directory: frontend
-        run: yarn tsc
+      - name: Type check edu hub
+        working-directory: frontend-nx
+        run: npx nx run edu-hub:build
 
-      - name: Check linting
-        working-directory: frontend
-        run: yarn lint
+      - name: Type check rent-a-scientist
+        working-directory: frontend-nx
+        run: npx nx run rent-a-scientist:build
+
+      - name: Check linting edu hub
+        working-directory: frontend-nx
+        run: npx nx run edu-hub:lint
+
+      - name: Check linting rent-a-scientist
+        working-directory: frontend-nx
+        run: npx nx run rent-a-scientist:lint

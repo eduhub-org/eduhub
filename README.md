@@ -87,6 +87,7 @@ X updateKeycloakProfile is not added to hasura, updateFromKeycloak does not inse
 # Todos Steffen
 
 - Rent-a-Scientist hasura access is broken because of the schema changes. I've tried a little to fix it, but could not get it to work. Somehow all the graphql definitions have to be modified for it to access the right schema in the database. Either move back the tables to the public schema or figure out how to correctly modify the GraphQL in rent-a-scientist. I've excluded rent-a-scientist from the apollo rebuild script for now for this reason.
+- Verify the new linter github action, it targets frontend-nx now
 - Fix production builds
 - Once production builds work: Delete ./frontend, ./rent-a-scientist, remove the old frontend config from the docker-compose.yml file, only leave the new frontend-nx.
 - Make sure nobody has pending pushes that change anything in ./frontend, since deleting that will cause ugly merge conflicts
@@ -101,6 +102,5 @@ X updateKeycloakProfile is not added to hasura, updateFromKeycloak does not inse
 - the certificates generation button should only be displayed in the last instructor course manage tab
 
 // TODO continue:
-// Fix the linter commands used in .github, the new ones likely should be "npx nx run edu-hub:lint", "npx nx run rent-a-scientist:lint", "npx nx run edu-hub:build", "npx nx run rent-a-scientist:build"
 // move some shared code into libraries to show how multiple frontend apps profit from the monorepo and how code reusage can work in the future
 // document the monorepo and make a pull request with a todo list for Steffen regarding production deployment
