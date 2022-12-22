@@ -11,5 +11,7 @@ const signInHandler = () => {
 export const LoginButton: FC = () => {
   const { t } = useTranslation("common");
 
+  console.log("test");
+
   return <Button onClick={signInHandler}>{t("loginButton")}</Button>;
 };
