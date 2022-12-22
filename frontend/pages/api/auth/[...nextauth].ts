@@ -66,7 +66,7 @@ export default NextAuth({
   providers: [
     KeycloakProvider({
       clientId: "hasura",
-      clientSecret: process.env.CLIENT_SECRET!,
+      //clientSecret: process.env.CLIENT_SECRET!,
       authorization: `${process.env.NEXT_PUBLIC_AUTH_URL}/auth`,
       issuer: `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub`,
       idToken: true,
