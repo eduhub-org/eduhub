@@ -57,6 +57,10 @@ resource "google_cloud_run_service" "eduhub" {
           value = "https://${local.keycloak_service_name}.opencampus.sh"
         }
         env {
+          name  = "NEXTAUTH_URL"
+          value = "https://${local.eduhub_service_name}.opencampus.sh"
+        }
+        env {
           name = "HASURA_ADMIN_SECRET"
           value_from {
             secret_key_ref {
