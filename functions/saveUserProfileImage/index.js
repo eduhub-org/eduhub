@@ -25,11 +25,13 @@ exports.saveUserProfileImage = async (req, res) => {
     );
 
     return res.json({
-      link: link,
+      path: link,
+      google_link: link,
     });
   } else {
     return res.json({
-      link: "error",
+      google_link: "incorrect secret",
+      path: "incorrect secret",
     });
   }
 };

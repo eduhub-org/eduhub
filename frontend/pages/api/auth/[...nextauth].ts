@@ -68,22 +68,14 @@ export default NextAuth({
     KeycloakProvider({
       clientId: "hasura",
       clientSecret:
-        process.env.CLIENT_SECRET || process.env.NEXT_AUTH_CLIENT_SECRET!,
+        process.env.KEYCLOAK_HASURA_CLIENT_SECRET ||
+        process.env.CLIENT_SECRET ||
+        process.env.NEXT_AUTH_CLIENT_SECRET!,
       authorization: `${process.env.NEXT_PUBLIC_AUTH_URL}/auth`,
       issuer: `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub`,
       idToken: true,
     }),
   ],
-  events: {
-    signIn: ({ account }) => {
-      console.log("signin event!");
-      if (account && account.access_token) {
-        updateUser(account.access_token, account.providerAccountId).catch(
-          console.log.bind(console)
-        );
-      }
-    },
-  },
   callbacks: {
     signIn: async ({ account }) => {
       if (account && account.access_token) {

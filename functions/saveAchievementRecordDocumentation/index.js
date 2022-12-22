@@ -26,6 +26,8 @@ exports.saveAchievementRecordDocumentation = async (req, res) => {
 
     return res.json({
       link: link,
+      path: path,
+      google_link: link,
     });
   } else {
     return res.json({

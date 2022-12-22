@@ -25,11 +25,13 @@ exports.saveAchievementOptionEvaluationScript = async (req, res) => {
     );
 
     return res.json({
-      link: link,
+      path: path,
+      google_link: link,
     });
   } else {
     return res.json({
-      link: "error",
+      google_link: "incorrect secret",
+      path: "incorrect secret",
     });
   }
 };

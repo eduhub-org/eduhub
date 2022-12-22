@@ -90,7 +90,6 @@ X updateKeycloakProfile is not added to hasura, updateFromKeycloak does not inse
 - Fix production builds
 - Once production builds work: Delete ./frontend, ./rent-a-scientist, remove the old frontend config from the docker-compose.yml file, only leave the new frontend-nx.
 - Make sure nobody has pending pushes that change anything in ./frontend, since deleting that will cause ugly merge conflicts
-- Fix the linter commands used in .github, the new ones likely should be "npx nx run edu-hub:lint", "npx nx run rent-a-scientist:lint"
 
 # Talk to Faiz
 
@@ -103,5 +102,6 @@ X updateKeycloakProfile is not added to hasura, updateFromKeycloak does not inse
 
 // TODO continue:
 // merge changes opencampus made...
+// Fix the linter commands used in .github, the new ones likely should be "npx nx run edu-hub:lint", "npx nx run rent-a-scientist:lint"
 // move some shared code into libraries to show how multiple frontend apps profit from the monorepo and how code reusage can work in the future
 // document the monorepo and make a pull request with a todo list for Steffen regarding production deployment
