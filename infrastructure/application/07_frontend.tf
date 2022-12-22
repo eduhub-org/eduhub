@@ -29,6 +29,30 @@ resource "google_secret_manager_secret_iam_member" "nextauth_secret" {
   depends_on = [google_secret_manager_secret.nextauth_secret]
 }
 
+
+# Create a variable for the Keycloak client secret for Hasura
+resource "google_secret_manager_secret" "keycloak_hasura_client_secret" {
+  provider  = google-beta
+  secret_id = "keycloak-hasura-client-secret"
+  replication {
+    automatic = true
+  }
+}
+# Set the password of the Keycloak client secret for Hasura
+resource "google_secret_manager_secret_version" "keycloak_hasura_client_secret" {
+  provider    = google-beta
+  secret      = google_secret_manager_secret.keycloak_hasura_client_secret.name
+  secret_data = var.keycloak_hasura_client_secret
+}
+# Grant the compute engine service account permissions to access the Keycloak client secret for Hasura
+resource "google_secret_manager_secret_iam_member" "keycloak_hasura_client_secret" {
+  secret_id  = google_secret_manager_secret.keycloak_hasura_client_secret.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.keycloak_hasura_client_secret]
+}
+
+
 # Define the Google Cloud Run service for the EduHub frontend
 resource "google_cloud_run_service" "eduhub" {
   provider = google-beta
@@ -57,6 +81,10 @@ resource "google_cloud_run_service" "eduhub" {
           value = "https://${local.keycloak_service_name}.opencampus.sh"
         }
         env {
+          name  = "NEXTAUTH_URL"
+          value = "https://${local.eduhub_service_name}.opencampus.sh"
+        }
+        env {
           name = "HASURA_ADMIN_SECRET"
           value_from {
             secret_key_ref {
@@ -70,6 +98,15 @@ resource "google_cloud_run_service" "eduhub" {
           value_from {
             secret_key_ref {
               name = google_secret_manager_secret.nextauth_secret.secret_id
+              key  = "latest"
+            }
+          }
+        }
+        env {
+          name = "KEYCLOAK_HASURA_CLIENT_SECRET"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.keycloak_hasura_client_secret.secret_id
               key  = "latest"
             }
           }
