@@ -45,7 +45,7 @@ type Mutation {
     base64file: String!
     courseid: Int!
     userid: String!
-  ): loadFileOutput
+  ): saveFileOutput
 }
 
 type Mutation {
@@ -53,21 +53,21 @@ type Mutation {
     base64file: String!
     filename: String!
     programid: Int!
-  ): loadFileOutput
+  ): saveFileOutput
 }
 
 type Mutation {
   saveAchievementOptionDocumentationTemplate(
     base64file: String!
     courseid: Int!
-  ): loadFileOutput
+  ): saveFileOutput
 }
 
 type Mutation {
   saveAchievementOptionEvaluationScript(
     base64file: String!
     courseid: Int!
-  ): loadFileOutput
+  ): saveFileOutput
 }
 
 type Mutation {
@@ -75,7 +75,7 @@ type Mutation {
     base64file: String!
     filename: String!
     achievementRecordId: Int!
-  ): loadFileOutput
+  ): saveFileOutput
 }
 
 type Mutation {
@@ -83,7 +83,7 @@ type Mutation {
     base64file: String!
     filename: String!
     achievementRecordId: Int!
-  ): loadFileOutput
+  ): saveFileOutput
 }
 
 type Mutation {
@@ -91,7 +91,7 @@ type Mutation {
     base64file: String!
     filename: String!
     courseid: Int!
-  ): loadFileOutput
+  ): saveFileOutput
 }
 
 type Mutation {
@@ -99,7 +99,7 @@ type Mutation {
     base64file: String!
     courseid: Int!
     userid: String!
-  ): loadFileOutput
+  ): saveFileOutput
 }
 
 type Mutation {
@@ -107,7 +107,7 @@ type Mutation {
     base64file: String!
     filename: String!
     programid: Int!
-  ): loadFileOutput
+  ): saveFileOutput
 }
 
 type Mutation {
@@ -115,7 +115,7 @@ type Mutation {
     base64file: String!
     filename: String!
     userid: String!
-  ): loadFileOutput
+  ): saveFileOutput
 }
 
 type Mutation {
@@ -130,5 +130,10 @@ type loadFileOutput {
 
 type result {
   result: String!
+}
+
+type saveFileOutput {
+  google_link: String!
+  path: String!
 }
 
