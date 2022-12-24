@@ -50,7 +50,3 @@ jobs:
       - name: Check linting rent-a-scientist
         working-directory: frontend-nx
         run: npx nx run rent-a-scientist:lint
-
-      - name: Check apollo regeneration
-        working-directory: frontend-nx
-        run: npx nx run edu-hub:apollo
