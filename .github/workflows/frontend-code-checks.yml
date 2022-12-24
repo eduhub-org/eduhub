@@ -1,7 +1,7 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: TSC and Linting
+name: Code Checks edu-hub
 
 on:
   push:
@@ -50,3 +50,7 @@ jobs:
       - name: Check linting rent-a-scientist
         working-directory: frontend-nx
         run: npx nx run rent-a-scientist:lint
+
+      - name: Check apollo regeneration
+        working-directory: frontend-nx
+        run: npx nx run edu-hub:apollo
