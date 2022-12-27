@@ -1,0 +1,74 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/rent-a-scientist",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/next:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "root": "apps/rent-a-scientist",
+        "outputPath": "dist/apps/rent-a-scientist"
+      },
+      "configurations": {
+        "development": {
+          "outputPath": "apps/rent-a-scientist"
+        },
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/next:server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "rent-a-scientist:build",
+        "dev": true
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "rent-a-scientist:build:development",
+          "dev": true,
+          "port": 4201
+        },
+        "production": {
+          "buildTarget": "rent-a-scientist:build:production",
+          "dev": false
+        }
+      }
+    },
+    "export": {
+      "executor": "@nrwl/next:export",
+      "options": {
+        "buildTarget": "rent-a-scientist:build:production"
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/rent-a-scientist"],
+      "options": {
+        "jestConfig": "apps/rent-a-scientist/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/rent-a-scientist/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "apollo": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": [
+          "rm -rf queries/__generated__/*",
+          "../../node_modules/apollo/bin/run client:codegen --includes ./queries/**/*.ts --target typescript"
+        ],
+        "cwd": "apps/rent-a-scientist",
+        "parallel": false
+      }
+    }
+  },
+  "tags": []
+}

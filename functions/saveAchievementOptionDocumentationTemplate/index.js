@@ -1,10 +1,6 @@
-const bodyParser = require("body-parser");
-const {Storage} = require('@google-cloud/storage');
-const util = require('util');
-
-const { saveToBucket } = require("./lib/eduHub.js");
-
-const storage = new Storage();
+const { Storage } = require("@google-cloud/storage");
+const { buildCloudStorage } = require("../lib/cloud-storage");
+const storage = buildCloudStorage(Storage);
 
 /**
  * Responds to any HTTP request.
@@ -18,18 +14,24 @@ exports.saveAchievementOptionDocumentationTemplate = async (req, res) => {
     const filename = req.body.input.filename;
     const courseid = req.body.input.courseid;
     const isPublic = false;
-    const bucket = storage.bucket(req.headers.bucket);
-    
-    const path = `courseid_${courseId}/achievementOptionDocumentationTemplate/${filename}`;
-    
-    const link = await saveToBucket(path, bucket, content, isPublic);
-    
+
+    const path = `courseid_${courseid}/achievementOptionDocumentationTemplate/${filename}`;
+
+    const link = await storage.saveToBucket(
+      path,
+      req.headers.bucket,
+      content,
+      isPublic
+    );
+
     return res.json({
-      link: link
+      path: path,
+      google_link: link,
     });
   } else {
     return res.json({
-      link: "error"
+      google_link: "incorrect secret",
+      path: "incorrect secret",
     });
   }
 };

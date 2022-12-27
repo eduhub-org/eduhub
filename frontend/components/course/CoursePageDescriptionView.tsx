@@ -18,11 +18,12 @@ export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
   return (
     <div className="flex flex-col space-y-24">
       <div className="flex flex-col">
-        <Image
+        <img
           src={course.coverImage ?? "https://picsum.photos/1280/620"}
           alt="Title image"
-          width={1280}
-          height={620}
+          width="1280px"
+          height="620px"
+          className="w-[1280px] h-[620px]"
         />
       </div>
       <PageBlock>

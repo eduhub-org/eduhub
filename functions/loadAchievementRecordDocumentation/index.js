@@ -1,10 +1,6 @@
-const bodyParser = require("body-parser");
-const {Storage} = require('@google-cloud/storage');
-const util = require('util');
-
-const { loadFromBucket } = require("./lib/eduHub.js");
-
-const storage = new Storage();
+const { Storage } = require("@google-cloud/storage");
+const { buildCloudStorage } = require("../lib/cloud-storage");
+const storage = buildCloudStorage(Storage);
 
 /**
  * Responds to any HTTP request.
@@ -15,16 +11,15 @@ const storage = new Storage();
 exports.loadAchievementRecordDocumentation = async (req, res) => {
   if (process.env.HASURA_CLOUD_FUNCTION_SECRET == req.headers.secret) {
     const path = req.body.input.path;
-    const bucket = storage.bucket(req.headers.bucket);
-    
-    const link = await loadFromBucket(path, bucket); 
-    
+
+    const link = await storage.loadFromBucket(path, req.headers.bucket);
+
     return res.json({
-      link: link
+      link: link,
     });
   } else {
     return res.json({
-      link: "error"
+      link: "error",
     });
   }
 };

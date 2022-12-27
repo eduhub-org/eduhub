@@ -10,6 +10,7 @@ import EhAddButton from "../common/EhAddButton";
 import EhMenuItem from "../common/EhMenuItem";
 import ModalControl from "../common/ModalController";
 import Searchbar from "../common/Searchbar";
+import { ProgramsMenubar } from "../program/ProgramsMenubar";
 import AddCourseForm from "./AddCourseForm";
 
 interface IProps {
@@ -179,15 +180,11 @@ const Menubar: FC<IMenubarProps> = ({
   /* #region */
   return (
     <div className="flex justify-between mb-5">
-      <div className="flex items-center space-x-5">
-        {menuItems.map((tab) => (
-          <EhMenuItem
-            key={tab.key}
-            property={tab}
-            onClickCallback={handleTabClick}
-          />
-        ))}
-      </div>
+      <ProgramsMenubar
+        programs={programs}
+        defaultProgramId={programs[0].id}
+        onTabClicked={handleTabClick}
+      />
       <Searchbar
         placeholder={t("courseSearchPlaceholder")}
         onChangeCallback={searchOnTitleCallback}

@@ -12,11 +12,12 @@ import {
   AdminCourseListVariables,
   AdminCourseList_Course,
 } from "../../queries/__generated__/AdminCourseList";
-import { useAdminQuery, useInstructorQuery } from "../../hooks/authedQuery";
+import { useInstructorQuery } from "../../hooks/authedQuery";
 import { COURSE_LIST } from "../../queries/courseList";
 import Loading from "../../components/courses/Loading";
 import { Tile } from "../../components/course/Tile";
 import EhMenuItem from "../../components/common/EhMenuItem";
+import { useUserId } from "../../hooks/user";
 
 export const getStaticProps = async ({ locale }: { locale: string }) => ({
   props: {
@@ -61,6 +62,8 @@ const Dashboard: FC<IProps> = ({ t }) => {
 };
 
 const Courses: FC = () => {
+  const userId = useUserId();
+
   let courses: AdminCourseList_Course[] = [];
   /* #region DB APIs */
   const courseListRequest = useInstructorQuery<
@@ -68,10 +71,7 @@ const Courses: FC = () => {
     AdminCourseListVariables
   >(COURSE_LIST, {
     variables: {
-      // TODO somehow we need to get the expert id of the currently logged in user
-      // no idea how to get that from keycloak, for me the keycloak sync does not work locally,
-      // so my user does not have an expert id at all
-      where: { CourseInstructors: { expertId: { _eq: 159 } } },
+      where: { CourseInstructors: { Expert: { userId: { _eq: userId } } } },
     },
   });
   /* #endregion */
