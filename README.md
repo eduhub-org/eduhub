@@ -69,38 +69,36 @@ There are a few helpful scripts.
   1. `./kc.sh export --file /opt/keycloak/data/import/edu-hub.json --users realm_file --realm edu-hub`
   1. Your local git should highlight changes in the file `./keycloak/imports-dev/edu-hub.json` now
 
-# Talk to Steffen
+## frontend-nx: NX Workspace for code sharing between various frontends
 
-X Problem with the nextauth callbacks: never called?
+The directory frontend-nx contains the nx based monorepository meant to contain all app code in the future. Midterm even serverless functions could be moved into this workspace.
+See https://nx.dev/ for more general information about this buildsystem. Advantages include:
 
-X users management is not really fully implemented, I think it is missing the ability to make a person instructor or admin? Can user creation even work at all from here? It's not like we can pass the password through hasura to keycloak?! Is user creation a necessary feature here? Why not create in keycloak? Normal students will register via keycloak as well, after all? Why do it differently for admins/instructors? Just let roles be set via eduhub?
-X updateKeycloakProfile is not added to hasura, updateFromKeycloak does not insert the necessary entry into the admin table to make eduhub understand a user is an admin
+- Code of various frontends can exist in the some workspace: ./frontend-nx/app/...
+- The various frontends can pull in shared code from libraries: ./frontend-nx/libs/...
+- Generator commands to quickly generate new apps or libraries are available via NX
 
-- require("../lib/eduHub.js") & other code changes in the functions necessary to make them work local
+This changes however requires changes in what commands are used to build the apps and where the app code is placed.
 
-- Why python serverless functions?
-
-* How are course invitations accepted anyway? I cant find a UI for that at all.
-
-- Problem with loadFromBucket: What path is input exactly? The full path produced by saveFromBucket would not work, as it is a full URL, not just a filename. The load\* serverless functions however seem to not contain the knowledge to build filepaths again...
+- The default configuration starts `./frontend-nx/dev.sh`, which runs the development frontends of edu-hub and rent-a-scientist
+- For production build you will need to do `npx nx run edu-hub:build` or `npx nx run rent-a-scientist:build` in `./frontend-nx`
+- Generators can be called with `npx nx g ...`, see [here](https://nx.dev/plugin-features/use-code-generators).
+- Then the compiled app should be under `./frontend-nx/dist/*`
+- There will need to be a new Dockerfile for production builds, likely a slightly modified version of `./frontend/Dockerfile`, which uses the changed build commands and output paths.
+- Or maybe even multiple ones, one per frontend.
 
 # Todos Steffen
 
 - Rent-a-Scientist hasura access is broken because of the schema changes. I've tried a little to fix it, but could not get it to work. Somehow all the graphql definitions have to be modified for it to access the right schema in the database. Either move back the tables to the public schema or figure out how to correctly modify the GraphQL in rent-a-scientist. I've excluded rent-a-scientist from the apollo rebuild script for now for this reason.
 - Verify the new linter github action, it targets frontend-nx now
-- Fix production builds
+- Fix production builds, especially the broken import path in the serverless functions
 - Once production builds work: Delete ./frontend, ./rent-a-scientist, remove the old frontend config from the docker-compose.yml file, only leave the new frontend-nx.
-- Make sure nobody has pending pushes that change anything in ./frontend, since deleting that will cause ugly merge conflicts
+- Make sure nobody has pending pushes that change anything in ./frontend or ./rent-a-scientist, since deleting that will cause ugly merge conflicts
 
 # Talk to Faiz
 
 - What is that "Anwesenheit und the CourseAchievement stuff in the instructor course manage page AuthorizedManageCourse
-- check out the new achievement functions for completion
+- check out the new achievement functions for completion, I am pretty sure there are still minor bugs in it at least, like hard coded course IDs or user IDs. Now with local serverless functions this should not be necessary anymore.
 - setup i18n for en/de, I will do the translation
 - fix template-upload to show an link to the file instead
 - the certificates generation button should only be displayed in the last instructor course manage tab
-
-// TODO continue:
-// move some shared code into libraries to show how multiple frontend apps profit from the monorepo and how code reusage can work in the future
-// document the monorepo and make a pull request with a todo list for Steffen regarding production deployment
-// figure out timeline with steffen so Faiz can complete work on achievements once production builds are confirmed to work
