@@ -1,7 +1,7 @@
 import { FC } from "react";
 
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
-import { BlockTitle } from "../common/BlockTitle";
+import { BlockTitle } from "@opencampus/shared-components";
 import { Button } from "../common/Button";
 
 interface IProps {

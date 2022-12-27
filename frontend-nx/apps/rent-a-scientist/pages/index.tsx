@@ -5,7 +5,7 @@ path.resolve('./next.config.js');
 import Head from "next/head";
 import Link from "next/link";
 import { FC } from "react";
-import { ClientOnly } from "../components/common/ClientOnly";
+import { ClientOnly } from "@opencampus/shared-components";
 import { OnlyLoggedIn } from "../components/common/OnlyLoggedIn";
 import { OffersSearch } from "../components/OffersSearch";
 

@@ -3,7 +3,7 @@ import { FC } from "react";
 
 import { getWeekdayStartAndEndString } from "../../helpers/dateHelpers";
 import { Course_Course_by_pk } from "../../queries/__generated__/Course";
-import { BlockTitle } from "../common/BlockTitle";
+import { BlockTitle } from "@opencampus/shared-components";
 
 interface IProps {
   course: Course_Course_by_pk;

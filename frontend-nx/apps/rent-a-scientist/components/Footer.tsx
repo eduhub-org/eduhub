@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { FC } from "react";
-import { ClientOnly } from "./common/ClientOnly";
+import { ClientOnly } from "@opencampus/shared-components";
 import { OnlyAdmin } from "./common/OnlyLoggedIn";
 
 export const Footer: FC = () => {

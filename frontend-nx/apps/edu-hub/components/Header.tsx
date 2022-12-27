@@ -11,9 +11,8 @@ import eduLogo from "../public/images/edu_logo.svg";
 import { LoginButton } from "./LoginButton";
 import { Menu } from "./Menu";
 import { RegisterButton } from "./RegisterButton";
-import { Avatar } from "./common/Avatar";
-import { OnlyDesktop } from "./common/OnlyDesktop";
-import { ClientOnly } from "./common/ClientOnly";
+import { Avatar, ClientOnly } from "@opencampus/shared-components";
+import { OnlyDesktop } from "@opencampus/shared-components"
 
 export const Header: FC = () => {
   const isLoggedIn = useIsLoggedIn();

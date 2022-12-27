@@ -6,7 +6,7 @@ import { FC, useMemo } from "react";
 import header from "../public/static/header.jpg";
 import { QUERY_RSA_CONFIG } from "../queries/ras_config";
 import { QueryRSAConfig } from "../queries/__generated__/QueryRSAConfig";
-import { ClientOnly } from "./common/ClientOnly";
+import { ClientOnly } from "@opencampus/shared-components";
 import { LoginButton } from "./LoginButton";
 
 export const Header: FC = () => {

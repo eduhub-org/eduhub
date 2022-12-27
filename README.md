@@ -95,7 +95,6 @@ X updateKeycloakProfile is not added to hasura, updateFromKeycloak does not inse
 # Talk to Faiz
 
 - What is that "Anwesenheit und the CourseAchievement stuff in the instructor course manage page AuthorizedManageCourse
-- The database design with an extra table for course instructors makes it hard to create a course in the empty database. Not a big issue, since the database will not be empty in production, as the old data is imported into it... Still makes it awkward to create a course for a new course instructor? -> First create the course, then create the course instructor entry
 - check out the new achievement functions for completion
 - setup i18n for en/de, I will do the translation
 - fix template-upload to show an link to the file instead

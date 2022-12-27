@@ -2,7 +2,7 @@ import { useMutation } from "@apollo/client";
 import { Button } from "@material-ui/core";
 import Head from "next/head";
 import { FC, useCallback, useEffect, useState } from "react";
-import { ClientOnly } from "../components/common/ClientOnly";
+import { ClientOnly } from "@opencampus/shared-components";
 import { OnlyLoggedIn } from "../components/common/OnlyLoggedIn";
 import { OnlyLoggedOut } from "../components/common/OnlyLoggedOut";
 import { RegisterButton } from "../components/LoginButton";

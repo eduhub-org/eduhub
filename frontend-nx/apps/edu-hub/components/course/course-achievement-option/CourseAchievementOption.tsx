@@ -11,7 +11,7 @@ import {
 import { Button } from "../../common/Button";
 import { useAdminQuery } from "../../../hooks/authedQuery";
 import { ACHIEVEMENT_OPTION_COURSES } from "../../../queries/achievementOptionCourse";
-import { BlockTitle } from "../../common/BlockTitle";
+import { BlockTitle } from "@opencampus/shared-components";
 import ModalControl from "../../common/ModalController";
 import ProjectResultsUpload from "./ProjectResultsUpload";
 

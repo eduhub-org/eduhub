@@ -21,7 +21,7 @@ import { SessionsTab } from "./SessionsTab";
 import { ApplicationTab } from "./ApplicationTab";
 import ManageCourseEnrollment from "./ManageCourseEnrollment";
 import { ContentRow } from "../common/ContentRow";
-import { BlockTitle } from "../common/BlockTitle";
+import { BlockTitle } from "@opencampus/shared-components";
 import CourseAchievementOption from "../course/course-achievement-option/CourseAchievementOption";
 
 interface Props {
@@ -93,7 +93,7 @@ const canUpgradeStatus = (course: ManagedCourse_Course_by_pk) => {
           session.SessionAddresses.length > 0
       ) &&
       new Set(course.Sessions.map((s) => s.title)).size ===
-        course.Sessions.length
+      course.Sessions.length
     );
   } else if (course.status === "READY_FOR_APPLICATION") {
     return (
