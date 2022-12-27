@@ -1,3 +1,15 @@
+# Todos Steffen
+
+- Rent-a-Scientist hasura access is broken because of the schema changes. I've tried a little to fix it, but could not get it to work. Somehow all the graphql definitions have to be modified for it to access the right schema in the database. Either move back the tables to the public schema or figure out how to correctly modify the GraphQL in rent-a-scientist. I've excluded rent-a-scientist from the apollo rebuild script for now for this reason.
+- Verify the new linter github action, it targets frontend-nx now
+- Fix production builds, especially the broken import path in the serverless functions
+- Make sure nobody has pending pushes that change anything in ./frontend or ./rent-a-scientist, since deleting that will cause ugly merge conflicts
+- Once production builds work: Delete ./frontend, ./rent-a-scientist, remove the old frontend config from the docker-compose.yml file, only leave the new frontend-nx.
+- Remember until this todo has been done there are multiple frontends running:
+- Port 5000 is the new version
+- Port 5001 is the rent-a-scientist frontend
+- Port 5005 serves the old frontend, it is meant to be removed
+
 # Edu-Hub local development
 
 Edu-Hub uses docker-compose to support full local development that does not depend on any external servers or secret database seeds anymore.
@@ -35,7 +47,8 @@ The following ports on the local machine are relevant
 
 - Port 4001 serves the files uploaded by the various serverless functions, during local development there is no concept of private links, all files can be directly accessed. This is because local development does not use google cloud buckets.
 - Port 8080 provides the hasura API
-- Port 5000 provides the Edu-Hub Frontend
+- Port 5000 provides the Edu-Hub frontend
+- Port 50001 provides the rent-a-scientist frontend
 - Port 28080 provides the keycloak admin interface, login as **admin** with password **admin**
 - Port 42000 to ~420025 provide serverless functions, each function has its own port, development of serverless functions might use these directly
 
@@ -86,19 +99,3 @@ This changes however requires changes in what commands are used to build the app
 - Then the compiled app should be under `./frontend-nx/dist/*`
 - There will need to be a new Dockerfile for production builds, likely a slightly modified version of `./frontend/Dockerfile`, which uses the changed build commands and output paths.
 - Or maybe even multiple ones, one per frontend.
-
-# Todos Steffen
-
-- Rent-a-Scientist hasura access is broken because of the schema changes. I've tried a little to fix it, but could not get it to work. Somehow all the graphql definitions have to be modified for it to access the right schema in the database. Either move back the tables to the public schema or figure out how to correctly modify the GraphQL in rent-a-scientist. I've excluded rent-a-scientist from the apollo rebuild script for now for this reason.
-- Verify the new linter github action, it targets frontend-nx now
-- Fix production builds, especially the broken import path in the serverless functions
-- Once production builds work: Delete ./frontend, ./rent-a-scientist, remove the old frontend config from the docker-compose.yml file, only leave the new frontend-nx.
-- Make sure nobody has pending pushes that change anything in ./frontend or ./rent-a-scientist, since deleting that will cause ugly merge conflicts
-
-# Talk to Faiz
-
-- What is that "Anwesenheit und the CourseAchievement stuff in the instructor course manage page AuthorizedManageCourse
-- check out the new achievement functions for completion, I am pretty sure there are still minor bugs in it at least, like hard coded course IDs or user IDs. Now with local serverless functions this should not be necessary anymore.
-- setup i18n for en/de, I will do the translation
-- fix template-upload to show an link to the file instead
-- the certificates generation button should only be displayed in the last instructor course manage tab

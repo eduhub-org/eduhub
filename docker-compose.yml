@@ -6,8 +6,8 @@ version: "3.8"
 services:
   frontend-nx:
     ports:
-      - "5001:4200"
-      - "5002:4201"
+      - "5000:4200"
+      - "5001:4201"
     build:
       context: ./frontend-nx
       dockerfile: Dockerfile-dev
@@ -21,7 +21,7 @@ services:
 
   frontend:
     ports:
-      - "5000:5000"
+      - "5005:5000"
     build:
       context: ./frontend
       dockerfile: Dockerfile-dev
