@@ -28,7 +28,7 @@ export const useUser = () => {
   }
 };
 
-interface IUserProfile {
+export interface IUserProfile {
   email: string | undefined;
   firstName: string | undefined;
   lastName: string | undefined;

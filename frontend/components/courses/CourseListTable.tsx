@@ -1,4 +1,3 @@
-import { TFunction } from "next-i18next";
 import { FC, useCallback, useState } from "react";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 import { QUERY_LIMIT } from "../../pages/courses";
@@ -10,7 +9,7 @@ import { Programs_Program } from "../../queries/__generated__/Programs";
 import SingleCourseRow from "./SingleCourseRow";
 
 interface IProps {
-  t: TFunction;
+  t: any;
   programs: Programs_Program[];
   courseListRequest: any;
   updateFilter: (newState: AdminCourseListVariables) => void;

@@ -14,7 +14,7 @@ const UPDATE_USER = gql`
   }
 `;
 
-const updateUser = async (accessToken: string, userId: string) => {
+export const updateUser = async (accessToken: string, userId: string) => {
   try {
     const graphQLClient = new GraphQLClient(
       process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/v1/graphql",
@@ -27,6 +27,7 @@ const updateUser = async (accessToken: string, userId: string) => {
     );
 
     const data = await graphQLClient.request(UPDATE_USER, { id: userId });
+    console.log("Update user result", data);
   } catch (e) {
     console.error(e);
   }
@@ -66,7 +67,10 @@ export default NextAuth({
   providers: [
     KeycloakProvider({
       clientId: "hasura",
-      clientSecret: process.env.KEYCLOAK_HASURA_CLIENT_SECRET!,
+      clientSecret:
+        process.env.KEYCLOAK_HASURA_CLIENT_SECRET ||
+        process.env.CLIENT_SECRET ||
+        process.env.NEXT_AUTH_CLIENT_SECRET!,
       authorization: `${process.env.NEXT_PUBLIC_AUTH_URL}/auth`,
       issuer: `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub`,
       idToken: true,

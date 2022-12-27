@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.check-list {
+  background: url(/images/course/checkmark.svg) no-repeat 0 0.5rem;
+  list-style: none;
+  padding-left: 2rem;
+}

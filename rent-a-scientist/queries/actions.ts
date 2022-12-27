@@ -11,16 +11,16 @@ import { gql } from "@apollo/client";
 // - loadFile then returns the full URL with a token parameter to access the data, but only if the current user
 // is allowed to access the data
 
-export const SAVE_FILE = gql`
-  mutation SaveAFile($base64file: String!, $fileName: String!) {
-    saveFile(base64file: $base64file, filename: $fileName)
-  }
-`;
+// export const SAVE_FILE = gql`
+//   mutation SaveAFile($base64file: String!, $fileName: String!) {
+//     saveFile(base64file: $base64file, filename: $fileName)
+//   }
+// `;
 
-export const LOAD_FILE = gql`
-  query LoadAFile($path: String!) {
-    loadFile(path: $path) {
-      link
-    }
-  }
-`;
+// export const LOAD_FILE = gql`
+//   query LoadAFile($path: String!) {
+//     loadFile(path: $path) {
+//       link
+//     }
+//   }
+// `;
