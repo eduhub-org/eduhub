@@ -33,7 +33,9 @@ const keycloakRefreshToken = async (
       keycloakParamsToRefreshToken.append("client_id", "hasura");
       keycloakParamsToRefreshToken.append(
         "client_secret",
-        process.env.NEXT_AUTH_CLIENT_SECRET!
+        process.env.KEYCLOAK_HASURA_CLIENT_SECRET ||
+          process.env.CLIENT_SECRET ||
+          process.env.NEXT_AUTH_CLIENT_SECRET!
       );
       keycloakParamsToRefreshToken.append(
         "grant_type",
