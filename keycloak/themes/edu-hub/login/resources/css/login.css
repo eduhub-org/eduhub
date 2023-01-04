@@ -345,6 +345,18 @@ div.kc-logo-text span {
     margin-bottom: 0;
 }
 
+#kc-registration a {
+    color: #222;
+}
+
+.login-pf-settings a {
+    color: #222;
+}
+
+.login-pf-settings a:hover {
+    color: #222;
+}
+
 /* TOTP */
 
 .subtitle {

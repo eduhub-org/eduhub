@@ -62,11 +62,12 @@
 }
 
 .pf-c-form-control {
-  border-color: #0D888D;
+  border-color: rgb(34,34,34);
 }
 
 .pf-c-form-control:hover {
-  border-color: #0D888D;
+  border-color: rgb(34,34,34);
+  border-bottom-width: 1px;
 }
 
 .card-pf {
@@ -82,9 +83,10 @@
 
 .pf-c-button.pf-m-primary {
   background-image: none;
-  background-color: rgb(34,34,34);
-  border-color: #0b7478;
+  background: transparent;
+  border: 2px solid rgb(34,34,34);
   border-radius: 9999px;
+  color: rgb(34,34,34);
   padding: 8px 24px;
   text-transform: lowercase;
 }
@@ -96,7 +98,8 @@
 
 .pf-c-button.pf-m-primary:hover {
   background-image: none;
-  background-color: #0b7478;
+  background-color: rgb(34,34,34);
+  color: #FFF;
 }
 
 a {
