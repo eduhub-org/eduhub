@@ -125,7 +125,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
-      <MenuItem onClick={() => signOut()}>
+      <MenuItem onClick={() => logout()}>
         <span className="w-full text-lg">Logout</span>
       </MenuItem>
     </StyledMenu>

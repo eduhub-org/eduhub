@@ -1,4 +1,9 @@
-import { AnchorHTMLAttributes, ButtonHTMLAttributes, FC, ReactNode } from "react";
+import {
+  AnchorHTMLAttributes,
+  ButtonHTMLAttributes,
+  FC,
+  ReactNode,
+} from "react";
 import Link, { LinkProps } from "next/link";
 
 type Props =
