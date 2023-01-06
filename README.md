@@ -10,9 +10,9 @@
 - Port 5001 is the rent-a-scientist frontend
 - Port 5005 serves the old frontend, it is meant to be removed
 
-# Edu-Hub local development
+# EduHub local development
 
-Edu-Hub uses docker-compose to support full local development that does not depend on any external servers or secret database seeds anymore.
+EduHub uses docker-compose to support full local development that does not depend on any external servers or secret database seeds anymore.
 
 ## Requirements for the host machine
 
