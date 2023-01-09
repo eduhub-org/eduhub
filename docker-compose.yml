@@ -120,4 +120,5 @@ services:
     volumes:
       - ./keycloak/imports-dev:/opt/keycloak/data/import
       - ./keycloak/themes/opencampus:/opt/keycloak/themes/opencampus
+      - ./keycloak/themes/edu-hub:/opt/keycloak/themes/edu-hub
       - ./keycloak/disable-theme-cache.cli:/opt/keycloak/startup-scripts/disable-theme-cache.cli

@@ -1,4 +1,4 @@
-# Todos Steffen
+# Todos
 
 - Rent-a-Scientist hasura access is broken because of the schema changes. I've tried a little to fix it, but could not get it to work. Somehow all the graphql definitions have to be modified for it to access the right schema in the database. Either move back the tables to the public schema or figure out how to correctly modify the GraphQL in rent-a-scientist. I've excluded rent-a-scientist from the apollo rebuild script for now for this reason.
 - Verify the new linter github action, it targets frontend-nx now
@@ -10,9 +10,9 @@
 - Port 5001 is the rent-a-scientist frontend
 - Port 5005 serves the old frontend, it is meant to be removed
 
-# Edu-Hub local development
+# EduHub local development
 
-Edu-Hub uses docker-compose to support full local development that does not depend on any external servers or secret database seeds anymore.
+EduHub uses docker-compose to support full local development that does not depend on any external servers or secret database seeds anymore.
 
 ## Requirements for the host machine
 
