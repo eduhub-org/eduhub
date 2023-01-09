@@ -5,7 +5,7 @@
     "body-parser": "1.19.0"
   },
   "devDependencies": {
-    "npm-watch": "^0.6.0",
+    "npm-watch": "^0.11.0",
     "@google-cloud/functions-framework": "^3.1.2"
   },
   "watch": {
