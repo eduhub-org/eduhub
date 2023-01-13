@@ -103,13 +103,13 @@ interface IProps {
 
 const getLegacyLanguage = (legacy: string | null) => {
   if (legacy == null) {
-    return "German";
+    return "DE";
   }
   const lowLegacy = legacy.toLocaleLowerCase();
   if (lowLegacy.includes("deutsch") || lowLegacy.includes("german")) {
-    return "German";
+    return "DE";
   } else {
-    return "English";
+    return "EN";
   }
 };
 
@@ -462,8 +462,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
                 onChange={updateCourseLanguage}
                 className="w-full h-8 bg-edu-light-gray"
               >
-                <option value="German">Deutsch</option>
-                <option value="English">Englisch</option>
+                <option value="DE">Deutsch</option>
+                <option value="EN">Englisch</option>
               </select>
             </div>
           </div>
