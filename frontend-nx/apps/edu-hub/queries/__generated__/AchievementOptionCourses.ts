@@ -11,6 +11,7 @@ import { AchievementOptionCourse_bool_exp, AchievementOptionCourse_order_by, Ach
 
 export interface AchievementOptionCourses_AchievementOptionCourse_AchievementOption {
   __typename: "AchievementOption";
+  id: number;
   /**
    * Title of an offered achievement option
    */

@@ -1,45 +1,35 @@
 import useTranslation from 'next-translate/useTranslation';
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { FC } from "react";
-import AchievementOptionDashboard from "../../components/achievements/AchievementOptionDashboard";
-import CommonPageHeader from "../../components/common/CommonPageHeader";
-import { Page } from "../../components/Page";
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { FC } from 'react';
+import AchievementOptionDashboard from '../../components/achievements/AchievementOptionDashboard';
+import CommonPageHeader from '../../components/common/CommonPageHeader';
+import { Page } from '../../components/Page';
 import {
   DefaultAchievementOptions,
   QUERY_LIMIT,
-} from "../../helpers/achievement";
-import { useAdminQuery } from "../../hooks/authedQuery";
+} from '../../helpers/achievement';
+import { useAdminQuery } from '../../hooks/authedQuery';
 import {
   useIsAdmin,
   useIsInstructor,
   useIsLoggedIn,
-} from "../../hooks/authentication";
-import { useKeycloakUserProfile, useUserId } from "../../hooks/user";
-import { ACHIEVEMENT_RECORD_TYPES } from "../../queries/achievement";
-import { ADMIN_COURSE_LIST } from "../../queries/courseList";
-import { AchievementRecordTypes } from "../../queries/__generated__/AchievementRecordTypes";
+} from '../../hooks/authentication';
+import { useKeycloakUserProfile, useUserId } from '../../hooks/user';
+import { ACHIEVEMENT_RECORD_TYPES } from '../../queries/achievement';
+import { ADMIN_COURSE_LIST } from '../../queries/courseList';
+import { AchievementRecordTypes } from '../../queries/__generated__/AchievementRecordTypes';
 import {
   AdminCourseList,
   AdminCourseListVariables,
   AdminCourseList_Course,
-} from "../../queries/__generated__/AdminCourseList";
-
-// export const getStaticProps = async ({ locale }: { locale: string }) => ({
-//   props: {
-//     ...(await serverSideTranslations(locale, [
-//       "common",
-//       "achievements-page",
-//       "course-page",
-//     ])),
-//   },
-// });
+} from '../../queries/__generated__/AdminCourseList';
 
 const Achievements: FC = () => {
   const isAdmin = useIsAdmin();
   const isLoggedIn = useIsLoggedIn();
   const isInstructor = useIsInstructor();
-  const { t } = useTranslation("achievements-page");
+  const { t } = useTranslation('achievements-page');
   const router = useRouter();
   const userId = useUserId();
   const profile = useKeycloakUserProfile();
@@ -77,12 +67,12 @@ const Achievements: FC = () => {
     ) || DefaultAchievementOptions;
 
   const header = isAdmin
-    ? "Achievement Administration"
-    : "Administration Leistungsnachweise";
+    ? t('achievement-record-admin')
+    : t('achievement-record');
   return (
     <>
       <Head>
-        <title>{t("title")}</title>
+        <title>{t('title')}</title>
       </Head>
       <Page>
         <div className="min-h-[77vh]">

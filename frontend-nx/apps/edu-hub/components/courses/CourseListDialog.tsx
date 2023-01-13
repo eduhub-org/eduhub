@@ -1,16 +1,17 @@
-import { Dialog, DialogContent, DialogTitle } from "@material-ui/core";
-import { FC, useCallback, useState } from "react";
-import { MdClose } from "react-icons/md";
-import { useAdminQuery } from "../../hooks/authedQuery";
-import { QUERY_LIMIT } from "../../pages/courses";
-import { ADMIN_COURSE_LIST } from "../../queries/courseList";
+import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
+import useTranslation from 'next-translate/useTranslation';
+import { FC, useCallback, useState } from 'react';
+import { MdClose } from 'react-icons/md';
+import { useAdminQuery } from '../../hooks/authedQuery';
+import { QUERY_LIMIT } from '../../pages/courses';
+import { ADMIN_COURSE_LIST } from '../../queries/courseList';
 import {
   AdminCourseList,
   AdminCourseListVariables,
   AdminCourseList_Course,
-} from "../../queries/__generated__/AdminCourseList";
-import { Button } from "../common/Button";
-import Searchbar from "../common/Searchbar";
+} from '../../queries/__generated__/AdminCourseList';
+import { Button } from '../common/Button';
+import SearchBox from '../common/SearchBox';
 
 interface IProps {
   title: string;
@@ -19,10 +20,11 @@ interface IProps {
 }
 
 const CourseListDialog: FC<IProps> = (props) => {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
+  const { t } = useTranslation();
 
   const handleCancel = useCallback(() => {
-    setSearchValue("");
+    setSearchValue('');
     props.onClose(false, null);
   }, [props]);
 
@@ -47,7 +49,7 @@ const CourseListDialog: FC<IProps> = (props) => {
 
   const onCourseClick = useCallback(
     (course: AdminCourseList_Course) => {
-      setSearchValue("");
+      setSearchValue('');
       props.onClose(false, course);
     },
     [setSearchValue, props]
@@ -73,7 +75,7 @@ const CourseListDialog: FC<IProps> = (props) => {
         </div>
 
         <div className="py-2">
-          <Searchbar
+          <SearchBox
             placeholder="Suchwert"
             onChangeCallback={handleNewInput}
             searchText={searchValue}
@@ -92,7 +94,7 @@ const CourseListDialog: FC<IProps> = (props) => {
         )}
 
         <div className="flex justify-center my-2">
-          <Button onClick={handleCancel}>Abbrechen</Button>
+          <Button onClick={handleCancel}>{t('cancel')}</Button>
           <div />
         </div>
       </DialogContent>

@@ -19,19 +19,19 @@ services:
       - hasura
       - keycloak
 
-  frontend:
-    ports:
-      - "5005:5000"
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile-dev
-    # uncomment this to disable automatic yarn dev on frontend startup
-    #command: tail -F anything
-    volumes:
-      - ./frontend:/opt/app
-    depends_on:
-      - hasura
-      - keycloak
+  # frontend:
+  #   ports:
+  #     - "5005:5000"
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile-dev
+  #   # uncomment this to disable automatic yarn dev on frontend startup
+  #   #command: tail -F anything
+  #   volumes:
+  #     - ./frontend:/opt/app
+  #   depends_on:
+  #     - hasura
+  #     - keycloak
 
   functions:
     image: node:18-bullseye-slim

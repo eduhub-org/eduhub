@@ -1,16 +1,16 @@
-import { Dialog, DialogContent, DialogTitle } from "@material-ui/core";
-import { FC, useCallback, useState } from "react";
-import { MdClose } from "react-icons/md";
-import { makeFullName } from "../../../helpers/util";
-import { useAdminQuery } from "../../../hooks/authedQuery";
-import { EXPERT_LIST } from "../../../queries/expert";
+import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
+import { FC, useCallback, useState } from 'react';
+import { MdClose } from 'react-icons/md';
+import { makeFullName } from '../../../helpers/util';
+import { useAdminQuery } from '../../../hooks/authedQuery';
+import { EXPERT_LIST } from '../../../queries/expert';
 import {
   ExpertList,
   ExpertListVariables,
   ExpertList_Expert,
-} from "../../../queries/__generated__/ExpertList";
-import { Button } from "../Button";
-import Searchbar from "../Searchbar";
+} from '../../../queries/__generated__/ExpertList';
+import { Button } from '../Button';
+import SearchBox from '../SearchBox';
 
 interface IProps {
   title: string;
@@ -19,10 +19,10 @@ interface IProps {
 }
 
 const ExpertsDialog: FC<IProps> = (props) => {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
 
   const handleCancel = useCallback(() => {
-    setSearchValue("");
+    setSearchValue('');
     props.onClose(false, null);
   }, [props]);
 
@@ -50,7 +50,7 @@ const ExpertsDialog: FC<IProps> = (props) => {
 
   const onUserClick = useCallback(
     (course: ExpertList_Expert) => {
-      setSearchValue("");
+      setSearchValue('');
       props.onClose(false, course);
     },
     [setSearchValue, props]
@@ -76,7 +76,7 @@ const ExpertsDialog: FC<IProps> = (props) => {
           Nutzer per Klick auswählen.
         </div>
         <div className="py-2">
-          <Searchbar
+          <SearchBox
             placeholder="Suchwert"
             onChangeCallback={handleNewInput}
             searchText={searchValue}

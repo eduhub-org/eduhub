@@ -148,6 +148,10 @@ export interface ManagedCourse_Course_by_pk_Program {
    * The last day a course lecture can possibly be in this program.
    */
   lectureEnd: any | null;
+  /**
+   * The deadline for the achievement record uploads.
+   */
+  achievementRecordUploadDeadline: any | null;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances_Session {

@@ -1,7 +1,7 @@
-import { gql } from "@apollo/client";
-import { COURSE_INSTRUCTOR_FRAGMENT } from "./courseInstructorFragment";
+import { gql } from '@apollo/client';
+import { COURSE_INSTRUCTOR_FRAGMENT } from './courseInstructorFragment';
 
-import { SESSION_FRAGMENT } from "./sessionFragement";
+import { SESSION_FRAGMENT } from './sessionFragement';
 
 export const COURSE_FRAGMENT = gql`
   ${SESSION_FRAGMENT}
@@ -50,6 +50,7 @@ export const ADMIN_COURSE_FRAGMENT = gql`
       shortTitle
       lectureStart
       lectureEnd
+      achievementRecordUploadDeadline
     }
   }
 `;

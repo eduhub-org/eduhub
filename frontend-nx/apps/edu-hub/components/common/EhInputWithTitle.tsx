@@ -1,5 +1,5 @@
-import { FC, useCallback } from "react";
-import { DebounceInput } from "react-debounce-input";
+import { FC, useCallback } from 'react';
+import { DebounceInput } from 'react-debounce-input';
 
 interface IPros {
   label: string;
@@ -9,6 +9,7 @@ interface IPros {
   textArea?: boolean;
   disabled?: boolean;
   autoFocus?: boolean;
+  maxLength?: number;
   onChangeHandler?: (value: string) => any;
 }
 const EhInputWithTitle: FC<IPros> = ({
@@ -19,6 +20,7 @@ const EhInputWithTitle: FC<IPros> = ({
   textArea,
   disabled,
   autoFocus,
+  maxLength,
   onChangeHandler,
 }) => {
   const handOnchange = useCallback(
@@ -39,14 +41,15 @@ const EhInputWithTitle: FC<IPros> = ({
             w-full
             border border-solid border-gray-300
             focus:border-none focus:outline-none`}
-        element={textArea ? "textarea" : "input"}
+        element={textArea ? 'textarea' : 'input'}
         forceNotifyByEnter={!textArea}
         debounceTimeout={debounceTime ?? 1000}
-        value={inputText ?? ""}
+        value={inputText ?? ''}
         onChange={handOnchange}
         placeholder={placeholder}
         disabled={disabled}
         autoFocus={autoFocus ?? false}
+        maxLength={maxLength ?? 200}
       />
     </div>
   );

@@ -1,5 +1,5 @@
-import { AchievementRecordType_enum } from "../__generated__/globalTypes";
-import { UploadFile } from "./filehandling";
+import { AchievementRecordType_enum } from '../__generated__/globalTypes';
+import { UploadFile } from './filehandling';
 
 export const QUERY_LIMIT = 100;
 
@@ -23,7 +23,7 @@ export interface IDataToManipulate {
   mentors: TempAchievementOptionMentor[];
   courses: TempAchievementOptionCourse[];
   documentTemplateFile?: UploadFile;
-  evalutionScriptFile?: UploadFile;
+  evaluationScriptFile?: UploadFile;
 }
 
 export interface IPayload {
@@ -38,9 +38,9 @@ export interface IPayload {
 }
 
 export const DefaultAchievementOptions: string[] = [
-  "ONLINE",
-  "DOCUMENTATION",
-  "DOCUMENTATION_AND_CSV",
+  'ONLINE',
+  'DOCUMENTATION',
+  'DOCUMENTATION_AND_CSV',
 ];
 
 /**
@@ -49,20 +49,20 @@ export const DefaultAchievementOptions: string[] = [
  */
 export const UploadFileTypes = {
   SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE:
-    "saveAchievementOptionDocumentationTemplate",
+    'saveAchievementOptionDocumentationTemplate',
   SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT:
-    "saveAchievementOptionEvaluationScript",
+    'saveAchievementOptionEvaluationScript',
 };
 
 export const AchievementKeys = {
-  CSV_TEMPLATE_URL: "csvTemplateUrl",
-  DESCRIPTION: "description",
-  RECORD_TYPE: "recordType",
-  TITLE: "title",
-  ADD_A_MENTOR: "addAMentor",
-  DELETE_A_MENTOR: "deleteAMentor",
-  ADD_A_COURSE: "addACourse",
-  DELETE_A_COURSE: "deleteACourse",
-  DOCUMENT_TEMPLATE_FILE: "documentTemplateFile",
-  EVALUTION_SCRIPT_FILE: "evalutionScriptFile",
+  CSV_TEMPLATE_URL: 'csvTemplateUrl',
+  DESCRIPTION: 'description',
+  RECORD_TYPE: 'recordType',
+  TITLE: 'title',
+  ADD_A_MENTOR: 'addAMentor',
+  DELETE_A_MENTOR: 'deleteAMentor',
+  ADD_A_COURSE: 'addACourse',
+  DELETE_A_COURSE: 'deleteACourse',
+  DOCUMENT_TEMPLATE_FILE: 'documentTemplateFile',
+  EVALUATION_SCRIPT_FILE: 'evaluationScriptFile',
 };

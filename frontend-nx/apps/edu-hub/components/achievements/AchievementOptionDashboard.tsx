@@ -1,58 +1,60 @@
-import { IconButton } from "@material-ui/core";
+import { IconButton } from '@material-ui/core';
+import { Translate } from 'next-translate';
 import useTranslation from 'next-translate/useTranslation';
-import { createContext, FC, useCallback, useContext, useState } from "react";
+import { createContext, FC, useCallback, useContext, useState } from 'react';
 import {
   MdDelete,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
-} from "react-icons/md";
-import { IPayload, UploadFileTypes } from "../../helpers/achievement";
-import { UploadFile } from "../../helpers/filehandling";
-import { makeFullName } from "../../helpers/util";
-import { useAdminMutation } from "../../hooks/authedMutation";
-import { useAdminQuery } from "../../hooks/authedQuery";
-import { IUserProfile } from "../../hooks/user";
-import { ACHIEVEMENT_OPTIONS } from "../../queries/achievement";
+} from 'react-icons/md';
+import { IPayload, UploadFileTypes } from '../../helpers/achievement';
+import { UploadFile } from '../../helpers/filehandling';
+import { makeFullName } from '../../helpers/util';
+import { useAdminMutation } from '../../hooks/authedMutation';
+import { useAdminQuery } from '../../hooks/authedQuery';
+import { IUserProfile } from '../../hooks/user';
+import { ACHIEVEMENT_OPTIONS } from '../../queries/achievement';
 import {
   SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE,
   SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT,
-} from "../../queries/actions";
+} from '../../queries/actions';
 import {
   DELETE_AN_ACHIEVEMENT_OPTION,
   UPDATE_AN_ACHIEVEMENT_OPTION,
-} from "../../queries/mutateAchievement";
-import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from "../../queries/programList";
+} from '../../queries/mutateAchievement';
+import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../queries/programList';
 import {
   AchievementOptionList,
   AchievementOptionListVariables,
   AchievementOptionList_AchievementOption,
-} from "../../queries/__generated__/AchievementOptionList";
-import { AdminCourseList_Course } from "../../queries/__generated__/AdminCourseList";
+} from '../../queries/__generated__/AchievementOptionList';
+import { AdminCourseList_Course } from '../../queries/__generated__/AdminCourseList';
 import {
   DeleteAnAchievementOption,
   DeleteAnAchievementOptionVariables,
-} from "../../queries/__generated__/DeleteAnAchievementOption";
-import { Programs } from "../../queries/__generated__/Programs";
+} from '../../queries/__generated__/DeleteAnAchievementOption';
+import { Programs } from '../../queries/__generated__/Programs';
 import {
   SaveAchievementOptionDocumentationTemplate,
   SaveAchievementOptionDocumentationTemplateVariables,
-} from "../../queries/__generated__/SaveAchievementOptionDocumentationTemplate";
+} from '../../queries/__generated__/SaveAchievementOptionDocumentationTemplate';
 import {
   SaveAchievementOptionEvaluationScript,
   SaveAchievementOptionEvaluationScriptVariables,
-} from "../../queries/__generated__/SaveAchievementOptionEvaluationScript";
+} from '../../queries/__generated__/SaveAchievementOptionEvaluationScript';
 import {
   UpdateAnAchievementOption,
   UpdateAnAchievementOptionVariables,
-} from "../../queries/__generated__/UpdateAnAchievementOption";
-import { StaticComponentProperty } from "../../types/UIComponents";
-import EhAddButton from "../common/EhAddButton";
-import EhTag from "../common/EhTag";
-import TagWithTwoText from "../common/TagWithTwoText";
-import Loading from "../courses/Loading";
-import { ProgramsMenubar } from "../program/ProgramsMenubar";
-import AddAchievemenOption from "./AddAchievementOption";
-import EditAchievementOption from "./EditAchievementOption";
+} from '../../queries/__generated__/UpdateAnAchievementOption';
+import { StaticComponentProperty } from '../../types/UIComponents';
+import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
+import EhAddButton from '../common/EhAddButton';
+import EhTag from '../common/EhTag';
+import TagWithTwoText from '../common/TagWithTwoText';
+import Loading from '../courses/Loading';
+import { ProgramsMenubar } from '../program/ProgramsMenubar';
+import AddAchievementOption from './AddAchievementOption';
+import EditAchievementOption from './EditAchievementOption';
 
 interface IContext {
   achievementRTypes: string[];
@@ -65,13 +67,15 @@ interface IContext {
   queryUpdateAchievementOptions: (
     id: number,
     payLoad: IPayload,
-    onSuccess?: (sucsse: boolean) => void
+    onSuccess?: (success: boolean) => void
   ) => Promise<boolean>;
   uploadFile: (
     file: UploadFile,
     achievementOptionId: number,
     type: string
   ) => Promise<string | undefined>;
+  t: Translate;
+  setAlertMessage: (message: string) => void;
 }
 
 export const AchievementContext = createContext({} as IContext);
@@ -85,7 +89,9 @@ interface IPropsDashBoard {
 const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
   const defaultProgram = -1; // All tab
   const [currentProgramId, setCurrentProgramId] = useState(defaultProgram);
+  const [alertMessage, setAlertMessage] = useState('');
 
+  const { t } = useTranslation();
   const achievementsRequest = useAdminQuery<
     AchievementOptionList,
     AchievementOptionListVariables
@@ -94,14 +100,14 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
       where:
         currentProgramId > -1
           ? {
-            AchievementOptionCourses: {
-              Course: {
-                Program: {
-                  id: { _eq: currentProgramId },
+              AchievementOptionCourses: {
+                Course: {
+                  Program: {
+                    id: { _eq: currentProgramId },
+                  },
                 },
               },
-            },
-          }
+            }
           : {},
     },
   });
@@ -110,7 +116,7 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
     achievementsRequest.refetch();
   }, [achievementsRequest]);
 
-  const aoptions = [...(achievementsRequest.data?.AchievementOption || [])];
+  const aOptions = [...(achievementsRequest.data?.AchievementOption || [])];
 
   const [updateAchievement] = useAdminMutation<
     UpdateAnAchievementOption,
@@ -121,7 +127,7 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
     async (
       id: number,
       payLoad: IPayload,
-      onSuccess?: (sucsse: boolean) => void
+      onSuccess?: (success: boolean) => void
     ): Promise<boolean> => {
       try {
         const response = await updateAchievement({
@@ -148,7 +154,7 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
     [updateAchievement]
   );
 
-  /* #region Database and ServerLess Fuctions Declarations */
+  /* #region Database and ServerLess Functions Declarations */
   const [saveAchievementOptionDocumentationTemplate] = useAdminMutation<
     SaveAchievementOptionDocumentationTemplate,
     SaveAchievementOptionDocumentationTemplateVariables
@@ -167,7 +173,6 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
     type: string
   ): Promise<string | undefined> => {
     let link: string | undefined;
-    console.log(file, type);
     try {
       switch (type) {
         case UploadFileTypes.SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: {
@@ -180,14 +185,16 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
 
           if (
             response.data &&
-            response.data.saveAchievementOptionDocumentationTemplate?.google_link
+            response.data.saveAchievementOptionDocumentationTemplate
+              ?.google_link
           ) {
             const url =
-              response.data.saveAchievementOptionDocumentationTemplate.google_link;
+              response.data.saveAchievementOptionDocumentationTemplate
+                .google_link;
             const dbResponse = await queryUpdateAchievementOptions(
               achievementOptionId,
               {
-                key: "documentationTemplateUrl",
+                key: 'documentationTemplateUrl',
                 value: url,
               }
             );
@@ -208,11 +215,12 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
             res2.data.saveAchievementOptionEvaluationScript?.google_link
           ) {
             const url =
-              res2.data && res2.data.saveAchievementOptionEvaluationScript.google_link;
+              res2.data &&
+              res2.data.saveAchievementOptionEvaluationScript.google_link;
             const dbResponse = await queryUpdateAchievementOptions(
               achievementOptionId,
               {
-                key: "evaluationScriptUrl",
+                key: 'evaluationScriptUrl',
                 value: url,
               }
             );
@@ -237,12 +245,25 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
     userId: props.userId,
     queryUpdateAchievementOptions,
     uploadFile,
+    t,
+    setAlertMessage,
   };
 
+  const closeAlertDialog = useCallback(() => {
+    setAlertMessage('');
+  }, [setAlertMessage]);
   return (
     <>
       <AchievementContext.Provider value={provider}>
-        <DashboardContent options={aoptions} />
+        {alertMessage.trim().length > 0 && (
+          <AlertMessageDialog
+            alert={alertMessage}
+            confirmationText={'OK'}
+            onClose={closeAlertDialog}
+            open={alertMessage.trim().length > 0}
+          />
+        )}
+        <DashboardContent options={aOptions} />
       </AchievementContext.Provider>
     </>
   );
@@ -301,23 +322,23 @@ const DashboardContent: FC<IPropsContent> = ({ options }) => {
         )}
       </div>
       <div className="flex flex-col space-y-1">
-        <div className="flex justify-end">
+        <div className="flex justify-end ">
           <EhAddButton
             buttonClickCallBack={addNewAchievement}
-            text="Neuen  hinzufügen"
+            text={context.t('add-new')}
           />
         </div>
         <AchievementList options={options} />
         {showNewAchievementView && (
-          <div className="flex bg-edu-light-gray py-5">
-            {<AddAchievemenOption onSuccess={onSuccessAddEdit} />}
+          <div className="flex bg-edu-light-gray">
+            {<AddAchievementOption onSuccess={onSuccessAddEdit} />}
           </div>
         )}
         {context.achievementRTypes.length > 0 && (
           <div className="flex justify-end">
             <EhAddButton
               buttonClickCallBack={addNewAchievement}
-              text="Neuen  hinzufügen"
+              text={context.t('add-new')}
             />
           </div>
         )}
@@ -327,44 +348,27 @@ const DashboardContent: FC<IPropsContent> = ({ options }) => {
 };
 
 // Start AchievementList
-const ml = "ml-[20px]";
 const AchievementList: FC<IPropsContent> = ({ options }) => {
-  const { t } = useTranslation("course-page");
-  const thClass = "font-medium text-gray-700 uppercase";
-  const pClass = "flex justify-start " + ml;
+  const { t } = useTranslation('course-page');
   return (
     <>
-      <table className="w-full table-auto">
-        <thead>
-          <tr>
-            <th className={thClass}>
-              <p className={pClass}>{t("tableHeaderTitle")}</p>
-            </th>
-            <th className={thClass}>
-              <p className={pClass}>{t("tableHeaderInstructor")}</p>
-            </th>
-            <th className={thClass}>
-              <p className={pClass}>{"Kurse & " + t("tableHeaderProgram")}</p>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {options.map((ac: AchievementOptionList_AchievementOption, index) => (
-            <AchievementRow key={`listData-${index}`} acop={ac} />
-          ))}
-        </tbody>
-      </table>
+      <div className="grid grid-cols-3 gap-5 pl-5">
+        <p>{t('tableHeaderTitle')}</p>
+        <p>{t('tableHeaderInstructor')}</p>
+        <p>{t('coursesHeadline') + ' & ' + t('tableHeaderProgram')}</p>
+      </div>
+      {options.map((ac: AchievementOptionList_AchievementOption, index) => (
+        <AchievementRow key={`list-data-${index}`} item={ac} />
+      ))}
     </>
   );
 };
 
 // Start AchievementRow
 interface IPropsForARow {
-  acop: AchievementOptionList_AchievementOption;
+  item: AchievementOptionList_AchievementOption;
 }
 const AchievementRow: FC<IPropsForARow> = (props) => {
-  const pClass = "text-gray-700 truncate font-medium ml-[20px]";
-  const tdClass = ml;
   const [showDetails, setShowDetails] = useState(false);
   const context = useContext(AchievementContext);
 
@@ -387,102 +391,93 @@ const AchievementRow: FC<IPropsForARow> = (props) => {
   >(DELETE_AN_ACHIEVEMENT_OPTION);
 
   const onClickDeleteAnAchievement = useCallback(async () => {
-    const response = await queryDeleteAnAchievement({
-      variables: { id: props.acop.id },
-    });
-    if (response.errors) {
-      console.log(response.errors);
-      onSuccessAddEdit(false);
-    } else {
-      onSuccessAddEdit(true);
+    try {
+      const response = await queryDeleteAnAchievement({
+        variables: { id: props.item.id },
+      });
+      if (response.errors) {
+        console.log(response.errors);
+        onSuccessAddEdit(false);
+      } else {
+        onSuccessAddEdit(true);
+      }
+    } catch (error) {
+      console.log(error);
+      context.setAlertMessage(error.message);
     }
-  }, [queryDeleteAnAchievement, onSuccessAddEdit, props]);
+  }, [queryDeleteAnAchievement, props.item.id, onSuccessAddEdit, context]);
   return (
     <>
-      <tr className="bg-edu-row-color h-12">
-        <td className={tdClass}>
-          {/* Title */}
-          <p className={`${pClass} max-w-[350px]`}>{props.acop.title}</p>
-        </td>
-        <td className={tdClass}>
-          {/* Mentoren */}
-          <div className={`${ml} flex items-center space-x-2`}>
-            {props.acop.AchievementOptionMentors.length > 0 &&
-              props.acop.AchievementOptionMentors[0].User && (
-                <EhTag
-                  tag={{
-                    display: makeFullName(
-                      props.acop.AchievementOptionMentors[0].User.firstName,
-                      props.acop.AchievementOptionMentors[0].User.lastName
-                    ),
-                    id: props.acop.AchievementOptionMentors[0].id,
-                  }}
-                />
-              )}
-            {/* <MdAddCircle
-                className="cursor-pointer inline-block align-middle stroke-cyan-500"
-                onClick={handleArrowClick}
-              /> */}
-          </div>
-        </td>
-        <td className={ml}>
-          {/* Course */}
-          <div className={`flex justify-between ${ml}`}>
-            <div className="flex items-center space-x-2">
-              {props.acop.AchievementOptionCourses.length > 0 && (
+      <div className="grid grid-cols-3 gap-5 pl-5 bg-edu-row-color py-2 items-center">
+        <p className="text-ellipsis text-gray-700 font-medium grid grid-cols-1">
+          {props.item.title}
+        </p>
+        {/* Authors */}
+        <div className="flex items-center flex-wrap gap-2">
+          {props.item.AchievementOptionMentors.map((men, index) => (
+            <div key={`mentor-${index}`} className="grid grid-cols-1">
+              <EhTag
+                tag={{
+                  display: makeFullName(men.User.firstName, men.User.lastName),
+                  id: men.id,
+                }}
+              />
+            </div>
+          ))}
+        </div>
+        {/* Programs and buttons */}
+        <div
+          id="course-programs-buttons"
+          className="flex justify-between gap-5"
+        >
+          <div
+            id="course-programs"
+            className="flex flex-wrap items-center gap-2"
+          >
+            {props.item.AchievementOptionCourses.map((c, index) => (
+              <div key={`view-course-${index}`} className="grid grid-cols-1">
                 <TagWithTwoText
-                  textLeft={props.acop.AchievementOptionCourses[0].Course.title}
-                  textRight={
-                    props.acop.AchievementOptionCourses[0].Course.Program
-                      ?.shortTitle
-                  }
+                  textLeft={c.Course.title}
+                  textRight={c.Course.Program?.shortTitle}
+                  textClickLink={`/manage/course/${c.courseId}`}
                 />
-              )}
-              {/* <MdAddCircle
-                  className="cursor-pointer inline-block align-middle stroke-cyan-500"
-                  onClick={handleArrowClick}
-                /> */}
-            </div>
-            <div className="">
-              <div className="flex px-3 items-center">
-                <button
-                  className="focus:ring-2 rounded-md focus:outline-none"
-                  role="button"
-                  aria-label="option"
-                >
-                  {showDetails ? (
-                    <MdKeyboardArrowUp size={26} onClick={handleArrowClick} />
-                  ) : (
-                    <MdKeyboardArrowDown size={26} onClick={handleArrowClick} />
-                  )}
-                </button>
               </div>
-            </div>
+            ))}
           </div>
-        </td>
-        <td className="bg-white">
-          {/* Delete button */}
-          <IconButton onClick={onClickDeleteAnAchievement} size="small">
-            <MdDelete />
-          </IconButton>
-        </td>
-      </tr>
+          <div id="buttons" className="flex justify-between">
+            <button
+              id={`expand-button-${props.item.id}`}
+              className="focus:ring-2 rounded-md focus:outline-none"
+              role="button"
+              aria-label="option"
+            >
+              {showDetails ? (
+                <MdKeyboardArrowUp size={26} onClick={handleArrowClick} />
+              ) : (
+                <MdKeyboardArrowDown size={26} onClick={handleArrowClick} />
+              )}
+            </button>
+            <IconButton
+              id={`delete-button-${props.item.id}`}
+              onClick={onClickDeleteAnAchievement}
+              size="small"
+            >
+              <MdDelete />
+            </IconButton>
+          </div>
+        </div>
+      </div>
 
       {showDetails && (
-        <tr>
-          <td colSpan={3}>
-            <div className="flex bg-edu-light-gray pt-5">
-              {
-                <EditAchievementOption
-                  achievementOption={props.acop}
-                  onSuccess={onSuccessAddEdit}
-                />
-              }
-            </div>
-          </td>
-        </tr>
+        <div className="bg-edu-light-gray">
+          {
+            <EditAchievementOption
+              achievementOption={props.item}
+              onSuccess={onSuccessAddEdit}
+            />
+          }
+        </div>
       )}
-      <tr className="h-1" />
     </>
   );
 };

@@ -6,48 +6,51 @@ import {
   useReducer,
   useRef,
   useState,
-} from "react";
-import { Button } from "../../common/Button";
+} from 'react';
+import { Button } from '../../common/Button';
 
-import { MdAddCircleOutline } from "react-icons/md";
+import { MdAddCircleOutline } from 'react-icons/md';
 import {
   parseFileUploadEvent,
   UploadFile,
-} from "../../../helpers/filehandling";
-import { makeFullName } from "../../../helpers/util";
-import { useAdminMutation } from "../../../hooks/authedMutation";
+} from '../../../helpers/filehandling';
+import { makeFullName } from '../../../helpers/util';
+import { useAdminMutation } from '../../../hooks/authedMutation';
 import {
   INSERT_AN_ACHIEVEMENT_RECORD,
   UPDATE_AN_ACHIEVEMENT_RECORD,
-} from "../../../queries/achievementRecord";
+} from '../../../queries/achievementRecord';
 import {
   SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE,
   SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION,
-} from "../../../queries/actions";
-import { AchievementOptionCourses_AchievementOptionCourse } from "../../../queries/__generated__/AchievementOptionCourses";
+} from '../../../queries/actions';
+import { AchievementOptionCourses_AchievementOptionCourse } from '../../../queries/__generated__/AchievementOptionCourses';
 import {
   InsertAnAchievementRecord,
   InsertAnAchievementRecordVariables,
-} from "../../../queries/__generated__/InsertAnAchievementRecord";
+} from '../../../queries/__generated__/InsertAnAchievementRecord';
 import {
   SaveAchievementRecordCoverImage,
   SaveAchievementRecordCoverImageVariables,
-} from "../../../queries/__generated__/SaveAchievementRecordCoverImage";
+} from '../../../queries/__generated__/SaveAchievementRecordCoverImage';
 import {
   SaveAchievementRecordDocumentation,
   SaveAchievementRecordDocumentationVariables,
-} from "../../../queries/__generated__/SaveAchievementRecordDocumentation";
+} from '../../../queries/__generated__/SaveAchievementRecordDocumentation';
 import {
   UpdateAchievementRecordByPk,
   UpdateAchievementRecordByPkVariables,
-} from "../../../queries/__generated__/UpdateAchievementRecordByPk";
-import { UserForSelection1_User } from "../../../queries/__generated__/UserForSelection1";
-import { AchievementRecordType_enum } from "../../../__generated__/globalTypes";
-import { ContentRow } from "../../common/ContentRow";
-import { SelectUserDialog } from "../../common/dialogs/SelectUserDialog";
-import EhDebounceInput from "../../common/EhDebounceInput";
-import EhTagStingId from "../../common/EhTagStingId";
-import { ProjectResutlUploadContext } from "./CourseAchievementOption";
+} from '../../../queries/__generated__/UpdateAchievementRecordByPk';
+import { UserForSelection1_User } from '../../../queries/__generated__/UserForSelection1';
+import {
+  AchievementRecordRating_enum,
+  AchievementRecordType_enum,
+} from '../../../__generated__/globalTypes';
+import { ContentRow } from '../../common/ContentRow';
+import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
+import EhDebounceInput from '../../common/EhDebounceInput';
+import EhTagStingId from '../../common/EhTagStingId';
+import { ProjectResultUploadContext } from './CourseAchievementOption';
 
 interface TempUser {
   id: string; // uuid
@@ -73,17 +76,21 @@ interface Type {
 
 interface IProps {
   achievementOptionCourse: AchievementOptionCourses_AchievementOptionCourse;
+  onSuccess: () => void;
 }
-const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
-  const context = useContext(ProjectResutlUploadContext);
+const ProjectResultsUpload: FC<IProps> = ({
+  achievementOptionCourse,
+  onSuccess,
+}) => {
+  const context = useContext(ProjectResultUploadContext);
   const achievementOptionId = achievementOptionCourse.achievementOptionId;
   const [visibleAuthorList, setVisibleAuthorList] = useState(false);
   const initialState: State = {
     achievementRecordTableId: -1,
-    imageName: "",
-    zipFileName: "",
-    csvFileName: "",
-    description: "",
+    imageName: '',
+    zipFileName: '',
+    csvFileName: '',
+    description: '',
     authors: [],
   };
 
@@ -99,7 +106,7 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
     InsertAnAchievementRecordVariables
   >(INSERT_AN_ACHIEVEMENT_RECORD);
 
-  const [udpateAnAchievementRecordAPI] = useAdminMutation<
+  const [updateAnAchievementRecordAPI] = useAdminMutation<
     UpdateAchievementRecordByPk,
     UpdateAchievementRecordByPkVariables
   >(UPDATE_AN_ACHIEVEMENT_RECORD);
@@ -115,26 +122,26 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
   >(SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION);
   /* #endregion */
 
-  const uploadTitleBild = useCallback(
+  const uploadCoverImage = useCallback(
     (file: UploadFile) => {
-      dispatch({ type: "imageName", value: file.name });
-      dispatch({ type: "coverImageFile", value: file });
+      dispatch({ type: 'imageName', value: file.name });
+      dispatch({ type: 'coverImageFile', value: file });
     },
     [dispatch]
   );
 
   const uploadDocumentationsZip = useCallback(
     (file: UploadFile) => {
-      dispatch({ type: "zipFileName", value: file.name });
-      dispatch({ type: "documentationZipFile", value: file });
+      dispatch({ type: 'zipFileName', value: file.name });
+      dispatch({ type: 'documentationZipFile', value: file });
     },
     [dispatch]
   );
 
   const uploadResultCsv = useCallback(
     (file: UploadFile) => {
-      dispatch({ type: "csvFileName", value: file.name });
-      dispatch({ type: "csvResultFile", value: file });
+      dispatch({ type: 'csvFileName', value: file.name });
+      dispatch({ type: 'csvResultFile', value: file });
     },
     [dispatch]
   );
@@ -143,7 +150,7 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
     (id: string) => {
       if (state.authors.find((u) => u.id === id)) {
         dispatch({
-          type: "authors",
+          type: 'authors',
           value: state.authors.filter((user) => user.id !== id),
         });
       }
@@ -156,11 +163,13 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
   }, [setVisibleAuthorList]);
 
   const save = useCallback(async () => {
-    console.log("save");
     try {
       const result = await insertAnAchievementRecordAPI({
         variables: {
           insertInput: {
+            coverImageUrl: '', // this is mandatory field
+            rating: AchievementRecordRating_enum.UNRATED, // this is mandatory field
+            score: 0, // because mandatory
             uploadUserId: context.userId,
             achievementOptionId,
             description: state.description,
@@ -177,11 +186,11 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
       const achievementRecordId = result.data.insert_AchievementRecord_one.id;
       if (achievementRecordId <= 0) return;
       if (state.csvResultFile) {
-        await udpateAnAchievementRecordAPI({
+        await updateAnAchievementRecordAPI({
           variables: {
             id: achievementRecordId,
             setInput: {
-              csvResults: state.coverImageFile?.data,
+              csvResults: state.csvResultFile?.data,
             },
           },
         });
@@ -196,7 +205,7 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
           },
         });
         if (saveResult.data?.saveAchievementRecordCoverImage?.google_link) {
-          await udpateAnAchievementRecordAPI({
+          await updateAnAchievementRecordAPI({
             variables: {
               id: achievementRecordId,
               setInput: {
@@ -215,8 +224,10 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
           fileName: state.documentationZipFile.name,
         },
       });
-      if (!uploadResult.data?.saveAchievementRecordDocumentation?.google_link) return;
-      await udpateAnAchievementRecordAPI({
+      if (!uploadResult.data?.saveAchievementRecordDocumentation?.google_link) {
+        return;
+      }
+      await updateAnAchievementRecordAPI({
         variables: {
           id: achievementRecordId,
           setInput: {
@@ -226,22 +237,30 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
         },
       });
     } catch (error) {
+      if (context.setAlertMessage) {
+        context.setAlertMessage(
+          `${context.t('operation-failed')} ${error.message}`
+        );
+      }
       console.log(error);
+    } finally {
+      onSuccess();
     }
   }, [
-    insertAnAchievementRecordAPI,
-    udpateAnAchievementRecordAPI,
     state,
-    saveAchievementRecordCoverImage,
-    saveAchievementRecordDocumentation,
+    insertAnAchievementRecordAPI,
+    context,
     achievementOptionId,
-    context.userId
+    saveAchievementRecordDocumentation,
+    updateAnAchievementRecordAPI,
+    saveAchievementRecordCoverImage,
+    onSuccess,
   ]);
 
   const onDescriptionChange = useCallback(
     (value: string) =>
       dispatch({
-        type: "description",
+        type: 'description',
         value,
       }),
     [dispatch]
@@ -252,7 +271,7 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
       if (user) {
         if (!state.authors.find((u) => u.id === user.id)) {
           dispatch({
-            type: "authors",
+            type: 'authors',
             value: [
               ...state.authors,
               {
@@ -276,11 +295,11 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
           <SelectUserDialog
             onClose={onCloseAuthorList}
             open={visibleAuthorList}
-            title="Autoren"
+            title={context.t('authors')}
           />
         )}
         <ContentRow
-          leftTop={<h1 className="w-1/2">Nachweis hochladen</h1>}
+          leftTop={<h1 className="w-1/2">{context.t('upload-proof')}</h1>}
           rightBottom={
             <p className="text-right w-1/2">{context.course.title}</p>
           }
@@ -294,23 +313,23 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
           <div className="flex flex-col space-y-2">
             {achievementOptionCourse.AchievementOption.recordType ===
               AchievementRecordType_enum.DOCUMENTATION && (
-                <div className="flex flex-row space-x-1">
-                  <p className="w-2/6">Titlebild</p>
-                  <div className="w-4/6">
-                    <UploadUI
-                      bottomText="Optimal ist eine Größe von XXX x XXX Pixel."
-                      onFileChoosed={uploadTitleBild}
-                      uploadFileName={state.imageName}
-                      acceptedFileTypes=".png"
-                      placeholder="Cover image (.png)"
-                    />
-                  </div>
+              <div className="flex flex-row space-x-1">
+                <p className="w-2/6">{context.t('cover-picture')}</p>
+                <div className="w-4/6">
+                  <UploadUI
+                    bottomText={context.t('form-info-cover-image-size')}
+                    onFileSelected={uploadCoverImage}
+                    uploadFileName={state.imageName}
+                    acceptedFileTypes=".png"
+                    placeholder={`${context.t('cover-picture')} (.png)`}
+                  />
                 </div>
-              )}
+              </div>
+            )}
 
             <div className="flex flex-row space-x-1">
-              <p className="w-2/6">Autoren</p>
-              <div className="w-4/6 flex felx-row">
+              <p className="w-2/6">{context.t('authors')}</p>
+              <div className="w-4/6 flex flex-row">
                 <div className="items-center pt-1 pr-3">
                   <MdAddCircleOutline
                     className="cursor-pointer"
@@ -332,12 +351,12 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
               </div>
             </div>
             <div className="flex flex-row space-x-1">
-              <p className="w-2/6">Beschreibung</p>
+              <p className="w-2/6">{context.t('description')}</p>
               <div className="w-4/6">
                 <EhDebounceInput
                   textArea={true}
                   onChangeHandler={onDescriptionChange}
-                  placeholder="Write the description"
+                  placeholder={context.t('description')}
                   inputText={state.description}
                 />
               </div>
@@ -345,37 +364,37 @@ const ProjectResultsUpload: FC<IProps> = ({ achievementOptionCourse }) => {
 
             {achievementOptionCourse.AchievementOption.recordType ===
               AchievementRecordType_enum.DOCUMENTATION && (
-                <div className="flex flex-row space-x-1">
-                  <p className="w-2/6">Dokumentation</p>
-                  <div className="w-4/6">
-                    <UploadUI
-                      bottomText="Benutze diese Vorlage zum Hochladen der Dokumentation!"
-                      onFileChoosed={uploadDocumentationsZip}
-                      uploadFileName={state.zipFileName}
-                      acceptedFileTypes=".zip"
-                      placeholder=".zip"
-                    />
-                  </div>
+              <div className="flex flex-row space-x-1">
+                <p className="w-2/6">{context.t('documentations')}</p>
+                <div className="w-4/6">
+                  <UploadUI
+                    bottomText={context.t('form-info-documentations')}
+                    onFileSelected={uploadDocumentationsZip}
+                    uploadFileName={state.zipFileName}
+                    acceptedFileTypes=".zip"
+                    placeholder=".zip"
+                  />
                 </div>
-              )}
+              </div>
+            )}
             {achievementOptionCourse.AchievementOption.recordType ===
               AchievementRecordType_enum.DOCUMENTATION_AND_CSV && (
-                <div className="flex flex-row space-x-1">
-                  <p className="w-2/6">CSV Ergebnisse</p>
-                  <div className="w-4/6">
-                    <UploadUI
-                      bottomText="Benutze diese Vorlage zum Hochladen der CSV-Ergebnisse!"
-                      onFileChoosed={uploadResultCsv}
-                      uploadFileName={state.csvFileName}
-                      acceptedFileTypes=".csv"
-                      placeholder=".csv"
-                    />
-                  </div>
+              <div className="flex flex-row space-x-1">
+                <p className="w-2/6">{context.t('csv-results')}</p>
+                <div className="w-4/6">
+                  <UploadUI
+                    bottomText={context.t('form-info-csv-results')}
+                    onFileSelected={uploadResultCsv}
+                    uploadFileName={state.csvFileName}
+                    acceptedFileTypes=".csv"
+                    placeholder=".csv"
+                  />
                 </div>
-              )}
+              </div>
+            )}
             <div className="flex justify-center items-center">
               <Button onClick={save} as="button" filled={false}>
-                Hochladen
+                {context.t('upload')}
               </Button>
             </div>
           </div>
@@ -391,7 +410,7 @@ export interface IPropsUpload {
   bottomText: string;
   uploadFileName: string;
   placeholder?: string;
-  onFileChoosed: (file: UploadFile) => void;
+  onFileSelected: (file: UploadFile) => void;
 }
 
 const UploadUI: FC<IPropsUpload> = (props) => {
@@ -404,8 +423,8 @@ const UploadUI: FC<IPropsUpload> = (props) => {
 
   const onChangeHandler = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
-      const ufile = await parseFileUploadEvent(event);
-      if (ufile) props.onFileChoosed(ufile);
+      const uFile = await parseFileUploadEvent(event);
+      if (uFile) props.onFileSelected(uFile);
     },
     [props]
   );
@@ -415,7 +434,7 @@ const UploadUI: FC<IPropsUpload> = (props) => {
       <div className="flex-col items-right" onClick={onClickHandler}>
         <div className="border-b border-b-1 border-gray-400 flex flex-row cursor-pointer">
           <input
-            placeholder={props.placeholder ?? ""}
+            placeholder={props.placeholder ?? ''}
             type="text"
             className="w-5/6 pr-1 truncate"
             disabled
@@ -434,7 +453,7 @@ const UploadUI: FC<IPropsUpload> = (props) => {
         name={props.uploadFileName}
         onChange={onChangeHandler}
         ref={fileInputRef}
-        style={{ display: "none" }}
+        style={{ display: 'none' }}
         type="file"
       />
     </form>
@@ -442,6 +461,6 @@ const UploadUI: FC<IPropsUpload> = (props) => {
 };
 
 UploadUI.defaultProps = {
-  acceptedFileTypes: "",
+  acceptedFileTypes: '',
   allowMultipleFiles: false,
 };

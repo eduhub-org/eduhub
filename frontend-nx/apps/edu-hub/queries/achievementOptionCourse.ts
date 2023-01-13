@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 export const ACHIEVEMENT_OPTION_COURSES = gql`
   query AchievementOptionCourses(
     $where: AchievementOptionCourse_bool_exp = {}
@@ -15,6 +15,7 @@ export const ACHIEVEMENT_OPTION_COURSES = gql`
       offset: $offset
     ) {
       AchievementOption {
+        id
         title
         recordType
         created_at
