@@ -1,5 +1,5 @@
 const { Storage } = require("@google-cloud/storage");
-const { buildCloudStorage } = require("../lib/cloud-storage");
+const { buildCloudStorage } = require((process.env.LIBRARY_PATH) ? process.env.LIBRARY_PATH : "./lib/cloud-storage");
 const storage = buildCloudStorage(Storage);
 
 /**
