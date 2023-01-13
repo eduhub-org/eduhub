@@ -426,17 +426,17 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
               <div>Tag</div>
               <div>
                 <select
-                  value={course.weekDay ?? "Monday"}
+                  value={course.weekDay ?? "MONDAY"}
                   onChange={updateWeekday}
                   className="w-full h-8 bg-edu-light-gray"
                 >
-                  <option value="Monday">Mo</option>
-                  <option value="Tuesday">DI</option>
-                  <option value="Wednesday">MI</option>
-                  <option value="Thursday">DO</option>
-                  <option value="Friday">FR</option>
-                  <option value="Saturday">SA</option>
-                  <option value="Sunday">SO</option>
+                  <option value="MONDAY">MO</option>
+                  <option value="TUESDAY">DI</option>
+                  <option value="WEDNESDAY">MI</option>
+                  <option value="THURSDAY">DO</option>
+                  <option value="FRIDAY">FR</option>
+                  <option value="SATURDAY">SA</option>
+                  <option value="SUNDAY">SO</option>
                 </select>
               </div>
             </div>

@@ -3019,7 +3019,7 @@ INSERT INTO public."AttendanceStatus" VALUES ('MISSED', NULL);
 -- Data for Name: Course; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."Course" VALUES (1, 'Course 1', 'APPLICANTS_INVITED', '5', 'tag', 'DE', '2022-12-17', '22', true, true, 2, 'MO', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 1, 'test', 'test', 'test', 'test', 'test', 'chat.openai.com', false, 20, '2022-12-17 22:00:02.674+00', '2022-12-17 11:45:01.513+00');
+INSERT INTO public."Course" VALUES (1, 'Course 1', 'APPLICANTS_INVITED', '5', 'tag', 'DE', '2022-12-17', '22', true, true, 2, 'MONDAY', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 1, 'test', 'test', 'test', 'test', 'test', 'chat.openai.com', false, 20, '2022-12-17 22:00:02.674+00', '2022-12-17 11:45:01.513+00');
 
 
 --
