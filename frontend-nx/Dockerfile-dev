@@ -1,0 +1,11 @@
+## https://blog.nrwl.io/create-a-next-js-web-app-with-nx-bcf2ab54613
+
+FROM node:16-alpine
+
+RUN apk add --no-cache libc6-compat yarn socat
+
+USER node
+
+WORKDIR /opt/app
+
+CMD [ "sh", "dev.sh" ]

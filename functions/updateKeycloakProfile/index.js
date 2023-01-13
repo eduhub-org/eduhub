@@ -1,12 +1,10 @@
-const KcAdminClient = require('@keycloak/keycloak-admin-client');
-const bodyParser = require("body-parser");
+const KcAdminClient = require("@keycloak/keycloak-admin-client");
 
 exports.updateKeycloakProfile = async (req, res) => {
   if (process.env.HASURA_CLOUD_FUNCTION_SECRET == req.headers.secret) {
-
     const kcAdminClient = new KcAdminClient({
       baseUrl: process.env.KEYCLOAK_URL,
-      realmName: 'master',
+      realmName: "master",
     });
 
     const firstName = req.body.event.data.new.firstName;
@@ -17,12 +15,12 @@ exports.updateKeycloakProfile = async (req, res) => {
     await kcAdminClient.auth({
       username: process.env.KEYCLOAK_USER,
       password: process.env.KEYCLOAK_PW,
-      grantType: 'password',
-      clientId: 'admin-cli'
+      grantType: "password",
+      clientId: "admin-cli",
     });
 
     kcAdminClient.setConfig({
-      realmName: 'edu-hub',
+      realmName: "edu-hub",
     });
 
     console.log(lastName);
@@ -32,12 +30,10 @@ exports.updateKeycloakProfile = async (req, res) => {
       {
         firstName: firstName,
         lastName: lastName,
-        email: email
-      },
+        email: email,
+      }
     );
 
-    return res.json({
-
-    });
+    return res.json({});
   }
 };

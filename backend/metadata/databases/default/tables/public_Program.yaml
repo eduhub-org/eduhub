@@ -27,11 +27,12 @@ select_permissions:
   - role: anonymous
     permission:
       columns:
+        - achievementRecordUploadDeadline
         - applicationStart
+        - defaultApplicationEnd
         - id
         - lectureEnd
         - lectureStart
-        - achievementRecordUploadDeadline
         - shortTitle
         - title
         - visibility

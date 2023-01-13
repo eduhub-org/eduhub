@@ -1,7 +1,8 @@
 # Fixed version to node 16, as node 17 is not supported by some dependencies
+
 FROM node:16-alpine
 
-RUN apk add --no-cache libc6-compat yarn
+RUN apk add --no-cache libc6-compat yarn socat
 
 COPY ./ /opt/app
 
@@ -10,20 +11,4 @@ WORKDIR /opt/app
 ENV PORT 25000
 EXPOSE 25000
 
-RUN yarn --frozen-lockfile
-
-CMD [ "yarn", "dev" ]
-
-# For development connect to this via
-# edu-hub_frontend_1 should be the name of the container started by
-# docker-compose up 
-# docker exec -it edu-hub_frontend_1 /bin/sh
-# and do 
-# yarn # first startup command in your checkup to install dependencies
-# yarn build # not sure yarn dev even needs this, I did it once...
-# yarn dev
-
-# Then use an editor running on the host machine on the files checked out normally,
-# So everything runs inside containers, but the code editing can happen on the host.
-# Open the running app on localhost:25000 of the host
-
+CMD [ "sh", "dev.sh" ]

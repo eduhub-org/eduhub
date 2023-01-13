@@ -1,89 +1,111 @@
 # This docker-compose file is meant for local development!
-
-# To make login work correctly you need to have an environment file called hasura_keycloak.env
-# which needs to contain the environment variable HASURA_GRAPHQL_JWT_SECRET which contains this value:
-# {"type": "RS256", "key": "-----BEGIN CERTIFICATE-----\nPUT_YOUR_PUBLIC_KEY_HERE\n-----END CERTIFICATE-----"}
-# The public key value is found in your keycloak instance, edu hub realm, keys, rs256 public key.
-# So make the file hasura_keycloak.env next to the docker-compose.yml with this content:
-
-# To get the public key in the first run you might have to provide an empty environment file, then do docker-compose stop and docker-compose up again once you have the public key.
-
-# Then start with docker-compose up -d
-
-# For the frontend you additionally need a frontend.env file that defines STORAGE_BUCKET_URL
-
-# The Hasura console is disabled, you need to start it via CLI instead
+# See readme.md
 
 version: "3.8"
 
 services:
+  frontend-nx:
+    ports:
+      - "5000:4200"
+      - "5001:4201"
+    build:
+      context: ./frontend-nx
+      dockerfile: Dockerfile-dev
+    # uncomment this to disable automatic yarn dev on frontend startup
+    # command: tail -F anything
+    volumes:
+      - ./frontend-nx:/opt/app
+    depends_on:
+      - hasura
+      - keycloak
+
   frontend:
     ports:
-      - "5000:5000"
+      - "5005:5000"
     build:
       context: ./frontend
       dockerfile: Dockerfile-dev
-    env_file:
-      - frontend.env
+    # uncomment this to disable automatic yarn dev on frontend startup
+    #command: tail -F anything
     volumes:
       - ./frontend:/opt/app
     depends_on:
       - hasura
       - keycloak
 
+  functions:
+    image: node:18-bullseye-slim
+    user: "node"
+    working_dir: /functions
+    volumes:
+      - ./functions:/functions
+    ports:
+      - "42000-42025:42000-42025"
+      - "4001:4001"
+    command: ["sh", "/functions/start.sh"]
+    environment:
+      LOCAL_TESTING: 1
+      STORAGE_PORT: 4001
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PW: admin
+      HASURA_ENDPOINT: http://hasura:8080/v1/graphql
+      HASURA_ADMIN_SECRET: myadminsecretkey
+      HASURA_CLOUD_FUNCTION_SECRET: test1234
+
   hasura:
+    restart: on-failure
     build: ./backend
     ports:
       - "8080:8080"
     depends_on:
       - db_hasura
       - keycloak
-    restart: always
-    env_file:
-      - hasura_keycloak.env
     environment:
+      HASURA_CLOUD_FUNCTION_SECRET: test1234
       HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgrespassword@db_hasura:5432/postgres
-      HASURA_GRAPHQL_ENABLE_CONSOLE: "false" # set to "false" to disable console
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "false" # set to "false" to disable console, the console has to run on the host for some technical reasons, it is very hard to get it to run from inside the container: https://github.com/hasura/graphql-engine/issues/2824
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
-      ## uncomment next line to set an admin secret
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: inherited_roles
+      HASURA_GRAPHQL_JWT_SECRET: '{"jwk_url": "http://keycloak:8080/realms/edu-hub/protocol/openid-connect/certs"}'
 
-      HASURA_BUCKET: "eduhub-staging-kc19"
-      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE: "https://load-achievement-certificate-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE_TEMPLATE: "https://load-achievement-certificate-template-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE: "https://load-participation-certificate-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE_TEMPLATE: "https://save-achievement-certificate-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION: "https://save-achievement-record-documentation-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_COURSE_IMAGE: "https://save-course-image-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_USER_PROFILE_IMAGE: "https://save-user-profile-image-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE: "https://save-achievement-record-cover-image-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION: "https://load-achievement-record-documentation-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE: "https://save-achievement-certificate-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE: "https://save-achievement-certificate-template-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE: "https://save-participation-certificate-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE: "https://save-participation-certificate-template-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK: "https://update-from-keycloak-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SEND_MAIL: "https://send-mail-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE: "https://add-keycloak-role-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: "https://load-achievement-option-documentation-template-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: "https://save-achievement-option-documentation-template-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "https://load-achievement-option-evaluation-script-szeuw2n5qa-ew.a.run.app"
-      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "https://save-achievement-option.evaluation-script-szeuw2n5qa-ew.a.run.app"
+      HASURA_BUCKET: emulated-bucket
+      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE: "http://functions:42002"
+      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE_TEMPLATE: "http://functions:42003"
+      CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE: "http://functions:42007"
+      CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE_TEMPLATE: "http://functions:42008"
+      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION: "http://functions:42006"
+      CLOUD_FUNCTION_LINK_SAVE_COURSE_IMAGE: "http://functions:42015"
+      CLOUD_FUNCTION_LINK_SAVE_USER_PROFILE_IMAGE: "http://functions:42018"
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE: "http://functions:42013"
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION: "http://functions:42014"
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE: "http://functions:42009"
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE: "http://functions:42010"
+      CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE: "http://functions:42016"
+      CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE: "http://functions:42017"
+      CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK: "http://functions:42020"
+      CLOUD_FUNCTION_LINK_SEND_MAIL: "http://functions:42019"
+      CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE: "http://functions:42000"
+      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: "http://functions:42004"
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: "http://functions:42011"
+      CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "http://functions:42005"
+      CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "http://functions:42012"
 
     volumes:
+      - ./backend:/hasura
       - ./backend/migrations:/hasura-migrations
       - ./backend/metadata:/hasura-metadata
       - ./backend/seeds:/hasura-seeds
 
   db_hasura:
     image: postgres:12
-    volumes:
-      - db_hasura_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: postgrespassword
+    volumes:
+      - ./backend/init.d:/docker-entrypoint-initdb.d:rw
 
   keycloak:
     build:
@@ -91,34 +113,12 @@ services:
       dockerfile: Dockerfile-dev
     ports:
       - 28080:8080
-    depends_on:
-     - db_keycloak
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_DB: postgres
-      KC_DB_VENDOR: postgres
-      KC_DB_URL: "jdbc:postgresql://db_keycloak:5432/keycloak"
-      KC_DB_USERNAME: keycloak
-      KC_DB_PASSWORD: password 
-      #KC_HOSTNAME: localhost
       KC_HOSTNAME_STRICT: "false"
-      #KC_HTTP_ENABLED: "true"
-      #KEYCLOAK_IMPORT: /imports/edu-hub-realm.json
     volumes:
-      - ./keycloak/imports:/imports
+      - ./keycloak/imports-dev:/opt/keycloak/data/import
       - ./keycloak/themes/opencampus:/opt/keycloak/themes/opencampus
+      - ./keycloak/themes/edu-hub:/opt/keycloak/themes/edu-hub
       - ./keycloak/disable-theme-cache.cli:/opt/keycloak/startup-scripts/disable-theme-cache.cli
-
-  db_keycloak:
-    image: postgres:12
-    volumes:
-      - db_keycloak_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: keycloak
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: password
-
-volumes:
-  db_hasura_data:
-  db_keycloak_data:

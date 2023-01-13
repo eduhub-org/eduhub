@@ -1,5 +1,5 @@
 import { FC, useCallback, useState } from "react";
-import { useAdminQuery, useInstructorQuery } from "../../hooks/authedQuery";
+import { useAdminQuery } from "../../hooks/authedQuery";
 import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from "../../queries/course";
 import {
   ManagedCourse,
@@ -11,10 +11,7 @@ import { PageBlock } from "../common/PageBlock";
 import { Button as OldButton } from "../common/Button";
 import { DescriptionTab } from "./DescriptionTab";
 import { QuestionConfirmationDialog } from "../common/dialogs/QuestionConfirmationDialog";
-import {
-  useAdminMutation,
-  useInstructorMutation,
-} from "../../hooks/authedMutation";
+import { useInstructorMutation } from "../../hooks/authedMutation";
 import {
   UpdateCourseStatus,
   UpdateCourseStatusVariables,
@@ -23,6 +20,9 @@ import { AlertMessageDialog } from "../common/dialogs/AlertMessageDialog";
 import { SessionsTab } from "./SessionsTab";
 import { ApplicationTab } from "./ApplicationTab";
 import ManageCourseEnrollment from "./ManageCourseEnrollment";
+import { ContentRow } from "../common/ContentRow";
+import { BlockTitle } from "../common/BlockTitle";
+import CourseAchievementOption from "../course/course-achievement-option/CourseAchievementOption";
 
 interface Props {
   courseId: number;
@@ -320,6 +320,22 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
         confirmationText={"OK"}
         onClose={handleCloseCantUpgrade}
         open={isCantUpgradeOpen}
+      />
+
+      <ContentRow
+        className="my-24"
+        leftTop={
+          <div className="flex flex-1">
+            <BlockTitle>Anwesenheit</BlockTitle>
+          </div>
+        }
+        rightBottom={
+          <div className="flex flex-1">
+            {course.achievementCertificatePossible && (
+              <CourseAchievementOption course={course} />
+            )}
+          </div>
+        }
       />
     </>
   );

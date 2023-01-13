@@ -1,12 +1,31 @@
 import { QueryResult } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import { FC, useCallback, useMemo, useState } from "react";
-import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
+import Link from "next/link";
+import { FC, useCallback, useState } from "react";
+import {
+  MdAddCircle,
+  MdKeyboardArrowDown,
+  MdKeyboardArrowUp,
+} from "react-icons/md";
 import { useAdminMutation } from "../../hooks/authedMutation";
+import { useAdminQuery } from "../../hooks/authedQuery";
+import { QUERY_LIMIT } from "../../pages/courses";
+import { ACHIEVEMENT_OPTIONS } from "../../queries/achievement";
+import { ACHIEVEMENT_OPTION_COURSES } from "../../queries/achievementOptionCourse";
 import {
   INSERT_SINGLE_ATTENDENCE,
   UPDATE_ATTENDENCE,
 } from "../../queries/courseEnrollment";
+import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE } from "../../queries/mutateAchievement";
+import {
+  AchievementOptionCourses,
+  AchievementOptionCoursesVariables,
+} from "../../queries/__generated__/AchievementOptionCourses";
+
+import {
+  DeleteAnAchievementOptionCourse,
+  DeleteAnAchievementOptionCourseVariables,
+} from "../../queries/__generated__/DeleteAnAchievementOptionCourse";
 import {
   InsertSingleAttendence,
   InsertSingleAttendenceVariables,
@@ -24,6 +43,8 @@ import {
 import { StaticComponentProperty } from "../../types/UIComponents";
 import { AttendanceStatus_enum } from "../../__generated__/globalTypes";
 import { DOT_COLORS, EhDot } from "../common/dots";
+import TagWithTwoText from "../common/TagWithTwoText";
+import Loading from "../courses/Loading";
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -32,7 +53,10 @@ interface IProps {
 const ManageCourseEnrollment: FC<IProps> = ({ course, qResult }) => {
   return (
     <>
-      <EnrollmentList course={course} qResult={qResult} />
+      <div className="flex flex-col space-y-2">
+        <CourseAchievementOptions courseId={course.id} />
+        <EnrollmentList course={course} qResult={qResult} />
+      </div>
     </>
   );
 };
@@ -345,3 +369,72 @@ const EhDotWithCallBack: FC<IEhDotProps> = ({
 };
 
 /* #endregion */
+
+/* #region Course AchievementOptions */
+
+interface IPropsCourseAchievementOptions {
+  courseId: number;
+}
+const CourseAchievementOptions: FC<IPropsCourseAchievementOptions> = (
+  props
+) => {
+  const achievementOptionsForACourse = useAdminQuery<
+    AchievementOptionCourses,
+    AchievementOptionCoursesVariables
+  >(ACHIEVEMENT_OPTION_COURSES, {
+    variables: {
+      limit: QUERY_LIMIT,
+      where: {
+        courseId: { _eq: props.courseId },
+      },
+    },
+  });
+
+  const [deleteAnAchievementCourse] = useAdminMutation<
+    DeleteAnAchievementOptionCourse,
+    DeleteAnAchievementOptionCourseVariables
+  >(DELETE_AN_ACHIEVEMENT_OPTION_COURSE);
+
+  const queryDeleteAnAchievementCourseFromDB = useCallback(
+    async (pk: number) => {
+      try {
+        const response = await deleteAnAchievementCourse({
+          variables: {
+            id: pk,
+          },
+        });
+        if (!response.errors) {
+          achievementOptionsForACourse.refetch();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [deleteAnAchievementCourse, achievementOptionsForACourse]
+  );
+  const list = [
+    ...(achievementOptionsForACourse.data?.AchievementOptionCourse || []),
+  ];
+
+  return (
+    <>
+      {achievementOptionsForACourse.loading && <Loading />}
+      <div className="grid gap-2 grid-cols-3">
+        {list.map((data, index) => (
+          <div className="max-w-[400px]" key={index}>
+            <TagWithTwoText
+              textLeft={data.AchievementOption.title}
+              onRemoveClick={queryDeleteAnAchievementCourseFromDB}
+              id={data.id}
+            />
+          </div>
+        ))}
+        <Link href={`/achievements?courseId=${props.courseId}`}>
+          <div>
+            <MdAddCircle className="cursor-pointer inline-block align-middle stroke-cyan-500" />
+          </div>
+        </Link>
+      </div>
+    </>
+  );
+};

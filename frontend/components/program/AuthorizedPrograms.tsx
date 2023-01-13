@@ -101,15 +101,6 @@ import {
   UpdateProgramParticipationCertVisible,
   UpdateProgramParticipationCertVisibleVariables,
 } from "../../queries/__generated__/UpdateProgramParticipationCertVisible";
-import {
-  SaveAFile,
-  SaveAFileVariables,
-} from "../../queries/__generated__/SaveAFile";
-import { LOAD_FILE, SAVE_FILE } from "../../queries/actions";
-import {
-  LoadAFile,
-  LoadAFileVariables,
-} from "../../queries/__generated__/LoadAFile";
 
 export const AuthorizedPrograms: FC = () => {
   const qResult = useAdminQuery<ProgramList>(PROGRAM_LIST);
@@ -127,33 +118,42 @@ export const AuthorizedPrograms: FC = () => {
 
   const [openProgram, setOpenProgram] = useState(-1);
 
-  const [saveFile, saveFileStatus] = useAdminMutation<
-    SaveAFile,
-    SaveAFileVariables
-  >(SAVE_FILE);
+  // const [saveFile, saveFileStatus] = useAdminMutation<
+  //   SaveAFile,
+  //   SaveAFileVariables
+  // >(SAVE_FILE);
 
-  console.log(saveFileStatus);
+  // console.log(saveFileStatus);
 
-  const saveTestFile = useCallback(async () => {
-    const helloWorld = "aGFjaw==";
-    const fileName = "public/hello.txt";
-    const response = await saveFile({
-      variables: {
-        base64file: helloWorld,
-        fileName,
-      },
-    });
+  // const [saveCourseImage, saveCourseImageStatus] = useAdminMutation<
+  //   SaveCourseImage,
+  //   SaveCourseImageVariables
+  // >(SAVE_COURSE_IMAGE);
 
-    console.log(response);
-  }, [saveFile]);
+  // console.log("saveCourseImageStatus", saveCourseImageStatus);
 
-  const lResult = useAdminQuery<LoadAFile, LoadAFileVariables>(LOAD_FILE, {
-    variables: {
-      path: "f9cc072c-4a93-449e-b7c3-0a4d9c1fe6c",
-    },
-  });
+  // const saveTestFile = useCallback(async () => {
+  //   const data = "aGFjaw==";
 
-  console.log(lResult);
+  //   const fileName = "hello.txt";
+  //   const response = await saveCourseImage({
+  //     variables: {
+  //       base64File: data,
+  //       fileName,
+  //       courseId: 2,
+  //     },
+  //   });
+
+  //   console.log("saveTestFile", response);
+  // }, [saveCourseImage]);
+
+  // const lResult = useAdminQuery<LoadAFile, LoadAFileVariables>(LOAD_FILE, {
+  //   variables: {
+  //     path: "f9cc072c-4a93-449e-b7c3-0a4d9c1fe6c",
+  //   },
+  // });
+
+  // console.log(lResult);
 
   const [insertProgram] = useAdminMutation<
     InsertProgram,
@@ -504,8 +504,6 @@ export const AuthorizedPrograms: FC = () => {
           <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />}>
             Programm hinzufügen
           </Button>
-
-          <Button onClick={saveTestFile}>Test save file</Button>
         </div>
         <div className="grid grid-cols-10">
           <div>Veröff.</div>

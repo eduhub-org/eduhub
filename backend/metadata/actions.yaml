@@ -181,4 +181,5 @@ custom_types:
   objects:
     - name: loadFileOutput
     - name: result
+    - name: saveFileOutput
   scalars: []

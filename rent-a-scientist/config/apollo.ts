@@ -105,10 +105,10 @@ export const client = new ApolloClient({
               return lectureEnd != null ? new Date(lectureEnd) : null;
             },
           },
-          projectRecordUploadDeadline: {
-            merge: (_, projectRecordUploadDeadline) => {
-              return projectRecordUploadDeadline != null
-                ? new Date(projectRecordUploadDeadline)
+          achievementRecordUploadDeadline: {
+            merge: (_, achievementRecordUploadDeadline) => {
+              return achievementRecordUploadDeadline != null
+                ? new Date(achievementRecordUploadDeadline)
                 : null;
             },
           },
