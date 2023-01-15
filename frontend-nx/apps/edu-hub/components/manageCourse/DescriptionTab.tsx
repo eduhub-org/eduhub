@@ -101,18 +101,6 @@ interface IProps {
   qResult: QueryResult<any, any>;
 }
 
-const getLegacyLanguage = (legacy: string | null) => {
-  if (legacy == null) {
-    return "DE";
-  }
-  const lowLegacy = legacy.toLocaleLowerCase();
-  if (lowLegacy.includes("deutsch") || lowLegacy.includes("german")) {
-    return "DE";
-  } else {
-    return "EN";
-  }
-};
-
 const prepDateTimeUpdate = (timeString: string) => {
   const now = new Date();
   const [hourS, minS] = timeString.split(":");
@@ -458,7 +446,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             <div>Sprache</div>
             <div>
               <select
-                value={getLegacyLanguage(course.language)}
+                value={course.language}
                 onChange={updateCourseLanguage}
                 className="w-full h-8 bg-edu-light-gray"
               >
