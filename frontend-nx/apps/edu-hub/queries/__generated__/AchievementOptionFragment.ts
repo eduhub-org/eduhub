@@ -32,4 +32,8 @@ export interface AchievementOptionFragment {
    * Type of the achivement record that must be uploaded for this option
    */
   recordType: AchievementRecordType_enum;
+  /**
+   * For TRUE the score table will include a column showing the authors; for FALSE the scores will be anonymous.
+   */
+  showScoreAuthors: boolean | null;
 }

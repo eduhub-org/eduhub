@@ -4,5 +4,9 @@
   "achievement-record": "Leistungsnachweise",
   "achievement-record-admin": "Administration Leistungsnachweise",
   "results": "Ergebnis",
-  "upload": "↑ Hochladen"
+  "upload": "↑ Hochladen",
+  "description": "Beschreibung",
+  "mentors": "Mentor(en)",
+  "result": "Ergebnis",
+  "documentation": "Dokumentation"
 }

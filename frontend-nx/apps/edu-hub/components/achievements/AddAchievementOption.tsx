@@ -1,19 +1,19 @@
 import { FC, useCallback, useContext } from 'react';
 import { useAdminMutation } from '../../hooks/authedMutation';
-import { UploadFileTypes } from '../../helpers/achievement';
+import { ResponseToARequest, UploadFileTypes } from '../../helpers/achievement';
 import { INSERT_AN_ACHIEVEMENT_OPTION } from '../../queries/mutateAchievement';
 import {
   InsertAnAchievementOption,
   InsertAnAchievementOptionVariables,
 } from '../../queries/__generated__/InsertAnAchievementOption';
 import { AchievementRecordType_enum } from '../../__generated__/globalTypes';
-import { AchievementContext } from './AchievementOptionDashboard';
 import {
   IDataToManipulate,
   TempAchievementOptionCourse,
   TempAchievementOptionMentor,
 } from '../../helpers/achievement';
-import AddEditAchievementOptionComponent from './AddEditAchievementOptionComponent';
+import FormToAddEditAchievementOption from './FormToAddEditAchievementOption';
+import { AchievementContext } from './AchievementsHelper';
 interface IProps {
   onSuccess: (success: boolean) => void;
 }
@@ -45,6 +45,7 @@ const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
               AchievementOptionMentors: {
                 data: data.mentors.map((e) => ({ userId: e.userId })), // We need to change this field
               },
+              showScoreAuthors: data.showScoreAuthors,
             },
           },
         });
@@ -80,20 +81,23 @@ const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
         }
       } catch (error) {
         console.log(error);
+        return { success: false, message: error.message } as ResponseToARequest;
       }
 
       onSuccess(true);
+      return { success: true } as ResponseToARequest;
     },
     [onSuccess, context, insertAnAchievement]
   );
 
   const data: IDataToManipulate = {
     achievementOptionId: null,
-    title: null,
-    description: null,
-    documentationTemplateUrl: null,
-    evaluationScriptUrl: null,
-    recordType: context.achievementRTypes[0] as AchievementRecordType_enum,
+    title: '',
+    description: '',
+    documentationTemplateUrl: '',
+    evaluationScriptUrl: '',
+    showScoreAuthors: true,
+    recordType: context.achievementRecordTypes[0] as AchievementRecordType_enum,
     mentors: profile
       ? new Array({
           userId: context.userId,
@@ -111,7 +115,7 @@ const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
       : [],
   };
   return (
-    <AddEditAchievementOptionComponent
+    <FormToAddEditAchievementOption
       defaultData={data}
       onSaveCallBack={onSave}
     />

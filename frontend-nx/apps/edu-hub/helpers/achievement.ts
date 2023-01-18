@@ -24,6 +24,7 @@ export interface IDataToManipulate {
   courses: TempAchievementOptionCourse[];
   documentTemplateFile?: UploadFile;
   evaluationScriptFile?: UploadFile;
+  showScoreAuthors: boolean;
 }
 
 export interface IPayload {
@@ -65,4 +66,10 @@ export const AchievementKeys = {
   DELETE_A_COURSE: 'deleteACourse',
   DOCUMENT_TEMPLATE_FILE: 'documentTemplateFile',
   EVALUATION_SCRIPT_FILE: 'evaluationScriptFile',
+  SHOW_SCORE_AUTHORS: 'showScoreAuthors',
 };
+
+export interface ResponseToARequest {
+  success: boolean;
+  message?: string;
+}

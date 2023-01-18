@@ -11,6 +11,8 @@ interface IPros {
   autoFocus?: boolean;
   maxLength?: number;
   onChangeHandler?: (value: string) => any;
+  id?: string;
+  name?: string;
 }
 const EhInputWithTitle: FC<IPros> = ({
   label,
@@ -22,6 +24,8 @@ const EhInputWithTitle: FC<IPros> = ({
   autoFocus,
   maxLength,
   onChangeHandler,
+  id,
+  name,
 }) => {
   const handOnchange = useCallback(
     (event) => {
@@ -50,6 +54,8 @@ const EhInputWithTitle: FC<IPros> = ({
         disabled={disabled}
         autoFocus={autoFocus ?? false}
         maxLength={maxLength ?? 200}
+        id={id}
+        name={name}
       />
     </div>
   );

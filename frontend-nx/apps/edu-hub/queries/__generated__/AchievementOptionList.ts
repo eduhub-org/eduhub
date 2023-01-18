@@ -91,6 +91,10 @@ export interface AchievementOptionList_AchievementOption {
    */
   recordType: AchievementRecordType_enum;
   /**
+   * For TRUE the score table will include a column showing the authors; for FALSE the scores will be anonymous.
+   */
+  showScoreAuthors: boolean | null;
+  /**
    * An array relationship
    */
   AchievementOptionCourses: AchievementOptionList_AchievementOption_AchievementOptionCourses[];

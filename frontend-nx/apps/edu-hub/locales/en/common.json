@@ -46,5 +46,8 @@
   "description-number-of-characters": "Beschreibung ({{numberOfCharacters}} Zeichen)",
   "cancel": "Abbrechen",
   "not-logged-in-message": "Waiting for Authentications",
-  "invalid-request": "Invalid request"
+  "invalid-request": "Invalid request",
+  "save": "Save",
+  "download-documentation-template": "Download documentation template",
+  "download-script-file-template": "Download script file template"
 }

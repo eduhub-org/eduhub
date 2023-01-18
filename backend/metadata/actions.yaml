@@ -2,7 +2,7 @@ actions:
   - name: loadAchievementCertificate
     definition:
       kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE}}'
+      handler: "{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -13,7 +13,7 @@ actions:
   - name: loadAchievementCertificateTemplate
     definition:
       kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE_TEMPLATE}}'
+      handler: "{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE_TEMPLATE}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -22,7 +22,7 @@ actions:
   - name: loadAchievementOptionDocumentationTemplate
     definition:
       kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE}}'
+      handler: "{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -31,16 +31,16 @@ actions:
   - name: loadAchievementOptionEvaluationScript
     definition:
       kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT}}'
+      handler: "{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
-          value_from_env: ' HASURA_BUCKET'
+          value_from_env: HASURA_BUCKET
   - name: loadAchievementRecordDocumentation
     definition:
       kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION}}'
+      handler: "{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -49,7 +49,7 @@ actions:
   - name: loadParticipationCertificate
     definition:
       kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE}}'
+      handler: "{{CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -60,7 +60,7 @@ actions:
   - name: loadparticipationCertificateTemplate
     definition:
       kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE_TEMPLATE}}'
+      handler: "{{CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE_TEMPLATE}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -69,7 +69,7 @@ actions:
   - name: saveAchievementCertificate
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE}}'
+      handler: "{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -78,7 +78,7 @@ actions:
   - name: saveAchievementCertificateTemplate
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE}}'
+      handler: "{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -87,25 +87,25 @@ actions:
   - name: saveAchievementOptionDocumentationTemplate
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE}}'
+      handler: "{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE}}"
       headers:
-        - name: secert
+        - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
   - name: saveAchievementOptionEvaluationScript
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT}}'
+      handler: "{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: hasura
+        - name: bucket
           value_from_env: HASURA_BUCKET
   - name: saveAchievementRecordCoverImage
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE}}'
+      handler: "{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -116,7 +116,7 @@ actions:
   - name: saveAchievementRecordDocumentation
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION}}'
+      handler: "{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -125,7 +125,7 @@ actions:
   - name: saveCourseImage
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_COURSE_IMAGE}}'
+      handler: "{{CLOUD_FUNCTION_LINK_SAVE_COURSE_IMAGE}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -136,7 +136,7 @@ actions:
   - name: saveParticipationCertificate
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE}}'
+      handler: "{{CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -145,7 +145,7 @@ actions:
   - name: saveParticipationCertificateTemplate
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE}}'
+      handler: "{{CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -154,7 +154,7 @@ actions:
   - name: saveUserProfileImage
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_USER_PROFILE_IMAGE}}'
+      handler: "{{CLOUD_FUNCTION_LINK_SAVE_USER_PROFILE_IMAGE}}"
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
@@ -166,7 +166,7 @@ actions:
   - name: updateFromKeycloak
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK}}'
+      handler: "{{CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK}}"
       forward_client_headers: true
       headers:
         - name: secret

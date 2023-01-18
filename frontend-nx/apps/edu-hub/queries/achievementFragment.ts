@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 export const ACHIEVEMENT_OPTION_FRAGMENT = gql`
   fragment AchievementOptionFragment on AchievementOption {
@@ -8,5 +8,6 @@ export const ACHIEVEMENT_OPTION_FRAGMENT = gql`
     documentationTemplateUrl
     evaluationScriptUrl
     recordType
+    showScoreAuthors
   }
 `;

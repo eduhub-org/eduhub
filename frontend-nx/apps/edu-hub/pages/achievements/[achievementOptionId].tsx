@@ -22,6 +22,7 @@ import Image from 'next/image';
 import { ContentRow } from 'apps/edu-hub/components/common/ContentRow';
 import { makeFullName } from 'apps/edu-hub/helpers/util';
 import { Button } from '../../components/common/Button';
+import { BlockTitle } from '@opencampus/shared-components';
 const AchievementOptionDetails: FC = () => {
   const router = useRouter();
   const { achievementOptionId } = router.query;
@@ -87,20 +88,22 @@ const AchievementOptionDetailsDashboard: FC<IProps> = ({
   achievementOption,
 }) => {
   const { t } = useTranslation('achievements-page');
+
+  console.log(achievementOption);
   const upload = useCallback(() => {
     console.log('');
   }, []);
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 mb-5">
       <div className="min-h-[375px] min-w-[194px]">
-        <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+        {/* <div style={{ width: '100%', height: '100%', position: 'relative' }}>
           <Image
             alt="Mountains"
             src="https://picsum.photos/375/194"
             width={375}
             height={194}
           />
-        </div>
+        </div> */}
       </div>
       <ContentRow
         className="w-full"
@@ -119,19 +122,39 @@ const AchievementOptionDetailsDashboard: FC<IProps> = ({
         }
       />
       <CommonPageHeader headline={achievementOption.title} />
-      <div id="mentors">
-        {achievementOption.AchievementOptionMentors.map((m, index) => (
-          <h1 key={index}>{makeFullName(m.User.firstName, m.User.lastName)}</h1>
-        ))}
+      <div id="mentors" className="flex flex-col gap-5">
+        <Title>{t('mentors')}</Title>
+        <BoldText>
+          {achievementOption.AchievementOptionMentors.map((m) =>
+            makeFullName(m.User.firstName, m.User.lastName)
+          ).join(', ')}
+        </BoldText>
       </div>
 
-      <div id="description">{achievementOption.description}</div>
+      <div id="mentors" className="flex flex-col gap-5">
+        <Title>{t('description')}</Title>
+        <BoldText>{achievementOption.description}</BoldText>
+      </div>
+
       <div id="results" className="flex flex-col gap-2">
-        <p>{t('results')}</p>
+        <Title>{t('results')}</Title>
         <div>
           <Button onClick={upload} filled>{`${t('upload')}`}</Button>
         </div>
       </div>
     </div>
+  );
+};
+interface IPropsTitle {
+  children: string;
+}
+
+const Title: FC<IPropsTitle> = ({ children }) => {
+  return <p className="uppercase text-sm">{children}</p>;
+};
+
+const BoldText: FC<IPropsTitle> = ({ children }) => {
+  return (
+    <p className="font-medium text-sm leading-5 grid grid-cols-1">{children}</p>
   );
 };
