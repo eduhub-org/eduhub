@@ -1,6 +1,11 @@
 table:
   name: School
   schema: rentAScientist
+configuration:
+  column_config: {}
+  custom_column_names: {}
+  custom_name: School
+  custom_root_fields: {}
 array_relationships:
   - name: SchoolClasses
     using:

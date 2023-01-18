@@ -1,6 +1,11 @@
 table:
   name: RentAScientistConfig
   schema: rentAScientist
+configuration:
+  column_config: {}
+  custom_column_names: {}
+  custom_name: RentAScientistConfig
+  custom_root_fields: {}
 object_relationships:
   - name: Program
     using:
