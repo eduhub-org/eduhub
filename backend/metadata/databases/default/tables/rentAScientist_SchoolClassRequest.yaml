@@ -1,6 +1,11 @@
 table:
   name: SchoolClassRequest
   schema: rentAScientist
+configuration:
+  column_config: {}
+  custom_column_names: {}
+  custom_name: SchoolClassRequest
+  custom_root_fields: {}
 object_relationships:
   - name: SchoolClass
     using:
