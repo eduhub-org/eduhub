@@ -15,7 +15,6 @@
 - "!include public_CourseInstructor.yaml"
 - "!include public_CourseLocation.yaml"
 - "!include public_CourseStatus.yaml"
-- "!include public_CourseTopicTag.yaml"
 - "!include public_Employment.yaml"
 - "!include public_Expert.yaml"
 - "!include public_Language.yaml"

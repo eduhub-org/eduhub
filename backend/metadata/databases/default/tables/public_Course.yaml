@@ -11,6 +11,9 @@ object_relationships:
   - name: Program
     using:
       foreign_key_constraint_on: programId
+  - name: Weekday
+    using:
+      foreign_key_constraint_on: weekDay
 array_relationships:
   - name: AchievementOptionCourses
     using:
