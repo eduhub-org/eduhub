@@ -71,7 +71,7 @@ export const Header: FC = () => {
           </div>
         ) : null}
         {isLoggedIn ? null : (
-          <div className="flex bg-red-300">
+          <div className="flex">
             <div className="flex">
               <LoginButton />
             </div>
