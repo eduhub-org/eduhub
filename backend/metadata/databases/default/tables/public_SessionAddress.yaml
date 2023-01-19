@@ -20,30 +20,27 @@ insert_permissions:
                   id:
                     _eq: X-Hasura-User-Id
       columns:
+        - address
         - id
-        - latitude
-        - link
-        - longitude
         - sessionId
+        - type
 select_permissions:
   - role: anonymous
     permission:
       columns:
-        - id
+        - address
         - created_at
-        - updated_at
+        - id
         - sessionId
-        - latitude
-        - link
-        - longitude
+        - type
+        - updated_at
       filter: {}
 update_permissions:
   - role: instructor_access
     permission:
       columns:
-        - latitude
-        - link
-        - longitude
+        - address
+        - type
       filter:
         Session:
           Course:
