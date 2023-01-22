@@ -73,19 +73,6 @@ export interface CourseList_Course_CourseInstructors {
   Expert: CourseList_Course_CourseInstructors_Expert;
 }
 
-export interface CourseList_Course_Program {
-  __typename: "Program";
-  id: number;
-  /**
-   * The 6 letter short title for the program.
-   */
-  shortTitle: string | null;
-  /**
-   * The title of the program
-   */
-  title: string;
-}
-
 export interface CourseList_Course {
   __typename: "Course";
   id: number;
@@ -165,10 +152,6 @@ export interface CourseList_Course {
    * An array relationship
    */
   CourseInstructors: CourseList_Course_CourseInstructors[];
-  /**
-   * An object relationship
-   */
-  Program: CourseList_Course_Program | null;
 }
 
 export interface CourseList {
