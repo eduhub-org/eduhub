@@ -250,7 +250,7 @@ export const UPDATE_COURSE_LANGUAGE = gql`
 `;
 
 export const UPDATE_COURSE_WEEKDAY = gql`
-  mutation UpdateCourseWeekday($courseId: Int!, $weekday: String!) {
+  mutation UpdateCourseWeekday($courseId: Int!, $weekday: Weekday_enum!) {
     update_Course_by_pk(
       pk_columns: { id: $courseId }
       _set: { weekDay: $weekday }

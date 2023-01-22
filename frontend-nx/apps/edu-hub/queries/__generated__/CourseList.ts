@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Course_bool_exp } from "./../../__generated__/globalTypes";
+import { Course_bool_exp, Weekday_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseList
@@ -73,6 +73,19 @@ export interface CourseList_Course_CourseInstructors {
   Expert: CourseList_Course_CourseInstructors_Expert;
 }
 
+export interface CourseList_Course_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The title of the program
+   */
+  title: string;
+}
+
 export interface CourseList_Course {
   __typename: "Course";
   id: number;
@@ -87,7 +100,7 @@ export interface CourseList_Course {
   /**
    * The day of the week the course takes place.
    */
-  weekDay: string | null;
+  weekDay: Weekday_enum | null;
   /**
    * A text providing info about the costs of a participation.
    */
@@ -152,6 +165,10 @@ export interface CourseList_Course {
    * An array relationship
    */
   CourseInstructors: CourseList_Course_CourseInstructors[];
+  /**
+   * An object relationship
+   */
+  Program: CourseList_Course_Program | null;
 }
 
 export interface CourseList {
