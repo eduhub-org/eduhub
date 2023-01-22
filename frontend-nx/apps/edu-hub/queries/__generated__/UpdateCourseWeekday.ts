@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { Weekday_enum } from "./../../__generated__/globalTypes";
+
 // ====================================================
 // GraphQL mutation operation: UpdateCourseWeekday
 // ====================================================
@@ -21,5 +23,5 @@ export interface UpdateCourseWeekday {
 
 export interface UpdateCourseWeekdayVariables {
   courseId: number;
-  weekday: string;
+  weekday: Weekday_enum;
 }
