@@ -56,7 +56,7 @@ The following ports on the local machine are relevant
 
 There are a few helpful scripts.
 
-- `regenerate-apollo.sh` is used to rebuild the apollo generated code for graphql queries. Call it like this: `sudo bash bin/regenerate-apollo.sh $USER`, it will handle running the `apollo:codegen` target and then fix the problem that generated files are generated as owned by root on your host machine. This way you will be able to push/pull the files using git without access violation errors. The containers need to be up for this. Hotreloading during development should pick up the changes, though I would not be surprised if in some situations a stop/start of the containers will be required to stabilize the setup after all those files are deleted and replaced.
+- `regenerate-apollo.sh` is used to rebuild the apollo generated code for graphql queries. Call it like this: `sudo bash regenerate-apollo.sh $USER` (from the root folder of the repo), it will handle running the `apollo:codegen` target and then fix the problem that generated files are generated as owned by root on your host machine. This way you will be able to push/pull the files using git without access violation errors. The containers need to be up for this. Hotreloading during development should pick up the changes, though I would not be surprised if in some situations a stop/start of the containers will be required to stabilize the setup after all those files are deleted and replaced.
 - `docker_install.sh` can be used to install docker, though it is missing docker-compose.
 
 ## Technical details
