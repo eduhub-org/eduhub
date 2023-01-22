@@ -3005,7 +3005,8 @@ export interface Course_bool_exp {
   tagline?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
-  weekDay?: Weekday_enum_comparison_exp | null;
+  visibility?: Boolean_comparison_exp | null;
+  weekDay?: String_comparison_exp | null;
 }
 
 /**
@@ -3045,7 +3046,8 @@ export interface Course_insert_input {
   tagline?: string | null;
   title?: string | null;
   updated_at?: any | null;
-  weekDay?: Weekday_enum | null;
+  visibility?: boolean | null;
+  weekDay?: string | null;
 }
 
 /**
