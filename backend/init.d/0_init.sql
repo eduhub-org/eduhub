@@ -1064,7 +1064,7 @@ CREATE TABLE public."Course" (
     "contentDescriptionField2" text,
     "learningGoals" text,
     "chatLink" text,
-    visibility boolean DEFAULT false,
+    published boolean DEFAULT false,
     "maxParticipants" integer,
     "endTime" timestamp with time zone,
     "startTime" timestamp with time zone
@@ -1953,6 +1953,7 @@ CREATE TABLE public."Program" (
     "defaultApplicationEnd" date,
     "achievementRecordUploadDeadline" date,
     visibility boolean DEFAULT false NOT NULL,
+    published boolean DEFAULT false,
     "startQuestionnaire" text,
     "speakerQuestionnaire" text,
     "closingQuestionnaire" text,
@@ -3139,7 +3140,7 @@ INSERT INTO public."MotivationRating" VALUES ('REVIEW', 'The motivation letter s
 -- Data for Name: Program; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."Program" VALUES (1, 'WISE 22/23', '2022-12-14', '2022-12-23', '2022-09-30', '2023-03-01', '2023-03-18', true, NULL, NULL, NULL, true, true, NULL, 'http://localhost:4001/emulated-bucket/programid_1/participation_certificate_template/dropped text.txt', 'WI22', 2);
+INSERT INTO public."Program" VALUES (1, 'WISE 22/23', '2022-12-14', '2022-12-23', '2022-09-30', '2023-03-01', '2023-03-18', true, true, NULL, NULL, NULL, true, true, NULL, 'http://localhost:4001/emulated-bucket/programid_1/participation_certificate_template/dropped text.txt', 'WI22', 2);
 
 
 --

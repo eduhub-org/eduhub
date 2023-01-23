@@ -25,11 +25,8 @@ export const MyCourses: FC = () => {
     return (
       <div className="flex flex-col space-y-10 justify-center items-center">
         <span className="text-xl font-bold">
-          Du hast noch keinen Kurs mit gemacht
+          Du hast Dich bisher auf keinen Kurs beworben.
         </span>
-        <Button as="a" href="#courses" filled>
-          Kurse entdecken
-        </Button>
       </div>
     );
   }

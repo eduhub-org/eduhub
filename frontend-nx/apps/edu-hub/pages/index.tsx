@@ -49,15 +49,6 @@ const Home: FC = () => {
               {t("subheadline")}
             </span>
           </div>
-          <ClientOnly>
-            <OnlyLoggedOut>
-              <div className="flex justify-center mb-12">
-                <Button href="/myrequests" as="link" filled>
-                  {t("registerNow")}
-                </Button>
-              </div>
-            </OnlyLoggedOut>
-          </ClientOnly>
         </div>
         <ClientOnly>
           <OnlyLoggedIn>
@@ -65,17 +56,18 @@ const Home: FC = () => {
               <MyCourses />
             </div>
           </OnlyLoggedIn>
-          <h2 id="courses" className="text-3xl font-semibold text-center mt-20">
-            {t("findCourses")}
-          </h2>
-          <div className="mt-11">
-            <TileSlider courses={courses?.Course ?? []} />
-          </div>
-          <div className="w-full flex justify-center mt-16 mb-24">
-            <Button href="/courses/admin" as="link">
-              {t("browse")}
-            </Button>
-          </div>
+
+          {courses?.Course?.length > 0 ? 
+            <>
+              <h2 id="courses" className="text-2xl font-semibold text-left mt-20">
+                {t("published")}
+              </h2>
+              <div className="mt-2">
+                <TileSlider courses={courses?.Course ?? []} />
+              </div>
+            </>
+          : null}
+
           <OnlyLoggedOut>
             <div className="flex flex-col sm:flex-row mx-6 mt-6 mb-24 sm:mt-48">
               <div className="flex flex-1 flex-col sm:items-center">

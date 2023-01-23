@@ -34,4 +34,8 @@ export interface ProgramFragment {
    * The deadline for the achievement record uploads.
    */
   achievementRecordUploadDeadline: any | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
 }
