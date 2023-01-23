@@ -1,17 +1,20 @@
 import { gql } from "@apollo/client";
 import { COURSE_INSTRUCTOR_FRAGMENT } from "./courseInstructorFragment";
+import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from "./programFragment";
 
 import { SESSION_FRAGMENT } from "./sessionFragement";
 
 export const COURSE_FRAGMENT = gql`
   ${SESSION_FRAGMENT}
   ${COURSE_INSTRUCTOR_FRAGMENT}
+  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
   fragment CourseFragment on Course {
     id
     ects
     tagline
     weekDay
     cost
+    published
     applicationEnd
     coverImage
     language
@@ -39,7 +42,7 @@ export const ADMIN_COURSE_FRAGMENT = gql`
   fragment AdminCourseFragment on Course {
     ...CourseFragment
     status
-    visibility
+    published
     achievementCertificatePossible
     attendanceCertificatePossible
     chatLink

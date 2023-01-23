@@ -33,6 +33,7 @@ select_permissions:
         - id
         - lectureEnd
         - lectureStart
+        - published
         - shortTitle
         - title
         - visibility
@@ -40,21 +41,22 @@ select_permissions:
   - role: instructor_access
     permission:
       columns:
-        - id
-        - title
-        - lectureStart
-        - lectureEnd
-        - applicationStart
-        - defaultApplicationEnd
         - achievementRecordUploadDeadline
         - visibility
-        - startQuestionnaire
-        - speakerQuestionnaire
-        - closingQuestionnaire
-        - visibilityParticipationCertificate
-        - visibilityAchievementCertificate
+        - applicationStart
         - attendanceCertificateTemplateURL
-        - participationCertificateTemplateURL
-        - shortTitle
+        - closingQuestionnaire
+        - defaultApplicationEnd
         - defaultMaxMissedSessions
+        - id
+        - lectureEnd
+        - lectureStart
+        - participationCertificateTemplateURL
+        - published
+        - shortTitle
+        - speakerQuestionnaire
+        - startQuestionnaire
+        - title
+        - visibilityAchievementCertificate
+        - visibilityParticipationCertificate
       filter: {}

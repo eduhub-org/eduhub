@@ -135,6 +135,10 @@ export interface CourseWithEnrollment_Course_by_pk_Program {
    * The deadline for the achievement record uploads.
    */
   achievementRecordUploadDeadline: any | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
 }
 
 export interface CourseWithEnrollment_Course_by_pk {
@@ -156,6 +160,10 @@ export interface CourseWithEnrollment_Course_by_pk {
    * A text providing info about the costs of a participation.
    */
   cost: string;
+  /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
   /**
    * Last day before applications are closed. (Set to the program's default value when the course is created.)
    */

@@ -68,6 +68,7 @@ select_permissions:
         - maxMissedSessions
         - maxParticipants
         - programId
+        - published
         - startTime
         - tagline
         - title
@@ -94,11 +95,11 @@ select_permissions:
         - maxMissedSessions
         - maxParticipants
         - programId
+        - published
         - startTime
         - status
         - tagline
         - title
-        - visibility
         - weekDay
       filter:
         CourseEnrollments:

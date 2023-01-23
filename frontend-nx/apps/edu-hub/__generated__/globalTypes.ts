@@ -368,12 +368,12 @@ export enum Course_update_column {
   maxMissedSessions = "maxMissedSessions",
   maxParticipants = "maxParticipants",
   programId = "programId",
+  published = "published",
   startTime = "startTime",
   status = "status",
   tagline = "tagline",
   title = "title",
   updated_at = "updated_at",
-  visibility = "visibility",
   weekDay = "weekDay",
 }
 
@@ -493,6 +493,7 @@ export enum Program_update_column {
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
   participationCertificateTemplateURL = "participationCertificateTemplateURL",
+  published = "published",
   shortTitle = "shortTitle",
   speakerQuestionnaire = "speakerQuestionnaire",
   startQuestionnaire = "startQuestionnaire",
@@ -2998,12 +2999,12 @@ export interface Course_bool_exp {
   maxMissedSessions?: Int_comparison_exp | null;
   maxParticipants?: Int_comparison_exp | null;
   programId?: Int_comparison_exp | null;
+  published?: Boolean_comparison_exp | null;
   startTime?: timestamptz_comparison_exp | null;
   status?: CourseStatus_enum_comparison_exp | null;
   tagline?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
-  visibility?: Boolean_comparison_exp | null;
   weekDay?: Weekday_enum_comparison_exp | null;
 }
 
@@ -3038,12 +3039,12 @@ export interface Course_insert_input {
   maxMissedSessions?: number | null;
   maxParticipants?: number | null;
   programId?: number | null;
+  published?: boolean | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
   tagline?: string | null;
   title?: string | null;
   updated_at?: any | null;
-  visibility?: boolean | null;
   weekDay?: Weekday_enum | null;
 }
 
@@ -3149,12 +3150,12 @@ export interface Course_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
+  published?: order_by | null;
   startTime?: order_by | null;
   status?: order_by | null;
   tagline?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
-  visibility?: order_by | null;
   weekDay?: order_by | null;
 }
 
@@ -3181,12 +3182,12 @@ export interface Course_set_input {
   maxMissedSessions?: number | null;
   maxParticipants?: number | null;
   programId?: number | null;
+  published?: boolean | null;
   startTime?: any | null;
   status?: CourseStatus_enum | null;
   tagline?: string | null;
   title?: string | null;
   updated_at?: any | null;
-  visibility?: boolean | null;
   weekDay?: Weekday_enum | null;
 }
 
@@ -3638,6 +3639,7 @@ export interface Program_bool_exp {
   lectureEnd?: date_comparison_exp | null;
   lectureStart?: date_comparison_exp | null;
   participationCertificateTemplateURL?: String_comparison_exp | null;
+  published?: Boolean_comparison_exp | null;
   shortTitle?: String_comparison_exp | null;
   speakerQuestionnaire?: String_comparison_exp | null;
   startQuestionnaire?: String_comparison_exp | null;
@@ -3664,6 +3666,7 @@ export interface Program_insert_input {
   lectureEnd?: any | null;
   lectureStart?: any | null;
   participationCertificateTemplateURL?: string | null;
+  published?: boolean | null;
   shortTitle?: string | null;
   speakerQuestionnaire?: string | null;
   startQuestionnaire?: string | null;
@@ -3707,6 +3710,7 @@ export interface Program_order_by {
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
   participationCertificateTemplateURL?: order_by | null;
+  published?: order_by | null;
   shortTitle?: order_by | null;
   speakerQuestionnaire?: order_by | null;
   startQuestionnaire?: order_by | null;

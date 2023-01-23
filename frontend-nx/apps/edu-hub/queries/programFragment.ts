@@ -9,6 +9,7 @@ export const USER_PROGRAM_FRAGMENT = gql`
     lectureStart
     title
     achievementRecordUploadDeadline
+    published
   }
 `;
 
@@ -28,6 +29,7 @@ export const ADMIN_PROGRAM_FRAGMENT = gql`
     speakerQuestionnaire
     startQuestionnaire
     title
+    published
     visibility
     visibilityAchievementCertificate
     visibilityParticipationCertificate
@@ -39,5 +41,6 @@ export const PROGRAM_FRAGMENT_MINIMUM_PROPERTIES = gql`
     id
     shortTitle
     title
+    published
   }
 `;
