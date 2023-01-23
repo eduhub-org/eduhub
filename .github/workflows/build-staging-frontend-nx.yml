@@ -30,7 +30,7 @@ jobs:
     name: Build and Store Edu Frontend Docker Image in Google Docker Repo
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
-      DOCKERFILE_FOLDER: frontend-nx/apps/edu
+      DOCKERFILE_FOLDER: frontend-nx/apps/edu-hub
       IMAGE_NAME: frontend
       BRANCH: ${{ github.ref_name }}
       PROJECT_ID: eduhub-staging-new
