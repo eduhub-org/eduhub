@@ -1,9 +1,9 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
-import { ADMIN_COURSE_FRAGMENT, COURSE_FRAGMENT } from "./courseFragment";
-import { ADMIN_ENROLLMENT_FRAGMENT } from "./enrollmentFragment";
-import { ADMIN_SESSION_FRAGMENT } from "./sessionFragement";
-import { USER_FRAGMENT } from "./userFragment";
+import { ADMIN_COURSE_FRAGMENT, COURSE_FRAGMENT } from './courseFragment';
+import { ADMIN_ENROLLMENT_FRAGMENT } from './enrollmentFragment';
+import { ADMIN_SESSION_FRAGMENT } from './sessionFragement';
+import { USER_FRAGMENT } from './userFragment';
 
 export const COURSE = gql`
   ${COURSE_FRAGMENT}
@@ -38,7 +38,6 @@ export const MANAGED_COURSE = gql`
       }
       CourseLocations {
         id
-        link
         locationOption
       }
       Sessions {
@@ -134,14 +133,9 @@ export const DELETE_SESSION_SPEAKER = gql`
 `;
 
 export const INSERT_NEW_SESSION_LOCATION = gql`
-  mutation InsertSessionLocation($sessionId: Int!, $link: String!) {
+  mutation InsertSessionLocation($sessionId: Int!, $address: String!) {
     insert_SessionAddress(
-      objects: {
-        sessionId: $sessionId
-        latitude: ""
-        longitude: ""
-        link: $link
-      }
+      objects: { sessionId: $sessionId, address: $address }
     ) {
       affected_rows
       returning {
@@ -170,13 +164,7 @@ export const LOCATION_OPTIONS = gql`
 export const INSERT_NEW_COURSE_LOCATION = gql`
   mutation InsertCourseLocation($courseId: Int!, $option: String!) {
     insert_CourseLocation(
-      objects: {
-        courseId: $courseId
-        locationOption: $option
-        latitude: ""
-        longitude: ""
-        link: ""
-      }
+      objects: { courseId: $courseId, locationOption: $option }
     ) {
       affected_rows
       returning {
@@ -198,10 +186,10 @@ export const UPDATE_COURSE_LOCATION_OPTION = gql`
 `;
 
 export const UPDATE_COURSE_LOCATION_LINK = gql`
-  mutation UpdateCourseLocationLink($locationId: Int!, $link: String!) {
+  mutation UpdateCourseLocationLink($locationId: Int!, $locationOption: String!) {
     update_CourseLocation_by_pk(
       pk_columns: { id: $locationId }
-      _set: { link: $link }
+      _set: { locationOption: $locationOption }
     ) {
       id
     }
@@ -250,7 +238,7 @@ export const UPDATE_COURSE_LANGUAGE = gql`
 `;
 
 export const UPDATE_COURSE_WEEKDAY = gql`
-  mutation UpdateCourseWeekday($courseId: Int!, $weekday: String!) {
+  mutation UpdateCourseWeekday($courseId: Int!, $weekday: Weekday_enum!) {
     update_Course_by_pk(
       pk_columns: { id: $courseId }
       _set: { weekDay: $weekday }

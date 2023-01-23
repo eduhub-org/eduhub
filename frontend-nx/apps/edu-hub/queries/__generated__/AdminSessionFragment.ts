@@ -11,9 +11,9 @@ export interface AdminSessionFragment_SessionAddresses {
   __typename: "SessionAddress";
   id: number;
   /**
-   * The link to a video conference call (if it is an online location)
+   * Where the session will take place; might be an offline or online location which is provided according to the provided type
    */
-  link: string | null;
+  address: string;
 }
 
 export interface AdminSessionFragment_SessionSpeakers_Expert_User {

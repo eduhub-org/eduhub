@@ -1,8 +1,8 @@
-import { IconButton } from "@material-ui/core";
-import { ChangeEvent, FC, useCallback } from "react";
-import { DebounceInput } from "react-debounce-input";
-import { MdDelete } from "react-icons/md";
-import { ManagedCourse_Course_by_pk_CourseLocations } from "../../queries/__generated__/ManagedCourse";
+import { IconButton } from '@material-ui/core';
+import { ChangeEvent, FC, useCallback } from 'react';
+import { DebounceInput } from 'react-debounce-input';
+import { MdDelete } from 'react-icons/md';
+import { ManagedCourse_Course_by_pk_CourseLocations } from '../../queries/__generated__/ManagedCourse';
 
 interface IProps {
   location: ManagedCourse_Course_by_pk_CourseLocations | null;
@@ -53,7 +53,7 @@ export const LocationSelectionRow: FC<IProps> = ({
         {location && (
           <select
             onChange={handleSetOption}
-            value={location.locationOption || "ONLINE"}
+            value={location.locationOption || 'ONLINE'}
             className="w-full h-10 bg-edu-light-gray"
           >
             {options.map((option) => (
@@ -69,7 +69,7 @@ export const LocationSelectionRow: FC<IProps> = ({
         {location && (
           <DebounceInput
             className="w-full h-10 bg-edu-light-gray"
-            value={location.link}
+            value={location.locationOption}
             onChange={handleSetLink}
             debounceTimeout={1000}
           />

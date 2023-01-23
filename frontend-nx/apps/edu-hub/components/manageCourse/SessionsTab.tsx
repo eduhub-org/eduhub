@@ -1,14 +1,14 @@
-import { QueryResult } from "@apollo/client";
-import { Button } from "@material-ui/core";
-import { FC, useCallback, useMemo } from "react";
-import { MdAddCircle } from "react-icons/md";
+import { QueryResult } from '@apollo/client';
+import { Button } from '@material-ui/core';
+import { FC, useCallback, useMemo } from 'react';
+import { MdAddCircle } from 'react-icons/md';
 import {
   identityEventMapper,
   pickIdPkMapper,
   useAdminMutation,
   useDeleteCallback,
   useUpdateCallback2,
-} from "../../hooks/authedMutation";
+} from '../../hooks/authedMutation';
 import {
   DELETE_SESSION,
   DELETE_SESSION_LOCATION,
@@ -18,43 +18,41 @@ import {
   UPDATE_SESSION_END_TIME,
   UPDATE_SESSION_START_TIME,
   UPDATE_SESSION_TITLE,
-} from "../../queries/course";
+} from '../../queries/course';
 import {
   InsertCourseSession,
   InsertCourseSessionVariables,
-} from "../../queries/__generated__/InsertCourseSession";
-import {
-  ManagedCourse_Course_by_pk,
-} from "../../queries/__generated__/ManagedCourse";
-import { SessionRow } from "./SessionRow";
+} from '../../queries/__generated__/InsertCourseSession';
+import { ManagedCourse_Course_by_pk } from '../../queries/__generated__/ManagedCourse';
+import { SessionRow } from './SessionRow';
 import {
   DeleteCourseSession,
   DeleteCourseSessionVariables,
-} from "../../queries/__generated__/DeleteCourseSession";
+} from '../../queries/__generated__/DeleteCourseSession';
 import {
   UpdateSessionStartTime,
   UpdateSessionStartTimeVariables,
-} from "../../queries/__generated__/UpdateSessionStartTime";
+} from '../../queries/__generated__/UpdateSessionStartTime';
 import {
   UpdateSessionEndTime,
   UpdateSessionEndTimeVariables,
-} from "../../queries/__generated__/UpdateSessionEndTime";
+} from '../../queries/__generated__/UpdateSessionEndTime';
 import {
   UpdateSessionTitle,
   UpdateSessionTitleVariables,
-} from "../../queries/__generated__/UpdateSessionTitle";
+} from '../../queries/__generated__/UpdateSessionTitle';
 import {
   InsertSessionLocation,
   InsertSessionLocationVariables,
-} from "../../queries/__generated__/InsertSessionLocation";
+} from '../../queries/__generated__/InsertSessionLocation';
 import {
   DeleteCourseSessionLocation,
   DeleteCourseSessionLocationVariables,
-} from "../../queries/__generated__/DeleteCourseSessionLocation";
+} from '../../queries/__generated__/DeleteCourseSessionLocation';
 import {
   DeleteSessionSpeaker,
   DeleteSessionSpeakerVariables,
-} from "../../queries/__generated__/DeleteSessionSpeaker";
+} from '../../queries/__generated__/DeleteSessionSpeaker';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -62,7 +60,7 @@ interface IProps {
 }
 
 export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
-  const userRole = "instructor";
+  const userRole = 'instructor';
 
   const courseSessions = useMemo(() => {
     const result = [...course.Sessions];
@@ -110,7 +108,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         await insertSessionLocationMutation({
           variables: {
             sessionId: newSessionId,
-            link: loc.link,
+            address: loc.locationOption,
           },
         });
       }
@@ -131,7 +129,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   >(
     DELETE_SESSION_LOCATION,
     userRole,
-    "addressId",
+    'addressId',
     identityEventMapper,
     qResult
   );
@@ -142,7 +140,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   >(
     DELETE_SESSION_SPEAKER,
     userRole,
-    "speakerId",
+    'speakerId',
     identityEventMapper,
     qResult
   );
@@ -150,7 +148,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const deleteSession = useDeleteCallback<
     DeleteCourseSession,
     DeleteCourseSessionVariables
-  >(DELETE_SESSION, userRole, "sessionId", identityEventMapper, qResult);
+  >(DELETE_SESSION, userRole, 'sessionId', identityEventMapper, qResult);
 
   const setSessionTitle = useUpdateCallback2<
     UpdateSessionTitle,
@@ -158,8 +156,8 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_SESSION_TITLE,
     userRole,
-    "sessionId",
-    "title",
+    'sessionId',
+    'title',
     pickIdPkMapper,
     identityEventMapper,
     qResult
@@ -171,8 +169,8 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_SESSION_START_TIME,
     userRole,
-    "sessionId",
-    "startTime",
+    'sessionId',
+    'startTime',
     pickIdPkMapper,
     identityEventMapper,
     qResult
@@ -184,8 +182,8 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_SESSION_END_TIME,
     userRole,
-    "sessionId",
-    "endTime",
+    'sessionId',
+    'endTime',
     pickIdPkMapper,
     identityEventMapper,
     qResult

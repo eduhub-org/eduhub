@@ -21,5 +21,5 @@ export interface UpdateCourseLocationLink {
 
 export interface UpdateCourseLocationLinkVariables {
   locationId: number;
-  link: string;
+  locationOption: string;
 }
