@@ -27,19 +27,14 @@ insert_permissions:
       columns:
         - courseId
         - id
-        - latitude
-        - link
         - locationOption
-        - longitude
 select_permissions:
   - role: anonymous
     permission:
       columns:
         - courseId
         - id
-        - latitude
         - locationOption
-        - longitude
       filter: {}
       limit: 10
   - role: user_access
@@ -48,10 +43,7 @@ select_permissions:
         - courseId
         - created_at
         - id
-        - latitude
-        - link
         - locationOption
-        - longitude
         - updated_at
       filter: {}
       limit: 10
@@ -60,10 +52,7 @@ update_permissions:
     permission:
       columns:
         - courseId
-        - latitude
-        - link
         - locationOption
-        - longitude
       filter:
         Course:
           CourseInstructors:

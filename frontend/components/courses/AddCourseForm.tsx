@@ -118,7 +118,7 @@ const Form: FC<IAddCourseProps> = ({
             applicationEnd: today,
             ects: "5.0",
             headingDescriptionField1: "",
-            language: "English",
+            language: "EN",
             maxMissedSessions: 3,
             programId,
             tagline: "",

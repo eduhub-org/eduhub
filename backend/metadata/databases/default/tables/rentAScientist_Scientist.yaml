@@ -1,6 +1,11 @@
 table:
   name: Scientist
   schema: rentAScientist
+configuration:
+  column_config: {}
+  custom_column_names: {}
+  custom_name: Scientist
+  custom_root_fields: {}
 array_relationships:
   - name: ScientistOfferRelations
     using:

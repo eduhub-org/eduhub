@@ -30,6 +30,8 @@ Initial development of the full docker based development environment happened on
 1. Initial startup might take a moment to run npm install on the serverless functions
 1. Once startup is completed navigate to `localhost:5000` and login as **dev@example.com** with password **dev**
 1. Keycloak can be accessed on `localhost:28080` as **admin**, password is **admin**
+1. Hasura can be accessed by chaning to the folder `backend` and running `hasura console`.
+   (If you not want to manually open the console via the provided link, you can run once `sudo ln -s $(which wslview) /usr/local/bin/xdg-open` and in the following the window will open automatically under WSL2.)
 
 ## Useful commands
 
