@@ -6,7 +6,7 @@ import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from "./programFragment";
 export const COURSE_LIST = gql`
   ${COURSE_FRAGMENT}
   query CourseList($where: Course_bool_exp! = {}) {
-    Course(order_by: { id: desc }, where: $where) {
+    Course(order_by: { id: desc }, where: {_and: [$where, {published: {_eq: true}}, {Program: { published: { _eq: true } } }]}) {
       ...CourseFragment
     }
   }
