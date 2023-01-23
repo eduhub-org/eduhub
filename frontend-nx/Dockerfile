@@ -37,8 +37,8 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
-COPY --from=builder /opt/app/next.config.js ./
-COPY --from=builder /opt/app/public ./public
+COPY --from=builder /opt/app/apps/edu-hub/next.config.js ./
+COPY --from=builder /opt/app/apps/edu-hub/public ./public
 COPY --from=builder /opt/app/package.json ./package.json
 
 # Automatically leverage output traces to reduce image size 
