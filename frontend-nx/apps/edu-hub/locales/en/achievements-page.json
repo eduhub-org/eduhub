@@ -3,10 +3,15 @@
   "page-header": "Leistungsnachweise",
   "achievement-record": "Leistungsnachweise",
   "achievement-record-admin": "Administration Leistungsnachweise",
-  "results": "Ergebnis",
-  "upload": "↑ Hochladen",
-  "description": "Beschreibung",
+  "results": "Results",
+  "upload": "↑ Upload",
+  "description": "Description",
   "mentors": "Mentors",
   "result": "Result",
-  "documentation": "Documentation"
+  "documentation": "Documentation",
+  "deadline": "Deadline",
+  "results-so-far": "Results so far",
+  "rank": "Rank",
+  "last-upload": "Last Upload",
+  "file-name": "File name"
 }

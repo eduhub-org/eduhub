@@ -8,5 +8,10 @@
   "description": "Beschreibung",
   "mentors": "Mentor(en)",
   "result": "Ergebnis",
-  "documentation": "Dokumentation"
+  "documentation": "Dokumentation",
+  "deadline": "Abgabeschluss",
+  "results-so-far": "Bisherige Ergebnisse",
+  "rank": "Rang",
+  "last-upload": "Letzter Upload",
+  "file-name": "Dateiname"
 }

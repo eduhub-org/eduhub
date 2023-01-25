@@ -1,4 +1,5 @@
 import { QueryResult } from '@apollo/client';
+import { ACHIEVEMENT_OPTION_COURSES } from '../../queries/achievementOption';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
 import { FC, useCallback, useState } from 'react';
@@ -10,7 +11,6 @@ import {
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { useAdminQuery } from '../../hooks/authedQuery';
 import { QUERY_LIMIT } from '../../pages/courses';
-import { ACHIEVEMENT_OPTION_COURSES } from '../../queries/achievementOptionCourse';
 import {
   INSERT_SINGLE_ATTENDENCE,
   UPDATE_ATTENDENCE,
@@ -41,11 +41,10 @@ import {
 } from '../../queries/__generated__/UpdateSingleAttendenceByPk';
 import { StaticComponentProperty } from '../../types/UIComponents';
 import { AttendanceStatus_enum } from '../../__generated__/globalTypes';
-import { ContentRow } from '../common/ContentRow';
 import { DOT_COLORS, EhDot } from '../common/dots';
 import TagWithTwoText from '../common/TagWithTwoText';
-import CourseAchievementOption from '../course/course-achievement-option/CourseAchievementOption';
 import Loading from '../courses/Loading';
+import { Button } from '../common/Button';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -190,18 +189,9 @@ const EnrollmentList: FC<IPropsEnrollmentList> = ({ course, qResult }) => {
           ))}
         </tbody>
       </table>
-
-      <ContentRow
-        className="my-24"
-        leftTop={<div className="flex flex-1"></div>}
-        rightBottom={
-          <div className="flex flex-1">
-            {course.achievementCertificatePossible && (
-              <CourseAchievementOption course={course} t={t} />
-            )}
-          </div>
-        }
-      />
+      <div className="flex justify-end mt-10">
+        <Button filled={true}>{t('certificate-generation')}</Button>
+      </div>
     </div>
   );
 };

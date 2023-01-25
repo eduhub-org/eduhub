@@ -8,6 +8,7 @@ import { Translate } from 'next-translate';
 import useTranslation from 'next-translate/useTranslation';
 import {
   FC,
+  ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -25,7 +26,10 @@ import {
   TempAchievementOptionCourse,
   TempAchievementOptionMentor,
 } from '../../helpers/achievement';
-import { makeFullName } from '../../helpers/util';
+import {
+  downloadCSVFileFromBase64String,
+  makeFullName,
+} from '../../helpers/util';
 import { AdminCourseList_Course } from '../../queries/__generated__/AdminCourseList';
 import { UserForSelection1_User } from '../../queries/__generated__/UserForSelection1';
 import { SelectUserDialog } from '../common/dialogs/SelectUserDialog';
@@ -214,28 +218,16 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
     });
   }, []);
 
-  const handleInputFile = useCallback(async (e) => {
-    const { name, value } = e.target;
-    const file: UploadFile = await parseFileUploadEvent(e);
-    dispatch({
-      key: name,
-      value: file,
-    });
-
-    if (name === AchievementKeys.DOCUMENT_TEMPLATE_FILE) {
+  const handleInputFile = useCallback(
+    (controlName: string, file: UploadFile) => {
+      console.log(controlName);
       dispatch({
-        key: 'documentationTemplateUrl',
-        value,
+        key: controlName,
+        value: file,
       });
-      return;
-    }
-    if (name === AchievementKeys.EVALUATION_SCRIPT_FILE) {
-      dispatch({
-        key: 'evaluationScriptUrl',
-        value,
-      });
-    }
-  }, []);
+    },
+    []
+  );
 
   const handleSubmit = useCallback(
     async (event) => {
@@ -252,6 +244,16 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
   const isEqual = () => {
     return _.isEqual(state, props.defaultData);
   };
+
+  /**
+   * https://www.geeksforgeeks.org/how-to-create-and-download-csv-file-in-javascript/
+   * https://stackoverflow.com/questions/73342056/convert-base64-string-to-csv-javascript-giving-blob-error
+   */
+  const clickCSV = useCallback(() => {
+    if (state.csvTemplateUrl) {
+      downloadCSVFileFromBase64String(state.csvTemplateUrl);
+    }
+  }, [state.csvTemplateUrl]);
 
   const tCommon: Translate = context.t;
   const { t } = useTranslation('course-page');
@@ -340,9 +342,9 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
           />
         </div>
 
-        <div id="edit-documentations" className="grid grid-cols-2 gap-5 pr-5">
-          <div className="h-full flex justify-start">
-            <div className="flex flex-col space-y-5 justify-between h-full">
+        <div id="edit-documentations" className="flex flex-col gap-5 pr-5">
+          <div className="h-full flex flex-row justify-between">
+            <div className="flex flex-col space-y-1">
               <div className="flex flex-col space-y-1">
                 <p>{`${tCommon('achievement-record-type')}*`}</p>
                 <EhSelectForEnum2
@@ -357,80 +359,75 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
                 'form-mandatory-field'
               )}`}</p>
             </div>
-          </div>
-          <div className="h-full flex justify-end">
-            {state.recordType === 'DOCUMENTATION' && (
-              <div className="flex flex-row space-x-1 items-center">
-                <CustomLinkWithTile
-                  title={`${tCommon('documentation-template')} (.doc)*`}
-                  downloadText={tCommon('download-documentation-template')}
-                  googleLink={documentTemplateGoogleLink}
-                  path={state.documentationTemplateUrl}
-                />
-
-                <div className="pt-6 pl-1">
-                  <CustomFileInput
-                    name={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
-                    id={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
-                    accept=".doc, .docx"
-                    onChangeHandler={handleInputFile}
-                  />
-                </div>
-              </div>
-            )}
+            <CustomFileInput
+              title={`${tCommon('documentation-template')} (.doc)*`}
+              name={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
+              id={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
+              accept=".doc, .docx"
+              onChangeHandler={handleInputFile}
+              customLink={
+                documentTemplateGoogleLink ? (
+                  <Link href={documentTemplateGoogleLink}>
+                    {tCommon('download-documentation-template')}
+                  </Link>
+                ) : (
+                  ''
+                )
+              }
+            />
             {state.recordType === 'DOCUMENTATION_AND_CSV' && (
-              <div className="flex flex-col space-y-5">
-                <div className="flex flex-row space-x-1 items-center">
-                  <CustomLinkWithTile
-                    title={`${tCommon('documentation-template')} (.doc)*`}
-                    downloadText={tCommon('download-documentation-template')}
-                    googleLink={documentTemplateGoogleLink}
-                    path={state.documentationTemplateUrl}
-                  />
-                  <div className="pt-6 pl-1">
-                    <CustomFileInput
-                      accept=".doc, .docx"
-                      onChangeHandler={handleInputFile}
-                      name={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
-                      id={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <div className="flex flex-col space-y-2 justify-start">
-                    <div className="flex flex-row space-x-1 items-center">
-                      <CustomLinkWithTile
-                        title={`${tCommon('evaluation-script')} (.py)*`}
-                        downloadText={tCommon('download-script-file-template')}
-                        googleLink={scriptGoogleUrl}
-                        path={state.evaluationScriptUrl}
-                      />
-                      <div className="pt-6 pl-1">
-                        <CustomFileInput
-                          accept=".py"
-                          onChangeHandler={handleInputFile}
-                          name={AchievementKeys.EVALUATION_SCRIPT_FILE}
-                          id={AchievementKeys.EVALUATION_SCRIPT_FILE}
-                        />
-                      </div>
-                    </div>
-
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          name={AchievementKeys.SHOW_SCORE_AUTHORS}
-                          onChange={handleCheckBox}
-                          id={AchievementKeys.SHOW_SCORE_AUTHORS}
-                          checked={state.showScoreAuthors}
-                        />
-                      }
-                      label={tCommon('show-authors-column')}
-                    />
-                  </div>
-                </div>
+              //
+              <CustomFileInput
+                title={`${tCommon('documentation-template-CSV')} (.csv)*`}
+                accept=".csv, .CSV"
+                onChangeHandler={handleInputFile}
+                name={AchievementKeys.CSV_TEMPLATE_FILE}
+                id={AchievementKeys.CSV_TEMPLATE_FILE}
+                customLink={
+                  state.csvTemplateUrl ? (
+                    <Link className="cursor-pointer" onClick={clickCSV}>
+                      {tCommon('download-csv-template-file')}
+                    </Link>
+                  ) : (
+                    ''
+                  )
+                }
+              />
+            )}
+          </div>
+          <div className="flex flex-col w-full justify-end gap-5">
+            {state.recordType === 'DOCUMENTATION_AND_CSV' && (
+              <div className="flex justify-end">
+                <CustomFileInput
+                  accept=".py"
+                  title={`${tCommon('evaluation-script')} (.py)*`}
+                  onChangeHandler={handleInputFile}
+                  name={AchievementKeys.EVALUATION_SCRIPT_FILE}
+                  id={AchievementKeys.EVALUATION_SCRIPT_FILE}
+                  customLink={
+                    scriptGoogleUrl ? (
+                      <Link href={scriptGoogleUrl}>
+                        {tCommon('download-script-file-template')}
+                      </Link>
+                    ) : (
+                      ''
+                    )
+                  }
+                />
               </div>
             )}
+            <FormControlLabel
+              className="justify-end"
+              control={
+                <Checkbox
+                  name={AchievementKeys.SHOW_SCORE_AUTHORS}
+                  onChange={handleCheckBox}
+                  id={AchievementKeys.SHOW_SCORE_AUTHORS}
+                  checked={state.showScoreAuthors}
+                />
+              }
+              label={tCommon('show-authors-column')}
+            />
           </div>
         </div>
         {!isEqual() && (
@@ -529,63 +526,62 @@ const EhSelectForEnum2: FC<IProsSelect> = ({
 };
 
 const CustomFileInput: FC<{
-  onChangeHandler: (event: any) => void;
+  onChangeHandler: (controlName: string, file: UploadFile) => void;
   name: string;
   accept: string;
   id: string;
-}> = ({ onChangeHandler, name, accept, id }) => {
+  title: string;
+  customLink?: ReactNode;
+}> = (props) => {
+  const [fileName, setFileName] = useState('');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const onClickHandler = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
+
+  const onChange = useCallback(
+    async (event) => {
+      const file: UploadFile = await parseFileUploadEvent(event);
+      setFileName(file.name);
+      props.onChangeHandler(props.name, file);
+    },
+    [props]
+  );
   return (
     <>
-      <div className="h-10 w-10  rounded-full border-2 border-gray-400 flex justify-center items-center">
-        <MdUploadFile
-          size="1.5em"
-          className="cursor-pointer"
-          onClick={onClickHandler}
-        />
+      <div className="flex flex-row space-x-1">
+        <div className="flex flex-col space-y-1 items-center ">
+          <p className="w-full">{props.title}</p>
+          <div className="h-12 text-center pt-3  px-2  bg-white  w-full">
+            {fileName.trim().length > 0 ? (
+              <p>{fileName}</p>
+            ) : props.customLink ? (
+              <>{props.customLink}</>
+            ) : (
+              <></>
+            )}
+          </div>
+        </div>
+        <div className="pt-6 pl-1">
+          <div className="h-10 w-10  rounded-full border-2 border-gray-400 flex justify-center items-center">
+            <MdUploadFile
+              size="1.5em"
+              className="cursor-pointer"
+              onClick={onClickHandler}
+            />
+          </div>
+          <input
+            accept={props.accept}
+            onChange={onChange}
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            type="file"
+            name={props.name}
+            id={props.id}
+          />
+        </div>
       </div>
-      <input
-        accept={accept}
-        onChange={onChangeHandler}
-        ref={fileInputRef}
-        style={{ display: 'none' }}
-        type="file"
-        name={name}
-        id={id}
-      />
     </>
-  );
-};
-
-const CustomLinkWithTile: FC<{
-  title: string;
-  googleLink: string;
-  path: string;
-  downloadText: string;
-}> = ({ title, googleLink, path, downloadText }) => {
-  const getLastPartOfAnUrl = (location: string) => {
-    if (!location || location.trim().length === 0) return '';
-    const pathFromDB = (location as string).split('/'); // courseid_8/achievementOptionEvaluationScript/undefined
-    if (pathFromDB.length > 1) return pathFromDB.pop();
-    return (location as string).split('\\').pop(); // Demo Path of local PC
-  };
-  const isLinkAndPathSame = googleLink ? googleLink.endsWith(path) : false;
-  return (
-    <div className="flex flex-col space-y-1 items-center ">
-      <p className="w-full">{title}</p>
-      <div className="h-12 text-center pt-3  px-2  bg-white  w-full">
-        {!path || path.trim().length === 0 ? (
-          <></>
-        ) : isLinkAndPathSame ? (
-          <Link href={googleLink}>{downloadText}</Link>
-        ) : (
-          <p>{getLastPartOfAnUrl(path)}</p>
-        )}
-      </div>
-    </div>
   );
 };
 

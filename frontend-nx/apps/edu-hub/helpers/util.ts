@@ -30,3 +30,33 @@ export const formattedDateWithTime = (date: Date, language = 'de') => {
     ':' + minute + ' '
   )}`;
 };
+
+export const downloadCSVFileFromBase64String = (base64File: string) => {
+  // decode the base-64 string
+  const csvContent = Buffer.from(base64File, 'base64');
+
+  // Creating a Blob for having a csv file format
+  // and passing the data with type
+
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+
+  // Creating an object for downloading url
+  const url = window.URL.createObjectURL(blob);
+
+  // Creating an anchor(a) tag of HTML
+  const a = document.createElement('a');
+
+  // Passing the blob downloading url
+  a.setAttribute('href', url);
+
+  // Setting the anchor tag attribute for downloading
+  // and passing the download file name
+  a.setAttribute('download', 'template.csv');
+
+  // Performing a download with click
+  a.click();
+};
+
+export const isDateExpired = (givenDate: Date) => {
+  return givenDate.getTime() - new Date().getTime() <= 0;
+};

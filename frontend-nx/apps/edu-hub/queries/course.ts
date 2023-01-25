@@ -1,15 +1,33 @@
 import { gql } from '@apollo/client';
 
-import { ADMIN_COURSE_FRAGMENT, COURSE_FRAGMENT } from './courseFragment';
+import {
+  ADMIN_COURSE_FRAGMENT,
+  COURSE_FRAGMENT,
+  COURSE_FRAGMENT_MINIMUM,
+} from './courseFragment';
 import { ADMIN_ENROLLMENT_FRAGMENT } from './enrollmentFragment';
 import { ADMIN_SESSION_FRAGMENT } from './sessionFragement';
 import { USER_FRAGMENT } from './userFragment';
+import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from './programFragment';
 
 export const COURSE = gql`
   ${COURSE_FRAGMENT}
   query Course($id: Int!) {
     Course_by_pk(id: $id) {
       ...CourseFragment
+    }
+  }
+`;
+
+export const COURSE_MINIMUM = gql`
+  ${COURSE_FRAGMENT_MINIMUM}
+  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
+  query CourseMinimum($id: Int!) {
+    Course_by_pk(id: $id) {
+      ...CourseFragmentMinimum
+      Program {
+        ...ProgramFragmentMinimumProperties
+      }
     }
   }
 `;
@@ -186,7 +204,10 @@ export const UPDATE_COURSE_LOCATION_OPTION = gql`
 `;
 
 export const UPDATE_COURSE_LOCATION_LINK = gql`
-  mutation UpdateCourseLocationLink($locationId: Int!, $locationOption: String!) {
+  mutation UpdateCourseLocationLink(
+    $locationId: Int!
+    $locationOption: String!
+  ) {
     update_CourseLocation_by_pk(
       pk_columns: { id: $locationId }
       _set: { locationOption: $locationOption }

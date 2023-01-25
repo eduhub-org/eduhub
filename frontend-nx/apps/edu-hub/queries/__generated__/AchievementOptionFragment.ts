@@ -21,6 +21,10 @@ export interface AchievementOptionFragment {
    */
   description: string;
   /**
+   * Type of the achivement record that must be uploaded for this option
+   */
+  recordType: AchievementRecordType_enum;
+  /**
    * An instructor or project mentor can provide a template for the record that must be uploaded to complete this achievement
    */
   documentationTemplateUrl: string;
@@ -29,9 +33,9 @@ export interface AchievementOptionFragment {
    */
   evaluationScriptUrl: string;
   /**
-   * Type of the achivement record that must be uploaded for this option
+   * URL to the template that shall be used for uploading csv data for a new achievement record
    */
-  recordType: AchievementRecordType_enum;
+  csvTemplateUrl: string | null;
   /**
    * For TRUE the score table will include a column showing the authors; for FALSE the scores will be anonymous.
    */

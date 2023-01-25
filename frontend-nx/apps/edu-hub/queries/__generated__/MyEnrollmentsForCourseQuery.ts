@@ -113,6 +113,14 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course {
    */
   title: string;
   /**
+   * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
+   */
+  achievementCertificatePossible: boolean;
+  /**
+   * Indicates whether participants will get a certificate showing the list of attendances (only issued if the did not miss then maxMissedCourses)
+   */
+  attendanceCertificatePossible: boolean;
+  /**
    * Id of the program to which the course belongs.
    */
   programId: number | null;

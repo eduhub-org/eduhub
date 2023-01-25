@@ -16,7 +16,7 @@ import {
   useIsLoggedIn,
 } from '../../hooks/authentication';
 import { useKeycloakUserProfile, useUserId } from '../../hooks/user';
-import { ACHIEVEMENT_RECORD_TYPES } from '../../queries/achievement';
+import { ACHIEVEMENT_RECORD_TYPES } from '../../queries/achievementOption';
 import { ADMIN_COURSE_LIST } from '../../queries/courseList';
 import { AchievementRecordTypes } from '../../queries/__generated__/AchievementRecordTypes';
 import {

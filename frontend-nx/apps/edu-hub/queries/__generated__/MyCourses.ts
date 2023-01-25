@@ -88,6 +88,31 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments
 
 export interface MyCourses_User_by_pk_CourseEnrollments_Course_Program {
   __typename: "Program";
+  id: number;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
+  /**
+   * The last day a course lecture can possibly be in this program.
+   */
+  lectureEnd: any | null;
+  /**
+   * The deadline for the achievement record uploads.
+   */
+  achievementRecordUploadDeadline: any | null;
+  /**
+   * Defines whether the tab for this course program is shown or not.
+   */
+  visibility: boolean;
   /**
    * The default application deadline for a course. It can be changed on the course level.
    */
@@ -96,23 +121,6 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_Program {
    * The day the application for all courses of the program start.
    */
   applicationStart: any | null;
-  id: number;
-  /**
-   * The last day a course lecture can possibly be in this program.
-   */
-  lectureEnd: any | null;
-  /**
-   * The first day a course lecture can possibly be in this program.
-   */
-  lectureStart: any | null;
-  /**
-   * The title of the program
-   */
-  title: string;
-  /**
-   * The deadline for the achievement record uploads.
-   */
-  achievementRecordUploadDeadline: any | null;
 }
 
 export interface MyCourses_User_by_pk_CourseEnrollments_Course {
@@ -154,6 +162,14 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course {
    * The title of the course (only editable by an admin user)
    */
   title: string;
+  /**
+   * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
+   */
+  achievementCertificatePossible: boolean;
+  /**
+   * Indicates whether participants will get a certificate showing the list of attendances (only issued if the did not miss then maxMissedCourses)
+   */
+  attendanceCertificatePossible: boolean;
   /**
    * Id of the program to which the course belongs.
    */

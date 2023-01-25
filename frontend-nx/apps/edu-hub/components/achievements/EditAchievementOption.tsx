@@ -201,6 +201,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
       evaluationScriptUrl: ao.evaluationScriptUrl,
       recordType: ao.recordType,
       showScoreAuthors: ao.showScoreAuthors,
+      csvTemplateUrl: ao.csvTemplateUrl,
       mentors: ao.AchievementOptionMentors.map(
         (m) =>
           ({
@@ -225,6 +226,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
   }, [
     ao.AchievementOptionCourses,
     ao.AchievementOptionMentors,
+    ao.csvTemplateUrl,
     ao.description,
     ao.documentationTemplateUrl,
     ao.evaluationScriptUrl,
@@ -334,6 +336,17 @@ const EditAchievementOption: FC<IProps> = (props) => {
                   updatedData.evaluationScriptFile,
                   achievementOptionId,
                   UploadFileTypes.SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT
+                );
+              }
+              break;
+            case AchievementKeys.CSV_TEMPLATE_FILE:
+              if (updatedData.csvTemplateFile) {
+                await context.queryUpdateAchievementOptions(
+                  data.achievementOptionId,
+                  {
+                    key: AchievementKeys.CSV_TEMPLATE_URL,
+                    value: updatedData[key].data,
+                  }
                 );
               }
               break;

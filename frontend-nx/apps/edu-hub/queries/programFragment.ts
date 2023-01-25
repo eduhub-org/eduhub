@@ -1,43 +1,38 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
+export const PROGRAM_FRAGMENT_MINIMUM_PROPERTIES = gql`
+  fragment ProgramFragmentMinimumProperties on Program {
+    id
+    title
+    shortTitle
+    lectureStart
+    lectureEnd
+    achievementRecordUploadDeadline
+    visibility
+  }
+`;
 export const USER_PROGRAM_FRAGMENT = gql`
+  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
   fragment ProgramFragment on Program {
+    ...ProgramFragmentMinimumProperties
     defaultApplicationEnd
     applicationStart
-    id
-    lectureEnd
-    lectureStart
-    title
-    achievementRecordUploadDeadline
   }
 `;
 
 export const ADMIN_PROGRAM_FRAGMENT = gql`
+  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
   fragment AdminProgramFragment on Program {
-    id
+    ...ProgramFragmentMinimumProperties
     applicationStart
     attendanceCertificateTemplateURL
     closingQuestionnaire
     defaultApplicationEnd
     defaultMaxMissedSessions
-    lectureEnd
-    lectureStart
     participationCertificateTemplateURL
-    achievementRecordUploadDeadline
-    shortTitle
     speakerQuestionnaire
     startQuestionnaire
-    title
-    visibility
     visibilityAchievementCertificate
     visibilityParticipationCertificate
-  }
-`;
-
-export const PROGRAM_FRAGMENT_MINIMUM_PROPERTIES = gql`
-  fragment ProgramFragmentMinimumProperties on Program {
-    id
-    shortTitle
-    title
   }
 `;

@@ -5,9 +5,10 @@ export const ACHIEVEMENT_OPTION_FRAGMENT = gql`
     id
     title
     description
+    recordType
     documentationTemplateUrl
     evaluationScriptUrl
-    recordType
+    csvTemplateUrl
     showScoreAuthors
   }
 `;

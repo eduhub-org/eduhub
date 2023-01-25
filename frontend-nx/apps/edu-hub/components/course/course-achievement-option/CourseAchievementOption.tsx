@@ -8,17 +8,10 @@ import {
   AchievementOptionCourses_AchievementOptionCourse,
 } from '../../../queries/__generated__/AchievementOptionCourses';
 import { Button } from '../../common/Button';
-import { useAdminQuery } from '../../../hooks/authedQuery';
-import { ACHIEVEMENT_OPTION_COURSES } from '../../../queries/achievementOptionCourse';
+import { useAuthedQuery } from '../../../hooks/authedQuery';
 import { BlockTitle } from '@opencampus/shared-components';
 import ModalControl from '../../common/ModalController';
-import ProjectResultsUpload from './AchievementResultsUpload';
-
-import { ACHIEVEMENT_RECORD_LIST } from '../../../queries/achievementRecord';
-import {
-  AchievementRecordList,
-  AchievementRecordListVariables,
-} from '../../../queries/__generated__/AchievementRecordList';
+import FormToUploadAchievementRecord from './FormToUploadAchievementRecord';
 import {
   makeFullName,
   formattedDate,
@@ -26,9 +19,15 @@ import {
 } from '../../../helpers/util';
 import { AlertMessageDialog } from '../../common/dialogs/AlertMessageDialog';
 import { Translate } from 'next-translate';
-import { ManagedCourse_Course_by_pk } from '../../../queries/__generated__/ManagedCourse';
+import { ACHIEVEMENT_OPTION_COURSES } from '../../../queries/achievementOption';
+import { ACHIEVEMENT_RECORD_AUTHORS } from 'apps/edu-hub/queries/AchievementRecordAuthor';
+import {
+  AchievementRecordAuthorQuery,
+  AchievementRecordAuthorQueryVariables,
+} from 'apps/edu-hub/queries/__generated__/AchievementRecordAuthorQuery';
 interface IContext {
-  course: ManagedCourse_Course_by_pk;
+  achievementRecordUploadDeadline: any;
+  courseTitle: string;
   userId: string | undefined;
   userProfile: IUserProfile | undefined;
   t: Translate;
@@ -38,11 +37,18 @@ interface IContext {
 export const ProjectResultUploadContext = createContext({} as IContext);
 
 interface IProps {
-  course: ManagedCourse_Course_by_pk;
+  courseId: number;
+  achievementRecordUploadDeadline: any;
   t: Translate;
+  courseTitle: string;
 }
 
-const CourseAchievementOption: FC<IProps> = ({ course, t }) => {
+const CourseAchievementOption: FC<IProps> = ({
+  courseId,
+  achievementRecordUploadDeadline,
+  courseTitle,
+  t,
+}) => {
   const userId = useUserId();
   const profile = useKeycloakUserProfile();
   const [showModal, setShowModal] = useState(false);
@@ -56,42 +62,33 @@ const CourseAchievementOption: FC<IProps> = ({ course, t }) => {
   const [archiveOptionsAnchorElement, setAnchorElement] =
     useState<HTMLElement>();
   /* #region Database */
-  const achievementOptionCourseRequest = useAdminQuery<
+  const query = useAuthedQuery<
     AchievementOptionCourses,
     AchievementOptionCoursesVariables
   >(ACHIEVEMENT_OPTION_COURSES, {
     variables: {
-      where:
-        course && course.id
-          ? {
-              courseId: { _eq: course.id },
-            }
-          : {},
+      where: {
+        courseId: { _eq: courseId },
+      },
     },
+    skip: courseId <= 0,
   });
 
-  const aCourseList = [
-    ...(achievementOptionCourseRequest.data?.AchievementOptionCourse || []),
-  ];
-
-  const achievementRecordListAPI = useAdminQuery<
-    AchievementRecordList,
-    AchievementRecordListVariables
-  >(ACHIEVEMENT_RECORD_LIST, {
+  const aCourseList = [...(query.data?.AchievementOptionCourse || [])];
+  const myRecordsQuery = useAuthedQuery<
+    AchievementRecordAuthorQuery,
+    AchievementRecordAuthorQueryVariables
+  >(ACHIEVEMENT_RECORD_AUTHORS, {
     variables: {
       where: {
         _and: [
           {
-            achievementOptionId: {
+            achievementRecordId: {
               _eq: selectedAchievementOption.achievementOptionId,
             },
           },
           {
-            AchievementRecordAuthors: {
-              userId: {
-                _eq: userId,
-              },
-            },
+            userId: { _eq: userId },
           },
         ],
       },
@@ -100,9 +97,14 @@ const CourseAchievementOption: FC<IProps> = ({ course, t }) => {
   });
 
   const myAchievementRecords = [
-    ...(achievementRecordListAPI.data?.AchievementRecord || []),
+    ...(myRecordsQuery.data?.AchievementRecordAuthor || []),
   ];
 
+  // console.log(
+  //   myAchievementRecords,
+  //   selectedAchievementOption.achievementOptionId,
+  //   userId
+  // );
   /* #endregion */
 
   /* #region Callbacks*/
@@ -135,14 +137,15 @@ const CourseAchievementOption: FC<IProps> = ({ course, t }) => {
 
   const onSuccess = useCallback(() => {
     setShowModal(false);
-    achievementRecordListAPI.refetch();
-  }, [setShowModal, achievementRecordListAPI]);
+    myRecordsQuery.refetch();
+  }, [myRecordsQuery]);
   /* #endregion */
 
   const providerValue: IContext = {
-    course: course,
+    achievementRecordUploadDeadline: achievementRecordUploadDeadline,
     userProfile: profile,
     userId,
+    courseTitle,
     t,
     setAlertMessage,
   };
@@ -161,16 +164,15 @@ const CourseAchievementOption: FC<IProps> = ({ course, t }) => {
         <BlockTitle>{t('achievement-option')}</BlockTitle>
         <span className="text-lg mt-6">
           {t('achievement-record-upload-dead-line-text', {
-            date: formattedDate(course.Program.achievementRecordUploadDeadline),
+            date: formattedDate(achievementRecordUploadDeadline),
           })}
         </span>
         <div className="flex mt-10 mb-4">
-          {!achievementOptionCourseRequest.loading &&
-            aCourseList.length > 0 && (
-              <div onClick={onAchievementOptionDropdown}>
-                <Button>{`${t('choose-achievement-option')} ↓`}</Button>
-              </div>
-            )}
+          {!query.loading && aCourseList.length > 0 && (
+            <div onClick={onAchievementOptionDropdown}>
+              <Button>{`${t('choose-achievement-option')} ↓`}</Button>
+            </div>
+          )}
 
           {isVisibleAchievementOptions && (
             <AchievementOptionDropDown
@@ -206,9 +208,21 @@ const CourseAchievementOption: FC<IProps> = ({ course, t }) => {
       </div>
       {showModal && (
         <ModalControl showModal={showModal} onClose={close}>
-          <ProjectResultsUpload
-            achievementOptionCourse={selectedAchievementOption}
+          <FormToUploadAchievementRecord
+            achievementOptionId={selectedAchievementOption.achievementOptionId}
+            csvTemplateUrl={
+              selectedAchievementOption.AchievementOption.csvTemplateUrl
+            }
+            documentationTemplateUrl={
+              selectedAchievementOption.AchievementOption
+                .documentationTemplateUrl
+            }
+            recordType={selectedAchievementOption.AchievementOption.recordType}
+            title={selectedAchievementOption.AchievementOption.title}
             onSuccess={onSuccess}
+            courseTitle={courseTitle}
+            setAlertMessage={setAlertMessage}
+            userId={userId}
           />
         </ModalControl>
       )}

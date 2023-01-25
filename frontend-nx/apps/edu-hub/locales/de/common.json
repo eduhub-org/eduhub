@@ -29,9 +29,9 @@
   "csv-results": "CSV Ergebnisse",
   "documentations": "Beschreibung",
   "operation-failed": "Vorgang fehlgeschlagen!",
-  "form-info-cover-image-size": "Optimal ist eine Größe von XXX x XXX Pixel.",
-  "form-info-documentations": "Benutze diese Vorlage zum Hochladen der Dokumentation!",
-  "form-info-csv-results": "Benutze diese Vorlage zum Hochladen der CSV-Ergebnisse!",
+  "form-info-cover-image-size": "Optimal ist eine Größe von {{width}} x {{height}} Pixel.",
+  "form-info-documentations": "Benutze <0>{{article}}</0> zum Hochladen der Dokumentation!",
+  "form-info-csv-results": "Benutze <0>{{article}}</0> zum Hochladen der CSV-Ergebnisse!",
   "achievement-record-upload-dead-line-text": "Den Leistungsnachweis musst Du bis spätestens zum {{date}}  hochgeladen haben.",
   "last-upload-from-a-author": "Der letzte Nachweis mit Dir als Autor wurde  {{dateTime}} von {{fullName}}  hochgeladen.",
   "no-proof-uploaded-by-me-as-author": "Bis jetzt wurde noch kein Nachweis mit Dir als Autor hochgeladen",
@@ -48,6 +48,13 @@
   "not-logged-in-message": "Waiting for Authentications",
   "invalid-request": "Invalid request",
   "save": "Speichern",
-  "download-documentation-template": "Dokumentationsvorlage herunterladen",
-  "download-script-file-template": "Vorlage für Skriptdatei herunterladen"
+  "download-documentation-template": "Dokumentationsvorlage",
+  "download-script-file-template": "Vorlage für Skriptdatei",
+  "documentation-template-CSV": "Dokumentationsvorlage CSV",
+  "download-csv-template-file": "CSV template",
+  "date": "Datum",
+  "type-name-email-minimum-3-letters": "Suche Nutzer anhand Vorname, Nachname oder E-Mail. Mindestens 3 Buchstaben eingeben. Nutzer per Klick auswählen.",
+  "search-value": "Suchwert",
+  "certificate-generation": "Zertifikate generieren",
+  "next": "Weiter"
 }

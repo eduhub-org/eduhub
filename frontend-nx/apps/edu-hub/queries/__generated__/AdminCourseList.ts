@@ -96,6 +96,10 @@ export interface AdminCourseList_Course_Program {
    * The deadline for the achievement record uploads.
    */
   achievementRecordUploadDeadline: any | null;
+  /**
+   * Defines whether the tab for this course program is shown or not.
+   */
+  visibility: boolean;
 }
 
 export interface AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus {
@@ -162,6 +166,14 @@ export interface AdminCourseList_Course {
    */
   title: string;
   /**
+   * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
+   */
+  achievementCertificatePossible: boolean;
+  /**
+   * Indicates whether participants will get a certificate showing the list of attendances (only issued if the did not miss then maxMissedCourses)
+   */
+  attendanceCertificatePossible: boolean;
+  /**
    * Id of the program to which the course belongs.
    */
   programId: number | null;
@@ -209,14 +221,6 @@ export interface AdminCourseList_Course {
    * The value decides whether the course is visible for users or anoymous persons.
    */
   visibility: boolean | null;
-  /**
-   * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
-   */
-  achievementCertificatePossible: boolean;
-  /**
-   * Indicates whether participants will get a certificate showing the list of attendances (only issued if the did not miss then maxMissedCourses)
-   */
-  attendanceCertificatePossible: boolean;
   /**
    * The link to the chat of the course (e.g. a mattermost channel)
    */

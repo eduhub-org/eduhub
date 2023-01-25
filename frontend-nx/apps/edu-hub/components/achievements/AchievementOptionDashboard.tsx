@@ -8,7 +8,7 @@ import {
 } from 'react-icons/md';
 import { makeFullName } from '../../helpers/util';
 import { useAdminQuery } from '../../hooks/authedQuery';
-import { ACHIEVEMENT_OPTIONS } from '../../queries/achievement';
+import { ACHIEVEMENT_OPTIONS } from '../../queries/achievementOption';
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../queries/programList';
 import {
   AchievementOptionList,

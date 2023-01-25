@@ -25,6 +25,8 @@ export interface IDataToManipulate {
   documentTemplateFile?: UploadFile;
   evaluationScriptFile?: UploadFile;
   showScoreAuthors: boolean;
+  csvTemplateUrl: string;
+  csvTemplateFile?: UploadFile;
 }
 
 export interface IPayload {
@@ -66,10 +68,16 @@ export const AchievementKeys = {
   DELETE_A_COURSE: 'deleteACourse',
   DOCUMENT_TEMPLATE_FILE: 'documentTemplateFile',
   EVALUATION_SCRIPT_FILE: 'evaluationScriptFile',
+  CSV_TEMPLATE_FILE: 'csvTemplateFile',
   SHOW_SCORE_AUTHORS: 'showScoreAuthors',
 };
 
 export interface ResponseToARequest {
   success: boolean;
   message?: string;
+}
+
+export interface NameId {
+  id: string;
+  name: string;
 }

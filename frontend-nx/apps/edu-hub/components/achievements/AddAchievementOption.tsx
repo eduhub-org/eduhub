@@ -39,6 +39,9 @@ const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
               evaluationScriptUrl: '', // This field is also mandatory while insert
               documentationTemplateUrl: '', // This field is also mandatory while insert
               recordType: data.recordType as AchievementRecordType_enum,
+              csvTemplateUrl: data.csvTemplateFile
+                ? data.csvTemplateFile.data
+                : null,
               AchievementOptionCourses: {
                 data: data.courses.map((c) => ({ courseId: c.courseId })),
               },
@@ -97,6 +100,7 @@ const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
     documentationTemplateUrl: '',
     evaluationScriptUrl: '',
     showScoreAuthors: true,
+    csvTemplateUrl: '',
     recordType: context.achievementRecordTypes[0] as AchievementRecordType_enum,
     mentors: profile
       ? new Array({
