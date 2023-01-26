@@ -37,15 +37,16 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
-#COPY --from=builder /opt/app/apps/edu-hub/next.config.js ./
+COPY --from=builder /opt/app/apps/edu-hub/next.config.js ./
 COPY --from=builder /opt/app/apps/edu-hub/public ./public
 COPY --from=builder /opt/app/package.json ./package.json
 
-# Automatically leverage output traces to reduce image size 
+# Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 #COPY --from=builder --chown=nextjs:nodejs /opt/app/dist/apps/edu-hub/.next/standalone ./
 #COPY --from=builder --chown=nextjs:nodejs /opt/app/apps/edu-hub/.next/static ./.next/static
 
+COPY --from=builder --chown=nextjs:nodejs /opt/app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /opt/app/dist/apps/edu-hub/.next/standalone/apps/edu-hub ./
 
 # USER nextjs
