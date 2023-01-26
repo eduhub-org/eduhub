@@ -46,7 +46,7 @@ COPY --from=builder /opt/app/package.json ./package.json
 #COPY --from=builder --chown=nextjs:nodejs /opt/app/dist/apps/edu-hub/.next/standalone ./
 #COPY --from=builder --chown=nextjs:nodejs /opt/app/apps/edu-hub/.next/static ./.next/static
 
-COPY --from=builder --chown=nextjs:nodejs ./dist/apps/edu-hub/.next/standalone/apps/edu-hub ./
+COPY --from=builder --chown=nextjs:nodejs /opt/app/dist/apps/edu-hub/.next/standalone/apps/edu-hub ./
 
 # USER nextjs
 
