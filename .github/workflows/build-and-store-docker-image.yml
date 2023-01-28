@@ -19,6 +19,10 @@ on:
       DOCKERFILE_FOLDER:
         required: true
         type: string
+      # Name of the Dockerfile that is used for creating the image
+      DOCKERFILE_NAME:
+        required: true
+        type: string
       NEXT_PUBLIC_API_URL:
         required: false
         type: string
@@ -49,7 +53,7 @@ jobs:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
           project_id: ${{ inputs.PROJECT_ID }}
       - name: Build Docker image
-        run: docker build ./${{ inputs.DOCKERFILE_FOLDER }} --file ./${{ inputs.DOCKERFILE_FOLDER }}/Dockerfile --tag ${{ inputs.IMAGE_NAME }} --label "runnumber=${GITHUB_RUN_ID}" --build-arg NEXT_PUBLIC_API_URL=${{ inputs.NEXT_PUBLIC_API_URL }} --build-arg NEXT_PUBLIC_AUTH_URL=${{ inputs.NEXT_PUBLIC_AUTH_URL }}
+        run: docker build ./${{ inputs.DOCKERFILE_FOLDER }} --file ./${{ inputs.DOCKERFILE_FOLDER }}/${{ inputs.DOCKERFILE_NAME }} --tag ${{ inputs.IMAGE_NAME }} --label "runnumber=${GITHUB_RUN_ID}" --build-arg NEXT_PUBLIC_API_URL=${{ inputs.NEXT_PUBLIC_API_URL }} --build-arg NEXT_PUBLIC_AUTH_URL=${{ inputs.NEXT_PUBLIC_AUTH_URL }}
       - name: Authenticate with Google Cloud Artifact Registry
         run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
       - name: Push Docker Image to Google Artifact Registry
