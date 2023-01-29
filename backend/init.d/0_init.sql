@@ -1064,7 +1064,7 @@ CREATE TABLE public."Course" (
     "contentDescriptionField2" text,
     "learningGoals" text,
     "chatLink" text,
-    published boolean DEFAULT false,
+    "published" boolean DEFAULT false,
     "maxParticipants" integer,
     "endTime" timestamp with time zone,
     "startTime" timestamp with time zone
@@ -1209,13 +1209,6 @@ COMMENT ON COLUMN public."Course"."learningGoals" IS 'An array of texts includin
 --
 
 COMMENT ON COLUMN public."Course"."chatLink" IS 'The link to the chat of the course (e.g. a mattermost channel)';
-
-
---
--- Name: COLUMN "Course".visibility; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN public."Course".visibility IS 'The value decides whether the course is visible for users or anoymous persons.';
 
 
 --
@@ -1953,7 +1946,7 @@ CREATE TABLE public."Program" (
     "defaultApplicationEnd" date,
     "achievementRecordUploadDeadline" date,
     visibility boolean DEFAULT false NOT NULL,
-    published boolean DEFAULT false,
+    "published" boolean DEFAULT false,
     "startQuestionnaire" text,
     "speakerQuestionnaire" text,
     "closingQuestionnaire" text,
