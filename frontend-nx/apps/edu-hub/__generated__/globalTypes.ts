@@ -3006,11 +3006,15 @@ export interface Course_bool_exp {
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 <<<<<<< HEAD
+<<<<<<< HEAD
   visibility?: Boolean_comparison_exp | null;
   weekDay?: String_comparison_exp | null;
 =======
   weekDay?: Weekday_enum_comparison_exp | null;
 >>>>>>> Only published courses from published program are shown to (not enrolled) users.
+=======
+  weekDay?: Weekday_enum_comparison_exp | null;
+>>>>>>> 0c6113facbf4344d84532d4e9ba764384a90855b
 }
 
 /**
@@ -3050,12 +3054,7 @@ export interface Course_insert_input {
   tagline?: string | null;
   title?: string | null;
   updated_at?: any | null;
-<<<<<<< HEAD
-  visibility?: boolean | null;
-  weekDay?: string | null;
-=======
   weekDay?: Weekday_enum | null;
->>>>>>> Only published courses from published program are shown to (not enrolled) users.
 }
 
 /**
