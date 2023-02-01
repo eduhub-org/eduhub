@@ -32,6 +32,7 @@ import {
   InsertNewSessionSpeakerVariables,
 } from '../../queries/__generated__/InsertNewSessionSpeaker';
 import EhMultipleTag from '../common/EhMultipleTag';
+import useTranslation from 'next-translate/useTranslation';
 
 const copyDateTime = (target: Date, source: Date) => {
   target = new Date(target);
@@ -76,6 +77,8 @@ export const SessionRow: FC<IProps> = ({
   onDeleteLocation,
   onDeleteSpeaker,
 }) => {
+  const { t } = useTranslation();
+
   const handleDelete = useCallback(() => {
     if (session != null) {
       onDelete(session.id);
@@ -247,7 +250,7 @@ export const SessionRow: FC<IProps> = ({
       >
         {!session && (
           <div className="mr-3 ml-3 col-span-4">
-            Datum
+            {t('date')}
             <br />
           </div>
         )}
@@ -268,9 +271,9 @@ export const SessionRow: FC<IProps> = ({
         <div className="mr-3 ml-3 col-span-3">
           {!session && (
             <>
-              Start
+              {t('start')}
               <br />
-              Uhrzeit
+              {t('time')}
             </>
           )}
           {session && (
@@ -284,9 +287,9 @@ export const SessionRow: FC<IProps> = ({
         <div className="mr-3 ml-3 col-span-3">
           {!session && (
             <>
-              Ende
+              {t('end')}
               <br />
-              Uhrzeit
+              {t('time')}
             </>
           )}
           {session && (
@@ -298,22 +301,24 @@ export const SessionRow: FC<IProps> = ({
           )}
         </div>
         <div className="mr-3 ml-3 col-span-10">
-          {!session && <>Beschreibung</>}
+          {!session && <>{t('description')}</>}
           {session && (
             <DebounceInput
               className="w-full bg-edu-light-gray m-2"
               value={session.title}
               onChange={handleSetTitle}
               debounceTimeout={1000}
-              placeholder="Bitte Beschreibung eingeben!"
+              placeholder={t('please-enter-something', {
+                something: t('description'),
+              })}
             />
           )}
         </div>
         <div className="mr-3 ml-3 col-span-5">
           {!session && (
             <>
-              Adresse / <br />
-              Link
+              {t('address')} / <br />
+              {t('link')}
             </>
           )}
           {session && (
@@ -354,15 +359,15 @@ export const SessionRow: FC<IProps> = ({
       </div>
       <InputDialog
         open={addressAddOpen}
-        confirmText="Hinzufügen"
-        inputLabel="Addresse/Link"
+        confirmText={t('add')}
+        inputLabel={`${t('address')}/${t('link')}`}
         onClose={handleAddNewAddress}
-        question={'Neue Addresse hinzufügen'}
+        question={t('add-new-something', { something: t('address') })}
       />
       <SelectUserDialog
         onClose={handleNewSpeaker}
         open={addSpeakerOpen}
-        title={'Speaker auswählen'}
+        title={t('select-something', { something: t('speaker') })}
       />
     </div>
   );

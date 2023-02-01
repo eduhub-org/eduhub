@@ -1,4 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
+import useTranslation from 'next-translate/useTranslation';
 import { ChangeEvent, FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
@@ -89,6 +90,7 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
 
   const users = [...(result1.data?.User || []), ...(result2.data?.User || [])];
 
+  const { t } = useTranslation();
   return (
     <Dialog open={open} onClose={handleCancel}>
       <DialogTitle>
@@ -101,12 +103,7 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
       </DialogTitle>
 
       <DialogContent>
-        <div>
-          Suche Nutzer anhand Vorname, Nachname oder E-Mail.
-          <br />
-          Mindestens 3 Buchstaben eingeben. <br />
-          Nutzer per Klick auswählen.
-        </div>
+        <div>{t('type-name-email-minimum-3-letters')}</div>
 
         <div>
           <input
@@ -126,7 +123,7 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
 
         <div className="grid grid-cols-2 mb-2">
           <div>
-            <Button onClick={handleCancel}>Abbrechen</Button>
+            <Button onClick={handleCancel}>{t('cancel')}</Button>
           </div>
           <div />
         </div>

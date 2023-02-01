@@ -17,13 +17,15 @@ import {
   AchievementOptionList_AchievementOption,
 } from '../../queries/__generated__/AchievementOptionList';
 import {
-  CircularProgress,
+  Box,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  Tooltip,
+  Typography,
 } from '@material-ui/core';
 import { PageBlock } from '../../components/common/PageBlock';
 import {
@@ -38,17 +40,19 @@ import {
   AchievementRecordListWithAuthors_AchievementRecord,
 } from '../../queries/__generated__/AchievementRecordListWithAuthors';
 import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../queries/achievementRecord';
-import { AchievementRecordType_enum } from '../../__generated__/globalTypes';
+import {
+  AchievementRecordType_enum,
+  order_by,
+} from '../../__generated__/globalTypes';
 import { Translate } from 'next-translate';
-import FormToUploadAchievementRecord from 'apps/edu-hub/components/course/course-achievement-option/FormToUploadAchievementRecord';
-import ModalControl from 'apps/edu-hub/components/common/ModalController';
-import { AlertMessageDialog } from 'apps/edu-hub/components/common/dialogs/AlertMessageDialog';
-import { useUserId } from 'apps/edu-hub/hooks/user';
-import { COURSE_ENROLLMENTS } from 'apps/edu-hub/queries/courseEnrollment';
+import FormToUploadAchievementRecord from '../../components/course/course-achievement-option/FormToUploadAchievementRecord';
+import { AlertMessageDialog } from '../../components/common/dialogs/AlertMessageDialog';
+import { useUserId } from '../../hooks/user';
+import { COURSE_ENROLLMENTS } from '../../queries/courseEnrollment';
 import {
   CourseEnrollmentQuery,
   CourseEnrollmentQueryVariables,
-} from 'apps/edu-hub/queries/__generated__/CourseEnrollmentQuery';
+} from '../../queries/__generated__/CourseEnrollmentQuery';
 const AchievementOptionDetails: FC = () => {
   const router = useRouter();
   const { achievementOptionId } = router.query;
@@ -60,6 +64,9 @@ const AchievementOptionDetails: FC = () => {
   const courseId =
     typeof courseIdString === 'string' ? parseInt(courseIdString) : 0;
   const [course, setCourse] = useState(null as CourseMinimum_Course_by_pk);
+  const [achievementOption, setAchievementOption] = useState(
+    null as AchievementOptionList_AchievementOption
+  );
 
   const achievementOptionQuery = useAuthedQuery<
     AchievementOptionList,
@@ -70,12 +77,6 @@ const AchievementOptionDetails: FC = () => {
     },
     skip: id <= 0,
   });
-
-  const achievementOptions = [
-    ...(achievementOptionQuery.data?.AchievementOption || []),
-  ];
-
-  const details = achievementOptions.length > 0 ? achievementOptions[0] : null;
 
   const courseDetails = useAuthedQuery<CourseMinimum, CourseMinimumVariables>(
     COURSE_MINIMUM,
@@ -90,31 +91,32 @@ const AchievementOptionDetails: FC = () => {
   useEffect(() => {
     const details = courseDetails.data?.Course_by_pk || null;
     setCourse(details);
-  }, [courseDetails, setCourse]);
+    const list = [...(achievementOptionQuery.data?.AchievementOption || [])];
+    setAchievementOption(list.length > 0 ? list[0] : null);
+  }, [
+    achievementOptionQuery.data?.AchievementOption,
+    courseDetails,
+    setCourse,
+  ]);
 
   return (
     <>
       <Head>
         <title>
-          {achievementOptionQuery.loading
-            ? 'Loading'
-            : details
-            ? details.title
-            : t('achievement-option')}
+          {t('achievement-option')}
+          {achievementOption &&
+            achievementOption.title &&
+            ` - ${achievementOption.title}`}
         </title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Page>
         <div className="min-h-[77vh]">
-          {achievementOptionQuery.loading ? (
-            <CircularProgress></CircularProgress>
-          ) : details && course ? (
+          {achievementOption && course && (
             <AchievementOptionDetailsDashboard
-              achievementOption={details}
+              achievementOption={achievementOption}
               course={course}
             />
-          ) : (
-            ''
           )}
         </div>
       </Page>
@@ -140,7 +142,7 @@ const AchievementOptionDetailsDashboard: FC<IProps> = ({
   }, [setAlertMessage]);
 
   return (
-    <PageBlock classname="flex flex-col gap-8">
+    <PageBlock classname="flex flex-col gap-8 pb-5">
       {alertMessage.trim().length > 0 && (
         <AlertMessageDialog
           alert={alertMessage}
@@ -184,7 +186,7 @@ const AchievementOptionDetailsDashboard: FC<IProps> = ({
 
       {achievementOption.recordType ===
         AchievementRecordType_enum.DOCUMENTATION && (
-        <ViewForOnlyDocument
+        <RecordTypeDocumentView
           achievementOption={achievementOption}
           course={course}
           t={t}
@@ -232,7 +234,7 @@ const ViewForCSV: FC<IProps2> = ({
     setAchievementRecords(r);
   }, [achievementRecords.data?.AchievementRecord]);
 
-  const close = useCallback(() => {
+  const onClosed = useCallback(() => {
     setShowModal(false);
   }, [setShowModal]);
 
@@ -248,22 +250,15 @@ const ViewForCSV: FC<IProps2> = ({
   return (
     <>
       {showModal && (
-        <ModalControl showModal={showModal} onClose={close}>
-          <FormToUploadAchievementRecord
-            achievementOptionId={achievementOption.id}
-            csvTemplateUrl={achievementOption.csvTemplateUrl}
-            documentationTemplateUrl={
-              achievementOption.documentationTemplateUrl
-            }
-            recordType={achievementOption.recordType}
-            title={achievementOption.title}
-            onSuccess={onSuccess}
-            courseTitle={course.title}
-            setAlertMessage={setAlertMessage}
-            userId={userId}
-            courseId={course.id}
-          />
-        </ModalControl>
+        <FormToUploadAchievementRecord
+          achievementOption={achievementOption}
+          onSuccess={onSuccess}
+          onClose={onClosed}
+          courseTitle={course.title}
+          setAlertMessage={setAlertMessage}
+          userId={userId}
+          courseId={course.id}
+        />
       )}
 
       {/* This section is only shown if any csv results were uploaded or the achievement option is not expired yet. */}
@@ -294,7 +289,7 @@ const ViewForCSV: FC<IProps2> = ({
           ></ContentRowTwoColumn>
           {/* The table is only shown if achievement records including csv results do actually exist. */}
           {records.length > 0 && (
-            <div id="records" className="pb-5">
+            <div id="records">
               <Title>{t('achievements-page:results-so-far')}</Title>
 
               <Paper>
@@ -309,11 +304,9 @@ const ViewForCSV: FC<IProps2> = ({
                       </TableCell>
                       {/* Column is only show when AchievementOption.showScoreAuthors==TRUE */}
                       {achievementOption.showScoreAuthors && (
-                        <TableCell align="left">
-                          {t('achievements-page:mentors')}
-                        </TableCell>
+                        <TableCell>{t('achievements-page:mentors')}</TableCell>
                       )}
-                      <TableCell align="left">{t('date')}</TableCell>
+                      <TableCell>{t('date')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -333,7 +326,7 @@ const ViewForCSV: FC<IProps2> = ({
                             </BoldText>
                           </TableCell>
                         )}
-                        <TableCell align="left">
+                        <TableCell>
                           {formattedDate(new Date(row.created_at))}
                         </TableCell>
                       </TableRow>
@@ -349,7 +342,7 @@ const ViewForCSV: FC<IProps2> = ({
   );
 };
 
-const ViewForOnlyDocument: FC<IProps2> = ({
+const RecordTypeDocumentView: FC<IProps2> = ({
   achievementOption,
   course,
   t,
@@ -359,6 +352,10 @@ const ViewForOnlyDocument: FC<IProps2> = ({
   const [records, setAchievementRecords] = useState(
     [] as AchievementRecordListWithAuthors_AchievementRecord[]
   );
+  const [myLastUpload, setMyLastUpload] = useState(
+    [] as AchievementRecordListWithAuthors_AchievementRecord[]
+  );
+
   const achievementRecords = useAuthedQuery<
     AchievementRecordListWithAuthors,
     AchievementRecordListWithAuthorsVariables
@@ -368,13 +365,29 @@ const ViewForOnlyDocument: FC<IProps2> = ({
     },
   });
 
+  const myUploadsQuery = useAuthedQuery<
+    AchievementRecordListWithAuthors,
+    AchievementRecordListWithAuthorsVariables
+  >(ACHIEVEMENT_RECORDS_WITH_AUTHORS, {
+    variables: {
+      where: {
+        _and: [
+          { achievementOptionId: { _eq: achievementOption.id } },
+          { uploadUserId: { _eq: userId } },
+        ],
+      },
+      orderBy: { created_at: order_by.desc },
+      limit: 1,
+    },
+  });
+
   useEffect(() => {
     const r = [...(achievementRecords.data?.AchievementRecord || [])];
     setAchievementRecords(r);
   }, [achievementRecords.data?.AchievementRecord]);
 
   const [showModal, setShowModal] = useState(false);
-  const close = useCallback(() => {
+  const onClosed = useCallback(() => {
     setShowModal(false);
   }, [setShowModal]);
 
@@ -385,7 +398,8 @@ const ViewForOnlyDocument: FC<IProps2> = ({
   const onSuccess = useCallback(() => {
     setShowModal(false);
     achievementRecords.refetch();
-  }, [achievementRecords]);
+    myUploadsQuery.refetch();
+  }, [achievementRecords, myUploadsQuery]);
 
   const enrollment = useAuthedQuery<
     CourseEnrollmentQuery,
@@ -407,6 +421,11 @@ const ViewForOnlyDocument: FC<IProps2> = ({
 
   const [isEnrolled, setEnrollmentStatus] = useState(false);
 
+  const getLastAfterSplitting = (input: string) => {
+    if (!input || input.trim().length === 0) return input;
+    return input.split('/').pop();
+  };
+
   useEffect(() => {
     const r = enrollment.data
       ? enrollment.data?.CourseEnrollment.length > 0
@@ -414,25 +433,22 @@ const ViewForOnlyDocument: FC<IProps2> = ({
     setEnrollmentStatus(r);
   }, [enrollment.data, setEnrollmentStatus]);
 
+  useEffect(() => {
+    const myLast = [...(myUploadsQuery.data?.AchievementRecord || [])];
+    setMyLastUpload(myLast);
+  }, [myUploadsQuery.data?.AchievementRecord]);
   return (
     <>
       {showModal && (
-        <ModalControl showModal={showModal} onClose={close}>
-          <FormToUploadAchievementRecord
-            achievementOptionId={achievementOption.id}
-            csvTemplateUrl={achievementOption.csvTemplateUrl}
-            documentationTemplateUrl={
-              achievementOption.documentationTemplateUrl
-            }
-            recordType={achievementOption.recordType}
-            title={achievementOption.title}
-            onSuccess={onSuccess}
-            courseTitle={course.title}
-            setAlertMessage={setAlertMessage}
-            userId={userId}
-            courseId={course.id}
-          />
-        </ModalControl>
+        <FormToUploadAchievementRecord
+          onClose={onClosed}
+          achievementOption={achievementOption}
+          onSuccess={onSuccess}
+          courseTitle={course.title}
+          setAlertMessage={setAlertMessage}
+          userId={userId}
+          courseId={course.id}
+        />
       )}
       {/* This section is only shown for a user currently registered in the course indicated for this achievement option */}
       {isEnrolled && (
@@ -454,40 +470,90 @@ const ViewForOnlyDocument: FC<IProps2> = ({
               </p>
             }
           ></ContentRowTwoColumn>
-          <div id="records" className="pb-5">
-            <Title>{t('achievements-page:results-so-far')}</Title>
+          {/* For users who are enrolled for the shown project (i.e. user is logged in) and already uploaded a documentation,
+           before the view includes an additional section below the upload button, showing the file name of the last submitted project documentation, the authors and the date it was uploaded. */}
+          {myLastUpload.length > 0 && (
+            <div id="my-uploads">
+              <Typography variant="button">
+                {t('achievements-page:last-submitted-documentation')}
+              </Typography>
+              <Paper>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>{t('achievements-page:file-name')}</TableCell>
+                      <TableCell>{t('achievements-page:mentors')}</TableCell>
+                      <TableCell>{t('date')}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>
+                        {myLastUpload[0].documentationUrl &&
+                          getLastAfterSplitting(
+                            myLastUpload[0].documentationUrl
+                          )}
+                      </TableCell>
+                      <TableCell>
+                        <BoldText>
+                          {myLastUpload[0].AchievementRecordAuthors.map((m) =>
+                            makeFullName(m.User.firstName, m.User.lastName)
+                          ).join(', ')}
+                        </BoldText>
+                      </TableCell>
+                      <TableCell>
+                        {formattedDate(new Date(myLastUpload[0].created_at))}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </Paper>
+            </div>
+          )}
+          <div id="records">
+            <Typography variant="button">
+              {t('achievements-page:results-so-far')}
+            </Typography>
             {records && (
               <Paper>
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell align="left">
-                        {t('achievements-page:file-name')}
-                      </TableCell>
-                      <TableCell align="left">
+                      <TableCell>{t('achievements-page:file-name')}</TableCell>
+                      <TableCell colSpan={4}>
                         {t('achievements-page:mentors')}
                       </TableCell>
-                      <TableCell align="left">{t('date')}</TableCell>
+                      <TableCell colSpan={4}>{t('date')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {records.map((row, index) => (
                       <TableRow key={row.id}>
-                        <TableCell align="left" component="th" scope="row">
-                          {row.documentationUrl.length > 0 && (
-                            <p className="text-ellipsis overflow-hidden">
-                              {row.documentationUrl.split('/').pop()}
-                            </p>
-                          )}
+                        <TableCell
+                          colSpan={1}
+                          variant="head"
+                          component="th"
+                          scope="row"
+                        >
+                          <Tooltip
+                            title={getLastAfterSplitting(row.documentationUrl)}
+                            enterDelay={300}
+                          >
+                            {row.documentationUrl.length > 0 && (
+                              <p className="text-ellipsis overflow-hidden">
+                                {getLastAfterSplitting(row.documentationUrl)}
+                              </p>
+                            )}
+                          </Tooltip>
                         </TableCell>
-                        <TableCell>
+                        <TableCell colSpan={4}>
                           <BoldText>
                             {row.AchievementRecordAuthors.map((m) =>
                               makeFullName(m.User.firstName, m.User.lastName)
                             ).join(', ')}
                           </BoldText>
                         </TableCell>
-                        <TableCell align="left">
+                        <TableCell colSpan={4}>
                           {formattedDate(new Date(row.created_at))}
                         </TableCell>
                       </TableRow>
@@ -504,11 +570,11 @@ const ViewForOnlyDocument: FC<IProps2> = ({
 };
 
 interface IPropsTitle {
-  children: string;
+  children: ReactNode;
 }
 
 const Title: FC<IPropsTitle> = ({ children }) => {
-  return <p className="uppercase text-sm">{children}</p>;
+  return <Typography variant="button">{children}</Typography>;
 };
 
 const BoldText: FC<IPropsTitle> = ({ children }) => {

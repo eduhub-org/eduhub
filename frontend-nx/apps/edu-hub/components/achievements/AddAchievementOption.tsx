@@ -95,7 +95,7 @@ const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
 
   const data: IDataToManipulate = {
     achievementOptionId: null,
-    title: '',
+    title: 'New Title',
     description: '',
     documentationTemplateUrl: '',
     evaluationScriptUrl: '',

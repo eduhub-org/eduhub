@@ -8,7 +8,6 @@ import {
   useRef,
   useState,
 } from 'react';
-// import { Button } from '../../common/Button';
 
 import { MdAddCircleOutline } from 'react-icons/md';
 import {
@@ -51,7 +50,11 @@ import {
 } from '../../../__generated__/globalTypes';
 import { ContentRow } from '../../common/ContentRow';
 import EhTagStingId from '../../common/EhTagStingId';
-import { NameId } from '../../../helpers/achievement';
+import {
+  AtLeastNameEmail,
+  MinAchievementOption,
+  NameId,
+} from '../../../helpers/achievement';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
 import {
   LoadAchievementOptionDocumentationTemplate,
@@ -61,14 +64,9 @@ import Trans from 'next-translate/Trans';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress, TextareaAutosize, Link } from '@material-ui/core';
 import { Button } from '../../common/Button';
-import EnrolledUserForACourseDialog, {
-  AtLeastNameEmail,
-} from '../../common/dialogs/EnrolledUserForACourseDialog';
-interface TempUser {
-  id: string; // uuid
-  firstName: string;
-  lastName: string;
-}
+import EnrolledUserForACourseDialog from '../../common/dialogs/EnrolledUserForACourseDialog';
+import ModalControl2 from '../../common/ModalController2';
+
 interface State {
   achievementRecordTableId: number; // book keeping
   coverImageUrl: UploadFile;
@@ -76,38 +74,33 @@ interface State {
   documentationUrl: UploadFile;
   evaluationScriptUrl: UploadFile;
   csvResults: UploadFile;
-  authors: TempUser[]; // book keeping
+  authors: AtLeastNameEmail[];
 }
 
 interface Type {
   type: string;
-  value: string | TempUser[] | UploadFile;
+  value: string | AtLeastNameEmail[] | UploadFile;
 }
 
 interface IProps {
   // achievementOptionCourse: AchievementOptionCourses_AchievementOptionCourse;
-  achievementOptionId: number;
-  documentationTemplateUrl: string;
-  csvTemplateUrl: string;
-  title: string;
-  recordType: AchievementRecordType_enum;
+  achievementOption: MinAchievementOption;
   onSuccess: () => void;
   userId: string;
   setAlertMessage: (message: string) => void;
   courseTitle: string;
   courseId: number;
+  onClose: () => void;
 }
+
 const FormToUploadAchievementRecord: FC<IProps> = ({
-  achievementOptionId,
-  documentationTemplateUrl,
-  csvTemplateUrl,
-  title,
-  recordType,
+  achievementOption,
   onSuccess,
   userId,
   setAlertMessage,
   courseTitle,
   courseId,
+  onClose,
 }) => {
   const [visibleAuthorList, setVisibleAuthorList] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -125,22 +118,21 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
   const reducer = (state: State = initialState, action: Type) => {
     return { ...state, [action.type]: action.value };
   };
-
   const [state, dispatch] = useReducer(reducer, initialState);
-  // const [scriptGoogleUrl, setScriptGoogleUrl] = useState(null as string);
   const [documentTemplateGoogleLink, setDocumentTemplateGoogleLink] = useState(
     null as string
   );
 
   /* #region database */
+  const docUrl = achievementOption.documentationTemplateUrl;
+  const csvUrl = achievementOption.csvTemplateUrl;
 
   const docLoadQuery = useAuthedQuery<
     LoadAchievementOptionDocumentationTemplate,
     LoadAchievementOptionDocumentationTemplateVariables
   >(LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE, {
-    variables: { path: documentationTemplateUrl },
-    skip:
-      !documentationTemplateUrl || documentationTemplateUrl.trim().length === 0,
+    variables: { path: docUrl },
+    skip: !docUrl || docUrl.trim().length === 0,
   });
 
   useEffect(() => {
@@ -152,7 +144,7 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
         docLoadQuery.data.loadAchievementOptionDocumentationTemplate.link
       );
     }
-  }, [docLoadQuery, documentationTemplateUrl]);
+  }, [docLoadQuery]);
 
   const [updateAnAchievementRecordAPI] = useAuthedMutation<
     UpdateAchievementRecordByPk,
@@ -198,7 +190,8 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
                 id: user.id,
                 firstName: user.firstName,
                 lastName: user.lastName,
-              } as TempUser,
+                email: user.email,
+              } as AtLeastNameEmail,
             ],
           });
         }
@@ -224,10 +217,10 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
   );
 
   const downloadCSV = useCallback(() => {
-    if (csvTemplateUrl) {
-      downloadCSVFileFromBase64String(csvTemplateUrl);
+    if (csvUrl) {
+      downloadCSVFileFromBase64String(csvUrl);
     }
-  }, [csvTemplateUrl]);
+  }, [csvUrl]);
 
   const [insertAnAchievementRecordAPI] = useAuthedMutation<
     InsertAnAchievementRecord,
@@ -239,16 +232,45 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
       try {
         setLoading(true);
         event.preventDefault();
+
+        if (
+          achievementOption.recordType ===
+            AchievementRecordType_enum.DOCUMENTATION &&
+          !state.coverImageUrl
+        ) {
+          setAlertMessage(`${t('achievements-page:cover-image-required')}`);
+          return;
+        }
+
+        if (state.authors.length === 0) {
+          setAlertMessage(`${t('achievements-page:authors-missing')}`);
+          return;
+        }
+
+        if (!state.documentationUrl) {
+          setAlertMessage(`${t('achievements-page:documentation-missing')}`);
+          return;
+        }
+        if (
+          achievementOption.recordType ===
+            AchievementRecordType_enum.DOCUMENTATION_AND_CSV &&
+          !state.csvResults
+        ) {
+          setAlertMessage(`${t('achievements-page:csv-file-missing')}`);
+          return;
+        }
         const result = await insertAnAchievementRecordAPI({
           variables: {
             insertInput: {
               coverImageUrl: '', // this is mandatory field
+              description: state.description ?? '',
               rating: AchievementRecordRating_enum.UNRATED, // this is mandatory field
               score: 0, // because mandatory
-              uploadUserId: userId,
-              achievementOptionId: achievementOptionId,
-              description: state.description ?? '',
+              evaluationScriptUrl:
+                achievementOption.evaluationScriptUrl ?? null,
+              achievementOptionId: achievementOption.id,
               csvResults: state.csvResults ? state.csvResults.data : null,
+              uploadUserId: userId,
               AchievementRecordAuthors: {
                 data: state.authors.map((a) => ({ userId: a.id })),
               },
@@ -263,7 +285,11 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
         const achievementRecordId = result.data.insert_AchievementRecord_one.id;
         if (achievementRecordId <= 0) return;
 
-        if (state.coverImageUrl) {
+        if (
+          achievementOption.recordType ===
+            AchievementRecordType_enum.DOCUMENTATION &&
+          state.coverImageUrl
+        ) {
           const saveResult = await saveAchievementRecordCoverImage({
             variables: {
               achievementRecordId,
@@ -303,6 +329,7 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
             },
           },
         });
+        onSuccess();
       } catch (error) {
         if (setAlertMessage) {
           setAlertMessage(`${t('operation-failed')} ${error.message}`);
@@ -310,18 +337,19 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
         console.log(error);
       } finally {
         setLoading(false);
-        onSuccess();
       }
     },
     [
+      state.documentationUrl,
+      state.coverImageUrl,
       state.csvResults,
       state.description,
       state.authors,
-      state.coverImageUrl,
-      state.documentationUrl,
+      achievementOption.recordType,
+      achievementOption.evaluationScriptUrl,
+      achievementOption.id,
       insertAnAchievementRecordAPI,
       userId,
-      achievementOptionId,
       saveAchievementRecordDocumentation,
       updateAnAchievementRecordAPI,
       setAlertMessage,
@@ -331,7 +359,7 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
     ]
   );
   return (
-    <>
+    <ModalControl2 onClosed={onClose}>
       <div className="flex flex-col space-y-5 w-full pb-5">
         {visibleAuthorList && (
           <EnrolledUserForACourseDialog
@@ -347,8 +375,9 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
         />
 
         <form onSubmit={save} className="flex flex-col space-y-5 mx-10">
-          <p className="uppercase">{title}</p>
-          {recordType === AchievementRecordType_enum.DOCUMENTATION && (
+          <p className="uppercase">{achievementOption.title}</p>
+          {achievementOption.recordType ===
+            AchievementRecordType_enum.DOCUMENTATION && (
             <div className="flex flex-row space-x-1">
               <p className="w-2/6">{t('cover-picture')}</p>
               <div className="w-4/6">
@@ -410,41 +439,41 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
             </div>
           </div>
 
-          {recordType === AchievementRecordType_enum.DOCUMENTATION && (
-            <div className="flex flex-row space-x-1">
-              <p className="w-2/6">{t('documentations')}</p>
-              <div className="w-4/6">
-                <UploadUI
-                  nodeBottom={
-                    documentTemplateGoogleLink && (
-                      <Trans
-                        i18nKey="form-info-documentations"
-                        components={[
-                          <Link href={documentTemplateGoogleLink} key="info" />,
-                        ]}
-                        values={{
-                          article: 'diese Vorlage',
-                        }}
-                      ></Trans>
-                    )
-                  }
-                  onFileSelected={onFileChange}
-                  acceptedFileTypes=".zip"
-                  placeholder=".zip"
-                  name="documentationUrl"
-                  id="documentationUrl"
-                />
-              </div>
+          <div className="flex flex-row space-x-1">
+            <p className="w-2/6">{t('documentations')}</p>
+            <div className="w-4/6">
+              <UploadUI
+                nodeBottom={
+                  documentTemplateGoogleLink && (
+                    <Trans
+                      i18nKey="form-info-documentations"
+                      components={[
+                        <Link href={documentTemplateGoogleLink} key="info" />,
+                      ]}
+                      values={{
+                        article: 'diese Vorlage',
+                      }}
+                    ></Trans>
+                  )
+                }
+                onFileSelected={onFileChange}
+                acceptedFileTypes=".zip"
+                placeholder=".zip"
+                name="documentationUrl"
+                id="documentationUrl"
+              />
             </div>
-          )}
-          {recordType === AchievementRecordType_enum.DOCUMENTATION_AND_CSV && (
+          </div>
+
+          {achievementOption.recordType ===
+            AchievementRecordType_enum.DOCUMENTATION_AND_CSV && (
             <div className="flex flex-row space-x-1">
               <p className="w-2/6">{t('csv-results')}</p>
               <p></p>
               <div className="w-4/6">
                 <UploadUI
                   nodeBottom={
-                    csvTemplateUrl && (
+                    csvUrl && (
                       <Trans
                         i18nKey="form-info-csv-results"
                         components={[<Link onClick={downloadCSV} key="info" />]}
@@ -470,7 +499,7 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
           </div>
         </form>
       </div>
-    </>
+    </ModalControl2>
   );
 };
 export default FormToUploadAchievementRecord;

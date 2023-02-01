@@ -13,5 +13,10 @@
   "results-so-far": "Bisherige Ergebnisse",
   "rank": "Rang",
   "last-upload": "Letzter Upload",
-  "file-name": "Dateiname"
+  "file-name": "Dateiname",
+  "last-submitted-documentation": "Zuletzt eingereichte Unterlagen",
+  "cover-image-required": "Cover image required",
+  "csv-file-missing": "CSV file missing!",
+  "documentation-missing": "Please upload documentation!",
+  "authors-missing": "Please add some authors!"
 }

@@ -1,9 +1,10 @@
 import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
-import { COURSE_ENROLLMENTS_WITH_USER } from 'apps/edu-hub/queries/courseEnrollment';
+import { AtLeastNameEmail } from '../../../helpers/achievement';
+import { COURSE_ENROLLMENTS_WITH_USER } from '../../../queries/courseEnrollment';
 import {
   CourseEnrollmentWithUserQuery,
   CourseEnrollmentWithUserQueryVariables,
-} from 'apps/edu-hub/queries/__generated__/CourseEnrollmentWithUserQuery';
+} from '../../../queries/__generated__/CourseEnrollmentWithUserQuery';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
@@ -11,15 +12,6 @@ import { makeFullName } from '../../../helpers/util';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
 import { Button } from '../Button';
 import SearchBox from '../SearchBox';
-
-type AtLeast<T> = { [K in keyof T]: T[K] };
-interface TempUserData {
-  id: any;
-  firstName: string;
-  lastName: string;
-  email: string;
-}
-export type AtLeastNameEmail = AtLeast<TempUserData>;
 
 interface IProps {
   title: string;
@@ -70,7 +62,7 @@ const EnrolledUserForACourseDialog: FC<IProps> = (props) => {
   );
 
   const onUserClick = useCallback(
-    (tempUser: TempUserData) => {
+    (tempUser: AtLeastNameEmail) => {
       setSearchValue('');
       props.onClose(false, tempUser);
     },

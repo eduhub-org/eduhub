@@ -2,30 +2,6 @@ import { gql } from '@apollo/client';
 import { ACHIEVEMENT_RECORD_AUTHOR_FRAGMENT } from './AchievementRecordAuthorFragment';
 import { ACHIEVEMENT_RECORD_FRAGMENT } from './achievementRecordFragment';
 
-export const ACHIEVEMENT_RECORD_LIST = gql`
-  query AchievementRecordList(
-    $where: AchievementRecord_bool_exp! = {}
-    $limit: Int = null
-    $offset: Int = 0
-    $orderBy: AchievementRecord_order_by = { id: desc }
-  ) {
-    AchievementRecord(
-      order_by: [$orderBy]
-      where: $where
-      limit: $limit
-      offset: $offset
-    ) {
-      id
-      uploadUserId
-      AchievementRecordAuthors {
-        id
-        userId
-      }
-      created_at
-    }
-  }
-`;
-
 export const INSERT_AN_ACHIEVEMENT_RECORD = gql`
   mutation InsertAnAchievementRecord(
     $insertInput: AchievementRecord_insert_input!

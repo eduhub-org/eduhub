@@ -1,4 +1,5 @@
 import { IconButton } from '@material-ui/core';
+import useTranslation from 'next-translate/useTranslation';
 import { ChangeEvent, FC, useCallback } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import { MdDelete } from 'react-icons/md';
@@ -22,6 +23,7 @@ export const LocationSelectionRow: FC<IProps> = ({
   onSetOption,
   onDelete,
 }) => {
+  const { t } = useTranslation();
   const handleSetOption = useCallback(
     (event: ChangeEvent<HTMLSelectElement>) => {
       if (location != null) {
@@ -49,7 +51,7 @@ export const LocationSelectionRow: FC<IProps> = ({
   return (
     <div className="grid grid-cols-12">
       <div className="col-span-4 mr-3 ml-3">
-        {!location && <div>Orte</div>}
+        {!location && <p>{t('places')}</p>}
         {location && (
           <select
             onChange={handleSetOption}
@@ -65,7 +67,7 @@ export const LocationSelectionRow: FC<IProps> = ({
         )}
       </div>
       <div className="col-span-7 mr-3 ml-3">
-        {!location && <div>Adresse / Link</div>}
+        {!location && <div>{`${t('address')} / ${t('link')}`}</div>}
         {location && (
           <DebounceInput
             className="w-full h-10 bg-edu-light-gray"

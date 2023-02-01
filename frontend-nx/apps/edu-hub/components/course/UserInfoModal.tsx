@@ -1,19 +1,20 @@
 /* eslint-disable react/jsx-no-bind */
-import { Modal } from "@material-ui/core";
-import Fade from "@material-ui/core/Fade";
-import { FC, useCallback, useEffect, useState } from "react";
+import { Modal } from '@material-ui/core';
+import Fade from '@material-ui/core/Fade';
+import { FC, useCallback, useEffect, useState } from 'react';
 
-import { useAuthedMutation } from "../../hooks/authedMutation";
-import { useKeycloakUserProfile, useUserId } from "../../hooks/user";
-import { Course_Course_by_pk } from "../../queries/__generated__/Course";
-import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
+import { useAuthedMutation } from '../../hooks/authedMutation';
+import { useKeycloakUserProfile, useUserId } from '../../hooks/user';
+import { Course_Course_by_pk } from '../../queries/__generated__/Course';
+import { CourseWithEnrollment_Course_by_pk } from '../../queries/__generated__/CourseWithEnrollment';
 import {
   InsertUser,
   InsertUserVariables,
-} from "../../queries/__generated__/InsertUser";
-import { INSERT_USER } from "../../queries/insertUser";
-import { Button } from "../common/Button";
-import { ModalContent } from "../common/ModalContent";
+} from '../../queries/__generated__/InsertUser';
+import { INSERT_USER } from '../../queries/insertUser';
+import { Button } from '../common/Button';
+import { ModalContent } from '../common/ModalContent';
+import useTranslation from 'next-translate/useTranslation';
 
 interface IProps {
   closeModal: () => void;
@@ -22,12 +23,12 @@ interface IProps {
 }
 
 export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState("");
-  const [school, setSchool] = useState("");
-  const [studentId, setStudentId] = useState("");
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState('');
+  const [school, setSchool] = useState('');
+  const [studentId, setStudentId] = useState('');
   const userId = useUserId();
   const profile = useKeycloakUserProfile();
 
@@ -39,7 +40,7 @@ export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
   const createUser = useCallback(() => {
     if (!userId) {
       // eslint-disable-next-line no-console
-      console.log("Missing user data.");
+      console.log('Missing user data.');
       return;
     }
 
@@ -50,20 +51,22 @@ export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
         lastName,
         email,
       },
-      refetchQueries: ["User"],
+      refetchQueries: ['User'],
     });
   }, [userId, firstName, lastName, email, insertUser]);
 
   useEffect(() => {
     if (profile) {
-      setFirstName(profile.firstName ?? "");
-      setLastName(profile.lastName ?? "");
-      setEmail(profile.email ?? "");
+      setFirstName(profile.firstName ?? '');
+      setLastName(profile.lastName ?? '');
+      setEmail(profile.email ?? '');
       // setStatus(profile.status);
       // setSchool(profile.school);
       // setStudentId(profile.studentId);
     }
   }, [profile]);
+
+  const { t } = useTranslation();
 
   return (
     <Modal
@@ -80,48 +83,44 @@ export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
           className="w-full sm:w-auto h-full sm:h-auto sm:m-16 sm:rounded bg-edu-black pb-8"
           xIconColor="white"
         >
-          {/* <div className="w-full sm:w-auto h-full sm:h-auto sm:m-16 sm:rounded bg-edu-black p-8"> */}
-          {/* <div className="w-[50%] px-10 pt-24 pb-16 border-2 bg-edu-black"> */}
-          <h1 className="pb-8 text-white">
-            Bitte gib uns zunächst noch ein paar Informationen über dich.
-          </h1>
+          <h1 className="pb-8 text-white">{t('users:some-info-about-you')}</h1>
           <div className="px-20">
             <input
               className="flex border-b-2 border-white bg-edu-black text-white pl-4 pb-2 pt-8 w-full"
-              placeholder="Vorname *"
+              placeholder={`${t('users:firstName')} *`}
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               disabled
             />
             <input
               className="flex border-b-2 border-white bg-edu-black text-white pl-4 pb-2 pt-8 w-full"
-              placeholder="Nachname *"
+              placeholder={t('users:lastName')}
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               disabled
             />
             <input
               className="flex border-b-2 border-white bg-edu-black text-white pl-4 pb-2 pt-8 w-full"
-              placeholder="E-Mail *"
+              placeholder={t('users:email')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled
             />
             <input
               className="flex border-b-2 border-white bg-edu-black text-white pl-4 pb-2 pt-8 w-full"
-              placeholder="Status *"
+              placeholder={t('users:status')}
               value={status}
               onChange={(e) => setStatus(e.target.value)}
             />
             <input
               className="flex border-b-2 border-white bg-edu-black text-white pl-4 pb-2 pt-8 w-full"
-              placeholder="Hochschule *"
+              placeholder={t('users:university')}
               value={school}
               onChange={(e) => setSchool(e.target.value)}
             />
             <input
               className="flex border-b-2 border-white bg-edu-black text-white pl-4 pb-2 pt-8 w-full"
-              placeholder="Matrikelnummer / Sonstiges *"
+              placeholder={`${t('users:matriculationNumber')}/${t('other')}`}
               value={studentId}
               onChange={(e) => setStudentId(e.target.value)}
             />
@@ -133,7 +132,7 @@ export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
           ) : null}
           <div className="flex justify-center pt-24">
             <Button as="button" onClick={createUser} filled inverted>
-              Weiter
+              {t('next')}
             </Button>
           </div>
           {/* </div> */}

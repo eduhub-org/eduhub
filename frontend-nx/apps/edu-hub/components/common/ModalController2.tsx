@@ -1,27 +1,23 @@
 import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
-import React, { FC, ReactElement, useCallback } from 'react';
+import React, { FC, ReactElement, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 
 interface IPros {
-  showModal: boolean;
   modalTitle?: string;
-  onClose: (showModel: boolean) => void;
+  onClosed: () => void;
   children?: ReactElement;
 }
 
-const ModalControl: FC<IPros> = ({
-  showModal,
-  onClose,
-  modalTitle,
-  children,
-}) => {
+const ModalControl2: FC<IPros> = ({ onClosed, modalTitle, children }) => {
+  const [open, setOpen] = useState(true);
   const onCloseHandler = useCallback(() => {
-    onClose(!showModal);
-  }, [showModal, onClose]);
+    setOpen(false);
+    onClosed();
+  }, [onClosed]);
 
   return (
     <>
-      <Dialog open={showModal} onClose={onCloseHandler}>
+      <Dialog open={open} onClose={onCloseHandler}>
         <DialogTitle>
           <div className="flex flex-row justify-between">
             {modalTitle && <p>{modalTitle}</p>}
@@ -34,4 +30,4 @@ const ModalControl: FC<IPros> = ({
   );
 };
 
-export default ModalControl;
+export default ModalControl2;

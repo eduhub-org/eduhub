@@ -41,16 +41,14 @@ const UserDashboard: FC<IProps> = ({ t }) => {
   /* #region Callbacks */
   const handleSearch = useCallback(
     (text: string) => {
-      console.log(text);
       setSearchText(text);
     },
     [setSearchText]
   );
 
   const handleMenuItemClick = useCallback(
-    (property: StaticComponentProperty) => {
-      console.log(property);
-    },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    (property: StaticComponentProperty) => {},
     []
   );
   /* #endregion */
@@ -74,7 +72,7 @@ interface IMenubarProps {
   handleSearch: (text: string) => void;
   searchText: string;
   topMenuItems: StaticComponentProperty[];
-  onMenuItemClick: (property: StaticComponentProperty) => void;
+  onMenuItemClick?: (property: StaticComponentProperty) => void;
 }
 const Menubar: FC<IMenubarProps> = ({
   t,

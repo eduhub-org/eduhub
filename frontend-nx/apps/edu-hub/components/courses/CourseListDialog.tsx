@@ -67,16 +67,11 @@ const CourseListDialog: FC<IProps> = (props) => {
       </DialogTitle>
 
       <DialogContent>
-        <div>
-          Suche Kurse by title.
-          <br />
-          Mindestens 3 Buchstaben eingeben. <br />
-          Kurse per Klick auswählen.
-        </div>
+        <div>{t('type-name-email-minimum-3-letters')}</div>
 
         <div className="py-2">
           <SearchBox
-            placeholder="Suchwert"
+            placeholder={t('search-value')}
             onChangeCallback={handleNewInput}
             searchText={searchValue}
             autoFocus={true}

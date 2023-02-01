@@ -1,3 +1,4 @@
+import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useState } from 'react';
 import { useInstructorMutation } from '../../hooks/authedMutation';
 import { useAdminQuery } from '../../hooks/authedQuery';
@@ -129,6 +130,7 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  * @returns {any} the component
  */
 export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
+  const { t } = useTranslation();
   const qResult = useAdminQuery<ManagedCourse, ManagedCourseVariables>(
     MANAGED_COURSE,
     {
@@ -215,7 +217,9 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
   );
 
   if (course == null) {
-    return <div>Kurs {courseId} wurde nicht gefunden!</div>;
+    return (
+      <div>{t('course-page:course-not-found', { courseId: courseId })}</div>
+    );
   }
 
   return (
@@ -235,7 +239,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
               )}`}
               onClick={openTab0}
             >
-              Kurzbeschreibung
+              {t('course-page:brief-description')}
             </div>
 
             <div
@@ -246,7 +250,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
               )}`}
               onClick={openTab1}
             >
-              Termine
+              {t('course-page:appointments')}
             </div>
 
             <div
@@ -257,7 +261,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
               )}`}
               onClick={openTab2}
             >
-              Bewerbungen
+              {t('course-page:applications')}
             </div>
 
             <div
@@ -268,7 +272,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
               )}`}
               onClick={openTab3}
             >
-              Teilnahmen & Leistungen
+              {t('course-page:participation-and-benefits')}
             </div>
           </div>
 
@@ -294,20 +298,20 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
                 as="button"
                 filled={true}
               >
-                Weiter
+                {t('next')}
               </OldButton>
             </div>
           )}
         </>
       </PageBlock>
       <QuestionConfirmationDialog
-        question={`Möchtest du den Kurs in den nächsten Status schieben?`}
-        confirmationText={'Status hochsetzen'}
+        question={t('course-page:confirmation-push-the-course-to-next-status')}
+        confirmationText={t('course-page:set-status-high')}
         onClose={handleUpgradeStatus}
         open={isConfirmUpgradeStatusOpen}
       />
       <AlertMessageDialog
-        alert={`Bitte alle Felder ausfüllen bevor der Kurs in den nächsten Status gesetzt wird!`}
+        alert={t('course-page:please-fill-in-all-fields-to-proceed-further')}
         confirmationText={'OK'}
         onClose={handleCloseCantUpgrade}
         open={isCantUpgradeOpen}

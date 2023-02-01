@@ -1,4 +1,5 @@
-import { Link } from '@material-ui/core';
+import { Link, Tooltip } from '@material-ui/core';
+import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback } from 'react';
 
 interface IPropsTagWithTwoText {
@@ -15,6 +16,8 @@ const TagWithTwoText: FC<IPropsTagWithTwoText> = (props) => {
       props.onRemoveClick(props.id);
     }
   }, [props]);
+
+  const { t } = useTranslation();
   return (
     <div className="flex justify-between rounded-full bg-edu-tag-color px-2 py-1">
       <div className="pr-1 w-full flex justify-between last:mb-0">
@@ -30,12 +33,14 @@ const TagWithTwoText: FC<IPropsTagWithTwoText> = (props) => {
             <p className="font-bold pl-2 truncate">{props.textRight}</p>
           )}
           {props.onRemoveClick && (
-            <p
-              onClick={onClickRemove}
-              className="text-white ml-2 cursor-pointer"
-            >
-              x
-            </p>
+            <Tooltip title={t('delete')}>
+              <p
+                onClick={onClickRemove}
+                className="text-white ml-2 cursor-pointer"
+              >
+                x
+              </p>
+            </Tooltip>
           )}
         </div>
       </div>

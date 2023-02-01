@@ -1,7 +1,7 @@
 import useTranslation from 'next-translate/useTranslation';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import AchievementOptionDashboard from '../../components/achievements/AchievementOptionDashboard';
 import CommonPageHeader from '../../components/common/CommonPageHeader';
 import { Page } from '../../components/Page';
@@ -26,6 +26,9 @@ import {
 } from '../../queries/__generated__/AdminCourseList';
 
 const Achievements: FC = () => {
+  const [course, setCourse] = useState(undefined as AdminCourseList_Course);
+  const [recordTypes, setRecordTypes] = useState([] as string[]);
+
   const isAdmin = useIsAdmin();
   const isLoggedIn = useIsLoggedIn();
   const isInstructor = useIsInstructor();
@@ -34,9 +37,8 @@ const Achievements: FC = () => {
   const userId = useUserId();
   const profile = useKeycloakUserProfile();
   const courseID: number = parseInt(router.query.courseId as string, 10); // {"courseId": 0}
-  let course: AdminCourseList_Course | undefined;
 
-  const courseList = useAdminQuery<AdminCourseList, AdminCourseListVariables>(
+  const query = useAdminQuery<AdminCourseList, AdminCourseListVariables>(
     ADMIN_COURSE_LIST,
     {
       variables: {
@@ -48,23 +50,25 @@ const Achievements: FC = () => {
       skip: courseID <= 0,
     }
   );
-  const c = [...(courseList.data?.Course || [])];
-  if (c.length > 0) {
-    course = c[0];
-  }
+
+  useEffect(() => {
+    const c = [...(query.data?.Course || [])];
+    if (c.length > 0) {
+      setCourse(c[0]);
+    }
+  }, [query.data?.Course]);
 
   const achievementRecordTypesAPI = useAdminQuery<AchievementRecordTypes>(
     ACHIEVEMENT_RECORD_TYPES
   );
 
-  if (achievementRecordTypesAPI.error) {
-    console.log(achievementRecordTypesAPI.error);
-  }
-
-  const achievementRecordTypes: string[] =
-    achievementRecordTypesAPI?.data?.AchievementRecordType.map(
-      (v) => v.value
-    ) || DefaultAchievementOptions;
+  useEffect(() => {
+    const rTypes: string[] =
+      achievementRecordTypesAPI?.data?.AchievementRecordType.map(
+        (v) => v.value
+      ) || DefaultAchievementOptions;
+    setRecordTypes(rTypes);
+  }, [achievementRecordTypesAPI?.data?.AchievementRecordType]);
 
   const header = isAdmin
     ? t('achievement-record-admin')
@@ -79,9 +83,9 @@ const Achievements: FC = () => {
           <CommonPageHeader headline={header} />
           {isLoggedIn &&
             (isAdmin || isInstructor) &&
-            achievementRecordTypes.length > 0 && (
+            recordTypes.length > 0 && (
               <AchievementOptionDashboard
-                achievementRecordTypes={achievementRecordTypes}
+                achievementRecordTypes={recordTypes}
                 userId={userId}
                 userProfile={profile}
                 course={course}

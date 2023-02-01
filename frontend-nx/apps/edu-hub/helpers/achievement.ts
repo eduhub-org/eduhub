@@ -81,3 +81,22 @@ export interface NameId {
   id: string;
   name: string;
 }
+
+type AtLeast<T> = { [K in keyof T]: T[K] };
+interface TempUserData {
+  id: any;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+export type AtLeastNameEmail = AtLeast<TempUserData>;
+
+export type MinAchievementOption = AtLeast<{
+  id: number;
+  title: string;
+  description: string;
+  recordType: AchievementRecordType_enum;
+  documentationTemplateUrl: string;
+  evaluationScriptUrl: string;
+  csvTemplateUrl: string | null;
+}>;

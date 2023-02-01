@@ -1,7 +1,7 @@
-import { FC, useCallback, useState } from "react";
-import { Programs_Program } from "../../queries/__generated__/Programs";
-import { StaticComponentProperty } from "../../types/UIComponents";
-import EhMenuItem from "../common/EhMenuItem";
+import { FC, useCallback, useState } from 'react';
+import { Programs_Program } from '../../queries/__generated__/Programs';
+import { StaticComponentProperty } from '../../types/UIComponents';
+import EhMenuItem from '../common/EhMenuItem';
 
 interface IMenubarProps {
   programs: Programs_Program[];
@@ -19,11 +19,23 @@ export const ProgramsMenubar: FC<IMenubarProps> = ({
   // We will just show latest Three and all, Ignore the Unknown id (0)
   const customPrograms =
     programs.length > maxMenuCount ? programs.slice(0, maxMenuCount) : programs;
+  //TODO : Fix the problem, new fields added, lectureStart, lectureEnd, achievementRecordUploadDeadline, visibility
+  // customPrograms.push({
+  //   id: allTabId,
+  //   shortTitle: "All",
+  //   title: "All",
+  //   __typename: "Program",
+  // });
+
   customPrograms.push({
     id: allTabId,
-    shortTitle: "All",
-    title: "All",
-    __typename: "Program",
+    shortTitle: 'All',
+    title: 'All',
+    __typename: 'Program',
+    lectureEnd: new Date(),
+    lectureStart: new Date(),
+    achievementRecordUploadDeadline: new Date(),
+    visibility: true,
   });
   const semesters: StaticComponentProperty[] = customPrograms.map((p) => {
     return {

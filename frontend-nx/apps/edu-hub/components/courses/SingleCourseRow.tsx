@@ -1,58 +1,62 @@
-import { IconButton } from "@material-ui/core";
-import { FC, MutableRefObject, useCallback, useRef, useState } from "react";
+import { IconButton } from '@material-ui/core';
+import { FC, MutableRefObject, useCallback, useRef, useState } from 'react';
 import {
   MdAddCircle,
   MdDelete,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
   MdUpload,
-} from "react-icons/md";
-import { useAdminMutation } from "../../hooks/authedMutation";
-import { SAVE_COURSE_IMAGE } from "../../queries/actions";
+} from 'react-icons/md';
+import { useAdminMutation } from '../../hooks/authedMutation';
+import { SAVE_COURSE_IMAGE } from '../../queries/actions';
 import {
   DELETE_A_COURSE,
   UPDATE_COURSE_PROPERTY,
-} from "../../queries/mutateCourse";
+} from '../../queries/mutateCourse';
 import {
   DELETE_COURSE_INSRTRUCTOR,
   INSERT_A_COURSEINSTRUCTOR,
-} from "../../queries/mutateCourseInstructor";
-import { INSERT_EXPERT } from "../../queries/user";
-import { AdminCourseList_Course } from "../../queries/__generated__/AdminCourseList";
+} from '../../queries/mutateCourseInstructor';
+import { INSERT_EXPERT } from '../../queries/user';
+import { AdminCourseList_Course } from '../../queries/__generated__/AdminCourseList';
 import {
   DeleteCourseByPk,
   DeleteCourseByPkVariables,
-} from "../../queries/__generated__/DeleteCourseByPk";
+} from '../../queries/__generated__/DeleteCourseByPk';
 import {
   DeleteCourseInstructor,
   DeleteCourseInstructorVariables,
-} from "../../queries/__generated__/DeleteCourseInstructor";
+} from '../../queries/__generated__/DeleteCourseInstructor';
 import {
   InsertCourseInstructor,
   InsertCourseInstructorVariables,
-} from "../../queries/__generated__/InsertCourseInstructor";
+} from '../../queries/__generated__/InsertCourseInstructor';
 import {
   InsertExpert,
   InsertExpertVariables,
-} from "../../queries/__generated__/InsertExpert";
-import { Programs_Program } from "../../queries/__generated__/Programs";
-import { SaveCourseImage, SaveCourseImageVariables } from "../../queries/__generated__/SaveCourseImage";
+} from '../../queries/__generated__/InsertExpert';
+import { Programs_Program } from '../../queries/__generated__/Programs';
+import {
+  SaveCourseImage,
+  SaveCourseImageVariables,
+} from '../../queries/__generated__/SaveCourseImage';
 import {
   UpdateCourseByPk,
   UpdateCourseByPkVariables,
-} from "../../queries/__generated__/UpdateCourseByPk";
-import { UserForSelection1_User } from "../../queries/__generated__/UserForSelection1";
-import { SelectOption } from "../../types/UIComponents";
+} from '../../queries/__generated__/UpdateCourseByPk';
+import { UserForSelection1_User } from '../../queries/__generated__/UserForSelection1';
+import { SelectOption } from '../../types/UIComponents';
 import {
   CourseEnrollmentStatus_enum,
   CourseStatus_enum,
   Course_set_input,
-} from "../../__generated__/globalTypes";
-import { SelectUserDialog } from "../common/dialogs/SelectUserDialog";
-import EhCheckBox from "../common/EhCheckbox";
-import EhSelect from "../common/EhSelect";
-import EhTag from "../common/EhTag";
-import { parseFileUploadEvent } from "../../helpers/filehandling";
+} from '../../__generated__/globalTypes';
+import { SelectUserDialog } from '../common/dialogs/SelectUserDialog';
+import EhCheckBox from '../common/EhCheckbox';
+import EhSelect from '../common/EhSelect';
+import EhTag from '../common/EhTag';
+import { parseFileUploadEvent } from '../../helpers/filehandling';
+import useTranslation from 'next-translate/useTranslation';
 
 /* #region Local Interfaces */
 interface EntrollmentStatusCount {
@@ -188,8 +192,9 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
           ? statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] + 1
           : 1;
     });
-    return `${statusRecordsWithSum[CourseEnrollmentStatus_enum.INVITED] ?? 0}/${statusRecordsWithSum[CourseEnrollmentStatus_enum.CONFIRMED] ?? 0
-      }/${course.AppliedAndUnratedCount.aggregate?.count}`;
+    return `${statusRecordsWithSum[CourseEnrollmentStatus_enum.INVITED] ?? 0}/${
+      statusRecordsWithSum[CourseEnrollmentStatus_enum.CONFIRMED] ?? 0
+    }/${course.AppliedAndUnratedCount.aggregate?.count}`;
   };
 
   const makeCompetitionField = () => {
@@ -205,8 +210,8 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
       0
     );
   };
-  const pClass = "text-gray-700 truncate font-medium max-w-xs";
-  const tdClass = "pl-5";
+  const pClass = 'text-gray-700 truncate font-medium max-w-xs';
+  const tdClass = 'pl-5';
   return (
     <>
       <tr className="font-medium bg-edu-course-list h-12">
@@ -268,7 +273,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
           </IconButton>
         </td>
       </tr>
-      <tr className={showDetails ? "h-0" : "h-1"} />
+      <tr className={showDetails ? 'h-0' : 'h-1'} />
       {/** Hiden Course Details */}
       {showDetails && (
         <CourseDetails
@@ -340,7 +345,7 @@ const CourseDetails: FC<IPropsCourseOneRow> = ({ course, refetchCourses }) => {
     imageUploadRef.current?.click();
   }, [imageUploadRef]);
 
-  const [saveCourseImage,] = useAdminMutation<
+  const [saveCourseImage] = useAdminMutation<
     SaveCourseImage,
     SaveCourseImageVariables
   >(SAVE_COURSE_IMAGE);
@@ -357,7 +362,6 @@ const CourseDetails: FC<IPropsCourseOneRow> = ({ course, refetchCourses }) => {
             courseId: course.id,
           },
         });
-        console.log(result);
         const coverImage = result.data?.saveCourseImage?.google_link;
         if (coverImage != null) {
           await updateCourseQuery({
@@ -374,6 +378,8 @@ const CourseDetails: FC<IPropsCourseOneRow> = ({ course, refetchCourses }) => {
     },
     [saveCourseImage, course.id, updateCourseQuery, refetchCourses]
   );
+
+  const { t } = useTranslation('course-page');
 
   return (
     <>
@@ -410,7 +416,7 @@ const CourseDetails: FC<IPropsCourseOneRow> = ({ course, refetchCourses }) => {
                       tag={{
                         display: makeFullName(
                           courseIn.Expert.User.firstName,
-                          courseIn.Expert.User.lastName ?? ""
+                          courseIn.Expert.User.lastName ?? ''
                         ),
                         id: courseIn.Expert.id,
                       }}
@@ -425,8 +431,8 @@ const CourseDetails: FC<IPropsCourseOneRow> = ({ course, refetchCourses }) => {
             {course.chatLink && (
               <div>
                 <label htmlFor="" className="uppercase">
-                  {" "}
-                  Live Chat{" "}
+                  {' '}
+                  Live Chat{' '}
                 </label>
                 <p className="bg-white w-3/5 p-2 text-ellipsis overflow-hidden">
                   {
@@ -438,7 +444,7 @@ const CourseDetails: FC<IPropsCourseOneRow> = ({ course, refetchCourses }) => {
               </div>
             )}
             <div className="flex flex-row space-x-4">
-              <label htmlFor="">Mögliche Bescheinigungen:</label>
+              <label htmlFor="">{`${t('certificate-possible')}:`}</label>
               <label htmlFor=""> {course.ects} </label>
             </div>
             <div className="flex flex-col space-y-2 w-1/3">
@@ -450,7 +456,7 @@ const CourseDetails: FC<IPropsCourseOneRow> = ({ course, refetchCourses }) => {
               >
                 <EhCheckBox
                   checked={course.attendanceCertificatePossible}
-                  text="Teilnahmenachweis"
+                  text={t('proof-of-participation')}
                 />
               </div>
               <div
@@ -461,7 +467,7 @@ const CourseDetails: FC<IPropsCourseOneRow> = ({ course, refetchCourses }) => {
               >
                 <EhCheckBox
                   checked={course.achievementCertificatePossible}
-                  text="Leistungszertifikat"
+                  text={t('performance-certificate')}
                 />
               </div>
             </div>
@@ -572,6 +578,7 @@ const InstructorColumn: FC<IPropsCourseOneRow> = ({
     [insertExpertMutation, refetchCourses, course, insertCourseInstructor]
   );
   /* #endregion */
+  const { t } = useTranslation('course-page');
 
   return (
     <div className="flex flex-row space-x-1 align-middle">
@@ -584,7 +591,7 @@ const InstructorColumn: FC<IPropsCourseOneRow> = ({
             tag={{
               display: makeFullName(
                 course.CourseInstructors[0].Expert.User.firstName,
-                course.CourseInstructors[0].Expert.User.lastName ?? " "
+                course.CourseInstructors[0].Expert.User.lastName ?? ' '
               ),
               id: course.CourseInstructors[0].Expert.id,
             }}
@@ -601,7 +608,7 @@ const InstructorColumn: FC<IPropsCourseOneRow> = ({
         <SelectUserDialog
           onClose={addInstructorHandler}
           open={openInstructorDialog}
-          title={"Add Instructor"}
+          title={t('add-instructors')}
         />
       )}
     </div>

@@ -95,6 +95,7 @@ import {
   UpdateCourseMaxParticipants,
   UpdateCourseMaxParticipantsVariables,
 } from '../../queries/__generated__/UpdateCourseMaxParticipants';
+import useTranslation from 'next-translate/useTranslation';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -319,15 +320,21 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     eventTargetNumberMapper,
     qResult
   );
+  const { t } = useTranslation();
 
   const courseLocations = [...course.CourseLocations];
   courseLocations.sort((a, b) => a.id - b.id);
-
   return (
     <div>
       <div className="grid grid-cols-2 ">
-        <div className="mr-3 ml-3">Kurzbeschreibung (max. 200 Zeichen)</div>
-        <div className="mr-3 ml-3">Lernziele (max. 500 Zeichen)</div>
+        <div className="mr-3 ml-3">{`${t('course-page:short-description')} (${t(
+          'course-page:max-n-characters',
+          { n: 200 }
+        )})`}</div>
+        <div className="mr-3 ml-3">{`${t('course-page:learning-goal')} (${t(
+          'course-page:max-n-characters',
+          { n: 500 }
+        )})`}</div>
       </div>
       <div className="grid grid-cols-2 mb-8">
         <DebounceInput
@@ -351,8 +358,12 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       </div>
 
       <div className="grid grid-cols-2">
-        <div className="mr-3 ml-3">Titel Info Block 1 (max. 50 Zeichen)</div>
-        <div className="mr-3 ml-3">Titel Info Block 2 (max. 50 Zeichen)</div>
+        <div className="mr-3 ml-3">{`${t(
+          'course-page:title-info-block'
+        )} 1 (${t('course-page:max-n-characters', { n: 50 })})`}</div>
+        <div className="mr-3 ml-3">{`${t(
+          'course-page:title-info-block'
+        )} 2 (${t('course-page:max-n-characters', { n: 50 })})`}</div>
       </div>
       <div className="grid grid-cols-2 mb-8">
         <DebounceInput
@@ -373,8 +384,12 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       </div>
 
       <div className="grid grid-cols-2">
-        <div className="mr-3 ml-3">Text Info Block 1 (max. 1500 Zeichen)</div>
-        <div className="mr-3 ml-3">Text Info Block 2 (max. 1500 Zeichen)</div>
+        <div className="mr-3 ml-3">{`${t(
+          'course-page:title-info-block'
+        )} 1 (${t('course-page:max-n-characters', { n: 1500 })})`}</div>
+        <div className="mr-3 ml-3">{`${t(
+          'course-page:title-info-block'
+        )} 2 (${t('course-page:max-n-characters', { n: 1500 })})`}</div>
       </div>
       <div className="grid grid-cols-2 mb-8">
         <DebounceInput
@@ -408,18 +423,18 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
                   onChange={updateWeekday}
                   className="w-full h-8 bg-edu-light-gray"
                 >
-                  <option value="MONDAY">MO</option>
-                  <option value="TUESDAY">DI</option>
-                  <option value="WEDNESDAY">MI</option>
-                  <option value="THURSDAY">DO</option>
-                  <option value="FRIDAY">FR</option>
-                  <option value="SATURDAY">SA</option>
-                  <option value="SUNDAY">SO</option>
+                  <option value="MONDAY">{t('Monday-short')}</option>
+                  <option value="TUESDAY">{t('Tuesday-short')}</option>
+                  <option value="WEDNESDAY">{t('Wednesday-short')}</option>
+                  <option value="THURSDAY">{t('Thursday-short')}</option>
+                  <option value="FRIDAY">{t('Friday-short')}</option>
+                  <option value="SATURDAY">{t('Saturday-short')}</option>
+                  <option value="SUNDAY">{t('Sunday-short')}</option>
                 </select>
               </div>
             </div>
             <div className="mr-3 ml-3">
-              <div>Startzeit</div>
+              <div>{t('course-page:start-time')}</div>
               <div>
                 <EhTimeSelect
                   value={formatTime(course.startTime)}
@@ -429,7 +444,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
               </div>
             </div>
             <div className="mr-3 ml-3">
-              <div>Endzeit</div>
+              <div>{t('course-page:end-time')}</div>
               <div>
                 <EhTimeSelect
                   value={formatTime(course.endTime)}
@@ -443,20 +458,20 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         </div>
         <div className="grid grid-cols-2 mb-8">
           <div className="mr-3 ml-3">
-            <div>Sprache</div>
+            <div>{t('language')}</div>
             <div>
               <select
                 value={course.language}
                 onChange={updateCourseLanguage}
                 className="w-full h-8 bg-edu-light-gray"
               >
-                <option value="DE">Deutsch</option>
-                <option value="EN">Englisch</option>
+                <option value="DE">{t('german')}</option>
+                <option value="EN">{t('english')}</option>
               </select>
             </div>
           </div>
           <div className="mr-3 ml-3">
-            <div>Max. Teil. Anzahl</div>
+            <div>{t('course-page:max-part-quantity')}</div>
             <div>
               <DebounceInput
                 type="number"
@@ -492,7 +507,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
 
       <div className="flex justify-end mb-8">
         <Button onClick={insertLocationOption} startIcon={<MdAddCircle />}>
-          neuen Ort hinzufügen
+          {t('course-page:add-new-location')}
         </Button>
       </div>
     </div>

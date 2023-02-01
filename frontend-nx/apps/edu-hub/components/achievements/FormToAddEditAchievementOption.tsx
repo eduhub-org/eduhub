@@ -289,6 +289,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
             id="title"
             value={state.title ?? ''}
             autoFocus={true}
+            maxLength={200}
           />
 
           {/* Edit authors */}

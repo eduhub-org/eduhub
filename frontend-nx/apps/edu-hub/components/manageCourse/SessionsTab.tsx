@@ -53,6 +53,7 @@ import {
   DeleteSessionSpeaker,
   DeleteSessionSpeakerVariables,
 } from '../../queries/__generated__/DeleteSessionSpeaker';
+import useTranslation from 'next-translate/useTranslation';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -61,6 +62,7 @@ interface IProps {
 
 export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const userRole = 'instructor';
+  const { t } = useTranslation();
 
   const courseSessions = useMemo(() => {
     const result = [...course.Sessions];
@@ -193,7 +195,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     <div>
       <div className="flex justify-end mb-4">
         <Button onClick={insertSession} startIcon={<MdAddCircle />}>
-          neuen Termin hinzufügen
+          {t('add-new-something', { something: t('appointment') })}
         </Button>
       </div>
 
@@ -230,7 +232,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
 
       <div className="flex justify-end mt-4 mb-4">
         <Button onClick={insertSession} startIcon={<MdAddCircle />}>
-          neuen Termin hinzufügen
+          {t('add-new-something', { something: t('appointment') })}
         </Button>
       </div>
     </div>

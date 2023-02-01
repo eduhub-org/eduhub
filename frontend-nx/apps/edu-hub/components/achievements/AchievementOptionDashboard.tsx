@@ -1,6 +1,8 @@
 import { CircularProgress, IconButton } from '@material-ui/core';
+import { IUserProfile } from '../../hooks/user';
+import { AdminCourseList_Course } from '../../queries/__generated__/AdminCourseList';
 import useTranslation from 'next-translate/useTranslation';
-import { FC, useCallback, useContext, useState } from 'react';
+import { FC, useCallback, useContext, useEffect, useState } from 'react';
 import {
   MdDelete,
   MdKeyboardArrowDown,
@@ -15,7 +17,10 @@ import {
   AchievementOptionListVariables,
   AchievementOptionList_AchievementOption,
 } from '../../queries/__generated__/AchievementOptionList';
-import { Programs } from '../../queries/__generated__/Programs';
+import {
+  Programs,
+  Programs_Program,
+} from '../../queries/__generated__/Programs';
 import { StaticComponentProperty } from '../../types/UIComponents';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import EhAddButton from '../common/EhAddButton';
@@ -29,11 +34,18 @@ import AchievementsHelper, {
 import AddAchievementOption from './AddAchievementOption';
 import EditAchievementOption from './EditAchievementOption';
 
-const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
+const AchievementOptionDashboard: FC<{
+  userId: string | undefined;
+  userProfile: IUserProfile | undefined;
+  achievementRecordTypes: string[];
+  course: AdminCourseList_Course;
+}> = (props) => {
   const defaultProgram = -1; // All tab
   const [currentProgramId, setCurrentProgramId] = useState(defaultProgram);
   const [alertMessage, setAlertMessage] = useState('');
-
+  const [achievements, setAchievements] = useState(
+    [] as AchievementOptionList_AchievementOption[]
+  );
   const achievementsRequest = useAdminQuery<
     AchievementOptionList,
     AchievementOptionListVariables
@@ -58,7 +70,12 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
     achievementsRequest.refetch();
   }, [achievementsRequest]);
 
-  const aOptions = [...(achievementsRequest.data?.AchievementOption || [])];
+  // const aOptions = [...(achievementsRequest.data?.AchievementOption || [])];
+
+  useEffect(() => {
+    const aOptions = [...(achievementsRequest.data?.AchievementOption || [])];
+    setAchievements(aOptions);
+  }, [achievementsRequest.data?.AchievementOption]);
 
   const provider: IPropsDashBoard = {
     achievementRecordTypes: props.achievementRecordTypes,
@@ -84,7 +101,7 @@ const AchievementOptionDashboard: FC<IPropsDashBoard> = (props) => {
           open={alertMessage.trim().length > 0}
         />
       )}
-      <DashboardContent options={aOptions} />
+      <DashboardContent options={achievements} />
     </AchievementsHelper>
   );
 };
@@ -98,6 +115,8 @@ interface IPropsContent {
 }
 const DashboardContent: FC<IPropsContent> = ({ options }) => {
   const context = useContext(AchievementContext);
+  const [programs, setPrograms] = useState([] as Programs_Program[]);
+
   const [showNewAchievementView, setShowNewAchievementView] = useState(false);
   const onProgramFilterChange = useCallback(
     (menu: StaticComponentProperty) => {
@@ -126,6 +145,12 @@ const DashboardContent: FC<IPropsContent> = ({ options }) => {
   if (programsRequest.loading) {
     <CircularProgress />;
   }
+
+  useEffect(() => {
+    const p = [...(programsRequest?.data?.Program || [])];
+    setPrograms(p);
+  }, [programsRequest?.data?.Program]);
+
   const addNewAchievement = useCallback(() => {
     setShowNewAchievementView(!showNewAchievementView);
   }, [setShowNewAchievementView, showNewAchievementView]);
@@ -135,7 +160,7 @@ const DashboardContent: FC<IPropsContent> = ({ options }) => {
       <div className="flex justify-between mb-5">
         {!programsRequest.loading && !programsRequest.error && (
           <ProgramsMenubar
-            programs={[...(programsRequest?.data?.Program || [])]}
+            programs={programs}
             defaultProgramId={context.programID}
             onTabClicked={onProgramFilterChange}
           />
