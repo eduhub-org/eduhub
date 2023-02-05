@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { Weekday_enum } from "./../../__generated__/globalTypes";
+
 // ====================================================
 // GraphQL fragment: CourseFragment
 // ====================================================
@@ -85,7 +87,7 @@ export interface CourseFragment {
   /**
    * The day of the week the course takes place.
    */
-  weekDay: string | null;
+  weekDay: Weekday_enum | null;
   /**
    * A text providing info about the costs of a participation.
    */

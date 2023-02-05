@@ -20,7 +20,7 @@ export const COURSE_WITH_ENROLLMENT = gql`
       }
       CourseLocations {
         id
-        link
+        locationOption
       }
       Program {
         ...ProgramFragment

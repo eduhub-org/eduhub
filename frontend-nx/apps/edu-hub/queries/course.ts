@@ -38,7 +38,6 @@ export const MANAGED_COURSE = gql`
       }
       CourseLocations {
         id
-        link
         locationOption
       }
       Sessions {
@@ -134,13 +133,11 @@ export const DELETE_SESSION_SPEAKER = gql`
 `;
 
 export const INSERT_NEW_SESSION_LOCATION = gql`
-  mutation InsertSessionLocation($sessionId: Int!, $link: String!) {
+  mutation InsertSessionLocation($sessionId: Int!, $type: SessionAddressType_enum!) {
     insert_SessionAddress(
       objects: {
         sessionId: $sessionId
-        latitude: ""
-        longitude: ""
-        link: $link
+        type: $type
       }
     ) {
       affected_rows
@@ -173,9 +170,6 @@ export const INSERT_NEW_COURSE_LOCATION = gql`
       objects: {
         courseId: $courseId
         locationOption: $option
-        latitude: ""
-        longitude: ""
-        link: ""
       }
     ) {
       affected_rows
@@ -191,17 +185,6 @@ export const UPDATE_COURSE_LOCATION_OPTION = gql`
     update_CourseLocation_by_pk(
       pk_columns: { id: $locationId }
       _set: { locationOption: $option }
-    ) {
-      id
-    }
-  }
-`;
-
-export const UPDATE_COURSE_LOCATION_LINK = gql`
-  mutation UpdateCourseLocationLink($locationId: Int!, $link: String!) {
-    update_CourseLocation_by_pk(
-      pk_columns: { id: $locationId }
-      _set: { link: $link }
     ) {
       id
     }
@@ -250,7 +233,7 @@ export const UPDATE_COURSE_LANGUAGE = gql`
 `;
 
 export const UPDATE_COURSE_WEEKDAY = gql`
-  mutation UpdateCourseWeekday($courseId: Int!, $weekday: String!) {
+  mutation UpdateCourseWeekday($courseId: Int!, $weekday: Weekday_enum!) {
     update_Course_by_pk(
       pk_columns: { id: $courseId }
       _set: { weekDay: $weekday }

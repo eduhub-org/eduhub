@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: AdminCourseFragment
@@ -108,7 +108,7 @@ export interface AdminCourseFragment {
   /**
    * The day of the week the course takes place.
    */
-  weekDay: string | null;
+  weekDay: Weekday_enum | null;
   /**
    * A text providing info about the costs of a participation.
    */
