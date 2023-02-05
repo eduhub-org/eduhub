@@ -5,6 +5,7 @@ version: "3.8"
 
 services:
   frontend-nx:
+    container_name: eduhub-frontend-nx
     ports:
       - "5000:4200"
       - "5001:4201"
@@ -20,6 +21,7 @@ services:
       - keycloak
 
   frontend:
+    container_name: eduhub-frontend
     ports:
       - "5005:5000"
     build:
@@ -34,6 +36,7 @@ services:
       - keycloak
 
   functions:
+    container_name: eduhub-functions
     image: node:18-bullseye-slim
     user: "node"
     working_dir: /functions
@@ -55,6 +58,7 @@ services:
       LIBRARY_PATH: ../lib/cloud-storage
 
   hasura:
+    container_name: eduhub-hasura
     restart: on-failure
     build: ./backend
     ports:
@@ -102,6 +106,7 @@ services:
       - ./backend/seeds:/hasura-seeds
 
   db_hasura:
+    container_name: eduhub-db_hasura
     image: postgres:12
     environment:
       POSTGRES_PASSWORD: postgrespassword
@@ -109,6 +114,7 @@ services:
       - ./backend/init.d:/docker-entrypoint-initdb.d:rw
 
   keycloak:
+    container_name: eduhub-keycloak
     build:
       context: ./keycloak/
       dockerfile: Dockerfile-dev
