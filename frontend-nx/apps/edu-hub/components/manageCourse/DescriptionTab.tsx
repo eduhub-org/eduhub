@@ -22,7 +22,7 @@ import {
   UPDATE_COURSE_HEADING_DESCRIPTION_2,
   UPDATE_COURSE_LANGUAGE,
   UPDATE_COURSE_LEARNING_GOALS,
-  UPDATE_COURSE_LOCATION_LINK,
+  UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
   UPDATE_COURSE_LOCATION_OPTION,
   UPDATE_COURSE_MAX_PARTICIPANTS,
   UPDATE_COURSE_START_TIME,
@@ -68,9 +68,9 @@ import {
   UpdateCourseLearningGoalsVariables,
 } from "../../queries/__generated__/UpdateCourseLearningGoals";
 import {
-  UpdateCourseLocationLink,
-  UpdateCourseLocationLinkVariables,
-} from "../../queries/__generated__/UpdateCourseLocationLink";
+  UpdateCourseDefaultSession,
+  UpdateCourseDefaultSessionVariables,
+} from "../../queries/__generated__/UpdateCourseDefaultSession";
 import {
   UpdateCourseLocationOption,
   UpdateCourseLocationOptionVariables,
@@ -164,14 +164,14 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     qResult
   );
 
-  const updateCourseLocationLink = useUpdateCallback2<
-    UpdateCourseLocationLink,
-    UpdateCourseLocationLinkVariables
+  const updateCourseSessionDefaultAddress = useUpdateCallback2<
+    UpdateCourseDefaultSession,
+    UpdateCourseDefaultSessionVariables
   >(
-    UPDATE_COURSE_LOCATION_LINK,
+    UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
     currentUpdateRole,
     "locationId",
-    "link",
+    "sessionDefaultAddress",
     pickIdPkMapper,
     identityEventMapper,
     qResult
@@ -474,7 +474,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <LocationSelectionRow
           location={null}
           onDelete={deleteLocationOption}
-          onSetLink={updateCourseLocationLink}
+          onSetLink={updateCourseSessionDefaultAddress}
           onSetOption={updateCourseLocationOption}
           options={locationOptions}
         />
@@ -484,7 +484,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             location={loc}
             options={locationOptions}
             onDelete={deleteLocationOption}
-            onSetLink={updateCourseLocationLink}
+            onSetLink={updateCourseSessionDefaultAddress}
             onSetOption={updateCourseLocationOption}
           />
         ))}
