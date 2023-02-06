@@ -135,7 +135,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     currentUpdateRole,
     "courseId",
     "option",
-    "sessionDefaultAddress",
     course?.id,
     constantOnlineMapper,
     qResult
@@ -172,7 +171,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
     currentUpdateRole,
     "locationId",
-    "sessionDefaultAddress",
+    "defaultSessionAddress",
     pickIdPkMapper,
     identityEventMapper,
     qResult

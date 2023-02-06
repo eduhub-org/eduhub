@@ -26,6 +26,7 @@ insert_permissions:
                   _eq: X-Hasura-User-Id
       columns:
         - courseId
+        - defaultSessionAddress
         - id
         - locationOption
 select_permissions:
@@ -52,6 +53,7 @@ update_permissions:
     permission:
       columns:
         - courseId
+        - defaultSessionAddress
         - locationOption
       filter:
         Course:
