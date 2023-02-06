@@ -194,7 +194,7 @@ export const UPDATE_COURSE_LOCATION_OPTION = gql`
 `;
 
 export const UPDATE_COURSE_SESSION_DEFAULT_ADDRESS = gql`
-  mutation UpdateCourseSessionDefaultAddres($locationId: Int!, $sessionDefaultAddress: String!) {
+  mutation UpdateCourseSessionDefaultAddress($locationId: Int!, $sessionDefaultAddress: String!) {
     update_CourseLocation_by_pk(
       pk_columns: { id: $locationId }
       _set: { sessionDefaultAddress: $sessionDefaultAddress }

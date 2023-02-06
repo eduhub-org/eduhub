@@ -68,9 +68,9 @@ import {
   UpdateCourseLearningGoalsVariables,
 } from "../../queries/__generated__/UpdateCourseLearningGoals";
 import {
-  UpdateCourseDefaultSession,
-  UpdateCourseDefaultSessionVariables,
-} from "../../queries/__generated__/UpdateCourseDefaultSession";
+  UpdateCourseSessionDefaultAddress,
+  UpdateCourseSessionDefaultAddressVariables,
+} from "../../queries/__generated__/UpdateCourseSessionDefaultAddress";
 import {
   UpdateCourseLocationOption,
   UpdateCourseLocationOptionVariables,
@@ -165,8 +165,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   );
 
   const updateCourseSessionDefaultAddress = useUpdateCallback2<
-    UpdateCourseDefaultSession,
-    UpdateCourseDefaultSessionVariables
+    UpdateCourseSessionDefaultAddress,
+    UpdateCourseSessionDefaultAddressVariables
   >(
     UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
     currentUpdateRole,
