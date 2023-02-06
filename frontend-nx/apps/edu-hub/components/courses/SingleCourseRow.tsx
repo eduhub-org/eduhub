@@ -147,7 +147,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
       variables: {
         id: course.id,
         changes: {
-          visibility: !course.visibility,
+          published: !course.published,
         },
       },
     });
@@ -212,7 +212,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
       <tr className="font-medium bg-edu-course-list h-12">
         <td className={tdClass}>
           <div onClick={onChangeVisivity}>
-            <EhCheckBox checked={course.visibility ?? false} />
+            <EhCheckBox checked={course.published ?? false} />
           </div>
         </td>
         <td className={tdClass}>
