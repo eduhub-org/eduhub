@@ -1064,7 +1064,7 @@ CREATE TABLE public."Course" (
     "contentDescriptionField2" text,
     "learningGoals" text,
     "chatLink" text,
-    "published" boolean DEFAULT false,
+    visibility boolean DEFAULT false,
     "maxParticipants" integer,
     "endTime" timestamp with time zone,
     "startTime" timestamp with time zone
@@ -1209,6 +1209,13 @@ COMMENT ON COLUMN public."Course"."learningGoals" IS 'An array of texts includin
 --
 
 COMMENT ON COLUMN public."Course"."chatLink" IS 'The link to the chat of the course (e.g. a mattermost channel)';
+
+
+--
+-- Name: COLUMN "Course".visibility; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public."Course".visibility IS 'The value decides whether the course is visible for users or anoymous persons.';
 
 
 --
@@ -1946,7 +1953,6 @@ CREATE TABLE public."Program" (
     "defaultApplicationEnd" date,
     "achievementRecordUploadDeadline" date,
     visibility boolean DEFAULT false NOT NULL,
-    "published" boolean DEFAULT false,
     "startQuestionnaire" text,
     "speakerQuestionnaire" text,
     "closingQuestionnaire" text,
@@ -3084,8 +3090,8 @@ INSERT INTO public."Expert" VALUES (1, '43bc2dc5-7171-422d-a99f-914650f41cb5', N
 -- Data for Name: Language; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."Language" VALUES ('DE', 'German');
-INSERT INTO public."Language" VALUES ('EN', 'English');
+INSERT INTO public."Language" VALUES ('de', 'German');
+INSERT INTO public."Language" VALUES ('en', 'English');
 
 
 --
@@ -3133,7 +3139,7 @@ INSERT INTO public."MotivationRating" VALUES ('REVIEW', 'The motivation letter s
 -- Data for Name: Program; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."Program" VALUES (1, 'WISE 22/23', '2022-12-14', '2022-12-23', '2022-09-30', '2023-03-01', '2023-03-18', true, true, NULL, NULL, NULL, true, true, NULL, 'http://localhost:4001/emulated-bucket/programid_1/participation_certificate_template/dropped text.txt', 'WI22', 2);
+INSERT INTO public."Program" VALUES (1, 'WISE 22/23', '2022-12-14', '2022-12-23', '2022-09-30', '2023-03-01', '2023-03-18', true, NULL, NULL, NULL, true, true, NULL, 'http://localhost:4001/emulated-bucket/programid_1/participation_certificate_template/dropped text.txt', 'WI22', 2);
 
 
 --
