@@ -68,9 +68,9 @@ import {
   UpdateCourseLearningGoalsVariables,
 } from "../../queries/__generated__/UpdateCourseLearningGoals";
 import {
-  UpdateCourseSessionDefaultAddress,
-  UpdateCourseSessionDefaultAddressVariables,
-} from "../../queries/__generated__/UpdateCourseSessionDefaultAddress";
+  UpdateCourseDefaultSessionAddress,
+  UpdateCourseDefaultSessionAddressVariables,
+} from "../../queries/__generated__/UpdateCourseDefaultSessionAddress";
 import {
   UpdateCourseLocationOption,
   UpdateCourseLocationOptionVariables,
@@ -127,7 +127,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     queryKnownLocationOptions.data?.LocationOption || []
   ).map((x) => x.value);
 
-  const insertLocationOption = useUpdateCallback<
+  const insertCourseLocation = useUpdateCallback<
     InsertCourseLocation,
     InsertCourseLocationVariables
   >(
@@ -135,12 +135,13 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     currentUpdateRole,
     "courseId",
     "option",
+    "sessionDefaultAddress",
     course?.id,
     constantOnlineMapper,
     qResult
   );
 
-  const deleteLocationOption = useDeleteCallback<
+  const deleteCourseLocation = useDeleteCallback<
     DeleteCourseLocation,
     DeleteCourseLocationVariables
   >(
@@ -164,9 +165,9 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     qResult
   );
 
-  const updateCourseSessionDefaultAddress = useUpdateCallback2<
-    UpdateCourseSessionDefaultAddress,
-    UpdateCourseSessionDefaultAddressVariables
+  const updateCourseDefaultSessionAddress = useUpdateCallback2<
+    UpdateCourseDefaultSessionAddress,
+    UpdateCourseDefaultSessionAddressVariables
   >(
     UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
     currentUpdateRole,
@@ -473,8 +474,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       <div className="mb-8">
         <LocationSelectionRow
           location={null}
-          onDelete={deleteLocationOption}
-          onSetLink={updateCourseSessionDefaultAddress}
+          onDelete={deleteCourseLocation}
+          onSetLink={updateCourseDefaultSessionAddress}
           onSetOption={updateCourseLocationOption}
           options={locationOptions}
         />
@@ -483,15 +484,15 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             key={loc.id}
             location={loc}
             options={locationOptions}
-            onDelete={deleteLocationOption}
-            onSetLink={updateCourseSessionDefaultAddress}
+            onDelete={deleteCourseLocation}
+            onSetLink={updateCourseDefaultSessionAddress}
             onSetOption={updateCourseLocationOption}
           />
         ))}
       </div>
 
       <div className="flex justify-end mb-8">
-        <Button onClick={insertLocationOption} startIcon={<MdAddCircle />}>
+        <Button onClick={insertCourseLocation} startIcon={<MdAddCircle />}>
           neuen Ort hinzufügen
         </Button>
       </div>

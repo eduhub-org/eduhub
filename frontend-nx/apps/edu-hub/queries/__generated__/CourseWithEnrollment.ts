@@ -109,7 +109,7 @@ export interface CourseWithEnrollment_Course_by_pk_CourseLocations {
   /**
    * Will be used as default for any new session address.
    */
-  sessionDefaultAddress: string | null;
+  defaultSessionAddress: string | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Program {

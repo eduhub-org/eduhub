@@ -38,7 +38,7 @@ export const MANAGED_COURSE = gql`
       }
       CourseLocations {
         id
-        sessionDefaultAddress
+        defaultSessionAddress
         locationOption
       }
       Sessions {
@@ -171,7 +171,7 @@ export const INSERT_NEW_COURSE_LOCATION = gql`
       objects: {
         courseId: $courseId
         locationOption: $option
-        sessionDefaultAddress: ""
+        defaultSessionAddress: ""
       }
     ) {
       affected_rows
@@ -194,10 +194,10 @@ export const UPDATE_COURSE_LOCATION_OPTION = gql`
 `;
 
 export const UPDATE_COURSE_SESSION_DEFAULT_ADDRESS = gql`
-  mutation UpdateCourseSessionDefaultAddress($locationId: Int!, $sessionDefaultAddress: String!) {
+  mutation UpdateCourseDefaultSessionAddress($locationId: Int!, $defaultSessionAddress: String!) {
     update_CourseLocation_by_pk(
       pk_columns: { id: $locationId }
-      _set: { sessionDefaultAddress: $sessionDefaultAddress }
+      _set: { defaultSessionAddress: $defaultSessionAddress }
     ) {
       id
     }
