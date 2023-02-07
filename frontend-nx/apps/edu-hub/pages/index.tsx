@@ -14,7 +14,7 @@ import { useAuthedQuery } from "../hooks/authedQuery";
 import { useIsLoggedIn } from "../hooks/authentication";
 import { CourseList } from "../queries/__generated__/CourseList";
 import { CourseListWithEnrollments } from "../queries/__generated__/CourseListWithEnrollments";
-import { PUBLISHED_COURSE_LIST } from "../queries/courseList";
+import { COURSE_LIST } from "../queries/courseList";
 import { COURSE_LIST_WITH_ENROLLMENT } from "../queries/courseListWithEnrollment";
 import { ClientOnly } from "@opencampus/shared-components";
 
@@ -23,7 +23,7 @@ const Home: FC = () => {
 
   const isLoggedIn = useIsLoggedIn();
 
-  const query = isLoggedIn ? COURSE_LIST_WITH_ENROLLMENT : PUBLISHED_COURSE_LIST;
+  const query = isLoggedIn ? COURSE_LIST_WITH_ENROLLMENT : COURSE_LIST;
   const {
     data: courses,
     error,
@@ -32,6 +32,9 @@ const Home: FC = () => {
   if (error) {
     console.log("got error in query for courses!", error);
   }
+
+  const publishedCourses = courses?.Course?.filter(course => course.published === true) ?? [];
+
 
   return (
     <>
@@ -52,18 +55,37 @@ const Home: FC = () => {
         </div>
         <ClientOnly>
           <OnlyLoggedIn>
-            <div className="mt-11">
-              <MyCourses />
-            </div>
+          {courses?.Course?.length > 0 ?
+            <>
+              <h2 id="courses" className="text-2xl font-semibold text-left mt-20">
+                {t("Course Organization")}
+              </h2>
+              <div className="mt-2">
+                <TileSlider courses={publishedCourses} />
+              </div>
+            </>
+          : null}
+          </OnlyLoggedIn>
+          <OnlyLoggedIn>
+          {courses?.Course?.length > 0 ? 
+            <>
+              <h2 id="courses" className="text-2xl font-semibold text-left mt-20">
+                {t("My Courses")}
+              </h2>
+              <div className="mt-2">
+                <TileSlider courses={courses?.Course ?? []} />
+              </div>
+            </>
+          : null}
           </OnlyLoggedIn>
 
           {courses?.Course?.length > 0 ? 
             <>
               <h2 id="courses" className="text-2xl font-semibold text-left mt-20">
-                {t("published")}
+                {t("Published Courses")}
               </h2>
               <div className="mt-2">
-                <TileSlider courses={courses?.Course ?? []} />
+                <TileSlider courses={publishedCourses} />
               </div>
             </>
           : null}

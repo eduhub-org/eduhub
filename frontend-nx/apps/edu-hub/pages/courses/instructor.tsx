@@ -11,7 +11,7 @@ import {
   AdminCourseList_Course,
 } from "../../queries/__generated__/AdminCourseList";
 import { useInstructorQuery } from "../../hooks/authedQuery";
-import { PUBLISHED_COURSE_LIST } from "../../queries/courseList";
+import { COURSE_LIST } from "../../queries/courseList";
 import Loading from "../../components/courses/Loading";
 import { Tile } from "../../components/course/Tile";
 import EhMenuItem from "../../components/common/EhMenuItem";
@@ -58,7 +58,7 @@ const Courses: FC = () => {
   const courseListRequest = useInstructorQuery<
     AdminCourseList,
     AdminCourseListVariables
-  >(PUBLISHED_COURSE_LIST, {
+  >(COURSE_LIST, {
     variables: {
       where: { CourseInstructors: { Expert: { userId: { _eq: userId } } } },
     },
