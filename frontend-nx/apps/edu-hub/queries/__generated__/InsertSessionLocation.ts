@@ -3,8 +3,6 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { SessionAddressType_enum } from "./../../__generated__/globalTypes";
-
 // ====================================================
 // GraphQL mutation operation: InsertSessionLocation
 // ====================================================

@@ -29,6 +29,7 @@ module.exports = {
         'edu-modal-bg-color': '#222222',
         'edu-tag-color': '#C4C4C4',
         'edu-row-color': '#E5E5E5',
+        'edu-red': '#D45A5A',
       },
     },
     fontFamily: {
