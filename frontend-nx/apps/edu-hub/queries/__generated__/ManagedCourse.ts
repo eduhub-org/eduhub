@@ -252,6 +252,10 @@ export interface ManagedCourse_Course_by_pk {
    */
   cost: string;
   /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
+  /**
    * Last day before applications are closed. (Set to the program's default value when the course is created.)
    */
   applicationEnd: any;
@@ -315,10 +319,6 @@ export interface ManagedCourse_Course_by_pk {
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
-  /**
-   * The value decides whether the course is visible for users or anoymous persons.
-   */
-  visibility: boolean | null;
   /**
    * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
    */

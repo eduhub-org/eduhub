@@ -63,6 +63,10 @@ export interface AdminProgramFragment {
    */
   title: string;
   /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+  /**
    * Defines whether the tab for this course program is shown or not.
    */
   visibility: boolean;

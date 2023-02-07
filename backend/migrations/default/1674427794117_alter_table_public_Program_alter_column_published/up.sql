@@ -1,0 +1,1 @@
+comment on column "public"."Program"."published" is E'Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)';

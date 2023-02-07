@@ -106,6 +106,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    */
   cost: string;
   /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
+  /**
    * Last day before applications are closed. (Set to the program's default value when the course is created.)
    */
   applicationEnd: any;
