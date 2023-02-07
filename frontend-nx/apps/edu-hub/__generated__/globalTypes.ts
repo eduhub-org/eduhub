@@ -6,7 +6,7 @@
 //==============================================================
 // START Enums and Input Objects
 //==============================================================
- 
+
 /**
  * unique or primary key constraints on table "AchievementOptionCourse"
  */
