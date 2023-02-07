@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 import { ADMIN_COURSE_FRAGMENT, COURSE_FRAGMENT } from "./courseFragment";
 import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from "./programFragment";
 
-export const COURSE_LIST = gql`
+export const PUBLISHED_COURSE_LIST = gql`
   ${COURSE_FRAGMENT}
   query CourseList($where: Course_bool_exp! = {}) {
     Course(order_by: { id: desc }, where: {_and: [$where, {published: {_eq: true}}, {Program: { published: { _eq: true } } }]}) {
