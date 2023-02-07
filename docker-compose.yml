@@ -20,21 +20,6 @@ services:
       - hasura
       - keycloak
 
-  frontend:
-    container_name: eduhub-frontend
-    ports:
-      - "5005:5000"
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile-dev
-    # uncomment this to disable automatic yarn dev on frontend startup
-    #command: tail -F anything
-    volumes:
-      - ./frontend:/opt/app
-    depends_on:
-      - hasura
-      - keycloak
-
   functions:
     container_name: eduhub-functions
     image: node:18-bullseye-slim
