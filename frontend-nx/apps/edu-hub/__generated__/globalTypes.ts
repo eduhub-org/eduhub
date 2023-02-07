@@ -307,6 +307,7 @@ export enum CourseLocation_constraint {
 export enum CourseLocation_update_column {
   courseId = "courseId",
   created_at = "created_at",
+  defaultSessionAddress = "defaultSessionAddress",
   id = "id",
   locationOption = "locationOption",
   updated_at = "updated_at",
@@ -2763,6 +2764,7 @@ export interface CourseLocation_bool_exp {
   _or?: CourseLocation_bool_exp[] | null;
   courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
+  defaultSessionAddress?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   locationOption?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -2776,6 +2778,7 @@ export interface CourseLocation_insert_input {
   LocationOption?: LocationOption_obj_rel_insert_input | null;
   courseId?: number | null;
   created_at?: any | null;
+  defaultSessionAddress?: string | null;
   id?: number | null;
   locationOption?: string | null;
   updated_at?: any | null;
@@ -2787,6 +2790,7 @@ export interface CourseLocation_insert_input {
 export interface CourseLocation_max_order_by {
   courseId?: order_by | null;
   created_at?: order_by | null;
+  defaultSessionAddress?: order_by | null;
   id?: order_by | null;
   locationOption?: order_by | null;
   updated_at?: order_by | null;
@@ -2798,6 +2802,7 @@ export interface CourseLocation_max_order_by {
 export interface CourseLocation_min_order_by {
   courseId?: order_by | null;
   created_at?: order_by | null;
+  defaultSessionAddress?: order_by | null;
   id?: order_by | null;
   locationOption?: order_by | null;
   updated_at?: order_by | null;

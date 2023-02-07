@@ -21,6 +21,7 @@ export const COURSE_WITH_ENROLLMENT = gql`
       CourseLocations {
         id
         locationOption
+        defaultSessionAddress
       }
       Program {
         ...ProgramFragment

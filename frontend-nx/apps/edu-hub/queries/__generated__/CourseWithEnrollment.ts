@@ -106,6 +106,10 @@ export interface CourseWithEnrollment_Course_by_pk_CourseLocations {
    * Either 'ONLINE' or one of the possible given offline locations
    */
   locationOption: string | null;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Program {

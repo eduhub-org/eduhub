@@ -35,5 +35,5 @@ export interface InsertSessionLocation {
 
 export interface InsertSessionLocationVariables {
   sessionId: number;
-  type: SessionAddressType_enum;
+  address: string;
 }
