@@ -24,7 +24,7 @@ fi
 # Run the codegen inside the container(s)
 
 # nx edu
-docker exec -ti eduhub_frontend-nx_1 npx nx run edu-hub:apollo
+docker exec -ti eduhub-frontend-nx npx nx run edu-hub:apollo
 
 # nx rent-a-scientist
 # docker exec -ti edu-hub_frontend-nx_1 npx nx run rent-a-scientist:apollo

@@ -103,9 +103,13 @@ export interface CourseWithEnrollment_Course_by_pk_CourseLocations {
   __typename: "CourseLocation";
   id: number;
   /**
-   * HTTP address of the video conference for online participation (only provided if it is an online address)
+   * Either 'ONLINE' or one of the possible given offline locations
    */
-  link: string;
+  locationOption: string | null;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Program {

@@ -307,11 +307,9 @@ export enum CourseLocation_constraint {
 export enum CourseLocation_update_column {
   courseId = "courseId",
   created_at = "created_at",
+  defaultSessionAddress = "defaultSessionAddress",
   id = "id",
-  latitude = "latitude",
-  link = "link",
   locationOption = "locationOption",
-  longitude = "longitude",
   updated_at = "updated_at",
 }
 
@@ -684,9 +682,6 @@ export enum SessionAddress_update_column {
   address = "address",
   created_at = "created_at",
   id = "id",
-  latitude = "latitude",
-  link = "link",
-  longitude = "longitude",
   sessionId = "sessionId",
   type = "type",
   updated_at = "updated_at",
@@ -804,6 +799,13 @@ export enum User_update_column {
   updated_at = "updated_at",
 }
 
+/**
+ * unique or primary key constraints on table "Weekday"
+ */
+export enum Weekday_constraint {
+  Weekday_pkey = "Weekday_pkey",
+}
+
 export enum Weekday_enum {
   FRIDAY = "FRIDAY",
   MONDAY = "MONDAY",
@@ -812,6 +814,14 @@ export enum Weekday_enum {
   THURSDAY = "THURSDAY",
   TUESDAY = "TUESDAY",
   WEDNESDAY = "WEDNESDAY",
+}
+
+/**
+ * update columns of table "Weekday"
+ */
+export enum Weekday_update_column {
+  comment = "comment",
+  value = "value",
 }
 
 /**
@@ -2755,11 +2765,9 @@ export interface CourseLocation_bool_exp {
   _or?: CourseLocation_bool_exp[] | null;
   courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
+  defaultSessionAddress?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
-  latitude?: String_comparison_exp | null;
-  link?: String_comparison_exp | null;
   locationOption?: String_comparison_exp | null;
-  longitude?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
 
@@ -2771,11 +2779,9 @@ export interface CourseLocation_insert_input {
   LocationOption?: LocationOption_obj_rel_insert_input | null;
   courseId?: number | null;
   created_at?: any | null;
+  defaultSessionAddress?: string | null;
   id?: number | null;
-  latitude?: string | null;
-  link?: string | null;
   locationOption?: string | null;
-  longitude?: string | null;
   updated_at?: any | null;
 }
 
@@ -2785,11 +2791,9 @@ export interface CourseLocation_insert_input {
 export interface CourseLocation_max_order_by {
   courseId?: order_by | null;
   created_at?: order_by | null;
+  defaultSessionAddress?: order_by | null;
   id?: order_by | null;
-  latitude?: order_by | null;
-  link?: order_by | null;
   locationOption?: order_by | null;
-  longitude?: order_by | null;
   updated_at?: order_by | null;
 }
 
@@ -2799,11 +2803,9 @@ export interface CourseLocation_max_order_by {
 export interface CourseLocation_min_order_by {
   courseId?: order_by | null;
   created_at?: order_by | null;
+  defaultSessionAddress?: order_by | null;
   id?: order_by | null;
-  latitude?: order_by | null;
-  link?: order_by | null;
   locationOption?: order_by | null;
-  longitude?: order_by | null;
   updated_at?: order_by | null;
 }
 
@@ -2977,6 +2979,7 @@ export interface Course_bool_exp {
   Language?: Language_bool_exp | null;
   Program?: Program_bool_exp | null;
   Sessions?: Session_bool_exp | null;
+  Weekday?: Weekday_bool_exp | null;
   _and?: Course_bool_exp[] | null;
   _not?: Course_bool_exp | null;
   _or?: Course_bool_exp[] | null;
@@ -3020,6 +3023,7 @@ export interface Course_insert_input {
   Language?: Language_obj_rel_insert_input | null;
   Program?: Program_obj_rel_insert_input | null;
   Sessions?: Session_arr_rel_insert_input | null;
+  Weekday?: Weekday_obj_rel_insert_input | null;
   achievementCertificatePossible?: boolean | null;
   applicationEnd?: any | null;
   attendanceCertificatePossible?: boolean | null;
@@ -3131,6 +3135,7 @@ export interface Course_order_by {
   Language?: Language_order_by | null;
   Program?: Program_order_by | null;
   Sessions_aggregate?: Session_aggregate_order_by | null;
+  Weekday?: Weekday_order_by | null;
   achievementCertificatePossible?: order_by | null;
   applicationEnd?: order_by | null;
   attendanceCertificatePossible?: order_by | null;
@@ -4423,9 +4428,6 @@ export interface SessionAddress_bool_exp {
   address?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
-  latitude?: String_comparison_exp | null;
-  link?: String_comparison_exp | null;
-  longitude?: String_comparison_exp | null;
   sessionId?: Int_comparison_exp | null;
   type?: SessionAddressType_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -4440,9 +4442,6 @@ export interface SessionAddress_insert_input {
   address?: string | null;
   created_at?: any | null;
   id?: number | null;
-  latitude?: string | null;
-  link?: string | null;
-  longitude?: string | null;
   sessionId?: number | null;
   type?: SessionAddressType_enum | null;
   updated_at?: any | null;
@@ -4959,6 +4958,17 @@ export interface User_order_by {
 }
 
 /**
+ * Boolean expression to filter rows from the table "Weekday". All fields are combined with a logical 'AND'.
+ */
+export interface Weekday_bool_exp {
+  _and?: Weekday_bool_exp[] | null;
+  _not?: Weekday_bool_exp | null;
+  _or?: Weekday_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
  * Boolean expression to compare columns of type "Weekday_enum". All fields are combined with logical 'AND'.
  */
 export interface Weekday_enum_comparison_exp {
@@ -4967,6 +4977,39 @@ export interface Weekday_enum_comparison_exp {
   _is_null?: boolean | null;
   _neq?: Weekday_enum | null;
   _nin?: Weekday_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "Weekday"
+ */
+export interface Weekday_insert_input {
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "Weekday"
+ */
+export interface Weekday_obj_rel_insert_input {
+  data: Weekday_insert_input;
+  on_conflict?: Weekday_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "Weekday"
+ */
+export interface Weekday_on_conflict {
+  constraint: Weekday_constraint;
+  update_columns: Weekday_update_column[];
+  where?: Weekday_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "Weekday".
+ */
+export interface Weekday_order_by {
+  comment?: order_by | null;
+  value?: order_by | null;
 }
 
 /**

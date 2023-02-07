@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, AttendanceStatus_enum, SessionAddressType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourse
@@ -13,9 +13,10 @@ export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses {
   __typename: "SessionAddress";
   id: number;
   /**
-   * The link to a video conference call (if it is an online location)
+   * Where the session will take place; might be an offline or online location which is provided according to the provided type
    */
-  link: string | null;
+  address: string;
+  type: SessionAddressType_enum;
 }
 
 export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User {
@@ -222,9 +223,9 @@ export interface ManagedCourse_Course_by_pk_CourseLocations {
   __typename: "CourseLocation";
   id: number;
   /**
-   * HTTP address of the video conference for online participation (only provided if it is an online address)
+   * Will be used as default for any new session address.
    */
-  link: string;
+  defaultSessionAddress: string | null;
   /**
    * Either 'ONLINE' or one of the possible given offline locations
    */
