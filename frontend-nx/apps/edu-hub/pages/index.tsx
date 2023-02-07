@@ -12,7 +12,7 @@ import { MyCourses } from "../components/course/MyCourses";
 import { TileSlider } from "../components/course/TileSlider";
 import { useAuthedQuery } from "../hooks/authedQuery";
 import { useIsLoggedIn } from "../hooks/authentication";
-import { PublishedCourseList } from "../queries/__generated__/PublishedCourseList";
+import { CourseList } from "../queries/__generated__/CourseList";
 import { CourseListWithEnrollments } from "../queries/__generated__/CourseListWithEnrollments";
 import { PUBLISHED_COURSE_LIST } from "../queries/courseList";
 import { COURSE_LIST_WITH_ENROLLMENT } from "../queries/courseListWithEnrollment";
@@ -27,7 +27,7 @@ const Home: FC = () => {
   const {
     data: courses,
     error,
-  } = useAuthedQuery<PublishedCourseList | CourseListWithEnrollments>(query);
+  } = useAuthedQuery<CourseList | CourseListWithEnrollments>(query);
 
   if (error) {
     console.log("got error in query for courses!", error);

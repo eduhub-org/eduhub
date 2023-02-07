@@ -157,7 +157,7 @@ export const SessionRow: FC<IProps> = ({
 
   const adressTags = (session?.SessionAddresses || []).map((x) => ({
     id: x.id,
-    display: x.link || "",
+    display: x.address || "",
   }));
 
   const speakerTags = (session?.SessionSpeakers || []).map((x) => ({
@@ -181,7 +181,7 @@ export const SessionRow: FC<IProps> = ({
         await insertSessionLocationMutation({
           variables: {
             sessionId: session.id,
-            link: inputValue,
+            address: inputValue,
           },
         });
         qResult.refetch();

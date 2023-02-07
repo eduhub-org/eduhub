@@ -110,7 +110,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         await insertSessionLocationMutation({
           variables: {
             sessionId: newSessionId,
-            link: loc.link,
+            address: loc.defaultSessionAddress,
           },
         });
       }
