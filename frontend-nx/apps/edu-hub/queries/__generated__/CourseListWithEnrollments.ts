@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseListWithEnrollments
@@ -129,7 +129,7 @@ export interface CourseListWithEnrollments_Course {
   /**
    * The day of the week the course takes place.
    */
-  weekDay: string | null;
+  weekDay: Weekday_enum | null;
   /**
    * A text providing info about the costs of a participation.
    */
