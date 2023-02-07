@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, CourseEnrollmentStatus_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseWithEnrollment
@@ -103,9 +103,13 @@ export interface CourseWithEnrollment_Course_by_pk_CourseLocations {
   __typename: "CourseLocation";
   id: number;
   /**
-   * HTTP address of the video conference for online participation (only provided if it is an online address)
+   * Either 'ONLINE' or one of the possible given offline locations
    */
-  link: string;
+  locationOption: string | null;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Program {
@@ -151,7 +155,7 @@ export interface CourseWithEnrollment_Course_by_pk {
   /**
    * The day of the week the course takes place.
    */
-  weekDay: string | null;
+  weekDay: Weekday_enum | null;
   /**
    * A text providing info about the costs of a participation.
    */

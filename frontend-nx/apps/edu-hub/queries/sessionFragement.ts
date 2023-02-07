@@ -19,7 +19,8 @@ export const ADMIN_SESSION_FRAGMENT = gql`
     ...SessionFragment
     SessionAddresses {
       id
-      link
+      address
+      type
     }
     SessionSpeakers {
       id

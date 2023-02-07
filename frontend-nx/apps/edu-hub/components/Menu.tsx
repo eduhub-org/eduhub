@@ -4,6 +4,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { withStyles } from "@material-ui/core/styles";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from 'next/router';
 import { FC, useCallback } from "react";
 import { useIsAdmin, useIsInstructor } from "../hooks/authentication";
 
@@ -42,6 +43,21 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
+
+  const router = useRouter();
+
+  const logout = useCallback(async () => {
+    // Fetch Keycloak Logout URL
+    const res = await fetch('/api/auth/logout');
+    const jsonPayload = await res?.json();
+    const url = JSON.parse(jsonPayload).url;
+
+    // Logging user out client side
+    await signOut({ redirect: false });
+
+    // Logging user out on keycloak and redirecting back to app
+    router.push(url);
+  }, [router]);
 
   return (
     <StyledMenu
@@ -105,7 +121,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
-      <MenuItem onClick={() => signOut()}>
+      <MenuItem onClick={() => logout()}>
         <span className="w-full text-lg">Logout</span>
       </MenuItem>
     </StyledMenu>
