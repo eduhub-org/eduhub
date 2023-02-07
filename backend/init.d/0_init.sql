@@ -3090,8 +3090,8 @@ INSERT INTO public."Expert" VALUES (1, '43bc2dc5-7171-422d-a99f-914650f41cb5', N
 -- Data for Name: Language; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."Language" VALUES ('DE', 'German');
-INSERT INTO public."Language" VALUES ('EN', 'English');
+INSERT INTO public."Language" VALUES ('de', 'German');
+INSERT INTO public."Language" VALUES ('en', 'English');
 
 
 --

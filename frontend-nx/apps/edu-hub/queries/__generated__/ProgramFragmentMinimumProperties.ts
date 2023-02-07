@@ -18,4 +18,8 @@ export interface ProgramFragmentMinimumProperties {
    * The title of the program
    */
   title: string;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
 }
