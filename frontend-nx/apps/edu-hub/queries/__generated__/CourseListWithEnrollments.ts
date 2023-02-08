@@ -101,6 +101,19 @@ export interface CourseListWithEnrollments_Course_CourseEnrollments {
 
 export interface CourseListWithEnrollments_Course_Program {
   __typename: "Program";
+  id: number;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
   /**
    * The default application deadline for a course. It can be changed on the course level.
    */
@@ -109,7 +122,6 @@ export interface CourseListWithEnrollments_Course_Program {
    * The day the application for all courses of the program start.
    */
   applicationStart: any | null;
-  id: number;
   /**
    * The last day a course lecture can possibly be in this program.
    */
@@ -119,17 +131,9 @@ export interface CourseListWithEnrollments_Course_Program {
    */
   lectureStart: any | null;
   /**
-   * The title of the program
-   */
-  title: string;
-  /**
    * The deadline for the achievement record uploads.
    */
   achievementRecordUploadDeadline: any | null;
-  /**
-   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
-   */
-  published: boolean;
 }
 
 export interface CourseListWithEnrollments_Course {

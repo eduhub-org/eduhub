@@ -86,6 +86,36 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseLocat
   locationOption: string | null;
 }
 
+export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseEnrollments {
+  __typename: "CourseEnrollment";
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
+  id: number;
+  /**
+   * The users current enrollment status to this course
+   */
+  status: CourseEnrollmentStatus_enum;
+}
+
+export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+}
+
 export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course {
   __typename: "Course";
   id: number;
@@ -173,6 +203,14 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course {
    * An array relationship
    */
   CourseLocations: MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseLocations[];
+  /**
+   * An array relationship
+   */
+  CourseEnrollments: MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseEnrollments[];
+  /**
+   * An object relationship
+   */
+  Program: MyEnrollmentsForCourseQuery_CourseEnrollment_Course_Program | null;
 }
 
 export interface MyEnrollmentsForCourseQuery_CourseEnrollment {

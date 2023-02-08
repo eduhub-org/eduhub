@@ -114,6 +114,19 @@ export interface CourseWithEnrollment_Course_by_pk_CourseEnrollments {
 
 export interface CourseWithEnrollment_Course_by_pk_Program {
   __typename: "Program";
+  id: number;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
   /**
    * The default application deadline for a course. It can be changed on the course level.
    */
@@ -122,7 +135,6 @@ export interface CourseWithEnrollment_Course_by_pk_Program {
    * The day the application for all courses of the program start.
    */
   applicationStart: any | null;
-  id: number;
   /**
    * The last day a course lecture can possibly be in this program.
    */
@@ -132,17 +144,9 @@ export interface CourseWithEnrollment_Course_by_pk_Program {
    */
   lectureStart: any | null;
   /**
-   * The title of the program
-   */
-  title: string;
-  /**
    * The deadline for the achievement record uploads.
    */
   achievementRecordUploadDeadline: any | null;
-  /**
-   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
-   */
-  published: boolean;
 }
 
 export interface CourseWithEnrollment_Course_by_pk {
@@ -233,10 +237,6 @@ export interface CourseWithEnrollment_Course_by_pk {
    */
   CourseLocations: CourseWithEnrollment_Course_by_pk_CourseLocations[];
   /**
-   * The link to the chat of the course (e.g. a mattermost channel)
-   */
-  chatLink: string | null;
-  /**
    * An array relationship
    */
   CourseEnrollments: CourseWithEnrollment_Course_by_pk_CourseEnrollments[];
@@ -244,6 +244,10 @@ export interface CourseWithEnrollment_Course_by_pk {
    * An object relationship
    */
   Program: CourseWithEnrollment_Course_by_pk_Program | null;
+  /**
+   * The link to the chat of the course (e.g. a mattermost channel)
+   */
+  chatLink: string | null;
 }
 
 export interface CourseWithEnrollment {

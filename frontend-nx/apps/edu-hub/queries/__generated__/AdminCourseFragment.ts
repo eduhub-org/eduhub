@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, CourseEnrollmentStatus_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: AdminCourseFragment
@@ -86,17 +86,34 @@ export interface AdminCourseFragment_CourseLocations {
   locationOption: string | null;
 }
 
+export interface AdminCourseFragment_CourseEnrollments {
+  __typename: "CourseEnrollment";
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
+  id: number;
+  /**
+   * The users current enrollment status to this course
+   */
+  status: CourseEnrollmentStatus_enum;
+}
+
 export interface AdminCourseFragment_Program {
   __typename: "Program";
   id: number;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
   /**
    * The title of the program
    */
   title: string;
   /**
-   * The 6 letter short title for the program.
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
    */
-  shortTitle: string | null;
+  published: boolean;
   /**
    * The first day a course lecture can possibly be in this program.
    */
@@ -195,6 +212,14 @@ export interface AdminCourseFragment {
    */
   CourseLocations: AdminCourseFragment_CourseLocations[];
   /**
+   * An array relationship
+   */
+  CourseEnrollments: AdminCourseFragment_CourseEnrollments[];
+  /**
+   * An object relationship
+   */
+  Program: AdminCourseFragment_Program | null;
+  /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
@@ -214,8 +239,4 @@ export interface AdminCourseFragment {
    * An array of texts including the learning goals for the course
    */
   learningGoals: string | null;
-  /**
-   * An object relationship
-   */
-  Program: AdminCourseFragment_Program | null;
 }

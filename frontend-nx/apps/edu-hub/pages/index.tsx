@@ -69,7 +69,16 @@ const Home: FC = () => {
     console.log("got error in query for enrolled courses!", error_enrolled);
   }
   // const myCourses = enrolledCourses?.Course ?? [];
-  const myCourses = enrolledCourses?.Course?.filter(course => course.CourseEnrollments) ?? [];
+  // const myCourses = enrolledCourses?.Course?.filter(course => course.CourseEnrollments) ?? [];
+  const {
+    data: coursesList,
+    error: coursesList_error,
+  } = useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT);
+  if (coursesList_error) {
+    console.log("got error in query for listed courses!", coursesList_error);
+  }
+  const myCourses = coursesList?.Course?.filter(course => course.CourseEnrollments.length>0) ?? [];
+  // const myCourses = myCourses1.filter(course => course.en);
 
 
   // Published Courses
@@ -80,7 +89,13 @@ const Home: FC = () => {
   if (error_courses) {
     console.log("got error in query for listed courses!", error_courses);
   }
-  const publishedCourses = courses?.Course?.filter(course => course.published === true) ?? [];
+  console.log("courses!", courses);
+  const publishedCourses = courses?.Course?.filter(course => course.published === true && course.Program.published === true) ?? [];
+  // const courseGroup1 = publishedCourses.filter(course => course.topicsTags?.includes("TECH_CODING"));
+  // const courseGroup2 = publishedCourses.filter(course => course.topicsTags?.includes("BUSINESS_STARTUP"));
+  // const courseGroup3 = publishedCourses.filter(course => course.topicsTags?.includes("CREATIVE_SOCIAL_SUSTAINABLE"));
+  // const degrees = publishedCourses.filter(course => course.Program.shortTitle === "DEGREES");
+  // const events = publishedCourses.filter(course => course.Program.shortTitle === "EVENTS");
 
 
   return (

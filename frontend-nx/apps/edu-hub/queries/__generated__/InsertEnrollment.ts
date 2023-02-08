@@ -99,6 +99,23 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
   status: CourseEnrollmentStatus_enum;
 }
 
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+}
+
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
   __typename: "Course";
   id: number;
@@ -190,6 +207,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    * An array relationship
    */
   CourseEnrollments: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments[];
+  /**
+   * An object relationship
+   */
+  Program: InsertEnrollment_insert_CourseEnrollment_returning_Course_Program | null;
 }
 
 export interface InsertEnrollment_insert_CourseEnrollment_returning {
