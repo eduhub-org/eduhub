@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: Course
@@ -84,19 +84,6 @@ export interface Course_Course_by_pk_CourseLocations {
    * Either 'ONLINE' or one of the possible given offline locations
    */
   locationOption: string | null;
-}
-
-export interface Course_Course_by_pk_CourseEnrollments {
-  __typename: "CourseEnrollment";
-  /**
-   * The last day a user can confirm his/her invitation to the given course
-   */
-  invitationExpirationDate: any | null;
-  id: number;
-  /**
-   * The users current enrollment status to this course
-   */
-  status: CourseEnrollmentStatus_enum;
 }
 
 export interface Course_Course_by_pk_Program {
@@ -203,10 +190,6 @@ export interface Course_Course_by_pk {
    * An array relationship
    */
   CourseLocations: Course_Course_by_pk_CourseLocations[];
-  /**
-   * An array relationship
-   */
-  CourseEnrollments: Course_Course_by_pk_CourseEnrollments[];
   /**
    * An object relationship
    */
