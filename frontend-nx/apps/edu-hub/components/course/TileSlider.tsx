@@ -1,8 +1,11 @@
-import { FC } from "react";
+import { FC } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
-import { CourseList_Course } from "../../queries/__generated__/CourseList";
+import 'swiper/css';
 
-import { Tile } from "./Tile";
+import { CourseList_Course } from '../../queries/__generated__/CourseList';
+
+import { Tile } from './Tile';
 
 interface IProps {
   courses: CourseList_Course[];
@@ -10,14 +13,17 @@ interface IProps {
 
 export const TileSlider: FC<IProps> = ({ courses }) => {
   return (
-    <div className="w-full overflow-x-scroll">
-      <div className="flex w-min whitespace-nowrap px-4 sm:px-16 xl:px-0 space-x-4">
-        {courses.map((course) => (
-          <div key={`${course.id}`} className="whitespace-normal">
-            <Tile course={course} />
-          </div>
-        ))}
-      </div>
-    </div>
+    <Swiper
+      spaceBetween={50}
+      slidesPerView={3}
+      onSlideChange={() => console.log('slide change')}
+      onSwiper={(swiper) => console.log(swiper)}
+    >
+      {courses.map((course) => (
+        <SwiperSlide key={`${course.id}`} className="whitespace-normal">
+          <Tile course={course} />
+        </SwiperSlide>
+      ))}
+    </Swiper>
   );
 };

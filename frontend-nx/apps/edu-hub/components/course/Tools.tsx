@@ -12,8 +12,8 @@ export const Tools: FC<IProps> = ({ course }) => {
   const { t } = useTranslation("course-page");
 
   const videoLink = course.CourseLocations.find(
-    (courseLocation) => !!courseLocation.link
-  )?.link;
+    (courseLocation) => !!courseLocation.defaultSessionAddress
+  )?.defaultSessionAddress;
 
   return (
     <div className="flex flex-1 gap-x-4">

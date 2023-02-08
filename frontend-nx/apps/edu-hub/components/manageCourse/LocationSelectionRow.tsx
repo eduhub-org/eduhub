@@ -69,7 +69,7 @@ export const LocationSelectionRow: FC<IProps> = ({
         {location && (
           <DebounceInput
             className="w-full h-10 bg-edu-light-gray"
-            value={location.link}
+            value={location.defaultSessionAddress}
             onChange={handleSetLink}
             debounceTimeout={1000}
           />

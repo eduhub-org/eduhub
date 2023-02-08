@@ -73,6 +73,19 @@ export interface CourseFragment_CourseInstructors {
   Expert: CourseFragment_CourseInstructors_Expert;
 }
 
+export interface CourseFragment_CourseLocations {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: string | null;
+}
+
 export interface CourseFragment {
   __typename: "Course";
   id: number;
@@ -156,4 +169,8 @@ export interface CourseFragment {
    * An array relationship
    */
   CourseInstructors: CourseFragment_CourseInstructors[];
+  /**
+   * An array relationship
+   */
+  CourseLocations: CourseFragment_CourseLocations[];
 }

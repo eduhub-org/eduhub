@@ -24,6 +24,7 @@ export const ProgramsMenubar: FC<IMenubarProps> = ({
     shortTitle: "All",
     title: "All",
     __typename: "Program",
+    published:  true
   });
   const semesters: StaticComponentProperty[] = customPrograms.map((p) => {
     return {

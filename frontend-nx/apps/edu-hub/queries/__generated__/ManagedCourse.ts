@@ -130,6 +130,19 @@ export interface ManagedCourse_Course_by_pk_CourseInstructors {
   Expert: ManagedCourse_Course_by_pk_CourseInstructors_Expert;
 }
 
+export interface ManagedCourse_Course_by_pk_CourseLocations {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: string | null;
+}
+
 export interface ManagedCourse_Course_by_pk_Program {
   __typename: "Program";
   id: number;
@@ -219,19 +232,6 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
   User: ManagedCourse_Course_by_pk_CourseEnrollments_User;
 }
 
-export interface ManagedCourse_Course_by_pk_CourseLocations {
-  __typename: "CourseLocation";
-  id: number;
-  /**
-   * Will be used as default for any new session address.
-   */
-  defaultSessionAddress: string | null;
-  /**
-   * Either 'ONLINE' or one of the possible given offline locations
-   */
-  locationOption: string | null;
-}
-
 export interface ManagedCourse_Course_by_pk {
   __typename: "Course";
   id: number;
@@ -316,6 +316,10 @@ export interface ManagedCourse_Course_by_pk {
    */
   CourseInstructors: ManagedCourse_Course_by_pk_CourseInstructors[];
   /**
+   * An array relationship
+   */
+  CourseLocations: ManagedCourse_Course_by_pk_CourseLocations[];
+  /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
@@ -343,10 +347,6 @@ export interface ManagedCourse_Course_by_pk {
    * An array relationship
    */
   CourseEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[];
-  /**
-   * An array relationship
-   */
-  CourseLocations: ManagedCourse_Course_by_pk_CourseLocations[];
 }
 
 export interface ManagedCourse {

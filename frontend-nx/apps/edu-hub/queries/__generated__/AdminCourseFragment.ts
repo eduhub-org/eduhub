@@ -73,6 +73,19 @@ export interface AdminCourseFragment_CourseInstructors {
   Expert: AdminCourseFragment_CourseInstructors_Expert;
 }
 
+export interface AdminCourseFragment_CourseLocations {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: string | null;
+}
+
 export interface AdminCourseFragment_Program {
   __typename: "Program";
   id: number;
@@ -177,6 +190,10 @@ export interface AdminCourseFragment {
    * An array relationship
    */
   CourseInstructors: AdminCourseFragment_CourseInstructors[];
+  /**
+   * An array relationship
+   */
+  CourseLocations: AdminCourseFragment_CourseLocations[];
   /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */

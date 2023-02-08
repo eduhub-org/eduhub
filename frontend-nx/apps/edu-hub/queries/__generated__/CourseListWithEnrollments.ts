@@ -73,6 +73,19 @@ export interface CourseListWithEnrollments_Course_CourseInstructors {
   Expert: CourseListWithEnrollments_Course_CourseInstructors_Expert;
 }
 
+export interface CourseListWithEnrollments_Course_CourseLocations {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: string | null;
+}
+
 export interface CourseListWithEnrollments_Course_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
@@ -202,6 +215,10 @@ export interface CourseListWithEnrollments_Course {
    * An array relationship
    */
   CourseInstructors: CourseListWithEnrollments_Course_CourseInstructors[];
+  /**
+   * An array relationship
+   */
+  CourseLocations: CourseListWithEnrollments_Course_CourseLocations[];
   /**
    * An array relationship
    */

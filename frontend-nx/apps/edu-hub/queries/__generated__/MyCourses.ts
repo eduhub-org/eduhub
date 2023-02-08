@@ -73,6 +73,19 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseInstructors
   Expert: MyCourses_User_by_pk_CourseEnrollments_Course_CourseInstructors_Expert;
 }
 
+export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseLocations {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: string | null;
+}
+
 export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
@@ -202,6 +215,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course {
    * An array relationship
    */
   CourseInstructors: MyCourses_User_by_pk_CourseEnrollments_Course_CourseInstructors[];
+  /**
+   * An array relationship
+   */
+  CourseLocations: MyCourses_User_by_pk_CourseEnrollments_Course_CourseLocations[];
   /**
    * An array relationship
    */

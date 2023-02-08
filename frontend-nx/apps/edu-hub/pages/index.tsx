@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import useTranslation from 'next-translate/useTranslation';
 
 import { LoginButton } from "../components/LoginButton";
@@ -12,26 +12,74 @@ import { MyCourses } from "../components/course/MyCourses";
 import { TileSlider } from "../components/course/TileSlider";
 import { useAuthedQuery } from "../hooks/authedQuery";
 import { useIsLoggedIn } from "../hooks/authentication";
-import { PublishedCourseList } from "../queries/__generated__/PublishedCourseList";
+import { CourseList } from "../queries/__generated__/CourseList";
 import { CourseListWithEnrollments } from "../queries/__generated__/CourseListWithEnrollments";
-import { PUBLISHED_COURSE_LIST } from "../queries/courseList";
+import { COURSE_LIST } from "../queries/courseList";
 import { COURSE_LIST_WITH_ENROLLMENT } from "../queries/courseListWithEnrollment";
 import { ClientOnly } from "@opencampus/shared-components";
+import { ApolloError } from "@apollo/client";
 
 const Home: FC = () => {
   const { t } = useTranslation("start-page");
 
   const isLoggedIn = useIsLoggedIn();
 
-  const query = isLoggedIn ? COURSE_LIST_WITH_ENROLLMENT : PUBLISHED_COURSE_LIST;
   const {
     data: courses,
-    error,
-  } = useAuthedQuery<PublishedCourseList | CourseListWithEnrollments>(query);
-
-  if (error) {
-    console.log("got error in query for courses!", error);
+    error: error_courses,
+  } = useAuthedQuery<CourseList>(COURSE_LIST);
+  if (error_courses) {
+    console.log("got error in query for enrolled courses!", error_courses);
   }
+
+  // let enrolledCourses: CourseListWithEnrollments, error_enrolled: ApolloError;
+  // if (isLoggedIn) {
+  //   const {
+  //     data: enrolledCourses,
+  //     error: error_enrolled,
+  //   } = useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT);
+  // }
+  // if (error_enrolled) {
+  //   console.log("got error in query for enrolled courses!", error_enrolled);
+  // }
+
+  // const [enrolledCourses, setEnrolledCourses] = useState<CourseListWithEnrollments | null>(null);
+  // const [error_enrolled, setErrorEnrolled] = useState<ApolloError | null>(null);
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     const fetchData = async () => {
+  //       try {
+  //         const result = await useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT);
+  //         setEnrolledCourses(result.data);
+  //       } catch (e) {
+  //         setErrorEnrolled(e);
+  //       }
+  //     };
+  //     fetchData();
+  //   }
+  // }, [isLoggedIn]);
+
+  const [enrolledCourses, setEnrolledCourses] = useState<CourseListWithEnrollments | null>(null);
+  const [error_enrolled, setErrorEnrolled] = useState<ApolloError | null>(null);
+  const { data, error } = useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      const fetchData = async () => {
+        try {
+          setEnrolledCourses(data);
+        } catch (e) {
+          setErrorEnrolled(error);
+        }
+      };
+      fetchData();
+    }
+  }, [isLoggedIn, data, error]);
+
+
+
+  const publishedCourses = courses?.Course?.filter(course => course.published === true) ?? [];
+  // const instructCourses = courses?.Course?.filter(course => course.published === true) ?? [];
 
   return (
     <>
@@ -51,19 +99,38 @@ const Home: FC = () => {
           </div>
         </div>
         <ClientOnly>
-          <OnlyLoggedIn>
-            <div className="mt-11">
-              <MyCourses />
-            </div>
-          </OnlyLoggedIn>
-
-          {courses?.Course?.length > 0 ? 
+          {/* <OnlyLoggedIn>
+          {instructCourses.length > 0 ?
             <>
               <h2 id="courses" className="text-2xl font-semibold text-left mt-20">
-                {t("published")}
+                {t("Course Organization")}
               </h2>
               <div className="mt-2">
-                <TileSlider courses={courses?.Course ?? []} />
+                <TileSlider courses={instructCourses} />
+              </div>
+            </>
+          : null}
+          </OnlyLoggedIn> */}
+          <OnlyLoggedIn>
+          {enrolledCourses?.Course ?? [].length > 0 ? 
+            <>
+              <h2 id="courses" className="text-2xl font-semibold text-left mt-20">
+                {t("My Courses")}
+              </h2>
+              <div className="mt-2">
+                <TileSlider courses={enrolledCourses?.Course ?? []} />
+              </div>
+            </>
+          : null}
+          </OnlyLoggedIn>
+
+          {publishedCourses.length > 0 ? 
+            <>
+              <h2 id="courses" className="text-2xl font-semibold text-left mt-20">
+                {t("Published Courses")}
+              </h2>
+              <div className="mt-2">
+                <TileSlider courses={publishedCourses} />
               </div>
             </>
           : null}

@@ -73,6 +73,19 @@ export interface Course_Course_by_pk_CourseInstructors {
   Expert: Course_Course_by_pk_CourseInstructors_Expert;
 }
 
+export interface Course_Course_by_pk_CourseLocations {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: string | null;
+}
+
 export interface Course_Course_by_pk {
   __typename: "Course";
   id: number;
@@ -156,6 +169,10 @@ export interface Course_Course_by_pk {
    * An array relationship
    */
   CourseInstructors: Course_Course_by_pk_CourseInstructors[];
+  /**
+   * An array relationship
+   */
+  CourseLocations: Course_Course_by_pk_CourseLocations[];
 }
 
 export interface Course {
