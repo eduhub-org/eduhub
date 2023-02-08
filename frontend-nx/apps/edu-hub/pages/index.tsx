@@ -11,75 +11,77 @@ import { OnlyLoggedOut } from "../components/common/OnlyLoggedOut";
 import { MyCourses } from "../components/course/MyCourses";
 import { TileSlider } from "../components/course/TileSlider";
 import { useAuthedQuery } from "../hooks/authedQuery";
-import { useIsLoggedIn } from "../hooks/authentication";
+import { useIsLoggedIn, useIsUser } from "../hooks/authentication";
 import { CourseList } from "../queries/__generated__/CourseList";
 import { CourseListWithEnrollments } from "../queries/__generated__/CourseListWithEnrollments";
 import { COURSE_LIST } from "../queries/courseList";
 import { COURSE_LIST_WITH_ENROLLMENT } from "../queries/courseListWithEnrollment";
 import { ClientOnly } from "@opencampus/shared-components";
 import { ApolloError } from "@apollo/client";
+import { useSession } from 'next-auth/react';
 
 const Home: FC = () => {
   const { t } = useTranslation("start-page");
 
-  const isLoggedIn = useIsLoggedIn();
 
-  const {
-    data: courses,
-    error: error_courses,
-  } = useAuthedQuery<CourseList>(COURSE_LIST);
-  if (error_courses) {
-    console.log("got error in query for enrolled courses!", error_courses);
-  }
+  // Get Logged-In Status
+  const useIsLoggedIn = (sessionData, status: "authenticated" | "loading" | "unauthenticated"): boolean => {
+    return (status === 'authenticated' || false) && !!sessionData?.accessToken;
+  };
+  const [sessionData, setSessionData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { data, status } = useSession();
+  const isLoggedIn = useIsLoggedIn(sessionData, status);
+  useEffect(() => {
+    setIsLoading(true);
+    fetch("api/auth/session")
+      .then((res) => res.json())
+      .then((data) => {
+        setSessionData(data);
+        setIsLoading(false);
+      });
+  }, []);
 
-  // let enrolledCourses: CourseListWithEnrollments, error_enrolled: ApolloError;
-  // if (isLoggedIn) {
-  //   const {
-  //     data: enrolledCourses,
-  //     error: error_enrolled,
-  //   } = useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT);
-  // }
-  // if (error_enrolled) {
-  //   console.log("got error in query for enrolled courses!", error_enrolled);
-  // }
 
-  // const [enrolledCourses, setEnrolledCourses] = useState<CourseListWithEnrollments | null>(null);
-  // const [error_enrolled, setErrorEnrolled] = useState<ApolloError | null>(null);
-  // useEffect(() => {
-  //   if (isLoggedIn) {
-  //     const fetchData = async () => {
-  //       try {
-  //         const result = await useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT);
-  //         setEnrolledCourses(result.data);
-  //       } catch (e) {
-  //         setErrorEnrolled(e);
-  //       }
-  //     };
-  //     fetchData();
-  //   }
-  // }, [isLoggedIn]);
+  // Course Organization
+  // TODO
 
+
+  // My Courses
   const [enrolledCourses, setEnrolledCourses] = useState<CourseListWithEnrollments | null>(null);
   const [error_enrolled, setErrorEnrolled] = useState<ApolloError | null>(null);
-  const { data, error } = useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT);
-
+  const { data: enrollmentData, error } = useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT);
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn && enrollmentData && !error && !isLoading) {
       const fetchData = async () => {
         try {
-          setEnrolledCourses(data);
+          setEnrolledCourses(enrollmentData);
         } catch (e) {
           setErrorEnrolled(error);
         }
       };
       fetchData();
     }
-  }, [isLoggedIn, data, error]);
+  }, [isLoggedIn, enrollmentData, error, isLoading]);
+
+ 
+  if (error_enrolled) {
+    console.log("got error in query for enrolled courses!", error_enrolled);
+  }
+  // const myCourses = enrolledCourses?.Course ?? [];
+  const myCourses = enrolledCourses?.Course?.filter(course => course.CourseEnrollments) ?? [];
 
 
-
+  // Published Courses
+  const {
+    data: courses,
+    error: error_courses,
+  } = useAuthedQuery<CourseList>(COURSE_LIST);
+  if (error_courses) {
+    console.log("got error in query for listed courses!", error_courses);
+  }
   const publishedCourses = courses?.Course?.filter(course => course.published === true) ?? [];
-  // const instructCourses = courses?.Course?.filter(course => course.published === true) ?? [];
+
 
   return (
     <>
@@ -112,13 +114,13 @@ const Home: FC = () => {
           : null}
           </OnlyLoggedIn> */}
           <OnlyLoggedIn>
-          {enrolledCourses?.Course ?? [].length > 0 ? 
+          {myCourses.length > 0 ? 
             <>
               <h2 id="courses" className="text-2xl font-semibold text-left mt-20">
                 {t("My Courses")}
               </h2>
               <div className="mt-2">
-                <TileSlider courses={enrolledCourses?.Course ?? []} />
+                <TileSlider courses={myCourses} />
               </div>
             </>
           : null}
