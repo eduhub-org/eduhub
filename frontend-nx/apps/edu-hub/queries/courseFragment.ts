@@ -34,6 +34,11 @@ export const COURSE_FRAGMENT = gql`
     CourseInstructors(order_by: { id: desc }) {
       ...CourseInstructorFragment
     }
+    CourseLocations {
+      id
+      defaultSessionAddress
+      locationOption
+    }
   }
 `;
 

@@ -73,6 +73,19 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
   Expert: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors_Expert;
 }
 
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseLocations {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: string | null;
+}
+
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
@@ -169,6 +182,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    * An array relationship
    */
   CourseInstructors: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors[];
+  /**
+   * An array relationship
+   */
+  CourseLocations: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseLocations[];
   /**
    * An array relationship
    */

@@ -86,6 +86,19 @@ export interface CourseWithEnrollment_Course_by_pk_CourseInstructors {
   Expert: CourseWithEnrollment_Course_by_pk_CourseInstructors_Expert;
 }
 
+export interface CourseWithEnrollment_Course_by_pk_CourseLocations {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: string | null;
+}
+
 export interface CourseWithEnrollment_Course_by_pk_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
@@ -97,19 +110,6 @@ export interface CourseWithEnrollment_Course_by_pk_CourseEnrollments {
    * The users current enrollment status to this course
    */
   status: CourseEnrollmentStatus_enum;
-}
-
-export interface CourseWithEnrollment_Course_by_pk_CourseLocations {
-  __typename: "CourseLocation";
-  id: number;
-  /**
-   * Either 'ONLINE' or one of the possible given offline locations
-   */
-  locationOption: string | null;
-  /**
-   * Will be used as default for any new session address.
-   */
-  defaultSessionAddress: string | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Program {
@@ -229,6 +229,10 @@ export interface CourseWithEnrollment_Course_by_pk {
    */
   CourseInstructors: CourseWithEnrollment_Course_by_pk_CourseInstructors[];
   /**
+   * An array relationship
+   */
+  CourseLocations: CourseWithEnrollment_Course_by_pk_CourseLocations[];
+  /**
    * The link to the chat of the course (e.g. a mattermost channel)
    */
   chatLink: string | null;
@@ -236,10 +240,6 @@ export interface CourseWithEnrollment_Course_by_pk {
    * An array relationship
    */
   CourseEnrollments: CourseWithEnrollment_Course_by_pk_CourseEnrollments[];
-  /**
-   * An array relationship
-   */
-  CourseLocations: CourseWithEnrollment_Course_by_pk_CourseLocations[];
   /**
    * An object relationship
    */

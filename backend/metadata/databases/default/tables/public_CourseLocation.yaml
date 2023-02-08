@@ -34,6 +34,7 @@ select_permissions:
     permission:
       columns:
         - courseId
+        - defaultSessionAddress
         - id
         - locationOption
       filter: {}
@@ -43,6 +44,7 @@ select_permissions:
       columns:
         - courseId
         - created_at
+        - defaultSessionAddress
         - id
         - locationOption
         - updated_at
