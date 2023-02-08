@@ -99,19 +99,6 @@ export interface CourseWithEnrollment_Course_by_pk_CourseLocations {
   locationOption: LocationOption_enum | null;
 }
 
-export interface CourseWithEnrollment_Course_by_pk_CourseEnrollments {
-  __typename: "CourseEnrollment";
-  /**
-   * The last day a user can confirm his/her invitation to the given course
-   */
-  invitationExpirationDate: any | null;
-  id: number;
-  /**
-   * The users current enrollment status to this course
-   */
-  status: CourseEnrollmentStatus_enum;
-}
-
 export interface CourseWithEnrollment_Course_by_pk_Program {
   __typename: "Program";
   id: number;
@@ -147,6 +134,19 @@ export interface CourseWithEnrollment_Course_by_pk_Program {
    * The day the application for all courses of the program start.
    */
   applicationStart: any | null;
+}
+
+export interface CourseWithEnrollment_Course_by_pk_CourseEnrollments {
+  __typename: "CourseEnrollment";
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
+  id: number;
+  /**
+   * The users current enrollment status to this course
+   */
+  status: CourseEnrollmentStatus_enum;
 }
 
 export interface CourseWithEnrollment_Course_by_pk {
@@ -245,10 +245,6 @@ export interface CourseWithEnrollment_Course_by_pk {
    */
   CourseLocations: CourseWithEnrollment_Course_by_pk_CourseLocations[];
   /**
-   * An array relationship
-   */
-  CourseEnrollments: CourseWithEnrollment_Course_by_pk_CourseEnrollments[];
-  /**
    * An object relationship
    */
   Program: CourseWithEnrollment_Course_by_pk_Program | null;
@@ -256,6 +252,10 @@ export interface CourseWithEnrollment_Course_by_pk {
    * The link to the chat of the course (e.g. a mattermost channel)
    */
   chatLink: string | null;
+  /**
+   * An array relationship
+   */
+  CourseEnrollments: CourseWithEnrollment_Course_by_pk_CourseEnrollments[];
 }
 
 export interface CourseWithEnrollment {

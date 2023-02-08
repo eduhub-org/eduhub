@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, LocationOption_enum, CourseEnrollmentStatus_enum, CourseStatus_enum, MotivationRating_enum, AttendanceStatus_enum, SessionAddressType_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, LocationOption_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, AttendanceStatus_enum, SessionAddressType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourse
@@ -143,6 +143,35 @@ export interface ManagedCourse_Course_by_pk_CourseLocations {
   locationOption: LocationOption_enum | null;
 }
 
+export interface ManagedCourse_Course_by_pk_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
+  /**
+   * The last day a course lecture can possibly be in this program.
+   */
+  lectureEnd: any | null;
+  /**
+   * The deadline for the achievement record uploads.
+   */
+  achievementRecordUploadDeadline: any | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+}
+
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances_Session {
   __typename: "Session";
   id: number;
@@ -209,35 +238,6 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
    * An object relationship
    */
   User: ManagedCourse_Course_by_pk_CourseEnrollments_User;
-}
-
-export interface ManagedCourse_Course_by_pk_Program {
-  __typename: "Program";
-  id: number;
-  /**
-   * The title of the program
-   */
-  title: string;
-  /**
-   * The 6 letter short title for the program.
-   */
-  shortTitle: string | null;
-  /**
-   * The first day a course lecture can possibly be in this program.
-   */
-  lectureStart: any | null;
-  /**
-   * The last day a course lecture can possibly be in this program.
-   */
-  lectureEnd: any | null;
-  /**
-   * The deadline for the achievement record uploads.
-   */
-  achievementRecordUploadDeadline: any | null;
-  /**
-   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
-   */
-  published: boolean;
 }
 
 export interface ManagedCourse_Course_by_pk {
@@ -336,10 +336,6 @@ export interface ManagedCourse_Course_by_pk {
    */
   CourseLocations: ManagedCourse_Course_by_pk_CourseLocations[];
   /**
-   * An array relationship
-   */
-  CourseEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[];
-  /**
    * An object relationship
    */
   Program: ManagedCourse_Course_by_pk_Program | null;
@@ -355,6 +351,10 @@ export interface ManagedCourse_Course_by_pk {
    * An array of texts including the learning goals for the course
    */
   learningGoals: string | null;
+  /**
+   * An array relationship
+   */
+  CourseEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[];
 }
 
 export interface ManagedCourse {

@@ -86,19 +86,6 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
   locationOption: LocationOption_enum | null;
 }
 
-export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments {
-  __typename: "CourseEnrollment";
-  /**
-   * The last day a user can confirm his/her invitation to the given course
-   */
-  invitationExpirationDate: any | null;
-  id: number;
-  /**
-   * The users current enrollment status to this course
-   */
-  status: CourseEnrollmentStatus_enum;
-}
-
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Program {
   __typename: "Program";
   id: number;
@@ -126,6 +113,19 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Progr
    * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
    */
   published: boolean;
+}
+
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments {
+  __typename: "CourseEnrollment";
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
+  id: number;
+  /**
+   * The users current enrollment status to this course
+   */
+  status: CourseEnrollmentStatus_enum;
 }
 
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
@@ -224,13 +224,13 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    */
   CourseLocations: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseLocations[];
   /**
-   * An array relationship
-   */
-  CourseEnrollments: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments[];
-  /**
    * An object relationship
    */
   Program: InsertEnrollment_insert_CourseEnrollment_returning_Course_Program | null;
+  /**
+   * An array relationship
+   */
+  CourseEnrollments: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments[];
 }
 
 export interface InsertEnrollment_insert_CourseEnrollment_returning {

@@ -73,7 +73,7 @@ const Home: FC = () => {
   const {
     data: coursesList,
     error: coursesList_error,
-  } = useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT);
+  } = useAuthedQuery<CourseList>(COURSE_LIST_WITH_ENROLLMENT);
   if (coursesList_error) {
     console.log("got error in query for listed courses!", coursesList_error);
   }

@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, LocationOption_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, LocationOption_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: CourseFragment
@@ -84,19 +84,6 @@ export interface CourseFragment_CourseLocations {
    * Either 'ONLINE' or one of the possible given offline locations
    */
   locationOption: LocationOption_enum | null;
-}
-
-export interface CourseFragment_CourseEnrollments {
-  __typename: "CourseEnrollment";
-  /**
-   * The last day a user can confirm his/her invitation to the given course
-   */
-  invitationExpirationDate: any | null;
-  id: number;
-  /**
-   * The users current enrollment status to this course
-   */
-  status: CourseEnrollmentStatus_enum;
 }
 
 export interface CourseFragment_Program {
@@ -223,10 +210,6 @@ export interface CourseFragment {
    * An array relationship
    */
   CourseLocations: CourseFragment_CourseLocations[];
-  /**
-   * An array relationship
-   */
-  CourseEnrollments: CourseFragment_CourseEnrollments[];
   /**
    * An object relationship
    */

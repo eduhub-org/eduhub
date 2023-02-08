@@ -86,19 +86,6 @@ export interface CourseListWithEnrollments_Course_CourseLocations {
   locationOption: LocationOption_enum | null;
 }
 
-export interface CourseListWithEnrollments_Course_CourseEnrollments {
-  __typename: "CourseEnrollment";
-  /**
-   * The last day a user can confirm his/her invitation to the given course
-   */
-  invitationExpirationDate: any | null;
-  id: number;
-  /**
-   * The users current enrollment status to this course
-   */
-  status: CourseEnrollmentStatus_enum;
-}
-
 export interface CourseListWithEnrollments_Course_Program {
   __typename: "Program";
   id: number;
@@ -134,6 +121,19 @@ export interface CourseListWithEnrollments_Course_Program {
    * The day the application for all courses of the program start.
    */
   applicationStart: any | null;
+}
+
+export interface CourseListWithEnrollments_Course_CourseEnrollments {
+  __typename: "CourseEnrollment";
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
+  id: number;
+  /**
+   * The users current enrollment status to this course
+   */
+  status: CourseEnrollmentStatus_enum;
 }
 
 export interface CourseListWithEnrollments_Course {
@@ -232,13 +232,13 @@ export interface CourseListWithEnrollments_Course {
    */
   CourseLocations: CourseListWithEnrollments_Course_CourseLocations[];
   /**
-   * An array relationship
-   */
-  CourseEnrollments: CourseListWithEnrollments_Course_CourseEnrollments[];
-  /**
    * An object relationship
    */
   Program: CourseListWithEnrollments_Course_Program | null;
+  /**
+   * An array relationship
+   */
+  CourseEnrollments: CourseListWithEnrollments_Course_CourseEnrollments[];
 }
 
 export interface CourseListWithEnrollments {

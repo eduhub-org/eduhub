@@ -86,19 +86,6 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseLocat
   locationOption: LocationOption_enum | null;
 }
 
-export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseEnrollments {
-  __typename: "CourseEnrollment";
-  /**
-   * The last day a user can confirm his/her invitation to the given course
-   */
-  invitationExpirationDate: any | null;
-  id: number;
-  /**
-   * The users current enrollment status to this course
-   */
-  status: CourseEnrollmentStatus_enum;
-}
-
 export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_Program {
   __typename: "Program";
   id: number;
@@ -223,10 +210,6 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course {
    * An array relationship
    */
   CourseLocations: MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseLocations[];
-  /**
-   * An array relationship
-   */
-  CourseEnrollments: MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseEnrollments[];
   /**
    * An object relationship
    */
