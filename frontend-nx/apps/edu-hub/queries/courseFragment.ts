@@ -41,9 +41,6 @@ export const COURSE_FRAGMENT = gql`
       defaultSessionAddress
       locationOption
     }
-    CourseEnrollments {
-      ...EnrollmentFragment
-    }
     Program {
       ...ProgramFragmentMinimumProperties
     }

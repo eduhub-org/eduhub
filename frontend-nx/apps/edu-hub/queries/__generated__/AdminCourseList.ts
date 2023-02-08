@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Course_bool_exp, Weekday_enum, CourseEnrollmentStatus_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { Course_bool_exp, Weekday_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: AdminCourseList
@@ -86,28 +86,6 @@ export interface AdminCourseList_Course_CourseLocations {
   locationOption: string | null;
 }
 
-export interface AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus {
-  __typename: "CourseEnrollmentStatus";
-  value: string;
-}
-
-export interface AdminCourseList_Course_CourseEnrollments {
-  __typename: "CourseEnrollment";
-  /**
-   * The last day a user can confirm his/her invitation to the given course
-   */
-  invitationExpirationDate: any | null;
-  id: number;
-  /**
-   * The users current enrollment status to this course
-   */
-  status: CourseEnrollmentStatus_enum;
-  /**
-   * An object relationship
-   */
-  CourseEnrollmentStatus: AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus;
-}
-
 export interface AdminCourseList_Course_Program {
   __typename: "Program";
   id: number;
@@ -131,6 +109,20 @@ export interface AdminCourseList_Course_Program {
    * The last day a course lecture can possibly be in this program.
    */
   lectureEnd: any | null;
+}
+
+export interface AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus {
+  __typename: "CourseEnrollmentStatus";
+  value: string;
+}
+
+export interface AdminCourseList_Course_CourseEnrollments {
+  __typename: "CourseEnrollment";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseEnrollmentStatus: AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus;
 }
 
 export interface AdminCourseList_Course_AppliedAndUnratedCount_aggregate {
@@ -231,10 +223,6 @@ export interface AdminCourseList_Course {
    */
   CourseLocations: AdminCourseList_Course_CourseLocations[];
   /**
-   * An array relationship
-   */
-  CourseEnrollments: AdminCourseList_Course_CourseEnrollments[];
-  /**
    * An object relationship
    */
   Program: AdminCourseList_Course_Program | null;
@@ -258,6 +246,10 @@ export interface AdminCourseList_Course {
    * An array of texts including the learning goals for the course
    */
   learningGoals: string | null;
+  /**
+   * An array relationship
+   */
+  CourseEnrollments: AdminCourseList_Course_CourseEnrollments[];
   /**
    * An aggregate relationship
    */

@@ -86,19 +86,6 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseLocations {
   locationOption: string | null;
 }
 
-export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments {
-  __typename: "CourseEnrollment";
-  /**
-   * The last day a user can confirm his/her invitation to the given course
-   */
-  invitationExpirationDate: any | null;
-  id: number;
-  /**
-   * The users current enrollment status to this course
-   */
-  status: CourseEnrollmentStatus_enum;
-}
-
 export interface MyCourses_User_by_pk_CourseEnrollments_Course_Program {
   __typename: "Program";
   id: number;
@@ -134,6 +121,19 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_Program {
    * The deadline for the achievement record uploads.
    */
   achievementRecordUploadDeadline: any | null;
+}
+
+export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments {
+  __typename: "CourseEnrollment";
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
+  id: number;
+  /**
+   * The users current enrollment status to this course
+   */
+  status: CourseEnrollmentStatus_enum;
 }
 
 export interface MyCourses_User_by_pk_CourseEnrollments_Course {
@@ -224,13 +224,13 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course {
    */
   CourseLocations: MyCourses_User_by_pk_CourseEnrollments_Course_CourseLocations[];
   /**
-   * An array relationship
-   */
-  CourseEnrollments: MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments[];
-  /**
    * An object relationship
    */
   Program: MyCourses_User_by_pk_CourseEnrollments_Course_Program | null;
+  /**
+   * An array relationship
+   */
+  CourseEnrollments: MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments[];
 }
 
 export interface MyCourses_User_by_pk_CourseEnrollments {
