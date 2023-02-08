@@ -43,21 +43,40 @@ const Home: FC = () => {
   //   console.log("got error in query for enrolled courses!", error_enrolled);
   // }
 
+  // const [enrolledCourses, setEnrolledCourses] = useState<CourseListWithEnrollments | null>(null);
+  // const [error_enrolled, setErrorEnrolled] = useState<ApolloError | null>(null);
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     const fetchData = async () => {
+  //       try {
+  //         const result = await useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT);
+  //         setEnrolledCourses(result.data);
+  //       } catch (e) {
+  //         setErrorEnrolled(e);
+  //       }
+  //     };
+  //     fetchData();
+  //   }
+  // }, [isLoggedIn]);
+
   const [enrolledCourses, setEnrolledCourses] = useState<CourseListWithEnrollments | null>(null);
   const [error_enrolled, setErrorEnrolled] = useState<ApolloError | null>(null);
+  const { data, error } = useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT);
+
   useEffect(() => {
     if (isLoggedIn) {
       const fetchData = async () => {
         try {
-          const result = await useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT);
-          setEnrolledCourses(result.data);
+          setEnrolledCourses(data);
         } catch (e) {
-          setErrorEnrolled(e);
+          setErrorEnrolled(error);
         }
       };
       fetchData();
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, data, error]);
+
+
 
   const publishedCourses = courses?.Course?.filter(course => course.published === true) ?? [];
   // const instructCourses = courses?.Course?.filter(course => course.published === true) ?? [];
