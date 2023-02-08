@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, LocationOption_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: CourseFragment
@@ -83,7 +83,49 @@ export interface CourseFragment_CourseLocations {
   /**
    * Either 'ONLINE' or one of the possible given offline locations
    */
-  locationOption: string | null;
+  locationOption: LocationOption_enum | null;
+}
+
+export interface CourseFragment_CourseEnrollments {
+  __typename: "CourseEnrollment";
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
+  id: number;
+  /**
+   * The users current enrollment status to this course
+   */
+  status: CourseEnrollmentStatus_enum;
+}
+
+export interface CourseFragment_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
+  /**
+   * The last day a course lecture can possibly be in this program.
+   */
+  lectureEnd: any | null;
+  /**
+   * The deadline for the achievement record uploads.
+   */
+  achievementRecordUploadDeadline: any | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
 }
 
 export interface CourseFragment {
@@ -181,4 +223,12 @@ export interface CourseFragment {
    * An array relationship
    */
   CourseLocations: CourseFragment_CourseLocations[];
+  /**
+   * An array relationship
+   */
+  CourseEnrollments: CourseFragment_CourseEnrollments[];
+  /**
+   * An object relationship
+   */
+  Program: CourseFragment_Program | null;
 }

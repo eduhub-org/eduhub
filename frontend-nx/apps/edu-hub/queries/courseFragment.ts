@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { COURSE_INSTRUCTOR_FRAGMENT } from "./courseInstructorFragment";
 import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from "./programFragment";
+import { ENROLLMENT_FRAGMENT } from "./enrollmentFragment";
 
 import { SESSION_FRAGMENT } from './sessionFragement';
 
@@ -8,6 +9,7 @@ export const COURSE_FRAGMENT = gql`
   ${SESSION_FRAGMENT}
   ${COURSE_INSTRUCTOR_FRAGMENT}
   ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
+  ${ENROLLMENT_FRAGMENT}
   fragment CourseFragment on Course {
     id
     ects
@@ -41,7 +43,13 @@ export const COURSE_FRAGMENT = gql`
       defaultSessionAddress
       locationOption
     }
-  }
+    CourseEnrollments {
+      ...EnrollmentFragment
+    }
+    Program {
+      ...ProgramFragmentMinimumProperties
+    }
+}
 `;
 
 export const ADMIN_COURSE_FRAGMENT = gql`

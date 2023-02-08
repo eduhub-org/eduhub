@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, LocationOption_enum, CourseEnrollmentStatus_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: AdminCourseFragment
@@ -83,7 +83,20 @@ export interface AdminCourseFragment_CourseLocations {
   /**
    * Either 'ONLINE' or one of the possible given offline locations
    */
-  locationOption: string | null;
+  locationOption: LocationOption_enum | null;
+}
+
+export interface AdminCourseFragment_CourseEnrollments {
+  __typename: "CourseEnrollment";
+  /**
+   * The last day a user can confirm his/her invitation to the given course
+   */
+  invitationExpirationDate: any | null;
+  id: number;
+  /**
+   * The users current enrollment status to this course
+   */
+  status: CourseEnrollmentStatus_enum;
 }
 
 export interface AdminCourseFragment_Program {
@@ -211,6 +224,14 @@ export interface AdminCourseFragment {
    */
   CourseLocations: AdminCourseFragment_CourseLocations[];
   /**
+   * An array relationship
+   */
+  CourseEnrollments: AdminCourseFragment_CourseEnrollments[];
+  /**
+   * An object relationship
+   */
+  Program: AdminCourseFragment_Program | null;
+  /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
@@ -222,8 +243,4 @@ export interface AdminCourseFragment {
    * An array of texts including the learning goals for the course
    */
   learningGoals: string | null;
-  /**
-   * An object relationship
-   */
-  Program: AdminCourseFragment_Program | null;
 }

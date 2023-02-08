@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum, Weekday_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum, Weekday_enum, LocationOption_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: MyCourses
@@ -83,7 +83,7 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseLocations {
   /**
    * Either 'ONLINE' or one of the possible given offline locations
    */
-  locationOption: string | null;
+  locationOption: LocationOption_enum | null;
 }
 
 export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments {

@@ -21,6 +21,7 @@ export const USER_PROGRAM_FRAGMENT = gql`
     lectureEnd
     lectureStart
     title
+    shortTitle
     achievementRecordUploadDeadline
     published
   }

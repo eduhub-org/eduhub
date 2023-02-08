@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum, Weekday_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum, Weekday_enum, LocationOption_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: InsertEnrollment
@@ -83,7 +83,7 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
   /**
    * Either 'ONLINE' or one of the possible given offline locations
    */
-  locationOption: string | null;
+  locationOption: LocationOption_enum | null;
 }
 
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments {
@@ -97,6 +97,35 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
    * The users current enrollment status to this course
    */
   status: CourseEnrollmentStatus_enum;
+}
+
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
+  /**
+   * The last day a course lecture can possibly be in this program.
+   */
+  lectureEnd: any | null;
+  /**
+   * The deadline for the achievement record uploads.
+   */
+  achievementRecordUploadDeadline: any | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
 }
 
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
@@ -198,6 +227,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    * An array relationship
    */
   CourseEnrollments: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments[];
+  /**
+   * An object relationship
+   */
+  Program: InsertEnrollment_insert_CourseEnrollment_returning_Course_Program | null;
 }
 
 export interface InsertEnrollment_insert_CourseEnrollment_returning {

@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, CourseEnrollmentStatus_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, LocationOption_enum, CourseEnrollmentStatus_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseWithEnrollment
@@ -96,7 +96,7 @@ export interface CourseWithEnrollment_Course_by_pk_CourseLocations {
   /**
    * Either 'ONLINE' or one of the possible given offline locations
    */
-  locationOption: string | null;
+  locationOption: LocationOption_enum | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_CourseEnrollments {
@@ -245,10 +245,6 @@ export interface CourseWithEnrollment_Course_by_pk {
    */
   CourseLocations: CourseWithEnrollment_Course_by_pk_CourseLocations[];
   /**
-   * The link to the chat of the course (e.g. a mattermost channel)
-   */
-  chatLink: string | null;
-  /**
    * An array relationship
    */
   CourseEnrollments: CourseWithEnrollment_Course_by_pk_CourseEnrollments[];
@@ -256,6 +252,10 @@ export interface CourseWithEnrollment_Course_by_pk {
    * An object relationship
    */
   Program: CourseWithEnrollment_Course_by_pk_Program | null;
+  /**
+   * The link to the chat of the course (e.g. a mattermost channel)
+   */
+  chatLink: string | null;
 }
 
 export interface CourseWithEnrollment {
