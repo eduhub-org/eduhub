@@ -14,13 +14,13 @@ import { useAuthedQuery } from '../hooks/authedQuery';
 import { useIsLoggedIn, useIsUser } from '../hooks/authentication';
 import { CourseList } from '../queries/__generated__/CourseList';
 import { CourseListWithEnrollments } from '../queries/__generated__/CourseListWithEnrollments';
+import { CourseListWithInstructors } from '../queries/__generated__/CourseListWithInstructors';
 import { COURSE_LIST } from '../queries/courseList';
 import { COURSE_LIST_WITH_ENROLLMENT } from '../queries/courseListWithEnrollments';
 import { COURSE_LIST_WITH_INSTRUCTOR } from '../queries/courseListWithInstructors';
 import { ClientOnly } from '@opencampus/shared-components';
 import { ApolloError } from '@apollo/client';
 import { useSession } from 'next-auth/react';
-import { CourseListWithInstructors } from '../queries/__generated__/CourseListWithInstructors';
 
 const Home: FC = () => {
   const { t } = useTranslation('start-page');
@@ -127,27 +127,27 @@ const Home: FC = () => {
 
   // Filtering to Slider Groups
   const coursesSliderGroup1 = publishedCourses.filter((course) =>
-    course.CourseGroups.filter(
+    course.CourseGroups.some(
       (courseGroup) => courseGroup.CourseGroupOption.order === 1
     )
   );
   const coursesSliderGroup2 = publishedCourses.filter((course) =>
-    course.CourseGroups.filter(
+    course.CourseGroups.some(
       (courseGroup) => courseGroup.CourseGroupOption.order === 2
     )
   );
   const coursesSliderGroup3 = publishedCourses.filter((course) =>
-    course.CourseGroups.filter(
+    course.CourseGroups.some(
       (courseGroup) => courseGroup.CourseGroupOption.order === 3
     )
   );
   const coursesSliderGroup4 = publishedCourses.filter((course) =>
-    course.CourseGroups.filter(
+    course.CourseGroups.some(
       (courseGroup) => courseGroup.CourseGroupOption.order === 4
     )
   );
   const coursesSliderGroup5 = publishedCourses.filter((course) =>
-    course.CourseGroups.filter(
+    course.CourseGroups.some(
       (courseGroup) => courseGroup.CourseGroupOption.order === 5
     )
   );
