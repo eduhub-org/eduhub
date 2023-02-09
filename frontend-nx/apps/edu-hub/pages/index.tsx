@@ -76,7 +76,7 @@ const Home: FC = () => {
   }
   const myAdminCourses =
     adminCourses?.Course?.filter(
-      (course: CourseListWithInstructors) => course.CourseEnrollments.length > 0
+      (course) => course.CourseInstructors.length > 0
     ) ?? [];
 
   // (My) Enrolled Courses
