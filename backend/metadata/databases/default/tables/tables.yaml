@@ -12,6 +12,8 @@
 - "!include public_Course.yaml"
 - "!include public_CourseEnrollment.yaml"
 - "!include public_CourseEnrollmentStatus.yaml"
+- "!include public_CourseGroup.yaml"
+- "!include public_CourseGroupOption.yaml"
 - "!include public_CourseInstructor.yaml"
 - "!include public_CourseLocation.yaml"
 - "!include public_CourseStatus.yaml"
