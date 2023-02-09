@@ -125,28 +125,41 @@ const Home: FC = () => {
       (course) => course.published === true && course.Program.published === true
     ) ?? [];
 
-  // Assignment to Slider Groups
-  // const coursesSliderGroup3 = publishedCourses.filter(course => course.topicsTags?.includes("TECH_CODING"));
-  // const coursesSliderGroup4 = publishedCourses.filter(course => course.topicsTags?.includes("BUSINESS_STARTUP"));
-  // const coursesSliderGroup5 = publishedCourses.filter(course => course.topicsTags?.includes("CREATIVE_SOCIAL_SUSTAINABLE"));
+  // Filtering to Slider Groups
+  const coursesSliderGroup1 = publishedCourses.filter((course) =>
+    course.CourseGroups.filter(
+      (courseGroup) => courseGroup.CourseGroupOption.order === 1
+    )
+  );
+  const coursesSliderGroup2 = publishedCourses.filter((course) =>
+    course.CourseGroups.filter(
+      (courseGroup) => courseGroup.CourseGroupOption.order === 2
+    )
+  );
+  const coursesSliderGroup3 = publishedCourses.filter((course) =>
+    course.CourseGroups.filter(
+      (courseGroup) => courseGroup.CourseGroupOption.order === 3
+    )
+  );
+  const coursesSliderGroup4 = publishedCourses.filter((course) =>
+    course.CourseGroups.filter(
+      (courseGroup) => courseGroup.CourseGroupOption.order === 4
+    )
+  );
+  const coursesSliderGroup5 = publishedCourses.filter((course) =>
+    course.CourseGroups.filter(
+      (courseGroup) => courseGroup.CourseGroupOption.order === 5
+    )
+  );
+
   const coursesGroups = [
     { title: 'Course Administration', courses: myAdminCourses },
     { title: 'My Courses', courses: myCourses },
-    { title: 'Tech & Coding', courses: publishedCourses },
-    { title: 'Business & Startup', courses: publishedCourses },
-    { title: 'Creative, Social & Sustainable', courses: publishedCourses },
-    {
-      title: 'Degrees',
-      courses: publishedCourses.filter(
-        (course) => course.Program.shortTitle === 'DEGREES'
-      ),
-    },
-    {
-      title: 'Events',
-      courses: publishedCourses.filter(
-        (course) => course.Program.shortTitle === 'EVENTS'
-      ),
-    },
+    { title: 'Tech & Coding', courses: coursesSliderGroup1 },
+    { title: 'Business & Startup', courses: coursesSliderGroup2 },
+    { title: 'Creative, Social & Sustainable', courses: coursesSliderGroup3 },
+    { title: 'Degrees', courses: coursesSliderGroup4 },
+    { title: 'Events', courses: coursesSliderGroup5 },
   ];
 
   return (

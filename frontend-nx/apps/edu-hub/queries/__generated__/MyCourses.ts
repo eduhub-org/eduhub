@@ -123,6 +123,22 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_Program {
   applicationStart: any | null;
 }
 
+export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
+export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseGroups {
+  __typename: "CourseGroup";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: MyCourses_User_by_pk_CourseEnrollments_Course_CourseGroups_CourseGroupOption;
+}
+
 export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
@@ -235,6 +251,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course {
    * An object relationship
    */
   Program: MyCourses_User_by_pk_CourseEnrollments_Course_Program | null;
+  /**
+   * An array relationship
+   */
+  CourseGroups: MyCourses_User_by_pk_CourseEnrollments_Course_CourseGroups[];
   /**
    * An array relationship
    */

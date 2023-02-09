@@ -115,6 +115,22 @@ export interface Course_Course_by_pk_Program {
   published: boolean;
 }
 
+export interface Course_Course_by_pk_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
+export interface Course_Course_by_pk_CourseGroups {
+  __typename: "CourseGroup";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: Course_Course_by_pk_CourseGroups_CourseGroupOption;
+}
+
 export interface Course_Course_by_pk {
   __typename: "Course";
   id: number;
@@ -214,6 +230,10 @@ export interface Course_Course_by_pk {
    * An object relationship
    */
   Program: Course_Course_by_pk_Program | null;
+  /**
+   * An array relationship
+   */
+  CourseGroups: Course_Course_by_pk_CourseGroups[];
 }
 
 export interface Course {

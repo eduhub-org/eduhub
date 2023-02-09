@@ -115,6 +115,22 @@ export interface AdminCourseList_Course_Program {
   published: boolean;
 }
 
+export interface AdminCourseList_Course_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
+export interface AdminCourseList_Course_CourseGroups {
+  __typename: "CourseGroup";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: AdminCourseList_Course_CourseGroups_CourseGroupOption;
+}
+
 export interface AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus {
   __typename: "CourseEnrollmentStatus";
   value: string;
@@ -238,6 +254,10 @@ export interface AdminCourseList_Course {
    * An object relationship
    */
   Program: AdminCourseList_Course_Program | null;
+  /**
+   * An array relationship
+   */
+  CourseGroups: AdminCourseList_Course_CourseGroups[];
   /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */

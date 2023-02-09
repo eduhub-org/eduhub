@@ -115,6 +115,22 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Progr
   published: boolean;
 }
 
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseGroups {
+  __typename: "CourseGroup";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseGroups_CourseGroupOption;
+}
+
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
@@ -227,6 +243,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    * An object relationship
    */
   Program: InsertEnrollment_insert_CourseEnrollment_returning_Course_Program | null;
+  /**
+   * An array relationship
+   */
+  CourseGroups: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseGroups[];
   /**
    * An array relationship
    */

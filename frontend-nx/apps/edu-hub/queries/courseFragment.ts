@@ -46,6 +46,14 @@ export const COURSE_FRAGMENT = gql`
     Program {
       ...ProgramFragmentMinimumProperties
     }
+    CourseGroups {
+      id
+      CourseGroupOption {
+        id
+        title
+        order
+      }
+    }
 }
 `;
 

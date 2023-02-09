@@ -136,6 +136,22 @@ export interface CourseWithEnrollment_Course_by_pk_Program {
   applicationStart: any | null;
 }
 
+export interface CourseWithEnrollment_Course_by_pk_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
+export interface CourseWithEnrollment_Course_by_pk_CourseGroups {
+  __typename: "CourseGroup";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: CourseWithEnrollment_Course_by_pk_CourseGroups_CourseGroupOption;
+}
+
 export interface CourseWithEnrollment_Course_by_pk_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
@@ -248,6 +264,10 @@ export interface CourseWithEnrollment_Course_by_pk {
    * An object relationship
    */
   Program: CourseWithEnrollment_Course_by_pk_Program | null;
+  /**
+   * An array relationship
+   */
+  CourseGroups: CourseWithEnrollment_Course_by_pk_CourseGroups[];
   /**
    * The link to the chat of the course (e.g. a mattermost channel)
    */

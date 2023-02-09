@@ -172,6 +172,22 @@ export interface ManagedCourse_Course_by_pk_Program {
   published: boolean;
 }
 
+export interface ManagedCourse_Course_by_pk_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
+export interface ManagedCourse_Course_by_pk_CourseGroups {
+  __typename: "CourseGroup";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: ManagedCourse_Course_by_pk_CourseGroups_CourseGroupOption;
+}
+
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances_Session {
   __typename: "Session";
   id: number;
@@ -339,6 +355,10 @@ export interface ManagedCourse_Course_by_pk {
    * An object relationship
    */
   Program: ManagedCourse_Course_by_pk_Program | null;
+  /**
+   * An array relationship
+   */
+  CourseGroups: ManagedCourse_Course_by_pk_CourseGroups[];
   /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
