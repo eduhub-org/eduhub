@@ -103,6 +103,22 @@ export interface CourseFragment_Program {
   published: boolean;
 }
 
+export interface CourseFragment_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
+export interface CourseFragment_CourseGroups {
+  __typename: "CourseGroup";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: CourseFragment_CourseGroups_CourseGroupOption;
+}
+
 export interface CourseFragment {
   __typename: "Course";
   id: number;
@@ -194,4 +210,8 @@ export interface CourseFragment {
    * An object relationship
    */
   Program: CourseFragment_Program | null;
+  /**
+   * An array relationship
+   */
+  CourseGroups: CourseFragment_CourseGroups[];
 }

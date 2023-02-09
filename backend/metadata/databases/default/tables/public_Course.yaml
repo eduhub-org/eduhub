@@ -29,6 +29,13 @@ array_relationships:
         table:
           name: CourseEnrollment
           schema: public
+  - name: CourseGroups
+    using:
+      foreign_key_constraint_on:
+        column: courseId
+        table:
+          name: CourseGroup
+          schema: public
   - name: CourseInstructors
     using:
       foreign_key_constraint_on:

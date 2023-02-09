@@ -103,6 +103,22 @@ export interface CourseList_Course_Program {
   published: boolean;
 }
 
+export interface CourseList_Course_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
+export interface CourseList_Course_CourseGroups {
+  __typename: "CourseGroup";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: CourseList_Course_CourseGroups_CourseGroupOption;
+}
+
 export interface CourseList_Course {
   __typename: "Course";
   id: number;
@@ -194,6 +210,10 @@ export interface CourseList_Course {
    * An object relationship
    */
   Program: CourseList_Course_Program | null;
+  /**
+   * An array relationship
+   */
+  CourseGroups: CourseList_Course_CourseGroups[];
 }
 
 export interface CourseList {

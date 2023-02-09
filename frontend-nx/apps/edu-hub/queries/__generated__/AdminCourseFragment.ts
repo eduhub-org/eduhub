@@ -111,6 +111,22 @@ export interface AdminCourseFragment_Program {
   lectureEnd: any | null;
 }
 
+export interface AdminCourseFragment_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
+export interface AdminCourseFragment_CourseGroups {
+  __typename: "CourseGroup";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: AdminCourseFragment_CourseGroups_CourseGroupOption;
+}
+
 export interface AdminCourseFragment {
   __typename: "Course";
   id: number;
@@ -202,6 +218,10 @@ export interface AdminCourseFragment {
    * An object relationship
    */
   Program: AdminCourseFragment_Program | null;
+  /**
+   * An array relationship
+   */
+  CourseGroups: AdminCourseFragment_CourseGroups[];
   /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */

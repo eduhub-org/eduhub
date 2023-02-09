@@ -123,6 +123,22 @@ export interface CourseListWithEnrollments_Course_Program {
   achievementRecordUploadDeadline: any | null;
 }
 
+export interface CourseListWithEnrollments_Course_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
+export interface CourseListWithEnrollments_Course_CourseGroups {
+  __typename: "CourseGroup";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: CourseListWithEnrollments_Course_CourseGroups_CourseGroupOption;
+}
+
 export interface CourseListWithEnrollments_Course_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
@@ -227,6 +243,10 @@ export interface CourseListWithEnrollments_Course {
    * An object relationship
    */
   Program: CourseListWithEnrollments_Course_Program | null;
+  /**
+   * An array relationship
+   */
+  CourseGroups: CourseListWithEnrollments_Course_CourseGroups[];
   /**
    * An array relationship
    */
