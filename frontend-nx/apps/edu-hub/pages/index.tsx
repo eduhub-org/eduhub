@@ -167,11 +167,18 @@ const Home: FC = () => {
   return (
     <>
       <Head>
-        <title>opencampus.sh Edu Hub</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>EduHub | opencampus.sh</title>
+        <link rel="icon" href="/favicon.png" />
       </Head>
       <Page>
-        <div className="flex flex-col bg-[#F2991D] px-3">
+        <div
+          className="flex flex-col max-w-screen-xl mx-auto"
+          style={{
+            backgroundImage: `url('/images/header_image.jpg')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
           <span className="flex text-6xl sm:text-9xl mt-16 sm:mt-28">
             {t('headline')}
           </span>
