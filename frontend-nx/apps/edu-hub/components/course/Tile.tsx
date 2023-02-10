@@ -103,25 +103,38 @@ export const Tile: FC<IProps> = ({ course }) => {
         isInstructor ? `/manage/course/${course.id}` : `/course/${course.id}`
       }
     >
-      <div className="relative w-60 h-72 rounded-2xl overflow-hidden">
-        <div className="h-1/2 bg-edu-black">
-          <img
-            src={course.coverImage ?? 'https://picsum.photos/240/144'}
-            alt="Edu Hub logo"
-            width={240}
-            height={144}
-            className="h-36 w-60"
-          />
-          <CourseStatusIndicator
+      <div className="relative w-9/10 rounded-2xl overflow-hidden">
+        {/* <div className="relative w-60 h-72 rounded-2xl overflow-hidden"></div> */}
+        <div
+          className="h-56 p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat bg-[image:var(--bg-small-url)]"
+          style={
+            {
+              '--bg-small-url':
+                "linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url('https://picsum.photos/240/144')",
+            } as React.CSSProperties
+          }
+        >
+          <span>{course.title}</span>
+          {/* <CourseStatusIndicator
             enrollmentStatus={enrollmentStatus}
             enrollment={enrollment}
-          />
+          /> */}
         </div>
         <div
           className={`flex h-1/2 flex-col justify-between ${highlightColor} p-3`}
         >
-          <span className="text-base">{course.title}</span>
-          <span className="text-xs uppercase">{t('course')}</span>
+          <div>
+            <div>
+              {`${course.weekDay} ${course.startTime} - ${course.endTime}`}
+            </div>
+            <div>{course.language}</div>
+          </div>
+          <span className="text-base">{course.tagline}</span>
+          <span className="text-xs">
+            {course.CourseLocations.map(
+              (location) => `${location.locationOption} +`
+            )}
+          </span>
         </div>
       </div>
     </Link>
