@@ -162,6 +162,8 @@ const Home: FC = () => {
     { title: 'Events', courses: coursesSliderGroup5 },
   ];
 
+  console.log(coursesGroups);
+
   return (
     <>
       <Head>

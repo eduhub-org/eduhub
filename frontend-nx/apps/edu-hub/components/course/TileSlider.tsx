@@ -11,11 +11,41 @@ interface IProps {
   courses: CourseList_Course[];
 }
 
+const breakpoints = {
+  460: {
+    slidesPerView: 2.15,
+    spaceBetween: 11,
+  },
+  640: {
+    slidesPerView: 3.15,
+    spaceBetween: 11,
+  },
+  768: {
+    slidesPerView: 3.15,
+    spaceBetween: 11,
+  },
+  1024: {
+    slidesPerView: 4.33333,
+    spaceBetween: 11,
+  },
+  1280: {
+    slidesPerView: 4.33333,
+    spaceBetween: 11,
+  },
+  1536: {
+    slidesPerView: 4.33333,
+    spaceBetween: 11,
+  },
+};
+
 export const TileSlider: FC<IProps> = ({ courses }) => {
   return (
     <Swiper
-      spaceBetween={50}
-      slidesPerView={3}
+      breakpoints={breakpoints}
+      spaceBetween={11}
+      slidesPerView={1.15}
+      slidesOffsetBefore={13}
+      slidesOffsetAfter={13}
       onSlideChange={() => console.log('slide change')}
       onSwiper={(swiper) => console.log(swiper)}
     >
