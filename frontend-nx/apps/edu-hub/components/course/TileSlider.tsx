@@ -15,26 +15,38 @@ const breakpoints = {
   460: {
     slidesPerView: 2.15,
     spaceBetween: 11,
+    slidesOffsetBefore: 13,
+    slidesOffsetAfter: 13,
   },
   640: {
     slidesPerView: 3.15,
     spaceBetween: 11,
+    slidesOffsetBefore: 13,
+    slidesOffsetAfter: 13,
   },
   768: {
     slidesPerView: 3.15,
     spaceBetween: 11,
+    slidesOffsetBefore: 13,
+    slidesOffsetAfter: 13,
   },
   1024: {
     slidesPerView: 4.33333,
     spaceBetween: 11,
+    slidesOffsetBefore: 13,
+    slidesOffsetAfter: 13,
   },
   1280: {
     slidesPerView: 4.33333,
     spaceBetween: 11,
+    slidesOffsetBefore: 0,
+    slidesOffsetAfter: 0,
   },
   1536: {
     slidesPerView: 4.33333,
     spaceBetween: 11,
+    slidesOffsetBefore: 0,
+    slidesOffsetAfter: 0,
   },
 };
 

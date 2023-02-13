@@ -12,7 +12,10 @@ import { CourseList_Course } from '../../queries/__generated__/CourseList';
 import { CourseListWithEnrollments_Course } from '../../queries/__generated__/CourseListWithEnrollments';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../queries/__generated__/CourseWithEnrollment';
 import { useIsInstructor } from '../../hooks/authentication';
-import useTranslation from 'next-translate/useTranslation';
+import { OuterExpressionKinds } from 'typescript';
+
+import languageIcon from '../../public/images/course/language.svg';
+import locationIcon from '../../public/images/course/pin.svg';
 
 interface IProps {
   course: CourseList_Course | CourseListWithEnrollments_Course;
@@ -89,11 +92,11 @@ export const Tile: FC<IProps> = ({ course }) => {
     program?.applicationStart <= currentDate &&
     currentDate <= program?.achievementRecordUploadDeadline;
 
-  const highlightColor =
-    enrollmentStatus === CourseEnrollmentStatus_enum.CONFIRMED &&
-    isCurrentProgram
-      ? 'bg-edu-course-current'
-      : 'bg-gray-100';
+  // const highlightColor =
+  //   enrollmentStatus === CourseEnrollmentStatus_enum.CONFIRMED &&
+  //   isCurrentProgram
+  //     ? 'bg-edu-course-current'
+  //     : 'bg-gray-100';
 
   const isInstructor = useIsInstructor();
 
@@ -103,7 +106,7 @@ export const Tile: FC<IProps> = ({ course }) => {
         isInstructor ? `/manage/course/${course.id}` : `/course/${course.id}`
       }
     >
-      <div className="relative w-9/10 rounded-2xl overflow-hidden">
+      <div className="relative w-9/10 rounded-2xl overflow-hidden font-medium">
         {/* <div className="relative w-60 h-72 rounded-2xl overflow-hidden"></div> */}
         <div
           className="h-56 p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat bg-[image:var(--bg-small-url)]"
@@ -120,17 +123,31 @@ export const Tile: FC<IProps> = ({ course }) => {
             enrollment={enrollment}
           /> */}
         </div>
-        <div
-          className={`flex h-1/2 flex-col justify-between ${highlightColor} p-3`}
-        >
-          <div>
-            <div>
-              {`${course.weekDay} ${course.startTime} - ${course.endTime}`}
+        <div className={`flex min-h-[210px] flex-col bg-white p-5`}>
+          <div className="flex justify-between mb-3">
+            <div className="text-sm tracking-wider">
+              {`${course.weekDay} ${new Date(
+                course.startTime
+              ).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })} - ${new Date(course.endTime).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}`}
             </div>
-            <div>{course.language}</div>
+            <div className="text-sm tracking-widest flex content-center">
+              <img
+                className="w-4 h-4 mr-2"
+                src={languageIcon}
+                alt="language icon"
+              />{' '}
+              {course.language}
+            </div>
           </div>
-          <span className="text-base">{course.tagline}</span>
-          <span className="text-xs">
+          <span className="text-lg mb-14">{course.tagline}</span>
+          <span className="text-xs uppercase flex content-center">
+            <img className="h-4 mr-2" src={locationIcon} alt="location icon" />
             {course.CourseLocations.map(
               (location) => `${location.locationOption} +`
             )}
