@@ -9,27 +9,23 @@
 
 export interface ProgramFragment {
   __typename: "Program";
-  /**
-   * The default application deadline for a course. It can be changed on the course level.
-   */
-  defaultApplicationEnd: any | null;
-  /**
-   * The day the application for all courses of the program start.
-   */
-  applicationStart: any | null;
   id: number;
   /**
-   * The last day a course lecture can possibly be in this program.
+   * The title of the program
    */
-  lectureEnd: any | null;
+  title: string;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
   /**
    * The first day a course lecture can possibly be in this program.
    */
   lectureStart: any | null;
   /**
-   * The title of the program
+   * The last day a course lecture can possibly be in this program.
    */
-  title: string;
+  lectureEnd: any | null;
   /**
    * The deadline for the achievement record uploads.
    */
@@ -38,4 +34,12 @@ export interface ProgramFragment {
    * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
    */
   published: boolean;
+  /**
+   * The default application deadline for a course. It can be changed on the course level.
+   */
+  defaultApplicationEnd: any | null;
+  /**
+   * The day the application for all courses of the program start.
+   */
+  applicationStart: any | null;
 }

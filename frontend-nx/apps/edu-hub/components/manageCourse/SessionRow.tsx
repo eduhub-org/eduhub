@@ -1,37 +1,38 @@
-import { FC, useCallback, useState } from "react";
-import { ManagedCourse_Course_by_pk_Sessions } from "../../queries/__generated__/ManagedCourse";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import EhTimeSelect, { formatTime } from "../common/EhTimeSelect";
-import { DebounceInput } from "react-debounce-input";
-import { IconButton } from "@material-ui/core";
-import { MdDelete } from "react-icons/md";
+import { FC, useCallback, useState } from 'react';
+import { ManagedCourse_Course_by_pk_Sessions } from '../../queries/__generated__/ManagedCourse';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import EhTimeSelect, { formatTime } from '../common/EhTimeSelect';
+import { DebounceInput } from 'react-debounce-input';
+import { IconButton } from '@material-ui/core';
+import { MdDelete } from 'react-icons/md';
 import {
   eventTargetValueMapper,
   useAdminMutation,
-} from "../../hooks/authedMutation";
-import { InputDialog } from "../common/dialogs/InputDialog";
+} from '../../hooks/authedMutation';
+import { InputDialog } from '../common/dialogs/InputDialog';
 import {
   InsertSessionLocation,
   InsertSessionLocationVariables,
-} from "../../queries/__generated__/InsertSessionLocation";
+} from '../../queries/__generated__/InsertSessionLocation';
 import {
   INSERT_NEW_SESSION_LOCATION,
   INSERT_NEW_SESSION_SPEAKER,
-} from "../../queries/course";
-import { QueryResult } from "@apollo/client";
-import { SelectUserDialog } from "../common/dialogs/SelectUserDialog";
-import { UserForSelection1_User } from "../../queries/__generated__/UserForSelection1";
+} from '../../queries/course';
+import { QueryResult } from '@apollo/client';
+import { SelectUserDialog } from '../common/dialogs/SelectUserDialog';
+import { UserForSelection1_User } from '../../queries/__generated__/UserForSelection1';
 import {
   InsertExpert,
   InsertExpertVariables,
-} from "../../queries/__generated__/InsertExpert";
-import { INSERT_EXPERT } from "../../queries/user";
+} from '../../queries/__generated__/InsertExpert';
+import { INSERT_EXPERT } from '../../queries/user';
 import {
   InsertNewSessionSpeaker,
   InsertNewSessionSpeakerVariables,
-} from "../../queries/__generated__/InsertNewSessionSpeaker";
-import EhMultipleTag from "../common/EhMultipleTag";
+} from '../../queries/__generated__/InsertNewSessionSpeaker';
+import EhMultipleTag from '../common/EhMultipleTag';
+import useTranslation from 'next-translate/useTranslation';
 
 const copyDateTime = (target: Date, source: Date) => {
   target = new Date(target);
@@ -76,6 +77,8 @@ export const SessionRow: FC<IProps> = ({
   onDeleteLocation,
   onDeleteSpeaker,
 }) => {
+  const { t } = useTranslation();
+
   const handleDelete = useCallback(() => {
     if (session != null) {
       onDelete(session.id);
@@ -125,7 +128,7 @@ export const SessionRow: FC<IProps> = ({
     (event: string) => {
       if (session != null) {
         const copyDate = new Date(session.startDateTime);
-        const [hoursStr, minutesStr] = event.split(":");
+        const [hoursStr, minutesStr] = event.split(':');
         const hours = Number(hoursStr);
         const minutes = Number(minutesStr);
         copyDate.setHours(hours);
@@ -142,7 +145,7 @@ export const SessionRow: FC<IProps> = ({
     (event: string) => {
       if (session != null) {
         const copyDate = new Date(session.endDateTime);
-        const [hoursStr, minutesStr] = event.split(":");
+        const [hoursStr, minutesStr] = event.split(':');
         const hours = Number(hoursStr);
         const minutes = Number(minutesStr);
         copyDate.setHours(hours);
@@ -155,14 +158,14 @@ export const SessionRow: FC<IProps> = ({
     [session, onSetEndDate]
   );
 
-  const adressTags = (session?.SessionAddresses || []).map((x) => ({
+  const addressTags = (session?.SessionAddresses || []).map((x) => ({
     id: x.id,
-    display: x.address || "",
+    display: x.address || '',
   }));
 
   const speakerTags = (session?.SessionSpeakers || []).map((x) => ({
     id: x.id,
-    display: [x.Expert.User.firstName, x.Expert.User.lastName].join(" "),
+    display: [x.Expert.User.firstName, x.Expert.User.lastName].join(' '),
   }));
 
   const [addressAddOpen, setAddressAddOpen] = useState(false);
@@ -241,12 +244,13 @@ export const SessionRow: FC<IProps> = ({
   return (
     <div>
       <div
-        className={`grid grid-cols-32 mb-1 ${session != null ? "bg-edu-light-gray" : ""
-          }`}
+        className={`grid grid-cols-32 mb-1 ${
+          session != null ? 'bg-edu-light-gray' : ''
+        }`}
       >
         {!session && (
           <div className="mr-3 ml-3 col-span-4">
-            Datum
+            {t('date')}
             <br />
           </div>
         )}
@@ -256,20 +260,20 @@ export const SessionRow: FC<IProps> = ({
             <DatePicker
               minDate={lectureStart}
               maxDate={lectureEnd}
-              dateFormat={"dd/MM/yyy"}
+              dateFormat={'dd/MM/yyy'}
               className="w-full bg-edu-light-gray"
               selected={session.startDateTime}
               onChange={handleSetDate}
-            />{" "}
+            />{' '}
           </div>
         )}
 
         <div className="mr-3 ml-3 col-span-3">
           {!session && (
             <>
-              Start
+              {t('start')}
               <br />
-              Uhrzeit
+              {t('time')}
             </>
           )}
           {session && (
@@ -283,9 +287,9 @@ export const SessionRow: FC<IProps> = ({
         <div className="mr-3 ml-3 col-span-3">
           {!session && (
             <>
-              Ende
+              {t('end')}
               <br />
-              Uhrzeit
+              {t('time')}
             </>
           )}
           {session && (
@@ -297,22 +301,24 @@ export const SessionRow: FC<IProps> = ({
           )}
         </div>
         <div className="mr-3 ml-3 col-span-10">
-          {!session && <>Beschreibung</>}
+          {!session && <>{t('description')}</>}
           {session && (
             <DebounceInput
               className="w-full bg-edu-light-gray m-2"
               value={session.title}
               onChange={handleSetTitle}
               debounceTimeout={1000}
-              placeholder="Bitte Beschreibung eingeben!"
+              placeholder={t('please-enter-something', {
+                something: t('description'),
+              })}
             />
           )}
         </div>
         <div className="mr-3 ml-3 col-span-5">
           {!session && (
             <>
-              Adresse / <br />
-              Link
+              {t('address')} / <br />
+              {t('link')}
             </>
           )}
           {session && (
@@ -320,7 +326,7 @@ export const SessionRow: FC<IProps> = ({
               <EhMultipleTag
                 requestAddTag={openAddressAdd}
                 requestDeleteTag={handleDeleteLocation}
-                tags={adressTags}
+                tags={addressTags}
               />
             </div>
           )}
@@ -353,15 +359,15 @@ export const SessionRow: FC<IProps> = ({
       </div>
       <InputDialog
         open={addressAddOpen}
-        confirmText="Hinzufügen"
-        inputLabel="Addresse/Link"
+        confirmText={t('add')}
+        inputLabel={`${t('address')}/${t('link')}`}
         onClose={handleAddNewAddress}
-        question={"Neue Addresse hinzufügen"}
+        question={t('add-new-something', { something: t('address') })}
       />
       <SelectUserDialog
         onClose={handleNewSpeaker}
         open={addSpeakerOpen}
-        title={"Speaker auswählen"}
+        title={t('select-something', { something: t('speaker') })}
       />
     </div>
   );

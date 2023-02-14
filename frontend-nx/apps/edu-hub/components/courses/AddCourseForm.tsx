@@ -1,25 +1,27 @@
-import { FC, useCallback, useState } from "react";
-import { useAdminMutation } from "../../hooks/authedMutation";
-import { useAdminQuery } from "../../hooks/authedQuery";
-import { COURSE_INSTRUCTOR_LIST } from "../../queries/courseInstructorList";
-import { INSERT_A_COURSE } from "../../queries/mutateCourse";
+import { CircularProgress } from '@material-ui/core';
+import useTranslation from 'next-translate/useTranslation';
+import { FC, useCallback, useState } from 'react';
+import { useAdminMutation } from '../../hooks/authedMutation';
+import { useAdminQuery } from '../../hooks/authedQuery';
+import { COURSE_INSTRUCTOR_LIST } from '../../queries/courseInstructorList';
+import { INSERT_A_COURSE } from '../../queries/mutateCourse';
 import {
   CourseInstructorList,
   CourseInstructorList_CourseInstructor,
-} from "../../queries/__generated__/CourseInstructorList";
+} from '../../queries/__generated__/CourseInstructorList';
 import {
   InsertSingleCourse,
   InsertSingleCourseVariables,
-} from "../../queries/__generated__/InsertSingleCourse";
-import { Programs_Program } from "../../queries/__generated__/Programs";
-import { SelectOption } from "../../types/UIComponents";
-import EhButton from "../common/EhButton";
-import EhDebounceInput from "../common/EhDebounceInput";
-import EhSelect from "../common/EhSelect";
+} from '../../queries/__generated__/InsertSingleCourse';
+import { Programs_Program } from '../../queries/__generated__/Programs';
+import { SelectOption } from '../../types/UIComponents';
+import EhButton from '../common/EhButton';
+import EhDebounceInput from '../common/EhDebounceInput';
+import EhSelect from '../common/EhSelect';
 
 const makeFullName = (instructor: CourseInstructorList_CourseInstructor) => {
   return (
-    instructor.Expert.User.firstName + " " + instructor.Expert.User.lastName
+    instructor.Expert.User.firstName + ' ' + instructor.Expert.User.lastName
   );
 };
 
@@ -33,6 +35,7 @@ const AddCourseForm: FC<IProps> = ({
   defaultProgramId,
   closeModalHandler,
 }) => {
+  const { t } = useTranslation('course-page');
   // DB request
   const instructorListRequest = useAdminQuery<CourseInstructorList>(
     COURSE_INSTRUCTOR_LIST
@@ -54,7 +57,7 @@ const AddCourseForm: FC<IProps> = ({
     })
   );
   if (instructorListRequest.loading) {
-    return <h2>Loading</h2>;
+    return <CircularProgress />;
   }
   return (
     <>
@@ -66,7 +69,7 @@ const AddCourseForm: FC<IProps> = ({
           closeModalHandler={closeModalHandler}
         />
       ) : (
-        <div>Es gibt keine Instruktoren!</div>
+        <p>{t('no-instructor')}</p>
       )}
     </>
   );
@@ -82,6 +85,7 @@ const Form: FC<IAddCourseProps> = ({
   defaultProgramId,
   closeModalHandler,
 }) => {
+  const { t } = useTranslation('course-page');
   const semesters: SelectOption[] = programs.map((p) => {
     return {
       key: p.id,
@@ -89,15 +93,15 @@ const Form: FC<IAddCourseProps> = ({
     };
   });
   /* #region Mutation endpoints */
-  const [insertACourse, { error: insertError }] =
-    useAdminMutation<InsertSingleCourse, InsertSingleCourseVariables>(
-      INSERT_A_COURSE
-    );
+  const [insertACourse, { error: insertError }] = useAdminMutation<
+    InsertSingleCourse,
+    InsertSingleCourseVariables
+  >(INSERT_A_COURSE);
   /* #endregion */
 
   /* #region state variables */
-  const [courseTitle, setCourseTitle] = useState("");
-  const [programId, setprogramId] = useState(defaultProgramId);
+  const [courseTitle, setCourseTitle] = useState('');
+  const [programId, setProgramId] = useState(defaultProgramId);
   const [instructorID, setInstructorId] = useState(instructorList[0].key);
   /* #endregion */
 
@@ -115,12 +119,12 @@ const Form: FC<IAddCourseProps> = ({
             achievementCertificatePossible: false,
             attendanceCertificatePossible: false,
             applicationEnd: today,
-            ects: "5.0",
-            headingDescriptionField1: "",
-            language: "EN",
+            ects: '5.0',
+            headingDescriptionField1: '',
+            language: 'DE',
             maxMissedSessions: 3,
             programId,
-            tagline: "",
+            tagline: '',
             title: courseTitle,
             CourseInstructors: {
               data: [
@@ -156,9 +160,9 @@ const Form: FC<IAddCourseProps> = ({
 
   const handleProgramOnchange = useCallback(
     (value: number) => {
-      setprogramId(value);
+      setProgramId(value);
     },
-    [setprogramId]
+    [setProgramId]
   );
   /* #endregion */
 
@@ -175,14 +179,14 @@ const Form: FC<IAddCourseProps> = ({
             inputText={courseTitle}
             onChangeHandler={onChangeTitle}
             debounceTime={0}
-            placeholder="Titel des Kurses eingeben*"
+            placeholder={`${t('course-title')}*`}
           />
         </div>
       </div>
       <div className="flex">
         <div className="w-2/6">
           <label className="mr-4" htmlFor="select-instructor">
-            Kursleitung
+            {t('course-instructor')}
           </label>
         </div>
         <div className="w-5/6">
@@ -194,14 +198,9 @@ const Form: FC<IAddCourseProps> = ({
         </div>
       </div>
       <div className="flex flex-col space-y-2">
-        <div>
-          <label htmlFor="select-semester" className="text-gray-600">
-            Vorname Nachname (emailadresse@gmx.de)
-          </label>
-        </div>
         <div className="flex">
           <label className="w-2/6" htmlFor="select-semester">
-            Semester
+            {t('semester')}
           </label>
           <div className="w-5/6">
             <EhSelect
@@ -215,7 +214,7 @@ const Form: FC<IAddCourseProps> = ({
       <div className="flex justify-center">
         <div className="pt-10 mt-10">
           <EhButton
-            buttonText="Anlegen"
+            buttonText={t('create')}
             onClickCallback={handleSaveButtonAction}
           />
         </div>

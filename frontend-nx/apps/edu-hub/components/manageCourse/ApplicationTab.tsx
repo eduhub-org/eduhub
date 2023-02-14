@@ -1,44 +1,45 @@
-import { QueryResult } from "@apollo/client";
-import { FC, useCallback, useMemo, useState } from "react";
+import { QueryResult } from '@apollo/client';
+import { FC, useCallback, useMemo, useState } from 'react';
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_CourseEnrollments,
-} from "../../queries/__generated__/ManagedCourse";
-import { ApplicationRow } from "./ApplicationRow";
-import { greenDot, greyDot, orangeDot, redDot } from "../common/dots";
-import { OnlyAdmin } from "../common/OnlyLoggedIn";
+} from '../../queries/__generated__/ManagedCourse';
+import { ApplicationRow } from './ApplicationRow';
+import { greenDot, greyDot, orangeDot, redDot } from '../common/dots';
+import { OnlyAdmin } from '../common/OnlyLoggedIn';
 import {
   identityEventMapper,
   pickIdPkMapper,
   useAdminMutation,
   useRoleMutation,
   useUpdateCallback2,
-} from "../../hooks/authedMutation";
+} from '../../hooks/authedMutation';
 import {
   UpdateEnrollmentRating,
   UpdateEnrollmentRatingVariables,
-} from "../../queries/__generated__/UpdateEnrollmentRating";
+} from '../../queries/__generated__/UpdateEnrollmentRating';
 import {
   UPDATE_ENROLLMENT_FOR_INVITE,
   UPDATE_ENROLLMENT_RATING,
-} from "../../queries/insertEnrollment";
-import { Button as OldButton } from "../common/Button";
-import { Dialog, DialogTitle } from "@material-ui/core";
-import { MdClose } from "react-icons/md";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { useAdminQuery } from "../../hooks/authedQuery";
-import { MailTemplates } from "../../queries/__generated__/MailTemplates";
-import { INSERT_MAIL_LOG, MAIL_TEMPLATES } from "../../queries/mail";
-import { displayDate } from "../../helpers/dateHelpers";
+} from '../../queries/insertEnrollment';
+import { Button as OldButton } from '../common/Button';
+import { Dialog, DialogTitle } from '@material-ui/core';
+import { MdClose } from 'react-icons/md';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { useAdminQuery } from '../../hooks/authedQuery';
+import { MailTemplates } from '../../queries/__generated__/MailTemplates';
+import { INSERT_MAIL_LOG, MAIL_TEMPLATES } from '../../queries/mail';
+import { displayDate } from '../../helpers/dateHelpers';
 import {
   InsertMailLog,
   InsertMailLogVariables,
-} from "../../queries/__generated__/InsertMailLog";
+} from '../../queries/__generated__/InsertMailLog';
 import {
   UpdateEnrollmentForInvite,
   UpdateEnrollmentForInviteVariables,
-} from "../../queries/__generated__/UpdateEnrollmentForInvite";
+} from '../../queries/__generated__/UpdateEnrollmentForInvite';
+import useTranslation from 'next-translate/useTranslation';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -64,7 +65,9 @@ const now7 = new Date();
 now7.setDate(now7.getDate() + 7);
 
 export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
-  const userRole = "instructor";
+  const { t } = useTranslation();
+
+  const userRole = 'instructor';
 
   const [selectedEnrollments, setSelectedEnrollments] = useState(
     [] as number[]
@@ -90,7 +93,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
   });
   const mailTemplates = queryMailTemplates.data;
   if (queryMailTemplates.error) {
-    console.log("fail to query mail templates!", queryMailTemplates);
+    console.log('fail to query mail templates!', queryMailTemplates);
   }
 
   const [insertMailLogMutation] = useAdminMutation<
@@ -108,7 +111,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
   const handleSendInvites = useCallback(async () => {
     if (mailTemplates != null) {
       const inviteTemplate = mailTemplates.MailTemplate.find(
-        (x) => x.title === "INVITE"
+        (x) => x.title === 'INVITE'
       );
       if (inviteTemplate != null) {
         const relevantEnrollments = selectedEnrollments
@@ -118,7 +121,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
           })
           .filter(
             (x) =>
-              x != null && ["APPLIED", "INVITED", "REJECTED"].includes(x.status)
+              x != null && ['APPLIED', 'INVITED', 'REJECTED'].includes(x.status)
           ) as ManagedCourse_Course_by_pk_CourseEnrollments[];
 
         try {
@@ -127,13 +130,13 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
 
             const doReplace = (source: string) => {
               return source
-                .replaceAll("[User:Firstname]", enrollment.User.firstName)
-                .replaceAll("[User:LastName]", enrollment.User.lastName)
+                .replaceAll('[User:Firstname]', enrollment.User.firstName)
+                .replaceAll('[User:LastName]', enrollment.User.lastName)
                 .replaceAll(
-                  "[Enrollment:ExpirationDate]",
+                  '[Enrollment:ExpirationDate]',
                   displayDate(inviteExpireDate)
                 )
-                .replaceAll("[Enrollment:CourseId--Course:Name]", course.title);
+                .replaceAll('[Enrollment:CourseId--Course:Name]', course.title);
             };
 
             template.content = doReplace(inviteTemplate.content);
@@ -144,8 +147,8 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
                 bcc: template.bcc,
                 cc: template.cc,
                 content: template.content,
-                from: template.from || "steffen@opencampus.sh",
-                status: "READY_TO_SEND",
+                from: template.from || 'steffen@opencampus.sh',
+                status: 'READY_TO_SEND',
                 subject: template.subject,
                 to: enrollment.User.email,
               },
@@ -163,7 +166,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
           setIsInviteDialogOpen(false);
         }
       } else {
-        console.log("Missing mail template INVITE, cannot send invite mails!");
+        console.log('Missing mail template INVITE, cannot send invite mails!');
       }
     }
   }, [
@@ -200,8 +203,8 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_ENROLLMENT_RATING,
     userRole,
-    "enrollmentId",
-    "rating",
+    'enrollmentId',
+    'rating',
     pickIdPkMapper,
     identityEventMapper,
     qResult
@@ -242,7 +245,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
         <OnlyAdmin>
           <div className="flex justify-end mb-6">
             <OldButton onClick={handleOpenInviteDialog}>
-              Einladungen verschicken
+              {t('course-page:send-invitations')}
             </OldButton>
           </div>
         </OnlyAdmin>
@@ -255,7 +258,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
       >
         <DialogTitle>
           <div className="grid grid-cols-2">
-            <div>Bewerber:innen einladen</div>
+            <div> {t('course-page:invite-applicants')} </div>
             <div className="cursor-pointer flex justify-end">
               <MdClose onClick={handleCloseInviteDialog} />
             </div>
@@ -264,10 +267,10 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
 
         <div className="m-16">
           <div className="grid grid-cols-2 h-64">
-            <div className="mr-3">Ablaufdatum für Einladung:</div>
+            <div className="mr-3">{t('course-page:invitation-deadline')}:</div>
             <div className="ml-3">
               <DatePicker
-                dateFormat={"dd/MM/yyyy"}
+                dateFormat={'dd/MM/yyyy'}
                 selected={inviteExpireDate}
                 onChange={handleSetInviteExpireDate}
                 minDate={now}
@@ -276,7 +279,9 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
           </div>
 
           <div className="flex justify-center mt-16">
-            <OldButton onClick={handleSendInvites}>Einladen</OldButton>
+            <OldButton onClick={handleSendInvites}>
+              {t('course-page:invite')}
+            </OldButton>
           </div>
         </div>
       </Dialog>

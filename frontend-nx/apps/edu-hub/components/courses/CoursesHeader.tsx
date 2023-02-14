@@ -1,14 +1,14 @@
-import { FC, useCallback, useState } from "react";
-import { AdminCourseListVariables } from "../../queries/__generated__/AdminCourseList";
-import { Programs_Program } from "../../queries/__generated__/Programs";
-import { StaticComponentProperty } from "../../types/UIComponents";
-import { Course_bool_exp } from "../../__generated__/globalTypes";
-import CommonPageHeader from "../common/CommonPageHeader";
-import EhAddButton from "../common/EhAddButton";
-import ModalControl from "../common/ModalController";
-import Searchbar from "../common/Searchbar";
-import { ProgramsMenubar } from "../program/ProgramsMenubar";
-import AddCourseForm from "./AddCourseForm";
+import { FC, useCallback, useState } from 'react';
+import { AdminCourseListVariables } from '../../queries/__generated__/AdminCourseList';
+import { Programs_Program } from '../../queries/__generated__/Programs';
+import { StaticComponentProperty } from '../../types/UIComponents';
+import { Course_bool_exp } from '../../__generated__/globalTypes';
+import CommonPageHeader from '../common/CommonPageHeader';
+import EhAddButton from '../common/EhAddButton';
+import ModalControl from '../common/ModalController';
+import SearchBox from '../common/SearchBox';
+import { ProgramsMenubar } from '../program/ProgramsMenubar';
+import AddCourseForm from './AddCourseForm';
 
 interface IProps {
   programs: Programs_Program[];
@@ -49,7 +49,7 @@ const CoursesHeader: FC<IProps> = ({
 
   return (
     <>
-      <CommonPageHeader headline={t("coursesHeadline")} />
+      <CommonPageHeader headline={t('coursesHeadline')} />
       <Menubar
         t={t}
         programs={programs}
@@ -60,11 +60,11 @@ const CoursesHeader: FC<IProps> = ({
       <div className="bg-white pb-10 flex justify-end">
         <EhAddButton
           buttonClickCallBack={openModalControl}
-          text={t("addCourseText")}
+          text={t('addCourseText')}
         />
       </div>
       <ModalControl
-        modalTitle={t("addCourseFormTitle")}
+        modalTitle={t('addCourseFormTitle')}
         onClose={onCloseAddCourseWindow}
         showModal={showModal}
       >
@@ -113,7 +113,7 @@ const Menubar: FC<IMenubarProps> = ({
 }) => {
   const allTabId = -1;
   const maxMenuCount = 3;
-  const [searchedTitle, setSearchedTitle] = useState("");
+  const [searchedTitle, setSearchedTitle] = useState('');
   const [programID, setProgramID] = useState(defaultProgramId);
   // We will just show latest Three and all, Ignore the Unknown id (0)
   const customPrograms =
@@ -127,7 +127,7 @@ const Menubar: FC<IMenubarProps> = ({
   });
   semesters.push({
     key: allTabId,
-    label: "All",
+    label: 'All',
     selected: false,
   });
 
@@ -150,7 +150,7 @@ const Menubar: FC<IMenubarProps> = ({
       updateFilter({
         ...courseListRequest.variables,
         where: createWhereClauseForCourse(searchedTitle, property.key),
-        offset: 0, // Because, we need to reinitiate the offset from the begining
+        offset: 0, // Because, we need to reinitiate the offset from the beginning
       });
       setProgramID(property.key);
     },
@@ -182,8 +182,8 @@ const Menubar: FC<IMenubarProps> = ({
         defaultProgramId={programs[0].id}
         onTabClicked={handleTabClick}
       />
-      <Searchbar
-        placeholder={t("courseSearchPlaceholder")}
+      <SearchBox
+        placeholder={t('courseSearchPlaceholder')}
         onChangeCallback={searchOnTitleCallback}
         searchText={searchedTitle}
       />

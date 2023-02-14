@@ -48,11 +48,11 @@ export const SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE = gql`
 export const SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE = gql`
   mutation SaveAchievementOptionDocumentationTemplate(
     $base64File: String!
-    $courseId: Int!
+    $achievementOptionId: Int!
   ) {
     saveAchievementOptionDocumentationTemplate(
       base64file: $base64File
-      courseid: $courseId
+      achievementOptionId: $achievementOptionId
     ) {
       google_link
       path
@@ -63,11 +63,11 @@ export const SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE = gql`
 export const SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT = gql`
   mutation SaveAchievementOptionEvaluationScript(
     $base64File: String!
-    $courseId: Int!
+    $achievementOptionId: Int!
   ) {
     saveAchievementOptionEvaluationScript(
       base64file: $base64File
-      courseid: $courseId
+      achievementOptionId: $achievementOptionId
     ) {
       google_link
       path
@@ -144,6 +144,22 @@ export const SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE = gql`
 export const LOAD_FILE = gql`
   query LoadAFile($path: String!) {
     loadAchievementCertificate(path: $path) {
+      link
+    }
+  }
+`;
+
+export const LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT = gql`
+  query LoadAchievementOptionEvaluationScript($path: String!) {
+    loadAchievementOptionEvaluationScript(path: $path) {
+      link
+    }
+  }
+`;
+
+export const LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE = gql`
+  query LoadAchievementOptionDocumentationTemplate($path: String!) {
+    loadAchievementOptionDocumentationTemplate(path: $path) {
       link
     }
   }

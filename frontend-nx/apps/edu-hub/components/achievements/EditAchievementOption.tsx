@@ -1,39 +1,41 @@
-import { FC, useCallback, useContext } from "react";
-import { useAdminMutation } from "../../hooks/authedMutation";
-import { AchievementOptionList_AchievementOption } from "../../queries/__generated__/AchievementOptionList";
-import { AchievementContext } from "./AchievementOptionDashboard";
+import { FC, useCallback, useContext, useEffect, useState } from 'react';
+import { useAdminMutation } from '../../hooks/authedMutation';
+import { AchievementOptionList_AchievementOption } from '../../queries/__generated__/AchievementOptionList';
 import {
   InsertAnAchievementOptionCourse,
   InsertAnAchievementOptionCourseVariables,
-} from "../../queries/__generated__/InsertAnAchievementOptionCourse";
+} from '../../queries/__generated__/InsertAnAchievementOptionCourse';
 import {
   InsertAnAchievementOptionMentor,
   InsertAnAchievementOptionMentorVariables,
-} from "../../queries/__generated__/InsertAnAchievementOptionMentor";
+} from '../../queries/__generated__/InsertAnAchievementOptionMentor';
 import {
   DELETE_AN_ACHIEVEMENT_OPTION_COURSE,
   DELETE_AN_ACHIEVEMENT_OPTION_MENTOR,
   INSERT_AN_ACHIEVEMENT_OPTION_COURSE,
   INSERT_AN_ACHIEVEMENT_OPTION_MENTOR,
-} from "../../queries/mutateAchievement";
+} from '../../queries/mutateAchievement';
 import {
   DeleteAnAchievementOptionCourseWithWhere,
   DeleteAnAchievementOptionCourseWithWhereVariables,
-} from "../../queries/__generated__/DeleteAnAchievementOptionCourseWithWhere";
+} from '../../queries/__generated__/DeleteAnAchievementOptionCourseWithWhere';
 import {
   DeleteAnAchievementOptionMentorWithWhere,
   DeleteAnAchievementOptionMentorWithWhereVariables,
-} from "../../queries/__generated__/DeleteAnAchievementOptionMentorWithWhere";
+} from '../../queries/__generated__/DeleteAnAchievementOptionMentorWithWhere';
 import {
   AchievementKeys,
   IDataToManipulate,
-  IPayload,
+  ResponseToARequest,
   TempAchievementOptionCourse,
   TempAchievementOptionMentor,
   UploadFileTypes,
-} from "../../helpers/achievement";
-import { UploadFile } from "../../helpers/filehandling";
-import AddEditAchievementOptionComponent from "./AddEditAchievementOptionComponent";
+} from '../../helpers/achievement';
+import FormToAddEditAchievementOption from './FormToAddEditAchievementOption';
+import _ from 'lodash';
+import { AchievementContext } from './AchievementsHelper';
+
+import { CircularProgress } from '@material-ui/core';
 
 interface IProps {
   onSuccess: (success: boolean) => void;
@@ -41,6 +43,8 @@ interface IProps {
 }
 const EditAchievementOption: FC<IProps> = (props) => {
   const context = useContext(AchievementContext);
+  const [data, setData] = useState(null as IDataToManipulate);
+
   /* #region Database Operations */
 
   const [insertAnAchievementOptionMentor] = useAdminMutation<
@@ -138,11 +142,12 @@ const EditAchievementOption: FC<IProps> = (props) => {
         props.onSuccess(false);
       } catch (error) {
         console.log(error);
+        context.setAlertMessage(error.message);
       }
 
       return 0;
     },
-    [deleteMentorQuery, props]
+    [deleteMentorQuery, props, context]
   );
 
   const [deleteAnAchievementCourse] = useAdminMutation<
@@ -151,7 +156,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
   >(DELETE_AN_ACHIEVEMENT_OPTION_COURSE);
 
   const queryDeleteAnAchievementCourseFromDB = useCallback(
-    async (achievementOptionId: number, coureId: number) => {
+    async (achievementOptionId: number, courseId: number) => {
       try {
         const response = await deleteAnAchievementCourse({
           variables: {
@@ -161,7 +166,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
                   achievementOptionId: { _eq: achievementOptionId },
                 },
                 {
-                  courseId: { _eq: coureId },
+                  courseId: { _eq: courseId },
                 },
               ],
             },
@@ -177,115 +182,204 @@ const EditAchievementOption: FC<IProps> = (props) => {
         props.onSuccess(false);
       } catch (error) {
         console.log(error);
+        context.setAlertMessage(error.message);
       }
       return 0;
     },
-    [deleteAnAchievementCourse, props]
+    [deleteAnAchievementCourse, props, context]
   );
 
   /* #endregion */
 
-  const onPropertyChanged = useCallback(
-    async (
-      achievementOptionId: number,
-      payload: IPayload
-    ): Promise<boolean> => {
+  const ao: AchievementOptionList_AchievementOption = props.achievementOption;
+  useEffect(() => {
+    const data: IDataToManipulate = {
+      achievementOptionId: ao.id,
+      title: ao.title,
+      description: ao.description,
+      documentationTemplateUrl: ao.documentationTemplateUrl,
+      evaluationScriptUrl: ao.evaluationScriptUrl,
+      recordType: ao.recordType,
+      showScoreAuthors: ao.showScoreAuthors,
+      csvTemplateUrl: ao.csvTemplateUrl,
+      mentors: ao.AchievementOptionMentors.map(
+        (m) =>
+          ({
+            userId: m.userId,
+            firstName: m.User?.firstName,
+            lastName: m.User?.lastName,
+          } as TempAchievementOptionMentor)
+      ),
+      courses: ao.AchievementOptionCourses.map(
+        (c) =>
+          ({
+            id: c.id,
+            courseId: c.courseId,
+            programShortName: c.Course.Program
+              ? c.Course.Program.shortTitle
+              : '',
+            title: c.Course.title,
+          } as TempAchievementOptionCourse)
+      ),
+    };
+    setData(data);
+  }, [
+    ao.AchievementOptionCourses,
+    ao.AchievementOptionMentors,
+    ao.csvTemplateUrl,
+    ao.description,
+    ao.documentationTemplateUrl,
+    ao.evaluationScriptUrl,
+    ao.id,
+    ao.recordType,
+    ao.showScoreAuthors,
+    ao.title,
+  ]);
+
+  /**
+   * _.difference([2, 1], [2, 3]);
+   * => [1]
+   */
+  const deletedAndNewIds = <T extends string | number>(
+    oldIds: T[],
+    newIds: T[]
+  ) => {
+    return {
+      deletedIds: _.difference(oldIds, newIds),
+      newIds: _.difference(newIds, oldIds),
+    };
+  };
+  const changedKeys = (old: IDataToManipulate, newData: IDataToManipulate) => {
+    const keys = _.union(_.keys(old), _.keys(newData));
+    return _.filter(keys, (key: string) => old[key] !== newData[key]);
+  };
+  const onSave = useCallback(
+    async (updatedData: IDataToManipulate) => {
       try {
-        switch (payload.key) {
-          case AchievementKeys.TITLE:
-          case AchievementKeys.DESCRIPTION:
-          case AchievementKeys.RECORD_TYPE: {
-            const success = await context.queryUpdateAchievementOptions(
-              achievementOptionId,
-              payload,
-              props.onSuccess
-            );
-            return success;
-          }
-          case AchievementKeys.ADD_A_MENTOR:
-            return (await queryAddAchievementOptionMentors(
-              achievementOptionId,
-              payload.value as string
-            )) > 0;
-          case AchievementKeys.ADD_A_COURSE:
-            return (await queryAddAchievementOptionCourse(
-              achievementOptionId,
-              payload.value as number
-            )) > 0;
-          case AchievementKeys.DELETE_A_MENTOR:
-            return (await queryDeleteAnAchievementMentorFromDB(
-              achievementOptionId,
-              payload.value as string
-            )) > 0;
-          case AchievementKeys.DELETE_A_COURSE:
-            return (await queryDeleteAnAchievementCourseFromDB(
-              achievementOptionId,
-              payload.value as number
-            )) > 0;
-          case AchievementKeys.DOCUMENT_TEMPLATE_FILE: {
-            const uploadedResponse = await context.uploadFile(
-              payload.value as UploadFile,
-              achievementOptionId,
-              UploadFileTypes.SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE
-            );
-            return uploadedResponse ? true : false;
-          }
-          case AchievementKeys.EVALUTION_SCRIPT_FILE: {
-            const uploadScriptFile = await context.uploadFile(
-              payload.value as UploadFile,
-              achievementOptionId,
-              UploadFileTypes.SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT
-            );
-            return uploadScriptFile ? true : false;
+        const cKeys = changedKeys(data, updatedData);
+        const achievementOptionId = data.achievementOptionId;
+        for (const key of cKeys) {
+          switch (key) {
+            case AchievementKeys.TITLE:
+            case AchievementKeys.DESCRIPTION:
+            case AchievementKeys.SHOW_SCORE_AUTHORS:
+            case AchievementKeys.RECORD_TYPE:
+              await context.queryUpdateAchievementOptions(
+                data.achievementOptionId,
+                {
+                  key,
+                  value: updatedData[key],
+                }
+              );
+              break;
+            case 'mentors': {
+              try {
+                const { deletedIds, newIds } = deletedAndNewIds(
+                  data.mentors.map((t) => t.userId),
+                  updatedData.mentors.map((m) => m.userId)
+                );
+                console.log(deletedIds, newIds);
+                for (const mentorId of deletedIds) {
+                  await queryDeleteAnAchievementMentorFromDB(
+                    achievementOptionId,
+                    mentorId
+                  );
+                }
+                for (const mentor of newIds) {
+                  await queryAddAchievementOptionMentors(
+                    achievementOptionId,
+                    mentor
+                  );
+                }
+              } catch (error) {
+                console.log(error);
+              }
+              break;
+            }
+
+            case 'courses': {
+              try {
+                const { deletedIds, newIds } = deletedAndNewIds(
+                  data.courses.map((t) => t.courseId),
+                  updatedData.courses.map((m) => m.courseId)
+                );
+                for (const deletedId of deletedIds) {
+                  await queryDeleteAnAchievementCourseFromDB(
+                    achievementOptionId,
+                    deletedId
+                  );
+                }
+                for (const newId of newIds) {
+                  await queryAddAchievementOptionCourse(
+                    achievementOptionId,
+                    newId
+                  );
+                }
+              } catch (error) {
+                console.log(error);
+              }
+              break;
+            }
+            case AchievementKeys.DOCUMENT_TEMPLATE_FILE:
+              if (updatedData.documentTemplateFile) {
+                await context.uploadFile(
+                  updatedData.documentTemplateFile,
+                  achievementOptionId,
+                  UploadFileTypes.SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE
+                );
+              }
+              break;
+
+            case AchievementKeys.EVALUATION_SCRIPT_FILE:
+              if (updatedData.evaluationScriptFile) {
+                await context.uploadFile(
+                  updatedData.evaluationScriptFile,
+                  achievementOptionId,
+                  UploadFileTypes.SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT
+                );
+              }
+              break;
+            case AchievementKeys.CSV_TEMPLATE_FILE:
+              if (updatedData.csvTemplateFile) {
+                await context.queryUpdateAchievementOptions(
+                  data.achievementOptionId,
+                  {
+                    key: AchievementKeys.CSV_TEMPLATE_URL,
+                    value: updatedData[key].data,
+                  }
+                );
+              }
+              break;
           }
         }
+        props.onSuccess(true);
+        return { success: true } as ResponseToARequest;
       } catch (error) {
         console.log(error);
+        return { success: false, message: error.message } as ResponseToARequest;
       }
-
-      return false;
     },
     [
-      props,
       context,
-      queryAddAchievementOptionMentors,
+      data,
+      props,
       queryAddAchievementOptionCourse,
-      queryDeleteAnAchievementMentorFromDB,
+      queryAddAchievementOptionMentors,
       queryDeleteAnAchievementCourseFromDB,
+      queryDeleteAnAchievementMentorFromDB,
     ]
   );
+  if (!data) return <CircularProgress />;
 
-  const ao: AchievementOptionList_AchievementOption = props.achievementOption;
-  const data: IDataToManipulate = {
-    achievementOptionId: ao.id,
-    title: ao.title,
-    description: ao.description,
-    documentationTemplateUrl: ao.documentationTemplateUrl,
-    evaluationScriptUrl: ao.evaluationScriptUrl,
-    recordType: ao.recordType,
-    mentors: ao.AchievementOptionMentors.map(
-      (m) =>
-      ({
-        userId: m.userId,
-        firstName: m.User?.firstName,
-        lastName: m.User?.lastName,
-      } as TempAchievementOptionMentor)
-    ),
-    courses: ao.AchievementOptionCourses.map(
-      (c) =>
-      ({
-        id: c.id,
-        courseId: c.courseId,
-        programShortName: c.Course.Program ? c.Course.Program.shortTitle : "",
-        title: c.Course.title,
-      } as TempAchievementOptionCourse)
-    ),
-  };
   return (
-    <AddEditAchievementOptionComponent
-      defaultData={data}
-      onPropertyChanged={onPropertyChanged}
-    />
+    <>
+      {data && (
+        <FormToAddEditAchievementOption
+          defaultData={data}
+          onSaveCallBack={onSave}
+        />
+      )}
+    </>
   );
 };
 

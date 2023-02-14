@@ -162,6 +162,14 @@ export interface ManagedCourse_Course_by_pk_Program {
    * The last day a course lecture can possibly be in this program.
    */
   lectureEnd: any | null;
+  /**
+   * The deadline for the achievement record uploads.
+   */
+  achievementRecordUploadDeadline: any | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances_Session {
@@ -276,6 +284,14 @@ export interface ManagedCourse_Course_by_pk {
    */
   title: string;
   /**
+   * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
+   */
+  achievementCertificatePossible: boolean;
+  /**
+   * Indicates whether participants will get a certificate showing the list of attendances (only issued if the did not miss then maxMissedCourses)
+   */
+  attendanceCertificatePossible: boolean;
+  /**
    * Id of the program to which the course belongs.
    */
   programId: number | null;
@@ -323,14 +339,6 @@ export interface ManagedCourse_Course_by_pk {
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
-  /**
-   * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
-   */
-  achievementCertificatePossible: boolean;
-  /**
-   * Indicates whether participants will get a certificate showing the list of attendances (only issued if the did not miss then maxMissedCourses)
-   */
-  attendanceCertificatePossible: boolean;
   /**
    * The link to the chat of the course (e.g. a mattermost channel)
    */

@@ -11,10 +11,31 @@ import { AchievementOption_bool_exp, AchievementOption_order_by, AchievementReco
 
 export interface AchievementOptionList_AchievementOption_AchievementOptionCourses_Course_Program {
   __typename: "Program";
+  id: number;
+  /**
+   * The title of the program
+   */
+  title: string;
   /**
    * The 6 letter short title for the program.
    */
   shortTitle: string | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
+  /**
+   * The last day a course lecture can possibly be in this program.
+   */
+  lectureEnd: any | null;
+  /**
+   * The deadline for the achievement record uploads.
+   */
+  achievementRecordUploadDeadline: any | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
 }
 
 export interface AchievementOptionList_AchievementOption_AchievementOptionCourses_Course {
@@ -44,6 +65,7 @@ export interface AchievementOptionList_AchievementOption_AchievementOptionCourse
 
 export interface AchievementOptionList_AchievementOption_AchievementOptionMentors_User {
   __typename: "User";
+  id: any;
   /**
    * The user's first name
    */
@@ -52,15 +74,19 @@ export interface AchievementOptionList_AchievementOption_AchievementOptionMentor
    * The user's last name
    */
   lastName: string;
+  /**
+   * The user's email address
+   */
+  email: string;
+  /**
+   * The user's profile picture
+   */
+  picture: string | null;
 }
 
 export interface AchievementOptionList_AchievementOption_AchievementOptionMentors {
   __typename: "AchievementOptionMentor";
   id: number;
-  /**
-   * ID of an expert that is mentor for an achievement option
-   */
-  userId: any;
   /**
    * An object relationship
    */
@@ -79,6 +105,10 @@ export interface AchievementOptionList_AchievementOption {
    */
   description: string;
   /**
+   * Type of the achivement record that must be uploaded for this option
+   */
+  recordType: AchievementRecordType_enum;
+  /**
    * An instructor or project mentor can provide a template for the record that must be uploaded to complete this achievement
    */
   documentationTemplateUrl: string;
@@ -87,9 +117,13 @@ export interface AchievementOptionList_AchievementOption {
    */
   evaluationScriptUrl: string;
   /**
-   * Type of the achivement record that must be uploaded for this option
+   * URL to the template that shall be used for uploading csv data for a new achievement record
    */
-  recordType: AchievementRecordType_enum;
+  csvTemplateUrl: string | null;
+  /**
+   * For TRUE the score table will include a column showing the authors; for FALSE the scores will be anonymous.
+   */
+  showScoreAuthors: boolean | null;
   /**
    * An array relationship
    */
