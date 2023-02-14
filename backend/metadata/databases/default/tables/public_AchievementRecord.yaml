@@ -114,17 +114,4 @@ update_permissions:
               User:
                 id:
                   _eq: X-Hasura-User-Id
-
       check: {}
-  - role: user_access
-    permission:
-      columns:
-        - coverImageUrl
-        - documentationUrl
-        - evaluationScriptUrl
-      filter:
-        AchievementRecordAuthors:
-          User:
-            id:
-              _eq: X-Hasura-User-Id
-      check: null
