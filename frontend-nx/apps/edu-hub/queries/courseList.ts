@@ -1,7 +1,7 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
-import { ADMIN_COURSE_FRAGMENT, COURSE_FRAGMENT } from "./courseFragment";
-import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from "./programFragment";
+import { ADMIN_COURSE_FRAGMENT, COURSE_FRAGMENT } from './courseFragment';
+import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from './programFragment';
 
 export const COURSE_LIST = gql`
   ${COURSE_FRAGMENT}

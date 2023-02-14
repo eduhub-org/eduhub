@@ -1,47 +1,48 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { QueryResult } from "@apollo/client";
-import { IconButton } from "@material-ui/core";
-import { FC, MutableRefObject, useCallback, useRef } from "react";
+import { QueryResult } from '@apollo/client';
+import { IconButton } from '@material-ui/core';
+import useTranslation from 'next-translate/useTranslation';
+import { FC, MutableRefObject, useCallback, useRef } from 'react';
 
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import {
   MdCheckBox,
   MdCheckBoxOutlineBlank,
   MdDelete,
   MdOutlineCheckBoxOutlineBlank,
   MdUpload,
-} from "react-icons/md";
-import { parseFileUploadEvent } from "../../helpers/filehandling";
-import { useAdminMutation } from "../../hooks/authedMutation";
+} from 'react-icons/md';
+import { parseFileUploadEvent } from '../../helpers/filehandling';
+import { useAdminMutation } from '../../hooks/authedMutation';
 import {
   SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
   SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE,
-} from "../../queries/actions";
+} from '../../queries/actions';
 import {
   UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
   UPDATE_PARTICIPATION_CERTIFICATE_TEMPLATE,
-} from "../../queries/updateProgram";
-import { ProgramList_Program } from "../../queries/__generated__/ProgramList";
+} from '../../queries/updateProgram';
+import { ProgramList_Program } from '../../queries/__generated__/ProgramList';
 import {
   SaveAchievementCertificateTemplate,
   SaveAchievementCertificateTemplateVariables,
-} from "../../queries/__generated__/SaveAchievementCertificateTemplate";
+} from '../../queries/__generated__/SaveAchievementCertificateTemplate';
 import {
   SaveParticipationCertificateTemplate,
   SaveParticipationCertificateTemplateVariables,
-} from "../../queries/__generated__/SaveParticipationCertificateTemplate";
+} from '../../queries/__generated__/SaveParticipationCertificateTemplate';
 
 import {
   UpdateProgramAchievementTemplate,
   UpdateProgramAchievementTemplateVariables,
-} from "../../queries/__generated__/UpdateProgramAchievementTemplate";
+} from '../../queries/__generated__/UpdateProgramAchievementTemplate';
 import {
   UpdateProgramParticipationTemplate,
   UpdateProgramParticipationTemplateVariables,
-} from "../../queries/__generated__/UpdateProgramParticipationTemplate";
-import EhDebounceInput from "../common/EhDebounceInput";
+} from '../../queries/__generated__/UpdateProgramParticipationTemplate';
+import EhDebounceInput from '../common/EhDebounceInput';
 
 interface ProgramsRowProps {
   program: ProgramList_Program;
@@ -56,14 +57,14 @@ interface ProgramsRowProps {
   onSetLectureStart: (p: ProgramList_Program, start: Date | null) => any;
   onSetLectureEnd: (p: ProgramList_Program, end: Date | null) => any;
   onSetUploadData: (p: ProgramList_Program, d: Date | null) => any;
-  onSetStartQuestionaire: (p: ProgramList_Program, link: string) => any;
-  onSetSpeakerQuestionaire: (p: ProgramList_Program, link: string) => any;
-  onSetClosingQuestionaire: (p: ProgramList_Program, link: string) => any;
+  onSetStartQuestionnaire: (p: ProgramList_Program, link: string) => any;
+  onSetSpeakerQuestionnaire: (p: ProgramList_Program, link: string) => any;
+  onSetClosingQuestionnaire: (p: ProgramList_Program, link: string) => any;
   onSetVisibilityParticipationCertificate: (
     p: ProgramList_Program,
     isVisible: boolean
   ) => any;
-  onSetVisiblityAchievementCertificate: (
+  onSetVisibilityAchievementCertificate: (
     p: ProgramList_Program,
     isVisible: boolean
   ) => any;
@@ -86,11 +87,11 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   onSetTitle,
   onSetUploadData,
   onSetVisibility,
-  onSetStartQuestionaire,
-  onSetSpeakerQuestionaire,
-  onSetClosingQuestionaire,
+  onSetStartQuestionnaire,
+  onSetSpeakerQuestionnaire,
+  onSetClosingQuestionnaire,
   onSetVisibilityParticipationCertificate,
-  onSetVisiblityAchievementCertificate,
+  onSetVisibilityAchievementCertificate,
 }) => {
   const handleToggleVisibilityParticipationCertificate = useCallback(() => {
     onSetVisibilityParticipationCertificate(
@@ -100,35 +101,35 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   }, [program, onSetVisibilityParticipationCertificate]);
 
   const handleToggleVisibilityAchievementCertificate = useCallback(() => {
-    onSetVisiblityAchievementCertificate(
+    onSetVisibilityAchievementCertificate(
       program,
       !program.visibilityAchievementCertificate
     );
-  }, [program, onSetVisiblityAchievementCertificate]);
+  }, [program, onSetVisibilityAchievementCertificate]);
 
   const handleToggleVisibility = useCallback(() => {
     onSetVisibility(program, !program.visibility);
   }, [program, onSetVisibility]);
 
-  const handleSetStartQuestionaire = useCallback(
+  const handleSetStartQuestionnaire = useCallback(
     (value: string) => {
-      onSetStartQuestionaire(program, value);
+      onSetStartQuestionnaire(program, value);
     },
-    [program, onSetStartQuestionaire]
+    [program, onSetStartQuestionnaire]
   );
 
-  const handleSetSpeakerQuestionaire = useCallback(
+  const handleSetSpeakerQuestionnaire = useCallback(
     (value: string) => {
-      onSetSpeakerQuestionaire(program, value);
+      onSetSpeakerQuestionnaire(program, value);
     },
-    [program, onSetSpeakerQuestionaire]
+    [program, onSetSpeakerQuestionnaire]
   );
 
-  const handleSetClosingQuestionaire = useCallback(
+  const handleSetClosingQuestionnaire = useCallback(
     (value: string) => {
-      onSetClosingQuestionaire(program, value);
+      onSetClosingQuestionnaire(program, value);
     },
-    [program, onSetClosingQuestionaire]
+    [program, onSetClosingQuestionnaire]
   );
 
   const handleSetTitle = useCallback(
@@ -205,22 +206,22 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
 
   const handleTemplateParticipationUploadEvent = useCallback(
     async (event: any) => {
-      const ufile = await parseFileUploadEvent(event);
+      const uploadFile = await parseFileUploadEvent(event);
 
-      if (ufile != null) {
-        const respone = await saveParticipationCertificateTemplate({
+      if (uploadFile != null) {
+        const res = await saveParticipationCertificateTemplate({
           variables: {
-            base64File: ufile.data,
-            fileName: ufile.name,
+            base64File: uploadFile.data,
+            fileName: uploadFile.name,
             programId: program.id,
           },
         });
-        if (respone.data?.saveParticipationCertificateTemplate?.path) {
+        if (res.data?.saveParticipationCertificateTemplate?.path) {
           await updateParticipationTemplate({
             variables: {
               programId: program.id,
               templatePath:
-                respone.data?.saveParticipationCertificateTemplate?.path,
+                res.data?.saveParticipationCertificateTemplate?.path,
             },
           });
 
@@ -236,10 +237,10 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
     ]
   );
 
-  const templateAchivementUploadRef: MutableRefObject<any> = useRef(null);
-  const handleUploadAchivementTemplateClick = useCallback(() => {
-    templateAchivementUploadRef.current?.click();
-  }, [templateAchivementUploadRef]);
+  const templateAchievementUploadRef: MutableRefObject<any> = useRef(null);
+  const handleUploadAchievementTemplateClick = useCallback(() => {
+    templateAchievementUploadRef.current?.click();
+  }, [templateAchievementUploadRef]);
 
   const [saveAchievementCertificateTemplate] = useAdminMutation<
     SaveAchievementCertificateTemplate,
@@ -251,14 +252,14 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
     UpdateProgramAchievementTemplateVariables
   >(UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE);
 
-  const handleTemplateAchivementUploadEvent = useCallback(
+  const handleTemplateAchievementUploadEvent = useCallback(
     async (event: any) => {
-      const ufile = await parseFileUploadEvent(event);
-      if (ufile != null) {
+      const uFile = await parseFileUploadEvent(event);
+      if (uFile != null) {
         const response = await saveAchievementCertificateTemplate({
           variables: {
-            base64File: ufile.data,
-            fileName: ufile.name,
+            base64File: uFile.data,
+            fileName: uFile.name,
             programId: program.id,
           },
         });
@@ -284,7 +285,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
     ]
   );
 
-  console.log(program);
+  const { t } = useTranslation();
 
   return (
     <div>
@@ -299,7 +300,9 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
 
         <div className="col-span-2">
           <EhDebounceInput
-            placeholder="Programmtitel setzen"
+            placeholder={`${t('set-something', {
+              something: t('course-page:program-title'),
+            })}`}
             onChangeHandler={handleSetTitle}
             inputText={program.title}
           />
@@ -307,9 +310,11 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
 
         <div>
           <EhDebounceInput
-            placeholder="Kurztitel setzen"
+            placeholder={`${t('set-something', {
+              something: t('course-page:short-title'),
+            })}`}
             onChangeHandler={handleSetShortTitle}
-            inputText={program.shortTitle ?? ""}
+            inputText={program.shortTitle ?? ''}
           />
         </div>
 
@@ -317,7 +322,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
             className="w-full bg-gray-100"
-            dateFormat={"dd/MM/yyyy"}
+            dateFormat={'dd/MM/yyyy'}
             selected={program.applicationStart || new Date()}
             onChange={handleSetApplicationStart}
           />
@@ -326,7 +331,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={"dd/MM/yyyy"}
+            dateFormat={'dd/MM/yyyy'}
             className="w-full bg-gray-100"
             selected={program.defaultApplicationEnd || new Date()}
             onChange={handleSetApplicationEnd}
@@ -336,7 +341,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={"dd/MM/yyyy"}
+            dateFormat={'dd/MM/yyyy'}
             className="w-full bg-gray-100"
             selected={program.lectureStart || new Date()}
             onChange={handleSetLectureStart}
@@ -346,7 +351,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={"dd/MM/yyyy"}
+            dateFormat={'dd/MM/yyyy'}
             className="w-full bg-gray-100"
             selected={program.lectureEnd || new Date()}
             onChange={handleSetLectureEnd}
@@ -356,7 +361,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={"dd/MM/yyyy"}
+            dateFormat={'dd/MM/yyyy'}
             className="w-full bg-gray-100"
             selected={program.achievementRecordUploadDeadline || new Date()}
             onChange={handleSetUploadData}
@@ -391,39 +396,48 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
               <span>Link Start-Evaluation</span>
               <br />
               <EhDebounceInput
-                placeholder="URL eintragen"
-                onChangeHandler={handleSetStartQuestionaire}
-                inputText={program.startQuestionnaire || ""}
+                placeholder={`${t('register-something', {
+                  something: 'URL',
+                })}`}
+                onChangeHandler={handleSetStartQuestionnaire}
+                inputText={program.startQuestionnaire || ''}
               />
             </div>
             <div className="p-3">
               <span>Link Speaker-Evaluation</span>
               <br />
               <EhDebounceInput
-                placeholder="URL eintragen"
-                onChangeHandler={handleSetSpeakerQuestionaire}
-                inputText={program.speakerQuestionnaire || ""}
+                placeholder={`${t('register-something', {
+                  something: 'URL',
+                })}`}
+                onChangeHandler={handleSetSpeakerQuestionnaire}
+                inputText={program.speakerQuestionnaire || ''}
               />
             </div>
             <div className="p-3">
-              <span>Link Abschluss-Evaluation</span>
+              <span>{t('course-page:link-final-evaluation')}</span>
               <br />
               <EhDebounceInput
-                placeholder="URL eintragen"
-                onChangeHandler={handleSetClosingQuestionaire}
-                inputText={program.closingQuestionnaire || ""}
+                placeholder={`${t('register-something', {
+                  something: 'URL',
+                })}`}
+                onChangeHandler={handleSetClosingQuestionnaire}
+                inputText={program.closingQuestionnaire || ''}
               />
             </div>
 
             <div className="p-3">
-              Template Teilnahmenachweis
+              {`${t('course-page:template')} ${t(
+                'course-page:proof-of-participation'
+              )}`}
+
               <IconButton onClick={handleUploadTemplateParticipationClick}>
                 <MdUpload size="0.75em" />
               </IconButton>
               <br />
               <div className="w-80 truncate">
                 {program.participationCertificateTemplateURL ||
-                  "Noch kein Template hochgeladen"}
+                  t('course-page:no-template-uploaded-yet')}
               </div>
               <input
                 ref={templateUploadInputRef}
@@ -433,24 +447,26 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
               />
             </div>
             <div className="p-3">
-              Template Leistungszertifiat
-              <IconButton onClick={handleUploadAchivementTemplateClick}>
+              {`${t('course-page:template')} ${t(
+                'course-page:performance-certificate'
+              )}`}
+              <IconButton onClick={handleUploadAchievementTemplateClick}>
                 <MdUpload size="0.75em" />
               </IconButton>
               <br />
               <div className="w-80 truncate">
                 {program.attendanceCertificateTemplateURL ||
-                  "Noch kein Template hochgeladen"}
+                  t('course-page:no-template-uploaded-yet')}
               </div>
               <input
-                ref={templateAchivementUploadRef}
-                onChange={handleTemplateAchivementUploadEvent}
+                ref={templateAchievementUploadRef}
+                onChange={handleTemplateAchievementUploadEvent}
                 className="hidden"
                 type="file"
               />
             </div>
             <div className="p-3">
-              Bescheinigungen einblenden:
+              {`${t('course-page:show-certificates')}:`}
               <div className="grid grid-cols-10">
                 <div
                   className="cursor-pointer"
@@ -463,7 +479,9 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
                     <MdOutlineCheckBoxOutlineBlank size="1.5em" />
                   )}
                 </div>
-                <div className="col-span-9">Teilnahmenachweis</div>
+                <div className="col-span-9">
+                  {t('course-page:proof-of-participation')}
+                </div>
               </div>
               <div className="grid grid-cols-10">
                 <div
@@ -477,7 +495,9 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
                     <MdOutlineCheckBoxOutlineBlank size="1.5em" />
                   )}
                 </div>
-                <div className="col-span-9">Leistungszertifikat</div>
+                <div className="col-span-9">
+                  {t('course-page:performance-certificate')}
+                </div>
               </div>
             </div>
           </div>

@@ -68,13 +68,15 @@ select_permissions:
   - role: user_access
     permission:
       columns:
-        - id
-        - title
+        - created_at
+        - csvTemplateUrl
         - description
-        - recordType
         - documentationTemplateUrl
         - evaluationScriptUrl
-        - created_at
+        - id
+        - recordType
+        - showScoreAuthors
+        - title
         - updated_at
       filter: {}
 update_permissions:

@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
-import { USER_FRAGMENT } from "./userFragment";
+import { gql } from '@apollo/client';
+import { USER_FRAGMENT } from './userFragment';
 
 export const SESSION_FRAGMENT = gql`
   fragment SessionFragment on Session {

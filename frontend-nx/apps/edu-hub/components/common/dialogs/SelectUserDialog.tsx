@@ -1,23 +1,24 @@
-import { Dialog, DialogContent, DialogTitle } from "@material-ui/core";
-import { ChangeEvent, FC, useCallback, useState } from "react";
-import { MdClose } from "react-icons/md";
-import { useAdminQuery } from "../../../hooks/authedQuery";
+import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
+import useTranslation from 'next-translate/useTranslation';
+import { ChangeEvent, FC, useCallback, useState } from 'react';
+import { MdClose } from 'react-icons/md';
+import { useAuthedQuery } from '../../../hooks/authedQuery';
 import {
   USER_SELECTION_ONE_PARAM,
   USER_SELECTION_TWO_PARAMS,
-} from "../../../queries/user";
+} from '../../../queries/user';
 import {
   UserForSelection1,
   UserForSelection1Variables,
   UserForSelection1_User,
-} from "../../../queries/__generated__/UserForSelection1";
+} from '../../../queries/__generated__/UserForSelection1';
 import {
   UserForSelection2,
   UserForSelection2Variables,
-} from "../../../queries/__generated__/UserForSelection2";
+} from '../../../queries/__generated__/UserForSelection2';
 
-import { Button } from "../Button";
-import SelectUserRow from "./SelectUserRow";
+import { Button } from '../Button';
+import SelectUserRow from './SelectUserRow';
 
 interface IProps {
   title: string;
@@ -26,7 +27,7 @@ interface IProps {
 }
 
 const getSearchVars = (searchValue: string) => {
-  const split = searchValue.split(" ");
+  const split = searchValue.split(' ');
   if (split.length > 1) {
     return {
       searchValue1: `%${split[0]}%`,
@@ -35,7 +36,7 @@ const getSearchVars = (searchValue: string) => {
   } else {
     return {
       searchValue1: `%${searchValue}%`,
-      searchValue2: "",
+      searchValue2: '',
     };
   }
 };
@@ -43,7 +44,7 @@ const getSearchVars = (searchValue: string) => {
 // Search user by some search value (partial name or email)
 // then select the user from a select
 export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const handleNewInput = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       setSearchValue(event.target.value);
@@ -52,12 +53,12 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
   );
 
   const handleCancel = useCallback(() => {
-    setSearchValue("");
+    setSearchValue('');
     onClose(false, null);
   }, [onClose]);
   const handleConfirm = useCallback(
     (user: UserForSelection1_User) => {
-      setSearchValue("");
+      setSearchValue('');
       onClose(true, user);
     },
     [onClose]
@@ -68,27 +69,28 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
   // Thus I have defined two query types and they are used depending on the provided input
 
   // in case there is no space just search with the full value
-  const result1 = useAdminQuery<UserForSelection1, UserForSelection1Variables>(
+  const result1 = useAuthedQuery<UserForSelection1, UserForSelection1Variables>(
     USER_SELECTION_ONE_PARAM,
     {
       variables: {
         searchValue: `%${searchValue.trim()}%`,
       },
-      skip: searchValue.length < 3 || searchValue.trim().includes(" "),
+      skip: searchValue.length < 3 || searchValue.trim().includes(' '),
     }
   );
   // in case there is a space search for a user that has a fitting first and last name
   // by splitting the search string
-  const result2 = useAdminQuery<UserForSelection2, UserForSelection2Variables>(
+  const result2 = useAuthedQuery<UserForSelection2, UserForSelection2Variables>(
     USER_SELECTION_TWO_PARAMS,
     {
       variables: getSearchVars(searchValue.trim()),
-      skip: searchValue.length < 3 || !searchValue.trim().includes(" "),
+      skip: searchValue.length < 3 || !searchValue.trim().includes(' '),
     }
   );
 
   const users = [...(result1.data?.User || []), ...(result2.data?.User || [])];
 
+  const { t } = useTranslation();
   return (
     <Dialog open={open} onClose={handleCancel}>
       <DialogTitle>
@@ -101,12 +103,7 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
       </DialogTitle>
 
       <DialogContent>
-        <div>
-          Suche Nutzer anhand Vorname, Nachname oder E-Mail.
-          <br />
-          Mindestens 3 Buchstaben eingeben. <br />
-          Nutzer per Klick auswählen.
-        </div>
+        <div>{t('type-name-email-minimum-3-letters')}</div>
 
         <div>
           <input
@@ -126,7 +123,7 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
 
         <div className="grid grid-cols-2 mb-2">
           <div>
-            <Button onClick={handleCancel}>Abbrechen</Button>
+            <Button onClick={handleCancel}>{t('cancel')}</Button>
           </div>
           <div />
         </div>

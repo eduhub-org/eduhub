@@ -1,7 +1,8 @@
-import { Dialog, DialogTitle } from "@material-ui/core";
-import { ChangeEvent, FC, useCallback, useState } from "react";
-import { MdClose } from "react-icons/md";
-import { Button } from "../../common/Button";
+import { Dialog, DialogTitle } from '@material-ui/core';
+import useTranslation from 'next-translate/useTranslation';
+import { ChangeEvent, FC, useCallback, useState } from 'react';
+import { MdClose } from 'react-icons/md';
+import { Button } from '../../common/Button';
 
 interface IProps {
   question: string;
@@ -18,15 +19,16 @@ export const InputDialog: FC<IProps> = ({
   open,
   confirmText,
 }) => {
-  const [currentValue, setCurrentValue] = useState("");
+  const { t } = useTranslation();
+  const [currentValue, setCurrentValue] = useState('');
 
   const handleCancel = useCallback(() => {
     onClose(false, currentValue);
-    setCurrentValue("");
+    setCurrentValue('');
   }, [onClose, currentValue]);
   const handleConfirm = useCallback(() => {
     onClose(true, currentValue);
-    setCurrentValue("");
+    setCurrentValue('');
   }, [onClose, currentValue]);
   const handleNewInput = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -39,7 +41,7 @@ export const InputDialog: FC<IProps> = ({
     <Dialog open={open} onClose={handleCancel}>
       <DialogTitle>
         <div className="grid grid-cols-2">
-          <div>Eingabe</div>
+          <div>{t('input')}</div>
           <div className="cursor-pointer flex justify-end">
             <MdClose onClick={handleCancel} />
           </div>
@@ -60,7 +62,7 @@ export const InputDialog: FC<IProps> = ({
           </div>
 
           <div className="col-span-3">
-            <Button onClick={handleCancel}>Abbrechen</Button>
+            <Button onClick={handleCancel}>{t('cancel')}</Button>
           </div>
           <div className="col-span-3 flex justify-end">
             <Button filled onClick={handleConfirm}>

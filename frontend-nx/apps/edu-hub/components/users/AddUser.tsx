@@ -1,33 +1,33 @@
-import { ChangeEvent, FC, useCallback, useState } from "react";
+import { ChangeEvent, FC, useCallback, useState } from 'react';
 import {
   SelectComponentProperty,
   StaticComponentProperty,
-} from "../../types/UIComponents";
-import EhButton from "../common/EhButton";
-import EhCheckBox2 from "../common/EhCheckBox2";
-import EhPassword from "../common/EhPassword";
-import { useAdminQuery } from "../../hooks/authedQuery";
+} from '../../types/UIComponents';
+import EhButton from '../common/EhButton';
+import EhCheckBox2 from '../common/EhCheckBox2';
+import EhPassword from '../common/EhPassword';
+import { useAdminQuery } from '../../hooks/authedQuery';
 import {
   UnversityByComment,
   UnversityByComment_University,
-} from "../../queries/__generated__/UnversityByComment";
-import { UNIVERSITY_LIST } from "../../queries/university";
-import Loading from "../courses/Loading";
-import { EMPLOYMENT_LIST } from "../../queries/employment";
+} from '../../queries/__generated__/UnversityByComment';
+import { UNIVERSITY_LIST } from '../../queries/university';
+import Loading from '../courses/Loading';
+import { EMPLOYMENT_LIST } from '../../queries/employment';
 import {
   EmplomentByValue,
   EmplomentByValue_Employment,
-} from "../../queries/__generated__/EmplomentByValue";
-import { useAdminMutation } from "../../hooks/authedMutation";
+} from '../../queries/__generated__/EmplomentByValue';
+import { useAdminMutation } from '../../hooks/authedMutation';
 import {
   InsertSingleUser,
   InsertSingleUserVariables,
-} from "../../queries/__generated__/InsertSingleUser";
-import { INSERT_A_USER } from "../../queries/insertUser";
+} from '../../queries/__generated__/InsertSingleUser';
+import { INSERT_A_USER } from '../../queries/insertUser';
 import {
   Employment_enum,
   University_enum,
-} from "../../__generated__/globalTypes";
+} from '../../__generated__/globalTypes';
 
 interface IProps {
   t: any;
@@ -86,14 +86,14 @@ const AddUserForm: FC<IPropsFrom> = ({
   universities,
   employmentList,
 }) => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
   const [status, setStatus] = useState(Employment_enum.EMPLOYED);
   const [school, setSchool] = useState(University_enum.CAU_KIEL);
-  const [studentId, setStudentId] = useState("");
-  const [schoolName, setSchoolName] = useState("");
-  const [, setPassword] = useState("");
+  const [studentId, setStudentId] = useState('');
+  const [schoolName, setSchoolName] = useState('');
+  const [, setPassword] = useState('');
 
   const [adminCheckBox, setAdminCheckBox] = useState<StaticComponentProperty>({
     key: 0,
@@ -119,7 +119,6 @@ const AddUserForm: FC<IPropsFrom> = ({
   const selectUniversity = 2;
   const onSelectChange = useCallback(
     (key: number, value: string) => {
-      console.log(key, value);
       switch (key) {
         case selectStatus:
           setStatus(value as Employment_enum);
@@ -157,15 +156,15 @@ const AddUserForm: FC<IPropsFrom> = ({
     await insertUser({
       variables: {
         user: {
-          id: "895cb63d-fe50-4cf0-9e0d-ca8a48770807",
+          id: '895cb63d-fe50-4cf0-9e0d-ca8a48770807',
           Admins: adminCheckBox.selected
             ? {
-              data: [
-                {
-                  userId: "895cb63d-fe50-4cf0-9e0d-ca8a48770807",
-                },
-              ],
-            }
+                data: [
+                  {
+                    userId: '895cb63d-fe50-4cf0-9e0d-ca8a48770807',
+                  },
+                ],
+              }
             : null,
           firstName,
           lastName,
@@ -195,7 +194,7 @@ const AddUserForm: FC<IPropsFrom> = ({
   ]);
 
   const inputBoxClass =
-    "h-15 bg-transparent transition ease-in-out border-b border-solid border-gray-300 focus:border-blue-600 focus:outline-none";
+    'h-15 bg-transparent transition ease-in-out border-b border-solid border-gray-300 focus:border-blue-600 focus:outline-none';
   return (
     <>
       <div className="flex flex-col space-y-5 p-10">
@@ -206,20 +205,20 @@ const AddUserForm: FC<IPropsFrom> = ({
         ) : null}
         <div className="grid grid-cols-12 gap-5">
           <div className="flex flex-col space-y-5 col-span-5">
-            <span> {t("firstName")} </span>
-            <span> {t("lastName")} </span>
-            <span> {t("email")} </span>
-            <span> {t("password")} </span>
-            <span> {t("employmentStatus")} </span>
-            <span> {t("university")} </span>
-            <span> {t("nameOfUniversity")} </span>
-            <span> {t("matriculationNumber")} </span>
-            <span> {t("administrator")} </span>
+            <span> {t('firstName')} </span>
+            <span> {t('lastName')} </span>
+            <span> {t('email')} </span>
+            <span> {t('password')} </span>
+            <span> {t('employmentStatus')} </span>
+            <span> {t('university')} </span>
+            <span> {t('nameOfUniversity')} </span>
+            <span> {t('matriculationNumber')} </span>
+            <span> {t('administrator')} </span>
           </div>
           <div className="flex flex-col space-y-5 col-span-7">
             <input
               className={inputBoxClass}
-              placeholder={`${t("firstName")}*`}
+              placeholder={`${t('firstName')}*`}
               value={firstName}
               onChange={useCallback(
                 (e: ChangeEvent<HTMLInputElement>) =>
@@ -229,7 +228,7 @@ const AddUserForm: FC<IPropsFrom> = ({
             />
             <input
               className={inputBoxClass}
-              placeholder={`${t("lastName")}*`}
+              placeholder={`${t('lastName')}*`}
               value={lastName}
               onChange={useCallback(
                 (e: ChangeEvent<HTMLInputElement>) =>
@@ -244,13 +243,13 @@ const AddUserForm: FC<IPropsFrom> = ({
                 (e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
                 [setEmail]
               )}
-              placeholder={`${t("email")}*`}
+              placeholder={`${t('email')}*`}
             />
             <EhPassword
               property={{
                 key: 0,
                 onChangeHandler: passwordChangeHandler,
-                placeHolder: `${t("password")}*`,
+                placeHolder: `${t('password')}*`,
               }}
             />
             <UserSelect
@@ -265,7 +264,7 @@ const AddUserForm: FC<IPropsFrom> = ({
             <input
               className={inputBoxClass}
               value={schoolName}
-              placeholder={`${t("nameOfUniversity")}*`}
+              placeholder={`${t('nameOfUniversity')}*`}
               disabled={school !== University_enum.OTHER}
               onChange={useCallback(
                 (e: ChangeEvent<HTMLInputElement>) =>
@@ -277,7 +276,7 @@ const AddUserForm: FC<IPropsFrom> = ({
             <input
               className={inputBoxClass}
               value={studentId}
-              placeholder={`${t("matriculationNumber")}*`}
+              placeholder={`${t('matriculationNumber')}*`}
               onChange={useCallback(
                 (e: ChangeEvent<HTMLInputElement>) => {
                   setStudentId(e.target.value);
@@ -295,7 +294,7 @@ const AddUserForm: FC<IPropsFrom> = ({
           {loading ? (
             <Loading />
           ) : (
-            <EhButton buttonText={t("save")} onClickCallback={handleSave} />
+            <EhButton buttonText={t('save')} onClickCallback={handleSave} />
           )}
         </div>
       </div>
@@ -338,7 +337,7 @@ const UserSelect: FC<IProsSelect> = ({
     <select
       className={selectStyle}
       onChange={onSelectChanged}
-      value={selelectedValue ?? ""}
+      value={selelectedValue ?? ''}
     >
       {componentProperty.options.map((option, index) => (
         <option key={option.value} value={option.value}>

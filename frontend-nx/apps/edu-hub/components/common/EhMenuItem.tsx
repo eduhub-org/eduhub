@@ -1,5 +1,5 @@
-import { FC, useCallback } from "react";
-import { StaticComponentProperty } from "../../types/UIComponents";
+import { FC, useCallback } from 'react';
+import { StaticComponentProperty } from '../../types/UIComponents';
 
 interface IPros {
   property: StaticComponentProperty;
@@ -15,8 +15,8 @@ const EhMenuItem: FC<IPros> = ({ property, onClickCallback }) => {
     <a
       onClick={tabClickCallback}
       href="#!"
-      className={`font-mormal border-b-2 border-solid hover:border-black px-6 focus:outline-none ${
-        property.selected ? "border-black font-bold" : "border-white"
+      className={`border-b-2 border-solid hover:border-black px-6 focus:outline-none ${
+        property.selected ? 'border-black font-bold' : 'border-white'
       }`}
     >
       {property.label && property.label}

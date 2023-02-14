@@ -1,11 +1,11 @@
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { FC } from "react";
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { FC } from 'react';
 
-import { Page } from "../../components/Page";
-import AuthorizedCoursePage from "../../components/course/AuthorizedCoursePage";
-import UnauthorizedCoursePage from "../../components/course/UnauthorizedCoursePage";
-import { useIsLoggedIn } from "../../hooks/authentication";
+import { Page } from '../../components/Page';
+import AuthorizedCoursePage from '../../components/course/AuthorizedCoursePage';
+import UnauthorizedCoursePage from '../../components/course/UnauthorizedCoursePage';
+import { useIsLoggedIn } from '../../hooks/authentication';
 
 // export const getStaticProps = async ({ locale }: { locale: string }) => ({
 //   props: {
@@ -36,7 +36,7 @@ const CoursePage: FC = () => {
   const id = parseInt(courseId as string, 10);
   const defaultTab = isLoggedIn ? 1 : 0;
   const tab =
-    typeof tabParam === "string" ? parseInt(tabParam, 10) : defaultTab;
+    typeof tabParam === 'string' ? parseInt(tabParam, 10) : defaultTab;
 
   return (
     <div>

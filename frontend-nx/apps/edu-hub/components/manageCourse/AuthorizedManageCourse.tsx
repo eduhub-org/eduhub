@@ -1,28 +1,26 @@
-import { FC, useCallback, useState } from "react";
-import { useAdminQuery } from "../../hooks/authedQuery";
-import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from "../../queries/course";
+import useTranslation from 'next-translate/useTranslation';
+import { FC, useCallback, useState } from 'react';
+import { useInstructorMutation } from '../../hooks/authedMutation';
+import { useAdminQuery } from '../../hooks/authedQuery';
+import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from '../../queries/course';
 import {
   ManagedCourse,
   ManagedCourseVariables,
   ManagedCourse_Course_by_pk,
-} from "../../queries/__generated__/ManagedCourse";
-import { CourseStatus_enum } from "../../__generated__/globalTypes";
-import { PageBlock } from "../common/PageBlock";
-import { Button as OldButton } from "../common/Button";
-import { DescriptionTab } from "./DescriptionTab";
-import { QuestionConfirmationDialog } from "../common/dialogs/QuestionConfirmationDialog";
-import { useInstructorMutation } from "../../hooks/authedMutation";
+} from '../../queries/__generated__/ManagedCourse';
 import {
   UpdateCourseStatus,
   UpdateCourseStatusVariables,
-} from "../../queries/__generated__/UpdateCourseStatus";
-import { AlertMessageDialog } from "../common/dialogs/AlertMessageDialog";
-import { SessionsTab } from "./SessionsTab";
-import { ApplicationTab } from "./ApplicationTab";
-import ManageCourseEnrollment from "./ManageCourseEnrollment";
-import { ContentRow } from "../common/ContentRow";
-import { BlockTitle } from "@opencampus/shared-components";
-import CourseAchievementOption from "../course/course-achievement-option/CourseAchievementOption";
+} from '../../queries/__generated__/UpdateCourseStatus';
+import { CourseStatus_enum } from '../../__generated__/globalTypes';
+import { Button as OldButton } from '../common/Button';
+import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
+import { QuestionConfirmationDialog } from '../common/dialogs/QuestionConfirmationDialog';
+import { PageBlock } from '../common/PageBlock';
+import { ApplicationTab } from './ApplicationTab';
+import { DescriptionTab } from './DescriptionTab';
+import ManageCourseEnrollment from './ManageCourseEnrollment';
+import { SessionsTab } from './SessionsTab';
 
 interface Props {
   courseId: number;
@@ -55,24 +53,24 @@ const determineTabClasses = (
   const maxAllowedTab = determineMaxAllowedTab(courseStatus);
 
   if (tabIndex === selectedTabIndex) {
-    return "bg-edu-black text-white";
+    return 'bg-edu-black text-white';
   }
 
   if (tabIndex < maxAllowedTab) {
-    return "bg-edu-confirmed cursor-pointer";
+    return 'bg-edu-confirmed cursor-pointer';
   }
 
   if (tabIndex === maxAllowedTab) {
-    return "bg-edu-dark-gray cursor-pointer";
+    return 'bg-edu-dark-gray cursor-pointer';
   }
 
-  return "bg-edu-light-gray";
+  return 'bg-edu-light-gray';
 };
 
 const canUpgradeStatus = (course: ManagedCourse_Course_by_pk) => {
   const isFilled = (x: string | null) => x != null && x.length > 0;
 
-  if (course.status === "DRAFT") {
+  if (course.status === 'DRAFT') {
     return (
       isFilled(course.learningGoals) &&
       isFilled(course.headingDescriptionField1) &&
@@ -81,7 +79,7 @@ const canUpgradeStatus = (course: ManagedCourse_Course_by_pk) => {
       isFilled(course.contentDescriptionField2) &&
       course.CourseLocations.length > 0
     );
-  } else if (course.status === "READY_FOR_PUBLICATION") {
+  } else if (course.status === 'READY_FOR_PUBLICATION') {
     return (
       course.Sessions.length > 0 &&
       course.Sessions.every(
@@ -93,11 +91,11 @@ const canUpgradeStatus = (course: ManagedCourse_Course_by_pk) => {
           session.SessionAddresses.length > 0
       ) &&
       new Set(course.Sessions.map((s) => s.title)).size ===
-      course.Sessions.length
+        course.Sessions.length
     );
-  } else if (course.status === "READY_FOR_APPLICATION") {
+  } else if (course.status === 'READY_FOR_APPLICATION') {
     return (
-      course.CourseEnrollments.find((e) => e.status === "CONFIRMED") != null
+      course.CourseEnrollments.find((e) => e.status === 'CONFIRMED') != null
     );
   } else {
     return false;
@@ -106,12 +104,12 @@ const canUpgradeStatus = (course: ManagedCourse_Course_by_pk) => {
 
 const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
   switch (course.status) {
-    case "DRAFT":
-      return "READY_FOR_PUBLICATION";
-    case "READY_FOR_PUBLICATION":
-      return "READY_FOR_APPLICATION";
-    case "READY_FOR_APPLICATION":
-      return "APPLICANTS_INVITED";
+    case 'DRAFT':
+      return 'READY_FOR_PUBLICATION';
+    case 'READY_FOR_PUBLICATION':
+      return 'READY_FOR_APPLICATION';
+    case 'READY_FOR_APPLICATION':
+      return 'APPLICANTS_INVITED';
     default:
       return course.status;
   }
@@ -132,6 +130,7 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  * @returns {any} the component
  */
 export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
+  const { t } = useTranslation();
   const qResult = useAdminQuery<ManagedCourse, ManagedCourseVariables>(
     MANAGED_COURSE,
     {
@@ -142,14 +141,14 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
   );
 
   if (qResult.error) {
-    console.log("query managed course error!", qResult.error);
+    console.log('query managed course error!', qResult.error);
   }
 
   const course: ManagedCourse_Course_by_pk | null =
     qResult.data?.Course_by_pk || null;
 
   const maxAllowedTab = determineMaxAllowedTab(
-    course?.status || ("DRAFT" as any)
+    course?.status || ('DRAFT' as any)
   );
 
   const [openTabIndex, setOpenTabIndex] = useState(0);
@@ -218,7 +217,9 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
   );
 
   if (course == null) {
-    return <div>Kurs {courseId} wurde nicht gefunden!</div>;
+    return (
+      <div>{t('course-page:course-not-found', { courseId: courseId })}</div>
+    );
   }
 
   return (
@@ -238,7 +239,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
               )}`}
               onClick={openTab0}
             >
-              Kurzbeschreibung
+              {t('course-page:brief-description')}
             </div>
 
             <div
@@ -249,7 +250,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
               )}`}
               onClick={openTab1}
             >
-              Termine
+              {t('course-page:appointments')}
             </div>
 
             <div
@@ -260,7 +261,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
               )}`}
               onClick={openTab2}
             >
-              Bewerbungen
+              {t('course-page:applications')}
             </div>
 
             <div
@@ -271,7 +272,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
               )}`}
               onClick={openTab3}
             >
-              Teilnahmen & Leistungen
+              {t('course-page:participation-and-benefits')}
             </div>
           </div>
 
@@ -297,45 +298,23 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
                 as="button"
                 filled={true}
               >
-                Weiter
+                {t('next')}
               </OldButton>
-            </div>
-          )}
-
-          {maxAllowedTab === 3 && (
-            <div className="flex justify-end mb-16">
-              <OldButton filled={true}>Zertifikate generieren</OldButton>
             </div>
           )}
         </>
       </PageBlock>
       <QuestionConfirmationDialog
-        question={`Möchtest du den Kurs in den nächsten Status schieben?`}
-        confirmationText={"Status hochsetzen"}
+        question={t('course-page:confirmation-push-the-course-to-next-status')}
+        confirmationText={t('course-page:set-status-high')}
         onClose={handleUpgradeStatus}
         open={isConfirmUpgradeStatusOpen}
       />
       <AlertMessageDialog
-        alert={`Bitte alle Felder ausfüllen bevor der Kurs in den nächsten Status gesetzt wird!`}
-        confirmationText={"OK"}
+        alert={t('course-page:please-fill-in-all-fields-to-proceed-further')}
+        confirmationText={'OK'}
         onClose={handleCloseCantUpgrade}
         open={isCantUpgradeOpen}
-      />
-
-      <ContentRow
-        className="my-24"
-        leftTop={
-          <div className="flex flex-1">
-            <BlockTitle>Anwesenheit</BlockTitle>
-          </div>
-        }
-        rightBottom={
-          <div className="flex flex-1">
-            {course.achievementCertificatePossible && (
-              <CourseAchievementOption course={course} />
-            )}
-          </div>
-        }
       />
     </>
   );

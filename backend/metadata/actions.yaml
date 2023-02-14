@@ -42,6 +42,8 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+    permissions:
+      - role: user_access
   - name: loadAchievementOptionEvaluationScript
     definition:
       kind: ""
@@ -50,7 +52,9 @@ actions:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
-          value_from_env: ' HASURA_BUCKET'
+          value_from_env: HASURA_BUCKET
+    permissions:
+      - role: user_access
   - name: loadAchievementRecordDocumentation
     definition:
       kind: ""
@@ -103,7 +107,7 @@ actions:
       kind: synchronous
       handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE}}'
       headers:
-        - name: secert
+        - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
@@ -114,7 +118,7 @@ actions:
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: hasura
+        - name: bucket
           value_from_env: HASURA_BUCKET
   - name: saveAchievementRecordCoverImage
     definition:
@@ -136,6 +140,8 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+    permissions:
+      - role: user_access
   - name: saveCourseImage
     definition:
       kind: synchronous
