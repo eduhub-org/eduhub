@@ -1,4 +1,29 @@
 type Query {
+  createAchievementCertificate(
+    template: String!
+    firstname: String!
+    lastname: String!
+    semester: String!
+    course_name: String!
+    ects: String!
+    practical_project: String!
+    online_courses: String!
+    certificate_text: String!
+  ): createCertificateOutput
+}
+
+type Query {
+  createParticipationCertificate(
+    template: String!
+    firstname: String!
+    lastname: String!
+    semester: String!
+    course_name: String!
+    event_entries: [String!]
+  ): createCertificateOutput
+}
+
+type Query {
   loadAchievementCertificate(
     path: String!
   ): loadFileOutput
@@ -135,5 +160,9 @@ type result {
 type saveFileOutput {
   google_link: String!
   path: String!
+}
+
+type createCertificateOutput {
+  pdf: String!
 }
 

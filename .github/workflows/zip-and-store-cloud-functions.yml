@@ -50,6 +50,8 @@ jobs:
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementOptionDocumentationTemplate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionDocumentationTemplate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionEvaluationScript/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/createAchievementCertificate/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/createParticipationCertificate/lib/'
 
       - name: Zip Archive for callPythonFunction
         uses: thedoctor0/zip-release@main
@@ -218,6 +220,20 @@ jobs:
           type: "zip"
           directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/addKeycloakRole"
           filename: "../addKeycloakRole.zip"
+
+      - name: Zip Archive for createAchievementCertificate
+        uses: thedoctor0/zip-release@main
+        with:
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/createAchievementCertificate"
+          filename: "../createAchievementCertificate.zip"
+
+      - name: Zip Archive for createParticipationCertificate
+        uses: thedoctor0/zip-release@main
+        with:
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/createParticipationCertificate"
+          filename: "../createParticipationCertificate.zip"
 
       - name: Authenticate to Google Cloud
         id: "auth"
