@@ -176,23 +176,22 @@ const Home: FC = () => {
           </div>
         </div>
         <ClientOnly>
-          {/* <OnlyLoggedIn>
-            {coursesGroupsAuthenticated.map((group, index) =>
-              group.courses.length > 0 ? (
-                <>
-                  <h2
-                    id={`sliderGroup${index + 1}`}
-                    className="text-2xl font-semibold text-left mt-20"
-                  >
-                    {t(group.title)}
-                  </h2>
-                  <div className="mt-2">
-                    <TileSlider courses={group.courses} />
-                  </div>
-                </>
-              ) : null
-            )}
-          </OnlyLoggedIn> */}
+          {/* <OnlyLoggedIn></OnlyLoggedIn> */}
+          {coursesGroupsAuthenticated.map((group, index) =>
+            group.courses.length > 0 ? (
+              <>
+                <h2
+                  id={`sliderGroup${index + 1}`}
+                  className="text-2xl font-semibold text-left mt-20"
+                >
+                  {t(group.title)}
+                </h2>
+                <div className="mt-2">
+                  <TileSlider courses={group.courses} />
+                </div>
+              </>
+            ) : null
+          )}
 
           {coursesGroups.map((group, index) =>
             group.courses.length > 0 ? (
@@ -204,7 +203,7 @@ const Home: FC = () => {
                   {t(group.title)}
                 </h2>
                 <div className="mt-2">
-                  <TileSlider courses={publishedCourses} />
+                  <TileSlider courses={group.courses} />
                 </div>
               </>
             ) : null
