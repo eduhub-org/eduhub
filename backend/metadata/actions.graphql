@@ -59,14 +59,14 @@ type Mutation {
 type Mutation {
   saveAchievementOptionDocumentationTemplate(
     base64file: String!
-    courseid: Int!
+    achievementOptionId: Int!
   ): saveFileOutput
 }
 
 type Mutation {
   saveAchievementOptionEvaluationScript(
     base64file: String!
-    courseid: Int!
+    achievementOptionId: Int!
   ): saveFileOutput
 }
 

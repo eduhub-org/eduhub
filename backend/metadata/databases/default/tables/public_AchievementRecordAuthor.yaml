@@ -28,3 +28,11 @@ select_permissions:
         - updated_at
         - userId
       filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - achievementRecordId
+        - created_at
+        - id
+        - userId
+      filter: {}

@@ -1,6 +1,6 @@
-import { ChangeEvent, FC, useCallback } from "react";
-import { DebounceInput } from "react-debounce-input";
-import { MdSearch } from "react-icons/md";
+import { ChangeEvent, FC, useCallback } from 'react';
+import { DebounceInput } from 'react-debounce-input';
+import { MdSearch } from 'react-icons/md';
 
 interface IProps {
   placeholder: string;
@@ -10,7 +10,7 @@ interface IProps {
   autoFocus?: boolean;
 }
 
-const Searchbar: FC<IProps> = ({
+const SearchBox: FC<IProps> = ({
   placeholder,
   searchText,
   debounceTime,
@@ -33,7 +33,7 @@ const Searchbar: FC<IProps> = ({
         <DebounceInput
           className="px-4 py-2 focus:outline-none"
           debounceTimeout={debounceTime ?? 1000}
-          value={searchText ?? ""}
+          value={searchText ?? ''}
           onChange={onChange}
           placeholder={placeholder}
           autoFocus={autoFocus ?? false}
@@ -43,4 +43,4 @@ const Searchbar: FC<IProps> = ({
   );
 };
 
-export default Searchbar;
+export default SearchBox;

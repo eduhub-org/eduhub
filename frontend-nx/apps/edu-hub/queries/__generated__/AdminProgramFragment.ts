@@ -11,6 +11,30 @@ export interface AdminProgramFragment {
   __typename: "Program";
   id: number;
   /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
+  /**
+   * The last day a course lecture can possibly be in this program.
+   */
+  lectureEnd: any | null;
+  /**
+   * The deadline for the achievement record uploads.
+   */
+  achievementRecordUploadDeadline: any | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+  /**
    * The day the application for all courses of the program start.
    */
   applicationStart: any | null;
@@ -31,25 +55,9 @@ export interface AdminProgramFragment {
    */
   defaultMaxMissedSessions: number | null;
   /**
-   * The last day a course lecture can possibly be in this program.
-   */
-  lectureEnd: any | null;
-  /**
-   * The first day a course lecture can possibly be in this program.
-   */
-  lectureStart: any | null;
-  /**
    * The URL to the pdf template for the attendance certificate
    */
   participationCertificateTemplateURL: string | null;
-  /**
-   * The deadline for the achievement record uploads.
-   */
-  achievementRecordUploadDeadline: any | null;
-  /**
-   * The 6 letter short title for the program.
-   */
-  shortTitle: string | null;
   /**
    * The questionnaire that is sent after all course sessions including a speaker.
    */
@@ -58,14 +66,6 @@ export interface AdminProgramFragment {
    * The questionnaire that the participants of all courses get sent after the first session of their course.
    */
   startQuestionnaire: string | null;
-  /**
-   * The title of the program
-   */
-  title: string;
-  /**
-   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
-   */
-  published: boolean;
   /**
    * Defines whether the tab for this course program is shown or not.
    */

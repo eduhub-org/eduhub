@@ -1,8 +1,9 @@
-import { Dialog, DialogTitle } from "@material-ui/core";
-import { FC, useCallback } from "react";
-import { MdClose } from "react-icons/md";
+import { Dialog, DialogTitle } from '@material-ui/core';
+import useTranslation from 'next-translate/useTranslation';
+import { FC, useCallback } from 'react';
+import { MdClose } from 'react-icons/md';
 
-import { Button } from "../../common/Button";
+import { Button } from '../../common/Button';
 
 interface AlertProps {
   alert: string;
@@ -18,12 +19,12 @@ export const AlertMessageDialog: FC<AlertProps> = ({
   onClose,
 }) => {
   const handleClose = useCallback(() => onClose(), [onClose]);
-
+  const { t } = useTranslation();
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>
         <div className="grid grid-cols-2">
-          <div>Achtung</div>
+          <div>{t('warning')}</div>
           <div className="cursor-pointer flex justify-end">
             <MdClose onClick={handleClose} />
           </div>

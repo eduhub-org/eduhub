@@ -1,103 +1,124 @@
-import { createContext, FC, MouseEvent, useCallback, useState } from "react";
-import { IUserProfile } from "../../../hooks/user";
-import { ManagedCourse_Course_by_pk } from "../../../queries/__generated__/ManagedCourse";
-import { useKeycloakUserProfile, useUserId } from "../../../hooks/user";
-import AchievementOptionDropDown from "../../achievements/AchievementOptionDropDown";
+import {
+  createContext,
+  FC,
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+import { IUserProfile } from '../../../hooks/user';
+import { useKeycloakUserProfile, useUserId } from '../../../hooks/user';
+import AchievementOptionDropDown from '../../achievements/AchievementOptionDropDown';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
-  AchievementOptionCourses_AchievementOptionCourse,
-} from "../../../queries/__generated__/AchievementOptionCourses";
-import { Button } from "../../common/Button";
-import { useAdminQuery } from "../../../hooks/authedQuery";
-import { ACHIEVEMENT_OPTION_COURSES } from "../../../queries/achievementOptionCourse";
-import { BlockTitle } from "@opencampus/shared-components";
-import ModalControl from "../../common/ModalController";
-import ProjectResultsUpload from "./ProjectResultsUpload";
+} from '../../../queries/__generated__/AchievementOptionCourses';
+import { Button } from '../../common/Button';
+import { useAuthedQuery } from '../../../hooks/authedQuery';
+import { BlockTitle } from '@opencampus/shared-components';
+import FormToUploadAchievementRecord from './FormToUploadAchievementRecord';
+import {
+  makeFullName,
+  formattedDate,
+  formattedDateWithTime,
+} from '../../../helpers/util';
+import { AlertMessageDialog } from '../../common/dialogs/AlertMessageDialog';
+import { Translate } from 'next-translate';
+import { ACHIEVEMENT_OPTION_COURSES } from '../../../queries/achievementOption';
 
+import { order_by } from '../../../__generated__/globalTypes';
 import {
-  ACHIEVEMENT_RECORD_LIST,
-} from "../../../queries/achievementRecord";
-import {
-  AchievementRecordList,
-  AchievementRecordListVariables,
-} from "../../../queries/__generated__/AchievementRecordList";
-import { makeFullName } from "../../../helpers/util";
+  AchievementRecordListWithAuthors,
+  AchievementRecordListWithAuthorsVariables,
+  AchievementRecordListWithAuthors_AchievementRecord,
+} from '../../../queries/__generated__/AchievementRecordListWithAuthors';
+import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../../queries/achievementRecord';
+import { Link } from '@material-ui/core';
+import { MinAchievementOption } from '../../../helpers/achievement';
 interface IContext {
-  course: ManagedCourse_Course_by_pk;
+  achievementRecordUploadDeadline: any;
+  courseTitle: string;
   userId: string | undefined;
   userProfile: IUserProfile | undefined;
+  t: Translate;
+  setAlertMessage: (value: string) => void;
 }
 
-export const ProjectResutlUploadContext = createContext({} as IContext);
+export const ProjectResultUploadContext = createContext({} as IContext);
 
 interface IProps {
-  course: ManagedCourse_Course_by_pk;
+  courseId: number;
+  achievementRecordUploadDeadline: any;
+  t: Translate;
+  courseTitle: string;
 }
 
-const CourseAchievementOption: FC<IProps> = ({ course }) => {
+const CourseAchievementOption: FC<IProps> = ({
+  courseId,
+  achievementRecordUploadDeadline,
+  courseTitle,
+  t,
+}) => {
   const userId = useUserId();
   const profile = useKeycloakUserProfile();
   const [showModal, setShowModal] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [myRecords, setMyRecords] = useState(
+    null as AchievementRecordListWithAuthors_AchievementRecord
+  );
 
-  const [selectedAhievementOption, setSelectedAhievementOption] = useState(
-    {} as AchievementOptionCourses_AchievementOptionCourse
+  const [selectedAchievementOption, setSelectedAchievementOption] = useState(
+    {} as MinAchievementOption
   );
   const [isVisibleAchievementOptions, setAchievementOptionVisibility] =
     useState(false);
   const [archiveOptionsAnchorElement, setAnchorElement] =
     useState<HTMLElement>();
-  /* #region Database*/
-  const achievementOptionCourseRequest = useAdminQuery<
+  const [achievementOptions, setAchievementOptions] = useState(
+    [] as MinAchievementOption[]
+  );
+
+  /* #region Database */
+  const query = useAuthedQuery<
     AchievementOptionCourses,
     AchievementOptionCoursesVariables
-  >(ACHIEVEMENT_OPTION_COURSES, {
-    variables: {
-      where:
-        course && course.id
-          ? {
-            courseId: { _eq: course.id },
-          }
-          : {},
-    },
-  });
+  >(ACHIEVEMENT_OPTION_COURSES);
 
-  const aCourseList = [
-    ...(achievementOptionCourseRequest.data?.AchievementOptionCourse || []),
-  ];
+  useEffect(() => {
+    const options = [...(query.data?.AchievementOptionCourse || [])];
+    setAchievementOptions(options.map((options) => options.AchievementOption));
+  }, [query.data?.AchievementOptionCourse]);
 
-  const achievementRecordListAPI = useAdminQuery<
-    AchievementRecordList,
-    AchievementRecordListVariables
-  >(ACHIEVEMENT_RECORD_LIST, {
+  const myRecordsQuery = useAuthedQuery<
+    AchievementRecordListWithAuthors,
+    AchievementRecordListWithAuthorsVariables
+  >(ACHIEVEMENT_RECORDS_WITH_AUTHORS, {
     variables: {
       where: {
         _and: [
           {
             achievementOptionId: {
-              _eq: selectedAhievementOption.achievementOptionId,
+              _eq: selectedAchievementOption.id,
             },
           },
           {
-            AchievementRecordAuthors: {
-              userId: {
-                _eq: userId,
-              },
-            },
+            AchievementRecordAuthors: { userId: { _eq: userId } },
           },
         ],
       },
+      orderBy: { created_at: order_by.desc },
+      limit: 1,
     },
-    skip: !selectedAhievementOption.achievementOptionId,
   });
 
-  const myAchievementRecords = [
-    ...(achievementRecordListAPI.data?.AchievementRecord || []),
-  ];
-  /* #endrgion */
+  /* #endregion */
 
+  useEffect(() => {
+    const r = myRecordsQuery.data?.AchievementRecord[0] || null;
+    setMyRecords(r);
+  }, [myRecordsQuery]);
   /* #region Callbacks*/
-  const close = useCallback(() => {
+  const onClosed = useCallback(() => {
     setShowModal(false);
   }, [setShowModal]);
 
@@ -105,7 +126,7 @@ const CourseAchievementOption: FC<IProps> = ({ course }) => {
     setShowModal(true);
   }, [setShowModal]);
 
-  const onAchivementOptionDropdown = useCallback(
+  const onAchievementOptionDropdown = useCallback(
     (event: MouseEvent<HTMLElement>) => {
       setAnchorElement(event.currentTarget);
       setAchievementOptionVisibility(true);
@@ -114,31 +135,52 @@ const CourseAchievementOption: FC<IProps> = ({ course }) => {
   );
 
   const onItemSelectedFromDropdown = useCallback(
-    async (item: AchievementOptionCourses_AchievementOptionCourse) => {
-      setSelectedAhievementOption(item);
+    async (item: MinAchievementOption) => {
+      setSelectedAchievementOption(item);
     },
-    [setSelectedAhievementOption]
+    [setSelectedAchievementOption]
   );
 
-  /* #endreigon */
+  const closeAlertDialog = useCallback(() => {
+    setAlertMessage('');
+  }, [setAlertMessage]);
+
+  const onSuccess = useCallback(() => {
+    setShowModal(false);
+    myRecordsQuery.refetch();
+  }, [myRecordsQuery]);
+  /* #endregion */
 
   const providerValue: IContext = {
-    course: course,
+    achievementRecordUploadDeadline: achievementRecordUploadDeadline,
     userProfile: profile,
     userId,
+    courseTitle,
+    t,
+    setAlertMessage,
   };
   return (
-    <ProjectResutlUploadContext.Provider value={providerValue}>
-      <div className="flex flex-col space-y-3 itmes-start">
-        <BlockTitle>Leistungsnachweis</BlockTitle>
+    <ProjectResultUploadContext.Provider value={providerValue}>
+      {alertMessage.trim().length > 0 && (
+        <AlertMessageDialog
+          alert={alertMessage}
+          confirmationText={'OK'}
+          onClose={closeAlertDialog}
+          open={alertMessage.trim().length > 0}
+        />
+      )}
+
+      <div className="flex flex-col space-y-3 items-start">
+        <BlockTitle>{t('achievement-option')}</BlockTitle>
         <span className="text-lg mt-6">
-          Den Leistungsnachweis musst Du bis spätestens zum 16.02.2021
-          hochgeladen haben.
+          {t('achievement-record-upload-dead-line-text', {
+            date: formattedDate(achievementRecordUploadDeadline),
+          })}
         </span>
         <div className="flex mt-10 mb-4">
-          {!achievementOptionCourseRequest.loading && aCourseList.length > 0 && (
-            <div onClick={onAchivementOptionDropdown}>
-              <Button>Wähle einen Leistungsnachweis ↓ </Button>
+          {!query.loading && achievementOptions.length > 0 && (
+            <div onClick={onAchievementOptionDropdown}>
+              <Button>{`${t('choose-achievement-option')} ↓`}</Button>
             </div>
           )}
 
@@ -147,44 +189,50 @@ const CourseAchievementOption: FC<IProps> = ({ course }) => {
               anchorElement={archiveOptionsAnchorElement}
               isVisible={isVisibleAchievementOptions}
               setVisible={setAchievementOptionVisibility}
-              courseAchievementOptions={aCourseList}
+              courseAchievementOptions={achievementOptions}
               callback={onItemSelectedFromDropdown}
             />
           )}
         </div>
-        {selectedAhievementOption.id && (
+        {selectedAchievementOption.id && (
+          <Link
+            href={`../achievements/${selectedAchievementOption.id}?courseId=${courseId}`}
+          >
+            {selectedAchievementOption.title}
+          </Link>
+        )}
+        {selectedAchievementOption.id && (
           <div className="flex">
             <Button filled onClick={upload}>
-              ↑ Nachweis hochladen
+              {`↑ ${t('upload-proof')}`}
             </Button>
           </div>
         )}
-        {selectedAhievementOption.id && myAchievementRecords.length > 0 && (
-          <div>
-            <p>
-              Der letzte Nachweis mit Dir als Autor wurde
-              {myAchievementRecords[0].created_at} von
-              {profile?.firstName &&
-                profile?.lastName &&
-                makeFullName(profile.firstName, profile.lastName)}
-              hochgeladen.
-            </p>
-          </div>
-        )}
-        {selectedAhievementOption.id && myAchievementRecords.length === 0 && (
+        {selectedAchievementOption.id && myRecords && (
           <p>
-            Bis jetzt wurde noch kein Nachweis mit Dir als Autor hochgeladen.
+            {t('last-upload-from-a-author', {
+              dateTime: formattedDateWithTime(new Date(myRecords.created_at)),
+              fullName: makeFullName(profile.firstName, profile.lastName),
+            })}
           </p>
+        )}
+
+        {selectedAchievementOption.id && !myRecords && (
+          <p>{t('no-proof-uploaded-by-me-as-author')}</p>
         )}
       </div>
       {showModal && (
-        <ModalControl showModal={showModal} onClose={close}>
-          <ProjectResultsUpload
-            achievementOptionCourse={selectedAhievementOption}
-          />
-        </ModalControl>
+        <FormToUploadAchievementRecord
+          onClose={onClosed}
+          achievementOption={selectedAchievementOption}
+          onSuccess={onSuccess}
+          courseTitle={courseTitle}
+          setAlertMessage={setAlertMessage}
+          userId={userId}
+          courseId={courseId}
+        />
       )}
-    </ProjectResutlUploadContext.Provider>
+    </ProjectResultUploadContext.Provider>
   );
 };
 

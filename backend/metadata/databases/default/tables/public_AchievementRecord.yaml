@@ -21,11 +21,15 @@ insert_permissions:
     permission:
       check: {}
       columns:
+        - achievementOptionId
         - coverImageUrl
         - csvResults
         - description
         - documentationUrl
+        - evaluationScriptUrl
         - id
+        - rating
+        - score
         - uploadUserId
 select_permissions:
   - role: anonymous
@@ -70,6 +74,7 @@ select_permissions:
       columns:
         - achievementOptionId
         - coverImageUrl
+        - created_at
         - csvResults
         - description
         - documentationUrl
@@ -86,6 +91,9 @@ update_permissions:
   - role: instructor_access
     permission:
       columns:
+        - coverImageUrl
+        - documentationUrl
+        - evaluationScriptUrl
         - rating
       filter:
         _or:
@@ -102,4 +110,21 @@ update_permissions:
                 User:
                   id:
                     _eq: X-Hasura-User-Id
+          - AchievementRecordAuthors:
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
+
       check: {}
+  - role: user_access
+    permission:
+      columns:
+        - coverImageUrl
+        - documentationUrl
+        - evaluationScriptUrl
+      filter:
+        AchievementRecordAuthors:
+          User:
+            id:
+              _eq: X-Hasura-User-Id
+      check: null

@@ -1,11 +1,11 @@
-import { FC } from "react";
-import { MdAddCircle } from "react-icons/md";
-import { Button } from "@material-ui/core";
+import { FC } from 'react';
+import { MdAddCircle } from 'react-icons/md';
+import { Button } from '@material-ui/core';
 
 interface IProps {
   text?: string;
   buttonClickCallBack: () => void;
-  buttonSize?: "small" | "medium" | "large";
+  buttonSize?: 'small' | 'medium' | 'large';
 }
 
 const EhAddButton: FC<IProps> = ({ text, buttonClickCallBack, buttonSize }) => {
@@ -13,10 +13,10 @@ const EhAddButton: FC<IProps> = ({ text, buttonClickCallBack, buttonSize }) => {
     <Button
       onClick={buttonClickCallBack}
       className="focus:outline-none"
-      size={buttonSize || "medium"}
+      size={buttonSize || 'medium'}
       startIcon={<MdAddCircle />}
     >
-      {text ?? ""}
+      {text ?? ''}
     </Button>
   );
 };

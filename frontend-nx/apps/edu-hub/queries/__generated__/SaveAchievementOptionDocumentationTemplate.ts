@@ -19,5 +19,5 @@ export interface SaveAchievementOptionDocumentationTemplate {
 
 export interface SaveAchievementOptionDocumentationTemplateVariables {
   base64File: string;
-  courseId: number;
+  achievementOptionId: number;
 }
