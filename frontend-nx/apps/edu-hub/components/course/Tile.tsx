@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { FC } from 'react';
+import useTranslation from 'next-translate/useTranslation';
 
 import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
 import {
@@ -78,6 +79,8 @@ const CourseStatusIndicator: FC<{
 };
 
 export const Tile: FC<IProps> = ({ course }) => {
+  const { t } = useTranslation('common');
+
   const enrollmentStatus = enrollmentStatusForCourse(course);
   const { t } = useTranslation('course-page');
   const program = hasProgram(course) ? course.Program : undefined;
@@ -126,7 +129,7 @@ export const Tile: FC<IProps> = ({ course }) => {
         <div className={`flex min-h-[210px] flex-col bg-white p-5`}>
           <div className="flex justify-between mb-3">
             <div className="text-sm tracking-wider">
-              {`${course.weekDay} ${new Date(
+              {`${t(course.weekDay)} ${new Date(
                 course.startTime
               ).toLocaleTimeString([], {
                 hour: '2-digit',
@@ -142,7 +145,7 @@ export const Tile: FC<IProps> = ({ course }) => {
                 src={languageIcon}
                 alt="language icon"
               />{' '}
-              {course.language}
+              {t(course.language)}
             </div>
           </div>
           <span className="text-lg mb-14">{course.tagline}</span>

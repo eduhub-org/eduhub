@@ -5,5 +5,12 @@
   "learnSubheadline": "Hier wieder ein super Text",
   "registerNow": "jetzt registrieren",
   "subheadline": "Coole catchy subheadline für edu",
-  "headline": "Gestalte deine Zukunft"
+  "headline": "Gestalte deine Zukunft",
+  "myAdminCourses": "Kurs-Administration",
+  "myCourses": "Meine Kurse",
+  "tech_coding": "Tech & Coding",
+  "business_startup": "Business & Startup",
+  "creative_social_sustainable": "Creative, Social & Sustainable",
+  "degree": "Degrees",
+  "event": "Events"
 }
