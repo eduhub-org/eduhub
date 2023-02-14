@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { FC } from 'react';
+import useTranslation from 'next-translate/useTranslation';
 
 import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
 import {
@@ -86,6 +87,8 @@ const CourseStatusIndicator: FC<{
 };
 
 export const Tile: FC<IProps> = ({ course }) => {
+  const { t } = useTranslation('common');
+
   const enrollmentStatus = enrollmentStatusForCourse(course);
 
   const program = hasProgram(course) ? course.Program : undefined;
@@ -134,11 +137,15 @@ export const Tile: FC<IProps> = ({ course }) => {
         <div className={`flex min-h-[210px] flex-col bg-white p-5`}>
           <div className="flex justify-between mb-3">
             <div className="text-sm tracking-wider">
-              {`${course.weekDay} ${new Date(
+              {`${t(course.weekDay)} ${new Date(
                 course.startTime
-              ).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${new Date(
-                course.endTime
-              ).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`}
+              ).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })} - ${new Date(course.endTime).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}`}
             </div>
             <div className="text-sm tracking-widest flex content-center">
               <img
@@ -146,16 +153,12 @@ export const Tile: FC<IProps> = ({ course }) => {
                 src={languageIcon}
                 alt="language icon"
               />{' '}
-              {course.language}
+              {t(course.language)}
             </div>
           </div>
           <span className="text-lg mb-14">{course.tagline}</span>
           <span className="text-xs uppercase flex content-center">
-            <img
-              className="h-4 mr-2"
-              src={locationIcon}
-              alt="location icon"
-            />
+            <img className="h-4 mr-2" src={locationIcon} alt="location icon" />
             {course.CourseLocations.map(
               (location) => `${location.locationOption} +`
             )}

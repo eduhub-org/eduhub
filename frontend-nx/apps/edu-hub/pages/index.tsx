@@ -125,42 +125,29 @@ const Home: FC = () => {
       (course) => course.published === true && course.Program.published === true
     ) ?? [];
 
-  // Filtering to Slider Groups
-  const coursesSliderGroup1 = publishedCourses.filter((course) =>
-    course.CourseGroups.some(
-      (courseGroup) => courseGroup.CourseGroupOption.order === 1
-    )
-  );
-  const coursesSliderGroup2 = publishedCourses.filter((course) =>
-    course.CourseGroups.some(
-      (courseGroup) => courseGroup.CourseGroupOption.order === 2
-    )
-  );
-  const coursesSliderGroup3 = publishedCourses.filter((course) =>
-    course.CourseGroups.some(
-      (courseGroup) => courseGroup.CourseGroupOption.order === 3
-    )
-  );
-  const coursesSliderGroup4 = publishedCourses.filter((course) =>
-    course.CourseGroups.some(
-      (courseGroup) => courseGroup.CourseGroupOption.order === 4
-    )
-  );
-  const coursesSliderGroup5 = publishedCourses.filter((course) =>
-    course.CourseGroups.some(
-      (courseGroup) => courseGroup.CourseGroupOption.order === 5
-    )
-  );
-
-  const coursesGroups = [
-    { title: 'Course Administration', courses: myAdminCourses },
-    { title: 'My Courses', courses: myCourses },
-    { title: 'Tech & Coding', courses: coursesSliderGroup1 },
-    { title: 'Business & Startup', courses: coursesSliderGroup2 },
-    { title: 'Creative, Social & Sustainable', courses: coursesSliderGroup3 },
-    { title: 'Degrees', courses: coursesSliderGroup4 },
-    { title: 'Events', courses: coursesSliderGroup5 },
+  const coursesGroupsAuthenticated = [
+    { title: t('myAdminCourses'), courses: myAdminCourses },
+    { title: t('myCourses'), courses: myCourses },
   ];
+
+  const coursesGroups = [1, 2, 3, 4, 5].map((order) => {
+    const courses = publishedCourses.filter((course) =>
+      course.CourseGroups.some(
+        (courseGroup) => courseGroup.CourseGroupOption.order === order
+      )
+    );
+
+    const coursesTitle = publishedCourses.filter((course) => {
+      const courseGroupOption = course.CourseGroups.find(
+        (courseGroup) => courseGroup.CourseGroupOption.order === order
+      );
+      return courseGroupOption ? true : false;
+    });
+
+    const title = coursesTitle[0]?.CourseGroups[0]?.CourseGroupOption.title;
+
+    return { title: t(title), courses };
+  });
 
   console.log(coursesGroups);
 
@@ -190,6 +177,21 @@ const Home: FC = () => {
         </div>
         <ClientOnly>
           {/* <OnlyLoggedIn>
+            {coursesGroupsAuthenticated.map((group, index) =>
+              group.courses.length > 0 ? (
+                <>
+                  <h2
+                    id={`sliderGroup${index + 1}`}
+                    className="text-2xl font-semibold text-left mt-20"
+                  >
+                    {t(group.title)}
+                  </h2>
+                  <div className="mt-2">
+                    <TileSlider courses={group.courses} />
+                  </div>
+                </>
+              ) : null
+            )}
           </OnlyLoggedIn> */}
 
           {coursesGroups.map((group, index) =>
