@@ -205,7 +205,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
       mentors: ao.AchievementOptionMentors.map(
         (m) =>
           ({
-            userId: m.userId,
+            userId: m.User?.id,
             firstName: m.User?.firstName,
             lastName: m.User?.lastName,
           } as TempAchievementOptionMentor)
