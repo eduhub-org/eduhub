@@ -12,9 +12,11 @@ import { MyCourses } from '../components/course/MyCourses';
 import { TileSlider } from '../components/course/TileSlider';
 import { useAuthedQuery } from '../hooks/authedQuery';
 import { useIsLoggedIn, useIsUser } from '../hooks/authentication';
+import { CourseGroupOptions } from '../queries/__generated__/CourseGroupOptions';
 import { CourseList } from '../queries/__generated__/CourseList';
 import { CourseListWithEnrollments } from '../queries/__generated__/CourseListWithEnrollments';
 import { CourseListWithInstructors } from '../queries/__generated__/CourseListWithInstructors';
+import { COURSE_GROUP_OPTIONS } from '../queries/courseGroupOptions';
 import { COURSE_LIST } from '../queries/courseList';
 import { COURSE_LIST_WITH_ENROLLMENT } from '../queries/courseListWithEnrollments';
 import { COURSE_LIST_WITH_INSTRUCTOR } from '../queries/courseListWithInstructors';
@@ -24,55 +26,13 @@ import { useSession } from 'next-auth/react';
 
 const Home: FC = () => {
   const { t } = useTranslation('start-page');
-
-  // Get Logged-In Status
-  const useIsLoggedIn = (
-    sessionData,
-    status: 'authenticated' | 'loading' | 'unauthenticated'
-  ): boolean => {
-    return (status === 'authenticated' || false) && !!sessionData?.accessToken;
-  };
-  const [sessionData, setSessionData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const { data, status } = useSession();
-  const isLoggedIn = useIsLoggedIn(sessionData, status);
-  useEffect(() => {
-    setIsLoading(true);
-    fetch('api/auth/session')
-      .then((res) => res.json())
-      .then((data) => {
-        setSessionData(data);
-        setIsLoading(false);
-      });
-  }, []);
+  const isLoggedIn = useIsLoggedIn();
 
   // (My) Administered Courses
-  // TODO Adjust selection to courses with instruction - currently
-  const [adminCourses, setAdminCourses] =
-    useState<CourseListWithInstructors | null>(null);
-  const [errorAdminCourses, setErrorAdminCourses] =
-    useState<ApolloError | null>(null);
-  const { data: adminCoursesQuery, error: errorAdminCoursesQuery } =
+  const { data: adminCourses, error: adminCoursesError } =
     useAuthedQuery<CourseListWithInstructors>(COURSE_LIST_WITH_INSTRUCTOR);
-  useEffect(() => {
-    if (
-      isLoggedIn &&
-      adminCoursesQuery &&
-      !errorAdminCoursesQuery &&
-      !isLoading
-    ) {
-      const fetchData = async () => {
-        try {
-          setAdminCourses(adminCoursesQuery);
-        } catch (e) {
-          setErrorAdminCourses(e);
-        }
-      };
-      fetchData();
-    }
-  }, [isLoggedIn, adminCoursesQuery, errorAdminCoursesQuery, isLoading]);
-  if (errorAdminCourses) {
-    console.log('got error in query for enrolled courses!', errorAdminCourses);
+  if (adminCoursesError) {
+    console.log('got error in query for admin courses!', adminCoursesError);
   }
   const myAdminCourses =
     adminCourses?.Course?.filter(
@@ -80,33 +40,12 @@ const Home: FC = () => {
     ) ?? [];
 
   // (My) Enrolled Courses
-  const [enrolledCourses, setEnrolledCourses] =
-    useState<CourseListWithEnrollments | null>(null);
-  const [errorEnrolledCourses, setErrorEnrolledCourses] =
-    useState<ApolloError | null>(null);
-  const { data: enrolledCoursesQuery, error: errorEnrolledCoursesQuery } =
+  const { data: enrolledCourses, error: enrolledCoursesError } =
     useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT);
-  useEffect(() => {
-    if (
-      isLoggedIn &&
-      enrolledCoursesQuery &&
-      !errorEnrolledCoursesQuery &&
-      !isLoading
-    ) {
-      const fetchData = async () => {
-        try {
-          setEnrolledCourses(enrolledCoursesQuery);
-        } catch (e) {
-          setErrorEnrolledCourses(e);
-        }
-      };
-      fetchData();
-    }
-  }, [isLoggedIn, enrolledCoursesQuery, errorEnrolledCoursesQuery, isLoading]);
-  if (errorEnrolledCourses) {
+  if (enrolledCoursesError) {
     console.log(
       'got error in query for enrolled courses!',
-      errorEnrolledCourses
+      enrolledCoursesError
     );
   }
   const myCourses =
@@ -115,41 +54,42 @@ const Home: FC = () => {
     ) ?? [];
 
   // All Published Courses
-  const { data: courses, error: error_courses } =
+  const { data: courses, error: coursesError } =
     useAuthedQuery<CourseList>(COURSE_LIST);
-  if (error_courses) {
-    console.log('got error in query for listed courses!', error_courses);
+  if (coursesError) {
+    console.log('got error in query for listed courses!', coursesError);
   }
+
   const publishedCourses =
     courses?.Course?.filter(
       (course) => course.published === true && course.Program.published === true
     ) ?? [];
 
+  // Arrays with authenticatend and unauthenticated courses
   const coursesGroupsAuthenticated = [
     { title: t('myAdminCourses'), courses: myAdminCourses },
     { title: t('myCourses'), courses: myCourses },
   ];
-
+  const { data: courseGroupOptions, error: courseGroupOptionError } =
+    useAuthedQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS);
+  if (courseGroupOptionError) {
+    console.log(
+      'got error in query for course group info!',
+      courseGroupOptionError
+    );
+  }
   const coursesGroups = [1, 2, 3, 4, 5].map((order) => {
     const courses = publishedCourses.filter((course) =>
       course.CourseGroups.some(
         (courseGroup) => courseGroup.CourseGroupOption.order === order
       )
     );
-
-    const coursesTitle = publishedCourses.filter((course) => {
-      const courseGroupOption = course.CourseGroups.find(
-        (courseGroup) => courseGroup.CourseGroupOption.order === order
-      );
-      return courseGroupOption ? true : false;
-    });
-
-    const title = coursesTitle[0]?.CourseGroups[0]?.CourseGroupOption.title;
-
-    return { title: t(title), courses };
+    const title = courseGroupOptions?.CourseGroupOption[order - 1].title;
+    return {
+      title,
+      courses,
+    };
   });
-
-  console.log(coursesGroups);
 
   return (
     <>
@@ -176,28 +116,31 @@ const Home: FC = () => {
           </div>
         </div>
         <ClientOnly>
-          {/* <OnlyLoggedIn></OnlyLoggedIn> */}
-          {coursesGroupsAuthenticated.map((group, index) =>
-            group.courses.length > 0 ? (
-              <>
-                <h2
-                  id={`sliderGroup${index + 1}`}
-                  className="text-2xl font-semibold text-left mt-20"
-                >
-                  {t(group.title)}
-                </h2>
-                <div className="mt-2">
-                  <TileSlider courses={group.courses} />
-                </div>
-              </>
-            ) : null
-          )}
+          <OnlyLoggedIn>
+            <>
+              {coursesGroupsAuthenticated.map((group, index) =>
+                group.courses.length > 0 ? (
+                  <>
+                    <h2
+                      id={`sliderGroup${index + 1}`}
+                      className="text-2xl font-semibold text-left mt-20"
+                    >
+                      {t(group.title)}
+                    </h2>
+                    <div className="mt-2">
+                      <TileSlider courses={group.courses} />
+                    </div>
+                  </>
+                ) : null
+              )}
+            </>
+          </OnlyLoggedIn>
 
           {coursesGroups.map((group, index) =>
             group.courses.length > 0 ? (
               <>
                 <h2
-                  id={`sliderGroup${index + 1}`}
+                  id={`sliderGroup${index + 3}`}
                   className="text-2xl font-semibold text-left mt-20"
                 >
                   {t(group.title)}
