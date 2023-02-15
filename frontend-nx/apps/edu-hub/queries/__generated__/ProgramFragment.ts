@@ -27,6 +27,10 @@ export interface ProgramFragment {
    */
   lectureEnd: any | null;
   /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
    * The deadline for the achievement record uploads.
    */
   achievementRecordUploadDeadline: any | null;

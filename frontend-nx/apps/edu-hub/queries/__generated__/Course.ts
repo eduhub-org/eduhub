@@ -131,6 +131,39 @@ export interface Course_Course_by_pk_CourseGroups {
   CourseGroupOption: Course_Course_by_pk_CourseGroups_CourseGroupOption;
 }
 
+export interface Course_Course_by_pk_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+}
+
+export interface Course_Course_by_pk_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
+export interface Course_Course_by_pk_CourseGroups {
+  __typename: "CourseGroup";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: Course_Course_by_pk_CourseGroups_CourseGroupOption;
+}
+
 export interface Course_Course_by_pk {
   __typename: "Course";
   id: number;
