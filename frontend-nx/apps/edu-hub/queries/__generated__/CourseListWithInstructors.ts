@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, LocationOption_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseListWithInstructors
@@ -83,20 +83,32 @@ export interface CourseListWithInstructors_Course_CourseLocations {
   /**
    * Either 'ONLINE' or one of the possible given offline locations
    */
-  locationOption: string | null;
+  locationOption: LocationOption_enum | null;
 }
 
 export interface CourseListWithInstructors_Course_Program {
   __typename: "Program";
   id: number;
   /**
+   * The title of the program
+   */
+  title: string;
+  /**
    * The 6 letter short title for the program.
    */
   shortTitle: string | null;
   /**
-   * The title of the program
+   * The first day a course lecture can possibly be in this program.
    */
-  title: string;
+  lectureStart: any | null;
+  /**
+   * The last day a course lecture can possibly be in this program.
+   */
+  lectureEnd: any | null;
+  /**
+   * The deadline for the achievement record uploads.
+   */
+  achievementRecordUploadDeadline: any | null;
   /**
    * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
    */
@@ -109,18 +121,6 @@ export interface CourseListWithInstructors_Course_Program {
    * The day the application for all courses of the program start.
    */
   applicationStart: any | null;
-  /**
-   * The last day a course lecture can possibly be in this program.
-   */
-  lectureEnd: any | null;
-  /**
-   * The first day a course lecture can possibly be in this program.
-   */
-  lectureStart: any | null;
-  /**
-   * The deadline for the achievement record uploads.
-   */
-  achievementRecordUploadDeadline: any | null;
 }
 
 export interface CourseListWithInstructors_Course_CourseGroups_CourseGroupOption {
@@ -195,6 +195,14 @@ export interface CourseListWithInstructors_Course {
    * The title of the course (only editable by an admin user)
    */
   title: string;
+  /**
+   * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
+   */
+  achievementCertificatePossible: boolean;
+  /**
+   * Indicates whether participants will get a certificate showing the list of attendances (only issued if the did not miss then maxMissedCourses)
+   */
+  attendanceCertificatePossible: boolean;
   /**
    * Id of the program to which the course belongs.
    */
