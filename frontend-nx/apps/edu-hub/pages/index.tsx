@@ -161,7 +161,7 @@ const Home: FC = () => {
         <div
           className="flex flex-col max-w-screen-xl mx-auto"
           style={{
-            backgroundImage: `url('/images/header_image.jpg')`,
+            backgroundImage: `url('/images/background_homepage/1536.jpg')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}

@@ -82,7 +82,7 @@ export const Tile: FC<IProps> = ({ course }) => {
   const { t } = useTranslation('common');
 
   const enrollmentStatus = enrollmentStatusForCourse(course);
-  const { t } = useTranslation('course-page');
+  // const { t } = useTranslation('course-page');
   const program = hasProgram(course) ? course.Program : undefined;
   const enrollment =
     hasEnrollments(course) && course.CourseEnrollments.length === 1
