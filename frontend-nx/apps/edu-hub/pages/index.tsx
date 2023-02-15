@@ -21,8 +21,6 @@ import { COURSE_LIST } from '../queries/courseList';
 import { COURSE_LIST_WITH_ENROLLMENT } from '../queries/courseListWithEnrollments';
 import { COURSE_LIST_WITH_INSTRUCTOR } from '../queries/courseListWithInstructors';
 import { ClientOnly } from '@opencampus/shared-components';
-import { ApolloError } from '@apollo/client';
-import { useSession } from 'next-auth/react';
 
 const Home: FC = () => {
   const { t } = useTranslation('start-page');
@@ -136,6 +134,19 @@ const Home: FC = () => {
             </>
           </OnlyLoggedIn>
 
+          {/* ##################################################### */}
+          {/* This Slider is only temporairly included for testing and must be removed later */}
+          <h2
+            id={`allCourses`}
+            className="text-2xl font-semibold text-left mt-20"
+          >
+            {'All Courses'}
+          </h2>
+          <div className="mt-2">
+            <TileSlider courses={publishedCourses} />
+          </div>
+          {/* ##################################################### */}
+
           {coursesGroups.map((group, index) =>
             group.courses.length > 0 ? (
               <>
@@ -151,7 +162,6 @@ const Home: FC = () => {
               </>
             ) : null
           )}
-
           <OnlyLoggedOut>
             <div className="flex flex-col sm:flex-row mx-6 mt-6 mb-24 sm:mt-48">
               <div className="flex flex-1 flex-col sm:items-center">
