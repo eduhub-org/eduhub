@@ -3,11 +3,21 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, LocationOption_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, SessionAddressType_enum, LocationOption_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: Course
 // ====================================================
+
+export interface Course_Course_by_pk_Sessions_SessionAddresses {
+  __typename: "SessionAddress";
+  id: number;
+  /**
+   * Where the session will take place; might be an offline or online location which is provided according to the provided type
+   */
+  address: string;
+  type: SessionAddressType_enum;
+}
 
 export interface Course_Course_by_pk_Sessions {
   __typename: "Session";
@@ -32,6 +42,10 @@ export interface Course_Course_by_pk_Sessions {
    * The title of the session
    */
   title: string;
+  /**
+   * An array relationship
+   */
+  SessionAddresses: Course_Course_by_pk_Sessions_SessionAddresses[];
 }
 
 export interface Course_Course_by_pk_CourseInstructors_Expert_User {

@@ -42,25 +42,45 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
         {t('courseContent')}
       </span>
       <ul>
-        {course.Sessions.map(({ startDateTime, title }, index) => (
-          <li key={index} className="flex mb-4">
-            <div className="flex flex-col flex-shrink-0 mr-6">
-              <span className="text-xs sm:text-sm font-semibold">
-                {startDateTime?.toLocaleDateString(lang, {
-                  month: '2-digit',
-                  day: '2-digit',
-                }) ?? ''}
-              </span>
-              <span className="text-xs sm:text-sm">
-                {startDateTime?.toLocaleTimeString(lang, {
-                  hour: 'numeric',
-                  minute: 'numeric',
-                }) ?? ''}
-              </span>
-            </div>
-            <span className="block text-sm sm:text-lg">{title}</span>
-          </li>
-        ))}
+        {course.Sessions.map(
+          ({ startDateTime, title, SessionAddresses }, index) => (
+            <li key={index} className="flex mb-4">
+              <div className="flex flex-col flex-shrink-0 mr-6">
+                <span className="text-xs sm:text-sm font-semibold">
+                  {startDateTime?.toLocaleDateString(lang, {
+                    month: '2-digit',
+                    day: '2-digit',
+                  }) ?? ''}
+                </span>
+                <span className="text-xs sm:text-sm">
+                  {startDateTime?.toLocaleTimeString(lang, {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                  }) ?? ''}
+                </span>
+              </div>
+              <div>
+                <span className="block text-sm sm:text-lg">{title}</span>
+                {SessionAddresses.map(({ address, type }, index) => (
+                  <span key={index} className="text-sm text-gray-600">
+                    {type === 'URL' ? (
+                      <a
+                        href={address}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline"
+                      >
+                        ONLINE
+                      </a>
+                    ) : (
+                      <>{address} + </> // or use <span>{address} + </span>
+                    )}
+                  </span>
+                ))}
+              </div>
+            </li>
+          )
+        )}
       </ul>
       <div className="flex">
         <div className="w-1/2 pr-4">
