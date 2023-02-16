@@ -215,6 +215,10 @@ export interface AdminCourseList_Course {
    */
   maxParticipants: number | null;
   /**
+   * An array of texts including the learning goals for the course
+   */
+  learningGoals: string | null;
+  /**
    * Heading of the the first course description field
    */
   headingDescriptionField1: string;
@@ -266,10 +270,6 @@ export interface AdminCourseList_Course {
    * The link to the chat of the course (e.g. a mattermost channel)
    */
   chatLink: string | null;
-  /**
-   * An array of texts including the learning goals for the course
-   */
-  learningGoals: string | null;
   /**
    * An array relationship
    */

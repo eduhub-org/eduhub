@@ -316,6 +316,10 @@ export interface ManagedCourse_Course_by_pk {
    */
   maxParticipants: number | null;
   /**
+   * An array of texts including the learning goals for the course
+   */
+  learningGoals: string | null;
+  /**
    * Heading of the the first course description field
    */
   headingDescriptionField1: string;
@@ -367,10 +371,6 @@ export interface ManagedCourse_Course_by_pk {
    * The link to the chat of the course (e.g. a mattermost channel)
    */
   chatLink: string | null;
-  /**
-   * An array of texts including the learning goals for the course
-   */
-  learningGoals: string | null;
   /**
    * An array relationship
    */

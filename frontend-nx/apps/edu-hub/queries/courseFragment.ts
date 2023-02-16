@@ -26,6 +26,7 @@ export const COURSE_FRAGMENT = gql`
     attendanceCertificatePossible
     programId
     maxParticipants
+    learningGoals
     headingDescriptionField1
     contentDescriptionField1
     headingDescriptionField2

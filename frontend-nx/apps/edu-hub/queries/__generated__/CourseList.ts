@@ -191,6 +191,10 @@ export interface CourseList_Course {
    */
   maxParticipants: number | null;
   /**
+   * An array of texts including the learning goals for the course
+   */
+  learningGoals: string | null;
+  /**
    * Heading of the the first course description field
    */
   headingDescriptionField1: string;
