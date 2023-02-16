@@ -1,13 +1,24 @@
 {
   "loginButton": "anmelden",
   "registerButton": "registrieren",
+  "language": "Sprache",
   "DE": "DEUTSCH",
   "EN": "ENGLISCH",
+  "firstName": "Vorname",
+  "lastName": "Nachname",
   "MONDAY": "MONTAG",
   "TUESDAY": "DIENSTAG",
   "WEDNESDAY": "MITTWOCH",
   "THURSDAY": "DONNERSTAG",
   "FRIDAY": "FREITAG",
   "SATURDAY": "SAMSTAG",
-  "SUNDAY": "SONNTAG"
+  "SUNDAY": "SONNTAG",
+  "place": "Ort",
+  "addresses": "Adressen",
+  "date": "Datum",
+  "start-time": "Startzeit",
+  "end-time": "Endzeit",
+  "description": "Beschreibung",
+  "speakers": "Referenten",
+  "status": "Status"
 }

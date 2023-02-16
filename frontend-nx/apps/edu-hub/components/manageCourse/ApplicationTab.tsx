@@ -46,19 +46,19 @@ interface IProps {
   qResult: QueryResult<any, any>;
 }
 
-const infoDots = (
-  <>
-    <div>Beurteilung der Bewerbung</div>
-    <div className="grid grid-cols-6">
-      <div>{greyDot} nicht bewertet</div>
-      <div>{greenDot} Einladen</div>
-      <div>{orangeDot} Review</div>
-      <div>{redDot} Ablehnen</div>
-      <div />
-      <div />
-    </div>
-  </>
-);
+// const infoDots = (
+//   <>
+//     <div>Beurteilung der Bewerbung</div>
+//     <div className="grid grid-cols-6">
+//       <div>{greyDot} nicht bewertet</div>
+//       <div>{greenDot} Einladen</div>
+//       <div>{orangeDot} Review</div>
+//       <div>{redDot} Ablehnen</div>
+//       <div />
+//       <div />
+//     </div>
+//   </>
+// );
 
 const now = new Date();
 const now7 = new Date();
@@ -66,6 +66,28 @@ now7.setDate(now7.getDate() + 7);
 
 export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
   const { t } = useTranslation();
+
+  const infoDots = (
+    <>
+      <div>{t('course-page:application-rating')}</div>
+      <div className="grid grid-cols-6">
+        <div>
+          {greenDot} {t('course-page:invite')}
+        </div>
+        <div>
+          {orangeDot} {t('course-page:unclear')}
+        </div>
+        <div>
+          {redDot} {t('course-page:reject')}
+        </div>
+        <div>
+          {greyDot} {t('course-page:not-rated')}
+        </div>
+        <div />
+        <div />
+      </div>
+    </>
+  );
 
   const userRole = 'instructor';
 
@@ -219,36 +241,42 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
   return (
     <>
       <div>
-        <div className="mb-6">{infoDots}</div>
+        {courseEnrollments.length > 0 ? (
+          <>
+            <ApplicationRow
+              enrollment={null}
+              qResult={qResult}
+              onSetRating={setEnrollmentRating}
+              onSelectRow={handleSelectRow}
+              isRowSelected={false}
+            />
 
-        <ApplicationRow
-          enrollment={null}
-          qResult={qResult}
-          onSetRating={setEnrollmentRating}
-          onSelectRow={handleSelectRow}
-          isRowSelected={false}
-        />
+            {courseEnrollments.map((enrollment) => (
+              <ApplicationRow
+                key={enrollment.id}
+                enrollment={enrollment}
+                qResult={qResult}
+                onSetRating={setEnrollmentRating}
+                onSelectRow={handleSelectRow}
+                isRowSelected={selectedEnrollments.includes(enrollment.id)}
+              />
+            ))}
 
-        {courseEnrollments.map((enrollment) => (
-          <ApplicationRow
-            key={enrollment.id}
-            enrollment={enrollment}
-            qResult={qResult}
-            onSetRating={setEnrollmentRating}
-            onSelectRow={handleSelectRow}
-            isRowSelected={selectedEnrollments.includes(enrollment.id)}
-          />
-        ))}
+            <div className="mt-6 mb-3">{infoDots}</div>
 
-        <div className="mt-6 mb-3">{infoDots}</div>
-
-        <OnlyAdmin>
-          <div className="flex justify-end mb-6">
-            <OldButton onClick={handleOpenInviteDialog}>
-              {t('course-page:send-invitations')}
-            </OldButton>
-          </div>
-        </OnlyAdmin>
+            <OnlyAdmin>
+              <div className="flex justify-end mb-6">
+                <OldButton onClick={handleOpenInviteDialog}>
+                  {t('course-page:send-invitations')}
+                </OldButton>
+              </div>
+            </OnlyAdmin>
+          </>
+        ) : (
+          <p className="m-auto text-center mb-14">
+            {t('course-page:no-applications-present')}
+          </p>
+        )}
       </div>
 
       <Dialog

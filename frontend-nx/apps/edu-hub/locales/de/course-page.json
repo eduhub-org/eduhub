@@ -39,12 +39,12 @@
   "proof-of-participation": "Teilnahmenachweis",
   "certificate-possible": "Mögliche Bescheinigungen",
   "performance-certificate": "Leistungszertifikat",
+  "certificate-generation": "Zertifikate ausstellen",
   "add-instructors": "Add Instructor",
   "application": "Bewerbung",
   "applications": "Bewerbungen",
   "applied": "Beworben",
   "evaluation": "Beurteilung",
-  "invite": "Invite",
   "invited": "Eingeladen",
   "invitation-confirmed": "Einladung bestätigt",
   "aborted": "Abgebrochen",
@@ -82,5 +82,13 @@
   "template": "Template",
   "link-final-evaluation": "Link Abschluss-Evaluation",
   "no-template-uploaded-yet": "Noch kein Template hochgeladen",
-  "show-certificates": "Bescheinigungen einblenden"
+  "show-certificates": "Bescheinigungen einblenden",
+  "default-address": "Standardadresse für die Sessions (soweit nichts abweichendes angegeben wird)",
+  "add-session": "Termin hinzufügen",
+  "application-rating": "Einstufung der Bewerbungen:",
+  "not-rated": "Nicht bewertet",
+  "unclear": "Unklar",
+  "reject": "Ablehnen",
+  "invite": "Zulassen",
+  "no-applications-present": "Es liegen noch keine Bewerbungen vor."
 }

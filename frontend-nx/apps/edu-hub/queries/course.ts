@@ -184,7 +184,7 @@ export const LOCATION_OPTIONS = gql`
 `;
 
 export const INSERT_NEW_COURSE_LOCATION = gql`
-  mutation InsertCourseLocation($courseId: Int!, $option: String!) {
+  mutation InsertCourseLocation($courseId: Int!, $option: LocationOption_enum!) {
     insert_CourseLocation(
       objects: {
         courseId: $courseId
@@ -201,7 +201,7 @@ export const INSERT_NEW_COURSE_LOCATION = gql`
 `;
 
 export const UPDATE_COURSE_LOCATION_OPTION = gql`
-  mutation UpdateCourseLocationOption($locationId: Int!, $option: String!) {
+  mutation UpdateCourseLocationOption($locationId: Int!, $option: LocationOption_enum!) {
     update_CourseLocation_by_pk(
       pk_columns: { id: $locationId }
       _set: { locationOption: $option }

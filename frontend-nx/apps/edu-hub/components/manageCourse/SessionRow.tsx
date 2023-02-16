@@ -269,13 +269,7 @@ export const SessionRow: FC<IProps> = ({
         )}
 
         <div className="mr-3 ml-3 col-span-3">
-          {!session && (
-            <>
-              {t('start')}
-              <br />
-              {t('time')}
-            </>
-          )}
+          {!session && <>{t('start-time')}</>}
           {session && (
             <EhTimeSelect
               className="bg-edu-light-gray m-2"
@@ -285,13 +279,7 @@ export const SessionRow: FC<IProps> = ({
           )}
         </div>
         <div className="mr-3 ml-3 col-span-3">
-          {!session && (
-            <>
-              {t('end')}
-              <br />
-              {t('time')}
-            </>
-          )}
+          {!session && <>{t('end-time')}</>}
           {session && (
             <EhTimeSelect
               className="bg-edu-light-gray m-2"
@@ -315,12 +303,7 @@ export const SessionRow: FC<IProps> = ({
           )}
         </div>
         <div className="mr-3 ml-3 col-span-5">
-          {!session && (
-            <>
-              {t('address')} / <br />
-              {t('link')}
-            </>
-          )}
+          {!session && <>{t('addresses')}</>}
           {session && (
             <div className="m-2">
               <EhMultipleTag
@@ -332,11 +315,7 @@ export const SessionRow: FC<IProps> = ({
           )}
         </div>
         <div className="mr-3 ml-3 col-span-5">
-          {!session && (
-            <>
-              Speaker <br />
-            </>
-          )}
+          {!session && <>{t('speakers')}</>}
           {session && (
             <div className="m-2">
               <EhMultipleTag

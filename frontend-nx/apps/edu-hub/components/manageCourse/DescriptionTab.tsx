@@ -423,13 +423,13 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
                   onChange={updateWeekday}
                   className="w-full h-8 bg-edu-light-gray"
                 >
-                  <option value="MONDAY">{t('Monday-short')}</option>
-                  <option value="TUESDAY">{t('Tuesday-short')}</option>
-                  <option value="WEDNESDAY">{t('Wednesday-short')}</option>
-                  <option value="THURSDAY">{t('Thursday-short')}</option>
-                  <option value="FRIDAY">{t('Friday-short')}</option>
-                  <option value="SATURDAY">{t('Saturday-short')}</option>
-                  <option value="SUNDAY">{t('Sunday-short')}</option>
+                  <option value="MONDAY">{t('MONDAY')}</option>
+                  <option value="TUESDAY">{t('TUESDAY')}</option>
+                  <option value="WEDNESDAY">{t('WEDNESDAY')}</option>
+                  <option value="THURSDAY">{t('THURSDAY')}</option>
+                  <option value="FRIDAY">{t('FRIDAY')}</option>
+                  <option value="SATURDAY">{t('SATURDAY')}</option>
+                  <option value="SUNDAY">{t('SUNDAY')}</option>
                 </select>
               </div>
             </div>
@@ -465,8 +465,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
                 onChange={updateCourseLanguage}
                 className="w-full h-8 bg-edu-light-gray"
               >
-                <option value="DE">{t('german')}</option>
-                <option value="EN">{t('english')}</option>
+                <option value="DE">{t('DE')}</option>
+                <option value="EN">{t('EN')}</option>
               </select>
             </div>
           </div>
