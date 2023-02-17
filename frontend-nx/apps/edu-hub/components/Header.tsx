@@ -27,7 +27,7 @@ export const Header: FC = () => {
   }, []);
 
   return (
-    <header className="flex w-full py-4">
+    <header className="flex w-full py-4 px-3 xl:px-0 absolute top-0 left-0 bg-edu-bg-gray bg-opacity-50">
       <div className="flex w-full items-center">
         <Link href="/">
           <div className="flex cursor-pointer">
