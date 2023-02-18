@@ -1,13 +1,35 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { FC, useCallback, useState } from "react";
-import { MdArrowBack, MdArrowForward } from "react-icons/md";
-import { QUERY_LIMIT } from "../../pages/courses";
+import { FC, useCallback, useState } from 'react';
+import { MdArrowBack, MdArrowForward } from 'react-icons/md';
+import { useAdminMutation } from '../../hooks/authedMutation';
+import { useAdminQuery } from '../../hooks/authedQuery';
+
+import { QUERY_LIMIT } from '../../pages/courses';
 import {
   AdminCourseListVariables,
   AdminCourseList_Course,
-} from "../../queries/__generated__/AdminCourseList";
-import { Programs_Program } from "../../queries/__generated__/Programs";
-import SingleCourseRow from "./SingleCourseRow";
+} from '../../queries/__generated__/AdminCourseList';
+import { Programs_Program } from '../../queries/__generated__/Programs';
+import SingleCourseRow from './SingleCourseRow';
+import { ADMIN_COURSE_LIST } from 'apps/edu-hub/queries/courseList';
+import {
+  UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE,
+  UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE,
+  UPDATE_COURSE_CHAT_LINK,
+} from '../../queries/course';
+import { CourseList } from 'apps/edu-hub/queries/__generated__/CourseList';
+import {
+  UpdateCourseAttendanceCertificatePossible,
+  UpdateCourseAttendanceCertificatePossibleVariables,
+} from 'apps/edu-hub/queries/__generated__/UpdateCourseAttendanceCertificatePossible';
+import {
+  UpdateCourseAchievementCertificatePossible,
+  UpdateCourseAchievementCertificatePossibleVariables,
+} from 'apps/edu-hub/queries/__generated__/UpdateCourseAchievementCertificatePossible';
+import {
+  UpdateCourseChatLink,
+  UpdateCourseChatLinkVariables,
+} from 'apps/edu-hub/queries/__generated__/UpdateCourseChatLink';
 
 interface IProps {
   t: any;
@@ -21,14 +43,20 @@ const CourseListTable: FC<IProps> = ({
   t,
   updateFilter,
 }) => {
-  const tableHeaders: string[] = [
-    t("tableHeaderOff"),
-    t("tableHeaderTitle"),
-    t("tableHeaderInstructor"),
-    t("tableHeaderBewerb"),
-    t("tableHeaderEingeladenOptions"),
-    t("tableHeaderProgram"),
-    t("tableHeaderStatus"),
+  const qResult = useAdminQuery<CourseList>(ADMIN_COURSE_LIST);
+
+  if (qResult.error) {
+    console.log('query programs error', qResult.error);
+  }
+
+  const tableHeaders: [string, string][] = [
+    [t('table-header-published'), 'justify-center'],
+    [t('table-header-title'), 'justify-start'],
+    [t('table-header-instructor'), 'justify-start'],
+    [t('table-header-applications'), 'justify-center'],
+    [t('table-header-application-status'), 'justify-center'],
+    [t('table-header-program'), 'justify-center'],
+    [t('table-header-status'), 'justify-center'],
   ];
   const courses: AdminCourseList_Course[] = [
     ...(courseListRequest.data?.Course ?? []),
@@ -38,6 +66,58 @@ const CourseListTable: FC<IProps> = ({
   }, [courseListRequest]);
 
   const count = courseListRequest.data?.Course_aggregate?.aggregate?.count || 0;
+
+  const [updateAttendanceCertificatePossible] = useAdminMutation<
+    UpdateCourseAttendanceCertificatePossible,
+    UpdateCourseAttendanceCertificatePossibleVariables
+  >(UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE);
+  const handleAttendanceCertificatePossible = useCallback(
+    async (c: AdminCourseList_Course, isPossible: boolean) => {
+      await updateAttendanceCertificatePossible({
+        variables: {
+          courseId: c.id,
+          isPossible,
+        },
+      });
+      qResult.refetch();
+    },
+    [qResult, updateAttendanceCertificatePossible]
+  );
+
+  const [updateAchievementCertificatePossible] = useAdminMutation<
+    UpdateCourseAchievementCertificatePossible,
+    UpdateCourseAchievementCertificatePossibleVariables
+  >(UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE);
+  const handleAchievementCertificatePossible = useCallback(
+    async (c: AdminCourseList_Course, isPossible: boolean) => {
+      await updateAchievementCertificatePossible({
+        variables: {
+          courseId: c.id,
+          isPossible,
+        },
+      });
+      qResult.refetch();
+    },
+    [qResult, updateAchievementCertificatePossible]
+  );
+
+  const [updateChatLink] = useAdminMutation<
+    UpdateCourseChatLink,
+    UpdateCourseChatLinkVariables
+  >(UPDATE_COURSE_CHAT_LINK);
+  const handleChatLink = useCallback(
+    async (c: AdminCourseList_Course, link: string) => {
+      await updateChatLink({
+        variables: {
+          courseId: c.id,
+          chatLink: link,
+        },
+      });
+      qResult.refetch();
+    },
+    [qResult, updateChatLink]
+  );
+
   return (
     <>
       <div className="flex flex-col space-y-10">
@@ -45,10 +125,13 @@ const CourseListTable: FC<IProps> = ({
           <table className="w-full">
             <thead>
               <tr>
-                {tableHeaders.map((text) => {
+                {tableHeaders.map((header, index) => {
+                  const [text, className] = header;
                   return (
                     <th key={text} className="py-2 px-5">
-                      <p className="flex justify-start font-medium text-gray-700 uppercase">
+                      <p
+                        className={`flex ${className} font-medium text-gray-700 uppercase`}
+                      >
                         {text}
                       </p>
                     </th>
@@ -64,6 +147,13 @@ const CourseListTable: FC<IProps> = ({
                   programs={programs}
                   refetchCourses={refetchCourses}
                   t={t}
+                  onSetAttendanceCertificatePossible={
+                    handleAttendanceCertificatePossible
+                  }
+                  onSetAchievementCertificatePossible={
+                    handleAchievementCertificatePossible
+                  }
+                  onSetChatLink={handleChatLink}
                 />
               ))}
             </tbody>
@@ -142,7 +232,7 @@ const Pagination: FC<IPageProps> = ({
         )}
         <p className="font-medium">
           {/* @ts-ignore */}
-          {t("paginationText", { currentPage: current_page, totalPage: pages })}
+          {t('paginationText', { currentPage: current_page, totalPage: pages })}
         </p>
 
         {current_page < pages && (

@@ -21,6 +21,7 @@ export const COURSE_FRAGMENT = gql`
     coverImage
     language
     maxMissedSessions
+    chatLink
     title
     achievementCertificatePossible
     attendanceCertificatePossible

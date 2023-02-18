@@ -185,6 +185,10 @@ export interface AdminCourseFragment {
    */
   maxMissedSessions: number;
   /**
+   * The link to the chat of the course (e.g. a mattermost channel)
+   */
+  chatLink: string | null;
+  /**
    * The title of the course (only editable by an admin user)
    */
   title: string;
@@ -256,8 +260,4 @@ export interface AdminCourseFragment {
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
-  /**
-   * The link to the chat of the course (e.g. a mattermost channel)
-   */
-  chatLink: string | null;
 }

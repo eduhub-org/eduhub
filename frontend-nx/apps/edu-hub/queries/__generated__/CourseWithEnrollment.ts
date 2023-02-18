@@ -219,6 +219,10 @@ export interface CourseWithEnrollment_Course_by_pk {
    */
   maxMissedSessions: number;
   /**
+   * The link to the chat of the course (e.g. a mattermost channel)
+   */
+  chatLink: string | null;
+  /**
    * The title of the course (only editable by an admin user)
    */
   title: string;
@@ -286,10 +290,6 @@ export interface CourseWithEnrollment_Course_by_pk {
    * An array relationship
    */
   CourseGroups: CourseWithEnrollment_Course_by_pk_CourseGroups[];
-  /**
-   * The link to the chat of the course (e.g. a mattermost channel)
-   */
-  chatLink: string | null;
   /**
    * An array relationship
    */

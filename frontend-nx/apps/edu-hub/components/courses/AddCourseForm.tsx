@@ -207,6 +207,9 @@ const Form: FC<IAddCourseProps> = ({
               value={programId}
               onChangeHandler={handleProgramOnchange}
               options={semesters}
+              onSetAttendanceCertificatePossible={
+                handleAttendanceCertificatePossible
+              }
             />
           </div>
         </div>

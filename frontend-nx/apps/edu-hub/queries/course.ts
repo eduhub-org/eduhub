@@ -376,3 +376,45 @@ export const UPDATE_COURSE_STATUS = gql`
     }
   }
 `;
+
+export const UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE = gql`
+  mutation UpdateCourseAttendanceCertificatePossible(
+    $courseId: Int!
+    $isPossible: Boolean!
+  ) {
+    update_Course_by_pk(
+      pk_columns: { id: $courseId }
+      _set: { attendanceCertificatePossible: $isPossible }
+    ) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE = gql`
+  mutation UpdateCourseAchievementCertificatePossible(
+    $courseId: Int!
+    $isPossible: Boolean!
+  ) {
+    update_Course_by_pk(
+      pk_columns: { id: $courseId }
+      _set: { achievementCertificatePossible: $isPossible }
+    ) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_COURSE_CHAT_LINK = gql`
+  mutation UpdateCourseChatLink(
+    $courseId: Int!
+    $chatLink: String!
+  ) {
+    update_Course_by_pk(
+      pk_columns: { id: $courseId }
+      _set: { chatLink: $chatLink }
+    ) {
+      id
+    }
+  }
+`;
