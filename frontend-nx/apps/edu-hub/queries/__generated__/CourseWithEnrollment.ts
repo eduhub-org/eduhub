@@ -237,7 +237,7 @@ export interface CourseWithEnrollment_Course_by_pk {
   /**
    * Id of the program to which the course belongs.
    */
-  programId: number | null;
+  programId: number;
   /**
    * The number of maximum participants in the course.
    */
@@ -249,7 +249,7 @@ export interface CourseWithEnrollment_Course_by_pk {
   /**
    * Heading of the the first course description field
    */
-  headingDescriptionField1: string;
+  headingDescriptionField1: string | null;
   /**
    * Content of the first course description field
    */
@@ -285,7 +285,7 @@ export interface CourseWithEnrollment_Course_by_pk {
   /**
    * An object relationship
    */
-  Program: CourseWithEnrollment_Course_by_pk_Program | null;
+  Program: CourseWithEnrollment_Course_by_pk_Program;
   /**
    * An array relationship
    */

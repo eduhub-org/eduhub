@@ -92,7 +92,7 @@ export interface CourseMinimum_Course_by_pk {
   /**
    * Id of the program to which the course belongs.
    */
-  programId: number | null;
+  programId: number;
   /**
    * An array of texts including the learning goals for the course
    */
@@ -120,7 +120,7 @@ export interface CourseMinimum_Course_by_pk {
   /**
    * An object relationship
    */
-  Program: CourseMinimum_Course_by_pk_Program | null;
+  Program: CourseMinimum_Course_by_pk_Program;
 }
 
 export interface CourseMinimum {

@@ -63,7 +63,7 @@ export interface CourseFragmentMinimum {
   /**
    * Id of the program to which the course belongs.
    */
-  programId: number | null;
+  programId: number;
   /**
    * An array of texts including the learning goals for the course
    */

@@ -20,5 +20,7 @@
   "end-time": "Endzeit",
   "description": "Beschreibung",
   "speakers": "Referenten",
-  "status": "Status"
+  "status": "Status",
+  "start": "Start",
+  "end": "Ende"
 }

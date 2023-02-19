@@ -203,7 +203,7 @@ export interface AdminCourseFragment {
   /**
    * Id of the program to which the course belongs.
    */
-  programId: number | null;
+  programId: number;
   /**
    * The number of maximum participants in the course.
    */
@@ -215,7 +215,7 @@ export interface AdminCourseFragment {
   /**
    * Heading of the the first course description field
    */
-  headingDescriptionField1: string;
+  headingDescriptionField1: string | null;
   /**
    * Content of the first course description field
    */
@@ -251,7 +251,7 @@ export interface AdminCourseFragment {
   /**
    * An object relationship
    */
-  Program: AdminCourseFragment_Program | null;
+  Program: AdminCourseFragment_Program;
   /**
    * An array relationship
    */

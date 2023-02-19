@@ -4,11 +4,25 @@ import { Programs_Program } from '../../queries/__generated__/Programs';
 import { StaticComponentProperty } from '../../types/UIComponents';
 import { Course_bool_exp } from '../../__generated__/globalTypes';
 import CommonPageHeader from '../common/CommonPageHeader';
+import { MdAddCircle } from 'react-icons/md';
+import { useAdminQuery } from '../../hooks/authedQuery';
+import { useAdminMutation } from '../../hooks/authedMutation';
+
+import { Button } from '@material-ui/core';
+
 import EhAddButton from '../common/EhAddButton';
 import ModalControl from '../common/ModalController';
 import SearchBox from '../common/SearchBox';
 import { ProgramsMenubar } from '../program/ProgramsMenubar';
 import AddCourseForm from './AddCourseForm';
+
+import {
+  InsertCourse,
+  InsertCourseVariables,
+} from 'apps/edu-hub/queries/__generated__/InsertCourse';
+import { INSERT_COURSE } from '../../queries/mutateCourse';
+import { ADMIN_COURSE_LIST } from 'apps/edu-hub/queries/courseList';
+import { CourseList } from 'apps/edu-hub/queries/__generated__/CourseList';
 
 interface IProps {
   programs: Programs_Program[];
@@ -47,6 +61,32 @@ const CoursesHeader: FC<IProps> = ({
     [setShowModal, courseListRequest]
   );
 
+  const qResult = useAdminQuery<CourseList>(ADMIN_COURSE_LIST);
+
+  if (qResult.error) {
+    console.log('query programs error', qResult.error);
+  }
+
+  const [insertCourse] = useAdminMutation<InsertCourse, InsertCourseVariables>(
+    INSERT_COURSE
+  );
+  const insertDefaultCourse = useCallback(async () => {
+    const today = new Date();
+    today.setMilliseconds(0);
+    today.setSeconds(0);
+    today.setMinutes(0);
+    today.setHours(0);
+    await insertCourse({
+      variables: {
+        title: t('course-page:course-default-title'),
+        applicationEnd: new Date(),
+        maxMissedSessions: 2,
+        programId: 1,
+      },
+    });
+    qResult.refetch();
+  }, [insertCourse, t, qResult]);
+
   return (
     <>
       <CommonPageHeader headline={t('coursesHeadline')} />
@@ -57,23 +97,11 @@ const CoursesHeader: FC<IProps> = ({
         courseListRequest={courseListRequest}
         updateFilter={updateFilter}
       />
-      <div className="bg-white pb-10 flex justify-end">
-        <EhAddButton
-          buttonClickCallBack={openModalControl}
-          text={t('addCourseText')}
-        />
+      <div className="flex justify-end mb-12">
+        <Button onClick={insertDefaultCourse} startIcon={<MdAddCircle />}>
+          {t('course-page:add-course')}
+        </Button>
       </div>
-      <ModalControl
-        modalTitle={t('addCourseFormTitle')}
-        onClose={onCloseAddCourseWindow}
-        showModal={showModal}
-      >
-        <AddCourseForm
-          defaultProgramId={defaultProgramId}
-          programs={programs}
-          closeModalHandler={closeModalHandler}
-        />
-      </ModalControl>
     </>
   );
 };

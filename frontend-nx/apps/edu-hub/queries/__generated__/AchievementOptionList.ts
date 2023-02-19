@@ -47,7 +47,7 @@ export interface AchievementOptionList_AchievementOption_AchievementOptionCourse
   /**
    * An object relationship
    */
-  Program: AchievementOptionList_AchievementOption_AchievementOptionCourses_Course_Program | null;
+  Program: AchievementOptionList_AchievementOption_AchievementOptionCourses_Course_Program;
 }
 
 export interface AchievementOptionList_AchievementOption_AchievementOptionCourses {

@@ -224,7 +224,7 @@ export interface CourseListWithInstructors_Course {
   /**
    * Id of the program to which the course belongs.
    */
-  programId: number | null;
+  programId: number;
   /**
    * The number of maximum participants in the course.
    */
@@ -236,7 +236,7 @@ export interface CourseListWithInstructors_Course {
   /**
    * Heading of the the first course description field
    */
-  headingDescriptionField1: string;
+  headingDescriptionField1: string | null;
   /**
    * Content of the first course description field
    */
@@ -272,7 +272,7 @@ export interface CourseListWithInstructors_Course {
   /**
    * An object relationship
    */
-  Program: CourseListWithInstructors_Course_Program | null;
+  Program: CourseListWithInstructors_Course_Program;
   /**
    * An array relationship
    */

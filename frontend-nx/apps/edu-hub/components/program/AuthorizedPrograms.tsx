@@ -121,9 +121,7 @@ export const AuthorizedPrograms: FC = () => {
     today.setHours(0);
     await insertProgram({
       variables: {
-        title: t('set-something', {
-          something: t('course-page:program-title'),
-        }),
+        title: t('course-page:program-title'),
         today: new Date(),
       },
     });
@@ -462,14 +460,14 @@ export const AuthorizedPrograms: FC = () => {
           </Button>
         </div>
         <div className="grid grid-cols-10">
-          <p>{t('course-page:published')}</p>
-          <div className="col-span-2">{t('course-page:program-title')}</div>
-          <div>{t('course-page:short-title')}</div>
-          <div>{`${t('course-page:application')} ${t('start')}`}</div>
-          <div>{`${t('course-page:application')} ${t('end')}`}</div>
-          <div>{t('start')}</div>
-          <div>{t('end')}</div>
-          <div>{t('course-page:delivery-deadline')}</div>
+          <p>{t('programs:published')}</p>
+          <div className="col-span-2">{t('programs:program-title')}</div>
+          <div>{t('programs:short-title')}</div>
+          <div>{t('programs:application-start')}</div>
+          <div>{t('programs:application-end')}</div>
+          <div>{t('programs:course-start')}</div>
+          <div>{t('programs:course-end')}</div>
+          <div>{t('programs:achievement-upload-deadline')}</div>
           <div>&nbsp;</div>
         </div>
         {programs != null &&
@@ -504,7 +502,7 @@ export const AuthorizedPrograms: FC = () => {
           ))}
         <div className="flex justify-end mt-12 mb-12">
           <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />}>
-            {t('add-something', { something: t('course-page:program') })}
+            {t('programs:add')}
           </Button>
         </div>
       </PageBlock>

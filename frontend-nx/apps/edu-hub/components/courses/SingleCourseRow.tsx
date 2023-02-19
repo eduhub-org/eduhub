@@ -10,6 +10,7 @@ import {
   MdKeyboardArrowUp,
   MdUpload,
 } from 'react-icons/md';
+import { QueryResult } from '@apollo/client';
 
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../queries/actions';
@@ -123,8 +124,9 @@ interface IPropsCourseOneRow {
   programs: Programs_Program[];
   course: AdminCourseList_Course;
   t: any;
+  qResult: QueryResult<any>;
   refetchCourses: () => void;
-  onSetChatLink: (p: AdminCourseList_Course, link: string) => any;
+  onSetChatLink: (c: AdminCourseList_Course, link: string) => any;
   onSetAttendanceCertificatePossible: (
     c: AdminCourseList_Course,
     isPossible: boolean
@@ -142,6 +144,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   onSetChatLink,
   onSetAttendanceCertificatePossible,
   onSetAchievementCertificatePossible,
+  qResult,
 }) => {
   const handleToggleAttendanceCertificatePossible = useCallback(() => {
     onSetAttendanceCertificatePossible(
@@ -338,7 +341,14 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
         }
       }
     },
-    [saveCourseImage, course.id, updateCourseQuery, refetchCourses]
+    [
+      course,
+      qResult,
+      saveCourseImage,
+      course.id,
+      updateCourseQuery,
+      refetchCourses,
+    ]
   );
 
   return (

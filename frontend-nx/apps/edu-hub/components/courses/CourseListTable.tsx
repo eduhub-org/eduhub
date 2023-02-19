@@ -12,12 +12,17 @@ import {
 import { Programs_Program } from '../../queries/__generated__/Programs';
 import SingleCourseRow from './SingleCourseRow';
 import { ADMIN_COURSE_LIST } from 'apps/edu-hub/queries/courseList';
+import { INSERT_COURSE } from '../../queries/mutateCourse';
 import {
   UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE,
   UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE,
   UPDATE_COURSE_CHAT_LINK,
 } from '../../queries/course';
 import { CourseList } from 'apps/edu-hub/queries/__generated__/CourseList';
+import {
+  InsertCourse,
+  InsertCourseVariables,
+} from 'apps/edu-hub/queries/__generated__/InsertCourse';
 import {
   UpdateCourseAttendanceCertificatePossible,
   UpdateCourseAttendanceCertificatePossibleVariables,
@@ -48,6 +53,26 @@ const CourseListTable: FC<IProps> = ({
   if (qResult.error) {
     console.log('query programs error', qResult.error);
   }
+
+  const [insertCourse] = useAdminMutation<InsertCourse, InsertCourseVariables>(
+    INSERT_COURSE
+  );
+  const insertDefaultCourse = useCallback(async () => {
+    const today = new Date();
+    today.setMilliseconds(0);
+    today.setSeconds(0);
+    today.setMinutes(0);
+    today.setHours(0);
+    await insertCourse({
+      variables: {
+        title: t('course-page:course-default-title'),
+        applicationEnd: new Date(),
+        maxMissedSessions: 2,
+        programId: 1,
+      },
+    });
+    qResult.refetch();
+  }, [insertCourse, t, qResult]);
 
   const tableHeaders: [string, string][] = [
     [t('table-header-published'), 'justify-center'],
@@ -154,6 +179,7 @@ const CourseListTable: FC<IProps> = ({
                     handleAchievementCertificatePossible
                   }
                   onSetChatLink={handleChatLink}
+                  qResult={qResult}
                 />
               ))}
             </tbody>
