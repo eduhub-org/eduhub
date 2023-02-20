@@ -178,6 +178,7 @@ const CourseListTable: FC<IProps> = ({
                   }
                   onSetChatLink={handleChatLink}
                   onSetEcts={handleEcts}
+                  // onDeleteCourseGroup={handleDeleteCourseGroup}
                   qResult={qResult}
                 />
               ))}

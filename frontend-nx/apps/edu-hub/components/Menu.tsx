@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
 import { useIsAdmin, useIsInstructor } from '../hooks/authentication';
+import useTranslation from 'next-translate/useTranslation';
 
 interface IProps {
   anchorElement: HTMLElement;
@@ -43,6 +44,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
+  const { t } = useTranslation();
 
   const router = useRouter();
 
@@ -69,52 +71,45 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       TransitionComponent={Fade}
       className="min-w-full"
     >
-      {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/user-management">
-            User Management
-          </Link>
-        </MenuItem>
-      )}
-
       <MenuItem onClick={closeMenu}>
         <Link className="w-full text-lg" href="/profile">
-          Profil
+          {t('menu-profile')}
         </Link>
       </MenuItem>
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/programs">
-            Programme
+          <Link className="w-full text-lg" href="/user-management">
+            {t('menu-administration-user')}
           </Link>
         </MenuItem>
       )}
 
-      {isInstructor && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/courses/instructor">
-            Kurse (Instruktor)
-          </Link>
-        </MenuItem>
-      )}
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link className="w-full text-lg" href="/courses">
-            Kurse (Admin)
+            {t('menu-administration-courses')}
           </Link>
         </MenuItem>
       )}
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link href="/achievements">
-            <span className="w-full text-lg">Achievements</span>
+          <Link className="w-full text-lg" href="/achievements">
+            {t('menu-administration-achievement')}
           </Link>
         </MenuItem>
       )}
 
-      <MenuItem onClick={() => logout()}>
-        <span className="w-full text-lg">Logout</span>
+      {isAdmin && (
+        <MenuItem onClick={closeMenu}>
+          <Link className="w-full text-lg" href="/programs">
+            {t('menu-administration-programs')}
+          </Link>
+        </MenuItem>
+      )}
+
+      <MenuItem className="w-full text-lg" onClick={() => logout()}>
+        {t('menu-logout')}
       </MenuItem>
     </StyledMenu>
   );

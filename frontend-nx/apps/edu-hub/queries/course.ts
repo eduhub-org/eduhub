@@ -432,3 +432,20 @@ export const UPDATE_COURSE_ECTS = gql`
     }
   }
 `;
+
+// export const INSERT_NEW_COURSE_GROUP = gql`
+//   mutation InsertCourseGroup($courseId: Int!, $option: CourseGroupOption_enum!) {
+//     insert_CourseGroup(
+//       objects: {
+//         courseId: $courseId
+//         groupOptionId: $option
+//         defaultSessionAddress: ""
+//       }
+//     ) {
+//       affected_rows
+//       returning {
+//         id
+//       }
+//     }
+//   }
+// `;

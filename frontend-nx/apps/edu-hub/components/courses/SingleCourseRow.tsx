@@ -32,14 +32,6 @@ import {
   DeleteCourseInstructor,
   DeleteCourseInstructorVariables,
 } from '../../queries/__generated__/DeleteCourseInstructor';
-import {
-  InsertCourseInstructor,
-  InsertCourseInstructorVariables,
-} from '../../queries/__generated__/InsertCourseInstructor';
-import {
-  InsertExpert,
-  InsertExpertVariables,
-} from '../../queries/__generated__/InsertExpert';
 import { Programs_Program } from '../../queries/__generated__/Programs';
 import {
   SaveCourseImage,
@@ -49,7 +41,6 @@ import {
   UpdateCourseByPk,
   UpdateCourseByPkVariables,
 } from '../../queries/__generated__/UpdateCourseByPk';
-import { UserForSelection1_User } from '../../queries/__generated__/UserForSelection1';
 import { SelectOption } from '../../types/UIComponents';
 import {
   CourseEnrollmentStatus_enum,
@@ -60,6 +51,8 @@ import { SelectUserDialog } from '../common/dialogs/SelectUserDialog';
 import EhCheckBox from '../common/EhCheckbox';
 import EhSelect from '../common/EhSelect';
 import EhTag from '../common/EhTag';
+import EhMultipleTag from '../common/EhMultipleTag';
+
 import { parseFileUploadEvent } from '../../helpers/filehandling';
 import EhDebounceInput from '../common/EhDebounceInput';
 
@@ -69,7 +62,9 @@ import readyForPublicationPie from '../../public/images/course/status/ready-for-
 import readyForApplicationPie from '../../public/images/course/status/ready-for-application.svg';
 import applicantsInvitedPie from '../../public/images/course/status/applicants-invited.svg';
 import participantsRatedPie from '../../public/images/course/status/participants-rated.svg';
-import { CourseList_Course } from 'apps/edu-hub/queries/__generated__/CourseList';
+
+import { InstructorColumn } from './CoursesInstructorColumn';
+import { INSERT_NEW_COURSE_LOCATION } from 'apps/edu-hub/queries/course';
 
 interface EntrollmentStatusCount {
   [key: string]: number;
@@ -136,6 +131,7 @@ interface IPropsCourseOneRow {
     c: AdminCourseList_Course,
     isPossible: boolean
   ) => any;
+  onDeleteCourseGroup: (id: number) => any;
 }
 const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   programs,
@@ -147,6 +143,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   onSetAttendanceCertificatePossible,
   onSetAchievementCertificatePossible,
   qResult,
+  // onDeleteCourseGroup,
 }) => {
   const handleToggleAttendanceCertificatePossible = useCallback(() => {
     onSetAttendanceCertificatePossible(
@@ -360,6 +357,51 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
     ]
   );
 
+  // const [addCourseGroupOpen, setAddCourseGroupOpen] = useState(false);
+  // const openAddCourseGroup = useCallback(() => {
+  //   setAddCourseGroupOpen(true);
+  // }, [setAddCourseGroupOpen]);
+
+  // const handleDeleteCourseGroup = useCallback(
+  //   (id: number) => {
+  //     onDeleteCourseGroup(id);
+  //   },
+  //   [onDeleteCourseGroup]
+  // );
+  // const courseGroupTags = (course?.CourseGroups || []).map((courseGroup) => ({
+  //   id: courseGroup.id,
+  //   display: courseGroup.CourseGroupOption.title,
+  // }));
+
+  // const [insertCourseGroup] = useAdminMutation<
+  //   InsertNewCourseGroup,
+  //   InsertNewCourseGroupVariables
+  // >(INSERT_NEW_COURSE_GROUP);
+  // INSERT_NEW_COURSE_LOCATION;
+  // const handleNewSpeaker = useCallback(
+  //   async (
+  //     confirmed: boolean,
+  //     courseGroup: courseGroupForSelection1_courseGroup | null
+  //   ) => {
+  //     if (confirmed && courseGroup != null && course != null) {
+  //       let expertId = -1;
+
+  //       if (expertId !== -1) {
+  //         await insertCourseGroup({
+  //           variables: {
+  //             courseGroup,
+  //             courseId: course.id,
+  //           },
+  //         });
+  //       }
+
+  //       qResult.refetch();
+  //     }
+  //     setAddCourseGroupOpen(false);
+  //   },
+  //   [course, insertCourseGroup, qResult]
+  // );
+
   return (
     <>
       <tr className="font-medium bg-edu-course-list h-12">
@@ -478,53 +520,74 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                     inputText={course.chatLink || ''}
                   />
                 </div>
-                {`${t('possible-certificates')}:`}
-                <div className="grid grid-cols-10">
-                  <div
-                    className="cursor-pointer"
-                    onClick={handleToggleAttendanceCertificatePossible}
-                  >
-                    {course.attendanceCertificatePossible && (
-                      <MdCheckBox size="1.5em" />
-                    )}
-                    {!course.attendanceCertificatePossible && (
-                      <MdOutlineCheckBoxOutlineBlank size="1.5em" />
-                    )}
+                <td>
+                  {`${t('possible-certificates')}:`}
+                  <div className="grid grid-cols-10">
+                    <div
+                      className="cursor-pointer"
+                      onClick={handleToggleAttendanceCertificatePossible}
+                    >
+                      {course.attendanceCertificatePossible && (
+                        <MdCheckBox size="1.5em" />
+                      )}
+                      {!course.attendanceCertificatePossible && (
+                        <MdOutlineCheckBoxOutlineBlank size="1.5em" />
+                      )}
+                    </div>
+                    <div className="col-span-9">
+                      {t('course-page:proof-of-participation')}
+                    </div>
                   </div>
-                  <div className="col-span-9">
-                    {t('course-page:proof-of-participation')}
+                  <div className="grid grid-cols-10">
+                    <div
+                      className="cursor-pointer"
+                      onClick={handleToggleAchievementCertificatePossible}
+                    >
+                      {course.achievementCertificatePossible && (
+                        <MdCheckBox size="1.5em" />
+                      )}
+                      {!course.achievementCertificatePossible && (
+                        <MdOutlineCheckBoxOutlineBlank size="1.5em" />
+                      )}
+                    </div>
+                    <div className="col-span-3">
+                      {t('course-page:performance-certificate')}
+                    </div>
+                    <div className="col-span-7 flex mt-2">
+                      <span className="mr-2">{t('course-page:ects')}: </span>
+                      <EhDebounceInput
+                        placeholder={t('course-page:ects-placeholder')}
+                        onChangeHandler={handleSetEcts}
+                        inputText={course.ects || ''}
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="grid grid-cols-10">
-                  <div
-                    className="cursor-pointer"
-                    onClick={handleToggleAchievementCertificatePossible}
-                  >
-                    {course.achievementCertificatePossible && (
-                      <MdCheckBox size="1.5em" />
-                    )}
-                    {!course.achievementCertificatePossible && (
-                      <MdOutlineCheckBoxOutlineBlank size="1.5em" />
-                    )}
-                  </div>
-                  <div className="col-span-3">
-                    {t('course-page:performance-certificate')}
-                  </div>
-                  <div className="col-span-7 flex mt-2">
-                    <span className="mr-2">{t('course-page:ects')}: </span>
-                    <EhDebounceInput
-                      placeholder={t('course-page:ects-placeholder')}
-                      onChangeHandler={handleSetEcts}
-                      inputText={course.ects || ''}
-                    />
-                  </div>
-                </div>
+                </td>
               </div>
             </td>
+            {/* <td className="px-5 inline-block align-top pb-2" colSpan={1}>
+              <div className="mr-3 ml-3 col-span-5">
+                {!course && <>{t('course-group')}</>}
+                {course && (
+                  <div className="m-2">
+                    <EhMultipleTag
+                      requestAddTag={openAddCourseGroup}
+                      requestDeleteTag={handleDeleteCourseGroup}
+                      tags={courseGroupTags}
+                    />
+                  </div>
+                )}
+              </div>
+            </td> */}
           </tr>
           <tr className="h-1" />
         </>
       )}
+      {/* <SelectUserDialog
+        onClose={handleNewSpeaker}
+        open={addSpeakerOpen}
+        title={t('select-something', { something: t('speaker') })}
+      /> */}
     </>
   );
 };
@@ -536,144 +599,144 @@ const makeFullName = (firstName: string, lastName: string): string => {
 };
 
 // /* #region Instructor column */
-interface IPropsInstructorColumn {
-  programs: Programs_Program[];
-  course: AdminCourseList_Course;
-  t: any;
-  qResult: QueryResult<any>;
-  refetchCourses: () => void;
-}
+// interface IPropsInstructorColumn {
+//   programs: Programs_Program[];
+//   course: AdminCourseList_Course;
+//   t: any;
+//   qResult: QueryResult<any>;
+//   refetchCourses: () => void;
+// }
 
-const InstructorColumn: FC<IPropsInstructorColumn> = ({
-  course,
-  refetchCourses,
-}) => {
-  const [openInstructorDialog, setOpenInstructorDialog] = useState(false);
+// const InstructorColumn: FC<IPropsInstructorColumn> = ({
+//   course,
+//   refetchCourses,
+// }) => {
+//   const [openInstructorDialog, setOpenInstructorDialog] = useState(false);
 
-  /* # region GraphQLAPIs */
-  const [insertCourseInstructor] = useAdminMutation<
-    InsertCourseInstructor,
-    InsertCourseInstructorVariables
-  >(INSERT_A_COURSEINSTRUCTOR);
+//   /* # region GraphQLAPIs */
+//   const [insertCourseInstructor] = useAdminMutation<
+//     InsertCourseInstructor,
+//     InsertCourseInstructorVariables
+//   >(INSERT_A_COURSEINSTRUCTOR);
 
-  const [deleteInstructorAPI] = useAdminMutation<
-    DeleteCourseInstructor,
-    DeleteCourseInstructorVariables
-  >(DELETE_COURSE_INSRTRUCTOR);
+//   const [deleteInstructorAPI] = useAdminMutation<
+//     DeleteCourseInstructor,
+//     DeleteCourseInstructorVariables
+//   >(DELETE_COURSE_INSRTRUCTOR);
 
-  const [insertExpertMutation] = useAdminMutation<
-    InsertExpert,
-    InsertExpertVariables
-  >(INSERT_EXPERT);
+//   const [insertExpertMutation] = useAdminMutation<
+//     InsertExpert,
+//     InsertExpertVariables
+//   >(INSERT_EXPERT);
 
-  /* # endregion */
+//   /* # endregion */
 
-  /* #region Callbacks */
-  const addInstructorDialogOpener = useCallback(async () => {
-    setOpenInstructorDialog(true);
-  }, [setOpenInstructorDialog]);
+//   /* #region Callbacks */
+//   const addInstructorDialogOpener = useCallback(async () => {
+//     setOpenInstructorDialog(true);
+//   }, [setOpenInstructorDialog]);
 
-  const deleteInstructorFromACourse = useCallback(
-    async (id: number) => {
-      const response = await deleteInstructorAPI({
-        variables: {
-          courseId: course.id,
-          expertId: id,
-        },
-      });
+//   const deleteInstructorFromACourse = useCallback(
+//     async (id: number) => {
+//       const response = await deleteInstructorAPI({
+//         variables: {
+//           courseId: course.id,
+//           expertId: id,
+//         },
+//       });
 
-      if (response.errors) {
-        console.log(response.errors);
-        return;
-      }
-      refetchCourses();
-    },
-    [deleteInstructorAPI, refetchCourses, course]
-  );
+//       if (response.errors) {
+//         console.log(response.errors);
+//         return;
+//       }
+//       refetchCourses();
+//     },
+//     [deleteInstructorAPI, refetchCourses, course]
+//   );
 
-  const addInstructorHandler = useCallback(
-    async (confirmed: boolean, user: UserForSelection1_User | null) => {
-      if (!confirmed || user == null) {
-        setOpenInstructorDialog(false);
-        return;
-      }
+//   const addInstructorHandler = useCallback(
+//     async (confirmed: boolean, user: UserForSelection1_User | null) => {
+//       if (!confirmed || user == null) {
+//         setOpenInstructorDialog(false);
+//         return;
+//       }
 
-      let expertId = -1;
-      if (user.Experts.length > 0) {
-        expertId = user.Experts[0].id;
-      } else {
-        const newExpert = await insertExpertMutation({
-          variables: {
-            userId: user.id,
-          },
-        });
-        if (newExpert.errors) {
-          console.log(newExpert.errors);
-          setOpenInstructorDialog(false);
-          return;
-        }
-        expertId = newExpert.data?.insert_Expert?.returning[0]?.id || -1;
-      }
+//       let expertId = -1;
+//       if (user.Experts.length > 0) {
+//         expertId = user.Experts[0].id;
+//       } else {
+//         const newExpert = await insertExpertMutation({
+//           variables: {
+//             userId: user.id,
+//           },
+//         });
+//         if (newExpert.errors) {
+//           console.log(newExpert.errors);
+//           setOpenInstructorDialog(false);
+//           return;
+//         }
+//         expertId = newExpert.data?.insert_Expert?.returning[0]?.id || -1;
+//       }
 
-      if (expertId === -1) {
-        setOpenInstructorDialog(false);
-        return;
-      }
-      if (
-        course.CourseInstructors.some((expert) => expert.Expert.id === expertId)
-      ) {
-        setOpenInstructorDialog(false);
-        return;
-      }
-      const response = await insertCourseInstructor({
-        variables: {
-          courseId: course.id,
-          expertId,
-        },
-      });
-      if (response.errors) {
-        console.log(response.errors);
-        setOpenInstructorDialog(false);
-        return;
-      }
-      refetchCourses();
-      setOpenInstructorDialog(false);
-    },
-    [insertExpertMutation, refetchCourses, course, insertCourseInstructor]
-  );
-  const { t } = useTranslation('course-page');
+//       if (expertId === -1) {
+//         setOpenInstructorDialog(false);
+//         return;
+//       }
+//       if (
+//         course.CourseInstructors.some((expert) => expert.Expert.id === expertId)
+//       ) {
+//         setOpenInstructorDialog(false);
+//         return;
+//       }
+//       const response = await insertCourseInstructor({
+//         variables: {
+//           courseId: course.id,
+//           expertId,
+//         },
+//       });
+//       if (response.errors) {
+//         console.log(response.errors);
+//         setOpenInstructorDialog(false);
+//         return;
+//       }
+//       refetchCourses();
+//       setOpenInstructorDialog(false);
+//     },
+//     [insertExpertMutation, refetchCourses, course, insertCourseInstructor]
+//   );
+//   const { t } = useTranslation('course-page');
 
-  return (
-    <div className="flex flex-row space-x-1 align-middle">
-      {
-        // we need to show just one instructore in main ui
-        course.CourseInstructors.length > 0 && (
-          <EhTag
-            key={`${course.id}-${course.CourseInstructors[0].Expert.id}`}
-            requestDeleteTag={deleteInstructorFromACourse}
-            tag={{
-              display: makeFullName(
-                course.CourseInstructors[0].Expert.User.firstName,
-                course.CourseInstructors[0].Expert.User.lastName ?? ' '
-              ),
-              id: course.CourseInstructors[0].Expert.id,
-            }}
-          />
-        )
-      }
-      <div className="">
-        <MdAddCircle
-          className="cursor-pointer inline-block align-middle stroke-cyan-500"
-          onClick={addInstructorDialogOpener}
-        />
-      </div>
-      {openInstructorDialog && (
-        <SelectUserDialog
-          onClose={addInstructorHandler}
-          open={openInstructorDialog}
-          title={t('add-instructors')}
-        />
-      )}
-    </div>
-  );
-};
+//   return (
+//     <div className="flex flex-row space-x-1 align-middle">
+//       {
+//         // we need to show just one instructore in main ui
+//         course.CourseInstructors.length > 0 && (
+//           <EhTag
+//             key={`${course.id}-${course.CourseInstructors[0].Expert.id}`}
+//             requestDeleteTag={deleteInstructorFromACourse}
+//             tag={{
+//               display: makeFullName(
+//                 course.CourseInstructors[0].Expert.User.firstName,
+//                 course.CourseInstructors[0].Expert.User.lastName ?? ' '
+//               ),
+//               id: course.CourseInstructors[0].Expert.id,
+//             }}
+//           />
+//         )
+//       }
+//       <div className="">
+//         <MdAddCircle
+//           className="cursor-pointer inline-block align-middle stroke-cyan-500"
+//           onClick={addInstructorDialogOpener}
+//         />
+//       </div>
+//       {openInstructorDialog && (
+//         <SelectUserDialog
+//           onClose={addInstructorHandler}
+//           open={openInstructorDialog}
+//           title={t('add-instructors')}
+//         />
+//       )}
+//     </div>
+//   );
+// };

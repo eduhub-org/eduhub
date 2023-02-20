@@ -1,5 +1,6 @@
 import { QueryResult } from '@apollo/client';
 import { FC } from 'react';
+import { useSession } from 'next-auth/react';
 import { DebounceInput } from 'react-debounce-input';
 import {
   eventTargetNumberMapper,
@@ -113,7 +114,12 @@ const prepDateTimeUpdate = (timeString: string) => {
 const constantOnlineMapper = () => 'ONLINE';
 
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
-  const currentUpdateRole = 'instructor';
+  const { data } = useSession();
+  const currentUpdateRole = data.profile['https://hasura.io/jwt/claims'][
+    'x-hasura-allowed-roles'
+  ].includes('admin')
+    ? 'admin'
+    : 'instructor';
 
   const queryKnownLocationOptions =
     useInstructorQuery<LocationOptionsKnown>(LOCATION_OPTIONS);

@@ -22,5 +22,11 @@
   "speakers": "Referenten",
   "status": "Status",
   "start": "Start",
-  "end": "Ende"
+  "end": "Ende",
+  "menu-profile": "Profil",
+  "menu-administration-user":"Benutzer",
+  "menu-administration-courses": "Kurse",
+  "menu-administration-achievement": "Leistungsnachweise",
+  "menu-administration-programs": "Programme",
+  "menu-logout": "Logout"
 }
