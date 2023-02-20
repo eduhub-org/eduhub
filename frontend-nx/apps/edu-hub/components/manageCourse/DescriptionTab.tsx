@@ -1,6 +1,7 @@
-import { QueryResult } from "@apollo/client";
-import { FC } from "react";
-import { DebounceInput } from "react-debounce-input";
+import { QueryResult } from '@apollo/client';
+import { FC } from 'react';
+import { useSession } from 'next-auth/react';
+import { DebounceInput } from 'react-debounce-input';
 import {
   eventTargetNumberMapper,
   eventTargetValueMapper,
@@ -9,8 +10,8 @@ import {
   useDeleteCallback,
   useUpdateCallback,
   useUpdateCallback2,
-} from "../../hooks/authedMutation";
-import { useInstructorQuery } from "../../hooks/authedQuery";
+} from '../../hooks/authedMutation';
+import { useInstructorQuery } from '../../hooks/authedQuery';
 import {
   DELETE_COURSE_LOCATION,
   INSERT_NEW_COURSE_LOCATION,
@@ -28,73 +29,74 @@ import {
   UPDATE_COURSE_START_TIME,
   UPDATE_COURSE_TAGLINE,
   UPDATE_COURSE_WEEKDAY,
-} from "../../queries/course";
+} from '../../queries/course';
 import {
   DeleteCourseLocation,
   DeleteCourseLocationVariables,
-} from "../../queries/__generated__/DeleteCourseLocation";
+} from '../../queries/__generated__/DeleteCourseLocation';
 import {
   InsertCourseLocation,
   InsertCourseLocationVariables,
-} from "../../queries/__generated__/InsertCourseLocation";
-import { LocationOptionsKnown } from "../../queries/__generated__/LocationOptionsKnown";
-import { ManagedCourse_Course_by_pk } from "../../queries/__generated__/ManagedCourse";
+} from '../../queries/__generated__/InsertCourseLocation';
+import { LocationOptionsKnown } from '../../queries/__generated__/LocationOptionsKnown';
+import { ManagedCourse_Course_by_pk } from '../../queries/__generated__/ManagedCourse';
 import {
   UpdateCourseContentDescriptionField1,
   UpdateCourseContentDescriptionField1Variables,
-} from "../../queries/__generated__/UpdateCourseContentDescriptionField1";
+} from '../../queries/__generated__/UpdateCourseContentDescriptionField1';
 import {
   UpdateCourseContentDescriptionField2,
   UpdateCourseContentDescriptionField2Variables,
-} from "../../queries/__generated__/UpdateCourseContentDescriptionField2";
+} from '../../queries/__generated__/UpdateCourseContentDescriptionField2';
 import {
   UpdateCourseEndTime,
   UpdateCourseEndTimeVariables,
-} from "../../queries/__generated__/UpdateCourseEndTime";
+} from '../../queries/__generated__/UpdateCourseEndTime';
 import {
   UpdateCourseHeadingDescription1,
   UpdateCourseHeadingDescription1Variables,
-} from "../../queries/__generated__/UpdateCourseHeadingDescription1";
+} from '../../queries/__generated__/UpdateCourseHeadingDescription1';
 import {
   UpdateCourseHeadingDescription2,
   UpdateCourseHeadingDescription2Variables,
-} from "../../queries/__generated__/UpdateCourseHeadingDescription2";
+} from '../../queries/__generated__/UpdateCourseHeadingDescription2';
 import {
   UpdateCourseLanguage,
   UpdateCourseLanguageVariables,
-} from "../../queries/__generated__/UpdateCourseLanguage";
+} from '../../queries/__generated__/UpdateCourseLanguage';
 import {
   UpdateCourseLearningGoals,
   UpdateCourseLearningGoalsVariables,
-} from "../../queries/__generated__/UpdateCourseLearningGoals";
+} from '../../queries/__generated__/UpdateCourseLearningGoals';
 import {
   UpdateCourseDefaultSessionAddress,
   UpdateCourseDefaultSessionAddressVariables,
-} from "../../queries/__generated__/UpdateCourseDefaultSessionAddress";
+} from '../../queries/__generated__/UpdateCourseDefaultSessionAddress';
 import {
   UpdateCourseLocationOption,
   UpdateCourseLocationOptionVariables,
-} from "../../queries/__generated__/UpdateCourseLocationOption";
+} from '../../queries/__generated__/UpdateCourseLocationOption';
 import {
   UpdateCourseStartTime,
   UpdateCourseStartTimeVariables,
-} from "../../queries/__generated__/UpdateCourseStartTime";
+} from '../../queries/__generated__/UpdateCourseStartTime';
 import {
   UpdateCourseWeekday,
   UpdateCourseWeekdayVariables,
-} from "../../queries/__generated__/UpdateCourseWeekday";
-import EhTimeSelect, { formatTime } from "../common/EhTimeSelect";
-import { LocationSelectionRow } from "./LocationSelectionRow";
-import { Button } from "@material-ui/core";
-import { MdAddCircle } from "react-icons/md";
+} from '../../queries/__generated__/UpdateCourseWeekday';
+import EhTimeSelect, { formatTime } from '../common/EhTimeSelect';
+import { LocationSelectionRow } from './LocationSelectionRow';
+import { Button } from '@material-ui/core';
+import { MdAddCircle } from 'react-icons/md';
 import {
   UpdateCourseTagline,
   UpdateCourseTaglineVariables,
-} from "../../queries/__generated__/UpdateCourseTagline";
+} from '../../queries/__generated__/UpdateCourseTagline';
 import {
   UpdateCourseMaxParticipants,
   UpdateCourseMaxParticipantsVariables,
-} from "../../queries/__generated__/UpdateCourseMaxParticipants";
+} from '../../queries/__generated__/UpdateCourseMaxParticipants';
+import useTranslation from 'next-translate/useTranslation';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -103,22 +105,27 @@ interface IProps {
 
 const prepDateTimeUpdate = (timeString: string) => {
   const now = new Date();
-  const [hourS, minS] = timeString.split(":");
+  const [hourS, minS] = timeString.split(':');
   now.setHours(Number(hourS));
   now.setMinutes(Number(minS));
   return now.toISOString();
 };
 
-const constantOnlineMapper = () => "ONLINE";
+const constantOnlineMapper = () => 'ONLINE';
 
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
-  const currentUpdateRole = "instructor";
+  const { data } = useSession();
+  const currentUpdateRole = data.profile['https://hasura.io/jwt/claims'][
+    'x-hasura-allowed-roles'
+  ].includes('admin')
+    ? 'admin'
+    : 'instructor';
 
   const queryKnownLocationOptions =
     useInstructorQuery<LocationOptionsKnown>(LOCATION_OPTIONS);
   if (queryKnownLocationOptions.error) {
     console.log(
-      "query known location options error",
+      'query known location options error',
       queryKnownLocationOptions.error
     );
   }
@@ -133,8 +140,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     INSERT_NEW_COURSE_LOCATION,
     currentUpdateRole,
-    "courseId",
-    "option",
+    'courseId',
+    'option',
     course?.id,
     constantOnlineMapper,
     qResult
@@ -146,7 +153,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     DELETE_COURSE_LOCATION,
     currentUpdateRole,
-    "locationId",
+    'locationId',
     pickIdPkMapper,
     qResult
   );
@@ -157,8 +164,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_COURSE_LOCATION_OPTION,
     currentUpdateRole,
-    "locationId",
-    "option",
+    'locationId',
+    'option',
     pickIdPkMapper,
     identityEventMapper,
     qResult
@@ -170,8 +177,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
     currentUpdateRole,
-    "locationId",
-    "defaultSessionAddress",
+    'locationId',
+    'defaultSessionAddress',
     pickIdPkMapper,
     identityEventMapper,
     qResult
@@ -183,8 +190,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_COURSE_START_TIME,
     currentUpdateRole,
-    "courseId",
-    "startTime",
+    'courseId',
+    'startTime',
     course?.id,
     prepDateTimeUpdate,
     qResult
@@ -196,8 +203,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_COURSE_END_TIME,
     currentUpdateRole,
-    "courseId",
-    "endTime",
+    'courseId',
+    'endTime',
     course?.id,
     prepDateTimeUpdate,
     qResult
@@ -209,8 +216,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_COURSE_LANGUAGE,
     currentUpdateRole,
-    "courseId",
-    "language",
+    'courseId',
+    'language',
     course?.id,
     eventTargetValueMapper,
     qResult
@@ -222,8 +229,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_COURSE_WEEKDAY,
     currentUpdateRole,
-    "courseId",
-    "weekday",
+    'courseId',
+    'weekday',
     course?.id,
     eventTargetValueMapper,
     qResult
@@ -235,8 +242,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1,
     currentUpdateRole,
-    "courseId",
-    "description",
+    'courseId',
+    'description',
     course?.id,
     eventTargetValueMapper,
     qResult
@@ -248,8 +255,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2,
     currentUpdateRole,
-    "courseId",
-    "description",
+    'courseId',
+    'description',
     course?.id,
     eventTargetValueMapper,
     qResult
@@ -261,8 +268,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_COURSE_HEADING_DESCRIPTION_1,
     currentUpdateRole,
-    "courseId",
-    "description",
+    'courseId',
+    'description',
     course?.id,
     eventTargetValueMapper,
     qResult
@@ -274,8 +281,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_COURSE_HEADING_DESCRIPTION_2,
     currentUpdateRole,
-    "courseId",
-    "description",
+    'courseId',
+    'description',
     course?.id,
     eventTargetValueMapper,
     qResult
@@ -287,8 +294,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_COURSE_LEARNING_GOALS,
     currentUpdateRole,
-    "courseId",
-    "description",
+    'courseId',
+    'description',
     course?.id,
     eventTargetValueMapper,
     qResult
@@ -300,8 +307,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_COURSE_TAGLINE,
     currentUpdateRole,
-    "courseId",
-    "tagline",
+    'courseId',
+    'tagline',
     course?.id,
     eventTargetValueMapper,
     qResult
@@ -313,21 +320,27 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   >(
     UPDATE_COURSE_MAX_PARTICIPANTS,
     currentUpdateRole,
-    "courseId",
-    "maxParticipants",
+    'courseId',
+    'maxParticipants',
     course?.id,
     eventTargetNumberMapper,
     qResult
   );
+  const { t } = useTranslation();
 
   const courseLocations = [...course.CourseLocations];
   courseLocations.sort((a, b) => a.id - b.id);
-
   return (
     <div>
       <div className="grid grid-cols-2 ">
-        <div className="mr-3 ml-3">Kurzbeschreibung (max. 200 Zeichen)</div>
-        <div className="mr-3 ml-3">Lernziele (max. 500 Zeichen)</div>
+        <div className="mr-3 ml-3">{`${t('course-page:short-description')} (${t(
+          'course-page:max-n-characters',
+          { n: 200 }
+        )})`}</div>
+        <div className="mr-3 ml-3">{`${t('course-page:learning-goal')} (${t(
+          'course-page:max-n-characters',
+          { n: 500 }
+        )})`}</div>
       </div>
       <div className="grid grid-cols-2 mb-8">
         <DebounceInput
@@ -336,7 +349,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           className="h-64 mr-3 ml-3 bg-edu-light-gray"
           onChange={updateTagline}
           forceNotifyByEnter={false}
-          element={"textarea"}
+          element={'textarea'}
           value={course.tagline}
         />
         <DebounceInput
@@ -345,14 +358,18 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           className="h-64 mr-3 ml-3 bg-edu-light-gray"
           onChange={updateLearningGoals}
           forceNotifyByEnter={false}
-          element={"textarea"}
-          value={course.learningGoals ?? ""}
+          element={'textarea'}
+          value={course.learningGoals ?? ''}
         />
       </div>
 
       <div className="grid grid-cols-2">
-        <div className="mr-3 ml-3">Titel Info Block 1 (max. 50 Zeichen)</div>
-        <div className="mr-3 ml-3">Titel Info Block 2 (max. 50 Zeichen)</div>
+        <div className="mr-3 ml-3">{`${t(
+          'course-page:title-info-block'
+        )} 1 (${t('course-page:max-n-characters', { n: 50 })})`}</div>
+        <div className="mr-3 ml-3">{`${t(
+          'course-page:title-info-block'
+        )} 2 (${t('course-page:max-n-characters', { n: 50 })})`}</div>
       </div>
       <div className="grid grid-cols-2 mb-8">
         <DebounceInput
@@ -360,7 +377,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           debounceTimeout={1000}
           className="h-8 mr-3 ml-3 bg-edu-light-gray"
           onChange={updateHeading1}
-          value={course.headingDescriptionField1 ?? ""}
+          value={course.headingDescriptionField1 ?? ''}
         />
 
         <DebounceInput
@@ -368,13 +385,17 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           debounceTimeout={1000}
           className="h-8 mr-3 ml-3 bg-edu-light-gray"
           onChange={updateHeading2}
-          value={course.headingDescriptionField2 ?? ""}
+          value={course.headingDescriptionField2 ?? ''}
         />
       </div>
 
       <div className="grid grid-cols-2">
-        <div className="mr-3 ml-3">Text Info Block 1 (max. 1500 Zeichen)</div>
-        <div className="mr-3 ml-3">Text Info Block 2 (max. 1500 Zeichen)</div>
+        <div className="mr-3 ml-3">{`${t(
+          'course-page:title-info-block'
+        )} 1 (${t('course-page:max-n-characters', { n: 1500 })})`}</div>
+        <div className="mr-3 ml-3">{`${t(
+          'course-page:title-info-block'
+        )} 2 (${t('course-page:max-n-characters', { n: 1500 })})`}</div>
       </div>
       <div className="grid grid-cols-2 mb-8">
         <DebounceInput
@@ -383,8 +404,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           className="h-64 mr-3 ml-3 bg-edu-light-gray"
           onChange={updateContent1}
           forceNotifyByEnter={false}
-          element={"textarea"}
-          value={course.contentDescriptionField1 ?? ""}
+          element={'textarea'}
+          value={course.contentDescriptionField1 ?? ''}
         />
         <DebounceInput
           maxLength={1500}
@@ -392,8 +413,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           className="h-64 mr-3 ml-3 bg-edu-light-gray"
           onChange={updateContent2}
           forceNotifyByEnter={false}
-          element={"textarea"}
-          value={course.contentDescriptionField2 ?? ""}
+          element={'textarea'}
+          value={course.contentDescriptionField2 ?? ''}
         />
       </div>
 
@@ -404,22 +425,22 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
               <div>Tag</div>
               <div>
                 <select
-                  value={course.weekDay ?? "MONDAY"}
+                  value={course.weekDay ?? 'MONDAY'}
                   onChange={updateWeekday}
                   className="w-full h-8 bg-edu-light-gray"
                 >
-                  <option value="MONDAY">MO</option>
-                  <option value="TUESDAY">DI</option>
-                  <option value="WEDNESDAY">MI</option>
-                  <option value="THURSDAY">DO</option>
-                  <option value="FRIDAY">FR</option>
-                  <option value="SATURDAY">SA</option>
-                  <option value="SUNDAY">SO</option>
+                  <option value="MONDAY">{t('MONDAY')}</option>
+                  <option value="TUESDAY">{t('TUESDAY')}</option>
+                  <option value="WEDNESDAY">{t('WEDNESDAY')}</option>
+                  <option value="THURSDAY">{t('THURSDAY')}</option>
+                  <option value="FRIDAY">{t('FRIDAY')}</option>
+                  <option value="SATURDAY">{t('SATURDAY')}</option>
+                  <option value="SUNDAY">{t('SUNDAY')}</option>
                 </select>
               </div>
             </div>
             <div className="mr-3 ml-3">
-              <div>Startzeit</div>
+              <div>{t('course-page:start-time')}</div>
               <div>
                 <EhTimeSelect
                   value={formatTime(course.startTime)}
@@ -429,7 +450,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
               </div>
             </div>
             <div className="mr-3 ml-3">
-              <div>Endzeit</div>
+              <div>{t('course-page:end-time')}</div>
               <div>
                 <EhTimeSelect
                   value={formatTime(course.endTime)}
@@ -443,20 +464,20 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         </div>
         <div className="grid grid-cols-2 mb-8">
           <div className="mr-3 ml-3">
-            <div>Sprache</div>
+            <div>{t('language')}</div>
             <div>
               <select
                 value={course.language}
                 onChange={updateCourseLanguage}
                 className="w-full h-8 bg-edu-light-gray"
               >
-                <option value="DE">Deutsch</option>
-                <option value="EN">Englisch</option>
+                <option value="DE">{t('DE')}</option>
+                <option value="EN">{t('EN')}</option>
               </select>
             </div>
           </div>
           <div className="mr-3 ml-3">
-            <div>Max. Teil. Anzahl</div>
+            <div>{t('course-page:max-part-quantity')}</div>
             <div>
               <DebounceInput
                 type="number"
@@ -492,7 +513,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
 
       <div className="flex justify-end mb-8">
         <Button onClick={insertCourseLocation} startIcon={<MdAddCircle />}>
-          neuen Ort hinzufügen
+          {t('course-page:add-new-location')}
         </Button>
       </div>
     </div>

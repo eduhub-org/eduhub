@@ -19,5 +19,5 @@ export interface SaveAchievementOptionEvaluationScript {
 
 export interface SaveAchievementOptionEvaluationScriptVariables {
   base64File: string;
-  courseId: number;
+  achievementOptionId: number;
 }

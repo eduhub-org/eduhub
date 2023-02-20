@@ -19,7 +19,7 @@ export const RegisterButton: FC = () => {
   }, [router]);
 
   return (
-    <Button onClick={register} filled>
+    <Button onClick={register} filled inverted>
       {t("registerButton")}
     </Button>
   );

@@ -57,6 +57,7 @@ services:
       HASURA_GRAPHQL_ENABLE_CONSOLE: "false" # set to "false" to disable console, the console has to run on the host for some technical reasons, it is very hard to get it to run from inside the container: https://github.com/hasura/graphql-engine/issues/2824
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+      HASURA_GRAPHQL_LOG_LEVEL: warn
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: inherited_roles
@@ -83,6 +84,8 @@ services:
       CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: "http://functions:42011"
       CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "http://functions:42005"
       CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "http://functions:42012"
+      CLOUD_FUNCTION_LINK_CREATE_ACHIEVEMENT_CERTIFICATE: "http://functions:42022"
+      CLOUD_FUNCTION_LINK_CREATE_PARTICIPATION_CERTIFICATE: "http://functions:42023"
 
     volumes:
       - ./backend:/hasura

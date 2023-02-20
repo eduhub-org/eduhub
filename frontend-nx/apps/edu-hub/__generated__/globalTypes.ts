@@ -277,6 +277,43 @@ export enum CourseEnrollment_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "CourseGroupOption"
+ */
+export enum CourseGroupOption_constraint {
+  CourseGroupOption_pkey = "CourseGroupOption_pkey",
+  CourseGroupOption_title_key = "CourseGroupOption_title_key",
+}
+
+/**
+ * update columns of table "CourseGroupOption"
+ */
+export enum CourseGroupOption_update_column {
+  created_at = "created_at",
+  id = "id",
+  order = "order",
+  title = "title",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "CourseGroup"
+ */
+export enum CourseGroup_constraint {
+  CourseGroup_pkey = "CourseGroup_pkey",
+}
+
+/**
+ * update columns of table "CourseGroup"
+ */
+export enum CourseGroup_update_column {
+  courseId = "courseId",
+  created_at = "created_at",
+  groupOptionId = "groupOptionId",
+  id = "id",
+  updated_at = "updated_at",
+}
+
+/**
  * unique or primary key constraints on table "CourseInstructor"
  */
 export enum CourseInstructor_constraint {
@@ -438,6 +475,11 @@ export enum Language_update_column {
  */
 export enum LocationOption_constraint {
   LocationOptions_pkey = "LocationOptions_pkey",
+}
+
+export enum LocationOption_enum {
+  KIEL = "KIEL",
+  ONLINE = "ONLINE",
 }
 
 /**
@@ -2565,6 +2607,207 @@ export interface CourseEnrollment_variance_order_by {
 }
 
 /**
+ * Boolean expression to filter rows from the table "CourseGroupOption". All fields are combined with a logical 'AND'.
+ */
+export interface CourseGroupOption_bool_exp {
+  CourseGroups?: CourseGroup_bool_exp | null;
+  _and?: CourseGroupOption_bool_exp[] | null;
+  _not?: CourseGroupOption_bool_exp | null;
+  _or?: CourseGroupOption_bool_exp[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  order?: Int_comparison_exp | null;
+  title?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "CourseGroupOption"
+ */
+export interface CourseGroupOption_insert_input {
+  CourseGroups?: CourseGroup_arr_rel_insert_input | null;
+  created_at?: any | null;
+  id?: number | null;
+  order?: number | null;
+  title?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "CourseGroupOption"
+ */
+export interface CourseGroupOption_obj_rel_insert_input {
+  data: CourseGroupOption_insert_input;
+  on_conflict?: CourseGroupOption_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "CourseGroupOption"
+ */
+export interface CourseGroupOption_on_conflict {
+  constraint: CourseGroupOption_constraint;
+  update_columns: CourseGroupOption_update_column[];
+  where?: CourseGroupOption_bool_exp | null;
+}
+
+/**
+ * order by aggregate values of table "CourseGroup"
+ */
+export interface CourseGroup_aggregate_order_by {
+  avg?: CourseGroup_avg_order_by | null;
+  count?: order_by | null;
+  max?: CourseGroup_max_order_by | null;
+  min?: CourseGroup_min_order_by | null;
+  stddev?: CourseGroup_stddev_order_by | null;
+  stddev_pop?: CourseGroup_stddev_pop_order_by | null;
+  stddev_samp?: CourseGroup_stddev_samp_order_by | null;
+  sum?: CourseGroup_sum_order_by | null;
+  var_pop?: CourseGroup_var_pop_order_by | null;
+  var_samp?: CourseGroup_var_samp_order_by | null;
+  variance?: CourseGroup_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "CourseGroup"
+ */
+export interface CourseGroup_arr_rel_insert_input {
+  data: CourseGroup_insert_input[];
+  on_conflict?: CourseGroup_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "CourseGroup"
+ */
+export interface CourseGroup_avg_order_by {
+  courseId?: order_by | null;
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "CourseGroup". All fields are combined with a logical 'AND'.
+ */
+export interface CourseGroup_bool_exp {
+  Course?: Course_bool_exp | null;
+  CourseGroupOption?: CourseGroupOption_bool_exp | null;
+  _and?: CourseGroup_bool_exp[] | null;
+  _not?: CourseGroup_bool_exp | null;
+  _or?: CourseGroup_bool_exp[] | null;
+  courseId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  groupOptionId?: Int_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "CourseGroup"
+ */
+export interface CourseGroup_insert_input {
+  Course?: Course_obj_rel_insert_input | null;
+  CourseGroupOption?: CourseGroupOption_obj_rel_insert_input | null;
+  courseId?: number | null;
+  created_at?: any | null;
+  groupOptionId?: number | null;
+  id?: number | null;
+  updated_at?: any | null;
+}
+
+/**
+ * order by max() on columns of table "CourseGroup"
+ */
+export interface CourseGroup_max_order_by {
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "CourseGroup"
+ */
+export interface CourseGroup_min_order_by {
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "CourseGroup"
+ */
+export interface CourseGroup_on_conflict {
+  constraint: CourseGroup_constraint;
+  update_columns: CourseGroup_update_column[];
+  where?: CourseGroup_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "CourseGroup"
+ */
+export interface CourseGroup_stddev_order_by {
+  courseId?: order_by | null;
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "CourseGroup"
+ */
+export interface CourseGroup_stddev_pop_order_by {
+  courseId?: order_by | null;
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "CourseGroup"
+ */
+export interface CourseGroup_stddev_samp_order_by {
+  courseId?: order_by | null;
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "CourseGroup"
+ */
+export interface CourseGroup_sum_order_by {
+  courseId?: order_by | null;
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "CourseGroup"
+ */
+export interface CourseGroup_var_pop_order_by {
+  courseId?: order_by | null;
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "CourseGroup"
+ */
+export interface CourseGroup_var_samp_order_by {
+  courseId?: order_by | null;
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "CourseGroup"
+ */
+export interface CourseGroup_variance_order_by {
+  courseId?: order_by | null;
+  groupOptionId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
  * order by aggregate values of table "CourseInstructor"
  */
 export interface CourseInstructor_aggregate_order_by {
@@ -2767,7 +3010,7 @@ export interface CourseLocation_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   defaultSessionAddress?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
-  locationOption?: String_comparison_exp | null;
+  locationOption?: LocationOption_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
 
@@ -2781,7 +3024,7 @@ export interface CourseLocation_insert_input {
   created_at?: any | null;
   defaultSessionAddress?: string | null;
   id?: number | null;
-  locationOption?: string | null;
+  locationOption?: LocationOption_enum | null;
   updated_at?: any | null;
 }
 
@@ -2793,7 +3036,6 @@ export interface CourseLocation_max_order_by {
   created_at?: order_by | null;
   defaultSessionAddress?: order_by | null;
   id?: order_by | null;
-  locationOption?: order_by | null;
   updated_at?: order_by | null;
 }
 
@@ -2805,7 +3047,6 @@ export interface CourseLocation_min_order_by {
   created_at?: order_by | null;
   defaultSessionAddress?: order_by | null;
   id?: order_by | null;
-  locationOption?: order_by | null;
   updated_at?: order_by | null;
 }
 
@@ -2973,6 +3214,7 @@ export interface Course_avg_order_by {
 export interface Course_bool_exp {
   AchievementOptionCourses?: AchievementOptionCourse_bool_exp | null;
   CourseEnrollments?: CourseEnrollment_bool_exp | null;
+  CourseGroups?: CourseGroup_bool_exp | null;
   CourseInstructors?: CourseInstructor_bool_exp | null;
   CourseLocations?: CourseLocation_bool_exp | null;
   CourseStatus?: CourseStatus_bool_exp | null;
@@ -3017,6 +3259,7 @@ export interface Course_bool_exp {
 export interface Course_insert_input {
   AchievementOptionCourses?: AchievementOptionCourse_arr_rel_insert_input | null;
   CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
+  CourseGroups?: CourseGroup_arr_rel_insert_input | null;
   CourseInstructors?: CourseInstructor_arr_rel_insert_input | null;
   CourseLocations?: CourseLocation_arr_rel_insert_input | null;
   CourseStatus?: CourseStatus_obj_rel_insert_input | null;
@@ -3129,6 +3372,7 @@ export interface Course_on_conflict {
 export interface Course_order_by {
   AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_order_by | null;
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
+  CourseGroups_aggregate?: CourseGroup_aggregate_order_by | null;
   CourseInstructors_aggregate?: CourseInstructor_aggregate_order_by | null;
   CourseLocations_aggregate?: CourseLocation_aggregate_order_by | null;
   CourseStatus?: CourseStatus_order_by | null;
@@ -3547,6 +3791,17 @@ export interface LocationOption_bool_exp {
   _or?: LocationOption_bool_exp[] | null;
   comment?: String_comparison_exp | null;
   value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "LocationOption_enum". All fields are combined with logical 'AND'.
+ */
+export interface LocationOption_enum_comparison_exp {
+  _eq?: LocationOption_enum | null;
+  _in?: LocationOption_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: LocationOption_enum | null;
+  _nin?: LocationOption_enum[] | null;
 }
 
 /**

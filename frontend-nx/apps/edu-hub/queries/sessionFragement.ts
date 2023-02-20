@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
-import { USER_FRAGMENT } from "./userFragment";
+import { gql } from '@apollo/client';
+import { USER_FRAGMENT } from './userFragment';
 
 export const SESSION_FRAGMENT = gql`
   fragment SessionFragment on Session {
@@ -9,6 +9,11 @@ export const SESSION_FRAGMENT = gql`
     description
     startDateTime
     title
+    SessionAddresses {
+      id
+      address
+      type
+    }
   }
 `;
 
@@ -17,11 +22,6 @@ export const ADMIN_SESSION_FRAGMENT = gql`
   ${USER_FRAGMENT}
   fragment AdminSessionFragment on Session {
     ...SessionFragment
-    SessionAddresses {
-      id
-      address
-      type
-    }
     SessionSpeakers {
       id
       Expert {

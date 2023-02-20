@@ -1,19 +1,19 @@
 import useTranslation from 'next-translate/useTranslation';
-import { FC } from "react";
+import { FC } from 'react';
 
-import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
-import { Button } from "../common/Button";
+import { CourseWithEnrollment_Course_by_pk } from '../../queries/__generated__/CourseWithEnrollment';
+import { Button } from '../common/Button';
 
 interface IProps {
   course: CourseWithEnrollment_Course_by_pk;
 }
 
 export const Tools: FC<IProps> = ({ course }) => {
-  const { t } = useTranslation("course-page");
+  const { t } = useTranslation('course-page');
 
-  const videoLink = course.CourseLocations.find(
-    (courseLocation) => !!courseLocation.defaultSessionAddress
-  )?.defaultSessionAddress;
+  // const videoLink = course.CourseLocations.find(
+  //   (courseLocation) => !!courseLocation.defaultSessionAddress
+  // )?.defaultSessionAddress;
 
   return (
     <div className="flex flex-1 gap-x-4">
@@ -25,10 +25,11 @@ export const Tools: FC<IProps> = ({ course }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {t("openChat")}
+          {t('openChat')}
         </Button>
       )}
-      {videoLink && (
+
+      {/* {videoLink && (
         <Button
           as="a"
           filled
@@ -36,9 +37,9 @@ export const Tools: FC<IProps> = ({ course }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {t("openVideoCall")}
+          {t('openVideoCall')}
         </Button>
-      )}
+      )} */}
     </div>
   );
 };

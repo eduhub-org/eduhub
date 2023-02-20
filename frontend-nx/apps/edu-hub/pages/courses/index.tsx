@@ -3,33 +3,33 @@ import path from 'path';
 path.resolve('./next.config.js');
 
 import useTranslation from 'next-translate/useTranslation';
-import Head from "next/head";
-import { FC, useCallback, useState } from "react";
-import CourseListTable from "../../components/courses/CourseListTable";
-import CoursesHeader from "../../components/courses/CoursesHeader";
-import Loading from "../../components/courses/Loading";
-import { Page } from "../../components/Page";
-import { useAdminQuery } from "../../hooks/authedQuery";
-import { useIsAdmin, useIsLoggedIn } from "../../hooks/authentication";
-import { ADMIN_COURSE_LIST } from "../../queries/courseList";
-import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from "../../queries/programList";
+import Head from 'next/head';
+import { FC, useCallback, useState } from 'react';
+import CourseListTable from '../../components/courses/CourseListTable';
+import CoursesHeader from '../../components/courses/CoursesHeader';
+import Loading from '../../components/courses/Loading';
+import { Page } from '../../components/Page';
+import { useAdminQuery } from '../../hooks/authedQuery';
+import { useIsAdmin, useIsLoggedIn } from '../../hooks/authentication';
+import { ADMIN_COURSE_LIST } from '../../queries/courseList';
+import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../queries/programList';
 import {
   AdminCourseList,
   AdminCourseListVariables,
-} from "../../queries/__generated__/AdminCourseList";
+} from '../../queries/__generated__/AdminCourseList';
 import {
   Programs,
   Programs_Program,
-} from "../../queries/__generated__/Programs";
+} from '../../queries/__generated__/Programs';
 
 const Index: FC = () => {
   const isAdmin = useIsAdmin();
   const isLoggedIn = useIsLoggedIn();
-  const { t } = useTranslation("course-page");
+  const { t } = useTranslation('course-page');
   return (
     <>
       <Head>
-        <title>{t("coursesPageTitle")}</title>
+        <title>{t('coursesPageTitle')}</title>
       </Head>
       <Page>
         <div className="min-h-[77vh]">
@@ -64,7 +64,7 @@ interface IProps {
 }
 const Content: FC<IProps> = ({ programs }) => {
   const defaultProgram = programs[0].id;
-  const { t } = useTranslation("course-page");
+  const { t } = useTranslation('course-page');
 
   const [filter, setFilter] = useState<AdminCourseListVariables>({
     limit: QUERY_LIMIT,

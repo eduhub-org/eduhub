@@ -3,11 +3,21 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, SessionAddressType_enum, LocationOption_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: AdminCourseFragment
 // ====================================================
+
+export interface AdminCourseFragment_Sessions_SessionAddresses {
+  __typename: "SessionAddress";
+  id: number;
+  /**
+   * Where the session will take place; might be an offline or online location which is provided according to the provided type
+   */
+  address: string;
+  type: SessionAddressType_enum;
+}
 
 export interface AdminCourseFragment_Sessions {
   __typename: "Session";
@@ -32,6 +42,10 @@ export interface AdminCourseFragment_Sessions {
    * The title of the session
    */
   title: string;
+  /**
+   * An array relationship
+   */
+  SessionAddresses: AdminCourseFragment_Sessions_SessionAddresses[];
 }
 
 export interface AdminCourseFragment_CourseInstructors_Expert_User {
@@ -83,7 +97,7 @@ export interface AdminCourseFragment_CourseLocations {
   /**
    * Either 'ONLINE' or one of the possible given offline locations
    */
-  locationOption: string | null;
+  locationOption: LocationOption_enum | null;
 }
 
 export interface AdminCourseFragment_Program {
@@ -105,6 +119,30 @@ export interface AdminCourseFragment_Program {
    * The last day a course lecture can possibly be in this program.
    */
   lectureEnd: any | null;
+  /**
+   * The deadline for the achievement record uploads.
+   */
+  achievementRecordUploadDeadline: any | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+}
+
+export interface AdminCourseFragment_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
+export interface AdminCourseFragment_CourseGroups {
+  __typename: "CourseGroup";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: AdminCourseFragment_CourseGroups_CourseGroupOption;
 }
 
 export interface AdminCourseFragment {
@@ -147,21 +185,37 @@ export interface AdminCourseFragment {
    */
   maxMissedSessions: number;
   /**
+   * The link to the chat of the course (e.g. a mattermost channel)
+   */
+  chatLink: string | null;
+  /**
    * The title of the course (only editable by an admin user)
    */
   title: string;
   /**
+   * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
+   */
+  achievementCertificatePossible: boolean;
+  /**
+   * Indicates whether participants will get a certificate showing the list of attendances (only issued if the did not miss then maxMissedCourses)
+   */
+  attendanceCertificatePossible: boolean;
+  /**
    * Id of the program to which the course belongs.
    */
-  programId: number | null;
+  programId: number;
   /**
    * The number of maximum participants in the course.
    */
   maxParticipants: number | null;
   /**
+   * An array of texts including the learning goals for the course
+   */
+  learningGoals: string | null;
+  /**
    * Heading of the the first course description field
    */
-  headingDescriptionField1: string;
+  headingDescriptionField1: string | null;
   /**
    * Content of the first course description field
    */
@@ -195,27 +249,15 @@ export interface AdminCourseFragment {
    */
   CourseLocations: AdminCourseFragment_CourseLocations[];
   /**
+   * An object relationship
+   */
+  Program: AdminCourseFragment_Program;
+  /**
+   * An array relationship
+   */
+  CourseGroups: AdminCourseFragment_CourseGroups[];
+  /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
-  /**
-   * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
-   */
-  achievementCertificatePossible: boolean;
-  /**
-   * Indicates whether participants will get a certificate showing the list of attendances (only issued if the did not miss then maxMissedCourses)
-   */
-  attendanceCertificatePossible: boolean;
-  /**
-   * The link to the chat of the course (e.g. a mattermost channel)
-   */
-  chatLink: string | null;
-  /**
-   * An array of texts including the learning goals for the course
-   */
-  learningGoals: string | null;
-  /**
-   * An object relationship
-   */
-  Program: AdminCourseFragment_Program | null;
 }

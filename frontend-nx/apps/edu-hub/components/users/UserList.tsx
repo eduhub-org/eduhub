@@ -1,20 +1,20 @@
-import { QueryResult } from "@apollo/client";
-import { FC, useCallback, useState } from "react";
-import { MdArrowBack, MdArrowForward } from "react-icons/md";
-import { useAdminQuery } from "../../hooks/authedQuery";
-import { USERS_BY_LAST_NAME } from "../../queries/user";
+import { QueryResult } from '@apollo/client';
+import { FC, useCallback, useState } from 'react';
+import { MdArrowBack, MdArrowForward } from 'react-icons/md';
+import { useAdminQuery } from '../../hooks/authedQuery';
+import { USERS_BY_LAST_NAME } from '../../queries/user';
 import {
   UesrsByLastName,
   UesrsByLastNameVariables,
   UesrsByLastName_User,
-} from "../../queries/__generated__/UesrsByLastName";
-import { StaticComponentProperty } from "../../types/UIComponents";
-import { User_bool_exp } from "../../__generated__/globalTypes";
-import EhAddButton from "../common/EhAddButton";
-import EhCheckBox2 from "../common/EhCheckBox2";
-import ModalControl from "../common/ModalController";
-import Loading from "../courses/Loading";
-import AddUser from "./AddUser";
+} from '../../queries/__generated__/UesrsByLastName';
+import { StaticComponentProperty } from '../../types/UIComponents';
+import { User_bool_exp } from '../../__generated__/globalTypes';
+import EhAddButton from '../common/EhAddButton';
+import EhCheckBox2 from '../common/EhCheckBox2';
+import ModalControl from '../common/ModalController';
+import Loading from '../courses/Loading';
+import AddUser from './AddUser';
 
 interface IProps {
   t: any;
@@ -28,9 +28,9 @@ const UserList: FC<IProps> = ({ t, searchedText }) => {
   const LIMIT = 15;
 
   const userTypes: StaticComponentProperty[] = [
-    { key: USER_TYPE_INSTUCTOR, label: t("courseInstructor"), selected: true },
-    { key: USER_TYPE_SPEAKER, label: t("speaker"), selected: false },
-    { key: USER_TYPE_AMIN, label: t("admin"), selected: false },
+    { key: USER_TYPE_INSTUCTOR, label: t('courseInstructor'), selected: true },
+    { key: USER_TYPE_SPEAKER, label: t('speaker'), selected: false },
+    { key: USER_TYPE_AMIN, label: t('admin'), selected: false },
   ];
 
   /** Filter actually works inner joining multiple tables.
@@ -181,7 +181,7 @@ const Header: FC<IHeaderProps> = ({
     setShowAddUserForm(true);
   }, [setShowAddUserForm]);
 
-  const handleCancleOfAddUserForm = useCallback(
+  const handleCancelOfAddUserForm = useCallback(
     (success: boolean) => {
       setShowAddUserForm(false);
       if (success) {
@@ -208,15 +208,15 @@ const Header: FC<IHeaderProps> = ({
       <div className="flex-end">
         <EhAddButton
           buttonClickCallBack={onAddUserClick}
-          text={t("addUserButtonText")}
+          text={t('addUserButtonText')}
         />
       </div>
       <ModalControl
-        modalTitle={t("addUserFormTitle")}
+        modalTitle={t('addUserFormTitle')}
         onClose={onCloseAddCourseWindow}
         showModal={showAddUserForm}
       >
-        <AddUser handleCancel={handleCancleOfAddUserForm} t={t} />
+        <AddUser handleCancel={handleCancelOfAddUserForm} t={t} />
       </ModalControl>
     </>
   );
@@ -228,9 +228,9 @@ interface ITableContentProps {
 }
 const TableContent: FC<ITableContentProps> = ({ t, users }) => {
   const tableHeaders: StaticComponentProperty[] = [
-    { key: 0, label: t("firstName") },
-    { key: 1, label: t("lastName") },
-    { key: 2, label: t("email") },
+    { key: 0, label: t('firstName') },
+    { key: 1, label: t('lastName') },
+    { key: 2, label: t('email') },
   ];
   return (
     <div className="overflow-x-auto transition-[height] w-full">
@@ -264,8 +264,8 @@ interface IPropsUser {
 }
 
 const UserOneRow: FC<IPropsUser> = ({ user }) => {
-  const pStyle = "text-gray-700 truncate font-medium max-w-xs";
-  const tdStyple = "pl-5";
+  const pStyle = 'text-gray-700 truncate font-medium max-w-xs';
+  const tdStyple = 'pl-5';
 
   return (
     <>
@@ -341,7 +341,7 @@ const Pagination: FC<IPaginationProps> = ({
           />
         )}
         <p className="font-medium">
-          {t("paginationText", { currentPage: current_page, totalPage: pages })}
+          {t('paginationText', { currentPage: current_page, totalPage: pages })}
         </p>
 
         {current_page < pages && (

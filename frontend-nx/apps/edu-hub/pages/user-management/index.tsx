@@ -1,28 +1,22 @@
-import useTranslation from "next-translate/useTranslation";
-import Head from "next/head";
-import { FC, useCallback, useState } from "react";
-import CommonPageHeader from "../../components/common/CommonPageHeader";
-import EhMenuItem from "../../components/common/EhMenuItem";
-import Searchbar from "../../components/common/Searchbar";
-import { Page } from "../../components/Page";
-import UserList from "../../components/users/UserList";
-import { useIsAdmin, useIsLoggedIn } from "../../hooks/authentication";
-import { StaticComponentProperty } from "../../types/UIComponents";
-
-// export const getStaticProps = async ({ locale }: { locale: string }) => ({
-//   props: {
-//     ...(await serverSideTranslations(locale, ["common", "users"])),
-//   },
-// });
+import useTranslation from 'next-translate/useTranslation';
+import Head from 'next/head';
+import { FC, useCallback, useState } from 'react';
+import CommonPageHeader from '../../components/common/CommonPageHeader';
+import EhMenuItem from '../../components/common/EhMenuItem';
+import SearchBox from '../../components/common/SearchBox';
+import { Page } from '../../components/Page';
+import UserList from '../../components/users/UserList';
+import { useIsAdmin, useIsLoggedIn } from '../../hooks/authentication';
+import { StaticComponentProperty } from '../../types/UIComponents';
 
 const Users: FC = () => {
-  const { t } = useTranslation("users");
+  const { t } = useTranslation('users');
   const isLoggedIn = useIsLoggedIn();
   const isAdmin = useIsAdmin();
   return (
     <>
       <Head>
-        <title>{t("title")}</title>
+        <title>{t('title')}</title>
       </Head>
       <Page>
         <div className="min-h-[77vh]">
@@ -40,34 +34,32 @@ interface IProps {
 }
 const UserDashboard: FC<IProps> = ({ t }) => {
   const menuItems: StaticComponentProperty[] = [
-    { key: -1, label: t("all"), selected: true },
+    { key: -1, label: t('all'), selected: true },
   ];
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
 
   /* #region Callbacks */
   const handleSearch = useCallback(
     (text: string) => {
-      console.log(text);
       setSearchText(text);
     },
     [setSearchText]
   );
 
-  const handleManuItemClick = useCallback(
-    (property: StaticComponentProperty) => {
-      console.log(property);
-    },
+  const handleMenuItemClick = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    (property: StaticComponentProperty) => {},
     []
   );
   /* #endregion */
   return (
     <>
-      <CommonPageHeader headline={t("headline")} />
+      <CommonPageHeader headline={t('headline')} />
       <Menubar
         t={t}
         topMenuItems={menuItems}
         handleSearch={handleSearch}
-        onMenuItemClick={handleManuItemClick}
+        onMenuItemClick={handleMenuItemClick}
         searchText={searchText}
       />
       <UserList t={t} searchedText={searchText} />
@@ -80,7 +72,7 @@ interface IMenubarProps {
   handleSearch: (text: string) => void;
   searchText: string;
   topMenuItems: StaticComponentProperty[];
-  onMenuItemClick: (property: StaticComponentProperty) => void;
+  onMenuItemClick?: (property: StaticComponentProperty) => void;
 }
 const Menubar: FC<IMenubarProps> = ({
   t,
@@ -123,9 +115,9 @@ const Menubar: FC<IMenubarProps> = ({
           />
         ))}
       </div>
-      <Searchbar
+      <SearchBox
         onChangeCallback={handleSearch}
-        placeholder={t("userSearchPlaceHolder")}
+        placeholder={t('userSearchPlaceHolder')}
         searchText={searchText}
       />
     </div>

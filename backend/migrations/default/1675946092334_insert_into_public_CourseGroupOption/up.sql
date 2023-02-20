@@ -1,0 +1,1 @@
+INSERT INTO "public"."CourseGroupOption"("id", "title", "order", "created_at", "updated_at") VALUES (3, E'creative_social_sustainable', 3, E'2023-02-09T12:34:52.220876+00:00', E'2023-02-09T12:34:52.220876+00:00');

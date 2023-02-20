@@ -1011,3 +1011,91 @@ resource "google_cloudfunctions2_function" "update_from_keycloak" {
     ingress_settings   = var.cloud_function_ingress_settings
   }
 }
+
+###############################################################################
+# Create Google cloud function for createAchievementCertificate
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "create_achievement_certificate_noauth_invoker" {
+  location    = google_cloudfunctions2_function.create_achievement_certificate.location
+  project     = google_cloudfunctions2_function.create_achievement_certificate.project
+  service     = google_cloudfunctions2_function.create_achievement_certificate.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "create_achievement_certificate" {
+  name   = "cloud-functions/createAchievementCertificate.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "create_achievement_certificate" {
+  provider    = google-beta
+  location    = var.region
+  name        = "create-achievement-certificate"
+  description = "Creates a certificate pdf (at the moment by calling anonther function) and returns it as base64"
+
+  build_config {
+    runtime     = "nodejs14"
+    entry_point = "createAchievementCertificate"
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.create_achievement_certificate.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+    }
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+  }
+}
+
+###############################################################################
+# Create Google cloud function for createParticipationCertificate
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "create_participation_certificate_noauth_invoker" {
+  location    = google_cloudfunctions2_function.create_participation_certificate.location
+  project     = google_cloudfunctions2_function.create_participation_certificate.project
+  service     = google_cloudfunctions2_function.create_participation_certificate.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "create_participation_certificate" {
+  name   = "cloud-functions/createParticipationCertificate.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "create_participation_certificate" {
+  provider    = google-beta
+  location    = var.region
+  name        = "create-participation-certificate"
+  description = "Creates a certificate pdf (at the moment by calling anonther function) and returns it as base64"
+
+  build_config {
+    runtime     = "nodejs14"
+    entry_point = "createParticipationCertificate"
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.create_participation_certificate.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+    }
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+  }
+}

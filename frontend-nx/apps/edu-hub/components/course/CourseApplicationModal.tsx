@@ -1,23 +1,23 @@
-import { Modal } from "@material-ui/core";
-import Fade from "@material-ui/core/Fade";
-import Image from "next/image";
-import { ChangeEvent, FC, useCallback, useState } from "react";
+import { Modal } from '@material-ui/core';
+import Fade from '@material-ui/core/Fade';
+import Image from 'next/image';
+import { ChangeEvent, FC, useCallback, useState } from 'react';
 
-import { CourseEnrollmentStatus_enum } from "../../__generated__/globalTypes";
-import { enrollmentStatusForCourse } from "../../helpers/courseHelpers";
-import { useAuthedMutation } from "../../hooks/authedMutation";
-import { useUserId } from "../../hooks/user";
-import xIcon from "../../public/images/common/x-calibur-black.svg";
-import { Course_Course_by_pk } from "../../queries/__generated__/Course";
-import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
+import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
+import { enrollmentStatusForCourse } from '../../helpers/courseHelpers';
+import { useAuthedMutation } from '../../hooks/authedMutation';
+import { useUserId } from '../../hooks/user';
+import xIcon from '../../public/images/common/x-calibur-black.svg';
+import { Course_Course_by_pk } from '../../queries/__generated__/Course';
+import { CourseWithEnrollment_Course_by_pk } from '../../queries/__generated__/CourseWithEnrollment';
 import {
   InsertEnrollment,
   InsertEnrollmentVariables,
-} from "../../queries/__generated__/InsertEnrollment";
-import { INSERT_ENROLLMENT } from "../../queries/insertEnrollment";
+} from '../../queries/__generated__/InsertEnrollment';
+import { INSERT_ENROLLMENT } from '../../queries/insertEnrollment';
 
-import { CourseApplicationModalFormContent } from "./CourseApplicationModalFormContent";
-import { CourseApplicationModalSuccessContent } from "./CourseApplicationModalSuccessContent";
+import { CourseApplicationModalFormContent } from './CourseApplicationModalFormContent';
+import { CourseApplicationModalSuccessContent } from './CourseApplicationModalSuccessContent';
 
 interface IProps {
   closeModal: () => void;
@@ -30,14 +30,14 @@ export const CourseApplicationModal: FC<IProps> = ({
   course,
   visible,
 }) => {
-  const [text, setText] = useState("");
+  const [text, setText] = useState('');
   const userId = useUserId();
 
   const onChangeText = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setText(event.target.value);
   }, []);
 
-  const [insertMutation,] = useAuthedMutation<
+  const [insertMutation] = useAuthedMutation<
     InsertEnrollment,
     InsertEnrollmentVariables
   >(INSERT_ENROLLMENT);
@@ -45,7 +45,7 @@ export const CourseApplicationModal: FC<IProps> = ({
   const applyForCourse = useCallback(() => {
     if (!userId) {
       // eslint-disable-next-line no-console
-      console.log("Missing user data.");
+      console.log('Missing user data.');
       return;
     }
 
@@ -63,10 +63,13 @@ export const CourseApplicationModal: FC<IProps> = ({
   return (
     <Modal
       open={visible}
-      onClose={closeModal}
+      onClose={(event, reason) => {
+        if (reason !== 'backdropClick') {
+          closeModal();
+        }
+      }}
       className="flex justify-center items-center border-none"
       disableEnforceFocus
-      disableBackdropClick={text.length > 0}
       closeAfterTransition
     >
       <Fade in={visible}>
@@ -77,7 +80,7 @@ export const CourseApplicationModal: FC<IProps> = ({
             </div>
           </div>
           <div className="flex flex-col mt-4 mx-6 sm:mx-20">
-            {status === "NOT_APPLIED" ? (
+            {status === 'NOT_APPLIED' ? (
               <CourseApplicationModalFormContent
                 applyForCourse={applyForCourse}
                 course={course}

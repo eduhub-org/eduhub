@@ -1,13 +1,15 @@
 import { gql } from "@apollo/client";
 import { COURSE_INSTRUCTOR_FRAGMENT } from "./courseInstructorFragment";
 import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from "./programFragment";
+import { ENROLLMENT_FRAGMENT } from "./enrollmentFragment";
 
-import { SESSION_FRAGMENT } from "./sessionFragement";
+import { SESSION_FRAGMENT } from './sessionFragement';
 
 export const COURSE_FRAGMENT = gql`
   ${SESSION_FRAGMENT}
   ${COURSE_INSTRUCTOR_FRAGMENT}
   ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
+  ${ENROLLMENT_FRAGMENT}
   fragment CourseFragment on Course {
     id
     ects
@@ -19,9 +21,13 @@ export const COURSE_FRAGMENT = gql`
     coverImage
     language
     maxMissedSessions
+    chatLink
     title
+    achievementCertificatePossible
+    attendanceCertificatePossible
     programId
     maxParticipants
+    learningGoals
     headingDescriptionField1
     contentDescriptionField1
     headingDescriptionField2
@@ -39,11 +45,23 @@ export const COURSE_FRAGMENT = gql`
       defaultSessionAddress
       locationOption
     }
-  }
+    Program {
+      ...ProgramFragmentMinimumProperties
+    }
+    CourseGroups {
+      id
+      CourseGroupOption {
+        id
+        title
+        order
+      }
+    }
+}
 `;
 
 export const ADMIN_COURSE_FRAGMENT = gql`
   ${COURSE_FRAGMENT}
+  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
   fragment AdminCourseFragment on Course {
     ...CourseFragment
     status
@@ -53,11 +71,32 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     chatLink
     learningGoals
     Program {
-      id
-      title
-      shortTitle
-      lectureStart
-      lectureEnd
+      ...ProgramFragmentMinimumProperties
     }
+  }
+`;
+
+export const COURSE_FRAGMENT_MINIMUM = gql`
+  fragment CourseFragmentMinimum on Course {
+    id
+    title
+    status
+    ects
+    tagline
+    language
+    applicationEnd
+    cost
+    achievementCertificatePossible
+    attendanceCertificatePossible
+    maxMissedSessions
+    weekDay
+    coverImage
+    programId
+    learningGoals
+    chatLink
+    published
+    maxParticipants
+    endTime
+    startTime
   }
 `;
