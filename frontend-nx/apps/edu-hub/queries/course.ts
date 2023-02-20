@@ -418,3 +418,17 @@ export const UPDATE_COURSE_CHAT_LINK = gql`
     }
   }
 `;
+
+export const UPDATE_COURSE_ECTS = gql`
+  mutation UpdateCourseEcts(
+    $courseId: Int!
+    $ects: String!
+  ) {
+    update_Course_by_pk(
+      pk_columns: { id: $courseId }
+      _set: { ects: $ects }
+    ) {
+      id
+    }
+  }
+`;

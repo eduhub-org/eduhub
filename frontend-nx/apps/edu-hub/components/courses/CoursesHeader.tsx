@@ -8,7 +8,7 @@ import { MdAddCircle } from 'react-icons/md';
 import { useAdminQuery } from '../../hooks/authedQuery';
 import { useAdminMutation } from '../../hooks/authedMutation';
 
-import { Button } from '@material-ui/core';
+import { Button, MenuItem } from '@material-ui/core';
 
 import EhAddButton from '../common/EhAddButton';
 import ModalControl from '../common/ModalController';
@@ -39,27 +39,27 @@ const CoursesHeader: FC<IProps> = ({
   t,
   updateFilter,
 }) => {
-  const [showModal, setShowModal] = useState(false);
+  // const [showModal, setShowModal] = useState(false);
 
-  const openModalControl = useCallback(() => {
-    setShowModal(!showModal);
-  }, [showModal, setShowModal]);
+  // const openModalControl = useCallback(() => {
+  //   setShowModal(!showModal);
+  // }, [showModal, setShowModal]);
 
-  const onCloseAddCourseWindow = useCallback(
-    (show: boolean) => {
-      setShowModal(show);
-    },
-    [setShowModal]
-  );
-  const closeModalHandler = useCallback(
-    (refetch: boolean) => {
-      setShowModal(false);
-      if (refetch) {
-        courseListRequest.refetch();
-      }
-    },
-    [setShowModal, courseListRequest]
-  );
+  // const onCloseAddCourseWindow = useCallback(
+  //   (show: boolean) => {
+  //     setShowModal(show);
+  //   },
+  //   [setShowModal]
+  // );
+  // const closeModalHandler = useCallback(
+  //   (refetch: boolean) => {
+  //     setShowModal(false);
+  //     if (refetch) {
+  //       courseListRequest.refetch();
+  //     }
+  //   },
+  //   [setShowModal, courseListRequest]
+  // );
 
   const qResult = useAdminQuery<CourseList>(ADMIN_COURSE_LIST);
 
@@ -81,7 +81,7 @@ const CoursesHeader: FC<IProps> = ({
         title: t('course-page:course-default-title'),
         applicationEnd: new Date(),
         maxMissedSessions: 2,
-        programId: 1,
+        programId: defaultProgramId,
       },
     });
     qResult.refetch();

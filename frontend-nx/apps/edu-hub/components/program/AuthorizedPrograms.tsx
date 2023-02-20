@@ -121,7 +121,7 @@ export const AuthorizedPrograms: FC = () => {
     today.setHours(0);
     await insertProgram({
       variables: {
-        title: t('course-page:program-title'),
+        title: t('course-page:programs-default-title'),
         today: new Date(),
       },
     });
@@ -452,22 +452,24 @@ export const AuthorizedPrograms: FC = () => {
     <>
       <PageBlock>
         <div className="flex flex-row mb-12">
-          <h1 className="text-4xl font-bold">{t('course-page:programs')}</h1>
+          <h1 className="text-4xl font-bold">
+            {t('course-page:programs-programs')}
+          </h1>
         </div>
         <div className="flex justify-end mb-12">
           <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />}>
-            {t('add-something', { something: t('course-page:program') })}
+            {t('course-page:programs-add')}
           </Button>
         </div>
         <div className="grid grid-cols-10">
-          <p>{t('programs:published')}</p>
-          <div className="col-span-2">{t('programs:program-title')}</div>
-          <div>{t('programs:short-title')}</div>
-          <div>{t('programs:application-start')}</div>
-          <div>{t('programs:application-end')}</div>
-          <div>{t('programs:course-start')}</div>
-          <div>{t('programs:course-end')}</div>
-          <div>{t('programs:achievement-upload-deadline')}</div>
+          <p>{t('course-page:programs-published')}</p>
+          <div className="col-span-2">{t('course-page:programs-title')}</div>
+          <div>{t('course-page:programs-short-title')}</div>
+          <div>{t('course-page:programs-application-start')}</div>
+          <div>{t('course-page:programs-application-end')}</div>
+          <div>{t('course-page:programs-course-start')}</div>
+          <div>{t('course-page:programs-course-end')}</div>
+          <div>{t('course-page:programs-achievement-upload-deadline')}</div>
           <div>&nbsp;</div>
         </div>
         {programs != null &&
@@ -502,7 +504,7 @@ export const AuthorizedPrograms: FC = () => {
           ))}
         <div className="flex justify-end mt-12 mb-12">
           <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />}>
-            {t('programs:add')}
+            {t('course-page:programs-add')}
           </Button>
         </div>
       </PageBlock>

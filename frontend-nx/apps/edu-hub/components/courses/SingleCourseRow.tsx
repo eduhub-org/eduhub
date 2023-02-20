@@ -127,6 +127,7 @@ interface IPropsCourseOneRow {
   qResult: QueryResult<any>;
   refetchCourses: () => void;
   onSetChatLink: (c: AdminCourseList_Course, link: string) => any;
+  onSetEcts: (c: AdminCourseList_Course, link: string) => any;
   onSetAttendanceCertificatePossible: (
     c: AdminCourseList_Course,
     isPossible: boolean
@@ -142,6 +143,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   t,
   refetchCourses,
   onSetChatLink,
+  onSetEcts,
   onSetAttendanceCertificatePossible,
   onSetAchievementCertificatePossible,
   qResult,
@@ -242,6 +244,13 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
       onSetChatLink(course, value);
     },
     [course, onSetChatLink]
+  );
+
+  const handleSetEcts = useCallback(
+    (value: string) => {
+      onSetEcts(course, value);
+    },
+    [course, onSetEcts]
   );
 
   /* #endregion */
@@ -368,7 +377,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
             course={course}
             refetchCourses={refetchCourses}
             programs={programs}
-            onSetChatLink={handleSetChatLink}
+            qResult={qResult}
           />
         </td>
         <td className={tdClassCentered}>
@@ -458,7 +467,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
             </td>
             <td className="px-5" colSpan={4}>
               <div className="flex flex-col space-y-2 mb-2">
-                <div className="p-3">
+                <div className="p-0 mb-3">
                   <span>{t('course-page:chat-link')}</span>
                   <br />
                   <EhDebounceInput
@@ -498,8 +507,16 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                       <MdOutlineCheckBoxOutlineBlank size="1.5em" />
                     )}
                   </div>
-                  <div className="col-span-9">
+                  <div className="col-span-3">
                     {t('course-page:performance-certificate')}
+                  </div>
+                  <div className="col-span-7 flex mt-2">
+                    <span className="mr-2">{t('course-page:ects')}: </span>
+                    <EhDebounceInput
+                      placeholder={t('course-page:ects-placeholder')}
+                      onChangeHandler={handleSetEcts}
+                      inputText={course.ects || ''}
+                    />
                   </div>
                 </div>
               </div>
@@ -519,7 +536,15 @@ const makeFullName = (firstName: string, lastName: string): string => {
 };
 
 // /* #region Instructor column */
-const InstructorColumn: FC<IPropsCourseOneRow> = ({
+interface IPropsInstructorColumn {
+  programs: Programs_Program[];
+  course: AdminCourseList_Course;
+  t: any;
+  qResult: QueryResult<any>;
+  refetchCourses: () => void;
+}
+
+const InstructorColumn: FC<IPropsInstructorColumn> = ({
   course,
   refetchCourses,
 }) => {

@@ -70,10 +70,7 @@
   "add-new-location": "neuen Ort hinzufügen",
   "program": "Programm",
   "programs": "Programme",
-  "program-title": "Programmtitel",
   "published": "Published",
-  "short-title": "Kurztitel",
-  "delivery-deadline": "Abgabe Frist",
   "do-you-want-to-publish-the-program": "Möchtest du das Programm {{title}} wirklich veröffentlichen?",
   "do-you-really-want-to-undo-the-publication-of-program": "Möchtest du die Veröffentlichung des Programmes {{title}} wirklich zurücknehmen?",
   "do-you-want-to-delete-the-program": "Möchtest du das Programm {{title}} wirklich löschen?",
@@ -93,5 +90,16 @@
   "no-applications-present": "Es liegen noch keine Bewerbungen vor.",
   "chat-link": "Chat Link:",
   "possible-certificates": "Mögliche Bescheinigungen",
-  "add-course": "Kurs hinzufügen"
+  "add-course": "Kurs hinzufügen",
+  "programs-programs": "Programme",
+  "programs-add": "Programm hinzufügen",
+  "programs-default-title": "Neues Programm",
+  "programs-title": "Programmtitel",
+  "programs-published": "Veröffentlicht",
+  "programs-short-title": "Kurztitel",
+  "programs-application-start": "Bewerbungs-anfang",
+  "programs-application-end": "Bewerbungs-ende",
+  "programs-course-start": "Kursstart",
+  "programs-course-end": "Kursende",
+  "programs-achievement-upload-deadline": "Abgabeschluss Leistungsnachweise"
 }

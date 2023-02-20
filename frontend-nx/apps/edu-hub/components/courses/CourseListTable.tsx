@@ -17,12 +17,9 @@ import {
   UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE,
   UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE,
   UPDATE_COURSE_CHAT_LINK,
+  UPDATE_COURSE_ECTS,
 } from '../../queries/course';
 import { CourseList } from 'apps/edu-hub/queries/__generated__/CourseList';
-import {
-  InsertCourse,
-  InsertCourseVariables,
-} from 'apps/edu-hub/queries/__generated__/InsertCourse';
 import {
   UpdateCourseAttendanceCertificatePossible,
   UpdateCourseAttendanceCertificatePossibleVariables,
@@ -35,6 +32,10 @@ import {
   UpdateCourseChatLink,
   UpdateCourseChatLinkVariables,
 } from 'apps/edu-hub/queries/__generated__/UpdateCourseChatLink';
+import {
+  UpdateCourseEcts,
+  UpdateCourseEctsVariables,
+} from 'apps/edu-hub/queries/__generated__/UpdateCourseEcts';
 
 interface IProps {
   t: any;
@@ -54,26 +55,6 @@ const CourseListTable: FC<IProps> = ({
     console.log('query programs error', qResult.error);
   }
 
-  const [insertCourse] = useAdminMutation<InsertCourse, InsertCourseVariables>(
-    INSERT_COURSE
-  );
-  const insertDefaultCourse = useCallback(async () => {
-    const today = new Date();
-    today.setMilliseconds(0);
-    today.setSeconds(0);
-    today.setMinutes(0);
-    today.setHours(0);
-    await insertCourse({
-      variables: {
-        title: t('course-page:course-default-title'),
-        applicationEnd: new Date(),
-        maxMissedSessions: 2,
-        programId: 1,
-      },
-    });
-    qResult.refetch();
-  }, [insertCourse, t, qResult]);
-
   const tableHeaders: [string, string][] = [
     [t('table-header-published'), 'justify-center'],
     [t('table-header-title'), 'justify-start'],
@@ -88,7 +69,7 @@ const CourseListTable: FC<IProps> = ({
   ];
   const refetchCourses = useCallback(() => {
     courseListRequest.refetch();
-  }, [courseListRequest]);
+  }, [courseListRequest.data]);
 
   const count = courseListRequest.data?.Course_aggregate?.aggregate?.count || 0;
 
@@ -143,6 +124,23 @@ const CourseListTable: FC<IProps> = ({
     [qResult, updateChatLink]
   );
 
+  const [updateEcts] = useAdminMutation<
+    UpdateCourseEcts,
+    UpdateCourseEctsVariables
+  >(UPDATE_COURSE_ECTS);
+  const handleEcts = useCallback(
+    async (c: AdminCourseList_Course, ectsPoints: string) => {
+      await updateEcts({
+        variables: {
+          courseId: c.id,
+          ects: ectsPoints,
+        },
+      });
+      qResult.refetch();
+    },
+    [qResult, updateEcts]
+  );
+
   return (
     <>
       <div className="flex flex-col space-y-10">
@@ -179,6 +177,7 @@ const CourseListTable: FC<IProps> = ({
                     handleAchievementCertificatePossible
                   }
                   onSetChatLink={handleChatLink}
+                  onSetEcts={handleEcts}
                   qResult={qResult}
                 />
               ))}
