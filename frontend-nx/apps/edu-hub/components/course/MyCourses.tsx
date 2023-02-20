@@ -4,7 +4,6 @@ import { useAdminQuery } from '../../hooks/authedQuery';
 import { useUserId } from '../../hooks/user';
 import { MyCourses as MyCoursesType } from '../../queries/__generated__/MyCourses';
 import { MY_COURSES } from '../../queries/myCourses';
-import { Button } from '../common/Button';
 
 import { TileSlider } from './TileSlider';
 import useTranslation from 'next-translate/useTranslation';

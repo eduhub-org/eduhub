@@ -11,31 +11,30 @@ import {
 } from '../../queries/__generated__/AdminCourseList';
 import { Programs_Program } from '../../queries/__generated__/Programs';
 import SingleCourseRow from './SingleCourseRow';
-import { ADMIN_COURSE_LIST } from 'apps/edu-hub/queries/courseList';
-import { INSERT_COURSE } from '../../queries/mutateCourse';
+import { ADMIN_COURSE_LIST } from '../../queries/courseList';
 import {
   UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE,
   UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE,
   UPDATE_COURSE_CHAT_LINK,
   UPDATE_COURSE_ECTS,
 } from '../../queries/course';
-import { CourseList } from 'apps/edu-hub/queries/__generated__/CourseList';
+import { CourseList } from '../../queries/__generated__/CourseList';
 import {
   UpdateCourseAttendanceCertificatePossible,
   UpdateCourseAttendanceCertificatePossibleVariables,
-} from 'apps/edu-hub/queries/__generated__/UpdateCourseAttendanceCertificatePossible';
+} from '../../queries/__generated__/UpdateCourseAttendanceCertificatePossible';
 import {
   UpdateCourseAchievementCertificatePossible,
   UpdateCourseAchievementCertificatePossibleVariables,
-} from 'apps/edu-hub/queries/__generated__/UpdateCourseAchievementCertificatePossible';
+} from '../../queries/__generated__/UpdateCourseAchievementCertificatePossible';
 import {
   UpdateCourseChatLink,
   UpdateCourseChatLinkVariables,
-} from 'apps/edu-hub/queries/__generated__/UpdateCourseChatLink';
+} from '../../queries/__generated__/UpdateCourseChatLink';
 import {
   UpdateCourseEcts,
   UpdateCourseEctsVariables,
-} from 'apps/edu-hub/queries/__generated__/UpdateCourseEcts';
+} from '../../queries/__generated__/UpdateCourseEcts';
 
 interface IProps {
   t: any;
@@ -69,7 +68,7 @@ const CourseListTable: FC<IProps> = ({
   ];
   const refetchCourses = useCallback(() => {
     courseListRequest.refetch();
-  }, [courseListRequest.data]);
+  }, [courseListRequest]);
 
   const count = courseListRequest.data?.Course_aggregate?.aggregate?.count || 0;
 

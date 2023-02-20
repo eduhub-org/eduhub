@@ -7,22 +7,18 @@ import CommonPageHeader from '../common/CommonPageHeader';
 import { MdAddCircle } from 'react-icons/md';
 import { useAdminQuery } from '../../hooks/authedQuery';
 import { useAdminMutation } from '../../hooks/authedMutation';
+import { Button } from '@material-ui/core';
 
-import { Button, MenuItem } from '@material-ui/core';
-
-import EhAddButton from '../common/EhAddButton';
-import ModalControl from '../common/ModalController';
 import SearchBox from '../common/SearchBox';
 import { ProgramsMenubar } from '../program/ProgramsMenubar';
-import AddCourseForm from './AddCourseForm';
 
 import {
   InsertCourse,
   InsertCourseVariables,
-} from 'apps/edu-hub/queries/__generated__/InsertCourse';
+} from '../../queries/__generated__/InsertCourse';
 import { INSERT_COURSE } from '../../queries/mutateCourse';
-import { ADMIN_COURSE_LIST } from 'apps/edu-hub/queries/courseList';
-import { CourseList } from 'apps/edu-hub/queries/__generated__/CourseList';
+import { ADMIN_COURSE_LIST } from '../../queries/courseList';
+import { CourseList } from '../../queries/__generated__/CourseList';
 
 interface IProps {
   programs: Programs_Program[];

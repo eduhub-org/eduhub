@@ -43,7 +43,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   }, [setVisible]);
 
   const isAdmin = useIsAdmin();
-  const isInstructor = useIsInstructor();
+  // const isInstructor = useIsInstructor();
   const { t } = useTranslation();
 
   const router = useRouter();

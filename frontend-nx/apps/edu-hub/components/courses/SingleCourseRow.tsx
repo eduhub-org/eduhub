@@ -2,10 +2,10 @@ import { IconButton } from '@material-ui/core';
 import { FC, MutableRefObject, useCallback, useRef, useState } from 'react';
 import {
   MdCheckBox,
-  MdCheckBoxOutlineBlank,
+  // MdCheckBoxOutlineBlank,
   MdDelete,
   MdOutlineCheckBoxOutlineBlank,
-  MdAddCircle,
+  // MdAddCircle,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
   MdUpload,
@@ -45,13 +45,13 @@ import { SelectOption } from '../../types/UIComponents';
 import {
   CourseEnrollmentStatus_enum,
   CourseStatus_enum,
-  Course_set_input,
+  // Course_set_input,
 } from '../../__generated__/globalTypes';
-import { SelectUserDialog } from '../common/dialogs/SelectUserDialog';
+// import { SelectUserDialog } from '../common/dialogs/SelectUserDialog';
 import EhCheckBox from '../common/EhCheckbox';
 import EhSelect from '../common/EhSelect';
 import EhTag from '../common/EhTag';
-import EhMultipleTag from '../common/EhMultipleTag';
+// import EhMultipleTag from '../common/EhMultipleTag';
 
 import { parseFileUploadEvent } from '../../helpers/filehandling';
 import EhDebounceInput from '../common/EhDebounceInput';
@@ -64,7 +64,7 @@ import applicantsInvitedPie from '../../public/images/course/status/applicants-i
 import participantsRatedPie from '../../public/images/course/status/participants-rated.svg';
 
 import { InstructorColumn } from './CoursesInstructorColumn';
-import { INSERT_NEW_COURSE_LOCATION } from 'apps/edu-hub/queries/course';
+// import { INSERT_NEW_COURSE_LOCATION } from '../../queries/course';
 
 interface EntrollmentStatusCount {
   [key: string]: number;
@@ -349,9 +349,9 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
     },
     [
       course,
-      qResult,
+      // qResult,
       saveCourseImage,
-      course.id,
+      // course.id,
       updateCourseQuery,
       refetchCourses,
     ]

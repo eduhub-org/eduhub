@@ -1,4 +1,3 @@
-import { IconButton } from '@material-ui/core';
 import { FC, MutableRefObject, useCallback, useRef, useState } from 'react';
 import {
   MdCheckBox,
@@ -13,21 +12,12 @@ import {
 import { QueryResult } from '@apollo/client';
 
 import { useAdminMutation } from '../../hooks/authedMutation';
-import { SAVE_COURSE_IMAGE } from '../../queries/actions';
-import {
-  DELETE_A_COURSE,
-  UPDATE_COURSE_PROPERTY,
-} from '../../queries/mutateCourse';
 import {
   DELETE_COURSE_INSRTRUCTOR,
   INSERT_A_COURSEINSTRUCTOR,
 } from '../../queries/mutateCourseInstructor';
 import { INSERT_EXPERT } from '../../queries/user';
 import { AdminCourseList_Course } from '../../queries/__generated__/AdminCourseList';
-import {
-  DeleteCourseByPk,
-  DeleteCourseByPkVariables,
-} from '../../queries/__generated__/DeleteCourseByPk';
 import {
   DeleteCourseInstructor,
   DeleteCourseInstructorVariables,
@@ -41,35 +31,11 @@ import {
   InsertExpertVariables,
 } from '../../queries/__generated__/InsertExpert';
 import { Programs_Program } from '../../queries/__generated__/Programs';
-import {
-  SaveCourseImage,
-  SaveCourseImageVariables,
-} from '../../queries/__generated__/SaveCourseImage';
-import {
-  UpdateCourseByPk,
-  UpdateCourseByPkVariables,
-} from '../../queries/__generated__/UpdateCourseByPk';
 import { UserForSelection1_User } from '../../queries/__generated__/UserForSelection1';
-import { SelectOption } from '../../types/UIComponents';
-import {
-  CourseEnrollmentStatus_enum,
-  CourseStatus_enum,
-  Course_set_input,
-} from '../../__generated__/globalTypes';
 import { SelectUserDialog } from '../common/dialogs/SelectUserDialog';
-import EhCheckBox from '../common/EhCheckbox';
-import EhSelect from '../common/EhSelect';
 import EhTag from '../common/EhTag';
-import { parseFileUploadEvent } from '../../helpers/filehandling';
-import EhDebounceInput from '../common/EhDebounceInput';
 
 import useTranslation from 'next-translate/useTranslation';
-import draftPie from '../../public/images/course/status/draft.svg';
-import readyForPublicationPie from '../../public/images/course/status/ready-for-publication.svg';
-import readyForApplicationPie from '../../public/images/course/status/ready-for-application.svg';
-import applicantsInvitedPie from '../../public/images/course/status/applicants-invited.svg';
-import participantsRatedPie from '../../public/images/course/status/participants-rated.svg';
-import { CourseList_Course } from 'apps/edu-hub/queries/__generated__/CourseList';
 
 interface IPropsInstructorColumn {
   programs: Programs_Program[];
