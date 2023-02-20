@@ -131,7 +131,7 @@ interface IPropsCourseOneRow {
     c: AdminCourseList_Course,
     isPossible: boolean
   ) => any;
-  onDeleteCourseGroup: (id: number) => any;
+  // onDeleteCourseGroup: (id: number) => any;
 }
 const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   programs,
