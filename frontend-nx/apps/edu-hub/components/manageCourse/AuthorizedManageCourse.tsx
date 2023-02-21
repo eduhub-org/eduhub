@@ -53,7 +53,7 @@ const determineTabClasses = (
   const maxAllowedTab = determineMaxAllowedTab(courseStatus);
 
   if (tabIndex === selectedTabIndex) {
-    return 'bg-edu-black text-white';
+    return 'bg-gray-800 text-white';
   }
 
   if (tabIndex < maxAllowedTab) {
@@ -226,7 +226,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
     <>
       <PageBlock>
         <>
-          <div className="flex flex-row mb-12 mt-12">
+          <div className="flex flex-row mb-12 mt-12 text-white">
             <h1 className="text-4xl font-bold">{course.title}</h1>
           </div>
 

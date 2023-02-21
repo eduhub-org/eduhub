@@ -13,6 +13,7 @@ import { useAuthedMutation } from '../../hooks/authedMutation';
 import { useAuthedQuery } from '../../hooks/authedQuery';
 import { UPDATE_USER } from '../../queries/updateUser';
 import { USER } from '../../queries/user';
+import useTranslation from 'next-translate/useTranslation';
 
 // generated types must be updated first with new fields in schema
 // import type { User } from "../../queries/__generated__/User";
@@ -170,6 +171,7 @@ const ProfileOverview: FC = () => {
       console.log(error);
     }
   };
+  const { t } = useTranslation();
 
   return (
     <div className="px-3">
@@ -177,22 +179,22 @@ const ProfileOverview: FC = () => {
       {!userLoading && !userError ? (
         <>
           <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)} className="">
-              <InputRow label="Vorname" name="firstName" required />
-              <InputRow label="Nachname" name="lastName" required />
+            <form onSubmit={handleSubmit(onSubmit)} className="text-gray-400">
+              <InputRow label={t('first-name')} name="firstName" required />
+              <InputRow label={t('last-name')} name="lastName" required />
               <InputRow
-                label="E-Mail"
+                label={t('email')}
                 name="email"
                 placeholder="name@example.com"
                 required
               />
-              <InputRow label="Status" name="employment" />
-              <InputRow label="Hochschule" name="university" />
+              <InputRow label={t('status')} name="employment" />
+              <InputRow label={t('university')} name="university" />
               <InputRow
-                label="Matrikel&shy;nummer"
+                label={t('matriculation-number')}
                 name="matriculationNumber"
               />
-              <InputRow label="Externer Link" name="externalProfile" />
+              <InputRow label={t('external-profile')} name="externalProfile" />
               <Button
                 as="button"
                 type="submit"

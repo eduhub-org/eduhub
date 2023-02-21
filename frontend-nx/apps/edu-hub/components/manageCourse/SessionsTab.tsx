@@ -199,7 +199,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         </Button>
       </div>
 
-      <div className="mb-8">
+      <div className="mb-8 text-gray-400">
         <SessionRow
           onDelete={deleteSession}
           onSetStartDate={setSessionStart}

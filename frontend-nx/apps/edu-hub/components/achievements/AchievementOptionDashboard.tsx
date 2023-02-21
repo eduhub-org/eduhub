@@ -231,7 +231,7 @@ const AchievementRow: FC<IPropsForARow> = (props) => {
   return (
     <>
       <div className="grid grid-cols-3 gap-5 pl-5 bg-edu-row-color py-2 items-center">
-        <p className="text-ellipsis text-gray-700 font-medium grid grid-cols-1">
+        <p className="text-ellipsis text-gray-400 font-medium grid grid-cols-1">
           {props.item.title}
         </p>
         {/* Authors */}

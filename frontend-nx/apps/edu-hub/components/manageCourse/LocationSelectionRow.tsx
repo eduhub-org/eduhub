@@ -51,7 +51,7 @@ export const LocationSelectionRow: FC<IProps> = ({
   return (
     <div className="grid grid-cols-12">
       <div className="col-span-4 mr-3 ml-3">
-        {!location && <p>{t('place')}</p>}
+        {!location && <p className="text-gray-400">{t('place')}</p>}
         {location && (
           <select
             onChange={handleSetOption}
@@ -67,7 +67,11 @@ export const LocationSelectionRow: FC<IProps> = ({
         )}
       </div>
       <div className="col-span-7 mr-3 ml-3">
-        {!location && <div>{`${t('course-page:default-address')}`}</div>}
+        {!location && (
+          <div className="text-gray-400">{`${t(
+            'course-page:default-address'
+          )}`}</div>
+        )}
         {location && (
           <DebounceInput
             className="w-full h-10 bg-edu-light-gray"

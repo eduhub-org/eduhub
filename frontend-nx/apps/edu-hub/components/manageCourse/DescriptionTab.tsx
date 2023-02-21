@@ -332,7 +332,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   courseLocations.sort((a, b) => a.id - b.id);
   return (
     <div>
-      <div className="grid grid-cols-2 ">
+      <div className="grid grid-cols-2 text-gray-400">
         <div className="mr-3 ml-3">{`${t('course-page:short-description')} (${t(
           'course-page:max-n-characters',
           { n: 200 }
@@ -363,7 +363,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         />
       </div>
 
-      <div className="grid grid-cols-2">
+      <div className="grid grid-cols-2 text-gray-400">
         <div className="mr-3 ml-3">{`${t(
           'course-page:title-info-block'
         )} 1 (${t('course-page:max-n-characters', { n: 50 })})`}</div>
@@ -389,7 +389,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         />
       </div>
 
-      <div className="grid grid-cols-2">
+      <div className="grid grid-cols-2 text-gray-400">
         <div className="mr-3 ml-3">{`${t(
           'course-page:title-info-block'
         )} 1 (${t('course-page:max-n-characters', { n: 1500 })})`}</div>
@@ -422,7 +422,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <div className="grid grid-cols-2">
           <div className="grid grid-cols-3">
             <div className="mr-3 ml-3">
-              <div>Tag</div>
+              <div className="text-gray-400">{t('course-page:day')}</div>
               <div>
                 <select
                   value={course.weekDay ?? 'MONDAY'}
@@ -440,7 +440,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
               </div>
             </div>
             <div className="mr-3 ml-3">
-              <div>{t('course-page:start-time')}</div>
+              <div className="text-gray-400">{t('course-page:start-time')}</div>
               <div>
                 <EhTimeSelect
                   value={formatTime(course.startTime)}
@@ -450,7 +450,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
               </div>
             </div>
             <div className="mr-3 ml-3">
-              <div>{t('course-page:end-time')}</div>
+              <div className="text-gray-400">{t('course-page:end-time')}</div>
               <div>
                 <EhTimeSelect
                   value={formatTime(course.endTime)}
@@ -464,7 +464,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         </div>
         <div className="grid grid-cols-2 mb-8">
           <div className="mr-3 ml-3">
-            <div>{t('language')}</div>
+            <div className="text-gray-400">{t('language')}</div>
             <div>
               <select
                 value={course.language}
@@ -477,7 +477,9 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             </div>
           </div>
           <div className="mr-3 ml-3">
-            <div>{t('course-page:max-part-quantity')}</div>
+            <div className="text-gray-400">
+              {t('course-page:max-part-quantity')}
+            </div>
             <div>
               <DebounceInput
                 type="number"

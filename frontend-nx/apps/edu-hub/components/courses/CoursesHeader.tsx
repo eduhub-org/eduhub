@@ -200,7 +200,7 @@ const Menubar: FC<IMenubarProps> = ({
 
   /* #region */
   return (
-    <div className="flex justify-between mb-5">
+    <div className="flex justify-between mb-5 text-white">
       <ProgramsMenubar
         programs={programs}
         defaultProgramId={programs[0].id}
