@@ -1,7 +1,8 @@
-import { FC } from "react";
+import { FC } from 'react';
 
 interface IProps {
   headline: string;
+  className;
 }
 const CommonPageHeader: FC<IProps> = ({ headline }) => {
   return (

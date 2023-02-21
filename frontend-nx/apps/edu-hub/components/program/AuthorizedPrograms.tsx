@@ -451,7 +451,7 @@ export const AuthorizedPrograms: FC = () => {
   return (
     <>
       <PageBlock>
-        <div className="flex flex-row mb-12">
+        <div className="flex flex-row mb-12 text-white">
           <h1 className="text-4xl font-bold">
             {t('course-page:programs-programs')}
           </h1>
@@ -461,7 +461,7 @@ export const AuthorizedPrograms: FC = () => {
             {t('course-page:programs-add')}
           </Button>
         </div>
-        <div className="grid grid-cols-10">
+        <div className="grid grid-cols-10 text-white">
           <p>{t('course-page:programs-published')}</p>
           <div className="col-span-2">{t('course-page:programs-title')}</div>
           <div>{t('course-page:programs-short-title')}</div>
