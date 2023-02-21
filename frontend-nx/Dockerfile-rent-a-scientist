@@ -2,14 +2,18 @@
 # 1. Install dependencies only when needed
 FROM node:16-alpine AS deps
 
-RUN apk add --no-cache libc6-compat yarn
+RUN apk add --no-cache libc6-compat
+
+RUN corepack enable
 
 WORKDIR /opt/app
 
 COPY package.json /opt/app
 COPY yarn.lock /opt/app
+COPY .yarn /opt/app
+COPY .yarnrc.yml /opt/app
 
-RUN yarn --frozen-lockfile
+RUN yarn --immutable
 
 # 2. Rebuild the source code only when needed
 FROM node:16-alpine AS builder
