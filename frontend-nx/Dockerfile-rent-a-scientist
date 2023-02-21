@@ -10,7 +10,7 @@ WORKDIR /opt/app
 
 COPY package.json /opt/app
 COPY yarn.lock /opt/app
-COPY .yarn /opt/app
+COPY .yarn/ /opt/app/.yarn
 COPY .yarnrc.yml /opt/app
 
 RUN yarn --immutable
