@@ -95,92 +95,96 @@ const Home: FC = () => {
         <title>EduHub | opencampus.sh</title>
         <link rel="icon" href="/favicon.png" />
       </Head>
-      <Page>
+      <Page className="text-white">
         <div
-          className="flex flex-col max-w-screen-xl mx-auto"
+          className="min-h-[60vh]"
           style={{
             backgroundImage: `url('/images/background_homepage/1536.jpg')`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            backgroundPosition: 'top center',
           }}
         >
-          <span className="flex text-6xl sm:text-9xl mt-16 sm:mt-28">
-            {t('headline')}
-          </span>
-          <div className="flex justify-center mt-4 mb-6 sm:mb-20">
-            <span className="text-xl sm:text-5xl text-center">
-              {t('subheadline')}
+          <div className="flex flex-col max-w-screen-xl mx-auto">
+            <span className="flex text-6xl sm:text-9xl mt-16 sm:mt-28">
+              {t('headline')}
             </span>
+            <div className="flex justify-center mt-4">
+              <span className="text-xl sm:text-5xl text-center">
+                {t('subheadline')}
+              </span>
+            </div>
           </div>
         </div>
-        <ClientOnly>
-          <OnlyLoggedIn>
-            <>
-              {coursesGroupsAuthenticated.map((group, index) =>
-                group.courses.length > 0 ? (
-                  <>
-                    <h2
-                      id={`sliderGroup${index + 1}`}
-                      className="text-2xl font-semibold text-left mt-20"
-                    >
-                      {t(group.title)}
-                    </h2>
-                    <div className="mt-2">
-                      <TileSlider courses={group.courses} />
-                    </div>
-                  </>
-                ) : null
-              )}
-            </>
-          </OnlyLoggedIn>
-
-          {/* ##################################################### */}
-          {/* This Slider is only temporairly included for testing and must be removed later */}
-          <h2
-            id={`allCourses`}
-            className="text-2xl font-semibold text-left mt-20"
-          >
-            {'All Courses'}
-          </h2>
-          <div className="mt-2">
-            <TileSlider courses={publishedCourses} />
-          </div>
-          {/* ##################################################### */}
-
-          {coursesGroups.map((group, index) =>
-            group.courses.length > 0 ? (
+        <div className="max-w-screen-xl mx-auto">
+          <ClientOnly>
+            <OnlyLoggedIn>
               <>
-                <h2
-                  id={`sliderGroup${index + 3}`}
-                  className="text-2xl font-semibold text-left mt-20"
-                >
-                  {t(group.title)}
-                </h2>
-                <div className="mt-2">
-                  <TileSlider courses={group.courses} />
-                </div>
+                {coursesGroupsAuthenticated.map((group, index) =>
+                  group.courses.length > 0 ? (
+                    <>
+                      <h2
+                        id={`sliderGroup${index + 1}`}
+                        className="text-2xl font-semibold text-left"
+                      >
+                        {t(group.title)}
+                      </h2>
+                      <div className="mt-2">
+                        <TileSlider courses={group.courses} />
+                      </div>
+                    </>
+                  ) : null
+                )}
               </>
-            ) : null
-          )}
-          <OnlyLoggedOut>
-            <div className="flex flex-col sm:flex-row mx-6 mt-6 mb-24 sm:mt-48">
-              <div className="flex flex-1 flex-col sm:items-center">
-                <div>
-                  <h2 className="text-3xl font-semibold">
-                    {t('continueLearning')}
-                  </h2>
-                  <h3 className="text-lg">{t('learnSubheadline')}</h3>
-                </div>
-              </div>
-              <div className="flex flex-1 justify-center mt-8">
-                <div className="flex justify-center items-center space-x-3">
-                  <LoginButton />
-                  <RegisterButton />
-                </div>
-              </div>
+            </OnlyLoggedIn>
+
+            {/* ##################################################### */}
+            {/* This Slider is only temporairly included for testing and must be removed later */}
+            <h2
+              id={`allCourses`}
+              className="text-2xl font-semibold text-left mt-20"
+            >
+              {'All Courses'}
+            </h2>
+            <div className="mt-2">
+              <TileSlider courses={publishedCourses} />
             </div>
-          </OnlyLoggedOut>
-        </ClientOnly>
+            {/* ##################################################### */}
+
+            {coursesGroups.map((group, index) =>
+              group.courses.length > 0 ? (
+                <>
+                  <h2
+                    id={`sliderGroup${index + 3}`}
+                    className="text-2xl font-semibold text-left mt-20"
+                  >
+                    {t(group.title)}
+                  </h2>
+                  <div className="mt-2">
+                    <TileSlider courses={group.courses} />
+                  </div>
+                </>
+              ) : null
+            )}
+            <OnlyLoggedOut>
+              <div className="flex flex-col sm:flex-row mx-6 mt-6 mb-24 sm:mt-48">
+                <div className="flex flex-1 flex-col sm:items-center">
+                  <div>
+                    <h2 className="text-3xl font-semibold">
+                      {t('continueLearning')}
+                    </h2>
+                    <h3 className="text-lg">{t('learnSubheadline')}</h3>
+                  </div>
+                </div>
+                <div className="flex flex-1 justify-center mt-8">
+                  <div className="flex justify-center items-center space-x-3">
+                    <LoginButton />
+                    <RegisterButton />
+                  </div>
+                </div>
+              </div>
+            </OnlyLoggedOut>
+          </ClientOnly>
+        </div>
       </Page>
     </>
   );

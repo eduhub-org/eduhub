@@ -11,7 +11,7 @@ type PageProps = {
 export const Page: FC<PageProps> = ({ children, className }: PageProps) => {
   return (
     <>
-      <div className={`flex flex-col max-w-screen-xl mx-auto ${className}`}>
+      <div className={`flex flex-col ${className}`}>
         <Header />
         <main className="">{children}</main>
         <Footer />

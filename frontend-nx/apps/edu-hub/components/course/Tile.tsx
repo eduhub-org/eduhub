@@ -109,7 +109,7 @@ export const Tile: FC<IProps> = ({ course }) => {
         isInstructor ? `/manage/course/${course.id}` : `/course/${course.id}`
       }
     >
-      <div className="relative w-9/10 rounded-2xl overflow-hidden font-medium">
+      <div className="relative w-9/10 rounded-2xl overflow-hidden font-medium text-edu-black">
         {/* <div className="relative w-60 h-72 rounded-2xl overflow-hidden"></div> */}
         <div
           className="h-56 p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat bg-[image:var(--bg-small-url)]"
