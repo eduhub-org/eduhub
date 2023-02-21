@@ -26,12 +26,16 @@ const Home: FC = () => {
   const { t } = useTranslation('start-page');
   const isLoggedIn = useIsLoggedIn();
 
-  // (My) Administered Courses
+  // (My) Organized Courses
   const { data: adminCourses, error: adminCoursesError } =
-    useAuthedQuery<CourseListWithInstructors>(COURSE_LIST_WITH_INSTRUCTOR);
+    useAuthedQuery<CourseListWithInstructors>(COURSE_LIST_WITH_INSTRUCTOR, {
+      skip: !isLoggedIn,
+    });
+
   if (adminCoursesError) {
     console.log('got error in query for admin courses!', adminCoursesError);
   }
+
   const myAdminCourses =
     adminCourses?.Course?.filter(
       (course) => course.CourseInstructors.length > 0
@@ -39,7 +43,9 @@ const Home: FC = () => {
 
   // (My) Enrolled Courses
   const { data: enrolledCourses, error: enrolledCoursesError } =
-    useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT);
+    useAuthedQuery<CourseListWithEnrollments>(COURSE_LIST_WITH_ENROLLMENT, {
+      skip: !isLoggedIn,
+    });
   if (enrolledCoursesError) {
     console.log(
       'got error in query for enrolled courses!',
@@ -117,7 +123,7 @@ const Home: FC = () => {
         </div>
         <div className="max-w-screen-xl mx-auto">
           <ClientOnly>
-            <OnlyLoggedIn>
+            {isLoggedIn && (
               <>
                 {coursesGroupsAuthenticated.map((group, index) =>
                   group.courses.length > 0 ? (
@@ -135,7 +141,8 @@ const Home: FC = () => {
                   ) : null
                 )}
               </>
-            </OnlyLoggedIn>
+            )}
+            {/* </OnlyLoggedIn> */}
 
             {/* ##################################################### */}
             {/* This Slider is only temporairly included for testing and must be removed later */}
