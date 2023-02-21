@@ -1,23 +1,21 @@
-import { FC, useCallback, useState } from "react";
-import {
-  MdAddCircle,
-} from "react-icons/md";
+import { FC, useCallback, useState } from 'react';
+import { MdAddCircle } from 'react-icons/md';
 
-import { PageBlock } from "../../components/common/PageBlock";
-import { QuestionConfirmationDialog } from "../../components/common/dialogs/QuestionConfirmationDialog";
-import { useAdminMutation } from "../../hooks/authedMutation";
-import { useAdminQuery } from "../../hooks/authedQuery";
+import { PageBlock } from '../../components/common/PageBlock';
+import { QuestionConfirmationDialog } from '../../components/common/dialogs/QuestionConfirmationDialog';
+import { useAdminMutation } from '../../hooks/authedMutation';
+import { useAdminQuery } from '../../hooks/authedQuery';
 
 import {
   ProgramList,
   ProgramList_Program,
-} from "../../queries/__generated__/ProgramList";
-import { PROGRAM_LIST } from "../../queries/programList";
-import "react-datepicker/dist/react-datepicker.css";
+} from '../../queries/__generated__/ProgramList';
+import { PROGRAM_LIST } from '../../queries/programList';
+import 'react-datepicker/dist/react-datepicker.css';
 import {
-  UpdateProgramVisibility,
-  UpdateProgramVisibilityVariables,
-} from "../../queries/__generated__/UpdateProgramVisibility";
+  UpdateProgramPublished,
+  UpdateProgramPublishedVariables,
+} from '../../queries/__generated__/UpdateProgramPublished';
 import {
   DELETE_PROGRAM,
   INSERT_PROGRAM,
@@ -31,73 +29,75 @@ import {
   UPDATE_PROGRAM_SHORT_TITLE,
   UPDATE_PROGRAM_TITLE,
   UPDATE_PROGRAM_UPLOAD_DEADLINE,
-  UPDATE_PROGRAM_VISIBILITY,
+  UPDATE_PROGRAM_PUBLISHED,
   UPDATE_SPEAKER_QUESTIONAIRE,
   UPDATE_START_QUESTIONAIRE,
-} from "../../queries/updateProgram";
+} from '../../queries/updateProgram';
 import {
   UpdateProgramTitle,
   UpdateProgramTitleVariables,
-} from "../../queries/__generated__/UpdateProgramTitle";
+} from '../../queries/__generated__/UpdateProgramTitle';
 import {
   UpdateProgramShortTitle,
   UpdateProgramShortTitleVariables,
-} from "../../queries/__generated__/UpdateProgramShortTitle";
+} from '../../queries/__generated__/UpdateProgramShortTitle';
 import {
   UpdateProgramApplicationStart,
   UpdateProgramApplicationStartVariables,
-} from "../../queries/__generated__/UpdateProgramApplicationStart";
+} from '../../queries/__generated__/UpdateProgramApplicationStart';
 import {
   UpdateProgramApplicationEnd,
   UpdateProgramApplicationEndVariables,
-} from "../../queries/__generated__/UpdateProgramApplicationEnd";
+} from '../../queries/__generated__/UpdateProgramApplicationEnd';
 import {
   UpdateProgramLectureStart,
   UpdateProgramLectureStartVariables,
-} from "../../queries/__generated__/UpdateProgramLectureStart";
+} from '../../queries/__generated__/UpdateProgramLectureStart';
 import {
   UpdateProgramLectureEnd,
   UpdateProgramLectureEndVariables,
-} from "../../queries/__generated__/UpdateProgramLectureEnd";
+} from '../../queries/__generated__/UpdateProgramLectureEnd';
 import {
   UpdateProgramUploadDeadline,
   UpdateProgramUploadDeadlineVariables,
-} from "../../queries/__generated__/UpdateProgramUploadDeadline";
+} from '../../queries/__generated__/UpdateProgramUploadDeadline';
 
-import { Button } from "@material-ui/core";
+import { Button } from '@material-ui/core';
 
 import {
   InsertProgram,
   InsertProgramVariables,
-} from "../../queries/__generated__/InsertProgram";
+} from '../../queries/__generated__/InsertProgram';
 import {
   DeleteProgram,
   DeleteProgramVariables,
-} from "../../queries/__generated__/DeleteProgram";
-import { ProgramsRow } from "./ProgramsRow";
+} from '../../queries/__generated__/DeleteProgram';
+import { ProgramsRow } from './ProgramsRow';
 import {
   UpdateProgramStartQuestionaire,
   UpdateProgramStartQuestionaireVariables,
-} from "../../queries/__generated__/UpdateProgramStartQuestionaire";
-import { UpdateProgramSpeakerQuestionaire } from "../../queries/__generated__/UpdateProgramSpeakerQuestionaire";
+} from '../../queries/__generated__/UpdateProgramStartQuestionaire';
+import { UpdateProgramSpeakerQuestionaire } from '../../queries/__generated__/UpdateProgramSpeakerQuestionaire';
 import {
   UpdateProgramClosingQuestionaire,
   UpdateProgramClosingQuestionaireVariables,
-} from "../../queries/__generated__/UpdateProgramClosingQuestionaire";
+} from '../../queries/__generated__/UpdateProgramClosingQuestionaire';
 import {
   UpdateProgramAchievementCertVisible,
   UpdateProgramAchievementCertVisibleVariables,
-} from "../../queries/__generated__/UpdateProgramAchievementCertVisible";
+} from '../../queries/__generated__/UpdateProgramAchievementCertVisible';
 import {
   UpdateProgramParticipationCertVisible,
   UpdateProgramParticipationCertVisibleVariables,
-} from "../../queries/__generated__/UpdateProgramParticipationCertVisible";
+} from '../../queries/__generated__/UpdateProgramParticipationCertVisible';
+import useTranslation from 'next-translate/useTranslation';
 
 export const AuthorizedPrograms: FC = () => {
+  const { t } = useTranslation();
   const qResult = useAdminQuery<ProgramList>(PROGRAM_LIST);
 
   if (qResult.error) {
-    console.log("query programs error", qResult.error);
+    console.log('query programs error', qResult.error);
   }
 
   const ps = [...(qResult.data?.Program || [])];
@@ -108,43 +108,6 @@ export const AuthorizedPrograms: FC = () => {
   const programs = ps;
 
   const [openProgram, setOpenProgram] = useState(-1);
-
-  // const [saveFile, saveFileStatus] = useAdminMutation<
-  //   SaveAFile,
-  //   SaveAFileVariables
-  // >(SAVE_FILE);
-
-  // console.log(saveFileStatus);
-
-  // const [saveCourseImage, saveCourseImageStatus] = useAdminMutation<
-  //   SaveCourseImage,
-  //   SaveCourseImageVariables
-  // >(SAVE_COURSE_IMAGE);
-
-  // console.log("saveCourseImageStatus", saveCourseImageStatus);
-
-  // const saveTestFile = useCallback(async () => {
-  //   const data = "aGFjaw==";
-
-  //   const fileName = "hello.txt";
-  //   const response = await saveCourseImage({
-  //     variables: {
-  //       base64File: data,
-  //       fileName,
-  //       courseId: 2,
-  //     },
-  //   });
-
-  //   console.log("saveTestFile", response);
-  // }, [saveCourseImage]);
-
-  // const lResult = useAdminQuery<LoadAFile, LoadAFileVariables>(LOAD_FILE, {
-  //   variables: {
-  //     path: "f9cc072c-4a93-449e-b7c3-0a4d9c1fe6c",
-  //   },
-  // });
-
-  // console.log(lResult);
 
   const [insertProgram] = useAdminMutation<
     InsertProgram,
@@ -158,12 +121,12 @@ export const AuthorizedPrograms: FC = () => {
     today.setHours(0);
     await insertProgram({
       variables: {
-        title: "Programmtitel festlegen",
+        title: t('course-page:programs-default-title'),
         today: new Date(),
       },
     });
     qResult.refetch();
-  }, [qResult, insertProgram]);
+  }, [insertProgram, t, qResult]);
 
   const [deleteProgramMutation] = useAdminMutation<
     DeleteProgram,
@@ -181,21 +144,21 @@ export const AuthorizedPrograms: FC = () => {
     [qResult, deleteProgramMutation]
   );
 
-  const [updateVisibility] = useAdminMutation<
-    UpdateProgramVisibility,
-    UpdateProgramVisibilityVariables
-  >(UPDATE_PROGRAM_VISIBILITY);
-  const setProgramVisibility = useCallback(
-    async (p: ProgramList_Program, isVisible: boolean) => {
-      await updateVisibility({
+  const [updatePublished] = useAdminMutation<
+    UpdateProgramPublished,
+    UpdateProgramPublishedVariables
+  >(UPDATE_PROGRAM_PUBLISHED);
+  const setProgramPublished = useCallback(
+    async (p: ProgramList_Program, isPublished: boolean) => {
+      await updatePublished({
         variables: {
           programId: p.id,
-          visible: isVisible,
+          published: isPublished,
         },
       });
       qResult.refetch();
     },
-    [qResult, updateVisibility]
+    [qResult, updatePublished]
   );
 
   const [updateTitle] = useAdminMutation<
@@ -386,7 +349,7 @@ export const AuthorizedPrograms: FC = () => {
     UpdateProgramAchievementCertVisible,
     UpdateProgramAchievementCertVisibleVariables
   >(UPDATE_PROGRAM_ACHIEVEMENT_CERT_VISIBLE);
-  const handleProgramAchivementCertVisible = useCallback(
+  const handleProgramAchievementCertVisible = useCallback(
     async (p: ProgramList_Program, isVisible: boolean) => {
       await updateProgramAchievementCertVisible({
         variables: {
@@ -423,11 +386,11 @@ export const AuthorizedPrograms: FC = () => {
   const handleMakeVisibleDialogClose = useCallback(
     (confirm: boolean) => {
       if (confirm && activeDialogProgram != null) {
-        setProgramVisibility(activeDialogProgram, true);
+        setProgramPublished(activeDialogProgram, true);
       }
       setConfirmMakeVisibleOpen(false);
     },
-    [activeDialogProgram, setProgramVisibility, setConfirmMakeVisibleOpen]
+    [activeDialogProgram, setProgramPublished, setConfirmMakeVisibleOpen]
   );
 
   const [confirmMakeInvisibleOpen, setConfirmMakeInvisibleOpen] =
@@ -435,11 +398,11 @@ export const AuthorizedPrograms: FC = () => {
   const handleMakeInvisibleDialogClose = useCallback(
     (confirm: boolean) => {
       if (confirm && activeDialogProgram != null) {
-        setProgramVisibility(activeDialogProgram, false);
+        setProgramPublished(activeDialogProgram, false);
       }
       setConfirmMakeInvisibleOpen(false);
     },
-    [activeDialogProgram, setProgramVisibility, setConfirmMakeInvisibleOpen]
+    [activeDialogProgram, setProgramPublished, setConfirmMakeInvisibleOpen]
   );
 
   const [confirmDeleteProgramOpen, setConfirmDeleteProgramOpen] =
@@ -454,10 +417,10 @@ export const AuthorizedPrograms: FC = () => {
     [activeDialogProgram, deleteProgram, setConfirmDeleteProgramOpen]
   );
 
-  const handleToggleVisibility = useCallback(
-    (v: ProgramList_Program, isVisible: boolean) => {
+  const handleTogglePublished = useCallback(
+    (v: ProgramList_Program, isPublished: boolean) => {
       setActiveDialogProgram(v);
-      if (!isVisible) {
+      if (!isPublished) {
         setConfirmMakeInvisibleOpen(true);
       } else {
         setConfirmMakeVisibleOpen(true);
@@ -488,23 +451,25 @@ export const AuthorizedPrograms: FC = () => {
   return (
     <>
       <PageBlock>
-        <div className="flex flex-row mb-12">
-          <h1 className="text-4xl font-bold">Programme</h1>
+        <div className="flex flex-row mb-12 text-white">
+          <h1 className="text-4xl font-bold">
+            {t('course-page:programs-programs')}
+          </h1>
         </div>
         <div className="flex justify-end mb-12">
           <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />}>
-            Programm hinzufügen
+            {t('course-page:programs-add')}
           </Button>
         </div>
-        <div className="grid grid-cols-10">
-          <div>Veröff.</div>
-          <div className="col-span-2">Programmtitel</div>
-          <div>Kurztitel</div>
-          <div>Bew. Start</div>
-          <div>Bew. Ende</div>
-          <div>Start</div>
-          <div>Ende</div>
-          <div>Abgabe Frist</div>
+        <div className="grid grid-cols-10 text-gray-400">
+          <p>{t('course-page:programs-published')}</p>
+          <div className="col-span-2">{t('course-page:programs-title')}</div>
+          <div>{t('course-page:programs-short-title')}</div>
+          <div>{t('course-page:programs-application-start')}</div>
+          <div>{t('course-page:programs-application-end')}</div>
+          <div>{t('course-page:programs-course-start')}</div>
+          <div>{t('course-page:programs-course-end')}</div>
+          <div>{t('course-page:programs-achievement-upload-deadline')}</div>
           <div>&nbsp;</div>
         </div>
         {programs != null &&
@@ -516,7 +481,7 @@ export const AuthorizedPrograms: FC = () => {
               qResult={qResult}
               canDelete={v.Courses.length === 0}
               openProgramId={openProgram}
-              onSetVisibility={handleToggleVisibility}
+              onSetPublished={handleTogglePublished}
               onSetTitle={handleProgramTitle}
               onSetShortTitle={handleProgramShortTitle}
               onSetApplicationStart={handleApplicationStart}
@@ -526,38 +491,47 @@ export const AuthorizedPrograms: FC = () => {
               onSetUploadData={handleUploadDeadline}
               onDelete={handleDelete}
               onOpenProgram={handleOpenProgram}
-              onSetStartQuestionaire={handleStartQuestionaire}
-              onSetClosingQuestionaire={handleClosingQuestionaire}
-              onSetSpeakerQuestionaire={handleSpeakerQuestionaire}
+              onSetStartQuestionnaire={handleStartQuestionaire}
+              onSetClosingQuestionnaire={handleClosingQuestionaire}
+              onSetSpeakerQuestionnaire={handleSpeakerQuestionaire}
               onSetVisibilityParticipationCertificate={
                 handleProgramParticipationCertVisible
               }
-              onSetVisiblityAchievementCertificate={
-                handleProgramAchivementCertVisible
+              onSetVisibilityAchievementCertificate={
+                handleProgramAchievementCertVisible
               }
             />
           ))}
         <div className="flex justify-end mt-12 mb-12">
           <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />}>
-            Programm hinzufügen
+            {t('course-page:programs-add')}
           </Button>
         </div>
       </PageBlock>
       <QuestionConfirmationDialog
-        question={`Möchtest du das Programm "${activeDialogProgram?.title}" wirklich veröffentlichen?`}
-        confirmationText={"Veröffentlichen"}
+        question={t('course-page:do-you-want-to-publish-the-program', {
+          title: activeDialogProgram?.title,
+        })}
+        confirmationText={t('course-page:publish')}
         onClose={handleMakeVisibleDialogClose}
         open={confirmMakeVisibleOpen}
       />
       <QuestionConfirmationDialog
-        question={`Möchtest du die Veröffentlichung des Programmes "${activeDialogProgram?.title}" wirklich zurücknehmen?`}
-        confirmationText={"Zurücknehmen"}
+        question={t(
+          'course-page:do-you-really-want-to-undo-the-publication-of-program',
+          {
+            title: activeDialogProgram?.title,
+          }
+        )}
+        confirmationText={t('course-page:withdraw')}
         onClose={handleMakeInvisibleDialogClose}
         open={confirmMakeInvisibleOpen}
       />
       <QuestionConfirmationDialog
-        question={`Möchtest du das Programm "${activeDialogProgram?.title}" wirklich löschen?`}
-        confirmationText={"Löschen"}
+        question={t('course-page:do-you-want-to-delete-the-program', {
+          title: activeDialogProgram?.title,
+        })}
+        confirmationText={t('delete')}
         onClose={handleConfirmDeleteProgramClose}
         open={confirmDeleteProgramOpen}
       />

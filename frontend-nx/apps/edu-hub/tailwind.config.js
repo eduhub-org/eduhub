@@ -20,6 +20,7 @@ module.exports = {
         'edu-black': '#222222',
         'edu-light-gray': '#F2F2F2',
         'edu-dark-gray': '#D8D8D8',
+        'edu-bg-gray': '#222222',
         'edu-course-current': '#A2EBA0',
         'edu-course-invited': '#FFA665',
         'edu-green': '#00A398',
@@ -29,6 +30,7 @@ module.exports = {
         'edu-modal-bg-color': '#222222',
         'edu-tag-color': '#C4C4C4',
         'edu-row-color': '#E5E5E5',
+        'edu-red': '#D45A5A',
       },
     },
     fontFamily: {

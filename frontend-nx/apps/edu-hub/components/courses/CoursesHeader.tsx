@@ -1,14 +1,24 @@
-import { FC, useCallback, useState } from "react";
-import { AdminCourseListVariables } from "../../queries/__generated__/AdminCourseList";
-import { Programs_Program } from "../../queries/__generated__/Programs";
-import { StaticComponentProperty } from "../../types/UIComponents";
-import { Course_bool_exp } from "../../__generated__/globalTypes";
-import CommonPageHeader from "../common/CommonPageHeader";
-import EhAddButton from "../common/EhAddButton";
-import ModalControl from "../common/ModalController";
-import Searchbar from "../common/Searchbar";
-import { ProgramsMenubar } from "../program/ProgramsMenubar";
-import AddCourseForm from "./AddCourseForm";
+import { FC, useCallback, useState } from 'react';
+import { AdminCourseListVariables } from '../../queries/__generated__/AdminCourseList';
+import { Programs_Program } from '../../queries/__generated__/Programs';
+import { StaticComponentProperty } from '../../types/UIComponents';
+import { Course_bool_exp } from '../../__generated__/globalTypes';
+import CommonPageHeader from '../common/CommonPageHeader';
+import { MdAddCircle } from 'react-icons/md';
+import { useAdminQuery } from '../../hooks/authedQuery';
+import { useAdminMutation } from '../../hooks/authedMutation';
+import { Button } from '@material-ui/core';
+
+import SearchBox from '../common/SearchBox';
+import { ProgramsMenubar } from '../program/ProgramsMenubar';
+
+import {
+  InsertCourse,
+  InsertCourseVariables,
+} from '../../queries/__generated__/InsertCourse';
+import { INSERT_COURSE } from '../../queries/mutateCourse';
+import { ADMIN_COURSE_LIST } from '../../queries/courseList';
+import { CourseList } from '../../queries/__generated__/CourseList';
 
 interface IProps {
   programs: Programs_Program[];
@@ -25,31 +35,57 @@ const CoursesHeader: FC<IProps> = ({
   t,
   updateFilter,
 }) => {
-  const [showModal, setShowModal] = useState(false);
+  // const [showModal, setShowModal] = useState(false);
 
-  const openModalControl = useCallback(() => {
-    setShowModal(!showModal);
-  }, [showModal, setShowModal]);
+  // const openModalControl = useCallback(() => {
+  //   setShowModal(!showModal);
+  // }, [showModal, setShowModal]);
 
-  const onCloseAddCourseWindow = useCallback(
-    (show: boolean) => {
-      setShowModal(show);
-    },
-    [setShowModal]
+  // const onCloseAddCourseWindow = useCallback(
+  //   (show: boolean) => {
+  //     setShowModal(show);
+  //   },
+  //   [setShowModal]
+  // );
+  // const closeModalHandler = useCallback(
+  //   (refetch: boolean) => {
+  //     setShowModal(false);
+  //     if (refetch) {
+  //       courseListRequest.refetch();
+  //     }
+  //   },
+  //   [setShowModal, courseListRequest]
+  // );
+
+  const qResult = useAdminQuery<CourseList>(ADMIN_COURSE_LIST);
+
+  if (qResult.error) {
+    console.log('query programs error', qResult.error);
+  }
+
+  const [insertCourse] = useAdminMutation<InsertCourse, InsertCourseVariables>(
+    INSERT_COURSE
   );
-  const closeModalHandler = useCallback(
-    (refetch: boolean) => {
-      setShowModal(false);
-      if (refetch) {
-        courseListRequest.refetch();
-      }
-    },
-    [setShowModal, courseListRequest]
-  );
+  const insertDefaultCourse = useCallback(async () => {
+    const today = new Date();
+    today.setMilliseconds(0);
+    today.setSeconds(0);
+    today.setMinutes(0);
+    today.setHours(0);
+    await insertCourse({
+      variables: {
+        title: t('course-page:course-default-title'),
+        applicationEnd: new Date(),
+        maxMissedSessions: 2,
+        programId: defaultProgramId,
+      },
+    });
+    qResult.refetch();
+  }, [insertCourse, t, qResult]);
 
   return (
     <>
-      <CommonPageHeader headline={t("coursesHeadline")} />
+      <CommonPageHeader headline={t('coursesHeadline')} />
       <Menubar
         t={t}
         programs={programs}
@@ -57,23 +93,11 @@ const CoursesHeader: FC<IProps> = ({
         courseListRequest={courseListRequest}
         updateFilter={updateFilter}
       />
-      <div className="bg-white pb-10 flex justify-end">
-        <EhAddButton
-          buttonClickCallBack={openModalControl}
-          text={t("addCourseText")}
-        />
+      <div className="flex justify-end mb-12">
+        <Button onClick={insertDefaultCourse} startIcon={<MdAddCircle />}>
+          {t('course-page:add-course')}
+        </Button>
       </div>
-      <ModalControl
-        modalTitle={t("addCourseFormTitle")}
-        onClose={onCloseAddCourseWindow}
-        showModal={showModal}
-      >
-        <AddCourseForm
-          defaultProgramId={defaultProgramId}
-          programs={programs}
-          closeModalHandler={closeModalHandler}
-        />
-      </ModalControl>
     </>
   );
 };
@@ -113,7 +137,7 @@ const Menubar: FC<IMenubarProps> = ({
 }) => {
   const allTabId = -1;
   const maxMenuCount = 3;
-  const [searchedTitle, setSearchedTitle] = useState("");
+  const [searchedTitle, setSearchedTitle] = useState('');
   const [programID, setProgramID] = useState(defaultProgramId);
   // We will just show latest Three and all, Ignore the Unknown id (0)
   const customPrograms =
@@ -127,7 +151,7 @@ const Menubar: FC<IMenubarProps> = ({
   });
   semesters.push({
     key: allTabId,
-    label: "All",
+    label: 'All',
     selected: false,
   });
 
@@ -150,7 +174,7 @@ const Menubar: FC<IMenubarProps> = ({
       updateFilter({
         ...courseListRequest.variables,
         where: createWhereClauseForCourse(searchedTitle, property.key),
-        offset: 0, // Because, we need to reinitiate the offset from the begining
+        offset: 0, // Because, we need to reinitiate the offset from the beginning
       });
       setProgramID(property.key);
     },
@@ -176,14 +200,14 @@ const Menubar: FC<IMenubarProps> = ({
 
   /* #region */
   return (
-    <div className="flex justify-between mb-5">
+    <div className="flex justify-between mb-5 text-white">
       <ProgramsMenubar
         programs={programs}
         defaultProgramId={programs[0].id}
         onTabClicked={handleTabClick}
       />
-      <Searchbar
-        placeholder={t("courseSearchPlaceholder")}
+      <SearchBox
+        placeholder={t('courseSearchPlaceholder')}
         onChangeCallback={searchOnTitleCallback}
         searchText={searchedTitle}
       />

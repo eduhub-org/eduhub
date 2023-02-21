@@ -213,6 +213,14 @@ module "hasura_service" {
       value = google_cloudfunctions2_function.send_mail.service_config[0].uri
     },
     {
+      name  = "CLOUD_FUNCTION_LINK_CREATE_ACHIEVEMENT_CERTIFICATE"
+      value = google_cloudfunctions2_function.create_achievement_certificate.service_config[0].uri
+    },
+    {
+      name  = "CLOUD_FUNCTION_LINK_CREATE_PARTICIPATION_CERTIFICATE"
+      value = google_cloudfunctions2_function.create_participation_certificate.service_config[0].uri
+    },
+    {
       name  = "HASURA_GRAPHQL_JWT_SECRET"
       value = "{ \"type\": \"RS256\", \"jwk_url\": \"https://${local.keycloak_service_name}.opencampus.sh/realms/edu-hub/protocol/openid-connect/certs\" }"
     }

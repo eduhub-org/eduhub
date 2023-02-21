@@ -3,11 +3,21 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, SessionAddressType_enum, LocationOption_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseListWithEnrollments
 // ====================================================
+
+export interface CourseListWithEnrollments_Course_Sessions_SessionAddresses {
+  __typename: "SessionAddress";
+  id: number;
+  /**
+   * Where the session will take place; might be an offline or online location which is provided according to the provided type
+   */
+  address: string;
+  type: SessionAddressType_enum;
+}
 
 export interface CourseListWithEnrollments_Course_Sessions {
   __typename: "Session";
@@ -32,6 +42,10 @@ export interface CourseListWithEnrollments_Course_Sessions {
    * The title of the session
    */
   title: string;
+  /**
+   * An array relationship
+   */
+  SessionAddresses: CourseListWithEnrollments_Course_Sessions_SessionAddresses[];
 }
 
 export interface CourseListWithEnrollments_Course_CourseInstructors_Expert_User {
@@ -73,6 +87,72 @@ export interface CourseListWithEnrollments_Course_CourseInstructors {
   Expert: CourseListWithEnrollments_Course_CourseInstructors_Expert;
 }
 
+export interface CourseListWithEnrollments_Course_CourseLocations {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: LocationOption_enum | null;
+}
+
+export interface CourseListWithEnrollments_Course_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * The title of the program
+   */
+  title: string;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+  /**
+   * The first day a course lecture can possibly be in this program.
+   */
+  lectureStart: any | null;
+  /**
+   * The last day a course lecture can possibly be in this program.
+   */
+  lectureEnd: any | null;
+  /**
+   * The deadline for the achievement record uploads.
+   */
+  achievementRecordUploadDeadline: any | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+  /**
+   * The default application deadline for a course. It can be changed on the course level.
+   */
+  defaultApplicationEnd: any | null;
+  /**
+   * The day the application for all courses of the program start.
+   */
+  applicationStart: any | null;
+}
+
+export interface CourseListWithEnrollments_Course_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
+export interface CourseListWithEnrollments_Course_CourseGroups {
+  __typename: "CourseGroup";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: CourseListWithEnrollments_Course_CourseGroups_CourseGroupOption;
+}
+
 export interface CourseListWithEnrollments_Course_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
@@ -84,35 +164,6 @@ export interface CourseListWithEnrollments_Course_CourseEnrollments {
    * The users current enrollment status to this course
    */
   status: CourseEnrollmentStatus_enum;
-}
-
-export interface CourseListWithEnrollments_Course_Program {
-  __typename: "Program";
-  /**
-   * The default application deadline for a course. It can be changed on the course level.
-   */
-  defaultApplicationEnd: any | null;
-  /**
-   * The day the application for all courses of the program start.
-   */
-  applicationStart: any | null;
-  id: number;
-  /**
-   * The last day a course lecture can possibly be in this program.
-   */
-  lectureEnd: any | null;
-  /**
-   * The first day a course lecture can possibly be in this program.
-   */
-  lectureStart: any | null;
-  /**
-   * The title of the program
-   */
-  title: string;
-  /**
-   * The deadline for the achievement record uploads.
-   */
-  achievementRecordUploadDeadline: any | null;
 }
 
 export interface CourseListWithEnrollments_Course {
@@ -129,11 +180,15 @@ export interface CourseListWithEnrollments_Course {
   /**
    * The day of the week the course takes place.
    */
-  weekDay: string | null;
+  weekDay: Weekday_enum | null;
   /**
    * A text providing info about the costs of a participation.
    */
   cost: string;
+  /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
   /**
    * Last day before applications are closed. (Set to the program's default value when the course is created.)
    */
@@ -151,21 +206,37 @@ export interface CourseListWithEnrollments_Course {
    */
   maxMissedSessions: number;
   /**
+   * The link to the chat of the course (e.g. a mattermost channel)
+   */
+  chatLink: string | null;
+  /**
    * The title of the course (only editable by an admin user)
    */
   title: string;
   /**
+   * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
+   */
+  achievementCertificatePossible: boolean;
+  /**
+   * Indicates whether participants will get a certificate showing the list of attendances (only issued if the did not miss then maxMissedCourses)
+   */
+  attendanceCertificatePossible: boolean;
+  /**
    * Id of the program to which the course belongs.
    */
-  programId: number | null;
+  programId: number;
   /**
    * The number of maximum participants in the course.
    */
   maxParticipants: number | null;
   /**
+   * An array of texts including the learning goals for the course
+   */
+  learningGoals: string | null;
+  /**
    * Heading of the the first course description field
    */
-  headingDescriptionField1: string;
+  headingDescriptionField1: string | null;
   /**
    * Content of the first course description field
    */
@@ -197,11 +268,19 @@ export interface CourseListWithEnrollments_Course {
   /**
    * An array relationship
    */
-  CourseEnrollments: CourseListWithEnrollments_Course_CourseEnrollments[];
+  CourseLocations: CourseListWithEnrollments_Course_CourseLocations[];
   /**
    * An object relationship
    */
-  Program: CourseListWithEnrollments_Course_Program | null;
+  Program: CourseListWithEnrollments_Course_Program;
+  /**
+   * An array relationship
+   */
+  CourseGroups: CourseListWithEnrollments_Course_CourseGroups[];
+  /**
+   * An array relationship
+   */
+  CourseEnrollments: CourseListWithEnrollments_Course_CourseEnrollments[];
 }
 
 export interface CourseListWithEnrollments {

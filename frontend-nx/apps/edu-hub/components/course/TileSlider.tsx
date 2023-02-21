@@ -1,23 +1,71 @@
-import { FC } from "react";
+import { FC } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
-import { CourseList_Course } from "../../queries/__generated__/CourseList";
+import 'swiper/css';
 
-import { Tile } from "./Tile";
+import { CourseList_Course } from '../../queries/__generated__/CourseList';
+
+import { Tile } from './Tile';
 
 interface IProps {
   courses: CourseList_Course[];
 }
 
+const breakpoints = {
+  460: {
+    slidesPerView: 2.15,
+    spaceBetween: 11,
+    slidesOffsetBefore: 13,
+    slidesOffsetAfter: 13,
+  },
+  640: {
+    slidesPerView: 3.15,
+    spaceBetween: 11,
+    slidesOffsetBefore: 13,
+    slidesOffsetAfter: 13,
+  },
+  768: {
+    slidesPerView: 3.15,
+    spaceBetween: 11,
+    slidesOffsetBefore: 13,
+    slidesOffsetAfter: 13,
+  },
+  1024: {
+    slidesPerView: 4.33333,
+    spaceBetween: 11,
+    slidesOffsetBefore: 13,
+    slidesOffsetAfter: 13,
+  },
+  1280: {
+    slidesPerView: 4.33333,
+    spaceBetween: 11,
+    slidesOffsetBefore: 0,
+    slidesOffsetAfter: 0,
+  },
+  1536: {
+    slidesPerView: 4.33333,
+    spaceBetween: 11,
+    slidesOffsetBefore: 0,
+    slidesOffsetAfter: 0,
+  },
+};
+
 export const TileSlider: FC<IProps> = ({ courses }) => {
   return (
-    <div className="w-full overflow-x-scroll">
-      <div className="flex w-min whitespace-nowrap px-4 sm:px-16 xl:px-0 space-x-4">
-        {courses.map((course) => (
-          <div key={`${course.id}`} className="whitespace-normal">
-            <Tile course={course} />
-          </div>
-        ))}
-      </div>
-    </div>
+    <Swiper
+      breakpoints={breakpoints}
+      spaceBetween={11}
+      slidesPerView={1.15}
+      slidesOffsetBefore={13}
+      slidesOffsetAfter={13}
+      onSlideChange={() => console.log('slide change')}
+      onSwiper={(swiper) => console.log(swiper)}
+    >
+      {courses.map((course) => (
+        <SwiperSlide key={`${course.id}`} className="whitespace-normal">
+          <Tile course={course} />
+        </SwiperSlide>
+      ))}
+    </Swiper>
   );
 };

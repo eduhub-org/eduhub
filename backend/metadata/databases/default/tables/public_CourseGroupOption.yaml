@@ -1,0 +1,21 @@
+table:
+  name: CourseGroupOption
+  schema: public
+array_relationships:
+  - name: CourseGroups
+    using:
+      foreign_key_constraint_on:
+        column: groupOptionId
+        table:
+          name: CourseGroup
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - title
+        - order
+        - created_at
+        - updated_at
+      filter: {}

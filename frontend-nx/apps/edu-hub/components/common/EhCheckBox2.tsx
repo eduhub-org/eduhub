@@ -1,6 +1,6 @@
-import { FC, useCallback } from "react";
-import { MdCheckBox, MdCheckBoxOutlineBlank } from "react-icons/md";
-import { StaticComponentProperty } from "../../types/UIComponents";
+import { FC, useCallback } from 'react';
+import { MdCheckBox, MdCheckBoxOutlineBlank } from 'react-icons/md';
+import { StaticComponentProperty } from '../../types/UIComponents';
 
 interface IProps {
   property: StaticComponentProperty;
@@ -21,7 +21,7 @@ const EhCheckBox2: FC<IProps> = ({ property, onClickHandler }) => {
         <MdCheckBoxOutlineBlank size="1.5em" />
       )}
       {property.label && (
-        <label className="inline-block text-gray-800 cursor-pointer">
+        <label className="inline-block text-gray-500 cursor-pointer">
           {property.label}
         </label>
       )}

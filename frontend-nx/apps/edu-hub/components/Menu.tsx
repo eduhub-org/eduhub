@@ -1,11 +1,13 @@
-import Fade from "@material-ui/core/Fade";
-import MaterialMenu, { MenuProps } from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import { withStyles } from "@material-ui/core/styles";
-import { signOut } from "next-auth/react";
-import Link from "next/link";
-import { FC, useCallback } from "react";
-import { useIsAdmin, useIsInstructor } from "../hooks/authentication";
+import Fade from '@material-ui/core/Fade';
+import MaterialMenu, { MenuProps } from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import { withStyles } from '@material-ui/core/styles';
+import { signOut } from 'next-auth/react';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { FC, useCallback } from 'react';
+import { useIsAdmin, useIsInstructor } from '../hooks/authentication';
+import useTranslation from 'next-translate/useTranslation';
 
 interface IProps {
   anchorElement: HTMLElement;
@@ -15,19 +17,19 @@ interface IProps {
 
 const StyledMenu = withStyles({
   paper: {
-    minWidth: "225px",
-    padding: "1rem 2rem",
+    minWidth: '225px',
+    padding: '1rem 2rem',
   },
 })((props: MenuProps) => (
   <MaterialMenu
     getContentAnchorEl={null}
     anchorOrigin={{
-      vertical: "bottom",
-      horizontal: "right",
+      vertical: 'bottom',
+      horizontal: 'right',
     }}
     transformOrigin={{
-      vertical: "top",
-      horizontal: "right",
+      vertical: 'top',
+      horizontal: 'right',
     }}
     {...props}
   />
@@ -41,7 +43,23 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   }, [setVisible]);
 
   const isAdmin = useIsAdmin();
-  const isInstructor = useIsInstructor();
+  // const isInstructor = useIsInstructor();
+  const { t } = useTranslation();
+
+  const router = useRouter();
+
+  const logout = useCallback(async () => {
+    // Fetch Keycloak Logout URL
+    const res = await fetch('/api/auth/logout');
+    const jsonPayload = await res?.json();
+    const url = JSON.parse(jsonPayload).url;
+
+    // Logging user out client side
+    await signOut({ redirect: false });
+
+    // Logging user out on keycloak and redirecting back to app
+    router.push(url);
+  }, [router]);
 
   return (
     <StyledMenu
@@ -53,60 +71,45 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       TransitionComponent={Fade}
       className="min-w-full"
     >
-      {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/user-management">
-            User Management
-          </Link>
-        </MenuItem>
-      )}
-
       <MenuItem onClick={closeMenu}>
         <Link className="w-full text-lg" href="/profile">
-          Profil
+          {t('menu-profile')}
         </Link>
       </MenuItem>
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/programs">
-            Programme
+          <Link className="w-full text-lg" href="/user-management">
+            {t('menu-administration-user')}
           </Link>
         </MenuItem>
       )}
 
-      {isInstructor && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/courses/instructor">
-            Kurse (Instruktor)
-          </Link>
-        </MenuItem>
-      )}
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link className="w-full text-lg" href="/courses">
-            Kurse (Admin)
-          </Link>
-        </MenuItem>
-      )}
-
-      {isInstructor && (
-        <MenuItem onClick={closeMenu}>
-          <Link href="/achievements">
-            <span className="w-full text-lg">Achievements (Instruktor)</span>
+            {t('menu-administration-courses')}
           </Link>
         </MenuItem>
       )}
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link href="/achievements">
-            <span className="w-full text-lg">Achievements (Admin)</span>
+          <Link className="w-full text-lg" href="/achievements">
+            {t('menu-administration-achievement')}
           </Link>
         </MenuItem>
       )}
 
-      <MenuItem onClick={() => signOut()}>
-        <span className="w-full text-lg">Logout</span>
+      {isAdmin && (
+        <MenuItem onClick={closeMenu}>
+          <Link className="w-full text-lg" href="/programs">
+            {t('menu-administration-programs')}
+          </Link>
+        </MenuItem>
+      )}
+
+      <MenuItem className="w-full text-lg" onClick={() => logout()}>
+        {t('menu-logout')}
       </MenuItem>
     </StyledMenu>
   );

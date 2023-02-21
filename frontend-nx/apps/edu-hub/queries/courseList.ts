@@ -1,12 +1,12 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
-import { ADMIN_COURSE_FRAGMENT, COURSE_FRAGMENT } from "./courseFragment";
-import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from "./programFragment";
+import { ADMIN_COURSE_FRAGMENT, COURSE_FRAGMENT } from './courseFragment';
+import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from './programFragment';
 
 export const COURSE_LIST = gql`
   ${COURSE_FRAGMENT}
   query CourseList($where: Course_bool_exp! = {}) {
-    Course(order_by: { id: desc }, where: $where) {
+    Course(order_by: { id: desc }) {
       ...CourseFragment
     }
   }

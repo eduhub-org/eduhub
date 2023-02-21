@@ -1,8 +1,9 @@
-import { Dialog, DialogTitle } from "@material-ui/core";
-import { FC, useCallback } from "react";
-import { MdClose } from "react-icons/md";
+import { Dialog, DialogTitle } from '@material-ui/core';
+import useTranslation from 'next-translate/useTranslation';
+import { FC, useCallback } from 'react';
+import { MdClose } from 'react-icons/md';
 
-import { Button } from "../../common/Button";
+import { Button } from '../../common/Button';
 
 interface QuestionProps {
   question: string;
@@ -19,12 +20,13 @@ export const QuestionConfirmationDialog: FC<QuestionProps> = ({
 }) => {
   const handleCancel = useCallback(() => onClose(false), [onClose]);
   const handleConfirm = useCallback(() => onClose(true), [onClose]);
+  const { t } = useTranslation();
 
   return (
     <Dialog open={open} onClose={handleCancel}>
       <DialogTitle>
         <div className="grid grid-cols-2">
-          <div>Bestätigung</div>
+          <div>{t('confirmation')}</div>
           <div className="cursor-pointer flex justify-end">
             <MdClose onClick={handleCancel} />
           </div>
@@ -35,7 +37,7 @@ export const QuestionConfirmationDialog: FC<QuestionProps> = ({
         <div className="mb-8">{question}</div>
         <div className="grid grid-cols-2">
           <div>
-            <Button onClick={handleCancel}>Abbrechen</Button>
+            <Button onClick={handleCancel}>{t('cancel')}</Button>
           </div>
           <div className="flex justify-end">
             <Button filled onClick={handleConfirm}>

@@ -5,6 +5,7 @@ version: "3.8"
 
 services:
   frontend-nx:
+    container_name: eduhub-frontend-nx
     ports:
       - "5000:4200"
       - "5001:4201"
@@ -19,21 +20,8 @@ services:
       - hasura
       - keycloak
 
-  frontend:
-    ports:
-      - "5005:5000"
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile-dev
-    # uncomment this to disable automatic yarn dev on frontend startup
-    #command: tail -F anything
-    volumes:
-      - ./frontend:/opt/app
-    depends_on:
-      - hasura
-      - keycloak
-
   functions:
+    container_name: eduhub-functions
     image: node:18-bullseye-slim
     user: "node"
     working_dir: /functions
@@ -55,6 +43,7 @@ services:
       LIBRARY_PATH: ../lib/cloud-storage
 
   hasura:
+    container_name: eduhub-hasura
     restart: on-failure
     build: ./backend
     ports:
@@ -68,6 +57,7 @@ services:
       HASURA_GRAPHQL_ENABLE_CONSOLE: "false" # set to "false" to disable console, the console has to run on the host for some technical reasons, it is very hard to get it to run from inside the container: https://github.com/hasura/graphql-engine/issues/2824
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+      HASURA_GRAPHQL_LOG_LEVEL: warn
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
       HASURA_GRAPHQL_UNAUTHORIZED_ROLE: anonymous
       HASURA_GRAPHQL_EXPERIMENTAL_FEATURES: inherited_roles
@@ -94,6 +84,8 @@ services:
       CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: "http://functions:42011"
       CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "http://functions:42005"
       CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "http://functions:42012"
+      CLOUD_FUNCTION_LINK_CREATE_ACHIEVEMENT_CERTIFICATE: "http://functions:42022"
+      CLOUD_FUNCTION_LINK_CREATE_PARTICIPATION_CERTIFICATE: "http://functions:42023"
 
     volumes:
       - ./backend:/hasura
@@ -102,6 +94,7 @@ services:
       - ./backend/seeds:/hasura-seeds
 
   db_hasura:
+    container_name: eduhub-db_hasura
     image: postgres:12
     environment:
       POSTGRES_PASSWORD: postgrespassword
@@ -109,6 +102,7 @@ services:
       - ./backend/init.d:/docker-entrypoint-initdb.d:rw
 
   keycloak:
+    container_name: eduhub-keycloak
     build:
       context: ./keycloak/
       dockerfile: Dockerfile-dev

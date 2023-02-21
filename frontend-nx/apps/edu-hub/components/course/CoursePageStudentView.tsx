@@ -1,20 +1,22 @@
-import { FC } from "react";
+import useTranslation from 'next-translate/useTranslation';
+import { FC } from 'react';
 
-import { CourseWithEnrollment_Course_by_pk } from "../../queries/__generated__/CourseWithEnrollment";
-import { ContentRow } from "../common/ContentRow";
-import { PageBlock } from "../common/PageBlock";
+import { CourseWithEnrollment_Course_by_pk } from '../../queries/__generated__/CourseWithEnrollment';
+import { ContentRow } from '../common/ContentRow';
+import { PageBlock } from '../common/PageBlock';
 
-import { Attendances } from "./Attendances";
-import { CourseTitleSubTitleBlock } from "./CourseTitleSubTitleBlock";
-import { Resources } from "./Resources";
-import { Tasks } from "./Tasks";
-import { Tools } from "./Tools";
+import { Attendances } from './Attendances';
+import CourseAchievementOption from './course-achievement-option/CourseAchievementOption';
+import { CourseTitleSubTitleBlock } from './CourseTitleSubTitleBlock';
+import { Resources } from './Resources';
+import { Tools } from './Tools';
 
 interface IProps {
   course: CourseWithEnrollment_Course_by_pk;
 }
 
 export const CoursePageStudentView: FC<IProps> = ({ course }) => {
+  const { t } = useTranslation();
   return (
     <>
       <PageBlock>
@@ -41,7 +43,16 @@ export const CoursePageStudentView: FC<IProps> = ({ course }) => {
           }
           rightBottom={
             <div className="flex flex-1">
-              <Tasks course={course} />
+              {course.achievementCertificatePossible && (
+                <CourseAchievementOption
+                  courseId={course.id}
+                  achievementRecordUploadDeadline={
+                    course.Program.achievementRecordUploadDeadline
+                  }
+                  courseTitle={course.title}
+                  t={t}
+                />
+              )}
             </div>
           }
         />

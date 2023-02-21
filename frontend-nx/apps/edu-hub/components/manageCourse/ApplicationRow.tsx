@@ -1,20 +1,19 @@
-import { QueryResult } from "@apollo/client";
-import { FC, useCallback, useState } from "react";
-import { GoPrimitiveDot } from "react-icons/go";
+import { QueryResult } from '@apollo/client';
+import useTranslation from 'next-translate/useTranslation';
+import { FC, useCallback, useState } from 'react';
+import { GoPrimitiveDot } from 'react-icons/go';
 import {
   IoIosArrowDown,
   IoIosArrowUp,
   IoIosCheckmarkCircle,
   IoIosCloseCircle,
-} from "react-icons/io";
-import { MdCheckBox, MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
-import { displayDate } from "../../helpers/dateHelpers";
-import {
-  ManagedCourse_Course_by_pk_CourseEnrollments,
-} from "../../queries/__generated__/ManagedCourse";
-import { MotivationRating_enum } from "../../__generated__/globalTypes";
-import { EhDot, greenDot, greyDot, orangeDot, redDot } from "../common/dots";
-import { OnlyAdmin } from "../common/OnlyLoggedIn";
+} from 'react-icons/io';
+import { MdCheckBox, MdOutlineCheckBoxOutlineBlank } from 'react-icons/md';
+import { displayDate } from '../../helpers/dateHelpers';
+import { ManagedCourse_Course_by_pk_CourseEnrollments } from '../../queries/__generated__/ManagedCourse';
+import { MotivationRating_enum } from '../../__generated__/globalTypes';
+import { EhDot, greenDot, greyDot, orangeDot, redDot } from '../common/dots';
+import { OnlyAdmin } from '../common/OnlyLoggedIn';
 
 interface IProps {
   enrollment: ManagedCourse_Course_by_pk_CourseEnrollments | null;
@@ -46,6 +45,8 @@ export const ApplicationRow: FC<IProps> = ({
   isRowSelected,
   onSelectRow,
 }) => {
+  const { t } = useTranslation();
+
   const handleToggleRowSelected = useCallback(() => {
     if (enrollment != null) {
       onSelectRow(enrollment.id, !isRowSelected);
@@ -86,11 +87,15 @@ export const ApplicationRow: FC<IProps> = ({
     <>
       {!enrollment && (
         <div className="grid grid-cols-24 mb-1">
-          <div className="mr-3 ml-3 col-span-3">Vorname</div>
-          <div className="mr-3 ml-3 col-span-3">Nachname</div>
-          <div className="mr-3 ml-3 col-span-12">Bewerbung</div>
-          <div className="mr-3 ml-3 col-span-2 text-center">Beurteilung</div>
-          <div className="mr-3 ml-3 col-span-2 text-center">Status</div>
+          <div className="mr-3 ml-3 col-span-3">{t('firstName')}</div>
+          <div className="mr-3 ml-3 col-span-3">{t('lastName')}</div>
+          <div className="mr-3 ml-3 col-span-12">
+            {t('course-page:application')}
+          </div>
+          <div className="mr-3 ml-3 col-span-2 text-center">
+            {t('course-page:evaluation')}
+          </div>
+          <div className="mr-3 ml-3 col-span-2 text-center">{t('status')}</div>
           <div className="col-span-1" />
           <div className="col-span-1" />
         </div>
@@ -98,10 +103,11 @@ export const ApplicationRow: FC<IProps> = ({
 
       {enrollment && (
         <>
-          {" "}
+          {' '}
           <div
-            className={`grid grid-cols-24 bg-edu-light-gray ${isRowOpen ? "" : "mb-1"
-              }`}
+            className={`grid grid-cols-24 bg-edu-light-gray ${
+              isRowOpen ? '' : 'mb-1'
+            }`}
           >
             <div className="mr-3 ml-3 col-span-3">
               {enrollment.User.firstName}
@@ -113,59 +119,59 @@ export const ApplicationRow: FC<IProps> = ({
               {enrollment.motivationLetter}
             </div>
             <div className="mr-3 ml-3 col-span-2 text-center">
-              {enrollment.motivationRating === "UNRATED" ? greyDot : <></>}
-              {enrollment.motivationRating === "INVITE" ? greenDot : <></>}
-              {enrollment.motivationRating === "REVIEW" ? orangeDot : <></>}
-              {enrollment.motivationRating === "DECLINE" ? redDot : <></>}
+              {enrollment.motivationRating === 'UNRATED' ? greyDot : <></>}
+              {enrollment.motivationRating === 'INVITE' ? greenDot : <></>}
+              {enrollment.motivationRating === 'REVIEW' ? orangeDot : <></>}
+              {enrollment.motivationRating === 'DECLINE' ? redDot : <></>}
             </div>
             <div className="mr-3 ml-3 col-span-2 text-center">
-              {!isExpired(enrollment) && enrollment.status === "APPLIED" && (
+              {!isExpired(enrollment) && enrollment.status === 'APPLIED' && (
                 <GoPrimitiveDot
                   className="inline"
-                  title="Beworben"
+                  title={t('course-page:applied')}
                   color="grey"
                   size="2.5em"
                 />
               )}
-              {!isExpired(enrollment) && enrollment.status === "INVITED" && (
+              {!isExpired(enrollment) && enrollment.status === 'INVITED' && (
                 <IoIosCheckmarkCircle
                   className="inline"
-                  title="Eingeladen"
+                  title={t('course-page:invited')}
                   color="grey"
                   size="1.5em"
                 />
               )}
-              {(enrollment.status === "CONFIRMED" ||
-                enrollment.status === "COMPLETED") && (
-                  <IoIosCheckmarkCircle
-                    className="inline"
-                    title="Einladung bestätigt"
-                    color="lightgreen"
-                    size="1.5em"
-                  />
-                )}
-              {enrollment.status === "ABORTED" && (
+              {(enrollment.status === 'CONFIRMED' ||
+                enrollment.status === 'COMPLETED') && (
                 <IoIosCheckmarkCircle
-                  title="Abgebrochen"
+                  className="inline"
+                  title={t('course-page:invitation-confirmed')}
+                  color="lightgreen"
+                  size="1.5em"
+                />
+              )}
+              {enrollment.status === 'ABORTED' && (
+                <IoIosCheckmarkCircle
+                  title={t('course-page:aborted')}
                   color="red"
                   size="1.5em"
                   className="inline"
                 />
               )}
-              {enrollment.status === "REJECTED" && (
+              {enrollment.status === 'REJECTED' && (
                 <IoIosCloseCircle
-                  title="Abgelehnt"
+                  title={t('course-page:rejected')}
                   color="red"
                   size="1.5em"
                   className="inline"
                 />
               )}
               {isExpired(enrollment) &&
-                (enrollment.status === "APPLIED" ||
-                  enrollment.status === "INVITED") && (
+                (enrollment.status === 'APPLIED' ||
+                  enrollment.status === 'INVITED') && (
                   <IoIosCloseCircle
                     className="inline"
-                    title="Einladung abgelaufen"
+                    title={t('course-page:invitation-expired')}
                     color="grey"
                     size="1.5em"
                   />
@@ -219,9 +225,9 @@ export const ApplicationRow: FC<IProps> = ({
                       className="cursor-pointer"
                       color="GREY"
                       size={
-                        enrollment.motivationRating === "UNRATED"
-                          ? "LARGE"
-                          : "DEFAULT"
+                        enrollment.motivationRating === 'UNRATED'
+                          ? 'LARGE'
+                          : 'DEFAULT'
                       }
                     />
                     <EhDot
@@ -229,9 +235,9 @@ export const ApplicationRow: FC<IProps> = ({
                       className="cursor-pointer"
                       color="GREEN"
                       size={
-                        enrollment.motivationRating === "INVITE"
-                          ? "LARGE"
-                          : "DEFAULT"
+                        enrollment.motivationRating === 'INVITE'
+                          ? 'LARGE'
+                          : 'DEFAULT'
                       }
                     />
                     <EhDot
@@ -239,9 +245,9 @@ export const ApplicationRow: FC<IProps> = ({
                       className="cursor-pointer"
                       color="ORANGE"
                       size={
-                        enrollment.motivationRating === "REVIEW"
-                          ? "LARGE"
-                          : "DEFAULT"
+                        enrollment.motivationRating === 'REVIEW'
+                          ? 'LARGE'
+                          : 'DEFAULT'
                       }
                     />
                     <EhDot
@@ -249,16 +255,16 @@ export const ApplicationRow: FC<IProps> = ({
                       className="cursor-pointer"
                       color="RED"
                       size={
-                        enrollment.motivationRating === "DECLINE"
-                          ? "LARGE"
-                          : "DEFAULT"
+                        enrollment.motivationRating === 'DECLINE'
+                          ? 'LARGE'
+                          : 'DEFAULT'
                       }
                     />
                   </div>
 
-                  {enrollment.status === "INVITED" && (
+                  {enrollment.status === 'INVITED' && (
                     <div className="mt-5">
-                      Ablaufdatum Einladung: <br />
+                      {`${t('course-page:invitation-deadline')}:`} <br />
                       {displayDate(enrollment.invitationExpirationDate)}
                     </div>
                   )}

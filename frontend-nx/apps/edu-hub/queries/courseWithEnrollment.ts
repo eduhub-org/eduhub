@@ -1,9 +1,9 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
-import { COURSE_FRAGMENT } from "./courseFragment";
-import { ENROLLMENT_FRAGMENT } from "./enrollmentFragment";
-import { USER_PROGRAM_FRAGMENT } from "./programFragment";
-import { SESSION_FRAGMENT } from "./sessionFragement";
+import { COURSE_FRAGMENT } from './courseFragment';
+import { ENROLLMENT_FRAGMENT } from './enrollmentFragment';
+import { USER_PROGRAM_FRAGMENT } from './programFragment';
+import { SESSION_FRAGMENT } from './sessionFragement';
 
 export const COURSE_WITH_ENROLLMENT = gql`
   ${COURSE_FRAGMENT}
@@ -20,7 +20,8 @@ export const COURSE_WITH_ENROLLMENT = gql`
       }
       CourseLocations {
         id
-        link
+        locationOption
+        defaultSessionAddress
       }
       Program {
         ...ProgramFragment

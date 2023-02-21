@@ -1,5 +1,5 @@
-import { FC } from "react";
-import { MdCheckBox, MdCheckBoxOutlineBlank } from "react-icons/md";
+import { FC } from 'react';
+import { MdCheckBox, MdCheckBoxOutlineBlank } from 'react-icons/md';
 
 interface IPros {
   checked: boolean;
@@ -15,7 +15,7 @@ const EhCheckBox: FC<IPros> = ({ checked, text }) => {
         <MdCheckBoxOutlineBlank size="1.5em" />
       )}
       {text && (
-        <label className="inline-block text-gray-800 cursor-pointer">
+        <label className="inline-block text-gray-500 cursor-pointer">
           {text}
         </label>
       )}

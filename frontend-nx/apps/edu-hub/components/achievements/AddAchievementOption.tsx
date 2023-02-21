@@ -1,27 +1,27 @@
-import { FC, useCallback, useContext } from "react";
-import { useAdminMutation } from "../../hooks/authedMutation";
-import { UploadFileTypes } from "../../helpers/achievement";
-import { INSERT_AN_ACHIEVEMENT_OPTION } from "../../queries/mutateAchievement";
+import { FC, useCallback, useContext } from 'react';
+import { useAdminMutation } from '../../hooks/authedMutation';
+import { ResponseToARequest, UploadFileTypes } from '../../helpers/achievement';
+import { INSERT_AN_ACHIEVEMENT_OPTION } from '../../queries/mutateAchievement';
 import {
   InsertAnAchievementOption,
   InsertAnAchievementOptionVariables,
-} from "../../queries/__generated__/InsertAnAchievementOption";
-import { AchievementRecordType_enum } from "../../__generated__/globalTypes";
-import { AchievementContext } from "./AchievementOptionDashboard";
+} from '../../queries/__generated__/InsertAnAchievementOption';
+import { AchievementRecordType_enum } from '../../__generated__/globalTypes';
 import {
   IDataToManipulate,
   TempAchievementOptionCourse,
   TempAchievementOptionMentor,
-} from "../../helpers/achievement";
-import AddEditAchievementOptionComponent from "./AddEditAchievementOptionComponent";
+} from '../../helpers/achievement';
+import FormToAddEditAchievementOption from './FormToAddEditAchievementOption';
+import { AchievementContext } from './AchievementsHelper';
 interface IProps {
   onSuccess: (success: boolean) => void;
 }
 
-const AddAchievemenOption: FC<IProps> = ({ onSuccess }) => {
+const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
   const context = useContext(AchievementContext);
   const profile = context.userProfile;
-  /* #region Database and ServerLess Fuctions Declarations */
+  /* #region Database and ServerLess Functions Declarations */
   const [insertAnAchievement] = useAdminMutation<
     InsertAnAchievementOption,
     InsertAnAchievementOptionVariables
@@ -36,15 +36,19 @@ const AddAchievemenOption: FC<IProps> = ({ onSuccess }) => {
             data: {
               title: data.title,
               description: data.description,
-              evaluationScriptUrl: "", // This field is also mendatory while insert
-              documentationTemplateUrl: "", // This field is also mendatory while insert
+              evaluationScriptUrl: '', // This field is also mandatory while insert
+              documentationTemplateUrl: '', // This field is also mandatory while insert
               recordType: data.recordType as AchievementRecordType_enum,
+              csvTemplateUrl: data.csvTemplateFile
+                ? data.csvTemplateFile.data
+                : null,
               AchievementOptionCourses: {
                 data: data.courses.map((c) => ({ courseId: c.courseId })),
               },
               AchievementOptionMentors: {
                 data: data.mentors.map((e) => ({ userId: e.userId })), // We need to change this field
               },
+              showScoreAuthors: data.showScoreAuthors,
             },
           },
         });
@@ -67,12 +71,12 @@ const AddAchievemenOption: FC<IProps> = ({ onSuccess }) => {
           }
 
           if (
-            data.evalutionScriptFile &&
-            data.evalutionScriptFile.data &&
-            data.evalutionScriptFile.data.trim().length > 0
+            data.evaluationScriptFile &&
+            data.evaluationScriptFile.data &&
+            data.evaluationScriptFile.data.trim().length > 0
           ) {
             await context.uploadFile(
-              data.evalutionScriptFile,
+              data.evaluationScriptFile,
               id,
               UploadFileTypes.SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT
             );
@@ -80,20 +84,24 @@ const AddAchievemenOption: FC<IProps> = ({ onSuccess }) => {
         }
       } catch (error) {
         console.log(error);
+        return { success: false, message: error.message } as ResponseToARequest;
       }
 
       onSuccess(true);
+      return { success: true } as ResponseToARequest;
     },
     [onSuccess, context, insertAnAchievement]
   );
 
   const data: IDataToManipulate = {
     achievementOptionId: null,
-    title: null,
-    description: null,
-    documentationTemplateUrl: null,
-    evaluationScriptUrl: null,
-    recordType: context.achievementRTypes[0] as AchievementRecordType_enum,
+    title: 'New Title',
+    description: '',
+    documentationTemplateUrl: '',
+    evaluationScriptUrl: '',
+    showScoreAuthors: true,
+    csvTemplateUrl: '',
+    recordType: context.achievementRecordTypes[0] as AchievementRecordType_enum,
     mentors: profile
       ? new Array({
           userId: context.userId,
@@ -111,11 +119,11 @@ const AddAchievemenOption: FC<IProps> = ({ onSuccess }) => {
       : [],
   };
   return (
-    <AddEditAchievementOptionComponent
+    <FormToAddEditAchievementOption
       defaultData={data}
       onSaveCallBack={onSave}
     />
   );
 };
 
-export default AddAchievemenOption;
+export default AddAchievementOption;

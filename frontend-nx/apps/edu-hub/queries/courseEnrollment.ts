@@ -1,36 +1,6 @@
-import { gql } from "@apollo/client";
-
-// export const COURSE_ENROLLMENT_BY_COURSE_ID = gql`
-//   query CourseEnrollmentByCourseID($courseId: Int!) {
-//     Course_by_pk(id: $courseId) {
-//       id
-//       maxMissedSessions
-//       CourseEnrollments(
-//         order_by: { User: { lastName: asc } }
-//         where: { courseId: { _eq: $courseId } }
-//       ) {
-//         id
-//         User {
-//           id
-//           firstName
-//           lastName
-//           email
-//           Attendances(where: { Session: { courseId: { _eq: $courseId } } }) {
-//             id
-//             status
-//             Session {
-//               id
-//             }
-//           }
-//         }
-//       }
-//       Sessions {
-//         id
-//         title
-//       }
-//     }
-//   }
-// `;
+import { gql } from '@apollo/client';
+import { COURSE_INSTRUCTOR_FRAGMENT } from './courseEnrollmentFragment';
+import { USER_FRAGMENT } from './userFragment';
 
 export const INSERT_SINGLE_ATTENDENCE = gql`
   mutation InsertSingleAttendence($input: Attendance_insert_input!) {
@@ -48,6 +18,46 @@ export const UPDATE_ATTENDENCE = gql`
     update_Attendance_by_pk(pk_columns: { id: $pkId }, _set: $changes) {
       id
       status
+    }
+  }
+`;
+
+export const COURSE_ENROLLMENTS = gql`
+  ${COURSE_INSTRUCTOR_FRAGMENT}
+  query CourseEnrollmentQuery(
+    $where: CourseEnrollment_bool_exp! = {}
+    $limit: Int = null
+    $offset: Int = 0
+  ) {
+    CourseEnrollment(
+      order_by: { id: desc }
+      where: $where
+      limit: $limit
+      offset: $offset
+    ) {
+      ...CourseEnrollmentFragment
+    }
+  }
+`;
+
+export const COURSE_ENROLLMENTS_WITH_USER = gql`
+  ${COURSE_INSTRUCTOR_FRAGMENT}
+  ${USER_FRAGMENT}
+  query CourseEnrollmentWithUserQuery(
+    $where: CourseEnrollment_bool_exp! = {}
+    $limit: Int = null
+    $offset: Int = 0
+  ) {
+    CourseEnrollment(
+      order_by: { id: desc }
+      where: $where
+      limit: $limit
+      offset: $offset
+    ) {
+      ...CourseEnrollmentFragment
+      User {
+        ...UserFragment
+      }
     }
   }
 `;

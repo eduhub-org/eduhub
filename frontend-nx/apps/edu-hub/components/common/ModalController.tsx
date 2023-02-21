@@ -1,6 +1,6 @@
-import { Dialog, DialogContent, DialogTitle } from "@material-ui/core";
-import React, { FC, ReactElement, useCallback } from "react";
-import { MdClose } from "react-icons/md";
+import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
+import React, { FC, ReactElement, useCallback } from 'react';
+import { MdClose } from 'react-icons/md';
 
 interface IPros {
   showModal: boolean;

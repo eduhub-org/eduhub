@@ -3,11 +3,21 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Course_bool_exp, CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { Course_bool_exp, Weekday_enum, SessionAddressType_enum, LocationOption_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: AdminCourseList
 // ====================================================
+
+export interface AdminCourseList_Course_Sessions_SessionAddresses {
+  __typename: "SessionAddress";
+  id: number;
+  /**
+   * Where the session will take place; might be an offline or online location which is provided according to the provided type
+   */
+  address: string;
+  type: SessionAddressType_enum;
+}
 
 export interface AdminCourseList_Course_Sessions {
   __typename: "Session";
@@ -32,6 +42,10 @@ export interface AdminCourseList_Course_Sessions {
    * The title of the session
    */
   title: string;
+  /**
+   * An array relationship
+   */
+  SessionAddresses: AdminCourseList_Course_Sessions_SessionAddresses[];
 }
 
 export interface AdminCourseList_Course_CourseInstructors_Expert_User {
@@ -73,6 +87,19 @@ export interface AdminCourseList_Course_CourseInstructors {
   Expert: AdminCourseList_Course_CourseInstructors_Expert;
 }
 
+export interface AdminCourseList_Course_CourseLocations {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: LocationOption_enum | null;
+}
+
 export interface AdminCourseList_Course_Program {
   __typename: "Program";
   id: number;
@@ -92,6 +119,30 @@ export interface AdminCourseList_Course_Program {
    * The last day a course lecture can possibly be in this program.
    */
   lectureEnd: any | null;
+  /**
+   * The deadline for the achievement record uploads.
+   */
+  achievementRecordUploadDeadline: any | null;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+}
+
+export interface AdminCourseList_Course_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
+export interface AdminCourseList_Course_CourseGroups {
+  __typename: "CourseGroup";
+  id: number;
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: AdminCourseList_Course_CourseGroups_CourseGroupOption;
 }
 
 export interface AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus {
@@ -132,11 +183,15 @@ export interface AdminCourseList_Course {
   /**
    * The day of the week the course takes place.
    */
-  weekDay: string | null;
+  weekDay: Weekday_enum | null;
   /**
    * A text providing info about the costs of a participation.
    */
   cost: string;
+  /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
   /**
    * Last day before applications are closed. (Set to the program's default value when the course is created.)
    */
@@ -154,21 +209,37 @@ export interface AdminCourseList_Course {
    */
   maxMissedSessions: number;
   /**
+   * The link to the chat of the course (e.g. a mattermost channel)
+   */
+  chatLink: string | null;
+  /**
    * The title of the course (only editable by an admin user)
    */
   title: string;
   /**
+   * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
+   */
+  achievementCertificatePossible: boolean;
+  /**
+   * Indicates whether participants will get a certificate showing the list of attendances (only issued if the did not miss then maxMissedCourses)
+   */
+  attendanceCertificatePossible: boolean;
+  /**
    * Id of the program to which the course belongs.
    */
-  programId: number | null;
+  programId: number;
   /**
    * The number of maximum participants in the course.
    */
   maxParticipants: number | null;
   /**
+   * An array of texts including the learning goals for the course
+   */
+  learningGoals: string | null;
+  /**
    * Heading of the the first course description field
    */
-  headingDescriptionField1: string;
+  headingDescriptionField1: string | null;
   /**
    * Content of the first course description field
    */
@@ -198,33 +269,21 @@ export interface AdminCourseList_Course {
    */
   CourseInstructors: AdminCourseList_Course_CourseInstructors[];
   /**
-   * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
+   * An array relationship
    */
-  status: CourseStatus_enum;
-  /**
-   * The value decides whether the course is visible for users or anoymous persons.
-   */
-  visibility: boolean | null;
-  /**
-   * Indicates whether participants can get an achievement certificate. If the course is offering ECTS, it must be possible to obtain this certificate for the course
-   */
-  achievementCertificatePossible: boolean;
-  /**
-   * Indicates whether participants will get a certificate showing the list of attendances (only issued if the did not miss then maxMissedCourses)
-   */
-  attendanceCertificatePossible: boolean;
-  /**
-   * The link to the chat of the course (e.g. a mattermost channel)
-   */
-  chatLink: string | null;
-  /**
-   * An array of texts including the learning goals for the course
-   */
-  learningGoals: string | null;
+  CourseLocations: AdminCourseList_Course_CourseLocations[];
   /**
    * An object relationship
    */
-  Program: AdminCourseList_Course_Program | null;
+  Program: AdminCourseList_Course_Program;
+  /**
+   * An array relationship
+   */
+  CourseGroups: AdminCourseList_Course_CourseGroups[];
+  /**
+   * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
+   */
+  status: CourseStatus_enum;
   /**
    * An array relationship
    */

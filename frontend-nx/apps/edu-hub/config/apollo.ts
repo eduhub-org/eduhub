@@ -1,8 +1,8 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 
 const httpLink = createHttpLink({
   uri: process.env.NEXT_PUBLIC_API_URL,
-  credentials: "include",
+  credentials: 'include',
 });
 
 export const client = new ApolloClient({
@@ -19,6 +19,9 @@ export const client = new ApolloClient({
             merge: (_, incoming) => incoming,
           },
           AchievementOptionCourse: {
+            merge: (_, incoming) => incoming,
+          },
+          User_by_pk: {
             merge: (_, incoming) => incoming,
           },
         },

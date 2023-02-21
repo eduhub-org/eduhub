@@ -1,8 +1,10 @@
 ## https://blog.nrwl.io/create-a-next-js-web-app-with-nx-bcf2ab54613
 
-FROM node:16-alpine
+FROM node:18-alpine
 
-RUN apk add --no-cache libc6-compat yarn socat
+RUN apk add --no-cache libc6-compat socat
+
+RUN corepack enable
 
 USER node
 

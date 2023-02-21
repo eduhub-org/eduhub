@@ -1,49 +1,50 @@
-import { QueryResult } from "@apollo/client";
+import { QueryResult } from '@apollo/client';
+import { ACHIEVEMENT_OPTION_COURSES } from '../../queries/achievementOption';
 import useTranslation from 'next-translate/useTranslation';
-import Link from "next/link";
-import { FC, useCallback, useState } from "react";
+import Link from 'next/link';
+import { FC, useCallback, useState } from 'react';
 import {
   MdAddCircle,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
-} from "react-icons/md";
-import { useAdminMutation } from "../../hooks/authedMutation";
-import { useAdminQuery } from "../../hooks/authedQuery";
-import { QUERY_LIMIT } from "../../pages/courses";
-import { ACHIEVEMENT_OPTION_COURSES } from "../../queries/achievementOptionCourse";
+} from 'react-icons/md';
+import { useAdminMutation } from '../../hooks/authedMutation';
+import { useAdminQuery } from '../../hooks/authedQuery';
+import { QUERY_LIMIT } from '../../pages/courses';
 import {
   INSERT_SINGLE_ATTENDENCE,
   UPDATE_ATTENDENCE,
-} from "../../queries/courseEnrollment";
-import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE } from "../../queries/mutateAchievement";
+} from '../../queries/courseEnrollment';
+import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../queries/mutateAchievement';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
-} from "../../queries/__generated__/AchievementOptionCourses";
+} from '../../queries/__generated__/AchievementOptionCourses';
 
 import {
   DeleteAnAchievementOptionCourse,
   DeleteAnAchievementOptionCourseVariables,
-} from "../../queries/__generated__/DeleteAnAchievementOptionCourse";
+} from '../../queries/__generated__/DeleteAnAchievementOptionCourse';
 import {
   InsertSingleAttendence,
   InsertSingleAttendenceVariables,
-} from "../../queries/__generated__/InsertSingleAttendence";
+} from '../../queries/__generated__/InsertSingleAttendence';
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_CourseEnrollments,
   ManagedCourse_Course_by_pk_Sessions,
-} from "../../queries/__generated__/ManagedCourse";
+} from '../../queries/__generated__/ManagedCourse';
 
 import {
   UpdateSingleAttendenceByPk,
   UpdateSingleAttendenceByPkVariables,
-} from "../../queries/__generated__/UpdateSingleAttendenceByPk";
-import { StaticComponentProperty } from "../../types/UIComponents";
-import { AttendanceStatus_enum } from "../../__generated__/globalTypes";
-import { DOT_COLORS, EhDot } from "../common/dots";
-import TagWithTwoText from "../common/TagWithTwoText";
-import Loading from "../courses/Loading";
+} from '../../queries/__generated__/UpdateSingleAttendenceByPk';
+import { StaticComponentProperty } from '../../types/UIComponents';
+import { AttendanceStatus_enum } from '../../__generated__/globalTypes';
+import { DOT_COLORS, EhDot } from '../common/dots';
+import TagWithTwoText from '../common/TagWithTwoText';
+import Loading from '../courses/Loading';
+import { Button } from '../common/Button';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -62,6 +63,81 @@ const ManageCourseEnrollment: FC<IProps> = ({ course, qResult }) => {
 
 export default ManageCourseEnrollment;
 
+/* #region Course AchievementOptions */
+
+interface IPropsCourseAchievementOptions {
+  courseId: number;
+}
+const CourseAchievementOptions: FC<IPropsCourseAchievementOptions> = (
+  props
+) => {
+  const achievementOptionsForACourse = useAdminQuery<
+    AchievementOptionCourses,
+    AchievementOptionCoursesVariables
+  >(ACHIEVEMENT_OPTION_COURSES, {
+    variables: {
+      limit: QUERY_LIMIT,
+      where: {
+        courseId: { _eq: props.courseId },
+      },
+    },
+  });
+
+  const [deleteAnAchievementCourse] = useAdminMutation<
+    DeleteAnAchievementOptionCourse,
+    DeleteAnAchievementOptionCourseVariables
+  >(DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK);
+
+  const queryDeleteAnAchievementCourseFromDB = useCallback(
+    async (pk: number) => {
+      try {
+        const response = await deleteAnAchievementCourse({
+          variables: {
+            id: pk,
+          },
+        });
+        if (!response.errors) {
+          achievementOptionsForACourse.refetch();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [deleteAnAchievementCourse, achievementOptionsForACourse]
+  );
+  const list = [
+    ...(achievementOptionsForACourse.data?.AchievementOptionCourse || []),
+  ];
+
+  return (
+    <>
+      {achievementOptionsForACourse.loading && <Loading />}
+      <div className="flex gap-2 items-center flex-wrap">
+        {list.map((data, index) => (
+          <div className="max-w-[30%]" key={index}>
+            <TagWithTwoText
+              textLeft={`${data.AchievementOption.title} - ${data.id}`}
+              onRemoveClick={queryDeleteAnAchievementCourseFromDB}
+              id={data.id}
+              textClickLink={`/achievements/${data.AchievementOption.id}`}
+            />
+          </div>
+        ))}
+        <Link href={`/achievements?courseId=${props.courseId}`}>
+          {/* 
+          To avoid the following warning , I used a an extra 'div'
+          Warning: Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()? */}
+          <div>
+            <MdAddCircle className="cursor-pointer" />
+          </div>
+        </Link>
+      </div>
+    </>
+  );
+};
+
+/* #endregion */
+
 /* #region Course Enrollment List */
 interface IPropsEnrollmentList {
   course: ManagedCourse_Course_by_pk;
@@ -71,11 +147,12 @@ interface IPropsEnrollmentList {
 const EnrollmentList: FC<IPropsEnrollmentList> = ({ course, qResult }) => {
   const { t } = useTranslation();
 
+  const newLocal = 'manage-course:attendances';
   const tableHeaders: StaticComponentProperty[] = [
-    { key: 0, label: t("firstName") },
-    { key: 1, label: t("lastName") },
-    { key: 2, label: t("manage-course:attendances") },
-    { key: 3, label: t("manage-course:certificateAchievement") },
+    { key: 0, label: t('firstName') },
+    { key: 1, label: t('lastName') },
+    { key: 2, label: t(newLocal) },
+    { key: 3, label: t('manage-course:certificateAchievement') },
   ];
 
   const enrollmentList = [...(course.CourseEnrollments || [])].sort((a, b) =>
@@ -91,7 +168,7 @@ const EnrollmentList: FC<IPropsEnrollmentList> = ({ course, qResult }) => {
             {tableHeaders.map((component) => {
               return (
                 <th key={component.key} className="py-2 px-5">
-                  <p className="flex justify-start font-medium text-gray-700 uppercase">
+                  <p className="flex justify-start font-medium text-gray-400 uppercase">
                     {component.label}
                   </p>
                 </th>
@@ -112,6 +189,9 @@ const EnrollmentList: FC<IPropsEnrollmentList> = ({ course, qResult }) => {
           ))}
         </tbody>
       </table>
+      <div className="flex justify-end mt-10">
+        <Button filled={true}>{t('course-page:certificate-generation')}</Button>
+      </div>
     </div>
   );
 };
@@ -123,8 +203,8 @@ interface IDotData {
   session: ManagedCourse_Course_by_pk_Sessions;
 }
 
-const pStyle = "text-gray-700 truncate";
-const tdStyple = "pl-5";
+const pStyle = 'text-gray-700 truncate';
+const tdStyle = 'pl-5';
 
 /* #region OneCourseEnrollmentRow */
 
@@ -144,7 +224,7 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
 }) => {
   const [showDetails, setShowDetails] = useState(false);
 
-  const attendenceRecordBySession: Record<
+  const attendanceRecordBySession: Record<
     number,
     { id: number; status: AttendanceStatus_enum }
   > = enrollment.User.Attendances.reduce<
@@ -159,7 +239,7 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
     InsertSingleAttendenceVariables
   >(INSERT_SINGLE_ATTENDENCE);
 
-  const [udpateAnAttendence] = useAdminMutation<
+  const [updateAnAttendence] = useAdminMutation<
     UpdateSingleAttendenceByPk,
     UpdateSingleAttendenceByPkVariables
   >(UPDATE_ATTENDENCE);
@@ -167,7 +247,7 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
   /**
    * By clicking on a circle the user can change the attendance status of the course,
    * from grey to green, from green to red, and from red to grey.
-   * @param  {AttendanceStatus_enum} previousStatus Previous attendence status
+   * @param  {AttendanceStatus_enum} previousStatus Previous attendance status
    * @returns {AttendanceStatus_enum} Returns an AttendanceStatus_enum
    */
   const updateAttendenceStatus = (previousStatus: AttendanceStatus_enum) => {
@@ -182,49 +262,49 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
 
   const handleDotClick = useCallback(
     async (session: ManagedCourse_Course_by_pk_Sessions) => {
-      const obj = attendenceRecordBySession[session.id];
+      const obj = attendanceRecordBySession[session.id];
       if (obj) {
-        const udpatedStatus: AttendanceStatus_enum = updateAttendenceStatus(
+        const updatedStatus: AttendanceStatus_enum = updateAttendenceStatus(
           obj.status
         );
-        const response = await udpateAnAttendence({
+        const response = await updateAnAttendence({
           variables: {
             pkId: obj.id,
             changes: {
-              status: udpatedStatus,
+              status: updatedStatus,
             },
           },
         });
         if (response.errors) {
-          console.log("Update Error: ", response.errors);
+          console.log('Update Error: ', response.errors);
           return;
         }
         qResult.refetch();
         return;
       }
 
-      // Insert attendence with default AttendanceStatus_enum = "ATTENDED"
+      // Insert attendance with default AttendanceStatus_enum = "ATTENDED"
       const response = await insertAttendence({
         variables: {
           input: {
             status: AttendanceStatus_enum.ATTENDED,
             sessionId: session.id,
-            source: "INSTRUCTOR",
+            source: 'INSTRUCTOR',
             userId,
           },
         },
       });
       if (response.errors) {
-        console.log("Error: ", response.errors);
+        console.log('Error: ', response.errors);
         return;
       }
       qResult.refetch();
     },
     [
-      attendenceRecordBySession,
+      attendanceRecordBySession,
       qResult,
       insertAttendence,
-      udpateAnAttendence,
+      updateAnAttendence,
       userId,
     ]
   );
@@ -242,12 +322,12 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
    * @returns {DOT_COLORS} ("GREY" | "GREEN" | "ORANGE" | "RED")
    */
   const dotColor = (sn: ManagedCourse_Course_by_pk_Sessions) => {
-    if (enrollment.User.Attendances.length === 0) return "GREY";
-    const attendance = attendenceRecordBySession[sn.id];
-    if (!attendance) return "GREY";
-    if (attendance.status === AttendanceStatus_enum.MISSED) return "RED";
-    if (attendance.status === AttendanceStatus_enum.ATTENDED) return "GREEN";
-    return "GREY";
+    if (enrollment.User.Attendances.length === 0) return 'GREY';
+    const attendance = attendanceRecordBySession[sn.id];
+    if (!attendance) return 'GREY';
+    if (attendance.status === AttendanceStatus_enum.MISSED) return 'RED';
+    if (attendance.status === AttendanceStatus_enum.ATTENDED) return 'GREEN';
+    return 'GREY';
   };
 
   const dotsData: IDotData[] = sessions.map((session) => ({
@@ -257,7 +337,7 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
   const attendedSessionCount = () => {
     const result = dotsData.reduce(
       (prev, current) =>
-        prev + (current.color === "GREEN" || current.color === "GREY" ? 1 : 0),
+        prev + (current.color === 'GREEN' || current.color === 'GREY' ? 1 : 0),
       0
     );
     return result;
@@ -265,19 +345,19 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
 
   const passedStatus = () => {
     const missedSession = sessions.length - attendedSessionCount();
-    return missedSession > maxMissedSessions ? "RED" : "GREEN";
+    return missedSession > maxMissedSessions ? 'RED' : 'GREEN';
   };
 
   return (
     <>
       <tr className="font-medium bg-edu-course-list h-12">
-        <td className={tdStyple}>
+        <td className={tdStyle}>
           <p className={pStyle}>{enrollment.User.firstName}</p>
         </td>
-        <td className={tdStyple}>
+        <td className={tdStyle}>
           <p className={pStyle}>{enrollment.User.lastName}</p>
         </td>
-        <td className={tdStyple}>
+        <td className={tdStyle}>
           <div className="flex space-x-10 flex-row">
             <div className="flex space-x-5 flex-row">
               {dotsData.map((dotData) => {
@@ -293,17 +373,17 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
             </div>
             <div className="flex space-x-1 flex-row">
               <p className={pStyle}>
-                {" "}
-                {`${attendedSessionCount()}/${sessions.length}`}{" "}
+                {' '}
+                {`${attendedSessionCount()}/${sessions.length}`}{' '}
               </p>
               <EhDot color={passedStatus()} />
             </div>
           </div>
         </td>
-        <td className={tdStyple}>
+        <td className={tdStyle}>
           <div className="flex space-x-2 flex-row">
             <div>
-              <p className={pStyle}> {"PerformanceRating?"} </p>
+              <p className={pStyle}> {'PerformanceRating?'} </p>
             </div>
             <button
               className="focus:ring-2 rounded-md focus:outline-none"
@@ -319,7 +399,7 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
           </div>
         </td>
       </tr>
-      <tr className={showDetails ? "h-0" : "h-1"} />
+      <tr className={showDetails ? 'h-0' : 'h-1'} />
       {showDetails && <ShowDetails enrollment={enrollment} />}
     </>
   );
@@ -333,7 +413,7 @@ const ShowDetails: FC<IPropsShowDetails> = ({ enrollment }) => {
   return (
     <>
       <tr className="bg-edu-course-list f-full">
-        <td colSpan={12} className={tdStyple}>
+        <td colSpan={12} className={tdStyle}>
           <div className="flex">
             <p className={pStyle}> {enrollment.User.email} </p>
           </div>
@@ -368,72 +448,3 @@ const EhDotWithCallBack: FC<IEhDotProps> = ({
 };
 
 /* #endregion */
-
-/* #region Course AchievementOptions */
-
-interface IPropsCourseAchievementOptions {
-  courseId: number;
-}
-const CourseAchievementOptions: FC<IPropsCourseAchievementOptions> = (
-  props
-) => {
-  const achievementOptionsForACourse = useAdminQuery<
-    AchievementOptionCourses,
-    AchievementOptionCoursesVariables
-  >(ACHIEVEMENT_OPTION_COURSES, {
-    variables: {
-      limit: QUERY_LIMIT,
-      where: {
-        courseId: { _eq: props.courseId },
-      },
-    },
-  });
-
-  const [deleteAnAchievementCourse] = useAdminMutation<
-    DeleteAnAchievementOptionCourse,
-    DeleteAnAchievementOptionCourseVariables
-  >(DELETE_AN_ACHIEVEMENT_OPTION_COURSE);
-
-  const queryDeleteAnAchievementCourseFromDB = useCallback(
-    async (pk: number) => {
-      try {
-        const response = await deleteAnAchievementCourse({
-          variables: {
-            id: pk,
-          },
-        });
-        if (!response.errors) {
-          achievementOptionsForACourse.refetch();
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    [deleteAnAchievementCourse, achievementOptionsForACourse]
-  );
-  const list = [
-    ...(achievementOptionsForACourse.data?.AchievementOptionCourse || []),
-  ];
-
-  return (
-    <>
-      {achievementOptionsForACourse.loading && <Loading />}
-      <div className="grid gap-2 grid-cols-3">
-        {list.map((data, index) => (
-          <div className="max-w-[400px]" key={index}>
-            <TagWithTwoText
-              textLeft={data.AchievementOption.title}
-              onRemoveClick={queryDeleteAnAchievementCourseFromDB}
-              id={data.id}
-            />
-          </div>
-        ))}
-        <Link href={`/achievements?courseId=${props.courseId}`}>
-          <div>
-            <MdAddCircle className="cursor-pointer inline-block align-middle stroke-cyan-500" />
-          </div>
-        </Link>
-      </div>
-    </>
-  );
-};
