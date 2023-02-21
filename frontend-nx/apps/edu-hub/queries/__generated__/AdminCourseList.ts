@@ -3,11 +3,21 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Course_bool_exp, Weekday_enum, LocationOption_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { Course_bool_exp, Weekday_enum, SessionAddressType_enum, LocationOption_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: AdminCourseList
 // ====================================================
+
+export interface AdminCourseList_Course_Sessions_SessionAddresses {
+  __typename: "SessionAddress";
+  id: number;
+  /**
+   * Where the session will take place; might be an offline or online location which is provided according to the provided type
+   */
+  address: string;
+  type: SessionAddressType_enum;
+}
 
 export interface AdminCourseList_Course_Sessions {
   __typename: "Session";
@@ -32,6 +42,10 @@ export interface AdminCourseList_Course_Sessions {
    * The title of the session
    */
   title: string;
+  /**
+   * An array relationship
+   */
+  SessionAddresses: AdminCourseList_Course_Sessions_SessionAddresses[];
 }
 
 export interface AdminCourseList_Course_CourseInstructors_Expert_User {
@@ -195,6 +209,10 @@ export interface AdminCourseList_Course {
    */
   maxMissedSessions: number;
   /**
+   * The link to the chat of the course (e.g. a mattermost channel)
+   */
+  chatLink: string | null;
+  /**
    * The title of the course (only editable by an admin user)
    */
   title: string;
@@ -209,15 +227,19 @@ export interface AdminCourseList_Course {
   /**
    * Id of the program to which the course belongs.
    */
-  programId: number | null;
+  programId: number;
   /**
    * The number of maximum participants in the course.
    */
   maxParticipants: number | null;
   /**
+   * An array of texts including the learning goals for the course
+   */
+  learningGoals: string | null;
+  /**
    * Heading of the the first course description field
    */
-  headingDescriptionField1: string;
+  headingDescriptionField1: string | null;
   /**
    * Content of the first course description field
    */
@@ -253,7 +275,7 @@ export interface AdminCourseList_Course {
   /**
    * An object relationship
    */
-  Program: AdminCourseList_Course_Program | null;
+  Program: AdminCourseList_Course_Program;
   /**
    * An array relationship
    */
@@ -262,14 +284,6 @@ export interface AdminCourseList_Course {
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
-  /**
-   * The link to the chat of the course (e.g. a mattermost channel)
-   */
-  chatLink: string | null;
-  /**
-   * An array of texts including the learning goals for the course
-   */
-  learningGoals: string | null;
   /**
    * An array relationship
    */

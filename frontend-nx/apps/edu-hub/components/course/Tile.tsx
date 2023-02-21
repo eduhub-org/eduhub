@@ -151,9 +151,13 @@ export const Tile: FC<IProps> = ({ course }) => {
           <span className="text-lg mb-14">{course.tagline}</span>
           <span className="text-xs uppercase flex content-center">
             <img className="h-4 mr-2" src={locationIcon} alt="location icon" />
-            {course.CourseLocations.map(
-              (location) => `${location.locationOption} +`
-            )}
+            {course.CourseLocations.length > 2
+              ? course.CourseLocations.map(
+                  (location) => `${location.locationOption} +`
+                ).join('')
+              : course.CourseLocations.map(
+                  (location) => `${location.locationOption}`
+                ).join(' + ')}
           </span>
         </div>
       </div>

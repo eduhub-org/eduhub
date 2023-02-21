@@ -11,9 +11,9 @@ interface IProps {
 export const Tools: FC<IProps> = ({ course }) => {
   const { t } = useTranslation('course-page');
 
-  const videoLink = course.CourseLocations.find(
-    (courseLocation) => !!courseLocation.defaultSessionAddress
-  )?.defaultSessionAddress;
+  // const videoLink = course.CourseLocations.find(
+  //   (courseLocation) => !!courseLocation.defaultSessionAddress
+  // )?.defaultSessionAddress;
 
   return (
     <div className="flex flex-1 gap-x-4">

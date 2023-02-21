@@ -1,5 +1,26 @@
 import { gql } from "@apollo/client";
 
+export const INSERT_COURSE = gql`
+  mutation InsertCourse($title: String!, $applicationEnd: date!, $maxMissedSessions: Int!, $programId: Int!) {
+    insert_Course(
+      objects: {
+        title: $title
+        tagline: ""
+        language: "DE"
+        applicationEnd: $applicationEnd
+        maxMissedSessions: $maxMissedSessions
+        programId: $programId
+      }
+    ) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`;
+
+
 export const INSERT_A_COURSE = gql`
   mutation InsertSingleCourse($course: Course_insert_input!) {
     insert_Course_one(object: $course) {

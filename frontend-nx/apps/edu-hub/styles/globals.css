@@ -1,4 +1,11 @@
 @tailwind base;
+
+@layer base {
+  body {
+    @apply font-medium;
+  }
+}
+
 @tailwind components;
 @tailwind utilities;
 

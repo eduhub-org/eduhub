@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, LocationOption_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, AttendanceStatus_enum, SessionAddressType_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, SessionAddressType_enum, LocationOption_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourse
@@ -296,6 +296,10 @@ export interface ManagedCourse_Course_by_pk {
    */
   maxMissedSessions: number;
   /**
+   * The link to the chat of the course (e.g. a mattermost channel)
+   */
+  chatLink: string | null;
+  /**
    * The title of the course (only editable by an admin user)
    */
   title: string;
@@ -310,15 +314,19 @@ export interface ManagedCourse_Course_by_pk {
   /**
    * Id of the program to which the course belongs.
    */
-  programId: number | null;
+  programId: number;
   /**
    * The number of maximum participants in the course.
    */
   maxParticipants: number | null;
   /**
+   * An array of texts including the learning goals for the course
+   */
+  learningGoals: string | null;
+  /**
    * Heading of the the first course description field
    */
-  headingDescriptionField1: string;
+  headingDescriptionField1: string | null;
   /**
    * Content of the first course description field
    */
@@ -354,7 +362,7 @@ export interface ManagedCourse_Course_by_pk {
   /**
    * An object relationship
    */
-  Program: ManagedCourse_Course_by_pk_Program | null;
+  Program: ManagedCourse_Course_by_pk_Program;
   /**
    * An array relationship
    */
@@ -363,14 +371,6 @@ export interface ManagedCourse_Course_by_pk {
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
-  /**
-   * The link to the chat of the course (e.g. a mattermost channel)
-   */
-  chatLink: string | null;
-  /**
-   * An array of texts including the learning goals for the course
-   */
-  learningGoals: string | null;
   /**
    * An array relationship
    */

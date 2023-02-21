@@ -190,7 +190,7 @@ const EnrollmentList: FC<IPropsEnrollmentList> = ({ course, qResult }) => {
         </tbody>
       </table>
       <div className="flex justify-end mt-10">
-        <Button filled={true}>{t('certificate-generation')}</Button>
+        <Button filled={true}>{t('course-page:certificate-generation')}</Button>
       </div>
     </div>
   );

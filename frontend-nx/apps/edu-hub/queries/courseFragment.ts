@@ -21,11 +21,13 @@ export const COURSE_FRAGMENT = gql`
     coverImage
     language
     maxMissedSessions
+    chatLink
     title
     achievementCertificatePossible
     attendanceCertificatePossible
     programId
     maxParticipants
+    learningGoals
     headingDescriptionField1
     contentDescriptionField1
     headingDescriptionField2

@@ -122,7 +122,7 @@ const Form: FC<IAddCourseProps> = ({
             ects: '5.0',
             headingDescriptionField1: '',
             language: 'DE',
-            maxMissedSessions: 3,
+            maxMissedSessions: 2,
             programId,
             tagline: '',
             title: courseTitle,
@@ -197,7 +197,7 @@ const Form: FC<IAddCourseProps> = ({
           />
         </div>
       </div>
-      <div className="flex flex-col space-y-2">
+      {/* <div className="flex flex-col space-y-2">
         <div className="flex">
           <label className="w-2/6" htmlFor="select-semester">
             {t('semester')}
@@ -207,10 +207,13 @@ const Form: FC<IAddCourseProps> = ({
               value={programId}
               onChangeHandler={handleProgramOnchange}
               options={semesters}
+              onSetAttendanceCertificatePossible={
+                handleAttendanceCertificatePossible
+              }
             />
           </div>
         </div>
-      </div>
+      </div> */}
       <div className="flex justify-center">
         <div className="pt-10 mt-10">
           <EhButton

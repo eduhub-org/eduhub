@@ -3,11 +3,21 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, LocationOption_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, SessionAddressType_enum, LocationOption_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: CourseFragment
 // ====================================================
+
+export interface CourseFragment_Sessions_SessionAddresses {
+  __typename: "SessionAddress";
+  id: number;
+  /**
+   * Where the session will take place; might be an offline or online location which is provided according to the provided type
+   */
+  address: string;
+  type: SessionAddressType_enum;
+}
 
 export interface CourseFragment_Sessions {
   __typename: "Session";
@@ -32,6 +42,10 @@ export interface CourseFragment_Sessions {
    * The title of the session
    */
   title: string;
+  /**
+   * An array relationship
+   */
+  SessionAddresses: CourseFragment_Sessions_SessionAddresses[];
 }
 
 export interface CourseFragment_CourseInstructors_Expert_User {
@@ -171,6 +185,10 @@ export interface CourseFragment {
    */
   maxMissedSessions: number;
   /**
+   * The link to the chat of the course (e.g. a mattermost channel)
+   */
+  chatLink: string | null;
+  /**
    * The title of the course (only editable by an admin user)
    */
   title: string;
@@ -185,15 +203,19 @@ export interface CourseFragment {
   /**
    * Id of the program to which the course belongs.
    */
-  programId: number | null;
+  programId: number;
   /**
    * The number of maximum participants in the course.
    */
   maxParticipants: number | null;
   /**
+   * An array of texts including the learning goals for the course
+   */
+  learningGoals: string | null;
+  /**
    * Heading of the the first course description field
    */
-  headingDescriptionField1: string;
+  headingDescriptionField1: string | null;
   /**
    * Content of the first course description field
    */
@@ -229,7 +251,7 @@ export interface CourseFragment {
   /**
    * An object relationship
    */
-  Program: CourseFragment_Program | null;
+  Program: CourseFragment_Program;
   /**
    * An array relationship
    */

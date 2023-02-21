@@ -74,7 +74,7 @@ export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
       onClose={closeModal}
       className="flex justify-center items-center border-none"
       disableEnforceFocus
-      disableBackdropClick={false}
+      BackdropProps={{ onClick: (e) => e.stopPropagation() }}
       closeAfterTransition
     >
       <Fade in={visible}>
