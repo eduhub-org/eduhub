@@ -114,7 +114,7 @@ const UserList: FC<IProps> = ({ t, searchedText }) => {
   const totalCount =
     userListRequest.data?.User_aggregate?.aggregate?.count || 0;
   return (
-    <div className="flex flex-col space-y-10">
+    <div className="flex flex-col space-y-10 text-white">
       <div className="flex justify-between w-full">
         <Header
           checkBoxItems={userTypes}
@@ -240,7 +240,7 @@ const TableContent: FC<ITableContentProps> = ({ t, users }) => {
             {tableHeaders.map((component) => {
               return (
                 <th key={component.key} className="py-2 px-5">
-                  <p className="flex justify-start font-medium text-gray-700 uppercase">
+                  <p className="flex justify-start font-medium text-gray-400 uppercase">
                     {component.label}
                   </p>
                 </th>

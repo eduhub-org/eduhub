@@ -49,7 +49,7 @@ interface ProgramsRowProps {
   openProgramId: number;
   canDelete: boolean;
   qResult: QueryResult<any>;
-  onSetVisibility: (p: ProgramList_Program, isVisible: boolean) => any;
+  onSetPublished: (p: ProgramList_Program, isPublished: boolean) => any;
   onSetTitle: (p: ProgramList_Program, title: string) => any;
   onSetShortTitle: (p: ProgramList_Program, shortTitle: string) => any;
   onSetApplicationStart: (p: ProgramList_Program, start: Date | null) => any;
@@ -86,7 +86,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   onSetShortTitle,
   onSetTitle,
   onSetUploadData,
-  onSetVisibility,
+  onSetPublished,
   onSetStartQuestionnaire,
   onSetSpeakerQuestionnaire,
   onSetClosingQuestionnaire,
@@ -107,9 +107,9 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
     );
   }, [program, onSetVisibilityAchievementCertificate]);
 
-  const handleToggleVisibility = useCallback(() => {
-    onSetVisibility(program, !program.visibility);
-  }, [program, onSetVisibility]);
+  const handleTogglePublished = useCallback(() => {
+    onSetPublished(program, !program.published);
+  }, [program, onSetPublished]);
 
   const handleSetStartQuestionnaire = useCallback(
     (value: string) => {
@@ -292,10 +292,10 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
       <div className="grid grid-cols-10 mb-1 bg-gray-100">
         <div
           className="flex justify-center cursor-pointer"
-          onClick={handleToggleVisibility}
+          onClick={handleTogglePublished}
         >
-          {!program.visibility && <MdCheckBoxOutlineBlank size="1.5em" />}
-          {program.visibility && <MdCheckBox size="1.5em" />}
+          {!program.published && <MdCheckBoxOutlineBlank size="1.5em" />}
+          {program.published && <MdCheckBox size="1.5em" />}
         </div>
 
         <div className="col-span-2">

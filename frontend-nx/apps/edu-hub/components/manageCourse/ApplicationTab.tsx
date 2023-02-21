@@ -70,7 +70,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
   const infoDots = (
     <>
       <div>{t('course-page:application-rating')}</div>
-      <div className="grid grid-cols-6">
+      <div className="grid grid-cols-6 text-gray-400">
         <div>
           {greenDot} {t('course-page:invite')}
         </div>
@@ -243,14 +243,15 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
       <div>
         {courseEnrollments.length > 0 ? (
           <>
-            <ApplicationRow
-              enrollment={null}
-              qResult={qResult}
-              onSetRating={setEnrollmentRating}
-              onSelectRow={handleSelectRow}
-              isRowSelected={false}
-            />
-
+            <div className="text-gray-400">
+              <ApplicationRow
+                enrollment={null}
+                qResult={qResult}
+                onSetRating={setEnrollmentRating}
+                onSelectRow={handleSelectRow}
+                isRowSelected={false}
+              />
+            </div>
             {courseEnrollments.map((enrollment) => (
               <ApplicationRow
                 key={enrollment.id}
@@ -266,14 +267,17 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
 
             <OnlyAdmin>
               <div className="flex justify-end mb-6">
-                <OldButton onClick={handleOpenInviteDialog}>
+                <OldButton
+                  onClick={handleOpenInviteDialog}
+                  className="text-gray-400"
+                >
                   {t('course-page:send-invitations')}
                 </OldButton>
               </div>
             </OnlyAdmin>
           </>
         ) : (
-          <p className="m-auto text-center mb-14">
+          <p className="m-auto text-center mb-14 text-gray-400">
             {t('course-page:no-applications-present')}
           </p>
         )}

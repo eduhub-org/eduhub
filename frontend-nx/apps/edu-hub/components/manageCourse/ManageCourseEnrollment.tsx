@@ -168,7 +168,7 @@ const EnrollmentList: FC<IPropsEnrollmentList> = ({ course, qResult }) => {
             {tableHeaders.map((component) => {
               return (
                 <th key={component.key} className="py-2 px-5">
-                  <p className="flex justify-start font-medium text-gray-700 uppercase">
+                  <p className="flex justify-start font-medium text-gray-400 uppercase">
                     {component.label}
                   </p>
                 </th>

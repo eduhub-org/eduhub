@@ -43,6 +43,18 @@ export const UPDATE_PROGRAM_VISIBILITY = gql`
   }
 `;
 
+export const UPDATE_PROGRAM_PUBLISHED = gql`
+  mutation UpdateProgramPublished($programId: Int!, $published: Boolean!) {
+    update_Program_by_pk(
+      pk_columns: { id: $programId }
+      _set: { published: $published }
+    ) {
+      id
+    }
+  }
+`;
+
+
 export const UPDATE_PROGRAM_TITLE = gql`
   mutation UpdateProgramTitle($programId: Int!, $title: String!) {
     update_Program_by_pk(

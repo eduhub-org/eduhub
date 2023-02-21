@@ -101,5 +101,6 @@
   "programs-application-end": "Bewerbungs-ende",
   "programs-course-start": "Kursstart",
   "programs-course-end": "Kursende",
-  "programs-achievement-upload-deadline": "Abgabeschluss Leistungsnachweise"
+  "programs-achievement-upload-deadline": "Abgabeschluss Leistungsnachweise",
+  "day": "Tag"
 }
