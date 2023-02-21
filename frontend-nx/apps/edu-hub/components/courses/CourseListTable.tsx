@@ -152,7 +152,7 @@ const CourseListTable: FC<IProps> = ({
                   return (
                     <th key={text} className="py-2 px-5">
                       <p
-                        className={`flex ${className} font-medium text-gray-700 uppercase`}
+                        className={`flex ${className} font-medium text-gray-400 uppercase`}
                       >
                         {text}
                       </p>

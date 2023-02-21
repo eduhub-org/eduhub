@@ -13,9 +13,9 @@ import {
 import { PROGRAM_LIST } from '../../queries/programList';
 import 'react-datepicker/dist/react-datepicker.css';
 import {
-  UpdateProgramVisibility,
-  UpdateProgramVisibilityVariables,
-} from '../../queries/__generated__/UpdateProgramVisibility';
+  UpdateProgramPublished,
+  UpdateProgramPublishedVariables,
+} from '../../queries/__generated__/UpdateProgramPublished';
 import {
   DELETE_PROGRAM,
   INSERT_PROGRAM,
@@ -29,7 +29,7 @@ import {
   UPDATE_PROGRAM_SHORT_TITLE,
   UPDATE_PROGRAM_TITLE,
   UPDATE_PROGRAM_UPLOAD_DEADLINE,
-  UPDATE_PROGRAM_VISIBILITY,
+  UPDATE_PROGRAM_PUBLISHED,
   UPDATE_SPEAKER_QUESTIONAIRE,
   UPDATE_START_QUESTIONAIRE,
 } from '../../queries/updateProgram';
@@ -144,21 +144,21 @@ export const AuthorizedPrograms: FC = () => {
     [qResult, deleteProgramMutation]
   );
 
-  const [updateVisibility] = useAdminMutation<
-    UpdateProgramVisibility,
-    UpdateProgramVisibilityVariables
-  >(UPDATE_PROGRAM_VISIBILITY);
-  const setProgramVisibility = useCallback(
-    async (p: ProgramList_Program, isVisible: boolean) => {
-      await updateVisibility({
+  const [updatePublished] = useAdminMutation<
+    UpdateProgramPublished,
+    UpdateProgramPublishedVariables
+  >(UPDATE_PROGRAM_PUBLISHED);
+  const setProgramPublished = useCallback(
+    async (p: ProgramList_Program, isPublished: boolean) => {
+      await updatePublished({
         variables: {
           programId: p.id,
-          visible: isVisible,
+          published: isPublished,
         },
       });
       qResult.refetch();
     },
-    [qResult, updateVisibility]
+    [qResult, updatePublished]
   );
 
   const [updateTitle] = useAdminMutation<
@@ -386,11 +386,11 @@ export const AuthorizedPrograms: FC = () => {
   const handleMakeVisibleDialogClose = useCallback(
     (confirm: boolean) => {
       if (confirm && activeDialogProgram != null) {
-        setProgramVisibility(activeDialogProgram, true);
+        setProgramPublished(activeDialogProgram, true);
       }
       setConfirmMakeVisibleOpen(false);
     },
-    [activeDialogProgram, setProgramVisibility, setConfirmMakeVisibleOpen]
+    [activeDialogProgram, setProgramPublished, setConfirmMakeVisibleOpen]
   );
 
   const [confirmMakeInvisibleOpen, setConfirmMakeInvisibleOpen] =
@@ -398,11 +398,11 @@ export const AuthorizedPrograms: FC = () => {
   const handleMakeInvisibleDialogClose = useCallback(
     (confirm: boolean) => {
       if (confirm && activeDialogProgram != null) {
-        setProgramVisibility(activeDialogProgram, false);
+        setProgramPublished(activeDialogProgram, false);
       }
       setConfirmMakeInvisibleOpen(false);
     },
-    [activeDialogProgram, setProgramVisibility, setConfirmMakeInvisibleOpen]
+    [activeDialogProgram, setProgramPublished, setConfirmMakeInvisibleOpen]
   );
 
   const [confirmDeleteProgramOpen, setConfirmDeleteProgramOpen] =
@@ -417,10 +417,10 @@ export const AuthorizedPrograms: FC = () => {
     [activeDialogProgram, deleteProgram, setConfirmDeleteProgramOpen]
   );
 
-  const handleToggleVisibility = useCallback(
-    (v: ProgramList_Program, isVisible: boolean) => {
+  const handleTogglePublished = useCallback(
+    (v: ProgramList_Program, isPublished: boolean) => {
       setActiveDialogProgram(v);
-      if (!isVisible) {
+      if (!isPublished) {
         setConfirmMakeInvisibleOpen(true);
       } else {
         setConfirmMakeVisibleOpen(true);
@@ -461,7 +461,7 @@ export const AuthorizedPrograms: FC = () => {
             {t('course-page:programs-add')}
           </Button>
         </div>
-        <div className="grid grid-cols-10 text-white">
+        <div className="grid grid-cols-10 text-gray-400">
           <p>{t('course-page:programs-published')}</p>
           <div className="col-span-2">{t('course-page:programs-title')}</div>
           <div>{t('course-page:programs-short-title')}</div>
@@ -481,7 +481,7 @@ export const AuthorizedPrograms: FC = () => {
               qResult={qResult}
               canDelete={v.Courses.length === 0}
               openProgramId={openProgram}
-              onSetVisibility={handleToggleVisibility}
+              onSetPublished={handleTogglePublished}
               onSetTitle={handleProgramTitle}
               onSetShortTitle={handleProgramShortTitle}
               onSetApplicationStart={handleApplicationStart}
