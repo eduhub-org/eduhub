@@ -22,7 +22,7 @@ import { CourseList } from '../queries/__generated__/CourseList';
 import { CourseListWithEnrollments } from '../queries/__generated__/CourseListWithEnrollments';
 import { CourseListWithInstructors } from '../queries/__generated__/CourseListWithInstructors';
 import { COURSE_GROUP_OPTIONS } from '../queries/courseGroupOptions';
-import { COURSE_LIST } from '../queries/courseList';
+import { COURSE_LIST, COURSE_LIST_ANONYMOUS } from '../queries/courseList';
 import { COURSE_LIST_WITH_ENROLLMENT } from '../queries/courseListWithEnrollments';
 import { COURSE_LIST_WITH_INSTRUCTOR } from '../queries/courseListWithInstructors';
 import { ClientOnly } from '@opencampus/shared-components';
