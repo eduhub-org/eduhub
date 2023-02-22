@@ -129,15 +129,17 @@ export const Tile: FC<IProps> = ({ course }) => {
         <div className={`flex min-h-[210px] flex-col bg-white p-5`}>
           <div className="flex justify-between mb-3">
             <div className="text-sm tracking-wider">
-              {`${t(course.weekDay)} ${new Date(
-                course.startTime
-              ).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-              })} - ${new Date(course.endTime).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}`}
+              {course.weekDay && course.startTime && course.endTime
+                ? `${t(course.weekDay)} ${new Date(
+                    course.startTime
+                  ).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })} - ${new Date(course.endTime).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}`
+                : ''}
             </div>
             <div className="text-sm tracking-widest flex content-center">
               <img
