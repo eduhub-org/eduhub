@@ -10,7 +10,12 @@ import { OnlyLoggedIn } from '../components/common/OnlyLoggedIn';
 import { OnlyLoggedOut } from '../components/common/OnlyLoggedOut';
 import { MyCourses } from '../components/course/MyCourses';
 import { TileSlider } from '../components/course/TileSlider';
-import { useAuthedQuery } from '../hooks/authedQuery';
+import { useQuery } from '@apollo/client';
+import {
+  useAuthedQuery,
+  useAdminQuery,
+  useInstructorQuery,
+} from '../hooks/authedQuery';
 import { useIsLoggedIn, useIsUser } from '../hooks/authentication';
 import { CourseGroupOptions } from '../queries/__generated__/CourseGroupOptions';
 import { CourseList } from '../queries/__generated__/CourseList';
@@ -28,7 +33,7 @@ const Home: FC = () => {
 
   // (My) Organized Courses
   const { data: adminCourses, error: adminCoursesError } =
-    useAuthedQuery<CourseListWithInstructors>(COURSE_LIST_WITH_INSTRUCTOR, {
+    useInstructorQuery<CourseListWithInstructors>(COURSE_LIST_WITH_INSTRUCTOR, {
       skip: !isLoggedIn,
     });
 
@@ -59,7 +64,7 @@ const Home: FC = () => {
 
   // All Published Courses
   const { data: courses, error: coursesError } =
-    useAuthedQuery<CourseList>(COURSE_LIST);
+    useQuery<CourseList>(COURSE_LIST);
   if (coursesError) {
     console.log('got error in query for listed courses!', coursesError);
   }

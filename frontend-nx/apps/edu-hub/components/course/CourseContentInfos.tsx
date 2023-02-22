@@ -16,27 +16,29 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
       <span className="text-3xl font-semibold mb-9">{t('youWillLearn')}</span>
       <ul className="list-disc">
         {course.learningGoals
-          .split('\n')
-          .filter((goal) => goal.trim() !== '')
-          .map((goal, index) => (
-            <li key={index} className="pl-6 mb-6">
-              <div className="flex align-items-start">
-                <img
-                  src={checkmark}
-                  alt="check mark"
-                  className="mr-2 inline-block"
-                />
-                <div className="ml-2">
-                  {goal.split('\n').map((line, i) => (
-                    <span key={i}>
-                      {line}
-                      <br />
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </li>
-          ))}
+          ? course.learningGoals
+              .split('\n')
+              .filter((goal) => goal.trim() !== '')
+              .map((goal, index) => (
+                <li key={index} className="pl-6 mb-6">
+                  <div className="flex align-items-start">
+                    <img
+                      src={checkmark}
+                      alt="check mark"
+                      className="mr-2 inline-block"
+                    />
+                    <div className="ml-2">
+                      {goal.split('\n').map((line, i) => (
+                        <span key={i}>
+                          {line}
+                          <br />
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </li>
+              ))
+          : []}
       </ul>
       <span className="text-3xl font-semibold mt-24 mb-9">
         {t('courseContent')}
