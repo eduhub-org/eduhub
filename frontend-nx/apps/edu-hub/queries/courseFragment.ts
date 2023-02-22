@@ -5,6 +5,29 @@ import { ENROLLMENT_FRAGMENT } from "./enrollmentFragment";
 
 import { SESSION_FRAGMENT } from './sessionFragement';
 
+
+export const COURSE_TILE_FRAGMENT_ANONYMOUS = gql`
+  fragment CourseTileFragmentAnonymous on Course {
+    id
+    weekDay
+    published
+    coverImage
+    language
+    title
+    startTime
+    endTime
+    CourseGroups {
+      id
+      CourseGroupOption {
+        id
+        title
+        order
+      }
+    }
+}
+`;
+
+
 export const COURSE_FRAGMENT = gql`
   ${SESSION_FRAGMENT}
   ${COURSE_INSTRUCTOR_FRAGMENT}

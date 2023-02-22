@@ -1,7 +1,16 @@
 import { gql } from '@apollo/client';
 
-import { ADMIN_COURSE_FRAGMENT, COURSE_FRAGMENT } from './courseFragment';
+import { ADMIN_COURSE_FRAGMENT, COURSE_FRAGMENT, COURSE_TILE_FRAGMENT_ANONYMOUS } from './courseFragment';
 import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from './programFragment';
+
+export const COURSE_LIST_ANONYMOUS = gql`
+  ${COURSE_TILE_FRAGMENT_ANONYMOUS}
+  query CourseTileListAnonymous($where: Course_bool_exp! = {}) {
+    Course(order_by: { id: desc }) {
+      ...CourseTileFragmentAnonymous
+    }
+  }
+`;
 
 export const COURSE_LIST = gql`
   ${COURSE_FRAGMENT}
