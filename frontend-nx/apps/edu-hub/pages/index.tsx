@@ -127,7 +127,7 @@ const Home: FC = () => {
             <div className="text-xl sm:text-5xl mt-4">{t('subheadline')}</div>
           </div>
         </div>
-        <div className="max-w-screen-xl mx-auto md:mt-[-100px] md:px-16">
+        <div className="max-w-screen-xl mx-auto md:mt-[-100px] md:pl-16">
           <ClientOnly>
             {isLoggedIn && (
               <>
