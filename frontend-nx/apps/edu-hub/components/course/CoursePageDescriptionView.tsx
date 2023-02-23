@@ -50,6 +50,15 @@ export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
             </div>
           }
         />
+        <div className="text-edu-course-current underline pt-4 text-3xl text-center  font-semibold">
+          <a
+            href="https://opencampus.gitbook.io/faq"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            How to 🡥
+          </a>
+        </div>
         <CourseDescriptionInfos course={course} />
       </div>
     </div>
