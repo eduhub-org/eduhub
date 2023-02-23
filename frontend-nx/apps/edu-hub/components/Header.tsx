@@ -27,8 +27,8 @@ export const Header: FC = () => {
   }, []);
 
   return (
-    <header className="flex w-full py-4 px-3 xl:px-0 absolute top-0 left-0 bg-edu-bg-gray bg-opacity-50">
-      <div className="flex max-w-screen-xl w-full mx-auto justify-between">
+    <header className="w-full absolute top-0 left-0 bg-edu-bg-gray bg-opacity-50">
+      <div className="flex py-4 px-3 md:px-16 max-w-screen-xl w-full mx-auto justify-between">
         <div className="flex-grow w-full items-center">
           <Link href="/">
             <div className="flex cursor-pointer">

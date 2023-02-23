@@ -7,7 +7,7 @@ import instagramIcon from "../public/images/share/instagram-icon.svg";
 export const Footer: FC = () => {
   return (
     <footer className="mt-7 sm:mt-20 bg-[#0F0F0F] text-white">
-      <div className="flex flex-col w-full p-6 xl:px-0 max-w-screen-xl mx-auto">
+      <div className="flex flex-col w-full p-6 md:px-16 max-w-screen-xl mx-auto">
         <h3>
           <span className="text-2xl font-medium">EDU HUB</span>
           <br />

@@ -115,7 +115,7 @@ const Home: FC = () => {
       </Head>
       <Page className="text-white">
         <div
-          className="h-[60vh]"
+          className="h-[60vh] mb-11 md:mb-0"
           style={{
             background: `linear-gradient(360deg, #0F0F0F 0%, rgba(0, 0, 0, 0) 12.18%), linear-gradient(53.37deg, rgba(0, 0, 0, 0.8) 16.6%, rgba(0, 0, 0, 0) 79.45%), url('/images/background_homepage/1536.jpg')`,
             backgroundSize: 'cover',
@@ -127,7 +127,7 @@ const Home: FC = () => {
             <div className="text-xl sm:text-5xl mt-4">{t('subheadline')}</div>
           </div>
         </div>
-        <div className="max-w-screen-xl mx-auto md:mt-[-100px] px-3 md:px-16">
+        <div className="max-w-screen-xl mx-auto md:mt-[-100px] md:px-16">
           <ClientOnly>
             {isLoggedIn && (
               <>
