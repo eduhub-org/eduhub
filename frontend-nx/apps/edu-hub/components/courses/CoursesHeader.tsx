@@ -74,12 +74,13 @@ const CoursesHeader: FC<IProps> = ({
     today.setHours(0);
     await insertCourse({
       variables: {
-        title: t('course-page:course-default-title'),
+        title: t('course-page:default-course-title'),
         applicationEnd: new Date(),
         maxMissedSessions: 2,
         programId: defaultProgramId,
       },
     });
+    console.log('!!!!!!!!!!!!!!! Bin hier!');
     qResult.refetch();
   }, [insertCourse, t, qResult]);
 
@@ -93,8 +94,12 @@ const CoursesHeader: FC<IProps> = ({
         courseListRequest={courseListRequest}
         updateFilter={updateFilter}
       />
-      <div className="flex justify-end mb-12">
-        <Button onClick={insertDefaultCourse} startIcon={<MdAddCircle />}>
+      <div className="flex justify-end mb-12  text-white">
+        <Button
+          onClick={insertDefaultCourse}
+          startIcon={<MdAddCircle />}
+          color="inherit"
+        >
           {t('course-page:add-course')}
         </Button>
       </div>

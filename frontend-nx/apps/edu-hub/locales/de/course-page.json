@@ -1,6 +1,6 @@
 {
   "applicationDeadline": "Bewerbungsfrist",
-  "applyNow": "jetzt bewerben",
+  "applyNow": "JETZT BEWERBEN",
   "attendance": "Attendance",
   "courseContent": "Kursinhalt",
   "courseCosts": "Der Kurs kostet {{price}}",
@@ -67,7 +67,7 @@
   "start-time": "Startzeit",
   "end-time": "Endzeit",
   "max-part-quantity": "Max. Teil. Anzahl",
-  "add-new-location": "neuen Ort hinzufügen",
+  "add-new-location": "Ort hinzufügen",
   "program": "Programm",
   "programs": "Programme",
   "published": "Published",
@@ -80,7 +80,7 @@
   "link-final-evaluation": "Link Abschluss-Evaluation",
   "no-template-uploaded-yet": "Noch kein Template hochgeladen",
   "show-certificates": "Bescheinigungen einblenden",
-  "default-address": "Standardadresse für die Sessions (soweit nichts abweichendes angegeben wird)",
+  "default-address": "Standardadresse für die Sessions (soweit dort nichts anderes angegeben ist)",
   "add-session": "Termin hinzufügen",
   "application-rating": "Einstufung der Bewerbungen:",
   "not-rated": "Unbewertet",
@@ -102,5 +102,10 @@
   "programs-course-start": "Kursstart",
   "programs-course-end": "Kursende",
   "programs-achievement-upload-deadline": "Abgabeschluss Leistungsnachweise",
-  "day": "Tag"
+  "day": "Tag",
+  "no-courses": "Dieses Programm enthält noch keine Kurse.",
+  "ects-NONE": "OHNE",
+  "ects-2,5": "2,5",
+  "ects-5": "5",
+  "default-course-title": "Neuer Kurs"
 }

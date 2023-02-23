@@ -64,7 +64,7 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
               <div>
                 <span className="block text-sm sm:text-lg">{title}</span>
                 {SessionAddresses.map(({ address, type }, index) => (
-                  <span key={index} className="text-sm text-gray-600">
+                  <span key={index} className="text-sm text-gray-400">
                     {type === 'URL' ? (
                       <a
                         href={address}
@@ -84,20 +84,6 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
           )
         )}
       </ul>
-      <div className="flex">
-        <div className="w-1/2 pr-4">
-          <h2 className="text-3xl font-semibold">
-            {course.headingDescriptionField1}
-          </h2>
-          <p>{course.contentDescriptionField1}</p>
-        </div>
-        <div className="w-1/2 pl-4">
-          <h2 className="text-3xl font-semibold">
-            {course.headingDescriptionField2}
-          </h2>
-          <p>{course.contentDescriptionField2}</p>
-        </div>
-      </div>
     </div>
   );
 };

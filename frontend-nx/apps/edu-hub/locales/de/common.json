@@ -34,5 +34,6 @@
   "menu-administration-courses": "Kurse",
   "menu-administration-achievement": "Leistungsnachweise",
   "menu-administration-programs": "Programme",
-  "menu-logout": "Logout"
+  "menu-logout": "Logout",
+  "change-password": "Passwort ändern"
 }

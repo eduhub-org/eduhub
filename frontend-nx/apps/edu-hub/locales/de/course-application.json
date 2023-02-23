@@ -12,5 +12,8 @@
   },
   "successBody": "Spätestens ein bis zwei Tage nach Bewerbungsschluss wirst Du über Deine Zulassung informiert.",
   "successCloseButtonTitle": "Schließen",
-  "successTitle": "Du hast dich erfolgreich beworben"
+  "successTitle": "Du hast dich erfolgreich beworben",
+  "introduction-motivation-letter-1": "Unser einziges Teilnahmekriterium ist: Deine Motivation!",
+  "introduction-motivation-letter-2": "Bitte schreibe uns, warum du an diesem Kurs teilnehmen möchtest und was deine persönliche Motivation ist.",
+  "placeholder-motivation-letter": "Meine Motivation ..."
 }

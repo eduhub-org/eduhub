@@ -513,8 +513,12 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         ))}
       </div>
 
-      <div className="flex justify-end mb-8">
-        <Button onClick={insertCourseLocation} startIcon={<MdAddCircle />}>
+      <div className="flex justify-end mb-8 text-white">
+        <Button
+          onClick={insertCourseLocation}
+          startIcon={<MdAddCircle />}
+          color="inherit"
+        >
           {t('course-page:add-new-location')}
         </Button>
       </div>

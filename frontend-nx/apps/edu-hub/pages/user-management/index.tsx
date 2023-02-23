@@ -15,14 +15,16 @@ const Users: FC = () => {
   const isAdmin = useIsAdmin();
   return (
     <>
-      <Head>
-        <title>{t('title')}</title>
-      </Head>
-      <Page>
-        <div className="min-h-[77vh]">
-          {isLoggedIn && isAdmin && <UserDashboard t={t} />}
-        </div>
-      </Page>
+      <div className="max-w-screen-xl mx-auto">
+        <Head>
+          <title>{t('title')}</title>
+        </Head>
+        <Page>
+          <div className="min-h-[77vh]">
+            {isLoggedIn && isAdmin && <UserDashboard t={t} />}
+          </div>
+        </Page>
+      </div>
     </>
   );
 };
@@ -105,7 +107,7 @@ const Menubar: FC<IMenubarProps> = ({
   /* #region */
 
   return (
-    <div className="flex justify-between mb-5">
+    <div className="flex justify-between mb-5 text-white">
       <div className="flex items-center space-x-5">
         {menuItems.map((tab) => (
           <EhMenuItem

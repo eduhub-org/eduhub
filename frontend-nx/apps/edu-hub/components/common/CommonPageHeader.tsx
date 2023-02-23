@@ -6,7 +6,7 @@ interface IProps {
 const CommonPageHeader: FC<IProps> = ({ headline }) => {
   return (
     <div className="py-10">
-      <p className="text-base sm:text-lg lg:text-3xl leading-normal text-edu-modal-bg-color">
+      <p className="text-base sm:text-lg lg:text-3xl leading-normal text-white mt-10">
         {headline}
       </p>
     </div>

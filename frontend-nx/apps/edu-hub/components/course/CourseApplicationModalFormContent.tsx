@@ -1,8 +1,8 @@
 import useTranslation from 'next-translate/useTranslation';
-import { FC } from "react";
+import { FC } from 'react';
 
-import { Course_Course_by_pk } from "../../queries/__generated__/Course";
-import { Button } from "../common/Button";
+import { Course_Course_by_pk } from '../../queries/__generated__/Course';
+import { Button } from '../common/Button';
 
 interface IProps {
   applyForCourse: () => void;
@@ -17,27 +17,31 @@ export const CourseApplicationModalFormContent: FC<IProps> = ({
   setText,
   text,
 }) => {
-  const { t } = useTranslation("course-application");
+  const { t } = useTranslation('course-application');
 
   return (
     <>
-      <span className="text-base mb-2">{t("applicationFor")}</span>
+      <span className="text-base mb-2">{t('applicationFor')}</span>
       <span className="text-3xl font-semibold">{course.title}</span>
-      <span className="text-base">Anforderungen</span>
       <span className="text-sm">
-        Anforderungen Hier ein Text über die Anforderungen für den Kurs. Wie
-        lang ist der Text tatsächlich?
+        {' '}
+        {t('course-application:introduction-motivation-letter')}
       </span>
-      <span className="font-semibold mt-12">{t("motivationalText")}</span>
+      <span className="font-semibold mt-12">
+        {t('introduction-motivation-letter-1')}
+      </span>
+      <span className="font-semibold mt-12">
+        {t('introduction-motivation-letter-2')}
+      </span>
       <textarea
         onChange={setText}
         className="h-48 mt-3 bg-gray-100 focus:border-none"
         value={text}
-        placeholder={t("motivationalTextPlaceholder")}
+        placeholder={t('course-application:placeholder-motivation-letter')}
       />
       <div className="flex justify-center my-6">
         <Button filled onClick={applyForCourse}>
-          {t("sendApplication")}
+          {t('sendApplication')}
         </Button>
       </div>
     </>

@@ -15,6 +15,7 @@ const EhAddButton: FC<IProps> = ({ text, buttonClickCallBack, buttonSize }) => {
       className="focus:outline-none"
       size={buttonSize || 'medium'}
       startIcon={<MdAddCircle />}
+      color="inherit"
     >
       {text ?? ''}
     </Button>
