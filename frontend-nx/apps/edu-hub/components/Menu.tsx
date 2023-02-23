@@ -72,44 +72,48 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       className="min-w-full"
     >
       <MenuItem onClick={closeMenu}>
-        <Link className="w-full text-lg" href="/profile">
-          {t('menu-profile')}
+        <Link href="/profile" passHref>
+          <a className="w-full text-lg">{t('menu-profile')}</a>
         </Link>
       </MenuItem>
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/user-management">
-            {t('menu-administration-user')}
+          <Link href="/user-management" passHref>
+            <a className="w-full text-lg">{t('menu-administration-user')}</a>
           </Link>
         </MenuItem>
       )}
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/courses">
-            {t('menu-administration-courses')}
+          <Link href="/courses" passHref>
+            <a className="w-full text-lg">{t('menu-administration-courses')}</a>
           </Link>
         </MenuItem>
       )}
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/achievements">
-            {t('menu-administration-achievement')}
+          <Link href="/achievements" passHref>
+            <a className="w-full text-lg">
+              {t('menu-administration-achievement')}
+            </a>
           </Link>
         </MenuItem>
       )}
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/programs">
-            {t('menu-administration-programs')}
+          <Link href="/programs" passHref>
+            <a className="w-full text-lg">
+              {t('menu-administration-programs')}
+            </a>
           </Link>
         </MenuItem>
       )}
 
-      <MenuItem className="w-full text-lg" onClick={() => logout()}>
-        {t('menu-logout')}
+      <MenuItem onClick={() => logout()}>
+        <button className="w-full text-lg text-left">{t('menu-logout')}</button>
       </MenuItem>
     </StyledMenu>
   );
