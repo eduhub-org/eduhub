@@ -101,15 +101,18 @@ const Content: FC<IProps> = ({ programs }) => {
       />
       {courseListRequest.loading ? (
         <Loading />
+      ) : courseListRequest.data?.Course &&
+        courseListRequest.data?.Course.length > 0 ? (
+        <CourseListTable
+          courseListRequest={courseListRequest}
+          programs={programs}
+          t={t}
+          updateFilter={updateFilter}
+        />
       ) : (
-        courseListRequest.data?.Course && (
-          <CourseListTable
-            courseListRequest={courseListRequest}
-            programs={programs}
-            t={t}
-            updateFilter={updateFilter}
-          />
-        )
+        <div className="text-white">
+          <p>Dieses Programm enthält noch keine Kurse.</p>
+        </div>
       )}
     </div>
   );

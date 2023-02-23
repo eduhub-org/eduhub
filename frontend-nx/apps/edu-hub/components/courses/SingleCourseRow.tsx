@@ -1,9 +1,11 @@
+import { useRouter } from 'next/router';
 import { IconButton } from '@material-ui/core';
 import { FC, MutableRefObject, useCallback, useRef, useState } from 'react';
 import {
   MdCheckBox,
   // MdCheckBoxOutlineBlank,
   MdDelete,
+  MdLink,
   MdOutlineCheckBoxOutlineBlank,
   // MdAddCircle,
   MdKeyboardArrowDown,
@@ -200,6 +202,11 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   const handleArrowClick = useCallback(() => {
     setShowDetails((previous) => !previous);
   }, [setShowDetails]);
+
+  const router = useRouter();
+  const onClickForward = (courseId) => {
+    router.push(`manage/course/${courseId}`);
+  };
 
   const onChangePublished = useCallback(async () => {
     const response = await updateCourse({
@@ -405,7 +412,13 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   return (
     <>
       <tr className="font-medium bg-edu-course-list h-12">
-        <td className={tdClass}>
+        <td className="${tdClass} grid grid-cols-2 mt-3">
+          <div>
+            <IconButton onClick={() => onClickForward(course.id)} size="small">
+              <MdLink />
+            </IconButton>
+          </div>
+
           <div onClick={onChangePublished}>
             <EhCheckBox checked={course.published ?? false} />
           </div>
