@@ -3421,6 +3421,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tailwindcss/line-clamp@npm:^0.4.2":
+  version: 0.4.2
+  resolution: "@tailwindcss/line-clamp@npm:0.4.2"
+  peerDependencies:
+    tailwindcss: ">=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1"
+  checksum: 26b8135df24fff51c3d3790ae795bdc12bc4a7113fa22dcab80568ae6ee00710e2ed4154048958c472bb654061f0f1573b7ac5e004ae6222cbd5ac6fcf199478
+  languageName: node
+  linkType: hard
+
 "@testing-library/dom@npm:^8.5.0":
   version: 8.19.0
   resolution: "@testing-library/dom@npm:8.19.0"
@@ -12575,6 +12584,7 @@ __metadata:
     "@nrwl/react": 14.5.10
     "@nrwl/web": 14.5.10
     "@nrwl/workspace": 14.5.10
+    "@tailwindcss/line-clamp": ^0.4.2
     "@testing-library/react": 13.3.0
     "@types/cookie": ^0.5.1
     "@types/cors": ^2.8.12

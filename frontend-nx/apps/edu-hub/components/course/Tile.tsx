@@ -121,10 +121,10 @@ export const Tile: FC<IProps> = ({ course }) => {
         isInstructor ? `/manage/course/${course.id}` : `/course/${course.id}`
       }
     >
-      <div className="relative w-9/10 rounded-2xl overflow-hidden font-medium text-edu-black">
+      <div className="relative flex-col rounded-2xl overflow-hidden font-medium text-edu-black">
         {/* <div className="relative w-60 h-72 rounded-2xl overflow-hidden"></div> */}
         <div
-          className="h-56 p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat bg-[image:var(--bg-small-url)]"
+          className="h-[230px] p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat bg-[image:var(--bg-small-url)]"
           style={
             {
               '--bg-small-url':
@@ -138,7 +138,7 @@ export const Tile: FC<IProps> = ({ course }) => {
             enrollment={enrollment}
           /> */}
         </div>
-        <div className={`flex min-h-[210px] flex-col bg-white p-5`}>
+        <div className={`flex h-[201px] flex-col justify-between bg-white p-5`}>
           <div className="flex justify-between mb-3">
             <div className="text-sm tracking-wider">
               {course.weekDay && course.startTime && course.endTime
@@ -162,7 +162,7 @@ export const Tile: FC<IProps> = ({ course }) => {
               {t(course.language)}
             </div>
           </div>
-          <span className="text-lg mb-14">{course.tagline}</span>
+          <span className="text-lg mb-auto line-clamp-3">{course.tagline}</span>
           <span className="text-xs uppercase flex content-center">
             <img className="h-4 mr-2" src={locationIcon} alt="location icon" />
             {course.CourseLocations.length > 2
