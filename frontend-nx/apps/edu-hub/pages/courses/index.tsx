@@ -91,7 +91,7 @@ const Content: FC<IProps> = ({ programs }) => {
   }
 
   return (
-    <div className="w-full">
+    <div className="max-w-screen-xl mx-auto">
       <CoursesHeader
         programs={programs}
         defaultProgramId={defaultProgram}
@@ -101,15 +101,18 @@ const Content: FC<IProps> = ({ programs }) => {
       />
       {courseListRequest.loading ? (
         <Loading />
+      ) : courseListRequest.data?.Course &&
+        courseListRequest.data?.Course.length > 0 ? (
+        <CourseListTable
+          courseListRequest={courseListRequest}
+          programs={programs}
+          t={t}
+          updateFilter={updateFilter}
+        />
       ) : (
-        courseListRequest.data?.Course && (
-          <CourseListTable
-            courseListRequest={courseListRequest}
-            programs={programs}
-            t={t}
-            updateFilter={updateFilter}
-          />
-        )
+        <div className="text-white">
+          <p>{t('course-page:no-courses')}</p>
+        </div>
       )}
     </div>
   );

@@ -450,91 +450,101 @@ export const AuthorizedPrograms: FC = () => {
 
   return (
     <>
-      <PageBlock>
-        <div className="flex flex-row mb-12 text-white">
-          <h1 className="text-4xl font-bold">
-            {t('course-page:programs-programs')}
-          </h1>
-        </div>
-        <div className="flex justify-end mb-12">
-          <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />}>
-            {t('course-page:programs-add')}
-          </Button>
-        </div>
-        <div className="grid grid-cols-10 text-gray-400">
-          <p>{t('course-page:programs-published')}</p>
-          <div className="col-span-2">{t('course-page:programs-title')}</div>
-          <div>{t('course-page:programs-short-title')}</div>
-          <div>{t('course-page:programs-application-start')}</div>
-          <div>{t('course-page:programs-application-end')}</div>
-          <div>{t('course-page:programs-course-start')}</div>
-          <div>{t('course-page:programs-course-end')}</div>
-          <div>{t('course-page:programs-achievement-upload-deadline')}</div>
-          <div>&nbsp;</div>
-        </div>
-        {programs != null &&
-          programs.length > 0 &&
-          programs.map((v, i) => (
-            <ProgramsRow
-              key={v.id}
-              program={v}
-              qResult={qResult}
-              canDelete={v.Courses.length === 0}
-              openProgramId={openProgram}
-              onSetPublished={handleTogglePublished}
-              onSetTitle={handleProgramTitle}
-              onSetShortTitle={handleProgramShortTitle}
-              onSetApplicationStart={handleApplicationStart}
-              onSetApplicationEnd={handleApplicationEnd}
-              onSetLectureStart={handleLectureStart}
-              onSetLectureEnd={handleLectureEnd}
-              onSetUploadData={handleUploadDeadline}
-              onDelete={handleDelete}
-              onOpenProgram={handleOpenProgram}
-              onSetStartQuestionnaire={handleStartQuestionaire}
-              onSetClosingQuestionnaire={handleClosingQuestionaire}
-              onSetSpeakerQuestionnaire={handleSpeakerQuestionaire}
-              onSetVisibilityParticipationCertificate={
-                handleProgramParticipationCertVisible
-              }
-              onSetVisibilityAchievementCertificate={
-                handleProgramAchievementCertVisible
-              }
-            />
-          ))}
-        <div className="flex justify-end mt-12 mb-12">
-          <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />}>
-            {t('course-page:programs-add')}
-          </Button>
-        </div>
-      </PageBlock>
-      <QuestionConfirmationDialog
-        question={t('course-page:do-you-want-to-publish-the-program', {
-          title: activeDialogProgram?.title,
-        })}
-        confirmationText={t('course-page:publish')}
-        onClose={handleMakeVisibleDialogClose}
-        open={confirmMakeVisibleOpen}
-      />
-      <QuestionConfirmationDialog
-        question={t(
-          'course-page:do-you-really-want-to-undo-the-publication-of-program',
-          {
+      <div className="max-w-screen-xl mx-auto">
+        <PageBlock>
+          <div className="flex flex-row mb-12 text-white">
+            <h1 className="text-4xl font-bold mt-24">
+              {t('course-page:programs-programs')}
+            </h1>
+          </div>
+          <div className="flex justify-end mb-12 text-white">
+            <Button
+              onClick={insertDefaultProgram}
+              startIcon={<MdAddCircle />}
+              color="inherit"
+            >
+              {t('course-page:programs-add')}
+            </Button>
+          </div>
+          <div className="grid grid-cols-10 text-gray-400">
+            <p>{t('course-page:programs-published')}</p>
+            <div className="col-span-2">{t('course-page:programs-title')}</div>
+            <div>{t('course-page:programs-short-title')}</div>
+            <div>{t('course-page:programs-application-start')}</div>
+            <div>{t('course-page:programs-application-end')}</div>
+            <div>{t('course-page:programs-course-start')}</div>
+            <div>{t('course-page:programs-course-end')}</div>
+            <div>{t('course-page:programs-achievement-upload-deadline')}</div>
+            <div>&nbsp;</div>
+          </div>
+          {programs != null &&
+            programs.length > 0 &&
+            programs.map((v, i) => (
+              <ProgramsRow
+                key={v.id}
+                program={v}
+                qResult={qResult}
+                canDelete={v.Courses.length === 0}
+                openProgramId={openProgram}
+                onSetPublished={handleTogglePublished}
+                onSetTitle={handleProgramTitle}
+                onSetShortTitle={handleProgramShortTitle}
+                onSetApplicationStart={handleApplicationStart}
+                onSetApplicationEnd={handleApplicationEnd}
+                onSetLectureStart={handleLectureStart}
+                onSetLectureEnd={handleLectureEnd}
+                onSetUploadData={handleUploadDeadline}
+                onDelete={handleDelete}
+                onOpenProgram={handleOpenProgram}
+                onSetStartQuestionnaire={handleStartQuestionaire}
+                onSetClosingQuestionnaire={handleClosingQuestionaire}
+                onSetSpeakerQuestionnaire={handleSpeakerQuestionaire}
+                onSetVisibilityParticipationCertificate={
+                  handleProgramParticipationCertVisible
+                }
+                onSetVisibilityAchievementCertificate={
+                  handleProgramAchievementCertVisible
+                }
+              />
+            ))}
+          <div className="flex justify-end mt-12 mb-12 text-white">
+            <Button
+              onClick={insertDefaultProgram}
+              startIcon={<MdAddCircle />}
+              color="inherit"
+            >
+              {t('course-page:programs-add')}
+            </Button>
+          </div>
+        </PageBlock>
+        <QuestionConfirmationDialog
+          question={t('course-page:do-you-want-to-publish-the-program', {
             title: activeDialogProgram?.title,
-          }
-        )}
-        confirmationText={t('course-page:withdraw')}
-        onClose={handleMakeInvisibleDialogClose}
-        open={confirmMakeInvisibleOpen}
-      />
-      <QuestionConfirmationDialog
-        question={t('course-page:do-you-want-to-delete-the-program', {
-          title: activeDialogProgram?.title,
-        })}
-        confirmationText={t('delete')}
-        onClose={handleConfirmDeleteProgramClose}
-        open={confirmDeleteProgramOpen}
-      />
+          })}
+          confirmationText={t('course-page:publish')}
+          onClose={handleMakeVisibleDialogClose}
+          open={confirmMakeVisibleOpen}
+        />
+        <QuestionConfirmationDialog
+          question={t(
+            'course-page:do-you-really-want-to-undo-the-publication-of-program',
+            {
+              title: activeDialogProgram?.title,
+            }
+          )}
+          confirmationText={t('course-page:withdraw')}
+          onClose={handleMakeInvisibleDialogClose}
+          open={confirmMakeInvisibleOpen}
+        />
+        <QuestionConfirmationDialog
+          question={t('course-page:do-you-want-to-delete-the-program', {
+            title: activeDialogProgram?.title,
+          })}
+          confirmationText={t('delete')}
+          onClose={handleConfirmDeleteProgramClose}
+          open={confirmDeleteProgramOpen}
+        />
+      </div>
     </>
   );
 };

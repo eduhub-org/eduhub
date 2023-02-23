@@ -28,7 +28,7 @@ const UserList: FC<IProps> = ({ t, searchedText }) => {
   const LIMIT = 15;
 
   const userTypes: StaticComponentProperty[] = [
-    { key: USER_TYPE_INSTUCTOR, label: t('courseInstructor'), selected: true },
+    { key: USER_TYPE_INSTUCTOR, label: t('courseInstructor'), selected: false },
     { key: USER_TYPE_SPEAKER, label: t('speaker'), selected: false },
     { key: USER_TYPE_AMIN, label: t('admin'), selected: false },
   ];
@@ -205,7 +205,7 @@ const Header: FC<IHeaderProps> = ({
         </div>
       </div>
 
-      <div className="flex-end">
+      <div className="flex-end text-white">
         <EhAddButton
           buttonClickCallBack={onAddUserClick}
           text={t('addUserButtonText')}

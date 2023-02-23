@@ -1,10 +1,11 @@
 const { join } = require('path');
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 // available since Nx v 12.5
 const { createGlobPatternsForDependencies } = require('@nrwl/next/tailwind');
 
 module.exports = {
-  plugins: [],
+  plugins: [require('@tailwindcss/line-clamp')],
   content: [
     join(__dirname, '/pages/**/*.{js,ts,jsx,tsx}'),
     join(__dirname, '/components/**/*.{js,ts,jsx,tsx}'),
@@ -41,6 +42,10 @@ module.exports = {
     },
     minWidth: {
       menu: '225px',
+    },
+    screens: {
+      xs: '375px',
+      ...defaultTheme.screens,
     },
   },
   variants: {

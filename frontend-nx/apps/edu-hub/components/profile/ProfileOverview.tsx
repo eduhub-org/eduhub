@@ -59,7 +59,7 @@ const InputRow: FC<InputRowProps> = ({
     <div className="relative">
       <label
         htmlFor={name}
-        className="text-xs uppercase tracking-widest font-medium"
+        className="text-xs uppercase tracking-widest font-medium text-gray-400"
       >
         {label}
       </label>
@@ -68,7 +68,7 @@ const InputRow: FC<InputRowProps> = ({
         type="text"
         placeholder={placeholder || label}
         {...register(name, { required })}
-        className="bg-edu-light-gray p-4 mb-6 w-full block"
+        className="bg-edu-light-gray p-4 mb-5 w-full block"
         aria-invalid={errors[name] ? 'true' : 'false'}
         {...rest}
       />
@@ -174,12 +174,11 @@ const ProfileOverview: FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="px-3">
-      <h1>Vorname</h1>
+    <div className="px-3 mt-6">
       {!userLoading && !userError ? (
         <>
           <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)} className="text-gray-400">
+            <form onSubmit={handleSubmit(onSubmit)}>
               <InputRow label={t('first-name')} name="firstName" required />
               <InputRow label={t('last-name')} name="lastName" required />
               <InputRow
@@ -209,8 +208,10 @@ const ProfileOverview: FC = () => {
             as="a"
             href={`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/login-actions/reset-credentials?client_id=account-console`}
             target="_blank"
+            filled
+            inverted
           >
-            Passwort ändern
+            {t('change-password')}
           </Button>
         </>
       ) : (

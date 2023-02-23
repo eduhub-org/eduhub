@@ -37,12 +37,14 @@ export const ApplyButtonBlock: FC<IProps> = ({ course, onClickApply }) => {
     <div className="flex flex-1 flex-col justify-center items-center">
       <Button
         filled
+        inverted
         onClick={onClickApply}
         disabled={now > course.applicationEnd}
+        className="bg-edu-course-current"
       >
         {t('applyNow')}
       </Button>
-      <span className="text-xs mt-4">
+      <span className="text-xs mt-4 text-white">
         {t('applicationDeadline')}{' '}
         {course.applicationEnd?.toLocaleDateString(lang, {
           month: '2-digit',
