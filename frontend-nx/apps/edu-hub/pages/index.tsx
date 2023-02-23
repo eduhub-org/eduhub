@@ -115,25 +115,19 @@ const Home: FC = () => {
       </Head>
       <Page className="text-white">
         <div
-          className="min-h-[60vh]"
+          className="h-[60vh]"
           style={{
-            backgroundImage: `url('/images/background_homepage/1536.jpg')`,
+            background: `linear-gradient(360deg, #0F0F0F 0%, rgba(0, 0, 0, 0) 12.18%), linear-gradient(53.37deg, rgba(0, 0, 0, 0.8) 16.6%, rgba(0, 0, 0, 0) 79.45%), url('/images/background_homepage/1536.jpg')`,
             backgroundSize: 'cover',
             backgroundPosition: 'top center',
           }}
         >
-          <div className="flex flex-col max-w-screen-xl mx-auto">
-            <span className="flex text-6xl sm:text-9xl mt-16 sm:mt-28">
-              {t('headline')}
-            </span>
-            <div className="flex justify-center mt-4">
-              <span className="text-xl sm:text-5xl text-center">
-                {t('subheadline')}
-              </span>
-            </div>
+          <div className="flex flex-col justify-center h-full max-w-screen-xl mx-auto px-3 md:px-16">
+            <div className="text-6xl sm:text-9xl">{t('headline')}</div>
+            <div className="text-xl sm:text-5xl mt-4">{t('subheadline')}</div>
           </div>
         </div>
-        <div className="max-w-screen-xl mx-auto">
+        <div className="max-w-screen-xl mx-auto md:mt-[-100px] px-3 md:px-16">
           <ClientOnly>
             {isLoggedIn && (
               <>
@@ -142,7 +136,7 @@ const Home: FC = () => {
                     <>
                       <h2
                         id={`sliderGroup${index + 1}`}
-                        className="text-2xl font-semibold text-left"
+                        className="text-2xl font-semibold text-left ml-3 md:ml-0"
                       >
                         {t(group.title)}
                       </h2>
@@ -160,7 +154,7 @@ const Home: FC = () => {
             {/* This Slider is only temporairly included for testing and must be removed later */}
             <h2
               id={`allCourses`}
-              className="text-2xl font-semibold text-left mt-20"
+              className="text-2xl font-semibold text-left mt-20 ml-3 md:ml-0"
             >
               {'All Courses'}
             </h2>
@@ -174,7 +168,7 @@ const Home: FC = () => {
                 <>
                   <h2
                     id={`sliderGroup${index + 3}`}
-                    className="text-2xl font-semibold text-left mt-20"
+                    className="text-2xl font-semibold text-left mt-20 ml-3 md:ml-0"
                   >
                     {t(group.title)}
                   </h2>

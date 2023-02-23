@@ -1,4 +1,5 @@
 const { join } = require('path');
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 // available since Nx v 12.5
 const { createGlobPatternsForDependencies } = require('@nrwl/next/tailwind');
@@ -43,8 +44,9 @@ module.exports = {
       menu: '225px',
     },
     screens: {
-      xs: '375px'
-    }
+      xs: '375px',
+      ...defaultTheme.screens,
+    },
   },
   variants: {
     extend: {},
