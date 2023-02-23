@@ -24,15 +24,21 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
   const endTime = getEndTimeString(course, lang);
 
   return (
-    <div className="flex flex-1 flex-col justify-center items-center lg:max-w-md bg-gray-100 p-12 sm:p-24">
-      <div className="grid grid-cols-2 gap-x-8">
-        {/* <span className="text-lg mt-2 text-center">{t(course.weekDay)}</span> */}
-        <span className="text-lg mt-2 text-center">{course.ects}</span>
+    <div className="flex flex-1 flex-col justify-center items-center rounded-2xl lg:max-w-md bg-gray-100 p-12 sm:p-24">
+      <div className="grid grid-cols-2 gap-x-28">
+        <span className="text-lg mt-2 text-center">
+          {course.weekDay ? t(course.weekDay) : ''}
+        </span>
+        <span className="text-lg mt-2 text-center">
+          {t('course-page:ects')}
+        </span>
         <span className="text-sm mt-2 text-center mb-12">
           {startTime}
           {endTime ? <span> - {endTime}</span> : ''}
         </span>
-        <span className="text-sm mt-2 text-center">{t('ects')}</span>
+        <span className="text-sm mt-2 text-center">
+          {t(`course-page:ects-${course.ects}`)}
+        </span>
         <div className="flex justify-center">
           <Image src={pinIcon} alt="Location" width={32} height={43} />
         </div>
@@ -52,26 +58,28 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
           {tLanguage(course.language)}
         </span>
       </div>
-      {course.CourseInstructors.map((instructor, index) => (
-        <div key={`instructor-${index}`} className="flex">
-          <div className="flex flex-shrink-0 items-start mr-4">
-            <Image
-              src={instructor.Expert.User.picture || mysteryImg}
-              alt="Image of the course instructor"
-              width={68}
-              height={68}
-              className="rounded-full overflow-hidden"
-              objectFit="cover"
-            />
+      <div className="p-16 justify-start">
+        {course.CourseInstructors.map((instructor, index) => (
+          <div key={`instructor-${index}`} className="flex items-center mb-6">
+            <div className="flex flex-shrink-0 items-start mr-4">
+              <Image
+                src={instructor.Expert.User.picture || mysteryImg}
+                alt="Image of the course instructor"
+                width={124}
+                height={124}
+                className="rounded-full overflow-hidden"
+                objectFit="cover"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-3xl mb-1">
+                {instructor.Expert.User.firstName}{' '}
+                {instructor.Expert.User.lastName}
+              </span>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <span className="text-base mb-1">
-              {instructor.Expert.User.firstName}{' '}
-              {instructor.Expert.User.lastName}
-            </span>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

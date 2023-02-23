@@ -1,5 +1,7 @@
 import { QueryResult } from '@apollo/client';
 import { FC, useCallback, useMemo, useState } from 'react';
+import { useSession } from 'next-auth/react';
+
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_CourseEnrollments,
@@ -46,25 +48,18 @@ interface IProps {
   qResult: QueryResult<any, any>;
 }
 
-// const infoDots = (
-//   <>
-//     <div>Beurteilung der Bewerbung</div>
-//     <div className="grid grid-cols-6">
-//       <div>{greyDot} nicht bewertet</div>
-//       <div>{greenDot} Einladen</div>
-//       <div>{orangeDot} Review</div>
-//       <div>{redDot} Ablehnen</div>
-//       <div />
-//       <div />
-//     </div>
-//   </>
-// );
-
 const now = new Date();
 const now7 = new Date();
 now7.setDate(now7.getDate() + 7);
 
 export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
+  const { data } = useSession();
+  const currentUpdateRole = data.profile['https://hasura.io/jwt/claims'][
+    'x-hasura-allowed-roles'
+  ].includes('admin')
+    ? 'admin'
+    : 'instructor';
+
   const { t } = useTranslation();
 
   const infoDots = (
@@ -88,8 +83,6 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
       </div>
     </>
   );
-
-  const userRole = 'instructor';
 
   const [selectedEnrollments, setSelectedEnrollments] = useState(
     [] as number[]
@@ -127,7 +120,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
     UpdateEnrollmentForInviteVariables
   >(UPDATE_ENROLLMENT_FOR_INVITE, {
     context: {
-      role: userRole,
+      role: currentUpdateRole,
     },
   });
   const handleSendInvites = useCallback(async () => {
@@ -158,7 +151,11 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
                   '[Enrollment:ExpirationDate]',
                   displayDate(inviteExpireDate)
                 )
-                .replaceAll('[Enrollment:CourseId--Course:Name]', course.title);
+                .replaceAll('[Enrollment:CourseId--Course:Name]', course.title)
+                .replaceAll(
+                  '[Enrollment:CourseLink]',
+                  `https://eduhub.opencampus.sh/course/${course.id}`
+                );
             };
 
             template.content = doReplace(inviteTemplate.content);
@@ -224,7 +221,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
     UpdateEnrollmentRatingVariables
   >(
     UPDATE_ENROLLMENT_RATING,
-    userRole,
+    currentUpdateRole,
     'enrollmentId',
     'rating',
     pickIdPkMapper,
@@ -267,10 +264,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
 
             <OnlyAdmin>
               <div className="flex justify-end mb-6">
-                <OldButton
-                  onClick={handleOpenInviteDialog}
-                  className="text-gray-400"
-                >
+                <OldButton onClick={handleOpenInviteDialog} filled inverted>
                   {t('course-page:send-invitations')}
                 </OldButton>
               </div>

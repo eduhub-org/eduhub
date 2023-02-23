@@ -16,7 +16,12 @@ import {
   useAdminQuery,
   useInstructorQuery,
 } from '../hooks/authedQuery';
-import { useIsLoggedIn, useIsUser } from '../hooks/authentication';
+import {
+  useIsLoggedIn,
+  useIsUser,
+  useIsInstructor,
+  useIsAdmin,
+} from '../hooks/authentication';
 import { CourseGroupOptions } from '../queries/__generated__/CourseGroupOptions';
 import { CourseList } from '../queries/__generated__/CourseList';
 import { CourseListWithEnrollments } from '../queries/__generated__/CourseListWithEnrollments';
@@ -30,17 +35,19 @@ import { ClientOnly } from '@opencampus/shared-components';
 const Home: FC = () => {
   const { t } = useTranslation('start-page');
   const isLoggedIn = useIsLoggedIn();
+  const isInstructor = useIsInstructor();
+  const isAdmin = useIsAdmin();
 
-  // (My) Organized Courses
+  // (My) Admin Courses
   const { data: adminCourses, error: adminCoursesError } =
     useInstructorQuery<CourseListWithInstructors>(COURSE_LIST_WITH_INSTRUCTOR, {
-      skip: !isLoggedIn,
+      skip: !isLoggedIn || !(isInstructor || isAdmin),
     });
 
   if (adminCoursesError) {
     console.log('got error in query for admin courses!', adminCoursesError);
   }
-
+  console.log('Request Admin courses:', adminCourses);
   const myAdminCourses =
     adminCourses?.Course?.filter(
       (course) => course.CourseInstructors.length > 0

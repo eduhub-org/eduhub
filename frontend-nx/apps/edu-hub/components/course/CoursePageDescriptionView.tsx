@@ -5,6 +5,7 @@ import { ContentRow } from '../common/ContentRow';
 import { PageBlock } from '../common/PageBlock';
 
 import { CourseContentInfos } from './CourseContentInfos';
+import { CourseDescriptionInfos } from './CourseDescriptionInfos';
 import { CourseMetaInfos } from './CourseMetaInfos';
 import { CourseStatus } from './CourseStatus';
 import { CourseTitleSubTitleBlock } from './CourseTitleSubTitleBlock';
@@ -27,15 +28,8 @@ export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
         }
       >
         <div className="max-w-screen-xl mx-auto w-full">{course.title}</div>
-        {/* <img
-          src={course.coverImage ?? 'https://picsum.photos/1280/620'}
-          alt={course.title}
-          width="1280px"
-          height="620px"
-          className="w-[1280px] h-[620px]"
-        /> */}
       </div>
-      <div className="max-w-screen-xl mx-auto">
+      <div className="max-w-screen-xl mx-auto w-full">
         <PageBlock>
           <ContentRow
             className="items-center"
@@ -46,7 +40,7 @@ export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
         <ContentRow
           className="flex pb-24"
           leftTop={
-            <PageBlock classname="flex-1">
+            <PageBlock classname="flex-1 text-white">
               <CourseContentInfos course={course} />
             </PageBlock>
           }
@@ -56,6 +50,7 @@ export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
             </div>
           }
         />
+        <CourseDescriptionInfos course={course} />
       </div>
     </div>
   );

@@ -225,7 +225,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
   return (
     <>
       <PageBlock>
-        <>
+        <div className="max-w-screen-xl mx-auto mt-20">
           <div className="flex flex-row mb-12 mt-12 text-white">
             <h1 className="text-4xl font-bold">{course.title}</h1>
           </div>
@@ -302,7 +302,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
               </OldButton>
             </div>
           )}
-        </>
+        </div>
       </PageBlock>
       <QuestionConfirmationDialog
         question={t('course-page:confirmation-push-the-course-to-next-status')}
