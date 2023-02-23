@@ -75,24 +75,26 @@ const Achievements: FC = () => {
     : t('achievement-record');
   return (
     <>
-      <Head>
-        <title>{t('title')}</title>
-      </Head>
-      <Page>
-        <div className="min-h-[77vh]">
-          <CommonPageHeader headline={header} />
-          {isLoggedIn &&
-            (isAdmin || isInstructor) &&
-            recordTypes.length > 0 && (
-              <AchievementOptionDashboard
-                achievementRecordTypes={recordTypes}
-                userId={userId}
-                userProfile={profile}
-                course={course}
-              />
-            )}
-        </div>
-      </Page>
+      <div className="max-w-screen-xl mx-auto mt-14">
+        <Head>
+          <title>{t('title')}</title>
+        </Head>
+        <Page>
+          <div className="min-h-[77vh]">
+            <CommonPageHeader headline={header} />
+            {isLoggedIn &&
+              (isAdmin || isInstructor) &&
+              recordTypes.length > 0 && (
+                <AchievementOptionDashboard
+                  achievementRecordTypes={recordTypes}
+                  userId={userId}
+                  userProfile={profile}
+                  course={course}
+                />
+              )}
+          </div>
+        </Page>
+      </div>
     </>
   );
 };

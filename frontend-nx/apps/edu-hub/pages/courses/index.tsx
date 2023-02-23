@@ -91,7 +91,7 @@ const Content: FC<IProps> = ({ programs }) => {
   }
 
   return (
-    <div className="w-full">
+    <div className="max-w-screen-xl mx-auto">
       <CoursesHeader
         programs={programs}
         defaultProgramId={defaultProgram}
@@ -111,7 +111,7 @@ const Content: FC<IProps> = ({ programs }) => {
         />
       ) : (
         <div className="text-white">
-          <p>Dieses Programm enthält noch keine Kurse.</p>
+          <p>{t('course-page:no-courses')}</p>
         </div>
       )}
     </div>

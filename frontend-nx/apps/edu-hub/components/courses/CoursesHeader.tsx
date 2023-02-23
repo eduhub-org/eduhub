@@ -93,8 +93,12 @@ const CoursesHeader: FC<IProps> = ({
         courseListRequest={courseListRequest}
         updateFilter={updateFilter}
       />
-      <div className="flex justify-end mb-12">
-        <Button onClick={insertDefaultCourse} startIcon={<MdAddCircle />}>
+      <div className="flex justify-end mb-12  text-white">
+        <Button
+          onClick={insertDefaultCourse}
+          startIcon={<MdAddCircle />}
+          color="inherit"
+        >
           {t('course-page:add-course')}
         </Button>
       </div>

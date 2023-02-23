@@ -5,6 +5,7 @@ import useTranslation from 'next-translate/useTranslation';
 import {
   getEndTimeString,
   getStartTimeString,
+  getWeekdayString,
 } from '../../helpers/dateHelpers';
 import mysteryImg from '../../public/images/common/mystery.svg';
 import languageIcon from '../../public/images/course/language.svg';
@@ -16,7 +17,7 @@ interface IProps {
 }
 
 export const CourseMetaInfos: FC<IProps> = ({ course }) => {
-  const { t, lang } = useTranslation('course-page');
+  const { t, lang } = useTranslation();
   const { t: tLanguage } = useTranslation('common');
 
   const startTime = getStartTimeString(course, lang);
@@ -25,9 +26,7 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
   return (
     <div className="flex flex-1 flex-col justify-center items-center lg:max-w-md bg-gray-100 p-12 sm:p-24">
       <div className="grid grid-cols-2 gap-x-8">
-        <span className="text-lg mt-2 text-center">
-          {tLanguage(course.weekDay)}
-        </span>
+        {/* <span className="text-lg mt-2 text-center">{t(course.weekDay)}</span> */}
         <span className="text-lg mt-2 text-center">{course.ects}</span>
         <span className="text-sm mt-2 text-center mb-12">
           {startTime}

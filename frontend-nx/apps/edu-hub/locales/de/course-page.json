@@ -102,5 +102,6 @@
   "programs-course-start": "Kursstart",
   "programs-course-end": "Kursende",
   "programs-achievement-upload-deadline": "Abgabeschluss Leistungsnachweise",
-  "day": "Tag"
+  "day": "Tag",
+  "no-courses": "Dieses Programm enthält noch keine Kurse."
 }
