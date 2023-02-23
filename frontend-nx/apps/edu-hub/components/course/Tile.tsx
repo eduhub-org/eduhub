@@ -103,6 +103,18 @@ export const Tile: FC<IProps> = ({ course }) => {
 
   const isInstructor = useIsInstructor();
 
+  const courseDateTimeString = `${course.weekDay ? `${t(course.weekDay)} ` : ""}${
+    course.startTime &&
+    course.endTime ?
+    `${new Date(course.startTime).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    })} - ${new Date(course.endTime).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    })}` : ""
+  }`;
+
   return (
     <Link
       href={
