@@ -3,7 +3,7 @@ import { Navigation } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { v4 as uuidv4 } from 'uuid';
 
-import type {Swiper as SwiperType} from "swiper";
+import type { Swiper as SwiperType } from 'swiper';
 
 import 'swiper/css';
 
@@ -118,7 +118,7 @@ export const TileSlider: FC<IProps> = ({ courses }) => {
       {courses.length > 1 && (
         <>
           <button
-            className={`button-prev-${prevButtonId} w-24 h-[431px] bg-opacity-80 bg-black flex flex-col justify-center items-center absolute top-0 left-0 z-10 rounded-tr-2xl rounded-br-2xl ${
+            className={`button-prev-${prevButtonId} w-24 h-[431px] bg-opacity-80 bg-black flex flex-col justify-center items-center absolute top-0 left-0 z-10 ${
               !prevVisible && 'hidden'
             }`}
             style={{
@@ -130,7 +130,9 @@ export const TileSlider: FC<IProps> = ({ courses }) => {
             <img className="block" src={sliderPreviousArrow} alt="blah" />
           </button>
           <button
-            className={`button-next-${nextButtonId} w-24 h-[431px] bg-opacity-80 bg-black flex flex-col justify-center items-center absolute top-0 right-0 z-10 rounded-tl-2xl rounded-bl-2xl ${
+            // className={`button-next-${nextButtonId} w-24 h-[431px] bg-opacity-80 bg-black flex flex-col justify-center items-center absolute top-0 right-0 z-10 rounded-tl-2xl rounded-bl-2xl ${
+            //   !nextVisible && 'hidden'
+            className={`button-next-${nextButtonId} w-24 h-[431px] bg-opacity-80 bg-black flex flex-col justify-center items-center absolute top-0 right-0 z-10 ${
               !nextVisible && 'hidden'
             }`}
             style={{
