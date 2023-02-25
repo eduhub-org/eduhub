@@ -115,19 +115,20 @@ const Home: FC = () => {
       </Head>
       <Page className="text-white">
         <div
-          className="h-[60vh] mb-11 md:mb-0"
+          className="h-[100vh] mb-11 md:mb-0"
           style={{
             background: `linear-gradient(360deg, #0F0F0F 0%, rgba(0, 0, 0, 0) 12.18%), linear-gradient(53.37deg, rgba(0, 0, 0, 0.8) 16.6%, rgba(0, 0, 0, 0) 79.45%), url('/images/background_homepage/1536.jpg')`,
             backgroundSize: 'cover',
             backgroundPosition: 'top center',
           }}
         >
-          <div className="flex flex-col justify-center h-full max-w-screen-xl mx-auto px-3 md:px-16">
+          <div className="flex flex-col justify-end h-full max-w-screen-xl mx-auto px-3 md:px-16 py-48">
             <div className="text-6xl sm:text-9xl">{t('headline')}</div>
             <div className="text-xl sm:text-5xl mt-4">{t('subheadline')}</div>
           </div>
         </div>
-        <div className="max-w-screen-xl mx-auto md:mt-[-100px] md:pl-16">
+        {/* <div className="max-w-screen-xl mx-auto md:mt-[-100px] md:pl-16"> */}
+        <div className="max-w-screen-xl mx-auto md:mt-[-130px] md:pl-16 mt-[-180px]">
           <ClientOnly>
             {isLoggedIn && (
               <>
@@ -152,7 +153,7 @@ const Home: FC = () => {
 
             {/* ##################################################### */}
             {/* This Slider is only temporairly included for testing and must be removed later */}
-            <h2
+            {/* <h2
               id={`allCourses`}
               className="text-2xl font-semibold text-left mt-20 ml-3 md:ml-0"
             >
@@ -160,7 +161,7 @@ const Home: FC = () => {
             </h2>
             <div className="mt-2">
               <TileSlider courses={publishedCourses} />
-            </div>
+            </div> */}
             {/* ##################################################### */}
 
             {coursesGroups.map((group, index) =>
@@ -168,11 +169,11 @@ const Home: FC = () => {
                 <>
                   <h2
                     id={`sliderGroup${index + 3}`}
-                    className="text-2xl font-semibold text-left mt-20 ml-3 md:ml-0"
+                    className="text-2xl font-semibold text-left ml-3 md:ml-0"
                   >
                     {t(group.title)}
                   </h2>
-                  <div className="mt-2">
+                  <div className="mt-2 mb-12">
                     <TileSlider courses={group.courses} />
                   </div>
                 </>
