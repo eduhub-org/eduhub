@@ -177,6 +177,14 @@ export interface CourseWithEnrollment_Course_by_pk_CourseEnrollments {
    * The users current enrollment status to this course
    */
   status: CourseEnrollmentStatus_enum;
+  /**
+   * URL to the file containing the user's achievement certificate (if he obtained one)
+   */
+  achievementCertificateURL: string | null;
+  /**
+   * URL to the file containing the user's attendance certificate (if he obtained one)
+   */
+  attendanceCertificateURL: string | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk {
