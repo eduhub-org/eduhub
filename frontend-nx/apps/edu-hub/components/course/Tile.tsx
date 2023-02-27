@@ -103,16 +103,18 @@ export const Tile: FC<IProps> = ({ course }) => {
 
   const isInstructor = useIsInstructor();
 
-  const courseDateTimeString = `${course.weekDay ? `${t(course.weekDay)} ` : ""}${
-    course.startTime &&
-    course.endTime ?
-    `${new Date(course.startTime).toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    })} - ${new Date(course.endTime).toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    })}` : ""
+  const courseDateTimeString = `${
+    course.weekDay ? `${t(course.weekDay)} ` : ''
+  }${
+    course.startTime && course.endTime
+      ? `${new Date(course.startTime).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        })} - ${new Date(course.endTime).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        })}`
+      : ''
   }`;
 
   return (
@@ -126,9 +128,14 @@ export const Tile: FC<IProps> = ({ course }) => {
         <div
           className="h-[230px] p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat bg-[image:var(--bg-small-url)]"
           style={
+            // {
+            //   '--bg-small-url':
+            //     "linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url('https://picsum.photos/240/144')",
+            // } as React.CSSProperties
             {
-              '--bg-small-url':
-                "linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url('https://picsum.photos/240/144')",
+              '--bg-small-url': `linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url(${
+                course?.coverImage || 'https://picsum.photos/240/144'
+              })`,
             } as React.CSSProperties
           }
         >
