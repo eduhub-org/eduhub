@@ -243,6 +243,14 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
    */
   status: CourseEnrollmentStatus_enum;
   /**
+   * URL to the file containing the user's achievement certificate (if he obtained one)
+   */
+  achievementCertificateURL: string | null;
+  /**
+   * URL to the file containing the user's attendance certificate (if he obtained one)
+   */
+  attendanceCertificateURL: string | null;
+  /**
    * The text of the user's motivation letter
    */
   motivationLetter: string;
