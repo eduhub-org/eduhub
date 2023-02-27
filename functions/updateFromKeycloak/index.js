@@ -3,10 +3,6 @@ const KcAdminClient = require("@keycloak/keycloak-admin-client").default;
 const { createClient } = require("graphqurl");
 
 exports.updateFromKeycloak = async (req, res) => {
-  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
   if (process.env.HASURA_CLOUD_FUNCTION_SECRET == req.headers.secret) {
     const kcAdminClient = new KcAdminClient({
       baseUrl: process.env.KEYCLOAK_URL,
@@ -55,10 +51,6 @@ exports.updateFromKeycloak = async (req, res) => {
     
     const admin_role = roles.filter(it => it.name === 'admin')[0];
     const instructor_role = roles.filter(it => it.name === 'instructor')[0];
-    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    console.log("admin_role");
-    console.log(admin_role);
-    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
     //get user from hasura
     let findUserResponse;
@@ -117,7 +109,7 @@ exports.updateFromKeycloak = async (req, res) => {
             findInstructorResponse = response.data.Expert;
           })
           .catch((error) => console.error(error));
-        if (!findinstructorResponse || (findInstructorResponse.length == 0)) {
+        if (!findInstructorResponse || (findInstructorResponse.length == 0)) {
           await client
           .query({
             query:
