@@ -39,7 +39,7 @@ const AuthorizedCoursePage: FC<{ id: number; tab: number }> = ({ id, tab }) => {
 
   return (
     <>
-      {isParticipating ? (
+      {/* {isParticipating ? (
         <PageBlock>
           <div className="py-4">
             <TabSelection
@@ -48,7 +48,7 @@ const AuthorizedCoursePage: FC<{ id: number; tab: number }> = ({ id, tab }) => {
             />
           </div>
         </PageBlock>
-      ) : null}
+      ) : null} */}
       {tab === 0 || !isParticipating ? (
         <CoursePageDescriptionView course={course} />
       ) : (

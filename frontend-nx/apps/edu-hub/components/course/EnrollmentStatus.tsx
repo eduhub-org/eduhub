@@ -11,6 +11,7 @@ import {
 } from '../../queries/__generated__/CourseWithEnrollment';
 import { COURSE_WITH_ENROLLMENT } from '../../queries/courseWithEnrollment';
 
+import { CourseLinkInfos } from './CourseLinkInfos';
 import { ApplyButtonBlock } from './ApplyButtonBlock';
 import { CourseApplicationModal } from './CourseApplicationModal';
 import { UserInfoModal } from './UserInfoModal';
@@ -27,7 +28,6 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
 
   const user = useUser();
   const userId = useUserId();
-
   const { data } = useAuthedQuery<
     CourseWithEnrollment,
     CourseWithEnrollmentVariables
@@ -63,6 +63,8 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
 
   const enrollments = data?.Course_by_pk?.CourseEnrollments;
 
+  // const onlineMeetingLink = 'https://zoom.us';
+
   let content = null;
 
   if (!enrollments || enrollments.length !== 1) {
@@ -89,16 +91,12 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
         );
         break;
       }
-      case CourseEnrollmentStatus_enum.COMPLETED: {
-        content = (
-          <span className="bg-gray-300 p-4">{t('status.rejected')}</span>
-        );
+      case CourseEnrollmentStatus_enum.CONFIRMED: {
+        content = <CourseLinkInfos course={course} />;
         break;
       }
-      case CourseEnrollmentStatus_enum.CONFIRMED: {
-        content = (
-          <span className="bg-gray-300 p-4">{t('status.rejected')}</span>
-        );
+      case CourseEnrollmentStatus_enum.COMPLETED: {
+        content = <CourseLinkInfos course={course} />;
         break;
       }
       default: {
@@ -109,7 +107,7 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
 
   return (
     <>
-      {content}
+      <div className="mx-auto">{content}</div>{' '}
       <UserInfoModal
         visible={isUserInfoModalVisible && !user}
         closeModal={hideUserInfoModal}
