@@ -12,16 +12,16 @@ import { Button } from '../common/Button';
 import {
   loadAchievementCertificate,
   loadAchievementCertificateVariables,
-} from 'apps/edu-hub/queries/__generated__/loadAchievementCertificate';
+} from '../../queries/__generated__/loadAchievementCertificate';
 import {
   loadParticipationCertificate,
   loadParticipationCertificateVariables,
-} from 'apps/edu-hub/queries/__generated__/loadParticipationCertificate';
+} from '../../queries/__generated__/loadParticipationCertificate';
 
 import {
   getEndTimeString,
   getStartTimeString,
-  getWeekdayString,
+  // getWeekdayString,
 } from '../../helpers/dateHelpers';
 // import { Course_Course_by_pk } from '../../queries/__generated__/Course';
 

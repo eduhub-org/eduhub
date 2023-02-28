@@ -6,7 +6,6 @@ import { CourseWithEnrollment_Course_by_pk } from '../../queries/__generated__/C
 
 import { ContentRow } from '../common/ContentRow';
 import { PageBlock } from '../common/PageBlock';
-import { Button } from '../common/Button';
 
 import { CourseContentInfos } from './CourseContentInfos';
 import { CourseDescriptionInfos } from './CourseDescriptionInfos';

@@ -5,7 +5,7 @@ import useTranslation from 'next-translate/useTranslation';
 import {
   getEndTimeString,
   getStartTimeString,
-  getWeekdayString,
+  // getWeekdayString,
 } from '../../helpers/dateHelpers';
 import mysteryImg from '../../public/images/common/mystery.svg';
 import languageIcon from '../../public/images/course/language.svg';

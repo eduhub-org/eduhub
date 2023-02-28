@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { Button } from '../common/Button';
