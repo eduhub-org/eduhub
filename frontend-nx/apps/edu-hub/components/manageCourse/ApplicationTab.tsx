@@ -142,7 +142,6 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
         try {
           for (const enrollment of relevantEnrollments) {
             const template = { ...inviteTemplate };
-
             const doReplace = (source: string) => {
               return source
                 .replaceAll('[User:Firstname]', enrollment.User.firstName)
@@ -154,7 +153,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
                 .replaceAll('[Enrollment:CourseId--Course:Name]', course.title)
                 .replaceAll(
                   '[Enrollment:CourseLink]',
-                  `${process.env['NEXTAUTH_URL']}/course/${course.id}`
+                  `https://${window.location.origin}/course/${course.id}`
                 );
             };
 
