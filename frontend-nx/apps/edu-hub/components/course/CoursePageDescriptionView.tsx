@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import useTranslation from 'next-translate/useTranslation';
 
 import { Course_Course_by_pk } from '../../queries/__generated__/Course';
 import { ContentRow } from '../common/ContentRow';
@@ -9,12 +10,15 @@ import { CourseDescriptionInfos } from './CourseDescriptionInfos';
 import { CourseMetaInfos } from './CourseMetaInfos';
 import { CourseStatus } from './CourseStatus';
 import { CourseTitleSubTitleBlock } from './CourseTitleSubTitleBlock';
+import { CourseParticipationBlock } from './CourseParticipationBlock';
 
 interface IProps {
   course: Course_Course_by_pk;
 }
 
 export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col space-y-24">
       <div
@@ -37,6 +41,7 @@ export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
             rightBottom={<CourseStatus course={course} />}
           />
         </PageBlock>
+        <CourseParticipationBlock course={course} />
         <ContentRow
           className="flex pb-24"
           leftTop={
@@ -56,7 +61,7 @@ export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            How to 🡥
+            {t('course-page:how-to')}
           </a>
         </div>
         <CourseDescriptionInfos course={course} />
