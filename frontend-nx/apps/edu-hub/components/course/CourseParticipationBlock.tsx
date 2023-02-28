@@ -26,6 +26,7 @@ import {
 // import { Course_Course_by_pk } from '../../queries/__generated__/Course';
 
 import { Attendances } from './Attendances';
+import { CertificateDownload } from './CertificateDownload';
 import CourseAchievementOption from './course-achievement-option/CourseAchievementOption';
 
 interface IProps {
@@ -70,45 +71,11 @@ export const CourseParticipationBlock: FC<IProps> = ({ course }) => {
 
   let content = null;
 
-  if (
-    courseEnrollment.status === CourseEnrollmentStatus_enum.CONFIRMED ||
-    courseEnrollment.status === CourseEnrollmentStatus_enum.COMPLETED
-  ) {
+  if (courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED) {
     content = (
       <>
-        {loadAchievementCertificateData &&
-          !loadAchievementCerfificateLoading && (
-            <Button
-              as="a"
-              filled
-              href={
-                loadAchievementCertificateData.loadAchievementCertificate.link
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t('achievementCertificateDownload')}
-            </Button>
-          )}
-
-        {loadParticipationCertificateData &&
-          !loadParticipationCerfificateLoading && (
-            <Button
-              as="a"
-              filled
-              href={
-                loadParticipationCertificateData.loadParticipationCertificate
-                  .link
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t('attendanceCertificateDownload')}
-            </Button>
-          )}
-
         <ContentRow
-          className="my-24 text-white"
+          className="my-24 text-edu-black bg-white px-8 py-8"
           leftTop={
             <div className="flex flex-1">
               <Attendances course={course} />
@@ -116,7 +83,7 @@ export const CourseParticipationBlock: FC<IProps> = ({ course }) => {
           }
           rightBottom={
             <div className="flex flex-1">
-              {course.achievementCertificatePossible && (
+              {/* {course.achievementCertificatePossible && (
                 <CourseAchievementOption
                   courseId={course.id}
                   achievementRecordUploadDeadline={
@@ -125,7 +92,27 @@ export const CourseParticipationBlock: FC<IProps> = ({ course }) => {
                   courseTitle={course.title}
                   t={t}
                 />
-              )}
+              )} */}
+            </div>
+          }
+        />
+      </>
+    );
+  } else if (
+    courseEnrollment?.status === CourseEnrollmentStatus_enum.COMPLETED
+  ) {
+    content = (
+      <>
+        <ContentRow
+          className="my-24 text-edu-black bg-white px-8 py-8"
+          leftTop={
+            <div className="flex flex-1 w-1/2">
+              <Attendances course={course} />
+            </div>
+          }
+          rightBottom={
+            <div className="w-1/2 px-10">
+              <CertificateDownload course={course} />
             </div>
           }
         />

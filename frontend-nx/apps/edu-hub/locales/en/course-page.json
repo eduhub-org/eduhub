@@ -108,7 +108,11 @@
   "ects-2,5": "2,5",
   "ects-5": "5",
   "default-course-title": "Neuer Kurs",
-  "how-to": "How to 🡥",
+  "how-to": "How to",
   "to-chat": "zum Chat",
-  "to-online-meeting": "ZUM ONLINE MEETING 🡥"
+  "to-online-meeting": "ZUM ONLINE MEETING",
+  "attendances": "Anwesenheiten",
+  "achievementCertificateDownload": "Dein Leistungszertifikat",
+  "attendanceCertificateDownload": "Deine Anwesenheitsbescheinigung",
+  "congrats-completion": "Herzlich Glückwunsch zum Abschluss des Kurses!"
 }
