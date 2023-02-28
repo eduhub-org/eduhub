@@ -18,7 +18,7 @@ const nextConfig = {
   },
   output: 'standalone',
   images: {
-    domains: ['picsum.photos', 'images.unsplash.com'],
+    domains: ['picsum.photos', 'images.unsplash.com', 'storage.googleapis.com', 'localhost'],
   },
   experimental: {
     // https://nextjs.org/docs/advanced-features/output-file-tracing#caveats

@@ -12,6 +12,7 @@ FROM quay.io/keycloak/keycloak:19.0
 COPY --from=builder /opt/keycloak/lib/quarkus/ /opt/keycloak/lib/quarkus/
 COPY ./libs/keycloak-bcrypt-1.5.0.jar /opt/keycloak/providers/
 COPY ./themes/opencampus /opt/keycloak/themes/opencampus
+COPY ./themes/edu-hub /opt/keycloak/themes/edu-hub
 
 WORKDIR /opt/keycloak
 # for demonstration purposes only, please make sure to use proper certificates in production instead

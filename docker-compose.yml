@@ -22,7 +22,7 @@ services:
 
   functions:
     container_name: eduhub-functions
-    image: node:18-bullseye-slim
+    image: node:18-bullseye
     user: "node"
     working_dir: /functions
     volumes:
