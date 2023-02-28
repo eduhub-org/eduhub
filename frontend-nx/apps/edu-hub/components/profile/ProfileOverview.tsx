@@ -1,4 +1,4 @@
-import { FC, InputHTMLAttributes } from 'react';
+import { FC, InputHTMLAttributes, SelectHTMLAttributes } from 'react';
 import {
   FormProvider,
   SubmitHandler,
@@ -15,6 +15,10 @@ import { UPDATE_USER } from '../../queries/updateUser';
 import { USER } from '../../queries/user';
 import useTranslation from 'next-translate/useTranslation';
 
+import { updateUserVariables, updateUser } from '../../queries/__generated__/updateUser';
+import { University_enum } from '../../__generated__/globalTypes';
+import { Employment_enum } from '../../__generated__/globalTypes';
+
 // generated types must be updated first with new fields in schema
 // import type { User } from "../../queries/__generated__/User";
 
@@ -22,14 +26,14 @@ type Inputs = {
   firstName: string;
   lastName: string;
   email: string;
-  employment: string;
-  university: string;
+  employment: Employment_enum | null;
+  university: University_enum | null;
   matriculationNumber: string;
   externalProfile: string;
   password: string;
 };
 
-type InputRowProps = {
+type FormFieldRowProps = {
   label: string;
   name:
     | 'firstName'
@@ -41,19 +45,26 @@ type InputRowProps = {
     | 'externalProfile';
   placeholder?: string;
   required?: boolean;
-} & InputHTMLAttributes<HTMLInputElement>;
+  options?: { label: string; value: string }[];
+  type?: 'text' | 'email' | 'select' | 'textarea';
+} & InputHTMLAttributes<HTMLInputElement> &
+  SelectHTMLAttributes<HTMLSelectElement>;
 
-const InputRow: FC<InputRowProps> = ({
+const FormFieldRow: FC<FormFieldRowProps> = ({
   label,
   name,
+  options,
   placeholder,
-  required,
+  required = false,
+  type = 'text',
   ...rest
 }) => {
   const {
     formState: { errors },
     register,
   } = useFormContext();
+
+  const { t } = useTranslation();
 
   return (
     <div className="relative">
@@ -63,15 +74,36 @@ const InputRow: FC<InputRowProps> = ({
       >
         {label}
       </label>
-      <input
-        id={name}
-        type="text"
-        placeholder={placeholder || label}
-        {...register(name, { required })}
-        className="bg-edu-light-gray p-4 mb-5 w-full block"
-        aria-invalid={errors[name] ? 'true' : 'false'}
-        {...rest}
-      />
+      {(type === 'text' || type === 'email') && (
+        <input
+          id={name}
+          type={type}
+          placeholder={placeholder || label}
+          {...register(name, { required })}
+          className="bg-edu-light-gray p-4 mb-5 w-full block"
+          aria-invalid={errors[name] ? 'true' : 'false'}
+          {...rest}
+        />
+      )}
+      {type === 'select' && options && (
+        <select
+          id={name}
+          placeholder={placeholder || label}
+          {...register(name, { required })}
+          className="bg-edu-light-gray p-4 mb-5 w-full block"
+          aria-invalid={errors[name] ? 'true' : 'false'}
+          {...rest}
+        >
+          <option value="" disabled selected hidden>
+            {t('form-select-placeholder')}
+          </option>
+          {options.map((option, i) => (
+            <option value={option.value} key={`formoption-${i}`}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      )}
       {errors[name] && (
         <div className="text-edu-red absolute top-full left-0" role="alert">
           This field is required
@@ -90,8 +122,8 @@ const ProfileOverview: FC = () => {
       firstName: sessionData?.profile?.given_name,
       lastName: sessionData?.profile?.family_name,
       email: sessionData?.profile?.email,
-      employment: '',
-      university: '',
+      employment: null,
+      university: null,
       matriculationNumber: '',
       externalProfile: '',
     },
@@ -127,7 +159,7 @@ const ProfileOverview: FC = () => {
     skip: !sessionData,
   });
 
-  const [updateUser] = useAuthedMutation(UPDATE_USER);
+  const [updateUser] = useAuthedMutation<updateUser, updateUserVariables>(UPDATE_USER);
 
   const accessToken = sessionData?.accessToken;
 
@@ -161,11 +193,10 @@ const ProfileOverview: FC = () => {
           matriculationNumber: data.matriculationNumber,
           university: data.university,
           externalProfile: data.externalProfile,
-          exployment: data.employment,
+          employment: data.employment,
         },
       });
       // const json = await res.json();
-      console.log(res);
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
       console.log(error);
@@ -173,31 +204,61 @@ const ProfileOverview: FC = () => {
   };
   const { t } = useTranslation();
 
+  const employmentSelectFormOptions = (
+    Object.keys(Employment_enum) as Array<keyof typeof Employment_enum>
+  ).map((key) => ({
+    label: t(key),
+    value: key,
+  }));
+
+  const universitySelectFormOptions = (
+    Object.keys(University_enum) as Array<keyof typeof University_enum>
+  ).map((key) => ({
+    label: t(key),
+    value: key,
+  }));
+
   return (
     <div className="px-3 mt-6">
       {!userLoading && !userError ? (
         <>
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <InputRow label={t('first-name')} name="firstName" required />
-              <InputRow label={t('last-name')} name="lastName" required />
-              <InputRow
+              <FormFieldRow label={t('first-name')} name="firstName" required />
+              <FormFieldRow label={t('last-name')} name="lastName" required />
+              <FormFieldRow
                 label={t('email')}
                 name="email"
                 placeholder="name@example.com"
                 required
+                type="email"
               />
-              <InputRow label={t('status')} name="employment" />
-              <InputRow label={t('university')} name="university" />
-              <InputRow
+              <FormFieldRow
+                label={t('status')}
+                name="employment"
+                type="select"
+                options={employmentSelectFormOptions}
+              />
+              <FormFieldRow
+                label={t('university')}
+                name="university"
+                type="select"
+                options={universitySelectFormOptions}
+              />
+              <FormFieldRow
                 label={t('matriculation-number')}
                 name="matriculationNumber"
               />
-              <InputRow label={t('external-profile')} name="externalProfile" />
+              <FormFieldRow
+                label={t('external-profile')}
+                name="externalProfile"
+              />
               <Button
                 as="button"
                 type="submit"
                 disabled={isSubmitting}
+                filled
+                inverted
                 className="block mx-auto mb-5 disabled:bg-slate-500"
               >
                 {isSubmitting ? 'speichert...' : 'speichern'}
