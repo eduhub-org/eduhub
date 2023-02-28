@@ -154,7 +154,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
                 .replaceAll('[Enrollment:CourseId--Course:Name]', course.title)
                 .replaceAll(
                   '[Enrollment:CourseLink]',
-                  `https://eduhub.opencampus.sh/course/${course.id}`
+                  `${process.env['NEXTAUTH_URL']}/course/${course.id}`
                 );
             };
 
