@@ -17,6 +17,7 @@ import {
   UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE,
   UPDATE_COURSE_CHAT_LINK,
   UPDATE_COURSE_ECTS,
+  UPDATE_COURSE_TITLE,
 } from '../../queries/course';
 import { CourseList } from '../../queries/__generated__/CourseList';
 import {
@@ -27,6 +28,10 @@ import {
   UpdateCourseAchievementCertificatePossible,
   UpdateCourseAchievementCertificatePossibleVariables,
 } from '../../queries/__generated__/UpdateCourseAchievementCertificatePossible';
+import {
+  UpdateCourseTitle,
+  UpdateCourseTitleVariables,
+} from '../../queries/__generated__/UpdateCourseTitle';
 import {
   UpdateCourseChatLink,
   UpdateCourseChatLinkVariables,
@@ -106,6 +111,23 @@ const CourseListTable: FC<IProps> = ({
     [qResult, updateAchievementCertificatePossible]
   );
 
+  const [updateTitle] = useAdminMutation<
+    UpdateCourseTitle,
+    UpdateCourseTitleVariables
+  >(UPDATE_COURSE_TITLE);
+  const handleTitle = useCallback(
+    async (c: AdminCourseList_Course, title: string) => {
+      await updateTitle({
+        variables: {
+          courseId: c.id,
+          courseTitle: title,
+        },
+      });
+      qResult.refetch();
+    },
+    [qResult, updateTitle]
+  );
+
   const [updateChatLink] = useAdminMutation<
     UpdateCourseChatLink,
     UpdateCourseChatLinkVariables
@@ -175,6 +197,7 @@ const CourseListTable: FC<IProps> = ({
                   onSetAchievementCertificatePossible={
                     handleAchievementCertificatePossible
                   }
+                  onSetTitle={handleTitle}
                   onSetChatLink={handleChatLink}
                   onSetEcts={handleEcts}
                   // onDeleteCourseGroup={handleDeleteCourseGroup}
