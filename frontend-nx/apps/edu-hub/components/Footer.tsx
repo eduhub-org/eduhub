@@ -1,8 +1,8 @@
-import Image from "next/image";
-import { FC } from "react";
+import Image from 'next/image';
+import { FC } from 'react';
 
-import facebookIcon from "../public/images/share/facebook-icon.svg";
-import instagramIcon from "../public/images/share/instagram-icon.svg";
+import facebookIcon from '../public/images/share/facebook-icon.svg';
+import instagramIcon from '../public/images/share/instagram-icon.svg';
 
 export const Footer: FC = () => {
   return (
@@ -14,10 +14,26 @@ export const Footer: FC = () => {
           <span className="text-xl font-light">by opencampus</span>
         </h3>
         <div className="mt-6 sm:mt-10 mb-16 sm:mb-20 text-sm font-thin">
-          <p>Impressum – Datenschutz</p>
-          <p>FAQ</p>
+          <p>
+            <a
+              href="https://edu.opencampus.sh/impressum"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {'Impressum - Datenschutz'}
+            </a>
+          </p>
+          <p>
+            <a
+              href="https://opencampus.gitbook.io/faq/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {'FAQ'}
+            </a>
+          </p>
         </div>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-end">
           <span className="text-sm font-light">© 2010 — 2021</span>
           <div className="flex items-center">
             <a
