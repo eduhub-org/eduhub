@@ -1,16 +1,19 @@
 {
-  "applyNow": "apply now",
-  "applicationFor": "application for",
-  "requirements": "requirements",
-  "motivationalText": "motivational letter",
-  "motivationalTextPlaceholder": "what is so awesome about you",
-  "sendApplication": "send application",
+  "applyNow": "jetzt bewerben",
+  "applicationFor": "Bewerbung für",
+  "requirements": "Anforderungen",
+  "motivationalText": "Motivationsschreiben",
+  "motivationalTextPlaceholder": "Schreibe was an dir so geil ist",
+  "sendApplication": "Bewerbung abschicken",
   "status": {
-    "aborted": "You did not complete this course successfully.",
-    "applied": "You already applied for this course and will get feedback in no time.",
-    "rejected": "You have declined the invitation to this course."
+    "aborted": "Du hast den Kurs leider nicht erfolgreich abgeschlossen.",
+    "applied": "Du hast dich für diesen Kurs bereits beworben! in Kürze wirst du Rückmeldung dazu bekommen",
+    "rejected": "Du hast die Einladung zu diesem Kurs abgelehnt."
   },
-  "successBody": "At latest one or two days after application closes you will get informed about your approval.",
-  "successCloseButtonTitle": "Close",
-  "successTitle": "You successfully applied"
+  "successBody": "Spätestens ein bis zwei Tage nach Bewerbungsschluss wirst Du über Deine Zulassung informiert.",
+  "successCloseButtonTitle": "Schließen",
+  "successTitle": "Du hast dich erfolgreich beworben",
+  "introduction-motivation-letter-1": "Unser einziges Teilnahmekriterium ist: Deine Motivation!",
+  "introduction-motivation-letter-2": "Bitte schreibe uns, warum du an diesem Kurs teilnehmen möchtest und was deine persönliche Motivation ist.",
+  "placeholder-motivation-letter": "Meine Motivation ..."
 }

@@ -1,4 +1,12 @@
 {
-  "attendances": "Teilnahmen",
-  "certificateAchievement": "Leistungsnachweis"
+  "add": "Programm hinzufügen",
+  "published": "Veröffentlicht",
+  "title": "Programmtitel",
+  "short-title": "Kurztitel",
+  "application-start": "Bewerbungsanfang",
+  "application-end": "Bewerbungsende",
+  "course-start": "Kursstart",
+  "course-end": "Kursende",
+  "achievement-upload-deadline": "Abgabeschluss Leistungsnachweise"
 }
+
