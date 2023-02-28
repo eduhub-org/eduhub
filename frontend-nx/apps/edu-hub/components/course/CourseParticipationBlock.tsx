@@ -1,16 +1,12 @@
-import Image from 'next/image';
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { ContentRow } from '../common/ContentRow';
 
 import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
 import { useAuthedQuery } from '../../hooks/authedQuery';
-import { useUser, useUserId } from '../../hooks/user';
-import { Course_Course_by_pk } from '../../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk } from '../../queries/__generated__/CourseWithEnrollment';
-import { COURSE_WITH_ENROLLMENT } from '../../queries/courseWithEnrollment';
-import { LOAD_ACHIEVEMENT_CERTIFICATE } from 'apps/edu-hub/queries/loadAchievementCertificate';
-import { LOAD_PARTICIPATION_CERTIFICATE } from 'apps/edu-hub/queries/loadParticipationCertificate';
+import { LOAD_ACHIEVEMENT_CERTIFICATE } from '../../queries/loadAchievementCertificate';
+import { LOAD_PARTICIPATION_CERTIFICATE } from '../../queries/loadParticipationCertificate';
 import { Button } from '../common/Button';
 
 import {

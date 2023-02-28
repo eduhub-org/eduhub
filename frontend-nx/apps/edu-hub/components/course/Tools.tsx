@@ -1,22 +1,22 @@
 import useTranslation from 'next-translate/useTranslation';
 import { FC } from 'react';
 
-import { useAuthedQuery } from 'apps/edu-hub/hooks/authedQuery';
+import { useAuthedQuery } from '../../hooks/authedQuery';
 
 import { Button } from '../common/Button';
 
-import { LOAD_ACHIEVEMENT_CERTIFICATE } from 'apps/edu-hub/queries/loadAchievementCertificate';
-import { LOAD_PARTICIPATION_CERTIFICATE } from 'apps/edu-hub/queries/loadParticipationCertificate';
+import { LOAD_ACHIEVEMENT_CERTIFICATE } from '../../queries/loadAchievementCertificate';
+import { LOAD_PARTICIPATION_CERTIFICATE } from '../../queries/loadParticipationCertificate';
 
 import { CourseWithEnrollment_Course_by_pk } from '../../queries/__generated__/CourseWithEnrollment';
 import {
   loadAchievementCertificate,
   loadAchievementCertificateVariables,
-} from 'apps/edu-hub/queries/__generated__/loadAchievementCertificate';
+} from '../../queries/__generated__/loadAchievementCertificate';
 import {
   loadParticipationCertificate,
   loadParticipationCertificateVariables,
-} from 'apps/edu-hub/queries/__generated__/loadParticipationCertificate';
+} from '../../queries/__generated__/loadParticipationCertificate';
 
 interface IProps {
   course: CourseWithEnrollment_Course_by_pk;
