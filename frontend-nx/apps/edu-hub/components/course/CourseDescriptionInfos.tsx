@@ -8,7 +8,7 @@ interface IProps {
 }
 
 export const CourseDescriptionInfos: FC<IProps> = ({ course }) => {
-  const { t, lang } = useTranslation('course-page');
+  // const { t, lang } = useTranslation('course-page');
 
   return (
     <div className="flex flex-1 flex-col">

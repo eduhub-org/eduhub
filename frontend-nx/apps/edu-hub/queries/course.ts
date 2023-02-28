@@ -405,6 +405,20 @@ export const UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE = gql`
   }
 `;
 
+export const UPDATE_COURSE_TITLE = gql`
+  mutation UpdateCourseTitle(
+    $courseId: Int!
+    $courseTitle: String!
+  ) {
+    update_Course_by_pk(
+      pk_columns: { id: $courseId }
+      _set: { title: $courseTitle }
+    ) {
+      id
+    }
+  }
+`;
+
 export const UPDATE_COURSE_CHAT_LINK = gql`
   mutation UpdateCourseChatLink(
     $courseId: Int!
