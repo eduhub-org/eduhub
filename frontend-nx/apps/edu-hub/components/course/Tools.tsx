@@ -44,18 +44,18 @@ export const Tools: FC<IProps> = ({ course }) => {
     skip: !courseEnrollment?.achievementCertificateURL,
   });
 
-    const {
-      data: loadParticipationCertificateData,
-      loading: loadParticipationCerfificateLoading,
-    } = useAuthedQuery<
-      loadParticipationCertificate,
-      loadParticipationCertificateVariables
-    >(LOAD_ACHIEVEMENT_CERTIFICATE, {
-      variables: {
-        path: courseEnrollment?.attendanceCertificateURL,
-      },
-      skip: !courseEnrollment?.attendanceCertificateURL,
-    });
+  const {
+    data: loadParticipationCertificateData,
+    loading: loadParticipationCerfificateLoading,
+  } = useAuthedQuery<
+    loadParticipationCertificate,
+    loadParticipationCertificateVariables
+  >(LOAD_PARTICIPATION_CERTIFICATE, {
+    variables: {
+      path: courseEnrollment?.attendanceCertificateURL,
+    },
+    skip: !courseEnrollment?.attendanceCertificateURL,
+  });
 
   return (
     <div className="flex flex-1 gap-x-4">
@@ -88,7 +88,9 @@ export const Tools: FC<IProps> = ({ course }) => {
           <Button
             as="a"
             filled
-            href={loadParticipationCertificateData.loadParticipationCertificate.link}
+            href={
+              loadParticipationCertificateData.loadParticipationCertificate.link
+            }
             target="_blank"
             rel="noopener noreferrer"
           >

@@ -141,7 +141,7 @@ const Home: FC = () => {
                       >
                         {t(group.title)}
                       </h2>
-                      <div className="mt-2">
+                      <div className="mt-2 mb-12">
                         <TileSlider courses={group.courses} />
                       </div>
                     </>

@@ -2,8 +2,11 @@ import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
 import { Course_Course_by_pk } from '../../queries/__generated__/Course';
+import { CourseWithEnrollment_Course_by_pk } from '../../queries/__generated__/CourseWithEnrollment';
+
 import { ContentRow } from '../common/ContentRow';
 import { PageBlock } from '../common/PageBlock';
+import { Button } from '../common/Button';
 
 import { CourseContentInfos } from './CourseContentInfos';
 import { CourseDescriptionInfos } from './CourseDescriptionInfos';
@@ -13,11 +16,17 @@ import { CourseTitleSubTitleBlock } from './CourseTitleSubTitleBlock';
 import { CourseParticipationBlock } from './CourseParticipationBlock';
 
 interface IProps {
-  course: Course_Course_by_pk;
+  course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk;
 }
 
 export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
   const { t } = useTranslation();
+
+  function isCourseWithEnrollment(
+    course: any
+  ): course is CourseWithEnrollment_Course_by_pk {
+    return 'CourseEnrollments' in course;
+  }
 
   return (
     <div className="flex flex-col space-y-24">
@@ -41,7 +50,9 @@ export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
             rightBottom={<CourseStatus course={course} />}
           />
         </PageBlock>
-        <CourseParticipationBlock course={course} />
+        {isCourseWithEnrollment(course) && (
+          <CourseParticipationBlock course={course} />
+        )}
         <ContentRow
           className="flex pb-24"
           leftTop={
