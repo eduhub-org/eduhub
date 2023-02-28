@@ -164,3 +164,20 @@ export const LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE = gql`
     }
   }
 `;
+
+export const SAVE_USER_PROFILE_IMAGE = gql`
+  mutation SaveUserProfileImage(
+    $base64File: String!
+    $fileName: String!
+    $userId: String!
+  ) {
+    saveUserProfileImage(
+      base64file: $base64File
+      filename: $fileName
+      userid: $userId
+    ) {
+      google_link
+      path
+    }
+  }
+`;

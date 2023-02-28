@@ -3,13 +3,14 @@ import { gql } from '@apollo/client';
 export const UPDATE_USER = gql`
   mutation updateUser(
     $userId: uuid!
-    $firstName: String!
-    $lastName: String!
-    $email: String!
+    $firstName: String
+    $lastName: String
+    $email: String
     $matriculationNumber: String
     $university: University_enum
     $externalProfile: String
     $employment: Employment_enum
+    $picture: String
   ) {
     update_User_by_pk(
       pk_columns: { id: $userId }
@@ -21,6 +22,7 @@ export const UPDATE_USER = gql`
         email: $email
         externalProfile: $externalProfile
         university: $university
+        picture: $picture
       }
     ) {
       id
@@ -31,6 +33,7 @@ export const UPDATE_USER = gql`
       email
       externalProfile
       university
+      picture
     }
   }
 `;
