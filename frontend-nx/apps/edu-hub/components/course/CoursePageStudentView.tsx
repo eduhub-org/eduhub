@@ -9,7 +9,6 @@ import { Attendances } from './Attendances';
 import CourseAchievementOption from './course-achievement-option/CourseAchievementOption';
 import { CourseTitleSubTitleBlock } from './CourseTitleSubTitleBlock';
 import { Resources } from './Resources';
-import { Tools } from './Tools';
 
 interface IProps {
   course: CourseWithEnrollment_Course_by_pk;
@@ -23,11 +22,7 @@ export const CoursePageStudentView: FC<IProps> = ({ course }) => {
         <ContentRow leftTop={<CourseTitleSubTitleBlock course={course} />} />
         <ContentRow
           className="mt-16"
-          leftTop={
-            <div className="flex flex-1">
-              <Tools course={course} />
-            </div>
-          }
+          leftTop={<div className="flex flex-1">{''}</div>}
           rightBottom={
             <div className="flex flex-1">
               <Resources course={course} />

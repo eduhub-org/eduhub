@@ -1,6 +1,9 @@
 import { FC } from 'react';
+import useTranslation from 'next-translate/useTranslation';
 
 import { Course_Course_by_pk } from '../../queries/__generated__/Course';
+import { CourseWithEnrollment_Course_by_pk } from '../../queries/__generated__/CourseWithEnrollment';
+
 import { ContentRow } from '../common/ContentRow';
 import { PageBlock } from '../common/PageBlock';
 
@@ -9,12 +12,21 @@ import { CourseDescriptionInfos } from './CourseDescriptionInfos';
 import { CourseMetaInfos } from './CourseMetaInfos';
 import { CourseStatus } from './CourseStatus';
 import { CourseTitleSubTitleBlock } from './CourseTitleSubTitleBlock';
+import { CourseParticipationBlock } from './CourseParticipationBlock';
 
 interface IProps {
-  course: Course_Course_by_pk;
+  course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk;
 }
 
 export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
+  const { t } = useTranslation();
+
+  function isCourseWithEnrollment(
+    course: any
+  ): course is CourseWithEnrollment_Course_by_pk {
+    return 'CourseEnrollments' in course;
+  }
+
   return (
     <div className="flex flex-col space-y-24">
       <div
@@ -37,6 +49,9 @@ export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
             rightBottom={<CourseStatus course={course} />}
           />
         </PageBlock>
+        {isCourseWithEnrollment(course) && (
+          <CourseParticipationBlock course={course} />
+        )}
         <ContentRow
           className="flex pb-24"
           leftTop={
@@ -56,7 +71,7 @@ export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            How to 🡥
+            {t('course-page:how-to')}
           </a>
         </div>
         <CourseDescriptionInfos course={course} />

@@ -11,13 +11,15 @@ interface IProps {
 }
 
 export const Attendances: FC<IProps> = ({ course }) => {
-  const { t } = useTranslation('course-page');
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col">
-      <BlockTitle>{t('attendance')}</BlockTitle>
+      <BlockTitle>{t('course-page:attendances')}</BlockTitle>
       <span className="text-lg mb-4">
-        {t('maxMissedSessions_plural', { count: course.maxMissedSessions })}
+        {t('course-page:maxMissedSessions_plural', {
+          count: course.maxMissedSessions,
+        })}
       </span>
       <div>
         <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3">

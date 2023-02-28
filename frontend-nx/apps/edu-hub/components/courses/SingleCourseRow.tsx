@@ -123,6 +123,7 @@ interface IPropsCourseOneRow {
   t: any;
   qResult: QueryResult<any>;
   refetchCourses: () => void;
+  onSetTitle: (c: AdminCourseList_Course, title: string) => any;
   onSetChatLink: (c: AdminCourseList_Course, link: string) => any;
   onSetEcts: (c: AdminCourseList_Course, link: string) => any;
   onSetAttendanceCertificatePossible: (
@@ -140,6 +141,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   course,
   t,
   refetchCourses,
+  onSetTitle,
   onSetChatLink,
   onSetEcts,
   onSetAttendanceCertificatePossible,
@@ -241,6 +243,13 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
       refetchCourses();
     },
     [refetchCourses, course.id, updateCourse]
+  );
+
+  const handleSetCourseTitle = useCallback(
+    (value: string) => {
+      onSetTitle(course, value);
+    },
+    [course, onSetTitle]
   );
 
   const handleSetChatLink = useCallback(
@@ -424,7 +433,13 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
           </div>
         </td>
         <td className={tdClass}>
-          <p className={pClass}>{course.title}</p>
+          <p className={pClass}>
+            <EhDebounceInput
+              placeholder={`${t('course-page:default-course-title')}`}
+              onChangeHandler={handleSetCourseTitle}
+              inputText={course.title || ''}
+            />
+          </p>
         </td>
         <td className={`${tdClass}`}>
           <InstructorColumn

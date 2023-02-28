@@ -153,7 +153,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
                 .replaceAll('[Enrollment:CourseId--Course:Name]', course.title)
                 .replaceAll(
                   '[Enrollment:CourseLink]',
-                  `https://${window.location.origin}/course/${course.id}`
+                  `${window.location.origin}/course/${course.id}`
                 );
             };
 

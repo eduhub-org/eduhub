@@ -2,10 +2,10 @@ import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
 import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
-import { PageBlock } from '../../components/common/PageBlock';
+// import { PageBlock } from '../../components/common/PageBlock';
 import { CoursePageDescriptionView } from '../../components/course/CoursePageDescriptionView';
-import { CoursePageStudentView } from '../../components/course/CoursePageStudentView';
-import { TabSelection } from '../../components/course/TabSelection';
+// import { CoursePageStudentView } from '../../components/course/CoursePageStudentView';
+// import { TabSelection } from '../../components/course/TabSelection';
 import { enrollmentStatusForCourse } from '../../helpers/courseHelpers';
 import { useAuthedQuery } from '../../hooks/authedQuery';
 import { useUserId } from '../../hooks/user';
@@ -39,7 +39,7 @@ const AuthorizedCoursePage: FC<{ id: number; tab: number }> = ({ id, tab }) => {
 
   return (
     <>
-      {isParticipating ? (
+      {/* {isParticipating ? (
         <PageBlock>
           <div className="py-4">
             <TabSelection
@@ -48,7 +48,7 @@ const AuthorizedCoursePage: FC<{ id: number; tab: number }> = ({ id, tab }) => {
             />
           </div>
         </PageBlock>
-      ) : null}
+      ) : null} */}
       {tab === 0 || !isParticipating ? (
         <CoursePageDescriptionView course={course} />
       ) : (
