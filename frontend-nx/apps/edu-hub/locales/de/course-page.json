@@ -80,7 +80,7 @@
   "link-final-evaluation": "Link Abschluss-Evaluation",
   "no-template-uploaded-yet": "Noch kein Template hochgeladen",
   "show-certificates": "Bescheinigungen einblenden",
-  "default-address": "Standardadresse für die Sessions (soweit dort nichts anderes angegeben ist)",
+  "default-address": "Standardadresse für neue Sessions",
   "add-session": "Termin hinzufügen",
   "application-rating": "Einstufung der Bewerbungen:",
   "not-rated": "Unbewertet",
@@ -88,6 +88,7 @@
   "reject": "Ablehnen",
   "invite": "Einladen",
   "no-applications-present": "Es liegen noch keine Bewerbungen vor.",
+  "no-enrollments-present": "Es wurden noch keine Teilnehmenden zugelassen.",
   "chat-link": "Chat Link:",
   "possible-certificates": "Mögliche Bescheinigungen",
   "add-course": "Kurs hinzufügen",
@@ -114,5 +115,6 @@
   "attendances": "Anwesenheiten",
   "achievementCertificateDownload": "Dein Leistungszertifikat",
   "attendanceCertificateDownload": "Deine Anwesenheitsbescheinigung",
-  "congrats-completion": "Herzlich Glückwunsch zum Abschluss des Kurses!"
+  "congrats-completion": "Herzlich Glückwunsch zum Abschluss des Kurses!",
+  "add-session-address": "Neue Adresse"
 }

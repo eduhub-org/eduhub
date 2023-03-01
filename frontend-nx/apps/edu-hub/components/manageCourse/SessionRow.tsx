@@ -8,7 +8,7 @@ import { IconButton } from '@material-ui/core';
 import { MdDelete } from 'react-icons/md';
 import {
   eventTargetValueMapper,
-  useAdminMutation,
+  useInstructorMutation,
 } from '../../hooks/authedMutation';
 import { InputDialog } from '../common/dialogs/InputDialog';
 import {
@@ -173,7 +173,7 @@ export const SessionRow: FC<IProps> = ({
     setAddressAddOpen(true);
   }, [setAddressAddOpen]);
 
-  const [insertSessionLocationMutation] = useAdminMutation<
+  const [insertSessionLocationMutation] = useInstructorMutation<
     InsertSessionLocation,
     InsertSessionLocationVariables
   >(INSERT_NEW_SESSION_LOCATION);
@@ -200,11 +200,11 @@ export const SessionRow: FC<IProps> = ({
     setAddSpeakerOpen(true);
   }, [setAddSpeakerOpen]);
 
-  const [insertExpertMutation] = useAdminMutation<
+  const [insertExpertMutation] = useInstructorMutation<
     InsertExpert,
     InsertExpertVariables
   >(INSERT_EXPERT);
-  const [insertSessionSpeaker] = useAdminMutation<
+  const [insertSessionSpeaker] = useInstructorMutation<
     InsertNewSessionSpeaker,
     InsertNewSessionSpeakerVariables
   >(INSERT_NEW_SESSION_SPEAKER);
@@ -289,16 +289,14 @@ export const SessionRow: FC<IProps> = ({
           )}
         </div>
         <div className="mr-3 ml-3 col-span-10">
-          {!session && <>{t('description')}</>}
+          {!session && <>{t('title')}</>}
           {session && (
             <DebounceInput
               className="w-full bg-edu-light-gray m-2"
               value={session.title}
               onChange={handleSetTitle}
               debounceTimeout={1000}
-              placeholder={t('please-enter-something', {
-                something: t('description'),
-              })}
+              placeholder={t('new-title')}
             />
           )}
         </div>
@@ -326,7 +324,7 @@ export const SessionRow: FC<IProps> = ({
             </div>
           )}
         </div>
-        <div className="ml-3 col-span-2 bg-white">
+        <div className="ml-3 col-span-2">
           {session && (
             <div onClick={handleDelete} className="mt-2 ml-2">
               <IconButton size="small">
@@ -338,10 +336,8 @@ export const SessionRow: FC<IProps> = ({
       </div>
       <InputDialog
         open={addressAddOpen}
-        confirmText={t('add')}
-        inputLabel={`${t('address')}/${t('link')}`}
         onClose={handleAddNewAddress}
-        question={t('add-new-something', { something: t('address') })}
+        inputLabel={t('course-page:add-session-address')}
       />
       <SelectUserDialog
         onClose={handleNewSpeaker}
