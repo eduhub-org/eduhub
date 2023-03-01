@@ -22,6 +22,7 @@ import {
   useIsInstructor,
   useIsAdmin,
 } from '../hooks/authentication';
+import { useUserId } from '../hooks/user';
 import { CourseGroupOptions } from '../queries/__generated__/CourseGroupOptions';
 import { CourseList } from '../queries/__generated__/CourseList';
 import { CourseListWithEnrollments } from '../queries/__generated__/CourseListWithEnrollments';
@@ -37,6 +38,7 @@ const Home: FC = () => {
   const isLoggedIn = useIsLoggedIn();
   const isInstructor = useIsInstructor();
   const isAdmin = useIsAdmin();
+  const userId = useUserId();
 
   // (My) Admin Courses
   const { data: adminCourses, error: adminCoursesError } =
@@ -49,8 +51,10 @@ const Home: FC = () => {
   }
   console.log('Request Admin courses:', adminCourses);
   const myAdminCourses =
-    adminCourses?.Course?.filter(
-      (course) => course.CourseInstructors.length > 0
+    adminCourses?.Course?.filter((course) =>
+      course.CourseInstructors.find(
+        (instructor) => instructor.Expert.User.id === userId
+      )
     ) ?? [];
 
   // (My) Enrolled Courses

@@ -1,7 +1,7 @@
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useState } from 'react';
 import { useInstructorMutation } from '../../hooks/authedMutation';
-import { useAdminQuery } from '../../hooks/authedQuery';
+import { useInstructorQuery } from '../../hooks/authedQuery';
 import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from '../../queries/course';
 import {
   ManagedCourse,
@@ -131,7 +131,7 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  */
 export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
   const { t } = useTranslation();
-  const qResult = useAdminQuery<ManagedCourse, ManagedCourseVariables>(
+  const qResult = useInstructorQuery<ManagedCourse, ManagedCourseVariables>(
     MANAGED_COURSE,
     {
       variables: {
