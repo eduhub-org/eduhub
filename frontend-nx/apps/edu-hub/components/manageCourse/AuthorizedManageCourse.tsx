@@ -296,7 +296,8 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
               <OldButton
                 onClick={handleRequestUpgradeStatus}
                 as="button"
-                filled={true}
+                filled
+                inverted
               >
                 {t('next')}
               </OldButton>
