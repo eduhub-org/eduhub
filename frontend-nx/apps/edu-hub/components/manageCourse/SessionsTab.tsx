@@ -5,7 +5,7 @@ import { MdAddCircle } from 'react-icons/md';
 import {
   identityEventMapper,
   pickIdPkMapper,
-  useAdminMutation,
+  useInstructorMutation,
   useDeleteCallback,
   useUpdateCallback2,
 } from '../../hooks/authedMutation';
@@ -74,11 +74,11 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     return result;
   }, [course]);
 
-  const [insertSessionMutation] = useAdminMutation<
+  const [insertSessionMutation] = useInstructorMutation<
     InsertCourseSession,
     InsertCourseSessionVariables
   >(INSERT_NEW_SESSION);
-  const [insertSessionLocationMutation] = useAdminMutation<
+  const [insertSessionLocationMutation] = useInstructorMutation<
     InsertSessionLocation,
     InsertSessionLocationVariables
   >(INSERT_NEW_SESSION_LOCATION);
