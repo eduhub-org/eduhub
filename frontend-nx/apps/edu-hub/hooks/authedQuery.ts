@@ -33,7 +33,7 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            // 'x-hasura-role': 'instructor',
+            'x-hasura-role': 'instructor',
             Authorization: `Bearer ${accessToken}`,
           },
         },
