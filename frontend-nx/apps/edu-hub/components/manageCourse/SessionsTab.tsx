@@ -193,8 +193,12 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
 
   return (
     <div>
-      <div className="flex justify-end mb-4">
-        <Button onClick={insertSession} startIcon={<MdAddCircle />}>
+      <div className="flex justify-start mb-4 text-white">
+        <Button
+          onClick={insertSession}
+          startIcon={<MdAddCircle />}
+          color="inherit"
+        >
           {t('course-page:add-session')}
         </Button>
       </div>
@@ -230,11 +234,15 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         />
       ))}
 
-      <div className="flex justify-end mt-4 mb-4">
-        <Button onClick={insertSession} startIcon={<MdAddCircle />}>
+      {/* <div className="flex justify-end mt-4 mb-4 text-white">
+        <Button
+          onClick={insertSession}
+          startIcon={<MdAddCircle />}
+          color="inherit"
+        >
           {t('course-page:add-session')}
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 };

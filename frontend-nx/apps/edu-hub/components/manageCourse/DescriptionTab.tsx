@@ -493,6 +493,16 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         </div>
       </div>
 
+      <div className="flex justify-start mb-2 text-white">
+        <Button
+          onClick={insertCourseLocation}
+          startIcon={<MdAddCircle />}
+          color="inherit"
+        >
+          {t('course-page:add-new-location')}
+        </Button>
+      </div>
+
       <div className="mb-8">
         <LocationSelectionRow
           location={null}
@@ -511,16 +521,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             onSetOption={updateCourseLocationOption}
           />
         ))}
-      </div>
-
-      <div className="flex justify-end mb-8 text-white">
-        <Button
-          onClick={insertCourseLocation}
-          startIcon={<MdAddCircle />}
-          color="inherit"
-        >
-          {t('course-page:add-new-location')}
-        </Button>
       </div>
     </div>
   );

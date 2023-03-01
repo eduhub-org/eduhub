@@ -153,20 +153,6 @@ const Home: FC = () => {
                 )}
               </>
             )}
-            {/* </OnlyLoggedIn> */}
-
-            {/* ##################################################### */}
-            {/* This Slider is only temporairly included for testing and must be removed later */}
-            {/* <h2
-              id={`allCourses`}
-              className="text-2xl font-semibold text-left mt-20 ml-3 md:ml-0"
-            >
-              {'All Courses'}
-            </h2>
-            <div className="mt-2">
-              <TileSlider courses={publishedCourses} />
-            </div> */}
-            {/* ##################################################### */}
 
             {coursesGroups.map((group, index) =>
               group.courses.length > 0 ? (
@@ -183,7 +169,7 @@ const Home: FC = () => {
                 </>
               ) : null
             )}
-            <OnlyLoggedOut>
+            {/* <OnlyLoggedOut>
               <div className="flex flex-col sm:flex-row mx-6 mt-6 mb-24 sm:mt-48">
                 <div className="flex flex-1 flex-col sm:items-center">
                   <div>
@@ -200,7 +186,7 @@ const Home: FC = () => {
                   </div>
                 </div>
               </div>
-            </OnlyLoggedOut>
+            </OnlyLoggedOut> */}
           </ClientOnly>
         </div>
       </Page>
