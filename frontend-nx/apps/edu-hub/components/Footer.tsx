@@ -34,7 +34,7 @@ export const Footer: FC = () => {
           </p>
         </div>
         <div className="flex justify-between items-end">
-          <span className="text-sm font-light">© 2010 — 2021</span>
+          <span className="text-sm font-light">© 2010 — 2023</span>
           <div className="flex items-center">
             <a
               href="https://www.instagram.com/opencampus_sh/"
