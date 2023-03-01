@@ -5,20 +5,12 @@ import { MdClose } from 'react-icons/md';
 import { Button } from '../../common/Button';
 
 interface IProps {
-  question: string;
-  confirmText: string;
   inputLabel: string;
   onClose: (confirmed: boolean, inputValue: string) => void;
   open: boolean;
 }
 
-export const InputDialog: FC<IProps> = ({
-  question,
-  inputLabel,
-  onClose,
-  open,
-  confirmText,
-}) => {
+export const InputDialog: FC<IProps> = ({ inputLabel, onClose, open }) => {
   const { t } = useTranslation();
   const [currentValue, setCurrentValue] = useState('');
 
@@ -41,7 +33,7 @@ export const InputDialog: FC<IProps> = ({
     <Dialog open={open} onClose={handleCancel}>
       <DialogTitle>
         <div className="grid grid-cols-2">
-          <div>{t('input')}</div>
+          <div>{t(inputLabel)}</div>
           <div className="cursor-pointer flex justify-end">
             <MdClose onClick={handleCancel} />
           </div>
@@ -49,15 +41,14 @@ export const InputDialog: FC<IProps> = ({
       </DialogTitle>
 
       <div className="mt-1 mr-12 ml-12 mb-8">
-        <div className="mb-2">{question}</div>
         <div className="grid grid-cols-6 w-[32rem]">
-          <div className="mb-2 col-span-2">{inputLabel}</div>
-          <div className="mb-2 col-span-4">
+          <div className="mb-2 col-span-6">
             <input
-              className="w-full border border-solid"
+              className="w-full mb-5 bg-gray-100 focus:border-none"
               type="text"
               value={currentValue}
               onChange={handleNewInput}
+              placeholder={inputLabel}
             />
           </div>
 
@@ -66,7 +57,7 @@ export const InputDialog: FC<IProps> = ({
           </div>
           <div className="col-span-3 flex justify-end">
             <Button filled onClick={handleConfirm}>
-              {confirmText}
+              {t('add')}
             </Button>
           </div>
         </div>

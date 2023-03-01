@@ -35,5 +35,9 @@
   "menu-administration-achievement": "Leistungsnachweise",
   "menu-administration-programs": "Programme",
   "menu-logout": "Logout",
-  "change-password": "Passwort ändern"
+  "change-password": "Passwort ändern",
+  "add": "Hinzufügen",
+  "cancel": "Abbrechen",
+  "title": "Titel",
+  "new-title": "Neuer Titel"
 }
