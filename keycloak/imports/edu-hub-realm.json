@@ -627,6 +627,7 @@
     "frontchannelLogout" : false,
     "protocol" : "openid-connect",
     "attributes" : {
+      "login_theme" : "edu-hub",
       "saml.assertion.signature" : "false",
       "id.token.as.detached.signature" : "false",
       "saml.multivalued.roles" : "false",
