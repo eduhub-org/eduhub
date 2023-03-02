@@ -37,3 +37,19 @@ export const UPDATE_USER = gql`
     }
   }
 `;
+
+export const UPDATE_USER_PROFILE_PICTURE = gql`
+  mutation updateUserProfilePicture(
+    $userId: uuid!
+    $picture: String
+  ) {
+    update_User_by_pk(
+      pk_columns: { id: $userId }
+      _set: {
+        picture: $picture
+      }
+    ) {
+      picture
+    }
+  }
+`;

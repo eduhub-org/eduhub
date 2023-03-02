@@ -7,6 +7,8 @@ import {
 } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
+import { IconButton } from '@material-ui/core';
+import { MdUpload } from 'react-icons/md';
 
 import { parseFileUploadEvent } from '../../helpers/filehandling';
 
@@ -18,6 +20,7 @@ import { useAuthedQuery } from '../../hooks/authedQuery';
 import { UPDATE_USER } from '../../queries/updateUser';
 import { USER } from '../../queries/user';
 import { SAVE_USER_PROFILE_IMAGE } from '../../queries/actions';
+import { UPDATE_USER_PROFILE_PICTURE } from '../../queries/updateUser';
 
 import type {
   MutableRefObject,
@@ -63,6 +66,7 @@ type FormFieldRowProps = {
     | 'picture';
   placeholder?: string;
   required?: boolean;
+  className?: string;
   options?: { label: string; value: string }[];
   type?: 'text' | 'email' | 'select' | 'textarea' | 'file';
 } & InputHTMLAttributes<HTMLInputElement> &
@@ -74,6 +78,7 @@ const FormFieldRow: FC<FormFieldRowProps> = ({
   options,
   placeholder,
   required = false,
+  className = '',
   type = 'text',
   ...rest
 }) => {
@@ -88,7 +93,7 @@ const FormFieldRow: FC<FormFieldRowProps> = ({
     <div className="relative">
       <label
         htmlFor={name}
-        className="text-xs uppercase tracking-widest font-medium text-gray-400"
+        className="${className} text-xs uppercase tracking-widest font-medium text-gray-400"
       >
         {label}
       </label>
@@ -193,6 +198,10 @@ const ProfileOverview: FC = () => {
   const [updateUser] = useAuthedMutation<updateUser, updateUserVariables>(
     UPDATE_USER
   );
+  const [updateUserProfilePicture] = useAuthedMutation<
+    updateUser,
+    updateUserVariables
+  >(UPDATE_USER_PROFILE_PICTURE);
 
   const accessToken = sessionData?.accessToken;
 
@@ -263,6 +272,35 @@ const ProfileOverview: FC = () => {
     SaveUserProfileImageVariables
   >(SAVE_USER_PROFILE_IMAGE);
 
+  // const handleUploadUserProfileImageEvent = useCallback(
+  //   async (event: any) => {
+  //     const ufile = await parseFileUploadEvent(event);
+
+  //     if (ufile != null) {
+  //       const result = await saveUserProfileImage({
+  //         variables: {
+  //           base64File: ufile.data,
+  //           fileName: ufile.name,
+  //           userId: sessionData?.profile?.sub,
+  //         },
+  //       });
+  //       const userProfileImage = result.data?.saveUserProfileImage?.google_link;
+  //       if (userProfileImage != null) {
+  //         setValue('picture', userProfileImage);
+  //         handleSubmit(onSubmit);
+  //       }
+  //     }
+  //   },
+  //   [
+  //     sessionData?.profile?.sub,
+  //     saveUserProfileImage,
+  //     updateUser,
+  //     refetchUser,
+  //     handleSubmit,
+  //     onSubmit,
+  //     setValue,
+  //   ]
+  // );
   const handleUploadUserProfileImageEvent = useCallback(
     async (event: any) => {
       const ufile = await parseFileUploadEvent(event);
@@ -277,8 +315,13 @@ const ProfileOverview: FC = () => {
         });
         const userProfileImage = result.data?.saveUserProfileImage?.google_link;
         if (userProfileImage != null) {
-          setValue('picture', userProfileImage);
-          handleSubmit(onSubmit);
+          await updateUserProfilePicture({
+            variables: {
+              userId: sessionData?.profile?.sub,
+              picture: result.data?.saveUserProfileImage?.google_link,
+            },
+          });
+          refetchUser();
         }
       }
     },
@@ -297,59 +340,112 @@ const ProfileOverview: FC = () => {
     <div className="px-3 mt-6">
       {!userLoading && !userError ? (
         <>
+          <label className="text-xs uppercase tracking-widest font-medium text-gray-400">
+            {t('profile-picture')}
+          </label>
+          <div className="bg-white h-40 justify-center mb-6 w-40">
+            <IconButton onClick={handleImageUploadClick}>
+              <MdUpload size="0.75em" />
+            </IconButton>
+            {userData.picture != null && (
+              // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+              // <img width="100px" height="100px" src={userData.picture} />
+              <img src={userData.picture} />
+            )}
+          </div>
+          <input
+            ref={imageUploadRef}
+            onChange={handleUploadUserProfileImageEvent}
+            className="hidden"
+            type="file"
+          />
+
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <FormFieldRow label={t('first-name')} name="firstName" required />
-              <FormFieldRow label={t('last-name')} name="lastName" required />
-              <FormFieldRow
-                label={t('email')}
-                name="email"
-                placeholder="name@example.com"
-                required
-                type="email"
-              />
-              <FormFieldRow
-                label={t('status')}
-                name="employment"
-                type="select"
-                options={employmentSelectFormOptions}
-              />
-              <FormFieldRow
-                label={t('university')}
-                name="university"
-                type="select"
-                options={universitySelectFormOptions}
-              />
-              <FormFieldRow
-                label={t('matriculation-number')}
-                name="matriculationNumber"
-              />
-              <FormFieldRow
-                label={t('external-profile')}
-                name="externalProfile"
-              />
-              <FormFieldRow name="picture" type="file" />
+              <div className="flex flex-wrap">
+                <div className="w-1/2 pr-3">
+                  <FormFieldRow
+                    label={t('first-name')}
+                    name="firstName"
+                    required
+                  />
+                </div>
+                <div className="w-1/2 pl-3">
+                  <FormFieldRow
+                    label={t('last-name')}
+                    name="lastName"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="flex flex-wrap">
+                <div className="w-1/2 pr-3">
+                  <FormFieldRow
+                    label={t('email')}
+                    name="email"
+                    placeholder="name@example.com"
+                    required
+                    type="email"
+                    className="w-1/2 pr-3"
+                  />
+                </div>
+                <div className="w-1/2 pl-3">
+                  <FormFieldRow
+                    label={t('status')}
+                    name="employment"
+                    type="select"
+                    options={employmentSelectFormOptions}
+                  />
+                </div>
+              </div>
+              <div className="flex flex-wrap">
+                <div className="w-1/2 pr-3">
+                  <FormFieldRow
+                    label={t('university')}
+                    name="university"
+                    type="select"
+                    options={universitySelectFormOptions}
+                  />
+                </div>
+                <div className="w-1/2 pl-3">
+                  <FormFieldRow
+                    label={t('matriculation-number')}
+                    name="matriculationNumber"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-wrap">
+                <div className="w-1/2 pr-3">
+                  <FormFieldRow
+                    label={t('external-profile')}
+                    name="externalProfile"
+                  />
+                </div>
+                <div className="w-1/2 pr-3 flex justify-center items-center">
+                  <Button
+                    as="a"
+                    href={`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/login-actions/reset-credentials?client_id=account-console`}
+                    target="_blank"
+                    filled
+                    inverted
+                  >
+                    {t('change-password')}
+                  </Button>
+                </div>
+              </div>
+              {/* <FormFieldRow name="picture" type="file" /> */}
               <Button
                 as="button"
                 type="submit"
                 disabled={isSubmitting}
                 filled
                 inverted
-                className="block mx-auto mb-5 disabled:bg-slate-500"
+                className="mt-8 block mx-auto mb-5 disabled:bg-slate-500"
               >
-                {isSubmitting ? 'speichert...' : 'speichern'}
+                {isSubmitting ? t('saving') : t('save')}
               </Button>
             </form>
           </FormProvider>
-          <Button
-            as="a"
-            href={`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/login-actions/reset-credentials?client_id=account-console`}
-            target="_blank"
-            filled
-            inverted
-          >
-            {t('change-password')}
-          </Button>
         </>
       ) : (
         <div>Loading</div>
