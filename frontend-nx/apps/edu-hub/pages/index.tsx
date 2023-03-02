@@ -22,6 +22,7 @@ import {
   useIsInstructor,
   useIsAdmin,
 } from '../hooks/authentication';
+import { useUserId } from '../hooks/user';
 import { CourseGroupOptions } from '../queries/__generated__/CourseGroupOptions';
 import { CourseList } from '../queries/__generated__/CourseList';
 import { CourseListWithEnrollments } from '../queries/__generated__/CourseListWithEnrollments';
@@ -37,6 +38,7 @@ const Home: FC = () => {
   const isLoggedIn = useIsLoggedIn();
   const isInstructor = useIsInstructor();
   const isAdmin = useIsAdmin();
+  const userId = useUserId();
 
   // (My) Admin Courses
   const { data: adminCourses, error: adminCoursesError } =
@@ -49,8 +51,10 @@ const Home: FC = () => {
   }
   console.log('Request Admin courses:', adminCourses);
   const myAdminCourses =
-    adminCourses?.Course?.filter(
-      (course) => course.CourseInstructors.length > 0
+    adminCourses?.Course?.filter((course) =>
+      course.CourseInstructors.find(
+        (instructor) => instructor.Expert.User.id === userId
+      )
     ) ?? [];
 
   // (My) Enrolled Courses
@@ -149,20 +153,6 @@ const Home: FC = () => {
                 )}
               </>
             )}
-            {/* </OnlyLoggedIn> */}
-
-            {/* ##################################################### */}
-            {/* This Slider is only temporairly included for testing and must be removed later */}
-            {/* <h2
-              id={`allCourses`}
-              className="text-2xl font-semibold text-left mt-20 ml-3 md:ml-0"
-            >
-              {'All Courses'}
-            </h2>
-            <div className="mt-2">
-              <TileSlider courses={publishedCourses} />
-            </div> */}
-            {/* ##################################################### */}
 
             {coursesGroups.map((group, index) =>
               group.courses.length > 0 ? (
@@ -179,7 +169,7 @@ const Home: FC = () => {
                 </>
               ) : null
             )}
-            <OnlyLoggedOut>
+            {/* <OnlyLoggedOut>
               <div className="flex flex-col sm:flex-row mx-6 mt-6 mb-24 sm:mt-48">
                 <div className="flex flex-1 flex-col sm:items-center">
                   <div>
@@ -196,7 +186,7 @@ const Home: FC = () => {
                   </div>
                 </div>
               </div>
-            </OnlyLoggedOut>
+            </OnlyLoggedOut> */}
           </ClientOnly>
         </div>
       </Page>

@@ -5,7 +5,7 @@ import { MdAddCircle } from 'react-icons/md';
 import {
   identityEventMapper,
   pickIdPkMapper,
-  useAdminMutation,
+  useInstructorMutation,
   useDeleteCallback,
   useUpdateCallback2,
 } from '../../hooks/authedMutation';
@@ -74,11 +74,11 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     return result;
   }, [course]);
 
-  const [insertSessionMutation] = useAdminMutation<
+  const [insertSessionMutation] = useInstructorMutation<
     InsertCourseSession,
     InsertCourseSessionVariables
   >(INSERT_NEW_SESSION);
-  const [insertSessionLocationMutation] = useAdminMutation<
+  const [insertSessionLocationMutation] = useInstructorMutation<
     InsertSessionLocation,
     InsertSessionLocationVariables
   >(INSERT_NEW_SESSION_LOCATION);
@@ -193,8 +193,12 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
 
   return (
     <div>
-      <div className="flex justify-end mb-4">
-        <Button onClick={insertSession} startIcon={<MdAddCircle />}>
+      <div className="flex justify-start mb-4 text-white">
+        <Button
+          onClick={insertSession}
+          startIcon={<MdAddCircle />}
+          color="inherit"
+        >
           {t('course-page:add-session')}
         </Button>
       </div>
@@ -230,11 +234,15 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         />
       ))}
 
-      <div className="flex justify-end mt-4 mb-4">
-        <Button onClick={insertSession} startIcon={<MdAddCircle />}>
+      {/* <div className="flex justify-end mt-4 mb-4 text-white">
+        <Button
+          onClick={insertSession}
+          startIcon={<MdAddCircle />}
+          color="inherit"
+        >
           {t('course-page:add-session')}
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 };

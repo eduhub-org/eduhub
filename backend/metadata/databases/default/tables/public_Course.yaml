@@ -85,6 +85,41 @@ select_permissions:
         - title
         - weekDay
       filter: {}
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - created_at
+        - updated_at
+        - learningGoals
+        - cost
+        - contentDescriptionField1
+        - contentDescriptionField2
+        - published
+        - headingDescriptionField1
+        - headingDescriptionField2
+        - programId
+        - achievementCertificatePossible
+        - attendanceCertificatePossible
+        - applicationEnd
+        - tagline
+        - status
+        - coverImage
+        - weekDay
+        - language
+        - chatLink
+        - maxMissedSessions
+        - ects
+        - maxParticipants
+        - endTime
+        - startTime
+        - title
+      filter:
+        CourseInstructors:
+          Expert:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
   - role: user_access
     permission:
       columns:

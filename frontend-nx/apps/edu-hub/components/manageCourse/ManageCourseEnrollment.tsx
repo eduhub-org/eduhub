@@ -3,6 +3,8 @@ import { ACHIEVEMENT_OPTION_COURSES } from '../../queries/achievementOption';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
 import { FC, useCallback, useState } from 'react';
+import { useIsAdmin } from '../../hooks/authentication';
+
 import {
   MdAddCircle,
   MdKeyboardArrowDown,
@@ -160,39 +162,54 @@ const EnrollmentList: FC<IPropsEnrollmentList> = ({ course, qResult }) => {
   );
   const sessions = [...(course.Sessions || [])];
 
+  const isAdmin = useIsAdmin();
+  console.log('EnrollmentList length: ', EnrollmentList.toString);
+
   return (
-    <div className="overflow-x-auto transition-[height] w-full pb-10">
-      <table className="w-full">
-        <thead>
-          <tr className="focus:outline-none h-16 ">
-            {tableHeaders.map((component) => {
-              return (
-                <th key={component.key} className="py-2 px-5">
-                  <p className="flex justify-start font-medium text-gray-400 uppercase">
-                    {component.label}
-                  </p>
-                </th>
-              );
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          {enrollmentList.map((ce) => (
-            <OneCourseEnrollmentRow
-              key={ce.id}
-              enrollment={ce}
-              sessions={sessions}
-              userId={ce.User.id}
-              qResult={qResult}
-              maxMissedSessions={course.maxMissedSessions}
-            />
-          ))}
-        </tbody>
-      </table>
-      <div className="flex justify-end mt-10">
-        <Button filled={true}>{t('course-page:certificate-generation')}</Button>
-      </div>
-    </div>
+    <>
+      {enrollmentList.length > 0 ? (
+        <div className="overflow-x-auto transition-[height] w-full pb-10">
+          <table className="w-full">
+            <thead>
+              <tr className="focus:outline-none h-16 ">
+                {tableHeaders.map((component) => {
+                  return (
+                    <th key={component.key} className="py-2 px-5">
+                      <p className="flex justify-start font-medium text-gray-400 uppercase">
+                        {component.label}
+                      </p>
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {enrollmentList.map((ce) => (
+                <OneCourseEnrollmentRow
+                  key={ce.id}
+                  enrollment={ce}
+                  sessions={sessions}
+                  userId={ce.User.id}
+                  qResult={qResult}
+                  maxMissedSessions={course.maxMissedSessions}
+                />
+              ))}
+            </tbody>
+          </table>
+          {isAdmin && (
+            <div className="flex justify-end mt-10">
+              <Button filled inverted>
+                {t('course-page:certificate-generation')}
+              </Button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <p className="m-auto text-center mb-14 text-gray-400">
+          {t('course-page:no-enrollments-present')}
+        </p>
+      )}
+    </>
   );
 };
 
