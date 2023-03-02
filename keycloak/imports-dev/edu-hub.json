@@ -745,7 +745,7 @@
       "saml.assertion.signature" : "false",
       "client.secret.creation.time" : "1671008120",
       "saml.encrypt" : "false",
-      "login_theme" : "opencampus",
+      "login_theme" : "edu-hub",
       "saml.server.signature" : "false",
       "exclude.session.state.from.auth.response" : "false",
       "tls-client-certificate-bound-access-tokens" : "false",
