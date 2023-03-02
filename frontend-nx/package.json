@@ -33,6 +33,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.0",
     "react-icons": "^4.4.0",
+    "react-markdown": "^8.0.5",
     "react-select": "^5.4.0",
     "regenerator-runtime": "0.13.7",
     "swiper": "^9.0.5",
