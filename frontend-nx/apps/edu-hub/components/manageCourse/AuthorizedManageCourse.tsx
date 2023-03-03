@@ -27,7 +27,7 @@ interface Props {
 }
 
 const determineMaxAllowedTab = (courseStatus: CourseStatus_enum) => {
-  let maxAllowedTab = 4;
+  const maxAllowedTab = 4;
   // switch (courseStatus) {
   //   case CourseStatus_enum.READY_FOR_PUBLICATION:
   //     maxAllowedTab = 1;
@@ -156,8 +156,6 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
   const openTab0 = useCallback(() => {
     if (maxAllowedTab >= 0) {
       setOpenTabIndex(0);
-    } else {
-      handleRequestUpgradeStatus;
     }
   }, [setOpenTabIndex, maxAllowedTab]);
 
