@@ -27,21 +27,21 @@ interface Props {
 }
 
 const determineMaxAllowedTab = (courseStatus: CourseStatus_enum) => {
-  let maxAllowedTab = 0;
-  switch (courseStatus) {
-    case CourseStatus_enum.READY_FOR_PUBLICATION:
-      maxAllowedTab = 1;
-      break;
-    case CourseStatus_enum.READY_FOR_APPLICATION:
-      maxAllowedTab = 2;
-      break;
-    case CourseStatus_enum.APPLICANTS_INVITED:
-      maxAllowedTab = 3;
-      break;
-    case CourseStatus_enum.PARTICIPANTS_RATED:
-      maxAllowedTab = 3;
-      break;
-  }
+  let maxAllowedTab = 4;
+  // switch (courseStatus) {
+  //   case CourseStatus_enum.READY_FOR_PUBLICATION:
+  //     maxAllowedTab = 1;
+  //     break;
+  //   case CourseStatus_enum.READY_FOR_APPLICATION:
+  //     maxAllowedTab = 2;
+  //     break;
+  //   case CourseStatus_enum.APPLICANTS_INVITED:
+  //     maxAllowedTab = 3;
+  //     break;
+  //   case CourseStatus_enum.PARTICIPANTS_RATED:
+  //     maxAllowedTab = 3;
+  //     break;
+  // }
   return maxAllowedTab;
 };
 
@@ -72,11 +72,11 @@ const canUpgradeStatus = (course: ManagedCourse_Course_by_pk) => {
 
   if (course.status === 'DRAFT') {
     return (
-      isFilled(course.learningGoals) &&
-      isFilled(course.headingDescriptionField1) &&
-      isFilled(course.headingDescriptionField2) &&
-      isFilled(course.contentDescriptionField1) &&
-      isFilled(course.contentDescriptionField2) &&
+      // isFilled(course.learningGoals) &&
+      // isFilled(course.headingDescriptionField1) &&
+      // isFilled(course.headingDescriptionField2) &&
+      // isFilled(course.contentDescriptionField1) &&
+      // isFilled(course.contentDescriptionField2) &&
       course.CourseLocations.length > 0
     );
   } else if (course.status === 'READY_FOR_PUBLICATION') {
@@ -152,21 +152,27 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
   );
 
   const [openTabIndex, setOpenTabIndex] = useState(0);
+
   const openTab0 = useCallback(() => {
     if (maxAllowedTab >= 0) {
       setOpenTabIndex(0);
+    } else {
+      handleRequestUpgradeStatus;
     }
   }, [setOpenTabIndex, maxAllowedTab]);
+
   const openTab1 = useCallback(() => {
     if (maxAllowedTab >= 1) {
       setOpenTabIndex(1);
     }
   }, [setOpenTabIndex, maxAllowedTab]);
+
   const openTab2 = useCallback(() => {
     if (maxAllowedTab >= 2) {
       setOpenTabIndex(2);
     }
   }, [setOpenTabIndex, maxAllowedTab]);
+
   const openTab3 = useCallback(() => {
     if (maxAllowedTab >= 3) {
       setOpenTabIndex(3);
@@ -291,7 +297,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
             <ManageCourseEnrollment course={course} qResult={qResult} />
           )}
 
-          {openTabIndex === maxAllowedTab && openTabIndex < 3 && (
+          {/* {openTabIndex === maxAllowedTab && openTabIndex < 3 && (
             <div className="flex justify-end mb-16">
               <OldButton
                 onClick={handleRequestUpgradeStatus}
@@ -299,10 +305,10 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
                 filled
                 inverted
               >
-                {t('next')}
+                {t('course-page:upgrade-status')}
               </OldButton>
             </div>
-          )}
+          )} */}
         </div>
       </PageBlock>
       <QuestionConfirmationDialog
