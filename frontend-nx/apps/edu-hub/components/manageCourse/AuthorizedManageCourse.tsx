@@ -27,7 +27,7 @@ interface Props {
 }
 
 const determineMaxAllowedTab = (courseStatus: CourseStatus_enum) => {
-  let maxAllowedTab = 3;
+  let maxAllowedTab = 4;
   // switch (courseStatus) {
   //   case CourseStatus_enum.READY_FOR_PUBLICATION:
   //     maxAllowedTab = 1;
