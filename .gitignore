@@ -3,6 +3,7 @@
 
 hasura_keycloak.env
 frontend.env
+node_modules
 
 reminder.log
 

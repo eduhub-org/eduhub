@@ -2,12 +2,11 @@ import Fade from '@material-ui/core/Fade';
 import MaterialMenu, { MenuProps } from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
-import { signOut } from 'next-auth/react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
-import { useIsAdmin, useIsInstructor } from '../hooks/authentication';
+import { useIsAdmin} from '../hooks/authentication';
 import useTranslation from 'next-translate/useTranslation';
+import useLogout from '../hooks/logout';
 
 interface IProps {
   anchorElement: HTMLElement;
@@ -43,23 +42,10 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   }, [setVisible]);
 
   const isAdmin = useIsAdmin();
-  // const isInstructor = useIsInstructor();
+
   const { t } = useTranslation();
 
-  const router = useRouter();
-
-  const logout = useCallback(async () => {
-    // Fetch Keycloak Logout URL
-    const res = await fetch('/api/auth/logout');
-    const jsonPayload = await res?.json();
-    const url = JSON.parse(jsonPayload).url;
-
-    // Logging user out client side
-    await signOut({ redirect: false });
-
-    // Logging user out on keycloak and redirecting back to app
-    router.push(url);
-  }, [router]);
+  const logout = useLogout();
 
   return (
     <StyledMenu
