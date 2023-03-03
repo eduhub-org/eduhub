@@ -117,5 +117,6 @@
   "achievementCertificateDownload": "Dein Leistungszertifikat",
   "attendanceCertificateDownload": "Deine Anwesenheitsbescheinigung",
   "congrats-completion": "Herzlich Glückwunsch zum Abschluss des Kurses!",
-  "add-session-address": "Neue Adresse"
+  "add-session-address": "Neue Adresse",
+  "upgrade-status": "Kursstatus erhöhen und zum nächsten Tab wechseln"
 }
