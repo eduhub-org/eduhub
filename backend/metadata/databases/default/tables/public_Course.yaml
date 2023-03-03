@@ -84,7 +84,13 @@ select_permissions:
         - tagline
         - title
         - weekDay
-      filter: {}
+      filter:
+        _and:
+          - Program:
+              published:
+                _eq: true
+          - published:
+              _eq: true
   - role: instructor_access
     permission:
       columns:
