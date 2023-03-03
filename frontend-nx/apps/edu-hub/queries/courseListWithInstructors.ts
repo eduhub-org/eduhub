@@ -11,7 +11,7 @@ export const COURSE_LIST_WITH_INSTRUCTOR = gql`
   ${USER_PROGRAM_FRAGMENT}
   ${COURSE_INSTRUCTOR_FRAGMENT}
   query CourseListWithInstructors {
-    Course {
+    Course (order_by: { id: desc }) {
       ...CourseFragment
       CourseEnrollments {
         ...EnrollmentFragment
