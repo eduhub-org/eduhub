@@ -156,8 +156,6 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
   const openTab0 = useCallback(() => {
     if (maxAllowedTab >= 0) {
       setOpenTabIndex(0);
-    } else {
-      handleRequestUpgradeStatus;
     }
   }, [setOpenTabIndex, maxAllowedTab]);
 
