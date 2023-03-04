@@ -1,15 +1,3 @@
-# Todos
-
-- Rent-a-Scientist hasura access is broken because of the schema changes. I've tried a little to fix it, but could not get it to work. Somehow all the graphql definitions have to be modified for it to access the right schema in the database. Either move back the tables to the public schema or figure out how to correctly modify the GraphQL in rent-a-scientist. I've excluded rent-a-scientist from the apollo rebuild script for now for this reason.
-- Verify the new linter github action, it targets frontend-nx now
-- Fix production builds, especially the broken import path in the serverless functions
-- Make sure nobody has pending pushes that change anything in ./frontend or ./rent-a-scientist, since deleting that will cause ugly merge conflicts
-- Once production builds work: Delete ./frontend, ./rent-a-scientist, remove the old frontend config from the docker-compose.yml file, only leave the new frontend-nx.
-- Remember until this todo has been done there are multiple frontends running:
-- Port 5000 is the new version
-- Port 5001 is the rent-a-scientist frontend
-- Port 5005 serves the old frontend, it is meant to be removed
-
 # EduHub local development
 
 EduHub uses docker-compose to support full local development that does not depend on any external servers or secret database seeds anymore.

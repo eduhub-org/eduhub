@@ -9,7 +9,7 @@ export const COURSE_LIST_WITH_ENROLLMENT = gql`
   ${ENROLLMENT_FRAGMENT}
   ${USER_PROGRAM_FRAGMENT}
   query CourseListWithEnrollments {
-    Course {
+    Course (order_by: { id: desc }) {
       ...CourseFragment
       CourseEnrollments {
         ...EnrollmentFragment
