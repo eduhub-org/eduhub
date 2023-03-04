@@ -29,7 +29,8 @@ const Index: FC = () => {
   return (
     <>
       <Head>
-        <title>{t('coursesPageTitle')}</title>
+        <title>EduHub | opencampus.sh</title>
+        <link rel="icon" href="/favicon.png" />
       </Head>
       <Page>
         <div className="min-h-[77vh]">

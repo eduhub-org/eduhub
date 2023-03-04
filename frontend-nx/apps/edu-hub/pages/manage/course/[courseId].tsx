@@ -1,9 +1,9 @@
-import Head from "next/head";
-import { FC } from "react";
-import { Page } from "../../../components/Page";
-import { useRouter } from "next/router";
-import { useIsInstructor } from "../../../hooks/authentication";
-import { AuthorizedManageCourse } from "../../../components/manageCourse/AuthorizedManageCourse";
+import Head from 'next/head';
+import { FC } from 'react';
+import { Page } from '../../../components/Page';
+import { useRouter } from 'next/router';
+import { useIsInstructor } from '../../../hooks/authentication';
+import { AuthorizedManageCourse } from '../../../components/manageCourse/AuthorizedManageCourse';
 
 // export const getStaticProps = async ({ locale }: { locale: string }) => ({
 //   props: {
@@ -33,8 +33,8 @@ const ManageCoursePage: FC = () => {
   return (
     <>
       <Head>
-        <title>opencampus.sh Edu Hub</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>EduHub | opencampus.sh</title>
+        <link rel="icon" href="/favicon.png" />
       </Head>
       <Page>
         {isInstructor ? (

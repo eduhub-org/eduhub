@@ -41,8 +41,8 @@ const CoursePage: FC = () => {
   return (
     <div>
       <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>EduHub | opencampus.sh</title>
+        <link rel="icon" href="/favicon.png" />
       </Head>
       <Page>
         {isLoggedIn ? (
