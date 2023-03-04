@@ -1,9 +1,12 @@
 import { useQuery } from '@apollo/client';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
+
 
 export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
   const { data } = useSession();
   const accessToken = data?.accessToken;
+  const router = useRouter();
 
   const options = accessToken
     ? {
@@ -19,12 +22,20 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
       }
     : passedOptions;
 
-  return useQuery(query, options);
+  const errorHandler = (error) => {
+    if (error?.response?.errors?.[0]?.extensions?.code === 'invalid-jwt') {
+      router.push('/login'); // Redirect to login page
+    }
+  };
+
+  return useQuery(query, { ...options, onError: errorHandler });
 };
+
 
 export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
   const { data } = useSession();
   const accessToken = data?.accessToken;
+  const router = useRouter();
 
   const options = accessToken
     ? {
@@ -40,12 +51,19 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
       }
     : passedOptions;
 
-  return useQuery(query, options);
-};
+    const errorHandler = (error) => {
+      if (error?.response?.errors?.[0]?.extensions?.code === 'invalid-jwt') {
+        router.push('/login'); // Redirect to login page
+      }
+    };
+  
+    return useQuery(query, { ...options, onError: errorHandler });
+  };
 
 export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
   const { data } = useSession();
   const accessToken = data?.accessToken;
+  const router = useRouter();
 
   const options = accessToken
     ? {
@@ -61,5 +79,11 @@ export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
       }
     : passedOptions;
 
-  return useQuery(query, options);
-};
+    const errorHandler = (error) => {
+      if (error?.response?.errors?.[0]?.extensions?.code === 'invalid-jwt') {
+        router.push('/login'); // Redirect to login page
+      }
+    };
+  
+    return useQuery(query, { ...options, onError: errorHandler });
+  };
