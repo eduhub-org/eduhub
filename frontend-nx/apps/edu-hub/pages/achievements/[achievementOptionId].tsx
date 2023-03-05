@@ -102,13 +102,8 @@ const AchievementOptionDetails: FC = () => {
   return (
     <>
       <Head>
-        <title>
-          {t('achievement-option')}
-          {achievementOption &&
-            achievementOption.title &&
-            ` - ${achievementOption.title}`}
-        </title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>EduHub | opencampus.sh</title>
+        <link rel="icon" href="/favicon.png" />
       </Head>
       <Page>
         <div className="min-h-[77vh]">

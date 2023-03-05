@@ -17,7 +17,8 @@ const Users: FC = () => {
     <>
       <div className="max-w-screen-xl mx-auto">
         <Head>
-          <title>{t('title')}</title>
+          <title>EduHub | opencampus.sh</title>
+          <link rel="icon" href="/favicon.png" />
         </Head>
         <Page>
           <div className="min-h-[77vh]">
