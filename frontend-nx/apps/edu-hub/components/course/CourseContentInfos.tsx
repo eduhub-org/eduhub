@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import checkmark from '../../public/images/course/checkmark.svg';
+import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
 import { Course_Course_by_pk } from '../../queries/__generated__/Course';
 import { useState } from 'react';
@@ -95,17 +96,19 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
       </ul>
       {showAllSessions ? (
         <button
-          className="text-white hover:underline italic"
+          className="text-white hover:underline italic text-sm flex items-center"
           onClick={() => setShowAllSessions(false)}
         >
           {t('course-page:hide-sessions')}
+          <IoIosArrowUp className="ml-1" />
         </button>
       ) : (
         <button
-          className="text-white hover:underline italic"
+          className="text-white hover:underline italic text-sm flex items-center"
           onClick={() => setShowAllSessions(true)}
         >
           {t('course-page:show-all-sessions')}
+          <IoIosArrowDown className="ml-1" />
         </button>
       )}
     </div>
