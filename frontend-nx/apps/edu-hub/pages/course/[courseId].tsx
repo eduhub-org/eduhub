@@ -6,6 +6,8 @@ import { Page } from '../../components/Page';
 import AuthorizedCoursePage from '../../components/course/AuthorizedCoursePage';
 import UnauthorizedCoursePage from '../../components/course/UnauthorizedCoursePage';
 import { useIsLoggedIn } from '../../hooks/authentication';
+import { useIsAdmin, useIsInstructor } from '../../hooks/authentication';
+import { isDataView } from 'util/types';
 
 // export const getStaticProps = async ({ locale }: { locale: string }) => ({
 //   props: {
@@ -38,20 +40,23 @@ const CoursePage: FC = () => {
   const tab =
     typeof tabParam === 'string' ? parseInt(tabParam, 10) : defaultTab;
 
+  const isAdmin = useIsAdmin();
+  const isInstructor = useIsInstructor();
+
   return (
-    <div>
+    <>
       <Head>
         <title>EduHub | opencampus.sh</title>
         <link rel="icon" href="/favicon.png" />
       </Head>
       <Page>
-        {isLoggedIn ? (
+        {isLoggedIn && !isAdmin && !isInstructor ? (
           <AuthorizedCoursePage id={id} tab={tab} />
         ) : (
           <UnauthorizedCoursePage id={id} />
         )}
       </Page>
-    </div>
+    </>
   );
 };
 
