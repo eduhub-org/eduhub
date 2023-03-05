@@ -3,6 +3,8 @@ import useTranslation from 'next-translate/useTranslation';
 import checkmark from '../../public/images/course/checkmark.svg';
 
 import { Course_Course_by_pk } from '../../queries/__generated__/Course';
+import { useState } from 'react';
+import { invert } from 'lodash';
 
 interface IProps {
   course: Course_Course_by_pk;
@@ -10,6 +12,10 @@ interface IProps {
 
 export const CourseContentInfos: FC<IProps> = ({ course }) => {
   const { t, lang } = useTranslation('course-page');
+  const [showAllSessions, setShowAllSessions] = useState(false);
+  const visibleSessions = showAllSessions
+    ? course.Sessions
+    : course.Sessions.slice(0, 4);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -44,7 +50,7 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
         {t('courseContent')}
       </span>
       <ul>
-        {course.Sessions.map(
+        {visibleSessions.map(
           ({ startDateTime, title, SessionAddresses }, index) => (
             <li key={index} className="flex mb-4">
               <div className="flex flex-col flex-shrink-0 mr-6">
@@ -87,6 +93,21 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
           )
         )}
       </ul>
+      {showAllSessions ? (
+        <button
+          className="text-white hover:underline italic"
+          onClick={() => setShowAllSessions(false)}
+        >
+          {t('course-page:hide-sessions')}
+        </button>
+      ) : (
+        <button
+          className="text-white hover:underline italic"
+          onClick={() => setShowAllSessions(true)}
+        >
+          {t('course-page:show-all-sessions')}
+        </button>
+      )}
     </div>
   );
 };
