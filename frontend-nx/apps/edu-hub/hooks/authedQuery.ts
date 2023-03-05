@@ -23,7 +23,7 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
     : passedOptions;
 
   const errorHandler = (error) => {
-    console.log("error: ", error?)
+    console.log("error: ", error)
     if (error?.response?.errors?.[0]?.extensions?.code === 'invalid-jwt') {
       console.log("error code: ", error?.response?.errors?.[0]?.extensions?.code)
       router.push('/login'); // Redirect to login page
@@ -54,7 +54,7 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
     : passedOptions;
 
     const errorHandler = (error) => {
-      console.log("error: ", error?)
+      console.log("error: ", error)
       if (error?.response?.errors?.[0]?.extensions?.code === 'invalid-jwt') {
         console.log("error code: ", error?.response?.errors?.[0]?.extensions?.code)
         router.push('/login'); // Redirect to login page
@@ -84,13 +84,12 @@ export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
     : passedOptions;
 
     const errorHandler = (error) => {
-      console.log("error: ", error?)
+      console.log("error: ", error)
       if (error?.response?.errors?.[0]?.extensions?.code === 'invalid-jwt') {
         console.log("error code: ", error?.response?.errors?.[0]?.extensions?.code)
         router.push('/login'); // Redirect to login page
       }
     };
-    console.log("error code: ", error?.response?.errors?.[0]?.extensions?.code)
   
     return useQuery(query, { ...options, onError: errorHandler });
   };
