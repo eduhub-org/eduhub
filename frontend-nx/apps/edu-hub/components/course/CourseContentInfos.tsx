@@ -75,7 +75,10 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
                         ONLINE
                       </a>
                     ) : (
-                      <>{address} + </> // or use <span>{address} + </span>
+                      <>
+                        {address}
+                        {index !== SessionAddresses.length - 1 && ' + '}
+                      </>
                     )}
                   </span>
                 ))}
