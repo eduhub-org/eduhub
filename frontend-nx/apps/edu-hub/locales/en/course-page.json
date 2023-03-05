@@ -117,5 +117,7 @@
   "achievementCertificateDownload": "Dein Leistungszertifikat",
   "attendanceCertificateDownload": "Deine Anwesenheitsbescheinigung",
   "congrats-completion": "Herzlich Glückwunsch zum Abschluss des Kurses!",
-  "add-session-address": "Neue Adresse"
+  "add-session-address": "Neue Adresse",
+  "show-all-sessions": "Alle Termine anzeigen",
+  "hide-sessions": "Termine einklappen"
 }
