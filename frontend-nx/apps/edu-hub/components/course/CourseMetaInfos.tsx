@@ -58,21 +58,21 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
           {tLanguage(course.language)}
         </span>
       </div>
-      <div className="p-16 justify-start">
+      <div className="mt-16 justify-start">
         {course.CourseInstructors.map((instructor, index) => (
           <div key={`instructor-${index}`} className="flex items-center mb-6">
             <div className="flex flex-shrink-0 items-start mr-4">
               <Image
                 src={instructor.Expert.User.picture || mysteryImg}
                 alt="Image of the course instructor"
-                width={124}
-                height={124}
+                width={100}
+                height={100}
                 className="rounded-full overflow-hidden"
                 objectFit="cover"
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-3xl mb-1">
+              <span className="text-lg mb-1">
                 {instructor.Expert.User.firstName}{' '}
                 {instructor.Expert.User.lastName}
               </span>
