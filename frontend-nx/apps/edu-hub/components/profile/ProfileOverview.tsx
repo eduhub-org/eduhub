@@ -424,7 +424,7 @@ const ProfileOverview: FC = () => {
                 <div className="w-1/2 pr-3 flex justify-center items-center">
                   <Button
                     as="a"
-                    href={`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/login-actions/reset-credentials?client_id=account-console`}
+                    href={`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account`}
                     target="_blank"
                     filled
                     inverted
