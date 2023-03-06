@@ -40,6 +40,10 @@ export interface updateUser_update_User_by_pk {
    * The university the user is attending or workin at (only provided if he is a student or working in academia)
    */
   university: University_enum | null;
+  /**
+   * The user's profile picture
+   */
+  picture: string | null;
 }
 
 export interface updateUser {
@@ -51,11 +55,12 @@ export interface updateUser {
 
 export interface updateUserVariables {
   userId: any;
-  firstName: string;
-  lastName: string;
-  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  email?: string | null;
   matriculationNumber?: string | null;
   university?: University_enum | null;
   externalProfile?: string | null;
   employment?: Employment_enum | null;
+  picture?: string | null;
 }
