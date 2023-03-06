@@ -202,10 +202,10 @@ const ProfileOverview: FC = () => {
   const [updateUser] = useAuthedMutation<updateUser, updateUserVariables>(
     UPDATE_USER
   );
-  const [updateUserProfilePicture] = useAuthedMutation<
-    updateUserProfilePicture,
-    updateUserProfilePictureVariables
-  >(UPDATE_USER_PROFILE_PICTURE);
+  // const [updateUserProfilePicture] = useAuthedMutation<
+  //   updateUserProfilePicture,
+  //   updateUserProfilePictureVariables
+  // >(UPDATE_USER_PROFILE_PICTURE);
 
   const accessToken = sessionData?.accessToken;
 
@@ -305,46 +305,46 @@ const ProfileOverview: FC = () => {
   //     setValue,
   //   ]
   // );
-  const handleUploadUserProfileImageEvent = useCallback(
-    async (event: any) => {
-      const ufile = await parseFileUploadEvent(event);
+  // const handleUploadUserProfileImageEvent = useCallback(
+  //   async (event: any) => {
+  //     const ufile = await parseFileUploadEvent(event);
 
-      if (ufile != null) {
-        const result = await saveUserProfileImage({
-          variables: {
-            base64File: ufile.data,
-            fileName: ufile.name,
-            userId: sessionData?.profile?.sub,
-          },
-        });
-        const userProfileImage = result.data?.saveUserProfileImage?.google_link;
-        if (userProfileImage != null) {
-          await updateUserProfilePicture({
-            variables: {
-              userId: sessionData?.profile?.sub,
-              picture: result.data?.saveUserProfileImage?.google_link,
-            },
-          });
-          refetchUser();
-        }
-      }
-    },
-    [
-      sessionData?.profile?.sub,
-      saveUserProfileImage,
-      updateUser,
-      refetchUser,
-      handleSubmit,
-      onSubmit,
-      setValue,
-    ]
-  );
+  //     if (ufile != null) {
+  //       const result = await saveUserProfileImage({
+  //         variables: {
+  //           base64File: ufile.data,
+  //           fileName: ufile.name,
+  //           userId: sessionData?.profile?.sub,
+  //         },
+  //       });
+  //       const userProfileImage = result.data?.saveUserProfileImage?.google_link;
+  //       if (userProfileImage != null) {
+  //         await updateUserProfilePicture({
+  //           variables: {
+  //             userId: sessionData?.profile?.sub,
+  //             picture: result.data?.saveUserProfileImage?.google_link,
+  //           },
+  //         });
+  //         refetchUser();
+  //       }
+  //     }
+  //   },
+  //   [
+  //     sessionData?.profile?.sub,
+  //     saveUserProfileImage,
+  //     updateUser,
+  //     refetchUser,
+  //     handleSubmit,
+  //     onSubmit,
+  //     setValue,
+  //   ]
+  // );
 
   return (
     <div className="px-3 mt-6">
       {!userLoading && !userError ? (
         <>
-          <label className="text-xs uppercase tracking-widest font-medium text-gray-400">
+          {/* <label className="text-xs uppercase tracking-widest font-medium text-gray-400">
             {t('profile-picture')}
           </label>
           <div className="bg-white h-40 justify-center mb-6 w-40">
@@ -362,7 +362,7 @@ const ProfileOverview: FC = () => {
             onChange={handleUploadUserProfileImageEvent}
             className="hidden"
             type="file"
-          />
+          /> */}
 
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
