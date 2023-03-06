@@ -249,89 +249,56 @@ const ProfileOverview: FC = () => {
         <>
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="flex flex-wrap">
-                <div className="w-1/2 pr-3">
-                  <FormFieldRow
-                    label={t('first-name')}
-                    name="firstName"
-                    required
-                  />
-                </div>
-                <div className="w-1/2 pl-3">
-                  <FormFieldRow
-                    label={t('last-name')}
-                    name="lastName"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="flex flex-wrap">
-                <div className="w-1/2 pr-3">
-                  <FormFieldRow
-                    label={t('email')}
-                    name="email"
-                    placeholder="name@example.com"
-                    required
-                    type="email"
-                  />
-                </div>
-                <div className="w-1/2 pl-3">
-                  <FormFieldRow
-                    label={t('status')}
-                    name="employment"
-                    type="select"
-                    options={employmentSelectFormOptions}
-                  />
-                </div>
-              </div>
-              <div className="flex flex-wrap">
-                <div className="w-1/2 pr-3">
-                  <FormFieldRow
-                    label={t('university')}
-                    name="university"
-                    type="select"
-                    options={universitySelectFormOptions}
-                  />
-                </div>
-                <div className="w-1/2 pl-3">
-                  <FormFieldRow
-                    label={t('matriculation-number')}
-                    name="matriculationNumber"
-                  />
-                </div>
-              </div>
-              <div className="flex flex-wrap">
-                <div className="w-1/2 pr-3">
-                  <FormFieldRow
-                    label={t('external-profile')}
-                    name="externalProfile"
-                  />
-                </div>
-              </div>
-              {/* <FormFieldRow name="picture" type="file" /> */}
+              <FormFieldRow label={t('first-name')} name="firstName" required />
+              <FormFieldRow label={t('last-name')} name="lastName" required />
+              <FormFieldRow
+                label={t('email')}
+                name="email"
+                placeholder="name@example.com"
+                required
+                type="email"
+              />
+              <FormFieldRow
+                label={t('status')}
+                name="employment"
+                type="select"
+                options={employmentSelectFormOptions}
+              />
+              <FormFieldRow
+                label={t('university')}
+                name="university"
+                type="select"
+                options={universitySelectFormOptions}
+              />
+              <FormFieldRow
+                label={t('matriculation-number')}
+                name="matriculationNumber"
+              />
+              <FormFieldRow
+                label={t('external-profile')}
+                name="externalProfile"
+              />
               <Button
                 as="button"
                 type="submit"
                 disabled={isSubmitting}
                 filled
                 inverted
-                className="mt-8 block mx-auto mb-5 disabled:bg-slate-500"
+                className="block mx-auto mb-5 disabled:bg-slate-500"
               >
                 {isSubmitting ? t('saving') : t('save')}
               </Button>
             </form>
           </FormProvider>
-          <div className="w-1/2 pr-3 flex justify-center items-center">
-            {/* <Button
-              as="a"
-              href={`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account`}
-              target="_blank"
-              filled
-              inverted
-            >
-              {t('change-password')}
-            </Button> */}
-          </div>
+          <Button
+            as="a"
+            href={`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account`}
+            target="_blank"
+            filled
+            inverted
+          >
+            {t('change-password')}
+          </Button>
         </>
       ) : (
         <div>Loading</div>
