@@ -49,6 +49,7 @@ export const UPDATE_USER_PROFILE_PICTURE = gql`
         picture: $picture
       }
     ) {
+      id
       picture
     }
   }

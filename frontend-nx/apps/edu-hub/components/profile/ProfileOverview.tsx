@@ -35,6 +35,10 @@ import {
   updateUserVariables,
   updateUser,
 } from '../../queries/__generated__/updateUser';
+import {
+  updateUserProfilePictureVariables,
+  updateUserProfilePicture,
+} from '../../queries/__generated__/updateUserProfilePicture';
 import { University_enum } from '../../__generated__/globalTypes';
 import { Employment_enum } from '../../__generated__/globalTypes';
 
@@ -199,8 +203,8 @@ const ProfileOverview: FC = () => {
     UPDATE_USER
   );
   const [updateUserProfilePicture] = useAuthedMutation<
-    updateUser,
-    updateUserVariables
+    updateUserProfilePicture,
+    updateUserProfilePictureVariables
   >(UPDATE_USER_PROFILE_PICTURE);
 
   const accessToken = sessionData?.accessToken;
