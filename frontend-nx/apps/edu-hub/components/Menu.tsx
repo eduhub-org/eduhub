@@ -4,7 +4,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
 import Link from 'next/link';
 import { FC, useCallback } from 'react';
-import { useIsAdmin} from '../hooks/authentication';
+import { useIsAdmin } from '../hooks/authentication';
 import useTranslation from 'next-translate/useTranslation';
 import useLogout from '../hooks/logout';
 
@@ -60,6 +60,12 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       <MenuItem onClick={closeMenu}>
         <Link href="/profile" passHref>
           <a className="w-full text-lg">{t('menu-profile')}</a>
+        </Link>
+      </MenuItem>
+
+      <MenuItem onClick={closeMenu}>
+        <Link href="https://opencampus.gitbook.io/faq/" passHref>
+          <a className="w-full text-lg">{t('menu-faq')}</a>
         </Link>
       </MenuItem>
 
