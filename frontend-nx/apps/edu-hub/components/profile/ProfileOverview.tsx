@@ -156,12 +156,14 @@ const ProfileOverview: FC = () => {
     handleSubmit,
     formState: { isSubmitting, isSubmitted, isSubmitSuccessful },
     reset,
+    setValue,
   } = methods;
 
   const {
     data: userData,
     loading: userLoading,
     error: userError,
+    refetch: refetchUser,
   } = useAuthedQuery(USER, {
     variables: {
       userId: sessionData?.profile?.sub,
@@ -185,6 +187,10 @@ const ProfileOverview: FC = () => {
   const [updateUser] = useAuthedMutation<updateUser, updateUserVariables>(
     UPDATE_USER
   );
+  const [updateUserProfilePicture] = useAuthedMutation<
+    updateUserProfilePicture,
+    updateUserProfilePictureVariables
+  >(UPDATE_USER_PROFILE_PICTURE);
 
   const accessToken = sessionData?.accessToken;
 
@@ -243,10 +249,75 @@ const ProfileOverview: FC = () => {
     value: key,
   }));
 
+  const imageUploadRef: MutableRefObject<any> = useRef(null);
+  const handleImageUploadClick = useCallback(() => {
+    imageUploadRef.current?.click();
+  }, [imageUploadRef]);
+
+  const [saveUserProfileImage] = useAuthedMutation<
+    SaveUserProfileImage,
+    SaveUserProfileImageVariables
+  >(SAVE_USER_PROFILE_IMAGE);
+
+  const handleUploadUserProfileImageEvent = useCallback(
+    async (event: any) => {
+      const ufile = await parseFileUploadEvent(event);
+
+      if (ufile != null) {
+        const result = await saveUserProfileImage({
+          variables: {
+            base64File: ufile.data,
+            fileName: ufile.name,
+            userId: sessionData?.profile?.sub,
+          },
+        });
+        const userProfileImage = result.data?.saveUserProfileImage?.google_link;
+        if (userProfileImage != null) {
+          await updateUserProfilePicture({
+            variables: {
+              userId: sessionData?.profile?.sub,
+              picture: result.data?.saveUserProfileImage?.google_link,
+            },
+          });
+          refetchUser();
+        }
+      }
+    },
+    [
+      sessionData?.profile?.sub,
+      saveUserProfileImage,
+      updateUser,
+      refetchUser,
+      handleSubmit,
+      onSubmit,
+      setValue,
+    ]
+  );
+
   return (
     <div className="px-3 mt-6">
       {!userLoading && !userError ? (
         <>
+          <label className="text-xs uppercase tracking-widest font-medium text-gray-400">
+            {t('profile-picture')}
+          </label>
+          <div className="bg-white h-40 justify-center mb-6 w-40">
+            <IconButton onClick={handleImageUploadClick}>
+              <MdUpload size="0.75em" />
+            </IconButton>
+            {userData.picture != null && (
+              // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+              // <img width="100px" height="100px" src={userData.picture} />
+              <img src={userData.picture} />
+            )}
+          </div>
+          <input
+            ref={imageUploadRef}
+            onChange={handleUploadUserProfileImageEvent}
+            className="hidden"
+            type="file"
+          />
+
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
               <FormFieldRow label={t('first-name')} name="firstName" required />
