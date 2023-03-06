@@ -307,17 +307,6 @@ const ProfileOverview: FC = () => {
                     name="externalProfile"
                   />
                 </div>
-                <div className="w-1/2 pr-3 flex justify-center items-center">
-                  <Button
-                    as="a"
-                    href={`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account`}
-                    target="_blank"
-                    filled
-                    inverted
-                  >
-                    {t('change-password')}
-                  </Button>
-                </div>
               </div>
               {/* <FormFieldRow name="picture" type="file" /> */}
               <Button
@@ -332,6 +321,17 @@ const ProfileOverview: FC = () => {
               </Button>
             </form>
           </FormProvider>
+          <div className="w-1/2 pr-3 flex justify-center items-center">
+            {/* <Button
+              as="a"
+              href={`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account`}
+              target="_blank"
+              filled
+              inverted
+            >
+              {t('change-password')}
+            </Button> */}
+          </div>
         </>
       ) : (
         <div>Loading</div>
