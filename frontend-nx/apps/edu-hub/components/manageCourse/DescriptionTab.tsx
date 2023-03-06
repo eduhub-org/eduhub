@@ -366,14 +366,14 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       <div className="grid grid-cols-2 text-gray-400">
         <div className="mr-3 ml-3">{`${t(
           'course-page:title-info-block'
-        )} 1 (${t('course-page:max-n-characters', { n: 50 })})`}</div>
+        )} 1 (${t('course-page:max-n-characters', { n: 200 })})`}</div>
         <div className="mr-3 ml-3">{`${t(
           'course-page:title-info-block'
-        )} 2 (${t('course-page:max-n-characters', { n: 50 })})`}</div>
+        )} 2 (${t('course-page:max-n-characters', { n: 200 })})`}</div>
       </div>
       <div className="grid grid-cols-2 mb-8">
         <DebounceInput
-          maxLength={50}
+          maxLength={200}
           debounceTimeout={1000}
           className="h-8 mr-3 ml-3 bg-edu-light-gray"
           onChange={updateHeading1}
@@ -381,7 +381,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         />
 
         <DebounceInput
-          maxLength={50}
+          maxLength={200}
           debounceTimeout={1000}
           className="h-8 mr-3 ml-3 bg-edu-light-gray"
           onChange={updateHeading2}
