@@ -353,8 +353,8 @@ const ProfileOverview: FC = () => {
             </IconButton>
             {userData.picture != null && (
               // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-              // <img width="100px" height="100px" src={userData.picture} />
-              <img src={userData.picture} />
+              <img width="100px" height="100px" src={userData.picture} />
+              // <img src={userData.picture} />
             )}
           </div>
           <input
