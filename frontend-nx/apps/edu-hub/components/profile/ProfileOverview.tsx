@@ -15,7 +15,10 @@ import { UPDATE_USER } from '../../queries/updateUser';
 import { USER } from '../../queries/user';
 import useTranslation from 'next-translate/useTranslation';
 
-import { updateUserVariables, updateUser } from '../../queries/__generated__/updateUser';
+import {
+  updateUserVariables,
+  updateUser,
+} from '../../queries/__generated__/updateUser';
 import { University_enum } from '../../__generated__/globalTypes';
 import { Employment_enum } from '../../__generated__/globalTypes';
 
@@ -159,7 +162,9 @@ const ProfileOverview: FC = () => {
     skip: !sessionData,
   });
 
-  const [updateUser] = useAuthedMutation<updateUser, updateUserVariables>(UPDATE_USER);
+  const [updateUser] = useAuthedMutation<updateUser, updateUserVariables>(
+    UPDATE_USER
+  );
 
   const accessToken = sessionData?.accessToken;
 

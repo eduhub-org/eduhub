@@ -23,7 +23,9 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
     : passedOptions;
 
   const errorHandler = (error) => {
+    console.log("error code: ", error?.response?.errors?.[0]?.extensions?.code)
     if (error?.response?.errors?.[0]?.extensions?.code === 'invalid-jwt') {
+      console.log("redirect login erreicht")
       router.push('/login'); // Redirect to login page
     }
   };
@@ -52,11 +54,13 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
     : passedOptions;
 
     const errorHandler = (error) => {
+      console.log("error code: ", error?.response?.errors?.[0]?.extensions?.code)
       if (error?.response?.errors?.[0]?.extensions?.code === 'invalid-jwt') {
+        console.log("redirect login erreicht")
         router.push('/login'); // Redirect to login page
       }
     };
-  
+    
     return useQuery(query, { ...options, onError: errorHandler });
   };
 
@@ -80,10 +84,12 @@ export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
     : passedOptions;
 
     const errorHandler = (error) => {
+      console.log("error code: ", error?.response?.errors?.[0]?.extensions?.code)
       if (error?.response?.errors?.[0]?.extensions?.code === 'invalid-jwt') {
+        console.log("redirect login erreicht")
         router.push('/login'); // Redirect to login page
       }
     };
-  
+    
     return useQuery(query, { ...options, onError: errorHandler });
   };
