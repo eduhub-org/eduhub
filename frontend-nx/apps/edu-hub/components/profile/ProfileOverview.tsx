@@ -35,6 +35,10 @@ import {
   updateUserVariables,
   updateUser,
 } from '../../queries/__generated__/updateUser';
+import {
+  updateUserProfilePictureVariables,
+  updateUserProfilePicture,
+} from '../../queries/__generated__/updateUserProfilePicture';
 import { University_enum } from '../../__generated__/globalTypes';
 import { Employment_enum } from '../../__generated__/globalTypes';
 
@@ -199,8 +203,8 @@ const ProfileOverview: FC = () => {
     UPDATE_USER
   );
   const [updateUserProfilePicture] = useAuthedMutation<
-    updateUser,
-    updateUserVariables
+    updateUserProfilePicture,
+    updateUserProfilePictureVariables
   >(UPDATE_USER_PROFILE_PICTURE);
 
   const accessToken = sessionData?.accessToken;
@@ -424,7 +428,7 @@ const ProfileOverview: FC = () => {
                 <div className="w-1/2 pr-3 flex justify-center items-center">
                   <Button
                     as="a"
-                    href={`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/login-actions/reset-credentials?client_id=account-console`}
+                    href={`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account`}
                     target="_blank"
                     filled
                     inverted

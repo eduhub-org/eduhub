@@ -9,6 +9,7 @@
 
 export interface updateUserProfilePicture_update_User_by_pk {
   __typename: "User";
+  id: any;
   /**
    * The user's profile picture
    */
