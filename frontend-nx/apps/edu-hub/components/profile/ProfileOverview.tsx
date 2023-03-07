@@ -35,6 +35,10 @@ import {
   updateUserVariables,
   updateUser,
 } from '../../queries/__generated__/updateUser';
+import {
+  updateUserProfilePictureVariables,
+  updateUserProfilePicture,
+} from '../../queries/__generated__/updateUserProfilePicture';
 import { University_enum } from '../../__generated__/globalTypes';
 import { Employment_enum } from '../../__generated__/globalTypes';
 
@@ -199,8 +203,8 @@ const ProfileOverview: FC = () => {
     UPDATE_USER
   );
   const [updateUserProfilePicture] = useAuthedMutation<
-    updateUser,
-    updateUserVariables
+    updateUserProfilePicture,
+    updateUserProfilePictureVariables
   >(UPDATE_USER_PROFILE_PICTURE);
 
   const accessToken = sessionData?.accessToken;
@@ -349,8 +353,8 @@ const ProfileOverview: FC = () => {
             </IconButton>
             {userData.picture != null && (
               // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-              // <img width="100px" height="100px" src={userData.picture} />
-              <img src={userData.picture} />
+              <img width="100px" height="100px" src={userData.picture} />
+              // <img src={userData.picture} />
             )}
           </div>
           <input
