@@ -19,8 +19,11 @@ exports.saveCourseImage = async (req, res) => {
 
     const path = `public/courseid_${courseid}/cover_image/${filename}`;
     
+    const nameparts = filename.split(".");
+    const filenamesmall = nameparts[0] + "-325." + nameparts[1];
+    
     //test for resizing with imagemagick
-    /* const pathsmall = `public/courseid_${courseid}/cover_image/small_${filename}`;
+     const pathsmall = `public/courseid_${courseid}/cover_image/${filenamesmall}`;
     
     fs.writeFile(filename, content, 'base64', function(err) {
       console.log(err);
@@ -28,17 +31,24 @@ exports.saveCourseImage = async (req, res) => {
     
     im.resize({
       srcPath: filename,
-      dstPath: 'small-' + filename,
-      width:   256
+      dstPath: filenamesmall,
+      width:   325
     }, function(err, stdout, stderr){
       if (err) throw err;
     });
-    */
+    
     
     const link = await storage.saveToBucket(
       path,
       req.headers.bucket,
       content,
+      isPublic
+    );
+    
+    const link_325 = await storage.saveToBucket(
+      pathsmall,
+      req.headers.bucket,
+      fs.readFileSync(filenamesmall , {encoding: 'base64'}),
       isPublic
     );
     
