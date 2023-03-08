@@ -4,7 +4,7 @@
   "requirements": "Anforderungen",
   "motivationalText": "Motivationsschreiben",
   "motivationalTextPlaceholder": "Schreibe was an dir so geil ist",
-  "sendApplication": "Bewerbung abschicken",
+  "sendApplication": "abschicken",
   "status": {
     "aborted": "Du hast den Kurs leider nicht erfolgreich abgeschlossen.",
     "applied": "Wir begutachten noch deine Bewerbung. Spätestens zum Bewerbungschluss benachrichtigen wir dich, ob du zugelassen wurdest.",

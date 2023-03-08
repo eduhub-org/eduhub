@@ -31,7 +31,7 @@ const SearchBox: FC<IProps> = ({
           <MdSearch size={26} />
         </button>
         <DebounceInput
-          className="px-4 py-2 focus:outline-none"
+          className="px-4 py-2 focus:outline-none text-black"
           debounceTimeout={debounceTime ?? 1000}
           value={searchText ?? ''}
           onChange={onChange}

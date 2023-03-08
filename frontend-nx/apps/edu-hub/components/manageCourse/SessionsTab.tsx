@@ -1,6 +1,8 @@
 import { QueryResult } from '@apollo/client';
 import { Button } from '@material-ui/core';
 import { FC, useCallback, useMemo } from 'react';
+import { useSession } from 'next-auth/react';
+
 import { MdAddCircle } from 'react-icons/md';
 import {
   identityEventMapper,
@@ -61,7 +63,13 @@ interface IProps {
 }
 
 export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
-  const userRole = 'instructor';
+  const { data } = useSession();
+  const currentUpdateRole = data.profile['https://hasura.io/jwt/claims'][
+    'x-hasura-allowed-roles'
+  ].includes('admin')
+    ? 'admin'
+    : 'instructor';
+
   const { t } = useTranslation();
 
   const courseSessions = useMemo(() => {
@@ -130,7 +138,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     DeleteCourseSessionLocationVariables
   >(
     DELETE_SESSION_LOCATION,
-    userRole,
+    currentUpdateRole,
     'addressId',
     identityEventMapper,
     qResult
@@ -141,7 +149,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     DeleteSessionSpeakerVariables
   >(
     DELETE_SESSION_SPEAKER,
-    userRole,
+    currentUpdateRole,
     'speakerId',
     identityEventMapper,
     qResult
@@ -150,14 +158,20 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const deleteSession = useDeleteCallback<
     DeleteCourseSession,
     DeleteCourseSessionVariables
-  >(DELETE_SESSION, userRole, 'sessionId', identityEventMapper, qResult);
+  >(
+    DELETE_SESSION,
+    currentUpdateRole,
+    'sessionId',
+    identityEventMapper,
+    qResult
+  );
 
   const setSessionTitle = useUpdateCallback2<
     UpdateSessionTitle,
     UpdateSessionTitleVariables
   >(
     UPDATE_SESSION_TITLE,
-    userRole,
+    currentUpdateRole,
     'sessionId',
     'title',
     pickIdPkMapper,
@@ -170,7 +184,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     UpdateSessionStartTimeVariables
   >(
     UPDATE_SESSION_START_TIME,
-    userRole,
+    currentUpdateRole,
     'sessionId',
     'startTime',
     pickIdPkMapper,
@@ -183,7 +197,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     UpdateSessionEndTimeVariables
   >(
     UPDATE_SESSION_END_TIME,
-    userRole,
+    currentUpdateRole,
     'sessionId',
     'endTime',
     pickIdPkMapper,
