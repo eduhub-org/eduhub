@@ -13,9 +13,11 @@ export const CourseTitleSubTitleBlock: FC<IProps> = ({ course }) => {
   const { t, lang } = useTranslation();
   return (
     <div className="flex flex-1 flex-col text-white mb-20">
-      <span className="text-xs">
-        {getWeekdayStartAndEndString(course, lang, t)}
-      </span>
+      {course.weekDay !== 'NONE' ? (
+        <span className="text-xs">
+          {getWeekdayStartAndEndString(course, lang, t)}
+        </span>
+      ) : null}
       <span className="text-2xl mt-2">{course.tagline}</span>
     </div>
   );
