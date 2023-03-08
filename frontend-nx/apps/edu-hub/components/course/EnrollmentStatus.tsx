@@ -67,7 +67,7 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
 
   let content = null;
 
-  if (!enrollments || enrollments.length !== 1) {
+  if (!enrollments || enrollments.length < 1) {
     content = <ApplyButtonBlock course={course} onClickApply={showModal} />;
   } else {
     const status = enrollments[0].status;

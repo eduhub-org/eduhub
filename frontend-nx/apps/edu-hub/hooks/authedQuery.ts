@@ -5,10 +5,10 @@ import { useRouter } from 'next/router';
 
 const errorHandler = (error) => {
   console.log("error handler error: ", error)
-  if (error.response?.errors) {
-    const firstError = error.response.errors[0];
-    const errorCode = firstError.extensions.code;
-    console.log("first error, error code:", errorCode)
+  if (error === "Error: Could not verify JWT: JWTExpired") {
+    // const firstError = error.response.errors[0];
+    // const errorCode = firstError.extensions.code;
+    // console.log("first error, error code:", errorCode)
     // Do something with the error code...
     console.log("redirect login erreicht")
     // router.push('/login'); // Redirect to login page
