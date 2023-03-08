@@ -4,7 +4,7 @@
 
 # Definition of the Terraform Cloud project
 terraform {
-  required_version = "~> 1.3.2"
+  required_version = "~> 1.3"
 
   cloud {
     organization = "opencampus"
