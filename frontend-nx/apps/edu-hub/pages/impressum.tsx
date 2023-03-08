@@ -11,34 +11,34 @@ const Impressum: FC = () => {
       </Head>
       <Page className="text-white">
         <div className="flex flex-row text-white">
-          <h1 className="text-4xl font-bold p-24 pb-4">Impressum</h1>
+          <h1 className="text-4xl font-bold p-24 pl-12 pb-0">Impressum</h1>
         </div>
 
-        <div className="flex">
-          <div className="ml-24 mr-10">
+        <div className="flex flex-wrap">
+          <div className="ml-12 mr-10 mt-4">
             <h2 className="text-2xl mb-2">Anschrift</h2>
             <dd>Campusbusinessbox e.V.</dd>
             <dd>Wissenschaftszentrum Kiel</dd>
             <dd>Fraunhoferstraße 13</dd>
             <dd>24118 Kiel</dd>
-            <dt>Telefon:</dt>
+            <dt className="italic mt-2">Telefon</dt>
             <dd>0431.90894380</dd>
-            <dt>Email:</dt>
+            <dt className="italic mt-2">Email</dt>
             <a href="mailto:team@opencampus.sh">team @ opencampus.sh</a>
           </div>
-          <div className="ml-24 mr-10">
+          <div className="ml-12 mr-10 mt-4">
             <h2 className="text-2xl mb-2">Vorstand</h2>
-            <dt>1. Vorsitzender:</dt>
+            <dt className="italic mt-2">1. Vorsitzender</dt>
             <dd>Harm Brand</dd>
-            <dt>Beisitzer:</dt>
+            <dt className="italic mt-2">Beisitzer</dt>
             <dd>Alexander Ohrt</dd>
-            <dt>Beisitzer:</dt>
+            <dt className="italic mt-2">Beisitzer</dt>
             <dd>Frederik Steinbock</dd>
           </div>
           <div className="col-0 col-md-1"></div>
         </div>
 
-        <div className="ml-24 mr-10">
+        <div className="ml-12 mr-10">
           <h2 className="text-2xl mt-12 mb-2">Datenschutzerklärung</h2>
           <h2 className="text-xl mt-6 mb-2">1. Datenschutz auf einen Blick</h2>
           <h3 className="text-lg mt-2 mb-2 italic">Allgemeine Hinweise</h3>{' '}
