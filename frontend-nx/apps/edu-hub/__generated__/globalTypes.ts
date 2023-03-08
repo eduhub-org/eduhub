@@ -851,6 +851,7 @@ export enum Weekday_constraint {
 export enum Weekday_enum {
   FRIDAY = "FRIDAY",
   MONDAY = "MONDAY",
+  NONE = "NONE",
   SATURDAY = "SATURDAY",
   SUNDAY = "SUNDAY",
   THURSDAY = "THURSDAY",

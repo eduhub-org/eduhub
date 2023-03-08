@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 
 
 const errorHandler = (error) => {
-  console.log("error handler error: ", error?.response?.errors?.[0]?.extensions?.code)
+  console.log("error handler error: ", error)
   if (error.response?.errors) {
     const firstError = error.response.errors[0];
     const errorCode = firstError.extensions.code;

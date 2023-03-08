@@ -429,6 +429,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
                   onChange={updateWeekday}
                   className="w-full h-8 bg-edu-light-gray"
                 >
+                  <option value="NONE">{t('NONE')}</option>
                   <option value="MONDAY">{t('MONDAY')}</option>
                   <option value="TUESDAY">{t('TUESDAY')}</option>
                   <option value="WEDNESDAY">{t('WEDNESDAY')}</option>

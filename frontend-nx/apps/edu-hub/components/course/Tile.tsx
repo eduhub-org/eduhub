@@ -152,7 +152,7 @@ export const Tile: FC<IProps> = ({ course }) => {
           >
             <div className="flex justify-between mb-3">
               <div className="text-sm tracking-wider">
-                {course.weekDay && course.startTime && course.endTime
+                {course.weekDay !== 'NONE' && course.startTime && course.endTime
                   ? `${t(course.weekDay)} ${new Date(
                       course.startTime
                     ).toLocaleTimeString([], {
@@ -162,7 +162,7 @@ export const Tile: FC<IProps> = ({ course }) => {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}`
-                  : ''}
+                  : null}
               </div>
               <div className="text-sm tracking-widest flex content-center">
                 <img
