@@ -59,7 +59,7 @@ export const MANAGED_COURSE = gql`
         defaultSessionAddress
         locationOption
       }
-      Sessions {
+      Sessions (order_by: { startDateTime: asc }) {
         ...AdminSessionFragment
       }
     }
