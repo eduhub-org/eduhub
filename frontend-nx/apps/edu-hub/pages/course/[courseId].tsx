@@ -50,7 +50,7 @@ const CoursePage: FC = () => {
         <link rel="icon" href="/favicon.png" />
       </Head>
       <Page>
-        {isLoggedIn && !isAdmin && !isInstructor ? (
+        {isLoggedIn ? (
           <AuthorizedCoursePage id={id} tab={tab} />
         ) : (
           <UnauthorizedCoursePage id={id} />

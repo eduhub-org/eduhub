@@ -17,18 +17,7 @@ object_relationships:
 insert_permissions:
   - role: user_access
     permission:
-      check:
-        _not:
-          _exists:
-            _table:
-              name: CourseEnrollment
-              schema: public
-            _where:
-              _or:
-                - userId:
-                    _eq: $userId
-                - courseId:
-                    _eq: $courseId
+      check: {}
       columns:
         - courseId
         - motivationLetter

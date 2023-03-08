@@ -20,29 +20,25 @@ export const CourseApplicationModalFormContent: FC<IProps> = ({
   const { t } = useTranslation('course-application');
 
   return (
-    <div className="modal-container fixed inset-0 z-50 overflow-auto bg-white flex items-center justify-center">
-      <div className="modal-content-container max-h-screen w-full px-4">
-        <div className="modal-content bg-white shadow-lg rounded-lg p-6">
-          <span className="text-base mb-2">
-            <p>{t('applicationFor')}</p>
-          </span>
-          <span className="text-3xl font-semibold">{course.title}</span>
-          <span className="font-semibold mt-4 mb-4">
-            <p>{t('introduction-motivation-letter-1')}</p>
-            <p>{t('introduction-motivation-letter-2')}</p>
-          </span>
-          <textarea
-            onChange={setText}
-            className="h-96 mt-3 bg-gray-100 focus:border-none overflow-y-auto w-full"
-            value={text}
-            placeholder={t('course-application:placeholder-motivation-letter')}
-          />
-          <div className="flex justify-center my-6">
-            <Button filled onClick={applyForCourse}>
-              {t('sendApplication')}
-            </Button>
-          </div>
-        </div>
+    <div className="bg-white shadow-lg rounded-lg p-6">
+      <span className="text-base mb-2">
+        <p>{t('applicationFor')}</p>
+      </span>
+      <span className="text-3xl font-semibold">{course.title}</span>
+      <span className="font-semibold mt-4 mb-4">
+        <p>{t('introduction-motivation-letter-1')}</p>
+        <p>{t('introduction-motivation-letter-2')}</p>
+      </span>
+      <textarea
+        onChange={setText}
+        className="md:h-24 h-96 mt-3 bg-gray-100 focus:border-none overflow-y-auto w-full"
+        value={text}
+        placeholder={t('course-application:placeholder-motivation-letter')}
+      />
+      <div className="flex justify-center my-6">
+        <Button filled onClick={applyForCourse}>
+          {t('sendApplication')}
+        </Button>
       </div>
     </div>
   );

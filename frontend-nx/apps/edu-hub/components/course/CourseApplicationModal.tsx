@@ -73,7 +73,7 @@ export const CourseApplicationModal: FC<IProps> = ({
       closeAfterTransition
     >
       <Fade in={visible}>
-        <div className="w-full sm:w-auto h-full sm:h-auto sm:m-16 sm:rounded bg-white">
+        <div className="w-full sm:w-auto h-full sm:h-auto sm:m-16 sm:rounded bg-white overflow-auto">
           <div className="flex">
             <div className="flex p-6 cursor-pointer" onClick={closeModal}>
               <Image src={xIcon} width={22} height={21} alt="close icon" />
