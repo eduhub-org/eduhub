@@ -94,7 +94,7 @@ const CoursesHeader: FC<IProps> = ({
         courseListRequest={courseListRequest}
         updateFilter={updateFilter}
       />
-      <div className="flex justify-end mb-12  text-white">
+      <div className="flex justify-start mt-8  text-white">
         <Button
           onClick={insertDefaultCourse}
           startIcon={<MdAddCircle />}

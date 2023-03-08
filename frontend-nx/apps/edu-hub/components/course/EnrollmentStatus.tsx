@@ -107,7 +107,7 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
 
   return (
     <>
-      <div className="flex mx-auto">{content}</div>
+      <div className="flex mx-auto mb-10">{content}</div>
       <UserInfoModal
         visible={isUserInfoModalVisible && !user}
         closeModal={hideUserInfoModal}
