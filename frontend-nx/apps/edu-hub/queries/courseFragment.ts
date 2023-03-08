@@ -57,7 +57,7 @@ export const COURSE_FRAGMENT = gql`
     contentDescriptionField2
     startTime
     endTime
-    Sessions (order_by: { startDateTime: asc }) {
+    Sessions {
       ...SessionFragment
     }
     CourseInstructors(order_by: { id: desc }) {
