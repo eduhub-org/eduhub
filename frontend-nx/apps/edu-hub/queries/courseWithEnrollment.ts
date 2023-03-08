@@ -26,7 +26,7 @@ export const COURSE_WITH_ENROLLMENT = gql`
       Program {
         ...ProgramFragment
       }
-      Sessions {
+      Sessions (order_by: { startDateTime: asc }) {
         ...SessionFragment
         Attendances(where: { User: { id: { _eq: $userId } } }) {
           id
