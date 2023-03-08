@@ -273,7 +273,7 @@ const Pagination: FC<IPageProps> = ({
       <div className="flex flex-row space-x-5">
         {current_page > 1 && (
           <MdArrowBack
-            className="border-2 rounded-full cursor-pointer hover:bg-indigo-100"
+            className="border-2 rounded-full cursor-pointer hover:bg-edu-black hover:text-white bg-white"
             size={40}
             onClick={handlePrevious}
           />
@@ -285,7 +285,7 @@ const Pagination: FC<IPageProps> = ({
 
         {current_page < pages && (
           <MdArrowForward
-            className="border-2 rounded-full cursor-pointer hover:bg-indigo-100"
+            className="border-2 rounded-full cursor-pointer hover:bg-edu-black hover:text-white bg-white"
             size={40}
             onClick={handleNext}
           />
