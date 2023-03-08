@@ -15,11 +15,7 @@ export const Footer: FC = () => {
         </h3>
         <div className="mt-6 sm:mt-10 mb-16 sm:mb-20 text-sm font-thin">
           <p>
-            <a
-              href="https://edu.opencampus.sh/impressum"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href="/impressum" target="_blank" rel="noopener noreferrer">
               {'Impressum - Datenschutz'}
             </a>
           </p>
