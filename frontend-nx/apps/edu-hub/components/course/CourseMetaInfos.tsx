@@ -27,14 +27,18 @@ export const CourseMetaInfos: FC<IProps> = ({ course }) => {
     <div className="flex flex-1 flex-col justify-center items-center rounded-2xl lg:max-w-md bg-gray-100 p-12 sm:p-24">
       <div className="grid grid-cols-2 gap-x-28">
         <span className="text-lg mt-2 text-center">
-          {course.weekDay ? t(course.weekDay) : ''}
+          {course.weekDay != 'NONE' ? t(course.weekDay) : ''}
         </span>
         <span className="text-lg mt-2 text-center">
           {t('course-page:ects')}
         </span>
         <span className="text-sm mt-2 text-center mb-12">
-          {startTime}
-          {endTime ? <span> - {endTime}</span> : ''}
+          {course.weekDay !== 'NONE' && (
+            <>
+              {startTime}
+              {endTime ? <span> - {endTime}</span> : ''}
+            </>
+          )}
         </span>
         <span className="text-sm mt-2 text-center">
           {t(`course-page:ects-${course.ects}`)}
