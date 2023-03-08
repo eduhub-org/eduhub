@@ -4,6 +4,23 @@ const storage = buildCloudStorage(Storage);
 const im = require("imagemagick");
 const fs = require("fs");
 
+
+function resizeImage(filename, filename_for_size, size){
+    return new Promise((resolve, reject) => {
+      im.resize({
+        srcPath: filename,
+        dstPath: filename_for_size,
+        width: size
+      }, function(err, stdout, stderr){
+        if(err) {
+            reject(err)
+        }
+        resolve(stdout);
+      });
+  })
+}
+
+
 /**
  * Responds to any HTTP request.
  *
@@ -19,28 +36,35 @@ exports.saveCourseImage = async (req, res) => {
 
     const path = `public/courseid_${courseid}/cover_image/${filename}`;
     
-    //test for resizing with imagemagick
-    /* const pathsmall = `public/courseid_${courseid}/cover_image/small_${filename}`;
-    
-    fs.writeFile(filename, content, 'base64', function(err) {
-      console.log(err);
-    });
-    
-    im.resize({
-      srcPath: filename,
-      dstPath: 'small-' + filename,
-      width:   256
-    }, function(err, stdout, stderr){
-      if (err) throw err;
-    });
-    */
-    
     const link = await storage.saveToBucket(
       path,
       req.headers.bucket,
       content,
       isPublic
     );
+    
+    fs.writeFile(filename, content, 'base64', function(err) {
+      console.log(err);
+    });
+    
+    const nameparts = filename.split(".");
+    const sizes = [460, 640, 768, 1024, 1280, 1536]
+    
+    var filename_for_size;
+    var path_for_size;
+
+    for (const size of sizes) {
+      filename_for_size = nameparts[0] + "-" + size.toString() + "." + nameparts[1];
+      path_for_size = `public/courseid_${courseid}/cover_image/${filename_for_size}`;
+      await resizeImage(filename, filename_for_size, size);
+      filecontent = await fs.readFileSync(filename_for_size , {encoding: 'base64'});
+      await storage.saveToBucket(
+          path_for_size,
+          req.headers.bucket,
+          filecontent,
+          isPublic
+      );
+    };
     
     return res.json({
       path: link,
