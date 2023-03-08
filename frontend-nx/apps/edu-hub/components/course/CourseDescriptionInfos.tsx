@@ -14,20 +14,43 @@ export const CourseDescriptionInfos: FC<IProps> = ({ course }) => {
 
   return (
     <>
-      <div className="flex flex-wrap mt-20 bg-edu-course-invited rounded-2xl p-4">
-        <div className="w-full md:w-1/2 p-6">
-          <h2 className="text-3xl font-semibold mb-6">
-            {course.headingDescriptionField1}
-          </h2>
-          <ReactMarkdown>{course.contentDescriptionField1}</ReactMarkdown>
+      {(course.headingDescriptionField1 && course.contentDescriptionField1) ||
+      (course.headingDescriptionField2 && course.contentDescriptionField2) ? (
+        <div className="flex flex-wrap mt-20 bg-edu-course-invited rounded-2xl p-4">
+          {course.headingDescriptionField1 ||
+          course.contentDescriptionField1 ? (
+            <div
+              className={`w-full md:w-1/2 p-6 ${
+                !course.headingDescriptionField2 &&
+                !course.contentDescriptionField2
+                  ? 'md:w-full'
+                  : ''
+              }`}
+            >
+              <h2 className="text-3xl font-semibold mb-6">
+                {course.headingDescriptionField1}
+              </h2>
+              <ReactMarkdown>{course.contentDescriptionField1}</ReactMarkdown>
+            </div>
+          ) : null}
+          {course.headingDescriptionField2 ||
+          course.contentDescriptionField2 ? (
+            <div
+              className={`w-full md:w-1/2 p-6 ${
+                !course.headingDescriptionField1 &&
+                !course.contentDescriptionField1
+                  ? 'md:w-full'
+                  : ''
+              }`}
+            >
+              <h2 className="text-3xl font-semibold mb-6">
+                {course.headingDescriptionField2}
+              </h2>
+              <ReactMarkdown>{course.contentDescriptionField2}</ReactMarkdown>
+            </div>
+          ) : null}
         </div>
-        <div className="w-full md:w-1/2 p-6">
-          <h2 className="text-3xl font-semibold mb-6">
-            {course.headingDescriptionField2}
-          </h2>
-          <ReactMarkdown>{course.contentDescriptionField2}</ReactMarkdown>
-        </div>
-      </div>
+      ) : null}
       <div className="flex flex-wrap mt-10 bg-white rounded-2xl p-4">
         <ReactMarkdown>{t('course-page:general-course-info')}</ReactMarkdown>
       </div>
