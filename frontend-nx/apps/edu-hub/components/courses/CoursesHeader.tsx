@@ -1,29 +1,32 @@
 import { FC, useCallback, useState } from 'react';
-import { AdminCourseListVariables } from '../../queries/__generated__/AdminCourseList';
-import { Programs_Program } from '../../queries/__generated__/Programs';
-import { StaticComponentProperty } from '../../types/UIComponents';
-import { Course_bool_exp } from '../../__generated__/globalTypes';
-import CommonPageHeader from '../common/CommonPageHeader';
-import { MdAddCircle } from 'react-icons/md';
-import { useAdminQuery } from '../../hooks/authedQuery';
-import { useAdminMutation } from '../../hooks/authedMutation';
 import { Button } from '@material-ui/core';
+import { MdAddCircle } from 'react-icons/md';
 
+import CommonPageHeader from '../common/CommonPageHeader';
 import SearchBox from '../common/SearchBox';
 import { ProgramsMenubar } from '../program/ProgramsMenubar';
 
-import {
+import { useAdminQuery } from '../../hooks/authedQuery';
+import { useAdminMutation } from '../../hooks/authedMutation';
+import { INSERT_COURSE } from '../../queries/mutateCourse';
+
+import type { StaticComponentProperty } from '../../types/UIComponents';
+import type { Programs_Program } from '../../queries/__generated__/Programs';
+import type { Course_bool_exp } from '../../__generated__/globalTypes';
+import type {
   InsertCourse,
   InsertCourseVariables,
 } from '../../queries/__generated__/InsertCourse';
-import { INSERT_COURSE } from '../../queries/mutateCourse';
-import { ADMIN_COURSE_LIST } from '../../queries/courseList';
-import { CourseList } from '../../queries/__generated__/CourseList';
+import type { QueryResult } from '@apollo/client';
+import type {
+  AdminCourseList,
+  AdminCourseListVariables,
+} from '../../queries/__generated__/AdminCourseList';
 
 interface IProps {
   programs: Programs_Program[];
   defaultProgramId: number;
-  courseListRequest: any;
+  courseListRequest: QueryResult<AdminCourseList, AdminCourseListVariables>;
   t: any;
   updateFilter: (newState: AdminCourseListVariables) => void;
 }
@@ -57,21 +60,10 @@ const CoursesHeader: FC<IProps> = ({
   //   [setShowModal, courseListRequest]
   // );
 
-  const qResult = useAdminQuery<CourseList>(ADMIN_COURSE_LIST);
-
-  if (qResult.error) {
-    console.log('query programs error', qResult.error);
-  }
-
   const [insertCourse] = useAdminMutation<InsertCourse, InsertCourseVariables>(
     INSERT_COURSE
   );
   const insertDefaultCourse = useCallback(async () => {
-    const today = new Date();
-    today.setMilliseconds(0);
-    today.setSeconds(0);
-    today.setMinutes(0);
-    today.setHours(0);
     await insertCourse({
       variables: {
         title: t('course-page:default-course-title'),
@@ -80,9 +72,9 @@ const CoursesHeader: FC<IProps> = ({
         programId: defaultProgramId,
       },
     });
-    console.log('!!!!!!!!!!!!!!! Bin hier!');
-    qResult.refetch();
-  }, [insertCourse, t, qResult]);
+
+    courseListRequest.refetch();
+  }, [insertCourse, t, courseListRequest, defaultProgramId]);
 
   return (
     <>
