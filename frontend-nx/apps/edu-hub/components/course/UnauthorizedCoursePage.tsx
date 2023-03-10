@@ -5,18 +5,17 @@ import { CoursePageDescriptionView } from '../../components/course/CoursePageDes
 import {
   useRoleQuery
 } from '../../hooks/authedQuery';
-import { useUserId } from '../../hooks/user';
-import { Course } from '../../queries/__generated__/Course';
 import { COURSE } from '../../queries/course';
+
+import type { Course, CourseVariables } from '../../queries/__generated__/Course';
+
 
 const UnauthorizedCoursePage: FC<{ id: number }> = ({ id }) => {
   const { t } = useTranslation('course-page');
-  const userId = useUserId();
 
-  const { data: courseData } = useRoleQuery<Course>(COURSE, {
+  const { data: courseData } = useRoleQuery<Course, CourseVariables>(COURSE, {
     variables: {
       id,
-      userId,
     },
   });
 
