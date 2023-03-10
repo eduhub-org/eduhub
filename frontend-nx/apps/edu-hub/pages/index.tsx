@@ -87,8 +87,8 @@ const Home: FC = () => {
 
   // Arrays with authenticatend and unauthenticated courses
   const coursesGroupsAuthenticated = [
-    { title: t('myAdminCourses'), courses: myAdminCourses },
-    { title: t('myCourses'), courses: myCourses },
+    { title: t('myAdminCourses'), courses: myAdminCourses, isManaged: true },
+    { title: t('myCourses'), courses: myCourses, isManaged: false },
   ];
   const { data: courseGroupOptions, error: courseGroupOptionError } =
     useAuthedQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS);
@@ -146,7 +146,10 @@ const Home: FC = () => {
                         {t(group.title)}
                       </h2>
                       <div className="mt-2 mb-12">
-                        <TileSlider courses={group.courses} />
+                        <TileSlider
+                          courses={group.courses}
+                          isManage={group.isManaged}
+                        />
                       </div>
                     </>
                   ) : null
@@ -164,7 +167,7 @@ const Home: FC = () => {
                     {t(group.title)}
                   </h2>
                   <div className="mt-2 mb-12">
-                    <TileSlider courses={group.courses} />
+                    <TileSlider courses={group.courses} isManage={false} />
                   </div>
                 </>
               ) : null
