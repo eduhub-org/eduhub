@@ -32,3 +32,23 @@ export const useIsUser = () => {
     ]?.includes('user') ?? false
   );
 };
+
+export const useCurrentRole = () => {
+  const isAdmin = useIsAdmin();
+  const isInstructor = useIsInstructor();
+  const isUser = useIsUser();
+
+  switch (true) {
+    case isAdmin:
+      return 'admin';
+
+    case isInstructor:
+      return 'instructor';
+
+    case isUser:
+      return 'user';
+
+    default:
+      return '';
+  }
+};

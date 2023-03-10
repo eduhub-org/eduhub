@@ -1,9 +1,54 @@
-import { QueryResult, useMutation } from '@apollo/client';
+import {
+  QueryResult,
+  useMutation,
+  DocumentNode,
+  TypedDocumentNode,
+  MutationHookOptions,
+  OperationVariables,
+  MutationTuple
+} from '@apollo/client';
 import { useSession } from 'next-auth/react';
 import { useCallback } from 'react';
-import { DocumentNode } from 'graphql';
 
-export const useRoleMutation: typeof useMutation = (
+import { useCurrentRole } from './authentication';
+
+interface UseRoleMutationInterface {
+  <TData = any, TVariables = OperationVariables>(
+    query: DocumentNode | TypedDocumentNode<TData, TVariables>,
+    passedOptions?: MutationHookOptions<TData, TVariables>,
+    role?: 'admin' | 'instructor' | 'user'
+  ): MutationTuple<TData, TVariables>;
+}
+
+export const useRoleMutation: UseRoleMutationInterface = (
+  mutation,
+  passedOptions,
+  role
+) => {
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
+  const currentRole = useCurrentRole();
+
+  console.log('ROLE GIVEN', Boolean(role));
+
+  const options = accessToken
+    ? {
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          headers: {
+            ...passedOptions?.context?.headers,
+            'x-hasura-role': role ? role : currentRole,
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      }
+    : passedOptions;
+
+  return useMutation(mutation, options);
+};
+
+export const useRoleMutationOld: typeof useMutation = (
   mutation,
   passedOptions
 ) => {
