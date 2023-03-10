@@ -1,30 +1,29 @@
 import useTranslation from 'next-translate/useTranslation';
-import Head from "next/head";
-import { FC, useCallback, useState } from "react";
-import { Page } from "../../components/Page";
-import { useIsInstructor, useIsLoggedIn } from "../../hooks/authentication";
-import CommonPageHeader from "../../components/common/CommonPageHeader";
-import { StaticComponentProperty } from "../../types/UIComponents";
+import Head from 'next/head';
+import { FC, useCallback, useState } from 'react';
+import { Page } from '../../components/Page';
+import { useIsInstructor, useIsLoggedIn } from '../../hooks/authentication';
+import CommonPageHeader from '../../components/common/CommonPageHeader';
+import { StaticComponentProperty } from '../../types/UIComponents';
 import {
   AdminCourseList,
   AdminCourseListVariables,
   AdminCourseList_Course,
-} from "../../queries/__generated__/AdminCourseList";
-import { useInstructorQuery } from "../../hooks/authedQuery";
-import { COURSE_LIST } from "../../queries/courseList";
-import Loading from "../../components/courses/Loading";
-import { Tile } from "../../components/course/Tile";
-import EhMenuItem from "../../components/common/EhMenuItem";
-import { useUserId } from "../../hooks/user";
-
+} from '../../queries/__generated__/AdminCourseList';
+import { useInstructorQuery } from '../../hooks/authedQuery';
+import { COURSE_LIST } from '../../queries/courseList';
+import Loading from '../../components/courses/Loading';
+import { Tile } from '../../components/course/Tile';
+import EhMenuItem from '../../components/common/EhMenuItem';
+import { useUserId } from '../../hooks/user';
 
 const Admin: FC = () => {
   const isLoggedIn = useIsLoggedIn();
   const isInstructor = useIsInstructor();
-  const { t } = useTranslation("course-admin-page");
+  const { t } = useTranslation('course-admin-page');
   return (
     <>
-      <Head>{<title>{t("pageTitle")}</title>}</Head>
+      <Head>{<title>{t('pageTitle')}</title>}</Head>
       <Page>
         <div className="min-h-[77vh]">
           {isLoggedIn && isInstructor && <Dashboard t={t} />}
@@ -42,7 +41,7 @@ interface IProps {
 const Dashboard: FC<IProps> = ({ t }) => {
   return (
     <>
-      <CommonPageHeader headline={t("headline")} />
+      <CommonPageHeader headline={t('headline')} />
       <div className="flex flex-row py-5 space-x-5">
         <div className="w-9/12">{<Courses />}</div>
       </div>
@@ -83,7 +82,7 @@ const Courses: FC = () => {
       <div className="grid grid-cols-3 gap-5 py-10">
         {courses.map((course) => (
           <div key={`${course.id}`} className="whitespace-normal">
-            <Tile course={course} />
+            <Tile course={course} isManage={true} />
           </div>
         ))}
       </div>
@@ -95,7 +94,10 @@ interface ISidebarProps {
   sidebarItems: StaticComponentProperty[];
   handleMenuSelection: (obj: StaticComponentProperty) => void;
 }
-export const Sidebar: FC<ISidebarProps> = ({ sidebarItems, handleMenuSelection }) => {
+export const Sidebar: FC<ISidebarProps> = ({
+  sidebarItems,
+  handleMenuSelection,
+}) => {
   const [menuItems, setMenuItems] = useState(sidebarItems);
 
   const updateMenuBar = useCallback(

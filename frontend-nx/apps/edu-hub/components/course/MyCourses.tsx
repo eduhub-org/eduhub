@@ -37,7 +37,7 @@ export const MyCourses: FC = () => {
         {t('your-courses')}
       </h2>
       <div className="mt-11">
-        <TileSlider courses={courses ?? []} />
+        <TileSlider courses={courses ?? []} isManage={false} />
       </div>
     </>
   );

@@ -20,6 +20,7 @@ import locationIcon from '../../public/images/course/pin.svg';
 
 interface IProps {
   course: CourseList_Course | CourseListWithEnrollments_Course;
+  isManage: boolean;
 }
 
 const colorForEnrollmentStatus = (
@@ -78,7 +79,7 @@ const CourseStatusIndicator: FC<{
   }
 };
 
-export const Tile: FC<IProps> = ({ course }) => {
+export const Tile: FC<IProps> = ({ course, isManage }) => {
   const { t } = useTranslation('common');
 
   const enrollmentStatus = enrollmentStatusForCourse(course);
@@ -101,8 +102,6 @@ export const Tile: FC<IProps> = ({ course }) => {
   //     ? 'bg-edu-course-current'
   //     : 'bg-gray-100';
 
-  const isInstructor = useIsInstructor();
-
   const courseDateTimeString = `${
     course.weekDay ? `${t(course.weekDay)} ` : ''
   }${
@@ -119,9 +118,7 @@ export const Tile: FC<IProps> = ({ course }) => {
 
   return (
     <Link
-      href={
-        isInstructor ? `/manage/course/${course.id}` : `/course/${course.id}`
-      }
+      href={isManage ? `/manage/course/${course.id}` : `/course/${course.id}`}
       passHref
     >
       <a>
