@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import { Course_Course_by_pk } from '../../queries/__generated__/Course';
 
@@ -30,7 +31,9 @@ export const CourseDescriptionInfos: FC<IProps> = ({ course }) => {
               <h2 className="text-3xl font-semibold mb-6">
                 {course.headingDescriptionField1}
               </h2>
-              <ReactMarkdown>{course.contentDescriptionField1}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {course.contentDescriptionField1}
+              </ReactMarkdown>
             </div>
           ) : null}
           {course.headingDescriptionField2 ||
@@ -46,13 +49,17 @@ export const CourseDescriptionInfos: FC<IProps> = ({ course }) => {
               <h2 className="text-3xl font-semibold mb-6">
                 {course.headingDescriptionField2}
               </h2>
-              <ReactMarkdown>{course.contentDescriptionField2}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {course.contentDescriptionField2}
+              </ReactMarkdown>
             </div>
           ) : null}
         </div>
       ) : null}
       <div className="flex flex-wrap mt-10 bg-white rounded-2xl p-4">
-        <ReactMarkdown>{t('course-page:general-course-info')}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {t('course-page:general-course-info')}
+        </ReactMarkdown>
       </div>
     </>
   );
