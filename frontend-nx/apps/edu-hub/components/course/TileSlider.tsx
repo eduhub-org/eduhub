@@ -16,6 +16,7 @@ import sliderPreviousArrow from '../../public/images/common/slider-previous-arro
 
 interface IProps {
   courses: CourseList_Course[];
+  isManage: boolean;
 }
 
 const breakpoints = {
@@ -51,7 +52,7 @@ const breakpoints = {
   },
 };
 
-export const TileSlider: FC<IProps> = ({ courses }) => {
+export const TileSlider: FC<IProps> = ({ courses, isManage }) => {
   const swiperRef = useRef(null);
   const [nextVisible, setNextVisible] = useState(true);
   const [prevVisible, setPrevVisible] = useState(false);
@@ -111,7 +112,7 @@ export const TileSlider: FC<IProps> = ({ courses }) => {
             key={`${course.id}`}
             className="whitespace-normal !h-[431px] !w-[275px] xs:!w-[325px]"
           >
-            <Tile course={course} />
+            <Tile course={course} isManage={isManage} />
           </SwiperSlide>
         ))}
       </Swiper>
