@@ -2,66 +2,23 @@ import {
   QueryResult,
   useMutation,
   DocumentNode,
-  TypedDocumentNode,
-  MutationHookOptions,
-  OperationVariables,
-  MutationTuple
 } from '@apollo/client';
 import { useSession } from 'next-auth/react';
 import { useCallback } from 'react';
 
 import { useCurrentRole } from './authentication';
 
-interface UseRoleMutationInterface {
-  <TData = any, TVariables = OperationVariables>(
-    query: DocumentNode | TypedDocumentNode<TData, TVariables>,
-    passedOptions?: MutationHookOptions<TData, TVariables>,
-    role?: 'admin' | 'instructor' | 'user'
-  ): MutationTuple<TData, TVariables>;
-}
+import { AuthRoles } from '../types/enums';
 
-export const useRoleMutation: UseRoleMutationInterface = (
-  mutation,
-  passedOptions,
-  role
-) => {
-  const { data } = useSession();
-  const accessToken = data?.accessToken;
-  const currentRole = useCurrentRole();
-
-  console.log('ROLE GIVEN', Boolean(role));
-
-  const options = accessToken
-    ? {
-        ...passedOptions,
-        context: {
-          ...passedOptions?.context,
-          headers: {
-            ...passedOptions?.context?.headers,
-            'x-hasura-role': role ? role : currentRole,
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      }
-    : passedOptions;
-
-  return useMutation(mutation, options);
-};
-
-export const useRoleMutationOld: typeof useMutation = (
+export const useRoleMutation: typeof useMutation = (
   mutation,
   passedOptions
 ) => {
   const { data } = useSession();
   const accessToken = data?.accessToken;
+  const currentRole = useCurrentRole();
 
-  const passedRole = passedOptions?.context?.role;
-
-  if (passedRole == null) {
-    throw new Error(
-      'You neeed to set a context.role in the passed options of your mutation if you want to use useRoleMutation!'
-    );
-  }
+  const passedRole: AuthRoles = passedOptions?.context?.role;
 
   const options = accessToken
     ? {
@@ -69,8 +26,12 @@ export const useRoleMutationOld: typeof useMutation = (
         context: {
           ...passedOptions?.context,
           headers: {
-            'x-hasura-role': `${passedRole}`,
-            Authorization: 'Bearer ' + accessToken,
+            ...(currentRole !== 'anonymous' && {
+              'x-hasura-role': passedRole ? passedRole : currentRole,
+            }),
+            ...(currentRole !== 'anonymous' && {
+              Authorization: `Bearer ${accessToken}`,
+            }),
           },
         },
       }
@@ -93,7 +54,7 @@ export const useInstructorMutation: typeof useMutation = (
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            'x-hasura-role': 'instructor',
+            'x-hasura-role': AuthRoles.instructor,
             Authorization: 'Bearer ' + accessToken,
           },
         },
@@ -117,7 +78,7 @@ export const useAdminMutation: typeof useMutation = (
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            'x-hasura-role': 'admin',
+            'x-hasura-role': AuthRoles.admin,
             Authorization: 'Bearer ' + accessToken,
           },
         },
@@ -159,12 +120,12 @@ export const pickIdPkMapper = (x: any) => x.id;
 // to update a single field
 export const useUpdateCallback = <QueryType, QueryVariables>(
   query: DocumentNode,
-  role: 'admin' | 'instructor',
   pkField: keyof QueryVariables,
   updateField: keyof QueryVariables,
   updatePK: any,
   eventMapper: (event: any) => any,
-  mainQueryResult: QueryResult<any, any>
+  mainQueryResult: QueryResult<any, any>,
+  role?: AuthRoles.admin | AuthRoles.instructor
 ) => {
   const [mutation] = useRoleMutation<QueryType, QueryVariables>(query, {
     context: {
@@ -193,12 +154,12 @@ export const useUpdateCallback = <QueryType, QueryVariables>(
 // one for the primary key and one for the updated value
 export const useUpdateCallback2 = <QueryType, QueryVariables>(
   query: DocumentNode,
-  role: 'admin' | 'instructor',
   pkField: keyof QueryVariables,
   updateField: keyof QueryVariables,
   pkMapper: (pKSource: any) => any,
   eventMapper: (event: any, pkSource: any) => any,
-  mainQueryResult: QueryResult<any, any>
+  mainQueryResult: QueryResult<any, any>,
+  role?: AuthRoles.admin | AuthRoles.instructor
 ) => {
   const [mutation] = useRoleMutation<QueryType, QueryVariables>(query, {
     context: {
@@ -224,10 +185,10 @@ export const useUpdateCallback2 = <QueryType, QueryVariables>(
 
 export const useDeleteCallback = <QueryType, QueryVariables>(
   query: DocumentNode,
-  role: 'admin' | 'instructor',
   pkField: keyof QueryVariables,
   pkMapper: (event: any) => any,
-  mainQueryResult: QueryResult<any, any>
+  mainQueryResult: QueryResult<any, any>,
+  role?: AuthRoles.admin | AuthRoles.instructor
 ) => {
   const [mutation] = useRoleMutation<QueryType, QueryVariables>(query, {
     context: {

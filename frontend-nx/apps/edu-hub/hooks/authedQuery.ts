@@ -1,15 +1,9 @@
-import { QueryResult, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
 
 import { useCurrentRole } from './authentication';
 
-import {
-  DocumentNode,
-  TypedDocumentNode,
-  QueryHookOptions,
-  OperationVariables,
-} from '@apollo/client';
+import { AuthRoles } from '../types/enums';
 
 const errorHandler = (error) => {
   console.log('error handler error: ', error);
@@ -25,24 +19,12 @@ const errorHandler = (error) => {
   }
 };
 
-interface UseRoleQueryInterface {
-  <TData = any, TVariables = OperationVariables>(
-    query: DocumentNode | TypedDocumentNode<TData, TVariables>,
-    passedOptions?: QueryHookOptions<TData, TVariables>,
-    role?: 'admin' | 'instructor' | 'user'
-  ): QueryResult<TData, TVariables>;
-}
-
-export const useRoleQuery: UseRoleQueryInterface = (
-  query,
-  passedOptions,
-  role
-) => {
+export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
   const { data } = useSession();
   const accessToken = data?.accessToken;
   const currentRole = useCurrentRole();
 
-  console.log('ROLE GIVEN', Boolean(role));
+  const passedRole: AuthRoles = passedOptions?.context?.role;
 
   const options = accessToken
     ? {
@@ -50,9 +32,12 @@ export const useRoleQuery: UseRoleQueryInterface = (
         context: {
           ...passedOptions?.context,
           headers: {
-            ...passedOptions?.context?.headers,
-            'x-hasura-role': role ? role : currentRole,
-            Authorization: `Bearer ${accessToken}`,
+            ...(currentRole !== 'anonymous' && {
+              'x-hasura-role': passedRole ? passedRole : currentRole,
+            }),
+            ...(currentRole !== 'anonymous' && {
+              Authorization: `Bearer ${accessToken}`,
+            }),
           },
         },
       }
@@ -64,7 +49,6 @@ export const useRoleQuery: UseRoleQueryInterface = (
 export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
   const { data } = useSession();
   const accessToken = data?.accessToken;
-  const router = useRouter();
 
   const options = accessToken
     ? {
@@ -73,7 +57,7 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            'x-hasura-role': 'admin',
+            'x-hasura-role': AuthRoles.admin,
             Authorization: `Bearer ${accessToken}`,
           },
         },
@@ -94,7 +78,6 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
 export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
   const { data } = useSession();
   const accessToken = data?.accessToken;
-  const router = useRouter();
 
   const options = accessToken
     ? {
@@ -103,7 +86,7 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            'x-hasura-role': 'instructor',
+            'x-hasura-role': AuthRoles.instructor,
             Authorization: `Bearer ${accessToken}`,
           },
         },
@@ -116,7 +99,6 @@ export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
 export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
   const { data } = useSession();
   const accessToken = data?.accessToken;
-  const router = useRouter();
 
   const options = accessToken
     ? {
@@ -125,7 +107,7 @@ export const useAuthedQuery: typeof useQuery = (query, passedOptions) => {
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            'x-hasura-role': 'user',
+            'x-hasura-role': AuthRoles.user,
             Authorization: `Bearer ${accessToken}`,
           },
         },

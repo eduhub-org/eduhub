@@ -1,5 +1,7 @@
 import { useSession } from 'next-auth/react';
 
+import { AuthRoles } from '../types/enums';
+
 export const useIsLoggedIn = (): boolean => {
   const { data: sessionData, status } = useSession();
 
@@ -11,7 +13,7 @@ export const useIsAdmin = () => {
   return (
     sessionData?.profile?.['https://hasura.io/jwt/claims']?.[
       'x-hasura-allowed-roles'
-    ]?.includes('admin') ?? false
+    ]?.includes(AuthRoles.admin) ?? false
   );
 };
 
@@ -20,7 +22,7 @@ export const useIsInstructor = () => {
   return (
     sessionData?.profile?.['https://hasura.io/jwt/claims']?.[
       'x-hasura-allowed-roles'
-    ]?.includes('instructor') ?? false
+    ]?.includes(AuthRoles.instructor) ?? false
   );
 };
 
@@ -29,7 +31,7 @@ export const useIsUser = () => {
   return (
     sessionData?.profile?.['https://hasura.io/jwt/claims']?.[
       'x-hasura-allowed-roles'
-    ]?.includes('user') ?? false
+    ]?.includes(AuthRoles.user) ?? false
   );
 };
 
@@ -40,15 +42,15 @@ export const useCurrentRole = () => {
 
   switch (true) {
     case isAdmin:
-      return 'admin';
+      return AuthRoles.admin;
 
     case isInstructor:
-      return 'instructor';
+      return AuthRoles.instructor;
 
     case isUser:
-      return 'user';
+      return AuthRoles.user;
 
     default:
-      return '';
+      return AuthRoles.anonymous;
   }
 };

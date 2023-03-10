@@ -1,10 +1,7 @@
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useState } from 'react';
-import { useInstructorMutation } from '../../hooks/authedMutation';
+import { useRoleMutation } from '../../hooks/authedMutation';
 import {
-  useAuthedQuery,
-  useInstructorQuery,
-  useAdminQuery,
   useRoleQuery
 } from '../../hooks/authedQuery';
 import { useIsAdmin, useIsInstructor } from '../../hooks/authentication';
@@ -197,7 +194,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
       setCantUpgradeOpen(true);
     }
   }, [course, setConfirmUpgradeStatusOpen]);
-  const [updateCourseStatusMutation] = useInstructorMutation<
+  const [updateCourseStatusMutation] = useRoleMutation<
     UpdateCourseStatus,
     UpdateCourseStatusVariables
   >(UPDATE_COURSE_STATUS);

@@ -8,7 +8,7 @@ import { IconButton } from '@material-ui/core';
 import { MdDelete } from 'react-icons/md';
 import {
   eventTargetValueMapper,
-  useInstructorMutation,
+  useRoleMutation,
 } from '../../hooks/authedMutation';
 import { InputDialog } from '../common/dialogs/InputDialog';
 import {
@@ -173,7 +173,7 @@ export const SessionRow: FC<IProps> = ({
     setAddressAddOpen(true);
   }, [setAddressAddOpen]);
 
-  const [insertSessionLocationMutation] = useInstructorMutation<
+  const [insertSessionLocationMutation] = useRoleMutation<
     InsertSessionLocation,
     InsertSessionLocationVariables
   >(INSERT_NEW_SESSION_LOCATION);
@@ -200,11 +200,11 @@ export const SessionRow: FC<IProps> = ({
     setAddSpeakerOpen(true);
   }, [setAddSpeakerOpen]);
 
-  const [insertExpertMutation] = useInstructorMutation<
+  const [insertExpertMutation] = useRoleMutation<
     InsertExpert,
     InsertExpertVariables
   >(INSERT_EXPERT);
-  const [insertSessionSpeaker] = useInstructorMutation<
+  const [insertSessionSpeaker] = useRoleMutation<
     InsertNewSessionSpeaker,
     InsertNewSessionSpeakerVariables
   >(INSERT_NEW_SESSION_SPEAKER);
