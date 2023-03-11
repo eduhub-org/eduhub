@@ -346,7 +346,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <DebounceInput
           maxLength={200}
           debounceTimeout={1000}
-          className="h-64 mr-3 ml-3 bg-edu-light-gray"
+          className="h-64 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
           onChange={updateTagline}
           forceNotifyByEnter={false}
           element={'textarea'}
@@ -355,7 +355,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <DebounceInput
           maxLength={500}
           debounceTimeout={1000}
-          className="h-64 mr-3 ml-3 bg-edu-light-gray"
+          className="h-64 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
           onChange={updateLearningGoals}
           forceNotifyByEnter={false}
           element={'textarea'}
@@ -375,7 +375,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <DebounceInput
           maxLength={200}
           debounceTimeout={1000}
-          className="h-8 mr-3 ml-3 bg-edu-light-gray"
+          className="h-8 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
           onChange={updateHeading1}
           value={course.headingDescriptionField1 ?? ''}
         />
@@ -383,7 +383,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <DebounceInput
           maxLength={200}
           debounceTimeout={1000}
-          className="h-8 mr-3 ml-3 bg-edu-light-gray"
+          className="h-8 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
           onChange={updateHeading2}
           value={course.headingDescriptionField2 ?? ''}
         />
@@ -401,7 +401,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <DebounceInput
           maxLength={10000}
           debounceTimeout={1000}
-          className="h-64 mr-3 ml-3 bg-edu-light-gray"
+          className="h-64 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
           onChange={updateContent1}
           forceNotifyByEnter={false}
           element={'textarea'}
@@ -410,7 +410,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <DebounceInput
           maxLength={10000}
           debounceTimeout={1000}
-          className="h-64 mr-3 ml-3 bg-edu-light-gray"
+          className="h-64 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
           onChange={updateContent2}
           forceNotifyByEnter={false}
           element={'textarea'}
@@ -484,7 +484,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             <div>
               <DebounceInput
                 type="number"
-                className="w-full h-8 bg-edu-light-gray"
+                className="w-full h-8 px-2 py-1 bg-edu-light-gray"
                 debounceTimeout={1000}
                 onChange={updateMaxParticipants}
                 value={course.maxParticipants || 0}
