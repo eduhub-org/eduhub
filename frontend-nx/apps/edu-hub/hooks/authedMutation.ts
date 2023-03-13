@@ -26,10 +26,10 @@ export const useRoleMutation: typeof useMutation = (
         context: {
           ...passedOptions?.context,
           headers: {
-            ...(currentRole !== 'anonymous' && {
+            ...(currentRole !== AuthRoles.anonymous && {
               'x-hasura-role': passedRole ? passedRole : currentRole,
             }),
-            ...(currentRole !== 'anonymous' && {
+            ...(currentRole !== AuthRoles.anonymous && {
               Authorization: `Bearer ${accessToken}`,
             }),
           },
