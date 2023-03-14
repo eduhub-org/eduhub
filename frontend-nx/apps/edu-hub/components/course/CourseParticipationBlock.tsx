@@ -37,7 +37,6 @@ interface IProps {
 export const CourseParticipationBlock: FC<IProps> = ({ course }) => {
   const { t, lang } = useTranslation();
   const { t: tLanguage } = useTranslation('common');
-
   const startTime = getStartTimeString(course, lang);
   const endTime = getEndTimeString(course, lang);
 
@@ -71,7 +70,7 @@ export const CourseParticipationBlock: FC<IProps> = ({ course }) => {
 
   let content = null;
 
-  if (courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED) {
+  if (!courseEnrollment?.achievementCertificateURL && !courseEnrollment?.attendanceCertificateURL) {
     content = (
       <>
         <ContentRow
@@ -99,7 +98,7 @@ export const CourseParticipationBlock: FC<IProps> = ({ course }) => {
       </>
     );
   } else if (
-    courseEnrollment?.status === CourseEnrollmentStatus_enum.COMPLETED
+    courseEnrollment?.achievementCertificateURL || courseEnrollment?.attendanceCertificateURL
   ) {
     content = (
       <>
