@@ -110,7 +110,8 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         await insertSessionLocationMutation({
           variables: {
             sessionId: newSessionId,
-            address: loc.defaultSessionAddress,
+            address:
+              loc.defaultSessionAddress || t('course-page:to-be-defined'),
           },
         });
       }
@@ -128,32 +129,17 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const deleteSessionLocation = useDeleteCallback<
     DeleteCourseSessionLocation,
     DeleteCourseSessionLocationVariables
-  >(
-    DELETE_SESSION_LOCATION,
-    'addressId',
-    identityEventMapper,
-    qResult
-  );
+  >(DELETE_SESSION_LOCATION, 'addressId', identityEventMapper, qResult);
 
   const deleteSessionSpeaker = useDeleteCallback<
     DeleteSessionSpeaker,
     DeleteSessionSpeakerVariables
-  >(
-    DELETE_SESSION_SPEAKER,
-    'speakerId',
-    identityEventMapper,
-    qResult
-  );
+  >(DELETE_SESSION_SPEAKER, 'speakerId', identityEventMapper, qResult);
 
   const deleteSession = useDeleteCallback<
     DeleteCourseSession,
     DeleteCourseSessionVariables
-  >(
-    DELETE_SESSION,
-    'sessionId',
-    identityEventMapper,
-    qResult
-  );
+  >(DELETE_SESSION, 'sessionId', identityEventMapper, qResult);
 
   const setSessionTitle = useUpdateCallback2<
     UpdateSessionTitle,
