@@ -1,6 +1,5 @@
 import { QueryResult } from '@apollo/client';
 import { FC } from 'react';
-import { useSession } from 'next-auth/react';
 import { DebounceInput } from 'react-debounce-input';
 import {
   eventTargetNumberMapper,
@@ -11,7 +10,7 @@ import {
   useUpdateCallback,
   useUpdateCallback2,
 } from '../../hooks/authedMutation';
-import { useInstructorQuery } from '../../hooks/authedQuery';
+import { useRoleQuery } from '../../hooks/authedQuery';
 import {
   DELETE_COURSE_LOCATION,
   INSERT_NEW_COURSE_LOCATION,
@@ -114,15 +113,8 @@ const prepDateTimeUpdate = (timeString: string) => {
 const constantOnlineMapper = () => 'ONLINE';
 
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
-  const { data } = useSession();
-  const currentUpdateRole = data.profile['https://hasura.io/jwt/claims'][
-    'x-hasura-allowed-roles'
-  ].includes('admin')
-    ? 'admin'
-    : 'instructor';
-
   const queryKnownLocationOptions =
-    useInstructorQuery<LocationOptionsKnown>(LOCATION_OPTIONS);
+    useRoleQuery<LocationOptionsKnown>(LOCATION_OPTIONS);
   if (queryKnownLocationOptions.error) {
     console.log(
       'query known location options error',
@@ -139,7 +131,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     InsertCourseLocationVariables
   >(
     INSERT_NEW_COURSE_LOCATION,
-    currentUpdateRole,
     'courseId',
     'option',
     course?.id,
@@ -152,7 +143,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     DeleteCourseLocationVariables
   >(
     DELETE_COURSE_LOCATION,
-    currentUpdateRole,
     'locationId',
     pickIdPkMapper,
     qResult
@@ -163,7 +153,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UpdateCourseLocationOptionVariables
   >(
     UPDATE_COURSE_LOCATION_OPTION,
-    currentUpdateRole,
     'locationId',
     'option',
     pickIdPkMapper,
@@ -176,7 +165,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UpdateCourseDefaultSessionAddressVariables
   >(
     UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
-    currentUpdateRole,
     'locationId',
     'defaultSessionAddress',
     pickIdPkMapper,
@@ -189,7 +177,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UpdateCourseStartTimeVariables
   >(
     UPDATE_COURSE_START_TIME,
-    currentUpdateRole,
     'courseId',
     'startTime',
     course?.id,
@@ -202,7 +189,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UpdateCourseEndTimeVariables
   >(
     UPDATE_COURSE_END_TIME,
-    currentUpdateRole,
     'courseId',
     'endTime',
     course?.id,
@@ -215,7 +201,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UpdateCourseLanguageVariables
   >(
     UPDATE_COURSE_LANGUAGE,
-    currentUpdateRole,
     'courseId',
     'language',
     course?.id,
@@ -228,7 +213,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UpdateCourseWeekdayVariables
   >(
     UPDATE_COURSE_WEEKDAY,
-    currentUpdateRole,
     'courseId',
     'weekday',
     course?.id,
@@ -241,7 +225,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UpdateCourseContentDescriptionField1Variables
   >(
     UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1,
-    currentUpdateRole,
     'courseId',
     'description',
     course?.id,
@@ -254,7 +237,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UpdateCourseContentDescriptionField2Variables
   >(
     UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2,
-    currentUpdateRole,
     'courseId',
     'description',
     course?.id,
@@ -267,7 +249,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UpdateCourseHeadingDescription1Variables
   >(
     UPDATE_COURSE_HEADING_DESCRIPTION_1,
-    currentUpdateRole,
     'courseId',
     'description',
     course?.id,
@@ -280,7 +261,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UpdateCourseHeadingDescription2Variables
   >(
     UPDATE_COURSE_HEADING_DESCRIPTION_2,
-    currentUpdateRole,
     'courseId',
     'description',
     course?.id,
@@ -293,7 +273,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UpdateCourseLearningGoalsVariables
   >(
     UPDATE_COURSE_LEARNING_GOALS,
-    currentUpdateRole,
     'courseId',
     'description',
     course?.id,
@@ -306,7 +285,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UpdateCourseTaglineVariables
   >(
     UPDATE_COURSE_TAGLINE,
-    currentUpdateRole,
     'courseId',
     'tagline',
     course?.id,
@@ -319,7 +297,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UpdateCourseMaxParticipantsVariables
   >(
     UPDATE_COURSE_MAX_PARTICIPANTS,
-    currentUpdateRole,
     'courseId',
     'maxParticipants',
     course?.id,
@@ -346,7 +323,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <DebounceInput
           maxLength={200}
           debounceTimeout={1000}
-          className="h-64 mr-3 ml-3 bg-edu-light-gray"
+          className="h-64 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
           onChange={updateTagline}
           forceNotifyByEnter={false}
           element={'textarea'}
@@ -355,7 +332,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <DebounceInput
           maxLength={500}
           debounceTimeout={1000}
-          className="h-64 mr-3 ml-3 bg-edu-light-gray"
+          className="h-64 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
           onChange={updateLearningGoals}
           forceNotifyByEnter={false}
           element={'textarea'}
@@ -375,7 +352,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <DebounceInput
           maxLength={200}
           debounceTimeout={1000}
-          className="h-8 mr-3 ml-3 bg-edu-light-gray"
+          className="h-8 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
           onChange={updateHeading1}
           value={course.headingDescriptionField1 ?? ''}
         />
@@ -383,7 +360,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <DebounceInput
           maxLength={200}
           debounceTimeout={1000}
-          className="h-8 mr-3 ml-3 bg-edu-light-gray"
+          className="h-8 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
           onChange={updateHeading2}
           value={course.headingDescriptionField2 ?? ''}
         />
@@ -401,7 +378,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <DebounceInput
           maxLength={10000}
           debounceTimeout={1000}
-          className="h-64 mr-3 ml-3 bg-edu-light-gray"
+          className="h-64 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
           onChange={updateContent1}
           forceNotifyByEnter={false}
           element={'textarea'}
@@ -410,7 +387,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <DebounceInput
           maxLength={10000}
           debounceTimeout={1000}
-          className="h-64 mr-3 ml-3 bg-edu-light-gray"
+          className="h-64 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
           onChange={updateContent2}
           forceNotifyByEnter={false}
           element={'textarea'}
@@ -484,7 +461,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             <div>
               <DebounceInput
                 type="number"
-                className="w-full h-8 bg-edu-light-gray"
+                className="w-full h-8 px-2 py-1 bg-edu-light-gray"
                 debounceTimeout={1000}
                 onChange={updateMaxParticipants}
                 value={course.maxParticipants || 0}
