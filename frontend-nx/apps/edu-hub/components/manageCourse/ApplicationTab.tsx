@@ -1,6 +1,5 @@
 import { QueryResult } from '@apollo/client';
 import { FC, useCallback, useMemo, useState } from 'react';
-import { useSession } from 'next-auth/react';
 
 import {
   ManagedCourse_Course_by_pk,
@@ -42,6 +41,8 @@ import {
   UpdateEnrollmentForInviteVariables,
 } from '../../queries/__generated__/UpdateEnrollmentForInvite';
 import useTranslation from 'next-translate/useTranslation';
+import { useCurrentRole } from '../../hooks/authentication';
+import { AuthRoles } from '../../types/enums';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -53,14 +54,8 @@ const now7 = new Date();
 now7.setDate(now7.getDate() + 7);
 
 export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
-  const { data } = useSession();
-  const currentUpdateRole = data.profile['https://hasura.io/jwt/claims'][
-    'x-hasura-allowed-roles'
-  ].includes('admin')
-    ? 'admin'
-    : 'instructor';
-
   const { t } = useTranslation();
+  const currentRole = useCurrentRole();
 
   const infoDots = (
     <>
@@ -104,7 +99,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
   }, [setIsInviteDialogOpen]);
 
   const queryMailTemplates = useAdminQuery<MailTemplates>(MAIL_TEMPLATES, {
-    skip: false, // skip if user is only instructor
+    skip: currentRole !== AuthRoles.admin,
   });
   const mailTemplates = queryMailTemplates.data;
   if (queryMailTemplates.error) {
@@ -118,11 +113,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
   const [updateEnrollmentForInvite] = useRoleMutation<
     UpdateEnrollmentForInvite,
     UpdateEnrollmentForInviteVariables
-  >(UPDATE_ENROLLMENT_FOR_INVITE, {
-    context: {
-      role: currentUpdateRole,
-    },
-  });
+  >(UPDATE_ENROLLMENT_FOR_INVITE);
   const handleSendInvites = useCallback(async () => {
     if (mailTemplates != null) {
       const inviteTemplate = mailTemplates.MailTemplate.find(
@@ -220,7 +211,6 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
     UpdateEnrollmentRatingVariables
   >(
     UPDATE_ENROLLMENT_RATING,
-    currentUpdateRole,
     'enrollmentId',
     'rating',
     pickIdPkMapper,

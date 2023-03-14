@@ -3,31 +3,19 @@ import useTranslation from 'next-translate/useTranslation';
 
 import { CoursePageDescriptionView } from '../../components/course/CoursePageDescriptionView';
 import {
-  useAuthedQuery,
-  useInstructorQuery,
-  useAdminQuery,
+  useRoleQuery
 } from '../../hooks/authedQuery';
-import { useUserId } from '../../hooks/user';
-import { Course } from '../../queries/__generated__/Course';
 import { COURSE } from '../../queries/course';
-import { useIsAdmin, useIsInstructor } from '../../hooks/authentication';
+
+import type { Course, CourseVariables } from '../../queries/__generated__/Course';
+
 
 const UnauthorizedCoursePage: FC<{ id: number }> = ({ id }) => {
   const { t } = useTranslation('course-page');
-  const userId = useUserId();
-  const isAdmin = useIsAdmin();
-  const isInstructor = useIsInstructor();
 
-  const queryHook = isAdmin
-    ? useAdminQuery
-    : isInstructor
-    ? useInstructorQuery
-    : useAuthedQuery;
-
-  const { data: courseData } = queryHook<Course>(COURSE, {
+  const { data: courseData } = useRoleQuery<Course, CourseVariables>(COURSE, {
     variables: {
       id,
-      userId,
     },
   });
 
