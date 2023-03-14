@@ -70,7 +70,7 @@ export const CourseParticipationBlock: FC<IProps> = ({ course }) => {
 
   let content = null;
 
-  if (!courseEnrollment?.achievementCertificateURL && !courseEnrollment?.attendanceCertificateURL) {
+  if (courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED && !courseEnrollment?.achievementCertificateURL && !courseEnrollment?.attendanceCertificateURL) {
     content = (
       <>
         <ContentRow
