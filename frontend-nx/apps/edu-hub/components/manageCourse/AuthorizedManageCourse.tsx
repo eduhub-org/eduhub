@@ -1,7 +1,10 @@
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useState } from 'react';
-import { useInstructorMutation } from '../../hooks/authedMutation';
-import { useInstructorQuery } from '../../hooks/authedQuery';
+import { useRoleMutation } from '../../hooks/authedMutation';
+import {
+  useRoleQuery
+} from '../../hooks/authedQuery';
+import { useIsAdmin, useIsInstructor } from '../../hooks/authentication';
 import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from '../../queries/course';
 import {
   ManagedCourse,
@@ -131,7 +134,8 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  */
 export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
   const { t } = useTranslation();
-  const qResult = useInstructorQuery<ManagedCourse, ManagedCourseVariables>(
+
+  const qResult = useRoleQuery<ManagedCourse, ManagedCourseVariables>(
     MANAGED_COURSE,
     {
       variables: {
@@ -190,7 +194,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
       setCantUpgradeOpen(true);
     }
   }, [course, setConfirmUpgradeStatusOpen]);
-  const [updateCourseStatusMutation] = useInstructorMutation<
+  const [updateCourseStatusMutation] = useRoleMutation<
     UpdateCourseStatus,
     UpdateCourseStatusVariables
   >(UPDATE_COURSE_STATUS);

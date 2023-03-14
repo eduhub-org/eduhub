@@ -1,13 +1,12 @@
 import { QueryResult } from '@apollo/client';
 import { Button } from '@material-ui/core';
 import { FC, useCallback, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 
 import { MdAddCircle } from 'react-icons/md';
 import {
   identityEventMapper,
   pickIdPkMapper,
-  useInstructorMutation,
+  useRoleMutation,
   useDeleteCallback,
   useUpdateCallback2,
 } from '../../hooks/authedMutation';
@@ -63,13 +62,6 @@ interface IProps {
 }
 
 export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
-  const { data } = useSession();
-  const currentUpdateRole = data.profile['https://hasura.io/jwt/claims'][
-    'x-hasura-allowed-roles'
-  ].includes('admin')
-    ? 'admin'
-    : 'instructor';
-
   const { t } = useTranslation();
 
   const courseSessions = useMemo(() => {
@@ -82,11 +74,11 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     return result;
   }, [course]);
 
-  const [insertSessionMutation] = useInstructorMutation<
+  const [insertSessionMutation] = useRoleMutation<
     InsertCourseSession,
     InsertCourseSessionVariables
   >(INSERT_NEW_SESSION);
-  const [insertSessionLocationMutation] = useInstructorMutation<
+  const [insertSessionLocationMutation] = useRoleMutation<
     InsertSessionLocation,
     InsertSessionLocationVariables
   >(INSERT_NEW_SESSION_LOCATION);
@@ -118,7 +110,8 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         await insertSessionLocationMutation({
           variables: {
             sessionId: newSessionId,
-            address: loc.defaultSessionAddress,
+            address:
+              loc.defaultSessionAddress || t('course-page:to-be-defined'),
           },
         });
       }
@@ -136,42 +129,23 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const deleteSessionLocation = useDeleteCallback<
     DeleteCourseSessionLocation,
     DeleteCourseSessionLocationVariables
-  >(
-    DELETE_SESSION_LOCATION,
-    currentUpdateRole,
-    'addressId',
-    identityEventMapper,
-    qResult
-  );
+  >(DELETE_SESSION_LOCATION, 'addressId', identityEventMapper, qResult);
 
   const deleteSessionSpeaker = useDeleteCallback<
     DeleteSessionSpeaker,
     DeleteSessionSpeakerVariables
-  >(
-    DELETE_SESSION_SPEAKER,
-    currentUpdateRole,
-    'speakerId',
-    identityEventMapper,
-    qResult
-  );
+  >(DELETE_SESSION_SPEAKER, 'speakerId', identityEventMapper, qResult);
 
   const deleteSession = useDeleteCallback<
     DeleteCourseSession,
     DeleteCourseSessionVariables
-  >(
-    DELETE_SESSION,
-    currentUpdateRole,
-    'sessionId',
-    identityEventMapper,
-    qResult
-  );
+  >(DELETE_SESSION, 'sessionId', identityEventMapper, qResult);
 
   const setSessionTitle = useUpdateCallback2<
     UpdateSessionTitle,
     UpdateSessionTitleVariables
   >(
     UPDATE_SESSION_TITLE,
-    currentUpdateRole,
     'sessionId',
     'title',
     pickIdPkMapper,
@@ -184,7 +158,6 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     UpdateSessionStartTimeVariables
   >(
     UPDATE_SESSION_START_TIME,
-    currentUpdateRole,
     'sessionId',
     'startTime',
     pickIdPkMapper,
@@ -197,7 +170,6 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     UpdateSessionEndTimeVariables
   >(
     UPDATE_SESSION_END_TIME,
-    currentUpdateRole,
     'sessionId',
     'endTime',
     pickIdPkMapper,

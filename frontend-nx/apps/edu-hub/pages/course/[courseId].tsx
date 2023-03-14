@@ -40,9 +40,6 @@ const CoursePage: FC = () => {
   const tab =
     typeof tabParam === 'string' ? parseInt(tabParam, 10) : defaultTab;
 
-  const isAdmin = useIsAdmin();
-  const isInstructor = useIsInstructor();
-
   return (
     <>
       <Head>

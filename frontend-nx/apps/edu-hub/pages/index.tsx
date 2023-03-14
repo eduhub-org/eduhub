@@ -1,24 +1,16 @@
 import Head from 'next/head';
-import { FC, useEffect, useState } from 'react';
+import { FC  } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
-import { LoginButton } from '../components/LoginButton';
 import { Page } from '../components/Page';
-import { RegisterButton } from '../components/RegisterButton';
-import { Button } from '../components/common/Button';
-import { OnlyLoggedIn } from '../components/common/OnlyLoggedIn';
-import { OnlyLoggedOut } from '../components/common/OnlyLoggedOut';
-import { MyCourses } from '../components/course/MyCourses';
 import { TileSlider } from '../components/course/TileSlider';
 import { useQuery } from '@apollo/client';
 import {
   useAuthedQuery,
-  useAdminQuery,
   useInstructorQuery,
 } from '../hooks/authedQuery';
 import {
   useIsLoggedIn,
-  useIsUser,
   useIsInstructor,
   useIsAdmin,
 } from '../hooks/authentication';
@@ -28,7 +20,7 @@ import { CourseList } from '../queries/__generated__/CourseList';
 import { CourseListWithEnrollments } from '../queries/__generated__/CourseListWithEnrollments';
 import { CourseListWithInstructors } from '../queries/__generated__/CourseListWithInstructors';
 import { COURSE_GROUP_OPTIONS } from '../queries/courseGroupOptions';
-import { COURSE_LIST, COURSE_LIST_ANONYMOUS } from '../queries/courseList';
+import { COURSE_LIST } from '../queries/courseList';
 import { COURSE_LIST_WITH_ENROLLMENT } from '../queries/courseListWithEnrollments';
 import { COURSE_LIST_WITH_INSTRUCTOR } from '../queries/courseListWithInstructors';
 import { ClientOnly } from '@opencampus/shared-components';
