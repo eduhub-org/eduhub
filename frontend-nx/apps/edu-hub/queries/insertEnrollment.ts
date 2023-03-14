@@ -56,3 +56,14 @@ export const UPDATE_ENROLLMENT_FOR_INVITE = gql`
     }
   }
 `;
+
+export const UPDATE_ENROLLMENT_STATUS = gql`
+  mutation UpdateEnrollmentStatus($enrollmentId: Int!, $status: CourseEnrollmentStatus_enum!) {
+    update_CourseEnrollment_by_pk(
+      pk_columns: { id: $enrollmentId }
+      _set: { status: $status }
+    ) {
+      id
+    }
+  }
+`;

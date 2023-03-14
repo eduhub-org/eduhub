@@ -93,3 +93,9 @@ update_permissions:
           - userId:
               _eq: X-Hasura-User-Id
       check: {}
+  - role: user_access
+    permission:
+      columns:
+        - status
+      filter: {}
+      check: null

@@ -238,6 +238,7 @@ export enum CourseEnrollmentStatus_constraint {
 export enum CourseEnrollmentStatus_enum {
   ABORTED = "ABORTED",
   APPLIED = "APPLIED",
+  CANCELLED = "CANCELLED",
   COMPLETED = "COMPLETED",
   CONFIRMED = "CONFIRMED",
   INVITED = "INVITED",

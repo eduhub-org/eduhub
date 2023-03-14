@@ -15,12 +15,14 @@ import { CourseLinkInfos } from './CourseLinkInfos';
 import { ApplyButtonBlock } from './ApplyButtonBlock';
 import { CourseApplicationModal } from './CourseApplicationModal';
 import { UserInfoModal } from './UserInfoModal';
+import { Button } from '../common/Button';
 
 interface IProps {
   course: Course_Course_by_pk;
+  invited?: boolean;
 }
 
-export const EnrollmentStatus: FC<IProps> = ({ course }) => {
+export const EnrollmentStatus: FC<IProps> = ({ course, invited }) => {
   const [isUserInfoModalVisible, setUserInfoModalVisible] = useState(false);
   const [isApplicationModalVisible, setApplicationModalVisible] =
     useState(false);
@@ -88,6 +90,22 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
       case CourseEnrollmentStatus_enum.REJECTED: {
         content = (
           <span className="bg-gray-300 p-4">{t('status.rejected')}</span>
+        );
+        break;
+      }
+      case CourseEnrollmentStatus_enum.INVITED: {
+        content = (
+          <>
+            <span className="bg-gray-300 p-4">{t('status.rejected')}</span>
+            <Button
+              filled
+              inverted
+              onClick={onClickApply}
+              className="bg-edu-course-current"
+            >
+              {t('acceptInvitation')}
+            </Button>
+          </>
         );
         break;
       }

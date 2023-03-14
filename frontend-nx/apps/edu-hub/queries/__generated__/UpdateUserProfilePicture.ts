@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL mutation operation: updateUserProfilePicture
+// GraphQL mutation operation: UpdateUserProfilePicture
 // ====================================================
 
-export interface updateUserProfilePicture_update_User_by_pk {
+export interface UpdateUserProfilePicture_update_User_by_pk {
   __typename: "User";
   id: any;
   /**
@@ -16,14 +16,14 @@ export interface updateUserProfilePicture_update_User_by_pk {
   picture: string | null;
 }
 
-export interface updateUserProfilePicture {
+export interface UpdateUserProfilePicture {
   /**
    * update single row of the table: "User"
    */
-  update_User_by_pk: updateUserProfilePicture_update_User_by_pk | null;
+  update_User_by_pk: UpdateUserProfilePicture_update_User_by_pk | null;
 }
 
-export interface updateUserProfilePictureVariables {
+export interface UpdateUserProfilePictureVariables {
   userId: any;
   picture?: string | null;
 }

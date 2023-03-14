@@ -1,4 +1,4 @@
-import { FC, useState, useCallback } from 'react';
+import { FC, useState, useCallback, useEffect } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
@@ -6,7 +6,6 @@ import { CircularProgress } from '@material-ui/core';
 
 import { CoursePageDescriptionView } from '../../components/course/CoursePageDescriptionView';
 import ModalControl from '../common/ModalController';
-import InvitationModal from './InvitationModal';
 import { useAuthedMutation } from '../../hooks/authedMutation';
 import { useAuthedQuery } from '../../hooks/authedQuery';
 import { useUserId } from '../../hooks/user';
@@ -35,11 +34,17 @@ type Inputs = {
   matriculationNumber: string;
 };
 
-const AuthorizedCoursePage: FC<{ id: number }> = ({ id }) => {
+interface IProps {
+  course: CourseWithEnrollment;
+  open: boolean;
+  onClose: (showModal: boolean) => void;
+  resetValues?: { [key in keyof Inputs]?: string };
+}
+
+const InvitationModal: FC<IProps> = ({ course, open, onClose }) => {
   const { t } = useTranslation();
   const userId = useUserId();
   const [modalOpen, setModalOpen] = useState(false);
-  const [resetValues, setResetValues] = useState(null);
   const { data: sessionData } = useSession();
 
   const methods = useForm<Inputs>({
@@ -167,9 +172,6 @@ const AuthorizedCoursePage: FC<{ id: number }> = ({ id }) => {
   }
 
   return (
-    <div>
-      <CoursePageDescriptionView course={course} invited={modalOpen} />
-      <InvitationModal open={modalOpen} resetValues={resetValues} />
       <ModalControl
         showModal={modalOpen}
         onClose={onCloseConfirmEnrollment}
@@ -249,8 +251,7 @@ const AuthorizedCoursePage: FC<{ id: number }> = ({ id }) => {
           </>
         )}
       </ModalControl>
-    </div>
   );
 };
 
-export default AuthorizedCoursePage;
+export default InvitationModal;

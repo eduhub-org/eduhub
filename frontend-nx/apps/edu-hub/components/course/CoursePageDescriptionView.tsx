@@ -16,9 +16,10 @@ import { CourseParticipationBlock } from './CourseParticipationBlock';
 
 interface IProps {
   course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk;
+  invited?: boolean;
 }
 
-export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
+export const CoursePageDescriptionView: FC<IProps> = ({ course, invited }) => {
   const { t } = useTranslation();
 
   function isCourseWithEnrollment(
@@ -46,7 +47,7 @@ export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
           <ContentRow
             className="items-center"
             leftTop={<CourseTitleSubTitleBlock course={course} />}
-            rightBottom={<CourseStatus course={course} />}
+            rightBottom={<CourseStatus course={course} invited={invited} />}
           />
         </PageBlock>
         {isCourseWithEnrollment(course) && (
