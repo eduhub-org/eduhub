@@ -506,8 +506,8 @@ resource "google_cloudfunctions2_function" "save_course_image" {
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
     }
     max_instance_count = 1
-    available_memory   = "256M"
-    timeout_seconds    = 60
+    available_memory   = "512M"
+    timeout_seconds    = 120
     ingress_settings   = var.cloud_function_ingress_settings
 
   }
