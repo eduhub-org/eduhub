@@ -4,6 +4,14 @@ import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
 import { FC, useCallback, useState } from 'react';
 import { useIsAdmin } from '../../hooks/authentication';
+import {
+  DOT_COLORS,
+  EhDot,
+  greenDot,
+  greyDot,
+  orangeDot,
+  redDot,
+} from '../common/dots';
 
 import {
   MdAddCircle,
@@ -43,10 +51,10 @@ import {
 } from '../../queries/__generated__/UpdateSingleAttendenceByPk';
 import { StaticComponentProperty } from '../../types/UIComponents';
 import { AttendanceStatus_enum } from '../../__generated__/globalTypes';
-import { DOT_COLORS, EhDot } from '../common/dots';
 import TagWithTwoText from '../common/TagWithTwoText';
 import Loading from '../courses/Loading';
 import { Button } from '../common/Button';
+import { DiagnosticCategory } from 'typescript';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -239,6 +247,7 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
   userId,
   maxMissedSessions,
 }) => {
+  const { t } = useTranslation();
   const [showDetails, setShowDetails] = useState(false);
 
   const attendanceRecordBySession: Record<
@@ -351,18 +360,25 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
     session,
     color: dotColor(session),
   }));
+  const missedSessionCount = () => {
+    const result = dotsData.reduce(
+      (prev, current) => prev + (current.color === 'RED' ? 1 : 0),
+      0
+    );
+    return result;
+  };
+
   const attendedSessionCount = () => {
     const result = dotsData.reduce(
-      (prev, current) =>
-        prev + (current.color === 'GREEN' || current.color === 'GREY' ? 1 : 0),
+      (prev, current) => prev + (current.color === 'GREEN' ? 1 : 0),
       0
     );
     return result;
   };
 
   const passedStatus = () => {
-    const missedSession = sessions.length - attendedSessionCount();
-    return missedSession > maxMissedSessions ? 'RED' : 'GREEN';
+    // const missedSession = sessions.length - missedSessionCount();
+    return missedSessionCount() > maxMissedSessions ? 'RED' : 'GREEN';
   };
 
   return (
@@ -376,32 +392,45 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
         </td>
         <td className={tdStyle}>
           <div className="flex space-x-10 flex-row">
-            <div className="flex space-x-5 flex-row">
+            <div className="flex space-x-3 flex-row">
               {dotsData.map((dotData) => {
                 return (
-                  <EhDotWithCallBack
-                    key={dotData.session.id}
-                    dotData={dotData}
-                    handleDotClick={handleDotClick}
-                    session={dotData.session}
-                  />
+                  <> {greyDot} </>
+                  // <EhDotWithCallBack
+                  //   key={dotData.session.id}
+                  //   dotData={dotData}
+                  //   handleDotClick={handleDotClick}
+                  //   session={dotData.session}
+                  // />
                 );
               })}
             </div>
             <div className="flex space-x-1 flex-row">
               <p className={pStyle}>
                 {' '}
-                {`${attendedSessionCount()}/${sessions.length}`}{' '}
+                {`${missedSessionCount()}/${
+                  attendedSessionCount() + missedSessionCount()
+                }`}{' '}
               </p>
               <EhDot color={passedStatus()} />
             </div>
           </div>
         </td>
         <td className={tdStyle}>
-          <div className="flex space-x-2 flex-row">
+          <div className="flex flex-row justify-center">
             <div>
-              <p className={pStyle}> {'PerformanceRating?'} </p>
+              <p className={pStyle}> {t('course-page:not-submitted')} </p>
             </div>
+            {greyDot}
+            {/* {enrollment.motivationRating === 'UNRATED' ? greyDot : <></>}
+            {enrollment.motivationRating === 'INVITE' ? greenDot : <></>}
+            {enrollment.motivationRating === 'REVIEW' ? orangeDot : <></>}
+            {enrollment.motivationRating === 'DECLINE' ? redDot : <></>} */}
+          </div>
+        </td>
+
+        <td className={tdStyle}>
+          <div>
             <button
               className="focus:ring-2 rounded-md focus:outline-none"
               role="button"

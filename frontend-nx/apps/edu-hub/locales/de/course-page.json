@@ -1,6 +1,6 @@
 {
   "applicationDeadline": "Bewerbungsfrist",
-  "applyNow": "JETZT BEWERBEN",
+  "applyNow": "JETZT ANMELDEN",
   "attendance": "Attendance",
   "courseContent": "Kursinhalt",
   "courseCosts": "Der Kurs kostet {{price}}",
@@ -107,6 +107,7 @@
   "no-courses": "Dieses Programm enthält noch keine Kurse.",
   "ects-NONE": "OHNE",
   "ects-12,5": "12,5",
+  "ects-0,5": "0,5",
   "ects-2,5": "2,5",
   "ects-2.5": "2,5",
   "ects-5": "5",
@@ -123,5 +124,6 @@
   "show-all-sessions": "Alle Termine anzeigen",
   "hide-sessions": "Termine einklappen",
   "general-course-info":"*Unsere Kurse sind offen für alle und kostenlos für Studierende, Schüler:innen, Auszubildende, Gründer:innen, wissenschaftliche Mitarbeiter:innen, Arbeitssuchende, Geflüchtete und Rentner:innen. Für Berufstätige fällt für den Erwerb eines Leistungszertifikats eine Gebühr in Höhe von 200 Euro an. Über team@opencampus.sh kann ein Stipendium beantragt werden.*",
-  "to-be-defined": "Der Ort bzw. die Adresse wird noch bekannt gegeben."
+  "to-be-defined": "Der Ort bzw. die Adresse wird noch bekannt gegeben.",
+  "not-submitted": "nicht eingereicht"
 }
