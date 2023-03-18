@@ -68,10 +68,28 @@ update_permissions:
         - motivationRating
         - status
       filter:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
+        _or:
+          - Course:
+              CourseInstructors:
+                Expert:
+                  userId:
+                    _eq: X-Hasura-User-Id
+          - userId:
+              _eq: X-Hasura-User-Id
+      check: {}
+  - role: user_access
+    permission:
+      columns:
+        - invitationExpirationDate
+        - motivationRating
+        - status
+      filter:
+        _or:
+          - Course:
+              CourseInstructors:
+                Expert:
+                  userId:
+                    _eq: X-Hasura-User-Id
+          - userId:
+              _eq: X-Hasura-User-Id
       check: {}
