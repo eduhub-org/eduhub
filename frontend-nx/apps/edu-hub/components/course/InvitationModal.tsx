@@ -1,10 +1,8 @@
-import { FC, useState, useCallback, useEffect } from 'react';
+import { FC, useEffect, useCallback, Dispatch, SetStateAction } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress } from '@material-ui/core';
 
-import { CoursePageDescriptionView } from '../../components/course/CoursePageDescriptionView';
 import ModalControl from '../common/ModalController';
 import { useAuthedMutation } from '../../hooks/authedMutation';
 import { useAuthedQuery } from '../../hooks/authedQuery';
@@ -12,8 +10,10 @@ import { useUserId } from '../../hooks/user';
 import { UPDATE_USER_ON_ENROLLMENT_CONFIRMATION } from '../../queries/updateUser';
 import { USER } from '../../queries/user';
 import { UPDATE_ENROLLMENT_STATUS } from '../../queries/insertEnrollment';
-import { CourseWithEnrollment } from '../../queries/__generated__/CourseWithEnrollment';
-import { COURSE_WITH_ENROLLMENT } from '../../queries/courseWithEnrollment';
+import {
+  CourseWithEnrollment,
+  CourseWithEnrollment_Course_by_pk,
+} from '../../queries/__generated__/CourseWithEnrollment';
 import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
 import { University_enum } from '../../__generated__/globalTypes';
 import { Employment_enum } from '../../__generated__/globalTypes';
@@ -25,8 +25,11 @@ import {
   UpdateEnrollmentStatus,
   UpdateEnrollmentStatusVariables,
 } from 'apps/edu-hub/queries/__generated__/UpdateEnrollmentStatus';
+import { User, UserVariables } from 'apps/edu-hub/queries/__generated__/User';
 import { Button } from '../common/Button';
 import FormFieldRow from '../common/forms/FormFieldRow';
+
+import type { OperationVariables, ApolloQueryResult } from '@apollo/client';
 
 type Inputs = {
   employment: Employment_enum | null;
@@ -35,17 +38,19 @@ type Inputs = {
 };
 
 interface IProps {
-  course: CourseWithEnrollment;
+  course: CourseWithEnrollment_Course_by_pk;
+  enrollmentId: number;
   open: boolean;
-  onClose: (showModal: boolean) => void;
-  resetValues?: { [key in keyof Inputs]?: string };
+  refetchCourse: (
+    variables?: Partial<OperationVariables>
+  ) => Promise<ApolloQueryResult<CourseWithEnrollment>>;
+  resetValues: { [key in keyof Inputs]?: string };
+  setModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const InvitationModal: FC<IProps> = ({ course, open, onClose }) => {
+const InvitationModal: FC<IProps> = ({ course, enrollmentId, open, refetchCourse, resetValues, setModalOpen }) => {
   const { t } = useTranslation();
   const userId = useUserId();
-  const [modalOpen, setModalOpen] = useState(false);
-  const { data: sessionData } = useSession();
 
   const methods = useForm<Inputs>({
     defaultValues: {
@@ -65,35 +70,28 @@ const InvitationModal: FC<IProps> = ({ course, open, onClose }) => {
     loading: userLoading,
     error: userError,
     refetch: refetchUser,
-  } = useAuthedQuery(USER, {
+  } = useAuthedQuery<User, UserVariables>(USER, {
     variables: {
-      userId: sessionData?.profile?.sub,
+      userId
     },
     skip: true,
   });
 
-  const { data: courseData, refetch: refetchCourse } =
-    useAuthedQuery<CourseWithEnrollment>(COURSE_WITH_ENROLLMENT, {
-      variables: {
-        id,
-        userId,
-      },
-      async onCompleted(data) {
-        const enrollmentStatus =
-          data?.Course_by_pk?.CourseEnrollments[0]?.status;
-        if (enrollmentStatus === CourseEnrollmentStatus_enum.INVITED) {
-          const userData = await refetchUser();
-          const user = userData?.data?.User_by_pk;
-
-          reset({
-            employment: user.employment,
-            university: user.university,
-            matriculationNumber: user.matriculationNumber,
-          });
-          setModalOpen(true);
-        }
-      },
-    });
+  useEffect(() => {
+    if (resetValues) {
+      const fetchUser = async () => {
+        const userQueryResult = await refetchUser();
+        const user = userQueryResult?.data?.User_by_pk;
+        reset({
+          employment: user.employment,
+          university: user.university,
+          matriculationNumber: user.matriculationNumber,
+        });
+        setModalOpen(true);
+      }
+      fetchUser();
+    }
+  },[refetchUser, resetValues, reset, setModalOpen]);
 
   const [updateUser] = useAuthedMutation<
     UpdateUserOnEnrollmentConfirmation,
@@ -105,8 +103,6 @@ const InvitationModal: FC<IProps> = ({ course, open, onClose }) => {
     UpdateEnrollmentStatusVariables
   >(UPDATE_ENROLLMENT_STATUS);
 
-  const course = courseData?.Course_by_pk;
-
   const onCloseConfirmEnrollment = useCallback(() => {
     setModalOpen(false);
   }, [setModalOpen]);
@@ -115,13 +111,12 @@ const InvitationModal: FC<IProps> = ({ course, open, onClose }) => {
     try {
       await updateUser({
         variables: {
-          userId: sessionData?.profile?.sub,
+          userId,
           matriculationNumber: data.matriculationNumber,
           university: data.university,
           employment: data.employment,
         },
       });
-      const enrollmentId = courseData?.Course_by_pk?.CourseEnrollments[0]?.id;
       await updateEnrollmentStatus({
         variables: {
           enrollmentId,
@@ -138,7 +133,6 @@ const InvitationModal: FC<IProps> = ({ course, open, onClose }) => {
 
   const onEnrollmentCancellation = async () => {
     try {
-      const enrollmentId = courseData?.Course_by_pk?.CourseEnrollments[0]?.id;
       await updateEnrollmentStatus({
         variables: {
           enrollmentId,
@@ -173,7 +167,7 @@ const InvitationModal: FC<IProps> = ({ course, open, onClose }) => {
 
   return (
       <ModalControl
-        showModal={modalOpen}
+        showModal={open}
         onClose={onCloseConfirmEnrollment}
         modalTitle={t('course-page:confirmationModalTitle')}
       >

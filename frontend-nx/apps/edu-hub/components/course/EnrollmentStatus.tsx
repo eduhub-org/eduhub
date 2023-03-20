@@ -100,7 +100,7 @@ export const EnrollmentStatus: FC<IProps> = ({ course, invited }) => {
             <Button
               filled
               inverted
-              onClick={onClickApply}
+              // onClick={onClickApply}
               className="bg-edu-course-current"
             >
               {t('acceptInvitation')}
