@@ -1,6 +1,6 @@
 ---
 name: Short Feature Request
-about: Describe this issue template's purpose here.
+about: For small, new features you would like to have added.
 title: ''
 labels: ''
 assignees: ''
