@@ -1,20 +1,22 @@
 {
-  "applyNow": "jetzt anmelden",
+  "applyNow": "Apply now",
   "acceptInvitation": "Accept invitation",
-  "applicationFor": "Bewerbung für",
-  "requirements": "Anforderungen",
-  "motivationalText": "Motivationsschreiben",
-  "motivationalTextPlaceholder": "Schreibe was an dir so geil ist",
-  "sendApplication": "abschicken",
+  "applicationFor": "Application for",
+  "requirements": "Requirements",
+  "motivationalText": "Motivational letter",
+  "motivationalTextPlaceholder": "Write about what's so great about you",
+  "sendApplication": "Submit",
   "status": {
-    "aborted": "Du hast den Kurs leider nicht erfolgreich abgeschlossen.",
-    "applied": "Wir begutachten noch deine Bewerbung. Spätestens zum Bewerbungschluss benachrichtigen wir dich, ob du zugelassen wurdest.",
-    "rejected": "Du hast die Einladung zu diesem Kurs abgelehnt."
+    "aborted": "Unfortunately, you did not successfully complete the course.",
+    "applied": "We are currently reviewing your application. You will be notified by the application deadline at the latest whether you have been accepted.",
+    "cancelled": "You have declined the invitation to this course.",
+    "invited": "Congratulations, your application was successful! You are invited to participate in this course.",
+    "rejected": "Unfortunately, we could not consider your application for this course this semester."
   },
-  "successBody": "Spätestens ein bis zwei Tage nach Bewerbungsschluss wirst Du über Deine Zulassung informiert.",
-  "successCloseButtonTitle": "Schließen",
-  "successTitle": "Du hast dich erfolgreich beworben",
-  "introduction-motivation-letter-1": "Unser einziges Teilnahmekriterium ist deine Motivation!",
-  "introduction-motivation-letter-2": "Bitte schreibe uns, warum du an diesem Kurs teilnehmen möchtest.",
-  "placeholder-motivation-letter": "Meine Motivation ..."
+  "successBody": "You will be informed about your admission no later than one to two days after the application deadline.",
+  "successCloseButtonTitle": "Close",
+  "successTitle": "You have successfully applied",
+  "introduction-motivation-letter-1": "Our only admission criterion is your motivation!",
+  "introduction-motivation-letter-2": "Please tell us why you want to participate in this course.",
+  "placeholder-motivation-letter": "My motivation ..."
 }

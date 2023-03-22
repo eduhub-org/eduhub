@@ -40,7 +40,10 @@ const AuthorizedCoursePage: FC<{ id: number }> = ({ id }) => {
 
   return (
     <div>
-      <CoursePageDescriptionView course={course} invited={modalOpen} />
+      <CoursePageDescriptionView
+        course={course}
+        setInvitationModalOpen={setModalOpen}
+      />
       <InvitationModal
         course={course}
         enrollmentId={enrollmentId}
