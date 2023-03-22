@@ -93,6 +93,12 @@ export const EnrollmentStatus: FC<IProps> = ({ course, setInvitationModalOpen })
         );
         break;
       }
+      case CourseEnrollmentStatus_enum.CANCELLED: {
+        content = (
+          <span className="bg-gray-300 p-4">{t('status.cancelled')}</span>
+        );
+        break;
+      }
       case CourseEnrollmentStatus_enum.INVITED: {
         content = (
           <div className="flex flex-col sm:flex-row sm:items-center">
