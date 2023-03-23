@@ -1,5 +1,5 @@
 import useTranslation from 'next-translate/useTranslation';
-import { FC, useCallback, useEffect, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useCallback, useEffect, useState } from 'react';
 
 import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
 import { useAuthedQuery } from '../../hooks/authedQuery';
@@ -15,12 +15,14 @@ import { CourseLinkInfos } from './CourseLinkInfos';
 import { ApplyButtonBlock } from './ApplyButtonBlock';
 import { CourseApplicationModal } from './CourseApplicationModal';
 import { UserInfoModal } from './UserInfoModal';
+import { Button } from '../common/Button';
 
 interface IProps {
   course: Course_Course_by_pk;
+  setInvitationModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export const EnrollmentStatus: FC<IProps> = ({ course }) => {
+export const EnrollmentStatus: FC<IProps> = ({ course, setInvitationModalOpen }) => {
   const [isUserInfoModalVisible, setUserInfoModalVisible] = useState(false);
   const [isApplicationModalVisible, setApplicationModalVisible] =
     useState(false);
@@ -88,6 +90,30 @@ export const EnrollmentStatus: FC<IProps> = ({ course }) => {
       case CourseEnrollmentStatus_enum.REJECTED: {
         content = (
           <span className="bg-gray-300 p-4">{t('status.rejected')}</span>
+        );
+        break;
+      }
+      case CourseEnrollmentStatus_enum.CANCELLED: {
+        content = (
+          <span className="bg-gray-300 p-4">{t('status.cancelled')}</span>
+        );
+        break;
+      }
+      case CourseEnrollmentStatus_enum.INVITED: {
+        content = (
+          <div className="flex flex-col sm:flex-row sm:items-center">
+            <div className="bg-gray-300 p-4 mb-6 sm:mb-0 sm:w-2/3 sm:mr-5">
+              {t('status.invited')}
+            </div>
+            <Button
+              filled
+              inverted
+              onClick={() => setInvitationModalOpen(true)}
+              className="bg-edu-course-current sm:w-1/3"
+            >
+              {t('acceptInvitation')}
+            </Button>
+          </div>
         );
         break;
       }

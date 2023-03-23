@@ -137,6 +137,7 @@ export enum AchievementRecord_constraint {
  */
 export enum AchievementRecord_update_column {
   achievementOptionId = "achievementOptionId",
+  courseId = "courseId",
   coverImageUrl = "coverImageUrl",
   created_at = "created_at",
   csvResults = "csvResults",
@@ -238,6 +239,7 @@ export enum CourseEnrollmentStatus_constraint {
 export enum CourseEnrollmentStatus_enum {
   ABORTED = "ABORTED",
   APPLIED = "APPLIED",
+  CANCELLED = "CANCELLED",
   COMPLETED = "COMPLETED",
   CONFIRMED = "CONFIRMED",
   INVITED = "INVITED",
@@ -1733,6 +1735,7 @@ export interface AchievementRecord_arr_rel_insert_input {
  */
 export interface AchievementRecord_avg_order_by {
   achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
 }
@@ -1748,6 +1751,7 @@ export interface AchievementRecord_bool_exp {
   _not?: AchievementRecord_bool_exp | null;
   _or?: AchievementRecord_bool_exp[] | null;
   achievementOptionId?: Int_comparison_exp | null;
+  courseId?: Int_comparison_exp | null;
   coverImageUrl?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   csvResults?: String_comparison_exp | null;
@@ -1769,6 +1773,7 @@ export interface AchievementRecord_insert_input {
   AchievementRecordAuthors?: AchievementRecordAuthor_arr_rel_insert_input | null;
   AchievementRecordRating?: AchievementRecordRating_obj_rel_insert_input | null;
   achievementOptionId?: number | null;
+  courseId?: number | null;
   coverImageUrl?: string | null;
   created_at?: any | null;
   csvResults?: string | null;
@@ -1787,6 +1792,7 @@ export interface AchievementRecord_insert_input {
  */
 export interface AchievementRecord_max_order_by {
   achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
   coverImageUrl?: order_by | null;
   created_at?: order_by | null;
   csvResults?: order_by | null;
@@ -1804,6 +1810,7 @@ export interface AchievementRecord_max_order_by {
  */
 export interface AchievementRecord_min_order_by {
   achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
   coverImageUrl?: order_by | null;
   created_at?: order_by | null;
   csvResults?: order_by | null;
@@ -1841,6 +1848,7 @@ export interface AchievementRecord_order_by {
   AchievementRecordAuthors_aggregate?: AchievementRecordAuthor_aggregate_order_by | null;
   AchievementRecordRating?: AchievementRecordRating_order_by | null;
   achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
   coverImageUrl?: order_by | null;
   created_at?: order_by | null;
   csvResults?: order_by | null;
@@ -1859,6 +1867,7 @@ export interface AchievementRecord_order_by {
  */
 export interface AchievementRecord_set_input {
   achievementOptionId?: number | null;
+  courseId?: number | null;
   coverImageUrl?: string | null;
   created_at?: any | null;
   csvResults?: string | null;
@@ -1877,6 +1886,7 @@ export interface AchievementRecord_set_input {
  */
 export interface AchievementRecord_stddev_order_by {
   achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
 }
@@ -1886,6 +1896,7 @@ export interface AchievementRecord_stddev_order_by {
  */
 export interface AchievementRecord_stddev_pop_order_by {
   achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
 }
@@ -1895,6 +1906,7 @@ export interface AchievementRecord_stddev_pop_order_by {
  */
 export interface AchievementRecord_stddev_samp_order_by {
   achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
 }
@@ -1904,6 +1916,7 @@ export interface AchievementRecord_stddev_samp_order_by {
  */
 export interface AchievementRecord_sum_order_by {
   achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
 }
@@ -1913,6 +1926,7 @@ export interface AchievementRecord_sum_order_by {
  */
 export interface AchievementRecord_var_pop_order_by {
   achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
 }
@@ -1922,6 +1936,7 @@ export interface AchievementRecord_var_pop_order_by {
  */
 export interface AchievementRecord_var_samp_order_by {
   achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
 }
@@ -1931,6 +1946,7 @@ export interface AchievementRecord_var_samp_order_by {
  */
 export interface AchievementRecord_variance_order_by {
   achievementOptionId?: order_by | null;
+  courseId?: order_by | null;
   id?: order_by | null;
   score?: order_by | null;
 }
