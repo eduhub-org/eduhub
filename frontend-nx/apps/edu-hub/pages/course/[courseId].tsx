@@ -6,8 +6,6 @@ import { Page } from '../../components/Page';
 import AuthorizedCoursePage from '../../components/course/AuthorizedCoursePage';
 import UnauthorizedCoursePage from '../../components/course/UnauthorizedCoursePage';
 import { useIsLoggedIn } from '../../hooks/authentication';
-import { useIsAdmin, useIsInstructor } from '../../hooks/authentication';
-import { isDataView } from 'util/types';
 
 // export const getStaticProps = async ({ locale }: { locale: string }) => ({
 //   props: {
@@ -31,14 +29,11 @@ import { isDataView } from 'util/types';
 
 const CoursePage: FC = () => {
   const router = useRouter();
-  const { courseId, tab: tabParam } = router.query;
+  const { courseId } = router.query;
 
   const isLoggedIn = useIsLoggedIn();
 
   const id = parseInt(courseId as string, 10);
-  const defaultTab = isLoggedIn ? 1 : 0;
-  const tab =
-    typeof tabParam === 'string' ? parseInt(tabParam, 10) : defaultTab;
 
   return (
     <>
@@ -48,7 +43,7 @@ const CoursePage: FC = () => {
       </Head>
       <Page>
         {isLoggedIn ? (
-          <AuthorizedCoursePage id={id} tab={tab} />
+          <AuthorizedCoursePage id={id} />
         ) : (
           <UnauthorizedCoursePage id={id} />
         )}

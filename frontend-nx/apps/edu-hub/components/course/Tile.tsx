@@ -17,7 +17,6 @@ import { OuterExpressionKinds } from 'typescript';
 
 import languageIcon from '../../public/images/course/language.svg';
 import locationIcon from '../../public/images/course/pin.svg';
-
 interface IProps {
   course: CourseList_Course | CourseListWithEnrollments_Course;
   isManage: boolean;
@@ -119,77 +118,66 @@ export const Tile: FC<IProps> = ({ course, isManage }) => {
   return (
     <Link
       href={isManage ? `/manage/course/${course.id}` : `/course/${course.id}`}
-      passHref
     >
-      <a>
-        <div className="relative flex-col rounded-2xl overflow-hidden font-medium text-edu-black">
-          {/* <div className="relative w-60 h-72 rounded-2xl overflow-hidden"></div> */}
-          <div
-            className="h-[230px] p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat bg-[image:var(--bg-small-url)]"
-            style={
-              // {
-              //   '--bg-small-url':
-              //     "linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url('https://picsum.photos/240/144')",
-              // } as React.CSSProperties
-              {
-                '--bg-small-url': `linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url(${
-                  course?.coverImage || 'https://picsum.photos/240/144'
-                })`,
-              } as React.CSSProperties
-            }
-          >
-            <span>{course.title}</span>
-            {/* <CourseStatusIndicator
+      <div className="relative flex-col rounded-2xl overflow-hidden font-medium text-edu-black">
+        {/* <div className="relative w-60 h-72 rounded-2xl overflow-hidden"></div> */}
+        <div
+          className="h-[230px] p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat bg-[image:var(--bg-small-url)]"
+          style={
+            // {
+            //   '--bg-small-url':
+            //     "linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url('https://picsum.photos/240/144')",
+            // } as React.CSSProperties
+            {
+              '--bg-small-url': `linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url(${
+                course?.coverImage || 'https://picsum.photos/240/144'
+              })`,
+            } as React.CSSProperties
+          }
+        >
+          <span>{course.title}</span>
+          {/* <CourseStatusIndicator
             enrollmentStatus={enrollmentStatus}
             enrollment={enrollment}
           /> */}
-          </div>
-          <div
-            className={`flex h-[201px] flex-col justify-between bg-white p-5`}
-          >
-            <div className="flex justify-between mb-3">
-              <div className="text-sm tracking-wider">
-                {course.weekDay !== 'NONE' && course.startTime && course.endTime
-                  ? `${t(course.weekDay)} ${new Date(
-                      course.startTime
-                    ).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })} - ${new Date(course.endTime).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}`
-                  : null}
-              </div>
-              <div className="text-sm tracking-widest flex content-center">
-                <img
-                  className="w-4 h-4 mr-2"
-                  src={languageIcon}
-                  alt="language icon"
-                />{' '}
-                {t(course.language)}
-              </div>
-            </div>
-            <span className="text-lg mb-auto line-clamp-3">
-              {course.tagline}
-            </span>
-            <span className="text-xs uppercase flex content-center">
-              <img
-                className="h-4 mr-2"
-                src={locationIcon}
-                alt="location icon"
-              />
-              {course.CourseLocations.length > 2
-                ? course.CourseLocations.map(
-                    (location) => `${location.locationOption} +`
-                  ).join('')
-                : course.CourseLocations.map(
-                    (location) => `${location.locationOption}`
-                  ).join(' + ')}
-            </span>
-          </div>
         </div>
-      </a>
+        <div className={`flex h-[201px] flex-col justify-between bg-white p-5`}>
+          <div className="flex justify-between mb-3">
+            <div className="text-sm tracking-wider">
+              {course.weekDay !== 'NONE' && course.startTime && course.endTime
+                ? `${t(course.weekDay)} ${new Date(
+                    course.startTime
+                  ).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })} - ${new Date(course.endTime).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}`
+                : null}
+            </div>
+            <div className="text-sm tracking-widest flex content-center">
+              <img
+                className="w-4 h-4 mr-2"
+                src={languageIcon}
+                alt="language icon"
+              />{' '}
+              {t(course.language)}
+            </div>
+          </div>
+          <span className="text-lg mb-auto line-clamp-3">{course.tagline}</span>
+          <span className="text-xs uppercase flex content-center">
+            <img className="h-4 mr-2" src={locationIcon} alt="location icon" />
+            {course.CourseLocations.length > 2
+              ? course.CourseLocations.map(
+                  (location) => `${location.locationOption} +`
+                ).join('')
+              : course.CourseLocations.map(
+                  (location) => `${location.locationOption}`
+                ).join(' + ')}
+          </span>
+        </div>
+      </div>
     </Link>
   );
 };

@@ -162,9 +162,9 @@ export const MyRequestsDisplay: FC<IProps> = ({ startDate }) => {
         gewünscht, können Sie die Anmeldungen auch zurücknehmen. <br />
         Haben Sie Fragen zu einer Anmeldung, können Sie uns unter Angabe der
         Anmeldungsnummer kontaktieren. <br />
-        Um weitere Schulklassen anzumelden, klicken Sie bitte{" "}
-        <Link href="/">
-          <a className="underline">hier</a>
+        Um weitere Schulklassen anzumelden, klicken Sie bitte{' '}
+        <Link className="underline" href="/">
+          hier
         </Link>
         .
       </div>
