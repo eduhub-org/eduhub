@@ -6,61 +6,41 @@
 import { University_enum, Employment_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL mutation operation: updateUser
+// GraphQL mutation operation: UpdateUserOnEnrollmentConfirmation
 // ====================================================
 
-export interface updateUser_update_User_by_pk {
+export interface UpdateUserOnEnrollmentConfirmation_update_User_by_pk {
   __typename: "User";
   id: any;
-  /**
-   * The user's first name
-   */
-  firstName: string;
   /**
    * The user's matriculation number at her/his university
    */
   matriculationNumber: string | null;
   /**
-   * The user's last name
-   */
-  lastName: string;
-  /**
    * The user's current employment status
    */
   employment: Employment_enum | null;
   /**
-   * The user's email address
+   * Name of the university the student is attending or working at (only provided if his/her university is not part of the provided list)
    */
-  email: string;
-  /**
-   * A link to an external profile, for example in LinkedIn or Xing
-   */
-  externalProfile: string | null;
+  otherUniversity: string | null;
   /**
    * The university the user is attending or workin at (only provided if he is a student or working in academia)
    */
   university: University_enum | null;
-  /**
-   * The user's profile picture
-   */
-  picture: string | null;
 }
 
-export interface updateUser {
+export interface UpdateUserOnEnrollmentConfirmation {
   /**
    * update single row of the table: "User"
    */
-  update_User_by_pk: updateUser_update_User_by_pk | null;
+  update_User_by_pk: UpdateUserOnEnrollmentConfirmation_update_User_by_pk | null;
 }
 
-export interface updateUserVariables {
+export interface UpdateUserOnEnrollmentConfirmationVariables {
   userId: any;
-  firstName?: string | null;
-  lastName?: string | null;
-  email?: string | null;
   matriculationNumber?: string | null;
+  otherUniversity?: string | null;
   university?: University_enum | null;
-  externalProfile?: string | null;
   employment?: Employment_enum | null;
-  picture?: string | null;
 }

@@ -3,7 +3,6 @@ import {
   FormProvider,
   SubmitHandler,
   useForm,
-  useFormContext,
 } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
@@ -13,6 +12,7 @@ import { MdUpload } from 'react-icons/md';
 import { parseFileUploadEvent } from '../../helpers/filehandling';
 
 import { Button } from '../common/Button';
+import FormFieldRow from '../common/forms/FormFieldRow';
 
 import { useAuthedMutation } from '../../hooks/authedMutation';
 import { useAuthedQuery } from '../../hooks/authedQuery';
@@ -24,21 +24,19 @@ import { UPDATE_USER_PROFILE_PICTURE } from '../../queries/updateUser';
 
 import type {
   MutableRefObject,
-  InputHTMLAttributes,
-  SelectHTMLAttributes,
 } from 'react';
 import {
   SaveUserProfileImage,
   SaveUserProfileImageVariables,
 } from '../../queries/__generated__/SaveUserProfileImage';
 import {
-  updateUserVariables,
-  updateUser,
-} from '../../queries/__generated__/updateUser';
+  UpdateUserVariables,
+  UpdateUser,
+} from '../../queries/__generated__/UpdateUser';
 import {
-  updateUserProfilePictureVariables,
-  updateUserProfilePicture,
-} from '../../queries/__generated__/updateUserProfilePicture';
+  UpdateUserProfilePictureVariables,
+  UpdateUserProfilePicture,
+} from '../../queries/__generated__/UpdateUserProfilePicture';
 import { University_enum } from '../../__generated__/globalTypes';
 import { Employment_enum } from '../../__generated__/globalTypes';
 
@@ -55,100 +53,6 @@ type Inputs = {
   externalProfile: string;
   password: string;
   picture: string;
-};
-
-type FormFieldRowProps = {
-  label?: string;
-  name:
-    | 'firstName'
-    | 'lastName'
-    | 'email'
-    | 'employment'
-    | 'university'
-    | 'matriculationNumber'
-    | 'externalProfile'
-    | 'picture';
-  placeholder?: string;
-  required?: boolean;
-  className?: string;
-  options?: { label: string; value: string }[];
-  type?: 'text' | 'email' | 'select' | 'textarea' | 'file';
-} & InputHTMLAttributes<HTMLInputElement> &
-  SelectHTMLAttributes<HTMLSelectElement>;
-
-const FormFieldRow: FC<FormFieldRowProps> = ({
-  label,
-  name,
-  options,
-  placeholder,
-  required = false,
-  className = '',
-  type = 'text',
-  ...rest
-}) => {
-  const {
-    formState: { errors },
-    register,
-  } = useFormContext();
-
-  const { t } = useTranslation();
-
-  return (
-    <div className="relative">
-      <label
-        htmlFor={name}
-        className="${className} text-xs uppercase tracking-widest font-medium text-gray-400"
-      >
-        {label}
-      </label>
-      {(type === 'text' || type === 'email') && (
-        <input
-          id={name}
-          type={type}
-          placeholder={placeholder || label}
-          {...register(name, { required })}
-          className="bg-edu-light-gray p-4 mb-5 w-full block"
-          aria-invalid={errors[name] ? 'true' : 'false'}
-          {...rest}
-        />
-      )}
-      {type === 'select' && options && (
-        <select
-          id={name}
-          placeholder={placeholder || label}
-          {...register(name, { required })}
-          className="bg-edu-light-gray p-4 mb-5 w-full block"
-          aria-invalid={errors[name] ? 'true' : 'false'}
-          {...rest}
-        >
-          <option value="" disabled selected hidden>
-            {t('form-select-placeholder')}
-          </option>
-          {options.map((option, i) => (
-            <option value={option.value} key={`formoption-${i}`}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      )}
-      {type === 'file' && (
-        <input
-          id={name}
-          placeholder={placeholder || label}
-          {...register(name, { required })}
-          className="hidden"
-          aria-invalid={errors[name] ? 'true' : 'false'}
-          type="file"
-          {...rest}
-        />
-      )}
-      {errors[name] && (
-        <div className="text-edu-red absolute top-full left-0" role="alert">
-          This field is required
-        </div>
-      )}
-    </div>
-  );
 };
 
 // interface IProps {}
@@ -199,12 +103,12 @@ const ProfileOverview: FC = () => {
     skip: !sessionData,
   });
 
-  const [updateUser] = useAuthedMutation<updateUser, updateUserVariables>(
+  const [updateUser] = useAuthedMutation<UpdateUser, UpdateUserVariables>(
     UPDATE_USER
   );
   const [updateUserProfilePicture] = useAuthedMutation<
-    updateUserProfilePicture,
-    updateUserProfilePictureVariables
+    UpdateUserProfilePicture,
+    UpdateUserProfilePictureVariables
   >(UPDATE_USER_PROFILE_PICTURE);
 
   const accessToken = sessionData?.accessToken;
@@ -332,11 +236,8 @@ const ProfileOverview: FC = () => {
     [
       sessionData?.profile?.sub,
       saveUserProfileImage,
-      updateUser,
       refetchUser,
-      handleSubmit,
-      onSubmit,
-      setValue,
+      updateUserProfilePicture,
     ]
   );
 
@@ -368,14 +269,14 @@ const ProfileOverview: FC = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="flex flex-wrap">
                 <div className="w-1/2 pr-3">
-                  <FormFieldRow
+                  <FormFieldRow<Inputs>
                     label={t('first-name')}
                     name="firstName"
                     required
                   />
                 </div>
                 <div className="w-1/2 pl-3">
-                  <FormFieldRow
+                  <FormFieldRow<Inputs>
                     label={t('last-name')}
                     name="lastName"
                     required
@@ -384,7 +285,7 @@ const ProfileOverview: FC = () => {
               </div>
               <div className="flex flex-wrap">
                 <div className="w-1/2 pr-3">
-                  <FormFieldRow
+                  <FormFieldRow<Inputs>
                     label={t('email')}
                     name="email"
                     placeholder="name@example.com"
@@ -394,7 +295,7 @@ const ProfileOverview: FC = () => {
                   />
                 </div>
                 <div className="w-1/2 pl-3">
-                  <FormFieldRow
+                  <FormFieldRow<Inputs>
                     label={t('status')}
                     name="employment"
                     type="select"
@@ -404,7 +305,7 @@ const ProfileOverview: FC = () => {
               </div>
               <div className="flex flex-wrap">
                 <div className="w-1/2 pr-3">
-                  <FormFieldRow
+                  <FormFieldRow<Inputs>
                     label={t('university')}
                     name="university"
                     type="select"
@@ -412,7 +313,7 @@ const ProfileOverview: FC = () => {
                   />
                 </div>
                 <div className="w-1/2 pl-3">
-                  <FormFieldRow
+                  <FormFieldRow<Inputs>
                     label={t('matriculation-number')}
                     name="matriculationNumber"
                   />
@@ -420,7 +321,7 @@ const ProfileOverview: FC = () => {
               </div>
               <div className="flex flex-wrap">
                 <div className="w-1/2 pr-3">
-                  <FormFieldRow
+                  <FormFieldRow<Inputs>
                     label={t('external-profile')}
                     name="externalProfile"
                   />
@@ -437,7 +338,7 @@ const ProfileOverview: FC = () => {
                   </Button>
                 </div>
               </div>
-              {/* <FormFieldRow name="picture" type="file" /> */}
+              {/* <FormFieldRow<Inputs> name="picture" type="file" /> */}
               <Button
                 as="button"
                 type="submit"

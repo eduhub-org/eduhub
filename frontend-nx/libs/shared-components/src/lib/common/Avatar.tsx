@@ -2,7 +2,7 @@ import Image from "next/image";
 import { FC } from "react";
 
 interface IProps {
-    imageUrl: string;
+    imageUrl: any;
 }
 
 export const Avatar: FC<IProps> = ({ imageUrl }) => {

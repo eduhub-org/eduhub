@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 export const UPDATE_USER = gql`
-  mutation updateUser(
+  mutation UpdateUser(
     $userId: uuid!
     $firstName: String
     $lastName: String
@@ -38,8 +38,34 @@ export const UPDATE_USER = gql`
   }
 `;
 
+export const UPDATE_USER_ON_ENROLLMENT_CONFIRMATION = gql`
+  mutation UpdateUserOnEnrollmentConfirmation(
+    $userId: uuid!
+    $matriculationNumber: String
+    $otherUniversity: String
+    $university: University_enum
+    $employment: Employment_enum
+  ) {
+    update_User_by_pk(
+      pk_columns: { id: $userId }
+      _set: {
+        matriculationNumber: $matriculationNumber
+        otherUniversity: $otherUniversity
+        employment: $employment
+        university: $university
+      }
+    ) {
+      id
+      matriculationNumber
+      employment
+      otherUniversity
+      university
+    }
+  }
+`;
+
 export const UPDATE_USER_PROFILE_PICTURE = gql`
-  mutation updateUserProfilePicture(
+  mutation UpdateUserProfilePicture(
     $userId: uuid!
     $picture: String
   ) {

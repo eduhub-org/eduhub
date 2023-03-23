@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { Dispatch, FC, SetStateAction } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
 import { Course_Course_by_pk } from '../../queries/__generated__/Course';
@@ -16,9 +16,13 @@ import { CourseParticipationBlock } from './CourseParticipationBlock';
 
 interface IProps {
   course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk;
+  setInvitationModalOpen?: Dispatch<SetStateAction<boolean>>;
 }
 
-export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
+export const CoursePageDescriptionView: FC<IProps> = ({
+  course,
+  setInvitationModalOpen,
+}) => {
   const { t } = useTranslation();
 
   function isCourseWithEnrollment(
@@ -46,7 +50,12 @@ export const CoursePageDescriptionView: FC<IProps> = ({ course }) => {
           <ContentRow
             className="items-center"
             leftTop={<CourseTitleSubTitleBlock course={course} />}
-            rightBottom={<CourseStatus course={course} />}
+            rightBottom={
+              <CourseStatus
+                course={course}
+                setInvitationModalOpen={setInvitationModalOpen}
+              />
+            }
           />
         </PageBlock>
         {isCourseWithEnrollment(course) && (

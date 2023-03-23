@@ -60,7 +60,7 @@ export const Header: FC = () => {
               <div className="flex">
                 <div className="flex">
                   <div className="cursor-pointer" onClick={openMenu}>
-                    <Avatar imageUrl={`${user?.picture || mysteryImg}`} />
+                    <Avatar imageUrl={user?.picture || mysteryImg} />
                   </div>
                   {menuAnchorElement ? (
                     <Menu

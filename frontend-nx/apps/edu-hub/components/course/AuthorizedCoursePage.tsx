@@ -1,61 +1,58 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
-import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
-// import { PageBlock } from '../../components/common/PageBlock';
 import { CoursePageDescriptionView } from '../../components/course/CoursePageDescriptionView';
-// import { CoursePageStudentView } from '../../components/course/CoursePageStudentView';
-// import { TabSelection } from '../../components/course/TabSelection';
-import { enrollmentStatusForCourse } from '../../helpers/courseHelpers';
+import InvitationModal from './InvitationModal';
 import { useAuthedQuery } from '../../hooks/authedQuery';
 import { useUserId } from '../../hooks/user';
 import { CourseWithEnrollment } from '../../queries/__generated__/CourseWithEnrollment';
 import { COURSE_WITH_ENROLLMENT } from '../../queries/courseWithEnrollment';
+import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
 
-const AuthorizedCoursePage: FC<{ id: number; tab: number }> = ({ id, tab }) => {
-  const { t } = useTranslation('course-page');
+const AuthorizedCoursePage: FC<{ id: number }> = ({ id }) => {
+  const { t } = useTranslation();
   const userId = useUserId();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [resetValues, setResetValues] = useState(null);
 
-  const { data: courseData } = useAuthedQuery<CourseWithEnrollment>(
-    COURSE_WITH_ENROLLMENT,
-    {
+
+  const { data: courseData, refetch: refetchCourse } =
+    useAuthedQuery<CourseWithEnrollment>(COURSE_WITH_ENROLLMENT, {
       variables: {
         id,
         userId,
       },
-    }
-  );
+      async onCompleted(data) {
+        const enrollmentStatus =
+          data?.Course_by_pk?.CourseEnrollments[0]?.status;
+        if (enrollmentStatus === CourseEnrollmentStatus_enum.INVITED) {
+          setResetValues(true);
+        }
+      },
+    });
 
   const course = courseData?.Course_by_pk;
+  const enrollmentId = courseData?.Course_by_pk?.CourseEnrollments[0]?.id;
 
   if (!course) {
     return <div>{t('courseNotAvailable')}</div>;
   }
 
-  const isParticipating =
-    enrollmentStatusForCourse(course) ===
-      CourseEnrollmentStatus_enum.CONFIRMED ||
-    enrollmentStatusForCourse(course) === CourseEnrollmentStatus_enum.COMPLETED;
-
   return (
-    <>
-      {/* {isParticipating ? (
-        <PageBlock>
-          <div className="py-4">
-            <TabSelection
-              currentTab={tab}
-              tabs={[t('toCourseDescription'), t('currentCourse')]}
-            />
-          </div>
-        </PageBlock>
-      ) : null} */}
-      {tab === 0 || !isParticipating ? (
-        <CoursePageDescriptionView course={course} />
-      ) : (
-        <CoursePageDescriptionView course={course} />
-        // <CoursePageStudentView course={course} />
-      )}
-    </>
+    <div>
+      <CoursePageDescriptionView
+        course={course}
+        setInvitationModalOpen={setModalOpen}
+      />
+      <InvitationModal
+        course={course}
+        enrollmentId={enrollmentId}
+        open={modalOpen}
+        resetValues={resetValues}
+        setModalOpen={setModalOpen}
+        refetchCourse={refetchCourse}
+      />
+    </div>
   );
 };
 
