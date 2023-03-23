@@ -42,6 +42,7 @@ export const UPDATE_USER_ON_ENROLLMENT_CONFIRMATION = gql`
   mutation UpdateUserOnEnrollmentConfirmation(
     $userId: uuid!
     $matriculationNumber: String
+    $otherUniversity: String
     $university: University_enum
     $employment: Employment_enum
   ) {
@@ -49,6 +50,7 @@ export const UPDATE_USER_ON_ENROLLMENT_CONFIRMATION = gql`
       pk_columns: { id: $userId }
       _set: {
         matriculationNumber: $matriculationNumber
+        otherUniversity: $otherUniversity
         employment: $employment
         university: $university
       }
@@ -56,6 +58,7 @@ export const UPDATE_USER_ON_ENROLLMENT_CONFIRMATION = gql`
       id
       matriculationNumber
       employment
+      otherUniversity
       university
     }
   }

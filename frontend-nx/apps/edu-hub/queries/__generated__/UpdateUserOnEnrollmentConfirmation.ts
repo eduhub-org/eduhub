@@ -21,6 +21,10 @@ export interface UpdateUserOnEnrollmentConfirmation_update_User_by_pk {
    */
   employment: Employment_enum | null;
   /**
+   * Name of the university the student is attending or working at (only provided if his/her university is not part of the provided list)
+   */
+  otherUniversity: string | null;
+  /**
    * The university the user is attending or workin at (only provided if he is a student or working in academia)
    */
   university: University_enum | null;
@@ -36,6 +40,7 @@ export interface UpdateUserOnEnrollmentConfirmation {
 export interface UpdateUserOnEnrollmentConfirmationVariables {
   userId: any;
   matriculationNumber?: string | null;
+  otherUniversity?: string | null;
   university?: University_enum | null;
   employment?: Employment_enum | null;
 }

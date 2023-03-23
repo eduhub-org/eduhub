@@ -1,10 +1,15 @@
 {
-    "firstName": "First Name",
-    "lastName": "Last Name",
-    "email": "Email",
-    "password": "Password",
-    "employmentStatus": "Employment Status",
-    "university": "University",
-    "nameOfUniversity": "Name of University",
-    "matriculationNumber": "Matriculation number"
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "email": "Email",
+  "password": "Password",
+  "employmentStatus": "Employment Status",
+  "university": "University",
+  "nameOfUniversity": "Name of University",
+  "matriculationNumber": "Matriculation number",
+  "otherUniversityLabel": {
+    "university": "University name",
+    "organization": "Organisation name",
+    "other": "Other employment"
+  }
 }

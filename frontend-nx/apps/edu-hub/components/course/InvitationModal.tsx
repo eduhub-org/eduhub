@@ -1,4 +1,11 @@
-import { FC, useEffect, useCallback, Dispatch, SetStateAction } from 'react';
+import {
+  FC,
+  useEffect,
+  useCallback,
+  Dispatch,
+  SetStateAction,
+  useState,
+} from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress } from '@material-ui/core';
@@ -33,6 +40,7 @@ import type { OperationVariables, ApolloQueryResult } from '@apollo/client';
 
 type Inputs = {
   employment: Employment_enum | null;
+  otherUniversity?: string;
   university: University_enum | null;
   matriculationNumber: string;
 };
@@ -48,13 +56,21 @@ interface IProps {
   setModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const InvitationModal: FC<IProps> = ({ course, enrollmentId, open, refetchCourse, resetValues, setModalOpen }) => {
+const InvitationModal: FC<IProps> = ({
+  course,
+  enrollmentId,
+  open,
+  refetchCourse,
+  resetValues,
+  setModalOpen,
+}) => {
   const { t } = useTranslation();
   const userId = useUserId();
 
   const methods = useForm<Inputs>({
     defaultValues: {
       employment: null,
+      otherUniversity: null,
       university: null,
       matriculationNumber: '',
     },
@@ -64,7 +80,53 @@ const InvitationModal: FC<IProps> = ({ course, enrollmentId, open, refetchCourse
     handleSubmit,
     formState: { isSubmitting },
     reset,
+    watch,
   } = methods;
+
+  const [universityVisible, setUniversityVisible] = useState(false);
+  const [otherUniversityVisible, setOtherUniversityVisible] = useState(false);
+  const [otherUniversityLabel, setOtherUniversityLabel] = useState('');
+  const watchEmployment = watch('employment');
+  const watchUniversity = watch('university');
+
+  useEffect(() => {
+    switch (watchEmployment) {
+      case Employment_enum.STUDENT:
+        setOtherUniversityLabel(
+          t('user-common:otherUniversityLabel.university')
+        );
+        setUniversityVisible(true);
+
+        if (watchUniversity === University_enum.OTHER) {
+          setOtherUniversityVisible(true);
+        } else {
+          setOtherUniversityVisible(false);
+        }
+        break;
+
+      case Employment_enum.OTHER:
+        setOtherUniversityLabel(
+          t('user-common:otherUniversityLabel.other')
+        );
+        setUniversityVisible(false);
+        setOtherUniversityVisible(true);
+        break;
+
+      case Employment_enum.ACADEMIA:
+      case Employment_enum.EMPLOYED:
+        setOtherUniversityLabel(
+          t('user-common:otherUniversityLabel.organization')
+        );
+        setUniversityVisible(false);
+        setOtherUniversityVisible(true);
+        break;
+
+      default:
+        setUniversityVisible(false);
+        setOtherUniversityVisible(false);
+        break;
+    }
+  }, [watchEmployment, watchUniversity, t]);
 
   const {
     loading: userLoading,
@@ -72,7 +134,7 @@ const InvitationModal: FC<IProps> = ({ course, enrollmentId, open, refetchCourse
     refetch: refetchUser,
   } = useAuthedQuery<User, UserVariables>(USER, {
     variables: {
-      userId
+      userId,
     },
     skip: true,
   });
@@ -84,14 +146,15 @@ const InvitationModal: FC<IProps> = ({ course, enrollmentId, open, refetchCourse
         const user = userQueryResult?.data?.User_by_pk;
         reset({
           employment: user.employment,
+          otherUniversity: user.otherUniversity,
           university: user.university,
           matriculationNumber: user.matriculationNumber,
         });
         setModalOpen(true);
-      }
+      };
       fetchUser();
     }
-  },[refetchUser, resetValues, reset, setModalOpen]);
+  }, [refetchUser, resetValues, reset, setModalOpen]);
 
   const [updateUser] = useAuthedMutation<
     UpdateUserOnEnrollmentConfirmation,
@@ -115,6 +178,7 @@ const InvitationModal: FC<IProps> = ({ course, enrollmentId, open, refetchCourse
           matriculationNumber: data.matriculationNumber,
           university: data.university,
           employment: data.employment,
+          otherUniversity: data.otherUniversity,
         },
       });
       await updateEnrollmentStatus({
@@ -166,33 +230,34 @@ const InvitationModal: FC<IProps> = ({ course, enrollmentId, open, refetchCourse
   }
 
   return (
-      <ModalControl
-        showModal={open}
-        onClose={onCloseConfirmEnrollment}
-        modalTitle={t('course-page:confirmationModalTitle')}
-      >
-        {!userLoading && !userError && (
-          <>
-            <div className="pb-5">
-              {t('course-page:confirmationModalTextTop')}
-            </div>
-            <div className="pb-6">
-              {t('course-page:confirmationModalTextBottom')}
-            </div>
-            <div>
-              <FormProvider {...methods}>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                  <div className="flex flex-wrap"></div>
-                  <div className="flex flex-wrap">
-                    <div className="w-1/2">
-                      <FormFieldRow<Inputs>
-                        label={t('user-common:employmentStatus')}
-                        name="employment"
-                        type="select"
-                        options={employmentSelectFormOptions}
-                      />
-                    </div>
+    <ModalControl
+      showModal={open}
+      onClose={onCloseConfirmEnrollment}
+      modalTitle={t('course-page:confirmationModalTitle')}
+    >
+      {!userLoading && !userError && (
+        <>
+          <div className="pb-5">
+            {t('course-page:confirmationModalTextTop')}
+          </div>
+          <div className="pb-6">
+            {t('course-page:confirmationModalTextBottom')}
+          </div>
+          <div>
+            <FormProvider {...methods}>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="flex flex-wrap"></div>
+                <div className="flex flex-wrap">
+                  <div className="w-1/2">
+                    <FormFieldRow<Inputs>
+                      label={t('user-common:employmentStatus')}
+                      name="employment"
+                      type="select"
+                      options={employmentSelectFormOptions}
+                    />
                   </div>
+                </div>
+                {universityVisible && (
                   <div className="flex flex-wrap">
                     <div className="w-1/2 pr-3">
                       <FormFieldRow<Inputs>
@@ -209,42 +274,49 @@ const InvitationModal: FC<IProps> = ({ course, enrollmentId, open, refetchCourse
                       />
                     </div>
                   </div>
-                  <div className="flex">
-                    <Button
-                      as="button"
-                      type="button"
-                      disabled={isSubmitting}
-                      filled
-                      inverted
-                      className="mt-8 block mx-auto mb-5 disabled:bg-slate-500"
-                      onClick={onEnrollmentCancellation}
-                    >
-                      {isSubmitting ? (
-                        <CircularProgress />
-                      ) : (
-                        t('course-page:reject')
-                      )}
-                    </Button>
-                    <Button
-                      as="button"
-                      type="submit"
-                      disabled={isSubmitting}
-                      filled
-                      className="mt-8 block mx-auto mb-5 disabled:bg-slate-500"
-                    >
-                      {isSubmitting ? (
-                        <CircularProgress />
-                      ) : (
-                        t('course-page:confirm')
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              </FormProvider>
-            </div>
-          </>
-        )}
-      </ModalControl>
+                )}
+                {otherUniversityVisible && (
+                  <FormFieldRow<Inputs>
+                    label={otherUniversityLabel}
+                    name="otherUniversity"
+                  />
+                )}
+                <div className="flex">
+                  <Button
+                    as="button"
+                    type="button"
+                    disabled={isSubmitting}
+                    filled
+                    inverted
+                    className="mt-8 block mx-auto mb-5 disabled:bg-slate-500"
+                    onClick={onEnrollmentCancellation}
+                  >
+                    {isSubmitting ? (
+                      <CircularProgress />
+                    ) : (
+                      t('course-page:reject')
+                    )}
+                  </Button>
+                  <Button
+                    as="button"
+                    type="submit"
+                    disabled={isSubmitting}
+                    filled
+                    className="mt-8 block mx-auto mb-5 disabled:bg-slate-500"
+                  >
+                    {isSubmitting ? (
+                      <CircularProgress />
+                    ) : (
+                      t('course-page:confirm')
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </FormProvider>
+          </div>
+        </>
+      )}
+    </ModalControl>
   );
 };
 
