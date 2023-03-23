@@ -16,7 +16,7 @@ import { CourseParticipationBlock } from './CourseParticipationBlock';
 
 interface IProps {
   course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk;
-  setInvitationModalOpen: Dispatch<SetStateAction<boolean>>;
+  setInvitationModalOpen?: Dispatch<SetStateAction<boolean>>;
 }
 
 export const CoursePageDescriptionView: FC<IProps> = ({
