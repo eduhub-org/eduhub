@@ -69,6 +69,7 @@ select_permissions:
         - contentDescriptionField2
         - cost
         - coverImage
+        - created_at
         - ects
         - endTime
         - headingDescriptionField1
@@ -83,6 +84,7 @@ select_permissions:
         - startTime
         - tagline
         - title
+        - updated_at
         - weekDay
       filter:
         _and:
@@ -137,6 +139,7 @@ select_permissions:
         - contentDescriptionField2
         - cost
         - coverImage
+        - created_at
         - ects
         - endTime
         - headingDescriptionField1
@@ -152,6 +155,7 @@ select_permissions:
         - status
         - tagline
         - title
+        - updated_at
         - weekDay
       filter:
         CourseEnrollments:

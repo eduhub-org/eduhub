@@ -1,4 +1,5 @@
 {
+  "name": "edu-hub",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/edu-hub",
   "projectType": "application",
@@ -23,7 +24,8 @@
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "edu-hub:build",
-        "dev": true
+        "dev": true,
+        "hostname": "0.0.0.0"
       },
       "configurations": {
         "development": {

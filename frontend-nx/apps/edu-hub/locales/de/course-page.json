@@ -2,6 +2,10 @@
   "applicationDeadline": "Bewerbungsfrist",
   "applyNow": "JETZT ANMELDEN",
   "attendance": "Attendance",
+  "confirm": "Confirm",
+  "confirmationModalTitle": "Confirm course participation",
+  "confirmationModalTextTop": "Herzlichen Glückwunsch zur Einladung für die Kursteilnahme!",
+  "confirmationModalTextBottom": "Bitte bestätige die Kursteilnahme nur, wenn Du sicher bist, dass Du Zeit hast bis zum Semesterende im vollen Umfang am Kursteilzunehmen.",
   "courseContent": "Kursinhalt",
   "courseCosts": "Der Kurs kostet {{price}}",
   "courseIsFree": "Der Kurs ist kostenfrei",
@@ -123,7 +127,7 @@
   "upgrade-status": "Kursstatus erhöhen und zum nächsten Tab wechseln",
   "show-all-sessions": "Alle Termine anzeigen",
   "hide-sessions": "Termine einklappen",
-  "general-course-info":"*Unsere Kurse sind offen für alle und kostenlos für Studierende, Schüler:innen, Auszubildende, Gründer:innen, wissenschaftliche Mitarbeiter:innen, Arbeitssuchende, Geflüchtete und Rentner:innen. Für Berufstätige fällt für den Erwerb eines Leistungszertifikats eine Gebühr in Höhe von 200 Euro an. Über team@opencampus.sh kann ein Stipendium beantragt werden.*",
+  "general-course-info":"*Unsere Kurse sind offen für alle und kostenlos für Studierende, Schüler:innen, Auszubildende, Gründer:innen, Lehrkräfte, wissenschaftliche Mitarbeiter:innen, Arbeitssuchende, Geflüchtete und Rentner:innen. Für Berufstätige fällt für den Erwerb eines Leistungszertifikats eine Gebühr in Höhe von 200 Euro an. Über team@opencampus.sh kann ein Stipendium beantragt werden.*",
   "to-be-defined": "Der Ort bzw. die Adresse wird noch bekannt gegeben.",
   "not-submitted": "nicht eingereicht"
 }

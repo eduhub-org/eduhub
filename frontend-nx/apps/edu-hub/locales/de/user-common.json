@@ -6,5 +6,10 @@
     "employmentStatus": "Employment Status",
     "university": "University",
     "nameOfUniversity": "Name of University",
-    "matriculationNumber": "Matriculation number"
+    "matriculationNumber": "Matriculation number",
+    "otherUniversityLabel": {
+      "university": "Name der Universität",
+      "organization": "Name der Organisation",
+      "other": "Andere Beschäftigung"
+    }
 }

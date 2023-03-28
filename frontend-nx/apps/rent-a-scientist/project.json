@@ -1,4 +1,5 @@
 {
+  "name": "rent-a-scientist",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/rent-a-scientist",
   "projectType": "application",

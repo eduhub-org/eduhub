@@ -1,15 +1,15 @@
 import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
-import React, { FC, ReactElement, useCallback } from 'react';
+import React, { FC, ReactNode, useCallback } from 'react';
 import { MdClose } from 'react-icons/md';
 
-interface IPros {
+interface IProps {
   showModal: boolean;
   modalTitle?: string;
   onClose: (showModel: boolean) => void;
-  children?: ReactElement;
+  children?: ReactNode;
 }
 
-const ModalControl: FC<IPros> = ({
+const ModalControl: FC<IProps> = ({
   showModal,
   onClose,
   modalTitle,

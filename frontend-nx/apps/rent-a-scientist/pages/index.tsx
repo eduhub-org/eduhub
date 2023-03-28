@@ -45,9 +45,9 @@ const Home: FC = () => {
                 Bereits getätigte Anmeldungen
               </h1>
               <div className="mt-2 mb-2">
-                <Link href="/myrequests">
-                  <a className="underline">Hier</a>
-                </Link>{" "}
+                <Link className="underline" href="/myrequests">
+                  Hier
+                </Link>{' '}
                 können Sie ihre bereits getätigten Anmeldungen sehen.
               </div>
             </>
