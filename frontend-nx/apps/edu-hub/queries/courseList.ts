@@ -15,7 +15,7 @@ export const COURSE_LIST_ANONYMOUS = gql`
 export const COURSE_LIST = gql`
   ${COURSE_FRAGMENT}
   query CourseList($where: Course_bool_exp! = {}) {
-    Course(order_by: { id: desc }) {
+    Course(order_by: { updated_at: desc }) {
       ...CourseFragment
     }
   }
