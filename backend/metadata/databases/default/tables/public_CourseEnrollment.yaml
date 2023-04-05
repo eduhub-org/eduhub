@@ -93,4 +93,3 @@ update_permissions:
           - userId:
               _eq: X-Hasura-User-Id
       check: {}
-
