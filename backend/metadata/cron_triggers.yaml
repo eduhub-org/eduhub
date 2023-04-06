@@ -1,5 +1,5 @@
 - name: send_questionaires
-  webhook: '{{CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES}}'
+  webhook: http://functions:42024
   schedule: 0 */2 * * *
   include_in_metadata: true
   payload: {}
