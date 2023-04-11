@@ -17,7 +17,7 @@ class EduHub:
     # __metaclass__ = "EduHub"
 
     def __init__(self):
-        self.url = os.getenv('HASURA_HASURA_ENDPOINT')
+        self.url = os.getenv('HASURA_ENDPOINT')
         self.hasura_admin_secret = os.getenv('HASURA_GRAPHQL_ADMIN_KEY')
         self.headers = ""
 
@@ -40,7 +40,7 @@ class EduHub:
 
     def send_query(self, query, variables):
         self.set_headers()
-        logging.info(
+        logging.debug(
             f"URL: {self.url}\nHeader: {self.headers}\nQuery: {query}\nVariables: {variables}")
         r = requests.post(
             self.url, json={'query': query, 'variables': variables}, headers=self.headers)
