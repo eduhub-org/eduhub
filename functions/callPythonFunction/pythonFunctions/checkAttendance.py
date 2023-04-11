@@ -24,10 +24,18 @@ def checkAttendance(payload):
         Ids of the sessions for which the attendances were checked
     """
 
-    return payload
+    logging.info(
+        "function checkAttendance called; returning without further action (WIP)")
+    return("function checkAttendance called; returning without further action (WIP)")
 
     edu = api.EduHub()
+    logging.info(f"edu.url:  {edu.url}")
     sessions = edu.get_finished_sessions_without_attendance_check()
+
+    # test if session is null
+    if sessions is None:
+        logging.info("No finished sessions without attendance check found")
+        return "No finished sessions without attendance check found"
 
     zoom = api.Zoom()
 

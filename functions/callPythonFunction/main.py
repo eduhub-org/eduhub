@@ -27,7 +27,7 @@ def call_python_function(request):
     """
 
     arguments_json = request.get_json()
-    logging.info(f"Request: {arguments_json}")
+    logging.debug(f"Request: {arguments_json}")
     # Transform the "headers" list into a dictionary
     headers_dict = {header['name']: header['value']
                     if 'value' in header else header['value_from_env'] for header in arguments_json['headers']}
