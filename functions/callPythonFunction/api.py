@@ -17,8 +17,7 @@ class EduHub:
     # __metaclass__ = "EduHub"
 
     def __init__(self):
-        self.url = 'https://' + \
-            os.getenv('HASURA_SERVICE_NAME') + '.opencampus.sh/v1/graphql'
+        self.url = os.getenv('HASURA_HASURA_ENDPOINT')
         self.hasura_admin_secret = os.getenv('HASURA_GRAPHQL_ADMIN_KEY')
         self.headers = ""
 
@@ -50,10 +49,10 @@ class EduHub:
         else:
             return(f'Something went wrong. HTTP Code: {r.status_code}')
 
-    def get_sessions_without_attendance_check(self):
+    def get_finished_sessions_without_attendance_check(self):
         variables = {}
         query = """query {
-            Session(where: {attendanceData: {_is_null: true}}) {
+            Session(where: {attendanceData: {_is_null: true}, endDateTime: {_lt: "now()"}}) {
                 id
                 SessionAddresses {
                     link
