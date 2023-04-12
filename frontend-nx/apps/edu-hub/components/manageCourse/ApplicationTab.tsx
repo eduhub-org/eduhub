@@ -1,5 +1,6 @@
 import { QueryResult } from '@apollo/client';
 import { FC, useCallback, useMemo, useState } from 'react';
+import { Button } from '../common/Button';
 
 import {
   ManagedCourse_Course_by_pk,
@@ -224,6 +225,13 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
     return result;
   }, [course]);
 
+  const getEmailsOfConfirmedApplications = () => {
+    return courseEnrollments
+      .filter((enrollment) => enrollment.status === 'CONFIRMED')
+      .map((enrollment) => enrollment.User.email)
+      .join(',');
+  };
+
   return (
     <>
       <div>
@@ -264,6 +272,14 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
             {t('course-page:no-applications-present')}
           </p>
         )}
+        <Button
+          as="a"
+          href={`mailto:?bcc=${getEmailsOfConfirmedApplications()}`}
+          className="bg-edu-course-current rounded-full py-2 px-4"
+          filled
+        >
+          {t('course-page:email-confirmed-applicants')}
+        </Button>{' '}
       </div>
 
       <Dialog
