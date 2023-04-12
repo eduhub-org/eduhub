@@ -31,8 +31,8 @@ import {
 import {
   UpdateEnrollmentStatus,
   UpdateEnrollmentStatusVariables,
-} from 'apps/edu-hub/queries/__generated__/UpdateEnrollmentStatus';
-import { User, UserVariables } from 'apps/edu-hub/queries/__generated__/User';
+} from '../../queries/__generated__/UpdateEnrollmentStatus';
+import { User, UserVariables } from '../../queries/__generated__/User';
 import { Button } from '../common/Button';
 import FormFieldRow from '../common/forms/FormFieldRow';
 
@@ -105,9 +105,7 @@ const InvitationModal: FC<IProps> = ({
         break;
 
       case Employment_enum.OTHER:
-        setOtherUniversityLabel(
-          t('user-common:otherUniversityLabel.other')
-        );
+        setOtherUniversityLabel(t('user-common:otherUniversityLabel.other'));
         setUniversityVisible(false);
         setOtherUniversityVisible(true);
         break;
