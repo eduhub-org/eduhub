@@ -115,12 +115,16 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
     UpdateEnrollmentForInvite,
     UpdateEnrollmentForInviteVariables
   >(UPDATE_ENROLLMENT_FOR_INVITE);
-  const handleSendInvites = useCallback(async () => {
+  const handleSendInvitesAndRejections = useCallback(async () => {
     if (mailTemplates != null) {
       const inviteTemplate = mailTemplates.MailTemplate.find(
         (x) => x.title === 'INVITE'
       );
-      if (inviteTemplate != null) {
+      const rejectTemplate = mailTemplates.MailTemplate.find(
+        (x) => x.title === 'DECLINE'
+      );
+
+      if (inviteTemplate != null && rejectTemplate != null) {
         const relevantEnrollments = selectedEnrollments
           .map((eid) => {
             const ce = course.CourseEnrollments.find((e) => e.id === eid);
@@ -133,7 +137,15 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
 
         try {
           for (const enrollment of relevantEnrollments) {
-            const template = { ...inviteTemplate };
+            let template;
+            if (enrollment.motivationRating === 'INVITE') {
+              template = { ...inviteTemplate };
+            } else if (enrollment.motivationRating === 'DECLINE') {
+              template = { ...rejectTemplate };
+            } else {
+              continue;
+            }
+
             const doReplace = (source: string) => {
               return source
                 .replaceAll('[User:Firstname]', enrollment.User.firstName)
@@ -149,15 +161,15 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
                 );
             };
 
-            template.content = doReplace(inviteTemplate.content);
-            template.subject = doReplace(inviteTemplate.subject);
+            template.content = doReplace(template.content);
+            template.subject = doReplace(template.subject);
 
             await insertMailLogMutation({
               variables: {
                 bcc: template.bcc,
                 cc: template.cc,
                 content: template.content,
-                from: template.from || 'steffen@opencampus.sh',
+                from: template.from || 'noreply@opencampus.sh',
                 status: 'READY_TO_SEND',
                 subject: template.subject,
                 to: enrollment.User.email,
@@ -176,7 +188,9 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
           setIsInviteDialogOpen(false);
         }
       } else {
-        console.log('Missing mail template INVITE, cannot send invite mails!');
+        console.log(
+          'Missing mail templates INVITE and/or REJECT, cannot send invite and rejection mails!'
+        );
       }
     }
   }, [
@@ -310,7 +324,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
           </div>
 
           <div className="flex justify-center mt-16">
-            <OldButton onClick={handleSendInvites}>
+            <OldButton onClick={handleSendInvitesAndRejections}>
               {t('course-page:invite')}
             </OldButton>
           </div>
