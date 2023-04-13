@@ -1,5 +1,6 @@
 import { QueryResult } from '@apollo/client';
 import { FC, useCallback, useMemo, useState } from 'react';
+import { Button } from '../common/Button';
 
 import {
   ManagedCourse_Course_by_pk,
@@ -20,7 +21,7 @@ import {
   UpdateEnrollmentRatingVariables,
 } from '../../queries/__generated__/UpdateEnrollmentRating';
 import {
-  UPDATE_ENROLLMENT_FOR_INVITE,
+  UPDATE_ENROLLMENT_STATUS,
   UPDATE_ENROLLMENT_RATING,
 } from '../../queries/insertEnrollment';
 import { Button as OldButton } from '../common/Button';
@@ -37,9 +38,9 @@ import {
   InsertMailLogVariables,
 } from '../../queries/__generated__/InsertMailLog';
 import {
-  UpdateEnrollmentForInvite,
-  UpdateEnrollmentForInviteVariables,
-} from '../../queries/__generated__/UpdateEnrollmentForInvite';
+  UpdateEnrollmentStatus,
+  UpdateEnrollmentStatusVariables,
+} from '../../queries/__generated__/UpdateEnrollmentStatus';
 import useTranslation from 'next-translate/useTranslation';
 import { useCurrentRole } from '../../hooks/authentication';
 import { AuthRoles } from '../../types/enums';
@@ -110,16 +111,20 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
     InsertMailLog,
     InsertMailLogVariables
   >(INSERT_MAIL_LOG);
-  const [updateEnrollmentForInvite] = useRoleMutation<
-    UpdateEnrollmentForInvite,
-    UpdateEnrollmentForInviteVariables
-  >(UPDATE_ENROLLMENT_FOR_INVITE);
-  const handleSendInvites = useCallback(async () => {
+  const [updateEnrollmentStatus] = useRoleMutation<
+    UpdateEnrollmentStatus,
+    UpdateEnrollmentStatusVariables
+  >(UPDATE_ENROLLMENT_STATUS);
+  const handleSendInvitesAndRejections = useCallback(async () => {
     if (mailTemplates != null) {
       const inviteTemplate = mailTemplates.MailTemplate.find(
         (x) => x.title === 'INVITE'
       );
-      if (inviteTemplate != null) {
+      const rejectTemplate = mailTemplates.MailTemplate.find(
+        (x) => x.title === 'DECLINE'
+      );
+
+      if (inviteTemplate != null && rejectTemplate != null) {
         const relevantEnrollments = selectedEnrollments
           .map((eid) => {
             const ce = course.CourseEnrollments.find((e) => e.id === eid);
@@ -132,7 +137,18 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
 
         try {
           for (const enrollment of relevantEnrollments) {
-            const template = { ...inviteTemplate };
+            let template;
+            let newStatus;
+            if (enrollment.motivationRating === 'INVITE') {
+              template = { ...inviteTemplate };
+              newStatus = 'INVITED';
+            } else if (enrollment.motivationRating === 'DECLINE') {
+              template = { ...rejectTemplate };
+              newStatus = 'REJECTED';
+            } else {
+              continue;
+            }
+
             const doReplace = (source: string) => {
               return source
                 .replaceAll('[User:Firstname]', enrollment.User.firstName)
@@ -148,41 +164,45 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
                 );
             };
 
-            template.content = doReplace(inviteTemplate.content);
-            template.subject = doReplace(inviteTemplate.subject);
+            template.content = doReplace(template.content);
+            template.subject = doReplace(template.subject);
 
             await insertMailLogMutation({
               variables: {
                 bcc: template.bcc,
                 cc: template.cc,
                 content: template.content,
-                from: template.from || 'steffen@opencampus.sh',
+                from: template.from || 'noreply@opencampus.sh',
                 status: 'READY_TO_SEND',
                 subject: template.subject,
                 to: enrollment.User.email,
               },
             });
 
-            await updateEnrollmentForInvite({
+            await updateEnrollmentStatus({
               variables: {
                 enrollmentId: enrollment.id,
-                expire: inviteExpireDate,
+                expire: newStatus === 'INVITED' ? inviteExpireDate : null,
+                status: newStatus,
               },
             });
           }
         } finally {
           qResult.refetch();
           setIsInviteDialogOpen(false);
+          setSelectedEnrollments([]);
         }
       } else {
-        console.log('Missing mail template INVITE, cannot send invite mails!');
+        console.log(
+          'Missing mail templates INVITE and/or REJECT, cannot send invite and rejection mails!'
+        );
       }
     }
   }, [
     mailTemplates,
     selectedEnrollments,
     insertMailLogMutation,
-    updateEnrollmentForInvite,
+    updateEnrollmentStatus,
     qResult,
     setIsInviteDialogOpen,
     inviteExpireDate,
@@ -224,6 +244,13 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
     return result;
   }, [course]);
 
+  const getEmailsOfConfirmedApplications = () => {
+    return courseEnrollments
+      .filter((enrollment) => enrollment.status === 'CONFIRMED')
+      .map((enrollment) => enrollment.User.email)
+      .join(',');
+  };
+
   return (
     <>
       <div>
@@ -264,6 +291,14 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
             {t('course-page:no-applications-present')}
           </p>
         )}
+        <Button
+          as="a"
+          href={`mailto:?bcc=${getEmailsOfConfirmedApplications()}`}
+          className="bg-edu-course-current rounded-full py-2 px-4"
+          filled
+        >
+          {t('course-page:email-confirmed-applicants')}
+        </Button>{' '}
       </div>
 
       <Dialog
@@ -294,7 +329,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
           </div>
 
           <div className="flex justify-center mt-16">
-            <OldButton onClick={handleSendInvites}>
+            <OldButton onClick={handleSendInvitesAndRejections}>
               {t('course-page:invite')}
             </OldButton>
           </div>

@@ -52,7 +52,8 @@
   "invited": "Eingeladen",
   "invitation-confirmed": "Einladung bestätigt",
   "aborted": "Abgebrochen",
-  "rejected": "Abgelehnt",
+  "rejected": "Bewerbung abgelehnt",
+  "cancelled": "Einladung abgelehnt",
   "invitation-expired": "Einladung abgelaufen",
   "invitation-deadline": "Ablaufdatum Einladung",
   "send-invitations": "Einladungen verschicken",
@@ -129,5 +130,6 @@
   "hide-sessions": "Termine einklappen",
   "general-course-info":"*Unsere Kurse sind offen für alle und kostenlos für Studierende, Schüler:innen, Auszubildende, Gründer:innen, wissenschaftliche Mitarbeiter:innen, Arbeitssuchende, Geflüchtete und Rentner:innen. Für Berufstätige fällt für den Erwerb eines Leistungszertifikats eine Gebühr in Höhe von 200 Euro an. Über team@opencampus.sh kann ein Stipendium beantragt werden.*",
   "to-be-defined": "Der Ort bzw. die Adresse wird noch bekannt gegeben.",
-  "not-submitted": "nicht eingereicht"
+  "not-submitted": "nicht eingereicht",
+  "email-confirmed-applicants": "Email an bestätigte Bewerber:innen"
 }
