@@ -24,4 +24,5 @@ export interface UpdateEnrollmentStatus {
 export interface UpdateEnrollmentStatusVariables {
   enrollmentId: number;
   status: CourseEnrollmentStatus_enum;
+  expire?: any | null;
 }
