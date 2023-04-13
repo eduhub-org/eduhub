@@ -186,6 +186,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
         } finally {
           qResult.refetch();
           setIsInviteDialogOpen(false);
+          setSelectedEnrollments([]);
         }
       } else {
         console.log(
