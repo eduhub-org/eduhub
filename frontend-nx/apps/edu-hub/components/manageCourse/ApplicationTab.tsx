@@ -21,7 +21,7 @@ import {
   UpdateEnrollmentRatingVariables,
 } from '../../queries/__generated__/UpdateEnrollmentRating';
 import {
-  UPDATE_ENROLLMENT_FOR_INVITE,
+  UPDATE_ENROLLMENT_STATUS,
   UPDATE_ENROLLMENT_RATING,
 } from '../../queries/insertEnrollment';
 import { Button as OldButton } from '../common/Button';
@@ -38,9 +38,9 @@ import {
   InsertMailLogVariables,
 } from '../../queries/__generated__/InsertMailLog';
 import {
-  UpdateEnrollmentForInvite,
-  UpdateEnrollmentForInviteVariables,
-} from '../../queries/__generated__/UpdateEnrollmentForInvite';
+  UpdateEnrollmentStatus,
+  UpdateEnrollmentStatusVariables,
+} from '../../queries/__generated__/UpdateEnrollmentStatus';
 import useTranslation from 'next-translate/useTranslation';
 import { useCurrentRole } from '../../hooks/authentication';
 import { AuthRoles } from '../../types/enums';
@@ -111,10 +111,10 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
     InsertMailLog,
     InsertMailLogVariables
   >(INSERT_MAIL_LOG);
-  const [updateEnrollmentForInvite] = useRoleMutation<
-    UpdateEnrollmentForInvite,
-    UpdateEnrollmentForInviteVariables
-  >(UPDATE_ENROLLMENT_FOR_INVITE);
+  const [updateEnrollmentStatus] = useRoleMutation<
+    UpdateEnrollmentStatus,
+    UpdateEnrollmentStatusVariables
+  >(UPDATE_ENROLLMENT_STATUS);
   const handleSendInvitesAndRejections = useCallback(async () => {
     if (mailTemplates != null) {
       const inviteTemplate = mailTemplates.MailTemplate.find(
@@ -138,10 +138,13 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
         try {
           for (const enrollment of relevantEnrollments) {
             let template;
+            let newStatus;
             if (enrollment.motivationRating === 'INVITE') {
               template = { ...inviteTemplate };
+              newStatus = 'INVITED';
             } else if (enrollment.motivationRating === 'DECLINE') {
               template = { ...rejectTemplate };
+              newStatus = 'REJECTED';
             } else {
               continue;
             }
@@ -176,10 +179,11 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
               },
             });
 
-            await updateEnrollmentForInvite({
+            await updateEnrollmentStatus({
               variables: {
                 enrollmentId: enrollment.id,
-                expire: inviteExpireDate,
+                expire: newStatus === 'INVITED' ? inviteExpireDate : null,
+                status: newStatus,
               },
             });
           }
@@ -198,7 +202,7 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
     mailTemplates,
     selectedEnrollments,
     insertMailLogMutation,
-    updateEnrollmentForInvite,
+    updateEnrollmentStatus,
     qResult,
     setIsInviteDialogOpen,
     inviteExpireDate,
