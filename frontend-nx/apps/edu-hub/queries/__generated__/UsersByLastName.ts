@@ -6,10 +6,10 @@
 import { User_bool_exp, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL query operation: UesrsByLastName
+// GraphQL query operation: UsersByLastName
 // ====================================================
 
-export interface UesrsByLastName_User_CourseEnrollments_Course_Program {
+export interface UsersByLastName_User_CourseEnrollments_Course_Program {
   __typename: "Program";
   id: number;
   /**
@@ -18,7 +18,7 @@ export interface UesrsByLastName_User_CourseEnrollments_Course_Program {
   title: string;
 }
 
-export interface UesrsByLastName_User_CourseEnrollments_Course {
+export interface UsersByLastName_User_CourseEnrollments_Course {
   __typename: "Course";
   id: number;
   /**
@@ -28,10 +28,10 @@ export interface UesrsByLastName_User_CourseEnrollments_Course {
   /**
    * An object relationship
    */
-  Program: UesrsByLastName_User_CourseEnrollments_Course_Program;
+  Program: UsersByLastName_User_CourseEnrollments_Course_Program;
 }
 
-export interface UesrsByLastName_User_CourseEnrollments {
+export interface UsersByLastName_User_CourseEnrollments {
   __typename: "CourseEnrollment";
   id: number;
   /**
@@ -50,10 +50,10 @@ export interface UesrsByLastName_User_CourseEnrollments {
   /**
    * An object relationship
    */
-  Course: UesrsByLastName_User_CourseEnrollments_Course;
+  Course: UsersByLastName_User_CourseEnrollments_Course;
 }
 
-export interface UesrsByLastName_User {
+export interface UsersByLastName_User {
   __typename: "User";
   id: any;
   /**
@@ -71,31 +71,31 @@ export interface UesrsByLastName_User {
   /**
    * An array relationship
    */
-  CourseEnrollments: UesrsByLastName_User_CourseEnrollments[];
+  CourseEnrollments: UsersByLastName_User_CourseEnrollments[];
 }
 
-export interface UesrsByLastName_User_aggregate_aggregate {
+export interface UsersByLastName_User_aggregate_aggregate {
   __typename: "User_aggregate_fields";
   count: number;
 }
 
-export interface UesrsByLastName_User_aggregate {
+export interface UsersByLastName_User_aggregate {
   __typename: "User_aggregate";
-  aggregate: UesrsByLastName_User_aggregate_aggregate | null;
+  aggregate: UsersByLastName_User_aggregate_aggregate | null;
 }
 
-export interface UesrsByLastName {
+export interface UsersByLastName {
   /**
    * fetch data from the table: "User"
    */
-  User: UesrsByLastName_User[];
+  User: UsersByLastName_User[];
   /**
    * fetch aggregated fields from the table: "User"
    */
-  User_aggregate: UesrsByLastName_User_aggregate;
+  User_aggregate: UsersByLastName_User_aggregate;
 }
 
-export interface UesrsByLastNameVariables {
+export interface UsersByLastNameVariables {
   limit?: number | null;
   offset?: number | null;
   filter?: User_bool_exp | null;

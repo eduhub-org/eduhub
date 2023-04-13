@@ -77,7 +77,7 @@ export const USER_SELECTION_TWO_PARAMS = gql`
 `;
 
 export const USERS_BY_LAST_NAME = gql`
-  query UesrsByLastName(
+  query UsersByLastName(
     $limit: Int = 10
     $offset: Int = 0
     $filter: User_bool_exp = {}
