@@ -266,6 +266,7 @@ interface IPropsUser {
 const UserOneRow: FC<IPropsUser> = ({ user }) => {
   const pStyle = 'text-gray-700 truncate font-medium max-w-xs';
   const tdStyple = 'pl-5';
+  const enrollmentPStyle = 'text-gray-600 truncate text-sm max-w-xs';
 
   return (
     <>
@@ -280,6 +281,24 @@ const UserOneRow: FC<IPropsUser> = ({ user }) => {
           <p className={pStyle}>{user.email}</p>
         </td>
       </tr>
+      {user.CourseEnrollments.map((enrollment) => (
+        <tr key={enrollment.id} className="bg-edu-course-list h-12">
+          <td className={tdStyple}>
+            <p className={enrollmentPStyle}>
+              {enrollment.Course.Program.title}: {enrollment.Course.title}
+            </p>
+          </td>
+          <td className={tdStyple}>
+            <p className={enrollmentPStyle}>Status: {enrollment.status}</p>
+          </td>
+          <td className={tdStyple}>
+            <p className={enrollmentPStyle}>
+              Last Updated:{' '}
+              {new Date(enrollment.updated_at).toLocaleDateString()}
+            </p>
+          </td>
+        </tr>
+      ))}
       <tr className="h-1" />
     </>
   );
