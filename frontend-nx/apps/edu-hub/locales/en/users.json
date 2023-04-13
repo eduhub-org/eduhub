@@ -21,5 +21,7 @@
   "regDate": "Reg. Date",
   "paginationText": "Page {{currentPage}} of {{totalPage}}",
   "some-info-about-you": "Bitte gib uns zunächst noch ein paar Informationen über dich.",
-  "status": "Status"
+  "status": "Status",
+  "allPrograms": "Alle Programme",
+  "filterByProgram": "Programmfilter"
 }
