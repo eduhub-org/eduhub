@@ -55,7 +55,7 @@ const now7 = new Date();
 now7.setDate(now7.getDate() + 7);
 
 export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const currentRole = useCurrentRole();
 
   const infoDots = (
@@ -320,10 +320,11 @@ export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
             <div className="mr-3">{t('course-page:invitation-deadline')}:</div>
             <div className="ml-3">
               <DatePicker
-                dateFormat={'dd/MM/yyyy'}
+                dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
                 selected={inviteExpireDate}
                 onChange={handleSetInviteExpireDate}
                 minDate={now}
+                locale={lang}
               />
             </div>
           </div>
