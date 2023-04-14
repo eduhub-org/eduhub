@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { IconButton } from '@material-ui/core';
 import { FC, MutableRefObject, useCallback, useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 import {
   MdCheckBox,
@@ -68,6 +69,7 @@ import applicantsInvitedPie from '../../public/images/course/status/applicants-i
 import participantsRatedPie from '../../public/images/course/status/participants-rated.svg';
 
 import { InstructorColumn } from './CoursesInstructorColumn';
+import { Translate } from 'next-translate';
 // import { INSERT_NEW_COURSE_LOCATION } from '../../queries/course';
 
 interface EntrollmentStatusCount {
@@ -122,7 +124,6 @@ const courseStatus = (status: string) => {
 interface IPropsCourseOneRow {
   programs: Programs_Program[];
   course: AdminCourseList_Course;
-  t: any;
   qResult: QueryResult<any>;
   refetchCourses: () => void;
   onSetTitle: (c: AdminCourseList_Course, title: string) => any;
@@ -141,7 +142,6 @@ interface IPropsCourseOneRow {
 const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   programs,
   course,
-  t,
   refetchCourses,
   onSetTitle,
   onSetChatLink,
@@ -151,6 +151,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   qResult,
   // onDeleteCourseGroup,
 }) => {
+  const { t, lang } = useTranslation('course-page');
   const handleToggleAttendanceCertificatePossible = useCallback(() => {
     onSetAttendanceCertificatePossible(
       course,
@@ -522,10 +523,11 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                   <span>{t('course-page:application-end')}</span>
                   <br />
                   <DatePicker
-                    dateFormat={'dd/MM/yyyy'}
+                    dateFormat={lang === "de" ? "dd.MM.yyyy" : 'MM/dd/yyyy'}
                     className="w-full bg-edu-light-gray"
                     selected={applicationEndDate}
                     onChange={handleApplicationEndDateChange}
+                    locale={lang}
                   />
                 </div>
                 <div className="p-0 mb-3">

@@ -77,7 +77,7 @@ export const SessionRow: FC<IProps> = ({
   onDeleteLocation,
   onDeleteSpeaker,
 }) => {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
   const handleDelete = useCallback(() => {
     if (session != null) {
@@ -260,10 +260,11 @@ export const SessionRow: FC<IProps> = ({
             <DatePicker
               minDate={lectureStart}
               maxDate={lectureEnd}
-              dateFormat={'dd/MM/yyy'}
+              dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
               className="w-full bg-edu-light-gray"
               selected={session.startDateTime}
               onChange={handleSetDate}
+              locale={lang}
             />{' '}
           </div>
         )}

@@ -40,9 +40,10 @@ import {
   UpdateCourseEcts,
   UpdateCourseEctsVariables,
 } from '../../queries/__generated__/UpdateCourseEcts';
+import { Translate } from 'next-translate';
 
 interface IProps {
-  t: any;
+  t: Translate;
   programs: Programs_Program[];
   courseListRequest: any;
   updateFilter: (newState: AdminCourseListVariables) => void;
@@ -190,7 +191,6 @@ const CourseListTable: FC<IProps> = ({
                   course={course}
                   programs={programs}
                   refetchCourses={refetchCourses}
-                  t={t}
                   onSetAttendanceCertificatePossible={
                     handleAttendanceCertificatePossible
                   }
