@@ -119,7 +119,7 @@
   "default-course-title": "Neuer Kurs",
   "how-to": "How to",
   "to-chat": "zum Chat",
-  "to-online-meeting": "ZUM ONLINE MEETING",
+  "to-online-meeting": "zum Online-Meeting",
   "attendances": "Anwesenheiten",
   "achievementCertificateDownload": "Dein Leistungszertifikat",
   "attendanceCertificateDownload": "Deine Anwesenheitsbescheinigung",
@@ -131,5 +131,6 @@
   "general-course-info":"*Unsere Kurse sind offen für alle und kostenlos für Studierende, Schüler:innen, Auszubildende, Gründer:innen, wissenschaftliche Mitarbeiter:innen, Arbeitssuchende, Geflüchtete und Rentner:innen. Für Berufstätige fällt für den Erwerb eines Leistungszertifikats eine Gebühr in Höhe von 200 Euro an. Über team@opencampus.sh kann ein Stipendium beantragt werden.*",
   "to-be-defined": "Der Ort bzw. die Adresse wird noch bekannt gegeben.",
   "not-submitted": "nicht eingereicht",
-  "email-confirmed-applicants": "Email an bestätigte Bewerber:innen"
+  "email-confirmed-applicants": "Email an bestätigte Bewerber:innen",
+  "application-end": "Bewerbungsende:"
 }
