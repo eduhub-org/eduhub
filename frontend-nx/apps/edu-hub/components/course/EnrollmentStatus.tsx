@@ -82,9 +82,9 @@ export const EnrollmentStatus: FC<IProps> = ({
   if (!enrollments || enrollments.length < 1) {
     // check if current date is after application deadline
     const currentDate = new Date();
-    const currentDateString = currentDate.toISOString().split('T')[0];
+    currentDate.setHours(0, 0, 0, 0);
 
-    if (course.applicationEnd <= currentDateString) {
+    if (course.applicationEnd <= currentDate) {
       content = (
         <span className="bg-gray-300 p-4">
           {t('status.applicationPeriodEnded')}
