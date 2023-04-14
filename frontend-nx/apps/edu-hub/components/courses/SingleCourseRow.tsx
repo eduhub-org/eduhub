@@ -1,6 +1,8 @@
 import { useRouter } from 'next/router';
 import { IconButton } from '@material-ui/core';
 import { FC, MutableRefObject, useCallback, useRef, useState } from 'react';
+import DatePicker from 'react-datepicker';
+
 import {
   MdCheckBox,
   // MdCheckBoxOutlineBlank,
@@ -373,50 +375,29 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
     ]
   );
 
-  // const [addCourseGroupOpen, setAddCourseGroupOpen] = useState(false);
-  // const openAddCourseGroup = useCallback(() => {
-  //   setAddCourseGroupOpen(true);
-  // }, [setAddCourseGroupOpen]);
+  const [applicationEndDate, setApplicationEndDate] = useState(
+    course.applicationEnd ? new Date(course.applicationEnd) : null
+  );
 
-  // const handleDeleteCourseGroup = useCallback(
-  //   (id: number) => {
-  //     onDeleteCourseGroup(id);
-  //   },
-  //   [onDeleteCourseGroup]
-  // );
-  // const courseGroupTags = (course?.CourseGroups || []).map((courseGroup) => ({
-  //   id: courseGroup.id,
-  //   display: courseGroup.CourseGroupOption.title,
-  // }));
-
-  // const [insertCourseGroup] = useAdminMutation<
-  //   InsertNewCourseGroup,
-  //   InsertNewCourseGroupVariables
-  // >(INSERT_NEW_COURSE_GROUP);
-  // INSERT_NEW_COURSE_LOCATION;
-  // const handleNewSpeaker = useCallback(
-  //   async (
-  //     confirmed: boolean,
-  //     courseGroup: courseGroupForSelection1_courseGroup | null
-  //   ) => {
-  //     if (confirmed && courseGroup != null && course != null) {
-  //       let expertId = -1;
-
-  //       if (expertId !== -1) {
-  //         await insertCourseGroup({
-  //           variables: {
-  //             courseGroup,
-  //             courseId: course.id,
-  //           },
-  //         });
-  //       }
-
-  //       qResult.refetch();
-  //     }
-  //     setAddCourseGroupOpen(false);
-  //   },
-  //   [course, insertCourseGroup, qResult]
-  // );
+  const handleApplicationEndDateChange = useCallback(
+    async (date) => {
+      setApplicationEndDate(date);
+      const response = await updateCourse({
+        variables: {
+          id: course.id,
+          changes: {
+            applicationEnd: date.toISOString(),
+          },
+        },
+      });
+      if (response.errors) {
+        console.log(response.errors);
+        return;
+      }
+      refetchCourses();
+    },
+    [course.id, refetchCourses, updateCourse]
+  );
 
   return (
     <>
@@ -538,6 +519,16 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
             <td className="px-5" colSpan={4}>
               <div className="flex flex-col space-y-2 mb-2">
                 <div className="p-0 mb-3">
+                  <span>{t('course-page:application-end')}</span>
+                  <br />
+                  <DatePicker
+                    dateFormat={'dd/MM/yyyy'}
+                    className="w-full bg-edu-light-gray"
+                    selected={applicationEndDate}
+                    onChange={handleApplicationEndDateChange}
+                  />
+                </div>
+                <div className="p-0 mb-3">
                   <span>{t('course-page:chat-link')}</span>
                   <br />
                   <EhDebounceInput
@@ -593,29 +584,10 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                 </td>
               </div>
             </td>
-            {/* <td className="px-5 inline-block align-top pb-2" colSpan={1}>
-              <div className="mr-3 ml-3 col-span-5">
-                {!course && <>{t('course-group')}</>}
-                {course && (
-                  <div className="m-2">
-                    <EhMultipleTag
-                      requestAddTag={openAddCourseGroup}
-                      requestDeleteTag={handleDeleteCourseGroup}
-                      tags={courseGroupTags}
-                    />
-                  </div>
-                )}
-              </div>
-            </td> */}
           </tr>
           <tr className="h-1" />
         </>
       )}
-      {/* <SelectUserDialog
-        onClose={handleNewSpeaker}
-        open={addSpeakerOpen}
-        title={t('select-something', { something: t('speaker') })}
-      /> */}
     </>
   );
 };
@@ -625,146 +597,3 @@ export default SingleCourseRow;
 const makeFullName = (firstName: string, lastName: string): string => {
   return `${firstName} ${lastName}`;
 };
-
-// /* #region Instructor column */
-// interface IPropsInstructorColumn {
-//   programs: Programs_Program[];
-//   course: AdminCourseList_Course;
-//   t: any;
-//   qResult: QueryResult<any>;
-//   refetchCourses: () => void;
-// }
-
-// const InstructorColumn: FC<IPropsInstructorColumn> = ({
-//   course,
-//   refetchCourses,
-// }) => {
-//   const [openInstructorDialog, setOpenInstructorDialog] = useState(false);
-
-//   /* # region GraphQLAPIs */
-//   const [insertCourseInstructor] = useAdminMutation<
-//     InsertCourseInstructor,
-//     InsertCourseInstructorVariables
-//   >(INSERT_A_COURSEINSTRUCTOR);
-
-//   const [deleteInstructorAPI] = useAdminMutation<
-//     DeleteCourseInstructor,
-//     DeleteCourseInstructorVariables
-//   >(DELETE_COURSE_INSRTRUCTOR);
-
-//   const [insertExpertMutation] = useAdminMutation<
-//     InsertExpert,
-//     InsertExpertVariables
-//   >(INSERT_EXPERT);
-
-//   /* # endregion */
-
-//   /* #region Callbacks */
-//   const addInstructorDialogOpener = useCallback(async () => {
-//     setOpenInstructorDialog(true);
-//   }, [setOpenInstructorDialog]);
-
-//   const deleteInstructorFromACourse = useCallback(
-//     async (id: number) => {
-//       const response = await deleteInstructorAPI({
-//         variables: {
-//           courseId: course.id,
-//           expertId: id,
-//         },
-//       });
-
-//       if (response.errors) {
-//         console.log(response.errors);
-//         return;
-//       }
-//       refetchCourses();
-//     },
-//     [deleteInstructorAPI, refetchCourses, course]
-//   );
-
-//   const addInstructorHandler = useCallback(
-//     async (confirmed: boolean, user: UserForSelection1_User | null) => {
-//       if (!confirmed || user == null) {
-//         setOpenInstructorDialog(false);
-//         return;
-//       }
-
-//       let expertId = -1;
-//       if (user.Experts.length > 0) {
-//         expertId = user.Experts[0].id;
-//       } else {
-//         const newExpert = await insertExpertMutation({
-//           variables: {
-//             userId: user.id,
-//           },
-//         });
-//         if (newExpert.errors) {
-//           console.log(newExpert.errors);
-//           setOpenInstructorDialog(false);
-//           return;
-//         }
-//         expertId = newExpert.data?.insert_Expert?.returning[0]?.id || -1;
-//       }
-
-//       if (expertId === -1) {
-//         setOpenInstructorDialog(false);
-//         return;
-//       }
-//       if (
-//         course.CourseInstructors.some((expert) => expert.Expert.id === expertId)
-//       ) {
-//         setOpenInstructorDialog(false);
-//         return;
-//       }
-//       const response = await insertCourseInstructor({
-//         variables: {
-//           courseId: course.id,
-//           expertId,
-//         },
-//       });
-//       if (response.errors) {
-//         console.log(response.errors);
-//         setOpenInstructorDialog(false);
-//         return;
-//       }
-//       refetchCourses();
-//       setOpenInstructorDialog(false);
-//     },
-//     [insertExpertMutation, refetchCourses, course, insertCourseInstructor]
-//   );
-//   const { t } = useTranslation('course-page');
-
-//   return (
-//     <div className="flex flex-row space-x-1 align-middle">
-//       {
-//         // we need to show just one instructore in main ui
-//         course.CourseInstructors.length > 0 && (
-//           <EhTag
-//             key={`${course.id}-${course.CourseInstructors[0].Expert.id}`}
-//             requestDeleteTag={deleteInstructorFromACourse}
-//             tag={{
-//               display: makeFullName(
-//                 course.CourseInstructors[0].Expert.User.firstName,
-//                 course.CourseInstructors[0].Expert.User.lastName ?? ' '
-//               ),
-//               id: course.CourseInstructors[0].Expert.id,
-//             }}
-//           />
-//         )
-//       }
-//       <div className="">
-//         <MdAddCircle
-//           className="cursor-pointer inline-block align-middle stroke-cyan-500"
-//           onClick={addInstructorDialogOpener}
-//         />
-//       </div>
-//       {openInstructorDialog && (
-//         <SelectUserDialog
-//           onClose={addInstructorHandler}
-//           open={openInstructorDialog}
-//           title={t('add-instructors')}
-//         />
-//       )}
-//     </div>
-//   );
-// };
