@@ -10,18 +10,33 @@ interface IProps {
 export const CourseLinkInfos: FC<IProps> = ({ course }) => {
   const { t } = useTranslation();
 
+  const onlineLocation = course.CourseLocations.find(
+    (location) => location.locationOption === 'ONLINE'
+  );
+
   return (
     <div className="flex justify-center items-center">
-      {/* <div className="mb-4 px-4">
-        <a
-          href={'https://opencampus.gitbook.io/faq'}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-white inline-block max-w-[100px]"
-        >
-          {t('course-page:to-online-meeting')}
-        </a>
-      </div> */}
+      {onlineLocation && onlineLocation.defaultSessionAddress && (
+        <div className="mx-4">
+          {/* <a
+            href={onlineLocation.defaultSessionAddress}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white inline-block max-w-[100px]"
+          >
+            {t('course-page:to-online-meeting')}
+          </a> */}
+          <Button
+            as="a"
+            href={onlineLocation.defaultSessionAddress}
+            filled
+            inverted
+            // className="bg-edu-course-current"
+          >
+            {t('course-page:to-online-meeting')}
+          </Button>
+        </div>
+      )}{' '}
       <div className="mx-4">
         <Button
           as="a"
