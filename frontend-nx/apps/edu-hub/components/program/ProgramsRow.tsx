@@ -285,7 +285,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
     ]
   );
 
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
 
   return (
     <div>
@@ -322,49 +322,54 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
             className="w-full bg-gray-100"
-            dateFormat={'dd/MM/yyyy'}
+            dateFormat={lang === "de" ? "dd.MM.yyyy" : 'MM/dd/yyyy'}
             selected={program.applicationStart || new Date()}
             onChange={handleSetApplicationStart}
+            locale={lang}
           />
         </div>
 
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={'dd/MM/yyyy'}
+            dateFormat={lang === "de" ? "dd.MM.yyyy" : 'MM/dd/yyyy'}
             className="w-full bg-gray-100"
             selected={program.defaultApplicationEnd || new Date()}
             onChange={handleSetApplicationEnd}
+            locale={lang}
           />
         </div>
 
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={'dd/MM/yyyy'}
+            dateFormat={lang === "de" ? "dd.MM.yyyy" : 'MM/dd/yyyy'}
             className="w-full bg-gray-100"
             selected={program.lectureStart || new Date()}
             onChange={handleSetLectureStart}
+            locale={lang}
           />
         </div>
 
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={'dd/MM/yyyy'}
+            dateFormat={lang === "de" ? "dd.MM.yyyy" : 'MM/dd/yyyy'}
             className="w-full bg-gray-100"
             selected={program.lectureEnd || new Date()}
             onChange={handleSetLectureEnd}
+            locale={lang}
           />
         </div>
 
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={'dd/MM/yyyy'}
+            dateFormat={lang === "de" ? "dd.MM.yyyy" : 'MM/dd/yyyy'}
             className="w-full bg-gray-100"
             selected={program.achievementRecordUploadDeadline || new Date()}
             onChange={handleSetUploadData}
+            locale={lang}
           />
         </div>
 
