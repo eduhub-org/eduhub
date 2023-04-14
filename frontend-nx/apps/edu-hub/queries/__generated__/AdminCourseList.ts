@@ -143,6 +143,7 @@ export interface AdminCourseList_Course_CourseGroups {
    * An object relationship
    */
   CourseGroupOption: AdminCourseList_Course_CourseGroups_CourseGroupOption;
+  groupOptionId: number;
 }
 
 export interface AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus {
@@ -304,6 +305,13 @@ export interface AdminCourseList_Course_aggregate {
   aggregate: AdminCourseList_Course_aggregate_aggregate | null;
 }
 
+export interface AdminCourseList_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  id: number;
+  title: string;
+  order: number;
+}
+
 export interface AdminCourseList {
   /**
    * fetch data from the table: "Course"
@@ -313,6 +321,10 @@ export interface AdminCourseList {
    * fetch aggregated fields from the table: "Course"
    */
   Course_aggregate: AdminCourseList_Course_aggregate;
+  /**
+   * fetch data from the table: "CourseGroupOption"
+   */
+  CourseGroupOption: AdminCourseList_CourseGroupOption[];
 }
 
 export interface AdminCourseListVariables {
