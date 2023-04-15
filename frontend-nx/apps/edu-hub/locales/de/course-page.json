@@ -9,6 +9,7 @@
   "courseContent": "Kursinhalt",
   "courseCosts": "Der Kurs kostet {{price}}",
   "courseIsFree": "Der Kurs ist kostenfrei",
+  "courseGroups": "Kursgruppen",
   "courseNotAvailable": "Kurs ist nicht verfügbar",
   "currentCourse": "laufender Kurs",
   "ects": "ECTS",
