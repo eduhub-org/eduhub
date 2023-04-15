@@ -55,6 +55,13 @@ export const ADMIN_COURSE_LIST = gql`
           value
         }
       }
+      CourseGroups {
+        id
+        CourseGroupOption {
+          title
+        }
+        groupOptionId
+      }
       AppliedAndUnratedCount: CourseEnrollments_aggregate(
         where: {
           _and: [
@@ -72,6 +79,11 @@ export const ADMIN_COURSE_LIST = gql`
       aggregate {
         count
       }
+    }
+    CourseGroupOption {
+      id
+      title
+      order
     }
   }
 `;
