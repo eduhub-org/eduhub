@@ -1,12 +1,3 @@
-- name: send_questionaires
-  webhook: http://functions:42024
-  schedule: 0 */2 * * *
-  include_in_metadata: true
-  payload: {}
-  headers:
-    - name: secret
-      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-  comment: Sends out questionaires if necessary
 - name: check_attendance
   webhook: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
   schedule: 0 */2 * * *
@@ -23,3 +14,12 @@
     - name: secret
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   comment: regularly checks zoom and questionaire attendance
+- name: send_questionaires
+  webhook: '{{CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES}}'
+  schedule: 0 */2 * * *
+  include_in_metadata: true
+  payload: {}
+  headers:
+    - name: secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  comment: Sends out questionaires if necessary
