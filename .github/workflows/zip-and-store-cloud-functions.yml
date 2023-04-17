@@ -234,6 +234,13 @@ jobs:
           type: "zip"
           directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/createParticipationCertificate"
           filename: "../createParticipationCertificate.zip"
+          
+      - name: Zip Archive for sendQuestionaires
+        uses: thedoctor0/zip-release@main
+        with:
+          type: "zip"
+          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendQuestionaires"
+          filename: "../sendQuestionaires.zip"
 
       - name: Authenticate to Google Cloud
         id: "auth"
