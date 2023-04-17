@@ -38,7 +38,7 @@ resource "google_cloudfunctions2_function" "call_python_function" {
 
   service_config {
     environment_variables = {
-      HASURA_SERVICE_NAME          = local.hasura_service_name
+      HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
       HASURA_GRAPHQL_ADMIN_KEY     = var.hasura_graphql_admin_key
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
       ZOOM_API_KEY                 = var.zoom_api_key

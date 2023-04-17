@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { FC, useCallback, useState } from 'react';
 import { MdArrowBack, MdArrowForward } from 'react-icons/md';
+import { CircularProgress } from '@material-ui/core';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { useAdminQuery } from '../../hooks/authedQuery';
 
 import { QUERY_LIMIT } from '../../pages/courses';
 import {
+  AdminCourseList,
   AdminCourseListVariables,
   AdminCourseList_Course,
 } from '../../queries/__generated__/AdminCourseList';
@@ -19,7 +21,6 @@ import {
   UPDATE_COURSE_ECTS,
   UPDATE_COURSE_TITLE,
 } from '../../queries/course';
-import { CourseList } from '../../queries/__generated__/CourseList';
 import {
   UpdateCourseAttendanceCertificatePossible,
   UpdateCourseAttendanceCertificatePossibleVariables,
@@ -40,9 +41,10 @@ import {
   UpdateCourseEcts,
   UpdateCourseEctsVariables,
 } from '../../queries/__generated__/UpdateCourseEcts';
+import { Translate } from 'next-translate';
 
 interface IProps {
-  t: any;
+  t: Translate;
   programs: Programs_Program[];
   courseListRequest: any;
   updateFilter: (newState: AdminCourseListVariables) => void;
@@ -53,7 +55,7 @@ const CourseListTable: FC<IProps> = ({
   t,
   updateFilter,
 }) => {
-  const qResult = useAdminQuery<CourseList>(ADMIN_COURSE_LIST);
+  const qResult = useAdminQuery<AdminCourseList>(ADMIN_COURSE_LIST);
 
   if (qResult.error) {
     console.log('query programs error', qResult.error);
@@ -166,46 +168,50 @@ const CourseListTable: FC<IProps> = ({
     <>
       <div className="flex flex-col space-y-10">
         <div className="overflow-x-auto transition-[height]">
-          <table className="w-full">
-            <thead>
-              <tr>
-                {tableHeaders.map((header, index) => {
-                  const [text, className] = header;
-                  return (
-                    <th key={text} className="py-2 px-5">
-                      <p
-                        className={`flex ${className} font-medium text-gray-400 uppercase`}
-                      >
-                        {text}
-                      </p>
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              {courses.map((course) => (
-                <SingleCourseRow
-                  key={course.id}
-                  course={course}
-                  programs={programs}
-                  refetchCourses={refetchCourses}
-                  t={t}
-                  onSetAttendanceCertificatePossible={
-                    handleAttendanceCertificatePossible
-                  }
-                  onSetAchievementCertificatePossible={
-                    handleAchievementCertificatePossible
-                  }
-                  onSetTitle={handleTitle}
-                  onSetChatLink={handleChatLink}
-                  onSetEcts={handleEcts}
-                  // onDeleteCourseGroup={handleDeleteCourseGroup}
-                  qResult={qResult}
-                />
-              ))}
-            </tbody>
-          </table>
+          {qResult.loading ? (
+            <CircularProgress />
+          ) : (
+            <table className="w-full">
+              <thead>
+                <tr>
+                  {tableHeaders.map((header, index) => {
+                    const [text, className] = header;
+                    return (
+                      <th key={text} className="py-2 px-5">
+                        <p
+                          className={`flex ${className} font-medium text-gray-400 uppercase`}
+                        >
+                          {text}
+                        </p>
+                      </th>
+                    );
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {courses.map((course) => (
+                  <SingleCourseRow
+                    key={course.id}
+                    course={course}
+                    programs={programs}
+                    courseGroupOptions={qResult.data.CourseGroupOption}
+                    refetchCourses={refetchCourses}
+                    onSetAttendanceCertificatePossible={
+                      handleAttendanceCertificatePossible
+                    }
+                    onSetAchievementCertificatePossible={
+                      handleAchievementCertificatePossible
+                    }
+                    onSetTitle={handleTitle}
+                    onSetChatLink={handleChatLink}
+                    onSetEcts={handleEcts}
+                    // onDeleteCourseGroup={handleDeleteCourseGroup}
+                    qResult={qResult}
+                  />
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
         {count > QUERY_LIMIT && (
           <Pagination

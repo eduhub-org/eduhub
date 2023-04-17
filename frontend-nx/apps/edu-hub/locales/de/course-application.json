@@ -11,7 +11,8 @@
     "applied": "Wir begutachten noch deine Bewerbung. Spätestens zum Bewerbungschluss benachrichtigen wir dich, ob du zugelassen wurdest.",
     "cancelled": "Du hast die Einladung zu diesem Kurs abgelehnt.",
     "invited": "Deine Bewerbung war erfolgreich! Du bist du diesem Kurs eingeladen.",
-    "rejected": "Leider konnten wir Deine Bewerbung auf diesen Kurs in diesem Semester nicht berücksichtigen."
+    "rejected": "Leider konnten wir Deine Bewerbung auf diesen Kurs in diesem Semester nicht berücksichtigen.",
+    "applicationPeriodEnded": "Die Bewerbungsfrist ist leider abgelaufen."
   },
   "successBody": "Spätestens ein bis zwei Tage nach Bewerbungsschluss wirst Du über Deine Zulassung informiert.",
   "successCloseButtonTitle": "Schließen",

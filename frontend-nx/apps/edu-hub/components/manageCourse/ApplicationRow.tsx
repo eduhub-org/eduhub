@@ -166,6 +166,14 @@ export const ApplicationRow: FC<IProps> = ({
                   className="inline"
                 />
               )}
+              {enrollment.status === 'CANCELLED' && (
+                <IoIosCloseCircle
+                  title={t('course-page:cancelled')}
+                  color="red"
+                  size="1.5em"
+                  className="inline"
+                />
+              )}
               {isExpired(enrollment) &&
                 (enrollment.status === 'APPLIED' ||
                   enrollment.status === 'INVITED') && (

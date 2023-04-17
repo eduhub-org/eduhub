@@ -21,16 +21,16 @@ services:
       - keycloak
 
   functions:
-    container_name: eduhub-functions
+    container_name: eduhub-node-functions
     image: node:18-bullseye
     user: "node"
     working_dir: /functions
     volumes:
       - ./functions:/functions
     ports:
-      - "42000-42025:42000-42025"
+      - "42000-42024:42000-42024"
       - "4001:4001"
-    command: ["sh", "/functions/start.sh"]
+    command: ["sh", "/functions/start-node.sh"]
     environment:
       LOCAL_TESTING: 1
       STORAGE_PORT: 4001
@@ -41,6 +41,31 @@ services:
       HASURA_ADMIN_SECRET: myadminsecretkey
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       LIBRARY_PATH: ../lib/cloud-storage
+
+  python_functions:
+    container_name: eduhub-python-functions
+    image: python:3.9-slim-bullseye
+    # user: "python"
+    working_dir: /functions
+    volumes:
+      - ./functions:/functions
+    ports:
+      - "42025:42025"
+#      - "5001:5001"
+    command: sh -c "pip install -r /functions/callPythonFunction/requirements.txt ; /functions/start-python.sh"    
+    env_file:
+      - docker-compose.env
+    environment:
+      LOCAL_TESTING: 1
+ #     STORAGE_PORT: 5001
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PW: admin
+      HASURA_ENDPOINT: http://hasura:8080/v1/graphql
+      HASURA_ADMIN_SECRET: myadminsecretkey
+      HASURA_CLOUD_FUNCTION_SECRET: test1234
+      LIBRARY_PATH: ../lib/cloud-storage
+      
 
   hasura:
     container_name: eduhub-hasura
@@ -87,7 +112,7 @@ services:
       CLOUD_FUNCTION_LINK_CREATE_ACHIEVEMENT_CERTIFICATE: "http://functions:42022"
       CLOUD_FUNCTION_LINK_CREATE_PARTICIPATION_CERTIFICATE: "http://functions:42023"
       CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES: "http://functions:42024"
-
+      CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION: "http://python-functions:42025"
     volumes:
       - ./backend:/hasura
       - ./backend/migrations:/hasura-migrations

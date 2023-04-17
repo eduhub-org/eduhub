@@ -129,7 +129,7 @@ module "hasura_service" {
       value = var.project_id
     },
     {
-      name  = "CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNTION"
+      name  = "CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION"
       value = google_cloudfunctions2_function.call_python_function.service_config[0].uri
     },
     {

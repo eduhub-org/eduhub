@@ -2,6 +2,7 @@
 .DS_Store
 
 hasura_keycloak.env
+docker-compose.env
 frontend.env
 node_modules
 

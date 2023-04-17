@@ -93,3 +93,20 @@ update_permissions:
           - userId:
               _eq: X-Hasura-User-Id
       check: {}
+event_triggers:
+  - name: add_user_to_mm_course_channel
+    definition:
+      enable_manual: false
+      update:
+        columns:
+          - status
+    retry_conf:
+      interval_sec: 10
+      num_retries: 0
+      timeout_sec: 60
+    webhook_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    headers:
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+      - name: name
+        value: addUserToMMCourseChannel

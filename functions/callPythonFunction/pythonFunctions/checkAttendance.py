@@ -11,7 +11,7 @@ from flask import jsonify
 from fuzzywuzzy import fuzz
 
 
-def checkAttendance(arguments_json):
+def checkAttendance(payload):
     """ For all sessions for which the attendance hasn't been checked yet
     (no attendance data stored in the session table), gets the participations
     from Zoom and Limesurvey and adds the individual attendances to the
@@ -24,12 +24,18 @@ def checkAttendance(arguments_json):
         Ids of the sessions for which the attendances were checked
     """
 
-    # The function should only be executed in production
-    if arguments_json['environment'] != 'production':
-        return f'Function is only executed in `production` mode.'
+    logging.info(
+        "function checkAttendance called; returning without further action (WIP)")
+    return("function checkAttendance called; returning without further action (WIP)")
 
     edu = api.EduHub()
-    sessions = edu.get_sessions_without_attendance_check()
+    logging.info(f"edu.url:  {edu.url}")
+    sessions = edu.get_finished_sessions_without_attendance_check()
+
+    # test if session is null
+    if sessions is None:
+        logging.info("No finished sessions without attendance check found")
+        return "No finished sessions without attendance check found"
 
     zoom = api.Zoom()
 

@@ -1,5 +1,12 @@
 import useTranslation from 'next-translate/useTranslation';
-import { Dispatch, FC, SetStateAction, useCallback, useEffect, useState } from 'react';
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 
 import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
 import { useAuthedQuery } from '../../hooks/authedQuery';
@@ -22,7 +29,10 @@ interface IProps {
   setInvitationModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export const EnrollmentStatus: FC<IProps> = ({ course, setInvitationModalOpen }) => {
+export const EnrollmentStatus: FC<IProps> = ({
+  course,
+  setInvitationModalOpen,
+}) => {
   const [isUserInfoModalVisible, setUserInfoModalVisible] = useState(false);
   const [isApplicationModalVisible, setApplicationModalVisible] =
     useState(false);
@@ -70,7 +80,19 @@ export const EnrollmentStatus: FC<IProps> = ({ course, setInvitationModalOpen })
   let content = null;
 
   if (!enrollments || enrollments.length < 1) {
-    content = <ApplyButtonBlock course={course} onClickApply={showModal} />;
+    // check if current date is after application deadline
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    if (course.applicationEnd <= currentDate) {
+      content = (
+        <span className="bg-gray-300 p-4">
+          {t('status.applicationPeriodEnded')}
+        </span>
+      );
+    } else {
+      content = <ApplyButtonBlock course={course} onClickApply={showModal} />;
+    }
   } else {
     const status = enrollments[0].status;
 
