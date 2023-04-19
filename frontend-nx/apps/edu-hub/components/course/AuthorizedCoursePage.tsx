@@ -3,7 +3,7 @@ import useTranslation from 'next-translate/useTranslation';
 
 import { CoursePageDescriptionView } from '../../components/course/CoursePageDescriptionView';
 import InvitationModal from './InvitationModal';
-import { useAuthedQuery } from '../../hooks/authedQuery';
+import { useRoleQuery } from '../../hooks/authedQuery';
 import { useUserId } from '../../hooks/user';
 import { CourseWithEnrollment } from '../../queries/__generated__/CourseWithEnrollment';
 import { COURSE_WITH_ENROLLMENT } from '../../queries/courseWithEnrollment';
@@ -15,9 +15,11 @@ const AuthorizedCoursePage: FC<{ id: number }> = ({ id }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [resetValues, setResetValues] = useState(null);
 
+  console.log('userId Logged in', userId);
+
 
   const { data: courseData, refetch: refetchCourse } =
-    useAuthedQuery<CourseWithEnrollment>(COURSE_WITH_ENROLLMENT, {
+    useRoleQuery<CourseWithEnrollment>(COURSE_WITH_ENROLLMENT, {
       variables: {
         id,
         userId,
@@ -35,7 +37,11 @@ const AuthorizedCoursePage: FC<{ id: number }> = ({ id }) => {
   const enrollmentId = courseData?.Course_by_pk?.CourseEnrollments[0]?.id;
 
   if (!course) {
-    return <div>{t('courseNotAvailable')}</div>;
+    return (
+      <div className="flex justify-center max-w-screen-xl mx-auto w-full pt-32">
+        <div className="text-white">{t('course-page:courseNotAvailable')}</div>
+      </div>
+    );
   }
 
   return (
