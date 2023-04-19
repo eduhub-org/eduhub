@@ -38,6 +38,7 @@ exports.sendQuestionaires = async (req, res) => {
                   startQuestionnaire
                   speakerQuestionnaire
                   closingQuestionnaire
+                  title
                 }
                 CourseEnrollments(where: {status: {_eq: CONFIRMED}}) {
                   User {
@@ -89,7 +90,7 @@ exports.sendQuestionaires = async (req, res) => {
                       <p>anbei schicken wir Dir einen (sehr kurzen) Fragebogen zur Evaluation Deines Kurses ${course.title} bei opencampus.sh.</p>
                       <p>Bitte nimm Dir kurz die Zeit, um ihn auszufüllen. Dein Feedback ist ein wichtiges Hilfsmittel für uns, um unser Programm weiterzuentwickeln.</p>
 
-                      <p><a href="${course.Program.startQuestionaire}?&c=${course.title}&t=${session.title}"> Zum Fragebogen </a></p>
+                      <p><a href="${course.Program.startQuestionaire}?&c=${course.title}&t=${session.title}&p=${course.Program.title}"> Zum Fragebogen </a></p>
 
                       <p>Viele Grüße</p>
                       <p>Dein opencampus.sh Team</p>
@@ -127,7 +128,7 @@ exports.sendQuestionaires = async (req, res) => {
                       <p>anbei schicken wir Dir einen (sehr kurzen) Fragebogen zur Evaluation der Veranstaltung ${session.title} im Rahmen Deines Kurses ${course.title} bei opencampus.sh.</p>
                       <p>Bitte nimm Dir kurz die Zeit, um ihn auszufüllen. Dein Feedback ist ein wichtiges Hilfsmittel für uns, um unser Programm weiterzuentwickeln.</p>
 
-                      <p><a href="${course.Program.speakerQuestionnaire}?&c=${course.title}&t=${session.title}"> Zum Fragebogen </a></p>
+                      <p><a href="${course.Program.speakerQuestionnaire}?&c=${course.title}&t=${session.title}&p=${course.Program.title}"> Zum Fragebogen </a></p>
 
                       <p>Viele Grüße</p>
                       <p>Dein opencampus.sh Team</p>
@@ -165,7 +166,7 @@ exports.sendQuestionaires = async (req, res) => {
                     <p>anbei schicken wir Dir einen (sehr kurzen) Fragebogen zur Evaluation Deines Kurses ${course.title} bei opencampus.sh.</p>
                     <p>Bitte nimm Dir kurz die Zeit, um ihn auszufüllen. Dein Feedback ist ein wichtiges Hilfsmittel für uns, um unser Programm weiterzuentwickeln.</p>
 
-                    <p><a href="${course.Program.closingQuestionnaire}?&c=${course.title}&t=${session.title}"> Zum Fragebogen </a></p>
+                    <p><a href="${course.Program.closingQuestionnaire}?&c=${course.title}&t=${session.title}&p=${course.Program.title}"> Zum Fragebogen </a></p>
 
                     <p>Viele Grüße</p>
                     <p>Dein opencampus.sh Team</p>
