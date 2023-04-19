@@ -861,6 +861,7 @@ resource "google_cloudfunctions2_function" "send_mail" {
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
       HASURA_MAIL_PW               = var.hasura_mail_pw
       HASURA_MAIL_USER             = var.hasura_mail_user
+      LOCAL_TESTING                = var.local_testing
     }
     max_instance_count = 50
     available_memory   = "256M"
@@ -1092,6 +1093,52 @@ resource "google_cloudfunctions2_function" "create_participation_certificate" {
   service_config {
     environment_variables = {
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+    }
+    max_instance_count = 1
+    available_memory   = "256M"
+    timeout_seconds    = 60
+    ingress_settings   = var.cloud_function_ingress_settings
+  }
+}
+
+###############################################################################
+# Create Google cloud function for sendQuestionnaires
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "send_questionaires_noauth_invoker" {
+  location    = google_cloudfunctions2_function.send_questionaires.location
+  project     = google_cloudfunctions2_function.send_questionaires.project
+  service     = google_cloudfunctions2_function.send_questionaires.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "send_questionaires" {
+  name   = "cloud-functions/sendQuestionaires.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "send_questionaires" {
+  provider    = google-beta
+  location    = var.region
+  name        = "send-questionaires"
+  description = "send out questionaires for published past sessions"
+
+  build_config {
+    runtime     = "nodejs16"
+    entry_point = "sendQuestionaires"
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.send_questionaires.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+      HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
+      HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
     }
     max_instance_count = 1
     available_memory   = "256M"
