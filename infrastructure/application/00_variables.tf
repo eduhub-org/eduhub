@@ -183,6 +183,11 @@ variable "environment" {
   type        = string
 }
 
+variable "local_testing" {
+  description = "is true in staging so no mails are send out"
+  type        = number
+}
+
 # API Access
 variable "zoom_api_key" {
   description = "Key identifier to the registered access the Zoom API"

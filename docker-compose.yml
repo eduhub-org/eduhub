@@ -111,8 +111,8 @@ services:
       CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "http://functions:42012"
       CLOUD_FUNCTION_LINK_CREATE_ACHIEVEMENT_CERTIFICATE: "http://functions:42022"
       CLOUD_FUNCTION_LINK_CREATE_PARTICIPATION_CERTIFICATE: "http://functions:42023"
+      CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES: "http://functions:42024"
       CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION: "http://python-functions:42025"
-
     volumes:
       - ./backend:/hasura
       - ./backend/migrations:/hasura-migrations
@@ -140,6 +140,7 @@ services:
       KC_HOSTNAME_STRICT: "false"
     volumes:
       - ./keycloak/imports-dev:/opt/keycloak/data/import
+      - ./keycloak/imports:/imports
       - ./keycloak/themes/opencampus:/opt/keycloak/themes/opencampus
       - ./keycloak/themes/edu-hub:/opt/keycloak/themes/edu-hub
       - ./keycloak/disable-theme-cache.cli:/opt/keycloak/startup-scripts/disable-theme-cache.cli
