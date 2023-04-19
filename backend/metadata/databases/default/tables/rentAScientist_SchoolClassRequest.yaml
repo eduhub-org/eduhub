@@ -82,7 +82,6 @@ update_permissions:
 delete_permissions:
   - role: user_access
     permission:
-      backend_only: false
       filter:
         SchoolClass:
           Teacher:
