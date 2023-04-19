@@ -5,16 +5,22 @@ from flask import Flask, request, jsonify
 import sys
 import importlib.util
 
+# Change working directory to callPythonFunction
+os.chdir('./callPythonFunction/')
+
 # Import the Flask app from main.py in the callPythonFunction folder
-sys.path.insert(0, './callPythonFunction')
+sys.path.insert(0, '.')
 
 spec = importlib.util.spec_from_file_location(
-    "main", "./callPythonFunction/main.py")
+    "main", "./main.py")
 main_module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(main_module)
 
 app = Flask(__name__)
 # app = main_module.app
+
+# Revert the working directory change
+os.chdir('..')
 
 
 @app.route('/', methods=['POST'])

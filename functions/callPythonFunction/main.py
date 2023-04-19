@@ -9,10 +9,10 @@ logging.basicConfig(level=logging.INFO)
 
 # Execution of all Python files in the folder `pythonFunctions` to make these available
 # to the function `call_python_function()`
-files = os.listdir('callPythonFunction/pythonFunctions')
+files = os.listdir('./pythonFunctions')
 python_files = [file for file in files if re.search(r'.py$', file)]
 for file in python_files:
-    exec(open('callPythonFunction/pythonFunctions/'+file).read())
+    exec(open('./pythonFunctions/'+file).read())
 
 
 # Generic function to call the requested Python function
