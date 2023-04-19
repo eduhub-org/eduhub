@@ -122,7 +122,7 @@ export const EnrollmentStatus: FC<IProps> = ({
         break;
       }
       case CourseEnrollmentStatus_enum.INVITED: {
-        if (enrollments[0].invitationExpirationDate.setHours(0, 0, 0, 0) > new Date().setHours(0, 0, 0, 0)) { 
+        if (enrollments[0].invitationExpirationDate.setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)) { 
           content = (
             <div className="flex flex-col sm:flex-row sm:items-center">
               <div className="bg-gray-300 p-4 mb-6 sm:mb-0 sm:w-2/3 sm:mr-5">

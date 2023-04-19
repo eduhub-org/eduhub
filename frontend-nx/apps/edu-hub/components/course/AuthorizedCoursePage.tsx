@@ -25,7 +25,7 @@ const AuthorizedCoursePage: FC<{ id: number }> = ({ id }) => {
       async onCompleted(data) {
         const enrollmentStatus =
           data?.Course_by_pk?.CourseEnrollments[0]?.status;
-        if (enrollmentStatus === CourseEnrollmentStatus_enum.INVITED) {
+        if ((enrollmentStatus === CourseEnrollmentStatus_enum.INVITED) && (data?.Course_by_pk?.CourseEnrollments[0]?.invitationExpirationDate.setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0))) {
           setResetValues(true);
         }
       },
