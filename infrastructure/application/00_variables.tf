@@ -184,8 +184,8 @@ variable "environment" {
 }
 
 variable "local_testing" {
-   description = "is true in staging so no mails are send out"
-   type        = bool
+  description = "is true in staging so no mails are send out"
+  type        = number
 }
 
 # API Access
