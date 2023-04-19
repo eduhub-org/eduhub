@@ -221,6 +221,10 @@ module "hasura_service" {
       value = google_cloudfunctions2_function.create_participation_certificate.service_config[0].uri
     },
     {
+      name  = "CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES"
+      value = google_cloudfunctions2_function.send_questionaires.service_config[0].uri
+    },
+    {
       name  = "HASURA_GRAPHQL_JWT_SECRET"
       value = "{ \"type\": \"RS256\", \"jwk_url\": \"https://${local.keycloak_service_name}.opencampus.sh/realms/edu-hub/protocol/openid-connect/certs\" }"
     }
