@@ -31,7 +31,7 @@ const htmlMailWithContent = (content: string) => {
       <table role="presentation" style="width:600px;border-collapse:collapse;border:0px solid #cccccc;border-spacing:0;text-align:left;">
           <tr>
               <td style="padding:5px;">
-              ${content.replaceAll("\n", "<br/>")}
+              ${content.replaceAll('\n', '<br/>')}
               </td>
           </tr>
       </table>
@@ -46,14 +46,14 @@ export const createRejectScientist = (
 ) => {
   const result: MailDescription = {
     to: contactMail,
-    subject: "Rent-a-Scientist Rückmeldung",
+    subject: 'Rent-a-Scientist Rückmeldung',
     content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
 
-vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2022 eine Schulunterrichtsstunde anzubieten.
+vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2023 eine Schulunterrichtsstunde anzubieten.
 Leider müssen wir Ihnen mitteilen, dass Ihr Angebot in diesem Jahr nicht gebucht wurde und Ihre Unterrichtsstunde dementsprechend nicht zu Stande kommt.
 
-Es gab insgesamt ein überwältigendes Feedback aus den Hochschulen und wissenschaftlichen Institutionen. Über 80 Angebote von Wissenschaftler*innen haben uns für Rent-a-Scientist 2022 erreicht, um eine oder sogar mehrere Unterrichtsstunden zu gestalten, weshalb die teilnehmenden Schulen den Luxus einer wirklich großen Auswahl hatten.
+Es gab insgesamt ein überwältigendes Feedback aus den Hochschulen und wissenschaftlichen Institutionen. Über 100 Angebote von Wissenschaftler*innen haben uns für Rent-a-Scientist 2023 erreicht, um eine oder sogar mehrere Unterrichtsstunden zu gestalten, weshalb die teilnehmenden Schulen den Luxus einer wirklich großen Auswahl hatten.
 
 Auch wenn es dieses Mal leider nicht geklappt hat, freuen wir uns sehr, wenn Sie im nächsten Jahr wieder dabei sind und sich für Rent-a-Scientist 2023 erneut zur Verfügung stellen.
 Sollten Sie noch Fragen oder Feedback haben, sind wir Ihnen für eine Nachricht an fdw@kielregion.de sehr dankbar.
@@ -104,10 +104,10 @@ export const createAcceptScientist = (
 ) => {
   const result: MailDescription = {
     to: contactMail,
-    subject: "Rent-a-Scientist Rückmeldung",
+    subject: 'Rent-a-Scientist Rückmeldung',
     content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
-vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2022 eine Schulunterrichtsstunde anzubieten.
+vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2023 eine Schulunterrichtsstunde anzubieten.
 Wir freuen uns sehr, Ihnen mitteilen zu können, dass Sie wie folgt angefragt wurden
 
 ${acceptedDays
@@ -130,7 +130,7 @@ Kontakt: ${a.contact}
 
     `
   )
-  .join("\n\n")}
+  .join('\n\n')}
 
 Die Schule wird sich mit Ihnen in Verbindung setzen, um die weiteren Details abzusprechen. 
 
@@ -184,12 +184,12 @@ export const createAcceptSchool = (
   info: SchoolAcceptedInfo
 ) => {
   const result: MailDescription = {
-    subject: "Rent-a-Scientist Rückmeldung",
+    subject: 'Rent-a-Scientist Rückmeldung',
     to: contactMail,
     content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
 
-vielen Dank, dass Sie sich mit der Schulklasse ${info.classGrade}${info.className} im Rahmen von Rent-a-Scientist für den Besuch einer Wissenschaftlerin bzw. eines Wissenschaftlers an Ihrer Schule beworben haben. Wir freuen uns sehr, Ihnen mitteilen zu können, dass wir Ihnen eine Ihrer Wunsch-Unterrichtsstunden für die Woche vom 26.09. bis zum 30.09. bestätigen können:
+vielen Dank, dass Sie sich mit der Schulklasse ${info.classGrade}${info.className} im Rahmen von Rent-a-Scientist für den Besuch einer Wissenschaftlerin bzw. eines Wissenschaftlers an Ihrer Schule beworben haben. Wir freuen uns sehr, Ihnen mitteilen zu können, dass wir Ihnen eine Ihrer Wunsch-Unterrichtsstunden für die Wochen vom 03.07. bis zum 14.07. bestätigen können:
 
 Wissenschaftler*in: ${info.scientist}
 
@@ -241,7 +241,7 @@ export const createRejectSchool = (
   grade: number
 ) => {
   const result: MailDescription = {
-    subject: "Rent-a-Scientist Rückmeldung",
+    subject: 'Rent-a-Scientist Rückmeldung',
     to: contactMail,
     content: htmlMailWithContent(`
         
@@ -249,7 +249,7 @@ Sehr geehrte*r ${contactName},
 
 vielen Dank für Ihre Anfrage im Rahmen unseres Schulprogramms Rent-a-Scientist.
 
-Aufgrund der extrem großen Nachfrage, die uns erreicht hat, müssen wir Ihnen leider mitteilen, dass wir Ihnen keine*n Wissenschaftler*in in der Woche vom 26.09. bis zum 30.09. zuteilen konnten.
+Aufgrund der extrem großen Nachfrage, die uns erreicht hat, müssen wir Ihnen leider mitteilen, dass wir Ihnen keine*n Wissenschaftler*in in den Wochen vom 03.07. bis zum 14.07. zuteilen konnten.
 
 Zur Entschädigung möchten wir Ihnen aber anbieten, im Nachgang eine*n Ihrer angefragten Wissenschaftler*innen zu kontaktieren und zu fragen, ob er*sie bereit wäre, einen individuellen Termin mit Ihnen zu vereinbaren. Sollten Sie daran Interesse haben, freuen wir uns über eine kurze Rückmeldung. 
 

@@ -24,7 +24,8 @@
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "rent-a-scientist:build",
-        "dev": true
+        "dev": true,
+        "hostname": "0.0.0.0"
       },
       "configurations": {
         "development": {

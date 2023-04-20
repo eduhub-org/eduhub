@@ -1,7 +1,7 @@
 import { Button } from "@material-ui/core";
 import jsonexport from "jsonexport/dist";
 import { FC, useCallback } from "react";
-import { useAuthedQuery } from "../../hooks/authedQuery";
+import { useAdminQuery } from "../../hooks/authedQuery";
 import { ALL_REQUESTS } from "../../queries/ras_matching";
 import { AllRequests } from "../../queries/__generated__/AllRequests";
 
@@ -19,7 +19,7 @@ export const saveTextData = (data: string, fileName: string) => {
 };
 
 export const CsvDownloadButton: FC = () => {
-  const allRequests = useAuthedQuery<AllRequests>(ALL_REQUESTS);
+  const allRequests = useAdminQuery<AllRequests>(ALL_REQUESTS);
 
   const clickCsvButton = useCallback(async () => {
     const newData = (await allRequests.refetch()).data.SchoolClassRequest;
