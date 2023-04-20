@@ -90,7 +90,7 @@ exports.sendQuestionaires = async (req, res) => {
                       <p>anbei schicken wir Dir einen (sehr kurzen) Fragebogen zur Evaluation Deines Kurses ${course.title} bei opencampus.sh.</p>
                       <p>Bitte nimm Dir kurz die Zeit, um ihn auszufüllen. Dein Feedback ist ein wichtiges Hilfsmittel für uns, um unser Programm weiterzuentwickeln.</p>
 
-                      <p><a href="${course.Program.startQuestionaire}?&c=${course.title}&t=${session.title}&p=${course.Program.title}"> Zum Fragebogen </a></p>
+                      <p><a href="${course.Program.startQuestionnaire}?&c=${course.title}&t=${session.title}&p=${course.Program.title}"> Zum Fragebogen </a></p>
 
                       <p>Viele Grüße</p>
                       <p>Dein opencampus.sh Team</p>

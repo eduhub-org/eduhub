@@ -20,7 +20,7 @@ export const CourseContentInfos: FC<IProps> = ({ course }) => {
 
   return (
     <div className="flex flex-1 flex-col">
-      {course.learningGoals.trim() !== '' && (
+      {course.learningGoals !== null && course.learningGoals.trim() !== '' && (
         <>
           <span className="text-3xl font-semibold mb-9">
             {t('youWillLearn')}

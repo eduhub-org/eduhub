@@ -29,13 +29,15 @@ interface IProps {
 const isExpired = (
   enrollment: ManagedCourse_Course_by_pk_CourseEnrollments | null
 ) => {
+
+  
   if (enrollment == null) {
     return false;
   }
   if (enrollment.invitationExpirationDate == null) {
     return false;
   }
-  return enrollment.invitationExpirationDate.getTime() < Date.now();
+  return enrollment.invitationExpirationDate.setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
 };
 
 export const ApplicationRow: FC<IProps> = ({
