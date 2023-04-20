@@ -2,7 +2,6 @@ import { FC, useCallback, useMemo, useState } from "react";
 import { useRasConfig } from "../../hooks/ras";
 
 import { Solve } from "@bygdle/javascript-lp-solver";
-import { useAuthedQuery } from "../../hooks/authedQuery";
 import {
   AllRequests,
 } from "../../queries/__generated__/AllRequests";
@@ -52,6 +51,7 @@ import {
   BatchInsertMail,
   BatchInsertMailVariables,
 } from "../../queries/__generated__/BatchInsertMail";
+import { useAdminQuery } from "../../hooks/authedQuery";
 
 interface CourseOffer {
   days: number[];
@@ -248,9 +248,9 @@ export const MatchingTableRow: FC<MatchingTableRowProps> = (row) => {
 export const MatchingCreation: FC = () => {
   const rsaConfig = useRasConfig();
 
-  const allRequests = useAuthedQuery<AllRequests>(ALL_REQUESTS);
+  const allRequests = useAdminQuery<AllRequests>(ALL_REQUESTS);
 
-  const scientistMailsInfo = useAuthedQuery<
+  const scientistMailsInfo = useAdminQuery<
     ScientistMailInfos,
     ScientistMailInfosVariables
   >(SCIENTIST_MAILS_INFO, {
@@ -259,7 +259,7 @@ export const MatchingCreation: FC = () => {
     },
   });
 
-  const schoolsMailsInfo = useAuthedQuery<
+  const schoolsMailsInfo = useAdminQuery<
     SchoolsMailsInfo,
     SchoolsMailsInfoVariables
   >(SCHOOLS_MAILS_INFO, {
@@ -275,11 +275,15 @@ export const MatchingCreation: FC = () => {
   const [matchings, setMatchings] = useState<AssignmentResult[] | null>(null);
 
   const runMatching = useCallback(async () => {
-    const newData = (
-      await allRequests.refetch()
-    ).data.SchoolClassRequest.filter(
+    const allRequestsResponse = await allRequests.refetch()
+
+    console.log("allRequestsResponse", allRequestsResponse);
+
+    const newData = allRequestsResponse.data.SchoolClassRequest.filter(
       (r) => r.ScientistOffer.Program.id === rsaConfig.programId
     );
+
+    console.log("newData", newData);
 
     const hasOfferIds = new Set<number>();
     const offers: CourseOffer[] = [];
@@ -363,6 +367,10 @@ export const MatchingCreation: FC = () => {
     );
 
     for (const scr of list) {
+      if (scr.SchoolClass == null) {
+        break;
+      }
+
       offerTitles[scr.ScientistOffer.id] = scr.ScientistOffer.title;
       offerScientists[scr.ScientistOffer.id] =
         scr.ScientistOffer.contactName || "";
