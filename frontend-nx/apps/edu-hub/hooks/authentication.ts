@@ -2,6 +2,12 @@ import { useSession } from 'next-auth/react';
 
 import { AuthRoles } from '../types/enums';
 
+export const useIsSessionLoading = (): boolean => {
+  const { status } = useSession();
+
+  return status === "loading";
+};
+
 export const useIsLoggedIn = (): boolean => {
   const { data: sessionData, status } = useSession();
 
