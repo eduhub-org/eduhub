@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import Image from "next/image";
 import Link from "next/link";
-import { FC, useMemo } from "react";
+import { FC, useEffect, useState } from "react";
 
 import header from "../public/static/header.jpg";
 import { QUERY_RSA_CONFIG } from "../queries/ras_config";
@@ -17,7 +17,9 @@ export const Header: FC = () => {
     return "" + x;
   };
 
-  const dateString = useMemo(() => {
+  const [dateValue, setDateValue] = useState("");
+
+  useEffect(() => {
     const startDate =
       qConfig.data?.RentAScientistConfig_by_pk?.Program.lectureStart;
     const endDate =
@@ -25,18 +27,18 @@ export const Header: FC = () => {
 
     if (startDate && endDate) {
       if (startDate.getMonth() === endDate.getMonth()) {
-        return `${p2(startDate.getDate())}. bis ${p2(endDate.getDate())}.${p2(
+        setDateValue(`${p2(startDate.getDate())}. bis ${p2(endDate.getDate())}.${p2(
           endDate.getMonth() + 1
-        )}.${endDate.getFullYear()}`;
+        )}.${endDate.getFullYear()}`);
       } else {
-        return `${p2(startDate.getDate())}.${p2(
+        setDateValue(`${p2(startDate.getDate())}.${p2(
           startDate.getMonth() + 1
         )}. bis ${p2(endDate.getDate())}.${p2(
           endDate.getMonth() + 1
-        )}.${endDate.getFullYear()}`;
+        )}.${endDate.getFullYear()}`);
       }
     } else {
-      return "";
+      setDateValue("");
     }
   }, [qConfig]);
 
@@ -49,7 +51,7 @@ export const Header: FC = () => {
       </div>
 
       <div className="absolute hidden bottom-6 z-50 right-96 lg:block">
-        <span className="text-2xl text-rsa-green">{dateString}</span>
+        <span className="text-2xl text-rsa-green">{dateValue}</span>
       </div>
 
       <div className="flex w-full items-center">
