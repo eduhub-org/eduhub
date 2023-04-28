@@ -5,7 +5,8 @@ import { FC } from 'react';
 import { Page } from '../../components/Page';
 import AuthorizedCoursePage from '../../components/course/AuthorizedCoursePage';
 import UnauthorizedCoursePage from '../../components/course/UnauthorizedCoursePage';
-import { useIsLoggedIn } from '../../hooks/authentication';
+import { useIsLoggedIn, useIsSessionLoading } from '../../hooks/authentication';
+import { CircularProgress } from '@material-ui/core';
 
 // export const getStaticProps = async ({ locale }: { locale: string }) => ({
 //   props: {
@@ -31,6 +32,7 @@ const CoursePage: FC = () => {
   const router = useRouter();
   const { courseId } = router.query;
 
+  const isSessionLoading = useIsSessionLoading();
   const isLoggedIn = useIsLoggedIn();
 
   const id = parseInt(courseId as string, 10);
@@ -41,14 +43,15 @@ const CoursePage: FC = () => {
         <title>EduHub | opencampus.sh</title>
         <link rel="icon" href="/favicon.png" />
         <meta property="og:title" content="EduHub | opencampus.sh" />
-        <meta property="og:image" content="https://edu.opencampus.sh/images/meta-image.png" />
+        <meta
+          property="og:image"
+          content="https://edu.opencampus.sh/images/meta-image.png"
+        />
       </Head>
       <Page>
-        {isLoggedIn ? (
-          <AuthorizedCoursePage id={id} />
-        ) : (
-          <UnauthorizedCoursePage id={id} />
-        )}
+        {!isSessionLoading && isLoggedIn && <AuthorizedCoursePage id={id} />}
+        {!isSessionLoading && !isLoggedIn && <UnauthorizedCoursePage id={id} />}
+        {isSessionLoading && <CircularProgress />}
       </Page>
     </>
   );
