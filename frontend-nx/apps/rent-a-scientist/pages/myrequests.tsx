@@ -349,7 +349,9 @@ const RegisterPage: FC = () => {
                 Bitte erstellen Sie einen Account. Nach der Registrierung können
                 Sie dann mit Ihrer Auswahl weiterarbeiten.
                 <br />
-                Falls Sie schon einen Account haben melden Sie sich an.
+                Falls Sie schon einen Account haben melden Sie sich an, klicken Sie hierzu rechts oben auf <span className="italic">Anmelden</span>.
+                <br />
+                Accounts vom letzten Jahr Rent-a-Scientist können erneut verwendet werden.
               </div>
               <RegisterButton />
             </div>

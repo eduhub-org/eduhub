@@ -22,6 +22,17 @@ array_relationships:
           name: SchoolClassRequest
           schema: rentAScientist
 insert_permissions:
+  - role: admin-rsa
+    permission:
+      check: {}
+      columns:
+        - grade
+        - id
+        - studensCount
+        - teacherId
+        - contact
+        - name
+        - schoolId
   - role: user_access
     permission:
       check:
@@ -38,6 +49,17 @@ insert_permissions:
         - studensCount
         - teacherId
 select_permissions:
+  - role: admin-rsa
+    permission:
+      columns:
+        - grade
+        - id
+        - studensCount
+        - teacherId
+        - contact
+        - name
+        - schoolId
+      filter: {}
   - role: user_access
     permission:
       columns:
@@ -54,6 +76,18 @@ select_permissions:
             id:
               _eq: X-Hasura-User-Id
 update_permissions:
+  - role: admin-rsa
+    permission:
+      columns:
+        - grade
+        - id
+        - studensCount
+        - teacherId
+        - contact
+        - name
+        - schoolId
+      filter: {}
+      check: {}
   - role: user_access
     permission:
       columns:
@@ -72,8 +106,13 @@ update_permissions:
             id:
               _eq: X-Hasura-User-Id
 delete_permissions:
+  - role: admin-rsa
+    permission:
+      backend_only: false
+      filter: {}
   - role: user_access
     permission:
+      backend_only: false
       filter:
         Teacher:
           User:
