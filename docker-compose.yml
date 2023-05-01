@@ -112,7 +112,7 @@ services:
       CLOUD_FUNCTION_LINK_CREATE_ACHIEVEMENT_CERTIFICATE: "http://functions:42022"
       CLOUD_FUNCTION_LINK_CREATE_PARTICIPATION_CERTIFICATE: "http://functions:42023"
       CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES: "http://functions:42024"
-      CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION: "http://python-functions:42025"
+      CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION: "http://python_functions:42025"
     volumes:
       - ./backend:/hasura
       - ./backend/migrations:/hasura-migrations

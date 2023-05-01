@@ -28,12 +28,12 @@ def call_python_function(request):
 
     arguments_json = request.get_json()
     logging.debug(f"Request: {arguments_json}")
-    # Transform the "headers" list into a dictionary
-    headers_dict = {header['name']: header['value']
-                    if 'value' in header else header['value_from_env'] for header in arguments_json['headers']}
 
-    # Get the value of the "secret" key from the dictionary and check if it is correct
-    secret_value = headers_dict.get('secret')
+    # Access the headers using request.headers
+    headers = request.headers
+
+    # Get the value of the "secret" key from the headers and check if it is correct
+    secret_value = headers.get('secret')
     hasura_cloud_function_secret = os.getenv('HASURA_CLOUD_FUNCTION_SECRET')
 
     # Print the values of the secrets for debugging purposes
@@ -44,8 +44,8 @@ def call_python_function(request):
     if secret_value != hasura_cloud_function_secret:
         return('error: cloud function secret is not correct!')
 
-    # Get the value of the "name" key from the dictionary (the name of the function to be called)
-    name_value = headers_dict.get('name')
+    # Get the value of the "name" key from the headers (the name of the function to be called)
+    name_value = headers.get('name')
 
     # Checking if an existing function name is provided and calling function
     if globals().get(name_value) is None:
@@ -53,5 +53,5 @@ def call_python_function(request):
     else:
         python_function = globals()[name_value]
         logging.info(f"Calling python function: {name_value}...")
-        logging.info(f"Payload: {arguments_json['payload']['payload']}")
-        return python_function(arguments_json['payload']['payload'])
+        logging.info(f"Payload: {arguments_json['payload']}")
+        return python_function(arguments_json['payload'])

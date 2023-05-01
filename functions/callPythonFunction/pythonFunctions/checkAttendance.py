@@ -24,10 +24,6 @@ def checkAttendance(payload):
         Ids of the sessions for which the attendances were checked
     """
 
-    logging.info(
-        "function checkAttendance called; returning without further action (WIP)")
-    return("function checkAttendance called; returning without further action (WIP)")
-
     edu = api.EduHub()
     logging.info(f"edu.url:  {edu.url}")
     sessions = edu.get_finished_sessions_without_attendance_check()
