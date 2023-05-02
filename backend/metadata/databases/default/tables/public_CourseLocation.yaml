@@ -68,6 +68,7 @@ update_permissions:
 delete_permissions:
   - role: instructor_access
     permission:
+      backend_only: false
       filter:
         Course:
           CourseInstructors:

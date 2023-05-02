@@ -13,7 +13,20 @@ object_relationships:
   - name: ScientistOffer
     using:
       foreign_key_constraint_on: offerId
+insert_permissions:
+  - role: admin-rsa
+    permission:
+      check: {}
+      columns:
+        - offerId
+        - scientistId
 select_permissions:
+  - role: admin-rsa
+    permission:
+      columns:
+        - offerId
+        - scientistId
+      filter: {}
   - role: anonymous
     permission:
       columns:
@@ -31,4 +44,17 @@ select_permissions:
       columns:
         - offerId
         - scientistId
+      filter: {}
+update_permissions:
+  - role: admin-rsa
+    permission:
+      columns:
+        - offerId
+        - scientistId
+      filter: {}
+      check: {}
+delete_permissions:
+  - role: admin-rsa
+    permission:
+      backend_only: false
       filter: {}

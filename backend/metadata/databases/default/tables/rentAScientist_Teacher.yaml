@@ -19,6 +19,12 @@ array_relationships:
           name: SchoolClass
           schema: rentAScientist
 insert_permissions:
+  - role: admin-rsa
+    permission:
+      check: {}
+      columns:
+        - id
+        - userId
   - role: user_access
     permission:
       check:
@@ -29,6 +35,12 @@ insert_permissions:
         - id
         - userId
 select_permissions:
+  - role: admin-rsa
+    permission:
+      columns:
+        - id
+        - userId
+      filter: {}
   - role: user_access
     permission:
       columns:
@@ -38,3 +50,16 @@ select_permissions:
         User:
           id:
             _eq: X-Hasura-User-Id
+update_permissions:
+  - role: admin-rsa
+    permission:
+      columns:
+        - id
+        - userId
+      filter: {}
+      check: {}
+delete_permissions:
+  - role: admin-rsa
+    permission:
+      backend_only: false
+      filter: {}

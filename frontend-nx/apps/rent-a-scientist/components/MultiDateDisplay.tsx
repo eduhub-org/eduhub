@@ -31,9 +31,16 @@ const rangeGroups = (indices: number[]) => {
 };
 
 export const dayFormat = (dnum: number, startDate: Date) => {
-  const doffset = dnum - 1;
+  let doffset = dnum - 1;
   const dayDate = new Date(startDate);
-  dayDate.setDate(startDate.getDate() + doffset);
+  while (doffset > 0) {
+    dayDate.setDate(dayDate.getDate() + 1);
+    // Skip weekends
+    while (dayDate.getDay() === 0 || dayDate.getDay() === 6) {
+      dayDate.setDate(dayDate.getDate() + 1);
+    }
+    doffset--;
+  }
 
   const wdays = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
   const weekday = wdays[dayDate.getDay()];

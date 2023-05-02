@@ -66,9 +66,9 @@ const refreshAccessToken = async (token: JWT) => {
 export default NextAuth({
   providers: [
     KeycloakProvider({
-      clientId: 'hasura',
+      clientId: 'rent-a-scientist',
       clientSecret:
-        process.env.KEYCLOAK_HASURA_CLIENT_SECRET ||
+        process.env.KEYCLOAK_RAS_CLIENT_SECRET ||
         process.env.CLIENT_SECRET ||
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         process.env.NEXT_AUTH_CLIENT_SECRET!,
