@@ -8,27 +8,27 @@ interface IProps {
   className?: string;
 }
 
-const umlautMap: any = {
-  Ü: "UE",
-  Ä: "AE",
-  Ö: "OE",
-  ü: "ue",
-  ä: "ae",
-  ö: "oe",
-  ß: "ss",
-};
+// const umlautMap: any = {
+//   Ü: "UE",
+//   Ä: "AE",
+//   Ö: "OE",
+//   ü: "ue",
+//   ä: "ae",
+//   ö: "oe",
+//   ß: "ss",
+// };
 
-const replaceUmlaute = (str: string) => {
-  return str
-    .replace(/[\u00dc|\u00c4|\u00d6][a-z]/g, (a) => {
-      const big = umlautMap[a.slice(0, 1)];
-      return big.charAt(0) + big.charAt(1).toLowerCase() + a.slice(1);
-    })
-    .replace(
-      new RegExp("[" + Object.keys(umlautMap).join("|") + "]", "g"),
-      (a) => umlautMap[a]
-    );
-};
+// const replaceUmlaute = (str: string) => {
+//   return str
+//     .replace(/[\u00dc|\u00c4|\u00d6][a-z]/g, (a) => {
+//       const big = umlautMap[a.slice(0, 1)];
+//       return big.charAt(0) + big.charAt(1).toLowerCase() + a.slice(1);
+//     })
+//     .replace(
+//       new RegExp("[" + Object.keys(umlautMap).join("|") + "]", "g"),
+//       (a) => umlautMap[a]
+//     );
+// };
 
 export const ScientistAvatar: FC<IProps> = ({
   scientist,
@@ -43,7 +43,7 @@ export const ScientistAvatar: FC<IProps> = ({
           alt="Bild Wissenschaftler"
           src={
             "/static/pics/" +
-            replaceUmlaute(
+            (
               scientist.image?.trim().toLocaleLowerCase() ||
               "99_wissenschaftzukunft"
             ) +
@@ -51,14 +51,14 @@ export const ScientistAvatar: FC<IProps> = ({
           }
           width={130}
           height={130}
-          className="w-[100px] h-[100px] lg:w-[140px] lg:h-[140px]"
+          className="w-[100px] lg:w-[140px]"
         />
         <div className="pl-5">
           {logo !== undefined && (
             <img
               alt="Logo Institution"
               className="lg:h-14 h-10"
-              src={"/static/logos/" + logo.trim() + ".png"}
+              src={"/static/logos/" + logo.trim().toLowerCase() + ".png"}
             />
           )}
 

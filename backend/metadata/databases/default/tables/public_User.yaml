@@ -52,6 +52,24 @@ array_relationships:
           name: Expert
           schema: public
 select_permissions:
+  - role: admin-rsa
+    permission:
+      columns:
+        - created_at
+        - updated_at
+        - id
+        - externalProfile
+        - anonymousId
+        - newsletterRegistration
+        - otherUniversity
+        - university
+        - employment
+        - email
+        - firstName
+        - lastName
+        - matriculationNumber
+        - picture
+      filter: {}
   - role: anonymous
     permission:
       columns:
