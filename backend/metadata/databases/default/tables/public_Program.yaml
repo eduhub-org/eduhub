@@ -24,6 +24,28 @@ array_relationships:
           name: ScientistOffer
           schema: rentAScientist
 select_permissions:
+  - role: admin-rsa
+    permission:
+      columns:
+        - id
+        - published
+        - visibility
+        - visibilityAchievementCertificate
+        - visibilityParticipationCertificate
+        - shortTitle
+        - applicationStart
+        - achievementRecordUploadDeadline
+        - defaultApplicationEnd
+        - defaultMaxMissedSessions
+        - lectureStart
+        - lectureEnd
+        - speakerQuestionnaire
+        - startQuestionnaire
+        - closingQuestionnaire
+        - title
+        - attendanceCertificateTemplateURL
+        - participationCertificateTemplateURL
+      filter: {}
   - role: anonymous
     permission:
       columns:

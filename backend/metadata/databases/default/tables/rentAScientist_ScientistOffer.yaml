@@ -25,7 +25,64 @@ array_relationships:
         table:
           name: ScientistOfferRelation
           schema: rentAScientist
+insert_permissions:
+  - role: admin-rsa
+    permission:
+      check: {}
+      columns:
+        - categories
+        - possibleDays
+        - possibleLocations
+        - timeWindow
+        - id
+        - maxDeployments
+        - maximumGrade
+        - minimumGrade
+        - programId
+        - classPreparation
+        - contactEmail
+        - contactName
+        - contactPhone
+        - description
+        - duration
+        - equipmentRequired
+        - extraComment
+        - format
+        - institutionLogo
+        - institutionName
+        - researchSubject
+        - roomRequirements
+        - subjectComment
+        - title
 select_permissions:
+  - role: admin-rsa
+    permission:
+      columns:
+        - categories
+        - possibleDays
+        - possibleLocations
+        - timeWindow
+        - id
+        - maxDeployments
+        - maximumGrade
+        - minimumGrade
+        - programId
+        - classPreparation
+        - contactEmail
+        - contactName
+        - contactPhone
+        - description
+        - duration
+        - equipmentRequired
+        - extraComment
+        - format
+        - institutionLogo
+        - institutionName
+        - researchSubject
+        - roomRequirements
+        - subjectComment
+        - title
+      filter: {}
   - role: anonymous
     permission:
       columns:
@@ -110,4 +167,39 @@ select_permissions:
         - roomRequirements
         - subjectComment
         - title
+      filter: {}
+update_permissions:
+  - role: admin-rsa
+    permission:
+      columns:
+        - categories
+        - possibleDays
+        - possibleLocations
+        - timeWindow
+        - id
+        - maxDeployments
+        - maximumGrade
+        - minimumGrade
+        - programId
+        - classPreparation
+        - contactEmail
+        - contactName
+        - contactPhone
+        - description
+        - duration
+        - equipmentRequired
+        - extraComment
+        - format
+        - institutionLogo
+        - institutionName
+        - researchSubject
+        - roomRequirements
+        - subjectComment
+        - title
+      filter: {}
+      check: {}
+delete_permissions:
+  - role: admin-rsa
+    permission:
+      backend_only: false
       filter: {}

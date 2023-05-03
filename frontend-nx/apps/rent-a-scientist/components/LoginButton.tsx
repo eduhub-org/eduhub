@@ -1,17 +1,15 @@
 import { Button } from "@material-ui/core";
-import { signIn, signOut } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import { FC, useCallback } from "react";
 import { useIsLoggedIn } from "../hooks/authentication";
+import useLogout from "../hooks/logout";
 
 export const useLogin = () => {
   const signInHandler = () => signIn("keycloak");
   return signInHandler;
 };
 
-export const useLogout = () => {
-  return () => signOut();
-};
 
 export const RegisterButton: FC = () => {
   const router = useRouter();
