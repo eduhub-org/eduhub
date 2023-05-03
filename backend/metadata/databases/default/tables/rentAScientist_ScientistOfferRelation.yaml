@@ -14,14 +14,14 @@ object_relationships:
     using:
       foreign_key_constraint_on: offerId
 insert_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       check: {}
       columns:
         - offerId
         - scientistId
 select_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       columns:
         - offerId
@@ -46,7 +46,7 @@ select_permissions:
         - scientistId
       filter: {}
 update_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       columns:
         - offerId
@@ -54,7 +54,7 @@ update_permissions:
       filter: {}
       check: {}
 delete_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       backend_only: false
       filter: {}

@@ -52,7 +52,7 @@ array_relationships:
           name: Expert
           schema: public
 select_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       columns:
         - created_at
