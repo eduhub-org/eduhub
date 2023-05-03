@@ -19,7 +19,7 @@ export const useIsAdmin = () => {
   return (
     sessionData?.profile?.['https://hasura.io/jwt/claims']?.[
       'x-hasura-allowed-roles'
-    ]?.includes('admin') ?? false
+    ]?.includes('admin-ras') ?? false
   );
 };
 
