@@ -15,7 +15,7 @@ array_relationships:
           name: ScientistOfferRelation
           schema: rentAScientist
 insert_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       check: {}
       columns:
@@ -25,7 +25,7 @@ insert_permissions:
         - surname
         - title
 select_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       columns:
         - id
@@ -62,7 +62,7 @@ select_permissions:
         - title
       filter: {}
 update_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       columns:
         - id
@@ -73,7 +73,7 @@ update_permissions:
       filter: {}
       check: {}
 delete_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       backend_only: false
       filter: {}
