@@ -62,7 +62,7 @@ resource "google_cloud_run_service" "rent_a_scientist" {
         }
         env {
           name  = "NEXTAUTH_URL"
-          value = "https://${local.eduhub_service_name}.opencampus.sh"
+          value = "https://${local.rent_a_scientist_service_name}.opencampus.sh"
         }
         env {
           name = "HASURA_ADMIN_SECRET"
