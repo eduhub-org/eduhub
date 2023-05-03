@@ -72,7 +72,7 @@ export const useAdminMutation: typeof useMutation = (
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            'x-hasura-role': 'admin-rsa',
+            'x-hasura-role': 'admin-ras',
             Authorization: 'Bearer ' + accessToken,
           },
         },
