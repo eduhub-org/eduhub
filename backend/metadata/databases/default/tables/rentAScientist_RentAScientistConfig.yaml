@@ -10,7 +10,24 @@ object_relationships:
   - name: Program
     using:
       foreign_key_constraint_on: program_id
+insert_permissions:
+  - role: admin-rsa
+    permission:
+      check: {}
+      columns:
+        - test_operation
+        - id
+        - program_id
+        - mailFrom
 select_permissions:
+  - role: admin-rsa
+    permission:
+      columns:
+        - test_operation
+        - id
+        - program_id
+        - mailFrom
+      filter: {}
   - role: anonymous
     permission:
       columns:
@@ -34,4 +51,19 @@ select_permissions:
         - mailFrom
         - program_id
         - test_operation
+      filter: {}
+update_permissions:
+  - role: admin-rsa
+    permission:
+      columns:
+        - test_operation
+        - id
+        - program_id
+        - mailFrom
+      filter: {}
+      check: {}
+delete_permissions:
+  - role: admin-rsa
+    permission:
+      backend_only: false
       filter: {}

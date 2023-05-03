@@ -177,6 +177,11 @@ variable "keycloak_hasura_client_secret" {
   type        = string
 }
 
+variable "keycloak_ras_client_secret" {
+  description = "Used to authenticate login requests from the rent-a-scientist client."
+  type        = string
+}
+
 # Serverless Functions
 variable "environment" {
   description = "Should typically be a value of either `production` or `staging` to possibly change the behaviour of as serverless function depending on the environment."

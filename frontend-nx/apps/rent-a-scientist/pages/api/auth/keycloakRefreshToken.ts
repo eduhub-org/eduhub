@@ -30,10 +30,10 @@ const keycloakRefreshToken = async (
       const keycloakRefreshTokenBody =
         request.body as IKeycloakRefreshTokenParams['body'];
 
-      keycloakParamsToRefreshToken.append('client_id', 'hasura');
+      keycloakParamsToRefreshToken.append('client_id', 'rent-a-scientist');
       keycloakParamsToRefreshToken.append(
         'client_secret',
-        process.env.KEYCLOAK_HASURA_CLIENT_SECRET ||
+        process.env.KEYCLOAK_RAS_CLIENT_SECRET ||
           process.env.CLIENT_SECRET ||
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           process.env.NEXT_AUTH_CLIENT_SECRET!

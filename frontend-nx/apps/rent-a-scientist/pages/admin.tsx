@@ -75,8 +75,8 @@ const CSV_KEYS = {
     SCIENTIST_IMAGE2: "Foto_2",
     SCIENTIST_IMAGE3: "Foto_3",
 
-    INSTITUTION_LOGO: "Logo",
-    INSTITUTION: "Institution",
+    INSTITUTION_LOGO: "Logo_1",
+    INSTITUTION: "Institution_1",
 
     OFFER_ID: "ID",
     OFFER_CATEGORY1: "Thema_1",
@@ -95,6 +95,11 @@ const CSV_KEYS = {
     OFFER_POSSIBLE_DAYS3: "Einsatztag_3",
     OFFER_POSSIBLE_DAYS4: "Einsatztag_4",
     OFFER_POSSIBLE_DAYS5: "Einsatztag_5",
+    OFFER_POSSIBLE_DAYS6: "Einsatztag_6",
+    OFFER_POSSIBLE_DAYS7: "Einsatztag_7",
+    OFFER_POSSIBLE_DAYS8: "Einsatztag_8",
+    OFFER_POSSIBLE_DAYS9: "Einsatztag_9",
+    OFFER_POSSIBLE_DAYS10: "Einsatztag_10",
     OFFER_MAX_DEPLOYMENTS: "Einsatzhäufigkeit?",
     OFFER_DURATION: "Dauer der Unterrichtseinheit?",
     OFFER_TIMEWINDOW_1: "Zeitfenster_1",
@@ -106,8 +111,8 @@ const CSV_KEYS = {
     OFFER_EQUIPMENT_REQUIREMENTS: "Organisatorische Anforderungen",
     OFFER_CLASS_PREP: "Vorbereitung der Schulklasse",
     OFFER_EXTRA_COMMENT: "Extra Informationen",
-    OFFER_SUBJECT: "Fachbereich",
-    OFFER_CONTACT_NAME: "Ansprechpartner*in",
+    OFFER_SUBJECT: "Fachbereich_1",
+    OFFER_CONTACT_NAME: "Ansprechspartner*in",
     OFFER_CONTACT_EMAIL: "Ansprechpartner*in E-Mail",
     OFFER_CONTACT_PHONE: "Ansprechpartner*in Telefon",
   },
@@ -187,8 +192,9 @@ const parseOfferFromRow = (row: any): ScientistOffer_insert_input | null => {
     CSV_KEYS.OFFER.OFFER_CATEGORY1,
     CSV_KEYS.OFFER.OFFER_CATEGORY2,
     CSV_KEYS.OFFER.OFFER_CATEGORY3,
-    CSV_KEYS.OFFER.OFFER_CATEGORY4,
-    CSV_KEYS.OFFER.OFFER_CATEGORY5,
+    // 2023 has less categories
+    // CSV_KEYS.OFFER.OFFER_CATEGORY4,
+    // CSV_KEYS.OFFER.OFFER_CATEGORY5,
   ];
 
   const days = [
@@ -197,22 +203,25 @@ const parseOfferFromRow = (row: any): ScientistOffer_insert_input | null => {
     CSV_KEYS.OFFER.OFFER_POSSIBLE_DAYS3,
     CSV_KEYS.OFFER.OFFER_POSSIBLE_DAYS4,
     CSV_KEYS.OFFER.OFFER_POSSIBLE_DAYS5,
+    CSV_KEYS.OFFER.OFFER_POSSIBLE_DAYS6,
+    CSV_KEYS.OFFER.OFFER_POSSIBLE_DAYS7,
+    CSV_KEYS.OFFER.OFFER_POSSIBLE_DAYS8,
+    CSV_KEYS.OFFER.OFFER_POSSIBLE_DAYS9,
+    CSV_KEYS.OFFER.OFFER_POSSIBLE_DAYS10,
   ];
 
   const mapDayValue = (dayString: string) => {
     if (dayString == null) return null;
 
-    if (dayString.includes("Montag")) {
-      return 1;
-    } else if (dayString.includes("Dienstag")) {
-      return 2;
-    } else if (dayString.includes("Mittwoch")) {
-      return 3;
-    } else if (dayString.includes("Donnerstag")) {
-      return 4;
-    } else if (dayString.includes("Freitag")) {
-      return 5;
+    // RaS 2023 edition
+    const dayElems = ["DUMMY_0_INDEX", "03.07", "04.07", "05.07", "06.07", "07.07", "10.07", "11.07", "12.07", "13.07", "14.07"];
+
+    for (let i = 0; i < dayElems.length; i++) {
+      if (dayString.includes(dayElems[i])) {
+        return i;
+      }
     }
+
     return null;
   };
 

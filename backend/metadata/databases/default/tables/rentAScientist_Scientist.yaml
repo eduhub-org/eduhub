@@ -14,7 +14,26 @@ array_relationships:
         table:
           name: ScientistOfferRelation
           schema: rentAScientist
+insert_permissions:
+  - role: admin-rsa
+    permission:
+      check: {}
+      columns:
+        - id
+        - forename
+        - image
+        - surname
+        - title
 select_permissions:
+  - role: admin-rsa
+    permission:
+      columns:
+        - id
+        - forename
+        - image
+        - surname
+        - title
+      filter: {}
   - role: anonymous
     permission:
       columns:
@@ -41,4 +60,20 @@ select_permissions:
         - image
         - surname
         - title
+      filter: {}
+update_permissions:
+  - role: admin-rsa
+    permission:
+      columns:
+        - id
+        - forename
+        - image
+        - surname
+        - title
+      filter: {}
+      check: {}
+delete_permissions:
+  - role: admin-rsa
+    permission:
+      backend_only: false
       filter: {}
