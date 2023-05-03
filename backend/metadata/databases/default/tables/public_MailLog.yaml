@@ -11,6 +11,60 @@ object_relationships:
         remote_table:
           name: MailStatus
           schema: public
+insert_permissions:
+  - role: admin-ras
+    permission:
+      check: {}
+      columns:
+        - id
+        - created_at
+        - updated_at
+        - bcc
+        - cc
+        - status
+        - to
+        - content
+        - templateId
+        - from
+        - subject
+select_permissions:
+  - role: admin-ras
+    permission:
+      columns:
+        - id
+        - created_at
+        - updated_at
+        - bcc
+        - cc
+        - status
+        - to
+        - content
+        - templateId
+        - from
+        - subject
+      filter: {}
+update_permissions:
+  - role: admin-ras
+    permission:
+      columns:
+        - id
+        - created_at
+        - updated_at
+        - bcc
+        - cc
+        - status
+        - to
+        - content
+        - templateId
+        - from
+        - subject
+      filter: {}
+      check: {}
+delete_permissions:
+  - role: admin-ras
+    permission:
+      backend_only: false
+      filter: {}
 event_triggers:
   - name: send_mail
     definition:

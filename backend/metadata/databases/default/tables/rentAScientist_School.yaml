@@ -15,7 +15,7 @@ array_relationships:
           name: SchoolClass
           schema: rentAScientist
 insert_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       check: {}
       columns:
@@ -27,7 +27,7 @@ insert_permissions:
         - schoolType
         - street
 select_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       columns:
         - city
@@ -72,7 +72,7 @@ select_permissions:
         - street
       filter: {}
 update_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       columns:
         - city
@@ -85,7 +85,7 @@ update_permissions:
       filter: {}
       check: null
 delete_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       backend_only: false
       filter: {}
