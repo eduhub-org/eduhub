@@ -40,6 +40,7 @@ export const ScientistAvatar: FC<IProps> = ({
     <div className={className}>
       <div className="flex">
         <img
+          loading="lazy"
           alt="Bild Wissenschaftler"
           src={
             "/static/pics/" +
@@ -56,6 +57,7 @@ export const ScientistAvatar: FC<IProps> = ({
         <div className="pl-5">
           {logo !== undefined && (
             <img
+              loading="lazy"
               alt="Logo Institution"
               className="lg:h-14 h-10"
               src={"/static/logos/" + logo.trim().toLowerCase() + ".png"}
