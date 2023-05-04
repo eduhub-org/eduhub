@@ -38,7 +38,7 @@ export const MyRequestsDisplaySingleElement: FC<SingleElementProps> = ({
     <div className="mt-10">
       <div className="flex items-center mb-2">
         <div className="text-xl font-bold">
-          Anmeldung Nr. 2022{requestSummary.schoolClassId}
+          Anmeldung Nr. {requestSummary.schoolClassId}
         </div>
 
         {allowTrash && (
