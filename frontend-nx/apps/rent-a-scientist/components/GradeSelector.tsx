@@ -21,7 +21,7 @@ export const GradeSelector: FC<IProps> = ({
   id,
 }) => {
   const minium = minGrade || 1;
-  const maximum = maxGrade || 13;
+  const maximum = maxGrade || 12;
 
   const options = [
     {
