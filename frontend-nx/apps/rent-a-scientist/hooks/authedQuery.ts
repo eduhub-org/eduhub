@@ -33,7 +33,7 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
           ...passedOptions?.context,
           headers: {
             ...passedOptions?.context?.headers,
-            'x-hasura-role': 'admin',
+            'x-hasura-role': 'admin-ras',
             Authorization: `Bearer ${accessToken}`,
           },
         },

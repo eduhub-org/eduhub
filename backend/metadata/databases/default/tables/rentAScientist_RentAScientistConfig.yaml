@@ -11,7 +11,7 @@ object_relationships:
     using:
       foreign_key_constraint_on: program_id
 insert_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       check: {}
       columns:
@@ -20,7 +20,7 @@ insert_permissions:
         - program_id
         - mailFrom
 select_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       columns:
         - test_operation
@@ -53,7 +53,7 @@ select_permissions:
         - test_operation
       filter: {}
 update_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       columns:
         - test_operation
@@ -63,7 +63,7 @@ update_permissions:
       filter: {}
       check: {}
 delete_permissions:
-  - role: admin-rsa
+  - role: admin-ras
     permission:
       backend_only: false
       filter: {}
