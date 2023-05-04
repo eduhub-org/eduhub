@@ -124,7 +124,7 @@ const RegisterPage: FC = () => {
   useEffect(() => {
     if (!myTeacher.loading && myUserId != null) {
       const me = myTeacher.data?.Teacher;
-      if (me != null && me.length == 0) { // eslint-disable-line
+      if (me == null || (me != null && me.length == 0)) { // eslint-disable-line
         console.log(
           "try to insert my teacher object, had no teacher object",
           myTeacher,
@@ -257,6 +257,14 @@ const RegisterPage: FC = () => {
   const handleStorePendingRequest = useCallback(async () => {
     const myTeacherId = myTeacher.data?.Teacher[0].id;
 
+    console.log("myTeacherId", myTeacherId)
+
+    if (myTeacherId == null) {
+      // ugly last resort fallback
+      alert("Es gab leider einen Übertragungsfehler, bitte versuchen Sie es erneut"); // eslint-disable-line
+      location.reload(); //eslint-disable-line
+    }
+
     if (pendingRequestSummary != null && myTeacherId != null) {
       if (
         pendingRequestSummary.contact === null ||
@@ -352,6 +360,8 @@ const RegisterPage: FC = () => {
                 Falls Sie schon einen Account haben melden Sie sich an, klicken Sie hierzu rechts oben auf <span className="italic">Anmelden</span>.
                 <br />
                 Accounts vom letzten Jahr Rent-a-Scientist können erneut verwendet werden.
+                <br />
+                Nach der Registrierung ist eventuell ein Klick auf <span className="italic">Anmelden</span> nötig.
               </div>
               <RegisterButton />
             </div>
