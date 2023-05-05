@@ -11,6 +11,7 @@ import sys
 import os
 from requests.structures import CaseInsensitiveDict
 import pandas as pd
+from dateutil import parser
 
 
 class EduHub:
@@ -33,9 +34,9 @@ class EduHub:
         self.headers["content-type"] = 'application/json'
 
     def to_datetime(self, date_time):
-        hasura_format = '%Y-%m-%dT%H:%M:%S%z'
         reference_timezone = 'Europe/Berlin'
-        date_time = pd.to_datetime(date_time, format=hasura_format)
+        date_time = parser.parse(date_time)
+        date_time = pd.to_datetime(date_time)
         return date_time.tz_convert(reference_timezone)
 
     def send_query(self, query, variables):
