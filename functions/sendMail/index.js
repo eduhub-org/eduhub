@@ -19,7 +19,7 @@ exports.sendMail = async (req, res) => {
 
     const emulated = process.env.LOCAL_TESTING;
 
-    if (emulated) {
+    if (emulated=="1") {
       console.log(`
         Mail was requested to be sent:
         From: ${from}
