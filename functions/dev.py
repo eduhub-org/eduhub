@@ -35,33 +35,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-# Test request for the server
-#   curl -X POST -H "Content-Type: application/json" -d '{
-#      "headers": [
-#          {
-#              "name": "Content-Type",
-#              "value": "application/json"
-#          },
-#          {
-#              "name": "User-Agent",
-#              "value": "hasura-graphql-engine/v2.19.0"
-#          },
-#          {
-#              "name": "name",
-#              "value": "checkAttendance"
-#          },
-#          {
-#              "name": "secret",
-#              "value_from_env": "HASURA_CLOUD_FUNCTION_SECRET"
-#          }
-#      ],
-#      "payload": {
-#          "comment": "regularly checks zoom and questionaire attendance",
-#          "id": "d4212a35-0e98-495b-a19d-7cd80ea66223",
-#          "name": "check_attendance",
-#          "payload": {},
-#          "scheduled_time": "2023-04-06T10:00:00Z"
-#      },
-#      "version": "1"
-#  }' http://localhost:42025/
