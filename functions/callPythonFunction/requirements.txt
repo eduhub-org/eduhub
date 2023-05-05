@@ -10,4 +10,4 @@ fuzzywuzzy
 typing
 authlib
 datetime
-dateutil
+python-dateutil
