@@ -11,6 +11,7 @@ import sys
 import os
 from requests.structures import CaseInsensitiveDict
 import pandas as pd
+from dateutil import parser
 
 
 class EduHub:
@@ -33,10 +34,10 @@ class EduHub:
         self.headers["content-type"] = 'application/json'
 
     def to_datetime(self, date_time):
-        hasura_format = '%Y-%m-%dT%H:%M:%SZ'
-        hasura_timezone = 'UTC'
+        hasura_format = '%Y-%m-%dT%H:%M:%S%z'
         reference_timezone = 'Europe/Berlin'
-        return pd.to_datetime(date_time, format=hasura_format).dt.tz_localize(hasura_timezone).dt.tz_convert(reference_timezone)
+        date_time = pd.to_datetime(date_time, format=hasura_format)
+        return date_time.tz_convert(reference_timezone)
 
     def send_query(self, query, variables):
         self.set_headers()
@@ -47,6 +48,7 @@ class EduHub:
         if r.status_code == 200:
             return r.json()
         else:
+            print(f"Response text: {r.text}")
             return(f'Something went wrong. HTTP Code: {r.status_code}')
 
     def get_finished_sessions_without_attendance_check(self):
@@ -54,29 +56,33 @@ class EduHub:
         query = """query {
             Session(where: {attendanceData: {_is_null: true}, endDateTime: {_lt: "now()"}}) {
                 id
-                SessionAddresses {
-                    link
-                    latitude
-                    longitude
-                }
+                title
                 startDateTime
                 endDateTime
+                Course {
+                    CourseLocations {
+                        locationOption
+                        defaultSessionAddress
+                    }
+                }
+                SessionAddresses {
+                    address
+                    type
+                }
             }
         }"""
         result = self.send_query(query, variables)
         if result.get('data') is None:
             return logging.error(f'{result}')
         result_list = result['data']['Session']
-        unnested_list = []
-        unnested_list.append([[item['id'], item['SessionAddresses']]
-                              for item in result_list])
-        sessions_df = pd.DataFrame(unnested_list[0], columns=[
-                                   'id', 'link', 'latitude', 'longitude', 'startDateTime', 'endDateTime'])
-        sessions_df['startDateTime'] = self.to_datetime(
-            sessions_df['startDateTime'])
-        sessions_df['endDateTime'] = self.to_datetime(
-            sessions_df['endDateTime'])
-        return sessions_df
+
+        # convert startDateTime and endDateTime to datetime
+        for session in result_list:
+            session['startDateTime'] = self.to_datetime(
+                session['startDateTime'])
+            session['endDateTime'] = self.to_datetime(session['endDateTime'])
+
+        return result_list
 
     def get_course_participants_from_session_id(self, session_id):
         variables = {'session_id': f'{session_id}'}
@@ -117,10 +123,14 @@ class EduHub:
         return pd.DataFrame(unnested_list[0], columns=['id', 'firstName', 'lastName', 'email'])
 
     def insert_attendance(self, course_participant_attendance):
-        variables = {'leaveDateTime': course_participant_attendance.get('leaveDateTime').iloc[0], 'interruptionCount': course_participant_attendance.get('interruptionCount').iloc[0],
-                     'recordedName': course_participant_attendance.get('recordedName').iloc[0], 'sessionId': course_participant_attendance.get('sessionId').iloc[0],
-                     'source': course_participant_attendance.get('source').iloc[0], 'joinDateTime': course_participant_attendance.get('joinDateTime').iloc[0],
-                     'status': course_participant_attendance.get('status').iloc[0], 'totalAttendanceTime': course_participant_attendance.get('duration').iloc[0],
+        variables = {'leaveDateTime': course_participant_attendance.get('leaveDateTime').iloc[0],
+                     'interruptionCount': None if course_participant_attendance.get('interruptionCount').iloc[0] is None else int(course_participant_attendance.get('interruptionCount').iloc[0]),
+                     'recordedName': course_participant_attendance.get('recordedName').iloc[0],
+                     'sessionId': int(course_participant_attendance.get('sessionId').iloc[0]),
+                     'source': course_participant_attendance.get('source').iloc[0],
+                     'joinDateTime': course_participant_attendance.get('joinDateTime').iloc[0],
+                     'status': course_participant_attendance.get('status').iloc[0],
+                     'totalAttendanceTime': None if course_participant_attendance.get('duration').iloc[0] is None else int(course_participant_attendance.get('duration').iloc[0]),
                      'userId': course_participant_attendance.get('userId').iloc[0]}
         mutation = """mutation($leaveDateTime: timestamptz, $interruptionCount: Int, $recordedName: String,
                                $sessionId: Int, $source: String, $joinDateTime: timestamptz, $status: AttendanceStatus_enum,
@@ -146,9 +156,9 @@ class EduHub:
         }"""
         return self.send_query(mutation, variables)
 
-    def update_session_attendanceData(self, attendance_data):
+    def update_session_attendanceData(self, attendance_data, session_id):
         variables = {
-            'sessionId': int(attendance_data['sessionId'][0]), 'attendanceData': attendance_data.to_json()}
+            'sessionId': int(session_id), 'attendanceData': attendance_data.to_json()}
         mutation = """mutation($sessionId: Int, $attendanceData: String) {
             update_Session(where: {id: {_eq: $sessionId}}, _set: {attendanceData: $attendanceData}) {
                 affected_rows
@@ -259,11 +269,11 @@ class Zoom:
         zoom_session = self.get_last_meeting_session(meeting_id)
         if zoom_session.status_code != 200:
             return f"Error: Zoom API answered with {zoom_session} \n\nFull Text: {zoom_session.text}"
-        logging.info(f"Zoom API response: {zoom_session}")
-        logging.info(f"Zoom API response text: {zoom_session.text}")
+        logging.debug(f"Zoom API response: {zoom_session}")
+        logging.debug(f"Zoom API response text: {zoom_session.text}")
         zoom_session = json.loads(zoom_session.text)
         if zoom_session.get('participants') is None:
-            return f"Report has no participants. Are you sure the meeting id is correct?\nReport:\n{zoom_session.text}"
+            return logging.info(f"Report has no participants. Are you sure the meeting id is correct?\nReport:\n{zoom_session.text}")
         zoom_attendances = self.format_zoom_attendances(
             zoom_session['participants'])
         return zoom_attendances
@@ -335,9 +345,13 @@ class LimeSurvey:
         req = self.create_lms_request(payload)
         try:
             f = urllib.request.urlopen(req)
-
             request_json = json.loads(f.read())
             result_base64 = request_json['result']
+            # check whether result is a valid base64 string
+            # if result_base64['status'] == "No permission":
+            #     logging.error(
+            #         f"############# No permission to access the survey. Please check your credentials.")
+            #     return f"############# No permission to access the survey. Please check your credentials."
             result_json = json.loads(base64.b64decode(result_base64))
             response_df = self.format_responses(result_json['responses'])
             return(response_df)
