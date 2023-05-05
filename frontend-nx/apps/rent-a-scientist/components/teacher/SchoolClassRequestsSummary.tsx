@@ -60,9 +60,7 @@ export const SchoolClassRequestsSummary: FC<IProps> = ({
       assignedDay,
       contactInfo:
         assignedDay !== null &&
-        assignedDay !== -1 &&
-        assignedDay > 0 &&
-        assignedDay < 6
+          assignedDay > 0
           ? requestSummary.contactInfos[oid]
           : "",
     };
