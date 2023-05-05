@@ -270,8 +270,7 @@ export const OffersSearch: FC<IProps> = ({ className }) => {
 
           {!rsaConfig.visibility && (
             <div className="mt-4 text-xl font-bold">
-              Leider ist die Anmeldephase vorbei. Sie können hier aber weiterhin
-              die Angebote einsehen
+              Die Anmeldung ist aktuell nicht möglich. Schauen Sie in den nächsten Tagen nochmal vorbei.
             </div>
           )}
 
