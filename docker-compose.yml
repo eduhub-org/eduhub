@@ -62,7 +62,7 @@ services:
       KEYCLOAK_USER: admin
       KEYCLOAK_PW: admin
       HASURA_ENDPOINT: http://hasura:8080/v1/graphql
-      HASURA_ADMIN_SECRET: myadminsecretkey
+      HASURA_GRAPHQL_ADMIN_KEY: myadminsecretkey
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       LIBRARY_PATH: ../lib/cloud-storage
       
