@@ -34,9 +34,9 @@ class EduHub:
         self.headers["content-type"] = 'application/json'
 
     def to_datetime(self, date_time):
+        hasura_format = '%Y-%m-%dT%H:%M:%S%z'
         reference_timezone = 'Europe/Berlin'
-        date_time = parser.parse(date_time)
-        date_time = pd.to_datetime(date_time)
+        date_time = pd.to_datetime(date_time, format=hasura_format)
         return date_time.tz_convert(reference_timezone)
 
     def send_query(self, query, variables):
