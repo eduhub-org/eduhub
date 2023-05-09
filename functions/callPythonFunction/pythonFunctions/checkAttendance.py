@@ -1,14 +1,8 @@
 import os
-from typing import Optional, Dict, Union, Any
-from authlib.jose import jwt
-import json
-import yaml
 import logging
-import api
 import pandas as pd
-from flask import escape
-from flask import jsonify
 from fuzzywuzzy import fuzz
+from api_clients import EduHubClient, ZoomClient, LimeSurveyClient
 
 
 def checkAttendance(payload):
@@ -25,9 +19,9 @@ def checkAttendance(payload):
     """
     logging.info("########## Check Attendance Function ##########")
 
-    edu = api.EduHub()
-    logging.debug(f"edu.url:  {edu.url}")
-    sessions = edu.get_finished_sessions_without_attendance_check()
+    eduhub_client = EduHubClient()
+    logging.debug(f"eduhub_client.url:  {eduhub_client.url}")
+    sessions = eduhub_client.get_finished_sessions_without_attendance_check()
 
     # test if session is null
     if len(sessions) == 0:
@@ -36,7 +30,7 @@ def checkAttendance(payload):
     with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'display.width', None):
         logging.debug("########## Full DataFrame:\n%s", sessions)
 
-    zoom = api.Zoom()
+    zoom_client = ZoomClient()
 
     # iterate over all elements in the sessions dictionary
     for session in sessions:
@@ -52,12 +46,16 @@ def checkAttendance(payload):
 
             # Checking zoom attendance
             if location['locationOption'] == "ONLINE":
-                zoom_attendance = zoom.get_session_attendance(
-                    location['defaultSessionAddress'])
-                zoom_attendance['source'] = 'ZOOM'
-                logging.debug(
-                    f"############# Zoom Attendance Data\n{zoom_attendance}")
-                attendance_data = pd.concat([attendance_data, zoom_attendance])
+                try:
+                    zoom_attendance = zoom_client.get_session_attendance(
+                        location['defaultSessionAddress'])
+                    logging.debug(
+                        f"############# Zoom Attendance Data\n{zoom_attendance}")
+                    zoom_attendance['source'] = 'ZOOM'
+                    attendance_data = pd.concat(
+                        [attendance_data, zoom_attendance])
+                except Exception as e:
+                    logging.error(f"Error while getting Zoom attendance: {e}")
 
             # Checking offline attendance
             elif location['locationOption'] == "KIEL":
@@ -79,7 +77,7 @@ def checkAttendance(payload):
         logging.debug(f"############# Attendance Data\n{attendance_data}")
 
         # Get course participants
-        course_participants = edu.get_course_participants_from_session_id(
+        course_participants = eduhub_client.get_course_participants_from_session_id(
             session['id'])
         logging.info("########## Checking attendances for the %s confirmed participants in the session's course",
                      len(course_participants))
@@ -94,7 +92,7 @@ def checkAttendance(payload):
                 course_participants.iloc[p, :], attendance_data, session['id'])
             logging.debug(
                 f"############# Course Participant Attendance\n{course_participant_attendance}")
-            edu.insert_attendance(course_participant_attendance)
+            eduhub_client.insert_attendance(course_participant_attendance)
             logging.info(
                 "### %s: %s [%s: %s to %s; recorded name: %s]",
                 course_participants.iloc[p, :]['email'],
@@ -105,7 +103,8 @@ def checkAttendance(payload):
                 course_participant_attendance['recordedName'][0]
             )
         # Storing JSON of complete attendance_data in Session table
-        edu.update_session_attendanceData(attendance_data, session['id'])
+        eduhub_client.update_session_attendanceData(
+            attendance_data, session['id'])
 
     return sessions
 
@@ -120,11 +119,12 @@ def get_offline_session_attendance(session, location):
         return "Error: Attendances cannot be checked since start or end time of the meeting was not provided"
     else:
         # Retrieve survey data from LimeSurvey
-        lms = api.LimeSurvey(sid=os.getenv("LMS_ATTENDANCE_SURVEY_ID"))
+        limesurvey_client = LimeSurveyClient(
+            sid=os.getenv("LMS_ATTENDANCE_SURVEY_ID"))
         logging.debug("############# LMS_ATTENDANCE_SURVEY_ID:\n%s",
                       os.getenv("LMS_ATTENDANCE_SURVEY_ID"))
-        lms.set_key(lms.get_session_key())
-        survey_answers = lms.get_responses()
+        limesurvey_client.set_key(limesurvey_client.get_session_key())
+        survey_answers = limesurvey_client.get_responses()
         logging.debug("############# Survey Answers\n%s", survey_answers)
         # Rename variables from LimeSurvey
         survey_answers.rename(columns={'datestamp': 'joinDateTime', 'N1': 'firstName',
@@ -133,7 +133,7 @@ def get_offline_session_attendance(session, location):
         survey_answers['name'] = survey_answers['firstName'] + \
             ' ' + survey_answers['lastName']
         # Format time variable
-        survey_answers['joinDateTime'] = lms.to_datetime(
+        survey_answers['joinDateTime'] = limesurvey_client.to_datetime(
             survey_answers['joinDateTime'])
         logging.debug("############# Survey Answers\n%s", survey_answers)
         # Filter to only those answers who registered during the correct time
