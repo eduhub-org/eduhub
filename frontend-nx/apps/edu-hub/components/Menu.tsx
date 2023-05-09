@@ -64,14 +64,18 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       </MenuItem>
 
       <MenuItem onClick={closeMenu}>
-        <Link className="w-full text-lg" href="https://opencampus.gitbook.io/faq/">
+        <Link
+          className="w-full text-lg"
+          href="https://opencampus.gitbook.io/faq/"
+          target="_blank"
+        >
           {t('menu-faq')}
         </Link>
       </MenuItem>
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/user-management">
+          <Link className="w-full text-lg" href="/manage/users">
             {t('menu-administration-user')}
           </Link>
         </MenuItem>
@@ -79,7 +83,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/courses">
+          <Link className="w-full text-lg" href="/manage/courses">
             {t('menu-administration-courses')}
           </Link>
         </MenuItem>
@@ -87,15 +91,15 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link className="w-full text-lg" href="/achievements">
-              {t('menu-administration-achievement')}
+            {t('menu-administration-achievement')}
           </Link>
         </MenuItem>
       )}
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/programs">
-              {t('menu-administration-programs')}
+          <Link className="w-full text-lg" href="/manage/programs">
+            {t('menu-administration-programs')}
           </Link>
         </MenuItem>
       )}
