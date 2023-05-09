@@ -11,7 +11,6 @@ import pandas as pd
 
 # version 13/10/2021
 class LimeSurveyClient:
-    __metaclass__ = "api"
 
     def __init__(self, sid):
         self.user = os.getenv('LMS_USER')

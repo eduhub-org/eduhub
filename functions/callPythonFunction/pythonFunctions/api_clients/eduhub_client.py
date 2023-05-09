@@ -6,7 +6,6 @@ import pandas as pd
 
 
 class EduHubClient:
-    __metaclass__ = "api"
 
     def __init__(self):
         self.url = os.getenv('HASURA_ENDPOINT')

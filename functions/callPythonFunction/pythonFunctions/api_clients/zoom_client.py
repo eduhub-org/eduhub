@@ -9,7 +9,6 @@ import pandas as pd
 
 
 class ZoomClient:
-    __metaclass__ = "api"
 
     def __init__(self):
         self.api_key = os.getenv('ZOOM_API_KEY')
