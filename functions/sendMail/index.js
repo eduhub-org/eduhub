@@ -17,9 +17,9 @@ exports.sendMail = async (req, res) => {
     const cc = req.body.event.data.new.cc;
     const bcc = req.body.event.data.new.bcc;
 
-    const emulated = process.env.LOCAL_TESTING;
+    const emulated = process.env.EMULATE_EMAIL;
 
-    if (emulated=="1") {
+    if (emulated == "1") {
       console.log(`
         Mail was requested to be sent:
         From: ${from}
@@ -32,7 +32,7 @@ exports.sendMail = async (req, res) => {
       `);
 
       return res.json({
-        message: "ok",
+        message: "!!!!! E-Mail Emulated !!!!!",
       });
     } else {
       let transporter = nodemailer.createTransport({

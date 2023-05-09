@@ -33,6 +33,7 @@ services:
     command: ["sh", "/functions/start-node.sh"]
     environment:
       LOCAL_TESTING: 1
+      EMULATE_EMAIL: "1"
       STORAGE_PORT: 4001
       KEYCLOAK_URL: http://keycloak:8080
       KEYCLOAK_USER: admin
