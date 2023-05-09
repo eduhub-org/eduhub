@@ -188,9 +188,9 @@ variable "environment" {
   type        = string
 }
 
-variable "local_testing" {
+variable "emulate_email" {
   description = "is true in staging so no mails are send out"
-  type        = number
+  type        = string
 }
 
 # API Access

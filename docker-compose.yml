@@ -33,6 +33,7 @@ services:
     command: ["sh", "/functions/start-node.sh"]
     environment:
       LOCAL_TESTING: 1
+      EMULATE_EMAIL: "1"
       STORAGE_PORT: 4001
       KEYCLOAK_URL: http://keycloak:8080
       KEYCLOAK_USER: admin
@@ -53,8 +54,6 @@ services:
       - "42025:42025"
 #      - "5001:5001"
     command: sh -c "pip install -r /functions/callPythonFunction/requirements.txt ; /functions/start-python.sh"    
-    env_file:
-      - docker-compose.env
     environment:
       LOCAL_TESTING: 1
  #     STORAGE_PORT: 5001
