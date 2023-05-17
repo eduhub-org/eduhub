@@ -53,5 +53,20 @@ def call_python_function(request):
     else:
         python_function = globals()[name_value]
         logging.info(f"Calling python function: {name_value}...")
-        logging.info(f"Payload: {arguments_json['payload']}")
+        logging.debug(f"Payload: {arguments_json['payload']}")
         return python_function(arguments_json['payload'])
+
+
+# Test request for the server
+# curl -X POST http://localhost:42025/ \
+# -H 'Content-Type: application/json' \
+# -H 'name: checkAttendance' \
+# -H "secret: test1234" \
+# -H "User-Agent: hasura-graphql-engine/v2.19.0" \
+# -d '{
+#   "comment": "regularly checks zoom and questionaire attendance",
+#   "id": "d4212a35-0e98-495b-a19d-7cd80ea66223",
+#   "name": "check_attendance",
+#   "payload": {},
+#   "scheduled_time": "2023-04-06T10:00:00Z"
+# }'

@@ -1,5 +1,8 @@
 */node_modules
 
+# ignore files with local environment variables
+*.env
+
 # Ignore the express installation that is created by start.sh
 node_modules
 package.json
