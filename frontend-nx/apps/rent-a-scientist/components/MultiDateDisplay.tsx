@@ -13,7 +13,7 @@ const rangeGroups = (indices: number[]) => {
 
   return indices
     .slice()
-    .sort()
+    .sort((a, b) => a - b)
     .reduce((prev, cur) => {
       if (prev.length === 0) {
         return [[cur]];
