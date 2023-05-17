@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { FC } from 'react';
-import { Page } from '../components/Page';
+import { Page } from '../../components/Page';
 
 const Impressum: FC = () => {
   return (

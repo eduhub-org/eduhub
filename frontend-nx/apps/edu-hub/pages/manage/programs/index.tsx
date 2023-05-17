@@ -1,9 +1,9 @@
 import Head from 'next/head';
 import { FC } from 'react';
-import { Page } from '../components/Page';
+import { Page } from '../../../components/Page';
 
-import { useIsAdmin } from '../hooks/authentication';
-import { AuthorizedPrograms } from '../components/program/AuthorizedPrograms';
+import { useIsAdmin } from '../../../hooks/authentication';
+import { AuthorizedPrograms } from '../../../components/program/AuthorizedPrograms';
 
 // export const getStaticProps = async ({ locale }: { locale: string }) => ({
 //   props: {

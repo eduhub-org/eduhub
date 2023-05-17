@@ -5,7 +5,7 @@ import { CircularProgress } from '@material-ui/core';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { useAdminQuery } from '../../hooks/authedQuery';
 
-import { QUERY_LIMIT } from '../../pages/courses';
+import { QUERY_LIMIT } from '../../pages/manage/courses';
 import {
   AdminCourseList,
   AdminCourseListVariables,
