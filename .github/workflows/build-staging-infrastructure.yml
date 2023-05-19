@@ -26,6 +26,7 @@ jobs:
     outputs:
       frontend_changes: ${{ steps.check_changes.outputs.frontend_changes }}
       hasura_changes: ${{ steps.check_changes.outputs.hasura_changes }}
+      functions_changes: ${{ steps.check_changes.outputs.functions_changes }}
     steps:
       - name: Check for changes in frontend-nx and backend folders
         id: check_changes
@@ -33,20 +34,21 @@ jobs:
         with:
           script: |
             const { commits } = context.payload;
-            if (!commits) return { frontend_changes: false, hasura_changes: false };
+            console.log('Context Payload:', context.payload);
+            if (!commits) return { frontend_changes: false, hasura_changes: false, functions_changes: false };
 
-            const frontendFolder = 'frontend-nx';
-            const hasuraFolder = 'backend';
-            const frontendChanges = commits.some(commit => {
-              return commit.modified.concat(commit.added, commit.removed)
-                .some(file => file.startsWith(frontendFolder));
-            });
-            const hasuraChanges = commits.some(commit => {
-              return commit.modified.concat(commit.added, commit.removed)
-                .some(file => file.startsWith(hasuraFolder));
-            });
+            function hasChanges(folder) {
+              return commits.some(commit => {
+                return (commit.modified || []).concat(commit.added || [], commit.removed || [])
+                  .some(file => file.startsWith(folder));
+              });
+            }
 
-            return { frontend_changes: frontendChanges, hasura_changes: hasuraChanges };
+            const frontendChanges = hasChanges('frontend-nx');
+            const hasuraChanges = hasChanges('backend');
+            const functionsChanges = hasChanges('functions');
+
+            return { frontend_changes: frontendChanges, hasura_changes: hasuraChanges, functions_changes: functionsChanges };
 
   save-commit-sha:
     name: Save SHA of current commit in Terraform Cloud
@@ -123,6 +125,7 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   zip-and-store-cloud-functions:
+    if: needs.check_changes.outputs.functions_changes == 'true'
     name: Zip and Store Cloud Functions
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
     with:
