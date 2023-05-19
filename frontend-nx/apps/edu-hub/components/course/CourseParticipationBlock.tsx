@@ -70,19 +70,19 @@ export const CourseParticipationBlock: FC<IProps> = ({ course }) => {
 
   let content = null;
 
-  if (courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED && !courseEnrollment?.achievementCertificateURL && !courseEnrollment?.attendanceCertificateURL) {
+  if (
+    courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED &&
+    !courseEnrollment?.achievementCertificateURL &&
+    !courseEnrollment?.attendanceCertificateURL
+  ) {
     content = (
       <>
-        <ContentRow
-          className="my-24 text-edu-black bg-white px-8 py-8"
-          leftTop={
-            <div className="flex flex-1">
-              <Attendances course={course} />
-            </div>
-          }
-          rightBottom={
-            <div className="flex flex-1">
-              {/* {course.achievementCertificatePossible && (
+        <ContentRow className="my-24 text-edu-black bg-white px-8 py-8">
+          <div className="flex flex-1">
+            <Attendances course={course} />
+          </div>
+          <div className="flex flex-1">
+            {/* {course.achievementCertificatePossible && (
                 <CourseAchievementOption
                   courseId={course.id}
                   achievementRecordUploadDeadline={
@@ -92,29 +92,26 @@ export const CourseParticipationBlock: FC<IProps> = ({ course }) => {
                   t={t}
                 />
               )} */}
-            </div>
-          }
-        />
+          </div>
+        </ContentRow>
       </>
     );
   } else if (
-    courseEnrollment?.achievementCertificateURL || courseEnrollment?.attendanceCertificateURL
+    courseEnrollment?.achievementCertificateURL ||
+    courseEnrollment?.attendanceCertificateURL
   ) {
     content = (
       <>
         <ContentRow
           className="my-24 text-edu-black bg-white px-8 py-8"
-          leftTop={
-            <div className="flex flex-1 w-1/2">
-              <Attendances course={course} />
-            </div>
-          }
-          rightBottom={
-            <div className="w-1/2 px-10">
-              <CertificateDownload course={course} />
-            </div>
-          }
-        />
+        >
+          <div className="flex flex-1 w-1/2">
+            <Attendances course={course} />
+          </div>
+          <div className="w-1/2 px-10">
+            <CertificateDownload course={course} />
+          </div>
+        </ContentRow>
       </>
     );
   } else {
