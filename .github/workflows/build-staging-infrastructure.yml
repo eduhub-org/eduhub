@@ -22,6 +22,45 @@ env:
 jobs:
 
   check_changes:
+    name: Check for changes in specific folders
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+        
+        # To compare changes between the current commit and the last pushed remote commit set `since_last_remote_commit: true`. e.g
+        # with:
+        #   since_last_remote_commit: true 
+
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
+
+          - name: Check if any file in the `backend` folder has changed
+          run: |
+            backend_changed=false
+            for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+              if [[ $file == backend/* ]]; then
+                backend_changed=true
+                break
+              fi
+            done
+        
+            if [[ $backend_changed == "true" ]]; then
+              echo "At least one file in the `backend` folder has changed"
+            else
+              echo "No file in the `backend` folder has changed"
+            fi
+
+  check_changes_old:
+    needs: [check_changes]
     runs-on: ubuntu-latest
     outputs:
       frontend_changes: ${{ steps.check_changes.outputs.frontend_changes }}
