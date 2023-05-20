@@ -144,19 +144,11 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
-  wait-for-builds:
-    name: Wait for build jobs
-    needs: [check_changes, build-keycloak, build-hasura, build-frontend, build-rent-a-scientist-frontend, zip-and-store-cloud-functions]
-    runs-on: ubuntu-latest
-    steps:
-      - name: All build jobs finished
-        run: echo "All build jobs finished"
-
   deploy-application:
     if: always()
     name: "Deploy Application Infrastructure"
     needs:
-      [wait-for-builds, save-commit-sha]
+      [check_changes, build-keycloak, build-hasura, build-frontend, build-rent-a-scientist-frontend, zip-and-store-cloud-functions, save-commit-sha]
     runs-on: ubuntu-latest
     defaults:
       run:

@@ -1,14 +1,11 @@
 import Head from 'next/head';
-import { FC  } from 'react';
+import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
 import { Page } from '../components/Page';
 import { TileSlider } from '../components/course/TileSlider';
 import { useQuery } from '@apollo/client';
-import {
-  useAuthedQuery,
-  useInstructorQuery,
-} from '../hooks/authedQuery';
+import { useAuthedQuery, useInstructorQuery } from '../hooks/authedQuery';
 import {
   useIsLoggedIn,
   useIsInstructor,
@@ -109,7 +106,10 @@ const Home: FC = () => {
         <title>EduHub | opencampus.sh</title>
         <link rel="icon" href="/favicon.png" />
         <meta property="og:title" content="EduHub | opencampus.sh" />
-        <meta property="og:image" content="https://edu.opencampus.sh/images/meta-image.png" />
+        <meta
+          property="og:image"
+          content="https://edu.opencampus.sh/images/meta-image.png"
+        />
       </Head>
       <Page className="text-white">
         <div
@@ -167,22 +167,6 @@ const Home: FC = () => {
               ) : null
             )}
             {/* <OnlyLoggedOut>
-              <div className="flex flex-col sm:flex-row mx-6 mt-6 mb-24 sm:mt-48">
-                <div className="flex flex-1 flex-col sm:items-center">
-                  <div>
-                    <h2 className="text-3xl font-semibold">
-                      {t('continueLearning')}
-                    </h2>
-                    <h3 className="text-lg">{t('learnSubheadline')}</h3>
-                  </div>
-                </div>
-                <div className="flex flex-1 justify-center mt-8">
-                  <div className="flex justify-center items-center space-x-3">
-                    <LoginButton />
-                    <RegisterButton />
-                  </div>
-                </div>
-              </div>
             </OnlyLoggedOut> */}
           </ClientOnly>
         </div>
