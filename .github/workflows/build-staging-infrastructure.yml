@@ -157,7 +157,7 @@ jobs:
     if: needs.check_folder_changes.outputs.functions_changed == 'true'
     name: Zip and Store Cloud Functions
     needs: [check_folder_changes]
-    uses: ./.github/workflows/zip_and_store_cloud_functions.yml
+    uses: ./.github/workflows/zip-and-store-cloud-functions.yml
     with:
       PROJECT_ID: eduhub-staging-new
       CLOUD_FUNCTION_FOLDER: functions
