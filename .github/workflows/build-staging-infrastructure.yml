@@ -25,10 +25,10 @@ jobs:
     name: Check for changes in specific folders
     runs-on: ubuntu-latest
     outputs:
-      frontend_changes: ${{ steps.check_changes.outputs.frontend_changes }}
-      hasura_changes: ${{ steps.check_changes.outputs.hasura_changes }}
-      keycloak_changes: ${{ steps.check_changes.outputs.keycloak_changes }}
-      functions_changes: ${{ steps.check_changes.outputs.functions_changes }}
+      frontend_changed: ${{ steps.check_changes.outputs.frontend_changed }}
+      hasura_changed: ${{ steps.check_changes.outputs.hasura_changed }}
+      keycloak_changed: ${{ steps.check_changes.outputs.keycloak_changed }}
+      functions_changed: ${{ steps.check_changes.outputs.functions_changed }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -49,47 +49,50 @@ jobs:
             echo "$file was changed"
           done
       
-      - name: Check if any file in the `backend` folder has changed
-        run: |
-          # backend_changed=false
-          # IFS=' ' read -ra changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
-          # for file in "${changed_files[@]}"; do
-          #   if [[ $file == backend/* ]]; then
-          #     backend_changed=true
-          #     break
-          #   fi
-          # done
-      
-          # if [[ $backend_changed == "true" ]]; then
-          #   echo "At least one file in the `backend` folder has changed"
-          # else
-          #   echo "No file in the `backend` folder has changed"
-          # fi
 
-          function hasChanges(changed_files, folder) {
-            folder_changed=false
-            # IFS=' ' read -ra changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
+      - name: Check if any file in the specified folders has changed
+        run: |
+          function check_folder_changes() {
+            folder=$1
             for file in "${changed_files[@]}"; do
               if [[ $file == $folder/* ]]; then
-              folder_changed=true
-                break
+                echo "true"
+                return
               fi
             done
-  
-            return folder_changed;
+            echo "false"
           }
 
-          (async () => {
-            # const changedFiles = await getChangedFiles();
-            IFS=' ' read -ra changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
+          IFS=' ' read -ra changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
+          backend_changed=$(check_folder_changes "backend")
+          keycloak_changed=$(check_folder_changes "keycloak")
+          frontend_nx_changed=$(check_folder_changes "frontend-nx")
+          functions_changed=$(check_folder_changes "functions")
 
-            const frontendChanges = hasChanges(changedFiles, 'frontend-nx');
-            const hasuraChanges = hasChanges(changedFiles, 'backend');
-            const functionsChanges = hasChanges(changedFiles, 'functions');
-            const keycloakChanges = hasChanges(changedFiles, 'keycloak');
+          echo "::set-output name=backend_changed::$backend_changed"
+          echo "::set-output name=keycloak_changed::$keycloak_changed"
+          echo "::set-output name=frontend_nx_changed::$frontend_nx_changed"
+          echo "::set-output name=functions_changed::$functions_changed"
 
-            return { frontend_changes: frontendChanges, hasura_changes: hasuraChanges, functions_changes: functionsChanges, keycloak_changes: keycloakChanges };
-          })();
+
+
+      # - name: Check if any file in the `backend` folder has changed
+      #   run: |
+      #     backend_changed=false
+      #     IFS=' ' read -ra changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
+      #     for file in "${changed_files[@]}"; do
+      #       if [[ $file == backend/* ]]; then
+      #         backend_changed=true
+      #         break
+      #       fi
+      #     done
+      
+      #     if [[ $backend_changed == "true" ]]; then
+      #       echo "At least one file in the `backend` folder has changed"
+      #     else
+      #       echo "No file in the `backend` folder has changed"
+      #     fi
+
 
 
   check_changes_old:
@@ -149,7 +152,7 @@ jobs:
           https://app.terraform.io/api/v2/workspaces/$TF_WORKSPACE_ID/vars/$TF_VAR_ID_COMMIT_SHA
 
   build-keycloak:
-    if: needs.check_changes.outputs.keycloak_changes == 'true'
+    if: needs.check_changes.outputs.keycloak_changed == 'true'
     name: Build and Store Keycloak Docker Image in Google Docker Repo
     needs: [check_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -164,7 +167,7 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build-hasura:
-    if: needs.check_changes.outputs.hasura_changes == 'true'
+    if: needs.check_changes.outputs.hasura_changed == 'true'
     name: Build and Store Hasura Docker Image in Google Docker Repo
     needs: [check_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -179,7 +182,7 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build-frontend:
-    if: needs.check_changes.outputs.frontend_changes == 'true'
+    if: needs.check_changes.outputs.frontend_changed == 'true'
     name: Build and Store Frontend Docker Image in Google Docker Repo
     needs: [check_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -196,7 +199,7 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build-rent-a-scientist-frontend:
-    if: needs.check_changes.outputs.frontend_changes == 'true'
+    if: needs.check_changes.outputs.frontend_changed == 'true'
     name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
     needs: [check_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -213,7 +216,7 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   zip-and-store-cloud-functions:
-    if: needs.check_changes.outputs.functions_changes == 'true'
+    if: needs.check_changes.outputs.functions_changed == 'true'
     name: Zip and Store Cloud Functions
     needs: [check_changes]
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
