@@ -37,7 +37,7 @@ jobs:
         # with:
         #   since_last_remote_commit: true 
 
-        - name: List all changed files
+      - name: List all changed files
         run: |
           IFS=' ' read -ra changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
           for file in "${changed_files[@]}"; do
@@ -60,7 +60,7 @@ jobs:
           else
             echo "No file in the `backend` folder has changed"
           fi
-          
+
   check_changes_old:
     needs: [check_changes]
     runs-on: ubuntu-latest
