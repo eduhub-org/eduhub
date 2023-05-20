@@ -34,23 +34,33 @@ jobs:
         uses: actions/github-script@v5
         with:
           script: |
-            const { commits } = context.payload;
-            console.log('Context Payload:', context.payload);
-            if (!commits) return { frontend_changes: false, hasura_changes: false, functions_changes: false, keycloak_changes: false };
-
-            function hasChanges(folder) {
-              return commits.some(commit => {
-                return (commit.modified || []).concat(commit.added || [], commit.removed || [])
-                  .some(file => file.startsWith(folder));
+            const { github, context } = this;
+            const prNumber = context.payload.pull_request.number;
+            const repo = context.repo;
+  
+            async function getChangedFiles() {
+              const listFilesOptions = github.pulls.listFiles.endpoint.merge({
+                ...repo,
+                pull_number: prNumber,
               });
+              const listFilesResponse = await github.paginate(listFilesOptions);
+              return listFilesResponse;
             }
-
-            const frontendChanges = hasChanges('frontend-nx');
-            const hasuraChanges = hasChanges('backend');
-            const functionsChanges = hasChanges('functions');
-            const keycloakChanges = hasChanges('keycloak');
-
-            return { frontend_changes: frontendChanges, hasura_changes: hasuraChanges, functions_changes: functionsChanges, keycloak_changes: keycloakChanges };
+  
+            function hasChanges(files, folder) {
+              return files.some(file => file.filename.startsWith(folder));
+            }
+  
+            (async () => {
+              const changedFiles = await getChangedFiles();
+  
+              const frontendChanges = hasChanges(changedFiles, 'frontend-nx');
+              const hasuraChanges = hasChanges(changedFiles, 'backend');
+              const functionsChanges = hasChanges(changedFiles, 'functions');
+              const keycloakChanges = hasChanges(changedFiles, 'keycloak');
+  
+              return { frontend_changes: frontendChanges, hasura_changes: hasuraChanges, functions_changes: functionsChanges, keycloak_changes: keycloakChanges };
+            })();
 
   save-commit-sha:
     name: Save SHA of current commit in Terraform Cloud
@@ -144,19 +154,11 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
-  wait-for-builds:
-    name: Wait for build jobs
-    needs: [check_changes, build-keycloak, build-hasura, build-frontend, build-rent-a-scientist-frontend, zip-and-store-cloud-functions]
-    runs-on: ubuntu-latest
-    steps:
-      - name: All build jobs finished
-        run: echo "All build jobs finished"
-
   deploy-application:
     if: always()
     name: "Deploy Application Infrastructure"
     needs:
-      [wait-for-builds, save-commit-sha]
+      [check_changes, build-keycloak, build-hasura, build-frontend, build-rent-a-scientist-frontend, zip-and-store-cloud-functions, save-commit-sha]
     runs-on: ubuntu-latest
     defaults:
       run:
