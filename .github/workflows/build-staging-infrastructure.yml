@@ -69,17 +69,10 @@ jobs:
           frontend_nx_changed=$(check_folder_changes "frontend-nx")
           functions_changed=$(check_folder_changes "functions")
 
-          # echo "{backend_changed}={$backend_changed}" >> $GITHUB_OUTPUT
-          # echo "{keycloak_changed}={$keycloak_changed}" >> $GITHUB_OUTPUT
-          # echo "{frontend_nx_changed}={$frontend_nx_changed}" >> $GITHUB_OUTPUT
-          # echo "{functions_changed}={$functions_changed}" >> $GITHUB_OUTPUT
-
-          # temporary workaround until the setting of SHA in Terraform Cloud is adapted
           echo "{backend_changed}={$backend_changed}" >> $GITHUB_OUTPUT
           echo "{keycloak_changed}={$keycloak_changed}" >> $GITHUB_OUTPUT
           echo "{frontend_nx_changed}={$frontend_nx_changed}" >> $GITHUB_OUTPUT
           echo "{functions_changed}={$functions_changed}" >> $GITHUB_OUTPUT
-
 
   save_commit_sha:
     name: Save SHA of current commit in Terraform Cloud
@@ -97,7 +90,6 @@ jobs:
           https://app.terraform.io/api/v2/workspaces/$TF_WORKSPACE_ID/vars/$TF_VAR_ID_COMMIT_SHA
 
   build_keycloak:
-    if: needs.check_folder_changes.outputs.keycloak_changed == 'true'
     name: Build and Store Keycloak Docker Image in Google Docker Repo
     needs: [check_folder_changes, save_commit_sha]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -112,7 +104,6 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build_hasura:
-    if: needs.check_folder_changes.outputs.hasura_changed == 'true'
     name: Build and Store Hasura Docker Image in Google Docker Repo
     needs: [check_folder_changes, save_commit_sha]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -127,7 +118,6 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build_frontend:
-    if: needs.check_folder_changes.outputs.frontend_changed == 'true'
     name: Build and Store Frontend Docker Image in Google Docker Repo
     needs: [check_folder_changes, save_commit_sha]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -144,7 +134,6 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build_rent_a_scientist_frontend:
-    if: needs.check_folder_changes.outputs.frontend_changed == 'true'
     name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
     needs: [check_folder_changes, save_commit_sha]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -161,7 +150,6 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   zip_and_store_cloud_functions:
-    if: needs.check_folder_changes.outputs.functions_changed == 'true'
     name: Zip and Store Cloud Functions
     needs: [check_folder_changes, save_commit_sha]
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
