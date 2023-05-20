@@ -150,6 +150,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: All build jobs finished
+        if: always() && needs.check_changes.result != 'skipped'
         run: echo "All build jobs finished"
 
   deploy-application:
