@@ -167,6 +167,22 @@ const Home: FC = () => {
               ) : null
             )}
             {/* <OnlyLoggedOut>
+              <div className="flex flex-col sm:flex-row mx-6 mt-6 mb-24 sm:mt-48">
+                <div className="flex flex-1 flex-col sm:items-center">
+                  <div>
+                    <h2 className="text-3xl font-semibold">
+                      {t('continueLearning')}
+                    </h2>
+                    <h3 className="text-lg">{t('learnSubheadline')}</h3>
+                  </div>
+                </div>
+                <div className="flex flex-1 justify-center mt-8">
+                  <div className="flex justify-center items-center space-x-3">
+                    <LoginButton />
+                    <RegisterButton />
+                  </div>
+                </div>
+              </div>
             </OnlyLoggedOut> */}
           </ClientOnly>
         </div>
