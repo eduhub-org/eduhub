@@ -34,7 +34,7 @@ jobs:
         uses: actions/github-script@v5
         with:
           script: |
-            const { github, context } = this;
+            const { context } = this;
             const prNumber = context.payload.pull_request.number;
             const repo = context.repo;
   
