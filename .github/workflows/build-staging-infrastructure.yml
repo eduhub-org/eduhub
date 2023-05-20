@@ -75,10 +75,10 @@ jobs:
           # echo "{functions_changed}={$functions_changed}" >> $GITHUB_OUTPUT
 
           # temporary workaround until the setting of SHA in Terraform Cloud is adapted
-          echo "{backend_changed}={$backend_changed}" >> $GITHUB_OUTPUT
-          echo "{keycloak_changed}={$keycloak_changed}" >> $GITHUB_OUTPUT
-          echo "{frontend_nx_changed}={$frontend_nx_changed}" >> $GITHUB_OUTPUT
-          echo "{functions_changed}={$functions_changed}" >> $GITHUB_OUTPUT
+          echo "{backend_changed}={'true'}" >> $GITHUB_OUTPUT
+          echo "{keycloak_changed}={'true'}" >> $GITHUB_OUTPUT
+          echo "{frontend_nx_changed}={'true'}" >> $GITHUB_OUTPUT
+          echo "{functions_changed}={'true'}" >> $GITHUB_OUTPUT
 
 
   save_commit_sha:
