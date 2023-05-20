@@ -69,10 +69,13 @@ jobs:
           frontend_nx_changed=$(check_folder_changes "frontend-nx")
           functions_changed=$(check_folder_changes "functions")
 
-          echo "::set-output name=backend_changed::$backend_changed"
-          echo "::set-output name=keycloak_changed::$keycloak_changed"
-          echo "::set-output name=frontend_nx_changed::$frontend_nx_changed"
-          echo "::set-output name=functions_changed::$functions_changed"
+          echo "{backend_changed}={$backend_changed}" >> $GITHUB_OUTPUT
+          echo "{keycloak_changed}={$keycloak_changed}" >> $GITHUB_OUTPUT
+          echo "{frontend_nx_changed}={$frontend_nx_changed}" >> $GITHUB_OUTPUT
+          echo "{functions_changed}={$functions_changed}" >> $GITHUB_OUTPUT
+          # echo "::set-output name=keycloak_changed::$keycloak_changed"
+          # echo "::set-output name=frontend_nx_changed::$frontend_nx_changed"
+          # echo "::set-output name=functions_changed::$functions_changed"
 
   save_commit_sha:
     name: Save SHA of current commit in Terraform Cloud
