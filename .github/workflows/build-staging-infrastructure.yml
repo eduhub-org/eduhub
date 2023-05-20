@@ -24,6 +24,11 @@ jobs:
   check_changes:
     name: Check for changes in specific folders
     runs-on: ubuntu-latest
+    outputs:
+      frontend_changes: ${{ steps.check_changes.outputs.frontend_changes }}
+      hasura_changes: ${{ steps.check_changes.outputs.hasura_changes }}
+      keycloak_changes: ${{ steps.check_changes.outputs.keycloak_changes }}
+      functions_changes: ${{ steps.check_changes.outputs.functions_changes }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -46,29 +51,55 @@ jobs:
       
       - name: Check if any file in the `backend` folder has changed
         run: |
-          backend_changed=false
-          IFS=' ' read -ra changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
-          for file in "${changed_files[@]}"; do
-            if [[ $file == backend/* ]]; then
-              backend_changed=true
-              break
-            fi
-          done
+          # backend_changed=false
+          # IFS=' ' read -ra changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
+          # for file in "${changed_files[@]}"; do
+          #   if [[ $file == backend/* ]]; then
+          #     backend_changed=true
+          #     break
+          #   fi
+          # done
       
-          if [[ $backend_changed == "true" ]]; then
-            echo "At least one file in the `backend` folder has changed"
-          else
-            echo "No file in the `backend` folder has changed"
-          fi
+          # if [[ $backend_changed == "true" ]]; then
+          #   echo "At least one file in the `backend` folder has changed"
+          # else
+          #   echo "No file in the `backend` folder has changed"
+          # fi
+
+          function hasChanges(changed_files, folder) {
+            folder_changed=false
+            # IFS=' ' read -ra changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
+            for file in "${changed_files[@]}"; do
+              if [[ $file == $folder/* ]]; then
+              folder_changed=true
+                break
+              fi
+            done
+  
+            return folder_changed;
+          }
+
+          (async () => {
+            # const changedFiles = await getChangedFiles();
+            IFS=' ' read -ra changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
+
+            const frontendChanges = hasChanges(changedFiles, 'frontend-nx');
+            const hasuraChanges = hasChanges(changedFiles, 'backend');
+            const functionsChanges = hasChanges(changedFiles, 'functions');
+            const keycloakChanges = hasChanges(changedFiles, 'keycloak');
+
+            return { frontend_changes: frontendChanges, hasura_changes: hasuraChanges, functions_changes: functionsChanges, keycloak_changes: keycloakChanges };
+          })();
+
 
   check_changes_old:
     needs: [check_changes]
     runs-on: ubuntu-latest
     outputs:
-      frontend_changes: ${{ steps.check_changes.outputs.frontend_changes }}
-      hasura_changes: ${{ steps.check_changes.outputs.hasura_changes }}
-      keycloak_changes: ${{ steps.check_changes.outputs.keycloak_changes }}
-      functions_changes: ${{ steps.check_changes.outputs.functions_changes }}
+      frontend_changes: ${{ steps.check_changes_old.outputs.frontend_changes }}
+      hasura_changes: ${{ steps.check_changes_old.outputs.hasura_changes }}
+      keycloak_changes: ${{ steps.check_changes_old.outputs.keycloak_changes }}
+      functions_changes: ${{ steps.check_changes_old.outputs.functions_changes }}
     steps:
       - name: Check for changes in specific folders
         id: check_changes
