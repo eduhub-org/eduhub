@@ -73,9 +73,6 @@ jobs:
           echo "{keycloak_changed}={$keycloak_changed}" >> $GITHUB_OUTPUT
           echo "{frontend_nx_changed}={$frontend_nx_changed}" >> $GITHUB_OUTPUT
           echo "{functions_changed}={$functions_changed}" >> $GITHUB_OUTPUT
-          # echo "::set-output name=keycloak_changed::$keycloak_changed"
-          # echo "::set-output name=frontend_nx_changed::$frontend_nx_changed"
-          # echo "::set-output name=functions_changed::$functions_changed"
 
   save_commit_sha:
     name: Save SHA of current commit in Terraform Cloud
