@@ -20,7 +20,61 @@ env:
   TF_VAR_ID_COMMIT_SHA: var-sSiBMg7YBPL7NcFh
 
 jobs:
-  save-commit-sha:
+
+  check_folder_changes:
+    name: Check for changes in specific folders
+    runs-on: ubuntu-latest
+    outputs:
+      frontend_changed: ${{ steps.check_folder_changes.outputs.frontend_changed }}
+      hasura_changed: ${{ steps.check_folder_changes.outputs.hasura_changed }}
+      keycloak_changed: ${{ steps.check_folder_changes.outputs.keycloak_changed }}
+      functions_changed: ${{ steps.check_folder_changes.outputs.functions_changed }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+        
+        # To compare changes between the current commit and the last pushed remote commit set `since_last_remote_commit: true`. e.g
+        # with:
+        #   since_last_remote_commit: true 
+
+      - name: List all changed files
+        run: |
+          IFS=' ' read -ra changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
+          for file in "${changed_files[@]}"; do
+            echo "$file was changed"
+          done
+      
+
+      - name: Check if any file in the specified folders has changed
+        run: |
+          function check_folder_changes() {
+            folder=$1
+            for file in "${changed_files[@]}"; do
+              if [[ $file == $folder/* ]]; then
+                echo "true"
+                return
+              fi
+            done
+            echo "false"
+          }
+
+          IFS=' ' read -ra changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
+          backend_changed=$(check_folder_changes "backend")
+          keycloak_changed=$(check_folder_changes "keycloak")
+          frontend_nx_changed=$(check_folder_changes "frontend-nx")
+          functions_changed=$(check_folder_changes "functions")
+
+          echo "{backend_changed}={$backend_changed}" >> $GITHUB_OUTPUT
+          echo "{keycloak_changed}={$keycloak_changed}" >> $GITHUB_OUTPUT
+          echo "{frontend_nx_changed}={$frontend_nx_changed}" >> $GITHUB_OUTPUT
+          echo "{functions_changed}={$functions_changed}" >> $GITHUB_OUTPUT
+
+  save_commit_sha:
     name: Save SHA of current commit in Terraform Cloud
     runs-on: ubuntu-latest
     steps:
@@ -35,8 +89,9 @@ jobs:
           --data "{ \"data\": { \"id\":\"$TF_VAR_ID_COMMIT_SHA\", \"attributes\": { \"value\":\"$(git rev-parse --short "$GITHUB_SHA")\" }, \"type\":\"vars\" }}" \
           https://app.terraform.io/api/v2/workspaces/$TF_WORKSPACE_ID/vars/$TF_VAR_ID_COMMIT_SHA
 
-  build-keycloak:
+  build_keycloak:
     name: Build and Store Keycloak Docker Image in Google Docker Repo
+    needs: [check_folder_changes, save_commit_sha]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: keycloak
@@ -48,8 +103,9 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
-  build-backend:
-    name: Build and Store Backend Docker Image in Google Docker Repo
+  build_hasura:
+    name: Build and Store Hasura Docker Image in Google Docker Repo
+    needs: [check_folder_changes, save_commit_sha]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: backend
@@ -61,8 +117,9 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
-  build-frontend:
+  build_frontend:
     name: Build and Store Frontend Docker Image in Google Docker Repo
+    needs: [check_folder_changes, save_commit_sha]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: frontend-nx
@@ -76,8 +133,9 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
-  build-rent-a-scientist-frontend:
+  build_rent_a_scientist_frontend:
     name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
+    needs: [check_folder_changes, save_commit_sha]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: frontend-nx
@@ -91,8 +149,9 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
-  zip-and-store-cloud-functions:
+  zip_and_store_cloud_functions:
     name: Zip and Store Cloud Functions
+    needs: [check_folder_changes, save_commit_sha]
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
     with:
       PROJECT_ID: eduhub-staging-new
@@ -102,17 +161,11 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
-  deploy-application:
+  deploy_application:
+    if: always()
     name: "Deploy Application Infrastructure"
     needs:
-      [
-        build-keycloak,
-        build-backend,
-        build-frontend,
-        build-rent-a-scientist-frontend,
-        zip-and-store-cloud-functions,
-        save-commit-sha,
-      ]
+      [build_keycloak, build_hasura, build_frontend, build_rent_a_scientist_frontend, zip_and_store_cloud_functions]
     runs-on: ubuntu-latest
     defaults:
       run:

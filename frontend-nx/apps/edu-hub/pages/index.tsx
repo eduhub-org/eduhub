@@ -1,14 +1,11 @@
 import Head from 'next/head';
-import { FC  } from 'react';
+import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
 import { Page } from '../components/Page';
 import { TileSlider } from '../components/course/TileSlider';
 import { useQuery } from '@apollo/client';
-import {
-  useAuthedQuery,
-  useInstructorQuery,
-} from '../hooks/authedQuery';
+import { useAuthedQuery, useInstructorQuery } from '../hooks/authedQuery';
 import {
   useIsLoggedIn,
   useIsInstructor,
@@ -109,7 +106,10 @@ const Home: FC = () => {
         <title>EduHub | opencampus.sh</title>
         <link rel="icon" href="/favicon.png" />
         <meta property="og:title" content="EduHub | opencampus.sh" />
-        <meta property="og:image" content="https://edu.opencampus.sh/images/meta-image.png" />
+        <meta
+          property="og:image"
+          content="https://edu.opencampus.sh/images/meta-image.png"
+        />
       </Head>
       <Page className="text-white">
         <div
