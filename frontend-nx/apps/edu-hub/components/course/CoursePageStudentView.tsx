@@ -19,32 +19,38 @@ export const CoursePageStudentView: FC<IProps> = ({ course }) => {
   return (
     <>
       <PageBlock>
-        <ContentRow>
-          <CourseTitleSubTitleBlock course={course} />
-        </ContentRow>
-        <ContentRow className="mt-16">
-          <div className="flex flex-1">{''}</div>
-          <div className="flex flex-1">
-            <Resources course={course} />
-          </div>
-        </ContentRow>
-        <ContentRow className="my-24">
-          <div className="flex flex-1">
-            <Attendances course={course} />
-          </div>
-          <div className="flex flex-1">
-            {course.achievementCertificatePossible && (
-              <CourseAchievementOption
-                courseId={course.id}
-                achievementRecordUploadDeadline={
-                  course.Program.achievementRecordUploadDeadline
-                }
-                courseTitle={course.title}
-                t={t}
-              />
-            )}
-          </div>
-        </ContentRow>
+        <ContentRow leftTop={<CourseTitleSubTitleBlock course={course} />} />
+        <ContentRow
+          className="mt-16"
+          leftTop={<div className="flex flex-1">{''}</div>}
+          rightBottom={
+            <div className="flex flex-1">
+              <Resources course={course} />
+            </div>
+          }
+        />
+        <ContentRow
+          className="my-24"
+          leftTop={
+            <div className="flex flex-1">
+              <Attendances course={course} />
+            </div>
+          }
+          rightBottom={
+            <div className="flex flex-1">
+              {course.achievementCertificatePossible && (
+                <CourseAchievementOption
+                  courseId={course.id}
+                  achievementRecordUploadDeadline={
+                    course.Program.achievementRecordUploadDeadline
+                  }
+                  courseTitle={course.title}
+                  t={t}
+                />
+              )}
+            </div>
+          }
+        />
       </PageBlock>
     </>
   );

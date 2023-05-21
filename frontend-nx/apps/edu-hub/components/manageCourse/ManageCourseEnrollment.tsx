@@ -20,7 +20,7 @@ import {
 } from 'react-icons/md';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { useAdminQuery } from '../../hooks/authedQuery';
-import { QUERY_LIMIT } from '../../pages/manage/courses';
+import { QUERY_LIMIT } from '../../pages/courses';
 import {
   INSERT_SINGLE_ATTENDENCE,
   UPDATE_ATTENDENCE,
