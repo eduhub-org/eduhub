@@ -369,10 +369,10 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
             courseId={courseId}
           />
         )}
-        <ContentRow>
-          <h1 className="w-1/2">{t('upload-proof')}</h1>
-          <p className="text-right w-1/2">{courseTitle}</p>
-        </ContentRow>
+        <ContentRow
+          leftTop={<h1 className="w-1/2">{t('upload-proof')}</h1>}
+          rightBottom={<p className="text-right w-1/2">{courseTitle}</p>}
+        />
 
         <form onSubmit={save} className="flex flex-col space-y-5 mx-10">
           <p className="uppercase">{achievementOption.title}</p>
@@ -423,7 +423,7 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
             <p className="w-2/6">{t('description')}</p>
             <div className="w-4/6">
               <TextareaAutosize
-                className="p-1 h-15
+                className="p-1 h-15 
                 bg-transparent
                 transition
                 ease-in-out

@@ -3,7 +3,7 @@ import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useAdminQuery } from '../../hooks/authedQuery';
-import { QUERY_LIMIT } from '../../pages/manage/courses';
+import { QUERY_LIMIT } from '../../pages/courses';
 import { ADMIN_COURSE_LIST } from '../../queries/courseList';
 import {
   AdminCourseList,
