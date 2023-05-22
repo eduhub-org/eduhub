@@ -1,13 +1,13 @@
 import useTranslation from 'next-translate/useTranslation';
 import Head from 'next/head';
 import { FC, useCallback, useState } from 'react';
-import CommonPageHeader from '../../../components/common/CommonPageHeader';
-import EhMenuItem from '../../../components/common/EhMenuItem';
-import SearchBox from '../../../components/common/SearchBox';
-import { Page } from '../../../components/Page';
-import UserList from '../../../components/users/UserList';
-import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';
-import { StaticComponentProperty } from '../../../types/UIComponents';
+import CommonPageHeader from '../../components/common/CommonPageHeader';
+import EhMenuItem from '../../components/common/EhMenuItem';
+import SearchBox from '../../components/common/SearchBox';
+import { Page } from '../../components/Page';
+import UserList from '../../components/users/UserList';
+import { useIsAdmin, useIsLoggedIn } from '../../hooks/authentication';
+import { StaticComponentProperty } from '../../types/UIComponents';
 
 const Users: FC = () => {
   const { t } = useTranslation('users');

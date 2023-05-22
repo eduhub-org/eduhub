@@ -37,7 +37,6 @@ import { Button } from '../common/Button';
 import FormFieldRow from '../common/forms/FormFieldRow';
 
 import type { OperationVariables, ApolloQueryResult } from '@apollo/client';
-import { Course_Course_by_pk } from '../../queries/__generated__/Course';
 
 type Inputs = {
   employment: Employment_enum | null;
@@ -47,7 +46,7 @@ type Inputs = {
 };
 
 interface IProps {
-  course: CourseWithEnrollment_Course_by_pk | Course_Course_by_pk;
+  course: CourseWithEnrollment_Course_by_pk;
   enrollmentId: number;
   open: boolean;
   refetchCourse: (

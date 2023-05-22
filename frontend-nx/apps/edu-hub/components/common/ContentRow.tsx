@@ -2,11 +2,13 @@ import { FC, ReactNode } from "react";
 
 interface IProps {
   className?: string;
-  children: ReactNode;
+  leftTop: ReactNode;
+  rightBottom?: ReactNode;
 }
 
 export const ContentRow: FC<IProps> = ({
-  children,
+  leftTop,
+  rightBottom = null,
   className = "",
 }) => {
   return (
@@ -16,7 +18,8 @@ export const ContentRow: FC<IProps> = ({
         className
       }
     >
-      {children}
+      {leftTop}
+      {rightBottom}
     </div>
   );
 };
