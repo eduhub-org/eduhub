@@ -234,7 +234,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
 
   const router = useRouter();
   const onClickForward = (courseId) => {
-    router.push(`manage/course/${courseId}`);
+    router.push(`course/${courseId}`);
   };
 
   const onChangePublished = useCallback(async () => {
@@ -354,7 +354,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   );
   /** #endregion */
 
-    const [insertCourseGroup] = useAdminMutation<
+  const [insertCourseGroup] = useAdminMutation<
     InsertCourseGroup,
     InsertCourseGroupVariables
   >(INSERT_COURSE_GROUP);
