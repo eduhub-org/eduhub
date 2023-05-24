@@ -97,7 +97,7 @@ module "hasura_service" {
     "run.googleapis.com/vpc-access-connector"  = google_vpc_access_connector.default.id
   }
 
-  depends_on = [google_secret_manager_secret_version.hasura_db_url, google_secret_manager_secret_version.hasura_graphql_admin_key, google_vpc_access_connector.default, google_secret_manager_secret_iam_member.hasura_db_url, google_secret_manager_secret_iam_member.hasura_graphql_admin_key, google_secret_manager_secret_iam_member.cloud_function]
+  depends_on = [google_secret_manager_secret_version.hasura_db_url, google_secret_manager_secret_version.hasura_graphql_admin_key, google_vpc_access_connector.default, google_secret_manager_secret_iam_member.hasura_db_url, google_secret_manager_secret_iam_member.hasura_graphql_admin_key, google_secret_manager_secret_iam_member.cloud_function, module.keycloak_service]
 
   env_vars = [
     {
