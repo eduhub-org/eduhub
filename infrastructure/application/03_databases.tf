@@ -15,10 +15,10 @@ resource "google_sql_database_instance" "default" {
       value = var.dbi_max_connections
     }
     backup_configuration {
-      enabled                        = true
-      binary_log_enabled             = true
+      enabled                        = var.enable_db_backup
+      binary_log_enabled             = var.enable_db_backup
       start_time                     = "02:00"
-      point_in_time_recovery_enabled = true
+      point_in_time_recovery_enabled = var.enable_db_backup
       backup_retention_settings {
         retained_backups = 30
       }
