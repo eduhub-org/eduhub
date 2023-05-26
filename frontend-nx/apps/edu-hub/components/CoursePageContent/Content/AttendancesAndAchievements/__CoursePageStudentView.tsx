@@ -7,7 +7,7 @@ import { PageBlock } from '../../../common/PageBlock';
 
 import { Attendances } from './Attendances';
 import CourseAchievementOption from './CourseAchievementOption';
-import { CourseTitleSubTitleBlock } from '../CourseTitleSubTitleBlock';
+import { Tagline } from '..';
 
 interface IProps {
   course: CourseWithEnrollment_Course_by_pk;
@@ -19,7 +19,7 @@ export const CoursePageStudentView: FC<IProps> = ({ course }) => {
     <>
       <PageBlock>
         <ContentRow>
-          <CourseTitleSubTitleBlock course={course} />
+          <Tagline course={course} />
         </ContentRow>
         <ContentRow className="mt-16">
           <div className="flex flex-1">{''}</div>
