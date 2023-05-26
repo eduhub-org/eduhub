@@ -1,27 +1,43 @@
 import { Dispatch, FC, SetStateAction } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
-import { Course_Course_by_pk } from '../../queries/__generated__/Course';
-import { CourseWithEnrollment_Course_by_pk } from '../../queries/__generated__/CourseWithEnrollment';
+import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
+import { CourseWithEnrollment_Course_by_pk } from '../../../queries/__generated__/CourseWithEnrollment';
 
-import { ContentRow } from '../common/ContentRow';
-import { PageBlock } from '../common/PageBlock';
+import { ContentRow } from '../../common/ContentRow';
+import { PageBlock } from '../../common/PageBlock';
 
-import { CourseContentInfos } from './CourseContentInfos';
-import { CourseDescriptionInfos } from './CourseDescriptionInfos';
-import { CourseMetaInfos } from './CourseMetaInfos';
-import { CourseStatus } from './CourseStatus';
-import { CourseTitleSubTitleBlock } from './CourseTitleSubTitleBlock';
-import { CourseParticipationBlock } from './CourseParticipationBlock';
+import { CourseContentInfos } from './GoalsAndSessions';
+import { DescriptionFields } from './DescriptionFields';
+import { TimeLocationLanguageInstructors } from './TimeLocationLanguageInstructors';
+import { ApplicationButtonOrStatusMessageOrLinks } from './ApplicationButtonOrStatusMessageOrLinks';
+import { AttendancesAndAchievements } from './AttendancesAndAchievements';
 
-import { useIsCourseWithEnrollment } from '../../hooks/course';
+import { useIsCourseWithEnrollment } from '../../../hooks/course';
+import { getWeekdayStartAndEndString } from '../../../helpers/dateHelpers';
 
-interface IProps {
+interface TaglineProps {
+  course: Course_Course_by_pk;
+}
+export const Tagline: FC<TaglineProps> = ({ course }) => {
+  const { t, lang } = useTranslation();
+  return (
+    <div className="flex flex-1 flex-col text-white mb-20">
+      {course.weekDay !== 'NONE' ? (
+        <span className="text-xs">
+          {getWeekdayStartAndEndString(course, lang, t)}
+        </span>
+      ) : null}
+      <span className="text-2xl mt-2">{course.tagline}</span>
+    </div>
+  );
+};
+
+interface ContentProps {
   course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk;
   setInvitationModalOpen?: Dispatch<SetStateAction<boolean>>;
 }
-
-export const CoursePageDescriptionView: FC<IProps> = ({
+export const Content: FC<ContentProps> = ({
   course,
   setInvitationModalOpen,
 }) => {
@@ -47,20 +63,22 @@ export const CoursePageDescriptionView: FC<IProps> = ({
       <div className="max-w-screen-xl mx-auto w-full">
         <PageBlock>
           <ContentRow className="items-center">
-            <CourseTitleSubTitleBlock course={course} />
-            <CourseStatus
+            <Tagline course={course} />
+            <ApplicationButtonOrStatusMessageOrLinks
               course={course}
               setInvitationModalOpen={setInvitationModalOpen}
             />
           </ContentRow>
         </PageBlock>
-        {isCourseWithEnrollment && <CourseParticipationBlock course={course} />}
+        {isCourseWithEnrollment && (
+          <AttendancesAndAchievements course={course} />
+        )}
         <ContentRow className="flex pb-24">
           <PageBlock classname="flex-1 text-white">
             <CourseContentInfos course={course} />
           </PageBlock>
           <div className="pr-0 lg:pr-6 xl:pr-0">
-            <CourseMetaInfos course={course} />
+            <TimeLocationLanguageInstructors course={course} />
           </div>
         </ContentRow>
         <div className="text-edu-course-current underline pt-4 text-3xl text-center font-semibold">
@@ -72,8 +90,10 @@ export const CoursePageDescriptionView: FC<IProps> = ({
             {t('course-page:how-to')}
           </a>
         </div>
-        <CourseDescriptionInfos course={course} />
+        <DescriptionFields course={course} />
       </div>
     </div>
   );
 };
+
+export default Content;

@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { FC } from 'react';
 import { Page } from '../../components/Page';
-import CoursePageContent from '../../components/course/CoursePageContent';
+import CoursePageContent from '../../components/CoursePageContent';
 import { useIsSessionLoading } from '../../hooks/authentication';
 import { CircularProgress } from '@material-ui/core';
 
@@ -46,7 +46,11 @@ const CoursePage: FC = () => {
         />
       </Head>
       <Page>
-        {isSessionLoading ? <CircularProgress /> : <CoursePageContent id={id} />}
+        {isSessionLoading ? (
+          <CircularProgress />
+        ) : (
+          <CoursePageContent id={id} />
+        )}
       </Page>
     </>
   );

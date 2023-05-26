@@ -7,12 +7,12 @@ import type { Swiper as SwiperType } from 'swiper';
 
 import 'swiper/css';
 
-import { CourseList_Course } from '../../queries/__generated__/CourseList';
+import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 
 import { Tile } from './Tile';
 
-import sliderNextArrow from '../../public/images/common/slider-next-arrow.svg';
-import sliderPreviousArrow from '../../public/images/common/slider-previous-arrow.svg';
+import sliderNextArrow from '../../../public/images/common/slider-next-arrow.svg';
+import sliderPreviousArrow from '../../../public/images/common/slider-previous-arrow.svg';
 
 interface IProps {
   courses: CourseList_Course[];

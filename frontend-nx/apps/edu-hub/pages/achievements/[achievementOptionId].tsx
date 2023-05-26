@@ -45,7 +45,7 @@ import {
   order_by,
 } from '../../__generated__/globalTypes';
 import { Translate } from 'next-translate';
-import FormToUploadAchievementRecord from '../../components/course/course-achievement-option/FormToUploadAchievementRecord';
+import FormToUploadAchievementRecord from '../../components/not-considered/course-achievement-option/FormToUploadAchievementRecord';
 import { AlertMessageDialog } from '../../components/common/dialogs/AlertMessageDialog';
 import { useUserId } from '../../hooks/user';
 import { COURSE_ENROLLMENTS } from '../../queries/courseEnrollment';

@@ -8,28 +8,28 @@ import {
   useState,
 } from 'react';
 
-import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
-import { useAuthedQuery } from '../../hooks/authedQuery';
-import { useUser, useUserId } from '../../hooks/user';
-import { Course_Course_by_pk } from '../../queries/__generated__/Course';
+import { CourseEnrollmentStatus_enum } from '../../../../../__generated__/globalTypes';
+import { useAuthedQuery } from '../../../../../hooks/authedQuery';
+import { useUser, useUserId } from '../../../../../hooks/user';
+import { Course_Course_by_pk } from '../../../../../queries/__generated__/Course';
 import {
   CourseWithEnrollment,
   CourseWithEnrollmentVariables,
-} from '../../queries/__generated__/CourseWithEnrollment';
-import { COURSE_WITH_ENROLLMENT } from '../../queries/courseWithEnrollment';
+} from '../../../../../queries/__generated__/CourseWithEnrollment';
+import { COURSE_WITH_ENROLLMENT } from '../../../../../queries/courseWithEnrollment';
 
-import { CourseLinkInfos } from './CourseLinkInfos';
-import { ApplyButtonBlock } from './ApplyButtonBlock';
-import { CourseApplicationModal } from './CourseApplicationModal';
+import { CourseLinkInfos } from './Links';
+import { ApplyButton } from '../ApplyButton';
+import { ApplicationModal } from './ApplicationModal';
 import { UserInfoModal } from './UserInfoModal';
-import { Button } from '../common/Button';
+import { Button } from '../../../../common/Button';
 
 interface IProps {
   course: Course_Course_by_pk;
   setInvitationModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export const EnrollmentStatus: FC<IProps> = ({
+export const EnrollmentUIController: FC<IProps> = ({
   course,
   setInvitationModalOpen,
 }) => {
@@ -91,7 +91,7 @@ export const EnrollmentStatus: FC<IProps> = ({
         </span>
       );
     } else {
-      content = <ApplyButtonBlock course={course} onClickApply={showModal} />;
+      content = <ApplyButton course={course} onClickApply={showModal} />;
     }
   } else {
     const status = enrollments[0].status;
@@ -122,7 +122,10 @@ export const EnrollmentStatus: FC<IProps> = ({
         break;
       }
       case CourseEnrollmentStatus_enum.INVITED: {
-        if (enrollments[0].invitationExpirationDate.setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)) { 
+        if (
+          enrollments[0].invitationExpirationDate.setHours(0, 0, 0, 0) >=
+          new Date().setHours(0, 0, 0, 0)
+        ) {
           content = (
             <div className="flex flex-col sm:flex-row sm:items-center">
               <div className="bg-gray-300 p-4 mb-6 sm:mb-0 sm:w-2/3 sm:mr-5">
@@ -140,7 +143,9 @@ export const EnrollmentStatus: FC<IProps> = ({
           );
         } else {
           content = (
-            <span className="bg-gray-300 p-4">{t('status.invitation_expired')}</span>
+            <span className="bg-gray-300 p-4">
+              {t('status.invitation_expired')}
+            </span>
           );
         }
         break;
@@ -167,7 +172,7 @@ export const EnrollmentStatus: FC<IProps> = ({
         closeModal={hideUserInfoModal}
         course={course}
       />
-      <CourseApplicationModal
+      <ApplicationModal
         visible={isApplicationModalVisible}
         closeModal={hideApplicationModal}
         course={course}

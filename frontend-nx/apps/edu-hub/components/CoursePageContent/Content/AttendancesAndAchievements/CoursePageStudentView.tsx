@@ -1,14 +1,13 @@
 import useTranslation from 'next-translate/useTranslation';
 import { FC } from 'react';
 
-import { CourseWithEnrollment_Course_by_pk } from '../../queries/__generated__/CourseWithEnrollment';
-import { ContentRow } from '../common/ContentRow';
-import { PageBlock } from '../common/PageBlock';
+import { CourseWithEnrollment_Course_by_pk } from '../../../../queries/__generated__/CourseWithEnrollment';
+import { ContentRow } from '../../../common/ContentRow';
+import { PageBlock } from '../../../common/PageBlock';
 
 import { Attendances } from './Attendances';
-import CourseAchievementOption from './course-achievement-option/CourseAchievementOption';
-import { CourseTitleSubTitleBlock } from './CourseTitleSubTitleBlock';
-import { Resources } from './Resources';
+import CourseAchievementOption from './CourseAchievementOption';
+import { CourseTitleSubTitleBlock } from '../CourseTitleSubTitleBlock';
 
 interface IProps {
   course: CourseWithEnrollment_Course_by_pk;
@@ -25,7 +24,7 @@ export const CoursePageStudentView: FC<IProps> = ({ course }) => {
         <ContentRow className="mt-16">
           <div className="flex flex-1">{''}</div>
           <div className="flex flex-1">
-            <Resources course={course} />
+            {/* <Resources course={course} /> */}
           </div>
         </ContentRow>
         <ContentRow className="my-24">

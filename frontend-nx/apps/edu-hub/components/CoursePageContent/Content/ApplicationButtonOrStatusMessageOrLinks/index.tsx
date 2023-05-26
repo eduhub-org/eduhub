@@ -2,11 +2,11 @@ import { Dispatch, FC, SetStateAction } from 'react';
 import { signIn } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
 
-import { useIsLoggedIn } from '../../hooks/authentication';
-import { Course_Course_by_pk } from '../../queries/__generated__/Course';
+import { useIsLoggedIn } from '../../../../hooks/authentication';
+import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
 
-import { ApplyButtonBlock } from './ApplyButtonBlock';
-import { EnrollmentStatus } from './EnrollmentStatus';
+import { ApplyButton } from './ApplyButton';
+import { EnrollmentUIController } from './EnrollmentUIController';
 
 interface IProps {
   course: Course_Course_by_pk;
@@ -17,7 +17,7 @@ const signInHandler = () => {
   return signIn('keycloak');
 };
 
-export const CourseStatus: FC<IProps> = ({
+export const ApplicationButtonOrStatusMessageOrLinks: FC<IProps> = ({
   course,
   setInvitationModalOpen,
 }) => {
@@ -37,12 +37,12 @@ export const CourseStatus: FC<IProps> = ({
       </span>
     );
   } else {
-    content = <ApplyButtonBlock course={course} onClickApply={signInHandler} />;
+    content = <ApplyButton course={course} onClickApply={signInHandler} />;
   }
   return (
     <div className="flex flex-1 lg:max-w-md">
       {isLoggedIn ? (
-        <EnrollmentStatus
+        <EnrollmentUIController
           course={course}
           setInvitationModalOpen={setInvitationModalOpen}
         />

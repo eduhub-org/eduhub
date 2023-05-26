@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress } from '@material-ui/core';
 
-import { CoursePageDescriptionView } from './CoursePageDescriptionView';
+import Description from './Content';
 import InvitationModal from './InvitationModal';
 import { useLazyRoleQuery } from '../../hooks/authedQuery';
 import { useUserId } from '../../hooks/user';
@@ -84,10 +84,7 @@ const CoursePageContent: FC<{ id: number }> = ({ id }) => {
         <CircularProgress />
       ) : (
         <>
-          <CoursePageDescriptionView
-            course={course}
-            setInvitationModalOpen={setModalOpen}
-          />
+          <Description course={course} setInvitationModalOpen={setModalOpen} />
           {isLoggedIn && (
             <InvitationModal
               course={course}

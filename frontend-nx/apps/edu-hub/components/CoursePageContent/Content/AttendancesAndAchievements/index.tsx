@@ -1,40 +1,40 @@
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-import { ContentRow } from '../common/ContentRow';
+import { ContentRow } from '../../../common/ContentRow';
 
-import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
-import { useAuthedQuery } from '../../hooks/authedQuery';
-import { CourseWithEnrollment_Course_by_pk } from '../../queries/__generated__/CourseWithEnrollment';
-import { LOAD_ACHIEVEMENT_CERTIFICATE } from '../../queries/loadAchievementCertificate';
-import { LOAD_PARTICIPATION_CERTIFICATE } from '../../queries/loadParticipationCertificate';
-import { Button } from '../common/Button';
+import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
+import { useAuthedQuery } from '../../../../hooks/authedQuery';
+import { CourseWithEnrollment_Course_by_pk } from '../../../../queries/__generated__/CourseWithEnrollment';
+import { LOAD_ACHIEVEMENT_CERTIFICATE } from '../../../../queries/loadAchievementCertificate';
+import { LOAD_PARTICIPATION_CERTIFICATE } from '../../../../queries/loadParticipationCertificate';
+import { Button } from '../../../common/Button';
 
 import {
   loadAchievementCertificate,
   loadAchievementCertificateVariables,
-} from '../../queries/__generated__/loadAchievementCertificate';
+} from '../../../../queries/__generated__/loadAchievementCertificate';
 import {
   loadParticipationCertificate,
   loadParticipationCertificateVariables,
-} from '../../queries/__generated__/loadParticipationCertificate';
+} from '../../../../queries/__generated__/loadParticipationCertificate';
 
 import {
   getEndTimeString,
   getStartTimeString,
   // getWeekdayString,
-} from '../../helpers/dateHelpers';
+} from '../../../../helpers/dateHelpers';
 // import { Course_Course_by_pk } from '../../queries/__generated__/Course';
 
 import { Attendances } from './Attendances';
 import { CertificateDownload } from './CertificateDownload';
-import CourseAchievementOption from './course-achievement-option/CourseAchievementOption';
+import CourseAchievementOption from './CourseAchievementOption';
 
 interface IProps {
   // course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk;
   course: CourseWithEnrollment_Course_by_pk;
 }
 
-export const CourseParticipationBlock: FC<IProps> = ({ course }) => {
+export const AttendancesAndAchievements: FC<IProps> = ({ course }) => {
   const { t, lang } = useTranslation();
   const { t: tLanguage } = useTranslation('common');
   const startTime = getStartTimeString(course, lang);
@@ -102,9 +102,7 @@ export const CourseParticipationBlock: FC<IProps> = ({ course }) => {
   ) {
     content = (
       <>
-        <ContentRow
-          className="my-24 text-edu-black bg-white px-8 py-8"
-        >
+        <ContentRow className="my-24 text-edu-black bg-white px-8 py-8">
           <div className="flex flex-1 w-1/2">
             <Attendances course={course} />
           </div>
