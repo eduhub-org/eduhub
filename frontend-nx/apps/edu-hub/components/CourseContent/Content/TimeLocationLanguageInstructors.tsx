@@ -71,8 +71,7 @@ export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
                 alt="Image of the course instructor"
                 width={100}
                 height={100}
-                className="rounded-full overflow-hidden"
-                objectFit="cover"
+                className="rounded-full object-cover"
               />
             </div>
             <div className="flex flex-col">
