@@ -12,7 +12,7 @@ import { StaticComponentProperty } from '../../types/UIComponents';
 import EhAddButton from '../common/EhAddButton';
 import EhCheckBox2 from '../common/EhCheckBox2';
 import ModalControl from '../common/ModalController';
-import Loading from '../courses/Loading';
+import Loading from '../ManageCoursesContent/Loading';
 import AddUser from './AddUser';
 
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../queries/programList';
@@ -22,7 +22,7 @@ import { Programs_Program } from '../../queries/__generated__/Programs';
 import {
   User_bool_exp,
   CourseEnrollmentStatus_enum,
-} from './../../__generated__/globalTypes';
+} from '../../__generated__/globalTypes';
 
 interface IProps {
   t: any;

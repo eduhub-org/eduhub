@@ -12,7 +12,7 @@ import {
   UnversityByComment_University,
 } from '../../queries/__generated__/UnversityByComment';
 import { UNIVERSITY_LIST } from '../../queries/university';
-import Loading from '../courses/Loading';
+import Loading from '../ManageCoursesContent/Loading';
 import { EMPLOYMENT_LIST } from '../../queries/employment';
 import {
   EmplomentByValue,

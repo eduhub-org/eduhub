@@ -5,7 +5,7 @@ import CommonPageHeader from '../../../components/common/CommonPageHeader';
 import EhMenuItem from '../../../components/common/EhMenuItem';
 import SearchBox from '../../../components/common/SearchBox';
 import { Page } from '../../../components/Page';
-import UserList from '../../../components/users/UserList';
+import ManageUsersContent from '../../../components/ManageUsersContent';
 import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';
 import { StaticComponentProperty } from '../../../types/UIComponents';
 
@@ -65,7 +65,7 @@ const UserDashboard: FC<IProps> = ({ t }) => {
         onMenuItemClick={handleMenuItemClick}
         searchText={searchText}
       />
-      <UserList t={t} searchedText={searchText} />
+      <ManageUsersContent t={t} searchedText={searchText} />
     </>
   );
 };

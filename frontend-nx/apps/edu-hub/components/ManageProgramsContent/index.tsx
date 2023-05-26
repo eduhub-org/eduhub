@@ -1,8 +1,8 @@
 import { FC, useCallback, useState } from 'react';
 import { MdAddCircle } from 'react-icons/md';
 
-import { PageBlock } from '../../components/common/PageBlock';
-import { QuestionConfirmationDialog } from '../../components/common/dialogs/QuestionConfirmationDialog';
+import { PageBlock } from '../common/PageBlock';
+import { QuestionConfirmationDialog } from '../common/dialogs/QuestionConfirmationDialog';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { useAdminQuery } from '../../hooks/authedQuery';
 
@@ -92,7 +92,7 @@ import {
 } from '../../queries/__generated__/UpdateProgramParticipationCertVisible';
 import useTranslation from 'next-translate/useTranslation';
 
-export const AuthorizedPrograms: FC = () => {
+export const ManageProgramsContent: FC = () => {
   const { t } = useTranslation();
   const qResult = useAdminQuery<ProgramList>(PROGRAM_LIST);
 

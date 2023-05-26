@@ -4,7 +4,7 @@ import { MdAddCircle } from 'react-icons/md';
 
 import CommonPageHeader from '../common/CommonPageHeader';
 import SearchBox from '../common/SearchBox';
-import { ProgramsMenubar } from '../program/ProgramsMenubar';
+import { ProgramsMenubar } from '../ProgramsMenubar';
 
 import { useAdminQuery } from '../../hooks/authedQuery';
 import { useAdminMutation } from '../../hooks/authedMutation';
