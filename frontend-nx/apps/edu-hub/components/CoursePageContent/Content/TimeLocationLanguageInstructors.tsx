@@ -6,17 +6,17 @@ import {
   getEndTimeString,
   getStartTimeString,
   // getWeekdayString,
-} from '../../helpers/dateHelpers';
-import mysteryImg from '../../public/images/common/mystery.svg';
-import languageIcon from '../../public/images/course/language.svg';
-import pinIcon from '../../public/images/course/pin.svg';
-import { Course_Course_by_pk } from '../../queries/__generated__/Course';
+} from '../../../helpers/dateHelpers';
+import mysteryImg from '../../../public/images/common/mystery.svg';
+import languageIcon from '../../../public/images/course/language.svg';
+import pinIcon from '../../../public/images/course/pin.svg';
+import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
 
 interface IProps {
   course: Course_Course_by_pk;
 }
 
-export const CourseMetaInfos: FC<IProps> = ({ course }) => {
+export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
   const { t, lang } = useTranslation();
   const { t: tLanguage } = useTranslation('common');
 

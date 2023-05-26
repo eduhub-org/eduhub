@@ -3,20 +3,20 @@ import Link from 'next/link';
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
-import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
 import {
   enrollmentStatusForCourse,
   hasEnrollments,
   hasProgram,
-} from '../../helpers/courseHelpers';
-import { CourseList_Course } from '../../queries/__generated__/CourseList';
-import { CourseListWithEnrollments_Course } from '../../queries/__generated__/CourseListWithEnrollments';
-import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../queries/__generated__/CourseWithEnrollment';
-import { useIsInstructor } from '../../hooks/authentication';
+} from '../../../helpers/courseHelpers';
+import { CourseList_Course } from '../../../queries/__generated__/CourseList';
+import { CourseListWithEnrollments_Course } from '../../../queries/__generated__/CourseListWithEnrollments';
+import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../queries/__generated__/CourseWithEnrollment';
+import { useIsInstructor } from '../../../hooks/authentication';
 import { OuterExpressionKinds } from 'typescript';
 
-import languageIcon from '../../public/images/course/language.svg';
-import locationIcon from '../../public/images/course/pin.svg';
+import languageIcon from '../../../public/images/course/language.svg';
+import locationIcon from '../../../public/images/course/pin.svg';
 interface IProps {
   course: CourseList_Course | CourseListWithEnrollments_Course;
   isManage: boolean;

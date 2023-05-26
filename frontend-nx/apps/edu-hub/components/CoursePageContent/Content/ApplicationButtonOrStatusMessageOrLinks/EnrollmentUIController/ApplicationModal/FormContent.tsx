@@ -1,8 +1,8 @@
 import useTranslation from 'next-translate/useTranslation';
 import { FC } from 'react';
 
-import { Course_Course_by_pk } from '../../queries/__generated__/Course';
-import { Button } from '../common/Button';
+import { Course_Course_by_pk } from '../../../../../../queries/__generated__/Course';
+import { Button } from '../../../../../common/Button';
 
 interface IProps {
   applyForCourse: () => void;

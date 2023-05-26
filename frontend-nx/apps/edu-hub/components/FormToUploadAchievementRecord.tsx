@@ -10,62 +10,56 @@ import {
 } from 'react';
 
 import { MdAddCircleOutline } from 'react-icons/md';
-import {
-  parseFileUploadEvent,
-  UploadFile,
-} from '../../../helpers/filehandling';
-import {
-  downloadCSVFileFromBase64String,
-  makeFullName,
-} from '../../../helpers/util';
-import { useAuthedMutation } from '../../../hooks/authedMutation';
+import { parseFileUploadEvent, UploadFile } from '../helpers/filehandling';
+import { downloadCSVFileFromBase64String, makeFullName } from '../helpers/util';
+import { useAuthedMutation } from '../hooks/authedMutation';
 import {
   INSERT_AN_ACHIEVEMENT_RECORD,
   UPDATE_AN_ACHIEVEMENT_RECORD,
-} from '../../../queries/achievementRecord';
+} from '../queries/achievementRecord';
 import {
   LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE,
   SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE,
   SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION,
-} from '../../../queries/actions';
+} from '../queries/actions';
 import {
   InsertAnAchievementRecord,
   InsertAnAchievementRecordVariables,
-} from '../../../queries/__generated__/InsertAnAchievementRecord';
+} from '../queries/__generated__/InsertAnAchievementRecord';
 import {
   SaveAchievementRecordCoverImage,
   SaveAchievementRecordCoverImageVariables,
-} from '../../../queries/__generated__/SaveAchievementRecordCoverImage';
+} from '../queries/__generated__/SaveAchievementRecordCoverImage';
 import {
   SaveAchievementRecordDocumentation,
   SaveAchievementRecordDocumentationVariables,
-} from '../../../queries/__generated__/SaveAchievementRecordDocumentation';
+} from '../queries/__generated__/SaveAchievementRecordDocumentation';
 import {
   UpdateAchievementRecordByPk,
   UpdateAchievementRecordByPkVariables,
-} from '../../../queries/__generated__/UpdateAchievementRecordByPk';
+} from '../queries/__generated__/UpdateAchievementRecordByPk';
 import {
   AchievementRecordRating_enum,
   AchievementRecordType_enum,
-} from '../../../__generated__/globalTypes';
-import { ContentRow } from '../../common/ContentRow';
-import EhTagStingId from '../../common/EhTagStingId';
+} from '../__generated__/globalTypes';
+import { ContentRow } from './common/ContentRow';
+import EhTagStingId from './common/EhTagStingId';
 import {
   AtLeastNameEmail,
   MinAchievementOption,
   NameId,
-} from '../../../helpers/achievement';
-import { useAuthedQuery } from '../../../hooks/authedQuery';
+} from '../helpers/achievement';
+import { useAuthedQuery } from '../hooks/authedQuery';
 import {
   LoadAchievementOptionDocumentationTemplate,
   LoadAchievementOptionDocumentationTemplateVariables,
-} from '../../../queries/__generated__/LoadAchievementOptionDocumentationTemplate';
+} from '../queries/__generated__/LoadAchievementOptionDocumentationTemplate';
 import Trans from 'next-translate/Trans';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress, TextareaAutosize, Link } from '@material-ui/core';
-import { Button } from '../../common/Button';
-import EnrolledUserForACourseDialog from '../../common/dialogs/EnrolledUserForACourseDialog';
-import ModalControl2 from '../../common/ModalController2';
+import { Button } from './common/Button';
+import EnrolledUserForACourseDialog from './common/dialogs/EnrolledUserForACourseDialog';
+import ModalControl2 from './common/ModalController2';
 
 interface State {
   achievementRecordTableId: number; // book keeping
@@ -533,7 +527,7 @@ const UploadUI: FC<IPropsUpload> = (props) => {
       <div className="flex-col items-right">
         <div
           onClick={onClickHandler}
-          className="cursor-pointer flex justify-between border-b border-b-1 border-gray-400 flex flex-row"
+          className="cursor-pointer flex justify-between border-b border-b-1 border-gray-400 flex-row"
         >
           <input
             placeholder={props.placeholder ?? ''}

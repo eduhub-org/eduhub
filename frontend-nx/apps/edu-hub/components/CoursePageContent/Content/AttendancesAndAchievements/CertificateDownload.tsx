@@ -1,21 +1,21 @@
 import useTranslation from 'next-translate/useTranslation';
 import { FC } from 'react';
 
-import { useAuthedQuery } from '../../hooks/authedQuery';
+import { useAuthedQuery } from '../../../../hooks/authedQuery';
 
-import { CourseWithEnrollment_Course_by_pk } from '../../queries/__generated__/CourseWithEnrollment';
-import { LOAD_ACHIEVEMENT_CERTIFICATE } from '../../queries/loadAchievementCertificate';
-import { LOAD_PARTICIPATION_CERTIFICATE } from '../../queries/loadParticipationCertificate';
-import { Button } from '../common/Button';
+import { CourseWithEnrollment_Course_by_pk } from '../../../../queries/__generated__/CourseWithEnrollment';
+import { LOAD_ACHIEVEMENT_CERTIFICATE } from '../../../../queries/loadAchievementCertificate';
+import { LOAD_PARTICIPATION_CERTIFICATE } from '../../../../queries/loadParticipationCertificate';
+import { Button } from '../../../common/Button';
 
 import {
   loadAchievementCertificate,
   loadAchievementCertificateVariables,
-} from '../../queries/__generated__/loadAchievementCertificate';
+} from '../../../../queries/__generated__/loadAchievementCertificate';
 import {
   loadParticipationCertificate,
   loadParticipationCertificateVariables,
-} from '../../queries/__generated__/loadParticipationCertificate';
+} from '../../../../queries/__generated__/loadParticipationCertificate';
 
 interface IProps {
   course: CourseWithEnrollment_Course_by_pk;

@@ -3,21 +3,21 @@ import Fade from '@material-ui/core/Fade';
 import Image from 'next/image';
 import { ChangeEvent, FC, useCallback, useState } from 'react';
 
-import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
-import { enrollmentStatusForCourse } from '../../helpers/courseHelpers';
-import { useAuthedMutation } from '../../hooks/authedMutation';
-import { useUserId } from '../../hooks/user';
-import xIcon from '../../public/images/common/x-calibur-black.svg';
-import { Course_Course_by_pk } from '../../queries/__generated__/Course';
-import { CourseWithEnrollment_Course_by_pk } from '../../queries/__generated__/CourseWithEnrollment';
+import { CourseEnrollmentStatus_enum } from '../../../../../../__generated__/globalTypes';
+import { enrollmentStatusForCourse } from '../../../../../../helpers/courseHelpers';
+import { useAuthedMutation } from '../../../../../../hooks/authedMutation';
+import { useUserId } from '../../../../../../hooks/user';
+import xIcon from '../../../../../../public/images/common/x-calibur-black.svg';
+import { Course_Course_by_pk } from '../../../../../../queries/__generated__/Course';
+import { CourseWithEnrollment_Course_by_pk } from '../../../../../../queries/__generated__/CourseWithEnrollment';
 import {
   InsertEnrollment,
   InsertEnrollmentVariables,
-} from '../../queries/__generated__/InsertEnrollment';
-import { INSERT_ENROLLMENT } from '../../queries/insertEnrollment';
+} from '../../../../../../queries/__generated__/InsertEnrollment';
+import { INSERT_ENROLLMENT } from '../../../../../../queries/insertEnrollment';
 
-import { CourseApplicationModalFormContent } from './CourseApplicationModalFormContent';
-import { CourseApplicationModalSuccessContent } from './CourseApplicationModalSuccessContent';
+import { CourseApplicationModalFormContent } from './FormContent';
+import { ApplicationSuccessMessage } from './ApplicationSuccessMessage';
 
 interface IProps {
   closeModal: () => void;
@@ -25,7 +25,7 @@ interface IProps {
   visible: boolean;
 }
 
-export const CourseApplicationModal: FC<IProps> = ({
+export const ApplicationModal: FC<IProps> = ({
   closeModal,
   course,
   visible,
@@ -88,7 +88,7 @@ export const CourseApplicationModal: FC<IProps> = ({
                 text={text}
               />
             ) : status === CourseEnrollmentStatus_enum.APPLIED ? (
-              <CourseApplicationModalSuccessContent closeModal={closeModal} />
+              <ApplicationSuccessMessage closeModal={closeModal} />
             ) : null}
           </div>
         </div>

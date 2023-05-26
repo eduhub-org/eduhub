@@ -6,35 +6,35 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { IUserProfile } from '../../../hooks/user';
-import { useKeycloakUserProfile, useUserId } from '../../../hooks/user';
-import AchievementOptionDropDown from '../../achievements/AchievementOptionDropDown';
+import { IUserProfile } from '../../../../hooks/user';
+import { useKeycloakUserProfile, useUserId } from '../../../../hooks/user';
+import AchievementOptionDropDown from '../../../achievements/AchievementOptionDropDown';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
-} from '../../../queries/__generated__/AchievementOptionCourses';
-import { Button } from '../../common/Button';
-import { useAuthedQuery } from '../../../hooks/authedQuery';
+} from '../../../../queries/__generated__/AchievementOptionCourses';
+import { Button } from '../../../common/Button';
+import { useAuthedQuery } from '../../../../hooks/authedQuery';
 import { BlockTitle } from '@opencampus/shared-components';
-import FormToUploadAchievementRecord from './FormToUploadAchievementRecord';
+import FormToUploadAchievementRecord from '../../../FormToUploadAchievementRecord';
 import {
   makeFullName,
   formattedDate,
   formattedDateWithTime,
-} from '../../../helpers/util';
-import { AlertMessageDialog } from '../../common/dialogs/AlertMessageDialog';
+} from '../../../../helpers/util';
+import { AlertMessageDialog } from '../../../common/dialogs/AlertMessageDialog';
 import { Translate } from 'next-translate';
-import { ACHIEVEMENT_OPTION_COURSES } from '../../../queries/achievementOption';
+import { ACHIEVEMENT_OPTION_COURSES } from '../../../../queries/achievementOption';
 
-import { order_by } from '../../../__generated__/globalTypes';
+import { order_by } from '../../../../__generated__/globalTypes';
 import {
   AchievementRecordListWithAuthors,
   AchievementRecordListWithAuthorsVariables,
   AchievementRecordListWithAuthors_AchievementRecord,
-} from '../../../queries/__generated__/AchievementRecordListWithAuthors';
-import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../../queries/achievementRecord';
+} from '../../../../queries/__generated__/AchievementRecordListWithAuthors';
+import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../../../queries/achievementRecord';
 import { Link } from '@material-ui/core';
-import { MinAchievementOption } from '../../../helpers/achievement';
+import { MinAchievementOption } from '../../../../helpers/achievement';
 interface IContext {
   achievementRecordUploadDeadline: any;
   courseTitle: string;
