@@ -13,7 +13,7 @@ import { useIsLoggedIn } from '../../hooks/authentication';
 import { COURSE } from '../../queries/course';
 import { Course, CourseVariables } from '../../queries/__generated__/Course';
 
-const CoursePageContent: FC<{ id: number }> = ({ id }) => {
+const CourseContent: FC<{ id: number }> = ({ id }) => {
   const { t } = useTranslation();
   const isLoggedIn = useIsLoggedIn();
   const userId = useUserId();
@@ -101,4 +101,4 @@ const CoursePageContent: FC<{ id: number }> = ({ id }) => {
   );
 };
 
-export default CoursePageContent;
+export default CourseContent;

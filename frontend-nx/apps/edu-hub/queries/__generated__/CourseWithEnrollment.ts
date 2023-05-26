@@ -26,6 +26,7 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions_Attendances {
    * The attendance status: MISSED for a user registered for the session but not recorded (or recognized), otherwise ATTENDED
    */
   status: AttendanceStatus_enum;
+  updated_at: any | null;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Sessions {

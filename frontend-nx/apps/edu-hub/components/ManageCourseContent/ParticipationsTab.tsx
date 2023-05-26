@@ -52,7 +52,7 @@ import {
 import { StaticComponentProperty } from '../../types/UIComponents';
 import { AttendanceStatus_enum } from '../../__generated__/globalTypes';
 import TagWithTwoText from '../common/TagWithTwoText';
-import Loading from '../courses/Loading';
+import Loading from '../ManageCoursesContent/Loading';
 import { Button } from '../common/Button';
 
 interface IProps {
@@ -266,7 +266,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
     }
     return prev;
   }, {});
-  
+
   const [insertAttendance] = useAdminMutation<
     InsertSingleAttendance,
     InsertSingleAttendanceVariables
