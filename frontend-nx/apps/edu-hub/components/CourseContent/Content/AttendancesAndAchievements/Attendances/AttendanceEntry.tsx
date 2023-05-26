@@ -13,9 +13,11 @@ const { NO_INFO, ATTENDED, MISSED } = AttendanceStatus_enum;
 export const AttendanceEntry: FC<IProps> = ({ session }) => {
   const { lang } = useTranslation();
 
-  const status =
-    session.Attendances.length > 0 ? session.Attendances[0].status : NO_INFO;
-  const bgColor =
+  const lastAttendanceRecord = session.Attendances.reduce((prev, current) => {
+    return prev.updated_at > current.updated_at ? prev : current;
+  });
+  
+  const status = lastAttendanceRecord ? lastAttendanceRecord.status : NO_INFO;  const bgColor =
     status === NO_INFO
       ? 'bg-gray-200'
       : status === ATTENDED
