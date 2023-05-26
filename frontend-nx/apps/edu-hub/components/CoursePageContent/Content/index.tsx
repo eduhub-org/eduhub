@@ -7,7 +7,7 @@ import { CourseWithEnrollment_Course_by_pk } from '../../../queries/__generated_
 import { ContentRow } from '../../common/ContentRow';
 import { PageBlock } from '../../common/PageBlock';
 
-import { CourseContentInfos } from './GoalsAndSessions';
+import { GoalsAndSessions } from './GoalsAndSessions';
 import { DescriptionFields } from './DescriptionFields';
 import { TimeLocationLanguageInstructors } from './TimeLocationLanguageInstructors';
 import { ApplicationButtonOrStatusMessageOrLinks } from './ApplicationButtonOrStatusMessageOrLinks';
@@ -75,7 +75,7 @@ export const Content: FC<ContentProps> = ({
         )}
         <ContentRow className="flex pb-24">
           <PageBlock classname="flex-1 text-white">
-            <CourseContentInfos course={course} />
+            <GoalsAndSessions course={course} />
           </PageBlock>
           <div className="pr-0 lg:pr-6 xl:pr-0">
             <TimeLocationLanguageInstructors course={course} />

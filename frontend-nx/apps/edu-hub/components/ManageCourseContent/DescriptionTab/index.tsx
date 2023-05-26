@@ -9,8 +9,8 @@ import {
   useDeleteCallback,
   useUpdateCallback,
   useUpdateCallback2,
-} from '../../hooks/authedMutation';
-import { useRoleQuery } from '../../hooks/authedQuery';
+} from '../../../hooks/authedMutation';
+import { useRoleQuery } from '../../../hooks/authedQuery';
 import {
   DELETE_COURSE_LOCATION,
   INSERT_NEW_COURSE_LOCATION,
@@ -28,73 +28,73 @@ import {
   UPDATE_COURSE_START_TIME,
   UPDATE_COURSE_TAGLINE,
   UPDATE_COURSE_WEEKDAY,
-} from '../../queries/course';
+} from '../../../queries/course';
 import {
   DeleteCourseLocation,
   DeleteCourseLocationVariables,
-} from '../../queries/__generated__/DeleteCourseLocation';
+} from '../../../queries/__generated__/DeleteCourseLocation';
 import {
   InsertCourseLocation,
   InsertCourseLocationVariables,
-} from '../../queries/__generated__/InsertCourseLocation';
-import { LocationOptionsKnown } from '../../queries/__generated__/LocationOptionsKnown';
-import { ManagedCourse_Course_by_pk } from '../../queries/__generated__/ManagedCourse';
+} from '../../../queries/__generated__/InsertCourseLocation';
+import { LocationOptionsKnown } from '../../../queries/__generated__/LocationOptionsKnown';
+import { ManagedCourse_Course_by_pk } from '../../../queries/__generated__/ManagedCourse';
 import {
   UpdateCourseContentDescriptionField1,
   UpdateCourseContentDescriptionField1Variables,
-} from '../../queries/__generated__/UpdateCourseContentDescriptionField1';
+} from '../../../queries/__generated__/UpdateCourseContentDescriptionField1';
 import {
   UpdateCourseContentDescriptionField2,
   UpdateCourseContentDescriptionField2Variables,
-} from '../../queries/__generated__/UpdateCourseContentDescriptionField2';
+} from '../../../queries/__generated__/UpdateCourseContentDescriptionField2';
 import {
   UpdateCourseEndTime,
   UpdateCourseEndTimeVariables,
-} from '../../queries/__generated__/UpdateCourseEndTime';
+} from '../../../queries/__generated__/UpdateCourseEndTime';
 import {
   UpdateCourseHeadingDescription1,
   UpdateCourseHeadingDescription1Variables,
-} from '../../queries/__generated__/UpdateCourseHeadingDescription1';
+} from '../../../queries/__generated__/UpdateCourseHeadingDescription1';
 import {
   UpdateCourseHeadingDescription2,
   UpdateCourseHeadingDescription2Variables,
-} from '../../queries/__generated__/UpdateCourseHeadingDescription2';
+} from '../../../queries/__generated__/UpdateCourseHeadingDescription2';
 import {
   UpdateCourseLanguage,
   UpdateCourseLanguageVariables,
-} from '../../queries/__generated__/UpdateCourseLanguage';
+} from '../../../queries/__generated__/UpdateCourseLanguage';
 import {
   UpdateCourseLearningGoals,
   UpdateCourseLearningGoalsVariables,
-} from '../../queries/__generated__/UpdateCourseLearningGoals';
+} from '../../../queries/__generated__/UpdateCourseLearningGoals';
 import {
   UpdateCourseDefaultSessionAddress,
   UpdateCourseDefaultSessionAddressVariables,
-} from '../../queries/__generated__/UpdateCourseDefaultSessionAddress';
+} from '../../../queries/__generated__/UpdateCourseDefaultSessionAddress';
 import {
   UpdateCourseLocationOption,
   UpdateCourseLocationOptionVariables,
-} from '../../queries/__generated__/UpdateCourseLocationOption';
+} from '../../../queries/__generated__/UpdateCourseLocationOption';
 import {
   UpdateCourseStartTime,
   UpdateCourseStartTimeVariables,
-} from '../../queries/__generated__/UpdateCourseStartTime';
+} from '../../../queries/__generated__/UpdateCourseStartTime';
 import {
   UpdateCourseWeekday,
   UpdateCourseWeekdayVariables,
-} from '../../queries/__generated__/UpdateCourseWeekday';
-import EhTimeSelect, { formatTime } from '../common/EhTimeSelect';
+} from '../../../queries/__generated__/UpdateCourseWeekday';
+import EhTimeSelect, { formatTime } from '../../common/EhTimeSelect';
 import { LocationSelectionRow } from './LocationSelectionRow';
 import { Button } from '@material-ui/core';
 import { MdAddCircle } from 'react-icons/md';
 import {
   UpdateCourseTagline,
   UpdateCourseTaglineVariables,
-} from '../../queries/__generated__/UpdateCourseTagline';
+} from '../../../queries/__generated__/UpdateCourseTagline';
 import {
   UpdateCourseMaxParticipants,
   UpdateCourseMaxParticipantsVariables,
-} from '../../queries/__generated__/UpdateCourseMaxParticipants';
+} from '../../../queries/__generated__/UpdateCourseMaxParticipants';
 import useTranslation from 'next-translate/useTranslation';
 
 interface IProps {

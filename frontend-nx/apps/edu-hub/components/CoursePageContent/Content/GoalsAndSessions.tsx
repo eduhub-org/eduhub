@@ -5,13 +5,12 @@ import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
 import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
 import { useState } from 'react';
-import { invert } from 'lodash';
 
 interface IProps {
   course: Course_Course_by_pk;
 }
 
-export const CourseContentInfos: FC<IProps> = ({ course }) => {
+export const GoalsAndSessions: FC<IProps> = ({ course }) => {
   const { t, lang } = useTranslation('course-page');
   const [showAllSessions, setShowAllSessions] = useState(false);
   const visibleSessions = showAllSessions

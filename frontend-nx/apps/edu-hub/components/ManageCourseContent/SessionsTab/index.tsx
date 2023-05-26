@@ -9,7 +9,7 @@ import {
   useRoleMutation,
   useDeleteCallback,
   useUpdateCallback2,
-} from '../../hooks/authedMutation';
+} from '../../../hooks/authedMutation';
 import {
   DELETE_SESSION,
   DELETE_SESSION_LOCATION,
@@ -19,41 +19,41 @@ import {
   UPDATE_SESSION_END_TIME,
   UPDATE_SESSION_START_TIME,
   UPDATE_SESSION_TITLE,
-} from '../../queries/course';
+} from '../../../queries/course';
 import {
   InsertCourseSession,
   InsertCourseSessionVariables,
-} from '../../queries/__generated__/InsertCourseSession';
-import { ManagedCourse_Course_by_pk } from '../../queries/__generated__/ManagedCourse';
+} from '../../../queries/__generated__/InsertCourseSession';
+import { ManagedCourse_Course_by_pk } from '../../../queries/__generated__/ManagedCourse';
 import { SessionRow } from './SessionRow';
 import {
   DeleteCourseSession,
   DeleteCourseSessionVariables,
-} from '../../queries/__generated__/DeleteCourseSession';
+} from '../../../queries/__generated__/DeleteCourseSession';
 import {
   UpdateSessionStartTime,
   UpdateSessionStartTimeVariables,
-} from '../../queries/__generated__/UpdateSessionStartTime';
+} from '../../../queries/__generated__/UpdateSessionStartTime';
 import {
   UpdateSessionEndTime,
   UpdateSessionEndTimeVariables,
-} from '../../queries/__generated__/UpdateSessionEndTime';
+} from '../../../queries/__generated__/UpdateSessionEndTime';
 import {
   UpdateSessionTitle,
   UpdateSessionTitleVariables,
-} from '../../queries/__generated__/UpdateSessionTitle';
+} from '../../../queries/__generated__/UpdateSessionTitle';
 import {
   InsertSessionLocation,
   InsertSessionLocationVariables,
-} from '../../queries/__generated__/InsertSessionLocation';
+} from '../../../queries/__generated__/InsertSessionLocation';
 import {
   DeleteCourseSessionLocation,
   DeleteCourseSessionLocationVariables,
-} from '../../queries/__generated__/DeleteCourseSessionLocation';
+} from '../../../queries/__generated__/DeleteCourseSessionLocation';
 import {
   DeleteSessionSpeaker,
   DeleteSessionSpeakerVariables,
-} from '../../queries/__generated__/DeleteSessionSpeaker';
+} from '../../../queries/__generated__/DeleteSessionSpeaker';
 import useTranslation from 'next-translate/useTranslation';
 
 interface IProps {

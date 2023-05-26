@@ -3,7 +3,7 @@ import useTranslation from 'next-translate/useTranslation';
 import { ChangeEvent, FC, useCallback } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import { MdDelete } from 'react-icons/md';
-import { ManagedCourse_Course_by_pk_CourseLocations } from '../../queries/__generated__/ManagedCourse';
+import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../queries/__generated__/ManagedCourse';
 
 interface IProps {
   location: ManagedCourse_Course_by_pk_CourseLocations | null;

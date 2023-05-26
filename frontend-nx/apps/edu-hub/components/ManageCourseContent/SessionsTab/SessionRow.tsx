@@ -1,37 +1,37 @@
 import { FC, useCallback, useState } from 'react';
-import { ManagedCourse_Course_by_pk_Sessions } from '../../queries/__generated__/ManagedCourse';
+import { ManagedCourse_Course_by_pk_Sessions } from '../../../queries/__generated__/ManagedCourse';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import EhTimeSelect, { formatTime } from '../common/EhTimeSelect';
+import EhTimeSelect, { formatTime } from '../../common/EhTimeSelect';
 import { DebounceInput } from 'react-debounce-input';
 import { IconButton } from '@material-ui/core';
 import { MdDelete } from 'react-icons/md';
 import {
   eventTargetValueMapper,
   useRoleMutation,
-} from '../../hooks/authedMutation';
-import { InputDialog } from '../common/dialogs/InputDialog';
+} from '../../../hooks/authedMutation';
+import { InputDialog } from '../../common/dialogs/InputDialog';
 import {
   InsertSessionLocation,
   InsertSessionLocationVariables,
-} from '../../queries/__generated__/InsertSessionLocation';
+} from '../../../queries/__generated__/InsertSessionLocation';
 import {
   INSERT_NEW_SESSION_LOCATION,
   INSERT_NEW_SESSION_SPEAKER,
-} from '../../queries/course';
+} from '../../../queries/course';
 import { QueryResult } from '@apollo/client';
-import { SelectUserDialog } from '../common/dialogs/SelectUserDialog';
-import { UserForSelection1_User } from '../../queries/__generated__/UserForSelection1';
+import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
+import { UserForSelection1_User } from '../../../queries/__generated__/UserForSelection1';
 import {
   InsertExpert,
   InsertExpertVariables,
-} from '../../queries/__generated__/InsertExpert';
-import { INSERT_EXPERT } from '../../queries/user';
+} from '../../../queries/__generated__/InsertExpert';
+import { INSERT_EXPERT } from '../../../queries/user';
 import {
   InsertNewSessionSpeaker,
   InsertNewSessionSpeakerVariables,
-} from '../../queries/__generated__/InsertNewSessionSpeaker';
-import EhMultipleTag from '../common/EhMultipleTag';
+} from '../../../queries/__generated__/InsertNewSessionSpeaker';
+import EhMultipleTag from '../../common/EhMultipleTag';
 import useTranslation from 'next-translate/useTranslation';
 
 const copyDateTime = (target: Date, source: Date) => {
