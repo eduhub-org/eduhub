@@ -6,21 +6,21 @@
 import { Attendance_insert_input } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL mutation operation: InsertSingleAttendence
+// GraphQL mutation operation: InsertSingleAttendance
 // ====================================================
 
-export interface InsertSingleAttendence_insert_Attendance_one {
+export interface InsertSingleAttendance_insert_Attendance_one {
   __typename: "Attendance";
   id: number;
 }
 
-export interface InsertSingleAttendence {
+export interface InsertSingleAttendance {
   /**
    * insert a single row into the table: "Attendance"
    */
-  insert_Attendance_one: InsertSingleAttendence_insert_Attendance_one | null;
+  insert_Attendance_one: InsertSingleAttendance_insert_Attendance_one | null;
 }
 
-export interface InsertSingleAttendenceVariables {
+export interface InsertSingleAttendanceVariables {
   input: Attendance_insert_input;
 }

@@ -9,11 +9,11 @@ import {
   IoIosCloseCircle,
 } from 'react-icons/io';
 import { MdCheckBox, MdOutlineCheckBoxOutlineBlank } from 'react-icons/md';
-import { displayDate } from '../../helpers/dateHelpers';
-import { ManagedCourse_Course_by_pk_CourseEnrollments } from '../../queries/__generated__/ManagedCourse';
-import { MotivationRating_enum } from '../../__generated__/globalTypes';
-import { EhDot, greenDot, greyDot, orangeDot, redDot } from '../common/dots';
-import { OnlyAdmin } from '../common/OnlyLoggedIn';
+import { displayDate } from '../../../helpers/dateHelpers';
+import { ManagedCourse_Course_by_pk_CourseEnrollments } from '../../../queries/__generated__/ManagedCourse';
+import { MotivationRating_enum } from '../../../__generated__/globalTypes';
+import { EhDot, greenDot, greyDot, orangeDot, redDot } from '../../common/dots';
+import { OnlyAdmin } from '../../common/OnlyLoggedIn';
 
 interface IProps {
   enrollment: ManagedCourse_Course_by_pk_CourseEnrollments | null;

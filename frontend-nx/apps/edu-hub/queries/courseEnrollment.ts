@@ -2,16 +2,16 @@ import { gql } from '@apollo/client';
 import { COURSE_INSTRUCTOR_FRAGMENT } from './courseEnrollmentFragment';
 import { USER_FRAGMENT } from './userFragment';
 
-export const INSERT_SINGLE_ATTENDENCE = gql`
-  mutation InsertSingleAttendence($input: Attendance_insert_input!) {
+export const INSERT_SINGLE_ATTENDANCE = gql`
+  mutation InsertSingleAttendance($input: Attendance_insert_input!) {
     insert_Attendance_one(object: $input) {
       id
     }
   }
 `;
 
-export const UPDATE_ATTENDENCE = gql`
-  mutation UpdateSingleAttendenceByPk(
+export const UPDATE_ATTENDANCE = gql`
+  mutation UpdateSingleAttendanceByPk(
     $pkId: Int!
     $changes: Attendance_set_input!
   ) {

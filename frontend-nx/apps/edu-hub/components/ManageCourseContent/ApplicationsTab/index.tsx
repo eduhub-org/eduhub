@@ -1,49 +1,49 @@
 import { QueryResult } from '@apollo/client';
 import { FC, useCallback, useMemo, useState } from 'react';
-import { Button } from '../common/Button';
+import { Button } from '../../common/Button';
 
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_CourseEnrollments,
-} from '../../queries/__generated__/ManagedCourse';
+} from '../../../queries/__generated__/ManagedCourse';
 import { ApplicationRow } from './ApplicationRow';
-import { greenDot, greyDot, orangeDot, redDot } from '../common/dots';
-import { OnlyAdmin } from '../common/OnlyLoggedIn';
+import { greenDot, greyDot, orangeDot, redDot } from '../../common/dots';
+import { OnlyAdmin } from '../../common/OnlyLoggedIn';
 import {
   identityEventMapper,
   pickIdPkMapper,
   useAdminMutation,
   useRoleMutation,
   useUpdateCallback2,
-} from '../../hooks/authedMutation';
+} from '../../../hooks/authedMutation';
 import {
   UpdateEnrollmentRating,
   UpdateEnrollmentRatingVariables,
-} from '../../queries/__generated__/UpdateEnrollmentRating';
+} from '../../../queries/__generated__/UpdateEnrollmentRating';
 import {
   UPDATE_ENROLLMENT_STATUS,
   UPDATE_ENROLLMENT_RATING,
-} from '../../queries/insertEnrollment';
-import { Button as OldButton } from '../common/Button';
+} from '../../../queries/insertEnrollment';
+import { Button as OldButton } from '../../common/Button';
 import { Dialog, DialogTitle } from '@material-ui/core';
 import { MdClose } from 'react-icons/md';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useAdminQuery } from '../../hooks/authedQuery';
-import { MailTemplates } from '../../queries/__generated__/MailTemplates';
-import { INSERT_MAIL_LOG, MAIL_TEMPLATES } from '../../queries/mail';
-import { displayDate } from '../../helpers/dateHelpers';
+import { useAdminQuery } from '../../../hooks/authedQuery';
+import { MailTemplates } from '../../../queries/__generated__/MailTemplates';
+import { INSERT_MAIL_LOG, MAIL_TEMPLATES } from '../../../queries/mail';
+import { displayDate } from '../../../helpers/dateHelpers';
 import {
   InsertMailLog,
   InsertMailLogVariables,
-} from '../../queries/__generated__/InsertMailLog';
+} from '../../../queries/__generated__/InsertMailLog';
 import {
   UpdateEnrollmentStatus,
   UpdateEnrollmentStatusVariables,
-} from '../../queries/__generated__/UpdateEnrollmentStatus';
+} from '../../../queries/__generated__/UpdateEnrollmentStatus';
 import useTranslation from 'next-translate/useTranslation';
-import { useCurrentRole } from '../../hooks/authentication';
-import { AuthRoles } from '../../types/enums';
+import { useCurrentRole } from '../../../hooks/authentication';
+import { AuthRoles } from '../../../types/enums';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -54,7 +54,7 @@ const now = new Date();
 const now7 = new Date();
 now7.setDate(now7.getDate() + 7);
 
-export const ApplicationTab: FC<IProps> = ({ course, qResult }) => {
+export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const { t, lang } = useTranslation();
   const currentRole = useCurrentRole();
 

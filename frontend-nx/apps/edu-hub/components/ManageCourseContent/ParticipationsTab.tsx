@@ -22,8 +22,8 @@ import { useAdminMutation } from '../../hooks/authedMutation';
 import { useAdminQuery } from '../../hooks/authedQuery';
 import { QUERY_LIMIT } from '../../pages/manage/courses';
 import {
-  INSERT_SINGLE_ATTENDENCE,
-  UPDATE_ATTENDENCE,
+  INSERT_SINGLE_ATTENDANCE,
+  UPDATE_ATTENDANCE,
 } from '../../queries/courseEnrollment';
 import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../queries/mutateAchievement';
 import {
@@ -36,9 +36,9 @@ import {
   DeleteAnAchievementOptionCourseVariables,
 } from '../../queries/__generated__/DeleteAnAchievementOptionCourse';
 import {
-  InsertSingleAttendence,
-  InsertSingleAttendenceVariables,
-} from '../../queries/__generated__/InsertSingleAttendence';
+  InsertSingleAttendance,
+  InsertSingleAttendanceVariables,
+} from '../../queries/__generated__/InsertSingleAttendance';
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_CourseEnrollments,
@@ -46,32 +46,36 @@ import {
 } from '../../queries/__generated__/ManagedCourse';
 
 import {
-  UpdateSingleAttendenceByPk,
-  UpdateSingleAttendenceByPkVariables,
-} from '../../queries/__generated__/UpdateSingleAttendenceByPk';
+  UpdateSingleAttendanceByPk,
+  UpdateSingleAttendanceByPkVariables,
+} from '../../queries/__generated__/UpdateSingleAttendanceByPk';
 import { StaticComponentProperty } from '../../types/UIComponents';
 import { AttendanceStatus_enum } from '../../__generated__/globalTypes';
 import TagWithTwoText from '../common/TagWithTwoText';
 import Loading from '../courses/Loading';
 import { Button } from '../common/Button';
-import { DiagnosticCategory } from 'typescript';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
 }
-const ManageCourseEnrollment: FC<IProps> = ({ course, qResult }) => {
+const ParticipationsTab: FC<IProps> = ({ course, qResult }) => {
   return (
     <>
       <div className="flex flex-col space-y-2">
+        {/* The following component displays all avaiable achievement options for this
+        cours (if available) and allows to delete them
+        TODO (Issue #515):
+        Rather allowing to delete it, clicking on it should forward to the site where it is defined */}
         <CourseAchievementOptions courseId={course.id} />
-        <EnrollmentList course={course} qResult={qResult} />
+
+        <ParticipationList course={course} qResult={qResult} />
       </div>
     </>
   );
 };
 
-export default ManageCourseEnrollment;
+export default ParticipationsTab;
 
 /* #region Course AchievementOptions */
 
@@ -149,33 +153,33 @@ const CourseAchievementOptions: FC<IPropsCourseAchievementOptions> = (
 /* #endregion */
 
 /* #region Course Enrollment List */
-interface IPropsEnrollmentList {
+interface IPropsParticipationList {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
 }
 
-const EnrollmentList: FC<IPropsEnrollmentList> = ({ course, qResult }) => {
+const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => {
   const { t } = useTranslation();
 
-  const newLocal = 'manage-course:attendances';
   const tableHeaders: StaticComponentProperty[] = [
     { key: 0, label: t('firstName') },
     { key: 1, label: t('lastName') },
-    { key: 2, label: t(newLocal) },
+    { key: 2, label: t('manage-course:attendances') },
     { key: 3, label: t('manage-course:certificateAchievement') },
   ];
 
-  const enrollmentList = [...(course.CourseEnrollments || [])].sort((a, b) =>
-    a.User.lastName.localeCompare(b.User.lastName)
+  const participationList = [...(course.CourseEnrollments || [])]
+    .filter(enrollment => enrollment.status === 'CONFIRMED')
+    .sort((a, b) => a.User.lastName.localeCompare(b.User.lastName)
   );
   const sessions = [...(course.Sessions || [])];
 
   const isAdmin = useIsAdmin();
-  console.log('EnrollmentList length: ', EnrollmentList.toString);
+  console.log('EnrollmentList length: ', ParticipationList.toString);
 
   return (
     <>
-      {enrollmentList.length > 0 ? (
+      {participationList.length > 0 ? (
         <div className="overflow-x-auto transition-[height] w-full pb-10">
           <table className="w-full">
             <thead>
@@ -192,8 +196,8 @@ const EnrollmentList: FC<IPropsEnrollmentList> = ({ course, qResult }) => {
               </tr>
             </thead>
             <tbody>
-              {enrollmentList.map((ce) => (
-                <OneCourseEnrollmentRow
+              {participationList.map((ce) => (
+                <ParticipationRow
                   key={ce.id}
                   enrollment={ce}
                   sessions={sessions}
@@ -231,16 +235,17 @@ interface IDotData {
 const pStyle = 'text-gray-700 truncate';
 const tdStyle = 'pl-5';
 
-/* #region OneCourseEnrollmentRow */
 
-interface IPropsOneRow {
+/* #region ParticipationRow */
+
+interface IPropsParticipationRow {
   enrollment: ManagedCourse_Course_by_pk_CourseEnrollments;
   sessions: ManagedCourse_Course_by_pk_Sessions[];
   qResult: QueryResult<any, any>;
   userId: string;
   maxMissedSessions: number;
 }
-const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
+const ParticipationRow: FC<IPropsParticipationRow> = ({
   enrollment,
   sessions,
   qResult,
@@ -256,19 +261,21 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
   > = enrollment.User.Attendances.reduce<
     Record<number, { id: number; status: AttendanceStatus_enum }>
   >((prev, current) => {
-    prev[current.Session.id] = { id: current.id, status: current.status };
+    if (!prev[current.Session.id] || prev[current.Session.id].id < current.id) {
+      prev[current.Session.id] = { id: current.id, status: current.status };
+    }
     return prev;
   }, {});
+  
+  const [insertAttendance] = useAdminMutation<
+    InsertSingleAttendance,
+    InsertSingleAttendanceVariables
+  >(INSERT_SINGLE_ATTENDANCE);
 
-  const [insertAttendence] = useAdminMutation<
-    InsertSingleAttendence,
-    InsertSingleAttendenceVariables
-  >(INSERT_SINGLE_ATTENDENCE);
-
-  const [updateAnAttendence] = useAdminMutation<
-    UpdateSingleAttendenceByPk,
-    UpdateSingleAttendenceByPkVariables
-  >(UPDATE_ATTENDENCE);
+  const [updateAnAttendance] = useAdminMutation<
+    UpdateSingleAttendanceByPk,
+    UpdateSingleAttendanceByPkVariables
+  >(UPDATE_ATTENDANCE);
 
   /**
    * By clicking on a circle the user can change the attendance status of the course,
@@ -276,7 +283,7 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
    * @param  {AttendanceStatus_enum} previousStatus Previous attendance status
    * @returns {AttendanceStatus_enum} Returns an AttendanceStatus_enum
    */
-  const updateAttendenceStatus = (previousStatus: AttendanceStatus_enum) => {
+  const updateAttendanceStatus = (previousStatus: AttendanceStatus_enum) => {
     if (previousStatus === AttendanceStatus_enum.ATTENDED) {
       return AttendanceStatus_enum.MISSED;
     }
@@ -288,52 +295,31 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
 
   const handleDotClick = useCallback(
     async (session: ManagedCourse_Course_by_pk_Sessions) => {
-      const obj = attendanceRecordBySession[session.id];
-      if (obj) {
-        const updatedStatus: AttendanceStatus_enum = updateAttendenceStatus(
-          obj.status
-        );
-        const response = await updateAnAttendence({
-          variables: {
-            pkId: obj.id,
-            changes: {
-              status: updatedStatus,
-            },
-          },
-        });
-        if (response.errors) {
-          console.log('Update Error: ', response.errors);
-          return;
-        }
-        qResult.refetch();
-        return;
+      const attendanceRecord = attendanceRecordBySession[session.id];
+      let status: AttendanceStatus_enum;
+      if (!attendanceRecord || attendanceRecord.status === AttendanceStatus_enum.MISSED || attendanceRecord.status ===  AttendanceStatus_enum.NO_INFO) {
+        status = AttendanceStatus_enum.ATTENDED;
+      } else {
+        status = AttendanceStatus_enum.MISSED;
       }
-
-      // Insert attendance with default AttendanceStatus_enum = "ATTENDED"
-      const response = await insertAttendence({
+      const insertResponse = await insertAttendance({
         variables: {
           input: {
-            status: AttendanceStatus_enum.ATTENDED,
+            status,
             sessionId: session.id,
             source: 'INSTRUCTOR',
             userId,
           },
         },
       });
-      if (response.errors) {
-        console.log('Error: ', response.errors);
+      if (insertResponse.errors) {
+        console.log('Error: ', insertResponse.errors);
         return;
       }
       qResult.refetch();
-    },
-    [
-      attendanceRecordBySession,
-      qResult,
-      insertAttendence,
-      updateAnAttendence,
-      userId,
-    ]
-  );
+      },
+      [qResult, insertAttendance, attendanceRecordBySession, userId]
+    );
 
   const handleDetailsClick = useCallback(() => {
     setShowDetails((prev) => !prev);
@@ -395,13 +381,13 @@ const OneCourseEnrollmentRow: FC<IPropsOneRow> = ({
             <div className="flex space-x-3 flex-row">
               {dotsData.map((dotData) => {
                 return (
-                  <> {greyDot} </>
-                  // <EhDotWithCallBack
-                  //   key={dotData.session.id}
-                  //   dotData={dotData}
-                  //   handleDotClick={handleDotClick}
-                  //   session={dotData.session}
-                  // />
+                  // <> {greyDot} </>
+                  <EhDotWithCallBack
+                    key={dotData.session.id}
+                    dotData={dotData}
+                    handleDotClick={handleDotClick}
+                    session={dotData.session}
+                  />
                 );
               })}
             </div>

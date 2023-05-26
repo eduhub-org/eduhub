@@ -20,9 +20,9 @@ import { Button as OldButton } from '../common/Button';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { QuestionConfirmationDialog } from '../common/dialogs/QuestionConfirmationDialog';
 import { PageBlock } from '../common/PageBlock';
-import { ApplicationTab } from './ApplicationTab';
+import { ApplicationsTab } from './ApplicationsTab';
 import { DescriptionTab } from './DescriptionTab';
-import ManageCourseEnrollment from './ManageCourseEnrollment';
+import ManageCourseEnrollment from './ParticipationsTab';
 import { SessionsTab } from './SessionsTab';
 
 interface Props {
@@ -132,7 +132,7 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  *
  * @returns {any} the component
  */
-export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
+export const ManageCourseContent: FC<Props> = ({ courseId }) => {
   const { t } = useTranslation();
 
   const qResult = useRoleQuery<ManagedCourse, ManagedCourseVariables>(
@@ -293,7 +293,7 @@ export const AuthorizedManageCourse: FC<Props> = ({ courseId }) => {
           )}
 
           {openTabIndex === 2 && (
-            <ApplicationTab course={course} qResult={qResult} />
+            <ApplicationsTab course={course} qResult={qResult} />
           )}
           {openTabIndex === 3 && (
             <ManageCourseEnrollment course={course} qResult={qResult} />
