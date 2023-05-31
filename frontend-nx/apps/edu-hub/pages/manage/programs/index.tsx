@@ -3,7 +3,7 @@ import { FC } from 'react';
 import { Page } from '../../../components/Page';
 
 import { useIsAdmin } from '../../../hooks/authentication';
-import { AuthorizedPrograms } from '../../../components/program/AuthorizedPrograms';
+import { ManageProgramsContent } from '../../../components/ManageProgramsContent';
 
 // export const getStaticProps = async ({ locale }: { locale: string }) => ({
 //   props: {
@@ -20,7 +20,7 @@ const ProgramsPage: FC = () => {
         <title>EduHub | opencampus.sh</title>
         <link rel="icon" href="/favicon.png" />
       </Head>
-      <Page>{isAdmin && <AuthorizedPrograms />}</Page>
+      <Page>{isAdmin && <ManageProgramsContent />}</Page>
     </>
   );
 };
