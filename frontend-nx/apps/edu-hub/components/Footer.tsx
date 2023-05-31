@@ -28,6 +28,15 @@ export const Footer: FC = () => {
               {'FAQ'}
             </a>
           </p>
+          <p>
+            <a
+              href="https://opencampus.substack.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {'Newsletter'}
+            </a>
+          </p>
         </div>
         <div className="flex justify-between items-end">
           <span className="text-sm font-light">© 2010 — 2023</span>
