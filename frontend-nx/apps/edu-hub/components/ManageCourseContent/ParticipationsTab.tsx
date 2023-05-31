@@ -21,10 +21,7 @@ import {
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { useAdminQuery } from '../../hooks/authedQuery';
 import { QUERY_LIMIT } from '../../pages/manage/courses';
-import {
-  INSERT_SINGLE_ATTENDANCE,
-  UPDATE_ATTENDANCE,
-} from '../../queries/courseEnrollment';
+import { INSERT_SINGLE_ATTENDANCE } from '../../queries/courseEnrollment';
 import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../queries/mutateAchievement';
 import {
   AchievementOptionCourses,
@@ -45,10 +42,6 @@ import {
   ManagedCourse_Course_by_pk_Sessions,
 } from '../../queries/__generated__/ManagedCourse';
 
-import {
-  UpdateSingleAttendanceByPk,
-  UpdateSingleAttendanceByPkVariables,
-} from '../../queries/__generated__/UpdateSingleAttendanceByPk';
 import { StaticComponentProperty } from '../../types/UIComponents';
 import { AttendanceStatus_enum } from '../../__generated__/globalTypes';
 import TagWithTwoText from '../common/TagWithTwoText';
@@ -271,27 +264,6 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
     InsertSingleAttendance,
     InsertSingleAttendanceVariables
   >(INSERT_SINGLE_ATTENDANCE);
-
-  const [updateAnAttendance] = useAdminMutation<
-    UpdateSingleAttendanceByPk,
-    UpdateSingleAttendanceByPkVariables
-  >(UPDATE_ATTENDANCE);
-
-  /**
-   * By clicking on a circle the user can change the attendance status of the course,
-   * from grey to green, from green to red, and from red to grey.
-   * @param  {AttendanceStatus_enum} previousStatus Previous attendance status
-   * @returns {AttendanceStatus_enum} Returns an AttendanceStatus_enum
-   */
-  const updateAttendanceStatus = (previousStatus: AttendanceStatus_enum) => {
-    if (previousStatus === AttendanceStatus_enum.ATTENDED) {
-      return AttendanceStatus_enum.MISSED;
-    }
-    if (previousStatus === AttendanceStatus_enum.MISSED) {
-      return AttendanceStatus_enum.NO_INFO;
-    }
-    return AttendanceStatus_enum.ATTENDED;
-  };
 
   const handleDotClick = useCallback(
     async (session: ManagedCourse_Course_by_pk_Sessions) => {
