@@ -1,5 +1,5 @@
 {
-  "title": "Achivements",
+  "title": "Achievements",
   "page-header": "Leistungsnachweise",
   "achievement-record": "Leistungsnachweise",
   "achievement-record-admin": "Administration Leistungsnachweise",
@@ -15,8 +15,8 @@
   "last-upload": "Letzter Upload",
   "file-name": "Dateiname",
   "last-submitted-documentation": "Zuletzt eingereichte Unterlagen",
-  "cover-image-required": "Cover image required",
-  "csv-file-missing": "CSV file missing!",
-  "documentation-missing": "Please upload documentation!",
-  "authors-missing": "Please add some authors!"
+  "cover-image-required": "Deckblatt erforderlich",
+  "csv-file-missing": "CSV datei fehlt!",
+  "documentation-missing": "Bitte Dokumentation hochladen!",
+  "authors-missing": "Bitte Autoren hinzufügen!"
 }

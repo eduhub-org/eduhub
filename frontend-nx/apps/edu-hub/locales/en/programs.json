@@ -1,12 +1,12 @@
 {
-  "add": "Programm hinzufügen",
-  "published": "Veröffentlicht",
-  "title": "Programmtitel",
-  "short-title": "Kurztitel",
-  "application-start": "Bewerbungsanfang",
-  "application-end": "Bewerbungsende",
-  "course-start": "Kursstart",
-  "course-end": "Kursende",
-  "achievement-upload-deadline": "Abgabeschluss Leistungsnachweise"
+  "add": "Add programm",
+  "published": "Published",
+  "title": "Program title",
+  "short-title": "Short title",
+  "application-start": "Application start",
+  "application-end": "Application deadline",
+  "course-start": "Course start",
+  "course-end": "Course end",
+  "achievement-upload-deadline": "Deadline achievement upload"
 }
 
