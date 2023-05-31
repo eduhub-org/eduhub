@@ -42,8 +42,8 @@ resource "google_cloudfunctions2_function" "call_python_function" {
       HASURA_GRAPHQL_ADMIN_KEY     = var.hasura_graphql_admin_key
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
       ZOOM_API_KEY                 = var.zoom_api_key
-      ZOOM_API_SECRET              = var.zoom_api_key
-      LMS_URL                      = var.lms_user
+      ZOOM_API_SECRET              = var.zoom_api_secret
+      LMS_URL                      = var.lms_url
       LMS_USER                     = var.lms_user
       LMS_PASSWORD                 = var.lms_password
       LMS_ATTENDANCE_SURVEY_ID     = var.lms_attendance_survey_id

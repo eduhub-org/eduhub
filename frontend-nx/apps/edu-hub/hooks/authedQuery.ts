@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery, useLazyQuery } from '@apollo/client';
 import { useSession } from 'next-auth/react';
 
 import { useCurrentRole } from './authentication';
@@ -44,6 +44,33 @@ export const useRoleQuery: typeof useQuery = (query, passedOptions) => {
     : passedOptions;
 
   return useQuery(query, { ...options, onError: errorHandler });
+};
+
+export const useLazyRoleQuery: typeof useLazyQuery = (query, passedOptions) => {
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
+  const currentRole = useCurrentRole();
+
+  const passedRole: AuthRoles = passedOptions?.context?.role;
+
+  const options = accessToken
+    ? {
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          headers: {
+            ...(currentRole !== AuthRoles.anonymous && {
+              'x-hasura-role': passedRole ? passedRole : currentRole,
+            }),
+            ...(currentRole !== AuthRoles.anonymous && {
+              Authorization: `Bearer ${accessToken}`,
+            }),
+          },
+        },
+      }
+    : passedOptions;
+
+  return useLazyQuery(query, { ...options, onError: errorHandler });
 };
 
 export const useAdminQuery: typeof useQuery = (query, passedOptions) => {

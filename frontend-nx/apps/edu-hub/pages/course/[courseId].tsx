@@ -1,11 +1,9 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { FC } from 'react';
-
 import { Page } from '../../components/Page';
-import AuthorizedCoursePage from '../../components/course/AuthorizedCoursePage';
-import UnauthorizedCoursePage from '../../components/course/UnauthorizedCoursePage';
-import { useIsLoggedIn, useIsSessionLoading } from '../../hooks/authentication';
+import CourseContent from '../../components/CourseContent';
+import { useIsSessionLoading } from '../../hooks/authentication';
 import { CircularProgress } from '@material-ui/core';
 
 // export const getStaticProps = async ({ locale }: { locale: string }) => ({
@@ -33,7 +31,6 @@ const CoursePage: FC = () => {
   const { courseId } = router.query;
 
   const isSessionLoading = useIsSessionLoading();
-  const isLoggedIn = useIsLoggedIn();
 
   const id = parseInt(courseId as string, 10);
 
@@ -49,9 +46,11 @@ const CoursePage: FC = () => {
         />
       </Head>
       <Page>
-        {!isSessionLoading && isLoggedIn && <AuthorizedCoursePage id={id} />}
-        {!isSessionLoading && !isLoggedIn && <UnauthorizedCoursePage id={id} />}
-        {isSessionLoading && <CircularProgress />}
+        {isSessionLoading ? (
+          <CircularProgress />
+        ) : (
+          <CourseContent id={id} />
+        )}
       </Page>
     </>
   );

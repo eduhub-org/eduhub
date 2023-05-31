@@ -1,14 +1,11 @@
 import Head from 'next/head';
-import { FC  } from 'react';
+import { FC, Fragment } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
 import { Page } from '../components/Page';
-import { TileSlider } from '../components/course/TileSlider';
+import { TileSlider } from '../components/common/TileSlider';
 import { useQuery } from '@apollo/client';
-import {
-  useAuthedQuery,
-  useInstructorQuery,
-} from '../hooks/authedQuery';
+import { useAuthedQuery, useInstructorQuery } from '../hooks/authedQuery';
 import {
   useIsLoggedIn,
   useIsInstructor,
@@ -39,9 +36,8 @@ const Home: FC = () => {
     });
 
   if (adminCoursesError) {
-    console.log('got error in query for admin courses!', adminCoursesError);
+    // console.log('got error in query for admin courses!', adminCoursesError);
   }
-  console.log('Request Admin courses:', adminCourses);
   const myAdminCourses =
     adminCourses?.Course?.filter((course) =>
       course.CourseInstructors.find(
@@ -55,10 +51,10 @@ const Home: FC = () => {
       skip: !isLoggedIn,
     });
   if (enrolledCoursesError) {
-    console.log(
-      'got error in query for enrolled courses!',
-      enrolledCoursesError
-    );
+    // console.log(
+    //   'got error in query for enrolled courses!',
+    //   enrolledCoursesError
+    // );
   }
   const myCourses =
     enrolledCourses?.Course?.filter(
@@ -69,7 +65,7 @@ const Home: FC = () => {
   const { data: courses, error: coursesError } =
     useQuery<CourseList>(COURSE_LIST);
   if (coursesError) {
-    console.log('got error in query for listed courses!', coursesError);
+    // console.log('got error in query for listed courses!', coursesError);
   }
 
   const publishedCourses =
@@ -79,16 +75,16 @@ const Home: FC = () => {
 
   // Arrays with authenticatend and unauthenticated courses
   const coursesGroupsAuthenticated = [
-    { title: t('myAdminCourses'), courses: myAdminCourses, isManaged: true },
-    { title: t('myCourses'), courses: myCourses, isManaged: false },
+    { title: 'myAdminCourses', courses: myAdminCourses, isManaged: true },
+    { title: 'myCourses', courses: myCourses, isManaged: false },
   ];
   const { data: courseGroupOptions, error: courseGroupOptionError } =
     useAuthedQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS);
   if (courseGroupOptionError) {
-    console.log(
-      'got error in query for course group info!',
-      courseGroupOptionError
-    );
+    // console.log(
+    //   'got error in query for course group info!',
+    //   courseGroupOptionError
+    // );
   }
   const coursesGroups = [1, 2, 3, 4, 5].map((order) => {
     const courses = publishedCourses.filter((course) =>
@@ -109,7 +105,10 @@ const Home: FC = () => {
         <title>EduHub | opencampus.sh</title>
         <link rel="icon" href="/favicon.png" />
         <meta property="og:title" content="EduHub | opencampus.sh" />
-        <meta property="og:image" content="https://edu.opencampus.sh/images/meta-image.png" />
+        <meta
+          property="og:image"
+          content="https://edu.opencampus.sh/images/meta-image.png"
+        />
       </Head>
       <Page className="text-white">
         <div
@@ -132,7 +131,7 @@ const Home: FC = () => {
               <>
                 {coursesGroupsAuthenticated.map((group, index) =>
                   group.courses.length > 0 ? (
-                    <>
+                    <Fragment key={`coursesGroupsAuthenticated-${index}`}>
                       <h2
                         id={`sliderGroup${index + 1}`}
                         className="text-2xl font-semibold text-left ml-3 md:ml-0"
@@ -145,7 +144,7 @@ const Home: FC = () => {
                           isManage={group.isManaged}
                         />
                       </div>
-                    </>
+                    </Fragment>
                   ) : null
                 )}
               </>
@@ -153,7 +152,7 @@ const Home: FC = () => {
 
             {coursesGroups.map((group, index) =>
               group.courses.length > 0 ? (
-                <>
+                <Fragment key={`coursesGroups-${index}`}>
                   <h2
                     id={`sliderGroup${index + 3}`}
                     className="text-2xl font-semibold text-left ml-3 md:ml-0"
@@ -163,7 +162,7 @@ const Home: FC = () => {
                   <div className="mt-2 mb-12">
                     <TileSlider courses={group.courses} isManage={false} />
                   </div>
-                </>
+                </Fragment>
               ) : null
             )}
             {/* <OnlyLoggedOut>
