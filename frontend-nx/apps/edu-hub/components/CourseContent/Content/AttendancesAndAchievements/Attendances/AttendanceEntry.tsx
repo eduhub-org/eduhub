@@ -11,13 +11,17 @@ interface IProps {
 const { NO_INFO, ATTENDED, MISSED } = AttendanceStatus_enum;
 
 export const AttendanceEntry: FC<IProps> = ({ session }) => {
-  const { lang } = useTranslation();
+  const { lang } = useTranslation();  
 
-  const lastAttendanceRecord = session.Attendances.reduce((prev, current) => {
-    return prev.updated_at > current.updated_at ? prev : current;
-  });
-  
-  const status = lastAttendanceRecord ? lastAttendanceRecord.status : NO_INFO;  const bgColor =
+  const lastAttendanceRecord = session.Attendances.length > 0
+  ? session.Attendances.reduce((prev, current) => {
+      return prev.updated_at > current.updated_at ? prev : current;
+    }, { updated_at: 0, status: NO_INFO })
+  : { updated_at: 0, status: NO_INFO };
+
+  const status = lastAttendanceRecord.status;
+
+  const bgColor =
     status === NO_INFO
       ? 'bg-gray-200'
       : status === ATTENDED
@@ -30,8 +34,9 @@ export const AttendanceEntry: FC<IProps> = ({ session }) => {
 
   return (
     <span
-      className={`text-sm ${fontWeight} ${textColor} text-center px-4 py-3 ${bgColor} rounded`}
-    >
+      className={`text-sm bg-gray-200 text-center px-4 py-3 rounded`}
+      // className={`text-sm ${fontWeight} ${textColor} text-center px-4 py-3 ${bgColor} rounded`}
+      >
       {session.startDateTime.toLocaleDateString(lang, {
         year: 'numeric',
         month: '2-digit',
