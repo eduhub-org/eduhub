@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { FC } from 'react';
 import { Page } from '../../components/Page';
 import { useIsLoggedIn } from '../../hooks/authentication';
-import ProfileOverview from '../../components/profile/ProfileOverview';
+import ProfileOverview from '../../components/ProfileContent/ProfileOverview';
 
 // export const getStaticProps = async ({ locale }: { locale: string }) => ({
 //   props: {

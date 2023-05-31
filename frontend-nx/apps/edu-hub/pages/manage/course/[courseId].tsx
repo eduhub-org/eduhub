@@ -3,7 +3,7 @@ import { FC } from 'react';
 import { Page } from '../../../components/Page';
 import { useRouter } from 'next/router';
 import { useIsInstructor } from '../../../hooks/authentication';
-import { AuthorizedManageCourse } from '../../../components/manageCourse/AuthorizedManageCourse';
+import { ManageCourseContent } from '../../../components/ManageCourseContent';
 
 // export const getStaticProps = async ({ locale }: { locale: string }) => ({
 //   props: {
@@ -38,7 +38,7 @@ const ManageCoursePage: FC = () => {
       </Head>
       <Page>
         {isInstructor ? (
-          <AuthorizedManageCourse courseId={Number(courseId)} />
+          <ManageCourseContent courseId={Number(courseId)} />
         ) : (
           <div>Waiting for authentication!</div>
         )}

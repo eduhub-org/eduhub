@@ -35,7 +35,7 @@ import { UserForSelection1_User } from '../../queries/__generated__/UserForSelec
 import { SelectUserDialog } from '../common/dialogs/SelectUserDialog';
 import EhTagStingId from '../common/EhTagStingId';
 import TagWithTwoText from '../common/TagWithTwoText';
-import CourseListDialog from '../courses/CourseListDialog';
+import CourseListDialog from '../ManageCoursesContent/CourseListDialog';
 import { UploadFile, parseFileUploadEvent } from '../../helpers/filehandling';
 import _ from 'lodash';
 import { Button } from '../common/Button';

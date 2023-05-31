@@ -3,7 +3,7 @@ import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
 import { Page } from '../components/Page';
-import { TileSlider } from '../components/course/TileSlider';
+import { TileSlider } from '../components/common/TileSlider';
 import { useQuery } from '@apollo/client';
 import { useAuthedQuery, useInstructorQuery } from '../hooks/authedQuery';
 import {
