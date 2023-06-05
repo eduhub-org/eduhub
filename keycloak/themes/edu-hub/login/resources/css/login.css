@@ -700,8 +700,8 @@ ul#kc-totp-supported-apps {
 @media (max-width: 767px) {
     .login-pf-page .card-pf {
         max-width: none;
-        margin-left: 0;
-        margin-right: 0;
+        margin-left: 1em;
+        margin-right: 1em;
         padding-top: 0;
         border-top: 0;
         box-shadow: 0 0;
