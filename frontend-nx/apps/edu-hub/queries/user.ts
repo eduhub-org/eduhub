@@ -92,6 +92,9 @@ export const USERS_BY_LAST_NAME = gql`
       firstName
       lastName
       email
+      matriculationNumber
+      university
+      employment
       CourseEnrollments {
         id
         courseId
