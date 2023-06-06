@@ -26,7 +26,7 @@ import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import EhAddButton from '../common/EhAddButton';
 import EhTag from '../common/EhTag';
 import TagWithTwoText from '../common/TagWithTwoText';
-import { ProgramsMenubar } from '../program/ProgramsMenubar';
+import { ProgramsMenubar } from '../ProgramsMenubar';
 import AchievementsHelper, {
   AchievementContext,
   IPropsDashBoard,

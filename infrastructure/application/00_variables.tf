@@ -118,6 +118,12 @@ variable "hasura_db_pw" {
   type        = string
 }
 
+variable "enable_db_backup" {
+  description = "Enable or disable database backup"
+  type        = bool
+  default     = true
+}
+
 # keycloak
 variable "commit_sha" {
   description = "SHA of the current git commit (used as tag for all docker images)"

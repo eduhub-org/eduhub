@@ -104,8 +104,11 @@ const solveMatching = (
 
   const seenClasses = new Set<number>();
 
+  const seenDays = new Set<number>();
+
   for (const request of requests) {
     for (const rday of request.days) {
+      seenDays.add(rday);
       const vname = "c" + request.classId + "o" + request.offerId + "d" + rday;
       variables[vname] = {
         points: 1,
@@ -155,8 +158,8 @@ const solveMatching = (
       constraints["c" + cid + "o" + offer.id] = { max: 1 };
 
       // constraint for each class: only one offer assigned per day
-      for (let i = 1; i <= 5; i++) {
-        constraints["c" + cid + "d" + i] = { max: 1 };
+      for (const dIndex of seenDays) {
+        constraints["c" + cid + "d" + dIndex] = { max: 1 };
       }
     }
   }
@@ -305,7 +308,7 @@ export const MatchingCreation: FC = () => {
       days: nd.possibleDays,
     }));
 
-    console.log("Version 2022-09-08 12:50");
+    console.log("Version 2023-06-06 11:00");
     console.log("build solver input data", offers, requests);
 
     const forcedAssignments: AssignmentResult[] = forcedAssignmentsTxt

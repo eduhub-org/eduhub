@@ -25,7 +25,8 @@ def checkAttendance(payload):
 
     # test if session is null
     if len(sessions) == 0:
-        return logging.info("No finished sessions without attendance check found")
+        logging.info("No finished sessions without attendance check found")
+        return "No finished sessions without attendance check found"
 
     with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'display.width', None):
         logging.debug("########## Full DataFrame:\n%s", sessions)

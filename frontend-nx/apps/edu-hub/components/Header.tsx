@@ -13,6 +13,7 @@ import { Menu } from './Menu';
 import { RegisterButton } from './RegisterButton';
 import { Avatar, ClientOnly } from '@opencampus/shared-components';
 import { OnlyDesktop } from '@opencampus/shared-components';
+import useTranslation from 'next-translate/useTranslation';
 
 export const Header: FC = () => {
   const isLoggedIn = useIsLoggedIn();
@@ -26,16 +27,35 @@ export const Header: FC = () => {
     setMenuVisible(true);
   }, []);
 
+const {lang} = useTranslation();
+const isEnglish = lang === 'en';
+
+const changeLanguage = (lng: string) => {
+  const currentUrl = window.location.href;
+  const urlParts = currentUrl.split('/');
+  const hasLanguageCode = urlParts.length > 3 && urlParts[3].length === 2;
+
+  let newUrl;
+  if (hasLanguageCode) {
+    urlParts[3] = lng;
+    newUrl = urlParts.join('/');
+  } else {
+    newUrl = `/${lng}${window.location.pathname}`;
+  }
+
+  window.location.href = newUrl;
+};
+
   return (
     <header className="w-full absolute top-0 left-0 bg-edu-bg-gray bg-opacity-50">
       <div className="flex py-4 px-3 md:px-16 max-w-screen-xl w-full mx-auto justify-between">
         <div className="flex-grow w-full items-center">
-          <Link href="/">
+          <Link href={`/`}>
             <div className="flex cursor-pointer">
               <div className="flex items-center">
                 <Image
                   src={ocLogo}
-                  alt="Edu Hub logo"
+                  alt="EduHub logo"
                   width={34}
                   height={34}
                   priority
@@ -53,7 +73,21 @@ export const Header: FC = () => {
             </div>
           </Link>
         </div>
-
+        <div className="mr-2 text-white flex items-center"> 
+        <button
+              onClick={() => changeLanguage('en')}
+              className={`mr-2 ${isEnglish ? 'font-bold' : 'font-light'}`}
+            >
+              EN
+            </button>
+            |
+            <button
+              onClick={() => changeLanguage('de')}
+              className={`mr-6 ml-2 ${isEnglish ? 'font-light' : 'font-bold'}`}
+            >
+              DE
+            </button>
+        </div>
         <ClientOnly>
           <div className="flex-shrink ">
             {isLoggedIn ? (

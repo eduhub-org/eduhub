@@ -766,6 +766,7 @@ export enum Session_update_column {
   description = "description",
   endDateTime = "endDateTime",
   id = "id",
+  questionaire_sent = "questionaire_sent",
   startDateTime = "startDateTime",
   title = "title",
   updated_at = "updated_at",
@@ -4824,6 +4825,7 @@ export interface Session_bool_exp {
   description?: String_comparison_exp | null;
   endDateTime?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  questionaire_sent?: Boolean_comparison_exp | null;
   startDateTime?: timestamptz_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -4843,6 +4845,7 @@ export interface Session_insert_input {
   description?: string | null;
   endDateTime?: any | null;
   id?: number | null;
+  questionaire_sent?: boolean | null;
   startDateTime?: any | null;
   title?: string | null;
   updated_at?: any | null;
