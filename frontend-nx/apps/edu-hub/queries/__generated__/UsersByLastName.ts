@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { User_bool_exp, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
+import { User_bool_exp, University_enum, Employment_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: UsersByLastName
@@ -68,6 +68,18 @@ export interface UsersByLastName_User {
    * The user's email address
    */
   email: string;
+  /**
+   * The user's matriculation number at her/his university
+   */
+  matriculationNumber: string | null;
+  /**
+   * The university the user is attending or workin at (only provided if he is a student or working in academia)
+   */
+  university: University_enum | null;
+  /**
+   * The user's current employment status
+   */
+  employment: Employment_enum | null;
   /**
    * An array relationship
    */

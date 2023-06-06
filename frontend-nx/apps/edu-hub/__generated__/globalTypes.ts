@@ -15,17 +15,6 @@ export enum AchievementOptionCourse_constraint {
 }
 
 /**
- * select columns of table "AchievementOptionCourse"
- */
-export enum AchievementOptionCourse_select_column {
-  achievementOptionId = "achievementOptionId",
-  courseId = "courseId",
-  created_at = "created_at",
-  id = "id",
-  updated_at = "updated_at",
-}
-
-/**
  * update columns of table "AchievementOptionCourse"
  */
 export enum AchievementOptionCourse_update_column {
@@ -44,17 +33,6 @@ export enum AchievementOptionMentor_constraint {
 }
 
 /**
- * select columns of table "AchievementOptionMentor"
- */
-export enum AchievementOptionMentor_select_column {
-  achievementOptionId = "achievementOptionId",
-  created_at = "created_at",
-  id = "id",
-  updated_at = "updated_at",
-  userId = "userId",
-}
-
-/**
  * update columns of table "AchievementOptionMentor"
  */
 export enum AchievementOptionMentor_update_column {
@@ -70,36 +48,6 @@ export enum AchievementOptionMentor_update_column {
  */
 export enum AchievementOption_constraint {
   AchievementOption_pkey = "AchievementOption_pkey",
-}
-
-/**
- * select columns of table "AchievementOption"
- */
-export enum AchievementOption_select_column {
-  created_at = "created_at",
-  csvTemplateUrl = "csvTemplateUrl",
-  description = "description",
-  documentationTemplateUrl = "documentationTemplateUrl",
-  evaluationScriptUrl = "evaluationScriptUrl",
-  id = "id",
-  recordType = "recordType",
-  showScoreAuthors = "showScoreAuthors",
-  title = "title",
-  updated_at = "updated_at",
-}
-
-/**
- * select "AchievementOption_aggregate_bool_exp_bool_and_arguments_columns" columns of table "AchievementOption"
- */
-export enum AchievementOption_select_column_AchievementOption_aggregate_bool_exp_bool_and_arguments_columns {
-  showScoreAuthors = "showScoreAuthors",
-}
-
-/**
- * select "AchievementOption_aggregate_bool_exp_bool_or_arguments_columns" columns of table "AchievementOption"
- */
-export enum AchievementOption_select_column_AchievementOption_aggregate_bool_exp_bool_or_arguments_columns {
-  showScoreAuthors = "showScoreAuthors",
 }
 
 /**
@@ -123,17 +71,6 @@ export enum AchievementOption_update_column {
  */
 export enum AchievementRecordAuthor_constraint {
   AchievementRecordAuthor_pkey = "AchievementRecordAuthor_pkey",
-}
-
-/**
- * select columns of table "AchievementRecordAuthor"
- */
-export enum AchievementRecordAuthor_select_column {
-  achievementRecordId = "achievementRecordId",
-  created_at = "created_at",
-  id = "id",
-  updated_at = "updated_at",
-  userId = "userId",
 }
 
 /**
@@ -196,25 +133,6 @@ export enum AchievementRecord_constraint {
 }
 
 /**
- * select columns of table "AchievementRecord"
- */
-export enum AchievementRecord_select_column {
-  achievementOptionId = "achievementOptionId",
-  courseId = "courseId",
-  coverImageUrl = "coverImageUrl",
-  created_at = "created_at",
-  csvResults = "csvResults",
-  description = "description",
-  documentationUrl = "documentationUrl",
-  evaluationScriptUrl = "evaluationScriptUrl",
-  id = "id",
-  rating = "rating",
-  score = "score",
-  updated_at = "updated_at",
-  uploadUserId = "uploadUserId",
-}
-
-/**
  * update columns of table "AchievementRecord"
  */
 export enum AchievementRecord_update_column {
@@ -238,16 +156,6 @@ export enum AchievementRecord_update_column {
  */
 export enum Admin_constraint {
   Admin_pkey = "Admin_pkey",
-}
-
-/**
- * select columns of table "Admin"
- */
-export enum Admin_select_column {
-  created_at = "created_at",
-  id = "id",
-  updated_at = "updated_at",
-  userId = "userId",
 }
 
 /**
@@ -304,24 +212,6 @@ export enum Attendance_constraint {
 }
 
 /**
- * select columns of table "Attendance"
- */
-export enum Attendance_select_column {
-  created_at = "created_at",
-  endDateTime = "endDateTime",
-  id = "id",
-  interruptionCount = "interruptionCount",
-  recordedName = "recordedName",
-  sessionId = "sessionId",
-  source = "source",
-  startDateTime = "startDateTime",
-  status = "status",
-  totalAttendanceTime = "totalAttendanceTime",
-  updated_at = "updated_at",
-  userId = "userId",
-}
-
-/**
  * update columns of table "Attendance"
  */
 export enum Attendance_update_column {
@@ -372,23 +262,6 @@ export enum CourseEnrollment_constraint {
 }
 
 /**
- * select columns of table "CourseEnrollment"
- */
-export enum CourseEnrollment_select_column {
-  achievementCertificateURL = "achievementCertificateURL",
-  attendanceCertificateURL = "attendanceCertificateURL",
-  courseId = "courseId",
-  created_at = "created_at",
-  id = "id",
-  invitationExpirationDate = "invitationExpirationDate",
-  motivationLetter = "motivationLetter",
-  motivationRating = "motivationRating",
-  status = "status",
-  updated_at = "updated_at",
-  userId = "userId",
-}
-
-/**
  * update columns of table "CourseEnrollment"
  */
 export enum CourseEnrollment_update_column {
@@ -432,17 +305,6 @@ export enum CourseGroup_constraint {
 }
 
 /**
- * select columns of table "CourseGroup"
- */
-export enum CourseGroup_select_column {
-  courseId = "courseId",
-  created_at = "created_at",
-  groupOptionId = "groupOptionId",
-  id = "id",
-  updated_at = "updated_at",
-}
-
-/**
  * update columns of table "CourseGroup"
  */
 export enum CourseGroup_update_column {
@@ -461,17 +323,6 @@ export enum CourseInstructor_constraint {
 }
 
 /**
- * select columns of table "CourseInstructor"
- */
-export enum CourseInstructor_select_column {
-  courseId = "courseId",
-  created_at = "created_at",
-  expertId = "expertId",
-  id = "id",
-  updated_at = "updated_at",
-}
-
-/**
  * update columns of table "CourseInstructor"
  */
 export enum CourseInstructor_update_column {
@@ -487,18 +338,6 @@ export enum CourseInstructor_update_column {
  */
 export enum CourseLocation_constraint {
   CourseAddress_pkey = "CourseAddress_pkey",
-}
-
-/**
- * select columns of table "CourseLocation"
- */
-export enum CourseLocation_select_column {
-  courseId = "courseId",
-  created_at = "created_at",
-  defaultSessionAddress = "defaultSessionAddress",
-  id = "id",
-  locationOption = "locationOption",
-  updated_at = "updated_at",
 }
 
 /**
@@ -541,56 +380,6 @@ export enum CourseStatus_update_column {
  */
 export enum Course_constraint {
   Course_pkey = "Course_pkey",
-}
-
-/**
- * select columns of table "Course"
- */
-export enum Course_select_column {
-  achievementCertificatePossible = "achievementCertificatePossible",
-  applicationEnd = "applicationEnd",
-  attendanceCertificatePossible = "attendanceCertificatePossible",
-  chatLink = "chatLink",
-  contentDescriptionField1 = "contentDescriptionField1",
-  contentDescriptionField2 = "contentDescriptionField2",
-  cost = "cost",
-  coverImage = "coverImage",
-  created_at = "created_at",
-  ects = "ects",
-  endTime = "endTime",
-  headingDescriptionField1 = "headingDescriptionField1",
-  headingDescriptionField2 = "headingDescriptionField2",
-  id = "id",
-  language = "language",
-  learningGoals = "learningGoals",
-  maxMissedSessions = "maxMissedSessions",
-  maxParticipants = "maxParticipants",
-  programId = "programId",
-  published = "published",
-  startTime = "startTime",
-  status = "status",
-  tagline = "tagline",
-  title = "title",
-  updated_at = "updated_at",
-  weekDay = "weekDay",
-}
-
-/**
- * select "Course_aggregate_bool_exp_bool_and_arguments_columns" columns of table "Course"
- */
-export enum Course_select_column_Course_aggregate_bool_exp_bool_and_arguments_columns {
-  achievementCertificatePossible = "achievementCertificatePossible",
-  attendanceCertificatePossible = "attendanceCertificatePossible",
-  published = "published",
-}
-
-/**
- * select "Course_aggregate_bool_exp_bool_or_arguments_columns" columns of table "Course"
- */
-export enum Course_select_column_Course_aggregate_bool_exp_bool_or_arguments_columns {
-  achievementCertificatePossible = "achievementCertificatePossible",
-  attendanceCertificatePossible = "attendanceCertificatePossible",
-  published = "published",
 }
 
 /**
@@ -655,17 +444,6 @@ export enum Employment_update_column {
  */
 export enum Expert_constraint {
   Instructor_pkey = "Instructor_pkey",
-}
-
-/**
- * select columns of table "Expert"
- */
-export enum Expert_select_column {
-  created_at = "created_at",
-  description = "description",
-  id = "id",
-  updated_at = "updated_at",
-  userId = "userId",
 }
 
 /**
@@ -775,30 +553,6 @@ export enum RentAScientistConfig_constraint {
 }
 
 /**
- * select columns of table "rentAScientist.RentAScientistConfig"
- */
-export enum RentAScientistConfig_select_column {
-  id = "id",
-  mailFrom = "mailFrom",
-  program_id = "program_id",
-  test_operation = "test_operation",
-}
-
-/**
- * select "RentAScientistConfig_aggregate_bool_exp_bool_and_arguments_columns" columns of table "rentAScientist.RentAScientistConfig"
- */
-export enum RentAScientistConfig_select_column_RentAScientistConfig_aggregate_bool_exp_bool_and_arguments_columns {
-  test_operation = "test_operation",
-}
-
-/**
- * select "RentAScientistConfig_aggregate_bool_exp_bool_or_arguments_columns" columns of table "rentAScientist.RentAScientistConfig"
- */
-export enum RentAScientistConfig_select_column_RentAScientistConfig_aggregate_bool_exp_bool_or_arguments_columns {
-  test_operation = "test_operation",
-}
-
-/**
  * update columns of table "rentAScientist.RentAScientistConfig"
  */
 export enum RentAScientistConfig_update_column {
@@ -813,19 +567,6 @@ export enum RentAScientistConfig_update_column {
  */
 export enum SchoolClassRequest_constraint {
   SchoolClassRequest_pkey = "SchoolClassRequest_pkey",
-}
-
-/**
- * select columns of table "rentAScientist.SchoolClassRequest"
- */
-export enum SchoolClassRequest_select_column {
-  assigned_day = "assigned_day",
-  classId = "classId",
-  commentGeneral = "commentGeneral",
-  commentTime = "commentTime",
-  id = "id",
-  offerId = "offerId",
-  possibleDays = "possibleDays",
 }
 
 /**
@@ -846,19 +587,6 @@ export enum SchoolClassRequest_update_column {
  */
 export enum SchoolClass_constraint {
   SchoolClass_pkey = "SchoolClass_pkey",
-}
-
-/**
- * select columns of table "rentAScientist.SchoolClass"
- */
-export enum SchoolClass_select_column {
-  contact = "contact",
-  grade = "grade",
-  id = "id",
-  name = "name",
-  schoolId = "schoolId",
-  studensCount = "studensCount",
-  teacherId = "teacherId",
 }
 
 /**
@@ -902,14 +630,6 @@ export enum ScientistOfferRelation_constraint {
 }
 
 /**
- * select columns of table "rentAScientist.ScientistOfferRelation"
- */
-export enum ScientistOfferRelation_select_column {
-  offerId = "offerId",
-  scientistId = "scientistId",
-}
-
-/**
  * update columns of table "rentAScientist.ScientistOfferRelation"
  */
 export enum ScientistOfferRelation_update_column {
@@ -922,36 +642,6 @@ export enum ScientistOfferRelation_update_column {
  */
 export enum ScientistOffer_constraint {
   ScientistOffer_pkey = "ScientistOffer_pkey",
-}
-
-/**
- * select columns of table "rentAScientist.ScientistOffer"
- */
-export enum ScientistOffer_select_column {
-  categories = "categories",
-  classPreparation = "classPreparation",
-  contactEmail = "contactEmail",
-  contactName = "contactName",
-  contactPhone = "contactPhone",
-  description = "description",
-  duration = "duration",
-  equipmentRequired = "equipmentRequired",
-  extraComment = "extraComment",
-  format = "format",
-  id = "id",
-  institutionLogo = "institutionLogo",
-  institutionName = "institutionName",
-  maxDeployments = "maxDeployments",
-  maximumGrade = "maximumGrade",
-  minimumGrade = "minimumGrade",
-  possibleDays = "possibleDays",
-  possibleLocations = "possibleLocations",
-  programId = "programId",
-  researchSubject = "researchSubject",
-  roomRequirements = "roomRequirements",
-  subjectComment = "subjectComment",
-  timeWindow = "timeWindow",
-  title = "title",
 }
 
 /**
@@ -1030,18 +720,6 @@ export enum SessionAddress_constraint {
 }
 
 /**
- * select columns of table "SessionAddress"
- */
-export enum SessionAddress_select_column {
-  address = "address",
-  created_at = "created_at",
-  id = "id",
-  sessionId = "sessionId",
-  type = "type",
-  updated_at = "updated_at",
-}
-
-/**
  * update columns of table "SessionAddress"
  */
 export enum SessionAddress_update_column {
@@ -1061,17 +739,6 @@ export enum SessionSpeaker_constraint {
 }
 
 /**
- * select columns of table "SessionSpeaker"
- */
-export enum SessionSpeaker_select_column {
-  created_at = "created_at",
-  expertId = "expertId",
-  id = "id",
-  sessionId = "sessionId",
-  updated_at = "updated_at",
-}
-
-/**
  * update columns of table "SessionSpeaker"
  */
 export enum SessionSpeaker_update_column {
@@ -1087,36 +754,6 @@ export enum SessionSpeaker_update_column {
  */
 export enum Session_constraint {
   Date_pkey = "Date_pkey",
-}
-
-/**
- * select columns of table "Session"
- */
-export enum Session_select_column {
-  attendanceData = "attendanceData",
-  courseId = "courseId",
-  created_at = "created_at",
-  description = "description",
-  endDateTime = "endDateTime",
-  id = "id",
-  questionaire_sent = "questionaire_sent",
-  startDateTime = "startDateTime",
-  title = "title",
-  updated_at = "updated_at",
-}
-
-/**
- * select "Session_aggregate_bool_exp_bool_and_arguments_columns" columns of table "Session"
- */
-export enum Session_select_column_Session_aggregate_bool_exp_bool_and_arguments_columns {
-  questionaire_sent = "questionaire_sent",
-}
-
-/**
- * select "Session_aggregate_bool_exp_bool_or_arguments_columns" columns of table "Session"
- */
-export enum Session_select_column_Session_aggregate_bool_exp_bool_or_arguments_columns {
-  questionaire_sent = "questionaire_sent",
 }
 
 /**
@@ -1188,40 +825,6 @@ export enum User_constraint {
 }
 
 /**
- * select columns of table "User"
- */
-export enum User_select_column {
-  anonymousId = "anonymousId",
-  created_at = "created_at",
-  email = "email",
-  employment = "employment",
-  externalProfile = "externalProfile",
-  firstName = "firstName",
-  id = "id",
-  lastName = "lastName",
-  matriculationNumber = "matriculationNumber",
-  newsletterRegistration = "newsletterRegistration",
-  otherUniversity = "otherUniversity",
-  picture = "picture",
-  university = "university",
-  updated_at = "updated_at",
-}
-
-/**
- * select "User_aggregate_bool_exp_bool_and_arguments_columns" columns of table "User"
- */
-export enum User_select_column_User_aggregate_bool_exp_bool_and_arguments_columns {
-  newsletterRegistration = "newsletterRegistration",
-}
-
-/**
- * select "User_aggregate_bool_exp_bool_or_arguments_columns" columns of table "User"
- */
-export enum User_select_column_User_aggregate_bool_exp_bool_or_arguments_columns {
-  newsletterRegistration = "newsletterRegistration",
-}
-
-/**
  * update columns of table "User"
  */
 export enum User_update_column {
@@ -1277,17 +880,6 @@ export enum order_by {
   desc = "desc",
   desc_nulls_first = "desc_nulls_first",
   desc_nulls_last = "desc_nulls_last",
-}
-
-export interface AchievementOptionCourse_aggregate_bool_exp {
-  count?: AchievementOptionCourse_aggregate_bool_exp_count | null;
-}
-
-export interface AchievementOptionCourse_aggregate_bool_exp_count {
-  arguments?: AchievementOptionCourse_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: AchievementOptionCourse_bool_exp | null;
-  predicate: Int_comparison_exp;
 }
 
 /**
@@ -1471,17 +1063,6 @@ export interface AchievementOptionCourse_variance_order_by {
   id?: order_by | null;
 }
 
-export interface AchievementOptionMentor_aggregate_bool_exp {
-  count?: AchievementOptionMentor_aggregate_bool_exp_count | null;
-}
-
-export interface AchievementOptionMentor_aggregate_bool_exp_count {
-  arguments?: AchievementOptionMentor_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: AchievementOptionMentor_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
 /**
  * order by aggregate values of table "AchievementOptionMentor"
  */
@@ -1642,33 +1223,6 @@ export interface AchievementOptionMentor_variance_order_by {
   id?: order_by | null;
 }
 
-export interface AchievementOption_aggregate_bool_exp {
-  bool_and?: AchievementOption_aggregate_bool_exp_bool_and | null;
-  bool_or?: AchievementOption_aggregate_bool_exp_bool_or | null;
-  count?: AchievementOption_aggregate_bool_exp_count | null;
-}
-
-export interface AchievementOption_aggregate_bool_exp_bool_and {
-  arguments: AchievementOption_select_column_AchievementOption_aggregate_bool_exp_bool_and_arguments_columns;
-  distinct?: boolean | null;
-  filter?: AchievementOption_bool_exp | null;
-  predicate: Boolean_comparison_exp;
-}
-
-export interface AchievementOption_aggregate_bool_exp_bool_or {
-  arguments: AchievementOption_select_column_AchievementOption_aggregate_bool_exp_bool_or_arguments_columns;
-  distinct?: boolean | null;
-  filter?: AchievementOption_bool_exp | null;
-  predicate: Boolean_comparison_exp;
-}
-
-export interface AchievementOption_aggregate_bool_exp_count {
-  arguments?: AchievementOption_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: AchievementOption_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
 /**
  * order by aggregate values of table "AchievementOption"
  */
@@ -1706,12 +1260,9 @@ export interface AchievementOption_avg_order_by {
  */
 export interface AchievementOption_bool_exp {
   AchievementOptionCourses?: AchievementOptionCourse_bool_exp | null;
-  AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_bool_exp | null;
   AchievementOptionMentors?: AchievementOptionMentor_bool_exp | null;
-  AchievementOptionMentors_aggregate?: AchievementOptionMentor_aggregate_bool_exp | null;
   AchievementRecordType?: AchievementRecordType_bool_exp | null;
   AchievementRecords?: AchievementRecord_bool_exp | null;
-  AchievementRecords_aggregate?: AchievementRecord_aggregate_bool_exp | null;
   _and?: AchievementOption_bool_exp[] | null;
   _not?: AchievementOption_bool_exp | null;
   _or?: AchievementOption_bool_exp[] | null;
@@ -1875,17 +1426,6 @@ export interface AchievementOption_var_samp_order_by {
  */
 export interface AchievementOption_variance_order_by {
   id?: order_by | null;
-}
-
-export interface AchievementRecordAuthor_aggregate_bool_exp {
-  count?: AchievementRecordAuthor_aggregate_bool_exp_count | null;
-}
-
-export interface AchievementRecordAuthor_aggregate_bool_exp_count {
-  arguments?: AchievementRecordAuthor_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: AchievementRecordAuthor_bool_exp | null;
-  predicate: Int_comparison_exp;
 }
 
 /**
@@ -2055,7 +1595,6 @@ export interface AchievementRecordAuthor_variance_order_by {
  */
 export interface AchievementRecordRating_bool_exp {
   AchievementRecords?: AchievementRecord_bool_exp | null;
-  AchievementRecords_aggregate?: AchievementRecord_aggregate_bool_exp | null;
   _and?: AchievementRecordRating_bool_exp[] | null;
   _not?: AchievementRecordRating_bool_exp | null;
   _or?: AchievementRecordRating_bool_exp[] | null;
@@ -2114,7 +1653,6 @@ export interface AchievementRecordRating_order_by {
  */
 export interface AchievementRecordType_bool_exp {
   AchievementOptions?: AchievementOption_bool_exp | null;
-  AchievementOptions_aggregate?: AchievementOption_aggregate_bool_exp | null;
   _and?: AchievementRecordType_bool_exp[] | null;
   _not?: AchievementRecordType_bool_exp | null;
   _or?: AchievementRecordType_bool_exp[] | null;
@@ -2168,17 +1706,6 @@ export interface AchievementRecordType_order_by {
   value?: order_by | null;
 }
 
-export interface AchievementRecord_aggregate_bool_exp {
-  count?: AchievementRecord_aggregate_bool_exp_count | null;
-}
-
-export interface AchievementRecord_aggregate_bool_exp_count {
-  arguments?: AchievementRecord_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: AchievementRecord_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
 /**
  * order by aggregate values of table "AchievementRecord"
  */
@@ -2220,7 +1747,6 @@ export interface AchievementRecord_avg_order_by {
 export interface AchievementRecord_bool_exp {
   AchievementOption?: AchievementOption_bool_exp | null;
   AchievementRecordAuthors?: AchievementRecordAuthor_bool_exp | null;
-  AchievementRecordAuthors_aggregate?: AchievementRecordAuthor_aggregate_bool_exp | null;
   AchievementRecordRating?: AchievementRecordRating_bool_exp | null;
   _and?: AchievementRecord_bool_exp[] | null;
   _not?: AchievementRecord_bool_exp | null;
@@ -2426,17 +1952,6 @@ export interface AchievementRecord_variance_order_by {
   score?: order_by | null;
 }
 
-export interface Admin_aggregate_bool_exp {
-  count?: Admin_aggregate_bool_exp_count | null;
-}
-
-export interface Admin_aggregate_bool_exp_count {
-  arguments?: Admin_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: Admin_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
 /**
  * order by aggregate values of table "Admin"
  */
@@ -2577,7 +2092,6 @@ export interface Admin_variance_order_by {
  */
 export interface AttendanceSource_bool_exp {
   Attendances?: Attendance_bool_exp | null;
-  Attendances_aggregate?: Attendance_aggregate_bool_exp | null;
   _and?: AttendanceSource_bool_exp[] | null;
   _not?: AttendanceSource_bool_exp | null;
   _or?: AttendanceSource_bool_exp[] | null;
@@ -2616,7 +2130,6 @@ export interface AttendanceSource_on_conflict {
  */
 export interface AttendanceStatus_bool_exp {
   Attendances?: Attendance_bool_exp | null;
-  Attendances_aggregate?: Attendance_aggregate_bool_exp | null;
   _and?: AttendanceStatus_bool_exp[] | null;
   _not?: AttendanceStatus_bool_exp | null;
   _or?: AttendanceStatus_bool_exp[] | null;
@@ -2659,17 +2172,6 @@ export interface AttendanceStatus_on_conflict {
   constraint: AttendanceStatus_constraint;
   update_columns: AttendanceStatus_update_column[];
   where?: AttendanceStatus_bool_exp | null;
-}
-
-export interface Attendance_aggregate_bool_exp {
-  count?: Attendance_aggregate_bool_exp_count | null;
-}
-
-export interface Attendance_aggregate_bool_exp_count {
-  arguments?: Attendance_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: Attendance_bool_exp | null;
-  predicate: Int_comparison_exp;
 }
 
 /**
@@ -2905,7 +2407,6 @@ export interface Boolean_comparison_exp {
  */
 export interface CourseEnrollmentStatus_bool_exp {
   CourseEnrollments?: CourseEnrollment_bool_exp | null;
-  CourseEnrollments_aggregate?: CourseEnrollment_aggregate_bool_exp | null;
   _and?: CourseEnrollmentStatus_bool_exp[] | null;
   _not?: CourseEnrollmentStatus_bool_exp | null;
   _or?: CourseEnrollmentStatus_bool_exp[] | null;
@@ -2948,17 +2449,6 @@ export interface CourseEnrollmentStatus_on_conflict {
   constraint: CourseEnrollmentStatus_constraint;
   update_columns: CourseEnrollmentStatus_update_column[];
   where?: CourseEnrollmentStatus_bool_exp | null;
-}
-
-export interface CourseEnrollment_aggregate_bool_exp {
-  count?: CourseEnrollment_aggregate_bool_exp_count | null;
-}
-
-export interface CourseEnrollment_aggregate_bool_exp_count {
-  arguments?: CourseEnrollment_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: CourseEnrollment_bool_exp | null;
-  predicate: Int_comparison_exp;
 }
 
 /**
@@ -3139,7 +2629,6 @@ export interface CourseEnrollment_variance_order_by {
  */
 export interface CourseGroupOption_bool_exp {
   CourseGroups?: CourseGroup_bool_exp | null;
-  CourseGroups_aggregate?: CourseGroup_aggregate_bool_exp | null;
   _and?: CourseGroupOption_bool_exp[] | null;
   _not?: CourseGroupOption_bool_exp | null;
   _or?: CourseGroupOption_bool_exp[] | null;
@@ -3177,17 +2666,6 @@ export interface CourseGroupOption_on_conflict {
   constraint: CourseGroupOption_constraint;
   update_columns: CourseGroupOption_update_column[];
   where?: CourseGroupOption_bool_exp | null;
-}
-
-export interface CourseGroup_aggregate_bool_exp {
-  count?: CourseGroup_aggregate_bool_exp_count | null;
-}
-
-export interface CourseGroup_aggregate_bool_exp_count {
-  arguments?: CourseGroup_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: CourseGroup_bool_exp | null;
-  predicate: Int_comparison_exp;
 }
 
 /**
@@ -3347,17 +2825,6 @@ export interface CourseGroup_variance_order_by {
   id?: order_by | null;
 }
 
-export interface CourseInstructor_aggregate_bool_exp {
-  count?: CourseInstructor_aggregate_bool_exp_count | null;
-}
-
-export interface CourseInstructor_aggregate_bool_exp_count {
-  arguments?: CourseInstructor_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: CourseInstructor_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
 /**
  * order by aggregate values of table "CourseInstructor"
  */
@@ -3513,17 +2980,6 @@ export interface CourseInstructor_variance_order_by {
   courseId?: order_by | null;
   expertId?: order_by | null;
   id?: order_by | null;
-}
-
-export interface CourseLocation_aggregate_bool_exp {
-  count?: CourseLocation_aggregate_bool_exp_count | null;
-}
-
-export interface CourseLocation_aggregate_bool_exp_count {
-  arguments?: CourseLocation_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: CourseLocation_bool_exp | null;
-  predicate: Int_comparison_exp;
 }
 
 /**
@@ -3682,7 +3138,6 @@ export interface CourseLocation_variance_order_by {
  */
 export interface CourseStatus_bool_exp {
   Courses?: Course_bool_exp | null;
-  Courses_aggregate?: Course_aggregate_bool_exp | null;
   _and?: CourseStatus_bool_exp[] | null;
   _not?: CourseStatus_bool_exp | null;
   _or?: CourseStatus_bool_exp[] | null;
@@ -3736,33 +3191,6 @@ export interface CourseStatus_order_by {
   value?: order_by | null;
 }
 
-export interface Course_aggregate_bool_exp {
-  bool_and?: Course_aggregate_bool_exp_bool_and | null;
-  bool_or?: Course_aggregate_bool_exp_bool_or | null;
-  count?: Course_aggregate_bool_exp_count | null;
-}
-
-export interface Course_aggregate_bool_exp_bool_and {
-  arguments: Course_select_column_Course_aggregate_bool_exp_bool_and_arguments_columns;
-  distinct?: boolean | null;
-  filter?: Course_bool_exp | null;
-  predicate: Boolean_comparison_exp;
-}
-
-export interface Course_aggregate_bool_exp_bool_or {
-  arguments: Course_select_column_Course_aggregate_bool_exp_bool_or_arguments_columns;
-  distinct?: boolean | null;
-  filter?: Course_bool_exp | null;
-  predicate: Boolean_comparison_exp;
-}
-
-export interface Course_aggregate_bool_exp_count {
-  arguments?: Course_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: Course_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
 /**
  * order by aggregate values of table "Course"
  */
@@ -3803,20 +3231,14 @@ export interface Course_avg_order_by {
  */
 export interface Course_bool_exp {
   AchievementOptionCourses?: AchievementOptionCourse_bool_exp | null;
-  AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_bool_exp | null;
   CourseEnrollments?: CourseEnrollment_bool_exp | null;
-  CourseEnrollments_aggregate?: CourseEnrollment_aggregate_bool_exp | null;
   CourseGroups?: CourseGroup_bool_exp | null;
-  CourseGroups_aggregate?: CourseGroup_aggregate_bool_exp | null;
   CourseInstructors?: CourseInstructor_bool_exp | null;
-  CourseInstructors_aggregate?: CourseInstructor_aggregate_bool_exp | null;
   CourseLocations?: CourseLocation_bool_exp | null;
-  CourseLocations_aggregate?: CourseLocation_aggregate_bool_exp | null;
   CourseStatus?: CourseStatus_bool_exp | null;
   Language?: Language_bool_exp | null;
   Program?: Program_bool_exp | null;
   Sessions?: Session_bool_exp | null;
-  Sessions_aggregate?: Session_aggregate_bool_exp | null;
   Weekday?: Weekday_bool_exp | null;
   _and?: Course_bool_exp[] | null;
   _not?: Course_bool_exp | null;
@@ -4111,7 +3533,6 @@ export interface Course_variance_order_by {
  */
 export interface Employment_bool_exp {
   Users?: User_bool_exp | null;
-  Users_aggregate?: User_aggregate_bool_exp | null;
   _and?: Employment_bool_exp[] | null;
   _not?: Employment_bool_exp | null;
   _or?: Employment_bool_exp[] | null;
@@ -4165,17 +3586,6 @@ export interface Employment_order_by {
   value?: order_by | null;
 }
 
-export interface Expert_aggregate_bool_exp {
-  count?: Expert_aggregate_bool_exp_count | null;
-}
-
-export interface Expert_aggregate_bool_exp_count {
-  arguments?: Expert_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: Expert_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
 /**
  * order by aggregate values of table "Expert"
  */
@@ -4213,9 +3623,7 @@ export interface Expert_avg_order_by {
  */
 export interface Expert_bool_exp {
   CourseInstructors?: CourseInstructor_bool_exp | null;
-  CourseInstructors_aggregate?: CourseInstructor_aggregate_bool_exp | null;
   SessionSpeakers?: SessionSpeaker_bool_exp | null;
-  SessionSpeakers_aggregate?: SessionSpeaker_aggregate_bool_exp | null;
   User?: User_bool_exp | null;
   _and?: Expert_bool_exp[] | null;
   _not?: Expert_bool_exp | null;
@@ -4349,7 +3757,6 @@ export interface Int_comparison_exp {
  */
 export interface Language_bool_exp {
   Courses?: Course_bool_exp | null;
-  Courses_aggregate?: Course_aggregate_bool_exp | null;
   _and?: Language_bool_exp[] | null;
   _not?: Language_bool_exp | null;
   _or?: Language_bool_exp[] | null;
@@ -4397,7 +3804,6 @@ export interface Language_order_by {
  */
 export interface LocationOption_bool_exp {
   Locations?: CourseLocation_bool_exp | null;
-  Locations_aggregate?: CourseLocation_aggregate_bool_exp | null;
   _and?: LocationOption_bool_exp[] | null;
   _not?: LocationOption_bool_exp | null;
   _or?: LocationOption_bool_exp[] | null;
@@ -4447,7 +3853,6 @@ export interface LocationOption_on_conflict {
  */
 export interface MotivationRating_bool_exp {
   Enrollments?: CourseEnrollment_bool_exp | null;
-  Enrollments_aggregate?: CourseEnrollment_aggregate_bool_exp | null;
   _and?: MotivationRating_bool_exp[] | null;
   _not?: MotivationRating_bool_exp | null;
   _or?: MotivationRating_bool_exp[] | null;
@@ -4497,11 +3902,8 @@ export interface MotivationRating_on_conflict {
  */
 export interface Program_bool_exp {
   Courses?: Course_bool_exp | null;
-  Courses_aggregate?: Course_aggregate_bool_exp | null;
   RentAScientistConfigs?: RentAScientistConfig_bool_exp | null;
-  RentAScientistConfigs_aggregate?: RentAScientistConfig_aggregate_bool_exp | null;
   ScientistOffers?: ScientistOffer_bool_exp | null;
-  ScientistOffers_aggregate?: ScientistOffer_aggregate_bool_exp | null;
   _and?: Program_bool_exp[] | null;
   _not?: Program_bool_exp | null;
   _or?: Program_bool_exp[] | null;
@@ -4594,33 +3996,6 @@ export interface Program_order_by {
   visibility?: order_by | null;
   visibilityAchievementCertificate?: order_by | null;
   visibilityParticipationCertificate?: order_by | null;
-}
-
-export interface RentAScientistConfig_aggregate_bool_exp {
-  bool_and?: RentAScientistConfig_aggregate_bool_exp_bool_and | null;
-  bool_or?: RentAScientistConfig_aggregate_bool_exp_bool_or | null;
-  count?: RentAScientistConfig_aggregate_bool_exp_count | null;
-}
-
-export interface RentAScientistConfig_aggregate_bool_exp_bool_and {
-  arguments: RentAScientistConfig_select_column_RentAScientistConfig_aggregate_bool_exp_bool_and_arguments_columns;
-  distinct?: boolean | null;
-  filter?: RentAScientistConfig_bool_exp | null;
-  predicate: Boolean_comparison_exp;
-}
-
-export interface RentAScientistConfig_aggregate_bool_exp_bool_or {
-  arguments: RentAScientistConfig_select_column_RentAScientistConfig_aggregate_bool_exp_bool_or_arguments_columns;
-  distinct?: boolean | null;
-  filter?: RentAScientistConfig_bool_exp | null;
-  predicate: Boolean_comparison_exp;
-}
-
-export interface RentAScientistConfig_aggregate_bool_exp_count {
-  arguments?: RentAScientistConfig_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: RentAScientistConfig_bool_exp | null;
-  predicate: Int_comparison_exp;
 }
 
 /**
@@ -4764,17 +4139,6 @@ export interface RentAScientistConfig_variance_order_by {
   program_id?: order_by | null;
 }
 
-export interface SchoolClassRequest_aggregate_bool_exp {
-  count?: SchoolClassRequest_aggregate_bool_exp_count | null;
-}
-
-export interface SchoolClassRequest_aggregate_bool_exp_count {
-  arguments?: SchoolClassRequest_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: SchoolClassRequest_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
 /**
  * input type for inserting array relation for remote table "rentAScientist.SchoolClassRequest"
  */
@@ -4825,17 +4189,6 @@ export interface SchoolClassRequest_on_conflict {
   where?: SchoolClassRequest_bool_exp | null;
 }
 
-export interface SchoolClass_aggregate_bool_exp {
-  count?: SchoolClass_aggregate_bool_exp_count | null;
-}
-
-export interface SchoolClass_aggregate_bool_exp_count {
-  arguments?: SchoolClass_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: SchoolClass_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
 /**
  * input type for inserting array relation for remote table "rentAScientist.SchoolClass"
  */
@@ -4850,7 +4203,6 @@ export interface SchoolClass_arr_rel_insert_input {
 export interface SchoolClass_bool_exp {
   School?: School_bool_exp | null;
   SchoolClassRequests?: SchoolClassRequest_bool_exp | null;
-  SchoolClassRequests_aggregate?: SchoolClassRequest_aggregate_bool_exp | null;
   Teacher?: Teacher_bool_exp | null;
   _and?: SchoolClass_bool_exp[] | null;
   _not?: SchoolClass_bool_exp | null;
@@ -4902,7 +4254,6 @@ export interface SchoolClass_on_conflict {
  */
 export interface School_bool_exp {
   SchoolClasses?: SchoolClass_bool_exp | null;
-  SchoolClasses_aggregate?: SchoolClass_aggregate_bool_exp | null;
   _and?: School_bool_exp[] | null;
   _not?: School_bool_exp | null;
   _or?: School_bool_exp[] | null;
@@ -4946,17 +4297,6 @@ export interface School_on_conflict {
   where?: School_bool_exp | null;
 }
 
-export interface ScientistOfferRelation_aggregate_bool_exp {
-  count?: ScientistOfferRelation_aggregate_bool_exp_count | null;
-}
-
-export interface ScientistOfferRelation_aggregate_bool_exp_count {
-  arguments?: ScientistOfferRelation_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: ScientistOfferRelation_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
 /**
  * input type for inserting array relation for remote table "rentAScientist.ScientistOfferRelation"
  */
@@ -4995,17 +4335,6 @@ export interface ScientistOfferRelation_on_conflict {
   constraint: ScientistOfferRelation_constraint;
   update_columns: ScientistOfferRelation_update_column[];
   where?: ScientistOfferRelation_bool_exp | null;
-}
-
-export interface ScientistOffer_aggregate_bool_exp {
-  count?: ScientistOffer_aggregate_bool_exp_count | null;
-}
-
-export interface ScientistOffer_aggregate_bool_exp_count {
-  arguments?: ScientistOffer_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: ScientistOffer_bool_exp | null;
-  predicate: Int_comparison_exp;
 }
 
 /**
@@ -5050,9 +4379,7 @@ export interface ScientistOffer_avg_order_by {
 export interface ScientistOffer_bool_exp {
   Program?: Program_bool_exp | null;
   SchoolClassRequests?: SchoolClassRequest_bool_exp | null;
-  SchoolClassRequests_aggregate?: SchoolClassRequest_aggregate_bool_exp | null;
   ScientistOfferRelations?: ScientistOfferRelation_bool_exp | null;
-  ScientistOfferRelations_aggregate?: ScientistOfferRelation_aggregate_bool_exp | null;
   _and?: ScientistOffer_bool_exp[] | null;
   _not?: ScientistOffer_bool_exp | null;
   _or?: ScientistOffer_bool_exp[] | null;
@@ -5266,7 +4593,6 @@ export interface ScientistOffer_variance_order_by {
  */
 export interface Scientist_bool_exp {
   ScientistOfferRelations?: ScientistOfferRelation_bool_exp | null;
-  ScientistOfferRelations_aggregate?: ScientistOfferRelation_aggregate_bool_exp | null;
   _and?: Scientist_bool_exp[] | null;
   _not?: Scientist_bool_exp | null;
   _or?: Scientist_bool_exp[] | null;
@@ -5311,7 +4637,6 @@ export interface Scientist_on_conflict {
  */
 export interface SessionAddressType_bool_exp {
   SessionAddresses?: SessionAddress_bool_exp | null;
-  SessionAddresses_aggregate?: SessionAddress_aggregate_bool_exp | null;
   _and?: SessionAddressType_bool_exp[] | null;
   _not?: SessionAddressType_bool_exp | null;
   _or?: SessionAddressType_bool_exp[] | null;
@@ -5354,17 +4679,6 @@ export interface SessionAddressType_on_conflict {
   constraint: SessionAddressType_constraint;
   update_columns: SessionAddressType_update_column[];
   where?: SessionAddressType_bool_exp | null;
-}
-
-export interface SessionAddress_aggregate_bool_exp {
-  count?: SessionAddress_aggregate_bool_exp_count | null;
-}
-
-export interface SessionAddress_aggregate_bool_exp_count {
-  arguments?: SessionAddress_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: SessionAddress_bool_exp | null;
-  predicate: Int_comparison_exp;
 }
 
 /**
@@ -5415,17 +4729,6 @@ export interface SessionAddress_on_conflict {
   where?: SessionAddress_bool_exp | null;
 }
 
-export interface SessionSpeaker_aggregate_bool_exp {
-  count?: SessionSpeaker_aggregate_bool_exp_count | null;
-}
-
-export interface SessionSpeaker_aggregate_bool_exp_count {
-  arguments?: SessionSpeaker_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: SessionSpeaker_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
 /**
  * input type for inserting array relation for remote table "SessionSpeaker"
  */
@@ -5472,33 +4775,6 @@ export interface SessionSpeaker_on_conflict {
   where?: SessionSpeaker_bool_exp | null;
 }
 
-export interface Session_aggregate_bool_exp {
-  bool_and?: Session_aggregate_bool_exp_bool_and | null;
-  bool_or?: Session_aggregate_bool_exp_bool_or | null;
-  count?: Session_aggregate_bool_exp_count | null;
-}
-
-export interface Session_aggregate_bool_exp_bool_and {
-  arguments: Session_select_column_Session_aggregate_bool_exp_bool_and_arguments_columns;
-  distinct?: boolean | null;
-  filter?: Session_bool_exp | null;
-  predicate: Boolean_comparison_exp;
-}
-
-export interface Session_aggregate_bool_exp_bool_or {
-  arguments: Session_select_column_Session_aggregate_bool_exp_bool_or_arguments_columns;
-  distinct?: boolean | null;
-  filter?: Session_bool_exp | null;
-  predicate: Boolean_comparison_exp;
-}
-
-export interface Session_aggregate_bool_exp_count {
-  arguments?: Session_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: Session_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
 /**
  * order by aggregate values of table "Session"
  */
@@ -5537,12 +4813,9 @@ export interface Session_avg_order_by {
  */
 export interface Session_bool_exp {
   Attendances?: Attendance_bool_exp | null;
-  Attendances_aggregate?: Attendance_aggregate_bool_exp | null;
   Course?: Course_bool_exp | null;
   SessionAddresses?: SessionAddress_bool_exp | null;
-  SessionAddresses_aggregate?: SessionAddress_aggregate_bool_exp | null;
   SessionSpeakers?: SessionSpeaker_bool_exp | null;
-  SessionSpeakers_aggregate?: SessionSpeaker_aggregate_bool_exp | null;
   _and?: Session_bool_exp[] | null;
   _not?: Session_bool_exp | null;
   _or?: Session_bool_exp[] | null;
@@ -5711,7 +4984,6 @@ export interface String_comparison_exp {
  */
 export interface Teacher_bool_exp {
   SchoolClasses?: SchoolClass_bool_exp | null;
-  SchoolClasses_aggregate?: SchoolClass_aggregate_bool_exp | null;
   User?: User_bool_exp | null;
   _and?: Teacher_bool_exp[] | null;
   _not?: Teacher_bool_exp | null;
@@ -5752,7 +5024,6 @@ export interface Teacher_on_conflict {
  */
 export interface University_bool_exp {
   Users?: User_bool_exp | null;
-  Users_aggregate?: User_aggregate_bool_exp | null;
   _and?: University_bool_exp[] | null;
   _not?: University_bool_exp | null;
   _or?: University_bool_exp[] | null;
@@ -5806,33 +5077,6 @@ export interface University_order_by {
   value?: order_by | null;
 }
 
-export interface User_aggregate_bool_exp {
-  bool_and?: User_aggregate_bool_exp_bool_and | null;
-  bool_or?: User_aggregate_bool_exp_bool_or | null;
-  count?: User_aggregate_bool_exp_count | null;
-}
-
-export interface User_aggregate_bool_exp_bool_and {
-  arguments: User_select_column_User_aggregate_bool_exp_bool_and_arguments_columns;
-  distinct?: boolean | null;
-  filter?: User_bool_exp | null;
-  predicate: Boolean_comparison_exp;
-}
-
-export interface User_aggregate_bool_exp_bool_or {
-  arguments: User_select_column_User_aggregate_bool_exp_bool_or_arguments_columns;
-  distinct?: boolean | null;
-  filter?: User_bool_exp | null;
-  predicate: Boolean_comparison_exp;
-}
-
-export interface User_aggregate_bool_exp_count {
-  arguments?: User_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: User_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
 /**
  * order by aggregate values of table "User"
  */
@@ -5855,17 +5099,11 @@ export interface User_arr_rel_insert_input {
  */
 export interface User_bool_exp {
   AchievementOptionMentors?: AchievementOptionMentor_bool_exp | null;
-  AchievementOptionMentors_aggregate?: AchievementOptionMentor_aggregate_bool_exp | null;
   AchievementRecordAuthors?: AchievementRecordAuthor_bool_exp | null;
-  AchievementRecordAuthors_aggregate?: AchievementRecordAuthor_aggregate_bool_exp | null;
   Admins?: Admin_bool_exp | null;
-  Admins_aggregate?: Admin_aggregate_bool_exp | null;
   Attendances?: Attendance_bool_exp | null;
-  Attendances_aggregate?: Attendance_aggregate_bool_exp | null;
   CourseEnrollments?: CourseEnrollment_bool_exp | null;
-  CourseEnrollments_aggregate?: CourseEnrollment_aggregate_bool_exp | null;
   Experts?: Expert_bool_exp | null;
-  Experts_aggregate?: Expert_aggregate_bool_exp | null;
   _and?: User_bool_exp[] | null;
   _not?: User_bool_exp | null;
   _or?: User_bool_exp[] | null;
