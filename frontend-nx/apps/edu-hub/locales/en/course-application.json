@@ -12,7 +12,7 @@
     "cancelled": "You have declined the invitation to this course.",
     "invited": "Congratulations, your application was successful! You are invited to participate in this course.",
     "rejected": "Unfortunately, we could not consider your application for this course this semester.",
-    "applicationPeriodEnded": "Die Bewerbungsfrist ist leider abgelaufen.",
+    "applicationPeriodEnded": "Unfortunately the application deadline has passed",
     "invitation_expired": "Unfortunately you missed the deadline to accept your invitation."
   },
   "successBody": "You will be informed about your admission no later than one to two days after the application deadline.",

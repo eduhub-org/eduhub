@@ -14,7 +14,6 @@ exports.sendQuestionaires = async (req, res) => {
       },
     });
     
- 
     //get courses with sessions
     let courses;
     await client
@@ -32,6 +31,7 @@ exports.sendQuestionaires = async (req, res) => {
                   questionaire_sent
                   SessionSpeakers {
                     id
+                    expertId
                   }
                 }
                 Program {
@@ -48,6 +48,9 @@ exports.sendQuestionaires = async (req, res) => {
                     lastName
                   }
                 }
+                CourseInstructors {
+                  expertId
+                }
               }
             }`,
         variables: { },
@@ -61,6 +64,20 @@ exports.sendQuestionaires = async (req, res) => {
       const firstsession = course.Sessions[0];
       const lastsession = course.Sessions.slice(-1)[0];
       for (const session of course.Sessions) {
+        
+        var doSpeakerQuestionaire = false;
+        for (const sessionSpeaker of session.SessionSpeakers) {
+          var isInstructor = false;
+          for (const courseInstructor of course.CourseInstructors) {
+            if (courseInstructor.expertId == sessionSpeaker.expertId) {
+              isInstructor = true;
+            }
+          }
+          if (!isInstructor) {
+            doSpeakerQuestionaire = true;
+          }
+        }
+        
         if (!session.questionaire_sent && Date.parse(session.endDateTime) <= Date.now()) {
           for (const enrollment of course.CourseEnrollments) {
             
@@ -103,7 +120,7 @@ exports.sendQuestionaires = async (req, res) => {
             }
             
             //send speaker questionaire
-            if (course.Program.speakerQuestionnaire && session.SessionSpeakers.length > 0) {
+            if (course.Program.speakerQuestionnaire && session.SessionSpeakers.length > 0 && doSpeakerQuestionaire) {
               await client
               .query({
                 query:`
