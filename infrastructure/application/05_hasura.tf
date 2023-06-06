@@ -106,7 +106,7 @@ module "hasura_service" {
     },
     {
       name  = "HASURA_GRAPHQL_MIGRATIONS_SERVER_TIMEOUT"
-      value = 60
+      value = 120
     },
     {
       name  = "HASURA_GRAPHQL_DEV_MODE"
