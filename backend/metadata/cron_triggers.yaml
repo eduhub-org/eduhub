@@ -1,6 +1,6 @@
 - name: check_attendance
   webhook: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
-  schedule: '* */1 * * *'
+  schedule: 0 0 * * *
   include_in_metadata: true
   payload: {}
   retry_conf:
