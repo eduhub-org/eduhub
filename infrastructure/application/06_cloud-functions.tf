@@ -50,7 +50,7 @@ resource "google_cloudfunctions2_function" "call_python_function" {
     }
     max_instance_count = 500
     available_memory   = "256M"
-    timeout_seconds    = 60
+    timeout_seconds    = 3600
     ingress_settings   = var.cloud_function_ingress_settings
 
   }
@@ -863,9 +863,9 @@ resource "google_cloudfunctions2_function" "send_mail" {
       HASURA_MAIL_USER             = var.hasura_mail_user
       EMULATE_EMAIL                = var.emulate_email
     }
-    max_instance_count = 50
+    max_instance_count = 100
     available_memory   = "256M"
-    timeout_seconds    = 60
+    timeout_seconds    = 600
     ingress_settings   = var.cloud_function_ingress_settings
   }
 }

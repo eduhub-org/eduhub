@@ -6,7 +6,7 @@
   retry_conf:
     num_retries: 0
     retry_interval_seconds: 10
-    timeout_seconds: 240
+    timeout_seconds: 3699
     tolerance_seconds: 21600
   headers:
     - name: name
