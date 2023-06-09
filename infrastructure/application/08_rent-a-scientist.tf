@@ -105,6 +105,9 @@ resource "google_cloud_run_service" "rent_a_scientist" {
     }
 
     metadata {
+      labels = {
+        sha = var.frontend_sha
+      }
       annotations = {
         "autoscaling.knative.dev/minScale" = "0"
         "autoscaling.knative.dev/maxScale" = "1"
