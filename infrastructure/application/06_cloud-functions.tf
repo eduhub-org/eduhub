@@ -24,6 +24,9 @@ resource "google_cloudfunctions2_function" "call_python_function" {
   location    = var.region
   name        = "call-python-function"
   description = "Calls a Python function povided in the corresponding function folder"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "python38"
@@ -50,9 +53,8 @@ resource "google_cloudfunctions2_function" "call_python_function" {
     }
     max_instance_count = 500
     available_memory   = "256M"
-    timeout_seconds    = 60
+    timeout_seconds    = 3600
     ingress_settings   = var.cloud_function_ingress_settings
-
   }
 }
 
@@ -77,6 +79,9 @@ resource "google_cloudfunctions2_function" "load_achievement_certificate" {
   location    = var.region
   name        = "load-achievement-certificate"
   description = "Loads an achievement certificate from Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -122,6 +127,9 @@ resource "google_cloudfunctions2_function" "load_achievement_certificate_templat
   location    = var.region
   name        = "load-achievement-certificate-template"
   description = "Loads an achivement certificate template (each program has its own) from Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -167,6 +175,9 @@ resource "google_cloudfunctions2_function" "load_achievement_record_documentatio
   location    = var.region
   name        = "load-achievement-record-documentation"
   description = "Loads an achivement record documentation file from Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -212,6 +223,9 @@ resource "google_cloudfunctions2_function" "load_participation_certificate" {
   location    = var.region
   name        = "load-participation-certificate"
   description = "Loads a participation certificate from Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -257,6 +271,9 @@ resource "google_cloudfunctions2_function" "load_participation_certificate_templ
   location    = var.region
   name        = "load-participation-certificate-template"
   description = "Loads a participation certificate template (each program has its own) from Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -301,6 +318,9 @@ resource "google_cloudfunctions2_function" "save_achievement_certificate" {
   location    = var.region
   name        = "save-achievement-certificate"
   description = "Save an created achievement certificate to Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -346,6 +366,9 @@ resource "google_cloudfunctions2_function" "save_achievement_certificate_templat
   location    = var.region
   name        = "save-achievement-certificate-template"
   description = "Save an achievement certificate template (each program has its own) to Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -391,6 +414,9 @@ resource "google_cloudfunctions2_function" "save_achievement_record_cover_image"
   location    = var.region
   name        = "save-achievement-record-cover-image"
   description = "Save the cover image of an achievement record to Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -440,6 +466,9 @@ resource "google_cloudfunctions2_function" "save_achievement_record_documentatio
   location    = var.region
   name        = "save-achievement-record-documentation"
   description = "Save the documentation file of an achievement record to Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -489,6 +518,9 @@ resource "google_cloudfunctions2_function" "save_course_image" {
   location    = var.region
   name        = "save-course-image"
   description = "Save the cover image of a course to Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -534,6 +566,9 @@ resource "google_cloudfunctions2_function" "save_participation_certificate" {
   location    = var.region
   name        = "save-participation-certificate"
   description = "Saves a created participation certificate to Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -579,6 +614,9 @@ resource "google_cloudfunctions2_function" "save_participation_certificate_templ
   location    = var.region
   name        = "save-participation-certificate-template"
   description = "Saves a participation certificate template (each program has its own)) to Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -624,6 +662,9 @@ resource "google_cloudfunctions2_function" "save_user_profile_image" {
   location    = var.region
   name        = "save-user-profile-image"
   description = "Saves a user profile image to Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -668,6 +709,9 @@ resource "google_cloudfunctions2_function" "load_achievement_option_documentatio
   location    = var.region
   name        = "load-achievement-option-documentation-template"
   description = "Loads an achievement option documentation template from Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -712,6 +756,9 @@ resource "google_cloudfunctions2_function" "save_achievement_option_evaluation_s
   location    = var.region
   name        = "save-achievement-option-evaluation-script"
   description = "Saves an achievement option evaluation script to Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -756,6 +803,9 @@ resource "google_cloudfunctions2_function" "load_achievement_option_evaluation_s
   location    = var.region
   name        = "load-achievement-option-evaluation-script"
   description = "Loads an achievement option evaluation script from Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -800,6 +850,9 @@ resource "google_cloudfunctions2_function" "save_achievement_option_documentatio
   location    = var.region
   name        = "save-achievement-option-documentation-template"
   description = "Saves an achievement option documentation template to Google Cloud Storage"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
@@ -844,6 +897,9 @@ resource "google_cloudfunctions2_function" "send_mail" {
   location    = var.region
   name        = "send-mail"
   description = "Sends an email as defined in the Hasura mail log table"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs14"
@@ -863,9 +919,9 @@ resource "google_cloudfunctions2_function" "send_mail" {
       HASURA_MAIL_USER             = var.hasura_mail_user
       EMULATE_EMAIL                = var.emulate_email
     }
-    max_instance_count = 50
+    max_instance_count = 100
     available_memory   = "256M"
-    timeout_seconds    = 60
+    timeout_seconds    = 600
     ingress_settings   = var.cloud_function_ingress_settings
   }
 }
@@ -891,6 +947,9 @@ resource "google_cloudfunctions2_function" "update_keycloak_profile" {
   location    = var.region
   name        = "update-keycloak-profile"
   description = "Updates the Keycloak profile on changes in Hasura"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs14"
@@ -938,6 +997,9 @@ resource "google_cloudfunctions2_function" "add_keycloak_role" {
   location    = var.region
   name        = "add-keycloak-role"
   description = "Adds role mapping for given role for keycloak hasura client"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs14"
@@ -985,6 +1047,9 @@ resource "google_cloudfunctions2_function" "update_from_keycloak" {
   location    = var.region
   name        = "update-from-keycloak"
   description = "Looks up keycloak user of given uuid and creates new hasura user if necessary or updates existing"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs14"
@@ -1034,6 +1099,9 @@ resource "google_cloudfunctions2_function" "create_achievement_certificate" {
   location    = var.region
   name        = "create-achievement-certificate"
   description = "Creates a certificate pdf (at the moment by calling anonther function) and returns it as base64"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs14"
@@ -1078,6 +1146,9 @@ resource "google_cloudfunctions2_function" "create_participation_certificate" {
   location    = var.region
   name        = "create-participation-certificate"
   description = "Creates a certificate pdf (at the moment by calling anonther function) and returns it as base64"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs14"
@@ -1122,6 +1193,9 @@ resource "google_cloudfunctions2_function" "send_questionaires" {
   location    = var.region
   name        = "send-questionaires"
   description = "send out questionaires for published past sessions"
+  labels = {
+    sha = var.functions_sha
+  }
 
   build_config {
     runtime     = "nodejs16"
