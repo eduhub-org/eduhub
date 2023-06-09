@@ -1075,9 +1075,6 @@ resource "google_cloudfunctions2_function" "update_from_keycloak" {
     available_memory   = "256M"
     timeout_seconds    = 60
     ingress_settings   = var.cloud_function_ingress_settings
-    labels = {
-      sha = var.functions_sha
-    }
   }
 }
 
