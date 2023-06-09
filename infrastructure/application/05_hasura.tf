@@ -73,7 +73,7 @@ module "hasura_service" {
   project_id   = var.project_id
   location     = var.region
   image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend"
-  tags = {
+  labels = {
     sha = var.hasura_sha
   }
 
