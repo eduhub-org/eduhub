@@ -56,9 +56,12 @@ resource "google_secret_manager_secret_iam_member" "keycloak_hasura_client_secre
 # Define the Google Cloud Run service for the Edu frontend
 resource "google_cloud_run_service" "eduhub" {
   provider = google-beta
-
   name     = local.eduhub_service_name
   location = var.region
+  tags = {
+    sha = var.hasura_sha
+  }
+
 
   template {
     spec {

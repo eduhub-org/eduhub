@@ -72,7 +72,10 @@ module "hasura_service" {
   service_name = local.hasura_service_name
   project_id   = var.project_id
   location     = var.region
-  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:${var.hasura_sha}"
+  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend"
+  tags = {
+    sha = var.hasura_sha
+  }
 
   limits = {
     cpu    = "1000m"

@@ -36,9 +36,11 @@ resource "google_secret_manager_secret_iam_member" "keycloak_ras_client_secret" 
 # Define the Google Cloud Run service for the Rent-a-Scientist Frontend
 resource "google_cloud_run_service" "rent_a_scientist" {
   provider = google-beta
-
   name     = local.rent_a_scientist_service_name
   location = var.region
+  tags = {
+    sha = var.hasura_sha
+  }
 
   template {
     spec {
