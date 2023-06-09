@@ -106,7 +106,7 @@ resource "google_cloud_run_service" "rent_a_scientist" {
 
     metadata {
       labels = {
-        sha = var.frontend_sha
+        sha = "${var.frontend_sha}"
       }
       annotations = {
         "autoscaling.knative.dev/minScale" = "0"
