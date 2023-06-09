@@ -58,8 +58,8 @@ resource "google_cloud_run_service" "eduhub" {
   provider = google-beta
   name     = local.eduhub_service_name
   location = var.region
-  tags = {
-    sha = var.hasura_sha
+  labels = {
+    sha = var.frontend_sha
   }
 
 
