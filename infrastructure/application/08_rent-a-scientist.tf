@@ -38,9 +38,6 @@ resource "google_cloud_run_service" "rent_a_scientist" {
   provider = google-beta
   name     = local.rent_a_scientist_service_name
   location = var.region
-  labels = {
-    sha = var.frontend_sha
-  }
 
   template {
     spec {
