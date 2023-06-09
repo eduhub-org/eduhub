@@ -56,7 +56,6 @@ resource "google_secret_manager_secret_iam_member" "keycloak_hasura_client_secre
 # Define the Google Cloud Run service for the Edu frontend
 resource "google_cloud_run_service" "eduhub" {
   provider = google-beta
-
   name     = local.eduhub_service_name
   location = var.region
 
@@ -123,6 +122,9 @@ resource "google_cloud_run_service" "eduhub" {
     }
 
     metadata {
+      labels = {
+        sha = "${var.frontend_sha}"
+      }
       annotations = {
         "autoscaling.knative.dev/minScale" = "0"
         "autoscaling.knative.dev/maxScale" = "1"

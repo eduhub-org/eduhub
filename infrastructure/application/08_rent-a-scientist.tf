@@ -36,7 +36,6 @@ resource "google_secret_manager_secret_iam_member" "keycloak_ras_client_secret" 
 # Define the Google Cloud Run service for the Rent-a-Scientist Frontend
 resource "google_cloud_run_service" "rent_a_scientist" {
   provider = google-beta
-
   name     = local.rent_a_scientist_service_name
   location = var.region
 
@@ -103,6 +102,9 @@ resource "google_cloud_run_service" "rent_a_scientist" {
     }
 
     metadata {
+      labels = {
+        sha = "${var.frontend_sha}"
+      }
       annotations = {
         "autoscaling.knative.dev/minScale" = "0"
         "autoscaling.knative.dev/maxScale" = "1"
