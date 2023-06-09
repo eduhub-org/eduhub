@@ -38,6 +38,11 @@ variable "cloudflare_api_key" {
   description = "API key for the user to access Cloudflare"
   type        = string
 }
+variable "commit_sha" {
+  description = "SHA of the current git commit (used as tag for all docker images)"
+  type        = string
+  default     = ""
+}
 
 
 # network
@@ -125,9 +130,10 @@ variable "enable_db_backup" {
 }
 
 # keycloak
-variable "commit_sha" {
-  description = "SHA of the current git commit (used as tag for all docker images)"
+variable "keycloak_sha" {
+  description = "SHA of the current keycloak folder"
   type        = string
+  default     = ""
 }
 variable "keycloak_user" {
   description = "User for the Keycloak console"
@@ -140,6 +146,11 @@ variable "keycloak_pw" {
 
 
 # hasura
+variable "hasura_sha" {
+  description = "SHA of the current hasura folder"
+  type        = string
+  default     = ""
+}
 variable "hasura_graphql_admin_key" {
   description = "Admin key for the Hasura GraphQL API"
   type        = string
@@ -173,22 +184,30 @@ variable "hasura_memory_limit" {
 }
 
 # Frontend
-# Rent-A-Scientist
+variable "frontend_sha" {
+  description = "SHA of the current frontend-nx folder"
+  type        = string
+  default     = ""
+}
 variable "nextauth_secret" {
   description = "Used to encrypt the NextAuth.js JWT, and to hash email verification tokens. This is the default value for the secret option in NextAuth and Middleware."
   type        = string
 }
 variable "keycloak_hasura_client_secret" {
-  description = "Used to authenticate login requests from the hasura client."
+  description = "Used to authenticate login requests from the edu client."
   type        = string
 }
-
 variable "keycloak_ras_client_secret" {
   description = "Used to authenticate login requests from the rent-a-scientist client."
   type        = string
 }
 
 # Serverless Functions
+variable "functions_sha" {
+  description = "SHA of the current functions folder"
+  type        = string
+  default     = ""
+}
 variable "environment" {
   description = "Should typically be a value of either `production` or `staging` to possibly change the behaviour of as serverless function depending on the environment."
   type        = string

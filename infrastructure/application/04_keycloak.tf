@@ -67,7 +67,7 @@ module "keycloak_service" {
   service_name = local.keycloak_service_name
   project_id   = var.project_id
   location     = var.region
-  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/keycloak:${var.commit_sha}"
+  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/keycloak:${var.keycloak_sha}"
 
   limits = {
     cpu    = "1000m"
