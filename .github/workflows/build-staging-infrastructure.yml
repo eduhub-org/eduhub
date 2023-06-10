@@ -96,6 +96,18 @@ jobs:
           echo "frontend_sha=${frontend_sha}" >> $GITHUB_ENV
           echo "functions_sha=${functions_sha}" >> $GITHUB_ENV  
 
+      # Add a new step to print the values of the output variables
+      - name: Print output variables
+        run: |
+          echo "frontend_changed: ${{ steps.check_folder_changes.outputs.frontend_changed }}"
+          echo "hasura_changed: ${{ steps.check_folder_changes.outputs.hasura_changed }}"
+          echo "keycloak_changed: ${{ steps.check_folder_changes.outputs.keycloak_changed }}"
+          echo "functions_changed: ${{ steps.check_folder_changes.outputs.functions_changed }}"
+          echo "frontend_sha: ${{ steps.check_folder_changes.outputs.frontend_sha }}"
+          echo "hasura_sha: ${{ steps.check_folder_changes.outputs.hasura_sha }}"
+          echo "keycloak_sha: ${{ steps.check_folder_changes.outputs.keycloak_sha }}"
+          echo "functions_sha: ${{ steps.check_folder_changes.outputs.functions_sha }}"
+
 
   save_commit_sha:
     name: Save SHA of current commit in Terraform Cloud
