@@ -63,7 +63,7 @@ resource "google_cloud_run_service" "eduhub" {
     spec {
       containers {
         image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/edu:latest"
-        
+
         ports {
           name           = "http1"
           container_port = 5000
