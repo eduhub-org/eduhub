@@ -103,14 +103,14 @@ jobs:
       - name: Print output variables
         id: print_output_variables
         run: |
-          echo "frontend_changed: ${{ steps.check_folder_changes.outputs.frontend_changed }}"
-          echo "hasura_changed: ${{ steps.check_folder_changes.outputs.hasura_changed }}"
-          echo "keycloak_changed: ${{ steps.check_folder_changes.outputs.keycloak_changed }}"
-          echo "functions_changed: ${{ steps.check_folder_changes.outputs.functions_changed }}"
-          echo "frontend_sha: ${{ steps.check_folder_changes.outputs.frontend_sha }}"
-          echo "hasura_sha: ${{ steps.check_folder_changes.outputs.hasura_sha }}"
-          echo "keycloak_sha: ${{ steps.check_folder_changes.outputs.keycloak_sha }}"
-          echo "functions_sha: ${{ steps.check_folder_changes.outputs.functions_sha }}"
+          echo "frontend_changed: ${{ steps.changed_folders.outputs.frontend_changed }}"
+          echo "hasura_changed: ${{ steps.changed_folders.outputs.hasura_changed }}"
+          echo "keycloak_changed: ${{ steps.changed_folders.outputs.keycloak_changed }}"
+          echo "functions_changed: ${{ steps.changed_folders.outputs.functions_changed }}"
+          echo "frontend_sha: ${{ steps.calculate_sha.outputs.frontend_sha }}"
+          echo "hasura_sha: ${{ steps.calculate_sha.outputs.hasura_sha }}"
+          echo "keycloak_sha: ${{ steps.calculate_sha.outputs.keycloak_sha }}"
+          echo "functions_sha: ${{ steps.calculate_sha.outputs.functions_sha }}"
 
 
   save_commit_sha:
