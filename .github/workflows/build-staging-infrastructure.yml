@@ -120,10 +120,9 @@ jobs:
     needs: check_folder_changes
     env: 
     steps:
-      - env:
-          frontend_changed: ${{needs.check_folder_changes.outputs.frontend_changed}}
-
       - name: Print the outputs of the job check_folder_changes
+        env:
+          frontend_changed: ${{needs.check_folder_changes.outputs.frontend_changed}}
         run: |
           echo "frontend_changed: $frontend_changed"
           echo "hasura_changed: " ${{ needs.check_folder_changes.outputs.hasura_changed }}
