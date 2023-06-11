@@ -70,8 +70,8 @@ module "keycloak_service" {
   image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/keycloak"
 
   service_labels = {
-    sha                                   = var.keycloak_sha
-    run.googleapis.com / startupProbeType = null
+    sha              = var.keycloak_sha
+    startupProbeType = null
   }
 
   limits = {

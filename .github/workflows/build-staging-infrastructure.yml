@@ -113,26 +113,6 @@ jobs:
           echo "functions_sha: ${{ steps.calculate_sha.outputs.functions_sha }}"
 
 
-
-  print_outputs:
-    name: Print the outputs of the job check_folder_changes
-    runs-on: ubuntu-latest
-    needs: check_folder_changes
-    steps:
-      - name: Print the outputs of the job check_folder_changes
-        env:
-          frontend_changed: ${{needs.check_folder_changes.outputs.frontend_changed}}
-        run: |
-          echo "frontend_changed: $frontend_changed"
-          echo "hasura_changed: " ${{ needs.check_folder_changes.outputs.hasura_changed }}
-          echo "keycloak_changed: ${{ needs.check_folder_changes.outputs.keycloak_changed }}"
-          echo "functions_changed: ${{ needs.check_folder_changes.outputs.functions_changed }}"
-          echo "frontend_sha: ${{ needs.check_folder_changes.outputs.frontend_sha }}"
-          echo "hasura_sha: ${{ needs.check_folder_changes.outputs.hasura_sha }}"
-          echo "keycloak_sha: ${{ needs.check_folder_changes.outputs.keycloak_sha }}"
-          echo "functions_sha: ${{ needs.check_folder_changes.outputs.functions_sha }}"
-
-
   save_commit_sha:
     name: Save SHA of current commit in Terraform Cloud
     runs-on: ubuntu-latest
