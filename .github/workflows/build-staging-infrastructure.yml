@@ -46,6 +46,9 @@ jobs:
         # To compare changes between the current commit and the last pushed remote commit set `since_last_remote_commit: true`. e.g
         # with:
         #   since_last_remote_commit: true 
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+       
 
       - name: List all changed files
         id: changed_files
