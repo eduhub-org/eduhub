@@ -121,7 +121,7 @@ jobs:
     steps:
       - name: Print the outputs of the job check_folder_changes
         run: |
-          echo "frontend_changed: ${{ needs.check_folder_changes.outputs.frontend_changed }}"
+          echo "frontend_changed: " ${{ needs.check_folder_changes.outputs.frontend_changed }}
           echo "hasura_changed: ${{ needs.check_folder_changes.outputs.hasura_changed }}"
           echo "keycloak_changed: ${{ needs.check_folder_changes.outputs.keycloak_changed }}"
           echo "functions_changed: ${{ needs.check_folder_changes.outputs.functions_changed }}"
