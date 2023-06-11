@@ -71,6 +71,7 @@ module "keycloak_service" {
 
   service_labels = {
     sha = var.keycloak_sha
+    run.googleapis.com/startupProbeType = null
   }
 
   limits = {
