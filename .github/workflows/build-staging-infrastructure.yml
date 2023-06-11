@@ -75,10 +75,10 @@ jobs:
           frontend_changed=$(check_folder_changes "frontend-nx")
           functions_changed=$(check_folder_changes "functions")
 
-          echo "hasura_changed=${hasura_changed}" >> $GITHUB_ENV
-          echo "keycloak_changed=${keycloak_changed}" >> $GITHUB_ENV
-          echo "frontend_changed=${frontend_changed}" >> $GITHUB_ENV
-          echo "functions_changed=${functions_changed}" >> $GITHUB_ENV
+          echo "hasura_changed=${hasura_changed}" >> $GITHUB_OUTPUT
+          echo "keycloak_changed=${keycloak_changed}" >> $GITHUB_OUTPUT
+          echo "frontend_changed=${frontend_changed}" >> $GITHUB_OUTPUT
+          echo "functions_changed=${functions_changed}" >> $GITHUB_OUTPUT
 
       - name: Calculate SHA for each folder
         id: calculate_sha
@@ -94,10 +94,10 @@ jobs:
           frontend_sha=$(calculate_sha "frontend-nx")
           functions_sha=$(calculate_sha "functions")
 
-          echo "hasura_sha=${hasura_sha}" >> $GITHUB_ENV
-          echo "keycloak_sha=${keycloak_sha}" >> $GITHUB_ENV
-          echo "frontend_sha=${frontend_sha}" >> $GITHUB_ENV
-          echo "functions_sha=${functions_sha}" >> $GITHUB_ENV  
+          echo "hasura_sha=${hasura_sha}" >> $GITHUB_OUTPUT
+          echo "keycloak_sha=${keycloak_sha}" >> $GITHUB_OUTPUT
+          echo "frontend_sha=${frontend_sha}" >> $GITHUB_OUTPUT
+          echo "functions_sha=${functions_sha}" >> $GITHUB_OUTPUT  
 
       # Add a new step to print the values of the output variables
       - name: Print output variables
