@@ -40,21 +40,21 @@ jobs:
           fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
 
       - name: Get changed files
-        id: get_changed_files
+        id: changed_files
         uses: tj-actions/changed-files@v35
         
         # To compare changes between the current commit and the last pushed remote commit set `since_last_remote_commit: true`. e.g
         # with:
         #   since_last_remote_commit: true 
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          since_last_merge_commit: true
+        # with:
+        #   ref: ${{ github.event.pull_request.head.sha }}
+        #   since_last_merge_commit: true
        
 
       - name: List all changed files
-        id: changed_files
+        id: list_changed_files
         run: |
-          IFS=' ' read -ra changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
+          IFS=' ' read -ra changed_files <<< "${{ steps.changed_files.outputs.all_changed_files }}"
           for file in "${changed_files[@]}"; do
             echo "$file was changed"
           done
