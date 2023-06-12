@@ -65,6 +65,7 @@ jobs:
           function check_folder_changes() {
             folder=$1
             for file in "${changed_files[@]}"; do
+              echo "Checking if $file is in $folder"
               if [[ $file == $folder/* ]]; then
                 echo "true"
                 return
