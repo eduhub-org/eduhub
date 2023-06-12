@@ -73,7 +73,7 @@ jobs:
             echo "false"
           }
 
-          IFS=' ' read -ra changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
+          IFS=' ' read -ra changed_files <<< "${{ steps.changed_files.outputs.all_changed_files }}"
           hasura_changed=$(check_folder_changes "backend")
           keycloak_changed=$(check_folder_changes "keycloak")
           frontend_changed=$(check_folder_changes "frontend-nx")
