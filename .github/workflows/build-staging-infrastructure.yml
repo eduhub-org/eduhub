@@ -206,8 +206,8 @@ jobs:
     environment:
       name: ${{ github.ref == 'refs/heads/production' && 'production' || 'staging' }}
     env:
-      TF_WORKSPACE: ${{ secrets.TF_WORKSPACE }}
-      TF_WORKSPACE_ID: ${{ secrets.TF_WORKSPACE_ID }}
+      TF_WORKSPACE: ${{ vars.TF_WORKSPACE }}
+      TF_WORKSPACE_ID: ${{ vars.TF_WORKSPACE_ID }}
   
     defaults:
       run:
@@ -215,11 +215,12 @@ jobs:
 
     steps:
 
-      # - name: Set environment variables
-      #   id: set_environment_variables
-      #   run: |
-      #     echo "export TF_WORKSPACE=${{ env.TF_WORKSPACE }}"
-      #     echo "export TF_WORKSPACE_ID=${{ env.TF_WORKSPACE_ID }}"
+      - name: Print env variables
+        id: print_environment_variables
+        run: |
+          echo "TF_WORKSPACE: $TF_WORKSPACE"
+          echo "TF_WORKSPACE_ID: $TF_WORKSPACE_ID"
+
 
       - name: Checkout
         uses: actions/checkout@v3
