@@ -79,10 +79,10 @@ jobs:
           frontend_changed=$(check_folder_changes "frontend-nx")
           functions_changed=$(check_folder_changes "functions")
 
-          echo "hasura_changed=${hasura_changed}" 
-          echo "keycloak_changed=${keycloak_changed}" 
-          echo "frontend_changed=${frontend_changed}" 
-          echo "functions_changed=${functions_changed}" 
+          echo "hasura_changed=${hasura_changed}" >> $GITHUB_OUTPUT
+          echo "keycloak_changed=${keycloak_changed}" >> $GITHUB_OUTPUT
+          echo "frontend_changed=${frontend_changed}" >> $GITHUB_OUTPUT
+          echo "functions_changed=${functions_changed}" >> $GITHUB_OUTPUT
 
       - name: Calculate SHA for each folder
         id: calculate_sha
