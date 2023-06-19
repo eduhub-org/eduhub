@@ -33,9 +33,10 @@ on:
       SHA:
         required: true
         type: string
-    secrets:
       GCP_KEY:
         required: true
+        type: string
+    secrets:
       GCP_REGION:
         required: true
 
