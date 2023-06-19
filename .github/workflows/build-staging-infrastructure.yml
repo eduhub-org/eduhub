@@ -122,6 +122,8 @@ jobs:
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
+      TF_WORKSPACE: ${{ github.TF_WORKSPACE }}
+      TF_WORKSPACE_ID: ${{ github.TF_WORKSPACE_ID }}
       DOCKERFILE_FOLDER: keycloak
       DOCKERFILE_NAME: Dockerfile
       IMAGE_NAME: keycloak
@@ -156,6 +158,8 @@ jobs:
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
+      TF_WORKSPACE: ${{ github.TF_WORKSPACE }}
+      TF_WORKSPACE_ID: ${{ github.TF_WORKSPACE_ID }}
       DOCKERFILE_FOLDER: frontend-nx
       DOCKERFILE_NAME: Dockerfile-edu
       IMAGE_NAME: edu
@@ -174,6 +178,8 @@ jobs:
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
+      TF_WORKSPACE: ${{ github.TF_WORKSPACE }}
+      TF_WORKSPACE_ID: ${{ github.TF_WORKSPACE_ID }}
       DOCKERFILE_FOLDER: frontend-nx
       DOCKERFILE_NAME: Dockerfile-rent-a-scientist
       IMAGE_NAME: rent-a-scientist
