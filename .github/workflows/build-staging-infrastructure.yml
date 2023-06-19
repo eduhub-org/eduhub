@@ -205,6 +205,10 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref == 'refs/heads/production' && 'production' || 'staging' }}
+    env:
+      TF_WORKSPACE: ${{ secrets.TF_WORKSPACE }}
+      TF_WORKSPACE_ID: ${{ secrets.TF_WORKSPACE_ID }}
+  
     defaults:
       run:
         working-directory: ./infrastructure/application
