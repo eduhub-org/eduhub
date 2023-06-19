@@ -17,7 +17,7 @@ on:
 jobs:
 
   prepare_environment:
-    name: Set environment variables
+    name: Prepare environment variables
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref == 'refs/heads/production' && 'production' || 'staging' }}
@@ -119,7 +119,7 @@ jobs:
   build_keycloak:
     if: needs.check_folder_changes.outputs.keycloak_changed == 'true'
     name: Build and Store Keycloak Docker Image in Google Docker Repo
-    needs: [check_folder_changes]
+    needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: keycloak
@@ -135,7 +135,7 @@ jobs:
   build_hasura:
     if: needs.check_folder_changes.outputs.hasura_changed == 'true'
     name: Build and Store Hasura Docker Image in Google Docker Repo
-    needs: [check_folder_changes]
+    needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: backend
@@ -151,7 +151,7 @@ jobs:
   build_frontend:
     if: needs.check_folder_changes.outputs.frontend_changed == 'true'
     name: Build and Store Frontend Docker Image in Google Docker Repo
-    needs: [check_folder_changes]
+    needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: frontend-nx
@@ -169,7 +169,7 @@ jobs:
   build_rent_a_scientist_frontend:
     if: needs.check_folder_changes.outputs.frontend_changed == 'true'
     name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
-    needs: [check_folder_changes]
+    needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: frontend-nx
@@ -187,7 +187,7 @@ jobs:
   zip_and_store_cloud_functions:
     if: needs.check_folder_changes.outputs.functions_changed == 'true'
     name: Zip and Store Cloud Functions
-    needs: [check_folder_changes]
+    needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
     with:
       PROJECT_ID: eduhub-staging-new
@@ -201,7 +201,7 @@ jobs:
     if: always()
     name: "Deploy Application Infrastructure"
     needs:
-      [check_folder_changes, build_keycloak, build_hasura, build_frontend, build_rent_a_scientist_frontend, zip_and_store_cloud_functions]
+      [prepare_environment, check_folder_changes, build_keycloak, build_hasura, build_frontend, build_rent_a_scientist_frontend, zip_and_store_cloud_functions]
     runs-on: ubuntu-latest
     defaults:
       run:
