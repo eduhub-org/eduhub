@@ -215,13 +215,6 @@ jobs:
 
     steps:
 
-      - name: Print env variables
-        id: print_environment_variables
-        run: |
-          echo "TF_WORKSPACE: $TF_WORKSPACE"
-          echo "TF_WORKSPACE_ID: $TF_WORKSPACE_ID"
-
-
       - name: Checkout
         uses: actions/checkout@v3
 
