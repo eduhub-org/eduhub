@@ -27,7 +27,7 @@ jobs:
       - name: Define env variables as output variables
         id: define_output_variables
         run: |
-          echo "PROJECT_ID = ${ vars.PROJECT_ID }" >> $GITHUB_OUTPUT
+          echo "PROJECT_ID = ${ env.PROJECT_ID }" >> $GITHUB_OUTPUT
 
   check_folder_changes:
     name: Check for changes in specific folders
