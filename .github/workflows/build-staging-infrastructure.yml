@@ -148,23 +148,23 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
-  # build_frontend:
-  #   if: needs.check_folder_changes.outputs.frontend_changed == 'true'
-  #   name: Build and Store Frontend Docker Image in Google Docker Repo
-  #   needs: [prepare_environment, check_folder_changes]
-  #   uses: ./.github/workflows/build-and-store-docker-image.yml
-  #   with:
-  #     DOCKERFILE_FOLDER: frontend-nx
-  #     DOCKERFILE_NAME: Dockerfile-edu
-  #     IMAGE_NAME: edu
-  #     BRANCH: ${{ github.ref_name }}
-  #     PROJECT_ID: eduhub-staging-new
-  #     NEXT_PUBLIC_API_URL: "https://hasura-staging.opencampus.sh/v1/graphql"
-  #     NEXT_PUBLIC_AUTH_URL: "https://keycloak-staging.opencampus.sh"
-  #     SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
-  #   secrets:
-  #     GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
-  #     GCP_REGION: ${{ secrets.GCP_REGION }}
+  build_frontend:
+    if: needs.check_folder_changes.outputs.frontend_changed == 'false'
+    name: Build and Store Frontend Docker Image in Google Docker Repo
+    needs: [prepare_environment, check_folder_changes]
+    uses: ./.github/workflows/build-and-store-docker-image.yml
+    with:
+      DOCKERFILE_FOLDER: frontend-nx
+      DOCKERFILE_NAME: Dockerfile-edu
+      IMAGE_NAME: edu
+      BRANCH: ${{ github.ref_name }}
+      PROJECT_ID: eduhub-staging-new
+      NEXT_PUBLIC_API_URL: "https://hasura-staging.opencampus.sh/v1/graphql"
+      NEXT_PUBLIC_AUTH_URL: "https://keycloak-staging.opencampus.sh"
+      SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
+      GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build_rent_a_scientist_frontend:
     if: needs.check_folder_changes.outputs.frontend_changed == 'true'
