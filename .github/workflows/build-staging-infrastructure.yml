@@ -17,7 +17,6 @@ on:
 env:
   TF_WORKSPACE: eduhub-application-staging
   TF_WORKSPACE_ID: ws-wVwkztBCRbphphYw
-  TF_VAR_ID_COMMIT_SHA: var-sSiBMg7YBPL7NcFh
 
 jobs:
 
@@ -43,14 +42,6 @@ jobs:
         id: changed_files
         uses: tj-actions/changed-files@v35
         
-        # To compare changes between the current commit and the last pushed remote commit set `since_last_remote_commit: true`. e.g
-        # with:
-        #   since_last_remote_commit: true 
-        # with:
-        #   ref: ${{ github.event.pull_request.head.sha }}
-        #   since_last_merge_commit: true
-       
-
       - name: List all changed files
         id: list_changed_files
         run: |
@@ -103,7 +94,6 @@ jobs:
           echo "frontend_sha=${frontend_sha}" >> $GITHUB_OUTPUT
           echo "functions_sha=${functions_sha}" >> $GITHUB_OUTPUT  
 
-      # Add a new step to print the values of the output variables
       - name: Print output variables
         id: print_output_variables
         run: |
@@ -117,25 +107,10 @@ jobs:
           echo "functions_sha: ${{ steps.calculate_sha.outputs.functions_sha }}"
 
 
-  save_commit_sha:
-    name: Save SHA of current commit in Terraform Cloud
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check Out the Repository Branch
-        uses: actions/checkout@v3
-      - name: Save commit SHA in Terraform Cloud variable
-        run: |
-          curl \
-          --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
-          --header "Content-Type: application/vnd.api+json" \
-          --request PATCH \
-          --data "{ \"data\": { \"id\":\"$TF_VAR_ID_COMMIT_SHA\", \"attributes\": { \"value\":\"$(git rev-parse --short "$GITHUB_SHA")\" }, \"type\":\"vars\" }}" \
-          https://app.terraform.io/api/v2/workspaces/$TF_WORKSPACE_ID/vars/$TF_VAR_ID_COMMIT_SHA
-
   build_keycloak:
     if: needs.check_folder_changes.outputs.keycloak_changed == 'true'
     name: Build and Store Keycloak Docker Image in Google Docker Repo
-    needs: [check_folder_changes, save_commit_sha]
+    needs: [check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: keycloak
@@ -151,7 +126,7 @@ jobs:
   build_hasura:
     if: needs.check_folder_changes.outputs.hasura_changed == 'true'
     name: Build and Store Hasura Docker Image in Google Docker Repo
-    needs: [check_folder_changes, save_commit_sha]
+    needs: [check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: backend
@@ -167,7 +142,7 @@ jobs:
   build_frontend:
     if: needs.check_folder_changes.outputs.frontend_changed == 'true'
     name: Build and Store Frontend Docker Image in Google Docker Repo
-    needs: [check_folder_changes, save_commit_sha]
+    needs: [check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: frontend-nx
@@ -185,7 +160,7 @@ jobs:
   build_rent_a_scientist_frontend:
     if: needs.check_folder_changes.outputs.frontend_changed == 'true'
     name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
-    needs: [check_folder_changes, save_commit_sha]
+    needs: [check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: frontend-nx
@@ -203,7 +178,7 @@ jobs:
   zip_and_store_cloud_functions:
     if: needs.check_folder_changes.outputs.functions_changed == 'true'
     name: Zip and Store Cloud Functions
-    needs: [check_folder_changes, save_commit_sha]
+    needs: [check_folder_changes]
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
     with:
       PROJECT_ID: eduhub-staging-new
@@ -217,7 +192,7 @@ jobs:
     if: always()
     name: "Deploy Application Infrastructure"
     needs:
-      [build_keycloak, build_hasura, build_frontend, build_rent_a_scientist_frontend, zip_and_store_cloud_functions]
+      [check_folder_changes, build_keycloak, build_hasura, build_frontend, build_rent_a_scientist_frontend, zip_and_store_cloud_functions]
     runs-on: ubuntu-latest
     defaults:
       run:
