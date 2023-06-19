@@ -14,11 +14,20 @@ on:
     branches:
       - staging
 
-env:
-  TF_WORKSPACE: eduhub-application-staging
-  TF_WORKSPACE_ID: ws-wVwkztBCRbphphYw
-
 jobs:
+
+  prepare_environment:
+    name: Set environment variables
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref == 'refs/heads/production' && 'production' || 'staging' }}
+      url: ${{ steps.set_environment_variables.outputs.url }}
+    steps:
+      - name: Set environment variables
+        id: set_environment_variables
+        run: |
+          echo "TF_WORKSPACE=env.TF_WORKSPACE" >> $GITHUB_ENV
+          echo "TF_WORKSPACE_ID=env.TF_WORKSPACE_ID" >> $GITHUB_ENV
 
   check_folder_changes:
     name: Check for changes in specific folders
