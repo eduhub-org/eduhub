@@ -167,7 +167,7 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
 
   build_rent_a_scientist_frontend:
-    if: needs.check_folder_changes.outputs.frontend_changed == 'true'
+    if: needs.check_folder_changes.outputs.frontend_changed == 'false'
     name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
