@@ -21,13 +21,13 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref == 'refs/heads/production' && 'production' || 'staging' }}
-      url: ${{ steps.set_environment_variables.outputs.url }}
+    outputs:
+      PROJECT_ID: ${{ steps.define_output_variables.outputs.PROJECT_ID }}
     steps:
-      - name: Set environment variables
-        id: set_environment_variables
+      - name: Define env variables as output variables
+        id: define_output_variables
         run: |
-          echo "TF_WORKSPACE=env.TF_WORKSPACE" >> $GITHUB_ENV
-          echo "TF_WORKSPACE_ID=env.TF_WORKSPACE_ID" >> $GITHUB_ENV
+          echo "PROJECT_ID = ${ vars.PROJECT_ID }" >> $GITHUB_OUTPUT
 
   check_folder_changes:
     name: Check for changes in specific folders
@@ -126,7 +126,7 @@ jobs:
       DOCKERFILE_NAME: Dockerfile
       IMAGE_NAME: keycloak
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: ${{ vars.PROJECT_ID }}
+      PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
       SHA: ${{ needs.check_folder_changes.outputs.keycloak_sha }}
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
@@ -142,7 +142,7 @@ jobs:
       IMAGE_NAME: backend
       DOCKERFILE_NAME: Dockerfile
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: ${{ vars.PROJECT_ID }}
+      PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
       SHA: ${{ needs.check_folder_changes.outputs.hasura_sha }}
     secrets:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
@@ -158,7 +158,7 @@ jobs:
       DOCKERFILE_NAME: Dockerfile-edu
       IMAGE_NAME: edu
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: ${{ vars.PROJECT_ID }}
+      PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
       NEXT_PUBLIC_API_URL: "https://hasura-staging.opencampus.sh/v1/graphql"
       NEXT_PUBLIC_AUTH_URL: "https://keycloak-staging.opencampus.sh"
       SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
@@ -171,12 +171,13 @@ jobs:
     name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
+
     with:
       DOCKERFILE_FOLDER: frontend-nx
       DOCKERFILE_NAME: Dockerfile-rent-a-scientist
       IMAGE_NAME: rent-a-scientist
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: ${{ vars.PROJECT_ID }}
+      PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
       NEXT_PUBLIC_API_URL: "https://hasura-staging.opencampus.sh/v1/graphql"
       NEXT_PUBLIC_AUTH_URL: "https://keycloak-staging.opencampus.sh"
       SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
@@ -190,7 +191,7 @@ jobs:
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
     with:
-      PROJECT_ID: ${{ vars.PROJECT_ID }}
+      PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
       CLOUD_FUNCTION_FOLDER: functions
       BUCKET_NAME: ${{ vars.PROJECT_ID }}
     secrets:
