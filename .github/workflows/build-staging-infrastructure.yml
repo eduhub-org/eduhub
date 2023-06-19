@@ -205,18 +205,17 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref == 'refs/heads/production' && 'production' || 'staging' }}
-      url: ${{ steps.set_environment_variables.outputs.url }}
     defaults:
       run:
         working-directory: ./infrastructure/application
 
     steps:
 
-      - name: Set environment variables
-        id: set_environment_variables
-        run: |
-          echo "export TF_WORKSPACE=${{ env.TF_WORKSPACE }}"
-          echo "export TF_WORKSPACE_ID=${{ env.TF_WORKSPACE_ID }}"
+      # - name: Set environment variables
+      #   id: set_environment_variables
+      #   run: |
+      #     echo "export TF_WORKSPACE=${{ env.TF_WORKSPACE }}"
+      #     echo "export TF_WORKSPACE_ID=${{ env.TF_WORKSPACE_ID }}"
 
       - name: Checkout
         uses: actions/checkout@v3
