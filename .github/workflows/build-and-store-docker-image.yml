@@ -33,6 +33,11 @@ on:
       SHA:
         required: true
         type: string
+    secrets:
+      GCP_KEY:
+        required: true
+      GCP_REGION:
+        required: true
 
 jobs:
   build-and-store:
@@ -49,7 +54,7 @@ jobs:
         id: "auth"
         uses: "google-github-actions/auth@v0"
         with:
-          credentials_json: ${{ secrets.GCP_KEY }}
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
           project_id: ${{ inputs.PROJECT_ID }}
       - name: Build Docker image
         id: build_image
