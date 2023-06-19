@@ -138,6 +138,8 @@ jobs:
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
+      TF_WORKSPACE: ${{ github.TF_WORKSPACE }}
+      TF_WORKSPACE_ID: ${{ github.TF_WORKSPACE_ID }}
       DOCKERFILE_FOLDER: backend
       IMAGE_NAME: backend
       DOCKERFILE_NAME: Dockerfile

@@ -3,6 +3,14 @@ name: Build and Store a Docker Image in the Artifact Registry
 on:
   workflow_call:
     inputs:
+      # name of the terraform workspace
+      TF_WORKSPACE:
+        required: true
+        type: string
+      # id of the terraform workspace
+      TF_WORKSPACE_ID:
+        required: true
+        type: string
       # Name for the docker image
       IMAGE_NAME:
         required: true
@@ -48,8 +56,8 @@ jobs:
     env:
       NEXT_PUBLIC_API_URL: ${{ inputs.NEXT_PUBLIC_API_URL }}
       NEXT_PUBLIC_AUTH_URL: ${{ inputs.NEXT_PUBLIC_AUTH_URL }}
-      TF_WORKSPACE: ${{ secrets.TF_WORKSPACE }}
-      TF_WORKSPACE_ID: ${{ secrets.TF_WORKSPACE_ID }}
+      TF_WORKSPACE: ${{ inputs.TF_WORKSPACE }}
+      TF_WORKSPACE_ID: ${{ inputs.TF_WORKSPACE_ID }}
 
     steps:
       - name: Print TF_WORKSPACE and TF_WORKSPACE_ID
