@@ -42,8 +42,6 @@ on:
 jobs:
   build-and-store:
     name: Build and Store Docker Image in the Artifact Registry
-    environment:
-      name: ${{ github.ref == 'refs/heads/production' && 'production' || 'staging' }}
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_API_URL: ${{ inputs.NEXT_PUBLIC_API_URL }}
