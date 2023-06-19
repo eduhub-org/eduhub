@@ -46,8 +46,8 @@ jobs:
     env:
       NEXT_PUBLIC_API_URL: ${{ inputs.NEXT_PUBLIC_API_URL }}
       NEXT_PUBLIC_AUTH_URL: ${{ inputs.NEXT_PUBLIC_AUTH_URL }}
-      TF_WORKSPACE: env.TF_WORKSPACE
-      TF_WORKSPACE_ID: env.TF_WORKSPACE_ID
+      TF_WORKSPACE: ${{ env.TF_WORKSPACE }}
+      TF_WORKSPACE_ID: ${{ env.TF_WORKSPACE_ID }}
 
     steps:
       - name: Check Out the Repository Branch
