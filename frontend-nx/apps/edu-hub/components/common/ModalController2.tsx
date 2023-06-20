@@ -6,9 +6,10 @@ interface IPros {
   modalTitle?: string;
   onClosed: () => void;
   children?: ReactElement;
+  maxWidth?: 'lg' | 'md' | 'sm' | 'xl' | 'xs' | false;
 }
 
-const ModalControl2: FC<IPros> = ({ onClosed, modalTitle, children }) => {
+const ModalControl2: FC<IPros> = ({ onClosed, modalTitle, children, maxWidth }) => {
   const [open, setOpen] = useState(true);
   const onCloseHandler = useCallback(() => {
     setOpen(false);
@@ -17,7 +18,7 @@ const ModalControl2: FC<IPros> = ({ onClosed, modalTitle, children }) => {
 
   return (
     <>
-      <Dialog open={open} onClose={onCloseHandler}>
+      <Dialog open={open} onClose={onCloseHandler} maxWidth={maxWidth}>
         <DialogTitle>
           <div className="flex flex-row justify-between">
             {modalTitle && <p>{modalTitle}</p>}

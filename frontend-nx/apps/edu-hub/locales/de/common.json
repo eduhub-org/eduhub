@@ -68,5 +68,9 @@
   "project-description": "Projektbeschreibung",
   "project-new-button": "Neues Projekt",
   "courses": "Kurse",
-  "achievement-record-type": "Typ der Projektdokumentation"
+  "achievement-record-type": "Typ der Projektdokumentation",
+  "authors": "Autoren",
+  "documentation": "Dokumentation",
+  "cover-picture": "Deckblatt",
+  "upload": "Hochladen"
 }
