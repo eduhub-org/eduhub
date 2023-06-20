@@ -197,13 +197,13 @@ const CourseAchievementOption: FC<IProps> = ({
             />
           )}
         </div>
-        {selectedAchievementOption.id && (
+        {/* {selectedAchievementOption.id && (
           <Link
             href={`../achievements/${selectedAchievementOption.id}?courseId=${courseId}`}
           >
             {selectedAchievementOption.title}
           </Link>
-        )}
+        )} */}
         {selectedAchievementOption.id && (
           <div className="flex">
             <Button filled onClick={upload}>
