@@ -23,7 +23,6 @@ import {
   formattedDateWithTime,
 } from '../../../../helpers/util';
 import { AlertMessageDialog } from '../../../common/dialogs/AlertMessageDialog';
-import { Translate } from 'next-translate';
 import { ACHIEVEMENT_OPTION_COURSES } from '../../../../queries/achievementOption';
 
 import { order_by } from '../../../../__generated__/globalTypes';
@@ -35,12 +34,12 @@ import {
 import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../../../queries/achievementRecord';
 import { Link } from '@material-ui/core';
 import { MinAchievementOption } from '../../../../helpers/achievement';
+import useTranslation from 'next-translate/useTranslation';
 interface IContext {
   achievementRecordUploadDeadline: any;
   courseTitle: string;
   userId: string | undefined;
   userProfile: IUserProfile | undefined;
-  t: Translate;
   setAlertMessage: (value: string) => void;
 }
 
@@ -49,7 +48,6 @@ export const ProjectResultUploadContext = createContext({} as IContext);
 interface IProps {
   courseId: number;
   achievementRecordUploadDeadline: any;
-  t: Translate;
   courseTitle: string;
 }
 
@@ -57,8 +55,8 @@ const CourseAchievementOption: FC<IProps> = ({
   courseId,
   achievementRecordUploadDeadline,
   courseTitle,
-  t,
 }) => {
+  const { t, lang } = useTranslation();
   const userId = useUserId();
   const profile = useKeycloakUserProfile();
   const [showModal, setShowModal] = useState(false);
@@ -156,7 +154,6 @@ const CourseAchievementOption: FC<IProps> = ({
     userProfile: profile,
     userId,
     courseTitle,
-    t,
     setAlertMessage,
   };
   return (
@@ -171,17 +168,23 @@ const CourseAchievementOption: FC<IProps> = ({
       )}
 
       <div className="flex flex-col space-y-3 items-start">
-        <BlockTitle>{t('achievement-option')}</BlockTitle>
-        <span className="text-lg mt-6">
-          {t('achievement-record-upload-dead-line-text', {
-            date: formattedDate(achievementRecordUploadDeadline),
-          })}
-        </span>
+        <BlockTitle>{t('course-page:achievement-option')}</BlockTitle>
+        {!query.loading && achievementOptions.length > 0 && (
+          <span className="text-lg mt-6">
+            {t('course-page:achievement-record-upload-dead-line-text', {
+              date: formattedDate(achievementRecordUploadDeadline),
+            })}
+          </span>
+        )}
         <div className="flex mt-10 mb-4">
-          {!query.loading && achievementOptions.length > 0 && (
+          {!query.loading && achievementOptions.length > 0 ? (
             <div onClick={onAchievementOptionDropdown}>
-              <Button>{`${t('choose-achievement-option')} ↓`}</Button>
+              <Button>{`${t(
+                'course-page:choose-achievement-option'
+              )} ↓`}</Button>
             </div>
+          ) : (
+            <div>{t('course-page:no-achievement-option')}</div>
           )}
 
           {isVisibleAchievementOptions && (
@@ -194,31 +197,31 @@ const CourseAchievementOption: FC<IProps> = ({
             />
           )}
         </div>
-        {selectedAchievementOption.id && (
+        {/* {selectedAchievementOption.id && (
           <Link
             href={`../achievements/${selectedAchievementOption.id}?courseId=${courseId}`}
           >
             {selectedAchievementOption.title}
           </Link>
-        )}
+        )} */}
         {selectedAchievementOption.id && (
           <div className="flex">
             <Button filled onClick={upload}>
-              {`↑ ${t('upload-proof')}`}
+              {`↑ ${t('course-page:upload-proof')}`}
             </Button>
           </div>
         )}
         {selectedAchievementOption.id && myRecords && (
           <p>
-            {t('last-upload-from-a-author', {
-              dateTime: formattedDateWithTime(new Date(myRecords.created_at)),
+            {t('course-page:last-upload-from-an-author', {
+              dateTime: formattedDateWithTime(new Date(myRecords.created_at), lang),
               fullName: makeFullName(profile.firstName, profile.lastName),
             })}
           </p>
         )}
 
         {selectedAchievementOption.id && !myRecords && (
-          <p>{t('no-proof-uploaded-by-me-as-author')}</p>
+          <p>{t('course-page:no-proof-uploaded-by-me-as-author')}</p>
         )}
       </div>
       {showModal && (
