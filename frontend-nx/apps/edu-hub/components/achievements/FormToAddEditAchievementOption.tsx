@@ -281,9 +281,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
         <div className="grid grid-cols-3 gap-5">
           {/* Edit title */}
           <EhInputWithTitle2
-            label={`${tCommon('title-number-of-characters', {
-              numberOfCharacters: 'XXX/200',
-            })}*`}
+            label={`${tCommon('project-title')}*`}
             onChangeHandler={handleInputChange}
             name="title"
             id="title"
@@ -293,47 +291,51 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
           />
 
           {/* Edit authors */}
-          <div className="flex gap-2 flex-wrap items-center pr-5">
-            {state.mentors.map((e, index) => (
-              <div key={`mentors-${index}`} className="grid grid-cols-1">
-                <EhTagStingId
-                  title={makeFullName(e.firstName, e.lastName)}
-                  id={e.userId ?? undefined}
-                  requestDeleteTag={onDeleteAMentor}
-                />
+          <div className="flex flex-col space-y-1">
+            <p>{`${tCommon('project-mentors')}`}</p>
+            <div className="flex gap-2 flex-wrap items-center pr-5">
+              {state.mentors.map((e, index) => (
+                <div key={`mentors-${index}`} className="grid grid-cols-1">
+                  <EhTagStingId
+                    title={makeFullName(e.firstName, e.lastName)}
+                    id={e.userId ?? undefined}
+                    requestDeleteTag={onDeleteAMentor}
+                  />
+                </div>
+              ))}
+              <div className="cursor-pointer">
+                {/* Extra div because class property was not working */}
+                <MdAddCircle onClick={showAddMentorDialog} />
               </div>
-            ))}
-            <div className="cursor-pointer">
-              {/* Extra div because class property was not working */}
-              <MdAddCircle onClick={showAddMentorDialog} />
             </div>
           </div>
 
           {/* Edit Program and course */}
-          <div className="flex flex-wrap gap-2 items-center pr-5">
-            {state.courses.map((course, index) => (
-              <div key={`course-${index}`} className="grid grid-cols-1">
-                <TagWithTwoText
-                  key={`course-${index}`}
-                  textLeft={course.title}
-                  textRight={course.programShortName}
-                  onRemoveClick={onDeleteACourse}
-                  id={course.courseId}
-                />
+          <div className="flex flex-col space-y-1">
+            <p>{`${tCommon('courses')}`}</p>
+            <div className="flex flex-wrap gap-2 items-center pr-5">
+              {state.courses.map((course, index) => (
+                <div key={`course-${index}`} className="grid grid-cols-1">
+                  <TagWithTwoText
+                    key={`course-${index}`}
+                    textLeft={course.title}
+                    textRight={course.programShortName}
+                    onRemoveClick={onDeleteACourse}
+                    id={course.courseId}
+                  />
+                </div>
+              ))}
+              <div className="cursor-pointer">
+                {/* Extra div because class property was not working */}
+                <MdAddCircle onClick={showAddCourseDialog} />
               </div>
-            ))}
-            <div className="cursor-pointer">
-              {/* Extra div because class property was not working */}
-              <MdAddCircle onClick={showAddCourseDialog} />
             </div>
           </div>
         </div>
 
         <div id="edit-description" className="pr-5">
           <EhInputWithTitle2
-            label={`${tCommon('description-number-of-characters', {
-              numberOfCharacters: 'XXX/500',
-            })}*`}
+            label={`${tCommon('project-description')}`}
             onChangeHandler={handleInputChange}
             name="description"
             id="description"
@@ -343,7 +345,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
           />
         </div>
 
-        <div id="edit-documentations" className="flex flex-col gap-5 pr-5">
+        <div id="edit-documentations" className="flex flex-col gap-5 pr-5 hidden">
           <div className="h-full flex flex-row justify-between">
             <div className="flex flex-col space-y-1">
               <div className="flex flex-col space-y-1">
@@ -431,13 +433,11 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
             />
           </div>
         </div>
-        {!isEqual() && (
-          <div className="flex justify-center">
-            <Button type="submit" id="submit-button" filled>
-              {loading ? <CircularProgress /> : tCommon('save')}
-            </Button>
-          </div>
-        )}
+        <div className="flex justify-center">
+          <Button type="submit" id="submit-button" filled>
+            {loading ? <CircularProgress /> : tCommon('save')}
+          </Button>
+        </div>
       </form>
     </>
   );

@@ -227,14 +227,14 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
         setLoading(true);
         event.preventDefault();
 
-        if (
-          achievementOption.recordType ===
-            AchievementRecordType_enum.DOCUMENTATION &&
-          !state.coverImageUrl
-        ) {
-          setAlertMessage(`${t('achievements-page:cover-image-required')}`);
-          return;
-        }
+        // if (
+        //   achievementOption.recordType ===
+        //     AchievementRecordType_enum.DOCUMENTATION &&
+        //   !state.coverImageUrl
+        // ) {
+        //   setAlertMessage(`${t('achievements-page:cover-image-required')}`);
+        //   return;
+        // }
 
         if (state.authors.length === 0) {
           setAlertMessage(`${t('achievements-page:authors-missing')}`);
@@ -353,7 +353,7 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
     ]
   );
   return (
-    <ModalControl2 onClosed={onClose}>
+    <ModalControl2 onClosed={onClose} maxWidth="xl">
       <div className="flex flex-col space-y-5 w-full pb-5">
         {visibleAuthorList && (
           <EnrolledUserForACourseDialog
@@ -364,7 +364,7 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
           />
         )}
         <ContentRow>
-          <h1 className="w-1/2">{t('upload-proof')}</h1>
+          <h1 className="w-1/2">{t('achievements-page:upload-proof')}</h1>
           <p className="text-right w-1/2">{courseTitle}</p>
         </ContentRow>
 
@@ -372,17 +372,20 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
           <p className="uppercase">{achievementOption.title}</p>
           {achievementOption.recordType ===
             AchievementRecordType_enum.DOCUMENTATION && (
-            <div className="flex flex-row space-x-1">
+            <div className="flex flex-row gap-6">
               <p className="w-2/6">{t('cover-picture')}</p>
               <div className="w-4/6">
                 <UploadUI
-                  nodeBottom={t('form-info-cover-image-size', {
-                    width: 520,
-                    height: 320,
-                  })}
+                  nodeBottom={t(
+                    'achievements-page:form-info-cover-image-size',
+                    {
+                      width: 520,
+                      height: 320,
+                    }
+                  )}
                   onFileSelected={onFileChange}
-                  acceptedFileTypes=".png"
-                  placeholder={`${t('cover-picture')} (.png)`}
+                    acceptedFileTypes=".jpg,.jpeg,.png,.gif,.bmp"
+                    placeholder={t('achievements-page:file-name')}
                   name="coverImageUrl"
                   id="coverImageUrl"
                 />
@@ -390,8 +393,8 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
             </div>
           )}
 
-          <div className="flex flex-row space-x-1">
-            <p className="w-2/6">{t('authors')}</p>
+          <div className="flex flex-row gap-6">
+            <p className="w-2/6">{t('authors')} *</p>
             <div className="w-4/6 flex flex-row">
               <div className="items-center pt-1 pr-3">
                 <MdAddCircleOutline
@@ -401,7 +404,7 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-1">
+              <div className="grid grid-cols-2 gap-6">
                 {state.authors.map((user, index) => (
                   <EhTagStingId
                     key={`achievement-authors-${index}`}
@@ -413,7 +416,7 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
               </div>
             </div>
           </div>
-          <div className="flex flex-row space-x-1">
+          <div className="flex flex-row gap-6">
             <p className="w-2/6">{t('description')}</p>
             <div className="w-4/6">
               <TextareaAutosize
@@ -422,37 +425,36 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
                 transition
                 ease-in-out
                 w-full
-                border border-solid border-gray-300
+                border border-solid border-gray-400
                 focus:border-blue-600 focus:outline-none"
                 name="description"
                 id="description"
-                placeholder={t('description')}
+                placeholder="..."
                 onChange={onInputChange}
                 minRows={4}
               ></TextareaAutosize>
             </div>
           </div>
 
-          <div className="flex flex-row space-x-1">
-            <p className="w-2/6">{t('documentations')}</p>
+          <div className="flex flex-row gap-6">
+            <p className="w-2/6">{t('documentation')} *</p>
             <div className="w-4/6">
               <UploadUI
                 nodeBottom={
                   documentTemplateGoogleLink && (
                     <Trans
-                      i18nKey="form-info-documentations"
-                      components={[
-                        <Link href={documentTemplateGoogleLink} key="info" />,
-                      ]}
-                      values={{
-                        article: 'diese Vorlage',
+                      i18nKey="achievements-page:form-info-documentations"
+                      components={{
+                        component: (
+                          <Link href={documentTemplateGoogleLink} key="info" />
+                        ),
                       }}
                     ></Trans>
                   )
                 }
                 onFileSelected={onFileChange}
-                acceptedFileTypes=".zip"
-                placeholder=".zip"
+                acceptedFileTypes=""
+                placeholder={t('achievements-page:file-name')}
                 name="documentationUrl"
                 id="documentationUrl"
               />

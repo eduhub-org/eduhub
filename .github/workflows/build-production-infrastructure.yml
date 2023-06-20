@@ -1,4 +1,4 @@
-name: Setup Production Environment
+name: Setup Environment
 on:
   push:
     # Run only on changes in the following branches
@@ -14,108 +14,213 @@ on:
     branches:
       - production
 
-env:
-  TF_WORKSPACE: eduhub-application-production
-  TF_WORKSPACE_ID: ws-wzFdRXijjGbir9z6
-  TF_VAR_ID_COMMIT_SHA: var-KUDdKLtdQGzJ8WnB
-
 jobs:
-  save_commit_sha:
-    name: Save SHA of current commit in Terraform Cloud
+
+  prepare_environment:
+    name: Prepare environment variables
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref == 'refs/heads/production' && 'production' || 'staging' }}
+    outputs:
+      # Defined for subsequent jobs since env variables cannot be directly accessed or passed to called workflows
+      PROJECT_ID: ${{ steps.define_output_variables.outputs.PROJECT_ID }}
+      NEXT_PUBLIC_AUTH_URL: ${{ steps.define_output_variables.outputs.NEXT_PUBLIC_AUTH_URL }}
+      NEXT_PUBLIC_API_URL: ${{ steps.define_output_variables.outputs.NEXT_PUBLIC_API_URL }}
+      GPC_KEY: ${{ steps.define_output_variables.outputs.GPC_KEY }}
     steps:
-      - name: Check Out the Repository Branch
-        uses: actions/checkout@v3
-      - name: Save commit SHA in Terraform Cloud variable
+      - name: Define env variables as output variables
+        id: define_output_variables
         run: |
-          curl \
-          --header "Authorization: Bearer ${{ secrets.TF_API_TOKEN }}" \
-          --header "Content-Type: application/vnd.api+json" \
-          --request PATCH \
-          --data "{ \"data\": { \"id\":\"$TF_VAR_ID_COMMIT_SHA\", \"attributes\": { \"value\":\"$(git rev-parse --short "$GITHUB_SHA")\" }, \"type\":\"vars\" }}" \
-          https://app.terraform.io/api/v2/workspaces/$TF_WORKSPACE_ID/vars/$TF_VAR_ID_COMMIT_SHA
+          echo "PROJECT_ID=${{ vars.PROJECT_ID }}" >> $GITHUB_OUTPUT
+          echo "NEXT_PUBLIC_AUTH_URL=${{ vars.NEXT_PUBLIC_AUTH_URL }}" >> $GITHUB_OUTPUT
+          echo "NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}" >> $GITHUB_OUTPUT
+          echo "GPC_KEY=${{ vars.GPC_KEY }}" >> $GITHUB_OUTPUT
+
+  check_folder_changes:
+    name: Check for changes in specific folders
+    runs-on: ubuntu-latest
+    outputs:
+      frontend_changed: ${{ steps.changed_folders.outputs.frontend_changed }}
+      hasura_changed: ${{ steps.changed_folders.outputs.hasura_changed }}
+      keycloak_changed: ${{ steps.changed_folders.outputs.keycloak_changed }}
+      functions_changed: ${{ steps.changed_folders.outputs.functions_changed }}
+      frontend_sha: ${{ steps.calculate_sha.outputs.frontend_sha }}
+      hasura_sha: ${{ steps.calculate_sha.outputs.hasura_sha }}
+      keycloak_sha: ${{ steps.calculate_sha.outputs.keycloak_sha }}
+      functions_sha: ${{ steps.calculate_sha.outputs.functions_sha }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
+
+      - name: Get changed files
+        id: changed_files
+        uses: tj-actions/changed-files@v35
+        
+      - name: List all changed files
+        id: list_changed_files
+        run: |
+          IFS=' ' read -ra changed_files <<< "${{ steps.changed_files.outputs.all_changed_files }}"
+          for file in "${changed_files[@]}"; do
+            echo "$file was changed"
+          done
+      
+      - name: Check if any file in the specified folders has changed
+        id: changed_folders
+        run: |
+          function check_folder_changes() {
+            folder=$1
+            for file in "${changed_files[@]}"; do
+              if [[ $file == $folder/* ]]; then
+                echo "true"
+                return
+              fi
+            done
+            echo "false"
+          }
+
+          IFS=' ' read -ra changed_files <<< "${{ steps.changed_files.outputs.all_changed_files }}"
+          hasura_changed=$(check_folder_changes "backend")
+          keycloak_changed=$(check_folder_changes "keycloak")
+          frontend_changed=$(check_folder_changes "frontend-nx")
+          functions_changed=$(check_folder_changes "functions")
+
+          echo "hasura_changed=${hasura_changed}" >> $GITHUB_OUTPUT
+          echo "keycloak_changed=${keycloak_changed}" >> $GITHUB_OUTPUT
+          echo "frontend_changed=${frontend_changed}" >> $GITHUB_OUTPUT
+          echo "functions_changed=${functions_changed}" >> $GITHUB_OUTPUT
+
+      - name: Calculate SHA for each folder
+        id: calculate_sha
+        run: |
+          function calculate_sha() {
+            folder=$1
+            sha=$(find $folder -type f -print0 | sort -z | xargs -0 sha1sum | awk '{print $1}' | sha1sum | awk '{print $1}')
+            echo $sha
+          }
+
+          hasura_sha=$(calculate_sha "backend")
+          keycloak_sha=$(calculate_sha "keycloak")
+          frontend_sha=$(calculate_sha "frontend-nx")
+          functions_sha=$(calculate_sha "functions")
+
+          echo "hasura_sha=${hasura_sha}" >> $GITHUB_OUTPUT
+          echo "keycloak_sha=${keycloak_sha}" >> $GITHUB_OUTPUT
+          echo "frontend_sha=${frontend_sha}" >> $GITHUB_OUTPUT
+          echo "functions_sha=${functions_sha}" >> $GITHUB_OUTPUT  
+
+      - name: Print output variables
+        id: print_output_variables
+        run: |
+          echo "frontend_changed: ${{ steps.changed_folders.outputs.frontend_changed }}"
+          echo "hasura_changed: ${{ steps.changed_folders.outputs.hasura_changed }}"
+          echo "keycloak_changed: ${{ steps.changed_folders.outputs.keycloak_changed }}"
+          echo "functions_changed: ${{ steps.changed_folders.outputs.functions_changed }}"
+          echo "frontend_sha: ${{ steps.calculate_sha.outputs.frontend_sha }}"
+          echo "hasura_sha: ${{ steps.calculate_sha.outputs.hasura_sha }}"
+          echo "keycloak_sha: ${{ steps.calculate_sha.outputs.keycloak_sha }}"
+          echo "functions_sha: ${{ steps.calculate_sha.outputs.functions_sha }}"
+
 
   build_keycloak:
+    if: needs.check_folder_changes.outputs.keycloak_changed == 'true'
     name: Build and Store Keycloak Docker Image in Google Docker Repo
-    needs: [save_commit_sha]
+    needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: keycloak
       DOCKERFILE_NAME: Dockerfile
       IMAGE_NAME: keycloak
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: eduhub-production
+      SHA: ${{ needs.check_folder_changes.outputs.keycloak_sha }}
+      PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
     secrets:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
-
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+  
   build_hasura:
-    name: Build and Store Backend Docker Image in Google Docker Repo
-    needs: [save_commit_sha]
+    if: needs.check_folder_changes.outputs.hasura_changed == 'true'
+    name: Build and Store Hasura Docker Image in Google Docker Repo
+    needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: backend
       IMAGE_NAME: backend
       DOCKERFILE_NAME: Dockerfile
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: eduhub-production
+      PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
+      SHA: ${{ needs.check_folder_changes.outputs.hasura_sha }}
     secrets:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
 
-  build_edu_frontend:
+  build_frontend:
+    if: needs.check_folder_changes.outputs.frontend_changed == 'true'
     name: Build and Store Frontend Docker Image in Google Docker Repo
-    needs: [save_commit_sha]
+    needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
     with:
       DOCKERFILE_FOLDER: frontend-nx
       DOCKERFILE_NAME: Dockerfile-edu
       IMAGE_NAME: edu
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: eduhub-production
-      NEXT_PUBLIC_API_URL: "https://hasura.opencampus.sh/v1/graphql"
-      NEXT_PUBLIC_AUTH_URL: "https://keycloak.opencampus.sh"
+      PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
+      NEXT_PUBLIC_API_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_API_URL }}
+      NEXT_PUBLIC_AUTH_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_AUTH_URL }}
+      SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
     secrets:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
-
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+  
   build_rent_a_scientist_frontend:
+    if: needs.check_folder_changes.outputs.frontend_changed == 'true'
     name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
-    needs: [save_commit_sha]
+    needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
+
     with:
       DOCKERFILE_FOLDER: frontend-nx
       DOCKERFILE_NAME: Dockerfile-rent-a-scientist
       IMAGE_NAME: rent-a-scientist
       BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: eduhub-production
-      NEXT_PUBLIC_API_URL: "https://hasura.opencampus.sh/v1/graphql"
-      NEXT_PUBLIC_AUTH_URL: "https://keycloak.opencampus.sh"
+      PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
+      NEXT_PUBLIC_API_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_API_URL }}
+      NEXT_PUBLIC_AUTH_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_AUTH_URL }}
+      SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
     secrets:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
       GCP_REGION: ${{ secrets.GCP_REGION }}
-
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+  
   zip_and_store_cloud_functions:
+    if: needs.check_folder_changes.outputs.functions_changed == 'true'
     name: Zip and Store Cloud Functions
-    needs: [save_commit_sha]
+    needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
     with:
-      PROJECT_ID: eduhub-production
+      PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
       CLOUD_FUNCTION_FOLDER: functions
-      BUCKET_NAME: eduhub-production
-    secrets:
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
-      GCP_REGION: ${{ secrets.GCP_REGION }}
+      BUCKET_NAME: ${{ vars.PROJECT_ID }}
+    secrets: inherit
 
   deploy_application:
+    if: always()
     name: "Deploy Application Infrastructure"
     needs:
-      [build_keycloak, build_hasura, build_edu_frontend, build_rent_a_scientist_frontend, zip_and_store_cloud_functions]
+      [prepare_environment, check_folder_changes, build_keycloak, build_hasura, build_frontend, build_rent_a_scientist_frontend, zip_and_store_cloud_functions]
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref == 'refs/heads/production' && 'production' || 'staging' }}
+    env:
+      TF_WORKSPACE: ${{ vars.TF_WORKSPACE }}
+      TF_WORKSPACE_ID: ${{ vars.TF_WORKSPACE_ID }}
+  
     defaults:
       run:
         working-directory: ./infrastructure/application
+
     steps:
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -130,16 +235,16 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: terraform init -var="keycloak_sha=${{ needs.check_folder_changes.outputs.keycloak_sha }}" -var="hasura_sha=${{ needs.check_folder_changes.outputs.hasura_sha }}" -var="frontend_sha=${{ needs.check_folder_changes.outputs.frontend_sha }}" -var="functions_sha=${{ needs.check_folder_changes.outputs.functions_sha }}"
 
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
-
+ 
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'pull_request'
-        run: terraform plan -detailed-exitcode -no-color -input=false
+        run: terraform plan -detailed-exitcode -no-color -input=false -var="keycloak_sha=${{ needs.check_folder_changes.outputs.keycloak_sha }}" -var="hasura_sha=${{ needs.check_folder_changes.outputs.hasura_sha }}" -var="frontend_sha=${{ needs.check_folder_changes.outputs.frontend_sha }}" -var="functions_sha=${{ needs.check_folder_changes.outputs.functions_sha }}"
         continue-on-error: true
 
       - name: Check for Plan Failure
@@ -147,5 +252,5 @@ jobs:
         run: exit 1
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/production' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
+        if: (github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/production') && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false -var="keycloak_sha=${{ needs.check_folder_changes.outputs.keycloak_sha }}" -var="hasura_sha=${{ needs.check_folder_changes.outputs.hasura_sha }}" -var="frontend_sha=${{ needs.check_folder_changes.outputs.frontend_sha }}" -var="functions_sha=${{ needs.check_folder_changes.outputs.functions_sha }}"

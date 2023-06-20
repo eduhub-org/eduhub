@@ -88,13 +88,21 @@ select_permissions:
             id:
               _eq: X-Hasura-User-Id
 update_permissions:
-  - role: instructor_access
+  - role: user_access
     permission:
       columns:
+        - achievementOptionId
+        - courseId
         - coverImageUrl
+        - created_at
+        - csvResults
+        - description
         - documentationUrl
         - evaluationScriptUrl
         - rating
+        - score
+        - updated_at
+        - uploadUserId
       filter:
         _or:
           - AchievementOption:
@@ -114,4 +122,4 @@ update_permissions:
               User:
                 id:
                   _eq: X-Hasura-User-Id
-      check: {}
+      check: null

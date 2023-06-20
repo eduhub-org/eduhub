@@ -26,6 +26,7 @@ import { CircularProgress } from '@material-ui/core';
 //   };
 // };
 
+
 const CoursePage: FC = () => {
   const router = useRouter();
   const { courseId } = router.query;

@@ -35,8 +35,8 @@ interface IProps {
 }
 
 export const AttendancesAndAchievements: FC<IProps> = ({ course }) => {
-  const { t, lang } = useTranslation();
-  const { t: tLanguage } = useTranslation('common');
+  const { lang } = useTranslation();
+  // const { t: tLanguage } = useTranslation('common');
   const startTime = getStartTimeString(course, lang);
   const endTime = getEndTimeString(course, lang);
 
@@ -82,16 +82,15 @@ export const AttendancesAndAchievements: FC<IProps> = ({ course }) => {
             <Attendances course={course} />
           </div>
           <div className="flex flex-1">
-            {/* {course.achievementCertificatePossible && (
+            {course.achievementCertificatePossible && (
                 <CourseAchievementOption
                   courseId={course.id}
                   achievementRecordUploadDeadline={
                     course.Program.achievementRecordUploadDeadline
                   }
                   courseTitle={course.title}
-                  t={t}
                 />
-              )} */}
+              )}
           </div>
         </ContentRow>
       </>
