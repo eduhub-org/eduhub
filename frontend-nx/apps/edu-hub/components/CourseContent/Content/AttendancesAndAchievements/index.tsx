@@ -35,8 +35,8 @@ interface IProps {
 }
 
 export const AttendancesAndAchievements: FC<IProps> = ({ course }) => {
-  const { t, lang } = useTranslation();
-  const { t: tLanguage } = useTranslation('common');
+  const { lang } = useTranslation();
+  // const { t: tLanguage } = useTranslation('common');
   const startTime = getStartTimeString(course, lang);
   const endTime = getEndTimeString(course, lang);
 
@@ -89,7 +89,6 @@ export const AttendancesAndAchievements: FC<IProps> = ({ course }) => {
                     course.Program.achievementRecordUploadDeadline
                   }
                   courseTitle={course.title}
-                  t={t}
                 />
               )}
           </div>
