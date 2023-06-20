@@ -82,7 +82,7 @@ export const AttendancesAndAchievements: FC<IProps> = ({ course }) => {
             <Attendances course={course} />
           </div>
           <div className="flex flex-1">
-            {/* {course.achievementCertificatePossible && (
+            {course.achievementCertificatePossible && (
                 <CourseAchievementOption
                   courseId={course.id}
                   achievementRecordUploadDeadline={
@@ -91,7 +91,7 @@ export const AttendancesAndAchievements: FC<IProps> = ({ course }) => {
                   courseTitle={course.title}
                   t={t}
                 />
-              )} */}
+              )}
           </div>
         </ContentRow>
       </>

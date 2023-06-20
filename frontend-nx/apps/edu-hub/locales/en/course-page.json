@@ -133,5 +133,8 @@
   "to-be-defined": "Location still to be determined",
   "not-submitted": "not submitted",
   "email-confirmed-applicants": "E-Mail to confirmed applicants",
-  "application-end": "Application deadline:"
-}
+  "application-end": "Application deadline:",
+  "achievement-option": "Achievement Record",
+  "achievement-record-upload-dead-line-text": "Please upload the documentation for your achievement record until {{date}}.",
+  "choose-achievement-option": "Please choose the title of your achievement record."
+  }
