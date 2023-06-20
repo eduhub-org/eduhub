@@ -136,5 +136,6 @@
   "application-end": "Bewerbungsende:",
   "achievement-option": "Leistungsnachweis",
   "achievement-record-upload-dead-line-text": "Du hast bist zum {{date}} Zeit einen Leistungsnachweise hochzuladen.",
-  "choose-achievement-option": "Wähle den Titel deines Leistungsnachweises aus."
+  "choose-achievement-option": "Wähle den Titel deines Leistungsnachweises aus.",
+  "no-achievement-option": "Aktuell steht kein Leistungsnachweis für diesen Kurs zur Verfügung."
 }
