@@ -133,5 +133,9 @@
   "to-be-defined": "Der Ort bzw. die Adresse wird noch bekannt gegeben.",
   "not-submitted": "nicht eingereicht",
   "email-confirmed-applicants": "Email an bestätigte Bewerber:innen",
-  "application-end": "Bewerbungsende:"
+  "application-end": "Bewerbungsende:",
+  "achievement-option": "Leistungsnachweis",
+  "achievement-record-upload-dead-line-text": "Du hast bist zum {{date}} Zeit einen Leistungsnachweise hochzuladen.",
+  "choose-achievement-option": "Wähle den Titel deines Leistungsnachweises aus.",
+  "no-achievement-option": "Aktuell steht kein Leistungsnachweis für diesen Kurs zur Verfügung."
 }
