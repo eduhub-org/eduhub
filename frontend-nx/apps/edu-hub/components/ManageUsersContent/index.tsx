@@ -23,6 +23,7 @@ import {
   User_bool_exp,
   CourseEnrollmentStatus_enum,
 } from '../../__generated__/globalTypes';
+import useTranslation from 'next-translate/useTranslation';
 
 interface IProps {
   t: any;
@@ -375,9 +376,12 @@ interface IPropsUser {
 }
 
 const UserOneRow: FC<IPropsUser> = ({ user }) => {
-  const pStyle = 'text-gray-700 truncate font-medium max-w-xs';
+  const pStyle = 'text-gray-700 font-bold truncate max-w-xs';
+  const pStyleSub = 'text-gray-700 truncate font-medium max-w-xs';
   const tdStyple = 'pl-5';
   const enrollmentPStyle = 'text-gray-600 truncate text-sm max-w-xs';
+
+  const { t } = useTranslation();
 
   return (
     <>
@@ -390,6 +394,23 @@ const UserOneRow: FC<IPropsUser> = ({ user }) => {
         </td>
         <td className={tdStyple}>
           <p className={pStyle}>{user.email}</p>
+        </td>
+      </tr>
+      <tr className="font-medium bg-edu-course-list h-12">
+        <td className={tdStyple}>
+          <p className={pStyleSub}>{`${t('status')}: ${
+            user.employment ? t(user.employment) : "-"
+          }`}</p>
+        </td>
+        <td className={tdStyple}>
+          <p className={pStyleSub}>{`${t('matriculation-number')}: ${
+           user.matriculationNumber ? user.matriculationNumber : "-"
+          }`}</p>
+        </td>
+        <td className={tdStyple}>
+          <p className={pStyleSub}>{`${t('university')}: ${
+            user.university ? t(user.university) : "-"
+          }`}</p>
         </td>
       </tr>
       {user.CourseEnrollments.map((enrollment) => (

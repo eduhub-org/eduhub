@@ -149,7 +149,9 @@
                                 </div>
                             </form>
                         </#if>
-
+                        
+                      <#nested "socialProviders">
+                    
                     <#if displayInfo>
                         <div id="kc-info" class="${properties.kcSignUpClass!}">
                             <div id="kc-info-wrapper" class="${properties.kcInfoAreaWrapperClass!}">

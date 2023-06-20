@@ -1,0 +1,1 @@
+comment on column "public"."Session"."questionaire_sent" is E'indicates whether a questionaire has been sent out yet. will also be true if it was determined that no questionaire should be send out due to session speaker is course instructor restriction';

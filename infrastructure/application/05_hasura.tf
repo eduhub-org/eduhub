@@ -66,19 +66,22 @@ resource "google_cloud_run_service_iam_policy" "hasura_noauth_invoker" {
 # Define the Google Cloud Run service for Keycloak
 module "hasura_service" {
   source  = "GoogleCloudPlatform/cloud-run/google"
-  version = "~> 0.2.0"
+  version = "~> 0.8"
 
   # Required variables
   service_name = local.hasura_service_name
   project_id   = var.project_id
   location     = var.region
-  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:${var.commit_sha}"
+  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend"
+
+  service_labels = {
+    sha = var.hasura_sha
+  }
 
   limits = {
     cpu    = "1000m"
     memory = var.hasura_memory_limit
   }
-
   container_concurrency = "80"
 
   service_annotations = {
@@ -106,7 +109,7 @@ module "hasura_service" {
     },
     {
       name  = "HASURA_GRAPHQL_MIGRATIONS_SERVER_TIMEOUT"
-      value = 60
+      value = 120
     },
     {
       name  = "HASURA_GRAPHQL_DEV_MODE"

@@ -62,8 +62,6 @@ export const TileSlider: FC<IProps> = ({ courses, isManage }) => {
   const handleSlideChange = () => {
     const swiper: SwiperType = swiperRef.current.swiper;
 
-    console.log(swiper.isBeginning, swiper.isEnd);
-
     if (swiper.isBeginning) {
       // Hide the previous button if in start position
       setPrevVisible(false);
@@ -100,7 +98,6 @@ export const TileSlider: FC<IProps> = ({ courses, isManage }) => {
         slidesOffsetBefore={13}
         slidesOffsetAfter={13}
         onSlideChange={handleSlideChange}
-        onSwiper={(swiper) => console.log(swiper)}
         // navigation={{
         //   nextEl: `.button-next-${nextButtonId}`,
         //   prevEl: `.button-prev-${prevButtonId}`,

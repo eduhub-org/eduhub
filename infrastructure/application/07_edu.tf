@@ -56,14 +56,14 @@ resource "google_secret_manager_secret_iam_member" "keycloak_hasura_client_secre
 # Define the Google Cloud Run service for the Edu frontend
 resource "google_cloud_run_service" "eduhub" {
   provider = google-beta
-
   name     = local.eduhub_service_name
   location = var.region
 
   template {
     spec {
       containers {
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/edu:${var.commit_sha}"
+        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/edu:latest"
+
         ports {
           name           = "http1"
           container_port = 5000
@@ -123,6 +123,9 @@ resource "google_cloud_run_service" "eduhub" {
     }
 
     metadata {
+      labels = {
+        sha = "${var.frontend_sha}"
+      }
       annotations = {
         "autoscaling.knative.dev/minScale" = "0"
         "autoscaling.knative.dev/maxScale" = "1"

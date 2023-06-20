@@ -20,8 +20,8 @@
   "save": "Save",
   "regDate": "Reg. Date",
   "paginationText": "Page {{currentPage}} of {{totalPage}}",
-  "some-info-about-you": "Bitte gib uns zunächst noch ein paar Informationen über dich.",
+  "some-info-about-you": "Please give us a few infos about yourself.",
   "status": "Status",
-  "allPrograms": "Alle Programme",
-  "filterByProgram": "Programmfilter"
+  "allPrograms": "All programs",
+  "filterByProgram": "Program filter"
 }

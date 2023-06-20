@@ -73,7 +73,7 @@ event_triggers:
     retry_conf:
       interval_sec: 10
       num_retries: 0
-      timeout_sec: 60
+      timeout_sec: 600
     webhook_from_env: CLOUD_FUNCTION_LINK_SEND_MAIL
     headers:
       - name: secret
