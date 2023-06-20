@@ -33,13 +33,12 @@ on:
       SHA:
         required: true
         type: string
-      GCP_KEY:
-        required: true
-        type: string
     secrets:
       GCP_REGION:
         required: true
-
+      GCP_KEY:
+        required: true
+ 
 jobs:
   build-and-store:
     name: Build and Store Docker Image in the Artifact Registry
