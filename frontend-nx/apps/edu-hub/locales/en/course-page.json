@@ -135,6 +135,6 @@
   "email-confirmed-applicants": "E-Mail to confirmed applicants",
   "application-end": "Application deadline:",
   "achievement-option": "Achievement Record",
-  "achievement-record-upload-dead-line-text": "Please upload the documentation for your achievement record until {{date}}.",
-  "choose-achievement-option": "Please choose the title of your achievement record."
+  "achievement-record-upload-dead-line-text": "You have time until {{date}} to upload an achievement record.",
+  "choose-achievement-option": "Choose the title of your achievement record."
   }
