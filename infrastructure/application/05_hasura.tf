@@ -72,7 +72,7 @@ module "hasura_service" {
   service_name = local.hasura_service_name
   project_id   = var.project_id
   location     = var.region
-  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend"
+  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:latest"
 
   service_labels = {
     sha = var.hasura_sha

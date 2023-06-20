@@ -42,7 +42,7 @@ resource "google_cloud_run_service" "rent_a_scientist" {
   template {
     spec {
       containers {
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/rent-a-scientist"
+        image = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/rent-a-scientist:latest"
         ports {
           name           = "http1"
           container_port = 5000
