@@ -1,4 +1,3 @@
-import useTranslation from 'next-translate/useTranslation';
 import { FC } from 'react';
 
 import { CourseWithEnrollment_Course_by_pk } from '../../../../queries/__generated__/CourseWithEnrollment';
@@ -14,7 +13,6 @@ interface IProps {
 }
 
 export const CoursePageStudentView: FC<IProps> = ({ course }) => {
-  const { t } = useTranslation();
   return (
     <>
       <PageBlock>
@@ -39,7 +37,6 @@ export const CoursePageStudentView: FC<IProps> = ({ course }) => {
                   course.Program.achievementRecordUploadDeadline
                 }
                 courseTitle={course.title}
-                t={t}
               />
             )}
           </div>
