@@ -172,16 +172,20 @@ const CourseAchievementOption: FC<IProps> = ({
 
       <div className="flex flex-col space-y-3 items-start">
         <BlockTitle>{t('course-page:achievement-option')}</BlockTitle>
-        <span className="text-lg mt-6">
-          {t('course-page:achievement-record-upload-dead-line-text', {
-            date: formattedDate(achievementRecordUploadDeadline),
-          })}
-        </span>
+        {!query.loading && achievementOptions.length > 0 && (
+          <span className="text-lg mt-6">
+            {t('course-page:achievement-record-upload-dead-line-text', {
+              date: formattedDate(achievementRecordUploadDeadline),
+            })}
+          </span>
+        )}
         <div className="flex mt-10 mb-4">
-          {!query.loading && achievementOptions.length > 0 && (
+          {!query.loading && achievementOptions.length > 0 ? (
             <div onClick={onAchievementOptionDropdown}>
               <Button>{`${t('course-page:choose-achievement-option')} ↓`}</Button>
             </div>
+          ) : (
+            <div>{t('course-page:no-achievement-option')}</div>
           )}
 
           {isVisibleAchievementOptions && (
