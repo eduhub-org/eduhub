@@ -381,8 +381,8 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
                     height: 320,
                   })}
                   onFileSelected={onFileChange}
-                  acceptedFileTypes=".png"
-                  placeholder={`${t('cover-picture')} (.png)`}
+                    acceptedFileTypes=".jpg,.jpeg,.png,.gif,.bmp"
+                    placeholder={t('achievements-page:file-name')}
                   name="coverImageUrl"
                   id="coverImageUrl"
                 />
@@ -422,11 +422,11 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
                 transition
                 ease-in-out
                 w-full
-                border border-solid border-gray-300
+                border border-solid border-gray-400
                 focus:border-blue-600 focus:outline-none"
                 name="description"
                 id="description"
-                placeholder={t('description')}
+                placeholder="..."
                 onChange={onInputChange}
                 minRows={4}
               ></TextareaAutosize>
@@ -451,8 +451,8 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
                   )
                 }
                 onFileSelected={onFileChange}
-                acceptedFileTypes=".zip"
-                placeholder=".zip"
+                acceptedFileTypes=""
+                placeholder={t('achievements-page:file-name')}
                 name="documentationUrl"
                 id="documentationUrl"
               />
