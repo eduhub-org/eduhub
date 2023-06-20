@@ -297,7 +297,6 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
               {state.mentors.map((e, index) => (
                 <div key={`mentors-${index}`} className="grid grid-cols-1">
                   <EhTagStingId
-                    label={`${tCommon('project-title')}*`}
                     title={makeFullName(e.firstName, e.lastName)}
                     id={e.userId ?? undefined}
                     requestDeleteTag={onDeleteAMentor}
