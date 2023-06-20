@@ -62,5 +62,11 @@
   "MUTHESIUS": "Muthesius Kunsthochschule",
   "TH_LUEBECK": "TH Lübeck",
   "UNI_FLENSBURG": "Uni Flensburg",
-  "UNI_LUEBECK": "Uni Lübeck"
+  "UNI_LUEBECK": "Uni Lübeck",
+  "project-title": "Projektname",
+  "project-mentors": "Projektmentoren",
+  "project-description": "Projektbeschreibung",
+  "project-new-button": "Neues Projekt",
+  "courses": "Kurse",
+  "achievement-record-type": "Typ der Projektdokumentation"
 }
