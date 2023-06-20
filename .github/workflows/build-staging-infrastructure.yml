@@ -137,7 +137,7 @@ jobs:
       PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
     secrets:
       GCP_REGION: ${{ secrets.GCP_REGION }}
-      GCP_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
   
   build_hasura:
     if: needs.check_folder_changes.outputs.hasura_changed == 'true'
@@ -153,7 +153,7 @@ jobs:
       SHA: ${{ needs.check_folder_changes.outputs.hasura_sha }}
     secrets:
       GCP_REGION: ${{ secrets.GCP_REGION }}
-      GCP_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
 
   build_frontend:
     if: needs.check_folder_changes.outputs.frontend_changed == 'false'
@@ -171,7 +171,7 @@ jobs:
       SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
     secrets:
       GCP_REGION: ${{ secrets.GCP_REGION }}
-      GCP_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
   
   build_rent_a_scientist_frontend:
     if: needs.check_folder_changes.outputs.frontend_changed == 'true'
@@ -190,7 +190,7 @@ jobs:
       SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
     secrets:
       GCP_REGION: ${{ secrets.GCP_REGION }}
-      GCP_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
   
   zip_and_store_cloud_functions:
     if: needs.check_folder_changes.outputs.functions_changed == 'true'
