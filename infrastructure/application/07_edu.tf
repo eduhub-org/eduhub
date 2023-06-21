@@ -135,7 +135,8 @@ resource "google_cloud_run_service" "eduhub" {
 
   metadata {
     annotations = {
-      "run.googleapis.com/launch-stage" = "BETA"
+      "run.googleapis.com/launch-stage"     = "BETA"
+      "run.googleapis.com/startupProbeType" = null
     }
   }
 

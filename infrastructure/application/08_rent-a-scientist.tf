@@ -114,7 +114,8 @@ resource "google_cloud_run_service" "rent_a_scientist" {
 
   metadata {
     annotations = {
-      "run.googleapis.com/launch-stage" = "BETA"
+      "run.googleapis.com/launch-stage"     = "BETA"
+      "run.googleapis.com/startupProbeType" = null
     }
   }
 
