@@ -20,7 +20,7 @@ jobs:
     name: Prepare environment variables
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.ref == 'refs/heads/production' && 'production' || 'staging' }}
+      name: ${{ (github.ref == 'refs/heads/production' || github.base_ref == 'refs/heads/production') && 'production' || 'staging' }}
     outputs:
       # Defined for subsequent jobs since env variables cannot be directly accessed or passed to called workflows
       PROJECT_ID: ${{ steps.define_output_variables.outputs.PROJECT_ID }}
@@ -124,7 +124,7 @@ jobs:
 
 
   build_keycloak:
-    if: needs.check_folder_changes.outputs.keycloak_changed == 'true'
+    if: needs.check_folder_changes.outputs.keycloak_changed == 'true' && github.event_name == 'pull_request'
     name: Build and Store Keycloak Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -140,7 +140,7 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
   
   build_hasura:
-    if: needs.check_folder_changes.outputs.hasura_changed == 'true'
+    if: needs.check_folder_changes.outputs.keycloak_changed == 'true' && github.event_name == 'pull_request'
     name: Build and Store Hasura Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -156,7 +156,7 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
 
   build_frontend:
-    if: needs.check_folder_changes.outputs.frontend_changed == 'true'
+    if: needs.check_folder_changes.outputs.keycloak_changed == 'true' && github.event_name == 'pull_request'
     name: Build and Store Frontend Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -174,7 +174,7 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
   
   build_rent_a_scientist_frontend:
-    if: needs.check_folder_changes.outputs.frontend_changed == 'true'
+    if: needs.check_folder_changes.outputs.keycloak_changed == 'true' && github.event_name == 'pull_request'
     name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
