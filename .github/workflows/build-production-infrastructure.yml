@@ -35,8 +35,8 @@ jobs:
           echo "NEXT_PUBLIC_AUTH_URL=${{ vars.NEXT_PUBLIC_AUTH_URL }}" >> $GITHUB_OUTPUT
           echo "NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}" >> $GITHUB_OUTPUT
           echo "GPC_KEY=${{ vars.GPC_KEY }}" >> $GITHUB_OUTPUT
-          echo "github.base_ref=${{ github.base_ref }}"
-          echo "github.ref=${{ github.ref }}"
+          echo "github.base_ref=${{ github.base_ref }}" >> $GITHUB_OUTPUT
+          echo "github.ref=${{ github.ref }}" >> $GITHUB_OUTPUT
 
   check_folder_changes:
     name: Check for changes in specific folders
