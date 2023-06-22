@@ -203,7 +203,7 @@ jobs:
     with:
       PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
       CLOUD_FUNCTION_FOLDER: functions
-      BUCKET_NAME: ${{ vars.PROJECT_ID }}
+      BUCKET_NAME: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
     secrets:
       GCP_REGION: ${{ secrets.GCP_REGION }}
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
