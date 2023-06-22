@@ -95,8 +95,6 @@ module "keycloak_service" {
     "autoscaling.knative.dev/maxScale"         = "1"
     "run.googleapis.com/vpc-access-connector"  = google_vpc_access_connector.default.id
   }
-  # Ignore changes to the template_annotations argument
-  ignore_changes = [template[0].metadata[0].annotations["run.googleapis.com/startupProbeType"]]
 
   env_vars = [
     {
