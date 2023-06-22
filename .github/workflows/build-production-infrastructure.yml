@@ -121,7 +121,6 @@ jobs:
 
 
   build_keycloak:
-    if: needs.check_folder_changes.outputs.keycloak_changed == 'true'
     name: Build and Store Keycloak Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -137,7 +136,6 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
   
   build_hasura:
-    if: needs.check_folder_changes.outputs.keycloak_changed == 'true'
     name: Build and Store Hasura Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -153,7 +151,6 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
 
   build_frontend:
-    if: needs.check_folder_changes.outputs.keycloak_changed == 'true'
     name: Build and Store Frontend Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -171,7 +168,6 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
   
   build_rent_a_scientist_frontend:
-    if: needs.check_folder_changes.outputs.keycloak_changed == 'true'
     name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -190,7 +186,6 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
   
   zip_and_store_cloud_functions:
-    if: needs.check_folder_changes.outputs.functions_changed == 'true'
     name: Zip and Store Cloud Functions
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml
