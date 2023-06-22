@@ -101,7 +101,7 @@ const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
     evaluationScriptUrl: '',
     showScoreAuthors: true,
     csvTemplateUrl: '',
-    recordType: context.achievementRecordTypes[0] as AchievementRecordType_enum,
+    recordType: 'DOCUMENTATION' as AchievementRecordType_enum,
     mentors: profile
       ? new Array({
           userId: context.userId,
