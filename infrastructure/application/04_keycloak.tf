@@ -94,8 +94,8 @@ module "keycloak_service" {
     "run.googleapis.com/execution-environment" = "gen2"
     "autoscaling.knative.dev/maxScale"         = "1"
     "run.googleapis.com/vpc-access-connector"  = google_vpc_access_connector.default.id
-    "run.googleapis.com/startupProbeType"      = null
   }
+
   env_vars = [
     {
       name  = "KC_DB_URL"
