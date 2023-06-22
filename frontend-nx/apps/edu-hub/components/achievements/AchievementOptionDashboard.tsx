@@ -1,4 +1,6 @@
 import { CircularProgress, IconButton } from '@material-ui/core';
+import { Button } from '@material-ui/core';
+import { MdAddCircle } from 'react-icons/md';
 import { IUserProfile } from '../../hooks/user';
 import { AdminCourseList_Course } from '../../queries/__generated__/AdminCourseList';
 import useTranslation from 'next-translate/useTranslation';
@@ -87,7 +89,7 @@ const AchievementOptionDashboard: FC<{
     userId: props.userId,
     setAlertMessage,
   };
-
+ 
   const closeAlertDialog = useCallback(() => {
     setAlertMessage('');
   }, [setAlertMessage]);
@@ -167,12 +169,18 @@ const DashboardContent: FC<IPropsContent> = ({ options }) => {
         )}
       </div>
       <div className="flex flex-col space-y-1">
-        <div className="flex justify-end ">
-          <EhAddButton
-            buttonClickCallBack={addNewAchievement}
-            text={context.t('add-new')}
-          />
+
+        <div className="flex justify-start mt-8  text-white">
+          <Button
+            onClick={addNewAchievement}
+            startIcon={<MdAddCircle />}
+            color="inherit"
+          >
+            {t('common:project-new-button')}
+          </Button>
         </div>
+          
+          
         <div className="grid grid-cols-3 gap-5 pl-5">
           <p>{t('tableHeaderTitle')}</p>
           <p>{t('tableHeaderInstructor')}</p>

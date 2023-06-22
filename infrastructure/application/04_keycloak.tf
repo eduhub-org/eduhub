@@ -61,19 +61,23 @@ resource "google_cloud_run_service_iam_binding" "cloud-run-iam" {
 # Define the Google Cloud Run service for Keycloak
 module "keycloak_service" {
   source  = "GoogleCloudPlatform/cloud-run/google"
-  version = "~> 0.2.0"
+  version = "~> 0.8"
 
   # Required variables
   service_name = local.keycloak_service_name
   project_id   = var.project_id
   location     = var.region
-  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/keycloak:${var.commit_sha}"
+  image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/keycloak:latest"
+
+  service_labels = {
+    sha              = var.keycloak_sha
+    startupProbeType = null
+  }
 
   limits = {
     cpu    = "1000m"
     memory = "2Gi"
   }
-
   container_concurrency = "80"
 
   service_annotations = {
@@ -91,6 +95,7 @@ module "keycloak_service" {
     "autoscaling.knative.dev/maxScale"         = "1"
     "run.googleapis.com/vpc-access-connector"  = google_vpc_access_connector.default.id
   }
+
   env_vars = [
     {
       name  = "KC_DB_URL"

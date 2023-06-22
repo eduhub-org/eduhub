@@ -133,5 +133,12 @@
   "to-be-defined": "Location still to be determined",
   "not-submitted": "not submitted",
   "email-confirmed-applicants": "E-Mail to confirmed applicants",
-  "application-end": "Application deadline:"
+  "application-end": "Application deadline:",
+  "achievement-option": "Achievement Record",
+  "achievement-record-upload-dead-line-text": "You have time until {{date}} to upload an achievement record.",
+  "choose-achievement-option": "Choose the title of your achievement record.",
+  "no-achievement-option": "Currently is no achievement record option available for this course.",
+  "upload-proof": "Upload proof",
+  "last-upload-from-an-author": "The last proof with you as the author was uploaded by {{fullName}} on {{dateTime}}.",
+  "no-proof-uploaded-by-me-as-author": "So far, no proof with you as the author has been uploaded."
 }

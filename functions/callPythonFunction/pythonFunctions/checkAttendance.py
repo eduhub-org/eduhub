@@ -27,11 +27,14 @@ def checkAttendance(payload):
     if len(sessions) == 0:
         logging.info("No finished sessions without attendance check found")
         return "No finished sessions without attendance check found"
+    else:
+        logging.info("########## Finished Sessions without Attendance Check:\n%s",
+                     sessions)
 
     with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'display.width', None):
         logging.debug("########## Full DataFrame:\n%s", sessions)
 
-    zoom_client = ZoomClient()
+    zoom_client = ZoomClient()  
 
     # iterate over all elements in the sessions dictionary
     for session in sessions:
@@ -87,25 +90,29 @@ def checkAttendance(payload):
         pd.options.mode.chained_assignment = None  # default='warn'
 
         for p in range(len(course_participants)):
-            logging.debug(
-                f"############# Preparation of attendance data for participant {course_participants.iloc[p, :]['firstName']} {course_participants.iloc[p, :]['lastName']}")
-            course_participant_attendance = prepare_participant_attendance_data(
-                course_participants.iloc[p, :], attendance_data, session['id'])
-            logging.debug(
-                f"############# Course Participant Attendance\n{course_participant_attendance}")
-            eduhub_client.insert_attendance(course_participant_attendance)
-            logging.info(
-                "### %s: %s [%s: %s to %s; recorded name: %s]",
-                course_participants.iloc[p, :]['email'],
-                course_participant_attendance['status'][0],
-                course_participant_attendance['source'][0],
-                course_participant_attendance['joinDateTime'][0],
-                course_participant_attendance['leaveDateTime'][0],
-                course_participant_attendance['recordedName'][0]
-            )
+            try:
+                logging.debug(
+                    f"############# Preparation of attendance data for participant {course_participants.iloc[p, :]['firstName']} {course_participants.iloc[p, :]['lastName']}")
+                course_participant_attendance = prepare_participant_attendance_data(
+                    course_participants.iloc[p, :], attendance_data, session['id'])
+                logging.debug(
+                    f"############# Course Participant Attendance\n{course_participant_attendance}")
+                eduhub_client.insert_attendance(course_participant_attendance)
+                logging.info(
+                    "### %s: %s [%s: %s to %s; recorded name: %s]",
+                    course_participants.iloc[p, :]['email'],
+                    course_participant_attendance['status'][0],
+                    course_participant_attendance['source'][0],
+                    course_participant_attendance['joinDateTime'][0],
+                    course_participant_attendance['leaveDateTime'][0],
+                    course_participant_attendance['recordedName'][0]
+                )
+            except Exception as e:
+                logging.error(f"Error while preparing attendance data for participant {course_participants.iloc[p, :]['firstName']} {course_participants.iloc[p, :]['lastName']}: {e}")
         # Storing JSON of complete attendance_data in Session table
         eduhub_client.update_session_attendanceData(
             attendance_data, session['id'])
+        logging.info("Attendance data updated for session %s", session['title'])
 
     return sessions
 

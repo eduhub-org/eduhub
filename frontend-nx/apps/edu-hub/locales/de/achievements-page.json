@@ -18,5 +18,8 @@
   "cover-image-required": "Deckblatt erforderlich",
   "csv-file-missing": "CSV datei fehlt!",
   "documentation-missing": "Bitte Dokumentation hochladen!",
-  "authors-missing": "Bitte Autoren hinzufügen!"
+  "authors-missing": "Bitte Autoren hinzufügen!",
+  "upload-proof": "Leistungsnachweis hochladen",
+  "form-info-cover-image-size": "Optimal ist eine Größe von {{width}} x {{height}} Pixel.",
+  "form-info-documentations": "<component>Benutze diese Vorlage zum Hochladen der Dokumentation!</component>"
 }
