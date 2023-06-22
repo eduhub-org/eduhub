@@ -1,7 +1,7 @@
 name: Setup Environment
 on:
   push:
-    # Run only on changes in the following branches
+    # Run only on pushes/merges to the following branch
     branches:
       - staging
 
@@ -10,7 +10,7 @@ on:
       - v*
 
   pull_request:
-    # Run tests for PRs.
+    # Run tests and build processes for PRs.
     branches:
       - staging
 
@@ -19,15 +19,12 @@ jobs:
   prepare_environment:
     name: Prepare environment variables
     runs-on: ubuntu-latest
-    environment:
-      name: staging
-      url: https://edu-staging.opencampus.sh
+    environment: staging
     outputs:
       # Defined for subsequent jobs since env variables cannot be directly accessed or passed to called workflows
       PROJECT_ID: ${{ steps.define_output_variables.outputs.PROJECT_ID }}
       NEXT_PUBLIC_AUTH_URL: ${{ steps.define_output_variables.outputs.NEXT_PUBLIC_AUTH_URL }}
       NEXT_PUBLIC_API_URL: ${{ steps.define_output_variables.outputs.NEXT_PUBLIC_API_URL }}
-      GPC_KEY: ${{ steps.define_output_variables.outputs.GPC_KEY }}
     steps:
       - name: Define env variables as output variables
         id: define_output_variables
@@ -35,7 +32,6 @@ jobs:
           echo "PROJECT_ID=${{ vars.PROJECT_ID }}" >> $GITHUB_OUTPUT
           echo "NEXT_PUBLIC_AUTH_URL=${{ vars.NEXT_PUBLIC_AUTH_URL }}" >> $GITHUB_OUTPUT
           echo "NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}" >> $GITHUB_OUTPUT
-          echo "GPC_KEY=${{ vars.GPC_KEY }}" >> $GITHUB_OUTPUT
 
   check_folder_changes:
     name: Check for changes in specific folders
