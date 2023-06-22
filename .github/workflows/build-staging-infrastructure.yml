@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: staging
-      url: https:/edu-staging.opencampus.sh
+      url: https://edu-staging.opencampus.sh
     outputs:
       # Defined for subsequent jobs since env variables cannot be directly accessed or passed to called workflows
       PROJECT_ID: ${{ steps.define_output_variables.outputs.PROJECT_ID }}
@@ -214,7 +214,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: staging
-      url: https:/edu-staging.opencampus.sh
+      url: https://edu-staging.opencampus.sh
     env:
       TF_WORKSPACE: ${{ vars.TF_WORKSPACE }}
       TF_WORKSPACE_ID: ${{ vars.TF_WORKSPACE_ID }}
