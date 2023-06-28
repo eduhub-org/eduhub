@@ -19,7 +19,7 @@ export interface AchievementOptionFragment {
   /**
    * Description of an offered achievement option
    */
-  description: string;
+  description: string | null;
   /**
    * Type of the achivement record that must be uploaded for this option
    */
@@ -27,11 +27,11 @@ export interface AchievementOptionFragment {
   /**
    * An instructor or project mentor can provide a template for the record that must be uploaded to complete this achievement
    */
-  documentationTemplateUrl: string;
+  documentationTemplateUrl: string | null;
   /**
    * If the record tye is "DOCUMENTATION_AND_CSV" an URL to a python script can be provided that returns a score for uploaded csv data.
    */
-  evaluationScriptUrl: string;
+  evaluationScriptUrl: string | null;
   /**
    * URL to the template that shall be used for uploading csv data for a new achievement record
    */
