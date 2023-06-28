@@ -344,8 +344,8 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
             value={state.description ?? ''}
           />
         </div>
- 
-        <div id="edit-documentations" className="flex flex-col gap-5 pr-5 hidden">
+
+        <div id="edit-documentations" className="flex flex-col gap-5 pr-5">
           <div className="h-full flex flex-row justify-between">
             <div className="flex flex-col space-y-1">
               <div className="flex flex-col space-y-1">
@@ -362,7 +362,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
                 'form-mandatory-field'
               )}`}</p>
             </div>
-            <CustomFileInput
+            {/* <CustomFileInput
               title={`${tCommon('documentation-template')} (.doc)*`}
               name={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
               id={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
@@ -377,7 +377,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
                   ''
                 )
               }
-            />
+            /> */}
             {state.recordType === 'DOCUMENTATION_AND_CSV' && (
               //
               <CustomFileInput
@@ -419,7 +419,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
                 />
               </div>
             )}
-            <FormControlLabel
+            {/* <FormControlLabel
               className="justify-end"
               control={
                 <Checkbox
@@ -430,11 +430,11 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
                 />
               }
               label={tCommon('show-authors-column')}
-            />
+            /> */}
           </div>
         </div>
         <div className="flex justify-center">
-          <Button type="submit" id="submit-button" filled>
+          <Button type="submit" id="submit-button" filled disabled={state.recordType === 'DOCUMENTATION_AND_CSV'}>
             {loading ? <CircularProgress /> : tCommon('save')}
           </Button>
         </div>
@@ -450,7 +450,7 @@ type IPropsEhInputWithTitle2 = {
   label: string;
   onChangeHandler: (event: any) => void;
 } & { [key: string]: any };
- 
+
 const EhInputWithTitle2: FC<IPropsEhInputWithTitle2> = ({
   label,
   onChangeHandler,
@@ -487,7 +487,7 @@ interface IProsSelect {
   onChange: (selected: string) => void;
   [key: string]: any;
 }
- 
+
 const EhSelectForEnum2: FC<IProsSelect> = ({
   options,
   onChange,
@@ -511,7 +511,7 @@ const EhSelectForEnum2: FC<IProsSelect> = ({
       bg-white
       transition
       ease-in-out
-      border 
+      border
       border-solid border-gray-300
       focus:text-black focus:bg-white focus:border-blue-600 focus:outline-none"
       onChange={onSelectChanged}

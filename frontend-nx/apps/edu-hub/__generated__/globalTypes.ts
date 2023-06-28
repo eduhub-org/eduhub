@@ -60,6 +60,7 @@ export enum AchievementOption_update_column {
   documentationTemplateUrl = "documentationTemplateUrl",
   evaluationScriptUrl = "evaluationScriptUrl",
   id = "id",
+  published = "published",
   recordType = "recordType",
   showScoreAuthors = "showScoreAuthors",
   title = "title",
@@ -115,6 +116,7 @@ export enum AchievementRecordType_constraint {
 export enum AchievementRecordType_enum {
   DOCUMENTATION = "DOCUMENTATION",
   DOCUMENTATION_AND_CSV = "DOCUMENTATION_AND_CSV",
+  ONLINE_COURSE = "ONLINE_COURSE",
 }
 
 /**
@@ -1272,6 +1274,7 @@ export interface AchievementOption_bool_exp {
   documentationTemplateUrl?: String_comparison_exp | null;
   evaluationScriptUrl?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  published?: Boolean_comparison_exp | null;
   recordType?: AchievementRecordType_enum_comparison_exp | null;
   showScoreAuthors?: Boolean_comparison_exp | null;
   title?: String_comparison_exp | null;
@@ -1292,6 +1295,7 @@ export interface AchievementOption_insert_input {
   documentationTemplateUrl?: string | null;
   evaluationScriptUrl?: string | null;
   id?: number | null;
+  published?: boolean | null;
   recordType?: AchievementRecordType_enum | null;
   showScoreAuthors?: boolean | null;
   title?: string | null;
@@ -1357,6 +1361,7 @@ export interface AchievementOption_order_by {
   documentationTemplateUrl?: order_by | null;
   evaluationScriptUrl?: order_by | null;
   id?: order_by | null;
+  published?: order_by | null;
   recordType?: order_by | null;
   showScoreAuthors?: order_by | null;
   title?: order_by | null;
@@ -1373,6 +1378,7 @@ export interface AchievementOption_set_input {
   documentationTemplateUrl?: string | null;
   evaluationScriptUrl?: string | null;
   id?: number | null;
+  published?: boolean | null;
   recordType?: AchievementRecordType_enum | null;
   showScoreAuthors?: boolean | null;
   title?: string | null;
