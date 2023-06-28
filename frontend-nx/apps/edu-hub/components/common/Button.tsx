@@ -57,8 +57,9 @@ export const Button: FC<Props> = (props) => {
     );
   }
 
+  const { as, filled, ...rest } = props;
   return (
-    <button className={className} onClick={props.onClick}>
+    <button className={`${className} ${props.disabled && 'bg-gray-400 text-zinc-500'}`} onClick={props.onClick} {...rest}>
       {props.children}
     </button>
   );

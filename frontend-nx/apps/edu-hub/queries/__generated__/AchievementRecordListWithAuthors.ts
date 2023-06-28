@@ -51,11 +51,11 @@ export interface AchievementRecordListWithAuthors_AchievementRecord {
   /**
    * Description that will be used in the project gallery
    */
-  description: string;
+  description: string | null;
   /**
    * ID of hte achievement option the record is uploaded for.
    */
-  achievementOptionId: number | null;
+  achievementOptionId: number;
   /**
    * ID of the user who uploaded the record
    */
@@ -63,11 +63,11 @@ export interface AchievementRecordListWithAuthors_AchievementRecord {
   /**
    * Image that will be used for the project gallery
    */
-  coverImageUrl: string;
+  coverImageUrl: string | null;
   /**
    * Score calculated for possibly uploaded csv data.
    */
-  score: any;
+  score: any | null;
   /**
    * The course instructor's or mentor's rating for the achievement record
    */
