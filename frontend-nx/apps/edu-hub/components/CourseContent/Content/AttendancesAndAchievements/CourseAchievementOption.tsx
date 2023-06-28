@@ -38,7 +38,7 @@ import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../../../queries/achievemen
 import { Link } from '@material-ui/core';
 import { MinAchievementOption } from '../../../../helpers/achievement';
 import useTranslation from 'next-translate/useTranslation';
-import { useAuthedMutation } from 'apps/edu-hub/hooks/authedMutation';
+import { useAuthedMutation } from '../../../../hooks/authedMutation';
 import { InsertAnAchievementRecord, InsertAnAchievementRecordVariables } from '../../../../queries/__generated__/InsertAnAchievementRecord';
 import Trans from 'next-translate/Trans';
 interface IContext {
