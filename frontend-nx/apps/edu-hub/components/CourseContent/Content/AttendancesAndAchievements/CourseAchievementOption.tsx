@@ -24,8 +24,11 @@ import {
 } from '../../../../helpers/util';
 import { AlertMessageDialog } from '../../../common/dialogs/AlertMessageDialog';
 import { ACHIEVEMENT_OPTION_COURSES } from '../../../../queries/achievementOption';
+import {
+  INSERT_AN_ACHIEVEMENT_RECORD,
+} from '../../../../queries/achievementRecord';
 
-import { order_by } from '../../../../__generated__/globalTypes';
+import { order_by, AchievementRecordType_enum, AchievementRecordRating_enum } from '../../../../__generated__/globalTypes';
 import {
   AchievementRecordListWithAuthors,
   AchievementRecordListWithAuthorsVariables,
@@ -35,6 +38,9 @@ import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../../../queries/achievemen
 import { Link } from '@material-ui/core';
 import { MinAchievementOption } from '../../../../helpers/achievement';
 import useTranslation from 'next-translate/useTranslation';
+import { useAuthedMutation } from 'apps/edu-hub/hooks/authedMutation';
+import { InsertAnAchievementRecord, InsertAnAchievementRecordVariables } from '../../../../queries/__generated__/InsertAnAchievementRecord';
+import Trans from 'next-translate/Trans';
 interface IContext {
   achievementRecordUploadDeadline: any;
   courseTitle: string;
@@ -82,6 +88,11 @@ const CourseAchievementOption: FC<IProps> = ({
     AchievementOptionCoursesVariables
   >(ACHIEVEMENT_OPTION_COURSES);
 
+    const [insertAnAchievementRecordAPI] = useAuthedMutation<
+    InsertAnAchievementRecord,
+    InsertAnAchievementRecordVariables
+  >(INSERT_AN_ACHIEVEMENT_RECORD);
+
   useEffect(() => {
     const options = [...(query.data?.AchievementOptionCourse || [])];
     setAchievementOptions(options.map((options) => options.AchievementOption));
@@ -123,6 +134,35 @@ const CourseAchievementOption: FC<IProps> = ({
   const upload = useCallback(() => {
     setShowModal(true);
   }, [setShowModal]);
+
+  const handleAchievementRecordOnlineCourseConfirm = async () => {
+    const result = await insertAnAchievementRecordAPI({
+          variables: {
+            insertInput: {
+              coverImageUrl: '', // this is mandatory field
+              description: '',
+              rating: AchievementRecordRating_enum.UNRATED, // this is mandatory field
+              score: 0, // because mandatory
+              evaluationScriptUrl: null,
+              achievementOptionId: selectedAchievementOption.id,
+              csvResults: null,
+              uploadUserId: userId,
+              AchievementRecordAuthors: {
+                data: [{ userId }],
+              },
+            },
+          },
+        });
+        if (result.errors || !result.data?.insert_AchievementRecord_one?.id) {
+          setAlertMessage(t('operation-failed'));
+          return;
+        }
+
+        const achievementRecordId = result.data.insert_AchievementRecord_one.id;
+        if (achievementRecordId <= 0) return;
+
+        myRecordsQuery.refetch();
+  }
 
   const onAchievementOptionDropdown = useCallback(
     (event: MouseEvent<HTMLElement>) => {
@@ -204,14 +244,31 @@ const CourseAchievementOption: FC<IProps> = ({
             {selectedAchievementOption.title}
           </Link>
         )} */}
-        {selectedAchievementOption.id && (
+        {selectedAchievementOption.id && selectedAchievementOption.recordType === AchievementRecordType_enum.DOCUMENTATION && (
           <div className="flex">
             <Button filled onClick={upload}>
               {`↑ ${t('course-page:upload-proof')}`}
             </Button>
           </div>
         )}
-        {selectedAchievementOption.id && myRecords && (
+        {selectedAchievementOption.id && selectedAchievementOption.recordType === AchievementRecordType_enum.ONLINE_COURSE && !myRecordsQuery.loading && !myRecords && (
+          <div className="flex flex-col">
+            <div className='mb-4'>
+            <Trans
+              i18nKey="course-page:confirm-online-course-description"
+              components={{
+                component: <a className='underline' target="_blank" rel="noreferrer" href='https://forms.office.com/e/DJPsDw6MGR' />,
+              }}
+              values={{ count: 42 }}
+              defaultTrans="<component>The number is <b>{{count}}</b></component>"
+            />
+            </div>
+            <Button filled onClick={handleAchievementRecordOnlineCourseConfirm}>
+              {`${t('course-page:confirm-online-course')}`}
+            </Button>
+          </div>
+        )}
+        {selectedAchievementOption.id && myRecords && selectedAchievementOption.recordType === AchievementRecordType_enum.DOCUMENTATION && (
           <p>
             {t('course-page:last-upload-from-an-author', {
               dateTime: formattedDateWithTime(new Date(myRecords.created_at), lang),
@@ -219,8 +276,16 @@ const CourseAchievementOption: FC<IProps> = ({
             })}
           </p>
         )}
+        {selectedAchievementOption.id && myRecords && selectedAchievementOption.recordType === AchievementRecordType_enum.ONLINE_COURSE && (
+          <p>
+            {t('course-page:online-course-confirmed', {
+              dateTime: formattedDateWithTime(new Date(myRecords.created_at), lang),
+              fullName: makeFullName(profile.firstName, profile.lastName),
+            })}
+          </p>
+        )}
 
-        {selectedAchievementOption.id && !myRecords && (
+        {selectedAchievementOption.id && !myRecords && selectedAchievementOption.recordType === AchievementRecordType_enum.DOCUMENTATION && (
           <p>{t('course-page:no-proof-uploaded-by-me-as-author')}</p>
         )}
       </div>
