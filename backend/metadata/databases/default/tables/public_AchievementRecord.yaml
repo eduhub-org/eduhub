@@ -88,7 +88,7 @@ select_permissions:
             id:
               _eq: X-Hasura-User-Id
 update_permissions:
-  - role: instructor_access
+  - role: user_access
     permission:
       columns:
         - coverImageUrl
