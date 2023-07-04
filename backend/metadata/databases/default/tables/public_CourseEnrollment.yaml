@@ -57,9 +57,10 @@ select_permissions:
         - status
         - userId
       filter:
-        User:
-          id:
-            _eq: X-Hasura-User-Id
+        Course:
+          CourseEnrollments:
+            userId:
+              _eq: X-Hasura-User-Id
 update_permissions:
   - role: instructor_access
     permission:
