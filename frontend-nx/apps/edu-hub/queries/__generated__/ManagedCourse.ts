@@ -234,6 +234,10 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_User {
 export interface ManagedCourse_Course_by_pk_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
+   * The ID of the user that enrolled for the given course
+   */
+  userId: any;
+  /**
    * The last day a user can confirm his/her invitation to the given course
    */
   invitationExpirationDate: any | null;

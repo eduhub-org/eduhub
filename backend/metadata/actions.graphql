@@ -1,4 +1,4 @@
-type Query {
+type Mutation {
   createAchievementCertificate(
     template: String!
     firstname: String!
@@ -12,7 +12,7 @@ type Query {
   ): createCertificateOutput
 }
 
-type Query {
+type Mutation {
   createParticipationCertificate(
     template: String!
     firstname: String!
