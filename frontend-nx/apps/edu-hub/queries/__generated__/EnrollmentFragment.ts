@@ -12,6 +12,10 @@ import { CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 export interface EnrollmentFragment {
   __typename: "CourseEnrollment";
   /**
+   * The ID of the user that enrolled for the given course
+   */
+  userId: any;
+  /**
    * The last day a user can confirm his/her invitation to the given course
    */
   invitationExpirationDate: any | null;

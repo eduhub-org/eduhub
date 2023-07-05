@@ -16,6 +16,7 @@ import {
   loadParticipationCertificate,
   loadParticipationCertificateVariables,
 } from '../../../../queries/__generated__/loadParticipationCertificate';
+import { useUserId } from '../../../../hooks/user';
 
 interface IProps {
   course: CourseWithEnrollment_Course_by_pk;
@@ -24,7 +25,10 @@ interface IProps {
 export const CertificateDownload: FC<IProps> = ({ course }) => {
   const { t } = useTranslation();
 
-  const courseEnrollment = course.CourseEnrollments[0];
+  // Find the course enrollment of the current user
+  const courseEnrollment = course.CourseEnrollments.find(
+    (enrollment) => enrollment.userId === useUserId()
+  );
 
   const {
     data: loadAchievementCertificateData,
@@ -54,23 +58,25 @@ export const CertificateDownload: FC<IProps> = ({ course }) => {
 
   return (
     <div className="mt-4">
-      <h3 className="text-3xl font-medium">
-        {t('course-page:congrats-completion')}
-      </h3>
       <div className="flex flex-col gap-4 mt-6">
         {loadAchievementCertificateData &&
           !loadAchievementCerfificateLoading && (
-            <Button
-              as="a"
-              filled
-              href={
-                loadAchievementCertificateData.loadAchievementCertificate.link
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t('course-page:achievementCertificateDownload')}
-            </Button>
+            <>
+              <h3 className="text-3xl font-medium">
+                {t('course-page:congrats-completion')}
+              </h3>
+              <Button
+                as="a"
+                filled
+                href={
+                  loadAchievementCertificateData.loadAchievementCertificate.link
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('course-page:achievementCertificateDownload')}
+              </Button>
+            </>
           )}
         {loadParticipationCertificateData &&
           !loadParticipationCerfificateLoading && (
