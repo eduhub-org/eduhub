@@ -51,17 +51,16 @@ import TagWithTwoText from '../common/TagWithTwoText';
 import Loading from '../ManageCoursesContent/Loading';
 import { Button } from '../common/Button';
 
-const isAdmin = useIsAdmin();
-const { t } = useTranslation();
-
 const CertificateButton = () => {
+  const isAdmin = useIsAdmin();
+  const { t } = useTranslation();
   const [createAchievementCertificate, { loading, error, data }] =
     useRoleMutation(CREATE_ACHIEVEMENT_CERTIFICATE, {
       variables: {
         template:
           'https://edu-old.opencampus.sh/templates/opencampus_certificate_template_WS2022.png',
-        firstName: 'John',
-        lastName: 'Doe',
+        firstname: 'John',
+        lastname: 'Doe',
         semester: 'Fall 2023',
         course_name: 'Advanced GraphQL',
         ects: '5',
@@ -200,6 +199,9 @@ const ParticipationList: FC<IPropsParticipationList> = ({
   course,
   qResult,
 }) => {
+  const { t } = useTranslation();
+  const isAdmin = useIsAdmin();
+
   const tableHeaders: StaticComponentProperty[] = [
     { key: 0, label: t('firstName') },
     { key: 1, label: t('lastName') },
