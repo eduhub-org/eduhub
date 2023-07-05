@@ -18,6 +18,7 @@ import {
 } from '../../../../queries/__generated__/loadParticipationCertificate';
 import { useUserId } from '../../../../hooks/user';
 
+const userId = useUserId();
 interface IProps {
   course: CourseWithEnrollment_Course_by_pk;
 }
@@ -27,7 +28,7 @@ export const CertificateDownload: FC<IProps> = ({ course }) => {
 
   // Find the course enrollment of the current user
   const courseEnrollment = course.CourseEnrollments.find(
-    (enrollment) => enrollment.userId === useUserId()
+    (enrollment) => enrollment.userId === userId
   );
 
   const {
