@@ -1,3 +1,4 @@
+
 INSERT INTO public."User" VALUES ('152f12c3-f7d2-4b73-8d29-603c164b0139', 'Student1', 'Student1', 'student1@example.com', 'http://localhost:4001/test_data/userid_152f12c3-f7d2-4b73-8d29-603c164b0139/profile_image/Student1_portrait.png', 'STUDENT', 'https://www.google.com', true, 'xedz2361', '2022-12-17 17:53:20.882635+00', '2022-12-19 13:56:07.483474+00', 'UNI_FLENSBURG', '123456', NULL);
 INSERT INTO public."User" VALUES ('b5df4676-3d75-4413-bfac-9cc4e2f61cd9', 'Student2', 'Student2', 'student2@example.com', 'http://localhost:4001/test_data/userid_b5df4676-3d75-4413-bfac-9cc4e2f61cd9/profile_image/student2_portrait.jpg', 'OTHER', 'http://www.google.com', false, 'vb43rty', '2022-12-17 17:53:20.882635+00', '2022-12-19 13:56:07.483474+00', NULL, '654321', NULL);
 INSERT INTO public."User" VALUES ('774b371a-b391-487f-ba57-1cee492eb233', 'Student3', 'Student3', 'student3@example.com', 'http://localhost:4001/test_data/userid_774b371a-b391-487f-ba57-1cee492eb233/profile_image/student3_portrait.gif', 'RETIREE', 'www.google.com', true, NULL, '2022-12-17 17:53:20.882635+00', '2022-12-19 13:56:07.483474+00', NULL, NULL, NULL);
@@ -79,6 +80,7 @@ INSERT INTO public."CourseEnrollment" VALUES (2, 1, 'b5df4676-3d75-4413-bfac-9cc
 INSERT INTO public."CourseEnrollment" VALUES (3, 1, '774b371a-b391-487f-ba57-1cee492eb233', 'CONFIRMED', '', 'INVITE', NULL, NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', '2022-11-01');
 INSERT INTO public."CourseEnrollment" VALUES (4, 1, 'efd6479e-0c87-4247-92e5-42cbb5ef6848', 'REJECTED', '', 'DECLINE', NULL, NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', NULL);
 
+
 INSERT INTO public."Course" VALUES (2, 'Past Course 2', 'APPLICANTS_INVITED', '2.5', '', 'EN', '2022-10-15', '', false, false, 2, NULL, NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 4, NULL, NULL, NULL, NULL, NULL, NULL, 20, '2022-11-01 16:00:02.674+00', '2022-11-01 22:00:01.513+00', true);
 INSERT INTO public."CourseLocation" VALUES (3, 2, '2022-12-19 12:56:07.352338+00', '2022-12-19 12:56:12.475054+00', 'ONLINE', NULL);
 INSERT INTO public."CourseInstructor" VALUES (3, 2, 2, '2022-12-17 22:20:20.615952+00', '2022-12-17 22:20:20.615952+00');
@@ -91,22 +93,22 @@ INSERT INTO public."SessionAddress" VALUES (23, '2022-12-19 13:21:41.891287+00',
 INSERT INTO public."SessionSpeaker" VALUES (15, 12, 2, '2022-12-19 13:21:51.940891+00', '2022-12-19 13:21:51.940891+00');
 INSERT INTO public."Session" VALUES (13, 'Session3 for Past Course 2', 'The third session for "Past Course 2"', '2022-11-17 16:00:41.866+00', '2022-11-15 20:00:41.866+00', 2, '2022-12-19 13:21:41.873742+00', '2022-12-19 13:21:56.669676+00', NULL);
 INSERT INTO public."Session" VALUES (14, 'Session4 for Past Course 2', 'The fourth session for "Past Course 2"', '2022-11-24 16:00:41.866+00', '2022-11-22 20:00:41.866+00', 2, '2022-12-19 13:21:41.873742+00', '2022-12-19 13:21:56.669676+00', NULL);
-INSERT INTO public."SessionAddress" VALUES (23, '2022-12-19 13:21:41.891287+00', '2022-12-19 13:21:41.891287+00', 1, 'https://zoom.us', 'FREETEXT_ADDRESS');
-INSERT INTO public."SessionAddress" VALUES (24, '2022-12-19 13:21:41.891287+00', '2022-12-19 13:21:41.891287+00', 1, 'Musterstraße 21, 22232 Kiel', 'URL');
+INSERT INTO public."SessionAddress" VALUES (24, '2022-12-19 13:21:41.891287+00', '2022-12-19 13:21:41.891287+00', 1, 'https://zoom.us', 'FREETEXT_ADDRESS');
+INSERT INTO public."SessionAddress" VALUES (25, '2022-12-19 13:21:41.891287+00', '2022-12-19 13:21:41.891287+00', 1, 'Musterstraße 21, 22232 Kiel', 'URL');
 INSERT INTO public."SessionSpeaker" VALUES (16, 14, 6, '2022-12-19 13:21:51.940891+00', '2022-12-19 13:21:51.940891+00');
 INSERT INTO public."Session" VALUES (15, 'Session5 for Past Course 2', 'The fifth session for "Past Course 2"', '2022-11-30 16:00:41.866+00', '2022-11-29 20:00:41.866+00', 2, '2022-12-19 13:21:41.873742+00', '2022-12-19 13:21:56.669676+00', NULL);
-INSERT INTO public."SessionAddress" VALUES (25, '2022-12-19 13:21:41.891287+00', '2022-12-19 13:21:41.891287+00', 2, 'https://zoom.us', 'URL');
+INSERT INTO public."SessionAddress" VALUES (26, '2022-12-19 13:21:41.891287+00', '2022-12-19 13:21:41.891287+00', 2, 'https://zoom.us', 'URL');
 INSERT INTO public."SessionSpeaker" VALUES (17, 15, 6, '2022-12-19 13:21:51.940891+00', '2022-12-19 13:21:51.940891+00');
 INSERT INTO public."Session" VALUES (16, 'Session6 for Past Course 2', 'The sixth session for "Past Course 2"', '2022-12-06 16:00:41.866+00', '2022-12-06 20:00:41.866+00', 2, '2022-12-19 13:21:41.873742+00', '2022-12-19 13:21:56.669676+00', NULL);
-INSERT INTO public."SessionAddress" VALUES (26, '2022-12-19 13:21:41.891287+00', '2022-12-19 13:21:41.891287+00', 2, 'https://zoom.us', 'URL');
+INSERT INTO public."SessionAddress" VALUES (27, '2022-12-19 13:21:41.891287+00', '2022-12-19 13:21:41.891287+00', 2, 'https://zoom.us', 'URL');
 INSERT INTO public."SessionSpeaker" VALUES (18, 16, 6, '2022-12-19 13:21:51.940891+00', '2022-12-19 13:21:51.940891+00');
 INSERT INTO public."CourseEnrollment" VALUES (5, 2, '152f12c3-f7d2-4b73-8d29-603c164b0139', 'CONFIRMED', 'The cat looks perfect', 'INVITE', NULL, NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', '2022-11-01');
 INSERT INTO public."CourseEnrollment" VALUES (6, 2, '774b371a-b391-487f-ba57-1cee492eb233', 'CONFIRMED', 'The cat looks perfect', 'INVITE', NULL, NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', '2022-11-01');
 
-INSERT INTO public."Course" VALUES (3, 'Past Course 3', 'APPLICANTS_INVITED', '3', 'Sed leo libero, bibendum non viverra et, suscipit at quam. Fusce augue est, molestie ut dapibus quis, accumsan at lectus. In id malesuada quam', 'DE', '2022-10-15', '120€', true, true, 2, '', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 4, 'test', 'test', 'test', 'test', 'test', 'chat.openai.com', 20, '2022-11-02 22:00:02.674+00', '2022-11-02 11:45:01.513+00', true);
+INSERT INTO public."Course" VALUES (3, 'Past Course 3', 'APPLICANTS_INVITED', '3', 'Sed leo libero, bibendum non viverra et, suscipit at quam. Fusce augue est, molestie ut dapibus quis, accumsan at lectus. In id malesuada quam', 'DE', '2022-10-15', '120€', true, true, 2, 'MONDAY', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 4, 'test', 'test', 'test', 'test', 'test', 'chat.openai.com', 20, '2022-11-02 22:00:02.674+00', '2022-11-02 11:45:01.513+00', true);
 INSERT INTO public."CourseInstructor" VALUES (4, 3, 2, '2022-12-17 22:20:20.615952+00', '2022-12-17 22:20:20.615952+00');
 INSERT INTO public."Session" VALUES (17, 'Session1 for Past Course 3', 'The first session for "Past Course 1"', '2022-11-24 16:00:41.866+00', '2022-11-22 20:00:41.866+00', 3, '2022-12-19 13:21:41.873742+00', '2022-12-19 13:21:56.669676+00', NULL);
-INSERT INTO public."SessionAddress" VALUES (27, '2022-12-19 13:21:41.891287+00', '2022-12-19 13:21:41.891287+00', 3, 'https://zoom.us', 'URL');
+INSERT INTO public."SessionAddress" VALUES (28, '2022-12-19 13:21:41.891287+00', '2022-12-19 13:21:41.891287+00', 3, 'https://zoom.us', 'URL');
 INSERT INTO public."SessionSpeaker" VALUES (19, 17, 2, '2022-12-19 13:21:51.940891+00', '2022-12-19 13:21:51.940891+00');
 INSERT INTO public."CourseEnrollment" VALUES (7, 3, '152f12c3-f7d2-4b73-8d29-603c164b0139', 'CONFIRMED', 'The cat looks perfect', 'INVITE', NULL, NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', '2022-11-01');
 
@@ -124,6 +126,6 @@ SELECT setval('"Semester_Id_seq"'::regclass, (SELECT MAX( "id") FROM "Program") 
 SELECT setval('"Attendence_Id_seq"'::regclass, (SELECT MAX( "id") FROM "Attendance") + 1);
 SELECT setval('"Enrollment_Id_seq"'::regclass, (SELECT MAX( "id") FROM "CourseEnrollment") + 1);
 SELECT setval('"CourseInstructor_Id_seq"'::regclass, (SELECT MAX( "id") FROM "CourseInstructor") + 1);
-SELECT setval('"SessionAddress_Id_seq"'::regclass, (SELECT MAX( "id") FROM "SessionAddress") + 1);
+SELECT setval('"SessionAddress_id_seq"'::regclass, (SELECT MAX( "id") FROM "SessionAddress") + 1);
 SELECT setval('"Instructor_Id_seq"'::regclass, (SELECT MAX( "id") FROM "Expert") + 1);
-SELECT setval('"CourseLocation_Id_seq"'::regclass, (SELECT MAX( "id") FROM "CourseLocation") + 1);
+SELECT setval('"CourseAddress_id_seq"'::regclass, (SELECT MAX( "id") FROM "CourseLocation") + 1);
