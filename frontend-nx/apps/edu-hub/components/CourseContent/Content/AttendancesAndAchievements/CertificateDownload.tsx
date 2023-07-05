@@ -16,6 +16,7 @@ import {
   loadParticipationCertificate,
   loadParticipationCertificateVariables,
 } from '../../../../queries/__generated__/loadParticipationCertificate';
+import { useUserId } from 'apps/edu-hub/hooks/user';
 
 interface IProps {
   course: CourseWithEnrollment_Course_by_pk;
@@ -24,7 +25,10 @@ interface IProps {
 export const CertificateDownload: FC<IProps> = ({ course }) => {
   const { t } = useTranslation();
 
-  const courseEnrollment = course.CourseEnrollments[0];
+  // Find the course enrollment of the current user
+  const courseEnrollment = course.CourseEnrollments.find(
+    (enrollment) => enrollment.userId === useUserId()
+  );
 
   const {
     data: loadAchievementCertificateData,
