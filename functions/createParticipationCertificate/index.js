@@ -16,7 +16,7 @@ export const createParticipationCertificate = async (req, res) => {
     const course_name = req.body.input.course_name;
     const event_entries = req.body.input.event_entries;
     
-    const url = 'https://edu.opencampus.sh/create_attendence_certificate_rest';
+    const url = 'https://edu-old.opencampus.sh/create_attendence_certificate_rest';
     const options = {
       json: {
         template: template,

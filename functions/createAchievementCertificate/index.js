@@ -19,7 +19,7 @@ export const createAchievementCertificate = async (req, res) => {
     const online_courses = req.body.input.online_courses;
     const certificate_text = req.body.input.certificate_text;
     
-    const url = 'https://edu.opencampus.sh/create_certificate_rest';
+    const url = 'https://edu-old.opencampus.sh/create_certificate_rest';
     const options = {
       json: {
         template: template,
