@@ -59,8 +59,21 @@ export const MANAGED_COURSE = gql`
         defaultSessionAddress
         locationOption
       }
-      Sessions (order_by: { startDateTime: asc }) {
+      Sessions(order_by: { startDateTime: asc }) {
         ...AdminSessionFragment
+      }
+      AchievementOptionCourses {
+        AchievementOption {
+          AchievementRecords {
+            documentationUrl
+            rating
+            created_at
+            AchievementRecordAuthors {
+              userId
+            }
+          }
+          recordType
+        }
       }
     }
   }
@@ -154,10 +167,7 @@ export const DELETE_SESSION_SPEAKER = gql`
 export const INSERT_NEW_SESSION_LOCATION = gql`
   mutation InsertSessionLocation($sessionId: Int!, $address: String!) {
     insert_SessionAddress(
-      objects: {
-        sessionId: $sessionId
-        address: $address
-      }
+      objects: { sessionId: $sessionId, address: $address }
     ) {
       affected_rows
       returning {
@@ -184,7 +194,10 @@ export const LOCATION_OPTIONS = gql`
 `;
 
 export const INSERT_NEW_COURSE_LOCATION = gql`
-  mutation InsertCourseLocation($courseId: Int!, $option: LocationOption_enum!) {
+  mutation InsertCourseLocation(
+    $courseId: Int!
+    $option: LocationOption_enum!
+  ) {
     insert_CourseLocation(
       objects: {
         courseId: $courseId
@@ -201,7 +214,10 @@ export const INSERT_NEW_COURSE_LOCATION = gql`
 `;
 
 export const UPDATE_COURSE_LOCATION_OPTION = gql`
-  mutation UpdateCourseLocationOption($locationId: Int!, $option: LocationOption_enum!) {
+  mutation UpdateCourseLocationOption(
+    $locationId: Int!
+    $option: LocationOption_enum!
+  ) {
     update_CourseLocation_by_pk(
       pk_columns: { id: $locationId }
       _set: { locationOption: $option }
@@ -212,7 +228,10 @@ export const UPDATE_COURSE_LOCATION_OPTION = gql`
 `;
 
 export const UPDATE_COURSE_SESSION_DEFAULT_ADDRESS = gql`
-  mutation UpdateCourseDefaultSessionAddress($locationId: Int!, $defaultSessionAddress: String!) {
+  mutation UpdateCourseDefaultSessionAddress(
+    $locationId: Int!
+    $defaultSessionAddress: String!
+  ) {
     update_CourseLocation_by_pk(
       pk_columns: { id: $locationId }
       _set: { defaultSessionAddress: $defaultSessionAddress }
@@ -406,10 +425,7 @@ export const UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE = gql`
 `;
 
 export const UPDATE_COURSE_TITLE = gql`
-  mutation UpdateCourseTitle(
-    $courseId: Int!
-    $courseTitle: String!
-  ) {
+  mutation UpdateCourseTitle($courseId: Int!, $courseTitle: String!) {
     update_Course_by_pk(
       pk_columns: { id: $courseId }
       _set: { title: $courseTitle }
@@ -420,10 +436,7 @@ export const UPDATE_COURSE_TITLE = gql`
 `;
 
 export const UPDATE_COURSE_CHAT_LINK = gql`
-  mutation UpdateCourseChatLink(
-    $courseId: Int!
-    $chatLink: String!
-  ) {
+  mutation UpdateCourseChatLink($courseId: Int!, $chatLink: String!) {
     update_Course_by_pk(
       pk_columns: { id: $courseId }
       _set: { chatLink: $chatLink }
@@ -434,14 +447,8 @@ export const UPDATE_COURSE_CHAT_LINK = gql`
 `;
 
 export const UPDATE_COURSE_ECTS = gql`
-  mutation UpdateCourseEcts(
-    $courseId: Int!
-    $ects: String!
-  ) {
-    update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { ects: $ects }
-    ) {
+  mutation UpdateCourseEcts($courseId: Int!, $ects: String!) {
+    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { ects: $ects }) {
       id
     }
   }

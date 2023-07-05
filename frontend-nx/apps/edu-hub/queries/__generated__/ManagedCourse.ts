@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, SessionAddressType_enum, LocationOption_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, AttendanceStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, SessionAddressType_enum, LocationOption_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, AttendanceStatus_enum, AchievementRecordRating_enum, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourse
@@ -264,6 +264,51 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
   User: ManagedCourse_Course_by_pk_CourseEnrollments_User;
 }
 
+export interface ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords_AchievementRecordAuthors {
+  __typename: "AchievementRecordAuthor";
+  /**
+   * ID of a user that is author of an uploaded achievement record
+   */
+  userId: any;
+}
+
+export interface ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords {
+  __typename: "AchievementRecord";
+  /**
+   * URL to the uploaded file with the documentation of the record.
+   */
+  documentationUrl: string | null;
+  /**
+   * The course instructor's or mentor's rating for the achievement record
+   */
+  rating: AchievementRecordRating_enum;
+  created_at: any | null;
+  /**
+   * An array relationship
+   */
+  AchievementRecordAuthors: ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords_AchievementRecordAuthors[];
+}
+
+export interface ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption {
+  __typename: "AchievementOption";
+  /**
+   * An array relationship
+   */
+  AchievementRecords: ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords[];
+  /**
+   * Type of the achivement record that must be uploaded for this option
+   */
+  recordType: AchievementRecordType_enum;
+}
+
+export interface ManagedCourse_Course_by_pk_AchievementOptionCourses {
+  __typename: "AchievementOptionCourse";
+  /**
+   * An object relationship
+   */
+  AchievementOption: ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption;
+}
+
 export interface ManagedCourse_Course_by_pk {
   __typename: "Course";
   id: number;
@@ -383,6 +428,10 @@ export interface ManagedCourse_Course_by_pk {
    * An array relationship
    */
   CourseEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[];
+  /**
+   * An array relationship
+   */
+  AchievementOptionCourses: ManagedCourse_Course_by_pk_AchievementOptionCourses[];
 }
 
 export interface ManagedCourse {
