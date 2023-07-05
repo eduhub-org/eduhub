@@ -58,23 +58,25 @@ export const CertificateDownload: FC<IProps> = ({ course }) => {
 
   return (
     <div className="mt-4">
-      <h3 className="text-3xl font-medium">
-        {t('course-page:congrats-completion')}
-      </h3>
       <div className="flex flex-col gap-4 mt-6">
         {loadAchievementCertificateData &&
           !loadAchievementCerfificateLoading && (
-            <Button
-              as="a"
-              filled
-              href={
-                loadAchievementCertificateData.loadAchievementCertificate.link
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t('course-page:achievementCertificateDownload')}
-            </Button>
+            <>
+              <h3 className="text-3xl font-medium">
+                {t('course-page:congrats-completion')}
+              </h3>
+              <Button
+                as="a"
+                filled
+                href={
+                  loadAchievementCertificateData.loadAchievementCertificate.link
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('course-page:achievementCertificateDownload')}
+              </Button>
+            </>
           )}
         {loadParticipationCertificateData &&
           !loadParticipationCerfificateLoading && (
