@@ -1,4 +1,4 @@
-import { QueryResult } from '@apollo/client';
+import { QueryResult, useMutation, useQuery } from '@apollo/client';
 import { ACHIEVEMENT_OPTION_COURSES } from '../../queries/achievementOption';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
@@ -12,6 +12,7 @@ import {
   orangeDot,
   redDot,
 } from '../common/dots';
+import { useRoleMutation } from '../../hooks/authedMutation';
 
 import {
   MdAddCircle,
@@ -23,6 +24,8 @@ import { useAdminQuery } from '../../hooks/authedQuery';
 import { QUERY_LIMIT } from '../../pages/manage/courses';
 import { INSERT_SINGLE_ATTENDANCE } from '../../queries/courseEnrollment';
 import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../queries/mutateAchievement';
+import { CREATE_ACHIEVEMENT_CERTIFICATE } from '../../queries/actions';
+import { CREATE_PARTICIPATION_CERTIFICATE } from '../../queries/actions';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
@@ -47,6 +50,48 @@ import { AttendanceStatus_enum } from '../../__generated__/globalTypes';
 import TagWithTwoText from '../common/TagWithTwoText';
 import Loading from '../ManageCoursesContent/Loading';
 import { Button } from '../common/Button';
+
+const isAdmin = useIsAdmin();
+const { t } = useTranslation();
+
+const CertificateButton = () => {
+  const [createAchievementCertificate, { loading, error, data }] =
+    useRoleMutation(CREATE_ACHIEVEMENT_CERTIFICATE, {
+      variables: {
+        template:
+          'https://edu-old.opencampus.sh/templates/opencampus_certificate_template_WS2022.png',
+        firstName: 'John',
+        lastName: 'Doe',
+        semester: 'Fall 2023',
+        course_name: 'Advanced GraphQL',
+        ects: '5',
+        practical_project: 'yes',
+        online_courses: 'no',
+        certificate_text: 'Congratulations!',
+      },
+    });
+
+  // log the data
+  console.log(data);
+
+  const handleClick = () => {
+    createAchievementCertificate().catch((error) => {
+      console.error('Error creating achievement certificate:', error);
+    });
+  };
+
+  return (
+    <div className="flex justify-end mt-10">
+      <Button filled inverted onClick={handleClick}>
+        {loading
+          ? 'Loading...'
+          : error
+          ? `Error! ${error.message}`
+          : t('course-page:certificate-generation')}
+      </Button>
+    </div>
+  );
+};
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -151,9 +196,10 @@ interface IPropsParticipationList {
   qResult: QueryResult<any, any>;
 }
 
-const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => {
-  const { t } = useTranslation();
-
+const ParticipationList: FC<IPropsParticipationList> = ({
+  course,
+  qResult,
+}) => {
   const tableHeaders: StaticComponentProperty[] = [
     { key: 0, label: t('firstName') },
     { key: 1, label: t('lastName') },
@@ -162,12 +208,10 @@ const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => 
   ];
 
   const participationList = [...(course.CourseEnrollments || [])]
-    .filter(enrollment => enrollment.status === 'CONFIRMED')
-    .sort((a, b) => a.User.lastName.localeCompare(b.User.lastName)
-  );
+    .filter((enrollment) => enrollment.status === 'CONFIRMED')
+    .sort((a, b) => a.User.lastName.localeCompare(b.User.lastName));
   const sessions = [...(course.Sessions || [])];
 
-  const isAdmin = useIsAdmin();
   console.log('EnrollmentList length: ', ParticipationList.toString);
 
   return (
@@ -201,13 +245,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => 
               ))}
             </tbody>
           </table>
-          {isAdmin && (
-            <div className="flex justify-end mt-10">
-              <Button filled inverted>
-                {t('course-page:certificate-generation')}
-              </Button>
-            </div>
-          )}
+          {isAdmin && <CertificateButton />}
         </div>
       ) : (
         <p className="m-auto text-center mb-14 text-gray-400">
@@ -227,7 +265,6 @@ interface IDotData {
 
 const pStyle = 'text-gray-700 truncate';
 const tdStyle = 'pl-5';
-
 
 /* #region ParticipationRow */
 
@@ -269,7 +306,11 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
     async (session: ManagedCourse_Course_by_pk_Sessions) => {
       const attendanceRecord = attendanceRecordBySession[session.id];
       let status: AttendanceStatus_enum;
-      if (!attendanceRecord || attendanceRecord.status === AttendanceStatus_enum.MISSED || attendanceRecord.status ===  AttendanceStatus_enum.NO_INFO) {
+      if (
+        !attendanceRecord ||
+        attendanceRecord.status === AttendanceStatus_enum.MISSED ||
+        attendanceRecord.status === AttendanceStatus_enum.NO_INFO
+      ) {
         status = AttendanceStatus_enum.ATTENDED;
       } else {
         status = AttendanceStatus_enum.MISSED;
@@ -289,9 +330,9 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
         return;
       }
       qResult.refetch();
-      },
-      [qResult, insertAttendance, attendanceRecordBySession, userId]
-    );
+    },
+    [qResult, insertAttendance, attendanceRecordBySession, userId]
+  );
 
   const handleDetailsClick = useCallback(() => {
     setShowDetails((prev) => !prev);
