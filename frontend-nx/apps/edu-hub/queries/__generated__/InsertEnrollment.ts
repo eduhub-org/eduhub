@@ -148,6 +148,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
+   * The ID of the user that enrolled for the given course
+   */
+  userId: any;
+  /**
    * The last day a user can confirm his/her invitation to the given course
    */
   invitationExpirationDate: any | null;
@@ -285,6 +289,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
 
 export interface InsertEnrollment_insert_CourseEnrollment_returning {
   __typename: "CourseEnrollment";
+  /**
+   * The ID of the user that enrolled for the given course
+   */
+  userId: any;
   /**
    * The last day a user can confirm his/her invitation to the given course
    */
