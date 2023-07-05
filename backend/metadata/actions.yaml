@@ -1,14 +1,14 @@
 actions:
   - name: createAchievementCertificate
     definition:
-      kind: ""
+      kind: synchronous
       handler: '{{CLOUD_FUNCTION_LINK_CREATE_ACHIEVEMENT_CERTIFICATE}}'
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   - name: createParticipationCertificate
     definition:
-      kind: ""
+      kind: synchronous
       handler: '{{CLOUD_FUNCTION_LINK_CREATE_PARTICIPATION_CERTIFICATE}}'
       headers:
         - name: secret
