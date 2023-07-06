@@ -17,7 +17,7 @@ import {
   loadParticipationCertificateVariables,
 } from '../../../../queries/__generated__/loadParticipationCertificate';
 import { useUserId } from '../../../../hooks/user';
-import { getCourseEnrollment } from 'apps/edu-hub/helpers/util';
+import { getCourseEnrollment } from '../../../../helpers/util';
 
 interface IProps {
   course: CourseWithEnrollment_Course_by_pk;
