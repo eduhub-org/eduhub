@@ -261,6 +261,10 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course {
 export interface MyEnrollmentsForCourseQuery_CourseEnrollment {
   __typename: "CourseEnrollment";
   /**
+   * The ID of the user that enrolled for the given course
+   */
+  userId: any;
+  /**
    * The last day a user can confirm his/her invitation to the given course
    */
   invitationExpirationDate: any | null;

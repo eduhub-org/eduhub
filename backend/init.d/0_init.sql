@@ -2993,10 +2993,6 @@ INSERT INTO public."AchievementRecordType" VALUES ('DOCUMENTATION_AND_CSV', 'A d
 -- Data for Name: Attendance; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."Attendance" VALUES (1, 1, '3dee812b-865e-497b-b247-ff3a6a978530', 'ATTENDED', '2022-12-19 13:55:28.341956+00', '2022-12-19 13:55:28.341956+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
-INSERT INTO public."Attendance" VALUES (2, 2, '3dee812b-865e-497b-b247-ff3a6a978530', 'ATTENDED', '2022-12-19 13:55:28.893252+00', '2022-12-19 13:55:28.893252+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
-INSERT INTO public."Attendance" VALUES (3, 3, '3dee812b-865e-497b-b247-ff3a6a978530', 'ATTENDED', '2022-12-19 13:55:29.341565+00', '2022-12-19 13:55:29.341565+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
-
 
 --
 -- Data for Name: AttendanceSource; Type: TABLE DATA; Schema: public; Owner: -
@@ -3019,14 +3015,10 @@ INSERT INTO public."AttendanceStatus" VALUES ('MISSED', NULL);
 -- Data for Name: Course; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."Course" VALUES (1, 'Course 1', 'APPLICANTS_INVITED', '5', 'tag', 'DE', '2022-12-17', '22', true, true, 2, 'MONDAY', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 1, 'test', 'test', 'test', 'test', 'test', 'chat.openai.com', false, 20, '2022-12-17 22:00:02.674+00', '2022-12-17 11:45:01.513+00');
-
 
 --
 -- Data for Name: CourseEnrollment; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-INSERT INTO public."CourseEnrollment" VALUES (1, 1, '3dee812b-865e-497b-b247-ff3a6a978530', 'CONFIRMED', 'The cat looks perfect', 'INVITE', NULL, NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', '2022-12-26');
 
 
 --
@@ -3045,14 +3037,10 @@ INSERT INTO public."CourseEnrollmentStatus" VALUES ('COMPLETED', 'The course was
 -- Data for Name: CourseInstructor; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."CourseInstructor" VALUES (1, 1, 1, '2022-12-17 22:20:20.615952+00', '2022-12-17 22:20:20.615952+00');
-
 
 --
 -- Data for Name: CourseLocation; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-INSERT INTO public."CourseLocation" VALUES (1, 1, '', '', 'test', '2022-12-19 12:56:07.352338+00', '2022-12-19 12:56:12.475054+00', 'KIEL');
 
 
 --
@@ -3083,8 +3071,6 @@ INSERT INTO public."Employment" VALUES ('RETIREE', '');
 -- Data for Name: Expert; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."Expert" VALUES (1, '43bc2dc5-7171-422d-a99f-914650f41cb5', NULL, '2022-12-17 22:05:57.650776+00', '2022-12-17 22:05:57.650776+00');
-
 
 --
 -- Data for Name: Language; Type: TABLE DATA; Schema: public; Owner: -
@@ -3105,9 +3091,6 @@ INSERT INTO public."LocationOption" VALUES ('KIEL', NULL);
 --
 -- Data for Name: MailLog; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-INSERT INTO public."MailLog" VALUES (1, 'Kurseinladung Course 1 für Colin', 'Hallo Colin Clausen, du bist eingeladen, bitte melde dich zurück bis zum 26.12.2022', 'c.clausen@pct-digital.de', 'steffen@opencampus.sh', NULL, NULL, '2022-12-19 13:50:11.140409+00', '2022-12-19 13:50:11.140409+00', NULL, 'READY_TO_SEND');
-
 
 --
 -- Data for Name: MailStatus; Type: TABLE DATA; Schema: public; Owner: -
@@ -3139,26 +3122,16 @@ INSERT INTO public."MotivationRating" VALUES ('REVIEW', 'The motivation letter s
 -- Data for Name: Program; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."Program" VALUES (1, 'WISE 22/23', '2022-12-14', '2022-12-23', '2022-09-30', '2023-03-01', '2023-03-18', true, NULL, NULL, NULL, true, true, NULL, 'http://localhost:4001/emulated-bucket/programid_1/participation_certificate_template/dropped text.txt', 'WI22', 2);
-
 
 --
 -- Data for Name: Session; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-INSERT INTO public."Session" VALUES (1, '48484', '', '2022-12-26 13:21:41.866+00', '2022-12-26 13:21:41.866+00', 1, '2022-12-19 13:21:41.873742+00', '2022-12-19 13:21:56.669676+00', NULL);
-INSERT INTO public."Session" VALUES (2, '484848484', '', '2023-01-02 13:21:41.866+00', '2023-01-02 13:21:41.866+00', 1, '2022-12-19 13:21:58.862093+00', '2022-12-19 13:22:04.411505+00', NULL);
-INSERT INTO public."Session" VALUES (3, '8/////', '', '2023-01-09 13:21:41.866+00', '2023-01-09 13:21:41.866+00', 1, '2022-12-19 13:22:04.77346+00', '2022-12-19 13:22:08.069518+00', NULL);
 
 
 --
 -- Data for Name: SessionAddress; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."SessionAddress" VALUES (1, '', '', 'test', '2022-12-19 13:21:41.891287+00', '2022-12-19 13:21:41.891287+00', 1, '', 'FREETEXT_ADDRESS');
-INSERT INTO public."SessionAddress" VALUES (2, '', '', '48484', '2022-12-19 13:21:47.492262+00', '2022-12-19 13:21:47.492262+00', 1, '', 'FREETEXT_ADDRESS');
-INSERT INTO public."SessionAddress" VALUES (3, '', '', 'test', '2022-12-19 13:21:58.878853+00', '2022-12-19 13:21:58.878853+00', 2, '', 'FREETEXT_ADDRESS');
-INSERT INTO public."SessionAddress" VALUES (4, '', '', 'test', '2022-12-19 13:22:04.790093+00', '2022-12-19 13:22:04.790093+00', 3, '', 'FREETEXT_ADDRESS');
 
 
 --
@@ -3168,12 +3141,10 @@ INSERT INTO public."SessionAddress" VALUES (4, '', '', 'test', '2022-12-19 13:22
 INSERT INTO public."SessionAddressType" VALUES ('URL', 'For online participation');
 INSERT INTO public."SessionAddressType" VALUES ('FREETEXT_ADDRESS', 'Address description for an offline participation');
 
-
 --
 -- Data for Name: SessionSpeaker; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public."SessionSpeaker" VALUES (1, 1, 1, '2022-12-19 13:21:51.940891+00', '2022-12-19 13:21:51.940891+00');
 
 
 --
@@ -3195,10 +3166,6 @@ INSERT INTO public."University" VALUES ('FH_WESTKUESTE', 'Fachhochschule Westkü
 --
 -- Data for Name: User; Type: TABLE DATA; Schema: public; Owner: -
 --
-
-INSERT INTO public."User" VALUES ('3dee812b-865e-497b-b247-ff3a6a978530', 'Colin', 'Clausen', 'c.clausen@pct-digital.de', NULL, NULL, NULL, NULL, NULL, '2022-12-19 13:34:37.410017+00', '2022-12-19 13:53:19.760953+00', NULL, NULL, NULL);
-INSERT INTO public."User" VALUES ('43bc2dc5-7171-422d-a99f-914650f41cb5', 'Dev', 'Dev', 'dev@example.com', NULL, NULL, NULL, NULL, NULL, '2022-12-17 17:53:20.882635+00', '2022-12-19 13:56:07.483474+00', NULL, NULL, NULL);
-
 
 --
 -- Data for Name: RentAScientistConfig; Type: TABLE DATA; Schema: rentAScientist; Owner: -

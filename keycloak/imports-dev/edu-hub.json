@@ -526,42 +526,17 @@
   "webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister": false,
   "webAuthnPolicyPasswordlessAcceptableAaguids": [],
   "users": [ {
-      "id" : "3dee812b-865e-497b-b247-ff3a6a978530",
-      "createdTimestamp" : 1671456236349,
-      "username" : "c.clausen@pct-digital.de",
-      "enabled" : true,
-      "totp" : false,
-      "emailVerified" : false,
-      "firstName" : "Colin",
-      "lastName" : "Clausen",
-      "email" : "c.clausen@pct-digital.de",
-      "credentials" : [ {
-        "id" : "60f878ea-083f-4973-817f-eb89ea47fc1d",
-        "type" : "password",
-        "createdDate" : 1671456236431,
-        "secretData" : "{\"value\":\"qXq811M08XHcKoob6V6zlS766vWE47fnwZt/ksR2zyi2/PadxN4Y+WLFCTBcdfygD2+myG8BLlPr4QCe7pff6Q==\",\"salt\":\"vEaxflCf977XijRwse4BHA==\",\"additionalParameters\":{}}",
-        "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
-      } ],
-      "disableableCredentialTypes" : [ ],
-      "requiredActions" : [ ],
-      "realmRoles" : [ "default-roles-edu-hub" ],
-      "clientRoles" : {
-        "hasura" : [ "user" ]
-      },
-      "notBefore" : 0,
-      "groups" : [ ]
-    }, {
-      "id" : "43bc2dc5-7171-422d-a99f-914650f41cb5",
+      "id" : "152f12c3-f7d2-4b73-8d29-603c164b0139",
       "createdTimestamp" : 1670948741507,
-      "username" : "dev@example.com",
+      "username" : "student1@example.com",
       "enabled" : true,
       "totp" : false,
       "emailVerified" : true,
-      "firstName" : "Dev",
-      "lastName" : "Dev",
-      "email" : "dev@example.com",
+      "firstName" : "Student1",
+      "lastName" : "Student1",
+      "email" : "student1@example.com",
       "credentials" : [ {
-        "id" : "62a86d33-985d-4845-9cae-6680b604dd83",
+        "id" : "21298177-b15a-4835-b2d4-eb87803a8d15",
         "type" : "password",
         "userLabel" : "My password",
         "createdDate" : 1670948759216,
@@ -572,11 +547,322 @@
       "requiredActions" : [ ],
       "realmRoles" : [ "default-roles-edu-hub" ],
       "clientRoles" : {
-        "hasura" : [ "user", "instructor", "admin" ],
-        "rent-a-scientist" : ["admin-ras"]
+        "hasura" : [ "user"]
       },
       "notBefore" : 0,
-      "groups" : [ ]
+      "groups" : [ "defaults" ]
+    }, {
+      "id" : "b5df4676-3d75-4413-bfac-9cc4e2f61cd9",
+      "createdTimestamp" : 1670948741507,
+      "username" : "student2@example.com",
+      "enabled" : true,
+      "totp" : false,
+      "emailVerified" : true,
+      "firstName" : "Student2",
+      "lastName" : "Student2",
+      "email" : "student2@example.com",
+      "credentials" : [ {
+        "id" : "8f048635-e511-4fc5-9d78-067e472be3d6",
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1670948759216,
+        "secretData" : "{\"value\":\"fN0ObkFyQW7Pp4WwLzAz+k8RJW3sOfWcHgXIEZB7JfK44O8XfFIaANMZaJk6n4YrkKc3gwURHFy8uJwbdplI/Q==\",\"salt\":\"gZwz/MqzUCBtoUfdP7dpPw==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-edu-hub" ],
+      "clientRoles" : {
+        "hasura" : [ "user" ]
+      },
+      "notBefore" : 0,
+      "groups" : [ "defaults" ]
+    }, {
+      "id" : "774b371a-b391-487f-ba57-1cee492eb233",
+      "createdTimestamp" : 1670948741507,
+      "username" : "student3@example.com",
+      "enabled" : true,
+      "totp" : false,
+      "emailVerified" : true,
+      "firstName" : "Student3",
+      "lastName" : "Student3",
+      "email" : "student3@example.com",
+      "credentials" : [ {
+        "id" : "1f98ea54-422d-4548-9b45-a1ce7e2696af",
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1670948759216,
+        "secretData" : "{\"value\":\"fN0ObkFyQW7Pp4WwLzAz+k8RJW3sOfWcHgXIEZB7JfK44O8XfFIaANMZaJk6n4YrkKc3gwURHFy8uJwbdplI/Q==\",\"salt\":\"gZwz/MqzUCBtoUfdP7dpPw==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-edu-hub" ],
+      "clientRoles" : {
+        "hasura" : [ "user" ]
+      },
+      "notBefore" : 0,
+      "groups" : [ "defaults" ]
+    }, {
+      "id" : "efd6479e-0c87-4247-92e5-42cbb5ef6848",
+      "createdTimestamp" : 1670948741507,
+      "username" : "student4@example.com",
+      "enabled" : true,
+      "totp" : false,
+      "emailVerified" : true,
+      "firstName" : "Student4",
+      "lastName" : "Student4",
+      "email" : "student4@example.com",
+      "credentials" : [ {
+        "id" : "799b2b60-f120-446b-9ed5-1870c39bab94",
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1670948759216,
+        "secretData" : "{\"value\":\"fN0ObkFyQW7Pp4WwLzAz+k8RJW3sOfWcHgXIEZB7JfK44O8XfFIaANMZaJk6n4YrkKc3gwURHFy8uJwbdplI/Q==\",\"salt\":\"gZwz/MqzUCBtoUfdP7dpPw==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-edu-hub" ],
+      "clientRoles" : {
+        "hasura" : [ "user" ]
+      },
+      "notBefore" : 0,
+      "groups" : [ "defaults" ]
+    }, {
+      "id" : "f1323e97-5671-450d-a665-727f7273c190",
+      "createdTimestamp" : 1670948741507,
+      "username" : "student5@example.com",
+      "enabled" : true,
+      "totp" : false,
+      "emailVerified" : true,
+      "firstName" : "Student5",
+      "lastName" : "Student5",
+      "email" : "student5@example.com",
+      "credentials" : [ {
+        "id" : "15266eec-90f7-4929-8af5-ddf8d715a08b",
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1670948759216,
+        "secretData" : "{\"value\":\"fN0ObkFyQW7Pp4WwLzAz+k8RJW3sOfWcHgXIEZB7JfK44O8XfFIaANMZaJk6n4YrkKc3gwURHFy8uJwbdplI/Q==\",\"salt\":\"gZwz/MqzUCBtoUfdP7dpPw==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-edu-hub" ],
+      "clientRoles" : {
+        "hasura" : [ "user" ]
+      },
+      "notBefore" : 0,
+      "groups" : [ "defaults" ]
+    }, {
+      "id" : "086bbe72-0ec0-44f8-af14-2057b4d8e94e",
+      "createdTimestamp" : 1670948741507,
+      "username" : "expert1@example.com",
+      "enabled" : true,
+      "totp" : false,
+      "emailVerified" : true,
+      "firstName" : "Expert1",
+      "lastName" : "Expert1",
+      "email" : "expert1@example.com",
+      "credentials" : [ {
+        "id" : "d4712f9e-ca46-4433-95b1-679ec7395af0",
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1670948759216,
+        "secretData" : "{\"value\":\"fN0ObkFyQW7Pp4WwLzAz+k8RJW3sOfWcHgXIEZB7JfK44O8XfFIaANMZaJk6n4YrkKc3gwURHFy8uJwbdplI/Q==\",\"salt\":\"gZwz/MqzUCBtoUfdP7dpPw==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-edu-hub" ],
+      "clientRoles" : {
+        "hasura" : [ "user", "instructor" ]
+      },
+      "notBefore" : 0,
+      "groups" : [ "defaults" ]
+    }, {
+      "id" : "1cd84073-d049-4a93-b39d-e14320dd68f4",
+      "createdTimestamp" : 1670948741507,
+      "username" : "expert2@example.com",
+      "enabled" : true,
+      "totp" : false,
+      "emailVerified" : true,
+      "firstName" : "Expert2",
+      "lastName" : "Expert2",
+      "email" : "expert2@example.com",
+      "credentials" : [ {
+        "id" : "0566334d-9733-469e-b4e2-abbeb9675764",
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1670948759216,
+        "secretData" : "{\"value\":\"fN0ObkFyQW7Pp4WwLzAz+k8RJW3sOfWcHgXIEZB7JfK44O8XfFIaANMZaJk6n4YrkKc3gwURHFy8uJwbdplI/Q==\",\"salt\":\"gZwz/MqzUCBtoUfdP7dpPw==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-edu-hub" ],
+      "clientRoles" : {
+        "hasura" : [ "user", "instructor" ]
+      },
+      "notBefore" : 0,
+      "groups" : [ "defaults" ]
+    }, {
+      "id" : "f39054eb-8993-4469-8e36-86ce5368e380",
+      "createdTimestamp" : 1670948741507,
+      "username" : "expert3@example.com",
+      "enabled" : true,
+      "totp" : false,
+      "emailVerified" : true,
+      "firstName" : "Expert3",
+      "lastName" : "Expert3",
+      "email" : "expert3@example.com",
+      "credentials" : [ {
+        "id" : "713f25fa-10e7-4207-9f03-b5b13551fd91",
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1670948759216,
+        "secretData" : "{\"value\":\"fN0ObkFyQW7Pp4WwLzAz+k8RJW3sOfWcHgXIEZB7JfK44O8XfFIaANMZaJk6n4YrkKc3gwURHFy8uJwbdplI/Q==\",\"salt\":\"gZwz/MqzUCBtoUfdP7dpPw==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-edu-hub" ],
+      "clientRoles" : {
+        "hasura" : [ "user", "instructor" ]
+      },
+      "notBefore" : 0,
+      "groups" : [ "defaults" ]
+    }, {
+      "id" : "ed1ea3aa-efe0-4176-baef-0f1a89348ce2",
+      "createdTimestamp" : 1670948741507,
+      "username" : "expert4@example.com",
+      "enabled" : true,
+      "totp" : false,
+      "emailVerified" : true,
+      "firstName" : "Expert4",
+      "lastName" : "Expert4",
+      "email" : "expert4@example.com",
+      "credentials" : [ {
+        "id" : "5cde2c8d-4c0f-4541-bec1-337dabb968c5",
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1670948759216,
+        "secretData" : "{\"value\":\"fN0ObkFyQW7Pp4WwLzAz+k8RJW3sOfWcHgXIEZB7JfK44O8XfFIaANMZaJk6n4YrkKc3gwURHFy8uJwbdplI/Q==\",\"salt\":\"gZwz/MqzUCBtoUfdP7dpPw==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-edu-hub" ],
+      "clientRoles" : {
+        "hasura" : [ "user", "instructor" ]
+      },
+      "notBefore" : 0,
+      "groups" : [ "defaults" ]
+    }, {
+      "id" : "ef6979e4-2d6c-43e4-9f80-b93c1571ecf0",
+      "createdTimestamp" : 1670948741507,
+      "username" : "expert5@example.com",
+      "enabled" : true,
+      "totp" : false,
+      "emailVerified" : true,
+      "firstName" : "Expert5",
+      "lastName" : "Expert5",
+      "email" : "expert5@example.com",
+      "credentials" : [ {
+        "id" : "7d884760-84c3-4ee7-9734-d10a9f7ef72b",
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1670948759216,
+        "secretData" : "{\"value\":\"fN0ObkFyQW7Pp4WwLzAz+k8RJW3sOfWcHgXIEZB7JfK44O8XfFIaANMZaJk6n4YrkKc3gwURHFy8uJwbdplI/Q==\",\"salt\":\"gZwz/MqzUCBtoUfdP7dpPw==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-edu-hub" ],
+      "clientRoles" : {
+        "hasura" : [ "user", "instructor" ]
+      },
+      "notBefore" : 0,
+      "groups" : [ "defaults" ]
+    }, {
+      "id" : "8914bee9-0549-44af-bcae-cafeec5ba92e",
+      "createdTimestamp" : 1670948741507,
+      "username" : "admin@example.com",
+      "enabled" : true,
+      "totp" : false,
+      "emailVerified" : true,
+      "firstName" : "Admin",
+      "lastName" : "Admin",
+      "email" : "admin@example.com",
+      "credentials" : [ {
+        "id" : "8b8e399e-1e4a-415c-a553-e517c26b9ef8",
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1670948759216,
+        "secretData" : "{\"value\":\"fN0ObkFyQW7Pp4WwLzAz+k8RJW3sOfWcHgXIEZB7JfK44O8XfFIaANMZaJk6n4YrkKc3gwURHFy8uJwbdplI/Q==\",\"salt\":\"gZwz/MqzUCBtoUfdP7dpPw==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-edu-hub" ],
+      "clientRoles" : {
+        "hasura" : [ "user", "instructor", "admin" ]
+      },
+      "notBefore" : 0,
+      "groups" : [ "defaults" ]
+    }, {
+      "id" : "c924cfed-0ea1-428a-ae2d-6b895234d578",
+      "createdTimestamp" : 1670948741507,
+      "username" : "student_mit_langem_namen_zu_design_test@example.com",
+      "enabled" : true,
+      "totp" : false,
+      "emailVerified" : true,
+      "firstName" : "Student mit langem namen",
+      "lastName" : "um zu schauen ob das design hällt",
+      "email" : "student_mit_langem_namen_zu_design_test@example.com",
+      "credentials" : [ {
+        "id" : "94d8c5ec-084c-4ba7-b94e-061aeac8ebd0",
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1670948759216,
+        "secretData" : "{\"value\":\"fN0ObkFyQW7Pp4WwLzAz+k8RJW3sOfWcHgXIEZB7JfK44O8XfFIaANMZaJk6n4YrkKc3gwURHFy8uJwbdplI/Q==\",\"salt\":\"gZwz/MqzUCBtoUfdP7dpPw==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-edu-hub" ],
+      "clientRoles" : {
+        "hasura" : [ "user" ]
+      },
+      "notBefore" : 0,
+      "groups" : [ "defaults" ]
+    }, {
+      "id" : "338b11d0-87e1-43dd-89d3-ecefbaf729c2",
+      "createdTimestamp" : 1670948741507,
+      "username" : "expert_mit_langem_namen_zu_design_test@example.com",
+      "enabled" : true,
+      "totp" : false,
+      "emailVerified" : true,
+      "firstName" : "Expert mit langem namen",
+      "lastName" : "um zu schauen ob das design hällt",
+      "email" : "expert_mit_langem_namen_zu_design_test@example.com",
+      "credentials" : [ {
+        "id" : "f40395be-5707-4242-a8b9-98c749b66b4d",
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1670948759216,
+        "secretData" : "{\"value\":\"fN0ObkFyQW7Pp4WwLzAz+k8RJW3sOfWcHgXIEZB7JfK44O8XfFIaANMZaJk6n4YrkKc3gwURHFy8uJwbdplI/Q==\",\"salt\":\"gZwz/MqzUCBtoUfdP7dpPw==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+      } ],
+      "disableableCredentialTypes" : [ ],
+      "requiredActions" : [ ],
+      "realmRoles" : [ "default-roles-edu-hub" ],
+      "clientRoles" : {
+        "hasura" : [ "user", "instructor" ]
+      },
+      "notBefore" : 0,
+      "groups" : [ "defaults" ]
     }, {
       "id": "295262fc-c7e8-4559-b5a8-642b5aaaa5cb",
       "createdTimestamp": 1681723987920,
