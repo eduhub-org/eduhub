@@ -23,6 +23,7 @@ import { ApplyButton } from '../ApplyButton';
 import { ApplicationModal } from './ApplicationModal';
 import { UserInfoModal } from './UserInfoModal';
 import { Button } from '../../../../common/Button';
+import { getCourseEnrollment } from '../../../../../helpers/util';
 
 interface IProps {
   course: Course_Course_by_pk;
@@ -73,13 +74,16 @@ export const EnrollmentUIController: FC<IProps> = ({
     }
   }, [user, isUserInfoModalVisible]);
 
-  const enrollments = data?.Course_by_pk?.CourseEnrollments;
+  //const enrollments = data?.Course_by_pk?.CourseEnrollments;
+
+  // Find the course enrollment of the current user
+  const courseEnrollment = getCourseEnrollment(data?.Course_by_pk, userId);
 
   // const onlineMeetingLink = 'https://zoom.us';
 
   let content = null;
 
-  if (!enrollments || enrollments.length < 1) {
+  if (!courseEnrollment) {
     // check if current date is after application deadline
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
@@ -94,7 +98,7 @@ export const EnrollmentUIController: FC<IProps> = ({
       content = <ApplyButton course={course} onClickApply={showModal} />;
     }
   } else {
-    const status = enrollments[0].status;
+    const status = courseEnrollment.status;
 
     switch (status) {
       case CourseEnrollmentStatus_enum.ABORTED: {
@@ -123,7 +127,7 @@ export const EnrollmentUIController: FC<IProps> = ({
       }
       case CourseEnrollmentStatus_enum.INVITED: {
         if (
-          enrollments[0].invitationExpirationDate.setHours(0, 0, 0, 0) >=
+          courseEnrollment.invitationExpirationDate.setHours(0, 0, 0, 0) >=
           new Date().setHours(0, 0, 0, 0)
         ) {
           content = (
