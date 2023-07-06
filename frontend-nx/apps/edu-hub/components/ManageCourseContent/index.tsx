@@ -1,10 +1,7 @@
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useState } from 'react';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import {
-  useRoleQuery
-} from '../../hooks/authedQuery';
-import { useIsAdmin, useIsInstructor } from '../../hooks/authentication';
+import { useRoleQuery } from '../../hooks/authedQuery';
 import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from '../../queries/course';
 import {
   ManagedCourse,
@@ -16,13 +13,12 @@ import {
   UpdateCourseStatusVariables,
 } from '../../queries/__generated__/UpdateCourseStatus';
 import { CourseStatus_enum } from '../../__generated__/globalTypes';
-import { Button as OldButton } from '../common/Button';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { QuestionConfirmationDialog } from '../common/dialogs/QuestionConfirmationDialog';
 import { PageBlock } from '../common/PageBlock';
 import { ApplicationsTab } from './ApplicationsTab';
 import { DescriptionTab } from './DescriptionTab';
-import ManageCourseEnrollment from './ParticipationsTab';
+import ManageCourseEnrollment from './ParticipationTab';
 import { SessionsTab } from './SessionsTab';
 
 interface Props {

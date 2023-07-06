@@ -1,9 +1,9 @@
 import { QueryResult, useMutation, useQuery } from '@apollo/client';
-import { ACHIEVEMENT_OPTION_COURSES } from '../../queries/achievementOption';
+import { ACHIEVEMENT_OPTION_COURSES } from '../../../queries/achievementOption';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
 import { FC, useCallback, useState } from 'react';
-import { useIsAdmin } from '../../hooks/authentication';
+import { useIsAdmin } from '../../../hooks/authentication';
 import {
   DOT_COLORS,
   EhDot,
@@ -11,86 +11,43 @@ import {
   greyDot,
   orangeDot,
   redDot,
-} from '../common/dots';
-import { useRoleMutation } from '../../hooks/authedMutation';
+} from '../../common/dots';
+import { useRoleMutation } from '../../../hooks/authedMutation';
 
 import {
   MdAddCircle,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
 } from 'react-icons/md';
-import { useAdminMutation } from '../../hooks/authedMutation';
-import { useAdminQuery } from '../../hooks/authedQuery';
-import { QUERY_LIMIT } from '../../pages/manage/courses';
-import { INSERT_SINGLE_ATTENDANCE } from '../../queries/courseEnrollment';
-import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../queries/mutateAchievement';
-import { CREATE_ACHIEVEMENT_CERTIFICATE } from '../../queries/actions';
-import { CREATE_PARTICIPATION_CERTIFICATE } from '../../queries/actions';
+import { useAdminMutation } from '../../../hooks/authedMutation';
+import { useAdminQuery } from '../../../hooks/authedQuery';
+import { QUERY_LIMIT } from '../../../pages/manage/courses';
+import { INSERT_SINGLE_ATTENDANCE } from '../../../queries/courseEnrollment';
+import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../../queries/mutateAchievement';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
-} from '../../queries/__generated__/AchievementOptionCourses';
+} from '../../../queries/__generated__/AchievementOptionCourses';
 
 import {
   DeleteAnAchievementOptionCourse,
   DeleteAnAchievementOptionCourseVariables,
-} from '../../queries/__generated__/DeleteAnAchievementOptionCourse';
+} from '../../../queries/__generated__/DeleteAnAchievementOptionCourse';
 import {
   InsertSingleAttendance,
   InsertSingleAttendanceVariables,
-} from '../../queries/__generated__/InsertSingleAttendance';
+} from '../../../queries/__generated__/InsertSingleAttendance';
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_CourseEnrollments,
   ManagedCourse_Course_by_pk_Sessions,
-} from '../../queries/__generated__/ManagedCourse';
+} from '../../../queries/__generated__/ManagedCourse';
 
-import { StaticComponentProperty } from '../../types/UIComponents';
-import { AttendanceStatus_enum } from '../../__generated__/globalTypes';
-import TagWithTwoText from '../common/TagWithTwoText';
-import Loading from '../ManageCoursesContent/Loading';
-import { Button } from '../common/Button';
-
-const CertificateButton = () => {
-  const isAdmin = useIsAdmin();
-  const { t } = useTranslation();
-  const [createAchievementCertificate, { loading, error, data }] =
-    useRoleMutation(CREATE_ACHIEVEMENT_CERTIFICATE, {
-      variables: {
-        template:
-          'https://edu-old.opencampus.sh/templates/opencampus_certificate_template_WS2022.png',
-        firstname: 'John',
-        lastname: 'Doe',
-        semester: 'Fall 2023',
-        course_name: 'Advanced GraphQL',
-        ects: '5',
-        practical_project: 'yes',
-        online_courses: 'no',
-        certificate_text: 'Congratulations!',
-      },
-    });
-
-  // log the data
-  console.log(data);
-
-  const handleClick = () => {
-    createAchievementCertificate().catch((error) => {
-      console.error('Error creating achievement certificate:', error);
-    });
-  };
-
-  return (
-    <div className="flex justify-end mt-10">
-      <Button filled inverted onClick={handleClick}>
-        {loading
-          ? 'Loading...'
-          : error
-          ? `Error! ${error.message}`
-          : t('course-page:certificate-generation')}
-      </Button>
-    </div>
-  );
-};
+import { StaticComponentProperty } from '../../../types/UIComponents';
+import { AttendanceStatus_enum } from '../../../__generated__/globalTypes';
+import TagWithTwoText from '../../common/TagWithTwoText';
+import Loading from '../../ManageCoursesContent/Loading';
+import { CertificateButton } from './CertificationButton';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
