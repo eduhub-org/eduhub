@@ -70,7 +70,7 @@ export const getCourseEnrollment = (
   userId: string
 ) => {
   // if the type is Course_Course_by_pk return the same value as if the type was CourseWithEnrollment_Course_by_pk and no enrollment was found
-  if (!('CourseEnrollments' in course)) {
+  if (!course || !('CourseEnrollments' in course)) {
     return null;
   }
   return course.CourseEnrollments.find(
