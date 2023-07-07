@@ -1117,6 +1117,8 @@ resource "google_cloudfunctions2_function" "create_achievement_certificate" {
   service_config {
     environment_variables = {
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+      HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
+      HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
     }
     max_instance_count = 1
     available_memory   = "256M"
@@ -1164,6 +1166,8 @@ resource "google_cloudfunctions2_function" "create_participation_certificate" {
   service_config {
     environment_variables = {
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+      HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
+      HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
     }
     max_instance_count = 1
     available_memory   = "256M"
