@@ -77,7 +77,7 @@ export const createAchievementCertificate = async (req, res) => {
         online_courses:
           data.CourseEnrollment[0].User.AchievementRecordAuthors
             .AchievementRecord.AchievementOption.title,
-        certificate_text: " ??? certificate_text ???",
+        certificate_text: data.CourseEnrollment[0].Course.learningGoals,
       },
     };
 

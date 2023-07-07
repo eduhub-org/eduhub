@@ -4,7 +4,8 @@
   "type": "module",
   "dependencies": {
     "body-parser": "1.19.0",
-    "got": "^12.5.3"
+    "got": "^12.5.3",
+    "graphql-request": "^6.1.0"
   },
   "devDependencies": {
     "npm-watch": "^0.6.0",
