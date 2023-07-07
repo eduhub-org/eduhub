@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { ChangeEvent, FC, useCallback, useState } from 'react';
 
 import { CourseEnrollmentStatus_enum } from '../../../../../../__generated__/globalTypes';
-import { enrollmentStatusForCourse } from '../../../../../../helpers/courseHelpers';
+// import { enrollmentStatusForCourse } from '../../../../../../helpers/courseHelpers';
 import { useAuthedMutation } from '../../../../../../hooks/authedMutation';
 import { useUserId } from '../../../../../../hooks/user';
 import xIcon from '../../../../../../public/images/common/x-calibur-black.svg';
@@ -18,6 +18,8 @@ import { INSERT_ENROLLMENT } from '../../../../../../queries/insertEnrollment';
 
 import { CourseApplicationModalFormContent } from './FormContent';
 import { ApplicationSuccessMessage } from './ApplicationSuccessMessage';
+import { get } from 'lodash';
+import { getCourseEnrollment } from '../../../../../../helpers/util';
 
 interface IProps {
   closeModal: () => void;
@@ -58,7 +60,7 @@ export const ApplicationModal: FC<IProps> = ({
     });
   }, [course.id, insertMutation, text, userId]);
 
-  const status = enrollmentStatusForCourse(course);
+  const status = getCourseEnrollment(course, userId)?.status || 'NOT_APPLIED';
 
   return (
     <Modal
