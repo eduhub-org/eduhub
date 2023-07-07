@@ -1,6 +1,10 @@
+import { Course_Course_by_pk } from '../queries/__generated__/Course';
+import { CourseWithEnrollment_Course_by_pk } from '../queries/__generated__/CourseWithEnrollment';
+
 export const makeFullName = (firstName: string, lastName: string): string => {
   return `${firstName} ${lastName}`;
 };
+
 export const formattedDate = (date: Date) => {
   const y = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(date);
   const m = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(date);
@@ -59,4 +63,17 @@ export const downloadCSVFileFromBase64String = (base64File: string) => {
 
 export const isDateExpired = (givenDate: Date) => {
   return givenDate.getTime() - new Date().getTime() <= 0;
+};
+
+export const getCourseEnrollment = (
+  course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk,
+  userId: string
+) => {
+  // if the type is Course_Course_by_pk return the same value as if the type was CourseWithEnrollment_Course_by_pk and no enrollment was found
+  if (!course || !('CourseEnrollments' in course)) {
+    return null;
+  }
+  return course.CourseEnrollments.find(
+    (enrollment) => enrollment.userId === userId
+  );
 };

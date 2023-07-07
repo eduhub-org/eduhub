@@ -4,11 +4,6 @@ import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
 import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
-import {
-  enrollmentStatusForCourse,
-  hasEnrollments,
-  hasProgram,
-} from '../../../helpers/courseHelpers';
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CourseListWithEnrollments_Course } from '../../../queries/__generated__/CourseListWithEnrollments';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../queries/__generated__/CourseWithEnrollment';
@@ -81,19 +76,20 @@ const CourseStatusIndicator: FC<{
 export const Tile: FC<IProps> = ({ course, isManage }) => {
   const { t } = useTranslation('common');
 
-  const enrollmentStatus = enrollmentStatusForCourse(course);
+  // const enrollmentStatus = enrollmentStatusForCourse(course);
   // const { t } = useTranslation('course-page');
-  const program = hasProgram(course) ? course.Program : undefined;
-  const enrollment =
-    hasEnrollments(course) && course.CourseEnrollments.length === 1
-      ? course.CourseEnrollments[0]
-      : undefined;
+  // const program = hasProgram(course) ? course.Program : undefined;
 
-  const currentDate = new Date();
-  const isCurrentProgram =
-    !!program &&
-    program?.applicationStart <= currentDate &&
-    currentDate <= program?.achievementRecordUploadDeadline;
+  // const enrollment =
+  //   hasEnrollments(course) && course.CourseEnrollments.length === 1
+  //     ? course.CourseEnrollments["null"]
+  //     : undefined;
+
+  // const currentDate = new Date();
+  // const isCurrentProgram =
+  //   !!program &&
+  //   program?.applicationStart <= currentDate &&
+  //   currentDate <= program?.achievementRecordUploadDeadline;
 
   // const highlightColor =
   //   enrollmentStatus === CourseEnrollmentStatus_enum.CONFIRMED &&
@@ -101,19 +97,19 @@ export const Tile: FC<IProps> = ({ course, isManage }) => {
   //     ? 'bg-edu-course-current'
   //     : 'bg-gray-100';
 
-  const courseDateTimeString = `${
-    course.weekDay ? `${t(course.weekDay)} ` : ''
-  }${
-    course.startTime && course.endTime
-      ? `${new Date(course.startTime).toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        })} - ${new Date(course.endTime).toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        })}`
-      : ''
-  }`;
+  // const courseDateTimeString = `${
+  //   course.weekDay ? `${t(course.weekDay)} ` : ''
+  // }${
+  //   course.startTime && course.endTime
+  //     ? `${new Date(course.startTime).toLocaleTimeString([], {
+  //         hour: '2-digit',
+  //         minute: '2-digit',
+  //       })} - ${new Date(course.endTime).toLocaleTimeString([], {
+  //         hour: '2-digit',
+  //         minute: '2-digit',
+  //       })}`
+  //     : ''
+  // }`;
 
   return (
     <Link
