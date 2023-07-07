@@ -5,24 +5,26 @@ import useTranslation from 'next-translate/useTranslation';
 import { Button } from '../../common/Button';
 import { CREATE_ACHIEVEMENT_CERTIFICATE } from '../../../queries/actions';
 import { CREATE_PARTICIPATION_CERTIFICATE } from '../../../queries/actions';
+import {
+  ManagedCourse_Course_by_pk,
+  ManagedCourse_Course_by_pk_CourseEnrollments,
+} from '../../../queries/__generated__/ManagedCourse';
 
-export const CertificateButton = () => {
+export const GenerateCertificatesButton = ({
+  participationList,
+  course,
+}: {
+  participationList: ManagedCourse_Course_by_pk_CourseEnrollments[];
+  course: ManagedCourse_Course_by_pk;
+}) => {
   const isAdmin = useIsAdmin();
   const { t } = useTranslation();
 
   const [createAchievementCertificate, { loading, error, data }] =
     useRoleMutation(CREATE_ACHIEVEMENT_CERTIFICATE, {
       variables: {
-        template:
-          'https://edu-old.opencampus.sh/templates/opencampus_certificate_template_WS2022.png',
-        firstname: 'John',
-        lastname: 'Doe',
-        semester: 'Fall 2023',
-        course_name: 'Advanced GraphQL',
-        ects: '5',
-        practical_project: 'yes',
-        online_courses: 'no',
-        certificate_text: 'Congratulations!',
+        courseId: course.id,
+        userIds: participationList.map((p) => p.userId),
       },
     });
 

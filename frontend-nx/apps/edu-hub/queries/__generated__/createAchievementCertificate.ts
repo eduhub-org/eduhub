@@ -8,8 +8,8 @@
 // ====================================================
 
 export interface createAchievementCertificate_createAchievementCertificate {
-  __typename: "createCertificateOutput";
-  pdf: string;
+  __typename: "result";
+  result: string;
 }
 
 export interface createAchievementCertificate {
@@ -17,13 +17,6 @@ export interface createAchievementCertificate {
 }
 
 export interface createAchievementCertificateVariables {
-  template: string;
-  firstname: string;
-  lastname: string;
-  semester: string;
-  course_name: string;
-  ects: string;
-  practical_project: string;
-  online_courses: string;
-  certificate_text: string;
+  userIds: any[];
+  courseId: number;
 }

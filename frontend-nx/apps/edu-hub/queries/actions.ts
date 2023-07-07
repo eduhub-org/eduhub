@@ -183,29 +183,9 @@ export const SAVE_USER_PROFILE_IMAGE = gql`
 `;
 
 export const CREATE_ACHIEVEMENT_CERTIFICATE = gql`
-  mutation createAchievementCertificate(
-    $template: String!
-    $firstname: String!
-    $lastname: String!
-    $semester: String!
-    $course_name: String!
-    $ects: String!
-    $practical_project: String!
-    $online_courses: String!
-    $certificate_text: String!
-  ) {
-    createAchievementCertificate(
-      template: $template
-      firstname: $firstname
-      lastname: $lastname
-      semester: $semester
-      course_name: $course_name
-      ects: $ects
-      practical_project: $practical_project
-      online_courses: $online_courses
-      certificate_text: $certificate_text
-    ) {
-      pdf
+  mutation createAchievementCertificate($userIds: [uuid!]!, $courseId: Int!) {
+    createAchievementCertificate(userIds: $userIds, courseId: $courseId) {
+      result
     }
   }
 `;

@@ -47,7 +47,7 @@ import { StaticComponentProperty } from '../../../types/UIComponents';
 import { AttendanceStatus_enum } from '../../../__generated__/globalTypes';
 import TagWithTwoText from '../../common/TagWithTwoText';
 import Loading from '../../ManageCoursesContent/Loading';
-import { CertificateButton } from './CertificationButton';
+import { GenerateCertificatesButton } from './GenerateCertificatesButton';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -204,7 +204,12 @@ const ParticipationList: FC<IPropsParticipationList> = ({
               ))}
             </tbody>
           </table>
-          {isAdmin && <CertificateButton />}
+          {isAdmin && (
+            <GenerateCertificatesButton
+              participationList={participationList}
+              course={course}
+            />
+          )}
         </div>
       ) : (
         <p className="m-auto text-center mb-14 text-gray-400">
