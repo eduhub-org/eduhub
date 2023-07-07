@@ -12,6 +12,7 @@ import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
 import { useIsLoggedIn } from '../../hooks/authentication';
 import { COURSE } from '../../queries/course';
 import { Course, CourseVariables } from '../../queries/__generated__/Course';
+import { getCourseEnrollment } from '../../helpers/util';
 
 const CourseContent: FC<{ id: number }> = ({ id }) => {
   const { t } = useTranslation();
@@ -33,15 +34,14 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       userId,
     },
     async onCompleted(data) {
-      const enrollmentStatus = data?.Course_by_pk?.CourseEnrollments[0]?.status;
+      // Find the course enrollment of the current user
+      const courseEnrollment = getCourseEnrollment(data?.Course_by_pk, userId);
+
+      const enrollmentStatus = courseEnrollment?.status;
       if (
         enrollmentStatus === CourseEnrollmentStatus_enum.INVITED &&
-        data?.Course_by_pk?.CourseEnrollments[0]?.invitationExpirationDate.setHours(
-          0,
-          0,
-          0,
-          0
-        ) >= new Date().setHours(0, 0, 0, 0)
+        courseEnrollment?.invitationExpirationDate.setHours(0, 0, 0, 0) >=
+          new Date().setHours(0, 0, 0, 0)
       ) {
         setResetValues(true);
       }
@@ -67,8 +67,10 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
 
   const course =
     authorizedCourseData?.Course_by_pk || unauthorizedCourseData?.Course_by_pk;
-  const enrollmentId =
-    authorizedCourseData?.Course_by_pk?.CourseEnrollments[0]?.id;
+  const enrollmentId = getCourseEnrollment(
+    authorizedCourseData?.Course_by_pk,
+    userId
+  )?.id;
 
   if (!course) {
     return (
