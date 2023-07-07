@@ -1,5 +1,5 @@
 import got from "got";
-import { request } from "graphql-request";
+import { request, gql } from "graphql-request";
 
 /**
  * Responds to any HTTP request.
@@ -13,7 +13,7 @@ export const createAchievementCertificate = async (req, res) => {
     const courseId = req.body.input.courseId;
 
     // Construct the GraphQL query to fetch the enrollment data
-    const query = `
+    const query = gql`
     query GetEnrollments($userIds: [uuid!]!, $courseId: Int!) {
         CourseEnrollment(where: {userId: {_in: $userIds}, Course: {id: {_eq: $courseId}, AchievementOptionCourses: {AchievementOption: {AchievementRecords: {rating: {_eq: UNRATED}}}}}}) {
           User {
@@ -49,15 +49,15 @@ export const createAchievementCertificate = async (req, res) => {
 
     // Send the GraphQL query to the Hasura endpoint
     const data = await request(
-      process.env.HASURA_GRAPHQL_ENDPOINT,
+      process.env.HASURA_ENDPOINT,
       query,
       variables,
       {
-        headers: {
-          "x-hasura-admin-secret": process.env.HASURA_GRAPHQL_ADMIN_SECRET,
-        },
+          "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
       }
     );
+    
+    console.log(data);
 
     // Check if all users are enrolled in their respective courses
 
