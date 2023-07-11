@@ -1,5 +1,5 @@
-import got from "got";
-import { request, gql } from "graphql-request";
+import { fetchEnrollments } from "./fetchEnrollments.js";
+import { generateCertificate } from "./generateCertificate.js";
 
 /**
  * Responds to any HTTP request.
@@ -12,81 +12,31 @@ export const createAchievementCertificate = async (req, res) => {
     const userIds = req.body.input.userIds;
     const courseId = req.body.input.courseId;
 
-    // Construct the GraphQL query to fetch the enrollment data
-    const query = gql`
-    query GetEnrollments($userIds: [uuid!]!, $courseId: Int!) {
-        CourseEnrollment(where: {userId: {_in: $userIds}, Course: {id: {_eq: $courseId}, AchievementOptionCourses: {AchievementOption: {AchievementRecords: {rating: {_eq: UNRATED}}}}}}) {
-          User {
-            firstName
-            lastName
-            AchievementRecordAuthors(where: {AchievementRecord: {rating: {_eq: UNRATED}, AchievementOption: {AchievementOptionCourses: {Course: {id: {_eq: $courseId}}}}}}, order_by: {AchievementRecord: {updated_at: desc}}, limit: 1) {
-              AchievementRecord {
-                AchievementOption {
-                  title
-                  recordType
-                }
-                created_at
-              }
-            }
-            id
-          }
-          Course {
-            Program {
-              title
-              attendanceCertificateTemplateURL
-            }
-            ects
-            title
-          }
-        }
-      }
-                  `;
-    // Set the variables for the GraphQL query
-    const variables = {
-      userIds: userIds,
-      courseId: courseId,
-    };
+    // log userId and courseid 
+    console.log(userIds);
+    console.log(courseId);
 
-    // Send the GraphQL query to the Hasura endpoint
-    const data = await request(
-      process.env.HASURA_ENDPOINT,
-      query,
-      variables,
-      {
-          "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
-      }
-    );
-    
-    console.log(data);
+    // get course enrollments
+    const courseEnrollments = fetchEnrollments(userIds, courseId);
 
-    // Check if all users are enrolled in their respective courses
+    console.log(courseEnrollments);
 
-    // Construct the options object for the certificate generation request
-    const options = {
-      json: {
-        template:
-          data.CourseEnrollment[0].Course.Program
-            .attendanceCertificateTemplateURL,
-        full_name: `${data.CourseEnrollment[0].User.firstName} ${data.CourseEnrollment[0].User.lastName}`,
-        semester: data.CourseEnrollment[0].Course.Program.title,
-        course_name: data.CourseEnrollment[0].Course.title,
-        ects: data.CourseEnrollment[0].Course.ects,
-        practical_project:
-          data.CourseEnrollment[0].User.AchievementRecordAuthors
-            .AchievementRecord.AchievementOption.title,
-        online_courses:
-          data.CourseEnrollment[0].User.AchievementRecordAuthors
-            .AchievementRecord.AchievementOption.title,
-        certificate_text: data.CourseEnrollment[0].Course.learningGoals,
-      },
-    };
+    // Check if data.CourseEnrollment is empty
+    if (courseEnrollments.length == 0) {
+      return res.json({
+        result: "no-certificates-to-generate",
+      });
+    }
 
-    // Send the certificate generation request to the certificate generation service
-    const url = "https://edu-old.opencampus.sh/create_certificate_rest";
-    const certificateData = await got.post(url, options).json();
+    const n = 0;
 
+    // call function to generate certificate
+    const certificateData = await generateCertificate(courseEnrollments[n]);
+
+    //return result including the number of certificates generated
+    const numCertificatesGenerated = data.CourseEnrollment.length;
     return res.json({
-      pdf: certificateData.pdf,
+      result: `${numCertificatesGenerated} certificate(s) generated`,
     });
   } else {
     return res.status(401).json({
