@@ -12,14 +12,20 @@ export const createAchievementCertificate = async (req, res) => {
     const userIds = req.body.input.userIds;
     const courseId = req.body.input.courseId;
 
-    // log userId and courseid 
-    console.log(userIds);
-    console.log(courseId);
+    // log userId and courseid
+    console.log("############# User Ids: ", userIds);
+    console.log("############# Course Id: ", courseId);
 
     // get course enrollments
-    const courseEnrollments = fetchEnrollments(userIds, courseId);
+    const courseEnrollments = await fetchEnrollments(userIds, courseId);
 
-    console.log(courseEnrollments);
+    console.log("############# Course Enrollments: ", courseEnrollments);
+
+    // log length of courseEnrollments
+    console.log(
+      "############# Course Enrollments Length: ",
+      courseEnrollments.length
+    );
 
     // Check if data.CourseEnrollment is empty
     if (courseEnrollments.length == 0) {

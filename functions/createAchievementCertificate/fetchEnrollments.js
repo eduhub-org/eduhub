@@ -1,6 +1,7 @@
 import { request, gql } from "graphql-request";
 
 export const fetchEnrollments = async (userIds, courseId) => {
+  // Construct the query
   const query = gql`
     query GetEnrollments($userIds: [uuid!]!, $courseId: Int!) {
       CourseEnrollment(
