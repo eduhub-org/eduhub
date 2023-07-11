@@ -19,16 +19,19 @@ export const GenerateCertificatesButton = ({
   participationList: ManagedCourse_Course_by_pk_CourseEnrollments[];
   course: ManagedCourse_Course_by_pk;
 }) => {
-  const isAdmin = useIsAdmin();
   const { t } = useTranslation();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  //  TODO: restrict user ids to only those with sufficient attendances and passed achievements record
+
+  const userIds = participationList.map((p) => p.userId);
 
   const [createAchievementCertificate, { loading, error, data }] =
     useRoleMutation(CREATE_ACHIEVEMENT_CERTIFICATE, {
       variables: {
         courseId: course.id,
-        userIds: participationList.map((p) => p.userId),
+        userIds: userIds,
       },
     });
 

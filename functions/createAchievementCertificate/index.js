@@ -20,8 +20,6 @@ export const createAchievementCertificate = async (req, res) => {
       // get course enrollments
       const courseEnrollments = await fetchEnrollments(userIds, courseId);
 
-      console.log("############# Course Enrollments: ", courseEnrollments);
-
       // log length of courseEnrollments
       console.log(
         "############# Course Enrollments Length: ",
@@ -29,25 +27,22 @@ export const createAchievementCertificate = async (req, res) => {
       );
 
       // Check if data.CourseEnrollment is empty
-      if (courseEnrollments.length == 0) {
+      if (courseEnrollments.length === 0) {
         return res.json({
           result: 0,
         });
       }
 
-      const n = 0;
-
       // call function to generate certificate
-      const certificateData = await generateCertificate(
-        courseEnrollments[n],
-        req.headers.bucket
-      );
-
-      //return result including the number of certificates generated
-      const numCertificatesGenerated = courseEnrollments.length;
+      courseEnrollments.forEach(async (enrollment) => {
+        const certificateData = await generateCertificate(
+          enrollment,
+          req.headers.bucket
+        );
+      });
 
       return res.json({
-        result: numCertificatesGenerated,
+        result: courseEnrollments.length,
       });
     } else {
       return res.status(401).json({
