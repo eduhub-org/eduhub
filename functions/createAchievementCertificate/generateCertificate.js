@@ -1,7 +1,7 @@
 import got from "got";
 import Storage from "@google-cloud/storage";
 
-import buildCloudStorage from "../lib/cloud-storage.js";
+import { buildCloudStorage } from "../lib/cloud-storage.js";
 
 export const generateCertificate = async (courseEnrollment, bucket) => {
   // set online_courses and practical_project according to recordType
