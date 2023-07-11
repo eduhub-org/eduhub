@@ -27,7 +27,7 @@ services:
     working_dir: /functions
     volumes:
       - ./functions:/functions
-      - ./backend/init.d/file_storage:/home/node/www/test_data
+      - ./backend/init.d/file_storage:/home/node/www/emulated-bucket
     ports:
       - "42000-42024:42000-42024"
       - "4001:4001"
