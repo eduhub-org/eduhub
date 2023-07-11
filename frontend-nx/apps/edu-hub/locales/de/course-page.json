@@ -129,7 +129,7 @@
   "upgrade-status": "Kursstatus erhöhen und zum nächsten Tab wechseln",
   "show-all-sessions": "Alle Termine anzeigen",
   "hide-sessions": "Termine einklappen",
-  "general-course-info":"*Unsere Kurse sind offen für alle und kostenlos für Studierende, Schüler:innen, Auszubildende, Gründer:innen, Lehrkräfte, wissenschaftliche Mitarbeiter:innen, Arbeitssuchende, Geflüchtete und Rentner:innen. Für Berufstätige fällt für den Erwerb eines Leistungszertifikats eine Gebühr in Höhe von 200 Euro an. Über team@opencampus.sh kann ein Stipendium beantragt werden.*",
+  "general-course-info": "*Unsere Kurse sind offen für alle und kostenlos für Studierende, Schüler:innen, Auszubildende, Gründer:innen, Lehrkräfte, wissenschaftliche Mitarbeiter:innen, Arbeitssuchende, Geflüchtete und Rentner:innen. Für Berufstätige fällt für den Erwerb eines Leistungszertifikats eine Gebühr in Höhe von 200 Euro an. Über team@opencampus.sh kann ein Stipendium beantragt werden.*",
   "to-be-defined": "Der Ort bzw. die Adresse wird noch bekannt gegeben.",
   "not-submitted": "nicht eingereicht",
   "email-confirmed-applicants": "Email an bestätigte Bewerber:innen",
@@ -143,5 +143,8 @@
   "no-proof-uploaded-by-me-as-author": "Es wurde bisher kein Nachweis mit Dir als Autor hochgeladen.",
   "confirm-online-course-description": "Hiermit bestätigst du an den erforderlichen Online-Kursen teilgenommen zu haben. Dein Leistungsnachweis ist dein Reflexionsbogen. Bitte klicke <component>HIER</component>, um ihn auszufüllen. Bei Fragen wende dich bitte an deine Kursleitung.",
   "confirm-online-course": "Bestätigen",
-  "online-course-confirmed": "Du hast am {{dateTime}} bestätigt an den erforderlichen Online-Kursen teilgenommen zu haben."
+  "online-course-confirmed": "Du hast am {{dateTime}} bestätigt an den erforderlichen Online-Kursen teilgenommen zu haben.",
+  "certificates-generated": "Es wurden {{number}} Zertifikate generiert.",
+  "1-certificate-generated": "Es wurde ein ein Zertifikat generiert.",
+  "no-certificates-generated": "Es wurden keine Zertifikate generiert."
 }

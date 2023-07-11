@@ -33,11 +33,22 @@ export const GenerateCertificatesButton = ({
     });
 
   const handleClick = () => {
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
     createAchievementCertificate()
       .then((result) => {
-        setSuccessMessage(
-          t('course-page:' + result.data.createAchievementCertificate.result)
-        );
+        if (result.data.createAchievementCertificate.result === 0) {
+          setSuccessMessage(t('course-page:no-certificates-generated'));
+        } else if (result.data.createAchievementCertificate.result === 1) {
+          setSuccessMessage(t('course-page:1-certificate-generated'));
+        } else {
+          setSuccessMessage(
+            t('course-page:certificates-generated', {
+              number: result.data.createAchievementCertificate.result,
+            })
+          );
+        }
       })
       .catch((error) => {
         console.error('Error creating achievement certificate:', error);
