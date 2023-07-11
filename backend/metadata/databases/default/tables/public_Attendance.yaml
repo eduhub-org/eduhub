@@ -20,6 +20,22 @@ object_relationships:
   - name: User
     using:
       foreign_key_constraint_on: userId
+insert_permissions:
+  - role: instructor_access
+    permission:
+      check:
+        Session:
+          Course:
+            CourseInstructors:
+              Expert:
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
+      columns:
+        - sessionId
+        - source
+        - status
+        - userId
 select_permissions:
   - role: instructor_access
     permission:
