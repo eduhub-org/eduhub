@@ -37,7 +37,10 @@ export const createAchievementCertificate = async (req, res) => {
     const n = 0;
 
     // call function to generate certificate
-    const certificateData = await generateCertificate(courseEnrollments[n]);
+    const certificateData = await generateCertificate(
+      courseEnrollments[n],
+      req.headers.bucket
+    );
 
     //return result including the number of certificates generated
     const numCertificatesGenerated = data.CourseEnrollment.length;

@@ -13,7 +13,8 @@ const fs = require("fs");
 // in the future it might be worth to setup a better mechanism to share code between functions
 // nx might be a good choice here, basically a monorepository for the functions with custom build process
 // to produce whatever output is needed in production
-exports.buildCloudStorage = (Storage) => {
+
+export const buildCloudStorage = (Storage) => {
   const emulated = process.env.LOCAL_TESTING;
   if (emulated) {
     const www = "/home/node/www/";
@@ -87,3 +88,5 @@ exports.buildCloudStorage = (Storage) => {
     };
   }
 };
+
+exports.buildCloudStorage = buildCloudStorage;

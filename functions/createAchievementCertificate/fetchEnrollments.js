@@ -49,6 +49,7 @@ export const fetchEnrollments = async (userIds, courseId) => {
             title
             attendanceCertificateTemplateURL
           }
+          id
           ects
           title
         }

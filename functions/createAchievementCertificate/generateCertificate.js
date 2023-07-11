@@ -1,6 +1,9 @@
 import got from "got";
+import Storage from "@google-cloud/storage";
 
-export const generateCertificate = async (courseEnrollment) => {
+import buildCloudStorage from "../lib/cloud-storage.js";
+
+export const generateCertificate = async (courseEnrollment, bucket) => {
   // set online_courses and practical_project according to recordType
   const recordType =
     courseEnrollment.User.AchievementRecordAuthors[0].AchievementRecord
@@ -35,17 +38,17 @@ export const generateCertificate = async (courseEnrollment) => {
 
   // Saving the certificate to the Google Cloud bucket
   const content = certificateData;
-  const userid = courseEnrollments[n].User.id;
+  const userid = courseEnrollment.User.id;
+  const courseId = courseEnrollment.Course.id;
   const isPublic = false;
 
   const path = `userid_${userid}/courseid_${courseId}/achievement_certificate_course_${courseId}.pdf`;
 
-  const link = await storage.saveToBucket(
-    path,
-    req.headers.bucket,
-    content,
-    isPublic
-  );
+  console.log("############# Saving certificate to bucket with path: " + path);
+
+  const storage = buildCloudStorage(Storage);
+
+  const link = await storage.saveToBucket(path, bucket, content, isPublic);
 
   // Saving the link to the course enrollment record
   const mutation = gql`
