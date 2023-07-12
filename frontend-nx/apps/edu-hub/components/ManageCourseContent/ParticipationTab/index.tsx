@@ -1,9 +1,9 @@
-import { QueryResult } from '@apollo/client';
-import { ACHIEVEMENT_OPTION_COURSES } from '../../queries/achievementOption';
+import { QueryResult, useMutation, useQuery } from '@apollo/client';
+import { ACHIEVEMENT_OPTION_COURSES } from '../../../queries/achievementOption';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
 import { FC, useCallback, useState } from 'react';
-import { useIsAdmin } from '../../hooks/authentication';
+import { useIsAdmin } from '../../../hooks/authentication';
 import {
   DOT_COLORS,
   EhDot,
@@ -11,42 +11,43 @@ import {
   greyDot,
   orangeDot,
   redDot,
-} from '../common/dots';
+} from '../../common/dots';
+import { useRoleMutation } from '../../../hooks/authedMutation';
 
 import {
   MdAddCircle,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
 } from 'react-icons/md';
-import { useAdminMutation } from '../../hooks/authedMutation';
-import { useAdminQuery } from '../../hooks/authedQuery';
-import { QUERY_LIMIT } from '../../pages/manage/courses';
-import { INSERT_SINGLE_ATTENDANCE } from '../../queries/courseEnrollment';
-import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../queries/mutateAchievement';
+import { useAdminMutation } from '../../../hooks/authedMutation';
+import { useAdminQuery } from '../../../hooks/authedQuery';
+import { QUERY_LIMIT } from '../../../pages/manage/courses';
+import { INSERT_SINGLE_ATTENDANCE } from '../../../queries/courseEnrollment';
+import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../../queries/mutateAchievement';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
-} from '../../queries/__generated__/AchievementOptionCourses';
+} from '../../../queries/__generated__/AchievementOptionCourses';
 
 import {
   DeleteAnAchievementOptionCourse,
   DeleteAnAchievementOptionCourseVariables,
-} from '../../queries/__generated__/DeleteAnAchievementOptionCourse';
+} from '../../../queries/__generated__/DeleteAnAchievementOptionCourse';
 import {
   InsertSingleAttendance,
   InsertSingleAttendanceVariables,
-} from '../../queries/__generated__/InsertSingleAttendance';
+} from '../../../queries/__generated__/InsertSingleAttendance';
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_CourseEnrollments,
   ManagedCourse_Course_by_pk_Sessions,
-} from '../../queries/__generated__/ManagedCourse';
+} from '../../../queries/__generated__/ManagedCourse';
 
-import { StaticComponentProperty } from '../../types/UIComponents';
-import { AttendanceStatus_enum } from '../../__generated__/globalTypes';
-import TagWithTwoText from '../common/TagWithTwoText';
-import Loading from '../ManageCoursesContent/Loading';
-import { Button } from '../common/Button';
+import { StaticComponentProperty } from '../../../types/UIComponents';
+import { AttendanceStatus_enum } from '../../../__generated__/globalTypes';
+import TagWithTwoText from '../../common/TagWithTwoText';
+import Loading from '../../ManageCoursesContent/Loading';
+import { GenerateCertificatesButton } from './GenerateCertificatesButton';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -151,8 +152,12 @@ interface IPropsParticipationList {
   qResult: QueryResult<any, any>;
 }
 
-const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => {
+const ParticipationList: FC<IPropsParticipationList> = ({
+  course,
+  qResult,
+}) => {
   const { t } = useTranslation();
+  const isAdmin = useIsAdmin();
 
   const tableHeaders: StaticComponentProperty[] = [
     { key: 0, label: t('firstName') },
@@ -162,12 +167,10 @@ const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => 
   ];
 
   const participationList = [...(course.CourseEnrollments || [])]
-    .filter(enrollment => enrollment.status === 'CONFIRMED')
-    .sort((a, b) => a.User.lastName.localeCompare(b.User.lastName)
-  );
+    .filter((enrollment) => enrollment.status === 'CONFIRMED')
+    .sort((a, b) => a.User.lastName.localeCompare(b.User.lastName));
   const sessions = [...(course.Sessions || [])];
 
-  const isAdmin = useIsAdmin();
   console.log('EnrollmentList length: ', ParticipationList.toString);
 
   return (
@@ -202,11 +205,10 @@ const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => 
             </tbody>
           </table>
           {isAdmin && (
-            <div className="flex justify-end mt-10">
-              <Button filled inverted>
-                {t('course-page:certificate-generation')}
-              </Button>
-            </div>
+            <GenerateCertificatesButton
+              participationList={participationList}
+              course={course}
+            />
           )}
         </div>
       ) : (
@@ -227,7 +229,6 @@ interface IDotData {
 
 const pStyle = 'text-gray-700 truncate';
 const tdStyle = 'pl-5';
-
 
 /* #region ParticipationRow */
 
@@ -260,7 +261,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
     return prev;
   }, {});
 
-  const [insertAttendance] = useAdminMutation<
+  const [insertAttendance] = useRoleMutation<
     InsertSingleAttendance,
     InsertSingleAttendanceVariables
   >(INSERT_SINGLE_ATTENDANCE);
@@ -269,7 +270,11 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
     async (session: ManagedCourse_Course_by_pk_Sessions) => {
       const attendanceRecord = attendanceRecordBySession[session.id];
       let status: AttendanceStatus_enum;
-      if (!attendanceRecord || attendanceRecord.status === AttendanceStatus_enum.MISSED || attendanceRecord.status ===  AttendanceStatus_enum.NO_INFO) {
+      if (
+        !attendanceRecord ||
+        attendanceRecord.status === AttendanceStatus_enum.MISSED ||
+        attendanceRecord.status === AttendanceStatus_enum.NO_INFO
+      ) {
         status = AttendanceStatus_enum.ATTENDED;
       } else {
         status = AttendanceStatus_enum.MISSED;
@@ -289,9 +294,9 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
         return;
       }
       qResult.refetch();
-      },
-      [qResult, insertAttendance, attendanceRecordBySession, userId]
-    );
+    },
+    [qResult, insertAttendance, attendanceRecordBySession, userId]
+  );
 
   const handleDetailsClick = useCallback(() => {
     setShowDetails((prev) => !prev);

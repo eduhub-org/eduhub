@@ -84,7 +84,7 @@ export interface CourseMinimum_Course_by_pk {
   /**
    * The day of the week the course takes place.
    */
-  weekDay: Weekday_enum | null;
+  weekDay: Weekday_enum;
   /**
    * The cover image for the course
    */
