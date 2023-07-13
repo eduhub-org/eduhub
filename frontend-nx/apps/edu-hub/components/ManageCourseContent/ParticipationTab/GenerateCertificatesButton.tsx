@@ -1,4 +1,3 @@
-import { useIsAdmin } from '../../../hooks/authentication';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import useTranslation from 'next-translate/useTranslation';
 
@@ -13,10 +12,10 @@ import {
 import { useState } from 'react';
 
 export const GenerateCertificatesButton = ({
-  participationList,
+  userEnrollments,
   course,
 }: {
-  participationList: ManagedCourse_Course_by_pk_CourseEnrollments[];
+  userEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[];
   course: ManagedCourse_Course_by_pk;
 }) => {
   const { t } = useTranslation();
@@ -25,7 +24,7 @@ export const GenerateCertificatesButton = ({
 
   //  TODO: restrict user ids to only those with sufficient attendances and passed achievements record
 
-  const userIds = participationList.map((p) => p.userId);
+  const userIds = userEnrollments.map((p) => p.userId);
 
   const [createAchievementCertificate, { loading, error, data }] =
     useRoleMutation(CREATE_ACHIEVEMENT_CERTIFICATE, {

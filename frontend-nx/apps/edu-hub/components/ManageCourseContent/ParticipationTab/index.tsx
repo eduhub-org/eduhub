@@ -48,6 +48,7 @@ import { AttendanceStatus_enum } from '../../../__generated__/globalTypes';
 import TagWithTwoText from '../../common/TagWithTwoText';
 import Loading from '../../ManageCoursesContent/Loading';
 import { GenerateCertificatesButton } from './GenerateCertificatesButton';
+import { getAttendancesForParticipants } from '../../../helpers/courseHelpers';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -166,16 +167,43 @@ const ParticipationList: FC<IPropsParticipationList> = ({
     { key: 3, label: t('manage-course:certificateAchievement') },
   ];
 
-  const participationList = [...(course.CourseEnrollments || [])]
+  const participationEnrollments = [...(course.CourseEnrollments || [])]
     .filter((enrollment) => enrollment.status === 'CONFIRMED')
     .sort((a, b) => a.User.lastName.localeCompare(b.User.lastName));
   const sessions = [...(course.Sessions || [])];
 
-  console.log('EnrollmentList length: ', ParticipationList.toString);
+  // log number of participation enrollments
+  console.log(
+    'number of users participating: ',
+    participationEnrollments.length.toString
+  );
+
+  const attendances = getAttendancesForParticipants(
+    participationEnrollments,
+    sessions
+  );
+  // assign passedUserEnrollments to the array of participationEnrollments filtered on enrollments from those users who have less then the allowed number of missed session attendances for this course
+  const passedUserEnrollments = participationEnrollments.filter(
+    (enrollment) => {
+      const userAttendances = attendances.filter(
+        (attendance) => attendance.userId === enrollment.userId
+      );
+      const missedAttendances = userAttendances.filter(
+        (attendance) => attendance.status === AttendanceStatus_enum.MISSED
+      );
+      return missedAttendances.length <= course.maxMissedSessions;
+    }
+  );
+
+  // log number of enrollments for users who passed the course
+  console.log(
+    'number of users who passed the course: ',
+    passedUserEnrollments.length.toString
+  );
 
   return (
     <>
-      {participationList.length > 0 ? (
+      {participationEnrollments.length > 0 ? (
         <div className="overflow-x-auto transition-[height] w-full pb-10">
           <table className="w-full">
             <thead>
@@ -192,7 +220,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({
               </tr>
             </thead>
             <tbody>
-              {participationList.map((ce) => (
+              {participationEnrollments.map((ce) => (
                 <ParticipationRow
                   key={ce.id}
                   enrollment={ce}
@@ -206,7 +234,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({
           </table>
           {isAdmin && (
             <GenerateCertificatesButton
-              participationList={participationList}
+              userEnrollments={passedUserEnrollments}
               course={course}
             />
           )}
