@@ -289,7 +289,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
     return prev;
   }, {});
 
-  const [insertAttendance] = useAdminMutation<
+  const [insertAttendance] = useRoleMutation<
     InsertSingleAttendance,
     InsertSingleAttendanceVariables
   >(INSERT_SINGLE_ATTENDANCE);

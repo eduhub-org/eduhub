@@ -28,6 +28,8 @@ import {
 import { Attendances } from './Attendances';
 import { CertificateDownload } from './CertificateDownload';
 import CourseAchievementOption from './CourseAchievementOption';
+import { getCourseEnrollment } from '../../../../helpers/util';
+import { useUserId } from '../../../../hooks/user';
 
 interface IProps {
   // course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk;
@@ -40,7 +42,8 @@ export const AttendancesAndAchievements: FC<IProps> = ({ course }) => {
   const startTime = getStartTimeString(course, lang);
   const endTime = getEndTimeString(course, lang);
 
-  const courseEnrollment = course.CourseEnrollments[0];
+  const userId = useUserId();
+  const courseEnrollment = getCourseEnrollment(course, userId);
 
   const {
     data: loadAchievementCertificateData,
@@ -83,14 +86,14 @@ export const AttendancesAndAchievements: FC<IProps> = ({ course }) => {
           </div>
           <div className="flex flex-1">
             {course.achievementCertificatePossible && (
-                <CourseAchievementOption
-                  courseId={course.id}
-                  achievementRecordUploadDeadline={
-                    course.Program.achievementRecordUploadDeadline
-                  }
-                  courseTitle={course.title}
-                />
-              )}
+              <CourseAchievementOption
+                courseId={course.id}
+                achievementRecordUploadDeadline={
+                  course.Program.achievementRecordUploadDeadline
+                }
+                courseTitle={course.title}
+              />
+            )}
           </div>
         </ContentRow>
       </>
