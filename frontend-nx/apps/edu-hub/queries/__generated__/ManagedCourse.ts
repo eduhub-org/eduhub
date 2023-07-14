@@ -274,6 +274,7 @@ export interface ManagedCourse_Course_by_pk_AchievementOptionCourses_Achievement
 
 export interface ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords {
   __typename: "AchievementRecord";
+  id: number;
   /**
    * URL to the uploaded file with the documentation of the record.
    */

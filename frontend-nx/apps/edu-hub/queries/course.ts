@@ -65,6 +65,7 @@ export const MANAGED_COURSE = gql`
       AchievementOptionCourses {
         AchievementOption {
           AchievementRecords {
+            id
             documentationUrl
             rating
             created_at

@@ -4,7 +4,14 @@ import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
 import { FC, useCallback, useState } from 'react';
 import { useIsAdmin } from '../../../hooks/authentication';
-import { DOT_COLORS, EhDot, greenDot, greyDot, redDot } from '../../common/dots';
+import { useRoleMutation } from '../../../hooks/authedMutation';
+import {
+  DOT_COLORS,
+  EhDot,
+  greenDot,
+  greyDot,
+  redDot,
+} from '../../common/dots';
 
 import {
   MdAddCircle,
@@ -14,6 +21,7 @@ import {
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { useAdminQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { QUERY_LIMIT } from '../../../pages/manage/courses';
+import { UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../queries/achievementRecord';
 import { INSERT_SINGLE_ATTENDANCE } from '../../../queries/courseEnrollment';
 import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../../queries/mutateAchievement';
 import { LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION } from 'apps/edu-hub/queries/loadAchievementRecordDocumentation';
@@ -21,7 +29,10 @@ import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
 } from '../../../queries/__generated__/AchievementOptionCourses';
-
+import {
+  UpdateAchievementRecordByPk,
+  UpdateAchievementRecordByPkVariables,
+} from '../../../queries/__generated__/UpdateAchievementRecordByPk';
 import {
   DeleteAnAchievementOptionCourse,
   DeleteAnAchievementOptionCourseVariables,
@@ -165,8 +176,6 @@ const ParticipationList: FC<IPropsParticipationList> = ({
 }) => {
   const { t } = useTranslation();
 
-  console.log('course', course, qResult);
-
   const tableHeaders: StaticComponentProperty[] = [
     { key: 0, label: t('firstName') },
     { key: 1, label: t('lastName') },
@@ -205,11 +214,9 @@ const ParticipationList: FC<IPropsParticipationList> = ({
         mostRecentRecord,
       };
     });
-  console.log('PLIST', participationList);
   const sessions = [...(course.Sessions || [])];
 
   const isAdmin = useIsAdmin();
-  console.log('EnrollmentList length: ', ParticipationList.toString);
 
   return (
     <>
@@ -488,6 +495,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
           achievementRecordDocumentationResult={
             getAchievementRecordDocumentationResult
           }
+          qResult={qResult}
         />
       )}
     </>
@@ -501,11 +509,30 @@ interface IPropsShowDetails {
     loadAchievementRecordDocumentation,
     loadAchievementRecordDocumentationVariables
   >;
+  qResult: QueryResult<any, any>;
 }
 const ShowDetails: FC<IPropsShowDetails> = ({
   enrollment,
   achievementRecordDocumentationResult,
+  qResult,
 }) => {
+  const [setAchievementRecord, { loading, error }] = useRoleMutation<
+    UpdateAchievementRecordByPk,
+    UpdateAchievementRecordByPkVariables
+  >(UPDATE_AN_ACHIEVEMENT_RECORD);
+  const onSetAchievementRecordRatingClick = async (
+    achievementRecordRating: AchievementRecordRating_enum
+  ) => {
+    await setAchievementRecord({
+      variables: {
+        id: enrollment.mostRecentRecord.id,
+        setInput: {
+          rating: achievementRecordRating,
+        },
+      },
+    });
+    qResult.refetch();
+  };
   return (
     <>
       <tr className="bg-edu-course-list f-full">
@@ -514,24 +541,75 @@ const ShowDetails: FC<IPropsShowDetails> = ({
             <p className={pStyle}> {enrollment.User.email} </p>
           </div>
         </td>
-        <td colSpan={2} className="pl-5 min-w-[260px]">
-          {enrollment.mostRecentRecord && (
-            <Button
-              as={'a'}
-              href={
-                achievementRecordDocumentationResult.loading
-                  ? '#'
-                  : achievementRecordDocumentationResult?.data
-                      ?.loadAchievementRecordDocumentation?.link
-              }
-            >
-              {achievementRecordDocumentationResult.loading ? (
-                <CircularProgress />
-              ) : (
-                'Download Documentation'
-              )}
-            </Button>
-          )}
+        <td colSpan={2} className={`${tdStyle} min-w-[260px]`}>
+          <div className="flex flex-col">
+            {enrollment.mostRecentRecord && (
+              <>
+                <div className="flex items-center mb-3">
+                  <EhDot
+                    onClick={() =>
+                      onSetAchievementRecordRatingClick(
+                        AchievementRecordRating_enum.UNRATED
+                      )
+                    }
+                    className="cursor-pointer"
+                    color="GREY"
+                    size={
+                      enrollment.mostRecentRecord.rating ===
+                      AchievementRecordRating_enum.UNRATED
+                        ? 'LARGE'
+                        : 'DEFAULT'
+                    }
+                  />
+                  <EhDot
+                    onClick={() =>
+                      onSetAchievementRecordRatingClick(
+                        AchievementRecordRating_enum.PASSED
+                      )
+                    }
+                    className="cursor-pointer"
+                    color="GREEN"
+                    size={
+                      enrollment.mostRecentRecord.rating ===
+                      AchievementRecordRating_enum.PASSED
+                        ? 'LARGE'
+                        : 'DEFAULT'
+                    }
+                  />
+                  <EhDot
+                    onClick={() =>
+                      onSetAchievementRecordRatingClick(
+                        AchievementRecordRating_enum.FAILED
+                      )
+                    }
+                    className="cursor-pointer"
+                    color="RED"
+                    size={
+                      enrollment.mostRecentRecord.rating ===
+                      AchievementRecordRating_enum.FAILED
+                        ? 'LARGE'
+                        : 'DEFAULT'
+                    }
+                  />
+                </div>
+                <Button
+                  as={'a'}
+                  href={
+                    achievementRecordDocumentationResult.loading
+                      ? '#'
+                      : achievementRecordDocumentationResult?.data
+                          ?.loadAchievementRecordDocumentation?.link
+                  }
+                >
+                  {achievementRecordDocumentationResult.loading ? (
+                    <CircularProgress />
+                  ) : (
+                    'Download Documentation'
+                  )}
+                </Button>
+              </>
+            )}
+          </div>
         </td>
       </tr>
       <tr className="h-1" />
