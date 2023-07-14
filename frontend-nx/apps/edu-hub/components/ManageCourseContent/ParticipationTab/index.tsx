@@ -1,55 +1,55 @@
 import { LazyQueryResult, QueryResult } from '@apollo/client';
-import { ACHIEVEMENT_OPTION_COURSES } from '../../queries/achievementOption';
+import { ACHIEVEMENT_OPTION_COURSES } from '../../../queries/achievementOption';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
 import { FC, useCallback, useState } from 'react';
-import { useIsAdmin } from '../../hooks/authentication';
-import { DOT_COLORS, EhDot, greenDot, greyDot, redDot } from '../common/dots';
+import { useIsAdmin } from '../../../hooks/authentication';
+import { DOT_COLORS, EhDot, greenDot, greyDot, redDot } from '../../common/dots';
 
 import {
   MdAddCircle,
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
 } from 'react-icons/md';
-import { useAdminMutation } from '../../hooks/authedMutation';
-import { useAdminQuery, useLazyRoleQuery } from '../../hooks/authedQuery';
-import { QUERY_LIMIT } from '../../pages/manage/courses';
-import { INSERT_SINGLE_ATTENDANCE } from '../../queries/courseEnrollment';
-import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../queries/mutateAchievement';
+import { useAdminMutation } from '../../../hooks/authedMutation';
+import { useAdminQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
+import { QUERY_LIMIT } from '../../../pages/manage/courses';
+import { INSERT_SINGLE_ATTENDANCE } from '../../../queries/courseEnrollment';
+import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../../queries/mutateAchievement';
 import { LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION } from 'apps/edu-hub/queries/loadAchievementRecordDocumentation';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
-} from '../../queries/__generated__/AchievementOptionCourses';
+} from '../../../queries/__generated__/AchievementOptionCourses';
 
 import {
   DeleteAnAchievementOptionCourse,
   DeleteAnAchievementOptionCourseVariables,
-} from '../../queries/__generated__/DeleteAnAchievementOptionCourse';
+} from '../../../queries/__generated__/DeleteAnAchievementOptionCourse';
 import {
   InsertSingleAttendance,
   InsertSingleAttendanceVariables,
-} from '../../queries/__generated__/InsertSingleAttendance';
+} from '../../../queries/__generated__/InsertSingleAttendance';
 import {
   loadAchievementRecordDocumentation,
   loadAchievementRecordDocumentationVariables,
-} from '../../queries/__generated__/loadAchievementRecordDocumentation';
+} from '../../../queries/__generated__/loadAchievementRecordDocumentation';
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords,
   ManagedCourse_Course_by_pk_CourseEnrollments,
   ManagedCourse_Course_by_pk_Sessions,
-} from '../../queries/__generated__/ManagedCourse';
+} from '../../../queries/__generated__/ManagedCourse';
 
-import { StaticComponentProperty } from '../../types/UIComponents';
+import { StaticComponentProperty } from '../../../types/UIComponents';
 import {
   AchievementRecordRating_enum,
   AchievementRecordType_enum,
   AttendanceStatus_enum,
-} from '../../__generated__/globalTypes';
-import TagWithTwoText from '../common/TagWithTwoText';
-import Loading from '../ManageCoursesContent/Loading';
-import { Button } from '../common/Button';
+} from '../../../__generated__/globalTypes';
+import TagWithTwoText from '../../common/TagWithTwoText';
+import Loading from '../../ManageCoursesContent/Loading';
+import { Button } from '../../common/Button';
 import { CircularProgress } from '@material-ui/core';
 
 interface IProps {
@@ -267,7 +267,7 @@ interface IDotData {
 }
 
 const pStyle = 'text-gray-700 truncate';
-const tdStyle = 'pl-5';
+const tdStyle = 'pl-5 py-4';
 
 /* #region ParticipationRow */
 
@@ -436,7 +436,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
             </div>
           </div>
         </td>
-        <td className={tdStyle}>
+        <td className={`${tdStyle} min-w-[260px]`}>
           <div className="flex flex-row">
             {!enrollment.mostRecentRecord && (
               <div>
@@ -514,7 +514,7 @@ const ShowDetails: FC<IPropsShowDetails> = ({
             <p className={pStyle}> {enrollment.User.email} </p>
           </div>
         </td>
-        <td colSpan={2} className="pl-5">
+        <td colSpan={2} className="pl-5 min-w-[260px]">
           {enrollment.mostRecentRecord && (
             <Button
               as={'a'}

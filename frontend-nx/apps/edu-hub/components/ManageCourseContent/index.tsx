@@ -22,7 +22,7 @@ import { QuestionConfirmationDialog } from '../common/dialogs/QuestionConfirmati
 import { PageBlock } from '../common/PageBlock';
 import { ApplicationsTab } from './ApplicationsTab';
 import { DescriptionTab } from './DescriptionTab';
-import ManageCourseEnrollment from './ParticipationsTab';
+import ManageCourseEnrollment from './ParticipationTab';
 import { SessionsTab } from './SessionsTab';
 
 interface Props {
