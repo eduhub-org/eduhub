@@ -66,6 +66,8 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+    permissions:
+      - role: instructor_access
   - name: loadParticipationCertificate
     definition:
       kind: ""

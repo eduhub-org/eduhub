@@ -1,18 +1,17 @@
-import { QueryResult, useMutation, useQuery } from '@apollo/client';
+import { LazyQueryResult, QueryResult } from '@apollo/client';
 import { ACHIEVEMENT_OPTION_COURSES } from '../../../queries/achievementOption';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
 import { FC, useCallback, useState } from 'react';
 import { useIsAdmin } from '../../../hooks/authentication';
+import { useRoleMutation } from '../../../hooks/authedMutation';
 import {
   DOT_COLORS,
   EhDot,
   greenDot,
   greyDot,
-  orangeDot,
   redDot,
 } from '../../common/dots';
-import { useRoleMutation } from '../../../hooks/authedMutation';
 
 import {
   MdAddCircle,
@@ -20,15 +19,20 @@ import {
   MdKeyboardArrowUp,
 } from 'react-icons/md';
 import { useAdminMutation } from '../../../hooks/authedMutation';
-import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useAdminQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { QUERY_LIMIT } from '../../../pages/manage/courses';
+import { UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../queries/achievementRecord';
 import { INSERT_SINGLE_ATTENDANCE } from '../../../queries/courseEnrollment';
 import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../../queries/mutateAchievement';
+import { LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION } from 'apps/edu-hub/queries/loadAchievementRecordDocumentation';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
 } from '../../../queries/__generated__/AchievementOptionCourses';
-
+import {
+  UpdateAchievementRecordByPk,
+  UpdateAchievementRecordByPkVariables,
+} from '../../../queries/__generated__/UpdateAchievementRecordByPk';
 import {
   DeleteAnAchievementOptionCourse,
   DeleteAnAchievementOptionCourseVariables,
@@ -38,17 +42,28 @@ import {
   InsertSingleAttendanceVariables,
 } from '../../../queries/__generated__/InsertSingleAttendance';
 import {
+  loadAchievementRecordDocumentation,
+  loadAchievementRecordDocumentationVariables,
+} from '../../../queries/__generated__/loadAchievementRecordDocumentation';
+import {
   ManagedCourse_Course_by_pk,
+  ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords,
   ManagedCourse_Course_by_pk_CourseEnrollments,
   ManagedCourse_Course_by_pk_Sessions,
 } from '../../../queries/__generated__/ManagedCourse';
 
 import { StaticComponentProperty } from '../../../types/UIComponents';
-import { AttendanceStatus_enum } from '../../../__generated__/globalTypes';
-import TagWithTwoText from '../../common/TagWithTwoText';
-import Loading from '../../ManageCoursesContent/Loading';
 import { GenerateCertificatesButton } from './GenerateCertificatesButton';
 import { getAttendancesForParticipants } from '../../../helpers/courseHelpers';
+import {
+  AchievementRecordRating_enum,
+  AchievementRecordType_enum,
+  AttendanceStatus_enum,
+} from '../../../__generated__/globalTypes';
+import TagWithTwoText from '../../common/TagWithTwoText';
+import Loading from '../../ManageCoursesContent/Loading';
+import { Button } from '../../common/Button';
+import { CircularProgress } from '@material-ui/core';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -133,7 +148,7 @@ const CourseAchievementOptions: FC<IPropsCourseAchievementOptions> = (
           </div>
         ))}
         <Link href={`/achievements?courseId=${props.courseId}`}>
-          {/* 
+          {/*
           To avoid the following warning , I used a an extra 'div'
           Warning: Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()? */}
           <div>
@@ -153,6 +168,10 @@ interface IPropsParticipationList {
   qResult: QueryResult<any, any>;
 }
 
+type ExtendedEnrollment = ManagedCourse_Course_by_pk_CourseEnrollments & {
+  mostRecentRecord?: ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords;
+};
+
 const ParticipationList: FC<IPropsParticipationList> = ({
   course,
   qResult,
@@ -167,16 +186,39 @@ const ParticipationList: FC<IPropsParticipationList> = ({
     { key: 3, label: t('manage-course:certificateAchievement') },
   ];
 
-  const participationEnrollments = [...(course.CourseEnrollments || [])]
+  const participationEnrollments: ExtendedEnrollment[] = [
+    ...(course.CourseEnrollments || []),
+  ]
     .filter((enrollment) => enrollment.status === 'CONFIRMED')
-    .sort((a, b) => a.User.lastName.localeCompare(b.User.lastName));
-  const sessions = [...(course.Sessions || [])];
+    .sort((a, b) => a.User.lastName.localeCompare(b.User.lastName))
+    .map((enrollment) => {
+      // get all records for this enrollment
+      const allRecords = course.AchievementOptionCourses.flatMap((course) =>
+        course.AchievementOption.AchievementRecords.filter((record) =>
+          record.AchievementRecordAuthors.some(
+            (author) => author.userId === enrollment.User.id
+          )
+        )
+      );
 
-  // log number of participation enrollments
-  console.log(
-    'number of users participating: ',
-    participationEnrollments.length.toString
-  );
+      // find most recent record for this enrollment
+      const mostRecentRecord =
+        allRecords.length > 0
+          ? allRecords.reduce((prevRecord, currRecord) =>
+              new Date(currRecord.created_at) > new Date(prevRecord.created_at)
+                ? currRecord
+                : prevRecord
+            )
+          : null;
+
+      // return a new object that combines the enrollment and its most recent record
+      return {
+        ...enrollment,
+        mostRecentRecord,
+      };
+    });
+
+  const sessions = [...(course.Sessions || [])];
 
   const attendances = getAttendancesForParticipants(
     participationEnrollments,
@@ -193,12 +235,6 @@ const ParticipationList: FC<IPropsParticipationList> = ({
       );
       return missedAttendances.length <= course.maxMissedSessions;
     }
-  );
-
-  // log number of enrollments for users who passed the course
-  console.log(
-    'number of users who passed the course: ',
-    passedUserEnrollments.length.toString
   );
 
   return (
@@ -256,12 +292,12 @@ interface IDotData {
 }
 
 const pStyle = 'text-gray-700 truncate';
-const tdStyle = 'pl-5';
+const tdStyle = 'pl-5 py-4';
 
 /* #region ParticipationRow */
 
 interface IPropsParticipationRow {
-  enrollment: ManagedCourse_Course_by_pk_CourseEnrollments;
+  enrollment: ExtendedEnrollment;
   sessions: ManagedCourse_Course_by_pk_Sessions[];
   qResult: QueryResult<any, any>;
   userId: string;
@@ -276,6 +312,15 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
 }) => {
   const { t } = useTranslation();
   const [showDetails, setShowDetails] = useState(false);
+  const [documentationUrlLoaded, setDocumentationUrlLoaded] = useState(false);
+
+  const [
+    getAchievementRecordDocumentation,
+    getAchievementRecordDocumentationResult,
+  ] = useLazyRoleQuery<
+    loadAchievementRecordDocumentation,
+    loadAchievementRecordDocumentationVariables
+  >(LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION);
 
   const attendanceRecordBySession: Record<
     number,
@@ -326,9 +371,18 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
     [qResult, insertAttendance, attendanceRecordBySession, userId]
   );
 
-  const handleDetailsClick = useCallback(() => {
+  const handleDetailsClick = async () => {
     setShowDetails((prev) => !prev);
-  }, [setShowDetails]);
+    console.log(enrollment.mostRecentRecord);
+    if (!documentationUrlLoaded && enrollment.mostRecentRecord !== null) {
+      getAchievementRecordDocumentation({
+        variables: {
+          path: enrollment.mostRecentRecord.documentationUrl,
+        },
+      });
+      setDocumentationUrlLoaded(true);
+    }
+  };
 
   /**
    * For each existing session in the course a circle is shown,
@@ -407,16 +461,32 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
             </div>
           </div>
         </td>
-        <td className={tdStyle}>
-          <div className="flex flex-row justify-center">
-            <div>
-              <p className={pStyle}> {t('course-page:not-submitted')} </p>
-            </div>
-            {greyDot}
-            {/* {enrollment.motivationRating === 'UNRATED' ? greyDot : <></>}
-            {enrollment.motivationRating === 'INVITE' ? greenDot : <></>}
-            {enrollment.motivationRating === 'REVIEW' ? orangeDot : <></>}
-            {enrollment.motivationRating === 'DECLINE' ? redDot : <></>} */}
+        <td className={`${tdStyle} min-w-[260px]`}>
+          <div className="flex flex-row">
+            {!enrollment.mostRecentRecord && (
+              <div>
+                <p className={pStyle}> {t('course-page:not-submitted')} </p>
+              </div>
+            )}
+
+            {enrollment.mostRecentRecord?.rating ===
+            AchievementRecordRating_enum.UNRATED ? (
+              greyDot
+            ) : (
+              <></>
+            )}
+            {enrollment.mostRecentRecord?.rating ===
+            AchievementRecordRating_enum.PASSED ? (
+              greenDot
+            ) : (
+              <></>
+            )}
+            {enrollment.mostRecentRecord?.rating ===
+            AchievementRecordRating_enum.FAILED ? (
+              redDot
+            ) : (
+              <></>
+            )}
           </div>
         </td>
 
@@ -437,22 +507,126 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
         </td>
       </tr>
       <tr className={showDetails ? 'h-0' : 'h-1'} />
-      {showDetails && <ShowDetails enrollment={enrollment} />}
+      {showDetails && (
+        <ShowDetails
+          enrollment={enrollment}
+          achievementRecordDocumentationResult={
+            getAchievementRecordDocumentationResult
+          }
+          qResult={qResult}
+        />
+      )}
     </>
   );
 };
 
 /* #endregion */
 interface IPropsShowDetails {
-  enrollment: ManagedCourse_Course_by_pk_CourseEnrollments;
+  enrollment: ExtendedEnrollment;
+  achievementRecordDocumentationResult: LazyQueryResult<
+    loadAchievementRecordDocumentation,
+    loadAchievementRecordDocumentationVariables
+  >;
+  qResult: QueryResult<any, any>;
 }
-const ShowDetails: FC<IPropsShowDetails> = ({ enrollment }) => {
+const ShowDetails: FC<IPropsShowDetails> = ({
+  enrollment,
+  achievementRecordDocumentationResult,
+  qResult,
+}) => {
+  const [setAchievementRecord, { loading, error }] = useRoleMutation<
+    UpdateAchievementRecordByPk,
+    UpdateAchievementRecordByPkVariables
+  >(UPDATE_AN_ACHIEVEMENT_RECORD);
+  const onSetAchievementRecordRatingClick = async (
+    achievementRecordRating: AchievementRecordRating_enum
+  ) => {
+    await setAchievementRecord({
+      variables: {
+        id: enrollment.mostRecentRecord.id,
+        setInput: {
+          rating: achievementRecordRating,
+        },
+      },
+    });
+    qResult.refetch();
+  };
   return (
     <>
       <tr className="bg-edu-course-list f-full">
-        <td colSpan={12} className={tdStyle}>
+        <td colSpan={3} className={tdStyle}>
           <div className="flex">
             <p className={pStyle}> {enrollment.User.email} </p>
+          </div>
+        </td>
+        <td colSpan={2} className={`${tdStyle} min-w-[260px]`}>
+          <div className="flex flex-col">
+            {enrollment.mostRecentRecord && (
+              <>
+                <div className="flex items-center mb-3">
+                  <EhDot
+                    onClick={() =>
+                      onSetAchievementRecordRatingClick(
+                        AchievementRecordRating_enum.UNRATED
+                      )
+                    }
+                    className="cursor-pointer"
+                    color="GREY"
+                    size={
+                      enrollment.mostRecentRecord.rating ===
+                      AchievementRecordRating_enum.UNRATED
+                        ? 'LARGE'
+                        : 'DEFAULT'
+                    }
+                  />
+                  <EhDot
+                    onClick={() =>
+                      onSetAchievementRecordRatingClick(
+                        AchievementRecordRating_enum.PASSED
+                      )
+                    }
+                    className="cursor-pointer"
+                    color="GREEN"
+                    size={
+                      enrollment.mostRecentRecord.rating ===
+                      AchievementRecordRating_enum.PASSED
+                        ? 'LARGE'
+                        : 'DEFAULT'
+                    }
+                  />
+                  <EhDot
+                    onClick={() =>
+                      onSetAchievementRecordRatingClick(
+                        AchievementRecordRating_enum.FAILED
+                      )
+                    }
+                    className="cursor-pointer"
+                    color="RED"
+                    size={
+                      enrollment.mostRecentRecord.rating ===
+                      AchievementRecordRating_enum.FAILED
+                        ? 'LARGE'
+                        : 'DEFAULT'
+                    }
+                  />
+                </div>
+                <Button
+                  as={'a'}
+                  href={
+                    achievementRecordDocumentationResult.loading
+                      ? '#'
+                      : achievementRecordDocumentationResult?.data
+                          ?.loadAchievementRecordDocumentation?.link
+                  }
+                >
+                  {achievementRecordDocumentationResult.loading ? (
+                    <CircularProgress />
+                  ) : (
+                    'Download Documentation'
+                  )}
+                </Button>
+              </>
+            )}
           </div>
         </td>
       </tr>
