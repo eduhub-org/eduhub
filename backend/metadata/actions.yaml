@@ -6,6 +6,8 @@ actions:
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
   - name: createParticipationCertificate
     definition:
       kind: synchronous
@@ -64,6 +66,8 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+    permissions:
+      - role: instructor_access
   - name: loadParticipationCertificate
     definition:
       kind: ""

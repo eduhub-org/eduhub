@@ -31,7 +31,7 @@ export interface CourseTileListAnonymous_Course {
   /**
    * The day of the week the course takes place.
    */
-  weekDay: Weekday_enum | null;
+  weekDay: Weekday_enum;
   /**
    * Decides whether the course is published for all users or not.
    */

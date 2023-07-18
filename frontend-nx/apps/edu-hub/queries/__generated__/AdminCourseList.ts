@@ -184,7 +184,7 @@ export interface AdminCourseList_Course {
   /**
    * The day of the week the course takes place.
    */
-  weekDay: Weekday_enum | null;
+  weekDay: Weekday_enum;
   /**
    * A text providing info about the costs of a participation.
    */
