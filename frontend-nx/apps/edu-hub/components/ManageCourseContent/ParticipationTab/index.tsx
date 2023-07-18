@@ -24,7 +24,7 @@ import { QUERY_LIMIT } from '../../../pages/manage/courses';
 import { UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../queries/achievementRecord';
 import { INSERT_SINGLE_ATTENDANCE } from '../../../queries/courseEnrollment';
 import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../../queries/mutateAchievement';
-import { LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION } from 'apps/edu-hub/queries/loadAchievementRecordDocumentation';
+import { LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION } from '../../../queries/loadAchievementRecordDocumentation';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
