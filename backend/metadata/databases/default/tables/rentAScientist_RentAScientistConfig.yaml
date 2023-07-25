@@ -65,5 +65,4 @@ update_permissions:
 delete_permissions:
   - role: admin-ras
     permission:
-      backend_only: false
       filter: {}

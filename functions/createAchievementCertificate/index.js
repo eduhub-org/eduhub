@@ -1,4 +1,5 @@
-import got from 'got';
+import { fetchEnrollments } from "./fetchEnrollments.js";
+import { generateCertificate } from "./generateCertificate.js";
 
 /**
  * Responds to any HTTP request.
@@ -7,40 +8,51 @@ import got from 'got';
  * @param {!express:Response} res HTTP response context.
  */
 export const createAchievementCertificate = async (req, res) => {
+  try {
+    if (process.env.HASURA_CLOUD_FUNCTION_SECRET == req.headers.secret) {
+      const userIds = req.body.input.userIds;
+      const courseId = req.body.input.courseId;
 
-  if (process.env.HASURA_CLOUD_FUNCTION_SECRET == req.headers.secret) {
-    const template = req.body.input.template;
-    const firstname = req.body.input.firstname;
-    const lastname = req.body.input.lastname;
-    const semester = req.body.input.semester;
-    const course_name = req.body.input.course_name;
-    const ects = req.body.input.ects;
-    const practical_project = req.body.input.ractical_project;
-    const online_courses = req.body.input.online_courses;
-    const certificate_text = req.body.input.certificate_text;
-    
-    const url = 'https://edu.opencampus.sh/create_certificate_rest';
-    const options = {
-      json: {
-        template: template,
-        full_name: firstname + " " + lastname,
-        semester: semester,
-        course_name: course_name,
-        ects: ects,
-        practical_project: practical_project,
-        online_courses: online_courses,
-        certificate_text: certificate_text,
-      },
-    };
-    
-    const data = await got.post(url, options).json();
+      // log userId and courseid
+      console.log("############# User Ids: ", userIds);
+      console.log("############# Course Id: ", courseId);
 
-    return res.json({
-      pdf: data.pdf
-    });
-  } else {
-    return res.json({
-      response: "error",
+      // get course enrollments
+      const courseEnrollments = await fetchEnrollments(userIds, courseId);
+
+      // log length of courseEnrollments
+      console.log(
+        "############# Course Enrollments Length: ",
+        courseEnrollments.length
+      );
+
+      // Check if data.CourseEnrollment is empty
+      if (courseEnrollments.length === 0) {
+        return res.json({
+          result: 0,
+        });
+      }
+
+      // call function to generate certificate
+      courseEnrollments.forEach(async (enrollment) => {
+        const certificateData = await generateCertificate(
+          enrollment,
+          req.headers.bucket
+        );
+      });
+
+      return res.json({
+        result: courseEnrollments.length,
+      });
+    } else {
+      return res.status(401).json({
+        error: "Unauthorized",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Internal Server Error",
     });
   }
 };

@@ -27,7 +27,7 @@ services:
     working_dir: /functions
     volumes:
       - ./functions:/functions
-      - ./backend/init.d/file_storage:/home/node/www/test_data
+      - ./backend/init.d/file_storage:/home/node/www/emulated-bucket
     ports:
       - "42000-42024:42000-42024"
       - "4001:4001"
@@ -42,7 +42,7 @@ services:
       HASURA_ENDPOINT: http://hasura:8080/v1/graphql
       HASURA_ADMIN_SECRET: myadminsecretkey
       HASURA_CLOUD_FUNCTION_SECRET: test1234
-      LIBRARY_PATH: ../lib/cloud-storage
+      LIBRARY_PATH: "../lib/cloud-storage.js"
 
   python_functions:
     container_name: eduhub-python-functions
@@ -53,11 +53,11 @@ services:
       - ./functions:/functions
     ports:
       - "42025:42025"
-#      - "5001:5001"
-    command: sh -c "pip install -r /functions/callPythonFunction/requirements.txt ; /functions/start-python.sh"    
+    #      - "5001:5001"
+    command: sh -c "pip install -r /functions/callPythonFunction/requirements.txt ; /functions/start-python.sh"
     environment:
       LOCAL_TESTING: 1
- #     STORAGE_PORT: 5001
+      #     STORAGE_PORT: 5001
       KEYCLOAK_URL: http://keycloak:8080
       KEYCLOAK_USER: admin
       KEYCLOAK_PW: admin
@@ -65,7 +65,6 @@ services:
       HASURA_GRAPHQL_ADMIN_KEY: myadminsecretkey
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       LIBRARY_PATH: ../lib/cloud-storage
-      
 
   hasura:
     container_name: eduhub-hasura

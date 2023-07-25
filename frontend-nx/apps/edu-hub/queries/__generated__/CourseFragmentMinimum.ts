@@ -55,7 +55,7 @@ export interface CourseFragmentMinimum {
   /**
    * The day of the week the course takes place.
    */
-  weekDay: Weekday_enum | null;
+  weekDay: Weekday_enum;
   /**
    * The cover image for the course
    */

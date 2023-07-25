@@ -181,3 +181,33 @@ export const SAVE_USER_PROFILE_IMAGE = gql`
     }
   }
 `;
+
+export const CREATE_ACHIEVEMENT_CERTIFICATE = gql`
+  mutation createAchievementCertificate($userIds: [uuid!]!, $courseId: Int!) {
+    createAchievementCertificate(userIds: $userIds, courseId: $courseId) {
+      result
+    }
+  }
+`;
+
+export const CREATE_PARTICIPATION_CERTIFICATE = gql`
+  mutation createParticipationCertificate(
+    $template: String!
+    $firstname: String!
+    $lastname: String!
+    $semester: String!
+    $course_name: String!
+    $event_entries: [String!]
+  ) {
+    createParticipationCertificate(
+      template: $template
+      firstname: $firstname
+      lastname: $lastname
+      semester: $semester
+      course_name: $course_name
+      event_entries: $event_entries
+    ) {
+      pdf
+    }
+  }
+`;

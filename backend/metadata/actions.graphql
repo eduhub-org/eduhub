@@ -1,15 +1,8 @@
 type Mutation {
   createAchievementCertificate(
-    template: String!
-    firstname: String!
-    lastname: String!
-    semester: String!
-    course_name: String!
-    ects: String!
-    practical_project: String!
-    online_courses: String!
-    certificate_text: String!
-  ): createCertificateOutput
+    userIds: [uuid!]!
+    courseId: Int!
+  ): result
 }
 
 type Mutation {
