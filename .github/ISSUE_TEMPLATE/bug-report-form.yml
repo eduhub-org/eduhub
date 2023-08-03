@@ -18,24 +18,34 @@ body:
     validations:
       required: false
   - type: textarea
-    id: what-happened
+    id: description
     attributes:
-      label: What happened?
-      description: Also tell us, what did you expect to happen?
+      label: Describe the bug 
+      description: A clear and concise description of what the bug is.
       placeholder: Tell us what you see!
       value: "A bug happened!"
     validations:
       required: true
-  - type: dropdown
-    id: version
+  - type: textarea
+    id: reproduction
     attributes:
-      label: Version
-      description: What version of our software are you running?
-      options:
-        - 1.0.2 (Default)
-        - 1.0.3 (Edge)
+      label: To reproduce 
+      description: Steps to reproduce the behavior:
+      placeholder: 
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+      value: "A bug happened!"
     validations:
       required: true
+  - type: markdown
+    attributes:
+      value: "## Screenshots (if applicable)"
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: If applicable, add screenshots to help explain your problem. You can add images by dragging and dropping, selecting, or pasting them here.
   - type: dropdown
     id: browsers
     attributes:
