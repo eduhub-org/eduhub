@@ -2,7 +2,7 @@
 name: Feature request
 about: Propose a new feature for this project
 title: "[FEATURE]"
-labels: feature
+labels: ''
 assignees: ''
 
 ---
@@ -23,4 +23,4 @@ List any additional requirements or dependencies that this new feature may have.
 A clear and concise description of any alternative solutions or features you've considered.  
 
 **Additional context**  
-Add any other context, wireframes, or screenshots about the feature request here.  
+Add any other context, wireframes, or screenshots about the feature request here.
