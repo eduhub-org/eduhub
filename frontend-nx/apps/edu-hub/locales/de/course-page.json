@@ -145,6 +145,6 @@
   "confirm-online-course": "Bestätigen",
   "online-course-confirmed": "Du hast am {{dateTime}} bestätigt an den erforderlichen Online-Kursen teilgenommen zu haben.",
   "certificates-generated": "Es wurden {{number}} Zertifikate generiert.",
-  "1-certificate-generated": "Es wurde ein ein Zertifikat generiert.",
+  "1-certificate-generated": "Es wurde ein Zertifikat generiert.",
   "no-certificates-generated": "Es wurden keine Zertifikate generiert."
 }

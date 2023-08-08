@@ -52,6 +52,7 @@ export const fetchEnrollments = async (userIds, courseId) => {
           id
           ects
           title
+          learningGoals
         }
       }
     }

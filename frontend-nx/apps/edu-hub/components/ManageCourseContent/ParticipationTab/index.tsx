@@ -225,8 +225,8 @@ const ParticipationList: FC<IPropsParticipationList> = ({
     sessions
   );
   // assign passedUserEnrollments to the array of participationEnrollments filtered on enrollments from those users who have less then the allowed number of missed session attendances for this course
-  const passedUserEnrollments = participationEnrollments.filter(
-    (enrollment) => {
+  const passedUserEnrollments = participationEnrollments
+    .filter((enrollment) => {
       const userAttendances = attendances.filter(
         (attendance) => attendance.userId === enrollment.userId
       );
@@ -234,8 +234,11 @@ const ParticipationList: FC<IPropsParticipationList> = ({
         (attendance) => attendance.status === AttendanceStatus_enum.MISSED
       );
       return missedAttendances.length <= course.maxMissedSessions;
-    }
-  );
+    })
+    .filter((enrollment) => {
+      const mostRecentRecord = enrollment.mostRecentRecord;
+      return mostRecentRecord && mostRecentRecord.rating === 'PASSED';
+    });
 
   return (
     <>

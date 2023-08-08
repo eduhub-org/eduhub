@@ -10,14 +10,23 @@ export const generateCertificate = async (courseEnrollment, bucket) => {
     const recordType =
       courseEnrollment.User.AchievementRecordAuthors[0].AchievementRecord
         .AchievementOption.recordType;
+    console.log("recordType: ", recordType);
     const recordTitle =
       courseEnrollment.User.AchievementRecordAuthors[0].AchievementRecord
         .AchievementOption.title;
-    const online_courses = recordType === "ONLINE_COURSE" ? "" : recordTitle;
-    const practical_project = recordType === "DOCUMENTATION" ? "" : recordTitle;
+    console.log("recordTitle: ", recordTitle);
+    const online_courses = recordType === "ONLINE_COURSE" ? recordTitle : "";
+    console.log("online_courses: ", online_courses);
+    const practical_project = recordType === "DOCUMENTATION" ? recordTitle : "";
+    console.log("practical_project: ", practical_project);
 
     // set certificate text to learning goals or empty string if learning goals is null
-    const certificate = courseEnrollment.Course.learningGoals || "";
+    const certificate = (courseEnrollment.Course.learningGoals || "")
+      .split("\n")
+      .filter((line) => line.trim() !== "")
+      .map((line) => `- ${line.trim()}`)
+      .join("\n");
+    console.log("certificate: ", certificate);
 
     // Construct the options object for the certificate generation request
     const options = {
@@ -33,7 +42,7 @@ export const generateCertificate = async (courseEnrollment, bucket) => {
         certificate_text: certificate,
       },
     };
-
+    console.log("options: ", options);
     // Send the certificate generation request to the certificate generation service
     const url = "https://edu-old.opencampus.sh/create_certificate_rest";
     const certificateData = await got.post(url, options).json();
@@ -73,7 +82,7 @@ export const generateCertificate = async (courseEnrollment, bucket) => {
     const mutationVariables = {
       userId: userid,
       courseId: courseId,
-      certificateURL: link,
+      certificateURL: path,
     };
     await request(process.env.HASURA_ENDPOINT, mutation, mutationVariables, {
       "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,

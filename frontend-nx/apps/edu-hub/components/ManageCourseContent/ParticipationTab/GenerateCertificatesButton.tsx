@@ -22,8 +22,6 @@ export const GenerateCertificatesButton = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  //  TODO: restrict user ids to only those with sufficient attendances and passed achievements record
-
   const userIds = userEnrollments.map((p) => p.userId);
 
   const [createAchievementCertificate, { loading, error, data }] =
