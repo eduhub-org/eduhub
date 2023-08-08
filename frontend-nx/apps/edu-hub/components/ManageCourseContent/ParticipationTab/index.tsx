@@ -57,7 +57,6 @@ import { GenerateCertificatesButton } from './GenerateCertificatesButton';
 import { getAttendancesForParticipants } from '../../../helpers/courseHelpers';
 import {
   AchievementRecordRating_enum,
-  AchievementRecordType_enum,
   AttendanceStatus_enum,
 } from '../../../__generated__/globalTypes';
 import TagWithTwoText from '../../common/TagWithTwoText';
@@ -237,7 +236,10 @@ const ParticipationList: FC<IPropsParticipationList> = ({
     })
     .filter((enrollment) => {
       const mostRecentRecord = enrollment.mostRecentRecord;
-      return mostRecentRecord && mostRecentRecord.rating === 'PASSED';
+      return (
+        mostRecentRecord &&
+        mostRecentRecord.rating === AchievementRecordRating_enum.PASSED
+      );
     });
 
   return (
