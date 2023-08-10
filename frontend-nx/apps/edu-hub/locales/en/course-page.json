@@ -144,6 +144,8 @@
   "confirm-online-course-description": "Hereby you confirm that you have participated in the required online courses. Your proof of performance is your reflection sheet. You can find it <component>HERE</component>. If you have any questions, please contact your course leader.",
   "confirm-online-course": "Confirm",
   "online-course-confirmed": "You have confirmed on {{dateTime}} that you have participated in the required online courses.",
+  "achievement-certificate-generation": "Generate Achievement Certificates",
+  "attendance-certificate-generation": "Generate Attendance Cartificates",
   "certificates-generated": "{{number}} certificates have been generated.",
   "1-certificate-generated": "One certificate has been generated.",
   "no-certificates-generated": "No certificates have been generated."

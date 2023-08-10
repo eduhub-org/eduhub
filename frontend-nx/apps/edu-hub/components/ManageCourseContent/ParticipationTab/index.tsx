@@ -224,8 +224,8 @@ const ParticipationList: FC<IPropsParticipationList> = ({
     sessions
   );
   // assign passedUserEnrollments to the array of participationEnrollments filtered on enrollments from those users who have less then the allowed number of missed session attendances for this course
-  const passedUserEnrollments = participationEnrollments
-    .filter((enrollment) => {
+  const passedUserEnrollmentsForAttendanceCertificate =
+    participationEnrollments.filter((enrollment) => {
       const userAttendances = attendances.filter(
         (attendance) => attendance.userId === enrollment.userId
       );
@@ -233,14 +233,26 @@ const ParticipationList: FC<IPropsParticipationList> = ({
         (attendance) => attendance.status === AttendanceStatus_enum.MISSED
       );
       return missedAttendances.length <= course.maxMissedSessions;
-    })
-    .filter((enrollment) => {
-      const mostRecentRecord = enrollment.mostRecentRecord;
-      return (
-        mostRecentRecord &&
-        mostRecentRecord.rating === AchievementRecordRating_enum.PASSED
-      );
     });
+
+  const passedUserEnrollmentsForAchievementCertificate =
+    participationEnrollments
+      .filter((enrollment) => {
+        const userAttendances = attendances.filter(
+          (attendance) => attendance.userId === enrollment.userId
+        );
+        const missedAttendances = userAttendances.filter(
+          (attendance) => attendance.status === AttendanceStatus_enum.MISSED
+        );
+        return missedAttendances.length <= course.maxMissedSessions;
+      })
+      .filter((enrollment) => {
+        const mostRecentRecord = enrollment.mostRecentRecord;
+        return (
+          mostRecentRecord &&
+          mostRecentRecord.rating === AchievementRecordRating_enum.PASSED
+        );
+      });
 
   return (
     <>
@@ -273,10 +285,18 @@ const ParticipationList: FC<IPropsParticipationList> = ({
               ))}
             </tbody>
           </table>
-          {isAdmin && (
+          {isAdmin && course.attendanceCertificatePossible === true && (
             <GenerateCertificatesButton
-              userEnrollments={passedUserEnrollments}
+              userEnrollments={passedUserEnrollmentsForAttendanceCertificate}
               course={course}
+              certificateType="attendance"
+            />
+          )}
+          {isAdmin && course.achievementCertificatePossible === true && (
+            <GenerateCertificatesButton
+              userEnrollments={passedUserEnrollmentsForAchievementCertificate}
+              course={course}
+              certificateType="achievement"
             />
           )}
         </div>
