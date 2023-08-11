@@ -44,7 +44,9 @@ const createCertificate = async (req, res) => {
         generateCertificate(enrollment, req.headers.bucket)
       )
     );
-    logger.info(`${courseEnrollments.length} certificate(s) generated`);
+    logger.info(
+      `${courseEnrollments.length} ${certificateType} certificate(s) generated`
+    );
     return res.json({
       result: courseEnrollments.length,
     });
