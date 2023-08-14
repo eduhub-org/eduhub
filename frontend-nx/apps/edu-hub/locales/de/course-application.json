@@ -12,7 +12,7 @@
     "cancelled": "Du hast die Einladung zu diesem Kurs abgelehnt.",
     "invited": "Deine Bewerbung war erfolgreich! Du bist du diesem Kurs eingeladen.",
     "rejected": "Leider konnten wir Deine Bewerbung auf diesen Kurs in diesem Semester nicht berücksichtigen.",
-    "applicationPeriodEnded": "Die Bewerbungsfrist ist leider abgelaufen.",
+    "applicationPeriodEnded": "Die Bewerbungsfrist ist leider abgelaufen. Bleibe immer auf dem Laufenden und verpasse nicht unser nächstes Kursprogramm, Events, Jobs und was es sonst noch Neues gibt: <a>ZUM NEWSLETTER</a>",
     "invitation_expired": "Die Rückmeldefrist deiner Einladung ist leider abgelaufen."
   },
   "successBody": "Spätestens ein bis zwei Tage nach Bewerbungsschluss wirst Du über Deine Zulassung informiert.",
