@@ -1,4 +1,7 @@
 {
   "attendances": "Teilnahmen",
-  "certificateAchievement": "Leistungsnachweis"
+  "certificateAchievement": "Leistungsnachweis",
+  "certificates": "Zertifikat Download",
+  "attendanceCertificateDownload": "T",
+  "achievementCertificateDownload": "L"
 }
