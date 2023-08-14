@@ -182,14 +182,6 @@ export const SAVE_USER_PROFILE_IMAGE = gql`
   }
 `;
 
-export const CREATE_ACHIEVEMENT_CERTIFICATE = gql`
-  mutation createAchievementCertificate($userIds: [uuid!]!, $courseId: Int!) {
-    createAchievementCertificate(userIds: $userIds, courseId: $courseId) {
-      result
-    }
-  }
-`;
-
 export const CREATE_PARTICIPATION_CERTIFICATE = gql`
   mutation createParticipationCertificate(
     $template: String!
@@ -208,6 +200,22 @@ export const CREATE_PARTICIPATION_CERTIFICATE = gql`
       event_entries: $event_entries
     ) {
       pdf
+    }
+  }
+`;
+
+export const CREATE_CERTIFICATE = gql`
+  mutation createCertificate(
+    $userIds: [uuid!]!
+    $courseId: Int!
+    $certificateType: String!
+  ) {
+    createCertificate(
+      userIds: $userIds
+      courseId: $courseId
+      certificateType: $certificateType
+    ) {
+      result
     }
   }
 `;

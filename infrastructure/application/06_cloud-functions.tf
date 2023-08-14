@@ -1079,37 +1079,37 @@ resource "google_cloudfunctions2_function" "update_from_keycloak" {
 }
 
 ###############################################################################
-# Create Google cloud function for createAchievementCertificate
+# Create Google cloud function for callNodeFunction
 #####
 # Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
-resource "google_cloud_run_service_iam_policy" "create_achievement_certificate_noauth_invoker" {
-  location    = google_cloudfunctions2_function.create_achievement_certificate.location
-  project     = google_cloudfunctions2_function.create_achievement_certificate.project
-  service     = google_cloudfunctions2_function.create_achievement_certificate.name
+resource "google_cloud_run_service_iam_policy" "call_node_function_noauth_invoker" {
+  location    = google_cloudfunctions2_function.call_node_function.location
+  project     = google_cloudfunctions2_function.call_node_function.project
+  service     = google_cloudfunctions2_function.call_node_function.name
   policy_data = data.google_iam_policy.noauth_invoker.policy_data
 }
 # Retrieve data object with zipped scource code
-data "google_storage_bucket_object" "create_achievement_certificate" {
-  name   = "cloud-functions/createAchievementCertificate.zip"
+data "google_storage_bucket_object" "call_node_function" {
+  name   = "cloud-functions/callNodeFunction.zip"
   bucket = var.project_id
 }
 # Create cloud function
-resource "google_cloudfunctions2_function" "create_achievement_certificate" {
+resource "google_cloudfunctions2_function" "call_node_function" {
   provider    = google-beta
   location    = var.region
-  name        = "create-achievement-certificate"
-  description = "Creates a certificate pdf (at the moment by calling anonther function) and returns it as base64"
+  name        = "call-node-function"
+  description = "Calls a node function specificed via the function header."
   labels = {
     sha = var.functions_sha
   }
 
   build_config {
     runtime     = "nodejs14"
-    entry_point = "createAchievementCertificate"
+    entry_point = "callNodeFunction"
     source {
       storage_source {
         bucket = var.project_id
-        object = data.google_storage_bucket_object.create_achievement_certificate.name
+        object = data.google_storage_bucket_object.call_node_function.name
       }
     }
   }
@@ -1120,7 +1120,7 @@ resource "google_cloudfunctions2_function" "create_achievement_certificate" {
       HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
       HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
     }
-    max_instance_count = 1
+    max_instance_count = 20
     available_memory   = "256M"
     timeout_seconds    = 60
     ingress_settings   = var.cloud_function_ingress_settings
