@@ -1,0 +1,18 @@
+FROM hasura/graphql-engine:v2.19.0.cli-migrations-v3
+
+# Copy your migrations, metadata, and seeds
+COPY ./migrations /hasura-migrations
+COPY ./metadata /hasura-metadata
+COPY ./seeds /hasura-seeds
+
+# Copy entrypoint script and config.yaml needed to execute hasura-cli commands
+COPY ./dockerfile-dev-entrypoint.sh /hasura/dockerfile-dev-entrypoint.sh
+COPY ./config.yaml /hasura/config.yaml
+COPY ./wait-for-it.sh /hasura/wait-for-it.sh
+
+# Make the entrypoint and wait-for-it script executable
+RUN chmod 755 /hasura/dockerfile-dev-entrypoint.sh
+RUN chmod 755 /hasura/wait-for-it.sh
+
+# Set the script as the ENTRYPOINT
+ENTRYPOINT ["/hasura/dockerfile-dev-entrypoint.sh"]
