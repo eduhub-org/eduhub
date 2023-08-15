@@ -2,6 +2,10 @@
 # Create Google Cloud Function Services
 #####
 
+# Random function id that is used to generate a unique name for the cloud function
+resource "random_id" "function_id" {
+  byte_length = 4 # Adjust this for the desired identifier length
+}
 
 ###############################################################################
 # Create Google cloud function for callPythonFunction
@@ -30,7 +34,7 @@ resource "google_cloudfunctions2_function" "call_python_function" {
 
   build_config {
     runtime     = "python38"
-    entry_point = "call_python_function"
+    entry_point = "call_python_function-${random_id.function_id.hex}"
     source {
       storage_source {
         bucket = var.project_id
@@ -54,6 +58,55 @@ resource "google_cloudfunctions2_function" "call_python_function" {
     max_instance_count = 500
     available_memory   = "256M"
     timeout_seconds    = 3600
+    ingress_settings   = var.cloud_function_ingress_settings
+  }
+}
+
+###############################################################################
+# Create Google cloud function for callNodeFunction
+#####
+# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
+resource "google_cloud_run_service_iam_policy" "call_node_function_noauth_invoker" {
+  location    = google_cloudfunctions2_function.call_node_function.location
+  project     = google_cloudfunctions2_function.call_node_function.project
+  service     = google_cloudfunctions2_function.call_node_function.name
+  policy_data = data.google_iam_policy.noauth_invoker.policy_data
+}
+# Retrieve data object with zipped scource code
+data "google_storage_bucket_object" "call_node_function" {
+  name   = "cloud-functions/callNodeFunction.zip"
+  bucket = var.project_id
+}
+# Create cloud function
+resource "google_cloudfunctions2_function" "call_node_function" {
+  provider    = google-beta
+  location    = var.region
+  name        = "call-node-function-${random_id.function_id.hex}"
+  description = "Calls a node function specificed via the function header."
+  labels = {
+    sha = var.functions_sha
+  }
+
+  build_config {
+    runtime     = "nodejs18"
+    entry_point = "callNodeFunction"
+    source {
+      storage_source {
+        bucket = var.project_id
+        object = data.google_storage_bucket_object.call_node_function.name
+      }
+    }
+  }
+
+  service_config {
+    environment_variables = {
+      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+      HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
+      HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
+    }
+    max_instance_count = 20
+    available_memory   = "256M"
+    timeout_seconds    = 60
     ingress_settings   = var.cloud_function_ingress_settings
   }
 }
@@ -1072,55 +1125,6 @@ resource "google_cloudfunctions2_function" "update_from_keycloak" {
       HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
     }
     max_instance_count = 1
-    available_memory   = "256M"
-    timeout_seconds    = 60
-    ingress_settings   = var.cloud_function_ingress_settings
-  }
-}
-
-###############################################################################
-# Create Google cloud function for callNodeFunction
-#####
-# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
-resource "google_cloud_run_service_iam_policy" "call_node_function_noauth_invoker" {
-  location    = google_cloudfunctions2_function.call_node_function.location
-  project     = google_cloudfunctions2_function.call_node_function.project
-  service     = google_cloudfunctions2_function.call_node_function.name
-  policy_data = data.google_iam_policy.noauth_invoker.policy_data
-}
-# Retrieve data object with zipped scource code
-data "google_storage_bucket_object" "call_node_function" {
-  name   = "cloud-functions/callNodeFunction.zip"
-  bucket = var.project_id
-}
-# Create cloud function
-resource "google_cloudfunctions2_function" "call_node_function" {
-  provider    = google-beta
-  location    = var.region
-  name        = "call-node-function"
-  description = "Calls a node function specificed via the function header."
-  labels = {
-    sha = var.functions_sha
-  }
-
-  build_config {
-    runtime     = "nodejs18"
-    entry_point = "callNodeFunction"
-    source {
-      storage_source {
-        bucket = var.project_id
-        object = data.google_storage_bucket_object.call_node_function.name
-      }
-    }
-  }
-
-  service_config {
-    environment_variables = {
-      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
-      HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
-      HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
-    }
-    max_instance_count = 20
     available_memory   = "256M"
     timeout_seconds    = 60
     ingress_settings   = var.cloud_function_ingress_settings
