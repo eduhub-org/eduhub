@@ -50,7 +50,7 @@ jobs:
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementOptionDocumentationTemplate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionDocumentationTemplate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionEvaluationScript/lib/'
-          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/createCertificate/lib/'
+          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/callNodeFunction/createCertificate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/createParticipationCertificate/lib/'
 
       - name: Zip Archive for callPythonFunction
