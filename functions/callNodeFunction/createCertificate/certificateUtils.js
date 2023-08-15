@@ -1,6 +1,7 @@
 import Storage from "@google-cloud/storage";
 import logger from "../index.js";
 import { request, gql } from "graphql-request";
+import { buildCloudStorage } from "../lib/cloud-storage.js";
 
 /**
  * Saves a certificate to a Google Cloud Storage bucket.
@@ -20,10 +21,10 @@ export const saveCertificateToBucket = async (
   isPublic
 ) => {
   try {
-    const libraryPath = process.env.LIBRARY_PATH
-      ? `../${process.env.LIBRARY_PATH}`
-      : "./lib/cloud-storage.js";
-    const { buildCloudStorage } = await import(libraryPath);
+    // const libraryPath = process.env.LIBRARY_PATH
+    //   ? `../${process.env.LIBRARY_PATH}`
+    //   : "./lib/cloud-storage.js";
+    // const { buildCloudStorage } = await import(libraryPath);
 
     const storage = buildCloudStorage(Storage);
     const content = certificateData.pdf;
