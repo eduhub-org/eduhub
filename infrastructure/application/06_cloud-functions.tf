@@ -1104,7 +1104,7 @@ resource "google_cloudfunctions2_function" "call_node_function" {
   }
 
   build_config {
-    runtime     = "nodejs14"
+    runtime     = "nodejs18"
     entry_point = "callNodeFunction"
     source {
       storage_source {
