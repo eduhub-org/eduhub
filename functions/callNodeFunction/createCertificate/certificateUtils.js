@@ -1,4 +1,4 @@
-import Storage from "@google-cloud/storage";
+import { Storage } from "@google-cloud/storage";
 import logger from "../index.js";
 import { request, gql } from "graphql-request";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
