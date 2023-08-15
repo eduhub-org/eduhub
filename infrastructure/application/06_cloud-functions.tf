@@ -4,7 +4,7 @@
 
 # Random function id that is used to generate a unique name for the cloud function
 resource "random_id" "function_id" {
-  byte_length = 4   # Adjust this for the desired identifier length
+  byte_length = 4 # Adjust this for the desired identifier length
 }
 
 ###############################################################################
