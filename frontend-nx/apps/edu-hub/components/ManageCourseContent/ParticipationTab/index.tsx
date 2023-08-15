@@ -183,6 +183,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({
     { key: 1, label: t('lastName') },
     { key: 2, label: t('manage-course:attendances') },
     { key: 3, label: t('manage-course:certificateAchievement') },
+    { key: 4, label: t('manage-course:certificates') },
   ];
 
   const participationEnrollments: ExtendedEnrollment[] = [
@@ -515,6 +516,31 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
           </div>
         </td>
 
+        <td>
+          <div className="flex gap-3">
+            {enrollment.achievementCertificateURL && (
+              <Button
+                as="a"
+                href={enrollment.achievementCertificateURL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('manage-course:achievementCertificateDownload')}
+              </Button>
+            )}
+            {enrollment.attendanceCertificateURL && (
+              <Button
+                as="a"
+                href={enrollment.attendanceCertificateURL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('manage-course:attendanceCertificateDownload')}
+              </Button>
+            )}
+          </div>
+        </td>
+
         <td className={tdStyle}>
           <div>
             <button
@@ -584,7 +610,7 @@ const ShowDetails: FC<IPropsShowDetails> = ({
             <p className={pStyle}> {enrollment.User.email} </p>
           </div>
         </td>
-        <td colSpan={2} className={`${tdStyle} min-w-[260px]`}>
+        <td colSpan={3} className={`${tdStyle} min-w-[260px]`}>
           <div className="flex flex-col">
             {enrollment.mostRecentRecord && (
               <>
