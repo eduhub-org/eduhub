@@ -18,8 +18,7 @@ import {
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
 } from 'react-icons/md';
-import { useAdminMutation } from '../../../hooks/authedMutation';
-import { useAdminQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
+import { useLazyRoleQuery, useRoleQuery } from '../../../hooks/authedQuery';
 import { QUERY_LIMIT } from '../../../pages/manage/courses';
 import { UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../queries/achievementRecord';
 import { INSERT_SINGLE_ATTENDANCE } from '../../../queries/courseEnrollment';
@@ -94,7 +93,7 @@ interface IPropsCourseAchievementOptions {
 const CourseAchievementOptions: FC<IPropsCourseAchievementOptions> = (
   props
 ) => {
-  const achievementOptionsForACourse = useAdminQuery<
+  const achievementOptionsForACourse = useRoleQuery<
     AchievementOptionCourses,
     AchievementOptionCoursesVariables
   >(ACHIEVEMENT_OPTION_COURSES, {
@@ -106,7 +105,7 @@ const CourseAchievementOptions: FC<IPropsCourseAchievementOptions> = (
     },
   });
 
-  const [deleteAnAchievementCourse] = useAdminMutation<
+  const [deleteAnAchievementCourse] = useRoleMutation<
     DeleteAnAchievementOptionCourse,
     DeleteAnAchievementOptionCourseVariables
   >(DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK);
@@ -399,7 +398,6 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
 
   const handleDetailsClick = async () => {
     setShowDetails((prev) => !prev);
-    console.log(enrollment.mostRecentRecord);
     if (!documentationUrlLoaded && enrollment.mostRecentRecord !== null) {
       getAchievementRecordDocumentation({
         variables: {
