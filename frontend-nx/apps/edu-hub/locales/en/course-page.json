@@ -137,6 +137,8 @@
   "achievement-option": "Achievement Record",
   "achievement-record-upload-dead-line-text": "You have time until {{date}} to upload an achievement record.",
   "choose-achievement-option": "Choose the title of your achievement record.",
+  "chosen-achievement-option": "Selected achievement record",
+  "no-achievement-option-chosen": "No achievement record selected",
   "no-achievement-option": "Currently is no achievement record option available for this course.",
   "upload-proof": "Upload proof",
   "last-upload-from-an-author": "The last proof with you as the author was uploaded by {{fullName}} on {{dateTime}}.",
