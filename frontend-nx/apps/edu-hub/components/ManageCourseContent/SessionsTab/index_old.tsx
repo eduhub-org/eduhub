@@ -53,7 +53,7 @@ import {
   DeleteSessionSpeaker,
   DeleteSessionSpeakerVariables,
 } from '../../../queries/__generated__/DeleteSessionSpeaker';
-import { TableGrid } from './TableGrid';
+import { SessionRow } from './SessionRow';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -175,45 +175,49 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     t,
   ]);
 
-  const format2Digits = (n: number) => {
-    return `${n < 10 ? '0' : ''}${n}`;
-  };
-
-  const formatTime = (time: Date | null): string => {
-    if (time == null) {
-      return formatTime(new Date());
-    }
-    return (
-      format2Digits(time.getHours()) +
-      ':' +
-      format2Digits(Math.round(time.getMinutes() / 15) * 15)
-    );
-  };
-
-  const data = courseSessions;
-  const columns = [
-    {
-      columnName: 'Date',
-      width: 4,
-      displayComponent: ({ rowData }) => (
-        <div>{formatTime(rowData.startDateTime)}</div>
-      ),
-    },
-    {
-      columnName: 'Title',
-      width: 10,
-      displayComponent: ({ rowData }) => <div>{rowData.title}</div>,
-    },
-  ];
-
   // Render component
   return (
-    <TableGrid
-      data={data}
-      keyField="id"
-      columns={columns}
-      showCheckbox={true}
-      showDelete={true}
-    />
+    <div>
+      <div className="flex justify-start mb-4 text-white">
+        <Button
+          onClick={insertSession}
+          startIcon={<MdAddCircle />}
+          color="inherit"
+        >
+          {t('course-page:add-session')}
+        </Button>
+      </div>
+
+      <div className="mb-8 text-gray-400">
+        <SessionRow
+          onDelete={deleteSession}
+          onSetStartDate={setSessionStart}
+          onSetEndDate={setSessionEnd}
+          onSetTitle={setSessionTitle}
+          onDeleteSpeaker={deleteSessionSpeaker}
+          onDeleteLocation={deleteSessionLocation}
+          lectureStart={course.Program?.lectureStart}
+          lectureEnd={course.Program?.lectureEnd}
+          session={null}
+          qResult={qResult}
+        />
+      </div>
+
+      {courseSessions.map((session) => (
+        <SessionRow
+          onDelete={deleteSession}
+          onSetStartDate={setSessionStart}
+          onSetEndDate={setSessionEnd}
+          onSetTitle={setSessionTitle}
+          onDeleteLocation={deleteSessionLocation}
+          onDeleteSpeaker={deleteSessionSpeaker}
+          lectureStart={course.Program?.lectureStart}
+          lectureEnd={course.Program?.lectureEnd}
+          key={session.id}
+          session={session}
+          qResult={qResult}
+        />
+      ))}
+    </div>
   );
 };
