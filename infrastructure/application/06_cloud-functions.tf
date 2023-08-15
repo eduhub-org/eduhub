@@ -2,11 +2,6 @@
 # Create Google Cloud Function Services
 #####
 
-# Random function id that is used to generate a unique name for the cloud function
-resource "random_id" "function_id" {
-  byte_length = 4 # Adjust this for the desired identifier length
-}
-
 ###############################################################################
 # Create Google cloud function for callPythonFunction
 #####
@@ -34,7 +29,12 @@ resource "google_cloudfunctions2_function" "call_python_function" {
 
   build_config {
     runtime     = "python38"
-    entry_point = "call_python_function-${random_id.function_id.hex}"
+    entry_point = "call_python_function"
+    environment_variables = {
+      # Causes a re-deploy of the function when the source changes
+      "SOURCE_SHA" = data.google_storage_bucket_object.call_python_function.md5hash
+    }
+
     source {
       storage_source {
         bucket = var.project_id
@@ -81,7 +81,7 @@ data "google_storage_bucket_object" "call_node_function" {
 resource "google_cloudfunctions2_function" "call_node_function" {
   provider    = google-beta
   location    = var.region
-  name        = "call-node-function-${random_id.function_id.hex}"
+  name        = "call-node-function"
   description = "Calls a node function specificed via the function header."
   labels = {
     sha = var.functions_sha
