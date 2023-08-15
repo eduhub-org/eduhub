@@ -65,6 +65,7 @@ services:
       HASURA_GRAPHQL_ADMIN_KEY: myadminsecretkey
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       LIBRARY_PATH: ../lib/cloud-storage
+      MM_API: ${MM_API}
 
   hasura:
     container_name: eduhub-hasura
