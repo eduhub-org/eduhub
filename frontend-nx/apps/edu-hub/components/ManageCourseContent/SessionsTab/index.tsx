@@ -1,8 +1,8 @@
-import { QueryResult } from '@apollo/client';
-import { Button } from '@material-ui/core';
 import { FC, useCallback, useMemo } from 'react';
-
+import { Button } from '@material-ui/core';
 import { MdAddCircle } from 'react-icons/md';
+import useTranslation from 'next-translate/useTranslation';
+import { QueryResult } from '@apollo/client';
 import {
   identityEventMapper,
   pickIdPkMapper,
@@ -25,7 +25,6 @@ import {
   InsertCourseSessionVariables,
 } from '../../../queries/__generated__/InsertCourseSession';
 import { ManagedCourse_Course_by_pk } from '../../../queries/__generated__/ManagedCourse';
-import { SessionRow } from './SessionRow';
 import {
   DeleteCourseSession,
   DeleteCourseSessionVariables,
@@ -54,7 +53,7 @@ import {
   DeleteSessionSpeaker,
   DeleteSessionSpeakerVariables,
 } from '../../../queries/__generated__/DeleteSessionSpeaker';
-import useTranslation from 'next-translate/useTranslation';
+import { SessionRow } from './SessionRow';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -64,6 +63,62 @@ interface IProps {
 export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const { t } = useTranslation();
 
+  // Define mutations
+  const [insertSessionMutation] = useRoleMutation<
+    InsertCourseSession,
+    InsertCourseSessionVariables
+  >(INSERT_NEW_SESSION);
+  const [insertSessionLocationMutation] = useRoleMutation<
+    InsertSessionLocation,
+    InsertSessionLocationVariables
+  >(INSERT_NEW_SESSION_LOCATION);
+  const deleteSessionLocation = useDeleteCallback<
+    DeleteCourseSessionLocation,
+    DeleteCourseSessionLocationVariables
+  >(DELETE_SESSION_LOCATION, 'addressId', identityEventMapper, qResult);
+  const deleteSessionSpeaker = useDeleteCallback<
+    DeleteSessionSpeaker,
+    DeleteSessionSpeakerVariables
+  >(DELETE_SESSION_SPEAKER, 'speakerId', identityEventMapper, qResult);
+  const deleteSession = useDeleteCallback<
+    DeleteCourseSession,
+    DeleteCourseSessionVariables
+  >(DELETE_SESSION, 'sessionId', identityEventMapper, qResult);
+  const setSessionTitle = useUpdateCallback2<
+    UpdateSessionTitle,
+    UpdateSessionTitleVariables
+  >(
+    UPDATE_SESSION_TITLE,
+    'sessionId',
+    'title',
+    pickIdPkMapper,
+    identityEventMapper,
+    qResult
+  );
+  const setSessionStart = useUpdateCallback2<
+    UpdateSessionStartTime,
+    UpdateSessionStartTimeVariables
+  >(
+    UPDATE_SESSION_START_TIME,
+    'sessionId',
+    'startTime',
+    pickIdPkMapper,
+    identityEventMapper,
+    qResult
+  );
+  const setSessionEnd = useUpdateCallback2<
+    UpdateSessionEndTime,
+    UpdateSessionEndTimeVariables
+  >(
+    UPDATE_SESSION_END_TIME,
+    'sessionId',
+    'endTime',
+    pickIdPkMapper,
+    identityEventMapper,
+    qResult
+  );
+
+  // Define memoized course sessions
   const courseSessions = useMemo(() => {
     const result = [...course.Sessions];
     result.sort((a, b) => {
@@ -74,14 +129,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     return result;
   }, [course]);
 
-  const [insertSessionMutation] = useRoleMutation<
-    InsertCourseSession,
-    InsertCourseSessionVariables
-  >(INSERT_NEW_SESSION);
-  const [insertSessionLocationMutation] = useRoleMutation<
-    InsertSessionLocation,
-    InsertSessionLocationVariables
-  >(INSERT_NEW_SESSION_LOCATION);
+  // Define insert session function
   const insertSession = useCallback(async () => {
     const startTime: Date = new Date(
       courseSessions.length > 0
@@ -103,7 +151,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
       },
     });
 
-    // add the standard locations
+    // Add the standard locations
     const newSessionId = inserted?.data?.insert_Session?.returning[0]?.id;
     if (newSessionId != null) {
       for (const loc of course.CourseLocations) {
@@ -124,59 +172,10 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     insertSessionMutation,
     courseSessions,
     insertSessionLocationMutation,
+    t,
   ]);
 
-  const deleteSessionLocation = useDeleteCallback<
-    DeleteCourseSessionLocation,
-    DeleteCourseSessionLocationVariables
-  >(DELETE_SESSION_LOCATION, 'addressId', identityEventMapper, qResult);
-
-  const deleteSessionSpeaker = useDeleteCallback<
-    DeleteSessionSpeaker,
-    DeleteSessionSpeakerVariables
-  >(DELETE_SESSION_SPEAKER, 'speakerId', identityEventMapper, qResult);
-
-  const deleteSession = useDeleteCallback<
-    DeleteCourseSession,
-    DeleteCourseSessionVariables
-  >(DELETE_SESSION, 'sessionId', identityEventMapper, qResult);
-
-  const setSessionTitle = useUpdateCallback2<
-    UpdateSessionTitle,
-    UpdateSessionTitleVariables
-  >(
-    UPDATE_SESSION_TITLE,
-    'sessionId',
-    'title',
-    pickIdPkMapper,
-    identityEventMapper,
-    qResult
-  );
-
-  const setSessionStart = useUpdateCallback2<
-    UpdateSessionStartTime,
-    UpdateSessionStartTimeVariables
-  >(
-    UPDATE_SESSION_START_TIME,
-    'sessionId',
-    'startTime',
-    pickIdPkMapper,
-    identityEventMapper,
-    qResult
-  );
-
-  const setSessionEnd = useUpdateCallback2<
-    UpdateSessionEndTime,
-    UpdateSessionEndTimeVariables
-  >(
-    UPDATE_SESSION_END_TIME,
-    'sessionId',
-    'endTime',
-    pickIdPkMapper,
-    identityEventMapper,
-    qResult
-  );
-
+  // Render component
   return (
     <div>
       <div className="flex justify-start mb-4 text-white">
@@ -219,16 +218,6 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           qResult={qResult}
         />
       ))}
-
-      {/* <div className="flex justify-end mt-4 mb-4 text-white">
-        <Button
-          onClick={insertSession}
-          startIcon={<MdAddCircle />}
-          color="inherit"
-        >
-          {t('course-page:add-session')}
-        </Button>
-      </div> */}
     </div>
   );
 };
