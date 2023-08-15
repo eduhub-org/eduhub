@@ -69,7 +69,9 @@ services:
   hasura:
     container_name: eduhub-hasura
     restart: on-failure
-    build: ./backend
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile-dev
     ports:
       - "8080:8080"
     depends_on:
@@ -108,9 +110,9 @@ services:
       CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE: "http://functions:42011"
       CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "http://functions:42005"
       CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT: "http://functions:42012"
-      CLOUD_FUNCTION_LINK_CREATE_ACHIEVEMENT_CERTIFICATE: "http://functions:42022"
       CLOUD_FUNCTION_LINK_CREATE_PARTICIPATION_CERTIFICATE: "http://functions:42023"
       CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES: "http://functions:42024"
+      CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION: "http://functions:42022"
       CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION: "http://python_functions:42025"
     volumes:
       - ./backend:/hasura

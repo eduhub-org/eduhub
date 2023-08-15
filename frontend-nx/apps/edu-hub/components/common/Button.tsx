@@ -37,29 +37,37 @@ export const Button: FC<Props> = (props) => {
       : 'bg-edu-black text-white'
     : 'text-edu-black';
 
-  const className = `${props.className} px-6 py-2 border-2 border-edu-black rounded-full items-center cursor-pointer select-none ${colors}`;
+  const combinedClassName = `${
+    props.className ? `${props.className} ` : ''
+  }px-6 py-2 border-2 border-edu-black rounded-full items-center cursor-pointer select-none ${colors}`;
+
+  console.log(combinedClassName);
 
   if (props.as === 'a') {
-    const { as, filled, ...rest } = props;
+    const { as,className, filled, ...rest } = props;
     return (
-      <a className={className} {...rest}>
+      <a className={combinedClassName} {...rest}>
         {props.children}
       </a>
     );
   }
 
   if (props.as === 'link') {
-    const { as, filled, ...rest } = props;
+    const { as,className,  filled, ...rest } = props;
     return (
-      <Link className={className} {...rest}>
+      <Link className={combinedClassName} {...rest}>
         {props.children}
       </Link>
     );
   }
 
-  const { as, filled, ...rest } = props;
+  const { as, className, filled, ...rest } = props;
   return (
-    <button className={`${className} ${props.disabled && 'bg-gray-400 text-zinc-500'}`} onClick={props.onClick} {...rest}>
+    <button
+      className={`${combinedClassName} disabled:bg-gray-400 disabled:text-zinc-500`}
+      onClick={props.onClick}
+      {...rest}
+    >
       {props.children}
     </button>
   );

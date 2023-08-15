@@ -18,8 +18,7 @@ import {
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
 } from 'react-icons/md';
-import { useAdminMutation } from '../../../hooks/authedMutation';
-import { useAdminQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
+import { useLazyRoleQuery, useRoleQuery } from '../../../hooks/authedQuery';
 import { QUERY_LIMIT } from '../../../pages/manage/courses';
 import { UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../queries/achievementRecord';
 import { INSERT_SINGLE_ATTENDANCE } from '../../../queries/courseEnrollment';
@@ -57,7 +56,6 @@ import { GenerateCertificatesButton } from './GenerateCertificatesButton';
 import { getAttendancesForParticipants } from '../../../helpers/courseHelpers';
 import {
   AchievementRecordRating_enum,
-  AchievementRecordType_enum,
   AttendanceStatus_enum,
 } from '../../../__generated__/globalTypes';
 import TagWithTwoText from '../../common/TagWithTwoText';
@@ -95,7 +93,7 @@ interface IPropsCourseAchievementOptions {
 const CourseAchievementOptions: FC<IPropsCourseAchievementOptions> = (
   props
 ) => {
-  const achievementOptionsForACourse = useAdminQuery<
+  const achievementOptionsForACourse = useRoleQuery<
     AchievementOptionCourses,
     AchievementOptionCoursesVariables
   >(ACHIEVEMENT_OPTION_COURSES, {
@@ -107,7 +105,7 @@ const CourseAchievementOptions: FC<IPropsCourseAchievementOptions> = (
     },
   });
 
-  const [deleteAnAchievementCourse] = useAdminMutation<
+  const [deleteAnAchievementCourse] = useRoleMutation<
     DeleteAnAchievementOptionCourse,
     DeleteAnAchievementOptionCourseVariables
   >(DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK);
@@ -184,6 +182,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({
     { key: 1, label: t('lastName') },
     { key: 2, label: t('manage-course:attendances') },
     { key: 3, label: t('manage-course:certificateAchievement') },
+    { key: 4, label: t('manage-course:certificates') },
   ];
 
   const participationEnrollments: ExtendedEnrollment[] = [
@@ -225,8 +224,8 @@ const ParticipationList: FC<IPropsParticipationList> = ({
     sessions
   );
   // assign passedUserEnrollments to the array of participationEnrollments filtered on enrollments from those users who have less then the allowed number of missed session attendances for this course
-  const passedUserEnrollments = participationEnrollments.filter(
-    (enrollment) => {
+  const passedUserEnrollmentsForAttendanceCertificate =
+    participationEnrollments.filter((enrollment) => {
       const userAttendances = attendances.filter(
         (attendance) => attendance.userId === enrollment.userId
       );
@@ -234,8 +233,26 @@ const ParticipationList: FC<IPropsParticipationList> = ({
         (attendance) => attendance.status === AttendanceStatus_enum.MISSED
       );
       return missedAttendances.length <= course.maxMissedSessions;
-    }
-  );
+    });
+
+  const passedUserEnrollmentsForAchievementCertificate =
+    participationEnrollments
+      .filter((enrollment) => {
+        const userAttendances = attendances.filter(
+          (attendance) => attendance.userId === enrollment.userId
+        );
+        const missedAttendances = userAttendances.filter(
+          (attendance) => attendance.status === AttendanceStatus_enum.MISSED
+        );
+        return missedAttendances.length <= course.maxMissedSessions;
+      })
+      .filter((enrollment) => {
+        const mostRecentRecord = enrollment.mostRecentRecord;
+        return (
+          mostRecentRecord &&
+          mostRecentRecord.rating === AchievementRecordRating_enum.PASSED
+        );
+      });
 
   return (
     <>
@@ -268,10 +285,18 @@ const ParticipationList: FC<IPropsParticipationList> = ({
               ))}
             </tbody>
           </table>
-          {isAdmin && (
+          {isAdmin && course.attendanceCertificatePossible === true && (
             <GenerateCertificatesButton
-              userEnrollments={passedUserEnrollments}
+              userEnrollments={passedUserEnrollmentsForAttendanceCertificate}
               course={course}
+              certificateType="attendance"
+            />
+          )}
+          {isAdmin && course.achievementCertificatePossible === true && (
+            <GenerateCertificatesButton
+              userEnrollments={passedUserEnrollmentsForAchievementCertificate}
+              course={course}
+              certificateType="achievement"
             />
           )}
         </div>
@@ -373,7 +398,6 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
 
   const handleDetailsClick = async () => {
     setShowDetails((prev) => !prev);
-    console.log(enrollment.mostRecentRecord);
     if (!documentationUrlLoaded && enrollment.mostRecentRecord !== null) {
       getAchievementRecordDocumentation({
         variables: {
@@ -490,6 +514,31 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
           </div>
         </td>
 
+        <td>
+          <div className="flex gap-3">
+            {enrollment.achievementCertificateURL && (
+              <Button
+                as="a"
+                href={enrollment.achievementCertificateURL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('manage-course:achievementCertificateDownload')}
+              </Button>
+            )}
+            {enrollment.attendanceCertificateURL && (
+              <Button
+                as="a"
+                href={enrollment.attendanceCertificateURL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t('manage-course:attendanceCertificateDownload')}
+              </Button>
+            )}
+          </div>
+        </td>
+
         <td className={tdStyle}>
           <div>
             <button
@@ -559,7 +608,7 @@ const ShowDetails: FC<IPropsShowDetails> = ({
             <p className={pStyle}> {enrollment.User.email} </p>
           </div>
         </td>
-        <td colSpan={2} className={`${tdStyle} min-w-[260px]`}>
+        <td colSpan={3} className={`${tdStyle} min-w-[260px]`}>
           <div className="flex flex-col">
             {enrollment.mostRecentRecord && (
               <>

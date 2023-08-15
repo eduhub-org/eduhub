@@ -216,8 +216,8 @@ module "hasura_service" {
       value = google_cloudfunctions2_function.send_mail.service_config[0].uri
     },
     {
-      name  = "CLOUD_FUNCTION_LINK_CREATE_ACHIEVEMENT_CERTIFICATE"
-      value = google_cloudfunctions2_function.create_achievement_certificate.service_config[0].uri
+      name  = "CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION"
+      value = google_cloudfunctions2_function.call_node_function.service_config[0].uri
     },
     {
       name  = "CLOUD_FUNCTION_LINK_CREATE_PARTICIPATION_CERTIFICATE"
