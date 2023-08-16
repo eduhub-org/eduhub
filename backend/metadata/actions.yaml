@@ -1,13 +1,16 @@
 actions:
-  - name: createAchievementCertificate
+  - name: createCertificate
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CREATE_ACHIEVEMENT_CERTIFICATE}}'
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+        - name: name
+          value: createCertificate
+    comment: Generates a certificate of a given type for a given course and user id
   - name: createParticipationCertificate
     definition:
       kind: synchronous

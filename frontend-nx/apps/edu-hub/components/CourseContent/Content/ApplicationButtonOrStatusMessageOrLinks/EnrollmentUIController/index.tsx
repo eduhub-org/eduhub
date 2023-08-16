@@ -24,6 +24,7 @@ import { ApplicationModal } from './ApplicationModal';
 import { UserInfoModal } from './UserInfoModal';
 import { Button } from '../../../../common/Button';
 import { getCourseEnrollment } from '../../../../../helpers/util';
+import Trans from 'next-translate/Trans';
 
 interface IProps {
   course: Course_Course_by_pk;
@@ -91,7 +92,19 @@ export const EnrollmentUIController: FC<IProps> = ({
     if (course.applicationEnd <= currentDate) {
       content = (
         <span className="bg-gray-300 p-4">
-          {t('status.applicationPeriodEnded')}
+          <Trans
+            i18nKey="course-application:status.applicationPeriodEnded"
+            components={{
+              a: (
+                <a
+                  href="https://opencampus.substack.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className='underline'
+                />
+              ),
+            }}
+          />
         </span>
       );
     } else {

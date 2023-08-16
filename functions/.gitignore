@@ -3,7 +3,11 @@
 # ignore files with local environment variables
 *.env
 
+# ignore log files in all subdirectories
+**/*.log
+
 # Ignore the express installation that is created by start.sh
 node_modules
-package.json
+/package.json
 package-lock.json
+
