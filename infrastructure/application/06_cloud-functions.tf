@@ -41,6 +41,7 @@ resource "google_cloudfunctions2_function" "call_python_function" {
 
   service_config {
     environment_variables = {
+      ENVIRONMENT                  = var.environment
       HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
       HASURA_GRAPHQL_ADMIN_KEY     = var.hasura_graphql_admin_key
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
@@ -97,6 +98,7 @@ resource "google_cloudfunctions2_function" "call_node_function" {
 
   service_config {
     environment_variables = {
+      ENVIRONMENT                  = var.environment
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
       HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
       HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key

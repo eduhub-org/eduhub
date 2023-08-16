@@ -62,7 +62,7 @@
   "course-not-found": "Course {{courseId}} could not be found!",
   "brief-description": "Shortdescription",
   "appointments": "Dates",
-  "participation-and-benefits": "Participations and Benefits",
+  "participation-and-benefits": "Participations and Achievements",
   "confirmation-push-the-course-to-next-status": "Do you want to send the course to its next state?",
   "please-fill-in-all-fields-to-proceed-further": "Please fill out all fields to proceed!",
   "set-status-high": "increase status",

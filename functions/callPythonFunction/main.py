@@ -4,7 +4,10 @@ import re
 from flask import Flask, request, jsonify
 
 # Initialize the logger level
-logging.basicConfig(level=logging.INFO)
+if os.environ.get("ENVIRONMENT") == "production":
+    logging.basicConfig(level=logging.INFO)
+else:
+    logging.basicConfig(level=logging.DEBUG)
 
 
 # Execution of all Python files in the folder `pythonFunctions` to make these available
