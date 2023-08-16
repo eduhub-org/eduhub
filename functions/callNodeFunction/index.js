@@ -11,7 +11,7 @@ import winston from "winston";
  * @property {Function} error Logs an error message.
  */
 const logger = winston.createLogger({
-  level: "info",
+  level: process.env.ENVIRONMENT === "production" ? "info" : "debug",
   format: winston.format.combine(
     // winston.format.timestamp(),
     winston.format.errors({ stack: true }),
