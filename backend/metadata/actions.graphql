@@ -54,6 +54,12 @@ type Query {
 }
 
 type Query {
+  loadParticipationData(
+    programId: Int!
+  ): loadFileOutput
+}
+
+type Query {
   loadparticipationCertificateTemplate(
     path: String!
   ): loadFileOutput
