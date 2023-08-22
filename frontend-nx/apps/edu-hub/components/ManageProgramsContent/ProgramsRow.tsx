@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { QueryResult } from '@apollo/client';
-import { IconButton } from '@material-ui/core';
+import { CircularProgress, IconButton } from '@material-ui/core';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, MutableRefObject, useCallback, useRef } from 'react';
 
@@ -14,12 +14,15 @@ import {
   MdOutlineCheckBoxOutlineBlank,
   MdUpload,
 } from 'react-icons/md';
+import { Button } from '../../components/common/Button';
 import { parseFileUploadEvent } from '../../helpers/filehandling';
 import { useAdminMutation } from '../../hooks/authedMutation';
+import { useLazyRoleQuery } from '../../hooks/authedQuery';
 import {
   SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
   SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE,
 } from '../../queries/actions';
+import { LOAD_PARTICIPATION_DATA } from '../../queries/loadParticipationData';
 import {
   UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
   UPDATE_PARTICIPATION_CERTIFICATE_TEMPLATE,
@@ -38,6 +41,10 @@ import {
   UpdateProgramAchievementTemplate,
   UpdateProgramAchievementTemplateVariables,
 } from '../../queries/__generated__/UpdateProgramAchievementTemplate';
+import {
+  loadParticipationData,
+  loadParticipationDataVariables,
+} from '../../queries/__generated__/loadParticipationData';
 import {
   UpdateProgramParticipationTemplate,
   UpdateProgramParticipationTemplateVariables,
@@ -252,6 +259,26 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
     UpdateProgramAchievementTemplateVariables
   >(UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE);
 
+  const [
+    loadParticipationData,
+    {
+      data: loadParticipationDataResult,
+      loading: loadParticipationDataLoading,
+      error: loadParticipationDataError,
+    },
+  ] = useLazyRoleQuery<loadParticipationData, loadParticipationDataVariables>(
+    LOAD_PARTICIPATION_DATA,
+    { variables: { programId: program.id } }
+  );
+
+  const handleLoadParticipationDataClick = () => {
+    try {
+      loadParticipationData();
+    } catch (error) {
+      console.log('loadParticipationDataError', error);
+    }
+  };
+
   const handleTemplateAchievementUploadEvent = useCallback(
     async (event: any) => {
       const uFile = await parseFileUploadEvent(event);
@@ -322,7 +349,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
             className="w-full bg-gray-100"
-            dateFormat={lang === "de" ? "dd.MM.yyyy" : 'MM/dd/yyyy'}
+            dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
             selected={program.applicationStart || new Date()}
             onChange={handleSetApplicationStart}
             locale={lang}
@@ -332,7 +359,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={lang === "de" ? "dd.MM.yyyy" : 'MM/dd/yyyy'}
+            dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
             className="w-full bg-gray-100"
             selected={program.defaultApplicationEnd || new Date()}
             onChange={handleSetApplicationEnd}
@@ -343,7 +370,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={lang === "de" ? "dd.MM.yyyy" : 'MM/dd/yyyy'}
+            dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
             className="w-full bg-gray-100"
             selected={program.lectureStart || new Date()}
             onChange={handleSetLectureStart}
@@ -354,7 +381,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={lang === "de" ? "dd.MM.yyyy" : 'MM/dd/yyyy'}
+            dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
             className="w-full bg-gray-100"
             selected={program.lectureEnd || new Date()}
             onChange={handleSetLectureEnd}
@@ -365,7 +392,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={lang === "de" ? "dd.MM.yyyy" : 'MM/dd/yyyy'}
+            dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
             className="w-full bg-gray-100"
             selected={program.achievementRecordUploadDeadline || new Date()}
             onChange={handleSetUploadData}
@@ -504,6 +531,33 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
                   {t('course-page:performance-certificate')}
                 </div>
               </div>
+            </div>
+            <div className="p-3">
+              <Button
+                as="button"
+                onClick={handleLoadParticipationDataClick}
+                disabled={loadParticipationDataLoading}
+              >
+                {loadParticipationDataLoading ? (
+                  <CircularProgress />
+                ) : (
+                  t('course-page:participationDataGenerate')
+                )}
+              </Button>
+              {loadParticipationDataResult &&
+                !loadParticipationDataLoading &&
+                !loadParticipationDataError && (
+                  <Button
+                    as="a"
+                    href={
+                      loadParticipationDataResult.loadParticipationData.link
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t('course-page:participationDataDownload')}
+                  </Button>
+                )}
             </div>
           </div>
         </div>

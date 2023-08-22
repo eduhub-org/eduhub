@@ -149,5 +149,7 @@
   "attendance-certificate-generation": "Teilnahmenachweise ausstellen",
   "certificates-generated": "Es wurden {{number}} Zertifikate generiert.",
   "1-certificate-generated": "Es wurde ein Zertifikat generiert.",
-  "no-certificates-generated": "Es wurden keine Zertifikate generiert."
+  "no-certificates-generated": "Es wurden keine Zertifikate generiert.",
+  "participationDataGenerate": "Teilnehmer:innen Daten generieren (CSV)",
+  "participationDataDownload": "Teilnehmer:innen Daten herunterladen (CSV)"
 }
