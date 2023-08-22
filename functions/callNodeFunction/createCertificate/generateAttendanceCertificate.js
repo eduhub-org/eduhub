@@ -62,13 +62,6 @@ export const generateAttendanceCertificate = async (
       link
     );
   } catch (error) {
-    logger.error(
-      `Error generating attendance certificate for user ${
-        courseEnrollment.User.id
-      } and course ${
-        courseEnrollment.Course.id
-      }. Certificate data: ${JSON.stringify(certificateData)}`
-    );
     throw error;
   }
 };
