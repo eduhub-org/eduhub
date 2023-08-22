@@ -35,7 +35,7 @@ export const saveCertificateToBucket = async (
       `Saved certificate for user ${userId} and course ${courseId} to ${link}`
     );
 
-    return link;
+    return path;
   } catch (error) {
     logger.error(
       `Failed to save certificate for user ${userId} and course ${courseId}: ${error}`
