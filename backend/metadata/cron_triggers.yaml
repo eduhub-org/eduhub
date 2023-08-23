@@ -9,11 +9,11 @@
     timeout_seconds: 3699
     tolerance_seconds: 21600
   headers:
-    - name: name
-      value: checkAttendance
-    - name: secret
+    - name: Function-Name
+      value: check_attendance
+    - name: Hasura-Secret
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-  comment: regularly checks zoom and questionaire attendance
+  comment: Regularly checks zoom and questionaire attendance
 - name: send_questionaires
   webhook: '{{CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES}}'
   schedule: 0 */2 * * *

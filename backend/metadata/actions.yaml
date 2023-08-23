@@ -87,10 +87,10 @@ actions:
       kind: ""
       handler: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
       headers:
-        - name: name
-          value: loadParticipationData
-        - name: secret
-          value: HASURA_CLOUD_FUNCTION_SECRET
+        - name: Function-Name
+          value: load_participation_data
+        - name: Hasura-Secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
     comment: loadParticipationData
   - name: loadparticipationCertificateTemplate
     definition:

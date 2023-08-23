@@ -12,10 +12,10 @@ else:
 
 # Execution of all Python files in the folder `pythonFunctions` to make these available
 # to the function `call_python_function()`
-files = os.listdir('./pythonFunctions')
-python_files = [file for file in files if re.search(r'.py$', file)]
+files = os.listdir("./pythonFunctions")
+python_files = [file for file in files if re.search(r".py$", file)]
 for file in python_files:
-    exec(open('./pythonFunctions/'+file).read())
+    exec(open("./pythonFunctions/" + file).read())
 
 
 # Generic function to call the requested Python function
@@ -29,35 +29,38 @@ def call_python_function(request):
         containing name and information about the participants.
     """
 
-    arguments_json = request.get_json()
-    logging.debug(f"Request: {arguments_json}")
+    arguments = request.get_json()
+    logging.debug(f"Request: {arguments}")
 
-    # Access the headers using request.headers
-    headers = request.headers
+    # Get the value of the secrets from the request header and the local cloud function
+    hasura_secret = request.headers.get("Hasura-Secret")
+    hasura_cloud_function_secret = os.getenv("HASURA_CLOUD_FUNCTION_SECRET")
 
-    # Get the value of the "secret" key from the headers and check if it is correct
-    secret_value = headers.get('secret')
-    hasura_cloud_function_secret = os.getenv('HASURA_CLOUD_FUNCTION_SECRET')
+    # check if secret value is correct otherwise return error
+    if not hasura_secret:
+        return "error: no secret value provided!"
 
-    # Print the values of the secrets for debugging purposes
-    logging.debug(f"Secret value from headers: {secret_value}")
-    logging.debug(
-        f"Secret value from environment: {hasura_cloud_function_secret}")
+    if hasura_secret == "HASURA_CLOUD_FUNCTION_SECRET":
+        return "error: header secret value is not set from environment in Hasura!"
 
-    if secret_value != hasura_cloud_function_secret:
-        return('error: cloud function secret is not correct!')
+    if hasura_secret != hasura_cloud_function_secret:
+        return "error: cloud function secret is not correct!"
 
     # Get the value of the "name" key from the headers (the name of the function to be called)
-    name_value = headers.get('name')
+    function_name = request.headers.get("Function-Name")
 
     # Checking if an existing function name is provided and calling function
-    if globals().get(name_value) is None:
-        return 'error: function with the given name not exist!'
+    if globals().get(function_name) is None:
+        return "error: function with the given name does not exist!"
     else:
-        python_function = globals()[name_value]
-        logging.info(f"Calling python function: {name_value}...")
-        logging.debug(f"Payload: {arguments_json['payload']}")
-        return python_function(arguments_json['payload'])
+        python_function = globals()[function_name]
+        logging.info(f"Calling python function: {function_name}...")
+        # check if payload is provided otherwise set to empty dict
+        if arguments.get("payload") is None:
+            return python_function(arguments)
+        else:
+            logging.debug(f"Payload: {arguments['payload']}")
+            return python_function(arguments["payload"])
 
 
 # Test request for the server
