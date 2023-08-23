@@ -1,0 +1,10 @@
+table:
+  name: CourseDegree
+  schema: public
+object_relationships:
+  - name: Course
+    using:
+      foreign_key_constraint_on: courseId
+  - name: DegreeCourse
+    using:
+      foreign_key_constraint_on: degreeCourseId
