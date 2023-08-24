@@ -80,7 +80,8 @@ class EduHubClient:
 
     def get_course_participants_from_session_id(self, session_id):
         variables = {"session_id": f"{session_id}"}
-        query = """query($session_id: Int) {
+
+        query = """query($id: UUID) {
             CourseEnrollment(where: {Course: {Sessions: {id: {_eq: $session_id}}}}) {
                 User {
                     id
@@ -219,23 +220,21 @@ class EduHubClient:
         }"""
         return self.send_query(mutation, variables)
 
-    def get_email_from_confirmed_users(self, id):
-        variables = {'id': f'{id}'}
-        query = """{
-            CourseEnrollment(where: {id: {_eq: id}}) {
-            User {
+    def get_user_details_from_id(self, user_id):
+        variables = {"userId": f"{user_id}"}
+        query = """query ($userId: uuid!) {
+            User(where: {id: {_eq: $userId}}) {
                 email
-                }
+                firstName
+                lastName
+                id
             }
         }"""
         result = self.send_query(query, variables)
-        result_list = result['data']['CourseEnrollment']
-        unnested_list = []
-        unnested_list.append([item['User'] for item in result_list])
-        return pd.DataFrame(unnested_list[0], columns=['email'])
+        return pd.json_normalize(result["data"]["User"])
 
     def get_channellinks_from_confirmed_users(self, id):
-        variables = {'id': f'{id}'}
+        variables = {"id": f"{id}"}
         query = """{
             CourseEnrollment(where: {id: {_eq: id}}) {
             Course {
@@ -244,7 +243,7 @@ class EduHubClient:
             }
         }"""
         result = self.send_query(query, variables)
-        result_list = result['data']['CourseEnrollment']
+        result_list = result["data"]["CourseEnrollment"]
         unnested_list = []
-        unnested_list.append([item['User'] for item in result_list])
-        return pd.DataFrame(unnested_list[0], columns=['chatlink'])
+        unnested_list.append([item["User"] for item in result_list])
+        return pd.DataFrame(unnested_list[0], columns=["chatlink"])

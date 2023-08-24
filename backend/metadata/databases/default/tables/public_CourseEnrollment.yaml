@@ -109,7 +109,7 @@ event_triggers:
       timeout_sec: 60
     webhook: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
     headers:
-      - name: name
+      - name: Function-Name
         value: add_confirmed_user_to_mm
-      - name: secret
-        value: HASURA_CLOUD_FUNCTION_SECRET
+      - name: Hasura-Secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET
