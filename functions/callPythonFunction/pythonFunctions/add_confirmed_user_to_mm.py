@@ -1,4 +1,4 @@
-import logging
+'''import logging
 import os 
 from api_clients import EduHubClient, MattermostClient
 
@@ -10,11 +10,11 @@ def addConfirmedToMM(payload):
     chatlinks = eduhub_client.get_channellinks_from_confirmed_users()
     
     # test if emails is null
-    if len(emails) == 0:
-        logging.info("No new confirmed Users")
-        return "No new confirmed Users found"
-    else:
-        logging.info("########## Newly confirmed Users:\n%s",
+    #if len(emails) == 0:
+        #logging.info("No new confirmed Users")
+        #return "No new confirmed Users found"
+    #else:
+        #logging.info("########## Newly confirmed Users:\n%s",
                      sessions)
 
     for email in emails: 
@@ -30,4 +30,4 @@ def addConfirmedToMM(payload):
             mm_client.add_user_to_channel(user_id, channel_id) #chatlink Channel 
             
         
-    
+    '''

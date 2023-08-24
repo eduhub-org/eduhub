@@ -95,9 +95,11 @@ update_permissions:
               _eq: X-Hasura-User-Id
       check: {}
 event_triggers:
-  - name: add_user_to_mm_course_channel
+  - name: add_confirmed_user_to_mm
     definition:
-      enable_manual: false
+      enable_manual: true
+      insert:
+        columns: '*'
       update:
         columns:
           - status
@@ -105,9 +107,9 @@ event_triggers:
       interval_sec: 10
       num_retries: 0
       timeout_sec: 60
-    webhook_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    webhook: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
     headers:
-      - name: secret
-        value_from_env: HASURA_CLOUD_FUNCTION_SECRET
       - name: name
-        value: addUserToMMCourseChannel
+        value: add_confirmed_user_to_mm
+      - name: secret
+        value: HASURA_CLOUD_FUNCTION_SECRET
