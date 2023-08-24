@@ -14,7 +14,7 @@ export interface createCertificate_createCertificate {
 
 export interface createCertificate {
   /**
-   * Generates a certificate of the given type for the given course and id
+   * Generates a certificate of a given type for a given course and user id
    */
   createCertificate: createCertificate_createCertificate | null;
 }

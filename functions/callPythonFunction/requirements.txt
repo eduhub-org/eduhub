@@ -11,3 +11,4 @@ typing
 authlib
 datetime
 python-dateutil
+google-cloud-storage
