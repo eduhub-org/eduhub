@@ -218,3 +218,33 @@ class EduHubClient:
             }
         }"""
         return self.send_query(mutation, variables)
+
+    def get_email_from_confirmed_users(self, id):
+        variables = {'id': f'{id}'}
+        query = """{
+            CourseEnrollment(where: {id: {_eq: id}}) {
+            User {
+                email
+                }
+            }
+        }"""
+        result = self.send_query(query, variables)
+        result_list = result['data']['CourseEnrollment']
+        unnested_list = []
+        unnested_list.append([item['User'] for item in result_list])
+        return pd.DataFrame(unnested_list[0], columns=['email'])
+
+    def get_channellinks_from_confirmed_users(self, id):
+        variables = {'id': f'{id}'}
+        query = """{
+            CourseEnrollment(where: {id: {_eq: id}}) {
+            Course {
+                chatLink
+                    }
+            }
+        }"""
+        result = self.send_query(query, variables)
+        result_list = result['data']['CourseEnrollment']
+        unnested_list = []
+        unnested_list.append([item['User'] for item in result_list])
+        return pd.DataFrame(unnested_list[0], columns=['chatlink'])
