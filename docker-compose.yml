@@ -66,6 +66,8 @@ services:
       BUCKET_NAME: emulated-bucket
       LOCAL_STORAGE_PORT: 4001
       MM_API: ${MM_API}
+      MM_URL: url
+      MM_TOKEN: token
 
   hasura:
     container_name: eduhub-hasura
