@@ -27,6 +27,10 @@ import {
   DELETE_COURSE_GROUP,
 } from '../../queries/courseGroup';
 import {
+  INSERT_COURSE_DEGREE,
+  DELETE_COURSE_DEGREE,
+} from '../../queries/courseDegree';
+import {
   DELETE_A_COURSE,
   UPDATE_COURSE_PROPERTY,
 } from '../../queries/mutateCourse';
@@ -47,6 +51,14 @@ import {
   InsertCourseGroup,
   InsertCourseGroupVariables,
 } from '../../queries/__generated__/InsertCourseGroup';
+import {
+  DeleteCourseDegree,
+  DeleteCourseDegreeVariables,
+} from '../../queries/__generated__/DeleteCourseDegree';
+import {
+  InsertCourseDegree,
+  InsertCourseDegreeVariables,
+} from '../../queries/__generated__/InsertCourseDegree';
 import {
   DeleteCourseByPk,
   DeleteCourseByPkVariables,
@@ -88,6 +100,7 @@ import participantsRatedPie from '../../public/images/course/status/participants
 
 import { InstructorColumn } from './CoursesInstructorColumn';
 import { Translate } from 'next-translate';
+import { TagSelector, createHandleTagChange } from '../common/TagSelector';
 // import { INSERT_NEW_COURSE_LOCATION } from '../../queries/course';
 
 interface EntrollmentStatusCount {
@@ -176,6 +189,8 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
     (group) => group.CourseGroupOption
   );
   const [courseGroupTags, setCourseGroupTags] = useState(courseGroups);
+  const degrees = course.CourseGroups.map((group) => group.CourseGroupOption);
+  const [degreeTags, setDegreeTags] = useState(degrees);
   const handleToggleAttendanceCertificatePossible = useCallback(() => {
     onSetAttendanceCertificatePossible(
       course,
@@ -354,16 +369,117 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   );
   /** #endregion */
 
-  const [insertCourseGroup] = useAdminMutation<
-    InsertCourseGroup,
-    InsertCourseGroupVariables
-  >(INSERT_COURSE_GROUP);
-  const insertCourseGroupIntoACourse = useCallback(
+// '  const [insertCourseGroup] = useAdminMutation<
+//     InsertCourseGroup,
+//     InsertCourseGroupVariables
+//   >(INSERT_COURSE_GROUP);
+//   const insertCourseGroupIntoACourse = useCallback(
+//     async (id: number) => {
+//       const response = await insertCourseGroup({
+//         variables: {
+//           courseId: course.id,
+//           courseGroupOptionId: id,
+//         },
+//       });
+
+//       if (response.errors) {
+//         console.log(response.errors);
+//         return;
+//       }
+//       refetchCourses();
+//     },
+//     [insertCourseGroup, refetchCourses, course]
+//   );
+
+//   const [deleteCourseGroup] = useAdminMutation<
+//     DeleteCourseGroup,
+//     DeleteCourseGroupVariables
+//   >(DELETE_COURSE_GROUP);
+//   const deleteCourseGroupFromACourse = useCallback(
+//     async (id: number) => {
+//       const response = await deleteCourseGroup({
+//         variables: {
+//           courseId: course.id,
+//           courseGroupOptionId: id,
+//         },
+//       });
+
+//       if (response.errors) {
+//         console.log(response.errors);
+//         return;
+//       }
+//       refetchCourses();
+//     },
+//     [deleteCourseGroup, refetchCourses, course]
+//   );
+
+//   const [insertCourseDegree] = useAdminMutation<
+//     InsertCourseDegree,
+//     InsertCourseDegreeVariables
+//   >(INSERT_COURSE_DEGREE);
+//   const insertCourseIntoADegree = useCallback(
+//     async (id: number) => {
+//       const response = await insertCourseDegree({
+//         variables: {
+//           courseId: course.id,
+//           degreeCourseId: id,
+//         },
+//       });
+
+//       if (response.errors) {
+//         console.log(response.errors);
+//         return;
+//       }
+//       refetchCourses();
+//     },
+//     [insertCourseDegree, refetchCourses, course]
+//   );
+
+//   const [deleteCourseDegree] = useAdminMutation<
+//     DeleteCourseDegree,
+//     DeleteCourseDegreeVariables
+//   >(DELETE_COURSE_DEGREE);
+//   const deleteCourseFromADegree = useCallback(
+//     async (id: number) => {
+//       const response = await deleteCourseDegree({
+//         variables: {
+//           courseId: course.id,
+//           degreeCourseId: id,
+//         },
+//       });
+
+//       if (response.errors) {
+//         console.log(response.errors);
+//         return;
+//       }
+//       refetchCourses();
+//     },
+//     [deleteCourseDegree, refetchCourses, course]
+//   );
+
+type MutationFunction<T, V> = (
+  variables: V
+) => Promise<FetchResult<T, Record<string, any>, Record<string, any>>>;
+
+interface MutationConfig<T, V> {
+  mutation: MutationFunction<T, V>;
+  courseId: number;
+  refetchCourses: () => void;
+}
+
+const useMutationWithCourseId = <T, V>({
+  mutation,
+  courseId,
+  refetchCourses,
+}: MutationConfig<T, V>) => {
+  const [mutate] = useAdminMutation<T, V>(mutation);
+
+  const handleMutation = useCallback(
     async (id: number) => {
-      const response = await insertCourseGroup({
+      const response = await mutate({
         variables: {
-          courseId: course.id,
-          courseGroupOptionId: id,
+          courseId,
+          ...id,
         },
       });
 
@@ -371,33 +487,52 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
         console.log(response.errors);
         return;
       }
+
       refetchCourses();
     },
-    [insertCourseGroup, refetchCourses, course]
+    [mutate, courseId, refetchCourses]
   );
 
-  const [deleteCourseGroup] = useAdminMutation<
-    DeleteCourseGroup,
-    DeleteCourseGroupVariables
-  >(DELETE_COURSE_GROUP);
-  const deleteCourseGroupFromACourse = useCallback(
-    async (id: number) => {
-      const response = await deleteCourseGroup({
-        variables: {
-          courseId: course.id,
-          courseGroupOptionId: id,
-        },
-      });
+  return handleMutation;
+};
 
-      if (response.errors) {
-        console.log(response.errors);
-        return;
-      }
-      refetchCourses();
-    },
-    [deleteCourseGroup, refetchCourses, course]
-  );
+const insertCourseGroupIntoACourse = useMutationWithCourseId<
+  InsertCourseGroup,
+  InsertCourseGroupVariables
+>({
+  mutation: INSERT_COURSE_GROUP,
+  courseId: course.id,
+  refetchCourses,
+});
 
+const deleteCourseGroupFromACourse = useMutationWithCourseId<
+  DeleteCourseGroup,
+  DeleteCourseGroupVariables
+>({
+  mutation: DELETE_COURSE_GROUP,
+  courseId: course.id,
+  refetchCourses,
+});
+
+const insertCourseIntoADegree = useMutationWithCourseId<
+  InsertCourseDegree,
+  InsertCourseDegreeVariables
+>({
+  mutation: INSERT_COURSE_DEGREE,
+  courseId: course.id,
+  refetchCourses,
+});
+
+const deleteCourseFromADegree = useMutationWithCourseId<
+  DeleteCourseDegree,
+  DeleteCourseDegreeVariables
+>({
+  mutation: DELETE_COURSE_DEGREE,
+  courseId: course.id,
+  refetchCourses,
+});
+
+'
   const imageUploadRef: MutableRefObject<any> = useRef(null);
   const handleImageUploadClick = useCallback(() => {
     imageUploadRef.current?.click();
@@ -468,32 +603,26 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
     [course.id, refetchCourses, updateCourse]
   );
 
-  const handleCourseGroupsChange = useCallback(
-    (event, value) => {
-      const removedTag = courseGroupTags.find(
-        (courseGroupTag) => !value.includes(courseGroupTag)
-      );
-      const addedTag = value.find(
-        (courseGroupTag) => !courseGroupTags.includes(courseGroupTag)
-      );
-
-      if (removedTag) {
-        deleteCourseGroupFromACourse(removedTag.id);
-        setCourseGroupTags(value);
-        refetchCourses();
-      } else if (addedTag) {
-        insertCourseGroupIntoACourse(addedTag.id);
-        setCourseGroupTags(value);
-        refetchCourses();
-      }
-    },
-    [
-      courseGroupTags,
-      deleteCourseGroupFromACourse,
-      insertCourseGroupIntoACourse,
-      refetchCourses,
-    ]
+  const handleCourseGroupsChange = createHandleTagChange(
+    courseGroupTags,
+    deleteCourseGroupFromACourse,
+    insertCourseGroupIntoACourse,
+    setCourseGroupTags,
+    refetchCourses
   );
+
+  const handleDegreeChange = createHandleTagChange(
+    degreeTags,
+    deleteCourseFromADegree,
+    insertCourseIntoADegree,
+    setDegreeTags,
+    refetchCourses
+  );
+
+  const degreeOptions: SelectOption[] = courseGroupOptions.map((option) => ({
+    key: option.id,
+    label: t(`start-page:${option.title}`),
+  }));
 
   return (
     <>
@@ -677,34 +806,27 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                         inputText={course.ects || ''}
                       />
                     </div>
-                    <div className="col-span-10 flex mt-3">
-                      <Autocomplete
-                        className="w-3/4"
-                        multiple
-                        id="tags-standard"
-                        options={courseGroupOptions}
-                        getOptionLabel={(option) =>
-                          t(`start-page:${option.title}`)
-                        }
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="standard"
-                            label={t('course-page:courseGroups')}
-                            placeholder={t('course-page:courseGroups')}
-                            InputLabelProps={{
-                              style: { color: 'rgb(34, 34, 34)' },
-                            }}
-                          />
-                        )}
-                        onChange={handleCourseGroupsChange}
-                        defaultValue={courseGroups}
-                        limitTags={2}
-                        getOptionSelected={(option, value) =>
-                          option.id === value.id
-                        }
-                      />
-                    </div>
+                    <TagSelector
+                      options={courseGroupOptions}
+                      getOptionLabel={(option) =>
+                        t(`start-page:${option.title}`)
+                      }
+                      label={t('course-page:courseGroups')}
+                      placeholder={t('course-page:courseGroups')}
+                      onChange={handleCourseGroupsChange}
+                      defaultValue={courseGroups}
+                    />
+
+                    <TagSelector
+                      options={degreeOptions}
+                      getOptionLabel={(option) =>
+                        t(`start-page:${option.title}`)
+                      }
+                      label={t('common:degrees')}
+                      placeholder={t('common:degrees')}
+                      onChange={handleDegreeChange}
+                      defaultValue={degrees}
+                    />
                   </div>
                 </td>
               </div>
