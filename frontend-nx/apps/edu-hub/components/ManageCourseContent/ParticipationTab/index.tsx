@@ -290,6 +290,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({
               userEnrollments={passedUserEnrollmentsForAttendanceCertificate}
               course={course}
               certificateType="attendance"
+              refetchCourse={qResult.refetch}
             />
           )}
           {isAdmin && course.achievementCertificatePossible === true && (
@@ -297,6 +298,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({
               userEnrollments={passedUserEnrollmentsForAchievementCertificate}
               course={course}
               certificateType="achievement"
+              refetchCourse={qResult.refetch}
             />
           )}
         </div>

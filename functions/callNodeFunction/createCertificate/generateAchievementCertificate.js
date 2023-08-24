@@ -73,7 +73,7 @@ export const generateAchievementCertificate = async (
     await updateCourseEnrollmentRecord(
       courseEnrollment.User.id,
       courseEnrollment.Course.id,
-      "attendanceCertificateURL",
+      "achievementCertificateURL",
       path
     );
   } catch (error) {
