@@ -48,6 +48,7 @@ export const generateAttendanceCertificate = async (
     // Save the certificate to the Google Cloud Storage bucket
     const path = await saveCertificateToBucket(
       generatedCertificate,
+      'attendance',
       courseEnrollment.User.id,
       courseEnrollment.Course.id,
       bucket,
