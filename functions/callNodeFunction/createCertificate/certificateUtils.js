@@ -15,6 +15,7 @@ import { buildCloudStorage } from "../lib/cloud-storage.js";
  */
 export const saveCertificateToBucket = async (
   certificateData,
+  certificateType,
   userId,
   courseId,
   bucket,
@@ -28,7 +29,7 @@ export const saveCertificateToBucket = async (
 
     const storage = buildCloudStorage(Storage);
     const content = certificateData.pdf;
-    const path = `userid_${userId}/courseid_${courseId}/certificate_course_${courseId}.pdf`;
+    const path = `${userId}/${courseId}/${certificateType}_certificate_${courseId}.pdf`;
 
     const link = await storage.saveToBucket(path, bucket, content, isPublic);
     logger.debug(
