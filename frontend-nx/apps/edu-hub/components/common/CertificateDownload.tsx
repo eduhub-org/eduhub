@@ -64,23 +64,23 @@ export const CertificateDownload: FC<IProps> = ({
     skip: !courseEnrollment?.attendanceCertificateURL,
   });
 
-  useEffect(() => {
-    if (refetchAchievementCertificates) {
-      loadAchievementCerfificateRefetch();
-      setRefetchAchievementCertificates(false);
-    }
-    if (refetchParticipationCertificates) {
-      loadParticipationCerfificateRefetch();
-      setRefetchParticipationCertificates(false);
-    }
-  }, [
-    refetchAchievementCertificates,
-    refetchParticipationCertificates,
-    loadAchievementCerfificateRefetch,
-    loadParticipationCerfificateRefetch,
-    setRefetchAchievementCertificates,
-    setRefetchParticipationCertificates,
-  ]);
+  // useEffect(() => {
+  //   if (refetchAchievementCertificates) {
+  //     loadAchievementCerfificateRefetch();
+  //     setRefetchAchievementCertificates(false);
+  //   }
+  //   if (refetchParticipationCertificates) {
+  //     loadParticipationCerfificateRefetch();
+  //     setRefetchParticipationCertificates(false);
+  //   }
+  // }, [
+  //   refetchAchievementCertificates,
+  //   refetchParticipationCertificates,
+  //   loadAchievementCerfificateRefetch,
+  //   loadParticipationCerfificateRefetch,
+  //   setRefetchAchievementCertificates,
+  //   setRefetchParticipationCertificates,
+  // ]);
 
   return (
     <div className={!manageView && 'mt-4'}>
