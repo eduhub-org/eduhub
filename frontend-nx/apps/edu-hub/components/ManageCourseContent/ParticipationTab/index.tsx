@@ -2,7 +2,7 @@ import { LazyQueryResult, QueryResult } from '@apollo/client';
 import { ACHIEVEMENT_OPTION_COURSES } from '../../../queries/achievementOption';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
-import { FC, useCallback, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useCallback, useState } from 'react';
 import { useIsAdmin } from '../../../hooks/authentication';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import {
@@ -12,6 +12,7 @@ import {
   greyDot,
   redDot,
 } from '../../common/dots';
+import { CertificateDownload } from '../../common/CertificateDownload';
 
 import {
   MdAddCircle,
@@ -176,6 +177,12 @@ const ParticipationList: FC<IPropsParticipationList> = ({
 }) => {
   const { t } = useTranslation();
   const isAdmin = useIsAdmin();
+  const [refetchAchievementCertificates, setRefetchAchievementCertificates] =
+    useState(false);
+  const [
+    refetchParticipationCertificates,
+    setRefetchParticipationCertificates,
+  ] = useState(false);
 
   const tableHeaders: StaticComponentProperty[] = [
     { key: 0, label: t('firstName') },
@@ -281,6 +288,18 @@ const ParticipationList: FC<IPropsParticipationList> = ({
                   userId={ce.User.id}
                   qResult={qResult}
                   maxMissedSessions={course.maxMissedSessions}
+                  refetchAchievementCertificates={
+                    refetchAchievementCertificates
+                  }
+                  refetchParticipationCertificates={
+                    refetchParticipationCertificates
+                  }
+                  setRefetchAchievementCertificates={
+                    setRefetchAchievementCertificates
+                  }
+                  setRefetchParticipationCertificates={
+                    setRefetchParticipationCertificates
+                  }
                 />
               ))}
             </tbody>
@@ -290,6 +309,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({
               userEnrollments={passedUserEnrollmentsForAttendanceCertificate}
               course={course}
               certificateType="attendance"
+              refetch={setRefetchParticipationCertificates}
             />
           )}
           {isAdmin && course.achievementCertificatePossible === true && (
@@ -297,6 +317,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({
               userEnrollments={passedUserEnrollmentsForAchievementCertificate}
               course={course}
               certificateType="achievement"
+              refetch={setRefetchAchievementCertificates}
             />
           )}
         </div>
@@ -327,6 +348,10 @@ interface IPropsParticipationRow {
   qResult: QueryResult<any, any>;
   userId: string;
   maxMissedSessions: number;
+  refetchAchievementCertificates: boolean;
+  refetchParticipationCertificates: boolean;
+  setRefetchAchievementCertificates: Dispatch<SetStateAction<boolean>>;
+  setRefetchParticipationCertificates: Dispatch<SetStateAction<boolean>>;
 }
 const ParticipationRow: FC<IPropsParticipationRow> = ({
   enrollment,
@@ -334,6 +359,10 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
   qResult,
   userId,
   maxMissedSessions,
+  refetchAchievementCertificates,
+  refetchParticipationCertificates,
+  setRefetchAchievementCertificates,
+  setRefetchParticipationCertificates,
 }) => {
   const { t } = useTranslation();
   const [showDetails, setShowDetails] = useState(false);
@@ -515,27 +544,21 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
         </td>
 
         <td>
-          <div className="flex gap-3">
-            {enrollment.achievementCertificateURL && (
-              <Button
-                as="a"
-                href={enrollment.achievementCertificateURL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {t('manage-course:achievementCertificateDownload')}
-              </Button>
-            )}
-            {enrollment.attendanceCertificateURL && (
-              <Button
-                as="a"
-                href={enrollment.attendanceCertificateURL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {t('manage-course:attendanceCertificateDownload')}
-              </Button>
-            )}
+          <div className={tdStyle}>
+            <CertificateDownload
+              courseEnrollment={enrollment}
+              manageView
+              refetchAchievementCertificates={refetchAchievementCertificates}
+              refetchParticipationCertificates={
+                refetchParticipationCertificates
+              }
+              setRefetchAchievementCertificates={
+                setRefetchAchievementCertificates
+              }
+              setRefetchParticipationCertificates={
+                setRefetchParticipationCertificates
+              }
+            />
           </div>
         </td>
 

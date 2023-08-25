@@ -8,16 +8,18 @@ import {
   ManagedCourse_Course_by_pk_CourseEnrollments,
 } from '../../../queries/__generated__/ManagedCourse';
 
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 
 export const GenerateCertificatesButton = ({
   userEnrollments,
   course,
   certificateType,
+  refetch
 }: {
   userEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[];
   course: ManagedCourse_Course_by_pk;
   certificateType: 'attendance' | 'achievement' | 'degree';
+  refetch: Dispatch<SetStateAction<boolean>>;
 }) => {
   const { t } = useTranslation();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -53,6 +55,7 @@ export const GenerateCertificatesButton = ({
             })
           );
         }
+        refetch(true);
       })
       .catch((error) => {
         console.error(`Error creating ${certificateType} certificate:`, error);

@@ -63,17 +63,18 @@ export const generateAchievementCertificate = async (
     // Save the certificate to the Google Cloud Storage bucket
     const link = await saveCertificateToBucket(
       generatedCertificate,
+      'achievement',
       courseEnrollment.User.id,
       courseEnrollment.Course.id,
       bucket,
-      false
+      false,
     );
 
     // Update the course enrollment record with the certificate URL
     await updateCourseEnrollmentRecord(
       courseEnrollment.User.id,
       courseEnrollment.Course.id,
-      "attendanceCertificateURL",
+      "achievementCertificateURL",
       link
     );
   } catch (error) {

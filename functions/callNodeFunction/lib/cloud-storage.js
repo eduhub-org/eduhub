@@ -20,9 +20,8 @@ export const buildCloudStorage = (Storage) => {
     return {
       saveToBucket: async (filename, bucketName, content, isPublic) => {
         const tokens = filename.split("/");
-        const fpath = [bucketName, ...tokens.slice(0, tokens.length - 1)].join(
-          "/"
-        );
+        const returnPath = [...tokens.slice(0, tokens.length - 1)].join("/");
+        const fpath = [bucketName, returnPath].join("/");
         const fname = tokens[tokens.length - 1];
 
         await fs.promises.mkdir(www + fpath, { recursive: true });
@@ -34,14 +33,11 @@ export const buildCloudStorage = (Storage) => {
           Buffer.from(content, "base64")
         );
 
-        return encodeURI(
-          `http://localhost:${process.env.STORAGE_PORT}/${fullPath}`
-        );
+        return encodeURI(returnPath + "/" + fname);
       },
       loadFromBucket: async (path, bucketName) => {
-        const fullPath = bucketName + "/" + path;
         return encodeURI(
-          `http://localhost:${process.env.STORAGE_PORT}/${fullPath}`
+          `http://localhost:${process.env.STORAGE_PORT}/${path}`
         );
       },
     };
