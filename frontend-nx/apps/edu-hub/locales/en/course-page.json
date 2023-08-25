@@ -150,5 +150,7 @@
   "attendance-certificate-generation": "Generate Attendance Cartificates",
   "certificates-generated": "{{number}} certificates have been generated.",
   "1-certificate-generated": "One certificate has been generated.",
-  "no-certificates-generated": "No certificates have been generated."
+  "no-certificates-generated": "No certificates have been generated.",
+  "participationDataGenerate": "Generate Participation Data (CSV)",
+  "participationDataDownload": "Download Participation Data (CSV)"
 }

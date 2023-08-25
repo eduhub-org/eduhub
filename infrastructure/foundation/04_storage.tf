@@ -6,6 +6,16 @@
 resource "google_storage_bucket" "main" {
   name     = var.project_id
   location = var.region
+
+  lifecycle_rule {
+    action {
+      type = "Delete"
+    }
+    condition {
+      age              = 7
+      with_prefix      = "temp/"
+    }
+  }
 }
 
 # Give the github service account admin permission on the Google Storage bucket

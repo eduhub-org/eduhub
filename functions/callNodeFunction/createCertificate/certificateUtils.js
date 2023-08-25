@@ -15,6 +15,7 @@ import { buildCloudStorage } from "../lib/cloud-storage.js";
  */
 export const saveCertificateToBucket = async (
   certificateData,
+  certificateType,
   userId,
   courseId,
   bucket,
@@ -28,14 +29,14 @@ export const saveCertificateToBucket = async (
 
     const storage = buildCloudStorage(Storage);
     const content = certificateData.pdf;
-    const path = `userid_${userId}/courseid_${courseId}/certificate_course_${courseId}.pdf`;
+    const path = `${userId}/${courseId}/${certificateType}_certificate_${courseId}.pdf`;
 
     const link = await storage.saveToBucket(path, bucket, content, isPublic);
     logger.debug(
       `Saved certificate for user ${userId} and course ${courseId} to ${link}`
     );
 
-    return link;
+    return path;
   } catch (error) {
     logger.error(
       `Failed to save certificate for user ${userId} and course ${courseId}: ${error}`
@@ -59,7 +60,7 @@ export const updateCourseEnrollmentRecord = async (
   value
 ) => {
   try {
-    const mutation = gql`
+    const updateAchievementCertificateURL = gql`
       mutation UpdateEnrollment(
         $userId: uuid!
         $courseId: Int!
@@ -67,18 +68,39 @@ export const updateCourseEnrollmentRecord = async (
       ) {
         update_CourseEnrollment(
           where: { userId: { _eq: $userId }, courseId: { _eq: $courseId } }
-          _set: { ${field}: $value }
+          _set: { achievementCertificateURL: $value }
         ) {
           affected_rows
         }
       }
     `;
-    const mutationVariables = {
+    const updateAttendanceCertificateURL = gql`
+      mutation UpdateEnrollment(
+        $userId: uuid!
+        $courseId: Int!
+        $value: String!
+      ) {
+        update_CourseEnrollment(
+          where: { userId: { _eq: $userId }, courseId: { _eq: $courseId } }
+          _set: { attendanceCertificateURL: $value }
+        ) {
+          affected_rows
+        }
+      }
+    `;
+
+    const mutation =
+      field === "achievementCertificateURL"
+        ? updateAchievementCertificateURL
+        : updateAttendanceCertificateURL;
+
+    const Variables = {
       userId: userId,
       courseId: courseId,
       value: value,
     };
-    await request(process.env.HASURA_ENDPOINT, mutation, mutationVariables, {
+
+    await request(process.env.HASURA_ENDPOINT, mutation, Variables, {
       "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET,
     });
 

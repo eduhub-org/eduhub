@@ -55,26 +55,27 @@ export const generateAchievementCertificate = async (
     const url = "https://edu-old.opencampus.sh/create_certificate_rest";
     const generatedCertificate = await got.post(url, certificateData).json();
 
-    // Log the certificate data
+    // Log the generated certificate
     logger.debug(
       `Generated achievement certificate for user ${courseEnrollment.User.id} and course ${courseEnrollment.Course.id}`
     );
 
     // Save the certificate to the Google Cloud Storage bucket
-    const link = await saveCertificateToBucket(
+    const path = await saveCertificateToBucket(
       generatedCertificate,
+      'achievement',
       courseEnrollment.User.id,
       courseEnrollment.Course.id,
       bucket,
-      false
+      false,
     );
 
     // Update the course enrollment record with the certificate URL
     await updateCourseEnrollmentRecord(
       courseEnrollment.User.id,
       courseEnrollment.Course.id,
-      "attendanceCertificateURL",
-      link
+      "achievementCertificateURL",
+      path
     );
   } catch (error) {
     throw error;

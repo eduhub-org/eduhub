@@ -1,4 +1,9 @@
 {
-    "editor.wordWrap": "wordWrapColumn",
-    "editor.wordWrapColumn": 120
+  "editor.wordWrap": "wordWrapColumn",
+  "editor.wordWrapColumn": 120,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "python.formatting.provider": "black",
+  "editor.defaultFormatter": "ms-python.black-formatter"
 }

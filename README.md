@@ -37,7 +37,7 @@ The following ports on the local machine are relevant
 
 - Port 4001 serves the files uploaded by the various serverless functions, during local development there is no concept of private links, all files can be directly accessed. This is because local development does not use google cloud buckets.
 - Port 8080 provides the hasura API
-- Port 5000 provides the Edu-Hub frontend
+- Port 5000 provides the EduHub frontend
 - Port 5001 provides the rent-a-scientist frontend
 - Port 28080 provides the keycloak admin interface, login as **admin** with password **admin**
 - Port 42000 to ~420025 provide serverless functions, each function has its own port, development of serverless functions might use these directly
@@ -51,9 +51,10 @@ There are a few helpful scripts.
 
 ## Technical details
 
+- For implementing a new Python serverless function consider the instructions given [here](./functions/callPythonFunction/README.md).
 - The hasura log is spammed by the JWK update, which happens once a second. This is correct hasura behavior for this setup.
 - The serverless functions watch their own code, so if it is changed the function is automatically rebuild
-- When adding new projects [this bug workaround](https://github.com/nrwl/nx/issues/9017#issuecomment-1140066503) has to be used!
+- When adding new frontend apps [this bug workaround](https://github.com/nrwl/nx/issues/9017#issuecomment-1140066503) has to be used!
 
 ## Updating the setup
 

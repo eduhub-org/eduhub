@@ -26,7 +26,7 @@ import {
 // import { Course_Course_by_pk } from '../../queries/__generated__/Course';
 
 import { Attendances } from './Attendances';
-import { CertificateDownload } from './CertificateDownload';
+import { CertificateDownload } from '../../../common/CertificateDownload';
 import CourseAchievementOption from './CourseAchievementOption';
 import { getCourseEnrollment } from '../../../../helpers/util';
 import { useUserId } from '../../../../hooks/user';
@@ -109,7 +109,7 @@ export const AttendancesAndAchievements: FC<IProps> = ({ course }) => {
             <Attendances course={course} />
           </div>
           <div className="w-1/2 px-10">
-            <CertificateDownload course={course} />
+            <CertificateDownload courseEnrollment={courseEnrollment} />
           </div>
         </ContentRow>
       </>
