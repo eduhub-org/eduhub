@@ -46,7 +46,7 @@ def load_participation_data(arguments):
         url,
     )
 
-    return url
+    return f'{{"data": {{"link": "{url}"}}}}'
 
 
 #############################################################################################
