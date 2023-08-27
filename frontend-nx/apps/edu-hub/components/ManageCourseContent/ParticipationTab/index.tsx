@@ -309,6 +309,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({
               userEnrollments={passedUserEnrollmentsForAttendanceCertificate}
               course={course}
               certificateType="attendance"
+              refetchCourse={qResult.refetch}
               refetch={setRefetchParticipationCertificates}
             />
           )}
@@ -317,6 +318,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({
               userEnrollments={passedUserEnrollmentsForAchievementCertificate}
               course={course}
               certificateType="achievement"
+              refetchCourse={qResult.refetch}
               refetch={setRefetchAchievementCertificates}
             />
           )}

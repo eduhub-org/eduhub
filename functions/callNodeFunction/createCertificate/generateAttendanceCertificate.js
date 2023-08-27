@@ -46,7 +46,7 @@ export const generateAttendanceCertificate = async (
     );
 
     // Save the certificate to the Google Cloud Storage bucket
-    const link = await saveCertificateToBucket(
+    const path = await saveCertificateToBucket(
       generatedCertificate,
       'attendance',
       courseEnrollment.User.id,
@@ -60,16 +60,9 @@ export const generateAttendanceCertificate = async (
       courseEnrollment.User.id,
       courseEnrollment.Course.id,
       "attendanceCertificateURL",
-      link
+      path
     );
   } catch (error) {
-    logger.error(
-      `Error generating attendance certificate for user ${
-        courseEnrollment.User.id
-      } and course ${
-        courseEnrollment.Course.id
-      }. Certificate data: ${JSON.stringify(certificateData)}`
-    );
     throw error;
   }
 };

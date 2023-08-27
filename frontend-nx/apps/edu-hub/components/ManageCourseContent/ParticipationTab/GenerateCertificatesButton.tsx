@@ -8,17 +8,20 @@ import {
   ManagedCourse_Course_by_pk_CourseEnrollments,
 } from '../../../queries/__generated__/ManagedCourse';
 
+import { ApolloQueryResult } from '@apollo/client';
 import { Dispatch, SetStateAction, useState } from 'react';
 
 export const GenerateCertificatesButton = ({
   userEnrollments,
   course,
   certificateType,
+  refetchCourse,
   refetch
 }: {
   userEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[];
   course: ManagedCourse_Course_by_pk;
   certificateType: 'attendance' | 'achievement' | 'degree';
+  refetchCourse: (variables?: Partial<any>) => Promise<ApolloQueryResult<any>>;
   refetch: Dispatch<SetStateAction<boolean>>;
 }) => {
   const { t } = useTranslation();
@@ -60,6 +63,9 @@ export const GenerateCertificatesButton = ({
       .catch((error) => {
         console.error(`Error creating ${certificateType} certificate:`, error);
         setErrorMessage(error.message);
+      })
+      .finally(() => {
+        refetchCourse();
       });
   };
   return (
