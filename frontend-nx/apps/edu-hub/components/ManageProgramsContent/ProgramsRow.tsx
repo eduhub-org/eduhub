@@ -544,6 +544,8 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
                   t('course-page:participationDataGenerate')
                 )}
               </Button>
+            </div>
+            <div className="p-3">
               {loadParticipationDataResult &&
                 !loadParticipationDataLoading &&
                 !loadParticipationDataError && (
@@ -554,6 +556,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
                     }
                     target="_blank"
                     rel="noopener noreferrer"
+                    className='block'
                   >
                     {t('course-page:participationDataDownload')}
                   </Button>
