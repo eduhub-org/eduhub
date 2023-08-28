@@ -116,7 +116,7 @@ class StorageClient:
             logging.debug(f"blob path:  {full_blob_path}")
             os.makedirs(os.path.dirname(local_container_path), exist_ok=True)
             dataframe.to_csv(local_container_path, **default_csv_args)
-            return f"localhost:{self.STORAGE_PORT}/{self.bucket_name}/{full_blob_path}"
+            return f"http://localhost:{self.STORAGE_PORT}/{self.bucket_name}/{full_blob_path}"
         else:
             # If it's not development, use GCS
             blob = self.storage_client.bucket(self.bucket_name).blob(full_blob_path)

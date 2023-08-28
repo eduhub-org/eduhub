@@ -7,7 +7,6 @@ from datetime import datetime
 # os.chdir("/home/steffen/00_code/eduhub/functions/callPythonFunction/")
 from api_clients import EduHubClient, StorageClient
 
-
 def load_participation_data(arguments):
     """Function to load participation data from the csv file and update the attendance data in the database
     Args:
@@ -46,8 +45,7 @@ def load_participation_data(arguments):
         url,
     )
 
-    return f'{{"data": {{"link": "{url}"}}}}'
-
+    return {"link": url}
 
 #############################################################################################
 # Helper functions
