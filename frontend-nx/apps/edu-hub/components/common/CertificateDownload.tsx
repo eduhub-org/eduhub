@@ -5,7 +5,7 @@ import { useAuthedQuery } from '../../hooks/authedQuery';
 
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../queries/__generated__/CourseWithEnrollment';
 import { LOAD_ACHIEVEMENT_CERTIFICATE } from '../../queries/loadAchievementCertificate';
-import { LOAD_PARTICIPATION_CERTIFICATE } from '../../queries/loadParticipationCertificate';
+import { LOAD_ATTENDANCE_CERTIFICATE } from '../../queries/loadAttendanceCertificate';
 import { Button } from './Button';
 
 import {
@@ -13,26 +13,26 @@ import {
   loadAchievementCertificateVariables,
 } from '../../queries/__generated__/loadAchievementCertificate';
 import {
-  loadParticipationCertificate,
-  loadParticipationCertificateVariables,
-} from '../../queries/__generated__/loadParticipationCertificate';
+  loadAttendanceCertificate,
+  loadAttendanceCertificateVariables,
+} from '../../queries/__generated__/loadAttendanceCertificate';
 
 interface IProps {
   courseEnrollment: CourseWithEnrollment_Course_by_pk_CourseEnrollments;
   manageView?: boolean;
   refetchAchievementCertificates?: boolean;
-  refetchParticipationCertificates?: boolean;
+  refetchAttendanceCertificates?: boolean;
   setRefetchAchievementCertificates?: Dispatch<SetStateAction<boolean>>;
-  setRefetchParticipationCertificates?: Dispatch<SetStateAction<boolean>>;
+  setRefetchAttendanceCertificates?: Dispatch<SetStateAction<boolean>>;
 }
 
 export const CertificateDownload: FC<IProps> = ({
   courseEnrollment,
   manageView,
   refetchAchievementCertificates,
-  refetchParticipationCertificates,
+  refetchAttendanceCertificates,
   setRefetchAchievementCertificates,
-  setRefetchParticipationCertificates,
+  setRefetchAttendanceCertificates,
 }) => {
   const { t } = useTranslation();
 
@@ -51,13 +51,13 @@ export const CertificateDownload: FC<IProps> = ({
   });
 
   const {
-    data: loadParticipationCertificateData,
-    loading: loadParticipationCerfificateLoading,
-    refetch: loadParticipationCerfificateRefetch,
+    data: loadAttendanceCertificateData,
+    loading: loadAttendanceCertificateLoading,
+    refetch: loadAttendanceCertificateRefetch,
   } = useAuthedQuery<
-    loadParticipationCertificate,
-    loadParticipationCertificateVariables
-  >(LOAD_PARTICIPATION_CERTIFICATE, {
+    loadAttendanceCertificate,
+    loadAttendanceCertificateVariables
+  >(LOAD_ATTENDANCE_CERTIFICATE, {
     variables: {
       path: courseEnrollment?.attendanceCertificateURL,
     },
@@ -69,17 +69,17 @@ export const CertificateDownload: FC<IProps> = ({
   //     loadAchievementCerfificateRefetch();
   //     setRefetchAchievementCertificates(false);
   //   }
-  //   if (refetchParticipationCertificates) {
-  //     loadParticipationCerfificateRefetch();
-  //     setRefetchParticipationCertificates(false);
+  //   if (refetchAttendanceCertificates) {
+  //     loadAttendanceCertificateRefetch();
+  //     setRefetchAttendanceCertificates(false);
   //   }
   // }, [
   //   refetchAchievementCertificates,
-  //   refetchParticipationCertificates,
+  //   refetchAttendanceCertificates,
   //   loadAchievementCerfificateRefetch,
-  //   loadParticipationCerfificateRefetch,
+  //   loadAttendanceCertificateRefetch,
   //   setRefetchAchievementCertificates,
-  //   setRefetchParticipationCertificates,
+  //   setRefetchAttendanceCertificates,
   // ]);
 
   return (
@@ -108,13 +108,13 @@ export const CertificateDownload: FC<IProps> = ({
               </Button>
             </>
           )}
-        {loadParticipationCertificateData &&
-          !loadParticipationCerfificateLoading && (
+        {loadAttendanceCertificateData &&
+          !loadAttendanceCertificateLoading && (
             <Button
               as="a"
               filled
               href={
-                loadParticipationCertificateData.loadParticipationCertificate
+                loadAttendanceCertificateData.loadAttendanceCertificate
                   .link
               }
               target="_blank"

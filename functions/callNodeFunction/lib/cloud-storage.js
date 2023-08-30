@@ -36,10 +36,12 @@ export const buildCloudStorage = (Storage) => {
         return encodeURI(returnPath + "/" + fname);
       },
       loadFromBucket: async (path, bucketName) => {
+        const fullPath = bucketName + "/" + path;
         return encodeURI(
-          `http://localhost:${process.env.STORAGE_PORT}/${path}`
+          `http://localhost:${process.env.STORAGE_PORT}/${fullPath}`
         );
       },
+
     };
   } else {
     const storage = new Storage();

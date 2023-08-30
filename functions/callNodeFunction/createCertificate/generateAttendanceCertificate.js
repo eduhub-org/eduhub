@@ -1,7 +1,7 @@
 import got from "got";
-import { request, gql } from "graphql-request";
 import logger from "../index.js";
 import {
+  getStorageBucketURL,
   saveCertificateToBucket,
   updateCourseEnrollmentRecord,
 } from "./certificateUtils.js";
@@ -25,8 +25,7 @@ export const generateAttendanceCertificate = async (
 
     const certificateData = {
       json: {
-        template:
-          courseEnrollment.Course.Program.attendanceCertificateTemplateURL,
+        template: getStorageBucketURL(courseEnrollment.Course.Program.attendanceCertificateTemplateURL, bucket),
         full_name: `${courseEnrollment.User.firstName} ${courseEnrollment.User.lastName}`,
         semester: courseEnrollment.Course.Program.title,
         course_name: courseEnrollment.Course.title,

@@ -3,10 +3,48 @@ import logger from "../index.js";
 import { request, gql } from "graphql-request";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
 
+
+/**
+ * Get the URL to a file in the Google Cloud Storage bucket.
+ *
+ * @param {string} path The relative path of the file in the bucket.
+ * @param {string} bucket The name of the Google Cloud Storage bucket to save the certificate to.
+ * @returns {Promise<string>} A Promise that resolves to the URL of the saved file.
+ */
+export const getStorageBucketURL = async (
+  path,
+  bucket,
+) => {
+  try {
+
+    const storage = buildCloudStorage(Storage);
+    // log path and bucket
+    logger.debug(
+      `Path to file: ${path}`
+    );
+    logger.debug(
+      `Bucket: ${bucket}`
+    );
+    const url = await storage.loadFromBucket(path, bucket);
+    logger.debug(
+      `URL to file retrieved:  ${url}`
+    );
+
+    return url;
+  } catch (error) {
+    logger.error(
+      `Failed to retrieve link for file: ${error}`
+    );
+    throw error;
+  }
+};
+
+
 /**
  * Saves a certificate to a Google Cloud Storage bucket.
  *
- * @param {Object} certificateData The certificate data object returned by the certificate generation service.
+ * @param {object} certificateData The certificate data object returned by the certificate generation service.
+ * @param {string} certificateType The type of the certificate.
  * @param {string} userId The ID of the user associated with the certificate.
  * @param {number} courseId The ID of the course associated with the certificate.
  * @param {string} bucket The name of the Google Cloud Storage bucket to save the certificate to.

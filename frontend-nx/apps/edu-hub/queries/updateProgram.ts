@@ -11,7 +11,7 @@ export const INSERT_PROGRAM = gql`
         achievementRecordUploadDeadline: $today
         title: $title
         visibility: false
-        visibilityParticipationCertificate: false
+        visibilityAttendanceCertificate: false
         visibilityAchievementCertificate: false
         defaultMaxMissedSessions: 2
       }
@@ -77,14 +77,14 @@ export const UPDATE_PROGRAM_SHORT_TITLE = gql`
   }
 `;
 
-export const UPDATE_PARTICIPATION_CERTIFICATE_TEMPLATE = gql`
+export const UPDATE_ATTENDANCE_CERTIFICATE_TEMPLATE = gql`
   mutation UpdateProgramParticipationTemplate(
     $programId: Int!
     $templatePath: String!
   ) {
     update_Program_by_pk(
       pk_columns: { id: $programId }
-      _set: { participationCertificateTemplateURL: $templatePath }
+      _set: { attendanceCertificateTemplateURL: $templatePath }
     ) {
       id
     }
@@ -98,7 +98,7 @@ export const UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE = gql`
   ) {
     update_Program_by_pk(
       pk_columns: { id: $programId }
-      _set: { attendanceCertificateTemplateURL: $templatePath }
+      _set: { achievementCertificateTemplateURL: $templatePath }
     ) {
       id
     }
@@ -229,7 +229,7 @@ export const UPDATE_PROGRAM_PARTICIPATION_CERT_VISIBLE = gql`
   ) {
     update_Program_by_pk(
       pk_columns: { id: $programId }
-      _set: { visibilityParticipationCertificate: $isVisible }
+      _set: { visibilityAttendanceCertificate: $isVisible }
     ) {
       id
     }
