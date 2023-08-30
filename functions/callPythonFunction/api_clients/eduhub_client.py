@@ -140,6 +140,8 @@ class EduHubClient:
                             employment
                         }
                     }
+                    ects
+                    title
                 }
             }
         }"""
@@ -152,6 +154,8 @@ class EduHubClient:
                 user_info = unnested_enrollment.pop("User")
                 for key, value in user_info.items():
                     unnested_enrollment[f"User_{key}"] = value
+                unnested_enrollment["Course_ects"] = item["ects"]
+                unnested_enrollment["Course_title"] = item["title"]
                 unnested_list.append(unnested_enrollment)
         # Convert the unnested list to a DataFrame
         return pd.DataFrame(unnested_list)
