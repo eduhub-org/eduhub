@@ -6,6 +6,33 @@ import {
   updateCourseEnrollmentRecord,
 } from "./certificateUtils.js";
 
+import PdfPrinter from "pdfmake/src/printer";
+
+function createPDF() {
+  // Return a new promise.
+  return new Promise(function(resolve, reject) {
+    let pdfCreation = false;
+    var docDefinition = {pageSize: 'A4',
+                         pageMargins: [ 40, 60, 40, 60 ],
+                         content: ['First paragraph',
+                                  'Another paragraph, this time a little bit longer to make sure, this line will be divided into at least two lines']
+                        }
+    const fontDescriptors = {Roboto: 
+                              { normal: './fonts/Roboto-Regular.ttf',
+                                bold: './fonts/Roboto-Medium.ttf',
+                                italics: './fonts/Roboto-Italic.ttf',
+                                bolditalics: './fonts/Roboto-MediumItalic.ttf',
+                              }
+                            };
+    const printer = new PdfPrinter(fontDescriptors);
+    const pdfDoc = printer.createPdfKitDocument(docDefinition);
+
+    console.log('Pdf successfully created!');
+    resolve("file_name");
+    pdfDoc.end();
+  });
+}
+
 /**
  * Generates an achievement certificate for a user.
  *
@@ -52,8 +79,9 @@ export const generateAchievementCertificate = async (
     logger.debug(`Certificate data: ${JSON.stringify(certificateData)}`);
 
     // Send the certificate generation request to the certificate generation service
-    const url = "https://edu-old.opencampus.sh/create_certificate_rest";
-    const generatedCertificate = await got.post(url, certificateData).json();
+    // const url = "https://edu-old.opencampus.sh/create_certificate_rest";
+    // const generatedCertificate = await got.post(url, certificateData).json();
+    const generatedCertificate = createPDF()
 
     // Log the generated certificate
     logger.debug(
