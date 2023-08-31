@@ -39,6 +39,49 @@ export const getStorageBucketURL = async (
   }
 };
 
+/**
+ * Gets an array with titles of attended sessions for the given course enrollment.
+ * @param participationList - The course enrollment array to get attendance records for.
+ * @param sessions - The sessions array to get attendance records for.
+ * @returns An array the titles of the attendanded sessions.
+ */
+export const getAttendandedSessions = (
+  enrollment,
+  sessions
+) => {
+  const attendances = sessions.map((session) => {
+    //get all attendance records for a single session (there might be multiple if the status was changed over time)
+    const attendancesForSession = enrollment?.User.Attendances.filter(
+      (attendance) => attendance.Session.id === session.id
+    );
+    // log attendancesForSession
+    logger.debug(
+      `Attendances for session: ${JSON.stringify(attendancesForSession)}`
+    );
+    // get the attendance that was added last by selecting the one with th highest id
+    const attendance =
+      attendancesForSession &&
+      attendancesForSession.length > 0 &&
+      attendancesForSession.sort((a, b) => b.id - a.id)[0];
+    return {
+      // only add new attendance if status is "ATTENDED"
+      sessionTitle: attendance?.status === "ATTENDED" ? session.title : null,
+      //date: session.startDateTime,
+      //status: attendance?.status || "NO_INFO",
+    };
+  });
+  // sort the session titles by start date of the session
+  attendances.sort((a, b) => a.date - b.date);
+
+  // get the session titles of the attendances
+  const attendedSessions = attendances
+  .filter(attendance => attendance.sessionTitle !== null)
+  .map(attendance => attendance.sessionTitle);
+
+  return attendedSessions;
+};
+
+
 
 /**
  * Saves a certificate to a Google Cloud Storage bucket.
@@ -168,6 +211,14 @@ export const fetchEnrollments = async (userIds, courseId) => {
         where: { userId: { _in: $userIds }, Course: { id: { _eq: $courseId } } }
       ) {
         User {
+          Attendances {
+            Session {
+              id
+              startDateTime
+            }
+            id
+            status
+          }
           firstName
           lastName
           AchievementRecordAuthors(
@@ -199,7 +250,9 @@ export const fetchEnrollments = async (userIds, courseId) => {
             attendanceCertificateTemplateURL
           }
           Sessions(order_by: { startDateTime: asc }) {
+            id
             title
+            startDateTime
           }
           id
           ects

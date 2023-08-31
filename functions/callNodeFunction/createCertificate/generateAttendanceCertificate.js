@@ -4,6 +4,7 @@ import {
   getStorageBucketURL,
   saveCertificateToBucket,
   updateCourseEnrollmentRecord,
+  getAttendandedSessions
 } from "./certificateUtils.js";
 
 /**
@@ -19,10 +20,8 @@ export const generateAttendanceCertificate = async (
   try {
     // Construct the certificateData object for the certificate generation request
 
-    const sessionTitles = courseEnrollment.Course.Sessions.map(
-      (session) => session.title
-    );
-
+    // Get the attendend session titles
+    const sessionTitles = getAttendandedSessions(courseEnrollment, courseEnrollment.Course.Sessions)
     const certificateData = {
       json: {
         template: getStorageBucketURL(courseEnrollment.Course.Program.attendanceCertificateTemplateURL, bucket),
