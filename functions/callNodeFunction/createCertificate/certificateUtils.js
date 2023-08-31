@@ -247,6 +247,7 @@ export const fetchEnrollments = async (userIds, courseId) => {
         Course {
           Program {
             title
+            achievementCertificateTemplateURL
             attendanceCertificateTemplateURL
           }
           Sessions(order_by: { startDateTime: asc }) {
