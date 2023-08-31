@@ -39,10 +39,6 @@ export interface AdminProgramFragment {
    */
   applicationStart: any | null;
   /**
-   * The URL to the pdf template for the attendance certificate
-   */
-  attendanceCertificateTemplateURL: string | null;
-  /**
    * The questionnaire that the participants of all courses get sent after the last session of their course.
    */
   closingQuestionnaire: string | null;
@@ -55,10 +51,6 @@ export interface AdminProgramFragment {
    */
   defaultMaxMissedSessions: number | null;
   /**
-   * The URL to the pdf template for the attendance certificate
-   */
-  participationCertificateTemplateURL: string | null;
-  /**
    * The questionnaire that is sent after all course sessions including a speaker.
    */
   speakerQuestionnaire: string | null;
@@ -66,6 +58,14 @@ export interface AdminProgramFragment {
    * The questionnaire that the participants of all courses get sent after the first session of their course.
    */
   startQuestionnaire: string | null;
+  /**
+   * The URL to the pdf template for the attendance certificate
+   */
+  attendanceCertificateTemplateURL: string | null;
+  /**
+   * The URL to the pdf template for the attendance certificate
+   */
+  achievementCertificateTemplateURL: string | null;
   /**
    * Defines whether the tab for this course program is shown or not.
    */
@@ -77,5 +77,5 @@ export interface AdminProgramFragment {
   /**
    * Sets the participation certificates for all courses of htis program to be visible for the recipients.
    */
-  visibilityParticipationCertificate: boolean | null;
+  visibilityAttendanceCertificate: boolean | null;
 }

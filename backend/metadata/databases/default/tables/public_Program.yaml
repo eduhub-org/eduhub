@@ -31,7 +31,7 @@ select_permissions:
         - published
         - visibility
         - visibilityAchievementCertificate
-        - visibilityParticipationCertificate
+        - visibilityAttendanceCertificate
         - shortTitle
         - applicationStart
         - achievementRecordUploadDeadline
@@ -44,7 +44,7 @@ select_permissions:
         - closingQuestionnaire
         - title
         - attendanceCertificateTemplateURL
-        - participationCertificateTemplateURL
+        - achievementCertificateTemplateURL
       filter: {}
   - role: anonymous
     permission:
@@ -73,14 +73,14 @@ select_permissions:
         - id
         - lectureEnd
         - lectureStart
-        - participationCertificateTemplateURL
+        - achievementCertificateTemplateURL
         - published
         - shortTitle
         - speakerQuestionnaire
         - startQuestionnaire
         - title
         - visibilityAchievementCertificate
-        - visibilityParticipationCertificate
+        - visibilityAttendanceCertificate
       filter: {}
 update_permissions:
   - role: admin-ras
@@ -90,7 +90,7 @@ update_permissions:
         - published
         - visibility
         - visibilityAchievementCertificate
-        - visibilityParticipationCertificate
+        - visibilityAttendanceCertificate
         - shortTitle
         - applicationStart
         - achievementRecordUploadDeadline
@@ -103,6 +103,6 @@ update_permissions:
         - closingQuestionnaire
         - title
         - attendanceCertificateTemplateURL
-        - participationCertificateTemplateURL
+        - achievementCertificateTemplateURL
       filter: {}
       check: {}

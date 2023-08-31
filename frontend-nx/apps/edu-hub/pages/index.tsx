@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { FC, Fragment } from 'react';
+import { FC, Fragment, useEffect, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
 import { Page } from '../components/Page';
@@ -10,6 +10,7 @@ import {
   useIsLoggedIn,
   useIsInstructor,
   useIsAdmin,
+  useIsSessionLoading,
 } from '../hooks/authentication';
 import { useUserId } from '../hooks/user';
 import { CourseGroupOptions } from '../queries/__generated__/CourseGroupOptions';
@@ -28,9 +29,11 @@ const Home: FC = () => {
   const isInstructor = useIsInstructor();
   const isAdmin = useIsAdmin();
   const userId = useUserId();
+  const isSessionLoading = useIsSessionLoading();
+  const [myAdminCourses, setMyAdminCourses] = useState([]);
 
   // (My) Admin Courses
-  const { data: adminCourses, error: adminCoursesError } =
+  const { data: adminCourses, error: adminCoursesError, loading: adminCoursesLoading } =
     useInstructorQuery<CourseListWithInstructors>(COURSE_LIST_WITH_INSTRUCTOR, {
       skip: !isLoggedIn || !(isInstructor || isAdmin),
     });
@@ -38,12 +41,18 @@ const Home: FC = () => {
   if (adminCoursesError) {
     // console.log('got error in query for admin courses!', adminCoursesError);
   }
-  const myAdminCourses =
-    adminCourses?.Course?.filter((course) =>
-      course.CourseInstructors.find(
-        (instructor) => instructor.Expert.User.id === userId
-      )
-    ) ?? [];
+
+  useEffect(() => {
+    if (!isSessionLoading && userId !== null && !adminCoursesLoading) {
+      setMyAdminCourses(
+        adminCourses?.Course?.filter((course) =>
+          course.CourseInstructors.find(
+            (instructor) => instructor.Expert.User.id === userId
+          )
+        ) ?? []
+      );
+    }
+  }, [isSessionLoading, adminCoursesLoading, adminCourses?.Course, userId]);
 
   // (My) Enrolled Courses
   const { data: enrolledCourses, error: enrolledCoursesError } =

@@ -1,4 +1,7 @@
 {
+  "confirmation": "Confirmation",
+  "warning": "Warning",
+  "delete": "Delete",
   "loginButton": "Login",
   "registerButton": "Register",
   "language": "Language",
