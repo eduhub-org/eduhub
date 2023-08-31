@@ -20,11 +20,13 @@ export const generateAttendanceCertificate = async (
   try {
     // Construct the certificateData object for the certificate generation request
 
+    const certificateTemplateUrl = await getStorageBucketURL(courseEnrollment.Course.Program.attendanceCertificateTemplateURL, bucket);
+
     // Get the attendend session titles
     const sessionTitles = getAttendandedSessions(courseEnrollment, courseEnrollment.Course.Sessions)
     const certificateData = {
       json: {
-        template: getStorageBucketURL(courseEnrollment.Course.Program.attendanceCertificateTemplateURL, bucket),
+        template: certificateTemplateUrl[0],
         full_name: `${courseEnrollment.User.firstName} ${courseEnrollment.User.lastName}`,
         semester: courseEnrollment.Course.Program.title,
         course_name: courseEnrollment.Course.title,
