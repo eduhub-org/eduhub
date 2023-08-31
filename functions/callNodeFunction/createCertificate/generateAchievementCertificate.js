@@ -37,7 +37,7 @@ export const generateAchievementCertificate = async (
       .join("\n");
 
     // Get the certificate template URL
-    const certificateTemplateURL = getStorageBucketURL(courseEnrollment.Course.Program.achievementCertificateTemplateURL, bucket)
+    const certificateTemplateURL = await getStorageBucketURL(courseEnrollment.Course.Program.achievementCertificateTemplateURL, bucket)
 
     // Log the certificate template URL
     logger.debug(
@@ -47,7 +47,7 @@ export const generateAchievementCertificate = async (
     // Construct the certificateData object for the certificate generation request
     const certificateData = {
       json: {
-        template: certificateTemplateURL,
+        template: certificateTemplateURL[0],
         full_name: `${courseEnrollment.User.firstName} ${courseEnrollment.User.lastName}`,
         semester: courseEnrollment.Course.Program.title,
         course_name: courseEnrollment.Course.title,
