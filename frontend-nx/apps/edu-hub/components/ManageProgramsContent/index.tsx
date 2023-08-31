@@ -366,7 +366,7 @@ export const ManageProgramsContent: FC = () => {
     UpdateProgramParticipationCertVisible,
     UpdateProgramParticipationCertVisibleVariables
   >(UPDATE_PROGRAM_PARTICIPATION_CERT_VISIBLE);
-  const handleProgramParticipationCertVisible = useCallback(
+  const handleProgramAttendanceCertificateVisible = useCallback(
     async (p: ProgramList_Program, isVisible: boolean) => {
       await updateProgramParticipationCertVisible({
         variables: {
@@ -499,8 +499,8 @@ export const ManageProgramsContent: FC = () => {
                 onSetStartQuestionnaire={handleStartQuestionaire}
                 onSetClosingQuestionnaire={handleClosingQuestionaire}
                 onSetSpeakerQuestionnaire={handleSpeakerQuestionaire}
-                onSetVisibilityParticipationCertificate={
-                  handleProgramParticipationCertVisible
+                onSetVisibilityAttendanceCertificate={
+                  handleProgramAttendanceCertificateVisible
                 }
                 onSetVisibilityAchievementCertificate={
                   handleProgramAchievementCertVisible

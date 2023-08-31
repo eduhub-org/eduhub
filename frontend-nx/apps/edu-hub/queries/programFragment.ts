@@ -32,15 +32,15 @@ export const ADMIN_PROGRAM_FRAGMENT = gql`
   fragment AdminProgramFragment on Program {
     ...ProgramFragmentMinimumProperties
     applicationStart
-    attendanceCertificateTemplateURL
     closingQuestionnaire
     defaultApplicationEnd
     defaultMaxMissedSessions
-    participationCertificateTemplateURL
     speakerQuestionnaire
     startQuestionnaire
+    attendanceCertificateTemplateURL
+    achievementCertificateTemplateURL
     visibility
     visibilityAchievementCertificate
-    visibilityParticipationCertificate
+    visibilityAttendanceCertificate
   }
 `;

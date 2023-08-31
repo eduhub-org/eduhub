@@ -6,25 +6,8 @@ type Mutation {
   ): result
 }
 
-type Mutation {
-  createParticipationCertificate(
-    template: String!
-    firstname: String!
-    lastname: String!
-    semester: String!
-    course_name: String!
-    event_entries: [String!]
-  ): createCertificateOutput
-}
-
 type Query {
   loadAchievementCertificate(
-    path: String!
-  ): loadFileOutput
-}
-
-type Query {
-  loadAchievementCertificateTemplate(
     path: String!
   ): loadFileOutput
 }
@@ -48,7 +31,7 @@ type Query {
 }
 
 type Query {
-  loadParticipationCertificate(
+  loadAttendanceCertificate(
     path: String!
   ): loadFileOutput
 }
@@ -57,20 +40,6 @@ type Query {
   loadParticipationData(
     programId: Int!
   ): loadFileOutput
-}
-
-type Query {
-  loadparticipationCertificateTemplate(
-    path: String!
-  ): loadFileOutput
-}
-
-type Mutation {
-  saveAchievementCertificate(
-    base64file: String!
-    courseid: Int!
-    userid: String!
-  ): saveFileOutput
 }
 
 type Mutation {
@@ -112,26 +81,18 @@ type Mutation {
 }
 
 type Mutation {
+  saveAttendanceCertificateTemplate(
+    base64file: String!
+    filename: String!
+    programid: Int!
+  ): saveFileOutput
+}
+
+type Mutation {
   saveCourseImage(
     base64file: String!
     filename: String!
     courseid: Int!
-  ): saveFileOutput
-}
-
-type Mutation {
-  saveParticipationCertificate(
-    base64file: String!
-    courseid: Int!
-    userid: String!
-  ): saveFileOutput
-}
-
-type Mutation {
-  saveParticipationCertificateTemplate(
-    base64file: String!
-    filename: String!
-    programid: Int!
   ): saveFileOutput
 }
 

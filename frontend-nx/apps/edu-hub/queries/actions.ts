@@ -11,16 +11,17 @@ import { gql } from '@apollo/client';
 // - loadFile then returns the full URL with a token parameter to access the data, but only if the current user
 // is allowed to access the data
 
-export const SAVE_ACHIEVEMENT_CERTIFICATE = gql`
-  mutation SaveAchievementCertificate(
+
+export const SAVE_ATTENDANCE_CERTIFICATE_TEMPLATE = gql`
+  mutation SaveAttendanceCertificateTemplate(
     $base64File: String!
-    $courseId: Int!
-    $userId: String!
+    $fileName: String!
+    $programId: Int!
   ) {
-    saveAchievementCertificate(
+    saveAttendanceCertificateTemplate(
       base64file: $base64File
-      courseid: $courseId
-      userid: $userId
+      filename: $fileName
+      programid: $programId
     ) {
       google_link
       path
@@ -125,22 +126,7 @@ export const SAVE_COURSE_IMAGE = gql`
     }
   }
 `;
-export const SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE = gql`
-  mutation SaveParticipationCertificateTemplate(
-    $base64File: String!
-    $fileName: String!
-    $programId: Int!
-  ) {
-    saveParticipationCertificateTemplate(
-      base64file: $base64File
-      filename: $fileName
-      programid: $programId
-    ) {
-      google_link
-      path
-    }
-  }
-`;
+
 export const LOAD_FILE = gql`
   query LoadAFile($path: String!) {
     loadAchievementCertificate(path: $path) {
@@ -178,28 +164,6 @@ export const SAVE_USER_PROFILE_IMAGE = gql`
     ) {
       google_link
       path
-    }
-  }
-`;
-
-export const CREATE_PARTICIPATION_CERTIFICATE = gql`
-  mutation createParticipationCertificate(
-    $template: String!
-    $firstname: String!
-    $lastname: String!
-    $semester: String!
-    $course_name: String!
-    $event_entries: [String!]
-  ) {
-    createParticipationCertificate(
-      template: $template
-      firstname: $firstname
-      lastname: $lastname
-      semester: $semester
-      course_name: $course_name
-      event_entries: $event_entries
-    ) {
-      pdf
     }
   }
 `;

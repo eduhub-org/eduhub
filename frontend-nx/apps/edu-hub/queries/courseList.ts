@@ -5,7 +5,7 @@ import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from './programFragment';
 
 export const COURSE_LIST_ANONYMOUS = gql`
   ${COURSE_TILE_FRAGMENT_ANONYMOUS}
-  query CourseTileListAnonymous($where: Course_bool_exp! = {}) {
+  query CourseTileListAnonymous {
     Course(order_by: { id: desc }) {
       ...CourseTileFragmentAnonymous
     }
@@ -14,7 +14,7 @@ export const COURSE_LIST_ANONYMOUS = gql`
 
 export const COURSE_LIST = gql`
   ${COURSE_FRAGMENT}
-  query CourseList($where: Course_bool_exp! = {}) {
+  query CourseList {
     Course(order_by: { updated_at: desc }) {
       ...CourseFragment
     }
