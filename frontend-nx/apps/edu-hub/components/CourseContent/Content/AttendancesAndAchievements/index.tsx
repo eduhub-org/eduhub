@@ -6,7 +6,7 @@ import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTyp
 import { useAuthedQuery } from '../../../../hooks/authedQuery';
 import { CourseWithEnrollment_Course_by_pk } from '../../../../queries/__generated__/CourseWithEnrollment';
 import { LOAD_ACHIEVEMENT_CERTIFICATE } from '../../../../queries/loadAchievementCertificate';
-import { LOAD_PARTICIPATION_CERTIFICATE } from '../../../../queries/loadParticipationCertificate';
+import { LOAD_ATTENDANCE_CERTIFICATE } from '../../../../queries/loadAttendanceCertificate';
 import { Button } from '../../../common/Button';
 
 import {
@@ -14,9 +14,9 @@ import {
   loadAchievementCertificateVariables,
 } from '../../../../queries/__generated__/loadAchievementCertificate';
 import {
-  loadParticipationCertificate,
-  loadParticipationCertificateVariables,
-} from '../../../../queries/__generated__/loadParticipationCertificate';
+  loadAttendanceCertificate,
+  loadAttendanceCertificateVariables,
+} from '../../../../queries/__generated__/loadAttendanceCertificate';
 
 import {
   getEndTimeString,
@@ -59,12 +59,12 @@ export const AttendancesAndAchievements: FC<IProps> = ({ course }) => {
   });
 
   const {
-    data: loadParticipationCertificateData,
-    loading: loadParticipationCerfificateLoading,
+    data: loadAttendanceCertificateData,
+    loading: loadAttendanceCertificateLoading,
   } = useAuthedQuery<
-    loadParticipationCertificate,
-    loadParticipationCertificateVariables
-  >(LOAD_PARTICIPATION_CERTIFICATE, {
+    loadAttendanceCertificate,
+    loadAttendanceCertificateVariables
+  >(LOAD_ATTENDANCE_CERTIFICATE, {
     variables: {
       path: courseEnrollment?.attendanceCertificateURL,
     },

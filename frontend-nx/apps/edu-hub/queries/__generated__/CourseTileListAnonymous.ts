@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Course_bool_exp, Weekday_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseTileListAnonymous
@@ -67,8 +67,4 @@ export interface CourseTileListAnonymous {
    * fetch data from the table: "Course"
    */
   Course: CourseTileListAnonymous_Course[];
-}
-
-export interface CourseTileListAnonymousVariables {
-  where: Course_bool_exp;
 }

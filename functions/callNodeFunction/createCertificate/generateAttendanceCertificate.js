@@ -1,9 +1,10 @@
 import got from "got";
-import { request, gql } from "graphql-request";
 import logger from "../index.js";
 import {
+  getStorageBucketURL,
   saveCertificateToBucket,
   updateCourseEnrollmentRecord,
+  getAttendandedSessions
 } from "./certificateUtils.js";
 
 /**
@@ -19,14 +20,13 @@ export const generateAttendanceCertificate = async (
   try {
     // Construct the certificateData object for the certificate generation request
 
-    const sessionTitles = courseEnrollment.Course.Sessions.map(
-      (session) => session.title
-    );
+    const certificateTemplateUrl = await getStorageBucketURL(courseEnrollment.Course.Program.attendanceCertificateTemplateURL, bucket);
 
+    // Get the attendend session titles
+    const sessionTitles = getAttendandedSessions(courseEnrollment, courseEnrollment.Course.Sessions)
     const certificateData = {
       json: {
-        template:
-          courseEnrollment.Course.Program.attendanceCertificateTemplateURL,
+        template: certificateTemplateUrl[0],
         full_name: `${courseEnrollment.User.firstName} ${courseEnrollment.User.lastName}`,
         semester: courseEnrollment.Course.Program.title,
         course_name: courseEnrollment.Course.title,

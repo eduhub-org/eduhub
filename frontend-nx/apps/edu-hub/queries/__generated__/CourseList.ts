@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Course_bool_exp, Weekday_enum, SessionAddressType_enum, LocationOption_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, SessionAddressType_enum, LocationOption_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseList
@@ -263,8 +263,4 @@ export interface CourseList {
    * fetch data from the table: "Course"
    */
   Course: CourseList_Course[];
-}
-
-export interface CourseListVariables {
-  where: Course_bool_exp;
 }

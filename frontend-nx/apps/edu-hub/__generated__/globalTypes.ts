@@ -752,6 +752,7 @@ export enum Program_constraint {
  * update columns of table "Program"
  */
 export enum Program_update_column {
+  achievementCertificateTemplateURL = "achievementCertificateTemplateURL",
   achievementRecordUploadDeadline = "achievementRecordUploadDeadline",
   applicationStart = "applicationStart",
   attendanceCertificateTemplateURL = "attendanceCertificateTemplateURL",
@@ -761,7 +762,6 @@ export enum Program_update_column {
   id = "id",
   lectureEnd = "lectureEnd",
   lectureStart = "lectureStart",
-  participationCertificateTemplateURL = "participationCertificateTemplateURL",
   published = "published",
   shortTitle = "shortTitle",
   speakerQuestionnaire = "speakerQuestionnaire",
@@ -769,7 +769,7 @@ export enum Program_update_column {
   title = "title",
   visibility = "visibility",
   visibilityAchievementCertificate = "visibilityAchievementCertificate",
-  visibilityParticipationCertificate = "visibilityParticipationCertificate",
+  visibilityAttendanceCertificate = "visibilityAttendanceCertificate",
 }
 
 /**
@@ -4514,6 +4514,7 @@ export interface Program_bool_exp {
   _and?: Program_bool_exp[] | null;
   _not?: Program_bool_exp | null;
   _or?: Program_bool_exp[] | null;
+  achievementCertificateTemplateURL?: String_comparison_exp | null;
   achievementRecordUploadDeadline?: date_comparison_exp | null;
   applicationStart?: date_comparison_exp | null;
   attendanceCertificateTemplateURL?: String_comparison_exp | null;
@@ -4523,7 +4524,6 @@ export interface Program_bool_exp {
   id?: Int_comparison_exp | null;
   lectureEnd?: date_comparison_exp | null;
   lectureStart?: date_comparison_exp | null;
-  participationCertificateTemplateURL?: String_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
   shortTitle?: String_comparison_exp | null;
   speakerQuestionnaire?: String_comparison_exp | null;
@@ -4531,7 +4531,7 @@ export interface Program_bool_exp {
   title?: String_comparison_exp | null;
   visibility?: Boolean_comparison_exp | null;
   visibilityAchievementCertificate?: Boolean_comparison_exp | null;
-  visibilityParticipationCertificate?: Boolean_comparison_exp | null;
+  visibilityAttendanceCertificate?: Boolean_comparison_exp | null;
 }
 
 /**
@@ -4541,6 +4541,7 @@ export interface Program_insert_input {
   Courses?: Course_arr_rel_insert_input | null;
   RentAScientistConfigs?: RentAScientistConfig_arr_rel_insert_input | null;
   ScientistOffers?: ScientistOffer_arr_rel_insert_input | null;
+  achievementCertificateTemplateURL?: string | null;
   achievementRecordUploadDeadline?: any | null;
   applicationStart?: any | null;
   attendanceCertificateTemplateURL?: string | null;
@@ -4550,7 +4551,6 @@ export interface Program_insert_input {
   id?: number | null;
   lectureEnd?: any | null;
   lectureStart?: any | null;
-  participationCertificateTemplateURL?: string | null;
   published?: boolean | null;
   shortTitle?: string | null;
   speakerQuestionnaire?: string | null;
@@ -4558,7 +4558,7 @@ export interface Program_insert_input {
   title?: string | null;
   visibility?: boolean | null;
   visibilityAchievementCertificate?: boolean | null;
-  visibilityParticipationCertificate?: boolean | null;
+  visibilityAttendanceCertificate?: boolean | null;
 }
 
 /**
@@ -4585,6 +4585,7 @@ export interface Program_order_by {
   Courses_aggregate?: Course_aggregate_order_by | null;
   RentAScientistConfigs_aggregate?: RentAScientistConfig_aggregate_order_by | null;
   ScientistOffers_aggregate?: ScientistOffer_aggregate_order_by | null;
+  achievementCertificateTemplateURL?: order_by | null;
   achievementRecordUploadDeadline?: order_by | null;
   applicationStart?: order_by | null;
   attendanceCertificateTemplateURL?: order_by | null;
@@ -4594,7 +4595,6 @@ export interface Program_order_by {
   id?: order_by | null;
   lectureEnd?: order_by | null;
   lectureStart?: order_by | null;
-  participationCertificateTemplateURL?: order_by | null;
   published?: order_by | null;
   shortTitle?: order_by | null;
   speakerQuestionnaire?: order_by | null;
@@ -4602,7 +4602,7 @@ export interface Program_order_by {
   title?: order_by | null;
   visibility?: order_by | null;
   visibilityAchievementCertificate?: order_by | null;
-  visibilityParticipationCertificate?: order_by | null;
+  visibilityAttendanceCertificate?: order_by | null;
 }
 
 export interface RentAScientistConfig_aggregate_bool_exp {

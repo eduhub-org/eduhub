@@ -180,8 +180,8 @@ const ParticipationList: FC<IPropsParticipationList> = ({
   const [refetchAchievementCertificates, setRefetchAchievementCertificates] =
     useState(false);
   const [
-    refetchParticipationCertificates,
-    setRefetchParticipationCertificates,
+    refetchAttendanceCertificates,
+    setRefetchAttendanceCertificates,
   ] = useState(false);
 
   const tableHeaders: StaticComponentProperty[] = [
@@ -230,7 +230,8 @@ const ParticipationList: FC<IPropsParticipationList> = ({
     participationEnrollments,
     sessions
   );
-  // assign passedUserEnrollments to the array of participationEnrollments filtered on enrollments from those users who have less then the allowed number of missed session attendances for this course
+
+  // assign passedUserEnrollments to the array of participationEnrollments filtered on enrollments from those users who have less then the allowed number of missed or not tracked attendances for this course
   const passedUserEnrollmentsForAttendanceCertificate =
     participationEnrollments.filter((enrollment) => {
       const userAttendances = attendances.filter(
@@ -239,7 +240,10 @@ const ParticipationList: FC<IPropsParticipationList> = ({
       const missedAttendances = userAttendances.filter(
         (attendance) => attendance.status === AttendanceStatus_enum.MISSED
       );
-      return missedAttendances.length <= course.maxMissedSessions;
+      const noInfoAttendances = userAttendances.filter(
+        (attendance) => attendance.status === AttendanceStatus_enum.NO_INFO
+      );
+      return missedAttendances.length + noInfoAttendances.length <= course.maxMissedSessions;
     });
 
   const passedUserEnrollmentsForAchievementCertificate =
@@ -251,7 +255,10 @@ const ParticipationList: FC<IPropsParticipationList> = ({
         const missedAttendances = userAttendances.filter(
           (attendance) => attendance.status === AttendanceStatus_enum.MISSED
         );
-        return missedAttendances.length <= course.maxMissedSessions;
+        const noInfoAttendances = userAttendances.filter(
+          (attendance) => attendance.status === AttendanceStatus_enum.NO_INFO
+        );
+          return missedAttendances.length + noInfoAttendances.length <= course.maxMissedSessions;
       })
       .filter((enrollment) => {
         const mostRecentRecord = enrollment.mostRecentRecord;
@@ -291,14 +298,14 @@ const ParticipationList: FC<IPropsParticipationList> = ({
                   refetchAchievementCertificates={
                     refetchAchievementCertificates
                   }
-                  refetchParticipationCertificates={
-                    refetchParticipationCertificates
+                  refetchAttendanceCertificates={
+                    refetchAttendanceCertificates
                   }
                   setRefetchAchievementCertificates={
                     setRefetchAchievementCertificates
                   }
-                  setRefetchParticipationCertificates={
-                    setRefetchParticipationCertificates
+                  setRefetchAttendanceCertificates={
+                    setRefetchAttendanceCertificates
                   }
                 />
               ))}
@@ -310,7 +317,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({
               course={course}
               certificateType="attendance"
               refetchCourse={qResult.refetch}
-              refetch={setRefetchParticipationCertificates}
+              refetch={setRefetchAttendanceCertificates}
             />
           )}
           {isAdmin && course.achievementCertificatePossible === true && (
@@ -351,9 +358,9 @@ interface IPropsParticipationRow {
   userId: string;
   maxMissedSessions: number;
   refetchAchievementCertificates: boolean;
-  refetchParticipationCertificates: boolean;
+  refetchAttendanceCertificates: boolean;
   setRefetchAchievementCertificates: Dispatch<SetStateAction<boolean>>;
-  setRefetchParticipationCertificates: Dispatch<SetStateAction<boolean>>;
+  setRefetchAttendanceCertificates: Dispatch<SetStateAction<boolean>>;
 }
 const ParticipationRow: FC<IPropsParticipationRow> = ({
   enrollment,
@@ -362,9 +369,9 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
   userId,
   maxMissedSessions,
   refetchAchievementCertificates,
-  refetchParticipationCertificates,
+  refetchAttendanceCertificates,
   setRefetchAchievementCertificates,
-  setRefetchParticipationCertificates,
+  setRefetchAttendanceCertificates,
 }) => {
   const { t } = useTranslation();
   const [showDetails, setShowDetails] = useState(false);
@@ -551,14 +558,14 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
               courseEnrollment={enrollment}
               manageView
               refetchAchievementCertificates={refetchAchievementCertificates}
-              refetchParticipationCertificates={
-                refetchParticipationCertificates
+              refetchAttendanceCertificates={
+                refetchAttendanceCertificates
               }
               setRefetchAchievementCertificates={
                 setRefetchAchievementCertificates
               }
-              setRefetchParticipationCertificates={
-                setRefetchParticipationCertificates
+              setRefetchAttendanceCertificates={
+                setRefetchAttendanceCertificates
               }
             />
           </div>

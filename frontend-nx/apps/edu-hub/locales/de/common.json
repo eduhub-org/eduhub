@@ -1,4 +1,7 @@
 {
+  "confirmation": "Bestätigung",
+  "warning": "Warnung",
+  "delete": "Löschen",
   "loginButton": "Anmelden",
   "registerButton": "Registrieren",
   "language": "Sprache",

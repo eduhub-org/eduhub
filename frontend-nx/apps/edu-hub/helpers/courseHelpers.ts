@@ -49,14 +49,11 @@ export const getAttendancesForParticipants = (
   sessions: ManagedCourse_Course_by_pk_Sessions[]
 ) => {
   const attendances = participationList.flatMap((participant) => {
-    // get enrollment for a single participant
-    const enrollment = participationList.find(
-      (enrollment) => enrollment.userId === participant.User
-    );
     const attendances = sessions.map((session) => {
       //get all attendance records for a single session (there might be multiple if the status was changed over time)
-      const attendancesForSession = enrollment?.User.Attendances.filter(
-        (attendance) => attendance.Session.id === session.id
+      // const attendancesForSession = enrollment?.User.Attendances.filter(
+      const attendancesForSession = participant.User.Attendances.filter(
+          (attendance) => attendance.Session.id === session.id
       );
       // get the attendance that was added last by selecting the one with th highest id
       const attendance =

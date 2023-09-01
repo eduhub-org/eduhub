@@ -144,10 +144,6 @@ module "hasura_service" {
       value = google_cloudfunctions2_function.load_achievement_certificate.service_config[0].uri
     },
     {
-      name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE"
-      value = google_cloudfunctions2_function.save_achievement_certificate.service_config[0].uri
-    },
-    {
       name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE_TEMPLATE"
       value = google_cloudfunctions2_function.load_achievement_certificate_template.service_config[0].uri
     },

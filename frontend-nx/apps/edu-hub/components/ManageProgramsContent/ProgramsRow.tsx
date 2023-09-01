@@ -20,22 +20,22 @@ import { useAdminMutation } from '../../hooks/authedMutation';
 import { useLazyRoleQuery } from '../../hooks/authedQuery';
 import {
   SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
-  SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE,
+  SAVE_ATTENDANCE_CERTIFICATE_TEMPLATE,
 } from '../../queries/actions';
 import { LOAD_PARTICIPATION_DATA } from '../../queries/loadParticipationData';
 import {
   UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
-  UPDATE_PARTICIPATION_CERTIFICATE_TEMPLATE,
+  UPDATE_ATTENDANCE_CERTIFICATE_TEMPLATE,
 } from '../../queries/updateProgram';
 import { ProgramList_Program } from '../../queries/__generated__/ProgramList';
 import {
   SaveAchievementCertificateTemplate,
   SaveAchievementCertificateTemplateVariables,
-} from '../../queries/__generated__/SaveAchievementCertificateTemplate';
+} from '../../queries/__generated__//SaveAchievementCertificateTemplate';
 import {
-  SaveParticipationCertificateTemplate,
-  SaveParticipationCertificateTemplateVariables,
-} from '../../queries/__generated__/SaveParticipationCertificateTemplate';
+  SaveAttendanceCertificateTemplate,
+  SaveAttendanceCertificateTemplateVariables,
+} from '../../queries/__generated__/SaveAttendanceCertificateTemplate';
 
 import {
   UpdateProgramAchievementTemplate,
@@ -67,7 +67,7 @@ interface ProgramsRowProps {
   onSetStartQuestionnaire: (p: ProgramList_Program, link: string) => any;
   onSetSpeakerQuestionnaire: (p: ProgramList_Program, link: string) => any;
   onSetClosingQuestionnaire: (p: ProgramList_Program, link: string) => any;
-  onSetVisibilityParticipationCertificate: (
+  onSetVisibilityAttendanceCertificate: (
     p: ProgramList_Program,
     isVisible: boolean
   ) => any;
@@ -97,15 +97,15 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   onSetStartQuestionnaire,
   onSetSpeakerQuestionnaire,
   onSetClosingQuestionnaire,
-  onSetVisibilityParticipationCertificate,
+  onSetVisibilityAttendanceCertificate,
   onSetVisibilityAchievementCertificate,
 }) => {
-  const handleToggleVisibilityParticipationCertificate = useCallback(() => {
-    onSetVisibilityParticipationCertificate(
+  const handleToggleVisibilityAttendanceCertificate = useCallback(() => {
+    onSetVisibilityAttendanceCertificate(
       program,
-      !program.visibilityParticipationCertificate
+      !program.visibilityAttendanceCertificate
     );
-  }, [program, onSetVisibilityParticipationCertificate]);
+  }, [program, onSetVisibilityAttendanceCertificate]);
 
   const handleToggleVisibilityAchievementCertificate = useCallback(() => {
     onSetVisibilityAchievementCertificate(
@@ -196,39 +196,39 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
     onDelete(program);
   }, [program, onDelete]);
 
-  const templateUploadInputRef: MutableRefObject<any> = useRef(null);
-  const handleUploadTemplateParticipationClick = useCallback(() => {
-    templateUploadInputRef.current?.click();
-  }, [templateUploadInputRef]);
+  const templateAttendanceUploadRef: MutableRefObject<any> = useRef(null);
+  const handleUploadAttendanceTemplateClick = useCallback(() => {
+    templateAttendanceUploadRef.current?.click();
+  }, [templateAttendanceUploadRef]);
 
-  const [saveParticipationCertificateTemplate] = useAdminMutation<
-    SaveParticipationCertificateTemplate,
-    SaveParticipationCertificateTemplateVariables
-  >(SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE);
+  const [saveAttendanceCertificateTemplate] = useAdminMutation<
+    SaveAttendanceCertificateTemplate,
+    SaveAttendanceCertificateTemplateVariables
+  >(SAVE_ATTENDANCE_CERTIFICATE_TEMPLATE);
 
   const [updateParticipationTemplate] = useAdminMutation<
     UpdateProgramParticipationTemplate,
     UpdateProgramParticipationTemplateVariables
-  >(UPDATE_PARTICIPATION_CERTIFICATE_TEMPLATE);
+  >(UPDATE_ATTENDANCE_CERTIFICATE_TEMPLATE);
 
-  const handleTemplateParticipationUploadEvent = useCallback(
+  const handleAttendanceTemplateUploadEvent = useCallback(
     async (event: any) => {
       const uploadFile = await parseFileUploadEvent(event);
 
       if (uploadFile != null) {
-        const res = await saveParticipationCertificateTemplate({
+        const res = await saveAttendanceCertificateTemplate({
           variables: {
             base64File: uploadFile.data,
             fileName: uploadFile.name,
             programId: program.id,
           },
         });
-        if (res.data?.saveParticipationCertificateTemplate?.path) {
+        if (res.data?.saveAttendanceCertificateTemplate?.path) {
           await updateParticipationTemplate({
             variables: {
               programId: program.id,
               templatePath:
-                res.data?.saveParticipationCertificateTemplate?.path,
+                res.data?.saveAttendanceCertificateTemplate?.path,
             },
           });
 
@@ -237,7 +237,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
       }
     },
     [
-      saveParticipationCertificateTemplate,
+      saveAttendanceCertificateTemplate,
       qResult,
       updateParticipationTemplate,
       program,
@@ -463,17 +463,17 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
                 'course-page:proof-of-participation'
               )}`}
 
-              <IconButton onClick={handleUploadTemplateParticipationClick}>
+              <IconButton onClick={handleUploadAttendanceTemplateClick}>
                 <MdUpload size="0.75em" />
               </IconButton>
               <br />
               <div className="w-80 truncate">
-                {program.participationCertificateTemplateURL ||
+                {program.attendanceCertificateTemplateURL ||
                   t('course-page:no-template-uploaded-yet')}
               </div>
               <input
-                ref={templateUploadInputRef}
-                onChange={handleTemplateParticipationUploadEvent}
+                ref={templateAttendanceUploadRef}
+                onChange={handleAttendanceTemplateUploadEvent}
                 className="hidden"
                 type="file"
               />
@@ -487,7 +487,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
               </IconButton>
               <br />
               <div className="w-80 truncate">
-                {program.attendanceCertificateTemplateURL ||
+                {program.achievementCertificateTemplateURL ||
                   t('course-page:no-template-uploaded-yet')}
               </div>
               <input
@@ -502,12 +502,12 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
               <div className="grid grid-cols-10">
                 <div
                   className="cursor-pointer"
-                  onClick={handleToggleVisibilityParticipationCertificate}
+                  onClick={handleToggleVisibilityAttendanceCertificate}
                 >
-                  {program.visibilityParticipationCertificate && (
+                  {program.visibilityAttendanceCertificate && (
                     <MdCheckBox size="1.5em" />
                   )}
-                  {!program.visibilityParticipationCertificate && (
+                  {!program.visibilityAttendanceCertificate && (
                     <MdOutlineCheckBoxOutlineBlank size="1.5em" />
                   )}
                 </div>
@@ -544,6 +544,8 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
                   t('course-page:participationDataGenerate')
                 )}
               </Button>
+            </div>
+            <div className="p-3">
               {loadParticipationDataResult &&
                 !loadParticipationDataLoading &&
                 !loadParticipationDataError && (
@@ -554,6 +556,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
                     }
                     target="_blank"
                     rel="noopener noreferrer"
+                    className='block'
                   >
                     {t('course-page:participationDataDownload')}
                   </Button>
