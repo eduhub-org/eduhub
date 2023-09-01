@@ -3,9 +3,6 @@ import { IconButton } from '@material-ui/core';
 import { FC, MutableRefObject, useCallback, useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { makeStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
 
 import {
   MdCheckBox,
@@ -23,13 +20,14 @@ import { QueryResult } from '@apollo/client';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../queries/actions';
 import {
-  INSERT_COURSE_GROUP,
-  DELETE_COURSE_GROUP,
+  INSERT_COURSE_GROUP_TAG,
+  DELETE_COURSE_GROUP_TAG,
 } from '../../queries/courseGroup';
 import {
-  INSERT_COURSE_DEGREE,
-  DELETE_COURSE_DEGREE,
+  INSERT_COURSE_DEGREE_TAG,
+  DELETE_COURSE_DEGREE_TAG,
 } from '../../queries/courseDegree';
+
 import {
   DELETE_A_COURSE,
   UPDATE_COURSE_PROPERTY,
@@ -43,22 +41,6 @@ import {
   AdminCourseList_Course,
   AdminCourseList_CourseGroupOption,
 } from '../../queries/__generated__/AdminCourseList';
-import {
-  DeleteCourseGroup,
-  DeleteCourseGroupVariables,
-} from '../../queries/__generated__/DeleteCourseGroup';
-import {
-  InsertCourseGroup,
-  InsertCourseGroupVariables,
-} from '../../queries/__generated__/InsertCourseGroup';
-import {
-  DeleteCourseDegree,
-  DeleteCourseDegreeVariables,
-} from '../../queries/__generated__/DeleteCourseDegree';
-import {
-  InsertCourseDegree,
-  InsertCourseDegreeVariables,
-} from '../../queries/__generated__/InsertCourseDegree';
 import {
   DeleteCourseByPk,
   DeleteCourseByPkVariables,
@@ -99,8 +81,7 @@ import applicantsInvitedPie from '../../public/images/course/status/applicants-i
 import participantsRatedPie from '../../public/images/course/status/participants-rated.svg';
 
 import { InstructorColumn } from './CoursesInstructorColumn';
-import { Translate } from 'next-translate';
-import { TagSelector, createHandleTagChange } from '../common/TagSelector';
+import TagSelector from '../common/TagSelector';
 // import { INSERT_NEW_COURSE_LOCATION } from '../../queries/course';
 
 interface EntrollmentStatusCount {
@@ -155,7 +136,8 @@ const courseStatus = (status: string) => {
 interface IPropsCourseOneRow {
   programs: Programs_Program[];
   course: AdminCourseList_Course;
-  courseGroupOptions: AdminCourseList_CourseGroupOption[];
+  courseGroupOptions: {id: number, name: string;}[];
+  degreeCourses: {id: number, name: string;}[];
   qResult: QueryResult<any>;
   refetchCourses: () => void;
   onSetTitle: (c: AdminCourseList_Course, title: string) => any;
@@ -175,6 +157,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   programs,
   course,
   courseGroupOptions,
+  degreeCourses,
   refetchCourses,
   onSetTitle,
   onSetChatLink,
@@ -185,12 +168,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   // onDeleteCourseGroup,
 }) => {
   const { t, lang } = useTranslation('course-page');
-  const courseGroups = course.CourseGroups.map(
-    (group) => group.CourseGroupOption
-  );
-  const [courseGroupTags, setCourseGroupTags] = useState(courseGroups);
-  const degrees = course.CourseGroups.map((group) => group.CourseGroupOption);
-  const [degreeTags, setDegreeTags] = useState(degrees);
+
   const handleToggleAttendanceCertificatePossible = useCallback(() => {
     onSetAttendanceCertificatePossible(
       course,
@@ -369,170 +347,6 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   );
   /** #endregion */
 
-// '  const [insertCourseGroup] = useAdminMutation<
-//     InsertCourseGroup,
-//     InsertCourseGroupVariables
-//   >(INSERT_COURSE_GROUP);
-//   const insertCourseGroupIntoACourse = useCallback(
-//     async (id: number) => {
-//       const response = await insertCourseGroup({
-//         variables: {
-//           courseId: course.id,
-//           courseGroupOptionId: id,
-//         },
-//       });
-
-//       if (response.errors) {
-//         console.log(response.errors);
-//         return;
-//       }
-//       refetchCourses();
-//     },
-//     [insertCourseGroup, refetchCourses, course]
-//   );
-
-//   const [deleteCourseGroup] = useAdminMutation<
-//     DeleteCourseGroup,
-//     DeleteCourseGroupVariables
-//   >(DELETE_COURSE_GROUP);
-//   const deleteCourseGroupFromACourse = useCallback(
-//     async (id: number) => {
-//       const response = await deleteCourseGroup({
-//         variables: {
-//           courseId: course.id,
-//           courseGroupOptionId: id,
-//         },
-//       });
-
-//       if (response.errors) {
-//         console.log(response.errors);
-//         return;
-//       }
-//       refetchCourses();
-//     },
-//     [deleteCourseGroup, refetchCourses, course]
-//   );
-
-//   const [insertCourseDegree] = useAdminMutation<
-//     InsertCourseDegree,
-//     InsertCourseDegreeVariables
-//   >(INSERT_COURSE_DEGREE);
-//   const insertCourseIntoADegree = useCallback(
-//     async (id: number) => {
-//       const response = await insertCourseDegree({
-//         variables: {
-//           courseId: course.id,
-//           degreeCourseId: id,
-//         },
-//       });
-
-//       if (response.errors) {
-//         console.log(response.errors);
-//         return;
-//       }
-//       refetchCourses();
-//     },
-//     [insertCourseDegree, refetchCourses, course]
-//   );
-
-//   const [deleteCourseDegree] = useAdminMutation<
-//     DeleteCourseDegree,
-//     DeleteCourseDegreeVariables
-//   >(DELETE_COURSE_DEGREE);
-//   const deleteCourseFromADegree = useCallback(
-//     async (id: number) => {
-//       const response = await deleteCourseDegree({
-//         variables: {
-//           courseId: course.id,
-//           degreeCourseId: id,
-//         },
-//       });
-
-//       if (response.errors) {
-//         console.log(response.errors);
-//         return;
-//       }
-//       refetchCourses();
-//     },
-//     [deleteCourseDegree, refetchCourses, course]
-//   );
-
-type MutationFunction<T, V> = (
-  variables: V
-) => Promise<FetchResult<T, Record<string, any>, Record<string, any>>>;
-
-interface MutationConfig<T, V> {
-  mutation: MutationFunction<T, V>;
-  courseId: number;
-  refetchCourses: () => void;
-}
-
-const useMutationWithCourseId = <T, V>({
-  mutation,
-  courseId,
-  refetchCourses,
-}: MutationConfig<T, V>) => {
-  const [mutate] = useAdminMutation<T, V>(mutation);
-
-  const handleMutation = useCallback(
-    async (id: number) => {
-      const response = await mutate({
-        variables: {
-          courseId,
-          ...id,
-        },
-      });
-
-      if (response.errors) {
-        console.log(response.errors);
-        return;
-      }
-
-      refetchCourses();
-    },
-    [mutate, courseId, refetchCourses]
-  );
-
-  return handleMutation;
-};
-
-const insertCourseGroupIntoACourse = useMutationWithCourseId<
-  InsertCourseGroup,
-  InsertCourseGroupVariables
->({
-  mutation: INSERT_COURSE_GROUP,
-  courseId: course.id,
-  refetchCourses,
-});
-
-const deleteCourseGroupFromACourse = useMutationWithCourseId<
-  DeleteCourseGroup,
-  DeleteCourseGroupVariables
->({
-  mutation: DELETE_COURSE_GROUP,
-  courseId: course.id,
-  refetchCourses,
-});
-
-const insertCourseIntoADegree = useMutationWithCourseId<
-  InsertCourseDegree,
-  InsertCourseDegreeVariables
->({
-  mutation: INSERT_COURSE_DEGREE,
-  courseId: course.id,
-  refetchCourses,
-});
-
-const deleteCourseFromADegree = useMutationWithCourseId<
-  DeleteCourseDegree,
-  DeleteCourseDegreeVariables
->({
-  mutation: DELETE_COURSE_DEGREE,
-  courseId: course.id,
-  refetchCourses,
-});
-
-'
   const imageUploadRef: MutableRefObject<any> = useRef(null);
   const handleImageUploadClick = useCallback(() => {
     imageUploadRef.current?.click();
@@ -603,26 +417,16 @@ const deleteCourseFromADegree = useMutationWithCourseId<
     [course.id, refetchCourses, updateCourse]
   );
 
-  const handleCourseGroupsChange = createHandleTagChange(
-    courseGroupTags,
-    deleteCourseGroupFromACourse,
-    insertCourseGroupIntoACourse,
-    setCourseGroupTags,
-    refetchCourses
-  );
 
-  const handleDegreeChange = createHandleTagChange(
-    degreeTags,
-    deleteCourseFromADegree,
-    insertCourseIntoADegree,
-    setDegreeTags,
-    refetchCourses
-  );
+const currentCourseGroups = course.CourseGroups.map((group) => ({
+    id: group.CourseGroupOption.id,
+    name: t(group.CourseGroupOption.title)
+}));
 
-  const degreeOptions: SelectOption[] = courseGroupOptions.map((option) => ({
-    key: option.id,
-    label: t(`start-page:${option.title}`),
-  }));
+const currentCourseDegrees = course.CourseDegrees.map((degree) => ({
+id: degree.degreeCourseId,
+name: t(degree.Course.title)
+}));
 
   return (
     <>
@@ -807,25 +611,25 @@ const deleteCourseFromADegree = useMutationWithCourseId<
                       />
                     </div>
                     <TagSelector
-                      options={courseGroupOptions}
-                      getOptionLabel={(option) =>
-                        t(`start-page:${option.title}`)
-                      }
                       label={t('course-page:courseGroups')}
                       placeholder={t('course-page:courseGroups')}
-                      onChange={handleCourseGroupsChange}
-                      defaultValue={courseGroups}
+                      itemId={course.id}
+                      currentTags={currentCourseGroups}
+                      tagOptions={courseGroupOptions}
+                      insertTagMutation={INSERT_COURSE_GROUP_TAG}
+                      deleteTagMutation={DELETE_COURSE_GROUP_TAG}
+                      refetchQueries={['AdminCourseList']}
+                      translationNamespace='start-page'
                     />
-
                     <TagSelector
-                      options={degreeOptions}
-                      getOptionLabel={(option) =>
-                        t(`start-page:${option.title}`)
-                      }
-                      label={t('common:degrees')}
-                      placeholder={t('common:degrees')}
-                      onChange={handleDegreeChange}
-                      defaultValue={degrees}
+                      label={t('course-page:courseDegreeTitle')}
+                      placeholder={t('course-page:courseDegree')}
+                      itemId={course.id}
+                      currentTags={currentCourseDegrees}
+                      tagOptions={degreeCourses}
+                      insertTagMutation={INSERT_COURSE_DEGREE_TAG}
+                      deleteTagMutation={DELETE_COURSE_DEGREE_TAG}
+                      refetchQueries={['AdminCourseList']}
                     />
                   </div>
                 </td>

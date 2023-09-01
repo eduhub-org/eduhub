@@ -10,6 +10,8 @@
   "courseCosts": "This course costs {{price}}",
   "courseIsFree": "This course is free of charge",
   "courseGroups": "Course Groups",
+  "courseDegree": "Degrees",
+  "courseDegreeTitle": "Part of the following degrees",
   "courseNotAvailable": "Course is not available",
   "currentCourse": "Current course",
   "ects": "ECTS",

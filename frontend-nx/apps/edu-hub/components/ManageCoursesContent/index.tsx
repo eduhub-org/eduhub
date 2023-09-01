@@ -164,6 +164,17 @@ const CourseListTable: FC<IProps> = ({
     [qResult, updateEcts]
   );
 
+  const courseGroupOptions = qResult.data?.CourseGroupOption?.map(option => ({
+    id: option.id,
+    name: t(option.title)
+  })) || [];
+
+  // get all course from the program with the title "DEGREE"
+  const degreeCourses = qResult.data?.Course.filter(course => course.Program.shortTitle === 'DEGREES').map(course => ({
+    id: course.id,
+    name: course.title
+  })) || [];
+
   return (
     <>
       <div className="flex flex-col space-y-10">
@@ -194,7 +205,8 @@ const CourseListTable: FC<IProps> = ({
                     key={course.id}
                     course={course}
                     programs={programs}
-                    courseGroupOptions={qResult.data.CourseGroupOption}
+                    courseGroupOptions={courseGroupOptions}
+                    degreeCourses={degreeCourses}
                     refetchCourses={refetchCourses}
                     onSetAttendanceCertificatePossible={
                       handleAttendanceCertificatePossible

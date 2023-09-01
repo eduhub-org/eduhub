@@ -1,21 +1,21 @@
 import { gql } from '@apollo/client';
 
-export const INSERT_COURSE_DEGREE = gql`
-  mutation InsertCourseDegree($courseId: Int!, $degreeCourseId: Int!) {
+export const INSERT_COURSE_DEGREE_TAG = gql`
+  mutation InsertCourseDegreeTag($itemId: Int!, $tagId: Int!) {
     insert_CourseDegree(
-      objects: { courseId: $courseId, degreeCourseId: $degreeCourseId }
+      objects: { courseId: $itemId, degreeCourseId: $tagId }
     ) {
       affected_rows
     }
   }
 `;
 
-export const DELETE_COURSE_DEGREE = gql`
-  mutation DeleteCourseDegree($courseId: Int!, $degreeCourseId: Int!) {
+export const DELETE_COURSE_DEGREE_TAG = gql`
+  mutation DeleteCourseDegreeTag($itemId: Int!, $tagId: Int!) {
     delete_CourseDegree(
       where: {
-        courseId: { _eq: $courseId }
-        degreeCourseId: { _eq: $degreeCourseId }
+        Course: { id: { _eq: $itemId } }
+        _and: { DegreeCourse: { id: { _eq: $tagId } } }
       }
     ) {
       affected_rows

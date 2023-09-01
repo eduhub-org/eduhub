@@ -160,6 +160,27 @@ export interface AdminCourseList_Course_CourseEnrollments {
   CourseEnrollmentStatus: AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus;
 }
 
+export interface AdminCourseList_Course_CourseDegrees_Course {
+  __typename: "Course";
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+}
+
+export interface AdminCourseList_Course_CourseDegrees {
+  __typename: "CourseDegree";
+  id: number;
+  /**
+   * ID of the course that represents a degree
+   */
+  degreeCourseId: number;
+  /**
+   * An object relationship
+   */
+  Course: AdminCourseList_Course_CourseDegrees_Course;
+}
+
 export interface AdminCourseList_Course_AppliedAndUnratedCount_aggregate {
   __typename: "CourseEnrollment_aggregate_fields";
   count: number;
@@ -289,6 +310,10 @@ export interface AdminCourseList_Course {
    * An array relationship
    */
   CourseEnrollments: AdminCourseList_Course_CourseEnrollments[];
+  /**
+   * An array relationship
+   */
+  CourseDegrees: AdminCourseList_Course_CourseDegrees[];
   /**
    * An aggregate relationship
    */

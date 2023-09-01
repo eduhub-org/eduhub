@@ -1,54 +1,77 @@
 import React from 'react';
-import { Autocomplete as MuiAutocomplete } from '@material-ui/lab';
-import { TextField } from '@material-ui/core';
+import MuiAutocomplete from '@material-ui/lab/Autocomplete';
+import TextField from '@material-ui/core/TextField';
+import { useAdminMutation } from '../../hooks/authedMutation';
+import { DocumentNode } from 'graphql';
+import useTranslation from 'next-translate/useTranslation';
 
-export const createHandleTagChange = (
-  tags: { id: number }[],
-  deleteTagFromItem: (id: number) => void,
-  insertTagIntoItem: (id: number) => void,
-  setTags: React.Dispatch<React.SetStateAction<{ id: number }[]>>,
-  refetchCourses: () => void
-) => {
-  return (event, value) => {
-    const removedTag = tags.find((tag) => !value.includes(tag));
-    const addedTag = value.find((tag) => !tags.includes(tag));
-
-    if (removedTag) {
-      deleteTagFromItem(removedTag.id);
-    }
-
-    if (addedTag) {
-      insertTagIntoItem(addedTag.id);
-    }
-
-    setTags(value);
-    refetchCourses();
-  };
-};
-
-interface Tag {
-  id: number;
-  title: string;
-}
-
-interface TagSelectorProps<T> {
-  options: T[];
-  getOptionLabel: (option: T) => string;
+type TagSelectorProps = {
   label: string;
   placeholder: string;
-  onChange: (event: React.ChangeEvent<unknown>, value: T[]) => void;
-  defaultValue: T[];
-}
+  itemId: number;
+  currentTags: { id: number, name: string }[];
+  tagOptions: { id: number, name: string }[];
+  insertTagMutation: DocumentNode;
+  deleteTagMutation: DocumentNode;
+  refetchQueries: string[];
+  onTagAdded?: (data: any) => void;
+  onTagRemoved?: (data: any) => void;
+  type?: string;
+  translationNamespace?: string;
+};
 
-export function TagSelector<T>(props: TagSelectorProps<T>) {
-  const {
-    options,
-    getOptionLabel,
-    label,
-    placeholder,
-    onChange,
-    defaultValue,
-  } = props;
+const TagSelector: React.FC<TagSelectorProps> = ({
+  label,
+  placeholder,
+  itemId,
+  currentTags,
+  tagOptions,
+  insertTagMutation,
+  deleteTagMutation,
+  onTagAdded,
+  onTagRemoved,
+  refetchQueries,
+  type = "default",
+  translationNamespace
+}) => {
+
+  const [insertTag] = useAdminMutation(insertTagMutation, {
+    onCompleted: (data) => {
+      if (onTagAdded) onTagAdded(data);
+    },
+    refetchQueries
+  });
+
+  const [deleteTag] = useAdminMutation(deleteTagMutation, {
+    onCompleted: (data) => {
+      if (onTagRemoved) onTagRemoved(data);
+    },
+    refetchQueries
+  });
+
+  const handleTagChange = (event, value) => {
+    const newTags = value;
+    const oldTags = currentTags;
+
+    for (const tag of newTags) {
+      if (!oldTags.includes(tag)) {
+        // New tag added
+        insertTag({ variables: { itemId, tagId: tag.id } });
+      }
+    }
+
+    for (const tag of oldTags) {
+      if (!newTags.includes(tag)) {
+        // Tag removed
+        deleteTag({ variables: { itemId, tagId: tag.id } });
+      }
+    }
+
+    currentTags = newTags; // Update the default value after changes
+  };
+  
+  const { t, lang } = useTranslation();
+  
 
   return (
     <div className="col-span-10 flex mt-3">
@@ -56,8 +79,12 @@ export function TagSelector<T>(props: TagSelectorProps<T>) {
         className="w-3/4"
         multiple
         id="tags-standard"
-        options={options}
-        getOptionLabel={getOptionLabel}
+        options={tagOptions}
+        getOptionLabel={(option) => 
+          translationNamespace 
+            ? t(`${translationNamespace}:${option.name}`) 
+            : option.name
+        }
         renderInput={(params) => (
           <TextField
             {...params}
@@ -69,11 +96,13 @@ export function TagSelector<T>(props: TagSelectorProps<T>) {
             }}
           />
         )}
-        onChange={onChange}
-        defaultValue={defaultValue}
+        onChange={handleTagChange}
+        defaultValue={currentTags}
         limitTags={2}
         getOptionSelected={(option, value) => option.id === value.id}
       />
     </div>
   );
-}
+};
+
+export default TagSelector;

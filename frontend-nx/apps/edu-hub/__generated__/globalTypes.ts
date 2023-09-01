@@ -182,7 +182,6 @@ export enum AchievementRecordType_constraint {
 export enum AchievementRecordType_enum {
   DOCUMENTATION = "DOCUMENTATION",
   DOCUMENTATION_AND_CSV = "DOCUMENTATION_AND_CSV",
-  ONLINE_COURSE = "ONLINE_COURSE",
 }
 
 /**
@@ -383,7 +382,6 @@ export enum CourseEnrollmentStatus_constraint {
 export enum CourseEnrollmentStatus_enum {
   ABORTED = "ABORTED",
   APPLIED = "APPLIED",
-  CANCELLED = "CANCELLED",
   COMPLETED = "COMPLETED",
   CONFIRMED = "CONFIRMED",
   INVITED = "INVITED",

@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL mutation operation: InsertCourseDegree
+// GraphQL mutation operation: DeleteCourseDegreeTag
 // ====================================================
 
-export interface InsertCourseDegree_insert_CourseDegree {
+export interface DeleteCourseDegreeTag_delete_CourseDegree {
   __typename: "CourseDegree_mutation_response";
   /**
    * number of rows affected by the mutation
@@ -15,14 +15,14 @@ export interface InsertCourseDegree_insert_CourseDegree {
   affected_rows: number;
 }
 
-export interface InsertCourseDegree {
+export interface DeleteCourseDegreeTag {
   /**
-   * insert data into the table: "CourseDegree"
+   * delete data from the table: "CourseDegree"
    */
-  insert_CourseDegree: InsertCourseDegree_insert_CourseDegree | null;
+  delete_CourseDegree: DeleteCourseDegreeTag_delete_CourseDegree | null;
 }
 
-export interface InsertCourseDegreeVariables {
-  courseId: number;
-  degreeCourseId: number;
+export interface DeleteCourseDegreeTagVariables {
+  itemId: number;
+  tagId: number;
 }
