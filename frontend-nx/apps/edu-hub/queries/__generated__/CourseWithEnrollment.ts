@@ -134,6 +134,10 @@ export interface CourseWithEnrollment_Course_by_pk_Program {
    */
   lectureEnd: any | null;
   /**
+   * The default application deadline for a course. It can be changed on the course level.
+   */
+  defaultApplicationEnd: any | null;
+  /**
    * The deadline for the achievement record uploads.
    */
   achievementRecordUploadDeadline: any | null;
@@ -141,10 +145,6 @@ export interface CourseWithEnrollment_Course_by_pk_Program {
    * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
    */
   published: boolean;
-  /**
-   * The default application deadline for a course. It can be changed on the course level.
-   */
-  defaultApplicationEnd: any | null;
   /**
    * The day the application for all courses of the program start.
    */

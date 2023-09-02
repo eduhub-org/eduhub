@@ -48,12 +48,14 @@ interface IProps {
   programs: Programs_Program[];
   courseListRequest: any;
   updateFilter: (newState: AdminCourseListVariables) => void;
+  currentFilter: AdminCourseListVariables;
 }
 const CourseListTable: FC<IProps> = ({
   courseListRequest,
   programs,
   t,
   updateFilter,
+  currentFilter
 }) => {
   const qResult = useAdminQuery<AdminCourseList>(ADMIN_COURSE_LIST);
 
@@ -230,6 +232,7 @@ const CourseListTable: FC<IProps> = ({
             courseListRequest={courseListRequest}
             programs={programs}
             updateFilter={updateFilter}
+            currentFilter={currentFilter}
             t={t}
             count={count}
           />

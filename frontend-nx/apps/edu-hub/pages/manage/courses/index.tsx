@@ -99,6 +99,7 @@ const Content: FC<IProps> = ({ programs }) => {
         courseListRequest={courseListRequest}
         t={t}
         updateFilter={updateFilter}
+        currentFilter={filter}
       />
       {courseListRequest.loading ? (
         <Loading />
@@ -109,6 +110,7 @@ const Content: FC<IProps> = ({ programs }) => {
           programs={programs}
           t={t}
           updateFilter={updateFilter}
+          currentFilter={filter}
         />
       ) : (
         <div className="text-white">
