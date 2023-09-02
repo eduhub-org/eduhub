@@ -145,6 +145,45 @@ export interface CourseList_Course_CourseGroups {
   CourseGroupOption: CourseList_Course_CourseGroups_CourseGroupOption;
 }
 
+export interface CourseList_Course_DegreeCourses_Course_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+}
+
+export interface CourseList_Course_DegreeCourses_Course {
+  __typename: "Course";
+  id: number;
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+  /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
+  /**
+   * An object relationship
+   */
+  Program: CourseList_Course_DegreeCourses_Course_Program;
+}
+
+export interface CourseList_Course_DegreeCourses {
+  __typename: "CourseDegree";
+  id: number;
+  /**
+   * ID of the course which is assigned to a degree
+   */
+  courseId: number;
+  /**
+   * An object relationship
+   */
+  Course: CourseList_Course_DegreeCourses_Course;
+}
+
 export interface CourseList_Course {
   __typename: "Course";
   id: number;
@@ -256,6 +295,10 @@ export interface CourseList_Course {
    * An array relationship
    */
   CourseGroups: CourseList_Course_CourseGroups[];
+  /**
+   * An array relationship
+   */
+  DegreeCourses: CourseList_Course_DegreeCourses[];
 }
 
 export interface CourseList {

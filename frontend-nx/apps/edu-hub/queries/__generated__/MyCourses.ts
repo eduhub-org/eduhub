@@ -153,6 +153,45 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseGroups {
   CourseGroupOption: MyCourses_User_by_pk_CourseEnrollments_Course_CourseGroups_CourseGroupOption;
 }
 
+export interface MyCourses_User_by_pk_CourseEnrollments_Course_DegreeCourses_Course_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+}
+
+export interface MyCourses_User_by_pk_CourseEnrollments_Course_DegreeCourses_Course {
+  __typename: "Course";
+  id: number;
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+  /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
+  /**
+   * An object relationship
+   */
+  Program: MyCourses_User_by_pk_CourseEnrollments_Course_DegreeCourses_Course_Program;
+}
+
+export interface MyCourses_User_by_pk_CourseEnrollments_Course_DegreeCourses {
+  __typename: "CourseDegree";
+  id: number;
+  /**
+   * ID of the course which is assigned to a degree
+   */
+  courseId: number;
+  /**
+   * An object relationship
+   */
+  Course: MyCourses_User_by_pk_CourseEnrollments_Course_DegreeCourses_Course;
+}
+
 export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
@@ -289,6 +328,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course {
    * An array relationship
    */
   CourseGroups: MyCourses_User_by_pk_CourseEnrollments_Course_CourseGroups[];
+  /**
+   * An array relationship
+   */
+  DegreeCourses: MyCourses_User_by_pk_CourseEnrollments_Course_DegreeCourses[];
   /**
    * An array relationship
    */

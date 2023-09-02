@@ -17,7 +17,7 @@ export const DescriptionFields: FC<IProps> = ({ course }) => {
     <>
       {(course.headingDescriptionField1 && course.contentDescriptionField1) ||
       (course.headingDescriptionField2 && course.contentDescriptionField2) ? (
-        <div className="flex flex-wrap mt-20 bg-edu-course-invited rounded-2xl p-4">
+        <div className="flex flex-wrap bg-edu-course-invited rounded-2xl p-4">
           {course.headingDescriptionField1 ||
           course.contentDescriptionField1 ? (
             <div

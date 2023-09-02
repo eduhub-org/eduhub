@@ -145,6 +145,45 @@ export interface CourseFragment_CourseGroups {
   CourseGroupOption: CourseFragment_CourseGroups_CourseGroupOption;
 }
 
+export interface CourseFragment_DegreeCourses_Course_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+}
+
+export interface CourseFragment_DegreeCourses_Course {
+  __typename: "Course";
+  id: number;
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+  /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
+  /**
+   * An object relationship
+   */
+  Program: CourseFragment_DegreeCourses_Course_Program;
+}
+
+export interface CourseFragment_DegreeCourses {
+  __typename: "CourseDegree";
+  id: number;
+  /**
+   * ID of the course which is assigned to a degree
+   */
+  courseId: number;
+  /**
+   * An object relationship
+   */
+  Course: CourseFragment_DegreeCourses_Course;
+}
+
 export interface CourseFragment {
   __typename: "Course";
   id: number;
@@ -256,4 +295,8 @@ export interface CourseFragment {
    * An array relationship
    */
   CourseGroups: CourseFragment_CourseGroups[];
+  /**
+   * An array relationship
+   */
+  DegreeCourses: CourseFragment_DegreeCourses[];
 }

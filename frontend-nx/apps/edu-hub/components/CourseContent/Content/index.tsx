@@ -7,7 +7,6 @@ import { CourseWithEnrollment_Course_by_pk } from '../../../queries/__generated_
 import { ContentRow } from '../../common/ContentRow';
 import { PageBlock } from '../../common/PageBlock';
 
-import { GoalsAndSessions } from './GoalsAndSessions';
 import { DescriptionFields } from './DescriptionFields';
 import { TimeLocationLanguageInstructors } from './TimeLocationLanguageInstructors';
 import { ApplicationButtonOrStatusMessageOrLinks } from './ApplicationButtonOrStatusMessageOrLinks';
@@ -15,6 +14,9 @@ import { AttendancesAndAchievements } from './AttendancesAndAchievements';
 
 import { useIsCourseWithEnrollment } from '../../../hooks/course';
 import { getWeekdayStartAndEndString } from '../../../helpers/dateHelpers';
+import { LearningGoals } from './LearningGoals';
+import { Sessions } from './Sessions';
+import { DegreeCourses } from './DegreeCourses';
 
 interface TaglineProps {
   course: Course_Course_by_pk;
@@ -73,23 +75,16 @@ export const Content: FC<ContentProps> = ({
         {isCourseWithEnrollment && (
           <AttendancesAndAchievements course={course} />
         )}
-        <ContentRow className="flex pb-24">
-          <PageBlock classname="flex-1 text-white">
-            <GoalsAndSessions course={course} />
+        <ContentRow className="flex">
+          <PageBlock classname="flex-1 text-white space-y-6">
+            <LearningGoals learningGoals={course.learningGoals}/>
+            <Sessions sessions={course.Sessions} />
+            <DegreeCourses degreeCourses={course.DegreeCourses}/>
           </PageBlock>
           <div className="pr-0 lg:pr-6 xl:pr-0">
             <TimeLocationLanguageInstructors course={course} />
           </div>
         </ContentRow>
-        <div className="text-edu-course-current underline pt-4 text-3xl text-center font-semibold">
-          <a
-            href="https://opencampus.gitbook.io/faq"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t('course-page:how-to')}
-          </a>
-        </div>
         <DescriptionFields course={course} />
       </div>
     </div>

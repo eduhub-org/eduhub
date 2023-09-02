@@ -4019,6 +4019,8 @@ export interface Course_bool_exp {
   CourseLocations?: CourseLocation_bool_exp | null;
   CourseLocations_aggregate?: CourseLocation_aggregate_bool_exp | null;
   CourseStatus?: CourseStatus_bool_exp | null;
+  DegreeCourses?: CourseDegree_bool_exp | null;
+  DegreeCourses_aggregate?: CourseDegree_aggregate_bool_exp | null;
   Language?: Language_bool_exp | null;
   Program?: Program_bool_exp | null;
   Sessions?: Session_bool_exp | null;
@@ -4034,8 +4036,6 @@ export interface Course_bool_exp {
   contentDescriptionField1?: String_comparison_exp | null;
   contentDescriptionField2?: String_comparison_exp | null;
   cost?: String_comparison_exp | null;
-  courseDegreesByDegreecourseid?: CourseDegree_bool_exp | null;
-  courseDegreesByDegreecourseid_aggregate?: CourseDegree_aggregate_bool_exp | null;
   coverImage?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   ects?: String_comparison_exp | null;
@@ -4068,6 +4068,7 @@ export interface Course_insert_input {
   CourseInstructors?: CourseInstructor_arr_rel_insert_input | null;
   CourseLocations?: CourseLocation_arr_rel_insert_input | null;
   CourseStatus?: CourseStatus_obj_rel_insert_input | null;
+  DegreeCourses?: CourseDegree_arr_rel_insert_input | null;
   Language?: Language_obj_rel_insert_input | null;
   Program?: Program_obj_rel_insert_input | null;
   Sessions?: Session_arr_rel_insert_input | null;
@@ -4079,7 +4080,6 @@ export interface Course_insert_input {
   contentDescriptionField1?: string | null;
   contentDescriptionField2?: string | null;
   cost?: string | null;
-  courseDegreesByDegreecourseid?: CourseDegree_arr_rel_insert_input | null;
   coverImage?: string | null;
   created_at?: any | null;
   ects?: string | null;
@@ -4183,6 +4183,7 @@ export interface Course_order_by {
   CourseInstructors_aggregate?: CourseInstructor_aggregate_order_by | null;
   CourseLocations_aggregate?: CourseLocation_aggregate_order_by | null;
   CourseStatus?: CourseStatus_order_by | null;
+  DegreeCourses_aggregate?: CourseDegree_aggregate_order_by | null;
   Language?: Language_order_by | null;
   Program?: Program_order_by | null;
   Sessions_aggregate?: Session_aggregate_order_by | null;
@@ -4194,7 +4195,6 @@ export interface Course_order_by {
   contentDescriptionField1?: order_by | null;
   contentDescriptionField2?: order_by | null;
   cost?: order_by | null;
-  courseDegreesByDegreecourseid_aggregate?: CourseDegree_aggregate_order_by | null;
   coverImage?: order_by | null;
   created_at?: order_by | null;
   ects?: order_by | null;

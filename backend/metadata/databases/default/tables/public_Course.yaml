@@ -57,19 +57,19 @@ array_relationships:
         table:
           name: CourseLocation
           schema: public
+  - name: DegreeCourses
+    using:
+      foreign_key_constraint_on:
+        column: degreeCourseId
+        table:
+          name: CourseDegree
+          schema: public
   - name: Sessions
     using:
       foreign_key_constraint_on:
         column: courseId
         table:
           name: Session
-          schema: public
-  - name: courseDegreesByDegreecourseid
-    using:
-      foreign_key_constraint_on:
-        column: degreeCourseId
-        table:
-          name: CourseDegree
           schema: public
 select_permissions:
   - role: anonymous

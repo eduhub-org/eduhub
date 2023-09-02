@@ -24,7 +24,7 @@ export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
   const endTime = getEndTimeString(course, lang);
 
   return (
-    <div className="flex flex-1 flex-col justify-center items-center rounded-2xl lg:max-w-md bg-gray-100 p-12 sm:p-24">
+    <div className="flex flex-1 flex-col justify-center items-center mb-9 rounded-2xl lg:max-w-md bg-gray-100 p-12 sm:p-24">
       <div className="grid grid-cols-2 gap-x-28">
         <span className="text-lg mt-2 text-center">
           {course.weekDay != 'NONE' ? t(course.weekDay) : ''}
