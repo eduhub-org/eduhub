@@ -2,8 +2,8 @@ import { Dispatch, FC, SetStateAction } from 'react';
 import { signIn } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
 
-import { useIsLoggedIn } from '../../../../hooks/authentication';
-import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
+import { useIsLoggedIn } from '../../../hooks/authentication';
+import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
 
 import { ApplyButton } from './ApplyButton';
 import { EnrollmentUIController } from './EnrollmentUIController';

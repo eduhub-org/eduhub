@@ -1,58 +1,25 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-import checkmark from '../../../public/images/course/checkmark.svg';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
-import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
-import { useState } from 'react';
+import { Course_Course_by_pk_Sessions as Session } from '../../queries/__generated__/Course';
 
-interface IProps {
-  course: Course_Course_by_pk;
+interface SessionsProps {
+  sessions: Session[];
 }
 
-export const GoalsAndSessions: FC<IProps> = ({ course }) => {
+export const Sessions: FC<SessionsProps> = ({ sessions }) => {
   const { t, lang } = useTranslation('course-page');
   const [showAllSessions, setShowAllSessions] = useState(false);
   const visibleSessions = showAllSessions
-    ? course.Sessions
-    : course.Sessions.slice(0, 4);
+    ? sessions
+    : sessions.slice(0, 4);
 
   return (
-    <div className="flex flex-1 flex-col">
-      {course.learningGoals !== null && course.learningGoals.trim() !== '' && (
-        <>
-          <span className="text-3xl font-semibold mb-9">
-            {t('youWillLearn')}
-          </span>
-          <ul className="list-disc">
-            {course.learningGoals
-              .split('\n')
-              .filter((goal) => goal.trim() !== '')
-              .map((goal, index) => (
-                <li key={index} className="pl-6 mb-6">
-                  <div className="flex align-items-start">
-                    <img
-                      src={checkmark}
-                      alt="check mark"
-                      className="mr-2 inline-block"
-                    />
-                    <div className="ml-2">
-                      {goal.split('\n').map((line, i) => (
-                        <span key={i}>
-                          {line}
-                          <br />
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </li>
-              ))}
-          </ul>
-        </>
-      )}
+    <>
       {visibleSessions.length > 0 && (
         <>
-          <span className="text-3xl font-semibold mt-24 mb-9">
+          <span className="text-3xl font-semibold mt-24">
             {t('courseContent')}
           </span>
           <ul>
@@ -118,6 +85,6 @@ export const GoalsAndSessions: FC<IProps> = ({ course }) => {
           )}
         </>
       )}
-    </div>
+    </>
   );
 };

@@ -1,35 +1,35 @@
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-import { ContentRow } from '../../../common/ContentRow';
+import { ContentRow } from '../../common/ContentRow';
 
-import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
-import { useAuthedQuery } from '../../../../hooks/authedQuery';
-import { CourseWithEnrollment_Course_by_pk } from '../../../../queries/__generated__/CourseWithEnrollment';
-import { LOAD_ACHIEVEMENT_CERTIFICATE } from '../../../../queries/loadAchievementCertificate';
-import { LOAD_ATTENDANCE_CERTIFICATE } from '../../../../queries/loadAttendanceCertificate';
-import { Button } from '../../../common/Button';
+import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
+import { useAuthedQuery } from '../../../hooks/authedQuery';
+import { CourseWithEnrollment_Course_by_pk } from '../../../queries/__generated__/CourseWithEnrollment';
+import { LOAD_ACHIEVEMENT_CERTIFICATE } from '../../../queries/loadAchievementCertificate';
+import { LOAD_ATTENDANCE_CERTIFICATE } from '../../../queries/loadAttendanceCertificate';
+import { Button } from '../../common/Button';
 
 import {
   loadAchievementCertificate,
   loadAchievementCertificateVariables,
-} from '../../../../queries/__generated__/loadAchievementCertificate';
+} from '../../../queries/__generated__/loadAchievementCertificate';
 import {
   loadAttendanceCertificate,
   loadAttendanceCertificateVariables,
-} from '../../../../queries/__generated__/loadAttendanceCertificate';
+} from '../../../queries/__generated__/loadAttendanceCertificate';
 
 import {
   getEndTimeString,
   getStartTimeString,
   // getWeekdayString,
-} from '../../../../helpers/dateHelpers';
+} from '../../../helpers/dateHelpers';
 // import { Course_Course_by_pk } from '../../queries/__generated__/Course';
 
 import { Attendances } from './Attendances';
-import { CertificateDownload } from '../../../common/CertificateDownload';
+import { CertificateDownload } from '../../common/CertificateDownload';
 import CourseAchievementOption from './CourseAchievementOption';
-import { getCourseEnrollment } from '../../../../helpers/util';
-import { useUserId } from '../../../../hooks/user';
+import { getCourseEnrollment } from '../../../helpers/util';
+import { useUserId } from '../../../hooks/user';
 
 interface IProps {
   // course: Course_Course_by_pk | CourseWithEnrollment_Course_by_pk;

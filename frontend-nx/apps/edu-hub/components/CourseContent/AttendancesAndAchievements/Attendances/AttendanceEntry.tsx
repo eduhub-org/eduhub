@@ -1,8 +1,8 @@
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
-import { AttendanceStatus_enum } from '../../../../../__generated__/globalTypes';
-import { CourseWithEnrollment_Course_by_pk_Sessions } from '../../../../../queries/__generated__/CourseWithEnrollment';
+import { AttendanceStatus_enum } from '../../../../__generated__/globalTypes';
+import { CourseWithEnrollment_Course_by_pk_Sessions } from '../../../../queries/__generated__/CourseWithEnrollment';
 
 interface IProps {
   session: CourseWithEnrollment_Course_by_pk_Sessions;

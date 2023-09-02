@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-import checkmark from '../../../public/images/course/checkmark.svg';
+import checkmark from '../../public/images/course/checkmark.svg';
 
 interface LearningGoalsProps {
   learningGoals: string;
