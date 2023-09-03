@@ -8,22 +8,22 @@ import {
   useState,
 } from 'react';
 
-import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
-import { useAuthedQuery } from '../../../../hooks/authedQuery';
-import { useUser, useUserId } from '../../../../hooks/user';
-import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
+import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
+import { useAuthedQuery } from '../../../hooks/authedQuery';
+import { useUser, useUserId } from '../../../hooks/user';
+import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
 import {
   CourseWithEnrollment,
   CourseWithEnrollmentVariables,
-} from '../../../../queries/__generated__/CourseWithEnrollment';
-import { COURSE_WITH_ENROLLMENT } from '../../../../queries/courseWithEnrollment';
+} from '../../../queries/__generated__/CourseWithEnrollment';
+import { COURSE_WITH_ENROLLMENT } from '../../../queries/courseWithEnrollment';
 
 import { CourseLinkInfos } from './Links';
 import { ApplyButton } from '../ApplyButton';
 import { ApplicationModal } from './ApplicationModal';
 import { UserInfoModal } from './UserInfoModal';
-import { Button } from '../../../common/Button';
-import { getCourseEnrollment } from '../../../../helpers/util';
+import { Button } from '../../common/Button';
+import { getCourseEnrollment } from '../../../helpers/util';
 import Trans from 'next-translate/Trans';
 
 interface IProps {

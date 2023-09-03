@@ -1,7 +1,7 @@
 import useTranslation from 'next-translate/useTranslation';
 import { FC } from 'react';
 
-import { Button } from '../../../../common/Button';
+import { Button } from '../../../common/Button';
 
 interface IProps {
   closeModal: () => void;

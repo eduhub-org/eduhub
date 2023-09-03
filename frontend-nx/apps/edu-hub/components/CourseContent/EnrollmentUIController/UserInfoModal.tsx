@@ -3,17 +3,17 @@ import { Modal } from '@material-ui/core';
 import Fade from '@material-ui/core/Fade';
 import { FC, useCallback, useEffect, useState } from 'react';
 
-import { useAuthedMutation } from '../../../../hooks/authedMutation';
-import { useKeycloakUserProfile, useUserId } from '../../../../hooks/user';
-import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
-import { CourseWithEnrollment_Course_by_pk } from '../../../../queries/__generated__/CourseWithEnrollment';
+import { useAuthedMutation } from '../../../hooks/authedMutation';
+import { useKeycloakUserProfile, useUserId } from '../../../hooks/user';
+import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
+import { CourseWithEnrollment_Course_by_pk } from '../../../queries/__generated__/CourseWithEnrollment';
 import {
   InsertUser,
   InsertUserVariables,
-} from '../../../../queries/__generated__/InsertUser';
-import { INSERT_USER } from '../../../../queries/insertUser';
-import { Button } from '../../../common/Button';
-import { ModalContent } from '../../../common/ModalContent';
+} from '../../../queries/__generated__/InsertUser';
+import { INSERT_USER } from '../../../queries/insertUser';
+import { Button } from '../../common/Button';
+import { ModalContent } from '../../common/ModalContent';
 import useTranslation from 'next-translate/useTranslation';
 
 interface IProps {
