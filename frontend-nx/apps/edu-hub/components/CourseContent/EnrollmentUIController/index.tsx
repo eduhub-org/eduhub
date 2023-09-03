@@ -24,7 +24,6 @@ import { ApplicationModal } from './ApplicationModal';
 import { UserInfoModal } from './UserInfoModal';
 import { Button } from '../../common/Button';
 import { getCourseEnrollment } from '../../../helpers/util';
-import Trans from 'next-translate/Trans';
 
 interface IProps {
   course: Course_Course_by_pk;
@@ -75,41 +74,14 @@ export const EnrollmentUIController: FC<IProps> = ({
     }
   }, [user, isUserInfoModalVisible]);
 
-  //const enrollments = data?.Course_by_pk?.CourseEnrollments;
-
-  // Find the course enrollment of the current user
+  // Get the course enrollment of the current user
   const courseEnrollment = getCourseEnrollment(data?.Course_by_pk, userId);
-
-  // const onlineMeetingLink = 'https://zoom.us';
 
   let content = null;
 
   if (!courseEnrollment) {
-    // check if current date is after application deadline
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
+    content = <ApplyButton course={course} onClickApply={showModal} />;
 
-    if (course.applicationEnd <= currentDate) {
-      content = (
-        <span className="bg-gray-300 p-4">
-          <Trans
-            i18nKey="course-application:status.applicationPeriodEnded"
-            components={{
-              a: (
-                <a
-                  href="https://opencampus.substack.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className='underline'
-                />
-              ),
-            }}
-          />
-        </span>
-      );
-    } else {
-      content = <ApplyButton course={course} onClickApply={showModal} />;
-    }
   } else {
     const status = courseEnrollment.status;
 

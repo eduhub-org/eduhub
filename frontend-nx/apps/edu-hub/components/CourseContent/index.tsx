@@ -108,35 +108,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     return signIn('keycloak');
   };
 
-  const currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0);
-
-  let content = null;
-
-  if (course.applicationEnd <= currentDate) {
-    content = (
-      <div className="flex">
-        <span className="bg-gray-300 p-4">
-          <Trans
-            i18nKey="course-application:status.applicationPeriodEnded"
-            components={{
-              a: (
-                <a
-                  href="https://opencampus.substack.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline"
-                />
-              ),
-            }}
-          />
-        </span>
-      </div>
-    );
-  } else {
-    content = <ApplyButton course={course} onClickApply={signInHandler} />;
-  }
-
   return (
     <div>
       {getCoursesAuthorizedLoading || getCoursesUnauthorizedLoading ? (
@@ -170,7 +141,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                         setInvitationModalOpen={setModalOpen}
                       />
                     ) : (
-                      <div className="mx-auto">{content}</div>
+                      <div className="mx-auto"><ApplyButton course={course} onClickApply={signInHandler} /></div>
                     )}
                   </div>
                 </ContentRow>
