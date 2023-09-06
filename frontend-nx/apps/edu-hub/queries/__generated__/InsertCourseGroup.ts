@@ -23,6 +23,6 @@ export interface InsertCourseGroup {
 }
 
 export interface InsertCourseGroupVariables {
-  courseId: number;
-  courseGroupOptionId: number;
+  itemId: number;
+  tagId: number;
 }

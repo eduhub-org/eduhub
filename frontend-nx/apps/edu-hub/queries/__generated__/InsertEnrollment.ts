@@ -120,6 +120,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Progr
    */
   lectureEnd: any | null;
   /**
+   * The default application deadline for a course. It can be changed on the course level.
+   */
+  defaultApplicationEnd: any | null;
+  /**
    * The deadline for the achievement record uploads.
    */
   achievementRecordUploadDeadline: any | null;
@@ -143,6 +147,45 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
    * An object relationship
    */
   CourseGroupOption: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseGroups_CourseGroupOption;
+}
+
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_DegreeCourses_Course_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+}
+
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_DegreeCourses_Course {
+  __typename: "Course";
+  id: number;
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+  /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
+  /**
+   * An object relationship
+   */
+  Program: InsertEnrollment_insert_CourseEnrollment_returning_Course_DegreeCourses_Course_Program;
+}
+
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_DegreeCourses {
+  __typename: "CourseDegree";
+  id: number;
+  /**
+   * ID of the course which is assigned to a degree
+   */
+  courseId: number;
+  /**
+   * An object relationship
+   */
+  Course: InsertEnrollment_insert_CourseEnrollment_returning_Course_DegreeCourses_Course;
 }
 
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments {
@@ -281,6 +324,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    * An array relationship
    */
   CourseGroups: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseGroups[];
+  /**
+   * An array relationship
+   */
+  DegreeCourses: InsertEnrollment_insert_CourseEnrollment_returning_Course_DegreeCourses[];
   /**
    * An array relationship
    */

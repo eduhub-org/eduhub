@@ -2,30 +2,9 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { FC } from 'react';
 import { Page } from '../../components/Page';
-import CourseContent from '../../components/CourseContent';
+import CourseContent from '../../components/CourseContent/index';
 import { useIsSessionLoading } from '../../hooks/authentication';
 import { CircularProgress } from '@material-ui/core';
-
-// export const getStaticProps = async ({ locale }: { locale: string }) => ({
-//   props: {
-//     ...(await serverSideTranslations(locale, [
-//       "common",
-//       "course-page",
-//       "course-application",
-//     ])),
-//   },
-// });
-
-// export const getStaticPaths = async () => {
-//   return {
-//     // Only `/posts/1` and `/posts/2` are generated at build time
-//     paths: [{ params: { courseId: "1" } }, { params: { courseId: "2" } }],
-//     // Enable statically generating additional pages
-//     // For example: `/posts/3`
-//     fallback: "blocking",
-//   };
-// };
-
 
 const CoursePage: FC = () => {
   const router = useRouter();

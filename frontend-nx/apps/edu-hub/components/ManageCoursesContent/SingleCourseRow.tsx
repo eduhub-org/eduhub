@@ -3,9 +3,6 @@ import { IconButton } from '@material-ui/core';
 import { FC, MutableRefObject, useCallback, useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { makeStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
 
 import {
   MdCheckBox,
@@ -23,9 +20,14 @@ import { QueryResult } from '@apollo/client';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../queries/actions';
 import {
-  INSERT_COURSE_GROUP,
-  DELETE_COURSE_GROUP,
+  INSERT_COURSE_GROUP_TAG,
+  DELETE_COURSE_GROUP_TAG,
 } from '../../queries/courseGroup';
+import {
+  INSERT_COURSE_DEGREE_TAG,
+  DELETE_COURSE_DEGREE_TAG,
+} from '../../queries/courseDegree';
+
 import {
   DELETE_A_COURSE,
   UPDATE_COURSE_PROPERTY,
@@ -39,14 +41,6 @@ import {
   AdminCourseList_Course,
   AdminCourseList_CourseGroupOption,
 } from '../../queries/__generated__/AdminCourseList';
-import {
-  DeleteCourseGroup,
-  DeleteCourseGroupVariables,
-} from '../../queries/__generated__/DeleteCourseGroup';
-import {
-  InsertCourseGroup,
-  InsertCourseGroupVariables,
-} from '../../queries/__generated__/InsertCourseGroup';
 import {
   DeleteCourseByPk,
   DeleteCourseByPkVariables,
@@ -87,7 +81,7 @@ import applicantsInvitedPie from '../../public/images/course/status/applicants-i
 import participantsRatedPie from '../../public/images/course/status/participants-rated.svg';
 
 import { InstructorColumn } from './CoursesInstructorColumn';
-import { Translate } from 'next-translate';
+import TagSelector from '../common/TagSelector';
 // import { INSERT_NEW_COURSE_LOCATION } from '../../queries/course';
 
 interface EntrollmentStatusCount {
@@ -142,7 +136,8 @@ const courseStatus = (status: string) => {
 interface IPropsCourseOneRow {
   programs: Programs_Program[];
   course: AdminCourseList_Course;
-  courseGroupOptions: AdminCourseList_CourseGroupOption[];
+  courseGroupOptions: {id: number, name: string;}[];
+  degreeCourses: {id: number, name: string;}[];
   qResult: QueryResult<any>;
   refetchCourses: () => void;
   onSetTitle: (c: AdminCourseList_Course, title: string) => any;
@@ -162,6 +157,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   programs,
   course,
   courseGroupOptions,
+  degreeCourses,
   refetchCourses,
   onSetTitle,
   onSetChatLink,
@@ -172,10 +168,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   // onDeleteCourseGroup,
 }) => {
   const { t, lang } = useTranslation('course-page');
-  const courseGroups = course.CourseGroups.map(
-    (group) => group.CourseGroupOption
-  );
-  const [courseGroupTags, setCourseGroupTags] = useState(courseGroups);
+
   const handleToggleAttendanceCertificatePossible = useCallback(() => {
     onSetAttendanceCertificatePossible(
       course,
@@ -354,50 +347,6 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   );
   /** #endregion */
 
-  const [insertCourseGroup] = useAdminMutation<
-    InsertCourseGroup,
-    InsertCourseGroupVariables
-  >(INSERT_COURSE_GROUP);
-  const insertCourseGroupIntoACourse = useCallback(
-    async (id: number) => {
-      const response = await insertCourseGroup({
-        variables: {
-          courseId: course.id,
-          courseGroupOptionId: id,
-        },
-      });
-
-      if (response.errors) {
-        console.log(response.errors);
-        return;
-      }
-      refetchCourses();
-    },
-    [insertCourseGroup, refetchCourses, course]
-  );
-
-  const [deleteCourseGroup] = useAdminMutation<
-    DeleteCourseGroup,
-    DeleteCourseGroupVariables
-  >(DELETE_COURSE_GROUP);
-  const deleteCourseGroupFromACourse = useCallback(
-    async (id: number) => {
-      const response = await deleteCourseGroup({
-        variables: {
-          courseId: course.id,
-          courseGroupOptionId: id,
-        },
-      });
-
-      if (response.errors) {
-        console.log(response.errors);
-        return;
-      }
-      refetchCourses();
-    },
-    [deleteCourseGroup, refetchCourses, course]
-  );
-
   const imageUploadRef: MutableRefObject<any> = useRef(null);
   const handleImageUploadClick = useCallback(() => {
     imageUploadRef.current?.click();
@@ -468,32 +417,16 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
     [course.id, refetchCourses, updateCourse]
   );
 
-  const handleCourseGroupsChange = useCallback(
-    (event, value) => {
-      const removedTag = courseGroupTags.find(
-        (courseGroupTag) => !value.includes(courseGroupTag)
-      );
-      const addedTag = value.find(
-        (courseGroupTag) => !courseGroupTags.includes(courseGroupTag)
-      );
 
-      if (removedTag) {
-        deleteCourseGroupFromACourse(removedTag.id);
-        setCourseGroupTags(value);
-        refetchCourses();
-      } else if (addedTag) {
-        insertCourseGroupIntoACourse(addedTag.id);
-        setCourseGroupTags(value);
-        refetchCourses();
-      }
-    },
-    [
-      courseGroupTags,
-      deleteCourseGroupFromACourse,
-      insertCourseGroupIntoACourse,
-      refetchCourses,
-    ]
-  );
+const currentCourseGroups = course.CourseGroups.map((group) => ({
+    id: group.CourseGroupOption.id,
+    name: t(group.CourseGroupOption.title)
+}));
+
+const currentCourseDegrees = course.CourseDegrees.map((degree) => ({
+id: degree.degreeCourseId,
+name: t(degree.Course.title)
+}));
 
   return (
     <>
@@ -677,34 +610,27 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                         inputText={course.ects || ''}
                       />
                     </div>
-                    <div className="col-span-10 flex mt-3">
-                      <Autocomplete
-                        className="w-3/4"
-                        multiple
-                        id="tags-standard"
-                        options={courseGroupOptions}
-                        getOptionLabel={(option) =>
-                          t(`start-page:${option.title}`)
-                        }
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="standard"
-                            label={t('course-page:courseGroups')}
-                            placeholder={t('course-page:courseGroups')}
-                            InputLabelProps={{
-                              style: { color: 'rgb(34, 34, 34)' },
-                            }}
-                          />
-                        )}
-                        onChange={handleCourseGroupsChange}
-                        defaultValue={courseGroups}
-                        limitTags={2}
-                        getOptionSelected={(option, value) =>
-                          option.id === value.id
-                        }
-                      />
-                    </div>
+                    <TagSelector
+                      label={t('course-page:courseGroups')}
+                      placeholder={t('course-page:courseGroups')}
+                      itemId={course.id}
+                      currentTags={currentCourseGroups}
+                      tagOptions={courseGroupOptions}
+                      insertTagMutation={INSERT_COURSE_GROUP_TAG}
+                      deleteTagMutation={DELETE_COURSE_GROUP_TAG}
+                      refetchQueries={['AdminCourseList']}
+                      translationNamespace='start-page'
+                    />
+                    <TagSelector
+                      label={t('course-page:courseDegreeTitle')}
+                      placeholder={t('course-page:courseDegree')}
+                      itemId={course.id}
+                      currentTags={currentCourseDegrees}
+                      tagOptions={degreeCourses}
+                      insertTagMutation={INSERT_COURSE_DEGREE_TAG}
+                      deleteTagMutation={DELETE_COURSE_DEGREE_TAG}
+                      refetchQueries={['AdminCourseList']}
+                    />
                   </div>
                 </td>
               </div>

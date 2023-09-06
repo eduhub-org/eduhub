@@ -7,6 +7,7 @@ export const PROGRAM_FRAGMENT_MINIMUM_PROPERTIES = gql`
     shortTitle
     lectureStart
     lectureEnd
+    defaultApplicationEnd
     achievementRecordUploadDeadline
     published
   }

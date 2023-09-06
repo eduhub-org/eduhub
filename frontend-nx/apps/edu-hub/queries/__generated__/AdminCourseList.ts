@@ -120,6 +120,10 @@ export interface AdminCourseList_Course_Program {
    */
   lectureEnd: any | null;
   /**
+   * The default application deadline for a course. It can be changed on the course level.
+   */
+  defaultApplicationEnd: any | null;
+  /**
    * The deadline for the achievement record uploads.
    */
   achievementRecordUploadDeadline: any | null;
@@ -146,6 +150,45 @@ export interface AdminCourseList_Course_CourseGroups {
   groupOptionId: number;
 }
 
+export interface AdminCourseList_Course_DegreeCourses_Course_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+}
+
+export interface AdminCourseList_Course_DegreeCourses_Course {
+  __typename: "Course";
+  id: number;
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+  /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
+  /**
+   * An object relationship
+   */
+  Program: AdminCourseList_Course_DegreeCourses_Course_Program;
+}
+
+export interface AdminCourseList_Course_DegreeCourses {
+  __typename: "CourseDegree";
+  id: number;
+  /**
+   * ID of the course which is assigned to a degree
+   */
+  courseId: number;
+  /**
+   * An object relationship
+   */
+  Course: AdminCourseList_Course_DegreeCourses_Course;
+}
+
 export interface AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus {
   __typename: "CourseEnrollmentStatus";
   value: string;
@@ -158,6 +201,27 @@ export interface AdminCourseList_Course_CourseEnrollments {
    * An object relationship
    */
   CourseEnrollmentStatus: AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus;
+}
+
+export interface AdminCourseList_Course_CourseDegrees_Course {
+  __typename: "Course";
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+}
+
+export interface AdminCourseList_Course_CourseDegrees {
+  __typename: "CourseDegree";
+  id: number;
+  /**
+   * ID of the course that represents a degree
+   */
+  degreeCourseId: number;
+  /**
+   * An object relationship
+   */
+  Course: AdminCourseList_Course_CourseDegrees_Course;
 }
 
 export interface AdminCourseList_Course_AppliedAndUnratedCount_aggregate {
@@ -282,6 +346,10 @@ export interface AdminCourseList_Course {
    */
   CourseGroups: AdminCourseList_Course_CourseGroups[];
   /**
+   * An array relationship
+   */
+  DegreeCourses: AdminCourseList_Course_DegreeCourses[];
+  /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
@@ -289,6 +357,10 @@ export interface AdminCourseList_Course {
    * An array relationship
    */
   CourseEnrollments: AdminCourseList_Course_CourseEnrollments[];
+  /**
+   * An array relationship
+   */
+  CourseDegrees: AdminCourseList_Course_CourseDegrees[];
   /**
    * An aggregate relationship
    */

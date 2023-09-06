@@ -5,7 +5,7 @@ path.resolve('./next.config.js');
 import useTranslation from 'next-translate/useTranslation';
 import Head from 'next/head';
 import { FC, useCallback, useState } from 'react';
-import CourseListTable from '../../../components/ManageCoursesContent/CourseListTable';
+import CourseListTable from '../../../components/ManageCoursesContent';
 import CoursesHeader from '../../../components/ManageCoursesContent/CoursesHeader';
 import Loading from '../../../components/ManageCoursesContent/Loading';
 import { Page } from '../../../components/Page';
@@ -99,6 +99,7 @@ const Content: FC<IProps> = ({ programs }) => {
         courseListRequest={courseListRequest}
         t={t}
         updateFilter={updateFilter}
+        currentFilter={filter}
       />
       {courseListRequest.loading ? (
         <Loading />
@@ -109,6 +110,7 @@ const Content: FC<IProps> = ({ programs }) => {
           programs={programs}
           t={t}
           updateFilter={updateFilter}
+          currentFilter={filter}
         />
       ) : (
         <div className="text-white">
