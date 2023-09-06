@@ -49,14 +49,27 @@ const Home: FC = () => {
   const { data: courseGroupOptions } = courseGroupOptionsData;
 
   useEffect(() => {
-    if (!isSessionLoading && userId !== null) {
+    //log the data below to the console in a single line
+    console.log('######### useEffect #########');
+    console.log('adminCoursesData: ', adminCoursesData);
+    console.log('adminCoursesData.loading: ', adminCoursesData.loading);
+    console.log('adminCoursesData.error: ', adminCoursesData.error);
+    console.log('adminCoursesData.data: ', adminCoursesData.data);
+    console.log('adminCoursesData.data.Course: ', adminCoursesData.data.Course);
+    console.log('coursesData: ', coursesData);
+    console.log('courseGroupOptionsData: ', courseGroupOptionsData);
+    console.log('isSessionLoading', isSessionLoading);
+    console.log('userId: ', userId);
+    console.log('##############################');
+    //Combine the above logs in a single output
+    if (!isSessionLoading && userId !== null && !adminCoursesData.loading && adminCoursesData?.data?.Course) {
       setMyAdminCourses(
         adminCourses?.Course?.filter(course =>
           course.CourseInstructors.some(instructor => instructor.Expert.User.id === userId)
         ) ?? []
       );
     }
-  }, [isSessionLoading, adminCourses?.Course, userId]);
+  }, [isSessionLoading, adminCourses?.Course, userId, adminCoursesData.loading, adminCoursesData?.data?.Course, adminCoursesData, coursesData, courseGroupOptionsData]);
 
   const myCourses = enrolledCourses?.Course?.filter(course => course.CourseEnrollments.length > 0) ?? [];
   const publishedCourses = courses?.Course?.filter(course => course.published && course.Program.published) ?? [];
@@ -65,7 +78,9 @@ const Home: FC = () => {
     { title: 'myAdminCourses', courses: myAdminCourses, isManaged: true },
     { title: 'myCourses', courses: myCourses, isManaged: false }
   ];
-
+  // log coursesGroupsAuthenticated to the console
+  console.log('coursesGroupsAuthenticated: ', coursesGroupsAuthenticated);
+  
   const coursesGroups = [1, 2, 3, 4, 5].map(order => {
     const filteredCourses = publishedCourses.filter(course =>
       course.CourseGroups.some(courseGroup => courseGroup.CourseGroupOption.order === order)
