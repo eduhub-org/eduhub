@@ -1,6 +1,8 @@
+import datetime
 import logging
 import os
 from google.cloud import storage
+from grpc import compute_engine_channel_credentials
 
 
 class StorageClient:
@@ -124,4 +126,13 @@ class StorageClient:
             # Convert dataframe to CSV string and upload
             csv_string = dataframe.to_csv(index=False, **default_csv_args)
             blob.upload_from_string(csv_string)
-            return blob.public_url
+
+            # Generate signed URL with access token
+            credentials = compute_engine_channel_credentials.Credentials()
+            url = blob.generate_signed_url(
+                version="v4",
+                expiration=datetime.timedelta(minutes=15),
+                credentials=credentials,
+            )
+
+            return url
