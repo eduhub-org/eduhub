@@ -13,7 +13,7 @@ def check_attendance(payload):
     and the Session table (a JSON including all recorded participants of the
     session).
     Args:
-        <Null>
+        payload (dict): Payload potentially containing function parameters (in this case none)
     Returns:
         Ids of the sessions for which the attendances were checked
     """
