@@ -1,19 +1,16 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { MdArrowBack, MdArrowForward } from 'react-icons/md';
 import { CircularProgress } from '@material-ui/core';
 import { useAdminMutation } from '../../hooks/authedMutation';
-import { useAdminQuery } from '../../hooks/authedQuery';
 
 import { QUERY_LIMIT } from '../../pages/manage/courses';
 import {
-  AdminCourseList,
   AdminCourseListVariables,
   AdminCourseList_Course,
 } from '../../queries/__generated__/AdminCourseList';
 import { Programs_Program } from '../../queries/__generated__/Programs';
 import SingleCourseRow from './SingleCourseRow';
-import { ADMIN_COURSE_LIST } from '../../queries/courseList';
 import {
   UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE,
   UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE,
@@ -55,12 +52,10 @@ const CourseListTable: FC<IProps> = ({
   programs,
   t,
   updateFilter,
-  currentFilter
+  currentFilter,
 }) => {
-  const qResult = useAdminQuery<AdminCourseList>(ADMIN_COURSE_LIST);
-
-  if (qResult.error) {
-    console.log('query programs error', qResult.error);
+  if (courseListRequest.error) {
+    console.log('query programs error', courseListRequest.error);
   }
 
   const tableHeaders: [string, string][] = [
@@ -93,9 +88,9 @@ const CourseListTable: FC<IProps> = ({
           isPossible,
         },
       });
-      qResult.refetch();
+      courseListRequest.refetch();
     },
-    [qResult, updateAttendanceCertificatePossible]
+    [courseListRequest, updateAttendanceCertificatePossible]
   );
 
   const [updateAchievementCertificatePossible] = useAdminMutation<
@@ -110,9 +105,9 @@ const CourseListTable: FC<IProps> = ({
           isPossible,
         },
       });
-      qResult.refetch();
+      courseListRequest.refetch();
     },
-    [qResult, updateAchievementCertificatePossible]
+    [courseListRequest, updateAchievementCertificatePossible]
   );
 
   const [updateTitle] = useAdminMutation<
@@ -127,9 +122,9 @@ const CourseListTable: FC<IProps> = ({
           courseTitle: title,
         },
       });
-      qResult.refetch();
+      courseListRequest.refetch();
     },
-    [qResult, updateTitle]
+    [courseListRequest, updateTitle]
   );
 
   const [updateChatLink] = useAdminMutation<
@@ -144,9 +139,9 @@ const CourseListTable: FC<IProps> = ({
           chatLink: link,
         },
       });
-      qResult.refetch();
+      courseListRequest.refetch();
     },
-    [qResult, updateChatLink]
+    [courseListRequest, updateChatLink]
   );
 
   const [updateEcts] = useAdminMutation<
@@ -161,27 +156,57 @@ const CourseListTable: FC<IProps> = ({
           ects: ectsPoints,
         },
       });
-      qResult.refetch();
+      courseListRequest.refetch();
     },
-    [qResult, updateEcts]
+    [courseListRequest, updateEcts]
   );
 
-  const courseGroupOptions = qResult.data?.CourseGroupOption?.map(option => ({
-    id: option.id,
-    name: t(option.title)
-  })) || [];
+  // const courseGroupOptions = qResult.data?.CourseGroupOption?.map(option => ({
+  //   id: option.id,
+  //   name: t(option.title)
+  // })) || [];
 
-  // get all course from the program with the title "DEGREE"
-  const degreeCourses = qResult.data?.Course.filter(course => course.Program.shortTitle === 'DEGREES').map(course => ({
-    id: course.id,
-    name: course.title
-  })) || [];
+  const courseGroupOptions = useMemo(() => {
+    if (
+      courseListRequest.data &&
+      !courseListRequest.loading &&
+      !courseListRequest.error
+    ) {
+      return (
+        courseListRequest.data.CourseGroupOption?.map((option) => ({
+          id: option.id,
+          name: t(option.title),
+        })) || []
+      );
+    } else {
+      return [];
+    }
+  }, [t, courseListRequest]);
+
+  const degreeCourses = useMemo(() => {
+    if (
+      courseListRequest.data &&
+      !courseListRequest.loading &&
+      !courseListRequest.error
+    ) {
+      return (
+        courseListRequest.data?.Course.filter(
+          (course) => course.Program.shortTitle === 'DEGREES'
+        ).map((course) => ({
+          id: course.id,
+          name: course.title,
+        })) || []
+      );
+    } else {
+      return [];
+    }
+  }, [courseListRequest]);
 
   return (
     <>
       <div className="flex flex-col space-y-10">
         <div className="overflow-x-auto transition-[height]">
-          {qResult.loading ? (
+          {courseListRequest.loading ? (
             <CircularProgress />
           ) : (
             <table className="w-full">
@@ -220,7 +245,7 @@ const CourseListTable: FC<IProps> = ({
                     onSetChatLink={handleChatLink}
                     onSetEcts={handleEcts}
                     // onDeleteCourseGroup={handleDeleteCourseGroup}
-                    qResult={qResult}
+                    qResult={courseListRequest}
                   />
                 ))}
               </tbody>

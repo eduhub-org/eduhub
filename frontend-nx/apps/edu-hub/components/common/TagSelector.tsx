@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import MuiAutocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { useAdminMutation } from '../../hooks/authedMutation';
@@ -34,7 +34,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   type = "default",
   translationNamespace
 }) => {
-
+  const [tags, setTags] = useState(currentTags);
   const [insertTag] = useAdminMutation(insertTagMutation, {
     onCompleted: (data) => {
       if (onTagAdded) onTagAdded(data);
@@ -67,11 +67,11 @@ const TagSelector: React.FC<TagSelectorProps> = ({
       }
     }
 
-    currentTags = newTags; // Update the default value after changes
+    setTags(newTags); // Update the default value after changes
   };
-  
-  const { t, lang } = useTranslation();
-  
+
+  const { t } = useTranslation();
+
 
   return (
     <div className="col-span-10 flex mt-3">
@@ -80,9 +80,9 @@ const TagSelector: React.FC<TagSelectorProps> = ({
         multiple
         id="tags-standard"
         options={tagOptions}
-        getOptionLabel={(option) => 
-          translationNamespace 
-            ? t(`${translationNamespace}:${option.name}`) 
+        getOptionLabel={(option) =>
+          translationNamespace
+            ? t(`${translationNamespace}:${option.name}`)
             : option.name
         }
         renderInput={(params) => (
@@ -97,7 +97,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
           />
         )}
         onChange={handleTagChange}
-        defaultValue={currentTags}
+        defaultValue={tags}
         limitTags={2}
         getOptionSelected={(option, value) => option.id === value.id}
       />
