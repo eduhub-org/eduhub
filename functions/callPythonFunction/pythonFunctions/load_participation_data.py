@@ -3,18 +3,24 @@ import logging
 import pandas as pd
 from fuzzywuzzy import fuzz
 from datetime import datetime
+from utils import is_admin
 
 # os.chdir("/home/steffen/00_code/eduhub/functions/callPythonFunction/")
 from api_clients import EduHubClient, StorageClient
 
-def load_participation_data(arguments):
+
+def load_participation_data(hasura_secret, arguments):
     """Function to load participation data from the csv file and update the attendance data in the database
     Args:
-        payload (dict): Payload containing the function parameters
+        hasura_secret (str): Secret to authenticate the user
+        arguments (dict): Payload containing the function parameters
     Returns:
         string: Returns a link to the file including the participation data
     """
     logging.info("########## Load Participation Data Function ##########")
+
+    if not is_admin(hasura_secret, arguments):
+        return "error: user is not admin!"
 
     # Instantiate the EduHubClient
     eduhub_client = EduHubClient()
@@ -46,6 +52,7 @@ def load_participation_data(arguments):
     )
 
     return {"link": url}
+
 
 #############################################################################################
 # Helper functions

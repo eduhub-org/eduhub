@@ -3,9 +3,10 @@ import logging
 import pandas as pd
 from fuzzywuzzy import fuzz
 from api_clients import EduHubClient, ZoomClient, LimeSurveyClient
+from utils import is_admin
 
 
-def check_attendance(payload):
+def check_attendance(hasura_secret, arguments):
     """For all sessions for which the attendance hasn't been checked yet
     (no attendance data stored in the session table), gets the participations
     from Zoom and Limesurvey and adds the individual attendances to the
@@ -13,11 +14,15 @@ def check_attendance(payload):
     and the Session table (a JSON including all recorded participants of the
     session).
     Args:
-        payload (dict): Payload potentially containing function parameters (in this case none)
+        hasura_secret (str): Secret to authenticate the user
+        arguments (dict): Payload potentially containing function parameters (in this case none)
     Returns:
         Ids of the sessions for which the attendances were checked
     """
     logging.info("########## Check Attendance Function ##########")
+
+    if not is_admin(hasura_secret, arguments):
+        return "error: user is not admin!"
 
     eduhub_client = EduHubClient()
     logging.debug(f"eduhub_client.url:  {eduhub_client.url}")
