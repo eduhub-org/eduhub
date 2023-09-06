@@ -11,6 +11,16 @@ actions:
         - name: name
           value: createCertificate
     comment: Generates a certificate of a given type for a given course and user id
+  - name: getMoocHubData
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
+      headers:
+        - name: Function-Name
+          value: provide_moochub_data
+    permissions:
+      - role: anonymous
+    comment: Provides the data for the MOOCHub API
   - name: loadAchievementCertificate
     definition:
       kind: ""
@@ -177,4 +187,11 @@ custom_types:
     - name: result
     - name: saveFileOutput
     - name: createCertificateOutput
+    - name: moocHubSchema
+    - name: Links
+    - name: Course
+    - name: CourseAttributes
+    - name: MoocHubCourse
+    - name: MoocHubImage
+    - name: Image
   scalars: []

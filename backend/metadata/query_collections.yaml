@@ -1,1 +1,30 @@
-[]
+- name: allowed-queries
+  definition:
+    queries:
+      - name: MOOChub API
+        query: |
+          query getMoocHubData {
+            getMoocHubData {
+              data {
+                attributes {
+                  courseMode
+                  languages
+                  name
+                  startDate
+                  abstract
+                  description
+                  image {
+                    alt
+                    url
+                  }
+                  moocProvider
+                  url
+                }
+                id
+                type
+              }
+              links {
+                self
+              }
+            }
+          }

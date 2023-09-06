@@ -1,1 +1,9 @@
-[]
+- comment: Public MOOChub API
+  definition:
+    query:
+      collection_name: allowed-queries
+      query_name: MOOChub API
+  methods:
+    - GET
+  name: MOOChub API
+  url: moochub

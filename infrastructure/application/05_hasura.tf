@@ -216,10 +216,6 @@ module "hasura_service" {
       value = google_cloudfunctions2_function.call_node_function.service_config[0].uri
     },
     {
-      name  = "CLOUD_FUNCTION_LINK_CREATE_PARTICIPATION_CERTIFICATE"
-      value = google_cloudfunctions2_function.create_participation_certificate.service_config[0].uri
-    },
-    {
       name  = "CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES"
       value = google_cloudfunctions2_function.send_questionaires.service_config[0].uri
     },
