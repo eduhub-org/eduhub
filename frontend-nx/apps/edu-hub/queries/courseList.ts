@@ -57,10 +57,17 @@ export const ADMIN_COURSE_LIST = gql`
       }
       CourseGroups {
         id
+        groupOptionId
         CourseGroupOption {
           title
         }
-        groupOptionId
+      }
+      CourseDegrees {
+        id
+        degreeCourseId
+        Course {
+          title
+        }
       }
       AppliedAndUnratedCount: CourseEnrollments_aggregate(
         where: {

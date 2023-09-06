@@ -79,6 +79,19 @@ export const COURSE_FRAGMENT = gql`
         order
       }
     }
+    DegreeCourses {
+      id
+      courseId
+      Course {
+        id
+        title
+        published
+        Program {
+          id
+          published
+        }
+      }
+    }
 }
 `;
 

@@ -23,6 +23,6 @@ export interface DeleteCourseGroup {
 }
 
 export interface DeleteCourseGroupVariables {
-  courseId: number;
-  courseGroupOptionId: number;
+  itemId: number;
+  tagId: number;
 }

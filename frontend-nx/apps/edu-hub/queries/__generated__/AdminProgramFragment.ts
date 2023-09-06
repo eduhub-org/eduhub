@@ -27,6 +27,10 @@ export interface AdminProgramFragment {
    */
   lectureEnd: any | null;
   /**
+   * The default application deadline for a course. It can be changed on the course level.
+   */
+  defaultApplicationEnd: any | null;
+  /**
    * The deadline for the achievement record uploads.
    */
   achievementRecordUploadDeadline: any | null;
@@ -42,10 +46,6 @@ export interface AdminProgramFragment {
    * The questionnaire that the participants of all courses get sent after the last session of their course.
    */
   closingQuestionnaire: string | null;
-  /**
-   * The default application deadline for a course. It can be changed on the course level.
-   */
-  defaultApplicationEnd: any | null;
   /**
    * The default maximum number of sessions a participant can miss in a course while still receiving a certificate. It can be changed on the course level.
    */
