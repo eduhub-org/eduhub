@@ -8,3 +8,13 @@ object_relationships:
   - name: DegreeCourse
     using:
       foreign_key_constraint_on: degreeCourseId
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - created_at
+        - updated_at
+        - degreeCourseId
+        - courseId
+      filter: {}
