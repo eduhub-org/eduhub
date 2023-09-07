@@ -3,7 +3,7 @@ from api_clients import EduHubClient
 import sys
 
 # set working directory to "functions/callPythonFunction"
-sys.path.append("functions/callPythonFunction")
+# sys.path.append("functions/callPythonFunction")
 
 
 def provide_moochub_data(hasura_secret, arguments):
