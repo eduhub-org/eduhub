@@ -2,7 +2,7 @@ import datetime
 import logging
 import os
 from google.cloud import storage
-from grpc import compute_engine_channel_credentials
+from google.auth import compute_engine
 
 
 class StorageClient:
@@ -128,7 +128,7 @@ class StorageClient:
             blob.upload_from_string(csv_string)
 
             # Generate signed URL with access token
-            credentials = compute_engine_channel_credentials.Credentials()
+            credentials = compute_engine.Credentials()
             url = blob.generate_signed_url(
                 version="v4",
                 expiration=datetime.timedelta(minutes=15),
