@@ -12,4 +12,4 @@ authlib
 datetime
 python-dateutil
 google-cloud-storage
-grpcio
+google-auth
