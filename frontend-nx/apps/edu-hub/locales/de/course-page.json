@@ -1,5 +1,8 @@
 {
-  "applicationDeadline": "Bewerbungsfrist",
+  "degree_course_list_title": "Aktuelle Degree Angebote",
+  "no_degree_elements_available": "Aktuell gibt es keine laufenden Angebote zu diesem Degree.",
+  "degreeCourses": "Degrees",
+  "application_deadline": "Bewerbungsfrist: ",
   "applyNow": "JETZT ANMELDEN",
   "attendance": "Attendance",
   "confirm": "Confirm",
@@ -10,6 +13,8 @@
   "courseCosts": "Der Kurs kostet {{price}}",
   "courseIsFree": "Der Kurs ist kostenfrei",
   "courseGroups": "Kursgruppen",
+  "courseDegree": "Degrees",
+  "courseDegreeTitle": "Teil der folgenden Degrees",
   "courseNotAvailable": "Kurs ist nicht verfügbar",
   "currentCourse": "laufender Kurs",
   "ects": "ECTS",

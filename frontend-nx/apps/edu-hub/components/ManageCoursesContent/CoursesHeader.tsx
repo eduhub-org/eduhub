@@ -6,7 +6,6 @@ import CommonPageHeader from '../common/CommonPageHeader';
 import SearchBox from '../common/SearchBox';
 import { ProgramsMenubar } from '../ProgramsMenubar';
 
-import { useAdminQuery } from '../../hooks/authedQuery';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { INSERT_COURSE } from '../../queries/mutateCourse';
 
@@ -29,6 +28,7 @@ interface IProps {
   courseListRequest: QueryResult<AdminCourseList, AdminCourseListVariables>;
   t: any;
   updateFilter: (newState: AdminCourseListVariables) => void;
+  currentFilter: AdminCourseListVariables;
 }
 
 const CoursesHeader: FC<IProps> = ({
@@ -37,44 +37,28 @@ const CoursesHeader: FC<IProps> = ({
   courseListRequest,
   t,
   updateFilter,
+  currentFilter,
 }) => {
-  // const [showModal, setShowModal] = useState(false);
-
-  // const openModalControl = useCallback(() => {
-  //   setShowModal(!showModal);
-  // }, [showModal, setShowModal]);
-
-  // const onCloseAddCourseWindow = useCallback(
-  //   (show: boolean) => {
-  //     setShowModal(show);
-  //   },
-  //   [setShowModal]
-  // );
-  // const closeModalHandler = useCallback(
-  //   (refetch: boolean) => {
-  //     setShowModal(false);
-  //     if (refetch) {
-  //       courseListRequest.refetch();
-  //     }
-  //   },
-  //   [setShowModal, courseListRequest]
-  // );
 
   const [insertCourse] = useAdminMutation<InsertCourse, InsertCourseVariables>(
     INSERT_COURSE
   );
+  const selectedProgramId = currentFilter.where.programId?._eq;
+  const selectedProgram = programs.find(program => program.id === selectedProgramId);
+  
   const insertDefaultCourse = useCallback(async () => {
     await insertCourse({
       variables: {
         title: t('course-page:default-course-title'),
-        applicationEnd: new Date(),
+        // applicationEnd: new Date(),
+        applicationEnd: selectedProgram?.defaultApplicationEnd && new Date(selectedProgram.defaultApplicationEnd) > new Date() ? selectedProgram.defaultApplicationEnd : new Date(),
         maxMissedSessions: 2,
-        programId: defaultProgramId,
+        programId: selectedProgramId,
       },
     });
 
     courseListRequest.refetch();
-  }, [insertCourse, t, courseListRequest, defaultProgramId]);
+  }, [selectedProgram.defaultApplicationEnd, selectedProgramId, insertCourse, t, courseListRequest]);
 
   return (
     <>
@@ -85,6 +69,7 @@ const CoursesHeader: FC<IProps> = ({
         defaultProgramId={defaultProgramId}
         courseListRequest={courseListRequest}
         updateFilter={updateFilter}
+        currentFilter={currentFilter}
       />
       <div className="flex justify-start mt-8  text-white">
         <Button

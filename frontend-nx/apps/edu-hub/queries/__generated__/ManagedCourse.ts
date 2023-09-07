@@ -163,6 +163,10 @@ export interface ManagedCourse_Course_by_pk_Program {
    */
   lectureEnd: any | null;
   /**
+   * The default application deadline for a course. It can be changed on the course level.
+   */
+  defaultApplicationEnd: any | null;
+  /**
    * The deadline for the achievement record uploads.
    */
   achievementRecordUploadDeadline: any | null;
@@ -186,6 +190,45 @@ export interface ManagedCourse_Course_by_pk_CourseGroups {
    * An object relationship
    */
   CourseGroupOption: ManagedCourse_Course_by_pk_CourseGroups_CourseGroupOption;
+}
+
+export interface ManagedCourse_Course_by_pk_DegreeCourses_Course_Program {
+  __typename: "Program";
+  id: number;
+  /**
+   * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
+   */
+  published: boolean;
+}
+
+export interface ManagedCourse_Course_by_pk_DegreeCourses_Course {
+  __typename: "Course";
+  id: number;
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+  /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
+  /**
+   * An object relationship
+   */
+  Program: ManagedCourse_Course_by_pk_DegreeCourses_Course_Program;
+}
+
+export interface ManagedCourse_Course_by_pk_DegreeCourses {
+  __typename: "CourseDegree";
+  id: number;
+  /**
+   * ID of the course which is assigned to a degree
+   */
+  courseId: number;
+  /**
+   * An object relationship
+   */
+  Course: ManagedCourse_Course_by_pk_DegreeCourses_Course;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances_Session {
@@ -425,6 +468,10 @@ export interface ManagedCourse_Course_by_pk {
    * An array relationship
    */
   CourseGroups: ManagedCourse_Course_by_pk_CourseGroups[];
+  /**
+   * An array relationship
+   */
+  DegreeCourses: ManagedCourse_Course_by_pk_DegreeCourses[];
   /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */

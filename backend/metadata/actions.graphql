@@ -7,6 +7,10 @@ type Mutation {
 }
 
 type Query {
+  getMoocHubData: moocHubSchema
+}
+
+type Query {
   loadAchievementCertificate(
     path: String!
   ): loadFileOutput
@@ -125,5 +129,48 @@ type saveFileOutput {
 
 type createCertificateOutput {
   pdf: String!
+}
+
+type moocHubSchema {
+  links: Links!
+  data: [MoocHubCourse!]!
+}
+
+type Links {
+  self: String!
+}
+
+type Course {
+  id: ID!
+  type: String!
+  attributes: CourseAttributes!
+}
+
+type CourseAttributes {
+  name: String!
+  courseMode: String!
+  languages: [String!]!
+  startDate: String!
+  url: String!
+  abstract: String!
+  description: String!
+  moocProvider: String!
+  image: Image!
+}
+
+type MoocHubCourse {
+  id: ID!
+  type: String!
+  attributes: CourseAttributes!
+}
+
+type MoocHubImage {
+  url: String!
+  alt: String!
+}
+
+type Image {
+  url: String!
+  alt: String!
 }
 

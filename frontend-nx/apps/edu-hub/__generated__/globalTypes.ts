@@ -345,6 +345,35 @@ export enum Attendance_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "CourseDegree"
+ */
+export enum CourseDegree_constraint {
+  CourseDegree_pkey = "CourseDegree_pkey",
+}
+
+/**
+ * select columns of table "CourseDegree"
+ */
+export enum CourseDegree_select_column {
+  courseId = "courseId",
+  created_at = "created_at",
+  degreeCourseId = "degreeCourseId",
+  id = "id",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "CourseDegree"
+ */
+export enum CourseDegree_update_column {
+  courseId = "courseId",
+  created_at = "created_at",
+  degreeCourseId = "degreeCourseId",
+  id = "id",
+  updated_at = "updated_at",
+}
+
+/**
  * unique or primary key constraints on table "CourseEnrollmentStatus"
  */
 export enum CourseEnrollmentStatus_constraint {
@@ -2909,6 +2938,174 @@ export interface Boolean_comparison_exp {
   _nin?: boolean[] | null;
 }
 
+export interface CourseDegree_aggregate_bool_exp {
+  count?: CourseDegree_aggregate_bool_exp_count | null;
+}
+
+export interface CourseDegree_aggregate_bool_exp_count {
+  arguments?: CourseDegree_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: CourseDegree_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "CourseDegree"
+ */
+export interface CourseDegree_aggregate_order_by {
+  avg?: CourseDegree_avg_order_by | null;
+  count?: order_by | null;
+  max?: CourseDegree_max_order_by | null;
+  min?: CourseDegree_min_order_by | null;
+  stddev?: CourseDegree_stddev_order_by | null;
+  stddev_pop?: CourseDegree_stddev_pop_order_by | null;
+  stddev_samp?: CourseDegree_stddev_samp_order_by | null;
+  sum?: CourseDegree_sum_order_by | null;
+  var_pop?: CourseDegree_var_pop_order_by | null;
+  var_samp?: CourseDegree_var_samp_order_by | null;
+  variance?: CourseDegree_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "CourseDegree"
+ */
+export interface CourseDegree_arr_rel_insert_input {
+  data: CourseDegree_insert_input[];
+  on_conflict?: CourseDegree_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "CourseDegree"
+ */
+export interface CourseDegree_avg_order_by {
+  courseId?: order_by | null;
+  degreeCourseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "CourseDegree". All fields are combined with a logical 'AND'.
+ */
+export interface CourseDegree_bool_exp {
+  Course?: Course_bool_exp | null;
+  DegreeCourse?: Course_bool_exp | null;
+  _and?: CourseDegree_bool_exp[] | null;
+  _not?: CourseDegree_bool_exp | null;
+  _or?: CourseDegree_bool_exp[] | null;
+  courseId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  degreeCourseId?: Int_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "CourseDegree"
+ */
+export interface CourseDegree_insert_input {
+  Course?: Course_obj_rel_insert_input | null;
+  DegreeCourse?: Course_obj_rel_insert_input | null;
+  courseId?: number | null;
+  created_at?: any | null;
+  degreeCourseId?: number | null;
+  id?: number | null;
+  updated_at?: any | null;
+}
+
+/**
+ * order by max() on columns of table "CourseDegree"
+ */
+export interface CourseDegree_max_order_by {
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  degreeCourseId?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "CourseDegree"
+ */
+export interface CourseDegree_min_order_by {
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  degreeCourseId?: order_by | null;
+  id?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "CourseDegree"
+ */
+export interface CourseDegree_on_conflict {
+  constraint: CourseDegree_constraint;
+  update_columns: CourseDegree_update_column[];
+  where?: CourseDegree_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "CourseDegree"
+ */
+export interface CourseDegree_stddev_order_by {
+  courseId?: order_by | null;
+  degreeCourseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "CourseDegree"
+ */
+export interface CourseDegree_stddev_pop_order_by {
+  courseId?: order_by | null;
+  degreeCourseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "CourseDegree"
+ */
+export interface CourseDegree_stddev_samp_order_by {
+  courseId?: order_by | null;
+  degreeCourseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "CourseDegree"
+ */
+export interface CourseDegree_sum_order_by {
+  courseId?: order_by | null;
+  degreeCourseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "CourseDegree"
+ */
+export interface CourseDegree_var_pop_order_by {
+  courseId?: order_by | null;
+  degreeCourseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "CourseDegree"
+ */
+export interface CourseDegree_var_samp_order_by {
+  courseId?: order_by | null;
+  degreeCourseId?: order_by | null;
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "CourseDegree"
+ */
+export interface CourseDegree_variance_order_by {
+  courseId?: order_by | null;
+  degreeCourseId?: order_by | null;
+  id?: order_by | null;
+}
+
 /**
  * Boolean expression to filter rows from the table "CourseEnrollmentStatus". All fields are combined with a logical 'AND'.
  */
@@ -3813,6 +4010,8 @@ export interface Course_avg_order_by {
 export interface Course_bool_exp {
   AchievementOptionCourses?: AchievementOptionCourse_bool_exp | null;
   AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_bool_exp | null;
+  CourseDegrees?: CourseDegree_bool_exp | null;
+  CourseDegrees_aggregate?: CourseDegree_aggregate_bool_exp | null;
   CourseEnrollments?: CourseEnrollment_bool_exp | null;
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_bool_exp | null;
   CourseGroups?: CourseGroup_bool_exp | null;
@@ -3822,6 +4021,8 @@ export interface Course_bool_exp {
   CourseLocations?: CourseLocation_bool_exp | null;
   CourseLocations_aggregate?: CourseLocation_aggregate_bool_exp | null;
   CourseStatus?: CourseStatus_bool_exp | null;
+  DegreeCourses?: CourseDegree_bool_exp | null;
+  DegreeCourses_aggregate?: CourseDegree_aggregate_bool_exp | null;
   Language?: Language_bool_exp | null;
   Program?: Program_bool_exp | null;
   Sessions?: Session_bool_exp | null;
@@ -3863,11 +4064,13 @@ export interface Course_bool_exp {
  */
 export interface Course_insert_input {
   AchievementOptionCourses?: AchievementOptionCourse_arr_rel_insert_input | null;
+  CourseDegrees?: CourseDegree_arr_rel_insert_input | null;
   CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
   CourseGroups?: CourseGroup_arr_rel_insert_input | null;
   CourseInstructors?: CourseInstructor_arr_rel_insert_input | null;
   CourseLocations?: CourseLocation_arr_rel_insert_input | null;
   CourseStatus?: CourseStatus_obj_rel_insert_input | null;
+  DegreeCourses?: CourseDegree_arr_rel_insert_input | null;
   Language?: Language_obj_rel_insert_input | null;
   Program?: Program_obj_rel_insert_input | null;
   Sessions?: Session_arr_rel_insert_input | null;
@@ -3976,11 +4179,13 @@ export interface Course_on_conflict {
  */
 export interface Course_order_by {
   AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_order_by | null;
+  CourseDegrees_aggregate?: CourseDegree_aggregate_order_by | null;
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
   CourseGroups_aggregate?: CourseGroup_aggregate_order_by | null;
   CourseInstructors_aggregate?: CourseInstructor_aggregate_order_by | null;
   CourseLocations_aggregate?: CourseLocation_aggregate_order_by | null;
   CourseStatus?: CourseStatus_order_by | null;
+  DegreeCourses_aggregate?: CourseDegree_aggregate_order_by | null;
   Language?: Language_order_by | null;
   Program?: Program_order_by | null;
   Sessions_aggregate?: Session_aggregate_order_by | null;

@@ -32,22 +32,9 @@ def call_python_function(request):
     arguments = request.get_json()
     logging.debug(f"Request: {arguments}")
 
-    # Get the value of the secrets from the request header and the local cloud function
-    hasura_secret = request.headers.get("Hasura-Secret")
-    hasura_cloud_function_secret = os.getenv("HASURA_CLOUD_FUNCTION_SECRET")
-
-    # check if secret value is correct otherwise return error
-    if not hasura_secret:
-        return "error: no secret value provided!"
-
-    if hasura_secret == "HASURA_CLOUD_FUNCTION_SECRET":
-        return "error: header secret value is not set from environment in Hasura!"
-
-    if hasura_secret != hasura_cloud_function_secret:
-        return "error: cloud function secret is not correct!"
-
     # Get the value of the "name" key from the headers (the name of the function to be called)
     function_name = request.headers.get("Function-Name")
+    hasura_secret = request.headers.get("Hasura-Secret")
 
     # Checking if an existing function name is provided and calling function
     if globals().get(function_name) is None:
@@ -55,12 +42,7 @@ def call_python_function(request):
     else:
         python_function = globals()[function_name]
         logging.info(f"Calling python function: {function_name}...")
-        # check if payload is provided otherwise set to empty dict
-        if arguments.get("payload") is None:
-            return python_function(arguments)
-        else:
-            logging.debug(f"Payload: {arguments['payload']}")
-            return python_function(arguments["payload"])
+        return python_function(hasura_secret, arguments)
 
 
 # Test request for the server
