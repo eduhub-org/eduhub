@@ -91,7 +91,7 @@ const Home: FC = () => {
   ];
   // log coursesGroupsAuthenticated to the console
   console.log('coursesGroupsAuthenticated: ', coursesGroupsAuthenticated);
-  
+
   const coursesGroups = [1, 2, 3, 4, 5].map(order => {
     const filteredCourses = publishedCourses.filter(course =>
       course.CourseGroups.some(courseGroup => courseGroup.CourseGroupOption.order === order)

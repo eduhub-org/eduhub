@@ -1,3 +1,17 @@
 table:
   name: AppSettings
   schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - created_at
+        - updated_at
+        - bannerBackgroundColor
+        - bannerTextEn
+        - bannerFontColor
+        - bannerTextDe
+        - backgroundImageURL
+        - previewImageURL
+      filter: {}
