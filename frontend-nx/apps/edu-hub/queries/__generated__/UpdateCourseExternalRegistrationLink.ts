@@ -20,6 +20,6 @@ export interface UpdateCourseExternalRegistrationLink {
 }
 
 export interface UpdateCourseExternalRegistrationLinkVariables {
-  courseId: number;
-  externalRegistrationLink: string;
+  itemId: number;
+  text: string;
 }

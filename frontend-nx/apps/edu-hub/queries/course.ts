@@ -456,8 +456,8 @@ export const UPDATE_COURSE_ECTS = gql`
 `;
 
 export const UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK = gql`
-  mutation UpdateCourseExternalRegistrationLink($courseId: Int!, $externalRegistrationLink: String!) {
-    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { externalRegistrationLink: $externalRegistrationLink }) {
+  mutation UpdateCourseExternalRegistrationLink($itemId: Int!, $text: String!) {
+    update_Course_by_pk(pk_columns: { id: $itemId }, _set: { externalRegistrationLink: $text }) {
       id
     }
   }
