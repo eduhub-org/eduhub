@@ -272,6 +272,10 @@ export interface Course_Course_by_pk {
    */
   contentDescriptionField2: string | null;
   /**
+   * URL to direct users to an appropriate registration page outside of the application. The internal registration is only used if this field is null.
+   */
+  externalRegistrationLink: string | null;
+  /**
    * The time the course starts each week.
    */
   startTime: any | null;
