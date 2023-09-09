@@ -455,6 +455,15 @@ export const UPDATE_COURSE_ECTS = gql`
   }
 `;
 
+export const UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK = gql`
+  mutation UpdateCourseExternalRegistrationLink($courseId: Int!, $externalRegistrationLink: String!) {
+    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { externalRegistrationLink: $externalRegistrationLink }) {
+      id
+    }
+  }
+`;
+
+
 // export const INSERT_NEW_COURSE_GROUP = gql`
 //   mutation InsertCourseGroup($courseId: Int!, $option: CourseGroupOption_enum!) {
 //     insert_CourseGroup(

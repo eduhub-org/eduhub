@@ -82,6 +82,8 @@ import participantsRatedPie from '../../public/images/course/status/participants
 
 import { InstructorColumn } from './CoursesInstructorColumn';
 import TagSelector from '../common/TagSelector';
+import TextFieldEditor from '../common/TextFieldEditor';
+import { UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK } from '../../queries/course';
 // import { INSERT_NEW_COURSE_LOCATION } from '../../queries/course';
 
 interface EntrollmentStatusCount {
@@ -629,6 +631,14 @@ name: t(degree.Course.title)
                       tagOptions={degreeCourses}
                       insertTagMutation={INSERT_COURSE_DEGREE_TAG}
                       deleteTagMutation={DELETE_COURSE_DEGREE_TAG}
+                      refetchQueries={['AdminCourseList']}
+                    />
+                    <TextFieldEditor
+                      label={t('course-page:external_registration_link')}
+                      placeholder={t('course-page:external_registration_link')}
+                      itemId={course.id}
+                      currentText={course.externalRegistrationLink || ''}
+                      updateTextMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
                       refetchQueries={['AdminCourseList']}
                     />
                   </div>

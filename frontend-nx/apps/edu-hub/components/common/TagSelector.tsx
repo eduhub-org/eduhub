@@ -13,9 +13,9 @@ type TagSelectorProps = {
   tagOptions: { id: number, name: string }[];
   insertTagMutation: DocumentNode;
   deleteTagMutation: DocumentNode;
-  refetchQueries: string[];
   onTagAdded?: (data: any) => void;
   onTagRemoved?: (data: any) => void;
+  refetchQueries: string[];
   type?: string;
   translationNamespace?: string;
 };
