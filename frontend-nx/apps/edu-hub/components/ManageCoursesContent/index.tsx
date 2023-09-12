@@ -3,6 +3,7 @@ import { FC, useCallback, useMemo, useState } from 'react';
 import { MdArrowBack, MdArrowForward } from 'react-icons/md';
 import { CircularProgress } from '@material-ui/core';
 import { useAdminMutation } from '../../hooks/authedMutation';
+import { useRoleQuery } from '../../hooks/authedQuery';
 
 import { QUERY_LIMIT } from '../../pages/manage/courses';
 import {
@@ -38,6 +39,10 @@ import {
   UpdateCourseEcts,
   UpdateCourseEctsVariables,
 } from '../../queries/__generated__/UpdateCourseEcts';
+import { DEGREE_COURSES} from '../../queries/courseDegree';
+import { DegreeCourses } from '../../queries/__generated__/DegreeCourses';
+
+
 import { Translate } from 'next-translate';
 
 interface IProps {
@@ -183,25 +188,20 @@ const CourseListTable: FC<IProps> = ({
     }
   }, [t, courseListRequest]);
 
+
+  const degreeCoursesQuery = useRoleQuery<DegreeCourses>(DEGREE_COURSES);
   const degreeCourses = useMemo(() => {
-    if (
-      courseListRequest.data &&
-      !courseListRequest.loading &&
-      !courseListRequest.error
-    ) {
-      return (
-        courseListRequest.data?.Course.filter(
-          (course) => course.Program.shortTitle === 'DEGREES'
-        ).map((course) => ({
-          id: course.id,
-          name: course.title,
-        })) || []
-      );
+    if (degreeCoursesQuery.data && !degreeCoursesQuery.loading && !degreeCoursesQuery.error) {
+      return degreeCoursesQuery.data.Course.map((course) => ({
+        id: course.id,
+        name: course.title,
+      }));
     } else {
       return [];
     }
-  }, [courseListRequest]);
-
+  }, [degreeCoursesQuery.data, degreeCoursesQuery.loading, degreeCoursesQuery.error]);
+  
+  
   return (
     <>
       <div className="flex flex-col space-y-10">

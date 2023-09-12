@@ -1,5 +1,14 @@
 import { gql } from '@apollo/client';
 
+export const DEGREE_COURSES = gql`
+  query DegreeCourses {
+    Course(where: {Program: {shortTitle: {_eq: "DEGREES"}}}) {
+      id
+      title
+    }
+  }
+`;
+
 export const INSERT_COURSE_DEGREE_TAG = gql`
   mutation InsertCourseDegreeTag($itemId: Int!, $tagId: Int!) {
     insert_CourseDegree(

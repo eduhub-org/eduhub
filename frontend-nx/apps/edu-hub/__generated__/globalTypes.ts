@@ -182,7 +182,7 @@ export enum AchievementRecordType_constraint {
 export enum AchievementRecordType_enum {
   DOCUMENTATION = "DOCUMENTATION",
   DOCUMENTATION_AND_CSV = "DOCUMENTATION_AND_CSV",
-ONLINE_COURSE = "ONLINE_COURSE",
+  ONLINE_COURSE = "ONLINE_COURSE",
 }
 
 /**
