@@ -16,7 +16,7 @@ type TagSelectorProps = {
   onTagAdded?: (data: any) => void;
   onTagRemoved?: (data: any) => void;
   refetchQueries: string[];
-  type?: string;
+  style?: string;
   translationNamespace?: string;
 };
 
@@ -31,7 +31,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   onTagAdded,
   onTagRemoved,
   refetchQueries,
-  type = "default",
+  style,
   translationNamespace
 }) => {
   const [tags, setTags] = useState(currentTags);

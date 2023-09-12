@@ -84,6 +84,7 @@ import { InstructorColumn } from './CoursesInstructorColumn';
 import TagSelector from '../common/TagSelector';
 import TextFieldEditor from '../common/TextFieldEditor';
 import { UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK } from '../../queries/course';
+import { isLinkFormat } from '../../helpers/util';
 // import { INSERT_NEW_COURSE_LOCATION } from '../../queries/course';
 
 interface EntrollmentStatusCount {
@@ -634,12 +635,16 @@ name: t(degree.Course.title)
                       refetchQueries={['AdminCourseList']}
                     />
                     <TextFieldEditor
-                      label={t('course-page:external_registration_link')}
-                      placeholder={t('course-page:external_registration_link')}
+                      label={'external_registration_link.label'}
+                      placeholder={'external_registration_link.label'}
                       itemId={course.id}
                       currentText={course.externalRegistrationLink || ''}
                       updateTextMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
                       refetchQueries={['AdminCourseList']}
+                      typeCheck={isLinkFormat}
+                      helpText='external_registration_link.help_text'
+                      errorText='external_registration_link.error_text'
+                      translationNamespace='manageCourses'
                     />
                   </div>
                 </td>

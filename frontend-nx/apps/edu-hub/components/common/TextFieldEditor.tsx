@@ -3,6 +3,10 @@ import TextField from '@material-ui/core/TextField';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { DocumentNode } from 'graphql';
 import useTranslation from 'next-translate/useTranslation';
+import Tooltip from '@material-ui/core/Tooltip';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import { useTheme } from '@material-ui/core/styles';
 
 type TextFieldEditorProps = {
   label: string;
@@ -12,8 +16,12 @@ type TextFieldEditorProps = {
   updateTextMutation: DocumentNode;
   onTextUpdated?: (data: any) => void;
   refetchQueries: string[];
-  type?: string;
+  typeCheck?: (text: string) => boolean;
+  helpText?: string;
+  errorText?: string;
   translationNamespace?: string;
+  isMandatory?: boolean;
+  style?: string;
 };
 
 const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
@@ -24,10 +32,16 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
   updateTextMutation,
   onTextUpdated,
   refetchQueries,
-  type = "default",
-  translationNamespace
+  typeCheck,
+  helpText,
+  errorText,
+  translationNamespace,
+  isMandatory=false,
+  style
 }) => {
   const [text, setText] = useState(currentText);
+  const [hasBlurred, setHasBlurred] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [updateText] = useAdminMutation(updateTextMutation, {
     onCompleted: (data) => {
       if (onTextUpdated) onTextUpdated(data);
@@ -39,23 +53,54 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
     const newText = event.target.value;
     updateText({ variables: { itemId, text: newText } });
     setText(newText);
+    setHasBlurred(false); // Reset the blurred state when text changes
+    setErrorMessage(''); // Clear any existing error message
   };
 
-  const { t } = useTranslation();
+  const handleBlur = () => {
+    setHasBlurred(true);
+    if (isTypeCheckFailed) {
+      setErrorMessage(t(errorText)); // Replace with your actual error message
+    }
+  };
+
+  const { t } = useTranslation(translationNamespace);
+
+  const isTypeCheckFailed = typeCheck ? 
+    !(typeCheck(text) || (!isMandatory && text === '')) : 
+    (isMandatory && text === '');
+
+  const theme = useTheme();
+  const placeholderColor = theme.palette.text.disabled;
 
   return (
     <div className="col-span-10 flex mt-3">
       <TextField
         className="w-3/4"
         variant="standard"
-        label={label}
-        placeholder={placeholder}
+        label={t(label)}
+        placeholder={t(placeholder)}
         value={text}
         onChange={handleTextChange}
+        onBlur={handleBlur}
         InputLabelProps={{
-          style: { color: 'rgb(34, 34, 34)' },
+          style: { color: isTypeCheckFailed ? 'red' : 'rgb(34, 34, 34)' }
+        }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <Tooltip title={t(helpText)} placement="top">
+                <HelpOutlineIcon style={{ cursor: "pointer", color: placeholderColor }} />
+              </Tooltip>
+            </InputAdornment>
+          ),
+          style: { color: isTypeCheckFailed ? 'red' : 'inherit' }
         }}
       />
+      {hasBlurred && errorMessage && (
+        <p className="text-red-500 mt-2 ml-2 text-sm">{errorMessage}</p>
+      )}
+
     </div>
   );
 };

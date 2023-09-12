@@ -1,0 +1,7 @@
+{
+  "external_registration_link": {
+    "label": "External registration link",
+    "help_text": "If the course or event should not be administered via EduHub, enter a link to the external registration here.",
+    "error_text": "Incorrect link format!"
+  }
+}
