@@ -13,6 +13,8 @@ export const DescriptionFields: FC<IProps> = ({ course }) => {
   // const { t, lang } = useTranslation('course-page');
   const { t } = useTranslation();
 
+  const isAchievementCertificatePossible = course.achievementCertificatePossible
+
   return (
     <>
       {(course.headingDescriptionField1 && course.contentDescriptionField1) ||
@@ -56,11 +58,12 @@ export const DescriptionFields: FC<IProps> = ({ course }) => {
           ) : null}
         </div>
       ) : null}
-      <div className="flex flex-wrap mt-10 bg-white rounded-2xl p-4">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {t('course-page:general-course-info')}
-        </ReactMarkdown>
-      </div>
-    </>
+      {isAchievementCertificatePossible ? (
+        <div className="flex flex-wrap mt-10 bg-white rounded-2xl p-4">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {t('course:general_achievement_certificate_conditions').replace(/\n/g, '  \n')}
+          </ReactMarkdown>
+        </div>
+      ) : null}    </>
   );
 };

@@ -108,6 +108,9 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     return signIn('keycloak');
   };
 
+  const hasExternalRegistration = course.externalRegistrationLink !== null && course.externalRegistrationLink !== '';
+  const eventHandler = () => {window.open(course.externalRegistrationLink, '_blank')}
+
   return (
     <div>
       {getCoursesAuthorizedLoading || getCoursesUnauthorizedLoading ? (
@@ -135,7 +138,11 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                     <span className="text-2xl mt-2">{course.tagline}</span>
                   </div>
                   <div className="flex flex-1 lg:max-w-md">
-                    {isLoggedIn ? (
+                    {hasExternalRegistration ? (
+                      <div className="mx-auto">
+                        <ApplyButton course={course} onClickApply={eventHandler} />
+                      </div>
+                    ) : isLoggedIn && !hasExternalRegistration ? (
                       <EnrollmentUIController
                         course={course}
                         setInvitationModalOpen={setModalOpen}

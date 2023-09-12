@@ -34,7 +34,7 @@ export const DegreeCourses: FC<DegreeCoursesProps> = ({ degreeCourses }) => {
                     {degreeCourses.map((degreeCourse) => (
                         <li key={degreeCourse.Course?.id}>
                             <NextLink href={`/course/${degreeCourse.Course?.id}`} passHref>
-                                <MuiLink>{degreeCourse.Course?.title}</MuiLink>
+                                <MuiLink style={{ color: '#9CA3AF' }}>{degreeCourse.Course?.title}</MuiLink>
                             </NextLink>
                         </li>
                     ))}

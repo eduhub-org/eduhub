@@ -1,0 +1,7 @@
+{
+  "external_registration_link": {
+    "label": "Externer Registrierungslink",
+    "help_text": "Wenn der Kurs oder die Veranstaltung nicht über EduHub verwaltet werden soll, gib hier einen Link zur externen Anmeldung an.",
+    "error_text": "Falsches Linkformat!"
+  }
+}
