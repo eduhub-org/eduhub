@@ -4,6 +4,7 @@
   "pages": {
     "*": [
       "common",
+      "course",
       "achievements-page",
       "course-admin-page",
       "course-application",
