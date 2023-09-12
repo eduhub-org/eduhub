@@ -8,7 +8,7 @@
   "confirm": "Confirm",
   "confirmationModalTitle": "Confirm course participation",
   "confirmationModalTextTop": "Herzlichen Glückwunsch zur Einladung für die Kursteilnahme!",
-  "confirmationModalTextBottom": "Bitte bestätige die Kursteilnahme nur, wenn Du sicher bist, dass Du Zeit hast bis zum Semesterende im vollen Umfang am Kursteilzunehmen.",
+  "confirmationModalTextBottom": "Bitte bestätige die Kursteilnahme nur, wenn Du Zeit hast, bis zum Semesterende am Kurs teilzunehmen.",
   "courseContent": "Kursinhalt",
   "courseCosts": "Der Kurs kostet {{price}}",
   "courseIsFree": "Der Kurs ist kostenfrei",
