@@ -7,7 +7,7 @@
   "confirm": "Confirm",
   "confirmationModalTitle": "Confirm course participation",
   "confirmationModalTextTop": "Congratulations, you are invited to participate in this course!",
-  "confirmationModalTextBottom": "Please confirm your course participation only if you are certain that you have the time to fully attend the course until the end of the semester.",
+  "confirmationModalTextBottom": "Please confirm your course participation only if you have the time to fully attend the course until the end of the semester.",
   "courseContent": "Course content",
   "courseCosts": "This course costs {{price}}",
   "courseIsFree": "This course is free of charge",
