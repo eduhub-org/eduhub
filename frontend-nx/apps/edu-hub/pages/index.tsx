@@ -125,7 +125,7 @@ const Home: FC = () => {
           }}>
           <div className="flex flex-col justify-end h-full max-w-screen-xl mx-auto px-3 md:px-16 py-48">
             <div className="text-6xl sm:text-9xl">{t('headline')}</div>
-            <div className="text-xl sm:text-5xl mt-4">{t('subheadline')}</div>
+            <div className="text-6xl sm:text-9xl mt-4">{t('subheadline')}</div>
           </div>
         </div>
         <div className="max-w-screen-xl mx-auto md:mt-[-130px] md:pl-16 mt-[-180px]">
