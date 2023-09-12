@@ -278,4 +278,4 @@ SELECT setval('"AchievementOptionCourse_id_seq"'::regclass, (SELECT MAX("id") FR
 SELECT setval('"AchievementOptionMentor_id_seq"'::regclass, (SELECT MAX("id") FROM "AchievementOptionMentor") + 1);
 SELECT setval('"AchievementRecord_id_seq"'::regclass, (SELECT MAX("id") FROM "AchievementRecord") + 1);
 SELECT setval('"AchievementRecordAuthor_id_seq"'::regclass, (SELECT MAX("id") FROM "AchievementRecordAuthor") + 1);
-SELECT setval('"CourseGroupOption_id_seq"'::regclass, (SELECT MAX("id") FROM "CourseGroupOption") + 1);
+SELECT setval('"CourseGroup_id_seq"'::regclass, (SELECT MAX("id") FROM "CourseGroup") + 1);
