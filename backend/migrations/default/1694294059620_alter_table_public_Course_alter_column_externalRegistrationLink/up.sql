@@ -1,0 +1,1 @@
+comment on column "public"."Course"."externalRegistrationLink" is E'URL to direct users to an appropriate registration page outside of the application. The internal registration is only used if this field is null.';
