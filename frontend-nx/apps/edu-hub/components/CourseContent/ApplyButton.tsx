@@ -24,7 +24,7 @@ export const ApplyButton: FC<IProps> = ({ course, onClickApply }) => {
 
     if (course.applicationEnd <= currentDate) {
       return (
-        <span className="bg-gray-300 p-4">
+        <div className="bg-gray-300 p-4">
           <Trans
             i18nKey="course-application:status.applicationPeriodEnded"
             components={{
@@ -38,7 +38,7 @@ export const ApplyButton: FC<IProps> = ({ course, onClickApply }) => {
               ),
             }}
           />
-        </span>
+        </div>
       );
     } else {
   return (
