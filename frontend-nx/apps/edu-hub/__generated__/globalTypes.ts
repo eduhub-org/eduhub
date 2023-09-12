@@ -182,7 +182,7 @@ export enum AchievementRecordType_constraint {
 export enum AchievementRecordType_enum {
   DOCUMENTATION = "DOCUMENTATION",
   DOCUMENTATION_AND_CSV = "DOCUMENTATION_AND_CSV",
-  ONLINE_COURSE = "ONLINE_COURSE",
+ONLINE_COURSE = "ONLINE_COURSE",
 }
 
 /**
@@ -592,6 +592,7 @@ export enum Course_select_column {
   created_at = "created_at",
   ects = "ects",
   endTime = "endTime",
+  externalRegistrationLink = "externalRegistrationLink",
   headingDescriptionField1 = "headingDescriptionField1",
   headingDescriptionField2 = "headingDescriptionField2",
   id = "id",
@@ -642,6 +643,7 @@ export enum Course_update_column {
   created_at = "created_at",
   ects = "ects",
   endTime = "endTime",
+  externalRegistrationLink = "externalRegistrationLink",
   headingDescriptionField1 = "headingDescriptionField1",
   headingDescriptionField2 = "headingDescriptionField2",
   id = "id",
@@ -4042,6 +4044,7 @@ export interface Course_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   ects?: String_comparison_exp | null;
   endTime?: timestamptz_comparison_exp | null;
+  externalRegistrationLink?: String_comparison_exp | null;
   headingDescriptionField1?: String_comparison_exp | null;
   headingDescriptionField2?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
@@ -4086,6 +4089,7 @@ export interface Course_insert_input {
   created_at?: any | null;
   ects?: string | null;
   endTime?: any | null;
+  externalRegistrationLink?: string | null;
   headingDescriptionField1?: string | null;
   headingDescriptionField2?: string | null;
   id?: number | null;
@@ -4116,6 +4120,7 @@ export interface Course_max_order_by {
   created_at?: order_by | null;
   ects?: order_by | null;
   endTime?: order_by | null;
+  externalRegistrationLink?: order_by | null;
   headingDescriptionField1?: order_by | null;
   headingDescriptionField2?: order_by | null;
   id?: order_by | null;
@@ -4143,6 +4148,7 @@ export interface Course_min_order_by {
   created_at?: order_by | null;
   ects?: order_by | null;
   endTime?: order_by | null;
+  externalRegistrationLink?: order_by | null;
   headingDescriptionField1?: order_by | null;
   headingDescriptionField2?: order_by | null;
   id?: order_by | null;
@@ -4201,6 +4207,7 @@ export interface Course_order_by {
   created_at?: order_by | null;
   ects?: order_by | null;
   endTime?: order_by | null;
+  externalRegistrationLink?: order_by | null;
   headingDescriptionField1?: order_by | null;
   headingDescriptionField2?: order_by | null;
   id?: order_by | null;
@@ -4233,6 +4240,7 @@ export interface Course_set_input {
   created_at?: any | null;
   ects?: string | null;
   endTime?: any | null;
+  externalRegistrationLink?: string | null;
   headingDescriptionField1?: string | null;
   headingDescriptionField2?: string | null;
   id?: number | null;

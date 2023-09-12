@@ -55,6 +55,7 @@ export const COURSE_FRAGMENT = gql`
     contentDescriptionField1
     headingDescriptionField2
     contentDescriptionField2
+    externalRegistrationLink
     startTime
     endTime
     Sessions (order_by: { startDateTime: asc }) {
@@ -100,12 +101,12 @@ export const ADMIN_COURSE_FRAGMENT = gql`
   ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
   fragment AdminCourseFragment on Course {
     ...CourseFragment
+    learningGoals
     status
     published
     achievementCertificatePossible
     attendanceCertificatePossible
     chatLink
-    learningGoals
     Program {
       ...ProgramFragmentMinimumProperties
     }
