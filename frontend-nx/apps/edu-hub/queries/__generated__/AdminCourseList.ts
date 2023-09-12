@@ -211,6 +211,14 @@ export interface AdminCourseList_Course_CourseDegrees_Course {
   title: string;
 }
 
+export interface AdminCourseList_Course_CourseDegrees_DegreeCourse {
+  __typename: "Course";
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+}
+
 export interface AdminCourseList_Course_CourseDegrees {
   __typename: "CourseDegree";
   id: number;
@@ -222,6 +230,10 @@ export interface AdminCourseList_Course_CourseDegrees {
    * An object relationship
    */
   Course: AdminCourseList_Course_CourseDegrees_Course;
+  /**
+   * An object relationship
+   */
+  DegreeCourse: AdminCourseList_Course_CourseDegrees_DegreeCourse;
 }
 
 export interface AdminCourseList_Course_AppliedAndUnratedCount_aggregate {

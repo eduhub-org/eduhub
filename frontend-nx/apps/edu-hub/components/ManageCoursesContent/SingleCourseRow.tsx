@@ -428,7 +428,7 @@ const currentCourseGroups = course.CourseGroups.map((group) => ({
 
 const currentCourseDegrees = course.CourseDegrees.map((degree) => ({
 id: degree.degreeCourseId,
-name: t(degree.Course.title)
+name: t(degree.DegreeCourse.title)
 }));
 
   return (
