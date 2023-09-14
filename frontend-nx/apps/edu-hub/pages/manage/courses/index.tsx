@@ -43,7 +43,7 @@ const Index: FC = () => {
 
 export default Index;
 
-export const QUERY_LIMIT = 15;
+export const QUERY_LIMIT = 50;
 
 const CoursesDashBoard: FC = () => {
   const programListRequest = useAdminQuery<Programs>(

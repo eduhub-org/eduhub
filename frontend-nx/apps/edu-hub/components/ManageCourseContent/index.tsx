@@ -246,38 +246,44 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
               {t('course-page:brief-description')}
             </div>
 
-            <div
-              className={`p-4 m-2 ${determineTabClasses(
-                1,
-                openTabIndex,
-                course.status
-              )}`}
-              onClick={openTab1}
-            >
-              {t('course-page:appointments')}
-            </div>
+            {course.Program.shortTitle !== "DEGREES" ? null : (
+              <div
+                className={`p-4 m-2 ${determineTabClasses(
+                  1,
+                  openTabIndex,
+                  course.status
+                )}`}
+                onClick={openTab1}
+              >
+                {t('course-page:appointments')}
+              </div>
+            )}
 
-            <div
-              className={`p-4 m-2 ${determineTabClasses(
-                2,
-                openTabIndex,
-                course.status
-              )}`}
-              onClick={openTab2}
-            >
-              {t('course-page:applications')}
-            </div>
+            {course.externalRegistrationLink ? null : (
+              <div
+                className={`p-4 m-2 ${determineTabClasses(
+                  2,
+                  openTabIndex,
+                  course.status
+                )}`}
+                onClick={openTab2}
+              >
+                {t('course-page:applications')}
+              </div>
+            )}
 
-            <div
-              className={`p-4 m-2 ${determineTabClasses(
-                3,
-                openTabIndex,
-                course.status
-              )}`}
-              onClick={openTab3}
-            >
-              {t('course-page:participation-and-benefits')}
-            </div>
+            {course.externalRegistrationLink ? null : (
+              <div
+                className={`p-4 m-2 ${determineTabClasses(
+                  3,
+                  openTabIndex,
+                  course.status
+                )}`}
+                onClick={openTab3}
+              >
+                {t('course-page:participation-and-benefits')}
+              </div>
+            )}
           </div>
 
           {openTabIndex === 0 && (

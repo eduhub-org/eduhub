@@ -20,6 +20,6 @@ export interface UpdateCourseEcts {
 }
 
 export interface UpdateCourseEctsVariables {
-  courseId: number;
-  ects: string;
+  itemId: number;
+  text: string;
 }

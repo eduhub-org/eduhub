@@ -10,7 +10,7 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress } from '@material-ui/core';
 
-import ModalControl from '../common/ModalController';
+import Modal from '../common/Modal';
 import { useAuthedMutation } from '../../hooks/authedMutation';
 import { useAuthedQuery } from '../../hooks/authedQuery';
 import { useUserId } from '../../hooks/user';
@@ -229,10 +229,10 @@ const InvitationModal: FC<IProps> = ({
   }
 
   return (
-    <ModalControl
-      showModal={open}
-      onClose={onCloseConfirmEnrollment}
-      modalTitle={t('course-page:confirmationModalTitle')}
+    <Modal
+      isOpen={open}
+      close={onCloseConfirmEnrollment}
+      title={t('course-page:confirmationModalTitle')}
     >
       {!userLoading && !userError && (
         <>
@@ -315,7 +315,7 @@ const InvitationModal: FC<IProps> = ({
           </div>
         </>
       )}
-    </ModalControl>
+    </Modal>
   );
 };
 

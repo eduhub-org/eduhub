@@ -44,6 +44,9 @@ import {
 import useTranslation from 'next-translate/useTranslation';
 import { useCurrentRole } from '../../../hooks/authentication';
 import { AuthRoles } from '../../../types/enums';
+import AddButton from '../../common/AddButton';
+import Modal from '../../common/Modal';
+import AddParticipantsForm from './AddParticipantsForm';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -55,7 +58,7 @@ const now7 = new Date();
 now7.setDate(now7.getDate() + 7);
 
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
-  const { t, lang } = useTranslation();
+  const { t, lang } = useTranslation('manageCourse');
   const currentRole = useCurrentRole();
 
   const infoDots = (
@@ -251,9 +254,30 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       .join(',');
   };
 
+  const [isAddParticipantsModalOpen, setAddParticipantsModalOpen] = useState(false);
+
+  const openAddParticipantsModal = () => setAddParticipantsModalOpen(true);
+  const closeAddParticipantsModal = () => setAddParticipantsModalOpen(false);
+
+
   return (
     <>
-      <div>
+      <OnlyAdmin>
+        <div className="flex justify-start mt-4 mb-4 text-white">
+          <AddButton
+            title='add_participants'
+            onClick={openAddParticipantsModal}
+            translationNamespace='manageCourse'
+          />
+        </div>
+        <Modal
+          isOpen={isAddParticipantsModalOpen}
+          close={closeAddParticipantsModal}
+          title={t('manageCourse:add_participants')}
+        >
+          <AddParticipantsForm courseId={course.id} onSubmit={closeAddParticipantsModal}/>
+        </Modal>
+      </OnlyAdmin>      <div>
         {courseEnrollments.length > 0 ? (
           <>
             <div className="text-gray-400">

@@ -15,8 +15,6 @@ import SingleCourseRow from './SingleCourseRow';
 import {
   UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE,
   UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE,
-  UPDATE_COURSE_CHAT_LINK,
-  UPDATE_COURSE_ECTS,
   UPDATE_COURSE_TITLE,
 } from '../../queries/course';
 import {
@@ -31,14 +29,6 @@ import {
   UpdateCourseTitle,
   UpdateCourseTitleVariables,
 } from '../../queries/__generated__/UpdateCourseTitle';
-import {
-  UpdateCourseChatLink,
-  UpdateCourseChatLinkVariables,
-} from '../../queries/__generated__/UpdateCourseChatLink';
-import {
-  UpdateCourseEcts,
-  UpdateCourseEctsVariables,
-} from '../../queries/__generated__/UpdateCourseEcts';
 import { DEGREE_COURSES} from '../../queries/courseDegree';
 import { DegreeCourses } from '../../queries/__generated__/DegreeCourses';
 
@@ -132,45 +122,6 @@ const CourseListTable: FC<IProps> = ({
     [courseListRequest, updateTitle]
   );
 
-  const [updateChatLink] = useAdminMutation<
-    UpdateCourseChatLink,
-    UpdateCourseChatLinkVariables
-  >(UPDATE_COURSE_CHAT_LINK);
-  const handleChatLink = useCallback(
-    async (c: AdminCourseList_Course, link: string) => {
-      await updateChatLink({
-        variables: {
-          courseId: c.id,
-          chatLink: link,
-        },
-      });
-      courseListRequest.refetch();
-    },
-    [courseListRequest, updateChatLink]
-  );
-
-  const [updateEcts] = useAdminMutation<
-    UpdateCourseEcts,
-    UpdateCourseEctsVariables
-  >(UPDATE_COURSE_ECTS);
-  const handleEcts = useCallback(
-    async (c: AdminCourseList_Course, ectsPoints: string) => {
-      await updateEcts({
-        variables: {
-          courseId: c.id,
-          ects: ectsPoints,
-        },
-      });
-      courseListRequest.refetch();
-    },
-    [courseListRequest, updateEcts]
-  );
-
-  // const courseGroupOptions = qResult.data?.CourseGroupOption?.map(option => ({
-  //   id: option.id,
-  //   name: t(option.title)
-  // })) || [];
-
   const courseGroupOptions = useMemo(() => {
     if (
       courseListRequest.data &&
@@ -242,9 +193,6 @@ const CourseListTable: FC<IProps> = ({
                       handleAchievementCertificatePossible
                     }
                     onSetTitle={handleTitle}
-                    onSetChatLink={handleChatLink}
-                    onSetEcts={handleEcts}
-                    // onDeleteCourseGroup={handleDeleteCourseGroup}
                     qResult={courseListRequest}
                   />
                 ))}

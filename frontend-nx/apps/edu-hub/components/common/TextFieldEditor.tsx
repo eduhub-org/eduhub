@@ -76,7 +76,7 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
   return (
     <div className="col-span-10 flex mt-3">
       <TextField
-        className="w-3/4"
+        className={hasBlurred && errorMessage ? "w-3/4" : "w-full"}
         variant="standard"
         label={t(label)}
         placeholder={t(placeholder)}
