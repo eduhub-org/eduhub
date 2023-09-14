@@ -8,7 +8,7 @@ import { useRoleMutation } from '../../../hooks/authedMutation';
 import { USER_LIST } from '../../../queries/user';
 import { UpdateEnrollment, UpdateEnrollmentVariables } from '../../../queries/__generated__/UpdateEnrollment';
 import { UPDATE_ENROLLMENT } from '../../../queries/insertEnrollment';
-import { CourseEnrollmentStatus_enum } from 'apps/edu-hub/__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
 
 interface AddParticipantsFormProps {
   courseId: number;
