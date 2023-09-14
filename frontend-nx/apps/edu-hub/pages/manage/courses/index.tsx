@@ -7,7 +7,7 @@ import Head from 'next/head';
 import { FC, useCallback, useState } from 'react';
 import CourseListTable from '../../../components/ManageCoursesContent';
 import CoursesHeader from '../../../components/ManageCoursesContent/CoursesHeader';
-import Loading from '../../../components/ManageCoursesContent/Loading';
+import Loading from '../../../components/common/Loading';
 import { Page } from '../../../components/Page';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';

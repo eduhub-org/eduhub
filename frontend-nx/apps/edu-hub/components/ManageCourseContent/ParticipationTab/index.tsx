@@ -60,7 +60,7 @@ import {
   AttendanceStatus_enum,
 } from '../../../__generated__/globalTypes';
 import TagWithTwoText from '../../common/TagWithTwoText';
-import Loading from '../../ManageCoursesContent/Loading';
+import Loading from '../../common/Loading';
 import { Button } from '../../common/Button';
 import { CircularProgress } from '@material-ui/core';
 
