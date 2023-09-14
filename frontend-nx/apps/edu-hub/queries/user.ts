@@ -1,5 +1,16 @@
 import { gql } from "@apollo/client";
 
+export const USER_LIST = gql`
+  query UserList {
+    User {
+      id
+      firstName
+      lastName
+      email
+    }
+  }
+`;
+
 export const USER = gql`
   query User($userId: uuid!) {
     User_by_pk(id: $userId) {

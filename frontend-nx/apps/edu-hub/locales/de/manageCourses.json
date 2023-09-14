@@ -1,4 +1,14 @@
 {
+  "chat_link": {
+    "label": "Link zum Chat des Kurses",
+    "help_text": "Der Kurs-Channel muss zunächst händisch in Mattermost angelegt werden.",
+    "error_text": "Falsches Linkformat!"
+  },
+  "ects": {
+    "label": "ECTS",
+    "help_text": "Aktuell sind nur Kurse mit '2,5', '5', or '12,5' ECTS erlaubt (letzere für Degrees.",
+    "error_text": "Falsches ECTS Format!"
+  },
   "external_registration_link": {
     "label": "Externer Registrierungslink",
     "help_text": "Wenn der Kurs oder die Veranstaltung nicht über EduHub verwaltet werden soll, gib hier einen Link zur externen Anmeldung an.",

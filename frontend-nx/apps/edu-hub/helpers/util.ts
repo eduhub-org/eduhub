@@ -89,3 +89,7 @@ export const isLinkFormat = (str) => {
     '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
   return pattern.test(str);
 };
+
+export const isECTSFormat = (str) => {
+  return str.match(/^(2,5|5|12,5)$/);
+};
