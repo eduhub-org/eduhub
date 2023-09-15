@@ -104,6 +104,10 @@ module "hasura_service" {
 
   env_vars = [
     {
+      name  = "DUMMY_VARIABLE_FOR_REDEPLOYMENT"
+      value = 9999
+    },
+    {
       name  = "HASURA_GRAPHQL_ENABLE_CONSOLE"
       value = var.hasura_graphql_enable_console
     },
