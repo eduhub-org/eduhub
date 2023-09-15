@@ -111,38 +111,34 @@ select_permissions:
   - role: instructor_access
     permission:
       columns:
-        - id
-        - created_at
-        - updated_at
-        - learningGoals
-        - cost
+        - achievementCertificatePossible
+        - applicationEnd
+        - attendanceCertificatePossible
+        - chatLink
         - contentDescriptionField1
         - contentDescriptionField2
-        - published
+        - cost
+        - coverImage
+        - created_at
+        - ects
+        - endTime
+        - externalRegistrationLink
         - headingDescriptionField1
         - headingDescriptionField2
-        - programId
-        - achievementCertificatePossible
-        - attendanceCertificatePossible
-        - applicationEnd
-        - tagline
-        - status
-        - coverImage
-        - weekDay
+        - id
         - language
-        - chatLink
+        - learningGoals
         - maxMissedSessions
-        - ects
         - maxParticipants
-        - endTime
+        - programId
+        - published
         - startTime
+        - status
+        - tagline
         - title
-      filter:
-        CourseInstructors:
-          Expert:
-            User:
-              id:
-                _eq: X-Hasura-User-Id
+        - updated_at
+        - weekDay
+      filter: {}
   - role: user_access
     permission:
       columns:

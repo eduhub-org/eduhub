@@ -52,6 +52,15 @@ export const MANAGED_COURSE = gql`
               id
             }
           }
+          CourseEnrollments {
+            status
+            Course {
+              title
+              Program {
+                shortTitle
+              }
+            }
+          }
         }
       }
       CourseLocations {

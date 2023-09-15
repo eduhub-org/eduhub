@@ -82,6 +82,7 @@ select_permissions:
   - role: instructor_access
     permission:
       columns:
+        - anonymousId
         - created_at
         - email
         - employment
