@@ -54,7 +54,9 @@ export const MANAGED_COURSE = gql`
           }
           CourseEnrollments {
             status
+            courseId
             Course {
+              id
               title
               Program {
                 shortTitle

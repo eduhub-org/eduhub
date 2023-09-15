@@ -224,12 +224,21 @@ export const ApplicationRow: FC<IProps> = ({
                   title={enrollment.User.email}
                 >
                   {enrollment.User.email}
-                  <p className="mt-4">{t('manageCourse:participation_history')}</p>
-                  {enrollment.User.CourseEnrollments.map((enrollment, index) => (
-                    <p key={index} className="text-xs whitespace-normal break-words mt-2 pl-4" style={{ textIndent: '-1rem' }}>
-                      {enrollment.Course?.title} ({enrollment.Course?.Program.shortTitle}) - {enrollment.status}
-                    </p>
-                  ))}
+                  <p className="mt-4">{t('manageCourse:application_history')}</p>
+                    {enrollment.User.CourseEnrollments.map((pastEnrollment, index) => {
+                      if (pastEnrollment.courseId === enrollment.courseId) {
+                        return null; // Skip rendering this enrollment
+                      }
+                      return (
+                        <p 
+                          key={index} 
+                          className="text-xs whitespace-normal break-words mt-2 pl-4" 
+                          style={{ textIndent: '-1rem' }}
+                        >
+                          {pastEnrollment.Course?.title} ({pastEnrollment.Course?.Program.shortTitle}) - {t(pastEnrollment.status)}
+                        </p>
+                      );
+                    })}
                 </div>
                 <div className="mr-3 ml-3 col-span-6">
                   {enrollment.motivationLetter}
