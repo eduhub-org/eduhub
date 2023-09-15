@@ -16,6 +16,10 @@ export interface UsersByLastName_User_CourseEnrollments_Course_Program {
    * The title of the program
    */
   title: string;
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
 }
 
 export interface UsersByLastName_User_CourseEnrollments_Course {

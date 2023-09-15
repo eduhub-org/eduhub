@@ -118,6 +118,7 @@ export const USERS_BY_LAST_NAME = gql`
           Program {
             id
             title
+            shortTitle
           }
         }
       }

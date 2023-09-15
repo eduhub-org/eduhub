@@ -38,13 +38,7 @@ select_permissions:
         - created_at
         - updated_at
         - invitationExpirationDate
-      filter:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
+      filter: {}
   - role: user_access
     permission:
       columns:

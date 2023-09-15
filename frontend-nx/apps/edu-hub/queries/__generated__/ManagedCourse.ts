@@ -249,6 +249,38 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances {
   Session: ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances_Session;
 }
 
+export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course_Program {
+  __typename: "Program";
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+}
+
+export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course {
+  __typename: "Course";
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+  /**
+   * An object relationship
+   */
+  Program: ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course_Program;
+}
+
+export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollments {
+  __typename: "CourseEnrollment";
+  /**
+   * The users current enrollment status to this course
+   */
+  status: CourseEnrollmentStatus_enum;
+  /**
+   * An object relationship
+   */
+  Course: ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course;
+}
+
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User {
   __typename: "User";
   id: any;
@@ -272,6 +304,10 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_User {
    * An array relationship
    */
   Attendances: ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances[];
+  /**
+   * An array relationship
+   */
+  CourseEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollments[];
 }
 
 export interface ManagedCourse_Course_by_pk_CourseEnrollments {
