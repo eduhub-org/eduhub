@@ -1,5 +1,12 @@
 {
   "degree_course_list_title": "Aktuelle Angebote im Rahmen des Degrees",
   "no_degree_elements_available": "Aktuell gibt es keine laufenden Angebote zu diesem Degree.",
-  "general_achievement_certificate_conditions": "**Online-Teilnahme:**\nDie Teilnahme an Terminen wird nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist.\n\n**Kosten:**\nUUnsere Kurse sind offen für alle und kostenlos für Studierende, Schüler:innen, Auszubildende, Gründer:innen, Lehrkräfte, wissenschaftliche Mitarbeiter:innen, Arbeitssuchende, Geflüchtete und Rentner:innen. Für Berufstätige fällt eine Gebühr in Höhe von 200 Euro für den Erwerb eines Leistungszertifikats an. Der Erwerb eines Leistungszertifikats ist in verschiedenen Kursen mit kursinternen Projekten eine Teilnahmevoraussetzung. Über team@opencampus.sh kann ein Stipendium beantragt werden."
+  "general_achievement_certificate_conditions": "**Online-Teilnahme:**\nDie Teilnahme an Terminen wird nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist.\n\n**Kosten:**\nUUnsere Kurse sind offen für alle und kostenlos für Studierende, Schüler:innen, Auszubildende, Gründer:innen, Lehrkräfte, wissenschaftliche Mitarbeiter:innen, Arbeitssuchende, Geflüchtete und Rentner:innen. Für Berufstätige fällt eine Gebühr in Höhe von 200 Euro für den Erwerb eines Leistungszertifikats an. Der Erwerb eines Leistungszertifikats ist in verschiedenen Kursen mit kursinternen Projekten eine Teilnahmevoraussetzung. Über team@opencampus.sh kann ein Stipendium beantragt werden.",
+  "external_profile": "Homepage",
+  "linkedin_profile": "LinkedIn-Profil",
+  "xing_profile": "Xing-Profil",
+  "show_all_sessions": "Alle Termine anzeigen",
+  "hide_sessions": "Termine einklappen",
+  "speaker": "Referent:in",
+  "course_content": "Kursinhalte"
 }
