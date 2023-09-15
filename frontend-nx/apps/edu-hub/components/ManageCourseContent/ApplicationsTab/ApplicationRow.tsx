@@ -224,8 +224,9 @@ export const ApplicationRow: FC<IProps> = ({
                   title={enrollment.User.email}
                 >
                   {enrollment.User.email}
+                  <p className="mt-4">{t('manageCourse:participation_history')}</p>
                   {enrollment.User.CourseEnrollments.map((enrollment, index) => (
-                    <p key={index} className="text-sm whitespace-normal break-words mt-2 pl-4" style={{ textIndent: '-1rem' }}>
+                    <p key={index} className="text-xs whitespace-normal break-words mt-2 pl-4" style={{ textIndent: '-1rem' }}>
                       {enrollment.Course?.title} ({enrollment.Course?.Program.shortTitle}) - {enrollment.status}
                     </p>
                   ))}
