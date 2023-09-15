@@ -199,6 +199,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments
    */
   userId: any;
   /**
+   * The ID of the course of this enrollment from the given user
+   */
+  courseId: number;
+  /**
    * The last day a user can confirm his/her invitation to the given course
    */
   invitationExpirationDate: any | null;
@@ -348,6 +352,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments {
    * The ID of the user that enrolled for the given course
    */
   userId: any;
+  /**
+   * The ID of the course of this enrollment from the given user
+   */
+  courseId: number;
   /**
    * The last day a user can confirm his/her invitation to the given course
    */

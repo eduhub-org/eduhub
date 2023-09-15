@@ -259,6 +259,7 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollm
 
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course {
   __typename: "Course";
+  id: number;
   /**
    * The title of the course (only editable by an admin user)
    */
@@ -275,6 +276,10 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollm
    * The users current enrollment status to this course
    */
   status: CourseEnrollmentStatus_enum;
+  /**
+   * The ID of the course of this enrollment from the given user
+   */
+  courseId: number;
   /**
    * An object relationship
    */
@@ -316,6 +321,10 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
    * The ID of the user that enrolled for the given course
    */
   userId: any;
+  /**
+   * The ID of the course of this enrollment from the given user
+   */
+  courseId: number;
   /**
    * The last day a user can confirm his/her invitation to the given course
    */

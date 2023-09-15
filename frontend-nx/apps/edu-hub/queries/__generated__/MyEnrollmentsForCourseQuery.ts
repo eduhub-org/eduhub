@@ -316,6 +316,10 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment {
    */
   userId: any;
   /**
+   * The ID of the course of this enrollment from the given user
+   */
+  courseId: number;
+  /**
    * The last day a user can confirm his/her invitation to the given course
    */
   invitationExpirationDate: any | null;

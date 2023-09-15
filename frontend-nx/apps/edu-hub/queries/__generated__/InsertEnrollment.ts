@@ -195,6 +195,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
    */
   userId: any;
   /**
+   * The ID of the course of this enrollment from the given user
+   */
+  courseId: number;
+  /**
    * The last day a user can confirm his/her invitation to the given course
    */
   invitationExpirationDate: any | null;
@@ -344,6 +348,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning {
    * The ID of the user that enrolled for the given course
    */
   userId: any;
+  /**
+   * The ID of the course of this enrollment from the given user
+   */
+  courseId: number;
   /**
    * The last day a user can confirm his/her invitation to the given course
    */
