@@ -413,24 +413,15 @@ const UserOneRow: FC<IPropsUser> = ({ user }) => {
           }`}</p>
         </td>
       </tr>
-      {user.CourseEnrollments.map((enrollment) => (
-        <tr key={enrollment.id} className="bg-edu-course-list h-12">
-          <td className={tdStyple}>
-            <p className={enrollmentPStyle}>
-              {enrollment.Course.Program.title}: {enrollment.Course.title}
-            </p>
-          </td>
-          <td className={tdStyple}>
-            <p className={enrollmentPStyle}>Status: {enrollment.status}</p>
-          </td>
-          <td className={tdStyple}>
-            <p className={enrollmentPStyle}>
-              Last Updated:{' '}
-              {new Date(enrollment.updated_at).toLocaleDateString()}
-            </p>
-          </td>
-        </tr>
-      ))}
+      <tr className="font-medium bg-edu-course-list h-12">
+        <td className={tdStyple} colSpan={3}>
+          {user.CourseEnrollments.map((enrollment, index) => (
+            <p key={index} className={enrollmentPStyle}>
+            {enrollment.Course.title} ({enrollment.Course.Program.shortTitle}) - {enrollment.status}
+          </p>
+          ))}
+        </td>
+      </tr>
       <tr className="h-1" />
     </>
   );
