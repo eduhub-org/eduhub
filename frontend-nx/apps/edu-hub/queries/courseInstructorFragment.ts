@@ -10,6 +10,9 @@ export const COURSE_INSTRUCTOR_FRAGMENT = gql`
         picture
         id
         lastName
+        university
+        otherUniversity
+        externalProfile
       }
       description
     }
