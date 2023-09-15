@@ -3,28 +3,28 @@ import React, { FC, ReactNode, useCallback } from 'react';
 import { MdClose } from 'react-icons/md';
 
 interface IProps {
-  showModal: boolean;
-  modalTitle?: string;
-  onClose: (showModel: boolean) => void;
+  isOpen: boolean;
+  close: (showModal: boolean) => void;
+  title?: string;
   children?: ReactNode;
 }
 
-const ModalControl: FC<IProps> = ({
-  showModal,
-  onClose,
-  modalTitle,
+const Modal: FC<IProps> = ({
+  isOpen,
+  close,
+  title,
   children,
 }) => {
   const onCloseHandler = useCallback(() => {
-    onClose(!showModal);
-  }, [showModal, onClose]);
+    close(!isOpen);
+  }, [isOpen, close]);
 
   return (
     <>
-      <Dialog open={showModal} onClose={onCloseHandler}>
+      <Dialog open={isOpen} onClose={onCloseHandler}>
         <DialogTitle>
           <div className="flex flex-row justify-between">
-            {modalTitle && <p>{modalTitle}</p>}
+            {title && <p>{title}</p>}
             <MdClose onClick={onCloseHandler} className="cursor-pointer" />
           </div>
         </DialogTitle>
@@ -34,4 +34,4 @@ const ModalControl: FC<IProps> = ({
   );
 };
 
-export default ModalControl;
+export default Modal;

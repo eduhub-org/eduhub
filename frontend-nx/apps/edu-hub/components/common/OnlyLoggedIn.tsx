@@ -1,4 +1,4 @@
-import { FC, ReactElement } from "react";
+import { FC, ReactElement, ReactNode } from "react";
 
 import {
   useIsAdmin,
@@ -39,16 +39,19 @@ export const OnlyNotInstructor: FC<TProps> = ({ children }: TProps) => {
   }
 };
 
-export const OnlyAdmin: FC<TProps> = ({ children }: TProps) => {
+type OnlyAdminProps = {
+  children: ReactNode | ReactNode[];
+};
+export const OnlyAdmin: FC<OnlyAdminProps> = ({ children }: OnlyAdminProps) => {
   const isLoggedIn = useIsLoggedIn();
   const isAdmin = useIsAdmin();
+
   if (isLoggedIn && isAdmin) {
     return <>{children}</>;
   } else {
     return null;
   }
 };
-
 export const OnlyInstructor: FC<TProps> = ({ children }: TProps) => {
   const isLoggedIn = useIsLoggedIn();
   const isAdmin = useIsAdmin();

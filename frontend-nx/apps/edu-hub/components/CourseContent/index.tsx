@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, Dispatch, SetStateAction } from 'react';
+import { FC, useState, useEffect } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress } from '@material-ui/core';
 
@@ -24,7 +24,6 @@ import { Sessions } from './Sessions';
 import { DegreeCourses } from './DegreeCourses';
 import { ApplyButton } from './ApplyButton';
 import { EnrollmentUIController } from './EnrollmentUIController';
-import Trans from 'next-translate/Trans';
 import { signIn } from 'next-auth/react';
 
 const CourseContent: FC<{ id: number }> = ({ id }) => {

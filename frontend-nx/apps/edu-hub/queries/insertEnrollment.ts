@@ -3,6 +3,30 @@ import { gql } from "@apollo/client";
 import { COURSE_FRAGMENT } from "./courseFragment";
 import { ENROLLMENT_FRAGMENT } from "./enrollmentFragment";
 
+export const UPDATE_ENROLLMENT = gql`
+  mutation UpdateEnrollment(
+    $userId: uuid!
+    $courseId: Int!
+    $motivationLetter: String!
+    $status: CourseEnrollmentStatus_enum!
+  ) {
+    insert_CourseEnrollment(
+      objects: {
+        userId: $userId
+        courseId: $courseId
+        motivationLetter: $motivationLetter,
+        status: $status
+      },
+      on_conflict: {
+        constraint: uniqueUserCourse,
+        update_columns: [status]
+      }
+    ) {
+      affected_rows
+    }
+  }
+`;
+
 export const INSERT_ENROLLMENT = gql`
   ${COURSE_FRAGMENT}
   ${ENROLLMENT_FRAGMENT}

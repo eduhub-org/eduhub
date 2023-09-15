@@ -11,8 +11,8 @@ import {
 import { StaticComponentProperty } from '../../types/UIComponents';
 import EhAddButton from '../common/EhAddButton';
 import EhCheckBox2 from '../common/EhCheckBox2';
-import ModalControl from '../common/ModalController';
-import Loading from '../ManageCoursesContent/Loading';
+import ModalControl from '../common/Modal';
+import Loading from '../common/Loading';
 import AddUser from './AddUser';
 
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../queries/programList';
@@ -324,9 +324,9 @@ const Header: FC<IHeaderProps> = ({
         />
       </div>
       <ModalControl
-        modalTitle={t('addUserFormTitle')}
-        onClose={onCloseAddCourseWindow}
-        showModal={showAddUserForm}
+        close={onCloseAddCourseWindow}
+        isOpen={showAddUserForm}
+        title={t('addUserFormTitle')}
       >
         <AddUser handleCancel={handleCancelOfAddUserForm} t={t} />
       </ModalControl>

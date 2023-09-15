@@ -437,10 +437,10 @@ export const UPDATE_COURSE_TITLE = gql`
 `;
 
 export const UPDATE_COURSE_CHAT_LINK = gql`
-  mutation UpdateCourseChatLink($courseId: Int!, $chatLink: String!) {
+  mutation UpdateCourseChatLink($itemId: Int!, $text: String!) {
     update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { chatLink: $chatLink }
+      pk_columns: { id: $itemId }
+      _set: { chatLink: $text }
     ) {
       id
     }
@@ -448,8 +448,8 @@ export const UPDATE_COURSE_CHAT_LINK = gql`
 `;
 
 export const UPDATE_COURSE_ECTS = gql`
-  mutation UpdateCourseEcts($courseId: Int!, $ects: String!) {
-    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { ects: $ects }) {
+  mutation UpdateCourseEcts($itemId: Int!, $text: String!) {
+    update_Course_by_pk(pk_columns: { id: $itemId }, _set: { ects: $text }) {
       id
     }
   }

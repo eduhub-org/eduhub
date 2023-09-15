@@ -103,7 +103,7 @@ export const CertificateDownload: FC<IProps> = ({
                 rel="noopener noreferrer"
               >
                 {manageView
-                  ? t('manage-course:achievementCertificateDownload')
+                  ? t('manageCourse:achievement_certificate_download')
                   : t('course-page:achievementCertificateDownload')}
               </Button>
             </>
@@ -121,7 +121,7 @@ export const CertificateDownload: FC<IProps> = ({
               rel="noopener noreferrer"
             >
               {manageView
-                ? t('manage-course:attendanceCertificateDownload')
+                ? t('manageCourse:attendance_certificate_download')
                 : t('course-page:attendanceCertificateDownload')}
             </Button>
           )}

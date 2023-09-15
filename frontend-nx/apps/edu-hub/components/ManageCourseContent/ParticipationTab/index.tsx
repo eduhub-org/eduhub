@@ -60,7 +60,7 @@ import {
   AttendanceStatus_enum,
 } from '../../../__generated__/globalTypes';
 import TagWithTwoText from '../../common/TagWithTwoText';
-import Loading from '../../ManageCoursesContent/Loading';
+import Loading from '../../common/Loading';
 import { Button } from '../../common/Button';
 import { CircularProgress } from '@material-ui/core';
 
@@ -187,9 +187,9 @@ const ParticipationList: FC<IPropsParticipationList> = ({
   const tableHeaders: StaticComponentProperty[] = [
     { key: 0, label: t('firstName') },
     { key: 1, label: t('lastName') },
-    { key: 2, label: t('manage-course:attendances') },
-    { key: 3, label: t('manage-course:certificateAchievement') },
-    { key: 4, label: t('manage-course:certificates') },
+    { key: 2, label: t('manageCourse:attendances') },
+    { key: 3, label: t('manageCourse:certificate_achievement') },
+    { key: 4, label: t('manageCourse:certificates') },
   ];
 
   const participationEnrollments: ExtendedEnrollment[] = [

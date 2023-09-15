@@ -18,7 +18,7 @@ function isPublished(degreeCourse: Course_Course_by_pk_DegreeCourses | CourseWit
 }
 
 export const DegreeCourses: FC<DegreeCoursesProps> = ({ degreeCourses }) => {
-    const { t } = useTranslation('course-page');
+    const { t } = useTranslation('course');
 
     const currentDegreeCourses = degreeCourses.filter(isPublished);
     
