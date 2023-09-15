@@ -246,7 +246,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
               {t('course-page:brief-description')}
             </div>
 
-            {course.Program.shortTitle !== "DEGREES" ? null : (
+            {course.Program.shortTitle === "DEGREES" ? null : (
               <div
                 className={`p-4 m-2 ${determineTabClasses(
                   1,
