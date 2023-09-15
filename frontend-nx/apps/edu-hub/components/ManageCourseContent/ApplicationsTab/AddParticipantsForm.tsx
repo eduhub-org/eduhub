@@ -26,7 +26,9 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, ch
 
   // GraphQL hooks
   const { data, loading, error } = useRoleQuery(USER_LIST);
-  const [insertEnrollment] = useRoleMutation<UpdateEnrollment, UpdateEnrollmentVariables>(UPDATE_ENROLLMENT);
+  const [insertEnrollment] = useRoleMutation<UpdateEnrollment, UpdateEnrollmentVariables>(UPDATE_ENROLLMENT, {
+    refetchQueries: ['ManagedCourse'],
+  });
 
   // Memoized user list based on GraphQL query
   const availableUsers = useMemo(() => {
