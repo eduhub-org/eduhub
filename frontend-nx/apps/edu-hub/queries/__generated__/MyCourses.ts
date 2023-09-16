@@ -31,10 +31,6 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_Sessions_SessionS
    */
   lastName: string;
   /**
-   * The user's email address
-   */
-  email: string;
-  /**
    * The user's profile picture
    */
   picture: string | null;

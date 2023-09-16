@@ -5,14 +5,19 @@
   import { Course_Course_by_pk_Sessions as Session } from '../../queries/__generated__/Course';
   import { isLinkFormat } from '../../helpers/util';
   import UserCard from './UserCard';
+  import { useIsAdmin, useIsInstructor } from '../../hooks/authentication';
 
   interface SessionsProps {
     sessions: Session[];
+    isLoggedInParticipant: boolean;
   }
 
-  export const Sessions: FC<SessionsProps> = ({ sessions }) => {
+  export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant }) => {
     const { t, lang } = useTranslation('course');
     const [showAllSessions, setShowAllSessions] = useState(false);
+
+    const isAdmin = useIsAdmin();
+    const isInstructor =useIsInstructor();
 
     const initiallyShownSessions = 4;
 
@@ -54,38 +59,38 @@
                     <div className="flex flex-col">
                       <span className="block text-sm sm:text-lg whitespace-nowrap sm:whitespace-normal">{title}</span>
                       <div className="whitespace-nowrap ml-0 pl-0">
-                        {SessionAddresses.map(({ address }, index) => (
-                          <span
-                            key={index}
-                            className="text-sm text-gray-400 ml-0 pl-0"
-                          >
-                            {isLinkFormat(address) ? (
-                              <a
-                                href={address}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="underline"
-                              >
-                                ONLINE
-                              </a>
-                            ) : (
-                              <>
-                                <a
-                                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                                    address
-                                  )}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="underline"
-                                >
-                                  {address}
-                                </a>
-                              </>
-                            )}
-                            {index < SessionAddresses.length - 1 && ' +\u00A0'}
-                          </span>
-                        ))}
-                      </div>
+                          {SessionAddresses.map(({ address }, index) => (
+                            <span key={index} className="text-sm text-gray-400 ml-0 pl-0">
+                              {isLoggedInParticipant || isAdmin || isInstructor ? (
+                                isLinkFormat(address) ? (
+                                  <a
+                                    href={address}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="underline"
+                                  >
+                                    ONLINE
+                                  </a>
+                                ) : (
+                                  <a
+                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                                      address
+                                    )}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="underline"
+                                  >
+                                    {address}
+                                  </a>
+                                )
+                              ) : (
+                                // If the user is not logged in, display the address as plain text
+                                isLinkFormat(address) ? 'ONLINE' : address
+                              )}
+                              {index < SessionAddresses.length - 1 && ' +\u00A0'}
+                            </span>
+                          ))}
+                        </div>
                       <div className="flex flex-col">
                       {SessionSpeakers && SessionSpeakers.map((speaker, speakerIndex) => (
                        <UserCard key={speakerIndex} className='flex items-center my-3' user={speaker.Expert.User} role={t('speaker')} size='medium'/>

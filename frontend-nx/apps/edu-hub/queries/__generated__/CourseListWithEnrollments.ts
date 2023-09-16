@@ -31,10 +31,6 @@ export interface CourseListWithEnrollments_Course_Sessions_SessionSpeakers_Exper
    */
   lastName: string;
   /**
-   * The user's email address
-   */
-  email: string;
-  /**
    * The user's profile picture
    */
   picture: string | null;

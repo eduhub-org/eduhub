@@ -31,10 +31,6 @@ export interface CourseList_Course_Sessions_SessionSpeakers_Expert_User {
    */
   lastName: string;
   /**
-   * The user's email address
-   */
-  email: string;
-  /**
    * The user's profile picture
    */
   picture: string | null;

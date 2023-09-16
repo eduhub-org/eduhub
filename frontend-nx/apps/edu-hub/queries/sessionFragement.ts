@@ -18,7 +18,13 @@ export const SESSION_FRAGMENT = gql`
     SessionSpeakers {
       Expert {
         User {
-          ...UserFragment
+          id
+          firstName
+          lastName
+          picture
+          externalProfile
+          university
+          otherUniversity
         }
       }
     }

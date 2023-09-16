@@ -32,7 +32,7 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
 
   const getProfileLink = (url: string) => {
     if (url.includes('linkedin.com')) {
-        return <a href={url} target="_blank" rel="noopener noreferrer" className="underline">{t('linkedin_profile')}</a>;
+        return <a href={url} target="_blank" rel="noopener noreferrer">{t('linkedin_profile')}</a>;
     } else if (url.includes('xing.com')) {
         return <a href={url} target="_blank" rel="noopener noreferrer" className="underline">{t('xing_profile')}</a>;
     } else {
