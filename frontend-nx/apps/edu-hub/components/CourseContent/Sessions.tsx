@@ -5,6 +5,7 @@
   import { Course_Course_by_pk_Sessions as Session } from '../../queries/__generated__/Course';
   import { isLinkFormat } from '../../helpers/util';
   import UserCard from './UserCard';
+  import { useIsAdmin, useIsInstructor } from '../../hooks/authentication';
 
   interface SessionsProps {
     sessions: Session[];
@@ -14,6 +15,9 @@
   export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant }) => {
     const { t, lang } = useTranslation('course');
     const [showAllSessions, setShowAllSessions] = useState(false);
+
+    const isAdmin = useIsAdmin();
+    const isInstructor =useIsInstructor();
 
     const initiallyShownSessions = 4;
 
@@ -57,7 +61,7 @@
                       <div className="whitespace-nowrap ml-0 pl-0">
                           {SessionAddresses.map(({ address }, index) => (
                             <span key={index} className="text-sm text-gray-400 ml-0 pl-0">
-                              {isLoggedInParticipant ? (
+                              {isLoggedInParticipant || isAdmin || isInstructor ? (
                                 isLinkFormat(address) ? (
                                   <a
                                     href={address}
