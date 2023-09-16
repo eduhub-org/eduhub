@@ -31,10 +31,6 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionSpeakers_Expe
    */
   lastName: string;
   /**
-   * The user's email address
-   */
-  email: string;
-  /**
    * The user's profile picture
    */
   picture: string | null;

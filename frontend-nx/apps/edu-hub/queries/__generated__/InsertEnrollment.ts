@@ -31,10 +31,6 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessi
    */
   lastName: string;
   /**
-   * The user's email address
-   */
-  email: string;
-  /**
    * The user's profile picture
    */
   picture: string | null;

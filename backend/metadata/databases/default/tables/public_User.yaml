@@ -73,10 +73,13 @@ select_permissions:
   - role: anonymous
     permission:
       columns:
+        - externalProfile
         - firstName
         - id
-        - picture
         - lastName
+        - otherUniversity
+        - picture
+        - university
       filter: {}
       limit: 10
   - role: instructor_access

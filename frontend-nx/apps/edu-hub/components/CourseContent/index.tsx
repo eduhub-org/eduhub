@@ -107,6 +107,23 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     return signIn('keycloak');
   };
 
+
+  // const { data } = useRoleQuery<
+  //   CourseWithEnrollment,
+  //   CourseWithEnrollmentVariables
+  // >(COURSE_WITH_ENROLLMENT, {
+  //   variables: {
+  //     id: course.id,
+  //     userId,
+  //   },
+  // });
+  // Get the course enrollment of the current user (necessary for admins and instructors)
+  const courseEnrollment = getCourseEnrollment(course, userId);
+
+
+
+  const isLoggedInParticipant = isLoggedIn && ( courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED || courseEnrollment?.status === CourseEnrollmentStatus_enum.COMPLETED );
+
   const hasExternalRegistration = course.externalRegistrationLink !== null && course.externalRegistrationLink !== '';
   const eventHandler = () => {window.open(course.externalRegistrationLink, '_blank')}
 
@@ -144,6 +161,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                     ) : isLoggedIn && !hasExternalRegistration ? (
                       <EnrollmentUIController
                         course={course}
+                        courseEnrollment={courseEnrollment}
                         setInvitationModalOpen={setModalOpen}
                       />
                     ) : (
@@ -158,7 +176,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
               <ContentRow className="flex">
                 <PageBlock classname="flex-1 text-white space-y-6">
                   <LearningGoals learningGoals={course.learningGoals} />
-                  <Sessions sessions={course.Sessions} />
+                  <Sessions sessions={course.Sessions} isLoggedInParticipant={isLoggedInParticipant} />
                   <DegreeCourses degreeCourses={course.DegreeCourses} />
                 </PageBlock>
                 <div className="pr-0 lg:pr-6 xl:pr-0">

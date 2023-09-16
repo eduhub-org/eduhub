@@ -31,10 +31,6 @@ export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User
    */
   lastName: string;
   /**
-   * The user's email address
-   */
-  email: string;
-  /**
    * The user's profile picture
    */
   picture: string | null;
@@ -50,6 +46,10 @@ export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User
    * Name of the university the student is attending or working at (only provided if his/her university is not part of the provided list)
    */
   otherUniversity: string | null;
+  /**
+   * The user's email address
+   */
+  email: string;
 }
 
 export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert {

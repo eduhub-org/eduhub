@@ -9,29 +9,27 @@ import {
 } from 'react';
 
 import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
-import { useAuthedQuery } from '../../../hooks/authedQuery';
-import { useUser, useUserId } from '../../../hooks/user';
+import { useUser } from '../../../hooks/user';
 import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
 import {
-  CourseWithEnrollment,
-  CourseWithEnrollmentVariables,
+  CourseWithEnrollment_Course_by_pk_CourseEnrollments,
 } from '../../../queries/__generated__/CourseWithEnrollment';
-import { COURSE_WITH_ENROLLMENT } from '../../../queries/courseWithEnrollment';
 
 import { CourseLinkInfos } from './Links';
 import { ApplyButton } from '../ApplyButton';
 import { ApplicationModal } from './ApplicationModal';
 import { UserInfoModal } from './UserInfoModal';
 import { Button } from '../../common/Button';
-import { getCourseEnrollment } from '../../../helpers/util';
 
 interface IProps {
   course: Course_Course_by_pk;
+  courseEnrollment: CourseWithEnrollment_Course_by_pk_CourseEnrollments;
   setInvitationModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export const EnrollmentUIController: FC<IProps> = ({
   course,
+  courseEnrollment,
   setInvitationModalOpen,
 }) => {
   const [isUserInfoModalVisible, setUserInfoModalVisible] = useState(false);
@@ -40,16 +38,6 @@ export const EnrollmentUIController: FC<IProps> = ({
   const { t } = useTranslation('course-application');
 
   const user = useUser();
-  const userId = useUserId();
-  const { data } = useAuthedQuery<
-    CourseWithEnrollment,
-    CourseWithEnrollmentVariables
-  >(COURSE_WITH_ENROLLMENT, {
-    variables: {
-      id: course.id,
-      userId,
-    },
-  });
 
   const showModal = useCallback(() => {
     if (!user) {
@@ -74,8 +62,6 @@ export const EnrollmentUIController: FC<IProps> = ({
     }
   }, [user, isUserInfoModalVisible]);
 
-  // Get the course enrollment of the current user
-  const courseEnrollment = getCourseEnrollment(data?.Course_by_pk, userId);
 
   let content = null;
 
