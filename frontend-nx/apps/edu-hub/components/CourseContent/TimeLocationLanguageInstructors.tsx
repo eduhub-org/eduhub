@@ -7,10 +7,10 @@ import {
   getStartTimeString,
   // getWeekdayString,
 } from '../../helpers/dateHelpers';
-import mysteryImg from '../../public/images/common/mystery.svg';
 import languageIcon from '../../public/images/course/language.svg';
 import pinIcon from '../../public/images/course/pin.svg';
 import { Course_Course_by_pk } from '../../queries/__generated__/Course';
+import UserCard from './UserCard'; // Adjust the path as needed
 
 interface IProps {
   course: Course_Course_by_pk;
@@ -63,25 +63,13 @@ export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
         </span>
       </div>
       <div className="mt-16 justify-start">
-        {course.CourseInstructors.map((instructor, index) => (
-          <div key={`instructor-${index}`} className="flex items-center mb-6">
-            <div className="flex flex-shrink-0 items-start mr-4">
-              <Image
-                src={instructor.Expert.User.picture || mysteryImg}
-                alt="Image of the course instructor"
-                width={100}
-                height={100}
-                className="rounded-full object-cover"
-              />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-lg mb-1">
-                {instructor.Expert.User.firstName}{' '}
-                {instructor.Expert.User.lastName}
-              </span>
-            </div>
-          </div>
-        ))}
+      {course.CourseInstructors.map((instructor, index) => (
+        <UserCard 
+          className='flex items-center mb-6'
+          key={`instructor-${index}`} 
+          user={instructor.Expert.User}
+        />
+      ))}
       </div>
     </div>
   );

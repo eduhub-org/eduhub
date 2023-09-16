@@ -2,6 +2,7 @@ import { gql } from '@apollo/client';
 import { USER_FRAGMENT } from './userFragment';
 
 export const SESSION_FRAGMENT = gql`
+  ${USER_FRAGMENT}
   fragment SessionFragment on Session {
     id
     endDateTime
@@ -13,6 +14,19 @@ export const SESSION_FRAGMENT = gql`
       id
       address
       type
+    }
+    SessionSpeakers {
+      Expert {
+        User {
+          id
+          firstName
+          lastName
+          picture
+          externalProfile
+          university
+          otherUniversity
+        }
+      }
     }
   }
 `;
