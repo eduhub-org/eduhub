@@ -70,7 +70,6 @@ module "keycloak_service" {
   image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/keycloak:latest"
 
   service_labels = {
-    sha              = var.keycloak_sha
     startupProbeType = null
   }
 
@@ -97,6 +96,10 @@ module "keycloak_service" {
   }
 
   env_vars = [
+    {
+      name  = "KEYCLOAK_SHA"
+      value = var.keycloak_sha
+    },
     {
       name  = "KC_DB_URL"
       value = "jdbc:postgresql://${google_sql_database_instance.default.private_ip_address}/keycloak"
