@@ -69,6 +69,10 @@ resource "google_cloud_run_service" "eduhub" {
           container_port = 5000
         }
         env {
+          name  = "EDU_SHA"
+          value = var.frontend_sha
+        }
+        env {
           name  = "NEXT_PUBLIC_API_URL"
           value = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
         }
@@ -123,9 +127,6 @@ resource "google_cloud_run_service" "eduhub" {
     }
 
     metadata {
-      labels = {
-        sha = "${var.frontend_sha}"
-      }
       annotations = {
         "autoscaling.knative.dev/minScale" = "0"
         "autoscaling.knative.dev/maxScale" = "1"

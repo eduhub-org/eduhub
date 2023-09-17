@@ -74,10 +74,6 @@ module "hasura_service" {
   location     = var.region
   image        = "${var.region}-docker.pkg.dev/${var.project_id}/docker-repo/backend:latest"
 
-  service_labels = {
-    sha = var.hasura_sha
-  }
-
   limits = {
     cpu    = "1000m"
     memory = var.hasura_memory_limit
@@ -104,8 +100,8 @@ module "hasura_service" {
 
   env_vars = [
     {
-      name  = "DUMMY_VARIABLE_FOR_REDEPLOYMENT"
-      value = 9999
+      name  = "HASURA_SHA"
+      value = var.hasura_sha
     },
     {
       name  = "HASURA_GRAPHQL_ENABLE_CONSOLE"
