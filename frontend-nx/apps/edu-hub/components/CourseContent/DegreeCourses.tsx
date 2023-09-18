@@ -21,7 +21,7 @@ export const DegreeCourses: FC<DegreeCoursesProps> = ({ degreeCourses }) => {
     const { t } = useTranslation('course');
 
     const currentDegreeCourses = degreeCourses.filter(isPublished);
-    
+
     return (
         <>
         {degreeCourses && degreeCourses.length > 0 && (
@@ -31,7 +31,7 @@ export const DegreeCourses: FC<DegreeCoursesProps> = ({ degreeCourses }) => {
             </span>
             {currentDegreeCourses.length > 0 ? (
                 <ul className="list-disc pb-12">
-                    {degreeCourses.map((degreeCourse) => (
+                    {currentDegreeCourses.map((degreeCourse) => (
                         <li key={degreeCourse.Course?.id}>
                             <NextLink href={`/course/${degreeCourse.Course?.id}`} passHref>
                                 <MuiLink style={{ color: '#9CA3AF' }}>{degreeCourse.Course?.title}</MuiLink>
