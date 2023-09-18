@@ -1,0 +1,16 @@
+{
+  "attendances": "Attendances",
+  "certificate_achievement": "Certificate",
+  "certificates": "Certificate Download",
+  "attendance_certificate_download": "Ach",
+  "achievement_certificate_download": "Att",
+  "add_participants": "Add or Edit Participants",
+  "selected_users": "Selected Users",
+  "name_or_email": "Name or email",
+  "add_as_confirmed": "add or change as confirmed",
+  "add_as_applied": "add or change as applied",
+  "add_as_invited": "add or change as invited",
+  "add_as_aborted": "add or change as aborted",
+  "add_user_error": "Please select at least one user!",
+  "application_history": "Application History:"
+}

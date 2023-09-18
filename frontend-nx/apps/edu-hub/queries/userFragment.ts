@@ -7,5 +7,8 @@ export const USER_FRAGMENT = gql`
     lastName
     email
     picture
+    externalProfile
+    university
+    otherUniversity
   }
 `;

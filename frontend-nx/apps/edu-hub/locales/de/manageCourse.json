@@ -1,0 +1,16 @@
+{
+  "attendances": "Teilnahmen",
+  "certificate_achievement": "Leistungsnachweis",
+  "certificates": "Zertifikat Download",
+  "attendance_certificate_download": "T",
+  "achievement_certificate_download": "L",
+  "add_participants": "Teilnehmende bearbeiten",
+  "selected_users": "Ausgewählte User",
+  "name_or_email": "Name oder E-Mail",
+  "add_as_confirmed": "als bestätigt hinzufügen oder ändern",
+  "add_as_applied": "als beworben hinzufügen oder ändern",
+  "add_as_invited": "als eingeladen hinzufügen oder ändern",
+  "add_as_aborted": "als abgebrochen hinzufügen oder ändern",
+  "add_user_error": "Bitte mindestens einen User auswählen!",
+  "application_history": "Sonstige Bewerbungen:"
+}

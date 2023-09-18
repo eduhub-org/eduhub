@@ -1,6 +1,4 @@
 {
-  "degree_course_list_title": "Current Degree Offers",
-  "no_degree_elements_available": "Currently there are no ongoing offerings for this Degree.",
   "application_deadline": "Application deadline: ",
   "applyNow": "APPLY NOW",
   "attendance": "Attendance",
@@ -8,7 +6,6 @@
   "confirmationModalTitle": "Confirm course participation",
   "confirmationModalTextTop": "Congratulations, you are invited to participate in this course!",
   "confirmationModalTextBottom": "Please confirm your course participation only if you have the time to fully attend the course until the end of the semester.",
-  "courseContent": "Course content",
   "courseCosts": "This course costs {{price}}",
   "courseIsFree": "This course is free of charge",
   "courseGroups": "Course Groups",
@@ -131,8 +128,6 @@
   "congrats-completion": "Congratulations for finishing this course!",
   "add-session-address": "New address",
   "upgrade-status": "Update course status and switch to next tab.",
-  "show-all-sessions": "Show all sessions",
-  "hide-sessions": "Collapse sessions",
   "to-be-defined": "Location still to be determined",
   "not-submitted": "not submitted",
   "email-confirmed-applicants": "E-Mail to confirmed applicants",

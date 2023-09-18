@@ -4,23 +4,27 @@ import TextField from '@material-ui/core/TextField';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { DocumentNode } from 'graphql';
 import useTranslation from 'next-translate/useTranslation';
+import { gql } from '@apollo/client';
 
 type TagSelectorProps = {
+  immediateCommit?: boolean;
   label: string;
   placeholder: string;
   itemId: number;
   currentTags: { id: number, name: string }[];
   tagOptions: { id: number, name: string }[];
-  insertTagMutation: DocumentNode;
-  deleteTagMutation: DocumentNode;
+  insertTagMutation?: DocumentNode;
+  deleteTagMutation?: DocumentNode;
+  onSelectedTagsChange?: (selectedTags: { id: number, name: string }[]) => void;
   onTagAdded?: (data: any) => void;
   onTagRemoved?: (data: any) => void;
   refetchQueries: string[];
-  style?: string;
+  className?: string;
   translationNamespace?: string;
 };
 
 const TagSelector: React.FC<TagSelectorProps> = ({
+  immediateCommit=true,
   label,
   placeholder,
   itemId,
@@ -28,21 +32,30 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   tagOptions,
   insertTagMutation,
   deleteTagMutation,
+  onSelectedTagsChange,
   onTagAdded,
   onTagRemoved,
   refetchQueries,
-  style,
+  className,
   translationNamespace
 }) => {
   const [tags, setTags] = useState(currentTags);
-  const [insertTag] = useAdminMutation(insertTagMutation, {
+  const { t } = useTranslation();
+
+  const DUMMY_MUTATION = gql`
+    mutation DummyMutation {
+      __typename
+    }
+  `;
+
+  const [insertTag] = useAdminMutation(insertTagMutation || DUMMY_MUTATION, {
     onCompleted: (data) => {
       if (onTagAdded) onTagAdded(data);
     },
     refetchQueries
   });
 
-  const [deleteTag] = useAdminMutation(deleteTagMutation, {
+  const [deleteTag] = useAdminMutation(deleteTagMutation || DUMMY_MUTATION, {
     onCompleted: (data) => {
       if (onTagRemoved) onTagRemoved(data);
     },
@@ -50,33 +63,36 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   });
 
   const handleTagChange = (event, value) => {
-    const newTags = value;
-    const oldTags = currentTags;
+    if (immediateCommit) {
+      const newTags = value;
+      const oldTags = currentTags;
 
-    for (const tag of newTags) {
-      if (!oldTags.includes(tag)) {
-        // New tag added
-        insertTag({ variables: { itemId, tagId: tag.id } });
+      for (const tag of newTags) {
+        if (!oldTags.includes(tag)) {
+          // New tag added
+          insertTag({ variables: { itemId, tagId: tag.id } });
+        }
+      }
+
+      for (const tag of oldTags) {
+        if (!newTags.includes(tag)) {
+          // Tag removed
+          deleteTag({ variables: { itemId, tagId: tag.id } });
+        }
       }
     }
+    setTags(value); // Update the default value after changes
 
-    for (const tag of oldTags) {
-      if (!newTags.includes(tag)) {
-        // Tag removed
-        deleteTag({ variables: { itemId, tagId: tag.id } });
-      }
-    }
-
-    setTags(newTags); // Update the default value after changes
+    // Notify the parent form of the change
+    if (onSelectedTagsChange) {
+      onSelectedTagsChange(value);
+    }     
   };
 
-  const { t } = useTranslation();
-
-
   return (
-    <div className="col-span-10 flex mt-3">
+    <div className={className}>
       <MuiAutocomplete
-        className="w-3/4"
+        className="w-full"
         multiple
         id="tags-standard"
         options={tagOptions}

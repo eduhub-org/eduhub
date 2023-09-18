@@ -1,5 +1,5 @@
 import useTranslation from 'next-translate/useTranslation';
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import { useRoleQuery } from '../../hooks/authedQuery';
 import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from '../../queries/course';
@@ -20,6 +20,7 @@ import { ApplicationsTab } from './ApplicationsTab';
 import { DescriptionTab } from './DescriptionTab';
 import ManageCourseEnrollment from './ParticipationTab';
 import { SessionsTab } from './SessionsTab';
+import { useIsAdmin, useIsUserIdInList } from '../../hooks/authentication';
 
 interface Props {
   courseId: number;
@@ -140,6 +141,15 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
     }
   );
 
+
+  const isAdmin = useIsAdmin();
+  const instructorIds = qResult?.data?.Course_by_pk?.CourseInstructors.map(
+    (ci) => ci.Expert.User.id
+  );
+  const isInstructorOfCourse = useIsUserIdInList(instructorIds);
+
+
+
   if (qResult.error) {
     console.log('query managed course error!', qResult.error);
   }
@@ -226,6 +236,15 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
     );
   }
 
+
+  // If the user is neither an admin nor an instructor for this course return empty div
+  // (is equivalent to a non existing course)
+  if (!isAdmin && !isInstructorOfCourse) {
+    return (
+      <div></div>
+    );
+  }
+
   return (
     <>
       <PageBlock>
@@ -246,38 +265,44 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
               {t('course-page:brief-description')}
             </div>
 
-            <div
-              className={`p-4 m-2 ${determineTabClasses(
-                1,
-                openTabIndex,
-                course.status
-              )}`}
-              onClick={openTab1}
-            >
-              {t('course-page:appointments')}
-            </div>
+            {course.Program.shortTitle === "DEGREES" ? null : (
+              <div
+                className={`p-4 m-2 ${determineTabClasses(
+                  1,
+                  openTabIndex,
+                  course.status
+                )}`}
+                onClick={openTab1}
+              >
+                {t('course-page:appointments')}
+              </div>
+            )}
 
-            <div
-              className={`p-4 m-2 ${determineTabClasses(
-                2,
-                openTabIndex,
-                course.status
-              )}`}
-              onClick={openTab2}
-            >
-              {t('course-page:applications')}
-            </div>
+            {course.externalRegistrationLink ? null : (
+              <div
+                className={`p-4 m-2 ${determineTabClasses(
+                  2,
+                  openTabIndex,
+                  course.status
+                )}`}
+                onClick={openTab2}
+              >
+                {t('course-page:applications')}
+              </div>
+            )}
 
-            <div
-              className={`p-4 m-2 ${determineTabClasses(
-                3,
-                openTabIndex,
-                course.status
-              )}`}
-              onClick={openTab3}
-            >
-              {t('course-page:participation-and-benefits')}
-            </div>
+            {course.externalRegistrationLink ? null : (
+              <div
+                className={`p-4 m-2 ${determineTabClasses(
+                  3,
+                  openTabIndex,
+                  course.status
+                )}`}
+                onClick={openTab3}
+              >
+                {t('course-page:participation-and-benefits')}
+              </div>
+            )}
           </div>
 
           {openTabIndex === 0 && (

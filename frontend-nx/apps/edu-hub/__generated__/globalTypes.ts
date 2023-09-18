@@ -403,6 +403,7 @@ export enum CourseEnrollmentStatus_update_column {
  */
 export enum CourseEnrollment_constraint {
   Enrollment_pkey = "Enrollment_pkey",
+  uniqueUserCourse = "uniqueUserCourse",
 }
 
 /**
@@ -672,6 +673,7 @@ export enum Employment_enum {
   ACADEMIA = "ACADEMIA",
   EMPLOYED = "EMPLOYED",
   OTHER = "OTHER",
+  PUPIL = "PUPIL",
   RETIREE = "RETIREE",
   SELFEMPLOYED = "SELFEMPLOYED",
   STUDENT = "STUDENT",

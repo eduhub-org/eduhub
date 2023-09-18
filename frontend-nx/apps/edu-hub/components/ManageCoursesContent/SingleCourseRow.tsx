@@ -34,12 +34,9 @@ import {
 } from '../../queries/mutateCourse';
 import {
   DELETE_COURSE_INSRTRUCTOR,
-  INSERT_A_COURSEINSTRUCTOR,
 } from '../../queries/mutateCourseInstructor';
-import { INSERT_EXPERT } from '../../queries/user';
 import {
   AdminCourseList_Course,
-  AdminCourseList_CourseGroupOption,
 } from '../../queries/__generated__/AdminCourseList';
 import {
   DeleteCourseByPk,
@@ -62,13 +59,10 @@ import { SelectOption } from '../../types/UIComponents';
 import {
   CourseEnrollmentStatus_enum,
   CourseStatus_enum,
-  // Course_set_input,
 } from '../../__generated__/globalTypes';
-// import { SelectUserDialog } from '../common/dialogs/SelectUserDialog';
 import EhCheckBox from '../common/EhCheckbox';
 import EhSelect from '../common/EhSelect';
 import EhTag from '../common/EhTag';
-// import EhMultipleTag from '../common/EhMultipleTag';
 
 import { parseFileUploadEvent } from '../../helpers/filehandling';
 import EhDebounceInput from '../common/EhDebounceInput';
@@ -83,9 +77,8 @@ import participantsRatedPie from '../../public/images/course/status/participants
 import { InstructorColumn } from './CoursesInstructorColumn';
 import TagSelector from '../common/TagSelector';
 import TextFieldEditor from '../common/TextFieldEditor';
-import { UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK } from '../../queries/course';
-import { isLinkFormat } from '../../helpers/util';
-// import { INSERT_NEW_COURSE_LOCATION } from '../../queries/course';
+import { UPDATE_COURSE_CHAT_LINK, UPDATE_COURSE_ECTS, UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK } from '../../queries/course';
+import { isECTSFormat, isLinkFormat } from '../../helpers/util';
 
 interface EntrollmentStatusCount {
   [key: string]: number;
@@ -131,10 +124,6 @@ const courseStatus = (status: string) => {
   }
 };
 
-// EINGELADEN/ BESTÄTIGT/ UNBEWERTET and BEWERB = sum of (EINGELADEN/ BESTÄTIGT/ UNBEWERTET)
-// related with courseEnrollment table
-// STATUS is related with Cousre - status
-// OFF is related with Course Visibility
 
 interface IPropsCourseOneRow {
   programs: Programs_Program[];
@@ -144,8 +133,6 @@ interface IPropsCourseOneRow {
   qResult: QueryResult<any>;
   refetchCourses: () => void;
   onSetTitle: (c: AdminCourseList_Course, title: string) => any;
-  onSetChatLink: (c: AdminCourseList_Course, link: string) => any;
-  onSetEcts: (c: AdminCourseList_Course, link: string) => any;
   onSetAttendanceCertificatePossible: (
     c: AdminCourseList_Course,
     isPossible: boolean
@@ -154,7 +141,6 @@ interface IPropsCourseOneRow {
     c: AdminCourseList_Course,
     isPossible: boolean
   ) => any;
-  // onDeleteCourseGroup: (id: number) => any;
 }
 const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   programs,
@@ -163,8 +149,6 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   degreeCourses,
   refetchCourses,
   onSetTitle,
-  onSetChatLink,
-  onSetEcts,
   onSetAttendanceCertificatePossible,
   onSetAchievementCertificatePossible,
   qResult,
@@ -275,21 +259,6 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
     [course, onSetTitle]
   );
 
-  const handleSetChatLink = useCallback(
-    (value: string) => {
-      onSetChatLink(course, value);
-    },
-    [course, onSetChatLink]
-  );
-
-  const handleSetEcts = useCallback(
-    (value: string) => {
-      onSetEcts(course, value);
-    },
-    [course, onSetEcts]
-  );
-
-  /* #endregion */
 
   const applicationStatus = () => {
     const statusRecordsWithSum: EntrollmentStatusCount = {};
@@ -428,7 +397,7 @@ const currentCourseGroups = course.CourseGroups.map((group) => ({
 
 const currentCourseDegrees = course.CourseDegrees.map((degree) => ({
 id: degree.degreeCourseId,
-name: t(degree.Course.title)
+name: t(degree.DegreeCourse.title)
 }));
 
   return (
@@ -561,18 +530,19 @@ name: t(degree.Course.title)
                     locale={lang}
                   />
                 </div>
-                <div className="p-0 mb-3">
-                  <span>{t('course-page:chat-link')}</span>
-                  <br />
-                  <EhDebounceInput
-                    placeholder={`${t('register-something', {
-                      something: 'URL',
-                    })}`}
-                    onChangeHandler={handleSetChatLink}
-                    inputText={course.chatLink || ''}
-                  />
-                </div>
-                <td>
+                <TextFieldEditor
+                      label={'chat_link.label'}
+                      placeholder={'chat_link.label'}
+                      itemId={course.id}
+                      currentText={course.chatLink || ''}
+                      updateTextMutation={UPDATE_COURSE_CHAT_LINK}
+                      refetchQueries={['AdminCourseList']}
+                      typeCheck={isLinkFormat}
+                      helpText='chat_link.help_text'
+                      errorText='chat_link.error_text'
+                      translationNamespace='manageCourses'
+                    />
+                 <td>
                   {`${t('possible-certificates')}:`}
                   <div className="grid grid-cols-10">
                     <div
@@ -605,15 +575,20 @@ name: t(degree.Course.title)
                     <div className="col-span-3">
                       {t('course-page:performance-certificate')}
                     </div>
-                    <div className="col-span-7 flex mt-2">
-                      <span className="mr-2">{t('course-page:ects')}: </span>
-                      <EhDebounceInput
-                        placeholder={t('course-page:ects-placeholder')}
-                        onChangeHandler={handleSetEcts}
-                        inputText={course.ects || ''}
-                      />
-                    </div>
+                    <TextFieldEditor
+                      label={'ects.label'}
+                      placeholder={'ects.label'}
+                      itemId={course.id}
+                      currentText={course.ects || ''}
+                      updateTextMutation={UPDATE_COURSE_ECTS}
+                      refetchQueries={['AdminCourseList']}
+                      typeCheck={isECTSFormat}
+                      helpText='ects.help_text'
+                      errorText='ects.error_text'
+                      translationNamespace='manageCourses'
+                    />
                     <TagSelector
+                      className="col-span-10 flex mt-3"
                       label={t('course-page:courseGroups')}
                       placeholder={t('course-page:courseGroups')}
                       itemId={course.id}
@@ -625,6 +600,7 @@ name: t(degree.Course.title)
                       translationNamespace='start-page'
                     />
                     <TagSelector
+                      className="col-span-10 flex mt-3"
                       label={t('course-page:courseDegreeTitle')}
                       placeholder={t('course-page:courseDegree')}
                       itemId={course.id}

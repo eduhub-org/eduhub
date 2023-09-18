@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, SessionAddressType_enum, LocationOption_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, AttendanceStatus_enum, AchievementRecordRating_enum, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, SessionAddressType_enum, University_enum, LocationOption_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, AttendanceStatus_enum, AchievementRecordRating_enum, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourse
@@ -31,31 +31,43 @@ export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User
    */
   lastName: string;
   /**
-   * The user's email address
-   */
-  email: string;
-  /**
    * The user's profile picture
    */
   picture: string | null;
+  /**
+   * A link to an external profile, for example in LinkedIn or Xing
+   */
+  externalProfile: string | null;
+  /**
+   * The university the user is attending or workin at (only provided if he is a student or working in academia)
+   */
+  university: University_enum | null;
+  /**
+   * Name of the university the student is attending or working at (only provided if his/her university is not part of the provided list)
+   */
+  otherUniversity: string | null;
+  /**
+   * The user's email address
+   */
+  email: string;
 }
 
 export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert {
   __typename: "Expert";
-  id: number;
   /**
    * An object relationship
    */
   User: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User;
+  id: number;
 }
 
 export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers {
   __typename: "SessionSpeaker";
-  id: number;
   /**
    * An object relationship
    */
   Expert: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert;
+  id: number;
 }
 
 export interface ManagedCourse_Course_by_pk_Sessions {
@@ -106,6 +118,18 @@ export interface ManagedCourse_Course_by_pk_CourseInstructors_Expert_User {
    * The user's last name
    */
   lastName: string;
+  /**
+   * The university the user is attending or workin at (only provided if he is a student or working in academia)
+   */
+  university: University_enum | null;
+  /**
+   * Name of the university the student is attending or working at (only provided if his/her university is not part of the provided list)
+   */
+  otherUniversity: string | null;
+  /**
+   * A link to an external profile, for example in LinkedIn or Xing
+   */
+  externalProfile: string | null;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseInstructors_Expert {
@@ -249,6 +273,43 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances {
   Session: ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances_Session;
 }
 
+export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course_Program {
+  __typename: "Program";
+  /**
+   * The 6 letter short title for the program.
+   */
+  shortTitle: string | null;
+}
+
+export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course {
+  __typename: "Course";
+  id: number;
+  /**
+   * The title of the course (only editable by an admin user)
+   */
+  title: string;
+  /**
+   * An object relationship
+   */
+  Program: ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course_Program;
+}
+
+export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollments {
+  __typename: "CourseEnrollment";
+  /**
+   * The users current enrollment status to this course
+   */
+  status: CourseEnrollmentStatus_enum;
+  /**
+   * The ID of the course of this enrollment from the given user
+   */
+  courseId: number;
+  /**
+   * An object relationship
+   */
+  Course: ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course;
+}
+
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User {
   __typename: "User";
   id: any;
@@ -269,9 +330,25 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_User {
    */
   picture: string | null;
   /**
+   * A link to an external profile, for example in LinkedIn or Xing
+   */
+  externalProfile: string | null;
+  /**
+   * The university the user is attending or workin at (only provided if he is a student or working in academia)
+   */
+  university: University_enum | null;
+  /**
+   * Name of the university the student is attending or working at (only provided if his/her university is not part of the provided list)
+   */
+  otherUniversity: string | null;
+  /**
    * An array relationship
    */
   Attendances: ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances[];
+  /**
+   * An array relationship
+   */
+  CourseEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollments[];
 }
 
 export interface ManagedCourse_Course_by_pk_CourseEnrollments {
@@ -280,6 +357,10 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments {
    * The ID of the user that enrolled for the given course
    */
   userId: any;
+  /**
+   * The ID of the course of this enrollment from the given user
+   */
+  courseId: number;
   /**
    * The last day a user can confirm his/her invitation to the given course
    */

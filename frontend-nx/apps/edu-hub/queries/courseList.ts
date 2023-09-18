@@ -68,6 +68,9 @@ export const ADMIN_COURSE_LIST = gql`
         Course {
           title
         }
+        DegreeCourse {
+          title
+        }
       }
       AppliedAndUnratedCount: CourseEnrollments_aggregate(
         where: {

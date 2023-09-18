@@ -20,6 +20,6 @@ export interface UpdateCourseChatLink {
 }
 
 export interface UpdateCourseChatLinkVariables {
-  courseId: number;
-  chatLink: string;
+  itemId: number;
+  text: string;
 }

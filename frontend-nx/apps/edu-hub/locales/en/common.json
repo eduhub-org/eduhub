@@ -76,5 +76,13 @@
   "documentation": "Documentation",
   "cover-picture": "Cover image",
   "upload": "Upload",
-  "degrees": "Degrees"
+  "degrees": "Degrees",
+  "submit": "submit",
+  "CONFIRMED": "confirmed",
+  "INVITED": "invited",
+  "APPLIED": "applied",
+  "REJECTED": "rejected",
+  "ABORTED": "aborted",
+  "COMPLETED": "completed",
+  "CANCELED": "canceled"
 }
