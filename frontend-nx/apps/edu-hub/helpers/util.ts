@@ -91,5 +91,5 @@ export const isLinkFormat = (str) => {
 };
 
 export const isECTSFormat = (str) => {
-  return str.match(/^(2,5|5|12,5)$/);
+  return str.match(/^(2,5|5|12,5|NONE)$/);
 };

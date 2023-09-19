@@ -14,3 +14,12 @@
   list-style: none;
   padding-left: 2rem;
 }
+
+.dot-before::before {
+  content: "•";
+  color: #9CA3AF; /* Color of the dot */
+  font-size: 2em; /* Increase font size */
+  vertical-align: -6%; /* Adjust the vertical alignment */
+  @apply mr-4; /* Add right margin */
+  @apply ml-7; /* Add right margin */
+}

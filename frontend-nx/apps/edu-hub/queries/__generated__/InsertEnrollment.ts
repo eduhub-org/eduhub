@@ -231,6 +231,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Degre
    */
   published: boolean;
   /**
+   * The number of ECTS of the course (only editable by an admin user))
+   */
+  ects: string;
+  /**
    * An object relationship
    */
   Program: InsertEnrollment_insert_CourseEnrollment_returning_Course_DegreeCourses_Course_Program;

@@ -87,6 +87,7 @@ export const COURSE_FRAGMENT = gql`
         id
         title
         published
+        ects
         Program {
           id
           published

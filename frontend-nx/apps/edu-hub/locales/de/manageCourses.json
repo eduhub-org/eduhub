@@ -6,7 +6,7 @@
   },
   "ects": {
     "label": "ECTS",
-    "help_text": "Aktuell sind nur Kurse mit '2,5', '5', or '12,5' ECTS erlaubt (letzere für Degrees.",
+    "help_text": "Aktuell sind nur Kurse mit '2,5', '5', '12,5' (für Degrees) oder 'NONE' erlaubt.",
     "error_text": "Falsches ECTS Format!"
   },
   "external_registration_link": {

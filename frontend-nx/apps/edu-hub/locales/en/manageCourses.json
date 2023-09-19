@@ -6,7 +6,7 @@
   },
   "ects": {
     "label": "ECTS",
-    "help_text": "Only courses with '2,5', '5', or '12,5' (the latter only for degrees) are allowed.",
+    "help_text": "Only courses with '2,5', '5', '12,5' (for degrees) or 'NONE' are allowed.",
     "error_text": "Incorrect ECTS format!"
   },
   "external_registration_link": {
