@@ -1,49 +1,60 @@
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-import NextLink from 'next/link'; // Renamed to avoid naming collision
+import NextLink from 'next/link';
 import MuiLink from '@material-ui/core/Link';
-import {
-    Course_Course_by_pk_DegreeCourses,
-} from '../../queries/__generated__/Course';
-import {
-    CourseWithEnrollment_Course_by_pk_DegreeCourses,
-} from '../../queries/__generated__/CourseWithEnrollment';
+import { useUser } from '../../../edu-hub/hooks/user';
+import { COMPLETED_DEGREE_ENROLLMENTS } from '../../queries/courseDegree';
+import { CompletedDegreeEnrollments, CompletedDegreeEnrollmentsVariables } from '../../queries/__generated__/CompletedDegreeEnrollments';
+import { useRoleQuery } from '../../hooks/authedQuery';
+import { Course_Course_by_pk_DegreeCourses } from '../../queries/__generated__/Course';
 
-interface DegreeCoursesProps {
-    degreeCourses: Course_Course_by_pk_DegreeCourses[] | CourseWithEnrollment_Course_by_pk_DegreeCourses[];
-}
+const isPublished = (degreeCourse) => degreeCourse?.Course?.published && degreeCourse?.Course?.Program?.published;
 
-function isPublished(degreeCourse: Course_Course_by_pk_DegreeCourses | CourseWithEnrollment_Course_by_pk_DegreeCourses) {
-  return degreeCourse.Course?.published && degreeCourse.Course?.Program?.published;
-}
-
-export const DegreeCourses: FC<DegreeCoursesProps> = ({ degreeCourses }) => {
+export const CurrentDegreeCourses: FC<{ degreeCourses: Course_Course_by_pk_DegreeCourses[] }> = ({ degreeCourses }) => {
     const { t } = useTranslation('course');
-
     const currentDegreeCourses = degreeCourses.filter(isPublished);
 
-    return (
-        <>
-        {degreeCourses && degreeCourses.length > 0 && (
-        <>
-            <span className="text-3xl font-semibold mb-9">
-                {t('degree_course_list_title')}
-            </span>
-            {currentDegreeCourses.length > 0 ? (
+    return currentDegreeCourses.length > 0 ? (
+<>
+  <span className="text-3xl font-semibold mb-4">{t('current_degree_elements')}</span>
+  <ul className="list-disc pb-12">
+    {currentDegreeCourses.map((degreeCourse) => (
+      <li className="dot-before" key={degreeCourse?.Course?.id}>
+        <NextLink href={`/course/${degreeCourse?.Course?.id}`} passHref>
+          <MuiLink style={{ color: '#9CA3AF' }}>{degreeCourse?.Course?.title}</MuiLink>
+        </NextLink>
+      </li>
+    ))}
+  </ul>
+</>
+    ) : null;
+};
+
+export const CompletedDegreeCourses: FC<{ degreeCourseId: number, isLoggedInParticipant: boolean }> = ({ degreeCourseId, isLoggedInParticipant }) => {
+    const { t } = useTranslation('course');
+    const { id: userId } = useUser();
+    const { data, loading, error } = useRoleQuery<CompletedDegreeEnrollments, CompletedDegreeEnrollmentsVariables>(COMPLETED_DEGREE_ENROLLMENTS, {
+        variables: { degreeCourseId, userId },
+    });
+
+    const completedDegreeEnrollments = data?.CourseEnrollment || [];
+
+    return isLoggedInParticipant ? (
+        <div className="mb-12 text-edu-black bg-white px-8 py-8">
+            <span className="text-3xl font-semibold mb-4">{t('completed_degree_elements')}</span>
+            {completedDegreeEnrollments.length > 0 ? (
                 <ul className="list-disc pb-12">
-                    {currentDegreeCourses.map((degreeCourse) => (
-                        <li key={degreeCourse.Course?.id}>
-                            <NextLink href={`/course/${degreeCourse.Course?.id}`} passHref>
-                                <MuiLink style={{ color: '#9CA3AF' }}>{degreeCourse.Course?.title}</MuiLink>
+                    {completedDegreeEnrollments.map((degreeEnrollment) => (
+                        <li key={degreeEnrollment?.Course?.id}>
+                            <NextLink href={`/course/${degreeEnrollment?.Course?.id}`} passHref>
+                                <MuiLink style={{ color: '#9CA3AF' }}>{degreeEnrollment?.Course?.title}  - {degreeEnrollment?.Course?.Program?.title} ({t(degreeEnrollment?.Course?.ects)} ECTS)</MuiLink>
                             </NextLink>
                         </li>
                     ))}
                 </ul>
             ) : (
-                <p>{t('no_degree_elements_available')}</p>
+                <p>{t('no_degree_elements_completed')}</p>
             )}
-        </>
-         )}
-        </>
-    );
+        </div>
+    ) : null;
 };

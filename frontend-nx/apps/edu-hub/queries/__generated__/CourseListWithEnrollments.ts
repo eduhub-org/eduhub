@@ -235,6 +235,10 @@ export interface CourseListWithEnrollments_Course_DegreeCourses_Course {
    */
   published: boolean;
   /**
+   * The number of ECTS of the course (only editable by an admin user))
+   */
+  ects: string;
+  /**
    * An object relationship
    */
   Program: CourseListWithEnrollments_Course_DegreeCourses_Course_Program;

@@ -21,7 +21,7 @@ import { useIsCourseWithEnrollment } from '../../hooks/course';
 import { getWeekdayStartAndEndString } from '../../helpers/dateHelpers';
 import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
-import { DegreeCourses } from './DegreeCourses';
+import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
 import { ApplyButton } from './ApplyButton';
 import { EnrollmentUIController } from './EnrollmentUIController';
 import { signIn } from 'next-auth/react';
@@ -88,6 +88,10 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     userId
   )?.id;
 
+  // Check if course is a degree course
+  const isDegreeCourse = course?.Program?.shortTitle === 'DEGREES';
+  const isEventCourse = course?.Program?.shortTitle === 'EVENTS';
+  
   // Ensure course is defined before extracting its properties
   if (!course) {
     return (
@@ -170,14 +174,18 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                   </div>
                 </ContentRow>
               </PageBlock>
-              {isCourseWithEnrollment && (
+              {isCourseWithEnrollment && !isDegreeCourse && !isEventCourse ? (
                 <AttendancesAndAchievements course={course} />
-              )}
+              ) : null}
+              {isCourseWithEnrollment && isDegreeCourse ? (
+                <CompletedDegreeCourses degreeCourseId={course.id} isLoggedInParticipant={isLoggedInParticipant} />
+              ) : null}
+
               <ContentRow className="flex">
                 <PageBlock classname="flex-1 text-white space-y-6">
                   <LearningGoals learningGoals={course.learningGoals} />
                   <Sessions sessions={course.Sessions} isLoggedInParticipant={isLoggedInParticipant} />
-                  <DegreeCourses degreeCourses={course.DegreeCourses} />
+                  <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
                 </PageBlock>
                 <div className="pr-0 lg:pr-6 xl:pr-0">
                   <TimeLocationLanguageInstructors course={course} />

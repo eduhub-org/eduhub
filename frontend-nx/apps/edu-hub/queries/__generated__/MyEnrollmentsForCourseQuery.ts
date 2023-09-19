@@ -231,6 +231,10 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_DegreeCours
    */
   published: boolean;
   /**
+   * The number of ECTS of the course (only editable by an admin user))
+   */
+  ects: string;
+  /**
    * An object relationship
    */
   Program: MyEnrollmentsForCourseQuery_CourseEnrollment_Course_DegreeCourses_Course_Program;
