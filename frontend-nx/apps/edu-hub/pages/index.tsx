@@ -71,8 +71,19 @@ const Home: FC = () => {
     }
   }, [isSessionLoading, adminCourses?.Course, userId, adminCoursesData.loading, adminCoursesData?.data?.Course, adminCoursesData, coursesData, courseGroupOptionsData]);
 
-  const myCourses = enrolledCourses?.Course?.filter(course => course.CourseEnrollments.length > 0) ?? [];
+
+  const myCourses = (enrolledCourses?.Course ?? [])
+  .filter(({ CourseEnrollments }) => CourseEnrollments.some(({ userId: enrolledUserId }) => enrolledUserId === userId))
+  .sort((a, b) => {
+    const dateA = new Date(a.applicationEnd).getTime();
+    const dateB = new Date(b.applicationEnd).getTime();
+    return dateB - dateA;
+  });
+
+  
+
   const publishedCourses = courses?.Course?.filter(course => course.published && course.Program.published) ?? [];
+
 
   const coursesGroupsAuthenticated = [
     { title: 'myAdminCourses', courses: myAdminCourses, isManaged: true },
