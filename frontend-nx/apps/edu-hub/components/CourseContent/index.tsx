@@ -21,7 +21,7 @@ import { useIsCourseWithEnrollment } from '../../hooks/course';
 import { getWeekdayStartAndEndString } from '../../helpers/dateHelpers';
 import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
-import { DegreeCourses } from './DegreeCourses';
+import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
 import { ApplyButton } from './ApplyButton';
 import { EnrollmentUIController } from './EnrollmentUIController';
 import { signIn } from 'next-auth/react';
@@ -88,6 +88,10 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     userId
   )?.id;
 
+  // Check if course is a degree course
+  const isDegreeCourse = course?.Program?.shortTitle === 'DEGREES';
+  const isEventCourse = course?.Program?.shortTitle === 'EVENTS';
+  
   // Ensure course is defined before extracting its properties
   if (!course) {
     return (
@@ -108,19 +112,8 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   };
 
 
-  // const { data } = useRoleQuery<
-  //   CourseWithEnrollment,
-  //   CourseWithEnrollmentVariables
-  // >(COURSE_WITH_ENROLLMENT, {
-  //   variables: {
-  //     id: course.id,
-  //     userId,
-  //   },
-  // });
   // Get the course enrollment of the current user (necessary for admins and instructors)
   const courseEnrollment = getCourseEnrollment(course, userId);
-
-
 
   const isLoggedInParticipant = isLoggedIn && ( courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED || courseEnrollment?.status === CourseEnrollmentStatus_enum.COMPLETED );
 
@@ -142,42 +135,46 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
             >
               <div className="max-w-screen-xl mx-auto w-full">{title}</div>
             </div>
-            <div className="max-w-screen-xl mx-auto w-full">
-              <PageBlock>
-                <ContentRow className="items-center">
-                  <div className="flex flex-1 flex-col text-white mb-20">
-                    {course.weekDay !== 'NONE' ? (
-                      <span className="text-xs">
-                        {getWeekdayStartAndEndString(course, lang, t)}
-                      </span>
-                    ) : null}
-                    <span className="text-2xl mt-2">{course.tagline}</span>
-                  </div>
-                  <div className="flex flex-1 lg:max-w-md">
-                    {hasExternalRegistration ? (
-                      <div className="mx-auto">
-                        <ApplyButton course={course} onClickApply={eventHandler} />
-                      </div>
-                    ) : isLoggedIn && !hasExternalRegistration ? (
-                      <EnrollmentUIController
-                        course={course}
-                        courseEnrollment={courseEnrollment}
-                        setInvitationModalOpen={setModalOpen}
-                      />
-                    ) : (
-                      <div className="mx-auto"><ApplyButton course={course} onClickApply={signInHandler} /></div>
-                    )}
-                  </div>
-                </ContentRow>
-              </PageBlock>
-              {isCourseWithEnrollment && (
+              <div className="max-w-screen-xl mx-auto w-full">
+                <PageBlock>
+                  <ContentRow className="items-center">
+                    <div className="flex flex-1 flex-col text-white mb-20">
+                      {course.weekDay !== 'NONE' ? (
+                        <span className="text-xs">
+                          {getWeekdayStartAndEndString(course, lang, t)}
+                        </span>
+                      ) : null}
+                      <span className="text-2xl mt-2">{course.tagline}</span>
+                    </div>
+                    <div className="flex flex-1 lg:max-w-md">
+                      {hasExternalRegistration ? (
+                        <div className="mx-auto mb-10">
+                          <ApplyButton course={course} onClickApply={eventHandler} />
+                        </div>
+                      ) : isLoggedIn && !hasExternalRegistration ? (
+                        <EnrollmentUIController
+                          course={course}
+                          courseEnrollment={courseEnrollment}
+                          setInvitationModalOpen={setModalOpen}
+                        />
+                      ) : (
+                        <div className="mx-auto mb-10"><ApplyButton course={course} onClickApply={signInHandler} /></div>
+                      )}
+                    </div>
+                  </ContentRow>
+                </PageBlock>
+              {isCourseWithEnrollment && !isDegreeCourse && !isEventCourse ? (
                 <AttendancesAndAchievements course={course} />
-              )}
+              ) : null}
+              {isCourseWithEnrollment && isDegreeCourse ? (
+                <CompletedDegreeCourses degreeCourseId={course.id} isLoggedInParticipant={isLoggedInParticipant} />
+              ) : null}
+
               <ContentRow className="flex">
                 <PageBlock classname="flex-1 text-white space-y-6">
                   <LearningGoals learningGoals={course.learningGoals} />
                   <Sessions sessions={course.Sessions} isLoggedInParticipant={isLoggedInParticipant} />
-                  <DegreeCourses degreeCourses={course.DegreeCourses} />
+                  <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
                 </PageBlock>
                 <div className="pr-0 lg:pr-6 xl:pr-0">
                   <TimeLocationLanguageInstructors course={course} />

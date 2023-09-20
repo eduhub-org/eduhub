@@ -9,6 +9,23 @@ export const DEGREE_COURSES = gql`
   }
 `;
 
+export const COMPLETED_DEGREE_ENROLLMENTS = gql`
+  query CompletedDegreeEnrollments($degreeCourseId: Int!, $userId: uuid!) {
+    CourseEnrollment(where: {userId: {_eq: $userId}, Course: {CourseDegrees: {degreeCourseId: {_eq: $degreeCourseId}}}, achievementCertificateURL: {_is_null: false}}) {
+      Course {
+        id
+        title
+        ects
+        Program {
+          shortTitle
+          title
+        }
+      }
+    }
+  }
+`;
+
+
 export const INSERT_COURSE_DEGREE_TAG = gql`
   mutation InsertCourseDegreeTag($itemId: Int!, $tagId: Int!) {
     insert_CourseDegree(

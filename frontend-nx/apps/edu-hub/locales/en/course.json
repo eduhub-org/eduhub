@@ -1,5 +1,7 @@
 {
-  "degree_course_list_title": "Current Offerings that are Part of the Degree",
+  "completed_degree_elements": "Completed Degree Elements",
+  "no_degree_elements_completed": "You have not completed any Degree Elements yet.",
+  "current_degree_elements": "Current Offerings that are Part of the Degree",
   "no_degree_elements_available": "Currently there are no ongoing offerings for this Degree.",
   "general_achievement_certificate_conditions": "**Online Participation:**\nAttendance is only counted as present if the camera is continuously turned on!\n\n**Cost:**\nOur courses are open to everyone and free for university or high school students, trainees, founders, teachers, research staff, job seekers, refugees, and retirees. For working professionals, a fee of 200 Euros is charged for obtaining an achievement certificate, which is mandatory for the participation in some courses. A scholarship can be applied for through team@opencampus.sh.",
   "external_profile": "Homepage",
