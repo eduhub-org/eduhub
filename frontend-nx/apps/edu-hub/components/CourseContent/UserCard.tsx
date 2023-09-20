@@ -60,7 +60,7 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
         <div className={`flex flex-shrink-0 items-start mr-4 ${fontSize}`}>
           <Image
             src={user.picture || mysteryImg}
-            alt={`{t('common:image_of')} ${role}`}
+            alt={`${t('common:image_of')} ${user.firstName}`}
             width={imageSize}
             height={imageSize}
             className="rounded-full object-cover"
