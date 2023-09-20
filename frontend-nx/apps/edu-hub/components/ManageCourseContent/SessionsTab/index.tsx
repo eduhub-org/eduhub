@@ -118,13 +118,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     }
 
     qResult.refetch();
-  }, [
-    course,
-    qResult,
-    insertSessionMutation,
-    courseSessions,
-    insertSessionLocationMutation,
-  ]);
+  }, [courseSessions, insertSessionMutation, course.id, course.CourseLocations, qResult, insertSessionLocationMutation, t]);
 
   const deleteSessionLocation = useDeleteCallback<
     DeleteCourseSessionLocation,
