@@ -13,29 +13,31 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
 
   const { t } = useTranslation('manageCourse');
 
-  const degreeParticipantsEnrollments = ['1','2'];
+  const degreeParticipantsEnrollments = course.CourseEnrollments;
+
+  
 
   const data = degreeParticipantsEnrollments;
   const columns = [
     {
       columnName: 'Name',
-      width: 4,
-      displayComponent: ({ rowData }) => <div>Data 1{rowData.startDateTime}</div>,
+      width: 2,
+      displayComponent: ({ rowData }) => <div>{rowData.User.firstName} {rowData.User.lastName}</div>,
     },
     {
       columnName: 'Participations',
-      width: 16,
+      width: 4,
       displayComponent: ({ rowData }) => <div>Data2{rowData.title}</div>,
     },
     {
       columnName: 'Last Participation',
-      width: 4,
+      width: 1,
       displayComponent: ({ rowData }) => <div>Data 3{rowData.title}</div>,
     },
     {
       columnName: 'Status',
       width: 2,
-      displayComponent: ({ rowData }) => <div>Data 4{rowData.title}</div>,
+      displayComponent: ({ rowData }) => <div>{rowData.status}</div>,
     },
   ];
 
