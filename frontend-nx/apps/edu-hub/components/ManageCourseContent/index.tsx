@@ -130,7 +130,7 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  * @returns {any} the component
  */
 export const ManageCourseContent: FC<Props> = ({ courseId }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('manageCourse');
 
   const qResult = useRoleQuery<ManagedCourse, ManagedCourseVariables>(
     MANAGED_COURSE,
@@ -262,7 +262,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
               )}`}
               onClick={openTab0}
             >
-              {t('course-page:brief-description')}
+              {t('description')}
             </div>
 
             {course.Program.shortTitle === "DEGREES" ? null : (
@@ -274,7 +274,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
                 )}`}
                 onClick={openTab1}
               >
-                {t('course-page:appointments')}
+                {t('sessions')}
               </div>
             )}
 
@@ -287,11 +287,11 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
                 )}`}
                 onClick={openTab2}
               >
-                {t('course-page:applications')}
+                {t('applications')}
               </div>
             )}
 
-            {course.externalRegistrationLink ? null : (
+            {course.externalRegistrationLink || course.Program.shortTitle === "DEGREES" ? null : (
               <div
                 className={`p-4 m-2 ${determineTabClasses(
                   3,
@@ -300,11 +300,25 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
                 )}`}
                 onClick={openTab3}
               >
-                {t('course-page:participation-and-benefits')}
+                {t('participations_and_achievements')}
               </div>
             )}
-          </div>
 
+            {course.Program.shortTitle === "DEGREES" ? (
+              <div
+                className={`p-4 m-2 ${determineTabClasses(
+                  1,
+                  openTabIndex,
+                  course.status
+                )}`}
+                onClick={openTab1}
+              >
+                {t('degree_participations')}
+              </div>
+            ) : null}
+
+          </div>
+          
           {openTabIndex === 0 && (
             <DescriptionTab course={course} qResult={qResult} />
           )}

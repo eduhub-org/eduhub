@@ -1,4 +1,9 @@
 {
+  "description": "Description",
+  "sessions": "Dates",
+  "applications": "Applications",
+  "participations_and_achievements": "Participations and Achievements",
+  "degree_participations": "Degree Participations",
   "attendances": "Attendances",
   "certificate_achievement": "Certificate",
   "certificates": "Certificate Download",
