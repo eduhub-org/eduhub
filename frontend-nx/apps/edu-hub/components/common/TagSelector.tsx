@@ -5,6 +5,29 @@ import { useAdminMutation } from '../../hooks/authedMutation';
 import { DocumentNode } from 'graphql';
 import useTranslation from 'next-translate/useTranslation';
 import { gql } from '@apollo/client';
+import { FixedSizeList } from 'react-window';
+
+
+const ListboxComponent = React.forwardRef<HTMLDivElement, { children: React.ReactNode }>(function ListboxComponent(props, ref) {
+  const { children, ...other } = props;
+  const itemCount = Array.isArray(children) ? children.length : 0;
+  const itemSize = 36; // you can adjust this value based on the actual size
+
+  return (
+    <div ref={ref}>
+      <FixedSizeList
+        height={itemSize * 5} // Show 5 items at a time
+        width="100%"
+        itemSize={itemSize}
+        itemCount={itemCount}
+        {...other}
+      >
+        {({ index, style }) => React.cloneElement(children[index], { style })}
+      </FixedSizeList>
+    </div>
+  );
+});
+
 
 type TagSelectorProps = {
   immediateCommit?: boolean;
@@ -101,6 +124,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
             ? t(`${translationNamespace}:${option.name}`)
             : option.name
         }
+        ListboxComponent={ListboxComponent}
         renderInput={(params) => (
           <TextField
             {...params}
