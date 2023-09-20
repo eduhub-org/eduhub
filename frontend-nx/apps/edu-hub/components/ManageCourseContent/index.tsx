@@ -16,10 +16,11 @@ import { CourseStatus_enum } from '../../__generated__/globalTypes';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { QuestionConfirmationDialog } from '../common/dialogs/QuestionConfirmationDialog';
 import { PageBlock } from '../common/PageBlock';
-import { ApplicationsTab } from './ApplicationsTab';
 import { DescriptionTab } from './DescriptionTab';
-import ManageCourseEnrollment from './CourseParticipationsTab';
 import { SessionsTab } from './SessionsTab';
+import { ApplicationsTab } from './ApplicationsTab';
+import { CourseParticipationsTab } from './CourseParticipationsTab';
+import { DegreeParticipationsTab } from './DegreeParticipationsTab';
 import { useIsAdmin, useIsUserIdInList } from '../../hooks/authentication';
 
 interface Props {
@@ -187,6 +188,13 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
     }
   }, [setOpenTabIndex, maxAllowedTab]);
 
+  const openTab4 = useCallback(() => {
+    if (maxAllowedTab >= 3) {
+      setOpenTabIndex(4);
+    }
+  }, [setOpenTabIndex, maxAllowedTab]);
+
+
   const [isCantUpgradeOpen, setCantUpgradeOpen] = useState(false);
   const handleCloseCantUpgrade = useCallback(() => {
     setCantUpgradeOpen(false);
@@ -311,7 +319,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
                   openTabIndex,
                   course.status
                 )}`}
-                onClick={openTab1}
+                onClick={openTab4}
               >
                 {t('degree_participations')}
               </div>
@@ -331,7 +339,10 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
             <ApplicationsTab course={course} qResult={qResult} />
           )}
           {openTabIndex === 3 && (
-            <ManageCourseEnrollment course={course} qResult={qResult} />
+            <CourseParticipationsTab course={course} qResult={qResult} />
+          )}
+          {openTabIndex === 4 && (
+            <DegreeParticipationsTab course={course} qResult={qResult} />
           )}
 
           {/* {openTabIndex === maxAllowedTab && openTabIndex < 3 && (

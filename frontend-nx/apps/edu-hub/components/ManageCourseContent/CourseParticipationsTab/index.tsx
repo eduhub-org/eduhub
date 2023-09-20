@@ -64,11 +64,11 @@ import Loading from '../../common/Loading';
 import { Button } from '../../common/Button';
 import { CircularProgress } from '@material-ui/core';
 
-interface IProps {
+interface CourseParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
 }
-const ParticipationsTab: FC<IProps> = ({ course, qResult }) => {
+export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ course, qResult }) => {
   return (
     <>
       <div className="flex flex-col space-y-2">
@@ -83,8 +83,6 @@ const ParticipationsTab: FC<IProps> = ({ course, qResult }) => {
     </>
   );
 };
-
-export default ParticipationsTab;
 
 /* #region Course AchievementOptions */
 
