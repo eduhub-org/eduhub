@@ -18,7 +18,7 @@ import { QuestionConfirmationDialog } from '../common/dialogs/QuestionConfirmati
 import { PageBlock } from '../common/PageBlock';
 import { ApplicationsTab } from './ApplicationsTab';
 import { DescriptionTab } from './DescriptionTab';
-import ManageCourseEnrollment from './ParticipationTab';
+import ManageCourseEnrollment from './CourseParticipationsTab';
 import { SessionsTab } from './SessionsTab';
 import { useIsAdmin, useIsUserIdInList } from '../../hooks/authentication';
 
