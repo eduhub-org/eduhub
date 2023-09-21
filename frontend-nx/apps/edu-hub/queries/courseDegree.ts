@@ -42,6 +42,40 @@ export const COMPLETED_DEGREE_ENROLLMENTS = gql`
   }
 `;
 
+export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
+  query DegreeParticipantsWithDegreeEnrollments($degreeCourseId: Int!) {
+    Course_by_pk(id: $degreeCourseId) {
+      CourseEnrollments {
+        id
+        status
+        User {
+          id
+          firstName
+          lastName
+          email
+        CourseEnrollments(where: {
+          Course: {CourseDegrees: {degreeCourseId: {_eq: $degreeCourseId}}}
+        }) {
+          id
+          status
+          achievementCertificateURL
+          updated_at
+          Course {
+            id
+            title
+            ects
+            Program {
+              id
+              shortTitle
+              title
+            }
+          }
+        }
+        }
+      }
+    }
+  }
+`;
 
 export const INSERT_COURSE_DEGREE_TAG = gql`
   mutation InsertCourseDegreeTag($itemId: Int!, $tagId: Int!) {
