@@ -33,7 +33,7 @@ export const CurrentDegreeCourses: FC<{ degreeCourses: Course_Course_by_pk_Degre
 export const CompletedDegreeCourses: FC<{ degreeCourseId: number, isLoggedInParticipant: boolean }> = ({ degreeCourseId, isLoggedInParticipant }) => {
     const { t } = useTranslation('course');
     const { id: userId } = useUser();
-    const { data, loading, error } = useRoleQuery<CompletedDegreeEnrollments, CompletedDegreeEnrollmentsVariables>(COMPLETED_DEGREE_ENROLLMENTS, {
+    const { data } = useRoleQuery<CompletedDegreeEnrollments, CompletedDegreeEnrollmentsVariables>(COMPLETED_DEGREE_ENROLLMENTS, {
         variables: { degreeCourseId, userId },
     });
 
@@ -47,7 +47,9 @@ export const CompletedDegreeCourses: FC<{ degreeCourseId: number, isLoggedInPart
                     {completedDegreeEnrollments.map((degreeEnrollment) => (
                         <li key={degreeEnrollment?.Course?.id}>
                             <NextLink href={`/course/${degreeEnrollment?.Course?.id}`} passHref>
-                                <MuiLink style={{ color: '#9CA3AF' }}>{degreeEnrollment?.Course?.title}  - {degreeEnrollment?.Course?.Program?.title} ({t(degreeEnrollment?.Course?.ects)} ECTS)</MuiLink>
+                              <MuiLink style={{ color: '#9CA3AF' }}>
+                              {degreeEnrollment?.Course?.title} - {degreeEnrollment?.Course?.Program?.shortTitle !== 'EVENTS' ? ` ${t(degreeEnrollment?.Course?.Program?.title)} (${t(degreeEnrollment?.Course?.ects)} ECTS)` : `${t(degreeEnrollment?.Course?.Program?.shortTitle)}`}
+                              </MuiLink>
                             </NextLink>
                         </li>
                     ))}
