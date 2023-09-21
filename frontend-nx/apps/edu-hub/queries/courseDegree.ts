@@ -29,6 +29,7 @@ export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
   query DegreeParticipantsWithDegreeEnrollments($degreeCourseId: Int!) {
     Course_by_pk(id: $degreeCourseId) {
       CourseEnrollments {
+        id
         status
         User {
           id
@@ -38,6 +39,7 @@ export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
         CourseEnrollments(where: {
           Course: {CourseDegrees: {degreeCourseId: {_eq: $degreeCourseId}}}
         }) {
+          id
           status
           achievementCertificateURL
           updated_at
@@ -46,6 +48,7 @@ export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
             title
             ects
             Program {
+              id
               shortTitle
               title
             }

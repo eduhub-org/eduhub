@@ -1,26 +1,26 @@
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-import { QueryResult } from '@apollo/client';
 import { ManagedCourse_Course_by_pk } from '../../../queries/__generated__/ManagedCourse';
-import { TableGrid } from './TableGrid';
-import { useRoleQuery } from 'apps/edu-hub/hooks/authedQuery';
+import { TableGrid } from '../../common/TableGrid';
+import { useRoleQuery } from '../../../hooks/authedQuery';
 import { DegreeParticipantsWithDegreeEnrollments, DegreeParticipantsWithDegreeEnrollmentsVariables } from '../../../queries/__generated__/DegreeParticipantsWithDegreeEnrollments';
 import { DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS } from '../../../queries/courseDegree';
 
 interface DegreeParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
-  qResult: QueryResult<any, any>;
 }
 
-export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ course, qResult }) => {
+export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ course }) => {
 
-  const { t, lang } = useTranslation('manageCourse');
+  const { lang } = useTranslation();
 
-  const degreeCourseId = course.id;
+  const degreeCourseId = course?.id;
   const { data } = useRoleQuery<DegreeParticipantsWithDegreeEnrollments, DegreeParticipantsWithDegreeEnrollmentsVariables>(DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS, {
       variables: { degreeCourseId },
   });
-  const degreeParticipantsEnrollments = data?.Course_by_pk?.CourseEnrollments || [];
+  const degreeParticipantsEnrollments = data?.Course_by_pk?.CourseEnrollments.filter(
+    (enrollment) => enrollment.status !== "REJECTED" && enrollment.status !== "APPLIED"
+  ) || [];
 
    // Helper functions for the table columns
    const getMaxUpdatedAt = (courseEnrollments) => {
@@ -32,13 +32,6 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       .reduce((maxDate, currentDate) => (currentDate > maxDate ? currentDate : maxDate));
     return maxDate.toLocaleString(lang);  // Convert the Date object to a string
   };
-  // const sortMaxUpdatedAt = (a, b, columnName, sortDirection) => {
-  //   const valueA = getMaxUpdatedAt(a.User.CourseEnrollments);
-  //   const valueB = getMaxUpdatedAt(b.User.CourseEnrollments);
-  //   if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
-  //   if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
-  //   return 0; 
-  // };
   
   const getTotalECTS = (courseEnrollments) => {
     if (!courseEnrollments || courseEnrollments.length === 0) {
@@ -70,29 +63,30 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
   const columns = [
     {
       columnName: 'name',
-      width: 2,
+      width: 3,
       displayComponent: ({ rowData }) => <div>{rowData?.User.firstName} {rowData.User.lastName}</div>,
     },
     {
       columnName: 'participations',
-      width: 4,
+      width: 5,
       displayComponent: ({ rowData }) => (
         <div>
           {rowData?.User.CourseEnrollments.map((enrollment, index) => (
-           <span key={index}>
-              {enrollment.Course.title} - {enrollment.Course.Program.shortTitle} ({enrollment.status})
-             {index < rowData?.User.CourseEnrollments.length - 1 ? ', ' : ''}
-            </span>
+                  <span key={index}>
+                    {enrollment.Course.title} - {enrollment.Course.Program.shortTitle} ({enrollment.status})
+                    <br />
+                  </span>
           ))}
         </div>
-      ),
+     ),
+      disableSorting: true,
     },
     {
       columnName: 'last_application',
       width: 1,
       className: 'text-center',
       displayComponent: ({ rowData }) => <div>{getMaxUpdatedAt(rowData.User.CourseEnrollments) || 'N/A'}</div>,
-      sortFunction: getMaxUpdatedAt,
+      sortValueFunction: getMaxUpdatedAt,
     },
     {
       columnName: 'status',
@@ -122,6 +116,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       columns={columns}
       showCheckbox={false}
       showDelete={false}
+      translationNamespace="manageCourse"
     />
   );
 };

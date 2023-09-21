@@ -1,13 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import { IconButton } from '@material-ui/core';
 import { MdDelete } from 'react-icons/md';
+import useTranslation from 'next-translate/useTranslation';
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 
 interface TableColumn<T> {
   columnName: string;
   width: number;
   className?: string;
   displayComponent: React.FC<{ rowData: T }>;
-  sortFunction?: (a: T, b: T, direction: 'asc' | 'desc') => number;
+  sortValueFunction?: (data:T[]) => number;
+  disableSorting?: boolean;
 }
 
 interface TableGridProps<T> {
@@ -16,6 +20,7 @@ interface TableGridProps<T> {
   columns: TableColumn<T>[];
   showCheckbox?: boolean;
   showDelete?: boolean;
+  translationNamespace?: string;
 }
 
 export const TableGrid = <T,>({
@@ -23,30 +28,50 @@ export const TableGrid = <T,>({
   keyField,
   columns,
   showCheckbox,
-  showDelete
+  showDelete,
+  translationNamespace,
 }: TableGridProps<T>) => {
+
+  const {t, lang} = useTranslation(translationNamespace);
   
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const handleSort = (columnName: string) => {
-    if (sortColumn === columnName) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortColumn(columnName);
-      setSortDirection('asc');
-    }
-  };
+const handleSort = (columnName: string) => {
+  // Find the corresponding column object
+  const column = columns.find(col => col.columnName === columnName);
+
+  // If sorting is disabled for this column, return early and do nothing
+  if (column?.disableSorting) {
+    return;
+  }
+
+  if (sortColumn === columnName) {
+    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+  } else {
+    setSortColumn(columnName);
+    setSortDirection('asc');
+  }
+};
 
   const sortedData = useMemo(() => {
     if (!sortColumn || !sortDirection) return data;
 
     const column = columns.find(col => col.columnName === sortColumn);
-    const sortFunction = column?.sortFunction || ((a, b, direction) => {
-      const valueA = a[sortColumn];
-      const valueB = b[sortColumn];
-      return valueA < valueB ? (direction === 'asc' ? -1 : 1) : (direction === 'asc' ? 1 : -1);
-    });
+    const sortFunction = column?.sortValueFunction ?
+      (((a, b, direction) => {
+        const valueA = column?.sortValueFunction(a[sortColumn]);
+        const valueB = column?.sortValueFunction(b[sortColumn]);
+        if (valueA < valueB) return direction === 'asc' ? -1 : 1;
+        if (valueA > valueB) return direction === 'asc' ? 1 : -1;
+        return 0; 
+    })) :
+      (((a, b, direction) => {
+        const valueA = a[sortColumn];
+        const valueB = b[sortColumn];
+        return valueA < valueB ? (direction === 'asc' ? -1 : 1) : (direction === 'asc' ? 1 : -1);
+      }));
+
 
     return [...data].sort((a, b) => sortFunction(a, b, sortDirection));
   }, [data, sortColumn, sortDirection, columns]);
@@ -57,15 +82,22 @@ export const TableGrid = <T,>({
       <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] mb-1 text-white">
         {showCheckbox && <div className="col-span-1" />}
         {columns.map((col) => (
-          <div
-            className={`${col.className} mr-3 ml-3 col-span-${col.width}`}
-            key={col.columnName}
-            onClick={() => handleSort(col.columnName)}
-          >
-            {col.columnName}
-            {sortColumn === col.columnName && (sortDirection === 'asc' ? '↑' : '↓')}
-          </div>
-        ))}
+  <div
+    className={`${col.className} mr-3 ml-3 col-span-${col.width} relative`}
+    key={col.columnName}
+    onClick={!col.disableSorting ? () => handleSort(col.columnName) : undefined}
+  >
+    <div className="flex-1 flex items-center">
+      <div>{t(col.columnName)}</div>
+      {!col.disableSorting && (
+        <div className="ml-1 flex flex-col items-center">
+          <ArrowDropUpIcon style={{ opacity: sortColumn === col.columnName && sortDirection === 'asc' ? 1 : 0.5 }} />
+          <ArrowDropDownIcon style={{ opacity: sortColumn === col.columnName && sortDirection === 'desc' ? 1 : 0.5 }} />
+        </div>
+      )}
+    </div>
+  </div>
+))}
         {showDelete && <div className="ml-3 col-span-2" />}
       </div>
 

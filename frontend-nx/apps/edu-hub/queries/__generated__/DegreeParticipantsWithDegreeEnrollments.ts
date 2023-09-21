@@ -11,6 +11,7 @@ import { CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course_Program {
   __typename: "Program";
+  id: number;
   /**
    * The 6 letter short title for the program.
    */
@@ -40,6 +41,7 @@ export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnro
 
 export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments {
   __typename: "CourseEnrollment";
+  id: number;
   /**
    * The users current enrollment status to this course
    */
@@ -78,6 +80,7 @@ export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnro
 
 export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments {
   __typename: "CourseEnrollment";
+  id: number;
   /**
    * The users current enrollment status to this course
    */
