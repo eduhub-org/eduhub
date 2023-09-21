@@ -40,7 +40,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     const totalEcts = courseEnrollments
       .filter(enrollment => enrollment.certificateAchievementURL)
       .reduce((total, current) => {
-        const ects = parseFloat(current.Course.ects.replace(',', '.'));
+        const ects = parseFloat(current.Course.ects.replace(',', '.')) || 0;
         return total + ects;
       }, 0);
   
