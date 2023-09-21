@@ -38,14 +38,16 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       return '0';
     }
     const totalEcts = courseEnrollments
-      .filter(enrollment => enrollment.certificateAchievementURL)
+      .filter(enrollment => enrollment.achievementCertificateURL)
       .reduce((total, current) => {
         const ects = parseFloat(current.Course.ects.replace(',', '.')) || 0;
         return total + ects;
       }, 0);
-  
-    return totalEcts.toLocaleString(lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  };
+      const formattedEcts = totalEcts === 0
+      ? totalEcts.toLocaleString(lang, { maximumFractionDigits: 0 })
+      : totalEcts.toLocaleString(lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+      return formattedEcts;
+    };
     
   const getAttendedEventsCount = (courseEnrollments) => {
     if (!courseEnrollments || courseEnrollments.length === 0) {
