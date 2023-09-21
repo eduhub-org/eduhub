@@ -16,10 +16,11 @@ import { CourseStatus_enum } from '../../__generated__/globalTypes';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { QuestionConfirmationDialog } from '../common/dialogs/QuestionConfirmationDialog';
 import { PageBlock } from '../common/PageBlock';
-import { ApplicationsTab } from './ApplicationsTab';
 import { DescriptionTab } from './DescriptionTab';
-import ManageCourseEnrollment from './ParticipationTab';
 import { SessionsTab } from './SessionsTab';
+import { ApplicationsTab } from './ApplicationsTab';
+import { CourseParticipationsTab } from './CourseParticipationsTab';
+import { DegreeParticipationsTab } from './DegreeParticipationsTab';
 import { useIsAdmin, useIsUserIdInList } from '../../hooks/authentication';
 
 interface Props {
@@ -27,7 +28,7 @@ interface Props {
 }
 
 const determineMaxAllowedTab = (courseStatus: CourseStatus_enum) => {
-  const maxAllowedTab = 4;
+  const maxAllowedTab = 5;
   // switch (courseStatus) {
   //   case CourseStatus_enum.READY_FOR_PUBLICATION:
   //     maxAllowedTab = 1;
@@ -130,7 +131,7 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  * @returns {any} the component
  */
 export const ManageCourseContent: FC<Props> = ({ courseId }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('manageCourse');
 
   const qResult = useRoleQuery<ManagedCourse, ManagedCourseVariables>(
     MANAGED_COURSE,
@@ -186,6 +187,13 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
       setOpenTabIndex(3);
     }
   }, [setOpenTabIndex, maxAllowedTab]);
+
+  const openTab4 = useCallback(() => {
+    if (maxAllowedTab >= 3) {
+      setOpenTabIndex(4);
+    }
+  }, [setOpenTabIndex, maxAllowedTab]);
+
 
   const [isCantUpgradeOpen, setCantUpgradeOpen] = useState(false);
   const handleCloseCantUpgrade = useCallback(() => {
@@ -262,7 +270,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
               )}`}
               onClick={openTab0}
             >
-              {t('course-page:brief-description')}
+              {t('description')}
             </div>
 
             {course.Program.shortTitle === "DEGREES" ? null : (
@@ -274,7 +282,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
                 )}`}
                 onClick={openTab1}
               >
-                {t('course-page:appointments')}
+                {t('sessions')}
               </div>
             )}
 
@@ -287,11 +295,11 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
                 )}`}
                 onClick={openTab2}
               >
-                {t('course-page:applications')}
+                {t('applications')}
               </div>
             )}
 
-            {course.externalRegistrationLink ? null : (
+            {course.externalRegistrationLink || course.Program.shortTitle === "DEGREES" ? null : (
               <div
                 className={`p-4 m-2 ${determineTabClasses(
                   3,
@@ -300,11 +308,25 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
                 )}`}
                 onClick={openTab3}
               >
-                {t('course-page:participation-and-benefits')}
+                {t('participations_and_achievements')}
               </div>
             )}
-          </div>
 
+            {course.Program.shortTitle === "DEGREES" ? (
+              <div
+                className={`p-4 m-2 ${determineTabClasses(
+                  4,
+                  openTabIndex,
+                  course.status
+                )}`}
+                onClick={openTab4}
+              >
+                {t('degree_participations')}
+              </div>
+            ) : null}
+
+          </div>
+          
           {openTabIndex === 0 && (
             <DescriptionTab course={course} qResult={qResult} />
           )}
@@ -317,7 +339,10 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
             <ApplicationsTab course={course} qResult={qResult} />
           )}
           {openTabIndex === 3 && (
-            <ManageCourseEnrollment course={course} qResult={qResult} />
+            <CourseParticipationsTab course={course} qResult={qResult} />
+          )}
+          {openTabIndex === 4 && (
+            <DegreeParticipationsTab course={course} />
           )}
 
           {/* {openTabIndex === maxAllowedTab && openTabIndex < 3 && (

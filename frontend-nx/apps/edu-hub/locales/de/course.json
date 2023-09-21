@@ -1,4 +1,5 @@
 {
+  "EVENTS": "Event",
   "completed_degree_elements": "Bisher abgeschlossene Elemente",
   "no_degree_elements_completed": "Bisher hast Du keine Elemente abgeschlossen.",
   "current_degree_elements": "Aktuelle Angebote im Rahmen des Degrees",
