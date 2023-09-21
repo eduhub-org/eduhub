@@ -115,7 +115,19 @@ const ProfileOverview: FC = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      await fetch(
+      const externalProfileLink = data.externalProfile.trim();
+      let externalProfileUrl = null;
+      try {
+        externalProfileUrl = new URL(externalProfileLink);
+      } catch (error) {
+        console.log('Invalid external profile link:', externalProfileLink);
+        try {
+          externalProfileUrl = new URL(`https://${externalProfileLink}`);
+        } catch (error) {
+          console.log('Invalid external profile link with https:', externalProfileLink);
+        }
+      }
+        await fetch(
         `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account/`,
         {
           method: 'POST',
@@ -142,7 +154,7 @@ const ProfileOverview: FC = () => {
           email: data.email,
           matriculationNumber: data.matriculationNumber,
           university: data.university,
-          externalProfile: data.externalProfile,
+          externalProfile: externalProfileUrl.toString(),
           employment: data.employment,
           picture: data.picture,
         },
