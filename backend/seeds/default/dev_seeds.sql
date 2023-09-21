@@ -245,13 +245,22 @@ INSERT INTO public."Course" VALUES (7, 'This is a Degree', 'APPLICANTS_INVITED',
 INSERT INTO public."CourseGroup" VALUES (9, 7, 4, '2022-12-19 12:56:07.352338+00', '2022-12-19 12:56:12.475054+00');
 INSERT INTO public."CourseInstructor" VALUES (9, 7, 2, '2022-12-17 22:20:20.615952+00', '2022-12-17 22:20:20.615952+00');
 INSERT INTO public."CourseEnrollment" VALUES (15, 7, '152f12c3-f7d2-4b73-8d29-603c164b0139', 'CONFIRMED', 'The cat looks perfect', 'INVITE', NULL, NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', '2022-11-01');
+INSERT INTO public."CourseEnrollment" VALUES (16, 7, '8914bee9-0549-44af-bcae-cafeec5ba92e', 'CONFIRMED', 'I like cats and dogs', 'INVITE', NULL, NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', '2022-11-01');
+INSERT INTO public."CourseEnrollment" VALUES (17, 7, 'b5df4676-3d75-4413-bfac-9cc4e2f61cd9', 'APPLIED', 'The dog looks perfect', 'DECLINE', NULL, NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', '2022-11-01');
+-- Adding Degree Courses
+INSERT INTO public."CourseDegree" VALUES (1, 1, 7, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00');
+INSERT INTO public."CourseDegree" VALUES (2, 2, 7, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00');
+INSERT INTO public."CourseDegree" VALUES (3, 4, 7, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00');
+INSERT INTO public."CourseDegree" VALUES (4, 5, 7, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00');
+
+
 
 -- Present course that is an event and only has the bare minimum to be functional
-INSERT INTO public."Course" VALUES (8, 'This is an Event', 'APPLICANTS_INVITED', 'NONE', 'Sed leo libero, bibendum non viverra et, suscipit at quam. Fusce augue est, molestie ut dapibus quis, accumsan at lectus. In id malesuada quam', 'DE', CURRENT_DATE + INTERVAL '1 month', '0', false, true, 2, 'NONE', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 2, 'headingDescriptionField1', 'headingDescriptionField2', 'Content Description Field 1', 'Content Description Field 2', 'Lerning Goal 1\nLerning Goal 2', NULL, 200, '2022-11-02 22:00:02.674+00', '2022-11-02 11:45:01.513+00', true);
+INSERT INTO public."Course" VALUES (8, 'This is an Event', 'APPLICANTS_INVITED', 'NONE', 'Sed leo libero, bibendum non viverra et, suscipit at quam. Fusce augue est, molestie ut dapibus quis, accumsan at lectus. In id malesuada quam', 'DE', CURRENT_DATE + INTERVAL '1 month', '0', false, true, 2, 'NONE', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 3, 'headingDescriptionField1', 'headingDescriptionField2', 'Content Description Field 1', 'Content Description Field 2', 'Lerning Goal 1\nLerning Goal 2', NULL, 200, '2022-11-02 22:00:02.674+00', '2022-11-02 11:45:01.513+00', true);
 INSERT INTO public."CourseGroup" VALUES (10, 8, 5, '2022-12-19 12:56:07.352338+00', '2022-12-19 12:56:12.475054+00');
 INSERT INTO public."CourseInstructor" VALUES (10, 8, 2, '2022-12-17 22:20:20.615952+00', '2022-12-17 22:20:20.615952+00');
 INSERT INTO public."CourseInstructor" VALUES (11, 8, 4, '2022-12-17 22:20:20.615952+00', '2022-12-17 22:20:20.615952+00');
-INSERT INTO public."CourseEnrollment" VALUES (16, 8, '152f12c3-f7d2-4b73-8d29-603c164b0139', 'CONFIRMED', 'The cat looks perfect', 'INVITE', NULL, NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', '2022-11-01');
+INSERT INTO public."CourseEnrollment" VALUES (18, 8, '152f12c3-f7d2-4b73-8d29-603c164b0139', 'CONFIRMED', 'The cat looks perfect', 'INVITE', NULL, NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', '2022-11-01');
 
 
 --INSERT INTO public."Attendance" VALUES (1, 1, '3dee812b-865e-497b-b247-ff3a6a978530', 'ATTENDED', '2022-12-19 13:55:28.341956+00', '2022-12-19 13:55:28.341956+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
@@ -279,3 +288,4 @@ SELECT setval('"AchievementOptionMentor_id_seq"'::regclass, (SELECT MAX("id") FR
 SELECT setval('"AchievementRecord_id_seq"'::regclass, (SELECT MAX("id") FROM "AchievementRecord") + 1);
 SELECT setval('"AchievementRecordAuthor_id_seq"'::regclass, (SELECT MAX("id") FROM "AchievementRecordAuthor") + 1);
 SELECT setval('"CourseGroup_id_seq"'::regclass, (SELECT MAX("id") FROM "CourseGroup") + 1);
+SELECT setval('"CourseDegree_id_seq"'::regclass, (SELECT MAX("id") FROM "CourseDegree") + 1);
