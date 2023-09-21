@@ -1,4 +1,9 @@
 {
+  "description": "Description",
+  "sessions": "Dates",
+  "applications": "Applications",
+  "participations_and_achievements": "Participations and Achievements",
+  "degree_participations": "Degree Participations",
   "attendances": "Attendances",
   "certificate_achievement": "Certificate",
   "certificates": "Certificate Download",
@@ -12,5 +17,11 @@
   "add_as_invited": "add or change as invited",
   "add_as_aborted": "add or change as aborted",
   "add_user_error": "Please select at least one user!",
-  "application_history": "Application History:"
+  "application_history": "Application History:",
+  "name": "Name",
+  "participations": "Participations",
+  "last_application": "Last Activity",
+  "status": "Status",
+  "ects_total": "Total ECTS",
+  "attended_events": "Attended Events"
 }
