@@ -613,7 +613,7 @@ const ShowDetails: FC<IPropsShowDetails> = ({
   achievementRecordDocumentationResult,
   qResult,
 }) => {
-  const [setAchievementRecord, { loading, error }] = useRoleMutation<
+  const [setAchievementRecord] = useRoleMutation<
     UpdateAchievementRecordByPk,
     UpdateAchievementRecordByPkVariables
   >(UPDATE_AN_ACHIEVEMENT_RECORD);

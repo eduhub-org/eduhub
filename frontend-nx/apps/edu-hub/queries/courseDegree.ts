@@ -11,7 +11,24 @@ export const DEGREE_COURSES = gql`
 
 export const COMPLETED_DEGREE_ENROLLMENTS = gql`
   query CompletedDegreeEnrollments($degreeCourseId: Int!, $userId: uuid!) {
-    CourseEnrollment(where: {userId: {_eq: $userId}, Course: {CourseDegrees: {degreeCourseId: {_eq: $degreeCourseId}}}, achievementCertificateURL: {_is_null: false}}) {
+    CourseEnrollment(
+      where: {
+        _or: [
+          {
+            userId: { _eq: $userId },
+            Course: { CourseDegrees: { degreeCourseId: { _eq: $degreeCourseId } } },
+            achievementCertificateURL: { _is_null: false }
+          },
+          {
+            userId: { _eq: $userId },
+            Course: { 
+              CourseDegrees: { degreeCourseId: { _eq: $degreeCourseId } },
+              Program: { shortTitle: { _eq: "EVENTS" } }
+            }
+          }
+        ]
+      }
+    ) {
       Course {
         id
         title
