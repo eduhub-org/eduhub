@@ -19,7 +19,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       variables: { degreeCourseId },
   });
   const degreeParticipantsEnrollments = data?.Course_by_pk?.CourseEnrollments.filter(
-    (enrollment) => enrollment.status !== "REJECTED" && enrollment.status !== "APPLIED"
+    (enrollment) => enrollment.status !== "REJECTED" && enrollment.status !== "APPLIED" && enrollment.status !== "INVITED"
   ) || [];
 
    // Helper functions for the table columns
@@ -53,7 +53,6 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     if (!courseEnrollments || courseEnrollments.length === 0) {
       return '0';
     }
-    
     const attendedEventsCount = courseEnrollments
       .filter(enrollment => enrollment.Course.Program.shortTitle === 'EVENTS')
       .length;
@@ -61,12 +60,26 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     return attendedEventsCount;
   };
 
+  const extendedDegreeParticipantsEnrollments = degreeParticipantsEnrollments.map(enrollment => {
+    const name = `${enrollment.User.firstName} ${enrollment.User.lastName}`;
+    const last_application = getMaxUpdatedAt(enrollment.User.CourseEnrollments) || 'N/A';
+    const ects_total = getTotalECTS(enrollment.User.CourseEnrollments);
+    const attended_events = getAttendedEventsCount(enrollment.User.CourseEnrollments);
+    return {
+      ...enrollment,
+      name,
+      last_application,
+      ects_total,
+      attended_events,
+    };
+    });
+
   // Column definitions
   const columns = [
     {
       columnName: 'name',
       width: 3,
-      displayComponent: ({ rowData }) => <div>{rowData?.User.firstName} {rowData.User.lastName}</div>,
+      displayComponent: ({ rowData }) => <div>{rowData?.User.firstName} {rowData?.User.lastName}</div>,
     },
     {
       columnName: 'participations',
@@ -87,8 +100,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       columnName: 'last_application',
       width: 1,
       className: 'text-center',
-      displayComponent: ({ rowData }) => <div>{getMaxUpdatedAt(rowData.User.CourseEnrollments) || 'N/A'}</div>,
-      sortValueFunction: getMaxUpdatedAt,
+      displayComponent: ({ rowData }) => <div>{rowData?.last_application}</div>,
     },
     {
       columnName: 'status',
@@ -100,20 +112,20 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       columnName: 'ects_total',
       width: 1,
       className: 'text-center',
-      displayComponent: ({ rowData }) => <div>{getTotalECTS( rowData.User.CourseEnrollments)}</div>,
+      displayComponent: ({ rowData }) => <div>{rowData?.ects_total}</div>,
     },
     {
       columnName: 'attended_events',
       width: 1,
       className: 'text-center',
-      displayComponent: ({ rowData }) => <div>{getAttendedEventsCount(rowData.User.CourseEnrollments)}</div>,
+      displayComponent: ({ rowData }) => <div>{rowData?.attended_events}</div>,
     },
   ];
 
   // Render component
   return (
     <TableGrid
-      data={degreeParticipantsEnrollments}
+      data={extendedDegreeParticipantsEnrollments}
       keyField="id"
       columns={columns}
       showCheckbox={false}

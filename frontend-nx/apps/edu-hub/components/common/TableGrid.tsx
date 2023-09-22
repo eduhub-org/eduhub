@@ -4,6 +4,7 @@ import { MdDelete } from 'react-icons/md';
 import useTranslation from 'next-translate/useTranslation';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import { orderBy } from 'lodash';
 
 interface TableColumn<T> {
   columnName: string;
@@ -32,49 +33,34 @@ export const TableGrid = <T,>({
   translationNamespace,
 }: TableGridProps<T>) => {
 
-  const {t, lang} = useTranslation(translationNamespace);
+  const {t} = useTranslation(translationNamespace);
   
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-const handleSort = (columnName: string) => {
-  // Find the corresponding column object
-  const column = columns.find(col => col.columnName === columnName);
+  const handleSort = (columnName: string) => {
+    // Find the corresponding column object
+    const column = columns.find(col => col.columnName === columnName);
 
-  // If sorting is disabled for this column, return early and do nothing
-  if (column?.disableSorting) {
-    return;
-  }
+    // If sorting is disabled for this column, return early and do nothing
+    if (column?.disableSorting) {
+      return;
+    }
 
-  if (sortColumn === columnName) {
-    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-  } else {
-    setSortColumn(columnName);
-    setSortDirection('asc');
-  }
-};
+    if (sortColumn === columnName) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(columnName);
+      setSortDirection('asc');
+    }
+  };
 
   const sortedData = useMemo(() => {
     if (!sortColumn || !sortDirection) return data;
 
-    const column = columns.find(col => col.columnName === sortColumn);
-    const sortFunction = column?.sortValueFunction ?
-      (((a, b, direction) => {
-        const valueA = column?.sortValueFunction(a[sortColumn]);
-        const valueB = column?.sortValueFunction(b[sortColumn]);
-        if (valueA < valueB) return direction === 'asc' ? -1 : 1;
-        if (valueA > valueB) return direction === 'asc' ? 1 : -1;
-        return 0; 
-    })) :
-      (((a, b, direction) => {
-        const valueA = a[sortColumn];
-        const valueB = b[sortColumn];
-        return valueA < valueB ? (direction === 'asc' ? -1 : 1) : (direction === 'asc' ? 1 : -1);
-      }));
-
-
-    return [...data].sort((a, b) => sortFunction(a, b, sortDirection));
-  }, [data, sortColumn, sortDirection, columns]);
+  const sorted = orderBy(data, [sortColumn], [sortDirection]);
+    return sorted;
+  }, [data, sortColumn, sortDirection]);
 
   return (
     <div>
