@@ -113,6 +113,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       width: 1,
       className: 'text-center',
       displayComponent: ({ rowData }) => <div>{rowData?.ects_total}</div>,
+      sortAsNumber: true,
     },
     {
       columnName: 'attended_events',
