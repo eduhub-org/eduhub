@@ -12,6 +12,7 @@ interface TableColumn<T> {
   className?: string;
   displayComponent: React.FC<{ rowData: T }>;
   sortValueFunction?: (data:T[]) => number;
+  sortAsNumber?: boolean;
   disableSorting?: boolean;
 }
 
@@ -55,13 +56,24 @@ export const TableGrid = <T,>({
     }
   };
 
+  // Function to sort the data
   const sortedData = useMemo(() => {
     if (!sortColumn || !sortDirection) return data;
-
-  const sorted = orderBy(data, [sortColumn], [sortDirection]);
+    const column = columns.find(col => col.columnName === sortColumn);
+    let sorted;
+    if (column?.sortAsNumber) {
+      sorted = [...data].sort((a, b) => {
+        const valueA = parseFloat(a[sortColumn]) || 0;
+        const valueB = parseFloat(b[sortColumn]) || 0;
+        return (valueA - valueB) * (sortDirection === 'asc' ? 1 : -1);
+      });
+    } else {
+      sorted = orderBy(data, [sortColumn], [sortDirection]);
+    }
     return sorted;
-  }, [data, sortColumn, sortDirection]);
+  }, [data, sortColumn, sortDirection, columns]);
 
+  
   return (
     <div>
       {/* Header row for column names */}
