@@ -23,5 +23,6 @@
   "last_application": "Letzte Aktivität",
   "status": "Status",
   "ects_total": "ECTS Gesamt",
-  "attended_events": "Besuchte Events"
+  "attended_events": "Besuchte Events",
+  "certificate": "Zertifikat"
 }

@@ -5,6 +5,7 @@ import { TableGrid } from '../../common/TableGrid';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { DegreeParticipantsWithDegreeEnrollments, DegreeParticipantsWithDegreeEnrollmentsVariables } from '../../../queries/__generated__/DegreeParticipantsWithDegreeEnrollments';
 import { DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS } from '../../../queries/courseDegree';
+import { CertificateDownload } from '../../common/CertificateDownload';
 
 interface DegreeParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -83,7 +84,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     },
     {
       columnName: 'participations',
-      width: 5,
+      width: 4,
       displayComponent: ({ rowData }) => (
         <div>
           {rowData?.User.CourseEnrollments.map((enrollment, index) => (
@@ -120,6 +121,19 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       width: 1,
       className: 'text-center',
       displayComponent: ({ rowData }) => <div>{rowData?.attended_events}</div>,
+    },
+    {
+      columnName: 'certificate',
+      width: 1,
+      className: 'text-center',
+      displayComponent: ({ rowData }) => 
+        <div>
+          <CertificateDownload
+            courseEnrollment={rowData}
+            manageView
+          />
+        </div>,
+      disableSorting: true,
     },
   ];
 
