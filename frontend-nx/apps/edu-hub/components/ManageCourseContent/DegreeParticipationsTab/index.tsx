@@ -89,7 +89,8 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         <div>
           {rowData?.User.CourseEnrollments.map((enrollment, index) => (
                   <span key={index}>
-                    {enrollment.Course.title} - {enrollment.Course.Program.shortTitle} ({enrollment.status})
+                    {enrollment.Course.title} - {enrollment.Course.Program.shortTitle} (
+                      {enrollment.achievementCertificateURL ? "COMPLETED" : enrollment.status})
                     <br />
                   </span>
           ))}
