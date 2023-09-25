@@ -86,6 +86,10 @@ export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnro
    */
   status: CourseEnrollmentStatus_enum;
   /**
+   * URL to the file containing the user's achievement certificate (if he obtained one)
+   */
+  achievementCertificateURL: string | null;
+  /**
    * An object relationship
    */
   User: DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User;

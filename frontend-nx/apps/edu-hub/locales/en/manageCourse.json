@@ -23,5 +23,6 @@
   "last_application": "Last Activity",
   "status": "Status",
   "ects_total": "Total ECTS",
-  "attended_events": "Attended Events"
+  "attended_events": "Attended Events",
+  "certificate": "Certificate"
 }

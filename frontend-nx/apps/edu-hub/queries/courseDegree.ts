@@ -48,6 +48,7 @@ export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
       CourseEnrollments {
         id
         status
+        achievementCertificateURL
         User {
           id
           firstName

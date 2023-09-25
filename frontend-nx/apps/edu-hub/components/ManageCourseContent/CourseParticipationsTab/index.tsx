@@ -355,10 +355,10 @@ interface IPropsParticipationRow {
   qResult: QueryResult<any, any>;
   userId: string;
   maxMissedSessions: number;
-  refetchAchievementCertificates: boolean;
-  refetchAttendanceCertificates: boolean;
-  setRefetchAchievementCertificates: Dispatch<SetStateAction<boolean>>;
-  setRefetchAttendanceCertificates: Dispatch<SetStateAction<boolean>>;
+  refetchAchievementCertificates?: boolean;
+  refetchAttendanceCertificates?: boolean;
+  setRefetchAchievementCertificates?: Dispatch<SetStateAction<boolean>>;
+  setRefetchAttendanceCertificates?: Dispatch<SetStateAction<boolean>>;
 }
 const ParticipationRow: FC<IPropsParticipationRow> = ({
   enrollment,
