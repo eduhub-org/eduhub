@@ -52,6 +52,7 @@ const MyApp: FC<AppProps & InitialProps> & {
         <Script
           id="fb-pixel"
           strategy="afterInteractive"
+          data-cookieconsent="marketing"
           dangerouslySetInnerHTML={{
             __html: `
             !function(f,b,e,v,n,t,s)
