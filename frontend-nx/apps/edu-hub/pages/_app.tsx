@@ -50,6 +50,7 @@ const MyApp: FC<AppProps & InitialProps> & {
       <ApolloProvider client={client}>
         {/* Global Site Code Pixel - Facebook Pixel */}
         <Script
+          defer
           id="fb-pixel"
           strategy="afterInteractive"
           data-cookieconsent="marketing"
@@ -69,6 +70,7 @@ const MyApp: FC<AppProps & InitialProps> & {
           }}
         />
         <Script
+          defer
           id="Cookiebot"
           src="https://consent.cookiebot.com/uc.js"
           data-cbid="718dfb5e-b62c-4993-9c65-99ae483f5510"
