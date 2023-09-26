@@ -28,7 +28,7 @@ class MyDocument extends Document {
               width="1"
               alt="fb pixel id image"
               style={{ display: 'none' }}
-              src={`https://www.facebook.com/tr?id=${FB_PIXEL_ID}&ev=PageView&noscript=1`}
+              src={`https://www.facebook.com/tr?id=1775867059535400&ev=PageView&noscript=1`}
             />
           </noscript>
         </Head>
