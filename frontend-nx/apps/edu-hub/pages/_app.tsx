@@ -1,7 +1,7 @@
 import { ApolloProvider } from '@apollo/client';
 import { SessionProvider } from 'next-auth/react';
 import type { AppContext, AppProps } from 'next/app';
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import Script from 'next/script';
 import { useRouter } from 'next/router';
 import * as fbq from '../lib/fpixel';
@@ -31,19 +31,23 @@ const MyApp: FC<AppProps & InitialProps> & {
 
   const router = useRouter();
 
+  const [isFBPixelLoaded, setFBPixelLoaded] = useState(false);
+
   useEffect(() => {
-    // This pageview only triggers the first time (it's important for Pixel to have real information)
-    fbq.pageview();
-
-    const handleRouteChange = () => {
+    if (isFBPixelLoaded && typeof window.fbq === 'function') {
+      // This pageview only triggers the first time
       fbq.pageview();
-    };
 
-    router.events.on('routeChangeComplete', handleRouteChange);
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange);
-    };
-  }, [router.events]);
+      const handleRouteChange = () => {
+        fbq.pageview();
+      };
+
+      router.events.on('routeChangeComplete', handleRouteChange);
+      return () => {
+        router.events.off('routeChangeComplete', handleRouteChange);
+      };
+    }
+  }, [router.events, isFBPixelLoaded]);
 
   return (
     <SessionProvider session={pageProps.session}>
@@ -54,6 +58,7 @@ const MyApp: FC<AppProps & InitialProps> & {
           data-cookieconsent="marketing"
           strategy="afterInteractive"
           type="text/plain"
+          onLoad={() => setFBPixelLoaded(true)}
           dangerouslySetInnerHTML={{
             __html: `
             !function(f,b,e,v,n,t,s)
