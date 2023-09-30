@@ -23,6 +23,22 @@
     - Call it as follows from the folder of the repo (Hasura must be running): `sudo bash regenerate-apollo.sh $USER`. It will handle running the `apollo:codegen` target and then fix the problem that generated files are generated as owned by root on your host machine. This way you will be able to push/pull the files using git without access violation errors. The containers need to be up for this. Hotreloading during development should pick up the changes, though I would not be surprised if in some situations a stop/start of the containers will be required to stabilize the setup after all those files are deleted and replaced.
 - `docker_install.sh` - Install Docker.
 
+### 🌱 Seeds
+The seed data includes the following users:
+- `admin@example.com`
+- `student1@example.com`
+- `student2@example.com`
+- `student3@example.com`
+- `student4@example.com`
+- `student5@example.com`
+- `expert1@example.com`
+- `expert2@example.com`
+- `expert3@example.com`
+- `expert4@example.com`
+- `expert5@example.com`
+The password for all users is `dev`
+To extend the seed data temporarily, use the Hasura console. To include them permantly add corresponding SQL statements to the seeds file [here](https://github.com/edu-hub-project/application/blob/develop/backend/seeds/default/dev_seeds.sql).
+
 ### Ports
 
 - `4001` - File uploads
