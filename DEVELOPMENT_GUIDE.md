@@ -38,7 +38,7 @@ The seed data includes the following users:
 - `expert5@example.com`
 
 The password for all users is `dev`.  
-To extend the seed data temporarily, use the Hasura console. To include them permantly add corresponding SQL statements to the seeds file [here](https://github.com/edu-hub-project/application/blob/develop/backend/seeds/default/dev_seeds.sql).
+To extend the seed data temporarily, use the Hasura console. To include them permantly, add corresponding SQL statements to the seeds file [here](https://github.com/edu-hub-project/application/blob/develop/backend/seeds/default/dev_seeds.sql).
 
 ### Ports
 
