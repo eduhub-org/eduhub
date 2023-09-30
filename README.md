@@ -24,12 +24,12 @@ We welcome contributions from everyone. Please check out the technical details f
 
 ## :computer: Tech Stack
 
-- Keycloak
-- Hasura
-- Apollo
-- React
-- Tailwind
-- Python & Node (Serverless Functions)
+- [Keycloak](https://www.keycloak.org/)
+- [Hasura](https://hasura.io/)
+- [Apollo](https://www.apollographql.com/)
+- [React](https://reactjs.org/)
+- [Tailwind](https://tailwindcss.com/)
+- [Python](https://www.python.org/) & [Node.js](https://nodejs.org/en/) (Serverless Functions)
 
 ## :memo: License
 
