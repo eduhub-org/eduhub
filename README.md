@@ -1,3 +1,10 @@
+EduHub is a platform around educational offerings. Focussing on the application and acceptence to courses, providing organizational course information, documenting project results, and issuing certifacates.  
+Besides the administration of single courses, it allows the definition of micro degrees composed of different courses and issueing corresponding degree certificates when all requirements are met.
+
+![grafik](https://github.com/edu-hub-project/application/assets/24397546/234637f5-1c99-474e-a5c7-1f6f0fc280b8)
+
+
+
 # EduHub local development
 
 EduHub uses docker-compose to support full local development that does not depend on any external servers or secret database seeds anymore.
