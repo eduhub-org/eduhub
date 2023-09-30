@@ -1,5 +1,8 @@
-EduHub is a platform around educational offerings. Focussing on the application and acceptence to courses, providing organizational course information, documenting project results, and issuing certifacates.  
+# EduHub
+
+This is a platform around educational offerings, focussing on the application and acceptence to single course offers, providing organizational course information, documenting project results completed in the courses, and issuing certificates.  
 Besides the administration of single courses, it allows the definition of micro degrees composed of different courses and issueing corresponding degree certificates when all requirements are met.
+Key focus areas of the current development are allowing for different application/registration processes (in particular fo event registrations) and fostering learning communities by an integration of Mattermost as chat tool.
 
 ![grafik](https://github.com/edu-hub-project/application/assets/24397546/234637f5-1c99-474e-a5c7-1f6f0fc280b8)
 
