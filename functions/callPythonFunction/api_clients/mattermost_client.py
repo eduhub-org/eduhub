@@ -12,6 +12,23 @@ class MattermostClient:
 
 # Getter
 
+    def get_user_id(self, email):
+        # URL für die Suche nach Benutzern anhand ihrer E-Mail-Adresse
+        url = f"{self.url}/api/v4/users/email/{email}"
+        
+        headers = {
+            "Authorization": f"Bearer {self.token}"
+        }
+        
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code == 200:
+            user_id = response.json().get("id")
+            return user_id
+        else:
+            print(f"Failed to get User ID for email '{email}'. Response code: {response.status_code}")
+            return None
+        
     def get_team_id(self, team_name):
         url = f"{self.url}/api/v4/teams/name/{team_name}"
         headers = {
@@ -37,7 +54,7 @@ class MattermostClient:
             "Authorization": f"Bearer {self.token}"
         }
         response = requests.get(url, headers=headers)
-        # If there is a Channel that has the given name in this specific team
+        #add If there is a Channel that has the given name in this specific team
         if response.status_code == 200:
             channel_id = response.json().get("id")
             return channel_id
