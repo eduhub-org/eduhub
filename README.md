@@ -12,9 +12,9 @@ EduHub aims to centralize educational offerings. It enables users to apply and g
 
 ## :rocket: Quick Start
 
-1. Install [Docker](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/).
+1. Install [Docker](https://docs.docker.com/engine/install/).
 2. Clone this repository.
-3. Run `docker-compose up`.
+3. Run `docker compose up`.
 4. Open `localhost:5000` in your browser.
 5. Log in as **admin@example.com** with password **dev**.
 
