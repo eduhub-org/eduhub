@@ -120,7 +120,7 @@ export const UserInfoModal: FC<IProps> = ({ closeModal, course, visible }) => {
             />
             <input
               className="flex border-b-2 border-white bg-edu-black text-white pl-4 pb-2 pt-8 w-full"
-              placeholder={`${t('users:matriculationNumber')}/${t('other')}`}
+              placeholder={`${t('users:matriculationNumber')}/${t('users:other')}`}
               value={studentId}
               onChange={(e) => setStudentId(e.target.value)}
             />
