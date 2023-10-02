@@ -23,5 +23,6 @@
   "some-info-about-you": "Bitte gib uns zunächst noch ein paar Informationen über dich.",
   "status": "Status",
   "allPrograms": "Alle Programme",
-  "filterByProgram": "Programmfilter"
+  "filterByProgram": "Programmfilter",
+  "other": "Andere"
 }

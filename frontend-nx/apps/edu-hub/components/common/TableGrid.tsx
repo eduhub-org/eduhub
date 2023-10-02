@@ -11,7 +11,6 @@ interface TableColumn<T> {
   width: number;
   className?: string;
   displayComponent: React.FC<{ rowData: T }>;
-  sortValueFunction?: (data:T[]) => number;
   sortAsNumber?: boolean;
   disableSorting?: boolean;
 }
