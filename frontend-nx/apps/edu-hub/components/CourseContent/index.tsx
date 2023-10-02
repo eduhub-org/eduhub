@@ -25,6 +25,7 @@ import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
 import { ApplyButton } from './ApplyButton';
 import { EnrollmentUIController } from './EnrollmentUIController';
 import { signIn } from 'next-auth/react';
+import { getBackgroundImage } from '../../helpers/imageHandling';
 
 const CourseContent: FC<{ id: number }> = ({ id }) => {
   const { t, lang } = useTranslation();
@@ -88,6 +89,20 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     userId
   )?.id;
 
+  const [backgroundImage, setBackgroundImage] = useState<string>('');
+// Use useEffect to call getBackgroundImage
+useEffect(() => {
+  const fetchBackgroundImage = async () => {
+    const baseLink = course?.coverImage;
+    const optimalImageLink = await getBackgroundImage(baseLink);
+    console.log('optimalImageLink: ', optimalImageLink);
+    setBackgroundImage(optimalImageLink);
+  };
+
+  fetchBackgroundImage();
+}, [course?.coverImage]);
+
+
   // Check if course is a degree course
   const isDegreeCourse = course?.Program?.shortTitle === 'DEGREES';
   const isEventCourse = course?.Program?.shortTitle === 'EVENTS';
@@ -100,9 +115,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       </div>
     );
   }
-
-  const { title, coverImage } = course;
-  const bgUrl = course?.coverImage ?? 'https://picsum.photos/1280/620';
 
 
   // Main Component Definition and Rendering
@@ -120,6 +132,8 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const hasExternalRegistration = course.externalRegistrationLink !== null && course.externalRegistrationLink !== '';
   const eventHandler = () => {window.open(course.externalRegistrationLink, '_blank')}
 
+  console.log('backgroundImage: ', backgroundImage);
+
   return (
     <div>
       {getCoursesAuthorizedLoading || getCoursesUnauthorizedLoading ? (
@@ -127,13 +141,13 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       ) : (
         <div className="flex flex-col space-y-24">
           <div className="flex flex-col space-y-24">
-            <div
-              className="h-96 p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat bg-[image:var(--bg-small-url)]"
-              style={{
-                '--bg-small-url': `linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url(${bgUrl})`,
-              } as React.CSSProperties}
-            >
-              <div className="max-w-screen-xl mx-auto w-full">{title}</div>
+          <div
+  className="h-96 p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat bg-[image:var(--bg-small-url)]"
+  style={{
+    '--bg-small-url': `linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url(${backgroundImage})`,
+  } as React.CSSProperties}
+>
+              <div className="max-w-screen-xl mx-auto w-full">{course.title}</div>
             </div>
               <div className="max-w-screen-xl mx-auto w-full">
                 <PageBlock>
