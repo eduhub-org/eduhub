@@ -10,16 +10,63 @@ import {
 
 import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
 import { useUser } from '../../../hooks/user';
-import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
-import {
-  CourseWithEnrollment_Course_by_pk_CourseEnrollments,
-} from '../../../queries/__generated__/CourseWithEnrollment';
+import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../queries/__generated__/CourseWithEnrollment';
 
-import { CourseLinkInfos } from './Links';
 import { ApplyButton } from '../ApplyButton';
 import { ApplicationModal } from './ApplicationModal';
-import { UserInfoModal } from './UserInfoModal';
+
 import { Button } from '../../common/Button';
+
+import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
+
+interface CourseLinkInfosProps {
+  course: Course_Course_by_pk;
+}
+
+const CourseLinkInfos: FC<CourseLinkInfosProps> = ({ course }) => {
+  const { t } = useTranslation();
+
+  const onlineLocation = course.CourseLocations.find(
+    (location) => location.locationOption === 'ONLINE'
+  );
+
+  return (
+    <div className="flex justify-center items-center">
+      {onlineLocation && onlineLocation.defaultSessionAddress && (
+        <div className="mx-4">
+          {/* <a
+            href={onlineLocation.defaultSessionAddress}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white inline-block max-w-[100px]"
+          >
+            {t('course-page:to-online-meeting')}
+          </a> */}
+          <Button
+            as="a"
+            href={onlineLocation.defaultSessionAddress}
+            filled
+            inverted
+            // className="bg-edu-course-current"
+          >
+            {t('course-page:to-online-meeting')}
+          </Button>
+        </div>
+      )}{' '}
+      <div className="mx-4">
+        <Button
+          as="a"
+          href={course.chatLink}
+          filled
+          inverted
+          // className="bg-edu-course-current"
+        >
+          {t('course-page:to-chat')}
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 interface IProps {
   course: Course_Course_by_pk;
@@ -32,7 +79,6 @@ export const EnrollmentUIController: FC<IProps> = ({
   courseEnrollment,
   setInvitationModalOpen,
 }) => {
-  const [isUserInfoModalVisible, setUserInfoModalVisible] = useState(false);
   const [isApplicationModalVisible, setApplicationModalVisible] =
     useState(false);
   const { t } = useTranslation('course-application');
@@ -40,34 +86,25 @@ export const EnrollmentUIController: FC<IProps> = ({
   const user = useUser();
 
   const showModal = useCallback(() => {
-    if (!user) {
-      setUserInfoModalVisible(true);
-    } else {
+    if (user) {
       setApplicationModalVisible(true);
     }
   }, [user]);
-  const hideUserInfoModal = useCallback(
-    () => setUserInfoModalVisible(false),
-    []
-  );
   const hideApplicationModal = useCallback(
     () => setApplicationModalVisible(false),
     []
   );
 
   useEffect(() => {
-    if (user && isUserInfoModalVisible) {
-      setUserInfoModalVisible(false);
+    if (user) {
       setApplicationModalVisible(true);
     }
-  }, [user, isUserInfoModalVisible]);
-
+  }, [user]);
 
   let content = null;
 
   if (!courseEnrollment) {
     content = <ApplyButton course={course} onClickApply={showModal} />;
-
   } else {
     const status = courseEnrollment.status;
 
@@ -142,11 +179,6 @@ export const EnrollmentUIController: FC<IProps> = ({
   return (
     <>
       <div className="flex mx-auto mb-10">{content}</div>
-      <UserInfoModal
-        visible={isUserInfoModalVisible && !user}
-        closeModal={hideUserInfoModal}
-        course={course}
-      />
       <ApplicationModal
         visible={isApplicationModalVisible}
         closeModal={hideApplicationModal}

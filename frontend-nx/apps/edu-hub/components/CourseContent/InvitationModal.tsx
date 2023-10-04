@@ -46,7 +46,7 @@ type Inputs = {
   matriculationNumber: string;
 };
 
-interface IProps {
+interface InvitationModalProps {
   course: CourseWithEnrollment_Course_by_pk | Course_Course_by_pk;
   enrollmentId: number;
   open: boolean;
@@ -57,7 +57,7 @@ interface IProps {
   setModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const InvitationModal: FC<IProps> = ({
+const InvitationModal: FC<InvitationModalProps> = ({
   course,
   enrollmentId,
   open,

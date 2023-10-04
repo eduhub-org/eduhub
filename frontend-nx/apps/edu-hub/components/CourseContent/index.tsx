@@ -10,17 +10,12 @@ import { COURSE_WITH_ENROLLMENT } from '../../queries/courseWithEnrollment';
 import { CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
 import { useIsLoggedIn } from '../../hooks/authentication';
 import { COURSE } from '../../queries/course';
-import {
-  Course,
-  CourseVariables,
-  Course_Course_by_pk,
-} from '../../queries/__generated__/Course';
+import { Course, CourseVariables } from '../../queries/__generated__/Course';
 import { getCourseEnrollment } from '../../helpers/util';
 import { ContentRow } from '../common/ContentRow';
 import { PageBlock } from '../common/PageBlock';
 import { DescriptionFields } from './DescriptionFields';
 import { TimeLocationLanguageInstructors } from './TimeLocationLanguageInstructors';
-import { AttendancesAndAchievements } from './AttendancesAndAchievements';
 import { getWeekdayStartAndEndString } from '../../helpers/dateHelpers';
 import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
@@ -31,7 +26,8 @@ import { signIn } from 'next-auth/react';
 import { getBackgroundImage } from '../../helpers/imageHandling';
 import { Attendances } from './Attendances';
 import { CertificateDownload } from '../common/CertificateDownload';
-import CourseAchievementOption from './AttendancesAndAchievements/CourseAchievementOption';
+import AchievementRecord from './AchievementRecord';
+import { useIsCourseWithEnrollment } from 'apps/edu-hub/hooks/course';
 
 const CourseContent: FC<{ id: number }> = ({ id }) => {
   const { t, lang } = useTranslation();
@@ -94,6 +90,8 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     userId
   )?.id;
 
+  const isCourseWithEnrollment = useIsCourseWithEnrollment(course);
+
   const [backgroundImage, setBackgroundImage] = useState<string>('');
   // Use useEffect to call getBackgroundImage
   useEffect(() => {
@@ -140,8 +138,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const eventHandler = () => {
     window.open(course.externalRegistrationLink, '_blank');
   };
-
-  console.log('backgroundImage: ', backgroundImage);
 
   return (
     <div>
@@ -199,6 +195,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 </ContentRow>
               </PageBlock>
               {!isEventCourse &&
+                isCourseWithEnrollment && // needed to assure the type of the course object
                 courseEnrollment?.status ===
                   CourseEnrollmentStatus_enum.CONFIRMED &&
                 (course.achievementCertificatePossible ||
@@ -209,7 +206,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                       <>
                         <Attendances course={course} />
                         {!courseEnrollment?.achievementCertificateURL && (
-                          <CourseAchievementOption
+                          <AchievementRecord
                             courseId={course.id}
                             achievementRecordUploadDeadline={
                               course.Program.achievementRecordUploadDeadline
