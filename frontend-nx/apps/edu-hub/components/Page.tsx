@@ -8,6 +8,9 @@ import { AppSettings } from '../queries/__generated__/AppSettings';
 import useTranslation from 'next-translate/useTranslation';
 import { APP_SETTINGS } from '../queries/appSettings';
 import { Transition } from '@headlessui/react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { MdClose } from 'react-icons/md';
 
 type PageProps = {
   children?: ReactNode;
@@ -38,16 +41,19 @@ export const Page: FC<PageProps> = ({ children, className }) => {
     }
   };
 
-  const { loading: appSettingsLoading, error: appSettingsError } =
-    useRoleQuery<AppSettings>(APP_SETTINGS, {
-      onCompleted: (data) => {
-        const appSettings = data.AppSettings[0];
-        if (lang === 'de')
-          handleBanner('bannerContentDe', appSettings.bannerTextDe);
-        else if (lang === 'en')
-          handleBanner('bannerContentEn', appSettings.bannerTextEn);
-      },
-    });
+  const {
+    data: appSettingsData,
+    loading: appSettingsLoading,
+    error: appSettingsError,
+  } = useRoleQuery<AppSettings>(APP_SETTINGS, {
+    onCompleted: (data) => {
+      const appSettings = data.AppSettings[0];
+      if (lang === 'de')
+        handleBanner('bannerContentDe', appSettings.bannerTextDe);
+      else if (lang === 'en')
+        handleBanner('bannerContentEn', appSettings.bannerTextEn);
+    },
+  });
 
   useEffect(() => {
     if (status !== 'loading' && session?.error === 'RefreshAccessTokenError')
@@ -78,10 +84,25 @@ export const Page: FC<PageProps> = ({ children, className }) => {
         leaveFrom="scale-y-100"
         leaveTo="scale-y-0"
       >
-        <div className="w-full h-32 bg-black text-white flex justify-between items-center p-4">
-          <span>{bannerState.content}</span>
+        <div
+          className={`w-full text-white flex justify-between items-center py-4 md:py-8 px-3 md:px-16`}
+          style={{
+            backgroundColor:
+              appSettingsData?.AppSettings[0]?.bannerBackgroundColor,
+          }}
+        >
+          <span
+            className="prose pr-3"
+            style={{
+              color: appSettingsData?.AppSettings[0]?.bannerFontColor,
+            }}
+          >
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {bannerState.content}
+            </ReactMarkdown>
+          </span>
           <button onClick={handleBannerClose} className="text-red-400">
-            Close
+            <MdClose className="w-8 h-8" title="Close" />
           </button>
         </div>
       </Transition>
