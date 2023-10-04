@@ -4,7 +4,7 @@ A comprehensive education platform focusing on course applications, event regist
 
 ## Introduction
 
-EduHub aims to centralize educational offerings. It enables users to apply and get accepted into courses, organizes course information, manages project results, and issues certificates. It also supports micro-degrees.
+EduHub aims to centralize educational offerings. It enables users to apply and get accepted into courses, organize course information, manage project results, and issue certificates. It also supports micro-degrees.
 
 **Current Focus**: Enhancing different application and registration processes, particularly for event registrations, and building stronger learning communities through a chat integration based on Mattermost.
 
