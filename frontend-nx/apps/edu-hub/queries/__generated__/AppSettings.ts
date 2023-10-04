@@ -29,6 +29,7 @@ export interface AppSettings_AppSettings {
    * English version for the text of a dismissiable banner on the homepage
    */
   bannerTextEn: string | null;
+  id: number;
   /**
    * Preview image that is shared with links
    */

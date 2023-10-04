@@ -9,7 +9,7 @@ const AppSettings: FC = () => {
 
   return (
     <>
-      <div className="max-w-screen-xl mx-auto mt-14">
+      <div>
         <Head>
           <title>EduHub | opencampus.sh</title>
           <link rel="icon" href="/favicon.png" />

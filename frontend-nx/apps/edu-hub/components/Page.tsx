@@ -92,7 +92,7 @@ export const Page: FC<PageProps> = ({ children, className }) => {
           }}
         >
           <span
-            className="prose pr-3"
+            className="prose max-w-none pr-4 md:pr-8 text-lg"
             style={{
               color: appSettingsData?.AppSettings[0]?.bannerFontColor,
             }}

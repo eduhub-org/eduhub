@@ -10,10 +10,6 @@
 export interface UpdateAppSettings_update_AppSettings_by_pk {
   __typename: "AppSettings";
   /**
-   * Homepage background image
-   */
-  backgroundImageURL: string;
-  /**
    * Background color for the dismissiable banner displayed on the homepage
    */
   bannerBackgroundColor: string | null;
@@ -29,10 +25,7 @@ export interface UpdateAppSettings_update_AppSettings_by_pk {
    * English version for the text of a dismissiable banner on the homepage
    */
   bannerTextEn: string | null;
-  /**
-   * Preview image that is shared with links
-   */
-  previewImageURL: string;
+  id: number;
 }
 
 export interface UpdateAppSettings {
@@ -43,10 +36,9 @@ export interface UpdateAppSettings {
 }
 
 export interface UpdateAppSettingsVariables {
-  backgroundImageURL?: string | null;
   bannerBackgroundColor?: string | null;
   bannerFontColor?: string | null;
   bannerTextDe?: string | null;
   bannerTextEn?: string | null;
-  previewImageURL?: string | null;
+  id: number;
 }

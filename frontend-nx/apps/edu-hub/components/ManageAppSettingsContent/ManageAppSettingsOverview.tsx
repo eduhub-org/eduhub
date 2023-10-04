@@ -21,12 +21,12 @@ import { APP_SETTINGS, UPDATE_APP_SETTINGS } from 'apps/edu-hub/queries/appSetti
 import { AppSettings } from 'apps/edu-hub/queries/__generated__/AppSettings';
 
 type Inputs = {
-  backgroundImageURL: string;
+  // backgroundImageURL: string;
   bannerBackgroundColor: string;
   bannerFontColor: string;
   bannerTextDe: string;
   bannerTextEn: string;
-  previewImageURL: string;
+  // previewImageURL: string;
 };
 
 const ManageAppSettingsOverview: FC = () => {
@@ -34,12 +34,12 @@ const ManageAppSettingsOverview: FC = () => {
 
   const methods = useForm<Inputs>({
     defaultValues: {
-      backgroundImageURL: '',
+      // backgroundImageURL: '',
       bannerBackgroundColor: '',
       bannerFontColor: '',
       bannerTextDe: '',
       bannerTextEn: '',
-      previewImageURL: '',
+      // previewImageURL: '',
     },
   });
 
@@ -50,20 +50,21 @@ const ManageAppSettingsOverview: FC = () => {
   } = methods;
 
   const {
+    data: appSettingsData,
     loading: appSettingsLoading,
     error: appSettingsError,
     refetch: refetchAppSettings,
   } = useAdminQuery<AppSettings>(APP_SETTINGS, {
     onCompleted: (data) => {
-      const appSettings = data.AppSettings_by_pk;
+      const appSettings = data.AppSettings[0];
 
       reset({
-        backgroundImageURL: appSettings.backgroundImageURL,
+        // backgroundImageURL: appSettings.backgroundImageURL,
         bannerBackgroundColor: appSettings.bannerBackgroundColor,
         bannerFontColor: appSettings.bannerFontColor,
         bannerTextDe: appSettings.bannerTextDe,
         bannerTextEn: appSettings.bannerTextEn,
-        previewImageURL: appSettings.previewImageURL,
+        // previewImageURL: appSettings.previewImageURL,
       });
     },
     skip: !sessionData,
@@ -77,12 +78,13 @@ const ManageAppSettingsOverview: FC = () => {
     try {
       await updateAppSettings({
         variables: {
-          backgroundImageURL: data.backgroundImageURL,
+          // backgroundImageURL: data.backgroundImageURL,
           bannerBackgroundColor: data.bannerBackgroundColor,
           bannerFontColor: data.bannerFontColor,
           bannerTextDe: data.bannerTextDe,
           bannerTextEn: data.bannerTextEn,
-          previewImageURL: data.previewImageURL,
+          id: appSettingsData.AppSettings[0].id,
+          // previewImageURL: data.previewImageURL,
         },
       });
       refetchAppSettings();
@@ -94,64 +96,64 @@ const ManageAppSettingsOverview: FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="px-3 mt-6">
+    <div className="px-3 mt-32 max-w-screen-xl mx-auto">
       {!appSettingsLoading && !appSettingsError ? (
         <>
           <label className="text-xs uppercase tracking-widest font-medium text-gray-400">
-            {t('appSettings')}
+            {t('manageAppSettings:appSettings')}
           </label>
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="flex flex-wrap">
-                <div className="w-1/2 pr-3">
+                {/* <div className="w-1/2 pr-3">
                   <FormFieldRow<Inputs>
-                    label={t('backgroundImageURL')}
+                    label={t('manageAppSettings:backgroundImageURL')}
                     name="backgroundImageURL"
                     required
                   />
-                </div>
-                <div className="w-1/2 pl-3">
+                </div> */}
+                <div className="w-1/2 pr-3">
                   <FormFieldRow<Inputs>
-                    label={t('bannerBackgroundColor')}
+                    label={t('manageAppSettings:bannerBackgroundColor')}
                     name="bannerBackgroundColor"
                     placeholder="#ffffff"
                     required
                   />
                 </div>
-              </div>
-              <div className="flex flex-wrap">
-                <div className="w-1/2 pr-3">
+                <div className="w-1/2 pl-3">
                   <FormFieldRow<Inputs>
-                    label={t('bannerFontColor')}
+                    label={t('manageAppSettings:bannerFontColor')}
                     name="bannerFontColor"
                     placeholder="#ffffff"
                     required
                     className="w-1/2 pr-3"
                   />
                 </div>
-                <div className="w-1/2 pl-3">
-                  <FormFieldRow<Inputs>
-                    label={t('bannerTextDe')}
-                    name="bannerTextDe"
-                    required
-                  />
-                </div>
               </div>
               <div className="flex flex-wrap">
                 <div className="w-1/2 pr-3">
                   <FormFieldRow<Inputs>
-                    label={t('bannerTextEn')}
-                    name="bannerTextEn"
+                    label={t('manageAppSettings:bannerTextDe')}
+                    name="bannerTextDe"
                     required
                   />
                 </div>
                 <div className="w-1/2 pl-3">
                   <FormFieldRow<Inputs>
-                    label={t('previewImageURL')}
-                    name="previewImageURL"
+                    label={t('manageAppSettings:bannerTextEn')}
+                    name="bannerTextEn"
+                    required
                   />
                 </div>
               </div>
+              {/* <div className="flex flex-wrap">
+                <div className="w-1/2 pl-3">
+                  <FormFieldRow<Inputs>
+                    label={t('manageAppSettings:previewImageURL')}
+                    name="previewImageURL"
+                  />
+                </div>
+              </div> */}
               <Button
                 as="button"
                 type="submit"
