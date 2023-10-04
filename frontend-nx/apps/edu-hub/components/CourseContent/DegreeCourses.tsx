@@ -30,7 +30,7 @@ export const CurrentDegreeCourses: FC<{ degreeCourses: Course_Course_by_pk_Degre
     ) : null;
 };
 
-export const CompletedDegreeCourses: FC<{ degreeCourseId: number, isLoggedInParticipant: boolean }> = ({ degreeCourseId, isLoggedInParticipant }) => {
+export const CompletedDegreeCourses: FC<{ degreeCourseId: number }> = ({ degreeCourseId }) => {
     const { t } = useTranslation('course');
     const { id: userId } = useUser();
     const { data } = useRoleQuery<CompletedDegreeEnrollments, CompletedDegreeEnrollmentsVariables>(COMPLETED_DEGREE_ENROLLMENTS, {
@@ -39,8 +39,8 @@ export const CompletedDegreeCourses: FC<{ degreeCourseId: number, isLoggedInPart
 
     const completedDegreeEnrollments = data?.CourseEnrollment || [];
 
-    return isLoggedInParticipant ? (
-        <div className="mb-12 text-edu-black bg-white px-8 py-8">
+    return (
+        <div className=" text-edu-black bg-white px-8 py-8">
             <span className="text-3xl font-semibold mb-4">{t('completed_degree_elements')}</span>
             {completedDegreeEnrollments.length > 0 ? (
                 <ul className="list-disc pb-12">
@@ -58,5 +58,5 @@ export const CompletedDegreeCourses: FC<{ degreeCourseId: number, isLoggedInPart
                 <p>{t('no_degree_elements_completed')}</p>
             )}
         </div>
-    ) : null;
+    );
 };
