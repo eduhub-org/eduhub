@@ -1,9 +1,5 @@
 import { FC, useRef, useCallback } from 'react';
-import {
-  FormProvider,
-  SubmitHandler,
-  useForm,
-} from 'react-hook-form';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
 import { IconButton } from '@material-ui/core';
@@ -22,9 +18,7 @@ import { USER } from '../../queries/user';
 import { SAVE_USER_PROFILE_IMAGE } from '../../queries/actions';
 import { UPDATE_USER_PROFILE_PICTURE } from '../../queries/updateUser';
 
-import type {
-  MutableRefObject,
-} from 'react';
+import type { MutableRefObject } from 'react';
 import {
   SaveUserProfileImage,
   SaveUserProfileImageVariables,
@@ -115,19 +109,7 @@ const ProfileOverview: FC = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const externalProfileLink = data.externalProfile.trim();
-      let externalProfileUrl = null;
-      try {
-        externalProfileUrl = new URL(externalProfileLink);
-      } catch (error) {
-        console.log('Invalid external profile link:', externalProfileLink);
-        try {
-          externalProfileUrl = new URL(`https://${externalProfileLink}`);
-        } catch (error) {
-          console.log('Invalid external profile link with https:', externalProfileLink);
-        }
-      }
-        await fetch(
+      await fetch(
         `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account/`,
         {
           method: 'POST',
@@ -154,7 +136,7 @@ const ProfileOverview: FC = () => {
           email: data.email,
           matriculationNumber: data.matriculationNumber,
           university: data.university,
-          externalProfile: externalProfileUrl.toString(),
+          externalProfile: data.externalProfile,
           employment: data.employment,
           picture: data.picture,
         },
