@@ -25,7 +25,7 @@ import { getBackgroundImage } from '../../helpers/imageHandling';
 import { Attendances } from './Attendances';
 import { CertificateDownload } from '../common/CertificateDownload';
 import AchievementRecord from './AchievementRecord';
-import { useIsCourseWithEnrollment } from 'apps/edu-hub/hooks/course';
+import { useIsCourseWithEnrollment } from '../../hooks/course';
 
 const CourseContent: FC<{ id: number }> = ({ id }) => {
   const { t, lang } = useTranslation();
