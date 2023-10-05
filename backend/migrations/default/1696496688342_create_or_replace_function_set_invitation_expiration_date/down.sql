@@ -1,0 +1,13 @@
+-- Could not auto-generate a down migration.
+-- Please write an appropriate down migration for the SQL below:
+-- CREATE OR REPLACE FUNCTION set_invitation_expiration_date()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--   NEW.invitationExpirationDate := CURRENT_DATE + INTERVAL '2 days';
+--   RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
+--
+-- CREATE TRIGGER set_invitation_expiration_date_trigger
+-- BEFORE INSERT ON "CourseEnrollment"
+-- FOR EACH ROW EXECUTE FUNCTION set_invitation_expiration_date();
