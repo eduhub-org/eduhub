@@ -46,7 +46,7 @@ type Inputs = {
   matriculationNumber: string;
 };
 
-interface IProps {
+interface OnboardingModalProps {
   course: CourseWithEnrollment_Course_by_pk | Course_Course_by_pk;
   enrollmentId: number;
   open: boolean;
@@ -57,7 +57,7 @@ interface IProps {
   setModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const InvitationModal: FC<IProps> = ({
+const OnboardingModal: FC<OnboardingModalProps> = ({
   course,
   enrollmentId,
   open,
@@ -65,7 +65,7 @@ const InvitationModal: FC<IProps> = ({
   resetValues,
   setModalOpen,
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('course');
   const userId = useUserId();
 
   const methods = useForm<Inputs>({
@@ -93,9 +93,7 @@ const InvitationModal: FC<IProps> = ({
   useEffect(() => {
     switch (watchEmployment) {
       case Employment_enum.STUDENT:
-        setOtherUniversityLabel(
-          t('user-common:otherUniversityLabel.university')
-        );
+        setOtherUniversityLabel(t('common:otherUniversityLabel.university'));
         setUniversityVisible(true);
 
         if (watchUniversity === University_enum.OTHER) {
@@ -106,16 +104,14 @@ const InvitationModal: FC<IProps> = ({
         break;
 
       case Employment_enum.OTHER:
-        setOtherUniversityLabel(t('user-common:otherUniversityLabel.other'));
+        setOtherUniversityLabel(t('common:otherUniversityLabel.other'));
         setUniversityVisible(false);
         setOtherUniversityVisible(true);
         break;
 
       case Employment_enum.ACADEMIA:
       case Employment_enum.EMPLOYED:
-        setOtherUniversityLabel(
-          t('user-common:otherUniversityLabel.organization')
-        );
+        setOtherUniversityLabel(t('common:otherUniversityLabel.organization'));
         setUniversityVisible(false);
         setOtherUniversityVisible(true);
         break;
@@ -144,10 +140,10 @@ const InvitationModal: FC<IProps> = ({
         const userQueryResult = await refetchUser();
         const user = userQueryResult?.data?.User_by_pk;
         reset({
-          employment: user.employment,
-          otherUniversity: user.otherUniversity,
-          university: user.university,
-          matriculationNumber: user.matriculationNumber,
+          employment: user?.employment,
+          otherUniversity: user?.otherUniversity,
+          university: user?.university,
+          matriculationNumber: user?.matriculationNumber,
         });
         setModalOpen(true);
       };
@@ -213,14 +209,14 @@ const InvitationModal: FC<IProps> = ({
   const employmentSelectFormOptions = (
     Object.keys(Employment_enum) as Array<keyof typeof Employment_enum>
   ).map((key) => ({
-    label: t(key),
+    label: t(`common:${key}`),
     value: key,
   }));
 
   const universitySelectFormOptions = (
     Object.keys(University_enum) as Array<keyof typeof University_enum>
   ).map((key) => ({
-    label: t(key),
+    label: t(`common:${key}`),
     value: key,
   }));
 
@@ -232,16 +228,12 @@ const InvitationModal: FC<IProps> = ({
     <Modal
       isOpen={open}
       close={onCloseConfirmEnrollment}
-      title={t('course-page:confirmationModalTitle')}
+      title={t('onboardingModal.title')}
     >
       {!userLoading && !userError && (
         <>
-          <div className="pb-5">
-            {t('course-page:confirmationModalTextTop')}
-          </div>
-          <div className="pb-6">
-            {t('course-page:confirmationModalTextBottom')}
-          </div>
+          <div className="pb-5">{t('onboardingModal.congratulation')}</div>
+          <div className="pb-1">{t('onboardingModal.formIntro')}</div>
           <div>
             <FormProvider {...methods}>
               <form onSubmit={handleSubmit(onSubmit)}>
@@ -249,7 +241,7 @@ const InvitationModal: FC<IProps> = ({
                 <div className="flex flex-wrap">
                   <div className="w-1/2">
                     <FormFieldRow<Inputs>
-                      label={t('user-common:employmentStatus')}
+                      label={t('common:employmentStatus')}
                       name="employment"
                       type="select"
                       options={employmentSelectFormOptions}
@@ -260,7 +252,7 @@ const InvitationModal: FC<IProps> = ({
                   <div className="flex flex-wrap">
                     <div className="w-1/2 pr-3">
                       <FormFieldRow<Inputs>
-                        label={t('user-common:university')}
+                        label={t('common:university')}
                         name="university"
                         type="select"
                         options={universitySelectFormOptions}
@@ -268,7 +260,7 @@ const InvitationModal: FC<IProps> = ({
                     </div>
                     <div className="w-1/2 pl-3">
                       <FormFieldRow<Inputs>
-                        label={t('user-common:matriculationNumber')}
+                        label={t('common:matriculationNumber')}
                         name="matriculationNumber"
                       />
                     </div>
@@ -280,6 +272,15 @@ const InvitationModal: FC<IProps> = ({
                     name="otherUniversity"
                   />
                 )}
+                <div className="pb-3">
+                  {t('onboardingModal.confirmSufficientTime')}
+                </div>
+                <div className="pb-3">
+                  <b>{t('onboardingModal.mattermostInfo1')}</b>
+                </div>
+                <div className="pb-0">
+                  {t('onboardingModal.mattermostInfo2')}
+                </div>
                 <div className="flex">
                   <Button
                     as="button"
@@ -303,11 +304,7 @@ const InvitationModal: FC<IProps> = ({
                     filled
                     className="mt-8 block mx-auto mb-5 disabled:bg-slate-500"
                   >
-                    {isSubmitting ? (
-                      <CircularProgress />
-                    ) : (
-                      t('course-page:confirm')
-                    )}
+                    {isSubmitting ? <CircularProgress /> : t('common:confirm')}
                   </Button>
                 </div>
               </form>
@@ -319,4 +316,4 @@ const InvitationModal: FC<IProps> = ({
   );
 };
 
-export default InvitationModal;
+export default OnboardingModal;
