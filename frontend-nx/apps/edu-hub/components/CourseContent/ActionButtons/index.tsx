@@ -1,23 +1,18 @@
 import useTranslation from 'next-translate/useTranslation';
-import {
-  Dispatch,
-  FC,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import { Dispatch, FC, SetStateAction, useCallback, useState } from 'react';
 
 import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
 import { useUser } from '../../../hooks/user';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../queries/__generated__/CourseWithEnrollment';
 
-import { ApplyButton } from '../ApplyButton';
+import { ApplyButton } from './ApplyButton';
 import { ApplicationModal } from './ApplicationModal';
 
 import { Button } from '../../common/Button';
 
 import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
+import { useIsLoggedIn } from '../../../hooks/authentication';
+import { signIn } from 'next-auth/react';
 
 interface CourseLinkInfosProps {
   course: Course_Course_by_pk;
@@ -68,13 +63,13 @@ const CourseLinkInfos: FC<CourseLinkInfosProps> = ({ course }) => {
   );
 };
 
-interface IProps {
+interface ActionButtonsProps {
   course: Course_Course_by_pk;
   courseEnrollment: CourseWithEnrollment_Course_by_pk_CourseEnrollments;
   setOnboardingModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export const EnrollmentUIController: FC<IProps> = ({
+export const ActionButtons: FC<ActionButtonsProps> = ({
   course,
   courseEnrollment,
   setOnboardingModalOpen,
@@ -82,6 +77,7 @@ export const EnrollmentUIController: FC<IProps> = ({
   const [isApplicationModalVisible, setApplicationModalVisible] =
     useState(false);
   const { t } = useTranslation('course-application');
+  const isLoggedIn = useIsLoggedIn();
 
   const user = useUser();
 
@@ -94,14 +90,6 @@ export const EnrollmentUIController: FC<IProps> = ({
     () => setApplicationModalVisible(false),
     []
   );
-
-  useEffect(() => {
-    if (user) {
-      setApplicationModalVisible(true);
-    }
-  }, [user]);
-
-  console.log(`ApplicationModalVisible: `, isApplicationModalVisible);
 
   let content = null;
 
@@ -178,9 +166,33 @@ export const EnrollmentUIController: FC<IProps> = ({
     }
   }
 
+  const signInHandler = () => {
+    console.log('signIN!');
+    return signIn('keycloak');
+  };
+
+  const hasExternalRegistration =
+    course.externalRegistrationLink !== null &&
+    course.externalRegistrationLink !== '';
+  const eventHandler = () => {
+    window.open(course.externalRegistrationLink, '_blank');
+  };
+
   return (
     <>
-      <div className="flex mx-auto mb-10">{content}</div>
+      <div className="flex mx-auto mb-10">
+        {hasExternalRegistration ? (
+          <div className="mx-auto mb-10">
+            <ApplyButton course={course} onClickApply={eventHandler} />
+          </div>
+        ) : isLoggedIn && !hasExternalRegistration ? (
+          content
+        ) : (
+          <div className="mx-auto mb-10">
+            <ApplyButton course={course} onClickApply={signInHandler} />
+          </div>
+        )}
+      </div>
       <ApplicationModal
         visible={isApplicationModalVisible}
         closeModal={hideApplicationModal}

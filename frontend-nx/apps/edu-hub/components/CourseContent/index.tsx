@@ -20,9 +20,7 @@ import { getWeekdayStartAndEndString } from '../../helpers/dateHelpers';
 import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
 import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
-import { ApplyButton } from './ApplyButton';
-import { EnrollmentUIController } from './EnrollmentUIController';
-import { signIn } from 'next-auth/react';
+import { ActionButtons } from './ActionButtons';
 import { getBackgroundImage } from '../../helpers/imageHandling';
 import { Attendances } from './Attendances';
 import { CertificateDownload } from '../common/CertificateDownload';
@@ -117,12 +115,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     );
   }
 
-  // Main Component Definition and Rendering
-  const signInHandler = () => {
-    console.log('signIN!');
-    return signIn('keycloak');
-  };
-
   // Get the course enrollment of the current user (necessary for admins and instructors)
   const courseEnrollment = getCourseEnrollment(course, userId);
 
@@ -130,13 +122,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     isLoggedIn &&
     (courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED ||
       courseEnrollment?.status === CourseEnrollmentStatus_enum.COMPLETED);
-
-  const hasExternalRegistration =
-    course.externalRegistrationLink !== null &&
-    course.externalRegistrationLink !== '';
-  const eventHandler = () => {
-    window.open(course.externalRegistrationLink, '_blank');
-  };
 
   return (
     <div>
@@ -169,27 +154,11 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                     <span className="text-2xl mt-2">{course.tagline}</span>
                   </div>
                   <div className="flex flex-1 lg:max-w-md">
-                    {hasExternalRegistration ? (
-                      <div className="mx-auto mb-10">
-                        <ApplyButton
-                          course={course}
-                          onClickApply={eventHandler}
-                        />
-                      </div>
-                    ) : isLoggedIn && !hasExternalRegistration ? (
-                      <EnrollmentUIController
-                        course={course}
-                        courseEnrollment={courseEnrollment}
-                        setOnboardingModalOpen={setOnboardingModalOpen}
-                      />
-                    ) : (
-                      <div className="mx-auto mb-10">
-                        <ApplyButton
-                          course={course}
-                          onClickApply={signInHandler}
-                        />
-                      </div>
-                    )}
+                    <ActionButtons
+                      course={course}
+                      courseEnrollment={courseEnrollment}
+                      setOnboardingModalOpen={setOnboardingModalOpen}
+                    />
                   </div>
                 </ContentRow>
               </PageBlock>
