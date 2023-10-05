@@ -21,9 +21,7 @@ interface CourseLinkInfosProps {
 const CourseLinkInfos: FC<CourseLinkInfosProps> = ({ course }) => {
   const { t } = useTranslation();
 
-  const onlineLocation = course.CourseLocations.find(
-    (location) => location.locationOption === 'ONLINE'
-  );
+  const onlineLocation = course.CourseLocations.find((location) => location.locationOption === 'ONLINE');
 
   return (
     <div className="flex justify-center items-center">
@@ -44,7 +42,7 @@ const CourseLinkInfos: FC<CourseLinkInfosProps> = ({ course }) => {
             inverted
             // className="bg-edu-course-current"
           >
-            {t('course-page:to-online-meeting')}
+            {t('course:toOnlineMeeting')}
           </Button>
         </div>
       )}{' '}
@@ -56,7 +54,7 @@ const CourseLinkInfos: FC<CourseLinkInfosProps> = ({ course }) => {
           inverted
           // className="bg-edu-course-current"
         >
-          {t('course-page:to-chat')}
+          {t('course:toCourseChat')}
         </Button>
       </div>
     </div>
@@ -69,13 +67,8 @@ interface ActionButtonsProps {
   setOnboardingModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export const ActionButtons: FC<ActionButtonsProps> = ({
-  course,
-  courseEnrollment,
-  setOnboardingModalOpen,
-}) => {
-  const [isApplicationModalVisible, setApplicationModalVisible] =
-    useState(false);
+export const ActionButtons: FC<ActionButtonsProps> = ({ course, courseEnrollment, setOnboardingModalOpen }) => {
+  const [isApplicationModalVisible, setApplicationModalVisible] = useState(false);
   const { t } = useTranslation('course-application');
   const isLoggedIn = useIsLoggedIn();
 
@@ -86,10 +79,7 @@ export const ActionButtons: FC<ActionButtonsProps> = ({
       setApplicationModalVisible(true);
     }
   }, [user]);
-  const hideApplicationModal = useCallback(
-    () => setApplicationModalVisible(false),
-    []
-  );
+  const hideApplicationModal = useCallback(() => setApplicationModalVisible(false), []);
 
   let content = null;
 
@@ -100,39 +90,26 @@ export const ActionButtons: FC<ActionButtonsProps> = ({
 
     switch (status) {
       case CourseEnrollmentStatus_enum.ABORTED: {
-        content = (
-          <span className="bg-gray-300 p-4">{t('status.aborted')}</span>
-        );
+        content = <span className="bg-gray-300 p-4">{t('status.aborted')}</span>;
         break;
       }
       case CourseEnrollmentStatus_enum.APPLIED: {
-        content = (
-          <span className="bg-gray-300 p-4">{t('status.applied')}</span>
-        );
+        content = <span className="bg-gray-300 p-4">{t('status.applied')}</span>;
         break;
       }
       case CourseEnrollmentStatus_enum.REJECTED: {
-        content = (
-          <span className="bg-gray-300 p-4">{t('status.rejected')}</span>
-        );
+        content = <span className="bg-gray-300 p-4">{t('status.rejected')}</span>;
         break;
       }
       case CourseEnrollmentStatus_enum.CANCELLED: {
-        content = (
-          <span className="bg-gray-300 p-4">{t('status.cancelled')}</span>
-        );
+        content = <span className="bg-gray-300 p-4">{t('status.cancelled')}</span>;
         break;
       }
       case CourseEnrollmentStatus_enum.INVITED: {
-        if (
-          courseEnrollment.invitationExpirationDate.setHours(0, 0, 0, 0) >=
-          new Date().setHours(0, 0, 0, 0)
-        ) {
+        if (courseEnrollment.invitationExpirationDate.setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)) {
           content = (
             <div className="flex flex-col sm:flex-row sm:items-center">
-              <div className="bg-gray-300 p-4 mb-6 sm:mb-0 sm:w-2/3 sm:mr-5">
-                {t('status.invited')}
-              </div>
+              <div className="bg-gray-300 p-4 mb-6 sm:mb-0 sm:w-2/3 sm:mr-5">{t('status.invited')}</div>
               <Button
                 filled
                 inverted
@@ -144,11 +121,7 @@ export const ActionButtons: FC<ActionButtonsProps> = ({
             </div>
           );
         } else {
-          content = (
-            <span className="bg-gray-300 p-4">
-              {t('status.invitation_expired')}
-            </span>
-          );
+          content = <span className="bg-gray-300 p-4">{t('status.invitation_expired')}</span>;
         }
         break;
       }
@@ -171,9 +144,7 @@ export const ActionButtons: FC<ActionButtonsProps> = ({
     return signIn('keycloak');
   };
 
-  const hasExternalRegistration =
-    course.externalRegistrationLink !== null &&
-    course.externalRegistrationLink !== '';
+  const hasExternalRegistration = course.externalRegistrationLink !== null && course.externalRegistrationLink !== '';
   const eventHandler = () => {
     window.open(course.externalRegistrationLink, '_blank');
   };
@@ -193,11 +164,7 @@ export const ActionButtons: FC<ActionButtonsProps> = ({
           </div>
         )}
       </div>
-      <ApplicationModal
-        visible={isApplicationModalVisible}
-        closeModal={hideApplicationModal}
-        course={course}
-      />
+      <ApplicationModal visible={isApplicationModalVisible} closeModal={hideApplicationModal} course={course} />
     </>
   );
 };
