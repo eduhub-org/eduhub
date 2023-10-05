@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress } from '@material-ui/core';
 
-import InvitationModal from './InvitationModal';
+import OnboardingModal from './OnboardingModal';
 import { useLazyRoleQuery } from '../../hooks/authedQuery';
 import { useUserId } from '../../hooks/user';
 import { CourseWithEnrollment } from '../../queries/__generated__/CourseWithEnrollment';
@@ -33,7 +33,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const { t, lang } = useTranslation();
   const isLoggedIn = useIsLoggedIn();
   const userId = useUserId();
-  const [modalOpen, setModalOpen] = useState(false);
+  const [onboardingModalOpen, setOnboardingModalOpen] = useState(false);
   const [resetValues, setResetValues] = useState(null);
 
   // Query for authorized course data
@@ -98,7 +98,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     const fetchBackgroundImage = async () => {
       const baseLink = course?.coverImage;
       const optimalImageLink = await getBackgroundImage(baseLink);
-      console.log('optimalImageLink: ', optimalImageLink);
       setBackgroundImage(optimalImageLink);
     };
 
@@ -181,7 +180,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                       <EnrollmentUIController
                         course={course}
                         courseEnrollment={courseEnrollment}
-                        setInvitationModalOpen={setModalOpen}
+                        setOnboardingModalOpen={setOnboardingModalOpen}
                       />
                     ) : (
                       <div className="mx-auto mb-10">
@@ -240,12 +239,12 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
             </div>
           </div>
           {isLoggedIn && (
-            <InvitationModal
+            <OnboardingModal
               course={course}
               enrollmentId={enrollmentId}
-              open={modalOpen}
+              open={onboardingModalOpen}
               resetValues={resetValues}
-              setModalOpen={setModalOpen}
+              setModalOpen={setOnboardingModalOpen}
               refetchCourse={refetchCourse}
             />
           )}

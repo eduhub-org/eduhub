@@ -71,13 +71,13 @@ const CourseLinkInfos: FC<CourseLinkInfosProps> = ({ course }) => {
 interface IProps {
   course: Course_Course_by_pk;
   courseEnrollment: CourseWithEnrollment_Course_by_pk_CourseEnrollments;
-  setInvitationModalOpen: Dispatch<SetStateAction<boolean>>;
+  setOnboardingModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export const EnrollmentUIController: FC<IProps> = ({
   course,
   courseEnrollment,
-  setInvitationModalOpen,
+  setOnboardingModalOpen,
 }) => {
   const [isApplicationModalVisible, setApplicationModalVisible] =
     useState(false);
@@ -100,6 +100,8 @@ export const EnrollmentUIController: FC<IProps> = ({
       setApplicationModalVisible(true);
     }
   }, [user]);
+
+  console.log(`ApplicationModalVisible: `, isApplicationModalVisible);
 
   let content = null;
 
@@ -146,7 +148,7 @@ export const EnrollmentUIController: FC<IProps> = ({
               <Button
                 filled
                 inverted
-                onClick={() => setInvitationModalOpen(true)}
+                onClick={() => setOnboardingModalOpen(true)}
                 className="bg-edu-course-current sm:w-1/3"
               >
                 {t('acceptInvitation')}

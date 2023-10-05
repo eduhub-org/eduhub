@@ -46,7 +46,7 @@ type Inputs = {
   matriculationNumber: string;
 };
 
-interface InvitationModalProps {
+interface OnboardingModalProps {
   course: CourseWithEnrollment_Course_by_pk | Course_Course_by_pk;
   enrollmentId: number;
   open: boolean;
@@ -57,7 +57,7 @@ interface InvitationModalProps {
   setModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const InvitationModal: FC<InvitationModalProps> = ({
+const OnboardingModal: FC<OnboardingModalProps> = ({
   course,
   enrollmentId,
   open,
@@ -319,4 +319,4 @@ const InvitationModal: FC<InvitationModalProps> = ({
   );
 };
 
-export default InvitationModal;
+export default OnboardingModal;
