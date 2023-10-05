@@ -37,11 +37,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   // Query for authorized course data
   const [
     getCoursesAuthorized,
-    {
-      data: authorizedCourseData,
-      refetch: refetchCourse,
-      loading: getCoursesAuthorizedLoading,
-    },
+    { data: authorizedCourseData, refetch: refetchCourse, loading: getCoursesAuthorizedLoading },
   ] = useLazyRoleQuery<CourseWithEnrollment>(COURSE_WITH_ENROLLMENT, {
     variables: {
       id,
@@ -53,8 +49,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       const enrollmentStatus = courseEnrollment?.status;
       if (
         enrollmentStatus === CourseEnrollmentStatus_enum.INVITED &&
-        courseEnrollment?.invitationExpirationDate.setHours(0, 0, 0, 0) >=
-          new Date().setHours(0, 0, 0, 0)
+        courseEnrollment?.invitationExpirationDate.setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)
       ) {
         setResetValues(true);
       }
@@ -62,14 +57,12 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   });
 
   // Query for unauthorized course data
-  const [
-    getCoursesUnauthorized,
-    { data: unauthorizedCourseData, loading: getCoursesUnauthorizedLoading },
-  ] = useLazyRoleQuery<Course, CourseVariables>(COURSE, {
-    variables: {
-      id,
-    },
-  });
+  const [getCoursesUnauthorized, { data: unauthorizedCourseData, loading: getCoursesUnauthorizedLoading }] =
+    useLazyRoleQuery<Course, CourseVariables>(COURSE, {
+      variables: {
+        id,
+      },
+    });
 
   // Call the appropriate query based on user authentication status
   useEffect(() => {
@@ -81,12 +74,8 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   }, [isLoggedIn, getCoursesAuthorized, getCoursesUnauthorized]);
 
   // Extract course data from authorized or unauthorized query result
-  const course =
-    authorizedCourseData?.Course_by_pk || unauthorizedCourseData?.Course_by_pk;
-  const enrollmentId = getCourseEnrollment(
-    authorizedCourseData?.Course_by_pk,
-    userId
-  )?.id;
+  const course = authorizedCourseData?.Course_by_pk || unauthorizedCourseData?.Course_by_pk;
+  const enrollmentId = getCourseEnrollment(authorizedCourseData?.Course_by_pk, userId)?.id;
 
   const isCourseWithEnrollment = useIsCourseWithEnrollment(course);
 
@@ -138,18 +127,14 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 } as React.CSSProperties
               }
             >
-              <div className="max-w-screen-xl mx-auto w-full">
-                {course.title}
-              </div>
+              <div className="max-w-screen-xl mx-auto w-full">{course.title}</div>
             </div>
             <div className="max-w-screen-xl mx-auto w-full">
               <PageBlock>
                 <ContentRow className="items-center">
                   <div className="flex flex-1 flex-col text-white mb-20">
                     {course.weekDay !== 'NONE' ? (
-                      <span className="text-xs">
-                        {getWeekdayStartAndEndString(course, lang, t)}
-                      </span>
+                      <span className="text-xs">{getWeekdayStartAndEndString(course, lang, t)}</span>
                     ) : null}
                     <span className="text-2xl mt-2">{course.tagline}</span>
                   </div>
@@ -164,10 +149,8 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
               </PageBlock>
               {!isEventCourse &&
                 isCourseWithEnrollment && // needed to assure the type of the course object
-                courseEnrollment?.status ===
-                  CourseEnrollmentStatus_enum.CONFIRMED &&
-                (course.achievementCertificatePossible ||
-                  course.attendanceCertificatePossible) && (
+                courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED &&
+                (course.achievementCertificatePossible || course.attendanceCertificatePossible) && (
                   // <div className="mx-auto">
                   <ContentRow className="my-24 text-edu-black bg-white px-8 py-8">
                     {!isDegreeCourse && (
@@ -176,17 +159,13 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                         {!courseEnrollment?.achievementCertificateURL && (
                           <AchievementRecord
                             courseId={course.id}
-                            achievementRecordUploadDeadline={
-                              course.Program.achievementRecordUploadDeadline
-                            }
+                            achievementRecordUploadDeadline={course.Program.achievementRecordUploadDeadline}
                             courseTitle={course.title}
                           />
                         )}
                       </>
                     )}
-                    {isDegreeCourse && (
-                      <CompletedDegreeCourses degreeCourseId={course.id} />
-                    )}
+                    {isDegreeCourse && <CompletedDegreeCourses degreeCourseId={course.id} />}
                     <CertificateDownload courseEnrollment={courseEnrollment} />
                   </ContentRow>
                   // </div>
@@ -194,11 +173,11 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
               <ContentRow className="flex">
                 <PageBlock classname="flex-1 text-white space-y-6">
                   <LearningGoals learningGoals={course.learningGoals} />
-                  <Sessions
-                    sessions={course.Sessions}
-                    isLoggedInParticipant={isLoggedInParticipant}
-                  />
-                  <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
+                  {!isDegreeCourse ? (
+                    <Sessions sessions={course.Sessions} isLoggedInParticipant={isLoggedInParticipant} />
+                  ) : (
+                    <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
+                  )}
                 </PageBlock>
                 <div className="pr-0 lg:pr-6 xl:pr-0">
                   <TimeLocationLanguageInstructors course={course} />
