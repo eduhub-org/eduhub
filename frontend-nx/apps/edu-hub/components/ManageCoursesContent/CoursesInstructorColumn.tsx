@@ -1,21 +1,9 @@
-import { FC, MutableRefObject, useCallback, useRef, useState } from 'react';
-import {
-  MdCheckBox,
-  MdCheckBoxOutlineBlank,
-  MdDelete,
-  MdOutlineCheckBoxOutlineBlank,
-  MdAddCircle,
-  MdKeyboardArrowDown,
-  MdKeyboardArrowUp,
-  MdUpload,
-} from 'react-icons/md';
+import { FC, useCallback, useState } from 'react';
+import { MdAddCircle } from 'react-icons/md';
 import { QueryResult } from '@apollo/client';
 
 import { useAdminMutation } from '../../hooks/authedMutation';
-import {
-  DELETE_COURSE_INSRTRUCTOR,
-  INSERT_A_COURSEINSTRUCTOR,
-} from '../../queries/mutateCourseInstructor';
+import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../queries/mutateCourseInstructor';
 import { INSERT_EXPERT } from '../../queries/user';
 import { AdminCourseList_Course } from '../../queries/__generated__/AdminCourseList';
 import {
@@ -26,10 +14,7 @@ import {
   InsertCourseInstructor,
   InsertCourseInstructorVariables,
 } from '../../queries/__generated__/InsertCourseInstructor';
-import {
-  InsertExpert,
-  InsertExpertVariables,
-} from '../../queries/__generated__/InsertExpert';
+import { InsertExpert, InsertExpertVariables } from '../../queries/__generated__/InsertExpert';
 import { Programs_Program } from '../../queries/__generated__/Programs';
 import { UserForSelection1_User } from '../../queries/__generated__/UserForSelection1';
 import { SelectUserDialog } from '../common/dialogs/SelectUserDialog';
@@ -45,27 +30,19 @@ interface IPropsInstructorColumn {
   refetchCourses: () => void;
 }
 
-export const InstructorColumn: FC<IPropsInstructorColumn> = ({
-  course,
-  refetchCourses,
-}) => {
+export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCourses }) => {
   const [openInstructorDialog, setOpenInstructorDialog] = useState(false);
 
   /* # region GraphQLAPIs */
-  const [insertCourseInstructor] = useAdminMutation<
-    InsertCourseInstructor,
-    InsertCourseInstructorVariables
-  >(INSERT_A_COURSEINSTRUCTOR);
+  const [insertCourseInstructor] = useAdminMutation<InsertCourseInstructor, InsertCourseInstructorVariables>(
+    INSERT_A_COURSEINSTRUCTOR
+  );
 
-  const [deleteInstructorAPI] = useAdminMutation<
-    DeleteCourseInstructor,
-    DeleteCourseInstructorVariables
-  >(DELETE_COURSE_INSRTRUCTOR);
+  const [deleteInstructorAPI] = useAdminMutation<DeleteCourseInstructor, DeleteCourseInstructorVariables>(
+    DELETE_COURSE_INSRTRUCTOR
+  );
 
-  const [insertExpertMutation] = useAdminMutation<
-    InsertExpert,
-    InsertExpertVariables
-  >(INSERT_EXPERT);
+  const [insertExpertMutation] = useAdminMutation<InsertExpert, InsertExpertVariables>(INSERT_EXPERT);
 
   /* # endregion */
 
@@ -120,9 +97,7 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({
         setOpenInstructorDialog(false);
         return;
       }
-      if (
-        course.CourseInstructors.some((expert) => expert.Expert.id === expertId)
-      ) {
+      if (course.CourseInstructors.some((expert) => expert.Expert.id === expertId)) {
         setOpenInstructorDialog(false);
         return;
       }
@@ -172,11 +147,7 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({
         />
       </div>
       {openInstructorDialog && (
-        <SelectUserDialog
-          onClose={addInstructorHandler}
-          open={openInstructorDialog}
-          title={t('add-instructors')}
-        />
+        <SelectUserDialog onClose={addInstructorHandler} open={openInstructorDialog} title={t('add-instructors')} />
       )}
     </div>
   );

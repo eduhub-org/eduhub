@@ -1,15 +1,25 @@
 {
   "EVENTS": "Event",
-  "completed_degree_elements": "Bisher abgeschlossene Elemente",
-  "no_degree_elements_completed": "Bisher hast Du keine Elemente abgeschlossen.",
-  "current_degree_elements": "Aktuelle Angebote im Rahmen des Degrees",
-  "no_degree_elements_available": "Aktuell gibt es keine laufenden Angebote zu diesem Degree.",
-  "general_achievement_certificate_conditions": "**Online-Teilnahme:**\nDie Teilnahme an Terminen wird nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist.\n\n**Kosten:**\nUnsere Kurse sind offen für alle und kostenlos für Studierende, Schüler:innen, Auszubildende, Gründer:innen, Lehrkräfte, wissenschaftliche Mitarbeiter:innen, Arbeitssuchende, Geflüchtete und Rentner:innen. Für Berufstätige fällt eine Gebühr in Höhe von 200 Euro für den Erwerb eines Leistungszertifikats an. Der Erwerb eines Leistungszertifikats ist in verschiedenen Kursen mit kursinternen Projekten eine Teilnahmevoraussetzung. Über team@opencampus.sh kann ein Stipendium beantragt werden.",
-  "external_profile": "Homepage",
-  "linkedin_profile": "LinkedIn-Profil",
-  "xing_profile": "Xing-Profil",
-  "show_all_sessions": "Alle Termine anzeigen",
-  "hide_sessions": "Termine einklappen",
+  "completedDegreeElements": "Bisher abgeschlossene Elemente",
+  "noDegreeElementsCompleted": "Bisher hast Du keine Elemente abgeschlossen.",
+  "currentDegreeElements": "Aktuelle Angebote im Rahmen des Degrees",
+  "noDegreeElementsAvailable": "Aktuell gibt es keine laufenden Angebote zu diesem Degree.",
+  "generalAchievementCertificateConditions": "**Online-Teilnahme:**\nWenn eine Online-Teilnahmen möglich ist, wird die Teilnahme nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist.\n\n**Kosten:**\nUnsere Kurse sind offen für alle und kostenlos für Studierende, Schüler:innen, Auszubildende, Gründer:innen, Lehrkräfte, wissenschaftliche Mitarbeiter:innen, Arbeitssuchende, Geflüchtete und Rentner:innen. Für Berufstätige fällt eine Gebühr in Höhe von 200 Euro für den Erwerb eines Leistungszertifikats an. Der Erwerb eines Leistungszertifikats ist in verschiedenen Kursen mit kursinternen Projekten eine Teilnahmevoraussetzung. Über team@opencampus.sh kann ein Stipendium beantragt werden.",
+  "externalProfile": "Homepage",
+  "linkedinProfile": "LinkedIn-Profil",
+  "xingProfile": "Xing-Profil",
+  "showAllSessions": "Alle Termine anzeigen",
+  "hideSessions": "Termine einklappen",
   "speaker": "Referent:in",
-  "course_content": "Kursinhalte"
+  "courseSessions": "Kurstermine",
+  "onboardingModal": {
+    "title": "Onboarding für Deine Kursteilnahme",
+    "congratulation": "Herzlichen Glückwunsch zur Einladung für die Teilnahme an diesem Kurs!",
+    "formIntro": "Bitte aktualisiere deinen aktuellen Beschäftigungsstatus:",
+    "confirmSufficientTime": "Bitte bestätige die Kursteilnahme nur, wenn Du Zeit hast, bis zum Ende am Kurs teilzunehmen.",
+    "mattermostInfo1": "Nach der Bestätigung gehe bitte direkt auf den Button zum Kurs-Chat.",
+    "mattermostInfo2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nAlle weiteren Informationen bekommst Du von Deiner Kursleitung dann im Kurschat."
+  },
+  "toCourseChat": "ZUM KURS-CHAT",
+  "toOnlineMeeting": "ZUM ONLINE-MEETING"
 }
