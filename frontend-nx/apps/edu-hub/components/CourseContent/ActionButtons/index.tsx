@@ -24,39 +24,19 @@ const CourseLinkInfos: FC<CourseLinkInfosProps> = ({ course }) => {
   const onlineLocation = course.CourseLocations.find((location) => location.locationOption === 'ONLINE');
 
   return (
-    <div className="flex justify-center items-center">
-      {onlineLocation && onlineLocation.defaultSessionAddress && (
-        <div className="mx-4">
-          {/* <a
-            href={onlineLocation.defaultSessionAddress}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white inline-block max-w-[100px]"
-          >
-            {t('course-page:to-online-meeting')}
-          </a> */}
-          <Button
-            as="a"
-            href={onlineLocation.defaultSessionAddress}
-            filled
-            inverted
-            // className="bg-edu-course-current"
-          >
-            {t('course:toOnlineMeeting')}
-          </Button>
-        </div>
-      )}{' '}
-      <div className="mx-4">
-        <Button
-          as="a"
-          href={course.chatLink}
-          filled
-          inverted
-          // className="bg-edu-course-current"
-        >
+    <div className="flex flex-col justify-between items-center">
+      <div className="mb-10 ">
+        <Button className=" bg-blue-200" as="a" href={course.chatLink} filled inverted>
           {t('course:toCourseChat')}
         </Button>
       </div>
+      {onlineLocation && onlineLocation.defaultSessionAddress && (
+        <div className="">
+          <Button className=" bg-blue-200" as="a" href={onlineLocation.defaultSessionAddress} filled inverted>
+            {t('course:toOnlineMeeting')}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,9 +1,4 @@
-import {
-  AnchorHTMLAttributes,
-  ButtonHTMLAttributes,
-  FC,
-  ReactNode,
-} from 'react';
+import { AnchorHTMLAttributes, ButtonHTMLAttributes, FC, ReactNode } from 'react';
 import Link, { LinkProps } from 'next/link';
 
 type Props =
@@ -37,12 +32,12 @@ export const Button: FC<Props> = (props) => {
       : 'bg-edu-black text-white'
     : 'text-edu-black';
 
-  const combinedClassName = `${
-    props.className ? `${props.className} ` : ''
-  }px-6 py-2 border-2 border-edu-black rounded-full items-center cursor-pointer select-none ${colors}`;
+  const combinedClassName = `px-6 py-2 border-2 border-edu-black rounded-full items-center cursor-pointer select-none ${colors} ${
+    props.className ? `${props.className}` : ''
+  }`;
 
   if (props.as === 'a') {
-    const { as,className, filled, ...rest } = props;
+    const { as, className, filled, ...rest } = props;
     return (
       <a className={combinedClassName} {...rest}>
         {props.children}
@@ -51,7 +46,7 @@ export const Button: FC<Props> = (props) => {
   }
 
   if (props.as === 'link') {
-    const { as,className,  filled, ...rest } = props;
+    const { as, className, filled, ...rest } = props;
     return (
       <Link className={combinedClassName} {...rest}>
         {props.children}
