@@ -1,0 +1,27 @@
+name: Update PR Description
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  update_pr:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Fetch commit messages and update PR description
+      run: |
+        # Fetch commit messages
+        messages=$(git log --pretty=format:"- %s" origin/${{ github.event.pull_request.base.ref }}..origin/${{ github.event.pull_request.head.ref }})
+        
+        # Update PR description
+        gh pr edit ${{ github.event.pull_request.number }} \
+          --add-label "auto-updated" \
+          --body "$messages"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
