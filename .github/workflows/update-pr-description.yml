@@ -13,11 +13,18 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Important: this fetches all branches
+
+    - name: Fetch additional branches
+      run: |
+        git fetch origin staging:staging
+        git fetch origin develop:develop
 
     - name: Fetch commit messages and update PR description
       run: |
         # Fetch commit messages
-        messages=$(git log --pretty=format:"- %s" origin/${{ github.event.pull_request.base.ref }}..origin/${{ github.event.pull_request.head.ref }})
+        messages=$(git log --pretty=format:"- %s" staging..develop)
         
         # Update PR description
         gh pr edit ${{ github.event.pull_request.number }} \
