@@ -86,6 +86,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       const baseLink = course?.coverImage;
       const optimalImageLink = await getBackgroundImage(baseLink);
       setBackgroundImage(optimalImageLink);
+      console.log('optimalImageLink: ', optimalImageLink);
     };
 
     fetchBackgroundImage();
@@ -120,10 +121,10 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
         <div className="flex flex-col space-y-24">
           <div className="flex flex-col space-y-24">
             <div
-              className="h-96 p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat bg [image:var(--bg-small-url)]"
+              className="h-96 p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat"
               style={
                 {
-                  '--bg-small-url': `linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url(${backgroundImage})`,
+                  backgroundImage: `linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url(${backgroundImage})`,
                 } as React.CSSProperties
               }
             >
