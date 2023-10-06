@@ -40,21 +40,14 @@ export const CertificateDownload: FC<IProps> = ({
     data: loadAchievementCertificateData,
     loading: loadAchievementCerfificateLoading,
     refetch: loadAchievementCerfificateRefetch,
-  } = useAuthedQuery<
-    loadAchievementCertificate,
-    loadAchievementCertificateVariables
-  >(LOAD_ACHIEVEMENT_CERTIFICATE, {
+  } = useAuthedQuery<loadAchievementCertificate, loadAchievementCertificateVariables>(LOAD_ACHIEVEMENT_CERTIFICATE, {
     variables: {
       path: courseEnrollment?.achievementCertificateURL,
     },
     skip: !courseEnrollment?.achievementCertificateURL,
   });
 
-  const {
-    data: loadAttendanceCertificateData,
-    loading: loadAttendanceCertificateLoading,
-    refetch: loadAttendanceCertificateRefetch,
-  } = useAuthedQuery<
+  const { data: loadAttendanceCertificateData, loading: loadAttendanceCertificateLoading } = useAuthedQuery<
     loadAttendanceCertificate,
     loadAttendanceCertificateVariables
   >(LOAD_ATTENDANCE_CERTIFICATE, {
@@ -64,67 +57,38 @@ export const CertificateDownload: FC<IProps> = ({
     skip: !courseEnrollment?.attendanceCertificateURL,
   });
 
-  // useEffect(() => {
-  //   if (refetchAchievementCertificates) {
-  //     loadAchievementCerfificateRefetch();
-  //     setRefetchAchievementCertificates(false);
-  //   }
-  //   if (refetchAttendanceCertificates) {
-  //     loadAttendanceCertificateRefetch();
-  //     setRefetchAttendanceCertificates(false);
-  //   }
-  // }, [
-  //   refetchAchievementCertificates,
-  //   refetchAttendanceCertificates,
-  //   loadAchievementCerfificateRefetch,
-  //   loadAttendanceCertificateRefetch,
-  //   setRefetchAchievementCertificates,
-  //   setRefetchAttendanceCertificates,
-  // ]);
-
   return (
     <div className={!manageView && 'mt-4'}>
-      <div className={`flex gap-4 ${!manageView && 'flex-col mt-6'}`}>
-        {loadAchievementCertificateData &&
-          !loadAchievementCerfificateLoading && (
-            <>
-              {!manageView && (
-                <h3 className="text-3xl font-medium">
-                  {t('course-page:congrats-completion')}
-                </h3>
-              )}
-              <Button
-                as="a"
-                filled
-                href={
-                  loadAchievementCertificateData.loadAchievementCertificate.link
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {manageView
-                  ? t('manageCourse:achievement_certificate_download')
-                  : t('course-page:achievementCertificateDownload')}
-              </Button>
-            </>
-          )}
-        {loadAttendanceCertificateData &&
-          !loadAttendanceCertificateLoading && (
+      <div className={`flex gap-4 ${!manageView && 'flex-col sm:px-24'}`}>
+        {loadAchievementCertificateData && !loadAchievementCerfificateLoading && (
+          <>
+            {!manageView && <h3 className="text-3xl font-medium">{t('course-page:congrats-completion')}</h3>}
             <Button
               as="a"
               filled
-              href={
-                loadAttendanceCertificateData.loadAttendanceCertificate
-                  .link
-              }
+              href={loadAchievementCertificateData.loadAchievementCertificate.link}
               target="_blank"
               rel="noopener noreferrer"
             >
               {manageView
-                ? t('manageCourse:attendance_certificate_download')
-                : t('course-page:attendanceCertificateDownload')}
+                ? t('manageCourse:achievement_certificate_download')
+                : t('course-page:achievementCertificateDownload')}
             </Button>
-          )}
+          </>
+        )}
+        {loadAttendanceCertificateData && !loadAttendanceCertificateLoading && (
+          <Button
+            as="a"
+            filled
+            href={loadAttendanceCertificateData.loadAttendanceCertificate.link}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {manageView
+              ? t('manageCourse:attendance_certificate_download')
+              : t('course-page:attendanceCertificateDownload')}
+          </Button>
+        )}
       </div>
     </div>
   );
