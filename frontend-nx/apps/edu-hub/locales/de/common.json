@@ -47,13 +47,14 @@
   "cancel": "Abbrechen",
   "save": "Speichern",
   "saving": "Speichern...",
+  "confirm": "Bestätigen",
   "profile-picture": "Profilbild",
   "title": "Titel",
   "new-title": "Neuer Titel",
   "form-select-placeholder": "Undefiniert",
   "ACADEMIA": "Wissenschaftliche:r Mitarbeitende:r",
   "EMPLOYED": "Angestellte:r",
-  "OTHER": "Sonstiges",
+  "OTHER": "Andere",
   "RETIREE": "Rentner:in",
   "SELFEMPLOYED": "Selbständige:r",
   "STUDENT": "Student:in",
@@ -86,5 +87,15 @@
   "REJECTED": "abgelehnt",
   "ABORTED": "abgebrochen",
   "COMPLETED": "abgeschlossen",
-  "CANCELED": "abgesagt"
+  "CANCELED": "abgesagt",
+  "password": "Password",
+  "employmentStatus": "Aktuelle Tätigkeit",
+  "nameOfUniversity": "Name der Universität",
+  "matriculationNumber": "Matrikelnummer",
+  "otherUniversityLabel": {
+    "university": "Name der Universität",
+    "organization": "Name der Organisation",
+    "other": "Andere Beschäftigung"
+  }
+
 }

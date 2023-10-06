@@ -9,11 +9,11 @@
   "image_of": "Image of",
   "DE": "DEUTSCH",
   "EN": "ENGLISCH",
-  "firstName": "Firstname",
-  "lastName": "Lastname",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "email": "Email",
   "first-name": "Firstname",
   "last-name": "Lastname",
-  "email": "E-Mail",
   "university": "University",
   "matriculation-number": "Matriculation number",
   "external-profile": "Link to external profile (LinkedIn, XING, ...)",
@@ -47,6 +47,7 @@
   "cancel": "Cancel",
   "save": "Save",
   "saving": "Saving...",
+  "confirm": "Confirm",
   "profile-picture": "Profile image",
   "title": "Title",
   "new-title": "New Title",
@@ -86,5 +87,14 @@
   "REJECTED": "rejected",
   "ABORTED": "aborted",
   "COMPLETED": "completed",
-  "CANCELED": "canceled"
+  "CANCELED": "canceled",
+  "password": "Password",
+  "employmentStatus": "Employment Status",
+  "nameOfUniversity": "Name of University",
+  "matriculationNumber": "Matriculation number",
+  "otherUniversityLabel": {
+    "university": "Name of the university",
+    "organization": "Name of the organization",
+    "other": "Other"
+  }
 }

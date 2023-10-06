@@ -1,0 +1,34 @@
+name: Update PR Description
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  update_pr:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Important: this fetches all branches
+
+    - name: Fetch additional branches
+      run: |
+        git fetch origin staging:staging
+        git fetch origin develop:develop
+
+    - name: Fetch commit messages and update PR description
+      run: |
+        # Fetch commit messages
+        messages=$(git log --pretty=format:"- %s" staging..develop)
+        
+        # Update PR description
+        gh pr edit ${{ github.event.pull_request.number }} \
+          --add-label "auto-updated" \
+          --body "$messages"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
