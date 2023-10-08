@@ -19,6 +19,8 @@ services:
     depends_on:
       - hasura
       - keycloak
+    environment:
+      HELP_DOCS_URL: https://opencampus.gitbook.io/faq/
 
   functions:
     container_name: eduhub-node-functions
