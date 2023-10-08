@@ -23,3 +23,10 @@
   @apply mr-4; /* Add right margin */
   @apply ml-7; /* Add right margin */
 }
+
+.responsive-iframe {
+  width: 100%;
+  max-width: 1200px; /* Or whatever maximum you prefer */
+  height: 600px;
+}
+
