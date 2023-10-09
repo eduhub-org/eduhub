@@ -90,7 +90,7 @@ resource "google_cloud_run_service" "eduhub" {
         }
         env {
           name  = "HELP_DOCS_URL"
-          value = "https://${local.help_docs_url}.opencampus.sh"
+          value = "https://${var.help_docs_url}.opencampus.sh"
         }
         env {
           name = "HASURA_ADMIN_SECRET"
