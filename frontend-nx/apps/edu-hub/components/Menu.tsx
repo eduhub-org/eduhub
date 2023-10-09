@@ -64,11 +64,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       </MenuItem>
 
       <MenuItem onClick={closeMenu}>
-        <Link
-          className="w-full text-lg"
-          href="https://opencampus.gitbook.io/faq/"
-          target="_blank"
-        >
+        <Link className="w-full text-lg" href="/help">
           {t('menu-faq')}
         </Link>
       </MenuItem>

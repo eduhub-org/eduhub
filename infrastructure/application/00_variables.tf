@@ -201,6 +201,12 @@ variable "keycloak_ras_client_secret" {
   description = "Used to authenticate login requests from the rent-a-scientist client."
   type        = string
 }
+variable "help_docs_url" {
+  description = "Stores the URL to a GitBook or other documentation resources that serve as the FAQ and user help guide for the application. The URL is utilized within the app to include the resourec via an iframe"
+  type        = string
+}
+
+
 
 # Serverless Functions
 variable "functions_sha" {

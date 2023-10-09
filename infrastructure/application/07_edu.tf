@@ -89,6 +89,10 @@ resource "google_cloud_run_service" "eduhub" {
           value = "https://${local.eduhub_service_name}.opencampus.sh"
         }
         env {
+          name  = "HELP_DOCS_URL"
+          value = "https://${var.help_docs_url}.opencampus.sh"
+        }
+        env {
           name = "HASURA_ADMIN_SECRET"
           value_from {
             secret_key_ref {
