@@ -5,7 +5,10 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 const { createGlobPatternsForDependencies } = require('@nrwl/next/tailwind');
 
 module.exports = {
-  plugins: [require('@tailwindcss/line-clamp')],
+  plugins: [
+    require('@tailwindcss/line-clamp'),
+    require('@tailwindcss/typography'),
+  ],
   content: [
     join(__dirname, '/pages/**/*.{js,ts,jsx,tsx}'),
     join(__dirname, '/components/**/*.{js,ts,jsx,tsx}'),
