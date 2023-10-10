@@ -17,8 +17,8 @@ import {
   UpdateAppSettingsVariables,
   UpdateAppSettings,
 } from '../../queries/__generated__/UpdateAppSettings';
-import { APP_SETTINGS, UPDATE_APP_SETTINGS } from 'apps/edu-hub/queries/appSettings';
-import { AppSettings } from 'apps/edu-hub/queries/__generated__/AppSettings';
+import { APP_SETTINGS, UPDATE_APP_SETTINGS } from '../../queries/appSettings';
+import { AppSettings } from '../../queries/__generated__/AppSettings';
 
 type Inputs = {
   // backgroundImageURL: string;
