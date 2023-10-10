@@ -6,6 +6,7 @@
 - "!include public_AchievementRecordRating.yaml"
 - "!include public_AchievementRecordType.yaml"
 - "!include public_Admin.yaml"
+- "!include public_AppSettings.yaml"
 - "!include public_Attendance.yaml"
 - "!include public_AttendanceSource.yaml"
 - "!include public_AttendanceStatus.yaml"
