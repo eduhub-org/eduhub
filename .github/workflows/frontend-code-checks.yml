@@ -5,22 +5,19 @@ name: Code Checks edu-hub
 
 on:
   push:
-    # Run only on changes in the following folder
     paths:
       - frontend-nx/**
   pull_request:
-    # Run only on changes in the following folder
     paths:
       - frontend-nx/**
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    if: github.event_name == 'push' || (github.event_name != 'push' && !contains(github.event.head_commit.message, 'Merge pull request'))
     strategy:
       matrix:
         node-version: [16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
       - name: Checkout project
