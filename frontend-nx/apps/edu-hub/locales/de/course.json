@@ -1,5 +1,7 @@
 {
   "EVENTS": "Event",
+  "reject": "Teilnahme ablehnen",
+  "confirm": "Teilnahme bestätigen",
   "completedDegreeElements": "Bisher abgeschlossene Elemente",
   "noDegreeElementsCompleted": "Bisher hast Du keine Elemente abgeschlossen.",
   "currentDegreeElements": "Aktuelle Angebote im Rahmen des Degrees",

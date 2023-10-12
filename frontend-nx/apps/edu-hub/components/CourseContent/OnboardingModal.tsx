@@ -1,11 +1,4 @@
-import {
-  FC,
-  useEffect,
-  useCallback,
-  Dispatch,
-  SetStateAction,
-  useState,
-} from 'react';
+import { FC, useEffect, useCallback, Dispatch, SetStateAction, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress } from '@material-ui/core';
@@ -50,9 +43,7 @@ interface OnboardingModalProps {
   course: CourseWithEnrollment_Course_by_pk | Course_Course_by_pk;
   enrollmentId: number;
   open: boolean;
-  refetchCourse: (
-    variables?: Partial<OperationVariables>
-  ) => Promise<ApolloQueryResult<CourseWithEnrollment>>;
+  refetchCourse: (variables?: Partial<OperationVariables>) => Promise<ApolloQueryResult<CourseWithEnrollment>>;
   resetValues: { [key in keyof Inputs]?: string };
   setModalOpen: Dispatch<SetStateAction<boolean>>;
 }
@@ -156,10 +147,9 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
     UpdateUserOnEnrollmentConfirmationVariables
   >(UPDATE_USER_ON_ENROLLMENT_CONFIRMATION);
 
-  const [updateEnrollmentStatus] = useAuthedMutation<
-    UpdateEnrollmentStatus,
-    UpdateEnrollmentStatusVariables
-  >(UPDATE_ENROLLMENT_STATUS);
+  const [updateEnrollmentStatus] = useAuthedMutation<UpdateEnrollmentStatus, UpdateEnrollmentStatusVariables>(
+    UPDATE_ENROLLMENT_STATUS
+  );
 
   const onCloseConfirmEnrollment = useCallback(() => {
     setModalOpen(false);
@@ -206,30 +196,26 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
     }
   };
 
-  const employmentSelectFormOptions = (
-    Object.keys(Employment_enum) as Array<keyof typeof Employment_enum>
-  ).map((key) => ({
-    label: t(`common:${key}`),
-    value: key,
-  }));
+  const employmentSelectFormOptions = (Object.keys(Employment_enum) as Array<keyof typeof Employment_enum>).map(
+    (key) => ({
+      label: t(`common:${key}`),
+      value: key,
+    })
+  );
 
-  const universitySelectFormOptions = (
-    Object.keys(University_enum) as Array<keyof typeof University_enum>
-  ).map((key) => ({
-    label: t(`common:${key}`),
-    value: key,
-  }));
+  const universitySelectFormOptions = (Object.keys(University_enum) as Array<keyof typeof University_enum>).map(
+    (key) => ({
+      label: t(`common:${key}`),
+      value: key,
+    })
+  );
 
   if (!course) {
     return <div>{t('courseNotAvailable')}</div>;
   }
 
   return (
-    <Modal
-      isOpen={open}
-      close={onCloseConfirmEnrollment}
-      title={t('onboardingModal.title')}
-    >
+    <Modal isOpen={open} close={onCloseConfirmEnrollment} title={t('onboardingModal.title')}>
       {!userLoading && !userError && (
         <>
           <div className="pb-5">{t('onboardingModal.congratulation')}</div>
@@ -259,28 +245,16 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
                       />
                     </div>
                     <div className="w-1/2 pl-3">
-                      <FormFieldRow<Inputs>
-                        label={t('common:matriculationNumber')}
-                        name="matriculationNumber"
-                      />
+                      <FormFieldRow<Inputs> label={t('common:matriculationNumber')} name="matriculationNumber" />
                     </div>
                   </div>
                 )}
-                {otherUniversityVisible && (
-                  <FormFieldRow<Inputs>
-                    label={otherUniversityLabel}
-                    name="otherUniversity"
-                  />
-                )}
-                <div className="pb-3">
-                  {t('onboardingModal.confirmSufficientTime')}
-                </div>
+                {otherUniversityVisible && <FormFieldRow<Inputs> label={otherUniversityLabel} name="otherUniversity" />}
+                <div className="pb-3">{t('onboardingModal.confirmSufficientTime')}</div>
                 <div className="pb-3">
                   <b>{t('onboardingModal.mattermostInfo1')}</b>
                 </div>
-                <div className="pb-0">
-                  {t('onboardingModal.mattermostInfo2')}
-                </div>
+                <div className="pb-0">{t('onboardingModal.mattermostInfo2')}</div>
                 <div className="flex">
                   <Button
                     as="button"
@@ -291,11 +265,7 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
                     className="mt-8 block mx-auto mb-5 disabled:bg-slate-500"
                     onClick={onEnrollmentCancellation}
                   >
-                    {isSubmitting ? (
-                      <CircularProgress />
-                    ) : (
-                      t('course-page:reject')
-                    )}
+                    {isSubmitting ? <CircularProgress /> : t('reject')}
                   </Button>
                   <Button
                     as="button"
@@ -304,7 +274,7 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
                     filled
                     className="mt-8 block mx-auto mb-5 disabled:bg-slate-500"
                   >
-                    {isSubmitting ? <CircularProgress /> : t('common:confirm')}
+                    {isSubmitting ? <CircularProgress /> : t('confirm')}
                   </Button>
                 </div>
               </form>

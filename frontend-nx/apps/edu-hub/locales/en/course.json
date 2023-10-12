@@ -1,5 +1,7 @@
 {
   "EVENTS": "Event",
+  "reject": "Decline participation",
+  "confirm": "Confirm participation",
   "completedDegreeElements": "Completed Degree Elements",
   "noDegreeElementsCompleted": "You have not completed any Degree Elements yet.",
   "currentDegreeElements": "Current Offerings that are Part of the Degree",
