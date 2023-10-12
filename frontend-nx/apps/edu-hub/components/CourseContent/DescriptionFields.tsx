@@ -26,10 +26,8 @@ export const DescriptionFields: FC<IProps> = ({ course }) => {
                 !course.headingDescriptionField2 && !course.contentDescriptionField2 ? 'md:w-full' : ''
               }`}
             >
-              <h2 className="text-3xl font-semibold mb-6">
-                {course.headingDescriptionField1}
-              </h2>
-              <ReactMarkdown className='prose max-w-none' remarkPlugins={[remarkGfm]}>
+              <h2 className="text-3xl font-semibold mb-6">{course.headingDescriptionField1}</h2>
+              <ReactMarkdown className="prose max-w-none" remarkPlugins={[remarkGfm]}>
                 {course.contentDescriptionField1}
               </ReactMarkdown>
             </div>
@@ -40,10 +38,8 @@ export const DescriptionFields: FC<IProps> = ({ course }) => {
                 !course.headingDescriptionField1 && !course.contentDescriptionField1 ? 'md:w-full' : ''
               }`}
             >
-              <h2 className="text-3xl font-semibold mb-6">
-                {course.headingDescriptionField2}
-              </h2>
-              <ReactMarkdown className='prose max-w-none' remarkPlugins={[remarkGfm]}>
+              <h2 className="text-3xl font-semibold mb-6">{course.headingDescriptionField2}</h2>
+              <ReactMarkdown className="prose max-w-none" remarkPlugins={[remarkGfm]}>
                 {course.contentDescriptionField2}
               </ReactMarkdown>
             </div>
@@ -53,7 +49,7 @@ export const DescriptionFields: FC<IProps> = ({ course }) => {
       {isAchievementCertificatePossible ? (
         <div className="flex flex-wrap mt-10 bg-white rounded-2xl p-4">
           <ReactMarkdown className="prose max-w-none" remarkPlugins={[remarkGfm]}>
-            {t('course:general_achievement_certificate_conditions').replace(/\n/g, '  \n')}
+            {t('generalAchievementCertificateConditions').replace(/\n/g, '  \n')}
           </ReactMarkdown>
         </div>
       ) : null}{' '}
