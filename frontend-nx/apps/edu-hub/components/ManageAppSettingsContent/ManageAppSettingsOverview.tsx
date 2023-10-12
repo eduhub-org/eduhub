@@ -1,9 +1,5 @@
 import { FC } from 'react';
-import {
-  FormProvider,
-  SubmitHandler,
-  useForm,
-} from 'react-hook-form';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
 
@@ -13,10 +9,7 @@ import FormFieldRow from '../common/forms/FormFieldRow';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { useAdminQuery } from '../../hooks/authedQuery';
 
-import {
-  UpdateAppSettingsVariables,
-  UpdateAppSettings,
-} from '../../queries/__generated__/UpdateAppSettings';
+import { UpdateAppSettingsVariables, UpdateAppSettings } from '../../queries/__generated__/UpdateAppSettings';
 import { APP_SETTINGS, UPDATE_APP_SETTINGS } from '../../queries/appSettings';
 import { AppSettings } from '../../queries/__generated__/AppSettings';
 
@@ -58,21 +51,20 @@ const ManageAppSettingsOverview: FC = () => {
     onCompleted: (data) => {
       const appSettings = data.AppSettings[0];
 
-      reset({
-        // backgroundImageURL: appSettings.backgroundImageURL,
-        bannerBackgroundColor: appSettings.bannerBackgroundColor,
-        bannerFontColor: appSettings.bannerFontColor,
-        bannerTextDe: appSettings.bannerTextDe,
-        bannerTextEn: appSettings.bannerTextEn,
-        // previewImageURL: appSettings.previewImageURL,
-      });
+      if (appSettings) {
+        reset({
+          // backgroundImageURL: appSettings.backgroundImageURL,
+          bannerBackgroundColor: appSettings.bannerBackgroundColor,
+          bannerFontColor: appSettings.bannerFontColor,
+          bannerTextDe: appSettings.bannerTextDe,
+          bannerTextEn: appSettings.bannerTextEn,
+        });
+      }
     },
     skip: !sessionData,
   });
 
-  const [updateAppSettings] = useAdminMutation<UpdateAppSettings, UpdateAppSettingsVariables>(
-    UPDATE_APP_SETTINGS
-  );
+  const [updateAppSettings] = useAdminMutation<UpdateAppSettings, UpdateAppSettingsVariables>(UPDATE_APP_SETTINGS);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
@@ -132,18 +124,10 @@ const ManageAppSettingsOverview: FC = () => {
               </div>
               <div className="flex flex-wrap">
                 <div className="w-1/2 pr-3">
-                  <FormFieldRow<Inputs>
-                    label={t('manageAppSettings:bannerTextDe')}
-                    name="bannerTextDe"
-                    required
-                  />
+                  <FormFieldRow<Inputs> label={t('manageAppSettings:bannerTextDe')} name="bannerTextDe" required />
                 </div>
                 <div className="w-1/2 pl-3">
-                  <FormFieldRow<Inputs>
-                    label={t('manageAppSettings:bannerTextEn')}
-                    name="bannerTextEn"
-                    required
-                  />
+                  <FormFieldRow<Inputs> label={t('manageAppSettings:bannerTextEn')} name="bannerTextEn" required />
                 </div>
               </div>
               {/* <div className="flex flex-wrap">
