@@ -12,6 +12,8 @@ on:
     # Run only on changes in the following folder
     paths:
       - frontend-nx/**
+    # Run only on opened pull requests
+    types: [opened]
 
 jobs:
   build:
