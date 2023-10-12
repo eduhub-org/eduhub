@@ -28,10 +28,7 @@ export const Page: FC<PageProps> = ({ children, className }) => {
   });
 
   const handleBanner = (contentKey: string, contentValue: string) => {
-    if (
-      localStorage.getItem(contentKey) !== contentValue ||
-      localStorage.getItem('bannerClosed') !== 'true'
-    ) {
+    if (localStorage.getItem(contentKey) !== contentValue || localStorage.getItem('bannerClosed') !== 'true') {
       setBannerState({
         content: contentValue,
         isVisible: true,
@@ -48,16 +45,15 @@ export const Page: FC<PageProps> = ({ children, className }) => {
   } = useRoleQuery<AppSettings>(APP_SETTINGS, {
     onCompleted: (data) => {
       const appSettings = data.AppSettings[0];
-      if (lang === 'de')
-        handleBanner('bannerContentDe', appSettings.bannerTextDe);
-      else if (lang === 'en')
-        handleBanner('bannerContentEn', appSettings.bannerTextEn);
+      if (appSettings) {
+        if (lang === 'de') handleBanner('bannerContentDe', appSettings.bannerTextDe);
+        else if (lang === 'en') handleBanner('bannerContentEn', appSettings.bannerTextEn);
+      }
     },
   });
 
   useEffect(() => {
-    if (status !== 'loading' && session?.error === 'RefreshAccessTokenError')
-      logout();
+    if (status !== 'loading' && session?.error === 'RefreshAccessTokenError') logout();
   }, [status, session, logout]);
 
   const handleBannerClose = () => {
@@ -87,8 +83,7 @@ export const Page: FC<PageProps> = ({ children, className }) => {
         <div
           className={`w-full text-white flex justify-between items-center py-4 md:py-8 px-3 md:px-16`}
           style={{
-            backgroundColor:
-              appSettingsData?.AppSettings[0]?.bannerBackgroundColor,
+            backgroundColor: appSettingsData?.AppSettings[0]?.bannerBackgroundColor,
           }}
         >
           <span
@@ -97,9 +92,7 @@ export const Page: FC<PageProps> = ({ children, className }) => {
               color: appSettingsData?.AppSettings[0]?.bannerFontColor,
             }}
           >
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {bannerState.content}
-            </ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{bannerState.content}</ReactMarkdown>
           </span>
           <button onClick={handleBannerClose} className="text-red-400">
             <MdClose className="w-8 h-8" title="Close" />
