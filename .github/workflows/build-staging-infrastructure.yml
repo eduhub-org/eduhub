@@ -1,13 +1,13 @@
 name: Setup Environment
 on:
-  push:
-    # Run only on pushes/merges to the following branch
-    branches:
-      - staging
+  #push:
+  #   Run only on pushes/merges to the following branch
+  #  branches:
+  #    - staging
 
-    # Publish `v1.2.3` tags as releases.
-    tags:
-      - v*
+  # Publish `v1.2.3` tags as releases.
+  #  tags:
+  #    - v*
 
   pull_request:
     # Run tests and build processes for PRs.
@@ -121,7 +121,7 @@ jobs:
 
 
   build_keycloak:
-    if: needs.check_folder_changes.outputs.keycloak_changed == 'true'
+    if: needs.check_folder_changes.outputs.keycloak_changed == 'true' && github.event.pull_request.state == 'open'
     name: Build and Store Keycloak Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -137,7 +137,7 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
   
   build_hasura:
-    if: needs.check_folder_changes.outputs.hasura_changed == 'true'
+    if: needs.check_folder_changes.outputs.hasura_changed == 'true' && github.event.pull_request.state == 'open'
     name: Build and Store Hasura Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -153,7 +153,7 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
 
   build_frontend:
-    if: needs.check_folder_changes.outputs.frontend_changed == 'true'
+    if: needs.check_folder_changes.outputs.frontend_changed == 'true' && github.event.pull_request.state == 'open'
     name: Build and Store Frontend Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -171,7 +171,7 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
   
   build_rent_a_scientist_frontend:
-    if: needs.check_folder_changes.outputs.frontend_changed == 'true'
+    if: needs.check_folder_changes.outputs.frontend_changed == 'true' && github.event.pull_request.state == 'open'
     name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/build-and-store-docker-image.yml
@@ -190,7 +190,7 @@ jobs:
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_STAGING_KEY }}
   
   zip_and_store_cloud_functions:
-    if: needs.check_folder_changes.outputs.functions_changed == 'true'
+    if: needs.check_folder_changes.outputs.functions_changed == 'true' && github.event.pull_request.state == 'open'
     name: Zip and Store Cloud Functions
     needs: [prepare_environment, check_folder_changes]
     uses: ./.github/workflows/zip-and-store-cloud-functions.yml

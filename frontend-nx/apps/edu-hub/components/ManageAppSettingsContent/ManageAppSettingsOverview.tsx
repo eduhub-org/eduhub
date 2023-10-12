@@ -10,8 +10,9 @@ import { useAdminMutation } from '../../hooks/authedMutation';
 import { useAdminQuery } from '../../hooks/authedQuery';
 
 import { UpdateAppSettingsVariables, UpdateAppSettings } from '../../queries/__generated__/UpdateAppSettings';
-import { APP_SETTINGS, UPDATE_APP_SETTINGS } from '../../queries/appSettings';
+import { APP_SETTINGS, INSERT_APP_SETTINGS, UPDATE_APP_SETTINGS } from '../../queries/appSettings';
 import { AppSettings } from '../../queries/__generated__/AppSettings';
+import { InsertAppSettings, InsertAppSettingsVariables } from '../../queries/__generated__/InsertAppSettings';
 
 type Inputs = {
   // backgroundImageURL: string;
@@ -65,26 +66,40 @@ const ManageAppSettingsOverview: FC = () => {
   });
 
   const [updateAppSettings] = useAdminMutation<UpdateAppSettings, UpdateAppSettingsVariables>(UPDATE_APP_SETTINGS);
+  const [insertAppSettings] = useAdminMutation<InsertAppSettings, InsertAppSettingsVariables>(INSERT_APP_SETTINGS);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      await updateAppSettings({
-        variables: {
-          // backgroundImageURL: data.backgroundImageURL,
-          bannerBackgroundColor: data.bannerBackgroundColor,
-          bannerFontColor: data.bannerFontColor,
-          bannerTextDe: data.bannerTextDe,
-          bannerTextEn: data.bannerTextEn,
-          id: appSettingsData.AppSettings[0].id,
-          // previewImageURL: data.previewImageURL,
-        },
-      });
+      const variables = {
+        // backgroundImageURL: data.backgroundImageURL,
+        bannerBackgroundColor: data.bannerBackgroundColor,
+        bannerFontColor: data.bannerFontColor,
+        bannerTextDe: data.bannerTextDe,
+        bannerTextEn: data.bannerTextEn,
+      };
+
+      if (appSettingsData.AppSettings && appSettingsData.AppSettings[0]) {
+        await updateAppSettings({
+          variables: {
+            ...variables,
+            id: appSettingsData.AppSettings[0].id,
+          },
+        });
+      } else {
+        await insertAppSettings({
+          variables: {
+            ...variables,
+          },
+        });
+      }
+
       refetchAppSettings();
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
       console.log(error);
     }
   };
+
   const { t } = useTranslation();
 
   return (
