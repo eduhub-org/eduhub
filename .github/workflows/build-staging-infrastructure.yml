@@ -1,13 +1,13 @@
 name: Setup Environment
 on:
-  #push:
-  #   Run only on pushes/merges to the following branch
-  #  branches:
-  #    - staging
+  push:
+    # Run only on pushes/merges to the following branch
+    branches:
+      - staging
 
-  # Publish `v1.2.3` tags as releases.
-  #  tags:
-  #    - v*
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
 
   pull_request:
     # Run tests and build processes for PRs.
