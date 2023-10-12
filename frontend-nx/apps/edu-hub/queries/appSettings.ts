@@ -46,3 +46,27 @@ export const UPDATE_APP_SETTINGS = gql`
     }
   }
 `;
+
+
+export const INSERT_APP_SETTINGS = gql`
+  mutation InsertAppSettings (
+    $bannerBackgroundColor: String
+    $bannerFontColor: String
+    $bannerTextDe: String
+    $bannerTextEn: String
+    # $backgroundImageURL: String
+    # $previewImageURL: String
+  ){
+    insert_AppSettings_one(
+      object: {
+        bannerBackgroundColor: $bannerBackgroundColor
+        bannerFontColor: $bannerFontColor
+        bannerTextDe: $bannerTextDe
+        bannerTextEn: $bannerTextEn
+        # backgroundImageURL: $backgroundImageURL
+        # previewImageURL: $previewImageURL
+        }) {
+      id
+    }
+  }
+`;
