@@ -2,13 +2,13 @@ import os
 import requests
 import random
 import string
-
+import logging
 
 class MattermostClient:
 
     def __init__(self):
-        self.url = os.getenv('MM_URL')
-        self.token = os.getenv('MM_API_KEY')
+        self.url = os.environ.get('MM_URL')
+        self.token = os.environ.get('MM_TOKEN')
 
 # Getter
 
@@ -30,6 +30,9 @@ class MattermostClient:
             return None
         
     def get_team_id(self, team_name):
+        logging.info(
+                "MM URL: %s", self.url
+            )
         url = f"{self.url}/api/v4/teams/name/{team_name}"
         headers = {
             "Authorization": f"Bearer {self.token}"
@@ -171,12 +174,21 @@ class MattermostClient:
             "team_id": team_id,
             "user_id": user_id
         }
+        logging.info(
+                "team_id: %s", team_id
+            )
         response = requests.post(url, headers=headers, json=data)
         if response.status_code == 201:
+            logging.info(
+                "Successfully added user with ID"
+            )
             print(
                 f"Successfully added user with ID '{user_id}' to team with ID '{team_id}'")
             return True
         else:
+            logging.info(
+                "Failed to add user with ID"
+            )
             print(
                 f"Failed to add user with ID '{user_id}' to team with ID '{team_id}'. Response code: {response.status_code}")
             return False
