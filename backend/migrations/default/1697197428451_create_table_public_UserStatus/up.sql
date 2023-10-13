@@ -1,0 +1,1 @@
+CREATE TABLE "public"."UserStatus" ("value" text NOT NULL, "comment" text NOT NULL, PRIMARY KEY ("value") , UNIQUE ("value"));COMMENT ON TABLE "public"."UserStatus" IS E'Possible activity status of a user';
