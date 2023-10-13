@@ -43,9 +43,11 @@ export const Page: FC<PageProps> = ({ children, className }) => {
     loading: appSettingsLoading,
     error: appSettingsError,
   } = useRoleQuery<AppSettings>(APP_SETTINGS, {
+    variables: { appName: 'edu' },
     onCompleted: (data) => {
-      const appSettings = data.AppSettings[0];
-      if (appSettings) {
+      const [appSettings] = data.AppSettings; // Using array destructuring to get the first item
+
+      if (appSettings.bannerTextDe && appSettings.bannerTextEn) {
         if (lang === 'de') handleBanner('bannerContentDe', appSettings.bannerTextDe);
         else if (lang === 'en') handleBanner('bannerContentEn', appSettings.bannerTextEn);
       }
