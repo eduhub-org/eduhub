@@ -9,6 +9,11 @@
 
 export interface UpdateAppSettings_update_AppSettings_by_pk {
   __typename: "AppSettings";
+  id: number;
+  /**
+   * Name of the app to which the given settings are applied
+   */
+  appName: string;
   /**
    * Background color for the dismissiable banner displayed on the homepage
    */
@@ -25,7 +30,6 @@ export interface UpdateAppSettings_update_AppSettings_by_pk {
    * English version for the text of a dismissiable banner on the homepage
    */
   bannerTextEn: string | null;
-  id: number;
 }
 
 export interface UpdateAppSettings {
@@ -36,9 +40,10 @@ export interface UpdateAppSettings {
 }
 
 export interface UpdateAppSettingsVariables {
+  id: number;
+  appName: string;
   bannerBackgroundColor?: string | null;
   bannerFontColor?: string | null;
   bannerTextDe?: string | null;
   bannerTextEn?: string | null;
-  id: number;
 }

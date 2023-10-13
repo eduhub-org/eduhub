@@ -9,10 +9,15 @@
 
 export interface AppSettings_AppSettings {
   __typename: "AppSettings";
+  id: number;
+  /**
+   * Name of the app to which the given settings are applied
+   */
+  appName: string;
   /**
    * Homepage background image
    */
-  backgroundImageURL: string;
+  backgroundImageURL: string | null;
   /**
    * Background color for the dismissiable banner displayed on the homepage
    */
@@ -29,11 +34,10 @@ export interface AppSettings_AppSettings {
    * English version for the text of a dismissiable banner on the homepage
    */
   bannerTextEn: string | null;
-  id: number;
   /**
    * Preview image that is shared with links
    */
-  previewImageURL: string;
+  previewImageURL: string | null;
 }
 
 export interface AppSettings {
@@ -41,4 +45,8 @@ export interface AppSettings {
    * fetch data from the table: "AppSettings"
    */
   AppSettings: AppSettings_AppSettings[];
+}
+
+export interface AppSettingsVariables {
+  appName: string;
 }
