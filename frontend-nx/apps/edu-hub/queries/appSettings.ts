@@ -1,33 +1,35 @@
 import { gql } from '@apollo/client';
 
 export const APP_SETTINGS = gql`
-  query AppSettings {
-    AppSettings {
+  query AppSettings($appName: String!) {
+    AppSettings(where: { appName: { _eq: $appName } }) {
+      id
+      appName
       backgroundImageURL
       bannerBackgroundColor
       bannerFontColor
       bannerTextDe
       bannerTextEn
-      id
       previewImageURL
     }
   }
 `;
 
-
 export const UPDATE_APP_SETTINGS = gql`
   mutation UpdateAppSettings(
+    $id: Int!
+    $appName: String!
     # $backgroundImageURL: String
     $bannerBackgroundColor: String
     $bannerFontColor: String
     $bannerTextDe: String
     $bannerTextEn: String
-    $id: Int!
     # $previewImageURL: String
   ) {
     update_AppSettings_by_pk(
       pk_columns: { id: $id }
       _set: {
+        appName: $appName
         # backgroundImageURL: $backgroundImageURL
         bannerBackgroundColor: $bannerBackgroundColor
         bannerFontColor: $bannerFontColor
@@ -36,37 +38,14 @@ export const UPDATE_APP_SETTINGS = gql`
         # previewImageURL: $previewImageURL
       }
     ) {
+      id
+      appName
       # backgroundImageURL
       bannerBackgroundColor
       bannerFontColor
       bannerTextDe
       bannerTextEn
-      id
       # previewImageURL
-    }
-  }
-`;
-
-
-export const INSERT_APP_SETTINGS = gql`
-  mutation InsertAppSettings (
-    $bannerBackgroundColor: String
-    $bannerFontColor: String
-    $bannerTextDe: String
-    $bannerTextEn: String
-    # $backgroundImageURL: String
-    # $previewImageURL: String
-  ){
-    insert_AppSettings_one(
-      object: {
-        bannerBackgroundColor: $bannerBackgroundColor
-        bannerFontColor: $bannerFontColor
-        bannerTextDe: $bannerTextDe
-        bannerTextEn: $bannerTextEn
-        # backgroundImageURL: $backgroundImageURL
-        # previewImageURL: $previewImageURL
-        }) {
-      id
     }
   }
 `;
