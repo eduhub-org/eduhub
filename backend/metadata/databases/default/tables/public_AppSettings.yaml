@@ -5,13 +5,13 @@ select_permissions:
   - role: anonymous
     permission:
       columns:
-        - id
-        - created_at
-        - updated_at
+        - appName
+        - backgroundImageURL
         - bannerBackgroundColor
-        - bannerTextEn
         - bannerFontColor
         - bannerTextDe
-        - backgroundImageURL
+        - bannerTextEn
+        - created_at
         - previewImageURL
+        - updated_at
       filter: {}

@@ -71,7 +71,6 @@ const ManageAppSettingsOverview: FC = () => {
     try {
       await updateAppSettings({
         variables: {
-          id: appSettingsData.AppSettings[0].id,
           appName: 'edu',
           // backgroundImageURL: data.backgroundImageURL,
           bannerBackgroundColor: data.bannerBackgroundColor,
@@ -127,10 +126,10 @@ const ManageAppSettingsOverview: FC = () => {
               </div>
               <div className="flex flex-wrap">
                 <div className="w-1/2 pr-3">
-                  <FormFieldRow<Inputs> label={t('manageAppSettings:bannerTextDe')} name="bannerTextDe" required />
+                  <FormFieldRow<Inputs> label={t('manageAppSettings:bannerTextDe')} name="bannerTextDe" />
                 </div>
                 <div className="w-1/2 pl-3">
-                  <FormFieldRow<Inputs> label={t('manageAppSettings:bannerTextEn')} name="bannerTextEn" required />
+                  <FormFieldRow<Inputs> label={t('manageAppSettings:bannerTextEn')} name="bannerTextEn" />
                 </div>
               </div>
               {/* <div className="flex flex-wrap">
