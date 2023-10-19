@@ -40,9 +40,7 @@ class ZoomClient:
 
     def fetch_access_token(self):
         url = "https://zoom.us/oauth/token?grant_type=client_credentials"
-        logging.debug(f"Fetching OAuth token from {url}")
         auth_values = (self.api_key, self.api_secret)
-        logging.debug(f"Auth values: {auth_values}")
         response = requests.post(url, auth=auth_values)
 
         if response.status_code == 200:
