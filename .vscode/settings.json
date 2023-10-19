@@ -9,5 +9,5 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "githubIssues.issueBranchTitle": "${user}/issue${issueNumber}/${sanitizedIssueTitle}"
+  "githubIssues.issueBranchTitle": "issue${issueNumber}/${sanitizedIssueTitle}"
 }
