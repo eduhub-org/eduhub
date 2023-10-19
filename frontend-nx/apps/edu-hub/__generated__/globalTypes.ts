@@ -1218,6 +1218,28 @@ export enum University_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "UserStatus"
+ */
+export enum UserStatus_constraint {
+  UserStatus_pkey = "UserStatus_pkey",
+}
+
+export enum UserStatus_enum {
+  ACTIVE = "ACTIVE",
+  DELETED = "DELETED",
+  INACTIVE = "INACTIVE",
+  SPAM = "SPAM",
+}
+
+/**
+ * update columns of table "UserStatus"
+ */
+export enum UserStatus_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
  * unique or primary key constraints on table "User"
  */
 export enum User_constraint {
@@ -1241,6 +1263,7 @@ export enum User_select_column {
   newsletterRegistration = "newsletterRegistration",
   otherUniversity = "otherUniversity",
   picture = "picture",
+  status = "status",
   university = "university",
   updated_at = "updated_at",
 }
@@ -1275,6 +1298,7 @@ export enum User_update_column {
   newsletterRegistration = "newsletterRegistration",
   otherUniversity = "otherUniversity",
   picture = "picture",
+  status = "status",
   university = "university",
   updated_at = "updated_at",
 }
@@ -6030,6 +6054,65 @@ export interface University_order_by {
   value?: order_by | null;
 }
 
+/**
+ * Boolean expression to filter rows from the table "UserStatus". All fields are combined with a logical 'AND'.
+ */
+export interface UserStatus_bool_exp {
+  Users?: User_bool_exp | null;
+  Users_aggregate?: User_aggregate_bool_exp | null;
+  _and?: UserStatus_bool_exp[] | null;
+  _not?: UserStatus_bool_exp | null;
+  _or?: UserStatus_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "UserStatus_enum". All fields are combined with logical 'AND'.
+ */
+export interface UserStatus_enum_comparison_exp {
+  _eq?: UserStatus_enum | null;
+  _in?: UserStatus_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: UserStatus_enum | null;
+  _nin?: UserStatus_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "UserStatus"
+ */
+export interface UserStatus_insert_input {
+  Users?: User_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "UserStatus"
+ */
+export interface UserStatus_obj_rel_insert_input {
+  data: UserStatus_insert_input;
+  on_conflict?: UserStatus_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "UserStatus"
+ */
+export interface UserStatus_on_conflict {
+  constraint: UserStatus_constraint;
+  update_columns: UserStatus_update_column[];
+  where?: UserStatus_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "UserStatus".
+ */
+export interface UserStatus_order_by {
+  Users_aggregate?: User_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
 export interface User_aggregate_bool_exp {
   bool_and?: User_aggregate_bool_exp_bool_and | null;
   bool_or?: User_aggregate_bool_exp_bool_or | null;
@@ -6090,6 +6173,7 @@ export interface User_bool_exp {
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_bool_exp | null;
   Experts?: Expert_bool_exp | null;
   Experts_aggregate?: Expert_aggregate_bool_exp | null;
+  UserStatus?: UserStatus_bool_exp | null;
   _and?: User_bool_exp[] | null;
   _not?: User_bool_exp | null;
   _or?: User_bool_exp[] | null;
@@ -6106,6 +6190,7 @@ export interface User_bool_exp {
   newsletterRegistration?: Boolean_comparison_exp | null;
   otherUniversity?: String_comparison_exp | null;
   picture?: String_comparison_exp | null;
+  status?: UserStatus_enum_comparison_exp | null;
   university?: University_enum_comparison_exp | null;
   universityByUniversity?: University_bool_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -6121,6 +6206,7 @@ export interface User_insert_input {
   Attendances?: Attendance_arr_rel_insert_input | null;
   CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
   Experts?: Expert_arr_rel_insert_input | null;
+  UserStatus?: UserStatus_obj_rel_insert_input | null;
   anonymousId?: string | null;
   created_at?: any | null;
   email?: string | null;
@@ -6134,6 +6220,7 @@ export interface User_insert_input {
   newsletterRegistration?: boolean | null;
   otherUniversity?: string | null;
   picture?: string | null;
+  status?: UserStatus_enum | null;
   university?: University_enum | null;
   universityByUniversity?: University_obj_rel_insert_input | null;
   updated_at?: any | null;
@@ -6200,6 +6287,7 @@ export interface User_order_by {
   Attendances_aggregate?: Attendance_aggregate_order_by | null;
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
   Experts_aggregate?: Expert_aggregate_order_by | null;
+  UserStatus?: UserStatus_order_by | null;
   anonymousId?: order_by | null;
   created_at?: order_by | null;
   email?: order_by | null;
@@ -6213,6 +6301,7 @@ export interface User_order_by {
   newsletterRegistration?: order_by | null;
   otherUniversity?: order_by | null;
   picture?: order_by | null;
+  status?: order_by | null;
   university?: order_by | null;
   universityByUniversity?: University_order_by | null;
   updated_at?: order_by | null;

@@ -9,7 +9,6 @@
 
 export interface AppSettings_AppSettings {
   __typename: "AppSettings";
-  id: number;
   /**
    * Name of the app to which the given settings are applied
    */

@@ -34,6 +34,7 @@
 - "!include public_SessionSpeaker.yaml"
 - "!include public_University.yaml"
 - "!include public_User.yaml"
+- "!include public_UserStatus.yaml"
 - "!include public_Weekday.yaml"
 - "!include rentAScientist_RentAScientistConfig.yaml"
 - "!include rentAScientist_School.yaml"
