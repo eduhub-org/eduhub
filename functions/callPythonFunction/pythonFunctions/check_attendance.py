@@ -21,8 +21,7 @@ def check_attendance(hasura_secret, arguments):
     """
     logging.info("########## Check Attendance Function ##########")
 
-    if not is_admin(hasura_secret, arguments):
-        return "error: user is not admin!"
+    logging.debug("arguments:", arguments)
 
     eduhub_client = EduHubClient()
     logging.debug(f"eduhub_client.url:  {eduhub_client.url}")

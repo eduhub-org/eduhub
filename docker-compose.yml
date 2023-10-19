@@ -22,7 +22,7 @@ services:
     environment:
       HELP_DOCS_URL: https://opencampus.gitbook.io/faq/
 
-  functions:
+  node_functions:
     container_name: eduhub-node-functions
     image: node:18-bullseye
     user: "node"
