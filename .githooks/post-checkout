@@ -1,0 +1,77 @@
+#!/bin/bash
+
+echo "Starting post-checkout script." >> .github/hooks/log.txt
+
+# Check if jq is installed, if not, attempt to install it
+if ! command -v jq &> /dev/null; then
+  echo "jq is not installed. Attempting to install..."
+  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    sudo apt-get update
+    sudo apt-get install -y jq
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    brew install jq
+  else
+    echo "Operating system not supported for automatic jq installation."
+    exit 1
+  fi
+fi
+
+echo "jq installed or already exists."
+
+# Define GitHub repository and authentication token
+REPO_OWNER="eduhub-org"
+REPO_NAME="eduhub"
+
+# Capture the name of the branch that was checked out
+NEW_BRANCH_NAME=$(git symbolic-ref --short HEAD)
+echo "Checked-out new branch: $NEW_BRANCH_NAME"
+
+# Check if the branch name starts with the specific pattern you're interested in
+if [[ $NEW_BRANCH_NAME == "issue"* ]]; then
+
+  echo "The branch name matches the criteria for renaming."
+
+  # Extract the issue number from the branch name
+  ISSUE_NUMBER=$(echo $NEW_BRANCH_NAME | grep -o -E 'issue([0-9]+)' | grep -o -E '[0-9]+')
+  echo "Extracted issue number: $ISSUE_NUMBER"
+
+  # Fetch issue labels using GitHub API
+  echo "Fetching issue labels from GitHub API..."
+  LABELS=$(curl -s \
+    "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/issues/$ISSUE_NUMBER" | \
+    jq -r '.labels[] .name')
+
+  echo "Fetched labels: $LABELS"
+
+  # Determine label to append
+  BRANCH_LABEL=""
+  for LABEL in $LABELS; do
+    case $LABEL in
+      "bug")
+        BRANCH_LABEL="bug"
+        break
+        ;;
+      "feature")
+        BRANCH_LABEL="feature"
+        break
+        ;;
+      "chore")
+        BRANCH_LABEL="chore"
+        break
+        ;;
+    esac
+  done
+
+  echo "Determined label to append: $BRANCH_LABEL"
+
+  # Rename branch if a relevant label is found
+  if [ ! -z "$BRANCH_LABEL" ]; then
+    NEW_BRANCH_NAME_WITH_LABEL="$BRANCH_LABEL/$NEW_BRANCH_NAME"
+    echo "Renaming branch to: $NEW_BRANCH_NAME_WITH_LABEL"
+    git branch -m $NEW_BRANCH_NAME $NEW_BRANCH_NAME_WITH_LABEL
+  fi
+else
+  echo "The branch name does not match the criteria for renaming."
+fi
+
+echo "Post-checkout script completed."
