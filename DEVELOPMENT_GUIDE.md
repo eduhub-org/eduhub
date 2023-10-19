@@ -1,12 +1,12 @@
 # Development Guide
 
-### Prerequisites
+## Prerequisites
 
 - Docker (See `bin/docker_install.sh` for installation)
 - Docker Compose (v1.29.2+)
 - Optional: `hasura-cli` for database migrations
 
-### :whale: Docker Commands
+## :whale: Docker Commands
 
 - `docker compose up -d` - Start dev environment
 - `docker compose stop` - Stop environment, keep data
@@ -17,14 +17,10 @@
 - `docker compose logs -f` - Show all logs
 - `docker logs container_name -f` - Show logs of a given container
 
-### :wrench: Useful Scripts
+## 🌱 Seeds
 
-- `regenerate-apollo.sh` - Rebuild Apollo GraphQL queries.
-    - Call it as follows from the folder of the repo (Hasura must be running): `sudo bash regenerate-apollo.sh $USER`. It will handle running the `apollo:codegen` target and then fix the problem that generated files are generated as owned by root on your host machine. This way you will be able to push/pull the files using git without access violation errors. The containers need to be up for this. Hotreloading during development should pick up the changes, though I would not be surprised if in some situations a stop/start of the containers will be required to stabilize the setup after all those files are deleted and replaced.
-- `docker_install.sh` - Install Docker.
-
-### 🌱 Seeds
 The seed data includes the following users:
+
 - `admin@example.com`
 - `student1@example.com`
 - `student2@example.com`
@@ -40,7 +36,21 @@ The seed data includes the following users:
 The password for all users is `dev`.  
 To extend the seed data temporarily, use the Hasura console. To include them permantly, add corresponding SQL statements to the seeds file [here](https://github.com/edu-hub-project/application/blob/develop/backend/seeds/default/dev_seeds.sql).
 
-### Ports
+## :wrench: Useful Scripts
+
+- `regenerate-apollo.sh` - Rebuild Apollo GraphQL queries.
+
+  - Call it as follows from the folder of the repo (Hasura must be running): `sudo bash regenerate-apollo.sh $USER`. It will handle running the `apollo:codegen` target and then fix the problem that generated files are generated as owned by root on your host machine. This way you will be able to push/pull the files using git without access violation errors. The containers need to be up for this. Hotreloading during development should pick up the changes, though I would not be surprised if in some situations a stop/start of the containers will be required to stabilize the setup after all those files are deleted and replaced.
+- `docker_install.sh` - Install Docker.
+
+## 📝 Naming Conventions
+
+- Branches: <issue_label>/issue<issue_no>/<sanitized_issue_title>
+  - We recommend using the GitHub extension to create new branches and copying the `post-checkout` script provided in the folder `.githooks` in the folder `.git/hooks/`. Branch created and checked-out via the issues provides in the GitHub extension will then automatically be named according to the convention.
+
+- Translations: all keys including the file names are camel case. Files should only exits on the page level and have the name of the corresponding page.
+
+## Ports
 
 - `4001` - File uploads
 - `8080` - Hasura API
@@ -58,7 +68,7 @@ To extend the seed data temporarily, use the Hasura console. To include them per
 - When adding new frontend apps [this bug workaround](https://github.com/nrwl/nx/issues/9017#issuecomment-1140066503) has to be used!
 - Recommended: [Manage docker as non-root user](https://docs.docker.com/engine/install/linux-postinstall/)
 
-### Updating the Setup
+## Updating the Setup
 
 - For Keycloak settings:
 To persist changes you made to the keycloak configuration export the edu-hub realm as described in [this documentation](https://www.keycloak.org/server/importExport).
@@ -66,5 +76,3 @@ To persist changes you made to the keycloak configuration export the edu-hub rea
   2. `cd bin`
   3. `./kc.sh export --file /opt/keycloak/data/import/edu-hub.json --users realm_file --realm edu-hub`
   4. Your local git should highlight changes in the file `./keycloak/imports-dev/edu-hub.json` now
-
-
