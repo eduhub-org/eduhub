@@ -1,0 +1,4 @@
+-- Could not auto-generate a down migration.
+-- Please write an appropriate down migration for the SQL below:
+-- INSERT INTO "public"."AppSettings" ("appName", "bannerBackgroundColor", "bannerFontColor", "bannerTextDe", "bannerTextEn")
+-- VALUES (E'edu', DEFAULT, DEFAULT, DEFAULT, DEFAULT);

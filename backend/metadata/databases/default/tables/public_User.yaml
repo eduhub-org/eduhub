@@ -2,6 +2,9 @@ table:
   name: User
   schema: public
 object_relationships:
+  - name: UserStatus
+    using:
+      foreign_key_constraint_on: status
   - name: employmentByEmployment
     using:
       foreign_key_constraint_on: employment
