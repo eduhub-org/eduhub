@@ -2,6 +2,15 @@ table:
   name: AchievementOption
   schema: public
 object_relationships:
+  - name: AchievementOptionTemplate
+    using:
+      manual_configuration:
+        column_mapping:
+          achievementDocumentationTemplateId: id
+        insertion_order: null
+        remote_table:
+          name: AchievementDocumentationTemplate
+          schema: public
   - name: AchievementRecordType
     using:
       foreign_key_constraint_on: recordType

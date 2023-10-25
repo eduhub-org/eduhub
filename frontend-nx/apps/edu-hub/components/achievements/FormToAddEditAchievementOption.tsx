@@ -1,9 +1,4 @@
-import {
-  //Checkbox,
-  CircularProgress,
-  //FormControlLabel,
-  Link,
-} from '@material-ui/core';
+import { Checkbox, CircularProgress, FormControlLabel, Link } from '@material-ui/core';
 import { Translate } from 'next-translate';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, ReactNode, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
@@ -61,7 +56,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
   const [showCourseListDialog, setShowCourseListDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [scriptGoogleUrl, setScriptGoogleUrl] = useState(null as string);
-  // const [documentTemplateGoogleLink, setDocumentTemplateGoogleLink] = useState(null as string);
+  const [documentTemplateGoogleLink, setDocumentTemplateGoogleLink] = useState(null as string);
 
   const loadAchievementOptionDocumentationTemplate = useAdminQuery<
     LoadAchievementOptionDocumentationTemplate,
@@ -82,9 +77,9 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
       loadAchievementOptionDocumentationTemplate &&
       loadAchievementOptionDocumentationTemplate.data?.loadAchievementOptionDocumentationTemplate?.link
     ) {
-      // setDocumentTemplateGoogleLink(
-      //   loadAchievementOptionDocumentationTemplate.data.loadAchievementOptionDocumentationTemplate.link
-      // );
+      setDocumentTemplateGoogleLink(
+        loadAchievementOptionDocumentationTemplate.data.loadAchievementOptionDocumentationTemplate.link
+      );
     }
 
     if (
@@ -313,23 +308,28 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
               </div>
               <p className="text-stela-500">{`* ${tCommon('form-mandatory-field')}`}</p>
             </div>
-            {/* <CustomFileInput
-              title={`${tCommon('documentation-template')} (.doc)*`}
-              name={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
-              id={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
-              accept=".doc, .docx"
-              onChangeHandler={handleInputFile}
-              customLink={
-                documentTemplateGoogleLink ? (
-                  <Link href={documentTemplateGoogleLink}>
-                    {tCommon('download-documentation-template')}
-                  </Link>
-                ) : (
-                  ''
-                )
-              }
-            /> */}
-            {state.recordType === 'DOCUMENTATION_AND_CSV' && (
+            {state.recordType === 'DOCUMENTATION' ||
+              (state.recordType === 'ONLINE_COURSE' && (
+                <CustomFileInput
+                  title={`${t(
+                    'achievements-page:uploadDocumentationTemplate'
+                  )} (.doc, .docx, .pdf, .zip, .xls, .csv)*`}
+                  name={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
+                  id={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
+                  accept=".doc, .docx, .zip, .pdf, .xls, .csv"
+                  onChangeHandler={handleInputFile}
+                  customLink={
+                    documentTemplateGoogleLink ? (
+                      <Link href={documentTemplateGoogleLink}>
+                        {t('achievements-page:uploadDocumentationTemplate')}
+                      </Link>
+                    ) : (
+                      ''
+                    )
+                  }
+                />
+              ))}
+            {/* {state.recordType === 'DOCUMENTATION_AND_CSV' && (
               //
               <CustomFileInput
                 title={`${tCommon('documentation-template-CSV')} (.csv)*`}
@@ -347,10 +347,10 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
                   )
                 }
               />
-            )}
+            )} */}
           </div>
           <div className="flex flex-col w-full justify-end gap-5">
-            {state.recordType === 'DOCUMENTATION_AND_CSV' && (
+            {/* {state.recordType === 'DOCUMENTATION_AND_CSV' && (
               <div className="flex justify-end">
                 <CustomFileInput
                   accept=".py"
@@ -367,7 +367,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
                   }
                 />
               </div>
-            )}
+            )} */}
             {/* <FormControlLabel
               className="justify-end"
               control={
