@@ -19,6 +19,7 @@
 
 ## 🌱 Seeds
 
+Seed data is a set of data that is used to initialize the database with an initial set of values. It is especially useful during development and testing.
 The seed data includes the following users:
 
 - `admin@example.com`
@@ -38,14 +39,16 @@ To extend the seed data temporarily, use the Hasura console. To include them per
 
 ## :wrench: Useful Scripts
 
-- `regenerate-apollo.sh` - Rebuild Apollo GraphQL queries.
+- `regenerate-apollo.sh` - This script rebuilds Apollo GraphQL queries. It is useful when you have made changes to your GraphQL schema and you want to generate new types and queries based on the updated schema.
 
   - Call it as follows from the folder of the repo (Hasura must be running): `sudo bash regenerate-apollo.sh $USER`. It will handle running the `apollo:codegen` target and then fix the problem that generated files are generated as owned by root on your host machine. This way you will be able to push/pull the files using git without access violation errors. The containers need to be up for this. Hotreloading during development should pick up the changes, though I would not be surprised if in some situations a stop/start of the containers will be required to stabilize the setup after all those files are deleted and replaced.
-- `docker_install.sh` - Install Docker.
+
+- `docker_install.sh` - This script installs Docker. It is useful when setting up a new development environment.
 
 ## 📝 Naming Conventions
 
 - Branches: <issue_label>/issue<issue_no>/<sanitized_issue_title>
+  - Example: bug/issue123/fixLoginError
   - We recommend using the GitHub extension to create new branches and copying the `post-checkout` script provided in the folder `.githooks` in the folder `.git/hooks/`. Branch created and checked-out via the issues provides in the GitHub extension will then automatically be named according to the convention.
 
 - Translations: all keys including the file names are camel case. Files should only exits on the page level and have the name of the corresponding page.
@@ -73,6 +76,10 @@ To extend the seed data temporarily, use the Hasura console. To include them per
 - For Keycloak settings:
 To persist changes you made to the keycloak configuration export the edu-hub realm as described in [this documentation](https://www.keycloak.org/server/importExport).
   1. `docker exec -ti edu-hub_keycloak_1 /bin/sh`
+  #This command opens a shell in the edu-hub_keycloak_1 container
   2. `cd bin`
+  #This command changes the current directory to bin
   3. `./kc.sh export --file /opt/keycloak/data/import/edu-hub.json --users realm_file --realm edu-hub`
+  #This command exports the current configuration of the edu-hub realm to a file
   4. Your local git should highlight changes in the file `./keycloak/imports-dev/edu-hub.json` now
+  #This step checks if there are any changes in the configuration file
