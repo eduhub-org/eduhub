@@ -51,6 +51,7 @@ class ZoomClient:
             if not access_token or not expires_in:
                 raise Exception("Invalid OAuth token response")
 
+            self.token_expiration = time.time() + expires_in
             return access_token, expires_in
 
         else:

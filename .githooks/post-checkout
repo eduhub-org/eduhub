@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Starting post-checkout script." >> .github/hooks/log.txt
+echo "Starting post-checkout script."
 
 # Check if jq is installed, if not, attempt to install it
 if ! command -v jq &> /dev/null; then
@@ -19,8 +19,8 @@ fi
 echo "jq installed or already exists."
 
 # Define GitHub repository and authentication token
-REPO_OWNER=$(git config --get remote.origin.url | sed 's/.*:\/\/github.com\///' | sed 's/\/.*//')
-REPO_NAME=$(basename `git rev-parse --show-toplevel`)
+REPO_OWNER="eduhub-org"
+REPO_NAME="eduhub"
 
 # Capture the name of the branch that was checked out
 NEW_BRANCH_NAME=$(git symbolic-ref --short HEAD)
