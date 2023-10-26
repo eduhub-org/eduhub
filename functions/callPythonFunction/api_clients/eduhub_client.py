@@ -237,25 +237,19 @@ class EduHubClient:
     def get_channellinks_from_confirmed_users(self, id):
         variables = {"id": id}
         query = """query ($id: Int!) {
-CourseEnrollment(where: {id: {_eq: $id}}) {
-    Course {
-        chatLink
-        }
-    }
-}"""
-
+            Course(where: {id: {_eq: $id}}) {
+                chatLink
+                }
+            }
+        """
         result = self.send_query(query, variables)
-        logging.info("GraphQL Response: %s", result)
     
     # Check for errors in the GraphQL response
         if "errors" in result:
-            logging.error("GraphQL Error: %s", result["errors"])
             return None  # or handle error as appropriate for your use case
-    
         try:
-            chat_link = result["data"]["CourseEnrollment"][0]["Course"]["chatLink"]
-            return pd.DataFrame([{"chatlink": chat_link}])
+            chat_link = result["data"]["Course"][0]["chatLink"]
+            return chat_link
         except (KeyError, IndexError) as e:
-            logging.error("Error extracting chatLink: %s", str(e))
             return None  # or handle error as appropriate for your use case
 
