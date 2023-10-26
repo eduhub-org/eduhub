@@ -51,14 +51,20 @@ class ZoomClient:
             if not access_token or not expires_in:
                 raise Exception("Invalid OAuth token response")
 
+            self.token_expiration = time.time() + expires_in
             return access_token, expires_in
 
         else:
             raise Exception(f"Failed to fetch OAuth token: {response.text}")
 
-    def validate_token(self):
-        if not self.access_token or not self.token_expiration:
-            self.access_token, self.token_expiration = self.fetch_access_token()
+
+def validate_token(self):
+    if (
+        not self.access_token
+        or not self.token_expiration
+        or time.time() > self.token_expiration
+    ):
+        self.access_token, self.token_expiration = self.fetch_access_token()
 
     def get_last_meeting_session(
         self, meeting_id: str, next_page_token: Optional[str] = None
