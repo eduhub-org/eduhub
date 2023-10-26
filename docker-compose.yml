@@ -67,6 +67,7 @@ services:
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       BUCKET_NAME: emulated-bucket
       LOCAL_STORAGE_PORT: 4001
+      
 
   hasura:
     container_name: eduhub-hasura
