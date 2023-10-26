@@ -33,4 +33,4 @@ We welcome contributions from everyone. Please check out the technical details f
 
 ## :memo: License
 
-This project is licensed under [AGPLv3 License](LICENSE.md).
+This project is licensed under [AGPLv3 License](LICENSE).
