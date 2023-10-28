@@ -46,6 +46,7 @@ resource "google_cloudfunctions2_function" "call_python_function" {
       HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
       HASURA_GRAPHQL_ADMIN_KEY     = var.hasura_graphql_admin_key
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
+      ZOOM_ACCOUNT_ID              = var.zoom_account_id
       ZOOM_API_KEY                 = var.zoom_api_key
       ZOOM_API_SECRET              = var.zoom_api_secret
       LMS_URL                      = var.lms_url
