@@ -225,8 +225,12 @@ variable "emulate_email" {
 }
 
 # API Access
+variable "zoom_account_id" {
+  description = "Account ID of the registered access the Zoom API"
+  type        = string
+}
 variable "zoom_api_key" {
-  description = "Key identifier to the registered access the Zoom API"
+  description = "Client ID of the registered access the Zoom API"
   type        = string
 }
 variable "zoom_api_secret" {
