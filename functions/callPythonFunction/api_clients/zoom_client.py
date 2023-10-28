@@ -1,3 +1,4 @@
+import base64
 import json
 import logging
 import time
@@ -12,6 +13,7 @@ class ZoomClient:
     def __init__(self):
         self.api_key = os.getenv("ZOOM_API_KEY")
         self.api_secret = os.getenv("ZOOM_API_SECRET")
+        self.account_id = os.getenv("ZOOM_ACCOUNT_ID")
         self.base_url = "https://api.zoom.us/v2"
         self.reports_url = f"{self.base_url}/report/meetings"
         self.access_token, self.token_expiration = self.fetch_access_token()
@@ -21,12 +23,6 @@ class ZoomClient:
 
     def set_api_secret(self, api_secret: str):
         self.api_secret = api_secret
-
-    def set_jwt_token(self, jwt_token: str):
-        self.jwt_token = jwt_token
-
-    def get_jwt_token(self):
-        return self.jwt_token
 
     def to_datetime(self, date_time):
         zoom_format = "%Y-%m-%dT%H:%M:%SZ"
@@ -39,9 +35,12 @@ class ZoomClient:
         )
 
     def fetch_access_token(self):
-        url = "https://zoom.us/oauth/token?grant_type=client_credentials"
-        auth_values = (self.api_key, self.api_secret)
-        response = requests.post(url, auth=auth_values)
+        url = "https://zoom.us/oauth/token"
+        auth_header = {
+            "Authorization": f"Basic {base64.b64encode(f'{self.api_key}:{self.api_secret}'.encode()).decode()}"
+        }
+        body = {"grant_type": "account_credentials", "account_id": self.account_id}
+        response = requests.post(url, headers=auth_header, data=body)
 
         if response.status_code == 200:
             response_data = json.loads(response.text)
@@ -53,15 +52,15 @@ class ZoomClient:
 
             self.token_expiration = time.time() + expires_in
             return access_token, expires_in
-
         else:
             raise Exception(f"Failed to fetch OAuth token: {response.text}")
 
     def validate_token(self):
+        buffer_time = 10  # 10 seconds buffer
         if (
             not self.access_token
             or not self.token_expiration
-            or time.time() > self.token_expiration
+            or time.time() > (self.token_expiration - buffer_time)
         ):
             self.access_token, self.token_expiration = self.fetch_access_token()
 
@@ -86,7 +85,7 @@ class ZoomClient:
         self.validate_token()
         url: str = f"{self.reports_url}/{meeting_id}"
         r: requests.Response = requests.get(
-            url, headers={"Authorization": f"Bearer {self.jwt_token.decode('utf-8')}"}
+            url, headers={"Authorization": f"Bearer {self.access_token}"}
         )
         return r
 

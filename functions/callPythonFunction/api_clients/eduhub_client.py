@@ -80,8 +80,7 @@ class EduHubClient:
 
     def get_course_participants_from_session_id(self, session_id):
         variables = {"session_id": f"{session_id}"}
-
-        query = """query($id: UUID) {
+        query = """query($session_id: Int) {
             CourseEnrollment(where: {Course: {Sessions: {id: {_eq: $session_id}}}}) {
                 User {
                     id
@@ -237,7 +236,6 @@ class EduHubClient:
         result = self.send_query(query, variables)
         return pd.json_normalize(result["data"]["User"])
 
-     
     def get_channellinks_from_confirmed_users(self, id):
         variables = {"id": id}
         query = """query ($id: Int!) {
@@ -247,8 +245,8 @@ class EduHubClient:
             }
         """
         result = self.send_query(query, variables)
-    
-    # Check for errors in the GraphQL response
+
+        # Check for errors in the GraphQL response
         if "errors" in result:
             return None  # or handle error as appropriate for your use case
         try:
@@ -256,4 +254,3 @@ class EduHubClient:
             return chat_link
         except (KeyError, IndexError) as e:
             return None  # or handle error as appropriate for your use case
-
