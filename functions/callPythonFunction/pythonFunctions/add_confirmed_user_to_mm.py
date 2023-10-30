@@ -6,7 +6,7 @@ import logging
 from api_clients import EduHubClient, MattermostClient
 
 
-def add_confirmed_user_to_mm(payload):
+def add_confirmed_user_to_mm(hasura_secret, payload):
     eduhub_client = EduHubClient()
     mattermost_client = MattermostClient()
 
