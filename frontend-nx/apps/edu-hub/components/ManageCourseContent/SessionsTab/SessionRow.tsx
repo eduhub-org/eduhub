@@ -6,26 +6,17 @@ import EhTimeSelect, { formatTime } from '../../common/EhTimeSelect';
 import { DebounceInput } from 'react-debounce-input';
 import { IconButton } from '@material-ui/core';
 import { MdDelete } from 'react-icons/md';
-import {
-  eventTargetValueMapper,
-  useRoleMutation,
-} from '../../../hooks/authedMutation';
-import { InputDialog } from '../../common/dialogs/InputDialog';
+import { eventTargetValueMapper, useRoleMutation } from '../../../hooks/authedMutation';
+import { InputDialog } from './InputDialog';
 import {
   InsertSessionLocation,
   InsertSessionLocationVariables,
 } from '../../../queries/__generated__/InsertSessionLocation';
-import {
-  INSERT_NEW_SESSION_LOCATION,
-  INSERT_NEW_SESSION_SPEAKER,
-} from '../../../queries/course';
+import { INSERT_NEW_SESSION_LOCATION, INSERT_NEW_SESSION_SPEAKER } from '../../../queries/course';
 import { QueryResult } from '@apollo/client';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import { UserForSelection1_User } from '../../../queries/__generated__/UserForSelection1';
-import {
-  InsertExpert,
-  InsertExpertVariables,
-} from '../../../queries/__generated__/InsertExpert';
+import { InsertExpert, InsertExpertVariables } from '../../../queries/__generated__/InsertExpert';
 import { INSERT_EXPERT } from '../../../queries/user';
 import {
   InsertNewSessionSpeaker,
@@ -49,18 +40,9 @@ interface IProps {
   lectureEnd: Date;
   qResult: QueryResult<any, any>;
   onDelete: (pk: number) => any;
-  onSetStartDate: (
-    session: ManagedCourse_Course_by_pk_Sessions,
-    date: Date
-  ) => any;
-  onSetEndDate: (
-    session: ManagedCourse_Course_by_pk_Sessions,
-    date: Date
-  ) => any;
-  onSetTitle: (
-    session: ManagedCourse_Course_by_pk_Sessions,
-    title: string
-  ) => any;
+  onSetStartDate: (session: ManagedCourse_Course_by_pk_Sessions, date: Date) => any;
+  onSetEndDate: (session: ManagedCourse_Course_by_pk_Sessions, date: Date) => any;
+  onSetTitle: (session: ManagedCourse_Course_by_pk_Sessions, title: string) => any;
   onDeleteLocation: (id: number) => any;
   onDeleteSpeaker: (id: number) => any;
 }
@@ -111,14 +93,8 @@ export const SessionRow: FC<IProps> = ({
   const handleSetDate = useCallback(
     (event: Date | null) => {
       if (session != null) {
-        onSetStartDate(
-          session,
-          copyDateTime(event || new Date(), session.startDateTime)
-        );
-        onSetEndDate(
-          session,
-          copyDateTime(event || new Date(), session.endDateTime)
-        );
+        onSetStartDate(session, copyDateTime(event || new Date(), session.startDateTime));
+        onSetEndDate(session, copyDateTime(event || new Date(), session.endDateTime));
       }
     },
     [session, onSetStartDate, onSetEndDate]
@@ -173,10 +149,9 @@ export const SessionRow: FC<IProps> = ({
     setAddressAddOpen(true);
   }, [setAddressAddOpen]);
 
-  const [insertSessionLocationMutation] = useRoleMutation<
-    InsertSessionLocation,
-    InsertSessionLocationVariables
-  >(INSERT_NEW_SESSION_LOCATION);
+  const [insertSessionLocationMutation] = useRoleMutation<InsertSessionLocation, InsertSessionLocationVariables>(
+    INSERT_NEW_SESSION_LOCATION
+  );
 
   const handleAddNewAddress = useCallback(
     async (confirmed: boolean, inputValue: string) => {
@@ -200,14 +175,10 @@ export const SessionRow: FC<IProps> = ({
     setAddSpeakerOpen(true);
   }, [setAddSpeakerOpen]);
 
-  const [insertExpertMutation] = useRoleMutation<
-    InsertExpert,
-    InsertExpertVariables
-  >(INSERT_EXPERT);
-  const [insertSessionSpeaker] = useRoleMutation<
-    InsertNewSessionSpeaker,
-    InsertNewSessionSpeakerVariables
-  >(INSERT_NEW_SESSION_SPEAKER);
+  const [insertExpertMutation] = useRoleMutation<InsertExpert, InsertExpertVariables>(INSERT_EXPERT);
+  const [insertSessionSpeaker] = useRoleMutation<InsertNewSessionSpeaker, InsertNewSessionSpeakerVariables>(
+    INSERT_NEW_SESSION_SPEAKER
+  );
 
   const handleNewSpeaker = useCallback(
     async (confirmed: boolean, user: UserForSelection1_User | null) => {
@@ -243,11 +214,7 @@ export const SessionRow: FC<IProps> = ({
 
   return (
     <div>
-      <div
-        className={`grid grid-cols-32 mb-1 ${
-          session != null ? 'bg-edu-light-gray' : ''
-        }`}
-      >
+      <div className={`grid grid-cols-32 mb-1 ${session != null ? 'bg-edu-light-gray' : ''}`}>
         {!session && (
           <div className="mr-3 ml-3 col-span-4">
             {t('date')}
@@ -317,11 +284,7 @@ export const SessionRow: FC<IProps> = ({
           {!session && <>{t('speakers')}</>}
           {session && (
             <div className="m-2">
-              <EhMultipleTag
-                requestAddTag={openAddSpeaker}
-                requestDeleteTag={handleDeleteSpeaker}
-                tags={speakerTags}
-              />
+              <EhMultipleTag requestAddTag={openAddSpeaker} requestDeleteTag={handleDeleteSpeaker} tags={speakerTags} />
             </div>
           )}
         </div>
