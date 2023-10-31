@@ -268,7 +268,7 @@ const Header: FC<IHeaderProps> = ({
   );
 
   // Callback for the enrollment status filter change
-  const onStatusFilterChange = useCallback(
+  /*  const onStatusFilterChange = useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
       const selectedOptions = Array.from(
         event.target.selectedOptions,
@@ -277,7 +277,7 @@ const Header: FC<IHeaderProps> = ({
       handleStatusFilterChange(selectedOptions);
     },
     [handleStatusFilterChange]
-  );
+  );*/
 
   return (
     <>

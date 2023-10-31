@@ -6,7 +6,6 @@ import Document, {
   NextScript,
 } from 'next/document';
 import Script from 'next/script';
-import { FB_PIXEL_ID } from '../lib/fpixel';
 
 class MyDocument extends Document {
   public static async getInitialProps(ctx: DocumentContext) {

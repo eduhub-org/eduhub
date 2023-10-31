@@ -67,9 +67,8 @@ const ProfileOverview: FC = () => {
 
   const {
     handleSubmit,
-    formState: { isSubmitting, isSubmitted, isSubmitSuccessful },
+    formState: { isSubmitting },
     reset,
-    setValue,
   } = methods;
 
   const {

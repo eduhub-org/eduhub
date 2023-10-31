@@ -1,7 +1,7 @@
 import {
-  Checkbox,
+  //Checkbox,
   CircularProgress,
-  FormControlLabel,
+  //FormControlLabel,
   Link,
 } from '@material-ui/core';
 import { Translate } from 'next-translate';
@@ -37,7 +37,7 @@ import EhTagStingId from '../common/EhTagStingId';
 import TagWithTwoText from '../common/TagWithTwoText';
 import CourseListDialog from './CourseListDialog';
 import { UploadFile, parseFileUploadEvent } from '../../helpers/filehandling';
-import _ from 'lodash';
+//import _ from 'lodash';
 import { Button } from '../common/Button';
 import { AchievementContext } from './AchievementsHelper';
 import { useAdminQuery } from '../../hooks/authedQuery';
@@ -78,7 +78,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
   const [showCourseListDialog, setShowCourseListDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [scriptGoogleUrl, setScriptGoogleUrl] = useState(null as string);
-  const [documentTemplateGoogleLink, setDocumentTemplateGoogleLink] = useState(
+  const [setDocumentTemplateGoogleLink] = useState(
     null as string
   );
 
@@ -210,13 +210,13 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
     [dispatch]
   );
 
-  const handleCheckBox = useCallback((e) => {
+  /*const handleCheckBox = useCallback((e) => {
     const { name, checked } = e.target;
     dispatch({
       key: name,
       value: checked,
     });
-  }, []);
+  }, []);*/
 
   const handleInputFile = useCallback(
     (controlName: string, file: UploadFile) => {
@@ -241,9 +241,10 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
   );
   /* #endregion */
   /* #region Main UI */
-  const isEqual = () => {
+
+ /* const isEqual = () => {
     return _.isEqual(state, props.defaultData);
-  };
+  };*/
 
   /**
    * https://www.geeksforgeeks.org/how-to-create-and-download-csv-file-in-javascript/

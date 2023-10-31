@@ -25,7 +25,7 @@ import {
 const Index: FC = () => {
   const isAdmin = useIsAdmin();
   const isLoggedIn = useIsLoggedIn();
-  const { t } = useTranslation('course-page');
+  //const { t } = useTranslation('course-page');
   return (
     <>
       <Head>

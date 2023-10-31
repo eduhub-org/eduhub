@@ -1,5 +1,5 @@
 import useTranslation from 'next-translate/useTranslation';
-import { Dispatch, FC, SetStateAction, useEffect } from 'react';
+import { Dispatch, FC, SetStateAction} from 'react';
 
 import { useAuthedQuery } from '../../hooks/authedQuery';
 
@@ -39,7 +39,7 @@ export const CertificateDownload: FC<IProps> = ({
   const {
     data: loadAchievementCertificateData,
     loading: loadAchievementCerfificateLoading,
-    refetch: loadAchievementCerfificateRefetch,
+    //refetch: loadAchievementCerfificateRefetch,
   } = useAuthedQuery<loadAchievementCertificate, loadAchievementCertificateVariables>(LOAD_ACHIEVEMENT_CERTIFICATE, {
     variables: {
       path: courseEnrollment?.achievementCertificateURL,
