@@ -19,14 +19,8 @@ import { SAVE_USER_PROFILE_IMAGE } from '../../queries/actions';
 import { UPDATE_USER_PROFILE_PICTURE } from '../../queries/updateUser';
 
 import type { MutableRefObject } from 'react';
-import {
-  SaveUserProfileImage,
-  SaveUserProfileImageVariables,
-} from '../../queries/__generated__/SaveUserProfileImage';
-import {
-  UpdateUserVariables,
-  UpdateUser,
-} from '../../queries/__generated__/UpdateUser';
+import { SaveUserProfileImage, SaveUserProfileImageVariables } from '../../queries/__generated__/SaveUserProfileImage';
+import { UpdateUserVariables, UpdateUser } from '../../queries/__generated__/UpdateUser';
 import {
   UpdateUserProfilePictureVariables,
   UpdateUserProfilePicture,
@@ -97,36 +91,30 @@ const ProfileOverview: FC = () => {
     skip: !sessionData,
   });
 
-  const [updateUser] = useAuthedMutation<UpdateUser, UpdateUserVariables>(
-    UPDATE_USER
+  const [updateUser] = useAuthedMutation<UpdateUser, UpdateUserVariables>(UPDATE_USER);
+  const [updateUserProfilePicture] = useAuthedMutation<UpdateUserProfilePicture, UpdateUserProfilePictureVariables>(
+    UPDATE_USER_PROFILE_PICTURE
   );
-  const [updateUserProfilePicture] = useAuthedMutation<
-    UpdateUserProfilePicture,
-    UpdateUserProfilePictureVariables
-  >(UPDATE_USER_PROFILE_PICTURE);
 
   const accessToken = sessionData?.accessToken;
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account/`,
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            firstName: data.firstName,
-            lastName: data.lastName,
-            username: data.email,
-            email: data.email,
-            emailVerified: sessionData?.profile?.email_verified,
-            id: sessionData?.profile?.sub,
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      await fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account/`, {
+        method: 'POST',
+        body: JSON.stringify({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          username: data.email,
+          email: data.email,
+          emailVerified: sessionData?.profile?.email_verified,
+          id: sessionData?.profile?.sub,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
       await updateUser({
         variables: {
@@ -150,29 +138,28 @@ const ProfileOverview: FC = () => {
   };
   const { t } = useTranslation();
 
-  const employmentSelectFormOptions = (
-    Object.keys(Employment_enum) as Array<keyof typeof Employment_enum>
-  ).map((key) => ({
-    label: t(key),
-    value: key,
-  }));
+  const employmentSelectFormOptions = (Object.keys(Employment_enum) as Array<keyof typeof Employment_enum>).map(
+    (key) => ({
+      label: t(key),
+      value: key,
+    })
+  );
 
-  const universitySelectFormOptions = (
-    Object.keys(University_enum) as Array<keyof typeof University_enum>
-  ).map((key) => ({
-    label: t(key),
-    value: key,
-  }));
+  const universitySelectFormOptions = (Object.keys(University_enum) as Array<keyof typeof University_enum>).map(
+    (key) => ({
+      label: t(key),
+      value: key,
+    })
+  );
 
   const imageUploadRef: MutableRefObject<any> = useRef(null);
   const handleImageUploadClick = useCallback(() => {
     imageUploadRef.current?.click();
   }, [imageUploadRef]);
 
-  const [saveUserProfileImage] = useAuthedMutation<
-    SaveUserProfileImage,
-    SaveUserProfileImageVariables
-  >(SAVE_USER_PROFILE_IMAGE);
+  const [saveUserProfileImage] = useAuthedMutation<SaveUserProfileImage, SaveUserProfileImageVariables>(
+    SAVE_USER_PROFILE_IMAGE
+  );
 
   // const handleUploadUserProfileImageEvent = useCallback(
   //   async (event: any) => {
@@ -227,21 +214,14 @@ const ProfileOverview: FC = () => {
         }
       }
     },
-    [
-      sessionData?.profile?.sub,
-      saveUserProfileImage,
-      refetchUser,
-      updateUserProfilePicture,
-    ]
+    [sessionData?.profile?.sub, saveUserProfileImage, refetchUser, updateUserProfilePicture]
   );
 
   return (
     <div className="px-3 mt-6">
       {!userLoading && !userError ? (
         <>
-          <label className="text-xs uppercase tracking-widest font-medium text-gray-400">
-            {t('profile-picture')}
-          </label>
+          <label className="text-xs uppercase tracking-widest font-medium text-gray-400">{t('profile-picture')}</label>
           <div className="bg-white h-40 justify-center mb-6 w-40">
             <IconButton onClick={handleImageUploadClick}>
               <MdUpload size="0.75em" />
@@ -252,29 +232,16 @@ const ProfileOverview: FC = () => {
               // <img src={userData.picture} />
             )}
           </div>
-          <input
-            ref={imageUploadRef}
-            onChange={handleUploadUserProfileImageEvent}
-            className="hidden"
-            type="file"
-          />
+          <input ref={imageUploadRef} onChange={handleUploadUserProfileImageEvent} className="hidden" type="file" />
 
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="flex flex-wrap">
                 <div className="w-1/2 pr-3">
-                  <FormFieldRow<Inputs>
-                    label={t('first-name')}
-                    name="firstName"
-                    required
-                  />
+                  <FormFieldRow<Inputs> label={t('first-name')} name="firstName" required />
                 </div>
                 <div className="w-1/2 pl-3">
-                  <FormFieldRow<Inputs>
-                    label={t('last-name')}
-                    name="lastName"
-                    required
-                  />
+                  <FormFieldRow<Inputs> label={t('last-name')} name="lastName" required />
                 </div>
               </div>
               <div className="flex flex-wrap">
@@ -307,20 +274,14 @@ const ProfileOverview: FC = () => {
                   />
                 </div>
                 <div className="w-1/2 pl-3">
-                  <FormFieldRow<Inputs>
-                    label={t('matriculation-number')}
-                    name="matriculationNumber"
-                  />
+                  <FormFieldRow<Inputs> label={t('matriculation-number')} name="matriculationNumber" />
                 </div>
               </div>
               <div className="flex flex-wrap">
                 <div className="w-1/2 pr-3">
-                  <FormFieldRow<Inputs>
-                    label={t('external-profile')}
-                    name="externalProfile"
-                  />
+                  <FormFieldRow<Inputs> label={t('external-profile')} name="externalProfile" />
                 </div>
-                <div className="w-1/2 pr-3 flex justify-center items-center">
+                <div className="w-1/2 pl-3 flex justify-center items-center text-center">
                   <Button
                     as="a"
                     href={`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account`}
