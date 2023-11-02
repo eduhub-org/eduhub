@@ -78,9 +78,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
   const [showCourseListDialog, setShowCourseListDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [scriptGoogleUrl, setScriptGoogleUrl] = useState(null as string);
-  const [setDocumentTemplateGoogleLink] = useState(
-    null as string
-  );
+  const [setDocumentTemplateGoogleLink] = useState<string | null>(null);
 
   const loadAchievementOptionDocumentationTemplate = useAdminQuery<
     LoadAchievementOptionDocumentationTemplate,
@@ -121,6 +119,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
   }, [
     loadAchievementOptionDocumentationTemplate,
     loadAchievementOptionEvaluationScript,
+    setDocumentTemplateGoogleLink
   ]);
 
   /* #region callbacks */

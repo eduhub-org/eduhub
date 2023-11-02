@@ -1,4 +1,5 @@
 import { QueryResult } from '@apollo/client';
+import React, { useMemo } from 'react';
 import { FC, useCallback, useState, useEffect } from 'react';
 import { MdArrowBack, MdArrowForward } from 'react-icons/md';
 import { useAdminQuery } from '../../hooks/authedQuery';
@@ -45,15 +46,13 @@ const UserList: FC<IProps> = ({ t, searchedText }) => {
 
   const LIMIT = 15;
 
-  const userTypes: StaticComponentProperty[] = [
+  const userTypes: StaticComponentProperty[] = useMemo(() => [
     { key: USER_TYPE_INSTUCTOR, label: t('courseInstructor'), selected: false },
     { key: USER_TYPE_SPEAKER, label: t('speaker'), selected: false },
     { key: USER_TYPE_AMIN, label: t('admin'), selected: false },
-  ];
+  ],[t]);
 
-  useEffect(() => {
-    setFilter(filterForUserTypes(userTypes));
-  }, [selectedProgram, selectedStatuses, userTypes]);
+
 
   /** Filter actually works inner joining multiple tables.
    * Example: To select Course Instructors:
@@ -64,7 +63,7 @@ const UserList: FC<IProps> = ({ t, searchedText }) => {
    * @param {StaticComponentProperty} uTypes usert types
    * @returns {User_bool_exp} Filter user by boolean expressions
    * */
-  const filterForUserTypes = (uTypes: StaticComponentProperty[]) => {
+  const filterForUserTypes = useCallback((uTypes: StaticComponentProperty[]) => {
     const userFilter: User_bool_exp[] = [];
 
     uTypes.forEach((ut) => {
@@ -100,7 +99,7 @@ const UserList: FC<IProps> = ({ t, searchedText }) => {
     return {
       _or: userFilter,
     };
-  };
+  }, [selectedProgram, selectedStatuses]);
 
   const [filter, setFilter] = useState(filterForUserTypes(userTypes));
   // GRAPHQL Related part
@@ -110,7 +109,9 @@ const UserList: FC<IProps> = ({ t, searchedText }) => {
     { email: { _ilike: `%${searchedText}%` } },
   ];
   // const userFilter = filterForUserTypes(uTypes);
-
+  useEffect(() => {
+    setFilter(filterForUserTypes(userTypes));
+  }, [selectedProgram, selectedStatuses, userTypes, filterForUserTypes]);
   /**
    * Filter:
    * User has to be Instructor/Speaker/Admin, if the respective checkbox is selected.
@@ -156,7 +157,7 @@ const UserList: FC<IProps> = ({ t, searchedText }) => {
     (nexItems: StaticComponentProperty[]) => {
       setFilter(filterForUserTypes(nexItems));
     },
-    [setFilter]
+    [setFilter, filterForUserTypes]
   );
   /* #endregion */
 
