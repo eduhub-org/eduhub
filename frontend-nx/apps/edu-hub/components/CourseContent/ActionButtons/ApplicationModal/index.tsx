@@ -18,7 +18,6 @@ import { INSERT_ENROLLMENT } from '../../../../queries/insertEnrollment';
 
 import { CourseApplicationModalFormContent } from './FormContent';
 import { ApplicationSuccessMessage } from './ApplicationSuccessMessage';
-import { get } from 'lodash';
 import { getCourseEnrollment } from '../../../../helpers/util';
 
 interface IProps {

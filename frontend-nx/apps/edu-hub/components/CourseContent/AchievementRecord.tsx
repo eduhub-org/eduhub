@@ -37,7 +37,7 @@ import {
   AchievementRecordListWithAuthors_AchievementRecord,
 } from '../../queries/__generated__/AchievementRecordListWithAuthors';
 import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../queries/achievementRecord';
-import { Link } from '@material-ui/core';
+//import { Link } from '@material-ui/core';
 import { MinAchievementOption } from '../../helpers/achievement';
 import useTranslation from 'next-translate/useTranslation';
 import { useAuthedMutation } from '../../hooks/authedMutation';

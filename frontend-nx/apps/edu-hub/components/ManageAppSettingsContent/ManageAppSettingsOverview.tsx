@@ -43,7 +43,7 @@ const ManageAppSettingsOverview: FC = () => {
   } = methods;
 
   const {
-    data: appSettingsData,
+    //data: appSettingsData,
     loading: appSettingsLoading,
     error: appSettingsError,
     refetch: refetchAppSettings,
