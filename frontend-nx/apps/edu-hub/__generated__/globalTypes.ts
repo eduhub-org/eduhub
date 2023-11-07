@@ -8,6 +8,25 @@
 //==============================================================
 
 /**
+ * unique or primary key constraints on table "AchievementDocumentationTemplate"
+ */
+export enum AchievementDocumentationTemplate_constraint {
+  AchievementDocumentationTemplate_pkey = "AchievementDocumentationTemplate_pkey",
+}
+
+/**
+ * update columns of table "AchievementDocumentationTemplate"
+ */
+export enum AchievementDocumentationTemplate_update_column {
+  achievementOptionId = "achievementOptionId",
+  created_at = "created_at",
+  id = "id",
+  title = "title",
+  updated_at = "updated_at",
+  url = "url",
+}
+
+/**
  * unique or primary key constraints on table "AchievementOptionCourse"
  */
 export enum AchievementOptionCourse_constraint {
@@ -76,6 +95,7 @@ export enum AchievementOption_constraint {
  * select columns of table "AchievementOption"
  */
 export enum AchievementOption_select_column {
+  achievementDocumentationTemplateId = "achievementDocumentationTemplateId",
   created_at = "created_at",
   csvTemplateUrl = "csvTemplateUrl",
   description = "description",
@@ -109,6 +129,7 @@ export enum AchievementOption_select_column_AchievementOption_aggregate_bool_exp
  * update columns of table "AchievementOption"
  */
 export enum AchievementOption_update_column {
+  achievementDocumentationTemplateId = "achievementDocumentationTemplateId",
   created_at = "created_at",
   csvTemplateUrl = "csvTemplateUrl",
   description = "description",
@@ -1341,6 +1362,62 @@ export enum order_by {
   desc_nulls_last = "desc_nulls_last",
 }
 
+/**
+ * Boolean expression to filter rows from the table "AchievementDocumentationTemplate". All fields are combined with a logical 'AND'.
+ */
+export interface AchievementDocumentationTemplate_bool_exp {
+  _and?: AchievementDocumentationTemplate_bool_exp[] | null;
+  _not?: AchievementDocumentationTemplate_bool_exp | null;
+  _or?: AchievementDocumentationTemplate_bool_exp[] | null;
+  achievementOptionId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  title?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+  url?: String_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "AchievementDocumentationTemplate"
+ */
+export interface AchievementDocumentationTemplate_insert_input {
+  achievementOptionId?: number | null;
+  created_at?: any | null;
+  id?: number | null;
+  title?: string | null;
+  updated_at?: any | null;
+  url?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "AchievementDocumentationTemplate"
+ */
+export interface AchievementDocumentationTemplate_obj_rel_insert_input {
+  data: AchievementDocumentationTemplate_insert_input;
+  on_conflict?: AchievementDocumentationTemplate_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "AchievementDocumentationTemplate"
+ */
+export interface AchievementDocumentationTemplate_on_conflict {
+  constraint: AchievementDocumentationTemplate_constraint;
+  update_columns: AchievementDocumentationTemplate_update_column[];
+  where?: AchievementDocumentationTemplate_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "AchievementDocumentationTemplate".
+ */
+export interface AchievementDocumentationTemplate_order_by {
+  achievementOptionId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+  url?: order_by | null;
+}
+
 export interface AchievementOptionCourse_aggregate_bool_exp {
   count?: AchievementOptionCourse_aggregate_bool_exp_count | null;
 }
@@ -1760,6 +1837,7 @@ export interface AchievementOption_arr_rel_insert_input {
  * order by avg() on columns of table "AchievementOption"
  */
 export interface AchievementOption_avg_order_by {
+  achievementDocumentationTemplateId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1771,12 +1849,14 @@ export interface AchievementOption_bool_exp {
   AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_bool_exp | null;
   AchievementOptionMentors?: AchievementOptionMentor_bool_exp | null;
   AchievementOptionMentors_aggregate?: AchievementOptionMentor_aggregate_bool_exp | null;
+  AchievementOptionTemplate?: AchievementDocumentationTemplate_bool_exp | null;
   AchievementRecordType?: AchievementRecordType_bool_exp | null;
   AchievementRecords?: AchievementRecord_bool_exp | null;
   AchievementRecords_aggregate?: AchievementRecord_aggregate_bool_exp | null;
   _and?: AchievementOption_bool_exp[] | null;
   _not?: AchievementOption_bool_exp | null;
   _or?: AchievementOption_bool_exp[] | null;
+  achievementDocumentationTemplateId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   csvTemplateUrl?: String_comparison_exp | null;
   description?: String_comparison_exp | null;
@@ -1796,8 +1876,10 @@ export interface AchievementOption_bool_exp {
 export interface AchievementOption_insert_input {
   AchievementOptionCourses?: AchievementOptionCourse_arr_rel_insert_input | null;
   AchievementOptionMentors?: AchievementOptionMentor_arr_rel_insert_input | null;
+  AchievementOptionTemplate?: AchievementDocumentationTemplate_obj_rel_insert_input | null;
   AchievementRecordType?: AchievementRecordType_obj_rel_insert_input | null;
   AchievementRecords?: AchievementRecord_arr_rel_insert_input | null;
+  achievementDocumentationTemplateId?: number | null;
   created_at?: any | null;
   csvTemplateUrl?: string | null;
   description?: string | null;
@@ -1815,6 +1897,7 @@ export interface AchievementOption_insert_input {
  * order by max() on columns of table "AchievementOption"
  */
 export interface AchievementOption_max_order_by {
+  achievementDocumentationTemplateId?: order_by | null;
   created_at?: order_by | null;
   csvTemplateUrl?: order_by | null;
   description?: order_by | null;
@@ -1829,6 +1912,7 @@ export interface AchievementOption_max_order_by {
  * order by min() on columns of table "AchievementOption"
  */
 export interface AchievementOption_min_order_by {
+  achievementDocumentationTemplateId?: order_by | null;
   created_at?: order_by | null;
   csvTemplateUrl?: order_by | null;
   description?: order_by | null;
@@ -1862,8 +1946,10 @@ export interface AchievementOption_on_conflict {
 export interface AchievementOption_order_by {
   AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_order_by | null;
   AchievementOptionMentors_aggregate?: AchievementOptionMentor_aggregate_order_by | null;
+  AchievementOptionTemplate?: AchievementDocumentationTemplate_order_by | null;
   AchievementRecordType?: AchievementRecordType_order_by | null;
   AchievementRecords_aggregate?: AchievementRecord_aggregate_order_by | null;
+  achievementDocumentationTemplateId?: order_by | null;
   created_at?: order_by | null;
   csvTemplateUrl?: order_by | null;
   description?: order_by | null;
@@ -1881,6 +1967,7 @@ export interface AchievementOption_order_by {
  * input type for updating data in table "AchievementOption"
  */
 export interface AchievementOption_set_input {
+  achievementDocumentationTemplateId?: number | null;
   created_at?: any | null;
   csvTemplateUrl?: string | null;
   description?: string | null;
@@ -1898,6 +1985,7 @@ export interface AchievementOption_set_input {
  * order by stddev() on columns of table "AchievementOption"
  */
 export interface AchievementOption_stddev_order_by {
+  achievementDocumentationTemplateId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1905,6 +1993,7 @@ export interface AchievementOption_stddev_order_by {
  * order by stddev_pop() on columns of table "AchievementOption"
  */
 export interface AchievementOption_stddev_pop_order_by {
+  achievementDocumentationTemplateId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1912,6 +2001,7 @@ export interface AchievementOption_stddev_pop_order_by {
  * order by stddev_samp() on columns of table "AchievementOption"
  */
 export interface AchievementOption_stddev_samp_order_by {
+  achievementDocumentationTemplateId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1919,6 +2009,7 @@ export interface AchievementOption_stddev_samp_order_by {
  * order by sum() on columns of table "AchievementOption"
  */
 export interface AchievementOption_sum_order_by {
+  achievementDocumentationTemplateId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1926,6 +2017,7 @@ export interface AchievementOption_sum_order_by {
  * order by var_pop() on columns of table "AchievementOption"
  */
 export interface AchievementOption_var_pop_order_by {
+  achievementDocumentationTemplateId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1933,6 +2025,7 @@ export interface AchievementOption_var_pop_order_by {
  * order by var_samp() on columns of table "AchievementOption"
  */
 export interface AchievementOption_var_samp_order_by {
+  achievementDocumentationTemplateId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -1940,6 +2033,7 @@ export interface AchievementOption_var_samp_order_by {
  * order by variance() on columns of table "AchievementOption"
  */
 export interface AchievementOption_variance_order_by {
+  achievementDocumentationTemplateId?: order_by | null;
   id?: order_by | null;
 }
 

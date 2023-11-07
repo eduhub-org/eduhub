@@ -16,6 +16,7 @@
     "@material-ui/icons": "4.11.3",
     "@material-ui/lab": "^4.0.0-alpha.61",
     "@nrwl/next": "15.8.7",
+    "@tanstack/react-table": "^8.10.7",
     "@types/cors": "^2.8.13",
     "@types/lodash": "^4.14.191",
     "axios": "^1.1.3",
