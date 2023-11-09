@@ -1,7 +1,11 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import useTranslation from 'next-translate/useTranslation';
+import {
+  flexRender,
+} from '@tanstack/react-table';
 import { ManagedCourse_Course_by_pk } from '../../../queries/__generated__/ManagedCourse';
 import { TableGrid } from '../../common/TableGrid';
+import TableGridNew, { CustomColumnDef } from '../../common/TableGridNew';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import {
   DegreeParticipantsWithDegreeEnrollments,
@@ -151,15 +155,47 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     },
   ];
 
+    interface ExtendedDegreeParticipantsEnrollment
+      extends DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments {
+      name?: string;
+      lastApplication?: string;
+      ectsTotal?: string;
+      attendedEvents?: number;
+    }
+
+    const columnsNew = useMemo<CustomColumnDef<ExtendedDegreeParticipantsEnrollment>[]>(
+      () => [
+        {
+          header: 'Name',
+          accessorKey: 'name',
+          accessorFn: (row) => row.name,
+          enableSorting: true,
+          className: "",
+          width: 3,
+          cell: ({ cell }) => <div>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>,
+        },
+      ],
+      []
+    );
+
   // Render component
   return (
-    <TableGrid
-      data={extendedDegreeParticipantsEnrollments}
-      keyField="id"
-      columns={columns}
-      showCheckbox={false}
-      showDelete={false}
-      translationNamespace="manageCourse"
-    />
+    <>
+      <TableGrid
+        data={extendedDegreeParticipantsEnrollments}
+        keyField="id"
+        columns={columns}
+        showCheckbox={false}
+        showDelete={false}
+        translationNamespace="manageCourse"
+      />
+      <TableGridNew
+        data={extendedDegreeParticipantsEnrollments}
+        columns={columnsNew}
+        showCheckbox={false}
+        showDelete={false}
+        translationNamespace="manageCourse"
+      />
+    </>
   );
 };
