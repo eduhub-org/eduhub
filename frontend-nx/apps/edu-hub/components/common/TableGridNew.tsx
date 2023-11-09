@@ -13,6 +13,10 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
+import {
+  DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments,
+} from '../../queries/__generated__/DegreeParticipantsWithDegreeEnrollments';
+
 // interface TableColumn<T> {
 //   width: number;
 //   className?: string;
@@ -25,13 +29,13 @@ import {
 type CustomProps<TData extends object> = {
   width: number;
   className?: string;
-  disableSorting?: boolean;
+  disableSortBy?: boolean;
 };
 
 // Create a new type for your columns that includes both ColumnDef and your custom properties
 type CustomColumnDef<TData extends object> = ColumnDef<TData> & CustomProps<TData>;
 
-interface TableGridProps<T> {
+interface TableGridProps<T extends object> {
   data: T[];
   keyField: keyof T;
   columns: CustomColumnDef<T>;
@@ -40,7 +44,7 @@ interface TableGridProps<T> {
   translationNamespace?: string;
 }
 
-export const TableGrid = <T,>({
+export const TableGrid = <T extends object,>({
   data,
   keyField,
   // columns,
@@ -52,17 +56,22 @@ export const TableGrid = <T,>({
 
   const [sorting, setSorting] = useState<SortingState>([]);
 
-const columns = useMemo<CustomColumnDef<Person>[]>(
+    interface ExtendedDegreeParticipantsEnrollment
+    extends DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments {
+    name?: string;
+    lastApplication?: string;
+    ectsTotal?: string;
+    attendedEvents?: number;
+  }
+
+const columns = useMemo<CustomColumnDef<ExtendedDegreeParticipantsEnrollment>[]>(
   () => [
     {
       header: 'Name',
       accessorKey: 'name',
+      accessorFn: (row) => row.name,
       width: 3,
-      cell: ({ row }) => (
-        <div>
-          {row.} {rowData?.User.lastName}
-        </div>
-      ),
+      cell: ({ cell }) => <div>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>,
     },
   ],
   []
@@ -74,6 +83,7 @@ const tableColumns = useMemo(() => {
     ? [
         {
           id: 'selection',
+          accessorFn: (row) => row.name,
           Header: () => <div>Select</div>,
           Cell: ({ row }) => <input type="checkbox" />,
         },
@@ -82,10 +92,8 @@ const tableColumns = useMemo(() => {
 
   // Create the data columns based on the input columns prop
   const dataColumns = columns.map((col) => ({
-    Header: col.columnName,
-    accessor: col.columnName,
-    Cell: ({ value }) => <col.displayComponent rowData={value} />,
-    disableSortBy: col.disableSorting,
+    ...col,
+    disableSortBy: col.disableSortBy,
   }));
 
   // Create the delete column if needed
@@ -93,6 +101,7 @@ const tableColumns = useMemo(() => {
     ? [
         {
           id: 'delete',
+          accessorFn: (row) => row.name,
           Header: () => <div>Delete</div>,
           Cell: ({ row }) => (
             <IconButton size="small">
@@ -112,7 +121,7 @@ const tableColumns = useMemo(() => {
 
   const table = useReactTable({
     data,
-    columns,
+    columns: tableColumns,
     state: {
       sorting,
     },
@@ -157,35 +166,13 @@ const tableColumns = useMemo(() => {
           className="${className} grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] mb-1 bg-edu-light-gray"
           key={row.id}
         >
-          {/* Optional Checkbox Column */}
-          {showCheckbox && (
-            <div className="col-span-1">
-              <input type="checkbox" />
-            </div>
-          )}
-
-          {/* Data Columns */}
-          {columns.map((col) => (
-            <div className={`${col.className} mr-3 ml-3 col-span-${col.width}`} key={col.columnName}>
-              <col.displayComponent rowData={row} />
-            </div>
-          ))}
           {row.getVisibleCells().map((cell) => {
             return (
-              <div className={`${col.className} mr-3 ml-3 col-span-${col.width}`} key={cell.id}>
+              <div className={`${cell.column.} mr-3 ml-3 col-span-${col.width}`} key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </div>
             );
           })}
-
-          {/* Optional Delete Column */}
-          {showDelete && (
-            <div className="ml-3 col-span-2">
-              <IconButton size="small">
-                <MdDelete size="1.25em" />
-              </IconButton>
-            </div>
-          )}
         </div>
       ))}
     </div>

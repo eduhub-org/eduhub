@@ -3,7 +3,11 @@ import useTranslation from 'next-translate/useTranslation';
 import { ManagedCourse_Course_by_pk } from '../../../queries/__generated__/ManagedCourse';
 import { TableGrid } from '../../common/TableGrid';
 import { useRoleQuery } from '../../../hooks/authedQuery';
-import { DegreeParticipantsWithDegreeEnrollments, DegreeParticipantsWithDegreeEnrollmentsVariables } from '../../../queries/__generated__/DegreeParticipantsWithDegreeEnrollments';
+import {
+  DegreeParticipantsWithDegreeEnrollments,
+  DegreeParticipantsWithDegreeEnrollmentsVariables,
+  DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments,
+} from '../../../queries/__generated__/DegreeParticipantsWithDegreeEnrollments';
 import { DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS } from '../../../queries/courseDegree';
 import { CertificateDownload } from '../../common/CertificateDownload';
 
@@ -33,7 +37,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       .reduce((maxDate, currentDate) => (currentDate > maxDate ? currentDate : maxDate));
     return maxDate.toLocaleString(lang);  // Convert the Date object to a string
   };
-  
+
   const getTotalECTS = (courseEnrollments) => {
     if (!courseEnrollments || courseEnrollments.length === 0) {
       return '0';
@@ -49,30 +53,39 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       : totalEcts.toLocaleString(lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
       return formattedEcts;
     };
-    
+
   const getAttendedEventsCount = (courseEnrollments) => {
     if (!courseEnrollments || courseEnrollments.length === 0) {
-      return '0';
+      return 0;
     }
     const attendedEventsCount = courseEnrollments
       .filter(enrollment => enrollment.Course.Program.shortTitle === 'EVENTS')
       .length;
-    
+
     return attendedEventsCount;
   };
 
-  const extendedDegreeParticipantsEnrollments = degreeParticipantsEnrollments.map(enrollment => {
-    const name = `${enrollment.User.firstName} ${enrollment.User.lastName}`;
-    const last_application = getMaxUpdatedAt(enrollment.User.CourseEnrollments) || 'N/A';
-    const ects_total = getTotalECTS(enrollment.User.CourseEnrollments);
-    const attended_events = getAttendedEventsCount(enrollment.User.CourseEnrollments);
-    return {
-      ...enrollment,
-      name,
-      last_application,
-      ects_total,
-      attended_events,
-    };
+  interface ExtendedDegreeParticipantsEnrollment
+    extends DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments {
+    name?: string;
+    lastApplication?: string;
+    ectsTotal?: string;
+    attendedEvents?: number;
+  }
+
+  const extendedDegreeParticipantsEnrollments: ExtendedDegreeParticipantsEnrollment[] =
+    degreeParticipantsEnrollments.map((enrollment) => {
+      const name = `${enrollment.User.firstName} ${enrollment.User.lastName}`;
+      const lastApplication = getMaxUpdatedAt(enrollment.User.CourseEnrollments) || 'N/A';
+      const ectsTotal = getTotalECTS(enrollment.User.CourseEnrollments);
+      const attendedEvents = getAttendedEventsCount(enrollment.User.CourseEnrollments);
+      return {
+        ...enrollment,
+        name,
+        lastApplication,
+        ectsTotal,
+        attendedEvents,
+      };
     });
 
   // Column definitions
@@ -127,7 +140,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       columnName: 'certificate',
       width: 1,
       className: 'text-center',
-      displayComponent: ({ rowData }) => 
+      displayComponent: ({ rowData }) =>
         <div>
           <CertificateDownload
             courseEnrollment={rowData}
