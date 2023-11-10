@@ -13,19 +13,9 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-// Define a type for your custom properties
-type CustomProps<TData extends object> = {
-  width: number;
-  className?: string;
-  disableSortBy?: boolean;
-};
-
-// Create a new type for your columns that includes both ColumnDef and your custom properties
-export type CustomColumnDef<TData extends object> = ColumnDef<TData> & CustomProps<TData>;
-
 interface TableGridProps<T extends object> {
   data: T[];
-  columns: CustomColumnDef<T>[];
+  columns: ColumnDef<T>[];
   showCheckbox?: boolean;
   showDelete?: boolean;
   translationNamespace?: string;
@@ -58,7 +48,6 @@ const TableGrid = <T extends object>({
     // Create the data columns based on the input columns prop
     const dataColumns = columns.map((col) => ({
       ...col,
-      disableSortBy: col.disableSortBy,
     }));
 
     // Create the delete column if needed
@@ -83,6 +72,9 @@ const TableGrid = <T extends object>({
 
   const table = useReactTable({
     data,
+    defaultColumn: {
+      enableSorting: false,
+    },
     columns: tableColumns,
     state: {
       sorting,
@@ -96,13 +88,13 @@ const TableGrid = <T extends object>({
   return (
     <div>
       {/* Header row for column names */}
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] mb-1 text-white">
-        {showCheckbox && <div className="col-span-1" />}
+      <div>
         {table.getHeaderGroups().map((headerGroup) => (
-          <div key={headerGroup.id}>
+          <div key={headerGroup.id} className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] mb-1 text-white">
+            {showCheckbox && <div className="col-span-1" />}
             {headerGroup.headers.map((header) => (
               <div
-                className={`mr-3 ml-3 relative`}
+                className={`${header.column.columnDef.meta.className} mr-3 ml-3 col-span-${header.column.columnDef.meta.width} relative`}
                 key={header.id}
                 onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
               >
@@ -117,9 +109,9 @@ const TableGrid = <T extends object>({
                 </div>
               </div>
             ))}
+            {showDelete && <div className="ml-3 col-span-2" />}
           </div>
         ))}
-        {showDelete && <div className="ml-3 col-span-2" />}
       </div>
 
       {/* Data Rows */}
@@ -130,7 +122,10 @@ const TableGrid = <T extends object>({
         >
           {row.getVisibleCells().map((cell) => {
             return (
-              <div className={`mr-3 ml-3`} key={cell.id}>
+              <div
+                className={`${cell.column.columnDef.meta.className} mr-3 ml-3 col-span-${cell.column.columnDef.meta.width}`}
+                key={cell.id}
+              >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </div>
             );
