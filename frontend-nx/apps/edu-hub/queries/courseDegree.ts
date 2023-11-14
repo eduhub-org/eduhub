@@ -21,7 +21,7 @@ export const COMPLETED_DEGREE_ENROLLMENTS = gql`
           },
           {
             userId: { _eq: $userId },
-            Course: { 
+            Course: {
               CourseDegrees: { degreeCourseId: { _eq: $degreeCourseId } },
               Program: { shortTitle: { _eq: "EVENTS" } }
             }
@@ -49,29 +49,29 @@ export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
         id
         status
         achievementCertificateURL
+        attendanceCertificateURL
         User {
           id
           firstName
           lastName
           email
-        CourseEnrollments(where: {
-          Course: {CourseDegrees: {degreeCourseId: {_eq: $degreeCourseId}}}
-        }) {
-          id
-          status
-          achievementCertificateURL
-          updated_at
-          Course {
+          CourseEnrollments(where: { Course: { CourseDegrees: { degreeCourseId: { _eq: $degreeCourseId } } } }) {
             id
-            title
-            ects
-            Program {
+            status
+            achievementCertificateURL
+            attendanceCertificateURL
+            updated_at
+            Course {
               id
-              shortTitle
               title
+              ects
+              Program {
+                id
+                shortTitle
+                title
+              }
             }
           }
-        }
         }
       }
     }

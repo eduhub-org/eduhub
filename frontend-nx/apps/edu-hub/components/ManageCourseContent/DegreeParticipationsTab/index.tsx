@@ -1,14 +1,30 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import useTranslation from 'next-translate/useTranslation';
+import {
+  ColumnDef,
+} from '@tanstack/react-table';
 import { ManagedCourse_Course_by_pk } from '../../../queries/__generated__/ManagedCourse';
-import { TableGrid } from '../../common/TableGrid';
+import TableGrid from '../../common/TableGrid';
 import { useRoleQuery } from '../../../hooks/authedQuery';
-import { DegreeParticipantsWithDegreeEnrollments, DegreeParticipantsWithDegreeEnrollmentsVariables } from '../../../queries/__generated__/DegreeParticipantsWithDegreeEnrollments';
+import {
+  DegreeParticipantsWithDegreeEnrollments,
+  DegreeParticipantsWithDegreeEnrollmentsVariables,
+  DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments,
+  DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments
+} from '../../../queries/__generated__/DegreeParticipantsWithDegreeEnrollments';
 import { DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS } from '../../../queries/courseDegree';
 import { CertificateDownload } from '../../common/CertificateDownload';
 
 interface DegreeParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
+}
+
+export  interface ExtendedDegreeParticipantsEnrollment
+  extends DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments {
+  name?: string;
+  lastApplication?: string;
+  ectsTotal?: string;
+  attendedEvents?: number;
 }
 
 export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ course }) => {
@@ -33,7 +49,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       .reduce((maxDate, currentDate) => (currentDate > maxDate ? currentDate : maxDate));
     return maxDate.toLocaleString(lang);  // Convert the Date object to a string
   };
-  
+
   const getTotalECTS = (courseEnrollments) => {
     if (!courseEnrollments || courseEnrollments.length === 0) {
       return '0';
@@ -49,104 +65,120 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       : totalEcts.toLocaleString(lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
       return formattedEcts;
     };
-    
+
   const getAttendedEventsCount = (courseEnrollments) => {
     if (!courseEnrollments || courseEnrollments.length === 0) {
-      return '0';
+      return 0;
     }
     const attendedEventsCount = courseEnrollments
       .filter(enrollment => enrollment.Course.Program.shortTitle === 'EVENTS')
       .length;
-    
+
     return attendedEventsCount;
   };
 
-  const extendedDegreeParticipantsEnrollments = degreeParticipantsEnrollments.map(enrollment => {
-    const name = `${enrollment.User.firstName} ${enrollment.User.lastName}`;
-    const last_application = getMaxUpdatedAt(enrollment.User.CourseEnrollments) || 'N/A';
-    const ects_total = getTotalECTS(enrollment.User.CourseEnrollments);
-    const attended_events = getAttendedEventsCount(enrollment.User.CourseEnrollments);
-    return {
-      ...enrollment,
-      name,
-      last_application,
-      ects_total,
-      attended_events,
-    };
+  const extendedDegreeParticipantsEnrollments: ExtendedDegreeParticipantsEnrollment[] =
+    degreeParticipantsEnrollments.map((enrollment) => {
+      const name = `${enrollment.User.firstName} ${enrollment.User.lastName}`;
+      const lastApplication = getMaxUpdatedAt(enrollment.User.CourseEnrollments) || 'N/A';
+      const ectsTotal = getTotalECTS(enrollment.User.CourseEnrollments);
+      const attendedEvents = getAttendedEventsCount(enrollment.User.CourseEnrollments);
+      return {
+        ...enrollment,
+        name,
+        lastApplication,
+        ectsTotal,
+        attendedEvents,
+      };
     });
 
-  // Column definitions
-  const columns = [
-    {
-      columnName: 'name',
-      width: 3,
-      displayComponent: ({ rowData }) => <div>{rowData?.User.firstName} {rowData?.User.lastName}</div>,
-    },
-    {
-      columnName: 'participations',
-      width: 4,
-      displayComponent: ({ rowData }) => (
-        <div>
-          {rowData?.User.CourseEnrollments.map((enrollment, index) => (
-                  <span key={index}>
-                    {enrollment.Course.title} - {enrollment.Course.Program.shortTitle} (
-                      {enrollment.achievementCertificateURL ? "COMPLETED" : enrollment.status})
-                    <br />
-                  </span>
-          ))}
-        </div>
-     ),
-      disableSorting: true,
-    },
-    {
-      columnName: 'last_application',
-      width: 1,
-      className: 'text-center',
-      displayComponent: ({ rowData }) => <div>{rowData?.last_application}</div>,
-    },
-    {
-      columnName: 'status',
-      width: 1,
-      className: 'text-center',
-      displayComponent: ({ rowData }) => <div>{rowData?.status}</div>,
-    },
-    {
-      columnName: 'ects_total',
-      width: 1,
-      className: 'text-center',
-      displayComponent: ({ rowData }) => <div>{rowData?.ects_total}</div>,
-      sortAsNumber: true,
-    },
-    {
-      columnName: 'attended_events',
-      width: 1,
-      className: 'text-center',
-      displayComponent: ({ rowData }) => <div>{rowData?.attended_events}</div>,
-    },
-    {
-      columnName: 'certificate',
-      width: 1,
-      className: 'text-center',
-      displayComponent: ({ rowData }) => 
-        <div>
-          <CertificateDownload
-            courseEnrollment={rowData}
-            manageView
-          />
-        </div>,
-      disableSorting: true,
-    },
-  ];
+    const columns = useMemo<ColumnDef<ExtendedDegreeParticipantsEnrollment>[]>(
+      () => [
+        {
+          accessorKey: 'name',
+          enableSorting: true,
+          className: '',
+          meta: {
+            width: 3,
+          },
+          cell: ({ getValue }) => <div className="uppercase">{getValue<string>()}</div>,
+        },
+        {
+          accessorKey: 'participations',
+          accessorFn: (row) => row.User.CourseEnrollments,
+          meta: {
+            width: 4,
+          },
+          cell: ({ getValue }) => (
+            <div>
+              {getValue<
+                DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments[]
+              >().map((enrollment, index) => (
+                <span key={`enrollment-${index}`}>
+                  {enrollment.Course.title} - {enrollment.Course.Program.shortTitle} (
+                  {enrollment.achievementCertificateURL ? 'COMPLETED' : enrollment.status})
+                  <br />
+                </span>
+              ))}
+            </div>
+          ),
+        },
+        {
+          accessorKey: 'lastApplication',
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+        },
+        {
+          accessorKey: 'status',
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+        },
+        {
+          accessorKey: 'ectsTotal',
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+          enableSorting: true,
+        },
+        {
+          accessorKey: 'attendedEvents',
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+        },
+        {
+          accessorKey: 'certificate',
+          accessorFn: (row) => row,
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+          cell: ({ getValue }) => (
+            <div>
+              <CertificateDownload courseEnrollment={getValue<ExtendedDegreeParticipantsEnrollment>()} manageView />
+            </div>
+          ),
+        },
+      ],
+      []
+    );
 
   // Render component
   return (
-    <TableGrid
-      data={extendedDegreeParticipantsEnrollments}
-      keyField="id"
-      columns={columns}
-      showCheckbox={false}
-      showDelete={false}
-      translationNamespace="manageCourse"
-    />
+    <>
+      <TableGrid
+        data={extendedDegreeParticipantsEnrollments}
+        columns={columns}
+        showCheckbox={false}
+        showDelete={false}
+        translationNamespace="manageCourse"
+      />
+    </>
   );
 };

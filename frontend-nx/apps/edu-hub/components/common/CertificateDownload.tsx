@@ -16,9 +16,10 @@ import {
   loadAttendanceCertificate,
   loadAttendanceCertificateVariables,
 } from '../../queries/__generated__/loadAttendanceCertificate';
+import { ExtendedDegreeParticipantsEnrollment } from '../ManageCourseContent/DegreeParticipationsTab';
 
 interface IProps {
-  courseEnrollment: CourseWithEnrollment_Course_by_pk_CourseEnrollments;
+  courseEnrollment: ExtendedDegreeParticipantsEnrollment;
   manageView?: boolean;
   refetchAchievementCertificates?: boolean;
   refetchAttendanceCertificates?: boolean;
