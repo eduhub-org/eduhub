@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const USER_LIST = gql`
   query UserList {
-    User {
+    User(where: { status: { _eq: ACTIVE } }) {
       id
       firstName
       lastName
@@ -45,10 +45,17 @@ export const USER_SELECTION_ONE_PARAM = gql`
     User(
       order_by: { lastName: asc }
       where: {
-        _or: [
-          { firstName: { _ilike: $searchValue } }
-          { lastName: { _ilike: $searchValue } }
-          { email: { _ilike: $searchValue } }
+        _and: [
+          {
+            status: { _eq: ACTIVE }
+          },
+          {
+            _or: [
+              { firstName: { _ilike: $searchValue } }
+              { lastName: { _ilike: $searchValue } }
+              { email: { _ilike: $searchValue } }
+            ]
+          }
         ]
       }
     ) {
@@ -68,10 +75,17 @@ export const USER_SELECTION_TWO_PARAMS = gql`
     User(
       order_by: { lastName: asc }
       where: {
-        _or: [
+        _and: [
           {
-            firstName: { _ilike: $searchValue1 }
-            lastName: { _ilike: $searchValue2 }
+            status: { _eq: ACTIVE }
+          },
+          {
+            _or: [
+              {
+                firstName: { _ilike: $searchValue1 }
+                lastName: { _ilike: $searchValue2 }
+              }
+            ]
           }
         ]
       }
@@ -97,7 +111,7 @@ export const USERS_BY_LAST_NAME = gql`
       limit: $limit
       offset: $offset
       order_by: { lastName: asc }
-      where: $filter
+      where: { _and: [{ status: { _eq: ACTIVE } }, $filter] }
     ) {
       id
       firstName
@@ -148,7 +162,7 @@ export const USERS_WITH_EXPERT_ID = gql`
     }
     User(
       order_by: [$userOrderBy]
-      where: $where
+      where: { _and: [{ status: { _eq: ACTIVE } }, $where] }
       limit: $limit
       offset: $offset
     ) {
