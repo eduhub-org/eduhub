@@ -19,7 +19,7 @@ import {
 import { ExtendedDegreeParticipantsEnrollment } from '../ManageCourseContent/DegreeParticipationsTab';
 
 interface IProps {
-  courseEnrollment: ExtendedDegreeParticipantsEnrollment;
+  courseEnrollment: ExtendedDegreeParticipantsEnrollment | CourseWithEnrollment_Course_by_pk_CourseEnrollments;
   manageView?: boolean;
   refetchAchievementCertificates?: boolean;
   refetchAttendanceCertificates?: boolean;
