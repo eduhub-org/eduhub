@@ -4,8 +4,7 @@ import {
   ColumnDef,
 } from '@tanstack/react-table';
 import { ManagedCourse_Course_by_pk } from '../../../queries/__generated__/ManagedCourse';
-import { TableGrid } from '../../common/TableGrid';
-import TableGridNew from '../../common/TableGridNew';
+import TableGrid from '../../common/TableGrid';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import {
   DegreeParticipantsWithDegreeEnrollments,
@@ -93,68 +92,82 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       };
     });
 
-  // Column definitions
-  const columns = [
-    {
-      columnName: 'name',
-      width: 3,
-      displayComponent: ({ rowData }) => <div>{rowData?.User.firstName} {rowData?.User.lastName}</div>,
-    },
-    {
-      columnName: 'participations',
-      width: 4,
-      displayComponent: ({ rowData }) => (
-        <div>
-          {rowData?.User.CourseEnrollments.map((enrollment, index) => (
-                  <span key={index}>
-                    {enrollment.Course.title} - {enrollment.Course.Program.shortTitle} (
-                      {enrollment.achievementCertificateURL ? "COMPLETED" : enrollment.status})
-                    <br />
-                  </span>
-          ))}
-        </div>
-     ),
-      disableSorting: true,
-    },
-    {
-      columnName: 'lastApplication',
-      width: 1,
-      className: 'text-center',
-      displayComponent: ({ rowData }) => <div>{rowData?.last_application}</div>,
-    },
-    {
-      columnName: 'status',
-      width: 1,
-      className: 'text-center',
-      displayComponent: ({ rowData }) => <div>{rowData?.status}</div>,
-    },
-    {
-      columnName: 'ectsTotal',
-      width: 1,
-      className: 'text-center',
-      displayComponent: ({ rowData }) => <div>{rowData?.ects_total}</div>,
-      sortAsNumber: true,
-    },
-    {
-      columnName: 'attendedEvents',
-      width: 1,
-      className: 'text-center',
-      displayComponent: ({ rowData }) => <div>{rowData?.attended_events}</div>,
-    },
-    {
-      columnName: 'certificate',
-      width: 1,
-      className: 'text-center',
-      displayComponent: ({ rowData }) =>
-        <div>
-          <CertificateDownload
-            courseEnrollment={rowData}
-            manageView
-          />
-        </div>,
-      disableSorting: true,
-    },
-  ];
+    const columns = useMemo<ColumnDef<ExtendedDegreeParticipantsEnrollment>[]>(
+      () => [
+        {
+          accessorKey: 'name',
+          enableSorting: true,
+          className: '',
+          meta: {
+            width: 3,
+          },
+          cell: ({ getValue }) => <div className="uppercase">{getValue<string>()}</div>,
+        },
+        {
+          accessorKey: 'participations',
+          accessorFn: (row) => row.User.CourseEnrollments,
+          meta: {
+            width: 4,
+          },
+          cell: ({ getValue }) => (
+            <div>
+              {getValue<
+                DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments[]
+              >().map((enrollment, index) => (
+                <span key={`enrollment-${index}`}>
+                  {enrollment.Course.title} - {enrollment.Course.Program.shortTitle} (
+                  {enrollment.achievementCertificateURL ? 'COMPLETED' : enrollment.status})
+                  <br />
+                </span>
+              ))}
+            </div>
+          ),
+        },
+        {
+          accessorKey: 'lastApplication',
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+        },
+        {
+          accessorKey: 'status',
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+        },
+        {
+          accessorKey: 'ectsTotal',
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+          enableSorting: true,
+        },
+        {
+          accessorKey: 'attendedEvents',
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+        },
+        {
+          accessorKey: 'certificate',
+          accessorFn: (row) => row,
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+          cell: ({ getValue }) => (
+            <div>
+              <CertificateDownload courseEnrollment={getValue<ExtendedDegreeParticipantsEnrollment>()} manageView />
+            </div>
+          ),
+        },
+      ],
+      []
+    );
 
     interface ExtendedDegreeParticipantsEnrollment
       extends DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments {
@@ -246,15 +259,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     <>
       <TableGrid
         data={extendedDegreeParticipantsEnrollments}
-        keyField="id"
         columns={columns}
-        showCheckbox={false}
-        showDelete={false}
-        translationNamespace="manageCourse"
-      />
-      <TableGridNew
-        data={extendedDegreeParticipantsEnrollments}
-        columns={columnsNew}
         showCheckbox={false}
         showDelete={false}
         translationNamespace="manageCourse"

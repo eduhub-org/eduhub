@@ -18,7 +18,6 @@ export enum AchievementDocumentationTemplate_constraint {
  * update columns of table "AchievementDocumentationTemplate"
  */
 export enum AchievementDocumentationTemplate_update_column {
-  achievementOptionId = "achievementOptionId",
   created_at = "created_at",
   id = "id",
   title = "title",
@@ -1369,7 +1368,6 @@ export interface AchievementDocumentationTemplate_bool_exp {
   _and?: AchievementDocumentationTemplate_bool_exp[] | null;
   _not?: AchievementDocumentationTemplate_bool_exp | null;
   _or?: AchievementDocumentationTemplate_bool_exp[] | null;
-  achievementOptionId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   title?: String_comparison_exp | null;
@@ -1381,7 +1379,6 @@ export interface AchievementDocumentationTemplate_bool_exp {
  * input type for inserting data into table "AchievementDocumentationTemplate"
  */
 export interface AchievementDocumentationTemplate_insert_input {
-  achievementOptionId?: number | null;
   created_at?: any | null;
   id?: number | null;
   title?: string | null;
@@ -1410,7 +1407,6 @@ export interface AchievementDocumentationTemplate_on_conflict {
  * Ordering options when selecting data from "AchievementDocumentationTemplate".
  */
 export interface AchievementDocumentationTemplate_order_by {
-  achievementOptionId?: order_by | null;
   created_at?: order_by | null;
   id?: order_by | null;
   title?: order_by | null;
