@@ -40,6 +40,7 @@
   "menu-administration-user": "Benutzer",
   "menu-administration-courses": "Kurse",
   "menu-administration-achievement": "Leistungsnachweise",
+  "menu-administration-achievement-templates": "Leistungsnachweisvorlagen",
   "menu-administration-programs": "Programme",
   "menu-administration-appSettings": "App Einstellungen",
   "menu-logout": "Logout",
@@ -98,5 +99,4 @@
     "organization": "Name der Organisation",
     "other": "Andere Beschäftigung"
   }
-
 }

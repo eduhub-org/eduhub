@@ -94,7 +94,7 @@ const TableGrid = <T extends object>({
             {showCheckbox && <div className="col-span-1" />}
             {headerGroup.headers.map((header) => (
               <div
-                className={`${header.column.columnDef.meta.className} mr-3 ml-3 col-span-${header.column.columnDef.meta.width} relative`}
+                className={`${header.column.columnDef.meta?.className} mr-3 ml-3 col-span-${header.column.columnDef.meta?.width} relative`}
                 key={header.id}
                 onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
               >
@@ -123,7 +123,7 @@ const TableGrid = <T extends object>({
           {row.getVisibleCells().map((cell) => {
             return (
               <div
-                className={`${cell.column.columnDef.meta.className} mr-3 ml-3 col-span-${cell.column.columnDef.meta.width}`}
+                className={`${cell.column.columnDef.meta?.className} mr-3 ml-3 col-span-${cell.column.columnDef.meta?.width}`}
                 key={cell.id}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
