@@ -12,6 +12,7 @@
  */
 export enum AchievementDocumentationTemplate_constraint {
   AchievementDocumentationTemplate_pkey = "AchievementDocumentationTemplate_pkey",
+  AchievementDocumentationTemplate_title_key = "AchievementDocumentationTemplate_title_key",
 }
 
 /**
