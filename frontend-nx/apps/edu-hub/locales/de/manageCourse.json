@@ -20,9 +20,9 @@
   "application_history": "Sonstige Bewerbungen:",
   "name": "Name",
   "participations": "Teilnahmen",
-  "last_application": "Letzte Aktivität",
+  "lastApplication": "Letzte Aktivität",
   "status": "Status",
-  "ects_total": "ECTS Gesamt",
-  "attended_events": "Besuchte Events",
+  "ectsTotal": "ECTS Gesamt",
+  "attendedEvents": "Besuchte Events",
   "certificate": "Zertifikat"
 }

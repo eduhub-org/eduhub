@@ -50,6 +50,10 @@ export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnro
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */
   achievementCertificateURL: string | null;
+  /**
+   * URL to the file containing the user's attendance certificate (if he obtained one)
+   */
+  attendanceCertificateURL: string | null;
   updated_at: any | null;
   /**
    * An object relationship
@@ -89,6 +93,10 @@ export interface DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnro
    * URL to the file containing the user's achievement certificate (if he obtained one)
    */
   achievementCertificateURL: string | null;
+  /**
+   * URL to the file containing the user's attendance certificate (if he obtained one)
+   */
+  attendanceCertificateURL: string | null;
   /**
    * An object relationship
    */

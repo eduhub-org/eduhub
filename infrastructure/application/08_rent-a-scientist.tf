@@ -12,7 +12,7 @@ resource "google_secret_manager_secret" "keycloak_ras_client_secret" {
   provider  = google-beta
   secret_id = "keycloak-ras-client-secret"
   replication {
-    automatic = true
+    auto {}
   }
 }
 

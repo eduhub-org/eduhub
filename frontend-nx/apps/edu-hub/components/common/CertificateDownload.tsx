@@ -1,5 +1,5 @@
 import useTranslation from 'next-translate/useTranslation';
-import { Dispatch, FC, SetStateAction, useEffect } from 'react';
+import { Dispatch, FC, SetStateAction} from 'react';
 
 import { useAuthedQuery } from '../../hooks/authedQuery';
 
@@ -16,9 +16,10 @@ import {
   loadAttendanceCertificate,
   loadAttendanceCertificateVariables,
 } from '../../queries/__generated__/loadAttendanceCertificate';
+import { ExtendedDegreeParticipantsEnrollment } from '../ManageCourseContent/DegreeParticipationsTab';
 
 interface IProps {
-  courseEnrollment: CourseWithEnrollment_Course_by_pk_CourseEnrollments;
+  courseEnrollment: ExtendedDegreeParticipantsEnrollment | CourseWithEnrollment_Course_by_pk_CourseEnrollments;
   manageView?: boolean;
   refetchAchievementCertificates?: boolean;
   refetchAttendanceCertificates?: boolean;
@@ -39,7 +40,7 @@ export const CertificateDownload: FC<IProps> = ({
   const {
     data: loadAchievementCertificateData,
     loading: loadAchievementCerfificateLoading,
-    refetch: loadAchievementCerfificateRefetch,
+    //refetch: loadAchievementCerfificateRefetch,
   } = useAuthedQuery<loadAchievementCertificate, loadAchievementCertificateVariables>(LOAD_ACHIEVEMENT_CERTIFICATE, {
     variables: {
       path: courseEnrollment?.achievementCertificateURL,

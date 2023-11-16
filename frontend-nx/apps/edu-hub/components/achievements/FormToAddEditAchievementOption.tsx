@@ -1,21 +1,12 @@
 import {
-  Checkbox,
+  //Checkbox,
   CircularProgress,
-  FormControlLabel,
+  //FormControlLabel,
   Link,
 } from '@material-ui/core';
 import { Translate } from 'next-translate';
 import useTranslation from 'next-translate/useTranslation';
-import {
-  FC,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from 'react';
+import { FC, ReactNode, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import { MdAddCircle, MdUploadFile } from 'react-icons/md';
 import {
@@ -26,10 +17,7 @@ import {
   TempAchievementOptionCourse,
   TempAchievementOptionMentor,
 } from '../../helpers/achievement';
-import {
-  downloadCSVFileFromBase64String,
-  makeFullName,
-} from '../../helpers/util';
+import { downloadCSVFileFromBase64String, makeFullName } from '../../helpers/util';
 import { AdminCourseList_Course } from '../../queries/__generated__/AdminCourseList';
 import { UserForSelection1_User } from '../../queries/__generated__/UserForSelection1';
 import { SelectUserDialog } from '../common/dialogs/SelectUserDialog';
@@ -37,7 +25,7 @@ import EhTagStingId from '../common/EhTagStingId';
 import TagWithTwoText from '../common/TagWithTwoText';
 import CourseListDialog from './CourseListDialog';
 import { UploadFile, parseFileUploadEvent } from '../../helpers/filehandling';
-import _ from 'lodash';
+//import _ from 'lodash';
 import { Button } from '../common/Button';
 import { AchievementContext } from './AchievementsHelper';
 import { useAdminQuery } from '../../hooks/authedQuery';
@@ -58,18 +46,13 @@ interface IPropsAddEditAchievementTempData {
   onSaveCallBack: (data: IDataToManipulate) => Promise<ResponseToARequest>;
 }
 
-const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
-  props
-) => {
+const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (props) => {
   const context = useContext(AchievementContext);
 
   const initialState: IDataToManipulate = {
     ...props.defaultData,
   };
-  const reducer = (
-    state: IDataToManipulate = initialState,
-    payload: IPayload
-  ) => {
+  const reducer = (state: IDataToManipulate = initialState, payload: IPayload) => {
     return { ...state, [payload.key]: payload.value };
   };
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -78,9 +61,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
   const [showCourseListDialog, setShowCourseListDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [scriptGoogleUrl, setScriptGoogleUrl] = useState(null as string);
-  const [documentTemplateGoogleLink, setDocumentTemplateGoogleLink] = useState(
-    null as string
-  );
+  // const [documentTemplateGoogleLink, setDocumentTemplateGoogleLink] = useState(null as string);
 
   const loadAchievementOptionDocumentationTemplate = useAdminQuery<
     LoadAchievementOptionDocumentationTemplate,
@@ -99,29 +80,20 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
   useEffect(() => {
     if (
       loadAchievementOptionDocumentationTemplate &&
-      loadAchievementOptionDocumentationTemplate.data
-        ?.loadAchievementOptionDocumentationTemplate?.link
+      loadAchievementOptionDocumentationTemplate.data?.loadAchievementOptionDocumentationTemplate?.link
     ) {
-      setDocumentTemplateGoogleLink(
-        loadAchievementOptionDocumentationTemplate.data
-          .loadAchievementOptionDocumentationTemplate.link
-      );
+      // setDocumentTemplateGoogleLink(
+      //   loadAchievementOptionDocumentationTemplate.data.loadAchievementOptionDocumentationTemplate.link
+      // );
     }
 
     if (
       loadAchievementOptionEvaluationScript &&
-      loadAchievementOptionEvaluationScript.data
-        ?.loadAchievementOptionEvaluationScript?.link
+      loadAchievementOptionEvaluationScript.data?.loadAchievementOptionEvaluationScript?.link
     ) {
-      setScriptGoogleUrl(
-        loadAchievementOptionEvaluationScript.data
-          .loadAchievementOptionEvaluationScript.link
-      );
+      setScriptGoogleUrl(loadAchievementOptionEvaluationScript.data.loadAchievementOptionEvaluationScript.link);
     }
-  }, [
-    loadAchievementOptionDocumentationTemplate,
-    loadAchievementOptionEvaluationScript,
-  ]);
+  }, [loadAchievementOptionDocumentationTemplate, loadAchievementOptionEvaluationScript]);
 
   /* #region callbacks */
   const showAddMentorDialog = useCallback(() => {
@@ -174,9 +146,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
       if (state.mentors.find((u) => u.userId === userIdFromUserTable)) {
         dispatch({
           key: 'mentors',
-          value: [
-            ...state.mentors.filter((e) => e.userId !== userIdFromUserTable),
-          ],
+          value: [...state.mentors.filter((e) => e.userId !== userIdFromUserTable)],
         });
       }
     },
@@ -188,11 +158,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
       if (state.courses.find((c) => c.courseId === courseIdFromCourseTable)) {
         dispatch({
           key: 'courses',
-          value: [
-            ...state.courses.filter(
-              (c) => c.courseId !== courseIdFromCourseTable
-            ),
-          ],
+          value: [...state.courses.filter((c) => c.courseId !== courseIdFromCourseTable)],
         });
       }
     },
@@ -210,24 +176,21 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
     [dispatch]
   );
 
-  const handleCheckBox = useCallback((e) => {
+  /*const handleCheckBox = useCallback((e) => {
     const { name, checked } = e.target;
     dispatch({
       key: name,
       value: checked,
     });
-  }, []);
+  }, []);*/
 
-  const handleInputFile = useCallback(
-    (controlName: string, file: UploadFile) => {
-      console.log(controlName);
-      dispatch({
-        key: controlName,
-        value: file,
-      });
-    },
-    []
-  );
+  const handleInputFile = useCallback((controlName: string, file: UploadFile) => {
+    console.log(controlName);
+    dispatch({
+      key: controlName,
+      value: file,
+    });
+  }, []);
 
   const handleSubmit = useCallback(
     async (event) => {
@@ -241,9 +204,10 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
   );
   /* #endregion */
   /* #region Main UI */
-  const isEqual = () => {
+
+  /* const isEqual = () => {
     return _.isEqual(state, props.defaultData);
-  };
+  };*/
 
   /**
    * https://www.geeksforgeeks.org/how-to-create-and-download-csv-file-in-javascript/
@@ -261,23 +225,12 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
   return (
     <>
       {showMentorDialog && (
-        <SelectUserDialog
-          onClose={addAchievementMentorHandler}
-          open={showMentorDialog}
-          title={tCommon('mentors')}
-        />
+        <SelectUserDialog onClose={addAchievementMentorHandler} open={showMentorDialog} title={tCommon('mentors')} />
       )}
       {showCourseListDialog && (
-        <CourseListDialog
-          onClose={onAddCourseHandler}
-          open={showCourseListDialog}
-          title={t('coursesHeadline')}
-        />
+        <CourseListDialog onClose={onAddCourseHandler} open={showCourseListDialog} title={t('coursesHeadline')} />
       )}
-      <form
-        onSubmit={handleSubmit}
-        className="w-full flex flex-col space-y-5 pl-5 py-5"
-      >
+      <form onSubmit={handleSubmit} className="w-full flex flex-col space-y-5 pl-5 py-5">
         <div className="grid grid-cols-3 gap-5">
           {/* Edit title */}
           <EhInputWithTitle2
@@ -358,9 +311,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
                   value={state.recordType ?? ''}
                 />
               </div>
-              <p className="text-stela-500">{`* ${tCommon(
-                'form-mandatory-field'
-              )}`}</p>
+              <p className="text-stela-500">{`* ${tCommon('form-mandatory-field')}`}</p>
             </div>
             {/* <CustomFileInput
               title={`${tCommon('documentation-template')} (.doc)*`}
@@ -409,9 +360,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (
                   id={AchievementKeys.EVALUATION_SCRIPT_FILE}
                   customLink={
                     scriptGoogleUrl ? (
-                      <Link href={scriptGoogleUrl}>
-                        {tCommon('download-script-file-template')}
-                      </Link>
+                      <Link href={scriptGoogleUrl}>{tCommon('download-script-file-template')}</Link>
                     ) : (
                       ''
                     )
@@ -451,11 +400,7 @@ type IPropsEhInputWithTitle2 = {
   onChangeHandler: (event: any) => void;
 } & { [key: string]: any };
 
-const EhInputWithTitle2: FC<IPropsEhInputWithTitle2> = ({
-  label,
-  onChangeHandler,
-  ...custom
-}) => {
+const EhInputWithTitle2: FC<IPropsEhInputWithTitle2> = ({ label, onChangeHandler, ...custom }) => {
   const handOnchange = useCallback(
     (event) => {
       onChangeHandler(event);
@@ -488,11 +433,7 @@ interface IProsSelect {
   [key: string]: any;
 }
 
-const EhSelectForEnum2: FC<IProsSelect> = ({
-  options,
-  onChange,
-  ...custom
-}) => {
+const EhSelectForEnum2: FC<IProsSelect> = ({ options, onChange, ...custom }) => {
   const onSelectChanged = useCallback(
     (event) => {
       onChange(event);
@@ -554,22 +495,12 @@ const CustomFileInput: FC<{
         <div className="flex flex-col space-y-1 items-center ">
           <p className="w-full">{props.title}</p>
           <div className="h-12 text-center pt-3  px-2  bg-white  w-full">
-            {fileName.trim().length > 0 ? (
-              <p>{fileName}</p>
-            ) : props.customLink ? (
-              <>{props.customLink}</>
-            ) : (
-              <></>
-            )}
+            {fileName.trim().length > 0 ? <p>{fileName}</p> : props.customLink ? <>{props.customLink}</> : <></>}
           </div>
         </div>
         <div className="pt-6 pl-1">
           <div className="h-10 w-10  rounded-full border-2 border-gray-400 flex justify-center items-center">
-            <MdUploadFile
-              size="1.5em"
-              className="cursor-pointer"
-              onClick={onClickHandler}
-            />
+            <MdUploadFile size="1.5em" className="cursor-pointer" onClick={onClickHandler} />
           </div>
           <input
             accept={props.accept}

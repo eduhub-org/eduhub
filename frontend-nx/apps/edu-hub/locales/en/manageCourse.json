@@ -20,9 +20,9 @@
   "application_history": "Application History:",
   "name": "Name",
   "participations": "Participations",
-  "last_application": "Last Activity",
+  "lastApplication": "Last Activity",
   "status": "Status",
-  "ects_total": "Total ECTS",
-  "attended_events": "Attended Events",
+  "ectsTotal": "Total ECTS",
+  "attendedEvents": "Attended Events",
   "certificate": "Certificate"
 }

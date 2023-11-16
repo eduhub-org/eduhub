@@ -1,4 +1,3 @@
-import useTranslation from 'next-translate/useTranslation';
 import Head from 'next/head';
 import { FC } from 'react';
 import { Page } from '../../components/Page';
@@ -12,7 +11,7 @@ import ProfileOverview from '../../components/ProfileContent/ProfileOverview';
 // });
 
 const Profile: FC = () => {
-  const { t } = useTranslation('users');
+  //const { t } = useTranslation('users');
   const isLoggedIn = useIsLoggedIn();
 
   return (

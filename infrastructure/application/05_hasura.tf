@@ -7,7 +7,7 @@ resource "google_secret_manager_secret" "cloud_function" {
   provider  = google-beta
   secret_id = "cloud-function"
   replication {
-    automatic = true
+    auto {}
   }
 }
 # Set the password for the Hasura cloud function secret
@@ -29,7 +29,7 @@ resource "google_secret_manager_secret" "hasura_graphql_admin_key" {
   provider  = google-beta
   secret_id = "hasura-graphql-admin-key"
   replication {
-    automatic = true
+    auto {}
   }
 }
 # Set the password for the Hasura graphql admin in the Google secret manager
