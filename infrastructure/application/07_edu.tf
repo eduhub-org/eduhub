@@ -12,7 +12,7 @@ resource "google_secret_manager_secret" "nextauth_secret" {
   provider  = google-beta
   secret_id = "nextauth-secret"
   replication {
-    automatic = true
+    auto {}
   }
 }
 # Set the password of the NextAuth secret
@@ -35,7 +35,7 @@ resource "google_secret_manager_secret" "keycloak_hasura_client_secret" {
   provider  = google-beta
   secret_id = "keycloak-hasura-client-secret"
   replication {
-    automatic = true
+    auto {}
   }
 }
 # Set the password of the Keycloak client secret for Hasura

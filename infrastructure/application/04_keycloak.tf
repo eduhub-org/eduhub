@@ -7,7 +7,7 @@ resource "google_secret_manager_secret" "keycloak_pw" {
   provider  = google-beta
   secret_id = "keycloak-pw"
   replication {
-    automatic = true
+    auto {}
   }
 }
 # Set the password for the Keycloak console
