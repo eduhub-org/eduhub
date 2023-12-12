@@ -99,7 +99,6 @@ export enum AchievementOption_select_column {
   created_at = "created_at",
   csvTemplateUrl = "csvTemplateUrl",
   description = "description",
-  documentationTemplateUrl = "documentationTemplateUrl",
   evaluationScriptUrl = "evaluationScriptUrl",
   id = "id",
   published = "published",
@@ -133,7 +132,6 @@ export enum AchievementOption_update_column {
   created_at = "created_at",
   csvTemplateUrl = "csvTemplateUrl",
   description = "description",
-  documentationTemplateUrl = "documentationTemplateUrl",
   evaluationScriptUrl = "evaluationScriptUrl",
   id = "id",
   published = "published",
@@ -1857,7 +1855,6 @@ export interface AchievementOption_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   csvTemplateUrl?: String_comparison_exp | null;
   description?: String_comparison_exp | null;
-  documentationTemplateUrl?: String_comparison_exp | null;
   evaluationScriptUrl?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
@@ -1880,7 +1877,6 @@ export interface AchievementOption_insert_input {
   created_at?: any | null;
   csvTemplateUrl?: string | null;
   description?: string | null;
-  documentationTemplateUrl?: string | null;
   evaluationScriptUrl?: string | null;
   id?: number | null;
   published?: boolean | null;
@@ -1898,7 +1894,6 @@ export interface AchievementOption_max_order_by {
   created_at?: order_by | null;
   csvTemplateUrl?: order_by | null;
   description?: order_by | null;
-  documentationTemplateUrl?: order_by | null;
   evaluationScriptUrl?: order_by | null;
   id?: order_by | null;
   title?: order_by | null;
@@ -1913,7 +1908,6 @@ export interface AchievementOption_min_order_by {
   created_at?: order_by | null;
   csvTemplateUrl?: order_by | null;
   description?: order_by | null;
-  documentationTemplateUrl?: order_by | null;
   evaluationScriptUrl?: order_by | null;
   id?: order_by | null;
   title?: order_by | null;
@@ -1950,7 +1944,6 @@ export interface AchievementOption_order_by {
   created_at?: order_by | null;
   csvTemplateUrl?: order_by | null;
   description?: order_by | null;
-  documentationTemplateUrl?: order_by | null;
   evaluationScriptUrl?: order_by | null;
   id?: order_by | null;
   published?: order_by | null;
@@ -1968,7 +1961,6 @@ export interface AchievementOption_set_input {
   created_at?: any | null;
   csvTemplateUrl?: string | null;
   description?: string | null;
-  documentationTemplateUrl?: string | null;
   evaluationScriptUrl?: string | null;
   id?: number | null;
   published?: boolean | null;

@@ -125,10 +125,6 @@ export interface AchievementOptionList_AchievementOption {
    */
   recordType: AchievementRecordType_enum;
   /**
-   * An instructor or project mentor can provide a template for the record that must be uploaded to complete this achievement
-   */
-  documentationTemplateUrl: string | null;
-  /**
    * If the record tye is "DOCUMENTATION_AND_CSV" an URL to a python script can be provided that returns a score for uploaded csv data.
    */
   evaluationScriptUrl: string | null;

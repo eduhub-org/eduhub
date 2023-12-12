@@ -1,3 +1,6 @@
 {
-  "addUserAchievementDocumentationTemplateText": "Vorlage hinzufügen"
+  "addUserAchievementDocumentationTemplateText": "Vorlage hinzufügen",
+  "url": "URL",
+  "title": "Titel",
+  "delete": "Löschen"
 }

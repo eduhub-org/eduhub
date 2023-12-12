@@ -25,6 +25,10 @@ import {
   InsertAchievementDocumentationTemplate,
   InsertAchievementDocumentationTemplateVariables,
 } from '../../queries/__generated__/InsertAchievementDocumentationTemplate';
+import {
+  DeleteAchievementDocumentationTemplate,
+  DeleteAchievementDocumentationTemplateVariables,
+} from '../../queries/__generated__/DeleteAchievementDocumentationTemplate';
 
 const ManageAchievementTemplatesContent: FC = () => {
   const { data, loading, error, refetch } = useAdminQuery<AchievementDocumentationTemplates>(
@@ -34,6 +38,10 @@ const ManageAchievementTemplatesContent: FC = () => {
     InsertAchievementDocumentationTemplate,
     InsertAchievementDocumentationTemplateVariables
   >(INSERT_ACHIEVEMENT_DOCUMENTATION_TEMPLATE);
+    const [deleteAchievementDocumentationTemplate] = useAdminMutation<
+      DeleteAchievementDocumentationTemplate,
+      DeleteAchievementDocumentationTemplateVariables
+    >(DELETE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE);
 
   const { t } = useTranslation('manageAchievementTemplates');
 
@@ -72,7 +80,7 @@ const ManageAchievementTemplatesContent: FC = () => {
         ),
       },
     ],
-    []
+    [t]
   );
 
   const onAddAchievementDocumentationTemplateClick = async () => {
@@ -97,13 +105,17 @@ const ManageAchievementTemplatesContent: FC = () => {
         {error && <div>Es ist ein Fehler aufgetreten</div>}
         {!loading && !error && (
           <div>
-            <EhAddButton
-              buttonClickCallBack={onAddAchievementDocumentationTemplateClick}
-              text={t('addUserAchievementDocumentationTemplateText')}
-            />
+            <div className="text-white">
+              <EhAddButton
+                buttonClickCallBack={onAddAchievementDocumentationTemplateClick}
+                text={t('addUserAchievementDocumentationTemplateText')}
+              />
+            </div>
             <TableGrid
               columns={columns}
               data={data.AchievementDocumentationTemplate}
+              deleteMutation={DELETE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE}
+              refetchQueries={['AchievementDocumentationTemplates']}
               showDelete
               translationNamespace="manageAchievementTemplates"
             />

@@ -16,7 +16,6 @@ export interface TempAchievementOptionCourse {
 export interface IDataToManipulate {
   achievementOptionId: number | null;
   description: string | null;
-  documentationTemplateUrl: string | null;
   evaluationScriptUrl: string | null;
   recordType: AchievementRecordType_enum | null;
   title: string | null;
@@ -96,7 +95,6 @@ export type MinAchievementOption = AtLeast<{
   title: string;
   description: string;
   recordType: AchievementRecordType_enum;
-  documentationTemplateUrl: string;
   evaluationScriptUrl: string;
   csvTemplateUrl: string | null;
 }>;

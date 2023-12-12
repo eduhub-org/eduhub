@@ -1,3 +1,6 @@
 {
-  "addUserAchievementDocumentationTemplateText": "Add template"
+  "addUserAchievementDocumentationTemplateText": "Add template",
+  "url": "URL",
+  "title": "Title",
+  "delete": "Delete"
 }
