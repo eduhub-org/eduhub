@@ -3919,6 +3919,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/match-sorter-utils@npm:^8.8.4":
+  version: 8.8.4
+  resolution: "@tanstack/match-sorter-utils@npm:8.8.4"
+  dependencies:
+    remove-accents: 0.4.2
+  checksum: d005f500754f52ef94966cbbe4217f26e7e3c07291faa2578b06bca9a5abe01689569994c37a1d01c6e783addf5ffbb28fa82eba7961d36eabf43ec43d1e496b
+  languageName: node
+  linkType: hard
+
 "@tanstack/react-table@npm:^8.10.7":
   version: 8.10.7
   resolution: "@tanstack/react-table@npm:8.10.7"
@@ -14332,6 +14341,7 @@ __metadata:
     "@nrwl/workspace": 15.8.7
     "@tailwindcss/line-clamp": ^0.4.2
     "@tailwindcss/typography": ^0.5.10
+    "@tanstack/match-sorter-utils": ^8.8.4
     "@tanstack/react-table": ^8.10.7
     "@testing-library/react": 13.3.0
     "@types/cookie": ^0.5.1
@@ -16015,6 +16025,13 @@ __metadata:
     mdast-util-to-hast: ^12.1.0
     unified: ^10.0.0
   checksum: b9ac8acff3383b204dfdc2599d0bdf86e6ca7e837033209584af2e6aaa6a9013e519a379afa3201299798cab7298c8f4b388de118c312c67234c133318aec084
+  languageName: node
+  linkType: hard
+
+"remove-accents@npm:0.4.2":
+  version: 0.4.2
+  resolution: "remove-accents@npm:0.4.2"
+  checksum: 84a6988555dea24115e2d1954db99509588d43fe55a1590f0b5894802776f7b488b3151c37ceb9e4f4b646f26b80b7325dcea2fae58bc3865df146e1fa606711
   languageName: node
   linkType: hard
 
