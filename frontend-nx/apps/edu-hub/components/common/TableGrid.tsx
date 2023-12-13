@@ -14,7 +14,11 @@ import {
 
 import TableGridDeleteButton from './TableGridDeleteButton';
 
-interface TableGridProps<T extends object> {
+interface BaseRow {
+  id: number;
+}
+
+interface TableGridProps<T extends BaseRow> {
   data: T[];
   columns: ColumnDef<T>[];
   deleteMutation?: DocumentNode;
@@ -24,7 +28,7 @@ interface TableGridProps<T extends object> {
   translationNamespace?: string;
 }
 
-const TableGrid = <T extends object>({
+const TableGrid = <T extends BaseRow>({
   data,
   columns,
   deleteMutation,
@@ -43,7 +47,6 @@ const TableGrid = <T extends object>({
       ? [
           {
             id: 'selection',
-            accessorFn: (row) => row.name,
             cell: ({ row }) => <input type="checkbox" />,
           },
         ]
@@ -60,7 +63,6 @@ const TableGrid = <T extends object>({
         ? [
             {
               id: 'delete',
-              accessorFn: (row) => row.name,
               cell: ({ row }) =>
                 deleteMutation && (
                   <TableGridDeleteButton deleteMutation={deleteMutation} id={row.original.id} refetchQueries={refetchQueries} />
@@ -86,6 +88,7 @@ const TableGrid = <T extends object>({
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     debugTable: true,
+    getRowId: (row) => row.id.toString(),
   });
 
   return (
