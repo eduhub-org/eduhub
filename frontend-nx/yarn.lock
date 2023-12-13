@@ -13757,9 +13757,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-auth@npm:^4.20.1":
-  version: 4.20.1
-  resolution: "next-auth@npm:4.20.1"
+"next-auth@npm:^4.24.5":
+  version: 4.24.5
+  resolution: "next-auth@npm:4.24.5"
   dependencies:
     "@babel/runtime": ^7.20.13
     "@panva/hkdf": ^1.0.2
@@ -13771,14 +13771,14 @@ __metadata:
     preact-render-to-string: ^5.1.19
     uuid: ^8.3.2
   peerDependencies:
-    next: ^12.2.5 || ^13
+    next: ^12.2.5 || ^13 || ^14
     nodemailer: ^6.6.5
     react: ^17.0.2 || ^18
     react-dom: ^17.0.2 || ^18
   peerDependenciesMeta:
     nodemailer:
       optional: true
-  checksum: f3414533716e7cc4f80bf070e4eec95e4dced331694e6dd446704b73145804585962be6e107946bdedab05d392b20dad7a7b62ac6cd0bfade0482a0a9d741c0b
+  checksum: 7cc49385123690ccb908f4552b75012717c4e45205a9fdc7cf48cd730dbcc7823a3e33e2a2073ecf1edae5c1980123f68678fd4af9198ea21ab0decb630cc71e
   languageName: node
   linkType: hard
 
@@ -14391,7 +14391,7 @@ __metadata:
     kleur: ^4.1.5
     lodash: ^4.17.21
     next: 13.2.4
-    next-auth: ^4.20.1
+    next-auth: ^4.24.5
     next-translate: ^1.6.0
     nx: 15.8.7
     papaparse: ^5.3.2
