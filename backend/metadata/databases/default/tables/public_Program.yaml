@@ -1,6 +1,13 @@
 table:
   name: Program
   schema: public
+object_relationships:
+  - name: CertificateTemplateText
+    using:
+      foreign_key_constraint_on: achievementCertificateTemplateTextId
+  - name: certificateTemplateTextByAttendancecertificatetemplatetextid
+    using:
+      foreign_key_constraint_on: attendanceCertificateTemplateTextId
 array_relationships:
   - name: Courses
     using:
