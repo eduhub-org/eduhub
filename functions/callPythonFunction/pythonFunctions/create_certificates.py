@@ -69,9 +69,6 @@ from functions.callPythonFunction.api_clients.storage_client import StorageClien
 '''
 
 
-# Umgebung für Jinja2 Template-Rendering
-env = Environment(loader=FileSystemLoader('/path/zu/unseren/templates'))
-
 
 def create_certificate(enrollment, certificate_type, bucket_name):
     # Zertifikatsdaten vorbereiten
@@ -80,7 +77,7 @@ def create_certificate(enrollment, certificate_type, bucket_name):
 
     # Generieren des PDFs und Hochladen auf GCS
     pdf_file_name = generate_pdf_file_name(enrollment, certificate_type)
-    pdf_url = generate_pdf_and_upload_to_gcs(certificate_data, html_template, bucket_name, pdf_file_name)
+    pdf_url = generate_pdf_and_upload_to_gcs(certificate_data, enrollment, certificate_type, bucket_name, pdf_file_name)
 
     # Aktualisieren des Kursanmeldedatensatzes
     update_course_enrollment_record(enrollment['User']['id'], enrollment['Course']['id'], pdf_url)
@@ -127,8 +124,21 @@ def generate_pdf(data, image, html):
 def generate_pdf_file_name(enrollment, certificate_type):
     return f"{enrollment['User']['id']}/{enrollment['Course']['id']}/{certificate_type}_certificate.pdf"
 
-def generate_pdf_and_upload_to_gcs(data, template_name, bucket_name, pdf_file_name):
-    template = env.get_template(template_name)
+def download_template(url):
+    response = requests.get(url)
+    response.raise_for_status()  # Stellt sicher, dass die Anfrage erfolgreich war
+    return response.text
+
+def generate_pdf_and_upload_to_gcs(data, enrollment, certificate_type, bucket_name, pdf_file_name):
+    if certificate_type == "attendance":
+        template_url = enrollment["Course"]["Program"]["attendanceCertificateTemplateURL"]
+    elif certificate_type =="achievement":
+        template_url = enrollment["Course"]["Program"]["achievementCertificateTemplateURL"]
+
+    template_content = download_template(template_url)
+    #Jinja Environment erstellen und Template aus String laden 
+    env = Environment()
+    template = env.from_string(template_content)
     html_content = template.render(data)
 
     pdf = HTML(string=html_content).write_pdf()
