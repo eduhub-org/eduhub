@@ -265,6 +265,93 @@ INSERT INTO public."CourseInstructor" VALUES (10, 8, 2, '2022-12-17 22:20:20.615
 INSERT INTO public."CourseInstructor" VALUES (11, 8, 4, '2022-12-17 22:20:20.615952+00', '2022-12-17 22:20:20.615952+00');
 INSERT INTO public."CourseEnrollment" VALUES (21, 8, '152f12c3-f7d2-4b73-8d29-603c164b0139', 'CONFIRMED', 'The cat looks perfect', 'INVITE', NULL, NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', '2022-11-01');
 
+INSERT INTO public."CertificateTemplateText" VALUES (
+    1, 
+    'achievement certificate example', 
+    '<html>
+      <head>
+        <meta charset=''utf-8'' />
+        <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap" rel="stylesheet"> 
+      </head>
+      <body style="height:297mm; width:210mm; margin: 0px;font-family: ''Lato'', sans-serif !important;padding: 0px">
+        <img src="{{ template }}" style="height:297mm;width:210mm" >
+        <div style="position:absolute;top:0mm;left:63mm;width:130mm;height:100%;">
+          <span style="position:absolute;top:50mm;font-size:7mm;color:#777777 !important;text-align:left;width:100%">{{ full_name }}</span>  
+          <span style="position:absolute;top:63mm;font-size:3.5mm;color:#777777 !important;text-align:left;width:100%">
+            hat im {{ semester }} an dem Kurs
+          </span>
+          <span style="position:absolute;top:64mm;font-size:7mm;color:#777777 !important;text-align:left;width:100%"></br>{{ course_name }}</span>  
+          <span style="position:absolute;top:90mm;font-size:3.5mm;color:#999999 !important">
+            <p>an folgenden Terminen teilgenommen:</p>
+            <p>         
+              <ul>
+                {% for event in event_entries %}
+                    <li>{{ event }} </li>
+                {% endfor %}
+              </ul>
+            </p>
+            <p>
+              </br>
+              Bei dem Kurs handelt es sich um ein interdisziplinäres Weiterbildungsangebot im </br>
+              Rahmen des Kieler Bildungsclusters opencampus.sh. </br>
+              Das Modul wird über das Zentrum für Schlüsselqualifikationen an der Christian-Albrechts-Universität zu Kiel angeboten.
+            </p>
+          </span>
+        </div>
+      </body>
+    </html>', 
+    '2023-12-14 13:40:34.079378+00', 
+    '2023-12-14 13:55:01.645233+00'
+);
+INSERT INTO public."CertificateTemplateText" VALUES (
+    2, 
+    'attendance certificate example', 
+    '<html>
+      <head>
+        <meta charset=''utf-8'' />
+        <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap" rel="stylesheet"> 
+      </head>
+      <body style="height:297mm; width:210mm; margin: 0px;font-family: ''Lato'', sans-serif !important;padding: 0px">
+        <img src="{{ template }}" style="height:297mm;width:210mm" >
+        <div style="position:absolute;top:0mm;left:63mm;width:130mm;height:100%;">
+          <span style="position:absolute;top:50mm;font-size:7mm;color:#777777 !important;text-align:left;width:100%">{{ full_name }}</span>  
+          <span style="position:absolute;top:63mm;font-size:3.5mm;color:#777777 !important;text-align:left;width:100%">
+            hat im {{ semester }} erfolgreich an dem Kurs
+          </span>
+          <span style="position:absolute;top:64mm;font-size:7mm;color:#777777 !important;text-align:left;width:100%"></br>{{ course_name }}</span>  
+          <span style="position:absolute;top:90mm;font-size:3.5mm;color:#999999 !important">
+            <p>teilgenommen.</p>
+            <p>
+              Bei dem Kurs handelt es sich um ein interdisziplinäres Weiterbildungsangebot im </br>
+              Rahmen des Kieler Bildungsclusters opencampus.sh. </br>
+              Das Modul wird über das Zentrum für Schlüsselqualifikationen an der Christian-Albrechts-Universität zu Kiel angeboten.
+            </p>
+            <p>
+              <b>Für den Abschluss des Kurses wurde ein Arbeitsumfang entsprechend von {{ ects }} ECTS erbracht. Dazu hat die/der Teilnehmende</b>
+              <ul>
+                <li>aktiv an den Kursterminen teilgenommen,</li>
+                {% if not practical_project.blank %}
+                  <li>das Praxisprojekt "{{ practical_project }}" erfolgreich abgeschlossen</li>
+                {% endif %}
+                {% if not online_courses.blank %}
+                  <li>die begleitenden Online-Kurse erfolgreich abgeschlossen: {{ online_courses }}</li>
+                {% endif %}
+              </ul>
+            </p>
+            <p>
+              {{ markdown }}
+              <b>Durch den erfolgreichen Abschluss des Kurses hat die/der Teilnehmende gelernt:</b></br>      
+              {{ certificate_text }}
+            </p>
+          </span>
+        </div>
+      </body>
+    </html>', 
+    '2023-12-14 13:40:34.079378+00', 
+    '2023-12-14 13:55:01.645233+00'
+);
+
+
 
 --INSERT INTO public."Attendance" VALUES (1, 1, '3dee812b-865e-497b-b247-ff3a6a978530', 'ATTENDED', '2022-12-19 13:55:28.341956+00', '2022-12-19 13:55:28.341956+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
 --INSERT INTO public."Attendance" VALUES (2, 2, '3dee812b-865e-497b-b247-ff3a6a978530', 'ATTENDED', '2022-12-19 13:55:28.893252+00', '2022-12-19 13:55:28.893252+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
