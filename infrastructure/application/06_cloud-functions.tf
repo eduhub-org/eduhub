@@ -1,4 +1,31 @@
 ###############################################################################
+# Create Google Cloud Function Service Account
+#####
+resource "google_service_account" "custom_cloud_function_account" {
+  account_id   = "custom-cloud-function-account"
+  display_name = "Custom Cloud Function Service Account"
+  project      = var.project_id
+}
+resource "google_project_iam_member" "cloud_functions_developer" {
+  project = var.project_id
+  role    = "roles/cloudfunctions.developer"
+  member  = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+}
+
+resource "google_project_iam_member" "storage_object_admin" {
+  project = var.project_id
+  role    = "roles/storage.objectAdmin"
+  member  = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+}
+
+resource "google_project_iam_member" "service_account_token_creator" {
+  project = var.project_id
+  role    = "roles/iam.serviceAccountTokenCreator"
+  member  = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+}
+
+
+###############################################################################
 # Create Google Cloud Function Services
 #####
 
@@ -58,6 +85,7 @@ resource "google_cloudfunctions2_function" "call_python_function" {
     available_memory   = "256M"
     timeout_seconds    = 3600
     ingress_settings   = var.cloud_function_ingress_settings
+    service_account_email = google_service_account.custom_cloud_function_account.email
   }
 }
 
