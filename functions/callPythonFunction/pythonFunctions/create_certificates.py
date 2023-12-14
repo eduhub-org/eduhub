@@ -69,9 +69,6 @@ from functions.callPythonFunction.api_clients.storage_client import StorageClien
 '''
 
 
-# Umgebung für Jinja2 Template-Rendering
-env = Environment(loader=FileSystemLoader('/path/zu/unseren/templates'))
-
 
 def create_certificate(enrollment, certificate_type, bucket_name):
     # Zertifikatsdaten vorbereiten
@@ -139,7 +136,7 @@ def generate_pdf_and_upload_to_gcs(data, enrollment, certificate_type, bucket_na
         template_url = enrollment["Course"]["Program"]["achievementCertificateTemplateURL"]
 
     template_content = download_template(template_url)
-    #Jinja Environment erstellen und Template aus String laden
+    #Jinja Environment erstellen und Template aus String laden 
     env = Environment()
     template = env.from_string(template_content)
     html_content = template.render(data)
