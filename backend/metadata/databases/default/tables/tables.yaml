@@ -11,6 +11,7 @@
 - "!include public_Attendance.yaml"
 - "!include public_AttendanceSource.yaml"
 - "!include public_AttendanceStatus.yaml"
+- "!include public_CertificateTemplateText.yaml"
 - "!include public_Course.yaml"
 - "!include public_CourseDegree.yaml"
 - "!include public_CourseEnrollment.yaml"

@@ -1,0 +1,3 @@
+table:
+  name: CertificateTextTemplate
+  schema: public
