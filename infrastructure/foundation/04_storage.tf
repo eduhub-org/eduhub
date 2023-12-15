@@ -12,8 +12,8 @@ resource "google_storage_bucket" "main" {
       type = "Delete"
     }
     condition {
-      age              = 7
-      with_prefix      = "temp/"
+      age            = 7
+      matches_prefix = "temp/"
     }
   }
 }
