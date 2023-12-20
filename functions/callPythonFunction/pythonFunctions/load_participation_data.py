@@ -46,7 +46,7 @@ def load_participation_data(hasura_secret, arguments):
     )
 
     logging.info(
-        "CSV with participation data for program %s saved under http://%s",
+        "CSV with participation data for program %s saved under %s",
         program_id,
         url,
     )

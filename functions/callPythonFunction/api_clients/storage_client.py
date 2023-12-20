@@ -1,12 +1,13 @@
-import datetime
-import io
 import logging
 import os
+import io
+
 from typing import Optional
-from google.cloud.storage import Client
+from datetime import timedelta
+
 from google import auth
 from google.auth.transport import requests
-import google_auth_oauthlib
+from google.cloud.storage import Client
 
 
 class StorageClient:
@@ -92,7 +93,15 @@ class StorageClient:
     #         blob = self.storage_client.bucket(self.bucket_name).blob(blob_name)
     #         blob.upload_from_filename(file_path)
 
-    def make_signed_upload_url(self, blob: google_auth_oauthlib.cloud.storage.blob.Blob, exp: Optional[datetime.timedelta] = None, content_type="application/octet-stream", min_size=1, max_size=int(1e6)):
+    def make_signed_upload_url(
+        self,
+        bucket: str,
+        blob: str,
+        exp: Optional[timedelta] = None,
+        content_type="application/octet-stream",
+        min_size=1,
+        max_size=int(1e6),
+    ):
         """
         Compute a GCS signed upload URL without needing a private key file.
         Can only be called when a service account is used as the application
@@ -104,8 +113,10 @@ class StorageClient:
 
         Parameters
         ----------
-        blob : google.cloud.storage.blob.Blob
-            Object that contains the blob information.
+        bucket : str
+            Name of the GCS bucket the signed URL will reference.
+        blob : str
+            Name of the GCS blob (in `bucket`) the signed URL will reference.
         exp : timedelta, optional
             Time from now when the signed url will expire.
         content_type : str, optional
@@ -119,7 +130,49 @@ class StorageClient:
             If the file is larger than this, GCS will return a 400 code on upload.
         """
         if exp is None:
-            exp = datetime.timedelta(hours=1)
+            exp = timedelta(hours=1)
+        credentials, project_id = auth.default()
+        if credentials.token is None:
+            # Perform a refresh request to populate the access token of the
+            # current credentials.
+            credentials.refresh(requests.Request())
+        client = Client()
+        bucket = client.get_bucket(bucket)
+        blob = bucket.blob(blob)
+
+        return blob.generate_signed_url(
+            version="v4",
+            expiration=exp,
+            service_account_email=credentials.service_account_email,
+            access_token=credentials.token,
+            method="PUT",
+            content_type=content_type,
+            headers={
+                "X-Goog-Content-Length-Range": f"{min_size},{max_size}",
+            },
+        )
+
+    def make_signed_download_url(
+        self,
+        blob,
+        exp: Optional[timedelta] = None,
+    ):
+        """
+        Compute a GCS signed upload URL without needing a private key file.
+        Can only be called when a service account is used as the application
+        default credentials, and when that service account has the proper IAM
+        roles, like `roles/storage.objectCreator` for the bucket, and
+        `roles/iam.serviceAccountTokenCreator`.
+
+        Parameters
+        ----------
+        blob
+            Object including the uploaded blob
+        exp : timedelta, optional
+            Time from now when the signed url will expire.
+        """
+        if exp is None:
+            exp = timedelta(hours=1)
         credentials, project_id = auth.default()
         if credentials.token is None:
             # Perform a refresh request to populate the access token of the
@@ -128,14 +181,14 @@ class StorageClient:
         # client = Client()
         # bucket = client.get_bucket(bucket)
         # blob = bucket.blob(blob)
+
         return blob.generate_signed_url(
             version="v4",
             expiration=exp,
             service_account_email=credentials.service_account_email,
             access_token=credentials.token,
-            method="PUT",
-            content_type=content_type,
-            headers={"X-Goog-Content-Length-Range": f"{min_size},{max_size}"}
+            method="GET",
+            headers={},
         )
 
     def upload_csv_from_dataframe(self, path, blob_name, dataframe, **csv_args):
@@ -148,10 +201,14 @@ class StorageClient:
 
         # Set default values for separator and decimal. If provided in csv_args, they will overwrite these.
         default_csv_args = {"sep": ";", "decimal": ","}
-        default_csv_args.update(csv_args)  # merge default args with any provided csv_args
+        default_csv_args.update(
+            csv_args
+        )  # merge default args with any provided csv_args
 
         if self.env == "development":
-            local_container_path = os.path.join("/home/node/www/", self.bucket_name, full_blob_path)
+            local_container_path = os.path.join(
+                "/home/node/www/", self.bucket_name, full_blob_path
+            )
             logging.debug(f"local container path: {local_container_path}")
             os.makedirs(os.path.dirname(local_container_path), exist_ok=True)
             dataframe.to_csv(local_container_path, **default_csv_args)
@@ -163,13 +220,12 @@ class StorageClient:
             buffer.seek(0)  # Reset buffer position to the beginning after writing
 
             blob = self.storage_client.bucket(self.bucket_name).blob(full_blob_path)
-            blob.upload_from_file(buffer, content_type='text/csv')
+            blob.upload_from_file(buffer, content_type="text/csv")
+            logging.debug(f"file uploaded to {blob.name}")
 
             # Generate signed URL with access token
-            url = self.make_signed_upload_url(
-                blob,
-                exp=datetime.timedelta(minutes=15),
-                content_type="text/csv",
+            url = self.make_signed_download_url(
+                blob=blob,
+                exp=timedelta(minutes=15),
             )
-
             return url
