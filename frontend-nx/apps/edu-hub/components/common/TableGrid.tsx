@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { IconButton } from '@material-ui/core';
+import { IconButton, TextField } from '@material-ui/core';
 import { MdDelete } from 'react-icons/md';
 import useTranslation from 'next-translate/useTranslation';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
@@ -9,15 +9,19 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
+  getFilteredRowModel,
   SortingState,
   useReactTable,
+  FilterFn,
 } from '@tanstack/react-table';
+import { rankItem } from '@tanstack/match-sorter-utils';
 
 interface TableGridProps<T extends object> {
   data: T[];
   columns: ColumnDef<T>[];
   showCheckbox?: boolean;
   showDelete?: boolean;
+  showGlobalSearchField?: boolean;
   translationNamespace?: string;
 }
 
@@ -26,11 +30,25 @@ const TableGrid = <T extends object>({
   columns,
   showCheckbox,
   showDelete,
+  showGlobalSearchField = true,
   translationNamespace,
 }: TableGridProps<T>) => {
   const { t } = useTranslation(translationNamespace);
 
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+
+  // Global filter function
+  const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+    // Rank the item
+    const itemRank = rankItem(row.getValue(columnId), value);
+    // Store the itemRank info
+    addMeta({
+      itemRank,
+    });
+    // Return if the item should be filtered in/out
+    return itemRank.passed;
+  };
 
   const tableColumns = useMemo(() => {
     // Create the checkbox column if needed
@@ -76,17 +94,48 @@ const TableGrid = <T extends object>({
       enableSorting: false,
     },
     columns: tableColumns,
+    filterFns: {
+      fuzzy: fuzzyFilter,
+    },
     state: {
       sorting,
+      globalFilter,
     },
+    globalFilterFn: fuzzyFilter,
+    onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     debugTable: true,
   });
 
   return (
     <div>
+      {/* Global Search Input */}
+      {showGlobalSearchField && (
+        <div className="flex justify-end">
+          <TextField
+            className="!w-64 bg-gray-600 border !mb-6"
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            label="Search"
+            variant="outlined"
+            size="small"
+            fullWidth
+            InputProps={{
+              style: {
+                color: 'white', // Text color
+                borderColor: 'white', // Border color,
+              },
+            }}
+            InputLabelProps={{
+              style: { color: 'white' }, // Label color
+            }}
+          />
+        </div>
+      )}
+
       {/* Header row for column names */}
       <div>
         {table.getHeaderGroups().map((headerGroup) => (

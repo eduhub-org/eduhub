@@ -117,6 +117,7 @@ select_permissions:
         - newsletterRegistration
         - otherUniversity
         - picture
+        - status
         - university
       filter:
         id:
