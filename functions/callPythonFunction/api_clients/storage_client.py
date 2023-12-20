@@ -199,8 +199,8 @@ class StorageClient:
 
         full_blob_path = os.path.join(path, blob_name) if path else blob_name
 
-        # Set default values for separator and decimal. If provided in csv_args, they will overwrite these.
-        default_csv_args = {"sep": ";", "decimal": ","}
+        # Set default values for separator, decimal, and encoding. If provided in csv_args, they will overwrite these.
+        default_csv_args = {"sep": ";", "decimal": ",", "encoding": "utf-8"}
         default_csv_args.update(
             csv_args
         )  # merge default args with any provided csv_args
