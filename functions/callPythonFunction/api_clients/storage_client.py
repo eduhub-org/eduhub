@@ -84,14 +84,20 @@ class StorageClient:
             blob = self.storage_client.bucket(self.bucket_name).blob(blob_name)
             blob.download_to_filename(file_path)
 
-    # def upload_file(self, blob_name, file_path):
-    #     if self.env == "development":
-    #         dest_path = os.path.join(self.BUCKET_DIRECTORY, self.bucket_name, blob_name)
-    #         os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-    #         os.replace(file_path, dest_path)
-    #     else:
-    #         blob = self.storage_client.bucket(self.bucket_name).blob(blob_name)
-    #         blob.upload_from_filename(file_path)
+    def upload_file(self, path, blob_name, buffer, content_type):
+        if self.env == "development":
+            local_container_path = os.path.join(
+                "/home/node/www/", self.bucket_name, path, blob_name
+            )
+            os.makedirs(os.path.dirname(local_container_path), exist_ok=True)
+            with open(local_container_path, "w") as f:
+                f.write(buffer.getvalue())
+            return f"http://localhost:{self.STORAGE_PORT}/{self.bucket_name}/{path}/{blob_name}"
+        else:
+            full_blob_path = os.path.join(path, blob_name) if path else blob_name
+            blob = self.storage_client.bucket(self.bucket_name).blob(full_blob_path)
+            blob.upload_from_file(buffer, content_type=content_type)
+            return self.make_signed_download_url(blob=blob, exp=timedelta(minutes=15))
 
     def make_signed_upload_url(
         self,
@@ -178,9 +184,6 @@ class StorageClient:
             # Perform a refresh request to populate the access token of the
             # current credentials.
             credentials.refresh(requests.Request())
-        # client = Client()
-        # bucket = client.get_bucket(bucket)
-        # blob = bucket.blob(blob)
 
         return blob.generate_signed_url(
             version="v4",
@@ -191,41 +194,15 @@ class StorageClient:
             headers={},
         )
 
-    def upload_csv_from_dataframe(self, path, blob_name, dataframe, **csv_args):
-        """
-        Uploads a pandas DataFrame as a CSV file to the specified bucket, path, and blob_name.
-        Returns a link to the uploaded blob.
-        """
-
-        full_blob_path = os.path.join(path, blob_name) if path else blob_name
-
+    def create_csv_from_dataframe(self, dataframe, **csv_args):
         # Set default values for separator, decimal, and encoding. If provided in csv_args, they will overwrite these.
-        default_csv_args = {"sep": ";", "decimal": ",", "encoding": "utf-8"}
-        default_csv_args.update(
-            csv_args
-        )  # merge default args with any provided csv_args
+        default_csv_args = {"sep": ";", "decimal": ",", "encoding": "utf-8-sig"}
+        default_csv_args.update(csv_args)
+        buffer = io.BytesIO()
+        dataframe.to_csv(buffer, index=False, **default_csv_args)
+        buffer.seek(0)
+        return buffer
 
-        if self.env == "development":
-            local_container_path = os.path.join(
-                "/home/node/www/", self.bucket_name, full_blob_path
-            )
-            logging.debug(f"local container path: {local_container_path}")
-            os.makedirs(os.path.dirname(local_container_path), exist_ok=True)
-            dataframe.to_csv(local_container_path, **default_csv_args)
-            return f"http://localhost:{self.STORAGE_PORT}/{self.bucket_name}/{full_blob_path}"
-        else:
-            # Use a BytesIO buffer to upload the DataFrame directly to GCS
-            buffer = io.BytesIO()
-            dataframe.to_csv(buffer, index=False, **default_csv_args)
-            buffer.seek(0)  # Reset buffer position to the beginning after writing
-
-            blob = self.storage_client.bucket(self.bucket_name).blob(full_blob_path)
-            blob.upload_from_file(buffer, content_type="text/csv")
-            logging.debug(f"file uploaded to {blob.name}")
-
-            # Generate signed URL with access token
-            url = self.make_signed_download_url(
-                blob=blob,
-                exp=timedelta(minutes=15),
-            )
-            return url
+    def upload_csv_from_dataframe(self, path, blob_name, dataframe, **csv_args):
+        buffer = self.create_csv_from_dataframe(dataframe, **csv_args)
+        return self.upload_file(path, blob_name, buffer, "text/csv")
