@@ -5,6 +5,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import TableGrid from '../common/TableGrid';
 import Loading from '../common/Loading';
 import TextFieldEditor from '../common/TextFieldEditor';
+import FileUpload from '../common/forms/FileUpload';
 
 import { useAdminQuery } from '../../hooks/authedQuery';
 import {
@@ -14,6 +15,8 @@ import {
   UPDATE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE,
   UPDATE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE_TITLE,
 } from '../../queries/achievementDocumentationTemplate';
+import { SAVE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE } from '../../queries/actions';
+import { SaveAchievementDocumentationTemplate, SaveAchievementDocumentationTemplateVariables } from '../../queries/__generated__/SaveAchievementDocumentationTemplate';
 import {
   AchievementDocumentationTemplates,
   AchievementDocumentationTemplates_AchievementDocumentationTemplate,
@@ -25,10 +28,7 @@ import {
   InsertAchievementDocumentationTemplate,
   InsertAchievementDocumentationTemplateVariables,
 } from '../../queries/__generated__/InsertAchievementDocumentationTemplate';
-import {
-  DeleteAchievementDocumentationTemplate,
-  DeleteAchievementDocumentationTemplateVariables,
-} from '../../queries/__generated__/DeleteAchievementDocumentationTemplate';
+import { UpdateAchievementDocumentationTemplate, UpdateAchievementDocumentationTemplateVariables } from 'apps/edu-hub/queries/__generated__/UpdateAchievementDocumentationTemplate';
 
 const ManageAchievementTemplatesContent: FC = () => {
   const { data, loading, error, refetch } = useAdminQuery<AchievementDocumentationTemplates>(
@@ -38,10 +38,17 @@ const ManageAchievementTemplatesContent: FC = () => {
     InsertAchievementDocumentationTemplate,
     InsertAchievementDocumentationTemplateVariables
   >(INSERT_ACHIEVEMENT_DOCUMENTATION_TEMPLATE);
-    const [deleteAchievementDocumentationTemplate] = useAdminMutation<
-      DeleteAchievementDocumentationTemplate,
-      DeleteAchievementDocumentationTemplateVariables
-    >(DELETE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE);
+
+  const [updateAchievementDocumentationTemplate] = useAdminMutation<
+    UpdateAchievementDocumentationTemplate,
+    UpdateAchievementDocumentationTemplateVariables
+  >(UPDATE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE);
+
+
+const [saveAchievementDocumentationTemplate] = useAdminMutation<
+  SaveAchievementDocumentationTemplate,
+  SaveAchievementDocumentationTemplateVariables
+>(SAVE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE);
 
   const { t } = useTranslation('manageAchievementTemplates');
 
@@ -67,7 +74,6 @@ const ManageAchievementTemplatesContent: FC = () => {
       {
         accessorKey: 'url',
         accessorFn: (row) => ({ title: row.title, url: row.url }),
-        className: '',
         meta: {
           width: 3,
         },
@@ -77,6 +83,20 @@ const ManageAchievementTemplatesContent: FC = () => {
               Download
             </a>
           </div>
+        ),
+      },
+      {
+        accessorKey: 'upload',
+        accessorFn: (row) => row.id,
+        meta: {
+          width: 3,
+        },
+        cell: ({ getValue }) => (
+          <FileUpload
+            submitMutation={updateAchievementDocumentationTemplate}
+            uploadMutation={saveAchievementDocumentationTemplate}
+            uploadVariables={{ achievementDocumentationTemplateId: getValue()}}
+          />
         ),
       },
     ],

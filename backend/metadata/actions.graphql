@@ -55,6 +55,14 @@ type Mutation {
 }
 
 type Mutation {
+  saveAchievementDocumentationTemplate(
+    base64file: String!
+    achievementDocumentationTemplateId: Int!
+    filename: String!
+  ): saveFileOutput
+}
+
+type Mutation {
   saveAchievementOptionDocumentationTemplate(
     base64file: String!
     achievementOptionId: Int!

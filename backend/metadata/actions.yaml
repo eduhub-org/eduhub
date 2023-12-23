@@ -95,6 +95,17 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+  - name: saveAchievementDocumentationTemplate
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveAchievementDocumentationTemplate
   - name: saveAchievementOptionDocumentationTemplate
     definition:
       kind: synchronous

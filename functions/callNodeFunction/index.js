@@ -1,4 +1,5 @@
 import createCertificate from "./createCertificate/index.js";
+import saveAchievementDocumentationTemplate from "./saveAchievementDocumentationTemplate/index.js";
 import winston from "winston";
 
 /**
@@ -43,6 +44,10 @@ export const callNodeFunction = async (req, res) => {
       case "createCertificate":
         logger.info("Calling createCertificate function");
         await createCertificate(req, res);
+        break;
+      case "saveAchievementDocumentationTemplate":
+        logger.info("Calling saveAchievementDocumentationTemplate function");
+        await saveAchievementDocumentationTemplate(req, res);
         break;
       default:
         return res.status(404).json({
