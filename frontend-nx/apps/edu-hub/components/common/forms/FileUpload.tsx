@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useFileUploader } from '../../../hooks/fileUpload';
 
-const FileUpload = ({ uploadMutation, submitMutation, uploadVariables }) => {
+const FileUpload = ({ uploadMutation, submitMutation, uploadVariables, submitVariables }) => {
   const { register, handleSubmit } = useForm();
   const { getFileBase64, isLoading } = useFileUploader();
 
@@ -18,14 +18,16 @@ const FileUpload = ({ uploadMutation, submitMutation, uploadVariables }) => {
           ...uploadVariables
         },
       });
-      fileUrl = uploadResult.data.uploadUrl; // Assuming this is the result of the upload mutation
+      const resultData = uploadResult.data;
+      const key = Object.keys(resultData)[0];
+      fileUrl = resultData[key].path;
     }
 
     // Submit the entire form data, including the file URL
     await submitMutation({
       variables: {
-        ...data,
-        fileUrl: fileUrl,
+        ...submitVariables,
+        url: fileUrl,
         // Add other form fields here
       },
     });

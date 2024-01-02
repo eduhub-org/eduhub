@@ -1,5 +1,6 @@
 import { Storage } from "@google-cloud/storage";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
+import { replacePlaceholders } from "../lib/utils.js";
 
 /**
  * Responds to any HTTP request.
@@ -7,7 +8,7 @@ import { buildCloudStorage } from "../lib/cloud-storage.js";
  * @param {!express:Request} req HTTP request context.
  * @param {!express:Response} res HTTP response context.
  */
-const saveAchievementDocumentationTemplate = async (req, res) => {
+const saveFile = async (req, res) => {
   if (process.env.HASURA_CLOUD_FUNCTION_SECRET == req.headers.secret) {
     const storage = buildCloudStorage(Storage);
     const content = req.body.input.base64file;
@@ -16,7 +17,8 @@ const saveAchievementDocumentationTemplate = async (req, res) => {
     const filename = req.body.input.filename;
     const isPublic = false;
 
-    const path = `achievementDocumentationTemplateId_${achievementDocumentationTemplateId}/${filename}`;
+    const templatePath = req.headers["file-path"];
+    const path = replacePlaceholders(templatePath, req.body.input);
 
     const link = await storage.saveToBucket(
       path,
@@ -36,3 +38,5 @@ const saveAchievementDocumentationTemplate = async (req, res) => {
     });
   }
 };
+
+export default saveFile;

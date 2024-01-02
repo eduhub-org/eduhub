@@ -105,7 +105,9 @@ actions:
         - name: bucket
           value_from_env: HASURA_BUCKET
         - name: name
-          value: saveAchievementDocumentationTemplate
+          value: saveFile
+        - name: file-path
+          value: achievementDocumentationTemplateId_${achievementDocumentationTemplateId}/${filename}
   - name: saveAchievementOptionDocumentationTemplate
     definition:
       kind: synchronous

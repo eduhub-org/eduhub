@@ -16,7 +16,10 @@ import {
   UPDATE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE_TITLE,
 } from '../../queries/achievementDocumentationTemplate';
 import { SAVE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE } from '../../queries/actions';
-import { SaveAchievementDocumentationTemplate, SaveAchievementDocumentationTemplateVariables } from '../../queries/__generated__/SaveAchievementDocumentationTemplate';
+import {
+  SaveAchievementDocumentationTemplate,
+  SaveAchievementDocumentationTemplateVariables,
+} from '../../queries/__generated__/SaveAchievementDocumentationTemplate';
 import {
   AchievementDocumentationTemplates,
   AchievementDocumentationTemplates_AchievementDocumentationTemplate,
@@ -28,7 +31,10 @@ import {
   InsertAchievementDocumentationTemplate,
   InsertAchievementDocumentationTemplateVariables,
 } from '../../queries/__generated__/InsertAchievementDocumentationTemplate';
-import { UpdateAchievementDocumentationTemplate, UpdateAchievementDocumentationTemplateVariables } from 'apps/edu-hub/queries/__generated__/UpdateAchievementDocumentationTemplate';
+import {
+  UpdateAchievementDocumentationTemplate,
+  UpdateAchievementDocumentationTemplateVariables,
+} from 'apps/edu-hub/queries/__generated__/UpdateAchievementDocumentationTemplate';
 
 const ManageAchievementTemplatesContent: FC = () => {
   const { data, loading, error, refetch } = useAdminQuery<AchievementDocumentationTemplates>(
@@ -44,11 +50,10 @@ const ManageAchievementTemplatesContent: FC = () => {
     UpdateAchievementDocumentationTemplateVariables
   >(UPDATE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE);
 
-
-const [saveAchievementDocumentationTemplate] = useAdminMutation<
-  SaveAchievementDocumentationTemplate,
-  SaveAchievementDocumentationTemplateVariables
->(SAVE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE);
+  const [saveAchievementDocumentationTemplate] = useAdminMutation<
+    SaveAchievementDocumentationTemplate,
+    SaveAchievementDocumentationTemplateVariables
+  >(SAVE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE);
 
   const { t } = useTranslation('manageAchievementTemplates');
 
@@ -91,16 +96,17 @@ const [saveAchievementDocumentationTemplate] = useAdminMutation<
         meta: {
           width: 3,
         },
-        cell: ({ getValue }) => (
+        cell: ({ getValue, row }) => (
           <FileUpload
             submitMutation={updateAchievementDocumentationTemplate}
             uploadMutation={saveAchievementDocumentationTemplate}
-            uploadVariables={{ achievementDocumentationTemplateId: getValue()}}
+            uploadVariables={{ achievementDocumentationTemplateId: getValue() }}
+            submitVariables={{ itemId: getValue(), text: row.original.title }}
           />
         ),
       },
     ],
-    [t]
+    [t, saveAchievementDocumentationTemplate, updateAchievementDocumentationTemplate]
   );
 
   const onAddAchievementDocumentationTemplateClick = async () => {
