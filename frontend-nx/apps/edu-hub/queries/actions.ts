@@ -145,8 +145,8 @@ export const SAVE_COURSE_IMAGE = gql`
 `;
 
 export const LOAD_FILE = gql`
-  query LoadAFile($path: String!) {
-    loadAchievementCertificate(path: $path) {
+  query LoadFile($path: String!) {
+    loadFile(path: $path) {
       link
     }
   }

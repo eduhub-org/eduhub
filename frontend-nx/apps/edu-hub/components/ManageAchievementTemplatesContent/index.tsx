@@ -35,11 +35,12 @@ import {
   UpdateAchievementDocumentationTemplate,
   UpdateAchievementDocumentationTemplateVariables,
 } from 'apps/edu-hub/queries/__generated__/UpdateAchievementDocumentationTemplate';
+import FileDownload from '../common/forms/FileDownload';
 
 const ManageAchievementTemplatesContent: FC = () => {
-  const { data, loading, error, refetch } = useAdminQuery<AchievementDocumentationTemplates>(
-    ACHIEVEMENT_DOCUMENTATION_TEMPLATES
-  );
+    const { data, loading, error, refetch } = useAdminQuery<AchievementDocumentationTemplates>(
+      ACHIEVEMENT_DOCUMENTATION_TEMPLATES
+    );
   const [insertAchievementDocumentationTemplate] = useAdminMutation<
     InsertAchievementDocumentationTemplate,
     InsertAchievementDocumentationTemplateVariables
@@ -83,11 +84,7 @@ const ManageAchievementTemplatesContent: FC = () => {
           width: 3,
         },
         cell: ({ getValue }) => (
-          <div>
-            <a target="_blank" rel="noreferrer" href={getValue<{ title: string; url: string }>().url}>
-              Download
-            </a>
-          </div>
+          <FileDownload filePath={getValue<{url: string}>().url} />
         ),
       },
       {
