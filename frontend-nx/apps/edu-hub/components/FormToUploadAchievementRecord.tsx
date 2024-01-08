@@ -113,32 +113,32 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
     return { ...state, [action.type]: action.value };
   };
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [documentTemplateGoogleLink, setDocumentTemplateGoogleLink] = useState(
-    null as string
-  );
+  // const [documentTemplateGoogleLink, setDocumentTemplateGoogleLink] = useState(
+  //   null as string
+  // );
 
   /* #region database */
-  const docUrl = achievementOption.documentationTemplateUrl;
+  // const docUrl = achievementOption.documentationTemplateUrl;
   const csvUrl = achievementOption.csvTemplateUrl;
 
-  const docLoadQuery = useAuthedQuery<
-    LoadAchievementOptionDocumentationTemplate,
-    LoadAchievementOptionDocumentationTemplateVariables
-  >(LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE, {
-    variables: { path: docUrl },
-    skip: !docUrl || docUrl.trim().length === 0,
-  });
+  // const docLoadQuery = useAuthedQuery<
+  //   LoadAchievementOptionDocumentationTemplate,
+  //   LoadAchievementOptionDocumentationTemplateVariables
+  // >(LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE, {
+  //   variables: { path: docUrl },
+  //   skip: !docUrl || docUrl.trim().length === 0,
+  // });
 
-  useEffect(() => {
-    if (
-      docLoadQuery &&
-      docLoadQuery.data?.loadAchievementOptionDocumentationTemplate?.link
-    ) {
-      setDocumentTemplateGoogleLink(
-        docLoadQuery.data.loadAchievementOptionDocumentationTemplate.link
-      );
-    }
-  }, [docLoadQuery]);
+  // useEffect(() => {
+  //   if (
+  //     docLoadQuery &&
+  //     docLoadQuery.data?.loadAchievementOptionDocumentationTemplate?.link
+  //   ) {
+  //     setDocumentTemplateGoogleLink(
+  //       docLoadQuery.data.loadAchievementOptionDocumentationTemplate.link
+  //     );
+  //   }
+  // }, [docLoadQuery]);
 
   const [updateAnAchievementRecordAPI] = useAuthedMutation<
     UpdateAchievementRecordByPk,
@@ -439,7 +439,7 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
           <div className="flex flex-row gap-6">
             <p className="w-2/6">{t('documentation')} *</p>
             <div className="w-4/6">
-              <UploadUI
+              {/* <UploadUI
                 nodeBottom={
                   documentTemplateGoogleLink && (
                     <Trans
@@ -457,7 +457,7 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
                 placeholder={t('achievements-page:file-name')}
                 name="documentationUrl"
                 id="documentationUrl"
-              />
+              /> */}
             </div>
           </div>
 
