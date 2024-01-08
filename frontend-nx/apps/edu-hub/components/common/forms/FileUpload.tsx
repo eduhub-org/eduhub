@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useFileUploader } from '../../../hooks/fileUpload';
 
-const FileUpload = ({ uploadMutation, submitMutation, uploadVariables, submitVariables }) => {
+const FileUpload = ({ uploadMutation, submitMutation, uploadVariables, submitVariables, refetchQueries }) => {
   const { register, handleSubmit } = useForm();
   const { getFileBase64, isLoading } = useFileUploader();
 
@@ -28,8 +28,8 @@ const FileUpload = ({ uploadMutation, submitMutation, uploadVariables, submitVar
       variables: {
         ...submitVariables,
         url: fileUrl,
-        // Add other form fields here
       },
+      refetchQueries,
     });
   };
 

@@ -9,14 +9,14 @@ export const useFileUploader = () => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
-        console.log('FILE', file);
-        console.log('READER', reader.result);
-        console.log('OLD No U8', bytesToBase64(file));
-        console.log('OLD U8', bytesToBase64(new Uint8Array(file)));
-        resolve(reader.result);
+        const result = reader.result as string;
+        const base64String = result.split(',')[1];
+        resolve(base64String);
       };
       reader.onerror = (error) => reject(error);
     });
+
+
 
   const getFileBase64 = async (file) => {
     setIsLoading(true);

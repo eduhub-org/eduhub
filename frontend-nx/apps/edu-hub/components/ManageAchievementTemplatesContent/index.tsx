@@ -83,9 +83,7 @@ const ManageAchievementTemplatesContent: FC = () => {
         meta: {
           width: 3,
         },
-        cell: ({ getValue }) => (
-          <FileDownload filePath={getValue<{url: string}>().url} />
-        ),
+        cell: ({ getValue }) => <FileDownload filePath={getValue<{ url: string }>().url} />,
       },
       {
         accessorKey: 'upload',
@@ -99,6 +97,7 @@ const ManageAchievementTemplatesContent: FC = () => {
             uploadMutation={saveAchievementDocumentationTemplate}
             uploadVariables={{ achievementDocumentationTemplateId: getValue() }}
             submitVariables={{ itemId: getValue(), text: row.original.title }}
+            refetchQueries={['AchievementDocumentationTemplates']}
           />
         ),
       },
