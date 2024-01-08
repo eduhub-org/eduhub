@@ -128,6 +128,7 @@
   "no-achievement-option-chosen": "Kein Leistungsnachweis ausgewählt",
   "no-achievement-option": "Aktuell steht kein Leistungsnachweis für diesen Kurs zur Verfügung.",
   "upload-proof": "Nachweis hochladen",
+  "download-template": "Vorlage herunterladen",
   "last-upload-from-an-author": "Der letzte Nachweis mit Dir als Autor wurde am {{dateTime}} von {{fullName}} hochgeladen.",
   "no-proof-uploaded-by-me-as-author": "Es wurde bisher kein Nachweis mit Dir als Autor hochgeladen.",
   "confirm-online-course-description": "Hiermit bestätigst du an den erforderlichen Online-Kursen teilgenommen zu haben. Dein Leistungsnachweis ist dein Reflexionsbogen. Bitte klicke <component>HIER</component>, um ihn auszufüllen. Bei Fragen wende dich bitte an deine Kursleitung.",

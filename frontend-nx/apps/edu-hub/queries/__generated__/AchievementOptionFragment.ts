@@ -9,6 +9,12 @@ import { AchievementRecordType_enum } from "./../../__generated__/globalTypes";
 // GraphQL fragment: AchievementOptionFragment
 // ====================================================
 
+export interface AchievementOptionFragment_AchievementOptionTemplate {
+  __typename: "AchievementDocumentationTemplate";
+  title: string;
+  url: string;
+}
+
 export interface AchievementOptionFragment {
   __typename: "AchievementOption";
   id: number;
@@ -37,4 +43,8 @@ export interface AchievementOptionFragment {
    */
   showScoreAuthors: boolean | null;
   achievementDocumentationTemplateId: number | null;
+  /**
+   * An object relationship
+   */
+  AchievementOptionTemplate: AchievementOptionFragment_AchievementOptionTemplate | null;
 }

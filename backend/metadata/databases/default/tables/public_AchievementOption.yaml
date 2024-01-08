@@ -75,6 +75,7 @@ select_permissions:
   - role: user_access
     permission:
       columns:
+        - achievementDocumentationTemplateId
         - created_at
         - csvTemplateUrl
         - description

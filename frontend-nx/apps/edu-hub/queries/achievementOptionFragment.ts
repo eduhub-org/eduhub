@@ -10,5 +10,9 @@ export const ACHIEVEMENT_OPTION_FRAGMENT = gql`
     csvTemplateUrl
     showScoreAuthors
     achievementDocumentationTemplateId
+    AchievementOptionTemplate {
+      title
+      url
+    }
   }
 `;

@@ -9,6 +9,12 @@ import { AchievementOption_bool_exp, AchievementOption_order_by, AchievementReco
 // GraphQL query operation: AchievementOptionList
 // ====================================================
 
+export interface AchievementOptionList_AchievementOption_AchievementOptionTemplate {
+  __typename: "AchievementDocumentationTemplate";
+  title: string;
+  url: string;
+}
+
 export interface AchievementOptionList_AchievementOption_AchievementOptionCourses_Course_Program {
   __typename: "Program";
   id: number;
@@ -137,6 +143,10 @@ export interface AchievementOptionList_AchievementOption {
    */
   showScoreAuthors: boolean | null;
   achievementDocumentationTemplateId: number | null;
+  /**
+   * An object relationship
+   */
+  AchievementOptionTemplate: AchievementOptionList_AchievementOption_AchievementOptionTemplate | null;
   /**
    * An array relationship
    */

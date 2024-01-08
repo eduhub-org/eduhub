@@ -9,6 +9,12 @@ import { AchievementOptionCourse_bool_exp, AchievementOptionCourse_order_by, Ach
 // GraphQL query operation: AchievementOptionCourses
 // ====================================================
 
+export interface AchievementOptionCourses_AchievementOptionCourse_AchievementOption_AchievementOptionTemplate {
+  __typename: "AchievementDocumentationTemplate";
+  title: string;
+  url: string;
+}
+
 export interface AchievementOptionCourses_AchievementOptionCourse_AchievementOption {
   __typename: "AchievementOption";
   id: number;
@@ -37,6 +43,10 @@ export interface AchievementOptionCourses_AchievementOptionCourse_AchievementOpt
    */
   showScoreAuthors: boolean | null;
   achievementDocumentationTemplateId: number | null;
+  /**
+   * An object relationship
+   */
+  AchievementOptionTemplate: AchievementOptionCourses_AchievementOptionCourse_AchievementOption_AchievementOptionTemplate | null;
 }
 
 export interface AchievementOptionCourses_AchievementOptionCourse {

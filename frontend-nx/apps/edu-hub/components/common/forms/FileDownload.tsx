@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
+import React, { FC, useState } from 'react';
 import GetAppIcon from '@material-ui/icons/GetApp';
+
+import { Button } from '../Button';
 
 import { useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { LOAD_FILE } from '../../../queries/actions';
 import { LoadFile, LoadFileVariables } from '../../../queries/__generated__/LoadFile';
+import useTranslation from 'next-translate/useTranslation';
 
-const FileDownload = ({ filePath }) => {
+interface IProps {
+  filePath: string;
+  className?: string;
+  label?: string;
+  type?: 'button' | 'icon';
+}
+
+const FileDownload: FC<IProps> = ({ filePath, className, label, type = 'icon' }) => {
+  const { t } = useTranslation();
+
   const [getFileUrl, { data, loading }] = useLazyRoleQuery<LoadFile, LoadFileVariables>(LOAD_FILE, {
     variables: { path: filePath },
   });
@@ -25,8 +37,16 @@ const FileDownload = ({ filePath }) => {
     setShouldDownload(false); // Reset the flag
   }
 
+  if (type === 'button') {
+    return (
+      <Button onClick={handleDownload} disabled={loading} className={className} inverted>
+        <GetAppIcon /> {label ? label : t('common:download')}
+      </Button>
+    );
+  }
+
   return (
-    <button onClick={handleDownload} disabled={loading}>
+    <button onClick={handleDownload} disabled={loading} className={className}>
       <GetAppIcon />
     </button>
   );

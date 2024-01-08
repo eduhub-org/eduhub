@@ -92,6 +92,7 @@ interface TempUserData {
 export type AtLeastNameEmail = AtLeast<TempUserData>;
 
 export type MinAchievementOption = AtLeast<{
+  achievementDocumentationTemplateId: number;
   id: number;
   title: string;
   description: string;
