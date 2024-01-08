@@ -98,5 +98,6 @@
     "university": "Name of the university",
     "organization": "Name of the organization",
     "other": "Other"
-  }
+  },
+  "achievement-documentation-template": "Achievement Record Documentation Template"
 }

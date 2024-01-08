@@ -86,7 +86,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       )}
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/achievements">
+          <Link className="w-full text-lg" href="/achievements">
             {t('menu-administration-achievement')}
           </Link>
         </MenuItem>

@@ -36,6 +36,7 @@ export interface AchievementOptionCourses_AchievementOptionCourse_AchievementOpt
    * For TRUE the score table will include a column showing the authors; for FALSE the scores will be anonymous.
    */
   showScoreAuthors: boolean | null;
+  achievementDocumentationTemplateId: number | null;
 }
 
 export interface AchievementOptionCourses_AchievementOptionCourse {

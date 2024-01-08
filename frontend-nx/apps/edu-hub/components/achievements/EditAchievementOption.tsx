@@ -194,10 +194,10 @@ const EditAchievementOption: FC<IProps> = (props) => {
   const ao: AchievementOptionList_AchievementOption = props.achievementOption;
   useEffect(() => {
     const data: IDataToManipulate = {
+      achievementDocumentationTemplateId: ao.achievementDocumentationTemplateId,
       achievementOptionId: ao.id,
       title: ao.title,
       description: ao.description,
-      documentationTemplateUrl: ao.documentationTemplateUrl,
       evaluationScriptUrl: ao.evaluationScriptUrl,
       recordType: ao.recordType,
       showScoreAuthors: ao.showScoreAuthors,
@@ -228,7 +228,6 @@ const EditAchievementOption: FC<IProps> = (props) => {
     ao.AchievementOptionMentors,
     ao.csvTemplateUrl,
     ao.description,
-    ao.documentationTemplateUrl,
     ao.evaluationScriptUrl,
     ao.id,
     ao.recordType,
@@ -264,6 +263,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
             case AchievementKeys.DESCRIPTION:
             case AchievementKeys.SHOW_SCORE_AUTHORS:
             case AchievementKeys.RECORD_TYPE:
+            case 'achievementDocumentationTemplateId':
               await context.queryUpdateAchievementOptions(
                 data.achievementOptionId,
                 {

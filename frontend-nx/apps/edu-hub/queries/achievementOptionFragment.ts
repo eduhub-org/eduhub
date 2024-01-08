@@ -9,5 +9,6 @@ export const ACHIEVEMENT_OPTION_FRAGMENT = gql`
     evaluationScriptUrl
     csvTemplateUrl
     showScoreAuthors
+    achievementDocumentationTemplateId
   }
 `;

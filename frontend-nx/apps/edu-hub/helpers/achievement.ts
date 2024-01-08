@@ -15,6 +15,7 @@ export interface TempAchievementOptionCourse {
 }
 export interface IDataToManipulate {
   achievementOptionId: number | null;
+  achievementDocumentationTemplateId: number | null;
   description: string | null;
   evaluationScriptUrl: string | null;
   recordType: AchievementRecordType_enum | null;

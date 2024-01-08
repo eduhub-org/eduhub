@@ -32,10 +32,12 @@ import {
   LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE,
   LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT,
 } from '../../queries/actions';
-import {
-  LoadAchievementOptionDocumentationTemplate,
-  LoadAchievementOptionDocumentationTemplateVariables,
-} from '../../queries/__generated__/LoadAchievementOptionDocumentationTemplate';
+// import {
+//   LoadAchievementOptionDocumentationTemplate,
+//   LoadAchievementOptionDocumentationTemplateVariables,
+// } from '../../queries/__generated__/LoadAchievementOptionDocumentationTemplate';
+import {ACHIEVEMENT_DOCUMENTATION_TEMPLATES} from '../../queries/achievementDocumentationTemplate';
+import {AchievementDocumentationTemplates} from '../../queries/__generated__/AchievementDocumentationTemplates';
 interface IPropsAddEditAchievementTempData {
   defaultData: IDataToManipulate;
   onSaveCallBack: (data: IDataToManipulate) => Promise<ResponseToARequest>;
@@ -58,13 +60,16 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
   const [scriptGoogleUrl, setScriptGoogleUrl] = useState(null as string);
   const [documentTemplateGoogleLink, setDocumentTemplateGoogleLink] = useState(null as string);
 
-  const loadAchievementOptionDocumentationTemplate = useAdminQuery<
-    LoadAchievementOptionDocumentationTemplate,
-    LoadAchievementOptionDocumentationTemplateVariables
-  >(LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE, {
-    variables: { path: props.defaultData.documentationTemplateUrl },
-    skip: props.defaultData.documentationTemplateUrl?.trim().length === 0,
-  });
+  // const loadAchievementOptionDocumentationTemplate = useAdminQuery<
+  //   LoadAchievementOptionDocumentationTemplate,
+  //   LoadAchievementOptionDocumentationTemplateVariables
+  // >(LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE, {
+  //   variables: { path: props.defaultData.documentationTemplateUrl },
+  //   skip: props.defaultData.documentationTemplateUrl?.trim().length === 0,
+  // });
+  const loadAchievementDocumentationTemplates = useAdminQuery<
+    AchievementDocumentationTemplates
+  >(ACHIEVEMENT_DOCUMENTATION_TEMPLATES);
   const loadAchievementOptionEvaluationScript = useAdminQuery<
     LoadAchievementOptionEvaluationScript,
     LoadAchievementOptionEvaluationScriptVariables
@@ -73,14 +78,14 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
     skip: props.defaultData.evaluationScriptUrl?.trim().length === 0,
   });
   useEffect(() => {
-    if (
-      loadAchievementOptionDocumentationTemplate &&
-      loadAchievementOptionDocumentationTemplate.data?.loadAchievementOptionDocumentationTemplate?.link
-    ) {
-      setDocumentTemplateGoogleLink(
-        loadAchievementOptionDocumentationTemplate.data.loadAchievementOptionDocumentationTemplate.link
-      );
-    }
+    // if (
+    //   loadAchievementOptionDocumentationTemplate &&
+    //   loadAchievementOptionDocumentationTemplate.data?.loadAchievementOptionDocumentationTemplate?.link
+    // ) {
+    //   setDocumentTemplateGoogleLink(
+    //     loadAchievementOptionDocumentationTemplate.data.loadAchievementOptionDocumentationTemplate.link
+    //   );
+    // }
 
     if (
       loadAchievementOptionEvaluationScript &&
@@ -88,7 +93,10 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
     ) {
       setScriptGoogleUrl(loadAchievementOptionEvaluationScript.data.loadAchievementOptionEvaluationScript.link);
     }
-  }, [loadAchievementOptionDocumentationTemplate, loadAchievementOptionEvaluationScript]);
+  }, [
+    // loadAchievementOptionDocumentationTemplate,
+    loadAchievementOptionEvaluationScript,
+  ]);
 
   /* #region callbacks */
   const showAddMentorDialog = useCallback(() => {
@@ -310,24 +318,37 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
             </div>
             {state.recordType === 'DOCUMENTATION' ||
               (state.recordType === 'ONLINE_COURSE' && (
-                <CustomFileInput
-                  title={`${t(
-                    'achievements-page:uploadDocumentationTemplate'
-                  )} (.doc, .docx, .pdf, .zip, .xls, .csv)*`}
-                  name={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
-                  id={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
-                  accept=".doc, .docx, .zip, .pdf, .xls, .csv"
-                  onChangeHandler={handleInputFile}
-                  customLink={
-                    documentTemplateGoogleLink ? (
-                      <Link href={documentTemplateGoogleLink}>
-                        {t('achievements-page:uploadDocumentationTemplate')}
-                      </Link>
-                    ) : (
-                      ''
-                    )
-                  }
-                />
+                // <CustomFileInput
+                //   title={`${t('achievements-page:uploadDocumentationTemplate')} (.doc, .docx, .pdf, .zip, .xls, .csv)*`}
+                //   name={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
+                //   id={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
+                //   accept=".doc, .docx, .zip, .pdf, .xls, .csv"
+                //   onChangeHandler={handleInputFile}
+                //   customLink={
+                //     documentTemplateGoogleLink ? (
+                //       <Link href={documentTemplateGoogleLink}>
+                //         {t('achievements-page:uploadDocumentationTemplate')}
+                //       </Link>
+                //     ) : (
+                //       ''
+                //     )
+                //   }
+                // />
+                <div className="flex flex-col space-y-1">
+                  <p>{`${tCommon('achievement-documentation-template')}*`}</p>
+                  <EhSelectCustom
+                    onChange={handleInputChange}
+                    options={loadAchievementDocumentationTemplates.data.AchievementDocumentationTemplate.map(
+                      (template) => ({
+                        label: template.title,
+                        value: template.id,
+                      })
+                    )}
+                    name={'achievementDocumentationTemplateId'}
+                    id={'achievementDocumentationTemplateId'}
+                    value={state.achievementDocumentationTemplateId ?? ''}
+                  />
+                </div>
               ))}
             {/* {state.recordType === 'DOCUMENTATION_AND_CSV' && (
               //
@@ -433,6 +454,15 @@ interface IProsSelect {
   [key: string]: any;
 }
 
+interface IProsSelectCustom {
+  options: {
+    label: string;
+    value: number | string;
+  }[];
+  onChange: (selected: string) => void;
+  [key: string]: any;
+}
+
 const EhSelectForEnum2: FC<IProsSelect> = ({ options, onChange, ...custom }) => {
   const onSelectChanged = useCallback(
     (event) => {
@@ -461,6 +491,40 @@ const EhSelectForEnum2: FC<IProsSelect> = ({ options, onChange, ...custom }) => 
       {options.map((option) => (
         <option key={option} value={option}>
           {option}
+        </option>
+      ))}
+    </select>
+  );
+};
+
+const EhSelectCustom: FC<IProsSelectCustom> = ({ options, onChange, ...custom }) => {
+  const onSelectChanged = useCallback(
+    (event) => {
+      onChange(event);
+    },
+    [onChange]
+  );
+
+  return (
+    <select
+      className="form-select h-12
+      appearance
+      block
+      w-full
+      px-3
+      font-normal
+      bg-white
+      transition
+      ease-in-out
+      border
+      border-solid border-gray-300
+      focus:text-black focus:bg-white focus:border-blue-600 focus:outline-none"
+      onChange={onSelectChanged}
+      {...custom}
+    >
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
         </option>
       ))}
     </select>

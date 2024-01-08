@@ -98,5 +98,6 @@
     "university": "Name der Universität",
     "organization": "Name der Organisation",
     "other": "Andere Beschäftigung"
-  }
+  },
+  "achievement-documentation-template": "Leistungsnachweisvorlage"
 }
