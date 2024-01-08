@@ -4,7 +4,7 @@ import PublishIcon from '@material-ui/icons/Publish';
 
 import { useFileUploader } from '../../../hooks/fileUpload';
 
-const FileUpload = ({ uploadMutation, submitMutation, uploadVariables, submitVariables, refetchQueries }) => {
+const FileUpload = ({ id, uploadMutation, submitMutation, uploadVariables, submitVariables, refetchQueries }) => {
   const { register } = useForm();
   const { getFileBase64, isLoading } = useFileUploader();
 
@@ -51,13 +51,11 @@ const FileUpload = ({ uploadMutation, submitMutation, uploadVariables, submitVar
           disabled={isLoading}
           onChange={onFileChange}
           className="absolute opacity-0 w-0 h-0"
-          id="fileInput"
+          id={`fileInput-${id}`}
         />
         <label
-          htmlFor="fileInput"
-          className={`cursor-pointer p-2  flex items-center justify-center w-6 h-6 ${
-            isLoading ? 'opacity-50' : ''
-          }`}
+          htmlFor={`fileInput-${id}`}
+          className={`cursor-pointer p-2  flex items-center justify-center w-6 h-6 ${isLoading ? 'opacity-50' : ''}`}
         >
           <PublishIcon />
         </label>

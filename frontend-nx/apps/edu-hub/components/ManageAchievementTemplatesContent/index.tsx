@@ -93,6 +93,7 @@ const ManageAchievementTemplatesContent: FC = () => {
         },
         cell: ({ getValue, row }) => (
           <FileUpload
+            id={row.original.id}
             submitMutation={updateAchievementDocumentationTemplate}
             uploadMutation={saveAchievementDocumentationTemplate}
             uploadVariables={{ achievementDocumentationTemplateId: getValue() }}

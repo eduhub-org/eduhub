@@ -36,8 +36,8 @@ import {
 //   LoadAchievementOptionDocumentationTemplate,
 //   LoadAchievementOptionDocumentationTemplateVariables,
 // } from '../../queries/__generated__/LoadAchievementOptionDocumentationTemplate';
-import {ACHIEVEMENT_DOCUMENTATION_TEMPLATES} from '../../queries/achievementDocumentationTemplate';
-import {AchievementDocumentationTemplates} from '../../queries/__generated__/AchievementDocumentationTemplates';
+import { ACHIEVEMENT_DOCUMENTATION_TEMPLATES } from '../../queries/achievementDocumentationTemplate';
+import { AchievementDocumentationTemplates } from '../../queries/__generated__/AchievementDocumentationTemplates';
 interface IPropsAddEditAchievementTempData {
   defaultData: IDataToManipulate;
   onSaveCallBack: (data: IDataToManipulate) => Promise<ResponseToARequest>;
@@ -67,9 +67,9 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
   //   variables: { path: props.defaultData.documentationTemplateUrl },
   //   skip: props.defaultData.documentationTemplateUrl?.trim().length === 0,
   // });
-  const loadAchievementDocumentationTemplates = useAdminQuery<
-    AchievementDocumentationTemplates
-  >(ACHIEVEMENT_DOCUMENTATION_TEMPLATES);
+  const loadAchievementDocumentationTemplates = useAdminQuery<AchievementDocumentationTemplates>(
+    ACHIEVEMENT_DOCUMENTATION_TEMPLATES
+  );
   const loadAchievementOptionEvaluationScript = useAdminQuery<
     LoadAchievementOptionEvaluationScript,
     LoadAchievementOptionEvaluationScriptVariables
@@ -334,20 +334,24 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
                 //     )
                 //   }
                 // />
-                <div className="flex flex-col space-y-1">
-                  <p>{`${tCommon('achievement-documentation-template')}*`}</p>
-                  <EhSelectCustom
-                    onChange={handleInputChange}
-                    options={loadAchievementDocumentationTemplates.data.AchievementDocumentationTemplate.map(
-                      (template) => ({
-                        label: template.title,
-                        value: template.id,
-                      })
-                    )}
-                    name={'achievementDocumentationTemplateId'}
-                    id={'achievementDocumentationTemplateId'}
-                    value={state.achievementDocumentationTemplateId ?? ''}
-                  />
+                <div>
+                  {loadAchievementDocumentationTemplates?.data?.AchievementDocumentationTemplate && (
+                    <div className="flex flex-col space-y-1">
+                      <p>{`${tCommon('achievement-documentation-template')}*`}</p>
+                      <EhSelectCustom
+                        onChange={handleInputChange}
+                        options={loadAchievementDocumentationTemplates.data.AchievementDocumentationTemplate.map(
+                          (template) => ({
+                            label: template.title,
+                            value: template.id,
+                          })
+                        )}
+                        name={'achievementDocumentationTemplateId'}
+                        id={'achievementDocumentationTemplateId'}
+                        value={state.achievementDocumentationTemplateId ?? ''}
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
             {/* {state.recordType === 'DOCUMENTATION_AND_CSV' && (
