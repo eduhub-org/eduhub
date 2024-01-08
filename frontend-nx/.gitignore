@@ -49,3 +49,6 @@ Thumbs.db
 
 # Next.js
 .next
+
+# nx
+frontend-nx/.nx/cache/
