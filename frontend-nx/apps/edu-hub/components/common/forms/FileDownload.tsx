@@ -27,7 +27,6 @@ const FileDownload = ({ filePath }) => {
 
   return (
     <button onClick={handleDownload} disabled={loading}>
-      {loading ? 'Loading...' : 'Download File'}
       <GetAppIcon />
     </button>
   );
