@@ -1,5 +1,5 @@
 from jinja2 import Environment, FileSystemLoader
-from sklearn import logger
+from logging import logger
 from weasyprint import HTML, CSS
 import os
 from google.cloud import storage
@@ -8,212 +8,91 @@ from functions.callPythonFunction.api_clients.storage_client import StorageClien
 
     # TODO:
     # 1. Translate comments - Done
-    # 2. Add wrapper function with user id list, course id, and certificate type as input (see index.json)
-    # 3. Fetch all enrollments for the given user ids and course id
+    # 2. Add wrapper function with user id list, course id, and certificate type as input (see index.json) - Done
+    # 3. Fetch all enrollments for the given user ids and course id - Done 
     # 4. Take first enrollment from the list to fetch the certificateURL and the certificateTextId of the course's program - Image and Text is the same for everyone in the course -> just one retrieve needed
-        # 5. Fetch the certificate text from the certificateTextId
-        # 6. Fetch image from the certificateURL
-    # 7. Iterate over all enrollments to create the certificates, upload them to GCS, and update the enrollment record
+        # 5. Fetch the certificate text from the certificateTextId - Done
+        # 6. Fetch image from the certificateURL - Done
+    # 7. Iterate over all enrollments to create the certificates, upload them to GCS, and update the enrollment record - Done 
     # 8. Integrate all functions to fetch and save data in Hasura in the EduHub backend API
 
-"""example_data = {
-    "template": "/Users/sinalucke/Desktop/eduhub/edu_zertifikat_SOSE2023.png",
-    "request": {
-        "host_with_port": "example.com:8000"
-    },
-    "user": {
-        "full_name": "Max Mustermann"
-    },
-    "course": {
-        "semester": "Sommersemester 2023",
-        "name": "Einführung in die Programmierung",
-        "certificate_text": "Hier steht der Text, der für das Zertifikat relevant ist.",
-        "ects": 5,
-        "referent":{
-            "user" : {
-                "id": 3, 
-                "full_name": "Max Musterreferent"
-            }
-
-        }, 
-        "certificate_list_events": True,
-        "events": [
-            {
-                "title": "Einführungsveranstaltung",
-                "referent": {
-                    "user": {
-                        "id": 1,
-                        "full_name": "Dr. Maria Schmidt"
-                    }
-                }
-            },
-            {
-                "title": "Abschlusspräsentation",
-                "referent": {
-                    "user": {
-                        "id": 2,
-                        "full_name": "Prof. Johann Bauer"
-                    }
-                }
-            }
-        ]
-    },
-    "project": {
-        "title": "Forschungsprojekt XYZ",
-        "mentor": {
-            "company": None,
-            "user": {
-                "full_name": "Luise Müller"
-            }
-        }
-    },
-    "enrollment": {
-        "practical_project": "Praxisprojekt ABC"
-    },
-    "datetime_now": "15.11.2023",
-    "attendance": {
-        "absence": False
-    }
-}
-
-
-"""
-
-def create_certificate(hasura_secret, arguments):
+def create_certificate(hasura_secrets, arguments):
+    storage_client = StorageClient()
+    bucket_name = #TODO
     user_ids = arguments["input"]["userIds"]
     course_id = arguments["input"]["courseId"]
     certificate_type = arguments["input"]["certificateType"]
-
+   
     logger.debug(
     "Input parameters: userIds=${userIds}, courseId=${courseId}, certificateType=${certificateType}"
-  )
-
-
-    # Fetch course enrollments
+    )
     try:
         enrollments = fetch_enrollments(user_ids, course_id)
     except Exception as e:
         print(f"Error when retrieving registrations: {e}")
         return
 
-    # Check if enrollments exist
+  # Check if enrollments exist
+
     if not enrollments:
         print("No enrollments were found.")
         return
+   
+    template_image_url = fetch_template_image(enrollments, certificate_type)
+    template_text = fetch_template_text(enrollments, certificate_type)
 
-    # Generating Certificates per enrollment
+
+  # Generating Certificates per enrollment
+
+
     for enrollment in enrollments:
         try:
-            bucket_name = "UnserBucketName"  # TODO muss mit storage_client noch gelöst werden 
-            pdf_url = generate_certificate(enrollment, certificate_type, bucket_name)
+            pdf_url = generate_and_save_certificate_to_gcs(enrollment, certificate_type, template_image_url, template_text, bucket_name)
 
             update_course_enrollment_record(enrollment["User"]["id"], enrollment["Course"]["id"], pdf_url)
         except Exception as e:
-            print(f"Error when generating certificate: {e}")
+          print(f"Error when generating certificate: {e}")
 
     print(f"{len(enrollments)} {certificate_type} Certificate(s) generated.")
 
-# Example Parameters for Testing
-# create_certificate(["user1", "user2"], "course123", "attendance")
-
-
-def generate_certificate(enrollment, certificate_type, bucket_name):
-
-    # Prepare Certificate Data
-    certificate_data = prepare_certificate_data(enrollment, certificate_type)
-    html_template = f"{certificate_type}_certificate.html"
-
-    # Generate PDF and Upload to GCS
+def generate_and_save_certificate_to_gcs(enrollment, certificate_type, template_image_url, template_text, bucket_name):
+    # Prepare Text Conten 
+    text_content = prepare_text_content(enrollment, certificate_type) 
+    # Generate PDF File Name
     pdf_file_name = generate_pdf_file_name(enrollment, certificate_type)
-    pdf_url = generate_pdf_and_upload_to_gcs(
-        certificate_data, enrollment, certificate_type, bucket_name, pdf_file_name
-    )
+    # Get Template Image
+    #template_image = download_template_image(template_image_url)
 
-    # Update the course enrollment with url to pdf
-    update_course_enrollment_record(
-        enrollment["User"]["id"], enrollment["Course"]["id"], pdf_url
-    )
+    ## Generate Certificate PDF 
+    # Create Jinja2 Environment
+    env = Environment(loader=jinja2.DictLoader({'template': template_text}))
 
-    return pdf_url
+    template = env.get_template('template')
 
+    rendered_html = template.render(background_image_url=template_image_url, html_content=text_content)
 
-####################################Helper###################################
-def prepare_certificate_data(enrollment, certificate_type):
-    if certificate_type == "attendance":
-        session_titles = get_attended_sessions(
-            enrollment, enrollment["Course"]["Sessions"]
-        )
-        template_url = enrollment["Course"]["Program"][
-            "attendanceCertificateTemplateURL"
-        ]
-    elif certificate_type == "achievement":
-        session_titles = None 
-        template_url = enrollment["Course"]["Program"][
-            "achievementCertificateTemplateURL"
-        ]
-    else:
-        raise ValueError("Invalid certificate type")
+    # create PDF as BytesIO Object
+    pdf_bytes_io = io.BytesIO()
+    HTML(string=rendered_html).write_pdf(pdf_bytes_io)
 
-    return {
-        "template": template_url,
-        "full_name": f"{enrollment['User']['firstName']} {enrollment['User']['lastName']}",
-        "course_name": enrollment["Course"]["title"],
-        "semester": enrollment["Course"]["Program"]["title"],
-        "event_entries": session_titles,
-    }
+    pdf_bytes_io.seek(0)
 
+    temporary_pdf = pdf_bytes_io
 
-"""funktionierende Version
-def generate_pdf(data, image, html):
-    #Hier muss ich nochmal was anpassen 
-    base_url = os.path.dirname(os.path.realpath("/Users/sinalucke/Desktop/eduhub"))
-    env = Environment(loader=FileSystemLoader('/Users/sinalucke/Desktop/eduhub'))
-    template = env.get_template('html')
-    # HTML-String aus Jinja2-Rendering
-    html_content = template.render(data)
+    ## Saving Certificate PDF
+    #Instantiiating GCS Client
+    storage_client = storage.Client()
 
-    # Erstellen der PDF mit Angabe des base_url
-    HTML(string=html_content, base_url=base_url).write_pdf("output.pdf")"""
+ 
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(pdf_file_name)
 
+    blob.upload_from_file(temporary_pdf, content_type='application/pdf')
 
-def generate_pdf_file_name(enrollment, certificate_type):
-    return f"{enrollment['User']['id']}/{enrollment['Course']['id']}/{certificate_type}_certificate.pdf"
-
-
-def download_template(url):
-    response = requests.get(url)
-    response.raise_for_status()  # Makes sure request was succesfull
-    return response.text
-
-
-def generate_pdf_and_upload_to_gcs(
-    data, enrollment, certificate_type, bucket_name, pdf_file_name
-):
-    if certificate_type == "attendance":
-        template_url = enrollment["Course"]["Program"][
-            "attendanceCertificateTemplateURL"
-        ]
-    elif certificate_type == "achievement":
-        template_url = enrollment["Course"]["Program"][
-            "achievementCertificateTemplateURL"
-        ]
-
-    template_content = download_template(template_url)
-    # Create Jinja Environment and loading Image Template from String 
-    env = Environment()
-    template = env.from_string(template_content)
-    html_content = template.render(data)
-
-    pdf = HTML(string=html_content).write_pdf()
-
-    storage_client = StorageClient()
-    storage_client.upload_file(pdf_file_name, pdf, bucket_name)
-
-    return storage_client.get_blob_url(pdf_file_name)
+    return blob.public_url
 
 
 def update_course_enrollment_record(user_id, course_id, certificate_url):
-
     hasura_endpoint = os.environ.get("HASURA_ENDPOINT")
 
     headers = {"x-hasura-admin-secret": os.environ.get("HASURA_ADMIN_SECRET")}
@@ -249,6 +128,175 @@ def update_course_enrollment_record(user_id, course_id, certificate_url):
     result = response.json()
     return result
 
+################################## Helper Functions ########################
+def fetch_enrollments(user_ids, course_id):
+    # GraphQL endpoint
+    hasura_endpoint = os.getenv('HASURA_ENDPOINT')
+    hasura_admin_secret = os.getenv('HASURA_ADMIN_SECRET')
+
+    # GraphQL query
+    query = """
+    query GetEnrollments($userIds: [uuid!]!, $courseId: Int!) {
+  CourseEnrollment(where: {userId: {_in: $userIds}, Course: {id: {_eq: $courseId}}}) {
+    User {
+      Attendances {
+        Session {
+          id
+          startDateTime
+        }
+        id
+        status
+      }
+      firstName
+      lastName
+      AchievementRecordAuthors(where: {AchievementRecord: {AchievementOption: {AchievementOptionCourses: {Course: {id: {_eq: $courseId}}}}}}, order_by: {AchievementRecord: {updated_at: desc}}, limit: 1) {
+        AchievementRecord {
+          AchievementOption {
+            title
+            recordType
+          }
+          created_at
+        }
+      }
+      id
+    }
+    Course {
+      Program {
+        title
+        achievementCertificateTemplateURL
+        attendanceCertificateTemplateURL
+        attendanceCertificateTemplateTextId
+        achievementCertificateTemplateTextId
+      }
+      Sessions(order_by: {startDateTime: asc}) {
+        id
+        title
+        startDateTime
+      }
+      id
+      ects
+      title
+      learningGoals
+    }
+  }
+}
+
+    """
+
+    # Variables for the GraphQL query
+    variables = {
+      "userIds": user_ids,
+      "courseId": course_id
+    }
+
+    # Headers including the admin secret
+    headers = {
+    "Content-Type": "application/json",
+    "x-hasura-admin-secret": hasura_admin_secret
+    }
+
+    # Make the request to the GraphQL endpoint
+    try:
+        response = requests.post(
+                hasura_endpoint,
+                json={'query': query, 'variables': variables},
+                headers=headers
+        )
+        response.raise_for_status()  # Raises a HTTPError if the HTTP request returned an unsuccessful status code
+    # Assuming the data is returned in JSON format
+        data = response.json()
+        return data['data']['CourseEnrollment']
+    except requests.exceptions.RequestException as e:
+        # Handle any errors that occur during the request
+        print(f"An error occurred: {e}")
+        raise
+ 
+
+def fetch_template_image(enrollments, certificate_type):
+    if certificate_type == "achievement":
+        image_url = [0]['Course']['Program']['achievementCertificateTemplateURL']
+        return image_url
+    elif certificate_type == "attendance":
+        image_url = [0]['Course']['Program']['attendanceCertificateTemplateURL']
+        return image_url
+    else: 
+        print("certificate type is incorrect or missing!")
+
+
+def fetch_template_text(enrollments, certificate_type):
+    # GraphQL endpoint
+    hasura_endpoint = os.getenv('HASURA_ENDPOINT')
+    hasura_admin_secret = os.getenv('HASURA_ADMIN_SECRET')
+
+    # Necessary Data to retrieve HTML from hasura 
+    if certificate_type == "achievement":
+        text_id = [0]['Course']['Program']['achievementCertificateTemplateTextId']
+
+    elif certificate_type == "attendance":
+        text_id = [0]['Course']['Program']['attendanceCertifiateTemplateTextId']
+    else: 
+        print("Certificate type is incorrect or missing!")
+
+    # GraphQL query
+    query = """
+    query getHTML {
+        CertificateTemplateText(where: {id: {_eq: "textId"}}) {
+            html
+    }
+    """
+    variables = {
+            "textId": text_id
+        }
+
+    # Headers including the admin secret
+    headers = {
+    "Content-Type": "application/json",
+    "x-hasura-admin-secret": hasura_admin_secret
+    }
+
+    # Make the request to the GraphQL endpoint
+    try:
+        response = requests.post(
+          hasura_endpoint,
+          json={'query': query, 'variables': variables},
+          headers=headers
+      )
+        response.raise_for_status()  # Raises a HTTPError if the HTTP request returned an unsuccessful status code
+
+        # Assuming the data is returned in JSON format
+        data = response.json()
+        return data['data']['html']
+    except requests.exceptions.RequestException as e:
+      # Handle any errors that occur during the request
+      print(f"An error occurred: {e}")
+      raise
+
+    
+def prepare_text_content(enrollment, certificate_type):
+    if certificate_type == "attendance":
+        session_titles = get_attended_sessions(
+            enrollment, enrollment["Course"]["Sessions"]
+        )
+    elif certificate_type == "achievement":
+        session_titles = None 
+    else:
+        raise ValueError("Invalid certificate type")
+
+    return {
+        "full_name": f"{enrollment['User']['firstName']} {enrollment['User']['lastName']}",
+        "course_name": enrollment["Course"]["title"],
+        "semester": enrollment["Course"]["Program"]["title"],
+        "event_entries": session_titles,
+        }
+
+def generate_pdf_file_name(enrollment, certificate_type):
+    return f"{enrollment['User']['id']}/{enrollment['Course']['id']}/{certificate_type}_certificate.pdf"
+
+
+def download_template_image(template_image_url):
+    response = requests.get(url)
+    response.raise_for_status()  # Makes sure request was succesfull
+    return response.text
 
 def get_attended_sessions(enrollment, sessions):
     attended_sessions = []
@@ -290,5 +338,3 @@ def get_attended_sessions(enrollment, sessions):
 
     return attended_session_titles
 
-def fetch_enrollments(hasura_endpoint, hasura_admin_secret, user_ids, course_id):
-    return 0
