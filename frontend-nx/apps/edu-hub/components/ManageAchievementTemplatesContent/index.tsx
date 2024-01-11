@@ -79,11 +79,21 @@ const ManageAchievementTemplatesContent: FC = () => {
       },
       {
         accessorKey: 'url',
-        accessorFn: (row) => ({ title: row.title, url: row.url }),
+        accessorFn: (row) => ({ url: row.url }),
+        header: 'Download',
         meta: {
           width: 3,
         },
-        cell: ({ getValue }) => <FileDownload filePath={getValue<{ url: string }>().url} />,
+        cell: ({ getValue }) => {
+          const { url } = getValue<{ url: string }>();
+          const filename = url.split('/').pop(); // Extracts the last segment of the URL
+          return (
+            <div className="flex items-center">
+              <FileDownload filePath={url} />
+              <span className="ml-2">{filename}</span>
+            </div>
+          );
+        },
       },
       {
         accessorKey: 'upload',

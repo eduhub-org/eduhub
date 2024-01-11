@@ -1,6 +1,7 @@
 {
   "addUserAchievementDocumentationTemplateText": "Add template",
-  "url": "URL",
+  "url": "Download",
   "title": "Title",
-  "delete": "Delete"
+  "delete": "Delete",
+  "upload": "Upload"
 }

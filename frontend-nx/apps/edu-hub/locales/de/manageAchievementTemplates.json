@@ -1,6 +1,7 @@
 {
   "addUserAchievementDocumentationTemplateText": "Vorlage hinzufügen",
-  "url": "URL",
+  "url": "Download",
   "title": "Titel",
-  "delete": "Löschen"
+  "delete": "Löschen",
+  "upload": "Upload"
 }
