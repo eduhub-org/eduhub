@@ -1,6 +1,6 @@
 import { createContext, FC, MouseEvent, useCallback, useEffect, useState } from 'react';
 import { IUserProfile } from '../../hooks/user';
-import { useKeycloakUserProfile, useUserId } from '../../hooks/user';
+import { useKeycloakUserProfile, useUserId, useUser } from '../../hooks/user';
 import AchievementOptionDropDown from '../achievements/AchievementOptionDropDown';
 import {
   AchievementOptionCourses,
@@ -52,6 +52,7 @@ interface IProps {
 const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUploadDeadline, courseTitle }) => {
   const { t, lang } = useTranslation();
   const userId = useUserId();
+  const user = useUser();
   const profile = useKeycloakUserProfile();
   const [showModal, setShowModal] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -246,33 +247,6 @@ const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUpload
               </Button>
             </div>
           )}
-        {/* {selectedAchievementOption?.id &&
-          selectedAchievementOption.recordType === AchievementRecordType_enum.ONLINE_COURSE &&
-          !myRecordsQuery.loading &&
-          !myRecords && (
-            <div className="flex flex-col">
-              <div className="mb-4">
-                <Trans
-                  i18nKey="course-page:confirm-online-course-description"
-                  components={{
-                    component: (
-                      <a
-                        className="underline"
-                        target="_blank"
-                        rel="noreferrer"
-                        href="https://forms.office.com/e/DJPsDw6MGR"
-                      />
-                    ),
-                  }}
-                  values={{ count: 42 }}
-                  defaultTrans="<component>The number is <b>{{count}}</b></component>"
-                />
-              </div>
-              <Button filled onClick={handleAchievementRecordOnlineCourseConfirm}>
-                {`${t('course-page:confirm-online-course')}`}
-              </Button>
-            </div>
-          )} */}
         {selectedAchievementOption?.id &&
           myRecords &&
           selectedAchievementOption.recordType === AchievementRecordType_enum.DOCUMENTATION && (
@@ -283,16 +257,6 @@ const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUpload
               })}
             </p>
           )}
-        {/* {selectedAchievementOption?.id &&
-          myRecords &&
-          selectedAchievementOption.recordType === AchievementRecordType_enum.ONLINE_COURSE && (
-            <p>
-              {t('course-page:online-course-confirmed', {
-                dateTime: formattedDateWithTime(new Date(myRecords.created_at), lang),
-                fullName: makeFullName(profile.firstName, profile.lastName),
-              })}
-            </p>
-          )} */}
 
         {selectedAchievementOption?.id &&
           !myRecords &&
@@ -302,10 +266,12 @@ const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUpload
       </div>
       {showModal && (
         <FormToUploadAchievementRecord
+          isOpen={showModal}
           onClose={onClosed}
           achievementOption={selectedAchievementOption}
           onSuccess={onSuccess}
           courseTitle={courseTitle}
+          user={user}
           setAlertMessage={setAlertMessage}
           userId={userId}
           courseId={courseId}

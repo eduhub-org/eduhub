@@ -215,7 +215,7 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
   }
 
   return (
-    <Modal isOpen={open} close={onCloseConfirmEnrollment} title={t('onboardingModal.title')}>
+    <Modal isOpen={open} onClose={onCloseConfirmEnrollment} title={t('onboardingModal.title')}>
       {!userLoading && !userError && (
         <>
           <div className="pb-5">{t('onboardingModal.congratulation')}</div>
