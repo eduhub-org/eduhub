@@ -35,7 +35,7 @@ def create_certificate(hasura_secrets, arguments):
   # Check if enrollments exist
 
     if not enrollments:
-        print("No enrollments were found.")
+        raise NoEnrollmentsFoundException("No enrollments were found.")
         return
    
     template_image_url = fetch_template_image(enrollments, certificate_type)
