@@ -18,7 +18,6 @@ from functions.callPythonFunction.api_clients.storage_client import StorageClien
 
 def create_certificate(hasura_secrets, arguments):
     storage_client = StorageClient()
-    bucket_name = #TODO
     user_ids = arguments["input"]["userIds"]
     course_id = arguments["input"]["courseId"]
     certificate_type = arguments["input"]["certificateType"]
@@ -47,7 +46,7 @@ def create_certificate(hasura_secrets, arguments):
 
     for enrollment in enrollments:
         try:
-            pdf_url = generate_and_save_certificate_to_gcs(enrollment, certificate_type, template_image_url, template_text, bucket_name)
+            pdf_url = generate_and_save_certificate_to_gcs(enrollment, certificate_type, template_image_url, template_text, storage_client.bucket_name)
 
             update_course_enrollment_record(enrollment["User"]["id"], enrollment["Course"]["id"], pdf_url)
         except Exception as e:
