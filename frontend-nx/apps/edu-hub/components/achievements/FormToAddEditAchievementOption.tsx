@@ -29,7 +29,6 @@ import {
   LoadAchievementOptionEvaluationScriptVariables,
 } from '../../queries/__generated__/LoadAchievementOptionEvaluationScript';
 import {
-  LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE,
   LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT,
 } from '../../queries/actions';
 // import {
@@ -58,7 +57,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
   const [showCourseListDialog, setShowCourseListDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [scriptGoogleUrl, setScriptGoogleUrl] = useState(null as string);
-  const [documentTemplateGoogleLink, setDocumentTemplateGoogleLink] = useState(null as string);
+  // const [documentTemplateGoogleLink, setDocumentTemplateGoogleLink] = useState(null as string);
 
   // const loadAchievementOptionDocumentationTemplate = useAdminQuery<
   //   LoadAchievementOptionDocumentationTemplate,
@@ -187,13 +186,13 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
     });
   }, []);*/
 
-  const handleInputFile = useCallback((controlName: string, file: UploadFile) => {
-    console.log(controlName);
-    dispatch({
-      key: controlName,
-      value: file,
-    });
-  }, []);
+  // const handleInputFile = useCallback((controlName: string, file: UploadFile) => {
+  //   console.log(controlName);
+  //   dispatch({
+  //     key: controlName,
+  //     value: file,
+  //   });
+  // }, []);
 
   const handleSubmit = useCallback(
     async (event) => {
@@ -216,11 +215,11 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
    * https://www.geeksforgeeks.org/how-to-create-and-download-csv-file-in-javascript/
    * https://stackoverflow.com/questions/73342056/convert-base64-string-to-csv-javascript-giving-blob-error
    */
-  const clickCSV = useCallback(() => {
-    if (state.csvTemplateUrl) {
-      downloadCSVFileFromBase64String(state.csvTemplateUrl);
-    }
-  }, [state.csvTemplateUrl]);
+  // const clickCSV = useCallback(() => {
+  //   if (state.csvTemplateUrl) {
+  //     downloadCSVFileFromBase64String(state.csvTemplateUrl);
+  //   }
+  // }, [state.csvTemplateUrl]);
 
   const tCommon: Translate = context.t;
   const { t } = useTranslation('course-page');
@@ -316,44 +315,50 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
               </div>
               <p className="text-stela-500">{`* ${tCommon('form-mandatory-field')}`}</p>
             </div>
-            {state.recordType === 'DOCUMENTATION' ||
-              (state.recordType === 'ONLINE_COURSE' && (
-                // <CustomFileInput
-                //   title={`${t('achievements-page:uploadDocumentationTemplate')} (.doc, .docx, .pdf, .zip, .xls, .csv)*`}
-                //   name={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
-                //   id={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
-                //   accept=".doc, .docx, .zip, .pdf, .xls, .csv"
-                //   onChangeHandler={handleInputFile}
-                //   customLink={
-                //     documentTemplateGoogleLink ? (
-                //       <Link href={documentTemplateGoogleLink}>
-                //         {t('achievements-page:uploadDocumentationTemplate')}
-                //       </Link>
-                //     ) : (
-                //       ''
-                //     )
-                //   }
-                // />
-                <div>
-                  {loadAchievementDocumentationTemplates?.data?.AchievementDocumentationTemplate && (
-                    <div className="flex flex-col space-y-1">
-                      <p>{`${tCommon('achievement-documentation-template')}*`}</p>
-                      <EhSelectCustom
-                        onChange={handleInputChange}
-                        options={loadAchievementDocumentationTemplates.data.AchievementDocumentationTemplate.map(
+            {(state.recordType === 'DOCUMENTATION' || state.recordType === 'ONLINE_COURSE') && (
+              // <CustomFileInput
+              //   title={`${t('achievements-page:uploadDocumentationTemplate')} (.doc, .docx, .pdf, .zip, .xls, .csv)*`}
+              //   name={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
+              //   id={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
+              //   accept=".doc, .docx, .zip, .pdf, .xls, .csv"
+              //   onChangeHandler={handleInputFile}
+              //   customLink={
+              //     documentTemplateGoogleLink ? (
+              //       <Link href={documentTemplateGoogleLink}>
+              //         {t('achievements-page:uploadDocumentationTemplate')}
+              //       </Link>
+              //     ) : (
+              //       ''
+              //     )
+              //   }
+              // />
+              <div>
+                {loadAchievementDocumentationTemplates?.data?.AchievementDocumentationTemplate && (
+                  <div className="flex flex-col space-y-1">
+                    <p>{`${tCommon('achievement-documentation-template')}*`}</p>
+                    <EhSelectCustom
+                      onChange={handleInputChange}
+                      options={[
+                        // Add a default option when state.achievementDocumentationTemplateId is not set
+                        !state.achievementDocumentationTemplateId && {
+                          label: t('selectTemplateDefaultLabel'),
+                          value: '',
+                        },
+                        ...loadAchievementDocumentationTemplates.data.AchievementDocumentationTemplate.map(
                           (template) => ({
                             label: template.title,
                             value: template.id,
                           })
-                        )}
-                        name={'achievementDocumentationTemplateId'}
-                        id={'achievementDocumentationTemplateId'}
-                        value={state.achievementDocumentationTemplateId ?? ''}
-                      />
-                    </div>
-                  )}
-                </div>
-              ))}
+                        ),
+                      ]}
+                      name={'achievementDocumentationTemplateId'}
+                      id={'achievementDocumentationTemplateId'}
+                      value={state.achievementDocumentationTemplateId ?? ''}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
             {/* {state.recordType === 'DOCUMENTATION_AND_CSV' && (
               //
               <CustomFileInput
@@ -535,54 +540,54 @@ const EhSelectCustom: FC<IProsSelectCustom> = ({ options, onChange, ...custom })
   );
 };
 
-const CustomFileInput: FC<{
-  onChangeHandler: (controlName: string, file: UploadFile) => void;
-  name: string;
-  accept: string;
-  id: string;
-  title: string;
-  customLink?: ReactNode;
-}> = (props) => {
-  const [fileName, setFileName] = useState('');
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const onClickHandler = useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
+// const CustomFileInput: FC<{
+//   onChangeHandler: (controlName: string, file: UploadFile) => void;
+//   name: string;
+//   accept: string;
+//   id: string;
+//   title: string;
+//   customLink?: ReactNode;
+// }> = (props) => {
+//   const [fileName, setFileName] = useState('');
+//   const fileInputRef = useRef<HTMLInputElement | null>(null);
+//   const onClickHandler = useCallback(() => {
+//     fileInputRef.current?.click();
+//   }, []);
 
-  const onChange = useCallback(
-    async (event) => {
-      const file: UploadFile = await parseFileUploadEvent(event);
-      setFileName(file.name);
-      props.onChangeHandler(props.name, file);
-    },
-    [props]
-  );
-  return (
-    <>
-      <div className="flex flex-row space-x-1">
-        <div className="flex flex-col space-y-1 items-center ">
-          <p className="w-full">{props.title}</p>
-          <div className="h-12 text-center pt-3  px-2  bg-white  w-full">
-            {fileName.trim().length > 0 ? <p>{fileName}</p> : props.customLink ? <>{props.customLink}</> : <></>}
-          </div>
-        </div>
-        <div className="pt-6 pl-1">
-          <div className="h-10 w-10  rounded-full border-2 border-gray-400 flex justify-center items-center">
-            <MdUploadFile size="1.5em" className="cursor-pointer" onClick={onClickHandler} />
-          </div>
-          <input
-            accept={props.accept}
-            onChange={onChange}
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            type="file"
-            name={props.name}
-            id={props.id}
-          />
-        </div>
-      </div>
-    </>
-  );
-};
+//   const onChange = useCallback(
+//     async (event) => {
+//       const file: UploadFile = await parseFileUploadEvent(event);
+//       setFileName(file.name);
+//       props.onChangeHandler(props.name, file);
+//     },
+//     [props]
+//   );
+//   return (
+//     <>
+//       <div className="flex flex-row space-x-1">
+//         <div className="flex flex-col space-y-1 items-center ">
+//           <p className="w-full">{props.title}</p>
+//           <div className="h-12 text-center pt-3  px-2  bg-white  w-full">
+//             {fileName.trim().length > 0 ? <p>{fileName}</p> : props.customLink ? <>{props.customLink}</> : <></>}
+//           </div>
+//         </div>
+//         <div className="pt-6 pl-1">
+//           <div className="h-10 w-10  rounded-full border-2 border-gray-400 flex justify-center items-center">
+//             <MdUploadFile size="1.5em" className="cursor-pointer" onClick={onClickHandler} />
+//           </div>
+//           <input
+//             accept={props.accept}
+//             onChange={onChange}
+//             ref={fileInputRef}
+//             style={{ display: 'none' }}
+//             type="file"
+//             name={props.name}
+//             id={props.id}
+//           />
+//         </div>
+//       </div>
+//     </>
+//   );
+// };
 
 /* #endregion */

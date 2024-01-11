@@ -140,5 +140,6 @@
   "1-certificate-generated": "Es wurde ein Zertifikat generiert.",
   "no-certificates-generated": "Es wurden keine Zertifikate generiert.",
   "participationDataGenerate": "Teilnehmer:innen Daten generieren (CSV)",
-  "participationDataDownload": "Teilnehmer:innen Daten herunterladen (CSV)"
+  "participationDataDownload": "Teilnehmer:innen Daten herunterladen (CSV)",
+  "selectTemplateDefaultLabel": "Vorlage auswählen"
 }

@@ -140,5 +140,6 @@
   "1-certificate-generated": "One certificate has been generated.",
   "no-certificates-generated": "No certificates have been generated.",
   "participationDataGenerate": "Generate Participation Data (CSV)",
-  "participationDataDownload": "Download Participation Data (CSV)"
+  "participationDataDownload": "Download Participation Data (CSV)",
+  "selectTemplateDefaultLabel": "Choose template"
 }

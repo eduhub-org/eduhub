@@ -224,6 +224,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
     };
     setData(data);
   }, [
+    ao.achievementDocumentationTemplateId,
     ao.AchievementOptionCourses,
     ao.AchievementOptionMentors,
     ao.csvTemplateUrl,
