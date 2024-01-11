@@ -454,7 +454,7 @@ const UploadUI: FC<IPropsUpload> = (props) => {
             placeholder={props.placeholder ?? ''}
             type="text"
             disabled
-            className="cursor-pointer bg-transparent"
+            className="cursor-pointer bg-transparent pointer-events-none"
             value={fileName}
           />
           <p>^</p>
