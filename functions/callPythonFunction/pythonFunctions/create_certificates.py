@@ -5,6 +5,7 @@ import os
 from google.cloud import storage
 import requests
 from functions.callPythonFunction.api_clients.storage_client import StorageClient
+import io 
 
 # TODO:
 
@@ -91,7 +92,7 @@ def create_certificates(hasura_secrets, arguments):
   # Check if enrollments exist
 
     if not enrollments:
-        print("No enrollments were found.")
+        raise NoEnrollmentsFoundException("No enrollments were found.")
         return
    
     template_image_url = fetch_template_image(enrollments, certificate_type)
@@ -103,7 +104,7 @@ def create_certificates(hasura_secrets, arguments):
 
     for enrollment in enrollments:
         try:
-            pdf_url = generate_and_save_certificate_to_gcs(enrollment, certificate_type, template_image_url, template_text, storage_client.bucket_name)
+            pdf_url = generate_and_save_certificate_to_gcs(enrollment, certificate_type, template_image_url, template_text, storage_client.get_bucket())
 
             update_course_enrollment_record(enrollment["User"]["id"], enrollment["Course"]["id"], pdf_url)
         except Exception as e:
