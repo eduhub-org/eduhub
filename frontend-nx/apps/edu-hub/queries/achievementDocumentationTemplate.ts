@@ -2,10 +2,11 @@ import { gql } from '@apollo/client';
 
 export const ACHIEVEMENT_DOCUMENTATION_TEMPLATES = gql`
   query AchievementDocumentationTemplates {
-    AchievementDocumentationTemplate(order_by: { title: asc }) {
+    AchievementDocumentationTemplate(order_by: { updated_at: desc }) {
       id
       title
       url
+      updated_at
     }
   }
 `;

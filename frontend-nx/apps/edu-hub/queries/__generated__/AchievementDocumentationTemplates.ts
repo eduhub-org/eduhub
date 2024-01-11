@@ -12,6 +12,7 @@ export interface AchievementDocumentationTemplates_AchievementDocumentationTempl
   id: number;
   title: string;
   url: string;
+  updated_at: any;
 }
 
 export interface AchievementDocumentationTemplates {
