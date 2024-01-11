@@ -6,17 +6,74 @@ from google.cloud import storage
 import requests
 from functions.callPythonFunction.api_clients.storage_client import StorageClient
 
-    # TODO:
-    # 1. Translate comments - Done
-    # 2. Add wrapper function with user id list, course id, and certificate type as input (see index.json) - Done
-    # 3. Fetch all enrollments for the given user ids and course id - Done 
-    # 4. Take first enrollment from the list to fetch the certificateURL and the certificateTextId of the course's program - Image and Text is the same for everyone in the course -> just one retrieve needed
-        # 5. Fetch the certificate text from the certificateTextId - Done
-        # 6. Fetch image from the certificateURL - Done
-    # 7. Iterate over all enrollments to create the certificates, upload them to GCS, and update the enrollment record - Done 
-    # 8. Integrate all functions to fetch and save data in Hasura in the EduHub backend API
+# TODO:
 
-def create_certificate(hasura_secrets, arguments):
+# 1. **`fetch_enrollments` Method:**
+#    - Purpose: To fetch enrollment data based on user IDs and course ID.
+#    - Inputs: List of user IDs, Course ID.
+#    - Output: Enrollment data.
+
+# 2. **`fetch_template_image` and `fetch_template_text` Methods:**
+#    - Purpose: To fetch the template image URL and template text based on the certificate type.
+#    - Inputs: Enrollments data, Certificate type.
+#    - Output: Template image URL and template text.
+
+# 3. **`prepare_certificate_content` Method:**
+#    - Purpose: To prepare the content to be inserted into the certificate, like user name, course details, etc.
+#    - Inputs: Enrollment data, Certificate type.
+#    - Output: Prepared text content for the certificate.
+
+# 4. **`generate_pdf_file_name` Method:**
+#    - Purpose: To generate a unique and descriptive file name for the certificate PDF.
+#    - Inputs: Enrollment data, Certificate type.
+#    - Output: PDF file name.
+
+# 5. **`render_certificate_to_pdf` Method:**
+#    - Purpose: To render the HTML template with the certificate data into a PDF.
+#    - Inputs: Template image URL, HTML content, additional styling if necessary.
+#    - Output: PDF file in memory (e.g., as a BytesIO object).
+
+# 6. **`upload_certificate_to_storage` Method:**
+#    - Purpose: To upload the generated certificate PDF to Google Cloud Storage.
+#    - Inputs: PDF BytesIO object, File name, Bucket name.
+#    - Output: Public URL of the uploaded file.
+
+# 7. **`update_enrollment_record` Method:**
+#    - Purpose: To update the course enrollment record with the certificate URL.
+#    - Inputs: User ID, Course ID, Certificate URL.
+
+# 8. **`download_template_image` Method:**
+#    - Purpose: To download the certificate image template if needed.
+#    - Inputs: Template image URL.
+#    - Output: Image data.
+
+# 9. **`get_attended_sessions` Method:**
+#    - Purpose: To extract information about attended sessions for attendance certificates.
+#    - Inputs: Enrollment data, Sessions data.
+#    - Output: List of attended sessions.
+
+# 10. **`generate_certificate_for_enrollment` Method:**
+#     - Purpose: To encapsulate the entire process of generating a certificate for a single enrollment.
+#     - Inputs: Enrollment data.
+#     - Output: Certificate URL or an indication of success/failure.
+
+# 11. **`process_certificates` Method:**
+#     - Purpose: Main method to process certificates for a batch of enrollments.
+#     - Inputs: User IDs, Course ID, Certificate type.
+#     - Output: Status of the process, e.g., number of certificates generated.
+
+
+# Class Initialization
+# - EduHub Client
+# - Storage Client
+# - Certificate type depending fetching of data
+#   - fetch_enrollments
+#   - fetch_template_image
+#   - fetch_template_text
+
+
+    
+def create_certificates(hasura_secrets, arguments):
     storage_client = StorageClient()
     user_ids = arguments["input"]["userIds"]
     course_id = arguments["input"]["courseId"]
@@ -213,10 +270,10 @@ def fetch_enrollments(user_ids, course_id):
 
 def fetch_template_image(enrollments, certificate_type):
     if certificate_type == "achievement":
-        image_url = [0]['Course']['Program']['achievementCertificateTemplateURL']
+        image_url = enrollments[0]['Course']['Program']['achievementCertificateTemplateURL']
         return image_url
     elif certificate_type == "attendance":
-        image_url = [0]['Course']['Program']['attendanceCertificateTemplateURL']
+        image_url = enrollments[0]['Course']['Program']['attendanceCertificateTemplateURL']
         return image_url
     else: 
         print("certificate type is incorrect or missing!")
