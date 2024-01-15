@@ -2,6 +2,15 @@ table:
   name: AchievementOption
   schema: public
 object_relationships:
+  - name: AchievementOptionTemplate
+    using:
+      manual_configuration:
+        column_mapping:
+          achievementDocumentationTemplateId: id
+        insertion_order: null
+        remote_table:
+          name: AchievementDocumentationTemplate
+          schema: public
   - name: AchievementRecordType
     using:
       foreign_key_constraint_on: recordType
@@ -44,34 +53,32 @@ insert_permissions:
                 id:
                   _eq: X-Hasura-User-Id
       columns:
-        - id
-        - description
-        - documentationTemplateUrl
-        - evaluationScriptUrl
-        - title
-        - recordType
         - created_at
+        - description
+        - evaluationScriptUrl
+        - id
+        - recordType
+        - title
         - updated_at
 select_permissions:
   - role: anonymous
     permission:
       columns:
-        - id
-        - description
-        - documentationTemplateUrl
-        - evaluationScriptUrl
-        - title
-        - recordType
         - created_at
+        - description
+        - evaluationScriptUrl
+        - id
+        - recordType
+        - title
         - updated_at
       filter: {}
   - role: user_access
     permission:
       columns:
+        - achievementDocumentationTemplateId
         - created_at
         - csvTemplateUrl
         - description
-        - documentationTemplateUrl
         - evaluationScriptUrl
         - id
         - recordType
@@ -83,13 +90,12 @@ update_permissions:
   - role: instructor_access
     permission:
       columns:
-        - id
-        - description
-        - documentationTemplateUrl
-        - evaluationScriptUrl
-        - title
-        - recordType
         - created_at
+        - description
+        - evaluationScriptUrl
+        - id
+        - recordType
+        - title
         - updated_at
       filter:
         _or:
