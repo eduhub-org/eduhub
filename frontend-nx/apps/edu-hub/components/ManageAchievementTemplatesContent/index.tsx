@@ -34,7 +34,7 @@ import {
 import {
   UpdateAchievementDocumentationTemplate,
   UpdateAchievementDocumentationTemplateVariables,
-} from 'apps/edu-hub/queries/__generated__/UpdateAchievementDocumentationTemplate';
+} from '../../queries/__generated__/UpdateAchievementDocumentationTemplate';
 import FileDownload from '../common/forms/FileDownload';
 
 const ManageAchievementTemplatesContent: FC = () => {
