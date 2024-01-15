@@ -37,7 +37,6 @@ jobs:
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementRecordDocumentation/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadParticipationCertificate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificate/lib/'
-          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificateTemplate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordCoverImage/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordDocumentation/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveCourseImage/lib/'
@@ -85,13 +84,6 @@ jobs:
           type: "zip"
           directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificate"
           filename: "../saveAchievementCertificate.zip"
-
-      - name: Zip Archive for saveAchievementCertificateTemplate
-        uses: thedoctor0/zip-release@main
-        with:
-          type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementCertificateTemplate"
-          filename: "../saveAchievementCertificateTemplate.zip"
 
       - name: Zip Archive for saveAchievementRecordDocumentation
         uses: thedoctor0/zip-release@main

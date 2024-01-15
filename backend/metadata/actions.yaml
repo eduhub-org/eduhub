@@ -107,6 +107,10 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveFile
+        - name: file-path
+          value: programid_${programid}/achievement_certificate_template/${filename}
   - name: saveAchievementDocumentationTemplate
     definition:
       kind: synchronous
