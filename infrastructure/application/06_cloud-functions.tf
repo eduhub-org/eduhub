@@ -186,51 +186,6 @@ resource "google_cloudfunctions2_function" "load_achievement_certificate" {
 }
 
 ###############################################################################
-# Create Google cloud function for loadAchievementCertificateTemplate
-#####
-# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
-resource "google_cloud_run_service_iam_policy" "load_achievement_certificate_template_noauth_invoker" {
-  location    = google_cloudfunctions2_function.load_achievement_certificate_template.location
-  project     = google_cloudfunctions2_function.load_achievement_certificate_template.project
-  service     = google_cloudfunctions2_function.load_achievement_certificate_template.name
-  policy_data = data.google_iam_policy.noauth_invoker.policy_data
-}
-# Retrieve data object with zipped scource code
-data "google_storage_bucket_object" "load_achievement_certificate_template" {
-  name   = "cloud-functions/loadAchievementCertificateTemplate.zip"
-  bucket = var.project_id
-}
-# Create cloud function
-resource "google_cloudfunctions2_function" "load_achievement_certificate_template" {
-  provider    = google-beta
-  location    = var.region
-  name        = "load-achievement-certificate-template"
-  description = "Loads an achivement certificate template (each program has its own) from Google Cloud Storage"
-
-  build_config {
-    runtime     = "nodejs16"
-    entry_point = "loadAchievementCertificateTemplate"
-    source {
-      storage_source {
-        bucket = var.project_id
-        object = data.google_storage_bucket_object.load_achievement_certificate_template.name
-      }
-    }
-  }
-
-  service_config {
-    environment_variables = {
-      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
-    }
-    max_instance_count = 1
-    available_memory   = "256M"
-    timeout_seconds    = 60
-    ingress_settings   = var.cloud_function_ingress_settings
-
-  }
-}
-
-###############################################################################
 # Create Google cloud function for loadAchievementRecordDocumentation
 #####
 # Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function

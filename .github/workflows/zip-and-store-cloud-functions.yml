@@ -34,7 +34,6 @@ jobs:
       - name: Copy module to functions
         run: |
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificate/lib/'
-          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificateTemplate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementRecordDocumentation/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadParticipationCertificate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadParticipationCertificateTemplate/lib/'
@@ -66,13 +65,6 @@ jobs:
           type: "zip"
           directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificate"
           filename: "../loadAchievementCertificate.zip"
-
-      - name: Zip Archive for loadAchievementCertificateTemplate
-        uses: thedoctor0/zip-release@main
-        with:
-          type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/loadAchievementCertificateTemplate"
-          filename: "../loadAchievementCertificateTemplate.zip"
 
       - name: Zip Archive for loadAchievementRecordDocumentation
         uses: thedoctor0/zip-release@main
