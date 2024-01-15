@@ -51,4 +51,4 @@ Thumbs.db
 .next
 
 # nx
-frontend-nx/.nx/cache/
+/.nx/cache/terminalOutputs/
