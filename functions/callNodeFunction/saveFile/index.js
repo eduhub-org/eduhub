@@ -12,9 +12,6 @@ const saveFile = async (req, res) => {
   if (process.env.HASURA_CLOUD_FUNCTION_SECRET == req.headers.secret) {
     const storage = buildCloudStorage(Storage);
     const content = req.body.input.base64file;
-    const achievementDocumentationTemplateId =
-      req.body.input.achievementDocumentationTemplateId;
-    const filename = req.body.input.filename;
     const isPublic = false;
 
     const templatePath = req.headers["file-path"];
