@@ -41,6 +41,12 @@ type Query {
 }
 
 type Query {
+  loadFile(
+    path: String!
+  ): loadFileOutput
+}
+
+type Query {
   loadParticipationData(
     programId: Int!
   ): loadFileOutput
@@ -51,6 +57,14 @@ type Mutation {
     base64file: String!
     filename: String!
     programid: Int!
+  ): saveFileOutput
+}
+
+type Mutation {
+  saveAchievementDocumentationTemplate(
+    base64file: String!
+    achievementDocumentationTemplateId: Int!
+    filename: String!
   ): saveFileOutput
 }
 

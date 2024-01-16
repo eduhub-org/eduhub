@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import TextField from '@material-ui/core/TextField';
-import { useAdminMutation } from '../../hooks/authedMutation';
 import { DocumentNode } from 'graphql';
-import useTranslation from 'next-translate/useTranslation';
+import TextField from '@material-ui/core/TextField';
 import Tooltip from '@material-ui/core/Tooltip';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import { useTheme } from '@material-ui/core/styles';
+import { useDebouncedCallback } from 'use-debounce';
+import { useAdminMutation } from '../../hooks/authedMutation';
+import useTranslation from 'next-translate/useTranslation';
 
 type TextFieldEditorProps = {
   label: string;
@@ -36,8 +37,8 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
   helpText,
   errorText,
   translationNamespace,
-  isMandatory=false,
-  style
+  isMandatory = false,
+  style,
 }) => {
   const [text, setText] = useState(currentText);
   const [hasBlurred, setHasBlurred] = useState(false);
@@ -46,29 +47,38 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
     onCompleted: (data) => {
       if (onTextUpdated) onTextUpdated(data);
     },
-    refetchQueries
+    refetchQueries,
   });
+
+  const { t } = useTranslation(translationNamespace);
+
+  const validateText = (newText) => {
+    if (typeCheck) {
+      return typeCheck(newText) || (!isMandatory && newText === '');
+    }
+    return isMandatory ? newText !== '' : true;
+  };
+
+  const debouncedUpdateText = useDebouncedCallback((newText) => {
+    if (validateText(newText)) {
+      updateText({ variables: { itemId, text: newText } });
+      setErrorMessage(''); // Clear any existing error message
+    } else {
+      setErrorMessage(t(errorText || 'Invalid input')); // Use your error message
+    }
+    setHasBlurred(false); // Reset the blurred state when text changes
+  }, 1000);
 
   const handleTextChange = (event) => {
     const newText = event.target.value;
-    updateText({ variables: { itemId, text: newText } });
-    setText(newText);
-    setHasBlurred(false); // Reset the blurred state when text changes
-    setErrorMessage(''); // Clear any existing error message
+    setText(newText); // Update text state immediately for UI feedback
+    debouncedUpdateText(newText); // Call debounced function with the new text
   };
 
   const handleBlur = () => {
     setHasBlurred(true);
-    if (isTypeCheckFailed) {
-      setErrorMessage(t(errorText)); // Replace with your actual error message
-    }
+    setErrorMessage(validateText(text) ? '' : t(errorText || 'Invalid input'));
   };
-
-  const { t } = useTranslation(translationNamespace);
-
-  const isTypeCheckFailed = typeCheck ? 
-    !(typeCheck(text) || (!isMandatory && text === '')) : 
-    (isMandatory && text === '');
 
   const theme = useTheme();
   const placeholderColor = theme.palette.text.disabled;
@@ -76,7 +86,7 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
   return (
     <div className="col-span-10 flex mt-3">
       <TextField
-        className={hasBlurred && errorMessage ? "w-3/4" : "w-full"}
+        className={hasBlurred && errorMessage ? 'w-3/4' : 'w-full'}
         variant="standard"
         label={t(label)}
         placeholder={t(placeholder)}
@@ -84,23 +94,20 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
         onChange={handleTextChange}
         onBlur={handleBlur}
         InputLabelProps={{
-          style: { color: isTypeCheckFailed ? 'red' : 'rgb(34, 34, 34)' }
+          style: { color: hasBlurred && errorMessage ? 'red' : 'rgb(34, 34, 34)' },
         }}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <Tooltip title={t(helpText)} placement="top">
-                <HelpOutlineIcon style={{ cursor: "pointer", color: placeholderColor }} />
+              <Tooltip title={t(helpText || '')} placement="top">
+                <HelpOutlineIcon style={{ cursor: 'pointer', color: placeholderColor }} />
               </Tooltip>
             </InputAdornment>
           ),
-          style: { color: isTypeCheckFailed ? 'red' : 'inherit' }
+          style: { color: hasBlurred && errorMessage ? 'red' : 'inherit' },
         }}
       />
-      {hasBlurred && errorMessage && (
-        <p className="text-red-500 mt-2 ml-2 text-sm">{errorMessage}</p>
-      )}
-
+      {hasBlurred && errorMessage && <p className="text-red-500 mt-2 ml-2 text-sm">{errorMessage}</p>}
     </div>
   );
 };

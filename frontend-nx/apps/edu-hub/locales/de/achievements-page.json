@@ -21,5 +21,6 @@
   "authors-missing": "Bitte Autoren hinzufügen!",
   "upload-proof": "Leistungsnachweis hochladen",
   "form-info-cover-image-size": "Optimal ist eine Größe von {{width}} x {{height}} Pixel.",
-  "form-info-documentations": "<component>Benutze diese Vorlage zum Hochladen der Dokumentation!</component>"
+  "form-info-documentations": "<component>Benutze diese Vorlage zum Hochladen der Dokumentation!</component>",
+  "uploadDocumentationTemplate": "Dokumentationsvorlage hochladen"
 }

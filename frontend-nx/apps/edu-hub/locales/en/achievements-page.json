@@ -21,5 +21,6 @@
   "authors-missing": "Please add some authors!",
   "upload-proof": "Upload proof",
   "form-info-cover-image-size": "Optimal size: {{width}} x {{height}} Pixel.",
-  "form-info-documentations": "<component>Use this template to upload the documentation!</component>"
+  "form-info-documentations": "<component>Use this template to upload the documentation!</component>",
+  "uploadDocumentationTemplate": "Upload documentation template"
 }

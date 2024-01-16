@@ -110,6 +110,23 @@ export const SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION = gql`
   }
 `;
 
+export const SAVE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE = gql`
+  mutation SaveAchievementDocumentationTemplate(
+    $base64File: String!
+    $fileName: String!
+    $achievementDocumentationTemplateId: Int!
+  ) {
+    saveAchievementDocumentationTemplate(
+      base64file: $base64File
+      filename: $fileName
+      achievementDocumentationTemplateId: $achievementDocumentationTemplateId
+    ) {
+      google_link
+      path
+    }
+  }
+`;
+
 export const SAVE_COURSE_IMAGE = gql`
   mutation SaveCourseImage(
     $base64File: String!
@@ -128,8 +145,8 @@ export const SAVE_COURSE_IMAGE = gql`
 `;
 
 export const LOAD_FILE = gql`
-  query LoadAFile($path: String!) {
-    loadAchievementCertificate(path: $path) {
+  query LoadFile($path: String!) {
+    loadFile(path: $path) {
       link
     }
   }

@@ -1,4 +1,6 @@
 import createCertificate from "./createCertificate/index.js";
+import loadFile from "./loadFile/index.js";
+import saveFile from "./saveFile/index.js";
 import winston from "winston";
 
 /**
@@ -43,6 +45,14 @@ export const callNodeFunction = async (req, res) => {
       case "createCertificate":
         logger.info("Calling createCertificate function");
         await createCertificate(req, res);
+        break;
+      case "loadFile":
+        logger.info("Calling loadFile function");
+        await loadFile(req, res);
+        break;
+      case "saveFile":
+        logger.info("Calling saveFile function");
+        await saveFile(req, res);
         break;
       default:
         return res.status(404).json({
