@@ -15,8 +15,8 @@ export interface TempAchievementOptionCourse {
 }
 export interface IDataToManipulate {
   achievementOptionId: number | null;
+  achievementDocumentationTemplateId: number | null;
   description: string | null;
-  documentationTemplateUrl: string | null;
   evaluationScriptUrl: string | null;
   recordType: AchievementRecordType_enum | null;
   title: string | null;
@@ -92,11 +92,11 @@ interface TempUserData {
 export type AtLeastNameEmail = AtLeast<TempUserData>;
 
 export type MinAchievementOption = AtLeast<{
+  achievementDocumentationTemplateId: number;
   id: number;
   title: string;
   description: string;
   recordType: AchievementRecordType_enum;
-  documentationTemplateUrl: string;
   evaluationScriptUrl: string;
   csvTemplateUrl: string | null;
 }>;

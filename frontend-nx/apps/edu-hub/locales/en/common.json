@@ -39,7 +39,8 @@
   "menu-faq": "FAQ",
   "menu-administration-user": "User",
   "menu-administration-courses": "Courses",
-  "menu-administration-achievement": "Performance Record",
+  "menu-administration-achievement": "Achievement Records",
+  "menu-administration-achievement-templates": "Achievement Record Templates",
   "menu-administration-programs": "Programs",
   "menu-administration-appSettings": "App Settings",
   "menu-logout": "Logout",
@@ -80,6 +81,7 @@
   "documentation": "Documentation",
   "cover-picture": "Cover image",
   "upload": "Upload",
+  "download": "Download",
   "degrees": "Degrees",
   "submit": "submit",
   "CONFIRMED": "confirmed",
@@ -97,5 +99,6 @@
     "university": "Name of the university",
     "organization": "Name of the organization",
     "other": "Other"
-  }
+  },
+  "achievement-documentation-template": "Achievement Record Documentation Template"
 }

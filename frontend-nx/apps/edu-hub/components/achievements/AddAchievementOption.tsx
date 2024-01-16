@@ -37,7 +37,6 @@ const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
               title: data.title,
               description: data.description,
               evaluationScriptUrl: '', // This field is also mandatory while insert
-              documentationTemplateUrl: '', // This field is also mandatory while insert
               recordType: data.recordType as AchievementRecordType_enum,
               csvTemplateUrl: data.csvTemplateFile
                 ? data.csvTemplateFile.data
@@ -94,10 +93,10 @@ const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
   );
 
   const data: IDataToManipulate = {
+    achievementDocumentationTemplateId: null,
     achievementOptionId: null,
     title: 'New Title',
     description: '',
-    documentationTemplateUrl: '',
     evaluationScriptUrl: '',
     showScoreAuthors: true,
     csvTemplateUrl: '',

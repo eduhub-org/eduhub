@@ -1,9 +1,4 @@
-import {
-  //Checkbox,
-  CircularProgress,
-  //FormControlLabel,
-  Link,
-} from '@material-ui/core';
+import { Checkbox, CircularProgress, FormControlLabel, Link } from '@material-ui/core';
 import { Translate } from 'next-translate';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, ReactNode, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
@@ -34,13 +29,14 @@ import {
   LoadAchievementOptionEvaluationScriptVariables,
 } from '../../queries/__generated__/LoadAchievementOptionEvaluationScript';
 import {
-  LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE,
   LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT,
 } from '../../queries/actions';
-import {
-  LoadAchievementOptionDocumentationTemplate,
-  LoadAchievementOptionDocumentationTemplateVariables,
-} from '../../queries/__generated__/LoadAchievementOptionDocumentationTemplate';
+// import {
+//   LoadAchievementOptionDocumentationTemplate,
+//   LoadAchievementOptionDocumentationTemplateVariables,
+// } from '../../queries/__generated__/LoadAchievementOptionDocumentationTemplate';
+import { ACHIEVEMENT_DOCUMENTATION_TEMPLATES } from '../../queries/achievementDocumentationTemplate';
+import { AchievementDocumentationTemplates } from '../../queries/__generated__/AchievementDocumentationTemplates';
 interface IPropsAddEditAchievementTempData {
   defaultData: IDataToManipulate;
   onSaveCallBack: (data: IDataToManipulate) => Promise<ResponseToARequest>;
@@ -63,29 +59,32 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
   const [scriptGoogleUrl, setScriptGoogleUrl] = useState(null as string);
   // const [documentTemplateGoogleLink, setDocumentTemplateGoogleLink] = useState(null as string);
 
-  const loadAchievementOptionDocumentationTemplate = useAdminQuery<
-    LoadAchievementOptionDocumentationTemplate,
-    LoadAchievementOptionDocumentationTemplateVariables
-  >(LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE, {
-    variables: { path: props.defaultData.documentationTemplateUrl },
-    skip: props.defaultData.documentationTemplateUrl.trim().length === 0,
-  });
+  // const loadAchievementOptionDocumentationTemplate = useAdminQuery<
+  //   LoadAchievementOptionDocumentationTemplate,
+  //   LoadAchievementOptionDocumentationTemplateVariables
+  // >(LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE, {
+  //   variables: { path: props.defaultData.documentationTemplateUrl },
+  //   skip: props.defaultData.documentationTemplateUrl?.trim().length === 0,
+  // });
+  const loadAchievementDocumentationTemplates = useAdminQuery<AchievementDocumentationTemplates>(
+    ACHIEVEMENT_DOCUMENTATION_TEMPLATES
+  );
   const loadAchievementOptionEvaluationScript = useAdminQuery<
     LoadAchievementOptionEvaluationScript,
     LoadAchievementOptionEvaluationScriptVariables
   >(LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT, {
     variables: { path: props.defaultData.evaluationScriptUrl },
-    skip: props.defaultData.evaluationScriptUrl.trim().length === 0,
+    skip: props.defaultData.evaluationScriptUrl?.trim().length === 0,
   });
   useEffect(() => {
-    if (
-      loadAchievementOptionDocumentationTemplate &&
-      loadAchievementOptionDocumentationTemplate.data?.loadAchievementOptionDocumentationTemplate?.link
-    ) {
-      // setDocumentTemplateGoogleLink(
-      //   loadAchievementOptionDocumentationTemplate.data.loadAchievementOptionDocumentationTemplate.link
-      // );
-    }
+    // if (
+    //   loadAchievementOptionDocumentationTemplate &&
+    //   loadAchievementOptionDocumentationTemplate.data?.loadAchievementOptionDocumentationTemplate?.link
+    // ) {
+    //   setDocumentTemplateGoogleLink(
+    //     loadAchievementOptionDocumentationTemplate.data.loadAchievementOptionDocumentationTemplate.link
+    //   );
+    // }
 
     if (
       loadAchievementOptionEvaluationScript &&
@@ -93,7 +92,10 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
     ) {
       setScriptGoogleUrl(loadAchievementOptionEvaluationScript.data.loadAchievementOptionEvaluationScript.link);
     }
-  }, [loadAchievementOptionDocumentationTemplate, loadAchievementOptionEvaluationScript]);
+  }, [
+    // loadAchievementOptionDocumentationTemplate,
+    loadAchievementOptionEvaluationScript,
+  ]);
 
   /* #region callbacks */
   const showAddMentorDialog = useCallback(() => {
@@ -184,13 +186,13 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
     });
   }, []);*/
 
-  const handleInputFile = useCallback((controlName: string, file: UploadFile) => {
-    console.log(controlName);
-    dispatch({
-      key: controlName,
-      value: file,
-    });
-  }, []);
+  // const handleInputFile = useCallback((controlName: string, file: UploadFile) => {
+  //   console.log(controlName);
+  //   dispatch({
+  //     key: controlName,
+  //     value: file,
+  //   });
+  // }, []);
 
   const handleSubmit = useCallback(
     async (event) => {
@@ -213,11 +215,11 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
    * https://www.geeksforgeeks.org/how-to-create-and-download-csv-file-in-javascript/
    * https://stackoverflow.com/questions/73342056/convert-base64-string-to-csv-javascript-giving-blob-error
    */
-  const clickCSV = useCallback(() => {
-    if (state.csvTemplateUrl) {
-      downloadCSVFileFromBase64String(state.csvTemplateUrl);
-    }
-  }, [state.csvTemplateUrl]);
+  // const clickCSV = useCallback(() => {
+  //   if (state.csvTemplateUrl) {
+  //     downloadCSVFileFromBase64String(state.csvTemplateUrl);
+  //   }
+  // }, [state.csvTemplateUrl]);
 
   const tCommon: Translate = context.t;
   const { t } = useTranslation('course-page');
@@ -313,23 +315,51 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
               </div>
               <p className="text-stela-500">{`* ${tCommon('form-mandatory-field')}`}</p>
             </div>
-            {/* <CustomFileInput
-              title={`${tCommon('documentation-template')} (.doc)*`}
-              name={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
-              id={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
-              accept=".doc, .docx"
-              onChangeHandler={handleInputFile}
-              customLink={
-                documentTemplateGoogleLink ? (
-                  <Link href={documentTemplateGoogleLink}>
-                    {tCommon('download-documentation-template')}
-                  </Link>
-                ) : (
-                  ''
-                )
-              }
-            /> */}
-            {state.recordType === 'DOCUMENTATION_AND_CSV' && (
+            {(state.recordType === 'DOCUMENTATION' || state.recordType === 'ONLINE_COURSE') && (
+              // <CustomFileInput
+              //   title={`${t('achievements-page:uploadDocumentationTemplate')} (.doc, .docx, .pdf, .zip, .xls, .csv)*`}
+              //   name={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
+              //   id={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
+              //   accept=".doc, .docx, .zip, .pdf, .xls, .csv"
+              //   onChangeHandler={handleInputFile}
+              //   customLink={
+              //     documentTemplateGoogleLink ? (
+              //       <Link href={documentTemplateGoogleLink}>
+              //         {t('achievements-page:uploadDocumentationTemplate')}
+              //       </Link>
+              //     ) : (
+              //       ''
+              //     )
+              //   }
+              // />
+              <div>
+                {loadAchievementDocumentationTemplates?.data?.AchievementDocumentationTemplate && (
+                  <div className="flex flex-col space-y-1">
+                    <p>{`${tCommon('achievement-documentation-template')}*`}</p>
+                    <EhSelectCustom
+                      onChange={handleInputChange}
+                      options={[
+                        // Add a default option when state.achievementDocumentationTemplateId is not set
+                        !state.achievementDocumentationTemplateId && {
+                          label: t('selectTemplateDefaultLabel'),
+                          value: '',
+                        },
+                        ...loadAchievementDocumentationTemplates.data.AchievementDocumentationTemplate.map(
+                          (template) => ({
+                            label: template.title,
+                            value: template.id,
+                          })
+                        ),
+                      ]}
+                      name={'achievementDocumentationTemplateId'}
+                      id={'achievementDocumentationTemplateId'}
+                      value={state.achievementDocumentationTemplateId ?? ''}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+            {/* {state.recordType === 'DOCUMENTATION_AND_CSV' && (
               //
               <CustomFileInput
                 title={`${tCommon('documentation-template-CSV')} (.csv)*`}
@@ -347,10 +377,10 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
                   )
                 }
               />
-            )}
+            )} */}
           </div>
           <div className="flex flex-col w-full justify-end gap-5">
-            {state.recordType === 'DOCUMENTATION_AND_CSV' && (
+            {/* {state.recordType === 'DOCUMENTATION_AND_CSV' && (
               <div className="flex justify-end">
                 <CustomFileInput
                   accept=".py"
@@ -367,7 +397,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
                   }
                 />
               </div>
-            )}
+            )} */}
             {/* <FormControlLabel
               className="justify-end"
               control={
@@ -433,6 +463,15 @@ interface IProsSelect {
   [key: string]: any;
 }
 
+interface IProsSelectCustom {
+  options: {
+    label: string;
+    value: number | string;
+  }[];
+  onChange: (selected: string) => void;
+  [key: string]: any;
+}
+
 const EhSelectForEnum2: FC<IProsSelect> = ({ options, onChange, ...custom }) => {
   const onSelectChanged = useCallback(
     (event) => {
@@ -467,54 +506,88 @@ const EhSelectForEnum2: FC<IProsSelect> = ({ options, onChange, ...custom }) => 
   );
 };
 
-const CustomFileInput: FC<{
-  onChangeHandler: (controlName: string, file: UploadFile) => void;
-  name: string;
-  accept: string;
-  id: string;
-  title: string;
-  customLink?: ReactNode;
-}> = (props) => {
-  const [fileName, setFileName] = useState('');
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const onClickHandler = useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
-
-  const onChange = useCallback(
-    async (event) => {
-      const file: UploadFile = await parseFileUploadEvent(event);
-      setFileName(file.name);
-      props.onChangeHandler(props.name, file);
+const EhSelectCustom: FC<IProsSelectCustom> = ({ options, onChange, ...custom }) => {
+  const onSelectChanged = useCallback(
+    (event) => {
+      onChange(event);
     },
-    [props]
+    [onChange]
   );
+
   return (
-    <>
-      <div className="flex flex-row space-x-1">
-        <div className="flex flex-col space-y-1 items-center ">
-          <p className="w-full">{props.title}</p>
-          <div className="h-12 text-center pt-3  px-2  bg-white  w-full">
-            {fileName.trim().length > 0 ? <p>{fileName}</p> : props.customLink ? <>{props.customLink}</> : <></>}
-          </div>
-        </div>
-        <div className="pt-6 pl-1">
-          <div className="h-10 w-10  rounded-full border-2 border-gray-400 flex justify-center items-center">
-            <MdUploadFile size="1.5em" className="cursor-pointer" onClick={onClickHandler} />
-          </div>
-          <input
-            accept={props.accept}
-            onChange={onChange}
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            type="file"
-            name={props.name}
-            id={props.id}
-          />
-        </div>
-      </div>
-    </>
+    <select
+      className="form-select h-12
+      appearance
+      block
+      w-full
+      px-3
+      font-normal
+      bg-white
+      transition
+      ease-in-out
+      border
+      border-solid border-gray-300
+      focus:text-black focus:bg-white focus:border-blue-600 focus:outline-none"
+      onChange={onSelectChanged}
+      {...custom}
+    >
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
   );
 };
+
+// const CustomFileInput: FC<{
+//   onChangeHandler: (controlName: string, file: UploadFile) => void;
+//   name: string;
+//   accept: string;
+//   id: string;
+//   title: string;
+//   customLink?: ReactNode;
+// }> = (props) => {
+//   const [fileName, setFileName] = useState('');
+//   const fileInputRef = useRef<HTMLInputElement | null>(null);
+//   const onClickHandler = useCallback(() => {
+//     fileInputRef.current?.click();
+//   }, []);
+
+//   const onChange = useCallback(
+//     async (event) => {
+//       const file: UploadFile = await parseFileUploadEvent(event);
+//       setFileName(file.name);
+//       props.onChangeHandler(props.name, file);
+//     },
+//     [props]
+//   );
+//   return (
+//     <>
+//       <div className="flex flex-row space-x-1">
+//         <div className="flex flex-col space-y-1 items-center ">
+//           <p className="w-full">{props.title}</p>
+//           <div className="h-12 text-center pt-3  px-2  bg-white  w-full">
+//             {fileName.trim().length > 0 ? <p>{fileName}</p> : props.customLink ? <>{props.customLink}</> : <></>}
+//           </div>
+//         </div>
+//         <div className="pt-6 pl-1">
+//           <div className="h-10 w-10  rounded-full border-2 border-gray-400 flex justify-center items-center">
+//             <MdUploadFile size="1.5em" className="cursor-pointer" onClick={onClickHandler} />
+//           </div>
+//           <input
+//             accept={props.accept}
+//             onChange={onChange}
+//             ref={fileInputRef}
+//             style={{ display: 'none' }}
+//             type="file"
+//             name={props.name}
+//             id={props.id}
+//           />
+//         </div>
+//       </div>
+//     </>
+//   );
+// };
 
 /* #endregion */

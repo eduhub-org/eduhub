@@ -164,6 +164,91 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     []
   );
 
+    interface ExtendedDegreeParticipantsEnrollment
+      extends DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments {
+      name?: string;
+      lastApplication?: string;
+      ectsTotal?: string;
+      attendedEvents?: number;
+    }
+
+    const columnsNew = useMemo<ColumnDef<ExtendedDegreeParticipantsEnrollment>[]>(
+      () => [
+        {
+          accessorKey: 'name',
+          enableSorting: true,
+          className: '',
+          meta: {
+            width: 3,
+          },
+          cell: ({ getValue }) => <div className="uppercase">{getValue<string>()}</div>,
+        },
+        {
+          accessorKey: 'participations',
+          accessorFn: (row) => row.User.CourseEnrollments,
+          meta: {
+            width: 4,
+          },
+          cell: ({ getValue }) => (
+            <div>
+              {getValue<
+                DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments[]
+              >().map((enrollment, index) => (
+                <span key={`enrollment-${index}`}>
+                  {enrollment.Course.title} - {enrollment.Course.Program.shortTitle} (
+                  {enrollment.achievementCertificateURL ? 'COMPLETED' : enrollment.status})
+                  <br />
+                </span>
+              ))}
+            </div>
+          ),
+        },
+        {
+          accessorKey: 'lastApplication',
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+        },
+        {
+          accessorKey: 'status',
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+        },
+        {
+          accessorKey: 'ectsTotal',
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+          enableSorting: true,
+        },
+        {
+          accessorKey: 'attendedEvents',
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+        },
+        {
+          accessorKey: 'certificate',
+          accessorFn: (row) => row,
+          meta: {
+            className: 'text-center',
+            width: 1,
+          },
+          cell: ({ getValue }) => (
+            <div>
+              <CertificateDownload courseEnrollment={getValue<ExtendedDegreeParticipantsEnrollment>()} manageView />
+            </div>
+          ),
+        },
+      ],
+      []
+    );
+
   // Render component
   return (
     <>
@@ -173,6 +258,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         showCheckbox={false}
         showDelete={false}
         translationNamespace="manageCourse"
+        refetchQueries={['DegreeParticipantsWithDegreeEnrollments']}
       />
     </>
   );

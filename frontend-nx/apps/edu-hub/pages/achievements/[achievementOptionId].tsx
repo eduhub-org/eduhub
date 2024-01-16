@@ -46,7 +46,7 @@ import {
 import { Translate } from 'next-translate';
 import FormToUploadAchievementRecord from '../../components/FormToUploadAchievementRecord';
 import { AlertMessageDialog } from '../../components/common/dialogs/AlertMessageDialog';
-import { useUserId } from '../../hooks/user';
+import { useUser, useUserId } from '../../hooks/user';
 import { COURSE_ENROLLMENTS } from '../../queries/courseEnrollment';
 import {
   CourseEnrollmentQuery,
@@ -223,6 +223,8 @@ const ViewForCSV: FC<IProps2> = ({
     },
   });
 
+  const user = useUser();
+
   useEffect(() => {
     const r = [...(achievementRecords.data?.AchievementRecord || [])];
     setAchievementRecords(r);
@@ -246,12 +248,14 @@ const ViewForCSV: FC<IProps2> = ({
       {showModal && (
         <FormToUploadAchievementRecord
           achievementOption={achievementOption}
+          isOpen={showModal}
           onSuccess={onSuccess}
           onClose={onClosed}
           courseTitle={course.title}
           setAlertMessage={setAlertMessage}
           userId={userId}
           courseId={course.id}
+          user={user}
         />
       )}
 
@@ -266,9 +270,7 @@ const ViewForCSV: FC<IProps2> = ({
                 {/* This button is only shown if the achievement option is not yet expired. */}
                 {!isDateExpired(new Date(course.endTime)) && (
                   <div>
-                    <Button onClick={upload} filled>{`${t(
-                      'achievements-page:upload'
-                    )}`}</Button>
+                    <Button onClick={upload} filled>{`${t('achievements-page:upload')}`}</Button>
                   </div>
                 )}
               </div>
@@ -276,8 +278,7 @@ const ViewForCSV: FC<IProps2> = ({
             right={
               <p className="uppercase">
                 {/* AchievementOption.Course.endDate */}
-                {t('achievements-page:deadline')}{' '}
-                {formattedDate(course.endTime)}
+                {t('achievements-page:deadline')} {formattedDate(course.endTime)}
               </p>
             }
           ></ContentRowTwoColumn>
@@ -290,16 +291,10 @@ const ViewForCSV: FC<IProps2> = ({
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell align="center">
-                        {t('achievements-page:rank')}
-                      </TableCell>
-                      <TableCell align="center">
-                        {t('achievements-page:results')}
-                      </TableCell>
+                      <TableCell align="center">{t('achievements-page:rank')}</TableCell>
+                      <TableCell align="center">{t('achievements-page:results')}</TableCell>
                       {/* Column is only show when AchievementOption.showScoreAuthors==TRUE */}
-                      {achievementOption.showScoreAuthors && (
-                        <TableCell>{t('achievements-page:mentors')}</TableCell>
-                      )}
+                      {achievementOption.showScoreAuthors && <TableCell>{t('achievements-page:mentors')}</TableCell>}
                       <TableCell>{t('date')}</TableCell>
                     </TableRow>
                   </TableHead>
@@ -320,9 +315,7 @@ const ViewForCSV: FC<IProps2> = ({
                             </BoldText>
                           </TableCell>
                         )}
-                        <TableCell>
-                          {formattedDate(new Date(row.created_at))}
-                        </TableCell>
+                        <TableCell>{formattedDate(new Date(row.created_at))}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -374,6 +367,8 @@ const RecordTypeDocumentView: FC<IProps2> = ({
       limit: 1,
     },
   });
+
+  const user = useUser();
 
   useEffect(() => {
     const r = [...(achievementRecords.data?.AchievementRecord || [])];
@@ -435,6 +430,7 @@ const RecordTypeDocumentView: FC<IProps2> = ({
     <>
       {showModal && (
         <FormToUploadAchievementRecord
+          isOpen={showModal}
           onClose={onClosed}
           achievementOption={achievementOption}
           onSuccess={onSuccess}
@@ -442,6 +438,7 @@ const RecordTypeDocumentView: FC<IProps2> = ({
           setAlertMessage={setAlertMessage}
           userId={userId}
           courseId={course.id}
+          user={user}
         />
       )}
       {/* This section is only shown for a user currently registered in the course indicated for this achievement option */}
@@ -451,16 +448,13 @@ const RecordTypeDocumentView: FC<IProps2> = ({
           <ContentRowTwoColumn
             left={
               <div id="results" className="flex flex-col gap-2">
-                <Button onClick={upload} filled>{`${t(
-                  'achievements-page:upload'
-                )}`}</Button>
+                <Button onClick={upload} filled>{`${t('achievements-page:upload')}`}</Button>
               </div>
             }
             right={
               <p className="uppercase">
                 {/* AchievementOption.Course.endDate */}
-                {t('achievements-page:deadline')}{' '}
-                {formattedDate(course.endTime)}
+                {t('achievements-page:deadline')} {formattedDate(course.endTime)}
               </p>
             }
           ></ContentRowTwoColumn>
@@ -468,9 +462,7 @@ const RecordTypeDocumentView: FC<IProps2> = ({
            before the view includes an additional section below the upload button, showing the file name of the last submitted project documentation, the authors and the date it was uploaded. */}
           {myLastUpload.length > 0 && (
             <div id="my-uploads">
-              <Typography variant="button">
-                {t('achievements-page:last-submitted-documentation')}
-              </Typography>
+              <Typography variant="button">{t('achievements-page:last-submitted-documentation')}</Typography>
               <Paper>
                 <Table>
                   <TableHead>
@@ -483,10 +475,7 @@ const RecordTypeDocumentView: FC<IProps2> = ({
                   <TableBody>
                     <TableRow>
                       <TableCell>
-                        {myLastUpload[0].documentationUrl &&
-                          getLastAfterSplitting(
-                            myLastUpload[0].documentationUrl
-                          )}
+                        {myLastUpload[0].documentationUrl && getLastAfterSplitting(myLastUpload[0].documentationUrl)}
                       </TableCell>
                       <TableCell>
                         <BoldText>
@@ -495,9 +484,7 @@ const RecordTypeDocumentView: FC<IProps2> = ({
                           ).join(', ')}
                         </BoldText>
                       </TableCell>
-                      <TableCell>
-                        {formattedDate(new Date(myLastUpload[0].created_at))}
-                      </TableCell>
+                      <TableCell>{formattedDate(new Date(myLastUpload[0].created_at))}</TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -505,34 +492,22 @@ const RecordTypeDocumentView: FC<IProps2> = ({
             </div>
           )}
           <div id="records">
-            <Typography variant="button">
-              {t('achievements-page:results-so-far')}
-            </Typography>
+            <Typography variant="button">{t('achievements-page:results-so-far')}</Typography>
             {records && (
               <Paper>
                 <Table>
                   <TableHead>
                     <TableRow>
                       <TableCell>{t('achievements-page:file-name')}</TableCell>
-                      <TableCell colSpan={4}>
-                        {t('achievements-page:mentors')}
-                      </TableCell>
+                      <TableCell colSpan={4}>{t('achievements-page:mentors')}</TableCell>
                       <TableCell colSpan={4}>{t('date')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {records.map((row, index) => (
                       <TableRow key={row.id}>
-                        <TableCell
-                          colSpan={1}
-                          variant="head"
-                          component="th"
-                          scope="row"
-                        >
-                          <Tooltip
-                            title={getLastAfterSplitting(row.documentationUrl)}
-                            enterDelay={300}
-                          >
+                        <TableCell colSpan={1} variant="head" component="th" scope="row">
+                          <Tooltip title={getLastAfterSplitting(row.documentationUrl)} enterDelay={300}>
                             {row.documentationUrl.length > 0 && (
                               <p className="text-ellipsis overflow-hidden">
                                 {getLastAfterSplitting(row.documentationUrl)}
@@ -547,9 +522,7 @@ const RecordTypeDocumentView: FC<IProps2> = ({
                             ).join(', ')}
                           </BoldText>
                         </TableCell>
-                        <TableCell colSpan={4}>
-                          {formattedDate(new Date(row.created_at))}
-                        </TableCell>
+                        <TableCell colSpan={4}>{formattedDate(new Date(row.created_at))}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

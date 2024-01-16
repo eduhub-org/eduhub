@@ -12,7 +12,7 @@ import {
 import { StaticComponentProperty } from '../../types/UIComponents';
 import EhAddButton from '../common/EhAddButton';
 import EhCheckBox2 from '../common/EhCheckBox2';
-import ModalControl from '../common/Modal';
+import Modal from '../common/Modal';
 import Loading from '../common/Loading';
 import AddUser from './AddUser';
 
@@ -20,10 +20,7 @@ import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../queries/programList';
 import { Programs } from '../../queries/__generated__/Programs';
 import { Programs_Program } from '../../queries/__generated__/Programs';
 
-import {
-  User_bool_exp,
-  CourseEnrollmentStatus_enum,
-} from '../../__generated__/globalTypes';
+import { User_bool_exp, CourseEnrollmentStatus_enum } from '../../__generated__/globalTypes';
 import useTranslation from 'next-translate/useTranslation';
 
 interface IProps {
@@ -31,14 +28,11 @@ interface IProps {
   searchedText: string;
 }
 const UserList: FC<IProps> = ({ t, searchedText }) => {
-  const [selectedProgram, setSelectedProgram] =
-    useState<Programs_Program | null>(null);
+  const [selectedProgram, setSelectedProgram] = useState<Programs_Program | null>(null);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 
   // Fetch the list of programs to display in the filter dropdown
-  const programsRequest = useAdminQuery<Programs>(
-    PROGRAMS_WITH_MINIMUM_PROPERTIES
-  );
+  const programsRequest = useAdminQuery<Programs>(PROGRAMS_WITH_MINIMUM_PROPERTIES);
 
   const USER_TYPE_INSTUCTOR = 1;
   const USER_TYPE_SPEAKER = 2;
@@ -46,13 +40,14 @@ const UserList: FC<IProps> = ({ t, searchedText }) => {
 
   const LIMIT = 15;
 
-  const userTypes: StaticComponentProperty[] = useMemo(() => [
-    { key: USER_TYPE_INSTUCTOR, label: t('courseInstructor'), selected: false },
-    { key: USER_TYPE_SPEAKER, label: t('speaker'), selected: false },
-    { key: USER_TYPE_AMIN, label: t('admin'), selected: false },
-  ],[t]);
-
-
+  const userTypes: StaticComponentProperty[] = useMemo(
+    () => [
+      { key: USER_TYPE_INSTUCTOR, label: t('courseInstructor'), selected: false },
+      { key: USER_TYPE_SPEAKER, label: t('speaker'), selected: false },
+      { key: USER_TYPE_AMIN, label: t('admin'), selected: false },
+    ],
+    [t]
+  );
 
   /** Filter actually works inner joining multiple tables.
    * Example: To select Course Instructors:
@@ -63,43 +58,46 @@ const UserList: FC<IProps> = ({ t, searchedText }) => {
    * @param {StaticComponentProperty} uTypes usert types
    * @returns {User_bool_exp} Filter user by boolean expressions
    * */
-  const filterForUserTypes = useCallback((uTypes: StaticComponentProperty[]) => {
-    const userFilter: User_bool_exp[] = [];
+  const filterForUserTypes = useCallback(
+    (uTypes: StaticComponentProperty[]) => {
+      const userFilter: User_bool_exp[] = [];
 
-    uTypes.forEach((ut) => {
-      if (!ut.selected) return;
+      uTypes.forEach((ut) => {
+        if (!ut.selected) return;
 
-      if (ut.key === USER_TYPE_AMIN) {
-        userFilter.push({ Admins: {} });
-      }
-      if (ut.key === USER_TYPE_INSTUCTOR) {
-        userFilter.push({ Experts: { CourseInstructors: {} } });
-      }
-      if (ut.key === USER_TYPE_SPEAKER) {
-        userFilter.push({ Experts: { SessionSpeakers: {} } });
-      }
-    });
-    if (selectedProgram) {
-      userFilter.push({
-        CourseEnrollments: {
-          Course: { programId: { _eq: selectedProgram.id } },
-        },
+        if (ut.key === USER_TYPE_AMIN) {
+          userFilter.push({ Admins: {} });
+        }
+        if (ut.key === USER_TYPE_INSTUCTOR) {
+          userFilter.push({ Experts: { CourseInstructors: {} } });
+        }
+        if (ut.key === USER_TYPE_SPEAKER) {
+          userFilter.push({ Experts: { SessionSpeakers: {} } });
+        }
       });
-    }
+      if (selectedProgram) {
+        userFilter.push({
+          CourseEnrollments: {
+            Course: { programId: { _eq: selectedProgram.id } },
+          },
+        });
+      }
 
-    if (selectedStatuses.length > 0) {
-      userFilter.push({
-        CourseEnrollments: {
-          status: { _in: selectedStatuses as CourseEnrollmentStatus_enum[] },
-        },
-      });
-    }
+      if (selectedStatuses.length > 0) {
+        userFilter.push({
+          CourseEnrollments: {
+            status: { _in: selectedStatuses as CourseEnrollmentStatus_enum[] },
+          },
+        });
+      }
 
-    if (userFilter.length === 0) return {};
-    return {
-      _or: userFilter,
-    };
-  }, [selectedProgram, selectedStatuses]);
+      if (userFilter.length === 0) return {};
+      return {
+        _or: userFilter,
+      };
+    },
+    [selectedProgram, selectedStatuses]
+  );
 
   const [filter, setFilter] = useState(filterForUserTypes(userTypes));
   // GRAPHQL Related part
@@ -117,10 +115,7 @@ const UserList: FC<IProps> = ({ t, searchedText }) => {
    * User has to be Instructor/Speaker/Admin, if the respective checkbox is selected.
    * Then we have to apply, Search filter.
    */
-  const userListRequest = useAdminQuery<
-    UsersByLastName,
-    UsersByLastNameVariables
-  >(USERS_BY_LAST_NAME, {
+  const userListRequest = useAdminQuery<UsersByLastName, UsersByLastNameVariables>(USERS_BY_LAST_NAME, {
     variables: {
       limit: LIMIT,
       offset: 0,
@@ -166,8 +161,7 @@ const UserList: FC<IProps> = ({ t, searchedText }) => {
   }
   const users = [...(userListRequest.data?.User || [])];
 
-  const totalCount =
-    userListRequest.data?.User_aggregate?.aggregate?.count || 0;
+  const totalCount = userListRequest.data?.User_aggregate?.aggregate?.count || 0;
 
   return (
     <div className="flex flex-col space-y-10 text-white">
@@ -183,22 +177,13 @@ const UserList: FC<IProps> = ({ t, searchedText }) => {
         ;
       </div>
       <div className="flex flex-start">
-        {userListRequest.loading ? (
-          <Loading />
-        ) : (
-          users.length > 0 && <TableContent t={t} users={users} />
-        )}
+        {userListRequest.loading ? <Loading /> : users.length > 0 && <TableContent t={t} users={users} />}
       </div>
       {userListRequest.loading ? (
         <></>
       ) : (
         totalCount > LIMIT && (
-          <Pagination
-            t={t}
-            records={totalCount}
-            defaultLimit={LIMIT}
-            userListRequest={userListRequest}
-          />
+          <Pagination t={t} records={totalCount} defaultLimit={LIMIT} userListRequest={userListRequest} />
         )
       )}
     </div>
@@ -260,9 +245,7 @@ const Header: FC<IHeaderProps> = ({
   const onProgramFilterChange = useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
       const selectedProgramId = parseInt(event.target.value, 10);
-      const selectedProgram = programs.find(
-        (program) => program.id === selectedProgramId
-      );
+      const selectedProgram = programs.find((program) => program.id === selectedProgramId);
       handleProgramFilterChange(selectedProgram || null);
     },
     [programs, handleProgramFilterChange]
@@ -309,28 +292,17 @@ const Header: FC<IHeaderProps> = ({
       <div className="grid content-center">
         <div className="flex space-x-5 flex-row">
           {menuItems.map((item) => (
-            <EhCheckBox2
-              key={item.key}
-              onClickHandler={handCheckBoxClick}
-              property={item}
-            />
+            <EhCheckBox2 key={item.key} onClickHandler={handCheckBoxClick} property={item} />
           ))}
         </div>
       </div>
 
       <div className="flex-end text-white">
-        <EhAddButton
-          buttonClickCallBack={onAddUserClick}
-          text={t('addUserButtonText')}
-        />
+        <EhAddButton buttonClickCallBack={onAddUserClick} text={t('addUserButtonText')} />
       </div>
-      <ModalControl
-        close={onCloseAddCourseWindow}
-        isOpen={showAddUserForm}
-        title={t('addUserFormTitle')}
-      >
+      <Modal onClose={onCloseAddCourseWindow} isOpen={showAddUserForm} title={t('addUserFormTitle')}>
         <AddUser handleCancel={handleCancelOfAddUserForm} t={t} />
-      </ModalControl>
+      </Modal>
     </>
   );
 };
@@ -353,9 +325,7 @@ const TableContent: FC<ITableContentProps> = ({ t, users }) => {
             {tableHeaders.map((component) => {
               return (
                 <th key={component.key} className="py-2 px-5">
-                  <p className="flex justify-start font-medium text-gray-400 uppercase">
-                    {component.label}
-                  </p>
+                  <p className="flex justify-start font-medium text-gray-400 uppercase">{component.label}</p>
                 </th>
               );
             })}
@@ -399,27 +369,23 @@ const UserOneRow: FC<IPropsUser> = ({ user }) => {
       </tr>
       <tr className="font-medium bg-edu-course-list h-12">
         <td className={tdStyple}>
-          <p className={pStyleSub}>{`${t('status')}: ${
-            user.employment ? t(user.employment) : "-"
-          }`}</p>
+          <p className={pStyleSub}>{`${t('status')}: ${user.employment ? t(user.employment) : '-'}`}</p>
         </td>
         <td className={tdStyple}>
           <p className={pStyleSub}>{`${t('matriculation-number')}: ${
-           user.matriculationNumber ? user.matriculationNumber : "-"
+            user.matriculationNumber ? user.matriculationNumber : '-'
           }`}</p>
         </td>
         <td className={tdStyple}>
-          <p className={pStyleSub}>{`${t('university')}: ${
-            user.university ? t(user.university) : "-"
-          }`}</p>
+          <p className={pStyleSub}>{`${t('university')}: ${user.university ? t(user.university) : '-'}`}</p>
         </td>
       </tr>
       <tr className="font-medium bg-edu-course-list h-12">
         <td className={tdStyple} colSpan={3}>
           {user.CourseEnrollments.map((enrollment, index) => (
             <p key={index} className={enrollmentPStyle}>
-            {enrollment.Course.title} ({enrollment.Course.Program.shortTitle}) - {enrollment.status}
-          </p>
+              {enrollment.Course.title} ({enrollment.Course.Program.shortTitle}) - {enrollment.status}
+            </p>
           ))}
         </td>
       </tr>
@@ -434,12 +400,7 @@ interface IPaginationProps {
   records: number;
   userListRequest: QueryResult<UsersByLastName, UsersByLastNameVariables>;
 }
-const Pagination: FC<IPaginationProps> = ({
-  t,
-  defaultLimit,
-  records,
-  userListRequest,
-}) => {
+const Pagination: FC<IPaginationProps> = ({ t, defaultLimit, records, userListRequest }) => {
   const limit = defaultLimit;
   const pages = Math.ceil(records / limit);
   const [current_page, setCurrentPage] = useState(1);
@@ -483,9 +444,7 @@ const Pagination: FC<IPaginationProps> = ({
             onClick={handlePrevious}
           />
         )}
-        <p className="font-medium">
-          {t('paginationText', { currentPage: current_page, totalPage: pages })}
-        </p>
+        <p className="font-medium">{t('paginationText', { currentPage: current_page, totalPage: pages })}</p>
 
         {current_page < pages && (
           <MdArrowForward

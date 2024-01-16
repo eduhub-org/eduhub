@@ -76,6 +76,18 @@ actions:
           value_from_env: HASURA_BUCKET
     permissions:
       - role: user_access
+  - name: loadFile
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+        - name: name
+          value: loadFile
+    comment: Loads file url from Google Storage Bucket
   - name: loadParticipationData
     definition:
       kind: ""
@@ -95,6 +107,19 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+  - name: saveAchievementDocumentationTemplate
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveFile
+        - name: file-path
+          value: achievementDocumentationTemplateId_${achievementDocumentationTemplateId}/${filename}
   - name: saveAchievementOptionDocumentationTemplate
     definition:
       kind: synchronous

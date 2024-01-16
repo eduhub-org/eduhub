@@ -42,7 +42,7 @@ interface IProps {
   updateFilter: (newState: AdminCourseListVariables) => void;
   currentFilter: AdminCourseListVariables;
 }
-const CourseListTable: FC<IProps> = ({
+const ManageCoursesContent: FC<IProps> = ({
   courseListRequest,
   programs,
   t,
@@ -151,8 +151,8 @@ const CourseListTable: FC<IProps> = ({
       return [];
     }
   }, [degreeCoursesQuery.data, degreeCoursesQuery.loading, degreeCoursesQuery.error]);
-  
-  
+
+
   return (
     <>
       <div className="flex flex-col space-y-10">
@@ -215,7 +215,7 @@ const CourseListTable: FC<IProps> = ({
   );
 };
 
-export default CourseListTable;
+export default ManageCoursesContent;
 
 /* #region Pagination */
 interface IPageProps extends IProps {

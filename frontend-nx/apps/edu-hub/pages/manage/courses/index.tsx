@@ -4,8 +4,8 @@ path.resolve('./next.config.js');
 
 import useTranslation from 'next-translate/useTranslation';
 import Head from 'next/head';
+import ManageCoursesContent from '../../../components/ManageCoursesContent';
 import { FC, useCallback, useMemo, useState } from 'react';
-import CourseListTable from '../../../components/ManageCoursesContent';
 import CoursesHeader from '../../../components/ManageCoursesContent/CoursesHeader';
 import Loading from '../../../components/common/Loading';
 import { Page } from '../../../components/Page';
@@ -102,8 +102,9 @@ const Content: FC<IProps> = ({ programs }) => {
       />
       {courseListRequest.loading ? (
         <Loading />
-      ) : courseListRequest.data?.Course && courseListRequest.data?.Course.length > 0 ? (
-        <CourseListTable
+      ) : courseListRequest.data?.Course &&
+        courseListRequest.data?.Course.length > 0 ? (
+        <ManageCoursesContent
           courseListRequest={courseListRequest}
           programs={sortedPrograms}
           t={t}

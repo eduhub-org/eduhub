@@ -20,10 +20,7 @@ import {
   UpdateEnrollmentRating,
   UpdateEnrollmentRatingVariables,
 } from '../../../queries/__generated__/UpdateEnrollmentRating';
-import {
-  UPDATE_ENROLLMENT_STATUS,
-  UPDATE_ENROLLMENT_RATING,
-} from '../../../queries/insertEnrollment';
+import { UPDATE_ENROLLMENT_STATUS, UPDATE_ENROLLMENT_RATING } from '../../../queries/insertEnrollment';
 import { Button as OldButton } from '../../common/Button';
 import { Dialog, DialogTitle } from '@material-ui/core';
 import { MdClose } from 'react-icons/md';
@@ -33,10 +30,7 @@ import { useAdminQuery } from '../../../hooks/authedQuery';
 import { MailTemplates } from '../../../queries/__generated__/MailTemplates';
 import { INSERT_MAIL_LOG, MAIL_TEMPLATES } from '../../../queries/mail';
 import { displayDate } from '../../../helpers/dateHelpers';
-import {
-  InsertMailLog,
-  InsertMailLogVariables,
-} from '../../../queries/__generated__/InsertMailLog';
+import { InsertMailLog, InsertMailLogVariables } from '../../../queries/__generated__/InsertMailLog';
 import {
   UpdateEnrollmentStatus,
   UpdateEnrollmentStatusVariables,
@@ -83,9 +77,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     </>
   );
 
-  const [selectedEnrollments, setSelectedEnrollments] = useState(
-    [] as number[]
-  );
+  const [selectedEnrollments, setSelectedEnrollments] = useState([] as number[]);
 
   const [inviteExpireDate, setInviteExpireDate] = useState(now7);
   const handleSetInviteExpireDate = useCallback(
@@ -110,22 +102,14 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     console.log('fail to query mail templates!', queryMailTemplates);
   }
 
-  const [insertMailLogMutation] = useAdminMutation<
-    InsertMailLog,
-    InsertMailLogVariables
-  >(INSERT_MAIL_LOG);
-  const [updateEnrollmentStatus] = useRoleMutation<
-    UpdateEnrollmentStatus,
-    UpdateEnrollmentStatusVariables
-  >(UPDATE_ENROLLMENT_STATUS);
+  const [insertMailLogMutation] = useAdminMutation<InsertMailLog, InsertMailLogVariables>(INSERT_MAIL_LOG);
+  const [updateEnrollmentStatus] = useRoleMutation<UpdateEnrollmentStatus, UpdateEnrollmentStatusVariables>(
+    UPDATE_ENROLLMENT_STATUS
+  );
   const handleSendInvitesAndRejections = useCallback(async () => {
     if (mailTemplates != null) {
-      const inviteTemplate = mailTemplates.MailTemplate.find(
-        (x) => x.title === 'INVITE'
-      );
-      const rejectTemplate = mailTemplates.MailTemplate.find(
-        (x) => x.title === 'DECLINE'
-      );
+      const inviteTemplate = mailTemplates.MailTemplate.find((x) => x.title === 'INVITE');
+      const rejectTemplate = mailTemplates.MailTemplate.find((x) => x.title === 'DECLINE');
 
       if (inviteTemplate != null && rejectTemplate != null) {
         const relevantEnrollments = selectedEnrollments
@@ -134,8 +118,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             return ce;
           })
           .filter(
-            (x) =>
-              x != null && ['APPLIED', 'INVITED', 'REJECTED'].includes(x.status)
+            (x) => x != null && ['APPLIED', 'INVITED', 'REJECTED'].includes(x.status)
           ) as ManagedCourse_Course_by_pk_CourseEnrollments[];
 
         try {
@@ -156,15 +139,9 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
               return source
                 .replaceAll('[User:Firstname]', enrollment.User.firstName)
                 .replaceAll('[User:LastName]', enrollment.User.lastName)
-                .replaceAll(
-                  '[Enrollment:ExpirationDate]',
-                  displayDate(inviteExpireDate)
-                )
+                .replaceAll('[Enrollment:ExpirationDate]', displayDate(inviteExpireDate))
                 .replaceAll('[Enrollment:CourseId--Course:Name]', course.title)
-                .replaceAll(
-                  '[Enrollment:CourseLink]',
-                  `${window.location.origin}/course/${course.id}`
-                );
+                .replaceAll('[Enrollment:CourseLink]', `${window.location.origin}/course/${course.id}`);
             };
 
             template.content = doReplace(template.content);
@@ -196,9 +173,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           setSelectedEnrollments([]);
         }
       } else {
-        console.log(
-          'Missing mail templates INVITE and/or REJECT, cannot send invite and rejection mails!'
-        );
+        console.log('Missing mail templates INVITE and/or REJECT, cannot send invite and rejection mails!');
       }
     }
   }, [
@@ -221,18 +196,13 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           setSelectedEnrollments(copy);
         }
       } else {
-        setSelectedEnrollments(
-          selectedEnrollments.filter((id) => id !== enrollmentId)
-        );
+        setSelectedEnrollments(selectedEnrollments.filter((id) => id !== enrollmentId));
       }
     },
     [selectedEnrollments, setSelectedEnrollments]
   );
 
-  const setEnrollmentRating = useUpdateCallback2<
-    UpdateEnrollmentRating,
-    UpdateEnrollmentRatingVariables
-  >(
+  const setEnrollmentRating = useUpdateCallback2<UpdateEnrollmentRating, UpdateEnrollmentRatingVariables>(
     UPDATE_ENROLLMENT_RATING,
     'enrollmentId',
     'rating',
@@ -259,25 +229,21 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const openAddParticipantsModal = () => setAddParticipantsModalOpen(true);
   const closeAddParticipantsModal = () => setAddParticipantsModalOpen(false);
 
-
   return (
     <>
       <OnlyAdmin>
         <div className="flex justify-start mt-4 mb-4 text-white">
-          <AddButton
-            title='add_participants'
-            onClick={openAddParticipantsModal}
-            translationNamespace='manageCourse'
-          />
+          <AddButton title="add_participants" onClick={openAddParticipantsModal} translationNamespace="manageCourse" />
         </div>
         <Modal
           isOpen={isAddParticipantsModalOpen}
-          close={closeAddParticipantsModal}
+          onClose={closeAddParticipantsModal}
           title={t('manageCourse:add_participants')}
         >
-          <AddParticipantsForm courseId={course.id} onSubmit={closeAddParticipantsModal}/>
+          <AddParticipantsForm courseId={course.id} onSubmit={closeAddParticipantsModal} />
         </Modal>
-      </OnlyAdmin>      <div>
+      </OnlyAdmin>{' '}
+      <div>
         {courseEnrollments.length > 0 ? (
           <>
             <div className="text-gray-400">
@@ -311,9 +277,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             </OnlyAdmin>
           </>
         ) : (
-          <p className="m-auto text-center mb-14 text-gray-400">
-            {t('course-page:no-applications-present')}
-          </p>
+          <p className="m-auto text-center mb-14 text-gray-400">{t('course-page:no-applications-present')}</p>
         )}
         <Button
           as="a"
@@ -324,12 +288,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           {t('course-page:email-confirmed-applicants')}
         </Button>{' '}
       </div>
-
-      <Dialog
-        className="h"
-        open={isInviteDialogOpen}
-        onClose={handleCloseInviteDialog}
-      >
+      <Dialog className="h" open={isInviteDialogOpen} onClose={handleCloseInviteDialog}>
         <DialogTitle>
           <div className="grid grid-cols-2">
             <div> {t('course-page:invite-applicants')} </div>
@@ -354,9 +313,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           </div>
 
           <div className="flex justify-center mt-16">
-            <OldButton onClick={handleSendInvitesAndRejections}>
-              {t('course-page:invite')}
-            </OldButton>
+            <OldButton onClick={handleSendInvitesAndRejections}>{t('course-page:invite')}</OldButton>
           </div>
         </div>
       </Dialog>

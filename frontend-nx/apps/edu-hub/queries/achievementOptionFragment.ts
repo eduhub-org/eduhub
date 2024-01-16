@@ -6,9 +6,13 @@ export const ACHIEVEMENT_OPTION_FRAGMENT = gql`
     title
     description
     recordType
-    documentationTemplateUrl
     evaluationScriptUrl
     csvTemplateUrl
     showScoreAuthors
+    achievementDocumentationTemplateId
+    AchievementOptionTemplate {
+      title
+      url
+    }
   }
 `;
