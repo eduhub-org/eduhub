@@ -8,6 +8,8 @@ socat tcp-listen:8080,reuseaddr,fork tcp:hasura:8080 &
 socat tcp-listen:5000,reuseaddr,fork tcp:localhost:4200 &
 # proxy access to rent-a-scientist frontend for the refreshToken Api Route callback
 socat tcp-listen:5001,reuseaddr,fork tcp:localhost:4201 &
+# proxy access to node_functions
+socat tcp-listen:4001,reuseaddr,fork tcp:node_functions:4001 &
 # make sure all libraries exist
 yarn
 # start the development servers for edu-hub and rent-a-scientist

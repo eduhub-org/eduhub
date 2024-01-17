@@ -46,6 +46,10 @@ RUN adduser -S nextjs -u 1001
 COPY --from=builder --chown=nextjs:nodejs /opt/app/dist/apps/edu-hub/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /opt/app/dist/apps/edu-hub/.next/static ./dist/apps/edu-hub/.next/static
 COPY --from=builder --chown=nextjs:nodejs /opt/app/dist/apps/edu-hub/public ./apps/edu-hub/public
+# Temporary fix to fix image generation
+# https://github.com/vercel/next.js/issues/48077
+# COPY --from=builder /opt/app/dist/apps/edu-hub/package.json ./package.json
+COPY --from=builder --chown=nextjs:nodejs /opt/app/node_modules/next/dist/compiled/jest-worker ./node_modules/next/dist/compiled/jest-worker
 
 WORKDIR /opt/app/apps/edu-hub
 
