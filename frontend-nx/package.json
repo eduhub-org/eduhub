@@ -97,6 +97,7 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-standard": "^5.0.0",
     "jest": "27.5.1",
+    "jest-worker": "^29.7.0",
     "nx": "15.8.7",
     "postcss": "^8.4.31",
     "prettier": "^2.8.6",
