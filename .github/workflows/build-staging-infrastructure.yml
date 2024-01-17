@@ -69,7 +69,7 @@ jobs:
           function check_folder_changes() {
             folder=$1
             for file in "${changed_files[@]}"; do
-              if [[ $file == $folder/* ]]; then
+              if [[ $file == $folder/* ]] || [[ $file == $folder ]]; then
                 echo "true"
                 return
               fi
