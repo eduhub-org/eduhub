@@ -64,136 +64,117 @@ import io
 #     - Output: Status of the process, e.g., number of certificates generated.
 
 
-# Class Initialization
-# - EduHub Client
-# - Storage Client
-# - Certificate type depending fetching of data
-#   - fetch_enrollments
-#   - fetch_template_image
-#   - fetch_template_text
 
+class CertificateCreator:
+    def __init__(self, storage_client, eduhub_client, arguments):
+        self.storage_client = storage_client
+        self.eduhub_client = eduhub_client
+        self.certificate_type = arguments["input"]["certificateType"]
+        self.user_ids = arguments["input"]["userIds"]
+        self.course_id = arguments["input"]["courseId"] 
+        self.enrollments = None
+        self.program_info = None
+
+        if self.certificate_type in ["achievement", "attendance"]:
+            self.enrollments = self._fetch_enrollments(self.user_ids, self.course_id)
+        else:
+            self.program_info = self._fetch_program_info(self.course_id)
+
+
+
+    def create_certificates(self):
+        template_image_url = self.fetch_template_image()
+        template_text = self.fetch_template_text()
+
+        if self.certificate_type == "achievement" or self.certificate_type == "attendance":
+            for enrollment in self.enrollments:
+                pdf_url = generate_and_save_certificate_to_gcs(template_image_url, template_text, self.storage_client.get_bucket())
+
+                self.update_course_enrollment_record(pdf_url)
+        else: 
+                pdf_url = generate_and_save_certificate_to_gcs(template_image_url, template_text, self.storage_client.get_bucket())
+
+                self.update_course_enrollment_record(pdf_url)
+
+
+        logging.info(f"{len(self.enrollments)} {self.certificate_type} Certificate(s) generated.")
+
+    def generate_and_save_certificate_to_gcs(self, template_image_url, template_text, bucket_name):
+        # Prepare Text Conten 
+        text_content = prepare_text_content() 
+        # Generate PDF File Name
+        pdf_file_name = generate_pdf_file_name()
+        # Get Template Image
+        #template_image = download_template_image(template_image_url)
+
+        ## Generate Certificate PDF 
+        # Create Jinja2 Environment
+        env = Environment(loader=jinja2.DictLoader({'template': template_text}))
+
+        template = env.get_template('template')
+
+        rendered_html = template.render(background_image_url=template_image_url, html_content=text_content)
+
+        # create PDF as BytesIO Object
+        pdf_bytes_io = io.BytesIO()
+        HTML(string=rendered_html).write_pdf(pdf_bytes_io)
+
+        pdf_bytes_io.seek(0)
+
+        temporary_pdf = pdf_bytes_io
+
+        ## Saving Certificate PDF
+        #Instantiiating GCS Client
+        storage_client = storage.Client()
 
     
-def create_certificates(hasura_secrets, arguments):
-    storage_client = StorageClient()
-    user_ids = arguments["input"]["userIds"]
-    course_id = arguments["input"]["courseId"]
-    certificate_type = arguments["input"]["certificateType"]
-   
-    logger.debug(
-    "Input parameters: userIds=${userIds}, courseId=${courseId}, certificateType=${certificateType}"
-    )
-    try:
-        enrollments = fetch_enrollments(user_ids, course_id)
-    except Exception as e:
-        print(f"Error when retrieving registrations: {e}")
-        return
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(pdf_file_name)
 
-  # Check if enrollments exist
+        blob.upload_from_file(temporary_pdf, content_type='application/pdf')
 
-    if not enrollments:
-        raise NoEnrollmentsFoundException("No enrollments were found.")
-        return
-   
-    template_image_url = fetch_template_image(enrollments, certificate_type)
-    template_text = fetch_template_text(enrollments, certificate_type)
+        return blob.public_url
 
-
-  # Generating Certificates per enrollment
-
-
-    for enrollment in enrollments:
-        try:
-            pdf_url = generate_and_save_certificate_to_gcs(enrollment, certificate_type, template_image_url, template_text, storage_client.get_bucket())
-
-            update_course_enrollment_record(enrollment["User"]["id"], enrollment["Course"]["id"], pdf_url)
-        except Exception as e:
-          print(f"Error when generating certificate: {e}")
-
-    print(f"{len(enrollments)} {certificate_type} Certificate(s) generated.")
-
-def generate_and_save_certificate_to_gcs(enrollment, certificate_type, template_image_url, template_text, bucket_name):
-    # Prepare Text Conten 
-    text_content = prepare_text_content(enrollment, certificate_type) 
-    # Generate PDF File Name
-    pdf_file_name = generate_pdf_file_name(enrollment, certificate_type)
-    # Get Template Image
-    #template_image = download_template_image(template_image_url)
-
-    ## Generate Certificate PDF 
-    # Create Jinja2 Environment
-    env = Environment(loader=jinja2.DictLoader({'template': template_text}))
-
-    template = env.get_template('template')
-
-    rendered_html = template.render(background_image_url=template_image_url, html_content=text_content)
-
-    # create PDF as BytesIO Object
-    pdf_bytes_io = io.BytesIO()
-    HTML(string=rendered_html).write_pdf(pdf_bytes_io)
-
-    pdf_bytes_io.seek(0)
-
-    temporary_pdf = pdf_bytes_io
-
-    ## Saving Certificate PDF
-    #Instantiiating GCS Client
-    storage_client = storage.Client()
-
- 
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(pdf_file_name)
-
-    blob.upload_from_file(temporary_pdf, content_type='application/pdf')
-
-    return blob.public_url
-
-
-def update_course_enrollment_record(user_id, course_id, certificate_url):
-    hasura_endpoint = os.environ.get("HASURA_ENDPOINT")
-
-    headers = {"x-hasura-admin-secret": os.environ.get("HASURA_ADMIN_SECRET")}
-
-    # GraphQL-Mutations to Update Course Enrollment
-    mutation = """
-    mutation UpdateEnrollment($userId: uuid!, $courseId: Int!, $certificateUrl: String!) {
-        update_CourseEnrollment(
-            where: { userId: { _eq: $userId }, courseId: { _eq: $courseId } }
-            _set: { certificateURL: $certificateUrl }
-        ) {
-            affected_rows
+    def update_course_enrollment_record(self, certificate_url):
+       
+        # GraphQL-Mutations to Update Course Enrollment
+        mutation = """
+        mutation UpdateEnrollment($userId: uuid!, $courseId: Int!, $certificateUrl: String!) {
+            update_CourseEnrollment(
+                where: { userId: { _eq: $userId }, courseId: { _eq: $courseId } }
+                _set: { certificateURL: $certificateUrl }
+            ) {
+                affected_rows
+            }
         }
-    }
-    """
+        """
 
-    # Data for the GraphQL-Mutation
-    variables = {
-        "userId": user_id,
-        "courseId": course_id,
-        "certificateUrl": certificate_url,
-    }
+        # Data for the GraphQL-Mutation
+        variables = {
+            "userId": self.user_id,
+            "courseId": self.course_id,
+            "certificateUrl": certificate_url,
+        }
 
-    response = requests.post(
-        hasura_endpoint,
-        json={"query": mutation, "variables": variables},
-        headers=headers,
-    )
+        response = requests.post(
+            self.eduhub_client.hasura_endpoint,
+            json={"query": mutation, "variables": variables},
+            headers=self.eduhub_client.headers,
+        )
 
-    if response.status_code != 200:
-        raise Exception(f"Failed to update course enrollment record: {response.text}")
+        if response.status_code != 200:
+            logging.error(f"Failed to update course enrollment record: {response.text}")
+            
 
-    result = response.json()
-    return result
+        result = response.json()
+        return result
+        
+    def fetch_enrollments(self):
 
-################################## Helper Functions ########################
-def fetch_enrollments(user_ids, course_id):
-    # GraphQL endpoint
-    hasura_endpoint = os.getenv('HASURA_ENDPOINT')
-    hasura_admin_secret = os.getenv('HASURA_ADMIN_SECRET')
 
-    # GraphQL query
-    query = """
-    query GetEnrollments($userIds: [uuid!]!, $courseId: Int!) {
+        # GraphQL query
+        query = """
+        query GetEnrollments($userIds: [uuid!]!, $courseId: Int!) {
   CourseEnrollment(where: {userId: {_in: $userIds}, Course: {id: {_eq: $courseId}}}) {
     User {
       Attendances {
@@ -239,159 +220,172 @@ def fetch_enrollments(user_ids, course_id):
 }
 
     """
+     # Variables for the GraphQL query
+        variables = {
+        "userIds": self.user_ids,
+        "courseId": self.course_id 
+        }
 
-    # Variables for the GraphQL query
-    variables = {
-      "userIds": user_ids,
-      "courseId": course_id
-    }
-
-    # Headers including the admin secret
-    headers = {
-    "Content-Type": "application/json",
-    "x-hasura-admin-secret": hasura_admin_secret
-    }
+     # Headers including the admin secret
+        headers = {
+        "Content-Type": "application/json",
+        "x-hasura-admin-secret":  self.eduhub_client.hasura_admin_secret
+        }
 
     # Make the request to the GraphQL endpoint
-    try:
-        response = requests.post(
-                hasura_endpoint,
-                json={'query': query, 'variables': variables},
-                headers=headers
+        try:
+            response = requests.post(
+            self.eduhub_client.url,
+            headers={"x-hasura-admin-secret": self.eduhub_client.hasura_admin_secret},
+            json={"query": query, "variables": {"userIds": self.user_ids, "courseId": self.course_id}}
+            )
+            response.raise_for_status()  # Raises a HTTPError if the HTTP request returned an unsuccessful status code
+        # Assuming the data is returned in JSON format
+            data = response.json()
+            return data['data']['CourseEnrollment']
+        except requests.exceptions.RequestException as e:
+            # Handle any errors that occur during the request
+            logging.error(f"An error occurred: {e}")
+            raise
+
+    def fetch_program_info(self):
+        #TODO: get textID and Image URL per userID via program 
+        pass
+
+    def fetch_template_image(self):
+        if self.certificate_type == "achievement" or self.certificate_type == "attendance":
+            if self.certificate_type == "achievement":
+                image_url = self.enrollments[0]['Course']['Program']['achievementCertificateTemplateURL']
+            else: 
+                image_url = self.enrollments[0]['Course']['Program']['attendanceCertificateTemplateURL']
+            return image_url
+        elif self.certificate_type == "instructor":
+            #There is no URL yet
+            pass            
+        else: 
+            raise ValueError("Invalid Certificate type")
+        
+    def fetch_template_text(self):
+         # Necessary Data to retrieve HTML from hasura 
+        if self.certificate_type == "achievement" or self.certificate_type == "attendance":
+            if self.certificate_type == "achievement":
+                text_id =self.enrollments[0]['Course']['Program']['achievementCertificateTemplateTextId']
+            else:
+                text_id = self.enrollments[0]['Course']['Program']['attendanceCertifiateTemplateTextId']
+            return text_id
+        elif self.certificate_type == "instructor":
+            #There is no ID yet
+            pass       
+        else: 
+            print("Certificate type is incorrect or missing!")
+
+        # GraphQL query
+        query = """
+        query getHTML {
+            CertificateTemplateText(where: {id: {_eq: "textId"}}) {
+                html
+        }
+        """
+        variables = {
+                "textId": text_id
+            }
+
+        # Headers including the admin secret
+        headers = {
+        "Content-Type": "application/json",
+        "x-hasura-admin-secret": self.eduhub_client.hasura_admin_secret
+        }
+
+        # Make the request to the GraphQL endpoint
+        try:
+            response = requests.post(
+            self.eduhub_client.hasura_endpoint,
+            json={'query': query, 'variables': variables},
+            headers=headers
         )
-        response.raise_for_status()  # Raises a HTTPError if the HTTP request returned an unsuccessful status code
-    # Assuming the data is returned in JSON format
-        data = response.json()
-        return data['data']['CourseEnrollment']
-    except requests.exceptions.RequestException as e:
+            response.raise_for_status()  # Raises a HTTPError if the HTTP request returned an unsuccessful status code
+
+            # Assuming the data is returned in JSON format
+            data = response.json()
+            return data['data']['html']
+        except requests.exceptions.RequestException as e:
         # Handle any errors that occur during the request
         print(f"An error occurred: {e}")
         raise
- 
 
-def fetch_template_image(enrollments, certificate_type):
-    if certificate_type == "achievement":
-        image_url = enrollments[0]['Course']['Program']['achievementCertificateTemplateURL']
-        return image_url
-    elif certificate_type == "attendance":
-        image_url = enrollments[0]['Course']['Program']['attendanceCertificateTemplateURL']
-        return image_url
-    else: 
-        print("certificate type is incorrect or missing!")
+    def prepare_text_content(self):
+        if self.certificate_type == "attendance" or self.certificate_type == "achievement":
+            if self.certificate_type == "attendance":
+                session_titles = self.get_attended_sessions(
+                    self.enrollment, self.enrollment["Course"]["Sessions"]
+                )
+            else:
+                session_titles = None 
+            return {
+            "full_name": f"{self.enrollment['User']['firstName']} {self.enrollment['User']['lastName']}",
+            "course_name": self.enrollment["Course"]["title"],
+            "semester":self.enrollment["Course"]["Program"]["title"],
+            "event_entries": session_titles,
+            }
 
+        elif self.certificate_type == "instructor":
+        
+            return {
+            "full_name": None,
+            "course_name": None,
+            "semester": None, 
+            "event_entries": None
+            }
+        else:
+            raise ValueError("Invalid certificate type")
 
-def fetch_template_text(enrollments, certificate_type):
-    # GraphQL endpoint
-    hasura_endpoint = os.getenv('HASURA_ENDPOINT')
-    hasura_admin_secret = os.getenv('HASURA_ADMIN_SECRET')
-
-    # Necessary Data to retrieve HTML from hasura 
-    if certificate_type == "achievement":
-        text_id = [0]['Course']['Program']['achievementCertificateTemplateTextId']
-
-    elif certificate_type == "attendance":
-        text_id = [0]['Course']['Program']['attendanceCertifiateTemplateTextId']
-    else: 
-        print("Certificate type is incorrect or missing!")
-
-    # GraphQL query
-    query = """
-    query getHTML {
-        CertificateTemplateText(where: {id: {_eq: "textId"}}) {
-            html
-    }
-    """
-    variables = {
-            "textId": text_id
-        }
-
-    # Headers including the admin secret
-    headers = {
-    "Content-Type": "application/json",
-    "x-hasura-admin-secret": hasura_admin_secret
-    }
-
-    # Make the request to the GraphQL endpoint
-    try:
-        response = requests.post(
-          hasura_endpoint,
-          json={'query': query, 'variables': variables},
-          headers=headers
-      )
-        response.raise_for_status()  # Raises a HTTPError if the HTTP request returned an unsuccessful status code
-
-        # Assuming the data is returned in JSON format
-        data = response.json()
-        return data['data']['html']
-    except requests.exceptions.RequestException as e:
-      # Handle any errors that occur during the request
-      print(f"An error occurred: {e}")
-      raise
-
+    def generate_pdf_file_name(self):
+        if self.certificate_type == "achievement" or self.certificate_type == "attendance":
+            return f"{self.enrollment['User']['id']}/{self.enrollment['Course']['id']}/{self.certificate_type}_certificate.pdf"
+        else: 
+            return f"{self.program_info['User']['id']}/{self.program_info['Course']['id']}/{self.certificate_type}_certificate.pdf"
     
-def prepare_text_content(enrollment, certificate_type):
-    if certificate_type == "attendance":
-        session_titles = get_attended_sessions(
-            enrollment, enrollment["Course"]["Sessions"]
-        )
-    elif certificate_type == "achievement":
-        session_titles = None 
-    else:
-        raise ValueError("Invalid certificate type")
+    def download_template_image(self, template_image_url):
+        response = requests.get(template_image_url)
+        response.raise_for_status()  # Makes sure request was succesfull
+        return response.text
+    
+    def get_attended_sessions(enrollment, sessions):
+        attended_sessions = []
 
-    return {
-        "full_name": f"{enrollment['User']['firstName']} {enrollment['User']['lastName']}",
-        "course_name": enrollment["Course"]["title"],
-        "semester": enrollment["Course"]["Program"]["title"],
-        "event_entries": session_titles,
-        }
+        for session in sessions:
+            # Get every attendance record for one session
+            attendances_for_session = [
+                attendance
+                for attendance in enrollment.get("User", {}).get("Attendances", [])
+                if attendance.get("Session", {}).get("id") == session.get("id")
+            ]
 
-def generate_pdf_file_name(enrollment, certificate_type):
-    return f"{enrollment['User']['id']}/{enrollment['Course']['id']}/{certificate_type}_certificate.pdf"
+            # Choosing the newest attendance record by highest ID
+            if attendances_for_session:
+                attendances_for_session.sort(key=lambda x: x.get("id"), reverse=True)
+                last_attendance = attendances_for_session[0]
 
+                # Add attendance if Status attended
+                if last_attendance.get("status") == "ATTENDED":
+                    attended_sessions.append(
+                        {
+                            "sessionTitle": session.get("title"),
+                            # "date": session.get("startDateTime"),  # Optional, fals Date is needed
+                            # "status": last_attendance.get("status", "NO_INFO"),  # Optional, if state is needed
+                        }
+                    )
 
-def download_template_image(template_image_url):
-    response = requests.get(url)
-    response.raise_for_status()  # Makes sure request was succesfull
-    return response.text
+        
+        # Sorting the Sessions by start Date 
+        # Attention: Date must have the correct format!
+        attended_sessions.sort(key=lambda x: x.get("date"))
 
-def get_attended_sessions(enrollment, sessions):
-    attended_sessions = []
-
-    for session in sessions:
-        # Get every attendance record for one session
-        attendances_for_session = [
-            attendance
-            for attendance in enrollment.get("User", {}).get("Attendances", [])
-            if attendance.get("Session", {}).get("id") == session.get("id")
+        # get the title of the attended Session 
+        attended_session_titles = [
+            session["sessionTitle"]
+            for session in attended_sessions
+            if session["sessionTitle"] is not None
         ]
 
-        # Choosing the newest attendance record by highest ID
-        if attendances_for_session:
-            attendances_for_session.sort(key=lambda x: x.get("id"), reverse=True)
-            last_attendance = attendances_for_session[0]
-
-            # Add attendance if Status attended
-            if last_attendance.get("status") == "ATTENDED":
-                attended_sessions.append(
-                    {
-                        "sessionTitle": session.get("title"),
-                        # "date": session.get("startDateTime"),  # Optional, fals Date is needed
-                        # "status": last_attendance.get("status", "NO_INFO"),  # Optional, if state is needed
-                    }
-                )
-
-    
-    # Sorting the Sessions by start Date 
-    # Attention: Date must have the correct format!
-    attended_sessions.sort(key=lambda x: x.get("date"))
-
-    # get the title of the attended Session 
-    attended_session_titles = [
-        session["sessionTitle"]
-        for session in attended_sessions
-        if session["sessionTitle"] is not None
-    ]
-
-    return attended_session_titles
-
+        return attended_session_titles
