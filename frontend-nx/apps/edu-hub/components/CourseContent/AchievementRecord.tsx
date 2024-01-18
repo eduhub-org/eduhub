@@ -52,7 +52,6 @@ interface IProps {
 const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUploadDeadline, courseTitle }) => {
   const { t, lang } = useTranslation();
   const userId = useUserId();
-  const user = useUser();
   const profile = useKeycloakUserProfile();
   const [showModal, setShowModal] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -113,35 +112,6 @@ const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUpload
   const upload = useCallback(() => {
     setShowModal(true);
   }, [setShowModal]);
-
-  const handleAchievementRecordOnlineCourseConfirm = async () => {
-    const result = await insertAnAchievementRecordAPI({
-      variables: {
-        insertInput: {
-          coverImageUrl: '', // this is mandatory field
-          description: '',
-          rating: AchievementRecordRating_enum.UNRATED, // this is mandatory field
-          score: 0, // because mandatory
-          evaluationScriptUrl: null,
-          achievementOptionId: selectedAchievementOption.id,
-          csvResults: null,
-          uploadUserId: userId,
-          AchievementRecordAuthors: {
-            data: [{ userId }],
-          },
-        },
-      },
-    });
-    if (result.errors || !result.data?.insert_AchievementRecord_one?.id) {
-      setAlertMessage(t('operation-failed'));
-      return;
-    }
-
-    const achievementRecordId = result.data.insert_AchievementRecord_one.id;
-    if (achievementRecordId <= 0) return;
-
-    myRecordsQuery.refetch();
-  };
 
   const onAchievementOptionDropdown = useCallback(
     (event: MouseEvent<HTMLElement>) => {
@@ -249,7 +219,8 @@ const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUpload
           )}
         {selectedAchievementOption?.id &&
           myRecords &&
-          selectedAchievementOption.recordType === AchievementRecordType_enum.DOCUMENTATION && (
+          (selectedAchievementOption.recordType === AchievementRecordType_enum.DOCUMENTATION ||
+            selectedAchievementOption.recordType === AchievementRecordType_enum.ONLINE_COURSE) && (
             <p>
               {t('course-page:last-upload-from-an-author', {
                 dateTime: formattedDateWithTime(new Date(myRecords.created_at), lang),
@@ -260,18 +231,17 @@ const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUpload
 
         {selectedAchievementOption?.id &&
           !myRecords &&
-          selectedAchievementOption.recordType === AchievementRecordType_enum.DOCUMENTATION && (
+          (selectedAchievementOption.recordType === AchievementRecordType_enum.DOCUMENTATION ||
+            selectedAchievementOption.recordType === AchievementRecordType_enum.ONLINE_COURSE) && (
             <p>{t('course-page:no-proof-uploaded-by-me-as-author')}</p>
           )}
       </div>
       {showModal && (
         <FormToUploadAchievementRecord
-          isOpen={showModal}
           onClose={onClosed}
           achievementOption={selectedAchievementOption}
           onSuccess={onSuccess}
           courseTitle={courseTitle}
-          user={user}
           setAlertMessage={setAlertMessage}
           userId={userId}
           courseId={courseId}
