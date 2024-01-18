@@ -7,21 +7,12 @@ import { FC, MutableRefObject, useCallback, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
-import {
-  MdCheckBox,
-  MdCheckBoxOutlineBlank,
-  MdDelete,
-  MdOutlineCheckBoxOutlineBlank,
-  MdUpload,
-} from 'react-icons/md';
+import { MdCheckBox, MdCheckBoxOutlineBlank, MdDelete, MdOutlineCheckBoxOutlineBlank, MdUpload } from 'react-icons/md';
 import { Button } from '../../components/common/Button';
 import { parseFileUploadEvent } from '../../helpers/filehandling';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { useLazyRoleQuery } from '../../hooks/authedQuery';
-import {
-  SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
-  SAVE_ATTENDANCE_CERTIFICATE_TEMPLATE,
-} from '../../queries/actions';
+import { SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE, SAVE_ATTENDANCE_CERTIFICATE_TEMPLATE } from '../../queries/actions';
 import { LOAD_PARTICIPATION_DATA } from '../../queries/loadParticipationData';
 import {
   UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
@@ -50,6 +41,7 @@ import {
   UpdateProgramParticipationTemplateVariables,
 } from '../../queries/__generated__/UpdateProgramParticipationTemplate';
 import EhDebounceInput from '../common/EhDebounceInput';
+import FileUpload from '../common/forms/FileUpload';
 
 interface ProgramsRowProps {
   program: ProgramList_Program;
@@ -67,14 +59,8 @@ interface ProgramsRowProps {
   onSetStartQuestionnaire: (p: ProgramList_Program, link: string) => any;
   onSetSpeakerQuestionnaire: (p: ProgramList_Program, link: string) => any;
   onSetClosingQuestionnaire: (p: ProgramList_Program, link: string) => any;
-  onSetVisibilityAttendanceCertificate: (
-    p: ProgramList_Program,
-    isVisible: boolean
-  ) => any;
-  onSetVisibilityAchievementCertificate: (
-    p: ProgramList_Program,
-    isVisible: boolean
-  ) => any;
+  onSetVisibilityAttendanceCertificate: (p: ProgramList_Program, isVisible: boolean) => any;
+  onSetVisibilityAchievementCertificate: (p: ProgramList_Program, isVisible: boolean) => any;
   onDelete: (p: ProgramList_Program) => any;
   onOpenProgram: (p: ProgramList_Program) => any;
 }
@@ -101,17 +87,11 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   onSetVisibilityAchievementCertificate,
 }) => {
   const handleToggleVisibilityAttendanceCertificate = useCallback(() => {
-    onSetVisibilityAttendanceCertificate(
-      program,
-      !program.visibilityAttendanceCertificate
-    );
+    onSetVisibilityAttendanceCertificate(program, !program.visibilityAttendanceCertificate);
   }, [program, onSetVisibilityAttendanceCertificate]);
 
   const handleToggleVisibilityAchievementCertificate = useCallback(() => {
-    onSetVisibilityAchievementCertificate(
-      program,
-      !program.visibilityAchievementCertificate
-    );
+    onSetVisibilityAchievementCertificate(program, !program.visibilityAchievementCertificate);
   }, [program, onSetVisibilityAchievementCertificate]);
 
   const handleTogglePublished = useCallback(() => {
@@ -227,8 +207,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
           await updateParticipationTemplate({
             variables: {
               programId: program.id,
-              templatePath:
-                res.data?.saveAttendanceCertificateTemplate?.path,
+              templatePath: res.data?.saveAttendanceCertificateTemplate?.path,
             },
           });
 
@@ -236,12 +215,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         }
       }
     },
-    [
-      saveAttendanceCertificateTemplate,
-      qResult,
-      updateParticipationTemplate,
-      program,
-    ]
+    [saveAttendanceCertificateTemplate, qResult, updateParticipationTemplate, program]
   );
 
   const templateAchievementUploadRef: MutableRefObject<any> = useRef(null);
@@ -261,15 +235,10 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
 
   const [
     loadParticipationData,
-    {
-      data: loadParticipationDataResult,
-      loading: loadParticipationDataLoading,
-      error: loadParticipationDataError,
-    },
-  ] = useLazyRoleQuery<loadParticipationData, loadParticipationDataVariables>(
-    LOAD_PARTICIPATION_DATA,
-    { variables: { programId: program.id } }
-  );
+    { data: loadParticipationDataResult, loading: loadParticipationDataLoading, error: loadParticipationDataError },
+  ] = useLazyRoleQuery<loadParticipationData, loadParticipationDataVariables>(LOAD_PARTICIPATION_DATA, {
+    variables: { programId: program.id },
+  });
 
   const handleLoadParticipationDataClick = () => {
     try {
@@ -283,53 +252,46 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
     async (event: any) => {
       const uFile = await parseFileUploadEvent(event);
       if (uFile != null) {
-        const response = await saveAchievementCertificateTemplate({
-          variables: {
-            base64File: uFile.data,
-            fileName: uFile.name,
-            programId: program.id,
-          },
-        });
-
-        if (response.data?.saveAchievementCertificateTemplate?.path) {
-          await updateAchievementCertificationTemplate({
+        try {
+          const response = await saveAchievementCertificateTemplate({
             variables: {
+              base64File: uFile.data,
+              fileName: uFile.name,
               programId: program.id,
-              templatePath:
-                response.data?.saveAchievementCertificateTemplate?.path,
             },
           });
 
-          qResult.refetch();
+          if (response.data?.saveAchievementCertificateTemplate?.path) {
+            await updateAchievementCertificationTemplate({
+              variables: {
+                programId: program.id,
+                templatePath: response.data?.saveAchievementCertificateTemplate?.path,
+              },
+            });
+
+            qResult.refetch();
+          }
+        } catch (error) {
+          console.error('Error saving achievement certificate template:', error);
         }
       }
     },
-    [
-      saveAchievementCertificateTemplate,
-      qResult,
-      updateAchievementCertificationTemplate,
-      program,
-    ]
+    [saveAchievementCertificateTemplate, qResult, updateAchievementCertificationTemplate, program]
   );
 
-  const { t, lang } = useTranslation();
+  const { t, lang } = useTranslation('managePrograms');
 
   return (
     <div>
       <div className="grid grid-cols-10 mb-1 bg-gray-100">
-        <div
-          className="flex justify-center cursor-pointer"
-          onClick={handleTogglePublished}
-        >
+        <div className="flex justify-center cursor-pointer" onClick={handleTogglePublished}>
           {!program.published && <MdCheckBoxOutlineBlank size="1.5em" />}
           {program.published && <MdCheckBox size="1.5em" />}
         </div>
 
         <div className="col-span-2">
           <EhDebounceInput
-            placeholder={`${t('set-something', {
-              something: t('course-page:program-title'),
-            })}`}
+            placeholder={t('title.placeholder')}
             onChangeHandler={handleSetTitle}
             inputText={program.title}
           />
@@ -337,9 +299,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
 
         <div>
           <EhDebounceInput
-            placeholder={`${t('set-something', {
-              something: t('course-page:short-title'),
-            })}`}
+            placeholder={t('short_title.placeholder')}
             onChangeHandler={handleSetShortTitle}
             inputText={program.shortTitle ?? ''}
           />
@@ -403,11 +363,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         <div className="grid grid-cols-2">
           <div>
             <IconButton onClick={handleOpenProgram}>
-              {openProgramId !== program.id ? (
-                <IoIosArrowDown size="0.75em" />
-              ) : (
-                <IoIosArrowUp size="0.75em" />
-              )}
+              {openProgramId !== program.id ? <IoIosArrowDown size="0.75em" /> : <IoIosArrowUp size="0.75em" />}
             </IconButton>
           </div>
 
@@ -425,51 +381,42 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         <div className="mb-1">
           <div className="grid grid-cols-3 bg-gray-100 p-10">
             <div className="p-3">
-              <span>Link Start-Evaluation</span>
+              <span>{t('start_evaluation.label')}</span>
               <br />
               <EhDebounceInput
-                placeholder={`${t('register-something', {
-                  something: 'URL',
-                })}`}
+                placeholder={t('start_evaluation.placeholder')}
                 onChangeHandler={handleSetStartQuestionnaire}
                 inputText={program.startQuestionnaire || ''}
               />
             </div>
             <div className="p-3">
-              <span>Link Speaker-Evaluation</span>
+              <span>{t('speaker_evaluation.label')}</span>
               <br />
               <EhDebounceInput
-                placeholder={`${t('register-something', {
-                  something: 'URL',
-                })}`}
+                placeholder={t('speaker_evaluation.placeholder')}
                 onChangeHandler={handleSetSpeakerQuestionnaire}
                 inputText={program.speakerQuestionnaire || ''}
               />
             </div>
             <div className="p-3">
-              <span>{t('course-page:link-final-evaluation')}</span>
+              <span>{t('final_evaluation.label')}</span>
               <br />
               <EhDebounceInput
-                placeholder={`${t('register-something', {
-                  something: 'URL',
-                })}`}
+                placeholder={t('final_evaluation.placeholder')}
                 onChangeHandler={handleSetClosingQuestionnaire}
                 inputText={program.closingQuestionnaire || ''}
               />
             </div>
 
             <div className="p-3">
-              {`${t('course-page:template')} ${t(
-                'course-page:proof-of-participation'
-              )}`}
+              {`${t('course-page:template')} ${t('course-page:proof-of-participation')}`}
 
               <IconButton onClick={handleUploadAttendanceTemplateClick}>
                 <MdUpload size="0.75em" />
               </IconButton>
               <br />
               <div className="w-80 truncate">
-                {program.attendanceCertificateTemplateURL ||
-                  t('course-page:no-template-uploaded-yet')}
+                {program.attendanceCertificateTemplateURL || t('course-page:no-template-uploaded-yet')}
               </div>
               <input
                 ref={templateAttendanceUploadRef}
@@ -479,16 +426,13 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
               />
             </div>
             <div className="p-3">
-              {`${t('course-page:template')} ${t(
-                'course-page:performance-certificate'
-              )}`}
+              {`${t('course-page:template')} ${t('course-page:performance-certificate')}`}
               <IconButton onClick={handleUploadAchievementTemplateClick}>
                 <MdUpload size="0.75em" />
               </IconButton>
               <br />
               <div className="w-80 truncate">
-                {program.achievementCertificateTemplateURL ||
-                  t('course-page:no-template-uploaded-yet')}
+                {program.achievementCertificateTemplateURL || t('course-page:no-template-uploaded-yet')}
               </div>
               <input
                 ref={templateAchievementUploadRef}
@@ -500,67 +444,37 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
             <div className="p-3">
               {`${t('course-page:show-certificates')}:`}
               <div className="grid grid-cols-10">
-                <div
-                  className="cursor-pointer"
-                  onClick={handleToggleVisibilityAttendanceCertificate}
-                >
-                  {program.visibilityAttendanceCertificate && (
-                    <MdCheckBox size="1.5em" />
-                  )}
-                  {!program.visibilityAttendanceCertificate && (
-                    <MdOutlineCheckBoxOutlineBlank size="1.5em" />
-                  )}
+                <div className="cursor-pointer" onClick={handleToggleVisibilityAttendanceCertificate}>
+                  {program.visibilityAttendanceCertificate && <MdCheckBox size="1.5em" />}
+                  {!program.visibilityAttendanceCertificate && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
                 </div>
-                <div className="col-span-9">
-                  {t('course-page:proof-of-participation')}
-                </div>
+                <div className="col-span-9">{t('course-page:proof-of-participation')}</div>
               </div>
               <div className="grid grid-cols-10">
-                <div
-                  className="cursor-pointer"
-                  onClick={handleToggleVisibilityAchievementCertificate}
-                >
-                  {program.visibilityAchievementCertificate && (
-                    <MdCheckBox size="1.5em" />
-                  )}
-                  {!program.visibilityAchievementCertificate && (
-                    <MdOutlineCheckBoxOutlineBlank size="1.5em" />
-                  )}
+                <div className="cursor-pointer" onClick={handleToggleVisibilityAchievementCertificate}>
+                  {program.visibilityAchievementCertificate && <MdCheckBox size="1.5em" />}
+                  {!program.visibilityAchievementCertificate && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
                 </div>
-                <div className="col-span-9">
-                  {t('course-page:performance-certificate')}
-                </div>
+                <div className="col-span-9">{t('course-page:performance-certificate')}</div>
               </div>
             </div>
             <div className="p-3">
-              <Button
-                as="button"
-                onClick={handleLoadParticipationDataClick}
-                disabled={loadParticipationDataLoading}
-              >
-                {loadParticipationDataLoading ? (
-                  <CircularProgress />
-                ) : (
-                  t('course-page:participationDataGenerate')
-                )}
+              <Button as="button" onClick={handleLoadParticipationDataClick} disabled={loadParticipationDataLoading}>
+                {loadParticipationDataLoading ? <CircularProgress /> : t('course-page:participationDataGenerate')}
               </Button>
             </div>
             <div className="p-3">
-              {loadParticipationDataResult &&
-                !loadParticipationDataLoading &&
-                !loadParticipationDataError && (
-                  <Button
-                    as="a"
-                    href={
-                      loadParticipationDataResult.loadParticipationData.link
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className='block'
-                  >
-                    {t('course-page:participationDataDownload')}
-                  </Button>
-                )}
+              {loadParticipationDataResult && !loadParticipationDataLoading && !loadParticipationDataError && (
+                <Button
+                  as="a"
+                  href={loadParticipationDataResult.loadParticipationData.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  {t('course-page:participationDataDownload')}
+                </Button>
+              )}
             </div>
           </div>
         </div>
