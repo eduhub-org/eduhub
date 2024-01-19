@@ -11,36 +11,6 @@ type Query {
 }
 
 type Query {
-  loadAchievementCertificate(
-    path: String!
-  ): loadFileOutput
-}
-
-type Query {
-  loadAchievementOptionDocumentationTemplate(
-    path: String!
-  ): loadFileOutput
-}
-
-type Query {
-  loadAchievementOptionEvaluationScript(
-    path: String!
-  ): loadFileOutput
-}
-
-type Query {
-  loadAchievementRecordDocumentation(
-    path: String!
-  ): loadFileOutput
-}
-
-type Query {
-  loadAttendanceCertificate(
-    path: String!
-  ): loadFileOutput
-}
-
-type Query {
   loadFile(
     path: String!
   ): loadFileOutput

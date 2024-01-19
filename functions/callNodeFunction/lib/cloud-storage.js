@@ -41,7 +41,12 @@ export const buildCloudStorage = (Storage) => {
           `http://localhost:${process.env.STORAGE_PORT}/${fullPath}`
         );
       },
-
+      setPublic: async (path, bucketName) => {
+        console.log(`[Emulated] Set public: ${bucketName}/${path}`);
+      },
+      setPrivate: async (path, bucketName) => {
+        console.log(`[Emulated] Set private: ${bucketName}/${path}`);
+      },
     };
   } else {
     const storage = new Storage();
@@ -81,6 +86,16 @@ export const buildCloudStorage = (Storage) => {
           });
         }
         return link;
+      },
+      setPublic: async (path, bucketName) => {
+        const bucket = storage.bucket(bucketName);
+        const file = bucket.file(path);
+        await file.makePublic();
+      },
+      setPrivate: async (path, bucketName) => {
+        const bucket = storage.bucket(bucketName);
+        const file = bucket.file(path);
+        await file.makePrivate();
       },
     };
   }

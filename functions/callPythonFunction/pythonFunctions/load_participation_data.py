@@ -30,8 +30,6 @@ def load_participation_data(hasura_secret, arguments):
     logging.debug(f"arguments:  {arguments}")
     program_id = arguments["input"]["programId"]
 
-    # program_id = 4
-
     # Get the program details
     participant_data = eduhub_client.get_participants_from_program(program_id)
     logging.debug("CSV with participation data for program %s retrieved", program_id)

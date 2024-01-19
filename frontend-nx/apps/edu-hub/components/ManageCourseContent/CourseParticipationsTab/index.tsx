@@ -5,26 +5,16 @@ import Link from 'next/link';
 import { Dispatch, FC, SetStateAction, useCallback, useState } from 'react';
 import { useIsAdmin } from '../../../hooks/authentication';
 import { useRoleMutation } from '../../../hooks/authedMutation';
-import {
-  DOT_COLORS,
-  EhDot,
-  greenDot,
-  greyDot,
-  redDot,
-} from '../../common/dots';
+import { DOT_COLORS, EhDot, greenDot, greyDot, redDot } from '../../common/dots';
 import { CertificateDownload } from '../../common/CertificateDownload';
 
-import {
-  MdAddCircle,
-  MdKeyboardArrowDown,
-  MdKeyboardArrowUp,
-} from 'react-icons/md';
+import { MdAddCircle, MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
 import { useLazyRoleQuery, useRoleQuery } from '../../../hooks/authedQuery';
 import { QUERY_LIMIT } from '../../../pages/manage/courses';
 import { UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../queries/achievementRecord';
 import { INSERT_SINGLE_ATTENDANCE } from '../../../queries/courseEnrollment';
 import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../../queries/mutateAchievement';
-import { LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION } from '../../../queries/loadAchievementRecordDocumentation';
+import { LOAD_FILE } from '../../../queries/actions';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
@@ -41,10 +31,7 @@ import {
   InsertSingleAttendance,
   InsertSingleAttendanceVariables,
 } from '../../../queries/__generated__/InsertSingleAttendance';
-import {
-  loadAchievementRecordDocumentation,
-  loadAchievementRecordDocumentationVariables,
-} from '../../../queries/__generated__/loadAchievementRecordDocumentation';
+import { LoadFile, LoadFileVariables } from '../../../queries/__generated__/LoadFile';
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords,
@@ -55,10 +42,7 @@ import {
 import { StaticComponentProperty } from '../../../types/UIComponents';
 import { GenerateCertificatesButton } from './GenerateCertificatesButton';
 import { getAttendancesForParticipants } from '../../../helpers/courseHelpers';
-import {
-  AchievementRecordRating_enum,
-  AttendanceStatus_enum,
-} from '../../../__generated__/globalTypes';
+import { AchievementRecordRating_enum, AttendanceStatus_enum } from '../../../__generated__/globalTypes';
 import TagWithTwoText from '../../common/TagWithTwoText';
 import Loading from '../../common/Loading';
 import { Button } from '../../common/Button';
@@ -89,20 +73,18 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
 interface IPropsCourseAchievementOptions {
   courseId: number;
 }
-const CourseAchievementOptions: FC<IPropsCourseAchievementOptions> = (
-  props
-) => {
-  const achievementOptionsForACourse = useRoleQuery<
-    AchievementOptionCourses,
-    AchievementOptionCoursesVariables
-  >(ACHIEVEMENT_OPTION_COURSES, {
-    variables: {
-      limit: QUERY_LIMIT,
-      where: {
-        courseId: { _eq: props.courseId },
+const CourseAchievementOptions: FC<IPropsCourseAchievementOptions> = (props) => {
+  const achievementOptionsForACourse = useRoleQuery<AchievementOptionCourses, AchievementOptionCoursesVariables>(
+    ACHIEVEMENT_OPTION_COURSES,
+    {
+      variables: {
+        limit: QUERY_LIMIT,
+        where: {
+          courseId: { _eq: props.courseId },
+        },
       },
-    },
-  });
+    }
+  );
 
   const [deleteAnAchievementCourse] = useRoleMutation<
     DeleteAnAchievementOptionCourse,
@@ -126,9 +108,7 @@ const CourseAchievementOptions: FC<IPropsCourseAchievementOptions> = (
     },
     [deleteAnAchievementCourse, achievementOptionsForACourse]
   );
-  const list = [
-    ...(achievementOptionsForACourse.data?.AchievementOptionCourse || []),
-  ];
+  const list = [...(achievementOptionsForACourse.data?.AchievementOptionCourse || [])];
 
   return (
     <>
@@ -169,18 +149,11 @@ type ExtendedEnrollment = ManagedCourse_Course_by_pk_CourseEnrollments & {
   mostRecentRecord?: ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords;
 };
 
-const ParticipationList: FC<IPropsParticipationList> = ({
-  course,
-  qResult,
-}) => {
+const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => {
   const { t } = useTranslation();
   const isAdmin = useIsAdmin();
-  const [refetchAchievementCertificates, setRefetchAchievementCertificates] =
-    useState(false);
-  const [
-    refetchAttendanceCertificates,
-    setRefetchAttendanceCertificates,
-  ] = useState(false);
+  const [refetchAchievementCertificates, setRefetchAchievementCertificates] = useState(false);
+  const [refetchAttendanceCertificates, setRefetchAttendanceCertificates] = useState(false);
 
   const tableHeaders: StaticComponentProperty[] = [
     { key: 0, label: t('firstName') },
@@ -190,18 +163,14 @@ const ParticipationList: FC<IPropsParticipationList> = ({
     { key: 4, label: t('manageCourse:certificates') },
   ];
 
-  const participationEnrollments: ExtendedEnrollment[] = [
-    ...(course.CourseEnrollments || []),
-  ]
+  const participationEnrollments: ExtendedEnrollment[] = [...(course.CourseEnrollments || [])]
     .filter((enrollment) => enrollment.status === 'CONFIRMED')
     .sort((a, b) => a.User.lastName.localeCompare(b.User.lastName))
     .map((enrollment) => {
       // get all records for this enrollment
       const allRecords = course.AchievementOptionCourses.flatMap((course) =>
         course.AchievementOption.AchievementRecords.filter((record) =>
-          record.AchievementRecordAuthors.some(
-            (author) => author.userId === enrollment.User.id
-          )
+          record.AchievementRecordAuthors.some((author) => author.userId === enrollment.User.id)
         )
       );
 
@@ -209,9 +178,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({
       const mostRecentRecord =
         allRecords.length > 0
           ? allRecords.reduce((prevRecord, currRecord) =>
-              new Date(currRecord.created_at) > new Date(prevRecord.created_at)
-                ? currRecord
-                : prevRecord
+              new Date(currRecord.created_at) > new Date(prevRecord.created_at) ? currRecord : prevRecord
             )
           : null;
 
@@ -224,17 +191,23 @@ const ParticipationList: FC<IPropsParticipationList> = ({
 
   const sessions = [...(course.Sessions || [])];
 
-  const attendances = getAttendancesForParticipants(
-    participationEnrollments,
-    sessions
-  );
+  const attendances = getAttendancesForParticipants(participationEnrollments, sessions);
 
   // assign passedUserEnrollments to the array of participationEnrollments filtered on enrollments from those users who have less then the allowed number of missed or not tracked attendances for this course
-  const passedUserEnrollmentsForAttendanceCertificate =
-    participationEnrollments.filter((enrollment) => {
-      const userAttendances = attendances.filter(
-        (attendance) => attendance.userId === enrollment.userId
-      );
+  const passedUserEnrollmentsForAttendanceCertificate = participationEnrollments.filter((enrollment) => {
+    const userAttendances = attendances.filter((attendance) => attendance.userId === enrollment.userId);
+    const missedAttendances = userAttendances.filter(
+      (attendance) => attendance.status === AttendanceStatus_enum.MISSED
+    );
+    const noInfoAttendances = userAttendances.filter(
+      (attendance) => attendance.status === AttendanceStatus_enum.NO_INFO
+    );
+    return missedAttendances.length + noInfoAttendances.length <= course.maxMissedSessions;
+  });
+
+  const passedUserEnrollmentsForAchievementCertificate = participationEnrollments
+    .filter((enrollment) => {
+      const userAttendances = attendances.filter((attendance) => attendance.userId === enrollment.userId);
       const missedAttendances = userAttendances.filter(
         (attendance) => attendance.status === AttendanceStatus_enum.MISSED
       );
@@ -242,29 +215,11 @@ const ParticipationList: FC<IPropsParticipationList> = ({
         (attendance) => attendance.status === AttendanceStatus_enum.NO_INFO
       );
       return missedAttendances.length + noInfoAttendances.length <= course.maxMissedSessions;
+    })
+    .filter((enrollment) => {
+      const mostRecentRecord = enrollment.mostRecentRecord;
+      return mostRecentRecord && mostRecentRecord.rating === AchievementRecordRating_enum.PASSED;
     });
-
-  const passedUserEnrollmentsForAchievementCertificate =
-    participationEnrollments
-      .filter((enrollment) => {
-        const userAttendances = attendances.filter(
-          (attendance) => attendance.userId === enrollment.userId
-        );
-        const missedAttendances = userAttendances.filter(
-          (attendance) => attendance.status === AttendanceStatus_enum.MISSED
-        );
-        const noInfoAttendances = userAttendances.filter(
-          (attendance) => attendance.status === AttendanceStatus_enum.NO_INFO
-        );
-          return missedAttendances.length + noInfoAttendances.length <= course.maxMissedSessions;
-      })
-      .filter((enrollment) => {
-        const mostRecentRecord = enrollment.mostRecentRecord;
-        return (
-          mostRecentRecord &&
-          mostRecentRecord.rating === AchievementRecordRating_enum.PASSED
-        );
-      });
 
   return (
     <>
@@ -276,9 +231,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({
                 {tableHeaders.map((component) => {
                   return (
                     <th key={component.key} className="py-2 px-5">
-                      <p className="flex justify-start font-medium text-gray-400 uppercase">
-                        {component.label}
-                      </p>
+                      <p className="flex justify-start font-medium text-gray-400 uppercase">{component.label}</p>
                     </th>
                   );
                 })}
@@ -293,18 +246,10 @@ const ParticipationList: FC<IPropsParticipationList> = ({
                   userId={ce.User.id}
                   qResult={qResult}
                   maxMissedSessions={course.maxMissedSessions}
-                  refetchAchievementCertificates={
-                    refetchAchievementCertificates
-                  }
-                  refetchAttendanceCertificates={
-                    refetchAttendanceCertificates
-                  }
-                  setRefetchAchievementCertificates={
-                    setRefetchAchievementCertificates
-                  }
-                  setRefetchAttendanceCertificates={
-                    setRefetchAttendanceCertificates
-                  }
+                  refetchAchievementCertificates={refetchAchievementCertificates}
+                  refetchAttendanceCertificates={refetchAttendanceCertificates}
+                  setRefetchAchievementCertificates={setRefetchAchievementCertificates}
+                  setRefetchAttendanceCertificates={setRefetchAttendanceCertificates}
                 />
               ))}
             </tbody>
@@ -329,9 +274,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({
           )}
         </div>
       ) : (
-        <p className="m-auto text-center mb-14 text-gray-400">
-          {t('course-page:no-enrollments-present')}
-        </p>
+        <p className="m-auto text-center mb-14 text-gray-400">{t('course-page:no-enrollments-present')}</p>
       )}
     </>
   );
@@ -375,30 +318,25 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
   const [showDetails, setShowDetails] = useState(false);
   const [documentationUrlLoaded, setDocumentationUrlLoaded] = useState(false);
 
-  const [
-    getAchievementRecordDocumentation,
-    getAchievementRecordDocumentationResult,
-  ] = useLazyRoleQuery<
-    loadAchievementRecordDocumentation,
-    loadAchievementRecordDocumentationVariables
-  >(LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION);
+  const [getAchievementRecordDocumentation, getAchievementRecordDocumentationResult] = useLazyRoleQuery<
+    LoadFile,
+    LoadFileVariables
+  >(LOAD_FILE);
 
-  const attendanceRecordBySession: Record<
-    number,
-    { id: number; status: AttendanceStatus_enum }
-  > = enrollment.User.Attendances.reduce<
-    Record<number, { id: number; status: AttendanceStatus_enum }>
-  >((prev, current) => {
-    if (!prev[current.Session.id] || prev[current.Session.id].id < current.id) {
-      prev[current.Session.id] = { id: current.id, status: current.status };
-    }
-    return prev;
-  }, {});
+  const attendanceRecordBySession: Record<number, { id: number; status: AttendanceStatus_enum }> =
+    enrollment.User.Attendances.reduce<Record<number, { id: number; status: AttendanceStatus_enum }>>(
+      (prev, current) => {
+        if (!prev[current.Session.id] || prev[current.Session.id].id < current.id) {
+          prev[current.Session.id] = { id: current.id, status: current.status };
+        }
+        return prev;
+      },
+      {}
+    );
 
-  const [insertAttendance] = useRoleMutation<
-    InsertSingleAttendance,
-    InsertSingleAttendanceVariables
-  >(INSERT_SINGLE_ATTENDANCE);
+  const [insertAttendance] = useRoleMutation<InsertSingleAttendance, InsertSingleAttendanceVariables>(
+    INSERT_SINGLE_ATTENDANCE
+  );
 
   const handleDotClick = useCallback(
     async (session: ManagedCourse_Course_by_pk_Sessions) => {
@@ -466,18 +404,12 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
     color: dotColor(session),
   }));
   const missedSessionCount = () => {
-    const result = dotsData.reduce(
-      (prev, current) => prev + (current.color === 'RED' ? 1 : 0),
-      0
-    );
+    const result = dotsData.reduce((prev, current) => prev + (current.color === 'RED' ? 1 : 0), 0);
     return result;
   };
 
   const attendedSessionCount = () => {
-    const result = dotsData.reduce(
-      (prev, current) => prev + (current.color === 'GREEN' ? 1 : 0),
-      0
-    );
+    const result = dotsData.reduce((prev, current) => prev + (current.color === 'GREEN' ? 1 : 0), 0);
     return result;
   };
 
@@ -511,12 +443,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
               })}
             </div>
             <div className="flex space-x-1 flex-row">
-              <p className={pStyle}>
-                {' '}
-                {`${missedSessionCount()}/${
-                  attendedSessionCount() + missedSessionCount()
-                }`}{' '}
-              </p>
+              <p className={pStyle}> {`${missedSessionCount()}/${attendedSessionCount() + missedSessionCount()}`} </p>
               <EhDot color={passedStatus()} />
             </div>
           </div>
@@ -529,24 +456,9 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
               </div>
             )}
 
-            {enrollment.mostRecentRecord?.rating ===
-            AchievementRecordRating_enum.UNRATED ? (
-              greyDot
-            ) : (
-              <></>
-            )}
-            {enrollment.mostRecentRecord?.rating ===
-            AchievementRecordRating_enum.PASSED ? (
-              greenDot
-            ) : (
-              <></>
-            )}
-            {enrollment.mostRecentRecord?.rating ===
-            AchievementRecordRating_enum.FAILED ? (
-              redDot
-            ) : (
-              <></>
-            )}
+            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.UNRATED ? greyDot : <></>}
+            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.PASSED ? greenDot : <></>}
+            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.FAILED ? redDot : <></>}
           </div>
         </td>
 
@@ -556,26 +468,16 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
               courseEnrollment={enrollment}
               manageView
               refetchAchievementCertificates={refetchAchievementCertificates}
-              refetchAttendanceCertificates={
-                refetchAttendanceCertificates
-              }
-              setRefetchAchievementCertificates={
-                setRefetchAchievementCertificates
-              }
-              setRefetchAttendanceCertificates={
-                setRefetchAttendanceCertificates
-              }
+              refetchAttendanceCertificates={refetchAttendanceCertificates}
+              setRefetchAchievementCertificates={setRefetchAchievementCertificates}
+              setRefetchAttendanceCertificates={setRefetchAttendanceCertificates}
             />
           </div>
         </td>
 
         <td className={tdStyle}>
           <div>
-            <button
-              className="focus:ring-2 rounded-md focus:outline-none"
-              role="button"
-              aria-label="option"
-            >
+            <button className="focus:ring-2 rounded-md focus:outline-none" role="button" aria-label="option">
               {showDetails ? (
                 <MdKeyboardArrowUp size={26} onClick={handleDetailsClick} />
               ) : (
@@ -589,9 +491,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
       {showDetails && (
         <ShowDetails
           enrollment={enrollment}
-          achievementRecordDocumentationResult={
-            getAchievementRecordDocumentationResult
-          }
+          achievementRecordDocumentationResult={getAchievementRecordDocumentationResult}
           qResult={qResult}
         />
       )}
@@ -602,24 +502,14 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
 /* #endregion */
 interface IPropsShowDetails {
   enrollment: ExtendedEnrollment;
-  achievementRecordDocumentationResult: LazyQueryResult<
-    loadAchievementRecordDocumentation,
-    loadAchievementRecordDocumentationVariables
-  >;
+  achievementRecordDocumentationResult: LazyQueryResult<LoadFile, LoadFileVariables>;
   qResult: QueryResult<any, any>;
 }
-const ShowDetails: FC<IPropsShowDetails> = ({
-  enrollment,
-  achievementRecordDocumentationResult,
-  qResult,
-}) => {
-  const [setAchievementRecord] = useRoleMutation<
-    UpdateAchievementRecordByPk,
-    UpdateAchievementRecordByPkVariables
-  >(UPDATE_AN_ACHIEVEMENT_RECORD);
-  const onSetAchievementRecordRatingClick = async (
-    achievementRecordRating: AchievementRecordRating_enum
-  ) => {
+const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocumentationResult, qResult }) => {
+  const [setAchievementRecord] = useRoleMutation<UpdateAchievementRecordByPk, UpdateAchievementRecordByPkVariables>(
+    UPDATE_AN_ACHIEVEMENT_RECORD
+  );
+  const onSetAchievementRecordRatingClick = async (achievementRecordRating: AchievementRecordRating_enum) => {
     await setAchievementRecord({
       variables: {
         id: enrollment.mostRecentRecord.id,
@@ -644,48 +534,27 @@ const ShowDetails: FC<IPropsShowDetails> = ({
               <>
                 <div className="flex items-center mb-3">
                   <EhDot
-                    onClick={() =>
-                      onSetAchievementRecordRatingClick(
-                        AchievementRecordRating_enum.UNRATED
-                      )
-                    }
+                    onClick={() => onSetAchievementRecordRatingClick(AchievementRecordRating_enum.UNRATED)}
                     className="cursor-pointer"
                     color="GREY"
                     size={
-                      enrollment.mostRecentRecord.rating ===
-                      AchievementRecordRating_enum.UNRATED
-                        ? 'LARGE'
-                        : 'DEFAULT'
+                      enrollment.mostRecentRecord.rating === AchievementRecordRating_enum.UNRATED ? 'LARGE' : 'DEFAULT'
                     }
                   />
                   <EhDot
-                    onClick={() =>
-                      onSetAchievementRecordRatingClick(
-                        AchievementRecordRating_enum.PASSED
-                      )
-                    }
+                    onClick={() => onSetAchievementRecordRatingClick(AchievementRecordRating_enum.PASSED)}
                     className="cursor-pointer"
                     color="GREEN"
                     size={
-                      enrollment.mostRecentRecord.rating ===
-                      AchievementRecordRating_enum.PASSED
-                        ? 'LARGE'
-                        : 'DEFAULT'
+                      enrollment.mostRecentRecord.rating === AchievementRecordRating_enum.PASSED ? 'LARGE' : 'DEFAULT'
                     }
                   />
                   <EhDot
-                    onClick={() =>
-                      onSetAchievementRecordRatingClick(
-                        AchievementRecordRating_enum.FAILED
-                      )
-                    }
+                    onClick={() => onSetAchievementRecordRatingClick(AchievementRecordRating_enum.FAILED)}
                     className="cursor-pointer"
                     color="RED"
                     size={
-                      enrollment.mostRecentRecord.rating ===
-                      AchievementRecordRating_enum.FAILED
-                        ? 'LARGE'
-                        : 'DEFAULT'
+                      enrollment.mostRecentRecord.rating === AchievementRecordRating_enum.FAILED ? 'LARGE' : 'DEFAULT'
                     }
                   />
                 </div>
@@ -694,15 +563,10 @@ const ShowDetails: FC<IPropsShowDetails> = ({
                   href={
                     achievementRecordDocumentationResult.loading
                       ? '#'
-                      : achievementRecordDocumentationResult?.data
-                          ?.loadAchievementRecordDocumentation?.link
+                      : achievementRecordDocumentationResult?.data?.loadFile?.link
                   }
                 >
-                  {achievementRecordDocumentationResult.loading ? (
-                    <CircularProgress />
-                  ) : (
-                    'Download Documentation'
-                  )}
+                  {achievementRecordDocumentationResult.loading ? <CircularProgress /> : 'Download Documentation'}
                 </Button>
               </>
             )}
@@ -719,11 +583,7 @@ interface IEhDotProps {
   handleDotClick: (session: ManagedCourse_Course_by_pk_Sessions) => void;
   session: ManagedCourse_Course_by_pk_Sessions;
 }
-const EhDotWithCallBack: FC<IEhDotProps> = ({
-  dotData,
-  handleDotClick,
-  session,
-}) => {
+const EhDotWithCallBack: FC<IEhDotProps> = ({ dotData, handleDotClick, session }) => {
   const handleClick = useCallback(() => {
     handleDotClick(session);
   }, [handleDotClick, session]);

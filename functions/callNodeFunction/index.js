@@ -15,7 +15,7 @@ import winston from "winston";
 const logger = winston.createLogger({
   level: process.env.ENVIRONMENT === "production" ? "info" : "debug",
   format: winston.format.combine(
-    // winston.format.timestamp(),
+    // winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.errors({ stack: true }),
     winston.format.splat(),
     winston.format.simple()
@@ -34,24 +34,27 @@ const logger = winston.createLogger({
  * @param {!express:Response} res HTTP response context.
  */
 export const callNodeFunction = async (req, res) => {
-  try {
-    if (process.env.HASURA_CLOUD_FUNCTION_SECRET != req.headers.secret) {
-      return res.status(401).json({
-        error: "Unauthorized",
-      });
-    }
+  const hasuraSecret = req.headers.secret;
+  const hasuraCloudFunctionSecret = process.env.HASURA_CLOUD_FUNCTION_SECRET;
+  const functionName = req.headers.name;
 
-    switch (req.headers.name) {
+  // Check if the provided secret matches the environment secret
+  if (hasuraSecret !== hasuraCloudFunctionSecret) {
+    return res.status(403).json({
+      error: "Invalid secret provided.",
+    });
+  }
+
+  try {
+    logger.info(`Calling ${functionName} function`);
+    switch (functionName) {
       case "createCertificate":
-        logger.info("Calling createCertificate function");
         await createCertificate(req, res);
         break;
       case "loadFile":
-        logger.info("Calling loadFile function");
         await loadFile(req, res);
         break;
       case "saveFile":
-        logger.info("Calling saveFile function");
         await saveFile(req, res);
         break;
       default:
@@ -60,7 +63,7 @@ export const callNodeFunction = async (req, res) => {
         });
     }
   } catch (error) {
-    logger.error(error);
+    logger.error(`Error in ${functionName}: ${error.message}`);
     return res.status(500).json({
       error: "Internal Server Error",
     });

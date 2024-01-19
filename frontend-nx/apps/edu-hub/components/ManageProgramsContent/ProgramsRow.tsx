@@ -13,7 +13,7 @@ import { parseFileUploadEvent } from '../../helpers/filehandling';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { useLazyRoleQuery } from '../../hooks/authedQuery';
 import { SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE, SAVE_ATTENDANCE_CERTIFICATE_TEMPLATE } from '../../queries/actions';
-import { LOAD_PARTICIPATION_DATA } from '../../queries/loadParticipationData';
+import { LOAD_PARTICIPATION_DATA } from '../../queries/actions';
 import {
   UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
   UPDATE_ATTENDANCE_CERTIFICATE_TEMPLATE,

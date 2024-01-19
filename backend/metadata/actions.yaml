@@ -21,61 +21,6 @@ actions:
     permissions:
       - role: anonymous
     comment: Provides the data for the MOOCHub API
-  - name: loadAchievementCertificate
-    definition:
-      kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE}}'
-      headers:
-        - name: secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
-          value_from_env: HASURA_BUCKET
-    permissions:
-      - role: user_access
-  - name: loadAchievementOptionDocumentationTemplate
-    definition:
-      kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE}}'
-      headers:
-        - name: secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
-          value_from_env: HASURA_BUCKET
-    permissions:
-      - role: user_access
-  - name: loadAchievementOptionEvaluationScript
-    definition:
-      kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT}}'
-      headers:
-        - name: secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
-          value_from_env: HASURA_BUCKET
-    permissions:
-      - role: user_access
-  - name: loadAchievementRecordDocumentation
-    definition:
-      kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION}}'
-      headers:
-        - name: secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
-          value_from_env: HASURA_BUCKET
-    permissions:
-      - role: instructor_access
-  - name: loadAttendanceCertificate
-    definition:
-      kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE}}'
-      headers:
-        - name: secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
-          value_from_env: HASURA_BUCKET
-    permissions:
-      - role: user_access
   - name: loadFile
     definition:
       kind: ""
@@ -87,6 +32,8 @@ actions:
           value_from_env: HASURA_BUCKET
         - name: name
           value: loadFile
+    permissions:
+      - role: user_access
     comment: Loads file url from Google Storage Bucket
   - name: loadParticipationData
     definition:
@@ -101,7 +48,7 @@ actions:
   - name: saveAchievementCertificateTemplate
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE}}'
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
