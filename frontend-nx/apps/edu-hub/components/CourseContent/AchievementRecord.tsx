@@ -51,6 +51,7 @@ interface IProps {
 
 const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUploadDeadline, courseTitle }) => {
   const { t, lang } = useTranslation();
+  const user = useUser();
   const userId = useUserId();
   const profile = useKeycloakUserProfile();
   const [showModal, setShowModal] = useState(false);
@@ -244,7 +245,9 @@ const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUpload
           courseTitle={courseTitle}
           setAlertMessage={setAlertMessage}
           userId={userId}
+          user={user}
           courseId={courseId}
+          isOpen={showModal}
         />
       )}
     </ProjectResultUploadContext.Provider>
