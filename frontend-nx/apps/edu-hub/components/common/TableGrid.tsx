@@ -17,6 +17,7 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils';
 
 import TableGridDeleteButton from './TableGridDeleteButton';
+import { Button } from './Button';
 
 interface BaseRow {
   id: number;
@@ -26,7 +27,10 @@ interface TableGridProps<T extends BaseRow> {
   data: T[];
   columns: ColumnDef<T>[];
   deleteMutation?: DocumentNode;
+  enablePagination?: boolean;
+  pageIndex?: number;
   refetchQueries: string[];
+  setPageIndex?: (number) => void;
   showCheckbox?: boolean;
   showDelete?: boolean;
   showGlobalSearchField?: boolean;
@@ -37,7 +41,10 @@ const TableGrid = <T extends BaseRow>({
   data,
   columns,
   deleteMutation,
+  enablePagination = false,
+  pageIndex = 0,
   refetchQueries,
+  setPageIndex,
   showCheckbox,
   showDelete,
   showGlobalSearchField = true,
@@ -106,6 +113,12 @@ const TableGrid = <T extends BaseRow>({
     state: {
       sorting,
       globalFilter,
+      ...(enablePagination && {
+        pagination: {
+          pageIndex,
+          pageSize: 15,
+        },
+      }),
     },
     globalFilterFn: fuzzyFilter,
     onGlobalFilterChange: setGlobalFilter,
@@ -191,6 +204,26 @@ const TableGrid = <T extends BaseRow>({
           })}
         </div>
       ))}
+
+      {enablePagination && (
+        <div className="flex justify-between items-center mt-4">
+          <Button onClick={() => setPageIndex((old) => Math.max(old - 1, 0))} disabled={pageIndex === 0}>
+            Previous Page
+          </Button>
+          <span>
+            Page{' '}
+            <strong>
+              {pageIndex + 1} of {table.getPageCount()}
+            </strong>
+          </span>
+          <Button
+            onClick={() => setPageIndex((old) => (old < table.getPageCount() - 1 ? old + 1 : old))}
+            disabled={pageIndex >= table.getPageCount() - 1}
+          >
+            Next Page
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

@@ -19,9 +19,11 @@ const ManageUsers: FC = () => {
         <title>EduHub | opencampus.sh</title>
         <link rel="icon" href="/favicon.png" />
       </Head>
-      <Page>
-        <div className="min-h-[77vh]">{isLoggedIn && isAdmin && <ManageUsersContent />}</div>
-      </Page>
+      <div className="max-w-screen-xl mx-auto">
+        <Page>
+          <div className="min-h-[77vh]">{isLoggedIn && isAdmin && <ManageUsersContent />}</div>
+        </Page>
+      </div>
     </>
   );
 };
