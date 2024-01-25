@@ -161,83 +161,105 @@ class EduHubClient:
         return pd.DataFrame(unnested_list)
 
     def fetch_enrollments(self):
+        """
+        Fetches enrollment data for given user IDs and a course ID from a GraphQL API.
 
+        This method constructs a GraphQL query, sends it to the defined endpoint,
+        and processes the response to extract course enrollment data.
 
+        Raises:
+            requests.exceptions.RequestException: If an error occurs during the request.
+
+        Returns:
+            list: A list of course enrollment records, or an empty list if no data is found.
+        """
         # GraphQL query
-        query = """
-        query GetEnrollments($userIds: [uuid!]!, $courseId: Int!) {
-  CourseEnrollment(where: {userId: {_in: $userIds}, Course: {id: {_eq: $courseId}}}) {
-    User {
-      Attendances {
-        Session {
-          id
-          startDateTime
-        }
-        id
-        status
-      }
-      firstName
-      lastName
-      AchievementRecordAuthors(where: {AchievementRecord: {AchievementOption: {AchievementOptionCourses: {Course: {id: {_eq: $courseId}}}}}}, order_by: {AchievementRecord: {updated_at: desc}}, limit: 1) {
-        AchievementRecord {
-          AchievementOption {
-            title
-            recordType
-          }
-          created_at
-        }
-      }
-      id
-    }
-    Course {
-      Program {
-        title
-        achievementCertificateTemplateURL
-        attendanceCertificateTemplateURL
-        attendanceCertificateTemplateTextId
-        achievementCertificateTemplateTextId
-      }
-      Sessions(order_by: {startDateTime: asc}) {
-        id
-        title
-        startDateTime
-      }
-      id
-      ects
-      title
-      learningGoals
-    }
-  }
-}
-
-    """
-     # Variables for the GraphQL query
+        query = """query GetEnrollments($userIds: [uuid!]!, $courseId: Int!) {
+            CourseEnrollment(where: {userId: {_in: $userIds}, Course: {id: {_eq: $courseId}}}) {
+                User {
+                    Attendances {
+                        Session {
+                            id
+                            startDateTime
+                        }
+                    id
+                    status
+                    }
+                    firstName
+                    lastName
+                    AchievementRecordAuthors(
+                        where: {AchievementRecord: {AchievementOption: {AchievementOptionCourses: {Course: {id: {_eq: $courseId}}}}}},
+                        order_by: {AchievementRecord: {updated_at: desc}}, limit: 1
+                    ) {
+                        AchievementRecord {
+                        AchievementOption {
+                            title
+                            recordType
+                        }
+                        created_at
+                    }
+                }
+                id
+                }
+                Course {
+                    Program {
+                        title
+                        achievementCertificateTemplateURL
+                        attendanceCertificateTemplateURL
+                        attendanceCertificateTemplateTextId
+                        achievementCertificateTemplateTextId
+                    }
+                    Sessions(order_by: {startDateTime: asc}) {
+                        id
+                        title
+                        startDateTime
+                    }
+                    id
+                    ects
+                    title
+                    learningGoals
+                }
+            }
+        }"""
+        # Variables for the GraphQL query
         variables = {
-        "userIds": self.user_ids,
-        "courseId": self.course_id 
+            "userIds": self.user_ids,
+            "courseId": self.course_id 
         }
 
-     # Headers including the admin secret
-        headers = {
-        "Content-Type": "application/json",
-        "x-hasura-admin-secret":  self.eduhub_client.hasura_admin_secret
-        }
-
-    # Make the request to the GraphQL endpoint
         try:
             response = requests.post(
-            self.eduhub_client.url,
-            headers={"x-hasura-admin-secret": self.eduhub_client.hasura_admin_secret},
-            json={"query": query, "variables": {"userIds": self.user_ids, "courseId": self.course_id}}
+                self.eduhub_client.url,
+                headers={"x-hasura-admin-secret": self.eduhub_client.hasura_admin_secret},
+                json={"query": query, "variables": variables}
             )
             response.raise_for_status()  # Raises a HTTPError if the HTTP request returned an unsuccessful status code
-        # Assuming the data is returned in JSON format
+
+            # Assuming the data is returned in JSON format
             data = response.json()
-            return data['data']['CourseEnrollment']
+            return self._extract_course_enrollment(data)
         except requests.exceptions.RequestException as e:
             # Handle any errors that occur during the request
-            logging.error(f"An error occurred: {e}")
+            logging.error(f"An error occurred during fetch_enrollments: {e}")
             raise
+
+    def _extract_course_enrollment(self, data):
+        """
+        Extracts course enrollment data from the API response.
+
+        Args:
+            data (dict): The response data from the API.
+
+        Returns:
+            list: A list of course enrollment records, or an empty list if no data is found.
+        """
+        try:
+            return data.get('data', {}).get('CourseEnrollment', [])
+        except KeyError as e:
+            logging.error(f"Key error in response parsing: {e}")
+            raise
+
+# Additional usage code and context would follow
 
     def insert_attendance(self, course_participant_attendance):
         variables = {
@@ -334,10 +356,16 @@ class EduHubClient:
         except (KeyError, IndexError) as e:
             return None  # or handle error as appropriate for your use case
 
-
     def update_course_enrollment_record(self, certificate_url):
-       
-        # GraphQL-Mutations to Update Course Enrollment
+        """
+        Updates the course enrollment record with a new certificate URL.
+
+        Args:
+            certificate_url (str): The new URL for the course certificate.
+
+        Returns:
+            tuple: A tuple containing a boolean indicating success and the number of affected rows.
+        """
         mutation = """
         mutation UpdateEnrollment($userId: uuid!, $courseId: Int!, $certificateUrl: String!) {
             update_CourseEnrollment(
@@ -349,22 +377,32 @@ class EduHubClient:
         }
         """
 
-        # Data for the GraphQL-Mutation
         variables = {
             "userId": self.user_id,
             "courseId": self.course_id,
             "certificateUrl": certificate_url,
         }
 
-        response = requests.post(
-            self.eduhub_client.hasura_endpoint,
-            json={"query": mutation, "variables": variables},
-            headers=self.eduhub_client.headers,
-        )
-
-        if response.status_code != 200:
-            logging.error(f"Failed to update course enrollment record: {response.text}")
+        try:
+            response = requests.post(
+                self.eduhub_client.hasura_endpoint,
+                json={"query": mutation, "variables": variables},
+                headers=self.eduhub_client.headers,
+            )
+            response.raise_for_status()
             
+            result = response.json()
 
-        result = response.json()
-        return result
+            if "errors" in result:
+                logging.error(f"GraphQL Error: {result['errors']}")
+                return False, 0
+
+            affected_rows = result.get("data", {}).get("update_CourseEnrollment", {}).get("affected_rows", 0)
+            return True, affected_rows
+
+        except requests.exceptions.RequestException as e:
+            logging.error(f"HTTP request error: {e}")
+            return False, 0
+        except ValueError as e:
+            logging.error(f"JSON decoding error: {e}")
+            return False, 0

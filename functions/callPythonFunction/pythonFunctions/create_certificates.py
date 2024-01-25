@@ -6,101 +6,67 @@ import requests
 from api_clients import EduHubClient, StorageClient
 import io 
 
-import unittest
-from unittest.mock import Mock, patch
-from your_module import CertificateCreator 
-
-# TODO:
-
-# 1. **`fetch_enrollments` Method:**
-#    - Purpose: To fetch enrollment data based on user IDs and course ID.
-#    - Inputs: List of user IDs, Course ID.
-#    - Output: Enrollment data.
-
-# 2. **`fetch_template_image` and `fetch_template_text` Methods:**
-#    - Purpose: To fetch the template image URL and template text based on the certificate type.
-#    - Inputs: Enrollments data, Certificate type.
-#    - Output: Template image URL and template text.
-
-# 3. **`prepare_certificate_content` Method:**
-#    - Purpose: To prepare the content to be inserted into the certificate, like user name, course details, etc.
-#    - Inputs: Enrollment data, Certificate type.
-#    - Output: Prepared text content for the certificate.
-
-# 4. **`generate_pdf_file_name` Method:**
-#    - Purpose: To generate a unique and descriptive file name for the certificate PDF.
-#    - Inputs: Enrollment data, Certificate type.
-#    - Output: PDF file name.
-
-# 5. **`render_certificate_to_pdf` Method:**
-#    - Purpose: To render the HTML template with the certificate data into a PDF.
-#    - Inputs: Template image URL, HTML content, additional styling if necessary.
-#    - Output: PDF file in memory (e.g., as a BytesIO object).
-
-# 6. **`upload_certificate_to_storage` Method:**
-#    - Purpose: To upload the generated certificate PDF to Google Cloud Storage.
-#    - Inputs: PDF BytesIO object, File name, Bucket name.
-#    - Output: Public URL of the uploaded file.
-
-# 7. **`update_enrollment_record` Method:**
-#    - Purpose: To update the course enrollment record with the certificate URL.
-#    - Inputs: User ID, Course ID, Certificate URL.
-
-# 8. **`download_template_image` Method:**
-#    - Purpose: To download the certificate image template if needed.
-#    - Inputs: Template image URL.
-#    - Output: Image data.
-
-# 9. **`get_attended_sessions` Method:**
-#    - Purpose: To extract information about attended sessions for attendance certificates.
-#    - Inputs: Enrollment data, Sessions data.
-#    - Output: List of attended sessions.
-
-# 10. **`generate_certificate_for_enrollment` Method:**
-#     - Purpose: To encapsulate the entire process of generating a certificate for a single enrollment.
-#     - Inputs: Enrollment data.
-#     - Output: Certificate URL or an indication of success/failure.
-
-# 11. **`process_certificates` Method:**
-#     - Purpose: Main method to process certificates for a batch of enrollments.
-#     - Inputs: User IDs, Course ID, Certificate type.
-#     - Output: Status of the process, e.g., number of certificates generated.
-
-
-
 class CertificateCreator:
-    def __init__(self, storage_client, eduhub_client, arguments):
-        self.storage_client = storage_client
-        self.eduhub_client = eduhub_client
+    """
+    A class for creating certificates based on course enrollments.
+
+    This class handles the generation of certificates for users based on their
+    course enrollments and the type of certificate (e.g., achievement, attendance).
+
+    Attributes:
+        storage_client (StorageClient): An instance of StorageClient for handling storage operations.
+        eduhub_client (EduHubClient): An instance of EduHubClient for interacting with the EduHub API.
+        certificate_type (str): The type of certificate to be created (e.g., 'achievement', 'attendance').
+        user_ids (list): A list of user IDs for whom the certificates are to be created.
+        course_id (int): The ID of the course for which the certificates are to be created.
+        enrollments (list): A list of enrollment data fetched based on provided user IDs and course ID.
+    """
+
+    def __init__(self, arguments):
+        """
+        Initializes the CertificateCreator with necessary arguments.
+
+        Args:
+            arguments (dict): A dictionary containing input data for certificate creation. 
+                              It must have keys 'input', 'certificateType', 'userIds', and 'courseId'.
+        """
+        # Initialization code...
+        self.storage_client = StorageClient()
+        self.eduhub_client = EduHubClient()
         self.certificate_type = arguments["input"]["certificateType"]
         self.user_ids = arguments["input"]["userIds"]
         self.course_id = arguments["input"]["courseId"] 
-        self.enrollments = None
-        self.program_info = None
 
-        if self.certificate_type in ["achievement", "attendance"]:
-            self.enrollments = self.eduhub_client.fetch_enrollments(self.user_ids, self.course_id)
-        else:
-            self.program_info = self._fetch_program_info(self.course_id)
+        if self.certificate_type not in ["achievement", "attendance"]:
+            logging.error("Certificate type is incorrect or missing!")
+            raise ValueError("Invalid certificate type")
 
-
+        self.enrollments = self.eduhub_client.fetch_enrollments(self.user_ids, self.course_id)
+        logging.info("Fetched enrollments for certificate creation.")
 
     def create_certificates(self):
+        """
+        Creates certificates for all enrollments and updates the course enrollment records.
+    
+        This method iterates through each enrollment, generates a certificate, and updates
+        the enrollment record with the certificate's URL. It handles both 'achievement'
+        and 'attendance' types of certificates.
+        """
+    
         template_image_url = self.fetch_template_image()
         template_text = self.fetch_template_text()
-
-        if self.certificate_type == "achievement" or self.certificate_type == "attendance":
-            for enrollment in self.enrollments:
-                pdf_url = generate_and_save_certificate_to_gcs(template_image_url, template_text, self.storage_client.get_bucket())
-
-                self.eduhub_client.update_course_enrollment_record(pdf_url)
-        else: 
-                pdf_url = generate_and_save_certificate_to_gcs(template_image_url, template_text, self.storage_client.get_bucket())
-
-                self.update_course_enrollment_record(pdf_url)
-
-
-        logging.info(f"{len(self.enrollments)} {self.certificate_type} Certificate(s) generated.")
+        bucket = self.storage_client.get_bucket()
+        successful_count = 0
+    
+        for i, enrollment in enumerate(self.enrollments, 1):
+            try:
+                pdf_url = self.generate_and_save_certificate_to_gcs(template_image_url, template_text, bucket)
+                self.eduhub_client.update_course_enrollment_record(enrollment["id"], pdf_url)
+                successful_count += 1
+            except Exception as e:
+                logging.error(f"Error in processing enrollment {i}: {e}")
+    
+        logging.info(f"{successful_count}/{len(self.enrollments)} {self.certificate_type} certificate(s) successfully   generated.")
 
     def generate_and_save_certificate_to_gcs(self, template_image_url, template_text, bucket_name):
         # Prepare Text Conten 
@@ -137,9 +103,6 @@ class CertificateCreator:
         blob.upload_from_file(temporary_pdf, content_type='application/pdf')
 
         return blob.public_url
-
-        
-   
 
     def fetch_program_info(self):
         #TODO: get textID and Image URL per userID via program 
@@ -283,37 +246,12 @@ class CertificateCreator:
         return attended_session_titles
 
 
+def create_certificates(hasura_secret, arguments):
+    try:
+        certificate_creator = CertificateCreator(arguments)
+        certificate_creator.create_certificates()
+        logging.info("Certificates creation process completed.")
+    except Exception as e:
+        logging.error("Error in creating certificates: %s", str(e))
 
-
-
-class TestCertificateCreator(unittest.TestCase):
-
-    def setUp(self):
-        # Use actual storage and eduhub clients, and real arguments
-        self.storage_client = StorageClient()
-        self.eduhub_client = EduHubClient()
-        self.arguments = {
-            "input": {
-                "certificateType": "achievement",
-                "userIds": ["152f12c3-f7d2-4b73-8d29-603c164b0139"],
-                "courseId": "1"
-            }
-        }
-
-        # Instantiate the CertificateCreator
-        self.certificate_creator = CertificateCreator(
-            self.storage_client, self.eduhub_client, self.arguments
-        )
-
-    def test_fetch_enrollments(self):
-        # Call the method
-        enrollments = self.certificate_creator.fetch_enrollments()
-
-        # Assert that the method returns a list (or another expected type)
-        self.assertIsInstance(enrollments, list)
-
-        # Further assertions can be made based on the expected structure of the enrollments
-
-if __name__ == '__main__':
-    unittest.main()
-    
+I
