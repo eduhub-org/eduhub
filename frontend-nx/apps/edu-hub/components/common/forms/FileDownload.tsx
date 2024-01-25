@@ -1,12 +1,9 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import GetAppIcon from '@material-ui/icons/GetApp';
-
 import { Button } from '../Button';
-
-import { useLazyRoleQuery } from '../../../hooks/authedQuery';
-import { LOAD_FILE } from '../../../queries/actions';
-import { LoadFile, LoadFileVariables } from '../../../queries/__generated__/LoadFile';
+import { useSignedUrl } from '../../../hooks/signedUrl';
 import useTranslation from 'next-translate/useTranslation';
+import { ErrorMessageDialog } from '../dialogs/ErrorMessageDialog';
 
 interface IProps {
   filePath: string;
@@ -18,37 +15,59 @@ interface IProps {
 const FileDownload: FC<IProps> = ({ filePath, className, label, type = 'icon' }) => {
   const { t } = useTranslation();
 
-  const [getFileUrl, { data, loading }] = useLazyRoleQuery<LoadFile, LoadFileVariables>(LOAD_FILE, {
-    variables: { path: filePath },
-  });
+  const { getSignedUrl, loading, error } = useSignedUrl(filePath);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
 
-  const [shouldDownload, setShouldDownload] = useState(false);
+  useEffect(() => {
+    if (downloadUrl) {
+      window.open(downloadUrl, '_blank');
+      setDownloadUrl(null); // Reset the URL after opening
+    }
+  }, [downloadUrl]);
+
+  useEffect(() => {
+    if (error) {
+      setIsErrorDialogOpen(true);
+    }
+  }, [error]);
 
   const handleDownload = async () => {
-    if (!loading) {
-      await getFileUrl();
-      setShouldDownload(true);
+    if (!loading && !error) {
+      const url = await getSignedUrl();
+      if (url) {
+        setDownloadUrl(url);
+      } else {
+        // Handle the case where no URL is returned
+        console.error('No URL returned for download');
+      }
     }
   };
 
-  // Open the link in a new tab when the URL is ready and the download has been triggered
-  if (shouldDownload && data && data.loadFile && data.loadFile.link) {
-    window.open(data.loadFile.link, '_blank');
-    setShouldDownload(false); // Reset the flag
-  }
-
-  if (type === 'button') {
-    return (
-      <Button onClick={handleDownload} disabled={loading} className={className} inverted>
-        <GetAppIcon /> {label ? label : t('common:download')}
-      </Button>
-    );
-  }
+  const handleCloseErrorDialog = () => {
+    setIsErrorDialogOpen(false);
+  };
 
   return (
-    <button onClick={handleDownload} disabled={loading} className={className}>
-      <GetAppIcon />
-    </button>
+    <>
+      {type === 'button' ? (
+        <Button onClick={handleDownload} disabled={loading} className={className} inverted>
+          <GetAppIcon /> {label ? label : t('common:download')}
+        </Button>
+      ) : (
+        <button onClick={handleDownload} disabled={loading} className={className}>
+          <GetAppIcon />
+        </button>
+      )}
+
+      {isErrorDialogOpen && (
+        <ErrorMessageDialog
+          open={isErrorDialogOpen}
+          onClose={handleCloseErrorDialog}
+          errorMessage={error?.message || t('common:error_occurred')}
+        />
+      )}
+    </>
   );
 };
 

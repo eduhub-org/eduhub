@@ -21,7 +21,7 @@ actions:
     permissions:
       - role: anonymous
     comment: Provides the data for the MOOCHub API
-  - name: loadFile
+  - name: getSignedUrl
     definition:
       kind: ""
       handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
@@ -31,10 +31,10 @@ actions:
         - name: bucket
           value_from_env: HASURA_BUCKET
         - name: name
-          value: loadFile
+          value: getSignedUrl
     permissions:
       - role: user_access
-    comment: Loads file url from Google Storage Bucket
+    comment: Gets a signed url for a file in the Google Storage Bucket
   - name: loadParticipationData
     definition:
       kind: ""
@@ -57,7 +57,7 @@ actions:
         - name: name
           value: saveFile
         - name: file-path
-          value: programid_${programid}/achievement_certificate_template/${filename}
+          value: programs/program-${programid}/private/attendance-certificate-template/${filename}
   - name: saveAchievementDocumentationTemplate
     definition:
       kind: synchronous
@@ -70,56 +70,54 @@ actions:
         - name: name
           value: saveFile
         - name: file-path
-          value: achievementDocumentationTemplateId_${achievementDocumentationTemplateId}/${filename}
-  - name: saveAchievementOptionDocumentationTemplate
-    definition:
-      kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE}}'
-      headers:
-        - name: secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
-          value_from_env: HASURA_BUCKET
-  - name: saveAchievementOptionEvaluationScript
-    definition:
-      kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT}}'
-      headers:
-        - name: secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
-          value_from_env: HASURA_BUCKET
+          value: achievement-docs-templates/public/template-${achievementDocumentationTemplateId}/${filename}
+        - name: is-public
+          value: "true"
   - name: saveAchievementRecordCoverImage
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE}}'
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveFile
+        - name: file-path
+          value: achievement-records/record-${achievementRecordId}/public/cover-image/${filename}
+        - name: is-public
+          value: "true"
     permissions:
       - role: user_access
   - name: saveAchievementRecordDocumentation
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION}}'
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveFile
+        - name: path
+          value: achievement-records/record-${achievementRecordId}/private/documentation/${filename}
     permissions:
       - role: user_access
   - name: saveAttendanceCertificateTemplate
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE}}'
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveFile
+        - name: file-path
+          value: program-${programid}/attendance-certificate-template/${filename}
   - name: saveCourseImage
     definition:
       kind: synchronous
@@ -134,12 +132,18 @@ actions:
   - name: saveUserProfileImage
     definition:
       kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_SAVE_USER_PROFILE_IMAGE}}'
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
       headers:
         - name: secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveFile
+        - name: file-path
+          value: users/user-${userid}/public/profile_image/${filename}
+        - name: is-public
+          value: "true"
     permissions:
       - role: instructor_access
       - role: user_access
@@ -170,4 +174,5 @@ custom_types:
     - name: MoocHubCourse
     - name: MoocHubImage
     - name: Image
+    - name: getSignedUrlOutput
   scalars: []

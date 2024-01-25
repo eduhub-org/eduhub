@@ -17,7 +17,7 @@ interface ErrorProps {
   onClose: () => void;
 }
 
-export const ErrorMessageDialogComponent: FC<ErrorProps> = ({ errorMessage, open, onClose }) => {
+export const ErrorMessageDialog: FC<ErrorProps> = ({ errorMessage, open, onClose }) => {
   const handleClose = useCallback(() => onClose(), [onClose]);
   const { t } = useTranslation();
 

@@ -42,36 +42,6 @@ export const SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE = gql`
   }
 `;
 
-export const SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE = gql`
-  mutation SaveAchievementOptionDocumentationTemplate(
-    $base64File: String!
-    $achievementOptionId: Int!
-  ) {
-    saveAchievementOptionDocumentationTemplate(
-      base64file: $base64File
-      achievementOptionId: $achievementOptionId
-    ) {
-      google_link
-      path
-    }
-  }
-`;
-
-export const SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT = gql`
-  mutation SaveAchievementOptionEvaluationScript(
-    $base64File: String!
-    $achievementOptionId: Int!
-  ) {
-    saveAchievementOptionEvaluationScript(
-      base64file: $base64File
-      achievementOptionId: $achievementOptionId
-    ) {
-      google_link
-      path
-    }
-  }
-`;
-
 export const SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE = gql`
   mutation SaveAchievementRecordCoverImage(
     $base64File: String!
@@ -140,9 +110,9 @@ export const SAVE_COURSE_IMAGE = gql`
   }
 `;
 
-export const LOAD_FILE = gql`
-  query LoadFile($path: String!) {
-    loadFile(path: $path) {
+export const GET_SIGNED_URL = gql`
+  query GetSignedUrl($path: String!) {
+    getSignedUrl(path: $path) {
       link
     }
   }

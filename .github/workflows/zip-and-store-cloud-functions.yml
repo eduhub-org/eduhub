@@ -36,7 +36,6 @@ jobs:
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordCoverImage/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementRecordDocumentation/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveCourseImage/lib/'
-          cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveParticipationCertificateTemplate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveUserProfileImage/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionDocumentationTemplate/lib/'
           cp -r './${{ inputs.CLOUD_FUNCTION_FOLDER }}/lib/' './${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveAchievementOptionEvaluationScript/lib/'
@@ -70,13 +69,6 @@ jobs:
           type: "zip"
           directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveCourseImage"
           filename: "../saveCourseImage.zip"
-
-      - name: Zip Archive for saveParticipationCertificateTemplate
-        uses: thedoctor0/zip-release@main
-        with:
-          type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/saveParticipationCertificateTemplate"
-          filename: "../saveParticipationCertificateTemplate.zip"
 
       - name: Zip Archive for saveUserProfileImage
         uses: thedoctor0/zip-release@main

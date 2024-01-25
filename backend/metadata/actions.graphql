@@ -11,9 +11,9 @@ type Query {
 }
 
 type Query {
-  loadFile(
+  getSignedUrl(
     path: String!
-  ): loadFileOutput
+  ): getSignedUrlOutput
 }
 
 type Query {
@@ -35,20 +35,6 @@ type Mutation {
     base64file: String!
     achievementDocumentationTemplateId: Int!
     filename: String!
-  ): saveFileOutput
-}
-
-type Mutation {
-  saveAchievementOptionDocumentationTemplate(
-    base64file: String!
-    achievementOptionId: Int!
-  ): saveFileOutput
-}
-
-type Mutation {
-  saveAchievementOptionEvaluationScript(
-    base64file: String!
-    achievementOptionId: Int!
   ): saveFileOutput
 }
 
@@ -156,5 +142,9 @@ type MoocHubImage {
 type Image {
   url: String!
   alt: String!
+}
+
+type getSignedUrlOutput {
+  link: String!
 }
 

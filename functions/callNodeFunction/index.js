@@ -1,5 +1,5 @@
 import createCertificate from "./createCertificate/index.js";
-import loadFile from "./loadFile/index.js";
+import loadFile from "./getSignedUrl/index.js";
 import saveFile from "./saveFile/index.js";
 import winston from "winston";
 
@@ -49,13 +49,13 @@ export const callNodeFunction = async (req, res) => {
     logger.info(`Calling ${functionName} function`);
     switch (functionName) {
       case "createCertificate":
-        await createCertificate(req, res);
+        await createCertificate(req, res, logger);
         break;
-      case "loadFile":
-        await loadFile(req, res);
+      case "getSignedUrl":
+        await getSignedUrl(req, res, logger);
         break;
       case "saveFile":
-        await saveFile(req, res);
+        await saveFile(req, res, logger);
         break;
       default:
         return res.status(404).json({

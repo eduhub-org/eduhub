@@ -1,5 +1,6 @@
 import { Storage } from "@google-cloud/storage";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
+import logger from "../index.js";
 
 /**
  * Responds to any HTTP request.
@@ -7,7 +8,7 @@ import { buildCloudStorage } from "../lib/cloud-storage.js";
  * @param {!express:Request} req HTTP request context.
  * @param {!express:Response} res HTTP response context.
  */
-const loadFile = async (req, res) => {
+const getSignedUrl = async (req, res) => {
 
   const storage = buildCloudStorage(Storage);
   const path = req.body.input.path;
@@ -18,19 +19,22 @@ const loadFile = async (req, res) => {
     // Admin users or users accessing their own folder
     if (userRole === 'admin' || (userUUID && path.startsWith(userUUID))) {
       const link = await storage.loadFromBucket(path, req.headers.bucket);
+      logger.info("File loaded successfully", { path, userRole, userUUID, link });
       return res.json({ link });
     } else {
       // Access denied for other cases
+      logger.warn("Access denied for file loading", { path, userRole, userUUID });
       return res.status(403).json({
         message: "You do not have permission to access this file.",
       });
     }
   } catch (error) {
     // Handle errors, such as issues with loading the file
+    logger.error("Error loading file", { error: error.message, path, userRole, userUUID, stack: error.stack });
     return res.status(500).json({
       error: "An error occurred while retrieving the file.",
     });
   }
 };
 
-export default loadFile;
+export default getSignedUrl;

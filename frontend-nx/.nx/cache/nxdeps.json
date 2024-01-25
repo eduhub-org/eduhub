@@ -35,6 +35,7 @@
     "react-select": "^5.4.0",
     "regenerator-runtime": "0.13.11",
     "remark-gfm": "^3.0.1",
+    "sharp": "^0.33.2",
     "swiper": "^9.0.5",
     "swr": "^1.3.0",
     "tslib": "^2.3.0",
@@ -96,7 +97,7 @@
     "ts-node": "10.9.1",
     "typescript": "~4.7.4"
   },
-  "lockFileHash": "f95a6f0020c0085c11a787a63f9b4602647adff2cca0e365238a4ef3050f035d",
+  "lockFileHash": "de354e7dec9edd1de71abb29cc7723ed61ba0d9dc6cb6ce03ad339d55fbc71ca",
   "pathMappings": {
     "@opencampus/shared-components": [
       "libs/shared-components/src/index.ts"
@@ -338,47 +339,47 @@
           },
           {
             "file": "apps/rent-a-scientist/.next/cache/webpack/client-development/0.pack",
-            "hash": "17515902303831608156"
+            "hash": "5671279819651487718"
           },
           {
             "file": "apps/rent-a-scientist/.next/cache/webpack/client-development/1.pack",
-            "hash": "11622772770567584747"
+            "hash": "17013726298735327179"
           },
           {
             "file": "apps/rent-a-scientist/.next/cache/webpack/client-development/2.pack",
-            "hash": "13460494311266672614"
+            "hash": "3940189135335869804"
           },
           {
             "file": "apps/rent-a-scientist/.next/cache/webpack/client-development/3.pack",
-            "hash": "16780084804362406322"
+            "hash": "17572664601795746959"
           },
           {
             "file": "apps/rent-a-scientist/.next/cache/webpack/client-development/index.pack",
-            "hash": "15272910154561747391"
+            "hash": "7275601489416650521"
           },
           {
             "file": "apps/rent-a-scientist/.next/cache/webpack/client-development/index.pack.old",
-            "hash": "12092035074615450531"
+            "hash": "17150285197616091432"
           },
           {
             "file": "apps/rent-a-scientist/.next/cache/webpack/server-development/0.pack",
-            "hash": "16273997241742999877"
+            "hash": "8771312083805000807"
           },
           {
             "file": "apps/rent-a-scientist/.next/cache/webpack/server-development/1.pack",
-            "hash": "11369110504126304553"
+            "hash": "17756958349701673605"
           },
           {
             "file": "apps/rent-a-scientist/.next/cache/webpack/server-development/2.pack",
-            "hash": "4642767609085219923"
+            "hash": "4789281947362175342"
           },
           {
             "file": "apps/rent-a-scientist/.next/cache/webpack/server-development/index.pack",
-            "hash": "14563214887189092376"
+            "hash": "7364113523660622981"
           },
           {
             "file": "apps/rent-a-scientist/.next/cache/webpack/server-development/index.pack.old",
-            "hash": "9926846728385463264"
+            "hash": "5821967590447698367"
           },
           {
             "file": "apps/rent-a-scientist/.next/package.json",
@@ -507,7 +508,7 @@
           },
           {
             "file": "apps/rent-a-scientist/.next/trace",
-            "hash": "8598998660895951030"
+            "hash": "5967477227558256367"
           },
           {
             "file": "apps/rent-a-scientist/apollo.config.js",
@@ -2418,7 +2419,7 @@
           },
           {
             "file": "apps/edu-hub/.env.development",
-            "hash": "17927428615539555824"
+            "hash": "9687349399010946560"
           },
           {
             "file": "apps/edu-hub/.env.local",
@@ -2430,183 +2431,239 @@
           },
           {
             "file": "apps/edu-hub/.next/build-manifest.json",
-            "hash": "2902240834213937198"
+            "hash": "1153955773547545776"
           },
           {
             "file": "apps/edu-hub/.next/cache/config.json",
             "hash": "17828552514048870520"
           },
           {
+            "file": "apps/edu-hub/.next/cache/images/jfGcxg4qgJdcgianEmh7RcgvakXmBLHirqBDGwVX6hY=/3.1705799422856.IVZQmhQOx9t5zlVKyduuQyBq9DHURR3qW9-81j9PmC8=.webp",
+            "hash": "18373146682205885217"
+          },
+          {
+            "file": "apps/edu-hub/.next/cache/webpack/client-development-fallback/0.pack",
+            "hash": "15426531216730326720"
+          },
+          {
+            "file": "apps/edu-hub/.next/cache/webpack/client-development-fallback/index.pack.old",
+            "hash": "5956167432305352016"
+          },
+          {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/0.pack",
-            "hash": "8558122777817214964"
+            "hash": "17755544621445939528"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/1.pack",
-            "hash": "4688811436260731944"
+            "hash": "2151201686820953708"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/10.pack",
-            "hash": "10127305800247103009"
+            "hash": "13088276715921038174"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/11.pack",
-            "hash": "12425451353459111715"
+            "hash": "8765534867905045231"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/12.pack",
-            "hash": "6967703568902799953"
+            "hash": "3583324804050054400"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/13.pack",
-            "hash": "2004677874914664743"
+            "hash": "8879750679637676525"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/14.pack",
-            "hash": "6848953011582533054"
+            "hash": "15187984391412260289"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/15.pack",
-            "hash": "9601195828501878304"
+            "hash": "15054831655637249045"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/16.pack",
-            "hash": "5946377617949043684"
+            "hash": "8245227180760081251"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/17.pack",
-            "hash": "4736955381307694841"
+            "hash": "16115726235971522153"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/18.pack",
-            "hash": "18137266170984542831"
+            "hash": "11826694949051930308"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/19.pack",
-            "hash": "9230811433353719061"
+            "hash": "3166020352424349040"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/2.pack",
-            "hash": "10085555872753806608"
+            "hash": "10388325600043457731"
+          },
+          {
+            "file": "apps/edu-hub/.next/cache/webpack/client-development/20.pack",
+            "hash": "16494221462706123882"
+          },
+          {
+            "file": "apps/edu-hub/.next/cache/webpack/client-development/21.pack",
+            "hash": "14530675584440106111"
+          },
+          {
+            "file": "apps/edu-hub/.next/cache/webpack/client-development/22.pack",
+            "hash": "13724838429331145977"
+          },
+          {
+            "file": "apps/edu-hub/.next/cache/webpack/client-development/23.pack",
+            "hash": "7692387404888725441"
+          },
+          {
+            "file": "apps/edu-hub/.next/cache/webpack/client-development/24.pack",
+            "hash": "501953574157627652"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/3.pack",
-            "hash": "3879925669479602427"
+            "hash": "9072192783801813848"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/4.pack",
-            "hash": "639773518995875000"
+            "hash": "14859637753580240284"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/5.pack",
-            "hash": "10169799532691785358"
+            "hash": "3215602318537123631"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/6.pack",
-            "hash": "8236857458987555205"
+            "hash": "10524443020500349586"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/7.pack",
-            "hash": "14727512079467912597"
+            "hash": "4953498307133937142"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/8.pack",
-            "hash": "16904958215534674968"
+            "hash": "4620019166340239598"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/9.pack",
-            "hash": "467861057378701590"
+            "hash": "10315804461726001652"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/index.pack",
-            "hash": "5271122978175371536"
+            "hash": "17788040622762785183"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/client-development/index.pack.old",
-            "hash": "4133002319141136529"
+            "hash": "7444816115043611065"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/0.pack",
-            "hash": "14597989398860009826"
+            "hash": "12663828590645640741"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/1.pack",
-            "hash": "10892594757666572917"
+            "hash": "18092373367451303192"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/10.pack",
-            "hash": "17248170595327185227"
+            "hash": "12892701372758708850"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/11.pack",
-            "hash": "13059419080193447915"
+            "hash": "16895483593201271714"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/12.pack",
-            "hash": "1073279992255745485"
+            "hash": "12479916470414285231"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/13.pack",
-            "hash": "8820308088320174771"
+            "hash": "16602323295970223061"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/14.pack",
-            "hash": "12135523799558936095"
+            "hash": "7605256267297123178"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/15.pack",
-            "hash": "14790770835310302963"
+            "hash": "14619484997140752878"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/16.pack",
-            "hash": "18247489711959564238"
+            "hash": "7846709306691432024"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/17.pack",
-            "hash": "16921345979810870098"
+            "hash": "15874184658431591877"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/18.pack",
-            "hash": "12155800339980272733"
+            "hash": "2213195279370459599"
+          },
+          {
+            "file": "apps/edu-hub/.next/cache/webpack/server-development/19.pack",
+            "hash": "1384866683074156032"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/2.pack",
-            "hash": "12715831917765887793"
+            "hash": "2805795532882558329"
+          },
+          {
+            "file": "apps/edu-hub/.next/cache/webpack/server-development/20.pack",
+            "hash": "15803968406586714311"
+          },
+          {
+            "file": "apps/edu-hub/.next/cache/webpack/server-development/21.pack",
+            "hash": "16629345789602453263"
+          },
+          {
+            "file": "apps/edu-hub/.next/cache/webpack/server-development/22.pack",
+            "hash": "16727776458211895152"
+          },
+          {
+            "file": "apps/edu-hub/.next/cache/webpack/server-development/23.pack",
+            "hash": "6735724420079302872"
+          },
+          {
+            "file": "apps/edu-hub/.next/cache/webpack/server-development/24.pack",
+            "hash": "4398287774261785349"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/3.pack",
-            "hash": "13332568417925432077"
+            "hash": "3401077980314354432"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/4.pack",
-            "hash": "1377462452267730639"
+            "hash": "6170563421660783398"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/5.pack",
-            "hash": "10378529094339716245"
+            "hash": "242442135061283869"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/6.pack",
-            "hash": "11084471520322609305"
+            "hash": "11074773252233956706"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/7.pack",
-            "hash": "926303560089057834"
+            "hash": "8751809412731398187"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/8.pack",
-            "hash": "1333893125674547914"
+            "hash": "16849059343979574747"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/9.pack",
-            "hash": "9425287721385935300"
+            "hash": "5089434429074367544"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/index.pack",
-            "hash": "6569196612872371119"
+            "hash": "6360226281083670894"
           },
           {
             "file": "apps/edu-hub/.next/cache/webpack/server-development/index.pack.old",
-            "hash": "5447732512791731116"
+            "hash": "11724416476397270287"
           },
           {
             "file": "apps/edu-hub/.next/package.json",
@@ -2673,6 +2730,10 @@
             "hash": "15325834737414097645"
           },
           {
+            "file": "apps/edu-hub/.next/server/locales_de_managePrograms_json.js",
+            "hash": "16338012014505037290"
+          },
+          {
             "file": "apps/edu-hub/.next/server/locales_de_programs_json.js",
             "hash": "16236976191460755109"
           },
@@ -2725,6 +2786,10 @@
             "hash": "3509145491954611312"
           },
           {
+            "file": "apps/edu-hub/.next/server/locales_en_managePrograms_json.js",
+            "hash": "9731171759267691023"
+          },
+          {
             "file": "apps/edu-hub/.next/server/locales_en_programs_json.js",
             "hash": "15948191369264080470"
           },
@@ -2738,7 +2803,7 @@
           },
           {
             "file": "apps/edu-hub/.next/server/middleware-build-manifest.js",
-            "hash": "3051578932103042771"
+            "hash": "7950505885848165902"
           },
           {
             "file": "apps/edu-hub/.next/server/middleware-manifest.json",
@@ -2758,11 +2823,11 @@
           },
           {
             "file": "apps/edu-hub/.next/server/pages-manifest.json",
-            "hash": "14876368611554580252"
+            "hash": "518025930687124401"
           },
           {
             "file": "apps/edu-hub/.next/server/pages/_app.js",
-            "hash": "17937747853882194309",
+            "hash": "16633364391593414294",
             "dependencies": [
               {
                 "source": "edu-hub",
@@ -2844,97 +2909,6 @@
             ]
           },
           {
-            "file": "apps/edu-hub/.next/server/pages/achievements.js",
-            "hash": "206692558008705978",
-            "dependencies": [
-              {
-                "source": "edu-hub",
-                "target": "npm:@apollo/client",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@material-ui/core",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@material-ui/icons",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@material-ui/lab",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:lodash",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:next-auth",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:next-translate",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:next",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-datepicker",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-debounce-input",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-icons",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@headlessui/react",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-markdown",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:remark-gfm",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:use-debounce",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:uuid",
-                "type": "dynamic"
-              }
-            ]
-          },
-          {
             "file": "apps/edu-hub/.next/server/pages/api/auth/[...nextauth].js",
             "hash": "15022391465743886875",
             "dependencies": [
@@ -2956,84 +2930,19 @@
             ]
           },
           {
-            "file": "apps/edu-hub/.next/server/pages/course/[courseId].js",
-            "hash": "14913277069076025061",
+            "file": "apps/edu-hub/.next/server/pages/api/auth/logout.js",
+            "hash": "14351929769370621098",
             "dependencies": [
-              {
-                "source": "edu-hub",
-                "target": "npm:@apollo/client",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@material-ui/core",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@material-ui/icons",
-                "type": "static"
-              },
               {
                 "source": "edu-hub",
                 "target": "npm:next-auth",
                 "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:next-translate",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:next",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-debounce-input",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-icons",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@headlessui/react",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-hook-form",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-markdown",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:remark-gfm",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:uuid",
-                "type": "dynamic"
               }
             ]
           },
           {
             "file": "apps/edu-hub/.next/server/pages/index.js",
-            "hash": "9285057919427068040",
+            "hash": "13510849541095990272",
             "dependencies": [
               {
                 "source": "edu-hub",
@@ -3094,7 +3003,7 @@
           },
           {
             "file": "apps/edu-hub/.next/server/pages/manage/achievement-templates.js",
-            "hash": "13966622867422794251",
+            "hash": "14794810569492815555",
             "dependencies": [
               {
                 "source": "edu-hub",
@@ -3174,190 +3083,8 @@
             ]
           },
           {
-            "file": "apps/edu-hub/.next/server/pages/manage/course/[courseId].js",
-            "hash": "6540953719756325013",
-            "dependencies": [
-              {
-                "source": "edu-hub",
-                "target": "npm:@apollo/client",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@material-ui/core",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@material-ui/icons",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@material-ui/lab",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:next-auth",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:next-translate",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:next",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-datepicker",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-debounce-input",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-icons",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@headlessui/react",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@tanstack/match-sorter-utils",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@tanstack/react-table",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-markdown",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:remark-gfm",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:use-debounce",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:uuid",
-                "type": "dynamic"
-              }
-            ]
-          },
-          {
-            "file": "apps/edu-hub/.next/server/pages/manage/courses.js",
-            "hash": "10676107346345508202",
-            "dependencies": [
-              {
-                "source": "edu-hub",
-                "target": "npm:@apollo/client",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@material-ui/core",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@material-ui/icons",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@material-ui/lab",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:next-auth",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:next-translate",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:next",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-datepicker",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-debounce-input",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-icons",
-                "type": "static"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:@headlessui/react",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:react-markdown",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:remark-gfm",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:use-debounce",
-                "type": "dynamic"
-              },
-              {
-                "source": "edu-hub",
-                "target": "npm:uuid",
-                "type": "dynamic"
-              }
-            ]
-          },
-          {
             "file": "apps/edu-hub/.next/server/pages/manage/programs.js",
-            "hash": "11719458734005711272",
+            "hash": "18268414274976296436",
             "dependencies": [
               {
                 "source": "edu-hub",
@@ -3418,10 +3145,66 @@
                 "source": "edu-hub",
                 "target": "npm:remark-gfm",
                 "type": "dynamic"
+              }
+            ]
+          },
+          {
+            "file": "apps/edu-hub/.next/server/pages/profile.js",
+            "hash": "4421308526698340819",
+            "dependencies": [
+              {
+                "source": "edu-hub",
+                "target": "npm:@apollo/client",
+                "type": "static"
               },
               {
                 "source": "edu-hub",
-                "target": "npm:uuid",
+                "target": "npm:@material-ui/core",
+                "type": "static"
+              },
+              {
+                "source": "edu-hub",
+                "target": "npm:next-auth",
+                "type": "static"
+              },
+              {
+                "source": "edu-hub",
+                "target": "npm:next-translate",
+                "type": "static"
+              },
+              {
+                "source": "edu-hub",
+                "target": "npm:next",
+                "type": "static"
+              },
+              {
+                "source": "edu-hub",
+                "target": "npm:react",
+                "type": "static"
+              },
+              {
+                "source": "edu-hub",
+                "target": "npm:react-icons",
+                "type": "static"
+              },
+              {
+                "source": "edu-hub",
+                "target": "npm:@headlessui/react",
+                "type": "dynamic"
+              },
+              {
+                "source": "edu-hub",
+                "target": "npm:react-hook-form",
+                "type": "dynamic"
+              },
+              {
+                "source": "edu-hub",
+                "target": "npm:react-markdown",
+                "type": "dynamic"
+              },
+              {
+                "source": "edu-hub",
+                "target": "npm:remark-gfm",
                 "type": "dynamic"
               }
             ]
@@ -3483,6 +3266,10 @@
             "hash": "5054109407165855189"
           },
           {
+            "file": "apps/edu-hub/.next/static/chunks/locales_de_managePrograms_json.js",
+            "hash": "13825173145062414174"
+          },
+          {
             "file": "apps/edu-hub/.next/static/chunks/locales_de_programs_json.js",
             "hash": "3503991853838742518"
           },
@@ -3535,6 +3322,10 @@
             "hash": "893454749904091709"
           },
           {
+            "file": "apps/edu-hub/.next/static/chunks/locales_en_managePrograms_json.js",
+            "hash": "16766049099673814173"
+          },
+          {
             "file": "apps/edu-hub/.next/static/chunks/locales_en_programs_json.js",
             "hash": "5024751732548536715"
           },
@@ -3552,39 +3343,27 @@
           },
           {
             "file": "apps/edu-hub/.next/static/chunks/pages/_app.js",
-            "hash": "11866816860375993056"
+            "hash": "11384520360047888641"
           },
           {
             "file": "apps/edu-hub/.next/static/chunks/pages/_error.js",
             "hash": "6916705719246238453"
           },
           {
-            "file": "apps/edu-hub/.next/static/chunks/pages/achievements.js",
-            "hash": "16173888553592266196"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/chunks/pages/course/[courseId].js",
-            "hash": "12204919243258560507"
-          },
-          {
             "file": "apps/edu-hub/.next/static/chunks/pages/index.js",
-            "hash": "3400816589082557222"
+            "hash": "11488854402966700015"
           },
           {
             "file": "apps/edu-hub/.next/static/chunks/pages/manage/achievement-templates.js",
-            "hash": "501398384829647569"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/chunks/pages/manage/course/[courseId].js",
-            "hash": "1071164986419844402"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/chunks/pages/manage/courses.js",
-            "hash": "12138644131319232629"
+            "hash": "18375733131600211408"
           },
           {
             "file": "apps/edu-hub/.next/static/chunks/pages/manage/programs.js",
-            "hash": "12111840939722269161"
+            "hash": "7358289522617804378"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/chunks/pages/profile.js",
+            "hash": "4209290367422968693"
           },
           {
             "file": "apps/edu-hub/.next/static/chunks/polyfills.js",
@@ -3596,759 +3375,431 @@
           },
           {
             "file": "apps/edu-hub/.next/static/chunks/webpack.js",
-            "hash": "6736706186822845388"
+            "hash": "12656508537655685547"
           },
           {
             "file": "apps/edu-hub/.next/static/development/_buildManifest.js",
-            "hash": "881070472738838650"
+            "hash": "12670929539097876543"
           },
           {
             "file": "apps/edu-hub/.next/static/development/_ssgManifest.js",
             "hash": "17018243955171961484"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/08d8a1db2a0b79b9.webpack.hot-update.json",
-            "hash": "15640674679819847807"
+            "file": "apps/edu-hub/.next/static/webpack/094c50e75ab035b0.webpack.hot-update.json",
+            "hash": "17582010060041582657"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/0b4027a4525eb74e.webpack.hot-update.json",
-            "hash": "1432925618540920562"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/0e31a11e7ae856d7.webpack.hot-update.json",
-            "hash": "3014596782072014601"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/17edabcde7eb66a0.webpack.hot-update.json",
-            "hash": "13405125561290911638"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/234c6c77c774ca26.webpack.hot-update.json",
-            "hash": "5812395235834059128"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/24a0cab66ed178a2.webpack.hot-update.json",
-            "hash": "15640674679819847807"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/2fd4de9cff52bef7.webpack.hot-update.json",
+            "file": "apps/edu-hub/.next/static/webpack/195cd119b1aaebfc.webpack.hot-update.json",
             "hash": "13299124071381356017"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/30e713161ea242ff.webpack.hot-update.json",
+            "file": "apps/edu-hub/.next/static/webpack/1ae82f2efe2cc7a7.webpack.hot-update.json",
+            "hash": "1655344449540731134"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/1cb95274b4193594.webpack.hot-update.json",
+            "hash": "1655344449540731134"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/25d70b8760923006.webpack.hot-update.json",
             "hash": "13405125561290911638"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/32d3105b84706ab7.webpack.hot-update.json",
+            "file": "apps/edu-hub/.next/static/webpack/29a386d80eef1344.webpack.hot-update.json",
+            "hash": "1655344449540731134"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/2cf3a0f4e1bf5e41.webpack.hot-update.json",
+            "hash": "7458333116419272363"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/301095091f19222a.webpack.hot-update.json",
+            "hash": "11622890875966317333"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/36ddac87371c22bd.webpack.hot-update.json",
+            "hash": "1655344449540731134"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/3826e2c4a473aee1.webpack.hot-update.json",
+            "hash": "8827134664535991227"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/3c6548e6a3565a70.webpack.hot-update.json",
+            "hash": "1655344449540731134"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/4a738387f2ee896f.webpack.hot-update.json",
+            "hash": "1655344449540731134"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/694d32a62262f847.webpack.hot-update.json",
             "hash": "13405125561290911638"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/339751e593eabba5.webpack.hot-update.json",
-            "hash": "15640674679819847807"
+            "file": "apps/edu-hub/.next/static/webpack/6b9983d930bc6af9.webpack.hot-update.json",
+            "hash": "13492283299129116260"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/3c9442cb89311b50.webpack.hot-update.json",
+            "file": "apps/edu-hub/.next/static/webpack/6ba7c884d69deeaf.webpack.hot-update.json",
+            "hash": "1655344449540731134"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/7016bdc6cf049d75.webpack.hot-update.json",
+            "hash": "12199429870650026263"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/71b11c77922d142a.webpack.hot-update.json",
             "hash": "13405125561290911638"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/3e8c51800d74d929.webpack.hot-update.json",
+            "file": "apps/edu-hub/.next/static/webpack/7e3ce62e85a1f047.webpack.hot-update.json",
             "hash": "13405125561290911638"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/40de7dfec41dec14.webpack.hot-update.json",
-            "hash": "15640674679819847807"
+            "file": "apps/edu-hub/.next/static/webpack/8d13d768a28f6f38.webpack.hot-update.json",
+            "hash": "3699790484333409036"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/41b329d94a0d6bd8.webpack.hot-update.json",
-            "hash": "702009728271288589"
+            "file": "apps/edu-hub/.next/static/webpack/96b186b26586e9a2.webpack.hot-update.json",
+            "hash": "4402062643656524033"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/4254ce129062af88.webpack.hot-update.json",
+            "file": "apps/edu-hub/.next/static/webpack/9e35fc71c7be544c.webpack.hot-update.json",
+            "hash": "13492283299129116260"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/9f5023afc9c60dd3.webpack.hot-update.json",
+            "hash": "1655344449540731134"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/a1bea49144536709.webpack.hot-update.json",
             "hash": "13405125561290911638"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/4e8564bab01b6fdc.webpack.hot-update.json",
-            "hash": "15640674679819847807"
+            "file": "apps/edu-hub/.next/static/webpack/a6659c9deb2954eb.webpack.hot-update.json",
+            "hash": "5609477202304293533"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/518ad1e9bbd6b445.webpack.hot-update.json",
-            "hash": "16094819470310680873"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/54f70cece63c5e10.webpack.hot-update.json",
-            "hash": "7615892862150333794"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/5911a1e1d3e13a52.webpack.hot-update.json",
+            "file": "apps/edu-hub/.next/static/webpack/a9504b75821b053d.webpack.hot-update.json",
             "hash": "13405125561290911638"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/5a1ff712b0bea056.webpack.hot-update.json",
+            "file": "apps/edu-hub/.next/static/webpack/adda7b11eb9b6510.webpack.hot-update.json",
             "hash": "13405125561290911638"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/623d9630c7c9c645.webpack.hot-update.json",
-            "hash": "12045841111887550454"
+            "file": "apps/edu-hub/.next/static/webpack/b23bbb88ea6f1d43.webpack.hot-update.json",
+            "hash": "1655344449540731134"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/688e4ffe8b5f1b5e.webpack.hot-update.json",
-            "hash": "15640674679819847807"
+            "file": "apps/edu-hub/.next/static/webpack/bbdc465a31fb0a89.webpack.hot-update.json",
+            "hash": "1655344449540731134"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/6cd75e38b90f8ad4.webpack.hot-update.json",
-            "hash": "13405125561290911638"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/6f13c541bd21141e.webpack.hot-update.json",
-            "hash": "6519651662064178656"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/72726ed1502ceb79.webpack.hot-update.json",
-            "hash": "15640674679819847807"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/746421fd3af005e3.webpack.hot-update.json",
-            "hash": "13405125561290911638"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/767bc3f82cabbba7.webpack.hot-update.json",
-            "hash": "13405125561290911638"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/7982de81aa3115e6.webpack.hot-update.json",
-            "hash": "13405125561290911638"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/7ec36b1fdfd47b02.webpack.hot-update.json",
-            "hash": "5812395235834059128"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/7f40f3092717b1c6.webpack.hot-update.json",
+            "file": "apps/edu-hub/.next/static/webpack/c511b7bf58ae5ff7.webpack.hot-update.json",
             "hash": "13299124071381356017"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/80a82288219e7a2b.webpack.hot-update.json",
-            "hash": "15640674679819847807"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/8725d93006de7144.webpack.hot-update.json",
+            "file": "apps/edu-hub/.next/static/webpack/c96ee8aba94ff5c8.webpack.hot-update.json",
             "hash": "13405125561290911638"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/8847cc72600e35ec.webpack.hot-update.json",
+            "file": "apps/edu-hub/.next/static/webpack/cf10b313e39d59c9.webpack.hot-update.json",
+            "hash": "2731954671169781161"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/d0a752018344806c.webpack.hot-update.json",
+            "hash": "1655344449540731134"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/d40ec8a1704d9f27.webpack.hot-update.json",
+            "hash": "5355994658842312969"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/d50bf1bb46d4bf10.webpack.hot-update.json",
+            "hash": "1655344449540731134"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/d74d1ab6e080fb05.webpack.hot-update.json",
+            "hash": "12365497015759105910"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/e6b6ae3c25e7bd3f.webpack.hot-update.json",
+            "hash": "1655344449540731134"
+          },
+          {
+            "file": "apps/edu-hub/.next/static/webpack/e727006a4b611185.webpack.hot-update.json",
             "hash": "13405125561290911638"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/8d22bedabccba713.webpack.hot-update.json",
-            "hash": "4275030011478316896"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/8fc2bf5deb191d49.webpack.hot-update.json",
-            "hash": "13299124071381356017"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/9361a11492bd41d2.webpack.hot-update.json",
-            "hash": "13299124071381356017"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/94d882022303b8c3.webpack.hot-update.json",
+            "file": "apps/edu-hub/.next/static/webpack/ebb9a91d514f8435.webpack.hot-update.json",
             "hash": "13405125561290911638"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/98213d7f606b2229.webpack.hot-update.json",
-            "hash": "4134040226546878011"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/a22148ee60f2cb5a.webpack.hot-update.json",
-            "hash": "8527078513566229518"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/a618674e07f9d3b9.webpack.hot-update.json",
-            "hash": "7615892862150333794"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/a990c89f5e1a2612.webpack.hot-update.json",
-            "hash": "5812395235834059128"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/ab7fd6696df44e36.webpack.hot-update.json",
+            "file": "apps/edu-hub/.next/static/webpack/f11973fa1e5bdd4c.webpack.hot-update.json",
             "hash": "13405125561290911638"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/ac9275f6904ca834.webpack.hot-update.json",
+            "file": "apps/edu-hub/.next/static/webpack/f819fca6e66f941a.webpack.hot-update.json",
             "hash": "13405125561290911638"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/b1304c6ddbde6f06.webpack.hot-update.json",
-            "hash": "15640674679819847807"
+            "file": "apps/edu-hub/.next/static/webpack/pages/index.8d13d768a28f6f38.hot-update.js",
+            "hash": "4103723576341859403"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/b26a375e25afd282.webpack.hot-update.json",
-            "hash": "13405125561290911638"
+            "file": "apps/edu-hub/.next/static/webpack/pages/index.a6659c9deb2954eb.hot-update.js",
+            "hash": "16963526908149407031"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/b44adee30b4b1e59.webpack.hot-update.json",
-            "hash": "13405125561290911638"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.1ae82f2efe2cc7a7.hot-update.js",
+            "hash": "17988439523951048175"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/b8b90632af91eecf.webpack.hot-update.json",
-            "hash": "15640674679819847807"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.1cb95274b4193594.hot-update.js",
+            "hash": "874107939674569051"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/bd93dbc896cfc1c6.webpack.hot-update.json",
-            "hash": "13405125561290911638"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.29a386d80eef1344.hot-update.js",
+            "hash": "4569527903325566439"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/bf5321db612a66a4.webpack.hot-update.json",
-            "hash": "15949750941416945144"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.36ddac87371c22bd.hot-update.js",
+            "hash": "7356620957306780451"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/c700ae59463c73d8.webpack.hot-update.json",
-            "hash": "15640674679819847807"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.3826e2c4a473aee1.hot-update.js",
+            "hash": "5038700599207125061"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/c9a7e09cb39f04bb.webpack.hot-update.json",
-            "hash": "15640674679819847807"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.3c6548e6a3565a70.hot-update.js",
+            "hash": "5828887428086192437"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/ce71dbf35bef7947.webpack.hot-update.json",
-            "hash": "13405125561290911638"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.4a738387f2ee896f.hot-update.js",
+            "hash": "15602243484864203302"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/d53dfdcbed823aea.webpack.hot-update.json",
-            "hash": "4005331251613948297"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.6b9983d930bc6af9.hot-update.js",
+            "hash": "8857346281491852139"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/d5d7d4aa18188172.webpack.hot-update.json",
-            "hash": "13405125561290911638"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.6ba7c884d69deeaf.hot-update.js",
+            "hash": "13968355860272534216"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/d6045863713263b3.webpack.hot-update.json",
-            "hash": "13637021926649183025"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.7016bdc6cf049d75.hot-update.js",
+            "hash": "16640177877245923571"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/dabf4130ea143141.webpack.hot-update.json",
-            "hash": "12045841111887550454"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.8d13d768a28f6f38.hot-update.js",
+            "hash": "5188859574204792146"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/dfa258ef23eaaa82.webpack.hot-update.json",
-            "hash": "13405125561290911638"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.9e35fc71c7be544c.hot-update.js",
+            "hash": "16880784754986943274"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/dfc7f967cb2316b1.webpack.hot-update.json",
-            "hash": "18269780334212437100"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.9f5023afc9c60dd3.hot-update.js",
+            "hash": "10675440344577428846"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/e26b2d6135172837.webpack.hot-update.json",
-            "hash": "13299124071381356017"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.a6659c9deb2954eb.hot-update.js",
+            "hash": "14363315831553490603"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/e7503b044ad0720c.webpack.hot-update.json",
-            "hash": "12650717241279185272"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.b23bbb88ea6f1d43.hot-update.js",
+            "hash": "5420397923737405367"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/f3f93c34840cedad.webpack.hot-update.json",
-            "hash": "15640674679819847807"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.bbdc465a31fb0a89.hot-update.js",
+            "hash": "8066739970413727808"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/f63db5e6229a43a9.webpack.hot-update.json",
-            "hash": "13316303898604563322"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.cf10b313e39d59c9.hot-update.js",
+            "hash": "14912025989421145325"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/faffea4180ef6a90.webpack.hot-update.json",
-            "hash": "13405125561290911638"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.d0a752018344806c.hot-update.js",
+            "hash": "16617611339833390587"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_de_achievements-page_json.0e31a11e7ae856d7.hot-update.js",
-            "hash": "4120970440820044706"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.d50bf1bb46d4bf10.hot-update.js",
+            "hash": "7400450387075056274"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_de_achievements-page_json.54f70cece63c5e10.hot-update.js",
-            "hash": "12195121020161396724"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.d74d1ab6e080fb05.hot-update.js",
+            "hash": "14458693658260289050"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_de_achievements-page_json.a618674e07f9d3b9.hot-update.js",
-            "hash": "4120970440820044706"
+            "file": "apps/edu-hub/.next/static/webpack/pages/profile.e6b6ae3c25e7bd3f.hot-update.js",
+            "hash": "16968041892882625271"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_de_achievements-page_json.dfc7f967cb2316b1.hot-update.js",
-            "hash": "12195121020161396724"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.094c50e75ab035b0.hot-update.js",
+            "hash": "4854957712761233530"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_de_common_json.0e31a11e7ae856d7.hot-update.js",
-            "hash": "1495349560830012680"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.195cd119b1aaebfc.hot-update.js",
+            "hash": "15632387118066645955"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_de_common_json.54f70cece63c5e10.hot-update.js",
-            "hash": "8437020378912874029"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.1ae82f2efe2cc7a7.hot-update.js",
+            "hash": "13209845086833897127"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_de_common_json.a618674e07f9d3b9.hot-update.js",
-            "hash": "1495349560830012680"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.1cb95274b4193594.hot-update.js",
+            "hash": "17890702581574194374"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_de_common_json.dfc7f967cb2316b1.hot-update.js",
-            "hash": "8437020378912874029"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.25d70b8760923006.hot-update.js",
+            "hash": "11449849901529504946"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_de_course-page_json.0e31a11e7ae856d7.hot-update.js",
-            "hash": "3501820725049441176"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.29a386d80eef1344.hot-update.js",
+            "hash": "15195310207136555177"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_de_course-page_json.41b329d94a0d6bd8.hot-update.js",
-            "hash": "12457303072260930802"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.2cf3a0f4e1bf5e41.hot-update.js",
+            "hash": "10300527357579299281"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_de_course-page_json.54f70cece63c5e10.hot-update.js",
-            "hash": "2907454225862718213"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.301095091f19222a.hot-update.js",
+            "hash": "15705404110318131347"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_de_course-page_json.a618674e07f9d3b9.hot-update.js",
-            "hash": "12457303072260930802"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.36ddac87371c22bd.hot-update.js",
+            "hash": "12788141015302077285"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_de_course-page_json.dfc7f967cb2316b1.hot-update.js",
-            "hash": "2907454225862718213"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.3826e2c4a473aee1.hot-update.js",
+            "hash": "1295164880846947680"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_de_manageAchievementTemplates_json.0b4027a4525eb74e.hot-update.js",
-            "hash": "16529597432410662347"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.3c6548e6a3565a70.hot-update.js",
+            "hash": "3305911959594112738"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_en_achievements-page_json.0e31a11e7ae856d7.hot-update.js",
-            "hash": "7434083480685757811"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.4a738387f2ee896f.hot-update.js",
+            "hash": "15986265987111357776"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_en_achievements-page_json.54f70cece63c5e10.hot-update.js",
-            "hash": "5963746498337250726"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.694d32a62262f847.hot-update.js",
+            "hash": "16168100248680266871"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_en_achievements-page_json.a618674e07f9d3b9.hot-update.js",
-            "hash": "7434083480685757811"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.6b9983d930bc6af9.hot-update.js",
+            "hash": "16380630096091316930"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_en_achievements-page_json.dfc7f967cb2316b1.hot-update.js",
-            "hash": "5963746498337250726"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.6ba7c884d69deeaf.hot-update.js",
+            "hash": "17639106850315368118"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_en_common_json.0e31a11e7ae856d7.hot-update.js",
-            "hash": "2763122600050577090"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.7016bdc6cf049d75.hot-update.js",
+            "hash": "8169802504626428051"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_en_common_json.54f70cece63c5e10.hot-update.js",
-            "hash": "13244552296116544244"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.71b11c77922d142a.hot-update.js",
+            "hash": "17280520299132768478"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_en_common_json.a618674e07f9d3b9.hot-update.js",
-            "hash": "2763122600050577090"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.7e3ce62e85a1f047.hot-update.js",
+            "hash": "11982978901219034162"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_en_common_json.dfc7f967cb2316b1.hot-update.js",
-            "hash": "13244552296116544244"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.8d13d768a28f6f38.hot-update.js",
+            "hash": "18337615329894569605"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_en_course-page_json.0e31a11e7ae856d7.hot-update.js",
-            "hash": "11556428404385720400"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.96b186b26586e9a2.hot-update.js",
+            "hash": "17851692238944615054"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_en_course-page_json.41b329d94a0d6bd8.hot-update.js",
-            "hash": "7703576225881015056"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.9e35fc71c7be544c.hot-update.js",
+            "hash": "14780753241733367342"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_en_course-page_json.54f70cece63c5e10.hot-update.js",
-            "hash": "4634897484357568020"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.9f5023afc9c60dd3.hot-update.js",
+            "hash": "15012240299565225955"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_en_course-page_json.a618674e07f9d3b9.hot-update.js",
-            "hash": "7703576225881015056"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.a1bea49144536709.hot-update.js",
+            "hash": "1754875334509515953"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_en_course-page_json.dfc7f967cb2316b1.hot-update.js",
-            "hash": "4634897484357568020"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.a6659c9deb2954eb.hot-update.js",
+            "hash": "4007322775020742242"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/locales_en_manageAchievementTemplates_json.0b4027a4525eb74e.hot-update.js",
-            "hash": "10837497035004776177"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.a9504b75821b053d.hot-update.js",
+            "hash": "2159430439535824478"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/_app.0e31a11e7ae856d7.hot-update.js",
-            "hash": "12781020181955216164"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.adda7b11eb9b6510.hot-update.js",
+            "hash": "8663910674081430261"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/_app.54f70cece63c5e10.hot-update.js",
-            "hash": "13325929014788112082"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.b23bbb88ea6f1d43.hot-update.js",
+            "hash": "9292545740420156203"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/_app.8d22bedabccba713.hot-update.js",
-            "hash": "12942602451343091839"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.bbdc465a31fb0a89.hot-update.js",
+            "hash": "2258141961064137725"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/_app.a618674e07f9d3b9.hot-update.js",
-            "hash": "12781020181955216164"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.c511b7bf58ae5ff7.hot-update.js",
+            "hash": "16823655993505505228"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/_app.bf5321db612a66a4.hot-update.js",
-            "hash": "15679534508423412088"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.c96ee8aba94ff5c8.hot-update.js",
+            "hash": "76621257530424449"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/_app.dfc7f967cb2316b1.hot-update.js",
-            "hash": "5270537162337602939"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.cf10b313e39d59c9.hot-update.js",
+            "hash": "17042921628037588273"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/achievements.a22148ee60f2cb5a.hot-update.js",
-            "hash": "3159115221012530042"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.d0a752018344806c.hot-update.js",
+            "hash": "17887556731322988961"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].08d8a1db2a0b79b9.hot-update.js",
-            "hash": "10319579382405914136"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.d40ec8a1704d9f27.hot-update.js",
+            "hash": "4116232252664453706"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].0e31a11e7ae856d7.hot-update.js",
-            "hash": "12654293997699247168"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.d50bf1bb46d4bf10.hot-update.js",
+            "hash": "11333340126290333640"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].234c6c77c774ca26.hot-update.js",
-            "hash": "12928705747330061208"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.d74d1ab6e080fb05.hot-update.js",
+            "hash": "735143005657788825"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].24a0cab66ed178a2.hot-update.js",
-            "hash": "5181390578453112141"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.e6b6ae3c25e7bd3f.hot-update.js",
+            "hash": "17678326346730134485"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].339751e593eabba5.hot-update.js",
-            "hash": "14894539392094990334"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.e727006a4b611185.hot-update.js",
+            "hash": "7807725907617496776"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].40de7dfec41dec14.hot-update.js",
-            "hash": "12661213542026220388"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.ebb9a91d514f8435.hot-update.js",
+            "hash": "12286005587748786582"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].4e8564bab01b6fdc.hot-update.js",
-            "hash": "6008740114476021450"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.f11973fa1e5bdd4c.hot-update.js",
+            "hash": "1876086705913202205"
           },
           {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].688e4ffe8b5f1b5e.hot-update.js",
-            "hash": "6991573463398605966"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].72726ed1502ceb79.hot-update.js",
-            "hash": "15567722440060246578"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].7ec36b1fdfd47b02.hot-update.js",
-            "hash": "5593553722795720368"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].80a82288219e7a2b.hot-update.js",
-            "hash": "206336425666626595"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].a990c89f5e1a2612.hot-update.js",
-            "hash": "12928705747330061208"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].b1304c6ddbde6f06.hot-update.js",
-            "hash": "5112203541525351932"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].b8b90632af91eecf.hot-update.js",
-            "hash": "11709609757470666545"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].bf5321db612a66a4.hot-update.js",
-            "hash": "17443038202750925538"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].c700ae59463c73d8.hot-update.js",
-            "hash": "11390573874755668007"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].c9a7e09cb39f04bb.hot-update.js",
-            "hash": "5434497426076978677"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].dfc7f967cb2316b1.hot-update.js",
-            "hash": "9694544339584839642"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/course/[courseId].f3f93c34840cedad.hot-update.js",
-            "hash": "9605263030790576437"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/manage/achievement-templates.0b4027a4525eb74e.hot-update.js",
-            "hash": "13349296960061741266"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/manage/achievement-templates.623d9630c7c9c645.hot-update.js",
-            "hash": "9492265154498867093"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/manage/achievement-templates.a22148ee60f2cb5a.hot-update.js",
-            "hash": "280501398749121544"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/manage/achievement-templates.d6045863713263b3.hot-update.js",
-            "hash": "4992580992850490192"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/pages/manage/achievement-templates.dabf4130ea143141.hot-update.js",
-            "hash": "8210488889157285719"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.08d8a1db2a0b79b9.hot-update.js",
-            "hash": "15703993303288276297"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.0b4027a4525eb74e.hot-update.js",
-            "hash": "17896538726571397015"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.0e31a11e7ae856d7.hot-update.js",
-            "hash": "4618608055497819881"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.17edabcde7eb66a0.hot-update.js",
-            "hash": "12893915525691502357"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.234c6c77c774ca26.hot-update.js",
-            "hash": "3472559389417060160"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.24a0cab66ed178a2.hot-update.js",
-            "hash": "4003092260639535014"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.2fd4de9cff52bef7.hot-update.js",
-            "hash": "2601203006472139972"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.30e713161ea242ff.hot-update.js",
-            "hash": "4606760676409396935"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.32d3105b84706ab7.hot-update.js",
-            "hash": "2766354212141219247"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.339751e593eabba5.hot-update.js",
-            "hash": "17722053655921003890"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.3c9442cb89311b50.hot-update.js",
-            "hash": "4938805610770082785"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.3e8c51800d74d929.hot-update.js",
-            "hash": "7992817301965639019"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.40de7dfec41dec14.hot-update.js",
-            "hash": "4829796664903953327"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.41b329d94a0d6bd8.hot-update.js",
-            "hash": "12658053689502274250"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.4254ce129062af88.hot-update.js",
-            "hash": "5220154130426015820"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.4e8564bab01b6fdc.hot-update.js",
-            "hash": "6345522138035397701"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.518ad1e9bbd6b445.hot-update.js",
-            "hash": "11589606590162954871"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.54f70cece63c5e10.hot-update.js",
-            "hash": "12404454444222136962"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.5911a1e1d3e13a52.hot-update.js",
-            "hash": "14615037306605287232"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.5a1ff712b0bea056.hot-update.js",
-            "hash": "8705542231263268923"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.623d9630c7c9c645.hot-update.js",
-            "hash": "5970490397726704891"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.688e4ffe8b5f1b5e.hot-update.js",
-            "hash": "14984605005867685812"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.6cd75e38b90f8ad4.hot-update.js",
-            "hash": "563701370202141835"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.6f13c541bd21141e.hot-update.js",
-            "hash": "14258240361776845767"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.72726ed1502ceb79.hot-update.js",
-            "hash": "16620364518994485489"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.746421fd3af005e3.hot-update.js",
-            "hash": "1976878141925710689"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.767bc3f82cabbba7.hot-update.js",
-            "hash": "18144364368500900112"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.7982de81aa3115e6.hot-update.js",
-            "hash": "14703112771958388274"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.7ec36b1fdfd47b02.hot-update.js",
-            "hash": "7530218380728956911"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.7f40f3092717b1c6.hot-update.js",
-            "hash": "1675390408141551368"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.80a82288219e7a2b.hot-update.js",
-            "hash": "9752879642483696767"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.8725d93006de7144.hot-update.js",
-            "hash": "13337887168827932316"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.8847cc72600e35ec.hot-update.js",
-            "hash": "6363046872429351587"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.8d22bedabccba713.hot-update.js",
-            "hash": "10755889627883133924"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.8fc2bf5deb191d49.hot-update.js",
-            "hash": "4082259923164463585"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.9361a11492bd41d2.hot-update.js",
-            "hash": "10171026173649715445"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.94d882022303b8c3.hot-update.js",
-            "hash": "6087768326909866895"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.98213d7f606b2229.hot-update.js",
-            "hash": "15106181859714452566"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.a22148ee60f2cb5a.hot-update.js",
-            "hash": "12265055160714919364"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.a618674e07f9d3b9.hot-update.js",
-            "hash": "15763594076510788185"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.a990c89f5e1a2612.hot-update.js",
-            "hash": "13520143985408082991"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.ab7fd6696df44e36.hot-update.js",
-            "hash": "134285592024217234"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.ac9275f6904ca834.hot-update.js",
-            "hash": "6203554978451983562"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.b1304c6ddbde6f06.hot-update.js",
-            "hash": "8229144832244698573"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.b26a375e25afd282.hot-update.js",
-            "hash": "16940125191658804677"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.b44adee30b4b1e59.hot-update.js",
-            "hash": "13950343965689297838"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.b8b90632af91eecf.hot-update.js",
-            "hash": "2552724764318850625"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.bd93dbc896cfc1c6.hot-update.js",
-            "hash": "10793984588185322907"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.bf5321db612a66a4.hot-update.js",
-            "hash": "8763499121121459619"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.c700ae59463c73d8.hot-update.js",
-            "hash": "2465710632969943848"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.c9a7e09cb39f04bb.hot-update.js",
-            "hash": "4944749058753693547"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.ce71dbf35bef7947.hot-update.js",
-            "hash": "16225951818196831126"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.d53dfdcbed823aea.hot-update.js",
-            "hash": "5970735188748389766"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.d5d7d4aa18188172.hot-update.js",
-            "hash": "12451050492174076077"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.d6045863713263b3.hot-update.js",
-            "hash": "10455137389367150167"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.dabf4130ea143141.hot-update.js",
-            "hash": "4081907148710898038"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.dfa258ef23eaaa82.hot-update.js",
-            "hash": "17769277505696044550"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.dfc7f967cb2316b1.hot-update.js",
-            "hash": "2094020677543461710"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.e26b2d6135172837.hot-update.js",
-            "hash": "2786955189324586790"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.e7503b044ad0720c.hot-update.js",
-            "hash": "7563321334737247371"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.f3f93c34840cedad.hot-update.js",
-            "hash": "4024526422483460126"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.f63db5e6229a43a9.hot-update.js",
-            "hash": "8914721394623914305"
-          },
-          {
-            "file": "apps/edu-hub/.next/static/webpack/webpack.faffea4180ef6a90.hot-update.js",
-            "hash": "5228582403173629104"
+            "file": "apps/edu-hub/.next/static/webpack/webpack.f819fca6e66f941a.hot-update.js",
+            "hash": "4008805924619327442"
           },
           {
             "file": "apps/edu-hub/.next/trace",
-            "hash": "7861334627301346430"
+            "hash": "446300874885230707"
           },
           {
             "file": "apps/edu-hub/apollo.config.js",
@@ -4540,16 +3991,16 @@
           },
           {
             "file": "apps/edu-hub/components/common/CertificateDownload.tsx",
-            "hash": "9605926548702291063",
+            "hash": "15698585115068629893",
             "dependencies": [
               {
                 "source": "edu-hub",
-                "target": "npm:next-translate",
+                "target": "npm:react",
                 "type": "static"
               },
               {
                 "source": "edu-hub",
-                "target": "npm:react",
+                "target": "npm:next-translate",
                 "type": "static"
               }
             ]
@@ -4626,6 +4077,32 @@
           {
             "file": "apps/edu-hub/components/common/dialogs/EnrolledUserForACourseDialog.tsx",
             "hash": "14468490005946195759",
+            "dependencies": [
+              {
+                "source": "edu-hub",
+                "target": "npm:@material-ui/core",
+                "type": "static"
+              },
+              {
+                "source": "edu-hub",
+                "target": "npm:next-translate",
+                "type": "static"
+              },
+              {
+                "source": "edu-hub",
+                "target": "npm:react",
+                "type": "static"
+              },
+              {
+                "source": "edu-hub",
+                "target": "npm:react-icons",
+                "type": "static"
+              }
+            ]
+          },
+          {
+            "file": "apps/edu-hub/components/common/dialogs/ErrorMessageDialog.tsx",
+            "hash": "5647513806658250040",
             "dependencies": [
               {
                 "source": "edu-hub",
@@ -4939,7 +4416,7 @@
           },
           {
             "file": "apps/edu-hub/components/common/forms/FileDownload.tsx",
-            "hash": "17861448534224772904",
+            "hash": "3782402363823951783",
             "dependencies": [
               {
                 "source": "edu-hub",
@@ -5735,7 +5212,7 @@
           },
           {
             "file": "apps/edu-hub/components/Header.tsx",
-            "hash": "10934401792264691127",
+            "hash": "2701298295554662689",
             "dependencies": [
               {
                 "source": "edu-hub",
@@ -5928,7 +5405,7 @@
           },
           {
             "file": "apps/edu-hub/components/ManageCourseContent/CourseParticipationsTab/index.tsx",
-            "hash": "12176703721288758754",
+            "hash": "16300198718250181912",
             "dependencies": [
               {
                 "source": "edu-hub",
@@ -6290,7 +5767,7 @@
           },
           {
             "file": "apps/edu-hub/components/ManageProgramsContent/ProgramsRow.tsx",
-            "hash": "2755372730393452726",
+            "hash": "10487608960739567158",
             "dependencies": [
               {
                 "source": "edu-hub",
@@ -6521,14 +5998,7 @@
           },
           {
             "file": "apps/edu-hub/helpers/filehandling.ts",
-            "hash": "16877043425688269078",
-            "dependencies": [
-              {
-                "source": "edu-hub",
-                "target": "npm:uuid",
-                "type": "static"
-              }
-            ]
+            "hash": "8119491707914610534"
           },
           {
             "file": "apps/edu-hub/helpers/imageHandling.ts",
@@ -6623,6 +6093,17 @@
             ]
           },
           {
+            "file": "apps/edu-hub/hooks/signedUrl.ts",
+            "hash": "14832889252290750031",
+            "dependencies": [
+              {
+                "source": "edu-hub",
+                "target": "npm:react",
+                "type": "static"
+              }
+            ]
+          },
+          {
             "file": "apps/edu-hub/hooks/user.ts",
             "hash": "14851705803451060145",
             "dependencies": [
@@ -6635,7 +6116,7 @@
           },
           {
             "file": "apps/edu-hub/i18n.json",
-            "hash": "14185975805833644287"
+            "hash": "8548059585005905305"
           },
           {
             "file": "apps/edu-hub/index.d.ts",
@@ -6690,6 +6171,10 @@
             "hash": "8690654446984691330"
           },
           {
+            "file": "apps/edu-hub/locales/de/managePrograms.json",
+            "hash": "15750809290816715196"
+          },
+          {
             "file": "apps/edu-hub/locales/de/programs.json",
             "hash": "16103599545033088345"
           },
@@ -6740,6 +6225,10 @@
           {
             "file": "apps/edu-hub/locales/en/manageCourses.json",
             "hash": "13866125567318250499"
+          },
+          {
+            "file": "apps/edu-hub/locales/en/managePrograms.json",
+            "hash": "8914204701475826633"
           },
           {
             "file": "apps/edu-hub/locales/en/programs.json",
@@ -7501,6 +6990,10 @@
             "hash": "15397641390235677888"
           },
           {
+            "file": "apps/edu-hub/queries/__generated__/GetSignedUrl.ts",
+            "hash": "14414447690933409949"
+          },
+          {
             "file": "apps/edu-hub/queries/__generated__/InsertAchievementDocumentationTemplate.ts",
             "hash": "1887523741832992514"
           },
@@ -7589,30 +7082,6 @@
             "hash": "1844285199769535390"
           },
           {
-            "file": "apps/edu-hub/queries/__generated__/loadAchievementCertificate.ts",
-            "hash": "16867737265256364640"
-          },
-          {
-            "file": "apps/edu-hub/queries/__generated__/LoadAchievementOptionDocumentationTemplate.ts",
-            "hash": "4810816911406444255"
-          },
-          {
-            "file": "apps/edu-hub/queries/__generated__/LoadAchievementOptionEvaluationScript.ts",
-            "hash": "1691606753251253319"
-          },
-          {
-            "file": "apps/edu-hub/queries/__generated__/loadAchievementRecordDocumentation.ts",
-            "hash": "2844785452663614949"
-          },
-          {
-            "file": "apps/edu-hub/queries/__generated__/loadAttendanceCertificate.ts",
-            "hash": "14060887706099023474"
-          },
-          {
-            "file": "apps/edu-hub/queries/__generated__/LoadFile.ts",
-            "hash": "219356457045899867"
-          },
-          {
             "file": "apps/edu-hub/queries/__generated__/loadParticipationData.ts",
             "hash": "14625173750622193342"
           },
@@ -7659,14 +7128,6 @@
           {
             "file": "apps/edu-hub/queries/__generated__/SaveAchievementDocumentationTemplate.ts",
             "hash": "11165898129030034867"
-          },
-          {
-            "file": "apps/edu-hub/queries/__generated__/SaveAchievementOptionDocumentationTemplate.ts",
-            "hash": "5795409364806719171"
-          },
-          {
-            "file": "apps/edu-hub/queries/__generated__/SaveAchievementOptionEvaluationScript.ts",
-            "hash": "10003915051487915435"
           },
           {
             "file": "apps/edu-hub/queries/__generated__/SaveAchievementRecordCoverImage.ts",
@@ -8023,7 +7484,7 @@
           },
           {
             "file": "apps/edu-hub/queries/actions.ts",
-            "hash": "18381432077854903474",
+            "hash": "17729093316091102692",
             "dependencies": [
               {
                 "source": "edu-hub",
@@ -8233,50 +7694,6 @@
           {
             "file": "apps/edu-hub/queries/insertUser.ts",
             "hash": "4242387968850723974",
-            "dependencies": [
-              {
-                "source": "edu-hub",
-                "target": "npm:@apollo/client",
-                "type": "static"
-              }
-            ]
-          },
-          {
-            "file": "apps/edu-hub/queries/loadAchievementCertificate.ts",
-            "hash": "7945387590286725421",
-            "dependencies": [
-              {
-                "source": "edu-hub",
-                "target": "npm:@apollo/client",
-                "type": "static"
-              }
-            ]
-          },
-          {
-            "file": "apps/edu-hub/queries/loadAchievementRecordDocumentation.ts",
-            "hash": "9434725589710495034",
-            "dependencies": [
-              {
-                "source": "edu-hub",
-                "target": "npm:@apollo/client",
-                "type": "static"
-              }
-            ]
-          },
-          {
-            "file": "apps/edu-hub/queries/loadAttendanceCertificate.ts",
-            "hash": "17614927098810446988",
-            "dependencies": [
-              {
-                "source": "edu-hub",
-                "target": "npm:@apollo/client",
-                "type": "static"
-              }
-            ]
-          },
-          {
-            "file": "apps/edu-hub/queries/loadParticipationData.ts",
-            "hash": "14790879683492546528",
             "dependencies": [
               {
                 "source": "edu-hub",
@@ -9938,6 +9355,15 @@
         "hash": "7bdcdaeb1bb692ec9d9bf8ec52538aa0bead6764753f4a067a171a511807a43fab016f7285a56bef6a606c2467ff3f1365e1ad2d2d583b81beed849ee1573fd1"
       }
     },
+    "npm:@emnapi/runtime": {
+      "type": "npm",
+      "name": "npm:@emnapi/runtime",
+      "data": {
+        "version": "0.45.0",
+        "packageName": "@emnapi/runtime",
+        "hash": "59c81a4edc68c959b2f891eb310b063c87e69ef18eb77563bfd59b0086b27c7581b8e40edbf590e3fd3af437ace98d06e81b7a8613e8317c619e479831540b93"
+      }
+    },
     "npm:@emotion/babel-plugin": {
       "type": "npm",
       "name": "npm:@emotion/babel-plugin",
@@ -10134,6 +9560,177 @@
         "version": "1.2.1",
         "packageName": "@humanwhocodes/object-schema",
         "hash": "a824a1ec31591231e4bad5787641f59e9633827d0a2eaae131a288d33c9ef0290bd16fda8da6f7c0fcb014147865d12118df10db57f27f41e20da92369fcb3f1"
+      }
+    },
+    "npm:@img/sharp-darwin-arm64": {
+      "type": "npm",
+      "name": "npm:@img/sharp-darwin-arm64",
+      "data": {
+        "version": "0.33.2",
+        "packageName": "@img/sharp-darwin-arm64",
+        "hash": "6dcb8062a1f8cfd383ffe6b825b0db2bc0313587fd4747625d4d36df97643bc4"
+      }
+    },
+    "npm:@img/sharp-darwin-x64": {
+      "type": "npm",
+      "name": "npm:@img/sharp-darwin-x64",
+      "data": {
+        "version": "0.33.2",
+        "packageName": "@img/sharp-darwin-x64",
+        "hash": "15e6c17b7373008ea8ec22520e7afc45e333481ce1efdee9549b048f7e0f7031"
+      }
+    },
+    "npm:@img/sharp-libvips-darwin-arm64": {
+      "type": "npm",
+      "name": "npm:@img/sharp-libvips-darwin-arm64",
+      "data": {
+        "version": "1.0.1",
+        "packageName": "@img/sharp-libvips-darwin-arm64",
+        "hash": "d3302c0cf2688001a50d0118b9760cc201d50e3814c6926bc7199ecc6aa3163b"
+      }
+    },
+    "npm:@img/sharp-libvips-darwin-x64": {
+      "type": "npm",
+      "name": "npm:@img/sharp-libvips-darwin-x64",
+      "data": {
+        "version": "1.0.1",
+        "packageName": "@img/sharp-libvips-darwin-x64",
+        "hash": "3d9c4f8951b65577ce565d6106be94a3b162f8d4e98e0e9cb9fb79bf5579ff64"
+      }
+    },
+    "npm:@img/sharp-libvips-linux-arm64": {
+      "type": "npm",
+      "name": "npm:@img/sharp-libvips-linux-arm64",
+      "data": {
+        "version": "1.0.1",
+        "packageName": "@img/sharp-libvips-linux-arm64",
+        "hash": "15ce65597164dda1330ad6a0d26d41de693f576fa37130cd02caa763cb607140"
+      }
+    },
+    "npm:@img/sharp-libvips-linux-arm": {
+      "type": "npm",
+      "name": "npm:@img/sharp-libvips-linux-arm",
+      "data": {
+        "version": "1.0.1",
+        "packageName": "@img/sharp-libvips-linux-arm",
+        "hash": "c04059652b49b8a4ea41cd68a6937c92890b5118a3a3b24084d473dfb284acba"
+      }
+    },
+    "npm:@img/sharp-libvips-linux-s390x": {
+      "type": "npm",
+      "name": "npm:@img/sharp-libvips-linux-s390x",
+      "data": {
+        "version": "1.0.1",
+        "packageName": "@img/sharp-libvips-linux-s390x",
+        "hash": "336185b1287994911753080885581d71963653483c48098c7b5bf93a5ada3f0d"
+      }
+    },
+    "npm:@img/sharp-libvips-linux-x64": {
+      "type": "npm",
+      "name": "npm:@img/sharp-libvips-linux-x64",
+      "data": {
+        "version": "1.0.1",
+        "packageName": "@img/sharp-libvips-linux-x64",
+        "hash": "50e3c3e7d727e4d6f38159df491eeeef40487c8f60874dafe1869df84bdc0468"
+      }
+    },
+    "npm:@img/sharp-libvips-linuxmusl-arm64": {
+      "type": "npm",
+      "name": "npm:@img/sharp-libvips-linuxmusl-arm64",
+      "data": {
+        "version": "1.0.1",
+        "packageName": "@img/sharp-libvips-linuxmusl-arm64",
+        "hash": "869fe5bbe55f08b5c4d8534cef291cffe5333448ee01396cac99e7e281ba8842"
+      }
+    },
+    "npm:@img/sharp-libvips-linuxmusl-x64": {
+      "type": "npm",
+      "name": "npm:@img/sharp-libvips-linuxmusl-x64",
+      "data": {
+        "version": "1.0.1",
+        "packageName": "@img/sharp-libvips-linuxmusl-x64",
+        "hash": "a67906d6f9440b563a3aa052aad9df44d08d418fbb81e99107e222dad1aada1c"
+      }
+    },
+    "npm:@img/sharp-linux-arm64": {
+      "type": "npm",
+      "name": "npm:@img/sharp-linux-arm64",
+      "data": {
+        "version": "0.33.2",
+        "packageName": "@img/sharp-linux-arm64",
+        "hash": "a2664a80b8b1bd8649d445535ab2aaa2677a08268c5ddd545f6c19d4de2ae38a"
+      }
+    },
+    "npm:@img/sharp-linux-arm": {
+      "type": "npm",
+      "name": "npm:@img/sharp-linux-arm",
+      "data": {
+        "version": "0.33.2",
+        "packageName": "@img/sharp-linux-arm",
+        "hash": "fbac7966efadd2419c00816c6bdc14fb9e5b3e99e1a20b322bdfc392a067ccc4"
+      }
+    },
+    "npm:@img/sharp-linux-s390x": {
+      "type": "npm",
+      "name": "npm:@img/sharp-linux-s390x",
+      "data": {
+        "version": "0.33.2",
+        "packageName": "@img/sharp-linux-s390x",
+        "hash": "44eda6b28c47fac493dd91ec1dd11279a0628c67b02f20817376acc2139f0f68"
+      }
+    },
+    "npm:@img/sharp-linux-x64": {
+      "type": "npm",
+      "name": "npm:@img/sharp-linux-x64",
+      "data": {
+        "version": "0.33.2",
+        "packageName": "@img/sharp-linux-x64",
+        "hash": "336ba723e69399f5080abdd6bbd67c4a7299803ae186da673ac206e8f70c57fc"
+      }
+    },
+    "npm:@img/sharp-linuxmusl-arm64": {
+      "type": "npm",
+      "name": "npm:@img/sharp-linuxmusl-arm64",
+      "data": {
+        "version": "0.33.2",
+        "packageName": "@img/sharp-linuxmusl-arm64",
+        "hash": "a2c22ad0546fb3a7516e01b3bda0b65491923ec6669e5612a299db9afb0cfc39"
+      }
+    },
+    "npm:@img/sharp-linuxmusl-x64": {
+      "type": "npm",
+      "name": "npm:@img/sharp-linuxmusl-x64",
+      "data": {
+        "version": "0.33.2",
+        "packageName": "@img/sharp-linuxmusl-x64",
+        "hash": "92d9825e050d8826f0244dd82036bbd12003b115f5503b947b1973993f39900a"
+      }
+    },
+    "npm:@img/sharp-wasm32": {
+      "type": "npm",
+      "name": "npm:@img/sharp-wasm32",
+      "data": {
+        "version": "0.33.2",
+        "packageName": "@img/sharp-wasm32",
+        "hash": "7da1b82f975c5857e7e808967f9d8e62e0ceaecebee49916fcaba5bd3aca1888"
+      }
+    },
+    "npm:@img/sharp-win32-ia32": {
+      "type": "npm",
+      "name": "npm:@img/sharp-win32-ia32",
+      "data": {
+        "version": "0.33.2",
+        "packageName": "@img/sharp-win32-ia32",
+        "hash": "694445991fd0fb9e9fac140904106c34b19fb4d0f7fc0978ae3cf377ebb063a8"
+      }
+    },
+    "npm:@img/sharp-win32-x64": {
+      "type": "npm",
+      "name": "npm:@img/sharp-win32-x64",
+      "data": {
+        "version": "0.33.2",
+        "packageName": "@img/sharp-win32-x64",
+        "hash": "9d819773bdf849885c3f90360fcb89eb858b44a199a1becf7e6910b3fb490efa"
       }
     },
     "npm:@istanbuljs/load-nyc-config": {
@@ -14177,6 +13774,15 @@
         "hash": "b0445859521eb4021cd0fb0cc1a75cecf67fceecae89b63f62b201cca8d345baf8b952c966862a9d9a2632987d4f6581f0ec8d957dfacece86f0a7919316f610"
       }
     },
+    "npm:color-string": {
+      "type": "npm",
+      "name": "npm:color-string",
+      "data": {
+        "version": "1.9.1",
+        "packageName": "color-string",
+        "hash": "c13fe7cff7885f603f49105827d621ce87f4571d78ba28ef4a3f1a104304748f620615e6bf065ecd2145d0d9dad83a3553f52bb25ede7239d18e9f81622f1cc5"
+      }
+    },
     "npm:color-support": {
       "type": "npm",
       "name": "npm:color-support",
@@ -14184,6 +13790,15 @@
         "version": "1.1.3",
         "packageName": "color-support",
         "hash": "9b7356817670b9a13a26ca5af1c21615463b500783b739b7634a0c2047c16cef4b2865d7576875c31c3cddf9dd621fa19285e628f20198b233a5cfdda6d0793b"
+      }
+    },
+    "npm:color": {
+      "type": "npm",
+      "name": "npm:color",
+      "data": {
+        "version": "4.2.3",
+        "packageName": "color",
+        "hash": "0579629c02c631b426780038da929cca8e8d80a40158b09811a0112a107c62e10e4aad719843b791b1e658ab4e800558f2e87ca4522c8b32349d497ecb6adeb4"
       }
     },
     "npm:colord": {
@@ -14931,6 +14546,15 @@
         "version": "1.2.0",
         "packageName": "destroy",
         "hash": "0acb300b7478a08b92d810ab229d5afe0d2f4399272045ab22affa0d99dbaf12637659411530a6fcd597a9bdac718fc94373a61a95b4651bbc7b83684a565e38"
+      }
+    },
+    "npm:detect-libc": {
+      "type": "npm",
+      "name": "npm:detect-libc",
+      "data": {
+        "version": "2.0.2",
+        "packageName": "detect-libc",
+        "hash": "2b2cd3649b83d576f4be7cc37eb3b1815c79969c8b1a03a40a4d55d83bc74d010753485753448eacb98784abf22f7dbd3911fd3b60e29fda28fed2d1a997944d"
       }
     },
     "npm:detect-newline": {
@@ -17415,6 +17039,15 @@
         "version": "0.2.1",
         "packageName": "is-arrayish",
         "hash": "eef4417e3c10e60e2c810b6084942b3ead455af16c4509959a27e490e7aee87cfb3f38e01bbde92220b528a0ee1a18d52b787e1458ee86174d8c7f0e58cd488f"
+      }
+    },
+    "npm:is-arrayish@0.3.2": {
+      "type": "npm",
+      "name": "npm:is-arrayish@0.3.2",
+      "data": {
+        "version": "0.3.2",
+        "packageName": "is-arrayish",
+        "hash": "977e64f54d91c8f169b59afcd80ff19227e9f5c791fa28fa2e5bce355cbaf6c2c356711b734656e80c9dd4a854dd7efcf7894402f1031dfc5de5d620775b4d5f"
       }
     },
     "npm:is-bigint": {
@@ -22430,6 +22063,15 @@
         "hash": "1b26ecf6db9e8292dd90df4e781d91875c0dcc1b1909e70f5d12959a23c7eebb8f01ea581c00783bbee72ceeaad9505797c381756326073850dc36ed284b21b9"
       }
     },
+    "npm:semver@7.5.4": {
+      "type": "npm",
+      "name": "npm:semver@7.5.4",
+      "data": {
+        "version": "7.5.4",
+        "packageName": "semver",
+        "hash": "12d8ad952fa353b0995bf180cdac205a4068b759a140e5d3c608317098b3575ac2f1e09182206bf2eb26120e1c0ed8fb92c48c592f6099680de56bb071423ca3"
+      }
+    },
     "npm:send": {
       "type": "npm",
       "name": "npm:send",
@@ -22529,6 +22171,15 @@
         "hash": "39b3dd9630a774aba288a680e7d2901f5c0eae7b8387fc5c8ea559918b29b3da144b7bdb990d7ccd9e11be05508ac9e459ce51d01fd65e583282f6ffafcba2e7"
       }
     },
+    "npm:sharp": {
+      "type": "npm",
+      "name": "npm:sharp",
+      "data": {
+        "version": "0.33.2",
+        "packageName": "sharp",
+        "hash": "3d294619d7322f292faabd4aea7192c87c59210eb29c5c507d1b092975ff83e48f084f2bf59dd8050182f665fa118f99e4de9df551b757c45c2859b12d8ccb44"
+      }
+    },
     "npm:shebang-command@1.2.0": {
       "type": "npm",
       "name": "npm:shebang-command@1.2.0",
@@ -22590,6 +22241,15 @@
         "version": "3.0.7",
         "packageName": "signal-exit",
         "hash": "a2f098f247adc367dffc27845853e9959b9e88b01cb301658cfe4194352d8d2bb32e18467c786a7fe15f1d44b233ea35633d076d5e737870b7139949d1ab6318"
+      }
+    },
+    "npm:simple-swizzle": {
+      "type": "npm",
+      "name": "npm:simple-swizzle",
+      "data": {
+        "version": "0.2.2",
+        "packageName": "simple-swizzle",
+        "hash": "a7f3f2ab5c76c4472d5c578df892e857323e452d9f392e1b5cf74b74db66e6294a1e1b8b390b519fa1b96b5b613f2a37db6cffef52c3f1f8f3c5ea64eb2d54c0"
       }
     },
     "npm:sisteransi": {
@@ -27212,6 +26872,13 @@
         "type": "static"
       }
     ],
+    "npm:@emnapi/runtime": [
+      {
+        "source": "npm:@emnapi/runtime",
+        "target": "npm:tslib",
+        "type": "static"
+      }
+    ],
     "npm:@emotion/babel-plugin": [
       {
         "source": "npm:@emotion/babel-plugin",
@@ -27474,6 +27141,69 @@
       {
         "source": "npm:@humanwhocodes/config-array",
         "target": "npm:minimatch",
+        "type": "static"
+      }
+    ],
+    "npm:@img/sharp-darwin-arm64": [
+      {
+        "source": "npm:@img/sharp-darwin-arm64",
+        "target": "npm:@img/sharp-libvips-darwin-arm64",
+        "type": "static"
+      }
+    ],
+    "npm:@img/sharp-darwin-x64": [
+      {
+        "source": "npm:@img/sharp-darwin-x64",
+        "target": "npm:@img/sharp-libvips-darwin-x64",
+        "type": "static"
+      }
+    ],
+    "npm:@img/sharp-linux-arm64": [
+      {
+        "source": "npm:@img/sharp-linux-arm64",
+        "target": "npm:@img/sharp-libvips-linux-arm64",
+        "type": "static"
+      }
+    ],
+    "npm:@img/sharp-linux-arm": [
+      {
+        "source": "npm:@img/sharp-linux-arm",
+        "target": "npm:@img/sharp-libvips-linux-arm",
+        "type": "static"
+      }
+    ],
+    "npm:@img/sharp-linux-s390x": [
+      {
+        "source": "npm:@img/sharp-linux-s390x",
+        "target": "npm:@img/sharp-libvips-linux-s390x",
+        "type": "static"
+      }
+    ],
+    "npm:@img/sharp-linux-x64": [
+      {
+        "source": "npm:@img/sharp-linux-x64",
+        "target": "npm:@img/sharp-libvips-linux-x64",
+        "type": "static"
+      }
+    ],
+    "npm:@img/sharp-linuxmusl-arm64": [
+      {
+        "source": "npm:@img/sharp-linuxmusl-arm64",
+        "target": "npm:@img/sharp-libvips-linuxmusl-arm64",
+        "type": "static"
+      }
+    ],
+    "npm:@img/sharp-linuxmusl-x64": [
+      {
+        "source": "npm:@img/sharp-linuxmusl-x64",
+        "target": "npm:@img/sharp-libvips-linuxmusl-x64",
+        "type": "static"
+      }
+    ],
+    "npm:@img/sharp-wasm32": [
+      {
+        "source": "npm:@img/sharp-wasm32",
+        "target": "npm:@emnapi/runtime",
         "type": "static"
       }
     ],
@@ -33998,6 +33728,30 @@
       {
         "source": "npm:color-convert",
         "target": "npm:color-name",
+        "type": "static"
+      }
+    ],
+    "npm:color-string": [
+      {
+        "source": "npm:color-string",
+        "target": "npm:color-name",
+        "type": "static"
+      },
+      {
+        "source": "npm:color-string",
+        "target": "npm:simple-swizzle",
+        "type": "static"
+      }
+    ],
+    "npm:color": [
+      {
+        "source": "npm:color",
+        "target": "npm:color-convert",
+        "type": "static"
+      },
+      {
+        "source": "npm:color",
+        "target": "npm:color-string",
         "type": "static"
       }
     ],
@@ -44830,6 +44584,13 @@
         "type": "static"
       }
     ],
+    "npm:semver@7.5.4": [
+      {
+        "source": "npm:semver@7.5.4",
+        "target": "npm:lru-cache",
+        "type": "static"
+      }
+    ],
     "npm:send": [
       {
         "source": "npm:send",
@@ -45006,6 +44767,118 @@
         "type": "static"
       }
     ],
+    "npm:sharp": [
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-darwin-arm64",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-darwin-x64",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-libvips-darwin-arm64",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-libvips-darwin-x64",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-libvips-linux-arm",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-libvips-linux-arm64",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-libvips-linux-s390x",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-libvips-linux-x64",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-libvips-linuxmusl-arm64",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-libvips-linuxmusl-x64",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-linux-arm",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-linux-arm64",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-linux-s390x",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-linux-x64",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-linuxmusl-arm64",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-linuxmusl-x64",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-wasm32",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-win32-ia32",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:@img/sharp-win32-x64",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:color",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:detect-libc",
+        "type": "static"
+      },
+      {
+        "source": "npm:sharp",
+        "target": "npm:semver@7.5.4",
+        "type": "static"
+      }
+    ],
     "npm:shebang-command@1.2.0": [
       {
         "source": "npm:shebang-command@1.2.0",
@@ -45051,6 +44924,13 @@
       {
         "source": "npm:side-channel",
         "target": "npm:object-inspect",
+        "type": "static"
+      }
+    ],
+    "npm:simple-swizzle": [
+      {
+        "source": "npm:simple-swizzle",
+        "target": "npm:is-arrayish@0.3.2",
         "type": "static"
       }
     ],
@@ -47498,27 +47378,22 @@
       },
       {
         "source": "edu-hub",
+        "target": "npm:graphql-request",
+        "type": "static"
+      },
+      {
+        "source": "edu-hub",
+        "target": "npm:axios",
+        "type": "dynamic"
+      },
+      {
+        "source": "edu-hub",
+        "target": "npm:axios",
+        "type": "static"
+      },
+      {
+        "source": "edu-hub",
         "target": "npm:@material-ui/core",
-        "type": "static"
-      },
-      {
-        "source": "edu-hub",
-        "target": "npm:@material-ui/icons",
-        "type": "static"
-      },
-      {
-        "source": "edu-hub",
-        "target": "npm:@material-ui/lab",
-        "type": "static"
-      },
-      {
-        "source": "edu-hub",
-        "target": "npm:lodash",
-        "type": "static"
-      },
-      {
-        "source": "edu-hub",
-        "target": "npm:react-debounce-input",
         "type": "static"
       },
       {
@@ -47558,57 +47433,17 @@
       },
       {
         "source": "edu-hub",
-        "target": "npm:use-debounce",
-        "type": "dynamic"
-      },
-      {
-        "source": "edu-hub",
-        "target": "npm:use-debounce",
-        "type": "static"
-      },
-      {
-        "source": "edu-hub",
-        "target": "npm:uuid",
-        "type": "dynamic"
-      },
-      {
-        "source": "edu-hub",
-        "target": "npm:uuid",
-        "type": "static"
-      },
-      {
-        "source": "edu-hub",
-        "target": "npm:graphql-request",
-        "type": "static"
-      },
-      {
-        "source": "edu-hub",
-        "target": "npm:axios",
-        "type": "dynamic"
-      },
-      {
-        "source": "edu-hub",
-        "target": "npm:axios",
-        "type": "static"
-      },
-      {
-        "source": "edu-hub",
-        "target": "npm:react-hook-form",
-        "type": "dynamic"
-      },
-      {
-        "source": "edu-hub",
-        "target": "npm:react-hook-form",
-        "type": "static"
-      },
-      {
-        "source": "edu-hub",
         "target": "npm:swiper",
         "type": "dynamic"
       },
       {
         "source": "edu-hub",
         "target": "npm:swiper",
+        "type": "static"
+      },
+      {
+        "source": "edu-hub",
+        "target": "npm:@material-ui/icons",
         "type": "static"
       },
       {
@@ -47629,11 +47464,46 @@
       {
         "source": "edu-hub",
         "target": "npm:@tanstack/react-table",
+        "type": "static"
+      },
+      {
+        "source": "edu-hub",
+        "target": "npm:react-hook-form",
+        "type": "dynamic"
+      },
+      {
+        "source": "edu-hub",
+        "target": "npm:react-hook-form",
+        "type": "static"
+      },
+      {
+        "source": "edu-hub",
+        "target": "npm:use-debounce",
+        "type": "dynamic"
+      },
+      {
+        "source": "edu-hub",
+        "target": "npm:use-debounce",
+        "type": "static"
+      },
+      {
+        "source": "edu-hub",
+        "target": "npm:react-debounce-input",
+        "type": "static"
+      },
+      {
+        "source": "edu-hub",
+        "target": "npm:lodash",
         "type": "static"
       },
       {
         "source": "edu-hub",
         "target": "npm:graphql",
+        "type": "static"
+      },
+      {
+        "source": "edu-hub",
+        "target": "npm:@material-ui/lab",
         "type": "static"
       },
       {
