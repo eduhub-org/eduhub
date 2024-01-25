@@ -4,18 +4,21 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: LoadAFile
+// GraphQL query operation: LoadFile
 // ====================================================
 
-export interface LoadAFile_loadAchievementCertificate {
+export interface LoadFile_loadFile {
   __typename: "loadFileOutput";
   link: string;
 }
 
-export interface LoadAFile {
-  loadAchievementCertificate: LoadAFile_loadAchievementCertificate | null;
+export interface LoadFile {
+  /**
+   * Loads file url from Google Storage Bucket
+   */
+  loadFile: LoadFile_loadFile | null;
 }
 
-export interface LoadAFileVariables {
+export interface LoadFileVariables {
   path: string;
 }

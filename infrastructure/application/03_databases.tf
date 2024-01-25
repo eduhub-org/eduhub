@@ -51,9 +51,10 @@ resource "google_secret_manager_secret" "keycloak_db_pw" {
   provider  = google-beta
   secret_id = "keycloak-db-pw"
   replication {
-    automatic = true
+    auto {}
   }
 }
+
 # Set a value for the password of the Keycloak database user in the above created variable
 resource "google_secret_manager_secret_version" "keycloak_db_pw" {
   provider    = google-beta
@@ -89,7 +90,7 @@ resource "google_secret_manager_secret" "hasura_db_url" {
   provider  = google-beta
   secret_id = "hasura-db-url"
   replication {
-    automatic = true
+    auto {}
   }
 }
 # Create a new version of the secret for the URL to the Hasura database based on the user and password created for the Hasura database

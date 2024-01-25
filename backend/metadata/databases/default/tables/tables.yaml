@@ -1,3 +1,4 @@
+- "!include public_AchievementDocumentationTemplate.yaml"
 - "!include public_AchievementOption.yaml"
 - "!include public_AchievementOptionCourse.yaml"
 - "!include public_AchievementOptionMentor.yaml"

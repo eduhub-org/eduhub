@@ -1,0 +1,13 @@
+table:
+  name: AchievementDocumentationTemplate
+  schema: public
+select_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - title
+        - url
+        - created_at
+        - updated_at
+      filter: {}

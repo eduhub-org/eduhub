@@ -4,8 +4,8 @@ path.resolve('./next.config.js');
 
 import useTranslation from 'next-translate/useTranslation';
 import Head from 'next/head';
-import { FC, useCallback, useState } from 'react';
-import CourseListTable from '../../../components/ManageCoursesContent';
+import ManageCoursesContent from '../../../components/ManageCoursesContent';
+import { FC, useCallback, useMemo, useState } from 'react';
 import CoursesHeader from '../../../components/ManageCoursesContent/CoursesHeader';
 import Loading from '../../../components/common/Loading';
 import { Page } from '../../../components/Page';
@@ -54,16 +54,17 @@ interface IProps {
   programs: Programs_Program[];
 }
 const Content: FC<IProps> = ({ programs }) => {
-  programs.sort((a, b) => {
-    // Assign specific indices for 'EVENTS' and 'DEGREES'
-    const indexA = a.shortTitle === 'EVENTS' ? -2 : a.shortTitle === 'DEGREES' ? -1 : programs.indexOf(a);
-    const indexB = b.shortTitle === 'EVENTS' ? -2 : b.shortTitle === 'DEGREES' ? -1 : programs.indexOf(b);
+  const sortedPrograms = useMemo(() => {
+    return [...programs].sort((a, b) => {
+      // Assign specific indices for 'EVENTS' and 'DEGREES'
+      const indexA = a.shortTitle === 'EVENTS' ? -2 : a.shortTitle === 'DEGREES' ? -1 : programs.indexOf(a);
+      const indexB = b.shortTitle === 'EVENTS' ? -2 : b.shortTitle === 'DEGREES' ? -1 : programs.indexOf(b);
+      // Sort based on these indices
+      return indexA - indexB;
+    });
+  }, [programs]);
 
-    // Sort based on these indices
-    return indexA - indexB;
-  });
-
-  const defaultProgram = programs.find(
+  const defaultProgram = sortedPrograms.find(
     (program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES'
   )?.id;
   const { t } = useTranslation('course-page');
@@ -92,7 +93,7 @@ const Content: FC<IProps> = ({ programs }) => {
   return (
     <div className="max-w-screen-xl mx-auto">
       <CoursesHeader
-        programs={programs}
+        programs={sortedPrograms}
         defaultProgramId={defaultProgram}
         courseListRequest={courseListRequest}
         t={t}
@@ -101,10 +102,11 @@ const Content: FC<IProps> = ({ programs }) => {
       />
       {courseListRequest.loading ? (
         <Loading />
-      ) : courseListRequest.data?.Course && courseListRequest.data?.Course.length > 0 ? (
-        <CourseListTable
+      ) : courseListRequest.data?.Course &&
+        courseListRequest.data?.Course.length > 0 ? (
+        <ManageCoursesContent
           courseListRequest={courseListRequest}
-          programs={programs}
+          programs={sortedPrograms}
           t={t}
           updateFilter={updateFilter}
           currentFilter={filter}
