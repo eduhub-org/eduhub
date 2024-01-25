@@ -1,11 +1,14 @@
 from jinja2 import Environment, FileSystemLoader
-from logging import logger
+import logging
 from weasyprint import HTML, CSS
 import os
-from google.cloud import storage
 import requests
-from functions.callPythonFunction.api_clients.storage_client import StorageClient
+from api_clients import EduHubClient, StorageClient
 import io 
+
+import unittest
+from unittest.mock import Mock, patch
+from your_module import CertificateCreator 
 
 # TODO:
 
@@ -76,7 +79,7 @@ class CertificateCreator:
         self.program_info = None
 
         if self.certificate_type in ["achievement", "attendance"]:
-            self.enrollments = self._fetch_enrollments(self.user_ids, self.course_id)
+            self.enrollments = self.eduhub_client.fetch_enrollments(self.user_ids, self.course_id)
         else:
             self.program_info = self._fetch_program_info(self.course_id)
 
@@ -90,7 +93,7 @@ class CertificateCreator:
             for enrollment in self.enrollments:
                 pdf_url = generate_and_save_certificate_to_gcs(template_image_url, template_text, self.storage_client.get_bucket())
 
-                self.update_course_enrollment_record(pdf_url)
+                self.eduhub_client.update_course_enrollment_record(pdf_url)
         else: 
                 pdf_url = generate_and_save_certificate_to_gcs(template_image_url, template_text, self.storage_client.get_bucket())
 
@@ -135,118 +138,8 @@ class CertificateCreator:
 
         return blob.public_url
 
-    def update_course_enrollment_record(self, certificate_url):
-       
-        # GraphQL-Mutations to Update Course Enrollment
-        mutation = """
-        mutation UpdateEnrollment($userId: uuid!, $courseId: Int!, $certificateUrl: String!) {
-            update_CourseEnrollment(
-                where: { userId: { _eq: $userId }, courseId: { _eq: $courseId } }
-                _set: { certificateURL: $certificateUrl }
-            ) {
-                affected_rows
-            }
-        }
-        """
-
-        # Data for the GraphQL-Mutation
-        variables = {
-            "userId": self.user_id,
-            "courseId": self.course_id,
-            "certificateUrl": certificate_url,
-        }
-
-        response = requests.post(
-            self.eduhub_client.hasura_endpoint,
-            json={"query": mutation, "variables": variables},
-            headers=self.eduhub_client.headers,
-        )
-
-        if response.status_code != 200:
-            logging.error(f"Failed to update course enrollment record: {response.text}")
-            
-
-        result = response.json()
-        return result
         
-    def fetch_enrollments(self):
-
-
-        # GraphQL query
-        query = """
-        query GetEnrollments($userIds: [uuid!]!, $courseId: Int!) {
-  CourseEnrollment(where: {userId: {_in: $userIds}, Course: {id: {_eq: $courseId}}}) {
-    User {
-      Attendances {
-        Session {
-          id
-          startDateTime
-        }
-        id
-        status
-      }
-      firstName
-      lastName
-      AchievementRecordAuthors(where: {AchievementRecord: {AchievementOption: {AchievementOptionCourses: {Course: {id: {_eq: $courseId}}}}}}, order_by: {AchievementRecord: {updated_at: desc}}, limit: 1) {
-        AchievementRecord {
-          AchievementOption {
-            title
-            recordType
-          }
-          created_at
-        }
-      }
-      id
-    }
-    Course {
-      Program {
-        title
-        achievementCertificateTemplateURL
-        attendanceCertificateTemplateURL
-        attendanceCertificateTemplateTextId
-        achievementCertificateTemplateTextId
-      }
-      Sessions(order_by: {startDateTime: asc}) {
-        id
-        title
-        startDateTime
-      }
-      id
-      ects
-      title
-      learningGoals
-    }
-  }
-}
-
-    """
-     # Variables for the GraphQL query
-        variables = {
-        "userIds": self.user_ids,
-        "courseId": self.course_id 
-        }
-
-     # Headers including the admin secret
-        headers = {
-        "Content-Type": "application/json",
-        "x-hasura-admin-secret":  self.eduhub_client.hasura_admin_secret
-        }
-
-    # Make the request to the GraphQL endpoint
-        try:
-            response = requests.post(
-            self.eduhub_client.url,
-            headers={"x-hasura-admin-secret": self.eduhub_client.hasura_admin_secret},
-            json={"query": query, "variables": {"userIds": self.user_ids, "courseId": self.course_id}}
-            )
-            response.raise_for_status()  # Raises a HTTPError if the HTTP request returned an unsuccessful status code
-        # Assuming the data is returned in JSON format
-            data = response.json()
-            return data['data']['CourseEnrollment']
-        except requests.exceptions.RequestException as e:
-            # Handle any errors that occur during the request
-            logging.error(f"An error occurred: {e}")
-            raise
+   
 
     def fetch_program_info(self):
         #TODO: get textID and Image URL per userID via program 
@@ -310,8 +203,7 @@ class CertificateCreator:
             return data['data']['html']
         except requests.exceptions.RequestException as e:
         # Handle any errors that occur during the request
-        print(f"An error occurred: {e}")
-        raise
+            logging.info("An error occured")
 
     def prepare_text_content(self):
         if self.certificate_type == "attendance" or self.certificate_type == "achievement":
@@ -389,3 +281,39 @@ class CertificateCreator:
         ]
 
         return attended_session_titles
+
+
+
+
+
+class TestCertificateCreator(unittest.TestCase):
+
+    def setUp(self):
+        # Use actual storage and eduhub clients, and real arguments
+        self.storage_client = StorageClient()
+        self.eduhub_client = EduHubClient()
+        self.arguments = {
+            "input": {
+                "certificateType": "achievement",
+                "userIds": ["152f12c3-f7d2-4b73-8d29-603c164b0139"],
+                "courseId": "1"
+            }
+        }
+
+        # Instantiate the CertificateCreator
+        self.certificate_creator = CertificateCreator(
+            self.storage_client, self.eduhub_client, self.arguments
+        )
+
+    def test_fetch_enrollments(self):
+        # Call the method
+        enrollments = self.certificate_creator.fetch_enrollments()
+
+        # Assert that the method returns a list (or another expected type)
+        self.assertIsInstance(enrollments, list)
+
+        # Further assertions can be made based on the expected structure of the enrollments
+
+if __name__ == '__main__':
+    unittest.main()
+    
