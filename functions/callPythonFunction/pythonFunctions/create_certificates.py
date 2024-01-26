@@ -1,10 +1,11 @@
 from jinja2 import Environment, FileSystemLoader
 import logging
-from weasyprint import HTML, CSS
+import jinja2
 import os
 import requests
 from api_clients import EduHubClient, StorageClient
 import io 
+from xhtml2pdf import pisa
 
 class CertificateCreator:
     """
@@ -69,14 +70,12 @@ class CertificateCreator:
         logging.info(f"{successful_count}/{len(self.enrollments)} {self.certificate_type} certificate(s) successfully   generated.")
 
     def generate_and_save_certificate_to_gcs(self, template_image_url, template_text, bucket_name):
-        # Prepare Text Conten 
-        text_content = prepare_text_content() 
-        # Generate PDF File Name
-        pdf_file_name = generate_pdf_file_name()
-        # Get Template Image
-        #template_image = download_template_image(template_image_url)
+        # Prepare Text Content
+        text_content = self.prepare_text_content()
 
-        ## Generate Certificate PDF 
+        # Generate PDF File Name
+        pdf_file_name = self.generate_pdf_file_name()
+
         # Create Jinja2 Environment
         env = Environment(loader=jinja2.DictLoader({'template': template_text}))
 
@@ -86,8 +85,18 @@ class CertificateCreator:
 
         # create PDF as BytesIO Object
         pdf_bytes_io = io.BytesIO()
-        HTML(string=rendered_html).write_pdf(pdf_bytes_io)
+        
+        # Convert HTML to PDF with xhtml2pdf
+        pisa_status = pisa.CreatePDF(
+            io.StringIO(rendered_html), 
+            dest=pdf_bytes_io
+        )
 
+        # Check for errors
+        if pisa_status.err:
+            raise Exception("Error generating PDF")
+
+        # Reset buffer position to the beginning
         pdf_bytes_io.seek(0)
 
         temporary_pdf = pdf_bytes_io
@@ -254,4 +263,3 @@ def create_certificates(hasura_secret, arguments):
     except Exception as e:
         logging.error("Error in creating certificates: %s", str(e))
 
-I
