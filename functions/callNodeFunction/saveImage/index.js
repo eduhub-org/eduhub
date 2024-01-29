@@ -5,7 +5,7 @@ import logger from "../index.js";
 import sharp from "sharp";
 
 const BYTES_PER_MB = 1024 * 1024;
-const DEFAULT_MAX_FILE_SIZE_MB = 20;
+const DEFAULT_MAX_FILE_SIZE_MB = 5;
 const SUPPORTED_FORMATS = ['jpeg', 'png', 'webp', 'gif', 'tiff'];
 
 /**
@@ -69,11 +69,14 @@ export const saveImage = async (req, res) => {
     const storage = buildCloudStorage(Storage);
     const contentBuffer = Buffer.from(req.body.input.base64file, 'base64');
     const templatePath = req.headers["file-path"];
-    const sizes = req.body.input.sizes || []
+    const sizes = JSON.parse(req.headers["sizes"]) || []
     const isPublic = req.headers['is-public'] ?? false;
-    const maxFileSizeInMB = req.body.input.maxFileSize ?? DEFAULT_MAX_FILE_SIZE_MB;
-    logger.debug(`Received saveImage request with isPublic: ${isPublic}, maxFileSize: ${maxFileSizeInMB}`);
-
+    const maxFileSizeInMB = req.headers['max-file-size-mb'] ?? DEFAULT_MAX_FILE_SIZE_MB;
+    logger.debug(`Received saveImage request with the following parameters: 
+            isPublic: ${isPublic}, 
+            maxFileSize: ${maxFileSizeInMB}MB, 
+            templatePath: ${templatePath}, 
+            number of sizes: ${sizes.length}`);
     const fileSizeInMB = contentBuffer.length / BYTES_PER_MB;
     logger.debug(`File size in MB: ${fileSizeInMB}`);
 

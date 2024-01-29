@@ -127,6 +127,14 @@ actions:
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
         - name: bucket
           value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveImage
+        - name: file-path
+          value: course-$[courseid}/public/cover-image/${filename}
+        - name: is-public
+          value: "true"
+        - name: sizes
+          value: '[460, 640, 768, 1024, 1280, 1536]'
     permissions:
       - role: instructor_access
   - name: saveUserProfileImage
@@ -144,6 +152,8 @@ actions:
           value: users/user-${userid}/public/profile_image/${filename}
         - name: is-public
           value: "true"
+        - name: sizes
+          value: '[64, 400]'
     permissions:
       - role: instructor_access
       - role: user_access

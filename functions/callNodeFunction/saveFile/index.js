@@ -23,9 +23,9 @@ const saveFile = async (req, res) => {
     
     const storage = buildCloudStorage(Storage);
     const content = req.body.input.base64file;
-    const templatePath = req.headers["file-path"];
+    const templatePath = req.headers['file-path'];
     const isPublic = req.headers['is-public'] ?? false;
-    const maxFileSizeInMB = req.body.input.maxFileSize ?? DEFAULT_MAX_FILE_SIZE_MB;
+    const maxFileSizeInMB = req.headers['max-file-size-mb'] ?? DEFAULT_MAX_FILE_SIZE_MB;
     logger.debug(`Received saveFile request with isPublic: ${isPublic}, maxFileSize: ${maxFileSizeInMB}`);
 
     const fileSizeInBytes = Buffer.byteLength(content, 'base64');

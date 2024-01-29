@@ -1,8 +1,8 @@
 {
   "run": {
     "command": "nx run edu-hub:apollo",
-    "startTime": "2024-01-20T18:16:36.595Z",
-    "endTime": "2024-01-20T18:16:42.419Z",
+    "startTime": "2024-01-29T15:20:51.502Z",
+    "endTime": "2024-01-29T15:20:57.420Z",
     "inner": false
   },
   "tasks": [
@@ -10,9 +10,9 @@
       "taskId": "edu-hub:apollo",
       "target": "apollo",
       "projectName": "edu-hub",
-      "hash": "803e1de39dbb9e13d86ef5a0505160403e7822a69c088c461226dfd241935ab3",
-      "startTime": "2024-01-20T18:16:36.607Z",
-      "endTime": "2024-01-20T18:16:42.410Z",
+      "hash": "e4f305459722866bfc56e0c9ce23d70fce2b265b0b17fd617ab7a13c5be4b525",
+      "startTime": "2024-01-29T15:20:51.514Z",
+      "endTime": "2024-01-29T15:20:57.420Z",
       "params": "",
       "cacheStatus": "cache-miss",
       "status": 0
