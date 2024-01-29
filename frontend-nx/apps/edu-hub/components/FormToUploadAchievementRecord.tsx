@@ -5,11 +5,7 @@ import { parseFileUploadEvent, UploadFile } from '../helpers/filehandling';
 import { downloadCSVFileFromBase64String, makeFullName } from '../helpers/util';
 import { useAuthedMutation } from '../hooks/authedMutation';
 import { INSERT_AN_ACHIEVEMENT_RECORD, UPDATE_AN_ACHIEVEMENT_RECORD } from '../queries/achievementRecord';
-import {
-  LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE,
-  SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE,
-  SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION,
-} from '../queries/actions';
+import { SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE, SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION } from '../queries/actions';
 import {
   InsertAnAchievementRecord,
   InsertAnAchievementRecordVariables,
@@ -30,11 +26,6 @@ import { AchievementRecordRating_enum, AchievementRecordType_enum } from '../__g
 import { ContentRow } from './common/ContentRow';
 import EhTagStingId from './common/EhTagStingId';
 import { AtLeastNameEmail, MinAchievementOption, NameId } from '../helpers/achievement';
-import { useAuthedQuery } from '../hooks/authedQuery';
-import {
-  LoadAchievementOptionDocumentationTemplate,
-  LoadAchievementOptionDocumentationTemplateVariables,
-} from '../queries/__generated__/LoadAchievementOptionDocumentationTemplate';
 import Trans from 'next-translate/Trans';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress, TextareaAutosize, Link } from '@material-ui/core';
