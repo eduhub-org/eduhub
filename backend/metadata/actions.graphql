@@ -93,8 +93,8 @@ type result {
 }
 
 type saveFileOutput {
+  file_path: String!
   google_link: String!
-  path: String!
 }
 
 type createCertificateOutput {

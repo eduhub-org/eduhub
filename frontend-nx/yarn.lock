@@ -12978,6 +12978,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"loglevel@npm:^1.9.1":
+  version: 1.9.1
+  resolution: "loglevel@npm:1.9.1"
+  checksum: e1c8586108c4d566122e91f8a79c8df728920e3a714875affa5120566761a24077ec8ec9e5fc388b022e39fc411ec6e090cde1b5775871241b045139771eeb06
+  languageName: node
+  linkType: hard
+
 "longest-streak@npm:^3.0.0":
   version: 3.1.0
   resolution: "longest-streak@npm:3.1.0"
@@ -14635,6 +14642,7 @@ __metadata:
     keycloak-js: ^19.0.3
     kleur: ^4.1.5
     lodash: ^4.17.21
+    loglevel: ^1.9.1
     next: 13.3.0
     next-auth: ^4.24.5
     next-translate: ^1.6.0

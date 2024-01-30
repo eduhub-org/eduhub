@@ -100,7 +100,7 @@ export const saveImage = async (req, res) => {
 
     await Promise.all(resizeOperations);
   
-    return res.json({ filePath: originalFilePath, google_link: originalLink });
+    return res.json({ file_path: originalFilePath, google_link: originalLink });
 
   } catch (error) {
     logger.error("Error saving image", { error: error.message, stack: error.stack });

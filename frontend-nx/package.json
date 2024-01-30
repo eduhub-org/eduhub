@@ -29,6 +29,7 @@
     "keycloak-js": "^19.0.3",
     "kleur": "^4.1.5",
     "lodash": "^4.17.21",
+    "loglevel": "^1.9.1",
     "next": "13.3.0",
     "next-auth": "^4.24.5",
     "next-translate": "^1.6.0",

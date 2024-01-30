@@ -4,7 +4,7 @@ import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
 import { Course_Course_by_pk_Sessions as Session } from '../../queries/__generated__/Course';
 import { isLinkFormat } from '../../helpers/util';
-import UserCard from './UserCard';
+import UserCard from '../common/UserCard';
 import { useIsAdmin, useIsInstructor } from '../../hooks/authentication';
 
 interface SessionsProps {

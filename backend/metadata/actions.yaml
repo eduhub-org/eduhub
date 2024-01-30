@@ -57,7 +57,7 @@ actions:
         - name: name
           value: saveFile
         - name: file-path
-          value: programs/program-${programid}/private/attendance-certificate-template/${filename}
+          value: programs/program-${programid}/private/achievement-certificate-template/${filename}
   - name: saveAchievementDocumentationTemplate
     definition:
       kind: synchronous
@@ -117,7 +117,7 @@ actions:
         - name: name
           value: saveFile
         - name: file-path
-          value: program-${programid}/attendance-certificate-template/${filename}
+          value: programs/program-${programid}/private/attendance-certificate-template/${filename}
   - name: saveCourseImage
     definition:
       kind: synchronous
@@ -130,7 +130,7 @@ actions:
         - name: name
           value: saveImage
         - name: file-path
-          value: course-$[courseid}/public/cover-image/${filename}
+          value: courses/course-$[courseid}/public/cover-image/${filename}
         - name: is-public
           value: "true"
         - name: sizes
@@ -147,7 +147,7 @@ actions:
         - name: bucket
           value_from_env: HASURA_BUCKET
         - name: name
-          value: saveFile
+          value: saveImage
         - name: file-path
           value: users/user-${userid}/public/profile_image/${filename}
         - name: is-public

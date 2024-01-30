@@ -4,6 +4,7 @@ import mysteryImg from '../../public/images/common/mystery.svg';
 import { Course_Course_by_pk_CourseInstructors_Expert_User } from '../../queries/__generated__/Course';
 import { isLinkFormat } from '../../helpers/util';
 import useTranslation from 'next-translate/useTranslation';
+import { getPublicUrl } from '../../helpers/filehandling';
 
 interface ImageSizeMap {
   small: number;
@@ -26,6 +27,8 @@ interface UserCardProps {
 
 const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) => {
   const { t } = useTranslation('course');
+
+  const userPictureUrl = getPublicUrl(user?.picture) || mysteryImg;
 
   const getProfileLink = (url: string) => {
     if (url.includes('linkedin.com')) {
@@ -68,7 +71,7 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
     <div className={className}>
       <div className={`flex flex-shrink-0 items-start mr-4 ${fontSize}`}>
         <Image
-          src={user.picture || mysteryImg}
+          src={userPictureUrl}
           alt={`${t('common:image_of')} ${user.firstName}`}
           width={imageSize}
           height={imageSize}

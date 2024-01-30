@@ -16,8 +16,10 @@ const getSignedUrl = async (req, res) => {
   const userUUID = req.body.session_variables['x-hasura-user-id'];
 
   try {
-    // Admin users or users accessing their own folder
-    if (userRole === 'admin' || (userUUID && path.startsWith(userUUID))) {
+    // Admin users or users accessing their own data
+    if (userRole === 'admin' ||
+       (userUUID && path.includes("/user-" + userUUID + "/")) ||
+       (userUUID && path.startsWith("/user-" + userUUID + "/"))) { // included for legacy names
       const link = await storage.loadFromBucket(path, req.headers.bucket);
       logger.info("File loaded successfully", { path, userRole, userUUID, link });
       return res.json({ link });

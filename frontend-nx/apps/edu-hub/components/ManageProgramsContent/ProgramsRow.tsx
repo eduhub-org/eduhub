@@ -42,6 +42,7 @@ import {
 } from '../../queries/__generated__/UpdateProgramParticipationTemplate';
 import EhDebounceInput from '../common/EhDebounceInput';
 import FileUpload from '../common/forms/FileUpload';
+import path from 'path';
 
 interface ProgramsRowProps {
   program: ProgramList_Program;
@@ -203,11 +204,11 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
             programId: program.id,
           },
         });
-        if (res.data?.saveAttendanceCertificateTemplate?.path) {
+        if (res.data?.saveAttendanceCertificateTemplate?.file_path) {
           await updateParticipationTemplate({
             variables: {
               programId: program.id,
-              templatePath: res.data?.saveAttendanceCertificateTemplate?.path,
+              templatePath: res.data?.saveAttendanceCertificateTemplate?.file_path,
             },
           });
 
@@ -261,11 +262,11 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
             },
           });
 
-          if (response.data?.saveAchievementCertificateTemplate?.path) {
+          if (response.data?.saveAchievementCertificateTemplate?.file_path) {
             await updateAchievementCertificationTemplate({
               variables: {
                 programId: program.id,
-                templatePath: response.data?.saveAchievementCertificateTemplate?.path,
+                templatePath: response.data?.saveAchievementCertificateTemplate?.file_path,
               },
             });
 
@@ -280,6 +281,13 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   );
 
   const { t, lang } = useTranslation('managePrograms');
+
+  const achievementCertificateTemplateName = program.achievementCertificateTemplateURL
+    ? path.basename(program.achievementCertificateTemplateURL)
+    : t('course-page:no-template-uploaded-yet');
+  const attendanceCertificateTemplateName = program.attendanceCertificateTemplateURL
+    ? path.basename(program.attendanceCertificateTemplateURL)
+    : t('course-page:no-template-uploaded-yet');
 
   return (
     <div>
@@ -415,9 +423,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
                 <MdUpload size="0.75em" />
               </IconButton>
               <br />
-              <div className="w-80 truncate">
-                {program.attendanceCertificateTemplateURL || t('course-page:no-template-uploaded-yet')}
-              </div>
+              <div className="w-80 truncate">{attendanceCertificateTemplateName}</div>
               <input
                 ref={templateAttendanceUploadRef}
                 onChange={handleAttendanceTemplateUploadEvent}
@@ -431,9 +437,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
                 <MdUpload size="0.75em" />
               </IconButton>
               <br />
-              <div className="w-80 truncate">
-                {program.achievementCertificateTemplateURL || t('course-page:no-template-uploaded-yet')}
-              </div>
+              <div className="w-80 truncate">{achievementCertificateTemplateName}</div>
               <input
                 ref={templateAchievementUploadRef}
                 onChange={handleTemplateAchievementUploadEvent}

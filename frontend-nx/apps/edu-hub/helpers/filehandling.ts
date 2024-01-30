@@ -1,7 +1,11 @@
+import log from 'loglevel';
+
 export const getPublicUrl = (filePath: string) => {
+  log.debug(`getPublicUrl called with filePath: ${filePath}`);
 
   // check if filePath is null
   if (filePath == null) {
+    log.debug('filePath is null, returning null.');
     return null;
   }
   
@@ -9,12 +13,18 @@ export const getPublicUrl = (filePath: string) => {
     filePath.startsWith("https://") || filePath.startsWith("http://");
   const isPublic = filePath.includes("/public/");
 
+  log.debug(`isPublicLegacy: ${isPublicLegacy}, isPublic: ${isPublic}`);
+
   if (isPublicLegacy) {
+    log.debug(`Returning legacy public URL: ${filePath}`);
     return filePath;
   } else if (isPublic) {
     const serverAddress = process.env.NEXT_PUBLIC_STORAGE_BUCKET_URL;
-    return `${serverAddress}/${filePath}`;
+    const publicUrl = `${serverAddress}/${filePath}`;
+    log.debug(`Returning constructed public URL: ${publicUrl}`);
+    return publicUrl;
   } else {
+    log.debug('File is not public, returning null.');
     return null;
   }
 }

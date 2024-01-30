@@ -5,7 +5,6 @@ import { FC, MouseEvent, useCallback, useState } from 'react';
 import { useIsLoggedIn } from '../hooks/authentication';
 import { useUser } from '../hooks/user';
 import eduhubLogo from '../public/images/eduhub-logo.svg';
-import mysteryImg from '../public/images/common/mystery.svg';
 import ocLogo from '../public/images/oc-logo.svg';
 
 import { LoginButton } from './LoginButton';

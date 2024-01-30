@@ -5,7 +5,7 @@ import useTranslation from 'next-translate/useTranslation';
 import { IconButton } from '@material-ui/core';
 import { MdUpload } from 'react-icons/md';
 
-import { parseFileUploadEvent } from '../../helpers/filehandling';
+import { getPublicUrl, parseFileUploadEvent } from '../../helpers/filehandling';
 
 import { Button } from '../common/Button';
 import FormFieldRow from '../common/forms/FormFieldRow';
@@ -27,6 +27,7 @@ import {
 } from '../../queries/__generated__/UpdateUserProfilePicture';
 import { University_enum } from '../../__generated__/globalTypes';
 import { Employment_enum } from '../../__generated__/globalTypes';
+import UserCard from '../common/UserCard';
 
 // generated types must be updated first with new fields in schema
 // import type { User } from "../../queries/__generated__/User";
@@ -160,35 +161,6 @@ const ProfileOverview: FC = () => {
     SAVE_USER_PROFILE_IMAGE
   );
 
-  // const handleUploadUserProfileImageEvent = useCallback(
-  //   async (event: any) => {
-  //     const ufile = await parseFileUploadEvent(event);
-
-  //     if (ufile != null) {
-  //       const result = await saveUserProfileImage({
-  //         variables: {
-  //           base64File: ufile.data,
-  //           fileName: ufile.name,
-  //           userId: sessionData?.profile?.sub,
-  //         },
-  //       });
-  //       const userProfileImage = result.data?.saveUserProfileImage?.google_link;
-  //       if (userProfileImage != null) {
-  //         setValue('picture', userProfileImage);
-  //         handleSubmit(onSubmit);
-  //       }
-  //     }
-  //   },
-  //   [
-  //     sessionData?.profile?.sub,
-  //     saveUserProfileImage,
-  //     updateUser,
-  //     refetchUser,
-  //     handleSubmit,
-  //     onSubmit,
-  //     setValue,
-  //   ]
-  // );
   const handleUploadUserProfileImageEvent = useCallback(
     async (event: any) => {
       const ufile = await parseFileUploadEvent(event);
@@ -206,7 +178,7 @@ const ProfileOverview: FC = () => {
           await updateUserProfilePicture({
             variables: {
               userId: sessionData?.profile?.sub,
-              picture: result.data?.saveUserProfileImage?.google_link,
+              picture: result.data?.saveUserProfileImage?.file_path,
             },
           });
           refetchUser();
@@ -217,19 +189,15 @@ const ProfileOverview: FC = () => {
   );
 
   return (
-    <div className="px-3 mt-6">
+    <div className="px-3 mt-20">
       {!userLoading && !userError ? (
         <>
           <label className="text-xs uppercase tracking-widest font-medium text-gray-400">{t('profile-picture')}</label>
-          <div className="bg-white h-40 justify-center mb-6 w-40">
+          <div className="bg-white h-40 justify-center mb-6 w-80">
             <IconButton onClick={handleImageUploadClick}>
               <MdUpload size="0.75em" />
             </IconButton>
-            {userData.picture != null && (
-              // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-              <img width="100px" height="100px" src={userData.picture} />
-              // <img src={userData.picture} />
-            )}
+            <UserCard className="flex items-center ml-6" key={`userCard`} user={userData?.User_by_pk} />
           </div>
           <input ref={imageUploadRef} onChange={handleUploadUserProfileImageEvent} className="hidden" type="file" />
 

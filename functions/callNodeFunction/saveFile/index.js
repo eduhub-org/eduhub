@@ -45,7 +45,7 @@ const saveFile = async (req, res) => {
     const link = await storage.saveToBucket(filePath, req.headers.bucket, content, isPublic);
     logger.debug(`File saved successfully: ${filePath}, public: ${isPublic}`);
 
-    return res.json({ filePath, google_link: link });
+    return res.json({ file_path: filePath, google_link: link });
 
   } catch (error) {
     logger.error("Error saving file", { error: error.message, stack: error.stack });

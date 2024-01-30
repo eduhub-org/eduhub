@@ -1,6 +1,7 @@
 import createCertificate from "./createCertificate/index.js";
-import loadFile from "./getSignedUrl/index.js";
+import getSignedUrl from "./getSignedUrl/index.js";
 import saveFile from "./saveFile/index.js";
+import saveImage from "./saveImage/index.js";
 import winston from "winston";
 
 /**
@@ -56,6 +57,9 @@ export const callNodeFunction = async (req, res) => {
         break;
       case "saveFile":
         await saveFile(req, res, logger);
+        break;
+      case "saveImage":
+        await saveImage(req, res, logger);
         break;
       default:
         return res.status(404).json({
