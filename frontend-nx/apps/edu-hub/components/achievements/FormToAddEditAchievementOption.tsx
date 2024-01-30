@@ -1,9 +1,9 @@
-import { Checkbox, CircularProgress, FormControlLabel, Link } from '@material-ui/core';
+import { CircularProgress } from '@material-ui/core';
 import { Translate } from 'next-translate';
 import useTranslation from 'next-translate/useTranslation';
-import { FC, ReactNode, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
+import { FC, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
-import { MdAddCircle, MdUploadFile } from 'react-icons/md';
+import { MdAddCircle } from 'react-icons/md';
 import {
   AchievementKeys,
   IDataToManipulate,
@@ -20,21 +20,9 @@ import EhTagStingId from '../common/EhTagStingId';
 import TagWithTwoText from '../common/TagWithTwoText';
 import CourseListDialog from './CourseListDialog';
 import { UploadFile, parseFileUploadEvent } from '../../helpers/filehandling';
-//import _ from 'lodash';
 import { Button } from '../common/Button';
 import { AchievementContext } from './AchievementsHelper';
 import { useAdminQuery } from '../../hooks/authedQuery';
-import {
-  LoadAchievementOptionEvaluationScript,
-  LoadAchievementOptionEvaluationScriptVariables,
-} from '../../queries/__generated__/LoadAchievementOptionEvaluationScript';
-import {
-  LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT,
-} from '../../queries/actions';
-// import {
-//   LoadAchievementOptionDocumentationTemplate,
-//   LoadAchievementOptionDocumentationTemplateVariables,
-// } from '../../queries/__generated__/LoadAchievementOptionDocumentationTemplate';
 import { ACHIEVEMENT_DOCUMENTATION_TEMPLATES } from '../../queries/achievementDocumentationTemplate';
 import { AchievementDocumentationTemplates } from '../../queries/__generated__/AchievementDocumentationTemplates';
 interface IPropsAddEditAchievementTempData {
@@ -57,45 +45,9 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
   const [showCourseListDialog, setShowCourseListDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [scriptGoogleUrl, setScriptGoogleUrl] = useState(null as string);
-  // const [documentTemplateGoogleLink, setDocumentTemplateGoogleLink] = useState(null as string);
-
-  // const loadAchievementOptionDocumentationTemplate = useAdminQuery<
-  //   LoadAchievementOptionDocumentationTemplate,
-  //   LoadAchievementOptionDocumentationTemplateVariables
-  // >(LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE, {
-  //   variables: { path: props.defaultData.documentationTemplateUrl },
-  //   skip: props.defaultData.documentationTemplateUrl?.trim().length === 0,
-  // });
   const loadAchievementDocumentationTemplates = useAdminQuery<AchievementDocumentationTemplates>(
     ACHIEVEMENT_DOCUMENTATION_TEMPLATES
   );
-  const loadAchievementOptionEvaluationScript = useAdminQuery<
-    LoadAchievementOptionEvaluationScript,
-    LoadAchievementOptionEvaluationScriptVariables
-  >(LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT, {
-    variables: { path: props.defaultData.evaluationScriptUrl },
-    skip: props.defaultData.evaluationScriptUrl?.trim().length === 0,
-  });
-  useEffect(() => {
-    // if (
-    //   loadAchievementOptionDocumentationTemplate &&
-    //   loadAchievementOptionDocumentationTemplate.data?.loadAchievementOptionDocumentationTemplate?.link
-    // ) {
-    //   setDocumentTemplateGoogleLink(
-    //     loadAchievementOptionDocumentationTemplate.data.loadAchievementOptionDocumentationTemplate.link
-    //   );
-    // }
-
-    if (
-      loadAchievementOptionEvaluationScript &&
-      loadAchievementOptionEvaluationScript.data?.loadAchievementOptionEvaluationScript?.link
-    ) {
-      setScriptGoogleUrl(loadAchievementOptionEvaluationScript.data.loadAchievementOptionEvaluationScript.link);
-    }
-  }, [
-    // loadAchievementOptionDocumentationTemplate,
-    loadAchievementOptionEvaluationScript,
-  ]);
 
   /* #region callbacks */
   const showAddMentorDialog = useCallback(() => {
@@ -178,22 +130,6 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
     [dispatch]
   );
 
-  /*const handleCheckBox = useCallback((e) => {
-    const { name, checked } = e.target;
-    dispatch({
-      key: name,
-      value: checked,
-    });
-  }, []);*/
-
-  // const handleInputFile = useCallback((controlName: string, file: UploadFile) => {
-  //   console.log(controlName);
-  //   dispatch({
-  //     key: controlName,
-  //     value: file,
-  //   });
-  // }, []);
-
   const handleSubmit = useCallback(
     async (event) => {
       event.preventDefault();
@@ -205,21 +141,6 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
     [context, props, state]
   );
   /* #endregion */
-  /* #region Main UI */
-
-  /* const isEqual = () => {
-    return _.isEqual(state, props.defaultData);
-  };*/
-
-  /**
-   * https://www.geeksforgeeks.org/how-to-create-and-download-csv-file-in-javascript/
-   * https://stackoverflow.com/questions/73342056/convert-base64-string-to-csv-javascript-giving-blob-error
-   */
-  // const clickCSV = useCallback(() => {
-  //   if (state.csvTemplateUrl) {
-  //     downloadCSVFileFromBase64String(state.csvTemplateUrl);
-  //   }
-  // }, [state.csvTemplateUrl]);
 
   const tCommon: Translate = context.t;
   const { t } = useTranslation('course-page');
@@ -316,22 +237,6 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
               <p className="text-stela-500">{`* ${tCommon('form-mandatory-field')}`}</p>
             </div>
             {(state.recordType === 'DOCUMENTATION' || state.recordType === 'ONLINE_COURSE') && (
-              // <CustomFileInput
-              //   title={`${t('achievements-page:uploadDocumentationTemplate')} (.doc, .docx, .pdf, .zip, .xls, .csv)*`}
-              //   name={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
-              //   id={AchievementKeys.DOCUMENT_TEMPLATE_FILE}
-              //   accept=".doc, .docx, .zip, .pdf, .xls, .csv"
-              //   onChangeHandler={handleInputFile}
-              //   customLink={
-              //     documentTemplateGoogleLink ? (
-              //       <Link href={documentTemplateGoogleLink}>
-              //         {t('achievements-page:uploadDocumentationTemplate')}
-              //       </Link>
-              //     ) : (
-              //       ''
-              //     )
-              //   }
-              // />
               <div>
                 {loadAchievementDocumentationTemplates?.data?.AchievementDocumentationTemplate && (
                   <div className="flex flex-col space-y-1">
@@ -359,58 +264,8 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
                 )}
               </div>
             )}
-            {/* {state.recordType === 'DOCUMENTATION_AND_CSV' && (
-              //
-              <CustomFileInput
-                title={`${tCommon('documentation-template-CSV')} (.csv)*`}
-                accept=".csv, .CSV"
-                onChangeHandler={handleInputFile}
-                name={AchievementKeys.CSV_TEMPLATE_FILE}
-                id={AchievementKeys.CSV_TEMPLATE_FILE}
-                customLink={
-                  state.csvTemplateUrl ? (
-                    <Link className="cursor-pointer" onClick={clickCSV}>
-                      {tCommon('download-csv-template-file')}
-                    </Link>
-                  ) : (
-                    ''
-                  )
-                }
-              />
-            )} */}
           </div>
-          <div className="flex flex-col w-full justify-end gap-5">
-            {/* {state.recordType === 'DOCUMENTATION_AND_CSV' && (
-              <div className="flex justify-end">
-                <CustomFileInput
-                  accept=".py"
-                  title={`${tCommon('evaluation-script')} (.py)*`}
-                  onChangeHandler={handleInputFile}
-                  name={AchievementKeys.EVALUATION_SCRIPT_FILE}
-                  id={AchievementKeys.EVALUATION_SCRIPT_FILE}
-                  customLink={
-                    scriptGoogleUrl ? (
-                      <Link href={scriptGoogleUrl}>{tCommon('download-script-file-template')}</Link>
-                    ) : (
-                      ''
-                    )
-                  }
-                />
-              </div>
-            )} */}
-            {/* <FormControlLabel
-              className="justify-end"
-              control={
-                <Checkbox
-                  name={AchievementKeys.SHOW_SCORE_AUTHORS}
-                  onChange={handleCheckBox}
-                  id={AchievementKeys.SHOW_SCORE_AUTHORS}
-                  checked={state.showScoreAuthors}
-                />
-              }
-              label={tCommon('show-authors-column')}
-            /> */}
-          </div>
+          <div className="flex flex-col w-full justify-end gap-5"></div>
         </div>
         <div className="flex justify-center">
           <Button type="submit" id="submit-button" filled disabled={state.recordType === 'DOCUMENTATION_AND_CSV'}>

@@ -1,4 +1,4 @@
-import { FC, useRef, useCallback } from 'react';
+import { FC, useRef, useCallback, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
@@ -28,6 +28,8 @@ import {
 import { University_enum } from '../../__generated__/globalTypes';
 import { Employment_enum } from '../../__generated__/globalTypes';
 import UserCard from '../common/UserCard';
+import log from 'loglevel';
+import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 
 // generated types must be updated first with new fields in schema
 // import type { User } from "../../queries/__generated__/User";
@@ -46,6 +48,10 @@ type Inputs = {
 
 // interface IProps {}
 const ProfileOverview: FC = () => {
+  // State for error handling
+  const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
   const { data: sessionData } = useSession();
 
   const methods = useForm<Inputs>({
@@ -133,7 +139,9 @@ const ProfileOverview: FC = () => {
       refetchUser();
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
-      console.log(error);
+      log.error("Error while updating user's profile", error);
+      setErrorMessage(error.message || "Error while updating user's profile"); // Set the error message
+      setIsErrorDialogOpen(true); // Show the error dialog
     }
   };
   const { t } = useTranslation();
@@ -163,30 +171,40 @@ const ProfileOverview: FC = () => {
 
   const handleUploadUserProfileImageEvent = useCallback(
     async (event: any) => {
-      const ufile = await parseFileUploadEvent(event);
+      try {
+        const ufile = await parseFileUploadEvent(event);
 
-      if (ufile != null) {
-        const result = await saveUserProfileImage({
-          variables: {
-            base64File: ufile.data,
-            fileName: ufile.name,
-            userId: sessionData?.profile?.sub,
-          },
-        });
-        const userProfileImage = result.data?.saveUserProfileImage?.google_link;
-        if (userProfileImage != null) {
-          await updateUserProfilePicture({
+        if (ufile != null) {
+          const result = await saveUserProfileImage({
             variables: {
+              base64File: ufile.data,
+              fileName: ufile.name,
               userId: sessionData?.profile?.sub,
-              picture: result.data?.saveUserProfileImage?.file_path,
             },
           });
-          refetchUser();
+          const userProfileImage = result.data?.saveUserProfileImage?.google_link;
+          if (userProfileImage != null) {
+            await updateUserProfilePicture({
+              variables: {
+                userId: sessionData?.profile?.sub,
+                picture: result.data?.saveUserProfileImage?.file_path,
+              },
+            });
+            refetchUser();
+          }
         }
+      } catch (error) {
+        log.error("Error while updating user's profile picture", error);
+        setErrorMessage(error.message || "Error while updating user's profile picture"); // Set the error message
+        setIsErrorDialogOpen(true); // Show the error dialog
       }
     },
     [sessionData?.profile?.sub, saveUserProfileImage, refetchUser, updateUserProfilePicture]
   );
+
+  const handleCloseErrorDialog = () => {
+    setIsErrorDialogOpen(false); // Close the error dialog
+  };
 
   return (
     <div className="px-3 mt-20">
@@ -276,6 +294,9 @@ const ProfileOverview: FC = () => {
         </>
       ) : (
         <div>Loading</div>
+      )}
+      {isErrorDialogOpen && (
+        <ErrorMessageDialog errorMessage={errorMessage} open={isErrorDialogOpen} onClose={handleCloseErrorDialog} />
       )}
     </div>
   );

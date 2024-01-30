@@ -5,16 +5,9 @@ import { FC, useEffect, useState } from 'react';
 import AchievementOptionDashboard from '../../components/achievements/AchievementOptionDashboard';
 import CommonPageHeader from '../../components/common/CommonPageHeader';
 import { Page } from '../../components/Page';
-import {
-  DefaultAchievementOptions,
-  QUERY_LIMIT,
-} from '../../helpers/achievement';
+import { DefaultAchievementOptions, QUERY_LIMIT } from '../../helpers/achievement';
 import { useAdminQuery } from '../../hooks/authedQuery';
-import {
-  useIsAdmin,
-  useIsInstructor,
-  useIsLoggedIn,
-} from '../../hooks/authentication';
+import { useIsAdmin, useIsInstructor, useIsLoggedIn } from '../../hooks/authentication';
 import { useKeycloakUserProfile, useUserId } from '../../hooks/user';
 import { ACHIEVEMENT_RECORD_TYPES } from '../../queries/achievementOption';
 import { ADMIN_COURSE_LIST } from '../../queries/courseList';
@@ -38,18 +31,15 @@ const Achievements: FC = () => {
   const profile = useKeycloakUserProfile();
   const courseID: number = parseInt(router.query.courseId as string, 10); // {"courseId": 0}
 
-  const query = useAdminQuery<AdminCourseList, AdminCourseListVariables>(
-    ADMIN_COURSE_LIST,
-    {
-      variables: {
-        limit: QUERY_LIMIT,
-        where: {
-          id: { _eq: courseID },
-        },
+  const query = useAdminQuery<AdminCourseList, AdminCourseListVariables>(ADMIN_COURSE_LIST, {
+    variables: {
+      limit: QUERY_LIMIT,
+      where: {
+        id: { _eq: courseID },
       },
-      skip: courseID <= 0,
-    }
-  );
+    },
+    skip: courseID <= 0,
+  });
 
   useEffect(() => {
     const c = [...(query.data?.Course || [])];
@@ -58,40 +48,32 @@ const Achievements: FC = () => {
     }
   }, [query.data?.Course]);
 
-  const achievementRecordTypesAPI = useAdminQuery<AchievementRecordTypes>(
-    ACHIEVEMENT_RECORD_TYPES
-  );
+  const achievementRecordTypesAPI = useAdminQuery<AchievementRecordTypes>(ACHIEVEMENT_RECORD_TYPES);
 
   useEffect(() => {
     const rTypes: string[] =
-      achievementRecordTypesAPI?.data?.AchievementRecordType.map(
-        (v) => v.value
-      ) || DefaultAchievementOptions;
+      achievementRecordTypesAPI?.data?.AchievementRecordType.map((v) => v.value) || DefaultAchievementOptions;
     setRecordTypes(rTypes);
   }, [achievementRecordTypesAPI?.data?.AchievementRecordType]);
 
-  const header = isAdmin
-    ? t('achievement-record-admin')
-    : t('achievement-record');
+  const header = isAdmin ? t('achievement-record-admin') : t('achievement-record');
   return (
     <>
-      <div className="max-w-screen-xl mx-auto mt-14">
+      <div className="max-w-screen-xl mx-auto">
         <Head>
           <title>{t('title')}</title>
         </Head>
         <Page>
           <div className="min-h-[77vh]">
             <CommonPageHeader headline={header} />
-            {isLoggedIn &&
-              (isAdmin || isInstructor) &&
-              recordTypes.length > 0 && (
-                <AchievementOptionDashboard
-                  achievementRecordTypes={recordTypes}
-                  userId={userId}
-                  userProfile={profile}
-                  course={course}
-                />
-              )}
+            {isLoggedIn && (isAdmin || isInstructor) && recordTypes.length > 0 && (
+              <AchievementOptionDashboard
+                achievementRecordTypes={recordTypes}
+                userId={userId}
+                userProfile={profile}
+                course={course}
+              />
+            )}
           </div>
         </Page>
       </div>

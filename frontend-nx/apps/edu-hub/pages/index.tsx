@@ -20,13 +20,6 @@ import { COURSE_LIST_WITH_INSTRUCTOR } from '../queries/courseListWithInstructor
 
 import { ClientOnly } from '@opencampus/shared-components';
 
-import log from 'loglevel';
-if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'production') {
-  log.setLevel('warn'); // Show only warnings and errors in production.
-} else {
-  log.setLevel('debug'); // Show all log levels in development.
-}
-
 const Home: FC = () => {
   const { t } = useTranslation('start-page');
   const isLoggedIn = useIsLoggedIn();

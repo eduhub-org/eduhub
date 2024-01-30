@@ -10,10 +10,10 @@ import ocLogo from '../public/images/oc-logo.svg';
 import { LoginButton } from './LoginButton';
 import { Menu } from './Menu';
 import { RegisterButton } from './RegisterButton';
-import { Avatar, ClientOnly } from '@opencampus/shared-components';
+import { ClientOnly } from '@opencampus/shared-components';
 import { OnlyDesktop } from '@opencampus/shared-components';
-import { getPublicUrl } from '../helpers/filehandling';
 import useTranslation from 'next-translate/useTranslation';
+import UserCard from './common/UserCard';
 
 export const Header: FC = () => {
   const isLoggedIn = useIsLoggedIn();
@@ -45,8 +45,6 @@ export const Header: FC = () => {
 
     window.location.href = newUrl;
   };
-
-  const userPictureUrl = getPublicUrl(user?.picture);
 
   return (
     <header className="w-full absolute top-0 left-0 bg-edu-bg-gray bg-opacity-50">
@@ -81,7 +79,7 @@ export const Header: FC = () => {
               <div className="flex">
                 <div className="flex">
                   <div className="cursor-pointer" onClick={openMenu}>
-                    <Avatar imageUrl={userPictureUrl} />
+                    <UserCard className="flex items-center" key={`avatar`} user={user} size={`small`} />
                   </div>
                   {menuAnchorElement ? (
                     <Menu isVisible={isMenuVisible} setVisible={setMenuVisible} anchorElement={menuAnchorElement} />

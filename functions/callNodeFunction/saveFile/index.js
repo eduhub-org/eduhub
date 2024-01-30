@@ -18,7 +18,7 @@ const saveFile = async (req, res) => {
   try{
     // Validate required fields
     if (!req.body.input.base64file || !req.headers['file-path'] || !req.headers.bucket) {
-      return res.status(400).json({ error: "Missing required fields" });
+      return res.status(400).json({ message: "Missing required fields" });
     }
     
     const storage = buildCloudStorage(Storage);
@@ -35,7 +35,7 @@ const saveFile = async (req, res) => {
     if (fileSizeInMB > maxFileSizeInMB) {
       logger.error("File size exceeds maximum size", { fileSize: content.length, maxFileSize });
       return res.status(400).json({
-        error: "File size exceeds maximum size",
+        message: "File size exceeds maximum size",
       });
     }
     
@@ -49,7 +49,7 @@ const saveFile = async (req, res) => {
 
   } catch (error) {
     logger.error("Error saving file", { error: error.message, stack: error.stack });
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

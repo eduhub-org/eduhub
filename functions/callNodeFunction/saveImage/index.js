@@ -3,10 +3,11 @@ import { buildCloudStorage } from "../lib/cloud-storage.js";
 import { replacePlaceholders } from "../lib/utils.js";
 import logger from "../index.js";
 import sharp from "sharp";
+import path from "path";
 
 const BYTES_PER_MB = 1024 * 1024;
 const DEFAULT_MAX_FILE_SIZE_MB = 5;
-const SUPPORTED_FORMATS = ['jpeg', 'png', 'webp', 'gif', 'tiff'];
+const SUPPORTED_FORMATS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'tiff'];
 
 /**
  * Resizes an image to a specified width and converts it to WebP format.
@@ -41,12 +42,12 @@ function generateResizedFilename(originalFilePath, size) {
  * @param {string} base64Image - The base64 encoded string of the image.
  * @returns {string|null} The extracted image format, or null if not found.
  */
-function extractFormatFromBase64(base64Image) {
-    const matches = base64Image.match(/^data:image\/([a-zA-Z]+);base64,/);
-    return matches && matches[1];
-}
-
-/**
+function extractFormatFromFileName(filename) {
+  let extension = path.extname(filename);
+  extension = extension.startsWith('.') ? extension.substring(1) : extension;
+  logger.debug(`File extension: ${extension}`);
+  return extension;
+}/**
  * Handles the HTTP request to save an image. Validates the request, saves the original image,
  * resizes the image to specified sizes, and saves the resized images.
  * 
@@ -58,12 +59,14 @@ export const saveImage = async (req, res) => {
   try {
     // Validate required fields
     if (!req.body.input.base64file || !req.headers['file-path'] || !req.headers.bucket) {
-      return res.status(400).json({ error: "Missing required fields" });
+      logger.error("Missing required fields", { body: req.body, headers: req.headers });
+      return res.status(400).json({ message: "Missing required fields" });
     }
     // Validate image format
-    const format = extractFormatFromBase64(req.body.input.base64file);
+    const format = extractFormatFromFileName(req.body.input.filename);
     if (!format || !SUPPORTED_FORMATS.includes(format.toLowerCase())) {
-      return res.status(400).json({ error: "Unsupported image format" });
+      logger.error("Unsupported image format", { format });
+      return res.status(400).json({ message: "Unsupported image format" });
     }
 
     const storage = buildCloudStorage(Storage);
@@ -82,7 +85,7 @@ export const saveImage = async (req, res) => {
 
     if (fileSizeInMB > maxFileSizeInMB) {
         logger.error("File size exceeds maximum size", { fileSize: content.length, maxFileSize });
-        return res.status(400).json({ error: "File size exceeds maximum size" });
+        return res.status(400).json({ message: "File size exceeds maximum size" });
     }
 
     const originalFilePath = replacePlaceholders(templatePath, req.body.input);
@@ -104,7 +107,7 @@ export const saveImage = async (req, res) => {
 
   } catch (error) {
     logger.error("Error saving image", { error: error.message, stack: error.stack });
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

@@ -5,6 +5,7 @@ import { Course_Course_by_pk_CourseInstructors_Expert_User } from '../../queries
 import { isLinkFormat } from '../../helpers/util';
 import useTranslation from 'next-translate/useTranslation';
 import { getPublicUrl } from '../../helpers/filehandling';
+import log from 'loglevel';
 
 interface ImageSizeMap {
   small: number;
@@ -53,7 +54,7 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
   };
 
   const imageSizeMap: ImageSizeMap = {
-    small: 50,
+    small: 40,
     medium: 75,
     large: 100,
   };
@@ -66,28 +67,32 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
 
   const imageSize = imageSizeMap[size];
   const fontSize = fontSizeMap[size];
+  // do not show name if selected size is small
+  const showName = size !== 'small';
 
   return (
     <div className={className}>
       <div className={`flex flex-shrink-0 items-start mr-4 ${fontSize}`}>
         <Image
           src={userPictureUrl}
-          alt={`${t('common:image_of')} ${user.firstName}`}
+          alt={`${t('common:image_of')} ${user?.firstName}`}
           width={imageSize}
           height={imageSize}
           className="rounded-full object-cover"
-          style={{ width: `${imageSize}px`, height: `${imageSize}px` }} // enforce image size
+          style={{ width: `${imageSize}px`, height: `${imageSize}px` }}
         />
       </div>
-      <div className={`flex flex-col ${fontSize}`}>
-        <span className="mb-1">
-          {user.firstName} {user.lastName}
-        </span>
-        {role && <span className="text-gray-500">{role}</span>}
-        {isLinkFormat(user.externalProfile) && (
-          <span className="text-gray-500">{getProfileLink(user.externalProfile)}</span>
-        )}
-      </div>
+      {showName && (
+        <div className={`flex flex-col ${fontSize}`}>
+          <span className="mb-1">
+            {user?.firstName} {user?.lastName}
+          </span>
+          {role && <span className="text-gray-500">{role}</span>}
+          {isLinkFormat(user?.externalProfile) && (
+            <span className="text-gray-500">{getProfileLink(user.externalProfile)}</span>
+          )}
+        </div>
+      )}
     </div>
   );
 };
