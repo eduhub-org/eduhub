@@ -1,10 +1,10 @@
 import log from 'loglevel';
 
-export const getPublicUrl = (filePath: string) => {
+export const getPublicUrl = (filePath: string): string | null  => {
   log.debug(`getPublicUrl called with filePath: ${filePath}`);
 
   // check if filePath is null
-  if (filePath == null) {
+  if (!filePath) {
     log.debug('filePath is null, returning null.');
     return null;
   }
@@ -27,6 +27,25 @@ export const getPublicUrl = (filePath: string) => {
     log.debug('File is not public, returning null.');
     return null;
   }
+}
+
+export const getPublicImageUrl = (filePath: string, size: number): string | null  => {
+  log.debug(`getPublicImageUrl called with filePath: ${filePath} and size: ${size}`);
+
+  // Check if filePath is null
+  if (!filePath) {
+    log.debug('filePath is null, returning null.');
+    return null;
+  }
+
+  // Modify the original image path to point to the resized image path
+  const resizedFilePath = filePath.replace(/\.[^.]+$/, `-${size}.webp`); // Change extension to .webp
+  log.debug(`Resized file path: ${resizedFilePath}`);
+
+  // Use getPublicUrl to construct the full URL for the resized image
+  const publicUrl = getPublicUrl(resizedFilePath);
+  log.debug(`Public URL for resized image: ${publicUrl}`);
+  return publicUrl;
 }
 
 export const bytesToBase64 = (bytes: Uint8Array) => {

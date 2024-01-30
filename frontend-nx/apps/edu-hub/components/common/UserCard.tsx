@@ -4,7 +4,7 @@ import mysteryImg from '../../public/images/common/mystery.svg';
 import { Course_Course_by_pk_CourseInstructors_Expert_User } from '../../queries/__generated__/Course';
 import { isLinkFormat } from '../../helpers/util';
 import useTranslation from 'next-translate/useTranslation';
-import { getPublicUrl } from '../../helpers/filehandling';
+import { getPublicImageUrl } from '../../helpers/filehandling';
 import log from 'loglevel';
 
 interface ImageSizeMap {
@@ -29,7 +29,31 @@ interface UserCardProps {
 const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) => {
   const { t } = useTranslation('course');
 
-  const userPictureUrl = getPublicUrl(user?.picture) || mysteryImg;
+  const imageSizeMap: ImageSizeMap = {
+    small: 40,
+    medium: 75,
+    large: 100,
+  };
+
+  const imageSolutionMap: ImageSizeMap = {
+    small: 64,
+    medium: 400,
+    large: 400,
+  };
+
+  const fontSizeMap: FontSizeMap = {
+    small: 'text-sm',
+    medium: 'text-base',
+    large: 'text-lg',
+  };
+
+  const imageSize = imageSizeMap[size];
+  const imageSolution = imageSolutionMap[size];
+  const fontSize = fontSizeMap[size];
+  // do not show name if selected size is small
+  const showName = size !== 'small';
+
+  const userPictureUrl = getPublicImageUrl(user?.picture, imageSolution) || mysteryImg;
 
   const getProfileLink = (url: string) => {
     if (url.includes('linkedin.com')) {
@@ -52,23 +76,6 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
       );
     }
   };
-
-  const imageSizeMap: ImageSizeMap = {
-    small: 40,
-    medium: 75,
-    large: 100,
-  };
-
-  const fontSizeMap: FontSizeMap = {
-    small: 'text-sm',
-    medium: 'text-base',
-    large: 'text-lg',
-  };
-
-  const imageSize = imageSizeMap[size];
-  const fontSize = fontSizeMap[size];
-  // do not show name if selected size is small
-  const showName = size !== 'small';
 
   return (
     <div className={className}>
