@@ -7,7 +7,7 @@ import { FC } from 'react';
 import { Page } from '../../../components/Page';
 import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';
 
-import ManageUsersContent from '../../../components/ManageUsersContentOld';
+import ManageUsersContent from '../../../components/ManageUsersContent';
 
 const ManageUsers: FC = () => {
   const isAdmin = useIsAdmin();

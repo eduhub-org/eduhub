@@ -4,6 +4,7 @@ import { TextField } from '@material-ui/core';
 import useTranslation from 'next-translate/useTranslation';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import { MdArrowBack, MdArrowForward } from 'react-icons/md';
 import {
   ColumnDef,
   flexRender,
@@ -29,6 +30,7 @@ interface TableGridProps<T extends BaseRow> {
   deleteMutation?: DocumentNode;
   enablePagination?: boolean;
   pageIndex?: number;
+  pages?: number;
   refetchQueries: string[];
   setPageIndex?: (number) => void;
   showCheckbox?: boolean;
@@ -43,6 +45,7 @@ const TableGrid = <T extends BaseRow>({
   deleteMutation,
   enablePagination = false,
   pageIndex = 0,
+  pages,
   refetchQueries,
   setPageIndex,
   showCheckbox,
@@ -54,6 +57,9 @@ const TableGrid = <T extends BaseRow>({
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
+
+  const handlePrevious = () => setPageIndex(Math.max(0, pageIndex - 1));
+  const handleNext = () => setPageIndex(pageIndex + 1);
 
   // Global filter function
   const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
@@ -206,22 +212,24 @@ const TableGrid = <T extends BaseRow>({
       ))}
 
       {enablePagination && (
-        <div className="flex justify-between items-center mt-4">
-          <Button onClick={() => setPageIndex((old) => Math.max(old - 1, 0))} disabled={pageIndex === 0}>
-            Previous Page
-          </Button>
-          <span>
-            Page{' '}
-            <strong>
-              {pageIndex + 1} of {table.getPageCount()}
-            </strong>
-          </span>
-          <Button
-            onClick={() => setPageIndex((old) => (old < table.getPageCount() - 1 ? old + 1 : old))}
-            disabled={pageIndex >= table.getPageCount() - 1}
-          >
-            Next Page
-          </Button>
+        <div className="flex justify-end pb-10 text-white">
+          <div className="flex flex-row space-x-5">
+            {pageIndex > 0 && (
+              <MdArrowBack
+                className="border-2 rounded-full cursor-pointer hover:bg-indigo-100"
+                size={40}
+                onClick={handlePrevious}
+              />
+            )}
+            <p className="font-medium">{t('paginationText', { currentPage: pageIndex + 1, totalPage: pages })}</p>
+            {pageIndex < pages - 1 && (
+              <MdArrowForward
+                className="border-2 rounded-full cursor-pointer hover:bg-indigo-100"
+                size={40}
+                onClick={handleNext}
+              />
+            )}
+          </div>
         </div>
       )}
     </div>
