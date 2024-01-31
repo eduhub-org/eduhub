@@ -2,7 +2,7 @@ import useTranslation from 'next-translate/useTranslation';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { FC, useEffect, useState } from 'react';
-import AchievementOptionDashboard from '../../components/achievements2/AchievementOptionDashboard';
+import AchievementOptionDashboard from '../../components/achievements/AchievementOptionDashboard';
 import CommonPageHeader from '../../components/common/CommonPageHeader';
 import { Page } from '../../components/Page';
 import { DefaultAchievementOptions, QUERY_LIMIT } from '../../helpers/achievement';
