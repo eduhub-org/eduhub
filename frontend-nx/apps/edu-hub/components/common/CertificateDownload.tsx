@@ -4,11 +4,11 @@ import { Dispatch, SetStateAction } from 'react';
 
 import { useRoleQuery } from '../../hooks/authedQuery';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../queries/__generated__/CourseWithEnrollment';
-import { LOAD_FILE } from '../../queries/actions';
-import { LoadFile, LoadFileVariables } from '../../queries/__generated__/LoadFile';
+import { GET_SIGNED_URL } from '../../queries/actions';
+import { GetSignedUrl, GetSignedUrlVariables } from '../../queries/__generated__/GetSignedUrl';
 import { Button } from './Button';
 import { ExtendedDegreeParticipantsEnrollment } from '../ManageCourseContent/DegreeParticipationsTab';
-import { ErrorMessageDialogComponent } from '../../components/common/dialogs/ErrorMessageDialog';
+import { ErrorMessageDialog } from '../../components/common/dialogs/ErrorMessageDialog';
 
 interface IProps {
   courseEnrollment: CourseWithEnrollment_Course_by_pk_CourseEnrollments | ExtendedDegreeParticipantsEnrollment;
@@ -38,7 +38,7 @@ export const CertificateDownload: FC<IProps> = ({
     data: loadAchievementCertificateData,
     loading: loadAchievementCerfificateLoading,
     error: achievementCertificateError,
-  } = useRoleQuery<LoadFile, LoadFileVariables>(LOAD_FILE, {
+  } = useRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL, {
     variables: {
       path: courseEnrollment?.achievementCertificateURL,
     },
@@ -50,7 +50,7 @@ export const CertificateDownload: FC<IProps> = ({
     data: loadAttendanceCertificateData,
     loading: loadAttendanceCertificateLoading,
     error: attendanceCertificateError,
-  } = useRoleQuery<LoadFile, LoadFileVariables>(LOAD_FILE, {
+  } = useRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL, {
     variables: {
       path: courseEnrollment?.attendanceCertificateURL,
     },
@@ -67,7 +67,7 @@ export const CertificateDownload: FC<IProps> = ({
             <Button
               as="a"
               filled
-              href={loadAchievementCertificateData.loadFile.link}
+              href={loadAchievementCertificateData.getSignedUrl.link}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -81,7 +81,7 @@ export const CertificateDownload: FC<IProps> = ({
           <Button
             as="a"
             filled
-            href={loadAttendanceCertificateData.loadFile.link}
+            href={loadAttendanceCertificateData.getSignedUrl.link}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -92,11 +92,7 @@ export const CertificateDownload: FC<IProps> = ({
         )}
         {/* Error Message Dialog */}
         {errorMessage && (
-          <ErrorMessageDialogComponent
-            errorMessage={errorMessage}
-            open={!!errorMessage}
-            onClose={() => setErrorMessage('')}
-          />
+          <ErrorMessageDialog errorMessage={errorMessage} open={!!errorMessage} onClose={() => setErrorMessage('')} />
         )}
       </div>
     </div>

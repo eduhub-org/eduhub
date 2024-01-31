@@ -14,7 +14,7 @@ import { QUERY_LIMIT } from '../../../pages/manage/courses';
 import { UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../queries/achievementRecord';
 import { INSERT_SINGLE_ATTENDANCE } from '../../../queries/courseEnrollment';
 import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../../queries/mutateAchievement';
-import { LOAD_FILE } from '../../../queries/actions';
+import { GET_SIGNED_URL } from '../../../queries/actions';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
@@ -31,7 +31,7 @@ import {
   InsertSingleAttendance,
   InsertSingleAttendanceVariables,
 } from '../../../queries/__generated__/InsertSingleAttendance';
-import { LoadFile, LoadFileVariables } from '../../../queries/__generated__/LoadFile';
+import { GetSignedUrl, GetSignedUrlVariables } from '../../../queries/__generated__/GetSignedUrl';
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords,
@@ -319,9 +319,9 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
   const [documentationUrlLoaded, setDocumentationUrlLoaded] = useState(false);
 
   const [getAchievementRecordDocumentation, getAchievementRecordDocumentationResult] = useLazyRoleQuery<
-    LoadFile,
-    LoadFileVariables
-  >(LOAD_FILE);
+    GetSignedUrl,
+    GetSignedUrlVariables
+  >(GET_SIGNED_URL);
 
   const attendanceRecordBySession: Record<number, { id: number; status: AttendanceStatus_enum }> =
     enrollment.User.Attendances.reduce<Record<number, { id: number; status: AttendanceStatus_enum }>>(
@@ -502,7 +502,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
 /* #endregion */
 interface IPropsShowDetails {
   enrollment: ExtendedEnrollment;
-  achievementRecordDocumentationResult: LazyQueryResult<LoadFile, LoadFileVariables>;
+  achievementRecordDocumentationResult: LazyQueryResult<GetSignedUrl, GetSignedUrlVariables>;
   qResult: QueryResult<any, any>;
 }
 const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocumentationResult, qResult }) => {
@@ -563,7 +563,7 @@ const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocum
                   href={
                     achievementRecordDocumentationResult.loading
                       ? '#'
-                      : achievementRecordDocumentationResult?.data?.loadFile?.link
+                      : achievementRecordDocumentationResult?.data?.getSignedUrl?.link
                   }
                 >
                   {achievementRecordDocumentationResult.loading ? <CircularProgress /> : 'Download Documentation'}

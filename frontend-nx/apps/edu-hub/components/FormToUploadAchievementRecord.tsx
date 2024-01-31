@@ -226,12 +226,12 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
               fileName: state.coverImageUrl.name,
             },
           });
-          if (saveResult.data?.saveAchievementRecordCoverImage?.path) {
+          if (saveResult.data?.saveAchievementRecordCoverImage?.file_path) {
             await updateAnAchievementRecordAPI({
               variables: {
                 id: achievementRecordId,
                 setInput: {
-                  coverImageUrl: saveResult.data.saveAchievementRecordCoverImage.path,
+                  coverImageUrl: saveResult.data.saveAchievementRecordCoverImage.file_path,
                 },
               },
             });
@@ -245,14 +245,14 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
             fileName: state.documentationUrl.name,
           },
         });
-        if (!uploadResult.data?.saveAchievementRecordDocumentation?.path) {
+        if (!uploadResult.data?.saveAchievementRecordDocumentation?.file_path) {
           return;
         }
         await updateAnAchievementRecordAPI({
           variables: {
             id: achievementRecordId,
             setInput: {
-              documentationUrl: uploadResult.data.saveAchievementRecordDocumentation.path,
+              documentationUrl: uploadResult.data.saveAchievementRecordDocumentation.file_path,
             },
           },
         });

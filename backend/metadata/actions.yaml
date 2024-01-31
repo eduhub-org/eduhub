@@ -101,7 +101,7 @@ actions:
           value_from_env: HASURA_BUCKET
         - name: name
           value: saveFile
-        - name: path
+        - name: file-path
           value: achievement-records/record-${achievementRecordId}/private/documentation/${filename}
     permissions:
       - role: user_access
