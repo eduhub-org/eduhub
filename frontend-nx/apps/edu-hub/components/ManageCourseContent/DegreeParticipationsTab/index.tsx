@@ -8,7 +8,6 @@ import {
   DegreeParticipantsWithDegreeEnrollments,
   DegreeParticipantsWithDegreeEnrollmentsVariables,
   DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments,
-  DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments_User_CourseEnrollments,
 } from '../../../queries/__generated__/DegreeParticipantsWithDegreeEnrollments';
 import { DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS } from '../../../queries/courseDegree';
 import { CertificateDownload } from '../../common/CertificateDownload';

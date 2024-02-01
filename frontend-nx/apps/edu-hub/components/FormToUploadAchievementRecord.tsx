@@ -268,8 +268,6 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
           },
         });
         onSuccess();
-      } catch (err) {
-        throw err;
       } finally {
         setLoading(false);
       }
