@@ -5,7 +5,6 @@ import { Course_Course_by_pk_CourseInstructors_Expert_User } from '../../queries
 import { isLinkFormat } from '../../helpers/util';
 import useTranslation from 'next-translate/useTranslation';
 import { getPublicImageUrl } from '../../helpers/filehandling';
-import log from 'loglevel';
 
 interface ImageSizeMap {
   small: number;

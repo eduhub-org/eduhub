@@ -11,13 +11,13 @@ export const useSignedUrl = (filePath) => {
   const [error, setError] = useState(null);
 
   // If the file is public, directly return the public URL
-  const pucblicUrl = getPublicUrl(filePath)
-  if (pucblicUrl) {
-    return { getSignedUrl: () => pucblicUrl, loading: false, error: null };
-  }
+  const publicUrl = getPublicUrl(filePath)
 
   const getSignedUrl = useCallback(async () => {
-    try {
+    if (publicUrl) {
+      return { getSignedUrl: () => publicUrl, loading: false, error: null };
+    }
+      try {
         await getFileSignedUrl();
         if (data?.getSignedUrl?.link) {
           console.log(`Returning signed file URL: ${data.getSignedUrl.link}`); // Debugging log
@@ -30,7 +30,7 @@ export const useSignedUrl = (filePath) => {
       setError(err);
       return null;
     }
-  }, [filePath, getFileSignedUrl, data]);
+  }, [getFileSignedUrl, data]);
 
   return { getSignedUrl, loading, error };
 };

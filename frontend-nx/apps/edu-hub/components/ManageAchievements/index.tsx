@@ -5,11 +5,7 @@ import { IUserProfile } from '../../hooks/user';
 import { AdminCourseList_Course } from '../../queries/__generated__/AdminCourseList';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useContext, useEffect, useState } from 'react';
-import {
-  MdDelete,
-  MdKeyboardArrowDown,
-  MdKeyboardArrowUp,
-} from 'react-icons/md';
+import { MdDelete, MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
 import { makeFullName } from '../../helpers/util';
 import { useAdminQuery } from '../../hooks/authedQuery';
 import { ACHIEVEMENT_OPTIONS } from '../../queries/achievementOption';
@@ -19,24 +15,18 @@ import {
   AchievementOptionListVariables,
   AchievementOptionList_AchievementOption,
 } from '../../queries/__generated__/AchievementOptionList';
-import {
-  Programs,
-  Programs_Program,
-} from '../../queries/__generated__/Programs';
+import { Programs, Programs_Program } from '../../queries/__generated__/Programs';
 import { StaticComponentProperty } from '../../types/UIComponents';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import EhAddButton from '../common/EhAddButton';
 import EhTag from '../common/EhTag';
 import TagWithTwoText from '../common/TagWithTwoText';
 import { ProgramsMenubar } from '../ProgramsMenubar';
-import AchievementsHelper, {
-  AchievementContext,
-  IPropsDashBoard,
-} from './AchievementsHelper';
+import AchievementsHelper, { AchievementContext, IPropsDashBoard } from './AchievementsHelper';
 import AddAchievementOption from './AddAchievementOption';
 import EditAchievementOption from './EditAchievementOption';
 
-const AchievementOptionDashboard: FC<{
+const ManageAchievements: FC<{
   userId: string | undefined;
   userProfile: IUserProfile | undefined;
   achievementRecordTypes: string[];
@@ -45,28 +35,26 @@ const AchievementOptionDashboard: FC<{
   const defaultProgram = -1; // All tab
   const [currentProgramId, setCurrentProgramId] = useState(defaultProgram);
   const [alertMessage, setAlertMessage] = useState('');
-  const [achievements, setAchievements] = useState(
-    [] as AchievementOptionList_AchievementOption[]
-  );
-  const achievementsRequest = useAdminQuery<
-    AchievementOptionList,
-    AchievementOptionListVariables
-  >(ACHIEVEMENT_OPTIONS, {
-    variables: {
-      where:
-        currentProgramId > -1
-          ? {
-              AchievementOptionCourses: {
-                Course: {
-                  Program: {
-                    id: { _eq: currentProgramId },
+  const [achievements, setAchievements] = useState([] as AchievementOptionList_AchievementOption[]);
+  const achievementsRequest = useAdminQuery<AchievementOptionList, AchievementOptionListVariables>(
+    ACHIEVEMENT_OPTIONS,
+    {
+      variables: {
+        where:
+          currentProgramId > -1
+            ? {
+                AchievementOptionCourses: {
+                  Course: {
+                    Program: {
+                      id: { _eq: currentProgramId },
+                    },
                   },
                 },
-              },
-            }
-          : {},
-    },
-  });
+              }
+            : {},
+      },
+    }
+  );
 
   const refetch = useCallback(() => {
     achievementsRequest.refetch();
@@ -89,7 +77,7 @@ const AchievementOptionDashboard: FC<{
     userId: props.userId,
     setAlertMessage,
   };
- 
+
   const closeAlertDialog = useCallback(() => {
     setAlertMessage('');
   }, [setAlertMessage]);
@@ -108,7 +96,7 @@ const AchievementOptionDashboard: FC<{
   );
 };
 
-export default AchievementOptionDashboard;
+export default ManageAchievements;
 
 // Start Content
 
@@ -137,9 +125,7 @@ const DashboardContent: FC<IPropsContent> = ({ options }) => {
     [context, setShowNewAchievementView]
   );
 
-  const programsRequest = useAdminQuery<Programs>(
-    PROGRAMS_WITH_MINIMUM_PROPERTIES
-  );
+  const programsRequest = useAdminQuery<Programs>(PROGRAMS_WITH_MINIMUM_PROPERTIES);
 
   if (programsRequest.error) {
     console.log(programsRequest.error);
@@ -169,27 +155,19 @@ const DashboardContent: FC<IPropsContent> = ({ options }) => {
         )}
       </div>
       <div className="flex flex-col space-y-1">
-
         <div className="flex justify-start mt-8  text-white">
-          <Button
-            onClick={addNewAchievement}
-            startIcon={<MdAddCircle />}
-            color="inherit"
-          >
+          <Button onClick={addNewAchievement} startIcon={<MdAddCircle />} color="inherit">
             {t('common:project-new-button')}
           </Button>
         </div>
-          
-          
+
         <div className="grid grid-cols-3 gap-5 pl-5">
           <p>{t('tableHeaderTitle')}</p>
           <p>{t('tableHeaderInstructor')}</p>
           <p>{t('coursesHeadline') + ' & ' + t('tableHeaderProgram')}</p>
         </div>
         {(options.length === 0 || showNewAchievementView) && (
-          <div className="flex bg-edu-light-gray">
-            {<AddAchievementOption onSuccess={onSuccessAddEdit} />}
-          </div>
+          <div className="flex bg-edu-light-gray">{<AddAchievementOption onSuccess={onSuccessAddEdit} />}</div>
         )}
         <div className="flex flex-col space-y-1">
           {options.map((ac: AchievementOptionList_AchievementOption, index) => (
@@ -199,10 +177,7 @@ const DashboardContent: FC<IPropsContent> = ({ options }) => {
 
         {context.achievementRecordTypes.length > 0 && (
           <div className="flex justify-end">
-            <EhAddButton
-              buttonClickCallBack={addNewAchievement}
-              text={context.t('add-new')}
-            />
+            <EhAddButton buttonClickCallBack={addNewAchievement} text={context.t('add-new')} />
           </div>
         )}
       </div>
@@ -239,9 +214,7 @@ const AchievementRow: FC<IPropsForARow> = (props) => {
   return (
     <>
       <div className="grid grid-cols-3 gap-5 pl-5 bg-edu-row-color py-2 items-center">
-        <p className="text-ellipsis text-gray-400 font-medium grid grid-cols-1">
-          {props.item.title}
-        </p>
+        <p className="text-ellipsis text-gray-400 font-medium grid grid-cols-1">{props.item.title}</p>
         {/* Authors */}
         <div className="flex items-center flex-wrap gap-2">
           {props.item.AchievementOptionMentors.map((men, index) => (
@@ -256,14 +229,8 @@ const AchievementRow: FC<IPropsForARow> = (props) => {
           ))}
         </div>
         {/* Programs and buttons */}
-        <div
-          id="course-programs-buttons"
-          className="flex justify-between gap-5"
-        >
-          <div
-            id="course-programs"
-            className="flex flex-wrap items-center gap-2"
-          >
+        <div id="course-programs-buttons" className="flex justify-between gap-5">
+          <div id="course-programs" className="flex flex-wrap items-center gap-2">
             {props.item.AchievementOptionCourses.map((c, index) => (
               <div key={`view-course-${index}`} className="grid grid-cols-1">
                 <TagWithTwoText
@@ -287,11 +254,7 @@ const AchievementRow: FC<IPropsForARow> = (props) => {
                 <MdKeyboardArrowDown size={26} onClick={handleArrowClick} />
               )}
             </button>
-            <IconButton
-              id={`delete-button-${props.item.id}`}
-              onClick={deleteThisEntry}
-              size="small"
-            >
+            <IconButton id={`delete-button-${props.item.id}`} onClick={deleteThisEntry} size="small">
               <MdDelete />
             </IconButton>
           </div>
@@ -300,12 +263,7 @@ const AchievementRow: FC<IPropsForARow> = (props) => {
 
       {showDetails && (
         <div className="bg-edu-light-gray">
-          {
-            <EditAchievementOption
-              achievementOption={props.item}
-              onSuccess={onSuccessAddEdit}
-            />
-          }
+          {<EditAchievementOption achievementOption={props.item} onSuccess={onSuccessAddEdit} />}
         </div>
       )}
     </>

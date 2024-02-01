@@ -10,6 +10,7 @@ import { Button } from '../../common/Button';
 const Transition = forwardRef<unknown, TransitionProps & { children?: ReactElement<any, any> }>((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
+Transition.displayName = 'Transition';
 
 interface ErrorProps {
   errorMessage: string;

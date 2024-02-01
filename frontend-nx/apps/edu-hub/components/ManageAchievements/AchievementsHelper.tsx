@@ -1,6 +1,6 @@
 import { createContext, FC, ReactNode, useCallback } from 'react';
 import { IUserProfile } from '../../hooks/user';
-import { IPayload, UploadFileTypes } from '../../helpers/achievement';
+import { IPayload } from '../../helpers/achievement';
 import { UploadFile } from '../../helpers/filehandling';
 import { Translate } from 'next-translate';
 import { DELETE_AN_ACHIEVEMENT_OPTION, UPDATE_AN_ACHIEVEMENT_OPTION } from '../../queries/mutateAchievement';

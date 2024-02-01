@@ -1,7 +1,7 @@
 import { CircularProgress } from '@material-ui/core';
 import { Translate } from 'next-translate';
 import useTranslation from 'next-translate/useTranslation';
-import { FC, useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
+import { FC, useCallback, useContext, useReducer, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import { MdAddCircle } from 'react-icons/md';
 import {
@@ -12,14 +12,13 @@ import {
   TempAchievementOptionCourse,
   TempAchievementOptionMentor,
 } from '../../helpers/achievement';
-import { downloadCSVFileFromBase64String, makeFullName } from '../../helpers/util';
+import { makeFullName } from '../../helpers/util';
 import { AdminCourseList_Course } from '../../queries/__generated__/AdminCourseList';
 import { UserForSelection1_User } from '../../queries/__generated__/UserForSelection1';
 import { SelectUserDialog } from '../common/dialogs/SelectUserDialog';
 import EhTagStingId from '../common/EhTagStingId';
 import TagWithTwoText from '../common/TagWithTwoText';
 import CourseListDialog from './CourseListDialog';
-import { UploadFile, parseFileUploadEvent } from '../../helpers/filehandling';
 import { Button } from '../common/Button';
 import { AchievementContext } from './AchievementsHelper';
 import { useAdminQuery } from '../../hooks/authedQuery';

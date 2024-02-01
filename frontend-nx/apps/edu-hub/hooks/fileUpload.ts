@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { bytesToBase64 } from '../helpers/filehandling';
 
 export const useFileUploader = () => {
   const [isLoading, setIsLoading] = useState(false);

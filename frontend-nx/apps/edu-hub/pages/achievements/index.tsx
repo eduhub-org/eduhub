@@ -2,7 +2,7 @@ import useTranslation from 'next-translate/useTranslation';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { FC, useEffect, useState } from 'react';
-import AchievementOptionDashboard from '../../components/achievements/AchievementOptionDashboard';
+import ManageAchievements from '../../components/ManageAchievements';
 import CommonPageHeader from '../../components/common/CommonPageHeader';
 import { Page } from '../../components/Page';
 import { DefaultAchievementOptions, QUERY_LIMIT } from '../../helpers/achievement';
@@ -67,7 +67,7 @@ const Achievements: FC = () => {
           <div className="min-h-[77vh]">
             <CommonPageHeader headline={header} />
             {isLoggedIn && (isAdmin || isInstructor) && recordTypes.length > 0 && (
-              <AchievementOptionDashboard
+              <ManageAchievements
                 achievementRecordTypes={recordTypes}
                 userId={userId}
                 userProfile={profile}
