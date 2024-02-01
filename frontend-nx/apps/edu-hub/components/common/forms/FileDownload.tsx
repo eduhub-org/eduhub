@@ -34,7 +34,8 @@ const FileDownload: FC<IProps> = ({ filePath, className, label, type = 'icon' })
 
   const handleDownload = async () => {
     if (!loading && !error) {
-      const url = await getSignedUrl();
+      const result = await getSignedUrl();
+      const url = result.url;
       if (url) {
         setDownloadUrl(url);
       } else {
