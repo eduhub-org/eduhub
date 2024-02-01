@@ -34,6 +34,7 @@ import EnrolledUserForACourseDialog from './common/dialogs/EnrolledUserForACours
 import Modal from './common/Modal';
 import { User_User_by_pk } from '../queries/__generated__/User';
 import { ErrorMessageDialog } from './common/dialogs/ErrorMessageDialog';
+import useErrorHandler from '../hooks/useErrorHandler';
 
 interface State {
   achievementRecordTableId: number; // book keeping
@@ -74,10 +75,7 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
   isOpen,
   onClose,
 }) => {
-  const [errorMessage, setErrorMessage] = useState('');
-  const handleQueryError = (error: string) => {
-    setErrorMessage(error);
-  };
+  const { error, handleError, resetError } = useErrorHandler();
 
   const [visibleAuthorList, setVisibleAuthorList] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -103,21 +101,21 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
     UpdateAchievementRecordByPk,
     UpdateAchievementRecordByPkVariables
   >(UPDATE_AN_ACHIEVEMENT_RECORD, {
-    onError: (error) => handleQueryError(t(error.message)),
+    onError: (error) => handleError(t(error.message)),
   });
 
   const [saveAchievementRecordCoverImage] = useAuthedMutation<
     SaveAchievementRecordCoverImage,
     SaveAchievementRecordCoverImageVariables
   >(SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE, {
-    onError: (error) => handleQueryError(t(error.message)),
+    onError: (error) => handleError(t(error.message)),
   });
 
   const [saveAchievementRecordDocumentation] = useAuthedMutation<
     SaveAchievementRecordDocumentation,
     SaveAchievementRecordDocumentationVariables
   >(SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION, {
-    onError: (error) => handleQueryError(t(error.message)),
+    onError: (error) => handleError(t(error.message)),
   });
 
   const requestDeleteTag = useCallback(
@@ -415,9 +413,7 @@ const FormToUploadAchievementRecord: FC<IProps> = ({
         </div>
       </Modal>
       {/* Error Message Dialog */}
-      {errorMessage && (
-        <ErrorMessageDialog errorMessage={errorMessage} open={!!errorMessage} onClose={() => setErrorMessage('')} />
-      )}
+      {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}
     </>
   );
 };
