@@ -162,6 +162,7 @@ jobs:
       PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
       NEXT_PUBLIC_API_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_API_URL }}
       NEXT_PUBLIC_AUTH_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_AUTH_URL }}
+      NEXT_PUBLIC_STORAGE_BUCKET_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
       SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
     secrets:
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -180,6 +181,7 @@ jobs:
       PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
       NEXT_PUBLIC_API_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_API_URL }}
       NEXT_PUBLIC_AUTH_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_AUTH_URL }}
+      NEXT_PUBLIC_STORAGE_BUCKET_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
       SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
     secrets:
       GCP_REGION: ${{ secrets.GCP_REGION }}
