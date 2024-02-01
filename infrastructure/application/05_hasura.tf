@@ -140,70 +140,6 @@ module "hasura_service" {
       value = google_cloudfunctions2_function.add_keycloak_role.service_config[0].uri
     },
     {
-      name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE"
-      value = google_cloudfunctions2_function.load_achievement_certificate.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_CERTIFICATE_TEMPLATE"
-      value = google_cloudfunctions2_function.load_achievement_certificate_template.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_RECORD_DOCUMENTATION"
-      value = google_cloudfunctions2_function.load_achievement_record_documentation.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT"
-      value = google_cloudfunctions2_function.load_achievement_option_evaluation_script.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE"
-      value = google_cloudfunctions2_function.load_achievement_option_documentation_template.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE"
-      value = google_cloudfunctions2_function.save_achievement_certificate_template.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE"
-      value = google_cloudfunctions2_function.load_participation_certificate.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE"
-      value = google_cloudfunctions2_function.save_participation_certificate.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_LOAD_PARTICIPATION_CERTIFICATE_TEMPLATE"
-      value = google_cloudfunctions2_function.load_participation_certificate_template.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_SAVE_PARTICIPATION_CERTIFICATE_TEMPLATE"
-      value = google_cloudfunctions2_function.save_participation_certificate_template.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE"
-      value = google_cloudfunctions2_function.save_achievement_record_cover_image.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION"
-      value = google_cloudfunctions2_function.save_achievement_record_documentation.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT"
-      value = google_cloudfunctions2_function.save_achievement_option_evaluation_script.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE"
-      value = google_cloudfunctions2_function.save_achievement_option_documentation_template.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_SAVE_COURSE_IMAGE"
-      value = google_cloudfunctions2_function.save_course_image.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_SAVE_USER_PROFILE_IMAGE"
-      value = google_cloudfunctions2_function.save_user_profile_image.service_config[0].uri
-    },
-    {
       name  = "CLOUD_FUNCTION_LINK_UPDATE_FROM_KEYCLOAK"
       value = google_cloudfunctions2_function.update_from_keycloak.service_config[0].uri
     },
@@ -214,10 +150,6 @@ module "hasura_service" {
     {
       name  = "CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION"
       value = google_cloudfunctions2_function.call_node_function.service_config[0].uri
-    },
-    {
-      name  = "CLOUD_FUNCTION_LINK_CREATE_PARTICIPATION_CERTIFICATE"
-      value = google_cloudfunctions2_function.create_participation_certificate.service_config[0].uri
     },
     {
       name  = "CLOUD_FUNCTION_LINK_SEND_QUESTIONAIRES"
