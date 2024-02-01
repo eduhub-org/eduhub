@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { DocumentNode } from '@apollo/client';
 import { TextField } from '@material-ui/core';
 import useTranslation from 'next-translate/useTranslation';
@@ -18,13 +18,14 @@ import {
 import { rankItem } from '@tanstack/match-sorter-utils';
 
 import TableGridDeleteButton from './TableGridDeleteButton';
-import { Button } from './Button';
+import EhAddButton from '../common/EhAddButton';
 
 interface BaseRow {
   id: number;
 }
 
 interface TableGridProps<T extends BaseRow> {
+  addButtonText?: string;
   data: T[];
   columns: ColumnDef<T>[];
   deleteMutation?: DocumentNode;
@@ -37,9 +38,11 @@ interface TableGridProps<T extends BaseRow> {
   showDelete?: boolean;
   showGlobalSearchField?: boolean;
   translationNamespace?: string;
+  onAddButtonClick?: () => void; // Optional Add button callback
 }
 
 const TableGrid = <T extends BaseRow>({
+  addButtonText,
   data,
   columns,
   deleteMutation,
@@ -52,8 +55,10 @@ const TableGrid = <T extends BaseRow>({
   showDelete,
   showGlobalSearchField = true,
   translationNamespace,
+  onAddButtonClick, // Add button callback
 }: TableGridProps<T>) => {
   const { t } = useTranslation(translationNamespace);
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -61,35 +66,35 @@ const TableGrid = <T extends BaseRow>({
   const handlePrevious = () => setPageIndex(Math.max(0, pageIndex - 1));
   const handleNext = () => setPageIndex(pageIndex + 1);
 
-  // Global filter function
+  const toggleRowExpansion = useCallback((rowId: number) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (expandedRows.has(rowId)) {
+      newExpandedRows.delete(rowId);
+    } else {
+      newExpandedRows.add(rowId);
+    }
+    setExpandedRows(newExpandedRows);
+  },[expandedRows]);
+
   const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    // Rank the item
     const itemRank = rankItem(row.getValue(columnId), value);
-    // Store the itemRank info
-    addMeta({
-      itemRank,
-    });
-    // Return if the item should be filtered in/out
+    addMeta({ itemRank });
     return itemRank.passed;
   };
 
   const tableColumns = useMemo(() => {
-    // Create the checkbox column if needed
-    const checkboxColumn = showCheckbox
-      ? [
-          {
-            id: 'selection',
-            cell: ({ row }) => <input type="checkbox" />,
-          },
-        ]
-      : [];
+    const expandCollapseColumn: ColumnDef<T>[] = [
+      {
+        id: 'expander',
+        cell: ({ row }) => (
+          <button onClick={() => toggleRowExpansion(row.original.id)}>
+            {expandedRows.has(row.original.id) ? '👇' : '👉'}
+          </button>
+        ),
+      },
+    ];
 
-    // Create the data columns based on the input columns prop
-    const dataColumns = columns.map((col) => ({
-      ...col,
-    }));
-
-    // Create the delete column if needed
+    const dataColumns = columns.map((col) => ({ ...col }));
     const deleteColumn =
       showDelete && deleteMutation
         ? [
@@ -97,35 +102,24 @@ const TableGrid = <T extends BaseRow>({
               id: 'delete',
               cell: ({ row }) =>
                 deleteMutation && (
-                  <TableGridDeleteButton deleteMutation={deleteMutation} id={row.original.id} refetchQueries={refetchQueries} />
+                  <TableGridDeleteButton
+                    deleteMutation={deleteMutation}
+                    id={row.original.id}
+                    refetchQueries={refetchQueries}
+                  />
                 ),
             },
           ]
         : [];
-
-    // Combine the columns without mutations
-    return [...checkboxColumn, ...dataColumns, ...deleteColumn];
-  }, [columns, deleteMutation, refetchQueries, showCheckbox, showDelete]);
+    return [...expandCollapseColumn, ...dataColumns, ...deleteColumn];
+  }, [columns, deleteMutation, refetchQueries, showDelete, expandedRows, toggleRowExpansion]);
 
   const table = useReactTable({
     data,
-    defaultColumn: {
-      enableSorting: false,
-    },
+    defaultColumn: { enableSorting: false },
     columns: tableColumns,
-    filterFns: {
-      fuzzy: fuzzyFilter,
-    },
-    state: {
-      sorting,
-      globalFilter,
-      ...(enablePagination && {
-        pagination: {
-          pageIndex,
-          pageSize: 15,
-        },
-      }),
-    },
+    filterFns: { fuzzy: fuzzyFilter },
+    state: { sorting, globalFilter, ...(enablePagination && { pagination: { pageIndex, pageSize: 15 } }) },
     globalFilterFn: fuzzyFilter,
     onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
@@ -138,6 +132,13 @@ const TableGrid = <T extends BaseRow>({
 
   return (
     <div>
+      {/* Optional Add Button */}
+      {onAddButtonClick && (
+        <div className="text-white mb-4">
+          <EhAddButton buttonClickCallBack={onAddButtonClick} text={addButtonText} />
+        </div>
+      )}
+
       {/* Global Search Input */}
       {showGlobalSearchField && (
         <div className="flex justify-end">
@@ -145,19 +146,12 @@ const TableGrid = <T extends BaseRow>({
             className="!w-64 bg-gray-600 border !mb-6"
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            label="Search"
+            label={t('search')}
             variant="outlined"
             size="small"
             fullWidth
-            InputProps={{
-              style: {
-                color: 'white', // Text color
-                borderColor: 'white', // Border color,
-              },
-            }}
-            InputLabelProps={{
-              style: { color: 'white' }, // Label color
-            }}
+            InputProps={{ style: { color: 'white', borderColor: 'white' } }}
+            InputLabelProps={{ style: { color: 'white' } }}
           />
         </div>
       )}
@@ -172,8 +166,8 @@ const TableGrid = <T extends BaseRow>({
             {showCheckbox && <div className="col-span-1" />}
             {headerGroup.headers.map((header) => (
               <div
-                className={`${header.column.columnDef.meta?.className} mr-3 ml-3 col-span-${header.column.columnDef.meta?.width} relative`}
                 key={header.id}
+                className={`${header.column.columnDef.meta?.className} mr-3 ml-3 col-span-${header.column.columnDef.meta?.width} relative`}
                 onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
               >
                 <div className="flex-1 flex items-center">
@@ -194,23 +188,36 @@ const TableGrid = <T extends BaseRow>({
 
       {/* Data Rows */}
       {table.getRowModel().rows.map((row) => (
-        <div
-          className="${className} grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center mb-1 py-2 bg-edu-light-gray"
-          key={row.id}
-        >
-          {row.getVisibleCells().map((cell) => {
-            return (
+        <React.Fragment key={row.id}>
+          {/* Primary Row */}
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center mb-1 py-2 bg-edu-light-gray">
+            {row.getVisibleCells().map((cell) => (
               <div
-                className={`${cell.column.columnDef.meta?.className} mr-3 ml-3 col-span-${cell.column.columnDef.meta?.width}`}
                 key={cell.id}
+                className={`${cell.column.columnDef.meta?.className} mr-3 ml-3 col-span-${cell.column.columnDef.meta?.width}`}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+          {/* Expandable Second Row */}
+          {expandedRows.has(row.original.id) && (
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center mb-1 py-2 bg-edu-light-gray">
+              {table.getAllColumns().map((column) => {
+                if (!column.columnDef.meta?.secondRowComponent) return null; // Skip columns without secondRowComponent
+                const SecondRowComponent = column.columnDef.meta.secondRowComponent;
+                return (
+                  <div key={column.id} className="col-span-full">
+                    <SecondRowComponent row={row} />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </React.Fragment>
       ))}
 
+      {/* Pagination */}
       {enablePagination && (
         <div className="flex justify-end pb-10 text-white">
           <div className="flex flex-row space-x-5">

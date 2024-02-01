@@ -46,6 +46,7 @@ const ManageUsersContent: FC = () => {
         enableSorting: true,
         meta: {
           width: 3,
+          secondRowComponent: ({ row }) => <div className="text-black">{row.original.university}</div>,
         },
         cell: ({ getValue, column, row }) => <div>{getValue<ReactNode>()}</div>,
       },
@@ -69,14 +70,9 @@ const ManageUsersContent: FC = () => {
     []
   );
 
-  // const onAddAchievementDocumentationTemplateClick = async () => {
-  //   await insertAchievementDocumentationTemplate({
-  //     variables: {
-  //       insertInput: { title: 'NEUES TEMPLATE', url: '/templates/default-achievement-template.txt' },
-  //     },
-  //   });
-  //   refetch();
-  // };
+  const onAddUserClick = async () => {
+    console.log("add user");
+  };
 
   if (error) {
     console.log(error);
@@ -91,23 +87,19 @@ const ManageUsersContent: FC = () => {
         {error && <div>Es ist ein Fehler aufgetreten</div>}
         {!loading && !error && (
           <div>
-            {/* <div className="text-white">
-              <EhAddButton
-                buttonClickCallBack={onAddAchievementDocumentationTemplateClick}
-                text={t('addUserAchievementDocumentationTemplateText')}
-              />
-            </div> */}
             <TableGrid
               columns={columns}
               data={data.User}
               // deleteMutation={DELETE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE}
               refetchQueries={['AchievementDocumentationTemplates']}
               showDelete
-              translationNamespace="manageAchievementTemplates"
+              translationNamespace="users"
               enablePagination
               pageIndex={pageIndex}
               setPageIndex={setPageIndex}
-              pages={data.User_aggregate.aggregate.count}
+              pages={Math.ceil(data.User_aggregate.aggregate.count / pageSize)}
+              addButtonText={t('addUserAchievementDocumentationTemplateText')}
+              onAddButtonClick={onAddUserClick}
             />
           </div>
         )}
