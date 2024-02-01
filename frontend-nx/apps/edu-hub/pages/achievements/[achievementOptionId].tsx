@@ -16,16 +16,7 @@ import {
   AchievementOptionListVariables,
   AchievementOptionList_AchievementOption,
 } from '../../queries/__generated__/AchievementOptionList';
-import {
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Tooltip,
-  Typography,
-} from '@material-ui/core';
+import { Paper, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@material-ui/core';
 import { PageBlock } from '../../components/common/PageBlock';
 import {
   CourseMinimum,
@@ -39,10 +30,7 @@ import {
   AchievementRecordListWithAuthors_AchievementRecord,
 } from '../../queries/__generated__/AchievementRecordListWithAuthors';
 import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../queries/achievementRecord';
-import {
-  AchievementRecordType_enum,
-  order_by,
-} from '../../__generated__/globalTypes';
+import { AchievementRecordType_enum, order_by } from '../../__generated__/globalTypes';
 import { Translate } from 'next-translate';
 import FormToUploadAchievementRecord from '../../components/FormToUploadAchievementRecord';
 import { AlertMessageDialog } from '../../components/common/dialogs/AlertMessageDialog';
@@ -52,51 +40,41 @@ import {
   CourseEnrollmentQuery,
   CourseEnrollmentQueryVariables,
 } from '../../queries/__generated__/CourseEnrollmentQuery';
+
 const AchievementOptionDetails: FC = () => {
   const router = useRouter();
   const { achievementOptionId } = router.query;
 
   const courseIdString = router.query.courseId;
   //const { t } = useTranslation();
-  const id =
-    typeof achievementOptionId === 'string' ? parseInt(achievementOptionId) : 0;
-  const courseId =
-    typeof courseIdString === 'string' ? parseInt(courseIdString) : 0;
+  const id = typeof achievementOptionId === 'string' ? parseInt(achievementOptionId) : 0;
+  const courseId = typeof courseIdString === 'string' ? parseInt(courseIdString) : 0;
   const [course, setCourse] = useState(null as CourseMinimum_Course_by_pk);
-  const [achievementOption, setAchievementOption] = useState(
-    null as AchievementOptionList_AchievementOption
-  );
+  const [achievementOption, setAchievementOption] = useState(null as AchievementOptionList_AchievementOption);
 
-  const achievementOptionQuery = useAuthedQuery<
-    AchievementOptionList,
-    AchievementOptionListVariables
-  >(ACHIEVEMENT_OPTIONS, {
-    variables: {
-      where: { id: { _eq: id } },
-    },
-    skip: id <= 0,
-  });
-
-  const courseDetails = useAuthedQuery<CourseMinimum, CourseMinimumVariables>(
-    COURSE_MINIMUM,
+  const achievementOptionQuery = useAuthedQuery<AchievementOptionList, AchievementOptionListVariables>(
+    ACHIEVEMENT_OPTIONS,
     {
       variables: {
-        id: courseId,
+        where: { id: { _eq: id } },
       },
-      skip: courseId === 0,
+      skip: id <= 0,
     }
   );
+
+  const courseDetails = useAuthedQuery<CourseMinimum, CourseMinimumVariables>(COURSE_MINIMUM, {
+    variables: {
+      id: courseId,
+    },
+    skip: courseId === 0,
+  });
 
   useEffect(() => {
     const details = courseDetails.data?.Course_by_pk || null;
     setCourse(details);
     const list = [...(achievementOptionQuery.data?.AchievementOption || [])];
     setAchievementOption(list.length > 0 ? list[0] : null);
-  }, [
-    achievementOptionQuery.data?.AchievementOption,
-    courseDetails,
-    setCourse,
-  ]);
+  }, [achievementOptionQuery.data?.AchievementOption, courseDetails, setCourse]);
 
   return (
     <>
@@ -107,10 +85,7 @@ const AchievementOptionDetails: FC = () => {
       <Page>
         <div className="min-h-[77vh]">
           {achievementOption && course && (
-            <AchievementOptionDetailsDashboard
-              achievementOption={achievementOption}
-              course={course}
-            />
+            <AchievementOptionDetailsDashboard achievementOption={achievementOption} course={course} />
           )}
         </div>
       </Page>
@@ -124,10 +99,7 @@ interface IProps {
   achievementOption: AchievementOptionList_AchievementOption;
   course: CourseMinimum_Course_by_pk;
 }
-const AchievementOptionDetailsDashboard: FC<IProps> = ({
-  achievementOption,
-  course,
-}) => {
+const AchievementOptionDetailsDashboard: FC<IProps> = ({ achievementOption, course }) => {
   const userId = useUserId();
   const { t } = useTranslation();
   const [alertMessage, setAlertMessage] = useState('');
@@ -148,17 +120,15 @@ const AchievementOptionDetailsDashboard: FC<IProps> = ({
 
       <ContentRowTwoColumn
         left={<span className="text-sm uppercase">{course.title}</span>}
-        right={
-          <span className="text-sm uppercase">{course.Program.shortTitle}</span>
-        }
+        right={<span className="text-sm uppercase">{course.Program.shortTitle}</span>}
       ></ContentRowTwoColumn>
       <BlockTitle>{achievementOption.title}</BlockTitle>
       <div id="mentors" className="flex flex-col gap-5">
         <Title>{t('achievements-page:mentors')}</Title>
         <BoldText>
-          {achievementOption.AchievementOptionMentors.map((m) =>
-            makeFullName(m.User.firstName, m.User.lastName)
-          ).join(', ')}
+          {achievementOption.AchievementOptionMentors.map((m) => makeFullName(m.User.firstName, m.User.lastName)).join(
+            ', '
+          )}
         </BoldText>
       </div>
 
@@ -167,8 +137,7 @@ const AchievementOptionDetailsDashboard: FC<IProps> = ({
         <BoldText>{achievementOption.description}</BoldText>
       </div>
 
-      {achievementOption.recordType ===
-        AchievementRecordType_enum.DOCUMENTATION_AND_CSV && (
+      {achievementOption.recordType === AchievementRecordType_enum.DOCUMENTATION_AND_CSV && (
         <ViewForCSV
           achievementOption={achievementOption}
           course={course}
@@ -178,8 +147,7 @@ const AchievementOptionDetailsDashboard: FC<IProps> = ({
         />
       )}
 
-      {achievementOption.recordType ===
-        AchievementRecordType_enum.DOCUMENTATION && (
+      {achievementOption.recordType === AchievementRecordType_enum.DOCUMENTATION && (
         <RecordTypeDocumentView
           achievementOption={achievementOption}
           course={course}
@@ -196,17 +164,9 @@ interface IProps2 extends IProps {
   setAlertMessage: (value: string) => void;
   userId: string;
 }
-const ViewForCSV: FC<IProps2> = ({
-  achievementOption,
-  course,
-  setAlertMessage,
-  userId,
-  t,
-}) => {
+const ViewForCSV: FC<IProps2> = ({ achievementOption, course, setAlertMessage, userId, t }) => {
   const [showModal, setShowModal] = useState(false);
-  const [records, setAchievementRecords] = useState(
-    [] as AchievementRecordListWithAuthors_AchievementRecord[]
-  );
+  const [records, setAchievementRecords] = useState([] as AchievementRecordListWithAuthors_AchievementRecord[]);
   const achievementRecords = useAuthedQuery<
     AchievementRecordListWithAuthors,
     AchievementRecordListWithAuthorsVariables
@@ -329,19 +289,9 @@ const ViewForCSV: FC<IProps2> = ({
   );
 };
 
-const RecordTypeDocumentView: FC<IProps2> = ({
-  achievementOption,
-  course,
-  t,
-  setAlertMessage,
-  userId,
-}) => {
-  const [records, setAchievementRecords] = useState(
-    [] as AchievementRecordListWithAuthors_AchievementRecord[]
-  );
-  const [myLastUpload, setMyLastUpload] = useState(
-    [] as AchievementRecordListWithAuthors_AchievementRecord[]
-  );
+const RecordTypeDocumentView: FC<IProps2> = ({ achievementOption, course, t, setAlertMessage, userId }) => {
+  const [records, setAchievementRecords] = useState([] as AchievementRecordListWithAuthors_AchievementRecord[]);
+  const [myLastUpload, setMyLastUpload] = useState([] as AchievementRecordListWithAuthors_AchievementRecord[]);
 
   const achievementRecords = useAuthedQuery<
     AchievementRecordListWithAuthors,
@@ -352,21 +302,18 @@ const RecordTypeDocumentView: FC<IProps2> = ({
     },
   });
 
-  const myUploadsQuery = useAuthedQuery<
-    AchievementRecordListWithAuthors,
-    AchievementRecordListWithAuthorsVariables
-  >(ACHIEVEMENT_RECORDS_WITH_AUTHORS, {
-    variables: {
-      where: {
-        _and: [
-          { achievementOptionId: { _eq: achievementOption.id } },
-          { uploadUserId: { _eq: userId } },
-        ],
+  const myUploadsQuery = useAuthedQuery<AchievementRecordListWithAuthors, AchievementRecordListWithAuthorsVariables>(
+    ACHIEVEMENT_RECORDS_WITH_AUTHORS,
+    {
+      variables: {
+        where: {
+          _and: [{ achievementOptionId: { _eq: achievementOption.id } }, { uploadUserId: { _eq: userId } }],
+        },
+        orderBy: { created_at: order_by.desc },
+        limit: 1,
       },
-      orderBy: { created_at: order_by.desc },
-      limit: 1,
-    },
-  });
+    }
+  );
 
   const user = useUser();
 
@@ -390,10 +337,7 @@ const RecordTypeDocumentView: FC<IProps2> = ({
     myUploadsQuery.refetch();
   }, [achievementRecords, myUploadsQuery]);
 
-  const enrollment = useAuthedQuery<
-    CourseEnrollmentQuery,
-    CourseEnrollmentQueryVariables
-  >(COURSE_ENROLLMENTS, {
+  const enrollment = useAuthedQuery<CourseEnrollmentQuery, CourseEnrollmentQueryVariables>(COURSE_ENROLLMENTS, {
     variables: {
       where: {
         _and: [
@@ -416,9 +360,7 @@ const RecordTypeDocumentView: FC<IProps2> = ({
   };
 
   useEffect(() => {
-    const r = enrollment.data
-      ? enrollment.data?.CourseEnrollment.length > 0
-      : false;
+    const r = enrollment.data ? enrollment.data?.CourseEnrollment.length > 0 : false;
     setEnrollmentStatus(r);
   }, [enrollment.data, setEnrollmentStatus]);
 
@@ -545,15 +487,10 @@ const Title: FC<IPropsTitle> = ({ children }) => {
 };
 
 const BoldText: FC<IPropsTitle> = ({ children }) => {
-  return (
-    <p className="font-medium text-sm leading-5 grid grid-cols-1">{children}</p>
-  );
+  return <p className="font-medium text-sm leading-5 grid grid-cols-1">{children}</p>;
 };
 
-const ContentRowTwoColumn: FC<{ left: ReactNode; right: ReactNode }> = ({
-  left,
-  right,
-}) => {
+const ContentRowTwoColumn: FC<{ left: ReactNode; right: ReactNode }> = ({ left, right }) => {
   return (
     <div className="flex flex-row justify-between">
       <div id="left" className="w-1/2">

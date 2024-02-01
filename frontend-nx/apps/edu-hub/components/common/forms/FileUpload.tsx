@@ -22,7 +22,7 @@ const FileUpload = ({ id, uploadMutation, submitMutation, uploadVariables, submi
       });
       const resultData = uploadResult.data;
       const key = Object.keys(resultData)[0];
-      fileUrl = resultData[key].path;
+      fileUrl = resultData[key].file_path;
     }
 
     // Submit the entire form data, including the file URL

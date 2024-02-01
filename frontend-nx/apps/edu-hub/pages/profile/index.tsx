@@ -4,27 +4,19 @@ import { Page } from '../../components/Page';
 import { useIsLoggedIn } from '../../hooks/authentication';
 import ProfileOverview from '../../components/ProfileContent/ProfileOverview';
 
-// export const getStaticProps = async ({ locale }: { locale: string }) => ({
-//   props: {
-//     ...(await serverSideTranslations(locale, ["common", "users"])),
-//   },
-// });
-
 const Profile: FC = () => {
   //const { t } = useTranslation('users');
   const isLoggedIn = useIsLoggedIn();
 
   return (
     <>
-      <div className="max-w-screen-xl mx-auto mt-14">
+      <div className="max-w-screen-xl mx-auto">
         <Head>
           <title>EduHub | opencampus.sh</title>
           <link rel="icon" href="/favicon.png" />
         </Head>
         <Page>
-          <div className="min-h-[77vh]">
-            {isLoggedIn && <ProfileOverview />}
-          </div>
+          <div className="min-h-[77vh]">{isLoggedIn && <ProfileOverview />}</div>
         </Page>
       </div>
     </>
