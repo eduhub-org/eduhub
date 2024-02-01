@@ -19,52 +19,27 @@ import { QueryResult } from '@apollo/client';
 
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../queries/actions';
-import {
-  INSERT_COURSE_GROUP_TAG,
-  DELETE_COURSE_GROUP_TAG,
-} from '../../queries/courseGroup';
-import {
-  INSERT_COURSE_DEGREE_TAG,
-  DELETE_COURSE_DEGREE_TAG,
-} from '../../queries/courseDegree';
+import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../queries/courseGroup';
+import { INSERT_COURSE_DEGREE_TAG, DELETE_COURSE_DEGREE_TAG } from '../../queries/courseDegree';
 
-import {
-  DELETE_A_COURSE,
-  UPDATE_COURSE_PROPERTY,
-} from '../../queries/mutateCourse';
-import {
-  DELETE_COURSE_INSRTRUCTOR,
-} from '../../queries/mutateCourseInstructor';
-import {
-  AdminCourseList_Course,
-} from '../../queries/__generated__/AdminCourseList';
-import {
-  DeleteCourseByPk,
-  DeleteCourseByPkVariables,
-} from '../../queries/__generated__/DeleteCourseByPk';
+import { DELETE_A_COURSE, UPDATE_COURSE_PROPERTY } from '../../queries/mutateCourse';
+import { DELETE_COURSE_INSRTRUCTOR } from '../../queries/mutateCourseInstructor';
+import { AdminCourseList_Course } from '../../queries/__generated__/AdminCourseList';
+import { DeleteCourseByPk, DeleteCourseByPkVariables } from '../../queries/__generated__/DeleteCourseByPk';
 import {
   DeleteCourseInstructor,
   DeleteCourseInstructorVariables,
 } from '../../queries/__generated__/DeleteCourseInstructor';
 import { Programs_Program } from '../../queries/__generated__/Programs';
-import {
-  SaveCourseImage,
-  SaveCourseImageVariables,
-} from '../../queries/__generated__/SaveCourseImage';
-import {
-  UpdateCourseByPk,
-  UpdateCourseByPkVariables,
-} from '../../queries/__generated__/UpdateCourseByPk';
+import { SaveCourseImage, SaveCourseImageVariables } from '../../queries/__generated__/SaveCourseImage';
+import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../queries/__generated__/UpdateCourseByPk';
 import { SelectOption } from '../../types/UIComponents';
-import {
-  CourseEnrollmentStatus_enum,
-  CourseStatus_enum,
-} from '../../__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum, CourseStatus_enum } from '../../__generated__/globalTypes';
 import EhCheckBox from '../common/EhCheckbox';
 import EhSelect from '../common/EhSelect';
 import EhTag from '../common/EhTag';
 
-import { parseFileUploadEvent } from '../../helpers/filehandling';
+import { getPublicImageUrl, parseFileUploadEvent } from '../../helpers/filehandling';
 import EhDebounceInput from '../common/EhDebounceInput';
 
 import useTranslation from 'next-translate/useTranslation';
@@ -77,7 +52,11 @@ import participantsRatedPie from '../../public/images/course/status/participants
 import { InstructorColumn } from './CoursesInstructorColumn';
 import TagSelector from '../common/TagSelector';
 import TextFieldEditor from '../common/TextFieldEditor';
-import { UPDATE_COURSE_CHAT_LINK, UPDATE_COURSE_ECTS, UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK } from '../../queries/course';
+import {
+  UPDATE_COURSE_CHAT_LINK,
+  UPDATE_COURSE_ECTS,
+  UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK,
+} from '../../queries/course';
 import { isECTSFormat, isLinkFormat } from '../../helpers/util';
 
 interface EntrollmentStatusCount {
@@ -124,23 +103,16 @@ const courseStatus = (status: string) => {
   }
 };
 
-
 interface IPropsCourseOneRow {
   programs: Programs_Program[];
   course: AdminCourseList_Course;
-  courseGroupOptions: {id: number, name: string;}[];
-  degreeCourses: {id: number, name: string;}[];
+  courseGroupOptions: { id: number; name: string }[];
+  degreeCourses: { id: number; name: string }[];
   qResult: QueryResult<any>;
   refetchCourses: () => void;
   onSetTitle: (c: AdminCourseList_Course, title: string) => any;
-  onSetAttendanceCertificatePossible: (
-    c: AdminCourseList_Course,
-    isPossible: boolean
-  ) => any;
-  onSetAchievementCertificatePossible: (
-    c: AdminCourseList_Course,
-    isPossible: boolean
-  ) => any;
+  onSetAttendanceCertificatePossible: (c: AdminCourseList_Course, isPossible: boolean) => any;
+  onSetAchievementCertificatePossible: (c: AdminCourseList_Course, isPossible: boolean) => any;
 }
 const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   programs,
@@ -157,17 +129,11 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   const { t, lang } = useTranslation('course-page');
 
   const handleToggleAttendanceCertificatePossible = useCallback(() => {
-    onSetAttendanceCertificatePossible(
-      course,
-      !course.attendanceCertificatePossible
-    );
+    onSetAttendanceCertificatePossible(course, !course.attendanceCertificatePossible);
   }, [course, onSetAttendanceCertificatePossible]);
 
   const handleToggleAchievementCertificatePossible = useCallback(() => {
-    onSetAchievementCertificatePossible(
-      course,
-      !course.achievementCertificatePossible
-    );
+    onSetAchievementCertificatePossible(course, !course.achievementCertificatePossible);
   }, [course, onSetAchievementCertificatePossible]);
 
   const [showDetails, setShowDetails] = useState(false);
@@ -177,15 +143,9 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
     label: program.shortTitle ?? program.title,
   }));
 
-  const [updateCourse] = useAdminMutation<
-    UpdateCourseByPk,
-    UpdateCourseByPkVariables
-  >(UPDATE_COURSE_PROPERTY);
+  const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
 
-  const [deleteACoursByPk] = useAdminMutation<
-    DeleteCourseByPk,
-    DeleteCourseByPkVariables
-  >(DELETE_A_COURSE);
+  const [deleteACoursByPk] = useAdminMutation<DeleteCourseByPk, DeleteCourseByPkVariables>(DELETE_A_COURSE);
 
   /* #region callbacks */
   const handleDelete = useCallback(
@@ -259,14 +219,14 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
     [course, onSetTitle]
   );
 
-
   const applicationStatus = () => {
     const statusRecordsWithSum: EntrollmentStatusCount = {};
     course.CourseEnrollments.forEach((courseEn) => {
-      statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] =
-        statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value]
-          ? statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] + 1
-          : 1;
+      statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] = statusRecordsWithSum[
+        courseEn.CourseEnrollmentStatus.value
+      ]
+        ? statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] + 1
+        : 1;
     });
     return `${statusRecordsWithSum[CourseEnrollmentStatus_enum.INVITED] ?? 0}/${
       statusRecordsWithSum[CourseEnrollmentStatus_enum.CONFIRMED] ?? 0
@@ -276,30 +236,24 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   const applications = () => {
     const statusRecordsWithSum: EntrollmentStatusCount = {};
     course.CourseEnrollments.forEach((courseEn) => {
-      statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] =
-        statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value]
-          ? statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] + 1
-          : 1;
+      statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] = statusRecordsWithSum[
+        courseEn.CourseEnrollmentStatus.value
+      ]
+        ? statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] + 1
+        : 1;
     });
-    return Object.keys(statusRecordsWithSum).reduce(
-      (sum, key) => sum + statusRecordsWithSum[key],
-      0
-    );
+    return Object.keys(statusRecordsWithSum).reduce((sum, key) => sum + statusRecordsWithSum[key], 0);
   };
   const pClass = 'text-gray-700 truncate font-medium max-w-xs';
   const tdClass = 'pl-5';
   const tdClassCentered = 'pl-5 text-center';
 
   // Course Details
-  const [updateCourseQuery] = useAdminMutation<
-    UpdateCourseByPk,
-    UpdateCourseByPkVariables
-  >(UPDATE_COURSE_PROPERTY);
+  const [updateCourseQuery] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
 
-  const [deleteInstructorAPI] = useAdminMutation<
-    DeleteCourseInstructor,
-    DeleteCourseInstructorVariables
-  >(DELETE_COURSE_INSRTRUCTOR);
+  const [deleteInstructorAPI] = useAdminMutation<DeleteCourseInstructor, DeleteCourseInstructorVariables>(
+    DELETE_COURSE_INSRTRUCTOR
+  );
   const deleteInstructorFromACourse = useCallback(
     async (id: number) => {
       const response = await deleteInstructorAPI({
@@ -324,10 +278,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
     imageUploadRef.current?.click();
   }, [imageUploadRef]);
 
-  const [saveCourseImage] = useAdminMutation<
-    SaveCourseImage,
-    SaveCourseImageVariables
-  >(SAVE_COURSE_IMAGE);
+  const [saveCourseImage] = useAdminMutation<SaveCourseImage, SaveCourseImageVariables>(SAVE_COURSE_IMAGE);
 
   const handleUploadCourseImageEvent = useCallback(
     async (event: any) => {
@@ -389,16 +340,17 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
     [course.id, refetchCourses, updateCourse]
   );
 
-
-const currentCourseGroups = course.CourseGroups.map((group) => ({
+  const currentCourseGroups = course.CourseGroups.map((group) => ({
     id: group.CourseGroupOption.id,
-    name: t(group.CourseGroupOption.title)
-}));
+    name: t(group.CourseGroupOption.title),
+  }));
 
-const currentCourseDegrees = course.CourseDegrees.map((degree) => ({
-id: degree.degreeCourseId,
-name: t(degree.DegreeCourse.title)
-}));
+  const currentCourseDegrees = course.CourseDegrees.map((degree) => ({
+    id: degree.degreeCourseId,
+    name: t(degree.DegreeCourse.title),
+  }));
+
+  const coverImage = getPublicImageUrl(course?.coverImage, 460);
 
   return (
     <>
@@ -449,11 +401,7 @@ name: t(degree.DegreeCourse.title)
           <div className="flex">
             <p className={pClass}>{courseStatus(course.status)}</p>
             <div className="flex px-3 items-center">
-              <button
-                className="focus:ring-2 rounded-md focus:outline-none"
-                role="button"
-                aria-label="option"
-              >
+              <button className="focus:ring-2 rounded-md focus:outline-none" role="button" aria-label="option">
                 {showDetails ? (
                   <MdKeyboardArrowUp size={26} onClick={handleArrowClick} />
                 ) : (
@@ -481,18 +429,9 @@ name: t(degree.DegreeCourse.title)
                 <IconButton onClick={handleImageUploadClick}>
                   <MdUpload size="0.75em" />
                 </IconButton>
-
-                {course.coverImage != null && (
-                  // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-                  <img width="100px" height="100px" src={course.coverImage} />
-                )}
+                {coverImage != null && <img width="300px" src={coverImage} alt="course cover image" />}
               </div>
-              <input
-                ref={imageUploadRef}
-                onChange={handleUploadCourseImageEvent}
-                className="hidden"
-                type="file"
-              />
+              <input ref={imageUploadRef} onChange={handleUploadCourseImageEvent} className="hidden" type="file" />
             </td>
             <td className="px-5 inline-block align-top pb-2" colSpan={1}>
               <div className="flex flex-col space-y-1">
@@ -505,10 +444,7 @@ name: t(degree.DegreeCourse.title)
                           key={`${course.id}-${courseIn.Expert.id}-${index}`}
                           requestDeleteTag={deleteInstructorFromACourse}
                           tag={{
-                            display: makeFullName(
-                              courseIn.Expert.User.firstName,
-                              courseIn.Expert.User.lastName ?? ''
-                            ),
+                            display: makeFullName(courseIn.Expert.User.firstName, courseIn.Expert.User.lastName ?? ''),
                             id: courseIn.Expert.id,
                           }}
                         />
@@ -531,50 +467,32 @@ name: t(degree.DegreeCourse.title)
                   />
                 </div>
                 <TextFieldEditor
-                      label={'chat_link.label'}
-                      placeholder={'chat_link.label'}
-                      itemId={course.id}
-                      currentText={course.chatLink || ''}
-                      updateTextMutation={UPDATE_COURSE_CHAT_LINK}
-                      refetchQueries={['AdminCourseList']}
-                      typeCheck={isLinkFormat}
-                      helpText='chat_link.help_text'
-                      errorText='chat_link.error_text'
-                      translationNamespace='manageCourses'
-                    />
-                 <td>
+                  label={'chat_link.label'}
+                  placeholder={'chat_link.label'}
+                  itemId={course.id}
+                  currentText={course.chatLink || ''}
+                  updateTextMutation={UPDATE_COURSE_CHAT_LINK}
+                  refetchQueries={['AdminCourseList']}
+                  typeCheck={isLinkFormat}
+                  helpText="chat_link.help_text"
+                  errorText="chat_link.error_text"
+                  translationNamespace="manageCourses"
+                />
+                <td>
                   {`${t('possible-certificates')}:`}
                   <div className="grid grid-cols-10">
-                    <div
-                      className="cursor-pointer"
-                      onClick={handleToggleAttendanceCertificatePossible}
-                    >
-                      {course.attendanceCertificatePossible && (
-                        <MdCheckBox size="1.5em" />
-                      )}
-                      {!course.attendanceCertificatePossible && (
-                        <MdOutlineCheckBoxOutlineBlank size="1.5em" />
-                      )}
+                    <div className="cursor-pointer" onClick={handleToggleAttendanceCertificatePossible}>
+                      {course.attendanceCertificatePossible && <MdCheckBox size="1.5em" />}
+                      {!course.attendanceCertificatePossible && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
                     </div>
-                    <div className="col-span-9">
-                      {t('course-page:proof-of-participation')}
-                    </div>
+                    <div className="col-span-9">{t('course-page:proof-of-participation')}</div>
                   </div>
                   <div className="grid grid-cols-10">
-                    <div
-                      className="cursor-pointer"
-                      onClick={handleToggleAchievementCertificatePossible}
-                    >
-                      {course.achievementCertificatePossible && (
-                        <MdCheckBox size="1.5em" />
-                      )}
-                      {!course.achievementCertificatePossible && (
-                        <MdOutlineCheckBoxOutlineBlank size="1.5em" />
-                      )}
+                    <div className="cursor-pointer" onClick={handleToggleAchievementCertificatePossible}>
+                      {course.achievementCertificatePossible && <MdCheckBox size="1.5em" />}
+                      {!course.achievementCertificatePossible && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
                     </div>
-                    <div className="col-span-3">
-                      {t('course-page:performance-certificate')}
-                    </div>
+                    <div className="col-span-3">{t('course-page:performance-certificate')}</div>
                     <TextFieldEditor
                       label={'ects.label'}
                       placeholder={'ects.label'}
@@ -583,9 +501,9 @@ name: t(degree.DegreeCourse.title)
                       updateTextMutation={UPDATE_COURSE_ECTS}
                       refetchQueries={['AdminCourseList']}
                       typeCheck={isECTSFormat}
-                      helpText='ects.help_text'
-                      errorText='ects.error_text'
-                      translationNamespace='manageCourses'
+                      helpText="ects.help_text"
+                      errorText="ects.error_text"
+                      translationNamespace="manageCourses"
                     />
                     <TagSelector
                       className="col-span-10 flex mt-3"
@@ -597,7 +515,7 @@ name: t(degree.DegreeCourse.title)
                       insertTagMutation={INSERT_COURSE_GROUP_TAG}
                       deleteTagMutation={DELETE_COURSE_GROUP_TAG}
                       refetchQueries={['AdminCourseList']}
-                      translationNamespace='start-page'
+                      translationNamespace="start-page"
                     />
                     <TagSelector
                       className="col-span-10 flex mt-3"
@@ -618,9 +536,9 @@ name: t(degree.DegreeCourse.title)
                       updateTextMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
                       refetchQueries={['AdminCourseList']}
                       typeCheck={isLinkFormat}
-                      helpText='external_registration_link.help_text'
-                      errorText='external_registration_link.error_text'
-                      translationNamespace='manageCourses'
+                      helpText="external_registration_link.help_text"
+                      errorText="external_registration_link.error_text"
+                      translationNamespace="manageCourses"
                     />
                   </div>
                 </td>

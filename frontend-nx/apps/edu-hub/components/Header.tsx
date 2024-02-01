@@ -5,15 +5,15 @@ import { FC, MouseEvent, useCallback, useState } from 'react';
 import { useIsLoggedIn } from '../hooks/authentication';
 import { useUser } from '../hooks/user';
 import eduhubLogo from '../public/images/eduhub-logo.svg';
-import mysteryImg from '../public/images/common/mystery.svg';
 import ocLogo from '../public/images/oc-logo.svg';
 
 import { LoginButton } from './LoginButton';
 import { Menu } from './Menu';
 import { RegisterButton } from './RegisterButton';
-import { Avatar, ClientOnly } from '@opencampus/shared-components';
+import { ClientOnly } from '@opencampus/shared-components';
 import { OnlyDesktop } from '@opencampus/shared-components';
 import useTranslation from 'next-translate/useTranslation';
+import UserCard from './common/UserCard';
 
 export const Header: FC = () => {
   const isLoggedIn = useIsLoggedIn();
@@ -27,24 +27,24 @@ export const Header: FC = () => {
     setMenuVisible(true);
   }, []);
 
-const {lang} = useTranslation();
-const isEnglish = lang === 'en';
+  const { lang } = useTranslation();
+  const isEnglish = lang === 'en';
 
-const changeLanguage = (lng: string) => {
-  const currentUrl = window.location.href;
-  const urlParts = currentUrl.split('/');
-  const hasLanguageCode = urlParts.length > 3 && urlParts[3].length === 2;
+  const changeLanguage = (lng: string) => {
+    const currentUrl = window.location.href;
+    const urlParts = currentUrl.split('/');
+    const hasLanguageCode = urlParts.length > 3 && urlParts[3].length === 2;
 
-  let newUrl;
-  if (hasLanguageCode) {
-    urlParts[3] = lng;
-    newUrl = urlParts.join('/');
-  } else {
-    newUrl = `/${lng}${window.location.pathname}`;
-  }
+    let newUrl;
+    if (hasLanguageCode) {
+      urlParts[3] = lng;
+      newUrl = urlParts.join('/');
+    } else {
+      newUrl = `/${lng}${window.location.pathname}`;
+    }
 
-  window.location.href = newUrl;
-};
+    window.location.href = newUrl;
+  };
 
   return (
     <header className="w-full absolute top-0 left-0 bg-edu-bg-gray bg-opacity-50">
@@ -53,40 +53,25 @@ const changeLanguage = (lng: string) => {
           <Link href={`/`}>
             <div className="flex cursor-pointer">
               <div className="flex items-center">
-                <Image
-                  src={ocLogo}
-                  alt="EduHub logo"
-                  width={34}
-                  height={34}
-                  priority
-                />
+                <Image src={ocLogo} alt="EduHub logo" width={34} height={34} priority />
               </div>
               <div className="flex items-center ml-2">
-                <Image
-                  src={eduhubLogo}
-                  alt="EduHub name"
-                  width={46}
-                  height={33}
-                  priority
-                />
+                <Image src={eduhubLogo} alt="EduHub name" width={46} height={33} priority />
               </div>
             </div>
           </Link>
         </div>
-        <div className="mr-2 text-white flex items-center"> 
-        <button
-              onClick={() => changeLanguage('en')}
-              className={`mr-2 ${isEnglish ? 'font-bold' : 'font-light'}`}
-            >
-              EN
-            </button>
-            |
-            <button
-              onClick={() => changeLanguage('de')}
-              className={`mr-6 ml-2 ${isEnglish ? 'font-light' : 'font-bold'}`}
-            >
-              DE
-            </button>
+        <div className="mr-2 text-white flex items-center">
+          <button onClick={() => changeLanguage('en')} className={`mr-2 ${isEnglish ? 'font-bold' : 'font-light'}`}>
+            EN
+          </button>
+          |
+          <button
+            onClick={() => changeLanguage('de')}
+            className={`mr-6 ml-2 ${isEnglish ? 'font-light' : 'font-bold'}`}
+          >
+            DE
+          </button>
         </div>
         <ClientOnly>
           <div className="flex-shrink ">
@@ -94,14 +79,10 @@ const changeLanguage = (lng: string) => {
               <div className="flex">
                 <div className="flex">
                   <div className="cursor-pointer" onClick={openMenu}>
-                    <Avatar imageUrl={user?.picture || mysteryImg} />
+                    <UserCard className="flex items-center" key={`avatar`} user={user} size={`small`} />
                   </div>
                   {menuAnchorElement ? (
-                    <Menu
-                      isVisible={isMenuVisible}
-                      setVisible={setMenuVisible}
-                      anchorElement={menuAnchorElement}
-                    />
+                    <Menu isVisible={isMenuVisible} setVisible={setMenuVisible} anchorElement={menuAnchorElement} />
                   ) : null}
                 </div>
               </div>

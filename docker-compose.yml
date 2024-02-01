@@ -20,7 +20,9 @@ services:
       - hasura
       - keycloak
     environment:
-      HELP_DOCS_URL: https://opencampus.gitbook.io/faq/
+      NEXT_PUBLIC_HELP_DOCS_URL: https://opencampus.gitbook.io/faq/
+      NEXT_PUBLIC_STORAGE_BUCKET_URL: http://localhost:4001/emulated-bucket
+      NEXT_PUBLIC_ENVIRONMENT: development
 
   node_functions:
     container_name: eduhub-node-functions
@@ -36,7 +38,6 @@ services:
     command: ["sh", "/functions/start-node.sh"]
     environment:
       ENVIRONMENT: development
-      LOCAL_TESTING: 1
       EMULATE_EMAIL: "1"
       STORAGE_PORT: 4001
       KEYCLOAK_URL: http://keycloak:8080

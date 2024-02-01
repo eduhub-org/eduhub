@@ -1,7 +1,7 @@
 import { createContext, FC, MouseEvent, useCallback, useEffect, useState } from 'react';
 import { IUserProfile } from '../../hooks/user';
 import { useKeycloakUserProfile, useUserId, useUser } from '../../hooks/user';
-import AchievementOptionDropDown from '../achievements/AchievementOptionDropDown';
+import AchievementOptionDropDown from '../ManageAchievements/AchievementOptionDropDown';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
@@ -13,9 +13,8 @@ import FormToUploadAchievementRecord from '../FormToUploadAchievementRecord';
 import { makeFullName, formattedDate, formattedDateWithTime } from '../../helpers/util';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { ACHIEVEMENT_OPTION_COURSES } from '../../queries/achievementOption';
-import { INSERT_AN_ACHIEVEMENT_RECORD } from '../../queries/achievementRecord';
 
-import { order_by, AchievementRecordType_enum, AchievementRecordRating_enum } from '../../__generated__/globalTypes';
+import { order_by, AchievementRecordType_enum } from '../../__generated__/globalTypes';
 import {
   AchievementRecordListWithAuthors,
   AchievementRecordListWithAuthorsVariables,
@@ -26,12 +25,6 @@ import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../queries/achievementRecor
 import { MinAchievementOption } from '../../helpers/achievement';
 import { AchievementOptionCourses_AchievementOptionCourse_AchievementOption } from '../../queries/__generated__/AchievementOptionCourses';
 import useTranslation from 'next-translate/useTranslation';
-import { useAuthedMutation } from '../../hooks/authedMutation';
-import {
-  InsertAnAchievementRecord,
-  InsertAnAchievementRecordVariables,
-} from '../../queries/__generated__/InsertAnAchievementRecord';
-import Trans from 'next-translate/Trans';
 import FileDownload from '../common/forms/FileDownload';
 interface IContext {
   achievementRecordUploadDeadline: any;
@@ -66,11 +59,6 @@ const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUpload
 
   /* #region Database */
   const query = useAuthedQuery<AchievementOptionCourses, AchievementOptionCoursesVariables>(ACHIEVEMENT_OPTION_COURSES);
-
-  const [insertAnAchievementRecordAPI] = useAuthedMutation<
-    InsertAnAchievementRecord,
-    InsertAnAchievementRecordVariables
-  >(INSERT_AN_ACHIEVEMENT_RECORD);
 
   useEffect(() => {
     const options = [...(query.data?.AchievementOptionCourse || [])];

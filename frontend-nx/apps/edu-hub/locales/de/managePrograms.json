@@ -1,0 +1,32 @@
+{
+    "title": {
+      "label": "Programmtitel",
+      "placeholder": "Neues Programm",
+      "help_text": "Der Name des Programms wie er auch den Teilnehmenden angezeigt wird.",
+      "error_text": "Der Name darf maximal 22 Zeichen lang sein."
+    },
+    "short_title": {
+      "label": "Kurzbezeichnung",
+      "placeholder": "KURZTITEL",
+      "help_text": "Die Kurzbezeichnung wird vor allem im Admin-Bereich verwendet. Sie sollte nicht länger als 10 Zeichen sein. Alle Buchstaben werden automatisch in Großbuchstaben umgewandelt.",
+      "error_text": "Die Kurzbezeichnung darf maximal 10 Zeichen lang sein."
+    },
+    "start_evaluation": {
+        "label": "Link Start-Evaluation",
+        "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
+        "help_text": "Der hier verlinkte Fragebogen wird den Teilnehmenden nach dem ersten Termin eines Kurses oder einer Veranstaltung per E-Mail zugeschickt.\n Der Titel des Programms und der Name des Kurses oder der Veranstaltung werden per URL-Parameter automatisch mitgegeben und können entsprechend in den Fragebogen übernommen werden.",
+        "error_text": "Ungültiges Linkformat!"
+      },
+    "speaker_evaluation": {
+      "label": "Link Speaker-Evaluation",
+      "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
+      "help_text": "Dieser Fragebogenlink wird den Teilnehmenden nach jedem Termin eines Kurses oder einer Veranstaltung, bei der ein externer Referent eingetragen ist, per E-Mail zugeschickt.\n Der Titel des Programms und der Name des Kurses oder der Veranstaltung werden per URL-Parameter automatisch mitgegeben und können entsprechend in den Fragebogen übernommen werden.",
+      "error_text": "Ungültiges Linkformat!"
+    },
+    "final_evaluation": {
+        "label": "Link Abschluss-Evaluation",
+        "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
+        "help_text": "Dieser Fragebogenlink wird den Teilnehmenden nach dem letzten Termin eines Kurses oder einer Veranstaltung per E-Mail zugeschickt.\n Der Titel des Programms und der Name des Kurses oder der Veranstaltung werden per URL-Parameter automatisch mitgegeben und können entsprechend in den Fragebogen übernommen werden.",
+        "error_text": "Ungültiges Linkformat!"
+    }
+}

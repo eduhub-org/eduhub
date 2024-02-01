@@ -1,22 +1,14 @@
+import React, { FC, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-import { Dispatch, FC, SetStateAction} from 'react';
+import { Dispatch, SetStateAction } from 'react';
 
-import { useAuthedQuery } from '../../hooks/authedQuery';
-
+import { useRoleQuery } from '../../hooks/authedQuery';
 import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../queries/__generated__/CourseWithEnrollment';
-import { LOAD_ACHIEVEMENT_CERTIFICATE } from '../../queries/loadAchievementCertificate';
-import { LOAD_ATTENDANCE_CERTIFICATE } from '../../queries/loadAttendanceCertificate';
+import { GET_SIGNED_URL } from '../../queries/actions';
+import { GetSignedUrl, GetSignedUrlVariables } from '../../queries/__generated__/GetSignedUrl';
 import { Button } from './Button';
-
-import {
-  loadAchievementCertificate,
-  loadAchievementCertificateVariables,
-} from '../../queries/__generated__/loadAchievementCertificate';
-import {
-  loadAttendanceCertificate,
-  loadAttendanceCertificateVariables,
-} from '../../queries/__generated__/loadAttendanceCertificate';
 import { ExtendedDegreeParticipantsEnrollment } from '../ManageCourseContent/DegreeParticipationsTab';
+import { ErrorMessageDialog } from '../../components/common/dialogs/ErrorMessageDialog';
 
 interface IProps {
   courseEnrollment: CourseWithEnrollment_Course_by_pk_CourseEnrollments | ExtendedDegreeParticipantsEnrollment;
@@ -36,26 +28,32 @@ export const CertificateDownload: FC<IProps> = ({
   setRefetchAttendanceCertificates,
 }) => {
   const { t } = useTranslation();
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const {
-    data: loadAchievementCertificateData,
-    loading: loadAchievementCerfificateLoading,
-    //refetch: loadAchievementCerfificateRefetch,
-  } = useAuthedQuery<loadAchievementCertificate, loadAchievementCertificateVariables>(LOAD_ACHIEVEMENT_CERTIFICATE, {
+  const handleQueryError = (error: string) => {
+    setErrorMessage(error);
+  };
+
+  const { data: loadAchievementCertificateData, loading: loadAchievementCerfificateLoading } = useRoleQuery<
+    GetSignedUrl,
+    GetSignedUrlVariables
+  >(GET_SIGNED_URL, {
     variables: {
       path: courseEnrollment?.achievementCertificateURL,
     },
     skip: !courseEnrollment?.achievementCertificateURL,
+    onError: () => handleQueryError(t('errorMessages:loadAchievementCertificateError')),
   });
 
-  const { data: loadAttendanceCertificateData, loading: loadAttendanceCertificateLoading } = useAuthedQuery<
-    loadAttendanceCertificate,
-    loadAttendanceCertificateVariables
-  >(LOAD_ATTENDANCE_CERTIFICATE, {
+  const { data: loadAttendanceCertificateData, loading: loadAttendanceCertificateLoading } = useRoleQuery<
+    GetSignedUrl,
+    GetSignedUrlVariables
+  >(GET_SIGNED_URL, {
     variables: {
       path: courseEnrollment?.attendanceCertificateURL,
     },
     skip: !courseEnrollment?.attendanceCertificateURL,
+    onError: () => handleQueryError(t('errorMessages:loadAttendanceCertificateError')),
   });
 
   return (
@@ -67,7 +65,7 @@ export const CertificateDownload: FC<IProps> = ({
             <Button
               as="a"
               filled
-              href={loadAchievementCertificateData.loadAchievementCertificate.link}
+              href={loadAchievementCertificateData.getSignedUrl.link}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -81,7 +79,7 @@ export const CertificateDownload: FC<IProps> = ({
           <Button
             as="a"
             filled
-            href={loadAttendanceCertificateData.loadAttendanceCertificate.link}
+            href={loadAttendanceCertificateData.getSignedUrl.link}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -89,6 +87,10 @@ export const CertificateDownload: FC<IProps> = ({
               ? t('manageCourse:attendance_certificate_download')
               : t('course-page:attendanceCertificateDownload')}
           </Button>
+        )}
+        {/* Error Message Dialog */}
+        {errorMessage && (
+          <ErrorMessageDialog errorMessage={errorMessage} open={!!errorMessage} onClose={() => setErrorMessage('')} />
         )}
       </div>
     </div>

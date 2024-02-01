@@ -5,7 +5,7 @@ cd /hasura
 
 # Wait for the database and keycloak to become ready
 ./wait-for-it.sh db_hasura:5432 --timeout=100 --strict
-./wait-for-it.sh keycloak:8080 --timeout=200 --strict
+./wait-for-it.sh keycloak:8080 --timeout=400 --strict
 
 # Start the Hasura GraphQL Engine in the background
 graphql-engine serve &

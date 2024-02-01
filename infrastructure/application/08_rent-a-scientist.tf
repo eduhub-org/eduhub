@@ -86,6 +86,10 @@ resource "google_cloud_run_service" "rent_a_scientist" {
           value = "production"
         }
         env {
+          name  = "ENVIRONMENT"
+          value = var.environment
+        }
+        env {
           name  = "STORAGE_BUCKET_URL"
           value = "https://storage.googleapis.com/storage/v1/${var.project_id}"
         }
