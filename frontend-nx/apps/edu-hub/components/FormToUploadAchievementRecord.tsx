@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, ReactNode, useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { ChangeEvent, FC, ReactNode, useCallback, useReducer, useRef, useState } from 'react';
 
 import { MdAddCircleOutline } from 'react-icons/md';
 import { parseFileUploadEvent, UploadFile } from '../helpers/filehandling';

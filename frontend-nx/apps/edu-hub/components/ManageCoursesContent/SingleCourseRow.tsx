@@ -429,7 +429,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                 <IconButton onClick={handleImageUploadClick}>
                   <MdUpload size="0.75em" />
                 </IconButton>
-                {coverImage != null && <img width="300px" src={coverImage} />}
+                {coverImage != null && <img width="300px" src={coverImage} alt="course cover image" />}
               </div>
               <input ref={imageUploadRef} onChange={handleUploadCourseImageEvent} className="hidden" type="file" />
             </td>

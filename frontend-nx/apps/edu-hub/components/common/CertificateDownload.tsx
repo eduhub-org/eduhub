@@ -34,11 +34,10 @@ export const CertificateDownload: FC<IProps> = ({
     setErrorMessage(error);
   };
 
-  const {
-    data: loadAchievementCertificateData,
-    loading: loadAchievementCerfificateLoading,
-    error: achievementCertificateError,
-  } = useRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL, {
+  const { data: loadAchievementCertificateData, loading: loadAchievementCerfificateLoading } = useRoleQuery<
+    GetSignedUrl,
+    GetSignedUrlVariables
+  >(GET_SIGNED_URL, {
     variables: {
       path: courseEnrollment?.achievementCertificateURL,
     },
@@ -46,11 +45,10 @@ export const CertificateDownload: FC<IProps> = ({
     onError: () => handleQueryError(t('errorMessages:loadAchievementCertificateError')),
   });
 
-  const {
-    data: loadAttendanceCertificateData,
-    loading: loadAttendanceCertificateLoading,
-    error: attendanceCertificateError,
-  } = useRoleQuery<GetSignedUrl, GetSignedUrlVariables>(GET_SIGNED_URL, {
+  const { data: loadAttendanceCertificateData, loading: loadAttendanceCertificateLoading } = useRoleQuery<
+    GetSignedUrl,
+    GetSignedUrlVariables
+  >(GET_SIGNED_URL, {
     variables: {
       path: courseEnrollment?.attendanceCertificateURL,
     },

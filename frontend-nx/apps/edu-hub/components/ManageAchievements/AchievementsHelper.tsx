@@ -39,7 +39,6 @@ export interface IContext extends IPropsDashBoard {
   onClickDeleteAnAchievement: (id: number) => Promise<boolean>;
 }
 export const AchievementContext = createContext({} as IContext);
-const fileUploadErrorMessage = 'incorrect secret';
 
 const AchievementsHelper: FC<{
   context: IPropsDashBoard;

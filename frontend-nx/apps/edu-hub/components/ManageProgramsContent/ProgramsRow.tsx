@@ -41,7 +41,6 @@ import {
   UpdateProgramParticipationTemplateVariables,
 } from '../../queries/__generated__/UpdateProgramParticipationTemplate';
 import EhDebounceInput from '../common/EhDebounceInput';
-import FileUpload from '../common/forms/FileUpload';
 import path from 'path';
 
 interface ProgramsRowProps {

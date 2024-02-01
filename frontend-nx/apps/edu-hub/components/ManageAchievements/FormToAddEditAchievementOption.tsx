@@ -43,7 +43,6 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
   const [showMentorDialog, setShowMentorDialog] = useState(false);
   const [showCourseListDialog, setShowCourseListDialog] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [scriptGoogleUrl, setScriptGoogleUrl] = useState(null as string);
   const loadAchievementDocumentationTemplates = useAdminQuery<AchievementDocumentationTemplates>(
     ACHIEVEMENT_DOCUMENTATION_TEMPLATES
   );

@@ -5,7 +5,7 @@ import useTranslation from 'next-translate/useTranslation';
 import { IconButton } from '@material-ui/core';
 import { MdUpload } from 'react-icons/md';
 
-import { getPublicUrl, parseFileUploadEvent } from '../../helpers/filehandling';
+import { parseFileUploadEvent } from '../../helpers/filehandling';
 
 import { Button } from '../common/Button';
 import FormFieldRow from '../common/forms/FormFieldRow';
