@@ -62,11 +62,7 @@ export const AchievementOptionDropDown: FC<IProps> = ({
       className="min-w-full"
     >
       {courseAchievementOptions.map((data, index) =>
-        createElement(
-          'div',
-          { key: `items-${index}` },
-          <SingleOption callback={onOptionClick} item={data} />
-        )
+        createElement('div', { key: `items-${index}` }, <SingleOption callback={onOptionClick} item={data} />)
       )}
     </StyledMenu>
   );

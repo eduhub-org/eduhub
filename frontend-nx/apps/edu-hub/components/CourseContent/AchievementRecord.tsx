@@ -1,7 +1,7 @@
 import { createContext, FC, MouseEvent, useCallback, useEffect, useState } from 'react';
 import { IUserProfile } from '../../hooks/user';
 import { useKeycloakUserProfile, useUserId, useUser } from '../../hooks/user';
-import AchievementOptionDropDown from '../ManageAchievements/AchievementOptionDropDown';
+import AchievementOptionDropDown from '../ManageAchievementsContent/AchievementOptionDropDown';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
