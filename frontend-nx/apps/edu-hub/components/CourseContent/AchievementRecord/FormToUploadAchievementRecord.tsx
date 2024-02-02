@@ -1,40 +1,40 @@
 import React, { ChangeEvent, FC, ReactNode, useCallback, useReducer, useRef, useState } from 'react';
 
 import { MdAddCircleOutline } from 'react-icons/md';
-import { parseFileUploadEvent, UploadFile } from '../helpers/filehandling';
-import { downloadCSVFileFromBase64String, makeFullName } from '../helpers/util';
-import { useAuthedMutation } from '../hooks/authedMutation';
-import { INSERT_AN_ACHIEVEMENT_RECORD, UPDATE_AN_ACHIEVEMENT_RECORD } from '../queries/achievementRecord';
-import { SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE, SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION } from '../queries/actions';
+import { parseFileUploadEvent, UploadFile } from '../../../helpers/filehandling';
+import { downloadCSVFileFromBase64String, makeFullName } from '../../../helpers/util';
+import { useAuthedMutation } from '../../../hooks/authedMutation';
+import { INSERT_AN_ACHIEVEMENT_RECORD, UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../queries/achievementRecord';
+import { SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE, SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION } from '../../../queries/actions';
 import {
   InsertAnAchievementRecord,
   InsertAnAchievementRecordVariables,
-} from '../queries/__generated__/InsertAnAchievementRecord';
+} from '../../../queries/__generated__/InsertAnAchievementRecord';
 import {
   SaveAchievementRecordCoverImage,
   SaveAchievementRecordCoverImageVariables,
-} from '../queries/__generated__/SaveAchievementRecordCoverImage';
+} from '../../../queries/__generated__/SaveAchievementRecordCoverImage';
 import {
   SaveAchievementRecordDocumentation,
   SaveAchievementRecordDocumentationVariables,
-} from '../queries/__generated__/SaveAchievementRecordDocumentation';
+} from '../../../queries/__generated__/SaveAchievementRecordDocumentation';
 import {
   UpdateAchievementRecordByPk,
   UpdateAchievementRecordByPkVariables,
-} from '../queries/__generated__/UpdateAchievementRecordByPk';
-import { AchievementRecordRating_enum, AchievementRecordType_enum } from '../__generated__/globalTypes';
-import { ContentRow } from './common/ContentRow';
-import EhTagStingId from './common/EhTagStingId';
-import { AtLeastNameEmail, MinAchievementOption, NameId } from '../helpers/achievement';
+} from '../../../queries/__generated__/UpdateAchievementRecordByPk';
+import { AchievementRecordRating_enum, AchievementRecordType_enum } from '../../../__generated__/globalTypes';
+import { ContentRow } from '../../common/ContentRow';
+import EhTagStingId from '../../common/EhTagStingId';
+import { AtLeastNameEmail, MinAchievementOption, NameId } from '../../../helpers/achievement';
 import Trans from 'next-translate/Trans';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress, TextareaAutosize, Link } from '@material-ui/core';
-import { Button } from './common/Button';
-import EnrolledUserForACourseDialog from './common/dialogs/EnrolledUserForACourseDialog';
-import Modal from './common/Modal';
-import { User_User_by_pk } from '../queries/__generated__/User';
-import { ErrorMessageDialog } from './common/dialogs/ErrorMessageDialog';
-import useErrorHandler from '../hooks/useErrorHandler';
+import { Button } from '../../common/Button';
+import EnrolledUserForACourseDialog from '../../common/dialogs/EnrolledUserForACourseDialog';
+import Modal from '../../common/Modal';
+import { User_User_by_pk } from '../../../queries/__generated__/User';
+import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
+import useErrorHandler from '../../../hooks/useErrorHandler';
 
 interface State {
   achievementRecordTableId: number; // book keeping

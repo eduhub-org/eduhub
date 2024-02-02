@@ -3,11 +3,24 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { AchievementRecordRating_enum } from "./../../__generated__/globalTypes";
+import { AchievementRecordRating_enum, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: AchievementRecordFragment
 // ====================================================
+
+export interface AchievementRecordFragment_AchievementOption {
+  __typename: "AchievementOption";
+  id: number;
+  /**
+   * Title of an offered achievement option
+   */
+  title: string;
+  /**
+   * Type of the achivement record that must be uploaded for this option
+   */
+  recordType: AchievementRecordType_enum;
+}
 
 export interface AchievementRecordFragment {
   __typename: "AchievementRecord";
@@ -45,4 +58,8 @@ export interface AchievementRecordFragment {
    * URL to the uploaded file with the documentation of the record.
    */
   documentationUrl: string | null;
+  /**
+   * An object relationship
+   */
+  AchievementOption: AchievementRecordFragment_AchievementOption;
 }

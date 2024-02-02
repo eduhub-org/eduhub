@@ -26,7 +26,7 @@ import AchievementsHelper, { AchievementContext, IPropsDashBoard } from './Achie
 import AddAchievementOption from './AddAchievementOption';
 import EditAchievementOption from './EditAchievementOption';
 
-const ManageAchievementsContent: FC<{
+const ManageAchievementOptionsContent: FC<{
   userId: string | undefined;
   userProfile: IUserProfile | undefined;
   achievementRecordTypes: string[];
@@ -96,7 +96,7 @@ const ManageAchievementsContent: FC<{
   );
 };
 
-export default ManageAchievementsContent;
+export default ManageAchievementOptionsContent;
 
 // Start Content
 

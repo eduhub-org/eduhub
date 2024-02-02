@@ -1,31 +1,31 @@
 import { createContext, FC, MouseEvent, useCallback, useEffect, useState } from 'react';
-import { IUserProfile } from '../../hooks/user';
-import { useKeycloakUserProfile, useUserId, useUser } from '../../hooks/user';
-import AchievementOptionDropDown from '../ManageAchievementsContent/AchievementOptionDropDown';
+import { IUserProfile } from '../../../hooks/user';
+import { useKeycloakUserProfile, useUserId, useUser } from '../../../hooks/user';
+import AchievementOptionDropDown from '../../ManageAchievementOptionsContent/AchievementOptionDropDown';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
-} from '../../queries/__generated__/AchievementOptionCourses';
-import { Button } from '../common/Button';
-import { useAuthedQuery } from '../../hooks/authedQuery';
+} from '../../../queries/__generated__/AchievementOptionCourses';
+import { Button } from '../../common/Button';
+import { useAuthedQuery } from '../../../hooks/authedQuery';
 import { BlockTitle } from '@opencampus/shared-components';
-import FormToUploadAchievementRecord from '../FormToUploadAchievementRecord';
-import { makeFullName, formattedDate, formattedDateWithTime } from '../../helpers/util';
-import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
-import { ACHIEVEMENT_OPTION_COURSES } from '../../queries/achievementOption';
+import FormToUploadAchievementRecord from './FormToUploadAchievementRecord';
+import { makeFullName, formattedDate, formattedDateWithTime } from '../../../helpers/util';
+import { AlertMessageDialog } from '../../common/dialogs/AlertMessageDialog';
+import { ACHIEVEMENT_OPTION_COURSES } from '../../../queries/achievementOption';
 
-import { order_by, AchievementRecordType_enum } from '../../__generated__/globalTypes';
+import { order_by, AchievementRecordType_enum } from '../../../__generated__/globalTypes';
 import {
   AchievementRecordListWithAuthors,
   AchievementRecordListWithAuthorsVariables,
   AchievementRecordListWithAuthors_AchievementRecord,
-} from '../../queries/__generated__/AchievementRecordListWithAuthors';
-import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../queries/achievementRecord';
+} from '../../../queries/__generated__/AchievementRecordListWithAuthors';
+import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../../queries/achievementRecord';
 //import { Link } from '@material-ui/core';
-import { MinAchievementOption } from '../../helpers/achievement';
-import { AchievementOptionCourses_AchievementOptionCourse_AchievementOption } from '../../queries/__generated__/AchievementOptionCourses';
+import { MinAchievementOption } from '../../../helpers/achievement';
+import { AchievementOptionCourses_AchievementOptionCourse_AchievementOption } from '../../../queries/__generated__/AchievementOptionCourses';
 import useTranslation from 'next-translate/useTranslation';
-import FileDownload from '../common/forms/FileDownload';
+import FileDownload from '../../common/forms/FileDownload';
 interface IContext {
   achievementRecordUploadDeadline: any;
   courseTitle: string;
@@ -42,7 +42,7 @@ interface IProps {
   courseTitle: string;
 }
 
-const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUploadDeadline, courseTitle }) => {
+const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadline, courseTitle }) => {
   const { t, lang } = useTranslation();
   const user = useUser();
   const userId = useUserId();
@@ -98,6 +98,19 @@ const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUpload
     setShowModal(false);
   }, [setShowModal]);
 
+  useEffect(() => {
+    const r = myRecordsQuery.data?.AchievementRecord[0] || null;
+    setMyRecords(r);
+    if (r) {
+      const matchingAchievementOption = query.data?.AchievementOptionCourse.find(
+        (option) => option.id === r.AchievementOption.id
+      );
+      if (matchingAchievementOption) {
+        setSelectedAchievementOption(matchingAchievementOption.AchievementOption);
+      }
+    }
+  }, [myRecordsQuery, query]);
+
   const upload = useCallback(() => {
     setShowModal(true);
   }, [setShowModal]);
@@ -114,7 +127,7 @@ const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUpload
     async (item: AchievementOptionCourses_AchievementOptionCourse_AchievementOption) => {
       setSelectedAchievementOption(item);
     },
-    [setSelectedAchievementOption]
+    [setSelectedAchievementOption, myRecordsQuery, query]
   );
 
   const closeAlertDialog = useCallback(() => {
@@ -173,22 +186,19 @@ const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUpload
             />
           )}
         </div>
-
         {selectedAchievementOption?.id ? (
           <div>
-            {`${t('course-page:chosen-achievement-option')}: `}
+            {`${t('course-page:current_achievement_option')}: `}
             {selectedAchievementOption.title}
           </div>
+        ) : myRecords ? (
+          <div>
+            {`${t('course-page:current_achievement_option')}: `}
+            {myRecords.AchievementOption.title}
+          </div>
         ) : (
-          <div>{t('course-page:no-achievement-option-chosen')}</div>
+          <div>{t('course-page:no_current_achievement_option')}</div>
         )}
-        {/* {selectedAchievementOption.id && (
-          <Link
-            href={`../achievements/${selectedAchievementOption.id}?courseId=${courseId}`}
-          >
-            {selectedAchievementOption.title}
-          </Link>
-        )} */}
         {selectedAchievementOption?.id &&
           (selectedAchievementOption.recordType === AchievementRecordType_enum.DOCUMENTATION ||
             selectedAchievementOption.recordType === AchievementRecordType_enum.ONLINE_COURSE) && (
@@ -206,24 +216,16 @@ const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUpload
               </Button>
             </div>
           )}
-        {selectedAchievementOption?.id &&
-          myRecords &&
-          (selectedAchievementOption.recordType === AchievementRecordType_enum.DOCUMENTATION ||
-            selectedAchievementOption.recordType === AchievementRecordType_enum.ONLINE_COURSE) && (
-            <p>
-              {t('course-page:last-upload-from-an-author', {
-                dateTime: formattedDateWithTime(new Date(myRecords.created_at), lang),
-                fullName: makeFullName(profile.firstName, profile.lastName),
-              })}
-            </p>
-          )}
-
-        {selectedAchievementOption?.id &&
-          !myRecords &&
-          (selectedAchievementOption.recordType === AchievementRecordType_enum.DOCUMENTATION ||
-            selectedAchievementOption.recordType === AchievementRecordType_enum.ONLINE_COURSE) && (
-            <p>{t('course-page:no-proof-uploaded-by-me-as-author')}</p>
-          )}
+        {myRecords ? (
+          <p>
+            {t('course-page:last-upload-from-an-author', {
+              dateTime: formattedDateWithTime(new Date(myRecords.created_at), lang),
+              fullName: makeFullName(profile.firstName, profile.lastName),
+            })}
+          </p>
+        ) : (
+          <p>{t('course-page:no-proof-uploaded-by-me-as-author')}</p>
+        )}
       </div>
       {showModal && (
         <FormToUploadAchievementRecord
@@ -242,4 +244,4 @@ const CourseAchievementOption: FC<IProps> = ({ courseId, achievementRecordUpload
   );
 };
 
-export default CourseAchievementOption;
+export default AchievementRecord;

@@ -2,23 +2,23 @@ import useTranslation from 'next-translate/useTranslation';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { FC, useEffect, useState } from 'react';
-import ManageAchievementsContent from '../../components/ManageAchievementsContent';
-import CommonPageHeader from '../../components/common/CommonPageHeader';
-import { Page } from '../../components/Page';
-import { DefaultAchievementOptions, QUERY_LIMIT } from '../../helpers/achievement';
-import { useAdminQuery } from '../../hooks/authedQuery';
-import { useIsAdmin, useIsInstructor, useIsLoggedIn } from '../../hooks/authentication';
-import { useKeycloakUserProfile, useUserId } from '../../hooks/user';
-import { ACHIEVEMENT_RECORD_TYPES } from '../../queries/achievementOption';
-import { ADMIN_COURSE_LIST } from '../../queries/courseList';
-import { AchievementRecordTypes } from '../../queries/__generated__/AchievementRecordTypes';
+import ManageAchievementOptionsContent from '../../../components/ManageAchievementOptionsContent';
+import CommonPageHeader from '../../../components/common/CommonPageHeader';
+import { Page } from '../../../components/Page';
+import { DefaultAchievementOptions, QUERY_LIMIT } from '../../../helpers/achievement';
+import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useIsAdmin, useIsInstructor, useIsLoggedIn } from '../../../hooks/authentication';
+import { useKeycloakUserProfile, useUserId } from '../../../hooks/user';
+import { ACHIEVEMENT_RECORD_TYPES } from '../../../queries/achievementOption';
+import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
+import { AchievementRecordTypes } from '../../../queries/__generated__/AchievementRecordTypes';
 import {
   AdminCourseList,
   AdminCourseListVariables,
   AdminCourseList_Course,
-} from '../../queries/__generated__/AdminCourseList';
+} from '../../../queries/__generated__/AdminCourseList';
 
-const Achievements: FC = () => {
+const AchievementOptions: FC = () => {
   const [course, setCourse] = useState(undefined as AdminCourseList_Course);
   const [recordTypes, setRecordTypes] = useState([] as string[]);
 
@@ -67,7 +67,7 @@ const Achievements: FC = () => {
           <div className="min-h-[77vh]">
             <CommonPageHeader headline={header} />
             {isLoggedIn && (isAdmin || isInstructor) && recordTypes.length > 0 && (
-              <ManageAchievementsContent
+              <ManageAchievementOptionsContent
                 achievementRecordTypes={recordTypes}
                 userId={userId}
                 userProfile={profile}
@@ -80,4 +80,4 @@ const Achievements: FC = () => {
     </>
   );
 };
-export default Achievements;
+export default AchievementOptions;

@@ -12,5 +12,10 @@ export const ACHIEVEMENT_RECORD_FRAGMENT = gql`
     score
     rating
     documentationUrl
+    AchievementOption {
+      id
+      title
+      recordType
+    }
   }
 `;
