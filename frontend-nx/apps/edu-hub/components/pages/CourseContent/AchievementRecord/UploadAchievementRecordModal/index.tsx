@@ -112,13 +112,6 @@ const UploadAchievementRecordModal: FC<IProps> = ({
     onError: (error) => handleError(t(error.message)),
   });
 
-  const [saveAchievementRecordCoverImage] = useAuthedMutation<
-    SaveAchievementRecordCoverImage,
-    SaveAchievementRecordCoverImageVariables
-  >(SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE, {
-    onError: (error) => handleError(t(error.message)),
-  });
-
   const [saveAchievementRecordDocumentation] = useAuthedMutation<
     SaveAchievementRecordDocumentation,
     SaveAchievementRecordDocumentationVariables
