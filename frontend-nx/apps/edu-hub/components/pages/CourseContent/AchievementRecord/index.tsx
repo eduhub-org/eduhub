@@ -1,4 +1,4 @@
-import { createContext, FC, MouseEvent, useCallback, useEffect, useState } from 'react';
+import { createContext, FC, useCallback, useEffect, useState } from 'react';
 import { IUserProfile } from '../../../../hooks/user';
 import { useKeycloakUserProfile, useUserId, useUser } from '../../../../hooks/user';
 import {

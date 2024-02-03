@@ -277,20 +277,15 @@ const UploadAchievementRecordModal: FC<IProps> = ({
     [
       selectedAchievementOption,
       state.documentationUrl,
-      state.coverImageUrl,
       state.csvResults,
       state.description,
       state.authors,
-      selectedAchievementOption?.recordType,
-      selectedAchievementOption?.evaluationScriptUrl,
-      selectedAchievementOption?.id,
       insertAnAchievementRecordAPI,
       userId,
       saveAchievementRecordDocumentation,
       updateAnAchievementRecordAPI,
       setAlertMessage,
       t,
-      saveAchievementRecordCoverImage,
       onSuccess,
     ]
   );
