@@ -1,17 +1,17 @@
 import { FC, useCallback, useContext } from 'react';
-import { useAdminMutation } from '../../hooks/authedMutation';
-import { ResponseToARequest, UploadFileTypes } from '../../helpers/achievement';
-import { INSERT_AN_ACHIEVEMENT_OPTION } from '../../queries/mutateAchievement';
+import { useAdminMutation } from '../../../hooks/authedMutation';
+import { ResponseToARequest, UploadFileTypes } from '../../../helpers/achievement';
+import { INSERT_AN_ACHIEVEMENT_OPTION } from '../../../queries/mutateAchievement';
 import {
   InsertAnAchievementOption,
   InsertAnAchievementOptionVariables,
-} from '../../queries/__generated__/InsertAnAchievementOption';
-import { AchievementRecordType_enum } from '../../__generated__/globalTypes';
+} from '../../../queries/__generated__/InsertAnAchievementOption';
+import { AchievementRecordType_enum } from '../../../__generated__/globalTypes';
 import {
   IDataToManipulate,
   TempAchievementOptionCourse,
   TempAchievementOptionMentor,
-} from '../../helpers/achievement';
+} from '../../../helpers/achievement';
 import FormToAddEditAchievementOption from './FormToAddEditAchievementOption';
 import { AchievementContext } from './AchievementsHelper';
 interface IProps {
@@ -22,10 +22,9 @@ const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
   const context = useContext(AchievementContext);
   const profile = context.userProfile;
   /* #region Database and ServerLess Functions Declarations */
-  const [insertAnAchievement] = useAdminMutation<
-    InsertAnAchievementOption,
-    InsertAnAchievementOptionVariables
-  >(INSERT_AN_ACHIEVEMENT_OPTION);
+  const [insertAnAchievement] = useAdminMutation<InsertAnAchievementOption, InsertAnAchievementOptionVariables>(
+    INSERT_AN_ACHIEVEMENT_OPTION
+  );
   /* #endregion */
 
   const onSave = useCallback(
@@ -38,9 +37,7 @@ const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
               description: data.description,
               evaluationScriptUrl: '', // This field is also mandatory while insert
               recordType: data.recordType as AchievementRecordType_enum,
-              csvTemplateUrl: data.csvTemplateFile
-                ? data.csvTemplateFile.data
-                : null,
+              csvTemplateUrl: data.csvTemplateFile ? data.csvTemplateFile.data : null,
               AchievementOptionCourses: {
                 data: data.courses.map((c) => ({ courseId: c.courseId })),
               },
@@ -52,10 +49,7 @@ const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
           },
         });
 
-        if (
-          !response.errors &&
-          response.data?.insert_AchievementOption_one?.id
-        ) {
+        if (!response.errors && response.data?.insert_AchievementOption_one?.id) {
           const id = response.data.insert_AchievementOption_one.id;
           if (
             data.documentTemplateFile &&
@@ -117,12 +111,7 @@ const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
         } as TempAchievementOptionCourse)
       : [],
   };
-  return (
-    <FormToAddEditAchievementOption
-      defaultData={data}
-      onSaveCallBack={onSave}
-    />
-  );
+  return <FormToAddEditAchievementOption defaultData={data} onSaveCallBack={onSave} />;
 };
 
 export default AddAchievementOption;

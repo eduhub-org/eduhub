@@ -1,28 +1,28 @@
 import { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { useAdminMutation } from '../../hooks/authedMutation';
-import { AchievementOptionList_AchievementOption } from '../../queries/__generated__/AchievementOptionList';
+import { useAdminMutation } from '../../../hooks/authedMutation';
+import { AchievementOptionList_AchievementOption } from '../../../queries/__generated__/AchievementOptionList';
 import {
   InsertAnAchievementOptionCourse,
   InsertAnAchievementOptionCourseVariables,
-} from '../../queries/__generated__/InsertAnAchievementOptionCourse';
+} from '../../../queries/__generated__/InsertAnAchievementOptionCourse';
 import {
   InsertAnAchievementOptionMentor,
   InsertAnAchievementOptionMentorVariables,
-} from '../../queries/__generated__/InsertAnAchievementOptionMentor';
+} from '../../../queries/__generated__/InsertAnAchievementOptionMentor';
 import {
   DELETE_AN_ACHIEVEMENT_OPTION_COURSE,
   DELETE_AN_ACHIEVEMENT_OPTION_MENTOR,
   INSERT_AN_ACHIEVEMENT_OPTION_COURSE,
   INSERT_AN_ACHIEVEMENT_OPTION_MENTOR,
-} from '../../queries/mutateAchievement';
+} from '../../../queries/mutateAchievement';
 import {
   DeleteAnAchievementOptionCourseWithWhere,
   DeleteAnAchievementOptionCourseWithWhereVariables,
-} from '../../queries/__generated__/DeleteAnAchievementOptionCourseWithWhere';
+} from '../../../queries/__generated__/DeleteAnAchievementOptionCourseWithWhere';
 import {
   DeleteAnAchievementOptionMentorWithWhere,
   DeleteAnAchievementOptionMentorWithWhereVariables,
-} from '../../queries/__generated__/DeleteAnAchievementOptionMentorWithWhere';
+} from '../../../queries/__generated__/DeleteAnAchievementOptionMentorWithWhere';
 import {
   AchievementKeys,
   IDataToManipulate,
@@ -30,7 +30,7 @@ import {
   TempAchievementOptionCourse,
   TempAchievementOptionMentor,
   UploadFileTypes,
-} from '../../helpers/achievement';
+} from '../../../helpers/achievement';
 import FormToAddEditAchievementOption from './FormToAddEditAchievementOption';
 import _ from 'lodash';
 import { AchievementContext } from './AchievementsHelper';
@@ -64,10 +64,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
           },
         });
 
-        if (
-          !response.errors &&
-          response.data?.insert_AchievementOptionMentor_one?.id
-        ) {
+        if (!response.errors && response.data?.insert_AchievementOptionMentor_one?.id) {
           props.onSuccess(true);
           return response.data.insert_AchievementOptionMentor_one.id;
         }
@@ -132,10 +129,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
             },
           },
         });
-        if (
-          !response.errors &&
-          response.data?.delete_AchievementOptionMentor?.affected_rows
-        ) {
+        if (!response.errors && response.data?.delete_AchievementOptionMentor?.affected_rows) {
           props.onSuccess(true);
           return response.data.delete_AchievementOptionMentor.affected_rows;
         }
@@ -172,10 +166,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
             },
           },
         });
-        if (
-          !response.errors &&
-          response.data?.delete_AchievementOptionCourse?.affected_rows
-        ) {
+        if (!response.errors && response.data?.delete_AchievementOptionCourse?.affected_rows) {
           props.onSuccess(true);
           return response.data.delete_AchievementOptionCourse?.affected_rows;
         }
@@ -215,9 +206,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
           ({
             id: c.id,
             courseId: c.courseId,
-            programShortName: c.Course.Program
-              ? c.Course.Program.shortTitle
-              : '',
+            programShortName: c.Course.Program ? c.Course.Program.shortTitle : '',
             title: c.Course.title,
           } as TempAchievementOptionCourse)
       ),
@@ -240,10 +229,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
    * _.difference([2, 1], [2, 3]);
    * => [1]
    */
-  const deletedAndNewIds = <T extends string | number>(
-    oldIds: T[],
-    newIds: T[]
-  ) => {
+  const deletedAndNewIds = <T extends string | number>(oldIds: T[], newIds: T[]) => {
     return {
       deletedIds: _.difference(oldIds, newIds),
       newIds: _.difference(newIds, oldIds),
@@ -265,13 +251,10 @@ const EditAchievementOption: FC<IProps> = (props) => {
             case AchievementKeys.SHOW_SCORE_AUTHORS:
             case AchievementKeys.RECORD_TYPE:
             case 'achievementDocumentationTemplateId':
-              await context.queryUpdateAchievementOptions(
-                data.achievementOptionId,
-                {
-                  key,
-                  value: updatedData[key],
-                }
-              );
+              await context.queryUpdateAchievementOptions(data.achievementOptionId, {
+                key,
+                value: updatedData[key],
+              });
               break;
             case 'mentors': {
               try {
@@ -281,16 +264,10 @@ const EditAchievementOption: FC<IProps> = (props) => {
                 );
                 console.log(deletedIds, newIds);
                 for (const mentorId of deletedIds) {
-                  await queryDeleteAnAchievementMentorFromDB(
-                    achievementOptionId,
-                    mentorId
-                  );
+                  await queryDeleteAnAchievementMentorFromDB(achievementOptionId, mentorId);
                 }
                 for (const mentor of newIds) {
-                  await queryAddAchievementOptionMentors(
-                    achievementOptionId,
-                    mentor
-                  );
+                  await queryAddAchievementOptionMentors(achievementOptionId, mentor);
                 }
               } catch (error) {
                 console.log(error);
@@ -305,16 +282,10 @@ const EditAchievementOption: FC<IProps> = (props) => {
                   updatedData.courses.map((m) => m.courseId)
                 );
                 for (const deletedId of deletedIds) {
-                  await queryDeleteAnAchievementCourseFromDB(
-                    achievementOptionId,
-                    deletedId
-                  );
+                  await queryDeleteAnAchievementCourseFromDB(achievementOptionId, deletedId);
                 }
                 for (const newId of newIds) {
-                  await queryAddAchievementOptionCourse(
-                    achievementOptionId,
-                    newId
-                  );
+                  await queryAddAchievementOptionCourse(achievementOptionId, newId);
                 }
               } catch (error) {
                 console.log(error);
@@ -342,13 +313,10 @@ const EditAchievementOption: FC<IProps> = (props) => {
               break;
             case AchievementKeys.CSV_TEMPLATE_FILE:
               if (updatedData.csvTemplateFile) {
-                await context.queryUpdateAchievementOptions(
-                  data.achievementOptionId,
-                  {
-                    key: AchievementKeys.CSV_TEMPLATE_URL,
-                    value: updatedData[key].data,
-                  }
-                );
+                await context.queryUpdateAchievementOptions(data.achievementOptionId, {
+                  key: AchievementKeys.CSV_TEMPLATE_URL,
+                  value: updatedData[key].data,
+                });
               }
               break;
           }
@@ -372,16 +340,7 @@ const EditAchievementOption: FC<IProps> = (props) => {
   );
   if (!data) return <CircularProgress />;
 
-  return (
-    <>
-      {data && (
-        <FormToAddEditAchievementOption
-          defaultData={data}
-          onSaveCallBack={onSave}
-        />
-      )}
-    </>
-  );
+  return <>{data && <FormToAddEditAchievementOption defaultData={data} onSaveCallBack={onSave} />}</>;
 };
 
 export default EditAchievementOption;
