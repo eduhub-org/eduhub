@@ -4,8 +4,8 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import TextFieldEditor from '../../common/TextFieldEditor';
-import FileUpload from '../../common/forms/FileUpload';
+import TextFieldEditor from '../../forms/TextFieldEditor';
+import FileUpload from '../../forms/FileUpload';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import {
@@ -35,7 +35,7 @@ import {
   UpdateAchievementDocumentationTemplate,
   UpdateAchievementDocumentationTemplateVariables,
 } from '../../../queries/__generated__/UpdateAchievementDocumentationTemplate';
-import FileDownload from '../../common/forms/FileDownload';
+import FileDownload from '../../forms/FileDownload';
 
 const ManageAchievementTemplatesContent: FC = () => {
   const { data, loading, error, refetch } = useAdminQuery<AchievementDocumentationTemplates>(

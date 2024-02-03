@@ -42,7 +42,7 @@ import {
   AchievementOptionCoursesVariables,
 } from '../../../../../queries/__generated__/AchievementOptionCourses';
 import { QueryResult } from '@apollo/client';
-import FileDownload from '../../../../common/forms/FileDownload';
+import FileDownload from '../../../../forms/FileDownload';
 import UploadUI from './UploadUI';
 import AchievementOptionDropDown from './AchievementOptionDropDown';
 

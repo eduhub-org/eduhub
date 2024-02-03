@@ -27,7 +27,7 @@ import {
 } from '../../../queries/__generated__/UpdateEnrollmentStatus';
 import { User, UserVariables } from '../../../queries/__generated__/User';
 import { Button } from '../../common/Button';
-import FormFieldRow from '../../common/forms/FormFieldRow';
+import FormFieldRow from '../../forms/FormFieldRow';
 
 import type { OperationVariables, ApolloQueryResult } from '@apollo/client';
 import { Course_Course_by_pk } from '../../../queries/__generated__/Course';

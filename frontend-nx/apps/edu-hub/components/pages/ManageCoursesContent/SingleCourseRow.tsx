@@ -43,15 +43,15 @@ import { getPublicImageUrl, parseFileUploadEvent } from '../../../helpers/fileha
 import EhDebounceInput from '../../common/EhDebounceInput';
 
 import useTranslation from 'next-translate/useTranslation';
-import draftPie from '../../public/images/course/status/draft.svg';
-import readyForPublicationPie from '../../public/images/course/status/ready-for-publication.svg';
-import readyForApplicationPie from '../../public/images/course/status/ready-for-application.svg';
-import applicantsInvitedPie from '../../public/images/course/status/applicants-invited.svg';
-import participantsRatedPie from '../../public/images/course/status/participants-rated.svg';
+import draftPie from '../../../public/images/course/status/draft.svg';
+import readyForPublicationPie from '../../../public/images/course/status/ready-for-publication.svg';
+import readyForApplicationPie from '../../../public/images/course/status/ready-for-application.svg';
+import applicantsInvitedPie from '../../../public/images/course/status/applicants-invited.svg';
+import participantsRatedPie from '../../../public/images/course/status/participants-rated.svg';
 
 import { InstructorColumn } from './CoursesInstructorColumn';
-import TagSelector from '../../common/TagSelector';
-import TextFieldEditor from '../../common/TextFieldEditor';
+import TagSelector from '../../forms/TagSelector';
+import TextFieldEditor from '../../forms/TextFieldEditor';
 import {
   UPDATE_COURSE_CHAT_LINK,
   UPDATE_COURSE_ECTS,

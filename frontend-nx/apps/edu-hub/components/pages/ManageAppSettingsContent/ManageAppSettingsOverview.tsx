@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
 
 import { Button } from '../../common/Button';
-import FormFieldRow from '../../common/forms/FormFieldRow';
+import FormFieldRow from '../../forms/FormFieldRow';
 
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { useAdminQuery } from '../../../hooks/authedQuery';

@@ -8,7 +8,7 @@ import { MdUpload } from 'react-icons/md';
 import { parseFileUploadEvent } from '../../../helpers/filehandling';
 
 import { Button } from '../../common/Button';
-import FormFieldRow from '../../common/forms/FormFieldRow';
+import FormFieldRow from '../../forms/FormFieldRow';
 
 import { useAuthedMutation } from '../../../hooks/authedMutation';
 import { useAuthedQuery } from '../../../hooks/authedQuery';

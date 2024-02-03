@@ -1,7 +1,7 @@
 import React, { FC, useMemo, useState, FormEvent } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { Button } from '../../../common/Button';
-import TagSelector from '../../../common/TagSelector';
+import TagSelector from '../../../forms/TagSelector';
 import RadioButtonSelector from '../../../common/RadioButtonSelector';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../../hooks/authedMutation';

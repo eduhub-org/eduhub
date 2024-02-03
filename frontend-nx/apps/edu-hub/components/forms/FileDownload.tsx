@@ -1,9 +1,9 @@
 import React, { FC, useEffect, useState } from 'react';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import { Button } from '../Button';
-import { useSignedUrl } from '../../../hooks/signedUrl';
+import { Button } from '../common/Button';
+import { useSignedUrl } from '../../hooks/signedUrl';
 import useTranslation from 'next-translate/useTranslation';
-import { ErrorMessageDialog } from '../dialogs/ErrorMessageDialog';
+import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 
 interface IProps {
   filePath: string;
