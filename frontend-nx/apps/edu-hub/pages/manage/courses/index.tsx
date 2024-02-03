@@ -102,8 +102,7 @@ const Content: FC<IProps> = ({ programs }) => {
       />
       {courseListRequest.loading ? (
         <Loading />
-      ) : courseListRequest.data?.Course &&
-        courseListRequest.data?.Course.length > 0 ? (
+      ) : courseListRequest.data?.Course && courseListRequest.data?.Course.length > 0 ? (
         <ManageCoursesContent
           courseListRequest={courseListRequest}
           programs={sortedPrograms}

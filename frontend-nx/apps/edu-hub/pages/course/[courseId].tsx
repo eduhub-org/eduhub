@@ -20,18 +20,9 @@ const CoursePage: FC = () => {
         <title>EduHub | opencampus.sh</title>
         <link rel="icon" href="/favicon.png" />
         <meta property="og:title" content="EduHub | opencampus.sh" />
-        <meta
-          property="og:image"
-          content="https://edu.opencampus.sh/images/meta-image.png"
-        />
+        <meta property="og:image" content="https://edu.opencampus.sh/images/meta-image.png" />
       </Head>
-      <Page>
-        {isSessionLoading ? (
-          <CircularProgress />
-        ) : (
-          <CourseContent id={id} />
-        )}
-      </Page>
+      <Page>{isSessionLoading ? <CircularProgress /> : <CourseContent id={id} />}</Page>
     </>
   );
 };

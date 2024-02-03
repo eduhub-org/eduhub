@@ -9,11 +9,7 @@ interface IMenubarProps {
   onTabClicked: (menuItem: StaticComponentProperty) => void;
 }
 
-export const ProgramsMenubar: FC<IMenubarProps> = ({
-  programs,
-  defaultProgramId,
-  onTabClicked,
-}) => {
+export const ProgramsMenubar: FC<IMenubarProps> = ({ programs, defaultProgramId, onTabClicked }) => {
   // const allTabId = -1;
   // const maxMenuCount = 3;
   // We will just show latest Three and all, Ignore the Unknown id (0)
@@ -71,11 +67,7 @@ export const ProgramsMenubar: FC<IMenubarProps> = ({
   return (
     <div className="flex items-center space-x-0 flex-wrap">
       {menuItems.map((tab) => (
-        <EhMenuItem
-          key={tab.key}
-          property={tab}
-          onClickCallback={handleTabClick}
-        />
+        <EhMenuItem key={tab.key} property={tab} onClickCallback={handleTabClick} />
       ))}
     </div>
   );

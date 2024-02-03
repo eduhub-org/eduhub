@@ -37,11 +37,7 @@ const ManageCoursePage: FC = () => {
         <link rel="icon" href="/favicon.png" />
       </Head>
       <Page>
-        {isInstructor ? (
-          <ManageCourseContent courseId={Number(courseId)} />
-        ) : (
-          <div>Waiting for authentication!</div>
-        )}
+        {isInstructor ? <ManageCourseContent courseId={Number(courseId)} /> : <div>Waiting for authentication!</div>}
       </Page>
     </>
   );

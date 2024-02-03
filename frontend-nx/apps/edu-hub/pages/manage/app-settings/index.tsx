@@ -15,9 +15,7 @@ const AppSettings: FC = () => {
           <link rel="icon" href="/favicon.png" />
         </Head>
         <Page>
-          <div className="min-h-[77vh]">
-            {isAdmin && <AppSettingsOverview />}
-          </div>
+          <div className="min-h-[77vh]">{isAdmin && <AppSettingsOverview />}</div>
         </Page>
       </div>
     </>

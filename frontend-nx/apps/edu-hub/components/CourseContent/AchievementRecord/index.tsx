@@ -1,7 +1,6 @@
 import { createContext, FC, MouseEvent, useCallback, useEffect, useState } from 'react';
 import { IUserProfile } from '../../../hooks/user';
 import { useKeycloakUserProfile, useUserId, useUser } from '../../../hooks/user';
-import AchievementOptionDropDown from '../../ManageAchievementOptionsContent/AchievementOptionDropDown';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
@@ -9,7 +8,7 @@ import {
 import { Button } from '../../common/Button';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
 import { BlockTitle } from '@opencampus/shared-components';
-import FormToUploadAchievementRecord from './FormToUploadAchievementRecord';
+import FormToUploadAchievementRecord from './UploadAchievementRecordModal';
 import { makeFullName, formattedDate, formattedDateWithTime } from '../../../helpers/util';
 import { AlertMessageDialog } from '../../common/dialogs/AlertMessageDialog';
 import { ACHIEVEMENT_OPTION_COURSES } from '../../../queries/achievementOption';
@@ -23,9 +22,7 @@ import {
 import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../../queries/achievementRecord';
 //import { Link } from '@material-ui/core';
 import { MinAchievementOption } from '../../../helpers/achievement';
-import { AchievementOptionCourses_AchievementOptionCourse_AchievementOption } from '../../../queries/__generated__/AchievementOptionCourses';
 import useTranslation from 'next-translate/useTranslation';
-import FileDownload from '../../common/forms/FileDownload';
 interface IContext {
   achievementRecordUploadDeadline: any;
   courseTitle: string;
@@ -51,8 +48,6 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
   const [alertMessage, setAlertMessage] = useState('');
   const [myRecords, setMyRecords] = useState(null as AchievementRecordListWithAuthors_AchievementRecord);
 
-  const [selectedAchievementOption, setSelectedAchievementOption] =
-    useState<AchievementOptionCourses_AchievementOptionCourse_AchievementOption>();
   const [isVisibleAchievementOptions, setAchievementOptionVisibility] = useState(false);
   const [archiveOptionsAnchorElement, setAnchorElement] = useState<HTMLElement>();
   const [achievementOptions, setAchievementOptions] = useState([] as MinAchievementOption[]);
@@ -70,23 +65,13 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
     {
       variables: {
         where: {
-          _and: [
-            {
-              achievementOptionId: {
-                _eq: selectedAchievementOption?.id,
-              },
-            },
-            {
-              AchievementRecordAuthors: { userId: { _eq: userId } },
-            },
-          ],
+          AchievementRecordAuthors: { userId: { _eq: userId } },
         },
         orderBy: { created_at: order_by.desc },
         limit: 1,
       },
     }
   );
-
   /* #endregion */
 
   useEffect(() => {
@@ -98,19 +83,6 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
     setShowModal(false);
   }, [setShowModal]);
 
-  useEffect(() => {
-    const r = myRecordsQuery.data?.AchievementRecord[0] || null;
-    setMyRecords(r);
-    if (r) {
-      const matchingAchievementOption = query.data?.AchievementOptionCourse.find(
-        (option) => option.id === r.AchievementOption.id
-      );
-      if (matchingAchievementOption) {
-        setSelectedAchievementOption(matchingAchievementOption.AchievementOption);
-      }
-    }
-  }, [myRecordsQuery, query]);
-
   const upload = useCallback(() => {
     setShowModal(true);
   }, [setShowModal]);
@@ -121,13 +93,6 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
       setAchievementOptionVisibility(true);
     },
     [setAnchorElement, setAchievementOptionVisibility]
-  );
-
-  const onItemSelectedFromDropdown = useCallback(
-    async (item: AchievementOptionCourses_AchievementOptionCourse_AchievementOption) => {
-      setSelectedAchievementOption(item);
-    },
-    [setSelectedAchievementOption, myRecordsQuery, query]
   );
 
   const closeAlertDialog = useCallback(() => {
@@ -167,70 +132,27 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
             })}
           </span>
         )}
-        <div className="flex mt-10 mb-4">
-          {!query.loading && achievementOptions.length > 0 ? (
-            <div onClick={onAchievementOptionDropdown}>
-              <Button>{`${t('course-page:choose-achievement-option')} ↓`}</Button>
-            </div>
-          ) : (
-            <div>{t('course-page:no-achievement-option')}</div>
-          )}
-
-          {isVisibleAchievementOptions && (
-            <AchievementOptionDropDown
-              anchorElement={archiveOptionsAnchorElement}
-              isVisible={isVisibleAchievementOptions}
-              setVisible={setAchievementOptionVisibility}
-              courseAchievementOptions={achievementOptions}
-              callback={onItemSelectedFromDropdown}
-            />
-          )}
-        </div>
-        {selectedAchievementOption?.id ? (
-          <div>
-            {`${t('course-page:current_achievement_option')}: `}
-            {selectedAchievementOption.title}
-          </div>
-        ) : myRecords ? (
-          <div>
-            {`${t('course-page:current_achievement_option')}: `}
-            {myRecords.AchievementOption.title}
-          </div>
-        ) : (
-          <div>{t('course-page:no_current_achievement_option')}</div>
-        )}
-        {selectedAchievementOption?.id &&
-          (selectedAchievementOption.recordType === AchievementRecordType_enum.DOCUMENTATION ||
-            selectedAchievementOption.recordType === AchievementRecordType_enum.ONLINE_COURSE) && (
-            <div className="flex flex-col lg:flex-row">
-              {selectedAchievementOption?.AchievementOptionTemplate?.url && (
-                <FileDownload
-                  filePath={selectedAchievementOption.AchievementOptionTemplate.url}
-                  type="button"
-                  className="mb-3 lg:mb-0 lg:mr-3"
-                  label={t('course-page:download-template')}
-                />
-              )}
-              <Button filled onClick={upload}>
-                {`↑ ${t('course-page:upload-proof')}`}
-              </Button>
-            </div>
-          )}
         {myRecords ? (
           <p>
-            {t('course-page:last-upload-from-an-author', {
+            {t('course-page:last_record_upload', {
               dateTime: formattedDateWithTime(new Date(myRecords.created_at), lang),
               fullName: makeFullName(profile.firstName, profile.lastName),
+              achievementRecordTitle: myRecords.AchievementOption.title,
             })}
           </p>
         ) : (
-          <p>{t('course-page:no-proof-uploaded-by-me-as-author')}</p>
+          <p>{t('course-page:no_existing_record_upload')}</p>
         )}
+        <div className="flex flex-col lg:flex-row">
+          <Button filled onClick={upload}>
+            {`↑ ${t('course-page:upload_achievement_record')}`}
+          </Button>
+        </div>
       </div>
       {showModal && (
         <FormToUploadAchievementRecord
           onClose={onClosed}
-          achievementOption={selectedAchievementOption}
+          achievementOptionsQuery={query}
           onSuccess={onSuccess}
           courseTitle={courseTitle}
           setAlertMessage={setAlertMessage}
