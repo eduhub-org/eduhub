@@ -38,7 +38,7 @@ on:
         required: true
       GCP_SERVICE_ACCOUNT_KEY:
         required: true
- 
+
 jobs:
   build-and-store:
     name: Build and Store Docker Image in the Artifact Registry
@@ -49,7 +49,7 @@ jobs:
 
     steps:
       - name: Check Out the Repository Branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Authenticate to Google Cloud
         id: "auth"
         uses: "google-github-actions/auth@v2"

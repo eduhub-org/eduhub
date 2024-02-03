@@ -49,7 +49,7 @@ jobs:
       functions_sha: ${{ steps.calculate_sha.outputs.functions_sha }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # OR "2" -> To retrieve the preceding commit.
 
@@ -163,7 +163,6 @@ jobs:
       PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
       NEXT_PUBLIC_API_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_API_URL }}
       NEXT_PUBLIC_AUTH_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_AUTH_URL }}
-      NEXT_PUBLIC_STORAGE_BUCKET_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
       SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
     secrets:
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -182,7 +181,6 @@ jobs:
       PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
       NEXT_PUBLIC_API_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_API_URL }}
       NEXT_PUBLIC_AUTH_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_AUTH_URL }}
-      NEXT_PUBLIC_STORAGE_BUCKET_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
       SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
     secrets:
       GCP_REGION: ${{ secrets.GCP_REGION }}
@@ -227,7 +225,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1

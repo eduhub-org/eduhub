@@ -3309,6 +3309,14 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nrwl/nx-linux-x64-gnu@npm:^15.9.3":
+  version: 15.9.7
+  resolution: "@nrwl/nx-linux-x64-gnu@npm:15.9.7"
+  checksum: 91c2d38afc4a00f656f6bc4b3ff0c1af37fbdea878d55302171abe3548bf95fb902c356b6f2ce9b84dd94c92526de9b57ea32c28fd399b2fd56d71bdcd7bd04c
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
 "@nrwl/nx-linux-x64-musl@npm:15.8.7":
   version: 15.8.7
   resolution: "@nrwl/nx-linux-x64-musl@npm:15.8.7"
@@ -14899,6 +14907,7 @@ __metadata:
     "@nrwl/jest": 15.8.7
     "@nrwl/linter": 15.8.7
     "@nrwl/next": 15.8.7
+    "@nrwl/nx-linux-x64-gnu": ^15.9.3
     "@nrwl/react": 15.8.7
     "@nrwl/web": 15.8.7
     "@nrwl/workspace": 15.8.7

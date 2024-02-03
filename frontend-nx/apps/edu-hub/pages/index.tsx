@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { FC, useEffect, useState, Fragment } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 
-import { Page } from '../components/Page';
+import { Page } from '../components/layout/Page';
 import TileSlider from '../components/common/TileSlider';
 import { useQuery } from '@apollo/client';
 import { useAuthedQuery, useInstructorQuery } from '../hooks/authedQuery';

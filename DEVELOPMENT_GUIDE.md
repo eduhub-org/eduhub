@@ -51,7 +51,14 @@ To extend the seed data temporarily, use the Hasura console. To include them per
   - Example: bug/issue123/fixLoginError
   - We recommend using the GitHub extension to create new branches and copying the `post-checkout` script provided in the folder `.githooks` in the folder `.git/hooks/`. Branch created and checked-out via the issues provides in the GitHub extension will then automatically be named according to the convention.
 
-- Translations: all keys including the file names are camel case. Files should only exits on the page level and have the name of the corresponding page.
+- Translations:
+  - all keys use snake_case (Example: `login_error_message`)
+  - for each page, there is a separate file in the `i18n` folder; the file name is the same as the page name but in hyphen-case (Example: `course-page.json`)
+  
+  
+## 🧱 Edu React App Structure and Component Usage
+See [this document](./frontend-nx/apps/edu-hub/README.md) for a detailed explanation of the structure of the React app and how to use components.
+
 
 ## Ports
 

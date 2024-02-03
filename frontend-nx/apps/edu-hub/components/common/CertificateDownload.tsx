@@ -7,7 +7,7 @@ import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../queri
 import { GET_SIGNED_URL } from '../../queries/actions';
 import { GetSignedUrl, GetSignedUrlVariables } from '../../queries/__generated__/GetSignedUrl';
 import { Button } from './Button';
-import { ExtendedDegreeParticipantsEnrollment } from '../ManageCourseContent/DegreeParticipationsTab';
+import { ExtendedDegreeParticipantsEnrollment } from '../pages/ManageCourseContent/DegreeParticipationsTab';
 import { ErrorMessageDialog } from '../../components/common/dialogs/ErrorMessageDialog';
 
 interface IProps {

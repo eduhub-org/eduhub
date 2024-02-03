@@ -3,11 +3,24 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { AchievementRecord_bool_exp, AchievementRecord_order_by, AchievementRecordRating_enum, University_enum } from "./../../__generated__/globalTypes";
+import { AchievementRecord_bool_exp, AchievementRecord_order_by, AchievementRecordRating_enum, AchievementRecordType_enum, University_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: AchievementRecordListWithAuthors
 // ====================================================
+
+export interface AchievementRecordListWithAuthors_AchievementRecord_AchievementOption {
+  __typename: "AchievementOption";
+  id: number;
+  /**
+   * Title of an offered achievement option
+   */
+  title: string;
+  /**
+   * Type of the achivement record that must be uploaded for this option
+   */
+  recordType: AchievementRecordType_enum;
+}
 
 export interface AchievementRecordListWithAuthors_AchievementRecord_AchievementRecordAuthors_User {
   __typename: "User";
@@ -88,6 +101,10 @@ export interface AchievementRecordListWithAuthors_AchievementRecord {
    * URL to the uploaded file with the documentation of the record.
    */
   documentationUrl: string | null;
+  /**
+   * An object relationship
+   */
+  AchievementOption: AchievementRecordListWithAuthors_AchievementRecord_AchievementOption;
   /**
    * An array relationship
    */
