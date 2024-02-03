@@ -15,7 +15,6 @@ on:
       - production
 
 jobs:
-
   prepare_environment:
     name: Prepare environment variables
     runs-on: ubuntu-latest
@@ -25,6 +24,8 @@ jobs:
       PROJECT_ID: ${{ steps.define_output_variables.outputs.PROJECT_ID }}
       NEXT_PUBLIC_AUTH_URL: ${{ steps.define_output_variables.outputs.NEXT_PUBLIC_AUTH_URL }}
       NEXT_PUBLIC_API_URL: ${{ steps.define_output_variables.outputs.NEXT_PUBLIC_API_URL }}
+      NEXT_PUBLIC_STORAGE_BUCKET_URL: ${{ steps.define_output_variables.outputs.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
+
     steps:
       - name: Define env variables as output variables
         id: define_output_variables
@@ -32,6 +33,7 @@ jobs:
           echo "PROJECT_ID=${{ vars.PROJECT_ID }}" >> $GITHUB_OUTPUT
           echo "NEXT_PUBLIC_AUTH_URL=${{ vars.NEXT_PUBLIC_AUTH_URL }}" >> $GITHUB_OUTPUT
           echo "NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}" >> $GITHUB_OUTPUT
+          echo "NEXT_PUBLIC_STORAGE_BUCKET_URL=${{ vars.NEXT_PUBLIC_STORAGE_BUCKET_URL }}" >> $GITHUB_OUTPUT
 
   check_folder_changes:
     name: Check for changes in specific folders
@@ -49,12 +51,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
+          fetch-depth: 0 # OR "2" -> To retrieve the preceding commit.
 
       - name: Get changed files
         id: changed_files
         uses: tj-actions/changed-files@v41
-        
+
       - name: List all changed files
         id: list_changed_files
         run: |
@@ -62,7 +64,7 @@ jobs:
           for file in "${changed_files[@]}"; do
             echo "$file was changed"
           done
-      
+
       - name: Check if any file in the specified folders has changed
         id: changed_folders
         run: |
@@ -105,7 +107,7 @@ jobs:
           echo "hasura_sha=${hasura_sha}" >> $GITHUB_OUTPUT
           echo "keycloak_sha=${keycloak_sha}" >> $GITHUB_OUTPUT
           echo "frontend_sha=${frontend_sha}" >> $GITHUB_OUTPUT
-          echo "functions_sha=${functions_sha}" >> $GITHUB_OUTPUT  
+          echo "functions_sha=${functions_sha}" >> $GITHUB_OUTPUT
 
       - name: Print output variables
         id: print_output_variables
@@ -118,7 +120,6 @@ jobs:
           echo "hasura_sha: ${{ steps.calculate_sha.outputs.hasura_sha }}"
           echo "keycloak_sha: ${{ steps.calculate_sha.outputs.keycloak_sha }}"
           echo "functions_sha: ${{ steps.calculate_sha.outputs.functions_sha }}"
-
 
   build_keycloak:
     name: Build and Store Keycloak Docker Image in Google Docker Repo
@@ -134,7 +135,7 @@ jobs:
     secrets:
       GCP_REGION: ${{ secrets.GCP_REGION }}
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
-  
+
   build_hasura:
     name: Build and Store Hasura Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
@@ -162,11 +163,12 @@ jobs:
       PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
       NEXT_PUBLIC_API_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_API_URL }}
       NEXT_PUBLIC_AUTH_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_AUTH_URL }}
+      NEXT_PUBLIC_STORAGE_BUCKET_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
       SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
     secrets:
       GCP_REGION: ${{ secrets.GCP_REGION }}
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
-  
+
   build_rent_a_scientist_frontend:
     name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
     needs: [prepare_environment, check_folder_changes]
@@ -180,11 +182,12 @@ jobs:
       PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
       NEXT_PUBLIC_API_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_API_URL }}
       NEXT_PUBLIC_AUTH_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_AUTH_URL }}
+      NEXT_PUBLIC_STORAGE_BUCKET_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
       SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
     secrets:
       GCP_REGION: ${{ secrets.GCP_REGION }}
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
-  
+
   zip_and_store_cloud_functions:
     name: Zip and Store Cloud Functions
     needs: [prepare_environment, check_folder_changes]
@@ -201,7 +204,15 @@ jobs:
     if: always()
     name: "Deploy Application Infrastructure"
     needs:
-      [prepare_environment, check_folder_changes, build_keycloak, build_hasura, build_frontend, build_rent_a_scientist_frontend, zip_and_store_cloud_functions]
+      [
+        prepare_environment,
+        check_folder_changes,
+        build_keycloak,
+        build_hasura,
+        build_frontend,
+        build_rent_a_scientist_frontend,
+        zip_and_store_cloud_functions,
+      ]
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -209,13 +220,12 @@ jobs:
     env:
       TF_WORKSPACE: ${{ vars.TF_WORKSPACE }}
       TF_WORKSPACE_ID: ${{ vars.TF_WORKSPACE_ID }}
-  
+
     defaults:
       run:
         working-directory: ./infrastructure/application
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -235,7 +245,7 @@ jobs:
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
- 
+
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'pull_request'

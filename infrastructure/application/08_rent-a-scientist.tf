@@ -94,10 +94,6 @@ resource "google_cloud_run_service" "rent_a_scientist" {
           value = "https://storage.googleapis.com/storage/v1/${var.project_id}"
         }
         env {
-          name  = "NEXT_PUBLIC_STORAGE_BUCKET_URL"
-          value = "https://storage.googleapis.com/storage/v1/${var.project_id}"
-        }
-        env {
           name = "KEYCLOAK_RAS_CLIENT_SECRET"
           value_from {
             secret_key_ref {
