@@ -13,7 +13,7 @@ import { makeFullName, formattedDate, formattedDateWithTime } from '../../../../
 import { AlertMessageDialog } from '../../../common/dialogs/AlertMessageDialog';
 import { ACHIEVEMENT_OPTION_COURSES } from '../../../../queries/achievementOption';
 
-import { order_by, AchievementRecordType_enum } from '../../../../__generated__/globalTypes';
+import { order_by } from '../../../../__generated__/globalTypes';
 import {
   AchievementRecordListWithAuthors,
   AchievementRecordListWithAuthorsVariables,
@@ -48,8 +48,6 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
   const [alertMessage, setAlertMessage] = useState('');
   const [myRecords, setMyRecords] = useState(null as AchievementRecordListWithAuthors_AchievementRecord);
 
-  const [isVisibleAchievementOptions, setAchievementOptionVisibility] = useState(false);
-  const [archiveOptionsAnchorElement, setAnchorElement] = useState<HTMLElement>();
   const [achievementOptions, setAchievementOptions] = useState([] as MinAchievementOption[]);
 
   /* #region Database */
@@ -86,14 +84,6 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
   const upload = useCallback(() => {
     setShowModal(true);
   }, [setShowModal]);
-
-  const onAchievementOptionDropdown = useCallback(
-    (event: MouseEvent<HTMLElement>) => {
-      setAnchorElement(event.currentTarget);
-      setAchievementOptionVisibility(true);
-    },
-    [setAnchorElement, setAchievementOptionVisibility]
-  );
 
   const closeAlertDialog = useCallback(() => {
     setAlertMessage('');

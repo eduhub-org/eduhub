@@ -25,7 +25,7 @@ import {
   UpdateAchievementRecordByPk,
   UpdateAchievementRecordByPkVariables,
 } from '../../../../../queries/__generated__/UpdateAchievementRecordByPk';
-import { AchievementRecordRating_enum, AchievementRecordType_enum } from '../../../../../__generated__/globalTypes';
+import { AchievementRecordRating_enum } from '../../../../../__generated__/globalTypes';
 import EhTagStingId from '../../../../common/EhTagStingId';
 import { AtLeastNameEmail, MinAchievementOption } from '../../../../../helpers/achievement';
 import useTranslation from 'next-translate/useTranslation';
@@ -275,6 +275,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
       }
     },
     [
+      selectedAchievementOption,
       state.documentationUrl,
       state.coverImageUrl,
       state.csvResults,
