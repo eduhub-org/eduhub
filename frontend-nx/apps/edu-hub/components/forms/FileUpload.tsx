@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import PublishIcon from '@material-ui/icons/Publish';
 
-import { useFileUploader } from '../../../hooks/fileUpload';
+import { useFileUploader } from '../../hooks/fileUpload';
 
 const FileUpload = ({ id, uploadMutation, submitMutation, uploadVariables, submitVariables, refetchQueries }) => {
   const { register } = useForm();
