@@ -124,13 +124,14 @@
   "achievement-option": "Leistungsnachweis",
   "achievement-record-upload-dead-line-text": "Du hast bis zum {{date}} Zeit einen Leistungsnachweis hochzuladen.",
   "choose-achievement-option": "Wähle den Titel deines Leistungsnachweises aus.",
-  "chosen-achievement-option": "Gewählter Leistungsnachweis",
-  "no-achievement-option-chosen": "Kein Leistungsnachweis ausgewählt",
+  "selected_achievement_option": "Gewählter Leistungsnachweis",
+  "no_current_achievement_option": "Bisher wurde kein Leistungsnachweis eingreicht.",
   "no-achievement-option": "Aktuell steht kein Leistungsnachweis für diesen Kurs zur Verfügung.",
-  "upload-proof": "Nachweis hochladen",
-  "download-template": "Vorlage herunterladen",
-  "last-upload-from-an-author": "Der letzte Nachweis mit Dir als Autor wurde am {{dateTime}} von {{fullName}} hochgeladen.",
-  "no-proof-uploaded-by-me-as-author": "Es wurde bisher kein Nachweis mit Dir als Autor hochgeladen.",
+  "upload_achievement_record": "Neuen Nachweis hochladen",
+  "download_template": "Vorlage herunterladen",
+  "last_record_upload": "Der letzte Nachweis mit Dir als Autor wurde am {{dateTime}} von {{fullName}} zu \"{{achievementRecordTitle}}\" hochgeladen.",
+  "no_existing_record_upload": "Es wurde bisher kein Nachweis mit Dir als Autor hochgeladen.",
+  "use_documentation_template": "Nutze folgende Vorlage zur Dokumentation:",
   "confirm-online-course-description": "Hiermit bestätigst du an den erforderlichen Online-Kursen teilgenommen zu haben. Dein Leistungsnachweis ist dein Reflexionsbogen. Bitte klicke <component>HIER</component>, um ihn auszufüllen. Bei Fragen wende dich bitte an deine Kursleitung.",
   "confirm-online-course": "Bestätigen",
   "online-course-confirmed": "Du hast am {{dateTime}} bestätigt an den erforderlichen Online-Kursen teilgenommen zu haben.",
@@ -141,5 +142,6 @@
   "no-certificates-generated": "Es wurden keine Zertifikate generiert.",
   "participationDataGenerate": "Teilnehmer:innen Daten generieren (CSV)",
   "participationDataDownload": "Teilnehmer:innen Daten herunterladen (CSV)",
-  "selectTemplateDefaultLabel": "Vorlage auswählen"
+  "selectTemplateDefaultLabel": "Vorlage auswählen",
+  "achievement_option_not_selected": "Bitte wähle einen Leistungsnachweis aus."
 }
