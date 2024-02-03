@@ -5,18 +5,11 @@ import { UploadFile } from '../../../../../helpers/filehandling';
 import { makeFullName } from '../../../../../helpers/util';
 import { useAuthedMutation } from '../../../../../hooks/authedMutation';
 import { INSERT_AN_ACHIEVEMENT_RECORD, UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../../../queries/achievementRecord';
-import {
-  SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE,
-  SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION,
-} from '../../../../../queries/actions';
+import { SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION } from '../../../../../queries/actions';
 import {
   InsertAnAchievementRecord,
   InsertAnAchievementRecordVariables,
 } from '../../../../../queries/__generated__/InsertAnAchievementRecord';
-import {
-  SaveAchievementRecordCoverImage,
-  SaveAchievementRecordCoverImageVariables,
-} from '../../../../../queries/__generated__/SaveAchievementRecordCoverImage';
 import {
   SaveAchievementRecordDocumentation,
   SaveAchievementRecordDocumentationVariables,
