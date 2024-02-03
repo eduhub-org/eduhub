@@ -1,9 +1,9 @@
 import Head from 'next/head';
 import { FC } from 'react';
-import { Page } from '../../../components/Page';
+import { Page } from '../../../components/layout/Page';
 import { useRouter } from 'next/router';
 import { useIsInstructor } from '../../../hooks/authentication';
-import { ManageCourseContent } from '../../../components/ManageCourseContent';
+import { ManageCourseContent } from '../../../components/pages/ManageCourseContent';
 
 // export const getStaticProps = async ({ locale }: { locale: string }) => ({
 //   props: {

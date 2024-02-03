@@ -1,8 +1,8 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { FC } from 'react';
-import { Page } from '../../components/Page';
-import CourseContent from '../../components/CourseContent/index';
+import { Page } from '../../components/layout/Page';
+import CourseContent from '../../components/pages/CourseContent/index';
 import { useIsSessionLoading } from '../../hooks/authentication';
 import { CircularProgress } from '@material-ui/core';
 

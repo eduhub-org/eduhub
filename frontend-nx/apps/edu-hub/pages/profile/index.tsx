@@ -1,8 +1,8 @@
 import Head from 'next/head';
 import { FC } from 'react';
-import { Page } from '../../components/Page';
+import { Page } from '../../components/layout/Page';
 import { useIsLoggedIn } from '../../hooks/authentication';
-import ProfileOverview from '../../components/ProfileContent/ProfileOverview';
+import ProfileOverview from '../../components/pages/ProfileContent/ProfileOverview';
 
 const Profile: FC = () => {
   //const { t } = useTranslation('users');

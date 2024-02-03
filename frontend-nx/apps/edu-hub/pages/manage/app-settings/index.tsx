@@ -1,8 +1,8 @@
 import Head from 'next/head';
 import { FC } from 'react';
-import { Page } from '../../../components/Page';
+import { Page } from '../../../components/layout/Page';
 import { useIsAdmin } from '../../../hooks/authentication';
-import AppSettingsOverview from '../../../components/ManageAppSettingsContent/ManageAppSettingsOverview';
+import AppSettingsOverview from '../../../components/pages/ManageAppSettingsContent/ManageAppSettingsOverview';
 
 const AppSettings: FC = () => {
   const isAdmin = useIsAdmin();
