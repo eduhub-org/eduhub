@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Check Out the Repository Branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Zip Archive for callPythonFunction
         uses: thedoctor0/zip-release@main

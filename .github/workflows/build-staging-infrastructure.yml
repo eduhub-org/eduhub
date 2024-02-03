@@ -48,7 +48,7 @@ jobs:
       functions_sha: ${{ steps.calculate_sha.outputs.functions_sha }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # OR "2" -> To retrieve the preceding commit.
 
@@ -231,7 +231,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
