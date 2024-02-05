@@ -1,24 +1,23 @@
 import { IconButton } from '@material-ui/core';
 import useTranslation from 'next-translate/useTranslation';
 import { ChangeEvent, FC, useCallback } from 'react';
-import { DebounceInput } from 'react-debounce-input';
 import { MdDelete } from 'react-icons/md';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
 import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { LocationOptionsKnown } from 'apps/edu-hub/queries/__generated__/LocationOptionsKnown';
 import { LOCATION_OPTIONS } from '../../../../queries/course';
-import EduHubTextFieldEditor from 'apps/edu-hub/components/forms/EduHubTextFieldEditor';
-import { isLinkFormat } from 'apps/edu-hub/helpers/util';
+import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
+import { isLinkFormat } from '../../../../helpers/util';
 
-interface IProps {
+interface LocationsIProps {
   location: ManagedCourse_Course_by_pk_CourseLocations | null;
   onSetOption: (c: ManagedCourse_Course_by_pk_CourseLocations, p: string) => any;
   onSetLink: (c: ManagedCourse_Course_by_pk_CourseLocations, l: string) => any;
   onDelete: (c: ManagedCourse_Course_by_pk_CourseLocations) => any;
 }
 
-export const LocationSelectionRow: FC<IProps> = ({ location, onSetLink, onSetOption, onDelete }) => {
+export const Locations: FC<LocationsIProps> = ({ location, onSetLink, onSetOption, onDelete }) => {
   const { t } = useTranslation('course-page');
 
   const queryKnownLocationOptions = useRoleQuery<LocationOptionsKnown>(LOCATION_OPTIONS);
@@ -93,3 +92,5 @@ export const LocationSelectionRow: FC<IProps> = ({ location, onSetLink, onSetOpt
     </div>
   );
 };
+
+export default Locations;

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, ReactNode, useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -83,7 +83,7 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
       <div className="text-white text-xs px-3 pb-8 mt-[-26px]">
         {t('markdown_info')}
         {' ('}
-        <a href="https://www.markdownguide.org" target="_blank">
+        <a href="https://www.markdownguide.org" target="_blank" rel="noreferrer">
           <u>{t('markdown_guide')}</u>
           {').'}
         </a>

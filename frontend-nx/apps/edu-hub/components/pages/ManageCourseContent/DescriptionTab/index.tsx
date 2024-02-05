@@ -1,6 +1,5 @@
 import { QueryResult } from '@apollo/client';
 import { FC } from 'react';
-import { DebounceInput } from 'react-debounce-input';
 import {
   eventTargetNumberMapper,
   eventTargetValueMapper,
@@ -10,11 +9,9 @@ import {
   useUpdateCallback,
   useUpdateCallback2,
 } from '../../../../hooks/authedMutation';
-import { useRoleQuery } from '../../../../hooks/authedQuery';
 import {
   DELETE_COURSE_LOCATION,
   INSERT_NEW_COURSE_LOCATION,
-  LOCATION_OPTIONS,
   UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1,
   UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2,
   UPDATE_COURSE_END_TIME,
@@ -37,7 +34,6 @@ import {
   InsertCourseLocation,
   InsertCourseLocationVariables,
 } from '../../../../queries/__generated__/InsertCourseLocation';
-import { LocationOptionsKnown } from '../../../../queries/__generated__/LocationOptionsKnown';
 import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
 import {
   UpdateCourseContentDescriptionField1,
@@ -84,7 +80,7 @@ import {
   UpdateCourseWeekdayVariables,
 } from '../../../../queries/__generated__/UpdateCourseWeekday';
 import { formatTime } from '../../../common/EhTimeSelect';
-import { LocationSelectionRow } from './LocationSelectionRow';
+import Locations from './Locations';
 import { Button } from '@material-ui/core';
 import { MdAddCircle } from 'react-icons/md';
 import {
@@ -372,7 +368,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           <div className="col-span-7">{t('address.label')}</div>
         </div>
         {courseLocations.map((loc) => (
-          <LocationSelectionRow
+          <Locations
             key={loc.id}
             location={loc}
             onDelete={deleteCourseLocation}
