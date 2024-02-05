@@ -4,17 +4,30 @@ import { ChangeEvent, FC, useCallback } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import { MdDelete } from 'react-icons/md';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
+import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
+import { useRoleQuery } from '../../../../hooks/authedQuery';
+import { LocationOptionsKnown } from 'apps/edu-hub/queries/__generated__/LocationOptionsKnown';
+import { LOCATION_OPTIONS } from '../../../../queries/course';
+import EduHubTextFieldEditor from 'apps/edu-hub/components/forms/EduHubTextFieldEditor';
+import { isLinkFormat } from 'apps/edu-hub/helpers/util';
 
 interface IProps {
   location: ManagedCourse_Course_by_pk_CourseLocations | null;
-  options: string[];
   onSetOption: (c: ManagedCourse_Course_by_pk_CourseLocations, p: string) => any;
   onSetLink: (c: ManagedCourse_Course_by_pk_CourseLocations, l: string) => any;
   onDelete: (c: ManagedCourse_Course_by_pk_CourseLocations) => any;
 }
 
-export const LocationSelectionRow: FC<IProps> = ({ location, options, onSetLink, onSetOption, onDelete }) => {
-  const { t } = useTranslation();
+export const LocationSelectionRow: FC<IProps> = ({ location, onSetLink, onSetOption, onDelete }) => {
+  const { t } = useTranslation('course-page');
+
+  const queryKnownLocationOptions = useRoleQuery<LocationOptionsKnown>(LOCATION_OPTIONS);
+  if (queryKnownLocationOptions.error) {
+    console.log('query known location options error', queryKnownLocationOptions.error);
+  }
+  const locationOptions = (queryKnownLocationOptions.data?.LocationOption || []).map((x) => x.value);
+  const locations = locationOptions.map((location) => ({ value: location, label: location }));
+
   const handleSetOption = useCallback(
     (event: ChangeEvent<HTMLSelectElement>) => {
       if (location != null) {
@@ -39,45 +52,44 @@ export const LocationSelectionRow: FC<IProps> = ({ location, options, onSetLink,
     }
   }, [location, onDelete]);
 
+  // locationOption dependent placeholder
+  const address_placeholder =
+    location?.locationOption === 'ONLINE' ? 'address.placeholder.online' : 'address.placeholder.offline';
+  // locationOption dependent typeCheck
+  const typeCheckFunction = location?.locationOption === 'ONLINE' ? isLinkFormat : undefined;
+
   return (
-    <div className="grid grid-cols-12">
-      <div className="col-span-4 mr-3 ml-3">
-        {!location && <p className="text-gray-400">{t('place')}</p>}
-        {location && (
-          <select
-            onChange={handleSetOption}
+    <div className="grid grid-cols-12 items-center">
+      {location && (
+        <div className="col-span-2">
+          <EduHubDropdownSelector
+            options={locations}
             value={location.locationOption || 'ONLINE'}
-            className="w-full h-10 bg-edu-light-gray"
-          >
-            {options.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        )}
-      </div>
-      <div className="col-span-7 mr-3 ml-3">
-        {!location && <div className="text-gray-400">{`${t('course-page:default-address')}`}</div>}
-        {location && (
-          <DebounceInput
-            className="w-full h-10 bg-edu-light-gray"
-            value={location.defaultSessionAddress}
-            onChange={handleSetLink}
-            debounceTimeout={1000}
+            onChange={handleSetOption}
+            className="mb-0"
           />
-        )}
+        </div>
+      )}
+      <div className="col-span-7">
+        <EduHubTextFieldEditor
+          element="input"
+          placeholder={t(address_placeholder)}
+          value={location?.defaultSessionAddress || ''}
+          onChange={handleSetLink}
+          typeCheck={typeCheckFunction}
+          errorText={t('address.error')}
+          className="mb-0"
+        />
       </div>
-      <div className="mr-3 ml-3">
-        {!location && <div>&nbsp;</div>}
+      <div>
         {location && (
           <div>
             <IconButton onClick={handleDelete}>
-              <MdDelete size="0.75em" />
+              <MdDelete size="0.75em" className="text-red-500" />
             </IconButton>
           </div>
         )}
-      </div>
+      </div>{' '}
     </div>
   );
 };

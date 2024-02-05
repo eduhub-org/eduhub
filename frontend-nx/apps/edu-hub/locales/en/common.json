@@ -100,5 +100,9 @@
     "organization": "Name of the organization",
     "other": "Other"
   },
-  "achievement-documentation-template": "Achievement Record Documentation Template"
+  "achievement-documentation-template": "Achievement Record Documentation Template",
+  "preview": "Preview",
+  "edit_markdown": "Edit",
+  "markdown_info": "You can use **bold**, _italic_, and other formatting",
+  "markdown_guide": "Markdown Guide"
 }

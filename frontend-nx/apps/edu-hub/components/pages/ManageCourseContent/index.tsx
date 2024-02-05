@@ -26,20 +26,6 @@ interface Props {
 
 const determineMaxAllowedTab = (courseStatus: CourseStatus_enum) => {
   const maxAllowedTab = 5;
-  // switch (courseStatus) {
-  //   case CourseStatus_enum.READY_FOR_PUBLICATION:
-  //     maxAllowedTab = 1;
-  //     break;
-  //   case CourseStatus_enum.READY_FOR_APPLICATION:
-  //     maxAllowedTab = 2;
-  //     break;
-  //   case CourseStatus_enum.APPLICANTS_INVITED:
-  //     maxAllowedTab = 3;
-  //     break;
-  //   case CourseStatus_enum.PARTICIPANTS_RATED:
-  //     maxAllowedTab = 3;
-  //     break;
-  // }
   return maxAllowedTab;
 };
 
@@ -60,41 +46,6 @@ const determineTabClasses = (tabIndex: number, selectedTabIndex: number, courseS
 
   return 'bg-edu-light-gray';
 };
-
-// const canUpgradeStatus = (course: ManagedCourse_Course_by_pk) => {
-//   const isFilled = (x: string | null) => x != null && x.length > 0;
-
-//   if (course.status === 'DRAFT') {
-//     return (
-//       // isFilled(course.learningGoals) &&
-//       // isFilled(course.headingDescriptionField1) &&
-//       // isFilled(course.headingDescriptionField2) &&
-//       // isFilled(course.contentDescriptionField1) &&
-//       // isFilled(course.contentDescriptionField2) &&
-//       course.CourseLocations.length > 0
-//     );
-//   } else if (course.status === 'READY_FOR_PUBLICATION') {
-//     return (
-//       course.Sessions.length > 0 &&
-//       course.Sessions.every(
-//         (session) =>
-//           session.startDateTime != null &&
-//           session.endDateTime != null &&
-//           isFilled(session.title) &&
-//           session.title !== course.title &&
-//           session.SessionAddresses.length > 0
-//       ) &&
-//       new Set(course.Sessions.map((s) => s.title)).size ===
-//         course.Sessions.length
-//     );
-//   } else if (course.status === 'READY_FOR_APPLICATION') {
-//     return (
-//       course.CourseEnrollments.find((e) => e.status === 'CONFIRMED') != null
-//     );
-//   } else {
-//     return false;
-//   }
-// };
 
 const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
   switch (course.status) {
@@ -181,13 +132,6 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
     setCantUpgradeOpen(false);
   }, [setCantUpgradeOpen]);
   const [isConfirmUpgradeStatusOpen, setConfirmUpgradeStatusOpen] = useState(false);
-  // const handleRequestUpgradeStatus = useCallback(() => {
-  //   if (course != null && canUpgradeStatus(course)) {
-  //     setConfirmUpgradeStatusOpen(true);
-  //   } else {
-  //     setCantUpgradeOpen(true);
-  //   }
-  // }, [course, setConfirmUpgradeStatusOpen]);
   const [updateCourseStatusMutation] = useRoleMutation<UpdateCourseStatus, UpdateCourseStatusVariables>(
     UPDATE_COURSE_STATUS
   );
@@ -260,25 +204,10 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
           </div>
 
           {openTabIndex === 0 && <DescriptionTab course={course} qResult={qResult} />}
-
           {openTabIndex === 1 && <SessionsTab course={course} qResult={qResult} />}
-
           {openTabIndex === 2 && <ApplicationsTab course={course} qResult={qResult} />}
           {openTabIndex === 3 && <CourseParticipationsTab course={course} qResult={qResult} />}
           {openTabIndex === 4 && <DegreeParticipationsTab course={course} />}
-
-          {/* {openTabIndex === maxAllowedTab && openTabIndex < 3 && (
-            <div className="flex justify-end mb-16">
-              <OldButton
-                onClick={handleRequestUpgradeStatus}
-                as="button"
-                filled
-                inverted
-              >
-                {t('course-page:upgrade-status')}
-              </OldButton>
-            </div>
-          )} */}
         </div>
       </PageBlock>
       <QuestionConfirmationDialog
