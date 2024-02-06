@@ -5,7 +5,7 @@ import { MdDelete } from 'react-icons/md';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
 import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
-import { LocationOptionsKnown } from 'apps/edu-hub/queries/__generated__/LocationOptionsKnown';
+import { LocationOptionsKnown } from '../../../../queries/__generated__/LocationOptionsKnown';
 import { LOCATION_OPTIONS } from '../../../../queries/course';
 import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
 import { isLinkFormat } from '../../../../helpers/util';
