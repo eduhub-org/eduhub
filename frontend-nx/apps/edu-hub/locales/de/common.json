@@ -100,5 +100,9 @@
     "organization": "Name der Organisation",
     "other": "Andere Beschäftigung"
   },
-  "achievement-documentation-template": "Leistungsnachweisvorlage"
+  "achievement-documentation-template": "Leistungsnachweisvorlage",
+  "preview": "Vorschau",
+  "edit_markdown": "Bearbeiten",
+  "markdown_info": "Du kannst **fett**, _kursiv_ und andere Formatierungen verwenden",
+  "markdown_guide": "Markdown Guide"
 }

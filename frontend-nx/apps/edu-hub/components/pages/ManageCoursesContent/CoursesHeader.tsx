@@ -12,9 +12,13 @@ import { INSERT_COURSE } from '../../../queries/mutateCourse';
 import type { StaticComponentProperty } from '../../../types/UIComponents';
 import type { Programs_Program } from '../../../queries/__generated__/Programs';
 import type { Course_bool_exp } from '../../../__generated__/globalTypes';
-import type { InsertCourse, InsertCourseVariables } from '../../../queries/__generated__/InsertCourse';
+import type {
+  InsertCourseWithLocation,
+  InsertCourseWithLocationVariables,
+} from '../../../queries/__generated__/InsertCourseWithLocation';
 import type { QueryResult } from '@apollo/client';
 import type { AdminCourseList, AdminCourseListVariables } from '../../../queries/__generated__/AdminCourseList';
+import { LocationOption_enum } from '../../../__generated__/globalTypes';
 
 interface IProps {
   programs: Programs_Program[];
@@ -33,7 +37,7 @@ const CoursesHeader: FC<IProps> = ({
   updateFilter,
   currentFilter,
 }) => {
-  const [insertCourse] = useAdminMutation<InsertCourse, InsertCourseVariables>(INSERT_COURSE);
+  const [insertCourse] = useAdminMutation<InsertCourseWithLocation, InsertCourseWithLocationVariables>(INSERT_COURSE);
   const selectedProgramId = currentFilter.where.programId?._eq;
   const selectedProgram = programs.find((program) => program.id === selectedProgramId);
 
@@ -48,6 +52,7 @@ const CoursesHeader: FC<IProps> = ({
             : new Date(),
         maxMissedSessions: 2,
         programId: selectedProgramId,
+        locationOption: LocationOption_enum.ONLINE,
       },
     });
 
