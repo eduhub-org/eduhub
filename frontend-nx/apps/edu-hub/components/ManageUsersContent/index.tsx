@@ -46,7 +46,6 @@ const ManageUsersContent: FC = () => {
         enableSorting: true,
         meta: {
           width: 3,
-          secondRowComponent: ({ row }) => <div className="text-black">{row.original.university}</div>,
         },
         cell: ({ getValue, column, row }) => <div>{getValue<ReactNode>()}</div>,
       },
@@ -100,6 +99,36 @@ const ManageUsersContent: FC = () => {
               pages={Math.ceil(data.User_aggregate.aggregate.count / pageSize)}
               addButtonText={t('addUserAchievementDocumentationTemplateText')}
               onAddButtonClick={onAddUserClick}
+              expandableRowComponent={({ row }) => (
+                <div>
+                  <div className="font-medium bg-edu-course-list h-12 flex">
+                    <td className="pl-5">
+                      <p className="text-gray-700 truncate font-medium max-w-xs">{`${t('common:status')}: ${
+                        row.employment ? t(`common:${row.employment}`) : '-'
+                      }`}</p>
+                    </td>
+                    <td className="pl-5">
+                      <p className="text-gray-700 truncate font-medium max-w-xs">{`${t(
+                        'common:matriculation-number'
+                      )}: ${row.matriculationNumber ? row.matriculationNumber : '-'}`}</p>
+                    </td>
+                    <td className="pl-5">
+                      <p className="text-gray-700 truncate font-medium max-w-xs">{`${t('common:university')}: ${
+                        row.university ? t(`common:${row.university}`) : '-'
+                      }`}</p>
+                    </td>
+                  </div>
+                  <div className="font-medium bg-edu-course-list h-12 flex">
+                    <td className="pl-5" colSpan={3}>
+                      {row.CourseEnrollments.map((enrollment, index) => (
+                        <p key={index} className="text-gray-600 truncate text-sm max-w-xs">
+                          {enrollment.Course.title} ({enrollment.Course.Program.shortTitle}) - {enrollment.status}
+                        </p>
+                      ))}
+                    </td>
+                  </div>
+                </div>
+              )}
             />
           </div>
         )}

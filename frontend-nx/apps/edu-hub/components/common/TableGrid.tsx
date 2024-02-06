@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, ReactElement } from 'react';
 import { DocumentNode } from '@apollo/client';
 import { TextField } from '@material-ui/core';
 import useTranslation from 'next-translate/useTranslation';
@@ -30,6 +30,7 @@ interface TableGridProps<T extends BaseRow> {
   columns: ColumnDef<T>[];
   deleteMutation?: DocumentNode;
   enablePagination?: boolean;
+  expandableRowComponent?: (props: { row: T }) => ReactElement | null;
   pageIndex?: number;
   pages?: number;
   refetchQueries: string[];
@@ -47,6 +48,7 @@ const TableGrid = <T extends BaseRow>({
   columns,
   deleteMutation,
   enablePagination = false,
+  expandableRowComponent,
   pageIndex = 0,
   pages,
   refetchQueries,
@@ -65,6 +67,8 @@ const TableGrid = <T extends BaseRow>({
 
   const handlePrevious = () => setPageIndex(Math.max(0, pageIndex - 1));
   const handleNext = () => setPageIndex(pageIndex + 1);
+
+  const ExpandableRowComponent = expandableRowComponent;
 
   const toggleRowExpansion = useCallback((rowId: number) => {
     const newExpandedRows = new Set(expandedRows);
@@ -201,17 +205,9 @@ const TableGrid = <T extends BaseRow>({
             ))}
           </div>
           {/* Expandable Second Row */}
-          {expandedRows.has(row.original.id) && (
+          {expandedRows.has(row.original.id) && expandableRowComponent && (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center mb-1 py-2 bg-edu-light-gray">
-              {table.getAllColumns().map((column) => {
-                if (!column.columnDef.meta?.secondRowComponent) return null; // Skip columns without secondRowComponent
-                const SecondRowComponent = column.columnDef.meta.secondRowComponent;
-                return (
-                  <div key={column.id} className="col-span-full">
-                    <SecondRowComponent row={row} />
-                  </div>
-                );
-              })}
+              <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
             </div>
           )}
         </React.Fragment>
