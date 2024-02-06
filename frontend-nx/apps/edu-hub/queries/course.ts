@@ -241,12 +241,12 @@ export const UPDATE_COURSE_LOCATION_OPTION = gql`
 
 export const UPDATE_COURSE_SESSION_DEFAULT_ADDRESS = gql`
   mutation UpdateCourseDefaultSessionAddress(
-    $locationId: Int!
-    $defaultSessionAddress: String!
+    $itemId: Int!
+    $text: String!
   ) {
     update_CourseLocation_by_pk(
-      pk_columns: { id: $locationId }
-      _set: { defaultSessionAddress: $defaultSessionAddress }
+      pk_columns: { id: $itemId }
+      _set: { defaultSessionAddress: $text }
     ) {
       id
     }
@@ -307,12 +307,12 @@ export const UPDATE_COURSE_WEEKDAY = gql`
 
 export const UPDATE_COURSE_HEADING_DESCRIPTION_1 = gql`
   mutation UpdateCourseHeadingDescription1(
-    $courseId: Int!
-    $description: String!
+    $itemId: Int!
+    $text: String!
   ) {
     update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { headingDescriptionField1: $description }
+      pk_columns: { id: $itemId }
+      _set: { headingDescriptionField1: $text }
     ) {
       id
     }
@@ -321,12 +321,12 @@ export const UPDATE_COURSE_HEADING_DESCRIPTION_1 = gql`
 
 export const UPDATE_COURSE_HEADING_DESCRIPTION_2 = gql`
   mutation UpdateCourseHeadingDescription2(
-    $courseId: Int!
-    $description: String!
+    $itemId: Int!
+    $text: String!
   ) {
     update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { headingDescriptionField2: $description }
+      pk_columns: { id: $itemId }
+      _set: { headingDescriptionField2: $text }
     ) {
       id
     }
@@ -335,12 +335,12 @@ export const UPDATE_COURSE_HEADING_DESCRIPTION_2 = gql`
 
 export const UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1 = gql`
   mutation UpdateCourseContentDescriptionField1(
-    $courseId: Int!
-    $description: String!
+    $itemId: Int!
+    $text: String!
   ) {
     update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { contentDescriptionField1: $description }
+      pk_columns: { id: $itemId }
+      _set: { contentDescriptionField1: $text }
     ) {
       id
     }
@@ -349,12 +349,12 @@ export const UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1 = gql`
 
 export const UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2 = gql`
   mutation UpdateCourseContentDescriptionField2(
-    $courseId: Int!
-    $description: String!
+    $itemId: Int!
+    $text: String!
   ) {
     update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { contentDescriptionField2: $description }
+      pk_columns: { id: $itemId }
+      _set: { contentDescriptionField2: $text }
     ) {
       id
     }
@@ -362,21 +362,21 @@ export const UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2 = gql`
 `;
 
 export const UPDATE_COURSE_LEARNING_GOALS = gql`
-  mutation UpdateCourseLearningGoals($courseId: Int!, $description: String!) {
+  mutation UpdateCourseLearningGoals($itemId: Int!, $text: String!) {
     update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { learningGoals: $description }
+      pk_columns: { id: $itemId }
+      _set: { learningGoals: $text }
     ) {
       id
     }
   }
 `;
 
-export const UPDATE_COURSE_TAGLINE = gql`
-  mutation UpdateCourseTagline($courseId: Int!, $tagline: String!) {
+export const UPDATE_COURSE_SHORT_DESCRIPTION = gql`
+  mutation UpdateShortDescription($itemId: Int!, $text: String!) {
     update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { tagline: $tagline }
+      pk_columns: { id: $itemId }
+      _set: { tagline: $text }
     ) {
       id
     }

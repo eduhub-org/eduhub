@@ -1,5 +1,5 @@
 import { QueryResult } from '@apollo/client';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import {
   eventTargetNumberMapper,
   eventTargetValueMapper,
@@ -19,12 +19,11 @@ import {
   UPDATE_COURSE_HEADING_DESCRIPTION_2,
   UPDATE_COURSE_LANGUAGE,
   UPDATE_COURSE_LEARNING_GOALS,
-  UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
   UPDATE_COURSE_LOCATION_OPTION,
   UPDATE_COURSE_MAX_PARTICIPANTS,
   UPDATE_COURSE_START_TIME,
-  UPDATE_COURSE_TAGLINE,
   UPDATE_COURSE_WEEKDAY,
+  UPDATE_COURSE_SHORT_DESCRIPTION,
 } from '../../../../queries/course';
 import {
   DeleteCourseLocation,
@@ -36,37 +35,13 @@ import {
 } from '../../../../queries/__generated__/InsertCourseLocation';
 import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
 import {
-  UpdateCourseContentDescriptionField1,
-  UpdateCourseContentDescriptionField1Variables,
-} from '../../../../queries/__generated__/UpdateCourseContentDescriptionField1';
-import {
-  UpdateCourseContentDescriptionField2,
-  UpdateCourseContentDescriptionField2Variables,
-} from '../../../../queries/__generated__/UpdateCourseContentDescriptionField2';
-import {
   UpdateCourseEndTime,
   UpdateCourseEndTimeVariables,
 } from '../../../../queries/__generated__/UpdateCourseEndTime';
 import {
-  UpdateCourseHeadingDescription1,
-  UpdateCourseHeadingDescription1Variables,
-} from '../../../../queries/__generated__/UpdateCourseHeadingDescription1';
-import {
-  UpdateCourseHeadingDescription2,
-  UpdateCourseHeadingDescription2Variables,
-} from '../../../../queries/__generated__/UpdateCourseHeadingDescription2';
-import {
   UpdateCourseLanguage,
   UpdateCourseLanguageVariables,
 } from '../../../../queries/__generated__/UpdateCourseLanguage';
-import {
-  UpdateCourseLearningGoals,
-  UpdateCourseLearningGoalsVariables,
-} from '../../../../queries/__generated__/UpdateCourseLearningGoals';
-import {
-  UpdateCourseDefaultSessionAddress,
-  UpdateCourseDefaultSessionAddressVariables,
-} from '../../../../queries/__generated__/UpdateCourseDefaultSessionAddress';
 import {
   UpdateCourseLocationOption,
   UpdateCourseLocationOptionVariables,
@@ -84,15 +59,12 @@ import Locations from './Locations';
 import { Button } from '@material-ui/core';
 import { MdAddCircle } from 'react-icons/md';
 import {
-  UpdateCourseTagline,
-  UpdateCourseTaglineVariables,
-} from '../../../../queries/__generated__/UpdateCourseTagline';
-import {
   UpdateCourseMaxParticipants,
   UpdateCourseMaxParticipantsVariables,
 } from '../../../../queries/__generated__/UpdateCourseMaxParticipants';
 import useTranslation from 'next-translate/useTranslation';
 import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
+import EduHubTextFieldEditorNew from '../../../forms/EduHubTextFieldEditor';
 import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
 import EduHubTimePicker from '../../../forms/EduHubTimePicker';
 import EduHubNumberFieldEditor from '../../../forms/EduHubNumberFieldEditor';
@@ -121,50 +93,6 @@ const prepDateTimeUpdate = (timeString: string) => {
 
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const { error, handleError, resetError } = useErrorHandler();
-
-  const updateHeading1 = useUpdateCallback<UpdateCourseHeadingDescription1, UpdateCourseHeadingDescription1Variables>(
-    UPDATE_COURSE_HEADING_DESCRIPTION_1,
-    'courseId',
-    'description',
-    course?.id,
-    eventTargetValueMapper,
-    qResult
-  );
-  const updateContent1 = useUpdateCallback<
-    UpdateCourseContentDescriptionField1,
-    UpdateCourseContentDescriptionField1Variables
-  >(UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1, 'courseId', 'description', course?.id, eventTargetValueMapper, qResult);
-
-  const updateHeading2 = useUpdateCallback<UpdateCourseHeadingDescription2, UpdateCourseHeadingDescription2Variables>(
-    UPDATE_COURSE_HEADING_DESCRIPTION_2,
-    'courseId',
-    'description',
-    course?.id,
-    eventTargetValueMapper,
-    qResult
-  );
-  const updateContent2 = useUpdateCallback<
-    UpdateCourseContentDescriptionField2,
-    UpdateCourseContentDescriptionField2Variables
-  >(UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2, 'courseId', 'description', course?.id, eventTargetValueMapper, qResult);
-
-  const updateShortDescription = useUpdateCallback<UpdateCourseTagline, UpdateCourseTaglineVariables>(
-    UPDATE_COURSE_TAGLINE,
-    'courseId',
-    'tagline',
-    course?.id,
-    eventTargetValueMapper,
-    qResult
-  );
-
-  const updateLearningGoals = useUpdateCallback<UpdateCourseLearningGoals, UpdateCourseLearningGoalsVariables>(
-    UPDATE_COURSE_LEARNING_GOALS,
-    'courseId',
-    'description',
-    course?.id,
-    eventTargetValueMapper,
-    qResult
-  );
 
   const insertCourseLocation = useUpdateCallback<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_NEW_COURSE_LOCATION,
@@ -197,12 +125,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     }
   };
 
-  // const deleteCourseLocation = useDeleteCallback<DeleteCourseLocation, DeleteCourseLocationVariables>(
-  //   DELETE_COURSE_LOCATION,
-  //   'locationId',
-  //   pickIdPkMapper,
-  //   qResult
-  // );
   const deleteCourseLocation = useDeleteCallback<DeleteCourseLocation, DeleteCourseLocationVariables>(
     DELETE_COURSE_LOCATION,
     'locationId',
@@ -233,18 +155,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     UpdateCourseLocationOption,
     UpdateCourseLocationOptionVariables
   >(UPDATE_COURSE_LOCATION_OPTION, 'locationId', 'option', pickIdPkMapper, identityEventMapper, qResult);
-
-  const updateCourseDefaultSessionAddress = useUpdateCallback2<
-    UpdateCourseDefaultSessionAddress,
-    UpdateCourseDefaultSessionAddressVariables
-  >(
-    UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
-    'locationId',
-    'defaultSessionAddress',
-    pickIdPkMapper,
-    identityEventMapper,
-    qResult
-  );
 
   const updateCourseStartTime = useUpdateCallback<UpdateCourseStartTime, UpdateCourseStartTimeVariables>(
     UPDATE_COURSE_START_TIME,
@@ -313,21 +223,23 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2">
-        <EduHubTextFieldEditor
+        <EduHubTextFieldEditorNew
           label={t('short_description.label')}
+          updateMutation={UPDATE_COURSE_SHORT_DESCRIPTION}
+          itemId={course.id}
           placeholder={t('short_description.label')}
           helpText={t('short_description.help_text')}
           className="h-64"
-          onChange={updateShortDescription}
           value={course.tagline}
         />
         <EduHubTextFieldEditor
+          updateMutation={UPDATE_COURSE_LEARNING_GOALS}
+          itemId={course.id}
           label={t('learning_goals.label')}
           placeholder={t('learning_goals.placeholder')}
           helpText={t('learning_goals.help_text')}
           maxLength={500}
           className="h-64"
-          onChange={updateLearningGoals}
           value={course.learningGoals ?? ''}
         />
       </div>
@@ -335,18 +247,20 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <div>
           <EduHubTextFieldEditor
             element="input"
+            updateMutation={UPDATE_COURSE_HEADING_DESCRIPTION_1}
+            itemId={course.id}
             label={t('info_block_1_title.label')}
             placeholder={t('info_block_1_title.placeholder')}
             helpText={t('info_block_1_title.help_text')}
-            onChange={updateHeading1}
             value={course.headingDescriptionField1 ?? ''}
             className="mb-0"
           />
           <EduHubTextFieldEditor
+            updateMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1}
+            itemId={course.id}
             placeholder={t('info_block_1_content.placeholder')}
             maxLength={10000}
             className="h-64"
-            onChange={updateContent1}
             value={course.contentDescriptionField1 ?? ''}
             isMarkdown={true}
           />
@@ -354,18 +268,20 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <div>
           <EduHubTextFieldEditor
             element="input"
+            updateMutation={UPDATE_COURSE_HEADING_DESCRIPTION_2}
+            itemId={course.id}
             label={t('info_block_2_title.label')}
             helpText={t('info_block_2_title.help_text')}
             placeholder={t('info_block_2_title.placeholder')}
-            onChange={updateHeading2}
             value={course.headingDescriptionField2 ?? ''}
             className="mb-0"
           />
           <EduHubTextFieldEditor
-            placeholder={t('info_block_1_content.placeholder')}
+            updateMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2}
+            itemId={course.id}
+            placeholder={t('info_block_2_content.placeholder')}
             maxLength={10000}
             className="h-64"
-            onChange={updateContent2}
             value={course.contentDescriptionField2 ?? ''}
             isMarkdown={true}
           />
@@ -422,7 +338,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             key={loc.id}
             location={loc}
             onDelete={handleDeleteCourseLocation}
-            onSetLink={updateCourseDefaultSessionAddress}
             onSetOption={updateCourseLocationOption}
           />
         ))}

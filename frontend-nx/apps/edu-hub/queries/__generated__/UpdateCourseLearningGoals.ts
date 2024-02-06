@@ -20,6 +20,6 @@ export interface UpdateCourseLearningGoals {
 }
 
 export interface UpdateCourseLearningGoalsVariables {
-  courseId: number;
-  description: string;
+  itemId: number;
+  text: string;
 }

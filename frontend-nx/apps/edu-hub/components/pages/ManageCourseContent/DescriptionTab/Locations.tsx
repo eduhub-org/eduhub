@@ -6,18 +6,17 @@ import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/
 import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { LocationOptionsKnown } from '../../../../queries/__generated__/LocationOptionsKnown';
-import { LOCATION_OPTIONS } from '../../../../queries/course';
+import { LOCATION_OPTIONS, UPDATE_COURSE_SESSION_DEFAULT_ADDRESS } from '../../../../queries/course';
 import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
 import { isLinkFormat } from '../../../../helpers/util';
 
 interface LocationsIProps {
   location: ManagedCourse_Course_by_pk_CourseLocations | null;
   onSetOption: (c: ManagedCourse_Course_by_pk_CourseLocations, p: string) => any;
-  onSetLink: (c: ManagedCourse_Course_by_pk_CourseLocations, l: string) => any;
   onDelete: (c: ManagedCourse_Course_by_pk_CourseLocations) => any;
 }
 
-export const Locations: FC<LocationsIProps> = ({ location, onSetLink, onSetOption, onDelete }) => {
+export const Locations: FC<LocationsIProps> = ({ location, onSetOption, onDelete }) => {
   const { t } = useTranslation('course-page');
 
   const queryKnownLocationOptions = useRoleQuery<LocationOptionsKnown>(LOCATION_OPTIONS);
@@ -34,15 +33,6 @@ export const Locations: FC<LocationsIProps> = ({ location, onSetLink, onSetOptio
       }
     },
     [location, onSetOption]
-  );
-
-  const handleSetLink = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      if (location != null) {
-        onSetLink(location, event.target.value);
-      }
-    },
-    [location, onSetLink]
   );
 
   const handleDelete = useCallback(() => {
@@ -72,11 +62,12 @@ export const Locations: FC<LocationsIProps> = ({ location, onSetLink, onSetOptio
       <div className="col-span-7">
         <EduHubTextFieldEditor
           element="input"
+          updateMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
+          itemId={location.id}
           placeholder={t(address_placeholder)}
           value={location?.defaultSessionAddress || ''}
-          onChange={handleSetLink}
           typeCheck={typeCheckFunction}
-          errorText={t('address.error')}
+          errorText={t('address.errorText')}
           className="mb-0"
         />
       </div>
