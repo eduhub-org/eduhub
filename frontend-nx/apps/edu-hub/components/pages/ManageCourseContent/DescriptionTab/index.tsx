@@ -1,5 +1,5 @@
 import { QueryResult } from '@apollo/client';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import {
   eventTargetNumberMapper,
   eventTargetValueMapper,
@@ -96,6 +96,9 @@ import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
 import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
 import EduHubTimePicker from '../../../forms/EduHubTimePicker';
 import EduHubNumberFieldEditor from '../../../forms/EduHubNumberFieldEditor';
+import { LocationOption_enum } from '../../../../__generated__/globalTypes';
+import useErrorHandler from '../../../../hooks/useErrorHandler';
+import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -116,9 +119,9 @@ const prepDateTimeUpdate = (timeString: string) => {
   return now.toISOString();
 };
 
-const constantOnlineMapper = () => 'ONLINE';
-
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
+  const { error, handleError, resetError } = useErrorHandler();
+
   const updateHeading1 = useUpdateCallback<UpdateCourseHeadingDescription1, UpdateCourseHeadingDescription1Variables>(
     UPDATE_COURSE_HEADING_DESCRIPTION_1,
     'courseId',
@@ -168,16 +171,63 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     'courseId',
     'option',
     course?.id,
-    constantOnlineMapper,
+    () => availableOption,
     qResult
   );
 
+  // Extract the currently used options
+  const usedOptions = new Set(course.CourseLocations.map((loc) => loc.locationOption));
+  // Find the first available option
+  const availableOption = Object.values(LocationOption_enum).find((option) => !usedOptions.has(option));
+
+  const handleinsertCourseLocation = async () => {
+    try {
+      // If there's no available option, throw an error
+      if (!availableOption) {
+        handleError('All location options already exist for this course.');
+        return; // Exit the function early
+      }
+      // If there's more than one location, proceed with deletion
+      await insertCourseLocation(availableOption); // Call the function directly
+    } catch (error) {
+      // Handle errors if any step in the try block fails
+      handleError(error.message);
+      // Optionally, re-throw the error if you want calling functions to be able to handle it as well
+      throw error;
+    }
+  };
+
+  // const deleteCourseLocation = useDeleteCallback<DeleteCourseLocation, DeleteCourseLocationVariables>(
+  //   DELETE_COURSE_LOCATION,
+  //   'locationId',
+  //   pickIdPkMapper,
+  //   qResult
+  // );
   const deleteCourseLocation = useDeleteCallback<DeleteCourseLocation, DeleteCourseLocationVariables>(
     DELETE_COURSE_LOCATION,
     'locationId',
     pickIdPkMapper,
     qResult
   );
+
+  const handleDeleteCourseLocation = async (locationId) => {
+    try {
+      // Check the number of course locations
+      if (course.CourseLocations.length <= 1) {
+        // Handle the case where the location is the last one (e.g., show an error message)
+        handleError('A course needs at least one location.');
+        return; // Exit the function early
+      }
+
+      // If there's more than one location, proceed with deletion
+      await deleteCourseLocation(locationId); // Call the function directly
+    } catch (error) {
+      // Handle errors if any step in the try block fails
+      handleError(error.message);
+      // Optionally, re-throw the error if you want calling functions to be able to handle it as well
+      throw error;
+    }
+  };
 
   const updateCourseLocationOption = useUpdateCallback2<
     UpdateCourseLocationOption,
@@ -344,7 +394,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           />
           <div />
         </div>
-        <div className="grid grid-cols-2 mb-8">
+        <div className="grid grid-cols-2">
           <EduHubDropdownSelector
             label={t('common:language')}
             options={languageOptions}
@@ -371,17 +421,18 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           <Locations
             key={loc.id}
             location={loc}
-            onDelete={deleteCourseLocation}
+            onDelete={handleDeleteCourseLocation}
             onSetLink={updateCourseDefaultSessionAddress}
             onSetOption={updateCourseLocationOption}
           />
         ))}
       </div>
-      <div className="flex justify-start mb-2 text-white">
-        <Button onClick={insertCourseLocation} startIcon={<MdAddCircle />} color="inherit">
+      <div className="flex justify-start text-white">
+        <Button onClick={handleinsertCourseLocation} startIcon={<MdAddCircle />} color="inherit">
           {t('course-page:add-new-location')}
         </Button>
       </div>
+      {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}
     </div>
   );
 };

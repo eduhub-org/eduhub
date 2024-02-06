@@ -1,23 +1,55 @@
 import { gql } from "@apollo/client";
 
+// export const INSERT_COURSE = gql`
+//   mutation InsertCourse($title: String!, $applicationEnd: date!, $maxMissedSessions: Int!, $programId: Int!) {
+//     insert_Course(
+//       objects: {
+//         title: $title
+//         tagline: ""
+//         language: "DE"
+//         applicationEnd: $applicationEnd
+//         maxMissedSessions: $maxMissedSessions
+//         programId: $programId
+//       }
+//     ) {
+//       affected_rows
+//       returning {
+//         id
+//       }
+//     }
+//   }
+// `;
 export const INSERT_COURSE = gql`
-  mutation InsertCourse($title: String!, $applicationEnd: date!, $maxMissedSessions: Int!, $programId: Int!) {
-    insert_Course(
-      objects: {
-        title: $title
-        tagline: ""
-        language: "DE"
-        applicationEnd: $applicationEnd
-        maxMissedSessions: $maxMissedSessions
-        programId: $programId
+mutation InsertCourseWithLocation(
+  $title: String!, 
+  $applicationEnd: date!, 
+  $maxMissedSessions: Int!, 
+  $programId: Int!,
+  $locationOption: LocationOption_enum!
+) {
+  insert_Course(objects: {
+    title: $title
+    tagline: ""
+    language: "DE"
+    applicationEnd: $applicationEnd
+    maxMissedSessions: $maxMissedSessions
+    programId: $programId
+    CourseLocations: {
+      data: {
+        locationOption: $locationOption
+        defaultSessionAddress: ""
       }
-    ) {
-      affected_rows
-      returning {
+    }
+  }) {
+    affected_rows
+    returning {
+      id
+      CourseLocations {
         id
       }
     }
   }
+}
 `;
 
 

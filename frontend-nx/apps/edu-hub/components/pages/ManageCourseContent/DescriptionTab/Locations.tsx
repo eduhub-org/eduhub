@@ -88,7 +88,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onSetLink, onSetOptio
             </IconButton>
           </div>
         )}
-      </div>{' '}
+      </div>
     </div>
   );
 };
