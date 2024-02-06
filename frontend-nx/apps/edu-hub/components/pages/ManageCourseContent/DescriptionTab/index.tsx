@@ -1,6 +1,5 @@
 import { QueryResult } from '@apollo/client';
-import { FC } from 'react';
-import { DebounceInput } from 'react-debounce-input';
+import { FC, useState } from 'react';
 import {
   eventTargetNumberMapper,
   eventTargetValueMapper,
@@ -10,11 +9,9 @@ import {
   useUpdateCallback,
   useUpdateCallback2,
 } from '../../../../hooks/authedMutation';
-import { useRoleQuery } from '../../../../hooks/authedQuery';
 import {
   DELETE_COURSE_LOCATION,
   INSERT_NEW_COURSE_LOCATION,
-  LOCATION_OPTIONS,
   UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1,
   UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2,
   UPDATE_COURSE_END_TIME,
@@ -37,7 +34,6 @@ import {
   InsertCourseLocation,
   InsertCourseLocationVariables,
 } from '../../../../queries/__generated__/InsertCourseLocation';
-import { LocationOptionsKnown } from '../../../../queries/__generated__/LocationOptionsKnown';
 import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
 import {
   UpdateCourseContentDescriptionField1,
@@ -83,8 +79,8 @@ import {
   UpdateCourseWeekday,
   UpdateCourseWeekdayVariables,
 } from '../../../../queries/__generated__/UpdateCourseWeekday';
-import EhTimeSelect, { formatTime } from '../../../common/EhTimeSelect';
-import { LocationSelectionRow } from './LocationSelectionRow';
+import { formatTime } from '../../../common/EhTimeSelect';
+import Locations from './Locations';
 import { Button } from '@material-ui/core';
 import { MdAddCircle } from 'react-icons/md';
 import {
@@ -96,6 +92,13 @@ import {
   UpdateCourseMaxParticipantsVariables,
 } from '../../../../queries/__generated__/UpdateCourseMaxParticipants';
 import useTranslation from 'next-translate/useTranslation';
+import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
+import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
+import EduHubTimePicker from '../../../forms/EduHubTimePicker';
+import EduHubNumberFieldEditor from '../../../forms/EduHubNumberFieldEditor';
+import { LocationOption_enum } from '../../../../__generated__/globalTypes';
+import useErrorHandler from '../../../../hooks/useErrorHandler';
+import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -103,6 +106,12 @@ interface IProps {
 }
 
 const prepDateTimeUpdate = (timeString: string) => {
+  // Ensure timeString is a string and is not empty
+  if (typeof timeString !== 'string' || !timeString.includes(':')) {
+    console.error('Invalid timeString:', timeString);
+    return ''; // or some fallback value like the current time
+  }
+
   const now = new Date();
   const [hourS, minS] = timeString.split(':');
   now.setHours(Number(hourS));
@@ -110,31 +119,115 @@ const prepDateTimeUpdate = (timeString: string) => {
   return now.toISOString();
 };
 
-const constantOnlineMapper = () => 'ONLINE';
-
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
-  const queryKnownLocationOptions = useRoleQuery<LocationOptionsKnown>(LOCATION_OPTIONS);
-  if (queryKnownLocationOptions.error) {
-    console.log('query known location options error', queryKnownLocationOptions.error);
-  }
+  const { error, handleError, resetError } = useErrorHandler();
 
-  const locationOptions = (queryKnownLocationOptions.data?.LocationOption || []).map((x) => x.value);
+  const updateHeading1 = useUpdateCallback<UpdateCourseHeadingDescription1, UpdateCourseHeadingDescription1Variables>(
+    UPDATE_COURSE_HEADING_DESCRIPTION_1,
+    'courseId',
+    'description',
+    course?.id,
+    eventTargetValueMapper,
+    qResult
+  );
+  const updateContent1 = useUpdateCallback<
+    UpdateCourseContentDescriptionField1,
+    UpdateCourseContentDescriptionField1Variables
+  >(UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1, 'courseId', 'description', course?.id, eventTargetValueMapper, qResult);
+
+  const updateHeading2 = useUpdateCallback<UpdateCourseHeadingDescription2, UpdateCourseHeadingDescription2Variables>(
+    UPDATE_COURSE_HEADING_DESCRIPTION_2,
+    'courseId',
+    'description',
+    course?.id,
+    eventTargetValueMapper,
+    qResult
+  );
+  const updateContent2 = useUpdateCallback<
+    UpdateCourseContentDescriptionField2,
+    UpdateCourseContentDescriptionField2Variables
+  >(UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2, 'courseId', 'description', course?.id, eventTargetValueMapper, qResult);
+
+  const updateShortDescription = useUpdateCallback<UpdateCourseTagline, UpdateCourseTaglineVariables>(
+    UPDATE_COURSE_TAGLINE,
+    'courseId',
+    'tagline',
+    course?.id,
+    eventTargetValueMapper,
+    qResult
+  );
+
+  const updateLearningGoals = useUpdateCallback<UpdateCourseLearningGoals, UpdateCourseLearningGoalsVariables>(
+    UPDATE_COURSE_LEARNING_GOALS,
+    'courseId',
+    'description',
+    course?.id,
+    eventTargetValueMapper,
+    qResult
+  );
 
   const insertCourseLocation = useUpdateCallback<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_NEW_COURSE_LOCATION,
     'courseId',
     'option',
     course?.id,
-    constantOnlineMapper,
+    () => availableOption,
     qResult
   );
 
+  // Extract the currently used options
+  const usedOptions = new Set(course.CourseLocations.map((loc) => loc.locationOption));
+  // Find the first available option
+  const availableOption = Object.values(LocationOption_enum).find((option) => !usedOptions.has(option));
+
+  const handleinsertCourseLocation = async () => {
+    try {
+      // If there's no available option, throw an error
+      if (!availableOption) {
+        handleError('All location options already exist for this course.');
+        return; // Exit the function early
+      }
+      // If there's more than one location, proceed with deletion
+      await insertCourseLocation(availableOption); // Call the function directly
+    } catch (error) {
+      // Handle errors if any step in the try block fails
+      handleError(error.message);
+      // Optionally, re-throw the error if you want calling functions to be able to handle it as well
+      throw error;
+    }
+  };
+
+  // const deleteCourseLocation = useDeleteCallback<DeleteCourseLocation, DeleteCourseLocationVariables>(
+  //   DELETE_COURSE_LOCATION,
+  //   'locationId',
+  //   pickIdPkMapper,
+  //   qResult
+  // );
   const deleteCourseLocation = useDeleteCallback<DeleteCourseLocation, DeleteCourseLocationVariables>(
     DELETE_COURSE_LOCATION,
     'locationId',
     pickIdPkMapper,
     qResult
   );
+
+  const handleDeleteCourseLocation = async (locationId) => {
+    try {
+      // Check the number of course locations
+      if (course.CourseLocations.length <= 1) {
+        // Handle the case where the location is the last one (e.g., show an error message)
+        handleError('A course needs at least one location.');
+        return; // Exit the function early
+      }
+
+      // If there's more than one location, proceed with deletion
+      await deleteCourseLocation(locationId); // Call the function directly
+    } catch (error) {
+      // Handle errors if any step in the try block fails
+      handleError(error.message);
+      // Optionally, re-throw the error if you want calling functions to be able to handle it as well
+      throw error;
+    }
+  };
 
   const updateCourseLocationOption = useUpdateCallback2<
     UpdateCourseLocationOption,
@@ -189,52 +282,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     qResult
   );
 
-  const updateContent1 = useUpdateCallback<
-    UpdateCourseContentDescriptionField1,
-    UpdateCourseContentDescriptionField1Variables
-  >(UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1, 'courseId', 'description', course?.id, eventTargetValueMapper, qResult);
-
-  const updateContent2 = useUpdateCallback<
-    UpdateCourseContentDescriptionField2,
-    UpdateCourseContentDescriptionField2Variables
-  >(UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2, 'courseId', 'description', course?.id, eventTargetValueMapper, qResult);
-
-  const updateHeading1 = useUpdateCallback<UpdateCourseHeadingDescription1, UpdateCourseHeadingDescription1Variables>(
-    UPDATE_COURSE_HEADING_DESCRIPTION_1,
-    'courseId',
-    'description',
-    course?.id,
-    eventTargetValueMapper,
-    qResult
-  );
-
-  const updateHeading2 = useUpdateCallback<UpdateCourseHeadingDescription2, UpdateCourseHeadingDescription2Variables>(
-    UPDATE_COURSE_HEADING_DESCRIPTION_2,
-    'courseId',
-    'description',
-    course?.id,
-    eventTargetValueMapper,
-    qResult
-  );
-
-  const updateLearningGoals = useUpdateCallback<UpdateCourseLearningGoals, UpdateCourseLearningGoalsVariables>(
-    UPDATE_COURSE_LEARNING_GOALS,
-    'courseId',
-    'description',
-    course?.id,
-    eventTargetValueMapper,
-    qResult
-  );
-
-  const updateTagline = useUpdateCallback<UpdateCourseTagline, UpdateCourseTaglineVariables>(
-    UPDATE_COURSE_TAGLINE,
-    'courseId',
-    'tagline',
-    course?.id,
-    eventTargetValueMapper,
-    qResult
-  );
-
   const updateMaxParticipants = useUpdateCallback<UpdateCourseMaxParticipants, UpdateCourseMaxParticipantsVariables>(
     UPDATE_COURSE_MAX_PARTICIPANTS,
     'courseId',
@@ -243,191 +290,149 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     eventTargetNumberMapper,
     qResult
   );
-  const { t } = useTranslation();
+  const { t } = useTranslation('course-page');
+
+  const weekDayOptions = [
+    { value: 'NONE', label: t('weekdays.NONE') },
+    { value: 'MONDAY', label: t('weekdays.MONDAY') },
+    { value: 'TUESDAY', label: t('weekdays.TUESDAY') },
+    { value: 'WEDNESDAY', label: t('weekdays.WEDNESDAY') },
+    { value: 'THURSDAY', label: t('weekdays.THURSDAY') },
+    { value: 'FRIDAY', label: t('weekdays.FRIDAY') },
+    { value: 'SATURDAY', label: t('weekdays.SATURDAY') },
+    { value: 'SUNDAY', label: t('weekdays.SUNDAY') },
+  ];
+
+  const languageOptions = [
+    { value: 'DE', label: t('languages.DE') },
+    { value: 'EN', label: t('languages.EN') },
+  ];
 
   const courseLocations = [...course.CourseLocations];
   courseLocations.sort((a, b) => a.id - b.id);
   return (
     <div>
-      <div className="grid grid-cols-2 text-gray-400">
-        <div className="mr-3 ml-3">{`${t('course-page:short-description')} (${t('course-page:max-n-characters', {
-          n: 200,
-        })})`}</div>
-        <div className="mr-3 ml-3">{`${t('course-page:learning-goal')} (${t('course-page:max-n-characters', {
-          n: 500,
-        })})`}</div>
-      </div>
-      <div className="grid grid-cols-2 mb-8">
-        <DebounceInput
-          maxLength={200}
-          debounceTimeout={1000}
-          className="h-64 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
-          onChange={updateTagline}
-          forceNotifyByEnter={false}
-          element={'textarea'}
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        <EduHubTextFieldEditor
+          label={t('short_description.label')}
+          placeholder={t('short_description.label')}
+          helpText={t('short_description.help_text')}
+          className="h-64"
+          onChange={updateShortDescription}
           value={course.tagline}
         />
-        <DebounceInput
+        <EduHubTextFieldEditor
+          label={t('learning_goals.label')}
+          placeholder={t('learning_goals.placeholder')}
+          helpText={t('learning_goals.help_text')}
           maxLength={500}
-          debounceTimeout={1000}
-          className="h-64 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
+          className="h-64"
           onChange={updateLearningGoals}
-          forceNotifyByEnter={false}
-          element={'textarea'}
           value={course.learningGoals ?? ''}
         />
       </div>
-
-      <div className="grid grid-cols-2 text-gray-400">
-        <div className="mr-3 ml-3">{`${t('course-page:title-info-block')} 1 (${t('course-page:max-n-characters', {
-          n: 200,
-        })})`}</div>
-        <div className="mr-3 ml-3">{`${t('course-page:title-info-block')} 2 (${t('course-page:max-n-characters', {
-          n: 200,
-        })})`}</div>
-      </div>
-      <div className="grid grid-cols-2 mb-8">
-        <DebounceInput
-          maxLength={200}
-          debounceTimeout={1000}
-          className="h-8 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
-          onChange={updateHeading1}
-          value={course.headingDescriptionField1 ?? ''}
-        />
-
-        <DebounceInput
-          maxLength={200}
-          debounceTimeout={1000}
-          className="h-8 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
-          onChange={updateHeading2}
-          value={course.headingDescriptionField2 ?? ''}
-        />
-      </div>
-
-      <div className="grid grid-cols-2 text-gray-400">
-        <div className="mr-3 ml-3">{`${t('course-page:title-info-block')} 1 (${t('course-page:max-n-characters', {
-          n: 10000,
-        })})`}</div>
-        <div className="mr-3 ml-3">{`${t('course-page:title-info-block')} 2 (${t('course-page:max-n-characters', {
-          n: 10000,
-        })})`}</div>
-      </div>
-      <div className="grid grid-cols-2 mb-8">
-        <DebounceInput
-          maxLength={10000}
-          debounceTimeout={1000}
-          className="h-64 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
-          onChange={updateContent1}
-          forceNotifyByEnter={false}
-          element={'textarea'}
-          value={course.contentDescriptionField1 ?? ''}
-        />
-        <DebounceInput
-          maxLength={10000}
-          debounceTimeout={1000}
-          className="h-64 mr-3 ml-3 px-2 py-1 bg-edu-light-gray"
-          onChange={updateContent2}
-          forceNotifyByEnter={false}
-          element={'textarea'}
-          value={course.contentDescriptionField2 ?? ''}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        <div>
+          <EduHubTextFieldEditor
+            element="input"
+            label={t('info_block_1_title.label')}
+            placeholder={t('info_block_1_title.placeholder')}
+            helpText={t('info_block_1_title.help_text')}
+            onChange={updateHeading1}
+            value={course.headingDescriptionField1 ?? ''}
+            className="mb-0"
+          />
+          <EduHubTextFieldEditor
+            placeholder={t('info_block_1_content.placeholder')}
+            maxLength={10000}
+            className="h-64"
+            onChange={updateContent1}
+            value={course.contentDescriptionField1 ?? ''}
+            isMarkdown={true}
+          />
+        </div>
+        <div>
+          <EduHubTextFieldEditor
+            element="input"
+            label={t('info_block_2_title.label')}
+            helpText={t('info_block_2_title.help_text')}
+            placeholder={t('info_block_2_title.placeholder')}
+            onChange={updateHeading2}
+            value={course.headingDescriptionField2 ?? ''}
+            className="mb-0"
+          />
+          <EduHubTextFieldEditor
+            placeholder={t('info_block_1_content.placeholder')}
+            maxLength={10000}
+            className="h-64"
+            onChange={updateContent2}
+            value={course.contentDescriptionField2 ?? ''}
+            isMarkdown={true}
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 mb-8">
-        <div className="grid grid-cols-2">
-          <div className="grid grid-cols-3">
-            <div className="mr-3 ml-3">
-              <div className="text-gray-400">{t('course-page:day')}</div>
-              <div>
-                <select
-                  value={course.weekDay ?? 'MONDAY'}
-                  onChange={updateWeekday}
-                  className="w-full h-8 bg-edu-light-gray"
-                >
-                  <option value="NONE">{t('NONE')}</option>
-                  <option value="MONDAY">{t('MONDAY')}</option>
-                  <option value="TUESDAY">{t('TUESDAY')}</option>
-                  <option value="WEDNESDAY">{t('WEDNESDAY')}</option>
-                  <option value="THURSDAY">{t('THURSDAY')}</option>
-                  <option value="FRIDAY">{t('FRIDAY')}</option>
-                  <option value="SATURDAY">{t('SATURDAY')}</option>
-                  <option value="SUNDAY">{t('SUNDAY')}</option>
-                </select>
-              </div>
-            </div>
-            <div className="mr-3 ml-3">
-              <div className="text-gray-400">{t('course-page:start-time')}</div>
-              <div>
-                <EhTimeSelect
-                  value={formatTime(course.startTime)}
-                  className="h-8 w-full bg-edu-light-gray"
-                  onChange={updateCourseStartTime}
-                />
-              </div>
-            </div>
-            <div className="mr-3 ml-3">
-              <div className="text-gray-400">{t('course-page:end-time')}</div>
-              <div>
-                <EhTimeSelect
-                  value={formatTime(course.endTime)}
-                  className="h-8 w-full bg-edu-light-gray"
-                  onChange={updateCourseEndTime}
-                />
-              </div>
-            </div>
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        <div className="grid grid-cols-3">
+          <EduHubDropdownSelector
+            label={t('weekday')}
+            options={weekDayOptions}
+            value={course.weekDay ?? 'MONDAY'}
+            onChange={updateWeekday}
+          />
+          <EduHubTimePicker
+            label={t('start_time')}
+            value={formatTime(course.startTime)}
+            onChange={updateCourseStartTime}
+            className="mb-4"
+          />
+          <EduHubTimePicker
+            label={t('end_time')}
+            value={formatTime(course.endTime)}
+            onChange={updateCourseEndTime}
+            className="mb-4"
+          />
           <div />
         </div>
-        <div className="grid grid-cols-2 mb-8">
-          <div className="mr-3 ml-3">
-            <div className="text-gray-400">{t('language')}</div>
-            <div>
-              <select value={course.language} onChange={updateCourseLanguage} className="w-full h-8 bg-edu-light-gray">
-                <option value="DE">{t('DE')}</option>
-                <option value="EN">{t('EN')}</option>
-              </select>
-            </div>
-          </div>
-          <div className="mr-3 ml-3">
-            <div className="text-gray-400">{t('course-page:max-part-quantity')}</div>
-            <div>
-              <DebounceInput
-                type="number"
-                className="w-full h-8 px-2 py-1 bg-edu-light-gray"
-                debounceTimeout={1000}
-                onChange={updateMaxParticipants}
-                value={course.maxParticipants || 0}
-              />
-            </div>
+        <div className="grid grid-cols-2">
+          <EduHubDropdownSelector
+            label={t('common:language')}
+            options={languageOptions}
+            value={course.language}
+            onChange={updateCourseLanguage}
+          />
+          <div>
+            <EduHubNumberFieldEditor
+              label={t('max_participants')}
+              onChange={updateMaxParticipants}
+              value={course.maxParticipants || 0}
+              min={0}
+            />
           </div>
         </div>
       </div>
 
-      <div className="flex justify-start mb-2 text-white">
-        <Button onClick={insertCourseLocation} startIcon={<MdAddCircle />} color="inherit">
-          {t('course-page:add-new-location')}
-        </Button>
-      </div>
-
-      <div className="mb-8">
-        <LocationSelectionRow
-          location={null}
-          onDelete={deleteCourseLocation}
-          onSetLink={updateCourseDefaultSessionAddress}
-          onSetOption={updateCourseLocationOption}
-          options={locationOptions}
-        />
+      <div>
+        <div className="grid grid-cols-12 text-gray-400 px-2">
+          <div className="col-span-2">{t('location.label')}</div>
+          <div className="col-span-7">{t('address.label')}</div>
+        </div>
         {courseLocations.map((loc) => (
-          <LocationSelectionRow
+          <Locations
             key={loc.id}
             location={loc}
-            options={locationOptions}
-            onDelete={deleteCourseLocation}
+            onDelete={handleDeleteCourseLocation}
             onSetLink={updateCourseDefaultSessionAddress}
             onSetOption={updateCourseLocationOption}
           />
         ))}
       </div>
+      <div className="flex justify-start text-white">
+        <Button onClick={handleinsertCourseLocation} startIcon={<MdAddCircle />} color="inherit">
+          {t('course-page:add-new-location')}
+        </Button>
+      </div>
+      {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}
     </div>
   );
 };

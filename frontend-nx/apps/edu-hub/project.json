@@ -63,7 +63,7 @@
       }
     },
     "apollo": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "commands": [
           "rm -rf queries/__generated__/*",
