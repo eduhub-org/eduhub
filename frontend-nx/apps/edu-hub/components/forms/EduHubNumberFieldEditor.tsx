@@ -2,6 +2,7 @@ import { DebounceInput } from 'react-debounce-input';
 import useTranslation from 'next-translate/useTranslation';
 import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import { prioritizeClasses } from '../../helpers/util';
 
 interface EduHubNumberFieldEditorProps {
   label?: string;
@@ -37,7 +38,7 @@ const EduHubNumberFieldEditor: React.FC<EduHubNumberFieldEditorProps> = ({
   const { t } = useTranslation(translationNamespace);
 
   const baseClass = 'w-full px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
-  const finalClassName = `${baseClass} ${className}`.trim();
+  const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
   return (
     <div className="px-2">

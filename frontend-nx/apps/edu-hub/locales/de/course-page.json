@@ -145,7 +145,8 @@
     "placeholder": {
       "online": "Dieser Link wird den Teilnehmenden für alle Online-Termine des Kurses mitgeteilt.",
       "offline": "Diese Adresse kann ggf. bei der Erstellung der Einzeltermine angepasst werden."
-    }
+    },
+    "errorText": "Der eingegebene Link hat nicht das korrekte Format."
   },
   "max_participants": "Max. Teilehmendenanzahl",
   "weekday": "Wochentag",

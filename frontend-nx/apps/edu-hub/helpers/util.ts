@@ -1,6 +1,14 @@
 import { Course_Course_by_pk } from '../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk } from '../queries/__generated__/CourseWithEnrollment';
 
+export const prioritizeClasses = (classString: string): string => {
+  const classes = classString.split(' ');
+  const mbClasses = classes.filter(className => className.startsWith('mb-'));
+  const lastMbClass = mbClasses[mbClasses.length - 1];
+  const nonMbClasses = classes.filter(className => !className.startsWith('mb-'));
+  return [...nonMbClasses, lastMbClass].join(' ');
+}
+
 export const makeFullName = (firstName: string, lastName: string): string => {
   return `${firstName} ${lastName}`;
 };

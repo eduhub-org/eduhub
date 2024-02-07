@@ -2,6 +2,7 @@ import React, { ChangeEvent, ReactNode } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import { prioritizeClasses } from '../../helpers/util';
 
 interface EduHubDropdownSelectorProps {
   label?: ReactNode;
@@ -24,8 +25,8 @@ const EduHubDropdownSelector: React.FC<EduHubDropdownSelectorProps> = ({
   ...props // rest of the props
 }) => {
   const { t } = useTranslation(translationNamespace);
-  const baseClass = 'w-full h-12 px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
-  const finalClassName = `${baseClass} ${className}`.trim();
+  const baseClass = 'w-full px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
+  const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
   return (
     <div className="px-2">

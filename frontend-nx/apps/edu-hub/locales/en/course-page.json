@@ -143,5 +143,59 @@
   "participationDataGenerate": "Generate Participation Data (CSV)",
   "participationDataDownload": "Download Participation Data (CSV)",
   "selectTemplateDefaultLabel": "Choose template",
-  "achievement_option_not_selected": "Please select an achievement record option."
+  "achievement_option_not_selected": "Please select an achievement record option.",
+  "location": {
+    "label": "Location"
+  },
+  "address": {
+    "label": "Link or Address",
+    "placeholder": {
+      "online": "This link will be provided to participants for all online sessions of the course.",
+      "offline": "This address can be adjusted when creating individual sessions if necessary."
+    },
+    "errorText": "The entered link does not have the correct format."
+  },
+  "max_participants": "Maximum Number of Participants",
+  "weekday": "Weekday",
+  "weekdays": {
+    "NONE": "Irregular",
+    "MONDAY": "Monday",
+    "TUESDAY": "Tuesday",
+    "WEDNESDAY": "Wednesday",
+    "THURSDAY": "Thursday",
+    "FRIDAY": "Friday",
+    "SATURDAY": "Saturday",
+    "SUNDAY": "Sunday"
+  },
+  "languages": {
+    "DE": "German",
+    "EN": "English"
+  },
+  "start_time": "Start Time",
+  "end_time": "End Time",
+  "short_description": {
+    "label": "Short Description",
+    "help_text": "This text will appear on the course tile and as a tagline on the course page."
+  },
+  "learning_goals": {
+    "label": "Learning Goals",
+    "help_text": "The learning goals are part of the performance certificate and can only be changed by the program management. If you would like to suggest changes or notice errors, please contact them.",
+    "placeholder": "Learning Goal 1\nLearning Goal 2\nLearning Goal 3\nLearning Goal 4"
+  }, 
+  "info_block_1_title": {
+    "label": "Info Block 1",
+    "help_text": "For the content of this part of the description, please refer to existing courses to stay as consistent as possible. Typically, this section describes what participants can expect in the course ('What you will get').",
+    "placeholder": "Title"
+  },
+  "info_block_1_content": {
+    "placeholder": "Content"
+  },
+  "info_block_2_title": {
+    "label": "Info Block 2",
+    "help_text": "For the content of this part of the description, please refer to existing courses to ensure consistency. Typically, this section describes what participants are expected to contribute or lead ('What you should bring').",
+    "placeholder": "Title"
+  },
+  "info_block_2_content": {
+    "placeholder": "Content"
+  }
 }

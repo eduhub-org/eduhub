@@ -2,19 +2,27 @@ import React, { ChangeEvent, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useRoleMutation } from '../../hooks/authedMutation';
 import useTranslation from 'next-translate/useTranslation';
 import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import { DocumentNode } from 'graphql';
+import { prioritizeClasses } from '../../helpers/util';
+import useErrorHandler from '../../hooks/useErrorHandler';
+import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 
 interface EduHubTextFieldEditorProps {
   label?: string;
-  placeholder?: string;
   element?: string;
-  maxLength?: number;
-  debounceTimeout?: number;
-  className?: string;
-  onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   value: string;
+  updateMutation: DocumentNode;
+  itemId: number;
+  onChange?: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  refetchQueries?: string[];
+  debounceTimeout?: number;
+  maxLength?: number;
+  placeholder?: string;
+  className?: string;
   typeCheck?: (text: string) => boolean;
   helpText?: string;
   errorText?: string;
@@ -25,28 +33,60 @@ interface EduHubTextFieldEditorProps {
 }
 
 const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
-  label = null,
-  placeholder,
+  label,
   element = 'textarea',
-  maxLength = 200,
-  debounceTimeout = 1000,
-  className = '',
-  onChange,
   value,
+  updateMutation,
+  itemId,
+  onChange,
+  refetchQueries,
+  debounceTimeout = 1000,
+  maxLength = 200,
+  placeholder,
+  className = '',
   typeCheck,
   helpText,
-  errorText,
+  errorText = 'Validation failed',
   translationNamespace,
   forceNotifyByEnter = false,
   isMarkdown = false,
   ...props // rest of the props
 }) => {
   const { t } = useTranslation(translationNamespace);
+  const { error, handleError, resetError } = useErrorHandler();
+
+  const [updateItem] = useRoleMutation(updateMutation, {
+    onError: (error) => handleError(t(error.message)),
+  });
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const newText = event.target.value;
+    if (typeCheck && !typeCheck(newText)) {
+      // Here a possible type error is handled while typing
+      return;
+    } else {
+      resetError(); // reset error if the new value passes typeCheck
+    }
+    updateItem({ variables: { itemId, text: newText } });
+    // You might want to handle loading state, errors, or the response here
+  };
+
+  const handleBlur = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const newText = event.target.value;
+    if (typeCheck && !typeCheck(newText)) {
+      handleError(errorText);
+    } else {
+      resetError(); // reset error if the new value passes typeCheck
+    }
+    // the valie is updated anyway, even if it's invalid
+    updateItem({ variables: { itemId, text: newText } });
+  };
+
   const [showPreview, setShowPreview] = useState(false);
   const togglePreview = () => setShowPreview(!showPreview);
 
   const baseClass = 'w-full px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
-  const finalClassName = `${baseClass} ${className}`.trim();
+  const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
   const renderInput = () => (
     <div className="relative">
@@ -57,8 +97,9 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
         maxLength={maxLength}
         debounceTimeout={debounceTimeout}
         className={finalClassName}
-        onChange={onChange}
+        onChange={handleChange}
         value={value}
+        onBlur={handleBlur}
         forceNotifyByEnter={forceNotifyByEnter}
         {...props} // spread the rest of the props
       />
@@ -111,6 +152,7 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
         </div>
         <div>{isMarkdown ? renderMarkdownInput() : renderInput()}</div>
       </div>
+      {error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
     </div>
   );
 };
