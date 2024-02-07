@@ -5,6 +5,7 @@ import useTranslation from 'next-translate/useTranslation';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { MdArrowBack, MdArrowForward } from 'react-icons/md';
+import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import {
   ColumnDef,
   flexRender,
@@ -70,15 +71,18 @@ const TableGrid = <T extends BaseRow>({
 
   const ExpandableRowComponent = expandableRowComponent;
 
-  const toggleRowExpansion = useCallback((rowId: number) => {
-    const newExpandedRows = new Set(expandedRows);
-    if (expandedRows.has(rowId)) {
-      newExpandedRows.delete(rowId);
-    } else {
-      newExpandedRows.add(rowId);
-    }
-    setExpandedRows(newExpandedRows);
-  },[expandedRows]);
+  const toggleRowExpansion = useCallback(
+    (rowId: number) => {
+      const newExpandedRows = new Set(expandedRows);
+      if (expandedRows.has(rowId)) {
+        newExpandedRows.delete(rowId);
+      } else {
+        newExpandedRows.add(rowId);
+      }
+      setExpandedRows(newExpandedRows);
+    },
+    [expandedRows]
+  );
 
   const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     const itemRank = rankItem(row.getValue(columnId), value);
@@ -90,9 +94,10 @@ const TableGrid = <T extends BaseRow>({
     const expandCollapseColumn: ColumnDef<T>[] = [
       {
         id: 'expander',
+        header: '',
         cell: ({ row }) => (
           <button onClick={() => toggleRowExpansion(row.original.id)}>
-            {expandedRows.has(row.original.id) ? '👇' : '👉'}
+            {expandedRows.has(row.original.id) ? <IoIosArrowUp /> : <IoIosArrowDown />}
           </button>
         ),
       },
@@ -115,7 +120,7 @@ const TableGrid = <T extends BaseRow>({
             },
           ]
         : [];
-    return [...expandCollapseColumn, ...dataColumns, ...deleteColumn];
+    return [...dataColumns, ...expandCollapseColumn, ...deleteColumn];
   }, [columns, deleteMutation, refetchQueries, showDelete, expandedRows, toggleRowExpansion]);
 
   const table = useReactTable({
@@ -136,16 +141,13 @@ const TableGrid = <T extends BaseRow>({
 
   return (
     <div>
-      {/* Optional Add Button */}
-      {onAddButtonClick && (
-        <div className="text-white mb-4">
-          <EhAddButton buttonClickCallBack={onAddButtonClick} text={addButtonText} />
-        </div>
-      )}
-
-      {/* Global Search Input */}
       {showGlobalSearchField && (
-        <div className="flex justify-end">
+        <div className={`flex ${onAddButtonClick ? 'justify-between' : 'justify-end'}`}>
+          {onAddButtonClick && (
+            <div className="text-white mb-4">
+              <EhAddButton buttonClickCallBack={onAddButtonClick} text={addButtonText} />
+            </div>
+          )}
           <TextField
             className="!w-64 bg-gray-600 border !mb-6"
             value={globalFilter}
@@ -175,7 +177,7 @@ const TableGrid = <T extends BaseRow>({
                 onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
               >
                 <div className="flex-1 flex items-center">
-                  <div>{t(header.column.id)}</div>
+                  {header.column.columnDef.header === '' ? null : <div>{t(header.column.id)}</div>}
                   {header.column.getCanSort() && (
                     <div className="ml-1 flex flex-col items-center">
                       <ArrowDropUpIcon style={{ opacity: header.column.getIsSorted() === 'asc' ? 1 : 0.5 }} />
@@ -194,7 +196,11 @@ const TableGrid = <T extends BaseRow>({
       {table.getRowModel().rows.map((row) => (
         <React.Fragment key={row.id}>
           {/* Primary Row */}
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center mb-1 py-2 bg-edu-light-gray">
+          <div
+            className={`grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center ${
+              expandedRows.has(row.original.id) && expandableRowComponent
+            ? 'mb-0' : 'mb-1'} py-2 bg-edu-light-gray`}
+          >
             {row.getVisibleCells().map((cell) => (
               <div
                 key={cell.id}
@@ -206,7 +212,7 @@ const TableGrid = <T extends BaseRow>({
           </div>
           {/* Expandable Second Row */}
           {expandedRows.has(row.original.id) && expandableRowComponent && (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center mb-1 py-2 bg-edu-light-gray">
+            <div className="items-center mb-1 py-2 bg-edu-light-gray">
               <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
             </div>
           )}
@@ -215,12 +221,12 @@ const TableGrid = <T extends BaseRow>({
 
       {/* Pagination */}
       {enablePagination && (
-        <div className="flex justify-end pb-10 text-white">
-          <div className="flex flex-row space-x-5">
+        <div className="flex justify-end pb-10 text-white mt-4">
+          <div className="flex flex-row items-center space-x-5">
             {pageIndex > 0 && (
               <MdArrowBack
                 className="border-2 rounded-full cursor-pointer hover:bg-indigo-100"
-                size={40}
+                size={30}
                 onClick={handlePrevious}
               />
             )}
@@ -228,7 +234,7 @@ const TableGrid = <T extends BaseRow>({
             {pageIndex < pages - 1 && (
               <MdArrowForward
                 className="border-2 rounded-full cursor-pointer hover:bg-indigo-100"
-                size={40}
+                size={30}
                 onClick={handleNext}
               />
             )}
