@@ -6,10 +6,10 @@
 import { LocationOption_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL mutation operation: DeleteLocationSessionAddress
+// GraphQL mutation operation: DeleteSessionAddressesByCourseAndLocation
 // ====================================================
 
-export interface DeleteLocationSessionAddress_delete_SessionAddress {
+export interface DeleteSessionAddressesByCourseAndLocation_delete_SessionAddress {
   __typename: "SessionAddress_mutation_response";
   /**
    * number of rows affected by the mutation
@@ -17,14 +17,14 @@ export interface DeleteLocationSessionAddress_delete_SessionAddress {
   affected_rows: number;
 }
 
-export interface DeleteLocationSessionAddress {
+export interface DeleteSessionAddressesByCourseAndLocation {
   /**
    * delete data from the table: "SessionAddress"
    */
-  delete_SessionAddress: DeleteLocationSessionAddress_delete_SessionAddress | null;
+  delete_SessionAddress: DeleteSessionAddressesByCourseAndLocation_delete_SessionAddress | null;
 }
 
-export interface DeleteLocationSessionAddressVariables {
+export interface DeleteSessionAddressesByCourseAndLocationVariables {
   courseId: number;
   location: LocationOption_enum;
 }

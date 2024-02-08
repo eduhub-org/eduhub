@@ -25,7 +25,7 @@ import {
   UPDATE_COURSE_START_TIME,
   UPDATE_COURSE_WEEKDAY,
   UPDATE_COURSE_SHORT_DESCRIPTION,
-  DELETE_LOCATION_SESSION_ADDRESS,
+  DELETE_SESSION_ADDRESSES_BY_COURSE_AND_LOCATION,
 } from '../../../../queries/course';
 import {
   DeleteCourseLocation,
@@ -74,9 +74,9 @@ import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import useErrorHandler from '../../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import {
-  DeleteLocationSessionAddress,
-  DeleteLocationSessionAddressVariables,
-} from '../../queries/__generated__/DeleteLocationSessionAddress';
+  DeleteSessionAddressesByCourseAndLocation,
+  DeleteSessionAddressesByCourseAndLocationVariables,
+} from '../../../../queries/__generated__/DeleteSessionAddressesByCourseAndLocation';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -145,10 +145,10 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       onError: (error) => handleError(t(error.message)),
     }
   );
-  const [deleteSessionLocationAddresses] = useRoleMutation<
-    DeleteLocationSessionAddress,
-    DeleteLocationSessionAddressVariables
-  >(DELETE_SESSION_ADDRESS, {
+  const [DeleteSessionAddressesByCourseAndLocation] = useRoleMutation<
+    DeleteSessionAddressesByCourseAndLocation,
+    DeleteSessionAddressesByCourseAndLocationVariables
+  >(DELETE_SESSION_ADDRESSES_BY_COURSE_AND_LOCATION, {
     onError: (error) => handleError(t(error.message)),
   });
 
@@ -160,10 +160,11 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         handleError('A course needs at least one location.');
         return; // Exit the function early
       }
-      const sessionIds = [];
       // If there's more than one location, proceed with deletion
       await deleteCourseLocation({ variables: { locationId: location.id } }); // Call the function directly
-      await deleteLocationSessionAddresses({ variables: { sessionIds: sessionIds } }); // Call the function directly
+      await DeleteSessionAddressesByCourseAndLocation({
+        variables: { courseId: course.id, location: location.locationOption },
+      }); // Call the function directly
       qResult.refetch(); // Refetch the query to update the UI
     } catch (error) {
       // Handle errors if any step in the try block fails

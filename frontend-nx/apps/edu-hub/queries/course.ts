@@ -236,16 +236,15 @@ export const UPDATE_SESSION_ADDRESS = gql`
 `;
 
 
-export const DELETE_LOCATION_SESSION_ADDRESS = gql`
-  mutation DeleteLocationSessionAddress (
+export const DELETE_SESSION_ADDRESSES_BY_COURSE_AND_LOCATION = gql`
+  mutation DeleteSessionAddressesByCourseAndLocation (
     $courseId: Int!
     $location: LocationOption_enum!
-) {
-  delete_SessionAddress(where: {_and: {Session: {Course: {id: {_eq: $courseId}}, SessionAddresses: {location: {_eq: $location}}}}}) {
-    affected_rows
-  }
-}
-`;
+  ) {
+    delete_SessionAddress(where: {_and: {location: {_eq: $location}, Session: {Course: {id: {_eq: $courseId}}}}}) {
+      affected_rows
+    }
+}`;
 
 export const LOCATION_OPTIONS = gql`
   query LocationOptions {
