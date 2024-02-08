@@ -145,10 +145,10 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       onError: (error) => handleError(t(error.message)),
     }
   );
-  const [deleteSessionLocationAddresses] = useRoleMutation<
+  const [deleteSessionLocationAddress] = useRoleMutation<
     DeleteLocationSessionAddress,
     DeleteLocationSessionAddressVariables
-  >(DELETE_SESSION_ADDRESS, {
+  >(DELETE_LOCATION_SESSION_ADDRESS, {
     onError: (error) => handleError(t(error.message)),
   });
 
@@ -163,7 +163,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       const sessionIds = [];
       // If there's more than one location, proceed with deletion
       await deleteCourseLocation({ variables: { locationId: location.id } }); // Call the function directly
-      await deleteLocationSessionAddresses({ variables: { sessionIds: sessionIds } }); // Call the function directly
+      await deleteSessionLocationAddress({ variables: { sessionIds: sessionIds } }); // Call the function directly
       qResult.refetch(); // Refetch the query to update the UI
     } catch (error) {
       // Handle errors if any step in the try block fails

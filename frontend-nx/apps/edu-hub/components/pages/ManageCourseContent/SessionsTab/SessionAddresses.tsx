@@ -36,7 +36,7 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, courseLo
   const placeholder = isOnline ? null : t('sessionAddress.offline.placeholder');
 
   return (
-    <>
+    <div className='mb-3'>
       <div>{label}:</div>
       <div>
         {isOnline ? (
@@ -54,7 +54,7 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, courseLo
           />
         )}
       </div>
-    </>
+    </div>
   );
 };
 
