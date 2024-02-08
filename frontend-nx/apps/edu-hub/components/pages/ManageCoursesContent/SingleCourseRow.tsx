@@ -298,7 +298,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
             variables: {
               id: course.id,
               changes: {
-                coverImage: result.data?.saveCourseImage?.google_link,
+                coverImage: result.data?.saveCourseImage?.file_path,
               },
             },
           });

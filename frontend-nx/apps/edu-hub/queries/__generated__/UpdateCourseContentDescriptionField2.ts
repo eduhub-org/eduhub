@@ -20,6 +20,6 @@ export interface UpdateCourseContentDescriptionField2 {
 }
 
 export interface UpdateCourseContentDescriptionField2Variables {
-  courseId: number;
-  description: string;
+  itemId: number;
+  text: string;
 }

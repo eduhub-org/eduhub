@@ -2,6 +2,7 @@ import React, { ChangeEvent, useCallback } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import { prioritizeClasses } from '../../helpers/util';
 
 const format2Digits = (n: number) => {
   return `${n < 10 ? '0' : ''}${n}`;
@@ -44,8 +45,8 @@ const EduHubTimePicker: React.FC<EduHubTimePickerProps> = ({
     const minutes = iMinutes % 60;
     timeOptions.push(formatTime(new Date(0, 0, 0, hours, minutes)));
   }
-
-  const finalClassName = `w-full h-12 px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray ${className}`.trim();
+  const baseClassName = 'w-full h-12 px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
+  const finalClassName = prioritizeClasses(`${baseClassName} ${className}`);
 
   const handleChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => onChange(event.target.value), [onChange]);
 

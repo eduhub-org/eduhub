@@ -541,6 +541,7 @@ export enum CourseInstructor_update_column {
  */
 export enum CourseLocation_constraint {
   CourseAddress_pkey = "CourseAddress_pkey",
+  unique_courseid_locationoption = "unique_courseid_locationoption",
 }
 
 /**
