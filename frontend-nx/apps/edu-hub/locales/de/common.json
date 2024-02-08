@@ -104,5 +104,9 @@
   "preview": "Vorschau",
   "edit_markdown": "Bearbeiten",
   "markdown_info": "Du kannst **fett**, _kursiv_ und andere Formatierungen verwenden",
-  "markdown_guide": "Markdown Guide"
+  "markdown_guide": "Markdown Guide",
+  "location": {
+    "ONLINE": "Online",
+    "KIEL": "Kiel"
+  }
 }
