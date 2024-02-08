@@ -29,6 +29,12 @@ on:
       NEXT_PUBLIC_AUTH_URL:
         required: false
         type: string
+      NEXT_PUBLIC_HELP_DOCS_URL:
+        required: false
+        type: string
+      NEXT_PUBLIC_STORAGE_BUCKET_URL:
+        required: false
+        type: string
       # SHA of the folder for the given application
       SHA:
         required: true
@@ -46,6 +52,8 @@ jobs:
     env:
       NEXT_PUBLIC_API_URL: ${{ inputs.NEXT_PUBLIC_API_URL }}
       NEXT_PUBLIC_AUTH_URL: ${{ inputs.NEXT_PUBLIC_AUTH_URL }}
+      NEXT_PUBLIC_HELP_DOCS_URL: ${{ inputs.NEXT_PUBLIC_HELP_DOCS_URL }}
+      NEXT_PUBLIC_STORAGE_BUCKET_URL: ${{ inputs.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
 
     steps:
       - name: Check Out the Repository Branch
@@ -58,7 +66,7 @@ jobs:
           project_id: ${{ inputs.PROJECT_ID }}
       - name: Build Docker image
         id: build_image
-        run: docker build ./${{ inputs.DOCKERFILE_FOLDER }} --file ./${{ inputs.DOCKERFILE_FOLDER }}/${{ inputs.DOCKERFILE_NAME }} --tag ${{ inputs.IMAGE_NAME }} --label "runnumber=${GITHUB_RUN_ID}" --build-arg NEXT_PUBLIC_API_URL=${{ inputs.NEXT_PUBLIC_API_URL }} --build-arg NEXT_PUBLIC_AUTH_URL=${{ inputs.NEXT_PUBLIC_AUTH_URL }}
+        run: docker build ./${{ inputs.DOCKERFILE_FOLDER }} --file ./${{ inputs.DOCKERFILE_FOLDER }}/${{ inputs.DOCKERFILE_NAME }} --tag ${{ inputs.IMAGE_NAME }} --label "runnumber=${GITHUB_RUN_ID}" --build-arg NEXT_PUBLIC_API_URL=${{ inputs.NEXT_PUBLIC_API_URL }} --build-arg NEXT_PUBLIC_AUTH_URL=${{ inputs.NEXT_PUBLIC_AUTH_URL }} --build-arg NEXT_PUBLIC_HELP_DOCS_URL=${{ inputs.NEXT_PUBLIC_HELP_DOCS_URL }} --build-arg NEXT_PUBLIC_STORAGE_BUCKET_URL=${{ inputs.NEXT_PUBLIC_STORAGE_BUCKET_URL }}
       - name: Authenticate with Google Cloud Artifact Registry
         id: auth_gcloud
         run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
