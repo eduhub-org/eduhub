@@ -99,7 +99,7 @@ INSERT INTO public."AchievementRecordAuthor" VALUES (2, 2, 'b5df4676-3d75-4413-b
 -- Past course that has some faulty or incomplete values
 INSERT INTO public."Course" VALUES (2, 'Past Course 2', 'APPLICANTS_INVITED', '2.5', '', 'EN', CURRENT_DATE - INTERVAL '6 month', '', false, false, 2, 'NONE', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 4, NULL, NULL, NULL, NULL, NULL, NULL, 20, '2022-11-01 16:00:02.674+00', '2022-11-01 22:00:01.513+00', true);
 INSERT INTO public."CourseGroup" VALUES (2, 2, 2, '2022-12-19 12:56:07.352338+00', '2022-12-19 12:56:12.475054+00');
-INSERT INTO public."CourseLocation" VALUES (3, 2, '2022-12-19 12:56:07.352338+00', '2022-12-19 12:56:12.475054+00', 'ONLINE', NULL);
+INSERT INTO public."CourseLocation" VALUES (3, 2, '2022-12-19 12:56:07.352338+00', '2022-12-19 12:56:12.475054+00', 'KIEL', NULL);
 INSERT INTO public."CourseInstructor" VALUES (3, 2, 2, '2022-12-17 22:20:20.615952+00', '2022-12-17 22:20:20.615952+00');
 INSERT INTO public."Session" VALUES (11, 'Session1 for Past Course 2', 'The first session for "Past Course 2"', CURRENT_DATE - INTERVAL '5 month' - INTERVAL '1 week' + TIME '16:00:00', CURRENT_DATE - INTERVAL '5 month' - INTERVAL '1 week' + TIME '18:00:00', 2, '2022-12-19 13:21:41.873742+00', '2022-12-19 13:21:56.669676+00', NULL);
 INSERT INTO public."SessionAddress" VALUES (21, '2022-12-19 13:21:41.891287+00', '2022-12-19 13:21:41.891287+00', 11, 'Musterstraße 21, 22232 Kiel', 'FREETEXT_ADDRESS');

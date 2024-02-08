@@ -173,15 +173,15 @@ export const SessionRow: FC<IProps> = ({
 
   return (
     <div>
-      <div className={`grid grid-cols-16 mb-1 ${session != null ? 'bg-edu-light-gray' : ''}`}>
+      <div className={`grid grid-cols-24 gap-3 mb-1 ${session != null ? 'bg-edu-light-gray' : ''}`}>
         {!session && (
-          <div className="mr-3 ml-3 col-span-1 row-span-1 w-24">
+          <div className="p-3 col-span-3">
             {t('date')}
             <br />
           </div>
         )}
         {session && (
-          <div className="mr-3 ml-3 mt-2 col-span-1 row-span-1 w-24">
+          <div className="p-3 col-span-3">
             <DatePicker
               minDate={lectureStart}
               maxDate={lectureEnd}
@@ -193,31 +193,31 @@ export const SessionRow: FC<IProps> = ({
             />{' '}
           </div>
         )}
-        <div className="mr-3 ml-3 col-span-1 row-span-1">
+        <div className="p-3 col-span-2">
           {!session && <>{t('start-time')}</>}
           {session && (
             <EhTimeSelect
-              className="bg-edu-light-gray m-2"
+              className="bg-edu-light-gray"
               onChange={handleSetStartTime}
               value={formatTime(session.startDateTime)}
             />
           )}
         </div>
-        <div className="mr-3 ml-3 col-span-1 row-span-1">
+        <div className="p-3 col-span-2">
           {!session && <>{t('end-time')}</>}
           {session && (
             <EhTimeSelect
-              className="bg-edu-light-gray m-2"
+              className="bg-edu-light-gray"
               onChange={handleSetEndTime}
               value={formatTime(session.endDateTime)}
             />
           )}
         </div>
-        <div className="mr-3 ml-3 col-span-4 row-span-1">
+        <div className="p-3 col-span-8">
           {!session && <>{t('title')}</>}
           {session && (
             <DebounceInput
-              className="w-full bg-edu-light-gray m-2"
+              className="w-full bg-edu-light-gray"
               value={session.title}
               onChange={handleSetTitle}
               debounceTimeout={1000}
@@ -225,30 +225,32 @@ export const SessionRow: FC<IProps> = ({
             />
           )}
         </div>
-        <div className="mr-3 ml-3 col-span-5 row-span-1 w-96">
+        <div className="p-3 col-span-7">
           {!session && <>{t('speakers')}</>}
           {session && (
-            <div className="m-2">
+            <div className="">
               <EhMultipleTag requestAddTag={openAddSpeaker} requestDeleteTag={handleDeleteSpeaker} tags={speakerTags} />
             </div>
           )}
         </div>
-        <div className="ml-3 col-span-1 row-span-1">
+        <div className="p-3 col-span-2">
           {session && (
             <div>
               <div>{location && <DeleteButton handleDelete={handleDelete} />}</div>
             </div>
           )}
         </div>
-        <div className="ml-5 col-start-2 col-span-12 row-span-1">
-          {session?.SessionAddresses.map((address) => (
-            <SessionAddresses
-              key={address.id}
-              address={address}
-              courseLocations={qResult.data.Course_by_pk.CourseLocations}
-            />
-          ))}{' '}
-        </div>
+        {session?.SessionAddresses && (
+          <div className="col-start-2 col-span-10 p-3">
+            {session?.SessionAddresses.map((address) => (
+              <SessionAddresses
+                key={address.id}
+                address={address}
+                courseLocations={qResult.data.Course_by_pk.CourseLocations}
+              />
+            ))}{' '}
+          </div>
+        )}
       </div>
       <SelectUserDialog
         onClose={handleNewSpeaker}
