@@ -29,6 +29,8 @@ interface EduHubTextFieldEditorProps {
   translationNamespace?: string;
   forceNotifyByEnter?: boolean;
   isMarkdown?: boolean;
+  showCharacterCount?: boolean;
+  invertColors?: boolean;
   [x: string]: any; // for the rest of the props
 }
 
@@ -50,6 +52,8 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
   translationNamespace,
   forceNotifyByEnter = false,
   isMarkdown = false,
+  showCharacterCount = true,
+  invertColors = false,
   ...props // rest of the props
 }) => {
   const { t } = useTranslation(translationNamespace);
@@ -85,7 +89,9 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
   const [showPreview, setShowPreview] = useState(false);
   const togglePreview = () => setShowPreview(!showPreview);
 
-  const baseClass = 'w-full px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
+  const baseClass = `w-full px-3 py-3 mb-8 rounded ${
+    invertColors ? 'bg-gray-200 text-black' : 'text-gray-500 bg-edu-light-gray'
+  }`;
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
   const renderInput = () => (
@@ -103,7 +109,9 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
         forceNotifyByEnter={forceNotifyByEnter}
         {...props} // spread the rest of the props
       />
-      <div className="absolute top-0 right-0 mr-2 mt-1 text-xs text-gray-400">{`${value.length}/${maxLength}`}</div>
+      {showCharacterCount && (
+        <div className="absolute top-0 right-0 mr-2 mt-1 text-xs text-gray-400">{`${value.length}/${maxLength}`}</div>
+      )}
     </div>
   );
 

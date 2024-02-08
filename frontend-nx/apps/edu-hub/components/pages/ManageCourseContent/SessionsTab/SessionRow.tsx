@@ -1,18 +1,15 @@
 import { FC, useCallback, useState } from 'react';
-import { ManagedCourse_Course_by_pk_Sessions } from '../../../../queries/__generated__/ManagedCourse';
+import {
+  ManagedCourse,
+  ManagedCourseVariables,
+  ManagedCourse_Course_by_pk_Sessions,
+} from '../../../../queries/__generated__/ManagedCourse';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import EhTimeSelect, { formatTime } from '../../../common/EhTimeSelect';
 import { DebounceInput } from 'react-debounce-input';
-import { IconButton } from '@material-ui/core';
-import { MdDelete } from 'react-icons/md';
 import { eventTargetValueMapper, useRoleMutation } from '../../../../hooks/authedMutation';
-import { InputDialog } from '../../../common/dialogs/InputDialog';
-import {
-  InsertSessionLocation,
-  InsertSessionLocationVariables,
-} from '../../../../queries/__generated__/InsertSessionLocation';
-import { INSERT_NEW_SESSION_LOCATION, INSERT_NEW_SESSION_SPEAKER } from '../../../../queries/course';
+import { INSERT_NEW_SESSION_SPEAKER } from '../../../../queries/course';
 import { QueryResult } from '@apollo/client';
 import { SelectUserDialog } from '../../../common/dialogs/SelectUserDialog';
 import { UserForSelection1_User } from '../../../../queries/__generated__/UserForSelection1';
@@ -24,6 +21,8 @@ import {
 } from '../../../../queries/__generated__/InsertNewSessionSpeaker';
 import EhMultipleTag from '../../../common/EhMultipleTag';
 import useTranslation from 'next-translate/useTranslation';
+import DeleteButton from '../../../../components/common/DeleteButton';
+import SessionAddresses from './SessionAddresses';
 
 const copyDateTime = (target: Date, source: Date) => {
   target = new Date(target);
@@ -38,12 +37,11 @@ interface IProps {
   session: ManagedCourse_Course_by_pk_Sessions | null;
   lectureStart: Date;
   lectureEnd: Date;
-  qResult: QueryResult<any, any>;
+  qResult: QueryResult<ManagedCourse, ManagedCourseVariables>;
   onDelete: (pk: number) => any;
   onSetStartDate: (session: ManagedCourse_Course_by_pk_Sessions, date: Date) => any;
   onSetEndDate: (session: ManagedCourse_Course_by_pk_Sessions, date: Date) => any;
   onSetTitle: (session: ManagedCourse_Course_by_pk_Sessions, title: string) => any;
-  onDeleteLocation: (id: number) => any;
   onDeleteSpeaker: (id: number) => any;
 }
 
@@ -56,7 +54,6 @@ export const SessionRow: FC<IProps> = ({
   onSetStartDate,
   onSetEndDate,
   onSetTitle,
-  onDeleteLocation,
   onDeleteSpeaker,
 }) => {
   const { t, lang } = useTranslation();
@@ -66,13 +63,6 @@ export const SessionRow: FC<IProps> = ({
       onDelete(session.id);
     }
   }, [session, onDelete]);
-
-  const handleDeleteLocation = useCallback(
-    (id: number) => {
-      onDeleteLocation(id);
-    },
-    [onDeleteLocation]
-  );
 
   const handleDeleteSpeaker = useCallback(
     (id: number) => {
@@ -134,41 +124,10 @@ export const SessionRow: FC<IProps> = ({
     [session, onSetEndDate]
   );
 
-  const addressTags = (session?.SessionAddresses || []).map((x) => ({
-    id: x.id,
-    display: x.address || '',
-  }));
-
   const speakerTags = (session?.SessionSpeakers || []).map((x) => ({
     id: x.id,
     display: [x.Expert.User.firstName, x.Expert.User.lastName].join(' '),
   }));
-
-  const [addressAddOpen, setAddressAddOpen] = useState(false);
-  const openAddressAdd = useCallback(() => {
-    setAddressAddOpen(true);
-  }, [setAddressAddOpen]);
-
-  const [insertSessionLocationMutation] = useRoleMutation<InsertSessionLocation, InsertSessionLocationVariables>(
-    INSERT_NEW_SESSION_LOCATION
-  );
-
-  const handleAddNewAddress = useCallback(
-    async (confirmed: boolean, inputValue: string) => {
-      if (session != null && confirmed) {
-        await insertSessionLocationMutation({
-          variables: {
-            sessionId: session.id,
-            address: inputValue,
-          },
-        });
-        qResult.refetch();
-      }
-
-      setAddressAddOpen(false);
-    },
-    [session, setAddressAddOpen, insertSessionLocationMutation, qResult]
-  );
 
   const [addSpeakerOpen, setAddSpeakerOpen] = useState(false);
   const openAddSpeaker = useCallback(() => {
@@ -214,16 +173,15 @@ export const SessionRow: FC<IProps> = ({
 
   return (
     <div>
-      <div className={`grid grid-cols-32 mb-1 ${session != null ? 'bg-edu-light-gray' : ''}`}>
+      <div className={`grid grid-cols-16 mb-1 ${session != null ? 'bg-edu-light-gray' : ''}`}>
         {!session && (
-          <div className="mr-3 ml-3 col-span-4">
+          <div className="mr-3 ml-3 col-span-1 row-span-1 w-24">
             {t('date')}
             <br />
           </div>
         )}
-
         {session && (
-          <div className="col-span-4 m-2">
+          <div className="mr-3 ml-3 mt-2 col-span-1 row-span-1 w-24">
             <DatePicker
               minDate={lectureStart}
               maxDate={lectureEnd}
@@ -235,8 +193,7 @@ export const SessionRow: FC<IProps> = ({
             />{' '}
           </div>
         )}
-
-        <div className="mr-3 ml-3 col-span-3">
+        <div className="mr-3 ml-3 col-span-1 row-span-1">
           {!session && <>{t('start-time')}</>}
           {session && (
             <EhTimeSelect
@@ -246,7 +203,7 @@ export const SessionRow: FC<IProps> = ({
             />
           )}
         </div>
-        <div className="mr-3 ml-3 col-span-3">
+        <div className="mr-3 ml-3 col-span-1 row-span-1">
           {!session && <>{t('end-time')}</>}
           {session && (
             <EhTimeSelect
@@ -256,7 +213,7 @@ export const SessionRow: FC<IProps> = ({
             />
           )}
         </div>
-        <div className="mr-3 ml-3 col-span-10">
+        <div className="mr-3 ml-3 col-span-4 row-span-1">
           {!session && <>{t('title')}</>}
           {session && (
             <DebounceInput
@@ -268,19 +225,7 @@ export const SessionRow: FC<IProps> = ({
             />
           )}
         </div>
-        <div className="mr-3 ml-3 col-span-5">
-          {!session && <>{t('addresses')}</>}
-          {session && (
-            <div className="m-2">
-              <EhMultipleTag
-                requestAddTag={openAddressAdd}
-                requestDeleteTag={handleDeleteLocation}
-                tags={addressTags}
-              />
-            </div>
-          )}
-        </div>
-        <div className="mr-3 ml-3 col-span-5">
+        <div className="mr-3 ml-3 col-span-5 row-span-1 w-96">
           {!session && <>{t('speakers')}</>}
           {session && (
             <div className="m-2">
@@ -288,21 +233,23 @@ export const SessionRow: FC<IProps> = ({
             </div>
           )}
         </div>
-        <div className="ml-3 col-span-2">
+        <div className="ml-3 col-span-1 row-span-1">
           {session && (
-            <div onClick={handleDelete} className="mt-2 ml-2">
-              <IconButton size="small">
-                <MdDelete size="1.25em" />
-              </IconButton>
+            <div>
+              <div>{location && <DeleteButton handleDelete={handleDelete} />}</div>
             </div>
           )}
         </div>
+        <div className="ml-5 col-start-2 col-span-12 row-span-1">
+          {session?.SessionAddresses.map((address) => (
+            <SessionAddresses
+              key={address.id}
+              address={address}
+              courseLocations={qResult.data.Course_by_pk.CourseLocations}
+            />
+          ))}{' '}
+        </div>
       </div>
-      <InputDialog
-        open={addressAddOpen}
-        onClose={handleAddNewAddress}
-        inputLabel={t('course-page:add-session-address')}
-      />
       <SelectUserDialog
         onClose={handleNewSpeaker}
         open={addSpeakerOpen}

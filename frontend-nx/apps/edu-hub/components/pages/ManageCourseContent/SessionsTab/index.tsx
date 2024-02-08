@@ -12,24 +12,15 @@ import {
 } from '../../../../hooks/authedMutation';
 import {
   DELETE_SESSION,
-  DELETE_SESSION_LOCATION,
   DELETE_SESSION_SPEAKER,
-  INSERT_NEW_SESSION,
-  INSERT_NEW_SESSION_LOCATION,
+  INSERT_SESSION_WITH_ADDRESSES,
   UPDATE_SESSION_END_TIME,
   UPDATE_SESSION_START_TIME,
   UPDATE_SESSION_TITLE,
 } from '../../../../queries/course';
-import {
-  InsertCourseSession,
-  InsertCourseSessionVariables,
-} from '../../../../queries/__generated__/InsertCourseSession';
 import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
 import { SessionRow } from './SessionRow';
-import {
-  DeleteCourseSession,
-  DeleteCourseSessionVariables,
-} from '../../../../queries/__generated__/DeleteCourseSession';
+import { DeleteSession, DeleteSessionVariables } from '../../../../queries/__generated__/DeleteSession';
 import {
   UpdateSessionStartTime,
   UpdateSessionStartTimeVariables,
@@ -40,18 +31,15 @@ import {
 } from '../../../../queries/__generated__/UpdateSessionEndTime';
 import { UpdateSessionTitle, UpdateSessionTitleVariables } from '../../../../queries/__generated__/UpdateSessionTitle';
 import {
-  InsertSessionLocation,
-  InsertSessionLocationVariables,
-} from '../../../../queries/__generated__/InsertSessionLocation';
-import {
-  DeleteCourseSessionLocation,
-  DeleteCourseSessionLocationVariables,
-} from '../../../../queries/__generated__/DeleteCourseSessionLocation';
+  InsertSessionWithAddresses,
+  InsertSessionWithAddressesVariables,
+} from '../../../../queries/__generated__/InsertSessionWithAddresses';
 import {
   DeleteSessionSpeaker,
   DeleteSessionSpeakerVariables,
 } from '../../../../queries/__generated__/DeleteSessionSpeaker';
 import useTranslation from 'next-translate/useTranslation';
+import { SessionAddress_insert_input } from 'apps/edu-hub/__generated__/globalTypes';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -71,11 +59,22 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     return result;
   }, [course]);
 
-  const [insertSessionMutation] = useRoleMutation<InsertCourseSession, InsertCourseSessionVariables>(
-    INSERT_NEW_SESSION
-  );
-  const [insertSessionLocationMutation] = useRoleMutation<InsertSessionLocation, InsertSessionLocationVariables>(
-    INSERT_NEW_SESSION_LOCATION
+  // get all locations for the course
+  const courseLocations = useMemo(() => {
+    const result = course.CourseLocations.map((cl) => cl.locationOption);
+    return result;
+  }, [course.CourseLocations]); // Add dependency array here
+
+  const sessionAddresses: SessionAddress_insert_input[] = courseLocations.map((locationOption) => ({
+    location: locationOption,
+    // Add other properties as needed, for example:
+    // created_at: new Date(),
+    // updated_at: new Date(),
+    // You may need to provide values for other properties depending on your schema
+  }));
+
+  const [insertSessionMutation] = useRoleMutation<InsertSessionWithAddresses, InsertSessionWithAddressesVariables>(
+    INSERT_SESSION_WITH_ADDRESSES
   );
   const insertSession = useCallback(async () => {
     const startTime: Date = new Date(
@@ -91,39 +90,12 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
         courseId: course.id,
         startTime,
         endTime,
+        sessionAddresses: sessionAddresses,
       },
     });
 
-    // add the standard locations
-    const newSessionId = inserted?.data?.insert_Session?.returning[0]?.id;
-    if (newSessionId != null) {
-      for (const loc of course.CourseLocations) {
-        await insertSessionLocationMutation({
-          variables: {
-            sessionId: newSessionId,
-            address: loc.defaultSessionAddress || t('course-page:to-be-defined'),
-          },
-        });
-      }
-    }
-
     qResult.refetch();
-  }, [
-    courseSessions,
-    insertSessionMutation,
-    course.id,
-    course.CourseLocations,
-    qResult,
-    insertSessionLocationMutation,
-    t,
-  ]);
-
-  const deleteSessionLocation = useDeleteCallback<DeleteCourseSessionLocation, DeleteCourseSessionLocationVariables>(
-    DELETE_SESSION_LOCATION,
-    'addressId',
-    identityEventMapper,
-    qResult
-  );
+  }, [courseSessions, insertSessionMutation, course.id, course.CourseLocations, qResult, t]);
 
   const deleteSessionSpeaker = useDeleteCallback<DeleteSessionSpeaker, DeleteSessionSpeakerVariables>(
     DELETE_SESSION_SPEAKER,
@@ -132,7 +104,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     qResult
   );
 
-  const deleteSession = useDeleteCallback<DeleteCourseSession, DeleteCourseSessionVariables>(
+  const deleteSession = useDeleteCallback<DeleteSession, DeleteSessionVariables>(
     DELETE_SESSION,
     'sessionId',
     identityEventMapper,
@@ -181,7 +153,6 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           onSetEndDate={setSessionEnd}
           onSetTitle={setSessionTitle}
           onDeleteSpeaker={deleteSessionSpeaker}
-          onDeleteLocation={deleteSessionLocation}
           lectureStart={course.Program?.lectureStart}
           lectureEnd={course.Program?.lectureEnd}
           session={null}
@@ -195,7 +166,6 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           onSetStartDate={setSessionStart}
           onSetEndDate={setSessionEnd}
           onSetTitle={setSessionTitle}
-          onDeleteLocation={deleteSessionLocation}
           onDeleteSpeaker={deleteSessionSpeaker}
           lectureStart={course.Program?.lectureStart}
           lectureEnd={course.Program?.lectureEnd}

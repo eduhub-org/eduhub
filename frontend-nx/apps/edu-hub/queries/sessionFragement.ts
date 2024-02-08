@@ -13,6 +13,7 @@ export const SESSION_FRAGMENT = gql`
     SessionAddresses {
       id
       address
+      location
       type
     }
     SessionSpeakers {

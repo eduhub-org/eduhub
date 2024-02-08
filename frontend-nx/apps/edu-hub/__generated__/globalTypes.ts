@@ -1094,6 +1094,7 @@ export enum SessionAddress_select_column {
   address = "address",
   created_at = "created_at",
   id = "id",
+  location = "location",
   sessionId = "sessionId",
   type = "type",
   updated_at = "updated_at",
@@ -1106,6 +1107,7 @@ export enum SessionAddress_update_column {
   address = "address",
   created_at = "created_at",
   id = "id",
+  location = "location",
   sessionId = "sessionId",
   type = "type",
   updated_at = "updated_at",
@@ -5711,6 +5713,7 @@ export interface SessionAddress_arr_rel_insert_input {
  * Boolean expression to filter rows from the table "SessionAddress". All fields are combined with a logical 'AND'.
  */
 export interface SessionAddress_bool_exp {
+  LocationOption?: LocationOption_bool_exp | null;
   Session?: Session_bool_exp | null;
   SessionAddressType?: SessionAddressType_bool_exp | null;
   _and?: SessionAddress_bool_exp[] | null;
@@ -5719,6 +5722,7 @@ export interface SessionAddress_bool_exp {
   address?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  location?: LocationOption_enum_comparison_exp | null;
   sessionId?: Int_comparison_exp | null;
   type?: SessionAddressType_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -5728,11 +5732,13 @@ export interface SessionAddress_bool_exp {
  * input type for inserting data into table "SessionAddress"
  */
 export interface SessionAddress_insert_input {
+  LocationOption?: LocationOption_obj_rel_insert_input | null;
   Session?: Session_obj_rel_insert_input | null;
   SessionAddressType?: SessionAddressType_obj_rel_insert_input | null;
   address?: string | null;
   created_at?: any | null;
   id?: number | null;
+  location?: LocationOption_enum | null;
   sessionId?: number | null;
   type?: SessionAddressType_enum | null;
   updated_at?: any | null;

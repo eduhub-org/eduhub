@@ -4,17 +4,17 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: LocationOptionsKnown
+// GraphQL query operation: LocationOptions
 // ====================================================
 
-export interface LocationOptionsKnown_LocationOption {
+export interface LocationOptions_LocationOption {
   __typename: "LocationOption";
   value: string;
 }
 
-export interface LocationOptionsKnown {
+export interface LocationOptions {
   /**
    * fetch data from the table: "LocationOption"
    */
-  LocationOption: LocationOptionsKnown_LocationOption[];
+  LocationOption: LocationOptions_LocationOption[];
 }

@@ -6,12 +6,13 @@ import {
   identityEventMapper,
   pickIdPkMapper,
   useDeleteCallback,
+  useRoleMutation,
   useUpdateCallback,
   useUpdateCallback2,
 } from '../../../../hooks/authedMutation';
 import {
   DELETE_COURSE_LOCATION,
-  INSERT_NEW_COURSE_LOCATION,
+  INSERT_COURSE_LOCATION,
   UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1,
   UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2,
   UPDATE_COURSE_END_TIME,
@@ -24,6 +25,7 @@ import {
   UPDATE_COURSE_START_TIME,
   UPDATE_COURSE_WEEKDAY,
   UPDATE_COURSE_SHORT_DESCRIPTION,
+  DELETE_LOCATION_SESSION_ADDRESS,
 } from '../../../../queries/course';
 import {
   DeleteCourseLocation,
@@ -71,6 +73,10 @@ import EduHubNumberFieldEditor from '../../../forms/EduHubNumberFieldEditor';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import useErrorHandler from '../../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
+import {
+  DeleteLocationSessionAddress,
+  DeleteLocationSessionAddressVariables,
+} from '../../queries/__generated__/DeleteLocationSessionAddress';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -95,7 +101,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const { error, handleError, resetError } = useErrorHandler();
 
   const insertCourseLocation = useUpdateCallback<InsertCourseLocation, InsertCourseLocationVariables>(
-    INSERT_NEW_COURSE_LOCATION,
+    INSERT_COURSE_LOCATION,
     'courseId',
     'option',
     course?.id,
@@ -125,14 +131,28 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     }
   };
 
-  const deleteCourseLocation = useDeleteCallback<DeleteCourseLocation, DeleteCourseLocationVariables>(
-    DELETE_COURSE_LOCATION,
-    'locationId',
-    pickIdPkMapper,
-    qResult
-  );
+  // const deleteCourseLocation = useDeleteCallback<DeleteCourseLocation, DeleteCourseLocationVariables>(
+  //   DELETE_COURSE_LOCATION,
+  //   'locationId',
+  //   pickIdPkMapper,
+  //   qResult
+  // );
 
-  const handleDeleteCourseLocation = async (locationId) => {
+  // define a new function deleteCourseLocation that used the DELETE_COURSE location mutation with useRoleMutation
+  const [deleteCourseLocation] = useRoleMutation<DeleteCourseLocation, DeleteCourseLocationVariables>(
+    DELETE_COURSE_LOCATION,
+    {
+      onError: (error) => handleError(t(error.message)),
+    }
+  );
+  const [deleteSessionLocationAddresses] = useRoleMutation<
+    DeleteLocationSessionAddress,
+    DeleteLocationSessionAddressVariables
+  >(DELETE_SESSION_ADDRESS, {
+    onError: (error) => handleError(t(error.message)),
+  });
+
+  const handleDeleteCourseLocation = async (location) => {
     try {
       // Check the number of course locations
       if (course.CourseLocations.length <= 1) {
@@ -140,9 +160,11 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         handleError('A course needs at least one location.');
         return; // Exit the function early
       }
-
+      const sessionIds = [];
       // If there's more than one location, proceed with deletion
-      await deleteCourseLocation(locationId); // Call the function directly
+      await deleteCourseLocation({ variables: { locationId: location.id } }); // Call the function directly
+      await deleteLocationSessionAddresses({ variables: { sessionIds: sessionIds } }); // Call the function directly
+      qResult.refetch(); // Refetch the query to update the UI
     } catch (error) {
       // Handle errors if any step in the try block fails
       handleError(error.message);
@@ -202,21 +224,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   );
   const { t } = useTranslation('course-page');
 
-  const weekDayOptions = [
-    { value: 'NONE', label: t('weekdays.NONE') },
-    { value: 'MONDAY', label: t('weekdays.MONDAY') },
-    { value: 'TUESDAY', label: t('weekdays.TUESDAY') },
-    { value: 'WEDNESDAY', label: t('weekdays.WEDNESDAY') },
-    { value: 'THURSDAY', label: t('weekdays.THURSDAY') },
-    { value: 'FRIDAY', label: t('weekdays.FRIDAY') },
-    { value: 'SATURDAY', label: t('weekdays.SATURDAY') },
-    { value: 'SUNDAY', label: t('weekdays.SUNDAY') },
-  ];
-
-  const languageOptions = [
-    { value: 'DE', label: t('languages.DE') },
-    { value: 'EN', label: t('languages.EN') },
-  ];
+  const weekDayOptions = ['NONE', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+  const languageOptions = ['DE', 'EN'];
 
   const courseLocations = [...course.CourseLocations];
   courseLocations.sort((a, b) => a.id - b.id);
@@ -295,6 +304,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             options={weekDayOptions}
             value={course.weekDay ?? 'MONDAY'}
             onChange={updateWeekday}
+            translationPrefix="course-page:weekdays."
           />
           <EduHubTimePicker
             label={t('start_time')}
@@ -316,6 +326,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             options={languageOptions}
             value={course.language}
             onChange={updateCourseLanguage}
+            translationPrefix="course-page:languages."
           />
           <div>
             <EduHubNumberFieldEditor

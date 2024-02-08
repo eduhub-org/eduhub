@@ -1,14 +1,13 @@
-import { IconButton } from '@material-ui/core';
 import useTranslation from 'next-translate/useTranslation';
 import { ChangeEvent, FC, useCallback } from 'react';
-import { MdDelete } from 'react-icons/md';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
 import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
-import { LocationOptionsKnown } from '../../../../queries/__generated__/LocationOptionsKnown';
+import { LocationOptions } from '../../../../queries/__generated__/LocationOptions';
 import { LOCATION_OPTIONS, UPDATE_COURSE_SESSION_DEFAULT_ADDRESS } from '../../../../queries/course';
 import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
 import { isLinkFormat } from '../../../../helpers/util';
+import DeleteButton from '../../../../components/common/DeleteButton';
 
 interface LocationsIProps {
   location: ManagedCourse_Course_by_pk_CourseLocations | null;
@@ -19,11 +18,11 @@ interface LocationsIProps {
 export const Locations: FC<LocationsIProps> = ({ location, onSetOption, onDelete }) => {
   const { t } = useTranslation('course-page');
 
-  const queryKnownLocationOptions = useRoleQuery<LocationOptionsKnown>(LOCATION_OPTIONS);
-  if (queryKnownLocationOptions.error) {
-    console.log('query known location options error', queryKnownLocationOptions.error);
+  const queryLocationOptions = useRoleQuery<LocationOptions>(LOCATION_OPTIONS);
+  if (queryLocationOptions.error) {
+    console.log('query known location options error', queryLocationOptions.error);
   }
-  const locationOptions = (queryKnownLocationOptions.data?.LocationOption || []).map((x) => x.value);
+  const locationOptions = (queryLocationOptions.data?.LocationOption || []).map((x) => x.value);
   const locations = locationOptions.map((location) => ({ value: location, label: location }));
 
   const handleSetOption = useCallback(
@@ -52,10 +51,11 @@ export const Locations: FC<LocationsIProps> = ({ location, onSetOption, onDelete
       {location && (
         <div className="col-span-2">
           <EduHubDropdownSelector
-            options={locations}
+            options={locationOptions}
             value={location.locationOption || 'ONLINE'}
             onChange={handleSetOption}
             className="mb-0"
+            translationPrefix="common:location."
           />
         </div>
       )}
@@ -71,15 +71,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onSetOption, onDelete
           className="mb-0"
         />
       </div>
-      <div>
-        {location && (
-          <div>
-            <IconButton onClick={handleDelete}>
-              <MdDelete size="0.75em" className="text-red-500" />
-            </IconButton>
-          </div>
-        )}
-      </div>
+      <div>{location && <DeleteButton handleDelete={handleDelete} />}</div>
     </div>
   );
 };
