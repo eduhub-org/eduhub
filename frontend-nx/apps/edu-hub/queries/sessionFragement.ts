@@ -15,6 +15,11 @@ export const SESSION_FRAGMENT = gql`
       address
       location
       type
+      CourseLocation {
+        id
+        locationOption
+        defaultSessionAddress
+      }
     }
     SessionSpeakers {
       Expert {

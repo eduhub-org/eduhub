@@ -35,6 +35,7 @@ export interface InsertSessionAddress {
 
 export interface InsertSessionAddressVariables {
   sessionId: number;
-  address: string;
   location: LocationOption_enum;
+  address: string;
+  courseLocationId: number;
 }

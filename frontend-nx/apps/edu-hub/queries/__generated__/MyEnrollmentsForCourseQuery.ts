@@ -9,6 +9,19 @@ import { CourseEnrollmentStatus_enum, Weekday_enum, LocationOption_enum, Session
 // GraphQL query operation: MyEnrollmentsForCourseQuery
 // ====================================================
 
+export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_Sessions_SessionAddresses_CourseLocation {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: LocationOption_enum | null;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
+}
+
 export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_Sessions_SessionAddresses {
   __typename: "SessionAddress";
   id: number;
@@ -21,6 +34,10 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_Sessions_Se
    */
   location: LocationOption_enum | null;
   type: SessionAddressType_enum;
+  /**
+   * An object relationship
+   */
+  CourseLocation: MyEnrollmentsForCourseQuery_CourseEnrollment_Course_Sessions_SessionAddresses_CourseLocation | null;
 }
 
 export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_Sessions_SessionSpeakers_Expert_User {

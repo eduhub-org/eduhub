@@ -20,6 +20,10 @@ export interface InsertSessionWithAddresses_insert_Session_returning_SessionAddr
    * Indicates to which of the existing location options this address is corresponding.
    */
   location: LocationOption_enum | null;
+  /**
+   * Provide the id of the course location the address is referring to If the address is part of a course itThe id of a course.
+   */
+  courseLocationId: number | null;
 }
 
 export interface InsertSessionWithAddresses_insert_Session_returning {

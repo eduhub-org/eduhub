@@ -177,9 +177,9 @@ export const DELETE_SESSION_SPEAKER = gql`
 `;
 
 export const INSERT_SESSION_ADDRESS = gql`
-  mutation InsertSessionAddress($sessionId: Int!, $address: String!, $location: LocationOption_enum!) {
+  mutation InsertSessionAddress($sessionId: Int!, $location: LocationOption_enum!, $address: String!, $courseLocationId: Int!) {
     insert_SessionAddress(
-      objects: { sessionId: $sessionId, address: $address , location: $location}
+      objects: { sessionId: $sessionId, location: $location, address: $address, courseLocationId: $courseLocationId}
     ) {
       affected_rows
       returning {
@@ -215,6 +215,7 @@ export const INSERT_SESSION_WITH_ADDRESSES = gql`
           id
           address
           location
+          courseLocationId
         }
       }
     }
@@ -274,8 +275,8 @@ export const INSERT_COURSE_LOCATION = gql`
   }
 `;
 
-export const UPDATE_COURSE_LOCATION_OPTION = gql`
-  mutation UpdateCourseLocationOption(
+export const UPDATE_COURSE_LOCATION = gql`
+  mutation UpdateCourseLocation(
     $locationId: Int!
     $option: LocationOption_enum!
   ) {

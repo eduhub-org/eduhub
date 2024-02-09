@@ -9,6 +9,19 @@ import { LocationOption_enum, SessionAddressType_enum, University_enum } from ".
 // GraphQL fragment: AdminSessionFragment
 // ====================================================
 
+export interface AdminSessionFragment_SessionAddresses_CourseLocation {
+  __typename: "CourseLocation";
+  id: number;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: LocationOption_enum | null;
+  /**
+   * Will be used as default for any new session address.
+   */
+  defaultSessionAddress: string | null;
+}
+
 export interface AdminSessionFragment_SessionAddresses {
   __typename: "SessionAddress";
   id: number;
@@ -21,6 +34,10 @@ export interface AdminSessionFragment_SessionAddresses {
    */
   location: LocationOption_enum | null;
   type: SessionAddressType_enum;
+  /**
+   * An object relationship
+   */
+  CourseLocation: AdminSessionFragment_SessionAddresses_CourseLocation | null;
 }
 
 export interface AdminSessionFragment_SessionSpeakers_Expert_User {

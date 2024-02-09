@@ -2,6 +2,9 @@ table:
   name: SessionAddress
   schema: public
 object_relationships:
+  - name: CourseLocation
+    using:
+      foreign_key_constraint_on: courseLocationId
   - name: LocationOption
     using:
       foreign_key_constraint_on: location

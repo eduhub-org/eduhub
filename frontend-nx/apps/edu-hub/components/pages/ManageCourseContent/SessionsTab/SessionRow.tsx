@@ -23,6 +23,7 @@ import EhMultipleTag from '../../../common/EhMultipleTag';
 import useTranslation from 'next-translate/useTranslation';
 import DeleteButton from '../../../../components/common/DeleteButton';
 import SessionAddresses from './SessionAddresses';
+import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 
 const copyDateTime = (target: Date, source: Date) => {
   target = new Date(target);
@@ -242,13 +243,23 @@ export const SessionRow: FC<IProps> = ({
         </div>
         {session?.SessionAddresses && (
           <div className="col-start-2 col-span-10 p-3">
-            {session?.SessionAddresses.map((address) => (
-              <SessionAddresses
-                key={address.id}
-                address={address}
-                courseLocations={qResult.data.Course_by_pk.CourseLocations}
-              />
-            ))}{' '}
+            {[...session?.SessionAddresses]
+              // Sort all addresses by location option
+              .sort((a, b) => {
+                const locationOptions = Object.values(LocationOption_enum);
+                return (
+                  locationOptions.indexOf(a.CourseLocation.locationOption) -
+                  locationOptions.indexOf(b.CourseLocation.locationOption)
+                );
+              })
+              // Map each address to a SessionAddresses component
+              .map((address) => (
+                <SessionAddresses
+                  key={address.id}
+                  address={address}
+                  courseLocations={qResult.data.Course_by_pk.CourseLocations}
+                />
+              ))}{' '}
           </div>
         )}
       </div>

@@ -1,12 +1,10 @@
 import useTranslation from 'next-translate/useTranslation';
-import { ChangeEvent, FC, useCallback } from 'react';
+import { FC } from 'react';
 import {
   ManagedCourse_Course_by_pk_CourseLocations,
   ManagedCourse_Course_by_pk_Sessions_SessionAddresses,
 } from '../../../../queries/__generated__/ManagedCourse';
-import { useRoleQuery } from '../../../../hooks/authedQuery';
-import { LocationOptions } from '../../../../queries/__generated__/LocationOptions';
-import { LOCATION_OPTIONS, UPDATE_SESSION_ADDRESS } from '../../../../queries/course';
+import { UPDATE_SESSION_ADDRESS } from '../../../../queries/course';
 import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
 import { isLinkFormat } from '../../../../helpers/util';
 
@@ -15,19 +13,20 @@ interface SessionAddressesIProps {
   courseLocations: ManagedCourse_Course_by_pk_CourseLocations[];
 }
 
-export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, courseLocations }) => {
+export const SessionAddresses: FC<SessionAddressesIProps> = ({ address }) => {
   const { t } = useTranslation('course-page');
 
   // select the default session address from the course location where location is equal to address.location
-  const location = courseLocations?.find((location) => location.locationOption === address?.location);
+  // const location = courseLocations?.find((location) => location.locationOption === address?.location);
 
-  const defaultSessionAddress = location ? location.defaultSessionAddress : undefined;
-  const isOnline = address?.location === 'ONLINE';
+  // const defaultSessionAddress = location ? location.defaultSessionAddress : undefined;
+  const defaultSessionAddress = address?.CourseLocation?.defaultSessionAddress;
+  const isOnline = address?.CourseLocation?.locationOption === 'ONLINE';
   const isValidLink = isLinkFormat(defaultSessionAddress);
 
   const label = isOnline
     ? t('sessionAddress.online.label')
-    : t('sessionAddress.offline.label') + t('common:location.' + address?.location);
+    : t('sessionAddress.offline.label') + t('common:location.' + address?.CourseLocation?.locationOption);
   const value = isOnline
     ? isValidLink
       ? defaultSessionAddress
@@ -36,7 +35,7 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, courseLo
   const placeholder = isOnline ? null : t('sessionAddress.offline.placeholder');
 
   return (
-    <div className='mb-3'>
+    <div className="mb-3">
       <div>{label}:</div>
       <div>
         {isOnline ? (

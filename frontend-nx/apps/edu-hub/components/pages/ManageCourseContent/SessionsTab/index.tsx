@@ -59,18 +59,14 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     return result;
   }, [course]);
 
-  // get all locations for the course
-  const courseLocations = useMemo(() => {
-    const result = course.CourseLocations.map((cl) => cl.locationOption);
+  // get all locations ids for the course
+  const courseLocationIds = useMemo(() => {
+    const result = course.CourseLocations.map((location) => location.id);
     return result;
   }, [course.CourseLocations]); // Add dependency array here
 
-  const sessionAddresses: SessionAddress_insert_input[] = courseLocations.map((locationOption) => ({
-    location: locationOption,
-    // Add other properties as needed, for example:
-    // created_at: new Date(),
-    // updated_at: new Date(),
-    // You may need to provide values for other properties depending on your schema
+  const sessionAddresses: SessionAddress_insert_input[] = courseLocationIds.map((courseLocationId) => ({
+    courseLocationId: courseLocationId,
   }));
 
   const [insertSessionMutation] = useRoleMutation<InsertSessionWithAddresses, InsertSessionWithAddressesVariables>(
@@ -85,7 +81,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     );
     startTime.setDate(startTime.getDate() + 7);
     endTime.setDate(endTime.getDate() + 7);
-    const inserted = await insertSessionMutation({
+    await insertSessionMutation({
       variables: {
         courseId: course.id,
         startTime,
