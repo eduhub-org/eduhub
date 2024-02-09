@@ -55,10 +55,10 @@ export const buildCloudStorage = (Storage) => {
     },
         
       setPublic: async (path, bucketName) => {
-        console.log(`[Emulated] Set public: ${bucketName}/${path}`);
+        logger.debug(`[Emulated] Set public: ${bucketName}/${path}`);
       },
       setPrivate: async (path, bucketName) => {
-        console.log(`[Emulated] Set private: ${bucketName}/${path}`);
+        logger.debug(`[Emulated] Set private: ${bucketName}/${path}`);
       },
     };
   } else {
@@ -70,11 +70,13 @@ export const buildCloudStorage = (Storage) => {
         const file = bucket.file(filename);
         const fileBuffer = new Buffer.from(content, "base64");
 
+        logger.debug(`Saving file ${filename} to bucket ${bucketName}`);
         const sr = await file.save(fileBuffer);
 
         let link = "";
-        if (isPublic == true) {
-          const mp = await file.makePublic();
+        if (isPublic) {
+          logger.debug(`Setting file ${filename} to public`);
+          await file.makePublic();
           link = await file.publicUrl();
         } else {
           link = await file.getSignedUrl({
