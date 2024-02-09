@@ -18,7 +18,7 @@ const EhTag: FC<IProps> = ({ tag, requestDeleteTag }) => {
   return (
     <div
       title={tag.display}
-      className="flex justify-between rounded-full bg-edu-tag-color px-2 py-1"
+      className="flex justify-between rounded-full bg-edu-tag-color px-2 py-1 mb-2"
       key={tag.id}
     >
       <p className="truncate">{tag.display}</p>

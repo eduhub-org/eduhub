@@ -6,12 +6,12 @@ import { prioritizeClasses } from '../../helpers/util';
 
 interface EduHubDropdownSelectorProps {
   label?: ReactNode;
-  options: { value: string; label: string }[];
+  options: string[];
   className?: string;
   onChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   value: string;
   helpText?: string;
-  translationNamespace?: string;
+  translationPrefix?: string;
 }
 
 const EduHubDropdownSelector: React.FC<EduHubDropdownSelectorProps> = ({
@@ -21,10 +21,10 @@ const EduHubDropdownSelector: React.FC<EduHubDropdownSelectorProps> = ({
   onChange,
   value,
   helpText,
-  translationNamespace,
+  translationPrefix,
   ...props // rest of the props
 }) => {
-  const { t } = useTranslation(translationNamespace);
+  const { t } = useTranslation();
   const baseClass = 'w-full px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
@@ -49,8 +49,8 @@ const EduHubDropdownSelector: React.FC<EduHubDropdownSelectorProps> = ({
             {...props} // spread the rest of the props
           >
             {options.map((option, index) => (
-              <option key={index} value={option.value}>
-                {option.label}
+              <option key={index} value={option}>
+                {t(translationPrefix + option)}
               </option>
             ))}
           </select>

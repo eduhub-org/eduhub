@@ -4,15 +4,15 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL mutation operation: InsertCourseSession
+// GraphQL mutation operation: InsertSession
 // ====================================================
 
-export interface InsertCourseSession_insert_Session_returning {
+export interface InsertSession_insert_Session_returning {
   __typename: "Session";
   id: number;
 }
 
-export interface InsertCourseSession_insert_Session {
+export interface InsertSession_insert_Session {
   __typename: "Session_mutation_response";
   /**
    * number of rows affected by the mutation
@@ -21,17 +21,17 @@ export interface InsertCourseSession_insert_Session {
   /**
    * data from the rows affected by the mutation
    */
-  returning: InsertCourseSession_insert_Session_returning[];
+  returning: InsertSession_insert_Session_returning[];
 }
 
-export interface InsertCourseSession {
+export interface InsertSession {
   /**
    * insert data into the table: "Session"
    */
-  insert_Session: InsertCourseSession_insert_Session | null;
+  insert_Session: InsertSession_insert_Session | null;
 }
 
-export interface InsertCourseSessionVariables {
+export interface InsertSessionVariables {
   courseId: number;
   startTime: any;
   endTime: any;

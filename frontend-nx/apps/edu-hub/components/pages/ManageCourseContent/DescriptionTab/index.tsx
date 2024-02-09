@@ -3,15 +3,12 @@ import { FC } from 'react';
 import {
   eventTargetNumberMapper,
   eventTargetValueMapper,
-  identityEventMapper,
-  pickIdPkMapper,
-  useDeleteCallback,
+  useRoleMutation,
   useUpdateCallback,
-  useUpdateCallback2,
 } from '../../../../hooks/authedMutation';
 import {
   DELETE_COURSE_LOCATION,
-  INSERT_NEW_COURSE_LOCATION,
+  INSERT_COURSE_LOCATION,
   UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1,
   UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2,
   UPDATE_COURSE_END_TIME,
@@ -19,11 +16,13 @@ import {
   UPDATE_COURSE_HEADING_DESCRIPTION_2,
   UPDATE_COURSE_LANGUAGE,
   UPDATE_COURSE_LEARNING_GOALS,
-  UPDATE_COURSE_LOCATION_OPTION,
+  UPDATE_COURSE_LOCATION,
   UPDATE_COURSE_MAX_PARTICIPANTS,
   UPDATE_COURSE_START_TIME,
   UPDATE_COURSE_WEEKDAY,
   UPDATE_COURSE_SHORT_DESCRIPTION,
+  DELETE_SESSION_ADDRESSES_BY_COURSE_AND_LOCATION,
+  INSERT_SESSION_ADDRESS,
 } from '../../../../queries/course';
 import {
   DeleteCourseLocation,
@@ -43,9 +42,9 @@ import {
   UpdateCourseLanguageVariables,
 } from '../../../../queries/__generated__/UpdateCourseLanguage';
 import {
-  UpdateCourseLocationOption,
-  UpdateCourseLocationOptionVariables,
-} from '../../../../queries/__generated__/UpdateCourseLocationOption';
+  UpdateCourseLocation,
+  UpdateCourseLocationVariables,
+} from '../../../../queries/__generated__/UpdateCourseLocation';
 import {
   UpdateCourseStartTime,
   UpdateCourseStartTimeVariables,
@@ -71,6 +70,14 @@ import EduHubNumberFieldEditor from '../../../forms/EduHubNumberFieldEditor';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import useErrorHandler from '../../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
+import {
+  DeleteSessionAddressesByCourseAndLocation,
+  DeleteSessionAddressesByCourseAndLocationVariables,
+} from '../../../../queries/__generated__/DeleteSessionAddressesByCourseAndLocation';
+import {
+  InsertSessionAddress,
+  InsertSessionAddressVariables,
+} from '../../../../queries/__generated__/InsertSessionAddress';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -94,29 +101,49 @@ const prepDateTimeUpdate = (timeString: string) => {
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const { error, handleError, resetError } = useErrorHandler();
 
-  const insertCourseLocation = useUpdateCallback<InsertCourseLocation, InsertCourseLocationVariables>(
-    INSERT_NEW_COURSE_LOCATION,
-    'courseId',
-    'option',
-    course?.id,
-    () => availableOption,
-    qResult
+  const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
+    INSERT_COURSE_LOCATION,
+    {
+      onError: (error) => handleError(t(error.message)),
+    }
   );
 
-  // Extract the currently used options
-  const usedOptions = new Set(course.CourseLocations.map((loc) => loc.locationOption));
-  // Find the first available option
-  const availableOption = Object.values(LocationOption_enum).find((option) => !usedOptions.has(option));
+  const [insertSessionAddress] = useRoleMutation<InsertSessionAddress, InsertSessionAddressVariables>(
+    INSERT_SESSION_ADDRESS,
+    {
+      onError: (error) => handleError(t(error.message)),
+    }
+  );
 
-  const handleinsertCourseLocation = async () => {
+  const handleInsertCourseLocation = async () => {
     try {
+      // Extract the currently used options
+      const usedOptions = new Set(course.CourseLocations.map((loc) => loc.locationOption));
+      // Find the first available option
+      const availableOption = Object.values(LocationOption_enum).find((option) => !usedOptions.has(option));
       // If there's no available option, throw an error
       if (!availableOption) {
         handleError('All location options already exist for this course.');
         return; // Exit the function early
       }
-      // If there's more than one location, proceed with deletion
-      await insertCourseLocation(availableOption); // Call the function directly
+      // If there's is an available option, proceed with insertion
+      const res = await insertCourseLocation({ variables: { courseId: course.id, option: availableOption } });
+      //extract the location id from the response
+      const insertedLocationId = res?.data?.insert_CourseLocation?.returning[0].id;
+      // loop through the session addresses and add the new location
+      await Promise.all(
+        course.Sessions.map((session) => {
+          return insertSessionAddress({
+            variables: {
+              sessionId: session.id,
+              location: availableOption,
+              address: '',
+              courseLocationId: insertedLocationId,
+            },
+          });
+        })
+      );
+      qResult.refetch();
     } catch (error) {
       // Handle errors if any step in the try block fails
       handleError(error.message);
@@ -125,36 +152,46 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     }
   };
 
-  const deleteCourseLocation = useDeleteCallback<DeleteCourseLocation, DeleteCourseLocationVariables>(
+  // define a new function deleteCourseLocation that used the DELETE_COURSE location mutation with useRoleMutation
+  const [deleteCourseLocation] = useRoleMutation<DeleteCourseLocation, DeleteCourseLocationVariables>(
     DELETE_COURSE_LOCATION,
-    'locationId',
-    pickIdPkMapper,
-    qResult
-  );
-
-  const handleDeleteCourseLocation = async (locationId) => {
-    try {
-      // Check the number of course locations
-      if (course.CourseLocations.length <= 1) {
-        // Handle the case where the location is the last one (e.g., show an error message)
-        handleError('A course needs at least one location.');
-        return; // Exit the function early
-      }
-
-      // If there's more than one location, proceed with deletion
-      await deleteCourseLocation(locationId); // Call the function directly
-    } catch (error) {
-      // Handle errors if any step in the try block fails
-      handleError(error.message);
-      // Optionally, re-throw the error if you want calling functions to be able to handle it as well
-      throw error;
+    {
+      onError: (error) => handleError(t(error.message)),
     }
+  );
+  const [DeleteSessionAddressesByCourseAndLocation] = useRoleMutation<
+    DeleteSessionAddressesByCourseAndLocation,
+    DeleteSessionAddressesByCourseAndLocationVariables
+  >(DELETE_SESSION_ADDRESSES_BY_COURSE_AND_LOCATION, {
+    onError: (error) => handleError(t(error.message)),
+  });
+
+  const handleDeleteCourseLocation = async (location) => {
+    // Check the number of course locations
+    if (course.CourseLocations.length <= 1) {
+      // Handle the case where the location is the last one (e.g., show an error message)
+      handleError('A course needs at least one location.');
+      return; // Exit the function early
+    }
+    // If there's more than one location, proceed with deletion
+    await deleteCourseLocation({ variables: { locationId: location.id } }); // Call the function directly
+    await DeleteSessionAddressesByCourseAndLocation({
+      variables: { courseId: course.id, location: location.locationOption },
+    }); // Call the function directly
+    qResult.refetch(); // Refetch the query to update the UI
   };
 
-  const updateCourseLocationOption = useUpdateCallback2<
-    UpdateCourseLocationOption,
-    UpdateCourseLocationOptionVariables
-  >(UPDATE_COURSE_LOCATION_OPTION, 'locationId', 'option', pickIdPkMapper, identityEventMapper, qResult);
+  const [updateCourseLocation] = useRoleMutation<UpdateCourseLocation, UpdateCourseLocationVariables>(
+    UPDATE_COURSE_LOCATION,
+    {
+      onError: (error) => handleError(t(error.message)),
+    }
+  );
+  const handleUpdateCourseLocation = async (location, option) => {
+    await updateCourseLocation({ variables: { locationId: location.id, option: option } });
+    // await UpdateSessionAddress
+    qResult.refetch();
+  };
 
   const updateCourseStartTime = useUpdateCallback<UpdateCourseStartTime, UpdateCourseStartTimeVariables>(
     UPDATE_COURSE_START_TIME,
@@ -202,21 +239,8 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   );
   const { t } = useTranslation('course-page');
 
-  const weekDayOptions = [
-    { value: 'NONE', label: t('weekdays.NONE') },
-    { value: 'MONDAY', label: t('weekdays.MONDAY') },
-    { value: 'TUESDAY', label: t('weekdays.TUESDAY') },
-    { value: 'WEDNESDAY', label: t('weekdays.WEDNESDAY') },
-    { value: 'THURSDAY', label: t('weekdays.THURSDAY') },
-    { value: 'FRIDAY', label: t('weekdays.FRIDAY') },
-    { value: 'SATURDAY', label: t('weekdays.SATURDAY') },
-    { value: 'SUNDAY', label: t('weekdays.SUNDAY') },
-  ];
-
-  const languageOptions = [
-    { value: 'DE', label: t('languages.DE') },
-    { value: 'EN', label: t('languages.EN') },
-  ];
+  const weekDayOptions = ['NONE', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+  const languageOptions = ['DE', 'EN'];
 
   const courseLocations = [...course.CourseLocations];
   courseLocations.sort((a, b) => a.id - b.id);
@@ -295,6 +319,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             options={weekDayOptions}
             value={course.weekDay ?? 'MONDAY'}
             onChange={updateWeekday}
+            translationPrefix="course-page:weekdays."
           />
           <EduHubTimePicker
             label={t('start_time')}
@@ -316,6 +341,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             options={languageOptions}
             value={course.language}
             onChange={updateCourseLanguage}
+            translationPrefix="course-page:languages."
           />
           <div>
             <EduHubNumberFieldEditor
@@ -338,12 +364,12 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             key={loc.id}
             location={loc}
             onDelete={handleDeleteCourseLocation}
-            onSetOption={updateCourseLocationOption}
+            onSetOption={handleUpdateCourseLocation}
           />
         ))}
       </div>
       <div className="flex justify-start text-white">
-        <Button onClick={handleinsertCourseLocation} startIcon={<MdAddCircle />} color="inherit">
+        <Button onClick={handleInsertCourseLocation} startIcon={<MdAddCircle />} color="inherit">
           {t('course-page:add-new-location')}
         </Button>
       </div>

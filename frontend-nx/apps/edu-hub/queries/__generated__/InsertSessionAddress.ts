@@ -3,16 +3,18 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { LocationOption_enum } from "./../../__generated__/globalTypes";
+
 // ====================================================
-// GraphQL mutation operation: InsertSessionLocation
+// GraphQL mutation operation: InsertSessionAddress
 // ====================================================
 
-export interface InsertSessionLocation_insert_SessionAddress_returning {
+export interface InsertSessionAddress_insert_SessionAddress_returning {
   __typename: "SessionAddress";
   id: number;
 }
 
-export interface InsertSessionLocation_insert_SessionAddress {
+export interface InsertSessionAddress_insert_SessionAddress {
   __typename: "SessionAddress_mutation_response";
   /**
    * number of rows affected by the mutation
@@ -21,17 +23,19 @@ export interface InsertSessionLocation_insert_SessionAddress {
   /**
    * data from the rows affected by the mutation
    */
-  returning: InsertSessionLocation_insert_SessionAddress_returning[];
+  returning: InsertSessionAddress_insert_SessionAddress_returning[];
 }
 
-export interface InsertSessionLocation {
+export interface InsertSessionAddress {
   /**
    * insert data into the table: "SessionAddress"
    */
-  insert_SessionAddress: InsertSessionLocation_insert_SessionAddress | null;
+  insert_SessionAddress: InsertSessionAddress_insert_SessionAddress | null;
 }
 
-export interface InsertSessionLocationVariables {
+export interface InsertSessionAddressVariables {
   sessionId: number;
+  location: LocationOption_enum;
   address: string;
+  courseLocationId: number;
 }
