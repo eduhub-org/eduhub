@@ -74,7 +74,6 @@ import {
   DeleteSessionAddressesByCourseAndLocation,
   DeleteSessionAddressesByCourseAndLocationVariables,
 } from '../../../../queries/__generated__/DeleteSessionAddressesByCourseAndLocation';
-import { map } from 'lodash';
 import {
   InsertSessionAddress,
   InsertSessionAddressVariables,

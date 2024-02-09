@@ -23,7 +23,6 @@ export const Locations: FC<LocationsIProps> = ({ location, onSetOption, onDelete
     console.log('query known location options error', queryLocationOptions.error);
   }
   const locationOptions = (queryLocationOptions.data?.LocationOption || []).map((x) => x.value);
-  const locations = locationOptions.map((location) => ({ value: location, label: location }));
 
   const handleSetOption = useCallback(
     (event: ChangeEvent<HTMLSelectElement>) => {

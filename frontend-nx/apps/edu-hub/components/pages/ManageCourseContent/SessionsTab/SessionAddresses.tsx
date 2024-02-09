@@ -36,23 +36,21 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address }) => {
 
   return (
     <div className="mb-3">
-      <div>{label}:</div>
-      <div>
-        {isOnline ? (
-          <div>{value}</div>
-        ) : (
-          <EduHubTextFieldEditor
-            element="input"
-            updateMutation={UPDATE_SESSION_ADDRESS}
-            itemId={address.id}
-            placeholder={placeholder}
-            value={value}
-            className="h-2 mb-0"
-            showCharacterCount={false}
-            invertColors={true}
-          />
-        )}
-      </div>
+      {label}:
+      {isOnline ? (
+        <div>{value}</div>
+      ) : (
+        <EduHubTextFieldEditor
+          element="input"
+          updateMutation={UPDATE_SESSION_ADDRESS}
+          itemId={address.id}
+          placeholder={placeholder}
+          value={value}
+          className="h-2 mb-0"
+          showCharacterCount={false}
+          invertColors={true}
+        />
+      )}
     </div>
   );
 };

@@ -39,7 +39,7 @@ import {
   DeleteSessionSpeakerVariables,
 } from '../../../../queries/__generated__/DeleteSessionSpeaker';
 import useTranslation from 'next-translate/useTranslation';
-import { SessionAddress_insert_input } from 'apps/edu-hub/__generated__/globalTypes';
+import { SessionAddress_insert_input } from '../../../../__generated__/globalTypes';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -91,7 +91,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     });
 
     qResult.refetch();
-  }, [courseSessions, insertSessionMutation, course.id, course.CourseLocations, qResult, t]);
+  }, [sessionAddresses, courseSessions, insertSessionMutation, course.id, course.CourseLocations, qResult, t]);
 
   const deleteSessionSpeaker = useDeleteCallback<DeleteSessionSpeaker, DeleteSessionSpeakerVariables>(
     DELETE_SESSION_SPEAKER,
