@@ -1,5 +1,9 @@
 import log from 'loglevel';
 
+const isPublicLegacy = (filePath) => filePath.startsWith("https://") || filePath.startsWith("http://");
+
+const isPublic = (filePath) => filePath.includes("/public/");
+
 export const getPublicUrl = (filePath: string): string | null  => {
   log.debug(`getPublicUrl called with filePath: ${filePath}`);
 
@@ -9,16 +13,13 @@ export const getPublicUrl = (filePath: string): string | null  => {
     return null;
   }
   
-  const isPublicLegacy =
-    filePath.startsWith("https://") || filePath.startsWith("http://");
-  const isPublic = filePath.includes("/public/");
 
-  log.debug(`isPublicLegacy: ${isPublicLegacy}, isPublic: ${isPublic}`);
+  log.debug(`isPublicLegacy: ${isPublicLegacy(filePath)}, isPublic: ${isPublic(filePath)}`);
 
-  if (isPublicLegacy) {
+  if (isPublicLegacy(filePath)) {
     log.debug(`Returning legacy public URL: ${filePath}`);
     return filePath;
-  } else if (isPublic) {
+  } else if (isPublic(filePath)) {
     const serverAddress = process.env.NEXT_PUBLIC_STORAGE_BUCKET_URL;
     const publicUrl = `${serverAddress}/${filePath}`;
     log.debug(`Returning constructed public URL: ${publicUrl}`);
@@ -38,10 +39,11 @@ export const getPublicImageUrl = (filePath: string, size: number): string | null
     return null;
   }
 
-  // Modify the original image path to point to the resized image path
-  const resizedFilePath = filePath.replace(/\.[^.]+$/, `-${size}.webp`); // Change extension to .webp
+  const originalFileType = filePath.split('.').pop();
+  const resizedFilePathBase = filePath.replace(/\.[^.]+$/, `-${size}`);
+  const resizedFilePath = isPublicLegacy(filePath) ? `${resizedFilePathBase}.${originalFileType}` : `${resizedFilePathBase}.webp`;
   log.debug(`Resized file path: ${resizedFilePath}`);
-
+  
   // Use getPublicUrl to construct the full URL for the resized image
   const publicUrl = getPublicUrl(resizedFilePath);
   log.debug(`Public URL for resized image: ${publicUrl}`);

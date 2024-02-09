@@ -190,5 +190,16 @@
   },
   "info_block_2_content": {
     "placeholder": "Inhalt"
+  },
+
+  "sessionAddress": {
+    "online": {
+      "label": "Link zur Online-Veranstaltung",
+      "placeholder": "Bitte gib im Tab \"Beschreibung\" einen gültigen Link ein."
+    },
+    "offline": {
+      "label": "Adresse zur Vor-Ort-Teilnahme in ",
+      "placeholder": "Definiere im Tab \"Beschreibung\" eine Standardaddresse."
+    }
   }
 }

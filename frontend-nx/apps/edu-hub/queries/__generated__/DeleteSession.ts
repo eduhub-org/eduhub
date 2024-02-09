@@ -4,21 +4,21 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL mutation operation: DeleteCourseSession
+// GraphQL mutation operation: DeleteSession
 // ====================================================
 
-export interface DeleteCourseSession_delete_Session_by_pk {
+export interface DeleteSession_delete_Session_by_pk {
   __typename: "Session";
   id: number;
 }
 
-export interface DeleteCourseSession {
+export interface DeleteSession {
   /**
    * delete single row from the table: "Session"
    */
-  delete_Session_by_pk: DeleteCourseSession_delete_Session_by_pk | null;
+  delete_Session_by_pk: DeleteSession_delete_Session_by_pk | null;
 }
 
-export interface DeleteCourseSessionVariables {
+export interface DeleteSessionVariables {
   sessionId: number;
 }

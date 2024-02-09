@@ -23,7 +23,7 @@ const EhMultipleTag: FC<IProps> = ({
       </div>
       <div className="col-span-2">
         <IconButton
-          className="focus:outline-none"
+          className="focus:outline-none mt-1"
           size="small"
           onClick={requestAddTag}
         >

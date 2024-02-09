@@ -1,0 +1,17 @@
+-- Could not auto-generate a down migration.
+-- Please write an appropriate down migration for the SQL below:
+-- UPDATE "public"."SessionAddress" SA
+-- SET "courseLocationId" = (
+--   SELECT CL."id"
+--   FROM "public"."CourseLocation" CL
+--   INNER JOIN "public"."Session" S ON CL."courseId" = S."courseId"
+--   WHERE CL."locationOption" = SA."location"
+--     AND S."id" = SA."sessionId"
+-- )
+-- WHERE EXISTS (
+--   SELECT 1
+--   FROM "public"."CourseLocation" CL
+--   INNER JOIN "public"."Session" S ON CL."courseId" = S."courseId"
+--   WHERE CL."locationOption" = SA."location"
+--     AND S."id" = SA."sessionId"
+-- );
