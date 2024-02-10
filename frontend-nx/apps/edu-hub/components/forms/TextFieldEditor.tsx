@@ -40,6 +40,8 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
   isMandatory = false,
   style,
 }) => {
+  const { t } = useTranslation(translationNamespace);
+
   const [text, setText] = useState(currentText);
   const [hasBlurred, setHasBlurred] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -49,8 +51,6 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
     },
     refetchQueries,
   });
-
-  const { t } = useTranslation(translationNamespace);
 
   const validateText = (newText) => {
     if (typeCheck) {

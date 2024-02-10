@@ -201,5 +201,10 @@
       "label": "Adresse zur Vor-Ort-Teilnahme in ",
       "placeholder": "Definiere im Tab \"Beschreibung\" eine Standardaddresse."
     }
-  }
+  },
+  "date": "Datum",
+  "title": "Titel",
+  "external_speakers": "Externe Referenten",
+  "add_external_speaker": "Externen Referenten hinzufügen",
+  "session_title": "Titel des Termins"
 }

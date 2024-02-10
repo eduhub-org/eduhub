@@ -7,19 +7,16 @@ import {
 import { UPDATE_SESSION_ADDRESS } from '../../../../queries/course';
 import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
 import { isLinkFormat } from '../../../../helpers/util';
+import { QueryResult } from '@apollo/client';
 
 interface SessionAddressesIProps {
   address: ManagedCourse_Course_by_pk_Sessions_SessionAddresses | null;
-  courseLocations: ManagedCourse_Course_by_pk_CourseLocations[];
+  refetchQuery: QueryResult<any, any>;
 }
 
-export const SessionAddresses: FC<SessionAddressesIProps> = ({ address }) => {
+export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQuery }) => {
   const { t } = useTranslation('course-page');
 
-  // select the default session address from the course location where location is equal to address.location
-  // const location = courseLocations?.find((location) => location.locationOption === address?.location);
-
-  // const defaultSessionAddress = location ? location.defaultSessionAddress : undefined;
   const defaultSessionAddress = address?.CourseLocation?.defaultSessionAddress;
   const isOnline = address?.CourseLocation?.locationOption === 'ONLINE';
   const isValidLink = isLinkFormat(defaultSessionAddress);
@@ -43,6 +40,7 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address }) => {
         <EduHubTextFieldEditor
           element="input"
           updateMutation={UPDATE_SESSION_ADDRESS}
+          refetchQuery={refetchQuery}
           itemId={address.id}
           placeholder={placeholder}
           value={value}

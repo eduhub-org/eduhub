@@ -197,5 +197,20 @@
   },
   "info_block_2_content": {
     "placeholder": "Content"
-  }
+  },
+  "sessionAddress": {
+    "online": {
+      "label": "Link to the online event",
+      "placeholder": "Please enter a valid link in the \"Description\" tab."
+    },
+    "offline": {
+      "label": "Address for on-site participation in ",
+      "placeholder": "Define a default address in the \"Description\" tab."
+    }
+  },
+  "date": "Date",
+  "title": "Title",
+  "external_speakers": "External Speakers",
+  "add_external_speaker": "Add External Speaker",
+  "session_title": "Session Title"
 }

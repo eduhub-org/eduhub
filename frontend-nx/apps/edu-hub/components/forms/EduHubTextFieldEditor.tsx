@@ -10,6 +10,8 @@ import { DocumentNode } from 'graphql';
 import { prioritizeClasses } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
+import log from 'loglevel';
+import { QueryResult } from '@apollo/client';
 
 interface EduHubTextFieldEditorProps {
   label?: string;
@@ -18,7 +20,7 @@ interface EduHubTextFieldEditorProps {
   updateMutation: DocumentNode;
   itemId: number;
   onChange?: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  refetchQueries?: string[];
+  refetchQuery?: QueryResult<any, any>;
   debounceTimeout?: number;
   maxLength?: number;
   placeholder?: string;
@@ -41,7 +43,7 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
   updateMutation,
   itemId,
   onChange,
-  refetchQueries,
+  refetchQuery,
   debounceTimeout = 1000,
   maxLength = 200,
   placeholder,
@@ -59,20 +61,30 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
   const { t } = useTranslation(translationNamespace);
   const { error, handleError, resetError } = useErrorHandler();
 
-  const [updateItem] = useRoleMutation(updateMutation, {
+  const [text, setText] = useState(value);
+  const [updateText] = useRoleMutation(updateMutation, {
     onError: (error) => handleError(t(error.message)),
+    onCompleted: (data) => {
+      if (onChange) onChange(data);
+    },
   });
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newText = event.target.value;
+    setText(newText); // Update text state immediately for UI feedback
+    // updateText(newText); // Call debounced function with the new text
     if (typeCheck && !typeCheck(newText)) {
       // Here a possible type error is handled while typing
       return;
     } else {
       resetError(); // reset error if the new value passes typeCheck
     }
-    updateItem({ variables: { itemId, text: newText } });
+    log.debug('Updating item with new text:', newText);
+    updateText({ variables: { itemId, text: newText }, refetchQueries: ['qResult', 'course'] });
     // You might want to handle loading state, errors, or the response here
+    if (refetchQuery) {
+      refetchQuery.refetch();
+    }
   };
 
   const handleBlur = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -82,8 +94,11 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
     } else {
       resetError(); // reset error if the new value passes typeCheck
     }
-    // the valie is updated anyway, even if it's invalid
-    updateItem({ variables: { itemId, text: newText } });
+    // the value is updated even if it's invalid
+    updateText({ variables: { itemId, text: newText }, refetchQueries: ['qResult', 'course'] });
+    if (refetchQuery) {
+      refetchQuery.refetch();
+    }
   };
 
   const [showPreview, setShowPreview] = useState(false);
@@ -146,7 +161,7 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
         <div className="flex justify-between mb-2">
           <div className="flex items-center">
             {helpText && (
-              <Tooltip title={t(helpText)} placement="top">
+              <Tooltip title={helpText} placement="top">
                 <HelpOutlineIcon style={{ cursor: 'pointer', marginRight: '5px' }} />
               </Tooltip>
             )}
