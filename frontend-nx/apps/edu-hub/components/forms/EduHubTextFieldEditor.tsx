@@ -61,7 +61,6 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
   const { t } = useTranslation(translationNamespace);
   const { error, handleError, resetError } = useErrorHandler();
 
-  const [text, setText] = useState(value);
   const [updateText] = useRoleMutation(updateMutation, {
     onError: (error) => handleError(t(error.message)),
     onCompleted: (data) => {
@@ -71,7 +70,6 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newText = event.target.value;
-    setText(newText); // Update text state immediately for UI feedback
     // updateText(newText); // Call debounced function with the new text
     if (typeCheck && !typeCheck(newText)) {
       // Here a possible type error is handled while typing

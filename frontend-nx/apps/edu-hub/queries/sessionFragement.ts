@@ -13,8 +13,6 @@ export const SESSION_FRAGMENT = gql`
     SessionAddresses {
       id
       address
-      location
-      type
       CourseLocation {
         id
         locationOption

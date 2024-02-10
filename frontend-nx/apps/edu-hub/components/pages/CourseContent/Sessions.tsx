@@ -13,7 +13,7 @@ interface SessionsProps {
 }
 
 export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant }) => {
-  const { t, lang } = useTranslation('course');
+  const { t, lang } = useTranslation('course-page');
   const [showAllSessions, setShowAllSessions] = useState(false);
 
   const isAdmin = useIsAdmin();
@@ -56,28 +56,40 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
                 <div className="flex flex-col">
                   <span className="block text-sm sm:text-lg whitespace-nowrap sm:whitespace-normal">{title}</span>
                   <div className="whitespace-nowrap ml-0 pl-0">
-                    {SessionAddresses.map(({ address }, index) => (
+                    {SessionAddresses.map(({ address, CourseLocation }, index) => (
                       <span key={index} className="text-sm text-gray-400 ml-0 pl-0">
-                        {isLoggedInParticipant || isAdmin || isInstructor ? (
-                          isLinkFormat(address) ? (
-                            <a href={address} target="_blank" rel="noopener noreferrer" className="underline">
-                              ONLINE
-                            </a>
-                          ) : (
-                            <a
-                              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="underline"
-                            >
-                              {address}
-                            </a>
-                          )
-                        ) : // If the user is not logged in, display the address as plain text
-                        isLinkFormat(address) ? (
-                          'ONLINE'
+                        {CourseLocation.locationOption === 'ONLINE' ? (
+                          <>
+                            {isLoggedInParticipant || isAdmin || isInstructor ? (
+                              // if the user is a logged in participant, an instructor or an admin, provide the link to the video call otherwise display the location as plain text
+                              isLinkFormat(CourseLocation.defaultSessionAddress) ? (
+                                <a
+                                  href={CourseLocation.defaultSessionAddress}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="underline"
+                                >
+                                  ONLINE
+                                </a>
+                              ) : (
+                                t('link_will_be_provided_soon')
+                              )
+                            ) : (
+                              'ONLINE'
+                            )}
+                          </>
                         ) : (
-                          address
+                          // If the user is not logged in, display the location or address as plain text
+                          <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                              CourseLocation.defaultSessionAddress
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline"
+                          >
+                            {CourseLocation.defaultSessionAddress}
+                          </a>
                         )}
                         {index < SessionAddresses.length - 1 && ' +\u00A0'}
                       </span>

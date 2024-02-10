@@ -206,5 +206,7 @@
   "title": "Titel",
   "external_speakers": "Externe Referenten",
   "add_external_speaker": "Externen Referenten hinzufügen",
-  "session_title": "Titel des Termins"
+  "session_title": "Titel des Termins",
+  "course_sessions": "Kurstermine",
+  "link_will_be_provided_soon": "[Link wird hier in Kürze bereitgestellt]"
 }
