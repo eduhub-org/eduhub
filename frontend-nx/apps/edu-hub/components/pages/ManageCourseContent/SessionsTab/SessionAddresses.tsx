@@ -1,9 +1,6 @@
 import useTranslation from 'next-translate/useTranslation';
 import { FC } from 'react';
-import {
-  ManagedCourse_Course_by_pk_CourseLocations,
-  ManagedCourse_Course_by_pk_Sessions_SessionAddresses,
-} from '../../../../queries/__generated__/ManagedCourse';
+import { ManagedCourse_Course_by_pk_Sessions_SessionAddresses } from '../../../../queries/__generated__/ManagedCourse';
 import { UPDATE_SESSION_ADDRESS } from '../../../../queries/course';
 import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
 import { isLinkFormat } from '../../../../helpers/util';

@@ -212,5 +212,7 @@
   "title": "Title",
   "external_speakers": "External Speakers",
   "add_external_speaker": "Add External Speaker",
-  "session_title": "Session Title"
+  "session_title": "Session Title",
+  "course_sessions": "Course Sessions",
+  "link_will_be_provided_soon": "[Link will be provided here soon]"
 }
