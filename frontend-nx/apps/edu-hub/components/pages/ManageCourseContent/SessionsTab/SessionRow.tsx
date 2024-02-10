@@ -242,7 +242,7 @@ export const SessionRow: FC<IProps> = ({
           )}
         </div>
         {session?.SessionAddresses && (
-          <div className="col-span-full p-3">
+          <div className="col-span-full pl-3 pb-3 pr-3">
             {[...(session?.SessionAddresses || [])]
               .sort((a, b) => {
                 const locationOptions = Object.values(LocationOption_enum);

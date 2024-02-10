@@ -32,10 +32,10 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
   const placeholder = isOnline ? null : t('sessionAddress.offline.placeholder');
 
   return (
-    <div className="mb-3">
-      {label}:
+    <div className="mb-2">
+      <span>{label}:</span>
       {isOnline ? (
-        <div>{value}</div>
+        <div className="h-2 mb-0 ml-16">{value}</div>
       ) : (
         <EduHubTextFieldEditor
           element="input"
@@ -44,7 +44,7 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
           itemId={address.id}
           placeholder={placeholder}
           value={value}
-          className="h-2 mb-0"
+          className="h-2 mb-0 ml-11 w-1/2"
           showCharacterCount={false}
           invertColors={true}
         />
