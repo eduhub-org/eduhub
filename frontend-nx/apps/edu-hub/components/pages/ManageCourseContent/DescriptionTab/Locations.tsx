@@ -1,3 +1,4 @@
+import { QueryResult } from '@apollo/client';
 import useTranslation from 'next-translate/useTranslation';
 import { ChangeEvent, FC, useCallback } from 'react';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
@@ -13,9 +14,10 @@ interface LocationsIProps {
   location: ManagedCourse_Course_by_pk_CourseLocations | null;
   onSetOption: (c: ManagedCourse_Course_by_pk_CourseLocations, p: string) => any;
   onDelete: (c: ManagedCourse_Course_by_pk_CourseLocations) => any;
+  refetchQuery: QueryResult<any, any>;
 }
 
-export const Locations: FC<LocationsIProps> = ({ location, onSetOption, onDelete }) => {
+export const Locations: FC<LocationsIProps> = ({ location, onSetOption, onDelete, refetchQuery }) => {
   const { t } = useTranslation('course-page');
 
   const queryLocationOptions = useRoleQuery<LocationOptions>(LOCATION_OPTIONS);
@@ -62,6 +64,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onSetOption, onDelete
         <EduHubTextFieldEditor
           element="input"
           updateMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
+          refetchQuery={refetchQuery}
           itemId={location.id}
           placeholder={t(address_placeholder)}
           value={location?.defaultSessionAddress || ''}

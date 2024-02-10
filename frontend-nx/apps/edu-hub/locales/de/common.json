@@ -108,5 +108,6 @@
   "location": {
     "ONLINE": "Online",
     "KIEL": "Kiel"
-  }
+  },
+  "type_name_or_email_minimum_3_letters": "Gib mindestens 3 Buchstaben ein."
 }

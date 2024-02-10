@@ -63,7 +63,6 @@ import {
 } from '../../../../queries/__generated__/UpdateCourseMaxParticipants';
 import useTranslation from 'next-translate/useTranslation';
 import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
-import EduHubTextFieldEditorNew from '../../../forms/EduHubTextFieldEditor';
 import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
 import EduHubTimePicker from '../../../forms/EduHubTimePicker';
 import EduHubNumberFieldEditor from '../../../forms/EduHubNumberFieldEditor';
@@ -189,7 +188,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   );
   const handleUpdateCourseLocation = async (location, option) => {
     await updateCourseLocation({ variables: { locationId: location.id, option: option } });
-    // await UpdateSessionAddress
     qResult.refetch();
   };
 
@@ -247,66 +245,72 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2">
-        <EduHubTextFieldEditorNew
+        <EduHubTextFieldEditor
+          value={course.tagline}
           label={t('short_description.label')}
           updateMutation={UPDATE_COURSE_SHORT_DESCRIPTION}
+          refetchQuery={qResult}
           itemId={course.id}
           placeholder={t('short_description.label')}
           helpText={t('short_description.help_text')}
           className="h-64"
-          value={course.tagline}
         />
         <EduHubTextFieldEditor
+          value={course.learningGoals ?? ''}
           updateMutation={UPDATE_COURSE_LEARNING_GOALS}
+          refetchQuery={qResult}
           itemId={course.id}
           label={t('learning_goals.label')}
           placeholder={t('learning_goals.placeholder')}
           helpText={t('learning_goals.help_text')}
           maxLength={500}
           className="h-64"
-          value={course.learningGoals ?? ''}
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div>
           <EduHubTextFieldEditor
             element="input"
-            updateMutation={UPDATE_COURSE_HEADING_DESCRIPTION_1}
+            value={course.headingDescriptionField1 ?? ''}
             itemId={course.id}
+            updateMutation={UPDATE_COURSE_HEADING_DESCRIPTION_1}
+            refetchQuery={qResult}
             label={t('info_block_1_title.label')}
             placeholder={t('info_block_1_title.placeholder')}
             helpText={t('info_block_1_title.help_text')}
-            value={course.headingDescriptionField1 ?? ''}
             className="mb-0"
           />
           <EduHubTextFieldEditor
-            updateMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1}
+            value={course.contentDescriptionField1 ?? ''}
             itemId={course.id}
+            updateMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1}
+            refetchQuery={qResult}
             placeholder={t('info_block_1_content.placeholder')}
             maxLength={10000}
             className="h-64"
-            value={course.contentDescriptionField1 ?? ''}
             isMarkdown={true}
           />
         </div>
         <div>
           <EduHubTextFieldEditor
             element="input"
-            updateMutation={UPDATE_COURSE_HEADING_DESCRIPTION_2}
+            value={course.headingDescriptionField2 ?? ''}
             itemId={course.id}
+            updateMutation={UPDATE_COURSE_HEADING_DESCRIPTION_2}
+            refetchQuery={qResult}
             label={t('info_block_2_title.label')}
             helpText={t('info_block_2_title.help_text')}
             placeholder={t('info_block_2_title.placeholder')}
-            value={course.headingDescriptionField2 ?? ''}
             className="mb-0"
           />
           <EduHubTextFieldEditor
-            updateMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2}
+            value={course.contentDescriptionField2 ?? ''}
             itemId={course.id}
+            updateMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2}
+            refetchQuery={qResult}
             placeholder={t('info_block_2_content.placeholder')}
             maxLength={10000}
             className="h-64"
-            value={course.contentDescriptionField2 ?? ''}
             isMarkdown={true}
           />
         </div>
@@ -365,6 +369,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             location={loc}
             onDelete={handleDeleteCourseLocation}
             onSetOption={handleUpdateCourseLocation}
+            refetchQuery={qResult}
           />
         ))}
       </div>

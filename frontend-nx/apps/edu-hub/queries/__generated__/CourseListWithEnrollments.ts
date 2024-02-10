@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, LocationOption_enum, SessionAddressType_enum, University_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, LocationOption_enum, University_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseListWithEnrollments
@@ -29,11 +29,6 @@ export interface CourseListWithEnrollments_Course_Sessions_SessionAddresses {
    * Where the session will take place; might be an offline or online location which is provided according to the provided type
    */
   address: string;
-  /**
-   * Indicates to which of the existing location options this address is corresponding.
-   */
-  location: LocationOption_enum | null;
-  type: SessionAddressType_enum;
   /**
    * An object relationship
    */

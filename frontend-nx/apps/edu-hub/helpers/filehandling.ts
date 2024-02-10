@@ -42,10 +42,14 @@ export const getPublicImageUrl = (filePath: string, size: number): string | null
   const originalFileType = filePath.split('.').pop();
   const resizedFilePathBase = filePath.replace(/\.[^.]+$/, `-${size}`);
   const resizedFilePath = isPublicLegacy(filePath) ? `${resizedFilePathBase}.${originalFileType}` : `${resizedFilePathBase}.webp`;
+
+  const isLegacyProfileImagePath = isPublicLegacy && filePath.includes('/profile_image/');
+
   log.debug(`Resized file path: ${resizedFilePath}`);
   
   // Use getPublicUrl to construct the full URL for the resized image
-  const publicUrl = getPublicUrl(resizedFilePath);
+  // If the original file is a legacy public URL, use the original URL since there is no resized version
+  const publicUrl = isLegacyProfileImagePath ? getPublicUrl(filePath): getPublicUrl(resizedFilePath);
   log.debug(`Public URL for resized image: ${publicUrl}`);
   return publicUrl;
 }

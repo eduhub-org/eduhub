@@ -104,5 +104,10 @@
   "preview": "Preview",
   "edit_markdown": "Edit",
   "markdown_info": "You can use **bold**, _italic_, and other formatting",
-  "markdown_guide": "Markdown Guide"
+  "markdown_guide": "Markdown Guide",
+  "location": {
+    "ONLINE": "Online",
+    "KIEL": "Kiel"
+  },
+  "type_name_or_email_minimum_3_letters": "Type a name or email (minimum 3 letters)."
 }

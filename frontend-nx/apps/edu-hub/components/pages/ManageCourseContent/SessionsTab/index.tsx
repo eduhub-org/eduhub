@@ -91,7 +91,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     });
 
     qResult.refetch();
-  }, [sessionAddresses, courseSessions, insertSessionMutation, course.id, course.CourseLocations, qResult, t]);
+  }, [sessionAddresses, courseSessions, insertSessionMutation, course.id, qResult]);
 
   const deleteSessionSpeaker = useDeleteCallback<DeleteSessionSpeaker, DeleteSessionSpeakerVariables>(
     DELETE_SESSION_SPEAKER,

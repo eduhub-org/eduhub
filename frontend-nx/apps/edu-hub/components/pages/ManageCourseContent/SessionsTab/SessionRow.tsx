@@ -57,7 +57,7 @@ export const SessionRow: FC<IProps> = ({
   onSetTitle,
   onDeleteSpeaker,
 }) => {
-  const { t, lang } = useTranslation();
+  const { t, lang } = useTranslation('course-page');
 
   const handleDelete = useCallback(() => {
     if (session != null) {
@@ -195,7 +195,7 @@ export const SessionRow: FC<IProps> = ({
           </div>
         )}
         <div className="p-3 col-span-2">
-          {!session && <>{t('start-time')}</>}
+          {!session && <>{t('start_time')}</>}
           {session && (
             <EhTimeSelect
               className="bg-edu-light-gray"
@@ -205,7 +205,7 @@ export const SessionRow: FC<IProps> = ({
           )}
         </div>
         <div className="p-3 col-span-2">
-          {!session && <>{t('end-time')}</>}
+          {!session && <>{t('end_time')}</>}
           {session && (
             <EhTimeSelect
               className="bg-edu-light-gray"
@@ -222,12 +222,12 @@ export const SessionRow: FC<IProps> = ({
               value={session.title}
               onChange={handleSetTitle}
               debounceTimeout={1000}
-              placeholder={t('new-title')}
+              placeholder={t('session_title')}
             />
           )}
         </div>
         <div className="p-3 col-span-7">
-          {!session && <>{t('speakers')}</>}
+          {!session && <>{t('external_speakers')}</>}
           {session && (
             <div className="">
               <EhMultipleTag requestAddTag={openAddSpeaker} requestDeleteTag={handleDeleteSpeaker} tags={speakerTags} />
@@ -242,7 +242,7 @@ export const SessionRow: FC<IProps> = ({
           )}
         </div>
         {session?.SessionAddresses && (
-          <div className="col-span-full p-3">
+          <div className="col-span-full pl-3 pb-3 pr-3">
             {[...(session?.SessionAddresses || [])]
               .sort((a, b) => {
                 const locationOptions = Object.values(LocationOption_enum);
@@ -252,20 +252,12 @@ export const SessionRow: FC<IProps> = ({
                 );
               })
               .map((address) => (
-                <SessionAddresses
-                  key={address.id}
-                  address={address}
-                  courseLocations={qResult.data.Course_by_pk.CourseLocations}
-                />
+                <SessionAddresses key={address.id} address={address} refetchQuery={qResult} />
               ))}
           </div>
         )}
       </div>
-      <SelectUserDialog
-        onClose={handleNewSpeaker}
-        open={addSpeakerOpen}
-        title={t('select-something', { something: t('speaker') })}
-      />
+      <SelectUserDialog onClose={handleNewSpeaker} open={addSpeakerOpen} title={t('add_external_speaker')} />
     </div>
   );
 };
