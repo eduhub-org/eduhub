@@ -27,7 +27,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
     <>
       {visibleSessions.length > 0 && (
         <>
-          <span className="text-3xl font-semibold mt-24">{t('courseSessions')}</span>
+          <span className="text-3xl font-semibold mt-24">{t('course_sessions')}</span>
           <ul>
             {visibleSessions.map(({ startDateTime, endDateTime, title, SessionAddresses, SessionSpeakers }, index) => (
               <li key={index} className="flex mb-4">
