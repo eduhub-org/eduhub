@@ -95,8 +95,8 @@ const ManageUsersContent: FC = () => {
               pageIndex={pageIndex}
               setPageIndex={setPageIndex}
               pages={Math.ceil(data.User_aggregate.aggregate.count / pageSize)}
-              addButtonText={t('addUserButtonText')}
-              onAddButtonClick={onAddUserClick}
+              // addButtonText={t('addUserButtonText')}
+              // onAddButtonClick={onAddUserClick}
               expandableRowComponent={({row}) => <UserRow row={row} />}
             />
           </div>

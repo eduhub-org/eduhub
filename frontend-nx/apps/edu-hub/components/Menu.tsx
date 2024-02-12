@@ -77,13 +77,13 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
-      {isAdmin && (
+      {/* {isAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link className="w-full text-lg" href="/manage/users-old">
             {t('menu-administration-user')}
           </Link>
         </MenuItem>
-      )}
+      )} */}
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
