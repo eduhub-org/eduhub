@@ -1,22 +1,20 @@
 import { Course_Course_by_pk } from '../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk } from '../queries/__generated__/CourseWithEnrollment';
 
-export const prioritizeClasses = (classString: string): string => {
-  let lastMbClass = '';
-  let lastWClass = '';
+export const prioritizeClasses = (classString: string, prefixes: string[] = ['mb-', 'w-']): string => {
+  const lastClasses = {};
   const otherClasses = [];
 
   classString.split(' ').forEach(className => {
-    if (className.startsWith('mb-')) {
-      lastMbClass = className;
-    } else if (className.startsWith('w-')) {
-      lastWClass = className;
+    const prefix = prefixes.find(prefix => className.startsWith(prefix));
+    if (prefix) {
+      lastClasses[prefix] = className;
     } else {
       otherClasses.push(className);
     }
   });
-
-  return [...otherClasses, lastMbClass, lastWClass].filter(Boolean).join(' ');
+  
+  return [...otherClasses, ...Object.values(lastClasses)].filter(Boolean).join(' ');
 };
 
 export const makeFullName = (firstName: string, lastName: string): string => {

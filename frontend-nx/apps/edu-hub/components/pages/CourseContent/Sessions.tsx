@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
@@ -21,7 +21,9 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
 
   const initiallyShownSessions = 4;
 
-  const visibleSessions = showAllSessions ? sessions : sessions.slice(0, initiallyShownSessions);
+  const visibleSessions = useMemo(() => {
+    return showAllSessions ? sessions : sessions.slice(0, initiallyShownSessions);
+  }, [showAllSessions, sessions, initiallyShownSessions]);
 
   return (
     <>
