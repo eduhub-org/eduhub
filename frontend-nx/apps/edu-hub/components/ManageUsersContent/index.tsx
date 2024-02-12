@@ -66,9 +66,9 @@ const ManageUsersContent: FC = () => {
     []
   );
 
-  const onAddUserClick = async () => {
-    console.log("add user");
-  };
+  // const onAddUserClick = async () => {
+  //   console.log("add user");
+  // };
 
   if (error) {
     console.log(error);
