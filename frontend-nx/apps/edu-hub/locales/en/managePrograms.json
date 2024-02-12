@@ -1,0 +1,32 @@
+{
+    "title": {
+      "label": "Program Title",
+      "placeholder": "New Program",
+      "help_text": "The name of the program as it will be displayed to the participants.",
+      "error_text": "The name can be a maximum of 22 characters long."
+    },
+    "short_title": {
+      "label": "Short Title",
+      "placeholder": "SHORTTITLE",
+      "help_text": "The short designation is mainly used in the admin area. It should not be longer than 10 characters. All letters are automatically converted to uppercase.",
+      "error_text": "The short designation can be a maximum of 10 characters long."
+    },
+    "start_evaluation": {
+        "label": "Start Evaluation Link",
+        "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
+        "help_text": "The questionnaire linked here will be sent to the participants by email after the first date of a course or event.\n The title of the program and the name of the course or event are automatically included as URL parameters and can be included in the questionnaire accordingly.",
+        "error_text": "Invalid link format!"
+      },
+    "speaker_evaluation": {
+      "label": "Speaker Evaluation Link",
+      "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
+      "help_text": "This questionnaire link will be sent to the participants by email after each date of a course or event where an external speaker is registered.\n The title of the program and the name of the course or event are automatically included as URL parameters and can be included in the questionnaire accordingly.",
+      "error_text": "Invalid link format!"
+    },
+    "final_evaluation": {
+        "label": "Final Evaluation Link",
+        "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
+        "help_text": "This questionnaire link will be sent to the participants by email after the last date of a course or event.\n The title of the program and the name of the course or event are automatically included as URL parameters and can be included in the questionnaire accordingly.",
+        "error_text": "Invalid link format!"
+    }
+}

@@ -1,4 +1,58 @@
-import { v4 as uuidv4 } from "uuid";
+import log from 'loglevel';
+
+const isPublicLegacy = (filePath) => filePath.startsWith("https://") || filePath.startsWith("http://");
+
+const isPublic = (filePath) => filePath.includes("/public/");
+
+export const getPublicUrl = (filePath: string): string | null  => {
+  log.debug(`getPublicUrl called with filePath: ${filePath}`);
+
+  // check if filePath is null
+  if (!filePath) {
+    log.debug('filePath is null, returning null.');
+    return null;
+  }
+  
+
+  log.debug(`isPublicLegacy: ${isPublicLegacy(filePath)}, isPublic: ${isPublic(filePath)}`);
+
+  if (isPublicLegacy(filePath)) {
+    log.debug(`Returning legacy public URL: ${filePath}`);
+    return filePath;
+  } else if (isPublic(filePath)) {
+    const serverAddress = process.env.NEXT_PUBLIC_STORAGE_BUCKET_URL;
+    const publicUrl = `${serverAddress}/${filePath}`;
+    log.debug(`Returning constructed public URL: ${publicUrl}`);
+    return publicUrl;
+  } else {
+    log.debug('File is not public, returning null.');
+    return null;
+  }
+}
+
+export const getPublicImageUrl = (filePath: string, size: number): string | null  => {
+  log.debug(`getPublicImageUrl called with filePath: ${filePath} and size: ${size}`);
+
+  // Check if filePath is null
+  if (!filePath) {
+    log.debug('filePath is null, returning null.');
+    return null;
+  }
+
+  const originalFileType = filePath.split('.').pop();
+  const resizedFilePathBase = filePath.replace(/\.[^.]+$/, `-${size}`);
+  const resizedFilePath = isPublicLegacy(filePath) ? `${resizedFilePathBase}.${originalFileType}` : `${resizedFilePathBase}.webp`;
+
+  const isLegacyProfileImagePath = isPublicLegacy && filePath.includes('/profile_image/');
+
+  log.debug(`Resized file path: ${resizedFilePath}`);
+  
+  // Use getPublicUrl to construct the full URL for the resized image
+  // If the original file is a legacy public URL, use the original URL since there is no resized version
+  const publicUrl = isLegacyProfileImagePath ? getPublicUrl(filePath): getPublicUrl(resizedFilePath);
+  log.debug(`Public URL for resized image: ${publicUrl}`);
+  return publicUrl;
+}
 
 export const bytesToBase64 = (bytes: Uint8Array) => {
   /* eslint-disable no-bitwise */
@@ -57,46 +111,6 @@ export interface UploadFile {
   name: string;
   data: string;
 }
-
-// maybe this could be provided by a query into hasura instead?
-export const STORAGE_BUCKET_URL =
-  "https://storage.cloud.google.com/eduhub-staging/";
-
-// the following functions could be changed to change the structure of files in the storage bucket
-
-export const buildParticipationPath = (courseId: number) => {
-  return [uuidv4(), courseId, "participation.pdf"].join("/");
-};
-
-export const buildAchievementPath = (courseId: number) => {
-  return [uuidv4(), courseId, "achievement.pdf"].join("/");
-};
-
-export const buildParticipationTemplatePath = (
-  programId: number,
-  fileName: string
-) => {
-  return [programId, "participation_certificate_template", fileName].join("/");
-};
-
-export const buildAchivementTemplatePath = (
-  programId: number,
-  fileName: string
-) => {
-  return [programId, "achivement_certificate_template", fileName].join("/");
-};
-
-export const buildAchievementDocumentationTemplatePath = (
-  archiveOptionId: number
-) => {
-  return [archiveOptionId, "documentation_template"].join("/");
-};
-
-export const buildAchievementEvaluationScriptTemplatePath = (
-  archiveOptionId: number
-) => {
-  return [archiveOptionId, "evaluation_script"].join("/");
-};
 
 export const parseFileUploadEvent = async (
   event: any

@@ -4,10 +4,10 @@ path.resolve('./next.config.js');
 
 import Head from 'next/head';
 import { FC } from 'react';
-import { Page } from '../../../components/Page';
+import { Page } from '../../../components/layout/Page';
 import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';
 
-import ManageUsersContent from '../../../components/ManageUsersContent';
+import ManageUsersContent from '../../../components/pages/ManageUsersContent';
 
 const ManageUsers: FC = () => {
   const isAdmin = useIsAdmin();

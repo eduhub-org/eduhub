@@ -14,6 +14,13 @@ import useTranslation from 'next-translate/useTranslation';
 registerLocale('de', de);
 registerLocale('en', en);
 
+import log from 'loglevel';
+if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'production') {
+  log.setLevel('warn'); // Show only warnings and errors in production.
+} else {
+  log.setLevel('debug'); // Show all log levels in development.
+}
+
 import { client } from '../config/apollo';
 
 import '../styles/globals.css';

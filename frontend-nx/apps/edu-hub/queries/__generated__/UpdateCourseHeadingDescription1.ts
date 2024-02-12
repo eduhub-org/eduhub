@@ -20,6 +20,6 @@ export interface UpdateCourseHeadingDescription1 {
 }
 
 export interface UpdateCourseHeadingDescription1Variables {
-  courseId: number;
-  description: string;
+  itemId: number;
+  text: string;
 }
