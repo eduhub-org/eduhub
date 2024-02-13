@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-import { UsersByLastName_User } from '../../queries/__generated__/UsersByLastName';
+import { UsersByLastName_User } from '../../../queries/__generated__/UsersByLastName';
 
 interface IProps {
   row: UsersByLastName_User;

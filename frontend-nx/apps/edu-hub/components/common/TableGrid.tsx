@@ -39,9 +39,9 @@ interface TableGridProps<T extends BaseRow> {
   pages?: number;
   pageSize?: number;
   refetchQueries: string[];
-  searchFilter: string;
+  searchFilter?: string;
   setPageIndex?: (number) => void;
-  setSearchFilter: Dispatch<SetStateAction<string>>;
+  setSearchFilter?: Dispatch<SetStateAction<string>>;
   showCheckbox?: boolean;
   showDelete?: boolean;
   showGlobalSearchField?: boolean;
