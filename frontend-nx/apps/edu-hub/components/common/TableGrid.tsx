@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useCallback, ReactElement } from 'react';
-import { DocumentNode } from '@apollo/client';
-import { TextField } from '@material-ui/core';
+import React, { useState, useMemo, useCallback, ReactElement, Dispatch, SetStateAction } from 'react';
+import { ApolloError, DocumentNode } from '@apollo/client';
+import { CircularProgress, TextField } from '@material-ui/core';
 import useTranslation from 'next-translate/useTranslation';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
@@ -15,6 +15,7 @@ import {
   SortingState,
   useReactTable,
   FilterFn,
+  OnChangeFn,
 } from '@tanstack/react-table';
 import { rankItem } from '@tanstack/match-sorter-utils';
 
@@ -31,11 +32,16 @@ interface TableGridProps<T extends BaseRow> {
   columns: ColumnDef<T>[];
   deleteMutation?: DocumentNode;
   enablePagination?: boolean;
+  error: ApolloError;
   expandableRowComponent?: (props: { row: T }) => ReactElement | null;
+  loading: boolean;
   pageIndex?: number;
   pages?: number;
+  pageSize?: number;
   refetchQueries: string[];
+  searchFilter: string;
   setPageIndex?: (number) => void;
+  setSearchFilter: Dispatch<SetStateAction<string>>;
   showCheckbox?: boolean;
   showDelete?: boolean;
   showGlobalSearchField?: boolean;
@@ -49,10 +55,15 @@ const TableGrid = <T extends BaseRow>({
   columns,
   deleteMutation,
   enablePagination = false,
+  error,
   expandableRowComponent,
+  loading,
   pageIndex = 0,
   pages,
+  pageSize,
   refetchQueries,
+  searchFilter,
+  setSearchFilter,
   setPageIndex,
   showCheckbox,
   showDelete,
@@ -64,7 +75,6 @@ const TableGrid = <T extends BaseRow>({
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState('');
 
   const handlePrevious = () => setPageIndex(Math.max(0, pageIndex - 1));
   const handleNext = () => setPageIndex(pageIndex + 1);
@@ -89,6 +99,14 @@ const TableGrid = <T extends BaseRow>({
     addMeta({ itemRank });
     return itemRank.passed;
   };
+
+  const onGlobalFilterChange: OnChangeFn<string> = useCallback(
+    async (value) => {
+      setSearchFilter(value);
+      setPageIndex(0);
+    },
+    [setPageIndex, setSearchFilter]
+  );
 
   const tableColumns = useMemo(() => {
     const expandCollapseColumn: ColumnDef<T>[] = [
@@ -128,9 +146,13 @@ const TableGrid = <T extends BaseRow>({
     defaultColumn: { enableSorting: false },
     columns: tableColumns,
     filterFns: { fuzzy: fuzzyFilter },
-    state: { sorting, globalFilter, ...(enablePagination && { pagination: { pageIndex, pageSize: 15 } }) },
+    state: {
+      sorting,
+      globalFilter: searchFilter,
+      ...(enablePagination && { pagination: { pageIndex, pageSize: 15 } }),
+    },
     globalFilterFn: fuzzyFilter,
-    onGlobalFilterChange: setGlobalFilter,
+    onGlobalFilterChange: onGlobalFilterChange,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -150,8 +172,8 @@ const TableGrid = <T extends BaseRow>({
           )}
           <TextField
             className="!w-64 bg-gray-600 border !mb-6"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
+            value={searchFilter}
+            onChange={(e) => onGlobalFilterChange(e.target.value)}
             label={t('search')}
             variant="outlined"
             size="small"
@@ -192,35 +214,43 @@ const TableGrid = <T extends BaseRow>({
         ))}
       </div>
 
+      {loading && (
+        <div className="flex justify-center items-center">
+          <CircularProgress />
+        </div>
+      )}
+
       {/* Data Rows */}
-      {table.getRowModel().rows.map((row) => (
-        <React.Fragment key={row.id}>
-          {/* Primary Row */}
-          <div
-            className={`grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center ${
-              expandedRows.has(row.original.id) && expandableRowComponent
-            ? 'mb-0' : 'mb-1'} py-2 bg-edu-light-gray`}
-          >
-            {row.getVisibleCells().map((cell) => (
-              <div
-                key={cell.id}
-                className={`${cell.column.columnDef.meta?.className} mr-3 ml-3 col-span-${cell.column.columnDef.meta?.width}`}
-              >
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </div>
-            ))}
-          </div>
-          {/* Expandable Second Row */}
-          {expandedRows.has(row.original.id) && expandableRowComponent && (
-            <div className="items-center mb-1 py-2 bg-edu-light-gray">
-              <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
+      {!loading &&
+        !error &&
+        table.getRowModel().rows.map((row) => (
+          <React.Fragment key={row.id}>
+            {/* Primary Row */}
+            <div
+              className={`grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center ${
+                expandedRows.has(row.original.id) && expandableRowComponent ? 'mb-0' : 'mb-1'
+              } py-2 bg-edu-light-gray`}
+            >
+              {row.getVisibleCells().map((cell) => (
+                <div
+                  key={cell.id}
+                  className={`${cell.column.columnDef.meta?.className} mr-3 ml-3 col-span-${cell.column.columnDef.meta?.width}`}
+                >
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </div>
+              ))}
             </div>
-          )}
-        </React.Fragment>
-      ))}
+            {/* Expandable Second Row */}
+            {expandedRows.has(row.original.id) && expandableRowComponent && (
+              <div className="items-center mb-1 py-2 bg-edu-light-gray">
+                <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
+              </div>
+            )}
+          </React.Fragment>
+        ))}
 
       {/* Pagination */}
-      {enablePagination && (
+      {!loading && !error && enablePagination && (
         <div className="flex justify-end pb-10 text-white mt-4">
           <div className="flex flex-row items-center space-x-5">
             {pageIndex > 0 && (

@@ -1,6 +1,7 @@
 import { FC, ReactNode, useMemo, useState, useEffect } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { ColumnDef } from '@tanstack/react-table';
+import { useDebouncedCallback } from 'use-debounce';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
@@ -17,10 +18,11 @@ import CommonPageHeader from '../../common/CommonPageHeader';
 import UserRow from './UserRow';
 
 const ManageUsersContent: FC = () => {
+  const [searchFilter, setSearchFilter] = useState('');
   const [pageIndex, setPageIndex] = useState(0);
-  const pageSize = 5;
+  const pageSize = 15;
 
-  const { data, loading, error, refetch } = useAdminQuery<UsersByLastName, UsersByLastNameVariables>(
+  const userQueryResult = useAdminQuery<UsersByLastName, UsersByLastNameVariables>(
     USERS_BY_LAST_NAME,
     {
       variables: {
@@ -30,9 +32,23 @@ const ManageUsersContent: FC = () => {
     }
   );
 
+  const { data, loading, error, refetch } = userQueryResult;
+
+  const debouncedRefetch = useDebouncedCallback(refetch, 1000);
+
   useEffect(() => {
-    refetch({ offset: pageIndex * pageSize, limit: pageSize });
-  }, [pageIndex, pageSize, refetch]);
+    debouncedRefetch({
+      offset: pageIndex * pageSize,
+      limit: pageSize,
+      filter: {
+        _or: [
+          { lastName: { _ilike: `%${searchFilter}%` } },
+          { firstName: { _ilike: `%${searchFilter}%` } },
+          { email: { _ilike: `%${searchFilter}%` } },
+        ],
+      },
+    });
+  }, [pageIndex, pageSize, debouncedRefetch, searchFilter]);
 
   const { t } = useTranslation('users');
 
@@ -70,12 +86,12 @@ const ManageUsersContent: FC = () => {
   //   console.log("add user");
   // };
 
-  if (error) {
-    console.log(error);
-  }
-  if (loading) {
-    return <Loading />;
-  }
+  // if (error) {
+  //   console.log(error);
+  // }
+  // if (loading) {
+  //   return <Loading />;
+  // }
   return (
     <PageBlock>
       <div className="max-w-screen-xl mx-auto mt-20">
@@ -87,17 +103,22 @@ const ManageUsersContent: FC = () => {
             <TableGrid
               columns={columns}
               data={data.User}
+              error={error}
+              loading={loading}
               // deleteMutation={DELETE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE}
-              refetchQueries={['AchievementDocumentationTemplates']}
+              refetchQueries={['UsersByLastName']}
               showDelete
               translationNamespace="users"
               enablePagination
               pageIndex={pageIndex}
+              pageSize={pageSize}
+              searchFilter={searchFilter}
               setPageIndex={setPageIndex}
+              setSearchFilter={setSearchFilter}
               pages={Math.ceil(data.User_aggregate.aggregate.count / pageSize)}
               // addButtonText={t('addUserButtonText')}
               // onAddButtonClick={onAddUserClick}
-              expandableRowComponent={({row}) => <UserRow row={row} />}
+              expandableRowComponent={({ row }) => <UserRow row={row} />}
             />
           </div>
         )}
