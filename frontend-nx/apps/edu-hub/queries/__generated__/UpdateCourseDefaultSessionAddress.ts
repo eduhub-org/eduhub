@@ -20,6 +20,6 @@ export interface UpdateCourseDefaultSessionAddress {
 }
 
 export interface UpdateCourseDefaultSessionAddressVariables {
-  locationId: number;
-  defaultSessionAddress: string;
+  itemId: number;
+  text: string;
 }

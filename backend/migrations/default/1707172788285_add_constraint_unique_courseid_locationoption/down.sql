@@ -1,0 +1,4 @@
+-- Could not auto-generate a down migration.
+-- Please write an appropriate down migration for the SQL below:
+-- ALTER TABLE "public"."CourseLocation"
+-- ADD CONSTRAINT unique_courseid_locationoption UNIQUE ("courseId", "locationOption");

@@ -72,26 +72,28 @@ resource "google_cloud_run_service" "eduhub" {
           name  = "EDU_SHA"
           value = var.frontend_sha
         }
-        env {
-          name  = "NEXT_PUBLIC_API_URL"
-          value = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
-        }
+        # rename to API_URL
         env {
           name  = "GRAPHQL_URI"
           value = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
         }
         env {
-          name  = "NEXT_PUBLIC_AUTH_URL"
-          value = "https://${local.keycloak_service_name}.opencampus.sh"
-        }
-        env {
           name  = "NEXTAUTH_URL"
           value = "https://${local.eduhub_service_name}.opencampus.sh"
         }
-        env {
-          name  = "NEXT_PUBLIC_HELP_DOCS_URL"
-          value = var.help_docs_url
-        }
+        # # TODO Remove the following 3 env
+        # env {
+        #   name  = "NEXT_PUBLIC_API_URL"
+        #   value = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
+        # }
+        # env {
+        #   name  = "NEXT_PUBLIC_AUTH_URL"
+        #   value = "https://${local.keycloak_service_name}.opencampus.sh"
+        # }
+        # env {
+        #   name  = "NEXT_PUBLIC_HELP_DOCS_URL"
+        #   value = var.help_docs_url
+        # }
         env {
           name = "HASURA_ADMIN_SECRET"
           value_from {
@@ -120,8 +122,8 @@ resource "google_cloud_run_service" "eduhub" {
           }
         }
         env {
-          name  = "NODE_ENV"
-          value = "production"
+          name  = "ENVIRONMENT"
+          value = var.environment
         }
         env {
           name  = "STORAGE_BUCKET_URL"

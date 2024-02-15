@@ -1,8 +1,8 @@
 import Head from 'next/head';
 import { FC } from 'react';
-import { Page } from '../../../components/Page';
+import { Page } from '../../../components/layout/Page';
 import { useIsAdmin } from '../../../hooks/authentication';
-import AppSettingsOverview from '../../../components/ManageAppSettingsContent/ManageAppSettingsOverview';
+import AppSettingsOverview from '../../../components/pages/ManageAppSettingsContent/ManageAppSettingsOverview';
 
 const AppSettings: FC = () => {
   const isAdmin = useIsAdmin();
@@ -15,9 +15,7 @@ const AppSettings: FC = () => {
           <link rel="icon" href="/favicon.png" />
         </Head>
         <Page>
-          <div className="min-h-[77vh]">
-            {isAdmin && <AppSettingsOverview />}
-          </div>
+          <div className="min-h-[77vh]">{isAdmin && <AppSettingsOverview />}</div>
         </Page>
       </div>
     </>

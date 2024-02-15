@@ -59,13 +59,6 @@
   "confirmation-push-the-course-to-next-status": "Möchtest du den Kurs in den nächsten Status schieben?",
   "please-fill-in-all-fields-to-proceed-further": "Bitte füllen Sie alle Felder aus, um fortzufahren!",
   "set-status-high": "Status hochsetzen",
-  "max-n-characters": "max. {{n}} Zeichen",
-  "short-description": "Kurzbeschreibung",
-  "learning-goal": "Lernziele",
-  "title-info-block": "Titel Info Block",
-  "start-time": "Startzeit",
-  "end-time": "Endzeit",
-  "max-part-quantity": "Max. Teil. Anzahl",
   "add-new-location": "Ort hinzufügen",
   "program": "Programm",
   "programs": "Programme",
@@ -79,7 +72,6 @@
   "link-final-evaluation": "Link Abschluss-Evaluation",
   "no-template-uploaded-yet": "Noch kein Template hochgeladen",
   "show-certificates": "Bescheinigungen einblenden",
-  "default-address": "Standardadresse für neue Sessions",
   "add-session": "Termin hinzufügen",
   "application-rating": "Einstufung der Bewerbungen:",
   "not-rated": "Unbewertet",
@@ -124,13 +116,14 @@
   "achievement-option": "Leistungsnachweis",
   "achievement-record-upload-dead-line-text": "Du hast bis zum {{date}} Zeit einen Leistungsnachweis hochzuladen.",
   "choose-achievement-option": "Wähle den Titel deines Leistungsnachweises aus.",
-  "chosen-achievement-option": "Gewählter Leistungsnachweis",
-  "no-achievement-option-chosen": "Kein Leistungsnachweis ausgewählt",
+  "selected_achievement_option": "Gewählter Leistungsnachweis",
+  "no_current_achievement_option": "Bisher wurde kein Leistungsnachweis eingreicht.",
   "no-achievement-option": "Aktuell steht kein Leistungsnachweis für diesen Kurs zur Verfügung.",
-  "upload-proof": "Nachweis hochladen",
-  "download-template": "Vorlage herunterladen",
-  "last-upload-from-an-author": "Der letzte Nachweis mit Dir als Autor wurde am {{dateTime}} von {{fullName}} hochgeladen.",
-  "no-proof-uploaded-by-me-as-author": "Es wurde bisher kein Nachweis mit Dir als Autor hochgeladen.",
+  "upload_achievement_record": "Neuen Nachweis hochladen",
+  "download_template": "Vorlage herunterladen",
+  "last_record_upload": "Der letzte Nachweis mit Dir als Autor wurde am {{dateTime}} von {{fullName}} zu \"{{achievementRecordTitle}}\" hochgeladen.",
+  "no_existing_record_upload": "Es wurde bisher kein Nachweis mit Dir als Autor hochgeladen.",
+  "use_documentation_template": "Nutze folgende Vorlage zur Dokumentation:",
   "confirm-online-course-description": "Hiermit bestätigst du an den erforderlichen Online-Kursen teilgenommen zu haben. Dein Leistungsnachweis ist dein Reflexionsbogen. Bitte klicke <component>HIER</component>, um ihn auszufüllen. Bei Fragen wende dich bitte an deine Kursleitung.",
   "confirm-online-course": "Bestätigen",
   "online-course-confirmed": "Du hast am {{dateTime}} bestätigt an den erforderlichen Online-Kursen teilgenommen zu haben.",
@@ -141,5 +134,79 @@
   "no-certificates-generated": "Es wurden keine Zertifikate generiert.",
   "participationDataGenerate": "Teilnehmer:innen Daten generieren (CSV)",
   "participationDataDownload": "Teilnehmer:innen Daten herunterladen (CSV)",
-  "selectTemplateDefaultLabel": "Vorlage auswählen"
+  "selectTemplateDefaultLabel": "Vorlage auswählen",
+  "achievement_option_not_selected": "Bitte wähle einen Leistungsnachweis aus.",
+  
+  "location": {
+    "label": "Veranstaltungsort"
+  },
+  "address": {
+    "label": "Link oder Adresse",
+    "placeholder": {
+      "online": "Dieser Link wird den Teilnehmenden für alle Online-Termine des Kurses mitgeteilt.",
+      "offline": "Diese Adresse kann ggf. bei der Erstellung der Einzeltermine angepasst werden."
+    },
+    "errorText": "Der eingegebene Link hat nicht das korrekte Format."
+  },
+  "max_participants": "Max. Teilehmendenanzahl",
+  "weekday": "Wochentag",
+  "weekdays": {
+    "NONE": "unregelmäßig",
+    "MONDAY": "Montag",
+    "TUESDAY": "Dienstag",
+    "WEDNESDAY": "Mittwoch",
+    "THURSDAY": "Donnerstag",
+    "FRIDAY": "Freitag",
+    "SATURDAY": "Samstag",
+    "SUNDAY": "Sonntag"
+  },
+  "languages": {
+    "DE": "Deutsch",
+    "EN": "Englisch"
+  },
+  "start_time": "Startzeit",
+  "end_time": "Endzeit",
+  "short_description": {
+    "label": "Kurzbeschreibung",
+    "help_text": "Dieser Text erscheint auf der Kachel des Kurses und als Tagline auf der Kursseite."
+  },
+  "learning_goals": {
+    "label": "Lernziele",
+    "help_text": "Die Lernziele sind Teil des Leistungszertifikats und können nur durch die Programmleitung geändert werden. Wenn du Änderungen vorschlagen möchtest oder dir Fehler auffallen, wende dich bitte an diese.",
+    "placeholder": "Lernziel 1\nLernziel 2\nLernziel 3\nLernziel 4"
+  }, 
+  "info_block_1_title": {
+    "label": "Info-Block 1",
+    "help_text": "Für den Inhalt zu diesem Teil der Beschreibung orientiere dich bitte an den existierenden Kursen, um möglichst konsistent zu bleiben. Üblicherweise wird hier beschrieben, was die Teilnehmenden im Kurs erwartet (\"Was due bekommst\").",
+    "placeholder": "Titel"
+  },
+  "info_block_1_content": {
+    "placeholder": "Inhalt"
+  },
+  "info_block_2_title": {
+    "label": "Info-Block 2",
+    "help_text": "Für den Inhalt zu diesem Teil der Beschreibung orientiere dich bitte an den existierenden Kursen, damit wir möglichst konsistent sind. Üblicherweise lautet wird hier beschrieben, was von den Teilnehmenden an Mitarbeit oder Leitung erwartet wird (\"Was Du mitbringen solltest\").",
+    "placeholder": "Titel"
+  },
+  "info_block_2_content": {
+    "placeholder": "Inhalt"
+  },
+
+  "sessionAddress": {
+    "online": {
+      "label": "Link zur Online-Veranstaltung",
+      "placeholder": "Bitte gib im Tab \"Beschreibung\" einen gültigen Link ein."
+    },
+    "offline": {
+      "label": "Adresse zur Vor-Ort-Teilnahme in ",
+      "placeholder": "Definiere im Tab \"Beschreibung\" eine Standardaddresse."
+    }
+  },
+  "date": "Datum",
+  "title": "Titel",
+  "external_speakers": "Externe Referenten",
+  "add_external_speaker": "Externen Referenten hinzufügen",
+  "session_title": "Titel des Termins",
+  "course_sessions": "Kurstermine",
+  "link_will_be_provided_soon": "[Link wird hier in Kürze bereitgestellt]"
 }

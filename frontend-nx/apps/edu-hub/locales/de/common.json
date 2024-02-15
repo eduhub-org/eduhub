@@ -100,5 +100,14 @@
     "organization": "Name der Organisation",
     "other": "Andere Beschäftigung"
   },
-  "achievement-documentation-template": "Leistungsnachweisvorlage"
+  "achievement-documentation-template": "Leistungsnachweisvorlage",
+  "preview": "Vorschau",
+  "edit_markdown": "Bearbeiten",
+  "markdown_info": "Du kannst **fett**, _kursiv_ und andere Formatierungen verwenden",
+  "markdown_guide": "Markdown Guide",
+  "location": {
+    "ONLINE": "Online",
+    "KIEL": "Kiel"
+  },
+  "type_name_or_email_minimum_3_letters": "Gib mindestens 3 Buchstaben ein."
 }

@@ -7,17 +7,12 @@ import { Button } from '../../common/Button';
 
 interface AlertProps {
   alert: string;
-  confirmationText: string;
+  confirmationText?: string;
   open: boolean;
   onClose: () => void;
 }
 
-export const AlertMessageDialog: FC<AlertProps> = ({
-  alert,
-  confirmationText,
-  open,
-  onClose,
-}) => {
+export const AlertMessageDialog: FC<AlertProps> = ({ alert, confirmationText = 'OK', open, onClose }) => {
   const handleClose = useCallback(() => onClose(), [onClose]);
   const { t } = useTranslation();
   return (

@@ -9,8 +9,8 @@
 
 export interface SaveAchievementDocumentationTemplate_saveAchievementDocumentationTemplate {
   __typename: "saveFileOutput";
+  file_path: string;
   google_link: string;
-  path: string;
 }
 
 export interface SaveAchievementDocumentationTemplate {

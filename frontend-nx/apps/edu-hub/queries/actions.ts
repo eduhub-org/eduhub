@@ -1,16 +1,12 @@
 import { gql } from '@apollo/client';
 
-// I am pretty sure the current loadFile/saveFile implementation is still broken,
-// I can't get it to work at all
-
-// I think the following concept would be reasonable and will implement the UI to use it:
-
-// - the saveFile mutation is given the base64 encoded data and the full path of the file
-// - if the path starts with public it can afterwards be accessed directly using the bucket_url + the path
-// - if the path does not start with public the UI needs to call loadFile with the full path of the file
-// - loadFile then returns the full URL with a token parameter to access the data, but only if the current user
-// is allowed to access the data
-
+export const LOAD_PARTICIPATION_DATA = gql`
+  query loadParticipationData($programId: Int!) {
+    loadParticipationData(programId: $programId) {
+      link
+    }
+  }
+`;
 
 export const SAVE_ATTENDANCE_CERTIFICATE_TEMPLATE = gql`
   mutation SaveAttendanceCertificateTemplate(
@@ -23,8 +19,8 @@ export const SAVE_ATTENDANCE_CERTIFICATE_TEMPLATE = gql`
       filename: $fileName
       programid: $programId
     ) {
+      file_path
       google_link
-      path
     }
   }
 `;
@@ -40,38 +36,8 @@ export const SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE = gql`
       filename: $fileName
       programid: $programId
     ) {
+      file_path
       google_link
-      path
-    }
-  }
-`;
-
-export const SAVE_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE = gql`
-  mutation SaveAchievementOptionDocumentationTemplate(
-    $base64File: String!
-    $achievementOptionId: Int!
-  ) {
-    saveAchievementOptionDocumentationTemplate(
-      base64file: $base64File
-      achievementOptionId: $achievementOptionId
-    ) {
-      google_link
-      path
-    }
-  }
-`;
-
-export const SAVE_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT = gql`
-  mutation SaveAchievementOptionEvaluationScript(
-    $base64File: String!
-    $achievementOptionId: Int!
-  ) {
-    saveAchievementOptionEvaluationScript(
-      base64file: $base64File
-      achievementOptionId: $achievementOptionId
-    ) {
-      google_link
-      path
     }
   }
 `;
@@ -87,8 +53,8 @@ export const SAVE_ACHIEVEMENT_RECORD_COVER_IMAGE = gql`
       filename: $fileName
       achievementRecordId: $achievementRecordId
     ) {
+      file_path
       google_link
-      path
     }
   }
 `;
@@ -104,8 +70,8 @@ export const SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION = gql`
       filename: $fileName
       achievementRecordId: $achievementRecordId
     ) {
+      file_path
       google_link
-      path
     }
   }
 `;
@@ -121,48 +87,15 @@ export const SAVE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE = gql`
       filename: $fileName
       achievementDocumentationTemplateId: $achievementDocumentationTemplateId
     ) {
+      file_path
       google_link
-      path
     }
   }
 `;
 
-export const SAVE_COURSE_IMAGE = gql`
-  mutation SaveCourseImage(
-    $base64File: String!
-    $fileName: String!
-    $courseId: Int!
-  ) {
-    saveCourseImage(
-      base64file: $base64File
-      filename: $fileName
-      courseid: $courseId
-    ) {
-      google_link
-      path
-    }
-  }
-`;
-
-export const LOAD_FILE = gql`
-  query LoadFile($path: String!) {
-    loadFile(path: $path) {
-      link
-    }
-  }
-`;
-
-export const LOAD_ACHIEVEMENT_OPTION_EVALUATION_SCRIPT = gql`
-  query LoadAchievementOptionEvaluationScript($path: String!) {
-    loadAchievementOptionEvaluationScript(path: $path) {
-      link
-    }
-  }
-`;
-
-export const LOAD_ACHIEVEMENT_OPTION_DOCUMENTATION_TEMPLATE = gql`
-  query LoadAchievementOptionDocumentationTemplate($path: String!) {
-    loadAchievementOptionDocumentationTemplate(path: $path) {
+export const GET_SIGNED_URL = gql`
+  query GetSignedUrl($path: String!) {
+    getSignedUrl(path: $path) {
       link
     }
   }
@@ -179,8 +112,25 @@ export const SAVE_USER_PROFILE_IMAGE = gql`
       filename: $fileName
       userid: $userId
     ) {
+      file_path
       google_link
-      path
+    }
+  }
+`;
+
+export const SAVE_COURSE_IMAGE = gql`
+  mutation SaveCourseImage(
+    $base64File: String!
+    $fileName: String!
+    $courseId: Int!
+  ) {
+    saveCourseImage(
+      base64file: $base64File
+      filename: $fileName
+      courseid: $courseId
+    ) {
+      file_path
+      google_link
     }
   }
 `;

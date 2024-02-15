@@ -1,6 +1,22 @@
 import { Course_Course_by_pk } from '../queries/__generated__/Course';
 import { CourseWithEnrollment_Course_by_pk } from '../queries/__generated__/CourseWithEnrollment';
 
+export const prioritizeClasses = (classString: string, prefixes: string[] = ['mb-', 'w-']): string => {
+  const lastClasses = {};
+  const otherClasses = [];
+
+  classString.split(' ').forEach(className => {
+    const prefix = prefixes.find(prefix => className.startsWith(prefix));
+    if (prefix) {
+      lastClasses[prefix] = className;
+    } else {
+      otherClasses.push(className);
+    }
+  });
+  
+  return [...otherClasses, ...Object.values(lastClasses)].filter(Boolean).join(' ');
+};
+
 export const makeFullName = (firstName: string, lastName: string): string => {
   return `${firstName} ${lastName}`;
 };

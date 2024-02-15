@@ -3,19 +3,13 @@ import useTranslation from 'next-translate/useTranslation';
 import { ChangeEvent, FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
-import {
-  USER_SELECTION_ONE_PARAM,
-  USER_SELECTION_TWO_PARAMS,
-} from '../../../queries/user';
+import { USER_SELECTION_ONE_PARAM, USER_SELECTION_TWO_PARAMS } from '../../../queries/user';
 import {
   UserForSelection1,
   UserForSelection1Variables,
   UserForSelection1_User,
 } from '../../../queries/__generated__/UserForSelection1';
-import {
-  UserForSelection2,
-  UserForSelection2Variables,
-} from '../../../queries/__generated__/UserForSelection2';
+import { UserForSelection2, UserForSelection2Variables } from '../../../queries/__generated__/UserForSelection2';
 
 import { Button } from '../Button';
 import SelectUserRow from './SelectUserRow';
@@ -69,24 +63,18 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
   // Thus I have defined two query types and they are used depending on the provided input
 
   // in case there is no space just search with the full value
-  const result1 = useAuthedQuery<UserForSelection1, UserForSelection1Variables>(
-    USER_SELECTION_ONE_PARAM,
-    {
-      variables: {
-        searchValue: `%${searchValue.trim()}%`,
-      },
-      skip: searchValue.length < 3 || searchValue.trim().includes(' '),
-    }
-  );
+  const result1 = useAuthedQuery<UserForSelection1, UserForSelection1Variables>(USER_SELECTION_ONE_PARAM, {
+    variables: {
+      searchValue: `%${searchValue.trim()}%`,
+    },
+    skip: searchValue.length < 3 || searchValue.trim().includes(' '),
+  });
   // in case there is a space search for a user that has a fitting first and last name
   // by splitting the search string
-  const result2 = useAuthedQuery<UserForSelection2, UserForSelection2Variables>(
-    USER_SELECTION_TWO_PARAMS,
-    {
-      variables: getSearchVars(searchValue.trim()),
-      skip: searchValue.length < 3 || !searchValue.trim().includes(' '),
-    }
-  );
+  const result2 = useAuthedQuery<UserForSelection2, UserForSelection2Variables>(USER_SELECTION_TWO_PARAMS, {
+    variables: getSearchVars(searchValue.trim()),
+    skip: searchValue.length < 3 || !searchValue.trim().includes(' '),
+  });
 
   const users = [...(result1.data?.User || []), ...(result2.data?.User || [])];
 
@@ -103,7 +91,7 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
       </DialogTitle>
 
       <DialogContent>
-        <div>{t('type-name-email-minimum-3-letters')}</div>
+        <div>{t('type_name_or_email_minimum_3_letters')}</div>
 
         <div>
           <input

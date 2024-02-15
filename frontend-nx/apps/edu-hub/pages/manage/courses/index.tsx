@@ -4,11 +4,11 @@ path.resolve('./next.config.js');
 
 import useTranslation from 'next-translate/useTranslation';
 import Head from 'next/head';
-import ManageCoursesContent from '../../../components/ManageCoursesContent';
+import ManageCoursesContent from '../../../components/pages/ManageCoursesContent';
 import { FC, useCallback, useMemo, useState } from 'react';
-import CoursesHeader from '../../../components/ManageCoursesContent/CoursesHeader';
+import CoursesHeader from '../../../components/pages/ManageCoursesContent/CoursesHeader';
 import Loading from '../../../components/common/Loading';
-import { Page } from '../../../components/Page';
+import { Page } from '../../../components/layout/Page';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';
 import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
@@ -102,8 +102,7 @@ const Content: FC<IProps> = ({ programs }) => {
       />
       {courseListRequest.loading ? (
         <Loading />
-      ) : courseListRequest.data?.Course &&
-        courseListRequest.data?.Course.length > 0 ? (
+      ) : courseListRequest.data?.Course && courseListRequest.data?.Course.length > 0 ? (
         <ManageCoursesContent
           courseListRequest={courseListRequest}
           programs={sortedPrograms}
