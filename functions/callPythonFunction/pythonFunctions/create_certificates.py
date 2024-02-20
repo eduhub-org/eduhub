@@ -1,3 +1,4 @@
+from urllib.request import urlopen
 from jinja2 import Environment, FileSystemLoader
 import logging
 import jinja2
@@ -5,7 +6,11 @@ import os
 import requests
 from api_clients import EduHubClient, StorageClient
 import io 
-from xhtml2pdf import pisa
+from fpdf import FPDF
+import requests
+from io import BytesIO
+from jinja2 import Environment, DictLoader
+
 
 class CertificateCreator:
     """
@@ -56,63 +61,70 @@ class CertificateCreator:
     
         template_image_url = self.fetch_template_image()
         template_text = self.fetch_template_text()
-        bucket = self.storage_client.get_bucket()
+        logging.info(f"The template text is: {template_text}")
         successful_count = 0
+        
+        logging.info("############################################################")
+        logging.info(f"Enrollments:{self.enrollments}")
+        logging.info(f"The template image url is {template_image_url}")
+        logging.info(f"The template text id  is {template_text}")
+    
     
         for i, enrollment in enumerate(self.enrollments, 1):
             try:
-                pdf_url = self.generate_and_save_certificate_to_gcs(template_image_url, template_text, bucket)
-                self.eduhub_client.update_course_enrollment_record(enrollment["id"], pdf_url)
+                pdf_url = self.generate_and_save_certificate_to_gcs(template_image_url, template_text, enrollment)
+                
+                logging.info(f"The pdf_url is: {pdf_url}")
+
+                self.eduhub_client.update_course_enrollment_record(enrollment["User"]["id"], enrollment["Course"]["id"], pdf_url, self.certificate_type)
                 successful_count += 1
             except Exception as e:
                 logging.error(f"Error in processing enrollment {i}: {e}")
     
         logging.info(f"{successful_count}/{len(self.enrollments)} {self.certificate_type} certificate(s) successfully   generated.")
 
-    def generate_and_save_certificate_to_gcs(self, template_image_url, template_text, bucket_name):
+
+
+    def generate_and_save_certificate_to_gcs(self, template_image_url, template_text, enrollment):
         # Prepare Text Content
-        text_content = self.prepare_text_content()
+        text_content = self.prepare_text_content(enrollment)
+        blob_name = template_image_url
+        image_url = f"http://localhost:4001/{self.storage_client.bucket_name}{blob_name}"
+        logging.info(f"Das ist die vollständige image url: {image_url}")
 
-        # Generate PDF File Name
-        pdf_file_name = self.generate_pdf_file_name()
-
-        # Create Jinja2 Environment
-        env = Environment(loader=jinja2.DictLoader({'template': template_text}))
-
+        # Create Jinja2 Environment and render HTML
+        env = Environment(loader=DictLoader({'template': template_text}))
         template = env.get_template('template')
+        template_content = text_content
+        #template_content["template"] = template_image_url
+        rendered_html = template.render(template_content)
 
-        rendered_html = template.render(background_image_url=template_image_url, html_content=text_content)
+        pdf = PDFWithBackground(image_url)
+        #pdf = PDFWithBackground()
+        pdf.add_page()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.chapter_title('Test')
+        pdf.chapter_body(rendered_html)
 
-        # create PDF as BytesIO Object
-        pdf_bytes_io = io.BytesIO()
-        
-        # Convert HTML to PDF with xhtml2pdf
-        pisa_status = pisa.CreatePDF(
-            io.StringIO(rendered_html), 
-            dest=pdf_bytes_io
-        )
+# Speichere das PDF im Speicher als Bytes
+        pdf_bytes_io = BytesIO()
+        pdf.output(pdf_bytes_io, 'S')
+        pdf_bytes_io.seek(0) 
 
-        # Check for errors
-        if pisa_status.err:
-            raise Exception("Error generating PDF")
+        bucket = self.storage_client.get_bucket()
+        pdf_file_name = self.generate_pdf_file_name(enrollment)
+        # Erstelle ein Blob im Bucket und lade die PDF-Bytes hoch   
+        # TODO: Für Production wahrscheinlich anpassen und wieder so reinnehmen      
+        '''blob = bucket.blob(pdf_file_name)
+        blob.upload_from_file(path="", blob_name=pdf_file_name, buffer=pdf_bytes_io, content_type='application/pdf')
+        # Option: URL zum Zugriff auf das PDF generieren
+        url = blob.public_url'''
 
-        # Reset buffer position to the beginning
-        pdf_bytes_io.seek(0)
+        url = self.storage_client.upload_file(path="", blob_name=pdf_file_name, buffer=pdf_bytes_io, content_type='application/pdf')
+        logging.info(f'Das PDF ist hier verfügbar: {url}') 
 
-        temporary_pdf = pdf_bytes_io
 
-        ## Saving Certificate PDF
-        #Instantiiating GCS Client
-        storage_client = storage.Client()
-
-    
-        bucket = storage_client.bucket(bucket_name)
-        blob = bucket.blob(pdf_file_name)
-
-        blob.upload_from_file(temporary_pdf, content_type='application/pdf')
-
-        return blob.public_url
-
+ 
     def fetch_program_info(self):
         #TODO: get textID and Image URL per userID via program 
         pass
@@ -132,39 +144,44 @@ class CertificateCreator:
         
     def fetch_template_text(self):
          # Necessary Data to retrieve HTML from hasura 
+        logging.info("fetch_template_text gets called")
+        
         if self.certificate_type == "achievement" or self.certificate_type == "attendance":
+            
             if self.certificate_type == "achievement":
                 text_id =self.enrollments[0]['Course']['Program']['achievementCertificateTemplateTextId']
             else:
                 text_id = self.enrollments[0]['Course']['Program']['attendanceCertifiateTemplateTextId']
-            return text_id
-        elif self.certificate_type == "instructor":
-            #There is no ID yet
-            pass       
+            
         else: 
-            print("Certificate type is incorrect or missing!")
+            logging.info("Certificate type is incorrect or missing!")
 
+        
         # GraphQL query
         query = """
-        query getHTML {
-            CertificateTemplateText(where: {id: {_eq: "textId"}}) {
+        query getHTML($textId: Int!) {
+            CertificateTemplateText(where: {id: {_eq: $textId}}) {
                 html
+            }
         }
         """
         variables = {
                 "textId": text_id
             }
 
+        logging.info(f" text id is: {text_id}")
         # Headers including the admin secret
         headers = {
         "Content-Type": "application/json",
         "x-hasura-admin-secret": self.eduhub_client.hasura_admin_secret
         }
 
+        logging.info(f"THe headers is: {headers}")
+        
         # Make the request to the GraphQL endpoint
         try:
             response = requests.post(
-            self.eduhub_client.hasura_endpoint,
+            self.eduhub_client.url,
             json={'query': query, 'variables': variables},
             headers=headers
         )
@@ -172,25 +189,36 @@ class CertificateCreator:
 
             # Assuming the data is returned in JSON format
             data = response.json()
-            return data['data']['html']
+            logging.info(f"The data is: {data}")
+            logging.info("----------------------------------------------------------------")
+            logging.info(f"The data is: {data['data']['CertificateTemplateText'][0]['html']}")
+            return data['data']['CertificateTemplateText'][0]['html']
         except requests.exceptions.RequestException as e:
         # Handle any errors that occur during the request
             logging.info("An error occured")
 
-    def prepare_text_content(self):
+    def prepare_text_content(self, enrollment):
         if self.certificate_type == "attendance" or self.certificate_type == "achievement":
             if self.certificate_type == "attendance":
                 session_titles = self.get_attended_sessions(
-                    self.enrollment, self.enrollment["Course"]["Sessions"]
+                    enrollment, enrollment["Course"]["Sessions"]
                 )
-            else:
-                session_titles = None 
-            return {
-            "full_name": f"{self.enrollment['User']['firstName']} {self.enrollment['User']['lastName']}",
-            "course_name": self.enrollment["Course"]["title"],
-            "semester":self.enrollment["Course"]["Program"]["title"],
-            "event_entries": session_titles,
+                return {
+                    "full_name": f"{enrollment['User']['firstName']} {enrollment['User']['lastName']}",
+                    "course_name": enrollment["Course"]["title"],
+                    "semester":enrollment["Course"]["Program"]["title"],
+                    "event_entries": session_titles,
+                    "template": "",
             }
+            else:
+                return {
+                "full_name": f"{enrollment['User']['firstName']} {enrollment['User']['lastName']}",
+                "course_name": enrollment["Course"]["title"],
+                "semester":enrollment["Course"]["Program"]["title"],
+                "template": "",
+                }
+            
+            
 
         elif self.certificate_type == "instructor":
         
@@ -203,9 +231,9 @@ class CertificateCreator:
         else:
             raise ValueError("Invalid certificate type")
 
-    def generate_pdf_file_name(self):
+    def generate_pdf_file_name(self, enrollment):
         if self.certificate_type == "achievement" or self.certificate_type == "attendance":
-            return f"{self.enrollment['User']['id']}/{self.enrollment['Course']['id']}/{self.certificate_type}_certificate.pdf"
+            return f"{enrollment['User']['id']}/{enrollment['Course']['id']}/{self.certificate_type}_certificate.pdf"
         else: 
             return f"{self.program_info['User']['id']}/{self.program_info['Course']['id']}/{self.certificate_type}_certificate.pdf"
     
@@ -255,6 +283,7 @@ class CertificateCreator:
         return attended_session_titles
 
 
+
 def create_certificates(hasura_secret, arguments):
     try:
         certificate_creator = CertificateCreator(arguments)
@@ -263,3 +292,49 @@ def create_certificates(hasura_secret, arguments):
     except Exception as e:
         logging.error("Error in creating certificates: %s", str(e))
 
+
+class PDFWithBackground(FPDF):
+    def __init__(self, background_url):
+        super().__init__()
+        logging.info(f"Das ist die background_url: {background_url}")
+        self.background_url = background_url
+        # Download the background image
+        response = requests.get(self.background_url)
+        logging.info("bis hier hin funktioniert es")
+        self.background_image = BytesIO(response.content)
+
+    def header(self):
+        # This method is automatically called on document start and when a new page is added
+        '''if self.page_no() == 1:
+            # Add a background image only for the first page or as needed
+            self.image(self.background_image, x=0, y=0, w=210, h=297)'''
+
+    def footer(self):
+        # Footer content here
+        pass
+
+    def chapter_title(self, label):
+        # Chapter title styling
+        self.set_font('Arial', '', 12)
+        self.cell(0, 10, f'{label}', 0, 1)
+
+    def chapter_body(self, body):
+        # Process HTML-like tags in body
+        self.set_font('Arial', '', 12)
+        html = body.split('\n')
+        for line in html:
+            if '<b>' in line:
+                self.set_font('', 'B')
+                line = line.replace('<b>', '').replace('</b>', '')
+            if '<i>' in line:
+                self.set_font('', 'I')
+                line = line.replace('<i>', '').replace('</i>', '')
+            if '<u>' in line:
+                self.set_font('', 'U')
+                line = line.replace('<u>', '').replace('</u>', '')
+            if '<p>' in line:
+                self.multi_cell(0, 10, line.replace('<p>', '').replace('</p>', ''))
+                self.ln()
+            else:
+                self.cell(0, 10, line, 0, 1)
+            self.set_font('Arial', '', 12) 
