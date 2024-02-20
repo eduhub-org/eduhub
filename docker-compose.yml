@@ -56,6 +56,7 @@ services:
       - ./backend/init.d/file_storage:/home/node/www/emulated-bucket
     ports:
       - "42025:42025"
+      - "4001:4001"
     command: sh -c "pip install -r /functions/callPythonFunction/requirements.txt ; /functions/start-python.sh"
     environment:
       ENVIRONMENT: development

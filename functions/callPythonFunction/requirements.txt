@@ -14,5 +14,4 @@ datetime
 python-dateutil
 google-cloud-storage
 jinja2
-weasyprint
-xhtml2pdf
+fpdf2

@@ -10,6 +10,8 @@ from google.auth.transport import requests
 from google.cloud.storage import Client
 
 
+
+
 class StorageClient:
     BUCKET_NAME = os.getenv(
         "BUCKET_NAME",  # Bucket name for cloud storage
@@ -90,7 +92,7 @@ class StorageClient:
                 "/home/node/www/", self.bucket_name, path, blob_name
             )
             os.makedirs(os.path.dirname(local_container_path), exist_ok=True)
-            with open(local_container_path, "w") as f:
+            with open(local_container_path, "wb") as f:
                 f.write(buffer.getvalue())
             return f"http://localhost:{self.STORAGE_PORT}/{self.bucket_name}/{path}/{blob_name}"
         else:

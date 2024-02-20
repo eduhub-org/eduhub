@@ -160,7 +160,7 @@ class EduHubClient:
         # Convert the unnested list to a DataFrame
         return pd.DataFrame(unnested_list)
 
-    def fetch_enrollments(self):
+    def fetch_enrollments(self, user_ids, course_id):
         """
         Fetches enrollment data for given user IDs and a course ID from a GraphQL API.
 
@@ -223,14 +223,14 @@ class EduHubClient:
         }"""
         # Variables for the GraphQL query
         variables = {
-            "userIds": self.user_ids,
-            "courseId": self.course_id 
+            "userIds": user_ids,
+            "courseId": course_id 
         }
 
         try:
             response = requests.post(
-                self.eduhub_client.url,
-                headers={"x-hasura-admin-secret": self.eduhub_client.hasura_admin_secret},
+                self.url,
+                headers={"x-hasura-admin-secret": self.hasura_admin_secret},
                 json={"query": query, "variables": variables}
             )
             response.raise_for_status()  # Raises a HTTPError if the HTTP request returned an unsuccessful status code
@@ -356,7 +356,7 @@ class EduHubClient:
         except (KeyError, IndexError) as e:
             return None  # or handle error as appropriate for your use case
 
-    def update_course_enrollment_record(self, certificate_url):
+    def update_course_enrollment_record(self, user_id, course_id, certificate_url, certificate_type):
         """
         Updates the course enrollment record with a new certificate URL.
 
@@ -367,42 +367,24 @@ class EduHubClient:
             tuple: A tuple containing a boolean indicating success and the number of affected rows.
         """
         mutation = """
-        mutation UpdateEnrollment($userId: uuid!, $courseId: Int!, $certificateUrl: String!) {
-            update_CourseEnrollment(
-                where: { userId: { _eq: $userId }, courseId: { _eq: $courseId } }
-                _set: { certificateURL: $certificateUrl }
-            ) {
-                affected_rows
+        mutation UpdateEnrollment($userId: uuid!, $courseId: Int!, $certificateUrl: String!, $certificateType: String!) {
+         update_CourseEnrollment(
+            where: { userId: { _eq: $userId }, courseId: { _eq: $courseId } }
+                _set: { 
+                    attendanceCertificateURL: $certificateType == "attendance" ? $certificateUrl : attendanceCertificateURL,
+                    achievementCertificateURL: $certificateType == "achievement" ? $certificateUrl : achievementCertificateURL
+                    }
+                 ) {
+            affected_rows
             }
-        }
-        """
+        }"""
+
 
         variables = {
-            "userId": self.user_id,
-            "courseId": self.course_id,
+            "userId": user_id,
+            "courseId": course_id,
             "certificateUrl": certificate_url,
+            "certificateType": certificate_type
         }
 
-        try:
-            response = requests.post(
-                self.eduhub_client.hasura_endpoint,
-                json={"query": mutation, "variables": variables},
-                headers=self.eduhub_client.headers,
-            )
-            response.raise_for_status()
-            
-            result = response.json()
-
-            if "errors" in result:
-                logging.error(f"GraphQL Error: {result['errors']}")
-                return False, 0
-
-            affected_rows = result.get("data", {}).get("update_CourseEnrollment", {}).get("affected_rows", 0)
-            return True, affected_rows
-
-        except requests.exceptions.RequestException as e:
-            logging.error(f"HTTP request error: {e}")
-            return False, 0
-        except ValueError as e:
-            logging.error(f"JSON decoding error: {e}")
-            return False, 0
+        return self.send_query(mutation, variables)
