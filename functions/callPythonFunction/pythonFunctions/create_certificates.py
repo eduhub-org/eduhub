@@ -85,11 +85,11 @@ class CertificateCreator:
 
 
 
-    def generate_and_save_certificate_to_gcs(self, template_image_url, template_text, enrollment):
+    def generate_and_save_certificate_to_gcs(self, enrollment, template_image_url, template_text):
         # Prepare Text Content
         text_content = self.prepare_text_content(enrollment)
         blob_name = template_image_url
-        image_url = f"http://localhost:4001/{self.storage_client.bucket_name}{blob_name}"
+        image_url = f"{self.storage_client.bucket_name}{blob_name}"
         logging.info(f"Das ist die vollständige image url: {image_url}")
 
         # Create Jinja2 Environment and render HTML
@@ -111,7 +111,6 @@ class CertificateCreator:
         pdf.output(pdf_bytes_io, 'S')
         pdf_bytes_io.seek(0) 
 
-        bucket = self.storage_client.get_bucket()
         pdf_file_name = self.generate_pdf_file_name(enrollment)
         # Erstelle ein Blob im Bucket und lade die PDF-Bytes hoch   
         # TODO: Für Production wahrscheinlich anpassen und wieder so reinnehmen      

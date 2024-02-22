@@ -227,8 +227,6 @@ class EduHubClient:
             response = requests.post(
                 self.url,
                 headers={"x-hasura-admin-secret": self.hasura_admin_secret},
-                self.url,
-                headers={"x-hasura-admin-secret": self.hasura_admin_secret},
                 json={"query": query, "variables": variables}
             )
             response.raise_for_status()  # Raises a HTTPError if the HTTP request returned an unsuccessful status code

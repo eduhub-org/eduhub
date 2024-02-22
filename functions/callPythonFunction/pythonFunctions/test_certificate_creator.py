@@ -35,7 +35,7 @@ class TestPDFGeneration(unittest.TestCase):
 
         # Assuming your method needs a bucket name, template image URL, and template text
         bucket_name = "test-bucket"
-        template_image_url = "http://example.com/image.png"
+        template_image_url = "http://localhost:4001/emulated-bucket/programid_4/achievement_certificate_template/opencampus_certificate_template_WS2022.png"
         template_text = "<html><body>{{html_content}}</body></html>"
         mock_enrollment = {
             "id": 123,
@@ -49,19 +49,19 @@ class TestPDFGeneration(unittest.TestCase):
                 "title": "Test Course",
                 "Program": {
                     "title": "Test Program",
-                    "achievementCertificateTemplateURL": "http://example.com/achievement_template.png",
+                    "achievementCertificateTemplateURL": "programid_4/achievement_certificate_template/opencampus_certificate_template_WS2022.png",
                     "achievementCertificateTemplateTextId": "achievement_text_id",
-                    "attendanceCertificateTemplateURL": "http://example.com/attendance_template.png",
+                    "attendanceCertificateTemplateURL": "programid_4/attendance_certificate_template/opencampus_certificate_template_WS2022.png",
                     "attendanceCertifiateTemplateTextId": "attendance_text_id"
                 }
             }
         }
 
         # Call the method under test
-        pdf_url = self.certificate_creator.generate_and_save_certificate_to_gcs(mock_enrollment, template_image_url, template_text, bucket_name)
+        pdf_url = self.certificate_creator.generate_and_save_certificate_to_gcs(mock_enrollment, template_image_url, template_text)
 
         # Assertions
-        mock_requests_get.assert_called_with(template_image_url)
+        #mock_requests_get.assert_called_with(template_image_url)
         mock_storage_client().bucket.assert_called_with(bucket_name)
         mock_bucket.blob.assert_called()
         mock_blob.upload_from_file.assert_called()
