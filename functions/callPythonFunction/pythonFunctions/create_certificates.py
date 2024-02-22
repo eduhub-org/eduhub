@@ -290,7 +290,7 @@ def create_certificates(hasura_secret, arguments):
 
 
 class PDFWithBackground(FPDF):
-    def __init__(self, background_image_blob):
+    def __init__(self, background_image: BytesIO):
         super().__init__()
         logging.info(f"Das ist die background_url: {background_url}")
         self.background_url = background_url
