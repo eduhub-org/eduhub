@@ -161,6 +161,7 @@ class EduHubClient:
         return pd.DataFrame(unnested_list)
 
     def fetch_enrollments(self, user_ids, course_id):
+    def fetch_enrollments(self, user_ids, course_id):
         """
         Fetches enrollment data for given user IDs and a course ID from a GraphQL API.
 
@@ -173,7 +174,7 @@ class EduHubClient:
         Returns:
             list: A list of course enrollment records, or an empty list if no data is found.
         """
-        # GraphQL query
+        variables = {"program_id": user_ids, "course_id": course_id}
         query = """query GetEnrollments($userIds: [uuid!]!, $courseId: Int!) {
             CourseEnrollment(where: {userId: {_in: $userIds}, Course: {id: {_eq: $courseId}}}) {
                 User {
@@ -221,14 +222,11 @@ class EduHubClient:
                 }
             }
         }"""
-        # Variables for the GraphQL query
-        variables = {
-            "userIds": user_ids,
-            "courseId": course_id 
-        }
 
         try:
             response = requests.post(
+                self.url,
+                headers={"x-hasura-admin-secret": self.hasura_admin_secret},
                 self.url,
                 headers={"x-hasura-admin-secret": self.hasura_admin_secret},
                 json={"query": query, "variables": variables}

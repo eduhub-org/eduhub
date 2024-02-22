@@ -1,6 +1,7 @@
 import logging
 import os
 import io
+from unittest.mock import MagicMock
 
 from typing import Optional
 from datetime import timedelta
@@ -36,10 +37,11 @@ class StorageClient:
 
     def get_bucket(self):
         if self.env == "development":
-            return self.bucket_name  # In local mode, just return the bucket name
+            mock_bucket = MagicMock()
+            return mock_bucket  # In local mode, return a mock bucket
         else:
             return self.storage_client.bucket(self.bucket_name)
-
+        
     def list_blobs(self):
         if self.env == "development":
             path = os.path.join(self.BUCKET_DIRECTORY, self.bucket_name)
