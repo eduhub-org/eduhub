@@ -14,6 +14,14 @@ type Mutation {
   ): result
 }
 
+type Mutation {
+  createCertificates(
+    userIds: [uuid!]!
+    courseId: Int!
+    certificateType: String!
+  ): result
+}
+
 type Query {
   getMoocHubData: moocHubSchema
 }
