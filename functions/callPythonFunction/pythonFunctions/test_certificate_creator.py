@@ -61,7 +61,7 @@ class TestPDFGeneration(unittest.TestCase):
         pdf_url = self.certificate_creator.generate_and_save_certificate_to_gcs(mock_enrollment, template_image_url, template_text)
 
         # Assertions
-        #mock_requests_get.assert_called_with(template_image_url)
+        mock_requests_get.assert_called_with(template_image_url)
         mock_storage_client().bucket.assert_called_with(bucket_name)
         mock_bucket.blob.assert_called()
         mock_blob.upload_from_file.assert_called()

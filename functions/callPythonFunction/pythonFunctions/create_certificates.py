@@ -88,9 +88,10 @@ class CertificateCreator:
     def generate_and_save_certificate_to_gcs(self, enrollment, template_image_url, template_text):
         # Prepare Text Content
         text_content = self.prepare_text_content(enrollment)
-        blob_name = template_image_url
-        image_url = f"{self.storage_client.bucket_name}{blob_name}"
-        logging.info(f"Das ist die vollständige image url: {image_url}")
+
+        image = self.storage_client.download_file(template_image_url)
+        logging.info(f"Das ist das image: {image}")
+
 
         # Create Jinja2 Environment and render HTML
         env = Environment(loader=DictLoader({'template': template_text}))
@@ -99,7 +100,7 @@ class CertificateCreator:
         #template_content["template"] = template_image_url
         rendered_html = template.render(template_content)
 
-        pdf = PDFWithBackground(image_url)
+        pdf = PDFWithBackground(image)
         #pdf = PDFWithBackground()
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
@@ -236,10 +237,6 @@ class CertificateCreator:
         else: 
             return f"{self.program_info['User']['id']}/{self.program_info['Course']['id']}/{self.certificate_type}_certificate.pdf"
     
-    def download_template_image(self, template_image_url):
-        response = requests.get(template_image_url)
-        response.raise_for_status()  # Makes sure request was succesfull
-        return response.text
     
     def get_attended_sessions(enrollment, sessions):
         attended_sessions = []
@@ -293,7 +290,7 @@ def create_certificates(hasura_secret, arguments):
 
 
 class PDFWithBackground(FPDF):
-    def __init__(self, background_url):
+    def __init__(self, background_image_blob):
         super().__init__()
         logging.info(f"Das ist die background_url: {background_url}")
         self.background_url = background_url
@@ -337,3 +334,32 @@ class PDFWithBackground(FPDF):
             else:
                 self.cell(0, 10, line, 0, 1)
             self.set_font('Arial', '', 12) 
+
+
+
+
+# from fpdf import FPDF
+# from PIL import Image
+# from io import BytesIO
+
+# # Assuming blob_bytes contains the bytes of the image
+# image_stream = BytesIO(blob_bytes)
+
+# # Convert the bytes to an image
+# image = Image.open(image_stream)
+
+# # Save the image to a new BytesIO object in a format that FPDF can understand
+# image_stream = BytesIO()
+# image.save(image_stream, format='JPEG')  # or 'PNG' if your image is a PNG
+# image_stream.seek(0)
+
+# pdf = FPDF()
+
+# # You need to add a page before you can add an image
+# pdf.add_page()
+
+# # Add the image to the PDF
+# pdf.image(image_stream, x=10, y=10, w=100, h=100)
+
+# # Output the PDF to a file
+# pdf.output('output.pdf', 'F')

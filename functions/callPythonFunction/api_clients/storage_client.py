@@ -1,6 +1,8 @@
 import logging
 import os
 import io
+from io import BytesIO
+
 from unittest.mock import MagicMock
 
 from typing import Optional
@@ -80,14 +82,17 @@ class StorageClient:
             blob = self.storage_client.bucket(self.bucket_name).blob(blob_name)
             blob.delete()
 
-    def download_file(self, blob_name, file_path):
+    def download_file(self, file_path):
         if self.env == "development":
-            src_path = os.path.join(self.BUCKET_DIRECTORY, self.bucket_name, blob_name)
-            os.replace(src_path, file_path)
+            local_path = os.path.join("/home/node/www/", self.bucket_name, file_path)
+            with open(local_path, 'rb') as f:
+                file_data = f.read()
+            return BytesIO(file_data)
         else:
-            blob = self.storage_client.bucket(self.bucket_name).blob(blob_name)
-            blob.download_to_filename(file_path)
-
+            blob = self.storage_client.bucket(self.bucket_name).blob(file_path)
+            blob_data = blob.download_as_bytes()
+            return BytesIO(blob_data)
+        
     def upload_file(self, path, blob_name, buffer, content_type):
         if self.env == "development":
             local_container_path = os.path.join(
