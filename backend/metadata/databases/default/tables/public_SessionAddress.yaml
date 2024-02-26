@@ -27,6 +27,7 @@ insert_permissions:
                     _eq: X-Hasura-User-Id
       columns:
         - address
+        - courseLocationId
         - id
         - sessionId
         - type
