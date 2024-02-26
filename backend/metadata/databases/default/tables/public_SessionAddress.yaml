@@ -29,6 +29,7 @@ insert_permissions:
         - address
         - courseLocationId
         - id
+        - location
         - sessionId
         - type
 select_permissions:
@@ -36,8 +37,10 @@ select_permissions:
     permission:
       columns:
         - address
+        - courseLocationId
         - created_at
         - id
+        - location
         - sessionId
         - type
         - updated_at
