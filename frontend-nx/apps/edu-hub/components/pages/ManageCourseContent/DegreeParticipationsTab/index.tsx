@@ -28,7 +28,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
   const { lang } = useTranslation();
 
   const degreeCourseId = course?.id;
-  const { data } = useRoleQuery<
+  const { data, error, loading } = useRoleQuery<
     DegreeParticipantsWithDegreeEnrollments,
     DegreeParticipantsWithDegreeEnrollmentsVariables
   >(DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS, {
@@ -254,6 +254,8 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       <TableGrid
         data={extendedDegreeParticipantsEnrollments}
         columns={columns}
+        error={error}
+        loading={loading}
         showCheckbox={false}
         showDelete={false}
         translationNamespace="manageCourse"

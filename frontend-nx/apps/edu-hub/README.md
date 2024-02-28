@@ -55,3 +55,9 @@ When adding new components:
 3. **Documentation:** Document the component's purpose, props, and usage examples in a comment block above the component definition.
 4. **Testing:** Write unit tests for the component's functionality to ensure reliability and prevent regressions.
 
+### Additional Information
+
+## Force redirect to Keycloak login page for specific links
+
+1. Use `withAuthRedirect` from `frontend-nx/apps/edu-hub/helpers/auth.ts` in your page (for reference see `frontend-nx/apps/edu-hub/pages/course/[courseId].tsx`)
+2. Add `?force_redirect=true` parameter to your link's URL
