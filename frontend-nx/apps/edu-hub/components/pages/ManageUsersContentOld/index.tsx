@@ -101,11 +101,11 @@ const UserList: FC<IProps> = ({ t, searchedText }) => {
 
   const [filter, setFilter] = useState(filterForUserTypes(userTypes));
   // GRAPHQL Related part
-  const makeSearchFilter = [
+  const makeSearchFilter = useMemo(() => [
     { lastName: { _ilike: `%${searchedText}%` } },
     { firstName: { _ilike: `%${searchedText}%` } },
     { email: { _ilike: `%${searchedText}%` } },
-  ];
+  ], [searchedText]);
   // const userFilter = filterForUserTypes(uTypes);
   useEffect(() => {
     setFilter(filterForUserTypes(userTypes));
