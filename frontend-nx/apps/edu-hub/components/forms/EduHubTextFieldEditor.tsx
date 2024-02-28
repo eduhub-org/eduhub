@@ -143,12 +143,11 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
         <div>{renderInput()}</div>
       )}
       <div className="text-white text-xs px-3 pb-8 mt-[-26px]">
-        {t('markdown_info')}
-        {' ('}
+        {`${t('markdown_info')} (`}
         <a href="https://www.markdownguide.org" target="_blank" rel="noreferrer">
-          <u>{t('markdown_guide')}</u>
-          {').'}
+          <u>{t('https://markdownguide.org')}</u>
         </a>
+        {`).`}
       </div>
     </>
   );
