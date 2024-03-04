@@ -58,6 +58,8 @@ import {
   UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK,
 } from '../../../queries/course';
 import { isECTSFormat, isLinkFormat } from '../../../helpers/util';
+import useErrorHandler from '../../../hooks/useErrorHandler';
+import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 
 interface EntrollmentStatusCount {
   [key: string]: number;
@@ -127,6 +129,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   // onDeleteCourseGroup,
 }) => {
   const { t, lang } = useTranslation('course-page');
+  const { error, handleError, resetError } = useErrorHandler();
 
   const handleToggleAttendanceCertificatePossible = useCallback(() => {
     onSetAttendanceCertificatePossible(course, !course.attendanceCertificatePossible);
@@ -278,7 +281,9 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
     imageUploadRef.current?.click();
   }, [imageUploadRef]);
 
-  const [saveCourseImage] = useAdminMutation<SaveCourseImage, SaveCourseImageVariables>(SAVE_COURSE_IMAGE);
+  const [saveCourseImage] = useAdminMutation<SaveCourseImage, SaveCourseImageVariables>(SAVE_COURSE_IMAGE, {
+    onError: (error) => handleError(t(error.message)),
+  });
 
   const handleUploadCourseImageEvent = useCallback(
     async (event: any) => {
@@ -548,6 +553,8 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
           <tr className="h-1" />
         </>
       )}
+      {/* Error Message Dialog */}
+      {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}
     </>
   );
 };
