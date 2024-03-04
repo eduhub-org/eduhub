@@ -18,6 +18,7 @@ const getSignedUrl = async (req, res) => {
   try {
     // Admin users or users accessing their own data
     if (userRole === 'admin' ||
+        userRole === 'instructor' ||
        (userUUID && path.includes("/user-" + userUUID + "/")) ||
        (userUUID && path.startsWith(userUUID + "/")) || // included for legacy names
        (userUUID && path.startsWith("/user-" + userUUID + "/"))) { // included for legacy names
