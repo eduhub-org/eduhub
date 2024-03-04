@@ -33,7 +33,7 @@ const saveFile = async (req, res) => {
     logger.debug(`File size in MB: ${fileSizeInMB}`);
 
     if (fileSizeInMB > maxFileSizeInMB) {
-      logger.error("File size exceeds maximum size", { fileSize: content.length, maxFileSizeInMB });
+      logger.error("File size exceeds maximum size", { fileSize: fileSizeInMB, maxFileSize: maxFileSizeInMB});
       return res.status(400).json({
         message: `File size exceeds maximum size of ${maxFileSizeInMB} MB`,
       });

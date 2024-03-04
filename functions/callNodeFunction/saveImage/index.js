@@ -84,9 +84,11 @@ export const saveImage = async (req, res) => {
     logger.debug(`File size in MB: ${fileSizeInMB}`);
 
     if (fileSizeInMB > maxFileSizeInMB) {
-        logger.error("File size exceeds maximum size", { fileSize: content.length, maxFileSize });
-        return res.status(400).json({ message: "File size exceeds maximum size" });
-    }
+        logger.error("File size exceeds maximum size", { fileSize: fileSizeInMB, maxFileSize: maxFileSizeInMB});
+        return res.status(400).json({
+          message: `File size exceeds maximum size of ${maxFileSizeInMB} MB`,
+        });
+     }
 
     const originalFilePath = replacePlaceholders(templatePath, req.body.input);
     logger.debug(`File path after replacing placeholders: ${originalFilePath}`);

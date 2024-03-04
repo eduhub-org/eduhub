@@ -130,7 +130,7 @@ actions:
         - name: name
           value: saveImage
         - name: file-path
-          value: courses/course-$[courseid}/public/cover-image/${filename}
+          value: courses/course-${courseid}/public/cover-image/${filename}
         - name: is-public
           value: "true"
         - name: sizes
