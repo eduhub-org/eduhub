@@ -12,13 +12,14 @@ export const getPublicUrl = (filePath: string): string | null  => {
     log.debug('filePath is null, returning null.');
     return null;
   }
-  
+
 
   log.debug(`isPublicLegacy: ${isPublicLegacy(filePath)}, isPublic: ${isPublic(filePath)}`);
 
   if (isPublicLegacy(filePath)) {
-    log.debug(`Returning legacy public URL: ${filePath}`);
-    return filePath;
+    const decodedFilePath = decodeURIComponent(filePath);
+    log.debug(`Returning legacy public URL: ${decodedFilePath}`);
+    return decodedFilePath;
   } else if (isPublic(filePath)) {
     const serverAddress = process.env.NEXT_PUBLIC_STORAGE_BUCKET_URL;
     const publicUrl = `${serverAddress}/${filePath}`;
@@ -43,10 +44,10 @@ export const getPublicImageUrl = (filePath: string, size: number): string | null
   const resizedFilePathBase = filePath.replace(/\.[^.]+$/, `-${size}`);
   const resizedFilePath = isPublicLegacy(filePath) ? `${resizedFilePathBase}.${originalFileType}` : `${resizedFilePathBase}.webp`;
 
-  const isLegacyProfileImagePath = isPublicLegacy && filePath.includes('/profile_image/');
+  const isLegacyProfileImagePath = isPublicLegacy && filePath.includes('profile_image');
 
   log.debug(`Resized file path: ${resizedFilePath}`);
-  
+
   // Use getPublicUrl to construct the full URL for the resized image
   // If the original file is a legacy public URL, use the original URL since there is no resized version
   const publicUrl = isLegacyProfileImagePath ? getPublicUrl(filePath): getPublicUrl(resizedFilePath);

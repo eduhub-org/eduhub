@@ -124,7 +124,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
               className="h-96 p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat"
               style={
                 {
-                  backgroundImage: `linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url(${backgroundImage})`,
+                  backgroundImage: `linear-gradient(51.32deg, rgba(0, 0, 0, 0.7) 17.57%, rgba(0, 0, 0, 0) 85.36%), url("${backgroundImage}")`,
                 } as React.CSSProperties
               }
             >
