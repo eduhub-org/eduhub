@@ -1,6 +1,7 @@
 import { ApolloProvider } from '@apollo/client';
 import { SessionProvider } from 'next-auth/react';
 import type { AppContext, AppProps } from 'next/app';
+import Head from 'next/head';
 import { FC, useEffect, useState } from 'react';
 import Script from 'next/script';
 import { useRouter } from 'next/router';
@@ -81,6 +82,9 @@ const MyApp: FC<AppProps & InitialProps> & {
           `,
           }}
         />
+        <Head>
+          <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        </Head>
         <Component {...pageProps} />
       </ApolloProvider>
     </SessionProvider>
