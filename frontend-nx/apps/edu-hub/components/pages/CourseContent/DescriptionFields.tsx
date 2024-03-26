@@ -19,7 +19,7 @@ export const DescriptionFields: FC<IProps> = ({ course }) => {
     <>
       {(course.headingDescriptionField1 && course.contentDescriptionField1) ||
       (course.headingDescriptionField2 && course.contentDescriptionField2) ? (
-        <div className="flex flex-wrap bg-edu-course-invited rounded-2xl p-4">
+        <div className="flex flex-wrap bg-edu-course-invited rounded-2xl p-4 mx-6 xl:mx-0">
           {course.headingDescriptionField1 || course.contentDescriptionField1 ? (
             <div
               className={`w-full md:w-1/2 p-6 ${
@@ -47,7 +47,7 @@ export const DescriptionFields: FC<IProps> = ({ course }) => {
         </div>
       ) : null}
       {isAchievementCertificatePossible ? (
-        <div className="flex flex-wrap mt-10 bg-white rounded-2xl p-4">
+        <div className="flex flex-wrap mt-10 bg-white rounded-2xl p-4 mx-6 xl:mx-0">
           <ReactMarkdown className="prose max-w-none" remarkPlugins={[remarkGfm]}>
             {t('generalAchievementCertificateConditions').replace(/\n/g, '  \n')}
           </ReactMarkdown>
