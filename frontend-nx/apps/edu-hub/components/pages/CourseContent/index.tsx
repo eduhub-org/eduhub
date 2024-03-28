@@ -167,13 +167,14 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                   // </div>
                 )}
               <ContentRow className="flex">
-                <PageBlock classname="flex-1 text-white">
-                  {isLoggedIn && (
+                <PageBlock classname="flex-1 text-white space-y-6">
+                  {isLoggedIn && resetValues && (
                     <Onboarding
                       course={course}
                       enrollmentId={enrollmentId}
                       resetValues={resetValues}
                       refetchCourse={refetchCourse}
+                      setResetValues={setResetValues}
                     />
                   )}
                   <LearningGoals learningGoals={course.learningGoals} />

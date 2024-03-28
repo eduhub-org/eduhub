@@ -27,6 +27,7 @@ import {
 import { User, UserVariables } from '../../../queries/__generated__/User';
 import { Button } from '../../common/Button';
 import FormFieldRow from '../../forms/FormFieldRow';
+import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
 
 import type { OperationVariables, ApolloQueryResult } from '@apollo/client';
 import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
@@ -43,6 +44,7 @@ interface OnboardingProps {
   enrollmentId: number;
   refetchCourse: (variables?: Partial<OperationVariables>) => Promise<ApolloQueryResult<CourseWithEnrollment>>;
   resetValues: { [key in keyof Inputs]?: string };
+  setResetValues: Dispatch<any>;
 }
 
 const Onboarding: FC<OnboardingProps> = ({
@@ -50,6 +52,7 @@ const Onboarding: FC<OnboardingProps> = ({
   enrollmentId,
   refetchCourse,
   resetValues,
+  setResetValues,
 }) => {
   const { t } = useTranslation('course');
   const userId = useUserId();
@@ -73,6 +76,7 @@ const Onboarding: FC<OnboardingProps> = ({
   const [universityVisible, setUniversityVisible] = useState(false);
   const [otherUniversityVisible, setOtherUniversityVisible] = useState(false);
   const [otherUniversityLabel, setOtherUniversityLabel] = useState('');
+  const [showDeclineDialog, setShowDeclineDialog] = useState(false);
   const watchEmployment = watch('employment');
   const watchUniversity = watch('university');
 
@@ -91,6 +95,12 @@ const Onboarding: FC<OnboardingProps> = ({
 
       case Employment_enum.OTHER:
         setOtherUniversityLabel(t('common:otherUniversityLabel.other'));
+        setUniversityVisible(false);
+        setOtherUniversityVisible(true);
+        break;
+
+      case Employment_enum.TEACHER:
+        setOtherUniversityLabel(t('common:otherUniversityLabel.teacher'));
         setUniversityVisible(false);
         setOtherUniversityVisible(true);
         break;
@@ -167,6 +177,7 @@ const Onboarding: FC<OnboardingProps> = ({
         },
       });
       refetchCourse();
+      setResetValues(null);
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
       console.log(error);
@@ -182,9 +193,19 @@ const Onboarding: FC<OnboardingProps> = ({
         },
       });
       refetchCourse();
+      setResetValues(null);
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const onDeclineDialogClose = async (isDeclined) => {
+    if (isDeclined) {
+      await onEnrollmentCancellation();
+      setShowDeclineDialog(false);
+    } else {
+      setShowDeclineDialog(false);
     }
   };
 
@@ -210,6 +231,7 @@ const Onboarding: FC<OnboardingProps> = ({
     <div className="bg-edu-course-invited rounded-2xl p-6 !text-edu-black mb-12">
       {!userLoading && !userError && (
         <>
+          <div className="pb-5 text-2xl font-bold">{t('onboardingModal.important')}</div>
           <div className="pb-5 text-xl font-bold">{t('onboardingModal.congratulation')}</div>
           <div className="pb-1">{t('onboardingModal.formIntro')}</div>
           <div>
@@ -217,7 +239,7 @@ const Onboarding: FC<OnboardingProps> = ({
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="flex flex-wrap"></div>
                 <div className="flex flex-wrap">
-                  <div className="w-full lg:w-1/2">
+                  <div className="w-full lg:w-1/2 lg:pr-3">
                     <FormFieldRow<Inputs>
                       label={t('common:employmentStatus')}
                       name="employment"
@@ -239,20 +261,25 @@ const Onboarding: FC<OnboardingProps> = ({
                       />
                     </div>
                     <div className="w-full lg:w-1/2 lg:pl-3">
-                      <FormFieldRow<Inputs>
-                        label={t('common:matriculationNumber')}
-                        name="matriculationNumber"
-                        formColor="text-edu-black"
-                      />
+                      {watchUniversity === University_enum.CAU_KIEL && (
+                        <FormFieldRow<Inputs>
+                          label={t('common:matriculationNumber')}
+                          name="matriculationNumber"
+                          formColor="text-edu-black"
+                          required={universityVisible && watchUniversity === University_enum.CAU_KIEL}
+                        />
+                      )}
                     </div>
                   </div>
                 )}
                 {otherUniversityVisible && (
-                  <FormFieldRow<Inputs>
-                    label={otherUniversityLabel}
-                    name="otherUniversity"
-                    formColor="text-edu-black"
-                  />
+                  <div className="w-full lg:w-1/2">
+                    <FormFieldRow<Inputs>
+                      label={otherUniversityLabel}
+                      name="otherUniversity"
+                      formColor="text-edu-black"
+                    />
+                  </div>
                 )}
                 <div className="pb-3">{t('onboardingModal.confirmSufficientTime')}</div>
                 <div className="pb-3">
@@ -267,7 +294,9 @@ const Onboarding: FC<OnboardingProps> = ({
                     filled
                     inverted
                     className="mt-8 block mx-auto lg:mb-5 disabled:bg-slate-500"
-                    onClick={onEnrollmentCancellation}
+                    onClick={() => {
+                      setShowDeclineDialog(true);
+                    }}
                   >
                     {isSubmitting ? <CircularProgress /> : t('reject')}
                   </Button>
@@ -284,6 +313,12 @@ const Onboarding: FC<OnboardingProps> = ({
               </form>
             </FormProvider>
           </div>
+          <QuestionConfirmationDialog
+            onClose={(isDeclined) => onDeclineDialogClose(isDeclined)}
+            open={showDeclineDialog}
+            confirmationText={t('onboardingModal.declineButtonText')}
+            question={t('onboardingModal.declineConfirmText')}
+          />
         </>
       )}
     </div>
