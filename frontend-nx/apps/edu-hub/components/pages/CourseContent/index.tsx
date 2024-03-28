@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress } from '@material-ui/core';
 
-import OnboardingModal from './OnboardingModal';
+import Onboarding from './Onboarding';
 import { useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { useUserId } from '../../../hooks/user';
 import { CourseWithEnrollment } from '../../../queries/__generated__/CourseWithEnrollment';
@@ -31,7 +31,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const { t, lang } = useTranslation();
   const isLoggedIn = useIsLoggedIn();
   const userId = useUserId();
-  const [onboardingModalOpen, setOnboardingModalOpen] = useState(false);
   const [resetValues, setResetValues] = useState(null);
 
   // Query for authorized course data
@@ -118,8 +117,8 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       {getCoursesAuthorizedLoading || getCoursesUnauthorizedLoading ? (
         <CircularProgress />
       ) : (
-        <div className="flex flex-col space-y-24">
-          <div className="flex flex-col space-y-24">
+        <div className="flex flex-col space-y-12 lg:space-y-24">
+          <div className="flex flex-col space-y-12 lg:space-y-24">
             <div
               className="h-96 p-3 text-3xl text-white flex justify-start items-end bg-cover bg-center bg-no-repeat"
               style={
@@ -133,18 +132,14 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
             <div className="max-w-screen-xl mx-auto w-full">
               <PageBlock>
                 <ContentRow className="items-center">
-                  <div className="flex flex-1 flex-col text-white mb-20">
+                  <div className="flex flex-1 flex-col text-white mb-4 lg:mb-20">
                     {course.weekDay !== 'NONE' ? (
                       <span className="text-xs">{getWeekdayStartAndEndString(course, lang, t)}</span>
                     ) : null}
                     <span className="text-2xl mt-2">{course.tagline}</span>
                   </div>
                   <div className="flex flex-1 lg:max-w-md">
-                    <ActionButtons
-                      course={course}
-                      courseEnrollment={courseEnrollment}
-                      setOnboardingModalOpen={setOnboardingModalOpen}
-                    />
+                    <ActionButtons course={course} courseEnrollment={courseEnrollment} />
                   </div>
                 </ContentRow>
               </PageBlock>
@@ -172,7 +167,15 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                   // </div>
                 )}
               <ContentRow className="flex">
-                <PageBlock classname="flex-1 text-white space-y-6">
+                <PageBlock classname="flex-1 text-white">
+                  {isLoggedIn && (
+                    <Onboarding
+                      course={course}
+                      enrollmentId={enrollmentId}
+                      resetValues={resetValues}
+                      refetchCourse={refetchCourse}
+                    />
+                  )}
                   <LearningGoals learningGoals={course.learningGoals} />
                   {!isDegreeCourse ? (
                     <Sessions sessions={course.Sessions} isLoggedInParticipant={isLoggedInParticipant} />
@@ -187,16 +190,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
               <DescriptionFields course={course} />
             </div>
           </div>
-          {isLoggedIn && (
-            <OnboardingModal
-              course={course}
-              enrollmentId={enrollmentId}
-              open={onboardingModalOpen}
-              resetValues={resetValues}
-              setModalOpen={setOnboardingModalOpen}
-              refetchCourse={refetchCourse}
-            />
-          )}
         </div>
       )}
     </div>

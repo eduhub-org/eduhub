@@ -44,10 +44,10 @@ const CourseLinkInfos: FC<CourseLinkInfosProps> = ({ course }) => {
 interface ActionButtonsProps {
   course: Course_Course_by_pk;
   courseEnrollment: CourseWithEnrollment_Course_by_pk_CourseEnrollments;
-  setOnboardingModalOpen: Dispatch<SetStateAction<boolean>>;
+  // setOnboardingModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export const ActionButtons: FC<ActionButtonsProps> = ({ course, courseEnrollment, setOnboardingModalOpen }) => {
+export const ActionButtons: FC<ActionButtonsProps> = ({ course, courseEnrollment }) => {
   const [isApplicationModalVisible, setApplicationModalVisible] = useState(false);
   const { t } = useTranslation('course-application');
   const isLoggedIn = useIsLoggedIn();
@@ -85,26 +85,26 @@ export const ActionButtons: FC<ActionButtonsProps> = ({ course, courseEnrollment
         content = <span className="bg-gray-300 p-4">{t('status.cancelled')}</span>;
         break;
       }
-      case CourseEnrollmentStatus_enum.INVITED: {
-        if (courseEnrollment.invitationExpirationDate.setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)) {
-          content = (
-            <div className="flex flex-col sm:flex-row sm:items-center">
-              <div className="bg-gray-300 p-4 mb-6 sm:mb-0 sm:w-2/3 sm:mr-5">{t('status.invited')}</div>
-              <Button
-                filled
-                inverted
-                onClick={() => setOnboardingModalOpen(true)}
-                className="bg-edu-course-current sm:w-1/3"
-              >
-                {t('acceptInvitation')}
-              </Button>
-            </div>
-          );
-        } else {
-          content = <span className="bg-gray-300 p-4">{t('status.invitation_expired')}</span>;
-        }
-        break;
-      }
+      // case CourseEnrollmentStatus_enum.INVITED: {
+      //   if (courseEnrollment.invitationExpirationDate.setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)) {
+      //     content = (
+      //       <div className="flex flex-col sm:flex-row sm:items-center">
+      //         <div className="bg-gray-300 p-4 mb-6 sm:mb-0 sm:w-2/3 sm:mr-5">{t('status.invited')}</div>
+      //         <Button
+      //           filled
+      //           inverted
+      //           onClick={() => setOnboardingModalOpen(true)}
+      //           className="bg-edu-course-current sm:w-1/3"
+      //         >
+      //           {t('acceptInvitation')}
+      //         </Button>
+      //       </div>
+      //     );
+      //   } else {
+      //     content = <span className="bg-gray-300 p-4">{t('status.invitation_expired')}</span>;
+      //   }
+      //   break;
+      // }
       case CourseEnrollmentStatus_enum.CONFIRMED: {
         content = <CourseLinkInfos course={course} />;
         break;
