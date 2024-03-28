@@ -3,7 +3,6 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress } from '@material-ui/core';
 
-import Modal from '../../common/Modal';
 import { useAuthedMutation } from '../../../hooks/authedMutation';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
 import { useUserId } from '../../../hooks/user';
@@ -28,6 +27,7 @@ import {
 import { User, UserVariables } from '../../../queries/__generated__/User';
 import { Button } from '../../common/Button';
 import FormFieldRow from '../../forms/FormFieldRow';
+import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
 
 import type { OperationVariables, ApolloQueryResult } from '@apollo/client';
 import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
@@ -39,22 +39,20 @@ type Inputs = {
   matriculationNumber: string;
 };
 
-interface OnboardingModalProps {
+interface OnboardingProps {
   course: CourseWithEnrollment_Course_by_pk | Course_Course_by_pk;
   enrollmentId: number;
-  open: boolean;
   refetchCourse: (variables?: Partial<OperationVariables>) => Promise<ApolloQueryResult<CourseWithEnrollment>>;
   resetValues: { [key in keyof Inputs]?: string };
-  setModalOpen: Dispatch<SetStateAction<boolean>>;
+  setResetValues: Dispatch<any>;
 }
 
-const OnboardingModal: FC<OnboardingModalProps> = ({
+const Onboarding: FC<OnboardingProps> = ({
   course,
   enrollmentId,
-  open,
   refetchCourse,
   resetValues,
-  setModalOpen,
+  setResetValues,
 }) => {
   const { t } = useTranslation('course');
   const userId = useUserId();
@@ -78,6 +76,7 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
   const [universityVisible, setUniversityVisible] = useState(false);
   const [otherUniversityVisible, setOtherUniversityVisible] = useState(false);
   const [otherUniversityLabel, setOtherUniversityLabel] = useState('');
+  const [showDeclineDialog, setShowDeclineDialog] = useState(false);
   const watchEmployment = watch('employment');
   const watchUniversity = watch('university');
 
@@ -96,6 +95,12 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
 
       case Employment_enum.OTHER:
         setOtherUniversityLabel(t('common:otherUniversityLabel.other'));
+        setUniversityVisible(false);
+        setOtherUniversityVisible(true);
+        break;
+
+      case Employment_enum.TEACHER:
+        setOtherUniversityLabel(t('common:otherUniversityLabel.teacher'));
         setUniversityVisible(false);
         setOtherUniversityVisible(true);
         break;
@@ -136,11 +141,10 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
           university: user?.university,
           matriculationNumber: user?.matriculationNumber,
         });
-        setModalOpen(true);
       };
       fetchUser();
     }
-  }, [refetchUser, resetValues, reset, setModalOpen]);
+  }, [refetchUser, resetValues, reset ]);
 
   const [updateUser] = useAuthedMutation<
     UpdateUserOnEnrollmentConfirmation,
@@ -151,9 +155,9 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
     UPDATE_ENROLLMENT_STATUS
   );
 
-  const onCloseConfirmEnrollment = useCallback(() => {
-    setModalOpen(false);
-  }, [setModalOpen]);
+  // const onCloseConfirmEnrollment = useCallback(() => {
+  //   setModalOpen(false);
+  // }, [setModalOpen]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
@@ -173,8 +177,8 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
         },
       });
       refetchCourse();
+      setResetValues(null);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      setModalOpen(false);
     } catch (error) {
       console.log(error);
     }
@@ -189,10 +193,19 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
         },
       });
       refetchCourse();
+      setResetValues(null);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      setModalOpen(false);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const onDeclineDialogClose = async (isDeclined) => {
+    if (isDeclined) {
+      await onEnrollmentCancellation();
+      setShowDeclineDialog(false);
+    } else {
+      setShowDeclineDialog(false);
     }
   };
 
@@ -215,55 +228,75 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
   }
 
   return (
-    <Modal isOpen={open} onClose={onCloseConfirmEnrollment} title={t('onboardingModal.title')}>
+    <div className="bg-edu-course-invited rounded-2xl p-6 !text-edu-black mb-12">
       {!userLoading && !userError && (
         <>
-          <div className="pb-5">{t('onboardingModal.congratulation')}</div>
+          <div className="pb-5 text-2xl font-bold">{t('onboardingModal.important')}</div>
+          <div className="pb-5 text-xl font-bold">{t('onboardingModal.congratulation')}</div>
           <div className="pb-1">{t('onboardingModal.formIntro')}</div>
           <div>
             <FormProvider {...methods}>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="flex flex-wrap"></div>
                 <div className="flex flex-wrap">
-                  <div className="w-1/2">
+                  <div className="w-full lg:w-1/2 lg:pr-3">
                     <FormFieldRow<Inputs>
                       label={t('common:employmentStatus')}
                       name="employment"
                       type="select"
                       options={employmentSelectFormOptions}
+                      formColor="text-edu-black"
                     />
                   </div>
                 </div>
                 {universityVisible && (
                   <div className="flex flex-wrap">
-                    <div className="w-1/2 pr-3">
+                    <div className="w-full lg:w-1/2 lg:pr-3">
                       <FormFieldRow<Inputs>
                         label={t('common:university')}
                         name="university"
                         type="select"
                         options={universitySelectFormOptions}
+                        formColor="text-edu-black"
                       />
                     </div>
-                    <div className="w-1/2 pl-3">
-                      <FormFieldRow<Inputs> label={t('common:matriculationNumber')} name="matriculationNumber" />
+                    <div className="w-full lg:w-1/2 lg:pl-3">
+                      {watchUniversity === University_enum.CAU_KIEL && (
+                        <FormFieldRow<Inputs>
+                          label={t('common:matriculationNumber')}
+                          name="matriculationNumber"
+                          formColor="text-edu-black"
+                          required={universityVisible && watchUniversity === University_enum.CAU_KIEL}
+                        />
+                      )}
                     </div>
                   </div>
                 )}
-                {otherUniversityVisible && <FormFieldRow<Inputs> label={otherUniversityLabel} name="otherUniversity" />}
+                {otherUniversityVisible && (
+                  <div className="w-full lg:w-1/2">
+                    <FormFieldRow<Inputs>
+                      label={otherUniversityLabel}
+                      name="otherUniversity"
+                      formColor="text-edu-black"
+                    />
+                  </div>
+                )}
                 <div className="pb-3">{t('onboardingModal.confirmSufficientTime')}</div>
                 <div className="pb-3">
                   <b>{t('onboardingModal.mattermostInfo1')}</b>
                 </div>
                 <div className="pb-0">{t('onboardingModal.mattermostInfo2')}</div>
-                <div className="flex">
+                <div className="flex flex-col lg:flex-row lg:gap-5">
                   <Button
                     as="button"
                     type="button"
                     disabled={isSubmitting}
                     filled
                     inverted
-                    className="mt-8 block mx-auto mb-5 disabled:bg-slate-500"
-                    onClick={onEnrollmentCancellation}
+                    className="mt-8 block mx-auto lg:mb-5 disabled:bg-slate-500"
+                    onClick={() => {
+                      setShowDeclineDialog(true);
+                    }}
                   >
                     {isSubmitting ? <CircularProgress /> : t('reject')}
                   </Button>
@@ -272,7 +305,7 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
                     type="submit"
                     disabled={isSubmitting}
                     filled
-                    className="mt-8 block mx-auto mb-5 disabled:bg-slate-500"
+                    className="mt-4 lg:mt-8 block mx-auto lg:mb-5 disabled:bg-slate-500"
                   >
                     {isSubmitting ? <CircularProgress /> : t('confirm')}
                   </Button>
@@ -280,10 +313,16 @@ const OnboardingModal: FC<OnboardingModalProps> = ({
               </form>
             </FormProvider>
           </div>
+          <QuestionConfirmationDialog
+            onClose={(isDeclined) => onDeclineDialogClose(isDeclined)}
+            open={showDeclineDialog}
+            confirmationText={t('onboardingModal.declineButtonText')}
+            question={t('onboardingModal.declineConfirmText')}
+          />
         </>
       )}
-    </Modal>
+    </div>
   );
 };
 
-export default OnboardingModal;
+export default Onboarding;

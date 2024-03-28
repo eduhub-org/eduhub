@@ -15,12 +15,15 @@
   "speaker": "Speaker",
   "courseSessions": "Course Sessions",
   "onboardingModal": {
+    "declineConfirmText": "Do you really want to decline the invitation to this course?",
+    "declineButtonText": "Yes",
     "title": "Onboarding for your Course Participation",
     "congratulation": "Congratulations, you are invited to participate in this course!",
     "formIntro": "Please, update you current employment status:",
     "confirmSufficientTime": "Finally, confirm your course participation only if you have the time to fully attend the course until the end.",
+    "important": "IMPORTANT: CONFIRM COURSE INVITATION!",
     "mattermostInfo1": "After confirmation, please click directly on the button to go to the course chat.",
-    "mattermostInfo2": "If you don't have an account in our chat yet, you will need to sign up there first. You will receive all further information from your course instructor in the course chat."
+    "mattermostInfo2": "If you don't have an account in our chat yet, you will need to sign up there first. The course chat is our central communication tool for the courses."
   },
   "toCourseChat": "GO TO COURSE CHAT",
   "toOnlineMeeting": "GO TO ONLINE MEETING"
