@@ -12,7 +12,7 @@ export const ContentRow: FC<IProps> = ({
   return (
     <div
       className={
-        "flex flex-col lg:flex-row space-x-0 space-y-24 lg:space-x-6 lg:space-y-0 " +
+        "flex flex-col lg:flex-row space-x-0 space-y-4 lg:space-x-6 lg:space-y-0 " +
         className
       }
     >

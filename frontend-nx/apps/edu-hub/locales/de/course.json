@@ -15,12 +15,15 @@
   "speaker": "Referent:in",
   "courseSessions": "Kurstermine",
   "onboardingModal": {
+    "declineConfirmText": "Möchtest du die Einladung zu diesem Kurs wirklich ablehnen?",
+    "declineButtonText": "Ja",
     "title": "Onboarding für Deine Kursteilnahme",
     "congratulation": "Herzlichen Glückwunsch zur Einladung für die Teilnahme an diesem Kurs!",
-    "formIntro": "Bitte aktualisiere deinen aktuellen Beschäftigungsstatus:",
+    "formIntro": "Bitte aktualisiere Deinen aktuellen Beschäftigungsstatus:",
     "confirmSufficientTime": "Bitte bestätige die Kursteilnahme nur, wenn Du Zeit hast, bis zum Ende am Kurs teilzunehmen.",
+    "important": "WICHTIG: KURSEINLADUNG BESTÄTIGEN!",
     "mattermostInfo1": "Nach der Bestätigung gehe bitte direkt auf den Button zum Kurs-Chat.",
-    "mattermostInfo2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nAlle weiteren Informationen bekommst Du von Deiner Kursleitung dann im Kurschat."
+    "mattermostInfo2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nDer Kurs-Chat ist unser zentrales Kommunikationstool für die Kurse."
   },
   "toCourseChat": "ZUM KURS-CHAT",
   "toOnlineMeeting": "ZUM ONLINE-MEETING"
