@@ -14,7 +14,7 @@
   "first-name": "Vorname",
   "last-name": "Nachname",
   "email": "E-Mail",
-  "university": "Universität",
+  "university": "Hochschule",
   "matriculation-number": "Matrikelnummer",
   "external-profile": "Link zu externem Profil (LinkedIn, XING, ...)",
   "NONE": "unregelmäßig",
@@ -63,6 +63,7 @@
   "UNEMPLOYED": "Arbeitssuchend",
   "PUPIL": "Schüler:in",
   "CAU_KIEL": "CAU Kiel",
+  "TEACHER": "Lehrkraft",
   "DHSH": "Duale Hochschule Schleswig-Holstein",
   "FH_FLENSBURG": "FH Flensburg",
   "FH_KIEL": "FH Kiel",
@@ -98,7 +99,8 @@
   "otherUniversityLabel": {
     "university": "Name der Universität",
     "organization": "Name der Organisation",
-    "other": "Andere Beschäftigung"
+    "other": "Andere Beschäftigung",
+    "teacher": "Name der Schule"
   },
   "achievement-documentation-template": "Leistungsnachweisvorlage",
   "preview": "Vorschau",

@@ -63,6 +63,7 @@
   "UNEMPLOYED": "Unemployed",
   "PUPIL": "Student in high school",
   "CAU_KIEL": "CAU Kiel",
+  "TEACHER": "Teacher",
   "DHSH": "Duale Hochschule Schleswig-Holstein",
   "FH_FLENSBURG": "FH Flensburg",
   "FH_KIEL": "FH Kiel",
@@ -98,7 +99,8 @@
   "otherUniversityLabel": {
     "university": "Name of the university",
     "organization": "Name of the organization",
-    "other": "Other"
+    "other": "Other",
+    "teacher": "Name of the school"
   },
   "achievement-documentation-template": "Achievement Record Documentation Template",
   "preview": "Preview",
