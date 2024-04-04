@@ -11,6 +11,16 @@ actions:
         - name: name
           value: createCertificate
     comment: Generates a certificate of a given type for a given course and user id
+  - name: createCertificates
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
+      headers:
+        - name: Hasura-Secret
+          value: HASURA_CLOUD_FUNCTION_SECRET
+        - name: Function-Name
+          value: create_certificates
+    comment: createCertificates
   - name: getMoocHubData
     definition:
       kind: ""

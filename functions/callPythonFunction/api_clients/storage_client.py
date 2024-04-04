@@ -1,7 +1,7 @@
 import logging
 import os
 import io
-from io import BytesIO
+
 from unittest.mock import MagicMock
 from typing import Optional
 from datetime import timedelta
