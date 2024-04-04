@@ -134,7 +134,7 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
     }
     max_instance_count = 20
-    available_memory   = "256M"
+    available_memory   = "512M"
     timeout_seconds    = 60
     ingress_settings   = var.cloud_function_ingress_settings
   }

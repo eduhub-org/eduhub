@@ -697,6 +697,7 @@ export enum Employment_enum {
   RETIREE = "RETIREE",
   SELFEMPLOYED = "SELFEMPLOYED",
   STUDENT = "STUDENT",
+  TEACHER = "TEACHER",
   UNEMPLOYED = "UNEMPLOYED",
 }
 
@@ -1282,6 +1283,7 @@ export enum User_select_column {
   externalProfile = "externalProfile",
   firstName = "firstName",
   id = "id",
+  integerId = "integerId",
   lastName = "lastName",
   matriculationNumber = "matriculationNumber",
   newsletterRegistration = "newsletterRegistration",
@@ -1317,6 +1319,7 @@ export enum User_update_column {
   externalProfile = "externalProfile",
   firstName = "firstName",
   id = "id",
+  integerId = "integerId",
   lastName = "lastName",
   matriculationNumber = "matriculationNumber",
   newsletterRegistration = "newsletterRegistration",
@@ -6248,9 +6251,17 @@ export interface User_aggregate_bool_exp_count {
  * order by aggregate values of table "User"
  */
 export interface User_aggregate_order_by {
+  avg?: User_avg_order_by | null;
   count?: order_by | null;
   max?: User_max_order_by | null;
   min?: User_min_order_by | null;
+  stddev?: User_stddev_order_by | null;
+  stddev_pop?: User_stddev_pop_order_by | null;
+  stddev_samp?: User_stddev_samp_order_by | null;
+  sum?: User_sum_order_by | null;
+  var_pop?: User_var_pop_order_by | null;
+  var_samp?: User_var_samp_order_by | null;
+  variance?: User_variance_order_by | null;
 }
 
 /**
@@ -6259,6 +6270,13 @@ export interface User_aggregate_order_by {
 export interface User_arr_rel_insert_input {
   data: User_insert_input[];
   on_conflict?: User_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "User"
+ */
+export interface User_avg_order_by {
+  integerId?: order_by | null;
 }
 
 /**
@@ -6289,6 +6307,7 @@ export interface User_bool_exp {
   externalProfile?: String_comparison_exp | null;
   firstName?: String_comparison_exp | null;
   id?: uuid_comparison_exp | null;
+  integerId?: Int_comparison_exp | null;
   lastName?: String_comparison_exp | null;
   matriculationNumber?: String_comparison_exp | null;
   newsletterRegistration?: Boolean_comparison_exp | null;
@@ -6319,6 +6338,7 @@ export interface User_insert_input {
   externalProfile?: string | null;
   firstName?: string | null;
   id?: any | null;
+  integerId?: number | null;
   lastName?: string | null;
   matriculationNumber?: string | null;
   newsletterRegistration?: boolean | null;
@@ -6340,6 +6360,7 @@ export interface User_max_order_by {
   externalProfile?: order_by | null;
   firstName?: order_by | null;
   id?: order_by | null;
+  integerId?: order_by | null;
   lastName?: order_by | null;
   matriculationNumber?: order_by | null;
   otherUniversity?: order_by | null;
@@ -6357,6 +6378,7 @@ export interface User_min_order_by {
   externalProfile?: order_by | null;
   firstName?: order_by | null;
   id?: order_by | null;
+  integerId?: order_by | null;
   lastName?: order_by | null;
   matriculationNumber?: order_by | null;
   otherUniversity?: order_by | null;
@@ -6400,6 +6422,7 @@ export interface User_order_by {
   externalProfile?: order_by | null;
   firstName?: order_by | null;
   id?: order_by | null;
+  integerId?: order_by | null;
   lastName?: order_by | null;
   matriculationNumber?: order_by | null;
   newsletterRegistration?: order_by | null;
@@ -6409,6 +6432,55 @@ export interface User_order_by {
   university?: order_by | null;
   universityByUniversity?: University_order_by | null;
   updated_at?: order_by | null;
+}
+
+/**
+ * order by stddev() on columns of table "User"
+ */
+export interface User_stddev_order_by {
+  integerId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "User"
+ */
+export interface User_stddev_pop_order_by {
+  integerId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "User"
+ */
+export interface User_stddev_samp_order_by {
+  integerId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "User"
+ */
+export interface User_sum_order_by {
+  integerId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "User"
+ */
+export interface User_var_pop_order_by {
+  integerId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "User"
+ */
+export interface User_var_samp_order_by {
+  integerId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "User"
+ */
+export interface User_variance_order_by {
+  integerId?: order_by | null;
 }
 
 /**

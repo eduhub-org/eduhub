@@ -6,7 +6,7 @@
   "noDegreeElementsCompleted": "Bisher hast Du keine Elemente abgeschlossen.",
   "currentDegreeElements": "Aktuelle Angebote im Rahmen des Degrees",
   "noDegreeElementsAvailable": "Aktuell gibt es keine laufenden Angebote zu diesem Degree.",
-  "generalAchievementCertificateConditions": "**Online-Teilnahme:**\nWenn eine Online-Teilnahmen möglich ist, wird die Teilnahme nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist.\n\n**Kosten:**\nUnsere Kurse sind offen für alle und kostenlos für Studierende, Schüler:innen, Auszubildende, Gründer:innen, Lehrkräfte, wissenschaftliche Mitarbeiter:innen, Arbeitssuchende, Geflüchtete und Rentner:innen. Für Berufstätige fällt eine Gebühr in Höhe von 200 Euro für den Erwerb eines Leistungszertifikats an. Der Erwerb eines Leistungszertifikats ist in verschiedenen Kursen mit kursinternen Projekten eine Teilnahmevoraussetzung. Über team@opencampus.sh kann ein Stipendium beantragt werden.",
+  "generalAchievementCertificateConditions": "**Online-Teilnahme:**\nWenn eine Online-Teilnahme möglich ist, wird die Teilnahme nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist.\n\n**Semester Opening:**\nWir laden euch zum kursübergreifenden Semester Opening am 11. April im Wissenschaftszentrum Kiel ein! 💛\nHier bekommt ihr Einblicke hinter die Kulissen unserer OC-Community, lernt Kursleitungen und andere Kursteilnehmer:innen kennen und könnt in inspirierenden Sessions die Kieler Unternehmenslandschaft entdecken.\nZu allen Infos und zur Anmeldung geht es hier: [https://forms.office.com/e/LUimmFDDdZ](https://forms.office.com/e/LUimmFDDdZ)",
   "externalProfile": "Homepage",
   "linkedinProfile": "LinkedIn-Profil",
   "xingProfile": "Xing-Profil",
@@ -15,12 +15,15 @@
   "speaker": "Referent:in",
   "courseSessions": "Kurstermine",
   "onboardingModal": {
+    "declineConfirmText": "Möchtest du die Einladung zu diesem Kurs wirklich ablehnen?",
+    "declineButtonText": "Ja",
     "title": "Onboarding für Deine Kursteilnahme",
     "congratulation": "Herzlichen Glückwunsch zur Einladung für die Teilnahme an diesem Kurs!",
-    "formIntro": "Bitte aktualisiere deinen aktuellen Beschäftigungsstatus:",
+    "formIntro": "Bitte aktualisiere Deinen aktuellen Beschäftigungsstatus:",
     "confirmSufficientTime": "Bitte bestätige die Kursteilnahme nur, wenn Du Zeit hast, bis zum Ende am Kurs teilzunehmen.",
+    "important": "WICHTIG: KURSEINLADUNG BESTÄTIGEN!",
     "mattermostInfo1": "Nach der Bestätigung gehe bitte direkt auf den Button zum Kurs-Chat.",
-    "mattermostInfo2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nAlle weiteren Informationen bekommst Du von Deiner Kursleitung dann im Kurschat."
+    "mattermostInfo2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nDer Kurs-Chat ist unser zentrales Kommunikationstool für die Kurse."
   },
   "toCourseChat": "ZUM KURS-CHAT",
   "toOnlineMeeting": "ZUM ONLINE-MEETING"

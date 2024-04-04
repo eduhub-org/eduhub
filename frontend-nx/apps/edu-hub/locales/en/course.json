@@ -6,7 +6,7 @@
   "noDegreeElementsCompleted": "You have not completed any Degree Elements yet.",
   "currentDegreeElements": "Current Offerings that are Part of the Degree",
   "noDegreeElementsAvailable": "Currently there are no ongoing offerings for this Degree.",
-  "generalAchievementCertificateConditions": "**Online Participation:**\nIf online participation is possible, attendances are only counted as present if the camera is continuously turned on!\n\n**Cost:**\nOur courses are open to everyone and free for university or high school students, trainees, founders, teachers, research staff, job seekers, refugees, and retirees. For working professionals, a fee of 200 Euros is charged for obtaining an achievement certificate, which is mandatory for the participation in some courses. A scholarship can be applied for through team@opencampus.sh.",
+  "generalAchievementCertificateConditions": "**Online Participation:**\nIf online participation is possible, attendances are only counted as present if the camera is continuously turned on!\n\n**Semester Opening:**\nWe invite you to the Semester Opening for all courses on April 11 at the Wissenschaftszentrum Kiel! 💛\nHere you can get a glimpse behind the scenes of our OC community, get to know course instructors and other course participants and discover Kiel’s corporate landscape in inspiring sessions.\nClick here for all information and to register: [https://forms.office.com/e/LUimmFDDdZ](https://forms.office.com/e/LUimmFDDdZ)",
   "externalProfile": "Homepage",
   "linkedinProfile": "LinkedIn Profile",
   "xingProfile": "Xing Profile",
@@ -15,12 +15,15 @@
   "speaker": "Speaker",
   "courseSessions": "Course Sessions",
   "onboardingModal": {
+    "declineConfirmText": "Do you really want to decline the invitation to this course?",
+    "declineButtonText": "Yes",
     "title": "Onboarding for your Course Participation",
     "congratulation": "Congratulations, you are invited to participate in this course!",
     "formIntro": "Please, update you current employment status:",
     "confirmSufficientTime": "Finally, confirm your course participation only if you have the time to fully attend the course until the end.",
+    "important": "IMPORTANT: CONFIRM COURSE INVITATION!",
     "mattermostInfo1": "After confirmation, please click directly on the button to go to the course chat.",
-    "mattermostInfo2": "If you don't have an account in our chat yet, you will need to sign up there first. You will receive all further information from your course instructor in the course chat."
+    "mattermostInfo2": "If you don't have an account in our chat yet, you will need to sign up there first. The course chat is our central communication tool for the courses."
   },
   "toCourseChat": "GO TO COURSE CHAT",
   "toOnlineMeeting": "GO TO ONLINE MEETING"

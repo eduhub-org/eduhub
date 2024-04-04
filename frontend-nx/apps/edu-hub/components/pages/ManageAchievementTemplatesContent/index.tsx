@@ -134,26 +134,24 @@ const ManageAchievementTemplatesContent: FC = () => {
   return (
     <PageBlock>
       <div className="max-w-screen-xl mx-auto mt-20">
-        {loading && <Loading />}
-        {error && <div>Es ist ein Fehler aufgetreten</div>}
-        {!loading && !error && (
-          <div>
-            <div className="text-white">
-              <EhAddButton
-                buttonClickCallBack={onAddAchievementDocumentationTemplateClick}
-                text={t('addUserAchievementDocumentationTemplateText')}
-              />
-            </div>
-            <TableGrid
-              columns={columns}
-              data={data.AchievementDocumentationTemplate}
-              deleteMutation={DELETE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE}
-              refetchQueries={['AchievementDocumentationTemplates']}
-              showDelete
-              translationNamespace="manageAchievementTemplates"
+        <div>
+          <div className="text-white">
+            <EhAddButton
+              buttonClickCallBack={onAddAchievementDocumentationTemplateClick}
+              text={t('addUserAchievementDocumentationTemplateText')}
             />
           </div>
-        )}
+          <TableGrid
+            columns={columns}
+            data={data.AchievementDocumentationTemplate}
+            deleteMutation={DELETE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE}
+            error={error}
+            loading={loading}
+            refetchQueries={['AchievementDocumentationTemplates']}
+            showDelete
+            translationNamespace="manageAchievementTemplates"
+          />
+        </div>
       </div>
     </PageBlock>
   );

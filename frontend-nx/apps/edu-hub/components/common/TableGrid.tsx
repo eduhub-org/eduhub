@@ -1,9 +1,11 @@
-import React, { useState, useMemo } from 'react';
-import { DocumentNode } from '@apollo/client';
-import { TextField } from '@material-ui/core';
+import React, { useState, useMemo, useCallback, ReactElement, Dispatch, SetStateAction } from 'react';
+import { ApolloError, DocumentNode } from '@apollo/client';
+import { CircularProgress, TextField } from '@material-ui/core';
 import useTranslation from 'next-translate/useTranslation';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import { MdArrowBack, MdArrowForward } from 'react-icons/md';
+import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import {
   ColumnDef,
   flexRender,
@@ -13,70 +15,113 @@ import {
   SortingState,
   useReactTable,
   FilterFn,
+  OnChangeFn,
 } from '@tanstack/react-table';
 import { rankItem } from '@tanstack/match-sorter-utils';
 
 import TableGridDeleteButton from './TableGridDeleteButton';
+import EhAddButton from '../common/EhAddButton';
 
 interface BaseRow {
   id: number;
 }
 
 interface TableGridProps<T extends BaseRow> {
+  addButtonText?: string;
   data: T[];
   columns: ColumnDef<T>[];
   deleteMutation?: DocumentNode;
+  enablePagination?: boolean;
+  error: ApolloError;
+  expandableRowComponent?: (props: { row: T }) => ReactElement | null;
+  loading: boolean;
+  pageIndex?: number;
+  pages?: number;
+  pageSize?: number;
   refetchQueries: string[];
+  searchFilter?: string;
+  setPageIndex?: (number) => void;
+  setSearchFilter?: Dispatch<SetStateAction<string>>;
   showCheckbox?: boolean;
   showDelete?: boolean;
   showGlobalSearchField?: boolean;
   translationNamespace?: string;
+  onAddButtonClick?: () => void; // Optional Add button callback
 }
 
 const TableGrid = <T extends BaseRow>({
+  addButtonText,
   data,
   columns,
   deleteMutation,
+  enablePagination = false,
+  error,
+  expandableRowComponent,
+  loading,
+  pageIndex = 0,
+  pages,
+  pageSize,
   refetchQueries,
+  searchFilter,
+  setSearchFilter,
+  setPageIndex,
   showCheckbox,
   showDelete,
   showGlobalSearchField = true,
   translationNamespace,
+  onAddButtonClick, // Add button callback
 }: TableGridProps<T>) => {
   const { t } = useTranslation(translationNamespace);
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState('');
 
-  // Global filter function
+  const handlePrevious = () => setPageIndex(Math.max(0, pageIndex - 1));
+  const handleNext = () => setPageIndex(pageIndex + 1);
+
+  const ExpandableRowComponent = expandableRowComponent;
+
+  const toggleRowExpansion = useCallback(
+    (rowId: number) => {
+      const newExpandedRows = new Set(expandedRows);
+      if (expandedRows.has(rowId)) {
+        newExpandedRows.delete(rowId);
+      } else {
+        newExpandedRows.add(rowId);
+      }
+      setExpandedRows(newExpandedRows);
+    },
+    [expandedRows]
+  );
+
   const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-    // Rank the item
     const itemRank = rankItem(row.getValue(columnId), value);
-    // Store the itemRank info
-    addMeta({
-      itemRank,
-    });
-    // Return if the item should be filtered in/out
+    addMeta({ itemRank });
     return itemRank.passed;
   };
 
+  const onGlobalFilterChange: OnChangeFn<string> = useCallback(
+    async (value) => {
+      setSearchFilter(value);
+      setPageIndex(0);
+    },
+    [setPageIndex, setSearchFilter]
+  );
+
   const tableColumns = useMemo(() => {
-    // Create the checkbox column if needed
-    const checkboxColumn = showCheckbox
-      ? [
-          {
-            id: 'selection',
-            cell: ({ row }) => <input type="checkbox" />,
-          },
-        ]
-      : [];
+    const expandCollapseColumn: ColumnDef<T>[] = [
+      {
+        id: 'expander',
+        header: '',
+        cell: ({ row }) => (
+          <button onClick={() => toggleRowExpansion(row.original.id)}>
+            {expandedRows.has(row.original.id) ? <IoIosArrowUp /> : <IoIosArrowDown />}
+          </button>
+        ),
+      },
+    ];
 
-    // Create the data columns based on the input columns prop
-    const dataColumns = columns.map((col) => ({
-      ...col,
-    }));
-
-    // Create the delete column if needed
+    const dataColumns = columns.map((col) => ({ ...col }));
     const deleteColumn =
       showDelete && deleteMutation
         ? [
@@ -84,31 +129,30 @@ const TableGrid = <T extends BaseRow>({
               id: 'delete',
               cell: ({ row }) =>
                 deleteMutation && (
-                  <TableGridDeleteButton deleteMutation={deleteMutation} id={row.original.id} refetchQueries={refetchQueries} />
+                  <TableGridDeleteButton
+                    deleteMutation={deleteMutation}
+                    id={row.original.id}
+                    refetchQueries={refetchQueries}
+                  />
                 ),
             },
           ]
         : [];
-
-    // Combine the columns without mutations
-    return [...checkboxColumn, ...dataColumns, ...deleteColumn];
-  }, [columns, deleteMutation, refetchQueries, showCheckbox, showDelete]);
+    return [...dataColumns, ...expandCollapseColumn, ...deleteColumn];
+  }, [columns, deleteMutation, refetchQueries, showDelete, expandedRows, toggleRowExpansion]);
 
   const table = useReactTable({
     data,
-    defaultColumn: {
-      enableSorting: false,
-    },
+    defaultColumn: { enableSorting: false },
     columns: tableColumns,
-    filterFns: {
-      fuzzy: fuzzyFilter,
-    },
+    filterFns: { fuzzy: fuzzyFilter },
     state: {
       sorting,
-      globalFilter,
+      globalFilter: searchFilter,
+      ...(enablePagination && { pagination: { pageIndex, pageSize: 15 } }),
     },
     globalFilterFn: fuzzyFilter,
-    onGlobalFilterChange: setGlobalFilter,
+    onGlobalFilterChange: onGlobalFilterChange,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -119,26 +163,23 @@ const TableGrid = <T extends BaseRow>({
 
   return (
     <div>
-      {/* Global Search Input */}
       {showGlobalSearchField && (
-        <div className="flex justify-end">
+        <div className={`flex ${onAddButtonClick ? 'justify-between' : 'justify-end'}`}>
+          {onAddButtonClick && (
+            <div className="text-white mb-4">
+              <EhAddButton buttonClickCallBack={onAddButtonClick} text={addButtonText} />
+            </div>
+          )}
           <TextField
             className="!w-64 bg-gray-600 border !mb-6"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            label="Search"
+            value={searchFilter}
+            onChange={(e) => onGlobalFilterChange(e.target.value)}
+            label={t('search')}
             variant="outlined"
             size="small"
             fullWidth
-            InputProps={{
-              style: {
-                color: 'white', // Text color
-                borderColor: 'white', // Border color,
-              },
-            }}
-            InputLabelProps={{
-              style: { color: 'white' }, // Label color
-            }}
+            InputProps={{ style: { color: 'white', borderColor: 'white' } }}
+            InputLabelProps={{ style: { color: 'white' } }}
           />
         </div>
       )}
@@ -153,12 +194,12 @@ const TableGrid = <T extends BaseRow>({
             {showCheckbox && <div className="col-span-1" />}
             {headerGroup.headers.map((header) => (
               <div
-                className={`${header.column.columnDef.meta?.className} mr-3 ml-3 col-span-${header.column.columnDef.meta?.width} relative`}
                 key={header.id}
+                className={`${header.column.columnDef.meta?.className} mr-3 ml-3 col-span-${header.column.columnDef.meta?.width} relative`}
                 onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
               >
                 <div className="flex-1 flex items-center">
-                  <div>{t(header.column.id)}</div>
+                  {header.column.columnDef.header === '' ? null : <div>{t(header.column.id)}</div>}
                   {header.column.getCanSort() && (
                     <div className="ml-1 flex flex-col items-center">
                       <ArrowDropUpIcon style={{ opacity: header.column.getIsSorted() === 'asc' ? 1 : 0.5 }} />
@@ -173,24 +214,63 @@ const TableGrid = <T extends BaseRow>({
         ))}
       </div>
 
-      {/* Data Rows */}
-      {table.getRowModel().rows.map((row) => (
-        <div
-          className="${className} grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center mb-1 py-2 bg-edu-light-gray"
-          key={row.id}
-        >
-          {row.getVisibleCells().map((cell) => {
-            return (
-              <div
-                className={`${cell.column.columnDef.meta?.className} mr-3 ml-3 col-span-${cell.column.columnDef.meta?.width}`}
-                key={cell.id}
-              >
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </div>
-            );
-          })}
+      {loading && (
+        <div className="flex justify-center items-center">
+          <CircularProgress />
         </div>
-      ))}
+      )}
+
+      {/* Data Rows */}
+      {!loading &&
+        !error &&
+        table.getRowModel().rows.map((row) => (
+          <React.Fragment key={row.id}>
+            {/* Primary Row */}
+            <div
+              className={`grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center ${
+                expandedRows.has(row.original.id) && expandableRowComponent ? 'mb-0' : 'mb-1'
+              } py-2 bg-edu-light-gray`}
+            >
+              {row.getVisibleCells().map((cell) => (
+                <div
+                  key={cell.id}
+                  className={`${cell.column.columnDef.meta?.className} mr-3 ml-3 col-span-${cell.column.columnDef.meta?.width}`}
+                >
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </div>
+              ))}
+            </div>
+            {/* Expandable Second Row */}
+            {expandedRows.has(row.original.id) && expandableRowComponent && (
+              <div className="items-center mb-1 py-2 bg-edu-light-gray">
+                <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
+              </div>
+            )}
+          </React.Fragment>
+        ))}
+
+      {/* Pagination */}
+      {!loading && !error && enablePagination && (
+        <div className="flex justify-end pb-10 text-white mt-4">
+          <div className="flex flex-row items-center space-x-5">
+            {pageIndex > 0 && (
+              <MdArrowBack
+                className="border-2 rounded-full cursor-pointer hover:bg-indigo-100"
+                size={30}
+                onClick={handlePrevious}
+              />
+            )}
+            <p className="font-medium">{t('paginationText', { currentPage: pageIndex + 1, totalPage: pages })}</p>
+            {pageIndex < pages - 1 && (
+              <MdArrowForward
+                className="border-2 rounded-full cursor-pointer hover:bg-indigo-100"
+                size={30}
+                onClick={handleNext}
+              />
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

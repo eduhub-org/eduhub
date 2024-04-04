@@ -9,6 +9,7 @@ type FormFieldRowProps<FieldNames> = {
   placeholder?: string;
   required?: boolean;
   className?: string;
+  formColor?: string;
   options?: { label: string; value: string }[];
   type?: 'text' | 'email' | 'select' | 'textarea' | 'file';
 } & InputHTMLAttributes<HTMLInputElement> &
@@ -21,6 +22,7 @@ const FormFieldRow = <FieldNames,>({
   placeholder,
   required = false,
   className = '',
+  formColor = 'text-gray-400',
   type = 'text',
   ...rest
 }: FormFieldRowProps<FieldNames>) => {
@@ -32,11 +34,8 @@ const FormFieldRow = <FieldNames,>({
   const { t } = useTranslation();
 
   return (
-    <div className="relative">
-      <label
-        htmlFor={name}
-        className="${className} text-xs uppercase tracking-widest font-medium text-gray-400"
-      >
+    <div className={`relative ${formColor}`}>
+      <label htmlFor={name} className={`${className} text-xs uppercase tracking-widest font-medium ${formColor}`}>
         {label}
       </label>
       {(type === 'text' || type === 'email') && (
@@ -45,7 +44,7 @@ const FormFieldRow = <FieldNames,>({
           type={type}
           placeholder={placeholder || label}
           {...register(name, { required })}
-          className="bg-edu-light-gray p-4 mb-5 w-full block"
+          className={`bg-edu-light-gray p-4 mb-5 w-full block ${formColor}`}
           aria-invalid={errors[name] ? 'true' : 'false'}
           {...rest}
         />
@@ -55,7 +54,7 @@ const FormFieldRow = <FieldNames,>({
           id={name}
           placeholder={placeholder || label}
           {...register(name, { required })}
-          className="bg-edu-light-gray p-4 mb-5 w-full block"
+          className={`bg-edu-light-gray p-4 mb-5 w-full block ${formColor}`}
           aria-invalid={errors[name] ? 'true' : 'false'}
           defaultValue=""
           {...rest}
