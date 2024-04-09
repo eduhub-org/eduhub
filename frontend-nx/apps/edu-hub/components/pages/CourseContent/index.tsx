@@ -42,6 +42,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       id,
       userId,
     },
+    fetchPolicy:'cache-and-network',
     async onCompleted(data) {
       // Check if user has been invited to the course and the invitation has not expired
       const courseEnrollment = getCourseEnrollment(data?.Course_by_pk, userId);
