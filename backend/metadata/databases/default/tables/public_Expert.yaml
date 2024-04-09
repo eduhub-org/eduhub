@@ -20,6 +20,15 @@ array_relationships:
         table:
           name: SessionSpeaker
           schema: public
+insert_permissions:
+  - role: instructor_access
+    permission:
+      check: {}
+      columns:
+        - created_at
+        - description
+        - updated_at
+        - userId
 select_permissions:
   - role: anonymous
     permission:
