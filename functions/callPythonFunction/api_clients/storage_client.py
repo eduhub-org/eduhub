@@ -1,11 +1,11 @@
 import logging
 import os
 import io
-
+from io import BytesIO
 from unittest.mock import MagicMock
 from typing import Optional
 from datetime import timedelta
-
+import base64
 from google import auth
 from google.auth.transport import requests
 from google.cloud.storage import Client
@@ -80,10 +80,14 @@ class StorageClient:
 
     def download_file(self, file_path):
         if self.env == "development":
-            local_path = os.path.join("/home/node/www/", self.bucket_name, file_path)
+            base_dir = os.path.dirname(__file__)  # Gibt das Verzeichnis des aktuellen Skripts zurück
+            local_path = os.path.join(base_dir, "opencampus_attendencecert_template_WS2022.png")
             with open(local_path, 'rb') as f:
                 file_data = f.read()
-            return BytesIO(file_data)
+            image_data = BytesIO(file_data)
+            mime_type = "image/png"
+            base64_encoded_data = base64.b64encode(image_data.getvalue()).decode()
+            return f"data:{mime_type};base64,{base64_encoded_data}"
         else:
             blob = self.storage_client.bucket(self.bucket_name).blob(file_path)
             blob_data = blob.download_as_bytes()

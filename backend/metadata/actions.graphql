@@ -11,7 +11,7 @@ type Mutation {
     userIds: [uuid!]!
     courseId: Int!
     certificateType: String!
-  ): result
+  ): String
 }
 
 type Query {
