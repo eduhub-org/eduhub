@@ -17,26 +17,18 @@ export const useIsLoggedIn = (): boolean => {
 export const useIsAdmin = () => {
   const { data: sessionData } = useSession();
   return (
-    sessionData?.profile?.['https://hasura.io/jwt/claims']?.[
-      'x-hasura-allowed-roles'
-    ]?.includes('admin-ras') ?? false
+    sessionData?.profile?.['https://hasura.io/jwt/claims']?.['x-hasura-allowed-roles']?.includes('admin-ras') ?? false
   );
 };
 
 export const useIsInstructor = () => {
   const { data: sessionData } = useSession();
   return (
-    sessionData?.profile?.['https://hasura.io/jwt/claims']?.[
-      'x-hasura-allowed-roles'
-    ]?.includes('instructor') ?? false
+    sessionData?.profile?.['https://hasura.io/jwt/claims']?.['x-hasura-allowed-roles']?.includes('instructor') ?? false
   );
 };
 
 export const useIsUser = () => {
   const { data: sessionData } = useSession();
-  return (
-    sessionData?.profile?.['https://hasura.io/jwt/claims']?.[
-      'x-hasura-allowed-roles'
-    ]?.includes('user') ?? false
-  );
+  return sessionData?.profile?.['https://hasura.io/jwt/claims']?.['x-hasura-allowed-roles']?.includes('user') ?? false;
 };

@@ -1,10 +1,8 @@
-import { FC, useCallback, useMemo, useState } from "react";
-import { useRasConfig } from "../../hooks/ras";
+import { FC, useCallback, useMemo, useState } from 'react';
+import { useRasConfig } from '../../hooks/ras';
 
-import { Solve } from "@bygdle/javascript-lp-solver";
-import {
-  AllRequests,
-} from "../../queries/__generated__/AllRequests";
+import { Solve } from '@bygdle/javascript-lp-solver';
+import { AllRequests } from '../../queries/__generated__/AllRequests';
 import {
   ALL_REQUESTS,
   BATCH_INSERT_MAIL_LOG,
@@ -12,23 +10,12 @@ import {
   SCHOOLS_MAILS_INFO,
   SCIENTIST_MAILS_INFO,
   UPDATE_ASSIGNMENTS,
-} from "../../queries/ras_matching";
-import { Button } from "@material-ui/core";
-import {
-  useAdminMutation,
-} from "../../hooks/authedMutation";
-import {
-  HideProgramById,
-  HideProgramByIdVariables,
-} from "../../queries/__generated__/HideProgramById";
-import {
-  UpdateAssignments,
-  UpdateAssignmentsVariables,
-} from "../../queries/__generated__/UpdateAssignments";
-import {
-  MailLog_insert_input,
-  SchoolClassRequest_insert_input,
-} from "../../__generated__/globalTypes";
+} from '../../queries/ras_matching';
+import { Button } from '@material-ui/core';
+import { useAdminMutation } from '../../hooks/authedMutation';
+import { HideProgramById, HideProgramByIdVariables } from '../../queries/__generated__/HideProgramById';
+import { UpdateAssignments, UpdateAssignmentsVariables } from '../../queries/__generated__/UpdateAssignments';
+import { MailLog_insert_input, SchoolClassRequest_insert_input } from '../../__generated__/globalTypes';
 import {
   MailDescription,
   ScientistSingleAcceptedInfo,
@@ -36,22 +23,16 @@ import {
   createAcceptScientist,
   createRejectSchool,
   createRejectScientist,
-} from "./mail";
+} from './mail';
 import {
   SchoolsMailsInfo,
   SchoolsMailsInfoVariables,
   SchoolsMailsInfo_SchoolClassRequest,
-} from "../../queries/__generated__/SchoolsMailsInfo";
-import {
-  ScientistMailInfos,
-  ScientistMailInfosVariables,
-} from "../../queries/__generated__/ScientistMailInfos";
-import { dayFormat } from "../MultiDateDisplay";
-import {
-  BatchInsertMail,
-  BatchInsertMailVariables,
-} from "../../queries/__generated__/BatchInsertMail";
-import { useAdminQuery } from "../../hooks/authedQuery";
+} from '../../queries/__generated__/SchoolsMailsInfo';
+import { ScientistMailInfos, ScientistMailInfosVariables } from '../../queries/__generated__/ScientistMailInfos';
+import { dayFormat } from '../MultiDateDisplay';
+import { BatchInsertMail, BatchInsertMailVariables } from '../../queries/__generated__/BatchInsertMail';
+import { useAdminQuery } from '../../hooks/authedQuery';
 
 interface CourseOffer {
   days: number[];
@@ -71,7 +52,8 @@ interface AssignmentResult {
   offerId: number;
 }
 
-function shuffle<T>(array: T[]) { //eslint-disable-line
+function shuffle<T>(array: T[]) {
+  //eslint-disable-line
   let currentIndex = array.length;
   let randomIndex;
 
@@ -82,10 +64,7 @@ function shuffle<T>(array: T[]) { //eslint-disable-line
     currentIndex--;
 
     // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex],
-      array[currentIndex],
-    ];
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
   }
 
   return array;
@@ -109,15 +88,15 @@ const solveMatching = (
   for (const request of requests) {
     for (const rday of request.days) {
       seenDays.add(rday);
-      const vname = "c" + request.classId + "o" + request.offerId + "d" + rday;
+      const vname = 'c' + request.classId + 'o' + request.offerId + 'd' + rday;
       variables[vname] = {
         points: 1,
-        ["o" + request.offerId + "capacity"]: 1,
-        ["o" + request.offerId + "d" + rday]: 1,
-        ["c" + request.classId + "bonus"]: 1,
-        ["c" + request.classId + "o" + request.offerId]: 1,
-        ["c" + request.classId + "d" + rday]: 1,
-        ["c" + request.classId + "capacity"]: 1,
+        ['o' + request.offerId + 'capacity']: 1,
+        ['o' + request.offerId + 'd' + rday]: 1,
+        ['c' + request.classId + 'bonus']: 1,
+        ['c' + request.classId + 'o' + request.offerId]: 1,
+        ['c' + request.classId + 'd' + rday]: 1,
+        ['c' + request.classId + 'capacity']: 1,
         [vname]: 1,
       };
 
@@ -127,10 +106,10 @@ const solveMatching = (
     if (!seenClasses.has(request.classId)) {
       seenClasses.add(request.classId);
 
-      const vname = "c-bonus-" + request.classId;
+      const vname = 'c-bonus-' + request.classId;
       variables[vname] = {
         points: 10000, // this way the 10ks are the bonses taken, the smaller part of the result score will be the number of matches
-        ["c" + request.classId + "bonus"]: -1,
+        ['c' + request.classId + 'bonus']: -1,
         [vname]: 1,
       };
 
@@ -146,69 +125,65 @@ const solveMatching = (
   const constraints: any = {};
   for (const offer of offers) {
     // constraint for each offer-maxDays!
-    constraints["o" + offer.id + "capacity"] = { max: offer.maxDays };
+    constraints['o' + offer.id + 'capacity'] = { max: offer.maxDays };
 
     for (const oday of offer.days) {
       // constraints for each offer-day to prevent assignment of more than 1 class per day
-      constraints["o" + offer.id + "d" + oday] = { max: 1 };
+      constraints['o' + offer.id + 'd' + oday] = { max: 1 };
     }
 
     for (const cid of Object.keys(cids)) {
       // constraint for each class: should not get the same assignment twice
-      constraints["c" + cid + "o" + offer.id] = { max: 1 };
+      constraints['c' + cid + 'o' + offer.id] = { max: 1 };
 
       // constraint for each class: only one offer assigned per day
       for (const dIndex of seenDays) {
-        constraints["c" + cid + "d" + dIndex] = { max: 1 };
+        constraints['c' + cid + 'd' + dIndex] = { max: 1 };
       }
     }
   }
 
   // constraints for forced assignments, if any
   for (const fa of forceAssignments) {
-    constraints["c" + fa.classId + "o" + fa.offerId + "d" + fa.day] = {
+    constraints['c' + fa.classId + 'o' + fa.offerId + 'd' + fa.day] = {
       min: 1,
     };
   }
 
   for (const cid of Object.keys(cids)) {
     // constraint: prevent taking the bonus points for a class that has not at least one request assigned to it
-    constraints["c" + cid + "bonus"] = { min: 0 };
+    constraints['c' + cid + 'bonus'] = { min: 0 };
 
     // constaint: limit number of maximum assignments the classes can get at most
-    constraints["c" + cid + "capacity"] = { max: maxAssignmentsPerClass };
+    constraints['c' + cid + 'capacity'] = { max: maxAssignmentsPerClass };
 
     // constraint: every class bonus can only be given once
-    constraints["c-bonus-" + cid] = { max: 1 };
+    constraints['c-bonus-' + cid] = { max: 1 };
   }
 
   const model: any = {
-    optimize: "points",
-    opType: "max",
+    optimize: 'points',
+    opType: 'max',
     constraints,
     variables,
     ints,
   };
 
-  console.log("model", model);
+  console.log('model', model);
 
   const solution = Solve(model);
 
-  console.log("solution", solution);
+  console.log('solution', solution);
 
   if (solution.feasible) {
-    const allPossibleAssignments = Object.keys(variables).filter(
-      (x) => !x.includes("-bonus-")
-    );
+    const allPossibleAssignments = Object.keys(variables).filter((x) => !x.includes('-bonus-'));
 
     const resultAssignments: AssignmentResult[] = [];
 
     for (const possibleAssignment of allPossibleAssignments) {
       if (solution[possibleAssignment] === 1) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [_empty, classStr, offerStr, dayStr] = possibleAssignment.split(
-          /[cod]/
-        );
+        const [_empty, classStr, offerStr, dayStr] = possibleAssignment.split(/[cod]/);
         resultAssignments.push({
           classId: Number(classStr),
           day: Number(dayStr),
@@ -253,40 +228,34 @@ export const MatchingCreation: FC = () => {
 
   const allRequests = useAdminQuery<AllRequests>(ALL_REQUESTS);
 
-  const scientistMailsInfo = useAdminQuery<
-    ScientistMailInfos,
-    ScientistMailInfosVariables
-  >(SCIENTIST_MAILS_INFO, {
+  const scientistMailsInfo = useAdminQuery<ScientistMailInfos, ScientistMailInfosVariables>(SCIENTIST_MAILS_INFO, {
     variables: {
       pid: rsaConfig.programId,
     },
   });
 
-  const schoolsMailsInfo = useAdminQuery<
-    SchoolsMailsInfo,
-    SchoolsMailsInfoVariables
-  >(SCHOOLS_MAILS_INFO, {
+  const schoolsMailsInfo = useAdminQuery<SchoolsMailsInfo, SchoolsMailsInfoVariables>(SCHOOLS_MAILS_INFO, {
     variables: {
       pid: rsaConfig.programId,
     },
   });
 
-  const [forcedAssignmentsTxt, setForcedAssignmentsTxt] = useState("");
+  const [forcedAssignmentsTxt, setForcedAssignmentsTxt] = useState('');
 
   const [maxPerClass, setMaxPerClass] = useState<number>(1);
 
   const [matchings, setMatchings] = useState<AssignmentResult[] | null>(null);
 
   const runMatching = useCallback(async () => {
-    const allRequestsResponse = await allRequests.refetch()
+    const allRequestsResponse = await allRequests.refetch();
 
-    console.log("allRequestsResponse", allRequestsResponse);
+    console.log('allRequestsResponse', allRequestsResponse);
 
     const newData = allRequestsResponse.data.SchoolClassRequest.filter(
       (r) => r.ScientistOffer.Program.id === rsaConfig.programId
     );
 
-    console.log("newData", newData);
+    console.log('newData', newData);
 
     const hasOfferIds = new Set<number>();
     const offers: CourseOffer[] = [];
@@ -308,14 +277,14 @@ export const MatchingCreation: FC = () => {
       days: nd.possibleDays,
     }));
 
-    console.log("Version 2023-06-06 11:00");
-    console.log("build solver input data", offers, requests);
+    console.log('Version 2024-04-11 13:00');
+    console.log('build solver input data', offers, requests);
 
     const forcedAssignments: AssignmentResult[] = forcedAssignmentsTxt
       .trim()
-      .split("\n")
+      .split('\n')
       .map((farow) => {
-        const [c, o, d] = farow.trim().split("=");
+        const [c, o, d] = farow.trim().split('=');
         const result: AssignmentResult = {
           classId: Number(c),
           day: Number(d),
@@ -323,28 +292,18 @@ export const MatchingCreation: FC = () => {
         };
         return result;
       })
-      .filter(
-        (x) =>
-          !Number.isNaN(x.classId) &&
-          !Number.isNaN(x.day) &&
-          !Number.isNaN(x.offerId)
-      );
+      .filter((x) => !Number.isNaN(x.classId) && !Number.isNaN(x.day) && !Number.isNaN(x.offerId));
 
-    console.log("Forced assignments are", forcedAssignments);
+    console.log('Forced assignments are', forcedAssignments);
 
-    const solution = solveMatching(
-      offers,
-      requests,
-      forcedAssignments,
-      maxPerClass
-    );
+    const solution = solveMatching(offers, requests, forcedAssignments, maxPerClass);
 
     solution?.sort((a, b) => a.day - b.day);
 
     console.log(solution);
 
     if (solution === null) {
-      alert("Matching ist nicht möglich!"); // eslint-disable-line
+      alert('Matching ist nicht möglich!'); // eslint-disable-line
     }
 
     setMatchings(solution);
@@ -375,16 +334,11 @@ export const MatchingCreation: FC = () => {
       }
 
       offerTitles[scr.ScientistOffer.id] = scr.ScientistOffer.title;
-      offerScientists[scr.ScientistOffer.id] =
-        scr.ScientistOffer.contactName || "";
-      schools[scr.SchoolClass.id] =
-        scr.SchoolClass.School.name + "; " + scr.SchoolClass.School.city;
+      offerScientists[scr.ScientistOffer.id] = scr.ScientistOffer.contactName || '';
+      schools[scr.SchoolClass.id] = scr.SchoolClass.School.name + '; ' + scr.SchoolClass.School.city;
       teachers[scr.SchoolClass.id] =
-        scr.SchoolClass.Teacher.User.firstName +
-        " " +
-        scr.SchoolClass.Teacher.User.lastName;
-      requestsReverse[scr.SchoolClass.id + "/" + scr.ScientistOffer.id] =
-        scr.id;
+        scr.SchoolClass.Teacher.User.firstName + ' ' + scr.SchoolClass.Teacher.User.lastName;
+      requestsReverse[scr.SchoolClass.id + '/' + scr.ScientistOffer.id] = scr.id;
     }
 
     return {
@@ -440,44 +394,32 @@ export const MatchingCreation: FC = () => {
     };
   }, [matchings]);
 
-  const [hideProgramById] = useAdminMutation<
-    HideProgramById,
-    HideProgramByIdVariables
-  >(HIDE_PROGRAM);
-  const [updateAssignments] = useAdminMutation<
-    UpdateAssignments,
-    UpdateAssignmentsVariables
-  >(UPDATE_ASSIGNMENTS);
+  const [hideProgramById] = useAdminMutation<HideProgramById, HideProgramByIdVariables>(HIDE_PROGRAM);
+  const [updateAssignments] = useAdminMutation<UpdateAssignments, UpdateAssignmentsVariables>(UPDATE_ASSIGNMENTS);
 
-  const [batchInsertMails] = useAdminMutation<
-    BatchInsertMail,
-    BatchInsertMailVariables
-  >(BATCH_INSERT_MAIL_LOG);
+  const [batchInsertMails] = useAdminMutation<BatchInsertMail, BatchInsertMailVariables>(BATCH_INSERT_MAIL_LOG);
 
   const handleFinalize = useCallback(async () => {
     let missedData = false;
     let allRequestIds = Object.values(requestsRecords.requestsReverse);
-    const updates: SchoolClassRequest_insert_input[] = matchingTableData.map(
-      (x) => {
-        const requestId =
-          requestsRecords.requestsReverse[x.classId + "/" + x.offerId];
-        if (requestId !== null && requestId !== undefined) {
-          allRequestIds = allRequestIds.filter((ari) => ari !== requestId);
-          return {
-            id: requestId,
-            assigned_day: x.day,
+    const updates: SchoolClassRequest_insert_input[] = matchingTableData.map((x) => {
+      const requestId = requestsRecords.requestsReverse[x.classId + '/' + x.offerId];
+      if (requestId !== null && requestId !== undefined) {
+        allRequestIds = allRequestIds.filter((ari) => ari !== requestId);
+        return {
+          id: requestId,
+          assigned_day: x.day,
 
-            offerId: x.offerId,
-            classId: x.classId,
-            possibleDays: "{}",
-          };
-        } else {
-          console.log("No request found for", x);
-          missedData = true;
-          return {};
-        }
+          offerId: x.offerId,
+          classId: x.classId,
+          possibleDays: '{}',
+        };
+      } else {
+        console.log('No request found for', x);
+        missedData = true;
+        return {};
       }
-    );
+    });
 
     for (const rem of allRequestIds) {
       updates.push({
@@ -488,17 +430,18 @@ export const MatchingCreation: FC = () => {
         // if is is not an upsert it will fail because there is no class with id -1
         offerId: -1,
         classId: -1,
-        possibleDays: "{}",
+        possibleDays: '{}',
       });
     }
 
     updates.sort((a, b) => (a.id || 0) - (b.id || 0));
 
-    console.log("updates", updates);
+    console.log('updates', updates);
 
     if (!missedData) {
-      const bccemail = prompt( // eslint-disable-line
-        "Welche E-Mail soll für bcc verwendet werden? Nach dieser Eingabe wird das Matching finalisiert und die Anmeldung für weitere Schulen abgeschaltet!"
+      const bccemail = prompt(
+        // eslint-disable-line
+        'Welche E-Mail soll für bcc verwendet werden? Nach dieser Eingabe wird das Matching finalisiert und die Anmeldung für weitere Schulen abgeschaltet!'
       );
 
       if (bccemail !== undefined && bccemail !== null && bccemail.length > 0) {
@@ -517,8 +460,8 @@ export const MatchingCreation: FC = () => {
         const schoolsMails = await schoolsMailsInfo.refetch();
         const scientistMails = await scientistMailsInfo.refetch();
 
-        console.log("schoolMailInfos", schoolsMails.data);
-        console.log("scientistMailInfos", scientistMails.data);
+        console.log('schoolMailInfos', schoolsMails.data);
+        console.log('scientistMailInfos', scientistMails.data);
 
         const mails: MailDescription[] = [];
 
@@ -535,27 +478,24 @@ export const MatchingCreation: FC = () => {
           }
 
           const acceptedSchools = so.SchoolClassRequests.filter(
-            (r) =>
-              r.assigned_day !== -1 &&
-              r.assigned_day !== null &&
-              r.assigned_day !== undefined
+            (r) => r.assigned_day !== -1 && r.assigned_day !== null && r.assigned_day !== undefined
           );
           if (acceptedSchools.length > 0) {
             const infos = acceptedSchools.map((as) => {
               if (as.assigned_day === null) {
-                throw new Error("the filter should have prevented this!");
+                throw new Error('the filter should have prevented this!');
               }
               const ssai: ScientistSingleAcceptedInfo = {
                 postalCode: as.SchoolClass.School.postalCode,
                 city: as.SchoolClass.School.city,
-                commentGeneral: as.commentGeneral || "",
-                commentTime: as.commentTime || "",
+                commentGeneral: as.commentGeneral || '',
+                commentTime: as.commentTime || '',
                 contact: [
                   as.SchoolClass.Teacher.User.firstName,
                   as.SchoolClass.Teacher.User.lastName,
                   as.SchoolClass.Teacher.User.email,
-                  as.SchoolClass.contact || "",
-                ].join(" "),
+                  as.SchoolClass.contact || '',
+                ].join(' '),
                 day: dayFormat(as.assigned_day, rsaConfig.start),
                 grade: as.SchoolClass.grade,
                 schoolName: as.SchoolClass.School.name,
@@ -565,19 +505,14 @@ export const MatchingCreation: FC = () => {
               return ssai;
             });
             counts.acceptedScientists++;
-            mails.push(
-              createAcceptScientist(so.contactName, so.contactEmail, infos)
-            );
+            mails.push(createAcceptScientist(so.contactName, so.contactEmail, infos));
           } else {
             counts.rejectedScientists++;
             mails.push(createRejectScientist(so.contactName, so.contactEmail));
           }
         }
 
-        const requestsByClass: Record<
-          number,
-          SchoolsMailsInfo_SchoolClassRequest[]
-        > = {};
+        const requestsByClass: Record<number, SchoolsMailsInfo_SchoolClassRequest[]> = {};
 
         for (const smail of schoolsMails.data.SchoolClassRequest) {
           const prev = requestsByClass[smail.SchoolClass.id] || [];
@@ -601,34 +536,26 @@ export const MatchingCreation: FC = () => {
                 continue;
               }
               const cname =
-                aRequest.SchoolClass.Teacher.User.firstName +
-                " " +
-                aRequest.SchoolClass.Teacher.User.lastName;
+                aRequest.SchoolClass.Teacher.User.firstName + ' ' + aRequest.SchoolClass.Teacher.User.lastName;
 
               counts.acceptedSchools++;
               mails.push(
-                createAcceptSchool(
-                  cname,
-                  aRequest.SchoolClass.Teacher.User.email,
-                  {
-                    classGrade: aRequest.SchoolClass.grade + "",
-                    className: aRequest.SchoolClass.name,
-                    contactEmail: aRequest.ScientistOffer.contactEmail || "",
-                    contactPhone: aRequest.ScientistOffer.contactPhone || "",
-                    day: dayFormat(aRequest.assigned_day, rsaConfig.start),
-                    scientist: aRequest.ScientistOffer.contactName || "",
-                    time: aRequest.ScientistOffer.timeWindow.join(", "),
-                    topic: aRequest.ScientistOffer.title,
-                  }
-                )
+                createAcceptSchool(cname, aRequest.SchoolClass.Teacher.User.email, {
+                  classGrade: aRequest.SchoolClass.grade + '',
+                  className: aRequest.SchoolClass.name,
+                  contactEmail: aRequest.ScientistOffer.contactEmail || '',
+                  contactPhone: aRequest.ScientistOffer.contactPhone || '',
+                  day: dayFormat(aRequest.assigned_day, rsaConfig.start),
+                  scientist: aRequest.ScientistOffer.contactName || '',
+                  time: aRequest.ScientistOffer.timeWindow.join(', '),
+                  topic: aRequest.ScientistOffer.title,
+                })
               );
             }
           } else if (requests.length > 0) {
             const anyRequest = requests[0];
             const cname =
-              anyRequest.SchoolClass.Teacher.User.firstName +
-              " " +
-              anyRequest.SchoolClass.Teacher.User.lastName;
+              anyRequest.SchoolClass.Teacher.User.firstName + ' ' + anyRequest.SchoolClass.Teacher.User.lastName;
             counts.rejectedSchools++;
             mails.push(
               createRejectSchool(
@@ -642,15 +569,15 @@ export const MatchingCreation: FC = () => {
         }
 
         const mailInserts: MailLog_insert_input[] = mails.map((mail) => ({
-          to: rsaConfig.test_operation ? "ras@nanodesu.info" : mail.to,
+          to: rsaConfig.test_operation ? 'ras@nanodesu.info' : mail.to,
           subject: mail.subject,
           bcc: bccemail,
           content: mail.content,
-          from: rsaConfig.fromMail || "info@opencampus.sh",
+          from: rsaConfig.fromMail || 'info@opencampus.sh',
         }));
 
-        console.log("emails", mailInserts);
-        console.log("email counts", counts);
+        console.log('emails', mailInserts);
+        console.log('email counts', counts);
 
         await batchInsertMails({
           variables: {
@@ -663,7 +590,9 @@ export const MatchingCreation: FC = () => {
         }, 500);
       }
     } else {
-      alert("Es gibt ein technisches Problem"); // eslint-disable-line
+      alert(
+        'Es gibt ein technisches Problem. Bitte Seite neu laden. Falls bei Erzeuge Matchingvorschau die Tabelle z.B. die Namen der Angebote oder Schulen nicht listet, so die Seite neu laden bis dies da ist, dann geht es.'
+      ); // eslint-disable-line
     }
   }, [
     hideProgramById,
@@ -687,23 +616,16 @@ export const MatchingCreation: FC = () => {
   return (
     <>
       <div>
-        Erzwinge Zuweisungen. Texteingabe im Format: KlassenId=OfferId=Tag.{" "}
-        <br />
-        Zum Beispiel 22=2022003=4 um der Klasse mit ID 22 das Angebot mit ID
-        2022003 am Tag 4 (Donnerstag) zuzuweisen.
+        Erzwinge Zuweisungen. Texteingabe im Format: KlassenId=OfferId=Tag. <br />
+        Zum Beispiel 22=2022003=4 um der Klasse mit ID 22 das Angebot mit ID 2022003 am Tag 4 (Donnerstag) zuzuweisen.
         <br />
         Pro Zeile eine Zuweisung.
         <br />
         Die IDs können in der CSV mit den Anfragen per Excel eingesehen werden.
         <br />
-        Es können keine Zuweisungen erzwungen werden für die es nicht auch eine
-        Anfrage gab!
+        Es können keine Zuweisungen erzwungen werden für die es nicht auch eine Anfrage gab!
         <div>
-          <textarea
-            className="border"
-            value={forcedAssignmentsTxt}
-            onChange={handleSetFATxt}
-          />
+          <textarea className="border" value={forcedAssignmentsTxt} onChange={handleSetFATxt} />
         </div>
       </div>
 
@@ -711,8 +633,8 @@ export const MatchingCreation: FC = () => {
         <div>
           <Button variant="contained" onClick={runMatching}>
             Erzeuge Matchingvorschau
-          </Button>{" "}
-          Maximale Anzahl Vorträge pro Klasse:{" "}
+          </Button>{' '}
+          Maximale Anzahl Vorträge pro Klasse:{' '}
           <input
             className="border border-black"
             type="number"
@@ -735,9 +657,8 @@ export const MatchingCreation: FC = () => {
       {matchings !== null && (
         <>
           <div className="text-xl font-bold mt-6">
-            Vorschau {matchingCounts.matchingsCount} Vorträge zwischen{" "}
-            {matchingCounts.classCount} Klassen und {matchingCounts.offerCount}{" "}
-            Angeboten
+            Vorschau {matchingCounts.matchingsCount} Vorträge zwischen {matchingCounts.classCount} Klassen und{' '}
+            {matchingCounts.offerCount} Angeboten
           </div>
           <table className="w-full mt-4">
             <tbody>
@@ -752,10 +673,7 @@ export const MatchingCreation: FC = () => {
               </tr>
 
               {matchingTableData.map((td) => (
-                <MatchingTableRow
-                  key={td.offerId + "/" + td.classId + "/" + td.day}
-                  {...td}
-                />
+                <MatchingTableRow key={td.offerId + '/' + td.classId + '/' + td.day} {...td} />
               ))}
             </tbody>
           </table>
