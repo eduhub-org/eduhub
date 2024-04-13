@@ -40,22 +40,19 @@ const htmlMailWithContent = (content: string) => {
   `;
 };
 
-export const createRejectScientist = (
-  contactName: string,
-  contactMail: string
-) => {
+export const createRejectScientist = (contactName: string, contactMail: string) => {
   const result: MailDescription = {
     to: contactMail,
     subject: 'Rent-a-Scientist Rückmeldung',
     content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
 
-vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2023 eine Schulunterrichtsstunde anzubieten.
+vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2024 eine Schulunterrichtsstunde anzubieten.
 Leider müssen wir Ihnen mitteilen, dass Ihr Angebot in diesem Jahr nicht gebucht wurde und Ihre Unterrichtsstunde dementsprechend nicht zu Stande kommt.
 
-Es gab insgesamt ein überwältigendes Feedback aus den Hochschulen und wissenschaftlichen Institutionen. Über 100 Angebote von Wissenschaftler*innen haben uns für Rent-a-Scientist 2023 erreicht, um eine oder sogar mehrere Unterrichtsstunden zu gestalten, weshalb die teilnehmenden Schulen den Luxus einer wirklich großen Auswahl hatten.
+Es gab insgesamt ein überwältigendes Feedback aus den Hochschulen und wissenschaftlichen Institutionen. Über 100 Angebote von Wissenschaftler*innen haben uns für Rent-a-Scientist 2024 erreicht, um eine oder sogar mehrere Unterrichtsstunden zu gestalten, weshalb die teilnehmenden Schulen den Luxus einer wirklich großen Auswahl hatten.
 
-Auch wenn es dieses Mal leider nicht geklappt hat, freuen wir uns sehr, wenn Sie im nächsten Jahr wieder dabei sind und sich für Rent-a-Scientist 2023 erneut zur Verfügung stellen.
+Auch wenn es dieses Mal leider nicht geklappt hat, freuen wir uns sehr, wenn Sie im nächsten Jahr wieder dabei sind und sich für Rent-a-Scientist 2024 erneut zur Verfügung stellen.
 Sollten Sie noch Fragen oder Feedback haben, sind wir Ihnen für eine Nachricht an fdw@kielregion.de sehr dankbar.
 
 Nochmals vielen Dank & herzliche Grüße
@@ -107,7 +104,7 @@ export const createAcceptScientist = (
     subject: 'Rent-a-Scientist Rückmeldung',
     content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
-vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2023 eine Schulunterrichtsstunde anzubieten.
+vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2024 eine Schulunterrichtsstunde anzubieten.
 Wir freuen uns sehr, Ihnen mitteilen zu können, dass Sie wie folgt angefragt wurden
 
 ${acceptedDays
@@ -178,11 +175,7 @@ export interface SchoolAcceptedInfo {
   classGrade: string;
 }
 
-export const createAcceptSchool = (
-  contactName: string,
-  contactMail: string,
-  info: SchoolAcceptedInfo
-) => {
+export const createAcceptSchool = (contactName: string, contactMail: string, info: SchoolAcceptedInfo) => {
   const result: MailDescription = {
     subject: 'Rent-a-Scientist Rückmeldung',
     to: contactMail,
@@ -234,12 +227,7 @@ Umsatzsteuer Ident Nr. DE 262 929 911
   return result;
 };
 
-export const createRejectSchool = (
-  contactName: string,
-  contactMail: string,
-  className: string,
-  grade: number
-) => {
+export const createRejectSchool = (contactName: string, contactMail: string, className: string, grade: number) => {
   const result: MailDescription = {
     subject: 'Rent-a-Scientist Rückmeldung',
     to: contactMail,
