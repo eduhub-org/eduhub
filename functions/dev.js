@@ -44,14 +44,19 @@ for (const dir of dirs) {
   const cwd = "/functions/" + dir;
   console.log("npm install " + cwd);
 
-  child_process.execSync(cmd, {
-    cwd,
-  });
-
-  const watchProc = child_process.spawn("npm", ["run", "watch"], {
-    cwd,
-  });
-  watchChildProc(watchProc, dir);
+  try {
+    child_process.execSync(cmd, {
+      cwd,
+    });
+  
+    const watchProc = child_process.spawn("npm", ["run", "watch"], {
+      cwd,
+    });
+    watchChildProc(watchProc, dir);
+  } catch (e) {
+    // if one fails, dont fail all, somehow createAchivementCertificate fails in my local system and it is not needed for me anyway
+    console.log("Failed stup of node cloud function!!!!", dir, e);
+  }
 }
 
 const app = express();

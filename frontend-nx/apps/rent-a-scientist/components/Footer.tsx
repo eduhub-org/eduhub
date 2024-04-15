@@ -1,13 +1,13 @@
-import Link from "next/link";
-import { FC } from "react";
-import { ClientOnly } from "@opencampus/shared-components";
-import { OnlyAdmin } from "./common/OnlyLoggedIn";
+import Link from 'next/link';
+import { FC } from 'react';
+import { ClientOnly } from '@opencampus/shared-components';
+import { OnlyAdmin } from './common/OnlyLoggedIn';
 
 export const Footer: FC = () => {
   return (
     <footer className="flex flex-col w-full p-6 bg-rsa-black text-white">
       <div className="flex justify-between items-center">
-        <span className="text-sm font-light">©2023</span>
+        <span className="text-sm font-light">©2024</span>
 
         <ClientOnly>
           <OnlyAdmin>
