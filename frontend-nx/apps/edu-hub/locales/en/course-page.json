@@ -219,6 +219,6 @@
     "ATTENDED": "Attended",
     "MISSED": "Missed",
     "NO_INFO": "In review",
-    "FUTURE_DATE": "Future date"
+    "PENDING": "Pending"
   }
 }

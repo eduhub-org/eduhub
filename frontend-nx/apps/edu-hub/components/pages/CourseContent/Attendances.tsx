@@ -9,8 +9,8 @@ import { AttendanceStatus_enum } from '../../../__generated__/globalTypes';
 import { CourseWithEnrollment_Course_by_pk_Sessions } from '../../../queries/__generated__/CourseWithEnrollment';
 
 const getBgColor = (status, date) => {
-  if (status === NO_INFO && date <= new Date()) {
-    return 'bg-yellow-500';
+  if (status === NO_INFO) {
+    return 'bg-gray-200';
   } else if (status === ATTENDED) {
     return 'bg-green-500';
   } else if (status === MISSED) {
@@ -28,13 +28,10 @@ const AttendanceStatusLegend: FC = () => {
         <Dot className="text-red fill-green-500" /> {t('course-page:attendanceStatus.ATTENDED')}
       </div>
       <div className="flex items-center">
-        <Dot className="text-red fill-yellow-500" /> {t('course-page:attendanceStatus.NO_INFO')}
-      </div>
-      <div className="flex items-center">
         <Dot className="text-red fill-red-500" /> {t('course-page:attendanceStatus.MISSED')}
       </div>
       <div className="flex items-center">
-        <Dot className="text-red fill-gray-200" /> {t('course-page:attendanceStatus.FUTURE_DATE')}
+        <Dot className="text-red fill-gray-200" /> {t('course-page:attendanceStatus.PENDING')}
       </div>
       <div />
       <div />

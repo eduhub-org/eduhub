@@ -213,6 +213,6 @@
     "ATTENDED": "Teilgenommen",
     "MISSED": "Nicht teilgenommen",
     "NO_INFO": "In Prüfung",
-    "FUTURE_DATE": "Zukünftiger Termin"
+    "PENDING": "Ausstehend"
   }
 }
