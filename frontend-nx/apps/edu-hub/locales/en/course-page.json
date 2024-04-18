@@ -181,7 +181,7 @@
     "label": "Learning Goals",
     "help_text": "The learning goals are part of the performance certificate and can only be changed by the program management. If you would like to suggest changes or notice errors, please contact them.",
     "placeholder": "Learning Goal 1\nLearning Goal 2\nLearning Goal 3\nLearning Goal 4"
-  }, 
+  },
   "info_block_1_title": {
     "label": "Info Block 1",
     "help_text": "For the content of this part of the description, please refer to existing courses to stay as consistent as possible. Typically, this section describes what participants can expect in the course ('What you will get').",
@@ -214,5 +214,11 @@
   "add_external_speaker": "Add External Speaker",
   "session_title": "Session Title",
   "course_sessions": "Course Sessions",
-  "link_will_be_provided_soon": "[Link will be provided here soon]"
+  "link_will_be_provided_soon": "[Link will be provided here soon]",
+  "attendanceStatus": {
+    "ATTENDED": "Attended",
+    "MISSED": "Missed",
+    "NO_INFO": "In review",
+    "PENDING": "Pending"
+  }
 }
