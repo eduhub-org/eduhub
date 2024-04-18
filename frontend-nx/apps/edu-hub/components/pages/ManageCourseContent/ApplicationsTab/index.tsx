@@ -7,7 +7,7 @@ import {
   ManagedCourse_Course_by_pk_CourseEnrollments,
 } from '../../../../queries/__generated__/ManagedCourse';
 import { ApplicationRow } from './ApplicationRow';
-import { greenDot, greyDot, orangeDot, redDot } from '../../../common/dots';
+import { greenDot, greyDot, orangeDot, redDot } from '../../../common/dots_old';
 import { OnlyAdmin } from '../../../common/OnlyLoggedIn';
 import {
   identityEventMapper,
