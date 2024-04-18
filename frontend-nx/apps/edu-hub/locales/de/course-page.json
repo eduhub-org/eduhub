@@ -136,7 +136,7 @@
   "participationDataDownload": "Teilnehmer:innen Daten herunterladen (CSV)",
   "selectTemplateDefaultLabel": "Vorlage auswählen",
   "achievement_option_not_selected": "Bitte wähle einen Leistungsnachweis aus.",
-  
+
   "location": {
     "label": "Veranstaltungsort"
   },
@@ -174,7 +174,7 @@
     "label": "Lernziele",
     "help_text": "Die Lernziele sind Teil des Leistungszertifikats und können nur durch die Programmleitung geändert werden. Wenn du Änderungen vorschlagen möchtest oder dir Fehler auffallen, wende dich bitte an diese.",
     "placeholder": "Lernziel 1\nLernziel 2\nLernziel 3\nLernziel 4"
-  }, 
+  },
   "info_block_1_title": {
     "label": "Info-Block 1",
     "help_text": "Für den Inhalt zu diesem Teil der Beschreibung orientiere dich bitte an den existierenden Kursen, um möglichst konsistent zu bleiben. Üblicherweise wird hier beschrieben, was die Teilnehmenden im Kurs erwartet (\"Was due bekommst\").",
@@ -208,5 +208,11 @@
   "add_external_speaker": "Externen Referenten hinzufügen",
   "session_title": "Titel des Termins",
   "course_sessions": "Kurstermine",
-  "link_will_be_provided_soon": "[Link wird hier in Kürze bereitgestellt]"
+  "link_will_be_provided_soon": "[Link wird hier in Kürze bereitgestellt]",
+  "attendanceStatus": {
+    "ATTENDED": "Teilgenommen",
+    "MISSED": "Nicht teilgenommen",
+    "NO_INFO": "In Prüfung",
+    "FUTURE_DATE": "Zukünftiger Termin"
+  }
 }

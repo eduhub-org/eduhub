@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Dispatch, FC, SetStateAction, useCallback, useState } from 'react';
 import { useIsAdmin } from '../../../../hooks/authentication';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
-import { DOT_COLORS, EhDot, greenDot, greyDot, redDot } from '../../../common/dots';
+import { DOT_COLORS, EhDot, greenDot, greyDot, redDot } from '../../../common/dots_old';
 import { CertificateDownload } from '../../../common/CertificateDownload';
 
 import { MdAddCircle, MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
