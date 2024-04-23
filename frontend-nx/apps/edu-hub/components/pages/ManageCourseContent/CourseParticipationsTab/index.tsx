@@ -593,6 +593,7 @@ const EhDotWithCallBack: FC<IEhDotProps> = ({ dotData, handleDotClick, session }
       onClick={handleClick}
       color={dotData.color}
       className="cursor-pointer hover:border-2 hover:border-indigo-200 hover:rounded-full"
+      title={new Date(session.startDateTime).toLocaleString()}
     />
   );
 };
