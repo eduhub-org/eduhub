@@ -51,7 +51,10 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
   const [achievementOptions, setAchievementOptions] = useState([] as MinAchievementOption[]);
 
   /* #region Database */
-  const query = useAuthedQuery<AchievementOptionCourses, AchievementOptionCoursesVariables>(ACHIEVEMENT_OPTION_COURSES);
+  const query = useAuthedQuery<AchievementOptionCourses, AchievementOptionCoursesVariables>(
+    ACHIEVEMENT_OPTION_COURSES,
+    { variables: { where: { courseId: { _eq: courseId } } } }
+  );
 
   useEffect(() => {
     const options = [...(query.data?.AchievementOptionCourse || [])];
