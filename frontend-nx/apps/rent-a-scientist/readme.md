@@ -8,3 +8,5 @@ Just some notes regarding rent-a-scientist:
 - if test_operation is set in the ras config table all outgoing emails will be redirected to ras@nanodesu.info, a mail I use for testing this stuff
 - mailFrom can be noreply@edu.opencampus.sh
 - the visibility of the program linked to the ras config determines if people can register, if it is set to false they cannot and the admin page says something about the finalized matching and mails getting send
+- how to deal with psd files: `for f in *.psd; do convert -flatten "$f" "${f%.*}.jpg"; done`
+- use mogrify to scale the images to a reasonable size: `mogrify -resize 400x400 *.jpg`

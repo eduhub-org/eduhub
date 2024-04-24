@@ -121,6 +121,10 @@ const getScientistPK = (s: Pick<Scientist, 'forename' | 'surname'>) => {
   return [s.forename, s.surname].join('/');
 };
 
+const fixExcelOddChars = (x: string) => {
+  return x.replaceAll('_x000D_', '');
+};
+
 const parseScientistsFromRow = (row: any): Scientist[] => {
   const results: Scientist[] = [];
 
@@ -234,16 +238,16 @@ const parseOfferFromRow = (row: any): ScientistOffer_insert_input | null => {
     timeWindow: twindows.map((t) => row[t]).filter((x) => x != null && x.length > 0),
     maxDeployments: Number(row[CSV_KEYS.OFFER.OFFER_MAX_DEPLOYMENTS]) || 1,
     possibleLocations: locs.map((l) => row[l]).filter((x) => x != null && x.length > 0),
-    equipmentRequired: row[CSV_KEYS.OFFER.OFFER_EQUIPMENT_REQUIREMENTS] || '',
-    roomRequirements: row[CSV_KEYS.OFFER.OFFER_ROOM_REQUIREMENTS] || '',
-    title: row[CSV_KEYS.OFFER.OFFER_TITLE] || '',
-    description: row[CSV_KEYS.OFFER.OFFER_DESCRIPTION] || '',
-    duration: row[CSV_KEYS.OFFER.OFFER_DURATION] || '',
-    extraComment: row[CSV_KEYS.OFFER.OFFER_EXTRA_COMMENT] || '',
-    subjectComment: row[CSV_KEYS.OFFER.OFFER_SUBJECT_COMMENT] || '',
-    classPreparation: row[CSV_KEYS.OFFER.OFFER_CLASS_PREP] || '',
-    institutionName: row[CSV_KEYS.OFFER.INSTITUTION] || '',
-    institutionLogo: row[CSV_KEYS.OFFER.INSTITUTION_LOGO] || '',
+    equipmentRequired: fixExcelOddChars(row[CSV_KEYS.OFFER.OFFER_EQUIPMENT_REQUIREMENTS] || ''),
+    roomRequirements: fixExcelOddChars(row[CSV_KEYS.OFFER.OFFER_ROOM_REQUIREMENTS] || ''),
+    title: fixExcelOddChars(row[CSV_KEYS.OFFER.OFFER_TITLE] || ''),
+    description: fixExcelOddChars(row[CSV_KEYS.OFFER.OFFER_DESCRIPTION] || ''),
+    duration: fixExcelOddChars(row[CSV_KEYS.OFFER.OFFER_DURATION] || ''),
+    extraComment: fixExcelOddChars(row[CSV_KEYS.OFFER.OFFER_EXTRA_COMMENT] || ''),
+    subjectComment: fixExcelOddChars(row[CSV_KEYS.OFFER.OFFER_SUBJECT_COMMENT] || ''),
+    classPreparation: fixExcelOddChars(row[CSV_KEYS.OFFER.OFFER_CLASS_PREP] || ''),
+    institutionName: fixExcelOddChars(row[CSV_KEYS.OFFER.INSTITUTION] || ''),
+    institutionLogo: fixExcelOddChars(row[CSV_KEYS.OFFER.INSTITUTION_LOGO] || ''),
     categories: cats.map((c) => row[c]).filter((c) => c != null && c.length > 0),
     contactEmail: row[CSV_KEYS.OFFER.OFFER_CONTACT_EMAIL] || '',
     contactPhone: row[CSV_KEYS.OFFER.OFFER_CONTACT_PHONE] || '',
