@@ -1,9 +1,7 @@
 import { useQuery } from '@apollo/client';
-import Image from 'next/image';
 import Link from 'next/link';
 import { FC, useEffect, useState } from 'react';
 
-import header from '../public/static/header.jpg';
 import { QUERY_RSA_CONFIG } from '../queries/ras_config';
 import { QueryRSAConfig } from '../queries/__generated__/QueryRSAConfig';
 import { ClientOnly } from '@opencampus/shared-components';
@@ -58,7 +56,13 @@ export const Header: FC = () => {
         <Link href="/">
           <div className="flex cursor-pointer">
             <div className="flex items-center">
-              <Image src={header} alt="Rent-A-Scientist Header Logo" width={1280} height={364} priority />
+              <img
+                alt="Rent-A-Scientist Header Logo"
+                src="/static/header.jpg"
+                width={1280}
+                height={364}
+                className="h-[364px] w-[1280px]"
+              />
             </div>
           </div>
         </Link>
