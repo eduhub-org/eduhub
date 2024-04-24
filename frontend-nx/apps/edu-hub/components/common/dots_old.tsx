@@ -7,9 +7,10 @@ interface IProps {
   size?: "DEFAULT" | "LARGE";
   className?: string;
   onClick?: () => void;
+  title?: string;
 }
 
-export const EhDot: FC<IProps> = ({ color, size, className, onClick }) => {
+export const EhDot: FC<IProps> = ({ color, size, className, onClick, title }) => {
   let clr = "grey";
   switch (color) {
     case "GREEN":
@@ -34,6 +35,7 @@ export const EhDot: FC<IProps> = ({ color, size, className, onClick }) => {
       color={clr}
       size={sz}
       className={`inline ${className || ""}`}
+      title={title}
     />
   );
 };
