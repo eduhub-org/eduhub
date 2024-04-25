@@ -579,15 +579,38 @@ export const MatchingCreation: FC = () => {
         console.log('emails', mailInserts);
         console.log('email counts', counts);
 
-        await batchInsertMails({
-          variables: {
-            objects: mailInserts,
-          },
-        });
+        // Slow down the mail creation to help the servers to not die from overload
+
+        const batchSize = 5;
+        const batches = Math.ceil(mailInserts.length / batchSize);
+        const batchDelayMs = 2000;
+
+        alert(
+          'Die ' +
+            mailInserts.length +
+            ' Mails werden jetzt zum Versand eingetragen. Dies dauert ca. ' +
+            ((batchDelayMs * batches) / 1000).toFixed(1) +
+            ' Sekunden. Die Seite darf nicht geschlossen werden, bitte auf Erfolgsmeldung warten!'
+        ); // eslint-disable-line
+
+        let mailCount = 0;
+
+        for (let i = 0; i < mailInserts.length; i += batchSize) {
+          const batch = mailInserts.slice(i, i + batchSize);
+          mailCount += batch.length;
+          await batchInsertMails({
+            variables: {
+              objects: batch,
+            },
+          });
+          await new Promise((resolve) => setTimeout(resolve, batchDelayMs));
+        }
+
+        alert('Erfolg: Alle ' + mailCount + ' E-Mails wurden für den Versand eingetragen.'); // eslint-disable-line
 
         setTimeout(() => {
           window.location.reload();
-        }, 500);
+        }, 1000);
       }
     } else {
       alert(
