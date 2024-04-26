@@ -1,0 +1,96 @@
+// TODO rename to .js file to use this
+
+const fs = require("fs");
+
+// see TODO for places that need to be modified
+
+// TODO
+// get this via
+// git log --name-status --find-renames=100%
+// by runnin detox in the git repository after the "bad" names were checked in already
+
+const replacementsRaw = [
+  // Ocatal escape sequences errors can be ignored here, running the file in node works fine
+  "frontend-nx/apps/rent-a-scientist/public/static/pics/105_Dietmar_Block und Christian_Schulze_CAU.jpg    frontend-nx/apps/rent-a-scientist/public/static/pics/105_Dietmar_Block_und_Christian_Schulze_CAU.jpg",
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/10_benjamin_claa\303\237en_mpi.jpg"       frontend-nx/apps/rent-a-scientist/public/static/pics/10_benjamin_claassen_mpi.jpg',
+  "frontend-nx/apps/rent-a-scientist/public/static/pics/110_Klaus_Lebert_FH Kiel.jpg       frontend-nx/apps/rent-a-scientist/public/static/pics/110_Klaus_Lebert_FH_Kiel.jpg",
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/12_Hans_J\303\274rgen_G\303\266tze_CAU.jpg"       frontend-nx/apps/rent-a-scientist/public/static/pics/12_Hans_Jurgen_Gotze_CAU.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/14_Joke_L\303\274bbecke_GEOMAR.jpg"       frontend-nx/apps/rent-a-scientist/public/static/pics/14_Joke_Lubbecke_GEOMAR.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/15_J\303\266rg_Geldmacher_GEOMAR.jpg"     frontend-nx/apps/rent-a-scientist/public/static/pics/15_Jorg_Geldmacher_GEOMAR.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/20_christopher_b\303\266hmker_mpi.jpg"    frontend-nx/apps/rent-a-scientist/public/static/pics/20_christopher_bohmker_mpi.jpg',
+  "frontend-nx/apps/rent-a-scientist/public/static/pics/21_Monja Gronenberg_CAU.jpg        frontend-nx/apps/rent-a-scientist/public/static/pics/21_Monja_Gronenberg_CAU.jpg",
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/29_S\303\266ren_Christensen_CAU.jpg"      frontend-nx/apps/rent-a-scientist/public/static/pics/29_Soren_Christensen_CAU.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/29_eva_sch\303\244ffer_uksh.jpg"  frontend-nx/apps/rent-a-scientist/public/static/pics/29_eva_schaffer_uksh.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/33_Robert_H\303\244sler_CAU_UKSH.jpg"     frontend-nx/apps/rent-a-scientist/public/static/pics/33_Robert_Hasler_CAU_UKSH.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/35_Bj\303\266rn_Gojdka_ISIT_.jpg" frontend-nx/apps/rent-a-scientist/public/static/pics/35_Bjorn_Gojdka_ISIT_.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/36_Carlotta_J\303\266hnk_CAU.png" frontend-nx/apps/rent-a-scientist/public/static/pics/36_Carlotta_Johnk_CAU.png',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/37_hans_j\303\274rgen_g\303\266tze_cau.jpg"       frontend-nx/apps/rent-a-scientist/public/static/pics/37_hans_jurgen_gotze_cau.jpg',
+  "frontend-nx/apps/rent-a-scientist/public/static/pics/39_Conrad_Wiermann_FH Kiel.jpg     frontend-nx/apps/rent-a-scientist/public/static/pics/39_Conrad_Wiermann_FH_Kiel.jpg",
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/44_Julia_Kn\303\274ppel_CAU, GEOMAR.jpg"  frontend-nx/apps/rent-a-scientist/public/static/pics/44_Julia_Knuppel_CAU,_GEOMAR.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/47_joke_l\303\274bbecke_geomar.jpg"       frontend-nx/apps/rent-a-scientist/public/static/pics/47_joke_lubbecke_geomar.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/48_j\303\266rg_geldmacher_geomar.jpg"     frontend-nx/apps/rent-a-scientist/public/static/pics/48_jorg_geldmacher_geomar.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/49_Malte_H\303\266rl\303\266ck_CAU.jpg"   frontend-nx/apps/rent-a-scientist/public/static/pics/49_Malte_Horlock_CAU.jpg',
+  "frontend-nx/apps/rent-a-scientist/public/static/pics/50_Marie_Berner_FH Kiel.jpg        frontend-nx/apps/rent-a-scientist/public/static/pics/50_Marie_Berner_FH_Kiel.jpg",
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/51_julia_kn\303\274ppel_geomar.jpg"       frontend-nx/apps/rent-a-scientist/public/static/pics/51_julia_knuppel_geomar.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/52_julian_kr\303\274ger_geomar.jpg"       frontend-nx/apps/rent-a-scientist/public/static/pics/52_julian_kruger_geomar.jpg',
+  "frontend-nx/apps/rent-a-scientist/public/static/pics/53_Paula Theresa_Meyer_ZIP.jpg     frontend-nx/apps/rent-a-scientist/public/static/pics/53_Paula_Theresa_Meyer_ZIP.jpg",
+  "frontend-nx/apps/rent-a-scientist/public/static/pics/54_Petra_Dickel_FH Kiel.jpg        frontend-nx/apps/rent-a-scientist/public/static/pics/54_Petra_Dickel_FH_Kiel.jpg",
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/56_Regina_Scherlie\303\237_CAU.jpg"       frontend-nx/apps/rent-a-scientist/public/static/pics/56_Regina_Scherliess_CAU.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/58_S\303\266nke_Harm_CAU.png"     frontend-nx/apps/rent-a-scientist/public/static/pics/58_Sonke_Harm_CAU.png',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/62_Maria_Wittm\303\274ss_CAU.jpg" frontend-nx/apps/rent-a-scientist/public/static/pics/62_Maria_Wittmuss_CAU.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/63_Eva_Sch\303\244ffer_UKSH.jpg"  frontend-nx/apps/rent-a-scientist/public/static/pics/63_Eva_Schaffer_UKSH.jpg',
+  "frontend-nx/apps/rent-a-scientist/public/static/pics/67_Harm_Bandholz_FH Kiel.jpg       frontend-nx/apps/rent-a-scientist/public/static/pics/67_Harm_Bandholz_FH_Kiel.jpg",
+  "frontend-nx/apps/rent-a-scientist/public/static/pics/73_monja gronenberg_cau.jpg        frontend-nx/apps/rent-a-scientist/public/static/pics/73_monja_gronenberg_cau.jpg",
+  "frontend-nx/apps/rent-a-scientist/public/static/pics/74_Holger Kersten_CAU.jpg  frontend-nx/apps/rent-a-scientist/public/static/pics/74_Holger_Kersten_CAU.jpg",
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/74_nele_matz-l\303\274ck_cau.jpg" frontend-nx/apps/rent-a-scientist/public/static/pics/74_nele_matz-luck_cau.jpg',
+  "frontend-nx/apps/rent-a-scientist/public/static/pics/76_Julian_Pforth_FH Kiel.jpg       frontend-nx/apps/rent-a-scientist/public/static/pics/76_Julian_Pforth_FH_Kiel.jpg",
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/78_Klaus-J\303\274rgen_Gern_IfW.jpg"      frontend-nx/apps/rent-a-scientist/public/static/pics/78_Klaus-Jurgen_Gern_IfW.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/85_s\303\266ren_christensen_cau.jpg"      frontend-nx/apps/rent-a-scientist/public/static/pics/85_soren_christensen_cau.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/89_Malte_L\303\266we_FH Kiel.jpg" frontend-nx/apps/rent-a-scientist/public/static/pics/89_Malte_Lowe_FH_Kiel.jpg',
+  "frontend-nx/apps/rent-a-scientist/public/static/pics/90_Florian_Brauer_FH Kiel.jpg      frontend-nx/apps/rent-a-scientist/public/static/pics/90_Florian_Brauer_FH_Kiel.jpg",
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/91_tobias_b\303\274nning_cau.jpg" frontend-nx/apps/rent-a-scientist/public/static/pics/91_tobias_bunning_cau.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/92_Ralph_G\303\244bler_GEOMAR.jpg"        frontend-nx/apps/rent-a-scientist/public/static/pics/92_Ralph_Gabler_GEOMAR.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/93_S\303\251verine_Furst_GEOMAR.jpg"      frontend-nx/apps/rent-a-scientist/public/static/pics/93_Severine_Furst_GEOMAR.jpg',
+  "frontend-nx/apps/rent-a-scientist/public/static/pics/94_Maria_Blanch Jover_GEOMAR.jpg   frontend-nx/apps/rent-a-scientist/public/static/pics/94_Maria_Blanch_Jover_GEOMAR.jpg",
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/96_robert_h\303\244sler_uksh.jpg" frontend-nx/apps/rent-a-scientist/public/static/pics/96_robert_hasler_uksh.jpg',
+  '"frontend-nx/apps/rent-a-scientist/public/static/pics/99_lasse_p\303\244plow_fh.jpg"    frontend-nx/apps/rent-a-scientist/public/static/pics/99_lasse_paplow_fh.jpg',
+];
+
+function procReplacements(rs) {
+  return rs.map((r) => {
+    const step1 = r
+      .trim()
+      .replaceAll(".png", ".jpg")
+      .replaceAll(".jpeg", ".jpg")
+      .replaceAll('"', "");
+    const [opath, npath] = step1.split(".jpg ");
+    const opsplit = opath.split("/");
+    const npathsplit = npath.split("/");
+    return [
+      opsplit[opsplit.length - 1].trim(),
+      npathsplit[npathsplit.length - 1].replaceAll(".jpg", "").trim(),
+    ];
+  });
+}
+
+function fixOcatal(input) {
+  return Buffer.from(input, "binary").toString("utf8");
+}
+
+const replacements = procReplacements(replacementsRaw.map(fixOcatal));
+
+// console.log(replacements);
+
+let file = fs
+  .readFileSync(
+    // TODO use whatever path you need
+    "/datadisk/customer/rent-a-scientist/2024/Anmeldungen RaS Stand 23.4.24 - PCT.csv"
+  )
+  .toString();
+
+for (const r of replacements) {
+  file = file.replaceAll(r[0], r[1]);
+}
+
+// TODO
+console.log(file); // pipe output of this script into a new file

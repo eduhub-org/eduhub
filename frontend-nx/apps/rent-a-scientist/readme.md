@@ -10,3 +10,6 @@ Just some notes regarding rent-a-scientist:
 - the visibility of the program linked to the ras config determines if people can register, if it is set to false they cannot and the admin page says something about the finalized matching and mails getting send
 - how to deal with psd files: `for f in *.psd; do convert -flatten "$f" "${f%.*}.jpg"; done`
 - use mogrify to scale the images to a reasonable size: `mogrify -resize 400x400 *.jpg`
+- use detox to fix any special characters in the scientist pictures
+- make sure all scientist picture names are lowercase: `rename 'y/A-Z/a-z/' *`
+- see `frontend-nx/apps/rent-a-scientist/fixnames.txt` for how to fix image names inside the csv files provided by KielRegion
