@@ -50,23 +50,22 @@ Sehr geehrte*r ${contactName},
 vielen Dank für Ihre Bereitschaft, im Rahmen von Rent-a-Scientist 2024 eine Schulunterrichtsstunde anzubieten.
 Leider müssen wir Ihnen mitteilen, dass Ihr Angebot in diesem Jahr nicht gebucht wurde und Ihre Unterrichtsstunde dementsprechend nicht zu Stande kommt.
 
-Es gab insgesamt ein überwältigendes Feedback aus den Hochschulen und wissenschaftlichen Institutionen. Über 100 Angebote von Wissenschaftler*innen haben uns für Rent-a-Scientist 2024 erreicht, um eine oder sogar mehrere Unterrichtsstunden zu gestalten, weshalb die teilnehmenden Schulen den Luxus einer wirklich großen Auswahl hatten.
+Es gab insgesamt ein überwältigendes Feedback aus den Hochschulen und wissenschaftlichen Institutionen. Über 110 Angebote von Wissenschaftler*innen haben uns für Rent-a-Scientist 2024 erreicht, um eine oder sogar mehrere Unterrichtsstunden zu gestalten, weshalb die teilnehmenden Schulen den Luxus einer wirklich großen Auswahl hatten.
 
-Auch wenn es dieses Mal leider nicht geklappt hat, freuen wir uns sehr, wenn Sie im nächsten Jahr wieder dabei sind und sich für Rent-a-Scientist 2024 erneut zur Verfügung stellen.
+Auch wenn es dieses Mal leider nicht geklappt hat, freuen wir uns sehr, wenn Sie im nächsten Jahr wieder dabei sind und sich für Rent-a-Scientist 2025 erneut zur Verfügung stellen.
 Sollten Sie noch Fragen oder Feedback haben, sind wir Ihnen für eine Nachricht an fdw@kielregion.de sehr dankbar.
 
 Nochmals vielen Dank & herzliche Grüße
 Ihr Rent-a-Scientist Team
 
 KielRegion GmbH 
-Wissenschaftspark Kiel 
-Neufeldtstraße 6 
-24118 Kiel 
+Alter Markt 9
+24103 Kiel
 
 E-Mail: fdw@kielregion.de
 Web: www.kielregion.de
 
-Aufsichtsratsvorsitzender: Lutz Schlünsen
+Aufsichtsratsvorsitzender: Dr. Ulf Kämpfer
 Geschäftsführerin: Ulrike Schrabback-Wielatt
 Amtsgericht Kiel, HRB 10353 KI
 Steuernummer: 19 294 31504 Finanzamt Kiel Nord 
@@ -144,19 +143,18 @@ Ihr Rent-a-Scientist Team
 
 
 KielRegion GmbH 
-Wissenschaftspark Kiel 
-Neufeldtstraße 6 
-24118 Kiel 
+Alter Markt 9
+24103 Kiel
+
 
 E-Mail: fdw@kielregion.de
 Web: www.kielregion.de
 
-Aufsichtsratsvorsitzender: Lutz Schlünsen
+Aufsichtsratsvorsitzender: Dr. Ulf Kämpfer
 Geschäftsführerin: Ulrike Schrabback-Wielatt
 Amtsgericht Kiel, HRB 10353 KI
 Steuernummer: 19 294 31504 Finanzamt Kiel Nord 
 Umsatzsteuer Ident Nr. DE 262 929 911
-
 
         `),
   };
@@ -182,7 +180,7 @@ export const createAcceptSchool = (contactName: string, contactMail: string, inf
     content: htmlMailWithContent(`
 Sehr geehrte*r ${contactName},
 
-vielen Dank, dass Sie sich mit der Schulklasse ${info.classGrade}${info.className} im Rahmen von Rent-a-Scientist für den Besuch einer Wissenschaftlerin bzw. eines Wissenschaftlers an Ihrer Schule beworben haben. Wir freuen uns sehr, Ihnen mitteilen zu können, dass wir Ihnen eine Ihrer Wunsch-Unterrichtsstunden für die Wochen vom 03.07. bis zum 14.07. bestätigen können:
+vielen Dank, dass Sie sich mit der Schulklasse ${info.classGrade}${info.className} im Rahmen von Rent-a-Scientist für den Besuch einer Wissenschaftlerin bzw. eines Wissenschaftlers an Ihrer Schule beworben haben. Wir freuen uns sehr, Ihnen mitteilen zu können, dass wir Ihnen eine Ihrer Wunsch-Unterrichtsstunden für die Wochen vom 01.07. bis zum 12.07. bestätigen können:
 
 Wissenschaftler*in: ${info.scientist}
 
@@ -197,8 +195,6 @@ Uhrzeit: ${info.time}
 
 Bitte setzen Sie sich mit Herr*Frau ${info.scientist} in Verbindung, um die Details für die Unterrichtsstunde zu besprechen.
 
-Sollten sich aufgrund des Infektionsgeschehens Veränderungen hinsichtlich des Schulbetriebs ankündigen, informieren Sie uns und den*die Wissenschaftler*in bitte schnellstmöglich.
-
 Kontaktieren Sie uns auch gern bei generellen Fragen zum Ablauf oder falls Unklarheiten oder Bedenken auftreten unter der E-Mail-Adresse fdw@kielregion.de.
 
 Wir wünschen Ihnen, Ihrer Klasse und Ihrem Gast eine hoffentlich spannende und unterhaltsame Unterrichtsstunde.
@@ -207,14 +203,13 @@ Mit den besten Grüßen
 Ihr Rent-a-Scientist Team
 
 KielRegion GmbH 
-Wissenschaftspark Kiel 
-Neufeldtstraße 6 
-24118 Kiel 
+Alter Markt 9
+24103 Kiel
 
 E-Mail: fdw@kielregion.de
 Web: www.kielregion.de
 
-Aufsichtsratsvorsitzender: Lutz Schlünsen
+Aufsichtsratsvorsitzender: Dr. Ulf Kämpfer
 Geschäftsführerin: Ulrike Schrabback-Wielatt
 Amtsgericht Kiel, HRB 10353 KI
 Steuernummer: 19 294 31504 Finanzamt Kiel Nord 
@@ -237,7 +232,7 @@ Sehr geehrte*r ${contactName},
 
 vielen Dank für Ihre Anfrage im Rahmen unseres Schulprogramms Rent-a-Scientist.
 
-Aufgrund der extrem großen Nachfrage, die uns erreicht hat, müssen wir Ihnen leider mitteilen, dass wir Ihnen keine*n Wissenschaftler*in in den Wochen vom 03.07. bis zum 14.07. zuteilen konnten.
+Aufgrund der extrem großen Nachfrage, die uns erreicht hat, müssen wir Ihnen leider mitteilen, dass wir Ihnen keine*n Wissenschaftler*in in den Wochen vom 01.07. bis zum 12.07. zuteilen konnten.
 
 Zur Entschädigung möchten wir Ihnen aber anbieten, im Nachgang eine*n Ihrer angefragten Wissenschaftler*innen zu kontaktieren und zu fragen, ob er*sie bereit wäre, einen individuellen Termin mit Ihnen zu vereinbaren. Sollten Sie daran Interesse haben, freuen wir uns über eine kurze Rückmeldung. 
 
@@ -251,16 +246,16 @@ Ihr Rent-a-Scientist Team
 
 
 KielRegion GmbH 
-Wissenschaftspark Kiel
-Neufeldtstraße 6
-24118 Kiel
+Alter Markt 9
+24103 Kiel
+
   
 E-Mail: fdw@kielregion.de 
 Web: www.kielregion.de 
   
-Aufsichtsratsvorsitzender: Lutz Schlünsen
+Aufsichtsratsvorsitzender: Dr. Ulf Kämpfer
 Geschäftsführerin: Ulrike Schrabback-Wielatt
-Amtsgericht Kiel, HRB 10353 KI 
+Amtsgericht Kiel, HRB 10353 KI
 Steuernummer: 19 294 31504 Finanzamt Kiel Nord 
 Umsatzsteuer Ident Nr. DE 262 929 911
 
