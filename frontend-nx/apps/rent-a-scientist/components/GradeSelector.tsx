@@ -1,5 +1,5 @@
-import { FC, useCallback } from "react";
-import Select from "react-select";
+import { FC, useCallback } from 'react';
+import Select from 'react-select';
 
 interface IProps {
   minGrade?: number;
@@ -21,18 +21,18 @@ export const GradeSelector: FC<IProps> = ({
   id,
 }) => {
   const minium = minGrade || 1;
-  const maximum = maxGrade || 12;
+  const maximum = maxGrade || 13;
 
   const options = [
     {
-      value: minium + "",
-      label: "Klasse " + minium,
+      value: minium + '',
+      label: 'Klasse ' + minium,
     },
   ];
   for (let i = minium + 1; i <= maximum; i++) {
     options.push({
-      value: i + "",
-      label: "Klasse " + i,
+      value: i + '',
+      label: 'Klasse ' + i,
     });
   }
 
@@ -53,7 +53,7 @@ export const GradeSelector: FC<IProps> = ({
         className={className}
         value={value}
         onChange={handleSelectGrade}
-        placeholder={"Klassenstufe wählen"}
+        placeholder={'Klassenstufe wählen'}
         instanceId={instanceId}
         id={id}
         isSearchable={false}
