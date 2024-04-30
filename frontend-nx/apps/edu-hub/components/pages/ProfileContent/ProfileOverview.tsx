@@ -33,6 +33,7 @@ import { Employment_enum } from '../../../__generated__/globalTypes';
 import UserCard from '../../common/UserCard';
 import log from 'loglevel';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
+import { User, UserVariables } from '../../../queries/__generated__/User';
 
 // generated types must be updated first with new fields in schema
 // import type { User } from "../../queries/__generated__/User";
@@ -80,7 +81,7 @@ const ProfileOverview: FC = () => {
     loading: userLoading,
     error: userError,
     refetch: refetchUser,
-  } = useAuthedQuery(USER, {
+  } = useAuthedQuery<User,UserVariables>(USER, {
     variables: {
       userId: sessionData?.profile?.sub,
     },
@@ -88,9 +89,9 @@ const ProfileOverview: FC = () => {
       const user = data.User_by_pk;
 
       reset({
-        firstName: sessionData?.profile?.given_name,
-        lastName: sessionData?.profile?.family_name,
-        email: sessionData?.profile?.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
         employment: user.employment,
         university: user.university,
         matriculationNumber: user.matriculationNumber,
