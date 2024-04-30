@@ -60,8 +60,8 @@ export const Header: FC = () => {
                 alt="Rent-A-Scientist Header Logo"
                 src="/static/header.jpg"
                 width={1280}
-                height={364}
-                className="h-[364px] w-[1280px]"
+                height={312}
+                className="h-[312px] w-[1280px]"
               />
             </div>
           </div>
