@@ -65,9 +65,7 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
     ACHIEVEMENT_RECORDS_WITH_AUTHORS,
     {
       variables: {
-        where: {
-          AchievementRecordAuthors: { userId: { _eq: userId } },
-        },
+        where: { _and: [{ AchievementRecordAuthors: { userId: { _eq: userId } } }, { courseId: { _eq: courseId } }] },
         orderBy: { created_at: order_by.desc },
         limit: 1,
       },
