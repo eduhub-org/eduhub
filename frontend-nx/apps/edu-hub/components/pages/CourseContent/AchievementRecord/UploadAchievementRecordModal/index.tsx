@@ -215,6 +215,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
           variables: {
             insertInput: {
               coverImageUrl: '', // this is mandatory field
+              courseId: courseId,
               description: state.description ?? '',
               rating: AchievementRecordRating_enum.UNRATED, // this is mandatory field
               score: 0, // because mandatory

@@ -22,6 +22,7 @@ insert_permissions:
       check: {}
       columns:
         - achievementOptionId
+        - courseId
         - coverImageUrl
         - csvResults
         - description
@@ -73,6 +74,7 @@ select_permissions:
     permission:
       columns:
         - achievementOptionId
+        - courseId
         - coverImageUrl
         - created_at
         - csvResults
