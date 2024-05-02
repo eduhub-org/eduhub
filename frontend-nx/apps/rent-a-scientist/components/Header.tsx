@@ -56,13 +56,7 @@ export const Header: FC = () => {
         <Link href="/">
           <div className="flex cursor-pointer">
             <div className="flex items-center">
-              <img
-                alt="Rent-A-Scientist Header Logo"
-                src="/static/header.jpg"
-                width={1280}
-                height={312}
-                className="h-[312px] w-[1280px]"
-              />
+              <img alt="Rent-A-Scientist Header Logo" src="/static/header.jpg" width={1280} className=" w-[1280px]" />
             </div>
           </div>
         </Link>
