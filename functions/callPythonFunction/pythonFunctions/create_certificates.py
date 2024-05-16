@@ -68,12 +68,13 @@ class CertificateCreator:
         # Vorbereitung des Textinhalts
         image = self.storage_client.download_file(template_image_url)
         text_content = self.prepare_text_content(enrollment, image)
-        logging.info(f"Der Text Content ist: {text_content}")
-        
+        logging.info(f"Der TextContent ist: {text_content}")
+        logging.info(f"Das html_template ist: {template}")
 
         # Erstellen der Jinja2-Umgebung und Rendern von HTML
         env = Environment(loader=DictLoader({'template': template_text}))
         template = env.get_template('template')
+        
         rendered_html = template.render(text_content)
         logging.info(f"Der gerenderte html: {rendered_html}")
 
@@ -92,9 +93,7 @@ class CertificateCreator:
 
         return url
 
-    def fetch_program_info(self):
-        #TODO: get textID and Image URL per userID via program 
-        pass
+   
 
     def fetch_template_image(self):
         if self.certificate_type == "achievement" or self.certificate_type == "attendance":
@@ -110,58 +109,63 @@ class CertificateCreator:
             raise ValueError("Invalid Certificate type")
         
     def fetch_template_text(self):
-         # Necessary Data to retrieve HTML from hasura 
         logging.info("fetch_template_text gets called")
         logging.info(f"The enrollments are: {self.enrollments}")
-        
-        if self.certificate_type == "achievement" or self.certificate_type == "attendance":
-            
-            if self.certificate_type == "achievement":
-                text_id =self.enrollments[0]['Course']['Program']['achievementCertificateTemplateTextId']
-            else:
-                text_id = self.enrollments[0]['Course']['Program']['attendanceCertificateTemplateTextId']
-                logging.info(f"The text_id is: {text_id}")
-        else: 
-            logging.info("Certificate type is incorrect or missing!")
 
-        
-        # GraphQL query
+        record_type = self.enrollments[0]['User']['AchievementRecordAuthors'][0]['AchievementRecord']['AchievementOption']['recordType']
+        record_type = record_type if record_type is not None else "NULL"
+        certificate_type = self.certificate_type 
+        program_id = self.enrollments[0]['Course']['Program']['id']
+
         query = """
-        query getHTML($textId: Int!) {
-            CertificateTemplateText(where: {id: {_eq: $textId}}) {
-                html
-            }
+        query getTemplateHtml($programId: Int!) {
+    CertificateTemplateProgram(where: {programId: {_eq: $programId}}) {
+        CertificateTemplateText {
+            html
+            recordType
+            certificateType 
         }
+    }
+}
+
         """
         variables = {
-                "textId": text_id
-            }
-
-        logging.info(f" text id is: {text_id}")
-        # Headers including the admin secret
-        headers = {
-        "Content-Type": "application/json",
-        "x-hasura-admin-secret": self.eduhub_client.hasura_admin_secret
+            "programId": program_id
         }
 
-        logging.info(f"THe headers is: {headers}")
-        
-        # Make the request to the GraphQL endpoint
+        headers = {
+            "Content-Type": "application/json",
+            "x-hasura-admin-secret": self.eduhub_client.hasura_admin_secret
+        }
+
         try:
             response = requests.post(
-            self.eduhub_client.url,
-            json={'query': query, 'variables': variables},
-            headers=headers
-        )
-            response.raise_for_status()  # Raises a HTTPError if the HTTP request returned an unsuccessful status code
-
-            # Assuming the data is returned in JSON format
+                self.eduhub_client.url,
+                json={'query': query, 'variables': variables},
+                headers=headers
+            )
+            response.raise_for_status()
             data = response.json()
-            logging.info(f"The data is: {data}")
-            return data['data']['CertificateTemplateText'][0]['html']
+            logging.info(f"The DATA is: {data}")
+
+            if 'errors' in data:
+                logging.error(f"GraphQL Error: {data['errors']}")
+                return None
+
+            # Durchlaufen der Templates und Finden des passenden Templates.
+            templates = data['data']['CertificateTemplateProgram']
+            for program in templates:
+                for template in program['CertificateTemplateText']:
+                    if template['recordType'] == record_type and template['certificateType'] == certificate_type:
+                        logging.info(f"Matching template found: {template['html']}")
+                        return template['html']
+
+            logging.error("No matching template found for the specified recordType and certificateType.")
+            return None
+
         except requests.exceptions.RequestException as e:
-        # Handle any errors that occur during the request
-            logging.info("An error occured")
+            logging.error(f"An error occurred during the GraphQL request: {str(e)}")
+            return None
 
     def prepare_text_content(self, enrollment, image):
         if self.certificate_type == "attendance" or self.certificate_type == "achievement":

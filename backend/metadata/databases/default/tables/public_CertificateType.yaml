@@ -1,0 +1,12 @@
+table:
+  name: CertificateType
+  schema: public
+is_enum: true
+array_relationships:
+  - name: CertificateTemplateTexts
+    using:
+      foreign_key_constraint_on:
+        column: certificateType
+        table:
+          name: CertificateTemplateText
+          schema: public

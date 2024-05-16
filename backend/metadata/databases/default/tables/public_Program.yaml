@@ -2,6 +2,13 @@ table:
   name: Program
   schema: public
 array_relationships:
+  - name: CertificateTemplatePrograms
+    using:
+      foreign_key_constraint_on:
+        column: programId
+        table:
+          name: CertificateTemplateProgram
+          schema: public
   - name: Courses
     using:
       foreign_key_constraint_on:

@@ -208,6 +208,7 @@ class EduHubClient:
                         attendanceCertificateTemplateURL
                         attendanceCertificateTemplateTextId
                         achievementCertificateTemplateTextId
+                        id
                     }
                     Sessions(order_by: {startDateTime: asc}) {
                         id
