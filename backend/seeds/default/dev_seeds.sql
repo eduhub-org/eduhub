@@ -287,7 +287,7 @@ INSERT INTO public."CertificateTemplateText" VALUES (
       }
     }
     body, html {
-      font-family: 'Lato', sans-serif !important;
+      font-family: ''Lato'', sans-serif !important;
       margin: 0;
       padding: 0;
       width: 210mm;
@@ -353,6 +353,7 @@ INSERT INTO public."CertificateTemplateText" VALUES (
     '2023-12-14 13:40:34.079378+00', 
     '2023-12-14 13:55:01.645233+00'
 );
+
 INSERT INTO public."CertificateTemplateText" VALUES (
     2, 
     'attendance certificate example', 
@@ -376,7 +377,7 @@ INSERT INTO public."CertificateTemplateText" VALUES (
       }
     }
     body, html {
-      font-family: 'Lato', sans-serif !important;
+      font-family: ''Lato'', sans-serif !important;
       margin: 0;
       padding: 0;
       width: 210mm;
@@ -432,7 +433,6 @@ INSERT INTO public."CertificateTemplateText" VALUES (
     '2023-12-14 13:40:34.079378+00', 
     '2023-12-14 13:55:01.645233+00'
 );
-
 
 --INSERT INTO public."Attendance" VALUES (1, 1, '3dee812b-865e-497b-b247-ff3a6a978530', 'ATTENDED', '2022-12-19 13:55:28.341956+00', '2022-12-19 13:55:28.341956+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
 --INSERT INTO public."Attendance" VALUES (2, 2, '3dee812b-865e-497b-b247-ff3a6a978530', 'ATTENDED', '2022-12-19 13:55:28.893252+00', '2022-12-19 13:55:28.893252+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
