@@ -69,12 +69,12 @@ class CertificateCreator:
         image = self.storage_client.download_file(template_image_url)
         text_content = self.prepare_text_content(enrollment, image)
         logging.info(f"Der TextContent ist: {text_content}")
-        logging.info(f"Das html_template ist: {template}")
+        logging.info(f"Der TemplateText ist: {template_text}")
 
         # Erstellen der Jinja2-Umgebung und Rendern von HTML
         env = Environment(loader=DictLoader({'template': template_text}))
         template = env.get_template('template')
-        
+        logging.info(f"Das ungerenderte template ist: {template}")
         rendered_html = template.render(text_content)
         logging.info(f"Der gerenderte html: {rendered_html}")
 
@@ -154,11 +154,14 @@ class CertificateCreator:
 
             # Durchlaufen der Templates und Finden des passenden Templates.
             templates = data['data']['CertificateTemplateProgram']
+            certificate_type_in_caps = certificate_type.upper()
             for program in templates:
-                for template in program['CertificateTemplateText']:
-                    if template['recordType'] == record_type and template['certificateType'] == certificate_type:
-                        logging.info(f"Matching template found: {template['html']}")
-                        return template['html']
+                template = program['CertificateTemplateText']
+                logging.info(f"Der gegRecordType ist: {record_type} und im template ist er: {template['recordType']}")
+                logging.info(f"Der gegCertType ist: {certificate_type_in_caps} und im template ist er: {template['certificateType']}")
+                if template['recordType'] == record_type and template['certificateType'] == certificate_type_in_caps:
+                    logging.info(f"Matching template found: {template['html']}")
+                    return template['html']
 
             logging.error("No matching template found for the specified recordType and certificateType.")
             return None
