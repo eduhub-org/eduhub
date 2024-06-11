@@ -1,0 +1,10 @@
+table:
+  name: CertificateTemplateProgram
+  schema: public
+object_relationships:
+  - name: CertificateTemplateText
+    using:
+      foreign_key_constraint_on: certificateTemplateText
+  - name: Program
+    using:
+      foreign_key_constraint_on: programId

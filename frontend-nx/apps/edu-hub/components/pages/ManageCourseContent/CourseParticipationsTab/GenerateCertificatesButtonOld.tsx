@@ -2,7 +2,7 @@ import { useRoleMutation } from '../../../../hooks/authedMutation';
 import useTranslation from 'next-translate/useTranslation';
 
 import { Button } from '../../../common/Button';
-import { CREATE_CERTIFICATES } from '../../../../queries/actions';
+import { CREATE_CERTIFICATE } from '../../../../queries/actions';
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_CourseEnrollments,
@@ -32,7 +32,7 @@ export const GenerateCertificatesButton: React.FC<Props> = ({
 
   const userIds = userEnrollments.map((enrollment) => enrollment.userId);
 
-  const [createCertificates, { loading, error }] = useRoleMutation(CREATE_CERTIFICATES, {
+  const [createCertificate, { loading, error }] = useRoleMutation(CREATE_CERTIFICATE, {
     variables: {
       courseId: course.id,
       userIds,
@@ -45,7 +45,7 @@ export const GenerateCertificatesButton: React.FC<Props> = ({
     setSuccessMessage(null);
 
     try {
-      const result = await createCertificates();
+      const result = await createCertificate();
       const { result: certResult } = result.data.createCertificate;
 
       const successTranslationKey =
