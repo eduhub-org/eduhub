@@ -1,10 +1,11 @@
 import logging
 import os
 import io
-
+from io import BytesIO
+from unittest.mock import MagicMock
 from typing import Optional
 from datetime import timedelta
-
+import base64
 from google import auth
 from google.auth.transport import requests
 from google.cloud.storage import Client
@@ -34,7 +35,8 @@ class StorageClient:
 
     def get_bucket(self):
         if self.env == "development":
-            return self.bucket_name  # In local mode, just return the bucket name
+            mock_bucket = MagicMock()
+            return mock_bucket  # In local mode, return a mock bucket
         else:
             return self.storage_client.bucket(self.bucket_name)
 
@@ -76,13 +78,20 @@ class StorageClient:
             blob = self.storage_client.bucket(self.bucket_name).blob(blob_name)
             blob.delete()
 
-    def download_file(self, blob_name, file_path):
+    def download_file(self, file_path):
         if self.env == "development":
-            src_path = os.path.join(self.BUCKET_DIRECTORY, self.bucket_name, blob_name)
-            os.replace(src_path, file_path)
+            base_dir = os.path.dirname(__file__)  # Gibt das Verzeichnis des aktuellen Skripts zurück
+            local_path = os.path.join(base_dir, "opencampus_attendencecert_template_WS2022.png")
+            with open(local_path, 'rb') as f:
+                file_data = f.read()
+            image_data = BytesIO(file_data)
+            mime_type = "image/png"
+            base64_encoded_data = base64.b64encode(image_data.getvalue()).decode()
+            return f"data:{mime_type};base64,{base64_encoded_data}"
         else:
-            blob = self.storage_client.bucket(self.bucket_name).blob(blob_name)
-            blob.download_to_filename(file_path)
+            blob = self.storage_client.bucket(self.bucket_name).blob(file_path)
+            blob_data = blob.download_as_bytes()
+            return BytesIO(blob_data)
 
     def upload_file(self, path, blob_name, buffer, content_type):
         if self.env == "development":

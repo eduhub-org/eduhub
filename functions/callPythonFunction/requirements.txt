@@ -12,3 +12,4 @@ authlib
 datetime
 python-dateutil
 google-cloud-storage
+xhtml2pdf

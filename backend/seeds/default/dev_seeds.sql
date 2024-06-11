@@ -264,7 +264,175 @@ INSERT INTO public."CourseGroup" VALUES (10, 8, 5, '2022-12-19 12:56:07.352338+0
 INSERT INTO public."CourseInstructor" VALUES (10, 8, 2, '2022-12-17 22:20:20.615952+00', '2022-12-17 22:20:20.615952+00');
 INSERT INTO public."CourseInstructor" VALUES (11, 8, 4, '2022-12-17 22:20:20.615952+00', '2022-12-17 22:20:20.615952+00');
 INSERT INTO public."CourseEnrollment" VALUES (21, 8, '152f12c3-f7d2-4b73-8d29-603c164b0139', 'CONFIRMED', 'The cat looks perfect', 'INVITE', NULL, NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', '2022-11-01');
+INSERT INTO public."CertificateTemplateText" VALUES (
+    1, 
+    'achievement certificate example', 
+    '<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>Document Title</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap" rel="stylesheet"> 
+  <style type="text/css">
+    @page {
+      size: a4;
+      background-image: url("{{ template }}");
+      background-position: center center;
+      background-size: cover;
+      @frame content_frame {
+        left: 165pt;
+        width: 420pt;
+        top: 150pt;
+        height:500pt;
+       
+      }
+    }
+    body, html {
+      font-family: ''Lato'', sans-serif !important;
+      margin: 0;
+      padding: 0;
+      width: 210mm;
+      height: 297mm;
+    }
+    .content {
+      position: absolute;
+      top: 0mm;
+      left: 63mm;
+      width: 130mm;
+      height: 100%;
+    }
+    .content span, .content p, .content ul, .content li {
+      color: #777;
+      text-align: left;
+      width: 100%;
+    }
+    .big {
+      font-size: 7mm;
+      font-weight: Black 900;
+    }
+    .small {
+      font-size: 4.2mm;
+    }
+    .bold {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+   <div class="content">
+    <span class="big bold" style="top:50mm;">{{ full_name }}</span><br><br><br>
+    <span class="small" style="top:63mm;">
+      hat im {{ semester }} an dem Kurs
+    </span><br><br><br>
+    <span class="big bold" style="top:50mm;">{{ course_name }}</span><br><br>
+    <div class="small" style="top:90mm;">
+      <p> teilgenommen.</p>
+      <p>
+        Bei dem Kurs handelt es sich um ein interdisziplinäres Weiterbildungsangebot im
+        Rahmen des Kieler Bildungsclusters opencampus.sh.
+        Das Modul wird über das Zentrum für Schlüsselqualifikationen an der Christian-Albrechts-Universität zu Kiel angeboten.
+      </p>
+      <p>
+        Für den Abschluss des Kurses wurde ein Arbeitsumfang entsprechend von {{ ECTS }} Arbeitsstunden erbracht. Dazu hat die/der Teilnehmende
+      </p>
+       <ul>
+        <li>aktiv an den Kursterminen teilgenommen,</li>
+        <li>das Praxisprojekt "{{ praxisprojekt }}" erfolgreich abgeschlossen.</li>
+      </ul>
+    </div>
+    <div class="small" style="top:150mm;">
+  <p>Durch den erfolgreichen Abschluss des Kurses hat die/der Teilnehmende gelernt:</p>
+  <ul>
+    {% for goal in learningGoalsList %}
+      <li>{{ goal }}</li>
+    {% endfor %}
+  </ul>
+</div>
+  </div>
+</body>
+</html>', 
+    '2023-12-14 13:40:34.079378+00', 
+    '2023-12-14 13:55:01.645233+00'
+);
 
+INSERT INTO public."CertificateTemplateText" VALUES (
+    2, 
+    'attendance certificate example', 
+    '<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>Document Title</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap" rel="stylesheet"> 
+  <style type="text/css">
+    @page {
+      size: a4;
+      background-image: url("{{ template }}");
+      background-position: center center;
+      background-size: cover;
+      @frame content_frame {
+        left: 165pt;
+        width: 420pt;
+        top: 150pt;
+        height:500pt;
+       
+      }
+    }
+    body, html {
+      font-family: ''Lato'', sans-serif !important;
+      margin: 0;
+      padding: 0;
+      width: 210mm;
+      height: 297mm;
+    }
+    .content {
+      position: absolute;
+      top: 0mm;
+      left: 63mm;
+      width: 130mm;
+      height: 100%;
+    }
+    .content span, .content p, .content ul, .content li {
+      color: #777;
+      text-align: left;
+      width: 100%;
+    }
+    .big {
+      font-size: 7mm;
+    }
+    .small {
+      font-size: 4.2mm;
+    }
+    .bold {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+   <div class="content">
+    <span class="big bold" style="top:50mm;">{{ full_name }}</span><br>
+    <span class="small" style="top:63mm;">
+      hat im {{semester}} an dem Kurs
+    </span><br>
+    <span class="big bold" style="top: 64mm;">{{course_name}}</span>
+    <div class="small" style="top: 90mm;">
+      <p>an folgenden Terminen teilgenommen:</p>
+       </ul>
+       {% for entry in event_entries %}
+      <li>{{ entry }}</li>
+    {% endfor %}
+    </ul>
+      <p>
+      <p>
+        Bei dem Kurs handelt es sich um ein interdisziplinäres Weiterbildungsangebot im
+        Rahmen des Kieler Bildungsclusters opencampus.sh.
+        Das Modul wird über das Zentrum für Schlüsselqualifikationen an der Christian-Albrechts-Universität zu Kiel angeboten.
+      </p>
+</div>
+  </div>
+</body>
+</html>', 
+    '2023-12-14 13:40:34.079378+00', 
+    '2023-12-14 13:55:01.645233+00'
+);
 
 --INSERT INTO public."Attendance" VALUES (1, 1, '3dee812b-865e-497b-b247-ff3a6a978530', 'ATTENDED', '2022-12-19 13:55:28.341956+00', '2022-12-19 13:55:28.341956+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
 --INSERT INTO public."Attendance" VALUES (2, 2, '3dee812b-865e-497b-b247-ff3a6a978530', 'ATTENDED', '2022-12-19 13:55:28.893252+00', '2022-12-19 13:55:28.893252+00', NULL, 'INSTRUCTOR', NULL, NULL, NULL, NULL);
