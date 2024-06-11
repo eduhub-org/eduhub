@@ -1,0 +1,32 @@
+table:
+  name: CertificateTemplateText
+  schema: public
+object_relationships:
+  - name: AchievementRecordType
+    using:
+      foreign_key_constraint_on: recordType
+  - name: CertificateType
+    using:
+      foreign_key_constraint_on: certificateType
+array_relationships:
+  - name: CertificateTemplatePrograms
+    using:
+      foreign_key_constraint_on:
+        column: certificateTemplateText
+        table:
+          name: CertificateTemplateProgram
+          schema: public
+  - name: Programs
+    using:
+      foreign_key_constraint_on:
+        column: achievementCertificateTemplateTextId
+        table:
+          name: Program
+          schema: public
+  - name: programsByAttendancecertificatetemplatetextid
+    using:
+      foreign_key_constraint_on:
+        column: attendanceCertificateTemplateTextId
+        table:
+          name: Program
+          schema: public
