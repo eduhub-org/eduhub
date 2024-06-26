@@ -113,6 +113,9 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     (courseEnrollment?.status === CourseEnrollmentStatus_enum.CONFIRMED ||
       courseEnrollment?.status === CourseEnrollmentStatus_enum.COMPLETED);
 
+  const hideAchievementCertificateButton = !course.Program.visibilityAchievementCertificate;
+  const hideAttendanceCertificateButton = !course.Program.visibilityAttendanceCertificate;
+
   return (
     <div>
       {getCoursesAuthorizedLoading || getCoursesUnauthorizedLoading ? (
@@ -163,7 +166,11 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                       </>
                     )}
                     {isDegreeCourse && <CompletedDegreeCourses degreeCourseId={course.id} />}
-                    <CertificateDownload courseEnrollment={courseEnrollment} />
+                    <CertificateDownload
+                      courseEnrollment={courseEnrollment}
+                      hideAchievementCertificateButton={hideAchievementCertificateButton}
+                      hideAttendanceCertificateButton={hideAttendanceCertificateButton}
+                    />
                   </ContentRow>
                   // </div>
                 )}

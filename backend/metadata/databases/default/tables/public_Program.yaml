@@ -66,6 +66,8 @@ select_permissions:
         - shortTitle
         - title
         - visibility
+        - visibilityAchievementCertificate
+        - visibilityAttendanceCertificate
       filter: {}
   - role: instructor_access
     permission:

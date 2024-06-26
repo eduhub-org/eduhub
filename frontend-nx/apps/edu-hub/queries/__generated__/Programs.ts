@@ -38,6 +38,14 @@ export interface Programs_Program {
    * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
    */
   published: boolean;
+  /**
+   * Sets the achievement certificates for all courses of htis program to be visible for the recipients.
+   */
+  visibilityAchievementCertificate: boolean | null;
+  /**
+   * Sets the participation certificates for all courses of htis program to be visible for the recipients.
+   */
+  visibilityAttendanceCertificate: boolean | null;
 }
 
 export interface Programs {
