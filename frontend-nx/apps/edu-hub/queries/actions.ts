@@ -152,7 +152,7 @@ export const CREATE_CERTIFICATE = gql`
 `;
 
 export const CREATE_CERTIFICATES = gql`
-  mutation createCertificate(
+  mutation createCertificates(
     $userIds: [uuid!]!
     $courseId: Int!
     $certificateType: String!

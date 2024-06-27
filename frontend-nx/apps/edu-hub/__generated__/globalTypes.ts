@@ -364,6 +364,85 @@ export enum Attendance_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "CertificateTemplateProgram"
+ */
+export enum CertificateTemplateProgram_constraint {
+  CertificateTemplateProgram_pkey = "CertificateTemplateProgram_pkey",
+}
+
+/**
+ * select columns of table "CertificateTemplateProgram"
+ */
+export enum CertificateTemplateProgram_select_column {
+  certificateTemplateText = "certificateTemplateText",
+  id = "id",
+  programId = "programId",
+}
+
+/**
+ * update columns of table "CertificateTemplateProgram"
+ */
+export enum CertificateTemplateProgram_update_column {
+  certificateTemplateText = "certificateTemplateText",
+  id = "id",
+  programId = "programId",
+}
+
+/**
+ * unique or primary key constraints on table "CertificateTemplateText"
+ */
+export enum CertificateTemplateText_constraint {
+  CertificateTemplateText_pkey = "CertificateTemplateText_pkey",
+  CertificateTemplateText_title_key = "CertificateTemplateText_title_key",
+}
+
+/**
+ * select columns of table "CertificateTemplateText"
+ */
+export enum CertificateTemplateText_select_column {
+  certificateType = "certificateType",
+  created_at = "created_at",
+  html = "html",
+  id = "id",
+  recordType = "recordType",
+  title = "title",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "CertificateTemplateText"
+ */
+export enum CertificateTemplateText_update_column {
+  certificateType = "certificateType",
+  created_at = "created_at",
+  html = "html",
+  id = "id",
+  recordType = "recordType",
+  title = "title",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "CertificateType"
+ */
+export enum CertificateType_constraint {
+  CertificateType_pkey = "CertificateType_pkey",
+}
+
+export enum CertificateType_enum {
+  ACHIEVEMENT = "ACHIEVEMENT",
+  ATTENDANCE = "ATTENDANCE",
+}
+
+/**
+ * update columns of table "CertificateType"
+ */
+export enum CertificateType_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
  * unique or primary key constraints on table "CourseDegree"
  */
 export enum CourseDegree_constraint {
@@ -803,12 +882,60 @@ export enum Program_constraint {
 }
 
 /**
- * update columns of table "Program"
+ * select columns of table "Program"
  */
-export enum Program_update_column {
+export enum Program_select_column {
+  achievementCertificateTemplateTextId = "achievementCertificateTemplateTextId",
   achievementCertificateTemplateURL = "achievementCertificateTemplateURL",
   achievementRecordUploadDeadline = "achievementRecordUploadDeadline",
   applicationStart = "applicationStart",
+  attendanceCertificateTemplateTextId = "attendanceCertificateTemplateTextId",
+  attendanceCertificateTemplateURL = "attendanceCertificateTemplateURL",
+  closingQuestionnaire = "closingQuestionnaire",
+  defaultApplicationEnd = "defaultApplicationEnd",
+  defaultMaxMissedSessions = "defaultMaxMissedSessions",
+  id = "id",
+  lectureEnd = "lectureEnd",
+  lectureStart = "lectureStart",
+  published = "published",
+  shortTitle = "shortTitle",
+  speakerQuestionnaire = "speakerQuestionnaire",
+  startQuestionnaire = "startQuestionnaire",
+  title = "title",
+  visibility = "visibility",
+  visibilityAchievementCertificate = "visibilityAchievementCertificate",
+  visibilityAttendanceCertificate = "visibilityAttendanceCertificate",
+}
+
+/**
+ * select "Program_aggregate_bool_exp_bool_and_arguments_columns" columns of table "Program"
+ */
+export enum Program_select_column_Program_aggregate_bool_exp_bool_and_arguments_columns {
+  published = "published",
+  visibility = "visibility",
+  visibilityAchievementCertificate = "visibilityAchievementCertificate",
+  visibilityAttendanceCertificate = "visibilityAttendanceCertificate",
+}
+
+/**
+ * select "Program_aggregate_bool_exp_bool_or_arguments_columns" columns of table "Program"
+ */
+export enum Program_select_column_Program_aggregate_bool_exp_bool_or_arguments_columns {
+  published = "published",
+  visibility = "visibility",
+  visibilityAchievementCertificate = "visibilityAchievementCertificate",
+  visibilityAttendanceCertificate = "visibilityAttendanceCertificate",
+}
+
+/**
+ * update columns of table "Program"
+ */
+export enum Program_update_column {
+  achievementCertificateTemplateTextId = "achievementCertificateTemplateTextId",
+  achievementCertificateTemplateURL = "achievementCertificateTemplateURL",
+  achievementRecordUploadDeadline = "achievementRecordUploadDeadline",
+  applicationStart = "applicationStart",
+  attendanceCertificateTemplateTextId = "attendanceCertificateTemplateTextId",
   attendanceCertificateTemplateURL = "attendanceCertificateTemplateURL",
   closingQuestionnaire = "closingQuestionnaire",
   defaultApplicationEnd = "defaultApplicationEnd",
@@ -3057,6 +3184,294 @@ export interface Boolean_comparison_exp {
   _nin?: boolean[] | null;
 }
 
+export interface CertificateTemplateProgram_aggregate_bool_exp {
+  count?: CertificateTemplateProgram_aggregate_bool_exp_count | null;
+}
+
+export interface CertificateTemplateProgram_aggregate_bool_exp_count {
+  arguments?: CertificateTemplateProgram_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: CertificateTemplateProgram_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "CertificateTemplateProgram"
+ */
+export interface CertificateTemplateProgram_aggregate_order_by {
+  avg?: CertificateTemplateProgram_avg_order_by | null;
+  count?: order_by | null;
+  max?: CertificateTemplateProgram_max_order_by | null;
+  min?: CertificateTemplateProgram_min_order_by | null;
+  stddev?: CertificateTemplateProgram_stddev_order_by | null;
+  stddev_pop?: CertificateTemplateProgram_stddev_pop_order_by | null;
+  stddev_samp?: CertificateTemplateProgram_stddev_samp_order_by | null;
+  sum?: CertificateTemplateProgram_sum_order_by | null;
+  var_pop?: CertificateTemplateProgram_var_pop_order_by | null;
+  var_samp?: CertificateTemplateProgram_var_samp_order_by | null;
+  variance?: CertificateTemplateProgram_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "CertificateTemplateProgram"
+ */
+export interface CertificateTemplateProgram_arr_rel_insert_input {
+  data: CertificateTemplateProgram_insert_input[];
+  on_conflict?: CertificateTemplateProgram_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "CertificateTemplateProgram"
+ */
+export interface CertificateTemplateProgram_avg_order_by {
+  certificateTemplateText?: order_by | null;
+  id?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "CertificateTemplateProgram". All fields are combined with a logical 'AND'.
+ */
+export interface CertificateTemplateProgram_bool_exp {
+  CertificateTemplateText?: CertificateTemplateText_bool_exp | null;
+  Program?: Program_bool_exp | null;
+  _and?: CertificateTemplateProgram_bool_exp[] | null;
+  _not?: CertificateTemplateProgram_bool_exp | null;
+  _or?: CertificateTemplateProgram_bool_exp[] | null;
+  certificateTemplateText?: Int_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  programId?: Int_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "CertificateTemplateProgram"
+ */
+export interface CertificateTemplateProgram_insert_input {
+  CertificateTemplateText?: CertificateTemplateText_obj_rel_insert_input | null;
+  Program?: Program_obj_rel_insert_input | null;
+  certificateTemplateText?: number | null;
+  id?: number | null;
+  programId?: number | null;
+}
+
+/**
+ * order by max() on columns of table "CertificateTemplateProgram"
+ */
+export interface CertificateTemplateProgram_max_order_by {
+  certificateTemplateText?: order_by | null;
+  id?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "CertificateTemplateProgram"
+ */
+export interface CertificateTemplateProgram_min_order_by {
+  certificateTemplateText?: order_by | null;
+  id?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "CertificateTemplateProgram"
+ */
+export interface CertificateTemplateProgram_on_conflict {
+  constraint: CertificateTemplateProgram_constraint;
+  update_columns: CertificateTemplateProgram_update_column[];
+  where?: CertificateTemplateProgram_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "CertificateTemplateProgram"
+ */
+export interface CertificateTemplateProgram_stddev_order_by {
+  certificateTemplateText?: order_by | null;
+  id?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "CertificateTemplateProgram"
+ */
+export interface CertificateTemplateProgram_stddev_pop_order_by {
+  certificateTemplateText?: order_by | null;
+  id?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "CertificateTemplateProgram"
+ */
+export interface CertificateTemplateProgram_stddev_samp_order_by {
+  certificateTemplateText?: order_by | null;
+  id?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "CertificateTemplateProgram"
+ */
+export interface CertificateTemplateProgram_sum_order_by {
+  certificateTemplateText?: order_by | null;
+  id?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "CertificateTemplateProgram"
+ */
+export interface CertificateTemplateProgram_var_pop_order_by {
+  certificateTemplateText?: order_by | null;
+  id?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "CertificateTemplateProgram"
+ */
+export interface CertificateTemplateProgram_var_samp_order_by {
+  certificateTemplateText?: order_by | null;
+  id?: order_by | null;
+  programId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "CertificateTemplateProgram"
+ */
+export interface CertificateTemplateProgram_variance_order_by {
+  certificateTemplateText?: order_by | null;
+  id?: order_by | null;
+  programId?: order_by | null;
+}
+
+export interface CertificateTemplateText_aggregate_bool_exp {
+  count?: CertificateTemplateText_aggregate_bool_exp_count | null;
+}
+
+export interface CertificateTemplateText_aggregate_bool_exp_count {
+  arguments?: CertificateTemplateText_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: CertificateTemplateText_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * input type for inserting array relation for remote table "CertificateTemplateText"
+ */
+export interface CertificateTemplateText_arr_rel_insert_input {
+  data: CertificateTemplateText_insert_input[];
+  on_conflict?: CertificateTemplateText_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "CertificateTemplateText". All fields are combined with a logical 'AND'.
+ */
+export interface CertificateTemplateText_bool_exp {
+  AchievementRecordType?: AchievementRecordType_bool_exp | null;
+  CertificateTemplatePrograms?: CertificateTemplateProgram_bool_exp | null;
+  CertificateTemplatePrograms_aggregate?: CertificateTemplateProgram_aggregate_bool_exp | null;
+  CertificateType?: CertificateType_bool_exp | null;
+  Programs?: Program_bool_exp | null;
+  Programs_aggregate?: Program_aggregate_bool_exp | null;
+  _and?: CertificateTemplateText_bool_exp[] | null;
+  _not?: CertificateTemplateText_bool_exp | null;
+  _or?: CertificateTemplateText_bool_exp[] | null;
+  certificateType?: CertificateType_enum_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  html?: String_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  programsByAttendancecertificatetemplatetextid?: Program_bool_exp | null;
+  programsByAttendancecertificatetemplatetextid_aggregate?: Program_aggregate_bool_exp | null;
+  recordType?: AchievementRecordType_enum_comparison_exp | null;
+  title?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "CertificateTemplateText"
+ */
+export interface CertificateTemplateText_insert_input {
+  AchievementRecordType?: AchievementRecordType_obj_rel_insert_input | null;
+  CertificateTemplatePrograms?: CertificateTemplateProgram_arr_rel_insert_input | null;
+  CertificateType?: CertificateType_obj_rel_insert_input | null;
+  Programs?: Program_arr_rel_insert_input | null;
+  certificateType?: CertificateType_enum | null;
+  created_at?: any | null;
+  html?: string | null;
+  id?: number | null;
+  programsByAttendancecertificatetemplatetextid?: Program_arr_rel_insert_input | null;
+  recordType?: AchievementRecordType_enum | null;
+  title?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "CertificateTemplateText"
+ */
+export interface CertificateTemplateText_obj_rel_insert_input {
+  data: CertificateTemplateText_insert_input;
+  on_conflict?: CertificateTemplateText_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "CertificateTemplateText"
+ */
+export interface CertificateTemplateText_on_conflict {
+  constraint: CertificateTemplateText_constraint;
+  update_columns: CertificateTemplateText_update_column[];
+  where?: CertificateTemplateText_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "CertificateType". All fields are combined with a logical 'AND'.
+ */
+export interface CertificateType_bool_exp {
+  CertificateTemplateTexts?: CertificateTemplateText_bool_exp | null;
+  CertificateTemplateTexts_aggregate?: CertificateTemplateText_aggregate_bool_exp | null;
+  _and?: CertificateType_bool_exp[] | null;
+  _not?: CertificateType_bool_exp | null;
+  _or?: CertificateType_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "CertificateType_enum". All fields are combined with logical 'AND'.
+ */
+export interface CertificateType_enum_comparison_exp {
+  _eq?: CertificateType_enum | null;
+  _in?: CertificateType_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: CertificateType_enum | null;
+  _nin?: CertificateType_enum[] | null;
+}
+
+/**
+ * input type for inserting data into table "CertificateType"
+ */
+export interface CertificateType_insert_input {
+  CertificateTemplateTexts?: CertificateTemplateText_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "CertificateType"
+ */
+export interface CertificateType_obj_rel_insert_input {
+  data: CertificateType_insert_input;
+  on_conflict?: CertificateType_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "CertificateType"
+ */
+export interface CertificateType_on_conflict {
+  constraint: CertificateType_constraint;
+  update_columns: CertificateType_update_column[];
+  where?: CertificateType_bool_exp | null;
+}
+
 export interface CourseDegree_aggregate_bool_exp {
   count?: CourseDegree_aggregate_bool_exp_count | null;
 }
@@ -4839,10 +5254,47 @@ export interface MotivationRating_on_conflict {
   where?: MotivationRating_bool_exp | null;
 }
 
+export interface Program_aggregate_bool_exp {
+  bool_and?: Program_aggregate_bool_exp_bool_and | null;
+  bool_or?: Program_aggregate_bool_exp_bool_or | null;
+  count?: Program_aggregate_bool_exp_count | null;
+}
+
+export interface Program_aggregate_bool_exp_bool_and {
+  arguments: Program_select_column_Program_aggregate_bool_exp_bool_and_arguments_columns;
+  distinct?: boolean | null;
+  filter?: Program_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface Program_aggregate_bool_exp_bool_or {
+  arguments: Program_select_column_Program_aggregate_bool_exp_bool_or_arguments_columns;
+  distinct?: boolean | null;
+  filter?: Program_bool_exp | null;
+  predicate: Boolean_comparison_exp;
+}
+
+export interface Program_aggregate_bool_exp_count {
+  arguments?: Program_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: Program_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * input type for inserting array relation for remote table "Program"
+ */
+export interface Program_arr_rel_insert_input {
+  data: Program_insert_input[];
+  on_conflict?: Program_on_conflict | null;
+}
+
 /**
  * Boolean expression to filter rows from the table "Program". All fields are combined with a logical 'AND'.
  */
 export interface Program_bool_exp {
+  CertificateTemplatePrograms?: CertificateTemplateProgram_bool_exp | null;
+  CertificateTemplatePrograms_aggregate?: CertificateTemplateProgram_aggregate_bool_exp | null;
   Courses?: Course_bool_exp | null;
   Courses_aggregate?: Course_aggregate_bool_exp | null;
   RentAScientistConfigs?: RentAScientistConfig_bool_exp | null;
@@ -4852,9 +5304,11 @@ export interface Program_bool_exp {
   _and?: Program_bool_exp[] | null;
   _not?: Program_bool_exp | null;
   _or?: Program_bool_exp[] | null;
+  achievementCertificateTemplateTextId?: Int_comparison_exp | null;
   achievementCertificateTemplateURL?: String_comparison_exp | null;
   achievementRecordUploadDeadline?: date_comparison_exp | null;
   applicationStart?: date_comparison_exp | null;
+  attendanceCertificateTemplateTextId?: Int_comparison_exp | null;
   attendanceCertificateTemplateURL?: String_comparison_exp | null;
   closingQuestionnaire?: String_comparison_exp | null;
   defaultApplicationEnd?: date_comparison_exp | null;
@@ -4876,12 +5330,15 @@ export interface Program_bool_exp {
  * input type for inserting data into table "Program"
  */
 export interface Program_insert_input {
+  CertificateTemplatePrograms?: CertificateTemplateProgram_arr_rel_insert_input | null;
   Courses?: Course_arr_rel_insert_input | null;
   RentAScientistConfigs?: RentAScientistConfig_arr_rel_insert_input | null;
   ScientistOffers?: ScientistOffer_arr_rel_insert_input | null;
+  achievementCertificateTemplateTextId?: number | null;
   achievementCertificateTemplateURL?: string | null;
   achievementRecordUploadDeadline?: any | null;
   applicationStart?: any | null;
+  attendanceCertificateTemplateTextId?: number | null;
   attendanceCertificateTemplateURL?: string | null;
   closingQuestionnaire?: string | null;
   defaultApplicationEnd?: any | null;
@@ -4920,12 +5377,15 @@ export interface Program_on_conflict {
  * Ordering options when selecting data from "Program".
  */
 export interface Program_order_by {
+  CertificateTemplatePrograms_aggregate?: CertificateTemplateProgram_aggregate_order_by | null;
   Courses_aggregate?: Course_aggregate_order_by | null;
   RentAScientistConfigs_aggregate?: RentAScientistConfig_aggregate_order_by | null;
   ScientistOffers_aggregate?: ScientistOffer_aggregate_order_by | null;
+  achievementCertificateTemplateTextId?: order_by | null;
   achievementCertificateTemplateURL?: order_by | null;
   achievementRecordUploadDeadline?: order_by | null;
   applicationStart?: order_by | null;
+  attendanceCertificateTemplateTextId?: order_by | null;
   attendanceCertificateTemplateURL?: order_by | null;
   closingQuestionnaire?: order_by | null;
   defaultApplicationEnd?: order_by | null;

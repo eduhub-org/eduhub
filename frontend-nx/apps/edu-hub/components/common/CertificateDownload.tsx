@@ -17,10 +17,14 @@ interface IProps {
   refetchAttendanceCertificates?: boolean;
   setRefetchAchievementCertificates?: Dispatch<SetStateAction<boolean>>;
   setRefetchAttendanceCertificates?: Dispatch<SetStateAction<boolean>>;
+  hideAchievementCertificateButton?: boolean;
+  hideAttendanceCertificateButton?: boolean;
 }
 
 export const CertificateDownload: FC<IProps> = ({
   courseEnrollment,
+  hideAchievementCertificateButton = false,
+  hideAttendanceCertificateButton = false,
   manageView,
   refetchAchievementCertificates,
   refetchAttendanceCertificates,
@@ -59,7 +63,7 @@ export const CertificateDownload: FC<IProps> = ({
   return (
     <div className={!manageView && 'mt-4'}>
       <div className={`flex gap-4 ${!manageView && 'flex-col sm:px-24'}`}>
-        {loadAchievementCertificateData && !loadAchievementCerfificateLoading && (
+        {loadAchievementCertificateData && !loadAchievementCerfificateLoading && !hideAchievementCertificateButton && (
           <>
             {!manageView && <h3 className="text-3xl font-medium">{t('course-page:congrats-completion')}</h3>}
             <Button
@@ -75,19 +79,21 @@ export const CertificateDownload: FC<IProps> = ({
             </Button>
           </>
         )}
-        {loadAttendanceCertificateData && !loadAttendanceCertificateLoading && (
-          <Button
-            as="a"
-            filled
-            href={loadAttendanceCertificateData.getSignedUrl.link}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {manageView
-              ? t('manageCourse:attendance_certificate_download')
-              : t('course-page:attendanceCertificateDownload')}
-          </Button>
-        )}
+        {loadAttendanceCertificateData &&
+          !loadAttendanceCertificateLoading &&
+          !hideAttendanceCertificateButton &&(
+            <Button
+              as="a"
+              filled
+              href={loadAttendanceCertificateData.getSignedUrl.link}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {manageView
+                ? t('manageCourse:attendance_certificate_download')
+                : t('course-page:attendanceCertificateDownload')}
+            </Button>
+          )}
         {/* Error Message Dialog */}
         {errorMessage && (
           <ErrorMessageDialog errorMessage={errorMessage} open={!!errorMessage} onClose={() => setErrorMessage('')} />

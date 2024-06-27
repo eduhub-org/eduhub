@@ -8,6 +8,7 @@ locals {
   hasura_service_name           = "${var.hasura_service_name_root}${var.service_name_extension}"
   eduhub_service_name           = "${var.eduhub_service_name_root}${var.service_name_extension}"
   rent_a_scientist_service_name = "${var.rent_a_scientist_service_name_root}${var.service_name_extension}"
+  mm_chatbot_service_name       = "${var.mm_chatbot_service_name_root}${var.service_name_extension}"
 }
 
 ######
@@ -63,6 +64,10 @@ variable "eduhub_service_name_root" {
   type        = string
 }
 variable "rent_a_scientist_service_name_root" {
+  description = "Name for the service of the Rent-a-Scientist frontend application"
+  type        = string
+}
+variable "mm_chatbot_service_name_root" {
   description = "Name for the service of the Rent-a-Scientist frontend application"
   type        = string
 }
@@ -251,5 +256,27 @@ variable "lms_password" {
 }
 variable "lms_attendance_survey_id" {
   description = "ID of the survey which is used to collect the attendance data"
+  type        = string
+}
+
+# Mattermost Chatbot 
+variable "mm_url" {
+  description = "The URL of the Mattermost Server"
+  type        = string
+}
+variable "mm_bot_name" {
+  description = "The display name of the Bot on Mattermost"
+  type        = string
+}
+variable "mm_bot_instruction" {
+  description = "Further instruction on how the bot should behave"
+  type        = string
+}
+variable "mm_bot_token" {
+  description = "API Token from Mattermost for the specific bot"
+  type        = string
+}
+variable "openai_token" {
+  description = "API Token for ChatGPT on OpenAI"
   type        = string
 }

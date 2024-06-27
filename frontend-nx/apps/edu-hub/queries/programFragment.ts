@@ -10,6 +10,8 @@ export const PROGRAM_FRAGMENT_MINIMUM_PROPERTIES = gql`
     defaultApplicationEnd
     achievementRecordUploadDeadline
     published
+    visibilityAchievementCertificate
+    visibilityAttendanceCertificate
   }
 `;
 export const USER_PROGRAM_FRAGMENT = gql`
@@ -25,6 +27,8 @@ export const USER_PROGRAM_FRAGMENT = gql`
     shortTitle
     achievementRecordUploadDeadline
     published
+    visibilityAchievementCertificate
+    visibilityAttendanceCertificate
   }
 `;
 
