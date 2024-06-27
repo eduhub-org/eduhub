@@ -67,6 +67,10 @@ variable "rent_a_scientist_service_name_root" {
   description = "Name for the service of the Rent-a-Scientist frontend application"
   type        = string
 }
+variable "mm_chatbot_service_name_root" {
+  description = "Name for the service of the Rent-a-Scientist frontend application"
+  type        = string
+}
 variable "service_name_extension" {
   description = "Name extension for the services not run in production but in other environments"
   type        = string
