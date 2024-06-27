@@ -83,7 +83,7 @@ resource "google_cloud_run_service" "mm_chatbot" {
         env {
           name  = "BOT_INSTRUCTION"
           value = var.mm_bot_instruction
-        }        
+        }
         env {
           name = "MATTERMOST_TOKEN"
           value_from {
@@ -101,7 +101,7 @@ resource "google_cloud_run_service" "mm_chatbot" {
               key  = "latest"
             }
           }
-        }   
+        }
         env {
           name  = "ENVIRONMENT"
           value = var.environment
