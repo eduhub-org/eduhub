@@ -111,7 +111,7 @@ resource "google_cloud_run_service" "mm_chatbot" {
 
     metadata {
       annotations = {
-        "autoscaling.knative.dev/minScale" = "0"
+        "autoscaling.knative.dev/minScale" = "1"
         "autoscaling.knative.dev/maxScale" = "1"
       }
     }
