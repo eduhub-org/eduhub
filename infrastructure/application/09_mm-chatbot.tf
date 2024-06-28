@@ -1,5 +1,5 @@
 # Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the EduHub frontend service
-resource "google_cloud_run_service_iam_policy" "mm_bot_noauth_invoker" {
+resource "google_cloud_run_service_iam_policy" "eduhub_noauth_invoker" {
   location = google_cloud_run_service.eduhub.location
   project  = google_cloud_run_service.eduhub.project
   service  = google_cloud_run_service.eduhub.name
@@ -83,7 +83,7 @@ resource "google_cloud_run_service" "mm_chatbot" {
         env {
           name  = "BOT_INSTRUCTION"
           value = var.mm_bot_instruction
-        }
+        }        
         env {
           name = "MATTERMOST_TOKEN"
           value_from {
@@ -101,7 +101,7 @@ resource "google_cloud_run_service" "mm_chatbot" {
               key  = "latest"
             }
           }
-        }
+        }   
         env {
           name  = "ENVIRONMENT"
           value = var.environment
