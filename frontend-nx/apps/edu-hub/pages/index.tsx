@@ -16,6 +16,7 @@ import { CoursesEnrolledByUser } from '../queries/__generated__/CoursesEnrolledB
 import { COURSE_GROUP_OPTIONS } from '../queries/courseGroupOptions';
 import { COURSE_TILES, COURSES_BY_INSTRUCTOR, COURSES_ENROLLED_BY_USER } from '../queries/courseQueries';
 import { ClientOnly } from '@opencampus/shared-components';
+import Loading from '../components/common/Loading';
 
 const Home: FC = () => {
   const { t } = useTranslation('start-page');
@@ -100,7 +101,7 @@ const Home: FC = () => {
         </div>
         <div className="max-w-screen-xl mx-auto md:mt-[-130px] md:pl-16 mt-[-180px]">
           {isLoading ? (
-            <div>Loading...</div>
+            <Loading />
           ) : (
             <ClientOnly>
               {isLoggedIn && renderCourseGroups(coursesGroupsAuthenticated, 'coursesGroupsAuthenticated')}
