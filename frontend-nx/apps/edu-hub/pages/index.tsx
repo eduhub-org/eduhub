@@ -1,22 +1,24 @@
 import Head from 'next/head';
 import { FC, Fragment, useMemo } from 'react';
+
+import { useQuery } from '@apollo/client';
 import useTranslation from 'next-translate/useTranslation';
+import { ClientOnly } from '@opencampus/shared-components';
 
 import { Page } from '../components/layout/Page';
+import Loading from '../components/common/Loading';
 import TileSlider from '../components/common/TileSlider';
-import { useQuery } from '@apollo/client';
+
 import { useAuthedQuery, useInstructorQuery } from '../hooks/authedQuery';
 import { useIsLoggedIn, useIsInstructor, useIsAdmin } from '../hooks/authentication';
 import { useUserId } from '../hooks/user';
 
+import { COURSE_GROUP_OPTIONS } from '../queries/courseGroupOptions';
+import { COURSE_TILES, COURSES_BY_INSTRUCTOR, COURSES_ENROLLED_BY_USER } from '../queries/courseQueries';
 import { CourseGroupOptions } from '../queries/__generated__/CourseGroupOptions';
 import { CourseTiles } from '../queries/__generated__/CourseTiles';
 import { CoursesByInstructor } from '../queries/__generated__/CoursesByInstructor';
 import { CoursesEnrolledByUser } from '../queries/__generated__/CoursesEnrolledByUser';
-import { COURSE_GROUP_OPTIONS } from '../queries/courseGroupOptions';
-import { COURSE_TILES, COURSES_BY_INSTRUCTOR, COURSES_ENROLLED_BY_USER } from '../queries/courseQueries';
-import { ClientOnly } from '@opencampus/shared-components';
-import Loading from '../components/common/Loading';
 
 const Home: FC = () => {
   const { t } = useTranslation('start-page');
