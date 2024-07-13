@@ -3,12 +3,12 @@ import Link from 'next/link';
 import { FC, useEffect, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
-import { CourseListWithEnrollments_Course } from '../../../queries/__generated__/CourseListWithEnrollments';
+import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
 import languageIcon from '../../../public/images/course/language.svg';
 import locationIcon from '../../../public/images/course/pin.svg';
 import { getTileImage } from '../../../helpers/imageHandling';
 
-type CourseType = CourseList_Course | CourseListWithEnrollments_Course;
+type CourseType = CourseList_Course | CoursesEnrolledByUser_Course;
 
 interface TileProps {
   course: CourseType;
