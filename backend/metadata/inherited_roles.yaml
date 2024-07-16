@@ -6,4 +6,5 @@
 - role_name: user
   role_set:
     - user_access
+    - user_access_others
     - anonymous
