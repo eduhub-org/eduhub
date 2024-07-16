@@ -51,10 +51,20 @@ select_permissions:
         - status
         - userId
       filter:
-        Course:
-          CourseEnrollments:
-            userId:
+        _and:
+          - userId:
               _eq: X-Hasura-User-Id
+          - Course:
+              CourseEnrollments:
+                userId:
+                  _eq: X-Hasura-User-Id
+  - role: user_access_others
+    permission:
+      columns:
+        - courseId
+        - id
+        - userId
+      filter: {}
 update_permissions:
   - role: instructor_access
     permission:
