@@ -67,6 +67,7 @@ const ProfileOverview: FC = () => {
       university: null,
       matriculationNumber: '',
       externalProfile: '',
+      picture: null,
     },
   });
 
@@ -96,6 +97,7 @@ const ProfileOverview: FC = () => {
         university: user.university,
         matriculationNumber: user.matriculationNumber,
         externalProfile: user.externalProfile,
+        picture: user.picture,
       });
     },
     skip: !sessionData,
@@ -226,25 +228,24 @@ const ProfileOverview: FC = () => {
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="flex flex-wrap">
-                <div className="w-1/2 pr-3">
+                <div className="w-full md:w-1/2 pr-0 md:pr-3">
                   <FormFieldRow<Inputs> label={t('first-name')} name="firstName" required />
                 </div>
-                <div className="w-1/2 pl-3">
+                <div className="w-full md:w-1/2 pl-0 md:pl-3">
                   <FormFieldRow<Inputs> label={t('last-name')} name="lastName" required />
                 </div>
               </div>
               <div className="flex flex-wrap">
-                <div className="w-1/2 pr-3">
+                <div className="w-full md:w-1/2 pr-0 md:pr-3">
                   <FormFieldRow<Inputs>
                     label={t('email')}
                     name="email"
                     placeholder="name@example.com"
                     required
                     type="email"
-                    className="w-1/2 pr-3"
                   />
                 </div>
-                <div className="w-1/2 pl-3">
+                <div className="w-full md:w-1/2 pl-0 md:pl-3">
                   <FormFieldRow<Inputs>
                     label={t('status')}
                     name="employment"
@@ -254,7 +255,7 @@ const ProfileOverview: FC = () => {
                 </div>
               </div>
               <div className="flex flex-wrap">
-                <div className="w-1/2 pr-3">
+                <div className="w-full md:w-1/2 pr-0 md:pr-3">
                   <FormFieldRow<Inputs>
                     label={t('university')}
                     name="university"
@@ -262,15 +263,15 @@ const ProfileOverview: FC = () => {
                     options={universitySelectFormOptions}
                   />
                 </div>
-                <div className="w-1/2 pl-3">
+                <div className="w-full md:w-1/2 pl-0 md:pl-3">
                   <FormFieldRow<Inputs> label={t('matriculation-number')} name="matriculationNumber" />
                 </div>
               </div>
               <div className="flex flex-wrap">
-                <div className="w-1/2 pr-3">
+                <div className="w-full md:w-1/2 pr-0 md:pr-3">
                   <FormFieldRow<Inputs> label={t('external-profile')} name="externalProfile" />
                 </div>
-                <div className="w-1/2 pl-3 flex justify-center items-center text-center">
+                <div className="w-full md:w-1/2 pl-0 md:pl-3 flex justify-center items-center text-center">
                   <Button
                     as="a"
                     href={`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account`}
