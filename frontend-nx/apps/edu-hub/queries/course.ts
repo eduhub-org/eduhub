@@ -83,6 +83,9 @@ export const MANAGED_COURSE = gql`
             AchievementRecordAuthors {
               userId
             }
+            AchievementOption {
+              title
+            }
           }
           recordType
         }
