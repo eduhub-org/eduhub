@@ -506,6 +506,7 @@ interface IPropsShowDetails {
   qResult: QueryResult<any, any>;
 }
 const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocumentationResult, qResult }) => {
+  const { t } = useTranslation();
   const [setAchievementRecord] = useRoleMutation<UpdateAchievementRecordByPk, UpdateAchievementRecordByPkVariables>(
     UPDATE_AN_ACHIEVEMENT_RECORD
   );
@@ -557,6 +558,10 @@ const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocum
                       enrollment.mostRecentRecord.rating === AchievementRecordRating_enum.FAILED ? 'LARGE' : 'DEFAULT'
                     }
                   />
+                </div>
+                <div className="mb-3">
+                  {`${t('manageCourse:projectTitle')}: `}
+                  {enrollment.mostRecentRecord.AchievementOption.title}
                 </div>
                 <Button
                   as={'a'}

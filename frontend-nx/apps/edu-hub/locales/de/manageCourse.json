@@ -24,5 +24,6 @@
   "status": "Status",
   "ectsTotal": "ECTS Gesamt",
   "attendedEvents": "Besuchte Events",
-  "certificate": "Zertifikat"
+  "certificate": "Zertifikat",
+  "projectTitle": "Projekttitel"
 }
