@@ -428,6 +428,14 @@ export interface ManagedCourse_Course_by_pk_AchievementOptionCourses_Achievement
   userId: any;
 }
 
+export interface ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords_AchievementOption {
+  __typename: "AchievementOption";
+  /**
+   * Title of an offered achievement option
+   */
+  title: string;
+}
+
 export interface ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords {
   __typename: "AchievementRecord";
   id: number;
@@ -444,6 +452,10 @@ export interface ManagedCourse_Course_by_pk_AchievementOptionCourses_Achievement
    * An array relationship
    */
   AchievementRecordAuthors: ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords_AchievementRecordAuthors[];
+  /**
+   * An object relationship
+   */
+  AchievementOption: ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords_AchievementOption;
 }
 
 export interface ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption {

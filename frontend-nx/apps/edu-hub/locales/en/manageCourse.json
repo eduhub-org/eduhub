@@ -24,5 +24,6 @@
   "status": "Status",
   "ectsTotal": "Total ECTS",
   "attendedEvents": "Attended Events",
-  "certificate": "Certificate"
+  "certificate": "Certificate",
+  "projectTitle": "Project title"
 }
