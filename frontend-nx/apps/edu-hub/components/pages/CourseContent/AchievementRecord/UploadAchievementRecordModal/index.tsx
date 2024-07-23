@@ -285,7 +285,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
             <Button>{`${t('course-page:choose-achievement-option')} ↓`}</Button>
           </div>
 
-          {selectedAchievementOption && selectedAchievementOption.AchievementOptionTemplate && (
+          {selectedAchievementOption && (
             <div>
               <div className="text-lg mb-6">
                 {t('course-page:selected_achievement_option')}:<br></br>
