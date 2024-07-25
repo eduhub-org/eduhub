@@ -26,5 +26,6 @@
     "mattermostInfo2": "If you don't have an account in our chat yet, you will need to sign up there first. The course chat is our central communication tool for the courses."
   },
   "toCourseChat": "GO TO COURSE CHAT",
-  "toOnlineMeeting": "GO TO ONLINE MEETING"
+  "toOnlineMeeting": "GO TO ONLINE MEETING",
+  "maxFileSize": "Maximum file size: 20MB"
 }

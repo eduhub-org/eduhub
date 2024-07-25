@@ -26,5 +26,6 @@
     "mattermostInfo2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nDer Kurs-Chat ist unser zentrales Kommunikationstool für die Kurse."
   },
   "toCourseChat": "ZUM KURS-CHAT",
-  "toOnlineMeeting": "ZUM ONLINE-MEETING"
+  "toOnlineMeeting": "ZUM ONLINE-MEETING",
+  "maxFileSize": "Maximale Dateigröße: 20MB"
 }
