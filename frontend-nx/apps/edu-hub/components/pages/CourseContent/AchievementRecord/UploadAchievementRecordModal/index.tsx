@@ -335,6 +335,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
                 />
               </div>
             </div>
+            <div className='text-xs italic text-right'>{t('course:maxFileSize')}</div>
             <div className="flex justify-center items-center">
               <Button>{isLoading ? <CircularProgress></CircularProgress> : t('upload')}</Button>
             </div>
