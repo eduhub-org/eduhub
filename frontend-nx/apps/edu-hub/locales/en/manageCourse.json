@@ -25,5 +25,6 @@
   "ectsTotal": "Total ECTS",
   "attendedEvents": "Attended Events",
   "certificate": "Certificate",
-  "projectTitle": "Project title"
+  "projectTitle": "Project title",
+  "lastRecordUpload": "Upload Date"
 }
