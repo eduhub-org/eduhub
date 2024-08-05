@@ -11,7 +11,7 @@ export const Footer: FC = () => {
         <h3>
           <span className="text-2xl font-medium">EDU HUB</span>
           <br />
-          <span className="text-xl font-light">by opencampus</span>
+          <span className="text-xl font-light">by opencampus.sh</span>
         </h3>
         <div className="mt-6 sm:mt-10 mb-16 sm:mb-20 text-sm font-thin">
           <p>
@@ -31,7 +31,7 @@ export const Footer: FC = () => {
           </p>
         </div>
         <div className="flex justify-between items-end">
-          <span className="text-sm font-light">© 2010 — 2023</span>
+          <span className="text-sm font-light">© 2010 — {new Date().getFullYear()}</span>
           <div className="flex items-center">
             <a href="https://www.instagram.com/opencampus_sh/" target="_blank" rel="noopener noreferrer">
               <div className="flex items-center">
