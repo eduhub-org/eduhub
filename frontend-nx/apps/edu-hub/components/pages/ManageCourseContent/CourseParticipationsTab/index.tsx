@@ -47,6 +47,7 @@ import TagWithTwoText from '../../../common/TagWithTwoText';
 import Loading from '../../../common/Loading';
 import { Button } from '../../../common/Button';
 import { CircularProgress } from '@material-ui/core';
+import { formattedDateWithTime } from '../../../../helpers/util';
 
 interface CourseParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -506,7 +507,7 @@ interface IPropsShowDetails {
   qResult: QueryResult<any, any>;
 }
 const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocumentationResult, qResult }) => {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [setAchievementRecord] = useRoleMutation<UpdateAchievementRecordByPk, UpdateAchievementRecordByPkVariables>(
     UPDATE_AN_ACHIEVEMENT_RECORD
   );
@@ -562,6 +563,12 @@ const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocum
                 <div className="mb-3">
                   {`${t('manageCourse:projectTitle')}: `}
                   {enrollment.mostRecentRecord.AchievementOption.title}
+                </div>
+                <div className="mb-3">
+                  {`${t('manageCourse:lastRecordUpload')}: ${formattedDateWithTime(
+                    new Date(enrollment.mostRecentRecord.created_at),
+                    lang
+                  )}`}
                 </div>
                 <Button
                   as={'a'}
