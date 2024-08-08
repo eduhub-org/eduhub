@@ -6,7 +6,7 @@ import {
 } from '../../../../queries/__generated__/ManagedCourse';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import EhTimeSelect, { formatTime } from '../../../common/EhTimeSelect';
+import EhTimeSelect from '../../../common/EhTimeSelect';
 import { DebounceInput } from 'react-debounce-input';
 import { eventTargetValueMapper, useRoleMutation } from '../../../../hooks/authedMutation';
 import { INSERT_NEW_SESSION_SPEAKER } from '../../../../queries/course';
@@ -25,14 +25,8 @@ import DeleteButton from '../../../../components/common/DeleteButton';
 import SessionAddresses from './SessionAddresses';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 
-const copyDateTime = (target: Date, source: Date) => {
-  target = new Date(target);
-  target.setHours(source.getHours());
-  target.setMinutes(source.getMinutes());
-  target.setSeconds(source.getSeconds());
-  target.setMilliseconds(source.getMilliseconds());
-  return target;
-};
+// Import the utility functions
+import { convertToGermanTimeString, convertToUTCTimeString } from '../../../../helpers/dateHelpers';
 
 interface IProps {
   session: ManagedCourse_Course_by_pk_Sessions | null;
@@ -59,6 +53,11 @@ export const SessionRow: FC<IProps> = ({
 }) => {
   const { t, lang } = useTranslation('course-page');
 
+  // Use utility functions to get time strings
+  const startTimeDisplay = session ? convertToGermanTimeString(new Date(session.startDateTime)) : '';
+  const endTimeDisplay = session ? convertToGermanTimeString(new Date(session.endDateTime)) : '';
+  const startDate = session ? new Date(session.startDateTime) : null;
+
   const handleDelete = useCallback(() => {
     if (session != null) {
       onDelete(session.id);
@@ -84,42 +83,48 @@ export const SessionRow: FC<IProps> = ({
   const handleSetDate = useCallback(
     (event: Date | null) => {
       if (session != null) {
-        onSetStartDate(session, copyDateTime(event || new Date(), session.startDateTime));
-        onSetEndDate(session, copyDateTime(event || new Date(), session.endDateTime));
+        const startTime = new Date(session.startDateTime);
+        const endTime = new Date(session.endDateTime);
+
+        // Adjust the date while keeping the time intact
+        const newStartDate = new Date(
+          event?.getFullYear() || startTime.getFullYear(),
+          event?.getMonth() || startTime.getMonth(),
+          event?.getDate() || startTime.getDate(),
+          startTime.getHours(),
+          startTime.getMinutes()
+        );
+
+        const newEndDate = new Date(
+          event?.getFullYear() || endTime.getFullYear(),
+          event?.getMonth() || endTime.getMonth(),
+          event?.getDate() || endTime.getDate(),
+          endTime.getHours(),
+          endTime.getMinutes()
+        );
+
+        onSetStartDate(session, newStartDate);
+        onSetEndDate(session, newEndDate);
       }
     },
     [session, onSetStartDate, onSetEndDate]
   );
 
   const handleSetStartTime = useCallback(
-    (event: string) => {
+    (timeString: string) => {
       if (session != null) {
-        const copyDate = new Date(session.startDateTime);
-        const [hoursStr, minutesStr] = event.split(':');
-        const hours = Number(hoursStr);
-        const minutes = Number(minutesStr);
-        copyDate.setHours(hours);
-        copyDate.setMinutes(minutes);
-        copyDate.setSeconds(0);
-        copyDate.setMilliseconds(0);
-        onSetStartDate(session, copyDate);
+        const utcTimeString = convertToUTCTimeString(timeString, new Date(session.startDateTime));
+        onSetStartDate(session, new Date(utcTimeString));
       }
     },
     [session, onSetStartDate]
   );
 
   const handleSetEndTime = useCallback(
-    (event: string) => {
+    (timeString: string) => {
       if (session != null) {
-        const copyDate = new Date(session.endDateTime);
-        const [hoursStr, minutesStr] = event.split(':');
-        const hours = Number(hoursStr);
-        const minutes = Number(minutesStr);
-        copyDate.setHours(hours);
-        copyDate.setMinutes(minutes);
-        copyDate.setSeconds(0);
-        copyDate.setMilliseconds(0);
-        onSetEndDate(session, copyDate);
+        const utcTimeString = convertToUTCTimeString(timeString, new Date(session.endDateTime));
+        onSetEndDate(session, new Date(utcTimeString));
       }
     },
     [session, onSetEndDate]
@@ -175,48 +180,40 @@ export const SessionRow: FC<IProps> = ({
   return (
     <div>
       <div className={`grid grid-cols-24 gap-3 mb-1 ${session != null ? 'bg-edu-light-gray' : ''}`}>
-        {!session && (
-          <div className="p-3 col-span-3">
-            {t('date')}
-            <br />
-          </div>
-        )}
-        {session && (
-          <div className="p-3 col-span-3">
+        <div className="p-3 col-span-3">
+          {session ? (
             <DatePicker
               minDate={lectureStart}
               maxDate={lectureEnd}
               dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
               className="w-full bg-edu-light-gray"
-              selected={session.startDateTime}
+              selected={startDate}
               onChange={handleSetDate}
               locale={lang}
-            />{' '}
-          </div>
-        )}
-        <div className="p-3 col-span-2">
-          {!session && <>{t('start_time')}</>}
-          {session && (
-            <EhTimeSelect
-              className="bg-edu-light-gray"
-              onChange={handleSetStartTime}
-              value={formatTime(session.startDateTime)}
             />
+          ) : (
+            <>
+              {t('date')}
+              <br />
+            </>
           )}
         </div>
         <div className="p-3 col-span-2">
-          {!session && <>{t('end_time')}</>}
-          {session && (
-            <EhTimeSelect
-              className="bg-edu-light-gray"
-              onChange={handleSetEndTime}
-              value={formatTime(session.endDateTime)}
-            />
+          {session ? (
+            <EhTimeSelect className="bg-edu-light-gray" onChange={handleSetStartTime} value={startTimeDisplay} />
+          ) : (
+            <>{t('start_time')}</>
+          )}
+        </div>
+        <div className="p-3 col-span-2">
+          {session ? (
+            <EhTimeSelect className="bg-edu-light-gray" onChange={handleSetEndTime} value={endTimeDisplay} />
+          ) : (
+            <>{t('end_time')}</>
           )}
         </div>
         <div className="p-3 col-span-8">
-          {!session && <>{t('title')}</>}
-          {session && (
+          {session ? (
             <DebounceInput
               className="w-full bg-edu-light-gray"
               value={session.title}
@@ -224,36 +221,29 @@ export const SessionRow: FC<IProps> = ({
               debounceTimeout={1000}
               placeholder={t('session_title')}
             />
+          ) : (
+            <>{t('title')}</>
           )}
         </div>
         <div className="p-3 col-span-7">
-          {!session && <>{t('external_speakers')}</>}
-          {session && (
-            <div className="">
-              <EhMultipleTag requestAddTag={openAddSpeaker} requestDeleteTag={handleDeleteSpeaker} tags={speakerTags} />
-            </div>
+          {session ? (
+            <EhMultipleTag requestAddTag={openAddSpeaker} requestDeleteTag={handleDeleteSpeaker} tags={speakerTags} />
+          ) : (
+            <>{t('external_speakers')}</>
           )}
         </div>
-        <div className="p-3 col-span-2">
-          {session && (
-            <div>
-              <div>{location && <DeleteButton handleDelete={handleDelete} />}</div>
-            </div>
-          )}
-        </div>
+        <div className="p-3 col-span-2">{session && <DeleteButton handleDelete={handleDelete} />}</div>
         {session?.SessionAddresses && (
           <div className="col-span-full pl-3 pb-3 pr-3">
-            {[...(session?.SessionAddresses || [])]
-              .sort((a, b) => {
-                const locationOptions = Object.values(LocationOption_enum);
-                return (
-                  locationOptions.indexOf(a.CourseLocation.locationOption) -
-                  locationOptions.indexOf(b.CourseLocation.locationOption)
-                );
-              })
-              .map((address) => (
-                <SessionAddresses key={address.id} address={address} refetchQuery={qResult} />
-              ))}
+            {session.SessionAddresses.sort((a, b) => {
+              const locationOptions = Object.values(LocationOption_enum);
+              return (
+                locationOptions.indexOf(a.CourseLocation.locationOption) -
+                locationOptions.indexOf(b.CourseLocation.locationOption)
+              );
+            }).map((address) => (
+              <SessionAddresses key={address.id} address={address} refetchQuery={qResult} />
+            ))}
           </div>
         )}
       </div>

@@ -64,3 +64,31 @@ export const getWeekdayStartAndEndString = (
 
   return `${weekday} ${startTime} - ${endTime}`;
 };
+
+export const roundTimeToNearestQuarterHour = (date: Date): Date => {
+  const minutes = date.getMinutes();
+  const roundedMinutes = Math.round(minutes / 15) * 15;
+  date.setMinutes(roundedMinutes);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+  return date;
+};
+
+export const convertToUTCTimeString = (timeString: string, referenceDate: Date): string => {
+  const [hours, minutes] = timeString.split(':').map(Number);
+  referenceDate.setHours(hours, minutes, 0, 0);
+  const utcDate = new Date(referenceDate.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
+  return utcDate.toISOString();
+};
+
+export const convertDateToUTCTimeString = (date: Date): string => {
+  const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
+  return utcDate.toISOString();
+};
+
+export const convertToGermanTimeString = (date: Date): string => {
+  const berlinDate = new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Berlin' }));
+  const hours = berlinDate.getHours().toString().padStart(2, '0');
+  const minutes = berlinDate.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
+};

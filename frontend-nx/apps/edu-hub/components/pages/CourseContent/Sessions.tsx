@@ -7,6 +7,9 @@ import { isLinkFormat } from '../../../helpers/util';
 import UserCard from '../../common/UserCard';
 import { useIsAdmin, useIsInstructor } from '../../../hooks/authentication';
 
+// Import the utility function for time conversion
+import { convertToGermanTimeString } from '../../../helpers/dateHelpers';
+
 interface SessionsProps {
   sessions: Session[];
   isLoggedInParticipant: boolean;
@@ -36,22 +39,17 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
                 <div className="flex flex-wrap items-start flex-shrink-0 mb-2">
                   <div className="flex flex-col mr-6">
                     <span className="block text-sm sm:text-lg font-semibold">
-                      {startDateTime?.toLocaleDateString(lang, {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                      }) ?? ''}
+                      {startDateTime
+                        ? new Date(startDateTime).toLocaleDateString(lang, {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                          })
+                        : ''}
                     </span>
                     <span className="text-sm">
-                      {startDateTime?.toLocaleTimeString(lang, {
-                        hour: 'numeric',
-                        minute: 'numeric',
-                      }) ?? ''}{' '}
-                      {' - '}
-                      {endDateTime?.toLocaleTimeString(lang, {
-                        hour: 'numeric',
-                        minute: 'numeric',
-                      }) ?? ''}
+                      {startDateTime ? convertToGermanTimeString(new Date(startDateTime)) : ''} {' - '}
+                      {endDateTime ? convertToGermanTimeString(new Date(endDateTime)) : ''}
                     </span>
                   </div>
                 </div>
@@ -63,7 +61,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
                         {CourseLocation.locationOption === 'ONLINE' ? (
                           <>
                             {isLoggedInParticipant || isAdmin || isInstructor ? (
-                              // if the user is a logged in participant, an instructor or an admin, provide the link to the video call otherwise display the location as plain text
+                              // If the user is a logged-in participant, an instructor or an admin, provide the link to the video call otherwise display the location as plain text
                               isLinkFormat(CourseLocation.defaultSessionAddress) ? (
                                 <a
                                   href={CourseLocation.defaultSessionAddress}

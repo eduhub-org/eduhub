@@ -53,7 +53,6 @@ import {
   UpdateCourseWeekday,
   UpdateCourseWeekdayVariables,
 } from '../../../../queries/__generated__/UpdateCourseWeekday';
-import { formatTime } from '../../../common/EhTimeSelect';
 import Locations from './Locations';
 import { Button } from '@material-ui/core';
 import { MdAddCircle } from 'react-icons/md';
@@ -78,27 +77,17 @@ import {
   InsertSessionAddressVariables,
 } from '../../../../queries/__generated__/InsertSessionAddress';
 
+// Import the utility functions
+import { convertToGermanTimeString, convertToUTCTimeString } from '../../../../helpers/dateHelpers';
+
 interface IProps {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
 }
 
-const prepDateTimeUpdate = (timeString: string) => {
-  // Ensure timeString is a string and is not empty
-  if (typeof timeString !== 'string' || !timeString.includes(':')) {
-    console.error('Invalid timeString:', timeString);
-    return ''; // or some fallback value like the current time
-  }
-
-  const now = new Date();
-  const [hourS, minS] = timeString.split(':');
-  now.setHours(Number(hourS));
-  now.setMinutes(Number(minS));
-  return now.toISOString();
-};
-
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const { error, handleError, resetError } = useErrorHandler();
+  const { t } = useTranslation('course-page');
 
   const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_COURSE_LOCATION,
@@ -127,9 +116,9 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       }
       // If there's is an available option, proceed with insertion
       const res = await insertCourseLocation({ variables: { courseId: course.id, option: availableOption } });
-      //extract the location id from the response
+      // Extract the location id from the response
       const insertedLocationId = res?.data?.insert_CourseLocation?.returning[0].id;
-      // loop through the session addresses and add the new location
+      // Loop through the session addresses and add the new location
       await Promise.all(
         course.Sessions.map((session) => {
           return insertSessionAddress({
@@ -151,7 +140,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     }
   };
 
-  // define a new function deleteCourseLocation that used the DELETE_COURSE location mutation with useRoleMutation
+  // Define a new function deleteCourseLocation that uses the DELETE_COURSE location mutation with useRoleMutation
   const [deleteCourseLocation] = useRoleMutation<DeleteCourseLocation, DeleteCourseLocationVariables>(
     DELETE_COURSE_LOCATION,
     {
@@ -191,12 +180,18 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     qResult.refetch();
   };
 
+  // Wrapper function to match the expected signature
+  const convertToUTCTimeForUpdate = (event: any, referenceDate: Date) => {
+    const timeString = event.target.value; // Extract time string from event
+    return convertToUTCTimeString(timeString, referenceDate);
+  };
+
   const updateCourseStartTime = useUpdateCallback<UpdateCourseStartTime, UpdateCourseStartTimeVariables>(
     UPDATE_COURSE_START_TIME,
     'courseId',
     'startTime',
     course?.id,
-    prepDateTimeUpdate,
+    (event) => convertToUTCTimeForUpdate(event, new Date(course.startTime)),
     qResult
   );
 
@@ -205,7 +200,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     'courseId',
     'endTime',
     course?.id,
-    prepDateTimeUpdate,
+    (event) => convertToUTCTimeForUpdate(event, new Date(course.endTime)),
     qResult
   );
 
@@ -235,13 +230,13 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     eventTargetNumberMapper,
     qResult
   );
-  const { t } = useTranslation('course-page');
 
   const weekDayOptions = ['NONE', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
   const languageOptions = ['DE', 'EN'];
 
   const courseLocations = [...course.CourseLocations];
   courseLocations.sort((a, b) => a.id - b.id);
+
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2">
@@ -327,13 +322,13 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           />
           <EduHubTimePicker
             label={t('start_time')}
-            value={formatTime(course.startTime)}
+            value={convertToGermanTimeString(new Date(course.startTime))}
             onChange={updateCourseStartTime}
             className="mb-4"
           />
           <EduHubTimePicker
             label={t('end_time')}
-            value={formatTime(course.endTime)}
+            value={convertToGermanTimeString(new Date(course.endTime))}
             onChange={updateCourseEndTime}
             className="mb-4"
           />

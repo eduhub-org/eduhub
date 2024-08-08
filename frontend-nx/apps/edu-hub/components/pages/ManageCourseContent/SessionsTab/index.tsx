@@ -41,6 +41,9 @@ import {
 import useTranslation from 'next-translate/useTranslation';
 import { SessionAddress_insert_input } from '../../../../__generated__/globalTypes';
 
+// Import the utility functions
+import { convertToUTCTimeString, convertToGermanTimeString } from '../../../../helpers/dateHelpers';
+
 interface IProps {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
@@ -59,11 +62,11 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     return result;
   }, [course]);
 
-  // get all locations ids for the course
+  // Get all location ids for the course
   const courseLocationIds = useMemo(() => {
     const result = course.CourseLocations.map((location) => location.id);
     return result;
-  }, [course.CourseLocations]); // Add dependency array here
+  }, [course.CourseLocations]);
 
   const sessionAddresses: SessionAddress_insert_input[] = courseLocationIds.map((courseLocationId) => ({
     courseLocationId: courseLocationId,
@@ -72,20 +75,25 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
   const [insertSessionMutation] = useRoleMutation<InsertSessionWithAddresses, InsertSessionWithAddressesVariables>(
     INSERT_SESSION_WITH_ADDRESSES
   );
+
   const insertSession = useCallback(async () => {
-    const startTime: Date = new Date(
-      courseSessions.length > 0 ? courseSessions[courseSessions.length - 1].startDateTime : new Date()
-    );
-    const endTime: Date = new Date(
-      courseSessions.length > 0 ? courseSessions[courseSessions.length - 1].endDateTime : new Date()
-    );
+    const lastSession = courseSessions.length > 0 ? courseSessions[courseSessions.length - 1] : null;
+
+    const startTime: Date = new Date(lastSession ? lastSession.startDateTime : new Date());
+    const endTime: Date = new Date(lastSession ? lastSession.endDateTime : new Date());
+
     startTime.setDate(startTime.getDate() + 7);
     endTime.setDate(endTime.getDate() + 7);
+
+    // Convert to UTC time string
+    const startTimeUTC = convertToUTCTimeString(convertToGermanTimeString(startTime), startTime);
+    const endTimeUTC = convertToUTCTimeString(convertToGermanTimeString(endTime), endTime);
+
     await insertSessionMutation({
       variables: {
         courseId: course.id,
-        startTime,
-        endTime,
+        startTime: new Date(startTimeUTC),
+        endTime: new Date(endTimeUTC),
         sessionAddresses: sessionAddresses,
       },
     });
@@ -121,7 +129,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     'sessionId',
     'startTime',
     pickIdPkMapper,
-    identityEventMapper,
+    (event, session) => convertToUTCTimeString(event.target.value, new Date(session.startDateTime)),
     qResult
   );
 
@@ -130,7 +138,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     'sessionId',
     'endTime',
     pickIdPkMapper,
-    identityEventMapper,
+    (event, session) => convertToUTCTimeString(event.target.value, new Date(session.endDateTime)),
     qResult
   );
 
@@ -170,16 +178,6 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           qResult={qResult}
         />
       ))}
-
-      {/* <div className="flex justify-end mt-4 mb-4 text-white">
-        <Button
-          onClick={insertSession}
-          startIcon={<MdAddCircle />}
-          color="inherit"
-        >
-          {t('course-page:add-session')}
-        </Button>
-      </div> */}
     </div>
   );
 };
