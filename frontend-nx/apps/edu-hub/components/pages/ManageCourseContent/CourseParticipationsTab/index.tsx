@@ -164,31 +164,34 @@ const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => 
     { key: 4, label: t('manageCourse:certificates') },
   ];
 
-  const participationEnrollments: ExtendedEnrollment[] = [...(course.CourseEnrollments || [])]
-    .filter((enrollment) => enrollment.status === 'CONFIRMED')
-    .sort((a, b) => a.User.lastName.localeCompare(b.User.lastName))
-    .map((enrollment) => {
-      // get all records for this enrollment
-      const allRecords = course.AchievementOptionCourses.flatMap((course) =>
-        course.AchievementOption.AchievementRecords.filter((record) =>
-          record.AchievementRecordAuthors.some((author) => author.userId === enrollment.User.id)
-        )
-      );
+const participationEnrollments: ExtendedEnrollment[] = [...(course.CourseEnrollments || [])]
+  .filter((enrollment) => enrollment.status === 'CONFIRMED')
+  .sort((a, b) => a.User.lastName.localeCompare(b.User.lastName))
+  .map((enrollment) => {
+    // get all records for this enrollment, with additional filtering by courseId
+    const allRecords = course.AchievementOptionCourses.flatMap((courseOption) =>
+      courseOption.AchievementOption.AchievementRecords.filter(
+        (record) =>
+          record.AchievementRecordAuthors.some((author) => author.userId === enrollment.User.id) &&
+          record.courseId === course.id
+      )
+    );
 
-      // find most recent record for this enrollment
-      const mostRecentRecord =
-        allRecords.length > 0
-          ? allRecords.reduce((prevRecord, currRecord) =>
-              new Date(currRecord.created_at) > new Date(prevRecord.created_at) ? currRecord : prevRecord
-            )
-          : null;
+    // find most recent record for this enrollment
+    const mostRecentRecord =
+      allRecords.length > 0
+        ? allRecords.reduce((prevRecord, currRecord) =>
+            new Date(currRecord.created_at) > new Date(prevRecord.created_at) ? currRecord : prevRecord
+          )
+        : null;
 
-      // return a new object that combines the enrollment and its most recent record
-      return {
-        ...enrollment,
-        mostRecentRecord,
-      };
-    });
+    // return a new object that combines the enrollment and its most recent record
+    return {
+      ...enrollment,
+      mostRecentRecord,
+    };
+  });
+
 
   const sessions = [...(course.Sessions || [])];
 
