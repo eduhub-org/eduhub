@@ -440,6 +440,10 @@ export interface ManagedCourse_Course_by_pk_AchievementOptionCourses_Achievement
   __typename: "AchievementRecord";
   id: number;
   /**
+   * ID of the course the record was uploaded for.
+   */
+  courseId: number | null;
+  /**
    * URL to the uploaded file with the documentation of the record.
    */
   documentationUrl: string | null;
