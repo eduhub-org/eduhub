@@ -164,34 +164,49 @@ const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => 
     { key: 4, label: t('manageCourse:certificates') },
   ];
 
-const participationEnrollments: ExtendedEnrollment[] = [...(course.CourseEnrollments || [])]
-  .filter((enrollment) => enrollment.status === 'CONFIRMED')
-  .sort((a, b) => a.User.lastName.localeCompare(b.User.lastName))
-  .map((enrollment) => {
-    // get all records for this enrollment, with additional filtering by courseId
-    const allRecords = course.AchievementOptionCourses.flatMap((courseOption) =>
-      courseOption.AchievementOption.AchievementRecords.filter(
-        (record) =>
-          record.AchievementRecordAuthors.some((author) => author.userId === enrollment.User.id) &&
-          record.courseId === course.id
-      )
-    );
+  const participationEnrollments: ExtendedEnrollment[] = [...(course.CourseEnrollments || [])]
+    .filter((enrollment) => {
+      console.log('enrollment.status', enrollment.status);
+      console.log('enrollment.userId', enrollment.userId);
+      console.log('enrollment.courseId', enrollment.courseId);
+      return enrollment.status === 'CONFIRMED';
+    })
+    .sort((a, b) => a.User.lastName.localeCompare(b.User.lastName))
+    .map((enrollment) => {
+      // get all records for this enrollment, with additional filtering by courseId
+      const allRecords = course.AchievementOptionCourses.flatMap((courseOption) => {
+        console.log('courseOption', courseOption);
+        return courseOption.AchievementOption.AchievementRecords.filter((record) => {
+          console.log('record.courseId', record.courseId);
+          console.log('course.id', course.id);
+          return (
+            record.AchievementRecordAuthors.some((author) => {
+              console.log('author.userId', author.userId);
+              console.log('enrollment.User.id', enrollment.User.id);
+              return author.userId === enrollment.User.id;
+            }) && record.courseId === course.id
+          );
+        });
+      });
 
-    // find most recent record for this enrollment
-    const mostRecentRecord =
-      allRecords.length > 0
-        ? allRecords.reduce((prevRecord, currRecord) =>
-            new Date(currRecord.created_at) > new Date(prevRecord.created_at) ? currRecord : prevRecord
-          )
-        : null;
+      // find most recent record for this enrollment
+      const mostRecentRecord =
+        allRecords.length > 0
+          ? allRecords.reduce((prevRecord, currRecord) =>
+              new Date(currRecord.created_at) > new Date(prevRecord.created_at) ? currRecord : prevRecord
+            )
+          : null;
 
-    // return a new object that combines the enrollment and its most recent record
-    return {
-      ...enrollment,
-      mostRecentRecord,
-    };
-  });
+      console.log("mostRecentRecord", mostRecentRecord);
+      console.log('mostRecentRecord.courseId', mostRecentRecord.courseId);
+      console.log('mostRecentRecord.id', mostRecentRecord.id);
 
+      // return a new object that combines the enrollment and its most recent record
+      return {
+        ...enrollment,
+        mostRecentRecord,
+      };
+    });
 
   const sessions = [...(course.Sessions || [])];
 
