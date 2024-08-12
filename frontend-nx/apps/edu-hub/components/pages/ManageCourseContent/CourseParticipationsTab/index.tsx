@@ -198,8 +198,6 @@ const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => 
           : null;
 
       console.log("mostRecentRecord", mostRecentRecord);
-      console.log('mostRecentRecord.courseId', mostRecentRecord.courseId);
-      console.log('mostRecentRecord.id', mostRecentRecord.id);
 
       // return a new object that combines the enrollment and its most recent record
       return {
