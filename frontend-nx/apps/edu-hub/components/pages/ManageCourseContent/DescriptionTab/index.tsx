@@ -1,4 +1,5 @@
 import { QueryResult } from '@apollo/client';
+import { Button } from '@material-ui/core';
 import { FC } from 'react';
 import {
   eventTargetNumberMapper,
@@ -54,7 +55,6 @@ import {
   UpdateCourseWeekdayVariables,
 } from '../../../../queries/__generated__/UpdateCourseWeekday';
 import Locations from './Locations';
-import { Button } from '@material-ui/core';
 import { MdAddCircle } from 'react-icons/md';
 import {
   UpdateCourseMaxParticipants,
@@ -76,9 +76,11 @@ import {
   InsertSessionAddress,
   InsertSessionAddressVariables,
 } from '../../../../queries/__generated__/InsertSessionAddress';
-
-// Import the utility functions
-import { convertToGermanTimeString, convertToUTCTimeString } from '../../../../helpers/dateHelpers';
+import {
+  convertToGermanTimeString,
+  convertToUTCTimeString,
+  extractTimeFromDateTime,
+} from '../../../../helpers/dateHelpers';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -105,42 +107,35 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
 
   const handleInsertCourseLocation = async () => {
     try {
-      // Extract the currently used options
       const usedOptions = new Set(course.CourseLocations.map((loc) => loc.locationOption));
-      // Find the first available option
       const availableOption = Object.values(LocationOption_enum).find((option) => !usedOptions.has(option));
-      // If there's no available option, throw an error
       if (!availableOption) {
         handleError('All location options already exist for this course.');
-        return; // Exit the function early
+        return;
       }
-      // If there's is an available option, proceed with insertion
+
       const res = await insertCourseLocation({ variables: { courseId: course.id, option: availableOption } });
-      // Extract the location id from the response
       const insertedLocationId = res?.data?.insert_CourseLocation?.returning[0].id;
-      // Loop through the session addresses and add the new location
+
       await Promise.all(
-        course.Sessions.map((session) => {
-          return insertSessionAddress({
+        course.Sessions.map((session) =>
+          insertSessionAddress({
             variables: {
               sessionId: session.id,
               location: availableOption,
               address: '',
               courseLocationId: insertedLocationId,
             },
-          });
-        })
+          })
+        )
       );
       qResult.refetch();
     } catch (error) {
-      // Handle errors if any step in the try block fails
       handleError(error.message);
-      // Optionally, re-throw the error if you want calling functions to be able to handle it as well
       throw error;
     }
   };
 
-  // Define a new function deleteCourseLocation that uses the DELETE_COURSE location mutation with useRoleMutation
   const [deleteCourseLocation] = useRoleMutation<DeleteCourseLocation, DeleteCourseLocationVariables>(
     DELETE_COURSE_LOCATION,
     {
@@ -155,18 +150,15 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   });
 
   const handleDeleteCourseLocation = async (location) => {
-    // Check the number of course locations
     if (course.CourseLocations.length <= 1) {
-      // Handle the case where the location is the last one (e.g., show an error message)
       handleError('A course needs at least one location.');
-      return; // Exit the function early
+      return;
     }
-    // If there's more than one location, proceed with deletion
-    await deleteCourseLocation({ variables: { locationId: location.id } }); // Call the function directly
+    await deleteCourseLocation({ variables: { locationId: location.id } });
     await DeleteSessionAddressesByCourseAndLocation({
       variables: { courseId: course.id, location: location.locationOption },
-    }); // Call the function directly
-    qResult.refetch(); // Refetch the query to update the UI
+    });
+    qResult.refetch();
   };
 
   const [updateCourseLocation] = useRoleMutation<UpdateCourseLocation, UpdateCourseLocationVariables>(
@@ -175,15 +167,10 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       onError: (error) => handleError(t(error.message)),
     }
   );
+
   const handleUpdateCourseLocation = async (location, option) => {
     await updateCourseLocation({ variables: { locationId: location.id, option: option } });
     qResult.refetch();
-  };
-
-  // Wrapper function to match the expected signature
-  const convertToUTCTimeForUpdate = (event: any, referenceDate: Date) => {
-    const timeString = event.target.value; // Extract time string from event
-    return convertToUTCTimeString(timeString, referenceDate);
   };
 
   const updateCourseStartTime = useUpdateCallback<UpdateCourseStartTime, UpdateCourseStartTimeVariables>(
@@ -191,7 +178,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     'courseId',
     'startTime',
     course?.id,
-    (event) => convertToUTCTimeForUpdate(event, new Date(course.startTime)),
+    (dateTimeString) => convertToUTCTimeString(extractTimeFromDateTime(dateTimeString), new Date(course.startTime)),
     qResult
   );
 
@@ -200,7 +187,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     'courseId',
     'endTime',
     course?.id,
-    (event) => convertToUTCTimeForUpdate(event, new Date(course.endTime)),
+    (dateTimeString) => convertToUTCTimeString(extractTimeFromDateTime(dateTimeString), new Date(course.endTime)),
     qResult
   );
 
@@ -323,13 +310,15 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           <EduHubTimePicker
             label={t('start_time')}
             value={convertToGermanTimeString(new Date(course.startTime))}
-            onChange={updateCourseStartTime}
+            onChange={(timeString) =>
+              updateCourseStartTime(convertToUTCTimeString(timeString, new Date(course.startTime)))
+            }
             className="mb-4"
           />
           <EduHubTimePicker
             label={t('end_time')}
             value={convertToGermanTimeString(new Date(course.endTime))}
-            onChange={updateCourseEndTime}
+            onChange={(timeString) => updateCourseEndTime(convertToUTCTimeString(timeString, new Date(course.endTime)))}
             className="mb-4"
           />
           <div />

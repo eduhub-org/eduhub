@@ -7,6 +7,7 @@ import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/Cou
 import languageIcon from '../../../public/images/course/language.svg';
 import locationIcon from '../../../public/images/course/pin.svg';
 import { getTileImage } from '../../../helpers/imageHandling';
+import { formatGermanTimeRange } from '../../../helpers/dateHelpers';
 
 type CourseType = CourseList_Course | CoursesEnrolledByUser_Course;
 
@@ -18,7 +19,6 @@ interface TileProps {
 export const Tile: FC<TileProps> = ({ course, isManage }) => {
   const { t } = useTranslation('common');
 
-  // Needed for legacy reasons: For cases where the image in the optimal image size does not exist but only the original image size
   const [coverImage, setCoverImage] = useState<string | null>(null);
   useEffect(() => {
     const loadCoverImage = async () => {
@@ -27,13 +27,6 @@ export const Tile: FC<TileProps> = ({ course, isManage }) => {
     };
     loadCoverImage();
   }, [course]);
-
-  // Helper function to format the time
-  const timeString = (date) =>
-    new Date(date).toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
 
   return (
     <Link href={isManage ? `/manage/course/${course.id}` : `/course/${course.id}`}>
@@ -57,9 +50,11 @@ export const Tile: FC<TileProps> = ({ course, isManage }) => {
         </div>
         <div className="flex flex-col h-[201px] justify-between bg-white p-5">
           <div className="flex justify-between mb-3 text-sm tracking-wider">
-            {course.weekDay !== 'NONE' && course.startTime && course.endTime
-              ? `${t(course.weekDay)} ${startTimeString} - ${endTimeString}`
-              : null}
+            {course.weekDay !== 'NONE' && course.startTime && course.endTime ? (
+              <span>
+                {t(course.weekDay)} {formatGermanTimeRange(new Date(course.startTime), new Date(course.endTime))}
+              </span>
+            ) : null}
             <div className="flex items-center">
               <Image src={languageIcon} alt="language icon" width={16} height={16} className="mr-1" />
               {t(course.language)}
