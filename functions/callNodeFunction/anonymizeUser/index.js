@@ -33,6 +33,8 @@ const UPDATE_USER = gql`
         firstName: $firstName
         lastName: $lastName
         email: $email
+        externalProfile: null
+        otherUniversity: null
         matriculationNumber: $matriculationNumber
         picture: null
       }
@@ -49,6 +51,9 @@ const GET_USER_AND_ENROLLMENTS = gql`
       firstName
       lastName
       email
+      externalProfile
+      university
+      otherUniversity
       matriculationNumber
       picture
       CourseEnrollments {
@@ -61,30 +66,27 @@ const GET_USER_AND_ENROLLMENTS = gql`
   }
 `;
 
-const removeProfileImage = async (storage, bucketName, imagePath) => {
-  if (!imagePath) return;
-
-  const bucket = storage.bucket(bucketName);
+const removeProfileImage = async (storage, imagePath, bucketName) => {
+    if (!imagePath) return;
+    
+    // Remove the original image
+    await storage.deleteFile(imagePath, bucketName);
+    logger.debug(`Attempted to remove profile picture at ${imagePath}`);
   
-  // Remove the original image
-  await bucket.file(imagePath).delete().catch(err => {
-    logger.warn(`Failed to delete original image at ${imagePath}: ${err.message}`);
-  });
-
-  // Remove any resized versions
-  const directory = path.dirname(imagePath);
-  const filename = path.basename(imagePath, path.extname(imagePath));
-  const [files] = await bucket.getFiles({ prefix: directory });
-
-  for (const file of files) {
-    const resizedFilename = file.name;
-    if (resizedFilename.startsWith(`${directory}/${filename}-`) && resizedFilename.endsWith('.webp')) {
-      await bucket.file(resizedFilename).delete().catch(err => {
-        logger.warn(`Failed to delete resized image at ${resizedFilename}: ${err.message}`);
-      });
+    // Remove any resized versions
+    const directory = path.dirname(imagePath);
+    const filename = path.basename(imagePath, path.extname(imagePath));
+    const files = await storage.listFiles(bucketName, { prefix: directory });
+  
+    for (const file of files) {
+      const resizedFilename = file.name;
+      if (resizedFilename.startsWith(`${directory}/${filename}-`) && resizedFilename.endsWith('.webp')) {
+        await storage.deleteFile(resizedFilename, bucketName);
+        logger.debug(`Attempted to remove resized image at ${resizedFilename}`);
+      }
     }
-  }
-};
+  };
+    
 
 const generateAnonymousFile = () => {
   return Buffer.from('This certificate has been deleted due to user anonymization.', 'utf-8');
@@ -115,14 +117,14 @@ const anonymizeUser = async (req, res) => {
     const anonymizedUser = anonymizeUserData(user);
 
     const storage = buildCloudStorage(Storage);
-    const bucketName = process.env.BUCKET_NAME;
+    const bucketName = req.headers.bucket;
 
     // Remove profile picture
     if (user.picture) {
-      await removeProfileImage(storage, bucketName, user.picture);
-      logger.debug(`Removed profile picture for userId: ${userId}`);
+        await removeProfileImage(storage, user.picture, bucketName);
+        logger.debug(`Attempted to remove profile picture for userId: ${userId}`);
     }
-
+  
     // Update user data
     await request(
       process.env.HASURA_ENDPOINT,
@@ -142,16 +144,16 @@ const anonymizeUser = async (req, res) => {
 
     // Handle certificates
     for (const enrollment of user.CourseEnrollments) {
-      if (enrollment.achievementCertificateURL) {
-        await storage.bucket(bucketName).file(enrollment.achievementCertificateURL).save(anonymousFileContent);
-        logger.debug(`Replaced achievement certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
-      }
-      if (enrollment.attendanceCertificateURL) {
-        await storage.bucket(bucketName).file(enrollment.attendanceCertificateURL).save(anonymousFileContent);
-        logger.debug(`Replaced attendance certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
-      }
+        if (enrollment.achievementCertificateURL) {
+          await storage.saveToBucket(enrollment.achievementCertificateURL, bucketName, anonymousFileContent);
+          logger.debug(`Replaced achievement certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
+        }
+        if (enrollment.attendanceCertificateURL) {
+          await storage.saveToBucket(enrollment.attendanceCertificateURL, bucketName, anonymousFileContent);
+          logger.debug(`Replaced attendance certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
+        }
     }
-
+  
     logger.debug(`Anonymized data saved for userId: ${userId}`);
 
     return res.json({ message: "User data anonymized successfully" });
