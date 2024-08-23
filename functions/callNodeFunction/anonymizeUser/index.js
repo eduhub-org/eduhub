@@ -3,6 +3,7 @@ import logger from "../index.js";
 import { Storage } from "@google-cloud/storage";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
 import path from "path";
+import axios from "axios";
 
 const shortenHashId = (hashId) => {
   return hashId.replace(/-/g, '').substr(0, 12);
@@ -92,6 +93,46 @@ const generateAnonymousFile = () => {
   return Buffer.from('This certificate has been deleted due to user anonymization.', 'utf-8');
 };
 
+const getKeycloakToken = async () => {
+  try {
+    const response = await axios.post(
+      `${process.env.KEYCLOAK_URL}/realms/master/protocol/openid-connect/token`,
+      new URLSearchParams({
+        grant_type: 'password',
+        client_id: 'admin-cli',
+        username: process.env.KEYCLOAK_USER || 'keycloak',
+        password: process.env.KEYCLOAK_PW,
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      }
+    );
+    return response.data.access_token;
+  } catch (error) {
+    logger.error('Error getting Keycloak token', error);
+    throw error;
+  }
+};
+
+const deleteKeycloakUser = async (userId, token) => {
+  try {
+    await axios.delete(
+      `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    logger.debug(`Deleted user from Keycloak: ${userId}`);
+  } catch (error) {
+    logger.error(`Error deleting user from Keycloak: ${error.message}`);
+    throw error;
+  }
+};
+
 const anonymizeUser = async (req, res) => {
   try {
     if (!req.body.input || !req.body.input.userId) {
@@ -100,6 +141,15 @@ const anonymizeUser = async (req, res) => {
 
     const userId = req.body.input.userId;
     logger.debug(`Received anonymizeUser request for userId: ${userId}`);
+
+    // Delete user from Keycloak
+    try {
+      const keycloakToken = await getKeycloakToken();
+      await deleteKeycloakUser(userId, keycloakToken);
+    } catch (keycloakError) {
+      logger.error(`Error in Keycloak operations: ${keycloakError.message}`);
+      // Continue with the process even if Keycloak deletion fails
+    }
 
     const userData = await request(
       process.env.HASURA_ENDPOINT,
@@ -121,8 +171,8 @@ const anonymizeUser = async (req, res) => {
 
     // Remove profile picture
     if (user.picture) {
-        await removeProfileImage(storage, user.picture, bucketName);
-        logger.debug(`Attempted to remove profile picture for userId: ${userId}`);
+      await removeProfileImage(storage, user.picture, bucketName);
+      logger.debug(`Attempted to remove profile picture for userId: ${userId}`);
     }
   
     // Update user data
@@ -144,19 +194,19 @@ const anonymizeUser = async (req, res) => {
 
     // Handle certificates
     for (const enrollment of user.CourseEnrollments) {
-        if (enrollment.achievementCertificateURL) {
-          await storage.saveToBucket(enrollment.achievementCertificateURL, bucketName, anonymousFileContent);
-          logger.debug(`Replaced achievement certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
-        }
-        if (enrollment.attendanceCertificateURL) {
-          await storage.saveToBucket(enrollment.attendanceCertificateURL, bucketName, anonymousFileContent);
-          logger.debug(`Replaced attendance certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
-        }
+      if (enrollment.achievementCertificateURL) {
+        await storage.saveToBucket(enrollment.achievementCertificateURL, bucketName, anonymousFileContent);
+        logger.debug(`Replaced achievement certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
+      }
+      if (enrollment.attendanceCertificateURL) {
+        await storage.saveToBucket(enrollment.attendanceCertificateURL, bucketName, anonymousFileContent);
+        logger.debug(`Replaced attendance certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
+      }
     }
   
     logger.debug(`Anonymized data saved for userId: ${userId}`);
 
-    return res.json({ message: "User data anonymized successfully" });
+    return res.json({ message: "User data anonymized successfully and deleted from Keycloak" });
 
   } catch (error) {
     logger.error("Error anonymizing user", { error: error.message, stack: error.stack });
