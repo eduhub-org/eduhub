@@ -49,6 +49,7 @@ export const callNodeFunction = async (req, res) => {
 
   try {
     logger.info(`Calling ${functionName} function`);
+    let result;
     switch (functionName) {
       case "createCertificate":
         await createCertificate(req, res, logger);
@@ -63,8 +64,8 @@ export const callNodeFunction = async (req, res) => {
         await saveImage(req, res, logger);
         break;
       case "anonymizeUser":
-        await anonymizeUser(req, res, logger);
-        break;
+        const { status, result } = await anonymizeUser(req, logger);
+        return res.status(status).json(result);
       default:
         return res.status(404).json({
           error: "Function Not Found",

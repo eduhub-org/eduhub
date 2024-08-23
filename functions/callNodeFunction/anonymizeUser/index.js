@@ -68,26 +68,25 @@ const GET_USER_AND_ENROLLMENTS = gql`
 `;
 
 const removeProfileImage = async (storage, imagePath, bucketName) => {
-    if (!imagePath) return;
-    
-    // Remove the original image
-    await storage.deleteFile(imagePath, bucketName);
-    logger.debug(`Attempted to remove profile picture at ${imagePath}`);
+  if (!imagePath) return;
   
-    // Remove any resized versions
-    const directory = path.dirname(imagePath);
-    const filename = path.basename(imagePath, path.extname(imagePath));
-    const files = await storage.listFiles(bucketName, { prefix: directory });
-  
-    for (const file of files) {
-      const resizedFilename = file.name;
-      if (resizedFilename.startsWith(`${directory}/${filename}-`) && resizedFilename.endsWith('.webp')) {
-        await storage.deleteFile(resizedFilename, bucketName);
-        logger.debug(`Attempted to remove resized image at ${resizedFilename}`);
-      }
+  // Remove the original image
+  await storage.deleteFile(imagePath, bucketName);
+  logger.debug(`Attempted to remove profile picture at ${imagePath}`);
+
+  // Remove any resized versions
+  const directory = path.dirname(imagePath);
+  const filename = path.basename(imagePath, path.extname(imagePath));
+  const files = await storage.listFiles(bucketName, { prefix: directory });
+
+  for (const file of files) {
+    const resizedFilename = file.name;
+    if (resizedFilename.startsWith(`${directory}/${filename}-`) && resizedFilename.endsWith('.webp')) {
+      await storage.deleteFile(resizedFilename, bucketName);
+      logger.debug(`Attempted to remove resized image at ${resizedFilename}`);
     }
-  };
-    
+  }
+};
 
 const generateAnonymousFile = () => {
   return Buffer.from('This certificate has been deleted due to user anonymization.', 'utf-8');
@@ -127,16 +126,31 @@ const deleteKeycloakUser = async (userId, token) => {
       }
     );
     logger.debug(`Deleted user from Keycloak: ${userId}`);
+    return true;
   } catch (error) {
+    if (error.response && error.response.status === 404) {
+      logger.debug(`User not found in Keycloak: ${userId}. Considering this as a successful deletion.`);
+      return true;
+    }
     logger.error(`Error deleting user from Keycloak: ${error.message}`);
     throw error;
   }
 };
 
-const anonymizeUser = async (req, res) => {
+const anonymizeUser = async (req, logger) => {
+  const result = {
+    keycloakDeletion: false,
+    userDataAnonymization: false,
+    profilePictureRemoval: false,
+    certificateAnonymization: false,
+    errors: []
+  };
+
   try {
     if (!req.body.input || !req.body.input.userId) {
-      return res.status(400).json({ message: "Missing required field: userId" });
+      logger.error("Missing required field: userId");
+      result.errors.push("Missing required field: userId");
+      return { status: 400, result };
     }
 
     const userId = req.body.input.userId;
@@ -145,10 +159,11 @@ const anonymizeUser = async (req, res) => {
     // Delete user from Keycloak
     try {
       const keycloakToken = await getKeycloakToken();
-      await deleteKeycloakUser(userId, keycloakToken);
+      result.keycloakDeletion = await deleteKeycloakUser(userId, keycloakToken);
     } catch (keycloakError) {
       logger.error(`Error in Keycloak operations: ${keycloakError.message}`);
-      // Continue with the process even if Keycloak deletion fails
+      result.errors.push(`Keycloak deletion failed: ${keycloakError.message}`);
+      // Don't throw here, continue with the process
     }
 
     const userData = await request(
@@ -160,7 +175,14 @@ const anonymizeUser = async (req, res) => {
 
     if (!userData.User_by_pk) {
       logger.error(`User not found: ${userId}`);
-      return res.status(404).json({ message: "User not found" });
+      result.errors.push("User not found in database");
+      return { 
+        status: 404, 
+        body: { 
+          message: "User not found", 
+          result 
+        }
+      };
     }
 
     const user = userData.User_by_pk;
@@ -171,46 +193,77 @@ const anonymizeUser = async (req, res) => {
 
     // Remove profile picture
     if (user.picture) {
-      await removeProfileImage(storage, user.picture, bucketName);
-      logger.debug(`Attempted to remove profile picture for userId: ${userId}`);
+      try {
+        await removeProfileImage(storage, user.picture, bucketName);
+        logger.debug(`Removed profile picture for userId: ${userId}`);
+        result.profilePictureRemoval = true;
+      } catch (pictureError) {
+        logger.error(`Error removing profile picture: ${pictureError.message}`);
+        result.errors.push(`Profile picture removal failed: ${pictureError.message}`);
+      }
+    } else {
+      result.profilePictureRemoval = true; // No picture to remove
     }
   
     // Update user data
-    await request(
-      process.env.HASURA_ENDPOINT,
-      UPDATE_USER,
-      {
-        userId: anonymizedUser.id,
-        firstName: anonymizedUser.firstName,
-        lastName: anonymizedUser.lastName,
-        email: anonymizedUser.email,
-        matriculationNumber: anonymizedUser.matriculationNumber,
-      },
-      { "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET }
-    );
+    try {
+      await request(
+        process.env.HASURA_ENDPOINT,
+        UPDATE_USER,
+        {
+          userId: anonymizedUser.id,
+          firstName: anonymizedUser.firstName,
+          lastName: anonymizedUser.lastName,
+          email: anonymizedUser.email,
+          matriculationNumber: anonymizedUser.matriculationNumber,
+        },
+        { "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET }
+      );
+      result.userDataAnonymization = true;
+    } catch (updateError) {
+      logger.error(`Error updating user data: ${updateError.message}`);
+      result.errors.push(`User data update failed: ${updateError.message}`);
+    }
 
     // Generate anonymous file content
     const anonymousFileContent = generateAnonymousFile();
 
     // Handle certificates
+    let certificateErrors = [];
     for (const enrollment of user.CourseEnrollments) {
-      if (enrollment.achievementCertificateURL) {
-        await storage.saveToBucket(enrollment.achievementCertificateURL, bucketName, anonymousFileContent);
-        logger.debug(`Replaced achievement certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
-      }
-      if (enrollment.attendanceCertificateURL) {
-        await storage.saveToBucket(enrollment.attendanceCertificateURL, bucketName, anonymousFileContent);
-        logger.debug(`Replaced attendance certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
+      try {
+        if (enrollment.achievementCertificateURL) {
+          await storage.saveToBucket(enrollment.achievementCertificateURL, bucketName, anonymousFileContent);
+          logger.debug(`Replaced achievement certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
+        }
+        if (enrollment.attendanceCertificateURL) {
+          await storage.saveToBucket(enrollment.attendanceCertificateURL, bucketName, anonymousFileContent);
+          logger.debug(`Replaced attendance certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
+        }
+      } catch (certError) {
+        certificateErrors.push(`Error anonymizing certificates for courseId ${enrollment.courseId}: ${certError.message}`);
       }
     }
+    
+    if (certificateErrors.length === 0) {
+      result.certificateAnonymization = true;
+    } else {
+      result.errors.push(...certificateErrors);
+    }
   
-    logger.debug(`Anonymized data saved for userId: ${userId}`);
+    logger.debug(`Anonymization process completed for userId: ${userId}`);
+    logger.info("Anonymization result:", result);
 
-    return res.json({ message: "User data anonymized successfully and deleted from Keycloak" });
+    const success = Object.values(result).filter(v => typeof v === 'boolean').every(Boolean);
+    const status = success ? 200 : 206; // 206 Partial Content if some operations failed
+
+    return { status, result };
 
   } catch (error) {
     logger.error("Error anonymizing user", { error: error.message, stack: error.stack });
-    return res.status(500).json({ message: "Internal Server Error" });
+    result.errors.push(`General error: ${error.message}`);
+    logger.info("Anonymization result (with error):", result);
+    return { status: 500, result };
   }
 };
 
