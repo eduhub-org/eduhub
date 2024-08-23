@@ -1,4 +1,10 @@
 type Mutation {
+  anonymizeUser(
+    userId: uuid!
+  ): result
+}
+
+type Mutation {
   createCertificate(
     userIds: [uuid!]!
     courseId: Int!
