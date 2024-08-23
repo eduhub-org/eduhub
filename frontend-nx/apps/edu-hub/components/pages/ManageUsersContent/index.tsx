@@ -7,7 +7,10 @@ import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
-import { USERS_BY_LAST_NAME } from '../../../queries/user';
+import {
+  USERS_BY_LAST_NAME,
+  DELETE_USER
+ } from '../../../queries/user';
 import {
   UsersByLastName,
   UsersByLastNameVariables,
@@ -105,7 +108,8 @@ const ManageUsersContent: FC = () => {
               data={data.User}
               error={error}
               loading={loading}
-              // deleteMutation={DELETE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE}
+              deleteMutation={DELETE_USER}
+              deleteIdType="uuidString"
               refetchQueries={['UsersByLastName']}
               showDelete
               translationNamespace="users"

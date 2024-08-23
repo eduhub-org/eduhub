@@ -31,6 +31,7 @@ interface TableGridProps<T extends BaseRow> {
   data: T[];
   columns: ColumnDef<T>[];
   deleteMutation?: DocumentNode;
+  deleteIdType?: 'number' | 'uuidString';
   enablePagination?: boolean;
   error: ApolloError;
   expandableRowComponent?: (props: { row: T }) => ReactElement | null;
@@ -54,6 +55,7 @@ const TableGrid = <T extends BaseRow>({
   data,
   columns,
   deleteMutation,
+  deleteIdType,
   enablePagination = false,
   error,
   expandableRowComponent,
@@ -132,6 +134,7 @@ const TableGrid = <T extends BaseRow>({
                   <TableGridDeleteButton
                     deleteMutation={deleteMutation}
                     id={row.original.id}
+                    idType={deleteIdType}
                     refetchQueries={refetchQueries}
                   />
                 ),
@@ -139,7 +142,7 @@ const TableGrid = <T extends BaseRow>({
           ]
         : [];
     return [...dataColumns, ...expandCollapseColumn, ...deleteColumn];
-  }, [columns, deleteMutation, refetchQueries, showDelete, expandedRows, toggleRowExpansion]);
+  }, [columns, deleteMutation, refetchQueries, showDelete, expandedRows, toggleRowExpansion, deleteIdType]);
 
   const table = useReactTable({
     data,
