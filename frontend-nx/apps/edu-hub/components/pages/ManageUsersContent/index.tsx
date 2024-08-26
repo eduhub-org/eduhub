@@ -1,4 +1,4 @@
-import { FC, ReactNode, useMemo, useState, useEffect } from 'react';
+import { FC, ReactNode, useMemo, useState, useEffect, useCallback } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { ColumnDef } from '@tanstack/react-table';
 import { useDebouncedCallback } from 'use-debounce';
@@ -7,7 +7,10 @@ import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
-import { USERS_BY_LAST_NAME } from '../../../queries/user';
+import {
+  USERS_BY_LAST_NAME,
+  DELETE_USER
+ } from '../../../queries/user';
 import {
   UsersByLastName,
   UsersByLastNameVariables,
@@ -82,6 +85,11 @@ const ManageUsersContent: FC = () => {
     []
   );
 
+  const generateDeletionConfirmation = useCallback((row: UsersByLastName_User) => {
+    return t('manageUsers:deletion_confirmation_question', { firstName: row.firstName, lastName: row.lastName });
+  }, [t]);
+
+
   // const onAddUserClick = async () => {
   //   console.log("add user");
   // };
@@ -105,7 +113,9 @@ const ManageUsersContent: FC = () => {
               data={data.User}
               error={error}
               loading={loading}
-              // deleteMutation={DELETE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE}
+              deleteMutation={DELETE_USER}
+              deleteIdType="uuidString"
+              generateDeletionConfirmationQuestion={generateDeletionConfirmation}
               refetchQueries={['UsersByLastName']}
               showDelete
               translationNamespace="users"

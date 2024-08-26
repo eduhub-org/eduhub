@@ -1,0 +1,18 @@
+{
+  "deletion_confirmation_question": "Are you sure you want to delete the account of {{firstName}} {{lastName}}? The following steps will be performed:\n\n1. Deleting the user account from the authentication system\n2. Anonymizing all personal data\n3. Deleting the profile picture\n4. Deleting motivation letters\n5. Replacing the certificates with anonymized versions\n\nThis process cannot be undone. Do you want to proceed with deleting with deleting {{firstName}} {{lastName}}'s account?",
+  "anonymization": {
+    "ANONYMIZATION_SUCCESS": "User data anonymized successfully",
+    "ANONYMIZATION_PARTIAL_SUCCESS": "User data partially anonymized",
+    "ANONYMIZATION_FAILED": "Failed to anonymize user data",
+    "ERROR_MISSING_USER_ID": "Missing required user ID",
+    "ERROR_SOME_STEPS_FAILED": "Some anonymization steps failed",
+    "ERROR_GENERAL": "An unexpected error occurred"
+  },
+  "anonymization_steps": {
+    "keycloak_deletion": "Keycloak deletion",
+    "user_data_anonymization": "User data anonymization",
+    "motivation_letter_anonymization": "Motivation letter anonymization",
+    "profile_picture_removal": "Profile picture removal",
+    "certificate_anonymization": "Certificate anonymization"
+  }
+}
