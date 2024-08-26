@@ -1,0 +1,18 @@
+{
+   "deletion_confirmation_question": "Bist du sicher, dass du den Account von {{firstName}} {{lastName}} löschen möchtest? Die folgenden Schritte werden ausgeführt:\n\n1. Löschung des Benutzerkontos aus dem Authentifizierungssystem\n2. Anonymisierung aller persönlichen Daten\n3. Löschung des Profilbildes\n4. Löschung der Motivationsbriefe\n5. Ersetzung der Zertifikate mit anonymisierten Versionen\n\nDieser Vorgang kann nicht rückgängig gemacht werden. Möchtest du mit der Löschung des Benutzerkontos von {{firstName}} {{lastName}} fortfahren?",
+   "anonymization": {
+    "ANONYMIZATION_SUCCESS": "Benutzerdaten wurden erfolgreich anonymisiert",
+    "ANONYMIZATION_PARTIAL_SUCCESS": "Benutzerdaten wurden teilweise anonymisiert",
+    "ANONYMIZATION_FAILED": "Anonymisierung der Benutzerdaten fehlgeschlagen",
+    "ERROR_MISSING_USER_ID": "Erforderliche Benutzer-ID fehlt",
+    "ERROR_SOME_STEPS_FAILED": "Einige Anonymisierungsschritte sind fehlgeschlagen",
+    "ERROR_GENERAL": "Ein unerwarteter Fehler ist aufgetreten"
+  },
+  "anonymization_steps": {
+    "keycloak_deletion": "Keycloak-Löschung",
+    "user_data_anonymization": "Anonymisierung der Benutzerdaten",
+    "motivation_letter_anonymization": "Anonymisierung der Motivationsbriefe",
+    "profile_picture_removal": "Entfernung des Profilbilds",
+    "certificate_anonymization": "Anonymisierung der Zertifikate"
+  }
+}

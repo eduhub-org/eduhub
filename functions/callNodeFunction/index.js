@@ -2,6 +2,7 @@ import createCertificate from "./createCertificate/index.js";
 import getSignedUrl from "./getSignedUrl/index.js";
 import saveFile from "./saveFile/index.js";
 import saveImage from "./saveImage/index.js";
+import anonymizeUser from "./anonymizeUser/index.js";
 import winston from "winston";
 
 /**
@@ -48,6 +49,7 @@ export const callNodeFunction = async (req, res) => {
 
   try {
     logger.info(`Calling ${functionName} function`);
+    let result;
     switch (functionName) {
       case "createCertificate":
         await createCertificate(req, res, logger);
@@ -61,6 +63,9 @@ export const callNodeFunction = async (req, res) => {
       case "saveImage":
         await saveImage(req, res, logger);
         break;
+      case "anonymizeUser":
+        const { status, result } = await anonymizeUser(req, logger);
+        return res.status(status).json(result);
       default:
         return res.status(404).json({
           error: "Function Not Found",
@@ -68,10 +73,18 @@ export const callNodeFunction = async (req, res) => {
     }
   } catch (error) {
     logger.error(`Error in ${functionName}: ${error.message}`);
-    return res.status(500).json({
-      error: "Internal Server Error",
-    });
+    if (error.status && typeof error.status === 'number') {
+      return res.status(error.status).json({
+        error: error.message,
+        details: error.details || "No additional details provided"
+      });
+    } else {
+      return res.status(500).json({
+        error: "Internal Server Error",
+        message: error.message,
+        details: "An unexpected error occurred"
+      });
+    }
   }
 };
-
 export default logger;
