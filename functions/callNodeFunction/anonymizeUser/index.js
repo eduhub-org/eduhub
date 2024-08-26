@@ -4,6 +4,7 @@ import { Storage } from "@google-cloud/storage";
 import { buildCloudStorage } from "../lib/cloud-storage.js";
 import path from "path";
 import axios from "axios";
+import fs from 'fs';
 
 const shortenHashId = (hashId) => {
   return hashId.replace(/-/g, '').substr(0, 12);
@@ -62,7 +63,16 @@ const GET_USER_AND_ENROLLMENTS = gql`
         courseId
         achievementCertificateURL
         attendanceCertificateURL
+        motivationLetter
       }
+    }
+  }
+`;
+
+const UPDATE_MOTIVATION_LETTERS = gql`
+  mutation UpdateMotivationLetters($updates: [CourseEnrollment_updates!]!) {
+    update_CourseEnrollment_many(updates: $updates) {
+      affected_rows
     }
   }
 `;
@@ -86,10 +96,6 @@ const removeProfileImage = async (storage, imagePath, bucketName) => {
       logger.debug(`Attempted to remove resized image at ${resizedFilename}`);
     }
   }
-};
-
-const generateAnonymousFile = () => {
-  return Buffer.from('This certificate has been deleted due to user anonymization.', 'utf-8');
 };
 
 const getKeycloakToken = async () => {
@@ -247,19 +253,43 @@ const anonymizeUser = async (req, logger) => {
       logger.error(`Error updating user data: ${updateError.message}`);
     }
 
-    // Generate anonymous file content
-    const anonymousFileContent = generateAnonymousFile();
+    // Anonymize motivation letters in all enrollments
+    const enrollmentsToUpdate = user.CourseEnrollments.map(enrollment => ({
+      where: { id: { _eq: enrollment.id } },
+      _set: {
+        motivationLetter: enrollment.motivationLetter 
+          ? "This motivation letter has been anonymized due to user request." 
+          : null
+      }
+    }));
+
+    try {
+      await request(
+        process.env.HASURA_ENDPOINT,
+        UPDATE_MOTIVATION_LETTERS,
+        { updates: enrollmentsToUpdate },  // Changed from 'enrollments' to 'updates'
+        { "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET }
+      );
+      logger.debug(`Anonymized motivation letters for userId: ${userId}`);
+      result.steps.motivation_letter_anonymization = true;
+    } catch (motivationLetterError) {
+      logger.error(`Error anonymizing motivation letters: ${motivationLetterError.message}`);
+      result.steps.motivation_letter_anonymization = false;
+    }
 
     // Handle certificates
     let allCertificatesAnonymized = true;
+    const currentWorkingDir = process.cwd();
+    const defaultCertificatePath = path.join(currentWorkingDir, 'anonymizeUser','default_deleted_certificate.pdf');
+    const pdfBufferDefaultCertificate = fs.readFileSync(defaultCertificatePath);
     for (const enrollment of user.CourseEnrollments) {
       try {
         if (enrollment.achievementCertificateURL) {
-          await storage.saveToBucket(enrollment.achievementCertificateURL, bucketName, anonymousFileContent);
+          await storage.saveToBucket(enrollment.achievementCertificateURL, bucketName, pdfBufferDefaultCertificate);
           logger.debug(`Replaced achievement certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
         }
         if (enrollment.attendanceCertificateURL) {
-          await storage.saveToBucket(enrollment.attendanceCertificateURL, bucketName, anonymousFileContent);
+          await storage.saveToBucket(enrollment.attendanceCertificateURL, bucketName, pdfBufferDefaultCertificate);
           logger.debug(`Replaced attendance certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
         }
       } catch (certError) {

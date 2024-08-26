@@ -180,5 +180,6 @@ type AnonymizationSteps {
   user_data_anonymization: Boolean!
   profile_picture_removal: Boolean!
   certificate_anonymization: Boolean!
+  motivation_letter_anonymization: Boolean!
 }
 
