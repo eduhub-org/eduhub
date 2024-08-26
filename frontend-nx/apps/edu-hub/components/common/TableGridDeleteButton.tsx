@@ -70,7 +70,7 @@ const TableGridDeleteButton = ({
         <MdDelete size="1.25em" style={{ color: 'red' }} />
       </IconButton>
       <QuestionConfirmationDialog
-        question={deletionConfirmationQuestion}
+        question={confirmationQuestion}
         confirmationText={t('common:confirm_delete')}
         open={isConfirmationOpen}
         onClose={handleConfirmationClose}

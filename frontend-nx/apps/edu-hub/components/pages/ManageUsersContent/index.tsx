@@ -1,4 +1,4 @@
-import { FC, ReactNode, useMemo, useState, useEffect } from 'react';
+import { FC, ReactNode, useMemo, useState, useEffect, useCallback } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { ColumnDef } from '@tanstack/react-table';
 import { useDebouncedCallback } from 'use-debounce';
@@ -85,6 +85,10 @@ const ManageUsersContent: FC = () => {
     []
   );
 
+  const generateDeletionConfirmation = useCallback((row: UsersByLastName_User) => {
+    return t('manageUsers:deletion_confirmation_question', { firstName: row.firstName, lastName: row.lastName });
+  }, [t]);
+
 
   // const onAddUserClick = async () => {
   //   console.log("add user");
@@ -111,6 +115,7 @@ const ManageUsersContent: FC = () => {
               loading={loading}
               deleteMutation={DELETE_USER}
               deleteIdType="uuidString"
+              generateDeletionConfirmationQuestion={generateDeletionConfirmation}
               refetchQueries={['UsersByLastName']}
               showDelete
               translationNamespace="users"
