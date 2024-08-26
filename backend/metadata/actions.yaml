@@ -1,7 +1,7 @@
 actions:
   - name: anonymizeUser
     definition:
-      kind: asynchronous
+      kind: synchronous
       handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
       headers:
         - name: secret
@@ -10,7 +10,7 @@ actions:
           value_from_env: HASURA_BUCKET
         - name: name
           value: anonymizeUser
-    comment: Anonymizes a user's data in Hasura and Google Cloud bucket and deletes it in Keycloak
+    comment: Anonymizes a user's data in Hasura and Googl Cloud bucket and deletes it in Keycloak
   - name: createCertificate
     definition:
       kind: synchronous
@@ -207,4 +207,7 @@ custom_types:
     - name: MoocHubImage
     - name: Image
     - name: getSignedUrlOutput
+    - name: DeleteUserResult
+    - name: AnonymizeUserResult
+    - name: AnonymizationSteps
   scalars: []

@@ -138,52 +138,76 @@ const deleteKeycloakUser = async (userId, token) => {
 };
 
 const anonymizeUser = async (req, logger) => {
+  let status = 200;
   const result = {
-    keycloakDeletion: false,
-    userDataAnonymization: false,
-    profilePictureRemoval: false,
-    certificateAnonymization: false,
-    errors: []
+    anonymizedUserId: null,
+    messageKey: "",
+    error: null,
+    steps: {
+      keycloak_deletion: false,
+      user_data_anonymization: false,
+      profile_picture_removal: false,
+      certificate_anonymization: false
+    }
   };
 
   try {
     if (!req.body.input || !req.body.input.userId) {
       logger.error("Missing required field: userId");
-      result.errors.push("Missing required field: userId");
-      return { status: 400, result };
+      status = 400;
+      result.error = "ERROR_MISSING_USER_ID";
+      result.messageKey = "ANONYMIZATION_FAILED_MISSING_USER_ID";
+      return { status, result };
     }
 
     const userId = req.body.input.userId;
+    result.anonymizedUserId = userId;
     logger.debug(`Received anonymizeUser request for userId: ${userId}`);
 
     // Delete user from Keycloak
     try {
       const keycloakToken = await getKeycloakToken();
-      result.keycloakDeletion = await deleteKeycloakUser(userId, keycloakToken);
+      result.steps.keycloak_deletion = await deleteKeycloakUser(userId, keycloakToken);
     } catch (keycloakError) {
       logger.error(`Error in Keycloak operations: ${keycloakError.message}`);
-      result.errors.push(`Keycloak deletion failed: ${keycloakError.message}`);
-      // Don't throw here, continue with the process
+      // We continue the process even if Keycloak deletion fails
     }
 
-    const userData = await request(
-      process.env.HASURA_ENDPOINT,
-      GET_USER_AND_ENROLLMENTS,
-      { userId },
-      { "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET }
-    );
-
+    let userData;
+    try {
+      userData = await request(
+        process.env.HASURA_ENDPOINT,
+        GET_USER_AND_ENROLLMENTS,
+        { userId },
+        { "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET }
+      );
+    } catch (error) {
+      logger.error(`Error fetching user data: ${error.message}`);
+      
+      if (error.message.includes("invalid input syntax for type uuid")) {
+        status = 400;
+        result.error = "ERROR_INVALID_UUID";
+        result.messageKey = "ANONYMIZATION_FAILED_INVALID_UUID";
+        result.message = `Invalid UUID format: ${userId}`;
+      } else {
+        status = 500;
+        result.error = "ERROR_FETCHING_USER_DATA";
+        result.messageKey = "ANONYMIZATION_FAILED_FETCHING_USER_DATA";
+        result.message = `Error fetching user data: ${error.message}`;
+      }
+      
+      return { status, result };
+    }
+    
     if (!userData.User_by_pk) {
       logger.error(`User not found: ${userId}`);
-      result.errors.push("User not found in database");
-      return { 
-        status: 404, 
-        body: { 
-          message: "User not found", 
-          result 
-        }
-      };
+      status = 404;
+      result.error = "ERROR_USER_NOT_FOUND";
+      result.messageKey = "ANONYMIZATION_FAILED_USER_NOT_FOUND";
+      result.message = `User not found with ID: ${userId}`;
+      return { status, result };
     }
+   
 
     const user = userData.User_by_pk;
     const anonymizedUser = anonymizeUserData(user);
@@ -196,13 +220,12 @@ const anonymizeUser = async (req, logger) => {
       try {
         await removeProfileImage(storage, user.picture, bucketName);
         logger.debug(`Removed profile picture for userId: ${userId}`);
-        result.profilePictureRemoval = true;
+        result.steps.profile_picture_removal = true;
       } catch (pictureError) {
         logger.error(`Error removing profile picture: ${pictureError.message}`);
-        result.errors.push(`Profile picture removal failed: ${pictureError.message}`);
       }
     } else {
-      result.profilePictureRemoval = true; // No picture to remove
+      result.steps.profile_picture_removal = true; // No picture to remove
     }
   
     // Update user data
@@ -219,17 +242,16 @@ const anonymizeUser = async (req, logger) => {
         },
         { "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET }
       );
-      result.userDataAnonymization = true;
+      result.steps.user_data_anonymization = true;
     } catch (updateError) {
       logger.error(`Error updating user data: ${updateError.message}`);
-      result.errors.push(`User data update failed: ${updateError.message}`);
     }
 
     // Generate anonymous file content
     const anonymousFileContent = generateAnonymousFile();
 
     // Handle certificates
-    let certificateErrors = [];
+    let allCertificatesAnonymized = true;
     for (const enrollment of user.CourseEnrollments) {
       try {
         if (enrollment.achievementCertificateURL) {
@@ -241,30 +263,39 @@ const anonymizeUser = async (req, logger) => {
           logger.debug(`Replaced attendance certificate for userId: ${userId}, courseId: ${enrollment.courseId}`);
         }
       } catch (certError) {
-        certificateErrors.push(`Error anonymizing certificates for courseId ${enrollment.courseId}: ${certError.message}`);
+        logger.error(`Error anonymizing certificates for courseId ${enrollment.courseId}: ${certError.message}`);
+        allCertificatesAnonymized = false;
       }
     }
     
-    if (certificateErrors.length === 0) {
-      result.certificateAnonymization = true;
-    } else {
-      result.errors.push(...certificateErrors);
-    }
+    result.steps.certificate_anonymization = allCertificatesAnonymized;
   
     logger.debug(`Anonymization process completed for userId: ${userId}`);
-    logger.info("Anonymization result:", result);
 
-    const success = Object.values(result).filter(v => typeof v === 'boolean').every(Boolean);
-    const status = success ? 200 : 206; // 206 Partial Content if some operations failed
+    const allStepsSuccessful = Object.values(result.steps).every(Boolean);
+    
+    if (allStepsSuccessful) {
+      status = 200;
+      result.messageKey = "ANONYMIZATION_SUCCESS";
+    } else {
+      status = 206; // Partial Content if some operations failed
+      result.messageKey = "ANONYMIZATION_PARTIAL_SUCCESS";
+      result.error = "ERROR_SOME_STEPS_FAILED";
+    }
+
+    logger.info(`Anonymization result: ${JSON.stringify(result, null, 2)}`);
 
     return { status, result };
 
   } catch (error) {
     logger.error("Error anonymizing user", { error: error.message, stack: error.stack });
-    result.errors.push(`General error: ${error.message}`);
-    logger.info("Anonymization result (with error):", result);
-    return { status: 500, result };
+    status = 500;
+    result.error = "ERROR_GENERAL";
+    result.messageKey = "ANONYMIZATION_FAILED_GENERAL_ERROR";
+    logger.info(`Anonymization result (with error): ${JSON.stringify(result, null, 2)}`);
+    return { status, result };
   }
 };
+
 
 export default anonymizeUser;
