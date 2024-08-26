@@ -73,10 +73,18 @@ export const callNodeFunction = async (req, res) => {
     }
   } catch (error) {
     logger.error(`Error in ${functionName}: ${error.message}`);
-    return res.status(500).json({
-      error: "Internal Server Error",
-    });
+    if (error.status && typeof error.status === 'number') {
+      return res.status(error.status).json({
+        error: error.message,
+        details: error.details || "No additional details provided"
+      });
+    } else {
+      return res.status(500).json({
+        error: "Internal Server Error",
+        message: error.message,
+        details: "An unexpected error occurred"
+      });
+    }
   }
 };
-
 export default logger;

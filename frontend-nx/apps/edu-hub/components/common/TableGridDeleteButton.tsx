@@ -11,17 +11,22 @@ interface TableGridDeleteButtonProps {
   id: string | number;
   refetchQueries: string[];
   idType: 'number' | 'uuidString';
+  deletionConfirmationQuestion?: string;
 }
 
 const TableGridDeleteButton = ({ 
   deleteMutation, 
   id, 
   refetchQueries, 
-  idType
+  idType,
+  deletionConfirmationQuestion 
 }: TableGridDeleteButtonProps) => {
   const [deleteItem] = useAdminMutation(deleteMutation);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const { t } = useTranslation();
+
+  // If no question is provided, use the default one
+  const confirmationQuestion = deletionConfirmationQuestion || t('common:deletion_confirmation_question');
 
   const handleDeleteClick = () => {
     setIsConfirmationOpen(true);
@@ -65,8 +70,8 @@ const TableGridDeleteButton = ({
         <MdDelete size="1.25em" style={{ color: 'red' }} />
       </IconButton>
       <QuestionConfirmationDialog
-        question={t('deleteConfirmationQuestion')}
-        confirmationText={t('confirmDelete')}
+        question={deletionConfirmationQuestion}
+        confirmationText={t('common:confirm_delete')}
         open={isConfirmationOpen}
         onClose={handleConfirmationClose}
       />

@@ -319,13 +319,18 @@ const anonymizeUser = async (req, logger) => {
 
   } catch (error) {
     logger.error("Error anonymizing user", { error: error.message, stack: error.stack });
-    status = 500;
-    result.error = "ERROR_GENERAL";
-    result.messageKey = "ANONYMIZATION_FAILED_GENERAL_ERROR";
-    logger.info(`Anonymization result (with error): ${JSON.stringify(result, null, 2)}`);
-    return { status, result };
+    const errorStatus = error.status || 500;
+    const errorMessage = error.status ? error.message : "ANONYMIZATION_FAILED_GENERAL_ERROR";
+    
+    return { 
+      status: errorStatus, 
+      result: {
+        ...result,
+        error: errorMessage,
+        details: error.details || error.message
+      }
+    };
   }
 };
-
 
 export default anonymizeUser;

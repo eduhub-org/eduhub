@@ -1,0 +1,17 @@
+{
+  "anonymization": {
+    "ANONYMIZATION_SUCCESS": "Benutzerdaten wurden erfolgreich anonymisiert",
+    "ANONYMIZATION_PARTIAL_SUCCESS": "Benutzerdaten wurden teilweise anonymisiert",
+    "ANONYMIZATION_FAILED": "Anonymisierung der Benutzerdaten fehlgeschlagen",
+    "ERROR_MISSING_USER_ID": "Erforderliche Benutzer-ID fehlt",
+    "ERROR_SOME_STEPS_FAILED": "Einige Anonymisierungsschritte sind fehlgeschlagen",
+    "ERROR_GENERAL": "Ein unerwarteter Fehler ist aufgetreten"
+  },
+  "anonymization_steps": {
+    "keycloak_deletion": "Keycloak-Löschung",
+    "user_data_anonymization": "Anonymisierung der Benutzerdaten",
+    "motivation_letter_anonymization": "Anonymisierung der Motivationsbriefe",
+    "profile_picture_removal": "Entfernung des Profilbilds",
+    "certificate_anonymization": "Anonymisierung der Zertifikate"
+  }
+}
