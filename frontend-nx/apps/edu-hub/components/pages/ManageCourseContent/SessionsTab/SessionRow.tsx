@@ -24,6 +24,9 @@ import useTranslation from 'next-translate/useTranslation';
 import DeleteButton from '../../../../components/common/DeleteButton';
 import SessionAddresses from './SessionAddresses';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
+import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
+import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
+import { useIsAdmin, useIsInstructor } from '../../../../hooks/authentication';
 
 const copyDateTime = (target: Date, source: Date) => {
   target = new Date(target);
@@ -58,12 +61,44 @@ export const SessionRow: FC<IProps> = ({
   onDeleteSpeaker,
 }) => {
   const { t, lang } = useTranslation('course-page');
+  const isAdmin = useIsAdmin();
+  const isInstructor = useIsInstructor();
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
 
   const handleDelete = useCallback(() => {
     if (session != null) {
-      onDelete(session.id);
+      const now = new Date();
+      const isSessionInThePast = session.startDateTime < now;
+
+      if (isAdmin) {
+        // Admins can delete any session
+        setIsConfirmDialogOpen(true);
+      } else if (isInstructor) {
+        if (isSessionInThePast) {
+          // Instructors cannot delete past sessions
+          setIsErrorDialogOpen(true);
+        } else {
+          // Instructors can delete future sessions
+          setIsConfirmDialogOpen(true);
+        }
+      }
     }
-  }, [session, onDelete]);
+  }, [session, isAdmin, isInstructor]);
+
+  const handleConfirmDelete = useCallback(
+    (confirmed: boolean) => {
+      setIsConfirmDialogOpen(false);
+      if (confirmed && session) {
+        onDelete(session.id);
+      }
+    },
+    [onDelete, session]
+  );
+
+  const handleCloseErrorDialog = useCallback(() => {
+    setIsErrorDialogOpen(false);
+  }, []);
 
   const handleDeleteSpeaker = useCallback(
     (id: number) => {
@@ -257,7 +292,23 @@ export const SessionRow: FC<IProps> = ({
           </div>
         )}
       </div>
+
       <SelectUserDialog onClose={handleNewSpeaker} open={addSpeakerOpen} title={t('add_external_speaker')} />
+
+      {/* Confirmation Dialog for Deletion */}
+      <QuestionConfirmationDialog
+        open={isConfirmDialogOpen}
+        onClose={handleConfirmDelete}
+        question={t('confirmDeleteSession')}
+        confirmationText={t('delete')}
+      />
+
+      {/* Error Dialog for Past Session Deletion Attempt */}
+      <ErrorMessageDialog
+        open={isErrorDialogOpen}
+        onClose={handleCloseErrorDialog}
+        errorMessage={t('cannotDeletePastSession')}
+      />
     </div>
   );
 };

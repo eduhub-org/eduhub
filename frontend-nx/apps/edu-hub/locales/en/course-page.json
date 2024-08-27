@@ -220,5 +220,8 @@
     "MISSED": "Missed",
     "NO_INFO": "In review",
     "PENDING": "Pending"
-  }
+  },
+  "confirmDeleteSession": "Do you really want to delete the session?",
+  "cannotDeletePastSession": "You cannot delete a session that is in the past! If you really want to delete the session, please contact an administrator.",
+  "delete": "Delete"
 }
