@@ -113,5 +113,6 @@
   },
   "type_name_or_email_minimum_3_letters": "Type a name or email (minimum 3 letters).",
   "deletion_confirmation_question": "Are you sure you want to delete this entry?",
-  "confirm_delete": "Confirm Deletion"
+  "confirm_delete": "Confirm Deletion",
+  "error": "Error"
 }
