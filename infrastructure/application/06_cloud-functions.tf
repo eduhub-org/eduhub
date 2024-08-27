@@ -129,6 +129,9 @@ resource "google_cloudfunctions2_function" "call_node_function" {
   service_config {
     environment_variables = {
       ENVIRONMENT                  = var.environment
+      KEYCLOAK_USER                = var.keycloak_user
+      KEYCLOAK_URL                 = "https://${local.keycloak_service_name}.opencampus.sh"
+      KEYCLOAK_PW                  = var.keycloak_pw
       HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
       HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
       HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
