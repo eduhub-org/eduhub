@@ -130,7 +130,7 @@
   "upload_achievement_record": "Upload new record",
   "use_documentation_template": "Use the following documentation template",
   "download_template": "Download Template",
-  "last_record_upload": "The last record with you as the author was uploaded by {{fullName}} on {{dateTime}} for \"{{achievementRecordTitle}}\".",
+  "last_record_upload": "The last record with you as the author was uploaded by {{fullName}} on {{dateTime}} for \"{{achievementRecordTitle}}\": {{achievementRecordFileName}}",
   "no_existing_record_upload": "So far, no record with you as the author has been uploaded.",
   "confirm-online-course-description": "Hereby you confirm that you have participated in the required online courses. Your record of performance is your reflection sheet. You can find it <component>HERE</component>. If you have any questions, please contact your course leader.",
   "confirm-online-course": "Confirm",
