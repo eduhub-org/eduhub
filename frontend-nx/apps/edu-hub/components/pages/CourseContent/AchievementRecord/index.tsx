@@ -129,6 +129,9 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
               dateTime: formattedDateWithTime(new Date(myRecords.created_at), lang),
               fullName: makeFullName(profile.firstName, profile.lastName),
               achievementRecordTitle: myRecords.AchievementOption.title,
+              achievementRecordFileName: myRecords.documentationUrl.substring(
+                myRecords.documentationUrl.lastIndexOf('/') + 1
+              ),
             })}
           </p>
         ) : (
