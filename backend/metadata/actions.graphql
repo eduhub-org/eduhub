@@ -1,4 +1,10 @@
 type Mutation {
+  anonymizeUser(
+    userId: uuid!
+  ): AnonymizeUserResult
+}
+
+type Mutation {
   createCertificate(
     userIds: [uuid!]!
     courseId: Int!
@@ -154,5 +160,26 @@ type Image {
 
 type getSignedUrlOutput {
   link: String!
+}
+
+type DeleteUserResult {
+  deletedUserId: String
+  message: String
+  error: String
+}
+
+type AnonymizeUserResult {
+  anonymizedUserId: String
+  messageKey: String
+  error: String
+  steps: AnonymizationSteps
+}
+
+type AnonymizationSteps {
+  keycloak_deletion: Boolean!
+  user_data_anonymization: Boolean!
+  profile_picture_removal: Boolean!
+  certificate_anonymization: Boolean!
+  motivation_letter_anonymization: Boolean!
 }
 

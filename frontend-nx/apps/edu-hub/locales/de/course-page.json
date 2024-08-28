@@ -121,7 +121,7 @@
   "no-achievement-option": "Aktuell steht kein Leistungsnachweis für diesen Kurs zur Verfügung.",
   "upload_achievement_record": "Neuen Nachweis hochladen",
   "download_template": "Vorlage herunterladen",
-  "last_record_upload": "Der letzte Nachweis mit Dir als Autor wurde am {{dateTime}} von {{fullName}} zu \"{{achievementRecordTitle}}\" hochgeladen.",
+  "last_record_upload": "Der letzte Nachweis mit Dir als Autor wurde am {{dateTime}} von {{fullName}} zu \"{{achievementRecordTitle}}\" hochgeladen: {{achievementRecordFileName}}",
   "no_existing_record_upload": "Es wurde bisher kein Nachweis mit Dir als Autor hochgeladen.",
   "use_documentation_template": "Nutze folgende Vorlage zur Dokumentation:",
   "confirm-online-course-description": "Hiermit bestätigst du an den erforderlichen Online-Kursen teilgenommen zu haben. Dein Leistungsnachweis ist dein Reflexionsbogen. Bitte klicke <component>HIER</component>, um ihn auszufüllen. Bei Fragen wende dich bitte an deine Kursleitung.",
@@ -214,5 +214,8 @@
     "MISSED": "Nicht teilgenommen",
     "NO_INFO": "In Prüfung",
     "PENDING": "Ausstehend"
-  }
+  },
+  "confirmDeleteSession": "Möchtest du den Termin wirklich löschen?",
+  "cannotDeletePastSession": "Du kannst keinen Termin der in der Vergangenheit liegt löschen! Solltest du den Termin wirklich löschen wollen, kontaktiere bitte einen Administrator.",
+  "delete": "Löschen"
 }
