@@ -316,23 +316,25 @@ export const DELETE_COURSE_LOCATION = gql`
 `;
 
 export const UPDATE_COURSE_START_TIME = gql`
-  mutation UpdateCourseStartTime($courseId: Int!, $startTime: timestamptz!) {
+  mutation UpdateCourseStartTime($courseId: Int!, $startTime: time) {
     update_Course_by_pk(
       pk_columns: { id: $courseId }
       _set: { startTime: $startTime }
     ) {
       id
+      startTime
     }
   }
 `;
 
 export const UPDATE_COURSE_END_TIME = gql`
-  mutation UpdateCourseEndTime($courseId: Int!, $endTime: timestamptz!) {
+  mutation UpdateCourseEndTime($courseId: Int!, $endTime: time) {
     update_Course_by_pk(
       pk_columns: { id: $courseId }
       _set: { endTime: $endTime }
     ) {
       id
+      endTime
     }
   }
 `;
@@ -349,12 +351,13 @@ export const UPDATE_COURSE_LANGUAGE = gql`
 `;
 
 export const UPDATE_COURSE_WEEKDAY = gql`
-  mutation UpdateCourseWeekday($courseId: Int!, $weekday: Weekday_enum!) {
+  mutation UpdateCourseWeekday($courseId: Int!, $value: Weekday_enum!) {
     update_Course_by_pk(
       pk_columns: { id: $courseId }
-      _set: { weekDay: $weekday }
+      _set: { weekDay: $value }
     ) {
       id
+      weekDay
     }
   }
 `;

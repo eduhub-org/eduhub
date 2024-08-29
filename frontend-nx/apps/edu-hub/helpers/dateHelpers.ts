@@ -1,6 +1,6 @@
 import { Course_Course_by_pk } from '../queries/__generated__/Course';
 
-const format2Digits = (n: number) => {
+export const format2Digits = (n: number) => {
   return `${n < 10 ? '0' : ''}${n}`;
 };
 
@@ -63,4 +63,11 @@ export const getWeekdayStartAndEndString = (
   if (!endTime) return `${weekday} ${startTime}`;
 
   return `${weekday} ${startTime} - ${endTime}`;
+};
+
+export const formatTime = (time: Date | null): string => {
+  if (time == null) {
+    return formatTime(new Date());
+  }
+  return format2Digits(time.getHours()) + ':' + format2Digits(Math.round(time.getMinutes() / 15) * 15);
 };

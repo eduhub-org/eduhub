@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL mutation operation: UpdateAppSettings
+// GraphQL mutation operation: UpdateBanner
 // ====================================================
 
-export interface UpdateAppSettings_update_AppSettings_by_pk {
+export interface UpdateBanner_update_AppSettings_by_pk {
   __typename: "AppSettings";
   /**
    * Name of the app to which the given settings are applied
@@ -35,14 +35,14 @@ export interface UpdateAppSettings_update_AppSettings_by_pk {
   bannerTextDe: string | null;
 }
 
-export interface UpdateAppSettings {
+export interface UpdateBanner {
   /**
    * update single row of the table: "AppSettings"
    */
-  update_AppSettings_by_pk: UpdateAppSettings_update_AppSettings_by_pk | null;
+  update_AppSettings_by_pk: UpdateBanner_update_AppSettings_by_pk | null;
 }
 
-export interface UpdateAppSettingsVariables {
+export interface UpdateBannerVariables {
   appName: string;
   bannerBackgroundColor?: string | null;
   bannerFontColor?: string | null;

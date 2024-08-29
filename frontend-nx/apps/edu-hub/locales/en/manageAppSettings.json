@@ -6,5 +6,18 @@
   "bannerTextEn": "News Banner Text EN",
   "previewImageURL": "Default preview image URL",
   "appSettings": "App Settings",
-  "courseGroupOptions": "Course Groups Order"
+  "courseGroupOptions": "Course Groups Order",
+  "timeZone": "Time Zone",
+  "bannerSettings": "Banner Settings",
+  "save": "Save",
+  "saving": "Saving...",
+  "timeZones": {
+    "Europe/Berlin": "Berlin",
+    "Europe/London": "London",
+    "Europe/Paris": "Paris",
+    "UTC": "UTC",
+    "America/New_York": "New York",
+    "America/Los_Angeles": "Los Angeles",
+    "Asia/Tokyo": "Tokio"
+  }
 }

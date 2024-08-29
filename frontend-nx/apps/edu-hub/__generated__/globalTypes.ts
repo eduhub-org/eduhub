@@ -4583,7 +4583,7 @@ export interface Course_bool_exp {
   coverImage?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   ects?: String_comparison_exp | null;
-  endTime?: timestamptz_comparison_exp | null;
+  endTime?: time_comparison_exp | null;
   externalRegistrationLink?: String_comparison_exp | null;
   headingDescriptionField1?: String_comparison_exp | null;
   headingDescriptionField2?: String_comparison_exp | null;
@@ -4594,7 +4594,7 @@ export interface Course_bool_exp {
   maxParticipants?: Int_comparison_exp | null;
   programId?: Int_comparison_exp | null;
   published?: Boolean_comparison_exp | null;
-  startTime?: timestamptz_comparison_exp | null;
+  startTime?: time_comparison_exp | null;
   status?: CourseStatus_enum_comparison_exp | null;
   tagline?: String_comparison_exp | null;
   title?: String_comparison_exp | null;
@@ -4659,7 +4659,6 @@ export interface Course_max_order_by {
   coverImage?: order_by | null;
   created_at?: order_by | null;
   ects?: order_by | null;
-  endTime?: order_by | null;
   externalRegistrationLink?: order_by | null;
   headingDescriptionField1?: order_by | null;
   headingDescriptionField2?: order_by | null;
@@ -4669,7 +4668,6 @@ export interface Course_max_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
-  startTime?: order_by | null;
   tagline?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
@@ -4687,7 +4685,6 @@ export interface Course_min_order_by {
   coverImage?: order_by | null;
   created_at?: order_by | null;
   ects?: order_by | null;
-  endTime?: order_by | null;
   externalRegistrationLink?: order_by | null;
   headingDescriptionField1?: order_by | null;
   headingDescriptionField2?: order_by | null;
@@ -4697,7 +4694,6 @@ export interface Course_min_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
-  startTime?: order_by | null;
   tagline?: order_by | null;
   title?: order_by | null;
   updated_at?: order_by | null;
@@ -7047,6 +7043,21 @@ export interface date_comparison_exp {
  * Boolean expression to compare columns of type "numeric". All fields are combined with logical 'AND'.
  */
 export interface numeric_comparison_exp {
+  _eq?: any | null;
+  _gt?: any | null;
+  _gte?: any | null;
+  _in?: any[] | null;
+  _is_null?: boolean | null;
+  _lt?: any | null;
+  _lte?: any | null;
+  _neq?: any | null;
+  _nin?: any[] | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "time". All fields are combined with logical 'AND'.
+ */
+export interface time_comparison_exp {
   _eq?: any | null;
   _gt?: any | null;
   _gte?: any | null;

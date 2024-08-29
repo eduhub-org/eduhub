@@ -109,10 +109,12 @@
   "markdown_guide": "Markdown Guide",
   "location": {
     "ONLINE": "Online",
-    "KIEL": "Kiel"
+    "KIEL": "Kiel",
+    "HEIDE": "Heide"
   },
   "type_name_or_email_minimum_3_letters": "Gib mindestens 3 Buchstaben ein.",
   "deletion_confirmation_question": "Bist du sicher, dass du diesen Eintrag löschen möchtest?",
   "confirm_delete": "Löschen bestätigen",
-  "error": "Fehler"
+  "error": "Fehler",
+  "select_time": "Zeit auswählen"
 }

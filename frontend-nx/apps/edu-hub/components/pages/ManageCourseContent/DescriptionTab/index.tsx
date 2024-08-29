@@ -1,11 +1,6 @@
 import { QueryResult } from '@apollo/client';
 import { FC } from 'react';
-import {
-  eventTargetNumberMapper,
-  eventTargetValueMapper,
-  useRoleMutation,
-  useUpdateCallback,
-} from '../../../../hooks/authedMutation';
+import { eventTargetNumberMapper, useRoleMutation, useUpdateCallback } from '../../../../hooks/authedMutation';
 import {
   DELETE_COURSE_LOCATION,
   INSERT_COURSE_LOCATION,
@@ -53,7 +48,7 @@ import {
   UpdateCourseWeekday,
   UpdateCourseWeekdayVariables,
 } from '../../../../queries/__generated__/UpdateCourseWeekday';
-import { formatTime } from '../../../common/EhTimeSelect';
+import { formatTime } from '../../../../helpers/dateHelpers';
 import Locations from './Locations';
 import { Button } from '@material-ui/core';
 import { MdAddCircle } from 'react-icons/md';
@@ -196,7 +191,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     'courseId',
     'startTime',
     course?.id,
-    prepDateTimeUpdate,
+    (time: string | null) => (time ? `${time}:00` : null),
     qResult
   );
 
@@ -205,25 +200,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     'courseId',
     'endTime',
     course?.id,
-    prepDateTimeUpdate,
-    qResult
-  );
-
-  const updateCourseLanguage = useUpdateCallback<UpdateCourseLanguage, UpdateCourseLanguageVariables>(
-    UPDATE_COURSE_LANGUAGE,
-    'courseId',
-    'language',
-    course?.id,
-    eventTargetValueMapper,
-    qResult
-  );
-
-  const updateWeekday = useUpdateCallback<UpdateCourseWeekday, UpdateCourseWeekdayVariables>(
-    UPDATE_COURSE_WEEKDAY,
-    'courseId',
-    'weekday',
-    course?.id,
-    eventTargetValueMapper,
+    (time: string | null) => (time ? `${time}:00` : null),
     qResult
   );
 
@@ -242,6 +219,10 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
 
   const courseLocations = [...course.CourseLocations];
   courseLocations.sort((a, b) => a.id - b.id);
+
+  console.log('Course start time:', course.startTime, typeof course.startTime);
+  console.log('Course end time:', course.endTime, typeof course.endTime);
+
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2">
@@ -322,18 +303,21 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             label={t('weekday')}
             options={weekDayOptions}
             value={course.weekDay ?? 'MONDAY'}
-            onChange={updateWeekday}
+            updateMutation={UPDATE_COURSE_WEEKDAY}
+            idVariables={{ courseId: course.id }}
+            refetchQueries={['ManagedCourse']}
             translationPrefix="course-page:weekdays."
-          />
+            translationNamespace="course-page"
+          />{' '}
           <EduHubTimePicker
             label={t('start_time')}
-            value={formatTime(course.startTime)}
+            value={course.startTime}
             onChange={updateCourseStartTime}
             className="mb-4"
           />
           <EduHubTimePicker
             label={t('end_time')}
-            value={formatTime(course.endTime)}
+            value={course.endTime}
             onChange={updateCourseEndTime}
             className="mb-4"
           />
@@ -344,9 +328,12 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             label={t('common:language')}
             options={languageOptions}
             value={course.language}
-            onChange={updateCourseLanguage}
+            updateMutation={UPDATE_COURSE_LANGUAGE}
+            idVariables={{ courseId: course.id }}
+            refetchQueries={['ManagedCourse']}
             translationPrefix="course-page:languages."
-          />
+            translationNamespace="course-page"
+          />{' '}
           <div>
             <EduHubNumberFieldEditor
               label={t('max_participants')}

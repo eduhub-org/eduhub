@@ -1,21 +1,11 @@
 import { ChangeEvent, FC, useCallback } from 'react';
+import { format2Digits, formatTime } from '../../helpers/dateHelpers';
 
 interface IProps {
   value?: string;
   className?: string;
   onChange: (value: string) => any;
 }
-
-const format2Digits = (n: number) => {
-  return `${n < 10 ? '0' : ''}${n}`;
-};
-
-export const formatTime = (time: Date | null): string => {
-  if (time == null) {
-    return formatTime(new Date());
-  }
-  return format2Digits(time.getHours()) + ':' + format2Digits(Math.round(time.getMinutes() / 15) * 15);
-};
 
 const now = new Date();
 const nowTime = formatTime(now);
