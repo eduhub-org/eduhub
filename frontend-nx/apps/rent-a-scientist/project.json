@@ -47,7 +47,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/rent-a-scientist"],
+      "outputs": ["{workspaceRoot}/coverage/apps/rent-a-scientist"],
       "options": {
         "jestConfig": "apps/rent-a-scientist/jest.config.ts",
         "passWithNoTests": true
