@@ -51,6 +51,7 @@ Thumbs.db
 .next
 
 # nx
-/.nx/cache/
+/.nx/cache
+.nx/workspace-data/
 
 .nx/cache
