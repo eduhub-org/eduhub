@@ -55,7 +55,6 @@
     "uvu": "^0.5.6"
   },
   "devDependencies": {
-    "@nrwl/eslint-plugin-nx": "16.10.0",
     "@nrwl/jest": "16.10.0",
     "@nrwl/nx-linux-x64-gnu": "^15.9.3",
     "@nrwl/react": "16.10.0",
@@ -110,7 +109,8 @@
     "@nx/workspace": "16.10.0",
     "@nx/linter": "16.10.0",
     "@nx/cypress": "16.10.0",
-    "@nx/web": "16.10.0"
+    "@nx/web": "16.10.0",
+    "@nx/eslint-plugin": "16.10.0"
   },
   "packageManager": "yarn@3.4.1"
 }
