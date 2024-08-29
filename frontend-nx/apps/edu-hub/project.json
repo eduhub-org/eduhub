@@ -53,7 +53,7 @@
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/edu-hub/**/*.{ts,tsx,js,jsx}", "!apps/edu-hub/.next"]
