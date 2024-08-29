@@ -1,0 +1,4621 @@
+{
+  "version": "6.0",
+  "nxVersion": "19.6.4",
+  "deps": {
+    "@apollo/client": "~3.3.21",
+    "@bygdle/javascript-lp-solver": "^0.4.26",
+    "@headlessui/react": "^1.7.19",
+    "@material-ui/core": "^4.12.4",
+    "@material-ui/icons": "4.11.3",
+    "@material-ui/lab": "^4.0.0-alpha.61",
+    "@tanstack/match-sorter-utils": "^8.19.4",
+    "@tanstack/react-table": "^8.20.5",
+    "@types/cors": "^2.8.17",
+    "@types/lodash": "^4.17.7",
+    "axios": "^1.7.5",
+    "cookie": "^0.5.0",
+    "core-js": "^3.38.1",
+    "graphql": "~15.8.0",
+    "graphql-request": "^5.2.0",
+    "jsonexport": "^3.2.0",
+    "keycloak-js": "^19.0.3",
+    "kleur": "^4.1.5",
+    "lodash": "^4.17.21",
+    "loglevel": "^1.9.1",
+    "next": "14.2.3",
+    "next-auth": "^4.24.7",
+    "next-translate": "^1.6.0",
+    "papaparse": "^5.4.1",
+    "react": "18.3.1",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-datepicker": "^4.25.0",
+    "react-debounce-input": "^3.3.0",
+    "react-dom": "18.3.1",
+    "react-hook-form": "^7.53.0",
+    "react-icons": "^4.12.0",
+    "react-markdown": "^8.0.7",
+    "react-select": "^5.8.0",
+    "regenerator-runtime": "0.13.11",
+    "remark-gfm": "^3.0.1",
+    "sharp": "^0.33.5",
+    "swiper": "^9.4.1",
+    "swr": "^1.3.0",
+    "tslib": "^2.7.0",
+    "use-debounce": "^10.0.3",
+    "uuid": "^8.3.2",
+    "uvu": "^0.5.6",
+    "@nrwl/nx-linux-x64-gnu": "^15.9.3",
+    "@nx/cypress": "19.6.4",
+    "@nx/eslint": "19.6.4",
+    "@nx/eslint-plugin": "19.6.4",
+    "@nx/jest": "19.6.4",
+    "@nx/next": "19.6.4",
+    "@nx/react": "19.6.4",
+    "@nx/web": "19.6.4",
+    "@nx/workspace": "19.6.4",
+    "@tailwindcss/line-clamp": "^0.4.4",
+    "@tailwindcss/typography": "^0.5.15",
+    "@testing-library/react": "15.0.6",
+    "@types/cookie": "^0.5.4",
+    "@types/jest": "29.5.12",
+    "@types/jsonexport": "^3.0.5",
+    "@types/node": "18.16.9",
+    "@types/papaparse": "^5.3.14",
+    "@types/react": "18.3.1",
+    "@types/react-datepicker": "^4.19.6",
+    "@types/react-dom": "18.3.0",
+    "@types/react-icons": "^3.0.0",
+    "@types/react-select": "^5.0.1",
+    "@types/react-time-picker": "^4.0.3",
+    "@types/uuid": "^8.3.4",
+    "@typescript-eslint/eslint-plugin": "7.18.0",
+    "@typescript-eslint/eslint-plugin-tslint": "^4.33.0",
+    "@typescript-eslint/parser": "7.18.0",
+    "apollo": "^2.34.0",
+    "autoprefixer": "^10.4.20",
+    "babel-jest": "29.7.0",
+    "cypress": "^10.11.0",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.3",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-cypress": "2.15.2",
+    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-jsx-a11y": "6.9.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-only-warn": "^1.1.0",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-prettier": "^3.4.1",
+    "eslint-plugin-promise": "^5.2.0",
+    "eslint-plugin-react": "7.35.0",
+    "eslint-plugin-react-hooks": "4.6.2",
+    "eslint-plugin-standard": "^5.0.0",
+    "jest": "29.7.0",
+    "jest-worker": "^29.7.0",
+    "nx": "19.6.4",
+    "postcss": "8.4.38",
+    "prettier": "^2.8.8",
+    "tailwindcss": "3.4.3",
+    "ts-jest": "29.1.5",
+    "ts-node": "10.9.2",
+    "typescript": "~4.7.4",
+    "unused-exports": "^0.0.6-beta"
+  },
+  "pathMappings": {
+    "@opencampus/shared-components": [
+      "libs/shared-components/src/index.ts"
+    ]
+  },
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {
+      "edu-hub": [
+        {
+          "file": "apps/edu-hub/.env.development",
+          "hash": "9687349399010946560"
+        },
+        {
+          "file": "apps/edu-hub/.env.local",
+          "hash": "8749764495928888819"
+        },
+        {
+          "file": "apps/edu-hub/.eslintrc.json",
+          "hash": "17371981515013899906"
+        },
+        {
+          "file": "apps/edu-hub/README.md",
+          "hash": "3705932136368030954"
+        },
+        {
+          "file": "apps/edu-hub/__generated__/globalTypes.ts",
+          "hash": "4944427534781891500"
+        },
+        {
+          "file": "apps/edu-hub/apollo.config.js",
+          "hash": "3440032327993522415"
+        },
+        {
+          "file": "apps/edu-hub/components/common/AddButton.tsx",
+          "hash": "11100579655445363137",
+          "deps": [
+            "npm:react",
+            "npm:react-icons",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/AddToLinkedinButton.tsx",
+          "hash": "9472073219536533185",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/Button.tsx",
+          "hash": "11898469847724631900",
+          "deps": [
+            "npm:react",
+            "npm:next"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/CertificateDownload.tsx",
+          "hash": "4918591177351805270",
+          "deps": [
+            "npm:react",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/CheckBoxSelector.tsx",
+          "hash": "2460828839245756908",
+          "deps": [
+            "npm:react",
+            "npm:@material-ui/core",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/CommonPageHeader.tsx",
+          "hash": "17186394546832641849",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/ContentRow.tsx",
+          "hash": "6310672557009699688",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/DeleteButton.tsx",
+          "hash": "15361815517008520481",
+          "deps": [
+            "npm:react",
+            "npm:@material-ui/core",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/Dot.tsx",
+          "hash": "551325382161993058",
+          "deps": [
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/EhAddButton.tsx",
+          "hash": "17111826033491669671",
+          "deps": [
+            "npm:react",
+            "npm:react-icons",
+            "npm:@material-ui/core"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/EhButton.tsx",
+          "hash": "13381132449181258371",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/EhCheckBox2.tsx",
+          "hash": "4014844319986909901",
+          "deps": [
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/EhCheckbox.tsx",
+          "hash": "5955892341455675781",
+          "deps": [
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/EhDebounceInput.tsx",
+          "hash": "1645303207323728697",
+          "deps": [
+            "npm:react",
+            "npm:react-debounce-input"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/EhInputWithTitle.tsx",
+          "hash": "15002191393769938368",
+          "deps": [
+            "npm:react",
+            "npm:react-debounce-input"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/EhMenuItem.tsx",
+          "hash": "8875965516324569351",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/EhMultipleTag.tsx",
+          "hash": "11137904203135854913",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/EhPassword.tsx",
+          "hash": "10524887550143184361",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/EhSelect.tsx",
+          "hash": "7942839769845957622",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/EhTag.tsx",
+          "hash": "671253400049106001",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/EhTagStingId.tsx",
+          "hash": "10580396326070553235",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/EhTimeSelect.tsx",
+          "hash": "4982396843865407350",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/InputText.tsx",
+          "hash": "13171825202916618495",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/Loading.tsx",
+          "hash": "10036654765245755201",
+          "deps": [
+            "npm:@material-ui/core"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/Modal.tsx",
+          "hash": "2514562288216953889",
+          "deps": [
+            "npm:react",
+            "npm:@material-ui/core",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/OnlyLoggedIn.tsx",
+          "hash": "15500463316736761230",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/OnlyLoggedOut.tsx",
+          "hash": "1399761725769905018",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/PageBlock.tsx",
+          "hash": "926140513659445907",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/RadioButtonSelector.tsx",
+          "hash": "13302238835408080652",
+          "deps": [
+            "npm:react",
+            "npm:graphql",
+            "npm:next-translate",
+            "npm:@apollo/client",
+            "npm:@material-ui/core"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/SearchBox.tsx",
+          "hash": "14194446784747653254",
+          "deps": [
+            "npm:react",
+            "npm:react-debounce-input",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/SingleNavItem.tsx",
+          "hash": "14279819268688772576",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/TableGrid.tsx",
+          "hash": "6802014903533915614",
+          "deps": [
+            "npm:react",
+            "npm:@apollo/client",
+            "npm:@material-ui/core",
+            "npm:next-translate",
+            "npm:@material-ui/icons",
+            "npm:react-icons",
+            "npm:@tanstack/react-table",
+            "npm:@tanstack/match-sorter-utils"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/TableGridDeleteButton.tsx",
+          "hash": "15499901299163585603",
+          "deps": [
+            "npm:react",
+            "npm:@material-ui/core",
+            "npm:react-icons",
+            "npm:graphql",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/TableGridNew.tsx",
+          "hash": "15841575994517110401",
+          "deps": [
+            "npm:react",
+            "npm:@material-ui/core",
+            "npm:react-icons",
+            "npm:next-translate",
+            "npm:@material-ui/icons",
+            "npm:@tanstack/react-table"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/TagChange.tsx",
+          "hash": "15891786633916875871"
+        },
+        {
+          "file": "apps/edu-hub/components/common/TagWithTwoText.tsx",
+          "hash": "6726694986863608666",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:next-translate",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/TileSlider/Tile.tsx",
+          "hash": "6804062678961309872",
+          "deps": [
+            "npm:next",
+            "npm:react",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/TileSlider/index.tsx",
+          "hash": "1429315420540404575",
+          "deps": [
+            "npm:react",
+            "npm:swiper"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/UserCard.tsx",
+          "hash": "10369405717074477572",
+          "deps": [
+            "npm:next",
+            "npm:react",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/dialogs/AlertMessageDialog.tsx",
+          "hash": "8993798759300716193",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:next-translate",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/dialogs/EnrolledUserForACourseDialog.tsx",
+          "hash": "14468490005946195759",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:next-translate",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/dialogs/ErrorMessageDialog.tsx",
+          "hash": "11063445743919242233",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:next-translate",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/dialogs/InputDialog.tsx",
+          "hash": "12698642125826788195",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:next-translate",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/dialogs/QuestionConfirmationDialog.tsx",
+          "hash": "1788485082513895125",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:next-translate",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/dialogs/SelectUserDialog.tsx",
+          "hash": "13340421094473631862",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:next-translate",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/dialogs/SelectUserRow.tsx",
+          "hash": "118636643734394324",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/common/dots_old.tsx",
+          "hash": "11203755813734089665",
+          "deps": [
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/forms/EduHubDropdownSelector.tsx",
+          "hash": "246562050038173464",
+          "deps": [
+            "npm:react",
+            "npm:next-translate",
+            "npm:@material-ui/core",
+            "npm:@material-ui/icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/forms/EduHubNumberFieldEditor.tsx",
+          "hash": "11733568453525408145",
+          "deps": [
+            "npm:react-debounce-input",
+            "npm:next-translate",
+            "npm:@material-ui/core",
+            "npm:@material-ui/icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/forms/EduHubTextFieldEditor.tsx",
+          "hash": "9758172966180139111",
+          "deps": [
+            "npm:react",
+            "npm:react-debounce-input",
+            "npm:react-markdown",
+            "npm:remark-gfm",
+            "npm:next-translate",
+            "npm:@material-ui/core",
+            "npm:@material-ui/icons",
+            "npm:graphql",
+            "npm:loglevel",
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/forms/EduHubTimePicker.tsx",
+          "hash": "9895002284955904939",
+          "deps": [
+            "npm:react",
+            "npm:next-translate",
+            "npm:@material-ui/core",
+            "npm:@material-ui/icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/forms/FileDownload.tsx",
+          "hash": "5029017502196930523",
+          "deps": [
+            "npm:react",
+            "npm:@material-ui/icons",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/forms/FileUpload.tsx",
+          "hash": "10678784076430737796",
+          "deps": [
+            "npm:react",
+            "npm:react-hook-form",
+            "npm:@material-ui/icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/forms/FormFieldRow.tsx",
+          "hash": "12367851623271011393",
+          "deps": [
+            "npm:react-hook-form",
+            "npm:next-translate",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/forms/TagSelector.tsx",
+          "hash": "1972474336973006508",
+          "deps": [
+            "npm:react",
+            "npm:@material-ui/lab",
+            "npm:@material-ui/core",
+            "npm:graphql",
+            "npm:next-translate",
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/forms/TextFieldEditor.tsx",
+          "hash": "6991028600573526886",
+          "deps": [
+            "npm:react",
+            "npm:graphql",
+            "npm:@material-ui/core",
+            "npm:@material-ui/icons",
+            "npm:use-debounce",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/layout/Footer.tsx",
+          "hash": "17023701504187085487",
+          "deps": [
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/layout/Header.tsx",
+          "hash": "15974613700803139256",
+          "deps": [
+            "npm:next",
+            "npm:react",
+            "shared-components",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/layout/LoginButton.tsx",
+          "hash": "938464939803241102",
+          "deps": [
+            "npm:next-auth",
+            "npm:react",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/layout/Menu.tsx",
+          "hash": "10317942963848742963",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:next",
+            "npm:react",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/layout/Page.tsx",
+          "hash": "8052063448925757242",
+          "deps": [
+            "npm:react",
+            "npm:next-auth",
+            "npm:next-translate",
+            "npm:@headlessui/react",
+            "npm:react-markdown",
+            "npm:remark-gfm",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/layout/ProgramsMenubar.tsx",
+          "hash": "12776363912947061069",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/layout/RegisterButton.tsx",
+          "hash": "10171911904662316412",
+          "deps": [
+            "npm:next",
+            "npm:react",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/AchievementRecord/UploadAchievementRecordModal/AchievementOptionDropDown.tsx",
+          "hash": "561995424505260376",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/AchievementRecord/UploadAchievementRecordModal/UploadUI.tsx",
+          "hash": "633940280551505992",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/AchievementRecord/UploadAchievementRecordModal/index.tsx",
+          "hash": "13193344673878037416",
+          "deps": [
+            "npm:react",
+            "npm:react-icons",
+            "npm:next-translate",
+            "npm:@material-ui/core",
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/AchievementRecord/index.tsx",
+          "hash": "18334010648037969590",
+          "deps": [
+            "npm:react",
+            "shared-components",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/ActionButtons/ApplicationModal/ApplicationSuccessMessage.tsx",
+          "hash": "471855037925919478",
+          "deps": [
+            "npm:next-translate",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/ActionButtons/ApplicationModal/FormContent.tsx",
+          "hash": "7640925240216147228",
+          "deps": [
+            "npm:next-translate",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/ActionButtons/ApplicationModal/index.tsx",
+          "hash": "12229311670960973329",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/ActionButtons/ApplyButton.tsx",
+          "hash": "7589575609323173681",
+          "deps": [
+            "npm:next-translate",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/ActionButtons/index.tsx",
+          "hash": "1299325361532098902",
+          "deps": [
+            "npm:next-translate",
+            "npm:react",
+            "npm:next-auth"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/Attendances.tsx",
+          "hash": "5342266545916977445",
+          "deps": [
+            "npm:next-translate",
+            "npm:react",
+            "shared-components"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/DegreeCourses.tsx",
+          "hash": "16896682467785034212",
+          "deps": [
+            "npm:react",
+            "npm:next-translate",
+            "npm:next",
+            "npm:@material-ui/core"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/DescriptionFields.tsx",
+          "hash": "12559023726271637298",
+          "deps": [
+            "npm:react",
+            "npm:next-translate",
+            "npm:react-markdown",
+            "npm:remark-gfm"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/LearningGoals.tsx",
+          "hash": "11888760958325598003",
+          "deps": [
+            "npm:react",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/Onboarding.tsx",
+          "hash": "14820488003090873167",
+          "deps": [
+            "npm:react",
+            "npm:react-hook-form",
+            "npm:next-translate",
+            "npm:@material-ui/core",
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/Sessions.tsx",
+          "hash": "1348527481636296628",
+          "deps": [
+            "npm:react",
+            "npm:next-translate",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/TimeLocationLanguageInstructors.tsx",
+          "hash": "11894964424530480095",
+          "deps": [
+            "npm:next",
+            "npm:react",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/CourseContent/index.tsx",
+          "hash": "12838961228379771103",
+          "deps": [
+            "npm:react",
+            "npm:next-translate",
+            "npm:@material-ui/core"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageAchievementOptionsContent/AchievementsHelper.tsx",
+          "hash": "7173387244190555448",
+          "deps": [
+            "npm:react",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageAchievementOptionsContent/AddAchievementOption.tsx",
+          "hash": "14850538465091496824",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageAchievementOptionsContent/CourseListDialog.tsx",
+          "hash": "6814488470779407109",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:next-translate",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageAchievementOptionsContent/EditAchievementOption.tsx",
+          "hash": "18255343162743884970",
+          "deps": [
+            "npm:react",
+            "npm:lodash",
+            "npm:@material-ui/core"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageAchievementOptionsContent/FormToAddEditAchievementOption.tsx",
+          "hash": "5257420188337376929",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:next-translate",
+            "npm:react",
+            "npm:react-debounce-input",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageAchievementOptionsContent/index.tsx",
+          "hash": "17305095242626045258",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:react-icons",
+            "npm:next-translate",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageAchievementTemplatesContent/index.tsx",
+          "hash": "16727602116449223068",
+          "deps": [
+            "npm:react",
+            "npm:next-translate",
+            "npm:@tanstack/react-table"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageAppSettingsContent/ManageAppSettingsOverview.tsx",
+          "hash": "14155259767670576571",
+          "deps": [
+            "npm:react",
+            "npm:react-hook-form",
+            "npm:next-auth",
+            "npm:next-translate",
+            "npm:react-beautiful-dnd"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCourseContent/ApplicationsTab/AddParticipantsForm.tsx",
+          "hash": "7986143306683664955",
+          "deps": [
+            "npm:react",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCourseContent/ApplicationsTab/ApplicationRow.tsx",
+          "hash": "5594758344865871290",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:next-translate",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCourseContent/ApplicationsTab/index.tsx",
+          "hash": "5693364074208139124",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:react",
+            "npm:@material-ui/core",
+            "npm:react-icons",
+            "npm:react-datepicker",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCourseContent/CourseParticipationsTab/GenerateCertificatesButton.tsx",
+          "hash": "12166948348469561199",
+          "deps": [
+            "npm:next-translate",
+            "npm:@apollo/client",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCourseContent/CourseParticipationsTab/GenerateCertificatesButtonOld.tsx",
+          "hash": "10048894639446126231",
+          "deps": [
+            "npm:next-translate",
+            "npm:@apollo/client",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCourseContent/CourseParticipationsTab/index.tsx",
+          "hash": "2771322061504449162",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:next-translate",
+            "npm:next",
+            "npm:react",
+            "npm:react-icons",
+            "npm:@material-ui/core"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCourseContent/DegreeParticipationsTab/index.tsx",
+          "hash": "16114537379821744371",
+          "deps": [
+            "npm:react",
+            "npm:next-translate",
+            "npm:@tanstack/react-table"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCourseContent/DescriptionTab/Locations.tsx",
+          "hash": "5469120775412726908",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:next-translate",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCourseContent/DescriptionTab/index.tsx",
+          "hash": "2921748866039500606",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:react",
+            "npm:@material-ui/core",
+            "npm:react-icons",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCourseContent/SessionsTab/SessionAddresses.tsx",
+          "hash": "9127048422705640401",
+          "deps": [
+            "npm:next-translate",
+            "npm:react",
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCourseContent/SessionsTab/SessionRow.tsx",
+          "hash": "4321290711178093573",
+          "deps": [
+            "npm:react",
+            "npm:react-datepicker",
+            "npm:react-debounce-input",
+            "npm:@apollo/client",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCourseContent/SessionsTab/index.tsx",
+          "hash": "13181999895996586685",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:@material-ui/core",
+            "npm:react",
+            "npm:react-icons",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCourseContent/index.tsx",
+          "hash": "813993973353235092",
+          "deps": [
+            "npm:next-translate",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCoursesContent/CoursesHeader.tsx",
+          "hash": "8169519921137601108",
+          "deps": [
+            "npm:react",
+            "npm:@material-ui/core",
+            "npm:react-icons",
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCoursesContent/CoursesInstructorColumn.tsx",
+          "hash": "11840775862291659771",
+          "deps": [
+            "npm:react",
+            "npm:react-icons",
+            "npm:@apollo/client",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCoursesContent/SingleCourseRow.tsx",
+          "hash": "6626204629526930217",
+          "deps": [
+            "npm:next",
+            "npm:@material-ui/core",
+            "npm:react",
+            "npm:react-datepicker",
+            "npm:react-icons",
+            "npm:@apollo/client",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageCoursesContent/index.tsx",
+          "hash": "7717438725916953883",
+          "deps": [
+            "npm:react",
+            "npm:react-icons",
+            "npm:@material-ui/core",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageProgramsContent/ProgramsRow.tsx",
+          "hash": "13208529597830888340",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:@material-ui/core",
+            "npm:next-translate",
+            "npm:react",
+            "npm:react-datepicker",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageProgramsContent/index.tsx",
+          "hash": "4845489672181061139",
+          "deps": [
+            "npm:react",
+            "npm:react-icons",
+            "npm:react-datepicker",
+            "npm:@material-ui/core",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageUsersContent/UserRow.tsx",
+          "hash": "11082912692860129275",
+          "deps": [
+            "npm:react",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageUsersContent/index.tsx",
+          "hash": "18301036950326285082",
+          "deps": [
+            "npm:react",
+            "npm:next-translate",
+            "npm:@tanstack/react-table",
+            "npm:use-debounce"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageUsersContentOld/AddUser.tsx",
+          "hash": "16494744531446988956",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ManageUsersContentOld/index.tsx",
+          "hash": "13969908660774454544",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:react",
+            "npm:react-icons",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/components/pages/ProfileContent/ProfileOverview.tsx",
+          "hash": "2450614816681831072",
+          "deps": [
+            "npm:react",
+            "npm:react-hook-form",
+            "npm:next-auth",
+            "npm:next-translate",
+            "npm:@material-ui/core",
+            "npm:react-icons",
+            "npm:loglevel"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/config/apollo.ts",
+          "hash": "14119408639974991131",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/helpers/achievement.ts",
+          "hash": "3156245930210148765"
+        },
+        {
+          "file": "apps/edu-hub/helpers/auth.ts",
+          "hash": "5339203071293094556",
+          "deps": [
+            "npm:next",
+            "npm:next-auth"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/helpers/courseHelpers.ts",
+          "hash": "12120520290892118866"
+        },
+        {
+          "file": "apps/edu-hub/helpers/dateHelpers.ts",
+          "hash": "9125643191673264885"
+        },
+        {
+          "file": "apps/edu-hub/helpers/filehandling.ts",
+          "hash": "12903634311063117859",
+          "deps": [
+            "npm:loglevel"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/helpers/imageHandling.ts",
+          "hash": "17122489718961269830"
+        },
+        {
+          "file": "apps/edu-hub/helpers/util.ts",
+          "hash": "10330348401185191255"
+        },
+        {
+          "file": "apps/edu-hub/hooks/authedMutation.ts",
+          "hash": "14224432715313334752",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:next-auth",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/hooks/authedQuery.ts",
+          "hash": "6894967677414838294",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:next-auth"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/hooks/authentication.ts",
+          "hash": "16900072618531029855",
+          "deps": [
+            "npm:next-auth"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/hooks/course.ts",
+          "hash": "8932559487977621470"
+        },
+        {
+          "file": "apps/edu-hub/hooks/fileUpload.ts",
+          "hash": "9376014794165787609",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/hooks/logout.ts",
+          "hash": "5814945259526242162",
+          "deps": [
+            "npm:react",
+            "npm:next-auth",
+            "npm:next"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/hooks/signedUrl.ts",
+          "hash": "4644795931702678008",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/hooks/useErrorHandler.ts",
+          "hash": "8339580279841036916",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/hooks/user.ts",
+          "hash": "14851705803451060145",
+          "deps": [
+            "npm:next-auth"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/i18n.json",
+          "hash": "4036731350127164073"
+        },
+        {
+          "file": "apps/edu-hub/index.d.ts",
+          "hash": "16299519003037541483"
+        },
+        {
+          "file": "apps/edu-hub/jest.config.ts",
+          "hash": "8994033411922574221"
+        },
+        {
+          "file": "apps/edu-hub/lib/fpixel.js",
+          "hash": "3837601278854593871"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/achievements-page.json",
+          "hash": "3311300729755813294"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/common.json",
+          "hash": "18043331083394798662"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/course-admin-page.json",
+          "hash": "15440020314884264992"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/course-application.json",
+          "hash": "6182585164399434767"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/course-page.json",
+          "hash": "5407471615913191978"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/course.json",
+          "hash": "5107806962244248936"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/manageAchievementTemplates.json",
+          "hash": "10824154989572014133"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/manageAppSettings.json",
+          "hash": "16860992662940858961"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/manageCourse.json",
+          "hash": "8423006942356245282"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/manageCourses.json",
+          "hash": "8690654446984691330"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/managePrograms.json",
+          "hash": "15750809290816715196"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/manageUsers.json",
+          "hash": "18166627750880819625"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/programs.json",
+          "hash": "16103599545033088345"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/start-page.json",
+          "hash": "1607717013131712937"
+        },
+        {
+          "file": "apps/edu-hub/locales/de/users.json",
+          "hash": "1266814165794102974"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/achievements-page.json",
+          "hash": "14250907064517088658"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/common.json",
+          "hash": "1661144680209530728"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/course-admin-page.json",
+          "hash": "7591818747143639678"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/course-application.json",
+          "hash": "15880225359727784342"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/course-page.json",
+          "hash": "3775095415675950184"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/course.json",
+          "hash": "14277393936803205906"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/manageAchievementTemplates.json",
+          "hash": "17719078852898696748"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/manageAppSettings.json",
+          "hash": "17419838437647639087"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/manageCourse.json",
+          "hash": "12635875787170712127"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/manageCourses.json",
+          "hash": "13866125567318250499"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/managePrograms.json",
+          "hash": "8914204701475826633"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/manageUsers.json",
+          "hash": "6778266491724998571"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/programs.json",
+          "hash": "15349826930444779585"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/start-page.json",
+          "hash": "11393146187305495518"
+        },
+        {
+          "file": "apps/edu-hub/locales/en/users.json",
+          "hash": "377547765534002719"
+        },
+        {
+          "file": "apps/edu-hub/next-env.d.ts",
+          "hash": "5909181270615354023"
+        },
+        {
+          "file": "apps/edu-hub/next.config.js",
+          "hash": "15649178859190063472",
+          "deps": [
+            "npm:@nx/next",
+            "npm:next-translate"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/_app.tsx",
+          "hash": "16645614701788126648",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:next-auth",
+            "npm:next",
+            "npm:react",
+            "npm:react-datepicker",
+            "npm:date-fns",
+            "npm:next-translate",
+            "npm:loglevel"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/_document.tsx",
+          "hash": "9042893995200946654",
+          "deps": [
+            "npm:next"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/api/auth/[...nextauth].ts",
+          "hash": "6696850923283111638",
+          "deps": [
+            "npm:next-auth",
+            "npm:graphql-request",
+            "npm:axios"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/api/auth/keycloakRefreshToken.ts",
+          "hash": "2765995996646536087",
+          "deps": [
+            "npm:next",
+            "npm:axios"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/api/auth/logout.ts",
+          "hash": "10925127102772322345",
+          "deps": [
+            "npm:next",
+            "npm:next-auth"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/auth/signin.tsx",
+          "hash": "6389925356094637086",
+          "deps": [
+            "npm:react",
+            "npm:next",
+            "npm:next-auth"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/course/[courseId].tsx",
+          "hash": "1516844893856031222",
+          "deps": [
+            "npm:next",
+            "npm:react",
+            "npm:@material-ui/core"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/help/index.tsx",
+          "hash": "10931900468074488730",
+          "deps": [
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/impressum/index.tsx",
+          "hash": "12492059225588510918",
+          "deps": [
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/index.tsx",
+          "hash": "3312518072051855269",
+          "deps": [
+            "npm:next",
+            "npm:react",
+            "npm:@apollo/client",
+            "npm:next-translate",
+            "shared-components"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/manage/achievement-options/index.tsx",
+          "hash": "7132213508191063941",
+          "deps": [
+            "npm:next-translate",
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/manage/achievement-templates/index.tsx",
+          "hash": "633772087665726813",
+          "deps": [
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/manage/app-settings/index.tsx",
+          "hash": "18097995419177255978",
+          "deps": [
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/manage/course/[courseId].tsx",
+          "hash": "6377551408784984707",
+          "deps": [
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/manage/courses/index.tsx",
+          "hash": "4942871729817492653",
+          "deps": [
+            "npm:next-translate",
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/manage/programs/index.tsx",
+          "hash": "3738538510738030238",
+          "deps": [
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/manage/users-old/index.tsx",
+          "hash": "2559660537626248136",
+          "deps": [
+            "npm:next-translate",
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/manage/users/index.tsx",
+          "hash": "11836176023023876874",
+          "deps": [
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/pages/profile/index.tsx",
+          "hash": "4257744724706961924",
+          "deps": [
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/postcss.config.js",
+          "hash": "13598591179375906364"
+        },
+        {
+          "file": "apps/edu-hub/project.json",
+          "hash": "11786242894023377254"
+        },
+        {
+          "file": "apps/edu-hub/public/favicon.png",
+          "hash": "17368130207555348123"
+        },
+        {
+          "file": "apps/edu-hub/public/images/background_homepage/1024.jpg",
+          "hash": "8293934259692702436"
+        },
+        {
+          "file": "apps/edu-hub/public/images/background_homepage/1280.jpg",
+          "hash": "5507140535590609389"
+        },
+        {
+          "file": "apps/edu-hub/public/images/background_homepage/1536.jpg",
+          "hash": "12740690930385139871"
+        },
+        {
+          "file": "apps/edu-hub/public/images/background_homepage/1536_old.jpg",
+          "hash": "14294141737160443795"
+        },
+        {
+          "file": "apps/edu-hub/public/images/background_homepage/460.jpg",
+          "hash": "4300921474363622494"
+        },
+        {
+          "file": "apps/edu-hub/public/images/background_homepage/640.jpg",
+          "hash": "15879364828942828815"
+        },
+        {
+          "file": "apps/edu-hub/public/images/background_homepage/768.jpg",
+          "hash": "16585165711050295253"
+        },
+        {
+          "file": "apps/edu-hub/public/images/background_homepage/edu_WISE23_HeaderWebsite_small.png",
+          "hash": "14912673021252901951"
+        },
+        {
+          "file": "apps/edu-hub/public/images/common/mystery.svg",
+          "hash": "589364125543247737"
+        },
+        {
+          "file": "apps/edu-hub/public/images/common/plus-symbol.svg",
+          "hash": "1368049296466188380"
+        },
+        {
+          "file": "apps/edu-hub/public/images/common/slider-next-arrow.svg",
+          "hash": "3064931542463702197"
+        },
+        {
+          "file": "apps/edu-hub/public/images/common/slider-previous-arrow.svg",
+          "hash": "4823084832532801776"
+        },
+        {
+          "file": "apps/edu-hub/public/images/common/x-calibur-black.svg",
+          "hash": "8575952206090312092"
+        },
+        {
+          "file": "apps/edu-hub/public/images/common/x-calibur-white.svg",
+          "hash": "10130930585327881920"
+        },
+        {
+          "file": "apps/edu-hub/public/images/course/checkmark.svg",
+          "hash": "2270439106795722305"
+        },
+        {
+          "file": "apps/edu-hub/public/images/course/completed_flag.svg",
+          "hash": "15637657197521699408"
+        },
+        {
+          "file": "apps/edu-hub/public/images/course/difficulty-easy.svg",
+          "hash": "15669393871172780259"
+        },
+        {
+          "file": "apps/edu-hub/public/images/course/language.svg",
+          "hash": "9650496324270929769"
+        },
+        {
+          "file": "apps/edu-hub/public/images/course/online-course.svg",
+          "hash": "16856954576970522239"
+        },
+        {
+          "file": "apps/edu-hub/public/images/course/pin.svg",
+          "hash": "9824770908741188819"
+        },
+        {
+          "file": "apps/edu-hub/public/images/course/status/applicants-invited.svg",
+          "hash": "17219780542419095643"
+        },
+        {
+          "file": "apps/edu-hub/public/images/course/status/draft.svg",
+          "hash": "1561368955188966270"
+        },
+        {
+          "file": "apps/edu-hub/public/images/course/status/participants-rated.svg",
+          "hash": "2688097103245051428"
+        },
+        {
+          "file": "apps/edu-hub/public/images/course/status/ready-for-application.svg",
+          "hash": "12161440389528789926"
+        },
+        {
+          "file": "apps/edu-hub/public/images/course/status/ready-for-publication.svg",
+          "hash": "9457451766632671895"
+        },
+        {
+          "file": "apps/edu-hub/public/images/edu_WISE23_HeaderWebsitePreview.png",
+          "hash": "5243280394926226870"
+        },
+        {
+          "file": "apps/edu-hub/public/images/eduhub-logo.svg",
+          "hash": "12612054920255909491"
+        },
+        {
+          "file": "apps/edu-hub/public/images/meta-image.png",
+          "hash": "8062586334927499298"
+        },
+        {
+          "file": "apps/edu-hub/public/images/oc-logo.svg",
+          "hash": "7783497390747771043"
+        },
+        {
+          "file": "apps/edu-hub/public/images/share/facebook-icon.svg",
+          "hash": "11443939891007461483"
+        },
+        {
+          "file": "apps/edu-hub/public/images/share/instagram-icon.svg",
+          "hash": "13354874769059870179"
+        },
+        {
+          "file": "apps/edu-hub/public/scripts/pixel.js",
+          "hash": "13588320547057385841"
+        },
+        {
+          "file": "apps/edu-hub/public/templates/default-achievement-template.txt",
+          "hash": "92380859872325418"
+        },
+        {
+          "file": "apps/edu-hub/public/vercel.svg",
+          "hash": "3233056503954796132"
+        },
+        {
+          "file": "apps/edu-hub/queries/AchievementRecordAuthor.ts",
+          "hash": "4518445155301356369",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/AchievementRecordAuthorFragment.ts",
+          "hash": "1158798390706150041",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AchievementDocumentationTemplates.ts",
+          "hash": "12089082270171756405"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AchievementOptionCourses.ts",
+          "hash": "16585728590791732419"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AchievementOptionFragment.ts",
+          "hash": "1052329872101004118"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AchievementOptionList.ts",
+          "hash": "10978560777358944863"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AchievementRecordAuthorFragment.ts",
+          "hash": "16627590420770390151"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AchievementRecordAuthorQuery.ts",
+          "hash": "13347997017475407461"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AchievementRecordFragment.ts",
+          "hash": "4630469634084311567"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AchievementRecordListWithAuthors.ts",
+          "hash": "6769555314655241188"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AchievementRecordTypes.ts",
+          "hash": "5079766214957850784"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AdminCourseFragment.ts",
+          "hash": "7622723744374239046"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AdminCourseList.ts",
+          "hash": "10537278690832301941"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AdminEnrollmentFragment.ts",
+          "hash": "8804634261643913519"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AdminProgramFragment.ts",
+          "hash": "9410321329550664749"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AdminSessionFragment.ts",
+          "hash": "12254880001278447232"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/AppSettings.ts",
+          "hash": "10316253409015336484"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CompletedDegreeEnrollments.ts",
+          "hash": "5737520018852209694"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/Course.ts",
+          "hash": "11539723359363069705"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseEnrollmentFragment.ts",
+          "hash": "14079684280926197528"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseEnrollmentQuery.ts",
+          "hash": "6750084045680858682"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseEnrollmentWithUserQuery.ts",
+          "hash": "12455807467563170340"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseFragment.ts",
+          "hash": "8433051472829678480"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseFragmentMinimum.ts",
+          "hash": "5339402140077793748"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseGroupOptions.ts",
+          "hash": "14998345259770954020"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseInstructorFragment.ts",
+          "hash": "9991612342107193259"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseInstructorList.ts",
+          "hash": "15896667489910367207"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseList.ts",
+          "hash": "867915358566785120"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseMinimum.ts",
+          "hash": "4453626261696434859"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseTileFragment.ts",
+          "hash": "10666222933973207195"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseTileFragmentAnonymous.ts",
+          "hash": "9879744816104409687"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseTileListAnonymous.ts",
+          "hash": "11249827853041029069"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseTiles.ts",
+          "hash": "5876978478928007182"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CourseWithEnrollment.ts",
+          "hash": "13546354306200537200"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CoursesByInstructor.ts",
+          "hash": "3045532447338531918"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/CoursesEnrolledByUser.ts",
+          "hash": "2602289657714745168"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DegreeCourses.ts",
+          "hash": "17502059526746625672"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DegreeParticipantsWithDegreeEnrollments.ts",
+          "hash": "15433806275056617580"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteAchievementDocumentationTemplate.ts",
+          "hash": "461962856833791497"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteAchievementRecordAuthorByPk.ts",
+          "hash": "10616395810168999976"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteAnAchievementOption.ts",
+          "hash": "12783264090896028491"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteAnAchievementOptionCourse.ts",
+          "hash": "5491295135090970114"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteAnAchievementOptionCourseWithWhere.ts",
+          "hash": "13908659319689922503"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteAnAchievementOptionMentor.ts",
+          "hash": "12707879343801671485"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteAnAchievementOptionMentorWithWhere.ts",
+          "hash": "1674368853875986719"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteCourseByPk.ts",
+          "hash": "15187094325752204799"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteCourseDegreeTag.ts",
+          "hash": "11998933126779847487"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteCourseGroup.ts",
+          "hash": "3593770585269261514"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteCourseInstructor.ts",
+          "hash": "7108218001905612280"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteCourseLocation.ts",
+          "hash": "4722970687555998222"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteProgram.ts",
+          "hash": "17137170200104872233"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteSession.ts",
+          "hash": "13985177406700835407"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteSessionAddressesByCourseAndLocation.ts",
+          "hash": "18156081092948937573"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteSessionSpeaker.ts",
+          "hash": "12391897501641167522"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/DeleteUser.ts",
+          "hash": "11819745354640959014"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/EmplomentByValue.ts",
+          "hash": "15396797904570117263"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/EnrollmentFragment.ts",
+          "hash": "5313374280267685622"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/ExpertList.ts",
+          "hash": "15397641390235677888"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/GetSignedUrl.ts",
+          "hash": "14414447690933409949"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertAchievementDocumentationTemplate.ts",
+          "hash": "1887523741832992514"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertAnAchievementOption.ts",
+          "hash": "684277767838643014"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertAnAchievementOptionCourse.ts",
+          "hash": "17301721206580511445"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertAnAchievementOptionMentor.ts",
+          "hash": "5575240259427950573"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertAnAchievementRecord.ts",
+          "hash": "6890338351449401273"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertAnAchievementRecordAuthor.ts",
+          "hash": "3514865531574223125"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertCourseDegreeTag.ts",
+          "hash": "15770181991539210081"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertCourseGroup.ts",
+          "hash": "9263697819260063245"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertCourseInstructor.ts",
+          "hash": "1364647310391379166"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertCourseLocation.ts",
+          "hash": "6056890097000991159"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertCourseWithLocation.ts",
+          "hash": "2145570769893415536"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertEnrollment.ts",
+          "hash": "2915616818434124272"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertExpert.ts",
+          "hash": "14970107706809560975"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertMailLog.ts",
+          "hash": "13169967956578629498"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertNewSessionSpeaker.ts",
+          "hash": "6699532552385931847"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertProgram.ts",
+          "hash": "13586653077512504155"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertSession.ts",
+          "hash": "14316261890828297204"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertSessionAddress.ts",
+          "hash": "13229640201610647535"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertSessionWithAddresses.ts",
+          "hash": "6777863737836517949"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertSingleAttendance.ts",
+          "hash": "13398790285712082088"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertSingleCourse.ts",
+          "hash": "4035489826886321463"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertSingleUser.ts",
+          "hash": "3578821192004348364"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/InsertUser.ts",
+          "hash": "1844285199769535390"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/LocationOptions.ts",
+          "hash": "14236900267653933624"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/MailTemplates.ts",
+          "hash": "8278349259181006637"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/ManagedCourse.ts",
+          "hash": "4002638463943216653"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/MyCourses.ts",
+          "hash": "12636201391863881414"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/MyEnrollmentsForCourseQuery.ts",
+          "hash": "726673548940997845"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/ProgramFragment.ts",
+          "hash": "4928905747253874520"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/ProgramFragmentMinimumProperties.ts",
+          "hash": "12848327118800092639"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/ProgramList.ts",
+          "hash": "906520044128431506"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/Programs.ts",
+          "hash": "3678800902239179633"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/SaveAchievementCertificateTemplate.ts",
+          "hash": "4636169870341295997"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/SaveAchievementDocumentationTemplate.ts",
+          "hash": "1269733255433370639"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/SaveAchievementRecordCoverImage.ts",
+          "hash": "3300406376781237322"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/SaveAchievementRecordDocumentation.ts",
+          "hash": "3358800395767825765"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/SaveAttendanceCertificateTemplate.ts",
+          "hash": "8029274786713890711"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/SaveCourseImage.ts",
+          "hash": "16414592972157476545"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/SaveUserProfileImage.ts",
+          "hash": "10483156029705768340"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/SessionFragment.ts",
+          "hash": "13214249512200909426"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UnversityByComment.ts",
+          "hash": "10983068346527254087"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateAchievementDocumentationTemplate.ts",
+          "hash": "754419420591243171"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateAchievementDocumentationTemplateTitle.ts",
+          "hash": "4035568969912105025"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateAchievementRecordByPk.ts",
+          "hash": "13951815764639051343"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateAnAchievementOption.ts",
+          "hash": "7087394834726835943"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateAnAchievementOptionCourse.ts",
+          "hash": "15946816034628718963"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateAnAchievementOptionMentor.ts",
+          "hash": "12815016751109480074"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateAppSettings.ts",
+          "hash": "17881836819123889781"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseAchievementCertificatePossible.ts",
+          "hash": "10266256167020222008"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseAttendanceCertificatePossible.ts",
+          "hash": "2192916741534405546"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseByPk.ts",
+          "hash": "9331770742820563962"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseChatLink.ts",
+          "hash": "12089455299809230475"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseContentDescriptionField1.ts",
+          "hash": "16007415866125293193"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseContentDescriptionField2.ts",
+          "hash": "18194839396135713238"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseDefaultSessionAddress.ts",
+          "hash": "16501089563437070250"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseEcts.ts",
+          "hash": "7716830850218097740"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseEndTime.ts",
+          "hash": "12619050079722622465"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseExternalRegistrationLink.ts",
+          "hash": "14568602704368959438"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseGroupOptionOrder.ts",
+          "hash": "1319112342608518607"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseHeadingDescription1.ts",
+          "hash": "1685149795486735024"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseHeadingDescription2.ts",
+          "hash": "8896865536772404412"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseLanguage.ts",
+          "hash": "9492241927031047950"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseLearningGoals.ts",
+          "hash": "7097841846941675800"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseLocation.ts",
+          "hash": "4338460534229746439"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseMaxParticipants.ts",
+          "hash": "4717351814562868827"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseStartTime.ts",
+          "hash": "15233048670077970094"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseStatus.ts",
+          "hash": "17427393038580686925"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseTitle.ts",
+          "hash": "13843108796923133067"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateCourseWeekday.ts",
+          "hash": "9165705385456742515"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateEnrollment.ts",
+          "hash": "7363117871165437064"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateEnrollmentForInvite.ts",
+          "hash": "521956984436116393"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateEnrollmentRating.ts",
+          "hash": "6725868678585509688"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateEnrollmentStatus.ts",
+          "hash": "9694409291764624866"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramAchievementCertVisible.ts",
+          "hash": "6493885691218276051"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramAchievementTemplate.ts",
+          "hash": "17961270635915901536"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramApplicationEnd.ts",
+          "hash": "11421467473128448004"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramApplicationStart.ts",
+          "hash": "14920306013757322372"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramClosingQuestionaire.ts",
+          "hash": "6986219713818393553"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramLectureEnd.ts",
+          "hash": "3025983697021341392"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramLectureStart.ts",
+          "hash": "5998718688802073252"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramParticipationCertVisible.ts",
+          "hash": "11199944710816220027"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramParticipationTemplate.ts",
+          "hash": "8036162686916835577"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramPublished.ts",
+          "hash": "15094750305294291017"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramShortTitle.ts",
+          "hash": "232849876861709717"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramSpeakerQuestionaire.ts",
+          "hash": "15744074911876954680"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramStartQuestionaire.ts",
+          "hash": "9008024863421812381"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramTitle.ts",
+          "hash": "6460622570267337244"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramUploadDeadline.ts",
+          "hash": "12888928222260430872"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateProgramVisibility.ts",
+          "hash": "4665003843853811684"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateSessionAddress.ts",
+          "hash": "17385021388693582301"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateSessionEndTime.ts",
+          "hash": "2298787794396554798"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateSessionStartTime.ts",
+          "hash": "7351753228547839180"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateSessionTitle.ts",
+          "hash": "2654075980272404057"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateShortDescription.ts",
+          "hash": "1667271546873084631"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateSingleAttendanceByPk.ts",
+          "hash": "1788652926705470068"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateUser.ts",
+          "hash": "16623064403274592806"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateUserOnEnrollmentConfirmation.ts",
+          "hash": "5441298169437888969"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UpdateUserProfilePicture.ts",
+          "hash": "17922656172312904507"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/User.ts",
+          "hash": "9241342168383218859"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UserForSelection1.ts",
+          "hash": "2646778265147288333"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UserForSelection2.ts",
+          "hash": "6421622716165238648"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UserFragment.ts",
+          "hash": "7061935356547996372"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UserList.ts",
+          "hash": "12407098538328078801"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UsersByLastName.ts",
+          "hash": "13676173619732419236"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/UsersWithExpertId.ts",
+          "hash": "11963675903137802441"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/createCertificate.ts",
+          "hash": "13968932840120160311"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/createCertificates.ts",
+          "hash": "3405319103650890299"
+        },
+        {
+          "file": "apps/edu-hub/queries/__generated__/loadParticipationData.ts",
+          "hash": "14625173750622193342"
+        },
+        {
+          "file": "apps/edu-hub/queries/achievementDocumentationTemplate.ts",
+          "hash": "17340436344548615987",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/achievementOption.ts",
+          "hash": "7054183093301106262",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/achievementOptionFragment.ts",
+          "hash": "9450800099263130274",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/achievementRecord.ts",
+          "hash": "9344393271739511421",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/achievementRecordFragment.ts",
+          "hash": "15605802996449551288",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/actions.ts",
+          "hash": "1597786015056466026",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/appSettings.ts",
+          "hash": "4615886680665853222",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/course.ts",
+          "hash": "14710054581273864498",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/courseDegree.ts",
+          "hash": "11282595111539204972",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/courseEnrollment.ts",
+          "hash": "15593117895259479334",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/courseEnrollmentFragment.ts",
+          "hash": "13469939786830581801",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/courseFragements.ts",
+          "hash": "10221457121270499915",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/courseFragment.ts",
+          "hash": "10855754387045764888",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/courseGroup.ts",
+          "hash": "12352185069938630627",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/courseGroupOptions.ts",
+          "hash": "10500478935291428508",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/courseInstructorFragment.ts",
+          "hash": "7140230762254599996",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/courseInstructorList.ts",
+          "hash": "14323817782899260012",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/courseList.ts",
+          "hash": "16088830736320924938",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/courseQueries.ts",
+          "hash": "457370172482091792",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/courseWithEnrollment.ts",
+          "hash": "10079869521449765286",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/employment.ts",
+          "hash": "11889755428103279190",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/enrollmentFragment.ts",
+          "hash": "18428259119951353447",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/expert.ts",
+          "hash": "15013866696477846127",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/insertEnrollment.ts",
+          "hash": "4998458181700611400",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/insertUser.ts",
+          "hash": "4242387968850723974",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/mail.ts",
+          "hash": "9716795036473276510",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/mutateAchievement.ts",
+          "hash": "7099269552057576184",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/mutateCourse.ts",
+          "hash": "5873111443026031532",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/mutateCourseInstructor.ts",
+          "hash": "1957289315402338787",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/myCourses.ts",
+          "hash": "16879207025428351443",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/myEnrollmentsForCourse.ts",
+          "hash": "12569096814627788776",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/programFragment.ts",
+          "hash": "5867708580792943015",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/programList.ts",
+          "hash": "5267707801719253229",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/sessionFragement.ts",
+          "hash": "4475460543143893315",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/university.ts",
+          "hash": "9593590835605765173",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/updateProgram.ts",
+          "hash": "9156549935923142702",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/updateUser.ts",
+          "hash": "17489683919591778518",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/user.ts",
+          "hash": "17774484432551315812",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/queries/userFragment.ts",
+          "hash": "8523778565909614535",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/styles/globals.css",
+          "hash": "3765461556541378560"
+        },
+        {
+          "file": "apps/edu-hub/tailwind.config.js",
+          "hash": "16306332815474851515",
+          "deps": [
+            "npm:tailwindcss",
+            "npm:@nx/next",
+            "npm:@tailwindcss/line-clamp",
+            "npm:@tailwindcss/typography"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/tsconfig.json",
+          "hash": "16977239261251157078"
+        },
+        {
+          "file": "apps/edu-hub/tsconfig.spec.json",
+          "hash": "6932660931697717727"
+        },
+        {
+          "file": "apps/edu-hub/types/UIComponents.ts",
+          "hash": "2069001846667282047"
+        },
+        {
+          "file": "apps/edu-hub/types/enums.ts",
+          "hash": "3458460913402555858"
+        },
+        {
+          "file": "apps/edu-hub/types/global.d.ts",
+          "hash": "2898468955237215486"
+        },
+        {
+          "file": "apps/edu-hub/types/next-auth.d.ts",
+          "hash": "11156217141795025837",
+          "deps": [
+            "npm:next-auth"
+          ]
+        },
+        {
+          "file": "apps/edu-hub/types/tanstack.d.ts",
+          "hash": "14616250016875536793",
+          "deps": [
+            "npm:@tanstack/react-table"
+          ]
+        }
+      ],
+      "rent-a-scientist": [
+        {
+          "file": "apps/rent-a-scientist/.env.development",
+          "hash": "2499469622098425716"
+        },
+        {
+          "file": "apps/rent-a-scientist/.eslintrc.json",
+          "hash": "3149883153118050231"
+        },
+        {
+          "file": "apps/rent-a-scientist/__generated__/globalTypes.ts",
+          "hash": "3135452093538773888"
+        },
+        {
+          "file": "apps/rent-a-scientist/apollo.config.js",
+          "hash": "3440032327993522415"
+        },
+        {
+          "file": "apps/rent-a-scientist/components/CategorySelector.tsx",
+          "hash": "12910949234516226426",
+          "deps": [
+            "npm:react",
+            "npm:react-select"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/Footer.tsx",
+          "hash": "13520046671563653540",
+          "deps": [
+            "npm:next",
+            "npm:react",
+            "shared-components"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/GradeSelector.tsx",
+          "hash": "169798856447775816",
+          "deps": [
+            "npm:react",
+            "npm:react-select"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/Header.tsx",
+          "hash": "11770227636304515573",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:next",
+            "npm:react",
+            "shared-components"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/LoginButton.tsx",
+          "hash": "6018765850415759924",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:next-auth",
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/MultiDateDisplay.tsx",
+          "hash": "11922558436005665854",
+          "deps": [
+            "npm:react",
+            "npm:react-select"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/MyRequestsDisplay.tsx",
+          "hash": "15144312601699100140",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:next",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/OfferDisplay.tsx",
+          "hash": "9397401464693622242",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/OffersSearch.tsx",
+          "hash": "17285138960816784225",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:@material-ui/core",
+            "npm:react",
+            "npm:next"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/Page.tsx",
+          "hash": "4645859020829315755",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/RegistrationSelection.tsx",
+          "hash": "761881693013940815",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/SchoolSelector.tsx",
+          "hash": "14360962536808147831",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:react",
+            "npm:react-select"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/ScientistAvatar.tsx",
+          "hash": "12051906400310420706",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/Button.tsx",
+          "hash": "7780296288144020425",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/CommonPageHeader.tsx",
+          "hash": "103282213802155919",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/ContentRow.tsx",
+          "hash": "6524482958741944483",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/EhAddButton.tsx",
+          "hash": "7478789339958572033",
+          "deps": [
+            "npm:react",
+            "npm:react-icons",
+            "npm:@material-ui/core"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/EhButton.tsx",
+          "hash": "13381132449181258371",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/EhCheckBox2.tsx",
+          "hash": "14711367171470536507",
+          "deps": [
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/EhCheckbox.tsx",
+          "hash": "282133375065766163",
+          "deps": [
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/EhDebounceInput.tsx",
+          "hash": "15050761575764338977",
+          "deps": [
+            "npm:react",
+            "npm:react-debounce-input"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/EhMenuItem.tsx",
+          "hash": "632623000998343286",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/EhPassword.tsx",
+          "hash": "5651057399695372539",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/EhSelect.tsx",
+          "hash": "15335403103887870811",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/EhTagEdit.tsx",
+          "hash": "16991670961775435038",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/EhTagEditTag.tsx",
+          "hash": "1178989619216971385",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/EhTimeSelect.tsx",
+          "hash": "518852750862531566",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/InputText.tsx",
+          "hash": "13171825202916618495",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/ModalContent.tsx",
+          "hash": "14784321869775779507",
+          "deps": [
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/ModalController.tsx",
+          "hash": "10076134290528925406",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/OnlyLoggedIn.tsx",
+          "hash": "10107380386789059361",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/OnlyLoggedOut.tsx",
+          "hash": "14896088780473844529",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/PageBlock.tsx",
+          "hash": "11323228622480947969",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/Searchbar.tsx",
+          "hash": "4398545695439720345",
+          "deps": [
+            "npm:react",
+            "npm:react-debounce-input",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/SingleNavItem.tsx",
+          "hash": "14279819268688772576",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/dialogs/AlertMessageDialog.tsx",
+          "hash": "10590003874160035876",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/dialogs/InputDialog.tsx",
+          "hash": "6958077682487471874",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/dialogs/QuestionConfirmationDialog.tsx",
+          "hash": "2161410027641587807",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/common/dots.tsx",
+          "hash": "7869805760567706370",
+          "deps": [
+            "npm:react",
+            "npm:react-icons"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/matching/CsvDownloadButton.tsx",
+          "hash": "11105778086676808569",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:jsonexport",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/matching/MatchingCreation.tsx",
+          "hash": "11543215213207512326",
+          "deps": [
+            "npm:react",
+            "npm:@bygdle/javascript-lp-solver",
+            "npm:@material-ui/core"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/matching/mail.ts",
+          "hash": "1881184242879580082"
+        },
+        {
+          "file": "apps/rent-a-scientist/components/teacher/SchoolClassEditor.tsx",
+          "hash": "6448812730059439708",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/teacher/SchoolClassRequestEditor.tsx",
+          "hash": "1846880729558772758",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/components/teacher/SchoolClassRequestsSummary.tsx",
+          "hash": "8669626229939729744",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/config/apollo.ts",
+          "hash": "2473072922833107214",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/fixnames.txt",
+          "hash": "15156712856235326203"
+        },
+        {
+          "file": "apps/rent-a-scientist/helpers/filehandling.ts",
+          "hash": "8682255955178138450",
+          "deps": [
+            "npm:papaparse"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/helpers/offerhelp.ts",
+          "hash": "4938642284241100633"
+        },
+        {
+          "file": "apps/rent-a-scientist/helpers/shuffle.ts",
+          "hash": "15004356687602189287"
+        },
+        {
+          "file": "apps/rent-a-scientist/hooks/authedMutation.ts",
+          "hash": "17927011895452013182",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:next-auth",
+            "npm:react",
+            "npm:graphql"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/hooks/authedQuery.ts",
+          "hash": "332593786133297774",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:next-auth"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/hooks/authentication.ts",
+          "hash": "18042552461004179099",
+          "deps": [
+            "npm:next-auth",
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/hooks/logout.ts",
+          "hash": "5814945259526242162",
+          "deps": [
+            "npm:react",
+            "npm:next-auth",
+            "npm:next"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/hooks/ras.ts",
+          "hash": "2046851328198219986",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/hooks/user.ts",
+          "hash": "14851705803451060145",
+          "deps": [
+            "npm:next-auth"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/index.d.ts",
+          "hash": "5498222895072842432"
+        },
+        {
+          "file": "apps/rent-a-scientist/jest.config.ts",
+          "hash": "15416552541936697901"
+        },
+        {
+          "file": "apps/rent-a-scientist/next-env.d.ts",
+          "hash": "5909181270615354023"
+        },
+        {
+          "file": "apps/rent-a-scientist/next.config.js",
+          "hash": "12599414302669730686",
+          "deps": [
+            "npm:@nx/next"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/pages/_app.tsx",
+          "hash": "11078156552274885524",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:next-auth",
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/pages/_document.tsx",
+          "hash": "1785488498021165314",
+          "deps": [
+            "npm:next"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/pages/admin.tsx",
+          "hash": "12760912255386468759",
+          "deps": [
+            "npm:@material-ui/core",
+            "npm:next",
+            "npm:react",
+            "npm:react-icons",
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/pages/api/auth/[...nextauth].ts",
+          "hash": "15251386472625370959",
+          "deps": [
+            "npm:next-auth",
+            "npm:graphql-request",
+            "npm:axios"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/pages/api/auth/keycloakRefreshToken.ts",
+          "hash": "786829824306161594",
+          "deps": [
+            "npm:next",
+            "npm:axios"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/pages/api/auth/logout.ts",
+          "hash": "3138520943131324476",
+          "deps": [
+            "npm:next",
+            "npm:next-auth"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/pages/index.tsx",
+          "hash": "14416437288343256937",
+          "deps": [
+            "npm:next",
+            "npm:react",
+            "shared-components"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/pages/matching.tsx",
+          "hash": "5430090054323809419",
+          "deps": [
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/pages/myrequests.tsx",
+          "hash": "12632801073646551205",
+          "deps": [
+            "npm:@apollo/client",
+            "npm:@material-ui/core",
+            "npm:next",
+            "npm:react",
+            "shared-components"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/postcss.config.js",
+          "hash": "13598591179375906364"
+        },
+        {
+          "file": "apps/rent-a-scientist/project.json",
+          "hash": "1989685737706475438"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/favicon.ico",
+          "hash": "12793503388389868665"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/images/common/mystery.svg",
+          "hash": "589364125543247737"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/images/common/plus-symbol.svg",
+          "hash": "1368049296466188380"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/images/common/x-calibur-black.svg",
+          "hash": "8575952206090312092"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/images/common/x-calibur-white.svg",
+          "hash": "10130930585327881920"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/images/logo_wzk_300x340.png",
+          "hash": "1193387496463974378"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/images/share/facebook-icon.svg",
+          "hash": "11443939891007461483"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/images/share/instagram-icon.svg",
+          "hash": "13354874769059870179"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/locales/de/common.json",
+          "hash": "13504899804023705729"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/locales/en/common.json",
+          "hash": "3937220070024075145"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/header.jpg",
+          "hash": "8367769425270588358"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/cau.png",
+          "hash": "2841868151199464562"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/dhsh.png",
+          "hash": "15085431286923085791"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/fh.png",
+          "hash": "653511726052897401"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/fzb.png",
+          "hash": "11376848867274455824"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/geomar.png",
+          "hash": "11954845196617632592"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/hereon.png",
+          "hash": "15225847194606393651"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/hifmb.png",
+          "hash": "10183760696289837936"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/ifw.png",
+          "hash": "12936485316075373085"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/ipn.png",
+          "hash": "9978576508672013207"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/kifo.png",
+          "hash": "3416521825452430956"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/kuha.png",
+          "hash": "15553951009853849531"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/mpi.png",
+          "hash": "7287242453145110195"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/muthesius.png",
+          "hash": "1906214412397516416"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/rg.png",
+          "hash": "15466293216207666790"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/roots.png",
+          "hash": "10622247975972380707"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/sst.png",
+          "hash": "14768701485776722165"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/submaris.png",
+          "hash": "2931861341196537554"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/ti.png",
+          "hash": "5588158456979364382"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/uksh.png",
+          "hash": "11533376066758178378"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/zbw.png",
+          "hash": "11672662341041264712"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/logos/zip.png",
+          "hash": "158052056782054910"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/01_alexander_jacobsen_mpi.jpg",
+          "hash": "11752605583052605550"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/01_andreas_luczak_fh.jpg",
+          "hash": "16761637006112426593"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/02_alexander_paar_dhsh.jpg",
+          "hash": "852261867970605528"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/02_bernd_hartke_cau.jpg",
+          "hash": "7398014221874400559"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/03_alois_peter_schaffarczyk_fh.jpg",
+          "hash": "15665457638318272316"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/03_birgit_schneider_cau.jpg",
+          "hash": "4385539651839119470"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/04_anca_remes_uksh.jpg",
+          "hash": "11336980649588562926"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/04_cathleen_schlundt_geomar.jpg",
+          "hash": "4801143227612880133"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/05_andrea_franke_hifmb.jpg",
+          "hash": "11130165726793912209"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/05_christian_peifer_cau.jpg",
+          "hash": "8312965824731199696"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/06_andrea_diefenhardt_fh.jpg",
+          "hash": "11114637784801115146"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/06_christoph_kaleta_cau.jpg",
+          "hash": "6030586590871529240"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/07_andreas_luczak_fh.jpg",
+          "hash": "5639288650366787544"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/07_dirk_schenke_cau.jpg",
+          "hash": "10321613923812099708"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/08_annika_kluge_uksh.jpg",
+          "hash": "1535392866462523835"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/08_elisa_dittbrenner_cau.jpg",
+          "hash": "6669691108114486619"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/09_behnam_daftary_besheli_cau.jpg",
+          "hash": "15537303332147313588"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/09_elke_edelmann_cau.jpg",
+          "hash": "8106736640700111899"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/100_imke-homma_cau.jpg",
+          "hash": "16773534433869826594"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/101_jan-martin_wagner_cau.jpg",
+          "hash": "16188885560576463394"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/102_steffen_rothardt_cau.jpg",
+          "hash": "8189961420735281168"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/103_matthias_vetter_cau.jpg",
+          "hash": "8005479737227846724"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/104_deik_petersen_cau.jpg",
+          "hash": "11910703599100371362"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/105_dietmar_block_und_christian_schulze_cau.jpg",
+          "hash": "17093588778745910736"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/106_tim_eckhorst_muthesius.jpg",
+          "hash": "8987039364512877651"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/107_mark_lenz_geomar.jpg",
+          "hash": "7056010099049419534"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/108_lavisha_parab_mpi.jpg",
+          "hash": "17396071110505984709"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/109_daniel_rufloff_geomar.jpg",
+          "hash": "4591912546002671040"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/10_benjamin_claassen_mpi.jpg",
+          "hash": "7503761348288726297"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/10_florian_huber_submaris.jpg",
+          "hash": "18443665160572766786"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/110_klaus_lebert_fh_kiel.jpg",
+          "hash": "9031606172635724494"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/111_celina_runke_cau.jpg",
+          "hash": "8933531404052821537"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/112_adrian_metzgen_cau.jpg",
+          "hash": "6445362416759476995"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/11_bernd_hartke_cau.jpg",
+          "hash": "17526615795999886799"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/11_frank_meisel_cau.jpg",
+          "hash": "8679123965217945039"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/12_bing_han_cau.jpg",
+          "hash": "7623731367171891807"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/12_hans_jurgen_gotze_cau.jpg",
+          "hash": "9845437782651844170"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/13_birgit_schneider_cau.jpg",
+          "hash": "9675199976912945836"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/13_jannes_freiberg_cau.jpg",
+          "hash": "8799022328057205259"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/14_cathleen_schlundt_geomar.jpg",
+          "hash": "7658316040515655770"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/14_joke_lubbecke_geomar.jpg",
+          "hash": "6636337429705914830"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/15_celina_prosch_fzb.jpg",
+          "hash": "10657503559970675572"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/15_jorg_geldmacher_geomar.jpg",
+          "hash": "5629998446436665901"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/16_christian_peifer_cau.jpg",
+          "hash": "571412161111536872"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/16_julian_paffrath_cau.jpg",
+          "hash": "18305499018239771406"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/17_christin_nyhoegen_mpi.jpg",
+          "hash": "11284825192585459190"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/17_katrin_mahlkow-nerge_fh.jpg",
+          "hash": "12820576655742822951"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/18_christine_pfeifle_mpi.jpg",
+          "hash": "9748813914457125124"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/18_kristian_ullrich_mpi.jpg",
+          "hash": "1059469757604073010"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/19_christoph_kaleta_cau.jpg",
+          "hash": "10767700040922006124"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/19_marc_wilken_ipn.jpg",
+          "hash": "4131945883627160711"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/20_christopher_bohmker_mpi.jpg",
+          "hash": "1392364300774979559"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/20_matthias_voss_cau.jpg",
+          "hash": "12409414288832852768"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/21_clemens_woitaske-proske_cau.jpg",
+          "hash": "4187202339739631205"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/21_monja_gronenberg_cau.jpg",
+          "hash": "16375818713729057078"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/22_deik_petersen_cau.jpg",
+          "hash": "13261776765554212429"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/22_norbert_stock_cau.jpg",
+          "hash": "5130543132598955191"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/23_dietmar_block_cau.jpg",
+          "hash": "8834704564576912100"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/23_paul_frank_cau.jpg",
+          "hash": "6469849627961967842"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/24_dirk_schenke_cau.jpg",
+          "hash": "13310070423674214507"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/24_rasmus_thiede_cau.jpg",
+          "hash": "8046100624634709391"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/25_elisa_dittbrenner_cau.jpg",
+          "hash": "10341051734369079572"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/25_roshani_madurawala_cau.jpg",
+          "hash": "17004346887343020213"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/26_elke_edelmann_cau.jpg",
+          "hash": "1061824757895092875"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/26_sandra_wind_cau.jpg",
+          "hash": "8660347795515688740"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/27_elke_kossel_geomar.jpg",
+          "hash": "9281106867018411742"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/27_sebastian_krastel_cau.jpg",
+          "hash": "14066533755015510019"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/28_elmar_eggert_cau.jpg",
+          "hash": "5787955841728695554"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/28_sonja_peterson_ifw.jpg",
+          "hash": "12377210003707135820"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/29_eva_schaffer_uksh.jpg",
+          "hash": "11529410674678705489"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/29_soren_christensen_cau.jpg",
+          "hash": "14431727297733563999"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/30_florian_brauer_fh.jpg",
+          "hash": "2802005171229702506"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/30_stefanie_schaefer-di_maida_cau.jpg",
+          "hash": "2685469474440471544"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/31_florian_huber_submaris.jpg",
+          "hash": "13857059821858522060"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/31_tom_scherzer_cau.jpg",
+          "hash": "14929438555821139282"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/32_florian_uellendahl-werth_cau.jpg",
+          "hash": "12968788802410244183"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/32_rolf_j._langhammer_ifw.jpg",
+          "hash": "14298717499350296047"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/33_frank_meisel_cau.jpg",
+          "hash": "9841192813119511810"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/33_robert_hasler_cau_uksh.jpg",
+          "hash": "5335185158906280791"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/34_annika_dochhan_cau.jpg",
+          "hash": "15810708047596673600"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/34_franz_faupel_cau.jpg",
+          "hash": "17572871828529949728"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/35_bjorn_gojdka_isit_.jpg",
+          "hash": "10847310696271863741"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/35_frauke_gerder-rohkamm_fh.jpg",
+          "hash": "5461886970310363249"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/36_carlotta_johnk_cau.jpg",
+          "hash": "15168939666491622079"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/36_gesine_richter_cau.jpg",
+          "hash": "4898636792745166145"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/37_christian_jung_cau.jpg",
+          "hash": "13391372362274634585"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/37_hans_jurgen_gotze_cau.jpg",
+          "hash": "4980960550279036977"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/38_clemens_woitaske-proske_cau.jpg",
+          "hash": "17706436825137721390"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/38_hans_ulrich_schmincke_geomar.jpg",
+          "hash": "6235524421797531543"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/39_conrad_wiermann_fh_kiel.jpg",
+          "hash": "694750722756707477"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/39_hendrik_dankowski_fh.jpg",
+          "hash": "5305411144823916040"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/40_felix_elling_cau.jpg",
+          "hash": "8080526264365744721"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/40_jan-martin_wagner_cau.jpg",
+          "hash": "3792977925926447426"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/41_gerhard_schmidt_cau.jpg",
+          "hash": "2394109213202793606"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/41_jan_piet_brozio_cau.jpg",
+          "hash": "2029675264846964794"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/42_jan-thorsten_graesner_uksh.jpg",
+          "hash": "5306020721029811167"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/42_jan_dierking_geomar.jpg",
+          "hash": "3528504128249181363"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/43_jannes_freiberg_cau.jpg",
+          "hash": "4820396139170213747"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/43_jannes_ophey_fraunhofer-isit.jpg",
+          "hash": "8249169032020408531"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/44_jennifer_strehse_cau.jpg",
+          "hash": "15506603749879633962"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/44_julia_knuppel_cau,_geomar.jpg",
+          "hash": "3799639702023141311"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/45_jens_schneider_von_deimling_cau.jpg",
+          "hash": "2236483353942060856"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/45_karin_schrieber_cau.jpg",
+          "hash": "157316326030598085"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/46_jochen_behrends_fzb.jpg",
+          "hash": "16755663768112621380"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/46_kim-braeuer-dhsh.jpg",
+          "hash": "16329006447735546058"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/47_joke_lubbecke_geomar.jpg",
+          "hash": "2606055200772633591"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/47_lara_schmittmann_geomar.jpg",
+          "hash": "3674076892163930083"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/48_jorg_geldmacher_geomar.jpg",
+          "hash": "7807914595916202741"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/48_luisa_rollwage_cau.jpg",
+          "hash": "4786009595401904408"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/49_judith_breuer_ipn.jpg",
+          "hash": "6119281637461686072"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/49_malte_horlock_cau.jpg",
+          "hash": "13366114574883058149"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/50_julia_gottschalk_cau.jpg",
+          "hash": "3306040485591736557"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/50_marie_berner_fh_kiel.jpg",
+          "hash": "15636613080482052277"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/51_julia_knuppel_geomar.jpg",
+          "hash": "5038385322840143028"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/51_moritz_hallmaier_geomar.jpg",
+          "hash": "7356330395280739670"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/52_julian_kruger_geomar.jpg",
+          "hash": "224248024891376901"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/52_nazgol_emrani_cau.jpg",
+          "hash": "11266672923517255437"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/53_julian_paffrath_cau.jpg",
+          "hash": "13994602473432755961"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/53_paula_theresa_meyer_zip.jpg",
+          "hash": "12270077816452136916"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/54_julienne_haas_uksh.jpg",
+          "hash": "1182652966237954377"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/54_petra_dickel_fh_kiel.jpg",
+          "hash": "11461359353783383507"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/55_katrin_mahlkow-nerge_fh.jpg",
+          "hash": "11599311171679453229"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/55_pia_pooker_cau.jpg",
+          "hash": "3484601018781436625"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/56_kristian_ullrich_mpi.jpg",
+          "hash": "9203474779280416914"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/56_regina_scherliess_cau.jpg",
+          "hash": "12256496114952093076"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/57_lars_eike_kruse_cau.jpg",
+          "hash": "5687056038764378170"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/57_robert_spielhagen_geomar.jpg",
+          "hash": "395135136282433149"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/58_lavisha_parab_mpi.jpg",
+          "hash": "15584524973001325944"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/58_sonke_harm_cau.jpg",
+          "hash": "13705078514716566080"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/59_lena_jebasinski_cau.jpg",
+          "hash": "9152831177018330192"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/59_teresa_lipsky_euf.jpg",
+          "hash": "17890101998533416156"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/60_linda_odenthal-hesse_mpi.jpg",
+          "hash": "8122449164307643807"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/60_theresa_geese_cau.jpg",
+          "hash": "16665618787435075350"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/61_manuela_bannick_zbw.jpg",
+          "hash": "16774449925501299916"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/61_tim_hollstein_uksh.jpg",
+          "hash": "9802780753012462972"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/62_manuela_spagnuolo_mpi.jpg",
+          "hash": "16282886638628849810"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/62_maria_wittmuss_cau.jpg",
+          "hash": "3427519409837661661"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/63_eva_schaffer_uksh.jpg",
+          "hash": "11192966123922045011"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/63_marc_wilken_ipn.jpg",
+          "hash": "11932420235739854979"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/64_julienne_haas_uksh.jpg",
+          "hash": "3908711100868372432"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/64_marco_bellomo_cau.jpg",
+          "hash": "5143127014144548600"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/65_christine_pfeifle_mpi.jpg",
+          "hash": "12883943987295391046"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/65_mari_sumita_geomar.jpg",
+          "hash": "9225225361592666977"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/66_carsten_brockhaus_ifw.webp",
+          "hash": "13614671317481336958"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/66_mark_lenz_geomar.jpg",
+          "hash": "18073281441911264606"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/67_harm_bandholz_fh_kiel.jpg",
+          "hash": "10665161357237912503"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/67_matthias_vetter_cau.jpg",
+          "hash": "354349877361482973"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/68_matthias_voss_cau.jpg",
+          "hash": "11578777047341837119"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/68_nikolas_schwaz_cau.jpg",
+          "hash": "4601548427572136433"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/69_meike_klischies_geomar.jpg",
+          "hash": "14819633800180776383"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/69_timo_hoffmann_ifw.jpg",
+          "hash": "8198375391293136287"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/70_michael_krawczak_cau.jpg",
+          "hash": "11139389299225662457"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/70_moitz_rothe_sst.jpg",
+          "hash": "1073276382356213821"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/71_henrike_knacke_uksh.jpg",
+          "hash": "16646432890215494670"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/71_michel_spils_cau.jpg",
+          "hash": "4117244666209830849"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/72_mareike-wendorff_ipn.jpg",
+          "hash": "958431534243131724"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/72_mira_h._wulf_ipn.jpg",
+          "hash": "15078709165839416847"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/73_monja_gronenberg_cau.jpg",
+          "hash": "7952110216353105939"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/73_sebastian_bauer_cau.jpg",
+          "hash": "9342013420299075077"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/74_holger_kersten_cau.jpg",
+          "hash": "1108809962648673594"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/74_nele_matz-luck_cau.jpg",
+          "hash": "18301836138549607678"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/75_norbert_hort_hereon.jpg",
+          "hash": "12653610809377430769"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/75_oke_horstmann_cau.jpg",
+          "hash": "7972246366115176008"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/76_julian_pforth_fh_kiel.jpg",
+          "hash": "14140665698355671402"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/76_norbert_stock_cau.jpg",
+          "hash": "9694562508534541377"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/77_franz_faupel_cau.jpg",
+          "hash": "6966333880036268445"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/77_paul_frank_cau.jpg",
+          "hash": "18314644618858553909"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/78_klaus-jurgen_gern_ifw.jpg",
+          "hash": "10649856571095397439"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/78_peter_haas_cau.jpg",
+          "hash": "17641221157212802787"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/79_isabelle_kunert_sst.jpg",
+          "hash": "396437367148236074"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/79_philipp_frey_cau.jpg",
+          "hash": "7141836505111858117"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/80_rasmus_thiede_cau.jpg",
+          "hash": "14658659289972165984"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/80_stefan_hindersin_sst.jpg",
+          "hash": "15893423038296931090"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/81_krauss-christian_fh.jpg",
+          "hash": "16364269427171046311"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/81_roshani_madurawala_cau.jpg",
+          "hash": "107163199588736102"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/82_bing_han_cau.jpg",
+          "hash": "15654853039019072309"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/82_sandra_wind_cau.jpg",
+          "hash": "14696831311991409967"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/83_hendrik_dankowski_fh.jpg",
+          "hash": "4644938338652020545"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/83_sebastian_krastel_cau.jpg",
+          "hash": "16899162329354542677"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/84_emma_doelger_cau.jpg",
+          "hash": "17836275421861819374"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/84_sonja_peterson_ifw.jpg",
+          "hash": "6374011857279947564"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/85_hanna_doenau_cau.jpg",
+          "hash": "3778352877052131944"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/85_soren_christensen_cau.jpg",
+          "hash": "15090328772482334723"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/86_henrike_timm_geomar.jpg",
+          "hash": "10356881858330464503"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/86_stefan_rose-john_cau.jpg",
+          "hash": "13192401196444545883"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/87_martin_fischbock_muthesius.jpg",
+          "hash": "336789897790268724"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/87_stefanie_schaefer-di_maida_cau.jpg",
+          "hash": "5332146840832858334"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/88-gonne-clasen_cau.jpg",
+          "hash": "13123570766037306746"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/88_thorben_jansen_ipn.jpg",
+          "hash": "13412128028747360301"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/89_malte_lowe_fh_kiel.jpg",
+          "hash": "17394840681723584721"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/89_tim_eckhorst_muthesius.jpg",
+          "hash": "48026511965607943"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/90_florian_brauer_fh_kiel.jpg",
+          "hash": "2746570016218240085"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/90_tobias_bayr_geomar.jpg",
+          "hash": "822657958227684801"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/91_anton_eisenhauer_geomar.jpg",
+          "hash": "9089044753294218610"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/91_tobias_bunning_cau.jpg",
+          "hash": "7878306372906005836"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/92_ralph_gabler_geomar.jpg",
+          "hash": "7746197726474047079"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/92_tom_scherzer_cau.jpg",
+          "hash": "2993152628694507712"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/93_bernhard_thalheim_cau.jpg",
+          "hash": "16820043109805874134"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/93_severine_furst_geomar.jpg",
+          "hash": "15703565014146161857"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/94_carsten_fortmann-grote_mpi.jpg",
+          "hash": "8393645847148299571"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/94_maria_blanch_jover_geomar.jpg",
+          "hash": "13466304779226612888"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/95_fiene_matthies_geomar.jpg",
+          "hash": "14074240294692740136"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/95_rolf_j._langhammer_ifw.jpg",
+          "hash": "8973459345768154781"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/96_angelina_kalashnikova_cau.jpg",
+          "hash": "2763027040159672722"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/96_robert_hasler_uksh.jpg",
+          "hash": "5335185158906280791"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/97_kerstin_prechel_dhsh.jpg",
+          "hash": "11836202689132779743"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/97_sophie_steinhaeuser_uksh.jpg",
+          "hash": "11778142681707388893"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/98_alina_hartmann_uksh.jpg",
+          "hash": "10946500581007869489"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/98_daniel_mansfeldt_fh.jpg",
+          "hash": "414200688717621793"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/99_katrin_kirsch_cau.jpg",
+          "hash": "3670107124362433416"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/99_lasse_paplow_fh.jpg",
+          "hash": "14209727296768508267"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/99_wissenschaftzukunft.jpg",
+          "hash": "17504928947512909027"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/static/pics/nein.jpg",
+          "hash": "17504928947512909027"
+        },
+        {
+          "file": "apps/rent-a-scientist/public/vercel.svg",
+          "hash": "3233056503954796132"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/AllRequests.ts",
+          "hash": "4190894174464309124"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/AllSchols.ts",
+          "hash": "6268332323686479321"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/AllScientistOffers.ts",
+          "hash": "15948818542952945317"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/AllScientists.ts",
+          "hash": "7794763917250373050"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/BatchInsertMail.ts",
+          "hash": "15565354720253707681"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/DeleteSchoolClassById.ts",
+          "hash": "5460292474936486987"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/DeleteScientistOfferRelations.ts",
+          "hash": "5845475442074205615"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/HideProgramById.ts",
+          "hash": "16390002504995537801"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/InsertClassRequests.ts",
+          "hash": "3404473025887756107"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/InsertMyTeacher.ts",
+          "hash": "8619224970676132912"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/InsertSchoolClass.ts",
+          "hash": "1871352277231102566"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/InsertScientistOfferRelations.ts",
+          "hash": "18275456785216399722"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/LoadAFile.ts",
+          "hash": "17751982631310773723"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/MyRequests.ts",
+          "hash": "1694495641179620878"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/MyTeacher.ts",
+          "hash": "17537033373727387501"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/QueryRSAConfig.ts",
+          "hash": "14481239291264057660"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/SaveAFile.ts",
+          "hash": "1949896299271180413"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/SchoolsMailsInfo.ts",
+          "hash": "5205965775672016653"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/ScientistMailInfos.ts",
+          "hash": "9224066414848820460"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/ScientistOfferById.ts",
+          "hash": "11201139891292320096"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/ScientistOfferComment.ts",
+          "hash": "15958039266033191440"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/UpdateAssignments.ts",
+          "hash": "10409657248406774841"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/UpsertSchools.ts",
+          "hash": "4898047245241246337"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/UpsertScientistOffers.ts",
+          "hash": "4127628260103198224"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/UpsertScientists.ts",
+          "hash": "5314877714025943302"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/__generated__/User.ts",
+          "hash": "9675007850804046663"
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/ras_config.ts",
+          "hash": "16119038081321988155",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/ras_csv.ts",
+          "hash": "4879205848217885440",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/ras_matching.ts",
+          "hash": "8908045216969233714",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/ras_offer.ts",
+          "hash": "17239567114018668458",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/ras_teacher.ts",
+          "hash": "14265238188078955383",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/queries/user.ts",
+          "hash": "14860490757095764259",
+          "deps": [
+            "npm:@apollo/client"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/readme.md",
+          "hash": "14269596679772723437"
+        },
+        {
+          "file": "apps/rent-a-scientist/styles/globals.css",
+          "hash": "2013863604024521808"
+        },
+        {
+          "file": "apps/rent-a-scientist/tailwind.config.js",
+          "hash": "6330619783258275823",
+          "deps": [
+            "npm:@nx/next"
+          ]
+        },
+        {
+          "file": "apps/rent-a-scientist/tsconfig.json",
+          "hash": "4549117079513823106"
+        },
+        {
+          "file": "apps/rent-a-scientist/tsconfig.spec.json",
+          "hash": "6932660931697717727"
+        },
+        {
+          "file": "apps/rent-a-scientist/types/UIComponents.ts",
+          "hash": "2069001846667282047"
+        },
+        {
+          "file": "apps/rent-a-scientist/types/next-auth.d.ts",
+          "hash": "2495014614060345405",
+          "deps": [
+            "npm:next-auth"
+          ]
+        }
+      ],
+      "shared-components": [
+        {
+          "file": "libs/shared-components/.babelrc",
+          "hash": "1231376027096048753"
+        },
+        {
+          "file": "libs/shared-components/.eslintrc.json",
+          "hash": "11012487992710232822"
+        },
+        {
+          "file": "libs/shared-components/README.md",
+          "hash": "11677072835307881696"
+        },
+        {
+          "file": "libs/shared-components/jest.config.ts",
+          "hash": "2987355958601020818"
+        },
+        {
+          "file": "libs/shared-components/project.json",
+          "hash": "6017411516255136410"
+        },
+        {
+          "file": "libs/shared-components/src/index.ts",
+          "hash": "2357548816152425002"
+        },
+        {
+          "file": "libs/shared-components/src/lib/common/Avatar.tsx",
+          "hash": "10329971329209543104",
+          "deps": [
+            "npm:next",
+            "npm:react"
+          ]
+        },
+        {
+          "file": "libs/shared-components/src/lib/common/BlockTitle.tsx",
+          "hash": "779467757335607796",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "libs/shared-components/src/lib/common/ConditionalDisplays.tsx",
+          "hash": "13647080281948623970",
+          "deps": [
+            "npm:react"
+          ]
+        },
+        {
+          "file": "libs/shared-components/src/lib/shared-components.module.css",
+          "hash": "125145030238681982"
+        },
+        {
+          "file": "libs/shared-components/src/lib/shared-components.tsx",
+          "hash": "3445147867000149787"
+        },
+        {
+          "file": "libs/shared-components/tsconfig.json",
+          "hash": "11477590071370859811"
+        },
+        {
+          "file": "libs/shared-components/tsconfig.lib.json",
+          "hash": "15212363619786954789"
+        },
+        {
+          "file": "libs/shared-components/tsconfig.spec.json",
+          "hash": "2406015174838385060"
+        }
+      ]
+    },
+    "nonProjectFiles": [
+      {
+        "file": ".editorconfig",
+        "hash": "16499057188806572188"
+      },
+      {
+        "file": ".eslintrc.json",
+        "hash": "18392445648697328016"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "14502665423183554032"
+      },
+      {
+        "file": ".prettierignore",
+        "hash": "9175937087874081623"
+      },
+      {
+        "file": ".prettierrc",
+        "hash": "18364264586821277305"
+      },
+      {
+        "file": ".vscode/extensions.json",
+        "hash": "235626400633494639"
+      },
+      {
+        "file": ".yarn/plugins/@yarnpkg/plugin-interactive-tools.cjs",
+        "hash": "4939858571171452218"
+      },
+      {
+        "file": ".yarn/releases/yarn-3.4.1.cjs",
+        "hash": "5175435219697530069"
+      },
+      {
+        "file": ".yarnrc.yml",
+        "hash": "7137289059215081529"
+      },
+      {
+        "file": "Dockerfile-dev",
+        "hash": "16533116588056916511"
+      },
+      {
+        "file": "Dockerfile-edu",
+        "hash": "12235409390764303043"
+      },
+      {
+        "file": "Dockerfile-rent-a-scientist",
+        "hash": "4428577799405051171"
+      },
+      {
+        "file": "README.md",
+        "hash": "9703605517982137958"
+      },
+      {
+        "file": "apps/.gitkeep",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "babel.config.json",
+        "hash": "5546405625092116747"
+      },
+      {
+        "file": "dev.sh",
+        "hash": "10150116574786987679"
+      },
+      {
+        "file": "jest.config.ts",
+        "hash": "12333515226966617182"
+      },
+      {
+        "file": "jest.preset.js",
+        "hash": "9430166341120122740"
+      },
+      {
+        "file": "libs/.gitkeep",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "migrations.json",
+        "hash": "214011762809325368"
+      },
+      {
+        "file": "nx.json",
+        "hash": "13093796775325904748"
+      },
+      {
+        "file": "package.json",
+        "hash": "12118995581526241872"
+      },
+      {
+        "file": "tools/tsconfig.tools.json",
+        "hash": "16088922570277978783"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "9999296823382856773"
+      },
+      {
+        "file": "yarn.lock",
+        "hash": "13020410246285208710"
+      }
+    ]
+  }
+}

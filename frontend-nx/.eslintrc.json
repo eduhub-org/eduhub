@@ -26,13 +26,18 @@
       "extends": ["plugin:@nx/typescript"],
       "rules": {
         "@typescript-eslint/no-explicit-any": "off",
-        "@next/next/no-img-element": "off"
+        "@next/next/no-img-element": "off",
+        "@typescript-eslint/no-extra-semi": "error",
+        "no-extra-semi": "off"
       }
     },
     {
       "files": ["*.js", "*.jsx"],
       "extends": ["plugin:@nx/javascript"],
-      "rules": {}
+      "rules": {
+        "@typescript-eslint/no-extra-semi": "error",
+        "no-extra-semi": "off"
+      }
     }
   ]
 }

@@ -64,3 +64,14 @@
 [NX Daemon Server] - 2024-08-29T08:44:16.093Z - [WATCHER]: Stopping the watcher for /Users/eric/Projects/opencampus/edu-hub/application/frontend-nx (sources)
 [NX Daemon Server] - 2024-08-29T08:44:16.100Z - Closed a connection. Number of open connections: 0
 [NX Daemon Server] - 2024-08-29T08:44:16.100Z - [WATCHER]: Stopping the watcher for /Users/eric/Projects/opencampus/edu-hub/application/frontend-nx (outputs)
+[NX Daemon Server] - 2024-08-29T08:49:12.828Z - Started listening on: /var/folders/pv/ksnzs3412xl475r2b2wn51480000gn/T/9e8ec2d72a528cce4108/d.sock
+[NX Daemon Server] - 2024-08-29T08:49:12.842Z - [WATCHER]: Subscribed to changes within: /Users/eric/Projects/opencampus/edu-hub/application/frontend-nx (native)
+[NX Daemon Server] - 2024-08-29T08:49:12.845Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-08-29T08:49:12.849Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2024-08-29T08:49:12.851Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-08-29T08:49:12.852Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2024-08-29T08:49:12.853Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2024-08-29T08:49:12.853Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2024-08-29T08:49:12.855Z - [WATCHER]: Stopping the watcher for /Users/eric/Projects/opencampus/edu-hub/application/frontend-nx (sources)
+[NX Daemon Server] - 2024-08-29T08:49:12.855Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-08-29T08:49:12.855Z - [WATCHER]: Stopping the watcher for /Users/eric/Projects/opencampus/edu-hub/application/frontend-nx (outputs)
