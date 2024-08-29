@@ -13,7 +13,7 @@
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/shared-components"],
       "options": {
         "jestConfig": "libs/shared-components/jest.config.ts",

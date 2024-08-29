@@ -6,9 +6,7 @@
   "targets": {
     "build": {
       "executor": "@nx/next:build",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
         "outputPath": "dist/apps/rent-a-scientist"
@@ -47,10 +45,8 @@
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/apps/rent-a-scientist"
-      ],
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/rent-a-scientist"],
       "options": {
         "jestConfig": "apps/rent-a-scientist/jest.config.ts",
         "passWithNoTests": true
@@ -58,13 +54,9 @@
     },
     "lint": {
       "executor": "@nx/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "apps/rent-a-scientist/**/*.{ts,tsx,js,jsx}"
-        ]
+        "lintFilePatterns": ["apps/rent-a-scientist/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "apollo": {
