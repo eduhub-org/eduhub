@@ -3,7 +3,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { withNx } = require('@nx/next/plugins/with-nx');
 
-const nextTranslate = require('next-translate');
+const nextTranslate = require('next-translate-plugin');
 
 const path = require('path');
 

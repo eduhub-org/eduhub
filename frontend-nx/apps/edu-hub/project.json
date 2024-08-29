@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/edu-hub",
   "projectType": "application",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/next:build",
@@ -67,6 +68,5 @@
         "parallel": false
       }
     }
-  },
-  "tags": []
+  }
 }

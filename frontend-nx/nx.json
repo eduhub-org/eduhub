@@ -1,11 +1,12 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "implicitDependencies": {
-    "package.json": {
-      "dependencies": "*",
-      "devDependencies": "*"
-    },
-    ".eslintrc.json": "*"
+  "namedInputs": {
+    "sharedGlobals": [
+      "{workspaceRoot}/.eslintrc.json"
+    ],
+    "default": [
+      "sharedGlobals"
+    ]
   },
   "targetDefaults": {
     "build": {

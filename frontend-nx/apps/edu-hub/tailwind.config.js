@@ -5,7 +5,7 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 const { createGlobPatternsForDependencies } = require('@nx/next/tailwind');
 
 module.exports = {
-  plugins: [require('@tailwindcss/line-clamp'), require('@tailwindcss/typography')],
+  plugins: [require('@tailwindcss/typography')],
   content: [
     join(__dirname, '/pages/**/*.{js,ts,jsx,tsx}'),
     join(__dirname, '/components/**/*.{js,ts,jsx,tsx}'),
