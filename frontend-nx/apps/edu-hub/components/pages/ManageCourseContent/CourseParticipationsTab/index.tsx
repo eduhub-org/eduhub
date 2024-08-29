@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Dispatch, FC, SetStateAction, useCallback, useState } from 'react';
 import { useIsAdmin } from '../../../../hooks/authentication';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
-import { DOT_COLORS, EhDot, greenDot, greyDot, redDot } from '../../../common/dots_old';
+import Dot, { greyDot, greenDot, orangeDot, redDot } from '../../../common/Dot';
 import { CertificateDownload } from '../../../common/CertificateDownload';
 
 import { MdAddCircle, MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
@@ -284,10 +284,9 @@ const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => 
 /* #endregion */
 
 interface IDotData {
-  color: DOT_COLORS;
+  color: DotColor;
   session: ManagedCourse_Course_by_pk_Sessions;
 }
-
 const pStyle = 'text-gray-700 truncate';
 const tdStyle = 'pl-5 py-4';
 
@@ -391,13 +390,13 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
    * @param {CourseEnrollmentByCourseID_Course_by_pk_Sessions} sn Database object
    * @returns {DOT_COLORS} ("GREY" | "GREEN" | "ORANGE" | "RED")
    */
-  const dotColor = (sn: ManagedCourse_Course_by_pk_Sessions) => {
-    if (enrollment.User.Attendances.length === 0) return 'GREY';
+  const dotColor = (sn: ManagedCourse_Course_by_pk_Sessions): DotColor => {
+    if (enrollment.User.Attendances.length === 0) return 'grey';
     const attendance = attendanceRecordBySession[sn.id];
-    if (!attendance) return 'GREY';
-    if (attendance.status === AttendanceStatus_enum.MISSED) return 'RED';
-    if (attendance.status === AttendanceStatus_enum.ATTENDED) return 'GREEN';
-    return 'GREY';
+    if (!attendance) return 'grey';
+    if (attendance.status === AttendanceStatus_enum.MISSED) return 'red';
+    if (attendance.status === AttendanceStatus_enum.ATTENDED) return 'lightgreen';
+    return 'grey';
   };
 
   const dotsData: IDotData[] = sessions.map((session) => ({
@@ -405,18 +404,15 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
     color: dotColor(session),
   }));
   const missedSessionCount = () => {
-    const result = dotsData.reduce((prev, current) => prev + (current.color === 'RED' ? 1 : 0), 0);
-    return result;
+    return dotsData.reduce((prev, current) => prev + (current.color === 'red' ? 1 : 0), 0);
   };
 
   const attendedSessionCount = () => {
-    const result = dotsData.reduce((prev, current) => prev + (current.color === 'GREEN' ? 1 : 0), 0);
-    return result;
+    return dotsData.reduce((prev, current) => prev + (current.color === 'lightgreen' ? 1 : 0), 0);
   };
 
-  const passedStatus = () => {
-    // const missedSession = sessions.length - missedSessionCount();
-    return missedSessionCount() > maxMissedSessions ? 'RED' : 'GREEN';
+  const passedStatus = (): DotColor => {
+    return missedSessionCount() > maxMissedSessions ? 'red' : 'lightgreen';
   };
 
   return (
@@ -445,7 +441,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
             </div>
             <div className="flex space-x-1 flex-row">
               <p className={pStyle}> {`${missedSessionCount()}/${attendedSessionCount() + missedSessionCount()}`} </p>
-              <EhDot color={passedStatus()} />
+              <Dot color={passedStatus()} />
             </div>
           </div>
         </td>
@@ -457,9 +453,9 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
               </div>
             )}
 
-            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.UNRATED ? greyDot : <></>}
-            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.PASSED ? greenDot : <></>}
-            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.FAILED ? redDot : <></>}
+            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.UNRATED && greyDot}
+            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.PASSED && greenDot}
+            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.FAILED && redDot}
           </div>
         </td>
 
@@ -535,30 +531,24 @@ const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocum
             {enrollment.mostRecentRecord && (
               <>
                 <div className="flex items-center mb-3">
-                  <EhDot
-                    onClick={() => onSetAchievementRecordRatingClick(AchievementRecordRating_enum.UNRATED)}
-                    className="cursor-pointer"
-                    color="GREY"
-                    size={
-                      enrollment.mostRecentRecord.rating === AchievementRecordRating_enum.UNRATED ? 'LARGE' : 'DEFAULT'
-                    }
-                  />
-                  <EhDot
-                    onClick={() => onSetAchievementRecordRatingClick(AchievementRecordRating_enum.PASSED)}
-                    className="cursor-pointer"
-                    color="GREEN"
-                    size={
-                      enrollment.mostRecentRecord.rating === AchievementRecordRating_enum.PASSED ? 'LARGE' : 'DEFAULT'
-                    }
-                  />
-                  <EhDot
-                    onClick={() => onSetAchievementRecordRatingClick(AchievementRecordRating_enum.FAILED)}
-                    className="cursor-pointer"
-                    color="RED"
-                    size={
-                      enrollment.mostRecentRecord.rating === AchievementRecordRating_enum.FAILED ? 'LARGE' : 'DEFAULT'
-                    }
-                  />
+                <Dot
+                  onClick={() => onSetAchievementRecordRatingClick(AchievementRecordRating_enum.UNRATED)}
+                  className="cursor-pointer"
+                  color="grey"
+                  size={enrollment.mostRecentRecord.rating === AchievementRecordRating_enum.UNRATED ? 'LARGE' : 'DEFAULT'}
+                />
+                <Dot
+                  onClick={() => onSetAchievementRecordRatingClick(AchievementRecordRating_enum.PASSED)}
+                  className="cursor-pointer"
+                  color="lightgreen"
+                  size={enrollment.mostRecentRecord.rating === AchievementRecordRating_enum.PASSED ? 'LARGE' : 'DEFAULT'}
+                />
+                <Dot
+                  onClick={() => onSetAchievementRecordRatingClick(AchievementRecordRating_enum.FAILED)}
+                  className="cursor-pointer"
+                  color="red"
+                  size={enrollment.mostRecentRecord.rating === AchievementRecordRating_enum.FAILED ? 'LARGE' : 'DEFAULT'}
+                />
                 </div>
                 <div className="mb-3">
                   {`${t('manageCourse:projectTitle')}: `}
@@ -601,7 +591,7 @@ const EhDotWithCallBack: FC<IEhDotProps> = ({ dotData, handleDotClick, session }
   }, [handleDotClick, session]);
 
   return (
-    <EhDot
+    <Dot
       onClick={handleClick}
       color={dotData.color}
       className="cursor-pointer hover:border-2 hover:border-indigo-200 hover:rounded-full"
