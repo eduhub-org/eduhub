@@ -57,7 +57,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
                 </div>
                 <div className="flex flex-col">
                   <span className="block text-sm sm:text-lg whitespace-nowrap sm:whitespace-normal">{title}</span>
-                  <div className="whitespace-nowrap ml-0 pl-0">
+                  {/* <div className="whitespace-nowrap ml-0 pl-0">
                     {SessionAddresses.map(({ address, CourseLocation }, index) => (
                       <span key={index} className="text-sm text-gray-400 ml-0 pl-0">
                         {CourseLocation.locationOption === 'ONLINE' ? (
@@ -96,7 +96,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
                         {index < SessionAddresses.length - 1 && ' +\u00A0'}
                       </span>
                     ))}
-                  </div>
+                  </div> */}
                   <div className="flex flex-col">
                     {SessionSpeakers &&
                       SessionSpeakers.map((speaker, speakerIndex) => (
