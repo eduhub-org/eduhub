@@ -51,7 +51,7 @@
       }
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/edu-hub/**/*.{ts,tsx,js,jsx}", "!apps/edu-hub/.next"]
