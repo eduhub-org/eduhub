@@ -1,5 +1,3 @@
-
-
 # Opencampus
 
 This project was generated using [Nx](https://nx.dev).
@@ -19,7 +17,7 @@ Below are our core plugins:
 - [React](https://reactjs.org)
   - `npm install --save-dev @nrwl/react`
 - Web (no framework frontends)
-  - `npm install --save-dev @nrwl/web`
+  - `npm install --save-dev @nx/web`
 - [Angular](https://angular.io)
   - `npm install --save-dev @nrwl/angular`
 - [Nest](https://nestjs.com)
@@ -78,8 +76,6 @@ Run `nx graph` to see a diagram of the dependencies of your projects.
 ## Further help
 
 Visit the [Nx Documentation](https://nx.dev) to learn more.
-
-
 
 ## ☁ Nx Cloud
 
