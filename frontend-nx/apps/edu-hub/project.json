@@ -47,8 +47,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/edu-hub"],
       "options": {
-        "jestConfig": "apps/edu-hub/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/edu-hub/jest.config.ts"
       }
     },
     "lint": {
