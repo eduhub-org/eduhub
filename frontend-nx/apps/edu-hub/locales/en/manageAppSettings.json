@@ -19,5 +19,6 @@
     "America/New_York": "New York",
     "America/Los_Angeles": "Los Angeles",
     "Asia/Tokyo": "Tokio"
-  }
+  },
+  "timeZoneHelpText": "The time zone is used to display dates and times in the application. General times like the recurring course time, which are not bound to a specific day, will always be displayed in the original time and not adjusted."
 }

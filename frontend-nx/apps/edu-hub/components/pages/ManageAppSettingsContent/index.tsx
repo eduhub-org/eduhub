@@ -162,14 +162,14 @@ const ManageAppSettingsContent: FC = () => {
         <>
           <div className="mt-16 border border-gray-300 rounded p-6">
             <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-4 block">
-              {t('manageAppSettings:bannerSettings')}
+              {t('banner.label')}
             </label>
             <FormProvider {...methods}>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="flex flex-wrap">
                   <div className="w-1/2 pr-3">
                     <FormFieldRow<Inputs>
-                      label={t('manageAppSettings:bannerBackgroundColor')}
+                      label={t('banner.background_color')}
                       name="bannerBackgroundColor"
                       placeholder="#ffffff"
                       required
@@ -177,7 +177,7 @@ const ManageAppSettingsContent: FC = () => {
                   </div>
                   <div className="w-1/2 pl-3">
                     <FormFieldRow<Inputs>
-                      label={t('manageAppSettings:bannerFontColor')}
+                      label={t('banner.fontColor')}
                       name="bannerFontColor"
                       placeholder="#ffffff"
                       required
@@ -186,10 +186,10 @@ const ManageAppSettingsContent: FC = () => {
                 </div>
                 <div className="flex flex-wrap">
                   <div className="w-1/2 pr-3">
-                    <FormFieldRow<Inputs> label={t('manageAppSettings:bannerTextDe')} name="bannerTextDe" />
+                    <FormFieldRow<Inputs> label={t('banner.text_de')} name="bannerTextDe" />
                   </div>
                   <div className="w-1/2 pl-3">
-                    <FormFieldRow<Inputs> label={t('manageAppSettings:bannerTextEn')} name="bannerTextEn" />
+                    <FormFieldRow<Inputs> label={t('banner.text_en')} name="bannerTextEn" />
                   </div>
                 </div>
                 <Button
@@ -208,7 +208,7 @@ const ManageAppSettingsContent: FC = () => {
 
           <div className="mt-16">
             <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-2 block">
-              {t('manageAppSettings:courseGroupOptions')}
+              {t('course_group_options')}
             </label>
             <DragDropContext onDragEnd={onDragEnd}>
               <Droppable droppableId="courseGroupOptions">
@@ -238,15 +238,16 @@ const ManageAppSettingsContent: FC = () => {
 
           <div className="mt-16">
             <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-2 block">
-              {t('manageAppSettings:timeZone')}
+              {t('time_zone.label')}
             </label>
             <EduHubDropdownSelector
               options={timeZones}
               value={appSettingsData?.AppSettings[0]?.timeZone}
+              helpText={t('time_zone.help_text')}
               updateMutation={UPDATE_APP_SETTINGS_TIME_ZONE}
               idVariables={{ appName: 'edu' }}
               refetchQueries={['AppSettings']} // Name of the query to refetch
-              translationPrefix="timeZones."
+              translationPrefix="time_zone.values."
               translationNamespace="manageAppSettings"
             />
           </div>
