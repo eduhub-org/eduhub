@@ -51,8 +51,7 @@
     "tslib": "^2.7.0",
     "use-debounce": "^10.0.3",
     "uuid": "^8.3.2",
-    "uvu": "^0.5.6",
-    "@nx/next": "16.10.0"
+    "uvu": "^0.5.6"
   },
   "devDependencies": {
     "@nrwl/jest": "16.10.0",
@@ -109,7 +108,8 @@
     "ts-jest": "29.1.5",
     "ts-node": "10.9.2",
     "typescript": "~4.7.4",
-    "unused-exports": "^0.0.6-beta"
+    "unused-exports": "^0.0.6-beta",
+    "@nx/next": "16.10.0"
   },
   "packageManager": "yarn@3.4.1"
 }
