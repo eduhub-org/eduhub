@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Dispatch, FC, SetStateAction, useCallback, useState } from 'react';
 import { useIsAdmin } from '../../../../hooks/authentication';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
-import Dot, { greyDot, greenDot, orangeDot, redDot } from '../../../common/Dot';
+import Dot, { DotColor } from '../../../common/Dot';
 import { CertificateDownload } from '../../../common/CertificateDownload';
 
 import { MdAddCircle, MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
@@ -453,9 +453,9 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
               </div>
             )}
 
-            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.UNRATED && greyDot}
-            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.PASSED && greenDot}
-            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.FAILED && redDot}
+            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.UNRATED && (<Dot color="grey" />)}
+            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.PASSED && (<Dot color="lightgreen" />)}
+            {enrollment.mostRecentRecord?.rating === AchievementRecordRating_enum.FAILED && (<Dot color="red" />)}
           </div>
         </td>
 
