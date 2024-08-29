@@ -52,3 +52,5 @@ Thumbs.db
 
 # nx
 /.nx/cache/
+
+.nx/cache
