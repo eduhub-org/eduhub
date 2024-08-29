@@ -56,6 +56,7 @@
   "devDependencies": {
     "@nrwl/nx-linux-x64-gnu": "^15.9.3",
     "@nx/cypress": "17.3.2",
+    "@nx/eslint": "17.3.2",
     "@nx/eslint-plugin": "17.3.2",
     "@nx/jest": "17.3.2",
     "@nx/next": "17.3.2",
@@ -108,8 +109,7 @@
     "ts-jest": "29.1.5",
     "ts-node": "10.9.2",
     "typescript": "~4.7.4",
-    "unused-exports": "^0.0.6-beta",
-    "@nx/eslint": "17.3.2"
+    "unused-exports": "^0.0.6-beta"
   },
   "packageManager": "yarn@3.4.1"
 }
