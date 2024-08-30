@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { GoPrimitiveDot } from "react-icons/go";
+import { GoDotFill } from 'react-icons/go';
 export type DOT_COLORS = "GREY" | "GREEN" | "ORANGE" | "RED";
 
 interface IProps {
@@ -29,15 +29,7 @@ export const EhDot: FC<IProps> = ({ color, size, className, onClick, title }) =>
 
   const sz = size === "LARGE" ? "2.5em" : "1.5em";
 
-  return (
-    <GoPrimitiveDot
-      onClick={onClick}
-      color={clr}
-      size={sz}
-      className={`inline ${className || ""}`}
-      title={title}
-    />
-  );
+  return <GoDotFill onClick={onClick} color={clr} size={sz} className={`inline ${className || ''}`} title={title} />;
 };
 
 export const greyDot = <EhDot color="GREY" />;

@@ -17,7 +17,8 @@
           "outputPath": "apps/edu-hub"
         },
         "production": {}
-      }
+      },
+      "dependsOn": ["lint"]
     },
     "serve": {
       "executor": "@nx/next:server",
@@ -54,7 +55,7 @@
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["!apps/edu-hub/.next"]
+        "lintFilePatterns": ["apps/edu-hub/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "apollo": {

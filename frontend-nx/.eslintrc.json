@@ -1,7 +1,14 @@
 {
   "root": true,
   "ignorePatterns": ["**/*"],
-  "plugins": ["@nx"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@nx/typescript",
+    "plugin:@nx/javascript"
+  ],
+  "plugins": ["@nx", "react", "@typescript-eslint"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
@@ -23,20 +30,18 @@
     },
     {
       "files": ["*.ts", "*.tsx"],
-      "extends": ["plugin:@nx/typescript"],
       "rules": {
         "@typescript-eslint/no-explicit-any": "off",
         "@next/next/no-img-element": "off",
-        "@typescript-eslint/no-extra-semi": "error",
-        "no-extra-semi": "off"
+        "no-extra-semi": "error", // Use the standard rule
+        "react/react-in-jsx-scope": "off" // Disable rule for React 17+ JSX transform
       }
     },
     {
       "files": ["*.js", "*.jsx"],
-      "extends": ["plugin:@nx/javascript"],
       "rules": {
-        "@typescript-eslint/no-extra-semi": "error",
-        "no-extra-semi": "off"
+        "no-extra-semi": "error", // Use the standard rule
+        "react/react-in-jsx-scope": "off" // Disable rule for React 17+ JSX transform
       }
     }
   ]

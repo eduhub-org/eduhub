@@ -1,7 +1,7 @@
 import { QueryResult } from '@apollo/client';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useState } from 'react';
-import { GoPrimitiveDot } from 'react-icons/go';
+import { GoDotFill } from 'react-icons/go';
 import { IoIosArrowDown, IoIosArrowUp, IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
 import { MdCheckBox, MdOutlineCheckBoxOutlineBlank } from 'react-icons/md';
 import { displayDate } from '../../../../helpers/dateHelpers';
@@ -96,7 +96,7 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, qResult, onSetRating, i
             </div>
             <div className="mr-3 ml-3 col-span-2 text-center">
               {!isExpired(enrollment) && enrollment.status === 'APPLIED' && (
-                <GoPrimitiveDot className="inline" title={t('course-page:applied')} color="grey" size="2.5em" />
+                <GoDotFill className="inline" title={t('course-page:applied')} color="grey" size="2.5em" />
               )}
               {!isExpired(enrollment) && enrollment.status === 'INVITED' && (
                 <IoIosCheckmarkCircle className="inline" title={t('course-page:invited')} color="grey" size="1.5em" />

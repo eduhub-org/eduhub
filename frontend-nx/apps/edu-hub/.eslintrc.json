@@ -1,20 +1,17 @@
 {
-  "extends": ["plugin:@nx/react-typescript", "next", "next/core-web-vitals", "../../.eslintrc.json"],
+  "extends": [
+    "next", // Base Next.js rules
+    "next/core-web-vitals", // Next.js recommended rules including React Hooks
+    "../../.eslintrc.json" // Extend from the shared root configuration
+  ],
   "ignorePatterns": ["!**/*", ".next"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
-        "@next/next/no-html-link-for-pages": ["error", "apps/edu-hub/pages"]
+        "@next/next/no-html-link-for-pages": ["error", "apps/edu-hub/pages"],
+        "react/react-in-jsx-scope": "off" // Disable rule for React 17+ JSX transform
       }
-    },
-    {
-      "files": ["*.ts", "*.tsx"],
-      "rules": {}
-    },
-    {
-      "files": ["*.js", "*.jsx"],
-      "rules": {}
     }
   ],
   "rules": {

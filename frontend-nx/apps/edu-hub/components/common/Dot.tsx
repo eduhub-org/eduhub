@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { GoPrimitiveDot } from 'react-icons/go';
+import { GoDotFill } from 'react-icons/go';
 
 interface DotProps {
   color?: string;
@@ -12,7 +12,7 @@ interface DotProps {
 const Dot: FC<DotProps> = ({ color, size = 'DEFAULT', className, onClick, title }) => {
   const sz = size === 'LARGE' ? '2.5em' : '1.5em';
   return (
-    <GoPrimitiveDot
+    <GoDotFill
       onClick={onClick}
       size={sz}
       className={`${className} inline-block`}

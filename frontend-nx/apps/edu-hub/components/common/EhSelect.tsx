@@ -34,7 +34,7 @@ const EhSelect: FC<IPros> = ({
   );
 
   options = distinctOptions(options);
-  const selectStyle = `form-select 
+  const selectStyle = `form-select
     appearance
     block
     w-full
@@ -50,11 +50,15 @@ const EhSelect: FC<IPros> = ({
   return (
     <select
       className={selectStyle}
-      aria-label={placeholder ?? ""}
+      aria-label={placeholder ?? ''}
       onChange={onSelectChanged}
       value={value}
-      placeholder={placeholder ?? ""}
     >
+      {placeholder && (
+        <option disabled={true} value="">
+          {placeholder}
+        </option>
+      )}
       {options.map((option, index) => (
         <option key={option.key} value={option.key}>
           {option.label}
