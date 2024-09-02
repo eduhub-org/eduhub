@@ -21,5 +21,5 @@ export interface UpdateCourseLanguage {
 
 export interface UpdateCourseLanguageVariables {
   courseId: number;
-  language: string;
+  value: string;
 }

@@ -16,7 +16,7 @@ import { ContentRow } from '../../common/ContentRow';
 import { PageBlock } from '../../common/PageBlock';
 import { DescriptionFields } from './DescriptionFields';
 import { TimeLocationLanguageInstructors } from './TimeLocationLanguageInstructors';
-import { getWeekdayStartAndEndString } from '../../../helpers/dateHelpers';
+import { getWeekdayStartAndEndString } from '../../../helpers/dateTimeHelpers';
 import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
 import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
@@ -42,7 +42,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       id,
       userId,
     },
-    fetchPolicy:'cache-and-network',
+    fetchPolicy: 'cache-and-network',
     async onCompleted(data) {
       // Check if user has been invited to the course and the invitation has not expired
       const courseEnrollment = getCourseEnrollment(data?.Course_by_pk, userId);

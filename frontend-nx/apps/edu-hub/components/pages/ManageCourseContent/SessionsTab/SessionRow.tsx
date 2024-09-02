@@ -6,7 +6,8 @@ import {
 } from '../../../../queries/__generated__/ManagedCourse';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import EhTimeSelect, { formatTime } from '../../../common/EhTimeSelect';
+import EhTimeSelect from '../../../common/EhTimeSelect';
+import { formatTime } from '../../../../helpers/dateTimeHelpers';
 import { DebounceInput } from 'react-debounce-input';
 import { eventTargetValueMapper, useRoleMutation } from '../../../../hooks/authedMutation';
 import { INSERT_NEW_SESSION_SPEAKER } from '../../../../queries/course';

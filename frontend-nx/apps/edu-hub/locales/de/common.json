@@ -105,7 +105,7 @@
   "achievement-documentation-template": "Leistungsnachweisvorlage",
   "preview": "Vorschau",
   "edit_markdown": "Bearbeiten",
-  "markdown_info": "Du kannst **fett**, _kursiv_ und andere Formatierungen verwenden",
+  "markdown_info": "Markdown-Formatierung wird unterstützt.",
   "markdown_guide": "Markdown Guide",
   "location": {
     "ONLINE": "Online",
@@ -116,5 +116,6 @@
   "deletion_confirmation_question": "Bist du sicher, dass du diesen Eintrag löschen möchtest?",
   "confirm_delete": "Löschen bestätigen",
   "error": "Fehler",
-  "select_time": "Zeit auswählen"
+  "select_time": "Zeit auswählen",
+  "close": "Schließen"
 }

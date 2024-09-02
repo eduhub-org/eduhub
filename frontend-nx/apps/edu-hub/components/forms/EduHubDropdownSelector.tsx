@@ -10,7 +10,7 @@ import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import log from 'loglevel';
 
 interface EduHubDropdownSelectorProps {
-  label?: ReactNode;
+  label?: string;
   options: string[];
   className?: string;
   value: string;
@@ -25,12 +25,12 @@ interface EduHubDropdownSelectorProps {
 }
 
 const EduHubDropdownSelector: React.FC<EduHubDropdownSelectorProps> = ({
-  label = null,
+  label,
   options,
   className = '',
   value,
   helpText,
-  translationPrefix,
+  translationPrefix = '',
   updateMutation,
   idVariables,
   refetchQueries = [],

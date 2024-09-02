@@ -282,13 +282,14 @@ export const INSERT_COURSE_LOCATION = gql`
 export const UPDATE_COURSE_LOCATION = gql`
   mutation UpdateCourseLocation(
     $locationId: Int!
-    $option: LocationOption_enum!
+    $value: LocationOption_enum!
   ) {
     update_CourseLocation_by_pk(
       pk_columns: { id: $locationId }
-      _set: { locationOption: $option }
+      _set: { locationOption: $value }
     ) {
       id
+      locationOption
     }
   }
 `;
@@ -340,10 +341,10 @@ export const UPDATE_COURSE_END_TIME = gql`
 `;
 
 export const UPDATE_COURSE_LANGUAGE = gql`
-  mutation UpdateCourseLanguage($courseId: Int!, $language: String!) {
+  mutation UpdateCourseLanguage($courseId: Int!, $value: String!) {
     update_Course_by_pk(
       pk_columns: { id: $courseId }
-      _set: { language: $language }
+      _set: { language: $value }
     ) {
       id
     }

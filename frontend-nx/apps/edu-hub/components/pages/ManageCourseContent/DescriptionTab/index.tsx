@@ -19,6 +19,19 @@ import {
   DELETE_SESSION_ADDRESSES_BY_COURSE_AND_LOCATION,
   INSERT_SESSION_ADDRESS,
 } from '../../../../queries/course';
+import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
+import Locations from './Locations';
+import { Button } from '@material-ui/core';
+import { MdAddCircle } from 'react-icons/md';
+import useTranslation from 'next-translate/useTranslation';
+import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
+import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
+import EduHubTimePicker from '../../../forms/EduHubTimePicker';
+import EduHubNumberFieldEditor from '../../../forms/EduHubNumberFieldEditor';
+import { LocationOption_enum } from '../../../../__generated__/globalTypes';
+import useErrorHandler from '../../../../hooks/useErrorHandler';
+import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
+import { useStartTimeString, useEndTimeString } from '../../../../helpers/dateTimeHelpers';
 import {
   DeleteCourseLocation,
   DeleteCourseLocationVariables,
@@ -27,15 +40,10 @@ import {
   InsertCourseLocation,
   InsertCourseLocationVariables,
 } from '../../../../queries/__generated__/InsertCourseLocation';
-import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
 import {
   UpdateCourseEndTime,
   UpdateCourseEndTimeVariables,
 } from '../../../../queries/__generated__/UpdateCourseEndTime';
-import {
-  UpdateCourseLanguage,
-  UpdateCourseLanguageVariables,
-} from '../../../../queries/__generated__/UpdateCourseLanguage';
 import {
   UpdateCourseLocation,
   UpdateCourseLocationVariables,
@@ -45,25 +53,9 @@ import {
   UpdateCourseStartTimeVariables,
 } from '../../../../queries/__generated__/UpdateCourseStartTime';
 import {
-  UpdateCourseWeekday,
-  UpdateCourseWeekdayVariables,
-} from '../../../../queries/__generated__/UpdateCourseWeekday';
-import { formatTime } from '../../../../helpers/dateHelpers';
-import Locations from './Locations';
-import { Button } from '@material-ui/core';
-import { MdAddCircle } from 'react-icons/md';
-import {
   UpdateCourseMaxParticipants,
   UpdateCourseMaxParticipantsVariables,
 } from '../../../../queries/__generated__/UpdateCourseMaxParticipants';
-import useTranslation from 'next-translate/useTranslation';
-import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
-import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
-import EduHubTimePicker from '../../../forms/EduHubTimePicker';
-import EduHubNumberFieldEditor from '../../../forms/EduHubNumberFieldEditor';
-import { LocationOption_enum } from '../../../../__generated__/globalTypes';
-import useErrorHandler from '../../../../hooks/useErrorHandler';
-import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import {
   DeleteSessionAddressesByCourseAndLocation,
   DeleteSessionAddressesByCourseAndLocationVariables,
@@ -78,22 +70,14 @@ interface IProps {
   qResult: QueryResult<any, any>;
 }
 
-const prepDateTimeUpdate = (timeString: string) => {
-  // Ensure timeString is a string and is not empty
-  if (typeof timeString !== 'string' || !timeString.includes(':')) {
-    console.error('Invalid timeString:', timeString);
-    return ''; // or some fallback value like the current time
-  }
-
-  const now = new Date();
-  const [hourS, minS] = timeString.split(':');
-  now.setHours(Number(hourS));
-  now.setMinutes(Number(minS));
-  return now.toISOString();
-};
-
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const { error, handleError, resetError } = useErrorHandler();
+  const { t } = useTranslation('course-page');
+  const getStartTimeString = useStartTimeString();
+  const getEndTimeString = useEndTimeString();
+
+  const startTime = getStartTimeString(course);
+  console.log('Start time:', course.startTime, 'Formatted:', startTime);
 
   const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_COURSE_LOCATION,
@@ -182,7 +166,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     }
   );
   const handleUpdateCourseLocation = async (location, option) => {
-    await updateCourseLocation({ variables: { locationId: location.id, option: option } });
+    await updateCourseLocation({ variables: { locationId: location.id, value: option } });
     qResult.refetch();
   };
 
@@ -212,16 +196,12 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     eventTargetNumberMapper,
     qResult
   );
-  const { t } = useTranslation('course-page');
 
   const weekDayOptions = ['NONE', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
   const languageOptions = ['DE', 'EN'];
 
   const courseLocations = [...course.CourseLocations];
   courseLocations.sort((a, b) => a.id - b.id);
-
-  console.log('Course start time:', course.startTime, typeof course.startTime);
-  console.log('Course end time:', course.endTime, typeof course.endTime);
 
   return (
     <div>
@@ -308,16 +288,16 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             refetchQueries={['ManagedCourse']}
             translationPrefix="course-page:weekdays."
             translationNamespace="course-page"
-          />{' '}
+          />
           <EduHubTimePicker
             label={t('start_time')}
-            value={course.startTime}
+            value={getStartTimeString(course)}
             onChange={updateCourseStartTime}
             className="mb-4"
           />
           <EduHubTimePicker
             label={t('end_time')}
-            value={course.endTime}
+            value={getEndTimeString(course)}
             onChange={updateCourseEndTime}
             className="mb-4"
           />
@@ -333,7 +313,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             refetchQueries={['ManagedCourse']}
             translationPrefix="course-page:languages."
             translationNamespace="course-page"
-          />{' '}
+          />
           <div>
             <EduHubNumberFieldEditor
               label={t('max_participants')}

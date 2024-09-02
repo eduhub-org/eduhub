@@ -29,7 +29,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useAdminQuery } from '../../../../hooks/authedQuery';
 import { MailTemplates } from '../../../../queries/__generated__/MailTemplates';
 import { INSERT_MAIL_LOG, MAIL_TEMPLATES } from '../../../../queries/mail';
-import { displayDate } from '../../../../helpers/dateHelpers';
+import { displayDate } from '../../../../helpers/dateTimeHelpers';
 import { InsertMailLog, InsertMailLogVariables } from '../../../../queries/__generated__/InsertMailLog';
 import {
   UpdateEnrollmentStatus,
