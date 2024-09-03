@@ -8,14 +8,14 @@ import { useRouter } from 'next/router';
 import * as fbq from '../lib/fpixel';
 
 import { registerLocale, setDefaultLocale } from 'react-datepicker';
-import de from 'date-fns/locale/de';
-import en from 'date-fns/locale/en-US';
+import { de } from 'date-fns/locale/de';
+import { enUS } from 'date-fns/locale/en-US';
 import useTranslation from 'next-translate/useTranslation';
 
 import { AppSettingsProvider } from '../contexts/AppSettingsContext';
 
 registerLocale('de', de);
-registerLocale('en', en);
+registerLocale('en', enUS);
 
 import log from 'loglevel';
 if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'production') {

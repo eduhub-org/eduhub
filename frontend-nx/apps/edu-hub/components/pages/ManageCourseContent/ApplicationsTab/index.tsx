@@ -48,8 +48,8 @@ interface IProps {
 }
 
 const now = new Date();
-const now7 = new Date();
-now7.setDate(now7.getDate() + 7);
+const nextWeek = new Date();
+nextWeek.setDate(nextWeek.getDate() + 7);
 
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const { t, lang } = useTranslation('manageCourse');
@@ -80,7 +80,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
   const [selectedEnrollments, setSelectedEnrollments] = useState([] as number[]);
 
-  const [inviteExpireDate, setInviteExpireDate] = useState(now7);
+  const [inviteExpireDate, setInviteExpireDate] = useState(nextWeek);
   const handleSetInviteExpireDate = useCallback(
     (d: Date | null) => {
       setInviteExpireDate(d || new Date());
