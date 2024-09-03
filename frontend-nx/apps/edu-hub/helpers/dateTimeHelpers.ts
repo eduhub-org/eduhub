@@ -20,19 +20,6 @@ export const useDisplayDate = () => {
   };
 };
 
-export const getWeekdayString = (
-  course: Course_Course_by_pk,
-  t: any,
-  short: boolean,
-  uppercased: boolean
-) => {
-  if (!course.weekDay) return null;
-
-  const weekday = short ? t(`${course.weekDay}-short`) : t(course.weekDay);
-
-  return uppercased ? weekday.toUpperCase() : weekday;
-};
-
 export const useFormatTimeString = () => {
   const { timeZone } = useAppSettings();
 
@@ -65,38 +52,58 @@ export const useFormatTimeString = () => {
   };
 };
 
-export const useStartTimeString = () => {
-  const formatTimeString = useFormatTimeString();
-  
-  return (course: Course_Course_by_pk) => {
-    const result = course.startTime ? formatTimeString(course.startTime) : '';
-    console.log('Start time input:', course.startTime, 'Formatted:', result);
-    return result;
-  };
+// Define a minimal course type that includes only the properties we need
+export type MinimalCourse = {
+  weekDay?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
 };
 
-export const useEndTimeString = () => {
-  const formatTimeString = useFormatTimeString();
-  
-  return (course: Course_Course_by_pk) => {
-    const result = course.endTime ? formatTimeString(course.endTime) : '';
-    console.log('End time input:', course.endTime, 'Formatted:', result);
-    return result;
-  };
+export const getWeekdayString = (
+  course: MinimalCourse,
+  t: any,
+  short: boolean = false,
+  uppercased: boolean = false
+): string => {
+  if (!course.weekDay || course.weekDay === 'NONE') return '';
+
+  const weekday = short ? t(`${course.weekDay}-short`) : t(course.weekDay);
+
+  return uppercased ? weekday.toUpperCase() : weekday;
 };
 
 export const useWeekdayStartAndEndString = () => {
   const getStartTimeString = useStartTimeString();
   const getEndTimeString = useEndTimeString();
   
-  return (course: Course_Course_by_pk, t: any) => {
-    const weekday = getWeekdayString(course, t, false, false);
-    const startTime = getStartTimeString(course);
-    const endTime = getEndTimeString(course);
+  return (course: MinimalCourse, t: any) => {
+    if (!course.weekDay || course.weekDay === 'NONE') return '';
 
+    const weekday = getWeekdayString(course, t);
+    const startTime = course.startTime ? getStartTimeString(course.startTime) : '';
+    const endTime = course.endTime ? getEndTimeString(course.endTime) : '';
+
+    if (!startTime) return weekday;
     if (!endTime) return `${weekday} ${startTime}`;
 
     return `${weekday} ${startTime} - ${endTime}`;
+  };
+};
+
+
+export const useStartTimeString = () => {
+  const formatTimeString = useFormatTimeString();
+  
+  return (time: string | null) => {
+    return time ? formatTimeString(time) : '';
+  };
+};
+
+export const useEndTimeString = () => {
+  const formatTimeString = useFormatTimeString();
+  
+  return (time: string | null) => {
+    return time ? formatTimeString(time) : '';
   };
 };
 
