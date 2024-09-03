@@ -172,23 +172,23 @@ jobs:
       GCP_REGION: ${{ secrets.GCP_REGION }}
       GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
 
-  build_rent_a_scientist_frontend:
-    name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
-    needs: [prepare_environment, check_folder_changes]
-    uses: ./.github/workflows/build-and-store-docker-image.yml
+  # build_rent_a_scientist_frontend:
+  #   name: Build and Store Rent-a-Scientist Docker Image in Google Docker Repo
+  #   needs: [prepare_environment, check_folder_changes]
+  #   uses: ./.github/workflows/build-and-store-docker-image.yml
 
-    with:
-      DOCKERFILE_FOLDER: frontend-nx
-      DOCKERFILE_NAME: Dockerfile-rent-a-scientist
-      IMAGE_NAME: rent-a-scientist
-      BRANCH: ${{ github.ref_name }}
-      PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
-      NEXT_PUBLIC_API_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_API_URL }}
-      NEXT_PUBLIC_AUTH_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_AUTH_URL }}
-      SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
-    secrets:
-      GCP_REGION: ${{ secrets.GCP_REGION }}
-      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
+  #   with:
+  #     DOCKERFILE_FOLDER: frontend-nx
+  #     DOCKERFILE_NAME: Dockerfile-rent-a-scientist
+  #     IMAGE_NAME: rent-a-scientist
+  #     BRANCH: ${{ github.ref_name }}
+  #     PROJECT_ID: ${{ needs.prepare_environment.outputs.PROJECT_ID }}
+  #     NEXT_PUBLIC_API_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_API_URL }}
+  #     NEXT_PUBLIC_AUTH_URL: ${{ needs.prepare_environment.outputs.NEXT_PUBLIC_AUTH_URL }}
+  #     SHA: ${{ needs.check_folder_changes.outputs.frontend_sha }}
+  #   secrets:
+  #     GCP_REGION: ${{ secrets.GCP_REGION }}
+  #     GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_EDUHUB_PRODUCTION_KEY }}
 
   zip_and_store_cloud_functions:
     name: Zip and Store Cloud Functions
