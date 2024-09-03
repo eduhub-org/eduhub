@@ -11,7 +11,6 @@ import {
   UPDATE_COURSE_HEADING_DESCRIPTION_2,
   UPDATE_COURSE_LANGUAGE,
   UPDATE_COURSE_LEARNING_GOALS,
-  UPDATE_COURSE_LOCATION,
   UPDATE_COURSE_MAX_PARTICIPANTS,
   UPDATE_COURSE_START_TIME,
   UPDATE_COURSE_WEEKDAY,
@@ -44,10 +43,6 @@ import {
   UpdateCourseEndTime,
   UpdateCourseEndTimeVariables,
 } from '../../../../queries/__generated__/UpdateCourseEndTime';
-import {
-  UpdateCourseLocation,
-  UpdateCourseLocationVariables,
-} from '../../../../queries/__generated__/UpdateCourseLocation';
 import {
   UpdateCourseStartTime,
   UpdateCourseStartTimeVariables,
@@ -155,13 +150,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     }); // Call the function directly
     qResult.refetch(); // Refetch the query to update the UI
   };
-
-  const [updateCourseLocation] = useRoleMutation<UpdateCourseLocation, UpdateCourseLocationVariables>(
-    UPDATE_COURSE_LOCATION,
-    {
-      onError: (error) => handleError(t(error.message)),
-    }
-  );
 
   const updateCourseStartTime = useUpdateCallback<UpdateCourseStartTime, UpdateCourseStartTimeVariables>(
     UPDATE_COURSE_START_TIME,
