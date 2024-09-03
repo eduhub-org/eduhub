@@ -7,12 +7,8 @@
   "currentDegreeElements": "Aktuelle Angebote im Rahmen des Degrees",
   "noDegreeElementsAvailable": "Aktuell gibt es keine laufenden Angebote zu diesem Degree.",
   "generalAchievementCertificateConditions": "**Online-Teilnahme:**\nWenn eine Online-Teilnahme möglich ist, wird die Teilnahme nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist.",
-  "externalProfile": "Homepage",
-  "linkedinProfile": "LinkedIn-Profil",
-  "xingProfile": "Xing-Profil",
   "showAllSessions": "Alle Termine anzeigen",
   "hideSessions": "Termine einklappen",
-  "speaker": "Referent:in",
   "courseSessions": "Kurstermine",
   "onboardingModal": {
     "declineConfirmText": "Möchtest du die Einladung zu diesem Kurs wirklich ablehnen?",
