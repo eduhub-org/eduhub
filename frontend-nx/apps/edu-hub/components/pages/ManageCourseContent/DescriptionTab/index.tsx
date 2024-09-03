@@ -76,9 +76,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const getStartTimeString = useStartTimeString();
   const getEndTimeString = useEndTimeString();
 
-  const startTime = getStartTimeString(course);
-  console.log('Start time:', course.startTime, 'Formatted:', startTime);
-
   const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_COURSE_LOCATION,
     {
@@ -291,13 +288,13 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           />
           <EduHubTimePicker
             label={t('start_time')}
-            value={getStartTimeString(course)}
+            value={getStartTimeString(course.startTime)}
             onChange={updateCourseStartTime}
             className="mb-4"
           />
           <EduHubTimePicker
             label={t('end_time')}
-            value={getEndTimeString(course)}
+            value={getEndTimeString(course.endTime)}
             onChange={updateCourseEndTime}
             className="mb-4"
           />
