@@ -4,7 +4,7 @@ import { FC, useCallback, useState } from 'react';
 import { GoPrimitiveDot } from 'react-icons/go';
 import { IoIosArrowDown, IoIosArrowUp, IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
 import { MdCheckBox, MdOutlineCheckBoxOutlineBlank } from 'react-icons/md';
-import { displayDate } from '../../../../helpers/dateHelpers';
+import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { ManagedCourse_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/ManagedCourse';
 import { MotivationRating_enum } from '../../../../__generated__/globalTypes';
 import { EhDot, greenDot, greyDot, orangeDot, redDot } from '../../../common/dots_old';
@@ -25,11 +25,12 @@ const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments | nu
   if (enrollment.invitationExpirationDate == null) {
     return false;
   }
-  return enrollment.invitationExpirationDate.setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
+  return new Date(enrollment.invitationExpirationDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
 };
 
 export const ApplicationRow: FC<IProps> = ({ enrollment, qResult, onSetRating, isRowSelected, onSelectRow }) => {
   const { t } = useTranslation();
+  const displayDate = useDisplayDate();
 
   const handleToggleRowSelected = useCallback(() => {
     if (enrollment != null) {

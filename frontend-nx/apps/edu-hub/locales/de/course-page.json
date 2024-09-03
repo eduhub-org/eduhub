@@ -138,7 +138,10 @@
   "achievement_option_not_selected": "Bitte wähle einen Leistungsnachweis aus.",
 
   "location": {
-    "label": "Veranstaltungsort"
+    "label": "Veranstaltungsort",
+    "ONLINE": "Online",
+    "KIEL": "Kiel",
+    "HEIDE": "Heide"
   },
   "address": {
     "label": "Link oder Adresse",

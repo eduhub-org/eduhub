@@ -29,7 +29,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useAdminQuery } from '../../../../hooks/authedQuery';
 import { MailTemplates } from '../../../../queries/__generated__/MailTemplates';
 import { INSERT_MAIL_LOG, MAIL_TEMPLATES } from '../../../../queries/mail';
-import { displayDate } from '../../../../helpers/dateHelpers';
+import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { InsertMailLog, InsertMailLogVariables } from '../../../../queries/__generated__/InsertMailLog';
 import {
   UpdateEnrollmentStatus,
@@ -54,6 +54,7 @@ now7.setDate(now7.getDate() + 7);
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const { t, lang } = useTranslation('manageCourse');
   const currentRole = useCurrentRole();
+  const displayDate = useDisplayDate();
 
   const infoDots = (
     <>
@@ -185,6 +186,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     setIsInviteDialogOpen,
     inviteExpireDate,
     course,
+    displayDate,
   ]);
 
   const handleSelectRow = useCallback(

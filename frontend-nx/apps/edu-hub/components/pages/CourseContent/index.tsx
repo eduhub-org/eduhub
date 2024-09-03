@@ -16,7 +16,7 @@ import { ContentRow } from '../../common/ContentRow';
 import { PageBlock } from '../../common/PageBlock';
 import { DescriptionFields } from './DescriptionFields';
 import { TimeLocationLanguageInstructors } from './TimeLocationLanguageInstructors';
-import { getWeekdayStartAndEndString } from '../../../helpers/dateHelpers';
+import { useWeekdayStartAndEndString } from '../../../helpers/dateTimeHelpers';
 import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
 import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
@@ -32,6 +32,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   const isLoggedIn = useIsLoggedIn();
   const userId = useUserId();
   const [resetValues, setResetValues] = useState(null);
+  const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
   // Query for authorized course data
   const [
@@ -42,7 +43,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       id,
       userId,
     },
-    fetchPolicy:'cache-and-network',
+    fetchPolicy: 'cache-and-network',
     async onCompleted(data) {
       // Check if user has been invited to the course and the invitation has not expired
       const courseEnrollment = getCourseEnrollment(data?.Course_by_pk, userId);
@@ -138,7 +139,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 <ContentRow className="items-center">
                   <div className="flex flex-1 flex-col text-white mb-4 lg:mb-20">
                     {course.weekDay !== 'NONE' ? (
-                      <span className="text-xs">{getWeekdayStartAndEndString(course, lang, t)}</span>
+                      <span className="text-xs">{getWeekdayStartAndEndString(course, t)}</span>
                     ) : null}
                     <span className="text-2xl mt-2">{course.tagline}</span>
                   </div>
