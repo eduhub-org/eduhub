@@ -186,6 +186,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     setIsInviteDialogOpen,
     inviteExpireDate,
     course,
+    displayDate,
   ]);
 
   const handleSelectRow = useCallback(

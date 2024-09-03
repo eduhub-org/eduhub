@@ -7,7 +7,7 @@ import {
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import EhTimeSelect from '../../../common/EhTimeSelect';
-import { useFormatTime, useDisplayDate } from '../../../../helpers/dateTimeHelpers';
+import { useFormatTime } from '../../../../helpers/dateTimeHelpers';
 import { DebounceInput } from 'react-debounce-input';
 import { eventTargetValueMapper, useRoleMutation } from '../../../../hooks/authedMutation';
 
@@ -68,7 +68,6 @@ export const SessionRow: FC<IProps> = ({
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
   const formatTime = useFormatTime();
-  const displayDate = useDisplayDate();
 
   const handleDelete = useCallback(() => {
     if (session != null) {

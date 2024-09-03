@@ -1,6 +1,5 @@
 import { parse, parseISO } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
-import { Course_Course_by_pk } from '../queries/__generated__/Course';
 import { useAppSettings } from '../contexts/AppSettingsContext';
 
 export const format2Digits = (n: number) => {
@@ -62,8 +61,8 @@ export type MinimalCourse = {
 export const getWeekdayString = (
   course: MinimalCourse,
   t: any,
-  short: boolean = false,
-  uppercased: boolean = false
+  short = false,
+  uppercased = false
 ): string => {
   if (!course.weekDay || course.weekDay === 'NONE') return '';
 
@@ -90,7 +89,6 @@ export const useWeekdayStartAndEndString = () => {
   };
 };
 
-
 export const useStartTimeString = () => {
   const formatTimeString = useFormatTimeString();
   
@@ -112,7 +110,7 @@ export const useFormatTime = () => {
   
   return (time: Date | string | null): string => {
     if (time == null) {
-      return useFormatTime()(new Date());
+      return formatInTimeZone(new Date(), timeZone, 'HH:mm');
     }
     const zonedTime = typeof time === 'string' ? parseISO(time) : time;
     const formattedTime = formatInTimeZone(zonedTime, timeZone, 'HH:mm');

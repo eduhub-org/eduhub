@@ -13,7 +13,7 @@ interface IProps {
 }
 
 export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
-  const { t, lang } = useTranslation();
+  const { t } = useTranslation();
   const { t: tLanguage } = useTranslation('common');
 
   const getStartTimeString = useStartTimeString();

@@ -1,5 +1,5 @@
-import { FC, useCallback } from 'react';
-import { FormProvider, SubmitHandler, useForm, Controller } from 'react-hook-form';
+import { FC } from 'react';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
