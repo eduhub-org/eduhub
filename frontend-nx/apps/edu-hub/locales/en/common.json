@@ -117,5 +117,6 @@
   "confirm_delete": "Confirm Deletion",
   "error": "Error",
   "select_time": "Select time",
-  "close": "Close"
+  "close": "Close",
+  "ok": "OK"
 }
