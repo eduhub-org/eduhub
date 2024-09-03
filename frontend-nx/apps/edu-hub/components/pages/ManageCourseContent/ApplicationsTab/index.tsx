@@ -7,7 +7,7 @@ import {
   ManagedCourse_Course_by_pk_CourseEnrollments,
 } from '../../../../queries/__generated__/ManagedCourse';
 import { ApplicationRow } from './ApplicationRow';
-import { greenDot, greyDot, orangeDot, redDot } from '../../../common/dots_old';
+import Dot from '../../../common/Dot';
 import { OnlyAdmin } from '../../../common/OnlyLoggedIn';
 import {
   identityEventMapper,
@@ -29,7 +29,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useAdminQuery } from '../../../../hooks/authedQuery';
 import { MailTemplates } from '../../../../queries/__generated__/MailTemplates';
 import { INSERT_MAIL_LOG, MAIL_TEMPLATES } from '../../../../queries/mail';
-import { displayDate } from '../../../../helpers/dateHelpers';
+import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { InsertMailLog, InsertMailLogVariables } from '../../../../queries/__generated__/InsertMailLog';
 import {
   UpdateEnrollmentStatus,
@@ -54,28 +54,29 @@ now7.setDate(now7.getDate() + 7);
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const { t, lang } = useTranslation('manageCourse');
   const currentRole = useCurrentRole();
+  const displayDate = useDisplayDate();
 
   const infoDots = (
     <>
-      <div>{t('course-page:application-rating')}</div>
-      <div className="grid grid-cols-6 text-gray-400">
-        <div>
-          {greenDot} {t('course-page:invite')}
-        </div>
-        <div>
-          {orangeDot} {t('course-page:unclear')}
-        </div>
-        <div>
-          {redDot} {t('course-page:reject')}
-        </div>
-        <div>
-          {greyDot} {t('course-page:not-rated')}
-        </div>
-        <div />
-        <div />
+    <div>{t('course-page:application-rating')}</div>
+    <div className="grid grid-cols-6 text-gray-400">
+      <div>
+        <Dot color="lightgreen" /> {t('course-page:invite')}
       </div>
-    </>
-  );
+      <div>
+        <Dot color="orange" /> {t('course-page:unclear')}
+      </div>
+      <div>
+        <Dot color="red" /> {t('course-page:reject')}
+      </div>
+      <div>
+        <Dot color="grey" /> {t('course-page:not-rated')}
+      </div>
+      <div />
+      <div />
+    </div>
+  </>
+);
 
   const [selectedEnrollments, setSelectedEnrollments] = useState([] as number[]);
 
@@ -185,6 +186,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     setIsInviteDialogOpen,
     inviteExpireDate,
     course,
+    displayDate,
   ]);
 
   const handleSelectRow = useCallback(

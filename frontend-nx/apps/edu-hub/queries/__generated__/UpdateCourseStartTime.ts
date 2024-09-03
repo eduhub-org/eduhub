@@ -10,6 +10,10 @@
 export interface UpdateCourseStartTime_update_Course_by_pk {
   __typename: "Course";
   id: number;
+  /**
+   * The time the course starts each week.
+   */
+  startTime: any | null;
 }
 
 export interface UpdateCourseStartTime {
@@ -21,5 +25,5 @@ export interface UpdateCourseStartTime {
 
 export interface UpdateCourseStartTimeVariables {
   courseId: number;
-  startTime: any;
+  startTime?: any | null;
 }

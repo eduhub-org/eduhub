@@ -128,6 +128,8 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
     </div>
   );
 
+  const MARKDOWN_GUIDE_URL = 'https://www.markdownguide.org';
+
   const renderMarkdownInput = () => (
     <>
       {showPreview ? (
@@ -138,16 +140,27 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
           >
             {value}
           </ReactMarkdown>
+          <a
+            href={MARKDOWN_GUIDE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline text-blue-400 hover:text-blue-300"
+          >
+            {t('markdown_info')}
+          </a>
         </div>
       ) : (
         <div>{renderInput()}</div>
       )}
-      <div className="text-white text-xs px-3 pb-8 mt-[-26px]">
-        {`${t('markdown_info')} (`}
-        <a href="https://www.markdownguide.org" target="_blank" rel="noreferrer">
-          <u>{t('https://markdownguide.org')}</u>
+      <div className="text-white text-xs px-3 pb-8">
+        <a
+          href={MARKDOWN_GUIDE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-blue-400 hover:text-blue-300"
+        >
+          {t('markdown_info')}
         </a>
-        {`).`}
       </div>
     </>
   );

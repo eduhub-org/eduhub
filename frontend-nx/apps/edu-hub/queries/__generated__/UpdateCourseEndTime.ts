@@ -10,6 +10,10 @@
 export interface UpdateCourseEndTime_update_Course_by_pk {
   __typename: "Course";
   id: number;
+  /**
+   * The time the course ends each week.
+   */
+  endTime: any | null;
 }
 
 export interface UpdateCourseEndTime {
@@ -21,5 +25,5 @@ export interface UpdateCourseEndTime {
 
 export interface UpdateCourseEndTimeVariables {
   courseId: number;
-  endTime: any;
+  endTime?: any | null;
 }
