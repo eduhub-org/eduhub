@@ -2,7 +2,7 @@ import { FC, useRef, useCallback, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
-import { IconButton } from '@material-ui/core';
+import { IconButton } from '@mui/material';
 import { MdUpload } from 'react-icons/md';
 
 import { parseFileUploadEvent } from '../../../helpers/filehandling';

@@ -64,6 +64,7 @@ export const Page: FC<PageProps> = ({ children, className }) => {
   return (
     <>
       <Transition
+        as="div"
         show={bannerState.isVisible && !appSettingsLoading && !appSettingsError}
         enter="transition-transform duration-150 origin-top"
         enterFrom="scale-y-0"

@@ -56,7 +56,7 @@ import {
   UpdateProgramUploadDeadlineVariables,
 } from '../../../queries/__generated__/UpdateProgramUploadDeadline';
 
-import { Button } from '@material-ui/core';
+import { Button } from '@mui/material';
 
 import { InsertProgram, InsertProgramVariables } from '../../../queries/__generated__/InsertProgram';
 import { DeleteProgram, DeleteProgramVariables } from '../../../queries/__generated__/DeleteProgram';
