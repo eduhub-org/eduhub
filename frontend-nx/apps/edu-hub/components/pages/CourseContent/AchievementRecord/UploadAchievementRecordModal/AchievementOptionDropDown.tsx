@@ -1,8 +1,8 @@
-import { ListItemText } from '@material-ui/core';
-import Fade from '@material-ui/core/Fade';
-import MaterialMenu, { MenuProps } from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import { withStyles } from '@material-ui/core/styles';
+import { ListItemText } from '@mui/material';
+import Fade from '@mui/material/Fade';
+import MaterialMenu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { styled } from '@mui/material/styles';
 import { MinAchievementOption } from '../../../../../helpers/achievement';
 import React, { FC, createElement, useCallback } from 'react';
 import { AchievementOptionCourses_AchievementOptionCourse_AchievementOption } from '../../../../../queries/__generated__/AchievementOptionCourses';
@@ -15,25 +15,13 @@ interface IProps {
   callback: (item: AchievementOptionCourses_AchievementOptionCourse_AchievementOption) => void;
 }
 
-const StyledMenu = withStyles({
-  paper: {
+// Replace with styled
+const StyledMenu = styled(MaterialMenu)(() => ({
+  '& .MuiPaper-root': {
     minWidth: '225px',
     padding: '1rem 2rem',
   },
-})((props: MenuProps) => (
-  <MaterialMenu
-    getContentAnchorEl={null}
-    anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'right',
-    }}
-    transformOrigin={{
-      vertical: 'top',
-      horizontal: 'right',
-    }}
-    {...props}
-  />
-));
+}));
 
 export const AchievementOptionDropDown: FC<IProps> = ({
   anchorElement,
@@ -55,11 +43,17 @@ export const AchievementOptionDropDown: FC<IProps> = ({
     <StyledMenu
       id="fade-menu"
       anchorEl={anchorElement}
-      // keepMounted
       open={isVisible}
       onClose={hideMenu}
       TransitionComponent={Fade}
-      className="min-w-full"
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
     >
       {courseAchievementOptions.map((data, index) =>
         createElement('div', { key: `items-${index}` }, <SingleOption callback={onOptionClick} item={data} />)
@@ -69,17 +63,20 @@ export const AchievementOptionDropDown: FC<IProps> = ({
 };
 
 export default AchievementOptionDropDown;
+
 interface IPropsSingleItem {
   callback: (data: MinAchievementOption) => void;
   item: MinAchievementOption;
 }
-const SingleOption: FC<IPropsSingleItem> = (option) => {
+
+const SingleOption: FC<IPropsSingleItem> = ({ callback, item }) => {
   const onOptionClick = useCallback(() => {
-    option.callback(option.item);
-  }, [option]);
+    callback(item);
+  }, [callback, item]);
+
   return (
     <MenuItem onClick={onOptionClick}>
-      <ListItemText primary={option.item.title} className="text" />
+      <ListItemText primary={item.title} className="text" />
     </MenuItem>
   );
 };

@@ -22,7 +22,7 @@ import {
 } from '../../../../queries/__generated__/UpdateEnrollmentRating';
 import { UPDATE_ENROLLMENT_STATUS, UPDATE_ENROLLMENT_RATING } from '../../../../queries/insertEnrollment';
 import { Button as OldButton } from '../../../common/Button';
-import { Dialog, DialogTitle } from '@material-ui/core';
+import { Dialog, DialogTitle } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -36,11 +36,11 @@ import {
   UpdateEnrollmentStatusVariables,
 } from '../../../../queries/__generated__/UpdateEnrollmentStatus';
 import useTranslation from 'next-translate/useTranslation';
-import { useCurrentRole } from '../../../../hooks/authentication';
 import { AuthRoles } from '../../../../types/enums';
 import AddButton from '../../../common/AddButton';
 import Modal from '../../../common/Modal';
 import AddParticipantsForm from './AddParticipantsForm';
+import { useCurrentRole } from '../../../../hooks/authentication';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -53,7 +53,6 @@ nextWeek.setDate(nextWeek.getDate() + 7);
 
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const { t, lang } = useTranslation('manageCourse');
-  const currentRole = useCurrentRole();
   const displayDate = useDisplayDate();
 
   const infoDots = (
@@ -77,6 +76,8 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     </div>
   </>
 );
+
+  const currentRole = useCurrentRole();
 
   const [selectedEnrollments, setSelectedEnrollments] = useState([] as number[]);
 

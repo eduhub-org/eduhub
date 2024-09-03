@@ -1,4 +1,4 @@
-import { Link, Tooltip } from '@material-ui/core';
+import { Link, Tooltip } from '@mui/material';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback } from 'react';
 

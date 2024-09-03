@@ -3,20 +3,29 @@ import { useAdminMutation } from '../../hooks/authedMutation';
 import { DocumentNode } from 'graphql';
 import useTranslation from 'next-translate/useTranslation';
 import { gql } from '@apollo/client';
-import { Radio, RadioGroup, FormControlLabel, FormControl, withStyles } from '@material-ui/core';
+import { Radio, RadioGroup, FormControlLabel, FormControl } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
 type RadioButtonSelectorProps = {
   immediateCommit?: boolean;
   label: string;
   itemId: number;
   currentValue: string;
-  radioOptions: { value: string, label: string }[];
+  radioOptions: { value: string; label: string }[];
   setRadioMutation?: DocumentNode;
-  onSelectedValueChange?: (newValue: string) => void; 
+  onSelectedValueChange?: (newValue: string) => void;
   refetchQueries: string[];
   className?: string;
   translationNamespace?: string;
 };
+
+// Create a styled Radio component
+const GrayRadio = styled(Radio)(() => ({
+  color: '#4A5568', // Tailwind's gray-400
+  '&.Mui-checked': {
+    color: '#4A5568',
+  },
+}));
 
 const RadioButtonSelector: React.FC<RadioButtonSelectorProps> = ({
   immediateCommit = true,
@@ -33,16 +42,6 @@ const RadioButtonSelector: React.FC<RadioButtonSelectorProps> = ({
   const [value, setValue] = useState(currentValue);
   const { t } = useTranslation();
 
-  const GrayRadio = withStyles({
-    root: {
-      color: '#4A5568',  // This is the hex code for Tailwind's gray-400
-      '&$checked': {
-        color: '#4A5568',
-      },
-    },
-    checked: {},
-  })(Radio);
-
   const DUMMY_MUTATION = gql`
     mutation DummyMutation {
       __typename
@@ -53,7 +52,7 @@ const RadioButtonSelector: React.FC<RadioButtonSelectorProps> = ({
     refetchQueries,
   });
 
-  const handleChange = (event) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
     setValue(newValue);
 
@@ -68,22 +67,13 @@ const RadioButtonSelector: React.FC<RadioButtonSelectorProps> = ({
   return (
     <div className={className}>
       <FormControl component="fieldset">
-        <RadioGroup
-          aria-label={label}
-          name={label}
-          value={value}
-          onChange={handleChange}
-        >
+        <RadioGroup aria-label={label} name={label} value={value} onChange={handleChange}>
           {radioOptions.map((option, index) => (
             <FormControlLabel
               key={index}
               value={option.value}
-              control={<GrayRadio/>}
-              label={
-                translationNamespace
-                  ? t(`${translationNamespace}:${option.label}`)
-                  : option.label
-              }
+              control={<GrayRadio />}
+              label={translationNamespace ? t(`${translationNamespace}:${option.label}`) : option.label}
             />
           ))}
         </RadioGroup>

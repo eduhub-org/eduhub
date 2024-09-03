@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import NextLink from 'next/link';
-import MuiLink from '@material-ui/core/Link';
+import MuiLink from '@mui/material/Link';
 import { useUser } from '../../../../edu-hub/hooks/user';
 import { COMPLETED_DEGREE_ENROLLMENTS } from '../../../queries/courseDegree';
 import {
