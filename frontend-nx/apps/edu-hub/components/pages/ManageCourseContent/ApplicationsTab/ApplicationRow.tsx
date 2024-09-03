@@ -12,7 +12,6 @@ import { OnlyAdmin } from '../../../common/OnlyLoggedIn';
 
 interface IProps {
   enrollment: ManagedCourse_Course_by_pk_CourseEnrollments | null;
-  qResult: QueryResult<any, any>;
   isRowSelected: boolean;
   onSelectRow: (enrollmentId: number, selected: boolean) => any;
   onSetRating: (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments, rating: MotivationRating_enum) => any;
@@ -28,7 +27,7 @@ const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments | nu
   return enrollment.invitationExpirationDate.setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
 };
 
-export const ApplicationRow: FC<IProps> = ({ enrollment, qResult, onSetRating, isRowSelected, onSelectRow }) => {
+export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelected, onSelectRow }) => {
   const { t } = useTranslation();
 
   const handleToggleRowSelected = useCallback(() => {

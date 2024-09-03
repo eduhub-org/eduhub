@@ -70,7 +70,7 @@ const EduHubTimePicker: React.FC<EduHubTimePickerProps> = ({
             value={value ?? nowTime}
             {...props} // spread the rest of the props
           >
-            {timeOptions.map((option, index) => (
+            {timeOptions.map((option) => (
               <option key={option} value={option}>
                 {option}
               </option>

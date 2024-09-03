@@ -1,35 +1,36 @@
-import { ChangeEvent, FC, useCallback } from 'react';
+import { ChangeEvent, FC, useCallback, useMemo } from 'react';
 
 interface IProps {
   value?: string;
   className?: string;
-  onChange: (value: string) => any;
+  onChange: (value: string) => void;
 }
 
-const format2Digits = (n: number) => {
-  return `${n < 10 ? '0' : ''}${n}`;
-};
+// Function to format a number into a two-digit string
+const format2Digits = (n: number) => `${n < 10 ? '0' : ''}${n}`;
 
+// Function to format time into a "HH:MM" string, rounded to the nearest 15 minutes
 export const formatTime = (time: Date | null): string => {
-  if (time == null) {
-    return formatTime(new Date());
-  }
-  return format2Digits(time.getHours()) + ':' + format2Digits(Math.round(time.getMinutes() / 15) * 15);
+  const now = time || new Date();
+  return `${format2Digits(now.getHours())}:${format2Digits(Math.round(now.getMinutes() / 15) * 15)}`;
 };
 
-const now = new Date();
-const nowTime = formatTime(now);
+// Generate time options at 15-minute intervals for 24 hours
+const generateTimeOptions = () => {
+  const times: string[] = [];
+  for (let i = 0; i < 24 * 4; i++) {
+    const minutes = i * 15;
+    const hours = Math.floor(minutes / 60);
+    const remainderMinutes = minutes % 60;
+    times.push(`${format2Digits(hours)}:${format2Digits(remainderMinutes)}`);
+  }
+  return times;
+};
 
-const options: string[] = [];
-for (let i = 0; i < 24 * 4; i++) {
-  const iMinutes = i * 15;
-  const hours = Math.floor(iMinutes / 60);
-  const minutes = iMinutes % 60;
-  options.push(format2Digits(hours) + ':' + format2Digits(minutes));
-}
-
-// I tried to use react-time-picker, but it doesnt work with next.js due to global css imports from node_modules
 const EhTimeSelect: FC<IProps> = ({ value, onChange, className }) => {
+  const nowTime = useMemo(() => formatTime(null), []);
+  const options = useMemo(generateTimeOptions, []);
+
   const onChangeEvent = useCallback(
     (event: ChangeEvent<HTMLSelectElement>) => onChange(event.target.value),
     [onChange]
@@ -37,7 +38,7 @@ const EhTimeSelect: FC<IProps> = ({ value, onChange, className }) => {
 
   return (
     <select className={className} onChange={onChangeEvent} value={value ?? nowTime}>
-      {options.map((option, index) => (
+      {options.map((option) => (
         <option key={option} value={option}>
           {option}
         </option>

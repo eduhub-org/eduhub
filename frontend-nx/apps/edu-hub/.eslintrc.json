@@ -10,7 +10,8 @@
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
         "@next/next/no-html-link-for-pages": ["error", "apps/edu-hub/pages"],
-        "react/react-in-jsx-scope": "off" // Disable rule for React 17+ JSX transform
+        "react/react-in-jsx-scope": "off",
+        "react/prop-types": "off"
       }
     }
   ],

@@ -39,7 +39,6 @@ interface TableGridProps<T extends BaseRow> {
   loading: boolean;
   pageIndex?: number;
   pages?: number;
-  pageSize?: number;
   refetchQueries: string[];
   searchFilter?: string;
   setPageIndex?: (number) => void;
@@ -64,7 +63,6 @@ const TableGrid = <T extends BaseRow>({
   loading,
   pageIndex = 0,
   pages,
-  pageSize,
   refetchQueries,
   searchFilter,
   setSearchFilter,
@@ -149,7 +147,16 @@ const TableGrid = <T extends BaseRow>({
           ]
         : [];
     return [...dataColumns, ...expandCollapseColumn, ...deleteColumn];
-  }, [columns, deleteMutation, refetchQueries, showDelete, expandedRows, toggleRowExpansion, deleteIdType]);
+  }, [
+    columns,
+    deleteMutation,
+    refetchQueries,
+    showDelete,
+    expandedRows,
+    toggleRowExpansion,
+    deleteIdType,
+    generateDeletionConfirmationQuestion,
+  ]);
 
   const table = useReactTable({
     data,

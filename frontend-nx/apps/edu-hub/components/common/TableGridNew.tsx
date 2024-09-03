@@ -40,7 +40,7 @@ const TableGrid = <T extends object>({
             id: 'selection',
             accessorFn: (row) => row.name,
             Header: () => <div>Select</div>,
-            Cell: ({ row }) => <input type="checkbox" />,
+            Cell: () => <input type="checkbox" />,
           },
         ]
       : [];
@@ -57,7 +57,7 @@ const TableGrid = <T extends object>({
             id: 'delete',
             accessorFn: (row) => row.name,
             Header: () => <div>Delete</div>,
-            Cell: ({ row }) => (
+            Cell: () => (
               <IconButton size="small">
                 <MdDelete size="1.25em" />
               </IconButton>

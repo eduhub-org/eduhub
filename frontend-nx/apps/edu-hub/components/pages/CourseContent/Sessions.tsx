@@ -3,7 +3,6 @@ import useTranslation from 'next-translate/useTranslation';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
 import { Course_Course_by_pk_Sessions as Session } from '../../../queries/__generated__/Course';
-import { isLinkFormat } from '../../../helpers/util';
 import UserCard from '../../common/UserCard';
 import { useIsAdmin, useIsInstructor } from '../../../hooks/authentication';
 
@@ -12,12 +11,9 @@ interface SessionsProps {
   isLoggedInParticipant: boolean;
 }
 
-export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant }) => {
+export const Sessions: FC<SessionsProps> = ({ sessions }) => {
   const { t, lang } = useTranslation('course-page');
   const [showAllSessions, setShowAllSessions] = useState(false);
-
-  const isAdmin = useIsAdmin();
-  const isInstructor = useIsInstructor();
 
   const initiallyShownSessions = 4;
 
@@ -31,7 +27,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
         <>
           <span className="text-3xl font-semibold mt-24">{t('course_sessions')}</span>
           <ul>
-            {visibleSessions.map(({ startDateTime, endDateTime, title, SessionAddresses, SessionSpeakers }, index) => (
+            {visibleSessions.map(({ startDateTime, endDateTime, title, SessionSpeakers }, index) => (
               <li key={index} className="flex mb-4">
                 <div className="flex flex-wrap items-start flex-shrink-0 mb-2">
                   <div className="flex flex-col mr-6">
