@@ -22,7 +22,6 @@ type TextFieldEditorProps = {
   errorText?: string;
   translationNamespace?: string;
   isMandatory?: boolean;
-  style?: string;
 };
 
 const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
@@ -38,7 +37,6 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
   errorText,
   translationNamespace,
   isMandatory = false,
-  style,
 }) => {
   const { t } = useTranslation(translationNamespace);
 

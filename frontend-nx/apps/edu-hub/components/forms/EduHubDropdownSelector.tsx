@@ -20,7 +20,6 @@ interface EduHubDropdownSelectorProps {
   idVariables: Record<string, any>;
   refetchQueries?: string[];
   onChange?: (newValue: string) => void;
-  errorText?: string;
   translationNamespace?: string;
 }
 
@@ -35,7 +34,6 @@ const EduHubDropdownSelector: React.FC<EduHubDropdownSelectorProps> = ({
   idVariables,
   refetchQueries = [],
   onChange,
-  errorText = 'Update failed',
   translationNamespace,
 }) => {
   const { t } = useTranslation(translationNamespace);

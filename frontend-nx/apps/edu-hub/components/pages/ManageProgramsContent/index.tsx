@@ -439,7 +439,7 @@ export const ManageProgramsContent: FC = () => {
           </div>
           {programs != null &&
             programs.length > 0 &&
-            programs.map((v, i) => (
+            programs.map((v) => (
               <ProgramsRow
                 key={v.id}
                 program={v}

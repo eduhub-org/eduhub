@@ -8,9 +8,6 @@ import languageIcon from '../../../public/images/course/language.svg';
 import locationIcon from '../../../public/images/course/pin.svg';
 import { getTileImage } from '../../../helpers/imageHandling';
 import {
-  useStartTimeString,
-  useEndTimeString,
-  getWeekdayString,
   useWeekdayStartAndEndString,
 } from '../../../helpers/dateTimeHelpers';
 
@@ -23,8 +20,6 @@ interface TileProps {
 
 export const Tile: FC<TileProps> = ({ course, isManage }) => {
   const { t } = useTranslation('common');
-  const getStartTimeString = useStartTimeString();
-  const getEndTimeString = useEndTimeString();
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
   // Needed for legacy reasons: For cases where the image in the optimal image size does not exist but only the original image size

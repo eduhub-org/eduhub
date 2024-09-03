@@ -12,11 +12,10 @@ import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTyp
 
 interface AddParticipantsFormProps {
   courseId: number;
-  children?: React.ReactNode;
   onSubmit: () => void;
 }
 
-export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, children, onSubmit }) => {
+export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, onSubmit }) => {
   const { t } = useTranslation('manageCourse');
 
   // State hooks

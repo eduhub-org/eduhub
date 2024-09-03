@@ -4,7 +4,7 @@ import { format2Digits, useFormatTime } from '../../helpers/dateTimeHelpers';
 interface IProps {
   value?: string;
   className?: string;
-  onChange: (value: string) => any;
+  onChange: (value: string) => void;
 }
 
 const EhTimeSelect: FC<IProps> = ({ value, onChange, className }) => {

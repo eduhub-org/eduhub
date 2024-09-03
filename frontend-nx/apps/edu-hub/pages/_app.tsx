@@ -35,7 +35,7 @@ interface InitialProps {
 // @ts-expect-error Typing does not work correctly here because of getInitialProps
 const MyApp: FC<AppProps & InitialProps> & {
   getInitialProps: (ctx: AppContext) => Promise<Record<string, unknown>>;
-} = ({ Component, pageProps, cookies }) => {
+} = ({ Component, pageProps }) => {
   const { lang } = useTranslation();
   setDefaultLocale(lang);
 

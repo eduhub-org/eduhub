@@ -28,7 +28,7 @@ import AchievementRecord from './AchievementRecord';
 import { useIsCourseWithEnrollment } from '../../../hooks/course';
 
 const CourseContent: FC<{ id: number }> = ({ id }) => {
-  const { t, lang } = useTranslation();
+  const { t } = useTranslation();
   const isLoggedIn = useIsLoggedIn();
   const userId = useUserId();
   const [resetValues, setResetValues] = useState(null);

@@ -1,18 +1,22 @@
-import {
-  QueryResult,
-  useMutation,
-  DocumentNode,
-} from '@apollo/client';
+import { QueryResult, useMutation, DocumentNode, MutationFunctionOptions } from '@apollo/client';
 import { useSession } from 'next-auth/react';
 import { useCallback } from 'react';
 
 import { useCurrentRole } from './authentication';
-
 import { AuthRoles } from '../types/enums';
 
-export const useRoleMutation: typeof useMutation = (
-  mutation,
-  passedOptions
+type CustomContext = {
+  headers?: Record<string, string>;
+  role?: AuthRoles;
+};
+
+type CustomMutationOptions<TData, TVariables> = MutationFunctionOptions<TData, TVariables> & {
+  context?: CustomContext;
+};
+
+export const useRoleMutation = <TData = any, TVariables = any>(
+  mutation: DocumentNode,
+  passedOptions?: CustomMutationOptions<TData, TVariables>
 ) => {
   const { data } = useSession();
   const accessToken = data?.accessToken;
@@ -37,12 +41,13 @@ export const useRoleMutation: typeof useMutation = (
       }
     : passedOptions;
 
-  return useMutation(mutation, options);
+  return useMutation<TData, TVariables>(mutation, options);
 };
 
-export const useInstructorMutation: typeof useMutation = (
-  mutation,
-  passedOptions
+// Corrected useInstructorMutation hook
+export const useInstructorMutation = <TData = any, TVariables = any>(
+  mutation: DocumentNode,
+  passedOptions?: CustomMutationOptions<TData, TVariables>
 ) => {
   const { data } = useSession();
   const accessToken = data?.accessToken;
@@ -61,12 +66,13 @@ export const useInstructorMutation: typeof useMutation = (
       }
     : passedOptions;
 
-  return useMutation(mutation, options);
+  return useMutation<TData, TVariables>(mutation, options);
 };
 
-export const useAdminMutation: typeof useMutation = (
-  mutation,
-  passedOptions
+// Corrected useAdminMutation hook
+export const useAdminMutation = <TData = any, TVariables = any>(
+  mutation: DocumentNode,
+  passedOptions?: CustomMutationOptions<TData, TVariables>
 ) => {
   const { data } = useSession();
   const accessToken = data?.accessToken;
@@ -85,12 +91,13 @@ export const useAdminMutation: typeof useMutation = (
       }
     : passedOptions;
 
-  return useMutation(mutation, options);
+  return useMutation<TData, TVariables>(mutation, options);
 };
 
-export const useAuthedMutation: typeof useMutation = (
-  mutation,
-  passedOptions
+// Corrected useAuthedMutation hook
+export const useAuthedMutation = <TData = any, TVariables = any>(
+  mutation: DocumentNode,
+  passedOptions?: CustomMutationOptions<TData, TVariables>
 ) => {
   const { data } = useSession();
   const accessToken = data?.accessToken;
@@ -108,9 +115,10 @@ export const useAuthedMutation: typeof useMutation = (
       }
     : passedOptions;
 
-  return useMutation(mutation, options);
+  return useMutation<TData, TVariables>(mutation, options);
 };
 
+// Helper functions for event mappers
 export const identityEventMapper = (x: any) => x;
 export const eventTargetValueMapper = (x: any) => x.target.value;
 export const eventTargetNumberMapper = (x: any) => Number(x.target.value);
@@ -183,6 +191,7 @@ export const useUpdateCallback2 = <QueryType, QueryVariables>(
   return callback;
 };
 
+// Callback for delete mutation
 export const useDeleteCallback = <QueryType, QueryVariables>(
   query: DocumentNode,
   pkField: keyof QueryVariables,

@@ -251,7 +251,6 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             <div className="text-gray-400">
               <ApplicationRow
                 enrollment={null}
-                qResult={qResult}
                 onSetRating={setEnrollmentRating}
                 onSelectRow={handleSelectRow}
                 isRowSelected={false}
@@ -261,7 +260,6 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
               <ApplicationRow
                 key={enrollment.id}
                 enrollment={enrollment}
-                qResult={qResult}
                 onSetRating={setEnrollmentRating}
                 onSelectRow={handleSelectRow}
                 isRowSelected={selectedEnrollments.includes(enrollment.id)}

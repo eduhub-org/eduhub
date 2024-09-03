@@ -60,7 +60,6 @@ interface IProps {
   onSuccess: () => void;
   userId: string;
   setAlertMessage: (message: string) => void;
-  courseTitle: string;
   user: User_User_by_pk;
   courseId: number;
   isOpen: boolean;
@@ -72,7 +71,6 @@ const UploadAchievementRecordModal: FC<IProps> = ({
   onSuccess,
   userId,
   setAlertMessage,
-  courseTitle,
   user,
   courseId,
   isOpen,
@@ -125,10 +123,8 @@ const UploadAchievementRecordModal: FC<IProps> = ({
 
   const onAchievementOptionDropdown = useCallback(
     (event: MouseEvent<HTMLElement>) => {
-      console.log('Dropdown clicked'); // Debug log
       setAnchorElement(event.currentTarget);
       setAchievementOptionVisibility((prevVisibility) => {
-        console.log('Visibility before:', prevVisibility); // Debug log
         return !prevVisibility;
       });
     },
@@ -262,6 +258,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
       }
     },
     [
+      courseId,
       selectedAchievementOption,
       state.documentationUrl,
       state.csvResults,
