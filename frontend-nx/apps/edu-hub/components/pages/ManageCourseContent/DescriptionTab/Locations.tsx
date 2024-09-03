@@ -16,12 +16,11 @@ import DeleteButton from '../../../../components/common/DeleteButton';
 
 interface LocationsIProps {
   location: ManagedCourse_Course_by_pk_CourseLocations | null;
-  onSetOption: (c: ManagedCourse_Course_by_pk_CourseLocations, p: string) => any;
   onDelete: (c: ManagedCourse_Course_by_pk_CourseLocations) => any;
   refetchQuery: QueryResult<any, any>;
 }
 
-export const Locations: FC<LocationsIProps> = ({ location, onSetOption, onDelete, refetchQuery }) => {
+export const Locations: FC<LocationsIProps> = ({ location, onDelete, refetchQuery }) => {
   const { t } = useTranslation('course-page');
 
   const queryLocationOptions = useRoleQuery<LocationOptions>(LOCATION_OPTIONS);

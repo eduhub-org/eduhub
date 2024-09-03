@@ -162,10 +162,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       onError: (error) => handleError(t(error.message)),
     }
   );
-  const handleUpdateCourseLocation = async (location, option) => {
-    await updateCourseLocation({ variables: { locationId: location.id, value: option } });
-    qResult.refetch();
-  };
 
   const updateCourseStartTime = useUpdateCallback<UpdateCourseStartTime, UpdateCourseStartTimeVariables>(
     UPDATE_COURSE_START_TIME,
@@ -332,7 +328,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             key={loc.id}
             location={loc}
             onDelete={handleDeleteCourseLocation}
-            onSetOption={handleUpdateCourseLocation}
             refetchQuery={qResult}
           />
         ))}

@@ -4,7 +4,6 @@ import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
 import { Course_Course_by_pk_Sessions as Session } from '../../../queries/__generated__/Course';
 import UserCard from '../../common/UserCard';
-import { useIsAdmin, useIsInstructor } from '../../../hooks/authentication';
 
 interface SessionsProps {
   sessions: Session[];
