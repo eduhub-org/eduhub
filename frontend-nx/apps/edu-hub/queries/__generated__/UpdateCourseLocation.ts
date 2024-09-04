@@ -12,6 +12,10 @@ import { LocationOption_enum } from "./../../__generated__/globalTypes";
 export interface UpdateCourseLocation_update_CourseLocation_by_pk {
   __typename: "CourseLocation";
   id: number;
+  /**
+   * Either 'ONLINE' or one of the possible given offline locations
+   */
+  locationOption: LocationOption_enum | null;
 }
 
 export interface UpdateCourseLocation {
@@ -23,5 +27,5 @@ export interface UpdateCourseLocation {
 
 export interface UpdateCourseLocationVariables {
   locationId: number;
-  option: LocationOption_enum;
+  value: LocationOption_enum;
 }

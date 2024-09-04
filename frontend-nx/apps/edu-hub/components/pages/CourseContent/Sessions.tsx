@@ -3,21 +3,16 @@ import useTranslation from 'next-translate/useTranslation';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
 import { Course_Course_by_pk_Sessions as Session } from '../../../queries/__generated__/Course';
-import { isLinkFormat } from '../../../helpers/util';
 import UserCard from '../../common/UserCard';
-import { useIsAdmin, useIsInstructor } from '../../../hooks/authentication';
 
 interface SessionsProps {
   sessions: Session[];
   isLoggedInParticipant: boolean;
 }
 
-export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant }) => {
+export const Sessions: FC<SessionsProps> = ({ sessions }) => {
   const { t, lang } = useTranslation('course-page');
   const [showAllSessions, setShowAllSessions] = useState(false);
-
-  const isAdmin = useIsAdmin();
-  const isInstructor = useIsInstructor();
 
   const initiallyShownSessions = 4;
 
@@ -31,7 +26,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
         <>
           <span className="text-3xl font-semibold mt-24">{t('course_sessions')}</span>
           <ul>
-            {visibleSessions.map(({ startDateTime, endDateTime, title, SessionAddresses, SessionSpeakers }, index) => (
+            {visibleSessions.map(({ startDateTime, endDateTime, title, SessionSpeakers }, index) => (
               <li key={index} className="flex mb-4">
                 <div className="flex flex-wrap items-start flex-shrink-0 mb-2">
                   <div className="flex flex-col mr-6">
@@ -57,7 +52,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
                 </div>
                 <div className="flex flex-col">
                   <span className="block text-sm sm:text-lg whitespace-nowrap sm:whitespace-normal">{title}</span>
-                  <div className="whitespace-nowrap ml-0 pl-0">
+                  {/* <div className="whitespace-nowrap ml-0 pl-0">
                     {SessionAddresses.map(({ address, CourseLocation }, index) => (
                       <span key={index} className="text-sm text-gray-400 ml-0 pl-0">
                         {CourseLocation.locationOption === 'ONLINE' ? (
@@ -96,7 +91,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
                         {index < SessionAddresses.length - 1 && ' +\u00A0'}
                       </span>
                     ))}
-                  </div>
+                  </div> */}
                   <div className="flex flex-col">
                     {SessionSpeakers &&
                       SessionSpeakers.map((speaker, speakerIndex) => (

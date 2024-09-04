@@ -13,5 +13,6 @@ select_permissions:
         - bannerTextEn
         - created_at
         - previewImageURL
+        - timeZone
         - updated_at
       filter: {}

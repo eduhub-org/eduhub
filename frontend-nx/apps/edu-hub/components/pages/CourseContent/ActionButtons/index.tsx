@@ -1,5 +1,5 @@
 import useTranslation from 'next-translate/useTranslation';
-import { Dispatch, FC, SetStateAction, useCallback, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 
 import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
 import { useUser } from '../../../../hooks/user';

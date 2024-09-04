@@ -9,7 +9,6 @@ import {
   ManagedCourse_Course_by_pk,
 } from '../../../queries/__generated__/ManagedCourse';
 import { UpdateCourseStatus, UpdateCourseStatusVariables } from '../../../queries/__generated__/UpdateCourseStatus';
-import { CourseStatus_enum } from '../../../__generated__/globalTypes';
 import { AlertMessageDialog } from '../../common/dialogs/AlertMessageDialog';
 import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
 import { PageBlock } from '../../common/PageBlock';
@@ -24,13 +23,8 @@ interface Props {
   courseId: number;
 }
 
-const determineMaxAllowedTab = (courseStatus: CourseStatus_enum) => {
+const determineTabClasses = (tabIndex: number, selectedTabIndex: number) => {
   const maxAllowedTab = 5;
-  return maxAllowedTab;
-};
-
-const determineTabClasses = (tabIndex: number, selectedTabIndex: number, courseStatus: CourseStatus_enum) => {
-  const maxAllowedTab = determineMaxAllowedTab(courseStatus);
 
   if (tabIndex === selectedTabIndex) {
     return 'bg-gray-800 text-white';
@@ -93,7 +87,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
 
   const course: ManagedCourse_Course_by_pk | null = qResult.data?.Course_by_pk || null;
 
-  const maxAllowedTab = determineMaxAllowedTab(course?.status || ('DRAFT' as any));
+  const maxAllowedTab = 5;
 
   const [openTabIndex, setOpenTabIndex] = useState(0);
 
@@ -174,30 +168,30 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
           </div>
 
           <div className="grid grid-cols-4 mb-20">
-            <div className={`p-4 m-2 ${determineTabClasses(0, openTabIndex, course.status)}`} onClick={openTab0}>
+            <div className={`p-4 m-2 ${determineTabClasses(0, openTabIndex)}`} onClick={openTab0}>
               {t('description')}
             </div>
 
             {course.Program.shortTitle === 'DEGREES' ? null : (
-              <div className={`p-4 m-2 ${determineTabClasses(1, openTabIndex, course.status)}`} onClick={openTab1}>
+              <div className={`p-4 m-2 ${determineTabClasses(1, openTabIndex)}`} onClick={openTab1}>
                 {t('sessions')}
               </div>
             )}
 
             {course.externalRegistrationLink ? null : (
-              <div className={`p-4 m-2 ${determineTabClasses(2, openTabIndex, course.status)}`} onClick={openTab2}>
+              <div className={`p-4 m-2 ${determineTabClasses(2, openTabIndex)}`} onClick={openTab2}>
                 {t('applications')}
               </div>
             )}
 
             {course.externalRegistrationLink || course.Program.shortTitle === 'DEGREES' ? null : (
-              <div className={`p-4 m-2 ${determineTabClasses(3, openTabIndex, course.status)}`} onClick={openTab3}>
+              <div className={`p-4 m-2 ${determineTabClasses(3, openTabIndex)}`} onClick={openTab3}>
                 {t('participations_and_achievements')}
               </div>
             )}
 
             {course.Program.shortTitle === 'DEGREES' ? (
-              <div className={`p-4 m-2 ${determineTabClasses(4, openTabIndex, course.status)}`} onClick={openTab4}>
+              <div className={`p-4 m-2 ${determineTabClasses(4, openTabIndex)}`} onClick={openTab4}>
                 {t('degree_participations')}
               </div>
             ) : null}

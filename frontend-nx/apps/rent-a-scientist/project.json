@@ -3,13 +3,13 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/rent-a-scientist",
   "projectType": "application",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nrwl/next:build",
+      "executor": "@nx/next:build",
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "root": "apps/rent-a-scientist",
         "outputPath": "dist/apps/rent-a-scientist"
       },
       "configurations": {
@@ -20,7 +20,7 @@
       }
     },
     "serve": {
-      "executor": "@nrwl/next:server",
+      "executor": "@nx/next:server",
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "rent-a-scientist:build",
@@ -40,28 +40,24 @@
       }
     },
     "export": {
-      "executor": "@nrwl/next:export",
+      "executor": "@nx/next:export",
       "options": {
         "buildTarget": "rent-a-scientist:build:production"
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/rent-a-scientist"],
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/rent-a-scientist"],
       "options": {
-        "jestConfig": "apps/rent-a-scientist/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/rent-a-scientist/jest.config.ts"
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/rent-a-scientist/**/*.{ts,tsx,js,jsx}"]
-      }
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
     },
     "apollo": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "commands": [
           "rm -rf queries/__generated__/*",
@@ -71,6 +67,5 @@
         "parallel": false
       }
     }
-  },
-  "tags": []
+  }
 }

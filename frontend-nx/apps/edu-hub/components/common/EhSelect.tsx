@@ -1,41 +1,38 @@
-import { ChangeEvent, FC, useCallback } from "react";
-import { SelectOption } from "../../types/UIComponents";
+import { ChangeEvent, FC, useCallback } from 'react';
+import { SelectOption } from '../../types/UIComponents';
 
-interface IPros {
+interface IProps {
   placeholder?: string;
   options: SelectOption[];
-  onChangeHandler: (value: number) => any;
+  onChangeHandler: (value: number) => void;
   value?: number;
 }
 
+// Function to filter distinct options based on their keys
 const distinctOptions = (list: SelectOption[]) => {
-  const flags = [];
-  const output = [];
-  const l = list.length;
-  let i;
-  for (i = 0; i < l; i++) {
-    if (flags[list[i].key]) continue;
-    flags[list[i].key] = true;
-    output.push(list[i]);
-  }
-  return output;
+  const uniqueOptions: { [key: string]: boolean } = {};
+  return list.filter((option) => {
+    if (uniqueOptions[option.key]) {
+      return false;
+    }
+    uniqueOptions[option.key] = true;
+    return true;
+  });
 };
-const EhSelect: FC<IPros> = ({
-  placeholder,
-  options,
-  value,
-  onChangeHandler,
-}) => {
+
+const EhSelect: FC<IProps> = ({ placeholder, options, value, onChangeHandler }) => {
   const onSelectChanged = useCallback(
     (event: ChangeEvent<HTMLSelectElement>) => {
-      onChangeHandler(parseInt(event.target.value, 10));
+      onChangeHandler(Number(event.target.value));
     },
     [onChangeHandler]
   );
 
-  options = distinctOptions(options);
-  const selectStyle = `form-select 
-    appearance
+  // Ensure options are distinct based on their keys
+  const distinctOpts = distinctOptions(options);
+
+  const selectStyle = `form-select
+    appearance-none
     block
     w-full
     px-3
@@ -50,12 +47,16 @@ const EhSelect: FC<IPros> = ({
   return (
     <select
       className={selectStyle}
-      aria-label={placeholder ?? ""}
+      aria-label={placeholder ?? ''}
       onChange={onSelectChanged}
-      value={value}
-      placeholder={placeholder ?? ""}
+      value={value !== undefined ? value : ''}
     >
-      {options.map((option, index) => (
+      {placeholder && (
+        <option disabled value="">
+          {placeholder}
+        </option>
+      )}
+      {distinctOpts.map((option) => (
         <option key={option.key} value={option.key}>
           {option.label}
         </option>

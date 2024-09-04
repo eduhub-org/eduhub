@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+
 const PIXEL_ID = document.currentScript.getAttribute('data-pixel-id');
 
 function initializeFacebookPixel(f, b, e, v, n, t, s) {
@@ -17,11 +19,6 @@ function initializeFacebookPixel(f, b, e, v, n, t, s) {
   s.parentNode.insertBefore(t, s);
 }
 
-initializeFacebookPixel(
-  window,
-  document,
-  'script',
-  'https://connect.facebook.net/en_US/fbevents.js'
-);
+initializeFacebookPixel(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
 
 window.fbq('init', PIXEL_ID);

@@ -15,13 +15,12 @@ interface EduHubNumberFieldEditorProps {
   max?: number;
   step?: number;
   helpText?: string;
-  errorText?: string;
   translationNamespace?: string;
-  [x: string]: any; // for the rest of the props
+  [x: string]: any; // To accept any additional props
 }
 
 const EduHubNumberFieldEditor: React.FC<EduHubNumberFieldEditorProps> = ({
-  label = null,
+  label,
   placeholder,
   debounceTimeout = 1000,
   className = '',
@@ -31,18 +30,18 @@ const EduHubNumberFieldEditor: React.FC<EduHubNumberFieldEditorProps> = ({
   max,
   step = 1,
   helpText,
-  errorText,
   translationNamespace,
-  ...props // rest of the props
+  ...props // Spread the rest of the props
 }) => {
   const { t } = useTranslation(translationNamespace);
 
+  // Classes for the input field
   const baseClass = 'w-full px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
   return (
     <div className="px-2">
-      <div className="text-gray-400">
+      {label && (
         <div className="text-gray-400 flex justify-between mb-2">
           <div className="flex items-center">
             {helpText && (
@@ -50,25 +49,24 @@ const EduHubNumberFieldEditor: React.FC<EduHubNumberFieldEditorProps> = ({
                 <HelpOutlineIcon style={{ cursor: 'pointer', marginRight: '5px' }} />
               </Tooltip>
             )}
-            {label}
+            <span>{label}</span>
           </div>
         </div>
-        <div className="relative">
-          <DebounceInput
-            element="input"
-            type="number"
-            label={label}
-            placeholder={placeholder}
-            debounceTimeout={debounceTimeout}
-            className={finalClassName}
-            onChange={onChange}
-            value={value}
-            min={min}
-            max={max}
-            step={step}
-            {...props} // spread the rest of the props
-          />
-        </div>
+      )}
+      <div className="relative">
+        <DebounceInput
+          element="input"
+          type="number"
+          placeholder={placeholder}
+          debounceTimeout={debounceTimeout}
+          className={finalClassName}
+          onChange={onChange}
+          value={value}
+          min={min}
+          max={max}
+          step={step}
+          {...props} // Spread the rest of the props
+        />
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 const { join } = require('path');
 
 // available since Nx v 12.5
-const { createGlobPatternsForDependencies } = require('@nrwl/next/tailwind');
+const { createGlobPatternsForDependencies } = require('@nx/next/tailwind');
 
 module.exports = {
   plugins: [],

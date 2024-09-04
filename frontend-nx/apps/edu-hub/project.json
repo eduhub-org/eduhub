@@ -3,13 +3,13 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/edu-hub",
   "projectType": "application",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nrwl/next:build",
+      "executor": "@nx/next:build",
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "root": "apps/edu-hub",
         "outputPath": "dist/apps/edu-hub"
       },
       "configurations": {
@@ -17,10 +17,11 @@
           "outputPath": "apps/edu-hub"
         },
         "production": {}
-      }
+      },
+      "dependsOn": ["lint"]
     },
     "serve": {
-      "executor": "@nrwl/next:server",
+      "executor": "@nx/next:server",
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "edu-hub:build",
@@ -39,27 +40,22 @@
       }
     },
     "export": {
-      "executor": "@nrwl/next:export",
+      "executor": "@nx/next:export",
       "options": {
         "buildTarget": "edu-hub:build:production"
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/edu-hub"],
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/edu-hub"],
       "options": {
-        "jestConfig": "apps/edu-hub/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/edu-hub/jest.config.ts"
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": [
-          "apps/edu-hub/**/*.{ts,tsx,js,jsx}",
-          "!apps/edu-hub/.next"
-        ]
+        "lintFilePatterns": ["apps/edu-hub/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "apollo": {
@@ -73,6 +69,5 @@
         "parallel": false
       }
     }
-  },
-  "tags": []
+  }
 }

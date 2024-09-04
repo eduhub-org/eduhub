@@ -139,7 +139,7 @@ const ManageCoursesContent: FC<IProps> = ({ courseListRequest, programs, t, upda
             <table className="w-full">
               <thead>
                 <tr>
-                  {tableHeaders.map((header, index) => {
+                  {tableHeaders.map((header) => {
                     const [text, className] = header;
                     return (
                       <th key={text} className="py-2 px-5">
@@ -190,7 +190,7 @@ interface IPageProps extends IProps {
   count: number;
 }
 
-const Pagination: FC<IPageProps> = ({ t, courseListRequest, count, updateFilter }) => {
+const Pagination: FC<IPageProps> = ({ t, courseListRequest, count }) => {
   const limit = QUERY_LIMIT;
   const pages = Math.ceil(count / QUERY_LIMIT);
   const [current_page, setCurrentPage] = useState(1);

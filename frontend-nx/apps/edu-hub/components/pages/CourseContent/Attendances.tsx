@@ -8,7 +8,7 @@ import Dot from '../../common/Dot';
 import { AttendanceStatus_enum } from '../../../__generated__/globalTypes';
 import { CourseWithEnrollment_Course_by_pk_Sessions } from '../../../queries/__generated__/CourseWithEnrollment';
 
-const getBgColor = (status, date) => {
+const getBgColor = (status) => {
   if (status === NO_INFO) {
     return 'bg-gray-200';
   } else if (status === ATTENDED) {
@@ -59,9 +59,8 @@ const AttendanceEntry: FC<AttendanceEntryProps> = ({ session }) => {
       : { updated_at: 0, status: NO_INFO };
 
   const status = lastAttendanceRecord.status;
-  const endDateTime = new Date(session.endDateTime);
 
-  const bgColor = getBgColor(status, endDateTime);
+  const bgColor = getBgColor(status);
 
   const fontWeight = status === ATTENDED ? 'font-semibold' : '';
 

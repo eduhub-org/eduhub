@@ -1,16 +1,15 @@
 import { FC, ReactNode, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import useLogout from '../../hooks/logout';
-import { Footer } from './Footer';
-import { Header } from './Header';
-import { useRoleQuery } from '../../hooks/authedQuery';
-import { AppSettings } from '../../queries/__generated__/AppSettings';
 import useTranslation from 'next-translate/useTranslation';
-import { APP_SETTINGS } from '../../queries/appSettings';
 import { Transition } from '@headlessui/react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { MdClose } from 'react-icons/md';
+
+import useLogout from '../../hooks/logout';
+import { Footer } from './Footer';
+import { Header } from './Header';
+import { useAppSettings } from '../../contexts/AppSettingsContext';
 
 type PageProps = {
   children?: ReactNode;
@@ -21,6 +20,14 @@ export const Page: FC<PageProps> = ({ children, className }) => {
   const { data: session, status } = useSession();
   const logout = useLogout();
   const { lang } = useTranslation();
+  const {
+    bannerBackgroundColor,
+    bannerFontColor,
+    bannerTextDe,
+    bannerTextEn,
+    loading: appSettingsLoading,
+    error: appSettingsError,
+  } = useAppSettings();
 
   const [bannerState, setBannerState] = useState({
     content: '',
@@ -38,21 +45,12 @@ export const Page: FC<PageProps> = ({ children, className }) => {
     }
   };
 
-  const {
-    data: appSettingsData,
-    loading: appSettingsLoading,
-    error: appSettingsError,
-  } = useRoleQuery<AppSettings>(APP_SETTINGS, {
-    variables: { appName: 'edu' },
-    onCompleted: (data) => {
-      const [appSettings] = data.AppSettings; // Using array destructuring to get the first item
-
-      if (appSettings.bannerTextDe && appSettings.bannerTextEn) {
-        if (lang === 'de') handleBanner('bannerContentDe', appSettings.bannerTextDe);
-        else if (lang === 'en') handleBanner('bannerContentEn', appSettings.bannerTextEn);
-      }
-    },
-  });
+  useEffect(() => {
+    if (bannerTextDe && bannerTextEn) {
+      if (lang === 'de') handleBanner('bannerContentDe', bannerTextDe);
+      else if (lang === 'en') handleBanner('bannerContentEn', bannerTextEn);
+    }
+  }, [lang, bannerTextDe, bannerTextEn]);
 
   useEffect(() => {
     if (status !== 'loading' && session?.error === 'RefreshAccessTokenError') logout();
@@ -65,14 +63,6 @@ export const Page: FC<PageProps> = ({ children, className }) => {
 
   return (
     <>
-      {/* {bannerState.isVisible && !appSettingsLoading && !appSettingsError && (
-        <div className="w-full h-24 bg-black text-white flex justify-between items-center p-4">
-          <span>{bannerState.content}</span>
-          <button onClick={handleBannerClose} className="text-red-400">
-            Close
-          </button>
-        </div>
-      )} */}
       <Transition
         show={bannerState.isVisible && !appSettingsLoading && !appSettingsError}
         enter="transition-transform duration-150 origin-top"
@@ -85,13 +75,13 @@ export const Page: FC<PageProps> = ({ children, className }) => {
         <div
           className={`w-full text-white flex justify-between items-center py-4 md:py-8 px-3 md:px-16`}
           style={{
-            backgroundColor: appSettingsData?.AppSettings[0]?.bannerBackgroundColor,
+            backgroundColor: bannerBackgroundColor || '',
           }}
         >
           <span
             className="prose max-w-none pr-4 md:pr-8 text-lg"
             style={{
-              color: appSettingsData?.AppSettings[0]?.bannerFontColor,
+              color: bannerFontColor || '',
             }}
           >
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{bannerState.content}</ReactMarkdown>

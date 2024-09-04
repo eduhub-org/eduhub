@@ -1,30 +1,60 @@
-import React, { ChangeEvent, ReactNode } from 'react';
+import React, { ChangeEvent } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import { prioritizeClasses } from '../../helpers/util';
+import { DocumentNode } from 'graphql';
+import { useRoleMutation } from '../../hooks/authedMutation';
+import useErrorHandler from '../../hooks/useErrorHandler';
+import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
+import log from 'loglevel';
 
 interface EduHubDropdownSelectorProps {
-  label?: ReactNode;
+  label?: string;
   options: string[];
   className?: string;
-  onChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   value: string;
   helpText?: string;
   translationPrefix?: string;
+  updateMutation: DocumentNode;
+  idVariables: Record<string, any>;
+  refetchQueries?: string[];
+  onChange?: (newValue: string) => void;
+  translationNamespace?: string;
 }
 
 const EduHubDropdownSelector: React.FC<EduHubDropdownSelectorProps> = ({
-  label = null,
+  label,
   options,
   className = '',
-  onChange,
   value,
   helpText,
-  translationPrefix,
-  ...props // rest of the props
+  translationPrefix = '',
+  updateMutation,
+  idVariables,
+  refetchQueries = [],
+  onChange,
+  translationNamespace,
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(translationNamespace);
+  const { error, handleError, resetError } = useErrorHandler();
+
+  const [updateValue] = useRoleMutation(updateMutation, {
+    onError: (error) => handleError(t(error.message)),
+    onCompleted: (data) => {
+      if (onChange) onChange(data[Object.keys(data)[0]]);
+    },
+  });
+
+  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const newValue = event.target.value;
+    log.debug('Updating item with new value:', newValue);
+    updateValue({
+      variables: { ...idVariables, value: newValue },
+      refetchQueries: refetchQueries,
+    });
+  };
+
   const baseClass = 'w-full px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
 
@@ -42,12 +72,7 @@ const EduHubDropdownSelector: React.FC<EduHubDropdownSelectorProps> = ({
           </div>
         </div>
         <div>
-          <select
-            onChange={onChange}
-            value={value}
-            className={finalClassName}
-            {...props} // spread the rest of the props
-          >
+          <select onChange={handleChange} value={value} className={finalClassName}>
             {options.map((option, index) => (
               <option key={index} value={option}>
                 {t(translationPrefix + option)}
@@ -56,6 +81,7 @@ const EduHubDropdownSelector: React.FC<EduHubDropdownSelectorProps> = ({
           </select>
         </div>
       </div>
+      {error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
     </div>
   );
 };

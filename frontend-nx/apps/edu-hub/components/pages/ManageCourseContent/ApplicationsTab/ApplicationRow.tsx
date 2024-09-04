@@ -1,18 +1,16 @@
-import { QueryResult } from '@apollo/client';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useState } from 'react';
-import { GoPrimitiveDot } from 'react-icons/go';
+import { GoDotFill } from 'react-icons/go';
 import { IoIosArrowDown, IoIosArrowUp, IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
 import { MdCheckBox, MdOutlineCheckBoxOutlineBlank } from 'react-icons/md';
-import { displayDate } from '../../../../helpers/dateHelpers';
+import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { ManagedCourse_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/ManagedCourse';
 import { MotivationRating_enum } from '../../../../__generated__/globalTypes';
-import { EhDot, greenDot, greyDot, orangeDot, redDot } from '../../../common/dots_old';
+import Dot from '../../../common/Dot';
 import { OnlyAdmin } from '../../../common/OnlyLoggedIn';
 
 interface IProps {
   enrollment: ManagedCourse_Course_by_pk_CourseEnrollments | null;
-  qResult: QueryResult<any, any>;
   isRowSelected: boolean;
   onSelectRow: (enrollmentId: number, selected: boolean) => any;
   onSetRating: (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments, rating: MotivationRating_enum) => any;
@@ -25,11 +23,12 @@ const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments | nu
   if (enrollment.invitationExpirationDate == null) {
     return false;
   }
-  return enrollment.invitationExpirationDate.setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
+  return new Date(enrollment.invitationExpirationDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
 };
 
-export const ApplicationRow: FC<IProps> = ({ enrollment, qResult, onSetRating, isRowSelected, onSelectRow }) => {
+export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelected, onSelectRow }) => {
   const { t } = useTranslation();
+  const displayDate = useDisplayDate();
 
   const handleToggleRowSelected = useCallback(() => {
     if (enrollment != null) {
@@ -89,14 +88,14 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, qResult, onSetRating, i
             <div className="mr-3 ml-3 col-span-3">{enrollment.User.lastName}</div>
             <div className="mr-3 ml-3 col-span-12 truncate">{enrollment.motivationLetter}</div>
             <div className="mr-3 ml-3 col-span-2 text-center">
-              {enrollment.motivationRating === 'UNRATED' ? greyDot : <></>}
-              {enrollment.motivationRating === 'INVITE' ? greenDot : <></>}
-              {enrollment.motivationRating === 'REVIEW' ? orangeDot : <></>}
-              {enrollment.motivationRating === 'DECLINE' ? redDot : <></>}
+              {enrollment.motivationRating === 'UNRATED' &&  <Dot color="grey" />}
+              {enrollment.motivationRating === 'INVITE' &&  <Dot color="lightgreen" />}
+              {enrollment.motivationRating === 'REVIEW' &&  <Dot color="orange" />}
+              {enrollment.motivationRating === 'DECLINE' &&  <Dot color="red" />}
             </div>
             <div className="mr-3 ml-3 col-span-2 text-center">
               {!isExpired(enrollment) && enrollment.status === 'APPLIED' && (
-                <GoPrimitiveDot className="inline" title={t('course-page:applied')} color="grey" size="2.5em" />
+                <GoDotFill className="inline" title={t('course-page:applied')} color="grey" size="2.5em" />
               )}
               {!isExpired(enrollment) && enrollment.status === 'INVITED' && (
                 <IoIosCheckmarkCircle className="inline" title={t('course-page:invited')} color="grey" size="1.5em" />
@@ -166,28 +165,28 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, qResult, onSetRating, i
                 <div className="mr-3 ml-3 col-span-6">{enrollment.motivationLetter}</div>
                 <div className="mr-3 ml-3 col-span-3">
                   <div>
-                    <EhDot
+                    <Dot
                       onClick={setUnrated}
                       className="cursor-pointer"
-                      color="GREY"
+                      color="grey"
                       size={enrollment.motivationRating === 'UNRATED' ? 'LARGE' : 'DEFAULT'}
                     />
-                    <EhDot
+                    <Dot
                       onClick={setInvite}
                       className="cursor-pointer"
-                      color="GREEN"
+                      color="lightgreen"
                       size={enrollment.motivationRating === 'INVITE' ? 'LARGE' : 'DEFAULT'}
                     />
-                    <EhDot
+                    <Dot
                       onClick={setReview}
                       className="cursor-pointer"
-                      color="ORANGE"
+                      color="orange"
                       size={enrollment.motivationRating === 'REVIEW' ? 'LARGE' : 'DEFAULT'}
                     />
-                    <EhDot
+                    <Dot
                       onClick={setDecline}
                       className="cursor-pointer"
-                      color="RED"
+                      color="red"
                       size={enrollment.motivationRating === 'DECLINE' ? 'LARGE' : 'DEFAULT'}
                     />
                   </div>

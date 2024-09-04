@@ -12,6 +12,10 @@ import { Weekday_enum } from "./../../__generated__/globalTypes";
 export interface UpdateCourseWeekday_update_Course_by_pk {
   __typename: "Course";
   id: number;
+  /**
+   * The day of the week the course takes place.
+   */
+  weekDay: Weekday_enum;
 }
 
 export interface UpdateCourseWeekday {
@@ -23,5 +27,5 @@ export interface UpdateCourseWeekday {
 
 export interface UpdateCourseWeekdayVariables {
   courseId: number;
-  weekday: Weekday_enum;
+  value: Weekday_enum;
 }

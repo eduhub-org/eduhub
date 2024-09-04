@@ -31,25 +31,25 @@ const Home: FC = () => {
     variables: { userId },
     skip: !isLoggedIn || !(isInstructor || isAdmin),
   });
-  
+
   const { data: enrolledCoursesData, loading: enrolledCoursesLoading } = useAuthedQuery<CoursesEnrolledByUser>(COURSES_ENROLLED_BY_USER, {
     variables: { userId },
     skip: !isLoggedIn,
   });
-  
+
   const { data: coursesData, loading: coursesLoading } = useQuery<CourseTiles>(COURSE_TILES);
 
   const { data: courseGroupOptionsData } = useAuthedQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS);
 
-  const myAdminCourses = adminCoursesData?.Course ?? [];
-  const myCourses = enrolledCoursesData?.Course ?? [];
-  const publishedCourses = coursesData?.Course ?? [];
+const myAdminCourses = useMemo(() => adminCoursesData?.Course ?? [], [adminCoursesData]);
+const myCourses = useMemo(() => enrolledCoursesData?.Course ?? [], [enrolledCoursesData]);
+const publishedCourses = useMemo(() => coursesData?.Course ?? [], [coursesData]);
 
   const coursesGroupsAuthenticated = useMemo(() => [
     { title: 'myAdminCourses', courses: myAdminCourses, isManaged: true },
     { title: 'myCourses', courses: myCourses, isManaged: false },
   ], [myAdminCourses, myCourses]);
-  
+
   const coursesGroups = useMemo(() => [1, 2, 3, 4, 5].map((order) => {
     const filteredCourses = publishedCourses.filter((course) =>
       course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.order === order)
@@ -60,7 +60,7 @@ const Home: FC = () => {
       courses: filteredCourses,
     };
   }), [publishedCourses, courseGroupOptionsData]);
-  
+
   const renderCourseGroups = (groups, groupKey) => (
     <>
       {groups.map((group, index) =>
@@ -109,7 +109,7 @@ const Home: FC = () => {
               {isLoggedIn && renderCourseGroups(coursesGroupsAuthenticated, 'coursesGroupsAuthenticated')}
               {renderCourseGroups(coursesGroups, 'coursesGroups')}
             </ClientOnly>
-          )}        
+          )}
         </div>
       </Page>
     </>
