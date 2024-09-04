@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAdminMutation } from '../../hooks/authedMutation';
-import { IconButton } from '@mui/material';
+import { IconButton } from '@material-ui/core';
 import { MdDelete } from 'react-icons/md';
 import { DocumentNode } from 'graphql';
 import useTranslation from 'next-translate/useTranslation';
@@ -14,12 +14,12 @@ interface TableGridDeleteButtonProps {
   deletionConfirmationQuestion?: string;
 }
 
-const TableGridDeleteButton = ({
-  deleteMutation,
-  id,
-  refetchQueries,
+const TableGridDeleteButton = ({ 
+  deleteMutation, 
+  id, 
+  refetchQueries, 
   idType,
-  deletionConfirmationQuestion
+  deletionConfirmationQuestion 
 }: TableGridDeleteButtonProps) => {
   const [deleteItem] = useAdminMutation(deleteMutation);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
@@ -41,7 +41,7 @@ const TableGridDeleteButton = ({
 
   const performDelete = () => {
     let variableId: string | number = id;
-
+    
     if (idType === 'number') {
       if (typeof id === 'string') {
         variableId = parseInt(id, 10);
@@ -58,9 +58,9 @@ const TableGridDeleteButton = ({
       // Optionally, you could add a UUID validation regex here
     }
 
-    deleteItem({
+    deleteItem({ 
       variables: { id: variableId },
-      refetchQueries
+      refetchQueries 
     });
   };
 

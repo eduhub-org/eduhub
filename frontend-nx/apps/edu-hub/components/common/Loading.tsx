@@ -1,4 +1,4 @@
-import { CircularProgress } from '@mui/material';
+import { CircularProgress } from "@material-ui/core";
 
 const Loading = () => {
   return (

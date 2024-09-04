@@ -1,7 +1,7 @@
-import { IconButton } from '@mui/material';
-import { FC } from 'react';
-import { IoMdAddCircle } from 'react-icons/io';
-import EhTag, { TagElement } from './EhTag';
+import { IconButton } from "@material-ui/core";
+import { FC } from "react";
+import { IoMdAddCircle } from "react-icons/io";
+import EhTag, { TagElement } from "./EhTag";
 
 interface IProps {
   tags: TagElement[];
@@ -9,7 +9,11 @@ interface IProps {
   requestDeleteTag: (id: number) => void;
 }
 
-const EhMultipleTag: FC<IProps> = ({ tags, requestAddTag, requestDeleteTag }) => {
+const EhMultipleTag: FC<IProps> = ({
+  tags,
+  requestAddTag,
+  requestDeleteTag,
+}) => {
   return (
     <div className="grid grid-cols-12">
       <div className="col-span-10">
@@ -18,7 +22,11 @@ const EhMultipleTag: FC<IProps> = ({ tags, requestAddTag, requestDeleteTag }) =>
         ))}
       </div>
       <div className="col-span-2">
-        <IconButton className="focus:outline-none mt-1" size="small" onClick={requestAddTag}>
+        <IconButton
+          className="focus:outline-none mt-1"
+          size="small"
+          onClick={requestAddTag}
+        >
           <IoMdAddCircle />
         </IconButton>
       </div>

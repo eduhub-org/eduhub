@@ -1,5 +1,5 @@
 import { QueryResult } from '@apollo/client';
-import { Button } from '@mui/material';
+import { Button } from '@material-ui/core';
 import { FC, useCallback, useMemo } from 'react';
 
 import { MdAddCircle } from 'react-icons/md';

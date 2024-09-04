@@ -1,7 +1,7 @@
 import { FC, useEffect, Dispatch, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import useTranslation from 'next-translate/useTranslation';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress } from '@material-ui/core';
 
 import { useAuthedMutation } from '../../../hooks/authedMutation';
 import { useAuthedQuery } from '../../../hooks/authedQuery';

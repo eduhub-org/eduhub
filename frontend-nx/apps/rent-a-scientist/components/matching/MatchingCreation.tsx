@@ -11,7 +11,7 @@ import {
   SCIENTIST_MAILS_INFO,
   UPDATE_ASSIGNMENTS,
 } from '../../queries/ras_matching';
-import { Button } from '@mui/material';
+import { Button } from '@material-ui/core';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { HideProgramById, HideProgramByIdVariables } from '../../queries/__generated__/HideProgramById';
 import { UpdateAssignments, UpdateAssignmentsVariables } from '../../queries/__generated__/UpdateAssignments';

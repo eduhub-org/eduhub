@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
 import { AtLeastNameEmail } from '../../../helpers/achievement';
 import { COURSE_ENROLLMENTS_WITH_USER } from '../../../queries/courseEnrollment';
 import {

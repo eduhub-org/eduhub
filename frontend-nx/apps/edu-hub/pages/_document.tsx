@@ -1,18 +1,16 @@
-import Document, { DocumentContext, DocumentInitialProps, Head, Html, Main, NextScript } from 'next/document';
+import Document, {
+  DocumentContext,
+  Head,
+  Html,
+  Main,
+  NextScript,
+} from 'next/document';
 import Script from 'next/script';
-import { DocumentHeadTags, documentGetInitialProps } from '@mui/material-nextjs/v14-pagesRouter';
-import type { DocumentHeadTagsProps } from '@mui/material-nextjs/v14-pagesRouter';
 
-// Extend the props for MyDocument to include DocumentHeadTagsProps
-type MyDocumentProps = DocumentInitialProps & DocumentHeadTagsProps;
-
-class MyDocument extends Document<MyDocumentProps> {
-  public static async getInitialProps(ctx: DocumentContext): Promise<MyDocumentProps> {
-    // Fetch initial props including DocumentHeadTagsProps
-    const initialProps = await documentGetInitialProps(ctx);
-
-    // Return the initial props with the proper typing
-    return initialProps as MyDocumentProps;
+class MyDocument extends Document {
+  public static async getInitialProps(ctx: DocumentContext) {
+    const initialProps = await Document.getInitialProps(ctx);
+    return { ...initialProps };
   }
 
   public render() {
@@ -41,8 +39,6 @@ class MyDocument extends Document<MyDocumentProps> {
             strategy="beforeInteractive"
             type="text/javaScript"
           />
-          {/* Pass the combined props to DocumentHeadTags */}
-          <DocumentHeadTags {...this.props} />
         </Head>
         <body className="font-body text-edu-black bg-edu-bg-gray">
           <Main />

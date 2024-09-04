@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import PublishIcon from '@mui/icons-material/Publish';
+import PublishIcon from '@material-ui/icons/Publish';
 
 import { useFileUploader } from '../../hooks/fileUpload';
 

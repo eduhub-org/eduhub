@@ -1,5 +1,5 @@
-import { CircularProgress, IconButton } from '@mui/material';
-import { Button } from '@mui/material';
+import { CircularProgress, IconButton } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import { MdAddCircle } from 'react-icons/md';
 import { IUserProfile } from '../../../hooks/user';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';

@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import GetAppIcon from '@mui/icons-material/GetApp';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import { Button } from '../common/Button';
 import { useSignedUrl } from '../../hooks/signedUrl';
 import useTranslation from 'next-translate/useTranslation';

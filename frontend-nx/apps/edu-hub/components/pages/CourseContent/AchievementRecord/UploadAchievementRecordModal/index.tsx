@@ -22,7 +22,7 @@ import { AchievementRecordRating_enum } from '../../../../../__generated__/globa
 import EhTagStingId from '../../../../common/EhTagStingId';
 import { AtLeastNameEmail, MinAchievementOption } from '../../../../../helpers/achievement';
 import useTranslation from 'next-translate/useTranslation';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress } from '@material-ui/core';
 import { Button } from '../../../../common/Button';
 import EnrolledUserForACourseDialog from '../../../../common/dialogs/EnrolledUserForACourseDialog';
 import Modal from '../../../../common/Modal';
