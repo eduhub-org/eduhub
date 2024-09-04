@@ -1,7 +1,7 @@
 import { DebounceInput } from 'react-debounce-input';
 import useTranslation from 'next-translate/useTranslation';
-import Tooltip from '@material-ui/core/Tooltip';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import Tooltip from '@mui/material/Tooltip';
+import { HelpOutline } from '@mui/icons-material';
 import { prioritizeClasses } from '../../helpers/util';
 
 interface EduHubNumberFieldEditorProps {
@@ -46,7 +46,7 @@ const EduHubNumberFieldEditor: React.FC<EduHubNumberFieldEditorProps> = ({
           <div className="flex items-center">
             {helpText && (
               <Tooltip title={t(helpText)} placement="top">
-                <HelpOutlineIcon style={{ cursor: 'pointer', marginRight: '5px' }} />
+                <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
               </Tooltip>
             )}
             <span>{label}</span>

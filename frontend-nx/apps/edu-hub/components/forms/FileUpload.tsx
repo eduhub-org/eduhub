@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import PublishIcon from '@material-ui/icons/Publish';
+import { Publish } from '@mui/icons-material';
 
 import { useFileUploader } from '../../hooks/fileUpload';
 
@@ -57,7 +57,7 @@ const FileUpload = ({ id, uploadMutation, submitMutation, uploadVariables, submi
           htmlFor={`fileInput-${id}`}
           className={`cursor-pointer p-2  flex items-center justify-center w-6 h-6 ${isLoading ? 'opacity-50' : ''}`}
         >
-          <PublishIcon />
+          <Publish />
         </label>
       </div>
     </form>

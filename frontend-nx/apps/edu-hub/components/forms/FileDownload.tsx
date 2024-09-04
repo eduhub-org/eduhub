@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import GetAppIcon from '@material-ui/icons/GetApp';
+import { GetApp } from '@mui/icons-material';
 import { Button } from '../common/Button';
 import { useSignedUrl } from '../../hooks/signedUrl';
 import useTranslation from 'next-translate/useTranslation';
@@ -53,11 +53,11 @@ const FileDownload: FC<IProps> = ({ filePath, className, label, type = 'icon' })
     <>
       {type === 'button' ? (
         <Button onClick={handleDownload} disabled={loading} className={className} inverted>
-          <GetAppIcon /> {label ? label : t('common:download')}
+          <GetApp /> {label ? label : t('common:download')}
         </Button>
       ) : (
         <button onClick={handleDownload} disabled={loading} className={className}>
-          <GetAppIcon />
+          <GetApp />
         </button>
       )}
 
