@@ -1,6 +1,6 @@
 # Fixed version to node 16, as node 17 is not supported by some dependencies
 # 1. Install dependencies only when needed
-FROM node:16-alpine AS deps
+FROM node:18-alpine AS deps
 
 RUN apk add --no-cache libc6-compat
 
@@ -16,7 +16,7 @@ COPY .yarnrc.yml /opt/app
 RUN yarn --immutable
 
 # 2. Rebuild the source code only when needed
-FROM node:16-alpine AS builder
+FROM node:18-alpine AS builder
 
 WORKDIR /opt/app
 
@@ -31,7 +31,7 @@ ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 RUN npx nx run rent-a-scientist:build
 
 # 3. Production image, copy all the files and run next
-FROM node:16-alpine AS runner
+FROM node:18-alpine AS runner
 
 WORKDIR /opt/app
 
