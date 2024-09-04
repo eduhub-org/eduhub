@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FormControl, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
+import { FormControl, FormGroup, FormControlLabel, Checkbox } from '@material-ui/core';
 import useTranslation from 'next-translate/useTranslation';
 
 type CheckboxSelectorProps = {

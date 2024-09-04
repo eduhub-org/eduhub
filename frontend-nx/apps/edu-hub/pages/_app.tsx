@@ -6,21 +6,16 @@ import { FC, useEffect, useState } from 'react';
 import Script from 'next/script';
 import { useRouter } from 'next/router';
 import * as fbq from '../lib/fpixel';
-import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-
 
 import { registerLocale, setDefaultLocale } from 'react-datepicker';
-import { de } from 'date-fns/locale/de';
-import { enUS } from 'date-fns/locale/en-US';
+import de from 'date-fns/locale/de';
+import en from 'date-fns/locale/en-US';
 import useTranslation from 'next-translate/useTranslation';
 
 import { AppSettingsProvider } from '../contexts/AppSettingsContext';
 
-const theme = createTheme();
-
 registerLocale('de', de);
-registerLocale('en', enUS);
+registerLocale('en', en);
 
 import log from 'loglevel';
 if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'production') {
@@ -67,18 +62,16 @@ const MyApp: FC<AppProps & InitialProps> & {
   return (
     <SessionProvider session={pageProps.session}>
       <ApolloProvider client={client}>
-        <AppCacheProvider {...pageProps}>
-          <ThemeProvider theme={theme}>
-            <AppSettingsProvider>
-              {/* Global Site Code Pixel - Facebook Pixel */}
-              <Script
-                id="fb-pixel"
-                data-cookieconsent="marketing"
-                strategy="afterInteractive"
-                type="text/plain"
-                onLoad={() => setFBPixelLoaded(true)}
-                dangerouslySetInnerHTML={{
-                  __html: `
+        <AppSettingsProvider>
+          {/* Global Site Code Pixel - Facebook Pixel */}
+          <Script
+            id="fb-pixel"
+            data-cookieconsent="marketing"
+            strategy="afterInteractive"
+            type="text/plain"
+            onLoad={() => setFBPixelLoaded(true)}
+            dangerouslySetInnerHTML={{
+              __html: `
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
             n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -90,15 +83,13 @@ const MyApp: FC<AppProps & InitialProps> & {
             fbq('init', '1775867059535400');
             fbq('track', 'PageView');
           `,
-                }}
-              />
-              <Head>
-                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-              </Head>
-              <Component {...pageProps} />
-            </AppSettingsProvider>
-          </ThemeProvider>
-        </AppCacheProvider>
+            }}
+          />
+          <Head>
+            <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+          </Head>
+          <Component {...pageProps} />
+        </AppSettingsProvider>
       </ApolloProvider>
     </SessionProvider>
   );

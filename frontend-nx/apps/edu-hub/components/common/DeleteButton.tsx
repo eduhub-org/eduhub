@@ -1,5 +1,5 @@
 import React from 'react';
-import IconButton from '@mui/material/IconButton';
+import IconButton from '@material-ui/core/IconButton';
 import { MdDelete } from 'react-icons/md';
 
 interface DeleteButtonProps {

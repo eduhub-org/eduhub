@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useCallback, ReactElement, Dispatch, SetStateAction } from 'react';
 import { ApolloError, DocumentNode } from '@apollo/client';
-import { CircularProgress, TextField } from '@mui/material';
+import { CircularProgress, TextField } from '@material-ui/core';
 import useTranslation from 'next-translate/useTranslation';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { MdArrowBack, MdArrowForward } from 'react-icons/md';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import {

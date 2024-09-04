@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { MdAddCircle } from 'react-icons/md';
-import { Button } from '@mui/material';
+import { Button } from '@material-ui/core';
 
 interface IProps {
   text?: string;

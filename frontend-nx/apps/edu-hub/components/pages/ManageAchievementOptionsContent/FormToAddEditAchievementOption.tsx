@@ -1,4 +1,4 @@
-import { CircularProgress } from '@mui/material';
+import { CircularProgress } from '@material-ui/core';
 import { Translate } from 'next-translate';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useContext, useReducer, useState } from 'react';

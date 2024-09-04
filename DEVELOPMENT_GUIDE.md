@@ -102,7 +102,3 @@ To persist changes you made to the keycloak configuration export the edu-hub rea
   #This command exports the current configuration of the edu-hub realm to a file
   4. Your local git should highlight changes in the file `./keycloak/imports-dev/edu-hub.json` now
   #This step checks if there are any changes in the configuration file
-
-## Updating frontend-nx packages
-- use `yarn upgrade-interactive` script to check for package updates
-- if package version are explicitly locked in, please check for potential issues or comments while upgrading

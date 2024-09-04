@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { IconButton } from '@mui/material';
+import { IconButton } from '@material-ui/core';
 import { FC, MutableRefObject, useCallback, useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';

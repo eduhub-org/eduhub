@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { DocumentNode } from 'graphql';
-import TextField from '@mui/material/TextField';
-import Tooltip from '@mui/material/Tooltip';
-import InputAdornment from '@mui/material/InputAdornment';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { useTheme } from '@mui/material/styles';
+import TextField from '@material-ui/core/TextField';
+import Tooltip from '@material-ui/core/Tooltip';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import { useTheme } from '@material-ui/core/styles';
 import { useDebouncedCallback } from 'use-debounce';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import useTranslation from 'next-translate/useTranslation';

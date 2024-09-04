@@ -1,4 +1,4 @@
-import { IconButton } from '@mui/material';
+import { IconButton } from '@material-ui/core';
 import Head from 'next/head';
 import { FC, MutableRefObject, useCallback, useMemo, useRef } from 'react';
 import { MdUpload } from 'react-icons/md';

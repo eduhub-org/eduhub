@@ -1,5 +1,5 @@
 import { FC, useCallback, useState } from 'react';
-import { Button } from '@mui/material';
+import { Button } from '@material-ui/core';
 import { MdAddCircle } from 'react-icons/md';
 
 import CommonPageHeader from '../../common/CommonPageHeader';

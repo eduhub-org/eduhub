@@ -1,5 +1,5 @@
-import { Modal } from '@mui/material';
-import Fade from '@mui/material/Fade';
+import { Modal } from '@material-ui/core';
+import Fade from '@material-ui/core/Fade';
 import Image from 'next/image';
 import { ChangeEvent, FC, useCallback, useState } from 'react';
 

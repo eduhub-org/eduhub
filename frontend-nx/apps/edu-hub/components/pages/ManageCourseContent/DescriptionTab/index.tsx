@@ -20,7 +20,7 @@ import {
 } from '../../../../queries/course';
 import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
 import Locations from './Locations';
-import { Button } from '@mui/material';
+import { Button } from '@material-ui/core';
 import { MdAddCircle } from 'react-icons/md';
 import useTranslation from 'next-translate/useTranslation';
 import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';

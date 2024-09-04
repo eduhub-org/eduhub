@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
@@ -108,7 +108,7 @@ const TagWithTwoText: FC<IPropsCourse> = ({ course, onClick }) => {
   return (
     <div
       onClick={clickThis}
-      className="flex justify-between bg-edu-row-color
+      className="flex justify-between bg-edu-row-color 
       px-2 py-1 cursor-pointer border border-slate-300 hover:border-solid hover:border-indigo-300"
     >
       <div className="pr-1 w-full flex justify-between">
