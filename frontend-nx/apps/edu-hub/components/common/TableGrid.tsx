@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, ReactElement, Dispatch, SetStateAction } from 'react';
 import { ApolloError, DocumentNode } from '@apollo/client';
-import { CircularProgress, TextField } from '@material-ui/core';
+import { CircularProgress, TextField } from '@mui/material';
 import useTranslation from 'next-translate/useTranslation';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
 import { MdArrowBack, MdArrowForward } from 'react-icons/md';

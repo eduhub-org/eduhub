@@ -1,6 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 
 import Onboarding from './Onboarding';
 import { useLazyRoleQuery } from '../../../hooks/authedQuery';

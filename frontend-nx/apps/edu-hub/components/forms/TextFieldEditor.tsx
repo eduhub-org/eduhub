@@ -3,11 +3,7 @@ import { DocumentNode } from 'graphql';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import InputAdornment from '@mui/material/InputAdornment';
-<<<<<<< HEAD
 import { HelpOutline } from '@mui/icons-material';
-=======
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
->>>>>>> e1e46892 (material ui 6 update and additional fixes)
 import { useTheme } from '@mui/material/styles';
 import { useDebouncedCallback } from 'use-debounce';
 import { useAdminMutation } from '../../hooks/authedMutation';

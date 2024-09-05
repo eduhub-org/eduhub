@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle } from '@material-ui/core';
+import { Dialog, DialogTitle } from '@mui/material';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useRef, useEffect } from 'react';
 import { MdClose } from 'react-icons/md';
@@ -38,8 +38,8 @@ export const QuestionConfirmationDialog: FC<QuestionProps> = ({
   ));
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={handleCancel}
       aria-labelledby="confirmation-dialog-title"
       maxWidth="sm"

@@ -5,7 +5,7 @@ import { FC } from 'react';
 import { Page } from '../../components/layout/Page';
 import CourseContent from '../../components/pages/CourseContent/index';
 import { useIsSessionLoading } from '../../hooks/authentication';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 import { withAuthRedirect } from '../../helpers/auth';
 
 const getServerSidePropsWithRedirect = (redirectTo: string) => withAuthRedirect({ redirectTo })();
