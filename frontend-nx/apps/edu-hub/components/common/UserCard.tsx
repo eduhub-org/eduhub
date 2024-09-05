@@ -28,7 +28,7 @@ interface UserCardProps {
 }
 
 const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) => {
-  const { t } = useTranslation('course');
+  const { t } = useTranslation('common');
 
   const { imageSize, imageSolution, fontSize } = sizeConfigs[size];
   const showName = size !== 'small';
@@ -41,16 +41,18 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
   const getProfileLink = (url: string) => {
     const safeUrl = url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`;
 
-    const linkTypes = {
-      'linkedin.com': 'linkedinProfile',
-      'xing.com': 'xingProfile',
-    };
-
-    const linkType = Object.keys(linkTypes).find((domain) => safeUrl.includes(domain)) || 'externalProfile';
+    let linkText: string;
+    if (safeUrl.includes('linkedin.com')) {
+      linkText = t('user_card.linkedin_profile');
+    } else if (safeUrl.includes('xing.com')) {
+      linkText = t('user_card.xing_profile');
+    } else {
+      linkText = t('user_card.external_profile');
+    }
 
     return (
       <a href={safeUrl} target="_blank" rel="noopener noreferrer" className="underline">
-        {t(linkTypes[linkType as keyof typeof linkTypes])}
+        {linkText}
       </a>
     );
   };
@@ -59,7 +61,7 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
     <div className={`flex items-start ${className}`}>
       <Image
         src={userPictureUrl}
-        alt={`${t('common:image_of')} ${user?.firstName}`}
+        alt={`${t('image_of')} ${user?.firstName}`}
         width={imageSize}
         height={imageSize}
         className="rounded-full object-cover mr-4"
