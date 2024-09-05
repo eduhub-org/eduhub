@@ -1,9 +1,8 @@
 import React, { useState, useMemo, useCallback, ReactElement, Dispatch, SetStateAction } from 'react';
 import { ApolloError, DocumentNode } from '@apollo/client';
-import { CircularProgress, TextField } from '@material-ui/core';
+import { CircularProgress, TextField } from '@mui/material';
 import useTranslation from 'next-translate/useTranslation';
-import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
 import { MdArrowBack, MdArrowForward } from 'react-icons/md';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import {
@@ -219,8 +218,8 @@ const TableGrid = <T extends BaseRow>({
                   {header.column.columnDef.header === '' ? null : <div>{t(header.column.id)}</div>}
                   {header.column.getCanSort() && (
                     <div className="ml-1 flex flex-col items-center">
-                      <ArrowDropUpIcon style={{ opacity: header.column.getIsSorted() === 'asc' ? 1 : 0.5 }} />
-                      <ArrowDropDownIcon style={{ opacity: header.column.getIsSorted() === 'desc' ? 1 : 0.5 }} />
+                      <ArrowDropUp style={{ opacity: header.column.getIsSorted() === 'asc' ? 1 : 0.5 }} />
+                      <ArrowDropDown style={{ opacity: header.column.getIsSorted() === 'desc' ? 1 : 0.5 }} />
                     </div>
                   )}
                 </div>

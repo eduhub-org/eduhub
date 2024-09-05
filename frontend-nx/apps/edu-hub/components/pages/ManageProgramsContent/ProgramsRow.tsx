@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { QueryResult } from '@apollo/client';
-import { CircularProgress, IconButton } from '@material-ui/core';
+import { CircularProgress, IconButton } from '@mui/material';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, MutableRefObject, useCallback, useRef } from 'react';
 

@@ -1,5 +1,5 @@
 import React, { FC, ReactNode, useCallback, useEffect } from 'react';
-import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 // import styles from './Modal.module.css'; // Uncomment if using CSS modules
 

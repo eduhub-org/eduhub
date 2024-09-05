@@ -1,7 +1,7 @@
-import Fade from '@material-ui/core/Fade';
-import MaterialMenu, { MenuProps } from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import { withStyles } from '@material-ui/core/styles';
+import Fade from '@mui/material/Fade';
+import MaterialMenu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { FC, useCallback } from 'react';
 import { useIsAdmin } from '../../hooks/authentication';
@@ -14,25 +14,13 @@ interface IProps {
   setVisible: (visible: boolean) => void;
 }
 
-const StyledMenu = withStyles({
-  paper: {
+// Replace with styled
+const StyledMenu = styled(MaterialMenu)(() => ({
+  '& .MuiPaper-root': {
     minWidth: '225px',
     padding: '1rem 2rem',
   },
-})((props: MenuProps) => (
-  <MaterialMenu
-    getContentAnchorEl={null}
-    anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'right',
-    }}
-    transformOrigin={{
-      vertical: 'top',
-      horizontal: 'right',
-    }}
-    {...props}
-  />
-));
+}));
 
 export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
   const hideMenu = useCallback(() => setVisible(false), [setVisible]);
@@ -51,11 +39,17 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
     <StyledMenu
       id="fade-menu"
       anchorEl={anchorElement}
-      // keepMounted
       open={isVisible}
       onClose={hideMenu}
       TransitionComponent={Fade}
-      className="min-w-full"
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
     >
       <MenuItem onClick={closeMenu}>
         <Link className="w-full text-lg" href="/profile">
@@ -76,14 +70,6 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
           </Link>
         </MenuItem>
       )}
-
-      {/* {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/users-old">
-            {t('menu-administration-user')}
-          </Link>
-        </MenuItem>
-      )} */}
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
