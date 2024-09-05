@@ -118,5 +118,11 @@
   "error": "Error",
   "select_time": "Select time",
   "close": "Close",
-  "ok": "OK"
+  "ok": "OK",
+  "user_card": {
+    "speaker": "Speaker",
+    "external_profile": "Homepage",
+    "linkedin_profile": "LinkedIn Profile",
+    "xing_profile": "Xing Profile"
+  }
 }
