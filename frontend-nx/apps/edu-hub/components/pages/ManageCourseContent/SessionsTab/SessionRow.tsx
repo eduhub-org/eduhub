@@ -6,9 +6,11 @@ import {
 } from '../../../../queries/__generated__/ManagedCourse';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import EhTimeSelect, { formatTime } from '../../../common/EhTimeSelect';
+import EhTimeSelect from '../../../common/EhTimeSelect';
+import { useFormatTime } from '../../../../helpers/dateTimeHelpers';
 import { DebounceInput } from 'react-debounce-input';
 import { eventTargetValueMapper, useRoleMutation } from '../../../../hooks/authedMutation';
+
 import { INSERT_NEW_SESSION_SPEAKER } from '../../../../queries/course';
 import { QueryResult } from '@apollo/client';
 import { SelectUserDialog } from '../../../common/dialogs/SelectUserDialog';
@@ -65,6 +67,7 @@ export const SessionRow: FC<IProps> = ({
   const isInstructor = useIsInstructor();
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
+  const formatTime = useFormatTime();
 
   const handleDelete = useCallback(() => {
     if (session != null) {
@@ -129,15 +132,12 @@ export const SessionRow: FC<IProps> = ({
   const handleSetStartTime = useCallback(
     (event: string) => {
       if (session != null) {
-        const copyDate = new Date(session.startDateTime);
         const [hoursStr, minutesStr] = event.split(':');
         const hours = Number(hoursStr);
         const minutes = Number(minutesStr);
-        copyDate.setHours(hours);
-        copyDate.setMinutes(minutes);
-        copyDate.setSeconds(0);
-        copyDate.setMilliseconds(0);
-        onSetStartDate(session, copyDate);
+        const newDate = new Date(session.startDateTime);
+        newDate.setHours(hours, minutes, 0, 0);
+        onSetStartDate(session, newDate);
       }
     },
     [session, onSetStartDate]
@@ -146,15 +146,12 @@ export const SessionRow: FC<IProps> = ({
   const handleSetEndTime = useCallback(
     (event: string) => {
       if (session != null) {
-        const copyDate = new Date(session.endDateTime);
         const [hoursStr, minutesStr] = event.split(':');
         const hours = Number(hoursStr);
         const minutes = Number(minutesStr);
-        copyDate.setHours(hours);
-        copyDate.setMinutes(minutes);
-        copyDate.setSeconds(0);
-        copyDate.setMilliseconds(0);
-        onSetEndDate(session, copyDate);
+        const newDate = new Date(session.endDateTime);
+        newDate.setHours(hours, minutes, 0, 0);
+        onSetEndDate(session, newDate);
       }
     },
     [session, onSetEndDate]
@@ -226,7 +223,7 @@ export const SessionRow: FC<IProps> = ({
               selected={session.startDateTime}
               onChange={handleSetDate}
               locale={lang}
-            />{' '}
+            />
           </div>
         )}
         <div className="p-3 col-span-2">

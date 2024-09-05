@@ -12,6 +12,8 @@ import de from 'date-fns/locale/de';
 import en from 'date-fns/locale/en-US';
 import useTranslation from 'next-translate/useTranslation';
 
+import { AppSettingsProvider } from '../contexts/AppSettingsContext';
+
 registerLocale('de', de);
 registerLocale('en', en);
 
@@ -33,7 +35,7 @@ interface InitialProps {
 // @ts-expect-error Typing does not work correctly here because of getInitialProps
 const MyApp: FC<AppProps & InitialProps> & {
   getInitialProps: (ctx: AppContext) => Promise<Record<string, unknown>>;
-} = ({ Component, pageProps, cookies }) => {
+} = ({ Component, pageProps }) => {
   const { lang } = useTranslation();
   setDefaultLocale(lang);
 
@@ -60,15 +62,16 @@ const MyApp: FC<AppProps & InitialProps> & {
   return (
     <SessionProvider session={pageProps.session}>
       <ApolloProvider client={client}>
-        {/* Global Site Code Pixel - Facebook Pixel */}
-        <Script
-          id="fb-pixel"
-          data-cookieconsent="marketing"
-          strategy="afterInteractive"
-          type="text/plain"
-          onLoad={() => setFBPixelLoaded(true)}
-          dangerouslySetInnerHTML={{
-            __html: `
+        <AppSettingsProvider>
+          {/* Global Site Code Pixel - Facebook Pixel */}
+          <Script
+            id="fb-pixel"
+            data-cookieconsent="marketing"
+            strategy="afterInteractive"
+            type="text/plain"
+            onLoad={() => setFBPixelLoaded(true)}
+            dangerouslySetInnerHTML={{
+              __html: `
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
             n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -80,12 +83,13 @@ const MyApp: FC<AppProps & InitialProps> & {
             fbq('init', '1775867059535400');
             fbq('track', 'PageView');
           `,
-          }}
-        />
-        <Head>
-          <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-        </Head>
-        <Component {...pageProps} />
+            }}
+          />
+          <Head>
+            <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+          </Head>
+          <Component {...pageProps} />
+        </AppSettingsProvider>
       </ApolloProvider>
     </SessionProvider>
   );

@@ -1,23 +1,26 @@
 import { QueryResult } from '@apollo/client';
 import useTranslation from 'next-translate/useTranslation';
-import { ChangeEvent, FC, useCallback } from 'react';
+import { FC, useCallback } from 'react';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
 import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { LocationOptions } from '../../../../queries/__generated__/LocationOptions';
-import { LOCATION_OPTIONS, UPDATE_COURSE_SESSION_DEFAULT_ADDRESS } from '../../../../queries/course';
+import {
+  LOCATION_OPTIONS,
+  UPDATE_COURSE_LOCATION,
+  UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
+} from '../../../../queries/course';
 import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
 import { isLinkFormat } from '../../../../helpers/util';
 import DeleteButton from '../../../../components/common/DeleteButton';
 
 interface LocationsIProps {
   location: ManagedCourse_Course_by_pk_CourseLocations | null;
-  onSetOption: (c: ManagedCourse_Course_by_pk_CourseLocations, p: string) => any;
   onDelete: (c: ManagedCourse_Course_by_pk_CourseLocations) => any;
   refetchQuery: QueryResult<any, any>;
 }
 
-export const Locations: FC<LocationsIProps> = ({ location, onSetOption, onDelete, refetchQuery }) => {
+export const Locations: FC<LocationsIProps> = ({ location, onDelete, refetchQuery }) => {
   const { t } = useTranslation('course-page');
 
   const queryLocationOptions = useRoleQuery<LocationOptions>(LOCATION_OPTIONS);
@@ -25,15 +28,6 @@ export const Locations: FC<LocationsIProps> = ({ location, onSetOption, onDelete
     console.log('query known location options error', queryLocationOptions.error);
   }
   const locationOptions = (queryLocationOptions.data?.LocationOption || []).map((x) => x.value);
-
-  const handleSetOption = useCallback(
-    (event: ChangeEvent<HTMLSelectElement>) => {
-      if (location != null) {
-        onSetOption(location, event.target.value);
-      }
-    },
-    [location, onSetOption]
-  );
 
   const handleDelete = useCallback(() => {
     if (location != null) {
@@ -54,9 +48,11 @@ export const Locations: FC<LocationsIProps> = ({ location, onSetOption, onDelete
           <EduHubDropdownSelector
             options={locationOptions}
             value={location.locationOption || 'ONLINE'}
-            onChange={handleSetOption}
-            className="mb-0"
-            translationPrefix="common:location."
+            updateMutation={UPDATE_COURSE_LOCATION}
+            idVariables={{ locationId: location.id }}
+            refetchQueries={['ManagedCourse']}
+            translationPrefix="course-page:location."
+            className="mb-2"
           />
         </div>
       )}
@@ -70,7 +66,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onSetOption, onDelete
           value={location?.defaultSessionAddress || ''}
           typeCheck={typeCheckFunction}
           errorText={t('address.errorText')}
-          className="mb-0"
+          className="mb-2"
         />
       </div>
       <div>{location && <DeleteButton handleDelete={handleDelete} />}</div>

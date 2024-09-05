@@ -1,10 +1,28 @@
 {
-  "backgroundImageURL": "Hintergrundbild URL",
-  "bannerBackgroundColor": "News Banner Hintergrundfarbe",
-  "bannerFontColor": "News Banner Textfarbe",
-  "bannerTextDe": "News Banner Text DE",
-  "bannerTextEn": "News Banner Text EN",
-  "previewImageURL": "Default Vorschaubild URL",
-  "appSettings": "App Einstellungen",
-  "courseGroupOptions": "Kursgruppen Reihenfolge"
+  "app_settings": "App Einstellungen",
+  "background_image_url": "Hintergrundbild URL",
+  "preview_image_url": "Vorschaubild URL",
+  "save": "Speichern",
+  "saving": "Speichern...",
+  "banner": {
+    "label": "Banner Einstellungen",
+    "background_color": "News Banner Hintergrundfarbe",
+    "fontColor": "News Banner Textfarbe",
+    "text_de": "News Banner Text DE",
+    "text_en": "News Banner Text EN"
+  },
+  "course_group_options": "Kursgruppierungen Reihenfolge",
+  "time_zone": {
+    "label": "Zeitzone",
+    "values": {
+      "Europe/Berlin": "Berlin",
+      "Europe/London": "London",
+      "Europe/Paris": "Paris",
+      "UTC": "UTC",
+      "America/New_York": "New York",
+      "America/Los_Angeles": "Los Angeles",
+      "Asia/Tokyo": "Tokio"
+    },
+    "help_text": "Die Zeitzone wird verwendet, um die Datums- und Uhrzeiten in der Anwendung anzuzeigen. Generelle Zeiten wie die wiederkehrende Kurszeit, die nicht an einen konkreten Tag gebunden sind, werden immer in der ursprünglich angelegten Zeit angezeigt und nicht angepasst."
+  }
 }

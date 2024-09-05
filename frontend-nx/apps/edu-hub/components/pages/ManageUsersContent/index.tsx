@@ -63,7 +63,7 @@ const ManageUsersContent: FC = () => {
         meta: {
           width: 3,
         },
-        cell: ({ getValue, column, row }) => <div>{getValue<ReactNode>()}</div>,
+        cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
       },
       {
         accessorKey: 'lastName',
@@ -71,7 +71,7 @@ const ManageUsersContent: FC = () => {
         meta: {
           width: 3,
         },
-        cell: ({ getValue, column, row }) => <div>{getValue<ReactNode>()}</div>,
+        cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
       },
       {
         accessorKey: 'email',
@@ -79,7 +79,7 @@ const ManageUsersContent: FC = () => {
         meta: {
           width: 3,
         },
-        cell: ({ getValue, column, row }) => <div>{getValue<ReactNode>()}</div>,
+        cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
       },
     ],
     []
@@ -121,7 +121,6 @@ const ManageUsersContent: FC = () => {
               translationNamespace="users"
               enablePagination
               pageIndex={pageIndex}
-              pageSize={pageSize}
               searchFilter={searchFilter}
               setPageIndex={setPageIndex}
               setSearchFilter={setSearchFilter}

@@ -26,10 +26,6 @@ export const CertificateDownload: FC<IProps> = ({
   hideAchievementCertificateButton = false,
   hideAttendanceCertificateButton = false,
   manageView,
-  refetchAchievementCertificates,
-  refetchAttendanceCertificates,
-  setRefetchAchievementCertificates,
-  setRefetchAttendanceCertificates,
 }) => {
   const { t } = useTranslation();
   const [errorMessage, setErrorMessage] = useState('');
@@ -38,7 +34,7 @@ export const CertificateDownload: FC<IProps> = ({
     setErrorMessage(error);
   };
 
-  const { data: loadAchievementCertificateData, loading: loadAchievementCerfificateLoading } = useRoleQuery<
+  const { data: loadAchievementCertificateData, loading: loadAchievementCertificateLoading } = useRoleQuery<
     GetSignedUrl,
     GetSignedUrlVariables
   >(GET_SIGNED_URL, {
@@ -61,9 +57,9 @@ export const CertificateDownload: FC<IProps> = ({
   });
 
   return (
-    <div className={!manageView && 'mt-4'}>
-      <div className={`flex gap-4 ${!manageView && 'flex-col sm:px-24'}`}>
-        {loadAchievementCertificateData && !loadAchievementCerfificateLoading && !hideAchievementCertificateButton && (
+    <div className={!manageView ? 'mt-4' : ''}>
+      <div className={`flex gap-4 ${!manageView ? 'flex-col sm:px-24' : ''}`}>
+        {loadAchievementCertificateData && !loadAchievementCertificateLoading && !hideAchievementCertificateButton && (
           <>
             {!manageView && <h3 className="text-3xl font-medium">{t('course-page:congrats-completion')}</h3>}
             <Button
@@ -79,21 +75,19 @@ export const CertificateDownload: FC<IProps> = ({
             </Button>
           </>
         )}
-        {loadAttendanceCertificateData &&
-          !loadAttendanceCertificateLoading &&
-          !hideAttendanceCertificateButton &&(
-            <Button
-              as="a"
-              filled
-              href={loadAttendanceCertificateData.getSignedUrl.link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {manageView
-                ? t('manageCourse:attendance_certificate_download')
-                : t('course-page:attendanceCertificateDownload')}
-            </Button>
-          )}
+        {loadAttendanceCertificateData && !loadAttendanceCertificateLoading && !hideAttendanceCertificateButton && (
+          <Button
+            as="a"
+            filled
+            href={loadAttendanceCertificateData.getSignedUrl.link}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {manageView
+              ? t('manageCourse:attendance_certificate_download')
+              : t('course-page:attendanceCertificateDownload')}
+          </Button>
+        )}
         {/* Error Message Dialog */}
         {errorMessage && (
           <ErrorMessageDialog errorMessage={errorMessage} open={!!errorMessage} onClose={() => setErrorMessage('')} />

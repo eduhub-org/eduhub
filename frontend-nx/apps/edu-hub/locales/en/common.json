@@ -105,14 +105,24 @@
   "achievement-documentation-template": "Achievement Record Documentation Template",
   "preview": "Preview",
   "edit_markdown": "Edit",
-  "markdown_info": "You can use **bold**, _italic_, and other formatting",
+  "markdown_info": "Markdown formatting is supported.",
   "markdown_guide": "Markdown Guide",
   "location": {
     "ONLINE": "Online",
-    "KIEL": "Kiel"
+    "KIEL": "Kiel",
+    "HEIDE": "Heide"
   },
   "type_name_or_email_minimum_3_letters": "Type a name or email (minimum 3 letters).",
   "deletion_confirmation_question": "Are you sure you want to delete this entry?",
   "confirm_delete": "Confirm Deletion",
-  "error": "Error"
+  "error": "Error",
+  "select_time": "Select time",
+  "close": "Close",
+  "ok": "OK",
+  "user_card": {
+    "speaker": "Speaker",
+    "external_profile": "Homepage",
+    "linkedin_profile": "LinkedIn Profile",
+    "xing_profile": "Xing Profile"
+  }
 }

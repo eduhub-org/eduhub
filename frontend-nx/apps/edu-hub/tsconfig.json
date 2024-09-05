@@ -11,8 +11,17 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "incremental": true,
-    "types": ["jest", "node"]
+    "types": ["jest", "node"], // Only include necessary types
+    "typeRoots": ["../../node_modules/@types"], // Correct locations for type definitions
+    "baseUrl": "../../" // Set correctly to the workspace root
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "next-env.d.ts", "types/global.d.ts"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
+    "next-env.d.ts",
+    "types/**/*.d.ts" // Include all types from your custom types directory
+  ],
   "exclude": ["node_modules", "jest.config.ts"]
 }

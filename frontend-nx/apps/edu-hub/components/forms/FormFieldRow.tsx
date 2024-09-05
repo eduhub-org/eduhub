@@ -52,7 +52,6 @@ const FormFieldRow = <FieldNames,>({
       {type === 'select' && options && (
         <select
           id={name}
-          placeholder={placeholder || label}
           {...register(name, { required })}
           className={`bg-edu-light-gray p-4 mb-5 w-full block ${formColor}`}
           aria-invalid={errors[name] ? 'true' : 'false'}

@@ -145,7 +145,10 @@
   "selectTemplateDefaultLabel": "Choose template",
   "achievement_option_not_selected": "Please select an achievement record option.",
   "location": {
-    "label": "Location"
+    "label": "Location",
+    "ONLINE": "Online",
+    "KIEL": "Kiel",
+    "HEIDE": "Heide"
   },
   "address": {
     "label": "Link or Address",

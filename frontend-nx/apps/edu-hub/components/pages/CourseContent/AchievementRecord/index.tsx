@@ -148,7 +148,6 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
           onClose={onClosed}
           achievementOptionsQuery={query}
           onSuccess={onSuccess}
-          courseTitle={courseTitle}
           setAlertMessage={setAlertMessage}
           userId={userId}
           user={user}

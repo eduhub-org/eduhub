@@ -37,6 +37,7 @@ export interface AppSettings_AppSettings {
    * Preview image that is shared with links
    */
   previewImageURL: string | null;
+  timeZone: string;
 }
 
 export interface AppSettings {
