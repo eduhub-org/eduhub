@@ -12017,17 +12017,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql@npm:14.0.2 - 14.2.0 || ^14.3.1 || ^15.0.0":
+"graphql@npm:14.0.2 - 14.2.0 || ^14.3.1 || ^15.0.0, graphql@npm:~15.8.0":
   version: 15.8.0
   resolution: "graphql@npm:15.8.0"
   checksum: 423325271db8858428641b9aca01699283d1fe5b40ef6d4ac622569ecca927019fce8196208b91dd1d8eb8114f00263fe661d241d0eb40c10e5bfd650f86ec5e
-  languageName: node
-  linkType: hard
-
-"graphql@npm:~16.9.0":
-  version: 16.9.0
-  resolution: "graphql@npm:16.9.0"
-  checksum: 8cb3d54100e9227310383ce7f791ca48d12f15ed9f2021f23f8735f1121aafe4e5e611a853081dd935ce221724ea1ae4638faef5d2921fb1ad7c26b5f46611e9
   languageName: node
   linkType: hard
 
@@ -16793,7 +16786,7 @@ __metadata:
     eslint-plugin-react: ^7.35.1
     eslint-plugin-react-hooks: ^4.6.2
     eslint-plugin-standard: ^5.0.0
-    graphql: ~16.9.0
+    graphql: ~15.8.0
     graphql-request: ^6.1.0
     jest: 29.7.0
     jest-worker: ^29.7.0
