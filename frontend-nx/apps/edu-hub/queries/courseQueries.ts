@@ -4,7 +4,7 @@ import { COURSE_TILE_FRAGMENT } from "./courseFragements";
 export const COURSE_TILES = gql`
   ${COURSE_TILE_FRAGMENT}
   query CourseTiles {
-    Course(order_by: { applicationEnd: desc }) {
+    Course(order_by: { updated_at: desc }) {
       ...CourseTileFragment
       CourseGroups {
         CourseGroupOption {
@@ -20,7 +20,7 @@ export const COURSES_BY_INSTRUCTOR = gql`
   ${COURSE_TILE_FRAGMENT}
   query CoursesByInstructor($userId: uuid!) {
     Course(
-      order_by: { applicationEnd: desc }
+      order_by: { updated_at: desc }
       where: {
         CourseInstructors: {
           Expert: {
@@ -40,7 +40,7 @@ export const COURSES_ENROLLED_BY_USER = gql`
   ${COURSE_TILE_FRAGMENT}
   query CoursesEnrolledByUser($userId: uuid!) {
     Course(
-      order_by: { applicationEnd: desc }
+      order_by: { updated_at: desc }
       where: {
         CourseEnrollments: {
           userId: { _eq: $userId }
