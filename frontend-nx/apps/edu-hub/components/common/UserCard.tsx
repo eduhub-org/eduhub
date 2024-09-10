@@ -65,6 +65,7 @@ const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) 
         width={imageSize}
         height={imageSize}
         className="rounded-full object-cover mr-4"
+        style={{ width: `${imageSize}px`, height: `${imageSize}px` }}
       />
       {showName && (
         <div className={`flex flex-col ${fontSize}`}>
