@@ -1,0 +1,7 @@
+{
+    "enrollment_statistics": "Teilnahmestatistiken",
+    "select_programs": {
+        "label": "Progamme oder Semester",
+        "placeholder": "Progamm oder Semester hinzufügen"
+    }
+}

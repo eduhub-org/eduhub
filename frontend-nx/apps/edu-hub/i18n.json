@@ -9,6 +9,7 @@
       "course-admin-page",
       "course-application",
       "course-page",
+      "enrollmentStatistics",
       "manageAchievementTemplates",
       "manageAppSettings",
       "manageCourse",

@@ -108,6 +108,14 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
+      {isAdmin && (
+        <MenuItem onClick={closeMenu}>
+          <Link className="w-full text-lg" href="/statistics">
+            {t('menu-administration-statistics')}
+          </Link>
+        </MenuItem>
+      )}
+
       <MenuItem onClick={() => logout()}>
         <button className="w-full text-lg text-left">{t('menu-logout')}</button>
       </MenuItem>
