@@ -1,7 +1,7 @@
 import React, { ChangeEvent } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-import Tooltip from '@material-ui/core/Tooltip';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import Tooltip from '@mui/material/Tooltip';
+import { HelpOutline } from '@mui/icons-material';
 import { prioritizeClasses } from '../../helpers/util';
 import { DocumentNode } from 'graphql';
 import { useRoleMutation } from '../../hooks/authedMutation';
@@ -65,7 +65,7 @@ const EduHubDropdownSelector: React.FC<EduHubDropdownSelectorProps> = ({
           <div className="flex items-center">
             {helpText && (
               <Tooltip title={t(helpText)} placement="top">
-                <HelpOutlineIcon style={{ cursor: 'pointer', marginRight: '5px' }} />
+                <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
               </Tooltip>
             )}
             {label}

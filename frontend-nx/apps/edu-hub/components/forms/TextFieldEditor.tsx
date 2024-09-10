@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { DocumentNode } from 'graphql';
-import TextField from '@material-ui/core/TextField';
-import Tooltip from '@material-ui/core/Tooltip';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import { useTheme } from '@material-ui/core/styles';
+import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
+import InputAdornment from '@mui/material/InputAdornment';
+import { HelpOutline } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 import { useDebouncedCallback } from 'use-debounce';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import useTranslation from 'next-translate/useTranslation';
@@ -98,7 +98,7 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
           endAdornment: (
             <InputAdornment position="end">
               <Tooltip title={t(helpText || '')} placement="top">
-                <HelpOutlineIcon style={{ cursor: 'pointer', color: placeholderColor }} />
+                <HelpOutline style={{ cursor: 'pointer', color: placeholderColor }} />
               </Tooltip>
             </InputAdornment>
           ),

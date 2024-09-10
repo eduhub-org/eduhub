@@ -4,8 +4,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import useTranslation from 'next-translate/useTranslation';
-import Tooltip from '@material-ui/core/Tooltip';
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import Tooltip from '@mui/material/Tooltip';
+import { HelpOutline } from '@mui/icons-material';
 import { DocumentNode } from 'graphql';
 import { prioritizeClasses } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
@@ -172,7 +172,7 @@ const EduHubTextFieldEditor: React.FC<EduHubTextFieldEditorProps> = ({
           <div className="flex items-center">
             {helpText && (
               <Tooltip title={helpText} placement="top">
-                <HelpOutlineIcon style={{ cursor: 'pointer', marginRight: '5px' }} />
+                <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
               </Tooltip>
             )}
             {label}
