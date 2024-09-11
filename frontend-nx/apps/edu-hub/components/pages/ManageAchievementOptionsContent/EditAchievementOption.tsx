@@ -35,7 +35,7 @@ import FormToAddEditAchievementOption from './FormToAddEditAchievementOption';
 import _ from 'lodash';
 import { AchievementContext } from './AchievementsHelper';
 
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 
 interface IProps {
   onSuccess: (success: boolean) => void;

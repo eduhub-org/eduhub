@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import MuiAutocomplete from '@material-ui/lab/Autocomplete';
-import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { DocumentNode } from 'graphql';
 import useTranslation from 'next-translate/useTranslation';
@@ -11,11 +11,11 @@ type TagSelectorProps = {
   label: string;
   placeholder: string;
   itemId: number;
-  currentTags: { id: number, name: string }[];
-  tagOptions: { id: number, name: string }[];
+  currentTags: { id: number; name: string }[];
+  tagOptions: { id: number; name: string }[];
   insertTagMutation?: DocumentNode;
   deleteTagMutation?: DocumentNode;
-  onSelectedTagsChange?: (selectedTags: { id: number, name: string }[]) => void;
+  onSelectedTagsChange?: (selectedTags: { id: number; name: string }[]) => void;
   onTagAdded?: (data: any) => void;
   onTagRemoved?: (data: any) => void;
   refetchQueries: string[];
@@ -24,7 +24,7 @@ type TagSelectorProps = {
 };
 
 const TagSelector: React.FC<TagSelectorProps> = ({
-  immediateCommit=true,
+  immediateCommit = true,
   label,
   placeholder,
   itemId,
@@ -37,7 +37,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   onTagRemoved,
   refetchQueries,
   className,
-  translationNamespace
+  translationNamespace,
 }) => {
   const [tags, setTags] = useState(currentTags);
   const { t } = useTranslation();
@@ -52,14 +52,14 @@ const TagSelector: React.FC<TagSelectorProps> = ({
     onCompleted: (data) => {
       if (onTagAdded) onTagAdded(data);
     },
-    refetchQueries
+    refetchQueries,
   });
 
   const [deleteTag] = useAdminMutation(deleteTagMutation || DUMMY_MUTATION, {
     onCompleted: (data) => {
       if (onTagRemoved) onTagRemoved(data);
     },
-    refetchQueries
+    refetchQueries,
   });
 
   const handleTagChange = (event, value) => {
@@ -86,36 +86,34 @@ const TagSelector: React.FC<TagSelectorProps> = ({
     // Notify the parent form of the change
     if (onSelectedTagsChange) {
       onSelectedTagsChange(value);
-    }     
+    }
   };
 
   return (
     <div className={className}>
-      <MuiAutocomplete
+      <Autocomplete
         className="w-full"
         multiple
         id="tags-standard"
         options={tagOptions}
-        getOptionLabel={(option) =>
-          translationNamespace
-            ? t(`${translationNamespace}:${option.name}`)
-            : option.name
-        }
+        getOptionLabel={(option) => (translationNamespace ? t(`${translationNamespace}:${option.name}`) : option.name)}
         renderInput={(params) => (
           <TextField
             {...params}
             variant="standard"
             label={label}
             placeholder={placeholder}
-            InputLabelProps={{
-              style: { color: 'rgb(34, 34, 34)' },
+            sx={{
+              '& .MuiInputLabel-root': {
+                color: 'rgb(34, 34, 34)',
+              },
             }}
           />
         )}
         onChange={handleTagChange}
         defaultValue={tags}
         limitTags={2}
-        getOptionSelected={(option, value) => option.id === value.id}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
       />
     </div>
   );

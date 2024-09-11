@@ -1,5 +1,5 @@
-import { Dialog, DialogTitle, Slide } from '@material-ui/core';
-import { TransitionProps } from '@material-ui/core/transitions';
+import { Dialog, DialogTitle, Slide } from '@mui/material';
+import { TransitionProps } from '@mui/material/transitions';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, forwardRef, ReactElement } from 'react';
 import { MdClose } from 'react-icons/md';
@@ -7,10 +7,13 @@ import { MdClose } from 'react-icons/md';
 import { Button } from '../../common/Button';
 
 // Transition for the dialog
-const Transition = forwardRef<unknown, TransitionProps & { children?: ReactElement<any, any> }>((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
+const Transition = forwardRef<unknown, TransitionProps & { children: ReactElement<any, any> }>((props, ref) => (
+  <Slide direction="up" ref={ref} {...props}>
+    {props.children}
+  </Slide>
 ));
 Transition.displayName = 'Transition';
+
 
 interface ErrorProps {
   errorMessage: string;

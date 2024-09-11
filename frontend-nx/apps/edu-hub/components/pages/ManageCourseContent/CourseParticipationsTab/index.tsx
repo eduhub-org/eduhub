@@ -46,7 +46,7 @@ import { AchievementRecordRating_enum, AttendanceStatus_enum } from '../../../..
 import TagWithTwoText from '../../../common/TagWithTwoText';
 import Loading from '../../../common/Loading';
 import { Button } from '../../../common/Button';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 import { formattedDateWithTime } from '../../../../helpers/util';
 
 interface CourseParticipationsTabIProps {

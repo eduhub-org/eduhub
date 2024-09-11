@@ -45,6 +45,7 @@ const AddAchievementOption: FC<IProps> = ({ onSuccess }) => {
                 data: data.mentors.map((e) => ({ userId: e.userId })), // We need to change this field
               },
               showScoreAuthors: data.showScoreAuthors,
+              achievementDocumentationTemplateId: data.achievementDocumentationTemplateId,
             },
           },
         });

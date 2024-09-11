@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle } from '@material-ui/core';
+import { Dialog, DialogTitle } from '@mui/material';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback } from 'react';
 import { MdClose } from 'react-icons/md';

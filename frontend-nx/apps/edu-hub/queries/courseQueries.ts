@@ -4,7 +4,7 @@ import { COURSE_TILE_FRAGMENT } from "./courseFragements";
 export const COURSE_TILES = gql`
   ${COURSE_TILE_FRAGMENT}
   query CourseTiles {
-    Course(order_by: { applicationEnd: desc }) {
+    Course(order_by: { updated_at: desc }) {
       ...CourseTileFragment
       CourseGroups {
         CourseGroupOption {
