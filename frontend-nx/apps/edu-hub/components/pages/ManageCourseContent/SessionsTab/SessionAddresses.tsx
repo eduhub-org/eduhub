@@ -15,17 +15,18 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
   const { t } = useTranslation('course-page');
 
   const defaultSessionAddress = address?.CourseLocation?.defaultSessionAddress;
+  const sessionAddress = address?.address || defaultSessionAddress;
   const isOnline = address?.CourseLocation?.locationOption === 'ONLINE';
-  const isValidLink = isLinkFormat(defaultSessionAddress);
+  const isValidLink = isLinkFormat(sessionAddress);
 
   const label = isOnline
     ? t('sessionAddress.online.label')
     : t('sessionAddress.offline.label') + t('common:location.' + address?.CourseLocation?.locationOption);
   const value = isOnline
     ? isValidLink
-      ? defaultSessionAddress
+      ? sessionAddress
       : t('sessionAddress.online.placeholder')
-    : defaultSessionAddress;
+    : sessionAddress;
   const placeholder = isOnline ? null : t('sessionAddress.offline.placeholder');
 
   return (

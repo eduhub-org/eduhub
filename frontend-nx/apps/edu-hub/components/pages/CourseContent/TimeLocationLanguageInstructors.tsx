@@ -7,6 +7,7 @@ import languageIcon from '../../../public/images/course/language.svg';
 import pinIcon from '../../../public/images/course/pin.svg';
 import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
 import UserCard from '../../common/UserCard'; // Adjust the path as needed
+import React from 'react';
 
 interface IProps {
   course: Course_Course_by_pk;
@@ -45,9 +46,12 @@ export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
           <Image src={languageIcon} alt="Language" width={47} height={40} />
         </div>
         <span className="text-sm mt-2 text-center">
-          {course.CourseLocations.length > 2
-            ? course.CourseLocations.map((location) => `${location.locationOption} +`).join('')
-            : course.CourseLocations.map((location) => `${location.locationOption}`).join(' + ')}
+          {course.CourseLocations.map((location, index) => (
+            <React.Fragment key={index}>
+              {location.locationOption}
+              {index < course.CourseLocations.length - 1 && ' + '}
+            </React.Fragment>
+          ))}
         </span>
         <span className="text-sm mt-2 text-center">{tLanguage(course.language)}</span>
       </div>
