@@ -34,7 +34,6 @@
 - "!include public_Program.yaml"
 - "!include public_Session.yaml"
 - "!include public_SessionAddress.yaml"
-- "!include public_SessionAddressType.yaml"
 - "!include public_SessionSpeaker.yaml"
 - "!include public_University.yaml"
 - "!include public_User.yaml"
