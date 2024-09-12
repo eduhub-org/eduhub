@@ -5,15 +5,9 @@ object_relationships:
   - name: CourseLocation
     using:
       foreign_key_constraint_on: courseLocationId
-  - name: LocationOption
-    using:
-      foreign_key_constraint_on: location
   - name: Session
     using:
       foreign_key_constraint_on: sessionId
-  - name: SessionAddressType
-    using:
-      foreign_key_constraint_on: type
 insert_permissions:
   - role: instructor_access
     permission:
@@ -29,9 +23,7 @@ insert_permissions:
         - address
         - courseLocationId
         - id
-        - location
         - sessionId
-        - type
 select_permissions:
   - role: anonymous
     permission:
@@ -40,9 +32,7 @@ select_permissions:
         - courseLocationId
         - created_at
         - id
-        - location
         - sessionId
-        - type
         - updated_at
       filter: {}
 update_permissions:
@@ -50,7 +40,6 @@ update_permissions:
     permission:
       columns:
         - address
-        - type
       filter:
         Session:
           Course:
