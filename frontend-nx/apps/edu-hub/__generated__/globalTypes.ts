@@ -840,6 +840,7 @@ export enum LocationOption_constraint {
 }
 
 export enum LocationOption_enum {
+  HEIDE = "HEIDE",
   KIEL = "KIEL",
   ONLINE = "ONLINE",
 }
@@ -1189,26 +1190,6 @@ export enum Scientist_update_column {
 }
 
 /**
- * unique or primary key constraints on table "SessionAddressType"
- */
-export enum SessionAddressType_constraint {
-  SessionAddressType_pkey = "SessionAddressType_pkey",
-}
-
-export enum SessionAddressType_enum {
-  FREETEXT_ADDRESS = "FREETEXT_ADDRESS",
-  URL = "URL",
-}
-
-/**
- * update columns of table "SessionAddressType"
- */
-export enum SessionAddressType_update_column {
-  comment = "comment",
-  value = "value",
-}
-
-/**
  * unique or primary key constraints on table "SessionAddress"
  */
 export enum SessionAddress_constraint {
@@ -1223,9 +1204,7 @@ export enum SessionAddress_select_column {
   courseLocationId = "courseLocationId",
   created_at = "created_at",
   id = "id",
-  location = "location",
   sessionId = "sessionId",
-  type = "type",
   updated_at = "updated_at",
 }
 
@@ -1237,9 +1216,7 @@ export enum SessionAddress_update_column {
   courseLocationId = "courseLocationId",
   created_at = "created_at",
   id = "id",
-  location = "location",
   sessionId = "sessionId",
-  type = "type",
   updated_at = "updated_at",
 }
 
@@ -6109,56 +6086,6 @@ export interface Scientist_on_conflict {
   where?: Scientist_bool_exp | null;
 }
 
-/**
- * Boolean expression to filter rows from the table "SessionAddressType". All fields are combined with a logical 'AND'.
- */
-export interface SessionAddressType_bool_exp {
-  SessionAddresses?: SessionAddress_bool_exp | null;
-  SessionAddresses_aggregate?: SessionAddress_aggregate_bool_exp | null;
-  _and?: SessionAddressType_bool_exp[] | null;
-  _not?: SessionAddressType_bool_exp | null;
-  _or?: SessionAddressType_bool_exp[] | null;
-  comment?: String_comparison_exp | null;
-  value?: String_comparison_exp | null;
-}
-
-/**
- * Boolean expression to compare columns of type "SessionAddressType_enum". All fields are combined with logical 'AND'.
- */
-export interface SessionAddressType_enum_comparison_exp {
-  _eq?: SessionAddressType_enum | null;
-  _in?: SessionAddressType_enum[] | null;
-  _is_null?: boolean | null;
-  _neq?: SessionAddressType_enum | null;
-  _nin?: SessionAddressType_enum[] | null;
-}
-
-/**
- * input type for inserting data into table "SessionAddressType"
- */
-export interface SessionAddressType_insert_input {
-  SessionAddresses?: SessionAddress_arr_rel_insert_input | null;
-  comment?: string | null;
-  value?: string | null;
-}
-
-/**
- * input type for inserting object relation for remote table "SessionAddressType"
- */
-export interface SessionAddressType_obj_rel_insert_input {
-  data: SessionAddressType_insert_input;
-  on_conflict?: SessionAddressType_on_conflict | null;
-}
-
-/**
- * on_conflict condition type for table "SessionAddressType"
- */
-export interface SessionAddressType_on_conflict {
-  constraint: SessionAddressType_constraint;
-  update_columns: SessionAddressType_update_column[];
-  where?: SessionAddressType_bool_exp | null;
-}
-
 export interface SessionAddress_aggregate_bool_exp {
   count?: SessionAddress_aggregate_bool_exp_count | null;
 }
@@ -6183,9 +6110,7 @@ export interface SessionAddress_arr_rel_insert_input {
  */
 export interface SessionAddress_bool_exp {
   CourseLocation?: CourseLocation_bool_exp | null;
-  LocationOption?: LocationOption_bool_exp | null;
   Session?: Session_bool_exp | null;
-  SessionAddressType?: SessionAddressType_bool_exp | null;
   _and?: SessionAddress_bool_exp[] | null;
   _not?: SessionAddress_bool_exp | null;
   _or?: SessionAddress_bool_exp[] | null;
@@ -6193,9 +6118,7 @@ export interface SessionAddress_bool_exp {
   courseLocationId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
-  location?: LocationOption_enum_comparison_exp | null;
   sessionId?: Int_comparison_exp | null;
-  type?: SessionAddressType_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
 
@@ -6204,16 +6127,12 @@ export interface SessionAddress_bool_exp {
  */
 export interface SessionAddress_insert_input {
   CourseLocation?: CourseLocation_obj_rel_insert_input | null;
-  LocationOption?: LocationOption_obj_rel_insert_input | null;
   Session?: Session_obj_rel_insert_input | null;
-  SessionAddressType?: SessionAddressType_obj_rel_insert_input | null;
   address?: string | null;
   courseLocationId?: number | null;
   created_at?: any | null;
   id?: number | null;
-  location?: LocationOption_enum | null;
   sessionId?: number | null;
-  type?: SessionAddressType_enum | null;
   updated_at?: any | null;
 }
 

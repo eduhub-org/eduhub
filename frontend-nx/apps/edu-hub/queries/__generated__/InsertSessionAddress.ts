@@ -3,8 +3,6 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { LocationOption_enum } from "./../../__generated__/globalTypes";
-
 // ====================================================
 // GraphQL mutation operation: InsertSessionAddress
 // ====================================================
@@ -35,7 +33,6 @@ export interface InsertSessionAddress {
 
 export interface InsertSessionAddressVariables {
   sessionId: number;
-  location: LocationOption_enum;
   address: string;
   courseLocationId: number;
 }
