@@ -181,9 +181,9 @@ export const DELETE_SESSION_SPEAKER = gql`
 `;
 
 export const INSERT_SESSION_ADDRESS = gql`
-  mutation InsertSessionAddress($sessionId: Int!, $location: LocationOption_enum!, $address: String!, $courseLocationId: Int!) {
+  mutation InsertSessionAddress($sessionId: Int!, $address: String!, $courseLocationId: Int!) {
     insert_SessionAddress(
-      objects: { sessionId: $sessionId, location: $location, address: $address, courseLocationId: $courseLocationId}
+      objects: { sessionId: $sessionId, address: $address, courseLocationId: $courseLocationId}
     ) {
       affected_rows
       returning {
@@ -218,7 +218,6 @@ export const INSERT_SESSION_WITH_ADDRESSES = gql`
         SessionAddresses {
           id
           address
-          location
           courseLocationId
         }
       }
@@ -240,16 +239,19 @@ export const UPDATE_SESSION_ADDRESS = gql`
   }
 `;
 
-
 export const DELETE_SESSION_ADDRESSES_BY_COURSE_AND_LOCATION = gql`
-  mutation DeleteSessionAddressesByCourseAndLocation (
-    $courseId: Int!
-    $location: LocationOption_enum!
+  mutation DeleteSessionAddressesByCourseAndLocation(
+    $courseId: Int!,
+    $courseLocationId: Int!
   ) {
-    delete_SessionAddress(where: {_and: {location: {_eq: $location}, Session: {Course: {id: {_eq: $courseId}}}}}) {
+    delete_SessionAddress(where: {
+      Session: {courseId: {_eq: $courseId}},
+      courseLocationId: {_eq: $courseLocationId}
+    }) {
       affected_rows
     }
-}`;
+  }
+`;
 
 export const LOCATION_OPTIONS = gql`
   query LocationOptions {
