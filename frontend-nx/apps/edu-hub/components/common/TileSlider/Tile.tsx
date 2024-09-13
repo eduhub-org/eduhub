@@ -10,6 +10,7 @@ import { getTileImage } from '../../../helpers/imageHandling';
 import {
   useWeekdayStartAndEndString,
 } from '../../../helpers/dateTimeHelpers';
+import React from 'react';
 
 type CourseType = CourseList_Course | CoursesEnrolledByUser_Course;
 
@@ -66,9 +67,12 @@ export const Tile: FC<TileProps> = ({ course, isManage }) => {
           <div className="flex justify-between text-xs items-center tracking-wider">
             <div className="flex uppercase">
               <Image src={locationIcon} alt="location icon" width={12} height={12} className="mr-1" />
-              {course.CourseLocations.length > 2
-                ? course.CourseLocations.map((location) => `${location.locationOption} +`).join('')
-                : course.CourseLocations.map((location) => `${location.locationOption}`).join(' + ')}
+              {course.CourseLocations.map((location, index) => (
+                <React.Fragment key={index}>
+                  {location.locationOption}
+                  {index < course.CourseLocations.length - 1 && ' + '}
+                </React.Fragment>
+              ))}
             </div>
             {!course.Program.published && course.Program.title}
           </div>

@@ -22,14 +22,19 @@ export const useDisplayDate = () => {
 export const useFormatTimeString = () => {
   const { timeZone } = useAppSettings();
 
-  return (ts: string | null) => {
+  return (ts: string | Date | null) => {
     if (ts == null) {
       return '';
     }
 
     try {
+      if (ts instanceof Date) {
+        // If it's a Date object, format it directly
+        return formatInTimeZone(ts, timeZone, 'HH:mm');
+      }
+
       // Check if the string is in HH:mm or HH:mm:ss format
-      if (/^\d{2}:\d{2}(:\d{2})?$/.test(ts)) {
+      if (typeof ts === 'string' && /^\d{2}:\d{2}(:\d{2})?$/.test(ts)) {
         // If it's just a time, we need to add a dummy date
         const dummyDate = new Date().toISOString().split('T')[0]; // Current date
         const dateTime = parse(`${dummyDate} ${ts}`, 'yyyy-MM-dd HH:mm:ss', new Date());
@@ -44,9 +49,13 @@ export const useFormatTimeString = () => {
       return formatInTimeZone(parsedDate, timeZone, 'HH:mm');
     } catch (error) {
       console.error('Error parsing time:', ts, error);
-      // Instead of returning the original string, let's try to extract the time part
-      const timeMatch = ts.match(/(\d{2}:\d{2})/);
-      return timeMatch ? timeMatch[1] : ts;
+      // If ts is a string, try to extract the time part
+      if (typeof ts === 'string') {
+        const timeMatch = ts.match(/(\d{2}:\d{2})/);
+        return timeMatch ? timeMatch[1] : ts;
+      }
+      // If ts is not a string (and not a valid Date), return an empty string
+      return '';
     }
   };
 };
