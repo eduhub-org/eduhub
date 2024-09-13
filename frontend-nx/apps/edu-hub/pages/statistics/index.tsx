@@ -1,9 +1,9 @@
 import Head from 'next/head';
 import { FC } from 'react';
 import { useIsAdmin } from '../../hooks/authentication';
-import EnrollmentStatisticsContent from '../../components/pages/EnrollmenteStatisticsContent';
+import StatisticsContent from '../../components/pages/StatisticsContent';
 
-const EnrollmentStatisticsPage: FC = () => {
+const StatisticsPage: FC = () => {
   const isAdmin = useIsAdmin();
 
   return (
@@ -12,9 +12,9 @@ const EnrollmentStatisticsPage: FC = () => {
         <title>EduHub | Enrollment Statistics</title>
         <link rel="icon" href="/favicon.png" />
       </Head>
-      {isAdmin ? <EnrollmentStatisticsContent /> : <div>Access denied</div>}
+      {isAdmin ? <StatisticsContent /> : <div>Access denied</div>}
     </>
   );
 };
 
-export default EnrollmentStatisticsPage;
+export default StatisticsPage;
