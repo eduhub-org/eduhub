@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useRoleQuery } from '../hooks/authedQuery';
-import { APP_SETTINGS } from '../queries/appSettings';
-import { AppSettings } from '../queries/__generated__/AppSettings';
+import { APP_SETTINGS } from '../graphql/queries/appSettings';
+import { AppSettings } from '../graphql/__generated__/AppSettings';
 
 interface AppSettingsContextType {
   timeZone: string;

@@ -18,21 +18,21 @@ import {
 import { QueryResult } from '@apollo/client';
 
 import { useAdminMutation } from '../../../hooks/authedMutation';
-import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
-import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
-import { INSERT_COURSE_DEGREE_TAG, DELETE_COURSE_DEGREE_TAG } from '../../../queries/courseDegree';
+import { SAVE_COURSE_IMAGE } from '../../../graphql/queries/actions';
+import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../graphql/mutations/courseGroup';
+import { INSERT_COURSE_DEGREE_TAG, DELETE_COURSE_DEGREE_TAG } from '../../../graphql/queries/course/courseDegree';
 
-import { DELETE_A_COURSE, UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
-import { DELETE_COURSE_INSRTRUCTOR } from '../../../queries/mutateCourseInstructor';
-import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
-import { DeleteCourseByPk, DeleteCourseByPkVariables } from '../../../queries/__generated__/DeleteCourseByPk';
+import { DELETE_A_COURSE, UPDATE_COURSE_PROPERTY } from '../../../graphql/mutations/mutateCourse';
+import { DELETE_COURSE_INSRTRUCTOR } from '../../../graphql/mutations/mutateCourseInstructor';
+import { AdminCourseList_Course } from '../../../graphql/__generated__/AdminCourseList';
+import { DeleteCourseByPk, DeleteCourseByPkVariables } from '../../../graphql/__generated__/DeleteCourseByPk';
 import {
   DeleteCourseInstructor,
   DeleteCourseInstructorVariables,
-} from '../../../queries/__generated__/DeleteCourseInstructor';
-import { Programs_Program } from '../../../queries/__generated__/Programs';
-import { SaveCourseImage, SaveCourseImageVariables } from '../../../queries/__generated__/SaveCourseImage';
-import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
+} from '../../../graphql/__generated__/DeleteCourseInstructor';
+import { Programs_Program } from '../../../graphql/__generated__/Programs';
+import { SaveCourseImage, SaveCourseImageVariables } from '../../../graphql/__generated__/SaveCourseImage';
+import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../graphql/__generated__/UpdateCourseByPk';
 import { SelectOption } from '../../../types/UIComponents';
 import { CourseEnrollmentStatus_enum, CourseStatus_enum } from '../../../__generated__/globalTypes';
 import EhCheckBox from '../../common/EhCheckbox';
@@ -56,7 +56,7 @@ import {
   UPDATE_COURSE_CHAT_LINK,
   UPDATE_COURSE_ECTS,
   UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK,
-} from '../../../queries/course';
+} from '../../../graphql/queries/course/course';
 import { isECTSFormat, isLinkFormat } from '../../../helpers/util';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';

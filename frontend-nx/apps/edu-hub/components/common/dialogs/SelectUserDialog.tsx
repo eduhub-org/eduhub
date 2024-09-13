@@ -3,13 +3,13 @@ import useTranslation from 'next-translate/useTranslation';
 import { ChangeEvent, FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
-import { USER_SELECTION_ONE_PARAM, USER_SELECTION_TWO_PARAMS } from '../../../queries/user';
+import { USER_SELECTION_ONE_PARAM, USER_SELECTION_TWO_PARAMS } from '../../../graphql/queries/user/user';
 import {
   UserForSelection1,
   UserForSelection1Variables,
   UserForSelection1_User,
-} from '../../../queries/__generated__/UserForSelection1';
-import { UserForSelection2, UserForSelection2Variables } from '../../../queries/__generated__/UserForSelection2';
+} from '../../../graphql/__generated__/UserForSelection1';
+import { UserForSelection2, UserForSelection2Variables } from '../../../graphql/__generated__/UserForSelection2';
 
 import { Button } from '../Button';
 import SelectUserRow from './SelectUserRow';

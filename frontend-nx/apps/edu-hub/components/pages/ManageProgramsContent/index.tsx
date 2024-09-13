@@ -6,13 +6,13 @@ import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirm
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 
-import { ProgramList, ProgramList_Program } from '../../../queries/__generated__/ProgramList';
-import { PROGRAM_LIST } from '../../../queries/programList';
+import { ProgramList, ProgramList_Program } from '../../../graphql/__generated__/ProgramList';
+import { PROGRAM_LIST } from '../../../graphql/queries/program/programList';
 import 'react-datepicker/dist/react-datepicker.css';
 import {
   UpdateProgramPublished,
   UpdateProgramPublishedVariables,
-} from '../../../queries/__generated__/UpdateProgramPublished';
+} from '../../../graphql/__generated__/UpdateProgramPublished';
 import {
   DELETE_PROGRAM,
   INSERT_PROGRAM,
@@ -29,55 +29,55 @@ import {
   UPDATE_PROGRAM_PUBLISHED,
   UPDATE_SPEAKER_QUESTIONAIRE,
   UPDATE_START_QUESTIONAIRE,
-} from '../../../queries/updateProgram';
-import { UpdateProgramTitle, UpdateProgramTitleVariables } from '../../../queries/__generated__/UpdateProgramTitle';
+} from '../../../graphql/mutations/updateProgram';
+import { UpdateProgramTitle, UpdateProgramTitleVariables } from '../../../graphql/__generated__/UpdateProgramTitle';
 import {
   UpdateProgramShortTitle,
   UpdateProgramShortTitleVariables,
-} from '../../../queries/__generated__/UpdateProgramShortTitle';
+} from '../../../graphql/__generated__/UpdateProgramShortTitle';
 import {
   UpdateProgramApplicationStart,
   UpdateProgramApplicationStartVariables,
-} from '../../../queries/__generated__/UpdateProgramApplicationStart';
+} from '../../../graphql/__generated__/UpdateProgramApplicationStart';
 import {
   UpdateProgramApplicationEnd,
   UpdateProgramApplicationEndVariables,
-} from '../../../queries/__generated__/UpdateProgramApplicationEnd';
+} from '../../../graphql/__generated__/UpdateProgramApplicationEnd';
 import {
   UpdateProgramLectureStart,
   UpdateProgramLectureStartVariables,
-} from '../../../queries/__generated__/UpdateProgramLectureStart';
+} from '../../../graphql/__generated__/UpdateProgramLectureStart';
 import {
   UpdateProgramLectureEnd,
   UpdateProgramLectureEndVariables,
-} from '../../../queries/__generated__/UpdateProgramLectureEnd';
+} from '../../../graphql/__generated__/UpdateProgramLectureEnd';
 import {
   UpdateProgramUploadDeadline,
   UpdateProgramUploadDeadlineVariables,
-} from '../../../queries/__generated__/UpdateProgramUploadDeadline';
+} from '../../../graphql/__generated__/UpdateProgramUploadDeadline';
 
 import { Button } from '@mui/material';
 
-import { InsertProgram, InsertProgramVariables } from '../../../queries/__generated__/InsertProgram';
-import { DeleteProgram, DeleteProgramVariables } from '../../../queries/__generated__/DeleteProgram';
+import { InsertProgram, InsertProgramVariables } from '../../../graphql/__generated__/InsertProgram';
+import { DeleteProgram, DeleteProgramVariables } from '../../../graphql/__generated__/DeleteProgram';
 import { ProgramsRow } from './ProgramsRow';
 import {
   UpdateProgramStartQuestionaire,
   UpdateProgramStartQuestionaireVariables,
-} from '../../../queries/__generated__/UpdateProgramStartQuestionaire';
-import { UpdateProgramSpeakerQuestionaire } from '../../../queries/__generated__/UpdateProgramSpeakerQuestionaire';
+} from '../../../graphql/__generated__/UpdateProgramStartQuestionaire';
+import { UpdateProgramSpeakerQuestionaire } from '../../../graphql/__generated__/UpdateProgramSpeakerQuestionaire';
 import {
   UpdateProgramClosingQuestionaire,
   UpdateProgramClosingQuestionaireVariables,
-} from '../../../queries/__generated__/UpdateProgramClosingQuestionaire';
+} from '../../../graphql/__generated__/UpdateProgramClosingQuestionaire';
 import {
   UpdateProgramAchievementCertVisible,
   UpdateProgramAchievementCertVisibleVariables,
-} from '../../../queries/__generated__/UpdateProgramAchievementCertVisible';
+} from '../../../graphql/__generated__/UpdateProgramAchievementCertVisible';
 import {
   UpdateProgramParticipationCertVisible,
   UpdateProgramParticipationCertVisibleVariables,
-} from '../../../queries/__generated__/UpdateProgramParticipationCertVisible';
+} from '../../../graphql/__generated__/UpdateProgramParticipationCertVisible';
 import useTranslation from 'next-translate/useTranslation';
 
 export const ManageProgramsContent: FC = () => {

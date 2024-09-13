@@ -1,11 +1,11 @@
 import { FC, useCallback, useContext } from 'react';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { ResponseToARequest, UploadFileTypes } from '../../../helpers/achievement';
-import { INSERT_AN_ACHIEVEMENT_OPTION } from '../../../queries/mutateAchievement';
+import { INSERT_AN_ACHIEVEMENT_OPTION } from '../../../graphql/mutations/mutateAchievement';
 import {
   InsertAnAchievementOption,
   InsertAnAchievementOptionVariables,
-} from '../../../queries/__generated__/InsertAnAchievementOption';
+} from '../../../graphql/__generated__/InsertAnAchievementOption';
 import { AchievementRecordType_enum } from '../../../__generated__/globalTypes';
 import {
   IDataToManipulate,

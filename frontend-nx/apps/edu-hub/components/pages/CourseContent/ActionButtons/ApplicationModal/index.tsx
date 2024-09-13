@@ -8,10 +8,10 @@ import { CourseEnrollmentStatus_enum } from '../../../../../__generated__/global
 import { useAuthedMutation } from '../../../../../hooks/authedMutation';
 import { useUserId } from '../../../../../hooks/user';
 import xIcon from '../../../../../public/images/common/x-calibur-black.svg';
-import { Course_Course_by_pk } from '../../../../../queries/__generated__/Course';
-import { CourseWithEnrollment_Course_by_pk } from '../../../../../queries/__generated__/CourseWithEnrollment';
-import { InsertEnrollment, InsertEnrollmentVariables } from '../../../../../queries/__generated__/InsertEnrollment';
-import { INSERT_ENROLLMENT } from '../../../../../queries/insertEnrollment';
+import { Course_Course_by_pk } from '../../../../../graphql/__generated__/Course';
+import { CourseWithEnrollment_Course_by_pk } from '../../../../../graphql/__generated__/CourseWithEnrollment';
+import { InsertEnrollment, InsertEnrollmentVariables } from '../../../../../graphql/__generated__/InsertEnrollment';
+import { INSERT_ENROLLMENT } from '../../../../../graphql/mutations/insertEnrollment';
 
 import { CourseApplicationModalFormContent } from './FormContent';
 import { ApplicationSuccessMessage } from './ApplicationSuccessMessage';

@@ -1,7 +1,7 @@
 import { useSession } from 'next-auth/react';
 
-import { User } from '../queries/__generated__/User';
-import { USER } from '../queries/user';
+import { User } from '../graphql/__generated__/User';
+import { USER } from '../graphql/queries/user/user';
 
 import { useAuthedQuery } from './authedQuery';
 

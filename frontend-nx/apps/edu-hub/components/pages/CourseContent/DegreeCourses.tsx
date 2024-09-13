@@ -3,13 +3,13 @@ import useTranslation from 'next-translate/useTranslation';
 import NextLink from 'next/link';
 import MuiLink from '@mui/material/Link';
 import { useUser } from '../../../../edu-hub/hooks/user';
-import { COMPLETED_DEGREE_ENROLLMENTS } from '../../../queries/courseDegree';
+import { COMPLETED_DEGREE_ENROLLMENTS } from '../../../graphql/queries/course/courseDegree';
 import {
   CompletedDegreeEnrollments,
   CompletedDegreeEnrollmentsVariables,
-} from '../../../queries/__generated__/CompletedDegreeEnrollments';
+} from '../../../graphql/__generated__/CompletedDegreeEnrollments';
 import { useRoleQuery } from '../../../hooks/authedQuery';
-import { Course_Course_by_pk_DegreeCourses } from '../../../queries/__generated__/Course';
+import { Course_Course_by_pk_DegreeCourses } from '../../../graphql/__generated__/Course';
 
 const isPublished = (degreeCourse) => degreeCourse?.Course?.published && degreeCourse?.Course?.Program?.published;
 

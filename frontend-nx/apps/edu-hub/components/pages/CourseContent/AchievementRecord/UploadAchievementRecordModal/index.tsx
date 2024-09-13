@@ -4,20 +4,20 @@ import { MdAddCircleOutline } from 'react-icons/md';
 import { UploadFile } from '../../../../../helpers/filehandling';
 import { makeFullName } from '../../../../../helpers/util';
 import { useAuthedMutation } from '../../../../../hooks/authedMutation';
-import { INSERT_AN_ACHIEVEMENT_RECORD, UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../../../queries/achievementRecord';
-import { SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION } from '../../../../../queries/actions';
+import { INSERT_AN_ACHIEVEMENT_RECORD, UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../../../graphql/queries/achievementRecord/achievementRecord';
+import { SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION } from '../../../../../graphql/queries/actions';
 import {
   InsertAnAchievementRecord,
   InsertAnAchievementRecordVariables,
-} from '../../../../../queries/__generated__/InsertAnAchievementRecord';
+} from '../../../../../graphql/__generated__/InsertAnAchievementRecord';
 import {
   SaveAchievementRecordDocumentation,
   SaveAchievementRecordDocumentationVariables,
-} from '../../../../../queries/__generated__/SaveAchievementRecordDocumentation';
+} from '../../../../../graphql/__generated__/SaveAchievementRecordDocumentation';
 import {
   UpdateAchievementRecordByPk,
   UpdateAchievementRecordByPkVariables,
-} from '../../../../../queries/__generated__/UpdateAchievementRecordByPk';
+} from '../../../../../graphql/__generated__/UpdateAchievementRecordByPk';
 import { AchievementRecordRating_enum } from '../../../../../__generated__/globalTypes';
 import EhTagStingId from '../../../../common/EhTagStingId';
 import { AtLeastNameEmail, MinAchievementOption } from '../../../../../helpers/achievement';
@@ -26,14 +26,14 @@ import { CircularProgress } from '@mui/material';
 import { Button } from '../../../../common/Button';
 import EnrolledUserForACourseDialog from '../../../../common/dialogs/EnrolledUserForACourseDialog';
 import Modal from '../../../../common/Modal';
-import { User_User_by_pk } from '../../../../../queries/__generated__/User';
+import { User_User_by_pk } from '../../../../../graphql/__generated__/User';
 import { ErrorMessageDialog } from '../../../../common/dialogs/ErrorMessageDialog';
 import useErrorHandler from '../../../../../hooks/useErrorHandler';
 import {
   AchievementOptionCourses,
   AchievementOptionCourses_AchievementOptionCourse_AchievementOption,
   AchievementOptionCoursesVariables,
-} from '../../../../../queries/__generated__/AchievementOptionCourses';
+} from '../../../../../graphql/__generated__/AchievementOptionCourses';
 import { QueryResult } from '@apollo/client';
 import FileDownload from '../../../../forms/FileDownload';
 import UploadUI from './UploadUI';

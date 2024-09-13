@@ -1,12 +1,12 @@
 import useTranslation from 'next-translate/useTranslation';
 import { FC } from 'react';
 
-import { CourseWithEnrollment_Course_by_pk } from '../../../queries/__generated__/CourseWithEnrollment';
+import { CourseWithEnrollment_Course_by_pk } from '../../../graphql/__generated__/CourseWithEnrollment';
 import { BlockTitle } from '@opencampus/shared-components';
 import Dot from '../../common/Dot';
 
 import { AttendanceStatus_enum } from '../../../__generated__/globalTypes';
-import { CourseWithEnrollment_Course_by_pk_Sessions } from '../../../queries/__generated__/CourseWithEnrollment';
+import { CourseWithEnrollment_Course_by_pk_Sessions } from '../../../graphql/__generated__/CourseWithEnrollment';
 
 const getBgColor = (status) => {
   if (status === NO_INFO) {

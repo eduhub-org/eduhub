@@ -10,12 +10,12 @@ import { useAdminQuery } from '../../../hooks/authedQuery';
 import {
   USERS_BY_LAST_NAME,
   DELETE_USER
- } from '../../../queries/user';
+ } from '../../../graphql/queries/user/user';
 import {
   UsersByLastName,
   UsersByLastNameVariables,
   UsersByLastName_User,
-} from '../../../queries/__generated__/UsersByLastName';
+} from '../../../graphql/__generated__/UsersByLastName';
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import UserRow from './UserRow';

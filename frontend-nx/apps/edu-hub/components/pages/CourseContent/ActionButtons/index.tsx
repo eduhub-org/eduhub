@@ -3,14 +3,14 @@ import { FC, useCallback, useState } from 'react';
 
 import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
 import { useUser } from '../../../../hooks/user';
-import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/CourseWithEnrollment';
+import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../graphql/__generated__/CourseWithEnrollment';
 
 import { ApplyButton } from './ApplyButton';
 import { ApplicationModal } from './ApplicationModal';
 
 import { Button } from '../../../common/Button';
 
-import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
+import { Course_Course_by_pk } from '../../../../graphql/__generated__/Course';
 import { useIsLoggedIn } from '../../../../hooks/authentication';
 import { signIn } from 'next-auth/react';
 

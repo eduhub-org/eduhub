@@ -1,5 +1,5 @@
 import { LazyQueryResult, QueryResult } from '@apollo/client';
-import { ACHIEVEMENT_OPTION_COURSES } from '../../../../queries/achievementOption';
+import { ACHIEVEMENT_OPTION_COURSES } from '../../../../graphql/queries/achievementOption';
 import useTranslation from 'next-translate/useTranslation';
 import Link from 'next/link';
 import { Dispatch, FC, SetStateAction, useCallback, useState } from 'react';
@@ -11,33 +11,33 @@ import { CertificateDownload } from '../../../common/CertificateDownload';
 import { MdAddCircle, MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
 import { useLazyRoleQuery, useRoleQuery } from '../../../../hooks/authedQuery';
 import { QUERY_LIMIT } from '../../../../pages/manage/courses';
-import { UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../../queries/achievementRecord';
-import { INSERT_SINGLE_ATTENDANCE } from '../../../../queries/courseEnrollment';
-import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../../../queries/mutateAchievement';
-import { GET_SIGNED_URL } from '../../../../queries/actions';
+import { UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../../graphql/queries/achievementRecord/achievementRecord';
+import { INSERT_SINGLE_ATTENDANCE } from '../../../../graphql/queries/course/courseEnrollment';
+import { DELETE_AN_ACHIEVEMENT_OPTION_COURSE_BY_PK } from '../../../../graphql/mutations/mutateAchievement';
+import { GET_SIGNED_URL } from '../../../../graphql/queries/actions';
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
-} from '../../../../queries/__generated__/AchievementOptionCourses';
+} from '../../../../graphql/__generated__/AchievementOptionCourses';
 import {
   UpdateAchievementRecordByPk,
   UpdateAchievementRecordByPkVariables,
-} from '../../../../queries/__generated__/UpdateAchievementRecordByPk';
+} from '../../../../graphql/__generated__/UpdateAchievementRecordByPk';
 import {
   DeleteAnAchievementOptionCourse,
   DeleteAnAchievementOptionCourseVariables,
-} from '../../../../queries/__generated__/DeleteAnAchievementOptionCourse';
+} from '../../../../graphql/__generated__/DeleteAnAchievementOptionCourse';
 import {
   InsertSingleAttendance,
   InsertSingleAttendanceVariables,
-} from '../../../../queries/__generated__/InsertSingleAttendance';
-import { GetSignedUrl, GetSignedUrlVariables } from '../../../../queries/__generated__/GetSignedUrl';
+} from '../../../../graphql/__generated__/InsertSingleAttendance';
+import { GetSignedUrl, GetSignedUrlVariables } from '../../../../graphql/__generated__/GetSignedUrl';
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_AchievementOptionCourses_AchievementOption_AchievementRecords,
   ManagedCourse_Course_by_pk_CourseEnrollments,
   ManagedCourse_Course_by_pk_Sessions,
-} from '../../../../queries/__generated__/ManagedCourse';
+} from '../../../../graphql/__generated__/ManagedCourse';
 
 import { StaticComponentProperty } from '../../../../types/UIComponents';
 import { GenerateCertificatesButton } from './GenerateCertificatesButton';

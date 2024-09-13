@@ -5,7 +5,7 @@ import { Button } from '../../../common/Button';
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_CourseEnrollments,
-} from '../../../../queries/__generated__/ManagedCourse';
+} from '../../../../graphql/__generated__/ManagedCourse';
 import { ApplicationRow } from './ApplicationRow';
 import Dot from '../../../common/Dot';
 import { OnlyAdmin } from '../../../common/OnlyLoggedIn';
@@ -19,22 +19,22 @@ import {
 import {
   UpdateEnrollmentRating,
   UpdateEnrollmentRatingVariables,
-} from '../../../../queries/__generated__/UpdateEnrollmentRating';
-import { UPDATE_ENROLLMENT_STATUS, UPDATE_ENROLLMENT_RATING } from '../../../../queries/insertEnrollment';
+} from '../../../../graphql/__generated__/UpdateEnrollmentRating';
+import { UPDATE_ENROLLMENT_STATUS, UPDATE_ENROLLMENT_RATING } from '../../../../graphql/mutations/insertEnrollment';
 import { Button as OldButton } from '../../../common/Button';
 import { Dialog, DialogTitle } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useAdminQuery } from '../../../../hooks/authedQuery';
-import { MailTemplates } from '../../../../queries/__generated__/MailTemplates';
-import { INSERT_MAIL_LOG, MAIL_TEMPLATES } from '../../../../queries/mail';
+import { MailTemplates } from '../../../../graphql/__generated__/MailTemplates';
+import { INSERT_MAIL_LOG, MAIL_TEMPLATES } from '../../../../graphql/queries/mail';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
-import { InsertMailLog, InsertMailLogVariables } from '../../../../queries/__generated__/InsertMailLog';
+import { InsertMailLog, InsertMailLogVariables } from '../../../../graphql/__generated__/InsertMailLog';
 import {
   UpdateEnrollmentStatus,
   UpdateEnrollmentStatusVariables,
-} from '../../../../queries/__generated__/UpdateEnrollmentStatus';
+} from '../../../../graphql/__generated__/UpdateEnrollmentStatus';
 import useTranslation from 'next-translate/useTranslation';
 import { AuthRoles } from '../../../../types/enums';
 import AddButton from '../../../common/AddButton';

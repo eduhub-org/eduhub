@@ -3,9 +3,9 @@ import useTranslation from 'next-translate/useTranslation';
 import { Dispatch, SetStateAction } from 'react';
 
 import { useRoleQuery } from '../../hooks/authedQuery';
-import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../queries/__generated__/CourseWithEnrollment';
-import { GET_SIGNED_URL } from '../../queries/actions';
-import { GetSignedUrl, GetSignedUrlVariables } from '../../queries/__generated__/GetSignedUrl';
+import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../graphql/__generated__/CourseWithEnrollment';
+import { GET_SIGNED_URL } from '../../graphql/queries/actions';
+import { GetSignedUrl, GetSignedUrlVariables } from '../../graphql/__generated__/GetSignedUrl';
 import { Button } from './Button';
 import { ExtendedDegreeParticipantsEnrollment } from '../pages/ManageCourseContent/DegreeParticipationsTab';
 import { ErrorMessageDialog } from '../../components/common/dialogs/ErrorMessageDialog';

@@ -2,20 +2,20 @@ import { CircularProgress, IconButton } from '@mui/material';
 import { Button } from '@mui/material';
 import { MdAddCircle } from 'react-icons/md';
 import { IUserProfile } from '../../../hooks/user';
-import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
+import { AdminCourseList_Course } from '../../../graphql/__generated__/AdminCourseList';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { MdDelete, MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
 import { makeFullName } from '../../../helpers/util';
 import { useAdminQuery } from '../../../hooks/authedQuery';
-import { ACHIEVEMENT_OPTIONS } from '../../../queries/achievementOption';
-import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../queries/programList';
+import { ACHIEVEMENT_OPTIONS } from '../../../graphql/queries/achievementOption';
+import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../graphql/queries/program/programList';
 import {
   AchievementOptionList,
   AchievementOptionListVariables,
   AchievementOptionList_AchievementOption,
-} from '../../../queries/__generated__/AchievementOptionList';
-import { Programs, Programs_Program } from '../../../queries/__generated__/Programs';
+} from '../../../graphql/__generated__/AchievementOptionList';
+import { Programs, Programs_Program } from '../../../graphql/__generated__/Programs';
 import { StaticComponentProperty } from '../../../types/UIComponents';
 import { AlertMessageDialog } from '../../common/dialogs/AlertMessageDialog';
 import EhAddButton from '../../common/EhAddButton';

@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { FC, useMemo } from 'react';
 import mysteryImg from '../../public/images/common/mystery.svg';
-import { Course_Course_by_pk_CourseInstructors_Expert_User } from '../../queries/__generated__/Course';
+import { Course_Course_by_pk_CourseInstructors_Expert_User } from '../../graphql/__generated__/Course';
 import { isLinkFormat } from '../../helpers/util';
 import useTranslation from 'next-translate/useTranslation';
 import { getPublicImageUrl } from '../../helpers/filehandling';

@@ -7,7 +7,7 @@ Our project uses GraphQL for efficient data fetching and manipulation. This sect
 The GraphQL folder structure is located in the `edu-hub` app of our NX workspace:
 
 ```
-frontend-nx/apps/edu-hub/src/graphql/
+frontend-nx/apps/edu-hub/graphql/
 ```
 
 ### Folder Structure
@@ -113,10 +113,10 @@ export const ACHIEVEMENT_OPTIONS = gql`
 We use GraphQL Code Generator to auto-generate TypeScript types. The configuration is in `codegen.yml` at the workspace root. To generate types:
 
 1. Ensure your GraphQL schema and operations are up to date.
-2. Run the generation script:
+2. In the folder `frontend-nx` run the generation script:
 
    ```
-   npm run generate:edu-hub
+   yarn generate:graphql
    ```
 
 3. The generated types will be updated in `graphql/types.ts`.

@@ -1,6 +1,6 @@
 import { useLazyRoleQuery } from "./authedQuery";
-import { GetSignedUrl, GetSignedUrlVariables } from "../queries/__generated__/GetSignedUrl";
-import { GET_SIGNED_URL } from "../queries/actions";
+import { GetSignedUrl, GetSignedUrlVariables } from "../graphql/__generated__/GetSignedUrl";
+import { GET_SIGNED_URL } from "../graphql/queries/actions";
 import { useCallback, useState } from 'react';
 import { getPublicUrl } from "../helpers/filehandling";
 

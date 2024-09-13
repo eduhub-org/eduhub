@@ -1,15 +1,15 @@
 import { QueryResult } from '@apollo/client';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback } from 'react';
-import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
+import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../graphql/__generated__/ManagedCourse';
 import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
-import { LocationOptions } from '../../../../queries/__generated__/LocationOptions';
+import { LocationOptions } from '../../../../graphql/__generated__/LocationOptions';
 import {
   LOCATION_OPTIONS,
   UPDATE_COURSE_LOCATION,
   UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
-} from '../../../../queries/course';
+} from '../../../../graphql/queries/course/course';
 import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
 import { isLinkFormat } from '../../../../helpers/util';
 import DeleteButton from '../../../../components/common/DeleteButton';

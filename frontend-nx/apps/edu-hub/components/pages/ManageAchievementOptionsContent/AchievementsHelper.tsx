@@ -3,16 +3,16 @@ import { IUserProfile } from '../../../hooks/user';
 import { IPayload } from '../../../helpers/achievement';
 import { UploadFile } from '../../../helpers/filehandling';
 import { Translate } from 'next-translate';
-import { DELETE_AN_ACHIEVEMENT_OPTION, UPDATE_AN_ACHIEVEMENT_OPTION } from '../../../queries/mutateAchievement';
-import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
+import { DELETE_AN_ACHIEVEMENT_OPTION, UPDATE_AN_ACHIEVEMENT_OPTION } from '../../../graphql/mutations/mutateAchievement';
+import { AdminCourseList_Course } from '../../../graphql/__generated__/AdminCourseList';
 import {
   DeleteAnAchievementOption,
   DeleteAnAchievementOptionVariables,
-} from '../../../queries/__generated__/DeleteAnAchievementOption';
+} from '../../../graphql/__generated__/DeleteAnAchievementOption';
 import {
   UpdateAnAchievementOption,
   UpdateAnAchievementOptionVariables,
-} from '../../../queries/__generated__/UpdateAnAchievementOption';
+} from '../../../graphql/__generated__/UpdateAnAchievementOption';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import useTranslation from 'next-translate/useTranslation';
 

@@ -13,8 +13,8 @@ import {
   TempAchievementOptionMentor,
 } from '../../../helpers/achievement';
 import { makeFullName } from '../../../helpers/util';
-import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
-import { UserForSelection1_User } from '../../../queries/__generated__/UserForSelection1';
+import { AdminCourseList_Course } from '../../../graphql/__generated__/AdminCourseList';
+import { UserForSelection1_User } from '../../../graphql/__generated__/UserForSelection1';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import EhTagStingId from '../../common/EhTagStingId';
 import TagWithTwoText from '../../common/TagWithTwoText';
@@ -22,8 +22,8 @@ import CourseListDialog from './CourseListDialog';
 import { Button } from '../../common/Button';
 import { AchievementContext } from './AchievementsHelper';
 import { useAdminQuery } from '../../../hooks/authedQuery';
-import { ACHIEVEMENT_DOCUMENTATION_TEMPLATES } from '../../../queries/achievementDocumentationTemplate';
-import { AchievementDocumentationTemplates } from '../../../queries/__generated__/AchievementDocumentationTemplates';
+import { ACHIEVEMENT_DOCUMENTATION_TEMPLATES } from '../../../graphql/queries/achievementDocumentationTemplate';
+import { AchievementDocumentationTemplates } from '../../../graphql/__generated__/AchievementDocumentationTemplates';
 interface IPropsAddEditAchievementTempData {
   defaultData: IDataToManipulate;
   onSaveCallBack: (data: IDataToManipulate) => Promise<ResponseToARequest>;

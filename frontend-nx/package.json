@@ -7,7 +7,7 @@
     "build": "nx build",
     "test": "nx test",
     "find-unused": "unused-exports ./apps/eduhub/components",
-    "generate:graphql": "yarn nx run edu-hub:graphql-codegen"
+    "generate:graphql": "dotenv -e ./apps/edu-hub/.env.development -- graphql-codegen"
   },
   "private": true,
   "dependencies": {
@@ -65,13 +65,16 @@
   "devDependencies": {
     "@eslint/compat": "^1.1.1",
     "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/typescript": "^4.0.9",
+    "@graphql-codegen/typescript-operations": "^4.2.3",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.2",
     "@nx/cypress": "19.6.4",
     "@nx/eslint": "19.6.4",
     "@nx/eslint-plugin": "19.6.4",
     "@nx/jest": "19.6.4",
     "@nx/next": "19.6.4",
     "@nx/nx-linux-x64-gnu": "^19.6.4",
-    "@nx/react": "19.6.4",
+    "@nx/react": "^19.7.3",
     "@nx/web": "19.6.4",
     "@nx/workspace": "19.6.4",
     "@tailwindcss/line-clamp": "^0.4.4",
@@ -96,6 +99,7 @@
     "autoprefixer": "^10.4.20",
     "babel-jest": "29.7.0",
     "cypress": "^13.14.1",
+    "dotenv-cli": "^7.4.2",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.7",
     "eslint-config-prettier": "9.1.0",

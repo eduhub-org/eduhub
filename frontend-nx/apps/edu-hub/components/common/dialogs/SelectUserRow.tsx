@@ -1,5 +1,5 @@
 import { FC, useCallback } from "react";
-import { UserForSelection1_User } from "../../../queries/__generated__/UserForSelection1";
+import { UserForSelection1_User } from "../../../graphql/__generated__/UserForSelection1";
 
 interface IProps {
   user: UserForSelection1_User;

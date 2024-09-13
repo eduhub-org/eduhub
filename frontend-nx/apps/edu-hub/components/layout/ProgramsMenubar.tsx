@@ -1,5 +1,5 @@
 import { FC, useCallback, useState } from 'react';
-import { Programs_Program } from '../../queries/__generated__/Programs';
+import { Programs_Program } from '../../graphql/__generated__/Programs';
 import { StaticComponentProperty } from '../../types/UIComponents';
 import EhMenuItem from '../common/EhMenuItem';
 

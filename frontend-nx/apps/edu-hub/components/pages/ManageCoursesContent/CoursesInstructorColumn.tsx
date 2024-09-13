@@ -3,20 +3,20 @@ import { MdAddCircle } from 'react-icons/md';
 import { QueryResult } from '@apollo/client';
 
 import { useAdminMutation } from '../../../hooks/authedMutation';
-import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../../queries/mutateCourseInstructor';
-import { INSERT_EXPERT } from '../../../queries/user';
-import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
+import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../../graphql/mutations/mutateCourseInstructor';
+import { INSERT_EXPERT } from '../../../graphql/queries/user/user';
+import { AdminCourseList_Course } from '../../../graphql/__generated__/AdminCourseList';
 import {
   DeleteCourseInstructor,
   DeleteCourseInstructorVariables,
-} from '../../../queries/__generated__/DeleteCourseInstructor';
+} from '../../../graphql/__generated__/DeleteCourseInstructor';
 import {
   InsertCourseInstructor,
   InsertCourseInstructorVariables,
-} from '../../../queries/__generated__/InsertCourseInstructor';
-import { InsertExpert, InsertExpertVariables } from '../../../queries/__generated__/InsertExpert';
-import { Programs_Program } from '../../../queries/__generated__/Programs';
-import { UserForSelection1_User } from '../../../queries/__generated__/UserForSelection1';
+} from '../../../graphql/__generated__/InsertCourseInstructor';
+import { InsertExpert, InsertExpertVariables } from '../../../graphql/__generated__/InsertExpert';
+import { Programs_Program } from '../../../graphql/__generated__/Programs';
+import { UserForSelection1_User } from '../../../graphql/__generated__/UserForSelection1';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import EhTag from '../../common/EhTag';
 

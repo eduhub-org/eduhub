@@ -13,27 +13,27 @@ import FormFieldRow from '../../forms/FormFieldRow';
 import { useAuthedMutation } from '../../../hooks/authedMutation';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
 
-import { UPDATE_USER } from '../../../queries/updateUser';
-import { USER } from '../../../queries/user';
-import { SAVE_USER_PROFILE_IMAGE } from '../../../queries/actions';
-import { UPDATE_USER_PROFILE_PICTURE } from '../../../queries/updateUser';
+import { UPDATE_USER } from '../../../graphql/mutations/updateUser';
+import { USER } from '../../../graphql/queries/user/user';
+import { SAVE_USER_PROFILE_IMAGE } from '../../../graphql/queries/actions';
+import { UPDATE_USER_PROFILE_PICTURE } from '../../../graphql/mutations/updateUser';
 
 import type { MutableRefObject } from 'react';
 import {
   SaveUserProfileImage,
   SaveUserProfileImageVariables,
-} from '../../../queries/__generated__/SaveUserProfileImage';
-import { UpdateUserVariables, UpdateUser } from '../../../queries/__generated__/UpdateUser';
+} from '../../../graphql/__generated__/SaveUserProfileImage';
+import { UpdateUserVariables, UpdateUser } from '../../../graphql/__generated__/UpdateUser';
 import {
   UpdateUserProfilePictureVariables,
   UpdateUserProfilePicture,
-} from '../../../queries/__generated__/UpdateUserProfilePicture';
+} from '../../../graphql/__generated__/UpdateUserProfilePicture';
 import { University_enum } from '../../../__generated__/globalTypes';
 import { Employment_enum } from '../../../__generated__/globalTypes';
 import UserCard from '../../common/UserCard';
 import log from 'loglevel';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
-import { User, UserVariables } from '../../../queries/__generated__/User';
+import { User, UserVariables } from '../../../graphql/__generated__/User';
 
 // generated types must be updated first with new fields in schema
 // import type { User } from "../../queries/__generated__/User";

@@ -10,15 +10,15 @@ import EduHubDropdownSelector from '../../forms/EduHubDropdownSelector';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
 
-import { UpdateBannerVariables, UpdateBanner } from '../../../queries/__generated__/UpdateBanner';
-import { APP_SETTINGS, UPDATE_APP_SETTINGS_BANNER, UPDATE_APP_SETTINGS_TIME_ZONE } from '../../../queries/appSettings';
-import { AppSettings } from '../../../queries/__generated__/AppSettings';
-import { COURSE_GROUP_OPTIONS, UPDATE_COURSE_GROUP_OPTION_ORDER } from '../../../queries/courseGroupOptions';
-import { CourseGroupOptions } from '../../../queries/__generated__/CourseGroupOptions';
+import { UpdateBannerVariables, UpdateBanner } from '../../../graphql/__generated__/UpdateBanner';
+import { APP_SETTINGS, UPDATE_APP_SETTINGS_BANNER, UPDATE_APP_SETTINGS_TIME_ZONE } from '../../../graphql/queries/appSettings';
+import { AppSettings } from '../../../graphql/__generated__/AppSettings';
+import { COURSE_GROUP_OPTIONS, UPDATE_COURSE_GROUP_OPTION_ORDER } from '../../../graphql/queries/courseGroupOptions';
+import { CourseGroupOptions } from '../../../graphql/__generated__/CourseGroupOptions';
 import {
   UpdateCourseGroupOptionOrder,
   UpdateCourseGroupOptionOrderVariables,
-} from '../../../queries/__generated__/UpdateCourseGroupOptionOrder';
+} from '../../../graphql/__generated__/UpdateCourseGroupOptionOrder';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 
 type Inputs = {

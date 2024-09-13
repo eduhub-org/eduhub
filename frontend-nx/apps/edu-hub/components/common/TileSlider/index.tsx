@@ -3,7 +3,7 @@ import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 
-import { CourseList_Course } from '../../../queries/__generated__/CourseList';
+import { CourseList_Course } from '../../../graphql/__generated__/CourseList';
 import { Tile } from './Tile';
 
 import sliderNextArrow from '../../../public/images/common/slider-next-arrow.svg';

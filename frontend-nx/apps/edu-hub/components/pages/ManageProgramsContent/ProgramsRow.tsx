@@ -12,34 +12,34 @@ import { Button } from '../../common/Button';
 import { parseFileUploadEvent } from '../../../helpers/filehandling';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { useLazyRoleQuery } from '../../../hooks/authedQuery';
-import { SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE, SAVE_ATTENDANCE_CERTIFICATE_TEMPLATE } from '../../../queries/actions';
-import { LOAD_PARTICIPATION_DATA } from '../../../queries/actions';
+import { SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE, SAVE_ATTENDANCE_CERTIFICATE_TEMPLATE } from '../../../graphql/queries/actions';
+import { LOAD_PARTICIPATION_DATA } from '../../../graphql/queries/actions';
 import {
   UPDATE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
   UPDATE_ATTENDANCE_CERTIFICATE_TEMPLATE,
-} from '../../../queries/updateProgram';
-import { ProgramList_Program } from '../../../queries/__generated__/ProgramList';
+} from '../../../graphql/mutations/updateProgram';
+import { ProgramList_Program } from '../../../graphql/__generated__/ProgramList';
 import {
   SaveAchievementCertificateTemplate,
   SaveAchievementCertificateTemplateVariables,
-} from '../../../queries/__generated__/SaveAchievementCertificateTemplate';
+} from '../../../graphql/__generated__/SaveAchievementCertificateTemplate';
 import {
   SaveAttendanceCertificateTemplate,
   SaveAttendanceCertificateTemplateVariables,
-} from '../../../queries/__generated__/SaveAttendanceCertificateTemplate';
+} from '../../../graphql/__generated__/SaveAttendanceCertificateTemplate';
 
 import {
   UpdateProgramAchievementTemplate,
   UpdateProgramAchievementTemplateVariables,
-} from '../../../queries/__generated__/UpdateProgramAchievementTemplate';
+} from '../../../graphql/__generated__/UpdateProgramAchievementTemplate';
 import {
   loadParticipationData,
   loadParticipationDataVariables,
-} from '../../../queries/__generated__/loadParticipationData';
+} from '../../../graphql/__generated__/loadParticipationData';
 import {
   UpdateProgramParticipationTemplate,
   UpdateProgramParticipationTemplateVariables,
-} from '../../../queries/__generated__/UpdateProgramParticipationTemplate';
+} from '../../../graphql/__generated__/UpdateProgramParticipationTemplate';
 import EhDebounceInput from '../../common/EhDebounceInput';
 import path from 'path';
 

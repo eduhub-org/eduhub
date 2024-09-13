@@ -1,15 +1,15 @@
 import { FC, useMemo } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { ColumnDef } from '@tanstack/react-table';
-import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
+import { ManagedCourse_Course_by_pk } from '../../../../graphql/__generated__/ManagedCourse';
 import TableGrid from '../../../common/TableGrid';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import {
   DegreeParticipantsWithDegreeEnrollments,
   DegreeParticipantsWithDegreeEnrollmentsVariables,
   DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments,
-} from '../../../../queries/__generated__/DegreeParticipantsWithDegreeEnrollments';
-import { DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS } from '../../../../queries/courseDegree';
+} from '../../../../graphql/__generated__/DegreeParticipantsWithDegreeEnrollments';
+import { DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS } from '../../../../graphql/queries/course/courseDegree';
 import { CertificateDownload } from '../../../common/CertificateDownload';
 
 interface DegreeParticipationsTabIProps {

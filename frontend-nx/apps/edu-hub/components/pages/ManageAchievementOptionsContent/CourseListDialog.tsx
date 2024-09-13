@@ -4,12 +4,12 @@ import { FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { QUERY_LIMIT } from '../../../pages/manage/courses';
-import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
+import { ADMIN_COURSE_LIST } from '../../../graphql/queries/course/courseList';
 import {
   AdminCourseList,
   AdminCourseListVariables,
   AdminCourseList_Course,
-} from '../../../queries/__generated__/AdminCourseList';
+} from '../../../graphql/__generated__/AdminCourseList';
 import { Button } from '../../common/Button';
 import SearchBox from '../../common/SearchBox';
 

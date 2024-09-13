@@ -2,13 +2,13 @@ import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useState } from 'react';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
-import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from '../../../queries/course';
+import { MANAGED_COURSE, UPDATE_COURSE_STATUS } from '../../../graphql/queries/course/course';
 import {
   ManagedCourse,
   ManagedCourseVariables,
   ManagedCourse_Course_by_pk,
-} from '../../../queries/__generated__/ManagedCourse';
-import { UpdateCourseStatus, UpdateCourseStatusVariables } from '../../../queries/__generated__/UpdateCourseStatus';
+} from '../../../graphql/__generated__/ManagedCourse';
+import { UpdateCourseStatus, UpdateCourseStatusVariables } from '../../../graphql/__generated__/UpdateCourseStatus';
 import { AlertMessageDialog } from '../../common/dialogs/AlertMessageDialog';
 import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
 import { PageBlock } from '../../common/PageBlock';

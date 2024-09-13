@@ -17,8 +17,8 @@ import {
   UPDATE_COURSE_SHORT_DESCRIPTION,
   DELETE_SESSION_ADDRESSES_BY_COURSE_AND_LOCATION,
   INSERT_SESSION_ADDRESS,
-} from '../../../../queries/course';
-import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
+} from '../../../../graphql/queries/course/course';
+import { ManagedCourse_Course_by_pk } from '../../../../graphql/__generated__/ManagedCourse';
 import Locations from './Locations';
 import { Button } from '@mui/material';
 import { MdAddCircle } from 'react-icons/md';
@@ -34,31 +34,31 @@ import { useStartTimeString, useEndTimeString } from '../../../../helpers/dateTi
 import {
   DeleteCourseLocation,
   DeleteCourseLocationVariables,
-} from '../../../../queries/__generated__/DeleteCourseLocation';
+} from '../../../../graphql/__generated__/DeleteCourseLocation';
 import {
   InsertCourseLocation,
   InsertCourseLocationVariables,
-} from '../../../../queries/__generated__/InsertCourseLocation';
+} from '../../../../graphql/__generated__/InsertCourseLocation';
 import {
   UpdateCourseEndTime,
   UpdateCourseEndTimeVariables,
-} from '../../../../queries/__generated__/UpdateCourseEndTime';
+} from '../../../../graphql/__generated__/UpdateCourseEndTime';
 import {
   UpdateCourseStartTime,
   UpdateCourseStartTimeVariables,
-} from '../../../../queries/__generated__/UpdateCourseStartTime';
+} from '../../../../graphql/__generated__/UpdateCourseStartTime';
 import {
   UpdateCourseMaxParticipants,
   UpdateCourseMaxParticipantsVariables,
-} from '../../../../queries/__generated__/UpdateCourseMaxParticipants';
+} from '../../../../graphql/__generated__/UpdateCourseMaxParticipants';
 import {
   DeleteSessionAddressesByCourseAndLocation,
   DeleteSessionAddressesByCourseAndLocationVariables,
-} from '../../../../queries/__generated__/DeleteSessionAddressesByCourseAndLocation';
+} from '../../../../graphql/__generated__/DeleteSessionAddressesByCourseAndLocation';
 import {
   InsertSessionAddress,
   InsertSessionAddressVariables,
-} from '../../../../queries/__generated__/InsertSessionAddress';
+} from '../../../../graphql/__generated__/InsertSessionAddress';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;

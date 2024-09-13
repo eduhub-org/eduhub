@@ -5,7 +5,7 @@ import useTranslation from 'next-translate/useTranslation';
 import { useStartTimeString, useEndTimeString, getWeekdayString } from '../../../helpers/dateTimeHelpers';
 import languageIcon from '../../../public/images/course/language.svg';
 import pinIcon from '../../../public/images/course/pin.svg';
-import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
+import { Course_Course_by_pk } from '../../../graphql/__generated__/Course';
 import UserCard from '../../common/UserCard'; // Adjust the path as needed
 import React from 'react';
 

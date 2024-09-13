@@ -1,0 +1,26 @@
+overwrite: true
+schema:
+  - http://hasura:8080/v1/graphql:
+      headers:
+        x-hasura-admin-secret: myadminsecretkey
+generates:
+  apps/edu-hub/graphql/generated/graphql.ts:
+    documents: "apps/edu-hub/**/*.{ts,tsx}"
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+    config:
+      withHooks: true
+      withComponent: false
+      withHOC: false
+  apps/rent-a-scientist/graphql.ts:
+    documents: "apps/rent-a-scientist/**/*.{ts,tsx}"
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+    config:
+      withHooks: true
+      withComponent: false
+      withHOC: false

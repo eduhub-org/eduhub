@@ -4,7 +4,7 @@ import { GoDotFill } from 'react-icons/go';
 import { IoIosArrowDown, IoIosArrowUp, IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
 import { MdCheckBox, MdOutlineCheckBoxOutlineBlank } from 'react-icons/md';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
-import { ManagedCourse_Course_by_pk_CourseEnrollments } from '../../../../queries/__generated__/ManagedCourse';
+import { ManagedCourse_Course_by_pk_CourseEnrollments } from '../../../../graphql/__generated__/ManagedCourse';
 import { MotivationRating_enum } from '../../../../__generated__/globalTypes';
 import Dot from '../../../common/Dot';
 import { OnlyAdmin } from '../../../common/OnlyLoggedIn';

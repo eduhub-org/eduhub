@@ -11,10 +11,10 @@ import Loading from '../../../components/common/Loading';
 import { Page } from '../../../components/layout/Page';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';
-import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
-import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../queries/programList';
-import { AdminCourseList, AdminCourseListVariables } from '../../../queries/__generated__/AdminCourseList';
-import { Programs, Programs_Program } from '../../../queries/__generated__/Programs';
+import { ADMIN_COURSE_LIST } from '../../../graphql/queries/course/courseList';
+import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../graphql/queries/program/programList';
+import { AdminCourseList, AdminCourseListVariables } from '../../../graphql/__generated__/AdminCourseList';
+import { Programs, Programs_Program } from '../../../graphql/__generated__/Programs';
 
 const Index: FC = () => {
   const isAdmin = useIsAdmin();

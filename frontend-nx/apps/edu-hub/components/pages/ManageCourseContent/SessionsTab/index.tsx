@@ -17,27 +17,27 @@ import {
   UPDATE_SESSION_END_TIME,
   UPDATE_SESSION_START_TIME,
   UPDATE_SESSION_TITLE,
-} from '../../../../queries/course';
-import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
+} from '../../../../graphql/queries/course/course';
+import { ManagedCourse_Course_by_pk } from '../../../../graphql/__generated__/ManagedCourse';
 import { SessionRow } from './SessionRow';
-import { DeleteSession, DeleteSessionVariables } from '../../../../queries/__generated__/DeleteSession';
+import { DeleteSession, DeleteSessionVariables } from '../../../../graphql/__generated__/DeleteSession';
 import {
   UpdateSessionStartTime,
   UpdateSessionStartTimeVariables,
-} from '../../../../queries/__generated__/UpdateSessionStartTime';
+} from '../../../../graphql/__generated__/UpdateSessionStartTime';
 import {
   UpdateSessionEndTime,
   UpdateSessionEndTimeVariables,
-} from '../../../../queries/__generated__/UpdateSessionEndTime';
-import { UpdateSessionTitle, UpdateSessionTitleVariables } from '../../../../queries/__generated__/UpdateSessionTitle';
+} from '../../../../graphql/__generated__/UpdateSessionEndTime';
+import { UpdateSessionTitle, UpdateSessionTitleVariables } from '../../../../graphql/__generated__/UpdateSessionTitle';
 import {
   InsertSessionWithAddresses,
   InsertSessionWithAddressesVariables,
-} from '../../../../queries/__generated__/InsertSessionWithAddresses';
+} from '../../../../graphql/__generated__/InsertSessionWithAddresses';
 import {
   DeleteSessionSpeaker,
   DeleteSessionSpeakerVariables,
-} from '../../../../queries/__generated__/DeleteSessionSpeaker';
+} from '../../../../graphql/__generated__/DeleteSessionSpeaker';
 import useTranslation from 'next-translate/useTranslation';
 import { SessionAddress_insert_input } from '../../../../__generated__/globalTypes';
 

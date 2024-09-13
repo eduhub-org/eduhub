@@ -1,28 +1,28 @@
 import { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { useAdminMutation } from '../../../hooks/authedMutation';
-import { AchievementOptionList_AchievementOption } from '../../../queries/__generated__/AchievementOptionList';
+import { AchievementOptionList_AchievementOption } from '../../../graphql/__generated__/AchievementOptionList';
 import {
   InsertAnAchievementOptionCourse,
   InsertAnAchievementOptionCourseVariables,
-} from '../../../queries/__generated__/InsertAnAchievementOptionCourse';
+} from '../../../graphql/__generated__/InsertAnAchievementOptionCourse';
 import {
   InsertAnAchievementOptionMentor,
   InsertAnAchievementOptionMentorVariables,
-} from '../../../queries/__generated__/InsertAnAchievementOptionMentor';
+} from '../../../graphql/__generated__/InsertAnAchievementOptionMentor';
 import {
   DELETE_AN_ACHIEVEMENT_OPTION_COURSE,
   DELETE_AN_ACHIEVEMENT_OPTION_MENTOR,
   INSERT_AN_ACHIEVEMENT_OPTION_COURSE,
   INSERT_AN_ACHIEVEMENT_OPTION_MENTOR,
-} from '../../../queries/mutateAchievement';
+} from '../../../graphql/mutations/mutateAchievement';
 import {
   DeleteAnAchievementOptionCourseWithWhere,
   DeleteAnAchievementOptionCourseWithWhereVariables,
-} from '../../../queries/__generated__/DeleteAnAchievementOptionCourseWithWhere';
+} from '../../../graphql/__generated__/DeleteAnAchievementOptionCourseWithWhere';
 import {
   DeleteAnAchievementOptionMentorWithWhere,
   DeleteAnAchievementOptionMentorWithWhereVariables,
-} from '../../../queries/__generated__/DeleteAnAchievementOptionMentorWithWhere';
+} from '../../../graphql/__generated__/DeleteAnAchievementOptionMentorWithWhere';
 import {
   AchievementKeys,
   IDataToManipulate,

@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
 import { MinAchievementOption } from '../../../../../helpers/achievement';
 import React, { FC, createElement, useCallback } from 'react';
-import { AchievementOptionCourses_AchievementOptionCourse_AchievementOption } from '../../../../../queries/__generated__/AchievementOptionCourses';
+import { AchievementOptionCourses_AchievementOptionCourse_AchievementOption } from '../../../../../graphql/__generated__/AchievementOptionCourses';
 
 interface IProps {
   anchorElement: HTMLElement | undefined;

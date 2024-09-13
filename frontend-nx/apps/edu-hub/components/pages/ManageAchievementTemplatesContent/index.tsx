@@ -14,27 +14,27 @@ import {
   INSERT_ACHIEVEMENT_DOCUMENTATION_TEMPLATE,
   UPDATE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE,
   UPDATE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE_TITLE,
-} from '../../../queries/achievementDocumentationTemplate';
-import { SAVE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE } from '../../../queries/actions';
+} from '../../../graphql/queries/achievementDocumentationTemplate';
+import { SAVE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE } from '../../../graphql/queries/actions';
 import {
   SaveAchievementDocumentationTemplate,
   SaveAchievementDocumentationTemplateVariables,
-} from '../../../queries/__generated__/SaveAchievementDocumentationTemplate';
+} from '../../../graphql/__generated__/SaveAchievementDocumentationTemplate';
 import {
   AchievementDocumentationTemplates,
   AchievementDocumentationTemplates_AchievementDocumentationTemplate,
-} from '../../../queries/__generated__/AchievementDocumentationTemplates';
+} from '../../../graphql/__generated__/AchievementDocumentationTemplates';
 import { PageBlock } from '../../common/PageBlock';
 import EhAddButton from '../../common/EhAddButton';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import {
   InsertAchievementDocumentationTemplate,
   InsertAchievementDocumentationTemplateVariables,
-} from '../../../queries/__generated__/InsertAchievementDocumentationTemplate';
+} from '../../../graphql/__generated__/InsertAchievementDocumentationTemplate';
 import {
   UpdateAchievementDocumentationTemplate,
   UpdateAchievementDocumentationTemplateVariables,
-} from '../../../queries/__generated__/UpdateAchievementDocumentationTemplate';
+} from '../../../graphql/__generated__/UpdateAchievementDocumentationTemplate';
 import FileDownload from '../../forms/FileDownload';
 
 const ManageAchievementTemplatesContent: FC = () => {

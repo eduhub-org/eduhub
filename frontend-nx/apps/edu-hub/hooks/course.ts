@@ -1,4 +1,4 @@
-import { CourseWithEnrollment_Course_by_pk } from "../queries/__generated__/CourseWithEnrollment";
+import { CourseWithEnrollment_Course_by_pk } from "../graphql/__generated__/CourseWithEnrollment";
 
 export const useIsCourseWithEnrollment = (
     course: any

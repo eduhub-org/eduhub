@@ -3,7 +3,7 @@ import {
   ManagedCourse,
   ManagedCourseVariables,
   ManagedCourse_Course_by_pk_Sessions,
-} from '../../../../queries/__generated__/ManagedCourse';
+} from '../../../../graphql/__generated__/ManagedCourse';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import EhTimeSelect from '../../../common/EhTimeSelect';
@@ -11,16 +11,16 @@ import { useFormatTime } from '../../../../helpers/dateTimeHelpers';
 import { DebounceInput } from 'react-debounce-input';
 import { eventTargetValueMapper, useRoleMutation } from '../../../../hooks/authedMutation';
 
-import { INSERT_NEW_SESSION_SPEAKER } from '../../../../queries/course';
+import { INSERT_NEW_SESSION_SPEAKER } from '../../../../graphql/queries/course/course';
 import { QueryResult } from '@apollo/client';
 import { SelectUserDialog } from '../../../common/dialogs/SelectUserDialog';
-import { UserForSelection1_User } from '../../../../queries/__generated__/UserForSelection1';
-import { InsertExpert, InsertExpertVariables } from '../../../../queries/__generated__/InsertExpert';
-import { INSERT_EXPERT } from '../../../../queries/user';
+import { UserForSelection1_User } from '../../../../graphql/__generated__/UserForSelection1';
+import { InsertExpert, InsertExpertVariables } from '../../../../graphql/__generated__/InsertExpert';
+import { INSERT_EXPERT } from '../../../../graphql/queries/user/user';
 import {
   InsertNewSessionSpeaker,
   InsertNewSessionSpeakerVariables,
-} from '../../../../queries/__generated__/InsertNewSessionSpeaker';
+} from '../../../../graphql/__generated__/InsertNewSessionSpeaker';
 import EhMultipleTag from '../../../common/EhMultipleTag';
 import useTranslation from 'next-translate/useTranslation';
 import DeleteButton from '../../../../components/common/DeleteButton';

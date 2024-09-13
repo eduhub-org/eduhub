@@ -1,10 +1,10 @@
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { AtLeastNameEmail } from '../../../helpers/achievement';
-import { COURSE_ENROLLMENTS_WITH_USER } from '../../../queries/courseEnrollment';
+import { COURSE_ENROLLMENTS_WITH_USER } from '../../../graphql/queries/course/courseEnrollment';
 import {
   CourseEnrollmentWithUserQuery,
   CourseEnrollmentWithUserQueryVariables,
-} from '../../../queries/__generated__/CourseEnrollmentWithUserQuery';
+} from '../../../graphql/__generated__/CourseEnrollmentWithUserQuery';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';

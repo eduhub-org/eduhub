@@ -2,7 +2,7 @@ import { FC, useMemo, useState, useEffect } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
-import { Course_Course_by_pk_Sessions as Session } from '../../../queries/__generated__/Course';
+import { Course_Course_by_pk_Sessions as Session } from '../../../graphql/__generated__/Course';
 import UserCard from '../../common/UserCard';
 import { useDisplayDate, useFormatTimeString } from '../../../helpers/dateTimeHelpers';
 import { isLinkFormat } from '../../../helpers/util';

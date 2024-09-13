@@ -6,25 +6,25 @@ import { useAdminMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 
 import { QUERY_LIMIT } from '../../../pages/manage/courses';
-import { AdminCourseListVariables, AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
-import { Programs_Program } from '../../../queries/__generated__/Programs';
+import { AdminCourseListVariables, AdminCourseList_Course } from '../../../graphql/__generated__/AdminCourseList';
+import { Programs_Program } from '../../../graphql/__generated__/Programs';
 import SingleCourseRow from './SingleCourseRow';
 import {
   UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE,
   UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE,
   UPDATE_COURSE_TITLE,
-} from '../../../queries/course';
+} from '../../../graphql/queries/course/course';
 import {
   UpdateCourseAttendanceCertificatePossible,
   UpdateCourseAttendanceCertificatePossibleVariables,
-} from '../../../queries/__generated__/UpdateCourseAttendanceCertificatePossible';
+} from '../../../graphql/__generated__/UpdateCourseAttendanceCertificatePossible';
 import {
   UpdateCourseAchievementCertificatePossible,
   UpdateCourseAchievementCertificatePossibleVariables,
-} from '../../../queries/__generated__/UpdateCourseAchievementCertificatePossible';
-import { UpdateCourseTitle, UpdateCourseTitleVariables } from '../../../queries/__generated__/UpdateCourseTitle';
-import { DEGREE_COURSES } from '../../../queries/courseDegree';
-import { DegreeCourses } from '../../../queries/__generated__/DegreeCourses';
+} from '../../../graphql/__generated__/UpdateCourseAchievementCertificatePossible';
+import { UpdateCourseTitle, UpdateCourseTitleVariables } from '../../../graphql/__generated__/UpdateCourseTitle';
+import { DEGREE_COURSES } from '../../../graphql/queries/course/courseDegree';
+import { DegreeCourses } from '../../../graphql/__generated__/DegreeCourses';
 
 import { Translate } from 'next-translate';
 

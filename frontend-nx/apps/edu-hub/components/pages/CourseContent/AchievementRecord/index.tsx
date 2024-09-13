@@ -4,22 +4,22 @@ import { useKeycloakUserProfile, useUserId, useUser } from '../../../../hooks/us
 import {
   AchievementOptionCourses,
   AchievementOptionCoursesVariables,
-} from '../../../../queries/__generated__/AchievementOptionCourses';
+} from '../../../../graphql/__generated__/AchievementOptionCourses';
 import { Button } from '../../../common/Button';
 import { useAuthedQuery } from '../../../../hooks/authedQuery';
 import { BlockTitle } from '@opencampus/shared-components';
 import FormToUploadAchievementRecord from './UploadAchievementRecordModal';
 import { makeFullName, formattedDate, formattedDateWithTime } from '../../../../helpers/util';
 import { AlertMessageDialog } from '../../../common/dialogs/AlertMessageDialog';
-import { ACHIEVEMENT_OPTION_COURSES } from '../../../../queries/achievementOption';
+import { ACHIEVEMENT_OPTION_COURSES } from '../../../../graphql/queries/achievementOption';
 
 import { order_by } from '../../../../__generated__/globalTypes';
 import {
   AchievementRecordListWithAuthors,
   AchievementRecordListWithAuthorsVariables,
   AchievementRecordListWithAuthors_AchievementRecord,
-} from '../../../../queries/__generated__/AchievementRecordListWithAuthors';
-import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../../../queries/achievementRecord';
+} from '../../../../graphql/__generated__/AchievementRecordListWithAuthors';
+import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../../../graphql/queries/achievementRecord/achievementRecord';
 //import { Link } from '@mui/material';
 import { MinAchievementOption } from '../../../../helpers/achievement';
 import useTranslation from 'next-translate/useTranslation';

@@ -6,31 +6,31 @@ import { CircularProgress } from '@mui/material';
 import { useAuthedMutation } from '../../../hooks/authedMutation';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
 import { useUserId } from '../../../hooks/user';
-import { UPDATE_USER_ON_ENROLLMENT_CONFIRMATION } from '../../../queries/updateUser';
-import { USER } from '../../../queries/user';
-import { UPDATE_ENROLLMENT_STATUS } from '../../../queries/insertEnrollment';
+import { UPDATE_USER_ON_ENROLLMENT_CONFIRMATION } from '../../../graphql/mutations/updateUser';
+import { USER } from '../../../graphql/queries/user/user';
+import { UPDATE_ENROLLMENT_STATUS } from '../../../graphql/mutations/insertEnrollment';
 import {
   CourseWithEnrollment,
   CourseWithEnrollment_Course_by_pk,
-} from '../../../queries/__generated__/CourseWithEnrollment';
+} from '../../../graphql/__generated__/CourseWithEnrollment';
 import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
 import { University_enum } from '../../../__generated__/globalTypes';
 import { Employment_enum } from '../../../__generated__/globalTypes';
 import {
   UpdateUserOnEnrollmentConfirmationVariables,
   UpdateUserOnEnrollmentConfirmation,
-} from '../../../queries/__generated__/UpdateUserOnEnrollmentConfirmation';
+} from '../../../graphql/__generated__/UpdateUserOnEnrollmentConfirmation';
 import {
   UpdateEnrollmentStatus,
   UpdateEnrollmentStatusVariables,
-} from '../../../queries/__generated__/UpdateEnrollmentStatus';
-import { User, UserVariables } from '../../../queries/__generated__/User';
+} from '../../../graphql/__generated__/UpdateEnrollmentStatus';
+import { User, UserVariables } from '../../../graphql/__generated__/User';
 import { Button } from '../../common/Button';
 import FormFieldRow from '../../forms/FormFieldRow';
 import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
 
 import type { OperationVariables, ApolloQueryResult } from '@apollo/client';
-import { Course_Course_by_pk } from '../../../queries/__generated__/Course';
+import { Course_Course_by_pk } from '../../../graphql/__generated__/Course';
 
 type Inputs = {
   employment: Employment_enum | null;

@@ -2,11 +2,11 @@ import { useRoleMutation } from '../../../../hooks/authedMutation';
 import useTranslation from 'next-translate/useTranslation';
 
 import { Button } from '../../../common/Button';
-import { CREATE_CERTIFICATES } from '../../../../queries/actions';
+import { CREATE_CERTIFICATES } from '../../../../graphql/queries/actions';
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_CourseEnrollments,
-} from '../../../../queries/__generated__/ManagedCourse';
+} from '../../../../graphql/__generated__/ManagedCourse';
 
 import { ApolloQueryResult } from '@apollo/client';
 import { Dispatch, SetStateAction, useState } from 'react';

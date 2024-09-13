@@ -5,9 +5,9 @@ import TagSelector from '../../../forms/TagSelector';
 import RadioButtonSelector from '../../../common/RadioButtonSelector';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
-import { USER_LIST } from '../../../../queries/user';
-import { UpdateEnrollment, UpdateEnrollmentVariables } from '../../../../queries/__generated__/UpdateEnrollment';
-import { UPDATE_ENROLLMENT } from '../../../../queries/insertEnrollment';
+import { USER_LIST } from '../../../../graphql/queries/user/user';
+import { UpdateEnrollment, UpdateEnrollmentVariables } from '../../../../graphql/__generated__/UpdateEnrollment';
+import { UPDATE_ENROLLMENT } from '../../../../graphql/mutations/insertEnrollment';
 import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
 
 interface AddParticipantsFormProps {

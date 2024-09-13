@@ -9,14 +9,14 @@ import { DefaultAchievementOptions, QUERY_LIMIT } from '../../../helpers/achieve
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useIsAdmin, useIsInstructor, useIsLoggedIn } from '../../../hooks/authentication';
 import { useKeycloakUserProfile, useUserId } from '../../../hooks/user';
-import { ACHIEVEMENT_RECORD_TYPES } from '../../../queries/achievementOption';
-import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
-import { AchievementRecordTypes } from '../../../queries/__generated__/AchievementRecordTypes';
+import { ACHIEVEMENT_RECORD_TYPES } from '../../../graphql/queries/achievementOption';
+import { ADMIN_COURSE_LIST } from '../../../graphql/queries/course/courseList';
+import { AchievementRecordTypes } from '../../../graphql/__generated__/AchievementRecordTypes';
 import {
   AdminCourseList,
   AdminCourseListVariables,
   AdminCourseList_Course,
-} from '../../../queries/__generated__/AdminCourseList';
+} from '../../../graphql/__generated__/AdminCourseList';
 
 const AchievementOptions: FC = () => {
   const [course, setCourse] = useState(undefined as AdminCourseList_Course);
