@@ -58,15 +58,10 @@
         "lintFilePatterns": ["apps/edu-hub/**/*.{ts,tsx,js,jsx}"]
       }
     },
-    "apollo": {
-      "executor": "nx:run-commands",
+    "graphql-codegen": {
+      "executor": "./tools/executors/graphql-codegen:graphql-codegen",
       "options": {
-        "commands": [
-          "rm -rf queries/__generated__/*",
-          "../../node_modules/apollo/bin/run client:codegen --includes ./queries/**/*.ts --target typescript"
-        ],
-        "cwd": "apps/edu-hub",
-        "parallel": false
+        "configFile": "apps/edu-hub/codegen.yml"
       }
     }
   }

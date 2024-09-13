@@ -6,7 +6,8 @@
     "start": "nx serve",
     "build": "nx build",
     "test": "nx test",
-    "find-unused": "unused-exports ./apps/eduhub/components"
+    "find-unused": "unused-exports ./apps/eduhub/components",
+    "generate:graphql": "yarn nx run edu-hub:graphql-codegen"
   },
   "private": true,
   "dependencies": {
@@ -63,6 +64,7 @@
   },
   "devDependencies": {
     "@eslint/compat": "^1.1.1",
+    "@graphql-codegen/cli": "^5.0.2",
     "@nx/cypress": "19.6.4",
     "@nx/eslint": "19.6.4",
     "@nx/eslint-plugin": "19.6.4",

@@ -55,18 +55,7 @@ To extend the seed data temporarily, use the Hasura console. To include them per
   - all keys use snake_case (Example: `login_error_message`)
   - for each page, there is a separate file in the `i18n` folder; the file name is the same as the page name but in hyphen-case (Example: `course-page.json`)
 
-- Queries:
-  - Use PascalCase for the overall query name.
-  - Start with the main entity or action.
-  - Follow with qualifiers or specifics.
-  - End with the word "Query" for clarity.
-  
-  Following these guidelines, here are some examples:
-  - CoursesByInstructorQuery
-  - UserEnrolledCoursesQuery
-  - ProgramDetailQuery
-  - InstructorCoursesQuery
-  
+    
   
 ## 🧱 Edu React App Structure and Component Usage
 See [this document](./frontend-nx/apps/edu-hub/README.md) for a detailed explanation of the structure of the React app and how to use components.

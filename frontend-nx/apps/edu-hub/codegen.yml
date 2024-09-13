@@ -1,0 +1,13 @@
+overwrite: true
+schema: "YOUR_SCHEMA_PATH"
+documents: "**/*.{ts,tsx}"
+generates:
+  ./src/graphql/types.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+    config:
+      withHooks: true
+      withComponent: false
+      withHOC: false
