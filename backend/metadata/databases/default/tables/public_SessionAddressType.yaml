@@ -2,11 +2,3 @@ table:
   name: SessionAddressType
   schema: public
 is_enum: true
-array_relationships:
-  - name: SessionAddresses
-    using:
-      foreign_key_constraint_on:
-        column: type
-        table:
-          name: SessionAddress
-          schema: public

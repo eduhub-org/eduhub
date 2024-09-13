@@ -1,0 +1,9 @@
+{
+    "enrollment_statistics": "Application Statistics",
+    "select_programs": {
+        "label": "Programs or Semesters",
+        "placeholder": "Add Program or Semester"
+    },
+    "daily_enrollments": "Daily Applications",
+    "cumulative_enrollments": "Cumulative Applications"
+}
