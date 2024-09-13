@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { SessionAddress_insert_input, LocationOption_enum } from "./../../__generated__/globalTypes";
+import { SessionAddress_insert_input } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: InsertSessionWithAddresses
@@ -16,10 +16,6 @@ export interface InsertSessionWithAddresses_insert_Session_returning_SessionAddr
    * Where the session will take place; might be an offline or online location which is provided according to the provided type
    */
   address: string;
-  /**
-   * Indicates to which of the existing location options this address is corresponding.
-   */
-  location: LocationOption_enum | null;
   /**
    * Provide the id of the course location the address is referring to If the address is part of a course itThe id of a course.
    */

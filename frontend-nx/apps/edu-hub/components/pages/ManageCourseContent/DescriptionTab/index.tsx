@@ -87,15 +87,25 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
 
   const handleInsertCourseLocation = async () => {
     try {
+      const totalLocationOptions = Object.keys(LocationOption_enum).length;
+      
+      // Check if the current number of locations is less than the total available options
+      if (course.CourseLocations.length >= totalLocationOptions) {
+        handleError('All available location options have been used for this course.');
+        return;
+      }
+
       // Extract the currently used options
       const usedOptions = new Set(course.CourseLocations.map((loc) => loc.locationOption));
       // Find the first available option
       const availableOption = Object.values(LocationOption_enum).find((option) => !usedOptions.has(option));
-      // If there's no available option, throw an error
+      
+      // If there's no available option, this shouldn't happen due to the previous check, but let's keep it as a safeguard
       if (!availableOption) {
         handleError('All location options already exist for this course.');
-        return; // Exit the function early
+        return;
       }
+      
       // If there's is an available option, proceed with insertion
       const res = await insertCourseLocation({ variables: { courseId: course.id, option: availableOption } });
       //extract the location id from the response
@@ -106,7 +116,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           return insertSessionAddress({
             variables: {
               sessionId: session.id,
-              location: availableOption,
               address: '',
               courseLocationId: insertedLocationId,
             },
@@ -146,7 +155,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     // If there's more than one location, proceed with deletion
     await deleteCourseLocation({ variables: { locationId: location.id } }); // Call the function directly
     await DeleteSessionAddressesByCourseAndLocation({
-      variables: { courseId: course.id, location: location.locationOption },
+      variables: { courseId: course.id, courseLocationId: location.id },
     }); // Call the function directly
     qResult.refetch(); // Refetch the query to update the UI
   };

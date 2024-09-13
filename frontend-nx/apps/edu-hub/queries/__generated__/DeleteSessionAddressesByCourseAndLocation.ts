@@ -3,8 +3,6 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { LocationOption_enum } from "./../../__generated__/globalTypes";
-
 // ====================================================
 // GraphQL mutation operation: DeleteSessionAddressesByCourseAndLocation
 // ====================================================
@@ -26,5 +24,5 @@ export interface DeleteSessionAddressesByCourseAndLocation {
 
 export interface DeleteSessionAddressesByCourseAndLocationVariables {
   courseId: number;
-  location: LocationOption_enum;
+  courseLocationId: number;
 }
