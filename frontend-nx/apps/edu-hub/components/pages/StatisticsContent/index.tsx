@@ -12,6 +12,11 @@ import CommonPageHeader from '../../common/CommonPageHeader';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { useCallback } from 'react';
 
+interface ChartDataPoint {
+  date: string;
+  [key: string]: number | string;
+}
+
 class ErrorBoundary extends React.Component<{ children: ReactNode }, { hasError: boolean }> {
   constructor(props: { children: ReactNode }) {
     super(props);
@@ -87,24 +92,24 @@ const StatisticsContent: FC = () => {
   }, [data]);
 
   const cumulativeChartData = useMemo(() => {
-    try {
-      if (!chartData.length) return [];
-      console.log('Processing cumulative chart data');
-      const cumulativeData = chartData.map((dataPoint, index) => {
-        const cumulativePoint: { [key: string]: any } = { date: dataPoint.date };
-        Object.keys(dataPoint).forEach((key) => {
-          if (key !== 'date') {
-            cumulativePoint[key] = dataPoint[key] + (index > 0 ? cumulativeChartData[index - 1][key] : 0);
-          }
-        });
-        return cumulativePoint;
+    if (!chartData.length) return [];
+    console.log('Processing cumulative chart data');
+    
+    const cumulativeData = chartData.reduce((acc, dataPoint, index) => {
+      const cumulativePoint: { [key: string]: any } = { date: dataPoint.date };
+      
+      Object.keys(dataPoint).forEach((key) => {
+        if (key !== 'date') {
+          cumulativePoint[key] = dataPoint[key] + (index > 0 ? acc[index - 1][key] : 0);
+        }
       });
-      console.log('Processed cumulative chart data:', cumulativeData);
-      return cumulativeData;
-    } catch (error) {
-      console.error('Error processing cumulative chart data:', error);
-      return [];
-    }
+      
+      acc.push(cumulativePoint);
+      return acc;
+    }, [] as { [key: string]: any }[]);
+
+    console.log('Processed cumulative chart data:', cumulativeData);
+    return cumulativeData;
   }, [chartData]);
 
   const programOptions = useMemo(() => {
@@ -136,7 +141,7 @@ const StatisticsContent: FC = () => {
           <div className="bg-white p-4 rounded-lg">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('cumulative_enrollments')}</h2>
             <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={cumulativeChartData}>
+              <LineChart data={cumulativeChartData as ChartDataPoint[]}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                 <XAxis 
                   dataKey="date" 
@@ -172,7 +177,7 @@ const StatisticsContent: FC = () => {
           <div className="bg-white p-4 rounded-lg">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('daily_enrollments')}</h2>
             <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={chartData}>
+              <LineChart data={chartData as ChartDataPoint[]}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                 <XAxis 
                   dataKey="date" 
