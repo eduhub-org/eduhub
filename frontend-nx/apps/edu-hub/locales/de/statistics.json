@@ -1,9 +1,10 @@
 {
     "enrollment_statistics": "Teilnahmestatistiken",
     "select_programs": {
-        "label": "Progamme oder Semester",
-        "placeholder": "Progamm oder Semester hinzufügen"
+        "label": "Programme oder Semester",
+        "placeholder": "Programm oder Semester hinzufügen"
     },
     "daily_enrollments": "Tägliche Bewerbungen",
-    "cumulative_enrollments": "Kumulierte Bewerbungen"
+    "cumulative_enrollments": "Kumulierte Bewerbungen",
+    "no_data_available": "Keine Daten verfügbar"
 }

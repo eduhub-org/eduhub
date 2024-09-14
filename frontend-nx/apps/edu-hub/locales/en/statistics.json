@@ -5,5 +5,6 @@
         "placeholder": "Add Program or Semester"
     },
     "daily_enrollments": "Daily Applications",
-    "cumulative_enrollments": "Cumulative Applications"
+    "cumulative_enrollments": "Cumulative Applications",
+    "no_data_available": "No data available"
 }
