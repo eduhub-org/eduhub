@@ -38,16 +38,13 @@ class ErrorBoundary extends React.Component<{ children: ReactNode }, { hasError:
 const StatisticsContent: FC = () => {
   const { t } = useTranslation('statistics');
   const [selectedPrograms, setSelectedPrograms] = useState<{ id: number; name: string }[]>([]);
-  const [key, setKey] = useState(0); // Add this line to create a key state
+  const [key, setKey] = useState(0);
 
   const { data: programsData, loading: programsLoading } = useRoleQuery<ProgramList>(PROGRAM_LIST);
-  console.log('Programs data:', programsData);
 
   const { data, loading, error } = useRoleQuery<MultiProgramEnrollments>(MULTI_PROGRAM_ENROLLMENTS, {
     variables: { programIds: selectedPrograms.map((program) => program.id) },
   });
-  console.log('Multi-program enrollments data:', data);
-  console.log('Multi-program enrollments error:', error);
 
   const chartData = useMemo(() => {
     try {
@@ -130,10 +127,88 @@ const StatisticsContent: FC = () => {
     setSelectedPrograms(selectedTags);
   }, []);
 
-  console.log('Rendering StatisticsContent');
-  console.log('Selected programs:', selectedPrograms);
-  console.log('Chart data length:', chartData.length);
-  console.log('Cumulative chart data length:', cumulativeChartData.length);
+  // Move rendering logic here
+  const renderCharts = () => {
+    if (selectedPrograms.length > 0 && chartData.length > 0 && cumulativeChartData.length > 0) {
+      return (
+        <div className="space-y-8">
+          {/* Cumulative Enrollments Chart */}
+          <div className="bg-white p-4 rounded-lg">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('cumulative_enrollments')}</h2>
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={cumulativeChartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="#333"
+                  allowDataOverflow={false}
+                  allowDecimals={true}
+                  allowDuplicatedCategory={true}
+                  hide={false}
+                  mirror={false}
+                  reversed={false}
+                  tickCount={5}
+                  xAxisId={0}
+                />
+                <YAxis stroke="#333" />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
+                  labelStyle={{ color: '#333' }}
+                />
+                <Legend wrapperStyle={{ color: '#333' }} />
+                {data?.Program.map((program, index) => (
+                  <Line
+                    key={program.id}
+                    type="monotone"
+                    dataKey={program.title}
+                    stroke={`hsl(${(index * 137.5) % 360}, 70%, 50%)`}
+                    strokeWidth={2}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          {/* Daily Enrollments Chart */}
+          <div className="bg-white p-4 rounded-lg">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('daily_enrollments')}</h2>
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="#333"
+                  allowDataOverflow={false}
+                  allowDecimals={true}
+                  allowDuplicatedCategory={true}
+                  hide={false}
+                  mirror={false}
+                  reversed={false}
+                  tickCount={5}
+                  xAxisId={0}
+                />
+                <YAxis stroke="#333" />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
+                  labelStyle={{ color: '#333' }}
+                />
+                <Legend wrapperStyle={{ color: '#333' }} />
+                {data?.Program.map((program, index) => (
+                  <Line
+                    key={program.id}
+                    type="monotone"
+                    dataKey={program.title}
+                    stroke={`hsl(${(index * 137.5) % 360}, 70%, 50%)`}
+                    strokeWidth={2}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      );
+    }
+    return <div className="mt-4 text-gray-300">{t('no_data_available')}</div>;
+  };
 
   return (
     <Page>
@@ -143,10 +218,9 @@ const StatisticsContent: FC = () => {
         {!loading && !error && (
           <div>
             <CommonPageHeader headline={t('enrollment_statistics')} />
-
             <div className="bg-white p-4 rounded-lg mb-6">
               <TagSelector
-                key={key} // Add this line to use the key state
+                key={key}
                 label={t('select_programs.label')}
                 placeholder={t('select_programs.placeholder')}
                 itemId={0}
@@ -157,83 +231,7 @@ const StatisticsContent: FC = () => {
                 className="text-gray-800"
               />
             </div>
-
-            {selectedPrograms.length > 0 && chartData.length > 0 && cumulativeChartData.length > 0 ? (
-              <div className="space-y-8">
-                <div className="bg-white p-4 rounded-lg">
-                  <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('cumulative_enrollments')}</h2>
-                  <ResponsiveContainer width="100%" height={400}>
-                    <LineChart data={cumulativeChartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                      <XAxis 
-                        dataKey="date" 
-                        stroke="#333"
-                        allowDataOverflow={false}
-                        allowDecimals={true}
-                        allowDuplicatedCategory={true}
-                        hide={false}
-                        mirror={false}
-                        reversed={false}
-                        tickCount={5}
-                        xAxisId={0}
-                      />
-                      <YAxis stroke="#333" />
-                      <Tooltip
-                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
-                        labelStyle={{ color: '#333' }}
-                      />
-                      <Legend wrapperStyle={{ color: '#333' }} />
-                      {data?.Program.map((program, index) => (
-                        <Line
-                          key={program.id}
-                          type="monotone"
-                          dataKey={program.title}
-                          stroke={`hsl(${(index * 137.5) % 360}, 70%, 50%)`}
-                          strokeWidth={2}
-                        />
-                      ))}
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="bg-white p-4 rounded-lg">
-                  <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('daily_enrollments')}</h2>
-                  <ResponsiveContainer width="100%" height={400}>
-                    <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                      <XAxis 
-                        dataKey="date" 
-                        stroke="#333"
-                        allowDataOverflow={false}
-                        allowDecimals={true}
-                        allowDuplicatedCategory={true}
-                        hide={false}
-                        mirror={false}
-                        reversed={false}
-                        tickCount={5}
-                        xAxisId={0}
-                      />
-                      <YAxis stroke="#333" />
-                      <Tooltip
-                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
-                        labelStyle={{ color: '#333' }}
-                      />
-                      <Legend wrapperStyle={{ color: '#333' }} />
-                      {data?.Program.map((program, index) => (
-                        <Line
-                          key={program.id}
-                          type="monotone"
-                          dataKey={program.title}
-                          stroke={`hsl(${(index * 137.5) % 360}, 70%, 50%)`}
-                          strokeWidth={2}
-                        />
-                      ))}
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            ) : (
-              <div className="mt-4 text-gray-300">{t('no_data_available')}</div>
-            )}
+            {renderCharts()}
           </div>
         )}
       </div>
