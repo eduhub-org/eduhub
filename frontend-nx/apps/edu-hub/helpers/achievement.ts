@@ -1,4 +1,4 @@
-import { AchievementRecordType_enum } from '../__generated__/globalTypes';
+import { AchievementRecordType_Enum } from '../types/generated/graphql';
 import { UploadFile } from './filehandling';
 
 export const QUERY_LIMIT = 100;
@@ -18,7 +18,7 @@ export interface IDataToManipulate {
   achievementDocumentationTemplateId: number | null;
   description: string | null;
   evaluationScriptUrl: string | null;
-  recordType: AchievementRecordType_enum | null;
+  recordType: AchievementRecordType_Enum | null;
   title: string | null;
   mentors: TempAchievementOptionMentor[];
   courses: TempAchievementOptionCourse[];
@@ -91,12 +91,12 @@ interface TempUserData {
 }
 export type AtLeastNameEmail = AtLeast<TempUserData>;
 
-export type MinAchievementOption = AtLeast<{
-  achievementDocumentationTemplateId: number;
+export type MinAchievementOption = {
   id: number;
   title: string;
-  description: string;
-  recordType: AchievementRecordType_enum;
-  evaluationScriptUrl: string;
-  csvTemplateUrl: string | null;
-}>;
+  description?: string; // Make optional
+  recordType: AchievementRecordType_Enum;
+  evaluationScriptUrl?: string; // Make optional
+  csvTemplateUrl?: string; // Make optional
+  achievementDocumentationTemplateId?: number; // Make optional
+};

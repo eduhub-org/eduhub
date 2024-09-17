@@ -1,6 +1,6 @@
-import { gql } from '@apollo/client';
+import { graphql } from '../../types/generated';
 
-export const ACHIEVEMENT_RECORD_FRAGMENT = gql`
+export const ACHIEVEMENT_RECORD_FRAGMENT = graphql(`
   fragment AchievementRecordFragment on AchievementRecord {
     id
     created_at
@@ -18,4 +18,4 @@ export const ACHIEVEMENT_RECORD_FRAGMENT = gql`
       recordType
     }
   }
-`;
+`);

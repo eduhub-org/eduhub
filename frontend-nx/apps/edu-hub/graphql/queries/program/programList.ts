@@ -1,12 +1,6 @@
-import { gql } from "@apollo/client";
+import { graphql } from '../../../types/generated';
 
-import {
-  ADMIN_PROGRAM_FRAGMENT,
-  PROGRAM_FRAGMENT_MINIMUM_PROPERTIES,
-} from "./programFragment";
-
-export const PROGRAM_LIST = gql`
-  ${ADMIN_PROGRAM_FRAGMENT}
+export const PROGRAM_LIST = graphql(`
   query ProgramList {
     Program {
       ...AdminProgramFragment
@@ -15,13 +9,12 @@ export const PROGRAM_LIST = gql`
       }
     }
   }
-`;
+`);
 
-export const PROGRAMS_WITH_MINIMUM_PROPERTIES = gql`
-  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
+export const PROGRAMS_WITH_MINIMUM_PROPERTIES = graphql(`
   query Programs {
     Program(order_by: { id: desc }) {
       ...ProgramFragmentMinimumProperties
     }
   }
-`;
+`);

@@ -1,6 +1,6 @@
-import { gql } from '@apollo/client';
+import { graphql } from '../../types/generated';
 
-export const COURSE_INSTRUCTOR_FRAGMENT = gql`
+export const COURSE_INSTRUCTOR_FRAGMENT = graphql(`
   fragment CourseEnrollmentFragment on CourseEnrollment {
     id
     courseId
@@ -11,4 +11,4 @@ export const COURSE_INSTRUCTOR_FRAGMENT = gql`
     achievementCertificateURL
     attendanceCertificateURL
   }
-`;
+`);

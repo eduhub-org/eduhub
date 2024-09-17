@@ -63,6 +63,9 @@
       "options": {
         "configFile": "apps/edu-hub/codegen.yml"
       }
+    },
+    "codegen-generate": {
+      "executor": "@nx-tools/nx-graphql-codegen:generate"
     }
   }
 }

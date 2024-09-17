@@ -6,38 +6,23 @@ import { makeFullName } from '../../../../../helpers/util';
 import { useAuthedMutation } from '../../../../../hooks/authedMutation';
 import { INSERT_AN_ACHIEVEMENT_RECORD, UPDATE_AN_ACHIEVEMENT_RECORD } from '../../../../../graphql/queries/achievementRecord/achievementRecord';
 import { SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION } from '../../../../../graphql/queries/actions';
-import {
-  InsertAnAchievementRecord,
-  InsertAnAchievementRecordVariables,
-} from '../../../../../graphql/__generated__/InsertAnAchievementRecord';
-import {
-  SaveAchievementRecordDocumentation,
-  SaveAchievementRecordDocumentationVariables,
-} from '../../../../../graphql/__generated__/SaveAchievementRecordDocumentation';
-import {
-  UpdateAchievementRecordByPk,
-  UpdateAchievementRecordByPkVariables,
-} from '../../../../../graphql/__generated__/UpdateAchievementRecordByPk';
 import { AchievementRecordRating_enum } from '../../../../../__generated__/globalTypes';
 import EhTagStingId from '../../../../common/EhTagStingId';
-import { AtLeastNameEmail, MinAchievementOption } from '../../../../../helpers/achievement';
+import { AtLeastNameEmail } from '../../../../../helpers/achievement';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress } from '@mui/material';
 import { Button } from '../../../../common/Button';
 import EnrolledUserForACourseDialog from '../../../../common/dialogs/EnrolledUserForACourseDialog';
 import Modal from '../../../../common/Modal';
-import { User_User_by_pk } from '../../../../../graphql/__generated__/User';
 import { ErrorMessageDialog } from '../../../../common/dialogs/ErrorMessageDialog';
 import useErrorHandler from '../../../../../hooks/useErrorHandler';
-import {
-  AchievementOptionCourses,
-  AchievementOptionCourses_AchievementOptionCourse_AchievementOption,
-  AchievementOptionCoursesVariables,
-} from '../../../../../graphql/__generated__/AchievementOptionCourses';
-import { QueryResult } from '@apollo/client';
 import FileDownload from '../../../../forms/FileDownload';
 import UploadUI from './UploadUI';
 import AchievementOptionDropDown from './AchievementOptionDropDown';
+import { AchievementOptionCoursesQuery, AchievementOptionCoursesQueryVariables, UserQuery } from '../../../../../types/generated/graphql';
+import { FragmentType, useFragment } from '../../../../../types/generated';
+import { ACHIEVEMENT_OPTION_FRAGMENT } from '../../../../../graphql/fragments/achievementOptionFragment';
+import { QueryResult } from '@apollo/client';
 
 interface State {
   achievementRecordTableId: number; // book keeping
@@ -56,11 +41,11 @@ interface Type {
 
 interface IProps {
   // achievementOptionCourse: AchievementOptionCourses_AchievementOptionCourse;
-  achievementOptionsQuery: QueryResult<AchievementOptionCourses, AchievementOptionCoursesVariables>;
+  achievementOptionsQuery: QueryResult<AchievementOptionCoursesQuery, AchievementOptionCoursesQueryVariables>;
   onSuccess: () => void;
   userId: string;
   setAlertMessage: (message: string) => void;
-  user: User_User_by_pk;
+  user: UserQuery['User_by_pk'];
   courseId: number;
   isOpen: boolean;
   onClose: () => void;
@@ -96,25 +81,21 @@ const UploadAchievementRecordModal: FC<IProps> = ({
   };
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const [updateAnAchievementRecordAPI] = useAuthedMutation<
-    UpdateAchievementRecordByPk,
-    UpdateAchievementRecordByPkVariables
-  >(UPDATE_AN_ACHIEVEMENT_RECORD, {
+  const [updateAnAchievementRecordAPI] = useAuthedMutation(UPDATE_AN_ACHIEVEMENT_RECORD, {
     onError: (error) => handleError(t(error.message)),
   });
 
-  const [saveAchievementRecordDocumentation] = useAuthedMutation<
-    SaveAchievementRecordDocumentation,
-    SaveAchievementRecordDocumentationVariables
-  >(SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION, {
+  const [saveAchievementRecordDocumentation] = useAuthedMutation(SAVE_ACHIEVEMENT_RECORD_DOCUMENTATION, {
     onError: (error) => handleError(t(error.message)),
   });
 
   const [selectedAchievementOption, setSelectedAchievementOption] =
-    useState<AchievementOptionCourses_AchievementOptionCourse_AchievementOption>();
+    useState<FragmentType<typeof ACHIEVEMENT_OPTION_FRAGMENT>>();
   const [isVisibleAchievementOptions, setAchievementOptionVisibility] = useState(false);
   const [archiveOptionsAnchorElement, setAnchorElement] = useState<HTMLElement>();
-  const [achievementOptions, setAchievementOptions] = useState([] as MinAchievementOption[]);
+  const [achievementOptions, setAchievementOptions] = useState<FragmentType<typeof ACHIEVEMENT_OPTION_FRAGMENT>[]>([]);
+
+  const unmaskedSelectedAchievementOption = useFragment(ACHIEVEMENT_OPTION_FRAGMENT, selectedAchievementOption);
 
   useEffect(() => {
     const options = [...(achievementOptionsQuery.data?.AchievementOptionCourse || [])];
@@ -131,7 +112,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
     [setAnchorElement]
   );
   const onItemSelectedFromDropdown = useCallback(
-    async (item: AchievementOptionCourses_AchievementOptionCourse_AchievementOption) => {
+    async (item: FragmentType<typeof ACHIEVEMENT_OPTION_FRAGMENT>) => {
       setSelectedAchievementOption(item);
     },
     [setSelectedAchievementOption]
@@ -183,10 +164,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
     [dispatch]
   );
 
-  const [insertAnAchievementRecordAPI] = useAuthedMutation<
-    InsertAnAchievementRecord,
-    InsertAnAchievementRecordVariables
-  >(INSERT_AN_ACHIEVEMENT_RECORD);
+  const [insertAnAchievementRecordAPI] = useAuthedMutation(INSERT_AN_ACHIEVEMENT_RECORD);
 
   const save = useCallback(
     async (event) => {
@@ -194,7 +172,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
         setLoading(true);
         event.preventDefault();
 
-        if (!selectedAchievementOption) {
+        if (!unmaskedSelectedAchievementOption) {
           setAlertMessage(`${t('course-page:achievement_option_not_selected')}`);
           return;
         }
@@ -216,7 +194,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
               rating: AchievementRecordRating_enum.UNRATED, // this is mandatory field
               score: 0, // because mandatory
               evaluationScriptUrl: null,
-              achievementOptionId: selectedAchievementOption?.id,
+              achievementOptionId: unmaskedSelectedAchievementOption?.id,
               csvResults: state.csvResults ? state.csvResults.data : null,
               uploadUserId: userId,
               AchievementRecordAuthors: {
@@ -259,7 +237,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
     },
     [
       courseId,
-      selectedAchievementOption,
+      unmaskedSelectedAchievementOption,
       state.documentationUrl,
       state.csvResults,
       state.description,
@@ -282,17 +260,17 @@ const UploadAchievementRecordModal: FC<IProps> = ({
             <Button>{`${t('course-page:choose-achievement-option')} ↓`}</Button>
           </div>
 
-          {selectedAchievementOption && (
+          {unmaskedSelectedAchievementOption && (
             <div>
               <div className="text-lg mb-6">
                 {t('course-page:selected_achievement_option')}:<br></br>
-                {selectedAchievementOption.title}
+                {unmaskedSelectedAchievementOption.title}
               </div>
-              {selectedAchievementOption.AchievementOptionTemplate && (
+              {unmaskedSelectedAchievementOption.AchievementOptionTemplate && (
                 <div>
                   <p className="mb-3">{t('course-page:use_documentation_template')}</p>
                   <FileDownload
-                    filePath={selectedAchievementOption.AchievementOptionTemplate.url}
+                    filePath={unmaskedSelectedAchievementOption.AchievementOptionTemplate.url}
                     type="button"
                     className="mb-3 lg:mb-0 lg:mr-3"
                     label={t('course-page:download_template')}

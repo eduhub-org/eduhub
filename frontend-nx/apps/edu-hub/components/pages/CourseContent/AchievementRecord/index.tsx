@@ -1,27 +1,19 @@
 import { createContext, FC, useCallback, useEffect, useState } from 'react';
 import { IUserProfile } from '../../../../hooks/user';
 import { useKeycloakUserProfile, useUserId, useUser } from '../../../../hooks/user';
-import {
-  AchievementOptionCourses,
-  AchievementOptionCoursesVariables,
-} from '../../../../graphql/__generated__/AchievementOptionCourses';
+import { FragmentType, useFragment } from '../../../../types/generated';
 import { Button } from '../../../common/Button';
 import { useAuthedQuery } from '../../../../hooks/authedQuery';
 import { BlockTitle } from '@opencampus/shared-components';
-import FormToUploadAchievementRecord from './UploadAchievementRecordModal';
+import UploadAchievementRecordModal from './UploadAchievementRecordModal';
 import { makeFullName, formattedDate, formattedDateWithTime } from '../../../../helpers/util';
 import { AlertMessageDialog } from '../../../common/dialogs/AlertMessageDialog';
 import { ACHIEVEMENT_OPTION_COURSES } from '../../../../graphql/queries/achievementOption';
+import { ACHIEVEMENT_OPTION_FRAGMENT } from '../../../../graphql/fragments/achievementOptionFragment';
+import { ACHIEVEMENT_RECORD_FRAGMENT } from '../../../../graphql/fragments/achievementRecordFragment';
 
-import { order_by } from '../../../../__generated__/globalTypes';
-import {
-  AchievementRecordListWithAuthors,
-  AchievementRecordListWithAuthorsVariables,
-  AchievementRecordListWithAuthors_AchievementRecord,
-} from '../../../../graphql/__generated__/AchievementRecordListWithAuthors';
+import { Order_By } from '../../../../types/generated/graphql';
 import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../../../graphql/queries/achievementRecord/achievementRecord';
-//import { Link } from '@mui/material';
-import { MinAchievementOption } from '../../../../helpers/achievement';
 import useTranslation from 'next-translate/useTranslation';
 interface IContext {
   achievementRecordUploadDeadline: any;
@@ -46,36 +38,35 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
   const profile = useKeycloakUserProfile();
   const [showModal, setShowModal] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const [myRecords, setMyRecords] = useState(null as AchievementRecordListWithAuthors_AchievementRecord);
+  const [myRecord, setMyRecord] = useState<FragmentType<typeof ACHIEVEMENT_RECORD_FRAGMENT>>(null);
 
-  const [achievementOptions, setAchievementOptions] = useState([] as MinAchievementOption[]);
+  const [achievementOptions, setAchievementOptions] = useState<FragmentType<typeof ACHIEVEMENT_OPTION_FRAGMENT>[]>([]);
+
+  const myUnmaskedRecord = useFragment(ACHIEVEMENT_RECORD_FRAGMENT, myRecord);
 
   /* #region Database */
-  const query = useAuthedQuery<AchievementOptionCourses, AchievementOptionCoursesVariables>(
+  const query = useAuthedQuery(
     ACHIEVEMENT_OPTION_COURSES,
     { variables: { where: { courseId: { _eq: courseId } } } }
   );
 
-  useEffect(() => {
+useEffect(() => {
     const options = [...(query.data?.AchievementOptionCourse || [])];
     setAchievementOptions(options.map((options) => options.AchievementOption));
   }, [query.data?.AchievementOptionCourse]);
 
-  const myRecordsQuery = useAuthedQuery<AchievementRecordListWithAuthors, AchievementRecordListWithAuthorsVariables>(
-    ACHIEVEMENT_RECORDS_WITH_AUTHORS,
-    {
-      variables: {
-        where: { _and: [{ AchievementRecordAuthors: { userId: { _eq: userId } } }, { courseId: { _eq: courseId } }] },
-        orderBy: { created_at: order_by.desc },
-        limit: 1,
-      },
-    }
-  );
+  const myRecordsQuery = useAuthedQuery(ACHIEVEMENT_RECORDS_WITH_AUTHORS, {
+    variables: {
+      where: { _and: [{ AchievementRecordAuthors: { userId: { _eq: userId } } }, { courseId: { _eq: courseId } }] },
+      orderBy: { created_at: Order_By.Desc },
+      limit: 1,
+    },
+  });
   /* #endregion */
 
   useEffect(() => {
     const r = myRecordsQuery.data?.AchievementRecord[0] || null;
-    setMyRecords(r);
+    setMyRecord(r);
   }, [myRecordsQuery]);
   /* #region Callbacks*/
   const onClosed = useCallback(() => {
@@ -123,14 +114,14 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
             })}
           </span>
         )}
-        {myRecords ? (
+        {myRecord ? (
           <p>
             {t('course-page:last_record_upload', {
-              dateTime: formattedDateWithTime(new Date(myRecords.created_at), lang),
+              dateTime: formattedDateWithTime(new Date(myUnmaskedRecord.created_at), lang),
               fullName: makeFullName(profile.firstName, profile.lastName),
-              achievementRecordTitle: myRecords.AchievementOption.title,
-              achievementRecordFileName: myRecords.documentationUrl.substring(
-                myRecords.documentationUrl.lastIndexOf('/') + 1
+              achievementRecordTitle: myUnmaskedRecord.AchievementOption.title,
+              achievementRecordFileName: myUnmaskedRecord.documentationUrl.substring(
+                myUnmaskedRecord.documentationUrl.lastIndexOf('/') + 1
               ),
             })}
           </p>
@@ -139,12 +130,12 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
         )}
         <div className="flex flex-col lg:flex-row">
           <Button filled onClick={upload}>
-            {`↑ ${t('course-page:upload_achievement_record')}`}
+           {`↑ ${t('course-page:upload_achievement_record')}`}
           </Button>
         </div>
       </div>
       {showModal && (
-        <FormToUploadAchievementRecord
+        <UploadAchievementRecordModal
           onClose={onClosed}
           achievementOptionsQuery={query}
           onSuccess={onSuccess}

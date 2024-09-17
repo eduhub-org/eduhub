@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client";
+import { graphql } from '../../types/generated';
 
-export const COURSE_INSTRUCTOR_FRAGMENT = gql`
+export const COURSE_INSTRUCTOR_FRAGMENT = graphql(`
   fragment CourseInstructorFragment on CourseInstructor {
     id
     Expert {
@@ -17,4 +17,4 @@ export const COURSE_INSTRUCTOR_FRAGMENT = gql`
       description
     }
   }
-`;
+`);

@@ -16,7 +16,9 @@
     "baseUrl": ".",
     "paths": {
       "@opencampus/shared-components": ["libs/shared-components/src/index.ts"]
-    }
+    },
+    "types": ["node"],
+    "typeRoots": ["node_modules/@types"]
   },
   "exclude": ["node_modules", "tmp"]
 }

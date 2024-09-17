@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client";
+import { graphql } from '../../types/generated';
 
-export const USER_FRAGMENT = gql`
+export const USER_FRAGMENT = graphql(`
   fragment UserFragment on User {
     id
     firstName
@@ -11,4 +11,4 @@ export const USER_FRAGMENT = gql`
     university
     otherUniversity
   }
-`;
+`);

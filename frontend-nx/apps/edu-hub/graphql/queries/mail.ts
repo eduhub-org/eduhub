@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client";
+import { graphql } from '../../types/generated';
 
-export const MAIL_TEMPLATES = gql`
+export const MAIL_TEMPLATES = graphql(`
   query MailTemplates {
     MailTemplate {
       id
@@ -12,9 +12,9 @@ export const MAIL_TEMPLATES = gql`
       title
     }
   }
-`;
+`);
 
-export const INSERT_MAIL_LOG = gql`
+export const INSERT_MAIL_LOG = graphql(`
   mutation InsertMailLog(
     $subject: String!
     $content: String!
@@ -25,15 +25,7 @@ export const INSERT_MAIL_LOG = gql`
     $status: String!
   ) {
     insert_MailLog(
-      objects: {
-        subject: $subject
-        content: $content
-        from: $from
-        cc: $cc
-        bcc: $bcc
-        to: $to
-        status: $status
-      }
+      objects: { subject: $subject, content: $content, from: $from, cc: $cc, bcc: $bcc, to: $to, status: $status }
     ) {
       affected_rows
       returning {
@@ -41,4 +33,4 @@ export const INSERT_MAIL_LOG = gql`
       }
     }
   }
-`;
+`);

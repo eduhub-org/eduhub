@@ -1,32 +1,21 @@
-import { gql } from '@apollo/client';
-import { ACHIEVEMENT_OPTION_FRAGMENT } from '../achievementOptionFragment';
-import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from '../programFragment';
-import { USER_FRAGMENT } from '../userFragment';
+import { graphql } from '../../types/generated';
 
-export const ACHIEVEMENT_RECORD_TYPES = gql`
+export const ACHIEVEMENT_RECORD_TYPES = graphql(`
   query AchievementRecordTypes {
     AchievementRecordType {
       value
     }
   }
-`;
+`);
 
-export const ACHIEVEMENT_OPTIONS = gql`
-  ${ACHIEVEMENT_OPTION_FRAGMENT}
-  ${USER_FRAGMENT}
-  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
+export const ACHIEVEMENT_OPTIONS = graphql(`
   query AchievementOptionList(
     $where: AchievementOption_bool_exp! = {}
     $limit: Int = null
     $offset: Int = 0
     $orderBy: AchievementOption_order_by = { id: desc }
   ) {
-    AchievementOption(
-      order_by: [$orderBy]
-      where: $where
-      limit: $limit
-      offset: $offset
-    ) {
+    AchievementOption(order_by: [$orderBy], where: $where, limit: $limit, offset: $offset) {
       ...AchievementOptionFragment
       AchievementOptionCourses {
         id
@@ -46,17 +35,14 @@ export const ACHIEVEMENT_OPTIONS = gql`
       }
     }
   }
-`;
+`);
 
-export const ACHIEVEMENT_OPTION_COURSES = gql`
-  ${ACHIEVEMENT_OPTION_FRAGMENT}
+export const ACHIEVEMENT_OPTION_COURSES = graphql(`
   query AchievementOptionCourses(
     $where: AchievementOptionCourse_bool_exp = {}
     $limit: Int = null
     $offset: Int = 0
-    $orderByAchievementOptionCourse: AchievementOptionCourse_order_by = {
-      id: desc
-    }
+    $orderByAchievementOptionCourse: AchievementOptionCourse_order_by = { id: desc }
   ) {
     AchievementOptionCourse(
       order_by: [$orderByAchievementOptionCourse]
@@ -73,4 +59,4 @@ export const ACHIEVEMENT_OPTION_COURSES = gql`
       created_at
     }
   }
-`;
+`);

@@ -5,6 +5,47 @@ __metadata:
   version: 6
   cacheKey: 8
 
+"@0no-co/graphql.web@npm:^1.0.5":
+  version: 1.0.8
+  resolution: "@0no-co/graphql.web@npm:1.0.8"
+  peerDependencies:
+    graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+  peerDependenciesMeta:
+    graphql:
+      optional: true
+  checksum: 5bd3ac2a55401c6d47e8af479170e1ae3b38c80847203d5b445f281f36e68ac11e6a6400e43e90b382d38f704721dd46acaab1088239362b9290b536a9e7d707
+  languageName: node
+  linkType: hard
+
+"@0no-co/graphqlsp@npm:^1.12.14":
+  version: 1.12.14
+  resolution: "@0no-co/graphqlsp@npm:1.12.14"
+  dependencies:
+    "@gql.tada/internal": ^1.0.0
+    graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
+  peerDependencies:
+    graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
+    typescript: ^5.0.0
+  checksum: 43f22d46aa797a2bc288e0bfaecf27e6861c8ef4850dbed40b614a08373460f5aca86022e54dad6e994b6441b1ea2a09815d49cfd4cd9fff1865f70975414858
+  languageName: node
+  linkType: hard
+
+"@actions/exec@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@actions/exec@npm:1.1.1"
+  dependencies:
+    "@actions/io": ^1.0.1
+  checksum: d976e66dd51ab03d76a143da8e1406daa1bcdee06046168e6e0bec681c87a12999eefaad7a81cb81f28e4190610f55a58b8458ae4b82cbaaba13200490f4e8c2
+  languageName: node
+  linkType: hard
+
+"@actions/io@npm:^1.0.1, @actions/io@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "@actions/io@npm:1.1.3"
+  checksum: 42841ac2b8a7afb29456b9edb5534dbe00148893c794bdbc17d29166847c51c884e2a7c087a489a428250a78e7b54bc761ba3b55eb2f97d9600e9193b60caf0b
+  languageName: node
+  linkType: hard
+
 "@adobe/css-tools@npm:^4.0.1":
   version: 4.4.0
   resolution: "@adobe/css-tools@npm:4.4.0"
@@ -2878,6 +2919,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@gql.tada/internal@npm:^1.0.0":
+  version: 1.0.8
+  resolution: "@gql.tada/internal@npm:1.0.8"
+  dependencies:
+    "@0no-co/graphql.web": ^1.0.5
+  peerDependencies:
+    graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
+    typescript: ^5.0.0
+  checksum: 8046283fa29e382c2a56ce293cb1aeb6a864cfab0f5476e22faf6e1d52a6e89a04a34bcd0342744bd2835bceb9d555c9965b3f23102bce7e4d7d11ce7d5fb8c6
+  languageName: node
+  linkType: hard
+
 "@graphql-codegen/add@npm:^5.0.3":
   version: 5.0.3
   resolution: "@graphql-codegen/add@npm:5.0.3"
@@ -3573,21 +3626,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-typed-document-node/core@npm:3.2.0, @graphql-typed-document-node/core@npm:^3.2.0":
+"@graphql-typed-document-node/core@npm:3.2.0":
   version: 3.2.0
   resolution: "@graphql-typed-document-node/core@npm:3.2.0"
   peerDependencies:
     graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
   checksum: fa44443accd28c8cf4cb96aaaf39d144a22e8b091b13366843f4e97d19c7bfeaf609ce3c7603a4aeffe385081eaf8ea245d078633a7324c11c5ec4b2011bb76d
-  languageName: node
-  linkType: hard
-
-"@graphql-typed-document-node/core@npm:^3.1.1":
-  version: 3.1.1
-  resolution: "@graphql-typed-document-node/core@npm:3.1.1"
-  peerDependencies:
-    graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
-  checksum: 87ff4cee308f1075f4472b80f9f9409667979940f8f701e87f0aa35ce5cf104d94b41258ea8192d05a0893475cd0f086a3929a07663b4fe8d0e805a277f07ed5
   languageName: node
   linkType: hard
 
@@ -5130,6 +5174,36 @@ __metadata:
   dependencies:
     "@nx/workspace": 19.7.3
   checksum: 49572cb127df5825db61e4cc1d35bdd8b88275682bd3c551b4dfc0837bb1d81c0e9b30421debd7765aef809c4e3affda7a58aa566b8b1dedc9ceba97b6af963a
+  languageName: node
+  linkType: hard
+
+"@nx-tools/core@npm:6.0.1":
+  version: 6.0.1
+  resolution: "@nx-tools/core@npm:6.0.1"
+  dependencies:
+    "@actions/exec": ^1.1.1
+    "@actions/io": ^1.1.3
+    chalk: ^4.1.2
+    ci-info: ^4.0.0
+    csv-parse: ^5.5.5
+  peerDependencies:
+    "@nx/devkit": ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    tslib: ^2.5.0
+  checksum: 39587f77b16b15cfcc9651672810c2883a1d480f30b7260026507682c9d190871eada0c256111ae4a10d1a282b458b37ffd149ea8690f2a8dbe8348759f75c2f
+  languageName: node
+  linkType: hard
+
+"@nx-tools/nx-graphql-codegen@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@nx-tools/nx-graphql-codegen@npm:1.0.1"
+  dependencies:
+    "@nx-tools/core": 6.0.1
+  peerDependencies:
+    "@graphql-codegen/cli": ^5.0.0
+    "@nx/devkit": ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    ts-node: ^10.0.0
+    tslib: ^2.5.0
+  checksum: 7c063b50259ee4a735caef761a9c3f0cf75129fb2fb2e857bf98531994386ae807753a39ac3565f13293449ea6e844774c7c3b43aad9a5f6a150ed77b1b16397
   languageName: node
   linkType: hard
 
@@ -6855,12 +6929,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.5.2":
-  version: 22.5.2
-  resolution: "@types/node@npm:22.5.2"
+"@types/node@npm:^22.5.5":
+  version: 22.5.5
+  resolution: "@types/node@npm:22.5.5"
   dependencies:
     undici-types: ~6.19.2
-  checksum: 5e47839dd1919b39927a5552137ded5d3f18d9ff7729083ba851d640a6a0997ee747b9e2cf4c8a1f8418ad92ef7f0ada4fdc2d005dad2efb39fa80a5c7f6d23d
+  checksum: 1f788966ff7df07add0af3481fb68c7fe5091cc72a265c671432abb443788ddacca4ca6378af64fe100c20f857c4d80170d358e66c070171fcea0d4adb1b45b1
   languageName: node
   linkType: hard
 
@@ -9736,6 +9810,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ci-info@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "ci-info@npm:4.0.0"
+  checksum: 122fe41c5eb8d0b5fa0ab6fd674c5ddcf2dc59766528b062a0144ff0d913cfb210ef925ec52110e7c2a7f4e603d5f0e8b91cfe68867e196e9212fa0b94d0a08a
+  languageName: node
+  linkType: hard
+
 "circular-json@npm:^0.3.1":
   version: 0.3.3
   resolution: "circular-json@npm:0.3.3"
@@ -10691,6 +10772,13 @@ __metadata:
   version: 3.1.3
   resolution: "csstype@npm:3.1.3"
   checksum: 8db785cc92d259102725b3c694ec0c823f5619a84741b5c7991b8ad135dfaa66093038a1cc63e03361a6cd28d122be48f2106ae72334e067dd619a51f49eddf7
+  languageName: node
+  linkType: hard
+
+"csv-parse@npm:^5.5.5":
+  version: 5.5.6
+  resolution: "csv-parse@npm:5.5.6"
+  checksum: ee06f97f674487dc1d001b360de8ea510a41b9d971abf43bcf9c3be22c83a3634df0d3ebfbe52fd49d145077066be7ff9f25de3fc6b71aefb973099b04147a25
   languageName: node
   linkType: hard
 
@@ -13946,10 +14034,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql@npm:14.0.2 - 14.2.0 || ^14.3.1 || ^15.0.0, graphql@npm:~15.8.0":
+"graphql@npm:14.0.2 - 14.2.0 || ^14.3.1 || ^15.0.0":
   version: 15.8.0
   resolution: "graphql@npm:15.8.0"
   checksum: 423325271db8858428641b9aca01699283d1fe5b40ef6d4ac622569ecca927019fce8196208b91dd1d8eb8114f00263fe661d241d0eb40c10e5bfd650f86ec5e
+  languageName: node
+  linkType: hard
+
+"graphql@npm:16.8.0":
+  version: 16.8.0
+  resolution: "graphql@npm:16.8.0"
+  checksum: d853d4085b0c911a7e2a926c3b0d379934ec61cd4329e70cdf281763102f024fd80a97db7a505b8b04fed9050cb4875f8f518150ea854557a500a0b41dcd7f4e
+  languageName: node
+  linkType: hard
+
+"graphql@npm:^15.5.0 || ^16.0.0 || ^17.0.0":
+  version: 16.9.0
+  resolution: "graphql@npm:16.9.0"
+  checksum: 8cb3d54100e9227310383ce7f791ca48d12f15ed9f2021f23f8735f1121aafe4e5e611a853081dd935ce221724ea1ae4638faef5d2921fb1ad7c26b5f46611e9
   languageName: node
   linkType: hard
 
@@ -18980,6 +19082,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "opencampus@workspace:."
   dependencies:
+    "@0no-co/graphqlsp": ^1.12.14
     "@apollo/client": ~3.11.5
     "@bygdle/javascript-lp-solver": ^0.4.26
     "@emotion/cache": ^11.13.1
@@ -18991,6 +19094,7 @@ __metadata:
     "@graphql-codegen/typescript": ^4.0.9
     "@graphql-codegen/typescript-operations": ^4.2.3
     "@graphql-codegen/typescript-react-apollo": ^4.3.2
+    "@graphql-typed-document-node/core": ^3.2.0
     "@headlessui/react": ^2.1.3
     "@hello-pangea/dnd": ^16.6.0
     "@mui/icons-material": ^6.0.2
@@ -18998,6 +19102,7 @@ __metadata:
     "@mui/material": ^6.0.2
     "@mui/material-nextjs": ^6.0.2
     "@mui/styles": ^6.0.2
+    "@nx-tools/nx-graphql-codegen": ^1.0.1
     "@nx/cypress": 19.6.4
     "@nx/eslint": 19.6.4
     "@nx/eslint-plugin": 19.6.4
@@ -19017,7 +19122,7 @@ __metadata:
     "@types/jest": 29.5.12
     "@types/jsonexport": ^3.0.5
     "@types/lodash": ^4.17.7
-    "@types/node": 22.5.2
+    "@types/node": ^22.5.5
     "@types/papaparse": ^5.3.14
     "@types/react": 18.3.5
     "@types/react-datepicker": ^7.0.0
@@ -19054,7 +19159,7 @@ __metadata:
     eslint-plugin-react: ^7.35.1
     eslint-plugin-react-hooks: ^4.6.2
     eslint-plugin-standard: ^5.0.0
-    graphql: ~15.8.0
+    graphql: 16.8.0
     graphql-request: ^6.1.0
     jest: 29.7.0
     jest-worker: ^29.7.0

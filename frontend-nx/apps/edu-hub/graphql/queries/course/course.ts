@@ -1,27 +1,14 @@
-import { gql } from '@apollo/client';
+import { graphql } from '../../../types/generated';
 
-import {
-  ADMIN_COURSE_FRAGMENT,
-  COURSE_FRAGMENT,
-  COURSE_FRAGMENT_MINIMUM,
-} from '../../fragments/courseFragment';
-import { ADMIN_ENROLLMENT_FRAGMENT } from '../enrollmentFragment';
-import { ADMIN_SESSION_FRAGMENT } from '../sessionFragement';
-import { USER_FRAGMENT } from '../userFragment';
-import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from '../programFragment';
-
-export const COURSE = gql`
-  ${COURSE_FRAGMENT}
+export const COURSE = graphql(`
   query Course($id: Int!) {
     Course_by_pk(id: $id) {
       ...CourseFragment
     }
   }
-`;
+`);
 
-export const COURSE_MINIMUM = gql`
-  ${COURSE_FRAGMENT_MINIMUM}
-  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
+export const COURSE_MINIMUM = graphql(`
   query CourseMinimum($id: Int!) {
     Course_by_pk(id: $id) {
       ...CourseFragmentMinimum
@@ -30,14 +17,10 @@ export const COURSE_MINIMUM = gql`
       }
     }
   }
-`;
+`);
 
 // Query to get all data on a course that is necessary for the manage course page
-export const MANAGED_COURSE = gql`
-  ${ADMIN_COURSE_FRAGMENT}
-  ${ADMIN_ENROLLMENT_FRAGMENT}
-  ${ADMIN_SESSION_FRAGMENT}
-  ${USER_FRAGMENT}
+export const MANAGED_COURSE = graphql(`
   query ManagedCourse($id: Int!) {
     Course_by_pk(id: $id) {
       ...AdminCourseFragment
@@ -93,22 +76,12 @@ export const MANAGED_COURSE = gql`
       }
     }
   }
-`;
+`);
 
-export const INSERT_SESSION = gql`
-  mutation InsertSession(
-    $courseId: Int!
-    $startTime: timestamptz!
-    $endTime: timestamptz!
-  ) {
+export const INSERT_SESSION = graphql(`
+  mutation InsertSession($courseId: Int!, $startTime: timestamptz!, $endTime: timestamptz!) {
     insert_Session(
-      objects: {
-        courseId: $courseId
-        title: ""
-        startDateTime: $startTime
-        endDateTime: $endTime
-        description: ""
-      }
+      objects: { courseId: $courseId, title: "", startDateTime: $startTime, endDateTime: $endTime, description: "" }
     ) {
       affected_rows
       returning {
@@ -116,84 +89,71 @@ export const INSERT_SESSION = gql`
       }
     }
   }
-`;
+`);
 
-export const DELETE_SESSION = gql`
+export const DELETE_SESSION = graphql(`
   mutation DeleteSession($sessionId: Int!) {
     delete_Session_by_pk(id: $sessionId) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_SESSION_TITLE = gql`
+export const UPDATE_SESSION_TITLE = graphql(`
   mutation UpdateSessionTitle($sessionId: Int!, $title: String!) {
-    update_Session_by_pk(
-      pk_columns: { id: $sessionId }
-      _set: { title: $title }
-    ) {
+    update_Session_by_pk(pk_columns: { id: $sessionId }, _set: { title: $title }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_SESSION_START_TIME = gql`
+export const UPDATE_SESSION_START_TIME = graphql(`
   mutation UpdateSessionStartTime($sessionId: Int!, $startTime: timestamptz!) {
-    update_Session_by_pk(
-      pk_columns: { id: $sessionId }
-      _set: { startDateTime: $startTime }
-    ) {
+    update_Session_by_pk(pk_columns: { id: $sessionId }, _set: { startDateTime: $startTime }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_SESSION_END_TIME = gql`
+export const UPDATE_SESSION_END_TIME = graphql(`
   mutation UpdateSessionEndTime($sessionId: Int!, $endTime: timestamptz!) {
-    update_Session_by_pk(
-      pk_columns: { id: $sessionId }
-      _set: { endDateTime: $endTime }
-    ) {
+    update_Session_by_pk(pk_columns: { id: $sessionId }, _set: { endDateTime: $endTime }) {
       id
     }
   }
-`;
+`);
 
-export const INSERT_NEW_SESSION_SPEAKER = gql`
+export const INSERT_NEW_SESSION_SPEAKER = graphql(`
   mutation InsertNewSessionSpeaker($sessionId: Int!, $expertId: Int!) {
-    insert_SessionSpeaker(
-      objects: { sessionId: $sessionId, expertId: $expertId }
-    ) {
+    insert_SessionSpeaker(objects: { sessionId: $sessionId, expertId: $expertId }) {
       affected_rows
       returning {
         id
       }
     }
   }
-`;
+`);
 
-export const DELETE_SESSION_SPEAKER = gql`
+export const DELETE_SESSION_SPEAKER = graphql(`
   mutation DeleteSessionSpeaker($speakerId: Int!) {
     delete_SessionSpeaker_by_pk(id: $speakerId) {
       id
     }
   }
-`;
+`);
 
-export const INSERT_SESSION_ADDRESS = gql`
+export const INSERT_SESSION_ADDRESS = graphql(`
   mutation InsertSessionAddress($sessionId: Int!, $address: String!, $courseLocationId: Int!) {
-    insert_SessionAddress(
-      objects: { sessionId: $sessionId, address: $address, courseLocationId: $courseLocationId}
-    ) {
+    insert_SessionAddress(objects: { sessionId: $sessionId, address: $address, courseLocationId: $courseLocationId }) {
       affected_rows
       returning {
         id
       }
     }
   }
-`;
+`);
 
-export const INSERT_SESSION_WITH_ADDRESSES = gql`
+export const INSERT_SESSION_WITH_ADDRESSES = graphql(`
   mutation InsertSessionWithAddresses(
     $courseId: Int!
     $startTime: timestamptz!
@@ -207,9 +167,7 @@ export const INSERT_SESSION_WITH_ADDRESSES = gql`
         startDateTime: $startTime
         endDateTime: $endTime
         description: ""
-        SessionAddresses: {
-          data: $sessionAddresses
-        }
+        SessionAddresses: { data: $sessionAddresses }
       }
     ) {
       affected_rows
@@ -223,314 +181,213 @@ export const INSERT_SESSION_WITH_ADDRESSES = gql`
       }
     }
   }
-`;
+`);
 
-export const UPDATE_SESSION_ADDRESS = gql`
-  mutation UpdateSessionAddress(
-    $itemId: Int!
-    $text: String!
-  ) {
-    update_SessionAddress_by_pk(
-      pk_columns: { id: $itemId }
-      _set: { address: $text }
-    ) {
+export const UPDATE_SESSION_ADDRESS = graphql(`
+  mutation UpdateSessionAddress($itemId: Int!, $text: String!) {
+    update_SessionAddress_by_pk(pk_columns: { id: $itemId }, _set: { address: $text }) {
       id
     }
   }
-`;
+`);
 
-export const DELETE_SESSION_ADDRESSES_BY_COURSE_AND_LOCATION = gql`
-  mutation DeleteSessionAddressesByCourseAndLocation(
-    $courseId: Int!,
-    $courseLocationId: Int!
-  ) {
-    delete_SessionAddress(where: {
-      Session: {courseId: {_eq: $courseId}},
-      courseLocationId: {_eq: $courseLocationId}
-    }) {
+export const DELETE_SESSION_ADDRESSES_BY_COURSE_AND_LOCATION = graphql(`
+  mutation DeleteSessionAddressesByCourseAndLocation($courseId: Int!, $courseLocationId: Int!) {
+    delete_SessionAddress(
+      where: { Session: { courseId: { _eq: $courseId } }, courseLocationId: { _eq: $courseLocationId } }
+    ) {
       affected_rows
     }
   }
-`;
+`);
 
-export const LOCATION_OPTIONS = gql`
+export const LOCATION_OPTIONS = graphql(`
   query LocationOptions {
     LocationOption {
       value
     }
   }
-`;
+`);
 
-export const INSERT_COURSE_LOCATION = gql`
-  mutation InsertCourseLocation(
-    $courseId: Int!
-    $option: LocationOption_enum!
-  ) {
-    insert_CourseLocation(
-      objects: {
-        courseId: $courseId
-        locationOption: $option
-        defaultSessionAddress: ""
-      }
-    ) {
+export const INSERT_COURSE_LOCATION = graphql(`
+  mutation InsertCourseLocation($courseId: Int!, $option: LocationOption_enum!) {
+    insert_CourseLocation(objects: { courseId: $courseId, locationOption: $option, defaultSessionAddress: "" }) {
       affected_rows
       returning {
         id
       }
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_LOCATION = gql`
-  mutation UpdateCourseLocation(
-    $locationId: Int!
-    $value: LocationOption_enum!
-  ) {
-    update_CourseLocation_by_pk(
-      pk_columns: { id: $locationId }
-      _set: { locationOption: $value }
-    ) {
+export const UPDATE_COURSE_LOCATION = graphql(`
+  mutation UpdateCourseLocation($locationId: Int!, $value: LocationOption_enum!) {
+    update_CourseLocation_by_pk(pk_columns: { id: $locationId }, _set: { locationOption: $value }) {
       id
       locationOption
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_SESSION_DEFAULT_ADDRESS = gql`
-  mutation UpdateCourseDefaultSessionAddress(
-    $itemId: Int!
-    $text: String!
-  ) {
-    update_CourseLocation_by_pk(
-      pk_columns: { id: $itemId }
-      _set: { defaultSessionAddress: $text }
-    ) {
+export const UPDATE_COURSE_SESSION_DEFAULT_ADDRESS = graphql(`
+  mutation UpdateCourseDefaultSessionAddress($itemId: Int!, $text: String!) {
+    update_CourseLocation_by_pk(pk_columns: { id: $itemId }, _set: { defaultSessionAddress: $text }) {
       id
     }
   }
-`;
+`);
 
-export const DELETE_COURSE_LOCATION = gql`
+export const DELETE_COURSE_LOCATION = graphql(`
   mutation DeleteCourseLocation($locationId: Int!) {
     delete_CourseLocation_by_pk(id: $locationId) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_START_TIME = gql`
+export const UPDATE_COURSE_START_TIME = graphql(`
   mutation UpdateCourseStartTime($courseId: Int!, $startTime: time) {
-    update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { startTime: $startTime }
-    ) {
+    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { startTime: $startTime }) {
       id
       startTime
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_END_TIME = gql`
+export const UPDATE_COURSE_END_TIME = graphql(`
   mutation UpdateCourseEndTime($courseId: Int!, $endTime: time) {
-    update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { endTime: $endTime }
-    ) {
+    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { endTime: $endTime }) {
       id
       endTime
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_LANGUAGE = gql`
+export const UPDATE_COURSE_LANGUAGE = graphql(`
   mutation UpdateCourseLanguage($courseId: Int!, $value: String!) {
-    update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { language: $value }
-    ) {
+    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { language: $value }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_WEEKDAY = gql`
+export const UPDATE_COURSE_WEEKDAY = graphql(`
   mutation UpdateCourseWeekday($courseId: Int!, $value: Weekday_enum!) {
-    update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { weekDay: $value }
-    ) {
+    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { weekDay: $value }) {
       id
       weekDay
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_HEADING_DESCRIPTION_1 = gql`
-  mutation UpdateCourseHeadingDescription1(
-    $itemId: Int!
-    $text: String!
-  ) {
-    update_Course_by_pk(
-      pk_columns: { id: $itemId }
-      _set: { headingDescriptionField1: $text }
-    ) {
+export const UPDATE_COURSE_HEADING_DESCRIPTION_1 = graphql(`
+  mutation UpdateCourseHeadingDescription1($itemId: Int!, $text: String!) {
+    update_Course_by_pk(pk_columns: { id: $itemId }, _set: { headingDescriptionField1: $text }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_HEADING_DESCRIPTION_2 = gql`
-  mutation UpdateCourseHeadingDescription2(
-    $itemId: Int!
-    $text: String!
-  ) {
-    update_Course_by_pk(
-      pk_columns: { id: $itemId }
-      _set: { headingDescriptionField2: $text }
-    ) {
+export const UPDATE_COURSE_HEADING_DESCRIPTION_2 = graphql(`
+  mutation UpdateCourseHeadingDescription2($itemId: Int!, $text: String!) {
+    update_Course_by_pk(pk_columns: { id: $itemId }, _set: { headingDescriptionField2: $text }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1 = gql`
-  mutation UpdateCourseContentDescriptionField1(
-    $itemId: Int!
-    $text: String!
-  ) {
-    update_Course_by_pk(
-      pk_columns: { id: $itemId }
-      _set: { contentDescriptionField1: $text }
-    ) {
+export const UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1 = graphql(`
+  mutation UpdateCourseContentDescriptionField1($itemId: Int!, $text: String!) {
+    update_Course_by_pk(pk_columns: { id: $itemId }, _set: { contentDescriptionField1: $text }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2 = gql`
-  mutation UpdateCourseContentDescriptionField2(
-    $itemId: Int!
-    $text: String!
-  ) {
-    update_Course_by_pk(
-      pk_columns: { id: $itemId }
-      _set: { contentDescriptionField2: $text }
-    ) {
+export const UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2 = graphql(`
+  mutation UpdateCourseContentDescriptionField2($itemId: Int!, $text: String!) {
+    update_Course_by_pk(pk_columns: { id: $itemId }, _set: { contentDescriptionField2: $text }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_LEARNING_GOALS = gql`
+export const UPDATE_COURSE_LEARNING_GOALS = graphql(`
   mutation UpdateCourseLearningGoals($itemId: Int!, $text: String!) {
-    update_Course_by_pk(
-      pk_columns: { id: $itemId }
-      _set: { learningGoals: $text }
-    ) {
+    update_Course_by_pk(pk_columns: { id: $itemId }, _set: { learningGoals: $text }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_SHORT_DESCRIPTION = gql`
+export const UPDATE_COURSE_SHORT_DESCRIPTION = graphql(`
   mutation UpdateShortDescription($itemId: Int!, $text: String!) {
-    update_Course_by_pk(
-      pk_columns: { id: $itemId }
-      _set: { tagline: $text }
-    ) {
+    update_Course_by_pk(pk_columns: { id: $itemId }, _set: { tagline: $text }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_MAX_PARTICIPANTS = gql`
-  mutation UpdateCourseMaxParticipants(
-    $courseId: Int!
-    $maxParticipants: Int!
-  ) {
-    update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { maxParticipants: $maxParticipants }
-    ) {
+export const UPDATE_COURSE_MAX_PARTICIPANTS = graphql(`
+  mutation UpdateCourseMaxParticipants($courseId: Int!, $maxParticipants: Int!) {
+    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { maxParticipants: $maxParticipants }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_STATUS = gql`
+export const UPDATE_COURSE_STATUS = graphql(`
   mutation UpdateCourseStatus($courseId: Int!, $status: CourseStatus_enum!) {
-    update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { status: $status }
-    ) {
+    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { status: $status }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE = gql`
-  mutation UpdateCourseAttendanceCertificatePossible(
-    $courseId: Int!
-    $isPossible: Boolean!
-  ) {
-    update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { attendanceCertificatePossible: $isPossible }
-    ) {
+export const UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE = graphql(`
+  mutation UpdateCourseAttendanceCertificatePossible($courseId: Int!, $isPossible: Boolean!) {
+    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { attendanceCertificatePossible: $isPossible }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE = gql`
-  mutation UpdateCourseAchievementCertificatePossible(
-    $courseId: Int!
-    $isPossible: Boolean!
-  ) {
-    update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { achievementCertificatePossible: $isPossible }
-    ) {
+export const UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE = graphql(`
+  mutation UpdateCourseAchievementCertificatePossible($courseId: Int!, $isPossible: Boolean!) {
+    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { achievementCertificatePossible: $isPossible }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_TITLE = gql`
+export const UPDATE_COURSE_TITLE = graphql(`
   mutation UpdateCourseTitle($courseId: Int!, $courseTitle: String!) {
-    update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { title: $courseTitle }
-    ) {
+    update_Course_by_pk(pk_columns: { id: $courseId }, _set: { title: $courseTitle }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_CHAT_LINK = gql`
+export const UPDATE_COURSE_CHAT_LINK = graphql(`
   mutation UpdateCourseChatLink($itemId: Int!, $text: String!) {
-    update_Course_by_pk(
-      pk_columns: { id: $itemId }
-      _set: { chatLink: $text }
-    ) {
+    update_Course_by_pk(pk_columns: { id: $itemId }, _set: { chatLink: $text }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_ECTS = gql`
+export const UPDATE_COURSE_ECTS = graphql(`
   mutation UpdateCourseEcts($itemId: Int!, $text: String!) {
     update_Course_by_pk(pk_columns: { id: $itemId }, _set: { ects: $text }) {
       id
     }
   }
-`;
+`);
 
-export const UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK = gql`
+export const UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK = graphql(`
   mutation UpdateCourseExternalRegistrationLink($itemId: Int!, $text: String!) {
     update_Course_by_pk(pk_columns: { id: $itemId }, _set: { externalRegistrationLink: $text }) {
       id
     }
   }
-`;
-
+`);

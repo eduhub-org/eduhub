@@ -1,8 +1,6 @@
-import { gql } from '@apollo/client';
-import { USER_FRAGMENT } from './userFragment';
+import { graphql } from '../../types/generated';
 
-export const SESSION_FRAGMENT = gql`
-  ${USER_FRAGMENT}
+export const SESSION_FRAGMENT = graphql(`
   fragment SessionFragment on Session {
     id
     endDateTime
@@ -33,11 +31,9 @@ export const SESSION_FRAGMENT = gql`
       }
     }
   }
-`;
+`);
 
-export const ADMIN_SESSION_FRAGMENT = gql`
-  ${SESSION_FRAGMENT}
-  ${USER_FRAGMENT}
+export const ADMIN_SESSION_FRAGMENT = graphql(`
   fragment AdminSessionFragment on Session {
     ...SessionFragment
     SessionSpeakers {
@@ -50,4 +46,4 @@ export const ADMIN_SESSION_FRAGMENT = gql`
       }
     }
   }
-`;
+`);

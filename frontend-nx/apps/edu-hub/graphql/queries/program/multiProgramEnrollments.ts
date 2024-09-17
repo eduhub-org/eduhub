@@ -1,8 +1,8 @@
-import { gql } from '@apollo/client';
+import { graphql } from '../../../types/generated';
 
-export const MULTI_PROGRAM_ENROLLMENTS = gql`
+export const MULTI_PROGRAM_ENROLLMENTS = graphql(`
   query MultiProgramEnrollments($programIds: [Int!]) {
-    Program(where: {id: {_in: $programIds}}) {
+    Program(where: { id: { _in: $programIds } }) {
       id
       title
       shortTitle
@@ -20,4 +20,4 @@ export const MULTI_PROGRAM_ENROLLMENTS = gql`
       }
     }
   }
-`;
+`);

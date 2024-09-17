@@ -1,6 +1,6 @@
-import { gql } from '@apollo/client';
+import { graphql } from '../../types/generated';
 
-export const ACHIEVEMENT_OPTION_FRAGMENT = gql`
+export const ACHIEVEMENT_OPTION_FRAGMENT = graphql(`
   fragment AchievementOptionFragment on AchievementOption {
     id
     title
@@ -15,4 +15,4 @@ export const ACHIEVEMENT_OPTION_FRAGMENT = gql`
       url
     }
   }
-`;
+`);

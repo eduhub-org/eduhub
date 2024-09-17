@@ -1,15 +1,6 @@
-import { gql } from '@apollo/client';
+import { graphql } from '../../../types/generated';
 
-import { COURSE_FRAGMENT } from '../../fragments/courseFragment';
-import { ENROLLMENT_FRAGMENT } from '../enrollmentFragment';
-import { USER_PROGRAM_FRAGMENT } from '../programFragment';
-import { SESSION_FRAGMENT } from '../sessionFragement';
-
-export const COURSE_WITH_ENROLLMENT = gql`
-  ${COURSE_FRAGMENT}
-  ${ENROLLMENT_FRAGMENT}
-  ${SESSION_FRAGMENT}
-  ${USER_PROGRAM_FRAGMENT}
+export const COURSE_WITH_ENROLLMENT = graphql(`
   query CourseWithEnrollment($id: Int!, $userId: uuid!) {
     Course_by_pk(id: $id) {
       ...CourseFragment
@@ -26,7 +17,7 @@ export const COURSE_WITH_ENROLLMENT = gql`
       Program {
         ...ProgramFragment
       }
-      Sessions (order_by: { startDateTime: asc }) {
+      Sessions(order_by: { startDateTime: asc }) {
         ...SessionFragment
         Attendances(where: { User: { id: { _eq: $userId } } }) {
           id
@@ -36,4 +27,4 @@ export const COURSE_WITH_ENROLLMENT = gql`
       }
     }
   }
-`;
+`);

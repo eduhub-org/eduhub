@@ -1,11 +1,9 @@
-import { gql } from "@apollo/client";
-import { COURSE_INSTRUCTOR_FRAGMENT } from "../courseInstructorFragment";
+import { graphql } from '../../../types/generated';
 
-export const COURSE_INSTRUCTOR_LIST = gql`
-  ${COURSE_INSTRUCTOR_FRAGMENT}
+export const COURSE_INSTRUCTOR_LIST = graphql(`
   query CourseInstructorList {
     CourseInstructor {
       ...CourseInstructorFragment
     }
   }
-`;
+`);

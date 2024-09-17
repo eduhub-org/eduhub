@@ -3,16 +3,16 @@ import Fade from '@mui/material/Fade';
 import MaterialMenu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
-import { MinAchievementOption } from '../../../../../helpers/achievement';
+import { FragmentType, useFragment } from '../../../../../types/generated';
+import { ACHIEVEMENT_OPTION_FRAGMENT } from '../../../../../graphql/fragments/achievementOptionFragment';
 import React, { FC, createElement, useCallback } from 'react';
-import { AchievementOptionCourses_AchievementOptionCourse_AchievementOption } from '../../../../../graphql/__generated__/AchievementOptionCourses';
 
 interface IProps {
   anchorElement: HTMLElement | undefined;
   isVisible: boolean;
   setVisible: (visible: boolean) => void;
-  courseAchievementOptions: MinAchievementOption[];
-  callback: (item: AchievementOptionCourses_AchievementOptionCourse_AchievementOption) => void;
+  courseAchievementOptions: FragmentType<typeof ACHIEVEMENT_OPTION_FRAGMENT>[];
+  callback: (item: FragmentType<typeof ACHIEVEMENT_OPTION_FRAGMENT>) => void;
 }
 
 // Replace with styled
@@ -32,7 +32,7 @@ export const AchievementOptionDropDown: FC<IProps> = ({
 }) => {
   const hideMenu = useCallback(() => setVisible(false), [setVisible]);
   const onOptionClick = useCallback(
-    (data: AchievementOptionCourses_AchievementOptionCourse_AchievementOption) => {
+    (data: FragmentType<typeof ACHIEVEMENT_OPTION_FRAGMENT>) => {
       setVisible(false);
       callback(data);
     },
@@ -65,8 +65,8 @@ export const AchievementOptionDropDown: FC<IProps> = ({
 export default AchievementOptionDropDown;
 
 interface IPropsSingleItem {
-  callback: (data: MinAchievementOption) => void;
-  item: MinAchievementOption;
+  callback: (data: FragmentType<typeof ACHIEVEMENT_OPTION_FRAGMENT>) => void;
+  item: FragmentType<typeof ACHIEVEMENT_OPTION_FRAGMENT>;
 }
 
 const SingleOption: FC<IPropsSingleItem> = ({ callback, item }) => {
@@ -74,9 +74,11 @@ const SingleOption: FC<IPropsSingleItem> = ({ callback, item }) => {
     callback(item);
   }, [callback, item]);
 
+  const unmaskedItem = useFragment(ACHIEVEMENT_OPTION_FRAGMENT, item);
+
   return (
     <MenuItem onClick={onOptionClick}>
-      <ListItemText primary={item.title} className="text" />
+      <ListItemText primary={unmaskedItem.title} className="text" />
     </MenuItem>
   );
 };

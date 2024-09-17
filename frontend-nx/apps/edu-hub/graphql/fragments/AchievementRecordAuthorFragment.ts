@@ -1,8 +1,6 @@
-import { gql } from '@apollo/client';
-import { USER_FRAGMENT } from './userFragment';
+import { graphql } from '../../types/generated';
 
-export const ACHIEVEMENT_RECORD_AUTHOR_FRAGMENT = gql`
-  ${USER_FRAGMENT}
+export const ACHIEVEMENT_RECORD_AUTHOR_FRAGMENT = graphql(`
   fragment AchievementRecordAuthorFragment on AchievementRecordAuthor {
     id
     created_at
@@ -10,4 +8,4 @@ export const ACHIEVEMENT_RECORD_AUTHOR_FRAGMENT = gql`
       ...UserFragment
     }
   }
-`;
+`);

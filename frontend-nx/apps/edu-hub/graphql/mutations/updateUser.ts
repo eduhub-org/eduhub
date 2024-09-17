@@ -1,6 +1,6 @@
-import { gql } from '@apollo/client';
+import { graphql } from '../../types/generated';
 
-export const UPDATE_USER = gql`
+export const UPDATE_USER = graphql(`
   mutation UpdateUser(
     $userId: uuid!
     $firstName: String
@@ -36,9 +36,9 @@ export const UPDATE_USER = gql`
       picture
     }
   }
-`;
+`);
 
-export const UPDATE_USER_ON_ENROLLMENT_CONFIRMATION = gql`
+export const UPDATE_USER_ON_ENROLLMENT_CONFIRMATION = graphql(`
   mutation UpdateUserOnEnrollmentConfirmation(
     $userId: uuid!
     $matriculationNumber: String
@@ -62,21 +62,13 @@ export const UPDATE_USER_ON_ENROLLMENT_CONFIRMATION = gql`
       university
     }
   }
-`;
+`);
 
-export const UPDATE_USER_PROFILE_PICTURE = gql`
-  mutation UpdateUserProfilePicture(
-    $userId: uuid!
-    $picture: String
-  ) {
-    update_User_by_pk(
-      pk_columns: { id: $userId }
-      _set: {
-        picture: $picture
-      }
-    ) {
+export const UPDATE_USER_PROFILE_PICTURE = graphql(`
+  mutation UpdateUserProfilePicture($userId: uuid!, $picture: String) {
+    update_User_by_pk(pk_columns: { id: $userId }, _set: { picture: $picture }) {
       id
       picture
     }
   }
-`;
+`);

@@ -1,25 +1,20 @@
-import { gql } from '@apollo/client';
+import { graphql } from '../../../types/generated';
 
-import { ADMIN_COURSE_FRAGMENT, COURSE_FRAGMENT, COURSE_TILE_FRAGMENT_ANONYMOUS } from '../../fragments/courseFragment';
-import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from '../programFragment';
-
-export const COURSE_LIST_ANONYMOUS = gql`
-  ${COURSE_TILE_FRAGMENT_ANONYMOUS}
+export const COURSE_LIST_ANONYMOUS = graphql(`
   query CourseTileListAnonymous {
     Course(order_by: { id: desc }) {
       ...CourseTileFragmentAnonymous
     }
   }
-`;
+`);
 
-export const COURSE_LIST = gql`
-  ${COURSE_FRAGMENT}
+export const COURSE_LIST = graphql(`
   query CourseList {
     Course(order_by: { updated_at: desc }) {
       ...CourseFragment
     }
   }
-`;
+`);
 
 /**
  *
@@ -31,20 +26,9 @@ export const COURSE_LIST = gql`
  *
  */
 
-export const ADMIN_COURSE_LIST = gql`
-  ${ADMIN_COURSE_FRAGMENT}
-  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
-  query AdminCourseList(
-    $where: Course_bool_exp! = {}
-    $limit: Int = null
-    $offset: Int = 0
-  ) {
-    Course(
-      order_by: { id: desc }
-      where: $where
-      limit: $limit
-      offset: $offset
-    ) {
+export const ADMIN_COURSE_LIST = graphql(`
+  query AdminCourseList($where: Course_bool_exp! = {}, $limit: Int = null, $offset: Int = 0) {
+    Course(order_by: { id: desc }, where: $where, limit: $limit, offset: $offset) {
       ...AdminCourseFragment
       Program {
         ...ProgramFragmentMinimumProperties
@@ -96,4 +80,4 @@ export const ADMIN_COURSE_LIST = gql`
       order
     }
   }
-`;
+`);

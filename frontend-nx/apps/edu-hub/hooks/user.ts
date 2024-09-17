@@ -1,6 +1,5 @@
 import { useSession } from 'next-auth/react';
 
-import { User } from '../graphql/__generated__/User';
 import { USER } from '../graphql/queries/user/user';
 
 import { useAuthedQuery } from './authedQuery';
@@ -13,7 +12,7 @@ export const useUserId = () => {
 export const useUser = () => {
   const { data: session } = useSession();
 
-  const { data } = useAuthedQuery<User>(USER, {
+  const { data } = useAuthedQuery(USER, {
     variables: {
       userId: session?.profile?.sub,
     },

@@ -1,12 +1,6 @@
-import { gql } from "@apollo/client";
-import { COURSE_INSTRUCTOR_FRAGMENT } from "../courseInstructorFragment";
-import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from "../programFragment";
-import { ENROLLMENT_FRAGMENT } from "../enrollmentFragment";
+import { graphql } from '../../types/generated';
 
-import { SESSION_FRAGMENT } from '../sessionFragement';
-
-
-export const COURSE_TILE_FRAGMENT_ANONYMOUS = gql`
+export const COURSE_TILE_FRAGMENT_ANONYMOUS = graphql(`
   fragment CourseTileFragmentAnonymous on Course {
     id
     weekDay
@@ -24,15 +18,10 @@ export const COURSE_TILE_FRAGMENT_ANONYMOUS = gql`
         order
       }
     }
-}
-`;
+  }
+`);
 
-
-export const COURSE_FRAGMENT = gql`
-  ${SESSION_FRAGMENT}
-  ${COURSE_INSTRUCTOR_FRAGMENT}
-  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
-  ${ENROLLMENT_FRAGMENT}
+export const COURSE_FRAGMENT = graphql(`
   fragment CourseFragment on Course {
     id
     ects
@@ -58,7 +47,7 @@ export const COURSE_FRAGMENT = gql`
     externalRegistrationLink
     startTime
     endTime
-    Sessions (order_by: { startDateTime: asc }) {
+    Sessions(order_by: { startDateTime: asc }) {
       ...SessionFragment
     }
     CourseInstructors(order_by: { id: desc }) {
@@ -94,12 +83,10 @@ export const COURSE_FRAGMENT = gql`
         }
       }
     }
-}
-`;
+  }
+`);
 
-export const ADMIN_COURSE_FRAGMENT = gql`
-  ${COURSE_FRAGMENT}
-  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
+export const ADMIN_COURSE_FRAGMENT = graphql(`
   fragment AdminCourseFragment on Course {
     ...CourseFragment
     learningGoals
@@ -112,9 +99,9 @@ export const ADMIN_COURSE_FRAGMENT = gql`
       ...ProgramFragmentMinimumProperties
     }
   }
-`;
+`);
 
-export const COURSE_FRAGMENT_MINIMUM = gql`
+export const COURSE_FRAGMENT_MINIMUM = graphql(`
   fragment CourseFragmentMinimum on Course {
     id
     title
@@ -137,4 +124,4 @@ export const COURSE_FRAGMENT_MINIMUM = gql`
     endTime
     startTime
   }
-`;
+`);

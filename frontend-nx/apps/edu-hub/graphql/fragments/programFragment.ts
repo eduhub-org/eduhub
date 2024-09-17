@@ -1,6 +1,6 @@
-import { gql } from '@apollo/client';
+import { graphql } from '../../types/generated';
 
-export const PROGRAM_FRAGMENT_MINIMUM_PROPERTIES = gql`
+export const PROGRAM_FRAGMENT_MINIMUM_PROPERTIES = graphql(`
   fragment ProgramFragmentMinimumProperties on Program {
     id
     title
@@ -13,9 +13,9 @@ export const PROGRAM_FRAGMENT_MINIMUM_PROPERTIES = gql`
     visibilityAchievementCertificate
     visibilityAttendanceCertificate
   }
-`;
-export const USER_PROGRAM_FRAGMENT = gql`
-  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
+`);
+
+export const USER_PROGRAM_FRAGMENT = graphql(`
   fragment ProgramFragment on Program {
     ...ProgramFragmentMinimumProperties
     defaultApplicationEnd
@@ -30,10 +30,9 @@ export const USER_PROGRAM_FRAGMENT = gql`
     visibilityAchievementCertificate
     visibilityAttendanceCertificate
   }
-`;
+`);
 
-export const ADMIN_PROGRAM_FRAGMENT = gql`
-  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
+export const ADMIN_PROGRAM_FRAGMENT = graphql(`
   fragment AdminProgramFragment on Program {
     ...ProgramFragmentMinimumProperties
     applicationStart
@@ -48,4 +47,4 @@ export const ADMIN_PROGRAM_FRAGMENT = gql`
     visibilityAchievementCertificate
     visibilityAttendanceCertificate
   }
-`;
+`);

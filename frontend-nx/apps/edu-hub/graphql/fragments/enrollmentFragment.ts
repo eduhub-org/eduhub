@@ -1,6 +1,6 @@
-import { gql } from '@apollo/client';
+import { graphql } from '../../types/generated';
 
-export const ENROLLMENT_FRAGMENT = gql`
+export const ENROLLMENT_FRAGMENT = graphql(`
   fragment EnrollmentFragment on CourseEnrollment {
     userId
     courseId
@@ -10,13 +10,12 @@ export const ENROLLMENT_FRAGMENT = gql`
     achievementCertificateURL
     attendanceCertificateURL
   }
-`;
+`);
 
-export const ADMIN_ENROLLMENT_FRAGMENT = gql`
-  ${ENROLLMENT_FRAGMENT}
+export const ADMIN_ENROLLMENT_FRAGMENT = graphql(`
   fragment AdminEnrollmentFragment on CourseEnrollment {
     ...EnrollmentFragment
     motivationLetter
     motivationRating
   }
-`;
+`);

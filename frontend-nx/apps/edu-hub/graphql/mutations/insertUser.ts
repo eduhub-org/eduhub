@@ -1,20 +1,8 @@
-import { gql } from "@apollo/client";
+import { graphql } from '../../types/generated';
 
-export const INSERT_USER = gql`
-  mutation InsertUser(
-    $userId: uuid!
-    $firstName: String!
-    $lastName: String!
-    $email: String!
-  ) {
-    insert_User(
-      objects: {
-        id: $userId
-        lastName: $lastName
-        firstName: $firstName
-        email: $email
-      }
-    ) {
+export const INSERT_USER = graphql(`
+  mutation InsertUser($userId: uuid!, $firstName: String!, $lastName: String!, $email: String!) {
+    insert_User(objects: { id: $userId, lastName: $lastName, firstName: $firstName, email: $email }) {
       affected_rows
       returning {
         id
@@ -25,9 +13,9 @@ export const INSERT_USER = gql`
       }
     }
   }
-`;
+`);
 
-export const INSERT_A_USER = gql`
+export const INSERT_A_USER = graphql(`
   mutation InsertSingleUser($user: User_insert_input!) {
     insert_User_one(object: $user) {
       id
@@ -37,4 +25,4 @@ export const INSERT_A_USER = gql`
       lastName
     }
   }
-`;
+`);

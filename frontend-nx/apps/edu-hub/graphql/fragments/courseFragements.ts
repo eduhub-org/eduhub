@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client";
+import { graphql } from '../../types/generated';
 
-export const COURSE_TILE_FRAGMENT = gql`
+export const COURSE_TILE_FRAGMENT = graphql(`
   fragment CourseTileFragment on Course {
     id
     title
@@ -18,4 +18,4 @@ export const COURSE_TILE_FRAGMENT = gql`
       locationOption
     }
   }
-`;
+`);
