@@ -1,0 +1,1 @@
+CREATE TABLE "public"."OrganizationType" ("value" text NOT NULL, "comment" text NOT NULL, PRIMARY KEY ("value") , UNIQUE ("value"));COMMENT ON TABLE "public"."OrganizationType" IS E'Used in the Organization table to categorize different entities.';

@@ -2,6 +2,9 @@ table:
   name: User
   schema: public
 object_relationships:
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
   - name: UserStatus
     using:
       foreign_key_constraint_on: status
@@ -80,6 +83,7 @@ select_permissions:
         - firstName
         - id
         - lastName
+        - organizationId
         - otherUniversity
         - picture
         - university
@@ -134,6 +138,7 @@ update_permissions:
         - lastName
         - matriculationNumber
         - newsletterRegistration
+        - organizationId
         - otherUniversity
         - picture
         - university
