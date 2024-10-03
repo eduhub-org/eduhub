@@ -21,7 +21,9 @@ import {
   UPDATE_ORGANIZATION_TYPE,
   UPDATE_ORGANIZATION_DESCRIPTION,
   DELETE_ORGANIZATION,
+  UPDATE_ORGANIZATION_ALIASES,
 } from '../../../queries/organization';
+import CreatableTagSelector from '../../forms/CreatableTagSelector';
 
 const PAGE_SIZE = 15;
 
@@ -32,8 +34,30 @@ type ExpandableRowProps = {
 const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row }): React.ReactElement => {
   const { t } = useTranslation('manageOrganizations');
 
+  // Ensure aliases are in the correct format (array of strings)
+  const currentTags = Array.isArray(row.aliases)
+    ? row.aliases
+        .filter((alias) => alias != null) // Filter out null and undefined
+        .map((alias) => {
+          if (typeof alias === 'string') return alias;
+          if (typeof alias === 'object' && alias !== null && 'name' in alias) return alias.name;
+          return null; // This will be filtered out in the next step
+        })
+        .filter((alias) => alias !== null) // Filter out any nulls that might have slipped through
+    : [];
+
   return (
     <div className="font-medium bg-edu-course-list p-4">
+      <CreatableTagSelector
+        label={t('organizationAliases')}
+        placeholder={t('enterOrganizationAlias')}
+        itemId={row.id}
+        currentTags={currentTags}
+        tagOptions={[]}
+        updateTagsMutation={UPDATE_ORGANIZATION_ALIASES}
+        refetchQueries={['OrganizationList']}
+        translationNamespace="manageOrganizations"
+      />
       <TextFieldEditor
         label={t('organizationDescription')}
         placeholder={t('enterOrganizationDescription')}

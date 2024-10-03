@@ -69,8 +69,11 @@ export const UPDATE_ORGANIZATION_DESCRIPTION = gql`
 `;
 
 export const UPDATE_ORGANIZATION_ALIASES = gql`
-  mutation UpdateOrganizationAliases($itemId: Int!, $text: Organization_set_input!) {
-    update_Organization_by_pk(pk_columns: { id: $itemId }, _set: $text) {
+  mutation UpdateOrganizationAliases($id: Int!, $tags: jsonb!) {
+    update_Organization_by_pk(
+      pk_columns: { id: $id },
+      _set: { aliases: $tags }
+    ) {
       id
       aliases
     }

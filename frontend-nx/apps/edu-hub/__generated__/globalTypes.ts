@@ -5379,7 +5379,7 @@ export interface Organization_bool_exp {
   _and?: Organization_bool_exp[] | null;
   _not?: Organization_bool_exp | null;
   _or?: Organization_bool_exp[] | null;
-  aliases?: _text_comparison_exp | null;
+  aliases?: jsonb_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   description?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
@@ -5457,19 +5457,6 @@ export interface Organization_order_by {
   name?: order_by | null;
   type?: order_by | null;
   updated_at?: order_by | null;
-}
-
-/**
- * input type for updating data in table "Organization"
- */
-export interface Organization_set_input {
-  aliases?: any | null;
-  created_at?: any | null;
-  description?: string | null;
-  id?: number | null;
-  name?: string | null;
-  type?: string | null;
-  updated_at?: any | null;
 }
 
 /**
@@ -7260,6 +7247,31 @@ export interface date_comparison_exp {
   _eq?: any | null;
   _gt?: any | null;
   _gte?: any | null;
+  _in?: any[] | null;
+  _is_null?: boolean | null;
+  _lt?: any | null;
+  _lte?: any | null;
+  _neq?: any | null;
+  _nin?: any[] | null;
+}
+
+export interface jsonb_cast_exp {
+  String?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "jsonb". All fields are combined with logical 'AND'.
+ */
+export interface jsonb_comparison_exp {
+  _cast?: jsonb_cast_exp | null;
+  _contained_in?: any | null;
+  _contains?: any | null;
+  _eq?: any | null;
+  _gt?: any | null;
+  _gte?: any | null;
+  _has_key?: string | null;
+  _has_keys_all?: string[] | null;
+  _has_keys_any?: string[] | null;
   _in?: any[] | null;
   _is_null?: boolean | null;
   _lt?: any | null;

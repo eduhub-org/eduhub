@@ -3,8 +3,6 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Organization_set_input } from "./../../__generated__/globalTypes";
-
 // ====================================================
 // GraphQL mutation operation: UpdateOrganizationAliases
 // ====================================================
@@ -23,6 +21,6 @@ export interface UpdateOrganizationAliases {
 }
 
 export interface UpdateOrganizationAliasesVariables {
-  itemId: number;
-  text: Organization_set_input;
+  id: number;
+  tags: any;
 }

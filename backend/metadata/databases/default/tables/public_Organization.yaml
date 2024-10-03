@@ -19,21 +19,21 @@ insert_permissions:
       check: {}
       columns:
         - aliases
-        - id
+        - created_at
         - description
+        - id
         - name
         - type
-        - created_at
         - updated_at
 select_permissions:
   - role: anonymous
     permission:
       columns:
+        - aliases
+        - created_at
+        - description
         - id
         - name
         - type
-        - description
-        - created_at
         - updated_at
-        - aliases
       filter: {}
