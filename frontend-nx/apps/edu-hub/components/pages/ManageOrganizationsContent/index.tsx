@@ -34,23 +34,22 @@ type ExpandableRowProps = {
 const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row }): React.ReactElement => {
   const { t } = useTranslation('manageOrganizations');
 
-  // Ensure aliases are in the correct format (array of strings)
   const currentTags = Array.isArray(row.aliases)
     ? row.aliases
-        .filter((alias) => alias != null) // Filter out null and undefined
+        .filter((alias) => alias != null)
         .map((alias) => {
           if (typeof alias === 'string') return alias;
           if (typeof alias === 'object' && alias !== null && 'name' in alias) return alias.name;
-          return null; // This will be filtered out in the next step
+          return null;
         })
-        .filter((alias) => alias !== null) // Filter out any nulls that might have slipped through
+        .filter((alias) => alias !== null)
     : [];
 
   return (
     <div className="font-medium bg-edu-course-list p-4">
       <CreatableTagSelector
-        label={t('organizationAliases')}
-        placeholder={t('enterOrganizationAlias')}
+        label={t('organization.aliases')}
+        placeholder={t('input.enter_alias')}
         itemId={row.id}
         currentTags={currentTags}
         tagOptions={[]}
@@ -59,8 +58,8 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row }): React
         translationNamespace="manageOrganizations"
       />
       <TextFieldEditor
-        label={t('organizationDescription')}
-        placeholder={t('enterOrganizationDescription')}
+        label={t('organization.description')}
+        placeholder={t('input.enter_description')}
         itemId={row.id}
         currentText={row.description || ''}
         updateTextMutation={UPDATE_ORGANIZATION_DESCRIPTION}
@@ -105,12 +104,11 @@ const ManageOrganizationsContent: FC = () => {
     () => [
       {
         accessorKey: 'name',
-        header: t('organizationName'),
+        header: t('organization.name'),
         meta: { width: 3 },
         cell: ({ getValue, row }) => (
           <TextFieldEditor
-            label={t('organizationName')}
-            placeholder={t('enterOrganizationName')}
+            placeholder={t('input.enter_name')}
             itemId={row.original.id}
             currentText={getValue<string>()}
             updateTextMutation={UPDATE_ORGANIZATION_NAME}
@@ -121,18 +119,17 @@ const ManageOrganizationsContent: FC = () => {
       },
       {
         accessorKey: 'type',
-        header: t('organizationType'),
+        header: t('organization.type'),
         meta: { width: 3 },
         cell: ({ getValue, row }) => (
           <DropDownSelector
-            label={t('organizationType')}
             itemId={row.original.id}
             currentValue={getValue<string>()}
             options={organizationTypes}
             updateValueMutation={UPDATE_ORGANIZATION_TYPE}
             refetchQueries={['OrganizationList']}
             translationNamespace="manageOrganizations"
-            translationPrefix="organizationType_"
+            translationPrefix="type_selection."
           />
         ),
       },
@@ -151,7 +148,7 @@ const ManageOrganizationsContent: FC = () => {
 
   const generateDeletionConfirmation = useCallback(
     (row: OrganizationList_Organization) => {
-      return t('deletion_confirmation_question', { name: row.name });
+      return t('action.delete_confirmation', { name: row.name });
     },
     [t]
   );
@@ -159,14 +156,14 @@ const ManageOrganizationsContent: FC = () => {
   if (loading) return <Loading />;
   if (error) {
     console.error('Error loading organizations:', error);
-    return <div>{t('errorLoadingOrganizations')}</div>;
+    return <div>{t('error.loading')}</div>;
   }
 
   return (
     <PageBlock>
       <div className="max-w-screen-xl mx-auto mt-20">
         <div className="text-white mb-4">
-          <EhAddButton buttonClickCallBack={onAddOrganizationClick} text={t('addOrganization')} />
+          <EhAddButton buttonClickCallBack={onAddOrganizationClick} text={t('action.add')} />
         </div>
         <TableGrid
           columns={columns}

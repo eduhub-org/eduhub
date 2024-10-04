@@ -125,5 +125,7 @@
     "external_profile": "Homepage",
     "linkedin_profile": "LinkedIn-Profil",
     "xing_profile": "Xing-Profil"
-  }
+  },
+  "add_tag": "\"{{value}}\" hinzufügen",
+  "pagination_text": "Seite {{currentPage}} von {{totalPage}}"
 }

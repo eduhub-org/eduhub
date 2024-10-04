@@ -46,7 +46,7 @@ interface TableGridProps<T extends BaseRow> {
   showDelete?: boolean;
   showGlobalSearchField?: boolean;
   translationNamespace?: string;
-  onAddButtonClick?: () => void; // Optional Add button callback
+  onAddButtonClick?: () => void;
 }
 
 const TableGrid = <T extends BaseRow>({
@@ -70,11 +70,10 @@ const TableGrid = <T extends BaseRow>({
   showDelete,
   showGlobalSearchField = true,
   translationNamespace,
-  onAddButtonClick, // Add button callback
+  onAddButtonClick,
 }: TableGridProps<T>) => {
   const { t } = useTranslation(translationNamespace);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
-
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const handlePrevious = () => setPageIndex(Math.max(0, pageIndex - 1));
@@ -123,39 +122,8 @@ const TableGrid = <T extends BaseRow>({
     ];
 
     const dataColumns = columns.map((col) => ({ ...col }));
-    const deleteColumn =
-      showDelete && deleteMutation
-        ? [
-            {
-              id: 'delete',
-              cell: ({ row }) =>
-                deleteMutation && (
-                  <TableGridDeleteButton
-                    deleteMutation={deleteMutation}
-                    id={row.original.id}
-                    idType={deleteIdType}
-                    deletionConfirmationQuestion={
-                      generateDeletionConfirmationQuestion
-                        ? generateDeletionConfirmationQuestion(row.original)
-                        : undefined
-                    }
-                    refetchQueries={refetchQueries}
-                  />
-                ),
-            },
-          ]
-        : [];
-    return [...dataColumns, ...expandCollapseColumn, ...deleteColumn];
-  }, [
-    columns,
-    deleteMutation,
-    refetchQueries,
-    showDelete,
-    expandedRows,
-    toggleRowExpansion,
-    deleteIdType,
-    generateDeletionConfirmationQuestion,
-  ]);
+    return [...dataColumns, ...expandCollapseColumn];
+  }, [columns, expandedRows, toggleRowExpansion]);
 
   const table = useReactTable({
     data,
@@ -200,41 +168,33 @@ const TableGrid = <T extends BaseRow>({
         </div>
       )}
 
-      {/* Header row for column names */}
-      <div>
-        {table.getHeaderGroups().map((headerGroup) => (
-          <div
-            key={headerGroup.id}
-            className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] mb-1 text-white items-center"
-          >
-            {showCheckbox && <div className="col-span-1" />}
-            {headerGroup.headers.map((header) => (
-              <div
-                key={header.id}
-                className={`${header.column.columnDef.meta?.className} mr-3 ml-3 col-span-${header.column.columnDef.meta?.width} relative`}
-                onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
-              >
-                <div className="flex-1 flex items-center">
-                  {header.column.columnDef.header === '' ? null : <div>{t(header.column.id)}</div>}
-                  {header.column.getCanSort() && (
-                    <div className="ml-1 flex flex-col items-center">
-                      <ArrowDropUp style={{ opacity: header.column.getIsSorted() === 'asc' ? 1 : 0.5 }} />
-                      <ArrowDropDown style={{ opacity: header.column.getIsSorted() === 'desc' ? 1 : 0.5 }} />
-                    </div>
-                  )}
+      {/* Header row */}
+      <div className="flex items-center mb-1 text-white">
+        <div className="flex-grow grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
+          {table.getHeaderGroups().map((headerGroup) => (
+            <React.Fragment key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <div
+                  key={header.id}
+                  className={`${header.column.columnDef.meta?.className} mr-3 ml-3 col-span-${header.column.columnDef.meta?.width} relative`}
+                  onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
+                >
+                  <div className="flex-1 flex items-center">
+                    {header.column.columnDef.header === '' ? null : <div>{t(header.column.id)}</div>}
+                    {header.column.getCanSort() && (
+                      <div className="ml-1 flex flex-col items-center">
+                        <ArrowDropUp style={{ opacity: header.column.getIsSorted() === 'asc' ? 1 : 0.5 }} />
+                        <ArrowDropDown style={{ opacity: header.column.getIsSorted() === 'desc' ? 1 : 0.5 }} />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-            {showDelete && <div className="ml-3 col-span-2" />}
-          </div>
-        ))}
-      </div>
-
-      {loading && (
-        <div className="flex justify-center items-center">
-          <CircularProgress />
+              ))}
+            </React.Fragment>
+          ))}
         </div>
-      )}
+        {showDelete && <div className="w-20 flex-shrink-0" />} {/* Wider placeholder for delete column */}
+      </div>
 
       {/* Data Rows */}
       {!loading &&
@@ -242,23 +202,38 @@ const TableGrid = <T extends BaseRow>({
         table.getRowModel().rows.map((row) => (
           <React.Fragment key={row.id}>
             {/* Primary Row */}
-            <div
-              className={`grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center ${
-                expandedRows.has(row.original.id) && expandableRowComponent ? 'mb-0' : 'mb-1'
-              } py-2 bg-edu-light-gray`}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <div
-                  key={cell.id}
-                  className={`${cell.column.columnDef.meta?.className} mr-3 ml-3 col-span-${cell.column.columnDef.meta?.width}`}
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            <div className="flex items-center mb-1">
+              <div className="flex-grow bg-edu-light-gray py-2">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center">
+                  {row.getVisibleCells().map((cell) => (
+                    <div
+                      key={cell.id}
+                      className={`${cell.column.columnDef.meta?.className} mr-3 ml-3 col-span-${cell.column.columnDef.meta?.width}`}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+              {showDelete && deleteMutation && (
+                <div className="w-20 flex-shrink-0 flex items-center justify-center py-2 pl-4">
+                  <TableGridDeleteButton
+                    deleteMutation={deleteMutation}
+                    id={row.original.id}
+                    idType={deleteIdType}
+                    deletionConfirmationQuestion={
+                      generateDeletionConfirmationQuestion
+                        ? generateDeletionConfirmationQuestion(row.original)
+                        : undefined
+                    }
+                    refetchQueries={refetchQueries}
+                  />
+                </div>
+              )}
             </div>
             {/* Expandable Second Row */}
             {expandedRows.has(row.original.id) && expandableRowComponent && (
-              <div className="items-center mb-1 py-2 bg-edu-light-gray">
+              <div className="bg-edu-light-gray mb-1 py-2">
                 <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
               </div>
             )}
@@ -276,8 +251,10 @@ const TableGrid = <T extends BaseRow>({
                 onClick={handlePrevious}
               />
             )}
-            <p className="font-medium">{t('paginationText', { currentPage: pageIndex + 1, totalPage: pages })}</p>
-            {pageIndex < pages - 1 && (
+            <p className="font-medium">
+              {t('common:pagination_text', { currentPage: pageIndex + 1, totalPage: pages })}
+            </p>
+            {pageIndex < (pages ?? 0) - 1 && (
               <MdArrowForward
                 className="border-2 rounded-full cursor-pointer hover:bg-indigo-100"
                 size={30}
@@ -290,5 +267,4 @@ const TableGrid = <T extends BaseRow>({
     </div>
   );
 };
-
 export default TableGrid;

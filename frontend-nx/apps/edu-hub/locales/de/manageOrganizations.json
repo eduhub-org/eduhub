@@ -1,0 +1,31 @@
+{
+  "name": "Name",
+  "type": "Typ",
+  "organization": {
+    "aliases": "Alias",
+    "description": "Beschreibung"
+  },
+  "action": {
+    "add": "Organisation hinzufügen",
+    "delete_confirmation": "Das Löschen einer Organisation ist nur möglich, wenn keine Benutzer mit dieser Organisation verknüpft sind.\nSind Sie sicher, dass Sie die Organisation \"{{name}}\" löschen möchten?"
+  },
+  "input": {
+    "enter_alias": "Organisationsalias eingeben",
+    "enter_description": "Organisationsbeschreibung eingeben",
+    "enter_name": "Organisationsname eingeben"
+  },
+  "error": {
+    "loading": "Fehler beim Laden der Organisationen"
+  },
+  "type_selection": {
+    "UNIVERSITY": "Universität",
+    "RESEARCH_INSTITUTE": "Forschungsinstitut",
+    "PUBLIC_SECTOR": "Öffentlicher Sektor",
+    "NON_PROFIT_ORGANIZATION": "Gemeinnützige Organisation",
+    "CORPORATION": "Unternehmen",
+    "SCHOOL": "Schule",
+    "FREELANCER": "Freiberuflich/Selbständig",
+    "OTHER": "Sonstige"
+  },
+  "deletion_confirmation_question": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the organization {{name}}?"
+}

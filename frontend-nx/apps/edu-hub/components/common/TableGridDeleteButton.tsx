@@ -19,7 +19,7 @@ const TableGridDeleteButton = ({
   id,
   refetchQueries,
   idType,
-  deletionConfirmationQuestion
+  deletionConfirmationQuestion,
 }: TableGridDeleteButtonProps) => {
   const [deleteItem] = useAdminMutation(deleteMutation);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
@@ -60,14 +60,26 @@ const TableGridDeleteButton = ({
 
     deleteItem({
       variables: { id: variableId },
-      refetchQueries
+      refetchQueries,
     });
   };
 
   return (
     <>
-      <IconButton size="small" onClick={handleDeleteClick}>
-        <MdDelete size="1.25em" style={{ color: 'red' }} />
+      <IconButton
+        size="small"
+        onClick={handleDeleteClick}
+        className="delete-button"
+        sx={{
+          backgroundColor: 'transparent !important',
+          padding: 0,
+          boxShadow: 'none',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 0, 0, 0.1) !important',
+          },
+        }}
+      >
+        <MdDelete size="1.25em" color="red" />
       </IconButton>
       <QuestionConfirmationDialog
         question={confirmationQuestion}

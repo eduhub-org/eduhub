@@ -10,7 +10,7 @@ import { useAdminMutation } from '../../hooks/authedMutation';
 import useTranslation from 'next-translate/useTranslation';
 
 type TextFieldEditorProps = {
-  label: string;
+  label?: string; // Made optional
   placeholder: string;
   itemId: number;
   currentText: string;
@@ -60,17 +60,17 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
   const debouncedUpdateText = useDebouncedCallback((newText) => {
     if (validateText(newText)) {
       updateText({ variables: { itemId, text: newText } });
-      setErrorMessage(''); // Clear any existing error message
+      setErrorMessage('');
     } else {
-      setErrorMessage(t(errorText || 'Invalid input')); // Use your error message
+      setErrorMessage(t(errorText || 'Invalid input'));
     }
-    setHasBlurred(false); // Reset the blurred state when text changes
+    setHasBlurred(false);
   }, 1000);
 
   const handleTextChange = (event) => {
     const newText = event.target.value;
-    setText(newText); // Update text state immediately for UI feedback
-    debouncedUpdateText(newText); // Call debounced function with the new text
+    setText(newText);
+    debouncedUpdateText(newText);
   };
 
   const handleBlur = () => {
@@ -86,7 +86,7 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
       <TextField
         className={hasBlurred && errorMessage ? 'w-3/4' : 'w-full'}
         variant="standard"
-        label={t(label)}
+        label={label ? t(label) : undefined} // Only set label if it's provided
         placeholder={t(placeholder)}
         value={text}
         onChange={handleTextChange}

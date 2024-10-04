@@ -13,7 +13,7 @@ import { useAdminMutation } from '../../hooks/authedMutation';
 import useTranslation from 'next-translate/useTranslation';
 
 type DropDownSelectorProps = {
-  label: string;
+  label?: string; // Made optional
   itemId: string | number;
   currentValue: string;
   options: string[];
@@ -84,11 +84,13 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
   return (
     <div className="col-span-10 flex mt-3">
       <FormControl variant="standard" className={hasBlurred && errorMessage ? 'w-3/4' : 'w-full'}>
-        <InputLabel id={`${label}-label`} style={{ color: hasBlurred && errorMessage ? 'red' : 'rgb(34, 34, 34)' }}>
-          {t(label)}
-        </InputLabel>
+        {label && (
+          <InputLabel id={`${label}-label`} style={{ color: hasBlurred && errorMessage ? 'red' : 'rgb(34, 34, 34)' }}>
+            {t(label)}
+          </InputLabel>
+        )}
         <Select
-          labelId={`${label}-label`}
+          labelId={label ? `${label}-label` : undefined}
           value={value}
           onChange={handleValueChange}
           onBlur={handleBlur}
