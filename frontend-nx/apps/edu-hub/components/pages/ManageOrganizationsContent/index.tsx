@@ -2,6 +2,8 @@ import React, { FC, useMemo, useState, useEffect, useCallback } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { ColumnDef } from '@tanstack/react-table';
 import { useDebouncedCallback } from 'use-debounce';
+import { ApolloError } from '@apollo/client';
+import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
@@ -74,8 +76,14 @@ const ManageOrganizationsContent: FC = () => {
   const [searchFilter, setSearchFilter] = useState('');
   const [pageIndex, setPageIndex] = useState(0);
   const { t } = useTranslation('manageOrganizations');
+  const [error, setError] = useState<string | null>(null);
 
-  const { data, loading, error, refetch } = useAdminQuery<OrganizationList>(ORGANIZATION_LIST, {
+  const {
+    data,
+    loading,
+    error: queryError,
+    refetch,
+  } = useAdminQuery<OrganizationList>(ORGANIZATION_LIST, {
     variables: {
       offset: pageIndex * PAGE_SIZE,
       limit: PAGE_SIZE,
@@ -139,15 +147,31 @@ const ManageOrganizationsContent: FC = () => {
   );
 
   const onAddOrganizationClick = async () => {
-    await insertOrganization({
-      variables: {
-        insertInput: {
-          name: t('organization.new_organization'), // Translated default name
-          type: organizationTypes[0],
-          description: t('organization.default_description'), // Optionally translate the description as well
+    try {
+      await insertOrganization({
+        variables: {
+          insertInput: {
+            name: t('organization.new_organization'),
+            type: organizationTypes[0],
+            description: t('organization.default_description'),
+          },
         },
-      },
-    });
+      });
+    } catch (error) {
+      let errorMessage = '';
+      if (error instanceof ApolloError) {
+        const rawErrorMessage = error.message;
+        if (rawErrorMessage.includes('duplicate key value violates unique constraint "Organization_name_key"')) {
+          errorMessage = t('error.duplicate_organization_name');
+        } else {
+          errorMessage = rawErrorMessage;
+        }
+      } else {
+        errorMessage = t('error.unexpected');
+      }
+      setError(errorMessage);
+      console.error('Error adding organization:', error);
+    }
     refetch();
   };
 
@@ -178,9 +202,13 @@ const ManageOrganizationsContent: FC = () => {
     [deleteOrganization, refetch, t]
   );
 
+  const handleCloseErrorDialog = () => {
+    setError(null);
+  };
+
   if (loading) return <Loading />;
-  if (error) {
-    console.error('Error loading organizations:', error);
+  if (queryError) {
+    console.error('Error loading organizations:', queryError);
     return <div>{t('error.loading')}</div>;
   }
 
@@ -194,7 +222,7 @@ const ManageOrganizationsContent: FC = () => {
           columns={columns}
           data={data.Organization}
           deleteMutation={DELETE_ORGANIZATION}
-          error={error}
+          error={queryError}
           loading={loading}
           refetchQueries={['OrganizationList']}
           showDelete
@@ -211,6 +239,7 @@ const ManageOrganizationsContent: FC = () => {
           generateDeletionConfirmationQuestion={generateDeletionConfirmation}
           expandableRowComponent={({ row }) => <ExpandableOrganizationRow row={row} />}
         />
+        <ErrorMessageDialog errorMessage={error || ''} open={!!error} onClose={handleCloseErrorDialog} />
       </div>
     </PageBlock>
   );

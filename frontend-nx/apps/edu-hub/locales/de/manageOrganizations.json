@@ -18,7 +18,11 @@
     "enter_name": "Organisationsname eingeben"
   },
   "error": {
-    "loading": "Fehler beim Laden der Organisationen"
+    "loading": "Fehler beim Laden der Organisationen",
+    "duplicate_organization_name": "Eine Organisation mit dem Standardnamen existiert noch. Bitte benenne oder lösche diese zuerst.",
+    "general": "Ein Fehler trat auf, während die Organisation hinzugefügt wurde. Bitte versuchen Sie es erneut.",
+    "network": "Ein Netzwerkfehler trat auf. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "unexpected": "Ein unerwarteter Fehler trat auf. Bitte versuchen Sie es später erneut."
   },
   "type_selection": {
     "UNIVERSITY": "Universität",

@@ -18,7 +18,11 @@
     "enter_name": "Enter organization name"
   },
   "error": {
-    "loading": "Error loading organizations"
+    "loading": "Error loading organizations",
+    "duplicate_organization_name": "An organization with the default name is still existing. Please rename or delete that one first.",
+    "general": "An error occurred while adding the organization. Please try again.",
+    "network": "A network error occurred. Please check your connection and try again.",
+    "unexpected": "An unexpected error occurred. Please try again later."
   },
   "type_selection": {
     "UNIVERSITY": "University",
