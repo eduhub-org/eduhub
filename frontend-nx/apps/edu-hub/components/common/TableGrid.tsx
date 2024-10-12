@@ -1,6 +1,15 @@
 import React, { useState, useMemo, useCallback, ReactElement, Dispatch, SetStateAction } from 'react';
 import { ApolloError, DocumentNode } from '@apollo/client';
-import { CircularProgress, TextField } from '@mui/material';
+import {
+  CircularProgress,
+  TextField,
+  Checkbox,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Button,
+} from '@mui/material';
 import useTranslation from 'next-translate/useTranslation';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
 import { MdArrowBack, MdArrowForward } from 'react-icons/md';
@@ -25,6 +34,11 @@ interface BaseRow {
   id: number;
 }
 
+interface BulkAction {
+  value: string;
+  label: string;
+}
+
 interface TableGridProps<T extends BaseRow> {
   addButtonText?: string;
   data: T[];
@@ -47,6 +61,8 @@ interface TableGridProps<T extends BaseRow> {
   showGlobalSearchField?: boolean;
   translationNamespace?: string;
   onAddButtonClick?: () => void;
+  onBulkAction?: (action: string, selectedRows: T[]) => void;
+  bulkActions?: BulkAction[];
 }
 
 const TableGrid = <T extends BaseRow>({
@@ -66,15 +82,19 @@ const TableGrid = <T extends BaseRow>({
   searchFilter,
   setSearchFilter,
   setPageIndex,
-  showCheckbox,
+  showCheckbox = false,
   showDelete,
   showGlobalSearchField = true,
   translationNamespace,
   onAddButtonClick,
+  onBulkAction,
+  bulkActions = [],
 }: TableGridProps<T>) => {
   const { t } = useTranslation(translationNamespace);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+  const [bulkAction, setBulkAction] = useState<string>('');
 
   const handlePrevious = () => setPageIndex(Math.max(0, pageIndex - 1));
   const handleNext = () => setPageIndex(pageIndex + 1);
@@ -94,6 +114,36 @@ const TableGrid = <T extends BaseRow>({
     [expandedRows]
   );
 
+  const toggleRowSelection = useCallback(
+    (rowId: number) => {
+      const newSelectedRows = new Set(selectedRows);
+      if (selectedRows.has(rowId)) {
+        newSelectedRows.delete(rowId);
+      } else {
+        newSelectedRows.add(rowId);
+      }
+      setSelectedRows(newSelectedRows);
+    },
+    [selectedRows]
+  );
+
+  const toggleAllRows = useCallback(() => {
+    if (selectedRows.size === data.length) {
+      setSelectedRows(new Set());
+    } else {
+      setSelectedRows(new Set(data.map((row) => row.id)));
+    }
+  }, [data, selectedRows]);
+
+  const handleBulkAction = () => {
+    if (onBulkAction && bulkAction) {
+      const selectedRowsData = data.filter((row) => selectedRows.has(row.id));
+      onBulkAction(bulkAction, selectedRowsData);
+      setBulkAction('');
+      setSelectedRows(new Set()); // Clear selections after action
+    }
+  };
+
   const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     const itemRank = rankItem(row.getValue(columnId), value);
     addMeta({ itemRank });
@@ -109,21 +159,45 @@ const TableGrid = <T extends BaseRow>({
   );
 
   const tableColumns = useMemo(() => {
-    const expandCollapseColumn: ColumnDef<T>[] = [
-      {
-        id: 'expander',
-        header: '',
-        cell: ({ row }) => (
-          <button onClick={() => toggleRowExpansion(row.original.id)}>
-            {expandedRows.has(row.original.id) ? <IoIosArrowUp /> : <IoIosArrowDown />}
-          </button>
-        ),
-      },
-    ];
+    const selectionColumn: ColumnDef<T>[] = showCheckbox
+      ? [
+          {
+            id: 'selection',
+            header: ({ table }) => (
+              <Checkbox
+                checked={table.getIsAllPageRowsSelected()}
+                indeterminate={table.getIsSomePageRowsSelected()}
+                onChange={table.getToggleAllPageRowsSelectedHandler()}
+                sx={{
+                  color: 'white',
+                  '&.Mui-checked': {
+                    color: 'white',
+                  },
+                  '&.MuiCheckbox-indeterminate': {
+                    color: 'white',
+                  },
+                }}
+              />
+            ),
+            cell: ({ row }) => (
+              <Checkbox
+                checked={row.getIsSelected()}
+                onChange={row.getToggleSelectedHandler()}
+                sx={{
+                  color: 'black',
+                  '&.Mui-checked': {
+                    color: 'black',
+                  },
+                }}
+              />
+            ),
+          },
+        ]
+      : [];
 
     const dataColumns = columns.map((col) => ({ ...col }));
-    return [...dataColumns, ...expandCollapseColumn];
-  }, [columns, expandedRows, toggleRowExpansion]);
+    return [...selectionColumn, ...dataColumns];
+  }, [columns, showCheckbox]);
 
   const table = useReactTable({
     data,
@@ -143,46 +217,89 @@ const TableGrid = <T extends BaseRow>({
     getFilteredRowModel: getFilteredRowModel(),
     debugTable: true,
     getRowId: (row) => row.id.toString(),
+    enableRowSelection: true,
+    enableMultiRowSelection: true,
   });
 
   return (
     <div>
-      {showGlobalSearchField && (
-        <div className={`flex ${onAddButtonClick ? 'justify-between' : 'justify-end'}`}>
-          {onAddButtonClick && (
-            <div className="text-white mb-4">
-              <EhAddButton buttonClickCallBack={onAddButtonClick} text={addButtonText} />
-            </div>
-          )}
+      <div className="flex justify-between items-center mb-4">
+        {onAddButtonClick && (
+          <div className="text-white">
+            <EhAddButton buttonClickCallBack={onAddButtonClick} text={addButtonText} />
+          </div>
+        )}
+        {showCheckbox && bulkActions.length > 0 && (
+          <div className="flex items-center">
+            <FormControl variant="outlined" size="small" style={{ minWidth: 200, marginRight: '10px' }}>
+              <InputLabel id="bulk-action-label" style={{ color: 'white' }}>
+                {t('common:table_grid.bulk_action')}
+              </InputLabel>
+              <Select
+                labelId="bulk-action-label"
+                value={bulkAction}
+                onChange={(e) => setBulkAction(e.target.value as string)}
+                label={t('common:table_grid.bulk_action')}
+                className="bg-gray-600 border"
+              >
+                <MenuItem value="">
+                  <em>{t('none')}</em>
+                </MenuItem>
+                {bulkActions.map((action) => (
+                  <MenuItem key={action.value} value={action.value}>
+                    {action.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleBulkAction}
+              disabled={!bulkAction || selectedRows.size === 0}
+            >
+              Apply
+            </Button>
+          </div>
+        )}
+        {showGlobalSearchField && (
           <TextField
-            className="!w-64 bg-gray-600 border !mb-6"
+            className="!w-64 bg-gray-600 border"
             value={searchFilter}
             onChange={(e) => onGlobalFilterChange(e.target.value)}
             label={t('search')}
             variant="outlined"
             size="small"
             fullWidth
-            InputProps={{ style: { color: 'white', borderColor: 'white' } }}
-            InputLabelProps={{ style: { color: 'white' } }}
+            slotProps={{
+              input: { style: { color: 'white', borderColor: 'white' } },
+              inputLabel: { style: { color: 'white' } },
+            }}
           />
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Header row */}
       <div className="flex items-center mb-1 text-white">
-        <div className="flex-grow grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
+        <div className="flex-grow grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}>
           {table.getHeaderGroups().map((headerGroup) => (
             <React.Fragment key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <div
                   key={header.id}
-                  className={`${header.column.columnDef.meta?.className} mr-3 ml-3 col-span-${header.column.columnDef.meta?.width} relative`}
+                  className={`${header.column.columnDef.meta?.className} px-3 col-span-${header.column.columnDef.meta?.width || 1} relative flex items-center h-full`}
                   onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
                 >
-                  <div className="flex-1 flex items-center">
-                    {header.column.columnDef.header === '' ? null : <div>{t(header.column.id)}</div>}
+                  <div className="flex items-center w-full">
+                    {header.column.columnDef.header === '' ? null : (
+                      <div className="flex-grow">
+                        {header.column.id === 'selection'
+                          ? flexRender(header.column.columnDef.header, header.getContext())
+                          : t(header.column.id)}
+                      </div>
+                    )}
                     {header.column.getCanSort() && (
-                      <div className="ml-1 flex flex-col items-center">
+                      <div className="flex flex-col items-center ml-1">
                         <ArrowDropUp style={{ opacity: header.column.getIsSorted() === 'asc' ? 1 : 0.5 }} />
                         <ArrowDropDown style={{ opacity: header.column.getIsSorted() === 'desc' ? 1 : 0.5 }} />
                       </div>
@@ -193,7 +310,8 @@ const TableGrid = <T extends BaseRow>({
             </React.Fragment>
           ))}
         </div>
-        {showDelete && <div className="w-20 flex-shrink-0" />} {/* Wider placeholder for delete column */}
+        {showDelete && <div className="w-20 flex-shrink-0" />}
+        {expandableRowComponent && <div className="w-10 flex-shrink-0" />}
       </div>
 
       {/* Data Rows */}
@@ -202,7 +320,7 @@ const TableGrid = <T extends BaseRow>({
         table.getRowModel().rows.map((row) => (
           <React.Fragment key={row.id}>
             {/* Primary Row */}
-            <div className="flex items-center mb-1">
+            <div className="flex items-stretch mb-1">
               <div className="flex-grow bg-edu-light-gray py-2">
                 <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center">
                   {row.getVisibleCells().map((cell) => (
@@ -215,6 +333,17 @@ const TableGrid = <T extends BaseRow>({
                   ))}
                 </div>
               </div>
+              {/* Add expand/collapse button here */}
+              {expandableRowComponent && (
+                <div className="w-10 flex-shrink-0 flex items-stretch bg-gray-300">
+                  <button
+                    onClick={() => toggleRowExpansion(row.original.id)}
+                    className="w-full flex items-center justify-center hover:bg-gray-400 transition-colors duration-200"
+                  >
+                    {expandedRows.has(row.original.id) ? <IoIosArrowUp size={20} /> : <IoIosArrowDown size={20} />}
+                  </button>
+                </div>
+              )}
               {showDelete && deleteMutation && (
                 <div className="w-20 flex-shrink-0 flex items-center justify-center py-2 pl-4">
                   <TableGridDeleteButton
@@ -233,8 +362,12 @@ const TableGrid = <T extends BaseRow>({
             </div>
             {/* Expandable Second Row */}
             {expandedRows.has(row.original.id) && expandableRowComponent && (
-              <div className="bg-edu-light-gray mb-1 py-2">
-                <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
+              <div className="flex mb-1">
+                <div className="flex-grow bg-edu-light-gray py-2">
+                  <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
+                </div>
+                <div className="w-10 flex-shrink-0"></div>
+                {showDelete && <div className="w-20 flex-shrink-0"></div>}
               </div>
             )}
           </React.Fragment>
@@ -252,7 +385,7 @@ const TableGrid = <T extends BaseRow>({
               />
             )}
             <p className="font-medium">
-              {t('common:pagination_text', { currentPage: pageIndex + 1, totalPage: pages })}
+              {t('common:table_grid.pagination_text', { currentPage: pageIndex + 1, totalPage: pages })}
             </p>
             {pageIndex < (pages ?? 0) - 1 && (
               <MdArrowForward
@@ -267,4 +400,5 @@ const TableGrid = <T extends BaseRow>({
     </div>
   );
 };
+
 export default TableGrid;

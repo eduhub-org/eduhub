@@ -126,7 +126,11 @@
     "linkedin_profile": "LinkedIn Profile",
     "xing_profile": "Xing Profile"
   },
-  "add_tag": "Add \"{{value}}\"",
-  "pagination_text": "Page {{currentPage}} of {{totalPage}}"
-
+  "table_grid":{
+    "add_tag": "Add \"{{value}}\"",
+    "pagination_text": "Page {{currentPage}} of {{totalPage}}",
+    "bulk_action": "Bulk Action",
+    "apply": "Apply",
+    "none": "Keine"
+  }
 }

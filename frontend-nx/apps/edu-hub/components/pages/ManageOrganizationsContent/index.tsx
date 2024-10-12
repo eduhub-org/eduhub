@@ -83,6 +83,7 @@ const ManageOrganizationsContent: FC = () => {
   });
 
   const [insertOrganization] = useAdminMutation<InsertOrganization, InsertOrganizationVariables>(INSERT_ORGANIZATION);
+  const [deleteOrganization] = useAdminMutation(DELETE_ORGANIZATION);
 
   const debouncedRefetch = useDebouncedCallback(refetch, 300);
 
@@ -153,6 +154,26 @@ const ManageOrganizationsContent: FC = () => {
     [t]
   );
 
+  const bulkActions = useMemo(() => [{ value: 'delete', label: t('action.delete_selected') }], [t]);
+
+  const handleBulkAction = useCallback(
+    async (action: string, selectedRows: OrganizationList_Organization[]) => {
+      if (action === 'delete') {
+        const confirmDelete = window.confirm(t('action.bulk_delete_confirmation', { count: selectedRows.length }));
+        if (confirmDelete) {
+          try {
+            await Promise.all(selectedRows.map((row) => deleteOrganization({ variables: { id: row.id } })));
+            refetch();
+          } catch (error) {
+            console.error('Error deleting org.nizations:', error);
+            // You might want to show an error message to the user here
+          }
+        }
+      }
+    },
+    [deleteOrganization, refetch, t]
+  );
+
   if (loading) return <Loading />;
   if (error) {
     console.error('Error loading organizations:', error);
@@ -173,6 +194,9 @@ const ManageOrganizationsContent: FC = () => {
           loading={loading}
           refetchQueries={['OrganizationList']}
           showDelete
+          showCheckbox={true}
+          bulkActions={bulkActions}
+          onBulkAction={handleBulkAction}
           translationNamespace="manageOrganizations"
           enablePagination
           pageIndex={pageIndex}
