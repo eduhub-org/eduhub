@@ -53,20 +53,20 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
     >
       <MenuItem onClick={closeMenu}>
         <Link className="w-full text-lg" href="/profile">
-          {t('menu-profile')}
+          {t('menu.profile')}
         </Link>
       </MenuItem>
 
       <MenuItem onClick={closeMenu}>
         <Link className="w-full text-lg" href="https://opencampus.gitbook.io/faq/" target="_blank">
-          {t('menu-faq')}
+          {t('menu.faq')}
         </Link>
       </MenuItem>
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link className="w-full text-lg" href="/manage/users">
-            {t('menu-administration-user')}
+            {t('menu.user')}
           </Link>
         </MenuItem>
       )}
@@ -74,28 +74,29 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link className="w-full text-lg" href="/manage/courses">
-            {t('menu-administration-courses')}
+            {t('menu.courses')}
           </Link>
         </MenuItem>
       )}
+
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link className="w-full text-lg" href="/manage/achievement-options">
-            {t('menu-administration-achievement')}
+            {t('menu.achievements')}
           </Link>
         </MenuItem>
       )}
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link className="w-full text-lg" href="/manage/achievement-templates">
-            {t('menu-administration-achievement-templates')}
+            {t('menu.achievement_templates')}
           </Link>
         </MenuItem>
       )}
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link className="w-full text-lg" href="/manage/programs">
-            {t('menu-administration-programs')}
+            {t('menu.programs')}
           </Link>
         </MenuItem>
       )}
@@ -103,7 +104,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link className="w-full text-lg" href="/manage/organizations">
-            {t('menu-administration-organizaions')}
+            {t('menu.organizations')}
           </Link>
         </MenuItem>
       )}
@@ -111,7 +112,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link className="w-full text-lg" href="/manage/app-settings">
-            {t('menu-administration-appSettings')}
+            {t('menu.app_settings')}
           </Link>
         </MenuItem>
       )}
@@ -119,13 +120,13 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
           <Link className="w-full text-lg" href="/statistics">
-            {t('menu-administration-statistics')}
+            {t('menu.statistics')}
           </Link>
         </MenuItem>
       )}
 
       <MenuItem onClick={() => logout()}>
-        <button className="w-full text-lg text-left">{t('menu-logout')}</button>
+        <button className="w-full text-lg text-left">{t('menu.logout')}</button>
       </MenuItem>
     </StyledMenu>
   );

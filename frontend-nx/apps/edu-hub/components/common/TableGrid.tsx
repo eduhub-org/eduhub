@@ -9,6 +9,7 @@ import {
   FormControl,
   InputLabel,
   Button,
+  SelectChangeEvent,
 } from '@mui/material';
 import useTranslation from 'next-translate/useTranslation';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
@@ -135,11 +136,11 @@ const TableGrid = <T extends BaseRow>({
     }
   }, [data, selectedRows]);
 
-  const handleBulkAction = () => {
-    if (onBulkAction && bulkAction) {
+  const handleBulkActionChange = (event: SelectChangeEvent<string>) => {
+    const action = event.target.value;
+    if (onBulkAction && action) {
       const selectedRowsData = data.filter((row) => selectedRows.has(row.id));
-      onBulkAction(bulkAction, selectedRowsData);
-      setBulkAction('');
+      onBulkAction(action, selectedRowsData);
       setSelectedRows(new Set()); // Clear selections after action
     }
   };
@@ -231,19 +232,19 @@ const TableGrid = <T extends BaseRow>({
         )}
         {showCheckbox && bulkActions.length > 0 && (
           <div className="flex items-center">
-            <FormControl variant="outlined" size="small" style={{ minWidth: 200, marginRight: '10px' }}>
+            <FormControl variant="outlined" size="small" style={{ minWidth: 200 }}>
               <InputLabel id="bulk-action-label" style={{ color: 'white' }}>
                 {t('common:table_grid.bulk_action')}
               </InputLabel>
               <Select
                 labelId="bulk-action-label"
                 value={bulkAction}
-                onChange={(e) => setBulkAction(e.target.value as string)}
+                onChange={handleBulkActionChange}
                 label={t('common:table_grid.bulk_action')}
                 className="bg-gray-600 border"
               >
                 <MenuItem value="">
-                  <em>{t('none')}</em>
+                  <em>{t('common:table_grid.none')}</em>
                 </MenuItem>
                 {bulkActions.map((action) => (
                   <MenuItem key={action.value} value={action.value}>
@@ -252,14 +253,6 @@ const TableGrid = <T extends BaseRow>({
                 ))}
               </Select>
             </FormControl>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleBulkAction}
-              disabled={!bulkAction || selectedRows.size === 0}
-            >
-              Apply
-            </Button>
           </div>
         )}
         {showGlobalSearchField && (
@@ -267,7 +260,7 @@ const TableGrid = <T extends BaseRow>({
             className="!w-64 bg-gray-600 border"
             value={searchFilter}
             onChange={(e) => onGlobalFilterChange(e.target.value)}
-            label={t('search')}
+            label={t('common:search')}
             variant="outlined"
             size="small"
             fullWidth

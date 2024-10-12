@@ -3,7 +3,9 @@
   "type": "Typ",
   "organization": {
     "aliases": "Alias",
-    "description": "Beschreibung"
+    "description": "Beschreibung",
+    "new_organization": "Neue Organisation",
+    "default_description": "Beschreibung"
   },
   "action": {
     "add": "Organisation hinzufügen",

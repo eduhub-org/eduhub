@@ -141,7 +141,11 @@ const ManageOrganizationsContent: FC = () => {
   const onAddOrganizationClick = async () => {
     await insertOrganization({
       variables: {
-        insertInput: { name: 'New Organization', type: organizationTypes[0], description: 'Description' },
+        insertInput: {
+          name: t('organization.new_organization'), // Translated default name
+          type: organizationTypes[0],
+          description: t('organization.default_description'), // Optionally translate the description as well
+        },
       },
     });
     refetch();
@@ -165,7 +169,7 @@ const ManageOrganizationsContent: FC = () => {
             await Promise.all(selectedRows.map((row) => deleteOrganization({ variables: { id: row.id } })));
             refetch();
           } catch (error) {
-            console.error('Error deleting org.nizations:', error);
+            console.error('Error deleting organizations:', error);
             // You might want to show an error message to the user here
           }
         }
