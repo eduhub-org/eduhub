@@ -1,0 +1,39 @@
+table:
+  name: Organization
+  schema: public
+object_relationships:
+  - name: OrganizationType
+    using:
+      foreign_key_constraint_on: type
+array_relationships:
+  - name: Users
+    using:
+      foreign_key_constraint_on:
+        column: organizationId
+        table:
+          name: User
+          schema: public
+insert_permissions:
+  - role: user_access
+    permission:
+      check: {}
+      columns:
+        - aliases
+        - created_at
+        - description
+        - id
+        - name
+        - type
+        - updated_at
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - aliases
+        - created_at
+        - description
+        - id
+        - name
+        - type
+        - updated_at
+      filter: {}

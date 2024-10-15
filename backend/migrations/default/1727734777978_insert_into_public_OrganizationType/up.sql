@@ -1,0 +1,1 @@
+INSERT INTO "public"."OrganizationType"("value", "comment") VALUES (E'RESEARCH_INSTITUTE', E'Organization primarily focused on conducting scientific research, often specialized in specific fields or disciplines.');
