@@ -2,7 +2,7 @@
   "name": "sendMail",
   "version": "0.0.1",
   "dependencies": {
-    "body-parser": "1.19.0",
+    "body-parser": "1.20.3",
     "nodemailer": "^6.6.3"
   },
   "devDependencies": {
