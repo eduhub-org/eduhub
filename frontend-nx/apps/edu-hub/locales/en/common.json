@@ -43,6 +43,7 @@
     "achievements": "Achievement Records",
     "achievement_templates": "Achievement Record Templates",
     "programs": "Programs",
+    "organizations": "Organizations",
     "app_settings": "App Settings",
     "statistics": "Statistics",
     "logout": "Logout"
@@ -129,8 +130,10 @@
     "linkedin_profile": "LinkedIn Profile",
     "xing_profile": "Xing Profile"
   },
+  "CreatableTagSelector": {
+    "add_tag": "Add \"{{value}}\""
+  },
   "table_grid":{
-    "add_tag": "Add \"{{value}}\"",
     "pagination_text": "Page {{currentPage}} of {{totalPage}}",
     "bulk_action": "Bulk Action",
     "apply": "Apply",

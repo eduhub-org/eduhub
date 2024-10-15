@@ -101,7 +101,9 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
         }}
         getOptionLabel={(option: TagOption) => option.inputValue || option.value || ''}
         renderOption={(props, option: TagOption) => (
-          <li {...props}>{option.inputValue ? t('common:add_tag', { value: option.inputValue }) : option.value}</li>
+          <li {...props}>
+            {option.inputValue ? t('common:CreatableTagSelector.add_tag', { value: option.inputValue }) : option.value}
+          </li>
         )}
         renderInput={(params) => (
           <TextField {...params} variant="standard" label={label} placeholder={placeholder} onKeyDown={handleKeyDown} />

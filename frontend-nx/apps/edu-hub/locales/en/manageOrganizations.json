@@ -10,7 +10,9 @@
   "action": {
     "add": "Add Organization",
     "delete_confirmation": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the organization \"{{name}}\"?",
-    "delete_selected": "Delete Selected Organizations"
+    "delete_selected": "Delete Selected Organizations",
+    "bulk_delete_confirmation": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the {{count}} selected organizations?",
+    "bulk_delete": "Delete Selected Organizations"
   },
   "input": {
     "enter_alias": "Enter organization alias",

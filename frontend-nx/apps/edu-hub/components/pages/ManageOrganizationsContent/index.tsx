@@ -4,6 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { useDebouncedCallback } from 'use-debounce';
 import { ApolloError } from '@apollo/client';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
+import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
@@ -12,7 +13,6 @@ import DropDownSelector from '../../forms/DropDownSelector';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { PageBlock } from '../../common/PageBlock';
-import EhAddButton from '../../common/EhAddButton';
 
 import { OrganizationList, OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
 import { InsertOrganization, InsertOrganizationVariables } from '../../../queries/__generated__/InsertOrganization';
@@ -26,6 +26,9 @@ import {
   UPDATE_ORGANIZATION_ALIASES,
 } from '../../../queries/organization';
 import CreatableTagSelector from '../../forms/CreatableTagSelector';
+import EhAddButton from '../../common/EhAddButton';
+
+import { useBulkActions } from '../../../hooks/bulkActions';
 
 const PAGE_SIZE = 15;
 
@@ -77,6 +80,8 @@ const ManageOrganizationsContent: FC = () => {
   const [pageIndex, setPageIndex] = useState(0);
   const { t } = useTranslation('manageOrganizations');
   const [error, setError] = useState<string | null>(null);
+  const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
+  const [selectedRowsForBulkAction, setSelectedRowsForBulkAction] = useState<OrganizationList_Organization[]>([]);
 
   const {
     data,
@@ -87,9 +92,14 @@ const ManageOrganizationsContent: FC = () => {
     variables: {
       offset: pageIndex * PAGE_SIZE,
       limit: PAGE_SIZE,
+      filter: searchFilter
+        ? {
+            _or: [{ name: { _ilike: `%${searchFilter}%` } }, { type: { _ilike: `%${searchFilter}%` } }],
+          }
+        : {},
+      order_by: { name: 'asc' },
     },
   });
-
   const [insertOrganization] = useAdminMutation<InsertOrganization, InsertOrganizationVariables>(INSERT_ORGANIZATION);
   const [deleteOrganization] = useAdminMutation(DELETE_ORGANIZATION);
 
@@ -105,15 +115,13 @@ const ManageOrganizationsContent: FC = () => {
     });
   }, [pageIndex, debouncedRefetch, searchFilter]);
 
-  const organizationTypes = useMemo(() => {
-    return data?.OrganizationType?.map((type) => type.value) || [];
-  }, [data]);
+  const organizationTypes = data?.OrganizationType?.map((type) => type.value) || [];
 
   const columns = useMemo<ColumnDef<OrganizationList_Organization>[]>(
     () => [
       {
         accessorKey: 'name',
-        header: t('organization.name'),
+        header: 'organization.name',
         meta: { width: 3 },
         cell: ({ getValue, row }) => (
           <TextFieldEditor
@@ -146,7 +154,7 @@ const ManageOrganizationsContent: FC = () => {
     [t, organizationTypes]
   );
 
-  const onAddOrganizationClick = async () => {
+  const onAddOrganizationClick = useCallback(async () => {
     try {
       await insertOrganization({
         variables: {
@@ -157,6 +165,7 @@ const ManageOrganizationsContent: FC = () => {
           },
         },
       });
+      refetch();
     } catch (error) {
       let errorMessage = '';
       if (error instanceof ApolloError) {
@@ -172,8 +181,7 @@ const ManageOrganizationsContent: FC = () => {
       setError(errorMessage);
       console.error('Error adding organization:', error);
     }
-    refetch();
-  };
+  }, [insertOrganization, t, organizationTypes, refetch]);
 
   const generateDeletionConfirmation = useCallback(
     (row: OrganizationList_Organization) => {
@@ -182,24 +190,30 @@ const ManageOrganizationsContent: FC = () => {
     [t]
   );
 
-  const bulkActions = useMemo(() => [{ value: 'delete', label: t('action.delete_selected') }], [t]);
+  const bulkActions = useMemo(() => [{ value: 'delete', label: t('action.bulk_delete') }], [t]);
 
-  const handleBulkAction = useCallback(
-    async (action: string, selectedRows: OrganizationList_Organization[]) => {
-      if (action === 'delete') {
-        const confirmDelete = window.confirm(t('action.bulk_delete_confirmation', { count: selectedRows.length }));
-        if (confirmDelete) {
-          try {
-            await Promise.all(selectedRows.map((row) => deleteOrganization({ variables: { id: row.id } })));
-            refetch();
-          } catch (error) {
-            console.error('Error deleting organizations:', error);
-            // You might want to show an error message to the user here
-          }
+  const handleBulkAction = useCallback((action: string, selectedRows: OrganizationList_Organization[]) => {
+    if (action === 'delete' && selectedRows.length > 0) {
+      setBulkActionDialogOpen(true);
+      setSelectedRowsForBulkAction(selectedRows);
+    }
+  }, []);
+
+  const handleBulkActionConfirmation = useCallback(
+    async (confirmed: boolean) => {
+      setBulkActionDialogOpen(false);
+      if (confirmed) {
+        try {
+          await Promise.all(selectedRowsForBulkAction.map((row) => deleteOrganization({ variables: { id: row.id } })));
+          refetch();
+        } catch (error) {
+          console.error('Error deleting organizations:', error);
+          setError(t('error.bulk_delete'));
         }
       }
+      setSelectedRowsForBulkAction([]);
     },
-    [deleteOrganization, refetch, t]
+    [selectedRowsForBulkAction, deleteOrganization, refetch, t]
   );
 
   const handleCloseErrorDialog = () => {
@@ -215,9 +229,6 @@ const ManageOrganizationsContent: FC = () => {
   return (
     <PageBlock>
       <div className="max-w-screen-xl mx-auto mt-20">
-        <div className="text-white mb-4">
-          <EhAddButton buttonClickCallBack={onAddOrganizationClick} text={t('action.add')} />
-        </div>
         <TableGrid
           columns={columns}
           data={data.Organization}
@@ -226,7 +237,6 @@ const ManageOrganizationsContent: FC = () => {
           loading={loading}
           refetchQueries={['OrganizationList']}
           showDelete
-          showCheckbox={true}
           bulkActions={bulkActions}
           onBulkAction={handleBulkAction}
           translationNamespace="manageOrganizations"
@@ -238,8 +248,18 @@ const ManageOrganizationsContent: FC = () => {
           pages={Math.ceil(data.Organization_aggregate.aggregate.count / PAGE_SIZE)}
           generateDeletionConfirmationQuestion={generateDeletionConfirmation}
           expandableRowComponent={({ row }) => <ExpandableOrganizationRow row={row} />}
+          onAddButtonClick={onAddOrganizationClick}
+          addButtonText={t('action.add')}
         />
         <ErrorMessageDialog errorMessage={error || ''} open={!!error} onClose={handleCloseErrorDialog} />
+        <QuestionConfirmationDialog
+          open={bulkActionDialogOpen}
+          question={t('action.bulk_delete_confirmation', {
+            count: selectedRowsForBulkAction.length,
+          })}
+          confirmationText={t('confirm')}
+          onClose={handleBulkActionConfirmation}
+        />
       </div>
     </PageBlock>
   );

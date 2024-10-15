@@ -130,8 +130,10 @@
     "linkedin_profile": "LinkedIn-Profil",
     "xing_profile": "Xing-Profil"
   },
+  "CreatableTagSelector": {
+    "add_tag": "\"{{value}}\" hinzufügen"
+  },
   "table_grid": {
-    "add_tag": "\"{{value}}\" hinzufügen",
     "pagination_text": "Seite {{currentPage}} von {{totalPage}}",
     "bulk_action": "Sammelaktion",
     "apply": "Ausführen",

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, ReactElement, Dispatch, SetStateAction } from 'react';
+import React, { useState, useMemo, useCallback, ReactElement, Dispatch, SetStateAction, useEffect } from 'react';
 import { ApolloError, DocumentNode } from '@apollo/client';
 import {
   CircularProgress,
@@ -10,10 +10,11 @@ import {
   InputLabel,
   Button,
   SelectChangeEvent,
+  IconButton,
 } from '@mui/material';
 import useTranslation from 'next-translate/useTranslation';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
-import { MdArrowBack, MdArrowForward } from 'react-icons/md';
+import { MdArrowBack, MdArrowForward, MdDelete } from 'react-icons/md';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import {
   ColumnDef,
@@ -28,17 +29,104 @@ import {
 } from '@tanstack/react-table';
 import { rankItem } from '@tanstack/match-sorter-utils';
 
-import TableGridDeleteButton from './TableGridDeleteButton';
 import EhAddButton from '../common/EhAddButton';
+import { QuestionConfirmationDialog } from './dialogs/QuestionConfirmationDialog';
+import { useAdminMutation } from '../../hooks/authedMutation';
+import { useBulkActions } from '../../hooks/bulkActions';
 
-interface BaseRow {
+export interface BaseRow {
   id: number;
 }
 
-interface BulkAction {
+export interface BulkAction {
   value: string;
   label: string;
 }
+
+interface TableGridDeleteButtonProps {
+  deleteMutation: DocumentNode;
+  id: string | number;
+  refetchQueries: string[];
+  idType: 'number' | 'uuidString';
+  deletionConfirmationQuestion?: string;
+}
+
+const TableGridDeleteButton = ({
+  deleteMutation,
+  id,
+  refetchQueries,
+  idType,
+  deletionConfirmationQuestion,
+}: TableGridDeleteButtonProps) => {
+  const [deleteItem] = useAdminMutation(deleteMutation);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const { t } = useTranslation();
+
+  // If no question is provided, use the default one
+  const confirmationQuestion = deletionConfirmationQuestion || t('common:deletion_confirmation_question');
+
+  const handleDeleteClick = () => {
+    setIsConfirmationOpen(true);
+  };
+
+  const handleConfirmationClose = (confirmed: boolean) => {
+    setIsConfirmationOpen(false);
+    if (confirmed) {
+      performDelete();
+    }
+  };
+
+  const performDelete = () => {
+    let variableId: string | number = id;
+
+    if (idType === 'number') {
+      if (typeof id === 'string') {
+        variableId = parseInt(id, 10);
+        if (isNaN(variableId)) {
+          console.error('Invalid numeric ID:', id);
+          return;
+        }
+      }
+    } else if (idType === 'uuidString') {
+      if (typeof id !== 'string') {
+        console.error('Invalid UUID string:', id);
+        return;
+      }
+      // Optionally, you could add a UUID validation regex here
+    }
+
+    deleteItem({
+      variables: { id: variableId },
+      refetchQueries,
+    });
+  };
+
+  return (
+    <>
+      <IconButton
+        size="small"
+        onClick={handleDeleteClick}
+        className="delete-button"
+        sx={{
+          backgroundColor: 'transparent !important',
+          padding: 0,
+          boxShadow: 'none',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 0, 0, 0.1) !important',
+          },
+        }}
+      >
+        <MdDelete size="1.25em" color="red" />
+      </IconButton>
+      <QuestionConfirmationDialog
+        question={confirmationQuestion}
+        confirmationText={t('common:confirm_delete')}
+        open={isConfirmationOpen}
+        onClose={handleConfirmationClose}
+      />
+    </>
+  );
+};
 
 interface TableGridProps<T extends BaseRow> {
   addButtonText?: string;
@@ -83,7 +171,6 @@ const TableGrid = <T extends BaseRow>({
   searchFilter,
   setSearchFilter,
   setPageIndex,
-  showCheckbox = false,
   showDelete,
   showGlobalSearchField = true,
   translationNamespace,
@@ -94,8 +181,31 @@ const TableGrid = <T extends BaseRow>({
   const { t } = useTranslation(translationNamespace);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
-  const [bulkAction, setBulkAction] = useState<string>('');
+
+  const showCheckbox = bulkActions.length > 0;
+
+  const {
+    selectedRowIds,
+    bulkAction,
+    setBulkAction,
+    toggleRowSelection,
+    toggleAllRows,
+    handleBulkActionChange,
+    isAllSelected,
+    isSomeSelected,
+  } = useBulkActions<T>(bulkActions, onBulkAction);
+
+  // Add this useEffect to log when bulk actions change
+  useEffect(() => {
+    console.log('Bulk action changed:', bulkAction);
+  }, [bulkAction]);
+
+  // Add this new function to handle the Select onChange event
+  const handleSelectChange = (event: SelectChangeEvent<string>) => {
+    const selectedAction = event.target.value;
+    setBulkAction(selectedAction);
+    handleBulkActionChange(selectedAction, data);
+  };
 
   const handlePrevious = () => setPageIndex(Math.max(0, pageIndex - 1));
   const handleNext = () => setPageIndex(pageIndex + 1);
@@ -115,36 +225,6 @@ const TableGrid = <T extends BaseRow>({
     [expandedRows]
   );
 
-  const toggleRowSelection = useCallback(
-    (rowId: number) => {
-      const newSelectedRows = new Set(selectedRows);
-      if (selectedRows.has(rowId)) {
-        newSelectedRows.delete(rowId);
-      } else {
-        newSelectedRows.add(rowId);
-      }
-      setSelectedRows(newSelectedRows);
-    },
-    [selectedRows]
-  );
-
-  const toggleAllRows = useCallback(() => {
-    if (selectedRows.size === data.length) {
-      setSelectedRows(new Set());
-    } else {
-      setSelectedRows(new Set(data.map((row) => row.id)));
-    }
-  }, [data, selectedRows]);
-
-  const handleBulkActionChange = (event: SelectChangeEvent<string>) => {
-    const action = event.target.value;
-    if (onBulkAction && action) {
-      const selectedRowsData = data.filter((row) => selectedRows.has(row.id));
-      onBulkAction(action, selectedRowsData);
-      setSelectedRows(new Set()); // Clear selections after action
-    }
-  };
-
   const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
     const itemRank = rankItem(row.getValue(columnId), value);
     addMeta({ itemRank });
@@ -159,16 +239,16 @@ const TableGrid = <T extends BaseRow>({
     [setPageIndex, setSearchFilter]
   );
 
-  const tableColumns = useMemo(() => {
+  const memoizedColumns = useMemo(() => {
     const selectionColumn: ColumnDef<T>[] = showCheckbox
       ? [
           {
             id: 'selection',
             header: ({ table }) => (
               <Checkbox
-                checked={table.getIsAllPageRowsSelected()}
-                indeterminate={table.getIsSomePageRowsSelected()}
-                onChange={table.getToggleAllPageRowsSelectedHandler()}
+                checked={isAllSelected(data)}
+                indeterminate={isSomeSelected(data)}
+                onChange={() => toggleAllRows(data)}
                 sx={{
                   color: 'white',
                   '&.Mui-checked': {
@@ -182,8 +262,8 @@ const TableGrid = <T extends BaseRow>({
             ),
             cell: ({ row }) => (
               <Checkbox
-                checked={row.getIsSelected()}
-                onChange={row.getToggleSelectedHandler()}
+                checked={selectedRowIds.has(row.original.id)}
+                onChange={() => toggleRowSelection(row.original.id)}
                 sx={{
                   color: 'black',
                   '&.Mui-checked': {
@@ -198,12 +278,12 @@ const TableGrid = <T extends BaseRow>({
 
     const dataColumns = columns.map((col) => ({ ...col }));
     return [...selectionColumn, ...dataColumns];
-  }, [columns, showCheckbox]);
+  }, [columns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, data, isAllSelected, isSomeSelected]);
 
   const table = useReactTable({
     data,
     defaultColumn: { enableSorting: false },
-    columns: tableColumns,
+    columns: memoizedColumns,
     filterFns: { fuzzy: fuzzyFilter },
     state: {
       sorting,
@@ -225,23 +305,32 @@ const TableGrid = <T extends BaseRow>({
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        {onAddButtonClick && (
-          <div className="text-white">
-            <EhAddButton buttonClickCallBack={onAddButtonClick} text={addButtonText} />
-          </div>
-        )}
-        {showCheckbox && bulkActions.length > 0 && (
-          <div className="flex items-center">
-            <FormControl variant="outlined" size="small" style={{ minWidth: 200 }}>
-              <InputLabel id="bulk-action-label" style={{ color: 'white' }}>
+        <div className="flex items-center">
+          {showCheckbox && (
+            <FormControl variant="outlined" size="small" sx={{ minWidth: 200, marginRight: '1rem' }}>
+              <InputLabel id="bulk-action-label" sx={{ color: 'white' }}>
                 {t('common:table_grid.bulk_action')}
               </InputLabel>
               <Select
                 labelId="bulk-action-label"
                 value={bulkAction}
-                onChange={handleBulkActionChange}
+                onChange={handleSelectChange}
                 label={t('common:table_grid.bulk_action')}
-                className="bg-gray-600 border"
+                sx={{
+                  color: 'white',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.23)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'white',
+                  },
+                  '& .MuiSvgIcon-root': {
+                    color: 'white',
+                  },
+                }}
               >
                 <MenuItem value="">
                   <em>{t('common:table_grid.none')}</em>
@@ -253,20 +342,40 @@ const TableGrid = <T extends BaseRow>({
                 ))}
               </Select>
             </FormControl>
-          </div>
-        )}
+          )}
+          {onAddButtonClick && (
+            <div className="text-white">
+              <EhAddButton buttonClickCallBack={onAddButtonClick} text={addButtonText} />
+            </div>
+          )}
+        </div>
         {showGlobalSearchField && (
           <TextField
-            className="!w-64 bg-gray-600 border"
             value={searchFilter}
             onChange={(e) => onGlobalFilterChange(e.target.value)}
             label={t('common:search')}
             variant="outlined"
             size="small"
-            fullWidth
-            slotProps={{
-              input: { style: { color: 'white', borderColor: 'white' } },
-              inputLabel: { style: { color: 'white' } },
+            sx={{
+              width: '16rem',
+              backgroundColor: 'gray.600',
+              border: '1px solid',
+              borderColor: 'gray.500',
+              '& .MuiInputBase-input': {
+                color: 'white',
+              },
+              '& .MuiInputLabel-root': {
+                color: 'white',
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'white',
+              },
+            }}
+            InputProps={{
+              sx: { color: 'white' },
+            }}
+            InputLabelProps={{
+              sx: { color: 'white' },
             }}
           />
         )}
@@ -313,7 +422,7 @@ const TableGrid = <T extends BaseRow>({
         table.getRowModel().rows.map((row) => (
           <React.Fragment key={row.id}>
             {/* Primary Row */}
-            <div className="flex items-stretch mb-1">
+            <div className={`flex items-stretch ${expandedRows.has(row.original.id) ? 'mb-0' : 'mb-1'}`}>
               <div className="flex-grow bg-edu-light-gray py-2">
                 <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center">
                   {row.getVisibleCells().map((cell) => (
