@@ -39,7 +39,7 @@
     "kleur": "^4.1.5",
     "lodash": "^4.17.21",
     "loglevel": "^1.9.1",
-    "next": "14.2.7",
+    "next": "14.2.10",
     "next-auth": "^4.24.7",
     "next-translate": "^2.6.2",
     "papaparse": "^5.4.1",
