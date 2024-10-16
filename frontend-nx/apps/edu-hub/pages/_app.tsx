@@ -9,7 +9,6 @@ import * as fbq from '../lib/fpixel';
 import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
-
 import { registerLocale, setDefaultLocale } from 'react-datepicker';
 import { de } from 'date-fns/locale/de';
 import { enUS } from 'date-fns/locale/en-US';
