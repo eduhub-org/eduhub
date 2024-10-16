@@ -57,11 +57,21 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </Link>
       </MenuItem>
 
-      <MenuItem onClick={closeMenu}>
-        <Link className="w-full text-lg" href="https://opencampus.gitbook.io/faq/" target="_blank">
-          {t('menu.faq')}
-        </Link>
-      </MenuItem>
+      {isAdmin && (
+        <MenuItem onClick={closeMenu}>
+          <Link className="w-full text-lg" href="/manage/courses">
+            {t('menu.courses')}
+          </Link>
+        </MenuItem>
+      )}
+
+      {isAdmin && (
+        <MenuItem onClick={closeMenu}>
+          <Link className="w-full text-lg" href="/manage/programs">
+            {t('menu.programs')}
+          </Link>
+        </MenuItem>
+      )}
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
@@ -73,8 +83,8 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/courses">
-            {t('menu.courses')}
+          <Link className="w-full text-lg" href="/manage/organizations">
+            {t('menu.organizations')}
           </Link>
         </MenuItem>
       )}
@@ -93,18 +103,11 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
           </Link>
         </MenuItem>
       )}
-      {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/programs">
-            {t('menu.programs')}
-          </Link>
-        </MenuItem>
-      )}
 
       {isAdmin && (
         <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/organizations">
-            {t('menu.organizations')}
+          <Link className="w-full text-lg" href="/statistics">
+            {t('menu.statistics')}
           </Link>
         </MenuItem>
       )}
@@ -117,13 +120,11 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         </MenuItem>
       )}
 
-      {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/statistics">
-            {t('menu.statistics')}
-          </Link>
-        </MenuItem>
-      )}
+      <MenuItem onClick={closeMenu}>
+        <Link className="w-full text-lg" href="https://opencampus.gitbook.io/faq/" target="_blank">
+          {t('menu.faq')}
+        </Link>
+      </MenuItem>
 
       <MenuItem onClick={() => logout()}>
         <button className="w-full text-lg text-left">{t('menu.logout')}</button>
