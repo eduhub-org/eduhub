@@ -306,8 +306,13 @@ const TableGrid = <T extends BaseRow>({
     <div>
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center">
+          {onAddButtonClick && (
+            <div className="text-white mr-4">
+              <EhAddButton buttonClickCallBack={onAddButtonClick} text={addButtonText} />
+            </div>
+          )}
           {showCheckbox && (
-            <FormControl variant="outlined" size="small" sx={{ minWidth: 200, marginRight: '1rem' }}>
+            <FormControl variant="outlined" size="small" sx={{ minWidth: 200 }}>
               <InputLabel id="bulk-action-label" sx={{ color: 'white' }}>
                 {t('common:table_grid.bulk_action')}
               </InputLabel>
@@ -342,11 +347,6 @@ const TableGrid = <T extends BaseRow>({
                 ))}
               </Select>
             </FormControl>
-          )}
-          {onAddButtonClick && (
-            <div className="text-white">
-              <EhAddButton buttonClickCallBack={onAddButtonClick} text={addButtonText} />
-            </div>
           )}
         </div>
         {showGlobalSearchField && (

@@ -36,14 +36,14 @@
   "start": "Start",
   "end": "Ende",
   "menu": {
-    "profile": "Profil",
+    "profile": "Mein Profil",
     "faq": "FAQ",
     "user": "Benutzer",
     "courses": "Kurse",
     "achievements": "Leistungsnachweise",
     "achievement_templates": "Leistungsnachweisvorlagen",
     "programs": "Programme",
-    "app_settings": "App Einstellungen",
+    "app_settings": "App-Einstellungen",
     "statistics": "Statistiken",
     "organizations": "Organisationen",
     "logout": "Logout"

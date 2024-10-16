@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC, useMemo, useCallback, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -6,6 +6,7 @@ import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 import TextFieldEditor from '../../forms/TextFieldEditor';
 import FileUpload from '../../forms/FileUpload';
+import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import {
@@ -36,6 +37,7 @@ import {
   UpdateAchievementDocumentationTemplateVariables,
 } from '../../../queries/__generated__/UpdateAchievementDocumentationTemplate';
 import FileDownload from '../../forms/FileDownload';
+import { ApolloError } from '@apollo/client';
 
 const ManageAchievementTemplatesContent: FC = () => {
   const { data, loading, error, refetch } = useAdminQuery<AchievementDocumentationTemplates>(
@@ -116,14 +118,36 @@ const ManageAchievementTemplatesContent: FC = () => {
     [t, saveAchievementDocumentationTemplate, updateAchievementDocumentationTemplate]
   );
 
-  const onAddAchievementDocumentationTemplateClick = async () => {
-    await insertAchievementDocumentationTemplate({
-      variables: {
-        insertInput: { title: 'NEUES TEMPLATE', url: '/templates/default-achievement-template.txt' },
-      },
-    });
-    refetch();
-  };
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const onAddAchievementDocumentationTemplateClick = useCallback(async () => {
+    try {
+      await insertAchievementDocumentationTemplate({
+        variables: {
+          insertInput: { title: 'NEUES TEMPLATE', url: '/templates/default-achievement-template.txt' },
+        },
+      });
+      refetch();
+    } catch (error) {
+      let errorMessage = '';
+      if (error instanceof ApolloError) {
+        console.error('Error adding achievement documentation template:', error);
+        const rawErrorMessage = error.message;
+        if (rawErrorMessage.includes('duplicate key value violates unique constraint')) {
+          errorMessage = t('error.duplicate_element_name');
+        } else {
+          errorMessage = rawErrorMessage;
+        }
+      } else {
+        errorMessage = t('error.unexpected');
+      }
+      setErrorMessage(errorMessage);
+    }
+  }, [insertAchievementDocumentationTemplate, refetch, t]);
+
+  const handleCloseErrorDialog = useCallback(() => {
+    setErrorMessage(null);
+  }, []);
 
   if (error) {
     console.log(error);
@@ -134,24 +158,19 @@ const ManageAchievementTemplatesContent: FC = () => {
   return (
     <PageBlock>
       <div className="max-w-screen-xl mx-auto mt-20">
-        <div>
-          <div className="text-white">
-            <EhAddButton
-              buttonClickCallBack={onAddAchievementDocumentationTemplateClick}
-              text={t('addUserAchievementDocumentationTemplateText')}
-            />
-          </div>
-          <TableGrid
-            columns={columns}
-            data={data.AchievementDocumentationTemplate}
-            deleteMutation={DELETE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE}
-            error={error}
-            loading={loading}
-            refetchQueries={['AchievementDocumentationTemplates']}
-            showDelete
-            translationNamespace="manageAchievementTemplates"
-          />
-        </div>
+        <TableGrid
+          columns={columns}
+          data={data.AchievementDocumentationTemplate}
+          deleteMutation={DELETE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE}
+          error={error}
+          loading={loading}
+          refetchQueries={['AchievementDocumentationTemplates']}
+          showDelete
+          translationNamespace="manageAchievementTemplates"
+          onAddButtonClick={onAddAchievementDocumentationTemplateClick}
+          addButtonText={t('addUserAchievementDocumentationTemplateText')}
+        />
+        <ErrorMessageDialog errorMessage={errorMessage} open={!!errorMessage} onClose={handleCloseErrorDialog} />
       </div>
     </PageBlock>
   );
