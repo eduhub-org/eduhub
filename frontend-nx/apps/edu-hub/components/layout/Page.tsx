@@ -1,5 +1,7 @@
+'use client';
+
 import { FC, ReactNode, useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, SessionProvider } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
 import { Transition } from '@headlessui/react';
 import ReactMarkdown from 'react-markdown';
@@ -16,7 +18,7 @@ type PageProps = {
   className?: string;
 };
 
-export const Page: FC<PageProps> = ({ children, className }) => {
+const PageContent: FC<PageProps> = ({ children, className }) => {
   const { data: session, status } = useSession();
   const logout = useLogout();
   const { lang } = useTranslation();
@@ -53,13 +55,19 @@ export const Page: FC<PageProps> = ({ children, className }) => {
   }, [lang, bannerTextDe, bannerTextEn]);
 
   useEffect(() => {
-    if (status !== 'loading' && session?.error === 'RefreshAccessTokenError') logout();
+    if (status === 'authenticated' && session?.error === 'RefreshAccessTokenError') {
+      logout();
+    }
   }, [status, session, logout]);
 
   const handleBannerClose = () => {
     localStorage.setItem('bannerClosed', 'true');
     setBannerState((prev) => ({ ...prev, isVisible: false }));
   };
+
+  if (status === 'loading') {
+    return <div>Loading...</div>; // Or your custom loading component
+  }
 
   return (
     <>
@@ -99,4 +107,8 @@ export const Page: FC<PageProps> = ({ children, className }) => {
       </div>
     </>
   );
+};
+
+export const Page: FC<PageProps> = ({ children, className }) => {
+  return <PageContent children={children} className={className} />;
 };

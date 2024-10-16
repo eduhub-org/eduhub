@@ -1,9 +1,10 @@
 import { useCallback } from 'react';
 import { signOut } from 'next-auth/react';
-import { useRouter } from 'next/router';
+import { useRouter as useRouterApp } from 'next/navigation';
 
 const useLogout = () => {
-  const router = useRouter();
+  const routerApp = useRouterApp();
+
   return useCallback(async () => {
     // Fetch Keycloak Logout URL
     const res = await fetch('/api/auth/logout');
@@ -13,9 +14,17 @@ const useLogout = () => {
     // Logging user out client side
     await signOut({ redirect: false });
 
-    // Logging user out on keycloak and redirecting back to app
-    router.push(url);
-  }, [router]);
+    // Determine which router to use and navigate
+    if ('push' in routerApp) {
+      // App Router
+      routerApp.push(url);
+    } else {
+      // Pages Router
+      const { useRouter: useRouterPages } = await import('next/router');
+      const routerPages = useRouterPages();
+      routerPages.push(url);
+    }
+  }, [routerApp]);
 };
 
 export default useLogout;
