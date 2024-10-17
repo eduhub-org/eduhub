@@ -1,0 +1,19 @@
+{
+  "name": "EduHub Development",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "frontend-nx",
+  "workspaceFolder": "/opt/app",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.vscode-typescript-next",
+        "graphql.vscode-graphql"
+      ]
+    }
+  },
+  "forwardPorts": [5000, 5001, 8080, 28080],
+  "postCreateCommand": "yarn install"
+}

@@ -34,3 +34,18 @@ We welcome contributions from everyone. Please check out the technical details f
 ## :memo: License
 
 This project is licensed under [AGPLv3 License](LICENSE).
+
+## Development with GitHub Codespaces
+
+This project supports development using GitHub Codespaces, which provides a complete, configurable dev environment in the cloud.
+
+To get started:
+
+1. From the GitHub repository, click the "Code" button and select "Open with Codespaces".
+2. Click "New codespace" to create a new Codespace for this project.
+3. Wait for the Codespace to be created and the environment to be set up.
+4. Once the Codespace is ready, you can start developing right in your browser!
+
+The Codespace is pre-configured with all necessary dependencies and VS Code extensions for this project.
+
+For more information on using GitHub Codespaces, see the [official documentation](https://docs.github.com/en/codespaces).
