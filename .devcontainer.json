@@ -2,7 +2,7 @@
   "name": "EduHub Development",
   "image": "mcr.microsoft.com/vscode/devcontainers/universal:linux",
   "features": {
-    "docker-in-docker": "latest",
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "github-cli": "latest"
   },
   "customizations": {
@@ -17,6 +17,6 @@
     }
   },
   "forwardPorts": [5000, 5001, 8080, 28080],
-  "postCreateCommand": "yarn install && docker-compose up -d",
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y docker-compose && yarn install && docker-compose up -d",
   "remoteUser": "vscode"
 }
