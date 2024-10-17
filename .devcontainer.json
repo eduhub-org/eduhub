@@ -17,7 +17,7 @@
     }
   },
   "forwardPorts": [5000, 5001, 8080, 28080],
-  "postCreateCommand": "yarn install",
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y docker-compose && yarn install",
   "remoteUser": "vscode",
   "mounts": [
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
