@@ -1,8 +1,10 @@
 {
   "name": "EduHub Development",
-  "dockerComposeFile": "docker-compose.yml",
-  "service": "frontend-nx",
-  "workspaceFolder": "/opt/app",
+  "image": "mcr.microsoft.com/vscode/devcontainers/universal:linux",
+  "features": {
+    "docker-in-docker": "latest",
+    "github-cli": "latest"
+  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -15,5 +17,6 @@
     }
   },
   "forwardPorts": [5000, 5001, 8080, 28080],
-  "postCreateCommand": "yarn install"
+  "postCreateCommand": "yarn install && docker-compose up -d",
+  "remoteUser": "vscode"
 }
