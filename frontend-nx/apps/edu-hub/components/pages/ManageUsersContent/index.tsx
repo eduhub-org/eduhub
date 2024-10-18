@@ -7,10 +7,7 @@ import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
-import {
-  USERS_BY_LAST_NAME,
-  DELETE_USER
- } from '../../../queries/user';
+import { USERS_BY_LAST_NAME, DELETE_USER } from '../../../queries/user';
 import {
   UsersByLastName,
   UsersByLastNameVariables,
@@ -18,22 +15,52 @@ import {
 } from '../../../queries/__generated__/UsersByLastName';
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
-import UserRow from './UserRow';
+
+const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
+  const { t } = useTranslation('common');
+  return (
+    <div>
+      <div className="font-medium bg-edu-course-list grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
+        <div className="pl-3 col-span-3">
+          <p className="text-gray-700 truncate font-medium">{`${t('common:status')}: ${
+            row.employment ? t(`common:${row.employment}`) : '-'
+          }`}</p>
+        </div>
+        <div className="pl-3 col-span-3">
+          <p className="text-gray-700 truncate font-medium">{`${t('common:matriculation-number')}: ${
+            row.matriculationNumber ? row.matriculationNumber : '-'
+          }`}</p>
+        </div>
+        <div className="pl-3 col-span-3">
+          <p className="text-gray-700 truncate font-medium">{`${t('common:university')}: ${
+            row.university ? t(`common:${row.university}`) : '-'
+          }`}</p>
+        </div>
+      </div>
+      <div className="font-medium bg-edu-course-list flex py-4">
+        <div className="pl-3">
+          {row.CourseEnrollments.map((enrollment, index) => (
+            <p key={index} className="text-gray-600 truncate text-sm">
+              {enrollment.Course.title} ({enrollment.Course.Program.shortTitle}) - {enrollment.status}
+            </p>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ManageUsersContent: FC = () => {
   const [searchFilter, setSearchFilter] = useState('');
   const [pageIndex, setPageIndex] = useState(0);
   const pageSize = 15;
 
-  const userQueryResult = useAdminQuery<UsersByLastName, UsersByLastNameVariables>(
-    USERS_BY_LAST_NAME,
-    {
-      variables: {
-        offset: pageIndex * pageSize,
-        limit: pageSize,
-      },
-    }
-  );
+  const userQueryResult = useAdminQuery<UsersByLastName, UsersByLastNameVariables>(USERS_BY_LAST_NAME, {
+    variables: {
+      offset: pageIndex * pageSize,
+      limit: pageSize,
+    },
+  });
 
   const { data, loading, error, refetch } = userQueryResult;
 
@@ -85,21 +112,13 @@ const ManageUsersContent: FC = () => {
     []
   );
 
-  const generateDeletionConfirmation = useCallback((row: UsersByLastName_User) => {
-    return t('manageUsers:deletion_confirmation_question', { firstName: row.firstName, lastName: row.lastName });
-  }, [t]);
+  const generateDeletionConfirmation = useCallback(
+    (row: UsersByLastName_User) => {
+      return t('manageUsers:deletion_confirmation_question', { firstName: row.firstName, lastName: row.lastName });
+    },
+    [t]
+  );
 
-
-  // const onAddUserClick = async () => {
-  //   console.log("add user");
-  // };
-
-  // if (error) {
-  //   console.log(error);
-  // }
-  // if (loading) {
-  //   return <Loading />;
-  // }
   return (
     <PageBlock>
       <div className="max-w-screen-xl mx-auto mt-20">
@@ -127,7 +146,7 @@ const ManageUsersContent: FC = () => {
               pages={Math.ceil(data.User_aggregate.aggregate.count / pageSize)}
               // addButtonText={t('addUserButtonText')}
               // onAddButtonClick={onAddUserClick}
-              expandableRowComponent={({ row }) => <UserRow row={row} />}
+              expandableRowComponent={({ row }) => <ExpandableUserRow row={row} />}
             />
           </div>
         )}

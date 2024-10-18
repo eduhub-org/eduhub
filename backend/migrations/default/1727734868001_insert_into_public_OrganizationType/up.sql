@@ -1,0 +1,1 @@
+INSERT INTO "public"."OrganizationType"("value", "comment") VALUES (E'CORPORATION', E'For-profit business entity, ranging from small companies to large multinational corporations across various industries.');

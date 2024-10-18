@@ -1,0 +1,40 @@
+{
+  "name": "Name",
+  "type": "Type",
+  "organization": {
+    "aliases": "Aliases",
+    "description": "Description",
+    "new_organization": "New Organization",
+    "default_description": "Description"
+  },
+  "action": {
+    "add": "Add Organization",
+    "delete_confirmation": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the organization \"{{name}}\"?",
+    "delete_selected": "Delete Selected Organizations",
+    "bulk_delete_confirmation": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the {{count}} selected organizations?",
+    "bulk_delete": "Delete Selected Organizations"
+  },
+  "input": {
+    "enter_alias": "Enter organization alias",
+    "enter_description": "Enter organization description",
+    "enter_name": "Enter organization name"
+  },
+  "error": {
+    "loading": "Error loading organizations",
+    "duplicate_organization_name": "An organization with the default name is still existing. Please rename or delete that one first.",
+    "general": "An error occurred while adding the organization. Please try again.",
+    "network": "A network error occurred. Please check your connection and try again.",
+    "unexpected": "An unexpected error occurred. Please try again later."
+  },
+  "type_selection": {
+    "UNIVERSITY": "University",
+    "RESEARCH_INSTITUTE": "Research Institute",
+    "PUBLIC_SECTOR": "Public Sector",
+    "NON_PROFIT_ORGANIZATION": "Non-Profit Organization",
+    "CORPORATION": "Corporation",
+    "SCHOOL": "School",
+    "FREELANCER": "Freelancer",
+    "OTHER": "Other"
+  },
+  "deletion_confirmation_question": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the organization {{name}}?"
+}

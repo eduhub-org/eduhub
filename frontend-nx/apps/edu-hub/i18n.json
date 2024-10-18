@@ -16,6 +16,7 @@
       "manageCourses",
       "managePrograms",
       "manageUsers",
+      "manageOrganizations",
       "start-page",
       "users"
     ]
