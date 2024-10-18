@@ -16,6 +16,7 @@ import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { QueryResult } from '@apollo/client';
 import log from 'loglevel';
+import { Snackbar } from '@mui/material';
 
 type UnifiedTextFieldEditorProps = {
   variant: 'material' | 'eduHub';
@@ -76,6 +77,7 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
   const [errorMessage, setErrorMessage] = useState('');
   const { error, handleError, resetError } = useErrorHandler();
   const theme = useTheme();
+  const [showSavedNotification, setShowSavedNotification] = useState(false);
 
   useEffect(() => {
     setLocalText(currentText);
@@ -107,6 +109,7 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
     if (validateText(newText)) {
       updateText({ variables: { itemId, text: newText }, refetchQueries });
       setErrorMessage('');
+      setShowSavedNotification(true);
     } else {
       setErrorMessage(t(errorText));
     }
@@ -219,10 +222,28 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
         )}
       </div>
       {error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        open={showSavedNotification}
+        autoHideDuration={2000}
+        onClose={() => setShowSavedNotification(false)}
+        message={t('Saved')}
+      />
     </div>
   );
 
-  return variant === 'material' ? renderMaterialUI() : renderEduHub();
+  return (
+    <>
+      {variant === 'material' ? renderMaterialUI() : renderEduHub()}
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        open={showSavedNotification}
+        autoHideDuration={2000}
+        onClose={() => setShowSavedNotification(false)}
+        message={t('Saved')}
+      />
+    </>
+  );
 };
 
 export default UnifiedTextFieldEditor;

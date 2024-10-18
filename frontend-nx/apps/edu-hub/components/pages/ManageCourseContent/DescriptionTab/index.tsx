@@ -23,7 +23,6 @@ import Locations from './Locations';
 import { Button } from '@mui/material';
 import { MdAddCircle } from 'react-icons/md';
 import useTranslation from 'next-translate/useTranslation';
-import EduHubTextFieldEditor from '../../../forms/EduHubTextFieldEditor';
 import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
 import EduHubTimePicker from '../../../forms/EduHubTimePicker';
 import EduHubNumberFieldEditor from '../../../forms/EduHubNumberFieldEditor';
@@ -59,6 +58,7 @@ import {
   InsertSessionAddress,
   InsertSessionAddressVariables,
 } from '../../../../queries/__generated__/InsertSessionAddress';
+import UnifiedTextFieldEditor from '../../../forms/UnifiedTextFieldEditor';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -88,7 +88,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const handleInsertCourseLocation = async () => {
     try {
       const totalLocationOptions = Object.keys(LocationOption_enum).length;
-      
+
       // Check if the current number of locations is less than the total available options
       if (course.CourseLocations.length >= totalLocationOptions) {
         handleError('All available location options have been used for this course.');
@@ -99,13 +99,13 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       const usedOptions = new Set(course.CourseLocations.map((loc) => loc.locationOption));
       // Find the first available option
       const availableOption = Object.values(LocationOption_enum).find((option) => !usedOptions.has(option));
-      
+
       // If there's no available option, this shouldn't happen due to the previous check, but let's keep it as a safeguard
       if (!availableOption) {
         handleError('All location options already exist for this course.');
         return;
       }
-      
+
       // If there's is an available option, proceed with insertion
       const res = await insertCourseLocation({ variables: { courseId: course.id, option: availableOption } });
       //extract the location id from the response
@@ -196,19 +196,22 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2">
-        <EduHubTextFieldEditor
+        <UnifiedTextFieldEditor
+          variant="eduHub"
           value={course.tagline}
           label={t('short_description.label')}
-          updateMutation={UPDATE_COURSE_SHORT_DESCRIPTION}
+          updateTextMutation={UPDATE_COURSE_SHORT_DESCRIPTION}
           refetchQuery={qResult}
           itemId={course.id}
           placeholder={t('short_description.label')}
           helpText={t('short_description.help_text')}
           className="h-64"
+          currentText={course.tagline}
         />
-        <EduHubTextFieldEditor
+        <UnifiedTextFieldEditor
+          variant="eduHub"
           value={course.learningGoals ?? ''}
-          updateMutation={UPDATE_COURSE_LEARNING_GOALS}
+          updateTextMutation={UPDATE_COURSE_LEARNING_GOALS}
           refetchQuery={qResult}
           itemId={course.id}
           label={t('learning_goals.label')}
@@ -216,53 +219,62 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           helpText={t('learning_goals.help_text')}
           maxLength={500}
           className="h-64"
+          currentText={course.learningGoals ?? ''}
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div>
-          <EduHubTextFieldEditor
+          <UnifiedTextFieldEditor
+            variant="eduHub"
             element="input"
             value={course.headingDescriptionField1 ?? ''}
             itemId={course.id}
-            updateMutation={UPDATE_COURSE_HEADING_DESCRIPTION_1}
+            updateTextMutation={UPDATE_COURSE_HEADING_DESCRIPTION_1}
             refetchQuery={qResult}
             label={t('info_block_1_title.label')}
             placeholder={t('info_block_1_title.placeholder')}
             helpText={t('info_block_1_title.help_text')}
             className="mb-0"
+            currentText={course.headingDescriptionField1 ?? ''}
           />
-          <EduHubTextFieldEditor
+          <UnifiedTextFieldEditor
+            variant="eduHub"
             value={course.contentDescriptionField1 ?? ''}
             itemId={course.id}
-            updateMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1}
+            updateTextMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1}
             refetchQuery={qResult}
             placeholder={t('info_block_1_content.placeholder')}
             maxLength={10000}
             className="h-64"
             isMarkdown={true}
+            currentText={course.contentDescriptionField1 ?? ''}
           />
         </div>
         <div>
-          <EduHubTextFieldEditor
+          <UnifiedTextFieldEditor
+            variant="eduHub"
             element="input"
             value={course.headingDescriptionField2 ?? ''}
             itemId={course.id}
-            updateMutation={UPDATE_COURSE_HEADING_DESCRIPTION_2}
+            updateTextMutation={UPDATE_COURSE_HEADING_DESCRIPTION_2}
             refetchQuery={qResult}
             label={t('info_block_2_title.label')}
             helpText={t('info_block_2_title.help_text')}
             placeholder={t('info_block_2_title.placeholder')}
             className="mb-0"
+            currentText={course.headingDescriptionField2 ?? ''}
           />
-          <EduHubTextFieldEditor
+          <UnifiedTextFieldEditor
+            variant="eduHub"
             value={course.contentDescriptionField2 ?? ''}
             itemId={course.id}
-            updateMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2}
+            updateTextMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2}
             refetchQuery={qResult}
             placeholder={t('info_block_2_content.placeholder')}
             maxLength={10000}
             className="h-64"
             isMarkdown={true}
+            currentText={course.contentDescriptionField2 ?? ''}
           />
         </div>
       </div>
@@ -321,12 +333,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           <div className="col-span-7">{t('address.label')}</div>
         </div>
         {courseLocations.map((loc) => (
-          <Locations
-            key={loc.id}
-            location={loc}
-            onDelete={handleDeleteCourseLocation}
-            refetchQuery={qResult}
-          />
+          <Locations key={loc.id} location={loc} onDelete={handleDeleteCourseLocation} refetchQuery={qResult} />
         ))}
       </div>
       <div className="flex justify-start text-white">
