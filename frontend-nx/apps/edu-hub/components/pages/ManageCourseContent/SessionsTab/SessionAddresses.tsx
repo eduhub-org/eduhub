@@ -32,7 +32,7 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
         <div className="h-2 mb-0 ml-16">{value}</div>
       ) : (
         <UnifiedTextFieldEditor
-          variant="eduHub"
+          variant="eduhub"
           element="input"
           updateTextMutation={UPDATE_SESSION_ADDRESS}
           refetchQuery={refetchQuery}

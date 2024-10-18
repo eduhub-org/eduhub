@@ -58,7 +58,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete, refetchQuer
       )}
       <div className="col-span-7">
         <UnifiedTextFieldEditor
-          variant="eduHub"
+          variant="eduhub"
           element="input"
           updateTextMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
           refetchQuery={refetchQuery}

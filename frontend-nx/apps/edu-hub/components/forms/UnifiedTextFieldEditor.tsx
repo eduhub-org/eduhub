@@ -18,7 +18,7 @@ import { QueryResult } from '@apollo/client';
 import Snackbar from '@mui/material/Snackbar';
 
 type UnifiedTextFieldEditorProps = {
-  variant: 'material' | 'eduHub';
+  variant: 'material' | 'eduhub';
   label?: string;
   placeholder?: string;
   itemId: number;
@@ -171,7 +171,7 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
     </div>
   );
 
-  const renderEduHub = () => (
+  const renderEduhub = () => (
     <div className="px-2">
       <div className="text-gray-400">
         <div className="flex justify-between mb-2">
@@ -233,7 +233,7 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
 
   return (
     <>
-      {variant === 'material' ? renderMaterialUI() : renderEduHub()}
+      {variant === 'material' ? renderMaterialUI() : renderEduhub()}
       {error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}

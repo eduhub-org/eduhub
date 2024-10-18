@@ -197,7 +197,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2">
         <UnifiedTextFieldEditor
-          variant="eduHub"
+          variant="eduhub"
           value={course.tagline}
           label={t('short_description.label')}
           updateTextMutation={UPDATE_COURSE_SHORT_DESCRIPTION}
@@ -209,7 +209,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           currentText={course.tagline}
         />
         <UnifiedTextFieldEditor
-          variant="eduHub"
+          variant="eduhub"
           value={course.learningGoals ?? ''}
           updateTextMutation={UPDATE_COURSE_LEARNING_GOALS}
           refetchQuery={qResult}
@@ -225,7 +225,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div>
           <UnifiedTextFieldEditor
-            variant="eduHub"
+            variant="eduhub"
             element="input"
             value={course.headingDescriptionField1 ?? ''}
             itemId={course.id}
@@ -238,7 +238,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             currentText={course.headingDescriptionField1 ?? ''}
           />
           <UnifiedTextFieldEditor
-            variant="eduHub"
+            variant="eduhub"
             value={course.contentDescriptionField1 ?? ''}
             itemId={course.id}
             updateTextMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1}
@@ -252,7 +252,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         </div>
         <div>
           <UnifiedTextFieldEditor
-            variant="eduHub"
+            variant="eduhub"
             element="input"
             value={course.headingDescriptionField2 ?? ''}
             itemId={course.id}
@@ -265,7 +265,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             currentText={course.headingDescriptionField2 ?? ''}
           />
           <UnifiedTextFieldEditor
-            variant="eduHub"
+            variant="eduhub"
             value={course.contentDescriptionField2 ?? ''}
             itemId={course.id}
             updateTextMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2}
