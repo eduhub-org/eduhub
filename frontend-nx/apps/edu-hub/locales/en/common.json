@@ -35,22 +35,26 @@
   "status": "Status",
   "start": "Start",
   "end": "End",
-  "menu-profile": "Profile",
-  "menu-faq": "FAQ",
-  "menu-administration-user": "User",
-  "menu-administration-courses": "Courses",
-  "menu-administration-achievement": "Achievement Records",
-  "menu-administration-achievement-templates": "Achievement Record Templates",
-  "menu-administration-programs": "Programs",
-  "menu-administration-appSettings": "App Settings",
-  "menu-administration-statistics": "Statistics",
-  "menu-logout": "Logout",
+  "menu": {
+    "profile": "My Profile",
+    "faq": "FAQ",
+    "user": "User",
+    "courses": "Courses",
+    "achievements": "Achievement Records",
+    "achievement_templates": "Achievement Record Templates",
+    "programs": "Programs",
+    "organizations": "Organizations",
+    "app_settings": "App Settings",
+    "statistics": "Statistics",
+    "logout": "Logout"
+  },
   "change-password": "Change email or password",
   "add": "Add",
   "cancel": "Cancel",
   "save": "Save",
   "saving": "Saving...",
   "confirm": "Confirm",
+  "search": "Search",
   "profile-picture": "Profile image",
   "title": "Title",
   "new-title": "New Title",
@@ -125,5 +129,14 @@
     "external_profile": "Homepage",
     "linkedin_profile": "LinkedIn Profile",
     "xing_profile": "Xing Profile"
+  },
+  "CreatableTagSelector": {
+    "add_tag": "Add \"{{value}}\""
+  },
+  "table_grid":{
+    "pagination_text": "Page {{currentPage}} of {{totalPage}}",
+    "bulk_action": "Bulk Action",
+    "apply": "Apply",
+    "none": "Keine"
   }
 }

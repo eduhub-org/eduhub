@@ -4,6 +4,7 @@ import saveFile from "./saveFile/index.js";
 import saveImage from "./saveImage/index.js";
 import anonymizeUser from "./anonymizeUser/index.js";
 import winston from "winston";
+import updateKeycloakUser from "./updateKeycloakUser/index.js";
 
 /**
  * Creates a logger instance.
@@ -66,6 +67,9 @@ export const callNodeFunction = async (req, res) => {
       case "anonymizeUser":
         const { status, result } = await anonymizeUser(req, logger);
         return res.status(status).json(result);
+      case "updateKeycloakUser":
+        const { status: updateStatus, result: updateResult } = await updateKeycloakUser(req, logger);
+        return res.status(updateStatus).json(updateResult);
       default:
         return res.status(404).json({
           error: "Function Not Found",

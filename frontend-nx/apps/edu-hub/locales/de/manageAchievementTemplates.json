@@ -1,4 +1,7 @@
 {
+  "error": {
+    "duplicate_element_name": "Ein Element mit dem Standardnamen existiert noch. Bitte benenne oder lösche dieses zuerst."
+  },
   "addUserAchievementDocumentationTemplateText": "Vorlage hinzufügen",
   "url": "Download",
   "title": "Titel",

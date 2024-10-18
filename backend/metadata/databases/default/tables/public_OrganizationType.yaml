@@ -1,0 +1,18 @@
+table:
+  name: OrganizationType
+  schema: public
+array_relationships:
+  - name: Organizations
+    using:
+      foreign_key_constraint_on:
+        column: type
+        table:
+          name: Organization
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - comment
+        - value
+      filter: {}

@@ -8676,7 +8676,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cookie@npm:0.6.0, cookie@npm:^0.6.0":
+"cookie@npm:0.6.0":
   version: 0.6.0
   resolution: "cookie@npm:0.6.0"
   checksum: f56a7d32a07db5458e79c726b77e3c2eff655c36792f2b6c58d351fb5f61531e5b1ab7f46987150136e366c65213cbe31729e02a3eaed630c3bf7334635fb410
@@ -8687,6 +8687,13 @@ __metadata:
   version: 0.5.0
   resolution: "cookie@npm:0.5.0"
   checksum: 1f4bd2ca5765f8c9689a7e8954183f5332139eb72b6ff783d8947032ec1fdf43109852c178e21a953a30c0dd42257828185be01b49d1eb1a67fd054ca588a180
+  languageName: node
+  linkType: hard
+
+"cookie@npm:^0.7.0":
+  version: 0.7.2
+  resolution: "cookie@npm:0.7.2"
+  checksum: 9bf8555e33530affd571ea37b615ccad9b9a34febbf2c950c86787088eb00a8973690833b0f8ebd6b69b753c62669ea60cec89178c1fb007bf0749abed74f93e
   languageName: node
   linkType: hard
 
@@ -16956,7 +16963,7 @@ __metadata:
     autoprefixer: ^10.4.20
     axios: ^1.7.7
     babel-jest: 29.7.0
-    cookie: ^0.6.0
+    cookie: ^0.7.0
     core-js: ^3.38.1
     cypress: ^13.14.1
     date-fns: ^3.6.0
@@ -17012,7 +17019,7 @@ __metadata:
     tslib: ^2.7.0
     typescript: ~5.5.4
     unused-exports: ^0.0.6-beta
-    use-debounce: ^10.0.3
+    use-debounce: ^10.0.4
     uuid: ^10.0.0
     uvu: ^0.5.6
   languageName: unknown
@@ -21815,12 +21822,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-debounce@npm:^10.0.3":
-  version: 10.0.3
-  resolution: "use-debounce@npm:10.0.3"
+"use-debounce@npm:^10.0.4":
+  version: 10.0.4
+  resolution: "use-debounce@npm:10.0.4"
   peerDependencies:
     react: "*"
-  checksum: 19146eeb9adb893fe18a601ee8d3ba095b3c8b01e200f552462e7bb7370fcdbe5e7ffa8d5072dbf5eee58cae64f95903c26a5446039c1338c721808be808b546
+  checksum: 59d7e014e9ac6ba57a5b1c411cf1c088b44987b898dd64a4dc73a02da66a5ecacbc3521e261d042e7d388445b69c820b43837a1533fe9def7f85adcaaec472d0
   languageName: node
   linkType: hard
 

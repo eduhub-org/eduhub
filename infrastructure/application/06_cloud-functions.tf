@@ -191,52 +191,6 @@ resource "google_cloudfunctions2_function" "send_mail" {
   }
 }
 
-###############################################################################
-# Create Google cloud function for updateKeycloakProfile
-#####
-# Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the serverless function
-resource "google_cloud_run_service_iam_policy" "update_keycloak_profile_noauth_invoker" {
-  location    = google_cloudfunctions2_function.update_keycloak_profile.location
-  project     = google_cloudfunctions2_function.update_keycloak_profile.project
-  service     = google_cloudfunctions2_function.update_keycloak_profile.name
-  policy_data = data.google_iam_policy.noauth_invoker.policy_data
-}
-# Retrieve data object with zipped scource code
-data "google_storage_bucket_object" "update_keycloak_profile" {
-  name   = "cloud-functions/updateKeycloakProfile.zip"
-  bucket = var.project_id
-}
-# Create cloud function
-resource "google_cloudfunctions2_function" "update_keycloak_profile" {
-  provider    = google-beta
-  location    = var.region
-  name        = "update-keycloak-profile"
-  description = "Updates the Keycloak profile on changes in Hasura"
-
-  build_config {
-    runtime     = "nodejs14"
-    entry_point = "updateKeycloakProfile"
-    source {
-      storage_source {
-        bucket = var.project_id
-        object = data.google_storage_bucket_object.update_keycloak_profile.name
-      }
-    }
-  }
-
-  service_config {
-    environment_variables = {
-      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
-      LEYCLOAK_USER                = var.keycloak_user
-      KEYCLOAK_URL                 = "https://${local.keycloak_service_name}.opencampus.sh"
-      KEYCLOAK_PW                  = var.keycloak_pw
-    }
-    max_instance_count = 1
-    available_memory   = "256M"
-    timeout_seconds    = 60
-    ingress_settings   = var.cloud_function_ingress_settings
-  }
-}
 
 ###############################################################################
 # Create Google cloud function for addKeycloakRole

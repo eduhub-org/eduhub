@@ -108,26 +108,8 @@ const ProfileOverview: FC = () => {
     UPDATE_USER_PROFILE_PICTURE
   );
 
-  const accessToken = sessionData?.accessToken;
-
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_AUTH_URL}/realms/edu-hub/account/`, {
-        method: 'POST',
-        body: JSON.stringify({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          username: data.email,
-          email: data.email,
-          emailVerified: sessionData?.profile?.email_verified,
-          id: sessionData?.profile?.sub,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
       await updateUser({
         variables: {
           userId: sessionData?.profile?.sub,
@@ -141,13 +123,12 @@ const ProfileOverview: FC = () => {
           picture: data.picture,
         },
       });
-      // const json = await res.json();
       refetchUser();
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
       log.error("Error while updating user's profile", error);
-      setErrorMessage(error.message || "Error while updating user's profile"); // Set the error message
-      setIsErrorDialogOpen(true); // Show the error dialog
+      setErrorMessage(error.message || "Error while updating user's profile");
+      setIsErrorDialogOpen(true);
     }
   };
   const { t } = useTranslation();
@@ -201,15 +182,15 @@ const ProfileOverview: FC = () => {
         }
       } catch (error) {
         log.error("Error while updating user's profile picture", error);
-        setErrorMessage(error.message || "Error while updating user's profile picture"); // Set the error message
-        setIsErrorDialogOpen(true); // Show the error dialog
+        setErrorMessage(error.message || "Error while updating user's profile picture");
+        setIsErrorDialogOpen(true);
       }
     },
     [sessionData?.profile?.sub, saveUserProfileImage, refetchUser, updateUserProfilePicture]
   );
 
   const handleCloseErrorDialog = () => {
-    setIsErrorDialogOpen(false); // Close the error dialog
+    setIsErrorDialogOpen(false);
   };
 
   return (

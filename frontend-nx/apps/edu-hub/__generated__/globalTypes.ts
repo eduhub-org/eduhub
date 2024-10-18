@@ -876,6 +876,55 @@ export enum MotivationRating_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "OrganizationType"
+ */
+export enum OrganizationType_constraint {
+  OrganizationType_pkey = "OrganizationType_pkey",
+}
+
+/**
+ * update columns of table "OrganizationType"
+ */
+export enum OrganizationType_update_column {
+  comment = "comment",
+  value = "value",
+}
+
+/**
+ * unique or primary key constraints on table "Organization"
+ */
+export enum Organization_constraint {
+  Organization_name_key = "Organization_name_key",
+  Organization_pkey = "Organization_pkey",
+}
+
+/**
+ * select columns of table "Organization"
+ */
+export enum Organization_select_column {
+  aliases = "aliases",
+  created_at = "created_at",
+  description = "description",
+  id = "id",
+  name = "name",
+  type = "type",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "Organization"
+ */
+export enum Organization_update_column {
+  aliases = "aliases",
+  created_at = "created_at",
+  description = "description",
+  id = "id",
+  name = "name",
+  type = "type",
+  updated_at = "updated_at",
+}
+
+/**
  * unique or primary key constraints on table "Program"
  */
 export enum Program_constraint {
@@ -1391,6 +1440,7 @@ export enum User_select_column {
   lastName = "lastName",
   matriculationNumber = "matriculationNumber",
   newsletterRegistration = "newsletterRegistration",
+  organizationId = "organizationId",
   otherUniversity = "otherUniversity",
   picture = "picture",
   status = "status",
@@ -1427,6 +1477,7 @@ export enum User_update_column {
   lastName = "lastName",
   matriculationNumber = "matriculationNumber",
   newsletterRegistration = "newsletterRegistration",
+  organizationId = "organizationId",
   otherUniversity = "otherUniversity",
   picture = "picture",
   status = "status",
@@ -5227,6 +5278,236 @@ export interface MotivationRating_on_conflict {
   where?: MotivationRating_bool_exp | null;
 }
 
+/**
+ * Boolean expression to filter rows from the table "OrganizationType". All fields are combined with a logical 'AND'.
+ */
+export interface OrganizationType_bool_exp {
+  Organizations?: Organization_bool_exp | null;
+  Organizations_aggregate?: Organization_aggregate_bool_exp | null;
+  _and?: OrganizationType_bool_exp[] | null;
+  _not?: OrganizationType_bool_exp | null;
+  _or?: OrganizationType_bool_exp[] | null;
+  comment?: String_comparison_exp | null;
+  value?: String_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "OrganizationType"
+ */
+export interface OrganizationType_insert_input {
+  Organizations?: Organization_arr_rel_insert_input | null;
+  comment?: string | null;
+  value?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "OrganizationType"
+ */
+export interface OrganizationType_obj_rel_insert_input {
+  data: OrganizationType_insert_input;
+  on_conflict?: OrganizationType_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "OrganizationType"
+ */
+export interface OrganizationType_on_conflict {
+  constraint: OrganizationType_constraint;
+  update_columns: OrganizationType_update_column[];
+  where?: OrganizationType_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "OrganizationType".
+ */
+export interface OrganizationType_order_by {
+  Organizations_aggregate?: Organization_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
+export interface Organization_aggregate_bool_exp {
+  count?: Organization_aggregate_bool_exp_count | null;
+}
+
+export interface Organization_aggregate_bool_exp_count {
+  arguments?: Organization_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: Organization_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "Organization"
+ */
+export interface Organization_aggregate_order_by {
+  avg?: Organization_avg_order_by | null;
+  count?: order_by | null;
+  max?: Organization_max_order_by | null;
+  min?: Organization_min_order_by | null;
+  stddev?: Organization_stddev_order_by | null;
+  stddev_pop?: Organization_stddev_pop_order_by | null;
+  stddev_samp?: Organization_stddev_samp_order_by | null;
+  sum?: Organization_sum_order_by | null;
+  var_pop?: Organization_var_pop_order_by | null;
+  var_samp?: Organization_var_samp_order_by | null;
+  variance?: Organization_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "Organization"
+ */
+export interface Organization_arr_rel_insert_input {
+  data: Organization_insert_input[];
+  on_conflict?: Organization_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "Organization"
+ */
+export interface Organization_avg_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "Organization". All fields are combined with a logical 'AND'.
+ */
+export interface Organization_bool_exp {
+  OrganizationType?: OrganizationType_bool_exp | null;
+  Users?: User_bool_exp | null;
+  Users_aggregate?: User_aggregate_bool_exp | null;
+  _and?: Organization_bool_exp[] | null;
+  _not?: Organization_bool_exp | null;
+  _or?: Organization_bool_exp[] | null;
+  aliases?: jsonb_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  description?: String_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  name?: String_comparison_exp | null;
+  type?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "Organization"
+ */
+export interface Organization_insert_input {
+  OrganizationType?: OrganizationType_obj_rel_insert_input | null;
+  Users?: User_arr_rel_insert_input | null;
+  aliases?: any | null;
+  created_at?: any | null;
+  description?: string | null;
+  id?: number | null;
+  name?: string | null;
+  type?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * order by max() on columns of table "Organization"
+ */
+export interface Organization_max_order_by {
+  created_at?: order_by | null;
+  description?: order_by | null;
+  id?: order_by | null;
+  name?: order_by | null;
+  type?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "Organization"
+ */
+export interface Organization_min_order_by {
+  created_at?: order_by | null;
+  description?: order_by | null;
+  id?: order_by | null;
+  name?: order_by | null;
+  type?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "Organization"
+ */
+export interface Organization_obj_rel_insert_input {
+  data: Organization_insert_input;
+  on_conflict?: Organization_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "Organization"
+ */
+export interface Organization_on_conflict {
+  constraint: Organization_constraint;
+  update_columns: Organization_update_column[];
+  where?: Organization_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "Organization".
+ */
+export interface Organization_order_by {
+  OrganizationType?: OrganizationType_order_by | null;
+  Users_aggregate?: User_aggregate_order_by | null;
+  aliases?: order_by | null;
+  created_at?: order_by | null;
+  description?: order_by | null;
+  id?: order_by | null;
+  name?: order_by | null;
+  type?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by stddev() on columns of table "Organization"
+ */
+export interface Organization_stddev_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "Organization"
+ */
+export interface Organization_stddev_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "Organization"
+ */
+export interface Organization_stddev_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "Organization"
+ */
+export interface Organization_sum_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "Organization"
+ */
+export interface Organization_var_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "Organization"
+ */
+export interface Organization_var_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "Organization"
+ */
+export interface Organization_variance_order_by {
+  id?: order_by | null;
+}
+
 export interface Program_aggregate_bool_exp {
   bool_and?: Program_aggregate_bool_exp_bool_and | null;
   bool_or?: Program_aggregate_bool_exp_bool_or | null;
@@ -6652,6 +6933,7 @@ export interface User_arr_rel_insert_input {
  */
 export interface User_avg_order_by {
   integerId?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -6670,6 +6952,7 @@ export interface User_bool_exp {
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_bool_exp | null;
   Experts?: Expert_bool_exp | null;
   Experts_aggregate?: Expert_aggregate_bool_exp | null;
+  Organization?: Organization_bool_exp | null;
   UserStatus?: UserStatus_bool_exp | null;
   _and?: User_bool_exp[] | null;
   _not?: User_bool_exp | null;
@@ -6686,6 +6969,7 @@ export interface User_bool_exp {
   lastName?: String_comparison_exp | null;
   matriculationNumber?: String_comparison_exp | null;
   newsletterRegistration?: Boolean_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
   otherUniversity?: String_comparison_exp | null;
   picture?: String_comparison_exp | null;
   status?: UserStatus_enum_comparison_exp | null;
@@ -6704,6 +6988,7 @@ export interface User_insert_input {
   Attendances?: Attendance_arr_rel_insert_input | null;
   CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
   Experts?: Expert_arr_rel_insert_input | null;
+  Organization?: Organization_obj_rel_insert_input | null;
   UserStatus?: UserStatus_obj_rel_insert_input | null;
   anonymousId?: string | null;
   created_at?: any | null;
@@ -6717,6 +7002,7 @@ export interface User_insert_input {
   lastName?: string | null;
   matriculationNumber?: string | null;
   newsletterRegistration?: boolean | null;
+  organizationId?: number | null;
   otherUniversity?: string | null;
   picture?: string | null;
   status?: UserStatus_enum | null;
@@ -6738,6 +7024,7 @@ export interface User_max_order_by {
   integerId?: order_by | null;
   lastName?: order_by | null;
   matriculationNumber?: order_by | null;
+  organizationId?: order_by | null;
   otherUniversity?: order_by | null;
   picture?: order_by | null;
   updated_at?: order_by | null;
@@ -6756,6 +7043,7 @@ export interface User_min_order_by {
   integerId?: order_by | null;
   lastName?: order_by | null;
   matriculationNumber?: order_by | null;
+  organizationId?: order_by | null;
   otherUniversity?: order_by | null;
   picture?: order_by | null;
   updated_at?: order_by | null;
@@ -6788,6 +7076,7 @@ export interface User_order_by {
   Attendances_aggregate?: Attendance_aggregate_order_by | null;
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
   Experts_aggregate?: Expert_aggregate_order_by | null;
+  Organization?: Organization_order_by | null;
   UserStatus?: UserStatus_order_by | null;
   anonymousId?: order_by | null;
   created_at?: order_by | null;
@@ -6801,6 +7090,7 @@ export interface User_order_by {
   lastName?: order_by | null;
   matriculationNumber?: order_by | null;
   newsletterRegistration?: order_by | null;
+  organizationId?: order_by | null;
   otherUniversity?: order_by | null;
   picture?: order_by | null;
   status?: order_by | null;
@@ -6814,6 +7104,7 @@ export interface User_order_by {
  */
 export interface User_stddev_order_by {
   integerId?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -6821,6 +7112,7 @@ export interface User_stddev_order_by {
  */
 export interface User_stddev_pop_order_by {
   integerId?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -6828,6 +7120,7 @@ export interface User_stddev_pop_order_by {
  */
 export interface User_stddev_samp_order_by {
   integerId?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -6835,6 +7128,7 @@ export interface User_stddev_samp_order_by {
  */
 export interface User_sum_order_by {
   integerId?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -6842,6 +7136,7 @@ export interface User_sum_order_by {
  */
 export interface User_var_pop_order_by {
   integerId?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -6849,6 +7144,7 @@ export interface User_var_pop_order_by {
  */
 export interface User_var_samp_order_by {
   integerId?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -6856,6 +7152,7 @@ export interface User_var_samp_order_by {
  */
 export interface User_variance_order_by {
   integerId?: order_by | null;
+  organizationId?: order_by | null;
 }
 
 /**
@@ -6950,6 +7247,31 @@ export interface date_comparison_exp {
   _eq?: any | null;
   _gt?: any | null;
   _gte?: any | null;
+  _in?: any[] | null;
+  _is_null?: boolean | null;
+  _lt?: any | null;
+  _lte?: any | null;
+  _neq?: any | null;
+  _nin?: any[] | null;
+}
+
+export interface jsonb_cast_exp {
+  String?: String_comparison_exp | null;
+}
+
+/**
+ * Boolean expression to compare columns of type "jsonb". All fields are combined with logical 'AND'.
+ */
+export interface jsonb_comparison_exp {
+  _cast?: jsonb_cast_exp | null;
+  _contained_in?: any | null;
+  _contains?: any | null;
+  _eq?: any | null;
+  _gt?: any | null;
+  _gte?: any | null;
+  _has_key?: string | null;
+  _has_keys_all?: string[] | null;
+  _has_keys_any?: string[] | null;
   _in?: any[] | null;
   _is_null?: boolean | null;
   _lt?: any | null;

@@ -45,13 +45,6 @@ jobs:
           directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/sendMail"
           filename: "../sendMail.zip"
 
-      - name: Zip Archive for updateKeycloakProfile
-        uses: thedoctor0/zip-release@main
-        with:
-          type: "zip"
-          directory: "./${{ inputs.CLOUD_FUNCTION_FOLDER }}/updateKeycloakProfile"
-          filename: "../updateKeycloakProfile.zip"
-
       - name: Zip Archive for updateFromKeycloak
         uses: thedoctor0/zip-release@main
         with:
@@ -95,6 +88,7 @@ jobs:
           destination: "${{ inputs.BUCKET_NAME }}/cloud-functions"
           glob: "*.zip"
           parent: false
+          process_gcloudignore: false
 
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}

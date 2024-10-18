@@ -1,4 +1,7 @@
 {
+  "error": {
+    "duplicate_element_name": "An element with the default name already exists. Please rename or delete it first."
+  },
   "addUserAchievementDocumentationTemplateText": "Add template",
   "url": "Download",
   "title": "Title",
