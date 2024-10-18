@@ -82,44 +82,31 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
     setLocalText(currentText);
   }, [currentText]);
 
-  const [updateTextAdmin] = useAdminMutation(updateTextMutation, {
-    onCompleted: (data) => {
-      if (onTextUpdated) onTextUpdated(data);
-    },
-    refetchQueries,
-  });
+  const [updateText] =
+    variant === 'material'
+      ? useAdminMutation(updateTextMutation, {
+          onCompleted: (data) => {
+            if (onTextUpdated) onTextUpdated(data);
+          },
+          refetchQueries,
+        })
+      : useRoleMutation(updateTextMutation, {
+          onError: (error) => handleError(t(error.message)),
+          onCompleted: (data) => {
+            if (onTextUpdated) onTextUpdated(data);
+          },
+        });
 
-  const [updateTextRole] = useRoleMutation(updateTextMutation, {
-    onError: (error) => handleError(t(error.message)),
-    onCompleted: (data) => {
-      if (onTextUpdated) onTextUpdated(data);
-    },
-  });
-
-  const updateText = useCallback(
-    (variables: { itemId: number; text: string }) => {
-      if (variant === 'material') {
-        return updateTextAdmin({ variables, refetchQueries });
-      } else {
-        return updateTextRole({ variables });
-      }
-    },
-    [variant, updateTextAdmin, updateTextRole, refetchQueries]
-  );
-
-  const validateText = useCallback(
-    (newText: string) => {
-      if (typeCheck) {
-        return typeCheck(newText) || (!isMandatory && newText === '');
-      }
-      return isMandatory ? newText !== '' : true;
-    },
-    [typeCheck, isMandatory]
-  );
+  const validateText = (newText: string) => {
+    if (typeCheck) {
+      return typeCheck(newText) || (!isMandatory && newText === '');
+    }
+    return isMandatory ? newText !== '' : true;
+  };
 
   const debouncedUpdateText = useDebouncedCallback((newText: string) => {
     if (validateText(newText)) {
-      updateText({ itemId, text: newText });
+      updateText({ variables: { itemId, text: newText } });
       setErrorMessage('');
       setShowSavedNotification(true);
     } else {
@@ -244,7 +231,19 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
     </div>
   );
 
-  return <>{variant === 'material' ? renderMaterialUI() : renderEduHub()}</>;
+  return (
+    <>
+      {variant === 'material' ? renderMaterialUI() : renderEduHub()}
+      {error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        open={showSavedNotification}
+        autoHideDuration={2000}
+        onClose={() => setShowSavedNotification(false)}
+        message={t('Saved')}
+      />
+    </>
+  );
 };
 
 export default UnifiedTextFieldEditor;
