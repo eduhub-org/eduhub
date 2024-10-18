@@ -51,7 +51,7 @@ import participantsRatedPie from '../../../public/images/course/status/participa
 
 import { InstructorColumn } from './CoursesInstructorColumn';
 import TagSelector from '../../forms/TagSelector';
-import TextFieldEditor from '../../forms/TextFieldEditor';
+import UnifiedTextFieldEditor from '../../forms/UnifiedTextFieldEditor';
 import {
   UPDATE_COURSE_CHAT_LINK,
   UPDATE_COURSE_ECTS,
@@ -471,7 +471,8 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                     locale={lang}
                   />
                 </div>
-                <TextFieldEditor
+                <UnifiedTextFieldEditor
+                  variant="material"
                   label={'chat_link.label'}
                   placeholder={'chat_link.label'}
                   itemId={course.id}
@@ -498,7 +499,8 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                       {!course.achievementCertificatePossible && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
                     </div>
                     <div className="col-span-3">{t('course-page:performance-certificate')}</div>
-                    <TextFieldEditor
+                    <UnifiedTextFieldEditor
+                      variant="material"
                       label={'ects.label'}
                       placeholder={'ects.label'}
                       itemId={course.id}
@@ -533,7 +535,8 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                       deleteTagMutation={DELETE_COURSE_DEGREE_TAG}
                       refetchQueries={['AdminCourseList']}
                     />
-                    <TextFieldEditor
+                    <UnifiedTextFieldEditor
+                      variant="material"
                       label={'external_registration_link.label'}
                       placeholder={'external_registration_link.label'}
                       itemId={course.id}

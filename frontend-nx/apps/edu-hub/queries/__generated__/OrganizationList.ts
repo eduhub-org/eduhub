@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Organization_bool_exp, Organization_order_by } from "./../../__generated__/globalTypes";
+import { Organization_bool_exp, Organization_order_by, OrganizationType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: OrganizationList
@@ -13,7 +13,7 @@ export interface OrganizationList_Organization {
   __typename: "Organization";
   id: number;
   name: string;
-  type: string;
+  type: OrganizationType_enum;
   description: string | null;
   aliases: any | null;
 }

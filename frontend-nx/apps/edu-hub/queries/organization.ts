@@ -51,7 +51,7 @@ export const UPDATE_ORGANIZATION_NAME = gql`
 `;
 
 export const UPDATE_ORGANIZATION_TYPE = gql`
-  mutation UpdateOrganizationType($id: Int!, $value: String!) {
+  mutation UpdateOrganizationType($id: Int!, $value: OrganizationType_enum!) {
     update_Organization_by_pk(pk_columns: {id: $id}, _set: {type: $value}) {
       id
       type

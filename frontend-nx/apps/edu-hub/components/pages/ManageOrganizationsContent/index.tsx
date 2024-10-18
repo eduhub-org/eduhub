@@ -8,7 +8,7 @@ import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirm
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import TextFieldEditor from '../../forms/TextFieldEditor';
+import UnifiedTextFieldEditor from '../../forms/UnifiedTextFieldEditor';
 import DropDownSelector from '../../forms/DropDownSelector';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
@@ -26,9 +26,7 @@ import {
   UPDATE_ORGANIZATION_ALIASES,
 } from '../../../queries/organization';
 import CreatableTagSelector from '../../forms/CreatableTagSelector';
-import EhAddButton from '../../common/EhAddButton';
-
-import { useBulkActions } from '../../../hooks/bulkActions';
+import { OrganizationType_enum } from '../../../__generated__/globalTypes';
 
 const PAGE_SIZE = 15;
 
@@ -62,7 +60,8 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row }): React
         refetchQueries={['OrganizationList']}
         translationNamespace="manageOrganizations"
       />
-      <TextFieldEditor
+      <UnifiedTextFieldEditor
+        variant="material"
         label={t('organization.description')}
         placeholder={t('input.enter_description')}
         itemId={row.id}
@@ -94,7 +93,7 @@ const ManageOrganizationsContent: FC = () => {
       limit: PAGE_SIZE,
       filter: searchFilter
         ? {
-            _or: [{ name: { _ilike: `%${searchFilter}%` } }, { type: { _ilike: `%${searchFilter}%` } }],
+            _or: [{ name: { _ilike: `%${searchFilter}%` } }, { type: { _eq: searchFilter } }],
           }
         : {},
       order_by: { name: 'asc' },
@@ -109,13 +108,18 @@ const ManageOrganizationsContent: FC = () => {
     debouncedRefetch({
       offset: pageIndex * PAGE_SIZE,
       limit: PAGE_SIZE,
-      filter: {
-        _or: [{ name: { _ilike: `%${searchFilter}%` } }, { type: { _ilike: `%${searchFilter}%` } }],
-      },
+      filter: searchFilter
+        ? {
+            _or: [{ name: { _ilike: `%${searchFilter}%` } }, { type: { _eq: searchFilter } }],
+          }
+        : {},
     });
   }, [pageIndex, debouncedRefetch, searchFilter]);
 
-  const organizationTypes = data?.OrganizationType?.map((type) => type.value) || [];
+  const organizationTypes = useMemo(
+    () => data?.OrganizationType?.map((type) => type.value as OrganizationType_enum) || [],
+    [data]
+  );
 
   const columns = useMemo<ColumnDef<OrganizationList_Organization>[]>(
     () => [
@@ -124,7 +128,8 @@ const ManageOrganizationsContent: FC = () => {
         header: 'organization.name',
         meta: { width: 3 },
         cell: ({ getValue, row }) => (
-          <TextFieldEditor
+          <UnifiedTextFieldEditor
+            variant="material"
             placeholder={t('input.enter_name')}
             itemId={row.original.id}
             currentText={getValue<string>()}
