@@ -26,7 +26,7 @@ import {
   UPDATE_ORGANIZATION_ALIASES,
 } from '../../../queries/organization';
 import CreatableTagSelector from '../../forms/CreatableTagSelector';
-import { OrganizationType_enum } from 'apps/edu-hub/__generated__/globalTypes';
+import { OrganizationType_enum } from '../../../__generated__/globalTypes';
 
 const PAGE_SIZE = 15;
 
