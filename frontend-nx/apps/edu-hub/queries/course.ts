@@ -319,10 +319,10 @@ export const DELETE_COURSE_LOCATION = gql`
 `;
 
 export const UPDATE_COURSE_START_TIME = gql`
-  mutation UpdateCourseStartTime($courseId: Int!, $startTime: time) {
+  mutation UpdateCourseStartTime($courseId: Int!, $value: time) {
     update_Course_by_pk(
       pk_columns: { id: $courseId }
-      _set: { startTime: $startTime }
+      _set: { startTime: $value }
     ) {
       id
       startTime
@@ -331,10 +331,10 @@ export const UPDATE_COURSE_START_TIME = gql`
 `;
 
 export const UPDATE_COURSE_END_TIME = gql`
-  mutation UpdateCourseEndTime($courseId: Int!, $endTime: time) {
+  mutation UpdateCourseEndTime($courseId: Int!, $value: time) {
     update_Course_by_pk(
       pk_columns: { id: $courseId }
-      _set: { endTime: $endTime }
+      _set: { endTime: $value }
     ) {
       id
       endTime

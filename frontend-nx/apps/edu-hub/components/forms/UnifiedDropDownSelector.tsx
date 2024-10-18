@@ -9,7 +9,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { HelpOutline } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { useDebouncedCallback } from 'use-debounce';
-import { useAdminMutation, useRoleMutation } from '../../hooks/authedMutation';
+import { useRoleMutation } from '../../hooks/authedMutation';
 import useTranslation from 'next-translate/useTranslation';
 import { prioritizeClasses } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
@@ -20,7 +20,7 @@ import Snackbar from '@mui/material/Snackbar';
 type UnifiedDropDownSelectorProps = {
   variant: 'material' | 'eduhub';
   label?: string;
-  itemId: string | number;
+  identifierVariables: Record<string, any>;
   currentValue: string;
   options: string[];
   updateValueMutation: DocumentNode;
@@ -32,13 +32,12 @@ type UnifiedDropDownSelectorProps = {
   translationPrefix?: string;
   isMandatory?: boolean;
   className?: string;
-  idVariables?: Record<string, any>;
 };
 
 const UnifiedDropDownSelector: React.FC<UnifiedDropDownSelectorProps> = ({
   variant,
   label,
-  itemId,
+  identifierVariables,
   currentValue,
   options,
   updateValueMutation,
@@ -50,7 +49,6 @@ const UnifiedDropDownSelector: React.FC<UnifiedDropDownSelectorProps> = ({
   translationPrefix = '',
   isMandatory = false,
   className = '',
-  idVariables = {},
 }) => {
   const { t } = useTranslation(translationNamespace);
   const [value, setValue] = useState(currentValue);
@@ -61,30 +59,25 @@ const UnifiedDropDownSelector: React.FC<UnifiedDropDownSelectorProps> = ({
 
   const theme = useTheme();
 
-  const [updateValue] =
-    variant === 'material'
-      ? useAdminMutation(updateValueMutation, {
-          onCompleted: (data) => {
-            if (onValueUpdated) onValueUpdated(data);
-            setShowSavedNotification(true);
-          },
-          refetchQueries,
-        })
-      : useRoleMutation(updateValueMutation, {
-          onError: (error) => handleError(t(error.message)),
-          onCompleted: (data) => {
-            if (onValueUpdated) onValueUpdated(data);
-            setShowSavedNotification(true);
-          },
-        });
+  const [updateValue] = useRoleMutation(updateValueMutation, {
+    onError: (error) => handleError(t(error.message)),
+    onCompleted: (data) => {
+      if (onValueUpdated) onValueUpdated(data);
+      setShowSavedNotification(true);
+    },
+    refetchQueries: variant === 'material' ? refetchQueries : undefined,
+  });
 
-  const validateValue = (newValue: string) => {
-    return isMandatory ? newValue !== '' : true;
-  };
+  const validateValue = useCallback(
+    (newValue: string) => {
+      return isMandatory ? newValue !== '' : true;
+    },
+    [isMandatory]
+  );
 
   const debouncedUpdateValue = useDebouncedCallback((newValue: string) => {
     if (validateValue(newValue)) {
-      const variables = variant === 'material' ? { id: itemId, value: newValue } : { ...idVariables, value: newValue };
+      const variables = { ...identifierVariables, value: newValue };
       updateValue({ variables });
       setErrorMessage('');
     } else {
@@ -106,7 +99,7 @@ const UnifiedDropDownSelector: React.FC<UnifiedDropDownSelectorProps> = ({
   const handleBlur = useCallback(() => {
     setHasBlurred(true);
     setErrorMessage(validateValue(value) ? '' : t(errorText));
-  }, [value, errorText, t]);
+  }, [value, errorText, t, validateValue]);
 
   const baseClass = 'w-full px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
@@ -146,7 +139,7 @@ const UnifiedDropDownSelector: React.FC<UnifiedDropDownSelectorProps> = ({
     </div>
   );
 
-  const renderEduHub = () => (
+  const renderEduhub = () => (
     <div className="px-2">
       <div className="text-gray-400">
         <div className="flex justify-between mb-2">
@@ -174,7 +167,7 @@ const UnifiedDropDownSelector: React.FC<UnifiedDropDownSelectorProps> = ({
 
   return (
     <>
-      {variant === 'material' ? renderMaterialUI() : renderEduHub()}
+      {variant === 'material' ? renderMaterialUI() : renderEduhub()}
       {error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}

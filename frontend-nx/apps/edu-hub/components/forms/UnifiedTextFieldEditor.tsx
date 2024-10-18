@@ -6,7 +6,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { HelpOutline } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { useDebouncedCallback } from 'use-debounce';
-import { useAdminMutation, useRoleMutation } from '../../hooks/authedMutation';
+import { useRoleMutation } from '../../hooks/authedMutation';
 import useTranslation from 'next-translate/useTranslation';
 import { DebounceInput } from 'react-debounce-input';
 import ReactMarkdown from 'react-markdown';
@@ -82,33 +82,29 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
     setLocalText(currentText);
   }, [currentText]);
 
-  const [updateText] =
-    variant === 'material'
-      ? useAdminMutation(updateTextMutation, {
-          onCompleted: (data) => {
-            if (onTextUpdated) onTextUpdated(data);
-          },
-          refetchQueries,
-        })
-      : useRoleMutation(updateTextMutation, {
-          onError: (error) => handleError(t(error.message)),
-          onCompleted: (data) => {
-            if (onTextUpdated) onTextUpdated(data);
-          },
-        });
+  const [updateText] = useRoleMutation(updateTextMutation, {
+    onError: (error) => handleError(t(error.message)),
+    onCompleted: (data) => {
+      if (onTextUpdated) onTextUpdated(data);
+      setShowSavedNotification(true);
+    },
+    refetchQueries: variant === 'material' ? refetchQueries : undefined,
+  });
 
-  const validateText = (newText: string) => {
-    if (typeCheck) {
-      return typeCheck(newText) || (!isMandatory && newText === '');
-    }
-    return isMandatory ? newText !== '' : true;
-  };
+  const validateText = useCallback(
+    (newText: string) => {
+      if (typeCheck) {
+        return typeCheck(newText) || (!isMandatory && newText === '');
+      }
+      return isMandatory ? newText !== '' : true;
+    },
+    [typeCheck, isMandatory]
+  );
 
   const debouncedUpdateText = useDebouncedCallback((newText: string) => {
     if (validateText(newText)) {
       updateText({ variables: { itemId, text: newText } });
       setErrorMessage('');
-      setShowSavedNotification(true);
     } else {
       setErrorMessage(t(errorText));
     }
@@ -171,7 +167,7 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
     </div>
   );
 
-  const renderEduhub = () => (
+  const renderEduHub = () => (
     <div className="px-2">
       <div className="text-gray-400">
         <div className="flex justify-between mb-2">
@@ -233,7 +229,7 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
 
   return (
     <>
-      {variant === 'material' ? renderMaterialUI() : renderEduhub()}
+      {variant === 'material' ? renderMaterialUI() : renderEduHub()}
       {error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}

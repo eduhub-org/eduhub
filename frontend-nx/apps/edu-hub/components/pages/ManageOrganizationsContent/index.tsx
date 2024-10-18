@@ -9,7 +9,7 @@ import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirm
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 import UnifiedTextFieldEditor from '../../forms/UnifiedTextFieldEditor';
-import DropDownSelector from '../../forms/DropDownSelector';
+import UnifiedDropDownSelector from '../../forms/UnifiedDropDownSelector';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { PageBlock } from '../../common/PageBlock';
@@ -144,8 +144,9 @@ const ManageOrganizationsContent: FC = () => {
         header: t('organization.type'),
         meta: { width: 3 },
         cell: ({ getValue, row }) => (
-          <DropDownSelector
-            itemId={row.original.id}
+          <UnifiedDropDownSelector
+            variant="material"
+            identifierVariables={{ id: row.original.id }}
             currentValue={getValue<string>()}
             options={organizationTypes}
             updateValueMutation={UPDATE_ORGANIZATION_TYPE}

@@ -23,8 +23,8 @@ import Locations from './Locations';
 import { Button } from '@mui/material';
 import { MdAddCircle } from 'react-icons/md';
 import useTranslation from 'next-translate/useTranslation';
-import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
-import EduHubTimePicker from '../../../forms/EduHubTimePicker';
+import UnifiedDropdownSelector from '../../../forms/UnifiedDropDownSelector';
+import UnifiedTimePicker from '../../../forms/UnifiedTimePicker';
 import EduHubNumberFieldEditor from '../../../forms/EduHubNumberFieldEditor';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import useErrorHandler from '../../../../hooks/useErrorHandler';
@@ -59,6 +59,7 @@ import {
   InsertSessionAddressVariables,
 } from '../../../../queries/__generated__/InsertSessionAddress';
 import UnifiedTextFieldEditor from '../../../forms/UnifiedTextFieldEditor';
+import EduHubTimePicker from '../../../forms/TimePicker';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -159,24 +160,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
     }); // Call the function directly
     qResult.refetch(); // Refetch the query to update the UI
   };
-
-  const updateCourseStartTime = useUpdateCallback<UpdateCourseStartTime, UpdateCourseStartTimeVariables>(
-    UPDATE_COURSE_START_TIME,
-    'courseId',
-    'startTime',
-    course?.id,
-    (time: string | null) => (time ? `${time}:00` : null),
-    qResult
-  );
-
-  const updateCourseEndTime = useUpdateCallback<UpdateCourseEndTime, UpdateCourseEndTimeVariables>(
-    UPDATE_COURSE_END_TIME,
-    'courseId',
-    'endTime',
-    course?.id,
-    (time: string | null) => (time ? `${time}:00` : null),
-    qResult
-  );
 
   const updateMaxParticipants = useUpdateCallback<UpdateCourseMaxParticipants, UpdateCourseMaxParticipantsVariables>(
     UPDATE_COURSE_MAX_PARTICIPANTS,
@@ -281,37 +264,47 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div className="grid grid-cols-3">
-          <EduHubDropdownSelector
+          <UnifiedDropdownSelector
+            variant="eduhub"
             label={t('weekday')}
             options={weekDayOptions}
-            value={course.weekDay ?? 'MONDAY'}
-            updateMutation={UPDATE_COURSE_WEEKDAY}
-            idVariables={{ courseId: course.id }}
+            currentValue={course.weekDay ?? 'MONDAY'}
+            updateValueMutation={UPDATE_COURSE_WEEKDAY}
+            identifierVariables={{ courseId: course.id }}
             refetchQueries={['ManagedCourse']}
             translationPrefix="course-page:weekdays."
             translationNamespace="course-page"
           />
-          <EduHubTimePicker
+          <UnifiedTimePicker
+            variant="eduhub"
             label={t('start_time')}
-            value={getStartTimeString(course.startTime)}
-            onChange={updateCourseStartTime}
+            currentValue={course.startTime ? new Date(`1970-01-01T${course.startTime}`) : null}
+            updateValueMutation={UPDATE_COURSE_START_TIME}
+            identifierVariables={{ courseId: course.id }}
+            refetchQueries={['ManagedCourse']}
             className="mb-4"
+            onValueUpdated={() => qResult.refetch()}
           />
-          <EduHubTimePicker
+          <UnifiedTimePicker
+            variant="eduhub"
             label={t('end_time')}
-            value={getEndTimeString(course.endTime)}
-            onChange={updateCourseEndTime}
+            currentValue={course.endTime ? new Date(`1970-01-01T${course.endTime}`) : null}
+            updateValueMutation={UPDATE_COURSE_END_TIME}
+            identifierVariables={{ courseId: course.id }}
+            refetchQueries={['ManagedCourse']}
             className="mb-4"
+            onValueUpdated={() => qResult.refetch()}
           />
           <div />
         </div>
         <div className="grid grid-cols-2">
-          <EduHubDropdownSelector
+          <UnifiedDropdownSelector
+            variant="eduhub"
             label={t('common:language')}
             options={languageOptions}
-            value={course.language}
-            updateMutation={UPDATE_COURSE_LANGUAGE}
-            idVariables={{ courseId: course.id }}
+            currentValue={course.language}
+            updateValueMutation={UPDATE_COURSE_LANGUAGE}
+            identifierVariables={{ courseId: course.id }}
             refetchQueries={['ManagedCourse']}
             translationPrefix="course-page:languages."
             translationNamespace="course-page"

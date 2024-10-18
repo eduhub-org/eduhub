@@ -25,5 +25,5 @@ export interface UpdateCourseEndTime {
 
 export interface UpdateCourseEndTimeVariables {
   courseId: number;
-  endTime?: any | null;
+  value?: any | null;
 }

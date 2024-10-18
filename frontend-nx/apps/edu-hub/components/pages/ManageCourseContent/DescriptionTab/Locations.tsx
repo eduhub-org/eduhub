@@ -2,7 +2,7 @@ import { QueryResult } from '@apollo/client';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback } from 'react';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
-import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
+import UnifiedDropDownSelector from '../../../forms/UnifiedDropDownSelector';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { LocationOptions } from '../../../../queries/__generated__/LocationOptions';
 import {
@@ -45,11 +45,12 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete, refetchQuer
     <div className="grid grid-cols-12 items-center">
       {location && (
         <div className="col-span-2">
-          <EduHubDropdownSelector
+          <UnifiedDropDownSelector
+            variant="eduhub"
             options={locationOptions}
-            value={location.locationOption || 'ONLINE'}
-            updateMutation={UPDATE_COURSE_LOCATION}
-            idVariables={{ locationId: location.id }}
+            currentValue={location.locationOption || 'ONLINE'}
+            updateValueMutation={UPDATE_COURSE_LOCATION}
+            identifierVariables={{ locationId: location.id }}
             refetchQueries={['ManagedCourse']}
             translationPrefix="course-page:location."
             className="mb-2"
