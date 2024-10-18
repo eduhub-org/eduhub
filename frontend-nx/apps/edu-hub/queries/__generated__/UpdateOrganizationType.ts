@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { OrganizationType_enum } from "./../../__generated__/globalTypes";
+
 // ====================================================
 // GraphQL mutation operation: UpdateOrganizationType
 // ====================================================
@@ -10,7 +12,7 @@
 export interface UpdateOrganizationType_update_Organization_by_pk {
   __typename: "Organization";
   id: number;
-  type: string;
+  type: OrganizationType_enum;
 }
 
 export interface UpdateOrganizationType {
@@ -22,5 +24,5 @@ export interface UpdateOrganizationType {
 
 export interface UpdateOrganizationTypeVariables {
   id: number;
-  value: string;
+  value: OrganizationType_enum;
 }

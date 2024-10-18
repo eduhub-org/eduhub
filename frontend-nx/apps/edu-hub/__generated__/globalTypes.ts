@@ -882,6 +882,17 @@ export enum OrganizationType_constraint {
   OrganizationType_pkey = "OrganizationType_pkey",
 }
 
+export enum OrganizationType_enum {
+  CORPORATION = "CORPORATION",
+  FREELANCER = "FREELANCER",
+  NON_PROFIT_ORGANIZATION = "NON_PROFIT_ORGANIZATION",
+  OTHER = "OTHER",
+  PUBLIC_SECTOR = "PUBLIC_SECTOR",
+  RESEARCH_INSTITUTE = "RESEARCH_INSTITUTE",
+  SCHOOL = "SCHOOL",
+  UNIVERSITY = "UNIVERSITY",
+}
+
 /**
  * update columns of table "OrganizationType"
  */
@@ -5292,6 +5303,17 @@ export interface OrganizationType_bool_exp {
 }
 
 /**
+ * Boolean expression to compare columns of type "OrganizationType_enum". All fields are combined with logical 'AND'.
+ */
+export interface OrganizationType_enum_comparison_exp {
+  _eq?: OrganizationType_enum | null;
+  _in?: OrganizationType_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: OrganizationType_enum | null;
+  _nin?: OrganizationType_enum[] | null;
+}
+
+/**
  * input type for inserting data into table "OrganizationType"
  */
 export interface OrganizationType_insert_input {
@@ -5384,7 +5406,7 @@ export interface Organization_bool_exp {
   description?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   name?: String_comparison_exp | null;
-  type?: String_comparison_exp | null;
+  type?: OrganizationType_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
 
@@ -5399,7 +5421,7 @@ export interface Organization_insert_input {
   description?: string | null;
   id?: number | null;
   name?: string | null;
-  type?: string | null;
+  type?: OrganizationType_enum | null;
   updated_at?: any | null;
 }
 
@@ -5411,7 +5433,6 @@ export interface Organization_max_order_by {
   description?: order_by | null;
   id?: order_by | null;
   name?: order_by | null;
-  type?: order_by | null;
   updated_at?: order_by | null;
 }
 
@@ -5423,7 +5444,6 @@ export interface Organization_min_order_by {
   description?: order_by | null;
   id?: order_by | null;
   name?: order_by | null;
-  type?: order_by | null;
   updated_at?: order_by | null;
 }
 
