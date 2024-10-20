@@ -1,42 +1,25 @@
-import { FC, useRef, useCallback, useState } from 'react';
+import { FC, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
-import { IconButton } from '@mui/material';
-import { MdUpload } from 'react-icons/md';
-
-import { parseFileUploadEvent } from '../../../helpers/filehandling';
 
 import { Button } from '../../common/Button';
 import FormFieldRow from '../../forms/FormFieldRow';
+import UnifiedFileUploader from '../../forms/UnifiedFileUploader';
 
 import { useAuthedMutation } from '../../../hooks/authedMutation';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
 
 import { UPDATE_USER } from '../../../queries/updateUser';
 import { USER } from '../../../queries/user';
-import { SAVE_USER_PROFILE_IMAGE } from '../../../queries/actions';
 import { UPDATE_USER_PROFILE_PICTURE } from '../../../queries/updateUser';
 
-import type { MutableRefObject } from 'react';
-import {
-  SaveUserProfileImage,
-  SaveUserProfileImageVariables,
-} from '../../../queries/__generated__/SaveUserProfileImage';
 import { UpdateUserVariables, UpdateUser } from '../../../queries/__generated__/UpdateUser';
-import {
-  UpdateUserProfilePictureVariables,
-  UpdateUserProfilePicture,
-} from '../../../queries/__generated__/UpdateUserProfilePicture';
 import { University_enum } from '../../../__generated__/globalTypes';
 import { Employment_enum } from '../../../__generated__/globalTypes';
-import UserCard from '../../common/UserCard';
 import log from 'loglevel';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import { User, UserVariables } from '../../../queries/__generated__/User';
-
-// generated types must be updated first with new fields in schema
-// import type { User } from "../../queries/__generated__/User";
 
 type Inputs = {
   firstName: string;
@@ -50,9 +33,7 @@ type Inputs = {
   picture: string;
 };
 
-// interface IProps {}
 const ProfileOverview: FC = () => {
-  // State for error handling
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -82,7 +63,7 @@ const ProfileOverview: FC = () => {
     loading: userLoading,
     error: userError,
     refetch: refetchUser,
-  } = useAuthedQuery<User,UserVariables>(USER, {
+  } = useAuthedQuery<User, UserVariables>(USER, {
     variables: {
       userId: sessionData?.profile?.sub,
     },
@@ -104,9 +85,6 @@ const ProfileOverview: FC = () => {
   });
 
   const [updateUser] = useAuthedMutation<UpdateUser, UpdateUserVariables>(UPDATE_USER);
-  const [updateUserProfilePicture] = useAuthedMutation<UpdateUserProfilePicture, UpdateUserProfilePictureVariables>(
-    UPDATE_USER_PROFILE_PICTURE
-  );
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
@@ -147,64 +125,21 @@ const ProfileOverview: FC = () => {
     })
   );
 
-  const imageUploadRef: MutableRefObject<any> = useRef(null);
-  const handleImageUploadClick = useCallback(() => {
-    imageUploadRef.current?.click();
-  }, [imageUploadRef]);
-
-  const [saveUserProfileImage] = useAuthedMutation<SaveUserProfileImage, SaveUserProfileImageVariables>(
-    SAVE_USER_PROFILE_IMAGE
-  );
-
-  const handleUploadUserProfileImageEvent = useCallback(
-    async (event: any) => {
-      try {
-        const ufile = await parseFileUploadEvent(event);
-
-        if (ufile != null) {
-          const result = await saveUserProfileImage({
-            variables: {
-              base64File: ufile.data,
-              fileName: ufile.name,
-              userId: sessionData?.profile?.sub,
-            },
-          });
-          const userProfileImage = result.data?.saveUserProfileImage?.google_link;
-          if (userProfileImage != null) {
-            await updateUserProfilePicture({
-              variables: {
-                userId: sessionData?.profile?.sub,
-                picture: result.data?.saveUserProfileImage?.file_path,
-              },
-            });
-            refetchUser();
-          }
-        }
-      } catch (error) {
-        log.error("Error while updating user's profile picture", error);
-        setErrorMessage(error.message || "Error while updating user's profile picture");
-        setIsErrorDialogOpen(true);
-      }
-    },
-    [sessionData?.profile?.sub, saveUserProfileImage, refetchUser, updateUserProfilePicture]
-  );
-
-  const handleCloseErrorDialog = () => {
-    setIsErrorDialogOpen(false);
-  };
-
   return (
     <div className="px-3 mt-20">
       {!userLoading && !userError ? (
         <>
-          <label className="text-xs uppercase tracking-widest font-medium text-gray-400">{t('profile-picture')}</label>
-          <div className="bg-white h-40 justify-center mb-6 w-80">
-            <IconButton onClick={handleImageUploadClick}>
-              <MdUpload size="0.75em" />
-            </IconButton>
-            <UserCard className="flex items-center ml-6" key={`userCard`} user={userData?.User_by_pk} />
-          </div>
-          <input ref={imageUploadRef} onChange={handleUploadUserProfileImageEvent} className="hidden" type="file" />
+          <UnifiedFileUploader
+            variant="eduhub"
+            element="profilePicture"
+            identifierVariables={{ userId: sessionData?.profile?.sub }}
+            currentFile={userData?.User_by_pk?.picture}
+            updateFileMutation={UPDATE_USER_PROFILE_PICTURE}
+            onFileUpdated={() => refetchUser()}
+            acceptedFileTypes="image/*"
+            maxFileSize={5 * 1024 * 1024} // 5MB
+            user={userData?.User_by_pk}
+          />
 
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -282,7 +217,11 @@ const ProfileOverview: FC = () => {
         <div>Loading</div>
       )}
       {isErrorDialogOpen && (
-        <ErrorMessageDialog errorMessage={errorMessage} open={isErrorDialogOpen} onClose={handleCloseErrorDialog} />
+        <ErrorMessageDialog
+          errorMessage={errorMessage}
+          open={isErrorDialogOpen}
+          onClose={() => setIsErrorDialogOpen(false)}
+        />
       )}
     </div>
   );

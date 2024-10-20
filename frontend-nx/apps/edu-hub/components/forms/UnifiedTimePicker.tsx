@@ -7,6 +7,7 @@ import { prioritizeClasses } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import Snackbar from '@mui/material/Snackbar';
+import { useFormatTimeString, useFormatTime } from '../../helpers/dateTimeHelpers';
 
 type UnifiedTimePickerProps = {
   variant: 'material' | 'eduhub';
@@ -38,15 +39,11 @@ const UnifiedTimePicker: React.FC<UnifiedTimePickerProps> = ({
   className = '',
 }) => {
   const { t } = useTranslation(translationNamespace);
+  const formatTimeString = useFormatTimeString();
+  const formatTime = useFormatTime();
 
   const formatTimeValue = (val: Date | string | null): string => {
-    if (!val) return '';
-    if (val instanceof Date) {
-      const hours = val.getHours().toString().padStart(2, '0');
-      const minutes = val.getMinutes().toString().padStart(2, '0');
-      return isNaN(val.getTime()) ? '' : `${hours}:${minutes}`;
-    }
-    return val;
+    return formatTimeString(val);
   };
 
   const [value, setValue] = useState<string | null>(currentValue ? formatTimeValue(currentValue) : null);
@@ -82,12 +79,12 @@ const UnifiedTimePicker: React.FC<UnifiedTimePickerProps> = ({
 
   const handleValueChange = useCallback(
     (newValue: string | null) => {
-      setValue(newValue);
-      debouncedUpdateValue(newValue);
+      const formattedValue = newValue ? formatTimeString(newValue) : null;
+      setValue(formattedValue);
+      debouncedUpdateValue(formattedValue);
     },
-    [debouncedUpdateValue]
+    [debouncedUpdateValue, formatTimeString]
   );
-
   const timeValue = value || '';
 
   const handleChange = useCallback(
@@ -101,11 +98,9 @@ const UnifiedTimePicker: React.FC<UnifiedTimePickerProps> = ({
   // Generate time options
   const timeOptions = [];
   for (let i = 0; i < 24 * 4; i++) {
-    const hours = Math.floor(i / 4)
-      .toString()
-      .padStart(2, '0');
-    const minutes = ((i % 4) * 15).toString().padStart(2, '0');
-    timeOptions.push(`${hours}:${minutes}`);
+    const date = new Date();
+    date.setHours(Math.floor(i / 4), (i % 4) * 15, 0, 0);
+    timeOptions.push(formatTime(date));
   }
 
   const baseClass = 'w-full h-12 px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';

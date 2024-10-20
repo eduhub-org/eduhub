@@ -138,5 +138,11 @@
     "bulk_action": "Sammelaktion",
     "apply": "Ausführen",
     "none": "Keine Aktion"
+  },
+  "file_uploader": {
+    "upload_new_profile_picture": "Neues Profilbild hochladen",
+    "upload_file": "Datei hochladen",
+    "file_size_exceeds_limit": "Die Datei ist zu groß. Bitte wähle eine Datei mit einer Größe von {{maxFileSize}}MB oder weniger.",
+    "error_uploading_profile_picture": "Fehler beim Hochladen des Profilbildes"
   }
 }

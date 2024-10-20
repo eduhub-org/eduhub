@@ -39,14 +39,6 @@ import {
   InsertCourseLocationVariables,
 } from '../../../../queries/__generated__/InsertCourseLocation';
 import {
-  UpdateCourseEndTime,
-  UpdateCourseEndTimeVariables,
-} from '../../../../queries/__generated__/UpdateCourseEndTime';
-import {
-  UpdateCourseStartTime,
-  UpdateCourseStartTimeVariables,
-} from '../../../../queries/__generated__/UpdateCourseStartTime';
-import {
   UpdateCourseMaxParticipants,
   UpdateCourseMaxParticipantsVariables,
 } from '../../../../queries/__generated__/UpdateCourseMaxParticipants';
@@ -59,7 +51,6 @@ import {
   InsertSessionAddressVariables,
 } from '../../../../queries/__generated__/InsertSessionAddress';
 import UnifiedTextFieldEditor from '../../../forms/UnifiedTextFieldEditor';
-import EduHubTimePicker from '../../../forms/TimePicker';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;

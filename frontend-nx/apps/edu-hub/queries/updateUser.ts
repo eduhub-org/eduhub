@@ -67,12 +67,12 @@ export const UPDATE_USER_ON_ENROLLMENT_CONFIRMATION = gql`
 export const UPDATE_USER_PROFILE_PICTURE = gql`
   mutation UpdateUserProfilePicture(
     $userId: uuid!
-    $picture: String
+    $file: String
   ) {
     update_User_by_pk(
       pk_columns: { id: $userId }
       _set: {
-        picture: $picture
+        picture: $file
       }
     ) {
       id

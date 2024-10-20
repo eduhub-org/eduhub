@@ -137,6 +137,12 @@
     "pagination_text": "Page {{currentPage}} of {{totalPage}}",
     "bulk_action": "Bulk Action",
     "apply": "Apply",
-    "none": "Keine"
+    "none": "None"
+  },
+  "file_uploader": {
+    "upload_new_profile_picture": "Upload new profile picture",
+    "upload_file": "Upload file",
+    "file_size_exceeds_limit": "The file is too large. Please choose a file with a size of {{maxFileSize}}MB or less.",
+    "error_uploading_profile_picture": "Error uploading profile picture"
   }
 }

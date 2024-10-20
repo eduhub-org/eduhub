@@ -16,6 +16,7 @@ import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { QueryResult } from '@apollo/client';
 import Snackbar from '@mui/material/Snackbar';
+import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 
 type UnifiedTextFieldEditorProps = {
   variant: 'material' | 'eduhub';
@@ -105,6 +106,7 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
     if (validateText(newText)) {
       updateText({ variables: { itemId, text: newText } });
       setErrorMessage('');
+      setShowSavedNotification(true);
     } else {
       setErrorMessage(t(errorText));
     }
@@ -124,11 +126,17 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
     setHasBlurred(true);
     if (!validateText(localText)) {
       setErrorMessage(t(errorText));
+      if (variant === 'eduhub') {
+        handleError(t(errorText)); // Only trigger error handling for eduhub variant
+      }
     } else {
       setErrorMessage('');
+      if (variant === 'eduhub') {
+        resetError(); // Only reset error state for eduhub variant
+      }
     }
     debouncedUpdateText.flush();
-  }, [localText, validateText, debouncedUpdateText, t, errorText]);
+  }, [variant, localText, validateText, debouncedUpdateText, t, errorText, handleError, resetError]);
 
   const [showPreview, setShowPreview] = useState(false);
   const togglePreview = () => setShowPreview(!showPreview);
@@ -230,14 +238,7 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
   return (
     <>
       {variant === 'material' ? renderMaterialUI() : renderEduHub()}
-      {error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
-      <Snackbar
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        open={showSavedNotification}
-        autoHideDuration={2000}
-        onClose={() => setShowSavedNotification(false)}
-        message={t('Saved')}
-      />
+      {variant === 'eduhub' && error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}
     </>
   );
 };
