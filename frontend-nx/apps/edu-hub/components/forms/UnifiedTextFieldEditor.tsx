@@ -17,36 +17,86 @@ import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { QueryResult } from '@apollo/client';
 import Snackbar from '@mui/material/Snackbar';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
+import { isLinkFormat, isECTSFormat } from '../../helpers/util';
 
 type UnifiedTextFieldEditorProps = {
+  // Determines the visual style and behavior of the component
+  // 'material' uses Material-UI components, 'eduhub' uses custom styling
   variant: 'material' | 'eduhub';
+
+  // HTML element type to use for input, now including 'markdown' option
+  type?: 'input' | 'textarea' | 'markdown' | 'link' | 'email' | 'ects';
+
+  // The label text for the input field
   label?: string;
+
+  // Placeholder text shown when the input is empty
   placeholder?: string;
+
+  // Unique identifier for the item being edited
   itemId: number;
+
+  // The current text value of the input field
   currentText: string;
+
+  // GraphQL mutation to update the text
+  // The mutation should accept two variables: 'itemId' and 'text'
+  // Example:
+  // const UPDATE_TEXT = gql`
+  //   mutation UpdateText($itemId: Int!, $text: String!) {
+  //     updateText(itemId: $itemId, text: $text) {
+  //       id
+  //       text
+  //     }
+  //   }
+  // `;
   updateTextMutation: DocumentNode;
+
+  // Callback function called after successful text update
   onTextUpdated?: (data: any) => void;
+
+  // List of GraphQL query names to refetch after mutation
   refetchQueries?: string[];
-  typeCheck?: (text: string) => boolean;
+
+  // Text shown in tooltip to provide additional information
   helpText?: string;
+
+  // Error message displayed when input is invalid
   errorText?: string;
+
+  // Namespace for translations
   translationNamespace?: string;
+
+  // Indicates if the field is required
   isMandatory?: boolean;
+
   // EduHub specific props
-  element?: string;
-  refetchQuery?: QueryResult<any, any>;
+
+  // Delay in milliseconds before triggering update after input
   debounceTimeout?: number;
+
+  // Maximum number of characters allowed in the input
   maxLength?: number;
+
+  // Additional CSS classes to apply to the input
   className?: string;
+
+  // If true, triggers update on Enter key press
   forceNotifyByEnter?: boolean;
-  isMarkdown?: boolean;
+
+  // If true, shows character count
   showCharacterCount?: boolean;
+
+  // If true, inverts the color scheme (for dark mode)
   invertColors?: boolean;
-  [x: string]: any; // for the rest of the props
+
+  // Allows for additional props to be passed
+  [x: string]: any;
 };
 
 const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
   variant,
+  type = 'textarea',
   label,
   placeholder,
   itemId,
@@ -54,19 +104,15 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
   updateTextMutation,
   onTextUpdated,
   refetchQueries = [],
-  typeCheck,
   helpText,
   errorText = 'Invalid input',
   translationNamespace,
   isMandatory = false,
   // EduHub specific props
-  element = 'textarea',
-  refetchQuery,
   debounceTimeout = 1000,
   maxLength = 200,
   className = '',
   forceNotifyByEnter = false,
-  isMarkdown = false,
   showCharacterCount = true,
   invertColors = false,
   ...props
@@ -78,6 +124,7 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
   const { error, handleError, resetError } = useErrorHandler();
   const theme = useTheme();
   const [showSavedNotification, setShowSavedNotification] = useState(false);
+  const [errorState, setErrorState] = useState<string | null>(null);
 
   useEffect(() => {
     setLocalText(currentText);
@@ -89,21 +136,24 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
       if (onTextUpdated) onTextUpdated(data);
       setShowSavedNotification(true);
     },
-    refetchQueries: variant === 'material' ? refetchQueries : undefined,
+    refetchQueries: refetchQueries,
   });
 
-  const validateText = useCallback(
-    (newText: string) => {
-      if (typeCheck) {
-        return typeCheck(newText) || (!isMandatory && newText === '');
-      }
-      return isMandatory ? newText !== '' : true;
-    },
-    [typeCheck, isMandatory]
-  );
+  const validateInput = (text: string): boolean => {
+    switch (type) {
+      case 'link':
+        return isLinkFormat(text);
+      case 'email':
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text);
+      case 'ects':
+        return isECTSFormat(text);
+      default:
+        return true;
+    }
+  };
 
   const debouncedUpdateText = useDebouncedCallback((newText: string) => {
-    if (validateText(newText)) {
+    if (validateInput(newText)) {
       updateText({ variables: { itemId, text: newText } });
       setErrorMessage('');
       setShowSavedNotification(true);
@@ -124,7 +174,7 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
 
   const handleBlur = useCallback(() => {
     setHasBlurred(true);
-    if (!validateText(localText)) {
+    if (!validateInput(localText)) {
       setErrorMessage(t(errorText));
       if (variant === 'eduhub') {
         handleError(t(errorText)); // Only trigger error handling for eduhub variant
@@ -136,7 +186,7 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
       }
     }
     debouncedUpdateText.flush();
-  }, [variant, localText, validateText, debouncedUpdateText, t, errorText, handleError, resetError]);
+  }, [variant, localText, validateInput, debouncedUpdateText, t, errorText, handleError, resetError]);
 
   const [showPreview, setShowPreview] = useState(false);
   const togglePreview = () => setShowPreview(!showPreview);
@@ -187,13 +237,13 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
             )}
             {label}
           </div>
-          {isMarkdown && (
+          {type === 'markdown' && (
             <button className="text-white text-xs px-3 pt-2" onClick={togglePreview}>
               {showPreview ? <u>{t('edit_markdown')}</u> : <u>{t('preview')}</u>}
             </button>
           )}
         </div>
-        {isMarkdown && showPreview ? (
+        {type === 'markdown' && showPreview ? (
           <div className={`${finalClassName} bg-gray-600`.trim()}>
             <ReactMarkdown
               className="prose max-w-none text-white whitespace-normal break-words"
@@ -205,10 +255,11 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
         ) : (
           <div className="relative">
             <DebounceInput
-              element={element}
+              element={type === 'markdown' ? 'textarea' : 'input'}
+              type={type === 'ects' ? 'number' : 'text'}
               debounceTimeout={debounceTimeout}
               forceNotifyByEnter={forceNotifyByEnter}
-              className={finalClassName}
+              className={`${finalClassName} ${errorState ? 'border-red-500' : ''}`}
               value={localText}
               onChange={handleTextChange}
               onBlur={handleBlur}
@@ -216,7 +267,7 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
               placeholder={t(placeholder || '')}
               {...props}
             />
-            {showCharacterCount && (
+            {showCharacterCount && type !== 'ects' && (
               <div className="absolute top-0 right-0 mr-2 mt-1 text-xs text-gray-400">
                 {`${localText.length}/${maxLength}`}
               </div>
