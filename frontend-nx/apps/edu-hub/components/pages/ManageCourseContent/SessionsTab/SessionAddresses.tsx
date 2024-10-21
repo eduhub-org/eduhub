@@ -2,7 +2,7 @@ import useTranslation from 'next-translate/useTranslation';
 import { FC } from 'react';
 import { ManagedCourse_Course_by_pk_Sessions_SessionAddresses } from '../../../../queries/__generated__/ManagedCourse';
 import { UPDATE_SESSION_ADDRESS } from '../../../../queries/course';
-import TextFieldEditor from '../../../forms/TextFieldEditor';
+import InputField from '../../../forms/InputField';
 import { isLinkFormat } from '../../../../helpers/util';
 
 interface SessionAddressesIProps {
@@ -30,14 +30,14 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
       {isOnline ? (
         <div className="h-2 mb-0 ml-16">{value}</div>
       ) : (
-        <TextFieldEditor
+        <InputField
           variant="eduhub"
           type="input"
-          updateTextMutation={UPDATE_SESSION_ADDRESS}
+          updateMutation={UPDATE_SESSION_ADDRESS}
           refetchQueries={refetchQueries}
           itemId={address.id}
           placeholder={placeholder}
-          currentText={value}
+          value={value}
           className="h-2 mb-0 ml-11 w-1/2"
           showCharacterCount={false}
           invertColors={true}

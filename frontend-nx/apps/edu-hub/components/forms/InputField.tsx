@@ -19,7 +19,7 @@ import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 import { isLinkFormat, isECTSFormat } from '../../helpers/util';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 
-type TextFieldEditorProps = {
+type InputFieldProps = {
   // Determines the visual style and behavior of the component
   // 'material' uses Material-UI components, 'eduhub' uses custom styling
   variant: 'material' | 'eduhub';
@@ -40,8 +40,8 @@ type TextFieldEditorProps = {
   // Unique identifier for the item being edited
   itemId: number;
 
-  // The current text value of the input field
-  currentText: string;
+  // The current value of the input field
+  value: string;
 
   // GraphQL mutation to update the text
   // The mutation should accept two variables: 'itemId' and 'text'
@@ -54,10 +54,10 @@ type TextFieldEditorProps = {
   //     }
   //   }
   // `;
-  updateTextMutation: DocumentNode;
+  updateMutation: DocumentNode;
 
   // Callback function called after successful text update
-  onTextUpdated?: (data: any) => void;
+  onValueUpdated?: (data: any) => void;
 
   // List of GraphQL query names to refetch after mutation
   refetchQueries?: string[];
@@ -95,15 +95,15 @@ type TextFieldEditorProps = {
   [x: string]: any;
 };
 
-const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
+const InputField: React.FC<InputFieldProps> = ({
   variant,
   type = 'textarea',
   label,
   placeholder,
   itemId,
-  currentText,
-  updateTextMutation,
-  onTextUpdated,
+  value,
+  updateMutation,
+  onValueUpdated,
   refetchQueries = [],
   helpText,
   translationNamespace,
@@ -118,7 +118,7 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
   ...props
 }) => {
   const { t } = useTranslation(translationNamespace);
-  const [localText, setLocalText] = useState(currentText);
+  const [localText, setLocalText] = useState(value);
   const [hasBlurred, setHasBlurred] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { error, handleError, resetError } = useErrorHandler();
@@ -127,13 +127,13 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
   const [errorState, setErrorState] = useState<string | null>(null);
 
   useEffect(() => {
-    setLocalText(currentText);
-  }, [currentText]);
+    setLocalText(value);
+  }, [value]);
 
-  const [updateText] = useRoleMutation(updateTextMutation, {
+  const [updateText] = useRoleMutation(updateMutation, {
     onError: (error) => handleError(t(error.message)),
     onCompleted: (data) => {
-      if (onTextUpdated) onTextUpdated(data);
+      if (onValueUpdated) onValueUpdated(data);
       setShowSavedNotification(true);
     },
     refetchQueries: refetchQueries,
@@ -312,4 +312,4 @@ const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
   );
 };
 
-export default TextFieldEditor;
+export default InputField;

@@ -10,7 +10,7 @@ import {
   UPDATE_COURSE_LOCATION,
   UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
 } from '../../../../queries/course';
-import TextFieldEditor from '../../../forms/TextFieldEditor';
+import InputField from '../../../forms/InputField';
 import { isLinkFormat } from '../../../../helpers/util';
 import DeleteButton from '../../../../components/common/DeleteButton';
 
@@ -58,14 +58,14 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete, refetchQuer
         </div>
       )}
       <div className="col-span-7">
-        <TextFieldEditor
+        <InputField
           variant="eduhub"
           type={location?.locationOption === 'ONLINE' ? 'link' : 'input'}
-          updateTextMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
+          updateMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
           refetchQueries={['ManagedCourse']}
           itemId={location.id}
           placeholder={t(address_placeholder)}
-          currentText={location?.defaultSessionAddress || ''}
+          value={location?.defaultSessionAddress || ''}
           className="mb-2"
           showCharacterCount={false}
         />

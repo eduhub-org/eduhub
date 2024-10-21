@@ -4,7 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import TextFieldEditor from '../../forms/TextFieldEditor';
+import InputField from '../../forms/InputField';
 import FileUpload from '../../forms/FileUpload';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 
@@ -26,7 +26,6 @@ import {
   AchievementDocumentationTemplates_AchievementDocumentationTemplate,
 } from '../../../queries/__generated__/AchievementDocumentationTemplates';
 import { PageBlock } from '../../common/PageBlock';
-import EhAddButton from '../../common/EhAddButton';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import {
   InsertAchievementDocumentationTemplate,
@@ -69,12 +68,12 @@ const ManageAchievementTemplatesContent: FC = () => {
           width: 3,
         },
         cell: ({ getValue, column, row }) => (
-          <TextFieldEditor
+          <InputField
             variant="material"
             type="input"
-            currentText={getValue<string>()}
+            value={getValue<string>()}
             label={t(column.columnDef.id)}
-            updateTextMutation={UPDATE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE_TITLE}
+            updateMutation={UPDATE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE_TITLE}
             itemId={row.original.id}
             placeholder={t(column.columnDef.id)}
             refetchQueries={['AchievementDocumentationTemplates']}

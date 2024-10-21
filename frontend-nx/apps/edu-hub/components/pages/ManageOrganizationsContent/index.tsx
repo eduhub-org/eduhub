@@ -8,7 +8,7 @@ import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirm
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import TextFieldEditor from '../../forms/TextFieldEditor';
+import InputField from '../../forms/InputField';
 import UnifiedDropDownSelector from '../../forms/UnifiedDropDownSelector';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
@@ -60,14 +60,14 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row }): React
         refetchQueries={['OrganizationList']}
         translationNamespace="manageOrganizations"
       />
-      <TextFieldEditor
+      <InputField
         variant="material"
         type="input"
         label={t('organization.description')}
         placeholder={t('input.enter_description')}
         itemId={row.id}
-        currentText={row.description || ''}
-        updateTextMutation={UPDATE_ORGANIZATION_DESCRIPTION}
+        value={row.description || ''}
+        updateMutation={UPDATE_ORGANIZATION_DESCRIPTION}
         refetchQueries={['OrganizationList']}
         translationNamespace="manageOrganizations"
       />
@@ -129,13 +129,13 @@ const ManageOrganizationsContent: FC = () => {
         header: 'organization.name',
         meta: { width: 3 },
         cell: ({ getValue, row }) => (
-          <TextFieldEditor
+          <InputField
             variant="material"
             type="input"
             placeholder={t('input.enter_name')}
             itemId={row.original.id}
-            currentText={getValue<string>()}
-            updateTextMutation={UPDATE_ORGANIZATION_NAME}
+            value={getValue<string>()}
+            updateMutation={UPDATE_ORGANIZATION_NAME}
             refetchQueries={['OrganizationList']}
             translationNamespace="manageOrganizations"
           />

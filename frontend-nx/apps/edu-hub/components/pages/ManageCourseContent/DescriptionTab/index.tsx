@@ -29,7 +29,6 @@ import EduHubNumberFieldEditor from '../../../forms/EduHubNumberFieldEditor';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import useErrorHandler from '../../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
-import { useStartTimeString, useEndTimeString } from '../../../../helpers/dateTimeHelpers';
 import {
   DeleteCourseLocation,
   DeleteCourseLocationVariables,
@@ -50,7 +49,7 @@ import {
   InsertSessionAddress,
   InsertSessionAddressVariables,
 } from '../../../../queries/__generated__/InsertSessionAddress';
-import TextFieldEditor from '../../../forms/TextFieldEditor';
+import InputField from '../../../forms/InputField';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -60,8 +59,6 @@ interface IProps {
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const { error, handleError, resetError } = useErrorHandler();
   const { t } = useTranslation('course-page');
-  const getStartTimeString = useStartTimeString();
-  const getEndTimeString = useEndTimeString();
 
   const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_COURSE_LOCATION,
@@ -170,12 +167,12 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2">
-        <TextFieldEditor
+        <InputField
           variant="eduhub"
           type="textarea"
           value={course.tagline}
           label={t('short_description.label')}
-          updateTextMutation={UPDATE_COURSE_SHORT_DESCRIPTION}
+          updateMutation={UPDATE_COURSE_SHORT_DESCRIPTION}
           refetchQueries={['ManagedCourse']}
           itemId={course.id}
           placeholder={t('short_description.placeholder')}
@@ -184,11 +181,11 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           currentText={course.tagline}
           maxLength={500}
         />
-        <TextFieldEditor
+        <InputField
           variant="eduhub"
           type="textarea"
           value={course.learningGoals ?? ''}
-          updateTextMutation={UPDATE_COURSE_LEARNING_GOALS}
+          updateMutation={UPDATE_COURSE_LEARNING_GOALS}
           refetchQueries={['ManagedCourse']}
           itemId={course.id}
           label={t('learning_goals.label')}
@@ -201,12 +198,12 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div>
-          <TextFieldEditor
+          <InputField
             variant="eduhub"
             type="input"
             value={course.headingDescriptionField1 ?? ''}
             itemId={course.id}
-            updateTextMutation={UPDATE_COURSE_HEADING_DESCRIPTION_1}
+            updateMutation={UPDATE_COURSE_HEADING_DESCRIPTION_1}
             refetchQueries={['ManagedCourse']}
             label={t('info_block_1_title.label')}
             placeholder={t('info_block_1_title.placeholder')}
@@ -214,12 +211,12 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             className="mb-0"
             currentText={course.headingDescriptionField1 ?? ''}
           />
-          <TextFieldEditor
+          <InputField
             variant="eduhub"
             type="markdown"
             value={course.contentDescriptionField1 ?? ''}
             itemId={course.id}
-            updateTextMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1}
+            updateMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1}
             refetchQueries={['ManagedCourse']}
             placeholder={t('info_block_1_content.placeholder')}
             maxLength={10000}
@@ -228,12 +225,12 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           />
         </div>
         <div>
-          <TextFieldEditor
+          <InputField
             variant="eduhub"
             type="input"
             value={course.headingDescriptionField2 ?? ''}
             itemId={course.id}
-            updateTextMutation={UPDATE_COURSE_HEADING_DESCRIPTION_2}
+            updateMutation={UPDATE_COURSE_HEADING_DESCRIPTION_2}
             refetchQueries={['ManagedCourse']}
             label={t('info_block_2_title.label')}
             helpText={t('info_block_2_title.help_text')}
@@ -241,12 +238,12 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             className="mb-0"
             currentText={course.headingDescriptionField2 ?? ''}
           />
-          <TextFieldEditor
+          <InputField
             variant="eduhub"
             type="markdown"
             value={course.contentDescriptionField2 ?? ''}
             itemId={course.id}
-            updateTextMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2}
+            updateMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2}
             refetchQueries={['ManagedCourse']}
             placeholder={t('info_block_2_content.placeholder')}
             maxLength={10000}
