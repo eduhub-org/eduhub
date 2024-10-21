@@ -144,5 +144,8 @@
     "upload_file": "Upload file",
     "file_size_exceeds_limit": "The file is too large. Please choose a file with a size of {{maxFileSize}}MB or less.",
     "error_uploading_profile_picture": "Error uploading profile picture"
+  },
+  "notification_snackbar": {
+    "saved": "Saved"
   }
 }

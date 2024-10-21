@@ -50,7 +50,7 @@ import {
   InsertSessionAddress,
   InsertSessionAddressVariables,
 } from '../../../../queries/__generated__/InsertSessionAddress';
-import UnifiedTextFieldEditor from '../../../forms/UnifiedTextFieldEditor';
+import TextFieldEditor from '../../../forms/TextFieldEditor';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -170,23 +170,26 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2">
-        <UnifiedTextFieldEditor
+        <TextFieldEditor
           variant="eduhub"
+          type="textarea"
           value={course.tagline}
           label={t('short_description.label')}
           updateTextMutation={UPDATE_COURSE_SHORT_DESCRIPTION}
-          refetchQuery={qResult}
+          refetchQueries={['ManagedCourse']}
           itemId={course.id}
-          placeholder={t('short_description.label')}
+          placeholder={t('short_description.placeholder')}
           helpText={t('short_description.help_text')}
           className="h-64"
           currentText={course.tagline}
+          maxLength={500}
         />
-        <UnifiedTextFieldEditor
+        <TextFieldEditor
           variant="eduhub"
+          type="textarea"
           value={course.learningGoals ?? ''}
           updateTextMutation={UPDATE_COURSE_LEARNING_GOALS}
-          refetchQuery={qResult}
+          refetchQueries={['ManagedCourse']}
           itemId={course.id}
           label={t('learning_goals.label')}
           placeholder={t('learning_goals.placeholder')}
@@ -198,56 +201,56 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div>
-          <UnifiedTextFieldEditor
+          <TextFieldEditor
             variant="eduhub"
-            element="input"
+            type="input"
             value={course.headingDescriptionField1 ?? ''}
             itemId={course.id}
             updateTextMutation={UPDATE_COURSE_HEADING_DESCRIPTION_1}
-            refetchQuery={qResult}
+            refetchQueries={['ManagedCourse']}
             label={t('info_block_1_title.label')}
             placeholder={t('info_block_1_title.placeholder')}
             helpText={t('info_block_1_title.help_text')}
             className="mb-0"
             currentText={course.headingDescriptionField1 ?? ''}
           />
-          <UnifiedTextFieldEditor
+          <TextFieldEditor
             variant="eduhub"
+            type="markdown"
             value={course.contentDescriptionField1 ?? ''}
             itemId={course.id}
             updateTextMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_1}
-            refetchQuery={qResult}
+            refetchQueries={['ManagedCourse']}
             placeholder={t('info_block_1_content.placeholder')}
             maxLength={10000}
             className="h-64"
-            isMarkdown={true}
             currentText={course.contentDescriptionField1 ?? ''}
           />
         </div>
         <div>
-          <UnifiedTextFieldEditor
+          <TextFieldEditor
             variant="eduhub"
-            element="input"
+            type="input"
             value={course.headingDescriptionField2 ?? ''}
             itemId={course.id}
             updateTextMutation={UPDATE_COURSE_HEADING_DESCRIPTION_2}
-            refetchQuery={qResult}
+            refetchQueries={['ManagedCourse']}
             label={t('info_block_2_title.label')}
             helpText={t('info_block_2_title.help_text')}
             placeholder={t('info_block_2_title.placeholder')}
             className="mb-0"
             currentText={course.headingDescriptionField2 ?? ''}
           />
-          <UnifiedTextFieldEditor
+          <TextFieldEditor
             variant="eduhub"
+            type="markdown"
             value={course.contentDescriptionField2 ?? ''}
             itemId={course.id}
             updateTextMutation={UPDATE_COURSE_CONTENT_DESCRIPTION_FIELD_2}
-            refetchQuery={qResult}
+            refetchQueries={['ManagedCourse']}
             placeholder={t('info_block_2_content.placeholder')}
             maxLength={10000}
             className="h-64"
-            isMarkdown={true}
             currentText={course.contentDescriptionField2 ?? ''}
           />
         </div>

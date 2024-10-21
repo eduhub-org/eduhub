@@ -8,7 +8,7 @@ import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirm
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import UnifiedTextFieldEditor from '../../forms/UnifiedTextFieldEditor';
+import TextFieldEditor from '../../forms/TextFieldEditor';
 import UnifiedDropDownSelector from '../../forms/UnifiedDropDownSelector';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
@@ -60,8 +60,9 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row }): React
         refetchQueries={['OrganizationList']}
         translationNamespace="manageOrganizations"
       />
-      <UnifiedTextFieldEditor
+      <TextFieldEditor
         variant="material"
+        type="input"
         label={t('organization.description')}
         placeholder={t('input.enter_description')}
         itemId={row.id}
@@ -128,8 +129,9 @@ const ManageOrganizationsContent: FC = () => {
         header: 'organization.name',
         meta: { width: 3 },
         cell: ({ getValue, row }) => (
-          <UnifiedTextFieldEditor
+          <TextFieldEditor
             variant="material"
+            type="input"
             placeholder={t('input.enter_name')}
             itemId={row.original.id}
             currentText={getValue<string>()}

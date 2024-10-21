@@ -14,17 +14,21 @@ import remarkGfm from 'remark-gfm';
 import { prioritizeClasses } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
-import { QueryResult } from '@apollo/client';
 import Snackbar from '@mui/material/Snackbar';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 import { isLinkFormat, isECTSFormat } from '../../helpers/util';
+import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 
-type UnifiedTextFieldEditorProps = {
+type TextFieldEditorProps = {
   // Determines the visual style and behavior of the component
   // 'material' uses Material-UI components, 'eduhub' uses custom styling
   variant: 'material' | 'eduhub';
 
-  // HTML element type to use for input, now including 'markdown' option
+  // HTML element type to use for input
+  // Support for types:
+  // - Both variants fully support: 'input', 'textarea', 'link', 'email', 'ects'
+  // - 'markdown' is only supported for 'eduhub' variant
+  // - 'link', 'email', and 'ects' are specialized input types with custom validation
   type?: 'input' | 'textarea' | 'markdown' | 'link' | 'email' | 'ects';
 
   // The label text for the input field
@@ -61,9 +65,6 @@ type UnifiedTextFieldEditorProps = {
   // Text shown in tooltip to provide additional information
   helpText?: string;
 
-  // Error message displayed when input is invalid
-  errorText?: string;
-
   // Namespace for translations
   translationNamespace?: string;
 
@@ -94,7 +95,7 @@ type UnifiedTextFieldEditorProps = {
   [x: string]: any;
 };
 
-const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
+const TextFieldEditor: React.FC<TextFieldEditorProps> = ({
   variant,
   type = 'textarea',
   label,
@@ -105,7 +106,6 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
   onTextUpdated,
   refetchQueries = [],
   helpText,
-  errorText = 'Invalid input',
   translationNamespace,
   isMandatory = false,
   // EduHub specific props
@@ -152,13 +152,26 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
     }
   };
 
+  const getErrorMessage = (inputType: string): string => {
+    switch (inputType) {
+      case 'link':
+        return t('Invalid link format');
+      case 'email':
+        return t('Invalid email format');
+      case 'ects':
+        return t('Invalid ECTS format');
+      default:
+        return t('Invalid input');
+    }
+  };
+
   const debouncedUpdateText = useDebouncedCallback((newText: string) => {
     if (validateInput(newText)) {
       updateText({ variables: { itemId, text: newText } });
       setErrorMessage('');
       setShowSavedNotification(true);
     } else {
-      setErrorMessage(t(errorText));
+      setErrorMessage(getErrorMessage(type));
     }
     setHasBlurred(false);
   }, debounceTimeout);
@@ -175,18 +188,18 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
   const handleBlur = useCallback(() => {
     setHasBlurred(true);
     if (!validateInput(localText)) {
-      setErrorMessage(t(errorText));
+      setErrorMessage(getErrorMessage(type));
       if (variant === 'eduhub') {
-        handleError(t(errorText)); // Only trigger error handling for eduhub variant
+        handleError(getErrorMessage(type));
       }
     } else {
       setErrorMessage('');
       if (variant === 'eduhub') {
-        resetError(); // Only reset error state for eduhub variant
+        resetError();
       }
     }
     debouncedUpdateText.flush();
-  }, [variant, localText, validateInput, debouncedUpdateText, t, errorText, handleError, resetError]);
+  }, [variant, localText, validateInput, debouncedUpdateText, type, handleError, resetError]);
 
   const [showPreview, setShowPreview] = useState(false);
   const togglePreview = () => setShowPreview(!showPreview);
@@ -206,22 +219,29 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
         value={localText}
         onChange={handleTextChange}
         onBlur={handleBlur}
-        InputLabelProps={{
-          style: { color: hasBlurred && errorMessage ? 'red' : 'rgb(34, 34, 34)' },
-        }}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <Tooltip title={t(helpText || '')} placement="top">
-                <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled }} />
-              </Tooltip>
-            </InputAdornment>
-          ),
-          style: { color: hasBlurred && errorMessage ? 'red' : 'inherit' },
+        slotProps={{
+          inputLabel: {
+            style: { color: hasBlurred && errorMessage ? 'red' : 'rgb(34, 34, 34)' },
+          },
+          input: {
+            style: { color: hasBlurred && errorMessage ? 'red' : 'inherit' },
+            endAdornment: (
+              <InputAdornment position="end">
+                <Tooltip title={t(helpText || '')} placement="top">
+                  <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled }} />
+                </Tooltip>
+              </InputAdornment>
+            ),
+          },
         }}
         {...props}
       />
       {hasBlurred && errorMessage && <p className="text-red-500 mt-2 ml-2 text-sm">{errorMessage}</p>}
+      <NotificationSnackbar
+        open={showSavedNotification}
+        onClose={() => setShowSavedNotification(false)}
+        message="notification_snackbar.saved"
+      />
     </div>
   );
 
@@ -255,7 +275,7 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
         ) : (
           <div className="relative">
             <DebounceInput
-              element={type === 'markdown' ? 'textarea' : 'input'}
+              element={type === 'textarea' || type === 'markdown' ? 'textarea' : 'input'}
               type={type === 'ects' ? 'number' : 'text'}
               debounceTimeout={debounceTimeout}
               forceNotifyByEnter={forceNotifyByEnter}
@@ -276,12 +296,10 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
         )}
       </div>
       {error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
-      <Snackbar
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      <NotificationSnackbar
         open={showSavedNotification}
-        autoHideDuration={2000}
         onClose={() => setShowSavedNotification(false)}
-        message={t('Saved')}
+        message="notification_snackbar.saved"
       />
     </div>
   );
@@ -294,4 +312,4 @@ const UnifiedTextFieldEditor: React.FC<UnifiedTextFieldEditorProps> = ({
   );
 };
 
-export default UnifiedTextFieldEditor;
+export default TextFieldEditor;

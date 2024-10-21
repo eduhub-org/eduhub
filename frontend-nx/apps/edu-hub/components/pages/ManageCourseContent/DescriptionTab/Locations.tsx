@@ -10,7 +10,7 @@ import {
   UPDATE_COURSE_LOCATION,
   UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
 } from '../../../../queries/course';
-import UnifiedTextFieldEditor from '../../../forms/UnifiedTextFieldEditor';
+import TextFieldEditor from '../../../forms/TextFieldEditor';
 import { isLinkFormat } from '../../../../helpers/util';
 import DeleteButton from '../../../../components/common/DeleteButton';
 
@@ -58,18 +58,16 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete, refetchQuer
         </div>
       )}
       <div className="col-span-7">
-        <UnifiedTextFieldEditor
+        <TextFieldEditor
           variant="eduhub"
-          element="input"
+          type={location?.locationOption === 'ONLINE' ? 'link' : 'input'}
           updateTextMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
-          refetchQuery={refetchQuery}
+          refetchQueries={['ManagedCourse']}
           itemId={location.id}
           placeholder={t(address_placeholder)}
-          value={location?.defaultSessionAddress || ''}
           currentText={location?.defaultSessionAddress || ''}
-          typeCheck={typeCheckFunction}
-          errorText={t('address.errorText')}
           className="mb-2"
+          showCharacterCount={false}
         />
       </div>
       <div>{location && <DeleteButton handleDelete={handleDelete} />}</div>

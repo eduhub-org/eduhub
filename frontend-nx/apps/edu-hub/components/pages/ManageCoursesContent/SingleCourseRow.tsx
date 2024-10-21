@@ -51,7 +51,7 @@ import participantsRatedPie from '../../../public/images/course/status/participa
 
 import { InstructorColumn } from './CoursesInstructorColumn';
 import TagSelector from '../../forms/TagSelector';
-import UnifiedTextFieldEditor from '../../forms/UnifiedTextFieldEditor';
+import TextFieldEditor from '../../forms/TextFieldEditor';
 import {
   UPDATE_COURSE_CHAT_LINK,
   UPDATE_COURSE_ECTS,
@@ -471,17 +471,16 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                     locale={lang}
                   />
                 </div>
-                <UnifiedTextFieldEditor
+                <TextFieldEditor
                   variant="material"
-                  label={'chat_link.label'}
-                  placeholder={'chat_link.label'}
+                  type="link"
+                  label="chat_link.label"
+                  placeholder="chat_link.label"
                   itemId={course.id}
                   currentText={course.chatLink || ''}
                   updateTextMutation={UPDATE_COURSE_CHAT_LINK}
                   refetchQueries={['AdminCourseList']}
-                  typeCheck={isLinkFormat}
                   helpText="chat_link.help_text"
-                  errorText="chat_link.error_text"
                   translationNamespace="manageCourses"
                 />
                 <td>
@@ -499,17 +498,16 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                       {!course.achievementCertificatePossible && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
                     </div>
                     <div className="col-span-3">{t('course-page:performance-certificate')}</div>
-                    <UnifiedTextFieldEditor
+                    <TextFieldEditor
                       variant="material"
-                      label={'ects.label'}
-                      placeholder={'ects.label'}
+                      type="ects"
+                      label="ects.label"
+                      placeholder="ects.label"
                       itemId={course.id}
                       currentText={course.ects || ''}
                       updateTextMutation={UPDATE_COURSE_ECTS}
                       refetchQueries={['AdminCourseList']}
-                      typeCheck={isECTSFormat}
                       helpText="ects.help_text"
-                      errorText="ects.error_text"
                       translationNamespace="manageCourses"
                     />
                     <TagSelector
@@ -535,17 +533,16 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                       deleteTagMutation={DELETE_COURSE_DEGREE_TAG}
                       refetchQueries={['AdminCourseList']}
                     />
-                    <UnifiedTextFieldEditor
+                    <TextFieldEditor
                       variant="material"
-                      label={'external_registration_link.label'}
-                      placeholder={'external_registration_link.label'}
+                      type="link"
+                      label="external_registration_link.label"
+                      placeholder="external_registration_link.label"
                       itemId={course.id}
                       currentText={course.externalRegistrationLink || ''}
                       updateTextMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
                       refetchQueries={['AdminCourseList']}
-                      typeCheck={isLinkFormat}
                       helpText="external_registration_link.help_text"
-                      errorText="external_registration_link.error_text"
                       translationNamespace="manageCourses"
                     />
                   </div>

@@ -4,7 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import UnifiedTextFieldEditor from '../../forms/UnifiedTextFieldEditor';
+import TextFieldEditor from '../../forms/TextFieldEditor';
 import FileUpload from '../../forms/FileUpload';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 
@@ -69,8 +69,9 @@ const ManageAchievementTemplatesContent: FC = () => {
           width: 3,
         },
         cell: ({ getValue, column, row }) => (
-          <UnifiedTextFieldEditor
+          <TextFieldEditor
             variant="material"
+            type="input"
             currentText={getValue<string>()}
             label={t(column.columnDef.id)}
             updateTextMutation={UPDATE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE_TITLE}
