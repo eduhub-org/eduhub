@@ -4,7 +4,7 @@
   "dependencies": {
     "@keycloak/keycloak-admin-client": "^16.1.0",
     "body-parser": "1.20.3",
-    "node-fetch": "2.6.0",
+    "node-fetch": "2.6.7",
     "graphqurl": "1.0.1"
   },
   "devDependencies": {
