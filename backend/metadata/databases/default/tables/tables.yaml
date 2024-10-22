@@ -31,8 +31,6 @@
 - "!include public_MailStatus.yaml"
 - "!include public_MailTemplate.yaml"
 - "!include public_MotivationRating.yaml"
-- "!include public_Organization.yaml"
-- "!include public_OrganizationType.yaml"
 - "!include public_Program.yaml"
 - "!include public_Session.yaml"
 - "!include public_SessionAddress.yaml"
