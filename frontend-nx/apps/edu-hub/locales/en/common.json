@@ -159,6 +159,9 @@
     "select_time": "Select time",
     "invalid_time": "Invalid time"
   },
+  "tag_selector": {
+    "selection_required": "Please select at least one tag."
+  },
   "notification_snackbar": {
     "saved": "Saved"
   }

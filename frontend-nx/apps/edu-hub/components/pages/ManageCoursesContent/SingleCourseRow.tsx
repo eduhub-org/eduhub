@@ -508,25 +508,28 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                       helpText={t('manageCourses:ects.help_text')}
                     />
                     <TagSelector
+                      variant="material"
                       className="col-span-10 flex mt-3"
                       label={t('course-page:courseGroups')}
                       placeholder={t('course-page:courseGroups')}
                       itemId={course.id}
-                      currentTags={currentCourseGroups}
-                      tagOptions={courseGroupOptions}
-                      insertTagMutation={INSERT_COURSE_GROUP_TAG}
-                      deleteTagMutation={DELETE_COURSE_GROUP_TAG}
+                      values={currentCourseGroups}
+                      options={courseGroupOptions}
+                      insertValueMutation={INSERT_COURSE_GROUP_TAG}
+                      deleteValueMutation={DELETE_COURSE_GROUP_TAG}
                       refetchQueries={['AdminCourseList']}
+                      optionsTranslationPrefix="start-page:"
                     />
                     <TagSelector
+                      variant="material"
                       className="col-span-10 flex mt-3"
                       label={t('course-page:courseDegreeTitle')}
                       placeholder={t('course-page:courseDegree')}
                       itemId={course.id}
-                      currentTags={currentCourseDegrees}
-                      tagOptions={degreeCourses}
-                      insertTagMutation={INSERT_COURSE_DEGREE_TAG}
-                      deleteTagMutation={DELETE_COURSE_DEGREE_TAG}
+                      values={currentCourseDegrees}
+                      options={degreeCourses}
+                      insertValueMutation={INSERT_COURSE_DEGREE_TAG}
+                      deleteValueMutation={DELETE_COURSE_DEGREE_TAG}
                       refetchQueries={['AdminCourseList']}
                     />
                     <InputField

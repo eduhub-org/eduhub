@@ -159,6 +159,9 @@
     "select_time": "Zeit auswählen",
     "invalid_time": "Ungültige Zeit"
   },
+  "tag_selector": {
+    "selection_required": "Bitte wähle mindestens einen Wert aus."
+  },
   "notification_snackbar": {
     "saved": "Gespeichert"
   }
