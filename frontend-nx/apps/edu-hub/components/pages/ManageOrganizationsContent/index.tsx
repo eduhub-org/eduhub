@@ -51,14 +51,14 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row }): React
   return (
     <div className="font-medium bg-edu-course-list p-4">
       <CreatableTagSelector
+        variant="material"
         label={t('organization.aliases')}
         placeholder={t('input.enter_alias')}
         itemId={row.id}
-        currentTags={currentTags}
-        tagOptions={[]}
-        updateTagsMutation={UPDATE_ORGANIZATION_ALIASES}
+        values={currentTags}
+        options={[]}
+        updateValuesMutation={UPDATE_ORGANIZATION_ALIASES}
         refetchQueries={['OrganizationList']}
-        translationNamespace="manageOrganizations"
       />
       <InputField
         variant="material"

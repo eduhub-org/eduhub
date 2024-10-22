@@ -6,15 +6,62 @@ import { DocumentNode } from 'graphql';
 import useTranslation from 'next-translate/useTranslation';
 
 type CreatableTagSelectorProps = {
+  // Determines the visual style and behavior of the component
+  // 'material' uses Material-UI components, 'eduhub' uses custom styling
+  variant: 'material' | 'eduhub';
+
+  // The label text displayed above the input field
   label: string;
+
+  // Placeholder text shown in the input field when it's empty
   placeholder: string;
+
+  // Unique identifier for the item being edited (e.g., organization ID, course ID)
   itemId: number;
-  currentTags: string[];
-  tagOptions: string[];
-  updateTagsMutation: DocumentNode;
-  refetchQueries: string[];
+
+  // Array of currently selected tags (strings)
+  values: string[];
+
+  // Array of available tag options (strings) to choose from
+  options: string[];
+
+  // GraphQL mutation to update the tags
+  // This mutation should accept two variables: 'itemId' and 'tags'
+  // Example:
+  // const UPDATE_TAGS = gql`
+  //   mutation UpdateTags($itemId: Int!, $tags: [String!]!) {
+  //     updateTags(itemId: $itemId, tags: $tags) {
+  //       id
+  //       tags
+  //     }
+  //   }
+  // `;
+  updateValuesMutation: DocumentNode;
+
+  // Callback function called after successful tag update
+  // It receives the data returned by the mutation
+  onTagsUpdated?: (data: any) => void;
+
+  // List of GraphQL query names to refetch after the mutation
+  // This ensures that the UI is updated with the latest data
+  refetchQueries?: string[];
+
+  // Text shown in tooltip to provide additional information about the field
+  helpText?: string;
+
+  // Indicates if the field is required
+  // If true, an error message will be shown if no tags are selected
+  isMandatory?: boolean;
+
+  // Delay in milliseconds before triggering the update after input
+  // This helps to reduce the number of API calls while typing
+  debounceTimeout?: number;
+
+  // Additional CSS classes to apply to the input field
   className?: string;
-  translationNamespace?: string;
+
+  // If true, inverts the color scheme (useful for dark mode)
+  invertColors?: boolean;
 };
 
 interface TagOption {
@@ -25,25 +72,30 @@ interface TagOption {
 const filter = createFilterOptions<TagOption>();
 
 const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
+  variant,
   label,
   placeholder,
   itemId,
-  currentTags,
-  tagOptions,
-  updateTagsMutation,
+  values,
+  options,
+  updateValuesMutation,
+  onTagsUpdated,
   refetchQueries,
+  helpText,
+  isMandatory,
+  debounceTimeout,
   className,
-  translationNamespace,
+  invertColors,
 }) => {
-  const [tags, setTags] = useState<TagOption[]>(currentTags.map((tag) => ({ value: tag })));
+  const [tags, setTags] = useState<TagOption[]>(values.map((tag) => ({ value: tag })));
   const [inputValue, setInputValue] = useState('');
-  const { t } = useTranslation(translationNamespace);
+  const { t } = useTranslation();
 
   useEffect(() => {
-    setTags(currentTags.map((tag) => ({ value: tag })));
-  }, [currentTags]);
+    setTags(values.map((tag) => ({ value: tag })));
+  }, [values]);
 
-  const [updateTags] = useAdminMutation(updateTagsMutation, {
+  const [updateValues] = useAdminMutation(updateValuesMutation, {
     refetchQueries,
   });
 
@@ -54,7 +106,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
 
     const uniqueTags = Array.from(new Set(updatedTags)); // Remove duplicates
 
-    updateTags({
+    updateValues({
       variables: {
         id: itemId,
         tags: uniqueTags,
@@ -80,7 +132,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
       <Autocomplete
         multiple
         id="tags-autocomplete"
-        options={tagOptions.map((tag) => ({ value: tag }))}
+        options={options.map((tag) => ({ value: tag }))}
         value={tags}
         onChange={handleTagChange}
         inputValue={inputValue}
