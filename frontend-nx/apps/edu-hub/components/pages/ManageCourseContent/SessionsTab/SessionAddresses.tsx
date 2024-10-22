@@ -33,7 +33,7 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
         <InputField
           variant="eduhub"
           type="input"
-          updateMutation={UPDATE_SESSION_ADDRESS}
+          updateValueMutation={UPDATE_SESSION_ADDRESS}
           refetchQueries={refetchQueries}
           itemId={address.id}
           placeholder={placeholder}

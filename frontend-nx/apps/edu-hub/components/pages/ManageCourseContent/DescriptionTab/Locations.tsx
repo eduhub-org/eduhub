@@ -2,7 +2,7 @@ import { QueryResult } from '@apollo/client';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback } from 'react';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
-import UnifiedDropDownSelector from '../../../forms/UnifiedDropDownSelector';
+import DropDownSelector from '../../../forms/DropDownSelector';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { LocationOptions } from '../../../../queries/__generated__/LocationOptions';
 import {
@@ -45,14 +45,14 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete, refetchQuer
     <div className="grid grid-cols-12 items-center">
       {location && (
         <div className="col-span-2">
-          <UnifiedDropDownSelector
+          <DropDownSelector
             variant="eduhub"
             options={locationOptions}
-            currentValue={location.locationOption || 'ONLINE'}
+            value={location.locationOption || 'ONLINE'}
             updateValueMutation={UPDATE_COURSE_LOCATION}
             identifierVariables={{ locationId: location.id }}
             refetchQueries={['ManagedCourse']}
-            translationPrefix="course-page:location."
+            optionsTranslationPrefix="course-page:location."
             className="mb-2"
           />
         </div>
@@ -61,7 +61,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete, refetchQuer
         <InputField
           variant="eduhub"
           type={location?.locationOption === 'ONLINE' ? 'link' : 'input'}
-          updateMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
+          updateValueMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
           refetchQueries={['ManagedCourse']}
           itemId={location.id}
           placeholder={t(address_placeholder)}

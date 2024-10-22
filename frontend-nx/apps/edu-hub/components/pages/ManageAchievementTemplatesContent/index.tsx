@@ -73,7 +73,7 @@ const ManageAchievementTemplatesContent: FC = () => {
             type="input"
             value={getValue<string>()}
             label={t(column.columnDef.id)}
-            updateMutation={UPDATE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE_TITLE}
+            updateValueMutation={UPDATE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE_TITLE}
             itemId={row.original.id}
             placeholder={t(column.columnDef.id)}
             refetchQueries={['AchievementDocumentationTemplates']}

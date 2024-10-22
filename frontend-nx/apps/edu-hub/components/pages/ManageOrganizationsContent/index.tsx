@@ -9,7 +9,7 @@ import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirm
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 import InputField from '../../forms/InputField';
-import UnifiedDropDownSelector from '../../forms/UnifiedDropDownSelector';
+import DropDownSelector from '../../forms/DropDownSelector';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { PageBlock } from '../../common/PageBlock';
@@ -67,7 +67,7 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row }): React
         placeholder={t('input.enter_description')}
         itemId={row.id}
         value={row.description || ''}
-        updateMutation={UPDATE_ORGANIZATION_DESCRIPTION}
+        updateValueMutation={UPDATE_ORGANIZATION_DESCRIPTION}
         refetchQueries={['OrganizationList']}
         translationNamespace="manageOrganizations"
       />
@@ -135,9 +135,8 @@ const ManageOrganizationsContent: FC = () => {
             placeholder={t('input.enter_name')}
             itemId={row.original.id}
             value={getValue<string>()}
-            updateMutation={UPDATE_ORGANIZATION_NAME}
+            updateValueMutation={UPDATE_ORGANIZATION_NAME}
             refetchQueries={['OrganizationList']}
-            translationNamespace="manageOrganizations"
           />
         ),
       },
@@ -146,15 +145,14 @@ const ManageOrganizationsContent: FC = () => {
         header: t('organization.type'),
         meta: { width: 3 },
         cell: ({ getValue, row }) => (
-          <UnifiedDropDownSelector
+          <DropDownSelector
             variant="material"
             identifierVariables={{ id: row.original.id }}
-            currentValue={getValue<string>()}
+            value={getValue<string>()}
             options={organizationTypes}
             updateValueMutation={UPDATE_ORGANIZATION_TYPE}
             refetchQueries={['OrganizationList']}
-            translationNamespace="manageOrganizations"
-            translationPrefix="type_selection."
+            optionsTranslationPrefix="manageOrganizations:type_selection."
           />
         ),
       },

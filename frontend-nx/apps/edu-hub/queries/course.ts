@@ -445,12 +445,12 @@ export const UPDATE_COURSE_SHORT_DESCRIPTION = gql`
 
 export const UPDATE_COURSE_MAX_PARTICIPANTS = gql`
   mutation UpdateCourseMaxParticipants(
-    $courseId: Int!
-    $maxParticipants: Int!
+    $itemId: Int!
+    $text: Int!
   ) {
     update_Course_by_pk(
-      pk_columns: { id: $courseId }
-      _set: { maxParticipants: $maxParticipants }
+      pk_columns: { id: $itemId }
+      _set: { maxParticipants: $text }
     ) {
       id
     }

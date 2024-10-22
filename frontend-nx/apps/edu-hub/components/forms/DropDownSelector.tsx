@@ -14,44 +14,67 @@ import useTranslation from 'next-translate/useTranslation';
 import { prioritizeClasses } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
-import log from 'loglevel';
-import Snackbar from '@mui/material/Snackbar';
+import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
+import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 
-type UnifiedDropDownSelectorProps = {
+type DropDownSelectorProps = {
+  // Determines the visual style and behavior of the component
+  // 'material' uses Material-UI components, 'eduhub' uses custom styling
   variant: 'material' | 'eduhub';
+
+  // The label for the dropdown selector (optional)
   label?: string;
-  identifierVariables: Record<string, any>;
-  currentValue: string;
+
+  // The currently selected value in the dropdown
+  value: string;
+
+  // Array of available options for the dropdown (in format used in the database)
   options: string[];
+
+  // GraphQL mutation to update the selected value
   updateValueMutation: DocumentNode;
+
+  // Callback function triggered after a successful value update (optional)
   onValueUpdated?: (data: any) => void;
+
+  // Array of query names to refetch after a successful update (optional)
   refetchQueries?: string[];
+
+  // Tooltip text to provide additional information about the dropdown (optional)
   helpText?: string;
+
+  // Error message to display when the selection is invalid (optional)
   errorText?: string;
-  translationNamespace?: string;
-  translationPrefix?: string;
+
+  // Prefix for options translations (optional)
+  optionsTranslationPrefix?: string;
+
+  // Indicates if the field is required (optional, default: false)
   isMandatory?: boolean;
+
+  // Additional CSS classes to apply to the component (optional)
   className?: string;
+
+  // Variables to include in the mutation for identification
+  identifierVariables: Record<string, any>;
 };
 
-const UnifiedDropDownSelector: React.FC<UnifiedDropDownSelectorProps> = ({
+const DropDownSelector: React.FC<DropDownSelectorProps> = ({
   variant,
   label,
-  identifierVariables,
-  currentValue,
+  value,
   options,
   updateValueMutation,
   onValueUpdated,
   refetchQueries = [],
   helpText,
-  errorText = 'Invalid selection',
-  translationNamespace,
-  translationPrefix = '',
+  optionsTranslationPrefix = '',
   isMandatory = false,
   className = '',
+  identifierVariables = {},
 }) => {
-  const { t } = useTranslation(translationNamespace);
-  const [value, setValue] = useState(currentValue);
+  const { t } = useTranslation();
+  const [localValue, setLocalValue] = useState(value);
   const [hasBlurred, setHasBlurred] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { error, handleError, resetError } = useErrorHandler();
@@ -65,23 +88,23 @@ const UnifiedDropDownSelector: React.FC<UnifiedDropDownSelectorProps> = ({
       if (onValueUpdated) onValueUpdated(data);
       setShowSavedNotification(true);
     },
-    refetchQueries: variant === 'material' ? refetchQueries : undefined,
+    refetchQueries,
   });
 
-  const validateValue = useCallback(
-    (newValue: string) => {
-      return isMandatory ? newValue !== '' : true;
-    },
-    [isMandatory]
-  );
+  const validateValue = (newValue: string) => {
+    return isMandatory ? newValue !== '' : true;
+  };
 
   const debouncedUpdateValue = useDebouncedCallback((newValue: string) => {
     if (validateValue(newValue)) {
-      const variables = { ...identifierVariables, value: newValue };
+      const variables = {
+        ...identifierVariables,
+        value: newValue,
+      };
       updateValue({ variables });
       setErrorMessage('');
     } else {
-      setErrorMessage(t(errorText));
+      setErrorMessage(t('unified_dropdown_selector.invalid_selection'));
     }
     setHasBlurred(false);
   }, 300);
@@ -89,17 +112,27 @@ const UnifiedDropDownSelector: React.FC<UnifiedDropDownSelectorProps> = ({
   const handleValueChange = useCallback(
     (event: SelectChangeEvent<string> | React.ChangeEvent<HTMLSelectElement>) => {
       const newValue = event.target.value;
-      setValue(newValue);
+      setLocalValue(newValue);
       debouncedUpdateValue(newValue);
-      log.debug('Updating item with new value:', newValue);
     },
     [debouncedUpdateValue]
   );
 
   const handleBlur = useCallback(() => {
     setHasBlurred(true);
-    setErrorMessage(validateValue(value) ? '' : t(errorText));
-  }, [value, errorText, t, validateValue]);
+    if (!validateValue(localValue)) {
+      setErrorMessage(t('dropdown_selector.invalid_selection'));
+      if (variant === 'eduhub') {
+        handleError(t('dropdown_selector.invalid_selection'));
+      }
+    } else {
+      setErrorMessage('');
+      if (variant === 'eduhub') {
+        resetError();
+      }
+    }
+    debouncedUpdateValue.flush();
+  }, [variant, localValue, validateValue, debouncedUpdateValue, handleError, resetError, t]);
 
   const baseClass = 'w-full px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
   const finalClassName = prioritizeClasses(`${baseClass} ${className}`);
@@ -114,7 +147,7 @@ const UnifiedDropDownSelector: React.FC<UnifiedDropDownSelectorProps> = ({
         )}
         <Select
           labelId={label ? `${label}-label` : undefined}
-          value={value}
+          value={localValue}
           onChange={handleValueChange}
           onBlur={handleBlur}
           style={{ color: hasBlurred && errorMessage ? 'red' : 'inherit' }}
@@ -130,7 +163,7 @@ const UnifiedDropDownSelector: React.FC<UnifiedDropDownSelectorProps> = ({
         >
           {options.map((option) => (
             <MenuItem key={option} value={option}>
-              {t(`${translationPrefix}${option}`)}
+              {t(`${optionsTranslationPrefix}${option}`)}
             </MenuItem>
           ))}
         </Select>
@@ -153,10 +186,15 @@ const UnifiedDropDownSelector: React.FC<UnifiedDropDownSelectorProps> = ({
           </div>
         </div>
         <div>
-          <select onChange={handleValueChange} value={value} className={finalClassName}>
+          <select
+            onChange={handleValueChange}
+            onBlur={handleBlur}
+            value={localValue}
+            className={`${finalClassName} ${errorMessage ? 'border-red-500' : ''}`}
+          >
             {options.map((option, index) => (
               <option key={index} value={option}>
-                {t(`${translationPrefix}${option}`)}
+                {t(`${optionsTranslationPrefix}${option}`)}
               </option>
             ))}
           </select>
@@ -168,16 +206,15 @@ const UnifiedDropDownSelector: React.FC<UnifiedDropDownSelectorProps> = ({
   return (
     <>
       {variant === 'material' ? renderMaterialUI() : renderEduhub()}
-      {error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
-      <Snackbar
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      {variant === 'material' && error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
+      {variant === 'eduhub' && error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}
+      <NotificationSnackbar
         open={showSavedNotification}
-        autoHideDuration={2000}
         onClose={() => setShowSavedNotification(false)}
-        message={t('Saved')}
+        message="notification_snackbar.saved"
       />
     </>
   );
 };
 
-export default UnifiedDropDownSelector;
+export default DropDownSelector;

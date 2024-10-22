@@ -26,5 +26,10 @@
   "attendedEvents": "Besuchte Events",
   "certificate": "Zertifikat",
   "projectTitle": "Projekttitel",
-  "lastRecordUpload": "Upload Datum"
+  "lastRecordUpload": "Upload Datum",
+  "max_participants": {
+    "label": "Max. Teilnehmendenanzahl",
+    "placeholder": "Max. Teilnehmendenanzahl",
+    "help_text": "Die maximale Teilnehmendenanzahl diesnt als Information zur Zulassung."
+  }
 }

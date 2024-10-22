@@ -346,7 +346,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
 
   const currentCourseGroups = course.CourseGroups.map((group) => ({
     id: group.CourseGroupOption.id,
-    name: t(group.CourseGroupOption.title),
+    name: t(`start-page:${group.CourseGroupOption.title}`),
   }));
 
   const currentCourseDegrees = course.CourseDegrees.map((degree) => ({
@@ -473,14 +473,13 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                 <InputField
                   variant="material"
                   type="link"
-                  label="chat_link.label"
-                  placeholder="chat_link.label"
+                  label={t('manageCourses:chat_link.label')}
+                  placeholder={t('manageCourses:chat_link.label')}
                   itemId={course.id}
                   value={course.chatLink || ''}
-                  updateMutation={UPDATE_COURSE_CHAT_LINK}
+                  updateValueMutation={UPDATE_COURSE_CHAT_LINK}
                   refetchQueries={['AdminCourseList']}
-                  helpText="chat_link.help_text"
-                  translationNamespace="manageCourses"
+                  helpText={t('manageCourses:chat_link.help_text')}
                 />
                 <td>
                   {`${t('possible-certificates')}:`}
@@ -499,15 +498,14 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                     <div className="col-span-3">{t('course-page:performance-certificate')}</div>
                     <InputField
                       variant="material"
-                      type="ects"
-                      label="ects.label"
-                      placeholder="ects.label"
+                      type={t('manageCourses:ects.type')}
+                      label={t('manageCourses:ects.label')}
+                      placeholder={t('manageCourses:ects.label')}
                       itemId={course.id}
                       value={course.ects || ''}
-                      updateMutation={UPDATE_COURSE_ECTS}
+                      updateValueMutation={UPDATE_COURSE_ECTS}
                       refetchQueries={['AdminCourseList']}
-                      helpText="ects.help_text"
-                      translationNamespace="manageCourses"
+                      helpText={t('manageCourses:ects.help_text')}
                     />
                     <TagSelector
                       className="col-span-10 flex mt-3"
@@ -519,7 +517,6 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                       insertTagMutation={INSERT_COURSE_GROUP_TAG}
                       deleteTagMutation={DELETE_COURSE_GROUP_TAG}
                       refetchQueries={['AdminCourseList']}
-                      translationNamespace="start-page"
                     />
                     <TagSelector
                       className="col-span-10 flex mt-3"
@@ -535,14 +532,13 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                     <InputField
                       variant="material"
                       type="link"
-                      label="external_registration_link.label"
-                      placeholder="external_registration_link.label"
+                      label={t('manageCourses:external_registration_link.label')}
+                      placeholder={t('manageCourses:external_registration_link.label')}
                       itemId={course.id}
                       value={course.externalRegistrationLink || ''}
-                      updateMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
+                      updateValueMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
                       refetchQueries={['AdminCourseList']}
-                      helpText="external_registration_link.help_text"
-                      translationNamespace="manageCourses"
+                      helpText={t('manageCourses:external_registration_link.help_text')}
                     />
                   </div>
                 </td>

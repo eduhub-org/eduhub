@@ -26,10 +26,10 @@ type InputFieldProps = {
 
   // HTML element type to use for input
   // Support for types:
-  // - Both variants fully support: 'input', 'textarea', 'link', 'email', 'ects'
+  // - Both variants fully support: 'input', 'textarea', 'link', 'email', 'ects', 'number'
   // - 'markdown' is only supported for 'eduhub' variant
-  // - 'link', 'email', and 'ects' are specialized input types with custom validation
-  type?: 'input' | 'textarea' | 'markdown' | 'link' | 'email' | 'ects';
+  // - 'link', 'email', 'ects', and 'number' are specialized input types with custom validation
+  type?: 'input' | 'textarea' | 'markdown' | 'link' | 'email' | 'ects' | 'number';
 
   // The label text for the input field
   label?: string;
@@ -54,7 +54,7 @@ type InputFieldProps = {
   //     }
   //   }
   // `;
-  updateMutation: DocumentNode;
+  updateValueMutation: DocumentNode;
 
   // Callback function called after successful text update
   onValueUpdated?: (data: any) => void;
@@ -64,9 +64,6 @@ type InputFieldProps = {
 
   // Text shown in tooltip to provide additional information
   helpText?: string;
-
-  // Namespace for translations
-  translationNamespace?: string;
 
   // Indicates if the field is required
   isMandatory?: boolean;
@@ -91,6 +88,12 @@ type InputFieldProps = {
   // If true, inverts the color scheme (for dark mode)
   invertColors?: boolean;
 
+  // Minimum value for number input
+  min?: number;
+
+  // Maximum value for number input
+  max?: number;
+
   // Allows for additional props to be passed
   [x: string]: any;
 };
@@ -102,11 +105,10 @@ const InputField: React.FC<InputFieldProps> = ({
   placeholder,
   itemId,
   value,
-  updateMutation,
+  updateValueMutation,
   onValueUpdated,
   refetchQueries = [],
   helpText,
-  translationNamespace,
   isMandatory = false,
   // EduHub specific props
   debounceTimeout = 1000,
@@ -115,9 +117,11 @@ const InputField: React.FC<InputFieldProps> = ({
   forceNotifyByEnter = false,
   showCharacterCount = true,
   invertColors = false,
+  min,
+  max,
   ...props
 }) => {
-  const { t } = useTranslation(translationNamespace);
+  const { t } = useTranslation();
   const [localText, setLocalText] = useState(value);
   const [hasBlurred, setHasBlurred] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -130,7 +134,7 @@ const InputField: React.FC<InputFieldProps> = ({
     setLocalText(value);
   }, [value]);
 
-  const [updateText] = useRoleMutation(updateMutation, {
+  const [updateText] = useRoleMutation(updateValueMutation, {
     onError: (error) => handleError(t(error.message)),
     onCompleted: (data) => {
       if (onValueUpdated) onValueUpdated(data);
@@ -147,6 +151,11 @@ const InputField: React.FC<InputFieldProps> = ({
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text);
       case 'ects':
         return isECTSFormat(text);
+      case 'number':
+        const num = parseInt(text, 10);
+        return (
+          !isNaN(num) && Number.isInteger(num) && (min === undefined || num >= min) && (max === undefined || num <= max)
+        );
       default:
         return true;
     }
@@ -155,13 +164,24 @@ const InputField: React.FC<InputFieldProps> = ({
   const getErrorMessage = (inputType: string): string => {
     switch (inputType) {
       case 'link':
-        return t('Invalid link format');
+        return t('input_field.invalid_link_format');
       case 'email':
-        return t('Invalid email format');
+        return t('input_field.invalid_email_format');
       case 'ects':
-        return t('Invalid ECTS format');
+        return t('input_field.invalid_ects_format');
+      case 'number':
+        if (Number.isInteger(parseInt(value, 10))) {
+          return t('input_field.invalid_integer_format');
+        } else if (min !== undefined && max !== undefined) {
+          return t(`input_field.invalid_minimum_maximum_integer`, { min, max });
+        } else if (min !== undefined) {
+          return t(`input_field.invalid_minimum_integer`, { min });
+        } else if (max !== undefined) {
+          return t(`input_field.invalid_maximum_integer`, { max });
+        }
+        return t('input_field.invalid_integer_format');
       default:
-        return t('Invalid input');
+        return t('input_field.invalid_input');
     }
   };
 
@@ -276,7 +296,7 @@ const InputField: React.FC<InputFieldProps> = ({
           <div className="relative">
             <DebounceInput
               element={type === 'textarea' || type === 'markdown' ? 'textarea' : 'input'}
-              type={type === 'ects' ? 'number' : 'text'}
+              type={type === 'number' ? 'number' : type === 'ects' ? 'number' : 'text'}
               debounceTimeout={debounceTimeout}
               forceNotifyByEnter={forceNotifyByEnter}
               className={`${finalClassName} ${errorState ? 'border-red-500' : ''}`}
@@ -285,6 +305,9 @@ const InputField: React.FC<InputFieldProps> = ({
               onBlur={handleBlur}
               maxLength={maxLength}
               placeholder={t(placeholder || '')}
+              min={type === 'number' ? min : undefined}
+              max={type === 'number' ? max : undefined}
+              step={type === 'number' ? 1 : undefined}
               {...props}
             />
             {showCharacterCount && type !== 'ects' && (

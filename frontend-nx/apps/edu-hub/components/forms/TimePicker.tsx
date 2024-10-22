@@ -6,10 +6,10 @@ import useTranslation from 'next-translate/useTranslation';
 import { prioritizeClasses } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
-import Snackbar from '@mui/material/Snackbar';
+import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 import { useFormatTimeString, useFormatTime } from '../../helpers/dateTimeHelpers';
 
-type UnifiedTimePickerProps = {
+type TimePickerProps = {
   variant: 'material' | 'eduhub';
   label: string;
   identifierVariables: Record<string, any>;
@@ -18,13 +18,11 @@ type UnifiedTimePickerProps = {
   onValueUpdated?: (data: any) => void;
   refetchQueries?: string[];
   helpText?: string;
-  errorText?: string;
-  translationNamespace?: string;
   isMandatory?: boolean;
   className?: string;
 };
 
-const UnifiedTimePicker: React.FC<UnifiedTimePickerProps> = ({
+const TimePicker: React.FC<TimePickerProps> = ({
   variant,
   label,
   identifierVariables,
@@ -33,12 +31,10 @@ const UnifiedTimePicker: React.FC<UnifiedTimePickerProps> = ({
   onValueUpdated,
   refetchQueries = [],
   helpText,
-  errorText = 'Invalid time',
-  translationNamespace,
   isMandatory = false,
   className = '',
 }) => {
-  const { t } = useTranslation(translationNamespace);
+  const { t } = useTranslation();
   const formatTimeString = useFormatTimeString();
   const formatTime = useFormatTime();
 
@@ -73,7 +69,7 @@ const UnifiedTimePicker: React.FC<UnifiedTimePickerProps> = ({
       updateValue({ variables });
       setErrorMessage('');
     } else {
-      setErrorMessage(t(errorText));
+      setErrorMessage(t('time_picker.invalid_time'));
     }
   }, 300);
 
@@ -115,7 +111,7 @@ const UnifiedTimePicker: React.FC<UnifiedTimePickerProps> = ({
           </div>
           <div>
             <select className={finalClassName} onChange={handleChange} value={timeValue}>
-              <option value="">{t('common:select_time')}</option>
+              <option value="">{t('time_picker.select_time')}</option>
               {timeOptions.map((option) => (
                 <option key={option} value={option}>
                   {option}
@@ -127,15 +123,13 @@ const UnifiedTimePicker: React.FC<UnifiedTimePickerProps> = ({
       </div>
       {errorMessage && <div className="text-red-500 mt-1">{errorMessage}</div>}
       {error && <AlertMessageDialog alert={error} open={!!error} onClose={resetError} />}
-      <Snackbar
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      <NotificationSnackbar
         open={showSavedNotification}
-        autoHideDuration={2000}
         onClose={() => setShowSavedNotification(false)}
-        message={t('Saved')}
+        message="saved"
       />
     </>
   );
 };
 
-export default UnifiedTimePicker;
+export default TimePicker;

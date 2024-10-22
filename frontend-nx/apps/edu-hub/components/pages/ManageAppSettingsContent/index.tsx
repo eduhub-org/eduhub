@@ -6,7 +6,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 import { Button } from '../../common/Button';
 import FormFieldRow from '../../forms/FormFieldRow';
-import UnifiedDropDownSelector from '../../forms/UnifiedDropDownSelector';
+import DropDownSelector from '../../forms/DropDownSelector';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
 
@@ -240,16 +240,15 @@ const ManageAppSettingsContent: FC = () => {
             <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-2 block">
               {t('time_zone.label')}
             </label>
-            <UnifiedDropDownSelector
+            <DropDownSelector
               variant="eduhub"
               options={timeZones}
-              currentValue={appSettingsData?.AppSettings[0]?.timeZone}
+              value={appSettingsData?.AppSettings[0]?.timeZone}
               helpText={t('time_zone.help_text')}
               updateValueMutation={UPDATE_APP_SETTINGS_TIME_ZONE}
               identifierVariables={{ appName: 'edu' }}
               refetchQueries={['AppSettings']}
-              translationPrefix="time_zone.values."
-              translationNamespace="manageAppSettings"
+              optionsTranslationPrefix="manageAppSettings:time_zone.values."
             />
           </div>
         </>
