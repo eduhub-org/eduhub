@@ -151,11 +151,12 @@ const InputField: React.FC<InputFieldProps> = ({
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text);
       case 'ects':
         return isECTSFormat(text);
-      case 'number':
+      case 'number': {
         const num = parseInt(text, 10);
         return (
           !isNaN(num) && Number.isInteger(num) && (min === undefined || num >= min) && (max === undefined || num <= max)
         );
+      }
       default:
         return true;
     }
@@ -169,17 +170,21 @@ const InputField: React.FC<InputFieldProps> = ({
         return t('input_field.invalid_email_format');
       case 'ects':
         return t('input_field.invalid_ects_format');
-      case 'number':
-        if (Number.isInteger(parseInt(value, 10))) {
+      case 'number': {
+        if (!Number.isInteger(parseInt(value, 10))) {
           return t('input_field.invalid_integer_format');
-        } else if (min !== undefined && max !== undefined) {
+        }
+        if (min !== undefined && max !== undefined) {
           return t(`input_field.invalid_minimum_maximum_integer`, { min, max });
-        } else if (min !== undefined) {
+        }
+        if (min !== undefined) {
           return t(`input_field.invalid_minimum_integer`, { min });
-        } else if (max !== undefined) {
+        }
+        if (max !== undefined) {
           return t(`input_field.invalid_maximum_integer`, { max });
         }
         return t('input_field.invalid_integer_format');
+      }
       default:
         return t('input_field.invalid_input');
     }
