@@ -8,7 +8,7 @@ export const format2Digits = (n: number) => {
 
 export const useDisplayDate = () => {
   const { timeZone } = useAppSettings();
-  
+
   return (date: Date | string | null) => {
     if (date == null) {
       return '';
@@ -33,11 +33,12 @@ export const useFormatTimeString = () => {
         return formatInTimeZone(ts, timeZone, 'HH:mm');
       }
 
-      // Check if the string is in HH:mm or HH:mm:ss format
-      if (typeof ts === 'string' && /^\d{2}:\d{2}(:\d{2})?$/.test(ts)) {
+      // Check if the string is in HH:mm or HH:mm:ss or HH:mm:ss.SSS format
+      if (typeof ts === 'string' && /^\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?$/.test(ts)) {
         // If it's just a time, we need to add a dummy date
         const dummyDate = new Date().toISOString().split('T')[0]; // Current date
-        const dateTime = parse(`${dummyDate} ${ts}`, 'yyyy-MM-dd HH:mm:ss', new Date());
+        const [hours, minutes, seconds] = ts.split(':');
+        const dateTime = new Date(`${dummyDate}T${hours}:${minutes}:${seconds || '00'}`);
         return formatInTimeZone(dateTime, timeZone, 'HH:mm');
       }
 
@@ -83,7 +84,7 @@ export const getWeekdayString = (
 export const useWeekdayStartAndEndString = () => {
   const getStartTimeString = useStartTimeString();
   const getEndTimeString = useEndTimeString();
-  
+
   return (course: MinimalCourse, t: any) => {
     if (!course.weekDay || course.weekDay === 'NONE') return '';
 
@@ -100,7 +101,7 @@ export const useWeekdayStartAndEndString = () => {
 
 export const useStartTimeString = () => {
   const formatTimeString = useFormatTimeString();
-  
+
   return (time: string | null) => {
     return time ? formatTimeString(time) : '';
   };
@@ -108,7 +109,7 @@ export const useStartTimeString = () => {
 
 export const useEndTimeString = () => {
   const formatTimeString = useFormatTimeString();
-  
+
   return (time: string | null) => {
     return time ? formatTimeString(time) : '';
   };
@@ -116,14 +117,14 @@ export const useEndTimeString = () => {
 
 export const useFormatTime = () => {
   const { timeZone } = useAppSettings();
-  
+
   return (time: Date | string | null): string => {
     if (time == null) {
       return formatInTimeZone(new Date(), timeZone, 'HH:mm');
     }
     const zonedTime = typeof time === 'string' ? parseISO(time) : time;
     const formattedTime = formatInTimeZone(zonedTime, timeZone, 'HH:mm');
-    
+
     // Round to nearest 15 minutes
     const [hours, minutes] = formattedTime.split(':').map(Number);
     const roundedMinutes = Math.round(minutes / 15) * 15;

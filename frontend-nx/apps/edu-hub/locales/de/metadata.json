@@ -1,0 +1,60 @@
+{
+  "impressum": {
+    "title": "Impressum | EduHub",
+    "description": "Impressum page for EduHub by opencampus.sh"
+  },
+  "help": {
+    "title": "Help | EduHub",
+    "description": "Help page for EduHub by opencampus.sh"
+  },
+  "course": {
+    "title": "Course | EduHub",
+    "description": "Course page for EduHub by opencampus.sh"
+  },
+  "profile": {
+    "title": "Profile | EduHub",
+    "description": "Profile page for EduHub by opencampus.sh"
+  },
+  "statistics": {
+    "title": "Statistics | EduHub",
+    "description": "Statistics page for EduHub by opencampus.sh"
+  },
+  "home": {
+    "title": "Home | EduHub",
+    "description": "Home page for EduHub by opencampus.sh"
+  },
+  "manage": {
+    "achievement-options": {
+      "title": "Achievement Options | EduHub",
+      "description": "Achievement Options page for EduHub by opencampus.sh"
+    },
+    "achievement-templates": {
+      "title": "Achievement Templates | EduHub",
+      "description": "Achievement Templates page for EduHub by opencampus.sh"
+    },
+    "app-settings": {
+      "title": "App Settings | EduHub",
+      "description": "App Settings page for EduHub by opencampus.sh"
+    },
+    "course": {
+      "title": "Course | EduHub",
+      "description": "Course page for EduHub by opencampus.sh"
+    },
+    "courses": {
+      "title": "Courses | EduHub",
+      "description": "Courses page for EduHub by opencampus.sh"
+    },
+    "organizations": {
+      "title": "Organizations | EduHub",
+      "description": "Organizations page for EduHub by opencampus.sh"
+    },
+    "programs": {
+      "title": "Programs | EduHub",
+      "description": "Programs page for EduHub by opencampus.sh"
+    },
+    "users": {
+      "title": "Users | EduHub",
+      "description": "Users page for EduHub by opencampus.sh"
+    }
+  }
+}

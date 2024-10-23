@@ -1,3 +1,5 @@
+'use client';
+
 import React, { FC, useState, useMemo, useEffect, ErrorInfo, ReactNode } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { Page } from '../../layout/Page';

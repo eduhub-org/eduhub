@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
@@ -27,10 +29,10 @@ type Inputs = {
   email: string;
   employment: Employment_enum | null;
   university: University_enum | null;
-  matriculationNumber: string;
-  externalProfile: string;
+  matriculationNumber: string | null;
+  externalProfile: string | null;
   password: string;
-  picture: string;
+  picture: string | null;
 };
 
 const ProfileOverview: FC = () => {
@@ -69,17 +71,18 @@ const ProfileOverview: FC = () => {
     },
     onCompleted: (data) => {
       const user = data.User_by_pk;
-
-      reset({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        employment: user.employment,
-        university: user.university,
-        matriculationNumber: user.matriculationNumber,
-        externalProfile: user.externalProfile,
-        picture: user.picture,
-      });
+      if (user) { // Add null check
+        reset({
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          employment: user.employment,
+          university: user.university,
+          matriculationNumber: user.matriculationNumber,
+          externalProfile: user.externalProfile,
+          picture: user.picture,
+        });
+      }
     },
     skip: !sessionData,
   });
@@ -132,8 +135,8 @@ const ProfileOverview: FC = () => {
           <UnifiedFileUploader
             variant="eduhub"
             element="profilePicture"
-            identifierVariables={{ userId: sessionData?.profile?.sub }}
-            currentFile={userData?.User_by_pk?.picture}
+            identifierVariables={{ userId: sessionData?.profile?.sub ?? null }}
+            currentFile={userData?.User_by_pk?.picture ?? null}
             updateFileMutation={UPDATE_USER_PROFILE_PICTURE}
             onFileUpdated={() => refetchUser()}
             acceptedFileTypes="image/*"

@@ -1,3 +1,5 @@
+'use client';
+
 import { FC, useState, useEffect } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { CircularProgress } from '@mui/material';
