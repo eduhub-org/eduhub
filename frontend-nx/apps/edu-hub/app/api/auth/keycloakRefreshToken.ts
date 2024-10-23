@@ -1,23 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import axios, { AxiosError } from 'axios';
-
-interface IKeycloakRefreshTokenParams {
-  body: {
-    refreshToken: string;
-  };
-}
-
-interface IKeycloakRefreshTokenApiResponse {
-  id_token: string;
-  token_type: string;
-  access_token: string;
-  refresh_token: string;
-  expires_in: number;
-  refresh_expires_in: number;
-  session_state: string;
-  scope: string;
-  'not-before-policy': number;
-}
+import { IKeycloakRefreshTokenParams } from '../../../types/keycloak';
 
 const keycloakRefreshToken = async (
   request: NextApiRequest,
@@ -70,4 +53,3 @@ const keycloakRefreshToken = async (
 };
 
 export default keycloakRefreshToken;
-export { type IKeycloakRefreshTokenApiResponse };

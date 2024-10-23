@@ -4,7 +4,7 @@ import { GraphQLClient, gql } from 'graphql-request';
 import axios from 'axios';
 
 import type { JWT } from 'next-auth/jwt';
-import type { IKeycloakRefreshTokenApiResponse } from '../pages/api/auth/keycloakRefreshToken';
+import type { IKeycloakRefreshTokenApiResponse } from '../types/keycloak';
 import { getServerSession } from "next-auth/next";
 
 const UPDATE_USER = gql`
