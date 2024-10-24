@@ -28,6 +28,7 @@ interface IPropsAddEditAchievementTempData {
   defaultData: IDataToManipulate;
   onSaveCallBack: (data: IDataToManipulate) => Promise<ResponseToARequest>;
 }
+import InputField from '../../inputs/InputField';
 
 const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (props) => {
   const context = useContext(AchievementContext);
@@ -117,16 +118,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
     [state, dispatch]
   );
 
-  const handleInputChange = useCallback(
-    (e) => {
-      const { name, value } = e.target;
-      dispatch({
-        key: name,
-        value,
-      });
-    },
-    [dispatch]
-  );
+
 
   const handleSubmit = useCallback(
     async (event) => {
@@ -154,12 +146,21 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
       <form onSubmit={handleSubmit} className="w-full flex flex-col space-y-5 pl-5 py-5">
         <div className="grid grid-cols-3 gap-5">
           {/* Edit title */}
-          <EhInputWithTitle2
+          <InputField
+            variant="eduhub"
+            immediateUpdate={false}
+            itemId={0}  // Dummy
+            updateValueMutation={null as any}  // Dummy
             label={`${tCommon('project-title')}*`}
-            onChangeHandler={handleInputChange}
             name="title"
-            id="title"
+            type="input"
             value={state.title ?? ''}
+            onValueUpdated={(data) => {
+              dispatch({
+                key: 'title',
+                value: data.text
+              });
+            }}
             autoFocus={true}
             maxLength={200}
           />
@@ -208,15 +209,23 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
         </div>
 
         <div id="edit-description" className="pr-5">
-          <EhInputWithTitle2
-            label={`${tCommon('project-description')}`}
-            onChangeHandler={handleInputChange}
-            name="description"
-            id="description"
-            element={'textarea'}
-            maxLength={3000}
-            value={state.description ?? ''}
-          />
+        <InputField
+          variant="eduhub"
+          immediateUpdate={false}
+          itemId={0}  // Dummy
+          updateValueMutation={null as any}  // Dummy
+          label={`${tCommon('project-description')}`}
+          name="description"
+          type="textarea" 
+          value={state.description ?? ''}
+          onValueUpdated={(data) => {
+            dispatch({
+              key: 'description',
+              value: data.text
+            });
+          }}
+          maxLength={3000}
+        />
         </div>
 
         <div id="edit-documentations" className="flex flex-col gap-5 pr-5">
@@ -224,8 +233,11 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
             <div className="flex flex-col space-y-1">
               <div className="flex flex-col space-y-1">
                 <p>{`${tCommon('achievement-record-type')}*`}</p>
-                <EhSelectForEnum2
-                  onChange={handleInputChange}
+                <SelectForInputField
+                  onChange={(e) => dispatch({
+                    key: AchievementKeys.RECORD_TYPE,
+                    value: e.target.value
+                  })}
                   options={context.achievementRecordTypes}
                   name={AchievementKeys.RECORD_TYPE}
                   id={AchievementKeys.RECORD_TYPE}
@@ -239,10 +251,12 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
                 {loadAchievementDocumentationTemplates?.data?.AchievementDocumentationTemplate && (
                   <div className="flex flex-col space-y-1">
                     <p>{`${tCommon('achievement-documentation-template')}*`}</p>
-                    <EhSelectCustom
-                      onChange={handleInputChange}
+                    <SelectCustom
+                      onChange={(e) => dispatch({
+                        key: 'achievementDocumentationTemplateId',
+                        value: e.target.value
+                      })}
                       options={[
-                        // Add a default option when state.achievementDocumentationTemplateId is not set
                         !state.achievementDocumentationTemplateId && {
                           label: t('selectTemplateDefaultLabel'),
                           value: '',
@@ -312,20 +326,21 @@ const EhInputWithTitle2: FC<IPropsEhInputWithTitle2> = ({ label, onChangeHandler
 
 interface IProsSelect {
   options: string[];
-  onChange: (selected: string) => void;
+  onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   [key: string]: any;
 }
+
 
 interface IProsSelectCustom {
   options: {
     label: string;
     value: number | string;
   }[];
-  onChange: (selected: string) => void;
+  onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   [key: string]: any;
 }
 
-const EhSelectForEnum2: FC<IProsSelect> = ({ options, onChange, ...custom }) => {
+const SelectForInputField: FC<IProsSelect> = ({ options, onChange, ...custom }) => {
   const onSelectChanged = useCallback(
     (event) => {
       onChange(event);
@@ -347,7 +362,7 @@ const EhSelectForEnum2: FC<IProsSelect> = ({ options, onChange, ...custom }) => 
       border
       border-solid border-gray-300
       focus:text-black focus:bg-white focus:border-blue-600 focus:outline-none"
-      onChange={onSelectChanged}
+      onChange={onChange}
       {...custom}
     >
       {options.map((option) => (
@@ -359,7 +374,7 @@ const EhSelectForEnum2: FC<IProsSelect> = ({ options, onChange, ...custom }) => 
   );
 };
 
-const EhSelectCustom: FC<IProsSelectCustom> = ({ options, onChange, ...custom }) => {
+const SelectCustom: FC<IProsSelectCustom> = ({ options, onChange, ...custom }) => {
   const onSelectChanged = useCallback(
     (event) => {
       onChange(event);
@@ -381,7 +396,7 @@ const EhSelectCustom: FC<IProsSelectCustom> = ({ options, onChange, ...custom })
       border
       border-solid border-gray-300
       focus:text-black focus:bg-white focus:border-blue-600 focus:outline-none"
-      onChange={onSelectChanged}
+      onChange={onChange}
       {...custom}
     >
       {options.map((option) => (
