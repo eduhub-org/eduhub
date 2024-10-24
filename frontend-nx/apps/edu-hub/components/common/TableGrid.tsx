@@ -27,7 +27,7 @@ import {
 } from '@tanstack/react-table';
 import { rankItem } from '@tanstack/match-sorter-utils';
 
-import EhAddButton from '../common/EhAddButton';
+import AddButton from '../common/AddButton';
 import { QuestionConfirmationDialog } from './dialogs/QuestionConfirmationDialog';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { useBulkActions } from '../../hooks/bulkActions';
@@ -306,7 +306,7 @@ const TableGrid = <T extends BaseRow>({
         <div className="flex items-center">
           {onAddButtonClick && (
             <div className="text-white mr-4">
-              <EhAddButton buttonClickCallBack={onAddButtonClick} text={addButtonText} />
+              <AddButton onClick={onAddButtonClick} title={addButtonText} size="medium" />
             </div>
           )}
           {showCheckbox && (

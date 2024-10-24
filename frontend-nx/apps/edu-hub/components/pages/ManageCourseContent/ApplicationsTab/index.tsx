@@ -236,7 +236,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     <>
       <OnlyAdmin>
         <div className="flex justify-start mt-4 mb-4 text-white">
-          <AddButton title="add_participants" onClick={openAddParticipantsModal} translationNamespace="manageCourse" />
+        <AddButton title="add_participants" onClick={openAddParticipantsModal} translationNamespace="manageCourse" />
         </div>
         <Modal
           isOpen={isAddParticipantsModalOpen}

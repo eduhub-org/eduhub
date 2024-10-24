@@ -18,7 +18,7 @@ import {
 import { Programs, Programs_Program } from '../../../queries/__generated__/Programs';
 import { StaticComponentProperty } from '../../../types/UIComponents';
 import { AlertMessageDialog } from '../../common/dialogs/AlertMessageDialog';
-import EhAddButton from '../../common/EhAddButton';
+import AddButton from '../../common/AddButton';
 import EhTag from '../../common/EhTag';
 import TagWithTwoText from '../../common/TagWithTwoText';
 import { ProgramsMenubar } from '../../layout/ProgramsMenubar';
@@ -177,7 +177,7 @@ const DashboardContent: FC<IPropsContent> = ({ options }) => {
 
         {context.achievementRecordTypes.length > 0 && (
           <div className="flex justify-end">
-            <EhAddButton buttonClickCallBack={addNewAchievement} text={context.t('add-new')} />
+             <AddButton onClick={addNewAchievement} title={context.t('add-new')}/>
           </div>
         )}
       </div>
