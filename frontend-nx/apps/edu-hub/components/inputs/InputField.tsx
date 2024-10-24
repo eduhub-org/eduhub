@@ -14,7 +14,6 @@ import remarkGfm from 'remark-gfm';
 import { prioritizeClasses } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
-import Snackbar from '@mui/material/Snackbar';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 import { isLinkFormat, isECTSFormat } from '../../helpers/util';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
@@ -91,7 +90,7 @@ type InputFieldProps = {
    * Indicates if the field is required.
    * @default false
    */
-  isMandatory?: boolean;
+  // isMandatory?: boolean;
 
   /**
    * Delay in milliseconds before triggering update after input.
@@ -173,7 +172,7 @@ const InputField: React.FC<InputFieldProps> = ({
   onValueUpdated,
   refetchQueries = [],
   helpText,
-  isMandatory = false,
+  // isMandatory = false,
   // EduHub specific props
   debounceTimeout = 1000,
   maxLength = 200,
@@ -193,23 +192,25 @@ const InputField: React.FC<InputFieldProps> = ({
   const { error, handleError, resetError } = useErrorHandler();
   const theme = useTheme();
   const [showSavedNotification, setShowSavedNotification] = useState(false);
-  const [errorState, setErrorState] = useState<string | null>(null);
 
   useEffect(() => {
     setLocalText(value);
   }, [value]);
 
-  const [updateText] =
-    immediateUpdate && updateValueMutation
-      ? useRoleMutation(updateValueMutation, {
-          onError: (error) => handleError(t(error.message)),
-          onCompleted: (data) => {
-            if (onValueUpdated) onValueUpdated(data);
-            setShowSavedNotification(true);
-          },
-          refetchQueries: refetchQueries,
-        })
-      : [() => {}];
+  const [updateText] = useRoleMutation(updateValueMutation, {
+    onError: (error) => handleError(t(error.message)),
+    onCompleted: (data) => {
+      if (onValueUpdated) onValueUpdated(data);
+      setShowSavedNotification(true);
+    },
+    refetchQueries: refetchQueries,
+  });
+
+  const handleNonImmediateUpdate = (newText: string) => {
+    if (onValueUpdated) {
+      onValueUpdated({ text: newText });
+    }
+  };
 
   const validateInput = (text: string): boolean => {
     switch (type) {
@@ -262,8 +263,8 @@ const InputField: React.FC<InputFieldProps> = ({
     if (validateInput(newText)) {
       if (immediateUpdate) {
         updateText({ variables: { itemId, text: newText } });
-      } else if (onValueUpdated) {
-        onValueUpdated({ text: newText });
+      } else {
+        handleNonImmediateUpdate(newText);
       }
       setErrorMessage('');
       setShowSavedNotification(immediateUpdate);
@@ -296,7 +297,7 @@ const InputField: React.FC<InputFieldProps> = ({
       }
     }
     debouncedUpdateText.flush();
-  }, [variant, localText, validateInput, debouncedUpdateText, type, handleError, resetError]);
+  }, [variant, localText, validateInput, debouncedUpdateText, type, handleError, resetError, getErrorMessage]);
 
   const [showPreview, setShowPreview] = useState(false);
   const togglePreview = () => setShowPreview(!showPreview);
@@ -376,7 +377,7 @@ const InputField: React.FC<InputFieldProps> = ({
               type={type === 'number' ? 'number' : type === 'ects' ? 'number' : 'text'}
               debounceTimeout={debounceTimeout}
               forceNotifyByEnter={forceNotifyByEnter}
-              className={`${finalClassName} ${errorState ? 'border-red-500' : ''}`}
+              className={`${finalClassName} ${errorMessage ? 'border-red-500' : ''}`}
               value={localText}
               onChange={handleTextChange}
               onBlur={handleBlur}

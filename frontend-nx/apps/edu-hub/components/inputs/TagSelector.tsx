@@ -110,34 +110,32 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   const [showSavedNotification, setShowSavedNotification] = useState(false);
   const theme = useTheme();
 
-  const [insertTag] =
-    immediateUpdate && insertValueMutation
-      ? useRoleMutation(insertValueMutation, {
-          onError: (error) => handleError(t(error.message)),
-          onCompleted: (data) => {
-            if (onValueUpdated) onValueUpdated(data);
-            setShowSavedNotification(true);
-          },
-          refetchQueries,
-        })
-      : [() => {}];
+  const [insertTag] = insertValueMutation
+    ? useRoleMutation(insertValueMutation, {
+        onError: (error) => handleError(t(error.message)),
+        onCompleted: (data) => {
+          if (onValueUpdated) onValueUpdated(data);
+          setShowSavedNotification(true);
+        },
+        refetchQueries,
+      })
+    : [() => {}];
 
-  const [deleteTag] =
-    immediateUpdate && deleteValueMutation
-      ? useRoleMutation(deleteValueMutation, {
-          onError: (error) => handleError(t(error.message)),
-          onCompleted: (data) => {
-            if (onValueUpdated) onValueUpdated(data);
-            setShowSavedNotification(true);
-          },
-          refetchQueries,
-        })
-      : [() => {}];
+  const [deleteTag] = deleteValueMutation
+    ? useRoleMutation(deleteValueMutation, {
+        onError: (error) => handleError(t(error.message)),
+        onCompleted: (data) => {
+          if (onValueUpdated) onValueUpdated(data);
+          setShowSavedNotification(true);
+        },
+        refetchQueries,
+      })
+    : [() => {}];
 
   const debouncedUpdateTags = useDebouncedCallback((newTags: { id: number; name: string }[]) => {
     const oldTags = values;
 
-    if (immediateUpdate) {
+    if (immediateUpdate && insertValueMutation && deleteValueMutation) {
       for (const tag of newTags) {
         if (!oldTags.some((oldTag) => oldTag.id === tag.id)) {
           // New tag added
