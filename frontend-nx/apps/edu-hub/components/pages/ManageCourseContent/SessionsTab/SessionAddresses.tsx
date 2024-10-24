@@ -2,7 +2,7 @@ import useTranslation from 'next-translate/useTranslation';
 import { FC } from 'react';
 import { ManagedCourse_Course_by_pk_Sessions_SessionAddresses } from '../../../../queries/__generated__/ManagedCourse';
 import { UPDATE_SESSION_ADDRESS } from '../../../../queries/course';
-import InputField from '../../../forms/InputField';
+import InputField from '../../../inputs/InputField';
 import { isLinkFormat } from '../../../../helpers/util';
 
 interface SessionAddressesIProps {

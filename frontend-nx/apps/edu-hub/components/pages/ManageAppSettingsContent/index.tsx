@@ -5,8 +5,8 @@ import useTranslation from 'next-translate/useTranslation';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 import { Button } from '../../common/Button';
-import FormFieldRow from '../../forms/FormFieldRow';
-import DropDownSelector from '../../forms/DropDownSelector';
+import FormFieldRow from '../../inputs/FormFieldRow';
+import DropDownSelector from '../../inputs/DropDownSelector';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
 

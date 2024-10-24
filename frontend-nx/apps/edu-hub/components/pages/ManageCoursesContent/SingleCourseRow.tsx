@@ -50,8 +50,8 @@ import applicantsInvitedPie from '../../../public/images/course/status/applicant
 import participantsRatedPie from '../../../public/images/course/status/participants-rated.svg';
 
 import { InstructorColumn } from './CoursesInstructorColumn';
-import TagSelector from '../../forms/TagSelector';
-import InputField from '../../forms/InputField';
+import TagSelector from '../../inputs/TagSelector';
+import InputField from '../../inputs/InputField';
 import {
   UPDATE_COURSE_CHAT_LINK,
   UPDATE_COURSE_ECTS,

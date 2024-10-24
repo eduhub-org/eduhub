@@ -4,8 +4,8 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import InputField from '../../forms/InputField';
-import FileUpload from '../../forms/FileUpload';
+import InputField from '../../inputs/InputField';
+import FileUpload from '../../inputs/FileUpload';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
@@ -35,7 +35,7 @@ import {
   UpdateAchievementDocumentationTemplate,
   UpdateAchievementDocumentationTemplateVariables,
 } from '../../../queries/__generated__/UpdateAchievementDocumentationTemplate';
-import FileDownload from '../../forms/FileDownload';
+import FileDownload from '../../inputs/FileDownload';
 import { ApolloError } from '@apollo/client';
 
 const ManageAchievementTemplatesContent: FC = () => {

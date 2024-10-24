@@ -4,7 +4,7 @@ import { Page } from '../../layout/Page';
 import { MULTI_PROGRAM_ENROLLMENTS } from '../../../queries/multiProgramEnrollments';
 import { MultiProgramEnrollments } from '../../../queries/__generated__/MultiProgramEnrollments';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import TagSelector from '../../forms/TagSelector';
+import TagSelector from '../../inputs/TagSelector';
 import { PROGRAM_LIST } from '../../../queries/programList';
 import { ProgramList } from '../../../queries/__generated__/ProgramList';
 import Loading from '../../common/Loading';

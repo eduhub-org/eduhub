@@ -35,7 +35,7 @@ import {
   AchievementOptionCoursesVariables,
 } from '../../../../../queries/__generated__/AchievementOptionCourses';
 import { QueryResult } from '@apollo/client';
-import FileDownload from '../../../../forms/FileDownload';
+import FileDownload from '../../../../inputs/FileDownload';
 import UploadUI from './UploadUI';
 import AchievementOptionDropDown from './AchievementOptionDropDown';
 
@@ -332,7 +332,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
                 />
               </div>
             </div>
-            <div className='text-xs italic text-right'>{t('course:maxFileSize')}</div>
+            <div className="text-xs italic text-right">{t('course:maxFileSize')}</div>
             <div className="flex justify-center items-center">
               <Button>{isLoading ? <CircularProgress></CircularProgress> : t('upload')}</Button>
             </div>

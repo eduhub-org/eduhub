@@ -4,8 +4,8 @@ import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
 
 import { Button } from '../../common/Button';
-import FormFieldRow from '../../forms/FormFieldRow';
-import UnifiedFileUploader from '../../forms/UnifiedFileUploader';
+import FormFieldRow from '../../inputs/FormFieldRow';
+import UnifiedFileUploader from '../../inputs/UnifiedFileUploader';
 
 import { useAuthedMutation } from '../../../hooks/authedMutation';
 import { useAuthedQuery } from '../../../hooks/authedQuery';

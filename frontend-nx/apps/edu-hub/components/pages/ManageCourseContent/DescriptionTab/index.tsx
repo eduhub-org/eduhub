@@ -23,8 +23,8 @@ import Locations from './Locations';
 import { Button } from '@mui/material';
 import { MdAddCircle } from 'react-icons/md';
 import useTranslation from 'next-translate/useTranslation';
-import UnifiedDropdownSelector from '../../../forms/DropDownSelector';
-import UnifiedTimePicker from '../../../forms/TimePicker';
+import UnifiedDropdownSelector from '../../../inputs/DropDownSelector';
+import UnifiedTimePicker from '../../../inputs/TimePicker';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import useErrorHandler from '../../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
@@ -48,8 +48,8 @@ import {
   InsertSessionAddress,
   InsertSessionAddressVariables,
 } from '../../../../queries/__generated__/InsertSessionAddress';
-import InputField from '../../../forms/InputField';
-import UnifiedDropDownSelector from '../../../forms/DropDownSelector';
+import InputField from '../../../inputs/InputField';
+import UnifiedDropDownSelector from '../../../inputs/DropDownSelector';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;

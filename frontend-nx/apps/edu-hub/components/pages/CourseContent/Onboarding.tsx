@@ -26,7 +26,7 @@ import {
 } from '../../../queries/__generated__/UpdateEnrollmentStatus';
 import { User, UserVariables } from '../../../queries/__generated__/User';
 import { Button } from '../../common/Button';
-import FormFieldRow from '../../forms/FormFieldRow';
+import FormFieldRow from '../../inputs/FormFieldRow';
 import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
 
 import type { OperationVariables, ApolloQueryResult } from '@apollo/client';
@@ -47,13 +47,7 @@ interface OnboardingProps {
   setResetValues: Dispatch<any>;
 }
 
-const Onboarding: FC<OnboardingProps> = ({
-  course,
-  enrollmentId,
-  refetchCourse,
-  resetValues,
-  setResetValues,
-}) => {
+const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, resetValues, setResetValues }) => {
   const { t } = useTranslation('course');
   const userId = useUserId();
 
@@ -144,7 +138,7 @@ const Onboarding: FC<OnboardingProps> = ({
       };
       fetchUser();
     }
-  }, [refetchUser, resetValues, reset ]);
+  }, [refetchUser, resetValues, reset]);
 
   const [updateUser] = useAuthedMutation<
     UpdateUserOnEnrollmentConfirmation,

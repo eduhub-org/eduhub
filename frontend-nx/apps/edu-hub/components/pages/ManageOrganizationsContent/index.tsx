@@ -8,8 +8,8 @@ import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirm
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import InputField from '../../forms/InputField';
-import DropDownSelector from '../../forms/DropDownSelector';
+import InputField from '../../inputs/InputField';
+import DropDownSelector from '../../inputs/DropDownSelector';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { PageBlock } from '../../common/PageBlock';
@@ -25,7 +25,7 @@ import {
   DELETE_ORGANIZATION,
   UPDATE_ORGANIZATION_ALIASES,
 } from '../../../queries/organization';
-import CreatableTagSelector from '../../forms/CreatableTagSelector';
+import CreatableTagSelector from '../../inputs/CreatableTagSelector';
 import { OrganizationType_enum } from '../../../__generated__/globalTypes';
 
 const PAGE_SIZE = 15;

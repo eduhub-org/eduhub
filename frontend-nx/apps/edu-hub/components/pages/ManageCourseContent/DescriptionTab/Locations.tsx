@@ -2,7 +2,7 @@ import { QueryResult } from '@apollo/client';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback } from 'react';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
-import DropDownSelector from '../../../forms/DropDownSelector';
+import DropDownSelector from '../../../inputs/DropDownSelector';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { LocationOptions } from '../../../../queries/__generated__/LocationOptions';
 import {
@@ -10,7 +10,7 @@ import {
   UPDATE_COURSE_LOCATION,
   UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
 } from '../../../../queries/course';
-import InputField from '../../../forms/InputField';
+import InputField from '../../../inputs/InputField';
 import { isLinkFormat } from '../../../../helpers/util';
 import DeleteButton from '../../../../components/common/DeleteButton';
 
