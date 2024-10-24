@@ -2,7 +2,7 @@ import { QueryResult } from '@apollo/client';
 import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback } from 'react';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
-import EduHubDropdownSelector from '../../../forms/EduHubDropdownSelector';
+import DropDownSelector from '../../../inputs/DropDownSelector';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { LocationOptions } from '../../../../queries/__generated__/LocationOptions';
 import {
@@ -10,7 +10,7 @@ import {
   UPDATE_COURSE_LOCATION,
   UPDATE_COURSE_SESSION_DEFAULT_ADDRESS,
 } from '../../../../queries/course';
-import UnifiedTextFieldEditor from '../../../forms/UnifiedTextFieldEditor';
+import InputField from '../../../inputs/InputField';
 import { isLinkFormat } from '../../../../helpers/util';
 import DeleteButton from '../../../../components/common/DeleteButton';
 
@@ -20,7 +20,7 @@ interface LocationsIProps {
   refetchQuery: QueryResult<any, any>;
 }
 
-export const Locations: FC<LocationsIProps> = ({ location, onDelete, refetchQuery }) => {
+export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
   const { t } = useTranslation('course-page');
 
   const queryLocationOptions = useRoleQuery<LocationOptions>(LOCATION_OPTIONS);
@@ -38,37 +38,34 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete, refetchQuer
   // locationOption dependent placeholder
   const address_placeholder =
     location?.locationOption === 'ONLINE' ? 'address.placeholder.online' : 'address.placeholder.offline';
-  // locationOption dependent typeCheck
-  const typeCheckFunction = location?.locationOption === 'ONLINE' ? isLinkFormat : undefined;
 
   return (
     <div className="grid grid-cols-12 items-center">
       {location && (
         <div className="col-span-2">
-          <EduHubDropdownSelector
+          <DropDownSelector
+            variant="eduhub"
             options={locationOptions}
             value={location.locationOption || 'ONLINE'}
-            updateMutation={UPDATE_COURSE_LOCATION}
-            idVariables={{ locationId: location.id }}
+            updateValueMutation={UPDATE_COURSE_LOCATION}
+            identifierVariables={{ locationId: location.id }}
             refetchQueries={['ManagedCourse']}
-            translationPrefix="course-page:location."
+            optionsTranslationPrefix="course-page:location."
             className="mb-2"
           />
         </div>
       )}
       <div className="col-span-7">
-        <UnifiedTextFieldEditor
-          variant="eduHub"
-          element="input"
-          updateTextMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
-          refetchQuery={refetchQuery}
+        <InputField
+          variant="eduhub"
+          type={location?.locationOption === 'ONLINE' ? 'link' : 'input'}
+          updateValueMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
+          refetchQueries={['ManagedCourse']}
           itemId={location.id}
           placeholder={t(address_placeholder)}
           value={location?.defaultSessionAddress || ''}
-          currentText={location?.defaultSessionAddress || ''}
-          typeCheck={typeCheckFunction}
-          errorText={t('address.errorText')}
           className="mb-2"
+          showCharacterCount={false}
         />
       </div>
       <div>{location && <DeleteButton handleDelete={handleDelete} />}</div>

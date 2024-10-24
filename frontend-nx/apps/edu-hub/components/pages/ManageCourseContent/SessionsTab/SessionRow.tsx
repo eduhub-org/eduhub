@@ -284,7 +284,7 @@ export const SessionRow: FC<IProps> = ({
                 );
               })
               .map((address) => (
-                <SessionAddresses key={address.id} address={address} refetchQuery={qResult} />
+                <SessionAddresses key={address.id} address={address} refetchQueries={['ManagedCourse']} />
               ))}
           </div>
         )}

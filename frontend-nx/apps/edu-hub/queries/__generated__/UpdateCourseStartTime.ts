@@ -25,5 +25,5 @@ export interface UpdateCourseStartTime {
 
 export interface UpdateCourseStartTimeVariables {
   courseId: number;
-  startTime?: any | null;
+  value?: any | null;
 }

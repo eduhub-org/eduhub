@@ -5,8 +5,8 @@ import useTranslation from 'next-translate/useTranslation';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 import { Button } from '../../common/Button';
-import FormFieldRow from '../../forms/FormFieldRow';
-import EduHubDropdownSelector from '../../forms/EduHubDropdownSelector';
+import FormFieldRow from '../../inputs/FormFieldRow';
+import DropDownSelector from '../../inputs/DropDownSelector';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
 
@@ -240,15 +240,15 @@ const ManageAppSettingsContent: FC = () => {
             <label className="text-xs uppercase tracking-widest font-medium text-gray-400 mb-2 block">
               {t('time_zone.label')}
             </label>
-            <EduHubDropdownSelector
+            <DropDownSelector
+              variant="eduhub"
               options={timeZones}
               value={appSettingsData?.AppSettings[0]?.timeZone}
               helpText={t('time_zone.help_text')}
-              updateMutation={UPDATE_APP_SETTINGS_TIME_ZONE}
-              idVariables={{ appName: 'edu' }}
-              refetchQueries={['AppSettings']} // Name of the query to refetch
-              translationPrefix="time_zone.values."
-              translationNamespace="manageAppSettings"
+              updateValueMutation={UPDATE_APP_SETTINGS_TIME_ZONE}
+              identifierVariables={{ appName: 'edu' }}
+              refetchQueries={['AppSettings']}
+              optionsTranslationPrefix="manageAppSettings:time_zone.values."
             />
           </div>
         </>

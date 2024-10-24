@@ -4,8 +4,8 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import UnifiedTextFieldEditor from '../../forms/UnifiedTextFieldEditor';
-import FileUpload from '../../forms/FileUpload';
+import InputField from '../../inputs/InputField';
+import FileUpload from '../../inputs/FileUpload';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
@@ -26,7 +26,6 @@ import {
   AchievementDocumentationTemplates_AchievementDocumentationTemplate,
 } from '../../../queries/__generated__/AchievementDocumentationTemplates';
 import { PageBlock } from '../../common/PageBlock';
-import EhAddButton from '../../common/EhAddButton';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import {
   InsertAchievementDocumentationTemplate,
@@ -36,7 +35,7 @@ import {
   UpdateAchievementDocumentationTemplate,
   UpdateAchievementDocumentationTemplateVariables,
 } from '../../../queries/__generated__/UpdateAchievementDocumentationTemplate';
-import FileDownload from '../../forms/FileDownload';
+import FileDownload from '../../inputs/FileDownload';
 import { ApolloError } from '@apollo/client';
 
 const ManageAchievementTemplatesContent: FC = () => {
@@ -69,11 +68,12 @@ const ManageAchievementTemplatesContent: FC = () => {
           width: 3,
         },
         cell: ({ getValue, column, row }) => (
-          <UnifiedTextFieldEditor
+          <InputField
             variant="material"
-            currentText={getValue<string>()}
+            type="input"
+            value={getValue<string>()}
             label={t(column.columnDef.id)}
-            updateTextMutation={UPDATE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE_TITLE}
+            updateValueMutation={UPDATE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE_TITLE}
             itemId={row.original.id}
             placeholder={t(column.columnDef.id)}
             refetchQueries={['AchievementDocumentationTemplates']}

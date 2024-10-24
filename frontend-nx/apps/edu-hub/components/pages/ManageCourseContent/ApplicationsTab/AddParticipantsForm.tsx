@@ -1,8 +1,8 @@
 import React, { FC, useMemo, useState, FormEvent } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { Button } from '../../../common/Button';
-import TagSelector from '../../../forms/TagSelector';
-import RadioButtonSelector from '../../../common/RadioButtonSelector';
+import TagSelector from '../../../inputs/TagSelector';
+import RadioButtonSelector from '../../../inputs/RadioButtonSelector';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import { USER_LIST } from '../../../../queries/user';
@@ -79,13 +79,14 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, on
   return (
     <form onSubmit={handleSubmit} className="bg-white shadow-lg rounded-lg p-6 w-[400px] h-[400px]">
       <TagSelector
-        immediateCommit={false}
+        variant="eduhub" // or "material" depending on your design
+        immediateUpdate={false}
         label={t('selected_users')}
         placeholder={t('name_or_email')}
         itemId={0}
-        currentTags={[]}
-        tagOptions={availableUsers}
-        onSelectedTagsChange={handleUserSelection}
+        values={selectedUserIds}
+        options={availableUsers}
+        onValueUpdated={handleUserSelection}
         refetchQueries={[]}
       />
       <RadioButtonSelector

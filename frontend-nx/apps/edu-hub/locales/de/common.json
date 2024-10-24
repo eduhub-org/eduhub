@@ -138,5 +138,31 @@
     "bulk_action": "Sammelaktion",
     "apply": "Ausführen",
     "none": "Keine Aktion"
+  },
+  "file_uploader": {
+    "upload_new_profile_picture": "Neues Profilbild hochladen",
+    "upload_file": "Datei hochladen",
+    "file_size_exceeds_limit": "Die Datei ist zu groß. Bitte wähle eine Datei mit einer Größe von {{maxFileSize}}MB oder weniger.",
+    "error_uploading_profile_picture": "Fehler beim Hochladen des Profilbildes"
+  },
+  "input_field": {
+    "invalid_link_format": "Ungültiges Link-Format",
+    "invalid_email_format": "Ungültiges E-Mail-Format",
+    "invalid_ects_format": "Ungültiges ECTS-Format",
+    "invalid_minimum_integer": "Der Wert muss mindestens {{min}} sein",
+    "invalid_maximum_integer": "Der Wert muss höchstens {{max}} sein",
+    "invalid_minimum_maximum_integer": "Der Wert muss mindestens {{min}} und höchstens {{max}} sein",
+    "invalid_integer_format": "Der Wert muss eine ganze Zahl sein",
+    "invalid_input": "Ungültige Eingabe"
+  },
+  "time_picker": {
+    "select_time": "Zeit auswählen",
+    "invalid_time": "Ungültige Zeit"
+  },
+  "tag_selector": {
+    "selection_required": "Bitte wähle mindestens einen Wert aus."
+  },
+  "notification_snackbar": {
+    "saved": "Gespeichert"
   }
 }

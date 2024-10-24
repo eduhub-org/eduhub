@@ -50,14 +50,13 @@ import applicantsInvitedPie from '../../../public/images/course/status/applicant
 import participantsRatedPie from '../../../public/images/course/status/participants-rated.svg';
 
 import { InstructorColumn } from './CoursesInstructorColumn';
-import TagSelector from '../../forms/TagSelector';
-import UnifiedTextFieldEditor from '../../forms/UnifiedTextFieldEditor';
+import TagSelector from '../../inputs/TagSelector';
+import InputField from '../../inputs/InputField';
 import {
   UPDATE_COURSE_CHAT_LINK,
   UPDATE_COURSE_ECTS,
   UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK,
 } from '../../../queries/course';
-import { isECTSFormat, isLinkFormat } from '../../../helpers/util';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 
@@ -347,7 +346,7 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
 
   const currentCourseGroups = course.CourseGroups.map((group) => ({
     id: group.CourseGroupOption.id,
-    name: t(group.CourseGroupOption.title),
+    name: t(`start-page:${group.CourseGroupOption.title}`),
   }));
 
   const currentCourseDegrees = course.CourseDegrees.map((degree) => ({
@@ -471,18 +470,16 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                     locale={lang}
                   />
                 </div>
-                <UnifiedTextFieldEditor
+                <InputField
                   variant="material"
-                  label={'chat_link.label'}
-                  placeholder={'chat_link.label'}
+                  type="link"
+                  label={t('manageCourses:chat_link.label')}
+                  placeholder={t('manageCourses:chat_link.label')}
                   itemId={course.id}
-                  currentText={course.chatLink || ''}
-                  updateTextMutation={UPDATE_COURSE_CHAT_LINK}
+                  value={course.chatLink || ''}
+                  updateValueMutation={UPDATE_COURSE_CHAT_LINK}
                   refetchQueries={['AdminCourseList']}
-                  typeCheck={isLinkFormat}
-                  helpText="chat_link.help_text"
-                  errorText="chat_link.error_text"
-                  translationNamespace="manageCourses"
+                  helpText={t('manageCourses:chat_link.help_text')}
                 />
                 <td>
                   {`${t('possible-certificates')}:`}
@@ -499,54 +496,52 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                       {!course.achievementCertificatePossible && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
                     </div>
                     <div className="col-span-3">{t('course-page:performance-certificate')}</div>
-                    <UnifiedTextFieldEditor
+                    <InputField
                       variant="material"
-                      label={'ects.label'}
-                      placeholder={'ects.label'}
+                      type={t('manageCourses:ects.type')}
+                      label={t('manageCourses:ects.label')}
+                      placeholder={t('manageCourses:ects.label')}
                       itemId={course.id}
-                      currentText={course.ects || ''}
-                      updateTextMutation={UPDATE_COURSE_ECTS}
+                      value={course.ects || ''}
+                      updateValueMutation={UPDATE_COURSE_ECTS}
                       refetchQueries={['AdminCourseList']}
-                      typeCheck={isECTSFormat}
-                      helpText="ects.help_text"
-                      errorText="ects.error_text"
-                      translationNamespace="manageCourses"
+                      helpText={t('manageCourses:ects.help_text')}
                     />
                     <TagSelector
+                      variant="material"
                       className="col-span-10 flex mt-3"
                       label={t('course-page:courseGroups')}
                       placeholder={t('course-page:courseGroups')}
                       itemId={course.id}
-                      currentTags={currentCourseGroups}
-                      tagOptions={courseGroupOptions}
-                      insertTagMutation={INSERT_COURSE_GROUP_TAG}
-                      deleteTagMutation={DELETE_COURSE_GROUP_TAG}
+                      values={currentCourseGroups}
+                      options={courseGroupOptions}
+                      insertValueMutation={INSERT_COURSE_GROUP_TAG}
+                      deleteValueMutation={DELETE_COURSE_GROUP_TAG}
                       refetchQueries={['AdminCourseList']}
-                      translationNamespace="start-page"
+                      optionsTranslationPrefix="start-page:"
                     />
                     <TagSelector
+                      variant="material"
                       className="col-span-10 flex mt-3"
                       label={t('course-page:courseDegreeTitle')}
                       placeholder={t('course-page:courseDegree')}
                       itemId={course.id}
-                      currentTags={currentCourseDegrees}
-                      tagOptions={degreeCourses}
-                      insertTagMutation={INSERT_COURSE_DEGREE_TAG}
-                      deleteTagMutation={DELETE_COURSE_DEGREE_TAG}
+                      values={currentCourseDegrees}
+                      options={degreeCourses}
+                      insertValueMutation={INSERT_COURSE_DEGREE_TAG}
+                      deleteValueMutation={DELETE_COURSE_DEGREE_TAG}
                       refetchQueries={['AdminCourseList']}
                     />
-                    <UnifiedTextFieldEditor
+                    <InputField
                       variant="material"
-                      label={'external_registration_link.label'}
-                      placeholder={'external_registration_link.label'}
+                      type="link"
+                      label={t('manageCourses:external_registration_link.label')}
+                      placeholder={t('manageCourses:external_registration_link.label')}
                       itemId={course.id}
-                      currentText={course.externalRegistrationLink || ''}
-                      updateTextMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
+                      value={course.externalRegistrationLink || ''}
+                      updateValueMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
                       refetchQueries={['AdminCourseList']}
-                      typeCheck={isLinkFormat}
-                      helpText="external_registration_link.help_text"
-                      errorText="external_registration_link.error_text"
-                      translationNamespace="manageCourses"
+                      helpText={t('manageCourses:external_registration_link.help_text')}
                     />
                   </div>
                 </td>

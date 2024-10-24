@@ -158,7 +158,6 @@
     },
     "errorText": "The entered link does not have the correct format."
   },
-  "max_participants": "Maximum Number of Participants",
   "weekday": "Weekday",
   "weekdays": {
     "NONE": "Irregular",

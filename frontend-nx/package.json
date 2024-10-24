@@ -23,6 +23,7 @@
     "@mui/material": "^6.0.2",
     "@mui/material-nextjs": "^6.0.2",
     "@mui/styles": "^6.0.2",
+    "@mui/x-date-pickers": "^7.21.0",
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/react-table": "^8.20.5",
     "@types/cors": "^2.8.17",

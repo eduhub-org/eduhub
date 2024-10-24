@@ -25,5 +25,5 @@ export interface UpdateUserProfilePicture {
 
 export interface UpdateUserProfilePictureVariables {
   userId: any;
-  picture?: string | null;
+  file?: string | null;
 }

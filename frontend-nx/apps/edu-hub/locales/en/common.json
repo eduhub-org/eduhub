@@ -137,6 +137,32 @@
     "pagination_text": "Page {{currentPage}} of {{totalPage}}",
     "bulk_action": "Bulk Action",
     "apply": "Apply",
-    "none": "Keine"
+    "none": "None"
+  },
+  "file_uploader": {
+    "upload_new_profile_picture": "Upload new profile picture",
+    "upload_file": "Upload file",
+    "file_size_exceeds_limit": "The file is too large. Please choose a file with a size of {{maxFileSize}}MB or less.",
+    "error_uploading_profile_picture": "Error uploading profile picture"
+  },
+  "input_field": {
+    "invalid_link_format": "Invalid link format",
+    "invalid_email_format": "Invalid email format",
+    "invalid_ects_format": "Invalid ECTS format",
+    "invalid_minimum_integer": "The value must be at least {{min}}",
+    "invalid_maximum_integer": "The value must be at most {{max}}",
+    "invalid_minimum_maximum_integer": "The value must be at least {{min}} and at most {{max}}",
+    "invalid_integer_format": "The value must be an integer",
+    "invalid_input": "Invalid input"
+  },
+  "time_picker": {
+    "select_time": "Select time",
+    "invalid_time": "Invalid time"
+  },
+  "tag_selector": {
+    "selection_required": "Please select at least one tag."
+  },
+  "notification_snackbar": {
+    "saved": "Saved"
   }
 }

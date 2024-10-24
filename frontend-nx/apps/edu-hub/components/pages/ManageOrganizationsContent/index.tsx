@@ -8,8 +8,8 @@ import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirm
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
-import UnifiedTextFieldEditor from '../../forms/UnifiedTextFieldEditor';
-import DropDownSelector from '../../forms/DropDownSelector';
+import InputField from '../../inputs/InputField';
+import DropDownSelector from '../../inputs/DropDownSelector';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { PageBlock } from '../../common/PageBlock';
@@ -25,7 +25,7 @@ import {
   DELETE_ORGANIZATION,
   UPDATE_ORGANIZATION_ALIASES,
 } from '../../../queries/organization';
-import CreatableTagSelector from '../../forms/CreatableTagSelector';
+import CreatableTagSelector from '../../inputs/CreatableTagSelector';
 import { OrganizationType_enum } from '../../../__generated__/globalTypes';
 
 const PAGE_SIZE = 15;
@@ -51,22 +51,23 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row }): React
   return (
     <div className="font-medium bg-edu-course-list p-4">
       <CreatableTagSelector
+        variant="material"
         label={t('organization.aliases')}
         placeholder={t('input.enter_alias')}
         itemId={row.id}
-        currentTags={currentTags}
-        tagOptions={[]}
-        updateTagsMutation={UPDATE_ORGANIZATION_ALIASES}
+        values={currentTags}
+        options={[]}
+        updateValuesMutation={UPDATE_ORGANIZATION_ALIASES}
         refetchQueries={['OrganizationList']}
-        translationNamespace="manageOrganizations"
       />
-      <UnifiedTextFieldEditor
+      <InputField
         variant="material"
+        type="input"
         label={t('organization.description')}
         placeholder={t('input.enter_description')}
         itemId={row.id}
-        currentText={row.description || ''}
-        updateTextMutation={UPDATE_ORGANIZATION_DESCRIPTION}
+        value={row.description || ''}
+        updateValueMutation={UPDATE_ORGANIZATION_DESCRIPTION}
         refetchQueries={['OrganizationList']}
         translationNamespace="manageOrganizations"
       />
@@ -128,14 +129,14 @@ const ManageOrganizationsContent: FC = () => {
         header: 'organization.name',
         meta: { width: 3 },
         cell: ({ getValue, row }) => (
-          <UnifiedTextFieldEditor
+          <InputField
             variant="material"
+            type="input"
             placeholder={t('input.enter_name')}
             itemId={row.original.id}
-            currentText={getValue<string>()}
-            updateTextMutation={UPDATE_ORGANIZATION_NAME}
+            value={getValue<string>()}
+            updateValueMutation={UPDATE_ORGANIZATION_NAME}
             refetchQueries={['OrganizationList']}
-            translationNamespace="manageOrganizations"
           />
         ),
       },
@@ -145,13 +146,13 @@ const ManageOrganizationsContent: FC = () => {
         meta: { width: 3 },
         cell: ({ getValue, row }) => (
           <DropDownSelector
-            itemId={row.original.id}
-            currentValue={getValue<string>()}
+            variant="material"
+            identifierVariables={{ id: row.original.id }}
+            value={getValue<string>()}
             options={organizationTypes}
             updateValueMutation={UPDATE_ORGANIZATION_TYPE}
             refetchQueries={['OrganizationList']}
-            translationNamespace="manageOrganizations"
-            translationPrefix="type_selection."
+            optionsTranslationPrefix="manageOrganizations:type_selection."
           />
         ),
       },
