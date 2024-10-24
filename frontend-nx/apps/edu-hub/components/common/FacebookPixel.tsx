@@ -1,30 +1,22 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import * as fbq from '../../lib/fpixel';
 
 const FacebookPixel = () => {
-  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const [isFBPixelLoaded, setFBPixelLoaded] = useState(false);
 
   useEffect(() => {
     if (isFBPixelLoaded && typeof window.fbq === 'function') {
-      // This pageview only triggers the first time
+      // This pageview triggers on initial load and subsequent route changes
       fbq.pageview();
-
-      const handleRouteChange = () => {
-        fbq.pageview();
-      };
-
-      router.events.on('routeChangeComplete', handleRouteChange);
-      return () => {
-        router.events.off('routeChangeComplete', handleRouteChange);
-      };
     }
-  }, [router.events, isFBPixelLoaded]);
+  }, [pathname, searchParams, isFBPixelLoaded]);
 
   return (
     <>
