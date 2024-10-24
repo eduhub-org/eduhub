@@ -1,3 +1,5 @@
+'use client';
+
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useRoleQuery } from '../hooks/authedQuery';
 import { APP_SETTINGS } from '../queries/appSettings';
