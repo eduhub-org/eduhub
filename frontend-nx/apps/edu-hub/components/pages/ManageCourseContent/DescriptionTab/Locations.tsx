@@ -20,7 +20,7 @@ interface LocationsIProps {
   refetchQuery: QueryResult<any, any>;
 }
 
-export const Locations: FC<LocationsIProps> = ({ location, onDelete, refetchQuery }) => {
+export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
   const { t } = useTranslation('course-page');
 
   const queryLocationOptions = useRoleQuery<LocationOptions>(LOCATION_OPTIONS);
@@ -38,8 +38,6 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete, refetchQuer
   // locationOption dependent placeholder
   const address_placeholder =
     location?.locationOption === 'ONLINE' ? 'address.placeholder.online' : 'address.placeholder.offline';
-  // locationOption dependent typeCheck
-  const typeCheckFunction = location?.locationOption === 'ONLINE' ? isLinkFormat : undefined;
 
   return (
     <div className="grid grid-cols-12 items-center">

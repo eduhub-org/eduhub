@@ -14,6 +14,7 @@ import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
+import { gql } from 'graphql-tag';
 
 type TagSelectorProps = {
   // Determines the visual style and behavior of the component
@@ -110,27 +111,39 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   const [showSavedNotification, setShowSavedNotification] = useState(false);
   const theme = useTheme();
 
-  const [insertTag] = insertValueMutation
-    ? useRoleMutation(insertValueMutation, {
-        onError: (error) => handleError(t(error.message)),
-        onCompleted: (data) => {
-          if (onValueUpdated) onValueUpdated(data);
-          setShowSavedNotification(true);
-        },
-        refetchQueries,
-      })
-    : [() => {}];
+  const [insertTag] = useRoleMutation(
+    insertValueMutation ||
+      gql`
+        mutation NoOp {
+          __typename
+        }
+      `,
+    {
+      onError: (error) => handleError(t(error.message)),
+      onCompleted: (data) => {
+        if (onValueUpdated) onValueUpdated(data);
+        setShowSavedNotification(true);
+      },
+      refetchQueries,
+    }
+  );
 
-  const [deleteTag] = deleteValueMutation
-    ? useRoleMutation(deleteValueMutation, {
-        onError: (error) => handleError(t(error.message)),
-        onCompleted: (data) => {
-          if (onValueUpdated) onValueUpdated(data);
-          setShowSavedNotification(true);
-        },
-        refetchQueries,
-      })
-    : [() => {}];
+  const [deleteTag] = useRoleMutation(
+    deleteValueMutation ||
+      gql`
+        mutation NoOp {
+          __typename
+        }
+      `,
+    {
+      onError: (error) => handleError(t(error.message)),
+      onCompleted: (data) => {
+        if (onValueUpdated) onValueUpdated(data);
+        setShowSavedNotification(true);
+      },
+      refetchQueries,
+    }
+  );
 
   const debouncedUpdateTags = useDebouncedCallback((newTags: { id: number; name: string }[]) => {
     const oldTags = values;

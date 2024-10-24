@@ -10,7 +10,7 @@ import { prioritizeClasses } from '../../helpers/util';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import Snackbar from '@mui/material/Snackbar';
 import { IconButton } from '@mui/material';
-import { MdUpload, MdPhotoCamera } from 'react-icons/md';
+import { MdPhotoCamera } from 'react-icons/md';
 import UserCard from '../common/UserCard';
 import { SAVE_USER_PROFILE_IMAGE } from '../../queries/actions';
 import { useSession } from 'next-auth/react';
