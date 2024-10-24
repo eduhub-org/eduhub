@@ -94,19 +94,22 @@ const StatisticsContent: FC = () => {
   const cumulativeChartData = useMemo(() => {
     if (!chartData.length) return [];
     console.log('Processing cumulative chart data');
-    
-    const cumulativeData = chartData.reduce((acc, dataPoint, index) => {
-      const cumulativePoint: { [key: string]: any } = { date: dataPoint.date };
-      
-      Object.keys(dataPoint).forEach((key) => {
-        if (key !== 'date') {
-          cumulativePoint[key] = dataPoint[key] + (index > 0 ? acc[index - 1][key] : 0);
-        }
-      });
-      
-      acc.push(cumulativePoint);
-      return acc;
-    }, [] as { [key: string]: any }[]);
+
+    const cumulativeData = chartData.reduce(
+      (acc, dataPoint, index) => {
+        const cumulativePoint: { [key: string]: any } = { date: dataPoint.date };
+
+        Object.keys(dataPoint).forEach((key) => {
+          if (key !== 'date') {
+            cumulativePoint[key] = dataPoint[key] + (index > 0 ? acc[index - 1][key] : 0);
+          }
+        });
+
+        acc.push(cumulativePoint);
+        return acc;
+      },
+      [] as { [key: string]: any }[]
+    );
 
     console.log('Processed cumulative chart data:', cumulativeData);
     return cumulativeData;
@@ -114,13 +117,12 @@ const StatisticsContent: FC = () => {
 
   const programOptions = useMemo(() => {
     if (!programsData?.Program) return [];
-    
-    const options = programsData.Program
-      .map((program) => ({
-        id: program.id,
-        name: program.title,
-        applicationStart: new Date(program.applicationStart),
-      }))
+
+    const options = programsData.Program.map((program) => ({
+      id: program.id,
+      name: program.title,
+      applicationStart: new Date(program.applicationStart),
+    }))
       .sort((a, b) => b.applicationStart.getTime() - a.applicationStart.getTime())
       .map(({ id, name }) => ({ id, name }));
     console.log('Program options:', options);
@@ -143,8 +145,8 @@ const StatisticsContent: FC = () => {
             <ResponsiveContainer width="100%" height={400}>
               <LineChart data={cumulativeChartData as ChartDataPoint[]}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                <XAxis 
-                  dataKey="date" 
+                <XAxis
+                  dataKey="date"
                   stroke="#333"
                   allowDataOverflow={false}
                   allowDecimals={true}
@@ -179,8 +181,8 @@ const StatisticsContent: FC = () => {
             <ResponsiveContainer width="100%" height={400}>
               <LineChart data={chartData as ChartDataPoint[]}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                <XAxis 
-                  dataKey="date" 
+                <XAxis
+                  dataKey="date"
                   stroke="#333"
                   allowDataOverflow={false}
                   allowDecimals={true}
@@ -225,15 +227,16 @@ const StatisticsContent: FC = () => {
             <CommonPageHeader headline={t('enrollment_statistics')} />
             <div className="bg-white p-4 rounded-lg mb-6">
               <TagSelector
-                key={key}
+                variant="material"
                 label={t('select_programs.label')}
                 placeholder={t('select_programs.placeholder')}
                 itemId={0}
-                currentTags={selectedPrograms}
-                tagOptions={programOptions}
-                onSelectedTagsChange={handleProgramChange}
+                values={selectedPrograms}
+                options={programOptions}
+                onValueUpdated={handleProgramChange}
                 refetchQueries={[]}
                 className="text-gray-800"
+                immediateUpdate={false}
               />
             </div>
             {renderCharts()}

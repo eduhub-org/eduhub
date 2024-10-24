@@ -36,10 +36,10 @@ type TagSelectorProps = {
   options: { id: number; name: string }[];
 
   // GraphQL mutation to insert a tag
-  insertValueMutation: DocumentNode;
+  insertValueMutation?: DocumentNode;
 
   // GraphQL mutation to delete a tag
-  deleteValueMutation: DocumentNode;
+  deleteValueMutation?: DocumentNode;
 
   // Callback function called after successful tag update
   onValueUpdated?: (data: any) => void;
@@ -64,6 +64,23 @@ type TagSelectorProps = {
 
   // Prefix for options/tags translations (optional)
   optionsTranslationPrefix?: string;
+
+  /**
+   * Controls whether the tag selector should update the server immediately on change or wait for external trigger.
+   *
+   * @default true
+   *
+   * When true (default):
+   * - The component will call the insert/delete mutations as soon as tags are added/removed.
+   * - This is suitable for standalone selectors or when immediate updates are desired.
+   *
+   * When false:
+   * - The component will not call the mutations directly.
+   * - Instead, it will call onValueUpdated with the new tags.
+   * - This allows the parent component to control when the update should occur (e.g., on form submission).
+   * - Useful for multi-field forms where you want to submit all changes at once.
+   */
+  immediateUpdate?: boolean;
 };
 
 const TagSelector: React.FC<TagSelectorProps> = ({
@@ -83,6 +100,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   className = '',
   invertColors = false,
   optionsTranslationPrefix = '',
+  immediateUpdate = true,
 }) => {
   const { t } = useTranslation();
   const [tags, setTags] = useState(values);
@@ -92,39 +110,49 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   const [showSavedNotification, setShowSavedNotification] = useState(false);
   const theme = useTheme();
 
-  const [insertTag] = useRoleMutation(insertValueMutation, {
-    onError: (error) => handleError(t(error.message)),
-    onCompleted: (data) => {
-      if (onValueUpdated) onValueUpdated(data);
-      setShowSavedNotification(true);
-    },
-    refetchQueries,
-  });
+  const [insertTag] =
+    immediateUpdate && insertValueMutation
+      ? useRoleMutation(insertValueMutation, {
+          onError: (error) => handleError(t(error.message)),
+          onCompleted: (data) => {
+            if (onValueUpdated) onValueUpdated(data);
+            setShowSavedNotification(true);
+          },
+          refetchQueries,
+        })
+      : [() => {}];
 
-  const [deleteTag] = useRoleMutation(deleteValueMutation, {
-    onError: (error) => handleError(t(error.message)),
-    onCompleted: (data) => {
-      if (onValueUpdated) onValueUpdated(data);
-      setShowSavedNotification(true);
-    },
-    refetchQueries,
-  });
+  const [deleteTag] =
+    immediateUpdate && deleteValueMutation
+      ? useRoleMutation(deleteValueMutation, {
+          onError: (error) => handleError(t(error.message)),
+          onCompleted: (data) => {
+            if (onValueUpdated) onValueUpdated(data);
+            setShowSavedNotification(true);
+          },
+          refetchQueries,
+        })
+      : [() => {}];
 
   const debouncedUpdateTags = useDebouncedCallback((newTags: { id: number; name: string }[]) => {
     const oldTags = values;
 
-    for (const tag of newTags) {
-      if (!oldTags.some((oldTag) => oldTag.id === tag.id)) {
-        // New tag added
-        insertTag({ variables: { itemId, tagId: tag.id } });
+    if (immediateUpdate) {
+      for (const tag of newTags) {
+        if (!oldTags.some((oldTag) => oldTag.id === tag.id)) {
+          // New tag added
+          insertTag({ variables: { itemId, tagId: tag.id } });
+        }
       }
-    }
 
-    for (const tag of oldTags) {
-      if (!newTags.some((newTag) => newTag.id === tag.id)) {
-        // Tag removed
-        deleteTag({ variables: { itemId, tagId: tag.id } });
+      for (const tag of oldTags) {
+        if (!newTags.some((newTag) => newTag.id === tag.id)) {
+          // Tag removed
+          deleteTag({ variables: { itemId, tagId: tag.id } });
+        }
       }
+    } else if (onValueUpdated) {
+      onValueUpdated(newTags);
     }
 
     setHasBlurred(false);

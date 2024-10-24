@@ -20,81 +20,145 @@ import { isLinkFormat, isECTSFormat } from '../../helpers/util';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 
 type InputFieldProps = {
-  // Determines the visual style and behavior of the component
-  // 'material' uses Material-UI components, 'eduhub' uses custom styling
+  /**
+   * Determines the visual style and behavior of the component.
+   * 'material' uses Material-UI components, 'eduhub' uses custom styling.
+   */
   variant: 'material' | 'eduhub';
 
-  // HTML element type to use for input
-  // Support for types:
-  // - Both variants fully support: 'input', 'textarea', 'link', 'email', 'ects', 'number'
-  // - 'markdown' is only supported for 'eduhub' variant
-  // - 'link', 'email', 'ects', and 'number' are specialized input types with custom validation
+  /**
+   * HTML element type to use for input.
+   * Both variants fully support: 'input', 'textarea', 'link', 'email', 'ects', 'number'.
+   * 'markdown' is only supported for 'eduhub' variant.
+   * 'link', 'email', 'ects', and 'number' are specialized input types with custom validation.
+   * @default 'textarea'
+   */
   type?: 'input' | 'textarea' | 'markdown' | 'link' | 'email' | 'ects' | 'number';
 
-  // The label text for the input field
+  /**
+   * The label text for the input field.
+   */
   label?: string;
 
-  // Placeholder text shown when the input is empty
+  /**
+   * Placeholder text shown when the input is empty.
+   */
   placeholder?: string;
 
-  // Unique identifier for the item being edited
+  /**
+   * Unique identifier for the item being edited.
+   */
   itemId: number;
 
-  // The current value of the input field
+  /**
+   * The current value of the input field.
+   */
   value: string;
 
-  // GraphQL mutation to update the text
-  // The mutation should accept two variables: 'itemId' and 'text'
-  // Example:
-  // const UPDATE_TEXT = gql`
-  //   mutation UpdateText($itemId: Int!, $text: String!) {
-  //     updateText(itemId: $itemId, text: $text) {
-  //       id
-  //       text
-  //     }
-  //   }
-  // `;
+  /**
+   * GraphQL mutation to update the text.
+   * The mutation should accept two variables: 'itemId' and 'text'.
+   * Example:
+   * const UPDATE_TEXT = gql`
+   *   mutation UpdateText($itemId: Int!, $text: String!) {
+   *     updateText(itemId: $itemId, text: $text) {
+   *       id
+   *       text
+   *     }
+   *   }
+   * `;
+   */
   updateValueMutation: DocumentNode;
 
-  // Callback function called after successful text update
+  /**
+   * Callback function called after successful text update.
+   * @param data - The data returned from the mutation.
+   */
   onValueUpdated?: (data: any) => void;
 
-  // List of GraphQL query names to refetch after mutation
+  /**
+   * List of GraphQL query names to refetch after mutation.
+   * @default []
+   */
   refetchQueries?: string[];
 
-  // Text shown in tooltip to provide additional information
+  /**
+   * Text shown in tooltip to provide additional information.
+   */
   helpText?: string;
 
-  // Indicates if the field is required
+  /**
+   * Indicates if the field is required.
+   * @default false
+   */
   isMandatory?: boolean;
 
-  // EduHub specific props
-
-  // Delay in milliseconds before triggering update after input
+  /**
+   * Delay in milliseconds before triggering update after input.
+   * @default 1000
+   */
   debounceTimeout?: number;
 
-  // Maximum number of characters allowed in the input
+  /**
+   * Maximum number of characters allowed in the input.
+   * @default 200
+   */
   maxLength?: number;
 
-  // Additional CSS classes to apply to the input
+  /**
+   * Additional CSS classes to apply to the input.
+   * @default ''
+   */
   className?: string;
 
-  // If true, triggers update on Enter key press
+  /**
+   * If true, triggers update on Enter key press.
+   * @default false
+   */
   forceNotifyByEnter?: boolean;
 
-  // If true, shows character count
+  /**
+   * If true, shows character count.
+   * @default true
+   */
   showCharacterCount?: boolean;
 
-  // If true, inverts the color scheme (for dark mode)
+  /**
+   * If true, inverts the color scheme (for dark mode).
+   * @default false
+   */
   invertColors?: boolean;
 
-  // Minimum value for number input
+  /**
+   * Minimum value for number input.
+   */
   min?: number;
 
-  // Maximum value for number input
+  /**
+   * Maximum value for number input.
+   */
   max?: number;
 
-  // Allows for additional props to be passed
+  /**
+   * Controls whether the input field should update the server immediately on change or wait for external trigger.
+   *
+   * @default true
+   *
+   * When true (default):
+   * - The component will call the updateValueMutation as soon as the input changes (with debounce).
+   * - This is suitable for standalone fields or when immediate updates are desired.
+   *
+   * When false:
+   * - The component will not call the updateValueMutation directly.
+   * - Instead, it will call onValueUpdated with the new value.
+   * - This allows the parent component to control when the update should occur (e.g., on form submission).
+   * - Useful for multi-field forms where you want to submit all changes at once.
+   */
+  immediateUpdate?: boolean;
+
+  /**
+   * Allows for additional props to be passed.
+   */
   [x: string]: any;
 };
 
@@ -119,6 +183,7 @@ const InputField: React.FC<InputFieldProps> = ({
   invertColors = false,
   min,
   max,
+  immediateUpdate = true,
   ...props
 }) => {
   const { t } = useTranslation();
@@ -134,14 +199,17 @@ const InputField: React.FC<InputFieldProps> = ({
     setLocalText(value);
   }, [value]);
 
-  const [updateText] = useRoleMutation(updateValueMutation, {
-    onError: (error) => handleError(t(error.message)),
-    onCompleted: (data) => {
-      if (onValueUpdated) onValueUpdated(data);
-      setShowSavedNotification(true);
-    },
-    refetchQueries: refetchQueries,
-  });
+  const [updateText] =
+    immediateUpdate && updateValueMutation
+      ? useRoleMutation(updateValueMutation, {
+          onError: (error) => handleError(t(error.message)),
+          onCompleted: (data) => {
+            if (onValueUpdated) onValueUpdated(data);
+            setShowSavedNotification(true);
+          },
+          refetchQueries: refetchQueries,
+        })
+      : [() => {}];
 
   const validateInput = (text: string): boolean => {
     switch (type) {
@@ -192,9 +260,13 @@ const InputField: React.FC<InputFieldProps> = ({
 
   const debouncedUpdateText = useDebouncedCallback((newText: string) => {
     if (validateInput(newText)) {
-      updateText({ variables: { itemId, text: newText } });
+      if (immediateUpdate) {
+        updateText({ variables: { itemId, text: newText } });
+      } else if (onValueUpdated) {
+        onValueUpdated({ text: newText });
+      }
       setErrorMessage('');
-      setShowSavedNotification(true);
+      setShowSavedNotification(immediateUpdate);
     } else {
       setErrorMessage(getErrorMessage(type));
     }
