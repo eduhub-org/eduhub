@@ -5,42 +5,35 @@ import { logger } from '../index.js';
 const getAdminUsers = async (req) => {
   try {
     const keycloakToken = await getKeycloakToken();
+    const userId = req.body.userId;
 
-    // First get all users
-    const usersResponse = await axios.get(
-      `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users`,
+    // Get user's role mappings directly
+    console.log('Attempting to fetch user role mappings...');
+    const userRoleMappings = await axios.get(
+      `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/users/${userId}/role-mappings/clients/hasura`,
       {
         headers: {
           Authorization: `Bearer ${keycloakToken}`,
         },
       }
     );
+    console.log('Successfully fetched user role mappings');
 
-    // Then get all users with admin role
-    const adminRole = await axios.get(
-      `${process.env.KEYCLOAK_URL}/admin/realms/edu-hub/roles/admin/users`,
-      {
-        headers: {
-          Authorization: `Bearer ${keycloakToken}`,
-        },
-      }
-    );
-
-    const adminUserIds = adminRole.data.map(user => user.id);
+    const isAdmin = userRoleMappings.data.some(role => role.name === 'admin');
 
     return {
       success: true,
-      adminUserIds,
-      messageKey: "GET_ADMIN_USERS_SUCCESS"
+      isAdmin,
+      messageKey: "GET_ADMIN_STATUS_SUCCESS"
     };
 
   } catch (error) {
-    logger.error("Error getting admin users", { error: error.message, stack: error.stack });
+    logger.error("Error checking admin status", { error: error.message, stack: error.stack });
     return {
       success: false,
-      adminUserIds: [],
-      error: "ERROR_GETTING_ADMIN_USERS",
-      messageKey: "GET_ADMIN_USERS_FAILED"
+      isAdmin: false,
+      error: "ERROR_CHECKING_ADMIN_STATUS",
+      messageKey: "GET_ADMIN_STATUS_FAILED"
     };
   }
 };

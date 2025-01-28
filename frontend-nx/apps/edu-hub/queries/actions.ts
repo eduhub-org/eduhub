@@ -119,7 +119,10 @@ export const SAVE_ACHIEVEMENT_DOCUMENTATION_TEMPLATE = gql`
 export const GET_SIGNED_URL = gql`
   query GetSignedUrl($path: String!) {
     getSignedUrl(path: $path) {
-      link
+      success
+      messageKey
+      error
+      signedUrl
     }
   }
 `;

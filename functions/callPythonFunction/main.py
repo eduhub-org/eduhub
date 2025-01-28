@@ -2,6 +2,7 @@ import logging
 import os
 from flask import request, jsonify
 from typing import Dict, Any, Callable
+import traceback
 
 # Import functions explicitly
 from pythonFunctions.add_confirmed_user_to_mm import add_confirmed_user_to_mm
@@ -24,6 +25,27 @@ PYTHON_FUNCTIONS: Dict[str, Callable] = {
     "load_participation_data": load_participation_data,
     "provide_moochub_data": provide_moochub_data,
 }
+
+def format_response(result: dict) -> dict:
+    """
+    Standardizes the response format.
+    
+    Args:
+        result: The function result
+        
+    Returns:
+        dict: Standardized response with required fields
+    """
+    # If result already has success and messageKey, return it directly
+    if isinstance(result, dict) and 'success' in result and 'messageKey' in result:
+        return result
+        
+    # Add standard fields for normal responses
+    return {
+        "success": True,
+        "messageKey": "OPERATION_SUCCESS",
+        "result": result
+    }
 
 def call_python_function(request):
     """Call the Python function indicated in the request and return the result.
@@ -56,15 +78,7 @@ def call_python_function(request):
 
         result = PYTHON_FUNCTIONS[function_name](arguments)
         
-        # If result is already a dict with success/error info, return it directly
-        if isinstance(result, dict) and ("success" in result or "error" in result):
-            return jsonify(result), 200
-            
-        # Otherwise, wrap the result in a success response
-        return jsonify({
-            "success": True,
-            "result": result
-        }), 200
+        return format_response(result)
 
     except Exception as error:
         logging.error(f"Error in {function_name}: {str(error)}")
@@ -72,19 +86,5 @@ def call_python_function(request):
             "success": False,
             "error": str(error),
             "messageKey": "INTERNAL_SERVER_ERROR",
+            "details": traceback.format_exc()
         }), 200
-
-
-# Test request for the server
-# curl -X POST http://localhost:42025/ \
-# -H 'Content-Type: application/json' \
-# -H 'name: checkAttendance' \
-# -H "secret: test1234" \
-# -H "User-Agent: hasura-graphql-engine/v2.19.0" \
-# -d '{
-#   "comment": "regularly checks zoom and questionaire attendance",
-#   "id": "d4212a35-0e98-495b-a19d-7cd80ea66223",
-#   "name": "check_attendance",
-#   "payload": {},
-#   "scheduled_time": "2023-04-06T10:00:00Z"
-# }'

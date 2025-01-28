@@ -62,17 +62,19 @@ const validateSecret = (hasuraSecret) => {
 /**
  * Standardizes the response format by ensuring success flag is present.
  * @param {*} result - The function result
- * @returns {Object} Standardized response with success flag
+ * @returns {StandardResponse} Standardized response
  */
 const formatResponse = (result) => {
-  // If result already has success/error properties, return it directly
-  if (result && typeof result === 'object' && ('success' in result || 'error' in result)) {
+  // If result already has success/messageKey properties, return it directly
+  if (result && typeof result === 'object' && 'success' in result && 'messageKey' in result) {
     return result;
   }
-  // Add success flag for normal responses
+  
+  // Add standard fields for normal responses
   return {
     success: true,
-    data: result
+    messageKey: "OPERATION_SUCCESS",
+    result  // Instead of data, use result for consistency
   };
 };
 

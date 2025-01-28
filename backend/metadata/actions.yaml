@@ -244,4 +244,5 @@ custom_types:
     - name: saveFileResult
     - name: saveImageResult
     - name: resizedImagePath
+    - name: getSignedUrlResult
   scalars: []

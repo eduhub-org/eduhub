@@ -31,7 +31,7 @@ type Query {
 type Query {
   getSignedUrl(
     path: String!
-  ): getSignedUrlOutput
+  ): getSignedUrlResult!
 }
 
 type Query {
@@ -262,5 +262,10 @@ type resizedImagePath {
   size: Int!
   filePath: String!
   accessUrl: String!
+type getSignedUrlResult {
+  success: Boolean!
+  messageKey: String!
+  error: String
+  signedUrl: String
 }
 

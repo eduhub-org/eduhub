@@ -13,12 +13,12 @@ import { logger } from "../index.js";
  *   - success (boolean): Whether the operation was successful
  *   - messageKey (string): Translation key for messages
  *   - error (string, optional): Error message if operation failed
- *   - link (string, optional): The generated signed URL if successful
+ *   - signedUrl (string, optional): The generated signed URL if successful
  */
 const getSignedUrl = async (req) => {
   logger.info("########## Get Signed URL ##########");
-  logger.debug("Request parameters", { 
-    path: req.body.input.path,
+  logger.debug("Request parameters", {
+    input: req.body.input,
     role: req.body.session_variables['x-hasura-role'],
     userId: req.body.session_variables['x-hasura-user-id']
   });
@@ -35,34 +35,40 @@ const getSignedUrl = async (req) => {
        (userUUID && path.includes("/user-" + userUUID + "/")) ||
        (userUUID && path.startsWith(userUUID + "/")) || // included for legacy names
        (userUUID && path.startsWith("/user-" + userUUID + "/"))) { // included for legacy names
-      const link = await storage.loadFromBucket(path, req.headers.bucket);
-      logger.info("File access granted", { path, userRole, userUUID });
+      const signedUrl = await storage.loadFromBucket(path, req.headers.bucket);
+      logger.info("Operation successful", {
+        path,
+        userRole,
+        userId: userUUID
+      });
       return {
         success: true,
         messageKey: "FILE_ACCESS_GRANTED",
-        link
+        signedUrl
       };
     } else {
-      // Access denied for other cases
-      logger.warn("Access denied for file loading", { path, userRole, userUUID });
+      logger.warn("Access denied", {
+        path,
+        userRole,
+        userId: userUUID
+      });
       return {
         success: false,
-        messageKey: "FILE_ACCESS_DENIED",
+        messageKey: "UNAUTHORIZED",
         error: "You do not have permission to access this file."
       };
     }
   } catch (error) {
-    // Handle errors, such as issues with loading the file
-    logger.error("Error loading file", { 
-      error: error.message, 
-      path, 
-      userRole, 
-      userUUID, 
-      stack: error.stack 
+    logger.error("Operation failed", {
+      error: error.message,
+      stack: error.stack,
+      path,
+      userRole,
+      userId: userUUID
     });
     return {
       success: false,
-      messageKey: "FILE_LOAD_ERROR",
+      messageKey: "OPERATION_FAILED",
       error: "An error occurred while retrieving the file."
     };
   }
