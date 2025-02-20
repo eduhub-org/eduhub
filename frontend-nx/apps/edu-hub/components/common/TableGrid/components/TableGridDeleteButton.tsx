@@ -16,7 +16,17 @@ const TableGridDeleteButton = ({
   idType,
   deletionConfirmationQuestion,
 }: TableGridDeleteButtonProps) => {
-  const [deleteItem] = useRoleMutation(deleteMutation);
+  const [deleteItem] = useRoleMutation(deleteMutation, {
+    onError: (error) => {
+      console.error('Error during deletion:', error);
+    },
+    onCompleted: (data) => {
+     
+      if (data?.anonymizeUser?.error) {
+        console.error('Anonymization error:', data.anonymizeUser.error);
+      }
+    }
+  });
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { t } = useTranslation();
@@ -40,7 +50,7 @@ const TableGridDeleteButton = ({
     setErrorMessage(null);
   };
 
-  const performDelete = () => {
+  const performDelete = async () => {
     let variableId: string | number = id;
 
     if (idType === 'number') {
@@ -68,6 +78,14 @@ const TableGridDeleteButton = ({
         console.error('Error deleting item:', error.message);
       },
     });
+    try {
+      await deleteItem({
+        variables: { id: variableId },
+        refetchQueries,
+      });
+    } catch (error) {
+      console.error('Error during deletion:', error);
+    }
   };
 
   return (

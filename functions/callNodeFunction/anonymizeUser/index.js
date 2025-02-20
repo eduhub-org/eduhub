@@ -37,7 +37,6 @@ const UPDATE_USER = gql`
         lastName: $lastName
         email: $email
         externalProfile: null
-        otherUniversity: null
         matriculationNumber: $matriculationNumber
         picture: null
       }
@@ -55,8 +54,6 @@ const GET_USER_AND_ENROLLMENTS = gql`
       lastName
       email
       externalProfile
-      university
-      otherUniversity
       matriculationNumber
       picture
       CourseEnrollments {
@@ -122,7 +119,6 @@ const deleteKeycloakUser = async (userId, token) => {
 };
 
 const anonymizeUser = async (req, logger) => {
-  let status = 200;
   const result = {
     anonymizedUserId: null,
     messageKey: "",
@@ -131,17 +127,23 @@ const anonymizeUser = async (req, logger) => {
       keycloak_deletion: false,
       user_data_anonymization: false,
       profile_picture_removal: false,
-      certificate_anonymization: false
+      certificate_anonymization: false,
+      motivation_letter_anonymization: false
     }
   };
 
   try {
     if (!req.body.input || !req.body.input.userId) {
       logger.error("Missing required field: userId");
-      status = 400;
-      result.error = "ERROR_MISSING_USER_ID";
-      result.messageKey = "ANONYMIZATION_FAILED_MISSING_USER_ID";
-      return { status, result };
+      return {
+        data: {
+          anonymizeUser: {
+            ...result,
+            error: "ERROR_MISSING_USER_ID",
+            messageKey: "ANONYMIZATION_FAILED_MISSING_USER_ID"
+          }
+        }
+      };
     }
 
     const userId = req.body.input.userId;
@@ -169,27 +171,32 @@ const anonymizeUser = async (req, logger) => {
       logger.error(`Error fetching user data: ${error.message}`);
       
       if (error.message.includes("invalid input syntax for type uuid")) {
-        status = 400;
         result.error = "ERROR_INVALID_UUID";
         result.messageKey = "ANONYMIZATION_FAILED_INVALID_UUID";
         result.message = `Invalid UUID format: ${userId}`;
       } else {
-        status = 500;
         result.error = "ERROR_FETCHING_USER_DATA";
         result.messageKey = "ANONYMIZATION_FAILED_FETCHING_USER_DATA";
         result.message = `Error fetching user data: ${error.message}`;
       }
       
-      return { status, result };
+      return {
+        data: {
+          anonymizeUser: result
+        }
+      };
     }
     
     if (!userData.User_by_pk) {
       logger.error(`User not found: ${userId}`);
-      status = 404;
       result.error = "ERROR_USER_NOT_FOUND";
       result.messageKey = "ANONYMIZATION_FAILED_USER_NOT_FOUND";
       result.message = `User not found with ID: ${userId}`;
-      return { status, result };
+      return {
+        data: {
+          anonymizeUser: result
+        }
+      };
     }
    
 
@@ -283,29 +290,30 @@ const anonymizeUser = async (req, logger) => {
     const allStepsSuccessful = Object.values(result.steps).every(Boolean);
     
     if (allStepsSuccessful) {
-      status = 200;
       result.messageKey = "ANONYMIZATION_SUCCESS";
     } else {
-      status = 206; // Partial Content if some operations failed
       result.messageKey = "ANONYMIZATION_PARTIAL_SUCCESS";
       result.error = "ERROR_SOME_STEPS_FAILED";
     }
 
     logger.info(`Anonymization result: ${JSON.stringify(result, null, 2)}`);
-
-    return { status, result };
+    
+    return {
+      data: {
+        anonymizeUser: result
+      }
+    };
 
   } catch (error) {
     logger.error("Error anonymizing user", { error: error.message, stack: error.stack });
-    const errorStatus = error.status || 500;
-    const errorMessage = error.status ? error.message : "ANONYMIZATION_FAILED_GENERAL_ERROR";
     
-    return { 
-      status: errorStatus, 
-      result: {
-        ...result,
-        error: errorMessage,
-        details: error.details || error.message
+    return {
+      data: {
+        anonymizeUser: {
+          ...result,
+          messageKey: "INTERNAL_SERVER_ERROR",
+          error: error.message || "Unknown error occurred"
+        }
       }
     };
   }

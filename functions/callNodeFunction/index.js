@@ -106,9 +106,14 @@ export const callNodeFunction = async (req, res) => {
 
   try {
     logger.info(`Executing function: ${functionName}`);
-    const result = await functionMap[functionName](req);
-    const formattedResponse = formatResponse(result);
+    const result = await functionMap[functionName](req, logger);
     
+
+    if (req.body.request_query?.includes('mutation')) {
+      return res.status(200).json(result);
+    }
+    
+   
     logger.info(`Successfully executed function: ${functionName}`, {
       response: formattedResponse
     });
@@ -121,6 +126,21 @@ export const callNodeFunction = async (req, res) => {
       stack: error.stack
     });
     
+
+    if (req.body.request_query?.includes('mutation')) {
+      return res.status(200).json({
+        data: {
+          [functionName]: {
+            error: error.message || "Internal Server Error",
+            messageKey: "INTERNAL_SERVER_ERROR",
+            anonymizedUserId: null,
+            steps: null
+          }
+        }
+      });
+    }
+    
+  
     return res.status(200).json({
       success: false,
       error: error.message || "Internal Server Error",
