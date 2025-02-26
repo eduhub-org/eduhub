@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 
 # Rate limiting configuration - 100 requests per hour per IP
-RATE_LIMIT = 100
+RATE_LIMIT = 60
 RATE_WINDOW = 3600  # 1 hour in seconds
 request_counts = {}  # In-memory storage for rate limiting
 
@@ -48,10 +48,19 @@ def generate_uuid_from_id(id_str):
     # Generate a UUID using the course ID string
     return str(uuid.uuid5(NAMESPACE_UUID, str(id_str)))
 
-def handle_moochub_data(page=1, per_page=10):
+def handle_moochub_data(page=1, per_page=25):
     try:
         # Use the existing EduHubClient
         eduhub_client = EduHubClient()
+        
+        # Get environment and storage configuration
+        env = os.getenv('ENVIRONMENT', 'development')
+        bucket_name = os.getenv('BUCKET_NAME', 'emulated-bucket')
+        storage_port = os.getenv('LOCAL_STORAGE_PORT', '4001')
+        
+        # Use environment variable for base URL and ensure it's a complete IRI
+        api_base_url = os.getenv('API_BASE_URL', 'https://localhost')
+        base_url = f"https://api-{api_base_url.replace('https://', '')}/moochub"
         
         query = """query {
             Course(where: {_and: {published: {_eq: true}, Program: {published: {_eq: true}}}}) {
@@ -113,7 +122,7 @@ def handle_moochub_data(page=1, per_page=10):
                 "courseMode": course_mode,
                 "inLanguage": [course["language"].lower()],
                 "startDate": [f"{course['applicationEnd']}T00:00:00Z"] if course["applicationEnd"] else None,
-                "url": f"https://edu.opencampus.sh/course/{course['id']}",
+                "url": f"{api_base_url}/course/{course['id']}",
                 "description": "\n".join(filter(None, [
                     course["headingDescriptionField1"],
                     course["contentDescriptionField1"],
@@ -138,10 +147,16 @@ def handle_moochub_data(page=1, per_page=10):
             }
             
             if course["coverImage"]:
+                # Construct URL based on environment
+                image_url = (
+                    f"http://localhost:{storage_port}/{bucket_name}/{course['coverImage']}"
+                    if env == "development"
+                    else f"https://storage.googleapis.com/{bucket_name}/{course['coverImage']}"
+                )
                 attributes["image"] = {
                     "description": "© Jan Konitzki / opencampus.sh",
                     "type": "ImageObject",
-                    "contentUrl": course["coverImage"],
+                    "contentUrl": image_url,
                     "license": [{
                         "identifier": "proprietary",
                         "url": None,
@@ -175,13 +190,12 @@ def handle_moochub_data(page=1, per_page=10):
         paginated_data = transformed_data[start_idx:end_idx]
         total_pages = (len(transformed_data) + per_page - 1) // per_page
 
-        base_url = "https://edu.opencampus.sh/moochub"
         
         moochub_response = {
             "links": {
-                "self": f"{base_url}?page={page}",
-                "first": f"{base_url}?page=1",
-                "last": f"{base_url}?page={total_pages}",
+                "self": f"{base_url}?page={page}&per_page={per_page}",
+                "first": f"{base_url}?page=1&per_page={per_page}",
+                "last": f"{base_url}?page={total_pages}&per_page={per_page}",
             },
             "data": paginated_data,
             "meta": {
@@ -192,9 +206,9 @@ def handle_moochub_data(page=1, per_page=10):
 
         # Add next/prev links if applicable
         if page < total_pages:
-            moochub_response["links"]["next"] = f"{base_url}?page={page + 1}"
+            moochub_response["links"]["next"] = f"{base_url}?page={page + 1}&per_page={per_page}"
         if page > 1:
-            moochub_response["links"]["prev"] = f"{base_url}?page={page - 1}"
+            moochub_response["links"]["prev"] = f"{base_url}?page={page - 1}&per_page={per_page}"
             
         return moochub_response
             
@@ -240,7 +254,7 @@ def handle_request(request):
     if path == 'moochub':
         # Validate pagination parameters
         page = request.args.get('page', 1)
-        per_page = request.args.get('per_page', 10)
+        per_page = request.args.get('per_page', 25)
         if not validate_pagination(page, per_page):
             return (jsonify({'error': 'Invalid pagination parameters'}), 400, get_cors_headers())
             

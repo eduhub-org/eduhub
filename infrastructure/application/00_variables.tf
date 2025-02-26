@@ -8,6 +8,7 @@ locals {
   hasura_service_name           = "${var.hasura_service_name_root}${var.service_name_extension}"
   eduhub_service_name           = "${var.eduhub_service_name_root}${var.service_name_extension}"
   rent_a_scientist_service_name = "${var.rent_a_scientist_service_name_root}${var.service_name_extension}"
+  eduhub_api_service_name       = "api-${local.eduhub_service_name}"
 }
 
 ######

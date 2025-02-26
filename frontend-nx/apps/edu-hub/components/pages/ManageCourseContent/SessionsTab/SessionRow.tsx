@@ -6,9 +6,12 @@ import {
 } from '../../../../queries/__generated__/ManagedCourse';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import TimePicker from '../../../inputs/TimePicker';
+import EhTimeSelect from '../../../common/EhTimeSelect';
+import { useFormatTime } from '../../../../helpers/dateTimeHelpers';
 import { DebounceInput } from 'react-debounce-input';
 import { eventTargetValueMapper, useRoleMutation } from '../../../../hooks/authedMutation';
+
+import { INSERT_NEW_SESSION_SPEAKER } from '../../../../queries/course';
 import { QueryResult } from '@apollo/client';
 import { SelectUserDialog } from '../../../common/dialogs/SelectUserDialog';
 import { UserForSelection1_User } from '../../../../queries/__generated__/UserForSelection1';
@@ -26,11 +29,6 @@ import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 import { useIsAdmin, useIsInstructor } from '../../../../hooks/authentication';
-import {
-  INSERT_NEW_SESSION_SPEAKER,
-  UPDATE_SESSION_START_TIME,
-  UPDATE_SESSION_END_TIME,
-} from '../../../../queries/course';
 
 const copyDateTime = (target: Date, source: Date) => {
   target = new Date(target);
@@ -69,6 +67,7 @@ export const SessionRow: FC<IProps> = ({
   const isInstructor = useIsInstructor();
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
+  const formatTime = useFormatTime();
 
   const handleDelete = useCallback(() => {
     if (session != null) {
@@ -76,11 +75,14 @@ export const SessionRow: FC<IProps> = ({
       const isSessionInThePast = session.startDateTime < now;
 
       if (isAdmin) {
+        // Admins can delete any session
         setIsConfirmDialogOpen(true);
       } else if (isInstructor) {
         if (isSessionInThePast) {
+          // Instructors cannot delete past sessions
           setIsErrorDialogOpen(true);
         } else {
+          // Instructors can delete future sessions
           setIsConfirmDialogOpen(true);
         }
       }
@@ -125,6 +127,34 @@ export const SessionRow: FC<IProps> = ({
       }
     },
     [session, onSetStartDate, onSetEndDate]
+  );
+
+  const handleSetStartTime = useCallback(
+    (event: string) => {
+      if (session != null) {
+        const [hoursStr, minutesStr] = event.split(':');
+        const hours = Number(hoursStr);
+        const minutes = Number(minutesStr);
+        const newDate = new Date(session.startDateTime);
+        newDate.setHours(hours, minutes, 0, 0);
+        onSetStartDate(session, newDate);
+      }
+    },
+    [session, onSetStartDate]
+  );
+
+  const handleSetEndTime = useCallback(
+    (event: string) => {
+      if (session != null) {
+        const [hoursStr, minutesStr] = event.split(':');
+        const hours = Number(hoursStr);
+        const minutes = Number(minutesStr);
+        const newDate = new Date(session.endDateTime);
+        newDate.setHours(hours, minutes, 0, 0);
+        onSetEndDate(session, newDate);
+      }
+    },
+    [session, onSetEndDate]
   );
 
   const speakerTags = (session?.SessionSpeakers || []).map((x) => ({
@@ -177,10 +207,14 @@ export const SessionRow: FC<IProps> = ({
   return (
     <div>
       <div className={`grid grid-cols-24 gap-3 mb-1 ${session != null ? 'bg-edu-light-gray' : ''}`}>
-        <div className={`p-3 col-span-3 ${!session ? 'h-12 flex items-center' : ''}`}>
-          {!session ? (
-            t('date')
-          ) : (
+        {!session && (
+          <div className="p-3 col-span-3">
+            {t('date')}
+            <br />
+          </div>
+        )}
+        {session && (
+          <div className="p-3 col-span-3">
             <DatePicker
               minDate={lectureStart}
               maxDate={lectureEnd}
@@ -190,47 +224,31 @@ export const SessionRow: FC<IProps> = ({
               onChange={handleSetDate}
               locale={lang}
             />
+          </div>
+        )}
+        <div className="p-3 col-span-2">
+          {!session && <>{t('start_time')}</>}
+          {session && (
+            <EhTimeSelect
+              className="bg-edu-light-gray"
+              onChange={handleSetStartTime}
+              value={formatTime(session.startDateTime)}
+            />
           )}
         </div>
-
-        <div className="col-span-3">
-          <div className={`${!session ? 'p-3 h-12 flex items-center' : ''}`}>
-            {!session && <div className="text-gray-400">{t('start_time')}</div>}
-            {session && (
-              <TimePicker
-                variant="eduhub"
-                label=""
-                identifierVariables={{ sessionId: session.id, startTime: session.startDateTime }}
-                currentValue={session.startDateTime}
-                updateValueMutation={UPDATE_SESSION_START_TIME}
-                className="bg-edu-light-gray h-12"
-                onValueUpdated={(data) => onSetStartDate(session, new Date(data.update_Session_by_pk.startDateTime))}
-              />
-            )}
-          </div>
+        <div className="p-3 col-span-2">
+          {!session && <>{t('end_time')}</>}
+          {session && (
+            <EhTimeSelect
+              className="bg-edu-light-gray"
+              onChange={handleSetEndTime}
+              value={formatTime(session.endDateTime)}
+            />
+          )}
         </div>
-
-        <div className="col-span-3">
-          <div className={`${!session ? 'p-3 h-12 flex items-center' : ''}`}>
-            {!session && <div className="text-gray-400">{t('end_time')}</div>}
-            {session && (
-              <TimePicker
-                variant="eduhub"
-                label=""
-                identifierVariables={{ sessionId: session.id, endTime: session.endDateTime }}
-                currentValue={session.endDateTime}
-                updateValueMutation={UPDATE_SESSION_END_TIME}
-                className="bg-edu-light-gray h-12"
-                onValueUpdated={(data) => onSetEndDate(session, new Date(data.update_Session_by_pk.endDateTime))}
-              />
-            )}
-          </div>
-        </div>
-
-        <div className={`p-3 col-span-6 ${!session ? 'h-12 flex items-center' : ''}`}>
-          {!session ? (
-            t('title')
-          ) : (
+        <div className="p-3 col-span-8">
+          {!session && <>{t('title')}</>}
+          {session && (
             <DebounceInput
               className="w-full bg-edu-light-gray"
               value={session.title}
@@ -240,25 +258,21 @@ export const SessionRow: FC<IProps> = ({
             />
           )}
         </div>
-
-        <div className={`p-3 col-span-7 ${!session ? 'h-12 flex items-center' : ''}`}>
-          {!session ? (
-            t('external_speakers')
-          ) : (
-            <div className="w-full">
+        <div className="p-3 col-span-7">
+          {!session && <>{t('external_speakers')}</>}
+          {session && (
+            <div className="">
               <EhMultipleTag requestAddTag={openAddSpeaker} requestDeleteTag={handleDeleteSpeaker} tags={speakerTags} />
             </div>
           )}
         </div>
-
         <div className="p-3 col-span-2">
           {session && (
             <div>
-              <DeleteButton handleDelete={handleDelete} />
+              <div>{location && <DeleteButton handleDelete={handleDelete} />}</div>
             </div>
           )}
         </div>
-
         {session?.SessionAddresses && (
           <div className="col-span-full pl-3 pb-3 pr-3">
             {[...(session?.SessionAddresses || [])]
@@ -277,6 +291,8 @@ export const SessionRow: FC<IProps> = ({
       </div>
 
       <SelectUserDialog onClose={handleNewSpeaker} open={addSpeakerOpen} title={t('add_external_speaker')} />
+
+      {/* Confirmation Dialog for Deletion */}
       <QuestionConfirmationDialog
         open={isConfirmDialogOpen}
         onClose={() => handleConfirmDelete(false)}
@@ -284,6 +300,8 @@ export const SessionRow: FC<IProps> = ({
         question={t('confirmDeleteSession')}
         confirmationText={t('delete')}
       />
+
+      {/* Error Dialog for Past Session Deletion Attempt */}
       <ErrorMessageDialog
         open={isErrorDialogOpen}
         onClose={handleCloseErrorDialog}

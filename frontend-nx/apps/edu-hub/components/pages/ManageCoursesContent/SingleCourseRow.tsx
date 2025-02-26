@@ -537,19 +537,6 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                       helpText={t('manageCourses:maxMissedSessions.help_text')}
                       min={0}
                     />
-                    <TagSelector
-                      variant="material"
-                      className="col-span-10 flex mt-3"
-                      label={t('course-page:courseGroups')}
-                      placeholder={t('course-page:courseGroups')}
-                      itemId={course.id}
-                      values={currentCourseGroups}
-                      options={courseGroupOptions}
-                      insertValueMutation={INSERT_COURSE_GROUP_TAG}
-                      deleteValueMutation={DELETE_COURSE_GROUP_TAG}
-                      refetchQueries={['AdminCourseList']}
-                      optionsTranslationPrefix="start-page:"
-                    />
                     <InputField
                       variant="material"
                       type="link"

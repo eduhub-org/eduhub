@@ -52,6 +52,14 @@ resource "google_compute_region_network_endpoint_group" "default" {
     #service  = module.keycloak_service.service_name
     url_mask = var.url_mask
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+  depends_on = [
+    google_compute_region_network_endpoint_group.default
+  ]
+
 }
 
 # create Cloud HTTP(S) Load Balancer with Serverless Network Endpoint Groups (NEGs)
@@ -64,7 +72,7 @@ module "lb-http" {
 
   # Create Google-managed SSL certificates for the specified domains. 
   ssl                             = "true"
-  managed_ssl_certificate_domains = ["${local.keycloak_service_name}.opencampus.sh", "${local.hasura_service_name}.opencampus.sh", "${local.eduhub_service_name}.opencampus.sh", "${local.rent_a_scientist_service_name}.opencampus.sh"]
+  managed_ssl_certificate_domains = ["${local.keycloak_service_name}.opencampus.sh", "${local.hasura_service_name}.opencampus.sh", "${local.eduhub_service_name}.opencampus.sh", "${local.rent_a_scientist_service_name}.opencampus.sh", "${local.eduhub_api_service_name}.opencampus.sh"]
   https_redirect                  = "true"
   random_certificate_suffix       = "true"
 
@@ -92,6 +100,9 @@ module "lb-http" {
       }
     }
   }
+  depends_on = [
+    google_compute_region_network_endpoint_group.default
+  ]
 }
 
 
@@ -127,6 +138,14 @@ resource "cloudflare_record" "eduhub" {
 resource "cloudflare_record" "rent_a_scientist" {
   zone_id = var.cloudflare_zone_id
   name    = local.rent_a_scientist_service_name
+  type    = "A"
+  value   = module.lb-http.external_ip
+}
+
+# Add a domain record for the EduHub API service
+resource "cloudflare_record" "eduhub_api" {
+  zone_id = var.cloudflare_zone_id
+  name    = local.eduhub_api_service_name
   type    = "A"
   value   = module.lb-http.external_ip
 }
