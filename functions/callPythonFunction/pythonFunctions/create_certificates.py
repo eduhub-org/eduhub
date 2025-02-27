@@ -7,6 +7,14 @@ from io import BytesIO
 from jinja2 import Environment, DictLoader
 from xhtml2pdf import pisa 
 
+
+class CertificateError(Exception):
+    """Exception class for certificate generation errors with message keys"""
+    def __init__(self, message, message_key):
+        self.message = message
+        self.message_key = message_key
+        super().__init__(message)
+
 class CertificateCreator:
     """
     The `CertificateCreator` class generates certificates for course enrollments by retrieving the necessary template images and html-texts, preparing the content for each certificate based on the enrollment data and then converting HTML templates into PDF certificates. These PDFs are then uploaded to Google Cloud Storage (GCS) and the URLs of the created certificates are updated in the course enrollment records. The class handles both attendance and achievement certificates.
@@ -30,7 +38,7 @@ class CertificateCreator:
 
         if self.certificate_type not in ["achievement", "attendance"]:
             logging.error("Certificate type is incorrect or missing!")
-            raise ValueError("Invalid certificate type")
+            raise CertificateError("Invalid certificate type", "INVALID_CERTIFICATE_TYPE")
 
         self.enrollments = self.eduhub_client.fetch_enrollments(self.user_ids, self.course_id)
         logging.info(f"Fetched enrollments for certificate creation: {self.enrollments}")
@@ -43,7 +51,7 @@ class CertificateCreator:
             int: Count of successfully generated certificates
             
         Raises:
-            RuntimeError: If there's an error in the certificate creation process
+            CertificateError: If there's an error in the certificate creation process
         """
         template_image_url = self.fetch_template_image()
         template_text = self.fetch_template_text()
@@ -54,13 +62,16 @@ class CertificateCreator:
                 pdf_url = self.generate_and_save_certificate_to_gcs(template_image_url, template_text, enrollment)
                 self.eduhub_client.update_course_enrollment_record(enrollment["User"]["id"], enrollment["Course"]["id"], pdf_url, self.certificate_type)
                 successful_count += 1
+            except CertificateError as e:
+                # Propagate certificate generation errors immediately
+                logging.error(f"Certificate error: {str(e)}")
+                raise
             except Exception as e:
                 logging.error(f"Error in processing enrollment {i}: {e}")
+                # Convert unexpected exceptions to CertificateError
+                raise CertificateError(f"Error in processing enrollment {i}: {str(e)}", "CERTIFICATE_GENERATION_ERROR")
         
         logging.info(f"{successful_count}/{len(self.enrollments)} {self.certificate_type} certificate(s) successfully generated.")
-        
-        if successful_count == 0:
-            raise RuntimeError("Failed to generate any certificates")
         
         return successful_count
 
@@ -77,11 +88,11 @@ class CertificateCreator:
             str: The file name of the generated PDF certificate
         
         Raises:
-            RuntimeError: If PDF creation fails
-            Exception: For other errors during the process
+            CertificateError: If PDF creation fails, template image file is not found, or other errors occur
         """
         try:
             # Vorbereitung des Textinhalts
+            logging.debug(f"Downloading template image from: {template_image_url}")
             image = self.storage_client.download_image_from_gcs(template_image_url)
             text_content = self.prepare_text_content(enrollment, image)
 
@@ -106,17 +117,17 @@ class CertificateCreator:
                 logging.info(f'PDF available at: {url}')
                 return pdf_file_name
             else:
-                error_msg = "Failed to create PDF with XHTML2PDF"
-                logging.error(error_msg)
-                raise RuntimeError(error_msg)
-            
-        except RuntimeError as e:
-            logging.error(f"PDF creation failed: {str(e)}")
+                raise CertificateError("Failed to create PDF with XHTML2PDF", "PDF_CREATION_FAILED")
+
+        except CertificateError:
+            # Re-raise CertificateError directly
             raise
+        except FileNotFoundError as e:
+            # Convert FileNotFoundError to CertificateError
+            raise CertificateError(f"Template file not found: {str(e)}", "CERTIFICATE_TEMPLATE_NOT_FOUND")
         except Exception as e:
-            error_msg = f"Error in certificate generation process: {str(e)}"
-            logging.error(error_msg)
-            raise RuntimeError(error_msg)
+            # Convert all other exceptions to CertificateError
+            raise CertificateError(f"Error in certificate generation process: {str(e)}", "CERTIFICATE_GENERATION_ERROR")
 
     def fetch_template_image(self):
         """
@@ -126,36 +137,40 @@ class CertificateCreator:
             str: The URL of the template image.
 
         Raises:
-            ValueError: If certificate type is invalid
-            KeyError: If template URL is missing in the enrollment data
-            Exception: For other unexpected errors
+            CertificateError: If template URL is missing or certificate type is invalid
         """
         try:
             if not self.enrollments:
-                raise ValueError("No enrollments found")
+                raise CertificateError("No enrollments found", "NO_ENROLLMENTS_FOUND")
             
             program = self.enrollments[0]['Course']['Program']
+            logging.info(f"Program: {program}")
             
             if self.certificate_type == "achievement":
                 if not program.get('achievementCertificateTemplateURL'):
-                    raise KeyError("Achievement certificate template URL not found")
+                    raise CertificateError("Achievement certificate template URL not found", 
+                                          "ACHIEVEMENT_TEMPLATE_URL_NOT_FOUND")
+                logging.debug(f"Achievement certificate template URL: {program['achievementCertificateTemplateURL']}")
                 return program['achievementCertificateTemplateURL']
             
             elif self.certificate_type == "attendance":
                 if not program.get('attendanceCertificateTemplateURL'):
-                    raise KeyError("Attendance certificate template URL not found")
+                    raise CertificateError("Attendance certificate template URL not found", 
+                                          "ATTENDANCE_TEMPLATE_URL_NOT_FOUND")
+                logging.debug(f"Attendance certificate template URL: {program['attendanceCertificateTemplateURL']}")
                 return program['attendanceCertificateTemplateURL']
             
             else:
-                raise ValueError(f"Invalid certificate type: {self.certificate_type}")
+                raise CertificateError(f"Invalid certificate type: {self.certificate_type}", 
+                                      "INVALID_CERTIFICATE_TYPE")
             
-        except (KeyError, ValueError) as e:
-            logging.error(f"Error fetching template image: {str(e)}")
+        except CertificateError:
+            # Re-raise CertificateError directly
             raise
         except Exception as e:
             error_msg = f"Unexpected error fetching template image: {str(e)}"
             logging.error(error_msg)
-            raise RuntimeError(error_msg)
+            raise CertificateError(error_msg, "TEMPLATE_FETCH_ERROR")
 
     def fetch_template_text(self):
         """
@@ -165,13 +180,11 @@ class CertificateCreator:
             str: The HTML template text.
 
         Raises:
-            ValueError: If no matching template is found
-            RequestException: If GraphQL request fails
-            Exception: For other unexpected errors
+            CertificateError: If template text cannot be fetched or is not found
         """
         try:
             if not self.enrollments:
-                raise ValueError("No enrollments found")
+                raise CertificateError("No enrollments found", "NO_ENROLLMENTS_FOUND")
             
             program_id = self.enrollments[0]['Course']['Program']['id']
             
@@ -179,7 +192,8 @@ class CertificateCreator:
             # Only get record_type for achievement certificates
             if self.certificate_type == "achievement":
                 if not self.enrollments[0].get('User', {}).get('AchievementRecordAuthors'):
-                    raise ValueError("No achievement record found for user")
+                    raise CertificateError("No achievement record found for user", 
+                                          "ACHIEVEMENT_RECORD_NOT_FOUND")
                 record_type = self.enrollments[0]['User']['AchievementRecordAuthors'][0]['AchievementRecord']['AchievementOption']['recordType']
             else:  # attendance certificate
                 record_type = "DOCUMENTATION"  # or whatever the correct record type is for attendance
@@ -203,34 +217,40 @@ class CertificateCreator:
                 "x-hasura-admin-secret": self.eduhub_client.hasura_admin_secret
             }
 
-            response = requests.post(
-                self.eduhub_client.url,
-                json={'query': query, 'variables': variables},
-                headers=headers
-            )
-            response.raise_for_status()
-            data = response.json()
+            try:
+                response = requests.post(
+                    self.eduhub_client.url,
+                    json={'query': query, 'variables': variables},
+                    headers=headers
+                )
+                response.raise_for_status()
+                data = response.json()
 
-            if 'errors' in data:
-                raise requests.exceptions.RequestException(f"GraphQL Error: {data['errors']}")
+                if 'errors' in data:
+                    raise CertificateError(f"GraphQL Error: {data['errors']}", 
+                                          "GRAPHQL_ERROR")
 
-            # check if the template is empty or more than one template is found
-            if not data['data']['CertificateTemplateProgram'] or len(data['data']['CertificateTemplateProgram']) > 1:
-                raise ValueError(f"No matching template found for recordType: {record_type} and certificateType: {self.certificate_type.upper()}")
-            
-            # Get the first template from the list of templates
-            return data['data']['CertificateTemplateProgram'][0]['CertificateTemplateText']['html']
+                # check if the template is empty or more than one template is found
+                if not data['data']['CertificateTemplateProgram'] or len(data['data']['CertificateTemplateProgram']) > 1:
+                    raise CertificateError(
+                        f"No matching template found for recordType: {record_type} and certificateType: {self.certificate_type.upper()}", 
+                        "CERTIFICATE_TEMPLATE_TEXT_NOT_FOUND"
+                    )
+                
+                # Get the first template from the list of templates
+                return data['data']['CertificateTemplateProgram'][0]['CertificateTemplateText']['html']
 
-        except requests.exceptions.RequestException as e:
-            logging.error(f"GraphQL request failed: {str(e)}")
-            raise
-        except ValueError as e:
-            logging.error(f"Template not found: {str(e)}")
+            except requests.exceptions.RequestException as e:
+                raise CertificateError(f"GraphQL request failed: {str(e)}", 
+                                      "API_REQUEST_FAILED")
+
+        except CertificateError:
+            # Re-raise CertificateError directly
             raise
         except Exception as e:
             error_msg = f"Unexpected error fetching template text: {str(e)}"
             logging.error(error_msg)
-            raise RuntimeError(error_msg)
+            raise CertificateError(error_msg, "TEMPLATE_TEXT_FETCH_ERROR")
 
     def prepare_text_content(self, enrollment, image):
         """
@@ -244,14 +264,12 @@ class CertificateCreator:
             dict: The prepared text content for the certificate
 
         Raises:
-            ValueError: If certificate type is invalid or required data is missing
-            KeyError: If required enrollment data is missing
-            Exception: For other unexpected errors
+            CertificateError: If required enrollment data is missing or certificate type is invalid
         """
         try:
             if self.certificate_type == "attendance":
                 if not enrollment.get('User') or not enrollment.get('Course'):
-                    raise KeyError("Missing required enrollment data")
+                    raise CertificateError("Missing required enrollment data", "MISSING_ENROLLMENT_DATA")
                 
                 session_titles = self.get_attended_sessions(enrollment, enrollment["Course"]["Sessions"])
                 return {
@@ -265,7 +283,7 @@ class CertificateCreator:
             
             elif self.certificate_type == "achievement":
                 if not enrollment.get('Course') or not enrollment.get('Course', {}).get('learningGoals'):
-                    raise KeyError("Missing required course or learning goals data")
+                    raise CertificateError("Missing required course or learning goals data", "MISSING_COURSE_DATA")
                 
                 learning_goals = [goal.strip() for goal in enrollment["Course"]["learningGoals"].split(". ") if goal.strip()]
                 return {
@@ -279,15 +297,19 @@ class CertificateCreator:
                 }
             
             else:
-                raise ValueError(f"Invalid certificate type: {self.certificate_type}")
+                raise CertificateError(f"Invalid certificate type: {self.certificate_type}", "INVALID_CERTIFICATE_TYPE")
             
-        except (KeyError, ValueError) as e:
-            logging.error(f"Error preparing text content: {str(e)}")
+        except CertificateError:
+            # Re-raise CertificateError directly
             raise
+        except KeyError as e:
+            error_msg = f"Missing required data field: {str(e)}"
+            logging.error(error_msg)
+            raise CertificateError(error_msg, "MISSING_REQUIRED_DATA")
         except Exception as e:
             error_msg = f"Unexpected error preparing text content: {str(e)}"
             logging.error(error_msg)
-            raise RuntimeError(error_msg)
+            raise CertificateError(error_msg, "TEXT_CONTENT_PREPARATION_ERROR")
 
     def generate_pdf_file_name(self, enrollment):
         """
@@ -359,30 +381,19 @@ class CertificateCreator:
 
 
 def create_certificates(arguments):
-    """Creates certificates for specified users in a course.
-    
-    Args:
-        hasura_secret (str): Secret for authentication with Hasura
-        arguments (dict): Contains:
-            - input.userIds (list): List of user IDs to generate certificates for
-            - input.courseId (int): Course ID
-            - input.certificateType (str): Type of certificate ('achievement' or 'attendance')
-            
-    Returns:
-        dict: Response containing:
-            - success (bool): Whether the operation was successful
-            - count (int): Number of certificates generated
-            - certificateType (str): Type of certificates generated
-            - error (str, optional): Error message if operation failed
-            - messageKey (str, optional): Translation key for the error message
-    """
+    """Creates certificates for specified users in a course."""
     try:
-        # if list of userIds is empty set count to 0
+        # if list of userIds is empty return success with count 0
         if not arguments["input"]["userIds"]:
-            count = 0
-        else:
-            certificate_creator = CertificateCreator(arguments)
-            count = certificate_creator.create_certificates()
+            return {
+                "success": True,
+                "count": 0,
+                "certificateType": arguments["input"]["certificateType"],
+                "messageKey": "NO_USERS_SELECTED"
+            }
+            
+        certificate_creator = CertificateCreator(arguments)
+        count = certificate_creator.create_certificates()
         
         logging.info(f"Successfully generated {count} certificates")
         return {
@@ -392,17 +403,18 @@ def create_certificates(arguments):
             "messageKey": "CERTIFICATES_GENERATED_SUCCESS"
         }
         
-    except ValueError as e:
-        logging.error(f"Invalid input for certificate generation: {str(e)}")
+    except CertificateError as e:
+        logging.error(f"Certificate error: {str(e)}")
         return {
             "success": False,
             "error": str(e),
-            "messageKey": "INVALID_INPUT"
+            "messageKey": e.message_key
         }
     except Exception as e:
-        logging.error(f"Error creating certificates: {str(e)}")
+        # Catch any unexpected exceptions that weren't converted to CertificateError
+        logging.error(f"Unexpected error creating certificates: {str(e)}")
         return {
             "success": False,
             "error": str(e),
-            "messageKey": "CERTIFICATE_GENERATION_FAILED"
+            "messageKey": "UNEXPECTED_ERROR"
         }

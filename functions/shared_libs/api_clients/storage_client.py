@@ -80,15 +80,20 @@ class StorageClient:
 
     def download_file(self, file_path):
         if self.env == "development":
-            base_dir = os.path.dirname(__file__)  # Gibt das Verzeichnis des aktuellen Skripts zurück
-            local_path = os.path.join(base_dir, "opencampus_attendencecert_template_WS2022.png")
-            with open(local_path, 'rb') as f:
-                file_data = f.read()
-            return BytesIO(file_data)
+            local_path = os.path.join(
+                "/home/node/www/", self.bucket_name, file_path)
+            try:
+                with open(local_path, 'rb') as f:
+                    file_data = f.read()
+                return BytesIO(file_data)
+            except FileNotFoundError:
+                logging.error(f"File not found at {local_path}")
+                raise
         else:
             blob = self.storage_client.bucket(self.bucket_name).blob(file_path)
             blob_data = blob.download_as_bytes()
             return BytesIO(blob_data)
+        
     def download_image_from_gcs(self, image_url):
         image_data = self.download_file(image_url)
         mime_type = "image/png"
