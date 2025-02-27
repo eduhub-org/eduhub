@@ -171,9 +171,6 @@ class EduHubClient:
         """
         Fetches enrollment data for given user IDs and a course ID from a GraphQL API.
 
-        This method constructs a GraphQL query, sends it to the defined endpoint,
-        and processes the response to extract course enrollment data.
-
         Raises:
             requests.exceptions.RequestException: If an error occurs during the request.
 
