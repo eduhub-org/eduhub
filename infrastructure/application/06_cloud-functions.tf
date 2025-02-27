@@ -101,7 +101,7 @@ resource "google_cloudfunctions2_function" "api_proxy" {
     }
 
     secret_environment_variables {
-      key        = "HASURA_GRAPHQL_ADMIN_KEY"
+      key        = "HASURA_ADMIN_SECRET"
       project_id = var.project_id
       secret     = google_secret_manager_secret.hasura_graphql_admin_key.secret_id
       version    = "latest"

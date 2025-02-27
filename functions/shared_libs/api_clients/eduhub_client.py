@@ -7,10 +7,12 @@ import pandas as pd
 
 class EduHubClient:
     def __init__(self):
-        self.url = os.getenv("HASURA_ENDPOINT", "http://localhost:8080/v1/graphql")
-        self.hasura_admin_secret = os.getenv(
-            "HASURA_GRAPHQL_ADMIN_KEY", "myadminsecretkey"
-        )
+        self.url = os.getenv("HASURA_ENDPOINT")
+        self.hasura_admin_secret = os.getenv("HASURA_ADMIN_SECRET")
+        if not self.url:
+            raise ValueError("HASURA_ENDPOINT is not set")
+        if not self.hasura_admin_secret:
+            raise ValueError("HASURA_ADMIN_SECRET is not set")
         self.headers = ""
 
     def set_url(self, url: str):
