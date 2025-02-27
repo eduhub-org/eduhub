@@ -35,12 +35,15 @@ class CertificateCreator:
         self.certificate_type = arguments["input"]["certificateType"]
         self.user_ids = arguments["input"]["userIds"]
         self.course_id = arguments["input"]["courseId"] 
-
+        
         if self.certificate_type not in ["achievement", "attendance"]:
             logging.error("Certificate type is incorrect or missing!")
             raise CertificateError("Invalid certificate type", "INVALID_CERTIFICATE_TYPE")
 
         self.enrollments = self.eduhub_client.fetch_enrollments(self.user_ids, self.course_id)
+        if not self.enrollments:
+            raise CertificateError("No enrollments found", "NO_ENROLLMENTS_FOUND")
+
         logging.info(f"Fetched enrollments for certificate creation: {self.enrollments}")
 
     def create_certificates(self):
@@ -140,9 +143,6 @@ class CertificateCreator:
             CertificateError: If template URL is missing or certificate type is invalid
         """
         try:
-            if not self.enrollments:
-                raise CertificateError("No enrollments found", "NO_ENROLLMENTS_FOUND")
-            
             program = self.enrollments[0]['Course']['Program']
             logging.info(f"Program: {program}")
             
@@ -183,9 +183,6 @@ class CertificateCreator:
             CertificateError: If template text cannot be fetched or is not found
         """
         try:
-            if not self.enrollments:
-                raise CertificateError("No enrollments found", "NO_ENROLLMENTS_FOUND")
-            
             program_id = self.enrollments[0]['Course']['Program']['id']
             
             logging.info(f"Certificate Type: {self.certificate_type}")

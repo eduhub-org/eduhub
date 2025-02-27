@@ -7,52 +7,6 @@ resource "google_cloud_run_service_iam_policy" "eduhub_noauth_invoker" {
   policy_data = data.google_iam_policy.noauth_invoker.policy_data
 }
 
-# Create a variable for the NextAuth secret 
-resource "google_secret_manager_secret" "nextauth_secret" {
-  provider  = google-beta
-  secret_id = "nextauth-secret"
-  replication {
-    auto {}
-  }
-}
-# Set the password of the NextAuth secret
-resource "google_secret_manager_secret_version" "nextauth_secret" {
-  provider    = google-beta
-  secret      = google_secret_manager_secret.nextauth_secret.name
-  secret_data = var.nextauth_secret
-}
-# Grant the compute engine service account permissions to access the secrect for the Hasura graphql admin
-resource "google_secret_manager_secret_iam_member" "nextauth_secret" {
-  secret_id  = google_secret_manager_secret.nextauth_secret.id
-  role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
-  depends_on = [google_secret_manager_secret.nextauth_secret]
-}
-
-
-# Create a variable for the Keycloak client secret for Hasura
-resource "google_secret_manager_secret" "keycloak_hasura_client_secret" {
-  provider  = google-beta
-  secret_id = "keycloak-hasura-client-secret"
-  replication {
-    auto {}
-  }
-}
-# Set the password of the Keycloak client secret for Hasura
-resource "google_secret_manager_secret_version" "keycloak_hasura_client_secret" {
-  provider    = google-beta
-  secret      = google_secret_manager_secret.keycloak_hasura_client_secret.name
-  secret_data = var.keycloak_hasura_client_secret
-}
-# Grant the compute engine service account permissions to access the Keycloak client secret for Hasura
-resource "google_secret_manager_secret_iam_member" "keycloak_hasura_client_secret" {
-  secret_id  = google_secret_manager_secret.keycloak_hasura_client_secret.id
-  role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
-  depends_on = [google_secret_manager_secret.keycloak_hasura_client_secret]
-}
-
-
 # Define the Google Cloud Run service for the Edu frontend
 resource "google_cloud_run_service" "eduhub" {
   provider = google-beta

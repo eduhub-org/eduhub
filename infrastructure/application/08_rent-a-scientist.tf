@@ -7,32 +7,6 @@ resource "google_cloud_run_service_iam_policy" "rent_a_scientist_noauth_invoker"
   policy_data = data.google_iam_policy.noauth_invoker.policy_data
 }
 
-# Create a variable for the Keycloak client secret for rent-a-scientist
-resource "google_secret_manager_secret" "keycloak_ras_client_secret" {
-  provider  = google-beta
-  secret_id = "keycloak-ras-client-secret"
-  replication {
-    auto {}
-  }
-}
-
-# Set the password of the Keycloak client secret for rent-a-scientist
-resource "google_secret_manager_secret_version" "keycloak_ras_client_secret" {
-  provider    = google-beta
-  secret      = google_secret_manager_secret.keycloak_ras_client_secret.name
-  secret_data = var.keycloak_ras_client_secret
-}
-
-# Grant the compute engine service account permissions to access the Keycloak client secret for rent-a-scientist
-resource "google_secret_manager_secret_iam_member" "keycloak_ras_client_secret" {
-  secret_id  = google_secret_manager_secret.keycloak_ras_client_secret.id
-  role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
-  depends_on = [google_secret_manager_secret.keycloak_ras_client_secret]
-}
-
-
-
 # Define the Google Cloud Run service for the Rent-a-Scientist Frontend
 resource "google_cloud_run_service" "rent_a_scientist" {
   provider = google-beta
