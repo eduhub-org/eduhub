@@ -4,6 +4,7 @@ import logging
 from api_clients.eduhub_client import EduHubClient
 import uuid
 from datetime import datetime
+import markdown
 
 # Rate limiting configuration - 100 requests per hour per IP
 RATE_LIMIT = 60
@@ -111,6 +112,31 @@ def handle_moochub_data(page=1, per_page=25):
                 for loc in course["CourseLocations"]
             ) else ["onsite"]
             
+            # Build HTML description
+            description_parts = []
+            if course["tagline"]:
+                description_parts.append(f"<p>{course['tagline']}</p>")
+
+            # Use English or German heading based on course language
+            if course["learningGoals"]:
+                learning_goals_heading = "Learning Goals:" if course["language"].lower() == "en" else "Lernziele:"
+                description_parts.append(f"<h3>{learning_goals_heading}</h3>")
+                description_parts.append(f"<p>{course['learningGoals']}</p>")
+
+            if course["headingDescriptionField1"]:
+                description_parts.append(f"<h3>{course['headingDescriptionField1']}</h3>")
+            if course["contentDescriptionField1"]:
+                # Convert markdown to HTML
+                html_content = markdown.markdown(course["contentDescriptionField1"])
+                description_parts.append(html_content)
+
+            if course["headingDescriptionField2"]:
+                description_parts.append(f"<h3>{course['headingDescriptionField2']}</h3>")
+            if course["contentDescriptionField2"]:
+                # Convert markdown to HTML
+                html_content = markdown.markdown(course["contentDescriptionField2"])
+                description_parts.append(html_content)
+
             attributes = {
                 "name": course["title"],
                 "courseCode": str(course["id"]),
@@ -123,12 +149,7 @@ def handle_moochub_data(page=1, per_page=25):
                 "inLanguage": [course["language"].lower()],
                 "startDate": [f"{course['applicationEnd']}T00:00:00Z"] if course["applicationEnd"] else None,
                 "url": f"{api_base_url}/course/{course['id']}",
-                "description": "\n".join(filter(None, [
-                    course["headingDescriptionField1"],
-                    course["contentDescriptionField1"],
-                    course["headingDescriptionField2"],
-                    course["contentDescriptionField2"]
-                ])),
+                "description": "".join(description_parts),
                 "publisher": {
                     "name": "opencampus.sh",
                     "type": "Organization",
