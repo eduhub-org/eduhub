@@ -94,12 +94,19 @@ resource "google_cloudfunctions2_function" "api_proxy" {
 
   service_config {
     environment_variables = {
-      HASURA_ENDPOINT          = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
-      HASURA_GRAPHQL_ADMIN_KEY = var.hasura_graphql_admin_key
-      API_BASE_URL             = "https://${local.eduhub_service_name}.opencampus.sh"
-      BUCKET_NAME              = var.project_id
-      ENVIRONMENT              = var.environment
+      HASURA_ENDPOINT = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
+      API_BASE_URL    = "https://${local.eduhub_service_name}.opencampus.sh"
+      BUCKET_NAME     = var.project_id
+      ENVIRONMENT     = var.environment
     }
+
+    secret_environment_variables {
+      key        = "HASURA_ADMIN_SECRET"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.hasura_graphql_admin_key.secret_id
+      version    = "latest"
+    }
+
     max_instance_count    = 1
     available_memory      = "256M"
     timeout_seconds       = 60
@@ -156,14 +163,10 @@ resource "google_cloudfunctions2_function" "call_python_function" {
       BUCKET_NAME              = var.project_id
       HASURA_ENDPOINT          = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
       ZOOM_ACCOUNT_ID          = var.zoom_account_id
-      ZOOM_API_KEY             = var.zoom_api_key
-      ZOOM_API_SECRET          = var.zoom_api_secret
       LMS_URL                  = var.lms_url
       LMS_USER                 = var.lms_user
-      LMS_PASSWORD             = var.lms_password
       LMS_ATTENDANCE_SURVEY_ID = var.lms_attendance_survey_id
       MM_URL                   = var.mm_url
-      MM_TOKEN                 = var.mm_token
     }
 
     secret_environment_variables {
@@ -180,6 +183,34 @@ resource "google_cloudfunctions2_function" "call_python_function" {
       version    = "latest"
     }
 
+    secret_environment_variables {
+      key        = "ZOOM_API_KEY"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.zoom_api_key.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "ZOOM_API_SECRET"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.zoom_api_secret.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "LMS_PASSWORD"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.lms_password.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "MM_TOKEN"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.mm_token.secret_id
+      version    = "latest"
+    }
+
     max_instance_count    = 500
     available_memory      = "512M"
     timeout_seconds       = 3600
@@ -188,7 +219,7 @@ resource "google_cloudfunctions2_function" "call_python_function" {
   }
 }
 
-# Make sure the Cloud Function's service account can access both secrets
+# Make sure the Cloud Function's service account can access all secrets
 resource "google_secret_manager_secret_iam_member" "call_python_function_admin_key_access" {
   secret_id = google_secret_manager_secret.hasura_graphql_admin_key.id
   role      = "roles/secretmanager.secretAccessor"
@@ -199,6 +230,34 @@ resource "google_secret_manager_secret_iam_member" "call_python_function_cloud_s
   secret_id = google_secret_manager_secret.cloud_function.id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "call_python_function_zoom_api_key" {
+  secret_id  = google_secret_manager_secret.zoom_api_key.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.zoom_api_key]
+}
+
+resource "google_secret_manager_secret_iam_member" "call_python_function_zoom_api_secret" {
+  secret_id  = google_secret_manager_secret.zoom_api_secret.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.zoom_api_secret]
+}
+
+resource "google_secret_manager_secret_iam_member" "call_python_function_lms_password" {
+  secret_id  = google_secret_manager_secret.lms_password.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.lms_password]
+}
+
+resource "google_secret_manager_secret_iam_member" "call_python_function_mm_token" {
+  secret_id  = google_secret_manager_secret.mm_token.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.mm_token]
 }
 
 ###############################################################################
@@ -240,14 +299,33 @@ resource "google_cloudfunctions2_function" "call_node_function" {
 
   service_config {
     environment_variables = {
-      ENVIRONMENT                  = var.environment
-      KEYCLOAK_USER                = var.keycloak_user
-      KEYCLOAK_URL                 = "https://${local.keycloak_service_name}.opencampus.sh"
-      KEYCLOAK_PW                  = var.keycloak_pw
-      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
-      HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
-      HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
+      ENVIRONMENT     = var.environment
+      KEYCLOAK_USER   = var.keycloak_user
+      KEYCLOAK_URL    = "https://${local.keycloak_service_name}.opencampus.sh"
+      HASURA_ENDPOINT = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
     }
+
+    secret_environment_variables {
+      key        = "KEYCLOAK_PW"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.keycloak_pw.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "HASURA_CLOUD_FUNCTION_SECRET"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.cloud_function.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "HASURA_ADMIN_SECRET"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.hasura_graphql_admin_key.secret_id
+      version    = "latest"
+    }
+
     max_instance_count = 20
     available_memory   = "512M"
     timeout_seconds    = 60
@@ -296,13 +374,32 @@ resource "google_cloudfunctions2_function" "send_mail" {
 
   service_config {
     environment_variables = {
-      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
-      HASURA_MAIL_PW               = var.hasura_mail_pw
-      HASURA_MAIL_USER             = var.hasura_mail_user
-      MAILGUN_API_KEY              = var.mailgun_api_key
-      MAILGUN_DOMAIN               = var.mailgun_domain
-      NODE_ENV                     = var.environment
+      HASURA_MAIL_USER = var.hasura_mail_user
+      MAILGUN_DOMAIN   = var.mailgun_domain
+      NODE_ENV         = var.environment
     }
+
+    secret_environment_variables {
+      key        = "HASURA_CLOUD_FUNCTION_SECRET"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.cloud_function.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "HASURA_MAIL_PW"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.hasura_mail_pw.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "MAILGUN_API_KEY"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.mailgun_api_key.secret_id
+      version    = "latest"
+    }
+
     max_instance_count = 100
     available_memory   = "256M"
     timeout_seconds    = 600
@@ -310,6 +407,24 @@ resource "google_cloudfunctions2_function" "send_mail" {
   }
 }
 
+# Add IAM permissions for the secrets
+resource "google_secret_manager_secret_iam_member" "send_mail_cloud_function_secret" {
+  secret_id = google_secret_manager_secret.cloud_function.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "send_mail_hasura_mail_pw" {
+  secret_id = google_secret_manager_secret.hasura_mail_pw.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "send_mail_mailgun_api_key" {
+  secret_id = google_secret_manager_secret.mailgun_api_key.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+}
 
 ###############################################################################
 # Create Google cloud function for addKeycloakRole
@@ -350,11 +465,24 @@ resource "google_cloudfunctions2_function" "add_keycloak_role" {
 
   service_config {
     environment_variables = {
-      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
-      KEYCLOAK_USER                = var.keycloak_user
-      KEYCLOAK_URL                 = "https://${local.keycloak_service_name}.opencampus.sh"
-      KEYCLOAK_PW                  = var.keycloak_pw
+      KEYCLOAK_USER = var.keycloak_user
+      KEYCLOAK_URL  = "https://${local.keycloak_service_name}.opencampus.sh"
     }
+
+    secret_environment_variables {
+      key        = "HASURA_CLOUD_FUNCTION_SECRET"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.cloud_function.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "KEYCLOAK_PW"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.keycloak_pw.secret_id
+      version    = "latest"
+    }
+
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
@@ -401,13 +529,32 @@ resource "google_cloudfunctions2_function" "update_from_keycloak" {
 
   service_config {
     environment_variables = {
-      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
-      KEYCLOAK_USER                = var.keycloak_user
-      KEYCLOAK_URL                 = "https://${local.keycloak_service_name}.opencampus.sh"
-      KEYCLOAK_PW                  = var.keycloak_pw
-      HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
-      HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
+      KEYCLOAK_USER   = var.keycloak_user
+      KEYCLOAK_URL    = "https://${local.keycloak_service_name}.opencampus.sh"
+      HASURA_ENDPOINT = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
     }
+
+    secret_environment_variables {
+      key        = "HASURA_CLOUD_FUNCTION_SECRET"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.cloud_function.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "KEYCLOAK_PW"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.keycloak_pw.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "HASURA_ADMIN_SECRET"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.hasura_graphql_admin_key.secret_id
+      version    = "latest"
+    }
+
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60
@@ -455,10 +602,23 @@ resource "google_cloudfunctions2_function" "send_questionaires" {
 
   service_config {
     environment_variables = {
-      HASURA_CLOUD_FUNCTION_SECRET = var.hasura_cloud_function_secret
-      HASURA_ENDPOINT              = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
-      HASURA_ADMIN_SECRET          = var.hasura_graphql_admin_key
+      HASURA_ENDPOINT = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
     }
+
+    secret_environment_variables {
+      key        = "HASURA_CLOUD_FUNCTION_SECRET"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.cloud_function.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "HASURA_ADMIN_SECRET"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.hasura_graphql_admin_key.secret_id
+      version    = "latest"
+    }
+
     max_instance_count = 1
     available_memory   = "256M"
     timeout_seconds    = 60

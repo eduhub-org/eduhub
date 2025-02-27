@@ -2,58 +2,6 @@
 # Create Google Cloud Run service for Hasura
 #####
 
-# Create a variable for the access to the Google Cloud functions in the Google secret manager 
-resource "google_secret_manager_secret" "cloud_function" {
-  provider  = google-beta
-  secret_id = "cloud-function"
-  replication {
-    auto {}
-  }
-}
-# Set the password for the Hasura cloud function secret
-resource "google_secret_manager_secret_version" "cloud_function" {
-  provider    = google-beta
-  secret      = google_secret_manager_secret.cloud_function.name
-  secret_data = var.hasura_cloud_function_secret
-}
-# Grant the compute engine service account permissions to access cloud functions secret 
-resource "google_secret_manager_secret_iam_member" "cloud_function" {
-  secret_id  = google_secret_manager_secret.cloud_function.id
-  role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
-  depends_on = [google_secret_manager_secret.cloud_function]
-}
-
-# Create a variable for the password of the Hasura graphql admin 
-resource "google_secret_manager_secret" "hasura_graphql_admin_key" {
-  provider  = google-beta
-  secret_id = "hasura-graphql-admin-key"
-  replication {
-    auto {}
-  }
-}
-# Set the password for the Hasura graphql admin in the Google secret manager
-resource "google_secret_manager_secret_version" "hasura_graphql_admin_key" {
-  provider    = google-beta
-  secret      = google_secret_manager_secret.hasura_graphql_admin_key.name
-  secret_data = var.hasura_graphql_admin_key
-}
-# Grant the compute engine service account permissions to access the secret for the Hasura graphql admin
-resource "google_secret_manager_secret_iam_member" "hasura_graphql_admin_key" {
-  secret_id  = google_secret_manager_secret.hasura_graphql_admin_key.id
-  role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
-  depends_on = [google_secret_manager_secret.hasura_graphql_admin_key]
-}
-
-# Grant the compute engine service account permissions to access the secrect for Hasura db url
-resource "google_secret_manager_secret_iam_member" "hasura_db_url" {
-  secret_id  = google_secret_manager_secret.hasura_db_url.id
-  role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
-  depends_on = [google_secret_manager_secret.hasura_db_url]
-}
-
 # Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the Cloud Run service for Hasura
 resource "google_cloud_run_service_iam_policy" "hasura_noauth_invoker" {
   location = module.hasura_service.location

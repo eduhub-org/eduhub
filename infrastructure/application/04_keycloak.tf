@@ -2,28 +2,6 @@
 # Create Google Cloud Run service for Keycloak
 #####
 
-# Create a secret for the password of the Keycloak console in the Google secret manager 
-resource "google_secret_manager_secret" "keycloak_pw" {
-  provider  = google-beta
-  secret_id = "keycloak-pw"
-  replication {
-    auto {}
-  }
-}
-# Set the password for the Keycloak console
-resource "google_secret_manager_secret_version" "keycloak_pw" {
-  provider    = google-beta
-  secret      = google_secret_manager_secret.keycloak_pw.name
-  secret_data = var.keycloak_pw
-}
-# Grant the defined service account member the IAM permissions to access the secrect with the password for the Keycloak console
-resource "google_secret_manager_secret_iam_member" "keycloak_pw" {
-  secret_id  = google_secret_manager_secret.keycloak_pw.id
-  role       = "roles/secretmanager.secretAccessor"
-  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
-  depends_on = [google_secret_manager_secret.keycloak_pw]
-}
-
 # Apply IAM policy (see 'main.tf') which grants any user the privilige to invoke the Cloud Run service for keycloak
 resource "google_cloud_run_service_iam_policy" "keycloak_noauth_invoker" {
   location    = module.keycloak_service.location
