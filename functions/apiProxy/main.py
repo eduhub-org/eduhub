@@ -121,7 +121,12 @@ def handle_moochub_data(page=1, per_page=25):
             if course["learningGoals"]:
                 learning_goals_heading = "Learning Goals:" if course["language"].lower() == "en" else "Lernziele:"
                 description_parts.append(f"<h3>{learning_goals_heading}</h3>")
-                description_parts.append(f"<p>{course['learningGoals']}</p>")
+                
+                # Split learning goals by newlines and create an HTML list
+                goals = [goal.strip() for goal in course["learningGoals"].split('\n') if goal.strip()]
+                if goals:
+                    list_items = "".join([f"<li>{goal}</li>" for goal in goals])
+                    description_parts.append(f"<ul>{list_items}</ul>")
 
             if course["headingDescriptionField1"]:
                 description_parts.append(f"<h3>{course['headingDescriptionField1']}</h3>")
