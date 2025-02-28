@@ -19,43 +19,46 @@ class CertificateCreator:
     """
     The `CertificateCreator` class generates certificates for course enrollments by retrieving the necessary template images and html-texts, preparing the content for each certificate based on the enrollment data and then converting HTML templates into PDF certificates. These PDFs are then uploaded to Google Cloud Storage (GCS) and the URLs of the created certificates are updated in the course enrollment records. The class handles both attendance and achievement certificates.
     """
-    def __init__(self, arguments):
+    def __init__(self, arguments, enrollments=None, edu_hub_client=None):
         """
         Initializes the CertificateCreator with necessary arguments.
 
         Args:
             arguments (dict): A dictionary containing input data for certificate creation. 
                               It must have keys 'input', 'certificateType', 'userIds', and 'courseId'.
-
-        This constructor sets up the initial state by initializing the storage and EduHub clients,
-        validating the certificate type, and fetching enrollments for the given user IDs and course ID.                                            
+            enrollments (list, optional): Pre-fetched enrollments list to reuse across batches.
         """
         self.storage_client = StorageClient()
-        self.eduhub_client = EduHubClient()
+        self.eduhub_client = edu_hub_client or EduHubClient()
         self.certificate_type = arguments["input"]["certificateType"]
         self.user_ids = arguments["input"]["userIds"]
         self.course_id = arguments["input"]["courseId"] 
+        self.image_cache = None
+        self.image_url_cache = None
         
         if self.certificate_type not in ["achievement", "attendance"]:
             logging.error("Certificate type is incorrect or missing!")
             raise CertificateError("Invalid certificate type", "INVALID_CERTIFICATE_TYPE")
 
-        self.enrollments = self.eduhub_client.fetch_enrollments(self.user_ids, self.course_id)
+        # Use pre-fetched enrollments if provided, otherwise fetch them
+        self.enrollments = enrollments
         if not self.enrollments:
             raise CertificateError("No enrollments found", "NO_ENROLLMENTS_FOUND")
 
-        logging.info(f"Fetched enrollments for certificate creation: {self.enrollments}")
+        logging.info(f"Processing {len(self.enrollments)} enrollments for certificate creation")
 
-    def create_certificates(self):
+
+    def create_certificates(self,):
         """
         Creates certificates for all enrollments and updates the course enrollment records.
         
         Returns:
             int: Count of successfully generated certificates
-            
+                        
         Raises:
             CertificateError: If there's an error in the certificate creation process
         """
+        # Use cached templates if provided, otherwise fetch them
         template_image_url = self.fetch_template_image()
         template_text = self.fetch_template_text()
         successful_count = 0
@@ -96,7 +99,16 @@ class CertificateCreator:
         try:
             # Vorbereitung des Textinhalts
             logging.debug(f"Downloading template image from: {template_image_url}")
-            image = self.storage_client.download_image_from_gcs(template_image_url)
+            if not self.image_url_cache or not self.image_cache:
+                image = self.storage_client.download_image_from_gcs(template_image_url)
+                self.image_cache = image
+                self.image_url_cache = template_image_url
+            elif self.image_url_cache != template_image_url:
+                image = self.storage_client.download_image_from_gcs(template_image_url)
+                self.image_cache = image
+                self.image_url_cache = template_image_url
+            else:
+                image = self.image_cache
             text_content = self.prepare_text_content(enrollment, image)
 
             # Erstellen der Jinja2-Umgebung und Rendern von HTML
@@ -117,6 +129,9 @@ class CertificateCreator:
                     buffer=pdf_bytes_io, 
                     content_type='application/pdf'
                 )
+                pdf_bytes_io.close()
+
+
                 logging.info(f'PDF available at: {url}')
                 return pdf_file_name
             else:
@@ -380,6 +395,7 @@ class CertificateCreator:
 def create_certificates(arguments):
     """Creates certificates for specified users in a course."""
     try:
+        edu_hub_client = EduHubClient()
         # if list of userIds is empty return success with count 0
         if not arguments["input"]["userIds"]:
             return {
@@ -388,14 +404,29 @@ def create_certificates(arguments):
                 "certificateType": arguments["input"]["certificateType"],
                 "messageKey": "NO_USERS_SELECTED"
             }
-            
-        certificate_creator = CertificateCreator(arguments)
-        count = certificate_creator.create_certificates()
         
-        logging.info(f"Successfully generated {count} certificates")
+        # Process in batches to prevent memory issues
+        batch_size = 5  # Adjust based on memory constraints
+        user_ids = arguments["input"]["userIds"]
+        total_count = 0
+        
+        enrollments = edu_hub_client.fetch_enrollments(user_ids, arguments["input"]["courseId"])
+
+        for i in range(0, len(enrollments), batch_size):
+            batch_enrollments = enrollments[i:i+batch_size if i+batch_size < len(enrollments) else len(enrollments)]
+            
+            certificate_creator = CertificateCreator(arguments, batch_enrollments, edu_hub_client)
+            count = certificate_creator.create_certificates()
+            total_count += count
+            
+            # Force garbage collection after each batch
+            import gc
+            gc.collect()
+            
+        logging.info(f"Successfully generated {total_count} certificates")
         return {
             "success": True,
-            "count": count,
+            "count": total_count,
             "certificateType": arguments["input"]["certificateType"],
             "messageKey": "CERTIFICATES_GENERATED_SUCCESS"
         }
