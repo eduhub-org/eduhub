@@ -25,8 +25,8 @@ Seed data is a set of data used to initialize the database with an initial set o
 The seed data includes the following users:
 
 - `admin@example.com`
-- `student1@example.com` through `student5@example.com`
-- `expert1@example.com` through `expert5@example.com`
+- `user@example.com`
+- `instructor@example.com`
 
 The password for all users is `dev`.  
 
@@ -69,8 +69,8 @@ The new initial state will be applied to fresh database installations
 
 ## 📝 Naming Conventions
 
-- Branches: <issue_label>/issue<issue_no>/<sanitized_issue_title>
-  - Example: bug/issue123/fixLoginError
+- Branches: <issue_no>/<sanitized_issue_title>
+  - Example: issue123/fixLoginError
   - We recommend using the GitHub extension to create new branches and copying the `post-checkout` script provided in the folder `.githooks` in the folder `.git/hooks/`. Branch created and checked-out via the issues provides in the GitHub extension will then automatically be named according to the convention.
 
 - Translations:
