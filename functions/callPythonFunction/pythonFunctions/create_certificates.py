@@ -297,7 +297,7 @@ class CertificateCreator:
                 if not enrollment.get('Course') or not enrollment.get('Course', {}).get('learningGoals'):
                     raise CertificateError("Missing required course or learning goals data", "MISSING_COURSE_DATA")
                 
-                learning_goals = [goal.strip() for goal in enrollment["Course"]["learningGoals"].split(". ") if goal.strip()]
+                learning_goals = [goal.strip() for goal in enrollment["Course"]["learningGoals"].split("\n") if goal.strip()]
                 return {
                     "full_name": f"{enrollment['User']['firstName']} {enrollment['User']['lastName']}",
                     "course_name": enrollment["Course"]["title"],
