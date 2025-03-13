@@ -18,7 +18,7 @@ export const updateUser = async (accessToken: string, userId: string) => {
   try {
     console.log('Trying to update user on hasura based on keycloak:', userId);
     const graphQLClient = new GraphQLClient(
-      process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/v1/graphql',
+      process.env.GRAPHQL_URI || 'http://localhost:8080/v1/graphql',
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
