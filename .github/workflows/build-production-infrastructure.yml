@@ -82,8 +82,15 @@ jobs:
           }
 
           IFS=' ' read -ra changed_files <<< "${{ steps.changed_files.outputs.all_changed_files }}"
-          hasura_changed=$(check_folder_changes "backend")
-          keycloak_changed=$(check_folder_changes "keycloak")
+
+          # Original code commented out
+          # hasura_changed=$(check_folder_changes "backend")
+          # keycloak_changed=$(check_folder_changes "keycloak")
+
+          # Always rebuild Keycloak and Hasura by setting their changed flags to true
+          hasura_changed="true"
+          keycloak_changed="true"
+
           frontend_changed=$(check_folder_changes "frontend-nx")
           functions_changed=$(check_folder_changes "functions")
 
@@ -101,8 +108,14 @@ jobs:
             echo $sha
           }
 
-          hasura_sha=$(calculate_sha "backend")
-          keycloak_sha=$(calculate_sha "keycloak")
+          # Original code commented out
+          # hasura_sha=$(calculate_sha "backend")
+          # keycloak_sha=$(calculate_sha "keycloak")
+
+          # Add timestamp to ensure Keycloak and Hasura SHAs are always different
+          hasura_sha=$(calculate_sha "backend")-$(date +%s)
+          keycloak_sha=$(calculate_sha "keycloak")-$(date +%s)
+
           frontend_sha=$(calculate_sha "frontend-nx")
           functions_sha=$(calculate_sha "functions")
 
