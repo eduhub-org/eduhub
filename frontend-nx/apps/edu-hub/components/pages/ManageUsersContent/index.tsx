@@ -28,6 +28,11 @@ const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
             row.Organization?.name ? row.Organization.name : '-'
           }`}</p>
         </div>
+        <div className="pl-3 col-span-3">
+          <p className="text-gray-700 truncate font-medium">{`${t('matriculation_number')}: ${
+            row.matriculationNumber ? `${row.matriculationNumber}` : '-'
+          }`}</p>
+        </div>
       </div>
       <div className="font-medium bg-edu-course-list flex py-4">
         <div className="pl-3">
