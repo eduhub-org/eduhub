@@ -221,5 +221,9 @@
   },
   "confirmDeleteSession": "Möchtest du den Termin wirklich löschen?",
   "cannotDeletePastSession": "Du kannst keinen Termin der in der Vergangenheit liegt löschen! Solltest du den Termin wirklich löschen wollen, kontaktiere bitte einen Administrator.",
-  "delete": "Löschen"
+  "delete": "Löschen",
+  "total_applications": "Bewerbungen (gesamt):",
+  "accepted_applications": "Bewerbungen (angenommen):",
+  "total_invitations": "Einladungen (gesamt):",
+  "confirmed_invitations": "Einladungen (bestätigt):"
 }

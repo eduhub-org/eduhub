@@ -55,9 +55,24 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const { t, lang } = useTranslation('manageCourse');
   const displayDate = useDisplayDate();
 
+  const applicationStats = useMemo(() => {
+    console.log(course.CourseEnrollments);
+    const totalApplications = course.CourseEnrollments.length;
+    const approvedApplications = course.CourseEnrollments.filter(
+      enrollment => enrollment.motivationRating === 'INVITE'
+    ).length;
+    const invitedApplicants = course.CourseEnrollments.filter(
+      enrollment => enrollment.status === 'INVITED' || enrollment.status === 'CONFIRMED'
+    ).length;
+    const confirmedApplicants = course.CourseEnrollments.filter(
+      enrollment => enrollment.status === 'CONFIRMED'
+    ).length;
+    return { totalApplications, approvedApplications, invitedApplicants, confirmedApplicants };
+  }, [course.CourseEnrollments]);
+
   const infoDots = (
     <>
-    <div>{t('course-page:application-rating')}</div>
+    <div className="text-gray-400">{t('course-page:application-rating')}</div>
     <div className="grid grid-cols-6 text-gray-400">
       <div>
         <Dot color="lightgreen" /> {t('course-page:invite')}
@@ -267,6 +282,20 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
               />
             ))}
 
+            <div className="mt-6 mb-6 text-gray-300 text-lg grid grid-cols-[max-content_auto] gap-x-8 gap-y-1">
+              <p className="font-semibold">{t('course-page:total_applications')}</p>
+              <p className="font-normal">{applicationStats.totalApplications}</p>
+
+              <p className="font-semibold">{t('course-page:accepted_applications')}</p>
+              <p className="font-normal">{applicationStats.approvedApplications}</p>
+
+              <p className="font-semibold">{t('course-page:total_invitations')}</p>
+              <p className="font-normal">{applicationStats.invitedApplicants}</p>
+
+              <p className="font-semibold">{t('course-page:confirmed_invitations')}</p>
+              <p className="font-normal">{applicationStats.confirmedApplicants}</p>
+            </div>
+
             <div className="mt-6 mb-3">{infoDots}</div>
 
             <OnlyAdmin>
@@ -283,7 +312,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         <Button
           as="a"
           href={`mailto:?bcc=${getEmailsOfConfirmedApplications()}`}
-          className="bg-edu-course-current rounded-full py-2 px-4"
+          className="bg-edu-course-current rounded-full py-2 px-4 text-gray-900"
           filled
         >
           {t('course-page:email-confirmed-applicants')}
