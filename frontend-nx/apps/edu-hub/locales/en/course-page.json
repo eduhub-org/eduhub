@@ -225,5 +225,9 @@
   },
   "confirmDeleteSession": "Do you really want to delete the session?",
   "cannotDeletePastSession": "You cannot delete a session that is in the past! If you really want to delete the session, please contact an administrator.",
-  "delete": "Delete"
+  "delete": "Delete",
+  "total_applications": "Applications (total):",
+  "accepted_applications": "Applications (accepted):",
+  "total_invitations": "Invitations (total):",
+  "confirmed_invitations": "Invitations (confirmed):"
 }
