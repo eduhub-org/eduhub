@@ -54,14 +54,16 @@ def load_participation_data(arguments):
         
         return {
             "success": True,
-            "link": url
+            "link": url,
+            "messageKey": "SUCCESS"
         }
 
     except Exception as e:
         logging.error(f"Error loading participation data: {str(e)}")
         return {
             "success": False,
-            "error": str(e)
+            "error": str(e),
+            "messageKey": "FAILURE"
         }
 
 
