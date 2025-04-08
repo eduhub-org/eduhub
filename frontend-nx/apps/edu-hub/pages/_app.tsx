@@ -92,6 +92,15 @@ const MyApp: FC<AppProps & InitialProps> & {
           `,
                 }}
               />
+
+              <Script
+                id="plausible-analytics"
+                data-domain="edu.opencampus.sh"
+                src="https://plausible.io/js/script.js"
+                strategy="afterInteractive"
+                data-cookieconsent="statistics"
+                type="text/plain"
+              />
               <Head>
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
               </Head>
