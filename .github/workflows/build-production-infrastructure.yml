@@ -57,7 +57,7 @@ jobs:
 
       - name: Get changed files
         id: changed_files
-        uses: tj-actions/changed-files@v41
+        uses: tj-actions/changed-files@v46
 
       - name: List all changed files
         id: list_changed_files
