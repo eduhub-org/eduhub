@@ -5,7 +5,7 @@ export const ORGANIZATION_LIST = gql`
     $limit: Int = 15
     $offset: Int = 0
     $filter: Organization_bool_exp = {}
-    $order_by: [Organization_order_by!] = {name: asc}
+    $order_by: [Organization_order_by!] = {created_at: desc}
   ) {
     Organization(
       limit: $limit
@@ -18,6 +18,7 @@ export const ORGANIZATION_LIST = gql`
       type
       description
       aliases
+      created_at
       Users {
         id
       }
