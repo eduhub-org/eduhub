@@ -193,7 +193,8 @@
       "course_enrollments": "Anmeldungen",
       "course_groups": "Kursgruppen",
       "course_degrees": "Kurs-Degrees",
-      "achievement_options": "Leistungsnachweisoptionen"
+      "achievement_options": "Leistungsnachweisoptionen",
+      "users": "Benutzern"
     }
   }
 }

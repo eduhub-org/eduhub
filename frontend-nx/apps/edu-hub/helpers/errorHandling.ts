@@ -39,6 +39,12 @@ const knownRelationships: TableRelationship[] = [
     constraintName: 'Course_programId_fkey',
     userFriendlyNameKey: 'error_handling.entities.courses'
   },
+  {
+    parentTable: 'Organization',
+    childTable: 'User',
+    constraintName: 'User_organizationId_fkey',
+    userFriendlyNameKey: 'error_handling.entities.users'
+  },
   // Add other relationships as needed
 ];
 

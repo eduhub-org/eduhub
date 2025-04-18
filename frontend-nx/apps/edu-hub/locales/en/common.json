@@ -193,7 +193,8 @@
       "course_enrollments": "enrollments",
       "course_groups": "course groups",
       "course_degrees": "course degrees",
-      "achievement_options": "achievement options"
+      "achievement_options": "achievement options",
+      "users": "users"
     }
   }
 }
