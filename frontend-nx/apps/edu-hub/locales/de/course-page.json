@@ -177,7 +177,8 @@
   "learning_goals": {
     "label": "Lernziele",
     "help_text": "Die Lernziele sind Teil des Leistungszertifikats und können nur durch die Programmleitung geändert werden. Wenn du Änderungen vorschlagen möchtest oder dir Fehler auffallen, wende dich bitte an diese.",
-    "placeholder": "Lernziel 1\nLernziel 2\nLernziel 3\nLernziel 4"
+    "placeholder": "Lernziel 1\nLernziel 2\nLernziel 3\nLernziel 4",
+    "read_only_placeholder": "Bitte kontaktiere die Programmleitung, um Lernziele zu vereinbaren und hier hinzuzufügen."
   },
   "info_block_1_title": {
     "label": "Info-Block 1",
