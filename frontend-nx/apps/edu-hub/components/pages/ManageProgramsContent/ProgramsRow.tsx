@@ -47,11 +47,12 @@ import {
 } from '../../../queries/__generated__/UpdateProgramParticipationTemplate';
 import path from 'path';
 import InputField from '../../inputs/InputField';
+import TableGridDeleteButton from '../../common/TableGrid/components/TableGridDeleteButton';
+import { DELETE_PROGRAM } from '../../../queries/updateProgram';
 
 interface ProgramsRowProps {
   program: ProgramList_Program;
   openProgramId: number;
-  canDelete: boolean;
   qResult: QueryResult<any>;
   onSetPublished: (p: ProgramList_Program, isPublished: boolean) => any;
   onSetApplicationStart: (p: ProgramList_Program, start: Date | null) => any;
@@ -61,17 +62,14 @@ interface ProgramsRowProps {
   onSetUploadData: (p: ProgramList_Program, d: Date | null) => any;
   onSetVisibilityAttendanceCertificate: (p: ProgramList_Program, isVisible: boolean) => any;
   onSetVisibilityAchievementCertificate: (p: ProgramList_Program, isVisible: boolean) => any;
-  onDelete: (p: ProgramList_Program) => any;
   onOpenProgram: (p: ProgramList_Program) => any;
 }
 
 export const ProgramsRow: FC<ProgramsRowProps> = ({
   program,
   openProgramId,
-  canDelete,
   qResult,
   onSetApplicationEnd,
-  onDelete,
   onOpenProgram,
   onSetApplicationStart,
   onSetLectureEnd,
@@ -131,10 +129,6 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   const handleOpenProgram = useCallback(() => {
     onOpenProgram(program);
   }, [program, onOpenProgram]);
-
-  const handleDeleteProgram = useCallback(() => {
-    onDelete(program);
-  }, [program, onDelete]);
 
   const templateAttendanceUploadRef: MutableRefObject<any> = useRef(null);
   const handleUploadAttendanceTemplateClick = useCallback(() => {
@@ -341,13 +335,17 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
             </IconButton>
           </div>
 
-          {canDelete && (
-            <div>
-              <IconButton onClick={handleDeleteProgram}>
-                <MdDelete size="0.75em" />
-              </IconButton>
-            </div>
-          )}
+          <div>
+            <TableGridDeleteButton
+              deleteMutation={DELETE_PROGRAM}
+              id={program.id}
+              refetchQueries={['ProgramList']}
+              idType="number"
+              deletionConfirmationQuestion={t('managePrograms:delete_button.delete_program_confirmation', {
+                title: program.title || t('managePrograms:delete_button.untitled_program'),
+              })}
+            />
+          </div>
         </div>
       </div>
 

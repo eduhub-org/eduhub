@@ -356,7 +356,6 @@ export const ManageProgramsContent: FC = () => {
                 key={v.id}
                 program={v}
                 qResult={qResult}
-                canDelete={v.Courses.length === 0}
                 openProgramId={openProgram}
                 onSetPublished={handleTogglePublished}
                 onSetApplicationStart={handleApplicationStart}
@@ -364,7 +363,6 @@ export const ManageProgramsContent: FC = () => {
                 onSetLectureStart={handleLectureStart}
                 onSetLectureEnd={handleLectureEnd}
                 onSetUploadData={handleUploadDeadline}
-                onDelete={handleDelete}
                 onOpenProgram={handleOpenProgram}
                 onSetVisibilityAttendanceCertificate={handleProgramAttendanceCertificateVisible}
                 onSetVisibilityAchievementCertificate={handleProgramAchievementCertVisible}

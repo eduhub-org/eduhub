@@ -25,8 +25,8 @@ export const INSERT_PROGRAM = gql`
 `;
 
 export const DELETE_PROGRAM = gql`
-  mutation DeleteProgram($programId: Int!) {
-    delete_Program_by_pk(id: $programId) {
+  mutation DeleteProgram($id: Int!) {
+    delete_Program_by_pk(id: $id) {
       id
     }
   }
