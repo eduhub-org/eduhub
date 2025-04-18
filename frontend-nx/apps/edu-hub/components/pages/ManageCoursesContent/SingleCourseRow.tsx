@@ -60,6 +60,7 @@ import {
 } from '../../../queries/course';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
+import TableGridDeleteButton from '../../common/TableGrid/components/TableGridDeleteButton';
 
 interface EntrollmentStatusCount {
   [key: string]: number;
@@ -150,26 +151,6 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   const [deleteACoursByPk] = useAdminMutation<DeleteCourseByPk, DeleteCourseByPkVariables>(DELETE_A_COURSE);
 
   /* #region callbacks */
-  const handleDelete = useCallback(
-    async (courseID: number) => {
-      const response = await deleteACoursByPk({
-        variables: {
-          id: courseID,
-        },
-      });
-      if (response.errors) {
-        console.log(response.errors);
-        return;
-      }
-      refetchCourses();
-    },
-    [deleteACoursByPk, refetchCourses]
-  );
-
-  const onClickDelete = useCallback(() => {
-    handleDelete(course.id);
-  }, [handleDelete, course.id]);
-
   const handleArrowClick = useCallback(() => {
     setShowDetails((previous) => !previous);
   }, [setShowDetails]);
@@ -409,10 +390,15 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
           </div>
         </td>
         <td className="bg-white">
-          {/* Delete button */}
-          <IconButton onClick={onClickDelete} size="small">
-            <MdDelete />
-          </IconButton>
+          <TableGridDeleteButton
+            deleteMutation={DELETE_A_COURSE}
+            id={course.id}
+            refetchQueries={['AdminCourseList']}
+            idType="number"
+            deletionConfirmationQuestion={t('manageCourses:delete_button.delete_course_confirmation', {
+              title: course.title || t('manageCourses:delete_button.untitled_course'),
+            })}
+          />
         </td>
       </tr>
       <tr className={showDetails ? 'h-0' : 'h-1'} />

@@ -5,7 +5,9 @@ import { MdDelete } from 'react-icons/md';
 
 import { TableGridDeleteButtonProps } from '../types';
 import { QuestionConfirmationDialog } from '../../dialogs/QuestionConfirmationDialog';
+import { ErrorMessageDialog } from '../../dialogs/ErrorMessageDialog';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
+import { handleForeignKeyError } from '../../../../helpers/errorHandling';
 
 const TableGridDeleteButton = ({
   deleteMutation,
@@ -16,10 +18,12 @@ const TableGridDeleteButton = ({
 }: TableGridDeleteButtonProps) => {
   const [deleteItem] = useRoleMutation(deleteMutation);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { t } = useTranslation();
 
   // If no question is provided, use the default one
-  const confirmationQuestion = deletionConfirmationQuestion || t('common:deletion_confirmation_question');
+  const confirmationQuestion =
+    deletionConfirmationQuestion || t('table_grid_delete_button:deletion_confirmation_question');
 
   const handleDeleteClick = () => {
     setIsConfirmationOpen(true);
@@ -30,6 +34,10 @@ const TableGridDeleteButton = ({
     if (confirmed) {
       performDelete();
     }
+  };
+
+  const handleErrorClose = () => {
+    setErrorMessage(null);
   };
 
   const performDelete = () => {
@@ -48,12 +56,17 @@ const TableGridDeleteButton = ({
         console.error('Invalid UUID string:', id);
         return;
       }
-      // Optionally, you could add a UUID validation regex here
     }
 
     deleteItem({
       variables: { id: variableId },
       refetchQueries,
+      onError: (error) => {
+        // Use the generic foreign key error handler
+        const message = handleForeignKeyError(error, t);
+        setErrorMessage(message);
+        console.error('Error deleting item:', error.message);
+      },
     });
   };
 
@@ -76,11 +89,14 @@ const TableGridDeleteButton = ({
       </IconButton>
       <QuestionConfirmationDialog
         question={confirmationQuestion}
-        confirmationText={t('common:confirm_delete')}
+        confirmationText={t('table_grid_delete_button.confirm_delete')}
         open={isConfirmationOpen}
         onClose={() => handleConfirmationClose(false)}
         onConfirm={() => handleConfirmationClose(true)}
       />
+      {errorMessage && (
+        <ErrorMessageDialog errorMessage={errorMessage} open={!!errorMessage} onClose={handleErrorClose} />
+      )}
     </>
   );
 };
