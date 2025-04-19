@@ -25,7 +25,6 @@ import { INSERT_COURSE_DEGREE_TAG, DELETE_COURSE_DEGREE_TAG } from '../../../que
 import { DELETE_A_COURSE, UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import { DELETE_COURSE_INSRTRUCTOR } from '../../../queries/mutateCourseInstructor';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
-import { DeleteCourseByPk, DeleteCourseByPkVariables } from '../../../queries/__generated__/DeleteCourseByPk';
 import {
   DeleteCourseInstructor,
   DeleteCourseInstructorVariables,

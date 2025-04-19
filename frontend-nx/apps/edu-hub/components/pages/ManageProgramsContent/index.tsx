@@ -14,7 +14,6 @@ import {
   UpdateProgramPublishedVariables,
 } from '../../../queries/__generated__/UpdateProgramPublished';
 import {
-  DELETE_PROGRAM,
   INSERT_PROGRAM,
   UPDATE_PROGRAM_ACHIEVEMENT_CERT_VISIBLE,
   UPDATE_PROGRAM_APPLICATION_END,
@@ -25,11 +24,6 @@ import {
   UPDATE_PROGRAM_UPLOAD_DEADLINE,
   UPDATE_PROGRAM_PUBLISHED,
 } from '../../../queries/updateProgram';
-import { UpdateProgramTitle, UpdateProgramTitleVariables } from '../../../queries/__generated__/UpdateProgramTitle';
-import {
-  UpdateProgramShortTitle,
-  UpdateProgramShortTitleVariables,
-} from '../../../queries/__generated__/UpdateProgramShortTitle';
 import {
   UpdateProgramApplicationStart,
   UpdateProgramApplicationStartVariables,
@@ -54,17 +48,7 @@ import {
 import { Button } from '@mui/material';
 
 import { InsertProgram, InsertProgramVariables } from '../../../queries/__generated__/InsertProgram';
-import { DeleteProgram, DeleteProgramVariables } from '../../../queries/__generated__/DeleteProgram';
 import { ProgramsRow } from './ProgramsRow';
-import {
-  UpdateProgramStartQuestionaire,
-  UpdateProgramStartQuestionaireVariables,
-} from '../../../queries/__generated__/UpdateProgramStartQuestionaire';
-import { UpdateProgramSpeakerQuestionaire } from '../../../queries/__generated__/UpdateProgramSpeakerQuestionaire';
-import {
-  UpdateProgramClosingQuestionaire,
-  UpdateProgramClosingQuestionaireVariables,
-} from '../../../queries/__generated__/UpdateProgramClosingQuestionaire';
 import {
   UpdateProgramAchievementCertVisible,
   UpdateProgramAchievementCertVisibleVariables,
