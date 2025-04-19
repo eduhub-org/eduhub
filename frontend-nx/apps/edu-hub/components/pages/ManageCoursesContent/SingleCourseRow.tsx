@@ -148,8 +148,6 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
 
   const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
 
-  const [deleteACoursByPk] = useAdminMutation<DeleteCourseByPk, DeleteCourseByPkVariables>(DELETE_A_COURSE);
-
   /* #region callbacks */
   const handleArrowClick = useCallback(() => {
     setShowDetails((previous) => !previous);

@@ -108,19 +108,6 @@ export const ManageProgramsContent: FC = () => {
     qResult.refetch();
   }, [insertProgram, t, qResult]);
 
-  const [deleteProgramMutation] = useAdminMutation<DeleteProgram, DeleteProgramVariables>(DELETE_PROGRAM);
-  const deleteProgram = useCallback(
-    async (p: ProgramList_Program) => {
-      await deleteProgramMutation({
-        variables: {
-          programId: p.id,
-        },
-      });
-      qResult.refetch();
-    },
-    [qResult, deleteProgramMutation]
-  );
-
   const [updatePublished] = useAdminMutation<UpdateProgramPublished, UpdateProgramPublishedVariables>(
     UPDATE_PROGRAM_PUBLISHED
   );
@@ -288,17 +275,6 @@ export const ManageProgramsContent: FC = () => {
     [activeDialogProgram, setProgramPublished, setConfirmMakeInvisibleOpen]
   );
 
-  const [confirmDeleteProgramOpen, setConfirmDeleteProgramOpen] = useState(false);
-  const handleConfirmDeleteProgramClose = useCallback(
-    (confirm: boolean) => {
-      if (confirm && activeDialogProgram != null) {
-        deleteProgram(activeDialogProgram);
-      }
-      setConfirmDeleteProgramOpen(false);
-    },
-    [activeDialogProgram, deleteProgram, setConfirmDeleteProgramOpen]
-  );
-
   const handleTogglePublished = useCallback(
     (v: ProgramList_Program, isPublished: boolean) => {
       setActiveDialogProgram(v);
@@ -309,14 +285,6 @@ export const ManageProgramsContent: FC = () => {
       }
     },
     [setActiveDialogProgram, setConfirmMakeInvisibleOpen, setConfirmMakeVisibleOpen]
-  );
-
-  const handleDelete = useCallback(
-    (v: ProgramList_Program) => {
-      setActiveDialogProgram(v);
-      setConfirmDeleteProgramOpen(true);
-    },
-    [setActiveDialogProgram, setConfirmDeleteProgramOpen]
   );
 
   const handleOpenProgram = useCallback(
@@ -391,15 +359,6 @@ export const ManageProgramsContent: FC = () => {
           onClose={() => handleMakeInvisibleDialogClose(false)}
           onConfirm={() => handleMakeInvisibleDialogClose(true)}
           open={confirmMakeInvisibleOpen}
-        />
-        <QuestionConfirmationDialog
-          question={t('course-page:do-you-want-to-delete-the-program', {
-            title: activeDialogProgram?.title,
-          })}
-          confirmationText={t('delete')}
-          onClose={() => handleConfirmDeleteProgramClose(false)}
-          onConfirm={() => handleConfirmDeleteProgramClose(true)}
-          open={confirmDeleteProgramOpen}
         />
       </div>
     </>
