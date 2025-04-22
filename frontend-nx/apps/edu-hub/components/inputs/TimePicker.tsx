@@ -7,7 +7,7 @@ import { prioritizeClasses } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
-import { useFormatTimeString, useFormatTime, useFormatDateTime } from '../../helpers/dateTimeHelpers';
+import { useFormatTimeString, useFormatTime } from '../../helpers/dateTimeHelpers';
 
 type TimePickerProps = {
   variant: 'material' | 'eduhub';
@@ -37,15 +37,12 @@ const TimePicker: React.FC<TimePickerProps> = ({
   const { t } = useTranslation();
   const formatTimeString = useFormatTimeString();
   const formatTime = useFormatTime();
-  const formatDateTime = useFormatDateTime();
 
   const formatTimeValue = (val: Date | string | null): string => {
     return formatTimeString(val);
   };
 
-  const [originalDateTime, setOriginalDateTime] = useState<Date | null>(
-    currentValue instanceof Date ? currentValue : null
-  );
+  const [originalDateTime] = useState<Date | null>(currentValue instanceof Date ? currentValue : null);
 
   const [value, setValue] = useState<string | null>(currentValue ? formatTimeValue(currentValue) : null);
   const [errorMessage, setErrorMessage] = useState('');
