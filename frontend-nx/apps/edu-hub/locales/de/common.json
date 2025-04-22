@@ -137,6 +137,10 @@
     "apply": "Ausführen",
     "none": "Keine Aktion"
   },
+  "table_grid_delete_button": {
+    "confirm_delete": "Löschen bestätigen",
+    "deletion_confirmation_question": "Bist du sicher, dass du diesen Eintrag löschen möchtest?"
+  },
   "file_uploader": {
     "upload_new_profile_picture": "Neues Profilbild hochladen",
     "upload_file": "Datei hochladen",
@@ -173,5 +177,24 @@
   "authed_query": {
     "session_expired_or_invalid": "Ihre Sitzung ist ungültig oder abgelaufen. Bitte melden Sie sich erneut an.",
     "authentication_error": "Authentifizierungsfehler"
+  },
+  "error_handling": {
+    "delete_restricted_by_relationship": "{{parent}} können nicht gelöscht werden, wenn sie mit {{child}} verknüpft sind. Bitte lösche diese zuerst.",
+    "delete_restricted_by_relationships": "{{table}} können nicht gelöscht werden, wenn sie mit anderen Einträgen verknüpft sind. Bitte lösche zuerst die anderen Einträge.",
+    "generic_error": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",
+    "entities": {
+      "course": "Kurse",
+      "courseenrollment": "Anmeldungen",
+      "coursegroup": "Kursgruppen",
+      "organization": "Organisationen",
+      "program": "Programme",
+      "achievement": "Leistungsnachweise",
+      "courses": "Kursen",
+      "course_enrollments": "Anmeldungen",
+      "course_groups": "Kursgruppen",
+      "course_degrees": "Kurs-Degrees",
+      "achievement_options": "Leistungsnachweisoptionen",
+      "users": "Benutzern"
+    }
   }
 }

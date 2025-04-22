@@ -28,5 +28,9 @@
         "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
         "help_text": "Dieser Fragebogenlink wird den Teilnehmenden nach dem letzten Termin eines Kurses oder einer Veranstaltung per E-Mail zugeschickt.\n Der Titel des Programms und der Name des Kurses oder der Veranstaltung werden per URL-Parameter automatisch mitgegeben und können entsprechend in den Fragebogen übernommen werden.",
         "error_text": "Ungültiges Linkformat!"
+    },
+    "delete_button": {
+      "delete_program_confirmation": "Soll das Programm '{{title}}' wirklich gelöscht werden?",
+      "untitled_program": "Unbenanntes Programm"
     }
 }

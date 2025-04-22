@@ -20,5 +20,5 @@ export interface DeleteProgram {
 }
 
 export interface DeleteProgramVariables {
-  programId: number;
+  id: number;
 }

@@ -18,5 +18,9 @@
     "label": "Maximum permitted missed sessions",
     "help_text": "By default, the value is set to 2, but all values greater than or equal to 0 are permitted.",
     "error_text": "Incorrect missed session Format!"
+  },
+  "delete_button": {
+    "delete_course_confirmation": "Are you sure you want to delete the course '{{title}}'?",
+    "untitled_course": "Untitled Course"
   }
 }
