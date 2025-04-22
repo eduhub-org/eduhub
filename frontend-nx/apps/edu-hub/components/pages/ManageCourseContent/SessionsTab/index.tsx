@@ -14,21 +14,11 @@ import {
   DELETE_SESSION,
   DELETE_SESSION_SPEAKER,
   INSERT_SESSION_WITH_ADDRESSES,
-  UPDATE_SESSION_END_TIME,
-  UPDATE_SESSION_START_TIME,
   UPDATE_SESSION_TITLE,
 } from '../../../../queries/course';
 import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
 import { SessionRow } from './SessionRow';
 import { DeleteSession, DeleteSessionVariables } from '../../../../queries/__generated__/DeleteSession';
-import {
-  UpdateSessionStartTime,
-  UpdateSessionStartTimeVariables,
-} from '../../../../queries/__generated__/UpdateSessionStartTime';
-import {
-  UpdateSessionEndTime,
-  UpdateSessionEndTimeVariables,
-} from '../../../../queries/__generated__/UpdateSessionEndTime';
 import { UpdateSessionTitle, UpdateSessionTitleVariables } from '../../../../queries/__generated__/UpdateSessionTitle';
 import {
   InsertSessionWithAddresses,
@@ -144,24 +134,6 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     qResult
   );
 
-  const setSessionStart = useUpdateCallback2<UpdateSessionStartTime, UpdateSessionStartTimeVariables>(
-    UPDATE_SESSION_START_TIME,
-    'sessionId',
-    'startTime',
-    pickIdPkMapper,
-    identityEventMapper,
-    qResult
-  );
-
-  const setSessionEnd = useUpdateCallback2<UpdateSessionEndTime, UpdateSessionEndTimeVariables>(
-    UPDATE_SESSION_END_TIME,
-    'sessionId',
-    'endTime',
-    pickIdPkMapper,
-    identityEventMapper,
-    qResult
-  );
-
   return (
     <div>
       <div className="flex justify-start mb-4 text-white">
@@ -173,8 +145,6 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
       <div className="mb-3 text-gray-400">
         <SessionRow
           onDelete={deleteSession}
-          onSetStartDate={setSessionStart}
-          onSetEndDate={setSessionEnd}
           onSetTitle={setSessionTitle}
           onDeleteSpeaker={deleteSessionSpeaker}
           lectureStart={course.Program?.lectureStart}
@@ -187,8 +157,6 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
       {courseSessions.map((session) => (
         <SessionRow
           onDelete={deleteSession}
-          onSetStartDate={setSessionStart}
-          onSetEndDate={setSessionEnd}
           onSetTitle={setSessionTitle}
           onDeleteSpeaker={deleteSessionSpeaker}
           lectureStart={course.Program?.lectureStart}

@@ -21,5 +21,5 @@ export interface UpdateSessionEndTime {
 
 export interface UpdateSessionEndTimeVariables {
   sessionId: number;
-  endTime: any;
+  value: any;
 }
