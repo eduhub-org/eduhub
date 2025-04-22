@@ -114,19 +114,67 @@ export const useEndTimeString = () => {
   };
 };
 
+// Private helper function for the common rounding logic
+const roundTimeToInterval = (
+  inputDate: Date,
+  timeZone: string,
+  roundToMinutes: number = 15,
+  format: string = 'HH:mm'
+): { hours: number, minutes: number } => {
+  const formattedTime = formatInTimeZone(inputDate, timeZone, format);
+  const [hours, minutes] = formattedTime.split(':').map(Number);
+  const roundedMinutes = Math.round(minutes / roundToMinutes) * roundToMinutes;
+  const adjustedHours = hours + Math.floor(roundedMinutes / 60);
+  const adjustedMinutes = roundedMinutes % 60;
+  
+  return {
+    hours: adjustedHours % 24,
+    minutes: adjustedMinutes
+  };
+};
+
+// Original hook that returns a formatted string
 export const useFormatTime = () => {
   const { timeZone } = useAppSettings();
   
-  return (time: Date | string | null): string => {
-    if (time == null) {
-      return formatInTimeZone(new Date(), timeZone, 'HH:mm');
+  return (
+    time: Date | string | null,
+    options?: {
+      roundToMinutes?: number;
+      format?: string;
     }
-    const zonedTime = typeof time === 'string' ? parseISO(time) : time;
-    const formattedTime = formatInTimeZone(zonedTime, timeZone, 'HH:mm');
+  ): string => {
+    const {
+      roundToMinutes = 15,
+      format = 'HH:mm'
+    } = options || {};
+
+    const inputDate = time == null ? new Date() : (typeof time === 'string' ? parseISO(time) : time);
+    const { hours, minutes } = roundTimeToInterval(inputDate, timeZone, roundToMinutes, format);
     
-    // Round to nearest 15 minutes
-    const [hours, minutes] = formattedTime.split(':').map(Number);
-    const roundedMinutes = Math.round(minutes / 15) * 15;
-    return `${format2Digits(hours)}:${format2Digits(roundedMinutes)}`;
+    return `${format2Digits(hours)}:${format2Digits(minutes)}`;
+  };
+};
+
+// New hook that returns a Date object with properly formatted time
+export const useFormatDateTime = () => {
+  const { timeZone } = useAppSettings();
+  
+  return (
+    time: Date | string | null,
+    options?: {
+      roundToMinutes?: number;
+    }
+  ): Date => {
+    const { roundToMinutes = 15 } = options || {};
+    
+    const inputDate = time == null ? new Date() : (typeof time === 'string' ? parseISO(time) : time);
+    const { hours, minutes } = roundTimeToInterval(inputDate, timeZone, roundToMinutes);
+    
+    // Create a new date with the formatted time
+    const formattedDate = new Date(inputDate);
+    formattedDate.setHours(hours, minutes, 0, 0);
+    
+    return formattedDate;
   };
 };
