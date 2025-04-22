@@ -1,6 +1,5 @@
 import useTranslation from 'next-translate/useTranslation';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { FC, useEffect, useState } from 'react';
 import ManageAchievementOptionsContent from '../../../components/pages/ManageAchievementOptionsContent';
 import CommonPageHeader from '../../../components/common/CommonPageHeader';

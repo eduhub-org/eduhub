@@ -7,7 +7,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 import {
   MdCheckBox,
   // MdCheckBoxOutlineBlank,
-  MdDelete,
   MdLink,
   MdOutlineCheckBoxOutlineBlank,
   // MdAddCircle,
