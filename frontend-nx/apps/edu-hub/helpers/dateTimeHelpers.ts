@@ -1,11 +1,33 @@
+/**
+ * Date and Time Helper Functions
+ * 
+ * This file contains utility functions and hooks for formatting, parsing, and displaying dates and times.
+ * All functions respect the application's timezone setting.
+ * 
+ * Main hooks:
+ * - useDisplayDate: Formats a date as "dd.MM.yyyy"
+ * - useFormatTimeString: Parses and formats various time inputs to "HH:mm" without rounding
+ * - useFormatTime: Formats and optionally rounds time to intervals, returns a string
+ * - useFormatDateTime: Formats and optionally rounds time, returns a Date object
+ */
+
 import { parse, parseISO } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useAppSettings } from '../contexts/AppSettingsContext';
 
+/**
+ * Formats a number to always have 2 digits by adding a leading zero if needed
+ * @param n - Number to format
+ * @returns String with 2 digits
+ */
 export const format2Digits = (n: number) => {
   return `${n < 10 ? '0' : ''}${n}`;
 };
 
+/**
+ * Hook for formatting a date to "dd.MM.yyyy" based on application timezone
+ * @returns Function that takes a date input and returns a formatted date string
+ */
 export const useDisplayDate = () => {
   const { timeZone } = useAppSettings();
   
@@ -19,6 +41,13 @@ export const useDisplayDate = () => {
   };
 };
 
+/**
+ * Hook for parsing various time formats and displaying as "HH:mm"
+ * Handles Date objects, time strings (HH:mm), and ISO date strings
+ * Does NOT round times - preserves exact time
+ * 
+ * @returns Function that parses different time inputs and returns "HH:mm" format
+ */
 export const useFormatTimeString = () => {
   const { timeZone } = useAppSettings();
 
@@ -114,12 +143,15 @@ export const useEndTimeString = () => {
   };
 };
 
-// Private helper function for the common rounding logic
+/**
+ * Private helper function for rounding time to specified intervals
+ * Used by useFormatTime and useFormatDateTime
+ */
 const roundTimeToInterval = (
   inputDate: Date,
   timeZone: string,
-  roundToMinutes: number = 15,
-  format: string = 'HH:mm'
+  roundToMinutes = 15,
+  format = 'HH:mm'
 ): { hours: number, minutes: number } => {
   const formattedTime = formatInTimeZone(inputDate, timeZone, format);
   const [hours, minutes] = formattedTime.split(':').map(Number);
@@ -133,7 +165,13 @@ const roundTimeToInterval = (
   };
 };
 
-// Original hook that returns a formatted string
+/**
+ * Hook for formatting time with optional rounding to intervals
+ * RETURNS A STRING in "HH:mm" format (or custom format)
+ * Use this when you need a formatted time string with rounding
+ * 
+ * @returns Function that formats time and returns a string
+ */
 export const useFormatTime = () => {
   const { timeZone } = useAppSettings();
   
@@ -156,7 +194,13 @@ export const useFormatTime = () => {
   };
 };
 
-// New hook that returns a Date object with properly formatted time
+/**
+ * Hook for formatting time with optional rounding to intervals
+ * RETURNS A DATE OBJECT with the rounded time
+ * Use this when you need a Date object with rounded time for calculations
+ * 
+ * @returns Function that formats time and returns a Date object
+ */
 export const useFormatDateTime = () => {
   const { timeZone } = useAppSettings();
   
