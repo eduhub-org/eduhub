@@ -6,12 +6,14 @@ import {
 } from '../../../../queries/__generated__/ManagedCourse';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import EhTimeSelect from '../../../common/EhTimeSelect';
-import { useFormatTime } from '../../../../helpers/dateTimeHelpers';
 import { DebounceInput } from 'react-debounce-input';
 import { eventTargetValueMapper, useRoleMutation } from '../../../../hooks/authedMutation';
 
-import { INSERT_NEW_SESSION_SPEAKER } from '../../../../queries/course';
+import {
+  INSERT_NEW_SESSION_SPEAKER,
+  UPDATE_SESSION_END_TIME,
+  UPDATE_SESSION_START_TIME,
+} from '../../../../queries/course';
 import { QueryResult } from '@apollo/client';
 import { SelectUserDialog } from '../../../common/dialogs/SelectUserDialog';
 import { UserForSelection1_User } from '../../../../queries/__generated__/UserForSelection1';
@@ -29,6 +31,7 @@ import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 import { useIsAdmin, useIsInstructor } from '../../../../hooks/authentication';
+import TimePicker from '../../../../components/inputs/TimePicker';
 
 const copyDateTime = (target: Date, source: Date) => {
   target = new Date(target);
@@ -45,8 +48,6 @@ interface IProps {
   lectureEnd: Date;
   qResult: QueryResult<ManagedCourse, ManagedCourseVariables>;
   onDelete: (pk: number) => any;
-  onSetStartDate: (session: ManagedCourse_Course_by_pk_Sessions, date: Date) => any;
-  onSetEndDate: (session: ManagedCourse_Course_by_pk_Sessions, date: Date) => any;
   onSetTitle: (session: ManagedCourse_Course_by_pk_Sessions, title: string) => any;
   onDeleteSpeaker: (id: number) => any;
 }
@@ -57,8 +58,6 @@ export const SessionRow: FC<IProps> = ({
   lectureEnd,
   qResult,
   onDelete,
-  onSetStartDate,
-  onSetEndDate,
   onSetTitle,
   onDeleteSpeaker,
 }) => {
@@ -67,8 +66,6 @@ export const SessionRow: FC<IProps> = ({
   const isInstructor = useIsInstructor();
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
-  const formatTime = useFormatTime();
-
   const handleDelete = useCallback(() => {
     if (session != null) {
       const now = new Date();
@@ -119,42 +116,37 @@ export const SessionRow: FC<IProps> = ({
     [session, onSetTitle]
   );
 
+  const [updateSessionStartTime] = useRoleMutation(UPDATE_SESSION_START_TIME);
+  const [updateSessionEndTime] = useRoleMutation(UPDATE_SESSION_END_TIME);
+
   const handleSetDate = useCallback(
     (event: Date | null) => {
-      if (session != null) {
-        onSetStartDate(session, copyDateTime(event || new Date(), session.startDateTime));
-        onSetEndDate(session, copyDateTime(event || new Date(), session.endDateTime));
-      }
-    },
-    [session, onSetStartDate, onSetEndDate]
-  );
+      if (session != null && event) {
+        // Update both start and end datetime with the new date but keep original times
+        const newStartDate = copyDateTime(event, session.startDateTime);
+        const newEndDate = copyDateTime(event, session.endDateTime);
 
-  const handleSetStartTime = useCallback(
-    (event: string) => {
-      if (session != null) {
-        const [hoursStr, minutesStr] = event.split(':');
-        const hours = Number(hoursStr);
-        const minutes = Number(minutesStr);
-        const newDate = new Date(session.startDateTime);
-        newDate.setHours(hours, minutes, 0, 0);
-        onSetStartDate(session, newDate);
-      }
-    },
-    [session, onSetStartDate]
-  );
+        // Update start time directly
+        updateSessionStartTime({
+          variables: {
+            sessionId: session.id,
+            value: newStartDate.toISOString(),
+          },
+        });
 
-  const handleSetEndTime = useCallback(
-    (event: string) => {
-      if (session != null) {
-        const [hoursStr, minutesStr] = event.split(':');
-        const hours = Number(hoursStr);
-        const minutes = Number(minutesStr);
-        const newDate = new Date(session.endDateTime);
-        newDate.setHours(hours, minutes, 0, 0);
-        onSetEndDate(session, newDate);
+        // Update end time directly
+        updateSessionEndTime({
+          variables: {
+            sessionId: session.id,
+            value: newEndDate.toISOString(),
+          },
+        });
+
+        // Optionally refresh data
+        qResult.refetch();
       }
     },
-    [session, onSetEndDate]
+    [session, updateSessionStartTime, updateSessionEndTime, qResult]
   );
 
   const speakerTags = (session?.SessionSpeakers || []).map((x) => ({
@@ -226,23 +218,31 @@ export const SessionRow: FC<IProps> = ({
             />
           </div>
         )}
-        <div className="p-3 col-span-2">
-          {!session && <>{t('start_time')}</>}
+        <div className="col-span-2">
+          {!session && <div className="p-3">{t('start_time')}</div>}
           {session && (
-            <EhTimeSelect
-              className="bg-edu-light-gray"
-              onChange={handleSetStartTime}
-              value={formatTime(session.startDateTime)}
+            <TimePicker
+              variant="eduhub"
+              className="!text-gray-800"
+              currentValue={session.startDateTime}
+              updateValueMutation={UPDATE_SESSION_START_TIME}
+              identifierVariables={{ sessionId: session.id }}
+              refetchQueries={['ManagedCourse']}
+              saveAsDateTime={true}
             />
           )}
         </div>
-        <div className="p-3 col-span-2">
-          {!session && <>{t('end_time')}</>}
+        <div className="col-span-2">
+          {!session && <div className="p-3">{t('end_time')}</div>}
           {session && (
-            <EhTimeSelect
-              className="bg-edu-light-gray"
-              onChange={handleSetEndTime}
-              value={formatTime(session.endDateTime)}
+            <TimePicker
+              variant="eduhub"
+              className="!text-gray-800"
+              currentValue={session.endDateTime}
+              updateValueMutation={UPDATE_SESSION_END_TIME}
+              identifierVariables={{ sessionId: session.id }}
+              refetchQueries={['ManagedCourse']}
+              saveAsDateTime={true}
             />
           )}
         </div>

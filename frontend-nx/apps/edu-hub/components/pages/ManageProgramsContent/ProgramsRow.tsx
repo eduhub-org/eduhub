@@ -7,7 +7,7 @@ import { FC, MutableRefObject, useCallback, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
-import { MdCheckBox, MdCheckBoxOutlineBlank, MdDelete, MdOutlineCheckBoxOutlineBlank, MdUpload } from 'react-icons/md';
+import { MdCheckBox, MdCheckBoxOutlineBlank, MdOutlineCheckBoxOutlineBlank, MdUpload } from 'react-icons/md';
 import { Button } from '../../common/Button';
 import { parseFileUploadEvent } from '../../../helpers/filehandling';
 import { useAdminMutation } from '../../../hooks/authedMutation';

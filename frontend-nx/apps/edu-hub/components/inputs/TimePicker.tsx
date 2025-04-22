@@ -11,7 +11,7 @@ import { useFormatTimeString, useFormatTime } from '../../helpers/dateTimeHelper
 
 type TimePickerProps = {
   variant: 'material' | 'eduhub';
-  label: string;
+  label?: string;
   identifierVariables: Record<string, any>;
   currentValue: Date | string | null;
   updateValueMutation: DocumentNode;
@@ -20,6 +20,7 @@ type TimePickerProps = {
   helpText?: string;
   isMandatory?: boolean;
   className?: string;
+  saveAsDateTime?: boolean;
 };
 
 const TimePicker: React.FC<TimePickerProps> = ({
@@ -31,6 +32,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
   refetchQueries = [],
   isMandatory = false,
   className = '',
+  saveAsDateTime = false,
 }) => {
   const { t } = useTranslation();
   const formatTimeString = useFormatTimeString();
@@ -39,6 +41,8 @@ const TimePicker: React.FC<TimePickerProps> = ({
   const formatTimeValue = (val: Date | string | null): string => {
     return formatTimeString(val);
   };
+
+  const [originalDateTime] = useState<Date | null>(currentValue instanceof Date ? currentValue : null);
 
   const [value, setValue] = useState<string | null>(currentValue ? formatTimeValue(currentValue) : null);
   const [errorMessage, setErrorMessage] = useState('');
@@ -63,7 +67,16 @@ const TimePicker: React.FC<TimePickerProps> = ({
 
   const debouncedUpdateValue = useDebouncedCallback((newValue: string | null) => {
     if (validateValue(newValue)) {
-      const variables = { ...identifierVariables, value: newValue };
+      let valueToSave = newValue;
+
+      if (saveAsDateTime && originalDateTime && newValue) {
+        const [hours, minutes] = newValue.split(':').map(Number);
+        const updatedDate = new Date(originalDateTime);
+        updatedDate.setHours(hours, minutes, 0, 0);
+        valueToSave = updatedDate.toISOString();
+      }
+
+      const variables = { ...identifierVariables, value: valueToSave };
       updateValue({ variables });
       setErrorMessage('');
     } else {
@@ -104,9 +117,11 @@ const TimePicker: React.FC<TimePickerProps> = ({
     <>
       <div className="px-2">
         <div className="text-gray-400">
-          <div className="flex justify-between mb-2">
-            <div className="flex items-center">{t(label)}</div>
-          </div>
+          {label && (
+            <div className="flex justify-between mb-2">
+              <div className="flex items-center">{t(label)}</div>
+            </div>
+          )}
           <div>
             <select className={finalClassName} onChange={handleChange} value={timeValue}>
               <option value="">{t('time_picker.select_time')}</option>
