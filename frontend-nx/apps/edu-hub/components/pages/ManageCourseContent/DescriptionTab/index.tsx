@@ -308,7 +308,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           <TimePicker
             variant="eduhub"
             label={t('start_time')}
-            currentValue={course.startTime ? new Date(`1970-01-01T${course.startTime}`) : null}
+            currentValue={course.startTime}
             updateValueMutation={UPDATE_COURSE_START_TIME}
             identifierVariables={{ courseId: course.id }}
             refetchQueries={['ManagedCourse']}
@@ -317,7 +317,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           <TimePicker
             variant="eduhub"
             label={t('end_time')}
-            currentValue={course.endTime ? new Date(`1970-01-01T${course.endTime}`) : null}
+            currentValue={course.endTime}
             updateValueMutation={UPDATE_COURSE_END_TIME}
             identifierVariables={{ courseId: course.id }}
             refetchQueries={['ManagedCourse']}
