@@ -64,10 +64,16 @@ export const useFormatTimeString = () => {
 
       // Check if the string is in HH:mm or HH:mm:ss format
       if (typeof ts === 'string' && /^\d{2}:\d{2}(:\d{2})?$/.test(ts)) {
-        // If it's just a time, we need to add a dummy date
-        const dummyDate = new Date().toISOString().split('T')[0]; // Current date
-        const dateTime = parse(`${dummyDate} ${ts}`, 'yyyy-MM-dd HH:mm:ss', new Date());
-        return formatInTimeZone(dateTime, timeZone, 'HH:mm');
+        // Since we're already dealing with a simple HH:mm format, we assume
+        // the input is already in the correct timezone and we don't need to
+        // convert it.
+
+        // Extract hours and minutes directly from the string
+        const [hours, minutes] = ts.split(':').map(Number);
+        
+        // We're already dealing with a simple HH:mm format, so just ensure
+        // the numbers have leading zeros if needed
+        return `${format2Digits(hours)}:${format2Digits(minutes)}`;
       }
 
       // If it's a full date-time string, use parseISO
