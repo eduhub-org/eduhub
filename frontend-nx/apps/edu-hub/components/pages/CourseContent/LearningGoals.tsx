@@ -20,7 +20,7 @@ export const LearningGoals: FC<LearningGoalsProps> = ({ learningGoals }) => {
               .filter((goal) => goal.trim() !== '')
               .map((goal, index) => (
                 <li key={index} className="pl-6 mb-6">
-                  <div className="flex align-items-start">
+                  <div className="flex">
                     <img src={checkmark} alt="check mark" className="mr-2 inline-block" />
                     <div className="ml-2">
                       {goal.split('\n').map((line, i) => (

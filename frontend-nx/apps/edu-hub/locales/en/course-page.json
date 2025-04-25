@@ -181,8 +181,9 @@
   },
   "learning_goals": {
     "label": "Learning Goals",
-    "help_text": "The learning goals are part of the performance certificate and can only be changed by the program management. If you would like to suggest changes or notice errors, please contact them.",
-    "placeholder": "Learning Goal 1\nLearning Goal 2\nLearning Goal 3\nLearning Goal 4"
+    "help_text": "The learning goals are part of the performance certificate and can only be changed by the program coordinator. If you would like to suggest changes or notice errors, please contact them.",
+    "placeholder": "Learning Goal 1\nLearning Goal 2\nLearning Goal 3\nLearning Goal 4",
+    "read_only_placeholder": "Please contact the program coordinator to agree on learning goals and have them added here."
   },
   "info_block_1_title": {
     "label": "Info Block 1",

@@ -137,6 +137,10 @@
     "apply": "Apply",
     "none": "None"
   },
+  "table_grid_delete_button": {
+    "confirm_delete": "Confirm Deletion",
+    "deletion_confirmation_question": "Are you sure you want to delete this entry?"
+  },
   "file_uploader": {
     "upload_new_profile_picture": "Upload new profile picture",
     "upload_file": "Upload file",
@@ -173,5 +177,24 @@
   "authed_query": {
     "session_expired_or_invalid": "Your session is invalid or has expired. Please log in again.",
     "authentication_error": "Authentication error"
+  },
+  "error_handling": {
+    "delete_restricted_by_relationship": "{{parent}} cannot be deleted when they are still associated with {{child}}. Please remove all {{child}} first.",
+    "delete_restricted_by_relationships": "{{table}} cannot be deleted when they are associated with other records. Please remove those records first.",
+    "generic_error": "An error occurred. Please try again later.",
+    "entities": {
+      "course": "Courses",
+      "courseenrollment": "Enrollments",
+      "coursegroup": "Course groups",
+      "organization": "Organizations",
+      "program": "Programs",
+      "achievement": "Achievement records",
+      "courses": "courses",
+      "course_enrollments": "enrollments",
+      "course_groups": "course groups",
+      "course_degrees": "course degrees",
+      "achievement_options": "achievement options",
+      "users": "users"
+    }
   }
 }

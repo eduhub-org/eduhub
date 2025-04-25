@@ -138,10 +138,10 @@ export const UPDATE_SESSION_TITLE = gql`
 `;
 
 export const UPDATE_SESSION_START_TIME = gql`
-  mutation UpdateSessionStartTime($sessionId: Int!, $startTime: timestamptz!) {
+  mutation UpdateSessionStartTime($sessionId: Int!, $value: timestamptz!) {
     update_Session_by_pk(
       pk_columns: { id: $sessionId }
-      _set: { startDateTime: $startTime }
+      _set: { startDateTime: $value }
     ) {
       id
     }
@@ -149,10 +149,10 @@ export const UPDATE_SESSION_START_TIME = gql`
 `;
 
 export const UPDATE_SESSION_END_TIME = gql`
-  mutation UpdateSessionEndTime($sessionId: Int!, $endTime: timestamptz!) {
+  mutation UpdateSessionEndTime($sessionId: Int!, $value: timestamptz!) {
     update_Session_by_pk(
       pk_columns: { id: $sessionId }
-      _set: { endDateTime: $endTime }
+      _set: { endDateTime: $value }
     ) {
       id
     }

@@ -14,21 +14,11 @@ import {
   DELETE_SESSION,
   DELETE_SESSION_SPEAKER,
   INSERT_SESSION_WITH_ADDRESSES,
-  UPDATE_SESSION_END_TIME,
-  UPDATE_SESSION_START_TIME,
   UPDATE_SESSION_TITLE,
 } from '../../../../queries/course';
 import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
 import { SessionRow } from './SessionRow';
 import { DeleteSession, DeleteSessionVariables } from '../../../../queries/__generated__/DeleteSession';
-import {
-  UpdateSessionStartTime,
-  UpdateSessionStartTimeVariables,
-} from '../../../../queries/__generated__/UpdateSessionStartTime';
-import {
-  UpdateSessionEndTime,
-  UpdateSessionEndTimeVariables,
-} from '../../../../queries/__generated__/UpdateSessionEndTime';
 import { UpdateSessionTitle, UpdateSessionTitleVariables } from '../../../../queries/__generated__/UpdateSessionTitle';
 import {
   InsertSessionWithAddresses,
@@ -73,14 +63,42 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     INSERT_SESSION_WITH_ADDRESSES
   );
   const insertSession = useCallback(async () => {
-    const startTime: Date = new Date(
-      courseSessions.length > 0 ? courseSessions[courseSessions.length - 1].startDateTime : new Date()
-    );
-    const endTime: Date = new Date(
-      courseSessions.length > 0 ? courseSessions[courseSessions.length - 1].endDateTime : new Date()
-    );
-    startTime.setDate(startTime.getDate() + 7);
-    endTime.setDate(endTime.getDate() + 7);
+    let startTime: Date;
+    let endTime: Date;
+
+    if (courseSessions.length > 0) {
+      // Copy from last session but add 7 days
+      startTime = new Date(courseSessions[courseSessions.length - 1].startDateTime);
+      endTime = new Date(courseSessions[courseSessions.length - 1].endDateTime);
+
+      // Add 7 days to both dates
+      startTime.setDate(startTime.getDate() + 7);
+      endTime.setDate(endTime.getDate() + 7);
+    } else {
+      // Use course start/end time if available, otherwise default to 00:00-00:00
+      const today = new Date();
+      startTime = new Date(today);
+      endTime = new Date(today);
+
+      if (course.startTime) {
+        // Parse course.startTime (format: "HH:MM:SS") and set to startTime
+        const [startHours, startMinutes] = course.startTime.split(':').map(Number);
+        startTime.setHours(startHours, startMinutes, 0, 0);
+      } else {
+        // Default to 00:00 AM if no course start time
+        startTime.setHours(0, 0, 0, 0);
+      }
+
+      if (course.endTime) {
+        // Parse course.endTime (format: "HH:MM:SS") and set to endTime
+        const [endHours, endMinutes] = course.endTime.split(':').map(Number);
+        endTime.setHours(endHours, endMinutes, 0, 0);
+      } else {
+        // Default to 00:00 AM if no course end time
+        endTime.setHours(0, 0, 0, 0);
+      }
+    }
+
     await insertSessionMutation({
       variables: {
         courseId: course.id,
@@ -91,7 +109,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     });
 
     qResult.refetch();
-  }, [sessionAddresses, courseSessions, insertSessionMutation, course.id, qResult]);
+  }, [sessionAddresses, courseSessions, insertSessionMutation, course.id, course.startTime, course.endTime, qResult]);
 
   const deleteSessionSpeaker = useDeleteCallback<DeleteSessionSpeaker, DeleteSessionSpeakerVariables>(
     DELETE_SESSION_SPEAKER,
@@ -116,24 +134,6 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     qResult
   );
 
-  const setSessionStart = useUpdateCallback2<UpdateSessionStartTime, UpdateSessionStartTimeVariables>(
-    UPDATE_SESSION_START_TIME,
-    'sessionId',
-    'startTime',
-    pickIdPkMapper,
-    identityEventMapper,
-    qResult
-  );
-
-  const setSessionEnd = useUpdateCallback2<UpdateSessionEndTime, UpdateSessionEndTimeVariables>(
-    UPDATE_SESSION_END_TIME,
-    'sessionId',
-    'endTime',
-    pickIdPkMapper,
-    identityEventMapper,
-    qResult
-  );
-
   return (
     <div>
       <div className="flex justify-start mb-4 text-white">
@@ -145,8 +145,6 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
       <div className="mb-3 text-gray-400">
         <SessionRow
           onDelete={deleteSession}
-          onSetStartDate={setSessionStart}
-          onSetEndDate={setSessionEnd}
           onSetTitle={setSessionTitle}
           onDeleteSpeaker={deleteSessionSpeaker}
           lectureStart={course.Program?.lectureStart}
@@ -159,8 +157,6 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
       {courseSessions.map((session) => (
         <SessionRow
           onDelete={deleteSession}
-          onSetStartDate={setSessionStart}
-          onSetEndDate={setSessionEnd}
           onSetTitle={setSessionTitle}
           onDeleteSpeaker={deleteSessionSpeaker}
           lectureStart={course.Program?.lectureStart}

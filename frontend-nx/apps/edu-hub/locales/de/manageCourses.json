@@ -18,5 +18,9 @@
     "label": "Maximal erlaubte Fehltermine",
     "help_text": "Standardmäßig ist der Wert auf 2 gesetzt, aber es sind alle Werte größer gleich 0 erlaubt.",
     "error_text": "Falsches Fehltermin Format!"
+  },
+  "delete_button": {
+    "delete_course_confirmation": "Soll der Kurs '{{title}}' wirklich gelöscht werden?",
+    "untitled_course": "Unbenannter Kurs"
   }
 }

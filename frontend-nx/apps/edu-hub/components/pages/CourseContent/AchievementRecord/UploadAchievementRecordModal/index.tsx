@@ -286,6 +286,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
 
         onSuccess();
       } catch (error) {
+        console.error('Failed to upload achievement record:', error);
         // Clean up the record if it was created but upload failed
         if (createdRecordId) {
           try {

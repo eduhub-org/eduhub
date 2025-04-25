@@ -1,11 +1,33 @@
+/**
+ * Date and Time Helper Functions
+ * 
+ * This file contains utility functions and hooks for formatting, parsing, and displaying dates and times.
+ * All functions respect the application's timezone setting.
+ * 
+ * Main hooks:
+ * - useDisplayDate: Formats a date as "dd.MM.yyyy"
+ * - useFormatTimeString: Parses and formats various time inputs to "HH:mm" without rounding
+ * - useFormatTime: Formats and optionally rounds time to intervals, returns a string
+ * - useFormatDateTime: Formats and optionally rounds time, returns a Date object
+ */
+
 import { parse, parseISO } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useAppSettings } from '../contexts/AppSettingsContext';
 
+/**
+ * Formats a number to always have 2 digits by adding a leading zero if needed
+ * @param n - Number to format
+ * @returns String with 2 digits
+ */
 export const format2Digits = (n: number) => {
   return `${n < 10 ? '0' : ''}${n}`;
 };
 
+/**
+ * Hook for formatting a date to "dd.MM.yyyy" based on application timezone
+ * @returns Function that takes a date input and returns a formatted date string
+ */
 export const useDisplayDate = () => {
   const { timeZone } = useAppSettings();
   
@@ -19,6 +41,13 @@ export const useDisplayDate = () => {
   };
 };
 
+/**
+ * Hook for parsing various time formats and displaying as "HH:mm"
+ * Handles Date objects, time strings (HH:mm), and ISO date strings
+ * Does NOT round times - preserves exact time
+ * 
+ * @returns Function that parses different time inputs and returns "HH:mm" format
+ */
 export const useFormatTimeString = () => {
   const { timeZone } = useAppSettings();
 
@@ -35,10 +64,16 @@ export const useFormatTimeString = () => {
 
       // Check if the string is in HH:mm or HH:mm:ss format
       if (typeof ts === 'string' && /^\d{2}:\d{2}(:\d{2})?$/.test(ts)) {
-        // If it's just a time, we need to add a dummy date
-        const dummyDate = new Date().toISOString().split('T')[0]; // Current date
-        const dateTime = parse(`${dummyDate} ${ts}`, 'yyyy-MM-dd HH:mm:ss', new Date());
-        return formatInTimeZone(dateTime, timeZone, 'HH:mm');
+        // Since we're already dealing with a simple HH:mm format, we assume
+        // the input is already in the correct timezone and we don't need to
+        // convert it.
+
+        // Extract hours and minutes directly from the string
+        const [hours, minutes] = ts.split(':').map(Number);
+        
+        // We're already dealing with a simple HH:mm format, so just ensure
+        // the numbers have leading zeros if needed
+        return `${format2Digits(hours)}:${format2Digits(minutes)}`;
       }
 
       // If it's a full date-time string, use parseISO
@@ -114,19 +149,82 @@ export const useEndTimeString = () => {
   };
 };
 
+/**
+ * Private helper function for rounding time to specified intervals
+ * Used by useFormatTime and useFormatDateTime
+ */
+const roundTimeToInterval = (
+  inputDate: Date,
+  timeZone: string,
+  roundToMinutes = 15,
+  format = 'HH:mm'
+): { hours: number, minutes: number } => {
+  const formattedTime = formatInTimeZone(inputDate, timeZone, format);
+  const [hours, minutes] = formattedTime.split(':').map(Number);
+  const roundedMinutes = Math.round(minutes / roundToMinutes) * roundToMinutes;
+  const adjustedHours = hours + Math.floor(roundedMinutes / 60);
+  const adjustedMinutes = roundedMinutes % 60;
+  
+  return {
+    hours: adjustedHours % 24,
+    minutes: adjustedMinutes
+  };
+};
+
+/**
+ * Hook for formatting time with optional rounding to intervals
+ * RETURNS A STRING in "HH:mm" format (or custom format)
+ * Use this when you need a formatted time string with rounding
+ * 
+ * @returns Function that formats time and returns a string
+ */
 export const useFormatTime = () => {
   const { timeZone } = useAppSettings();
   
-  return (time: Date | string | null): string => {
-    if (time == null) {
-      return formatInTimeZone(new Date(), timeZone, 'HH:mm');
+  return (
+    time: Date | string | null,
+    options?: {
+      roundToMinutes?: number;
+      format?: string;
     }
-    const zonedTime = typeof time === 'string' ? parseISO(time) : time;
-    const formattedTime = formatInTimeZone(zonedTime, timeZone, 'HH:mm');
+  ): string => {
+    const {
+      roundToMinutes = 15,
+      format = 'HH:mm'
+    } = options || {};
+
+    const inputDate = time == null ? new Date() : (typeof time === 'string' ? parseISO(time) : time);
+    const { hours, minutes } = roundTimeToInterval(inputDate, timeZone, roundToMinutes, format);
     
-    // Round to nearest 15 minutes
-    const [hours, minutes] = formattedTime.split(':').map(Number);
-    const roundedMinutes = Math.round(minutes / 15) * 15;
-    return `${format2Digits(hours)}:${format2Digits(roundedMinutes)}`;
+    return `${format2Digits(hours)}:${format2Digits(minutes)}`;
+  };
+};
+
+/**
+ * Hook for formatting time with optional rounding to intervals
+ * RETURNS A DATE OBJECT with the rounded time
+ * Use this when you need a Date object with rounded time for calculations
+ * 
+ * @returns Function that formats time and returns a Date object
+ */
+export const useFormatDateTime = () => {
+  const { timeZone } = useAppSettings();
+  
+  return (
+    time: Date | string | null,
+    options?: {
+      roundToMinutes?: number;
+    }
+  ): Date => {
+    const { roundToMinutes = 15 } = options || {};
+    
+    const inputDate = time == null ? new Date() : (typeof time === 'string' ? parseISO(time) : time);
+    const { hours, minutes } = roundTimeToInterval(inputDate, timeZone, roundToMinutes);
+    
+    // Create a new date with the formatted time
+    const formattedDate = new Date(inputDate);
+    formattedDate.setHours(hours, minutes, 0, 0);
+    
+    return formattedDate;
   };
 };

@@ -21,6 +21,7 @@ export interface OrganizationList_Organization {
   type: OrganizationType_enum;
   description: string | null;
   aliases: any | null;
+  created_at: any;
   /**
    * An array relationship
    */

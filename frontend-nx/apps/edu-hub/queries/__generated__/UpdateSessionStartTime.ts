@@ -21,5 +21,5 @@ export interface UpdateSessionStartTime {
 
 export interface UpdateSessionStartTimeVariables {
   sessionId: number;
-  startTime: any;
+  value: any;
 }
