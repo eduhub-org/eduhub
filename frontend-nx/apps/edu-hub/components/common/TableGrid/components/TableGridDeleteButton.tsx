@@ -27,6 +27,17 @@ const TableGridDeleteButton = ({
       }
     }
   });
+  const [deleteItem] = useRoleMutation(deleteMutation, {
+    onError: (error) => {
+      console.error('Error during deletion:', error);
+    },
+    onCompleted: (data) => {
+     
+      if (data?.anonymizeUser?.error) {
+        console.error('Anonymization error:', data.anonymizeUser.error);
+      }
+    }
+  });
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { t } = useTranslation();
