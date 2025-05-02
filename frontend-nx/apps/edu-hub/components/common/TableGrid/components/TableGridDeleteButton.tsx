@@ -51,8 +51,7 @@ const TableGridDeleteButton = ({
   };
 
   const performDelete = async () => {
-    let variableId: string | number = id;
-
+    let variableId = id;
     if (idType === 'number') {
       if (typeof id === 'string') {
         variableId = parseInt(id, 10);
@@ -67,21 +66,17 @@ const TableGridDeleteButton = ({
         return;
       }
     }
-
-    deleteItem({
-      variables: { id: variableId },
-      refetchQueries,
-      onError: (error) => {
-        // Use the generic foreign key error handler
-        const message = handleForeignKeyError(error, t);
-        setErrorMessage(message);
-        console.error('Error deleting item:', error.message);
-      },
-    });
+  
     try {
       await deleteItem({
         variables: { id: variableId },
         refetchQueries,
+        onError: (error) => {
+          // Use the generic foreign key error handler
+          const message = handleForeignKeyError(error, t);
+          setErrorMessage(message);
+          console.error('Error deleting item:', error.message);
+        },
       });
     } catch (error) {
       console.error('Error during deletion:', error);
