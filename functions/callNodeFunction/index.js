@@ -113,7 +113,9 @@ export const callNodeFunction = async (req, res) => {
       return res.status(200).json(result);
     }
     
-   
+    // Definiere formattedResponse mit dem Ergebnis von formatResponse
+    const formattedResponse = formatResponse(result);
+    
     logger.info(`Successfully executed function: ${functionName}`, {
       response: formattedResponse
     });

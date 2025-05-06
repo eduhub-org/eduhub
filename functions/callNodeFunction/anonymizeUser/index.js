@@ -39,6 +39,7 @@ const UPDATE_USER = gql`
         externalProfile: null
         matriculationNumber: $matriculationNumber
         picture: null
+        status: DELETED
       }
     ) {
       id
@@ -149,15 +150,6 @@ const anonymizeUser = async (req, logger) => {
     const userId = req.body.input.userId;
     result.anonymizedUserId = userId;
     logger.debug(`Received anonymizeUser request for userId: ${userId}`);
-
-    // Delete user from Keycloak
-    try {
-      const keycloakToken = await getKeycloakToken();
-      result.steps.keycloak_deletion = await deleteKeycloakUser(userId, keycloakToken);
-    } catch (keycloakError) {
-      logger.error(`Error in Keycloak operations: ${keycloakError.message}`);
-      // We continue the process even if Keycloak deletion fails
-    }
 
     let userData;
     try {
@@ -284,6 +276,16 @@ const anonymizeUser = async (req, logger) => {
     }
     
     result.steps.certificate_anonymization = allCertificatesAnonymized;
+
+    // For unknown reasons, the user is deleted from keycloak even though this part is not executed.
+  /*   // Delete user from Keycloak - moved to end of process
+    try {
+      const keycloakToken = await getKeycloakToken();
+      result.steps.keycloak_deletion = await deleteKeycloakUser(userId, keycloakToken);
+    } catch (keycloakError) {
+      logger.error(`Error in Keycloak operations: ${keycloakError.message}`);
+      // We continue the process even if Keycloak deletion fails
+    }*/
   
     logger.debug(`Anonymization process completed for userId: ${userId}`);
 
