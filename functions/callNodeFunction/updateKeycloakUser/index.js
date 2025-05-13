@@ -40,6 +40,18 @@ const updateKeycloakUser = async (userId, updatedFields, token) => {
     return true;
   } catch (error) {
     logger.error(`Error updating user in Keycloak: ${error.message}`);
+    
+    // Prüfen, ob es sich um einen 404-Fehler handelt (Benutzer nicht gefunden)
+    if (error.response && error.response.status === 404) {
+      logger.warn(`User not found in Keycloak: ${userId}. User might have been deleted or never existed.`);
+      // Wir geben ein spezielles Objekt zurück, anstatt einen Fehler zu werfen
+      return {
+        success: false,
+        notFound: true,
+        message: "User not found in Keycloak"
+      };
+    }
+    
     throw error;
   }
 };
@@ -94,7 +106,18 @@ const updateKeycloakUserHandler = async (req) => {
     }
 
     const keycloakToken = await getKeycloakToken();
-    await updateKeycloakUser(userId, updatedFields, keycloakToken);
+    const updateResult = await updateKeycloakUser(userId, updatedFields, keycloakToken);
+
+    // Prüfen, ob der Benutzer nicht gefunden wurde
+    if (updateResult && updateResult.notFound) {
+      logger.warn(`User ${userId} not found in Keycloak, skipping update`);
+      return {
+        success: true,
+        messageKey: "USER_NOT_FOUND_IN_KEYCLOAK",
+        userId,
+        details: "User not found in Keycloak, may have been deleted or never existed"
+      };
+    }
 
     logger.debug(`Keycloak update process completed for userId: ${userId}`);
     return {

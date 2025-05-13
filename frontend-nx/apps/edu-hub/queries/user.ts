@@ -185,7 +185,7 @@ export const USERS_WITH_EXPERT_ID = gql`
 
 export const DELETE_USER = gql`
   mutation DeleteUser($id: uuid!) {
-    anonymizeUser(userId:  $id) {
+    anonymizeUser(userId: $id) {
       anonymizedUserId
       messageKey
       error
