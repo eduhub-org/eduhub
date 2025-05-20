@@ -23,6 +23,7 @@ export interface ExtendedDegreeParticipantsEnrollment
 
 export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ course }) => {
   const { t, lang } = useTranslation('manageCourse');
+  const pageSize = 50;
 
   const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter } = useTableGrid({
     queryHook: useRoleQuery,
@@ -30,18 +31,22 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     queryVariables: {
       degreeCourseId: course?.id,
     },
-    pageSize: 15,
+    pageSize,
     refetchFilter: (searchFilter) => ({
       User: {
         _or: [{ firstName: { _ilike: `%${searchFilter}%` } }, { lastName: { _ilike: `%${searchFilter}%` } }],
       },
     }),
   });
+
   const degreeParticipantsEnrollments =
     data?.Course_by_pk?.CourseEnrollments.filter(
       (enrollment) =>
         enrollment.status !== 'REJECTED' && enrollment.status !== 'APPLIED' && enrollment.status !== 'INVITED'
     ) || [];
+
+  // Get total count from the aggregate query
+  const totalCount = data?.Course_by_pk?.CourseEnrollments_aggregate?.aggregate?.count || 0;
 
   // Helper functions for the table columns
   const getMaxUpdatedAt = (courseEnrollments) => {
@@ -82,15 +87,50 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     return attendedEventsCount;
   };
 
+  const formatParticipations = (courseEnrollments) => {
+    if (!courseEnrollments || courseEnrollments.length === 0) return '';
+
+    // Passed courses (achievement certificate)
+    const passed = courseEnrollments
+      .filter((ce) => ce.achievementCertificateURL)
+      .map((ce) => {
+        let ects = ce.Course.ects ? ce.Course.ects.replace(',', '.') : '0';
+        ects = isNaN(parseFloat(ects)) ? '0' : parseFloat(ects).toString();
+        return `${ce.Course.title} (${ce.Course.Program.shortTitle}; ${ects} ECTS)`;
+      });
+
+    // Attended courses (attendance certificate, but not achievement certificate)
+    const attended = courseEnrollments
+      .filter((ce) => ce.attendanceCertificateURL && !ce.achievementCertificateURL)
+      .map((ce) => `${ce.Course.title} (${ce.Course.Program.shortTitle})`);
+
+    // Enrolled courses (no certificate)
+    const enrolled = courseEnrollments
+      .filter((ce) => !ce.achievementCertificateURL && !ce.attendanceCertificateURL)
+      .map((ce) => `${ce.Course.title} (${ce.Course.Program.shortTitle})`);
+
+    let result = '';
+    if (passed.length > 0) {
+      result += 'Passed: ' + passed.join(', ');
+    }
+    if (attended.length > 0) {
+      if (result) result += '\n';
+      result += 'Attended: ' + attended.join(', ');
+    }
+    if (enrolled.length > 0) {
+      if (result) result += '\n';
+      result += 'Enrolled: ' + enrolled.join(', ');
+    }
+    return result;
+  };
+
   const extendedDegreeParticipantsEnrollments: ExtendedDegreeParticipantsEnrollment[] =
     degreeParticipantsEnrollments.map((enrollment) => {
       const name = `${enrollment.User.firstName} ${enrollment.User.lastName}`;
       const lastApplication = getMaxUpdatedAt(enrollment.User.CourseEnrollments) || 'N/A';
       const ectsTotal = getTotalECTS(enrollment.User.CourseEnrollments);
       const attendedEvents = getAttendedEventsCount(enrollment.User.CourseEnrollments);
-      const participations = enrollment.User.CourseEnrollments.map(
-        (ce) => `${ce.Course.title} (${ce.Course.Program.shortTitle})`
-      ).join(', '); // Flatten array of enrollments into a summary string
+      const participations = formatParticipations(enrollment.User.CourseEnrollments);
 
       return {
         ...enrollment,
@@ -98,7 +138,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         lastApplication,
         ectsTotal,
         attendedEvents,
-        participations, // Include the flattened summary string
+        participations,
       };
     });
 
@@ -120,7 +160,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         meta: {
           width: 4,
         },
-        cell: ({ getValue }) => <div>{getValue<string>()}</div>, // Display the summary string
+        cell: ({ getValue }) => <div style={{ whiteSpace: 'pre-line' }}>{getValue<string>()}</div>, // Display the summary string with multiline support
       },
       {
         header: t('lastApplication'),
@@ -173,22 +213,14 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     [t]
   );
 
-  interface ExtendedDegreeParticipantsEnrollment
-    extends DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments {
-    name?: string;
-    lastApplication?: string;
-    ectsTotal?: string;
-    attendedEvents?: number;
-  }
-
-  // Render component
   return (
     <>
       <TableGrid
         columns={columns}
         data={extendedDegreeParticipantsEnrollments}
-        totalCount={data?.Course_by_pk?.CourseEnrollments?.length || 0}
+        totalCount={totalCount}
         pageIndex={pageIndex}
+        pageSize={pageSize}
         onPageChange={setPageIndex}
         searchFilter={searchFilter}
         onSearchFilterChange={setSearchFilter}
