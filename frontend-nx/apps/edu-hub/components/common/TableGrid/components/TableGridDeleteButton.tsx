@@ -16,7 +16,18 @@ const TableGridDeleteButton = ({
   idType,
   deletionConfirmationQuestion,
 }: TableGridDeleteButtonProps) => {
-  const [deleteItem] = useRoleMutation(deleteMutation);
+  const [deleteItem] = useRoleMutation(deleteMutation, {
+    onError: (error) => {
+      console.error('Error during deletion:', error);
+    },
+    onCompleted: (data) => {
+     
+      if (data?.anonymizeUser?.error) {
+        console.error('Anonymization error:', data.anonymizeUser.error);
+      }
+    }
+  });
+
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { t } = useTranslation();
@@ -40,9 +51,8 @@ const TableGridDeleteButton = ({
     setErrorMessage(null);
   };
 
-  const performDelete = () => {
-    let variableId: string | number = id;
-
+  const performDelete = async () => {
+    let variableId = id;
     if (idType === 'number') {
       if (typeof id === 'string') {
         variableId = parseInt(id, 10);
@@ -57,17 +67,21 @@ const TableGridDeleteButton = ({
         return;
       }
     }
-
-    deleteItem({
-      variables: { id: variableId },
-      refetchQueries,
-      onError: (error) => {
-        // Use the generic foreign key error handler
-        const message = handleForeignKeyError(error, t);
-        setErrorMessage(message);
-        console.error('Error deleting item:', error.message);
-      },
-    });
+  
+    try {
+      await deleteItem({
+        variables: { id: variableId },
+        refetchQueries,
+        onError: (error) => {
+          // Use the generic foreign key error handler
+          const message = handleForeignKeyError(error, t);
+          setErrorMessage(message);
+          console.error('Error deleting item:', error.message);
+        },
+      });
+    } catch (error) {
+      console.error('Error during deletion:', error);
+    }
   };
 
   return (
