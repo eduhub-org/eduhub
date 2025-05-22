@@ -23,7 +23,7 @@ export interface ExtendedDegreeParticipantsEnrollment
 
 export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ course }) => {
   const { t, lang } = useTranslation('manageCourse');
-  const pageSize = 50;
+  const pageSize = 300;
 
   const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter } = useTableGrid({
     queryHook: useRoleQuery,
@@ -90,24 +90,29 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
   const formatParticipations = (courseEnrollments) => {
     if (!courseEnrollments || courseEnrollments.length === 0) return '';
 
-    // Passed courses (achievement certificate)
-    const passed = courseEnrollments
-      .filter((ce) => ce.achievementCertificateURL)
-      .map((ce) => {
-        let ects = ce.Course.ects ? ce.Course.ects.replace(',', '.') : '0';
-        ects = isNaN(parseFloat(ects)) ? '0' : parseFloat(ects).toString();
-        return `${ce.Course.title} (${ce.Course.Program.shortTitle}; ${ects} ECTS)`;
-      });
+    // Passed courses (achievement certificate - highest priority)
+    const passedEnrollments = courseEnrollments.filter((ce) => ce.achievementCertificateURL);
 
-    // Attended courses (attendance certificate, but not achievement certificate)
-    const attended = courseEnrollments
-      .filter((ce) => ce.attendanceCertificateURL && !ce.achievementCertificateURL)
-      .map((ce) => `${ce.Course.title} (${ce.Course.Program.shortTitle})`);
+    // Attended courses (not passed AND (has attendance certificate OR is an EVENT course))
+    const attendedEnrollments = courseEnrollments.filter(
+      (ce) =>
+        !ce.achievementCertificateURL && (ce.attendanceCertificateURL || ce.Course.Program.shortTitle === 'EVENTS')
+    );
 
-    // Enrolled courses (no certificate)
-    const enrolled = courseEnrollments
-      .filter((ce) => !ce.achievementCertificateURL && !ce.attendanceCertificateURL)
-      .map((ce) => `${ce.Course.title} (${ce.Course.Program.shortTitle})`);
+    // Enrolled courses (not passed AND not attended by new definition)
+    const enrolledEnrollments = courseEnrollments.filter(
+      (ce) => !ce.achievementCertificateURL && !ce.attendanceCertificateURL && ce.Course.Program.shortTitle !== 'EVENTS'
+    );
+
+    const passed = passedEnrollments.map((ce) => {
+      let ects = ce.Course.ects ? ce.Course.ects.replace(',', '.') : '0';
+      ects = isNaN(parseFloat(ects)) ? '0' : parseFloat(ects).toString();
+      return `${ce.Course.title} (${ce.Course.Program.shortTitle}; ${ects} ECTS)`;
+    });
+
+    const attended = attendedEnrollments.map((ce) => `${ce.Course.title} (${ce.Course.Program.shortTitle})`);
+
+    const enrolled = enrolledEnrollments.map((ce) => `${ce.Course.title} (${ce.Course.Program.shortTitle})`);
 
     let result = '';
     if (passed.length > 0) {
