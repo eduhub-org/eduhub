@@ -42,6 +42,8 @@ const TableGrid = <T extends BaseRow>({
   onAddButtonClick,
   onBulkAction,
   bulkActions = [],
+  onPageSizeChange,
+  availablePageSizes = [10, 20, 50, 100, 500],
 }: TableGridProps<T>) => {
   const onGlobalFilterChange = useCallback(
     (value: string) => {
@@ -59,6 +61,10 @@ const TableGrid = <T extends BaseRow>({
 
   if (enablePagination && typeof onPageChange === 'undefined') {
     console.warn('TableGrid: onPageChange prop is required when enablePagination is true');
+  }
+
+  if (enablePagination && typeof onPageSizeChange === 'undefined') {
+    console.warn('TableGrid: onPageSizeChange prop is required when enablePagination is true');
   }
 
   const { t } = useTranslation();
@@ -360,6 +366,41 @@ const TableGrid = <T extends BaseRow>({
       {!loading && !error && enablePagination && totalCount > 0 && (
         <div className="flex justify-end pb-10 text-white mt-4">
           <div className="flex flex-row items-center space-x-5">
+            {onPageSizeChange && (
+              <FormControl sx={{ m: 1, minWidth: 130 }} size="small">
+                <InputLabel id="page-size-select-label" sx={{ color: 'white' }}>
+                  {t('common:table_grid.items_per_page')}
+                </InputLabel>
+                <Select
+                  labelId="page-size-select-label"
+                  id="page-size-select"
+                  value={pageSize}
+                  label={t('common:table_grid.items_per_page')}
+                  onChange={(e) => onPageSizeChange(Number(e.target.value))}
+                  sx={{
+                    color: 'white',
+                    '.MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(255, 255, 255, 0.23)',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(255, 255, 255, 0.5)',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'white',
+                    },
+                    '.MuiSvgIcon-root': {
+                      color: 'white',
+                    },
+                  }}
+                >
+                  {availablePageSizes.map((size) => (
+                    <MenuItem key={size} value={size}>
+                      {size}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
             {pageIndex > 0 && (
               <MdArrowBack
                 className="border-2 rounded-full cursor-pointer hover:bg-indigo-100"

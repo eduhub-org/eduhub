@@ -135,7 +135,8 @@
     "pagination_text": "Page {{currentPage}} of {{totalPage}}",
     "bulk_action": "Bulk Action",
     "apply": "Apply",
-    "none": "None"
+    "none": "None",
+    "items_per_page": "Items per page"
   },
   "table_grid_delete_button": {
     "confirm_delete": "Confirm Deletion",

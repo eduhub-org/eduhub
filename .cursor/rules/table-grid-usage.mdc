@@ -1,0 +1,155 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# TableGrid Component Usage Guide
+
+The `TableGrid` component ([frontend-nx/apps/edu-hub/components/common/TableGrid/index.tsx](mdc:frontend-nx/apps/edu-hub/components/common/TableGrid/index.tsx)) is a reusable component for displaying data in a sortable, filterable, and paginated table.
+
+Refer to [frontend-nx/apps/edu-hub/components/common/TableGrid/types.ts](mdc:frontend-nx/apps/edu-hub/components/common/TableGrid/types.ts) for all available `TableGridProps`.
+
+## Key Features
+
+*   Global text search
+*   Column sorting
+*   Expandable rows
+*   Bulk actions
+*   Row deletion
+*   Pagination
+*   Page size selection
+
+## Implementing Pagination and Page Size
+
+To enable and control pagination and page size selection, you need to manage state in the parent component that uses `TableGrid`.
+
+### Required Props for Pagination & Page Size:
+
+*   `data`: Array of data objects to display (typically for the current page).
+*   `columns`: Array of column definitions.
+*   `totalCount`: Total number of items available in the dataset (for calculating total pages).
+*   `pageIndex`: Current page index (0-based). This state should be managed in the parent component.
+*   `onPageChange`: Function to call when the page index changes. Signature: `(newIndex: number) => void`. This should update the `pageIndex` state in the parent.
+*   `pageSize`: Number of items per page. This state should be managed in the parent component.
+*   `onPageSizeChange`: Function to call when the page size changes. Signature: `(newPageSize: number) => void`. This should update the `pageSize` state and typically reset `pageIndex` to 0.
+
+### Optional Props Related to Pagination & Page Size:
+
+*   `enablePagination`: Boolean, defaults to `true`. If set to `false`, pagination controls (including page size selector) are hidden.
+*   `availablePageSizes`: Array of numbers for page size options (e.g., `[10, 20, 50, 100]`). Defaults to `[10, 20, 50, 100, 500]` within `TableGrid`.
+
+### Example Parent Component Setup:
+
+This example demonstrates managing `pageIndex` and `pageSize` state and integrating with the `useTableGrid` hook for data fetching.
+
+```typescript
+import { useState, FC, useMemo } from 'react';
+import TableGrid from './path/to/TableGrid'; // Adjust path
+import { useTableGrid } from './path/to/useTableGrid'; // Adjust path
+// Assuming ColumnDef and your data types are imported
+// import { ColumnDef } from '@tanstack/react-table';
+// import { YourDataRowType } from './your-types';
+
+interface MyDataRow { // Replace with your actual data row type
+  id: number;
+  name: string;
+  // ... other properties
+}
+
+const MyPageComponent: FC = () => {
+  // State for pagination and page size
+  const [pageSize, setPageSize] = useState(15); // Initial page size
+
+  // Handler for page size change
+  // Note: pageIndex is managed by useTableGrid in this example
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    // It's crucial to reset the page index when page size changes.
+    // If useTableGrid's setPageIndex is available and appropriate, use it.
+    // Otherwise, ensure your data fetching logic correctly fetches page 0.
+    // For useTableGrid, changing pageSize should implicitly cause it to refetch
+    // from the first page if its internal offset calculation depends on pageSize.
+    // Explicitly calling setPageIndex(0) from useTableGrid is safest if available.
+    // If setPageIndex from useTableGrid is not directly exposed or suitable for this,
+    // you might need a local pageIndex state synchronized with the hook.
+    // For simplicity, this example assumes useTableGrid handles resetting/refetching correctly.
+    // A common pattern is that useTableGrid will need pageIndex reset too.
+    // Let's assume 'setPageIndex' from useTableGrid is what we need.
+    setPageIndex(0); 
+  };
+  
+  const {
+    data,
+    loading,
+    error,
+    pageIndex,       // pageIndex from useTableGrid
+    setPageIndex,    // setPageIndex from useTableGrid
+    searchFilter,
+    setSearchFilter,
+    // totalCount might come from the data response, not directly from useTableGrid
+  } = useTableGrid({
+    queryHook: /* your useQuery (e.g., useAdminQuery) */,
+    query: /* YOUR_GRAPHQL_QUERY */,
+    pageSize: pageSize, // Pass current page size to the hook
+    queryVariables: { /* your base variables */ },
+    refetchFilter: (currentSearchFilter) => ({
+      // your filter logic based on searchFilter
+    }),
+  });
+
+  // Extract data and totalCount from the hook's response
+  const tableData: MyDataRow[] = data?.YourQuery?.nodes || []; // Adjust path to your data
+  const totalCount = data?.YourQuery?.totalCount || 0;    // Adjust path to total count
+
+  const columns = useMemo<ColumnDef<MyDataRow>[]>(() => [
+    // ... your column definitions
+    { header: 'ID', accessorKey: 'id' },
+    { header: 'Name', accessorKey: 'name' },
+  ], []);
+
+  return (
+    <TableGrid<MyDataRow>
+      columns={columns}
+      data={tableData}
+      loading={loading}
+      error={error}
+      
+      // Pagination & Page Size Props
+      enablePagination={true}
+      totalCount={totalCount}
+      pageIndex={pageIndex}               // Use pageIndex from useTableGrid
+      onPageChange={setPageIndex}         // Use setPageIndex from useTableGrid
+      pageSize={pageSize}                 // Use local pageSize state
+      onPageSizeChange={handlePageSizeChange} // Use local handler
+      availablePageSizes={[10, 15, 25, 50, 100]} // Optional: customize options
+      
+      // Other necessary props
+      searchFilter={searchFilter}
+      onSearchFilterChange={setSearchFilter}
+      refetchQueries={['YourQueryName']} // For cache updates on mutations
+    />
+  );
+};
+
+export default MyPageComponent;
+```
+
+### Important Considerations:
+
+1.  **Data Fetching & `useTableGrid`**:
+    *   The `TableGrid` component itself is UI-only; it doesn't fetch data.
+    *   The `useTableGrid` hook ([frontend-nx/apps/edu-hub/components/common/TableGrid/hooks/index.ts](mdc:frontend-nx/apps/edu-hub/components/common/TableGrid/hooks/index.ts)) is designed to work with `TableGrid` for data fetching, search, and pagination state management.
+    *   When `pageSize` changes (managed by your parent component's state), `useTableGrid` should receive this new `pageSize`. It will then use this new `pageSize` in its GraphQL query variables (e.g., `limit`).
+    *   When `onPageChange` is called by `TableGrid`, the `setPageIndex` function (from `useTableGrid`) updates the hook's internal state, triggering a refetch with new offset/page variables.
+    *   **Crucially**, when `onPageSizeChange` is called in your parent component, you must update your local `pageSize` state AND call `setPageIndex(0)` (from `useTableGrid`) to reset to the first page. This ensures data is fetched correctly for the new page size.
+
+2.  **`totalCount`**: This prop is essential for `TableGrid` to calculate the total number of pages and render pagination controls correctly. It must represent the *total* number of items in the entire dataset, not just the items on the current page. This typically comes from an aggregate field in your GraphQL response.
+
+3.  **Translations**:
+    *   The page size selector uses the translation key `common:table_grid.items_per_page`. Ensure this is defined in your translation files (e.g., `frontend-nx/apps/edu-hub/locales/de/common.json`).
+    *   The pagination text uses `common:table_grid.pagination_text`.
+
+4.  **Styling Page Size Selector**:
+    *   If the label for the page size selector ("Items per page") is truncated, you can adjust its width. The `FormControl` wrapping the selector in `TableGrid/index.tsx` (around line 370 in recent versions) has an `sx` prop with `minWidth`. Increase this value as needed (e.g., `minWidth: 170`).
+
+This guide should help you effectively integrate and use the `TableGrid` component with its pagination and page size features.

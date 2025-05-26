@@ -1,4 +1,4 @@
-import { FC, ReactNode, useMemo, useCallback } from 'react';
+import { FC, ReactNode, useMemo, useCallback, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -49,10 +49,17 @@ const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
 
 const ManageUsersContent: FC = () => {
   const { t } = useTranslation('manageUsers');
+  const [pageSize, setPageSize] = useState(20);
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPageIndex(0); // Reset to first page when page size changes
+  };
+
   const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter } = useTableGrid({
     queryHook: useAdminQuery,
     query: USERS_BY_LAST_NAME,
-    pageSize: 15,
+    pageSize: pageSize,
     refetchFilter: (searchFilter) => ({
       _or: [
         { lastName: { _ilike: `%${searchFilter}%` } },
@@ -120,6 +127,8 @@ const ManageUsersContent: FC = () => {
               totalCount={data?.User_aggregate?.aggregate?.count || 0}
               pageIndex={pageIndex}
               onPageChange={setPageIndex}
+              pageSize={pageSize}
+              onPageSizeChange={handlePageSizeChange}
               searchFilter={searchFilter}
               onSearchFilterChange={setSearchFilter}
               deleteMutation={DELETE_USER}
