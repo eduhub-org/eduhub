@@ -79,12 +79,12 @@
     "placeholder_motivation_letter": "Meine Motivation ..."
   },
   "status": {
-    "applied": "Beworben",
-    "aborted": "Abgebrochen",
-    "rejected": "Bewerbung abgelehnt",
-    "cancelled": "Einladung abgelehnt",
-    "invited": "Eingeladen",
-    "invitation_expired": "Einladung abgelaufen",
+    "applied": "Deine Bewerbung ist in der Prüfung",
+    "aborted": "Du hast die Teilnahme abgebrochen",
+    "rejected": "Leider wurde deine Bewerbung abgelehnt",
+    "cancelled": "Du hast deine Einladung abgelehnt",
+    "invited": "Du wurdest eingeladen und musst deine Teilnahme bestätigen",
+    "invitation_expired": "Deine Einladung ist abgelaufen",
     "application_period_ended": "Die Bewerbungsfrist  ist leider abgelaufen. Du kannst unseren <a>Newsletter</a> abonnieren, um über neue Angebote informiert zu bleiben.",
     "application_period_ended_title": "Bewerbungsfrist abgelaufen"
   },

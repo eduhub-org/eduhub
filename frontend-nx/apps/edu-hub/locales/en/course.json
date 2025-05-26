@@ -79,13 +79,13 @@
     "placeholder_motivation_letter": "My motivation ..."
   },
   "status": {
-    "applied": "Applied",
-    "aborted": "Aborted",
-    "rejected": "Rejected",
-    "cancelled": "Cancelled",
-    "invited": "Invited",
-    "invitation_expired": "Invitation expired",
-    "application_period_ended": "The application period unfortunately has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
+    "applied": "Your application is under review",
+    "aborted": "You aborted the participation",
+    "rejected": "Unfortunately, your application has been rejected",
+    "cancelled": "Your invitation has been cancelled",
+    "invited": "You have been invited and need to confirm your participation",
+    "invitation_expired": "Your invitation has expired",
+    "application_period_ended": "Unfortunately, the application period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
     "application_period_ended_title": "Application Period Ended"
   },
   "modal": {
