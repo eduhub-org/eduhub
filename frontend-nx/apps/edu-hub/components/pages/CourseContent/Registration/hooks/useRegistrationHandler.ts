@@ -58,7 +58,7 @@ export const useRegistrationHandler = ({
   const [isLoading, setIsLoading] = useState(false);
   const userId = useUserId();
   
-  const [insertEnrollmentMutation] = useAuthedMutation<UpdateEnrollment, UpdateEnrollmentVariables>(
+  const [updateEnrollmentMutation] = useAuthedMutation<UpdateEnrollment, UpdateEnrollmentVariables>(
     UPDATE_ENROLLMENT
   );
 
@@ -88,7 +88,7 @@ export const useRegistrationHandler = ({
           ? CourseEnrollmentStatus_enum.CONFIRMED 
           : CourseEnrollmentStatus_enum.APPLIED;
 
-        const result = await insertEnrollmentMutation({
+        const result = await updateEnrollmentMutation({
           variables: {
             courseId: course.id,
             userId,
@@ -113,7 +113,7 @@ export const useRegistrationHandler = ({
         setIsLoading(false);
       }
     },
-    [course.id, insertEnrollmentMutation, userId, onSuccess, config.isDirect]
+    [course.id, updateEnrollmentMutation, userId, onSuccess, config.isDirect]
   );
 
   const handlePaymentRegistration = useCallback(
@@ -127,6 +127,12 @@ export const useRegistrationHandler = ({
   );
 
   const handleRegistration = useCallback(() => {
+    // Check if user is authenticated before proceeding with any registration logic
+    if (!userId) {
+      handleLogin();
+      return;
+    }
+
     if (config.isExternal) {
       handleExternalRegistration();
       return;
@@ -142,7 +148,7 @@ export const useRegistrationHandler = ({
     if (config.isDirect) {
       handleDirectRegistration();
     }
-  }, [config, handleExternalRegistration, handleDirectRegistration]);
+  }, [userId, handleLogin, config, handleExternalRegistration, handleDirectRegistration]);
 
   const submitRegistration = useCallback(
     async (formData: RegistrationFormData): Promise<RegistrationResult> => {

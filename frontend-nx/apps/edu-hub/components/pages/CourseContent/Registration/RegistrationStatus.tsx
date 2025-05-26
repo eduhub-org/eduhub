@@ -90,7 +90,7 @@ export const RegistrationStatus: FC<RegistrationStatusProps> = ({ courseEnrollme
     case CourseEnrollmentStatus_enum.INVITED: {
       if (
         courseEnrollment.invitationExpirationDate &&
-        courseEnrollment.invitationExpirationDate.setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)
+        new Date(courseEnrollment.invitationExpirationDate).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)
       ) {
         return (
           <div className="flex flex-col sm:flex-row sm:items-center">

@@ -1,13 +1,13 @@
 {
   "general": {
     "events": "Event",
-    "reject": "Decline participation",
-    "confirm": "Confirm participation",
+  "reject": "Decline participation",
+  "confirm": "Confirm participation",
     "ects": "ECTS",
     "course_not_available": "Course not available",
     "to_course_chat": "GO TO COURSE CHAT",
     "to_online_meeting": "GO TO ONLINE MEETING",
-    "speaker": "Speaker",
+  "speaker": "Speaker",
     "link_will_be_provided_soon": "[Link will be provided here soon]"
   },
   "ects": {
@@ -72,7 +72,6 @@
   "registration": {
     "application_deadline": "Application deadline: ",
     "apply_now": "Apply now",
-    "sign_in_to_register": "Sign In to Register",
     "register_external": "Register via External Link",
     "register_with_payment": "Register with Payment",
     "register_now": "Register Now",
@@ -91,7 +90,7 @@
   "modal": {
     "title_approval": "Application",
     "title_direct": "Registration",
-    "title_with_payment": "Register and Pay for Course",
+    "title_with_payment": "Registration and Payment",
     "motivation_letter_label": "Motivation Letter",
     "motivation_letter_placeholder": "Please tell us why you want to participate in this course...",
     "payment_info": "This course costs {{cost}}. You will be redirected to the payment page after registration.",

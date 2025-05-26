@@ -1,8 +1,8 @@
 {
   "general": {
     "events": "Event",
-    "reject": "Teilnahme ablehnen",
-    "confirm": "Teilnahme bestätigen",
+  "reject": "Teilnahme ablehnen",
+  "confirm": "Teilnahme bestätigen",
     "ects": "ECTS",
     "course_not_available": "Kurs nicht verfügbar",
     "to_course_chat": "ZUM KURS-CHAT",
@@ -72,7 +72,6 @@
   "registration": {
     "application_deadline": "Bewerbungsschluss: ",
     "apply_now": "Jetzt bewerben",
-    "sign_in_to_register": "Anmelden zur Registrierung",
     "register_external": "Über externen Link registrieren",
     "register_with_payment": "Mit Zahlung registrieren",
     "register_now": "Jetzt registrieren",
@@ -91,7 +90,7 @@
   "modal": {
     "title_approval": "Bewerbung",
     "title_direct": "Registrierung",
-    "title_with_payment": "Registrieren und für Kurs bezahlen",
+    "title_with_payment": "Registrierung und Bezahlung",
     "motivation_letter_label": "Motivationsschreiben",
     "motivation_letter_placeholder": "Bitte erzähle uns, warum du teilnehmen möchtest...",
     "payment_info": "Dieser Kurs kostet {{cost}}. Du wirst nach der Registrierung zur Zahlungsseite weitergeleitet.",

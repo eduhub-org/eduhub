@@ -49,10 +49,8 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
   // Check if application period has ended
   const now = new Date();
   now.setHours(0, 0, 0, 0);
-  const currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0);
 
-  if (course.applicationEnd <= currentDate) {
+  if (course.applicationEnd <= now) {
     return (
       <div className="bg-gray-300 p-4">
         <Trans
@@ -74,10 +72,6 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
 
   // Get button text based on registration type and login status
   const getButtonText = () => {
-    if (!isLoggedIn) {
-      return t('registration.sign_in_to_register');
-    }
-
     if (course.externalRegistrationLink) {
       return t('registration.register_external');
     }
@@ -99,7 +93,7 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
         filled
         inverted
         onClick={onClick}
-        disabled={now > course.applicationEnd}
+        disabled={course.applicationEnd <= now}
         className="bg-edu-course-current"
       >
         {getButtonText()}

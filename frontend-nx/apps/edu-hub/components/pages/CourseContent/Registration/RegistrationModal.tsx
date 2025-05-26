@@ -90,12 +90,8 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     });
 
     if (result.success) {
-      // Close modal and reset form after a short delay to allow success notification
-      setTimeout(() => {
-        closeModal();
-        setMotivationLetter('');
-        setAcceptTerms(false);
-      }, 500);
+      // Close modal immediately after successful submission
+      closeModal();
     } else {
       setError(result.error || t('errors.registration_failed'));
     }
@@ -104,6 +100,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
   const handleClose = useCallback(() => {
     if (!isLoading) {
       closeModal();
+      // Reset form state when modal closes
       setError(null);
       setMotivationLetter('');
       setAcceptTerms(false);

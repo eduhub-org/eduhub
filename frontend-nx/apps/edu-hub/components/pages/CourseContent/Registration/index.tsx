@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import useTranslation from 'next-translate/useTranslation';
 
 import { CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
@@ -48,7 +47,6 @@ interface RegistrationProps {
  * @returns JSX element representing the registration interface
  */
 export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, onRegistrationSuccess }) => {
-  const { t } = useTranslation();
   const isLoggedIn = useIsLoggedIn();
 
   const registrationHandler = useRegistrationHandler({
