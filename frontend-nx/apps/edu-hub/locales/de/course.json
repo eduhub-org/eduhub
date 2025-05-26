@@ -89,11 +89,11 @@
     "application_period_ended": "Die Bewerbungsfrist für diesen Kurs ist abgelaufen. Du kannst unseren <a>Newsletter</a> abonnieren, um über neue Kurse informiert zu bleiben."
   },
   "modal": {
-    "title_approval": "Für Kurs bewerben",
-    "title_direct": "Für Kurs registrieren",
+    "title_approval": "Bewerbung",
+    "title_direct": "Registrierung",
     "title_with_payment": "Registrieren und für Kurs bezahlen",
     "motivation_letter_label": "Motivationsschreiben",
-    "motivation_letter_placeholder": "Bitte erzähle uns, warum du an diesem Kurs teilnehmen möchtest...",
+    "motivation_letter_placeholder": "Bitte erzähle uns, warum du teilnehmen möchtest...",
     "payment_info": "Dieser Kurs kostet {{cost}}. Du wirst nach der Registrierung zur Zahlungsseite weitergeleitet.",
     "accept_terms": "Ich akzeptiere die Allgemeinen Geschäftsbedingungen und die Datenschutzerklärung",
     "cancel": "Abbrechen",

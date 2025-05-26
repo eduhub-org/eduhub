@@ -89,8 +89,8 @@
     "application_period_ended": "The application period for this course has ended. You can subscribe to our <a>newsletter</a> to stay informed about new courses."
   },
   "modal": {
-    "title_approval": "Apply for Course",
-    "title_direct": "Register for Course",
+    "title_approval": "Application",
+    "title_direct": "Registration",
     "title_with_payment": "Register and Pay for Course",
     "motivation_letter_label": "Motivation Letter",
     "motivation_letter_placeholder": "Please tell us why you want to participate in this course...",
