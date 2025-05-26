@@ -1,5 +1,5 @@
 ---
-description: 
+description: Provides a comprehensive guide for using the TableGrid React component, including setup for data display, pagination, page size selection, sorting, filtering, and integration with the useTableGrid hook. Useful for implementing or modifying tables with these features in the EduHub frontend.
 globs: 
 alwaysApply: false
 ---
