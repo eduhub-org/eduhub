@@ -57,24 +57,30 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
 
   // If user has an enrollment, show status
   if (courseEnrollment) {
-    return <RegistrationStatus courseEnrollment={courseEnrollment} course={course} />;
+    return (
+      <div className="w-full">
+        <RegistrationStatus courseEnrollment={courseEnrollment} course={course} />
+      </div>
+    );
   }
 
   // If not logged in, show login prompt
   if (!isLoggedIn) {
     return (
-      <RegistrationButton
-        course={course}
-        registrationType={course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT}
-        onClick={registrationHandler.handleLogin}
-        isLoggedIn={false}
-      />
+      <div className="w-full">
+        <RegistrationButton
+          course={course}
+          registrationType={course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT}
+          onClick={registrationHandler.handleLogin}
+          isLoggedIn={false}
+        />
+      </div>
     );
   }
 
   // Show appropriate registration button based on registration type
   return (
-    <>
+    <div className="w-full">
       <RegistrationButton
         course={course}
         registrationType={course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT}
@@ -89,7 +95,7 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
         onSubmit={registrationHandler.submitRegistration}
         isLoading={registrationHandler.isLoading}
       />
-    </>
+    </div>
   );
 };
 

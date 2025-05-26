@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import Trans from 'next-translate/Trans';
+import { MdInfoOutline } from 'react-icons/md';
 
 import { CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
@@ -52,20 +53,30 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
 
   if (course.applicationEnd <= now) {
     return (
-      <div className="bg-gray-300 p-4">
-        <Trans
-          i18nKey="course:status.application_period_ended"
-          components={{
-            a: (
-              <a
-                href="https://opencampus.substack.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
+      <div className="bg-amber-50 rounded-lg p-6 mb-9 w-full">
+        <div className="flex items-start space-x-3">
+          <div className="flex-shrink-0">
+            <MdInfoOutline className="text-2xl text-amber-600" />
+          </div>
+          <div className="text-amber-800">
+            <h3 className="font-semibold text-lg mb-2">{t('status.application_period_ended_title')}</h3>
+            <div className="text-sm leading-relaxed">
+              <Trans
+                i18nKey="course:status.application_period_ended"
+                components={{
+                  a: (
+                    <a
+                      href="https://opencampus.substack.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-amber-900 transition-colors font-medium"
+                    />
+                  ),
+                }}
               />
-            ),
-          }}
-        />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -88,24 +99,26 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
   };
 
   return (
-    <div className="flex flex-1 flex-col justify-center items-center">
+    <div className="flex flex-1 flex-col justify-center items-center space-y-4 w-full">
       <Button
         filled
         inverted
         onClick={onClick}
         disabled={course.applicationEnd <= now}
-        className="bg-edu-course-current"
+        className="bg-edu-course-current hover:bg-opacity-90 transition-all duration-200 px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
       >
         {getButtonText()}
       </Button>
-      <span className="text-xs mt-4 text-white">
-        {t('registration.application_deadline')}
-        {course.applicationEnd?.toLocaleDateString(lang, {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        }) ?? ''}
-      </span>
+      <div className="text-center">
+        <div className="text-xs text-white/90 mb-1">{t('registration.application_deadline')}</div>
+        <div className="text-sm font-medium text-white">
+          {course.applicationEnd?.toLocaleDateString(lang, {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          }) ?? ''}
+        </div>
+      </div>
     </div>
   );
 };

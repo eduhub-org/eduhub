@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
+import { MdCheckCircle, MdHourglassEmpty, MdCancel, MdError, MdMailOutline, MdAccessTime } from 'react-icons/md';
 
 import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
@@ -17,6 +18,30 @@ interface RegistrationStatusProps {
 }
 
 /**
+ * Status card component for displaying enrollment status with appropriate styling and icons
+ */
+const StatusCard: FC<{
+  status: 'success' | 'pending' | 'warning' | 'error' | 'info';
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}> = ({ status, icon, children }) => {
+  const statusStyles = {
+    success: 'bg-green-50 border-green-200 text-green-800',
+    pending: 'bg-blue-50 border-blue-200 text-blue-800',
+    warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+    error: 'bg-red-50 border-red-200 text-red-800',
+    info: 'bg-gray-50 border-gray-200 text-gray-800',
+  };
+
+  return (
+    <div className={`rounded-lg border-2 p-4 w-full ${statusStyles[status]} flex items-center space-x-3`}>
+      <div className="flex-shrink-0 text-xl">{icon}</div>
+      <div className="font-medium">{children}</div>
+    </div>
+  );
+};
+
+/**
  * Component that displays course resource access buttons for confirmed/completed enrollments.
  * Shows direct links to course chat and online meeting when available.
  *
@@ -29,7 +54,7 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
   const onlineLocation = course.CourseLocations?.find((location) => location.locationOption === 'ONLINE');
 
   return (
-    <div className="flex flex-col justify-between items-center">
+    <div className="flex flex-col justify-between items-center w-full">
       <div className="mb-10">
         <Button className="bg-blue-200" as="a" href={course.chatLink} filled inverted>
           {t('general.to_course_chat')}
@@ -76,16 +101,32 @@ export const RegistrationStatus: FC<RegistrationStatusProps> = ({ courseEnrollme
 
   switch (status) {
     case CourseEnrollmentStatus_enum.ABORTED: {
-      return <span className="bg-gray-300 p-4">{t('status.aborted')}</span>;
+      return (
+        <StatusCard status="error" icon={<MdError />}>
+          {t('status.aborted')}
+        </StatusCard>
+      );
     }
     case CourseEnrollmentStatus_enum.APPLIED: {
-      return <span className="bg-gray-300 p-4">{t('status.applied')}</span>;
+      return (
+        <StatusCard status="pending" icon={<MdHourglassEmpty />}>
+          {t('status.applied')}
+        </StatusCard>
+      );
     }
     case CourseEnrollmentStatus_enum.REJECTED: {
-      return <span className="bg-gray-300 p-4">{t('status.rejected')}</span>;
+      return (
+        <StatusCard status="error" icon={<MdCancel />}>
+          {t('status.rejected')}
+        </StatusCard>
+      );
     }
     case CourseEnrollmentStatus_enum.CANCELLED: {
-      return <span className="bg-gray-300 p-4">{t('status.cancelled')}</span>;
+      return (
+        <StatusCard status="warning" icon={<MdCancel />}>
+          {t('status.cancelled')}
+        </StatusCard>
+      );
     }
     case CourseEnrollmentStatus_enum.INVITED: {
       if (
@@ -93,8 +134,12 @@ export const RegistrationStatus: FC<RegistrationStatusProps> = ({ courseEnrollme
         new Date(courseEnrollment.invitationExpirationDate).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)
       ) {
         return (
-          <div className="flex flex-col sm:flex-row sm:items-center">
-            <div className="bg-gray-300 p-4 mb-6 sm:mb-0 sm:w-2/3 sm:mr-5">{t('status.invited')}</div>
+          <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full">
+            <div className="flex-1">
+              <StatusCard status="success" icon={<MdMailOutline />}>
+                {t('status.invited')}
+              </StatusCard>
+            </div>
             <Button
               filled
               inverted
@@ -102,14 +147,18 @@ export const RegistrationStatus: FC<RegistrationStatusProps> = ({ courseEnrollme
                 // This will be handled by the parent component
                 console.log('Accept invitation clicked');
               }}
-              className="bg-edu-course-current sm:w-1/3"
+              className="bg-green-600 hover:bg-green-700 transition-colors duration-200 px-6 py-3 font-medium"
             >
               {t('registration.accept_invitation')}
             </Button>
           </div>
         );
       } else {
-        return <span className="bg-gray-300 p-4">{t('status.invitation_expired')}</span>;
+        return (
+          <StatusCard status="warning" icon={<MdAccessTime />}>
+            {t('status.invitation_expired')}
+          </StatusCard>
+        );
       }
     }
     case CourseEnrollmentStatus_enum.CONFIRMED: {

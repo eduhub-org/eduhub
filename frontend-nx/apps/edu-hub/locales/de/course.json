@@ -5,7 +5,7 @@
   "confirm": "Teilnahme bestätigen",
     "ects": "ECTS",
     "course_not_available": "Kurs nicht verfügbar",
-    "to_course_chat": "ZUM KURS-CHAT",
+    "to_course_chat": "ZUM CHAT",
     "to_online_meeting": "ZUM ONLINE-MEETING",
     "speaker": "Referent:in",
     "link_will_be_provided_soon": "[Link wird hier in Kürze bereitgestellt]"
@@ -85,7 +85,8 @@
     "cancelled": "Einladung abgelehnt",
     "invited": "Eingeladen",
     "invitation_expired": "Einladung abgelaufen",
-    "application_period_ended": "Die Bewerbungsfrist für diesen Kurs ist abgelaufen. Du kannst unseren <a>Newsletter</a> abonnieren, um über neue Kurse informiert zu bleiben."
+    "application_period_ended": "Die Bewerbungsfrist  ist leider abgelaufen. Du kannst unseren <a>Newsletter</a> abonnieren, um über neue Angebote informiert zu bleiben.",
+    "application_period_ended_title": "Bewerbungsfrist abgelaufen"
   },
   "modal": {
     "title_approval": "Bewerbung",

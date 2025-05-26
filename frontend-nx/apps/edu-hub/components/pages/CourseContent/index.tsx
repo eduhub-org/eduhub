@@ -170,7 +170,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                     ) : null}
                     <span className="text-2xl mt-2">{course.tagline}</span>
                   </div>
-                  <div className="flex flex-1 lg:max-w-md">
+                  <div className="flex flex-1 justify-center items-center mx-6 lg:mx-0 lg:max-w-md">
                     <Registration
                       course={course}
                       courseEnrollment={courseEnrollment}
@@ -215,7 +215,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                     <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
                   )}
                 </PageBlock>
-                <div className="pr-0 lg:pr-6 xl:pr-0">
+                <div className="flex flex-1 justify-center items-center mx-6 lg:mx-0 lg:max-w-md pr-0 lg:pr-6 xl:pr-0 ">
                   <TimeLocationLanguageInstructors course={course} />
                 </div>
               </ContentRow>

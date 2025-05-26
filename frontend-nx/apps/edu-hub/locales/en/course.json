@@ -5,7 +5,7 @@
   "confirm": "Confirm participation",
     "ects": "ECTS",
     "course_not_available": "Course not available",
-    "to_course_chat": "GO TO COURSE CHAT",
+    "to_course_chat": "GO TO CHAT",
     "to_online_meeting": "GO TO ONLINE MEETING",
   "speaker": "Speaker",
     "link_will_be_provided_soon": "[Link will be provided here soon]"
@@ -85,7 +85,8 @@
     "cancelled": "Cancelled",
     "invited": "Invited",
     "invitation_expired": "Invitation expired",
-    "application_period_ended": "The application period for this course has ended. You can subscribe to our <a>newsletter</a> to stay informed about new courses."
+    "application_period_ended": "The application period unfortunately has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
+    "application_period_ended_title": "Application Period Ended"
   },
   "modal": {
     "title_approval": "Application",
