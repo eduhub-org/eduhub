@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseStatus_enum, Weekday_enum, ProgramType_enum } from "./../../__generated__/globalTypes";
+import { CourseStatus_enum, Weekday_enum, CourseRegistrationType_enum, ProgramType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseMinimum
@@ -130,6 +130,7 @@ export interface CourseMinimum_Course_by_pk {
    * The time the course starts each week.
    */
   startTime: any | null;
+  registrationType: CourseRegistrationType_enum | null;
   /**
    * An object relationship
    */

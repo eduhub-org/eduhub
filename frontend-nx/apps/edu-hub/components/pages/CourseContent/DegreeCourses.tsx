@@ -21,20 +21,22 @@ export const CurrentDegreeCourses: FC<{
 
   return (
     <>
-      <span className="text-3xl font-semibold mb-4">{t('currentDegreeElements')}</span>
-      {currentDegreeCourses.length > 0 ? (
-        <ul className="list-disc pb-12">
-          {currentDegreeCourses.map((degreeCourse) => (
-            <li className="dot-before" key={degreeCourse?.Course?.id}>
-              <NextLink href={`/course/${degreeCourse?.Course?.id}`} passHref>
-                <MuiLink style={{ color: '#9CA3AF' }}>{degreeCourse?.Course?.title}</MuiLink>
-              </NextLink>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>{t('noDegreeElementsAvailable')}</p>
-      )}
+      <div className="flex flex-col">
+        <span className="text-3xl font-semibold mb-4">{t('degree_elements.current_degree_elements')}</span>
+        {currentDegreeCourses.length > 0 ? (
+          <ul className="list-disc pb-12">
+            {currentDegreeCourses.map((degreeCourse) => (
+              <li className="dot-before" key={degreeCourse?.Course?.id}>
+                <NextLink href={`/course/${degreeCourse?.Course?.id}`} passHref>
+                  <MuiLink style={{ color: '#9CA3AF' }}>{degreeCourse?.Course?.title}</MuiLink>
+                </NextLink>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>{t('degree_elements.no_degree_elements_available')}</p>
+        )}
+      </div>
     </>
   );
 };
@@ -51,27 +53,32 @@ export const CompletedDegreeCourses: FC<{ degreeCourseId: number }> = ({ degreeC
 
   const completedDegreeEnrollments = data?.CourseEnrollment || [];
 
+  // Get ECTS translations object to handle keys with dots/commas
+  const ectsTranslations = t('ects', {}, { returnObjects: true }) as Record<string, string>;
+
   return (
     <div className=" text-edu-black bg-white px-8 py-8">
-      <span className="text-3xl font-semibold mb-4">{t('completedDegreeElements')}</span>
-      {completedDegreeEnrollments.length > 0 ? (
-        <ul className="list-disc pb-12">
-          {completedDegreeEnrollments.map((degreeEnrollment) => (
-            <li key={degreeEnrollment?.Course?.id}>
-              <NextLink href={`/course/${degreeEnrollment?.Course?.id}`} passHref>
-                <MuiLink style={{ color: '#9CA3AF' }}>
-                  {degreeEnrollment?.Course?.title} -{' '}
-                  {degreeEnrollment?.Course?.Program?.shortTitle !== 'EVENTS'
-                    ? ` ${t(degreeEnrollment?.Course?.Program?.title)} (${t(degreeEnrollment?.Course?.ects)} ECTS)`
-                    : `${t(degreeEnrollment?.Course?.Program?.shortTitle)}`}
-                </MuiLink>
-              </NextLink>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>{t('noDegreeElementsCompleted')}</p>
-      )}
+      <div className="flex flex-col">
+        <span className="text-3xl font-semibold mb-4">{t('degree_elements.completed_degree_elements')}</span>
+        {completedDegreeEnrollments.length > 0 ? (
+          <ul className="list-disc pb-12">
+            {completedDegreeEnrollments.map((degreeEnrollment) => (
+              <li key={degreeEnrollment?.Course?.id}>
+                <NextLink href={`/course/${degreeEnrollment?.Course?.id}`} passHref>
+                  <MuiLink style={{ color: '#9CA3AF' }}>
+                    {degreeEnrollment?.Course?.title} -{' '}
+                    {degreeEnrollment?.Course?.Program?.shortTitle !== 'EVENTS'
+                      ? ` ${t(degreeEnrollment?.Course?.Program?.title)} (${ectsTranslations[degreeEnrollment?.Course?.ects] || degreeEnrollment?.Course?.ects} ECTS)`
+                      : `${t(degreeEnrollment?.Course?.Program?.shortTitle)}`}
+                  </MuiLink>
+                </NextLink>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>{t('degree_elements.no_degree_elements_completed')}</p>
+        )}
+      </div>
     </div>
   );
 };

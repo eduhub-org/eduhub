@@ -545,3 +545,15 @@ export const UPDATE_COURSE_MAX_MISSED_SESSION = gql`
     }
   }
 `;
+
+export const UPDATE_COURSE_REGISTRATION_TYPE = gql`
+  mutation UpdateCourseRegistrationType($itemId: Int!, $value: CourseRegistrationType_enum!) {
+    update_Course_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { registrationType: $value }
+    ) {
+      id
+      registrationType
+    }
+  }
+`;

@@ -19,6 +19,16 @@
     "help_text": "By default, the value is set to 2, but all values greater than or equal to 0 are permitted.",
     "error_text": "Incorrect missed session Format!"
   },
+  "registration_type": {
+    "label": "Registration Type",
+    "help_text": "Select how participants can register for this course or event.",
+    "options": {
+      "APPROVAL_WITH_INPUT": "Application with approval process",
+      "EXTERNAL_REGISTRATION": "External registration link",
+      "DIRECT_WITH_INPUT": "Direct registration with input form",
+      "DIRECT_CONFIRMATION": "Direct registration"
+    }
+  },
   "delete_button": {
     "delete_course_confirmation": "Are you sure you want to delete the course '{{title}}'?",
     "untitled_course": "Untitled Course"

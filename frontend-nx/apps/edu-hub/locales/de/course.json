@@ -1,30 +1,128 @@
 {
-  "EVENTS": "Event",
-  "reject": "Teilnahme ablehnen",
-  "confirm": "Teilnahme bestätigen",
-  "completedDegreeElements": "Bisher abgeschlossene Elemente",
-  "noDegreeElementsCompleted": "Bisher hast Du keine Elemente abgeschlossen.",
-  "currentDegreeElements": "Aktuelle Angebote im Rahmen des Degrees",
-  "noDegreeElementsAvailable": "Aktuell gibt es keine laufenden Angebote zu diesem Degree.",
-  "generalAchievementCertificateConditions": "**Online-Teilnahme:**\nWenn eine Online-Teilnahme möglich ist, wird die Teilnahme nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist.\n\n**Semester Opening:**\nWir laden euch zum kursübergreifenden Semester Opening am 11. April im Wissenschaftszentrum Kiel ein! 💛\nHier bekommt ihr Einblicke hinter die Kulissen unserer OC-Community, lernt Kursleitungen und andere Kursteilnehmer:innen kennen und könnt in inspirierenden Sessions die Kieler Unternehmenslandschaft entdecken.\nZu allen Infos und zur Anmeldung geht es [hier](https://forms.office.com/e/bbAd8xpua8)",
-  "showAllSessions": "Alle Termine anzeigen",
-  "hideSessions": "Termine einklappen",
-  "courseSessions": "Kurstermine",
-  "onboardingModal": {
-    "declineConfirmText": "Möchtest du die Einladung zu diesem Kurs wirklich ablehnen?",
-    "declineButtonText": "Ja",
+  "general": {
+    "events": "Event",
+    "reject": "Teilnahme ablehnen",
+    "confirm": "Teilnahme bestätigen",
+    "ects": "ECTS",
+    "course_not_available": "Kurs nicht verfügbar",
+    "to_course_chat": "ZUM KURS-CHAT",
+    "to_online_meeting": "ZUM ONLINE-MEETING",
+    "speaker": "Referent:in",
+    "link_will_be_provided_soon": "[Link wird hier in Kürze bereitgestellt]"
+  },
+  "ects": {
+    "NONE": "OHNE",
+    "0,5": "0,5",
+    "2,5": "2,5",
+    "2.5": "2,5",
+    "5": "5",
+    "12,5": "12,5"
+  },
+  "degree_elements": {
+    "completed_degree_elements": "Bisher abgeschlossene Elemente",
+    "no_degree_elements_completed": "Bisher hast Du keine Elemente abgeschlossen.",
+    "current_degree_elements": "Aktuelle Angebote im Rahmen des Degrees",
+    "no_degree_elements_available": "Aktuell gibt es keine laufenden Angebote zu diesem Degree."
+  },
+  "learning": {
+    "you_will_learn": "Du wirst lernen",
+    "general_achievement_certificate_conditions": "**Online-Teilnahme:**\nWenn eine Online-Teilnahme möglich ist, wird die Teilnahme nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist.\n\n**Semester Opening:**\nWir laden euch zum kursübergreifenden Semester Opening am 11. April im Wissenschaftszentrum Kiel ein! 💛\nHier bekommt ihr Einblicke hinter die Kulissen unserer OC-Community, lernt Kursleitungen und andere Kursteilnehmer:innen kennen und könnt in inspirierenden Sessions die Kieler Unternehmenslandschaft entdecken.\nZu allen Infos und zur Anmeldung geht es [hier](https://forms.office.com/e/bbAd8xpua8)"
+  },
+  "sessions": {
+    "show_all_sessions": "Alle Termine anzeigen",
+    "hide_sessions": "Termine einklappen",
+    "course_sessions": "Kurstermine"
+  },
+  "attendances": {
+    "attendances": "Anwesenheiten",
+    "max_missed_sessions": "Du darfst an maximal einem Termin fehlen",
+    "max_missed_sessions_plural": "Du darfst an maximal {{count}} Terminen fehlen",
+    "attendance_status": {
+      "ATTENDED": "Teilgenommen",
+      "MISSED": "Nicht teilgenommen",
+      "NO_INFO": "In Prüfung",
+      "PENDING": "Überprüfung ausstehend"
+    }
+  },
+  "achievement": {
+    "achievement_option": "Leistungsnachweis",
+    "achievement_record_upload_dead_line_text": "Du hast bis zum {{date}} Zeit einen Leistungsnachweis hochzuladen.",
+    "choose_achievement_option": "Wähle den Titel deines Leistungsnachweises aus.",
+    "selected_achievement_option": "Gewählter Leistungsnachweis",
+    "no_current_achievement_option": "Bisher wurde kein Leistungsnachweis eingreicht.",
+    "no_achievement_option": "Aktuell steht kein Leistungsnachweis für diesen Kurs zur Verfügung.",
+    "upload_achievement_record": "Neuen Nachweis hochladen",
+    "download_template": "Vorlage herunterladen",
+    "last_record_upload": "Der letzte Nachweis mit Dir als Autor wurde am {{dateTime}} von {{fullName}} zu \"{{achievementRecordTitle}}\" hochgeladen: {{achievementRecordFileName}}",
+    "no_existing_record_upload": "Es wurde bisher kein Nachweis mit Dir als Autor hochgeladen.",
+    "use_documentation_template": "Nutze folgende Vorlage zur Dokumentation:",
+    "achievement_option_not_selected": "Bitte wähle einen Leistungsnachweis aus.",
+    "authors": "Autoren",
+    "documentation": "Dokumentation",
+    "upload": "Hochladen",
+    "authors_missing": "Bitte Autoren hinzufügen!",
+    "documentation_missing": "Bitte Dokumentation hochladen!",
+    "file_name": "Dateiname",
+    "operation_failed": "Vorgang fehlgeschlagen",
+    "max_file_size": "Maximale Dateigröße: {{size}} MB",
+    "upload_achievement_record_modal": {
+      "file_too_large": "Die Datei ist zu groß. Die maximale Größe beträgt {{size}} MB."
+    }
+  },
+  "registration": {
+    "application_deadline": "Bewerbungsschluss: ",
+    "apply_now": "Jetzt bewerben",
+    "sign_in_to_register": "Anmelden zur Registrierung",
+    "register_external": "Über externen Link registrieren",
+    "register_with_payment": "Mit Zahlung registrieren",
+    "register_now": "Jetzt registrieren",
+    "accept_invitation": "Einladung annehmen",
+    "placeholder_motivation_letter": "Meine Motivation ..."
+  },
+  "status": {
+    "applied": "Beworben",
+    "aborted": "Abgebrochen",
+    "rejected": "Bewerbung abgelehnt",
+    "cancelled": "Einladung abgelehnt",
+    "invited": "Eingeladen",
+    "invitation_expired": "Einladung abgelaufen",
+    "application_period_ended": "Die Bewerbungsfrist für diesen Kurs ist abgelaufen. Du kannst unseren <a>Newsletter</a> abonnieren, um über neue Kurse informiert zu bleiben."
+  },
+  "modal": {
+    "title_approval": "Für Kurs bewerben",
+    "title_direct": "Für Kurs registrieren",
+    "title_with_payment": "Registrieren und für Kurs bezahlen",
+    "motivation_letter_label": "Motivationsschreiben",
+    "motivation_letter_placeholder": "Bitte erzähle uns, warum du an diesem Kurs teilnehmen möchtest...",
+    "payment_info": "Dieser Kurs kostet {{cost}}. Du wirst nach der Registrierung zur Zahlungsseite weitergeleitet.",
+    "accept_terms": "Ich akzeptiere die Allgemeinen Geschäftsbedingungen und die Datenschutzerklärung",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "submit": "Bewerbung absenden",
+    "proceed_to_payment": "Zur Zahlung",
+    "submitting": "Wird gesendet...",
+    "success_message_approval": "Deine Bewerbung wurde erfolgreich eingereicht. Du erhältst eine E-Mail-Benachrichtigung, sobald deine Bewerbung geprüft wurde.",
+    "success_message_direct": "Du wurdest erfolgreich für diesen Kurs registriert. Du erhältst in Kürze eine Bestätigungs-E-Mail."
+  },
+  "errors": {
+    "motivation_letter_required": "Bitte schreib uns, warum du an diesem Kurs teilnehmen möchtest",
+    "terms_required": "Bitte akzeptiere die Allgemeinen Geschäftsbedingungen",
+    "registration_failed": "Registrierung fehlgeschlagen. Bitte versuche es erneut."
+  },
+  "onboarding_modal": {
+    "decline_confirm_text": "Möchtest du die Einladung zu diesem Kurs wirklich ablehnen?",
+    "decline_button_text": "Ja",
     "title": "Onboarding für Deine Kursteilnahme",
     "congratulation": "Herzlichen Glückwunsch zur Einladung für die Teilnahme an diesem Kurs!",
-    "formIntro": "Bitte aktualisiere Deinen aktuellen Beschäftigungsstatus:",
-    "confirmSufficientTime": "Bitte bestätige die Kursteilnahme nur, wenn Du Zeit hast, bis zum Ende am Kurs teilzunehmen.",
+    "form_intro": "Bitte aktualisiere Deinen aktuellen Beschäftigungsstatus:",
+    "confirm_sufficient_time": "Bitte bestätige die Kursteilnahme nur, wenn Du Zeit hast, bis zum Ende am Kurs teilzunehmen.",
     "important": "WICHTIG: KURSEINLADUNG BESTÄTIGEN!",
-    "mattermostInfo1": "Nach der Bestätigung gehe bitte direkt auf den Button zum Kurs-Chat.",
-    "mattermostInfo2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nDer Kurs-Chat ist unser zentrales Kommunikationstool für die Kurse."
+    "mattermost_info_1": "Nach der Bestätigung gehe bitte direkt auf den Button zum Kurs-Chat.",
+    "mattermost_info_2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nDer Kurs-Chat ist unser zentrales Kommunikationstool für die Kurse."
   },
-  "toCourseChat": "ZUM KURS-CHAT",
-  "toOnlineMeeting": "ZUM ONLINE-MEETING",
-  "max_file_size": "Maximale Dateigröße: {{size}} MB",
-  "upload_achievement_record_modal": {
-    "file_too_large": "Die Datei ist zu groß. Die maximale Größe beträgt {{size}} MB."
+  "success_messages": {
+    "success_title": "Bewerbung erfolgreich eingereicht!",
+    "success_body": "Du wirst spätestens ein bis zwei Tage nach Bewerbungsschluss über deine Zulassung informiert.",
+    "success_close_button_title": "Schließen"
   }
 }
