@@ -1,0 +1,234 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Translation Implementation Guide
+
+This guide covers how to implement translations in the EduHub project following established conventions and component-based organization.
+
+## File Structure and Naming
+
+### Translation Files
+- **Location**: `frontend-nx/apps/edu-hub/locales/{language}/`
+- **Languages**: `de` (German), `en` (English)
+- **File naming**: Use Pascal-case matching the page/component name
+  - Example: `manageCourse.json` for manage/course components
+
+### Key Naming Convention
+- **All translation keys MUST use snake_case**
+- Examples: `login_error_message`, `application_deadline`, `max_missed_sessions`
+
+## Language Consistency Rules
+
+### German Translations - MANDATORY "Du" Usage
+- **ALWAYS use informal "Du" variant in German translations**
+- **NEVER use formal "Sie" variant**
+- This is a strict requirement for all German translations in the EduHub project
+- Examples:
+  - ✅ `"Du kannst unseren Newsletter abonnieren"`
+  - ❌ `"Sie können unseren Newsletter abonnieren"`
+  - ✅ `"Bitte gib ein Motivationsschreiben an"`
+  - ❌ `"Bitte geben Sie ein Motivationsschreiben an"`
+  - ✅ `"Du wirst nach der Registrierung weitergeleitet"`
+  - ❌ `"Sie werden nach der Registrierung weitergeleitet"`
+  - ✅ `"Deine Bewerbung wurde eingereicht"`
+  - ❌ `"Ihre Bewerbung wurde eingereicht"`
+
+### English Translations
+- Use clear, concise language
+- Maintain consistent terminology across components
+
+## Component-Based Translation Organization
+
+### Main Course Translations ([course.json](mdc:frontend-nx/apps/edu-hub/locales/de/course.json))
+
+Organize translations into logical groups based on component functionality:
+
+```json
+{
+  "general": {
+    "events": "Event",
+    "reject": "Teilnahme ablehnen", 
+    "confirm": "Teilnahme bestätigen",
+    "ects": "ECTS",
+    "course_not_available": "Kurs nicht verfügbar",
+    "to_course_chat": "ZUM KURS-CHAT",
+    "to_online_meeting": "ZUM ONLINE-MEETING",
+    "speaker": "Referent:in",
+    "link_will_be_provided_soon": "[Link wird hier in Kürze bereitgestellt]"
+  },
+  "ects": {
+    "NONE": "OHNE",
+    "0,5": "0,5", 
+    "2,5": "2,5",
+    "5": "5",
+    "12,5": "12,5"
+  },
+  "degree_elements": {
+    "completed_degree_elements": "Bisher abgeschlossene Elemente",
+    "current_degree_elements": "Aktuelle Angebote im Rahmen des Degrees"
+  },
+  "learning": {
+    "you_will_learn": "Du wirst lernen",
+    "general_achievement_certificate_conditions": "Certificate conditions..."
+  },
+  "sessions": {
+    "show_all_sessions": "Alle Termine anzeigen",
+    "hide_sessions": "Termine einklappen", 
+    "course_sessions": "Kurstermine"
+  },
+  "attendances": {
+    "attendances": "Anwesenheiten",
+    "max_missed_sessions": "Du darfst an maximal einem Termin fehlen",
+    "attendance_status": {
+      "ATTENDED": "Teilgenommen",
+      "MISSED": "Nicht teilgenommen"
+    }
+  },
+  "achievement": {
+    "achievement_option": "Leistungsnachweis",
+    "upload_achievement_record": "Neuen Nachweis hochladen",
+    "choose_achievement_option": "Wähle den Titel deines Leistungsnachweises aus"
+  },
+  "registration": {
+    "application_deadline": "Bewerbungsschluss: ",
+    "apply_now": "Jetzt bewerben",
+    "sign_in_to_register": "Anmelden zur Registrierung"
+  },
+  "status": {
+    "applied": "Beworben",
+    "invited": "Eingeladen", 
+    "rejected": "Bewerbung abgelehnt"
+  },
+  "modal": {
+    "title_approval": "Für Kurs bewerben",
+    "motivation_letter_label": "Motivationsschreiben",
+    "cancel": "Abbrechen"
+  },
+  "errors": {
+    "motivation_letter_required": "Bitte gib ein Motivationsschreiben an",
+    "registration_failed": "Registrierung fehlgeschlagen"
+  }
+}
+```
+
+## Translation Usage in Components
+
+### Import and Setup
+```typescript
+import useTranslation from 'next-translate/useTranslation';
+
+const { t } = useTranslation('course'); // Use namespace matching filename
+```
+
+### Accessing Grouped Translations
+```typescript
+// General translations
+const buttonText = t('general.confirm');
+const ectsLabel = t('general.ects');
+
+// ECTS values with bracket notation for keys containing dots/commas
+const { t: tCourse } = useTranslation('course');
+const ectsTranslations = tCourse('ects', { returnObjects: true });
+const ectsValue = ectsTranslations[course.ects]; // e.g., ectsTranslations['2,5']
+
+// Achievement translations
+const achievementTitle = t('achievement.achievement_option');
+const uploadText = t('achievement.upload_achievement_record');
+
+// Registration translations  
+const applyButton = t('registration.apply_now');
+const deadline = t('registration.application_deadline');
+
+// Status translations
+const statusText = t('status.applied');
+
+// Modal translations
+const modalTitle = t('modal.title_approval');
+const motivationLabel = t('modal.motivation_letter_label');
+
+// Error messages
+const errorMsg = t('errors.motivation_letter_required');
+```
+
+## Best Practices
+
+### Adding New Translations
+1. **Identify the component group** the translation belongs to
+2. **Use snake_case** for all keys
+3. **Add to both German and English** files simultaneously
+4. **Maintain consistent grouping** within the JSON structure
+5. **MANDATORY: Use informal "Du" in ALL German translations**
+
+### Accessing Nested Translations
+```typescript
+// For simple nested access
+const text = t('group.key');
+
+// For dynamic keys or keys with special characters
+const translations = t('group', { returnObjects: true });
+const value = translations[dynamicKey];
+```
+
+### Error Handling
+```typescript
+// Provide fallback for missing translations
+const text = t('group.key') || 'Fallback text';
+
+// Check if translation exists
+const hasTranslation = t('group.key') !== 'group.key';
+```
+
+### Pluralization
+```typescript
+// Use count parameter for plural forms
+const missedSessions = t('attendances.max_missed_sessions', { count: maxMissed });
+```
+
+## File Organization Examples
+
+### CourseContent Structure
+```
+frontend-nx/apps/edu-hub/components/pages/CourseContent/
+├── index.tsx                    # Uses: general.*, sessions.*
+├── LearningGoals.tsx           # Uses: learning.*
+├── DegreeCourses.tsx           # Uses: degree_elements.*
+├── TimeLocationLanguageInstructors.tsx # Uses: general.ects, ects.*
+├── Sessions.tsx                # Uses: sessions.*
+├── Registration/
+│   ├── index.tsx              # Uses: registration.*, status.*
+│   ├── RegistrationModal.tsx  # Uses: modal.*, errors.*
+│   └── RegistrationStatus.tsx # Uses: status.*, general.*
+└── AchievementRecord/
+    ├── index.tsx              # Uses: achievement.*
+    └── UploadModal.tsx        # Uses: achievement.*, errors.*
+```
+
+### Translation File Mapping
+- **CourseContent components** → `course.json`
+- **Management pages** → `course-page.json`  
+- **Authentication** → `auth.json`
+- **Common elements** → `common.json`
+
+## Migration Guidelines
+
+When consolidating translations:
+1. **Identify duplicate keys** across files
+2. **Move CourseContent translations** to `course.json` with proper grouping
+3. **Update component imports** to use new namespace
+4. **Convert keys to snake_case** if needed
+5. **CRITICAL: Convert ALL German translations to informal "Du" form**
+6. **Remove duplicates** from original files
+7. **Test all affected components**
+
+## Quality Assurance
+
+### German Translation Review
+When reviewing German translations, check for:
+- No formal "Sie/Ihnen/Ihre" pronouns
+- Consistent informal verb conjugations
+- Proper informal possessive pronouns (dein/deine)
+- Friendly, approachable tone throughout
+
+This structure ensures maintainable, organized translations that scale with component growth while maintaining consistency and the required informal tone across the application.

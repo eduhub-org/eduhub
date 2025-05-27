@@ -32,7 +32,11 @@ import { Programs_Program } from '../../../queries/__generated__/Programs';
 import { SaveCourseImage, SaveCourseImageVariables } from '../../../queries/__generated__/SaveCourseImage';
 import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
 import { SelectOption } from '../../../types/UIComponents';
-import { CourseEnrollmentStatus_enum, CourseStatus_enum } from '../../../__generated__/globalTypes';
+import {
+  CourseEnrollmentStatus_enum,
+  CourseStatus_enum,
+  CourseRegistrationType_enum,
+} from '../../../__generated__/globalTypes';
 import EhCheckBox from '../../common/EhCheckbox';
 import EhSelect from '../../common/EhSelect';
 import EhTag from '../../common/EhTag';
@@ -49,12 +53,14 @@ import participantsRatedPie from '../../../public/images/course/status/participa
 import { InstructorColumn } from './CoursesInstructorColumn';
 import TagSelector from '../../inputs/TagSelector';
 import InputField from '../../inputs/InputField';
+import DropDownSelector from '../../inputs/DropDownSelector';
 import {
   UPDATE_COURSE_CHAT_LINK,
   UPDATE_COURSE_ECTS,
   UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK,
   UPDATE_COURSE_TITLE,
   UPDATE_COURSE_MAX_MISSED_SESSION,
+  UPDATE_COURSE_REGISTRATION_TYPE,
 } from '../../../queries/course';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
@@ -142,6 +148,11 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
   const semesters: SelectOption[] = programs.map((program) => ({
     key: program.id,
     label: program.shortTitle ?? program.title,
+  }));
+
+  const registrationTypeOptions = Object.values(CourseRegistrationType_enum).map((type) => ({
+    value: type,
+    label: `manageCourses:registration_type.options.${type}`,
   }));
 
   const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
@@ -529,6 +540,17 @@ const SingleCourseRow: FC<IPropsCourseOneRow> = ({
                       updateValueMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
                       refetchQueries={['AdminCourseList']}
                       helpText={t('manageCourses:external_registration_link.help_text')}
+                    />
+                    <DropDownSelector
+                      variant="material"
+                      label={t('manageCourses:registration_type.label')}
+                      value={course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT}
+                      options={registrationTypeOptions}
+                      updateValueMutation={UPDATE_COURSE_REGISTRATION_TYPE}
+                      identifierVariables={{ itemId: course.id }}
+                      refetchQueries={['AdminCourseList']}
+                      helpText={t('manageCourses:registration_type.help_text')}
+                      className="col-span-10 mt-3"
                     />
                   </div>
                 </td>

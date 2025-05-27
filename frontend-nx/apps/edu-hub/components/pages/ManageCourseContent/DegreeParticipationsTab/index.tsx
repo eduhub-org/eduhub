@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC, useMemo, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { ColumnDef } from '@tanstack/react-table';
 import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
@@ -23,7 +23,13 @@ export interface ExtendedDegreeParticipantsEnrollment
 
 export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ course }) => {
   const { t, lang } = useTranslation('manageCourse');
-  const pageSize = 300;
+
+  const [pageSize, setPageSize] = useState(20);
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPageIndex(0);
+  };
 
   const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter } = useTableGrid({
     queryHook: useRoleQuery,
@@ -227,6 +233,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         pageIndex={pageIndex}
         pageSize={pageSize}
         onPageChange={setPageIndex}
+        onPageSizeChange={handlePageSizeChange}
         searchFilter={searchFilter}
         onSearchFilterChange={setSearchFilter}
         error={error}

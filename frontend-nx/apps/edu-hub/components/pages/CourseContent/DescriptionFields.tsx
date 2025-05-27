@@ -10,7 +10,6 @@ interface IProps {
 }
 
 export const DescriptionFields: FC<IProps> = ({ course }) => {
-  // const { t, lang } = useTranslation('course-page');
   const { t } = useTranslation('course');
 
   const isAchievementCertificatePossible = course.achievementCertificatePossible;
@@ -49,7 +48,7 @@ export const DescriptionFields: FC<IProps> = ({ course }) => {
       {isAchievementCertificatePossible ? (
         <div className="flex flex-wrap mt-10 bg-white rounded-2xl p-4 mx-6 xl:mx-0">
           <ReactMarkdown className="prose max-w-none" remarkPlugins={[remarkGfm]}>
-            {t('generalAchievementCertificateConditions').replace(/\n/g, '  \n')}
+            {t('learning.general_achievement_certificate_conditions').replace(/\n/g, '  \n')}
           </ReactMarkdown>
         </div>
       ) : null}{' '}

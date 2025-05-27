@@ -142,14 +142,14 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
   };
 
   if (!course) {
-    return <div>{t('courseNotAvailable')}</div>;
+    return <div>{t('general.course_not_available')}</div>;
   }
 
   return (
     <div className="bg-edu-course-invited rounded-2xl p-6 !text-edu-black mb-12">
-      <div className="pb-5 text-2xl font-bold">{t('onboardingModal.important')}</div>
-      <div className="pb-5 text-xl font-bold">{t('onboardingModal.congratulation')}</div>
-      <div className="pb-4">{t('onboardingModal.formIntro')}</div>
+      <div className="pb-5 text-2xl font-bold">{t('onboarding_modal.important')}</div>
+      <div className="pb-5 text-xl font-bold">{t('onboarding_modal.congratulation')}</div>
+      <div className="pb-4">{t('onboarding_modal.form_intro')}</div>
       <div className="flex flex-wrap">
         <div className="w-full lg:w-1/2 lg:pr-3">
           <DropDownSelector
@@ -191,11 +191,11 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
           />
         </div>
       )}
-      <div className="pb-3">{t('onboardingModal.confirmSufficientTime')}</div>
+      <div className="pb-3">{t('onboarding_modal.confirm_sufficient_time')}</div>
       <div className="pb-3">
-        <b>{t('onboardingModal.mattermostInfo1')}</b>
+        <b>{t('onboarding_modal.mattermost_info_1')}</b>
       </div>
-      <div className="pb-0">{t('onboardingModal.mattermostInfo2')}</div>
+      <div className="pb-0">{t('onboarding_modal.mattermost_info_2')}</div>
       <div className="flex flex-col lg:flex-row lg:gap-5">
         <Button
           as="button"
@@ -206,7 +206,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
           className="mt-8 block mx-auto lg:mb-5 disabled:bg-slate-500"
           onClick={() => setShowDeclineDialog(true)}
         >
-          {isSubmitting ? <CircularProgress /> : t('reject')}
+          {isSubmitting ? <CircularProgress /> : t('general.reject')}
         </Button>
         <Button
           as="button"
@@ -216,7 +216,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
           className="mt-4 lg:mt-8 block mx-auto lg:mb-5 disabled:bg-slate-500"
           onClick={handleEnrollmentConfirmation}
         >
-          {isSubmitting ? <CircularProgress /> : t('confirm')}
+          {isSubmitting ? <CircularProgress /> : t('general.confirm')}
         </Button>
       </div>
 
@@ -224,8 +224,8 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
         open={showDeclineDialog}
         onClose={() => setShowDeclineDialog(false)}
         onConfirm={handleEnrollmentCancellation}
-        question={t('course:onboardingModal.declineConfirmText')}
-        confirmationText={t('course:onboardingModal.declineButtonText')}
+        question={t('onboarding_modal.decline_confirm_text')}
+        confirmationText={t('onboarding_modal.decline_button_text')}
       />
     </div>
   );

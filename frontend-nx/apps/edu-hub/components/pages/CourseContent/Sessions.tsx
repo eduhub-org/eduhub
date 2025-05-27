@@ -14,7 +14,7 @@ interface SessionsProps {
 }
 
 export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant }) => {
-  const { t } = useTranslation('course-page');
+  const { t } = useTranslation('course');
   const [showAllSessions, setShowAllSessions] = useState(false);
   const displayDate = useDisplayDate();
   const formatTimeString = useFormatTimeString();
@@ -36,7 +36,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
     <>
       {visibleSessions.length > 0 && (
         <>
-          <span className="text-3xl font-semibold mt-24">{t('course_sessions')}</span>
+          <span className="text-3xl font-semibold mt-24">{t('sessions.course_sessions')}</span>
           <ul className="max-w-2xl">
             {visibleSessions.map(({ startDateTime, endDateTime, title, SessionSpeakers, SessionAddresses }, index) => (
               <li key={index} className="flex mb-4">
@@ -81,7 +81,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
                                       ONLINE
                                     </a>
                                   ) : (
-                                    t('link_will_be_provided_soon')
+                                    t('general.link_will_be_provided_soon')
                                   )
                                 ) : (
                                   'ONLINE'
@@ -114,7 +114,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
                           key={speakerIndex}
                           className="flex items-center my-3"
                           user={speaker.Expert.User}
-                          role={t('speaker')}
+                          role={t('general.speaker')}
                           size="medium"
                         />
                       ))}
@@ -129,7 +129,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
                 className="text-white text-sm sm:text-lg font-semibold hover:underline italic flex items-center pb-6"
                 onClick={() => setShowAllSessions(false)}
               >
-                {t('course:hideSessions')}
+                {t('sessions.hide_sessions')}
                 <IoIosArrowUp className="ml-1" />
               </button>
             ) : (
@@ -137,7 +137,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, isLoggedInParticipant })
                 className="text-white text-sm sm:text-lg font-semibold hover:underline italic flex items-center pb-6"
                 onClick={() => setShowAllSessions(true)}
               >
-                {t('course:showAllSessions')}
+                {t('sessions.show_all_sessions')}
                 <IoIosArrowDown className="ml-1" />
               </button>
             ))}
