@@ -101,7 +101,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
     authors: [user],
   };
 
-  const { t } = useTranslation();
+  const { t } = useTranslation('course');
   const reducer = (state: State = initialState, action: Type) => {
     return { ...state, [action.type]: action.value };
   };
@@ -199,7 +199,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
         // Check file size before allowing upload
         const fileSizeInMB = file.size / BYTES_PER_MB;
         if (fileSizeInMB > MAX_FILE_SIZE_MB) {
-          setAlertMessage(t('upload_achievement_record_modal.file_too_large', { size: MAX_FILE_SIZE_MB }));
+          setAlertMessage(t('achievement.upload_achievement_record_modal.file_too_large', { size: MAX_FILE_SIZE_MB }));
           return;
         }
       }
@@ -221,16 +221,16 @@ const UploadAchievementRecordModal: FC<IProps> = ({
         event.preventDefault();
 
         if (!selectedAchievementOption) {
-          setAlertMessage(`${t('achievement_option_not_selected')}`);
+          setAlertMessage(`${t('achievement.achievement_option_not_selected')}`);
           return;
         }
         if (state.authors.length === 0) {
-          setAlertMessage(`${t('authors_missing')}`);
+          setAlertMessage(`${t('achievement.authors_missing')}`);
           return;
         }
 
         if (!state.documentationUrl) {
-          setAlertMessage(`${t('documentation_missing')}`);
+          setAlertMessage(`${t('achievement.documentation_missing')}`);
           return;
         }
 
@@ -255,7 +255,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
         });
 
         if (result.errors || !result.data?.insert_AchievementRecord_one?.id) {
-          setAlertMessage(t('operation_failed'));
+          setAlertMessage(t('achievement.operation_failed'));
           return;
         }
 
@@ -297,7 +297,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
             console.error('Failed to delete incomplete record:', deleteError);
           }
         }
-        setAlertMessage(t('operation_failed'));
+        setAlertMessage(t('achievement.operation_failed'));
       } finally {
         setLoading(false);
       }
@@ -322,28 +322,28 @@ const UploadAchievementRecordModal: FC<IProps> = ({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} maxWidth="xl" title={t('upload_achievement_record')}>
+      <Modal isOpen={isOpen} onClose={onClose} maxWidth="xl" title={t('achievement.upload_achievement_record')}>
         <div className="flex flex-col space-y-5 w-full p-4 sm:p-5">
           <div className="w-full sm:w-auto">
             <div onClick={onAchievementOptionDropdown}>
-              <Button>{`${t('choose_achievement_option')} ↓`}</Button>
+              <Button>{`${t('achievement.choose_achievement_option')} ↓`}</Button>
             </div>
           </div>
 
           {selectedAchievementOption && (
             <div className="w-full">
               <div className="text-lg mb-6">
-                {t('selected_achievement_option')}:<br />
+                {t('achievement.selected_achievement_option')}:<br />
                 {selectedAchievementOption.title}
               </div>
               {selectedAchievementOption.AchievementOptionTemplate && (
                 <div>
-                  <p className="mb-3">{t('use_documentation_template')}</p>
+                  <p className="mb-3">{t('achievement.use_documentation_template')}</p>
                   <FileDownload
                     filePath={selectedAchievementOption.AchievementOptionTemplate.url}
                     type="button"
                     className="mb-3 lg:mb-0 lg:mr-3"
-                    label={t('download_template')}
+                    label={t('achievement.download_template')}
                   />
                 </div>
               )}
@@ -352,7 +352,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
 
           <form onSubmit={save} className="flex flex-col space-y-5 mx-2 sm:mx-4 md:mx-6 lg:mx-8">
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-              <p className="w-full sm:w-2/6">{t('authors')}:</p>
+              <p className="w-full sm:w-2/6">{t('achievement.authors')}:</p>
               <div className="w-full sm:w-4/6 flex flex-col sm:flex-row">
                 <div className="items-center pt-1 pr-3">
                   <MdAddCircleOutline className="cursor-pointer" onClick={makeAuthorListVisible} size="1.4em" />
@@ -371,21 +371,23 @@ const UploadAchievementRecordModal: FC<IProps> = ({
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-              <p className="w-full sm:w-2/6">{t('documentation')}:</p>
+              <p className="w-full sm:w-2/6">{t('achievement.documentation')}:</p>
               <div className="w-full sm:w-4/6">
                 <UploadUI
                   onFileSelected={onFileChange}
                   acceptedFileTypes=""
-                  placeholder={t('file_name')}
+                  placeholder={t('achievement.file_name')}
                   name="documentationUrl"
                   id="documentationUrl"
                 />
               </div>
             </div>
 
-            <div className="text-xs italic text-right">{t('max_file_size', { size: MAX_FILE_SIZE_MB })}</div>
+            <div className="text-xs italic text-right">
+              {t('achievement.max_file_size', { size: MAX_FILE_SIZE_MB })}
+            </div>
             <div className="flex justify-center items-center">
-              <Button>{isLoading ? <CircularProgress /> : t('upload')}</Button>
+              <Button>{isLoading ? <CircularProgress /> : t('achievement.upload')}</Button>
             </div>
           </form>
 
@@ -402,7 +404,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
             <EnrolledUserForACourseDialog
               onClose={onCloseAuthorList}
               open={visibleAuthorList}
-              title={t('authors')}
+              title={t('achievement.authors')}
               courseId={courseId}
             />
           )}

@@ -140,17 +140,6 @@ export const RegistrationStatus: FC<RegistrationStatusProps> = ({ courseEnrollme
                 {t('status.invited')}
               </StatusCard>
             </div>
-            <Button
-              filled
-              inverted
-              onClick={() => {
-                // This will be handled by the parent component
-                console.log('Accept invitation clicked');
-              }}
-              className="bg-green-600 hover:bg-green-700 transition-colors duration-200 px-6 py-3 font-medium"
-            >
-              {t('registration.accept_invitation')}
-            </Button>
           </div>
         );
       } else {

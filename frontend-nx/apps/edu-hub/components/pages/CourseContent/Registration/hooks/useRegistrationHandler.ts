@@ -101,7 +101,7 @@ export const useRegistrationHandler = ({
           onSuccess?.();
           return {
             success: true,
-            enrollmentId: undefined, // UPDATE_ENROLLMENT doesn't return the enrollment ID
+            enrollmentId: result.data.insert_CourseEnrollment.returning?.[0]?.id,
           };
         }
 

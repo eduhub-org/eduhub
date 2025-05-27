@@ -116,12 +116,12 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
 
       <div className="flex flex-col w-full md:w-1/2 mb-4 md:mb-0">
         <div className="mb-2 text-xl sm:text-2xl">
-          <BlockTitle>{t('achievement_option')}</BlockTitle>
+          <BlockTitle>{t('achievement.achievement_option')}</BlockTitle>
         </div>
 
         {!query.loading && achievementOptions.length > 0 && (
           <span className="text-lg mb-4">
-            {t('achievement_record_upload_dead_line_text', {
+            {t('achievement.achievement_record_upload_dead_line_text', {
               date: formattedDate(achievementRecordUploadDeadline),
             })}
           </span>
@@ -130,7 +130,7 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
         <div>
           {myRecords && myRecords.documentationUrl && myRecords.documentationUrl !== 'pending_upload' ? (
             <p>
-              {t('last_record_upload', {
+              {t('achievement.last_record_upload', {
                 dateTime: formattedDateWithTime(new Date(myRecords.created_at), lang),
                 fullName: makeFullName(profile.firstName, profile.lastName),
                 achievementRecordTitle: myRecords.AchievementOption.title,
@@ -141,14 +141,14 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
             </p>
           ) : (
             <span className="text-lg mb-4">
-              <p>{t('no_existing_record_upload')}</p>
+              <p>{t('achievement.no_existing_record_upload')}</p>
             </span>
           )}
         </div>
 
         <div className="mt-4">
           <Button filled onClick={upload} className="w-full sm:w-auto">
-            {`↑ ${t('upload_achievement_record')}`}
+            {`↑ ${t('achievement.upload_achievement_record')}`}
           </Button>
         </div>
       </div>

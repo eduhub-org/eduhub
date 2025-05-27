@@ -18,6 +18,90 @@ Registration/
 └── README.md                    # This documentation
 ```
 
+## Invitation Confirmation Flow
+
+The registration system works in conjunction with the **Onboarding component** to handle invitation confirmations. This creates a complete user journey from invitation to course participation.
+
+### How Invitation Confirmation Works
+
+1. **Invitation Detection**: When a user with `INVITED` status visits a course page, the CourseContent component automatically detects this and triggers the onboarding flow
+2. **Onboarding Display**: The Onboarding component is conditionally rendered above the Registration component when:
+   - User is logged in (`isLoggedIn === true`)
+   - User has an active invitation (`resetValues === true`)
+   - Invitation has not expired (`invitationExpirationDate >= current date`)
+
+3. **User Profile Completion**: The Onboarding component requires users to complete their profile information:
+   - **Occupation**: Dropdown selection from predefined options
+   - **Organization**: Dropdown with search and create functionality
+   - **Matriculation Number**: Required for university students only
+
+4. **Invitation Decision**: Users can either:
+   - **Confirm Participation**: Updates enrollment status from `INVITED` to `CONFIRMED`
+   - **Decline Invitation**: Updates enrollment status from `INVITED` to `CANCELLED`
+
+### Integration with Registration Component
+
+```tsx
+// In CourseContent component
+{isLoggedIn && resetValues && (
+  <Onboarding
+    course={course}
+    enrollmentId={enrollmentId}
+    refetchCourse={refetchCourse}
+    setResetValues={setResetValues}
+  />
+)}
+
+<Registration
+  course={course}
+  courseEnrollment={courseEnrollment}
+  onRegistrationSuccess={handleRegistrationSuccess}
+/>
+```
+
+### Onboarding Component Features
+
+**Profile Completion Form:**
+- **Occupation Selector**: Dynamically translated dropdown with occupation options
+- **Organization Selector**: Searchable dropdown with ability to create new organizations
+- **Conditional Fields**: Matriculation number field appears only for university students
+- **Real-time Updates**: Form fields update user profile immediately via GraphQL mutations
+
+**Invitation Actions:**
+- **Confirm Button**: Accepts invitation and updates status to `CONFIRMED`
+- **Decline Button**: Shows confirmation dialog before cancelling invitation
+- **Loading States**: Buttons show loading spinners during status updates
+- **Error Handling**: Graceful error handling with console logging
+
+**User Experience:**
+- **Visual Distinction**: Special background color (`bg-edu-course-invited`) to highlight invitation status
+- **Clear Messaging**: Congratulatory message and important information about course participation
+- **Mattermost Integration**: Information about course chat access after confirmation
+- **Responsive Design**: Mobile-friendly layout with proper spacing and button arrangement
+
+### Status Transition Flow
+
+```
+INVITED (with valid expiration) → Onboarding Component → CONFIRMED/CANCELLED
+                                                      ↓
+                                              Registration Component
+                                                      ↓
+                                              RegistrationStatus Component
+                                                      ↓
+                                              Course Resource Access
+```
+
+### Key Differences from Registration Component
+
+| Aspect | Registration Component | Onboarding Component |
+|--------|----------------------|---------------------|
+| **Purpose** | Handle new applications | Confirm existing invitations |
+| **User State** | Not enrolled | Already invited |
+| **Profile Data** | Optional | Required completion |
+| **Actions** | Apply/Register | Confirm/Decline |
+| **Visibility** | Always visible for eligible users | Only for invited users |
+| **Form Type** | Course-specific (motivation letter) | Profile-specific (occupation, organization) |
+
 ## Registration Types
 
 The system supports 6 different registration types as defined in the backend:
@@ -64,12 +148,13 @@ Shows the current enrollment status for users who are already enrolled.
 **Supported Statuses (from database):**
 - **APPLIED**: "The course application was received" - Shows applied status badge
 - **REJECTED**: "The application was rejected" - Shows rejected status badge  
-- **INVITED**: "Invitation was sent to Student" - Shows invited status with accept button (if not expired)
+- **INVITED**: "Invitation was sent to Student" - Shows invited status message only (confirmation handled by Onboarding component)
 - **CONFIRMED**: "The course invitation was confirmed by the student" - Shows course resource buttons
 - **ABORTED**: "The course was not successfully completed" - Shows aborted status badge
 - **COMPLETED**: "The course was successfully completed by receiving at least one certificate" - Shows course resource buttons
 - **CANCELLED**: "User has cancelled application" - Shows cancelled status badge
-- Loading states during status changes
+
+**Important Note**: For `INVITED` status, the RegistrationStatus component only displays a status message. The actual invitation confirmation functionality is handled by the separate Onboarding component, which appears above the Registration component when a user has an active invitation.
 
 **Course Resource Access:**
 For confirmed and completed enrollments, displays action buttons for:
@@ -147,6 +232,8 @@ All registration-related translations are consolidated in the main course transl
 - **status**: Enrollment status messages
 - **errors**: Validation and error messages
 - **success_messages**: Success notifications and confirmations
+- **onboarding_modal**: Onboarding component specific translations
+- **general**: Common actions like confirm/reject buttons
 
 ### Translation Keys Structure
 ```
@@ -170,13 +257,33 @@ course:
   success_messages:
     success_title: "You have successfully applied"
     # ... other success keys
+  onboarding_modal:
+    important: "Important"
+    congratulation: "Congratulations!"
+    form_intro: "Please complete your profile information"
+    # ... other onboarding keys
+  general:
+    confirm: "Confirm"
+    reject: "Decline"
+    # ... other general keys
 ```
 
 ## Integration
 
-The Registration component is integrated into the main CourseContent component:
+The Registration component is integrated into the main CourseContent component alongside the Onboarding component:
 
 ```tsx
+{/* Onboarding appears first for invited users */}
+{isLoggedIn && resetValues && (
+  <Onboarding
+    course={course}
+    enrollmentId={enrollmentId}
+    refetchCourse={refetchCourse}
+    setResetValues={setResetValues}
+  />
+)}
+
+{/* Registration component handles all other cases */}
 <Registration 
   course={course} 
   courseEnrollment={courseEnrollment} 
@@ -189,6 +296,7 @@ The Registration component is integrated into the main CourseContent component:
 - GraphQL mutations for enrollment operations
 - Translation system (`next-translate`) with `course` namespace
 - Material-UI components for modal and form elements
+- Profile-related mutations for user data updates (Onboarding)
 
 ## Future Enhancements
 
@@ -199,19 +307,12 @@ The system is prepared for payment integration with:
 - Payment result handling with appropriate notifications
 - Payment status tracking and error recovery
 
-### Additional Registration Types
-Easy to add new registration types by:
-1. Adding to backend enum
-2. Updating `REGISTRATION_TYPE_CONFIG` in types.ts
-3. Adding translations for new type in `course.json`
-4. Implementing specific logic in useRegistrationHandler if needed
-5. Adding payment flow if required
-
-### Enhanced Features
-- **Bulk Registration**: Support for registering multiple participants
-- **Waitlist Management**: Automatic waitlist handling for full courses
-- **Calendar Integration**: Add to calendar functionality
-- **Email Notifications**: Integration with email notification system
+### Enhanced Onboarding
+Potential improvements to the invitation confirmation flow:
+- Email verification step before confirmation
+- Course-specific onboarding questions
+- Integration with calendar systems for session reminders
+- Automated Mattermost channel invitation upon confirmation
 
 ## Benefits
 
