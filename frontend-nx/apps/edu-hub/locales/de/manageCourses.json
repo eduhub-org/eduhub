@@ -1,26 +1,36 @@
 {
   "chat_link": {
     "label": "Link zum Chat des Kurses",
-    "help_text": "Der Kurs-Channel muss zunächst händisch in Mattermost angelegt werden.",
-    "error_text": "Falsches Linkformat!"
+    "help_text": "Der Kanal für den Kurs muss vorher manuell in Mattermost erstellt werden.",
+    "error_text": "Falsches Link-Format!"
   },
   "ects": {
     "label": "ECTS",
-    "help_text": "Aktuell sind nur Kurse mit '2,5', '5', '12,5' (für Degrees) oder 'NONE' erlaubt.",
-    "error_text": "Falsches ECTS Format!"
+    "help_text": "Nur Kurse mit '2,5', '5', '12,5' (für Degrees) oder 'NONE' sind erlaubt.",
+    "error_text": "Falsches ECTS-Format!"
   },
   "external_registration_link": {
-    "label": "Externer Registrierungslink",
-    "help_text": "Wenn der Kurs oder die Veranstaltung nicht über EduHub verwaltet werden soll, gib hier einen Link zur externen Anmeldung an.",
-    "error_text": "Falsches Linkformat!"
+    "label": "Externer Anmeldelink",
+    "help_text": "Wenn der Kurs oder die Veranstaltung nicht über EduHub verwaltet werden soll, geben Sie hier einen Link zur externen Anmeldung ein.",
+    "error_text": "Falsches Link-Format!"
   },
-  "max_missed_sessions":{
-    "label": "Maximal erlaubte Fehltermine",
-    "help_text": "Standardmäßig ist der Wert auf 2 gesetzt, aber es sind alle Werte größer gleich 0 erlaubt.",
-    "error_text": "Falsches Fehltermin Format!"
+  "max_missed_sessions": {
+    "label": "Maximal erlaubte verpasste Termine",
+    "help_text": "Standardmäßig ist der Wert auf 2 gesetzt, aber alle Werte größer oder gleich 0 sind erlaubt.",
+    "error_text": "Falsches Format für verpasste Termine!"
+  },
+  "registration_type": {
+    "label": "Anmeldeart",
+    "help_text": "Wählen Sie aus, wie sich Teilnehmende für diesen Kurs oder diese Veranstaltung anmelden können.",
+    "options": {
+      "APPROVAL_WITH_INPUT": "Bewerbung mit Genehmigungsprozess",
+      "EXTERNAL_REGISTRATION": "Externer Anmeldelink",
+      "DIRECT_WITH_INPUT": "Direkte Anmeldung mit Formular",
+      "DIRECT_CONFIRMATION": "Direkte Anmeldung"
+    }
   },
   "delete_button": {
-    "delete_course_confirmation": "Soll der Kurs '{{title}}' wirklich gelöscht werden?",
+    "delete_course_confirmation": "Sind Sie sicher, dass Sie den Kurs '{{title}}' löschen möchten?",
     "untitled_course": "Unbenannter Kurs"
   }
 }

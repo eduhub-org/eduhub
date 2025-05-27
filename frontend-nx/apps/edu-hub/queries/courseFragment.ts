@@ -56,6 +56,7 @@ export const COURSE_FRAGMENT = gql`
     headingDescriptionField2
     contentDescriptionField2
     externalRegistrationLink
+    registrationType
     startTime
     endTime
     Sessions (order_by: { startDateTime: asc }) {
@@ -108,6 +109,7 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     achievementCertificatePossible
     attendanceCertificatePossible
     chatLink
+    registrationType
     Program {
       ...ProgramFragmentMinimumProperties
     }
@@ -136,5 +138,6 @@ export const COURSE_FRAGMENT_MINIMUM = gql`
     maxParticipants
     endTime
     startTime
+    registrationType
   }
 `;

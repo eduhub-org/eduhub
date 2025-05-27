@@ -21,17 +21,17 @@ const getBgColor = (status) => {
 };
 
 const AttendanceStatusLegend: FC = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('course');
   return (
     <div className="flex flex-wrap gap-4 mt-4">
       <div className="flex items-center">
-        <Dot className="text-red fill-green-500" /> {t('course-page:attendanceStatus.ATTENDED')}
+        <Dot className="text-red fill-green-500" /> {t('attendances.attendance_status.ATTENDED')}
       </div>
       <div className="flex items-center">
-        <Dot className="text-red fill-red-500" /> {t('course-page:attendanceStatus.MISSED')}
+        <Dot className="text-red fill-red-500" /> {t('attendances.attendance_status.MISSED')}
       </div>
       <div className="flex items-center">
-        <Dot className="text-red fill-gray-200" /> {t('course-page:attendanceStatus.PENDING')}
+        <Dot className="text-red fill-gray-200" /> {t('attendances.attendance_status.PENDING')}
       </div>
     </div>
   );
@@ -83,15 +83,15 @@ interface AttendancesProps {
 }
 
 export const Attendances: FC<AttendancesProps> = ({ course }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('course');
 
   return (
     <div className="flex flex-col w-full md:w-1/2 mb-4 md:mb-0">
       <div className="mb-2">
-        <BlockTitle>{t('course-page:attendances')}</BlockTitle>
+        <BlockTitle>{t('attendances.attendances')}</BlockTitle>
       </div>
       <span className="text-lg mb-4">
-        {t('course-page:maxMissedSessions_plural', {
+        {t('attendances.max_missed_sessions_plural', {
           count: course.maxMissedSessions,
         })}
       </span>

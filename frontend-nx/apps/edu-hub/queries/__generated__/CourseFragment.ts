@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, LocationOption_enum, ProgramType_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: CourseFragment
@@ -349,6 +349,7 @@ export interface CourseFragment {
    * URL to direct users to an appropriate registration page outside of the application. The internal registration is only used if this field is null.
    */
   externalRegistrationLink: string | null;
+  registrationType: CourseRegistrationType_enum | null;
   /**
    * The time the course starts each week.
    */

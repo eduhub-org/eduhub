@@ -23,6 +23,9 @@ export const UPDATE_ENROLLMENT = gql`
       }
     ) {
       affected_rows
+      returning {
+        id
+      }
     }
   }
 `;

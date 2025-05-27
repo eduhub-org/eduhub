@@ -7,7 +7,7 @@ import { useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { useUserId } from '../../../hooks/user';
 import { CourseWithEnrollment } from '../../../queries/__generated__/CourseWithEnrollment';
 import { COURSE_WITH_ENROLLMENT } from '../../../queries/courseWithEnrollment';
-import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum, CourseRegistrationType_enum } from '../../../__generated__/globalTypes';
 import { useIsLoggedIn } from '../../../hooks/authentication';
 import { COURSE } from '../../../queries/course';
 import { Course, CourseVariables } from '../../../queries/__generated__/Course';
@@ -20,18 +20,21 @@ import { useWeekdayStartAndEndString } from '../../../helpers/dateTimeHelpers';
 import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
 import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
-import { ActionButtons } from './ActionButtons';
+import { Registration } from './Registration';
 import { getBackgroundImage } from '../../../helpers/imageHandling';
 import { Attendances } from './Attendances';
 import { CertificateDownload } from '../../common/CertificateDownload';
 import AchievementRecord from './AchievementRecord';
 import { useIsCourseWithEnrollment } from '../../../hooks/course';
+import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
+import { getRegistrationTypeConfig } from './Registration/types';
 
 const CourseContent: FC<{ id: number }> = ({ id }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('course');
   const isLoggedIn = useIsLoggedIn();
   const userId = useUserId();
   const [resetValues, setResetValues] = useState(null);
+  const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
   // Query for authorized course data
@@ -93,6 +96,22 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     fetchBackgroundImage();
   }, [course?.coverImage]);
 
+  // Handle registration success
+  const handleRegistrationSuccess = () => {
+    setShowSuccessSnackbar(true);
+    refetchCourse();
+  };
+
+  // Get success message based on registration type
+  const getSuccessMessage = () => {
+    if (!course?.registrationType) return '';
+
+    const registrationType = course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT;
+    const config = getRegistrationTypeConfig(registrationType);
+
+    return config.requiresApproval ? t('modal.success_message_approval') : t('modal.success_message_direct');
+  };
+
   // Check if course is a degree course
   const isDegreeCourse = course?.Program?.shortTitle === 'DEGREES';
   const isEventCourse = course?.Program?.shortTitle === 'EVENTS';
@@ -101,7 +120,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
   if (!course) {
     return (
       <div className="flex justify-center max-w-screen-xl mx-auto w-full pt-32">
-        <div className="text-white">{t('course-page:courseNotAvailable')}</div>
+        <div className="text-white">{t('general.course_not_available')}</div>
       </div>
     );
   }
@@ -151,8 +170,12 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                     ) : null}
                     <span className="text-2xl mt-2">{course.tagline}</span>
                   </div>
-                  <div className="flex flex-1 lg:max-w-md">
-                    <ActionButtons course={course} courseEnrollment={courseEnrollment} />
+                  <div className="flex flex-1 justify-center items-center mx-6 lg:mx-0 lg:max-w-md">
+                    <Registration
+                      course={course}
+                      courseEnrollment={courseEnrollment}
+                      onRegistrationSuccess={handleRegistrationSuccess}
+                    />
                   </div>
                 </ContentRow>
               </PageBlock>
@@ -192,7 +215,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                     <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
                   )}
                 </PageBlock>
-                <div className="pr-0 lg:pr-6 xl:pr-0">
+                <div className="flex flex-1 justify-center items-center mx-6 lg:mx-0 lg:max-w-md pr-0 lg:pr-6 xl:pr-0 ">
                   <TimeLocationLanguageInstructors course={course} />
                 </div>
               </ContentRow>
@@ -201,6 +224,13 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
           </div>
         </div>
       )}
+
+      <NotificationSnackbar
+        open={showSuccessSnackbar}
+        onClose={() => setShowSuccessSnackbar(false)}
+        message={getSuccessMessage()}
+        duration={4000}
+      />
     </div>
   );
 };

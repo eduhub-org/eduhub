@@ -14,8 +14,8 @@ interface IProps {
 }
 
 export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
-  const { t } = useTranslation();
-  const { t: tLanguage } = useTranslation('common');
+  const { t } = useTranslation(); // used to get weekday and language
+  const { t: tCourse } = useTranslation('course');
 
   const getStartTimeString = useStartTimeString();
   const getEndTimeString = useEndTimeString();
@@ -23,13 +23,16 @@ export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
   const startTime = getStartTimeString(course.startTime);
   const endTime = getEndTimeString(course.endTime);
 
+  // Get ECTS translations object to handle keys with dots/commas
+  const ectsTranslations = tCourse('ects', {}, { returnObjects: true }) as Record<string, string>;
+
   return (
     <div className="flex flex-1 flex-col justify-center items-center mx-6 lg:mx-0 mb-9 rounded-2xl lg:max-w-md bg-gray-100 p-12 sm:p-24">
       <div className="grid grid-cols-2 gap-x-28">
         <span className="text-lg mt-2 text-center">
           {course.weekDay != 'NONE' ? getWeekdayString(course, t, false, false) : ''}
         </span>
-        <span className="text-lg mt-2 text-center">{t('course-page:ects')}</span>
+        <span className="text-lg mt-2 text-center">{tCourse('general.ects')}</span>
         <span className="text-sm mt-2 text-center mb-12">
           {course.weekDay !== 'NONE' && (
             <>
@@ -38,7 +41,7 @@ export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
             </>
           )}
         </span>
-        <span className="text-sm mt-2 text-center">{t(`course-page:ects-${course.ects}`)}</span>
+        <span className="text-sm mt-2 text-center">{ectsTranslations[course.ects] || course.ects}</span>
         <div className="flex justify-center">
           <Image src={pinIcon} alt="Location" width={32} height={43} />
         </div>
@@ -53,7 +56,7 @@ export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
             </React.Fragment>
           ))}
         </span>
-        <span className="text-sm mt-2 text-center">{tLanguage(course.language)}</span>
+        <span className="text-sm mt-2 text-center">{t(course.language)}</span>
       </div>
       <div className="mt-16 justify-start">
         {course.CourseInstructors.map((instructor, index) => (
