@@ -15,34 +15,47 @@ jobs:
         with:
           script: |
             const query = `
+              fragment ProjectFields on ProjectV2Item {
+                id
+                project {
+                  title
+                }
+                fieldValues(first: 8) {
+                  nodes {
+                    ... on ProjectV2ItemFieldTextValue {
+                      text
+                      field {
+                        ... on ProjectV2FieldCommon {
+                          name
+                        }
+                      }
+                    }
+                    ... on ProjectV2ItemFieldSingleSelectValue {
+                      name
+                      field {
+                        ... on ProjectV2FieldCommon {
+                          name
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
               query($owner: String!, $repo: String!, $number: Int!) {
                 repository(owner: $owner, name: $repo) {
-                  issue(number: $number) {
-                    projectItems(first: 10) {
-                      nodes {
-                        id
-                        project {
-                          title
+                  issueOrPullRequest(number: $number) {
+                    ... on Issue {
+                      projectItems(first: 20) {
+                        nodes {
+                          ...ProjectFields
                         }
-                        fieldValues(first: 8) {
-                          nodes {
-                            ... on ProjectV2ItemFieldTextValue {
-                              text
-                              field {
-                                ... on ProjectV2FieldCommon {
-                                  name
-                                }
-                              }
-                            }
-                            ... on ProjectV2ItemFieldSingleSelectValue {
-                              name
-                              field {
-                                ... on ProjectV2FieldCommon {
-                                  name
-                                }
-                              }
-                            }
-                          }
+                      }
+                    }
+                    ... on PullRequest {
+                      projectItems(first: 20) {
+                        nodes {
+                          ...ProjectFields
                         }
                       }
                     }
@@ -59,7 +72,8 @@ jobs:
 
             try {
               const result = await github.graphql(query, variables);
-              const projectItems = result.repository.issue.projectItems.nodes;
+              const issueOrPR = result.repository.issueOrPullRequest;
+              const projectItems = issueOrPR ? issueOrPR.projectItems.nodes : [];
               
               for (const item of projectItems) {
                 for (const fieldValue of item.fieldValues.nodes) {
