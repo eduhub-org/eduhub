@@ -1,0 +1,170 @@
+---
+alwaysApply: true
+description: EduHub frontend development and testing guide using yarn with full paths
+---
+
+# EduHub Frontend Development Guide
+
+## Project Structure
+
+The EduHub frontend is located in [frontend-nx/](mdc:frontend-nx/) and uses Next.js with TypeScript.
+
+### Key Directories
+- [frontend-nx/apps/edu-hub/](mdc:frontend-nx/apps/edu-hub/) - Main application
+- [frontend-nx/apps/edu-hub/components/](mdc:frontend-nx/apps/edu-hub/components/) - Reusable components
+- [frontend-nx/apps/edu-hub/pages/](mdc:frontend-nx/apps/edu-hub/pages/) - Next.js pages
+- [frontend-nx/apps/edu-hub/queries/](mdc:frontend-nx/apps/edu-hub/queries/) - GraphQL queries
+- [frontend-nx/apps/edu-hub/locales/](mdc:frontend-nx/apps/edu-hub/locales/) - Translation files
+
+## Development Commands
+
+**ALWAYS use full paths and yarn commands when working with the frontend:**
+
+### Building and Development
+```bash
+# Navigate to frontend directory (always use full path)
+cd /home/steffen/eduhub/frontend-nx
+
+# Install dependencies
+yarn install
+
+# Start development server
+yarn dev
+
+# Build for production
+yarn build
+
+# Start production server
+yarn start
+
+# Lint the code
+yarn lint
+
+# Type checking
+yarn type-check
+```
+
+### Testing Commands
+```bash
+# Run all tests
+cd /home/steffen/eduhub/frontend-nx && yarn test
+
+# Run tests in watch mode
+cd /home/steffen/eduhub/frontend-nx && yarn test:watch
+
+# Run tests with coverage
+cd /home/steffen/eduhub/frontend-nx && yarn test:coverage
+
+# Run specific test file
+cd /home/steffen/eduhub/frontend-nx && yarn test components/inputs/EmailEditor.test.tsx
+
+# Run tests for specific pattern
+cd /home/steffen/eduhub/frontend-nx && yarn test --testNamePattern="EmailEditor"
+```
+
+### NX Commands
+```bash
+# Build specific app
+cd /home/steffen/eduhub/frontend-nx && npx nx build edu-hub
+
+# Lint specific app
+cd /home/steffen/eduhub/frontend-nx && npx nx lint edu-hub
+
+# Test specific app
+cd /home/steffen/eduhub/frontend-nx && npx nx test edu-hub
+```
+
+## Component Development
+
+### Creating New Components
+- Place in [frontend-nx/apps/edu-hub/components/](mdc:frontend-nx/apps/edu-hub/components/)
+- Follow existing patterns like [EmailEditor.tsx](mdc:frontend-nx/apps/edu-hub/components/inputs/EmailEditor.tsx)
+- Use TypeScript interfaces
+- Include proper error handling
+- Add translations in [locales/](mdc:frontend-nx/apps/edu-hub/locales/)
+
+### Page Components
+- Place in [frontend-nx/apps/edu-hub/pages/](mdc:frontend-nx/apps/edu-hub/pages/)
+- Follow pattern from [manage/email-templates/index.tsx](mdc:frontend-nx/apps/edu-hub/pages/manage/email-templates/index.tsx)
+- Use proper SEO meta tags
+- Implement proper loading states
+
+### Common Patterns
+
+#### GraphQL Integration
+```typescript
+// Place queries in queries/ directory
+import { useAdminQuery, useRoleMutation } from '../../hooks/authedMutation';
+import { EMAIL_TEMPLATES_LIST } from '../../queries/emailTemplates';
+```
+
+#### Translation Usage
+```typescript
+import useTranslation from 'next-translate/useTranslation';
+
+const { t } = useTranslation('componentName');
+const text = t('translation.key');
+```
+
+#### TableGrid Integration
+Follow pattern from [ManageEmailTemplatesContent/index.tsx](mdc:frontend-nx/apps/edu-hub/components/pages/ManageEmailTemplatesContent/index.tsx)
+
+## Development Workflow
+
+### Before Making Changes
+1. **Always use full paths**: `cd /home/steffen/eduhub/frontend-nx`
+2. **Pull latest changes**: `git pull origin develop`
+3. **Install dependencies**: `yarn install`
+4. **Check for linting issues**: `yarn lint`
+
+### Testing Workflow
+1. **Run tests before committing**: `cd /home/steffen/eduhub/frontend-nx && yarn test`
+2. **Check type safety**: `cd /home/steffen/eduhub/frontend-nx && yarn type-check`
+3. **Test build process**: `cd /home/steffen/eduhub/frontend-nx && yarn build`
+
+### Common Issues and Solutions
+
+#### Build Errors
+```bash
+# Clean and rebuild
+cd /home/steffen/eduhub/frontend-nx
+rm -rf .next node_modules
+yarn install
+yarn build
+```
+
+#### Linting Issues
+```bash
+# Fix auto-fixable issues
+cd /home/steffen/eduhub/frontend-nx && yarn lint --fix
+
+# Check specific files
+cd /home/steffen/eduhub/frontend-nx && npx eslint apps/edu-hub/components/inputs/EmailEditor.tsx
+```
+
+#### Type Errors
+```bash
+# Generate GraphQL types
+cd /home/steffen/eduhub/frontend-nx && yarn codegen
+
+# Check types without emitting
+cd /home/steffen/eduhub/frontend-nx && npx tsc --noEmit
+```
+
+## Important Notes
+
+- **Never assume current directory** - always use full paths
+- **Use yarn** instead of npm for consistency
+- **Test on multiple screen sizes** - the app is responsive
+- **Check both German and English translations**
+- **Follow Material-UI patterns** for consistency
+- **Use the existing GraphQL schema** and queries
+- **Always add proper error handling**
+- **Include loading states** for better UX
+
+## File References
+
+- Main config: [package.json](mdc:frontend-nx/package.json)
+- Next.js config: [next.config.js](mdc:frontend-nx/apps/edu-hub/next.config.js)
+- TypeScript config: [tsconfig.json](mdc:frontend-nx/tsconfig.json)
+- i18n config: [i18n.json](mdc:frontend-nx/apps/edu-hub/i18n.json)
