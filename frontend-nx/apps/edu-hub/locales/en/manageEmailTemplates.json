@@ -1,0 +1,22 @@
+{
+  "headline": "Email Templates",
+  "columns": {
+    "title": "Template Type",
+    "subject": "Subject",
+    "updated_at": "Last Updated"
+  },
+  "placeholders": {
+    "subject": "Enter email subject...",
+    "body": "Start typing your email content here. Use the toolbar for formatting and quick placeholders..."
+  },
+  "expandable": {
+    "body_content": "Email Content",
+    "trigger_description": "When is this email sent?",
+    "keyword_placeholders": "Available Placeholders",
+    "preview": "Preview",
+    "generate_preview": "Generate Preview",
+    "generating_preview": "Generating..."
+  },
+  "delete_confirmation": "Are you sure you want to delete the email template '{{title}}'?",
+  "unknown_trigger": "Unknown trigger type"
+} 

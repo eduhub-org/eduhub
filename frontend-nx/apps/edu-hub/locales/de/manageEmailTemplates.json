@@ -1,0 +1,22 @@
+{
+  "headline": "E-Mail-Vorlagen",
+  "columns": {
+    "title": "Vorlagen-Typ",
+    "subject": "Betreff",
+    "updated_at": "Zuletzt aktualisiert"
+  },
+  "placeholders": {
+    "subject": "E-Mail-Betreff eingeben...",
+    "body": "Beginne hier mit deinem E-Mail-Inhalt. Nutze die Toolbar für Formatierung und schnelle Platzhalter..."
+  },
+  "expandable": {
+    "body_content": "E-Mail-Inhalt",
+    "trigger_description": "Wann wird diese E-Mail versendet?",
+    "keyword_placeholders": "Verfügbare Platzhalter",
+    "preview": "Vorschau",
+    "generate_preview": "Vorschau generieren",
+    "generating_preview": "Wird generiert..."
+  },
+  "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage '{{title}}' löschen möchtest?",
+  "unknown_trigger": "Unbekannter Auslöser-Typ"
+} 
