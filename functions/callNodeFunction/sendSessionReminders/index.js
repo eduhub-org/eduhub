@@ -1,6 +1,33 @@
 import { gql, GraphQLClient } from 'graphql-request';
 
 /**
+ * Calculates time window for a reminder based on current time
+ * @param {Date} now - Current time
+ * @param {Object} window - Reminder window config { type, hours, tolerance }
+ * @returns {Object} { startTime, endTime, targetTime }
+ */
+export function calculateReminderTimeWindow(now, window) {
+  const targetTime = new Date(now.getTime() + window.hours * 60 * 60 * 1000);
+  const toleranceMs = window.tolerance * 60 * 60 * 1000;
+  const startTime = new Date(targetTime.getTime() - toleranceMs);
+  const endTime = new Date(targetTime.getTime() + toleranceMs);
+  
+  return { startTime, endTime, targetTime };
+}
+
+/**
+ * Gets the default reminder window configurations
+ * @returns {Array} Array of reminder window configs
+ */
+export function getReminderWindows() {
+  return [
+    { type: '24_HOURS', hours: 24, tolerance: 0.25 }, // 24 hours ± 15 minutes
+    { type: '1_HOUR', hours: 1, tolerance: 0.25 },    // 1 hour ± 15 minutes
+    { type: '15_MINUTES', hours: 0.25, tolerance: 0.1 } // 15 minutes ± 6 minutes
+  ];
+}
+
+/**
  * Sends session reminder emails for upcoming course sessions
  * ONLY sends reminders for the FIRST session in each course
  * Uses MailLog metadata to track sent reminders (no separate table needed)
@@ -22,20 +49,13 @@ export default async function sendSessionReminders(req, logger) {
     });
 
     const now = new Date();
-    const reminderWindows = [
-      { type: '24_HOURS', hours: 24, tolerance: 0.25 }, // 24 hours ± 15 minutes
-      { type: '1_HOUR', hours: 1, tolerance: 0.25 },    // 1 hour ± 15 minutes
-      { type: '15_MINUTES', hours: 0.25, tolerance: 0.1 } // 15 minutes ± 6 minutes
-    ];
+    const reminderWindows = getReminderWindows();
 
     let totalEmailsSent = 0;
     const processedSessions = [];
 
     for (const window of reminderWindows) {
-      const targetTime = new Date(now.getTime() + window.hours * 60 * 60 * 1000);
-      const toleranceMs = window.tolerance * 60 * 60 * 1000;
-      const startTime = new Date(targetTime.getTime() - toleranceMs);
-      const endTime = new Date(targetTime.getTime() + toleranceMs);
+      const { startTime, endTime } = calculateReminderTimeWindow(now, window);
 
       logger.info(`Processing ${window.type} reminders for FIRST sessions between ${startTime.toISOString()} and ${endTime.toISOString()}`);
 
@@ -148,7 +168,8 @@ export default async function sendSessionReminders(req, logger) {
       const sentReminders = new Set();
       sentRemindersData?.MailLog?.forEach(mail => {
         const metadata = mail.metadata;
-        if (metadata?.sessionId && metadata?.userId && metadata?.reminderType) {
+        if (metadata?.sessionId && metadata?.userId && metadata?.reminderType && 
+            typeof metadata.sessionId === 'number' && typeof metadata.userId === 'number') {
           sentReminders.add(`${metadata.sessionId}:${metadata.userId}:${metadata.reminderType}`);
         }
       });

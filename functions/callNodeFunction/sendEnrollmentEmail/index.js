@@ -137,17 +137,55 @@ export default async function sendEnrollmentEmail(req, logger) {
 
     const template = templateData.MailTemplate[0];
 
+    // Get app settings for locale determination
+    const GET_APP_SETTINGS = gql`
+      query GetAppSettings($appName: String!) {
+        AppSettings(where: { appName: { _eq: $appName } }) {
+          timeZone
+        }
+      }
+    `;
+
+    const appSettingsData = await client.request(GET_APP_SETTINGS, {
+      appName: 'edu'
+    });
+
+    // Map timezone to appropriate locale for date formatting
+    const getLocaleFromTimeZone = (timeZone) => {
+      const timezoneLocaleMap = {
+        'Europe/Berlin': 'de-DE',
+        'Europe/London': 'en-GB', 
+        'Europe/Paris': 'fr-FR',
+        'America/New_York': 'en-US',
+        'America/Los_Angeles': 'en-US',
+        'Asia/Tokyo': 'ja-JP',
+        'UTC': 'en-US'
+      };
+      return timezoneLocaleMap[timeZone] || 'de-DE'; // Default to German locale
+    };
+
+    const appTimeZone = appSettingsData?.AppSettings?.[0]?.timeZone || 'Europe/Berlin';
+    const locale = getLocaleFromTimeZone(appTimeZone);
+
     // Replace placeholders in email content
+    const formatDate = (dateString) => {
+      return new Date(dateString).toLocaleDateString(locale, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    };
+
     const replaceVariables = (text) => {
       return text
         .replaceAll('[User:Firstname]', enrollmentDetails.User.firstName)
         .replaceAll('[User:LastName]', enrollmentDetails.User.lastName)
         .replaceAll('[Enrollment:CourseId--Course:Name]', enrollmentDetails.Course.title)
-        .replaceAll('[Enrollment:CreatedAt]', new Date(enrollmentDetails.created_at).toLocaleDateString())
-        .replaceAll('[Enrollment:ExpirationDate]', enrollmentDetails.invitationExpirationDate ? new Date(enrollmentDetails.invitationExpirationDate).toLocaleDateString() : 'TBD')
+        .replaceAll('[Enrollment:CreatedAt]', formatDate(enrollmentDetails.created_at))
+        .replaceAll('[Enrollment:ExpirationDate]', enrollmentDetails.invitationExpirationDate ? formatDate(enrollmentDetails.invitationExpirationDate) : 'TBD')
         .replaceAll('[Enrollment:CourseLink]', `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${enrollmentDetails.Course.id}`)
-        .replaceAll('[Course:StartTime]', enrollmentDetails.Course.startTime ? new Date(enrollmentDetails.Course.startTime).toLocaleDateString() : 'TBD')
-        .replaceAll('[Course:EndTime]', enrollmentDetails.Course.endTime ? new Date(enrollmentDetails.Course.endTime).toLocaleDateString() : 'TBD');
+        .replaceAll('[Course:StartTime]', enrollmentDetails.Course.startTime ? formatDate(enrollmentDetails.Course.startTime) : 'TBD')
+        .replaceAll('[Course:EndTime]', enrollmentDetails.Course.endTime ? formatDate(enrollmentDetails.Course.endTime) : 'TBD');
     };
 
     const emailSubject = replaceVariables(template.subject);
