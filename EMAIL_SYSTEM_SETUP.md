@@ -157,27 +157,54 @@ The email templates are automatically inserted via migration. You can customize 
 
 ## Email Template Variables
 
-The following variables are available in email templates:
+The email system uses a **centralized variable system** located in `functions/callNodeFunction/emailTemplateVariables.js` to ensure consistency and maintainability across all email functions.
 
-### User Variables
+### Key Features
+- **Centralized management**: Single source of truth for all email variables
+- **Automatic locale formatting**: Dates formatted based on app timezone settings
+- **Template validation**: Validates templates against known variables
+- **Type safety**: Prevents runtime errors from missing data
+- **Easy maintenance**: Add new variables in one place
+
+### Quick Reference
+
+#### User Variables (Available in all emails)
 - `[User:Firstname]`: User's first name
 - `[User:LastName]`: User's last name
 
-### Course/Enrollment Variables
+#### Course Variables (Available in enrollment emails)
 - `[Enrollment:CourseId--Course:Name]`: Course title
-- `[Enrollment:CreatedAt]`: Application date
+- `[Course:StartTime]`: Course start date (auto-formatted by timezone)
+- `[Course:EndTime]`: Course end date (auto-formatted by timezone)
+
+#### Enrollment Variables (Available in enrollment emails)
+- `[Enrollment:CreatedAt]`: Application date (auto-formatted)
+- `[Enrollment:ExpirationDate]`: Invitation expiration (auto-formatted)
 - `[Enrollment:CourseLink]`: Link to course page
 
-### Course Variables
-- `[Course:StartTime]`: Course start date
-- `[Course:EndTime]`: Course end date
-
-### Session Variables (for reminders)
+#### Session Variables (Available in reminder emails)
 - `[Session:Title]`: Session title
 - `[Session:StartDateTime]`: Session start date and time
-- `[Session:Duration]`: Session duration
-- `[Session:ReminderText]`: Dynamic text based on reminder type
-- `[Session:ReminderTime]`: Dynamic time text based on reminder type
+- `[Session:Duration]`: Session duration (calculated)
+- `[Session:ReminderText]`: Dynamic text ("starts tomorrow", "starts in 1 hour")
+- `[Session:ReminderTime]`: Dynamic time text ("tomorrow", "in 1 hour")
+
+### Complete Documentation
+For full details, usage examples, and developer information, see:
+**[`functions/callNodeFunction/EMAIL_TEMPLATE_VARIABLES.md`](functions/callNodeFunction/EMAIL_TEMPLATE_VARIABLES.md)**
+
+### Automatic Date Formatting
+All date variables are automatically formatted based on the app's timezone setting:
+- **Europe/Berlin** → `15. Januar 2024` (German)
+- **Europe/London** → `15 January 2024` (British)
+- **America/New_York** → `January 15, 2024` (US)
+
+### Adding New Variables
+1. Update the registry in `emailTemplateVariables.js`
+2. Add replacement logic to `createVariableReplacer()`
+3. Update convenience functions as needed
+4. Add comprehensive tests
+5. Update documentation
 
 ## Testing
 

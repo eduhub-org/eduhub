@@ -55,20 +55,31 @@ export default async function functionName(req, logger) {
 - Use MailLog metadata for duplicate prevention
 - Filter: `sessionInWindow.id === firstSessionInCourse.id`
 
-### Variable Replacement Patterns
+### Variable Replacement System
+
+**CRITICAL**: Use the centralized email template variable system from `emailTemplateVariables.js`:
+
 ```javascript
-const replaceVariables = (text) => {
-  return text
-    .replaceAll('[User:Firstname]', user.firstName)
-    .replaceAll('[User:LastName]', user.lastName)
-    .replaceAll('[Enrollment:CourseId--Course:Name]', course.title)
-    .replaceAll('[Enrollment:CourseLink]', `${FRONTEND_URL}/course/${courseId}`)
-    .replaceAll('[Session:Title]', session.title)
-    .replaceAll('[Session:StartDateTime]', sessionStart.toLocaleString())
-    .replaceAll('[Session:Duration]', duration)
-    .replaceAll('[Session:ReminderText]', reminderText);
-};
+import { createEnrollmentVariableReplacer, createSessionVariableReplacer } from '../emailTemplateVariables.js';
+
+// For enrollment emails
+const replaceVariables = createEnrollmentVariableReplacer(enrollmentDetails, formatDate);
+
+// For session reminders  
+const replaceVariables = createSessionVariableReplacer(session, enrollment, {
+  startDateTime: sessionStart.toLocaleString(),
+  duration,
+  reminderText,
+  reminderTime
+});
 ```
+
+**Benefits**:
+- ✅ Centralized variable management
+- ✅ Automatic locale-based date formatting  
+- ✅ Template validation
+- ✅ Type safety and error prevention
+- ✅ Single source of truth
 
 ## Testing Guidelines
 
@@ -184,26 +195,45 @@ const handleSendInvitesAndRejections = async () => {
 3. **❌ Don't forget duplicate prevention** (check MailLog metadata)
 4. **❌ Don't hardcode email templates** (use database templates)
 5. **❌ Don't forget error handling** (always return proper response format)
-6. **✅ Always use replaceAll for variable substitution**
-7. **✅ Always log start and completion messages**
-8. **✅ Always include metadata in MailLog for tracking**
+6. **❌ Don't use manual variable replacement** (use centralized system)
+7. **❌ Don't hardcode date formats** (use timezone-based formatting)
+8. **✅ Always use centralized variable replacement functions**
+9. **✅ Always log start and completion messages**
+10. **✅ Always include metadata in MailLog for tracking**
+11. **✅ Always validate templates against known variables**
 
 ## Email Template Variables Reference
 
-### Common Variables
+**IMPORTANT**: All variables are managed centrally in `emailTemplateVariables.js`. See **[`functions/callNodeFunction/EMAIL_TEMPLATE_VARIABLES.md`](functions/callNodeFunction/EMAIL_TEMPLATE_VARIABLES.md)** for complete documentation.
+
+### Quick Reference
+
+#### User Variables (All emails)
 - `[User:Firstname]` - User's first name
 - `[User:LastName]` - User's last name  
-- `[Enrollment:CourseId--Course:Name]` - Course title
-- `[Enrollment:CourseLink]` - Link to course page
-- `[Enrollment:CreatedAt]` - Application date
-- `[Enrollment:ExpirationDate]` - Invitation expiration
 
-### Session Reminder Variables  
+#### Course Variables (Enrollment emails)
+- `[Enrollment:CourseId--Course:Name]` - Course title
+- `[Course:StartTime]` - Course start date (auto-formatted by timezone)
+- `[Course:EndTime]` - Course end date (auto-formatted by timezone)
+
+#### Enrollment Variables (Enrollment emails)
+- `[Enrollment:CreatedAt]` - Application date (auto-formatted)
+- `[Enrollment:ExpirationDate]` - Invitation expiration (auto-formatted)
+- `[Enrollment:CourseLink]` - Link to course page
+
+#### Session Variables (Reminder emails)
 - `[Session:Title]` - Session title
 - `[Session:StartDateTime]` - Session start time
 - `[Session:Duration]` - Session duration (calculated)
 - `[Session:ReminderText]` - "starts tomorrow", "starts in 1 hour", etc.
 - `[Session:ReminderTime]` - "tomorrow", "in 1 hour", etc.
+
+### Date Formatting
+All dates automatically formatted by app timezone:
+- **Europe/Berlin** → `15. Januar 2024`
+- **Europe/London** → `15 January 2024`  
+- **America/New_York** → `January 15, 2024`
 
 ## Performance Considerations
 

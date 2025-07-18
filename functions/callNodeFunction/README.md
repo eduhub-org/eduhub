@@ -22,6 +22,26 @@ Sends automated session reminder emails for the **first session only** of each c
 - 1 hour before (±15 minutes tolerance)  
 - 15 minutes before (±6 minutes tolerance)
 
+## Email Template Variables
+
+Both email functions use a **centralized variable system** (`emailTemplateVariables.js`) that provides:
+
+✅ **Centralized Management**: Single source of truth for all email variables  
+✅ **Automatic Date Formatting**: Dates formatted based on app timezone settings  
+✅ **Template Validation**: Validates templates against known variables  
+✅ **Type Safety**: Prevents runtime errors from missing data  
+✅ **Easy Maintenance**: Add new variables in one place  
+
+### Quick Usage
+```javascript
+import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
+
+const replaceVariables = createEnrollmentVariableReplacer(enrollmentDetails, formatDate);
+const emailContent = replaceVariables(template.content);
+```
+
+**Complete Documentation**: [`EMAIL_TEMPLATE_VARIABLES.md`](EMAIL_TEMPLATE_VARIABLES.md)
+
 ## Testing
 
 ### Prerequisites

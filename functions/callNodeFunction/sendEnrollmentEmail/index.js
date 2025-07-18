@@ -1,4 +1,5 @@
 import { gql, GraphQLClient } from 'graphql-request';
+import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
 
 /**
  * Sends enrollment status emails when CourseEnrollment status changes
@@ -167,7 +168,7 @@ export default async function sendEnrollmentEmail(req, logger) {
     const appTimeZone = appSettingsData?.AppSettings?.[0]?.timeZone || 'Europe/Berlin';
     const locale = getLocaleFromTimeZone(appTimeZone);
 
-    // Replace placeholders in email content
+    // Replace placeholders in email content using centralized system
     const formatDate = (dateString) => {
       return new Date(dateString).toLocaleDateString(locale, {
         year: 'numeric',
@@ -176,17 +177,7 @@ export default async function sendEnrollmentEmail(req, logger) {
       });
     };
 
-    const replaceVariables = (text) => {
-      return text
-        .replaceAll('[User:Firstname]', enrollmentDetails.User.firstName)
-        .replaceAll('[User:LastName]', enrollmentDetails.User.lastName)
-        .replaceAll('[Enrollment:CourseId--Course:Name]', enrollmentDetails.Course.title)
-        .replaceAll('[Enrollment:CreatedAt]', formatDate(enrollmentDetails.created_at))
-        .replaceAll('[Enrollment:ExpirationDate]', enrollmentDetails.invitationExpirationDate ? formatDate(enrollmentDetails.invitationExpirationDate) : 'TBD')
-        .replaceAll('[Enrollment:CourseLink]', `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${enrollmentDetails.Course.id}`)
-        .replaceAll('[Course:StartTime]', enrollmentDetails.Course.startTime ? formatDate(enrollmentDetails.Course.startTime) : 'TBD')
-        .replaceAll('[Course:EndTime]', enrollmentDetails.Course.endTime ? formatDate(enrollmentDetails.Course.endTime) : 'TBD');
-    };
+    const replaceVariables = createEnrollmentVariableReplacer(enrollmentDetails, formatDate);
 
     const emailSubject = replaceVariables(template.subject);
     const emailContent = replaceVariables(template.content);

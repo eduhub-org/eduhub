@@ -1,4 +1,5 @@
 import { gql, GraphQLClient } from 'graphql-request';
+import { createSessionVariableReplacer } from '../emailTemplateVariables.js';
 
 /**
  * Calculates time window for a reminder based on current time
@@ -240,19 +241,13 @@ export default async function sendSessionReminders(req, logger) {
             ? `${durationHours}h ${durationMinutes}m`
             : `${durationMinutes}m`;
 
-          // Replace placeholders in email content
-          const replaceVariables = (text) => {
-            return text
-              .replaceAll('[User:Firstname]', enrollment.User.firstName)
-              .replaceAll('[User:LastName]', enrollment.User.lastName)
-              .replaceAll('[Enrollment:CourseId--Course:Name]', session.Course.title)
-              .replaceAll('[Enrollment:CourseLink]', `${process.env.FRONTEND_URL || 'https://edu.opencampus.sh'}/course/${session.Course.id}`)
-              .replaceAll('[Session:Title]', session.title)
-              .replaceAll('[Session:StartDateTime]', sessionStart.toLocaleString())
-              .replaceAll('[Session:Duration]', duration)
-              .replaceAll('[Session:ReminderText]', reminderText)
-              .replaceAll('[Session:ReminderTime]', reminderTime);
-          };
+          // Replace placeholders in email content using centralized system
+          const replaceVariables = createSessionVariableReplacer(session, enrollment, {
+            startDateTime: sessionStart.toLocaleString(),
+            duration,
+            reminderText,
+            reminderTime
+          });
 
           const emailSubject = replaceVariables(template.subject);
           const emailContent = replaceVariables(template.content);
