@@ -12,7 +12,6 @@ import { OnlyAdmin } from '../../../common/OnlyLoggedIn';
 import {
   identityEventMapper,
   pickIdPkMapper,
-  useAdminMutation,
   useRoleMutation,
   useUpdateCallback2,
 } from '../../../../hooks/authedMutation';
@@ -26,21 +25,14 @@ import { Dialog, DialogTitle } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useAdminQuery } from '../../../../hooks/authedQuery';
-import { MailTemplates } from '../../../../queries/__generated__/MailTemplates';
-import { INSERT_MAIL_LOG, MAIL_TEMPLATES } from '../../../../queries/mail';
-import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
-import { InsertMailLog, InsertMailLogVariables } from '../../../../queries/__generated__/InsertMailLog';
 import {
   UpdateEnrollmentStatus,
   UpdateEnrollmentStatusVariables,
 } from '../../../../queries/__generated__/UpdateEnrollmentStatus';
 import useTranslation from 'next-translate/useTranslation';
-import { AuthRoles } from '../../../../types/enums';
 import AddButton from '../../../common/AddButton';
 import Modal from '../../../common/Modal';
 import AddParticipantsForm from './AddParticipantsForm';
-import { useCurrentRole } from '../../../../hooks/authentication';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -53,46 +45,43 @@ nextWeek.setDate(nextWeek.getDate() + 7);
 
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const { t, lang } = useTranslation('manageCourse');
-  const displayDate = useDisplayDate();
 
   const applicationStats = useMemo(() => {
     console.log(course.CourseEnrollments);
     const totalApplications = course.CourseEnrollments.length;
     const approvedApplications = course.CourseEnrollments.filter(
-      enrollment => enrollment.motivationRating === 'INVITE'
+      (enrollment) => enrollment.motivationRating === 'INVITE'
     ).length;
     const invitedApplicants = course.CourseEnrollments.filter(
-      enrollment => enrollment.status === 'INVITED' || enrollment.status === 'CONFIRMED'
+      (enrollment) => enrollment.status === 'INVITED' || enrollment.status === 'CONFIRMED'
     ).length;
     const confirmedApplicants = course.CourseEnrollments.filter(
-      enrollment => enrollment.status === 'CONFIRMED'
+      (enrollment) => enrollment.status === 'CONFIRMED'
     ).length;
     return { totalApplications, approvedApplications, invitedApplicants, confirmedApplicants };
   }, [course.CourseEnrollments]);
 
   const infoDots = (
     <>
-    <div className="text-gray-400">{t('course-page:application-rating')}</div>
-    <div className="grid grid-cols-6 text-gray-400">
-      <div>
-        <Dot color="lightgreen" /> {t('course-page:invite')}
+      <div className="text-gray-400">{t('course-page:application-rating')}</div>
+      <div className="grid grid-cols-6 text-gray-400">
+        <div>
+          <Dot color="lightgreen" /> {t('course-page:invite')}
+        </div>
+        <div>
+          <Dot color="orange" /> {t('course-page:unclear')}
+        </div>
+        <div>
+          <Dot color="red" /> {t('course-page:reject')}
+        </div>
+        <div>
+          <Dot color="grey" /> {t('course-page:not-rated')}
+        </div>
+        <div />
+        <div />
       </div>
-      <div>
-        <Dot color="orange" /> {t('course-page:unclear')}
-      </div>
-      <div>
-        <Dot color="red" /> {t('course-page:reject')}
-      </div>
-      <div>
-        <Dot color="grey" /> {t('course-page:not-rated')}
-      </div>
-      <div />
-      <div />
-    </div>
-  </>
-);
-
-  const currentRole = useCurrentRole();
+    </>
+  );
 
   const [selectedEnrollments, setSelectedEnrollments] = useState([] as number[]);
 
@@ -111,99 +100,45 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     setIsInviteDialogOpen(true);
   }, [setIsInviteDialogOpen]);
 
-  const queryMailTemplates = useAdminQuery<MailTemplates>(MAIL_TEMPLATES, {
-    skip: currentRole !== AuthRoles.admin,
-  });
-  const mailTemplates = queryMailTemplates.data;
-  if (queryMailTemplates.error) {
-    console.log('fail to query mail templates!', queryMailTemplates);
-  }
-
-  const [insertMailLogMutation] = useAdminMutation<InsertMailLog, InsertMailLogVariables>(INSERT_MAIL_LOG);
   const [updateEnrollmentStatus] = useRoleMutation<UpdateEnrollmentStatus, UpdateEnrollmentStatusVariables>(
     UPDATE_ENROLLMENT_STATUS
   );
   const handleSendInvitesAndRejections = useCallback(async () => {
-    if (mailTemplates != null) {
-      const inviteTemplate = mailTemplates.MailTemplate.find((x) => x.title === 'INVITE');
-      const rejectTemplate = mailTemplates.MailTemplate.find((x) => x.title === 'DECLINE');
+    const relevantEnrollments = selectedEnrollments
+      .map((eid) => {
+        const ce = course.CourseEnrollments.find((e) => e.id === eid);
+        return ce;
+      })
+      .filter(
+        (x) => x != null && ['APPLIED', 'INVITED', 'REJECTED'].includes(x.status)
+      ) as ManagedCourse_Course_by_pk_CourseEnrollments[];
 
-      if (inviteTemplate != null && rejectTemplate != null) {
-        const relevantEnrollments = selectedEnrollments
-          .map((eid) => {
-            const ce = course.CourseEnrollments.find((e) => e.id === eid);
-            return ce;
-          })
-          .filter(
-            (x) => x != null && ['APPLIED', 'INVITED', 'REJECTED'].includes(x.status)
-          ) as ManagedCourse_Course_by_pk_CourseEnrollments[];
-
-        try {
-          for (const enrollment of relevantEnrollments) {
-            let template;
-            let newStatus;
-            if (enrollment.motivationRating === 'INVITE') {
-              template = { ...inviteTemplate };
-              newStatus = 'INVITED';
-            } else if (enrollment.motivationRating === 'DECLINE') {
-              template = { ...rejectTemplate };
-              newStatus = 'REJECTED';
-            } else {
-              continue;
-            }
-
-            const doReplace = (source: string) => {
-              return source
-                .replaceAll('[User:Firstname]', enrollment.User.firstName)
-                .replaceAll('[User:LastName]', enrollment.User.lastName)
-                .replaceAll('[Enrollment:ExpirationDate]', displayDate(inviteExpireDate))
-                .replaceAll('[Enrollment:CourseId--Course:Name]', course.title)
-                .replaceAll('[Enrollment:CourseLink]', `${window.location.origin}/course/${course.id}`);
-            };
-
-            template.content = doReplace(template.content);
-            template.subject = doReplace(template.subject);
-
-            await insertMailLogMutation({
-              variables: {
-                bcc: template.bcc,
-                cc: template.cc,
-                content: template.content,
-                from: template.from || 'noreply@opencampus.sh',
-                status: 'READY_TO_SEND',
-                subject: template.subject,
-                to: enrollment.User.email,
-              },
-            });
-
-            await updateEnrollmentStatus({
-              variables: {
-                enrollmentId: enrollment.id,
-                expire: newStatus === 'INVITED' ? inviteExpireDate : null,
-                status: newStatus,
-              },
-            });
-          }
-        } finally {
-          qResult.refetch();
-          setIsInviteDialogOpen(false);
-          setSelectedEnrollments([]);
+    try {
+      for (const enrollment of relevantEnrollments) {
+        let newStatus;
+        if (enrollment.motivationRating === 'INVITE') {
+          newStatus = 'INVITED';
+        } else if (enrollment.motivationRating === 'DECLINE') {
+          newStatus = 'REJECTED';
+        } else {
+          continue;
         }
-      } else {
-        console.log('Missing mail templates INVITE and/or REJECT, cannot send invite and rejection mails!');
+
+        // Update enrollment status - email will be sent automatically via event trigger
+        await updateEnrollmentStatus({
+          variables: {
+            enrollmentId: enrollment.id,
+            expire: newStatus === 'INVITED' ? inviteExpireDate : null,
+            status: newStatus,
+          },
+        });
       }
+    } finally {
+      qResult.refetch();
+      setIsInviteDialogOpen(false);
+      setSelectedEnrollments([]);
     }
-  }, [
-    mailTemplates,
-    selectedEnrollments,
-    insertMailLogMutation,
-    updateEnrollmentStatus,
-    qResult,
-    setIsInviteDialogOpen,
-    inviteExpireDate,
-    course,
-    displayDate,
-  ]);
+  }, [selectedEnrollments, updateEnrollmentStatus, qResult, setIsInviteDialogOpen, inviteExpireDate, course]);
 
   const handleSelectRow = useCallback(
     (enrollmentId: number, selected: boolean) => {
@@ -251,7 +186,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     <>
       <OnlyAdmin>
         <div className="flex justify-start mt-4 mb-4 text-white">
-        <AddButton title="add_participants" onClick={openAddParticipantsModal} translationNamespace="manageCourse" />
+          <AddButton title="add_participants" onClick={openAddParticipantsModal} translationNamespace="manageCourse" />
         </div>
         <Modal
           isOpen={isAddParticipantsModalOpen}
