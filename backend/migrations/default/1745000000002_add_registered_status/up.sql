@@ -1,0 +1,2 @@
+-- Add REGISTERED status to CourseEnrollmentStatus enum
+INSERT INTO "public"."CourseEnrollmentStatus"("value", "comment") VALUES ('REGISTERED', 'User directly registered for course/event without application process') ON CONFLICT ("value") DO NOTHING; 
