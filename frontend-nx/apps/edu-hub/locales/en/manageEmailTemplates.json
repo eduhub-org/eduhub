@@ -2,12 +2,15 @@
   "headline": "Email Templates",
   "columns": {
     "title": "Template Type",
-    "subject": "Subject",
+    "subject": "Email Subject Line",
     "updated_at": "Last Updated"
   },
   "placeholders": {
     "subject": "Enter email subject...",
     "body": "Start typing your email content here. Use the toolbar for formatting and quick placeholders..."
+  },
+  "help_text": {
+    "subject": "The subject line that will appear in the recipient's email inbox. You can use placeholders like [User:Firstname] to personalize the subject."
   },
   "expandable": {
     "body_content": "Email Content",

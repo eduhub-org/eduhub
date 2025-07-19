@@ -2,12 +2,15 @@
   "headline": "E-Mail-Vorlagen",
   "columns": {
     "title": "Vorlagen-Typ",
-    "subject": "Betreff",
+    "subject": "E-Mail-Betreffzeile",
     "updated_at": "Zuletzt aktualisiert"
   },
   "placeholders": {
     "subject": "E-Mail-Betreff eingeben...",
     "body": "Beginne hier mit deinem E-Mail-Inhalt. Nutze die Toolbar für Formatierung und schnelle Platzhalter..."
+  },
+  "help_text": {
+    "subject": "Die Betreffzeile, die im E-Mail-Posteingang des Empfängers angezeigt wird. Du kannst Platzhalter wie [User:Firstname] verwenden, um den Betreff zu personalisieren."
   },
   "expandable": {
     "body_content": "E-Mail-Inhalt",

@@ -120,6 +120,12 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
 
   return (
     <div className="font-medium bg-edu-course-list p-4 space-y-6">
+      {/* Trigger description */}
+      <div>
+        <h4 className="text-lg font-semibold mb-2 text-gray-800">{t('expandable.trigger_description')}</h4>
+        <p className="text-gray-600 bg-gray-100 p-3 rounded">{triggerDescription}</p>
+      </div>
+
       {/* Body content editor */}
       <div>
         <h4 className="text-lg font-semibold mb-2 text-gray-800">{t('expandable.body_content')}</h4>
@@ -133,12 +139,6 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
           className="w-full"
           templateType={row.title}
         />
-      </div>
-
-      {/* Trigger description */}
-      <div>
-        <h4 className="text-lg font-semibold mb-2 text-gray-800">{t('expandable.trigger_description')}</h4>
-        <p className="text-gray-600 bg-gray-100 p-3 rounded">{triggerDescription}</p>
       </div>
 
       {/* Preview section */}
@@ -225,6 +225,7 @@ const ManageEmailTemplatesContent: FC = () => {
             value={row.original.subject || ''}
             updateValueMutation={UPDATE_EMAIL_TEMPLATE_SUBJECT}
             refetchQueries={['EmailTemplatesList']}
+            helpText={t('help_text.subject')}
             className="!mb-0"
           />
         ),
