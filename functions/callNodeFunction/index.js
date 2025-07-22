@@ -7,6 +7,8 @@ import anonymizeUser from "./anonymizeUser/index.js";
 import updateKeycloakUser from "./updateKeycloakUser/index.js";
 import updateAdminUser from "./updateAdminUser/index.js";
 import getAdminUsers from "./getAdminUsers/index.js";
+import sendEnrollmentEmail from "./sendEnrollmentEmail/index.js";
+import sendSessionReminders from "./sendSessionReminders/index.js";
 
 /**
  * Creates a logger instance with structured logging.
@@ -34,7 +36,9 @@ const functionMap = {
   anonymizeUser,
   updateKeycloakUser,
   updateAdminUser,
-  getAdminUsers
+  getAdminUsers,
+  sendEnrollmentEmail,
+  sendSessionReminders
 };
 
 /**

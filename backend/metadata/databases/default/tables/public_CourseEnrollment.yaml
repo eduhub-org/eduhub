@@ -117,3 +117,21 @@ event_triggers:
         value: add_confirmed_user_to_mm
       - name: Hasura-Secret
         value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  - name: send_enrollment_status_email
+    definition:
+      enable_manual: true
+      insert:
+        columns: '*'
+      update:
+        columns:
+          - status
+    retry_conf:
+      interval_sec: 3660
+      num_retries: 10
+      timeout_sec: 600
+    webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+    headers:
+      - name: Function-Name
+        value: sendEnrollmentEmail
+      - name: Hasura-Secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET
