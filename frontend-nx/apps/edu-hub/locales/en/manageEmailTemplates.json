@@ -20,6 +20,14 @@
     "generate_preview": "Generate Preview",
     "generating_preview": "Generating..."
   },
+  "triggers": {
+    "APPLICATION_RECEIVED": "Sent when a user applies for a course",
+    "APPLICATION_CONFIRMED": "Sent when a user's participation is confirmed",
+    "INVITE": "Sent when admin invites users to a course",
+    "DECLINE": "Sent when admin rejects applications",
+    "REGISTRATION_CONFIRMED": "Sent when a user directly registers for a course/event",
+    "SESSION_REMINDER": "Sent before sessions start (24h, 1h, 15min before)"
+  },
   "delete_confirmation": "Are you sure you want to delete the email template '{{title}}'?",
   "unknown_trigger": "Unknown trigger type"
 } 

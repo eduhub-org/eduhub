@@ -34,16 +34,6 @@ interface EmailTemplateRow {
   updated_at: string;
 }
 
-// Trigger descriptions mapping
-const TRIGGER_DESCRIPTIONS: Record<string, string> = {
-  APPLICATION_RECEIVED: 'Sent when a user applies for a course',
-  APPLICATION_CONFIRMED: "Sent when a user's participation is confirmed",
-  INVITE: 'Sent when admin invites users to a course',
-  DECLINE: 'Sent when admin rejects applications',
-  REGISTRATION_CONFIRMED: 'Sent when a user directly registers for a course/event',
-  SESSION_REMINDER: 'Sent before sessions start (24h, 1h, 15min before)',
-};
-
 // Expandable row component with full functionality
 const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }) => {
   const { t } = useTranslation('manageEmailTemplates');
@@ -51,7 +41,7 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
   const [showPreview, setShowPreview] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
 
-  const triggerDescription = TRIGGER_DESCRIPTIONS[row.title] || t('unknown_trigger');
+  const triggerDescription = t(`triggers.${row.title}`, { fallback: t('unknown_trigger') });
 
   const handlePreview = async () => {
     setPreviewLoading(true);
