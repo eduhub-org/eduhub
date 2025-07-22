@@ -71,3 +71,21 @@ export const UPDATE_USER_MATRICULATION_NUMBER = gql`
   }
 `;
 
+export const UPDATE_USER_ZIP_CODE = gql`
+  mutation UpdateUserZipCode($itemId: uuid!, $text: String!) {
+    update_User_by_pk(pk_columns: { id: $itemId }, _set: { zipCode: $text }) {
+      id
+      zipCode
+    }
+  }
+`;
+
+export const UPDATE_USER_COUNTRY = gql`
+  mutation UpdateUserCountry($itemId: uuid!, $text: String!) {
+    update_User_by_pk(pk_columns: { id: $itemId }, _set: { country: $text }) {
+      id
+      country
+    }
+  }
+`;
+
