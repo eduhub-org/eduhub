@@ -15,6 +15,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
+import DOMPurify from 'dompurify';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 import { gql } from 'graphql-tag';
@@ -63,10 +64,13 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
   );
 
   const debouncedUpdate = useDebouncedCallback((newContent: string) => {
+    // Sanitize content before saving to database
+    const sanitizedContent = DOMPurify.sanitize(newContent);
+
     if (updateValueMutation) {
-      updateContent({ variables: { id: itemId, content: newContent } });
+      updateContent({ variables: { id: itemId, content: sanitizedContent } });
     } else if (onValueUpdated) {
-      onValueUpdated({ content: newContent });
+      onValueUpdated({ content: sanitizedContent });
     }
     setShowSavedNotification(!!updateValueMutation);
   }, 1000);
@@ -96,7 +100,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
   useEffect(() => {
     if (editor && !editor.isDestroyed) {
       const { from, to } = editor.state.selection;
-      editor.commands.setContent(value, { emitUpdate: false });
+      editor.commands.setContent(value, false);
       editor.commands.setTextSelection({ from, to });
     }
     setHtmlContent(value);
@@ -104,9 +108,11 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
 
   const handleHtmlContentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = event.target.value;
-    setHtmlContent(newContent);
+    // Sanitize HTML content before setting it
+    const sanitizedContent = DOMPurify.sanitize(newContent);
+    setHtmlContent(sanitizedContent);
     if (editor) {
-      editor.commands.setContent(newContent, { emitUpdate: false });
+      editor.commands.setContent(sanitizedContent, false);
     }
   };
 
@@ -118,7 +124,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
       setHtmlContent(editor?.getHTML() || '');
     } else {
       // Exiting HTML mode
-      editor?.commands.setContent(htmlContent, { emitUpdate: false });
+      editor?.commands.setContent(htmlContent, false);
     }
   };
 
@@ -127,7 +133,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
       if (isHtmlMode) {
         // Simple insertion for textarea, can be improved to insert at cursor
         setHtmlContent((prev) => prev + text);
-        editor?.commands.setContent(htmlContent + text, { emitUpdate: false });
+        editor?.commands.setContent(htmlContent + text, false);
       } else {
         editor?.chain().focus().insertContent(text).run();
       }

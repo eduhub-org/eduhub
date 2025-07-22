@@ -1,6 +1,7 @@
 import React, { FC, useMemo, useState, useCallback } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { ColumnDef } from '@tanstack/react-table';
+import DOMPurify from 'dompurify';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
@@ -103,15 +104,17 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
         </div>
       `;
 
-      setPreview(fullPreview);
+      setPreview(DOMPurify.sanitize(fullPreview));
       setShowPreview(true);
     } catch (error) {
       console.error('Preview error:', error);
       // Minimal fallback
-      setPreview(`<div style="padding: 16px; border: 1px solid #ccc; border-radius: 4px;">
+      setPreview(
+        DOMPurify.sanitize(`<div style="padding: 16px; border: 1px solid #ccc; border-radius: 4px;">
         <p><strong>Subject:</strong> ${row.subject}</p>
         <div>${row.content}</div>
-      </div>`);
+      </div>`)
+      );
       setShowPreview(true);
     } finally {
       setPreviewLoading(false);
