@@ -4,6 +4,7 @@
     "name": "Name",
     "type": "Typ",
     "user_count": "Zugehörige Nutzer",
+    "users": "Nutzer",
     "aliases": "Alias",
     "description": "Beschreibung",
     "new_organization": "Neue Organisation",
@@ -20,11 +21,24 @@
     },
     "merge": {
       "label": "Organisationen zusammenführen",
+      "title": "Organisationen zusammenführen",
       "description": "Wählen Sie die Organisation aus, zu der die ausgewählten Organisationen zusammengeführt werden sollen.",
       "select_target": {
         "label": "Zielorganisation",
         "placeholder": "Zielorganisation auswählen"
-      }
+      },
+      "confirm_merge": "Organisationen zusammenführen",
+      "preview_title": "Zusammenführungsvorschau",
+      "target_organization": "Zielorganisation",
+      "organizations_to_merge": "Zusammenzuführende Organisationen",
+      "total_users_affected": "Betroffene Nutzer insgesamt",
+      "aliases_to_add": "Hinzuzufügende Aliase",
+      "type_change_warning": "Typänderung",
+      "will_become_university": "Die Zielorganisation wird zum Universitätstyp geändert",
+      "deletion_warning": "Warnung",
+      "organizations_will_be_deleted_one": "1 Organisation wird dauerhaft gelöscht",
+      "organizations_will_be_deleted_other": "{{count}} Organisationen werden dauerhaft gelöscht",
+      "no_organizations_selected": "Keine Organisationen zum Zusammenführen ausgewählt"
     }
   },
   "input": {
@@ -38,7 +52,8 @@
     "general": "Ein Fehler trat auf, während die Organisation hinzugefügt wurde. Bitte versuchen Sie es erneut.",
     "network": "Ein Netzwerkfehler trat auf. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
     "unexpected": "Ein unerwarteter Fehler trat auf. Bitte versuchen Sie es später erneut.",
-    "bulk_delete_failed": "Fehler beim Löschen der ausgewählten Organisationen"
+    "bulk_delete_failed": "Fehler beim Löschen der ausgewählten Organisationen",
+    "merge_failed": "Fehler beim Zusammenführen der Organisationen"
   },
   "type_selection": {
     "UNIVERSITY": "Universität",

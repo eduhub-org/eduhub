@@ -4,6 +4,7 @@
     "name": "Name",
     "type": "Type",
     "user_count": "Affiliated Users",
+    "users": "users",
     "aliases": "Aliases",
     "description": "Description",
     "new_organization": "New Organization",
@@ -20,11 +21,24 @@
     },
     "merge": {
       "label": "Merge organizations",
+      "title": "Merge Organizations",
       "description": "Select the organization to which the selected organizations should be merged.",
       "select_target": {
         "label": "Target organization",
         "placeholder": "Select target organization"
-      }
+      },
+      "confirm_merge": "Merge Organizations",
+      "preview_title": "Merge Preview",
+      "target_organization": "Target Organization",
+      "organizations_to_merge": "Organizations to merge",
+      "total_users_affected": "Total users affected",
+      "aliases_to_add": "Aliases to be added",
+      "type_change_warning": "Type Change",
+      "will_become_university": "The target organization will be changed to University type",
+      "deletion_warning": "Warning",
+      "organizations_will_be_deleted_one": "1 organization will be permanently deleted",
+      "organizations_will_be_deleted_other": "{{count}} organizations will be permanently deleted",
+      "no_organizations_selected": "No organizations selected for merging"
     }
   },
   "input": {
@@ -38,7 +52,8 @@
     "general": "An error occurred while adding the organization. Please try again.",
     "network": "A network error occurred. Please check your connection and try again.",
     "unexpected": "An unexpected error occurred. Please try again later.",
-    "bulk_delete_failed": "Error deleting selected organizations"
+    "bulk_delete_failed": "Error deleting selected organizations",
+    "merge_failed": "Error merging organizations"
   },
   "type_selection": {
     "UNIVERSITY": "University",

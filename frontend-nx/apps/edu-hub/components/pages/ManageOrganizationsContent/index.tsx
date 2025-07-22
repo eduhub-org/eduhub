@@ -107,6 +107,7 @@ const ManageOrganizationsContent: FC = () => {
   const [insertOrganization] = useRoleMutation<InsertOrganization, InsertOrganizationVariables>(INSERT_ORGANIZATION);
   const [deleteOrganization] = useRoleMutation(DELETE_ORGANIZATION);
   const [updateOrganizationAliases] = useRoleMutation(UPDATE_ORGANIZATION_ALIASES);
+  const [updateOrganizationType] = useRoleMutation(UPDATE_ORGANIZATION_TYPE);
   const [updateUserOrganizationId] = useRoleMutation(UPDATE_USER_ORGANIZATION_ID);
 
   const organizationTypes = useMemo(
@@ -216,15 +217,18 @@ const ManageOrganizationsContent: FC = () => {
   }, []);
 
   const handleMergeConfirmation = useCallback(
-    async (targetOrgId: string) => {
+    async (targetOrgId: string, targetOrg: OrganizationList_Organization) => {
       setMergeDialogOpen(false);
       try {
-        // Find target organization from the full organization list
-        const targetOrg = data?.Organization?.find((org) => org.id === parseInt(targetOrgId, 10));
         const targetOrgExistingAliases = targetOrg?.aliases || [];
+        const orgsToMerge = selectedRowsForBulkAction.filter((org) => org.id !== parseInt(targetOrgId, 10));
+
+        // Check if any organization being merged is a university
+        const hasUniversityType =
+          orgsToMerge.some((org) => org.type === 'UNIVERSITY') || targetOrg.type === 'UNIVERSITY';
 
         // Get all aliases from selected organizations and their names
-        const aliasesToMerge = selectedRowsForBulkAction.flatMap((org) => {
+        const aliasesToMerge = orgsToMerge.flatMap((org) => {
           const orgAliases = Array.isArray(org.aliases)
             ? org.aliases
                 .filter((alias) => alias != null)
@@ -236,12 +240,13 @@ const ManageOrganizationsContent: FC = () => {
                 .filter((alias): alias is string => alias !== null)
             : [];
 
-          return org.id !== parseInt(targetOrgId, 10) ? [...orgAliases, org.name] : [];
+          return [...orgAliases, org.name];
         });
 
         // Combine existing target aliases with new aliases, removing duplicates
         const combinedAliases = Array.from(new Set([...targetOrgExistingAliases, ...aliasesToMerge]));
 
+        // Prepare updates - aliases first
         await updateOrganizationAliases({
           variables: {
             id: parseInt(targetOrgId, 10),
@@ -249,9 +254,19 @@ const ManageOrganizationsContent: FC = () => {
           },
         });
 
+        // Update organization type to UNIVERSITY if any merged org is a university and target isn't already
+        if (hasUniversityType && targetOrg.type !== 'UNIVERSITY') {
+          await updateOrganizationType({
+            variables: {
+              id: parseInt(targetOrgId, 10),
+              value: 'UNIVERSITY',
+            },
+          });
+        }
+
         // Update all users to the new organization
         await Promise.all(
-          selectedRowsForBulkAction.flatMap((org) =>
+          orgsToMerge.flatMap((org) =>
             (org.Users || []).map((user) =>
               updateUserOrganizationId({
                 variables: {
@@ -264,11 +279,14 @@ const ManageOrganizationsContent: FC = () => {
         );
 
         // Delete all selected organizations except the target one
-        const orgsToDelete = selectedRowsForBulkAction.filter((org) => org.id !== parseInt(targetOrgId, 10));
+        await Promise.all(orgsToMerge.map((org) => deleteOrganization({ variables: { id: org.id } })));
 
-        await Promise.all(orgsToDelete.map((org) => deleteOrganization({ variables: { id: org.id } })));
-
+        // Show success notification
+        setError(null);
         debouncedRefetch();
+
+        // Optional: Show success message
+        console.log(`Successfully merged ${orgsToMerge.length} organizations into ${targetOrg.name}`);
       } catch (error) {
         console.error('Error merging organizations:', error);
         if (error instanceof ApolloError) {
@@ -281,9 +299,9 @@ const ManageOrganizationsContent: FC = () => {
     },
     [
       selectedRowsForBulkAction,
-      data?.Organization,
       deleteOrganization,
       updateOrganizationAliases,
+      updateOrganizationType,
       updateUserOrganizationId,
       debouncedRefetch,
       t,
@@ -355,6 +373,7 @@ const ManageOrganizationsContent: FC = () => {
                 setSelectedRowsForBulkAction([]);
               }}
               onConfirm={handleMergeConfirmation}
+              selectedOrganizations={selectedRowsForBulkAction}
             />
           </div>
         )}
