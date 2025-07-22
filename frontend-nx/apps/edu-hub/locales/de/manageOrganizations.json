@@ -53,7 +53,11 @@
     "network": "Ein Netzwerkfehler trat auf. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
     "unexpected": "Ein unerwarteter Fehler trat auf. Bitte versuchen Sie es später erneut.",
     "bulk_delete_failed": "Fehler beim Löschen der ausgewählten Organisationen",
-    "merge_failed": "Fehler beim Zusammenführen der Organisationen"
+    "merge_failed": "Fehler beim Zusammenführen der Organisationen",
+    "alias_already_exists": "Der Alias \"{{alias}}\" existiert bereits in der Organisation \"{{organization}}\". Bitte wählen Sie einen anderen Namen oder wählen Sie die bestehende Organisation aus.",
+    "alias_duplicate_error": "Dieser Alias existiert bereits in einer anderen Organisation. Bitte wählen Sie einen anderen Namen.",
+    "alias_update_failed": "Fehler beim Aktualisieren der Organisationsaliase. Bitte versuchen Sie es erneut.",
+    "alias_unexpected_error": "Ein unerwarteter Fehler ist beim Aktualisieren der Aliase aufgetreten. Bitte versuchen Sie es erneut."
   },
   "type_selection": {
     "UNIVERSITY": "Universität",

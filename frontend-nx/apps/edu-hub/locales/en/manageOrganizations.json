@@ -53,7 +53,11 @@
     "network": "A network error occurred. Please check your connection and try again.",
     "unexpected": "An unexpected error occurred. Please try again later.",
     "bulk_delete_failed": "Error deleting selected organizations",
-    "merge_failed": "Error merging organizations"
+    "merge_failed": "Error merging organizations",
+    "alias_already_exists": "The alias \"{{alias}}\" already exists in organization \"{{organization}}\". Please choose a different name or select the existing organization instead.",
+    "alias_duplicate_error": "This alias already exists in another organization. Please choose a different name.",
+    "alias_update_failed": "Failed to update organization aliases. Please try again.",
+    "alias_unexpected_error": "An unexpected error occurred while updating aliases. Please try again."
   },
   "type_selection": {
     "UNIVERSITY": "University",

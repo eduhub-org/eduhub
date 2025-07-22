@@ -7,6 +7,7 @@ import useTranslation from 'next-translate/useTranslation';
 import Tooltip from '@mui/material/Tooltip';
 import { HelpOutline } from '@mui/icons-material';
 import { prioritizeClasses } from '../../helpers/util';
+import { ApolloError } from '@apollo/client';
 
 type CreatableTagSelectorProps = {
   // Determines the visual style and behavior of the component
@@ -45,6 +46,10 @@ type CreatableTagSelectorProps = {
   // It receives the data returned by the mutation
   onTagsUpdated?: (data: any) => void;
 
+  // Callback function called when an error occurs during tag update
+  // Allows parent component to handle business-specific errors
+  onError?: (error: ApolloError, attemptedTags: string[]) => void;
+
   // List of GraphQL query names to refetch after the mutation
   // This ensures that the UI is updated with the latest data
   refetchQueries?: string[];
@@ -82,6 +87,8 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
   values,
   options,
   updateValuesMutation,
+  onTagsUpdated,
+  onError,
   refetchQueries,
   helpText,
   className,
@@ -98,20 +105,36 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
     refetchQueries,
   });
 
-  const handleTagChange = (event: React.SyntheticEvent, newValue: TagOption[]) => {
+  const handleTagChange = async (event: React.SyntheticEvent, newValue: TagOption[]) => {
     const updatedTags = newValue
       .map((option) => option.inputValue?.trim() || option.value?.trim() || '')
       .filter((tag) => tag !== ''); // Filter out empty strings
 
     const uniqueTags = Array.from(new Set(updatedTags)); // Remove duplicates
 
-    updateValues({
-      variables: {
-        id: itemId,
-        tags: uniqueTags,
-      },
-    });
-    setTags(uniqueTags.map((tag) => ({ value: tag })));
+    try {
+      const result = await updateValues({
+        variables: {
+          id: itemId,
+          tags: uniqueTags,
+        },
+      });
+      setTags(uniqueTags.map((tag) => ({ value: tag })));
+      if (onTagsUpdated) {
+        onTagsUpdated(result.data);
+      }
+    } catch (error) {
+      // Revert to previous tags on error
+      setTags(values.map((tag) => ({ value: tag })));
+
+      // Let parent component handle the error
+      if (onError && error instanceof ApolloError) {
+        onError(error, uniqueTags);
+      } else {
+        // Fallback: log error if no error handler provided
+        console.error('CreatableTagSelector error:', error);
+      }
+    }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -153,11 +176,14 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
         return filtered;
       }}
       getOptionLabel={(option: TagOption) => option.inputValue || option.value || ''}
-      renderOption={(props, option: TagOption) => (
-        <li {...props}>
-          {option.inputValue ? t('common:CreatableTagSelector.add_tag', { value: option.inputValue }) : option.value}
-        </li>
-      )}
+      renderOption={(props, option: TagOption) => {
+        const { key, ...otherProps } = props;
+        return (
+          <li key={key} {...otherProps}>
+            {option.inputValue ? t('common:CreatableTagSelector.add_tag', { value: option.inputValue }) : option.value}
+          </li>
+        );
+      }}
       renderInput={(params) => (
         <TextField {...params} variant="standard" label={label} placeholder={placeholder} onKeyDown={handleKeyDown} />
       )}
@@ -207,13 +233,16 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
             return filtered;
           }}
           getOptionLabel={(option: TagOption) => option.inputValue || option.value || ''}
-          renderOption={(props, option: TagOption) => (
-            <li {...props}>
-              {option.inputValue
-                ? t('common:CreatableTagSelector.add_tag', { value: option.inputValue })
-                : option.value}
-            </li>
-          )}
+          renderOption={(props, option: TagOption) => {
+            const { key, ...otherProps } = props;
+            return (
+              <li key={key} {...otherProps}>
+                {option.inputValue
+                  ? t('common:CreatableTagSelector.add_tag', { value: option.inputValue })
+                  : option.value}
+              </li>
+            );
+          }}
           renderInput={(params) => (
             <TextField
               {...params}

@@ -33,10 +33,38 @@ import { useTableGrid } from '../../common/TableGrid/hooks';
 
 type ExpandableRowProps = {
   row: OrganizationList_Organization;
+  onError: (errorMessage: string) => void;
 };
 
-const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row }): React.ReactElement => {
+const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement => {
   const { t } = useTranslation('manageOrganizations');
+
+  // Handle organization alias errors specifically
+  const handleAliasError = useCallback(
+    (error: ApolloError, attemptedTags: string[]) => {
+      // Check for duplicate alias constraint error
+      if (error.message.includes('already exists in organization')) {
+        // Extract the alias name and existing organization from the error message
+        const match = error.message.match(/Alias "([^"]+)" already exists in organization "([^"]+)"/);
+        if (match) {
+          const [, aliasName, orgName] = match;
+          onError(
+            t('error.alias_already_exists', {
+              alias: aliasName,
+              organization: orgName,
+            })
+          );
+          return;
+        }
+        onError(t('error.alias_duplicate_error'));
+        return;
+      }
+
+      // Default error message
+      onError(t('error.alias_update_failed'));
+    },
+    [onError, t]
+  );
 
   const currentTags = Array.isArray(row.aliases)
     ? row.aliases
@@ -59,6 +87,7 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row }): React
         values={currentTags}
         options={[]}
         updateValuesMutation={UPDATE_ORGANIZATION_ALIASES}
+        onError={handleAliasError}
         refetchQueries={['OrganizationList']}
       />
       <InputField
@@ -350,7 +379,7 @@ const ManageOrganizationsContent: FC = () => {
               bulkActions={bulkActions}
               onBulkAction={handleBulkAction}
               generateDeletionConfirmationQuestion={generateDeletionConfirmation}
-              expandableRowComponent={({ row }) => <ExpandableOrganizationRow row={row} />}
+              expandableRowComponent={({ row }) => <ExpandableOrganizationRow row={row} onError={setError} />}
               onAddButtonClick={onAddOrganizationClick}
               addButtonText={t('action.add')}
             />
