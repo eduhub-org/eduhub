@@ -161,4 +161,5 @@ INSERT INTO "public"."MailTemplate"("subject", "content", "from", "title") VALUE
   </html>',
   'noreply@opencampus.sh',
   'REGISTRATION_CONFIRMED'
-); 
+) 
+ON CONFLICT ("title") DO NOTHING;

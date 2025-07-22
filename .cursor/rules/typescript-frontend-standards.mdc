@@ -1,0 +1,128 @@
+---
+globs: "*.ts,*.tsx"
+description: "TypeScript and React component standards for EduHub frontend"
+---
+
+# TypeScript Frontend Standards
+
+## Code Quality Rules
+
+### Always follow these patterns in EduHub TypeScript/React code:
+
+#### Component Structure
+```typescript
+import React, { useState, useCallback, useMemo } from 'react';
+import useTranslation from 'next-translate/useTranslation';
+import { useAdminQuery, useRoleMutation } from '../../hooks/authedMutation';
+
+interface ComponentProps {
+  // Always define props interface
+  id: number;
+  value: string;
+  onUpdate?: (data: any) => void;
+}
+
+const Component: React.FC<ComponentProps> = ({ id, value, onUpdate }) => {
+  const { t } = useTranslation('componentNamespace');
+  
+  // Component logic here
+  
+  return (
+    // JSX here
+  );
+};
+
+export default Component;
+```
+
+#### Error Handling
+```typescript
+// Always include proper error handling
+const [mutation] = useRoleMutation(MUTATION, {
+  onError: (error) => console.error('Error:', error),
+  onCompleted: (data) => {
+    if (onValueUpdated) onValueUpdated(data);
+  },
+  refetchQueries: ['QueryName'],
+});
+```
+
+#### State Management
+```typescript
+// Use proper TypeScript types
+const [loading, setLoading] = useState<boolean>(false);
+const [data, setData] = useState<DataType | null>(null);
+
+// Use useCallback for event handlers
+const handleSubmit = useCallback((event: React.FormEvent) => {
+  event.preventDefault();
+  // Handle logic
+}, [dependencies]);
+
+// Use useMemo for expensive calculations
+const processedData = useMemo(() => {
+  return data ? processData(data) : [];
+}, [data]);
+```
+
+## Required Practices
+
+- **Always use TypeScript interfaces** for component props
+- **Include proper error boundaries** for error handling
+- **Use useTranslation** for all user-facing text
+- **Follow Material-UI patterns** for consistent styling
+- **Include loading states** for better UX
+- **Use proper GraphQL query patterns** with error handling
+- **Add proper TypeScript types** for all variables and functions
+- **Use semicolons** at the end of statements
+- **Export components as default** unless multiple exports needed
+
+## Common Patterns
+
+### TableGrid Usage
+```typescript
+const columns = useMemo<ColumnDef<RowType>[]>(
+  () => [
+    {
+      header: t('column.header'),
+      accessorKey: 'fieldName',
+      meta: { width: 3 },
+      cell: ({ row }) => (
+        <InputField
+          variant="material"
+          // ... props
+        />
+      ),
+    },
+  ],
+  [t]
+);
+```
+
+### GraphQL Integration
+```typescript
+// Use proper typing for GraphQL results
+const { data, loading, error } = useAdminQuery<QueryResult>(QUERY, {
+  variables: { id },
+});
+
+const [mutation] = useRoleMutation<MutationResult>(MUTATION, {
+  onCompleted: (data) => {
+    // Handle success
+  },
+  onError: (error) => {
+    console.error('Mutation error:', error);
+  },
+});
+```
+
+### Translation Usage
+```typescript
+const { t } = useTranslation('namespace');
+
+// For simple strings
+const text = t('key');
+
+// For interpolation
+const interpolated = t('key', { variable: value });
+```

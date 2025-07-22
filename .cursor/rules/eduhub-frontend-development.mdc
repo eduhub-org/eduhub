@@ -1,0 +1,305 @@
+---
+alwaysApply: true
+description: EduHub frontend development and testing guide using yarn with full paths
+---
+
+# EduHub Frontend Development Guide
+
+## Project Structure
+
+The EduHub frontend is located in [frontend-nx/](mdc:frontend-nx/) and uses Next.js with TypeScript.
+
+### Key Directories
+- [frontend-nx/apps/edu-hub/](mdc:frontend-nx/apps/edu-hub/) - Main application
+- [frontend-nx/apps/edu-hub/components/](mdc:frontend-nx/apps/edu-hub/components/) - Reusable components
+- [frontend-nx/apps/edu-hub/pages/](mdc:frontend-nx/apps/edu-hub/pages/) - Next.js pages
+- [frontend-nx/apps/edu-hub/queries/](mdc:frontend-nx/apps/edu-hub/queries/) - GraphQL queries
+- [frontend-nx/apps/edu-hub/locales/](mdc:frontend-nx/apps/edu-hub/locales/) - Translation files
+
+## Environment Setup
+
+### Setting EDUHUB_ROOT Environment Variable
+
+For consistent command execution across different developer environments, you should set the `EDUHUB_ROOT` environment variable:
+
+#### Permanent Setup (Recommended)
+Add to your shell profile to persist across sessions:
+
+```bash
+# For Bash users: Add to ~/.bashrc
+echo 'export EDUHUB_ROOT="/home/your-username/eduhub"' >> ~/.bashrc
+source ~/.bashrc
+
+# For Zsh users: Add to ~/.zshrc
+echo 'export EDUHUB_ROOT="/home/your-username/eduhub"' >> ~/.zshrc
+source ~/.zshrc
+
+# For Fish users: Add to ~/.config/fish/config.fish
+echo 'set -gx EDUHUB_ROOT "/home/your-username/eduhub"' >> ~/.config/fish/config.fish
+source ~/.config/fish/config.fish
+```
+
+#### Temporary Setup (Per Session)
+For one-time use or testing:
+
+```bash
+# Set for current session only
+export EDUHUB_ROOT="/path/to/your/eduhub/project"
+
+# Or auto-detect if you're in the project root
+export EDUHUB_ROOT="$(pwd)"
+```
+
+#### Verify Setup
+```bash
+echo $EDUHUB_ROOT
+# Should output: /path/to/your/eduhub/project
+```
+
+If `EDUHUB_ROOT` is not set, commands will use the current working directory (`$PWD`).
+
+### Cursor IDE Integration
+
+This project includes Cursor-specific rules and configurations to enhance your development experience:
+
+#### Available Cursor Rules
+- **`table-grid-usage`**: Comprehensive guide for using the TableGrid React component with pagination, sorting, and filtering
+- **`typescript-frontend-standards`**: TypeScript and React component standards for EduHub frontend development
+
+#### Accessing Cursor Rules
+Rules are automatically applied when working in Cursor IDE. You can find them in:
+- `.cursor/rules/` directory
+- This file: `.cursor/rules/eduhub-frontend-development.mdc`
+
+#### Manual Rule Access
+If you need to reference rules manually:
+
+```bash
+# View available rules
+ls -la .cursor/rules/
+
+# Read specific rule files
+cat .cursor/rules/table-grid-usage.mdc
+cat .cursor/rules/typescript-frontend-standards.mdc
+```
+
+#### Benefits of Cursor Rules
+- **Consistent coding standards** across the team
+- **Automated suggestions** for component usage
+- **Best practices enforcement** for TypeScript and React
+- **Project-specific guidelines** always available
+
+## Development Commands
+
+**ALWAYS use full paths and yarn commands when working with the frontend:**
+
+### Building and Development
+```bash
+# Navigate to frontend directory (use environment variable or current directory)
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx
+
+# Install dependencies
+yarn install
+
+# Start development server
+yarn dev
+
+# Build for production
+yarn build
+
+# Start production server
+yarn start
+
+# Lint the code
+yarn lint
+
+# Type checking
+yarn type-check
+```
+
+### Testing Commands
+```bash
+# Run all tests
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test
+
+# Run tests in watch mode
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test:watch
+
+# Run tests with coverage
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test:coverage
+
+# Run specific test file
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test components/inputs/EmailEditor.test.tsx
+
+# Run tests for specific pattern
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test --testNamePattern="EmailEditor"
+```
+
+### NX Commands
+```bash
+# Build specific app
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && npx nx build edu-hub
+
+# Lint specific app
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && npx nx lint edu-hub
+
+# Test specific app
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && npx nx test edu-hub
+```
+
+## Component Development
+
+### Creating New Components
+- Place in [frontend-nx/apps/edu-hub/components/](mdc:frontend-nx/apps/edu-hub/components/)
+- Follow existing patterns like [EmailEditor.tsx](mdc:frontend-nx/apps/edu-hub/components/inputs/EmailEditor.tsx)
+- Use TypeScript interfaces
+- Include proper error handling
+- Add translations in [locales/](mdc:frontend-nx/apps/edu-hub/locales/)
+
+### Page Components
+- Place in [frontend-nx/apps/edu-hub/pages/](mdc:frontend-nx/apps/edu-hub/pages/)
+- Follow pattern from [manage/email-templates/index.tsx](mdc:frontend-nx/apps/edu-hub/pages/manage/email-templates/index.tsx)
+- Use proper SEO meta tags
+- Implement proper loading states
+
+### Common Patterns
+
+#### GraphQL Integration
+```typescript
+// Place queries in queries/ directory
+import { useAdminQuery, useRoleMutation } from '../../hooks/authedMutation';
+import { EMAIL_TEMPLATES_LIST } from '../../queries/emailTemplates';
+```
+
+#### Translation Usage
+```typescript
+import useTranslation from 'next-translate/useTranslation';
+
+const { t } = useTranslation('componentName');
+const text = t('translation.key');
+```
+
+#### TableGrid Integration
+Follow pattern from [ManageEmailTemplatesContent/index.tsx](mdc:frontend-nx/apps/edu-hub/components/pages/ManageEmailTemplatesContent/index.tsx)
+
+## Development Workflow
+
+### Before Making Changes
+1. **Always use consistent paths**: `cd ${EDUHUB_ROOT:-$PWD}/frontend-nx`
+2. **Pull latest changes**: `git pull origin develop`
+3. **Install dependencies**: `yarn install`
+4. **Check for linting issues**: `yarn lint`
+
+### Testing Workflow
+1. **Run tests before committing**: `cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test`
+2. **Check type safety**: `cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn type-check`
+3. **Test build process**: `cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn build`
+
+### Common Issues and Solutions
+
+#### Build Errors
+```bash
+# Clean and rebuild
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx
+rm -rf .next node_modules
+yarn install
+yarn build
+```
+
+#### Linting Issues
+```bash
+# Fix auto-fixable issues
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn lint --fix
+
+# Check specific files
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && npx eslint apps/edu-hub/components/inputs/EmailEditor.tsx
+```
+
+#### Type Errors
+```bash
+# Generate GraphQL types
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn codegen
+
+# Check types without emitting
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && npx tsc --noEmit
+```
+
+## Important Notes
+
+- **Never assume current directory** - always use the EDUHUB_ROOT environment variable or explicit paths
+- **Use yarn** instead of npm for consistency
+- **Test on multiple screen sizes** - the app is responsive
+- **Check both German and English translations**
+- **Follow Material-UI patterns** for consistency
+- **Use the existing GraphQL schema** and queries
+- **Always add proper error handling**
+- **Include loading states** for better UX
+
+## Troubleshooting
+
+### Common Environment Issues
+
+#### Wrong Directory Errors
+**Problem**: Yarn commands create cache files in the wrong directory or fail with "script not found" errors.
+
+**Solution**: Always use the environment variable pattern:
+```bash
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn [command]
+```
+
+**Prevention**: Set `EDUHUB_ROOT` permanently (see Environment Setup section above).
+
+#### Yarn Cache in Wrong Location
+**Problem**: Thousands of files created in `.yarn/cache` at project root instead of `frontend-nx/.yarn/cache`.
+
+**Solution**: Clean up and use correct directory:
+```bash
+# Remove incorrectly created files from project root
+rm -rf .yarn/ yarn.lock
+
+# Set environment variable and run from correct directory
+export EDUHUB_ROOT="$(pwd)"
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn install
+```
+
+#### Build Failures After Dependency Updates
+**Problem**: TypeScript errors or build failures after updating packages.
+
+**Solution**: Clear cache and reinstall:
+```bash
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx
+yarn cache clean
+yarn install
+yarn build
+```
+
+#### Permission Errors
+**Problem**: Permission denied when installing dependencies.
+
+**Solution**: Check yarn version and node permissions:
+```bash
+yarn --version  # Should be 3.4.1+
+node --version  # Should be 20.x+
+# Avoid using sudo with yarn
+```
+
+### Verification Commands
+
+After setup, verify everything works:
+```bash
+# Check environment
+echo $EDUHUB_ROOT
+
+# Verify yarn works in correct directory
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn --version
+
+# Test build process
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn build
+```
+
+## File References
+
+- Main config: [package.json](mdc:frontend-nx/package.json)
+- Next.js config: [next.config.js](mdc:frontend-nx/apps/edu-hub/next.config.js)
+- TypeScript config: [tsconfig.json](mdc:frontend-nx/tsconfig.json)
+- i18n config: [i18n.json](mdc:frontend-nx/apps/edu-hub/i18n.json)

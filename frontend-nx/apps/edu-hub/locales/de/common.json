@@ -41,9 +41,10 @@
     "achievements": "Leistungsnachweise",
     "achievement_templates": "Leistungsnachweisvorlagen",
     "programs": "Programme",
+    "organizations": "Organisationen",
+    "email_templates": "E-Mail-Vorlagen",
     "app_settings": "App-Einstellungen",
     "statistics": "Statistiken",
-    "organizations": "Organisationen",
     "logout": "Logout"
   },
   "change-password": "Passwort oder E-Mail ändern",
