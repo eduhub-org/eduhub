@@ -29,5 +29,7 @@
   },
   "external_profile": "Link zu externem Profil (LinkedIn, XING, ...)",
   "matriculation_number": "Matrikelnummer",
+  "zip_code": "Postleitzahl",
+  "country": "Land",
   "change_password_or_email": "Passwort oder E-Mail ändern"
 }

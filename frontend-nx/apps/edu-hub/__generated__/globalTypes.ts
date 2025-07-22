@@ -458,6 +458,7 @@ export enum CourseEnrollmentStatus_enum {
   COMPLETED = "COMPLETED",
   CONFIRMED = "CONFIRMED",
   INVITED = "INVITED",
+  REGISTERED = "REGISTERED",
   REJECTED = "REJECTED",
 }
 
@@ -1491,6 +1492,7 @@ export enum User_constraint {
  */
 export enum User_select_column {
   anonymousId = "anonymousId",
+  country = "country",
   created_at = "created_at",
   email = "email",
   externalProfile = "externalProfile",
@@ -1505,6 +1507,7 @@ export enum User_select_column {
   picture = "picture",
   status = "status",
   updated_at = "updated_at",
+  zipCode = "zipCode",
 }
 
 /**
@@ -1526,6 +1529,7 @@ export enum User_select_column_User_aggregate_bool_exp_bool_or_arguments_columns
  */
 export enum User_update_column {
   anonymousId = "anonymousId",
+  country = "country",
   created_at = "created_at",
   email = "email",
   externalProfile = "externalProfile",
@@ -1540,6 +1544,7 @@ export enum User_update_column {
   picture = "picture",
   status = "status",
   updated_at = "updated_at",
+  zipCode = "zipCode",
 }
 
 /**
@@ -5147,6 +5152,39 @@ export interface LocationOption_on_conflict {
 }
 
 /**
+ * Boolean expression to filter rows from the table "MailTemplate". All fields are combined with a logical 'AND'.
+ */
+export interface MailTemplate_bool_exp {
+  _and?: MailTemplate_bool_exp[] | null;
+  _not?: MailTemplate_bool_exp | null;
+  _or?: MailTemplate_bool_exp[] | null;
+  bcc?: String_comparison_exp | null;
+  cc?: String_comparison_exp | null;
+  content?: String_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  from?: String_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  subject?: String_comparison_exp | null;
+  title?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "MailTemplate".
+ */
+export interface MailTemplate_order_by {
+  bcc?: order_by | null;
+  cc?: order_by | null;
+  content?: order_by | null;
+  created_at?: order_by | null;
+  from?: order_by | null;
+  id?: order_by | null;
+  subject?: order_by | null;
+  title?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
  * Boolean expression to filter rows from the table "MotivationRating". All fields are combined with a logical 'AND'.
  */
 export interface MotivationRating_bool_exp {
@@ -7294,6 +7332,7 @@ export interface User_bool_exp {
   _not?: User_bool_exp | null;
   _or?: User_bool_exp[] | null;
   anonymousId?: String_comparison_exp | null;
+  country?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   email?: String_comparison_exp | null;
   externalProfile?: String_comparison_exp | null;
@@ -7308,6 +7347,7 @@ export interface User_bool_exp {
   picture?: String_comparison_exp | null;
   status?: UserStatus_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
+  zipCode?: String_comparison_exp | null;
 }
 
 /**
@@ -7324,6 +7364,7 @@ export interface User_insert_input {
   UserOccupation?: UserOccupation_obj_rel_insert_input | null;
   UserStatus?: UserStatus_obj_rel_insert_input | null;
   anonymousId?: string | null;
+  country?: string | null;
   created_at?: any | null;
   email?: string | null;
   externalProfile?: string | null;
@@ -7338,6 +7379,7 @@ export interface User_insert_input {
   picture?: string | null;
   status?: UserStatus_enum | null;
   updated_at?: any | null;
+  zipCode?: string | null;
 }
 
 /**
@@ -7345,6 +7387,7 @@ export interface User_insert_input {
  */
 export interface User_max_order_by {
   anonymousId?: order_by | null;
+  country?: order_by | null;
   created_at?: order_by | null;
   email?: order_by | null;
   externalProfile?: order_by | null;
@@ -7356,6 +7399,7 @@ export interface User_max_order_by {
   organizationId?: order_by | null;
   picture?: order_by | null;
   updated_at?: order_by | null;
+  zipCode?: order_by | null;
 }
 
 /**
@@ -7363,6 +7407,7 @@ export interface User_max_order_by {
  */
 export interface User_min_order_by {
   anonymousId?: order_by | null;
+  country?: order_by | null;
   created_at?: order_by | null;
   email?: order_by | null;
   externalProfile?: order_by | null;
@@ -7374,6 +7419,7 @@ export interface User_min_order_by {
   organizationId?: order_by | null;
   picture?: order_by | null;
   updated_at?: order_by | null;
+  zipCode?: order_by | null;
 }
 
 /**
@@ -7407,6 +7453,7 @@ export interface User_order_by {
   UserOccupation?: UserOccupation_order_by | null;
   UserStatus?: UserStatus_order_by | null;
   anonymousId?: order_by | null;
+  country?: order_by | null;
   created_at?: order_by | null;
   email?: order_by | null;
   externalProfile?: order_by | null;
@@ -7421,6 +7468,7 @@ export interface User_order_by {
   picture?: order_by | null;
   status?: order_by | null;
   updated_at?: order_by | null;
+  zipCode?: order_by | null;
 }
 
 /**

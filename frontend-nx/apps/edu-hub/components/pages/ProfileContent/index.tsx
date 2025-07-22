@@ -15,6 +15,8 @@ import {
   UPDATE_USER_ORGANIZATION_ID,
   UPDATE_USER_EXTERNAL_PROFILE,
   UPDATE_USER_MATRICULATION_NUMBER,
+  UPDATE_USER_ZIP_CODE,
+  UPDATE_USER_COUNTRY,
 } from '../../../queries/updateUser';
 import { USER, USER_OCCUPATION } from '../../../queries/user';
 
@@ -140,6 +142,30 @@ const ProfileContent: FC = () => {
           </div>
         </div>
         <div className="flex flex-wrap">
+          <div className="w-full md:w-1/2 md:p-0">
+            <InputField
+              variant="eduhub"
+              type="input"
+              label={t('zip_code')}
+              itemId={userData?.User_by_pk?.id}
+              value={userData?.User_by_pk?.zipCode || ''}
+              updateValueMutation={UPDATE_USER_ZIP_CODE}
+              showCharacterCount={false}
+            />
+          </div>
+          <div className="w-full md:w-1/2 md:p-0">
+            <InputField
+              variant="eduhub"
+              type="input"
+              label={t('country')}
+              itemId={userData?.User_by_pk?.id}
+              value={userData?.User_by_pk?.country || ''}
+              updateValueMutation={UPDATE_USER_COUNTRY}
+              showCharacterCount={false}
+            />
+          </div>
+        </div>
+        <div className="flex flex-wrap">
           <div className="w-full md:w-1/2 md:p-0 pb-6">
             <DropDownSelector
               variant="eduhub"
@@ -174,7 +200,7 @@ const ProfileContent: FC = () => {
                 type="number"
                 label={t('matriculation_number')}
                 itemId={userData?.User_by_pk?.id}
-                value={userData?.User_by_pk?.matriculationNumber}
+                value={userData?.User_by_pk?.matriculationNumber || ''}
                 updateValueMutation={UPDATE_USER_MATRICULATION_NUMBER}
                 showCharacterCount={false}
               />
@@ -186,7 +212,7 @@ const ProfileContent: FC = () => {
               type="link"
               label={t('external_profile')}
               itemId={userData?.User_by_pk?.id}
-              value={userData?.User_by_pk?.externalProfile}
+              value={userData?.User_by_pk?.externalProfile || ''}
               updateValueMutation={UPDATE_USER_EXTERNAL_PROFILE}
               showCharacterCount={false}
             />
