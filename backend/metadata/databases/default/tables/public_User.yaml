@@ -59,6 +59,7 @@ select_permissions:
     permission:
       columns:
         - anonymousId
+        - country
         - created_at
         - email
         - externalProfile
@@ -70,6 +71,7 @@ select_permissions:
         - occupation
         - picture
         - updated_at
+        - zipCode
       filter: {}
   - role: anonymous
     permission:
@@ -87,6 +89,7 @@ select_permissions:
     permission:
       columns:
         - anonymousId
+        - country
         - created_at
         - email
         - externalProfile
@@ -98,11 +101,13 @@ select_permissions:
         - occupation
         - picture
         - updated_at
+        - zipCode
       filter: {}
       limit: 100
   - role: user_access
     permission:
       columns:
+        - country
         - email
         - externalProfile
         - firstName
@@ -114,6 +119,7 @@ select_permissions:
         - organizationId
         - picture
         - status
+        - zipCode
       filter:
         id:
           _eq: X-Hasura-User-Id
@@ -122,6 +128,7 @@ update_permissions:
   - role: user_access
     permission:
       columns:
+        - country
         - email
         - externalProfile
         - firstName
@@ -131,6 +138,7 @@ update_permissions:
         - occupation
         - organizationId
         - picture
+        - zipCode
       filter:
         id:
           _eq: X-Hasura-User-Id
