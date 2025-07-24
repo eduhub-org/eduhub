@@ -89,9 +89,119 @@ cat .cursor/rules/typescript-frontend-standards.mdc
 - **Best practices enforcement** for TypeScript and React
 - **Project-specific guidelines** always available
 
-## Development Commands
+## Docker Development Environment
 
-**ALWAYS use full paths and yarn commands when working with the frontend:**
+### Primary Development Method
+
+**The EduHub project uses Docker Compose for the complete development environment.** This is the recommended and primary way to run the development environment.
+
+### Starting the Development Environment
+
+```bash
+# Start all services (frontend, backend, database, etc.)
+docker compose up
+
+# Start in detached mode (background)
+docker compose up -d
+
+# Start with rebuild (if you've made changes to Dockerfiles)
+docker compose up --build
+
+# Start only specific services
+docker compose up frontend-nx hasura db_hasura
+```
+
+### Development Environment Services
+
+The Docker Compose setup includes:
+
+- **frontend-nx** (Port 5000) - Next.js development server with hot reload
+- **hasura** (Port 8080) - GraphQL API and database management
+- **db_hasura** - PostgreSQL database
+- **keycloak** (Port 28080) - Authentication service
+- **node_functions** (Ports 42000-42024) - Serverless Node.js functions
+- **python_functions** (Ports 42025-42026) - Serverless Python functions
+
+### Access Points
+
+- **Frontend**: http://localhost:5000
+- **Hasura Console**: http://localhost:8080
+- **Keycloak Admin**: http://localhost:28080 (admin/admin)
+- **File Storage**: http://localhost:4001
+
+### Development Workflow with Docker
+
+1. **Start the environment**: `docker compose up`
+2. **Make code changes** - Hot reload will automatically apply changes
+3. **View logs**: `docker compose logs -f frontend-nx`
+4. **Stop environment**: `docker compose down`
+
+### Troubleshooting Docker Issues
+
+#### Fresh Start (Recommended for Swiper errors)
+```bash
+# Stop all containers and remove volumes
+docker compose down -v
+
+# Remove all containers and images (nuclear option)
+docker compose down --rmi all --volumes --remove-orphans
+
+# Rebuild and start fresh
+docker compose up --build
+```
+
+#### Viewing Logs
+```bash
+# View all logs
+docker compose logs
+
+# View specific service logs
+docker compose logs frontend-nx
+docker compose logs hasura
+
+# Follow logs in real-time
+docker compose logs -f frontend-nx
+```
+
+#### Container Access
+```bash
+# Access frontend container shell
+docker compose exec frontend-nx sh
+
+# Access database
+docker compose exec db_hasura psql -U postgres -d postgres
+
+# Access Hasura container
+docker compose exec hasura sh
+```
+
+### Alternative: Local Development (Not Recommended)
+
+**Note**: The project is designed for Docker development. Local development may require additional setup and may not work correctly.
+
+If you must run locally (not recommended):
+
+```bash
+# Navigate to frontend directory
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx
+
+# Install dependencies
+yarn install
+
+# Start development server
+yarn dev
+```
+
+**Warning**: Local development may have issues with:
+- Database connections
+- Authentication (Keycloak)
+- Serverless functions
+- File storage
+- Cross-service communication
+
+## Development Commands (Docker Environment)
+
+**When using Docker Compose, the frontend development server runs automatically. For manual commands inside the container:**
 
 ### Building and Development
 ```bash
@@ -282,6 +392,24 @@ yarn --version  # Should be 3.4.1+
 node --version  # Should be 20.x+
 # Avoid using sudo with yarn
 ```
+
+#### Swiper Runtime Errors (Docker Environment)
+**Problem**: `TypeError: can't access property "cssMode", swiper.params is undefined` after container restart.
+
+**Solution**: This is typically caused by container state issues or missing CSS imports. Use the fresh start approach:
+
+```bash
+# Complete fresh start (recommended)
+docker compose down -v
+docker compose up --build
+
+# If the error persists, check the TileSlider component:
+# - Ensure 'swiper/css/navigation' is imported
+# - Verify Swiper initialization with proper error handling
+# - Check for conflicts with Cookiebot consent scripts
+```
+
+**Prevention**: Always use `docker compose down -v` when experiencing runtime errors after container restarts.
 
 ### Verification Commands
 

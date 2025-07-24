@@ -2,6 +2,8 @@ import React, { FC, useRef, useState, memo, useEffect } from 'react';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
+import 'swiper/css/navigation';
+import useTranslation from 'next-translate/useTranslation';
 
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { Tile } from './Tile';
@@ -13,6 +15,31 @@ interface TileSliderProps {
   courses: CourseList_Course[];
   isManage: boolean;
 }
+
+interface NavButtonProps {
+  idSuffix: string;
+  className: string;
+  visible: boolean;
+  onClick: () => void;
+  imgSrc: string;
+  imgAlt: string;
+}
+
+const buttonStyles = {
+  background:
+    'linear-gradient(0deg, rgba(15, 15, 15, 0.7), rgba(15, 15, 15, 0.7)), linear-gradient(270deg, rgba(34, 34, 34, 0.5) 0%, rgba(255, 253, 253, 0) 105.56%)',
+};
+
+const NavButton: FC<NavButtonProps> = ({ idSuffix, className, visible, onClick, imgSrc, imgAlt }) => (
+  <button
+    id={idSuffix}
+    className={`${className} w-10 h-[431px] ${!visible ? 'hidden' : ''}`}
+    style={buttonStyles}
+    onClick={onClick}
+  >
+    <img src={imgSrc} alt={imgAlt} />
+  </button>
+);
 
 const LazyTile = memo(Tile);
 const COMMON_SPACE_BETWEEN = 11;
@@ -28,24 +55,26 @@ const breakpoints = {
 };
 
 const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
+  const { t } = useTranslation('common');
   const swiperRef = useRef(null);
   const containerRef = useRef(null);
   const [nextVisible, setNextVisible] = useState(true);
   const [prevVisible, setPrevVisible] = useState(false);
+  const [isSwiperReady, setIsSwiperReady] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const idSuffix = useRef(Date.now().toString()).current; // unique identifier
 
-
   const handleSlideChange = () => {
-    const swiper = swiperRef.current.swiper;
-    setPrevVisible(!swiper.isBeginning);
-    setNextVisible(!swiper.isEnd);
-    console.log('swiper.isBeginning:', swiper.isBeginning);
-    console.log('swiper.isEnd:', swiper.isEnd);
-
+    if (swiperRef.current?.swiper) {
+      const swiper = swiperRef.current.swiper;
+      setPrevVisible(!swiper.isBeginning);
+      setNextVisible(!swiper.isEnd);
+    }
   };
 
-  const swiperPrev = () => swiperRef.current.swiper.slidePrev();
-  const swiperNext = () => swiperRef.current.swiper.slideNext();
+  const swiperPrev = () => swiperRef.current?.swiper?.slidePrev();
+  const swiperNext = () => swiperRef.current?.swiper?.slideNext();
 
   const calculateTileWidth = () => {
     const tileWidth = window.innerWidth >= 640 ? 325 : 275; // Tile width based on breakpoint
@@ -60,12 +89,65 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
       setNextVisible(totalTileWidth > containerWidth);
     };
     checkIfAllTilesFit();
-    window.addEventListener("resize", checkIfAllTilesFit);
+    window.addEventListener('resize', checkIfAllTilesFit);
     return () => {
-      window.removeEventListener("resize", checkIfAllTilesFit);
+      window.removeEventListener('resize', checkIfAllTilesFit);
     };
   }, [courses]);
 
+  // Ensure we're on the client side before initializing Swiper
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Add a timeout to detect if Swiper fails to initialize
+  useEffect(() => {
+    if (!isClient) return;
+
+    const timeout = setTimeout(() => {
+      if (!isSwiperReady && !hasError) {
+        console.warn('Swiper failed to initialize within timeout');
+        setHasError(true);
+      }
+    }, 5000); // 5 second timeout
+
+    return () => clearTimeout(timeout);
+  }, [isSwiperReady, hasError, isClient]);
+
+  // Don't render Swiper if no courses
+  if (!courses || courses.length === 0) {
+    return <div className="relative h-[431px]" ref={containerRef} />;
+  }
+
+  // Don't render Swiper until client-side
+  if (!isClient) {
+    return (
+      <div className="relative h-[431px]" ref={containerRef}>
+        <div className="animate-pulse bg-gray-200 h-full rounded" />
+      </div>
+    );
+  }
+
+  // If there was an error, render a fallback
+  if (hasError) {
+    return (
+      <div className="relative h-[431px]" ref={containerRef}>
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <p className="text-gray-500 mb-4">{t('tile_slider_unavailable')}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {courses.slice(0, 3).map((course) => (
+                <div key={course.id} className="bg-white rounded-lg shadow p-4">
+                  <h3 className="font-semibold">{course.title}</h3>
+                  <p className="text-sm text-gray-600">{course.tagline || t('no_description_available')}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative h-[431px]" ref={containerRef}>
@@ -79,14 +161,42 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
         slidesOffsetAfter={13}
         onSlideChange={handleSlideChange}
         navigation
+        onInit={(swiper) => {
+          try {
+            // Ensure swiper is properly initialized
+            if (swiper && swiper.params) {
+              setIsSwiperReady(true);
+            } else {
+              console.warn('Swiper initialization failed - params undefined');
+              setHasError(true);
+            }
+          } catch (error) {
+            console.error('Swiper initialization error:', error);
+            setHasError(true);
+          }
+        }}
+        onSwiper={(swiper) => {
+          try {
+            // Additional safety check
+            if (swiper && swiper.params) {
+              // Swiper instance created successfully
+            } else {
+              console.warn('Swiper instance creation failed - params undefined');
+              setHasError(true);
+            }
+          } catch (error) {
+            console.error('Swiper instance creation error:', error);
+            setHasError(true);
+          }
+        }}
       >
-        {courses.map(course => (
+        {courses.map((course) => (
           <SwiperSlide key={course.id} className="whitespace-normal !h-[431px] !w-[275px] xs:!w-[325px]">
             <LazyTile course={course} isManage={isManage} />
           </SwiperSlide>
         ))}
       </Swiper>
-      {courses.length > 1 && (
+      {courses.length > 1 && isSwiperReady && (
         <>
           <NavButton
             idSuffix={`prev-${idSuffix}`}
@@ -107,21 +217,7 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
         </>
       )}
     </div>
-  );};
-
-  const NavButton = ({ idSuffix, className, visible, onClick, imgSrc, imgAlt }) => (
-    <button
-      id={idSuffix}
-      className={`${className} w-10 h-[431px] ${!visible ? 'hidden' : ''}`}
-      style={buttonStyles}
-      onClick={onClick}
-    >
-      <img src={imgSrc} alt={imgAlt} />
-    </button>
   );
-
-const buttonStyles = {
-  background: 'linear-gradient(0deg, rgba(15, 15, 15, 0.7), rgba(15, 15, 15, 0.7)), linear-gradient(270deg, rgba(34, 34, 34, 0.5) 0%, rgba(255, 253, 253, 0) 105.56%)',
 };
 
 export default TileSlider;

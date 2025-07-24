@@ -21,7 +21,9 @@ export const USER = gql`
       externalProfile
       occupation
       organizationId
-      picture	
+      picture
+      zipCode
+      country
       Organization {
         id
         name
@@ -122,6 +124,8 @@ export const USERS_BY_LAST_NAME = gql`
       email
       matriculationNumber
       occupation
+      zipCode
+      country
       Organization {
         id
         name
