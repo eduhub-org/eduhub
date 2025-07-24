@@ -15,12 +15,21 @@ interface TileSliderProps {
   isManage: boolean;
 }
 
+interface NavButtonProps {
+  idSuffix: string;
+  className: string;
+  visible: boolean;
+  onClick: () => void;
+  imgSrc: string;
+  imgAlt: string;
+}
+
 const buttonStyles = {
   background:
     'linear-gradient(0deg, rgba(15, 15, 15, 0.7), rgba(15, 15, 15, 0.7)), linear-gradient(270deg, rgba(34, 34, 34, 0.5) 0%, rgba(255, 253, 253, 0) 105.56%)',
 };
 
-const NavButton = ({ idSuffix, className, visible, onClick, imgSrc, imgAlt }) => (
+const NavButton: FC<NavButtonProps> = ({ idSuffix, className, visible, onClick, imgSrc, imgAlt }) => (
   <button
     id={idSuffix}
     className={`${className} w-10 h-[431px] ${!visible ? 'hidden' : ''}`}
@@ -154,7 +163,6 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
           try {
             // Ensure swiper is properly initialized
             if (swiper && swiper.params) {
-              console.log('Swiper initialized successfully');
               setIsSwiperReady(true);
             } else {
               console.warn('Swiper initialization failed - params undefined');
@@ -169,7 +177,7 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
           try {
             // Additional safety check
             if (swiper && swiper.params) {
-              console.log('Swiper instance created successfully');
+              // Swiper instance created successfully
             } else {
               console.warn('Swiper instance creation failed - params undefined');
               setHasError(true);
