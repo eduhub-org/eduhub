@@ -178,9 +178,11 @@
     "saved": "Gespeichert"
   },
   "authed_query": {
-    "session_expired_or_invalid": "Ihre Sitzung ist ungültig oder abgelaufen. Bitte melden Sie sich erneut an.",
+    "session_expired_or_invalid": "Deine Sitzung ist ungültig oder abgelaufen. Bitte melde dich erneut an.",
     "authentication_error": "Authentifizierungsfehler"
   },
+  "tile_slider_unavailable": "Kachel-Slider vorübergehend nicht verfügbar",
+  "no_description_available": "Keine Beschreibung verfügbar",
   "error_handling": {
     "delete_restricted_by_relationship": "{{parent}} können nicht gelöscht werden, wenn sie mit {{child}} verknüpft sind. Bitte lösche diese zuerst.",
     "delete_restricted_by_relationships": "{{table}} können nicht gelöscht werden, wenn sie mit anderen Einträgen verknüpft sind. Bitte lösche zuerst die anderen Einträge.",

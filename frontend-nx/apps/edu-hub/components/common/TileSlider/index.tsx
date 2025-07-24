@@ -3,6 +3,7 @@ import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import useTranslation from 'next-translate/useTranslation';
 
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { Tile } from './Tile';
@@ -54,6 +55,7 @@ const breakpoints = {
 };
 
 const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
+  const { t } = useTranslation('common');
   const swiperRef = useRef(null);
   const containerRef = useRef(null);
   const [nextVisible, setNextVisible] = useState(true);
@@ -132,12 +134,12 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
       <div className="relative h-[431px]" ref={containerRef}>
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
-            <p className="text-gray-500 mb-4">Course slider temporarily unavailable</p>
+            <p className="text-gray-500 mb-4">{t('tile_slider_unavailable')}</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {courses.slice(0, 3).map((course) => (
                 <div key={course.id} className="bg-white rounded-lg shadow p-4">
                   <h3 className="font-semibold">{course.title}</h3>
-                  <p className="text-sm text-gray-600">{course.tagline || 'No description available'}</p>
+                  <p className="text-sm text-gray-600">{course.tagline || t('no_description_available')}</p>
                 </div>
               ))}
             </div>

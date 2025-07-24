@@ -181,6 +181,8 @@
     "session_expired_or_invalid": "Your session is invalid or has expired. Please log in again.",
     "authentication_error": "Authentication error"
   },
+  "tile_slider_unavailable": "Tile slider temporarily unavailable",
+  "no_description_available": "No description available",
   "error_handling": {
     "delete_restricted_by_relationship": "{{parent}} cannot be deleted when they are still associated with {{child}}. Please remove all {{child}} first.",
     "delete_restricted_by_relationships": "{{table}} cannot be deleted when they are associated with other records. Please remove those records first.",
