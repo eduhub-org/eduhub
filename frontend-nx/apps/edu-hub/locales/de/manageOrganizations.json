@@ -12,12 +12,12 @@
   },
   "action": {
     "add": "Organisation hinzufügen",
-    "delete_confirmation": "Das Löschen einer Organisation ist nur möglich, wenn keine Benutzer mit dieser Organisation verknüpft sind.\nSind Sie sicher, dass Sie die Organisation \"{{name}}\" löschen möchten?"
+    "delete_confirmation": "Das Löschen einer Organisation ist nur möglich, wenn keine Benutzer mit dieser Organisation verknüpft sind.\nBist du sicher, dass du die Organisation \"{{name}}\" löschen möchtest?"
   },
   "bulk_action": {
     "delete": {
       "label": "Organisationen löschen",
-      "description": "Das Löschen einer Organisation ist nur möglich, wenn keine Benutzer mit dieser Organisation verknüpft sind.\nSind Sie sicher, dass Sie die {{count}} ausgewählten Organisationen löschen möchten?"
+      "description": "Das Löschen einer Organisation ist nur möglich, wenn keine Benutzer mit dieser Organisation verknüpft sind.\nBist du sicher, dass du die {{count}} ausgewählten Organisationen löschen möchtest?"
     },
     "merge": {
       "label": "Organisationen zusammenführen",
