@@ -59,8 +59,6 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
       const swiper = swiperRef.current.swiper;
       setPrevVisible(!swiper.isBeginning);
       setNextVisible(!swiper.isEnd);
-      console.log('swiper.isBeginning:', swiper.isBeginning);
-      console.log('swiper.isEnd:', swiper.isEnd);
     }
   };
 
