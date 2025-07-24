@@ -29,5 +29,12 @@
   },
   "external_profile": "Link zu externem Profil (LinkedIn, XING, ...)",
   "matriculation_number": "Matrikelnummer",
+  "matriculation_number_placeholder": "z.B. 12345678",
+  "zip_code": "Postleitzahl",
+  "zip_code_placeholder": "z.B. 12345 oder 10117",
+  "country": "Land",
+  "country_none": "-- Land auswählen --",
+  "occupation_none": "-- Beschäftigung auswählen --",
+  "external_profile_placeholder": "z.B. https://linkedin.com/in/deinname",
   "change_password_or_email": "Passwort oder E-Mail ändern"
 }

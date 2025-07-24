@@ -32,6 +32,14 @@ export interface AchievementRecordAuthorQuery_AchievementRecordAuthor_User {
    * A link to an external profile, for example in LinkedIn or Xing
    */
   externalProfile: string | null;
+  /**
+   * The user's postal/zip code
+   */
+  zipCode: string | null;
+  /**
+   * The user's country of residence
+   */
+  country: string | null;
 }
 
 export interface AchievementRecordAuthorQuery_AchievementRecordAuthor {
