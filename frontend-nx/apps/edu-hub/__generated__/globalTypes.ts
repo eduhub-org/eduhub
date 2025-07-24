@@ -416,6 +416,22 @@ export enum CertificateType_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "Country"
+ */
+export enum Country_constraint {
+  Country_pkey = "Country_pkey",
+}
+
+/**
+ * update columns of table "Country"
+ */
+export enum Country_update_column {
+  code = "code",
+  name_de = "name_de",
+  name_en = "name_en",
+}
+
+/**
  * unique or primary key constraints on table "CourseDegree"
  */
 export enum CourseDegree_constraint {
@@ -3414,6 +3430,57 @@ export interface CertificateType_on_conflict {
   constraint: CertificateType_constraint;
   update_columns: CertificateType_update_column[];
   where?: CertificateType_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "Country". All fields are combined with a logical 'AND'.
+ */
+export interface Country_bool_exp {
+  Users?: User_bool_exp | null;
+  Users_aggregate?: User_aggregate_bool_exp | null;
+  _and?: Country_bool_exp[] | null;
+  _not?: Country_bool_exp | null;
+  _or?: Country_bool_exp[] | null;
+  code?: String_comparison_exp | null;
+  name_de?: String_comparison_exp | null;
+  name_en?: String_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "Country"
+ */
+export interface Country_insert_input {
+  Users?: User_arr_rel_insert_input | null;
+  code?: string | null;
+  name_de?: string | null;
+  name_en?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "Country"
+ */
+export interface Country_obj_rel_insert_input {
+  data: Country_insert_input;
+  on_conflict?: Country_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "Country"
+ */
+export interface Country_on_conflict {
+  constraint: Country_constraint;
+  update_columns: Country_update_column[];
+  where?: Country_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "Country".
+ */
+export interface Country_order_by {
+  Users_aggregate?: User_aggregate_order_by | null;
+  code?: order_by | null;
+  name_de?: order_by | null;
+  name_en?: order_by | null;
 }
 
 export interface CourseDegree_aggregate_bool_exp {
@@ -7319,6 +7386,7 @@ export interface User_bool_exp {
   AchievementRecordAuthors_aggregate?: AchievementRecordAuthor_aggregate_bool_exp | null;
   Attendances?: Attendance_bool_exp | null;
   Attendances_aggregate?: Attendance_aggregate_bool_exp | null;
+  Country?: Country_bool_exp | null;
   CourseEnrollments?: CourseEnrollment_bool_exp | null;
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_bool_exp | null;
   Experts?: Expert_bool_exp | null;
@@ -7357,6 +7425,7 @@ export interface User_insert_input {
   AchievementOptionMentors?: AchievementOptionMentor_arr_rel_insert_input | null;
   AchievementRecordAuthors?: AchievementRecordAuthor_arr_rel_insert_input | null;
   Attendances?: Attendance_arr_rel_insert_input | null;
+  Country?: Country_obj_rel_insert_input | null;
   CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
   Experts?: Expert_arr_rel_insert_input | null;
   Organization?: Organization_obj_rel_insert_input | null;
@@ -7446,6 +7515,7 @@ export interface User_order_by {
   AchievementOptionMentors_aggregate?: AchievementOptionMentor_aggregate_order_by | null;
   AchievementRecordAuthors_aggregate?: AchievementRecordAuthor_aggregate_order_by | null;
   Attendances_aggregate?: Attendance_aggregate_order_by | null;
+  Country?: Country_order_by | null;
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
   Experts_aggregate?: Expert_aggregate_order_by | null;
   Organization?: Organization_order_by | null;

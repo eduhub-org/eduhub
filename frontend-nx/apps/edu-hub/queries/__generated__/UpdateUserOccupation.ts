@@ -27,5 +27,5 @@ export interface UpdateUserOccupation {
 
 export interface UpdateUserOccupationVariables {
   userId: any;
-  value: UserOccupation_enum;
+  value?: UserOccupation_enum | null;
 }

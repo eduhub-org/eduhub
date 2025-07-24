@@ -2,6 +2,9 @@ table:
   name: User
   schema: public
 object_relationships:
+  - name: Country
+    using:
+      foreign_key_constraint_on: country
   - name: Organization
     using:
       foreign_key_constraint_on: organizationId

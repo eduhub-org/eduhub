@@ -24,6 +24,6 @@ export interface UpdateUserCountry {
 }
 
 export interface UpdateUserCountryVariables {
-  itemId: any;
-  text: string;
+  userId: any;
+  value?: string | null;
 }

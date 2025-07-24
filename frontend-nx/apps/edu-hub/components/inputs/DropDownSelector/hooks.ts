@@ -11,7 +11,8 @@ export const useDropDownLogic = (
   updateValueMutation: any | null,
   identifierVariables: any,
   onValueUpdated: (value: string) => string,
-  refetchQueries: any[]
+  refetchQueries: any[],
+  nullable = false
 ) => {
   // Initialize all hooks unconditionally at the top level
   const [localValue, setLocalValue] = useState(value);
@@ -45,9 +46,11 @@ export const useDropDownLogic = (
   const debouncedUpdateValue = useDebouncedCallback((newValue: string, isMandatory = false) => {
     if (validateValue(newValue, isMandatory)) {
       if (updateValueMutation) {
+        // Convert empty string to null for nullable fields
+        const finalValue = nullable && newValue === '' ? null : newValue;
         const variables = {
           ...identifierVariables,
-          value: newValue,
+          value: finalValue,
         };
         updateValue({ variables });
       } else if (onValueUpdated) {

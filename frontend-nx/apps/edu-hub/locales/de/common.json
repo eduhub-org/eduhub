@@ -164,7 +164,8 @@
     "no_results": "Keine Ergebnisse gefunden"
   },
   "dropdown_selector": {
-    "create_option": "\"{{option}}\" neu hinzufügen"
+    "create_option": "\"{{option}}\" neu hinzufügen",
+    "none_option": "-- Keine Auswahl --"
   },
   "time_picker": {
     "select_time": "Zeit auswählen",

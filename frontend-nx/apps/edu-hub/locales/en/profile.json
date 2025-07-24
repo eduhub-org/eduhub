@@ -29,7 +29,12 @@
   },
   "external_profile": "Link to external profile (LinkedIn, XING, ...)",
   "matriculation_number": "Matriculation number",
+  "matriculation_number_placeholder": "e.g., 12345678",
   "zip_code": "Zip/Postal code",
+  "zip_code_placeholder": "e.g., 12345 or SW1A 1AA",
   "country": "Country",
+  "country_none": "-- Select Country --",
+  "occupation_none": "-- Select Occupation --",
+  "external_profile_placeholder": "e.g., https://linkedin.com/in/yourname",
   "change_password_or_email": "Change password or email"
 }

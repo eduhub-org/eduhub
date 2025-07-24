@@ -36,7 +36,7 @@ export const UPDATE_USER_LAST_NAME = gql`
 `;
 
 export const UPDATE_USER_OCCUPATION = gql`
-  mutation UpdateUserOccupation($userId: uuid!, $value: UserOccupation_enum!) {
+  mutation UpdateUserOccupation($userId: uuid!, $value: UserOccupation_enum) {
     update_User_by_pk(pk_columns: { id: $userId }, _set: { occupation: $value }) {
       id
       occupation
@@ -81,8 +81,8 @@ export const UPDATE_USER_ZIP_CODE = gql`
 `;
 
 export const UPDATE_USER_COUNTRY = gql`
-  mutation UpdateUserCountry($itemId: uuid!, $text: String!) {
-    update_User_by_pk(pk_columns: { id: $itemId }, _set: { country: $text }) {
+  mutation UpdateUserCountry($userId: uuid!, $value: String) {
+    update_User_by_pk(pk_columns: { id: $userId }, _set: { country: $value }) {
       id
       country
     }

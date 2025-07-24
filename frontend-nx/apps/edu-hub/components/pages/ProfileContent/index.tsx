@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
+import { useRouter } from 'next/router';
 
 import { Button } from '../../common/Button';
 import UnifiedFileUploader from '../../inputs/UnifiedFileUploader';
@@ -19,6 +20,7 @@ import {
   UPDATE_USER_COUNTRY,
 } from '../../../queries/updateUser';
 import { USER, USER_OCCUPATION } from '../../../queries/user';
+import { COUNTRY_LIST } from '../../../queries/country';
 
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import { User, UserVariables } from '../../../queries/__generated__/User';
@@ -29,6 +31,7 @@ import { CREATE_ORGANIZATION, ORGANIZATION_LIST } from '../../../queries/organiz
 
 const ProfileContent: FC = () => {
   const { t } = useTranslation('profile');
+  const { locale } = useRouter();
   const { data: sessionData, status: sessionStatus } = useSession();
   const [showError, setShowError] = useState(true);
 
@@ -50,6 +53,15 @@ const ProfileContent: FC = () => {
   const occupationOptions = (queryOccupationOptions.data?.UserOccupation || []).map((x) => ({
     label: t(`profile:occupation.${x.value}`), // Apply translation here
     value: x.value,
+  }));
+
+  const { data: queryCountryOptions } = useRoleQuery(COUNTRY_LIST, {
+    skip: sessionStatus === 'loading',
+  });
+  // Country options with proper language selection
+  const countryOptions = (queryCountryOptions?.Country || []).map((country) => ({
+    label: locale === 'de' ? country.name_de : country.name_en,
+    value: country.code,
   }));
 
   const { data: queryOrganizationOptions } = useRoleQuery(ORGANIZATION_LIST, {
@@ -147,6 +159,7 @@ const ProfileContent: FC = () => {
               variant="eduhub"
               type="input"
               label={t('zip_code')}
+              placeholder={t('zip_code_placeholder')}
               itemId={userData?.User_by_pk?.id}
               value={userData?.User_by_pk?.zipCode || ''}
               updateValueMutation={UPDATE_USER_ZIP_CODE}
@@ -154,14 +167,15 @@ const ProfileContent: FC = () => {
             />
           </div>
           <div className="w-full md:w-1/2 md:p-0">
-            <InputField
+            <DropDownSelector
               variant="eduhub"
-              type="input"
               label={t('country')}
-              itemId={userData?.User_by_pk?.id}
               value={userData?.User_by_pk?.country || ''}
+              options={countryOptions}
               updateValueMutation={UPDATE_USER_COUNTRY}
-              showCharacterCount={false}
+              identifierVariables={{ userId: userData?.User_by_pk?.id }}
+              nullable={true}
+              nullableLabel={t('country_none')}
             />
           </div>
         </div>
@@ -170,10 +184,12 @@ const ProfileContent: FC = () => {
             <DropDownSelector
               variant="eduhub"
               label={t('occupation.label')}
-              value={userData?.User_by_pk?.occupation}
+              value={userData?.User_by_pk?.occupation || ''}
               options={occupationOptions}
               updateValueMutation={UPDATE_USER_OCCUPATION}
               identifierVariables={{ userId: userData?.User_by_pk?.id }}
+              nullable={true}
+              nullableLabel={t('occupation_none')}
             />
           </div>
           <div className="w-full md:w-1/2 md:p-0">
@@ -199,6 +215,7 @@ const ProfileContent: FC = () => {
                 variant="eduhub"
                 type="number"
                 label={t('matriculation_number')}
+                placeholder={t('matriculation_number_placeholder')}
                 itemId={userData?.User_by_pk?.id}
                 value={userData?.User_by_pk?.matriculationNumber || ''}
                 updateValueMutation={UPDATE_USER_MATRICULATION_NUMBER}
@@ -211,6 +228,7 @@ const ProfileContent: FC = () => {
               variant="eduhub"
               type="link"
               label={t('external_profile')}
+              placeholder={t('external_profile_placeholder')}
               itemId={userData?.User_by_pk?.id}
               value={userData?.User_by_pk?.externalProfile || ''}
               updateValueMutation={UPDATE_USER_EXTERNAL_PROFILE}
