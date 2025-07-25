@@ -11,15 +11,13 @@ import Loading from '../../../components/common/Loading';
 import { Page } from '../../../components/layout/Page';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';
-import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
+import { AdminCourseListVariables } from '../../../queries/__generated__/AdminCourseList';
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../queries/programList';
-import { AdminCourseList, AdminCourseListVariables } from '../../../queries/__generated__/AdminCourseList';
 import { Programs, Programs_Program } from '../../../queries/__generated__/Programs';
 
 const Index: FC = () => {
   const isAdmin = useIsAdmin();
   const isLoggedIn = useIsLoggedIn();
-  //const { t } = useTranslation('course-page');
   return (
     <>
       <Head>
@@ -75,10 +73,6 @@ const Content: FC<IProps> = ({ programs }) => {
     where: { programId: { _eq: defaultProgram } },
   });
 
-  const courseListRequest = useAdminQuery<AdminCourseList, AdminCourseListVariables>(ADMIN_COURSE_LIST, {
-    variables: filter,
-  });
-
   const updateFilter = useCallback(
     (newState: AdminCourseListVariables) => {
       setFilter(newState);
@@ -86,35 +80,16 @@ const Content: FC<IProps> = ({ programs }) => {
     [setFilter]
   );
 
-  if (courseListRequest.error) {
-    console.log(courseListRequest.error);
-  }
-
   return (
     <div className="max-w-screen-xl mx-auto">
       <CoursesHeader
         programs={sortedPrograms}
         defaultProgramId={defaultProgram}
-        courseListRequest={courseListRequest}
         t={t}
         updateFilter={updateFilter}
         currentFilter={filter}
       />
-      {courseListRequest.loading ? (
-        <Loading />
-      ) : courseListRequest.data?.Course && courseListRequest.data?.Course.length > 0 ? (
-        <ManageCoursesContent
-          courseListRequest={courseListRequest}
-          programs={sortedPrograms}
-          t={t}
-          updateFilter={updateFilter}
-          currentFilter={filter}
-        />
-      ) : (
-        <div className="text-white">
-          <p>{t('course-page:no-courses')}</p>
-        </div>
-      )}
+      <ManageCoursesContent programs={sortedPrograms} t={t} updateFilter={updateFilter} currentFilter={filter} />
     </div>
   );
 };

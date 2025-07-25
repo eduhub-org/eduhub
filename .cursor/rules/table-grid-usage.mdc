@@ -134,6 +134,102 @@ const MyPageComponent: FC = () => {
 export default MyPageComponent;
 ```
 
+## Column Sizing and Layout Control
+
+TableGrid uses TanStack Table's built-in column sizing system to provide precise control over column widths. This replaces the legacy CSS grid approach with a flexible, responsive solution.
+
+### Column Size Properties:
+
+*   `size`: Column width in pixels (default: 150px)
+*   `minSize`: Minimum column width in pixels (default: 50px)  
+*   `maxSize`: Maximum column width in pixels (default: 800px)
+
+### Modern Column Sizing (Recommended):
+
+```typescript
+const columns = useMemo<ColumnDef<YourDataType>[]>(() => [
+  {
+    header: 'Status',
+    accessorKey: 'status',
+    size: 80,        // Compact 80px width for status indicators
+  },
+  {
+    header: 'Title',
+    accessorKey: 'title', 
+    size: 400,       // Generous 400px for main content
+    minSize: 300,    // Won't shrink below 300px
+    maxSize: 600,    // Won't grow above 600px
+  },
+  {
+    header: 'Count',
+    accessorKey: 'count',
+    size: 100,       // Narrow 100px for numeric data
+  },
+], []);
+```
+
+### Legacy Meta Width (Deprecated - Should Be Replaced):
+
+⚠️ **Legacy Approach (Replace When Encountered):**
+
+```typescript
+// ❌ OLD - Do not use in new code
+{
+  header: 'Title',
+  accessorKey: 'title',
+  meta: { width: 3 }, // This converts to 300px automatically for backward compatibility
+}
+
+// ✅ NEW - Use this instead
+{
+  header: 'Title', 
+  accessorKey: 'title',
+  size: 300,          // Direct pixel width specification
+  minSize: 200,       // Optional: minimum width
+}
+```
+
+### Column Sizing Best Practices:
+
+1.  **Status/Icon Columns**: 50-100px (narrow indicators)
+2.  **Numeric Columns**: 80-150px (IDs, counts, dates)
+3.  **Content Columns**: 200-500px (titles, descriptions)
+4.  **Action Columns**: 100-200px (buttons, links)
+
+### Migration from Legacy Meta Width:
+
+When you encounter `meta: { width: X }` in existing code:
+
+1.  **Replace** `meta: { width: 3 }` with `size: 300` (multiply by 100)
+2.  **Add** `minSize` and `maxSize` if the column needs constraints
+3.  **Test** the layout to ensure proper spacing
+4.  **Remove** the `meta.width` property entirely
+
+### Example Migration:
+
+```typescript
+// Before (Legacy)
+{
+  header: t('table-header-title'),
+  accessorKey: 'title',
+  meta: { width: 4 },  // ❌ Replace this
+  cell: ({ row }) => (
+    <InputField value={row.original.title} />
+  ),
+}
+
+// After (Modern)
+{
+  header: t('table-header-title'),
+  accessorKey: 'title', 
+  size: 400,           // ✅ Direct pixel specification
+  minSize: 250,        // ✅ Prevent excessive shrinking
+  cell: ({ row }) => (
+    <InputField value={row.original.title} />
+  ),
+}
+```
+
 ### Important Considerations:
 
 1.  **Data Fetching & `useTableGrid`**:

@@ -1,33 +1,54 @@
 {
-  "chat_link": {
-    "label": "Link to the Chat of the Course",
-    "help_text": "The channel for the course has to be created manually in Mattermost before.",
-    "error_text": "Incorrect link format!"
+  "table-header-published": "Published",
+  "table-header-title": "Title",
+  "table-header-instructor": "Instructor",
+  "table-header-applications": "Applications",
+  "table-header-application-status": "Confirmed/Invited/Applied",
+  "table-header-program": "Program",
+  "table-header-status": "Status",
+  "title": "Manage Courses",
+  "tile_slider_group": {
+    "label": "Tile Slider Group",
+    "placeholder": "Select tile slider groups"
   },
-  "ects": {
-    "label": "ECTS",
-    "help_text": "Only courses with '2,5', '5', '12,5' (for degrees) or 'NONE' are allowed.",
-    "error_text": "Incorrect ECTS format!"
+  "cover_image": {
+    "label": "Cover Image",
+    "upload_text": "Click to upload cover image"
   },
-  "external_registration_link": {
-    "label": "External registration link",
-    "help_text": "If the course or event should not be administered via EduHub, enter a link to the external registration here.",
-    "error_text": "Incorrect link format!"
-  }, 
-  "max_missed_sessions":{
-    "label": "Maximum permitted missed sessions",
-    "help_text": "By default, the value is set to 2, but all values greater than or equal to 0 are permitted.",
-    "error_text": "Incorrect missed session Format!"
+  "instructors": {
+    "label": "Instructors",
+    "add": "Add Instructor"
   },
   "registration_type": {
     "label": "Registration Type",
-    "help_text": "Select how participants can register for this course or event.",
+    "help_text": "Select how participants can register for this course",
     "options": {
-      "APPROVAL_WITH_INPUT": "Application with approval process",
-      "EXTERNAL_REGISTRATION": "External registration link",
-      "DIRECT_WITH_INPUT": "Direct registration with input form",
-      "DIRECT_CONFIRMATION": "Direct registration"
+      "APPROVAL_WITH_INPUT": "Approval Required with Input",
+      "DIRECT_CONFIRMATION": "Direct Confirmation",
+      "DIRECT_WITH_INPUT": "Direct with Input",
+      "EXTERNAL_REGISTRATION": "External Registration"
     }
+  },
+  "external_registration_link": {
+    "label": "External Registration Link",
+    "help_text": "URL where participants can register externally"
+  },
+  "chat_link": {
+    "label": "Course Chat Link",
+    "help_text": "Link to the course chat or communication platform"
+  },
+  "ects": {
+    "label": "ECTS Credits",
+    "help_text": "Number of ECTS credits for this course"
+  },
+  "max_missed_sessions": {
+    "label": "Maximum Missed Sessions",
+    "help_text": "Maximum number of sessions a participant can miss"
+  },
+  "learning_goals": {
+    "label": "Learning Goals",
+    "help_text": "Define what participants will achieve after completing this course. Write each learning goal on a new line without numbering. Use action verbs like 'understand', 'apply', 'analyze', 'create' (see: https://www.bloomstaxonomy.org).",
+    "placeholder": "Understand the fundamentals of the topic\nApply key concepts in practical scenarios\nAnalyze complex problems and solutions\nCreate innovative approaches"
   },
   "delete_button": {
     "delete_course_confirmation": "Are you sure you want to delete the course '{{title}}'?",

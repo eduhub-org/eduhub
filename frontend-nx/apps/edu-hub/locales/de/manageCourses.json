@@ -1,33 +1,54 @@
 {
-  "chat_link": {
-    "label": "Link zum Chat des Kurses",
-    "help_text": "Der Kanal für den Kurs muss vorher manuell in Mattermost erstellt werden.",
-    "error_text": "Falsches Link-Format!"
+  "table-header-published": "Veröffentlicht",
+  "table-header-title": "Titel",
+  "table-header-instructor": "Dozent",
+  "table-header-applications": "Bewerbungen",
+  "table-header-application-status": "Bestätigt/Eingeladen/Beworben",
+  "table-header-program": "Programm",
+  "table-header-status": "Status",
+  "title": "Kurse verwalten",
+  "tile_slider_group": {
+    "label": "Kachel-Slider Gruppe",
+    "placeholder": "Kachel-Slider Gruppen auswählen"
   },
-  "ects": {
-    "label": "ECTS",
-    "help_text": "Nur Kurse mit '2,5', '5', '12,5' (für Degrees) oder 'NONE' sind erlaubt.",
-    "error_text": "Falsches ECTS-Format!"
+  "cover_image": {
+    "label": "Titelbild",
+    "upload_text": "Klicken um Titelbild hochzuladen"
   },
-  "external_registration_link": {
-    "label": "Externer Anmeldelink",
-    "help_text": "Wenn der Kurs oder die Veranstaltung nicht über EduHub verwaltet werden soll, geben Sie hier einen Link zur externen Anmeldung ein.",
-    "error_text": "Falsches Link-Format!"
-  },
-  "max_missed_sessions": {
-    "label": "Maximal erlaubte verpasste Termine",
-    "help_text": "Standardmäßig ist der Wert auf 2 gesetzt, aber alle Werte größer oder gleich 0 sind erlaubt.",
-    "error_text": "Falsches Format für verpasste Termine!"
+  "instructors": {
+    "label": "Kursleitung",
+    "add": "Kursleitung hinzufügen"
   },
   "registration_type": {
     "label": "Anmeldeart",
-    "help_text": "Wählen Sie aus, wie sich Teilnehmende für diesen Kurs oder diese Veranstaltung anmelden können.",
+    "help_text": "Wählen Sie aus, wie sich Teilnehmer für diesen Kurs anmelden können",
     "options": {
-      "APPROVAL_WITH_INPUT": "Bewerbung mit Genehmigungsprozess",
-      "EXTERNAL_REGISTRATION": "Externer Anmeldelink",
-      "DIRECT_WITH_INPUT": "Direkte Anmeldung mit Formular",
-      "DIRECT_CONFIRMATION": "Direkte Anmeldung"
+      "APPROVAL_WITH_INPUT": "Genehmigung erforderlich mit Eingabe",
+      "DIRECT_CONFIRMATION": "Direkte Bestätigung",
+      "DIRECT_WITH_INPUT": "Direkt mit Eingabe",
+      "EXTERNAL_REGISTRATION": "Externe Anmeldung"
     }
+  },
+  "external_registration_link": {
+    "label": "Externe Anmeldung Link",
+    "help_text": "URL wo sich Teilnehmer extern anmelden können"
+  },
+  "chat_link": {
+    "label": "Kurs-Chat Link",
+    "help_text": "Link zum Kurs-Chat oder zur Kommunikationsplattform"
+  },
+  "ects": {
+    "label": "ECTS-Punkte",
+    "help_text": "Anzahl der ECTS-Punkte für diesen Kurs"
+  },
+  "max_missed_sessions": {
+    "label": "Maximal verpasste Sitzungen",
+    "help_text": "Maximale Anzahl von Sitzungen, die ein Teilnehmer verpassen kann"
+  },
+  "learning_goals": {
+    "label": "Lernziele",
+    "help_text": "Definieren Sie, was die Teilnehmer nach Abschluss dieses Kurses erreichen werden. Schreiben Sie jedes Lernziel in eine neue Zeile ohne Nummerierung. Verwenden Sie Handlungsverben wie 'verstehen', 'anwenden', 'analysieren', 'erstellen' (siehe: https://www.bloomstaxonomy.org).",
+    "placeholder": "Die Grundlagen des Themas verstehen\nSchlüsselkonzepte in praktischen Szenarien anwenden\nKomplexe Probleme und Lösungen analysieren\nInnovative Ansätze entwickeln"
   },
   "delete_button": {
     "delete_course_confirmation": "Sind Sie sicher, dass Sie den Kurs '{{title}}' löschen möchten?",

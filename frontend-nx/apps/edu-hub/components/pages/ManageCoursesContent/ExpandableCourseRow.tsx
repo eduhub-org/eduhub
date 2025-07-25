@@ -1,0 +1,485 @@
+import { FC, useCallback, useRef, useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { IconButton } from '@mui/material';
+import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdUpload, MdAddCircle } from 'react-icons/md';
+import { useAdminMutation } from '../../../hooks/authedMutation';
+import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
+import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
+import { INSERT_COURSE_DEGREE_TAG, DELETE_COURSE_DEGREE_TAG } from '../../../queries/courseDegree';
+import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../../queries/mutateCourseInstructor';
+import { INSERT_EXPERT } from '../../../queries/user';
+import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
+import {
+  DeleteCourseInstructor,
+  DeleteCourseInstructorVariables,
+} from '../../../queries/__generated__/DeleteCourseInstructor';
+import {
+  InsertCourseInstructor,
+  InsertCourseInstructorVariables,
+} from '../../../queries/__generated__/InsertCourseInstructor';
+import { InsertExpert, InsertExpertVariables } from '../../../queries/__generated__/InsertExpert';
+import { UserForSelection1_User } from '../../../queries/__generated__/UserForSelection1';
+import { SaveCourseImage, SaveCourseImageVariables } from '../../../queries/__generated__/SaveCourseImage';
+import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
+import { CourseRegistrationType_enum } from '../../../__generated__/globalTypes';
+import EhTag from '../../common/EhTag';
+import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
+import { getPublicImageUrl, parseFileUploadEvent } from '../../../helpers/filehandling';
+import useTranslation from 'next-translate/useTranslation';
+import TagSelector from '../../inputs/TagSelector';
+import InputField from '../../inputs/InputField';
+import DropDownSelector from '../../inputs/DropDownSelector';
+import {
+  UPDATE_COURSE_CHAT_LINK,
+  UPDATE_COURSE_ECTS,
+  UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK,
+  UPDATE_COURSE_MAX_MISSED_SESSION,
+  UPDATE_COURSE_REGISTRATION_TYPE,
+  UPDATE_COURSE_LEARNING_GOALS,
+} from '../../../queries/course';
+import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
+import useErrorHandler from '../../../hooks/useErrorHandler';
+import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
+
+interface ExpandableCourseRowProps {
+  course: AdminCourseList_Course;
+  courseGroupOptions: { id: number; name: string }[];
+  degreeCourses: { id: number; name: string }[];
+  onSetAttendanceCertificatePossible: (c: AdminCourseList_Course, isPossible: boolean) => any;
+  onSetAchievementCertificatePossible: (c: AdminCourseList_Course, isPossible: boolean) => any;
+}
+
+const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
+  course,
+  courseGroupOptions,
+  degreeCourses,
+  onSetAttendanceCertificatePossible,
+  onSetAchievementCertificatePossible,
+}) => {
+  const { t, lang } = useTranslation('course-page');
+  const { error, handleError, resetError } = useErrorHandler();
+
+  // Helper function
+  const makeFullName = (firstName: string, lastName: string): string => {
+    return `${firstName} ${lastName}`;
+  };
+
+  // Instructor management state
+  const [instructorDialogOpen, setInstructorDialogOpen] = useState(false);
+
+  // Instructor management mutations
+  const [insertCourseInstructor] = useAdminMutation<InsertCourseInstructor, InsertCourseInstructorVariables>(
+    INSERT_A_COURSEINSTRUCTOR,
+    {
+      refetchQueries: ['AdminCourseList'],
+    }
+  );
+
+  const [deleteInstructorAPI] = useAdminMutation<DeleteCourseInstructor, DeleteCourseInstructorVariables>(
+    DELETE_COURSE_INSRTRUCTOR,
+    {
+      refetchQueries: ['AdminCourseList'],
+    }
+  );
+
+  const [insertExpertMutation] = useAdminMutation<InsertExpert, InsertExpertVariables>(INSERT_EXPERT, {
+    refetchQueries: ['AdminCourseList'],
+  });
+
+  // Image upload functionality
+  const imageUploadRef = useRef<any>(null);
+  const handleImageUploadClick = useCallback(() => {
+    imageUploadRef.current?.click();
+  }, [imageUploadRef]);
+
+  const handleToggleAttendanceCertificatePossible = useCallback(() => {
+    onSetAttendanceCertificatePossible(course, !course.attendanceCertificatePossible);
+  }, [course, onSetAttendanceCertificatePossible]);
+
+  const handleToggleAchievementCertificatePossible = useCallback(() => {
+    onSetAchievementCertificatePossible(course, !course.achievementCertificatePossible);
+  }, [course, onSetAchievementCertificatePossible]);
+
+  // Instructor management functions
+  const openInstructorDialog = useCallback(() => {
+    setInstructorDialogOpen(true);
+  }, []);
+
+  const closeInstructorDialog = useCallback(() => {
+    setInstructorDialogOpen(false);
+  }, []);
+
+  const deleteInstructorFromCourse = useCallback(
+    async (expertId: number) => {
+      const response = await deleteInstructorAPI({
+        variables: {
+          courseId: course.id,
+          expertId,
+        },
+      });
+
+      if (response.errors) {
+        console.log(response.errors);
+        return;
+      }
+    },
+    [deleteInstructorAPI, course.id]
+  );
+
+  const addInstructorHandler = useCallback(
+    async (confirmed: boolean, user: UserForSelection1_User | null) => {
+      if (!confirmed || user == null) {
+        closeInstructorDialog();
+        return;
+      }
+
+      let expertId = -1;
+      if (user.Experts.length > 0) {
+        expertId = user.Experts[0].id;
+      } else {
+        const newExpert = await insertExpertMutation({
+          variables: {
+            userId: user.id,
+          },
+        });
+        if (newExpert.errors) {
+          console.log(newExpert.errors);
+          closeInstructorDialog();
+          return;
+        }
+        expertId = newExpert.data?.insert_Expert?.returning[0]?.id || -1;
+      }
+
+      if (expertId === -1) {
+        closeInstructorDialog();
+        return;
+      }
+
+      if (course.CourseInstructors.some((expert) => expert.Expert.id === expertId)) {
+        closeInstructorDialog();
+        return;
+      }
+
+      const response = await insertCourseInstructor({
+        variables: {
+          courseId: course.id,
+          expertId,
+        },
+      });
+
+      if (response.errors) {
+        console.log(response.errors);
+        closeInstructorDialog();
+        return;
+      }
+
+      closeInstructorDialog();
+    },
+    [insertExpertMutation, course, insertCourseInstructor, closeInstructorDialog]
+  );
+
+  const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
+
+  const [saveCourseImage] = useAdminMutation<SaveCourseImage, SaveCourseImageVariables>(SAVE_COURSE_IMAGE, {
+    onError: (error) => handleError(t(error.message)),
+    refetchQueries: ['AdminCourseList'],
+  });
+
+  const handleUploadCourseImageEvent = useCallback(
+    async (event: any) => {
+      const ufile = await parseFileUploadEvent(event);
+
+      if (ufile != null) {
+        const result = await saveCourseImage({
+          variables: {
+            base64File: ufile.data,
+            fileName: ufile.name,
+            courseId: course.id,
+          },
+        });
+
+        const uploadResult = result.data?.saveCourseImage;
+        if (uploadResult?.success) {
+          await updateCourse({
+            variables: {
+              id: course.id,
+              changes: {
+                coverImage: uploadResult.filePath,
+              },
+            },
+            refetchQueries: ['AdminCourseList'],
+          });
+        } else {
+          handleError(t(uploadResult?.messageKey || 'operation-failed'));
+        }
+      }
+    },
+    [course.id, saveCourseImage, updateCourse, handleError, t]
+  );
+
+  const currentCourseGroups = course.CourseGroups.map((group) => ({
+    id: group.CourseGroupOption.id,
+    name: t(`start-page:${group.CourseGroupOption.title}`),
+  }));
+
+  const currentCourseDegrees = course.CourseDegrees.map((degree) => ({
+    id: degree.degreeCourseId,
+    name: t(degree.DegreeCourse.title),
+  }));
+
+  const coverImage = getPublicImageUrl(course?.coverImage, 460);
+
+  const registrationTypeOptions = Object.values(CourseRegistrationType_enum).map((type) => ({
+    value: type,
+    label: `manageCourses:registration_type.options.${type}`,
+  }));
+
+  const isExternalRegistration = course.registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION;
+
+  return (
+    <>
+      <div className="bg-edu-course-list p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Left Column */}
+          <div className="space-y-4">
+            {/* 1. Registration Type */}
+            <DropDownSelector
+              variant="material"
+              label={t('manageCourses:registration_type.label')}
+              value={course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT}
+              options={registrationTypeOptions}
+              updateValueMutation={UPDATE_COURSE_REGISTRATION_TYPE}
+              identifierVariables={{ itemId: course.id }}
+              refetchQueries={['AdminCourseList']}
+              helpText={t('manageCourses:registration_type.help_text')}
+            />
+
+            {/* 2. External Registration Link - Always reserve space */}
+            <div className="min-h-[80px]">
+              {isExternalRegistration && (
+                <InputField
+                  variant="material"
+                  type="link"
+                  label={t('manageCourses:external_registration_link.label')}
+                  placeholder={t('manageCourses:external_registration_link.label')}
+                  itemId={course.id}
+                  value={course.externalRegistrationLink || ''}
+                  updateValueMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
+                  refetchQueries={['AdminCourseList']}
+                  helpText={t('manageCourses:external_registration_link.help_text')}
+                />
+              )}
+            </div>
+
+            {/* 3. Assignment to Degrees */}
+            <TagSelector
+              variant="material"
+              label={t('course-page:courseDegreeTitle')}
+              placeholder={t('course-page:courseDegree')}
+              itemId={course.id}
+              values={currentCourseDegrees}
+              options={degreeCourses}
+              insertValueMutation={INSERT_COURSE_DEGREE_TAG}
+              deleteValueMutation={DELETE_COURSE_DEGREE_TAG}
+              refetchQueries={['AdminCourseList']}
+            />
+
+            {/* 4. Tile Slider Group (formerly Course Groups) */}
+            <TagSelector
+              variant="material"
+              label={t('manageCourses:tile_slider_group.label')}
+              placeholder={t('manageCourses:tile_slider_group.placeholder')}
+              itemId={course.id}
+              values={currentCourseGroups}
+              options={courseGroupOptions}
+              insertValueMutation={INSERT_COURSE_GROUP_TAG}
+              deleteValueMutation={DELETE_COURSE_GROUP_TAG}
+              refetchQueries={['AdminCourseList']}
+              optionsTranslationPrefix="start-page:"
+            />
+
+            {/* 5. Cover Image Upload */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">{t('manageCourses:cover_image.label')}</h4>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-gray-400 transition-colors">
+                <div className="flex flex-col items-center justify-center space-y-2">
+                  {coverImage ? (
+                    <div className="relative">
+                      <img
+                        src={coverImage}
+                        alt="course cover"
+                        className="w-40 h-24 object-contain rounded bg-gray-100"
+                      />
+                      <button
+                        onClick={handleImageUploadClick}
+                        className="absolute inset-0 bg-black bg-opacity-50 text-white rounded flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
+                      >
+                        <MdUpload className="w-6 h-6" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleImageUploadClick}
+                      className="flex flex-col items-center space-y-2 text-gray-500 hover:text-gray-700"
+                    >
+                      <MdUpload className="w-8 h-8" />
+                      <span className="text-sm">{t('manageCourses:cover_image.upload_text')}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input
+                ref={imageUploadRef}
+                onChange={handleUploadCourseImageEvent}
+                className="hidden"
+                type="file"
+                accept="image/*"
+              />
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-4">
+            {/* 1. List of Instructors */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">{t('manageCourses:instructors.label')}</h4>
+              <div className="space-y-2">
+                {course.CourseInstructors.map((courseInstructor, index) => (
+                  <div
+                    key={`${course.id}-${courseInstructor.Expert.id}-${index}`}
+                    className="flex items-center justify-between bg-gray-50 p-2 rounded"
+                  >
+                    <div className="flex-1">
+                      <div className="font-medium">
+                        {makeFullName(
+                          courseInstructor.Expert.User.firstName,
+                          courseInstructor.Expert.User.lastName ?? ''
+                        )}
+                        {courseInstructor.Expert.User.email && (
+                          <span className="text-sm text-gray-600 ml-1">({courseInstructor.Expert.User.email})</span>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => deleteInstructorFromCourse(courseInstructor.Expert.id)}
+                      className="text-red-500 hover:text-red-700 p-1"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+                <button
+                  onClick={openInstructorDialog}
+                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 p-2 w-full"
+                >
+                  <MdAddCircle className="w-5 h-5" />
+                  <span>{t('manageCourses:instructors.add')}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 2. Types of Available Certificates */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">{t('possible-certificates')}</h4>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <div className="cursor-pointer" onClick={handleToggleAttendanceCertificatePossible}>
+                    {course.attendanceCertificatePossible ? (
+                      <MdCheckBox className="w-6 h-6 text-blue-600" />
+                    ) : (
+                      <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-gray-400" />
+                    )}
+                  </div>
+                  <span>{t('course-page:proof-of-participation')}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="cursor-pointer" onClick={handleToggleAchievementCertificatePossible}>
+                    {course.achievementCertificatePossible ? (
+                      <MdCheckBox className="w-6 h-6 text-blue-600" />
+                    ) : (
+                      <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-gray-400" />
+                    )}
+                  </div>
+                  <span>{t('course-page:performance-certificate')}</span>
+                </div>
+                {course.achievementCertificatePossible && (
+                  <div className="ml-8">
+                    <InputField
+                      variant="material"
+                      type="ects"
+                      label={t('manageCourses:ects.label')}
+                      placeholder={t('manageCourses:ects.label')}
+                      itemId={course.id}
+                      value={course.ects || ''}
+                      updateValueMutation={UPDATE_COURSE_ECTS}
+                      refetchQueries={['AdminCourseList']}
+                      helpText={t('manageCourses:ects.help_text')}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 3. Maximum Number of Allowed Missing Sessions */}
+            <InputField
+              variant="material"
+              type="number"
+              label={t('manageCourses:max_missed_sessions.label')}
+              placeholder={t('manageCourses:max_missed_sessions.label')}
+              itemId={course.id}
+              value={String(course.maxMissedSessions ?? 2)}
+              updateValueMutation={UPDATE_COURSE_MAX_MISSED_SESSION}
+              refetchQueries={['AdminCourseList']}
+              helpText={t('manageCourses:max_missed_sessions.help_text')}
+              min={0}
+            />
+
+            {/* 4. Learning Goals */}
+            <InputField
+              variant="eduhub"
+              type="textarea"
+              value={course.learningGoals ?? ''}
+              updateValueMutation={UPDATE_COURSE_LEARNING_GOALS}
+              refetchQueries={['AdminCourseList']}
+              itemId={course.id}
+              label={t('manageCourses:learning_goals.label')}
+              placeholder={t('manageCourses:learning_goals.placeholder')}
+              helpText={t('manageCourses:learning_goals.help_text')}
+              maxLength={500}
+              className="h-32"
+              currentText={course.learningGoals ?? ''}
+            />
+
+            {/* 5. Link to the Chat of the Course */}
+            <InputField
+              variant="material"
+              type="link"
+              label={t('manageCourses:chat_link.label')}
+              placeholder={t('manageCourses:chat_link.label')}
+              itemId={course.id}
+              value={course.chatLink || ''}
+              updateValueMutation={UPDATE_COURSE_CHAT_LINK}
+              refetchQueries={['AdminCourseList']}
+              helpText={t('manageCourses:chat_link.help_text')}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Instructor Management Dialog */}
+      {instructorDialogOpen && (
+        <SelectUserDialog
+          onClose={addInstructorHandler}
+          open={instructorDialogOpen}
+          title={t('manageCourses:instructors.add')}
+        />
+      )}
+
+      {/* Error Message Dialog */}
+      {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}
+    </>
+  );
+};
+
+export default ExpandableCourseRow;

@@ -1,18 +1,16 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { FC, useCallback, useMemo, useState } from 'react';
-import { MdArrowBack, MdArrowForward } from 'react-icons/md';
 import { CircularProgress } from '@mui/material';
+import { ColumnDef } from '@tanstack/react-table';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 
 import { QUERY_LIMIT } from '../../../pages/manage/courses';
 import { AdminCourseListVariables, AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
 import { Programs_Program } from '../../../queries/__generated__/Programs';
-import SingleCourseRow from './SingleCourseRow';
 import {
   UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE,
   UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE,
-  UPDATE_COURSE_TITLE,
 } from '../../../queries/course';
 import {
   UpdateCourseAttendanceCertificatePossible,
@@ -22,92 +20,127 @@ import {
   UpdateCourseAchievementCertificatePossible,
   UpdateCourseAchievementCertificatePossibleVariables,
 } from '../../../queries/__generated__/UpdateCourseAchievementCertificatePossible';
-import { UpdateCourseTitle, UpdateCourseTitleVariables } from '../../../queries/__generated__/UpdateCourseTitle';
 import { DEGREE_COURSES } from '../../../queries/courseDegree';
 import { DegreeCourses } from '../../../queries/__generated__/DegreeCourses';
+import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
 
 import { Translate } from 'next-translate';
+import TableGrid from '../../common/TableGrid';
+import { useTableGrid } from '../../common/TableGrid/hooks';
+import { useAdminQuery } from '../../../hooks/authedQuery';
+import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
+import ExpandableCourseRow from './ExpandableCourseRow';
+import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
+import useTranslation from 'next-translate/useTranslation';
+import draftPie from '../../../public/images/course/status/draft.svg';
+import readyForPublicationPie from '../../../public/images/course/status/ready-for-publication.svg';
+import readyForApplicationPie from '../../../public/images/course/status/ready-for-application.svg';
+import applicantsInvitedPie from '../../../public/images/course/status/applicants-invited.svg';
+import participantsRatedPie from '../../../public/images/course/status/participants-rated.svg';
+import { CourseStatus_enum } from '../../../__generated__/globalTypes';
+import { useRouter } from 'next/router';
+import InputField from '../../inputs/InputField';
+import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
+import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { SelectProgramDialog } from '../../common/dialogs/SelectProgramDialog';
+import { COPY_COURSES_TO_PROGRAM } from '../../../queries/copyCourse';
 
 interface IProps {
   t: Translate;
   programs: Programs_Program[];
-  courseListRequest: any;
   updateFilter: (newState: AdminCourseListVariables) => void;
   currentFilter: AdminCourseListVariables;
 }
-const ManageCoursesContent: FC<IProps> = ({ courseListRequest, programs, t, updateFilter, currentFilter }) => {
-  if (courseListRequest.error) {
-    console.log('query programs error', courseListRequest.error);
-  }
 
-  const tableHeaders: [string, string][] = [
-    [t('table-header-published'), 'justify-center'],
-    [t('table-header-title'), 'justify-start'],
-    [t('table-header-instructor'), 'justify-start'],
-    [t('table-header-applications'), 'justify-center'],
-    [t('table-header-application-status'), 'justify-center'],
-    [t('table-header-program'), 'justify-center'],
-    [t('table-header-status'), 'justify-center'],
-  ];
-  const courses: AdminCourseList_Course[] = [...(courseListRequest.data?.Course ?? [])];
-  const refetchCourses = useCallback(() => {
-    courseListRequest.refetch();
-  }, [courseListRequest]);
+const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFilter }) => {
+  const { t: translate, lang } = useTranslation('course-page');
+  const router = useRouter();
 
-  const count = courseListRequest.data?.Course_aggregate?.aggregate?.count || 0;
+  // Dialog state for program selection
+  const [showProgramDialog, setShowProgramDialog] = useState(false);
+  const [coursesToCopy, setCoursesToCopy] = useState<AdminCourseList_Course[]>([]);
+
+  // Use TableGrid hook for data management
+  const { data, loading, error, searchFilter, pageIndex, setSearchFilter, setPageIndex } = useTableGrid({
+    queryHook: useAdminQuery,
+    query: ADMIN_COURSE_LIST,
+    queryVariables: currentFilter,
+    pageSize: QUERY_LIMIT,
+    refetchFilter: (searchFilter) => ({
+      where: {
+        ...currentFilter.where,
+        ...(searchFilter ? { title: { _ilike: `%${searchFilter}%` } } : {}),
+      },
+    }),
+  });
+
+  const courses: AdminCourseList_Course[] = data?.Course || [];
+  const totalCount = data?.Course_aggregate?.aggregate?.count || 0;
 
   const [updateAttendanceCertificatePossible] = useAdminMutation<
     UpdateCourseAttendanceCertificatePossible,
     UpdateCourseAttendanceCertificatePossibleVariables
   >(UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE);
-  const handleAttendanceCertificatePossible = useCallback(
-    async (c: AdminCourseList_Course, isPossible: boolean) => {
-      await updateAttendanceCertificatePossible({
-        variables: {
-          courseId: c.id,
-          isPossible,
-        },
-      });
-      courseListRequest.refetch();
-    },
-    [courseListRequest, updateAttendanceCertificatePossible]
-  );
 
   const [updateAchievementCertificatePossible] = useAdminMutation<
     UpdateCourseAchievementCertificatePossible,
     UpdateCourseAchievementCertificatePossibleVariables
   >(UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE);
-  const handleAchievementCertificatePossible = useCallback(
-    async (c: AdminCourseList_Course, isPossible: boolean) => {
-      await updateAchievementCertificatePossible({
-        variables: {
-          courseId: c.id,
-          isPossible,
-        },
-      });
-      courseListRequest.refetch();
+
+  const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
+
+  const [copyCourses] = useAdminMutation(COPY_COURSES_TO_PROGRAM);
+
+  // Bulk action handlers
+  const handleBulkAction = useCallback(
+    async (action: string, selectedCourses: AdminCourseList_Course[]) => {
+      const courseIds = selectedCourses.map((course) => course.id);
+
+      if (action === 'publish') {
+        // Update all selected courses to published
+        await Promise.all(
+          courseIds.map((id) =>
+            updateCourse({
+              variables: {
+                id,
+                changes: { published: true },
+              },
+            })
+          )
+        );
+      } else if (action === 'unpublish') {
+        // Update all selected courses to unpublished
+        await Promise.all(
+          courseIds.map((id) =>
+            updateCourse({
+              variables: {
+                id,
+                changes: { published: false },
+              },
+            })
+          )
+        );
+      } else if (action === 'copy') {
+        // Open program selection dialog
+        setCoursesToCopy(selectedCourses);
+        setShowProgramDialog(true);
+      }
     },
-    [courseListRequest, updateAchievementCertificatePossible]
+    [updateCourse]
   );
 
-  const [updateTitle] = useAdminMutation<UpdateCourseTitle, UpdateCourseTitleVariables>(UPDATE_COURSE_TITLE);
-  const handleTitle = useCallback(
-    async (c: AdminCourseList_Course, title: string) => {
-      await updateTitle({
-        variables: {
-          itemId: c.id,
-          text: title,
-        },
-      });
-      courseListRequest.refetch();
-    },
-    [courseListRequest, updateTitle]
-  );
+  const bulkActions = [
+    { value: 'publish', label: translate('course-page:bulk_action_publish') },
+    { value: 'unpublish', label: translate('course-page:bulk_action_unpublish') },
+    { value: 'copy', label: translate('course-page:bulk_action_copy') },
+  ];
 
   const courseGroupOptions = useMemo(() => {
-    if (courseListRequest.data && !courseListRequest.loading && !courseListRequest.error) {
+    if (data && !loading && !error) {
       return (
-        courseListRequest.data.CourseGroupOption?.map((option) => ({
+        data.CourseGroupOption?.map((option) => ({
           id: option.id,
           name: t(option.title),
         })) || []
@@ -115,7 +148,7 @@ const ManageCoursesContent: FC<IProps> = ({ courseListRequest, programs, t, upda
     } else {
       return [];
     }
-  }, [t, courseListRequest]);
+  }, [t, data, loading, error]);
 
   const degreeCoursesQuery = useRoleQuery<DegreeCourses>(DEGREE_COURSES);
   const degreeCourses = useMemo(() => {
@@ -129,126 +162,352 @@ const ManageCoursesContent: FC<IProps> = ({ courseListRequest, programs, t, upda
     }
   }, [degreeCoursesQuery.data, degreeCoursesQuery.loading, degreeCoursesQuery.error]);
 
+  const handleAttendanceCertificatePossible = useCallback(
+    async (c: AdminCourseList_Course, isPossible: boolean) => {
+      await updateAttendanceCertificatePossible({
+        variables: {
+          courseId: c.id,
+          isPossible,
+        },
+      });
+    },
+    [updateAttendanceCertificatePossible]
+  );
+
+  const handleAchievementCertificatePossible = useCallback(
+    async (c: AdminCourseList_Course, isPossible: boolean) => {
+      await updateAchievementCertificatePossible({
+        variables: {
+          courseId: c.id,
+          isPossible,
+        },
+      });
+    },
+    [updateAchievementCertificatePossible]
+  );
+
+  const handleProgramChange = useCallback(
+    async (course: AdminCourseList_Course, programId: number) => {
+      await updateCourse({
+        variables: {
+          id: course.id,
+          changes: {
+            programId,
+          },
+        },
+      });
+    },
+    [updateCourse]
+  );
+
+  const handleApplicationEndChange = useCallback(
+    (course: AdminCourseList_Course) => async (applicationEnd: Date | null) => {
+      await updateCourse({
+        variables: {
+          id: course.id,
+          changes: {
+            applicationEnd: applicationEnd ? applicationEnd.toISOString().split('T')[0] : null,
+          },
+        },
+      });
+    },
+    [updateCourse]
+  );
+
+  const handleProgramDialogClose = useCallback(
+    async (confirmed: boolean, targetProgram: Programs_Program | null) => {
+      setShowProgramDialog(false);
+
+      if (confirmed && targetProgram && coursesToCopy.length > 0) {
+        try {
+          // Prepare course data for copying
+          const coursesToInsert = coursesToCopy.map((course) => ({
+            title: `${course.title} (Copy)`,
+            tagline: course.tagline || '',
+            language: course.language || 'DE',
+            applicationEnd: course.applicationEnd || new Date().toISOString().split('T')[0], // Required field
+            cost: course.cost,
+            ects: course.ects,
+            maxMissedSessions: course.maxMissedSessions || 0,
+            maxParticipants: course.maxParticipants,
+            learningGoals: course.learningGoals,
+            headingDescriptionField1: course.headingDescriptionField1,
+            contentDescriptionField1: course.contentDescriptionField1,
+            headingDescriptionField2: course.headingDescriptionField2,
+            contentDescriptionField2: course.contentDescriptionField2,
+            achievementCertificatePossible: course.achievementCertificatePossible,
+            attendanceCertificatePossible: course.attendanceCertificatePossible,
+            weekDay: course.weekDay || 'NONE',
+            startTime: course.startTime,
+            endTime: course.endTime,
+            registrationType: course.registrationType,
+            externalRegistrationLink: course.externalRegistrationLink,
+            programId: targetProgram.id,
+            published: false, // Always start as unpublished
+            // Note: We don't copy sessions, enrollments, or other related data
+          }));
+
+          await copyCourses({
+            variables: {
+              courses: coursesToInsert,
+            },
+            refetchQueries: ['AdminCourseList'],
+          });
+
+          console.log(`Successfully copied ${coursesToCopy.length} courses to ${targetProgram.title}`);
+        } catch (error) {
+          console.error('Error copying courses:', error);
+        }
+      }
+
+      setCoursesToCopy([]);
+    },
+    [coursesToCopy, copyCourses]
+  );
+
+  const courseStatus = (status: string) => {
+    switch (status) {
+      case CourseStatus_enum.DRAFT:
+        return (
+          <span title="draft">
+            <img src={draftPie} alt="draft" />
+          </span>
+        );
+      case CourseStatus_enum.READY_FOR_PUBLICATION:
+        return (
+          <span title="ready for publication">
+            <img src={readyForPublicationPie} alt="ready for publication" />
+          </span>
+        );
+      case CourseStatus_enum.READY_FOR_APPLICATION:
+        return (
+          <span title="ready for application">
+            <img src={readyForApplicationPie} alt="ready for application" />
+          </span>
+        );
+      case CourseStatus_enum.APPLICANTS_INVITED:
+        return (
+          <span title="applicants invited">
+            <img src={applicantsInvitedPie} alt="applicants invited" />
+          </span>
+        );
+      case CourseStatus_enum.PARTICIPANTS_RATED:
+        return (
+          <span title="participants rated">
+            <img src={participantsRatedPie} alt="participants rated" />
+          </span>
+        );
+      default:
+        return (
+          <span title="default">
+            <img src={draftPie} alt="default" />
+          </span>
+        );
+    }
+  };
+
+  const getStatusCounts = (course: AdminCourseList_Course) => {
+    const statusRecordsWithSum: { [key: string]: number } = {};
+    course.CourseEnrollments.forEach((courseEn) => {
+      statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] = statusRecordsWithSum[
+        courseEn.CourseEnrollmentStatus.value
+      ]
+        ? statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] + 1
+        : 1;
+    });
+    return statusRecordsWithSum;
+  };
+
+  const getApplicationsCount = (course: AdminCourseList_Course) => {
+    const statusCounts = getStatusCounts(course);
+    return Object.keys(statusCounts).reduce((sum, key) => sum + statusCounts[key], 0);
+  };
+
+  const getConfirmedCount = (course: AdminCourseList_Course) => {
+    const statusCounts = getStatusCounts(course);
+    return statusCounts[CourseEnrollmentStatus_enum.CONFIRMED] ?? 0;
+  };
+
+  const getUnratedAndRatedButNotInformed = (course: AdminCourseList_Course) => {
+    const statusCounts = getStatusCounts(course);
+    const unrated = statusCounts[CourseEnrollmentStatus_enum.APPLIED] ?? 0;
+    const ratedButNotInformed = statusCounts[CourseEnrollmentStatus_enum.COMPLETED] ?? 0;
+    return `${unrated} / ${ratedButNotInformed}`;
+  };
+
+  const semesters: { key: number; label: string }[] = programs.map((program) => ({
+    key: program.id,
+    label: program.shortTitle ?? program.title,
+  }));
+
+  const columns = useMemo<ColumnDef<AdminCourseList_Course>[]>(
+    () => [
+      {
+        header: t('table-header-published'),
+        accessorKey: 'published',
+        size: 70,
+        meta: { className: 'text-center' },
+        cell: ({ row }) => (
+          <div className="flex justify-center">
+            <div
+              className={`w-3 h-3 rounded-full ${row.original.published ? 'bg-green-500' : 'bg-red-500'}`}
+              title={row.original.published ? t('course-page:published') : t('course-page:not_published')}
+            />
+          </div>
+        ),
+      },
+      {
+        header: t('table-header-title'),
+        accessorKey: 'title',
+        size: 320,
+        minSize: 250,
+        cell: ({ row }) => (
+          <div className="flex items-center space-x-2">
+            <div className="flex-1">
+              <InputField
+                variant="material"
+                type="input"
+                placeholder={translate('course-page:default-course-title')}
+                itemId={row.original.id}
+                value={row.original.title || ''}
+                updateValueMutation={UPDATE_COURSE_PROPERTY}
+                refetchQueries={['AdminCourseList']}
+              />
+            </div>
+            <a
+              href={`course/${row.original.id}`}
+              className="text-blue-600 hover:text-blue-800 text-sm font-medium underline whitespace-nowrap"
+              title={t('course-page:view_course')}
+            >
+              {t('course-page:view')}
+            </a>
+          </div>
+        ),
+      },
+      {
+        header: t('table-header-applications'),
+        accessorKey: 'applications',
+        size: 100,
+        meta: { className: 'text-center' },
+        cell: ({ row }) => <div className="text-center">{getApplicationsCount(row.original)}</div>,
+      },
+      {
+        header: t('course-page:confirmed'),
+        accessorKey: 'confirmed',
+        size: 100,
+        meta: { className: 'text-center' },
+        cell: ({ row }) => <div className="text-center">{getConfirmedCount(row.original)}</div>,
+      },
+      {
+        header: t('course-page:unrated_rated_not_informed'),
+        accessorKey: 'unratedRatedNotInformed',
+        size: 140,
+        meta: { className: 'text-center' },
+        cell: ({ row }) => <div className="text-center">{getUnratedAndRatedButNotInformed(row.original)}</div>,
+      },
+      {
+        header: t('course-page:application-end'),
+        accessorKey: 'applicationEnd',
+        size: 110,
+        meta: { className: 'text-center' },
+        cell: ({ row }) => {
+          const endDate = row.original.applicationEnd ? new Date(row.original.applicationEnd) : null;
+          return (
+            <div className="text-center">
+              {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
+              <DatePicker
+                className="w-full text-center bg-transparent text-sm p-1 rounded"
+                dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
+                selected={endDate}
+                onChange={handleApplicationEndChange(row.original)}
+                locale={lang}
+                placeholderText="-"
+              />
+            </div>
+          );
+        },
+      },
+      {
+        header: t('table-header-status'),
+        accessorKey: 'status',
+        size: 80,
+        meta: { className: 'text-center' },
+        cell: ({ row }) => <div className="text-center">{courseStatus(row.original.status)}</div>,
+      },
+    ],
+    [
+      t,
+      translate,
+      router,
+      handleApplicationEndChange,
+      lang,
+      getApplicationsCount,
+      getConfirmedCount,
+      getUnratedAndRatedButNotInformed,
+    ]
+  );
+
+  const handlePageSizeChange = useCallback(
+    (newPageSize: number) => {
+      // Update the filter with new page size
+      updateFilter({
+        ...currentFilter,
+        limit: newPageSize,
+        offset: 0,
+      });
+      setPageIndex(0);
+    },
+    [currentFilter, updateFilter, setPageIndex]
+  );
+
+  if (loading) {
+    return <CircularProgress />;
+  }
+
   return (
     <>
-      <div className="flex flex-col space-y-10">
-        <div className="overflow-x-auto transition-[height]">
-          {courseListRequest.loading ? (
-            <CircularProgress />
-          ) : (
-            <table className="w-full">
-              <thead>
-                <tr>
-                  {tableHeaders.map((header) => {
-                    const [text, className] = header;
-                    return (
-                      <th key={text} className="py-2 px-5">
-                        <p className={`flex ${className} font-medium text-gray-400 uppercase`}>{text}</p>
-                      </th>
-                    );
-                  })}
-                </tr>
-              </thead>
-              <tbody>
-                {courses.map((course) => (
-                  <SingleCourseRow
-                    key={course.id}
-                    course={course}
-                    programs={programs}
-                    courseGroupOptions={courseGroupOptions}
-                    degreeCourses={degreeCourses}
-                    refetchCourses={refetchCourses}
-                    onSetAttendanceCertificatePossible={handleAttendanceCertificatePossible}
-                    onSetAchievementCertificatePossible={handleAchievementCertificatePossible}
-                    onSetTitle={handleTitle}
-                    qResult={courseListRequest}
-                  />
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-        {count > QUERY_LIMIT && (
-          <Pagination
-            courseListRequest={courseListRequest}
-            programs={programs}
-            updateFilter={updateFilter}
-            currentFilter={currentFilter}
-            t={t}
-            count={count}
+      <TableGrid<AdminCourseList_Course>
+        columns={columns}
+        data={courses}
+        loading={loading}
+        error={error}
+        enablePagination={true}
+        totalCount={totalCount}
+        pageIndex={pageIndex}
+        onPageChange={setPageIndex}
+        pageSize={QUERY_LIMIT}
+        onPageSizeChange={handlePageSizeChange}
+        searchFilter={searchFilter}
+        onSearchFilterChange={setSearchFilter}
+        refetchQueries={['AdminCourseList']}
+        bulkActions={bulkActions}
+        onBulkAction={handleBulkAction}
+        expandableRowComponent={(props) => (
+          <ExpandableCourseRow
+            course={props.row}
+            courseGroupOptions={courseGroupOptions}
+            degreeCourses={degreeCourses}
+            onSetAttendanceCertificatePossible={handleAttendanceCertificatePossible}
+            onSetAchievementCertificatePossible={handleAchievementCertificatePossible}
           />
         )}
-      </div>
+        deleteMutation={DELETE_A_COURSE}
+        deleteIdType="number"
+        generateDeletionConfirmationQuestion={(row) =>
+          t('manageCourses:delete_button.delete_course_confirmation', {
+            title: row.title || t('manageCourses:delete_button.untitled_course'),
+          })
+        }
+      />
+
+      <SelectProgramDialog
+        open={showProgramDialog}
+        programs={programs}
+        onClose={handleProgramDialogClose}
+        title={translate('course-page:copy_courses_to_program')}
+      />
     </>
   );
 };
 
 export default ManageCoursesContent;
-
-/* #region Pagination */
-interface IPageProps extends IProps {
-  count: number;
-}
-
-const Pagination: FC<IPageProps> = ({ t, courseListRequest, count }) => {
-  const limit = QUERY_LIMIT;
-  const pages = Math.ceil(count / QUERY_LIMIT);
-  const [current_page, setCurrentPage] = useState(1);
-
-  const calculateOffset = useCallback(
-    (pageNumber: number) => {
-      if (count <= limit) return 0;
-      return pageNumber * limit - limit;
-    },
-    [limit, count]
-  );
-
-  const handlePrevious = useCallback(() => {
-    setCurrentPage((prev) => {
-      const currentPage = prev - 1;
-      courseListRequest.refetch({
-        ...courseListRequest.variables,
-        offset: calculateOffset(currentPage),
-      });
-      return currentPage;
-    });
-  }, [setCurrentPage, calculateOffset, courseListRequest]);
-
-  const handleNext = useCallback(() => {
-    setCurrentPage((prev) => {
-      const currentPage = prev + 1;
-      courseListRequest.refetch({
-        ...courseListRequest.variables,
-        offset: calculateOffset(currentPage),
-      });
-      return currentPage;
-    });
-  }, [setCurrentPage, courseListRequest, calculateOffset]);
-
-  return (
-    <div className="flex justify-end pb-10">
-      <div className="flex flex-row space-x-5">
-        {current_page > 1 && (
-          <MdArrowBack
-            className="border-2 rounded-full cursor-pointer hover:bg-edu-black hover:text-white bg-white"
-            size={40}
-            onClick={handlePrevious}
-          />
-        )}
-        <p className="font-medium">
-          {/* @ts-ignore */}
-          {t('paginationText', { currentPage: current_page, totalPage: pages })}
-        </p>
-
-        {current_page < pages && (
-          <MdArrowForward
-            className="border-2 rounded-full cursor-pointer hover:bg-edu-black hover:text-white bg-white"
-            size={40}
-            onClick={handleNext}
-          />
-        )}
-      </div>
-    </div>
-  );
-};
-/* #endregion */

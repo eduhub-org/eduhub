@@ -16,27 +16,18 @@ import type {
   InsertCourseWithLocation,
   InsertCourseWithLocationVariables,
 } from '../../../queries/__generated__/InsertCourseWithLocation';
-import type { QueryResult } from '@apollo/client';
-import type { AdminCourseList, AdminCourseListVariables } from '../../../queries/__generated__/AdminCourseList';
+import type { AdminCourseListVariables } from '../../../queries/__generated__/AdminCourseList';
 import { LocationOption_enum } from '../../../__generated__/globalTypes';
 
 interface IProps {
   programs: Programs_Program[];
   defaultProgramId: number;
-  courseListRequest: QueryResult<AdminCourseList, AdminCourseListVariables>;
   t: any;
   updateFilter: (newState: AdminCourseListVariables) => void;
   currentFilter: AdminCourseListVariables;
 }
 
-const CoursesHeader: FC<IProps> = ({
-  programs,
-  defaultProgramId,
-  courseListRequest,
-  t,
-  updateFilter,
-  currentFilter,
-}) => {
+const CoursesHeader: FC<IProps> = ({ programs, defaultProgramId, t, updateFilter, currentFilter }) => {
   const [insertCourse] = useAdminMutation<InsertCourseWithLocation, InsertCourseWithLocationVariables>(INSERT_COURSE);
   const selectedProgramId = currentFilter.where.programId?._eq;
   const selectedProgram = programs.find((program) => program.id === selectedProgramId);
@@ -56,8 +47,8 @@ const CoursesHeader: FC<IProps> = ({
       },
     });
 
-    courseListRequest.refetch();
-  }, [selectedProgram.defaultApplicationEnd, selectedProgramId, insertCourse, t, courseListRequest]);
+    // The TableGrid will automatically refetch data when the cache is updated
+  }, [selectedProgram?.defaultApplicationEnd, selectedProgramId, insertCourse, t]);
 
   return (
     <>
@@ -66,7 +57,6 @@ const CoursesHeader: FC<IProps> = ({
         t={t}
         programs={programs}
         defaultProgramId={defaultProgramId}
-        courseListRequest={courseListRequest}
         updateFilter={updateFilter}
         currentFilter={currentFilter}
       />
@@ -96,10 +86,15 @@ const createWhereClauseForCourse = (courseTitle: string, programId: number): Cou
   };
 };
 
-interface IMenubarProps extends IProps {
+interface IMenubarProps {
   t: any;
+  programs: Programs_Program[];
+  defaultProgramId: number;
+  updateFilter: (newState: AdminCourseListVariables) => void;
+  currentFilter: AdminCourseListVariables;
 }
-const Menubar: FC<IMenubarProps> = ({ t, programs, defaultProgramId, courseListRequest, updateFilter }) => {
+
+const Menubar: FC<IMenubarProps> = ({ t, programs, defaultProgramId, updateFilter, currentFilter }) => {
   const allTabId = -1;
   const maxMenuCount = 3;
   const [searchedTitle, setSearchedTitle] = useState('');
@@ -132,28 +127,29 @@ const Menubar: FC<IMenubarProps> = ({ t, programs, defaultProgramId, courseListR
     },
     [menuItems, setMenuItems]
   );
+
   const handleTabClick = useCallback(
     (property: StaticComponentProperty) => {
       updateMenuBar(property);
       updateFilter({
-        ...courseListRequest.variables,
+        ...currentFilter,
         where: createWhereClauseForCourse(searchedTitle, property.key),
         offset: 0, // Because, we need to reinitiate the offset from the beginning
       });
       setProgramID(property.key);
     },
-    [updateMenuBar, setProgramID, searchedTitle, courseListRequest, updateFilter]
+    [updateMenuBar, setProgramID, searchedTitle, currentFilter, updateFilter]
   );
 
   const searchOnTitleCallback = useCallback(
     (text: string) => {
       updateFilter({
-        ...courseListRequest.variables,
+        ...currentFilter,
         where: createWhereClauseForCourse(text, programID),
       });
       setSearchedTitle(text);
     },
-    [courseListRequest, setSearchedTitle, programID, updateFilter]
+    [currentFilter, setSearchedTitle, programID, updateFilter]
   );
 
   /* #region */
