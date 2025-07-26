@@ -3,7 +3,7 @@ import useTranslation from 'next-translate/useTranslation';
 import { FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { Programs_Program } from '../../../queries/__generated__/Programs';
-import { Button } from '../Button';
+import { Button } from '../../common/Button';
 
 interface SelectProgramDialogProps {
   open: boolean;
@@ -13,7 +13,7 @@ interface SelectProgramDialogProps {
 }
 
 export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, programs, onClose, title }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('manageCourses');
   const [selectedProgram, setSelectedProgram] = useState<Programs_Program | null>(null);
 
   const handleCancel = useCallback(() => {
@@ -47,7 +47,7 @@ export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, progra
 
       <DialogContent>
         <div className="mb-4">
-          <p className="text-gray-600">{t('course-page:select_target_program')}</p>
+          <p className="text-gray-600">{t('select_target_program')}</p>
         </div>
 
         <div className="max-h-96 overflow-auto mb-6">
@@ -70,7 +70,7 @@ export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, progra
         <div className="flex justify-between">
           <Button onClick={handleCancel}>{t('cancel')}</Button>
           <Button filled onClick={handleConfirm} disabled={!selectedProgram}>
-            {t('course-page:copy_courses')}
+            {t('copy_courses')}
           </Button>
         </div>
       </DialogContent>

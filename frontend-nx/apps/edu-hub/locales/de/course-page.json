@@ -199,8 +199,5 @@
   "view": "Anzeigen",
   "confirmed": "Bestätigt",
   "unrated_rated_not_informed": "Unbewertet / Bewertet aber nicht informiert",
-  "bulk_action_copy": "In Programm kopieren",
-  "copy_courses_to_program": "Kurse in Programm kopieren",
-  "select_target_program": "Wählen Sie das Zielprogramm aus, in das die Kurse kopiert werden sollen:",
-  "copy_courses": "Kurse kopieren"
+  "bulk_action_copy": "In Programm kopieren"
 }

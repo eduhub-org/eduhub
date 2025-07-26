@@ -53,5 +53,8 @@
   "delete_button": {
     "delete_course_confirmation": "Are you sure you want to delete the course '{{title}}'?",
     "untitled_course": "Untitled Course"
-  }
+  },
+  "copy_courses_to_program": "Copy Courses to Program",
+  "select_target_program": "Select the target program where the courses should be copied:",
+  "copy_courses": "Copy Courses"
 }

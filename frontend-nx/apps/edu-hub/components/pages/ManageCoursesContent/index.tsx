@@ -44,8 +44,9 @@ import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { SelectProgramDialog } from '../../common/dialogs/SelectProgramDialog';
+import { SelectProgramDialog } from './SelectProgramDialog';
 import { COPY_COURSES_TO_PROGRAM } from '../../../queries/copyCourse';
+import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 
 interface IProps {
   t: Translate;
@@ -61,6 +62,10 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
   // Dialog state for program selection
   const [showProgramDialog, setShowProgramDialog] = useState(false);
   const [coursesToCopy, setCoursesToCopy] = useState<AdminCourseList_Course[]>([]);
+
+  // Notification state
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Use TableGrid hook for data management
   const { data, loading, error, searchFilter, pageIndex, setSearchFilter, setPageIndex } = useTableGrid({
@@ -186,20 +191,6 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
     [updateAchievementCertificatePossible]
   );
 
-  const handleProgramChange = useCallback(
-    async (course: AdminCourseList_Course, programId: number) => {
-      await updateCourse({
-        variables: {
-          id: course.id,
-          changes: {
-            programId,
-          },
-        },
-      });
-    },
-    [updateCourse]
-  );
-
   const handleApplicationEndChange = useCallback(
     (course: AdminCourseList_Course) => async (applicationEnd: Date | null) => {
       await updateCourse({
@@ -254,7 +245,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
             refetchQueries: ['AdminCourseList'],
           });
 
-          console.log(`Successfully copied ${coursesToCopy.length} courses to ${targetProgram.title}`);
+          setSuccessMessage(`Successfully copied ${coursesToCopy.length} courses to ${targetProgram.title}`);
+          setShowSuccessNotification(true);
         } catch (error) {
           console.error('Error copying courses:', error);
         }
@@ -334,11 +326,6 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
     const ratedButNotInformed = statusCounts[CourseEnrollmentStatus_enum.COMPLETED] ?? 0;
     return `${unrated} / ${ratedButNotInformed}`;
   };
-
-  const semesters: { key: number; label: string }[] = programs.map((program) => ({
-    key: program.id,
-    label: program.shortTitle ?? program.title,
-  }));
 
   const columns = useMemo<ColumnDef<AdminCourseList_Course>[]>(
     () => [
@@ -438,7 +425,6 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
     [
       t,
       translate,
-      router,
       handleApplicationEndChange,
       lang,
       getApplicationsCount,
@@ -505,6 +491,13 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
         programs={programs}
         onClose={handleProgramDialogClose}
         title={translate('course-page:copy_courses_to_program')}
+      />
+
+      <NotificationSnackbar
+        open={showSuccessNotification}
+        onClose={() => setShowSuccessNotification(false)}
+        message={successMessage}
+        duration={4000}
       />
     </>
   );

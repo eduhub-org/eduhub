@@ -205,8 +205,5 @@
   "view": "View",
   "confirmed": "Confirmed",
   "unrated_rated_not_informed": "Unrated / Rated but not informed",
-  "bulk_action_copy": "Copy to Program",
-  "copy_courses_to_program": "Copy Courses to Program",
-  "select_target_program": "Select the target program where the courses should be copied:",
-  "copy_courses": "Copy Courses"
+  "bulk_action_copy": "Copy to Program"
 }

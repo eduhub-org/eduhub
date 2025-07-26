@@ -53,5 +53,8 @@
   "delete_button": {
     "delete_course_confirmation": "Sind Sie sicher, dass Sie den Kurs '{{title}}' löschen möchten?",
     "untitled_course": "Unbenannter Kurs"
-  }
+  },
+  "copy_courses_to_program": "Kurse in Programm kopieren",
+  "select_target_program": "Wählen Sie das Zielprogramm aus, in das die Kurse kopiert werden sollen:",
+  "copy_courses": "Kurse kopieren"
 }
