@@ -279,23 +279,23 @@ const TableGrid = <T extends BaseRow>({
       </div>
 
       {/* Header row */}
-      <div className="flex items-center mb-1 text-white">
+      <div className="flex items-center mb-1 text-white py-2">
         <div className="flex-grow flex gap-3">
           {table.getHeaderGroups().map((headerGroup) => (
             <React.Fragment key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <div
                   key={header.id}
-                  className={`${header.column.columnDef.meta?.className} relative flex items-center h-full`}
+                  className={`${header.column.columnDef.meta?.className} relative flex items-center h-12`}
                   style={{
                     width: `${header.getSize()}px`,
                     flexShrink: 0,
                   }}
                   onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
                 >
-                  <div className="flex items-center w-full">
+                  <div className="flex items-center w-full h-full">
                     {header.column.columnDef.header === '' ? null : (
-                      <div className="flex-grow">
+                      <div>
                         {header.column.id === 'selection'
                           ? flexRender(header.column.columnDef.header, header.getContext())
                           : typeof header.column.columnDef.header === 'string'
