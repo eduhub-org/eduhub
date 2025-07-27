@@ -71,5 +71,19 @@
     "title": "Copy Courses to Program",
     "description": "Select the target program where the courses should be copied:",
     "button": "Copy Courses"
+  },
+  "notifications": {
+    "course_added_success": "Course added successfully",
+    "course_add_failed": "Failed to add course. Please try again.",
+    "courses_published_success_singular": "Successfully published {{count}} course",
+    "courses_published_success_plural": "Successfully published {{count}} courses",
+    "courses_unpublished_success_singular": "Successfully unpublished {{count}} course",
+    "courses_unpublished_success_plural": "Successfully unpublished {{count}} courses",
+    "bulk_action_failed": "Failed to {{action}} courses. Please try again.",
+    "attendance_certificate_update_failed": "Failed to update attendance certificate setting",
+    "achievement_certificate_update_failed": "Failed to update achievement certificate setting",
+    "application_end_update_failed": "Failed to update application end date",
+    "courses_copied_success_singular": "Successfully copied {{count}} course to {{programTitle}}",
+    "courses_copied_success_plural": "Successfully copied {{count}} courses to {{programTitle}}"
   }
 }

@@ -124,11 +124,11 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
         refetchQueries: ['AdminCourseList'],
       });
 
-      setSuccessMessage('Course added successfully');
+      setSuccessMessage(t('notifications.course_added_success'));
       setShowSuccessNotification(true);
     } catch (error) {
       console.error('Error adding course:', error);
-      setErrorMessage('Failed to add course. Please try again.');
+      setErrorMessage(t('notifications.course_add_failed'));
       setShowErrorNotification(true);
     }
   }, [currentFilter.where.programId?._eq, programs, insertCourse, t]);
@@ -152,7 +152,14 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
             )
           );
           setSuccessMessage(
-            `Successfully published ${selectedCourses.length} course${selectedCourses.length > 1 ? 's' : ''}`
+            t(
+              selectedCourses.length === 1
+                ? 'notifications.courses_published_success_singular'
+                : 'notifications.courses_published_success_plural',
+              {
+                count: selectedCourses.length,
+              }
+            )
           );
           setShowSuccessNotification(true);
         } else if (action === 'unpublish') {
@@ -168,7 +175,14 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
             )
           );
           setSuccessMessage(
-            `Successfully unpublished ${selectedCourses.length} course${selectedCourses.length > 1 ? 's' : ''}`
+            t(
+              selectedCourses.length === 1
+                ? 'notifications.courses_unpublished_success_singular'
+                : 'notifications.courses_unpublished_success_plural',
+              {
+                count: selectedCourses.length,
+              }
+            )
           );
           setShowSuccessNotification(true);
         } else if (action === 'copy') {
@@ -178,7 +192,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
         }
       } catch (error) {
         console.error(`Error during bulk ${action} action:`, error);
-        setErrorMessage(`Failed to ${action} courses. Please try again.`);
+        setErrorMessage(t('notifications.bulk_action_failed', { action }));
         setShowErrorNotification(true);
       }
     },
@@ -227,7 +241,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
         });
       } catch (error) {
         console.error('Error updating attendance certificate setting:', error);
-        setErrorMessage('Failed to update attendance certificate setting');
+        setErrorMessage(t('notifications.attendance_certificate_update_failed'));
         setShowErrorNotification(true);
       }
     },
@@ -245,7 +259,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
         });
       } catch (error) {
         console.error('Error updating achievement certificate setting:', error);
-        setErrorMessage('Failed to update achievement certificate setting');
+        setErrorMessage(t('notifications.achievement_certificate_update_failed'));
         setShowErrorNotification(true);
       }
     },
@@ -265,7 +279,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
         });
       } catch (error) {
         console.error('Error updating application end date:', error);
-        setErrorMessage('Failed to update application end date');
+        setErrorMessage(t('notifications.application_end_update_failed'));
         setShowErrorNotification(true);
       }
     },
@@ -312,7 +326,17 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
             refetchQueries: ['AdminCourseList'],
           });
 
-          setSuccessMessage(`Successfully copied ${coursesToCopy.length} courses to ${targetProgram.title}`);
+          setSuccessMessage(
+            t(
+              coursesToCopy.length === 1
+                ? 'notifications.courses_copied_success_singular'
+                : 'notifications.courses_copied_success_plural',
+              {
+                count: coursesToCopy.length,
+                programTitle: targetProgram.title,
+              }
+            )
+          );
           setShowSuccessNotification(true);
         } catch (error) {
           console.error('Error copying courses:', error);
