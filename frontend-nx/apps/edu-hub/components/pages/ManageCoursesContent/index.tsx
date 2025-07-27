@@ -24,7 +24,6 @@ import { DEGREE_COURSES } from '../../../queries/courseDegree';
 import { DegreeCourses } from '../../../queries/__generated__/DegreeCourses';
 import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
 
-import { Translate } from 'next-translate';
 import TableGrid from '../../common/TableGrid';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { useAdminQuery } from '../../../hooks/authedQuery';
@@ -37,11 +36,15 @@ import readyForPublicationPie from '../../../public/images/course/status/ready-f
 import readyForApplicationPie from '../../../public/images/course/status/ready-for-application.svg';
 import applicantsInvitedPie from '../../../public/images/course/status/applicants-invited.svg';
 import participantsRatedPie from '../../../public/images/course/status/participants-rated.svg';
-import { CourseStatus_enum } from '../../../__generated__/globalTypes';
+import { CourseStatus_enum, LocationOption_enum } from '../../../__generated__/globalTypes';
 import { useRouter } from 'next/router';
 import InputField from '../../inputs/InputField';
-import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
+import { UPDATE_COURSE_PROPERTY, INSERT_COURSE } from '../../../queries/mutateCourse';
 import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
+import {
+  InsertCourseWithLocation,
+  InsertCourseWithLocationVariables,
+} from '../../../queries/__generated__/InsertCourseWithLocation';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { SelectProgramDialog } from './SelectProgramDialog';
@@ -49,14 +52,13 @@ import { COPY_COURSES_TO_PROGRAM } from '../../../queries/copyCourse';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 
 interface IProps {
-  t: Translate;
   programs: Programs_Program[];
   updateFilter: (newState: AdminCourseListVariables) => void;
   currentFilter: AdminCourseListVariables;
 }
 
-const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFilter }) => {
-  const { t: translate, lang } = useTranslation('course-page');
+const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilter }) => {
+  const { t, lang } = useTranslation('manageCourses');
   const router = useRouter();
 
   // Dialog state for program selection
@@ -66,6 +68,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
   // Notification state
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Use TableGrid hook for data management
   const { data, loading, error, searchFilter, pageIndex, setSearchFilter, setPageIndex } = useTableGrid({
@@ -96,50 +100,95 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
 
   const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
 
+  const [insertCourse] = useAdminMutation<InsertCourseWithLocation, InsertCourseWithLocationVariables>(INSERT_COURSE);
+
   const [copyCourses] = useAdminMutation(COPY_COURSES_TO_PROGRAM);
+
+  // Add course handler
+  const handleAddCourse = useCallback(async () => {
+    const selectedProgramId = currentFilter.where.programId?._eq;
+    const selectedProgram = programs.find((program) => program.id === selectedProgramId);
+
+    try {
+      await insertCourse({
+        variables: {
+          title: t('default_course_title'),
+          applicationEnd:
+            selectedProgram?.defaultApplicationEnd && new Date(selectedProgram.defaultApplicationEnd) > new Date()
+              ? selectedProgram.defaultApplicationEnd
+              : new Date(),
+          maxMissedSessions: 2,
+          programId: selectedProgramId,
+          locationOption: LocationOption_enum.ONLINE,
+        },
+        refetchQueries: ['AdminCourseList'],
+      });
+
+      setSuccessMessage('Course added successfully');
+      setShowSuccessNotification(true);
+    } catch (error) {
+      console.error('Error adding course:', error);
+      setErrorMessage('Failed to add course. Please try again.');
+      setShowErrorNotification(true);
+    }
+  }, [currentFilter.where.programId?._eq, programs, insertCourse, t]);
 
   // Bulk action handlers
   const handleBulkAction = useCallback(
     async (action: string, selectedCourses: AdminCourseList_Course[]) => {
       const courseIds = selectedCourses.map((course) => course.id);
 
-      if (action === 'publish') {
-        // Update all selected courses to published
-        await Promise.all(
-          courseIds.map((id) =>
-            updateCourse({
-              variables: {
-                id,
-                changes: { published: true },
-              },
-            })
-          )
-        );
-      } else if (action === 'unpublish') {
-        // Update all selected courses to unpublished
-        await Promise.all(
-          courseIds.map((id) =>
-            updateCourse({
-              variables: {
-                id,
-                changes: { published: false },
-              },
-            })
-          )
-        );
-      } else if (action === 'copy') {
-        // Open program selection dialog
-        setCoursesToCopy(selectedCourses);
-        setShowProgramDialog(true);
+      try {
+        if (action === 'publish') {
+          // Update all selected courses to published
+          await Promise.all(
+            courseIds.map((id) =>
+              updateCourse({
+                variables: {
+                  id,
+                  changes: { published: true },
+                },
+              })
+            )
+          );
+          setSuccessMessage(
+            `Successfully published ${selectedCourses.length} course${selectedCourses.length > 1 ? 's' : ''}`
+          );
+          setShowSuccessNotification(true);
+        } else if (action === 'unpublish') {
+          // Update all selected courses to unpublished
+          await Promise.all(
+            courseIds.map((id) =>
+              updateCourse({
+                variables: {
+                  id,
+                  changes: { published: false },
+                },
+              })
+            )
+          );
+          setSuccessMessage(
+            `Successfully unpublished ${selectedCourses.length} course${selectedCourses.length > 1 ? 's' : ''}`
+          );
+          setShowSuccessNotification(true);
+        } else if (action === 'copy') {
+          // Open program selection dialog
+          setCoursesToCopy(selectedCourses);
+          setShowProgramDialog(true);
+        }
+      } catch (error) {
+        console.error(`Error during bulk ${action} action:`, error);
+        setErrorMessage(`Failed to ${action} courses. Please try again.`);
+        setShowErrorNotification(true);
       }
     },
     [updateCourse]
   );
 
   const bulkActions = [
-    { value: 'publish', label: translate('course-page:bulk_action_publish') },
-    { value: 'unpublish', label: translate('course-page:bulk_action_unpublish') },
-    { value: 'copy', label: translate('course-page:bulk_action_copy') },
+    { value: 'publish', label: t('bulk_action.publish') },
+    { value: 'unpublish', label: t('bulk_action.unpublish') },
+    { value: 'copy', label: t('bulk_action.copy') },
   ];
 
   const courseGroupOptions = useMemo(() => {
@@ -169,38 +218,56 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
 
   const handleAttendanceCertificatePossible = useCallback(
     async (c: AdminCourseList_Course, isPossible: boolean) => {
-      await updateAttendanceCertificatePossible({
-        variables: {
-          courseId: c.id,
-          isPossible,
-        },
-      });
+      try {
+        await updateAttendanceCertificatePossible({
+          variables: {
+            courseId: c.id,
+            isPossible,
+          },
+        });
+      } catch (error) {
+        console.error('Error updating attendance certificate setting:', error);
+        setErrorMessage('Failed to update attendance certificate setting');
+        setShowErrorNotification(true);
+      }
     },
     [updateAttendanceCertificatePossible]
   );
 
   const handleAchievementCertificatePossible = useCallback(
     async (c: AdminCourseList_Course, isPossible: boolean) => {
-      await updateAchievementCertificatePossible({
-        variables: {
-          courseId: c.id,
-          isPossible,
-        },
-      });
+      try {
+        await updateAchievementCertificatePossible({
+          variables: {
+            courseId: c.id,
+            isPossible,
+          },
+        });
+      } catch (error) {
+        console.error('Error updating achievement certificate setting:', error);
+        setErrorMessage('Failed to update achievement certificate setting');
+        setShowErrorNotification(true);
+      }
     },
     [updateAchievementCertificatePossible]
   );
 
   const handleApplicationEndChange = useCallback(
     (course: AdminCourseList_Course) => async (applicationEnd: Date | null) => {
-      await updateCourse({
-        variables: {
-          id: course.id,
-          changes: {
-            applicationEnd: applicationEnd ? applicationEnd.toISOString().split('T')[0] : null,
+      try {
+        await updateCourse({
+          variables: {
+            id: course.id,
+            changes: {
+              applicationEnd: applicationEnd ? applicationEnd.toISOString().split('T')[0] : null,
+            },
           },
-        },
-      });
+        });
+      } catch (error) {
+        console.error('Error updating application end date:', error);
+        setErrorMessage('Failed to update application end date');
+        setShowErrorNotification(true);
+      }
     },
     [updateCourse]
   );
@@ -330,7 +397,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
   const columns = useMemo<ColumnDef<AdminCourseList_Course>[]>(
     () => [
       {
-        header: t('table-header-published'),
+        header: t('table_header.published'),
         accessorKey: 'published',
         size: 70,
         meta: { className: 'text-center' },
@@ -338,13 +405,13 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
           <div className="flex justify-center">
             <div
               className={`w-3 h-3 rounded-full ${row.original.published ? 'bg-green-500' : 'bg-red-500'}`}
-              title={row.original.published ? t('course-page:published') : t('course-page:not_published')}
+              title={row.original.published ? t('table_header.published') : t('not_published')}
             />
           </div>
         ),
       },
       {
-        header: t('table-header-title'),
+        header: t('table_header.title'),
         accessorKey: 'title',
         size: 320,
         minSize: 250,
@@ -354,7 +421,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
               <InputField
                 variant="material"
                 type="input"
-                placeholder={translate('course-page:default-course-title')}
+                placeholder={t('default_course_title')}
                 itemId={row.original.id}
                 value={row.original.title || ''}
                 updateValueMutation={UPDATE_COURSE_PROPERTY}
@@ -364,36 +431,36 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
             <a
               href={`course/${row.original.id}`}
               className="text-blue-600 hover:text-blue-800 text-sm font-medium underline whitespace-nowrap"
-              title={t('course-page:view_course')}
+              title={t('view_course')}
             >
-              {t('course-page:view')}
+              {t('view')}
             </a>
           </div>
         ),
       },
       {
-        header: t('table-header-applications'),
+        header: t('table_header.applications'),
         accessorKey: 'applications',
         size: 100,
         meta: { className: 'text-center' },
         cell: ({ row }) => <div className="text-center">{getApplicationsCount(row.original)}</div>,
       },
       {
-        header: t('course-page:confirmed'),
+        header: t('table_header.confirmed'),
         accessorKey: 'confirmed',
         size: 100,
         meta: { className: 'text-center' },
         cell: ({ row }) => <div className="text-center">{getConfirmedCount(row.original)}</div>,
       },
       {
-        header: t('course-page:unrated_rated_not_informed'),
+        header: t('table_header.unrated_rated_not_informed'),
         accessorKey: 'unratedRatedNotInformed',
         size: 140,
         meta: { className: 'text-center' },
         cell: ({ row }) => <div className="text-center">{getUnratedAndRatedButNotInformed(row.original)}</div>,
       },
       {
-        header: t('course-page:application-end'),
+        header: t('table_header.application_end'),
         accessorKey: 'applicationEnd',
         size: 110,
         meta: { className: 'text-center' },
@@ -415,22 +482,14 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
         },
       },
       {
-        header: t('table-header-status'),
+        header: t('table_header.status'),
         accessorKey: 'status',
         size: 80,
         meta: { className: 'text-center' },
         cell: ({ row }) => <div className="text-center">{courseStatus(row.original.status)}</div>,
       },
     ],
-    [
-      t,
-      translate,
-      handleApplicationEndChange,
-      lang,
-      getApplicationsCount,
-      getConfirmedCount,
-      getUnratedAndRatedButNotInformed,
-    ]
+    [t, t, handleApplicationEndChange, lang, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed]
   );
 
   const handlePageSizeChange = useCallback(
@@ -468,6 +527,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
         refetchQueries={['AdminCourseList']}
         bulkActions={bulkActions}
         onBulkAction={handleBulkAction}
+        onAddButtonClick={handleAddCourse}
+        addButtonText={t('add_course_button')}
         expandableRowComponent={(props) => (
           <ExpandableCourseRow
             course={props.row}
@@ -480,8 +541,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
         deleteMutation={DELETE_A_COURSE}
         deleteIdType="number"
         generateDeletionConfirmationQuestion={(row) =>
-          t('manageCourses:delete_button.delete_course_confirmation', {
-            title: row.title || t('manageCourses:delete_button.untitled_course'),
+          t('delete_button.delete_course_confirmation', {
+            title: row.title || t('delete_button.untitled_course'),
           })
         }
       />
@@ -490,7 +551,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
         open={showProgramDialog}
         programs={programs}
         onClose={handleProgramDialogClose}
-        title={translate('course-page:copy_courses_to_program')}
+        title={t('copy_courses_to_program_dialog.title')}
       />
 
       <NotificationSnackbar
@@ -498,6 +559,13 @@ const ManageCoursesContent: FC<IProps> = ({ programs, t, updateFilter, currentFi
         onClose={() => setShowSuccessNotification(false)}
         message={successMessage}
         duration={4000}
+      />
+
+      <NotificationSnackbar
+        open={showErrorNotification}
+        onClose={() => setShowErrorNotification(false)}
+        message={errorMessage}
+        duration={6000}
       />
     </>
   );

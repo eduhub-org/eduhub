@@ -190,14 +190,5 @@
   "total_applications": "Bewerbungen (gesamt):",
   "accepted_applications": "Bewerbungen (angenommen):",
   "total_invitations": "Einladungen (gesamt):",
-  "confirmed_invitations": "Einladungen (bestätigt):",
-  "bulk_action_publish": "Ausgewählte veröffentlichen",
-  "bulk_action_unpublish": "Ausgewählte zurückziehen",
-  "published": "Veröffentlicht",
-  "not_published": "Nicht veröffentlicht",
-  "view_course": "Kurs anzeigen",
-  "view": "Anzeigen",
-  "confirmed": "Bestätigt",
-  "unrated_rated_not_informed": "Unbewertet / Bewertet aber nicht informiert",
-  "bulk_action_copy": "In Programm kopieren"
+  "confirmed_invitations": "Einladungen (bestätigt):"
 }

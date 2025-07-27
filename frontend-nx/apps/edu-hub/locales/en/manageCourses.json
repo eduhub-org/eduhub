@@ -1,11 +1,18 @@
 {
-  "table-header-published": "Published",
-  "table-header-title": "Title",
-  "table-header-instructor": "Instructor",
-  "table-header-applications": "Applications",
-  "table-header-application-status": "Confirmed/Invited/Applied",
-  "table-header-program": "Program",
-  "table-header-status": "Status",
+  "table_header": {
+    "published": "Published",
+    "title": "Title",
+    "instructor": "Instructor",
+    "applications": "Applications",
+    "confirmed": "Confirmed",
+    "unrated_rated_not_informed": "Unrated / Rated but not informed",
+    "application_end": "Application End",
+    "program": "Program",
+    "status": "Status"
+  },
+  "view": "View",
+  "not_published": "Not Published",
+  "default_course_title": "Untitled Course",
   "title": "Manage Courses",
   "tile_slider_group": {
     "label": "Tile Slider Group",
@@ -50,11 +57,19 @@
     "help_text": "Define what participants will achieve after completing this course. Write each learning goal on a new line without numbering. Use action verbs like 'understand', 'apply', 'analyze', 'create' (see: https://www.bloomstaxonomy.org).",
     "placeholder": "Understand the fundamentals of the topic\nApply key concepts in practical scenarios\nAnalyze complex problems and solutions\nCreate innovative approaches"
   },
+  "add_course_button": "Add Course",
   "delete_button": {
     "delete_course_confirmation": "Are you sure you want to delete the course '{{title}}'?",
     "untitled_course": "Untitled Course"
   },
-  "copy_courses_to_program": "Copy Courses to Program",
-  "select_target_program": "Select the target program where the courses should be copied:",
-  "copy_courses": "Copy Courses"
+  "bulk_action": {
+    "publish": "Publish Selected",
+    "unpublish": "Unpublish Selected",
+    "copy": "Copy to Program"
+  },
+  "copy_courses_to_program_dialog": {
+    "title": "Copy Courses to Program",
+    "description": "Select the target program where the courses should be copied:",
+    "button": "Copy Courses"
+  }
 }

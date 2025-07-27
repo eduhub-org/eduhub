@@ -1,11 +1,18 @@
 {
-  "table-header-published": "Veröffentlicht",
-  "table-header-title": "Titel",
-  "table-header-instructor": "Dozent",
-  "table-header-applications": "Bewerbungen",
-  "table-header-application-status": "Bestätigt/Eingeladen/Beworben",
-  "table-header-program": "Programm",
-  "table-header-status": "Status",
+  "table_header": {
+    "published": "Veröffent- licht",
+    "title": "Titel",
+    "instructor": "Dozent",
+    "applications": "Bewerbungen",
+    "confirmed": "Bestätigt",
+    "unrated_rated_not_informed": "Unbewertet / Bewertet aber nicht informiert",
+    "application_end": "Bewerbungs- ende",
+    "program": "Programm",
+    "status": "Status"
+  },
+  "view": "Anzeigen",
+  "not_published": "Nicht veröffentlicht",
+  "default_course_title": "Unbenannter Kurs",
   "title": "Kurse verwalten",
   "tile_slider_group": {
     "label": "Kachel-Slider Gruppe",
@@ -21,7 +28,7 @@
   },
   "registration_type": {
     "label": "Anmeldeart",
-    "help_text": "Wählen Sie aus, wie sich Teilnehmer für diesen Kurs anmelden können",
+    "help_text": "Wähle aus, wie sich Teilnehmer für diesen Kurs anmelden können",
     "options": {
       "APPROVAL_WITH_INPUT": "Genehmigung erforderlich mit Eingabe",
       "DIRECT_CONFIRMATION": "Direkte Bestätigung",
@@ -47,14 +54,22 @@
   },
   "learning_goals": {
     "label": "Lernziele",
-    "help_text": "Definieren Sie, was die Teilnehmer nach Abschluss dieses Kurses erreichen werden. Schreiben Sie jedes Lernziel in eine neue Zeile ohne Nummerierung. Verwenden Sie Handlungsverben wie 'verstehen', 'anwenden', 'analysieren', 'erstellen' (siehe: https://www.bloomstaxonomy.org).",
+    "help_text": "Definiere, was die Teilnehmer nach Abschluss dieses Kurses erreichen werden. Schreibe jedes Lernziel in eine neue Zeile ohne Nummerierung. Verwende Handlungsverben wie 'verstehen', 'anwenden', 'analysieren', 'erstellen' (siehe: https://www.bloomstaxonomy.org).",
     "placeholder": "Die Grundlagen des Themas verstehen\nSchlüsselkonzepte in praktischen Szenarien anwenden\nKomplexe Probleme und Lösungen analysieren\nInnovative Ansätze entwickeln"
   },
+  "add_course_button": "Kurs hinzufügen",
   "delete_button": {
-    "delete_course_confirmation": "Sind Sie sicher, dass Sie den Kurs '{{title}}' löschen möchten?",
+    "delete_course_confirmation": "Bist du sicher, dass du den Kurs '{{title}}' löschen möchtest?",
     "untitled_course": "Unbenannter Kurs"
   },
-  "copy_courses_to_program": "Kurse in Programm kopieren",
-  "select_target_program": "Wählen Sie das Zielprogramm aus, in das die Kurse kopiert werden sollen:",
-  "copy_courses": "Kurse kopieren"
+  "bulk_action": {
+    "publish": "Ausgewählte veröffentlichen",
+    "unpublish": "Ausgewählte zurückziehen",
+    "copy": "In Programm kopieren"
+  },
+  "copy_courses_to_program_dialog": {
+    "title": "Kurse in Programm kopieren",
+    "description": "Wähle das Zielprogramm aus, in das die Kurse kopiert werden sollen:",
+    "button": "Kurse kopieren"
+  }
 }

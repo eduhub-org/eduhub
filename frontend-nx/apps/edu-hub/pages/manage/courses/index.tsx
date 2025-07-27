@@ -89,7 +89,7 @@ const Content: FC<IProps> = ({ programs }) => {
         updateFilter={updateFilter}
         currentFilter={filter}
       />
-      <ManageCoursesContent programs={sortedPrograms} t={t} updateFilter={updateFilter} currentFilter={filter} />
+      <ManageCoursesContent programs={sortedPrograms} updateFilter={updateFilter} currentFilter={filter} />
     </div>
   );
 };

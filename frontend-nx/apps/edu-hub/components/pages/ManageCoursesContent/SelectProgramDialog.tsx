@@ -47,7 +47,7 @@ export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, progra
 
       <DialogContent>
         <div className="mb-4">
-          <p className="text-gray-600">{t('select_target_program')}</p>
+          <p className="text-gray-600">{t('copy_courses_to_program_dialog.description')}</p>
         </div>
 
         <div className="max-h-96 overflow-auto mb-6">
@@ -70,7 +70,7 @@ export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, progra
         <div className="flex justify-between">
           <Button onClick={handleCancel}>{t('cancel')}</Button>
           <Button filled onClick={handleConfirm} disabled={!selectedProgram}>
-            {t('copy_courses')}
+            {t('copy_courses_to_program_dialog.button')}
           </Button>
         </div>
       </DialogContent>
