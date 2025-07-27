@@ -30,9 +30,9 @@
     "label": "Registration Type",
     "help_text": "Select how participants can register for this course",
     "options": {
-      "APPROVAL_WITH_INPUT": "Approval Required with Input",
-      "DIRECT_CONFIRMATION": "Direct Confirmation",
-      "DIRECT_WITH_INPUT": "Direct with Input",
+      "APPROVAL_WITH_INPUT": "Approval Required with Application",
+      "DIRECT_CONFIRMATION": "Direct Confirmation without Motivation Text",
+      "DIRECT_WITH_INPUT": "Direct Confirmation with Motivation Text",
       "EXTERNAL_REGISTRATION": "External Registration"
     }
   },

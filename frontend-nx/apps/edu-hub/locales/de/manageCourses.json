@@ -30,9 +30,9 @@
     "label": "Anmeldeart",
     "help_text": "Wähle aus, wie sich Teilnehmer für diesen Kurs anmelden können",
     "options": {
-      "APPROVAL_WITH_INPUT": "Genehmigung erforderlich mit Eingabe",
-      "DIRECT_CONFIRMATION": "Direkte Bestätigung",
-      "DIRECT_WITH_INPUT": "Direkt mit Eingabe",
+      "APPROVAL_WITH_INPUT": "Zulassung mit Bewerbungsprozess",
+      "DIRECT_CONFIRMATION": "Direkte Zulassung ohne Motivationstext",
+      "DIRECT_WITH_INPUT": "Direkte Zulassung mit Motivationstext",
       "EXTERNAL_REGISTRATION": "Externe Anmeldung"
     }
   },
