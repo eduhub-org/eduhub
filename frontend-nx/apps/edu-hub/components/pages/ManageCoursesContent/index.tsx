@@ -39,6 +39,7 @@ import participantsRatedPie from '../../../public/images/course/status/participa
 import { CourseStatus_enum, LocationOption_enum } from '../../../__generated__/globalTypes';
 import InputField from '../../inputs/InputField';
 import { UPDATE_COURSE_PROPERTY, INSERT_COURSE } from '../../../queries/mutateCourse';
+import { UPDATE_COURSE_TITLE } from '../../../queries/course';
 import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
 import {
   InsertCourseWithLocation,
@@ -543,7 +544,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
                 placeholder={t('default_course_title')}
                 itemId={row.original.id}
                 value={row.original.title || ''}
-                updateValueMutation={UPDATE_COURSE_PROPERTY}
+                updateValueMutation={UPDATE_COURSE_TITLE}
                 refetchQueries={['AdminCourseList']}
               />
             </div>

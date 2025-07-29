@@ -14,7 +14,7 @@ import { useTableGrid } from '../../common/TableGrid/hooks';
 
 import {
   EMAIL_TEMPLATES_LIST,
-  UPDATE_EMAIL_TEMPLATE_SUBJECT,
+  UPDATE_EMAIL_TEMPLATE_SUBJECT_TEXT,
   UPDATE_EMAIL_TEMPLATE_CONTENT,
   DELETE_EMAIL_TEMPLATE,
 } from '../../../queries/emailTemplates';
@@ -161,25 +161,18 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
 
 const ManageEmailTemplatesContent: FC = () => {
   const { t } = useTranslation('manageEmailTemplates');
-  const [pageSize, setPageSize] = useState(15);
 
-  const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter } = useTableGrid({
+  const { data, loading, error, searchFilter, setSearchFilter } = useTableGrid({
     queryHook: useAdminQuery,
     query: EMAIL_TEMPLATES_LIST,
-    pageSize: pageSize,
+    pageSize: 50, // Fixed page size since pagination is disabled
     queryVariables: {},
     refetchFilter: (searchFilter: string) => ({
-      _or: [{ title: { _ilike: `%${searchFilter}%` } }, { subject: { _ilike: `%${searchFilter}%` } }],
+      where: {
+        _or: [{ title: { _ilike: `%${searchFilter}%` } }, { subject: { _ilike: `%${searchFilter}%` } }],
+      },
     }),
   });
-
-  const handlePageSizeChange = useCallback(
-    (newPageSize: number) => {
-      setPageSize(newPageSize);
-      setPageIndex(0);
-    },
-    [setPageIndex]
-  );
 
   const emailTemplates: EmailTemplateRow[] = data?.MailTemplate || [];
   const totalCount = data?.MailTemplate_aggregate?.aggregate?.count || 0;
@@ -196,11 +189,11 @@ const ManageEmailTemplatesContent: FC = () => {
       {
         header: t('columns.title'),
         accessorKey: 'title',
-        meta: { width: 3, className: 'whitespace-nowrap' },
+        meta: { width: 2, className: 'whitespace-nowrap' },
         cell: ({ row }) => (
-          <div className="flex mt-3">
-            <div className="w-full pt-3 pb-1 text-base text-gray-900 border-b border-gray-300 min-h-[32px] flex items-end">
-              {row.original.title}
+          <div className="flex items-center h-full py-3">
+            <div className="w-full px-3 text-base text-gray-900 font-medium">
+              {t(`template_types.${row.original.title}`, { fallback: row.original.title })}
             </div>
           </div>
         ),
@@ -208,7 +201,7 @@ const ManageEmailTemplatesContent: FC = () => {
       {
         header: t('columns.subject'),
         accessorKey: 'subject',
-        meta: { width: 4, className: 'whitespace-nowrap' },
+        meta: { width: 8, className: 'whitespace-nowrap' },
         cell: ({ row }) => (
           <InputField
             variant="material"
@@ -216,7 +209,7 @@ const ManageEmailTemplatesContent: FC = () => {
             placeholder={t('placeholders.subject')}
             itemId={row.original.id}
             value={row.original.subject || ''}
-            updateValueMutation={UPDATE_EMAIL_TEMPLATE_SUBJECT}
+            updateValueMutation={UPDATE_EMAIL_TEMPLATE_SUBJECT_TEXT}
             refetchQueries={['EmailTemplatesList']}
             helpText={t('help_text.subject')}
             className="!mb-0"
@@ -228,8 +221,8 @@ const ManageEmailTemplatesContent: FC = () => {
         accessorKey: 'updated_at',
         meta: { width: 1, className: 'whitespace-nowrap' },
         cell: ({ row }) => (
-          <div className="flex mt-3">
-            <div className="w-full pt-3 pb-1 text-base text-gray-900 border-b border-gray-300 text-right min-h-[32px] flex items-end justify-end">
+          <div className="flex items-center h-full py-3">
+            <div className="w-full px-3 text-base text-gray-900 text-right">
               {new Date(row.original.updated_at).toLocaleDateString()}
             </div>
           </div>
@@ -249,10 +242,9 @@ const ManageEmailTemplatesContent: FC = () => {
           columns={columns}
           data={emailTemplates}
           totalCount={totalCount}
-          pageIndex={pageIndex}
-          onPageChange={setPageIndex}
-          pageSize={pageSize}
-          onPageSizeChange={handlePageSizeChange}
+          enablePagination={false}
+          pageIndex={0}
+          onPageChange={() => {}}
           searchFilter={searchFilter}
           onSearchFilterChange={setSearchFilter}
           deleteMutation={DELETE_EMAIL_TEMPLATE}
