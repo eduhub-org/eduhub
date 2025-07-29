@@ -39,7 +39,7 @@ jobs:
 
       - name: Install yarn dependencies
         working-directory: frontend-nx
-        run: yarn install --immutable --immutable-cache
+        run: yarn install --immutable
 
       - name: Type check edu hub
         working-directory: frontend-nx
