@@ -45,6 +45,17 @@ Semantic release automatically updates versions in:
 - All `functions/*/package.json` files (serverless functions)
 - `CHANGELOG.md` (auto-generated changelog)
 
+## Workspace Version Synchronization
+
+**Critical for Monorepo Setup**: EduHub uses Yarn 3 workspaces, requiring version alignment:
+
+- **Semantic-release runs from `frontend-nx`** directory and auto-updates `frontend-nx/package.json`
+- **Root `package.json` is manually updated** via `prepareCmd` to prevent version drift
+- **All function packages sync** to the same version for consistency
+- **Prevents Yarn workspace resolution issues** and noisy diffs
+
+**Never manually edit version numbers** - the automated system keeps everything synchronized.
+
 ## Automated Processes
 
 - **Changelog Generation**: Automatic based on conventional commits
@@ -56,5 +67,7 @@ Semantic release automatically updates versions in:
 
 - Semantic release runs from the `frontend-nx` directory in the monorepo
 - The workflow requires conventional commit format for proper version determination
+- All version updates happen automatically - do not manually edit version numbers
+- The `[skip ci]` flag is automatically added to release commits to prevent infinite loops
 - All version updates happen automatically - do not manually edit version numbers
 - The `[skip ci]` flag is automatically added to release commits to prevent infinite loops
