@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - production
-      - staging  
+      - staging
       - develop
 
 permissions:
@@ -15,7 +15,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,16 +26,25 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'yarn'
-          cache-dependency-path: 'frontend-nx/yarn.lock'
+          node-version: "18"
+          cache: "yarn"
+          cache-dependency-path: "frontend-nx/yarn.lock"
 
       - name: Install dependencies
         working-directory: frontend-nx
         run: yarn install --frozen-lockfile
+
+      - name: Verify branch configuration
+        run: |
+          if [[ "${{ github.ref_name }}" != "production" && "${{ github.ref_name }}" != "staging" && "${{ github.ref_name }}" != "develop" ]]; then
+            echo "❌ Branch '${{ github.ref_name }}' is not configured for releases"
+            echo "✅ Configured branches: production, staging, develop"
+            exit 1
+          fi
 
       - name: Release
         working-directory: frontend-nx
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          timeout-minutes: 10
