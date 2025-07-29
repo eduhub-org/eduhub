@@ -27,7 +27,7 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "echo 'Updating version files for ${nextRelease.version}' && find ../functions -name 'package.json' -exec sed -i 's/\"version\": \"[^\"]*\"/\"version\": \"${nextRelease.version}\"/g' {} \\;",
+        "prepareCmd": "echo 'Updating version files for ${nextRelease.version}' && sed -i 's/\"version\": \"[^\"]*\"/\"version\": \"${nextRelease.version}\"/g' ../package.json && find ../functions -name 'package.json' -exec sed -i 's/\"version\": \"[^\"]*\"/\"version\": \"${nextRelease.version}\"/g' {} \\;",
         "publishCmd": "echo 'Published ${nextRelease.version} on ${nextRelease.channel}'"
       }
     ],
