@@ -69,5 +69,3 @@ Semantic release automatically updates versions in:
 - The workflow requires conventional commit format for proper version determination
 - All version updates happen automatically - do not manually edit version numbers
 - The `[skip ci]` flag is automatically added to release commits to prevent infinite loops
-- All version updates happen automatically - do not manually edit version numbers
-- The `[skip ci]` flag is automatically added to release commits to prevent infinite loops
