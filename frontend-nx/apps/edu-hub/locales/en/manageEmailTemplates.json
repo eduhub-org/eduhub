@@ -5,6 +5,14 @@
     "subject": "Email Subject Line",
     "updated_at": "Last Updated"
   },
+  "template_types": {
+    "APPLICATION_RECEIVED": "Application Received",
+    "APPLICATION_CONFIRMED": "Application Confirmed",
+    "SESSION_REMINDER": "Session Reminder",
+    "INVITE": "Invitation",
+    "DECLINE": "Application Declined",
+    "REGISTRATION_CONFIRMED": "Registration Confirmed"
+  },
   "placeholders": {
     "subject": "Enter email subject...",
     "body": "Start typing your email content here. Use the toolbar for formatting and quick placeholders..."

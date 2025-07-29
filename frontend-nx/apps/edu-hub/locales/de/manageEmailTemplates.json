@@ -5,6 +5,14 @@
     "subject": "E-Mail-Betreffzeile",
     "updated_at": "Zuletzt aktualisiert"
   },
+  "template_types": {
+    "APPLICATION_RECEIVED": "Bewerbung erhalten",
+    "APPLICATION_CONFIRMED": "Bewerbung bestätigt",
+    "SESSION_REMINDER": "Sitzungserinnerung",
+    "INVITE": "Einladung",
+    "DECLINE": "Bewerbung abgelehnt",
+    "REGISTRATION_CONFIRMED": "Registrierung bestätigt"
+  },
   "placeholders": {
     "subject": "E-Mail-Betreff eingeben...",
     "body": "Beginne hier mit deinem E-Mail-Inhalt. Nutze die Toolbar für Formatierung und schnelle Platzhalter..."

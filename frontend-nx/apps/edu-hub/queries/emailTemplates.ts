@@ -44,11 +44,39 @@ export const UPDATE_EMAIL_TEMPLATE_SUBJECT = gql`
   }
 `;
 
+// InputField-compatible mutation for email template subject
+export const UPDATE_EMAIL_TEMPLATE_SUBJECT_TEXT = gql`
+  mutation UpdateEmailTemplateSubjectText($itemId: Int!, $text: String!) {
+    update_MailTemplate_by_pk(
+      pk_columns: { id: $itemId },
+      _set: { subject: $text }
+    ) {
+      id
+      subject
+      updated_at
+    }
+  }
+`;
+
 export const UPDATE_EMAIL_TEMPLATE_CONTENT = gql`
   mutation UpdateEmailTemplateContent($id: Int!, $content: String!) {
     update_MailTemplate_by_pk(
       pk_columns: { id: $id },
       _set: { content: $content }
+    ) {
+      id
+      content
+      updated_at
+    }
+  }
+`;
+
+// InputField-compatible mutation for email template content
+export const UPDATE_EMAIL_TEMPLATE_CONTENT_TEXT = gql`
+  mutation UpdateEmailTemplateContentText($itemId: Int!, $text: String!) {
+    update_MailTemplate_by_pk(
+      pk_columns: { id: $itemId },
+      _set: { content: $text }
     ) {
       id
       content
