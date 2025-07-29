@@ -41,7 +41,7 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
 
   // Handle organization alias errors specifically
   const handleAliasError = useCallback(
-    (error: ApolloError, attemptedTags: string[]) => {
+    (error: ApolloError) => {
       // Check for duplicate alias constraint error
       if (error.message.includes('already exists in organization')) {
         // Extract the alias name and existing organization from the error message

@@ -126,6 +126,7 @@ const TableGrid = <T extends BaseRow>({
       ? [
           {
             id: 'selection',
+            size: 50, // Fixed width for checkbox column
             header: () => (
               <Checkbox
                 checked={isAllSelected(data)}
@@ -158,17 +159,28 @@ const TableGrid = <T extends BaseRow>({
         ]
       : [];
 
-    const dataColumns = columns.map((col) => ({ ...col }));
+    const dataColumns = columns.map((col) => ({
+      ...col,
+      // Backward compatibility: convert meta.width to size if size is not specified
+      size: col.size || (col.meta?.width ? col.meta.width * 100 : undefined),
+    }));
     return [...selectionColumn, ...dataColumns];
   }, [columns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, data, isAllSelected, isSomeSelected]);
 
   const table = useReactTable({
     data,
-    defaultColumn: { enableSorting: false },
+    defaultColumn: {
+      enableSorting: false,
+      size: 150, // Default column width
+      minSize: 50, // Minimum column width
+      maxSize: 800, // Maximum column width
+    },
     columns: memoizedColumns,
     filterFns: { fuzzy: fuzzyFilter },
     manualPagination: enablePagination,
     manualFiltering: true,
+    enableColumnResizing: true,
+    columnResizeMode: 'onChange',
     state: {
       sorting,
       globalFilter: searchFilter,
@@ -267,19 +279,23 @@ const TableGrid = <T extends BaseRow>({
       </div>
 
       {/* Header row */}
-      <div className="flex items-center mb-1 text-white">
-        <div className="flex-grow grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}>
+      <div className="flex items-center mb-1 text-white py-2">
+        <div className="flex-grow flex gap-3">
           {table.getHeaderGroups().map((headerGroup) => (
             <React.Fragment key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <div
                   key={header.id}
-                  className={`${header.column.columnDef.meta?.className} px-3 col-span-${header.column.columnDef.meta?.width || 1} relative flex items-center h-full`}
+                  className={`${header.column.columnDef.meta?.className} relative flex items-center h-12`}
+                  style={{
+                    width: `${header.getSize()}px`,
+                    flexShrink: 0,
+                  }}
                   onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
                 >
-                  <div className="flex items-center w-full">
+                  <div className="flex items-center w-full h-full">
                     {header.column.columnDef.header === '' ? null : (
-                      <div className="flex-grow">
+                      <div>
                         {header.column.id === 'selection'
                           ? flexRender(header.column.columnDef.header, header.getContext())
                           : typeof header.column.columnDef.header === 'string'
@@ -311,11 +327,15 @@ const TableGrid = <T extends BaseRow>({
             {/* Primary Row */}
             <div className={`flex items-stretch ${expandedRows.has(row.original.id) ? 'mb-0' : 'mb-1'}`}>
               <div className="flex-grow bg-edu-light-gray py-2">
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] items-center">
+                <div className="flex items-center gap-3">
                   {row.getVisibleCells().map((cell) => (
                     <div
                       key={cell.id}
-                      className={`${cell.column.columnDef.meta?.className} mr-3 ml-3 col-span-${cell.column.columnDef.meta?.width}`}
+                      className={`${cell.column.columnDef.meta?.className}`}
+                      style={{
+                        width: `${cell.column.getSize()}px`,
+                        flexShrink: 0,
+                      }}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </div>

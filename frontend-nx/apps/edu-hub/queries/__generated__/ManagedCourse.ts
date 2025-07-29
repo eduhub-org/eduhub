@@ -121,36 +121,40 @@ export interface ManagedCourse_Course_by_pk_Sessions {
 
 export interface ManagedCourse_Course_by_pk_CourseInstructors_Expert_User {
   __typename: "User";
+  id: any;
   /**
    * The user's first name
    */
   firstName: string;
   /**
-   * The user's profile picture
-   */
-  picture: string | null;
-  id: any;
-  /**
    * The user's last name
    */
   lastName: string;
   /**
+   * The user's profile picture
+   */
+  picture: string | null;
+  /**
    * A link to an external profile, for example in LinkedIn or Xing
    */
   externalProfile: string | null;
+  /**
+   * The user's email address
+   */
+  email: string;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseInstructors_Expert {
   __typename: "Expert";
   id: number;
   /**
-   * An object relationship
-   */
-  User: ManagedCourse_Course_by_pk_CourseInstructors_Expert_User;
-  /**
    * A short description on the expert's background
    */
   description: string | null;
+  /**
+   * An object relationship
+   */
+  User: ManagedCourse_Course_by_pk_CourseInstructors_Expert_User;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseInstructors {
