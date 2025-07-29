@@ -15,6 +15,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    if: ${{ github.ref_name == 'production' || github.ref_name == 'staging' || github.ref_name == 'develop' }}
 
     steps:
       - name: Checkout
@@ -34,17 +35,9 @@ jobs:
         working-directory: frontend-nx
         run: yarn install --frozen-lockfile
 
-      - name: Verify branch configuration
-        run: |
-          if [[ "${{ github.ref_name }}" != "production" && "${{ github.ref_name }}" != "staging" && "${{ github.ref_name }}" != "develop" ]]; then
-            echo "❌ Branch '${{ github.ref_name }}' is not configured for releases"
-            echo "✅ Configured branches: production, staging, develop"
-            exit 1
-          fi
-
       - name: Release
         working-directory: frontend-nx
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          timeout-minutes: 10
+        timeout-minutes: 10
