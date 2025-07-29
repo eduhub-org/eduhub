@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState, useCallback } from 'react';
+import React, { FC, useMemo, useCallback } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { ColumnDef } from '@tanstack/react-table';
 import DOMPurify from 'dompurify';
@@ -184,6 +184,11 @@ const ManageEmailTemplatesContent: FC = () => {
     [t]
   );
 
+  // No-op function for disabled pagination
+  const handlePageChange = useCallback(() => {
+    // Pagination is disabled, this function is only provided to satisfy TypeScript
+  }, []);
+
   const columns = useMemo<ColumnDef<EmailTemplateRow>[]>(
     () => [
       {
@@ -244,7 +249,7 @@ const ManageEmailTemplatesContent: FC = () => {
           totalCount={totalCount}
           enablePagination={false}
           pageIndex={0}
-          onPageChange={() => {}}
+          onPageChange={handlePageChange}
           searchFilter={searchFilter}
           onSearchFilterChange={setSearchFilter}
           deleteMutation={DELETE_EMAIL_TEMPLATE}
