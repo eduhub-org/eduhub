@@ -248,4 +248,237 @@ When you encounter `meta: { width: X }` in existing code:
 4.  **Styling Page Size Selector**:
     *   If the label for the page size selector ("Items per page") is truncated, you can adjust its width. The `FormControl` wrapping the selector in `TableGrid/index.tsx` (around line 370 in recent versions) has an `sx` prop with `minWidth`. Increase this value as needed (e.g., `minWidth: 170`).
 
-This guide should help you effectively integrate and use the `TableGrid` component with its pagination and page size features.
+## Advanced Usage Patterns & Critical Fixes
+
+### 🔧 Essential refetchFilter Fix for GraphQL Queries
+
+**CRITICAL**: The `useTableGrid` hook had a bug where `refetchFilter` passed a non-existent `filter` parameter to GraphQL queries. This fix is essential for search functionality to work:
+
+```typescript
+// ❌ BROKEN: Before fix in useTableGrid hook
+useEffect(() => {
+  debouncedRefetch({
+    offset: pageIndex * pageSize,
+    limit: pageSize,
+    filter: refetchFilter ? refetchFilter(searchFilter) : {}, // ❌ 'filter' param doesn't exist!
+    ...queryVariables,
+  });
+}, [/* deps */]);
+
+// ✅ FIXED: After fix in useTableGrid hook
+useEffect(() => {
+  const refetchVariables = refetchFilter ? refetchFilter(searchFilter) : {};
+  debouncedRefetch({
+    offset: pageIndex * pageSize,
+    limit: pageSize,
+    ...queryVariables,
+    ...refetchVariables, // ✅ Properly merged into queryVariables
+  });
+}, [/* deps */]);
+```
+
+### 🎯 Critical PageSize Synchronization
+
+**IMPORTANT**: The `pageSize` parameter must be synchronized between `useTableGrid` and `TableGrid` for pagination to work correctly:
+
+```typescript
+// ❌ WRONG: Causes pagination to break
+const { pageIndex, setPageIndex } = useTableGrid({
+  pageSize: QUERY_LIMIT, // Hardcoded value
+  queryVariables: filter,
+});
+
+return (
+  <TableGrid
+    pageSize={filter.limit} // Different value!
+    pageIndex={pageIndex}
+    onPageChange={setPageIndex}
+  />
+);
+
+// ✅ CORRECT: Synchronized values
+const { pageIndex, setPageIndex } = useTableGrid({
+  pageSize: filter.limit || QUERY_LIMIT, // Same value
+  queryVariables: filter,
+});
+
+return (
+  <TableGrid
+    pageSize={filter.limit || QUERY_LIMIT} // Same value
+    pageIndex={pageIndex}
+    onPageChange={setPageIndex}
+  />
+);
+```
+
+### 🔍 Proper Search Implementation with refetchFilter
+
+Use `refetchFilter` to combine search terms with existing filters:
+
+```typescript
+const { searchFilter, setSearchFilter } = useTableGrid({
+  queryHook: useAdminQuery,
+  query: YOUR_QUERY,
+  queryVariables: filter, // Base filter (e.g., program selection)
+  pageSize: filter.limit || QUERY_LIMIT,
+  debounceMs: 1000, // Configurable debounce time
+  refetchFilter: useCallback(
+    (searchTerm: string) => {
+      const searchWhere = searchTerm ? { title: { _ilike: `%${searchTerm}%` } } : {};
+      return {
+        where: {
+          ...filter.where, // Preserve existing filters
+          ...searchWhere,  // Add search filter
+        },
+      };
+    },
+    [filter.where] // Update when base filter changes
+  ),
+});
+
+// Pass search state to TableGrid
+<TableGrid
+  searchFilter={searchFilter}
+  onSearchFilterChange={setSearchFilter}
+  // ... other props
+/>
+```
+
+### ⚠️ Pagination State Management Pitfalls
+
+**Avoid offset conflicts** by letting `useTableGrid` handle pagination calculation:
+
+```typescript
+// ❌ WRONG: Creates offset conflicts
+const [filter, setFilter] = useState({
+  limit: 50,
+  offset: 0, // ❌ Don't manage offset manually
+  where: { /* filters */ }
+});
+
+// ✅ CORRECT: Let useTableGrid calculate offset
+const [filter, setFilter] = useState({
+  limit: 50,
+  // ❌ No offset property
+  where: { /* filters */ }
+});
+
+// useTableGrid calculates: offset = pageIndex * pageSize
+```
+
+**Reset pagination when filters change**:
+
+```typescript
+const handleFilterChange = useCallback((newFilter) => {
+  updateFilter(newFilter);
+  setPageIndex(0); // ✅ Reset to first page
+}, [updateFilter, setPageIndex]);
+```
+
+### 🚀 Configurable Debounce for Search
+
+The `useTableGrid` hook supports configurable debounce timing:
+
+```typescript
+const { searchFilter, setSearchFilter } = useTableGrid({
+  queryHook: useAdminQuery,
+  query: YOUR_QUERY,
+  queryVariables: filter,
+  pageSize: filter.limit || QUERY_LIMIT,
+  debounceMs: 1000, // ✅ Configurable (default: 300ms)
+  refetchFilter: /* ... */,
+});
+```
+
+**Recommended debounce times**:
+- **300ms**: Default, good for most cases
+- **600ms**: Slower typing, less aggressive
+- **1000ms**: Very conservative, good for expensive queries
+
+### 📋 Complete Implementation Example
+
+Here's a complete example incorporating all best practices:
+
+```typescript
+import { useState, useCallback, useMemo } from 'react';
+import { useTableGrid } from '../common/TableGrid/hooks';
+import TableGrid from '../common/TableGrid';
+
+const MyComponent = () => {
+  // Base filter state (no offset!)
+  const [filter, setFilter] = useState({
+    limit: 50,
+    where: { programId: { _eq: defaultProgramId } }
+  });
+
+  const updateFilter = useCallback((newState) => {
+    setFilter(newState);
+  }, []);
+
+  // TableGrid hook with proper configuration
+  const { data, loading, error, searchFilter, pageIndex, setSearchFilter, setPageIndex } = useTableGrid({
+    queryHook: useAdminQuery,
+    query: YOUR_QUERY,
+    queryVariables: filter,
+    pageSize: filter.limit || 50, // ✅ Synchronized
+    debounceMs: 1000,             // ✅ Configurable
+    refetchFilter: useCallback(
+      (searchTerm) => {
+        const searchWhere = searchTerm ? { title: { _ilike: `%${searchTerm}%` } } : {};
+        return {
+          where: {
+            ...filter.where, // ✅ Preserve base filters
+            ...searchWhere,  // ✅ Add search
+          },
+        };
+      },
+      [filter.where]
+    ),
+  });
+
+  // Handle filter changes with pagination reset
+  const handleFilterChange = useCallback((property) => {
+    updateFilter({
+      ...filter,
+      where: { programId: { _eq: property.key } },
+    });
+    setPageIndex(0); // ✅ Reset pagination
+  }, [filter, updateFilter, setPageIndex]);
+
+  // Handle page size changes
+  const handlePageSizeChange = useCallback((newPageSize) => {
+    updateFilter({
+      ...filter,
+      limit: newPageSize,
+    });
+    setPageIndex(0); // ✅ Reset pagination
+  }, [filter, updateFilter, setPageIndex]);
+
+  return (
+    <TableGrid
+      columns={columns}
+      data={data?.Course || []}
+      loading={loading}
+      error={error}
+      enablePagination={true}
+      totalCount={data?.Course_aggregate?.aggregate?.count || 0}
+      pageIndex={pageIndex}
+      onPageChange={setPageIndex}
+      pageSize={filter.limit || 50}        // ✅ Synchronized
+      onPageSizeChange={handlePageSizeChange}
+      searchFilter={searchFilter}          // ✅ From useTableGrid
+      onSearchFilterChange={setSearchFilter} // ✅ From useTableGrid
+      refetchQueries={['YourQueryName']}
+    />
+  );
+};
+```
+
+### 🎯 Key Takeaways
+
+1. **Always synchronize `pageSize`** between `useTableGrid` and `TableGrid`
+2. **Use `refetchFilter`** to combine search with existing filters  
+3. **Don't manage `offset` manually** - let `useTableGrid` calculate it
+4. **Reset pagination** when filters change
+5. **Configure debounce** based on query complexity
+6. **Apply the refetchFilter fix** to ensure search works with GraphQL
