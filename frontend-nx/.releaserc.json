@@ -18,7 +18,26 @@
   "repositoryUrl": "https://github.com/edu-hub-project/application",
   "plugins": [
     "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "angular",
+        "presetConfig": {
+          "types": [
+            {"type": "feat", "section": "Features"},
+            {"type": "fix", "section": "Bug Fixes"},
+            {"type": "docs", "section": "Documentation"},
+            {"type": "style", "section": "Styles"},
+            {"type": "refactor", "section": "Code Refactoring"},
+            {"type": "perf", "section": "Performance Improvements"},
+            {"type": "test", "section": "Tests"},
+            {"type": "build", "section": "Build System"},
+            {"type": "ci", "section": "Continuous Integration"},
+            {"type": "chore", "section": "Chores"}
+          ]
+        }
+      }
+    ],
     [
       "@semantic-release/changelog",
       {
@@ -44,6 +63,14 @@
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
-    "@semantic-release/github"
+    [
+      "@semantic-release/github",
+      {
+        "successComment": false,
+        "failTitle": false,
+        "releasedLabels": false,
+        "failComment": false
+      }
+    ]
   ]
 }
