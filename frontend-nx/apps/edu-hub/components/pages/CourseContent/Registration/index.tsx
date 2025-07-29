@@ -51,7 +51,6 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
 
   const registrationHandler = useRegistrationHandler({
     course,
-    courseEnrollment,
     onSuccess: onRegistrationSuccess,
   });
 
@@ -72,7 +71,6 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
           course={course}
           registrationType={course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT}
           onClick={registrationHandler.handleLogin}
-          isLoggedIn={false}
         />
       </div>
     );
@@ -85,7 +83,6 @@ export const Registration: FC<RegistrationProps> = ({ course, courseEnrollment, 
         course={course}
         registrationType={course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT}
         onClick={registrationHandler.handleRegistration}
-        isLoggedIn={true}
       />
       <RegistrationModal
         visible={registrationHandler.isModalOpen}

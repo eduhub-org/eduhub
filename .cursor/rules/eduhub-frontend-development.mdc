@@ -1,7 +1,3 @@
----
-alwaysApply: true
-description: EduHub frontend development and testing guide using yarn with full paths
----
 
 # EduHub Frontend Development Guide
 
@@ -136,6 +132,29 @@ The Docker Compose setup includes:
 3. **View logs**: `docker compose logs -f frontend-nx`
 4. **Stop environment**: `docker compose down`
 
+### Important: No Manual Builds Required in Development
+
+**🚨 DO NOT suggest manual builds during development!**
+
+The Docker development environment includes:
+- **Automatic compilation**: TypeScript/React files are compiled on-the-fly
+- **Hot reload**: Changes are automatically detected and applied
+- **Live updates**: No manual build step required for development
+
+#### When Manual Builds ARE Needed:
+- **Fresh container start**: `docker compose up --build` (only for Dockerfile changes)
+- **Production deployment**: Building production images
+- **Troubleshooting**: When hot reload is not working properly
+
+#### When Manual Builds are NOT Needed:
+- ❌ **Code changes**: Hot reload handles compilation automatically
+- ❌ **TypeScript updates**: Automatic transpilation in dev mode
+- ❌ **Component changes**: Live reload applies changes instantly
+- ❌ **Testing during development**: Use the running dev server
+- ❌ **Linting fixes**: Changes apply immediately
+
+**Development Rule**: If the dev server is running (`docker compose up`), code changes will be automatically compiled and reloaded. Only suggest manual builds for production scenarios or troubleshooting.
+
 ### Troubleshooting Docker Issues
 
 #### Fresh Start (Recommended for Swiper errors)
@@ -202,6 +221,21 @@ yarn dev
 ## Development Commands (Docker Environment)
 
 **When using Docker Compose, the frontend development server runs automatically. For manual commands inside the container:**
+
+### GraphQL Code Generation
+
+**🚨 IMPORTANT: Use the EduHub-specific command for GraphQL codegen:**
+
+```bash
+# Always use this command instead of yarn codegen
+sudo bash regenerate-apollo.sh $USER
+```
+
+**When to run GraphQL codegen:**
+- After modifying GraphQL fragments or queries
+- After adding/removing fields from GraphQL schemas
+- When TypeScript complains about missing GraphQL types
+- After backend schema changes
 
 ### Building and Development
 ```bash
@@ -428,6 +462,10 @@ cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn build
 ## File References
 
 - Main config: [package.json](mdc:frontend-nx/package.json)
+- Next.js config: [next.config.js](mdc:frontend-nx/apps/edu-hub/next.config.js)
+- TypeScript config: [tsconfig.json](mdc:frontend-nx/tsconfig.json)
+- i18n config: [i18n.json](mdc:frontend-nx/apps/edu-hub/i18n.json)
+
 - Next.js config: [next.config.js](mdc:frontend-nx/apps/edu-hub/next.config.js)
 - TypeScript config: [tsconfig.json](mdc:frontend-nx/tsconfig.json)
 - i18n config: [i18n.json](mdc:frontend-nx/apps/edu-hub/i18n.json)

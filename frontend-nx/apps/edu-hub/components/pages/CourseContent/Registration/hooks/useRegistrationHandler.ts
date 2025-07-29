@@ -3,7 +3,6 @@ import { signIn } from 'next-auth/react';
 
 import { CourseRegistrationType_enum, CourseEnrollmentStatus_enum } from '../../../../../__generated__/globalTypes';
 import { Course_Course_by_pk } from '../../../../../queries/__generated__/Course';
-import { CourseWithEnrollment_Course_by_pk_CourseEnrollments } from '../../../../../queries/__generated__/CourseWithEnrollment';
 import { useAuthedMutation } from '../../../../../hooks/authedMutation';
 import { useUserId } from '../../../../../hooks/user';
 import { UPDATE_ENROLLMENT } from '../../../../../queries/insertEnrollment';
@@ -16,8 +15,6 @@ import { getRegistrationTypeConfig, RegistrationFormData, RegistrationResult } f
 interface UseRegistrationHandlerProps {
   /** Course data containing registration configuration and details */
   course: Course_Course_by_pk;
-  /** Optional existing enrollment data for the current user */
-  courseEnrollment?: CourseWithEnrollment_Course_by_pk_CourseEnrollments;
   /** Optional callback function called after successful registration */
   onSuccess?: () => void;
 }
@@ -51,7 +48,6 @@ interface UseRegistrationHandlerProps {
  */
 export const useRegistrationHandler = ({
   course,
-  courseEnrollment,
   onSuccess,
 }: UseRegistrationHandlerProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);

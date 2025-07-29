@@ -5,14 +5,15 @@ export const COURSE_INSTRUCTOR_FRAGMENT = gql`
     id
     Expert {
       id
-      User {
-        firstName
-        picture
-        id
-        lastName
-        externalProfile
-      }
       description
+      User {
+        id
+        firstName
+        lastName
+        picture
+        externalProfile
+        email
+      }
     }
   }
 `;
