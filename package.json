@@ -1,5 +1,6 @@
 {
   "name": "eduhub-root",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "preinstall": "echo \"Please run package manager commands in the frontend-nx directory\" && exit 1"

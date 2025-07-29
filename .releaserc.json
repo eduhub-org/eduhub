@@ -1,0 +1,48 @@
+{
+  "branches": [
+    {
+      "name": "production",
+      "channel": "latest"
+    },
+    {
+      "name": "staging", 
+      "prerelease": "rc",
+      "channel": "staging"
+    },
+    {
+      "name": "develop",
+      "prerelease": "dev",
+      "channel": "develop"
+    }
+  ],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "CHANGELOG.md"
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "node scripts/update-versions.js \"${nextRelease.version}\"",
+        "publishCmd": "echo 'Published ${nextRelease.version} on ${nextRelease.channel}'"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "CHANGELOG.md",
+          "frontend-nx/package.json",
+          "package.json",
+          "functions/*/package.json"
+        ],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ],
+    "@semantic-release/github"
+  ]
+}

@@ -37,20 +37,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Nx Cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules/.cache/nx
-            .nx/cache
-          key: ${{ runner.os }}-nx-${{ hashFiles('yarn.lock') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-nx-${{ hashFiles('yarn.lock') }}-
-            ${{ runner.os }}-nx-
-
       - name: Install yarn dependencies
         working-directory: frontend-nx
-        run: yarn
+        run: yarn install --immutable
 
       - name: Type check edu hub
         working-directory: frontend-nx
