@@ -16,8 +16,6 @@
     }
   ],
   "repositoryUrl": "https://github.com/edu-hub-project/application",
-  "debug": false,
-  "dryRun": false,
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
