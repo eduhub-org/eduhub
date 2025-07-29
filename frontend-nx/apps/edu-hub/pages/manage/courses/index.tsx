@@ -2,7 +2,6 @@
 import path from 'path';
 path.resolve('./next.config.js');
 
-import useTranslation from 'next-translate/useTranslation';
 import Head from 'next/head';
 import ManageCoursesContent from '../../../components/pages/ManageCoursesContent';
 import { FC } from 'react';
