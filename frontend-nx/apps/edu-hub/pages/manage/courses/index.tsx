@@ -5,15 +5,13 @@ path.resolve('./next.config.js');
 import useTranslation from 'next-translate/useTranslation';
 import Head from 'next/head';
 import ManageCoursesContent from '../../../components/pages/ManageCoursesContent';
-import { FC, useCallback, useMemo, useState } from 'react';
-import CoursesHeader from '../../../components/pages/ManageCoursesContent/CoursesHeader';
+import { FC } from 'react';
 import Loading from '../../../components/common/Loading';
 import { Page } from '../../../components/layout/Page';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useIsAdmin, useIsLoggedIn } from '../../../hooks/authentication';
-import { AdminCourseListVariables } from '../../../queries/__generated__/AdminCourseList';
 import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../queries/programList';
-import { Programs, Programs_Program } from '../../../queries/__generated__/Programs';
+import { Programs } from '../../../queries/__generated__/Programs';
 
 const Index: FC = () => {
   const isAdmin = useIsAdmin();
@@ -36,7 +34,7 @@ export default Index;
 export const QUERY_LIMIT = 50;
 
 const CoursesDashBoard: FC = () => {
-  const programListRequest = useAdminQuery<Programs>(PROGRAMS_WITH_MINIMUM_PROPERTIES); // Load Program list from db
+  const programListRequest = useAdminQuery<Programs>(PROGRAMS_WITH_MINIMUM_PROPERTIES);
 
   if (programListRequest.error) {
     console.log(programListRequest.error);
@@ -44,52 +42,14 @@ const CoursesDashBoard: FC = () => {
   if (programListRequest.loading) {
     return <Loading />;
   }
-  const ps = [...(programListRequest?.data?.Program || [])];
-  return ps.length > 0 ? <Content programs={ps} /> : <></>;
-};
 
-interface IProps {
-  programs: Programs_Program[];
-}
-const Content: FC<IProps> = ({ programs }) => {
-  const sortedPrograms = useMemo(() => {
-    return [...programs].sort((a, b) => {
-      // Assign specific indices for 'EVENTS' and 'DEGREES'
-      const indexA = a.shortTitle === 'EVENTS' ? -2 : a.shortTitle === 'DEGREES' ? -1 : programs.indexOf(a);
-      const indexB = b.shortTitle === 'EVENTS' ? -2 : b.shortTitle === 'DEGREES' ? -1 : programs.indexOf(b);
-      // Sort based on these indices
-      return indexA - indexB;
-    });
-  }, [programs]);
+  const programs = [...(programListRequest?.data?.Program || [])];
 
-  const defaultProgram = sortedPrograms.find(
-    (program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES'
-  )?.id;
-  const { t } = useTranslation('course-page');
-
-  const [filter, setFilter] = useState<AdminCourseListVariables>({
-    limit: QUERY_LIMIT,
-    offset: 0,
-    where: { programId: { _eq: defaultProgram } },
-  });
-
-  const updateFilter = useCallback(
-    (newState: AdminCourseListVariables) => {
-      setFilter(newState);
-    },
-    [setFilter]
-  );
-
-  return (
+  return programs.length > 0 ? (
     <div className="max-w-screen-xl mx-auto">
-      <CoursesHeader
-        programs={sortedPrograms}
-        defaultProgramId={defaultProgram}
-        t={t}
-        updateFilter={updateFilter}
-        currentFilter={filter}
-      />
-      <ManageCoursesContent programs={sortedPrograms} updateFilter={updateFilter} currentFilter={filter} />
+      <ManageCoursesContent programs={programs} />
     </div>
+  ) : (
+    <></>
   );
 };

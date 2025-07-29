@@ -50,14 +50,94 @@ import { SelectProgramDialog } from './SelectProgramDialog';
 import { COPY_COURSES_TO_PROGRAM } from '../../../queries/copyCourse';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 
+// Header imports
+import CommonPageHeader from '../../common/CommonPageHeader';
+import { ProgramsMenubar } from '../../layout/ProgramsMenubar';
+import type { StaticComponentProperty } from '../../../types/UIComponents';
+
 interface IProps {
   programs: Programs_Program[];
-  updateFilter: (newState: AdminCourseListVariables) => void;
-  currentFilter: AdminCourseListVariables;
 }
 
-const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilter }) => {
+const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const { t, lang } = useTranslation('manageCourses');
+
+  // Calculate default program
+  const sortedPrograms = useMemo(() => {
+    return [...programs].sort((a, b) => {
+      // Assign specific indices for 'EVENTS' and 'DEGREES'
+      const indexA = a.shortTitle === 'EVENTS' ? -2 : a.shortTitle === 'DEGREES' ? -1 : programs.indexOf(a);
+      const indexB = b.shortTitle === 'EVENTS' ? -2 : b.shortTitle === 'DEGREES' ? -1 : programs.indexOf(b);
+      // Sort based on these indices
+      return indexA - indexB;
+    });
+  }, [programs]);
+
+  const defaultProgramId = sortedPrograms.find(
+    (program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES'
+  )?.id;
+
+  // Filter state management (single source of truth)
+  const [filter, setFilter] = useState<AdminCourseListVariables>({
+    limit: QUERY_LIMIT,
+    offset: 0,
+    where: { programId: { _eq: defaultProgramId } },
+  });
+
+  // Menubar configuration
+  const allTabId = -1;
+  const maxOtherPrograms = 3;
+
+  // Create programs list for menubar: EVENTS + DEGREES + 3 most recent others + All
+  const menubarPrograms: Programs_Program[] = useMemo(() => {
+    const programs: Programs_Program[] = [];
+
+    // First, add EVENTS and DEGREES if they exist (maintain their priority)
+    const eventsProgram = sortedPrograms.find((p) => p.shortTitle === 'EVENTS');
+    const degreesProgram = sortedPrograms.find((p) => p.shortTitle === 'DEGREES');
+
+    if (eventsProgram) programs.push(eventsProgram);
+    if (degreesProgram) programs.push(degreesProgram);
+
+    // Then, get other programs (excluding EVENTS and DEGREES)
+    const otherPrograms = sortedPrograms.filter((p) => p.shortTitle !== 'EVENTS' && p.shortTitle !== 'DEGREES');
+
+    // Take the most recent other programs (they should already be sorted by recency)
+    const recentOtherPrograms = otherPrograms.slice(0, maxOtherPrograms);
+    programs.push(...recentOtherPrograms);
+
+    // Add "All" option as a pseudo-program
+    programs.push({
+      id: allTabId,
+      shortTitle: 'All',
+      title: 'All',
+      __typename: 'Program',
+    } as Programs_Program);
+
+    return programs;
+  }, [sortedPrograms, allTabId, maxOtherPrograms]);
+
+  // Derive current program ID from filter (single source of truth)
+  const currentProgramId = filter.where?.programId?._eq ?? allTabId;
+
+  // Efficient filter update function
+  const updateFilter = useCallback((newState: AdminCourseListVariables) => {
+    setFilter(newState);
+  }, []);
+
+  // Handle program tab clicks
+  const handleTabClick = useCallback(
+    (property: StaticComponentProperty) => {
+      // Update the base filter with the new program selection
+      updateFilter({
+        ...filter,
+        where: property.key === allTabId ? {} : { programId: { _eq: property.key } },
+        offset: 0, // Reset pagination when changing programs
+      });
+      // Keep search term when switching programs
+    },
+    [filter, updateFilter, allTabId]
+  );
 
   // Dialog state for program selection
   const [showProgramDialog, setShowProgramDialog] = useState(false);
@@ -69,18 +149,26 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Use TableGrid hook for data management
+  // Use TableGrid hook with proper refetchFilter for search debouncing
   const { data, loading, error, searchFilter, pageIndex, setSearchFilter, setPageIndex } = useTableGrid({
     queryHook: useAdminQuery,
     query: ADMIN_COURSE_LIST,
-    queryVariables: currentFilter,
+    queryVariables: filter,
     pageSize: QUERY_LIMIT,
-    refetchFilter: (searchFilter) => ({
-      where: {
-        ...currentFilter.where,
-        ...(searchFilter ? { title: { _ilike: `%${searchFilter}%` } } : {}),
+    debounceMs: 1000, // Increased debounce time for search
+    refetchFilter: useCallback(
+      (searchTerm: string) => {
+        // Return the complete queryVariables including search
+        const searchWhere = searchTerm ? { title: { _ilike: `%${searchTerm}%` } } : {};
+        return {
+          where: {
+            ...filter.where, // Include current program filter
+            ...searchWhere, // Add search filter
+          },
+        };
       },
-    }),
+      [filter.where] // Update when program filter changes
+    ),
   });
 
   const courses: AdminCourseList_Course[] = data?.Course || [];
@@ -104,8 +192,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
 
   // Add course handler
   const handleAddCourse = useCallback(async () => {
-    const selectedProgramId = currentFilter.where.programId?._eq;
-    const selectedProgram = programs.find((program) => program.id === selectedProgramId);
+    const selectedProgramId = filter.where.programId?._eq;
+    const selectedProgram = sortedPrograms.find((program) => program.id === selectedProgramId);
 
     try {
       await insertCourse({
@@ -129,7 +217,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
       setErrorMessage(t('notifications.course_add_failed'));
       setShowErrorNotification(true);
     }
-  }, [currentFilter.where.programId?._eq, programs, insertCourse, t]);
+  }, [filter.where.programId?._eq, sortedPrograms, insertCourse, t]);
 
   // Bulk action handlers
   const handleBulkAction = useCallback(
@@ -527,13 +615,13 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
     (newPageSize: number) => {
       // Update the filter with new page size
       updateFilter({
-        ...currentFilter,
+        ...filter,
         limit: newPageSize,
         offset: 0,
       });
       setPageIndex(0);
     },
-    [currentFilter, updateFilter, setPageIndex]
+    [filter, updateFilter, setPageIndex]
   );
 
   if (loading) {
@@ -542,6 +630,16 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
 
   return (
     <>
+      <CommonPageHeader headline={t('course-page:coursesHeadline')} />
+      <div className="flex justify-start mb-5 text-white">
+        <ProgramsMenubar
+          programs={menubarPrograms}
+          defaultProgramId={defaultProgramId}
+          currentSelectedId={currentProgramId}
+          onTabClicked={handleTabClick}
+        />
+      </div>
+
       <TableGrid<AdminCourseList_Course>
         columns={columns}
         data={courses}
@@ -580,7 +678,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
 
       <SelectProgramDialog
         open={showProgramDialog}
-        programs={programs}
+        programs={sortedPrograms}
         onClose={handleProgramDialogClose}
         title={t('copy_courses_to_program_dialog.title')}
       />
