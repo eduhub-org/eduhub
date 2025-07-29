@@ -12,7 +12,6 @@ import {
   UPDATE_COURSE_HEADING_DESCRIPTION_1,
   UPDATE_COURSE_HEADING_DESCRIPTION_2,
   UPDATE_COURSE_LANGUAGE,
-  UPDATE_COURSE_LEARNING_GOALS,
   UPDATE_COURSE_MAX_PARTICIPANTS,
   UPDATE_COURSE_START_TIME,
   UPDATE_COURSE_WEEKDAY,
@@ -48,7 +47,6 @@ import {
 } from '../../../../queries/__generated__/InsertSessionAddress';
 import InputField from '../../../inputs/InputField';
 import DropDownSelector from '../../../inputs/DropDownSelector';
-import { useIsAdmin } from '../../../../hooks/authentication';
 import checkmark from '../../../../public/images/course/checkmark.svg';
 
 interface IProps {
@@ -59,7 +57,6 @@ interface IProps {
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const { error, handleError, resetError } = useErrorHandler();
   const { t } = useTranslation('course-page');
-  const isAdmin = useIsAdmin();
 
   const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_COURSE_LOCATION,

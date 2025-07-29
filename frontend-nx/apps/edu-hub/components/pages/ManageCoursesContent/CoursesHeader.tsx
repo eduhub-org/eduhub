@@ -20,7 +20,6 @@ const CoursesHeader: FC<IProps> = ({ programs, defaultProgramId, t, updateFilter
     <>
       <CommonPageHeader headline={t('coursesHeadline')} />
       <Menubar
-        t={t}
         programs={programs}
         defaultProgramId={defaultProgramId}
         updateFilter={updateFilter}
@@ -32,17 +31,16 @@ const CoursesHeader: FC<IProps> = ({ programs, defaultProgramId, t, updateFilter
 export default CoursesHeader;
 
 interface IMenubarProps {
-  t: any;
   programs: Programs_Program[];
   defaultProgramId: number;
   updateFilter: (newState: AdminCourseListVariables) => void;
   currentFilter: AdminCourseListVariables;
 }
 
-const Menubar: FC<IMenubarProps> = ({ t, programs, defaultProgramId, updateFilter, currentFilter }) => {
+const Menubar: FC<IMenubarProps> = ({ programs, defaultProgramId, updateFilter, currentFilter }) => {
   const allTabId = -1;
   const maxMenuCount = 3;
-  const [programID, setProgramID] = useState(defaultProgramId);
+  const [, setProgramID] = useState(defaultProgramId);
   // We will just show latest Three and all, Ignore the Unknown id (0)
   const customPrograms = programs.length > maxMenuCount ? programs.slice(0, maxMenuCount) : programs;
   const semesters: StaticComponentProperty[] = customPrograms.map((p) => {

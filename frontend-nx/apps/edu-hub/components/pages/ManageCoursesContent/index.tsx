@@ -37,7 +37,6 @@ import readyForApplicationPie from '../../../public/images/course/status/ready-f
 import applicantsInvitedPie from '../../../public/images/course/status/applicants-invited.svg';
 import participantsRatedPie from '../../../public/images/course/status/participants-rated.svg';
 import { CourseStatus_enum, LocationOption_enum } from '../../../__generated__/globalTypes';
-import { useRouter } from 'next/router';
 import InputField from '../../inputs/InputField';
 import { UPDATE_COURSE_PROPERTY, INSERT_COURSE } from '../../../queries/mutateCourse';
 import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
@@ -59,7 +58,6 @@ interface IProps {
 
 const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilter }) => {
   const { t, lang } = useTranslation('manageCourses');
-  const router = useRouter();
 
   // Dialog state for program selection
   const [showProgramDialog, setShowProgramDialog] = useState(false);
@@ -196,7 +194,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
         setShowErrorNotification(true);
       }
     },
-    [updateCourse]
+    [updateCourse, t]
   );
 
   const bulkActions = [
@@ -245,7 +243,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
         setShowErrorNotification(true);
       }
     },
-    [updateAttendanceCertificatePossible]
+    [updateAttendanceCertificatePossible, t]
   );
 
   const handleAchievementCertificatePossible = useCallback(
@@ -263,7 +261,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
         setShowErrorNotification(true);
       }
     },
-    [updateAchievementCertificatePossible]
+    [updateAchievementCertificatePossible, t]
   );
 
   const handleApplicationEndChange = useCallback(
@@ -283,7 +281,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
         setShowErrorNotification(true);
       }
     },
-    [updateCourse]
+    [updateCourse, t]
   );
 
   const handleProgramDialogClose = useCallback(
@@ -345,7 +343,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
 
       setCoursesToCopy([]);
     },
-    [coursesToCopy, copyCourses]
+    [coursesToCopy, copyCourses, t]
   );
 
   const courseStatus = (status: string) => {
@@ -389,7 +387,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
     }
   };
 
-  const getStatusCounts = (course: AdminCourseList_Course) => {
+  const getStatusCounts = useCallback((course: AdminCourseList_Course) => {
     const statusRecordsWithSum: { [key: string]: number } = {};
     course.CourseEnrollments.forEach((courseEn) => {
       statusRecordsWithSum[courseEn.CourseEnrollmentStatus.value] = statusRecordsWithSum[
@@ -399,24 +397,33 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
         : 1;
     });
     return statusRecordsWithSum;
-  };
+  }, []);
 
-  const getApplicationsCount = (course: AdminCourseList_Course) => {
-    const statusCounts = getStatusCounts(course);
-    return Object.keys(statusCounts).reduce((sum, key) => sum + statusCounts[key], 0);
-  };
+  const getApplicationsCount = useCallback(
+    (course: AdminCourseList_Course) => {
+      const statusCounts = getStatusCounts(course);
+      return Object.keys(statusCounts).reduce((sum, key) => sum + statusCounts[key], 0);
+    },
+    [getStatusCounts]
+  );
 
-  const getConfirmedCount = (course: AdminCourseList_Course) => {
-    const statusCounts = getStatusCounts(course);
-    return statusCounts[CourseEnrollmentStatus_enum.CONFIRMED] ?? 0;
-  };
+  const getConfirmedCount = useCallback(
+    (course: AdminCourseList_Course) => {
+      const statusCounts = getStatusCounts(course);
+      return statusCounts[CourseEnrollmentStatus_enum.CONFIRMED] ?? 0;
+    },
+    [getStatusCounts]
+  );
 
-  const getUnratedAndRatedButNotInformed = (course: AdminCourseList_Course) => {
-    const statusCounts = getStatusCounts(course);
-    const unrated = statusCounts[CourseEnrollmentStatus_enum.APPLIED] ?? 0;
-    const ratedButNotInformed = statusCounts[CourseEnrollmentStatus_enum.COMPLETED] ?? 0;
-    return `${unrated} / ${ratedButNotInformed}`;
-  };
+  const getUnratedAndRatedButNotInformed = useCallback(
+    (course: AdminCourseList_Course) => {
+      const statusCounts = getStatusCounts(course);
+      const unrated = statusCounts[CourseEnrollmentStatus_enum.APPLIED] ?? 0;
+      const ratedButNotInformed = statusCounts[CourseEnrollmentStatus_enum.COMPLETED] ?? 0;
+      return `${unrated} / ${ratedButNotInformed}`;
+    },
+    [getStatusCounts]
+  );
 
   const columns = useMemo<ColumnDef<AdminCourseList_Course>[]>(
     () => [
@@ -513,7 +520,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs, updateFilter, currentFilte
         cell: ({ row }) => <div className="text-center">{courseStatus(row.original.status)}</div>,
       },
     ],
-    [t, t, handleApplicationEndChange, lang, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed]
+    [t, handleApplicationEndChange, lang, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed]
   );
 
   const handlePageSizeChange = useCallback(

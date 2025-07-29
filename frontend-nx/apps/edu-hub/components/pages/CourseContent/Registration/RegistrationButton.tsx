@@ -18,8 +18,6 @@ interface RegistrationButtonProps {
   registrationType: CourseRegistrationType_enum;
   /** Callback function triggered when the registration button is clicked */
   onClick: () => void;
-  /** Whether the current user is authenticated/logged in */
-  isLoggedIn: boolean;
 }
 
 /**
@@ -43,7 +41,7 @@ interface RegistrationButtonProps {
  * @param props - The component props
  * @returns JSX element representing the registration button and deadline info
  */
-export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, registrationType, onClick, isLoggedIn }) => {
+export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, registrationType, onClick }) => {
   const { t, lang } = useTranslation('course');
   const config = getRegistrationTypeConfig(registrationType);
 

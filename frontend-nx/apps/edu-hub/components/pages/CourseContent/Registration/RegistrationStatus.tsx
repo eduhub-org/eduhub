@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-import { MdCheckCircle, MdHourglassEmpty, MdCancel, MdError, MdMailOutline, MdAccessTime } from 'react-icons/md';
+import { MdHourglassEmpty, MdCancel, MdError, MdMailOutline, MdAccessTime } from 'react-icons/md';
 
 import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';

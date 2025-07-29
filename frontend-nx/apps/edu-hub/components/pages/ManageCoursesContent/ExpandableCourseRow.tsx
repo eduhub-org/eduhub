@@ -1,7 +1,5 @@
 import { FC, useCallback, useRef, useState } from 'react';
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { IconButton } from '@mui/material';
 import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdUpload, MdAddCircle } from 'react-icons/md';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
@@ -23,7 +21,6 @@ import { UserForSelection1_User } from '../../../queries/__generated__/UserForSe
 import { SaveCourseImage, SaveCourseImageVariables } from '../../../queries/__generated__/SaveCourseImage';
 import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
 import { CourseRegistrationType_enum } from '../../../__generated__/globalTypes';
-import EhTag from '../../common/EhTag';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import { getPublicImageUrl, parseFileUploadEvent } from '../../../helpers/filehandling';
 import useTranslation from 'next-translate/useTranslation';
@@ -57,7 +54,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   onSetAttendanceCertificatePossible,
   onSetAchievementCertificatePossible,
 }) => {
-  const { t, lang } = useTranslation('course-page');
+  const { t } = useTranslation('course-page');
   const { error, handleError, resetError } = useErrorHandler();
 
   // Helper function
@@ -120,11 +117,11 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
       });
 
       if (response.errors) {
-        console.log(response.errors);
+        handleError(response.errors?.[0]?.message || t('operation_failed'));
         return;
       }
     },
-    [deleteInstructorAPI, course.id]
+    [deleteInstructorAPI, course.id, handleError, t]
   );
 
   const addInstructorHandler = useCallback(
@@ -144,7 +141,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
           },
         });
         if (newExpert.errors) {
-          console.log(newExpert.errors);
+          handleError(newExpert.errors?.[0]?.message || t('operation_failed'));
           closeInstructorDialog();
           return;
         }
@@ -169,14 +166,14 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
       });
 
       if (response.errors) {
-        console.log(response.errors);
+        handleError(response.errors?.[0]?.message || t('operation_failed'));
         closeInstructorDialog();
         return;
       }
 
       closeInstructorDialog();
     },
-    [insertExpertMutation, course, insertCourseInstructor, closeInstructorDialog]
+    [insertExpertMutation, course, insertCourseInstructor, closeInstructorDialog, handleError, t]
   );
 
   const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
