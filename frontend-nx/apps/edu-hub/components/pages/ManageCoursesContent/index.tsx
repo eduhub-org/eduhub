@@ -80,7 +80,6 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   // Filter state management (single source of truth)
   const [filter, setFilter] = useState<AdminCourseListVariables>({
     limit: QUERY_LIMIT,
-    offset: 0,
     where: { programId: { _eq: defaultProgramId } },
   });
 
@@ -125,36 +124,12 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     setFilter(newState);
   }, []);
 
-  // Handle program tab clicks
-  const handleTabClick = useCallback(
-    (property: StaticComponentProperty) => {
-      // Update the base filter with the new program selection
-      updateFilter({
-        ...filter,
-        where: property.key === allTabId ? {} : { programId: { _eq: property.key } },
-        offset: 0, // Reset pagination when changing programs
-      });
-      // Keep search term when switching programs
-    },
-    [filter, updateFilter, allTabId]
-  );
-
-  // Dialog state for program selection
-  const [showProgramDialog, setShowProgramDialog] = useState(false);
-  const [coursesToCopy, setCoursesToCopy] = useState<AdminCourseList_Course[]>([]);
-
-  // Notification state
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [showErrorNotification, setShowErrorNotification] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
   // Use TableGrid hook with proper refetchFilter for search debouncing
   const { data, loading, error, searchFilter, pageIndex, setSearchFilter, setPageIndex } = useTableGrid({
     queryHook: useAdminQuery,
     query: ADMIN_COURSE_LIST,
     queryVariables: filter,
-    pageSize: QUERY_LIMIT,
+    pageSize: filter.limit || QUERY_LIMIT, // Use actual page size for offset calculations
     debounceMs: 1000, // Increased debounce time for search
     refetchFilter: useCallback(
       (searchTerm: string) => {
@@ -170,6 +145,31 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
       [filter.where] // Update when program filter changes
     ),
   });
+
+  // Handle program tab clicks (moved after useTableGrid to access setPageIndex)
+  const handleTabClick = useCallback(
+    (property: StaticComponentProperty) => {
+      // Update the base filter with the new program selection
+      updateFilter({
+        ...filter,
+        where: property.key === allTabId ? {} : { programId: { _eq: property.key } },
+      });
+      // Reset pagination state when switching programs
+      setPageIndex(0);
+      // Keep search term when switching programs
+    },
+    [filter, updateFilter, allTabId, setPageIndex]
+  );
+
+  // Dialog state for program selection
+  const [showProgramDialog, setShowProgramDialog] = useState(false);
+  const [coursesToCopy, setCoursesToCopy] = useState<AdminCourseList_Course[]>([]);
+
+  // Notification state
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const courses: AdminCourseList_Course[] = data?.Course || [];
   const totalCount = data?.Course_aggregate?.aggregate?.count || 0;
@@ -613,11 +613,10 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
 
   const handlePageSizeChange = useCallback(
     (newPageSize: number) => {
-      // Update the filter with new page size
+      // Update the filter with new page size (useTableGrid handles offset)
       updateFilter({
         ...filter,
         limit: newPageSize,
-        offset: 0,
       });
       setPageIndex(0);
     },
@@ -649,7 +648,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         totalCount={totalCount}
         pageIndex={pageIndex}
         onPageChange={setPageIndex}
-        pageSize={QUERY_LIMIT}
+        pageSize={filter.limit || QUERY_LIMIT}
         onPageSizeChange={handlePageSizeChange}
         searchFilter={searchFilter}
         onSearchFilterChange={setSearchFilter}
