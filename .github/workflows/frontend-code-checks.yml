@@ -41,7 +41,6 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            frontend-nx/.yarn/cache
             frontend-nx/node_modules/.cache/nx
             frontend-nx/.nx/cache
           key: ${{ runner.os }}-yarn-${{ hashFiles('frontend-nx/yarn.lock') }}-${{ github.sha }}
