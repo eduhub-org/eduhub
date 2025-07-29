@@ -37,17 +37,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Yarn Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            frontend-nx/node_modules/.cache/nx
-            frontend-nx/.nx/cache
-          key: ${{ runner.os }}-yarn-${{ hashFiles('frontend-nx/yarn.lock') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-${{ hashFiles('frontend-nx/yarn.lock') }}-
-            ${{ runner.os }}-yarn-
-
       - name: Install yarn dependencies
         working-directory: frontend-nx
         run: yarn install --immutable --immutable-cache
