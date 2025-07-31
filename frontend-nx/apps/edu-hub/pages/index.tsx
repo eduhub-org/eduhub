@@ -8,6 +8,7 @@ import { ClientOnly } from '@opencampus/shared-components';
 import { Page } from '../components/layout/Page';
 import Loading from '../components/common/Loading';
 import TileSlider from '../components/common/TileSlider';
+import FaqSection from '../components/common/FaqSection';
 
 import { useAuthedQuery, useInstructorQuery } from '../hooks/authedQuery';
 import { useIsLoggedIn, useIsInstructor, useIsAdmin } from '../hooks/authentication';
@@ -124,6 +125,13 @@ const Home: FC = () => {
               {renderCourseGroups(coursesGroups, 'coursesGroups')}
             </ClientOnly>
           )}
+        </div>
+
+        {/* FAQ Section */}
+        <div className="max-w-screen-xl mx-auto px-3 md:px-16 py-16">
+          <ClientOnly>
+            <FaqSection collection="default" />
+          </ClientOnly>
         </div>
       </Page>
     </>
