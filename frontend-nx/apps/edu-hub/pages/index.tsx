@@ -27,53 +27,67 @@ const Home: FC = () => {
   const isAdmin = useIsAdmin();
   const userId = useUserId();
 
-  const { data: adminCoursesData, loading: adminCoursesLoading } = useInstructorQuery<CoursesByInstructor>(COURSES_BY_INSTRUCTOR, {
-    variables: { userId },
-    skip: !isLoggedIn || !(isInstructor || isAdmin),
-  });
+  const { data: adminCoursesData, loading: adminCoursesLoading } = useInstructorQuery<CoursesByInstructor>(
+    COURSES_BY_INSTRUCTOR,
+    {
+      variables: { userId },
+      skip: !isLoggedIn || !(isInstructor || isAdmin),
+    }
+  );
 
-  const { data: enrolledCoursesData, loading: enrolledCoursesLoading } = useAuthedQuery<CoursesEnrolledByUser>(COURSES_ENROLLED_BY_USER, {
-    variables: { userId },
-    skip: !isLoggedIn,
-  });
+  const { data: enrolledCoursesData, loading: enrolledCoursesLoading } = useAuthedQuery<CoursesEnrolledByUser>(
+    COURSES_ENROLLED_BY_USER,
+    {
+      variables: { userId },
+      skip: !isLoggedIn,
+    }
+  );
 
   const { data: coursesData, loading: coursesLoading } = useQuery<CourseTiles>(COURSE_TILES);
 
   const { data: courseGroupOptionsData } = useAuthedQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS);
 
-const myAdminCourses = useMemo(() => adminCoursesData?.Course ?? [], [adminCoursesData]);
-const myCourses = useMemo(() => enrolledCoursesData?.Course ?? [], [enrolledCoursesData]);
-const publishedCourses = useMemo(() => coursesData?.Course ?? [], [coursesData]);
+  const myAdminCourses = useMemo(() => adminCoursesData?.Course ?? [], [adminCoursesData]);
+  const myCourses = useMemo(() => enrolledCoursesData?.Course ?? [], [enrolledCoursesData]);
+  const publishedCourses = useMemo(() => coursesData?.Course ?? [], [coursesData]);
 
-  const coursesGroupsAuthenticated = useMemo(() => [
-    { title: 'myAdminCourses', courses: myAdminCourses, isManaged: true },
-    { title: 'myCourses', courses: myCourses, isManaged: false },
-  ], [myAdminCourses, myCourses]);
+  const coursesGroupsAuthenticated = useMemo(
+    () => [
+      { title: 'myAdminCourses', courses: myAdminCourses, isManaged: true },
+      { title: 'myCourses', courses: myCourses, isManaged: false },
+    ],
+    [myAdminCourses, myCourses]
+  );
 
-  const coursesGroups = useMemo(() => [1, 2, 3, 4, 5].map((order) => {
-    const filteredCourses = publishedCourses.filter((course) =>
-      course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.order === order)
-    );
-    const title = courseGroupOptionsData?.CourseGroupOption[order - 1]?.title;
-    return {
-      title,
-      courses: filteredCourses,
-    };
-  }), [publishedCourses, courseGroupOptionsData]);
+  const coursesGroups = useMemo(
+    () =>
+      [1, 2, 3, 4, 5].map((order) => {
+        const filteredCourses = publishedCourses.filter((course) =>
+          course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.order === order)
+        );
+        const title = courseGroupOptionsData?.CourseGroupOption[order - 1]?.title;
+        return {
+          title,
+          courses: filteredCourses,
+        };
+      }),
+    [publishedCourses, courseGroupOptionsData]
+  );
 
   const renderCourseGroups = (groups, groupKey) => (
     <>
-      {groups.map((group, index) =>
-        group.courses.length > 0 && (
-          <Fragment key={`${groupKey}-${index}`}>
-            <h2 id={`sliderGroup${index + 1}`} className="text-2xl font-semibold text-left ml-3 md:ml-0">
-              {t(group.title)}
-            </h2>
-            <div className="mt-2 mb-12">
-              <TileSlider courses={group.courses} isManage={group.isManaged ?? false} />
-            </div>
-          </Fragment>
-        )
+      {groups.map(
+        (group, index) =>
+          group.courses.length > 0 && (
+            <Fragment key={`${groupKey}-${index}`}>
+              <h2 id={`sliderGroup${index + 1}`} className="text-2xl font-semibold text-left ml-3 md:ml-0">
+                {t(`common:course_group_options.${group.title}`)}
+              </h2>
+              <div className="mt-2 mb-12">
+                <TileSlider courses={group.courses} isManage={group.isManaged ?? false} />
+              </div>
+            </Fragment>
+          )
       )}
     </>
   );

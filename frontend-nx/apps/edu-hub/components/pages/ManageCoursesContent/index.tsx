@@ -297,7 +297,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
       return (
         data.CourseGroupOption?.map((option) => ({
           id: option.id,
-          name: t(option.title),
+          name: t(`common:course_group_options.${option.title}`),
         })) || []
       );
     } else {
@@ -363,6 +363,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
               applicationEnd: applicationEnd ? applicationEnd.toISOString().split('T')[0] : null,
             },
           },
+          refetchQueries: ['AdminCourseList'],
         });
       } catch (error) {
         console.error('Error updating application end date:', error);
