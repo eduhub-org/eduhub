@@ -1,6 +1,6 @@
 -- Create FAQ collections table
 CREATE TABLE "public"."FaqCollection" (
-  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
+  "id" serial NOT NULL,
   "name" text NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT now(),
   "updated_at" timestamptz NOT NULL DEFAULT now(),

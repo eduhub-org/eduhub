@@ -1,7 +1,7 @@
 -- Create FAQ translations table
 CREATE TABLE "public"."FaqTranslation" (
-  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
-  "faqId" uuid NOT NULL,
+  "id" serial NOT NULL,
+  "faqId" integer NOT NULL,
   "lang" text NOT NULL,
   "question" text NOT NULL,
   "answer" text NOT NULL,

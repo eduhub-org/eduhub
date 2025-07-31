@@ -10,7 +10,9 @@ export const APP_SETTINGS = gql`
       bannerTextDe
       bannerTextEn
       previewImageURL
-      timeZone  
+      timeZone
+      showFaqSection
+      faqCollectionName
     }
   }
 `;
@@ -49,4 +51,39 @@ export const UPDATE_APP_SETTINGS_BANNER = gql`
     bannerTextDe
   }
 }
+`;
+
+export const UPDATE_APP_SETTINGS_FAQ_VISIBILITY = gql`
+  mutation UpdateFaqVisibility($appName: String!, $value: Boolean!) {
+    update_AppSettings_by_pk(
+      pk_columns: { appName: $appName }
+      _set: { showFaqSection: $value }
+    ) {
+      appName
+      showFaqSection
+      faqCollectionName
+    }
+  }
+`;
+
+export const UPDATE_APP_SETTINGS_FAQ_COLLECTION = gql`
+  mutation UpdateFaqCollection($appName: String!, $value: String!) {
+    update_AppSettings_by_pk(
+      pk_columns: { appName: $appName }
+      _set: { faqCollectionName: $value }
+    ) {
+      appName
+      showFaqSection
+      faqCollectionName
+    }
+  }
+`;
+
+export const FAQ_COLLECTIONS = gql`
+  query FaqCollections {
+    FaqCollection(order_by: { name: asc }) {
+      id
+      name
+    }
+  }
 `;

@@ -9,7 +9,7 @@
 
 export interface GetFaqsByCollectionAndLang_FaqCollection_Faqs_FaqTranslations {
   __typename: "FaqTranslation";
-  id: any;
+  id: number;
   lang: string;
   question: string;
   answer: string;
@@ -17,7 +17,7 @@ export interface GetFaqsByCollectionAndLang_FaqCollection_Faqs_FaqTranslations {
 
 export interface GetFaqsByCollectionAndLang_FaqCollection_Faqs_FaqTranslations_fallback {
   __typename: "FaqTranslation";
-  id: any;
+  id: number;
   lang: string;
   question: string;
   answer: string;
@@ -25,7 +25,7 @@ export interface GetFaqsByCollectionAndLang_FaqCollection_Faqs_FaqTranslations_f
 
 export interface GetFaqsByCollectionAndLang_FaqCollection_Faqs {
   __typename: "Faq";
-  id: any;
+  id: number;
   /**
    * An array relationship
    */
@@ -38,7 +38,7 @@ export interface GetFaqsByCollectionAndLang_FaqCollection_Faqs {
 
 export interface GetFaqsByCollectionAndLang_FaqCollection {
   __typename: "FaqCollection";
-  id: any;
+  id: number;
   name: string;
   /**
    * An array relationship

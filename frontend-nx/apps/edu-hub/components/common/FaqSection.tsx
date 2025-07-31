@@ -8,7 +8,7 @@ import { GetFaqsByCollectionAndLang } from '../../queries/__generated__/GetFaqsB
 import Loading from './Loading';
 
 interface FaqItem {
-  id: string;
+  id: number;
   question: string;
   answer: string;
   lang: string;

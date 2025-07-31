@@ -1,7 +1,7 @@
 -- Create FAQs table
 CREATE TABLE "public"."Faq" (
-  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
-  "collectionId" uuid NOT NULL,
+  "id" serial NOT NULL,
+  "collectionId" integer NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT now(),
   "updated_at" timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY ("id")
