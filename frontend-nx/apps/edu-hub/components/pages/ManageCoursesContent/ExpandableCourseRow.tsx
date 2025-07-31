@@ -293,7 +293,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               insertValueMutation={INSERT_COURSE_GROUP_TAG}
               deleteValueMutation={DELETE_COURSE_GROUP_TAG}
               refetchQueries={['AdminCourseList']}
-              optionsTranslationPrefix="start-page:"
             />
 
             {/* 5. Cover Image Upload */}

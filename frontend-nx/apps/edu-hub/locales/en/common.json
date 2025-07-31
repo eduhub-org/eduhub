@@ -201,5 +201,12 @@
       "achievement_options": "achievement options",
       "users": "users"
     }
+  },
+  "course_group_options": {
+    "tech_coding": "Tech & Coding",
+    "business_startup": "Business & Startup",
+    "creative_social_sustainable": "Creative, Social & Sustainable",
+    "degree": "Degrees",
+    "event": "Events"
   }
 }
