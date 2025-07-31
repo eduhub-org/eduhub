@@ -1,0 +1,80 @@
+{
+  "branches": [
+    {
+      "name": "production",
+      "channel": "latest"
+    },
+    {
+      "name": "staging",
+      "prerelease": "rc",
+      "channel": "staging"
+    },
+    {
+      "name": "develop",
+      "prerelease": "dev",
+      "channel": "develop"
+    }
+  ],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "conventionalcommits",
+        "presetConfig": {
+          "types": [
+            {"type": "feat", "section": "Features"},
+            {"type": "fix", "section": "Bug Fixes"},
+            {"type": "perf", "section": "Performance Improvements"},
+            {"type": "revert", "section": "Reverts"},
+            {"type": "docs", "hidden": true},
+            {"type": "style", "hidden": true},
+            {"type": "chore", "hidden": true},
+            {"type": "refactor", "hidden": true},
+            {"type": "test", "hidden": true},
+            {"type": "build", "hidden": true},
+            {"type": "ci", "hidden": true}
+          ]
+        },
+        "writerOpts": {
+          "commitsSort": ["subject", "scope"]
+        }
+      }
+    ],
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "CHANGELOG.md"
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "node scripts/update-versions.js \"${nextRelease.version}\"",
+        "publishCmd": "echo 'Published ${nextRelease.version} on ${nextRelease.channel}'"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "CHANGELOG.md",
+          "frontend-nx/package.json",
+          "package.json",
+          "functions/*/package.json"
+        ],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "successComment": false,
+        "failTitle": false,
+        "failComment": false,
+        "releasedLabels": false,
+        "addReleases": "bottom"
+      }
+    ]
+  ]
+}

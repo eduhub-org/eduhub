@@ -1,0 +1,71 @@
+---
+alwaysApply: true
+description: "Semantic release workflow, branch structure, and automated version management for EduHub"
+---
+
+# Semantic Release Workflow
+
+EduHub uses automated semantic versioning with a three-branch workflow for consistent release management.
+
+## Branch Structure
+
+- **`develop`** - Main development branch
+  - All feature branches merge here
+  - Creates development releases: `0.1.0-dev.1`, `0.1.0-dev.2`, etc.
+  - Automatically deployed to development environment
+
+- **`staging`** - Pre-production testing branch  
+  - PRs from `develop` to `staging` for release candidates
+  - Creates release candidate versions: `0.1.0-rc.1`, `0.1.0-rc.2`, etc.
+  - Automatically deployed to staging environment
+  - Used for final testing before production
+
+- **`production`** - Production releases
+  - PRs from `staging` to `production` for final releases
+  - Creates final release versions: `0.1.0`, `0.2.0`, etc.
+  - Automatically deployed to production environment
+
+## Release Flow
+
+1. **Development**: Feature branches → `develop` → `0.1.0-dev.x`
+2. **Staging**: PR `develop` → `staging` → `0.1.0-rc.x`
+3. **Production**: PR `staging` → `production` → `0.1.0`
+
+## Configuration Files
+
+- **[frontend-nx/.releaserc.json](mdc:frontend-nx/.releaserc.json)** - Semantic release configuration
+- **[.github/workflows/release.yml](mdc:.github/workflows/release.yml)** - GitHub Actions workflow
+- **[CONTRIBUTING.md](mdc:CONTRIBUTING.md)** - Contribution guidelines with commit conventions
+
+## Version Management
+
+Semantic release automatically updates versions in:
+- `frontend-nx/package.json` (main frontend package)
+- `package.json` (root workspace package)
+- All `functions/*/package.json` files (serverless functions)
+- `CHANGELOG.md` (auto-generated changelog)
+
+## Workspace Version Synchronization
+
+**Critical for Monorepo Setup**: EduHub uses Yarn 3 workspaces, requiring version alignment:
+
+- **Semantic-release runs from `frontend-nx`** directory and auto-updates `frontend-nx/package.json`
+- **Root `package.json` is manually updated** via `prepareCmd` to prevent version drift
+- **All function packages sync** to the same version for consistency
+- **Prevents Yarn workspace resolution issues** and noisy diffs
+
+**Never manually edit version numbers** - the automated system keeps everything synchronized.
+
+## Automated Processes
+
+- **Changelog Generation**: Automatic based on conventional commits
+- **GitHub Releases**: Created with release notes
+- **Git Tags**: Applied with proper versioning
+- **Version Bumping**: Based on commit message types
+
+## Important Notes
+
+- Semantic release runs from the `frontend-nx` directory in the monorepo
+- The workflow requires conventional commit format for proper version determination
+- All version updates happen automatically - do not manually edit version numbers
+- The `[skip ci]` flag is automatically added to release commits to prevent infinite loops
