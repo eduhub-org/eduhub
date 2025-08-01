@@ -1,0 +1,1 @@
+-- This migration is intentionally empty as the group options are added as seed data 
