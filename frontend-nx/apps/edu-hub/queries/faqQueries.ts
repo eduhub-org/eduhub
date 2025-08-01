@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { GetFaqsByCollectionAndLang, GetFaqsByCollectionAndLangVariables } from "./__generated__/GetFaqsByCollectionAndLang";
 
 export const GET_FAQS_BY_COLLECTION_AND_LANG = gql`
   query GetFaqsByCollectionAndLang($collection: String!, $lang: String!) {
@@ -13,7 +14,7 @@ export const GET_FAQS_BY_COLLECTION_AND_LANG = gql`
           question
           answer
         }
-        FaqTranslations_fallback: FaqTranslations(where: {lang: {_eq: "EN"}}) {
+        FaqTranslations_fallback: FaqTranslations(where: {lang: {_eq: "EN"}}, limit: 1) {
           id
           lang
           question
@@ -23,3 +24,6 @@ export const GET_FAQS_BY_COLLECTION_AND_LANG = gql`
     }
   }
 `;
+
+// Export generated types for consumers
+export type { GetFaqsByCollectionAndLang, GetFaqsByCollectionAndLangVariables };

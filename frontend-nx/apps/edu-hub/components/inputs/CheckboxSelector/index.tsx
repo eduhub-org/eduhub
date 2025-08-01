@@ -1,13 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { useCheckboxLogic } from './hooks';
 import { CheckboxSelectorProps } from './types';
 import { MaterialCheckbox } from './components/MaterialCheckbox';
 import { EduhubCheckbox } from './components/EduhubCheckbox';
-import { useRoleMutation } from '../../../hooks/authedMutation';
 import useTranslation from 'next-translate/useTranslation';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
-import { gql } from '@apollo/client';
 
 const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
   variant,

@@ -3,13 +3,14 @@ import { useRoleMutation } from '../../../hooks/authedMutation';
 import { useDebouncedCallback } from 'use-debounce';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { gql } from '@apollo/client';
+import { DocumentNode } from 'graphql';
 
 export const useCheckboxLogic = (
   checked: boolean,
-  updateValueMutation: any | null,
-  identifierVariables: any,
-  onValueUpdated: (value: any) => any,
-  refetchQueries: any[]
+  updateValueMutation: DocumentNode | null,
+  identifierVariables: Record<string, unknown>,
+  onValueUpdated: (value: unknown) => void,
+  refetchQueries: string[]
 ) => {
   const [localChecked, setLocalChecked] = useState(checked);
   const { error, handleError, resetError } = useErrorHandler();

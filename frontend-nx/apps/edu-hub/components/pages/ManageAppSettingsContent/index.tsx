@@ -1,4 +1,4 @@
-import { FC, useState, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
@@ -242,7 +242,9 @@ const ManageAppSettingsContent: FC = () => {
                             {...provided.dragHandleProps}
                             className="p-4 border border-gray-300 rounded mb-2 bg-white flex justify-between items-center"
                           >
-                            <h2 className="text-xl font-semibold">{t(`start-page:${option.title}`)}</h2>
+                            <h2 className="text-xl font-semibold">
+                              {t(`common:course_group_options.${option.title}`)}
+                            </h2>
                             <span className="text-gray-500">{index + 1}</span>
                           </div>
                         )}
