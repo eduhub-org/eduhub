@@ -279,6 +279,57 @@ import { TableGrid } from '../common/TableGrid';
 import { Button } from '../common/Button';
 ```
 
+## Development Commands
+
+### Standard Development Workflow
+
+Before committing code, always run these commands to ensure quality:
+
+```bash
+# Install dependencies (use immutable flag for consistent installs)
+yarn install --immutable
+
+# Build the project to check for TypeScript errors and build issues
+npx nx run edu-hub:build
+
+# Run linting to check code style and potential issues
+npx nx run edu-hub:lint
+```
+
+### Pre-commit Checklist
+
+Before committing any frontend changes:
+
+1. ✅ **Dependencies are up to date**
+   ```bash
+   yarn install --immutable
+   ```
+
+2. ✅ **Project builds successfully**
+   ```bash
+   npx nx run edu-hub:build
+   ```
+
+3. ✅ **Linting passes without errors**
+   ```bash
+   npx nx run edu-hub:lint
+   ```
+
+4. ✅ **All TypeScript errors are resolved**
+   - Check the build output for any type errors
+   - Ensure all components have proper TypeScript interfaces
+
+5. ✅ **Code follows component reuse guidelines**
+   - Checked existing components before creating new ones
+   - Used appropriate dialog, input, and common components
+
+### CI/CD Integration
+
+These same commands are used in the GitHub Actions workflow (`.github/workflows/frontend-code-checks.yml`) to ensure:
+- Consistent builds across environments
+- Automated quality checks on pull requests
+- Early detection of build and linting issues
+
 ## Component Usage Checklist
 
 Before writing any component code, ask:

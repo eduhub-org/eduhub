@@ -208,5 +208,10 @@
     "creative_social_sustainable": "Creative, Social & Sustainable",
     "degree": "Degrees",
     "event": "Events"
+  },
+  "faq": {
+    "title": "Häufig gestellte Fragen",
+    "error_loading": "Fehler beim Laden der FAQs. Bitte versuche es später erneut.",
+    "no_faqs_available": "Keine FAQs verfügbar."
   }
 }

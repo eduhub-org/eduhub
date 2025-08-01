@@ -12,6 +12,12 @@
     "text_en": "News Banner Text EN"
   },
   "course_group_options": "Kursgruppierungen Reihenfolge",
+  "faq": {
+    "label": "FAQ Einstellungen",
+    "show_section": "FAQ-Bereich auf der Startseite anzeigen",
+    "collection_name": "Angezeigte FAQ-Sammlung",
+    "collection_placeholder": "FAQ-Sammlung auswählen"
+  },
   "time_zone": {
     "label": "Zeitzone",
     "values": {

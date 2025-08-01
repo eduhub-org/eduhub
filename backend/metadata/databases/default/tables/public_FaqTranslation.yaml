@@ -1,0 +1,35 @@
+table:
+  name: FaqTranslation
+  schema: public
+object_relationships:
+  - name: Faq
+    using:
+      foreign_key_constraint_on: faqId
+  - name: Language
+    using:
+      foreign_key_constraint_on: lang
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - faqId
+        - lang
+        - question
+        - answer
+        - created_at
+        - updated_at
+      filter: {}
+      allow_aggregations: true
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - faqId
+        - lang
+        - question
+        - answer
+        - created_at
+        - updated_at
+      filter: {}
+      allow_aggregations: true

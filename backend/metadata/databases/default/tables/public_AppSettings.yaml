@@ -12,7 +12,9 @@ select_permissions:
         - bannerTextDe
         - bannerTextEn
         - created_at
+        - faqCollectionName
         - previewImageURL
+        - showFaqSection
         - timeZone
         - updated_at
       filter: {}
