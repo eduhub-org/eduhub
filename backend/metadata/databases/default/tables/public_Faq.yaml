@@ -1,0 +1,34 @@
+table:
+  name: Faq
+  schema: public
+object_relationships:
+  - name: FaqCollection
+    using:
+      foreign_key_constraint_on: collectionId
+array_relationships:
+  - name: FaqTranslations
+    using:
+      foreign_key_constraint_on:
+        column: faqId
+        table:
+          name: FaqTranslation
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - collectionId
+        - created_at
+        - updated_at
+      filter: {}
+      allow_aggregations: true
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - collectionId
+        - created_at
+        - updated_at
+      filter: {}
+      allow_aggregations: true
