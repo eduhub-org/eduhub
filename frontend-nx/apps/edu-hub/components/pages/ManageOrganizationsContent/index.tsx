@@ -9,6 +9,7 @@ import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
+import UnifiedFileUploader from '../../inputs/UnifiedFileUploader';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { PageBlock } from '../../common/PageBlock';
@@ -24,6 +25,7 @@ import {
   DELETE_ORGANIZATION,
   UPDATE_ORGANIZATION_ALIASES,
 } from '../../../queries/organization';
+import { UPDATE_ORGANIZATION_LOGO } from '../../../queries/updateOrganization';
 import { UPDATE_USER_ORGANIZATION_ID } from '../../../queries/updateUser';
 import CreatableTagSelector from '../../inputs/CreatableTagSelector';
 import { OrganizationType_enum } from '../../../__generated__/globalTypes';
@@ -38,6 +40,7 @@ type ExpandableRowProps = {
 
 const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement => {
   const { t } = useTranslation('manageOrganizations');
+  const { refetch } = useRoleQuery(ORGANIZATION_LIST);
 
   // Handle organization alias errors specifically
   const handleAliasError = useCallback(
@@ -100,6 +103,23 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
         updateValueMutation={UPDATE_ORGANIZATION_DESCRIPTION}
         refetchQueries={['OrganizationList']}
       />
+      <div className="mt-6">
+        <UnifiedFileUploader
+          variant="material"
+          element="organizationLogo"
+          label={t('organization.logo')}
+          identifierVariables={{ organizationId: row.id }}
+          currentFile={row.logo}
+          updateFileMutation={UPDATE_ORGANIZATION_LOGO}
+          onFileUpdated={() => {
+            // Refetch the organization list to show updated logo
+            refetch();
+          }}
+          acceptedFileTypes="image/*"
+          maxFileSize={2 * 1024 * 1024} // 2MB for logos
+          translationNamespace="manageOrganizations"
+        />
+      </div>
     </div>
   );
 };

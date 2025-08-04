@@ -18,6 +18,7 @@ export const ORGANIZATION_LIST = gql`
       type
       description
       aliases
+      logo
       created_at
       Users {
         id

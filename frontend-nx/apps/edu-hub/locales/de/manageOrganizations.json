@@ -7,6 +7,7 @@
     "users": "Nutzer",
     "aliases": "Alias",
     "description": "Beschreibung",
+    "logo": "Logo",
     "new_organization": "Neue Organisation",
     "default_description": "Beschreibung"
   },
@@ -68,6 +69,10 @@
     "SCHOOL": "Schule",
     "FREELANCER": "Freiberuflich/Selbständig",
     "OTHER": "Sonstige"
+  },
+  "file_uploader": {
+    "upload_new_logo": "Neues Logo hochladen",
+    "uploading": "Hochladen..."
   },
   "deletion_confirmation_question": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the organization {{name}}?"
 }

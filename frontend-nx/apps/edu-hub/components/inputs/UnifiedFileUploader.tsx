@@ -12,12 +12,13 @@ import Snackbar from '@mui/material/Snackbar';
 import { IconButton } from '@mui/material';
 import { MdPhotoCamera } from 'react-icons/md';
 import UserCard from '../common/UserCard';
-import { SAVE_USER_PROFILE_IMAGE } from '../../queries/actions';
+import { SAVE_USER_PROFILE_IMAGE, SAVE_ORGANIZATION_LOGO } from '../../queries/actions';
 import { useSession } from 'next-auth/react';
+import { getPublicUrl } from '../../helpers/filehandling';
 
 type UnifiedFileUploaderProps = {
   variant: 'material' | 'eduhub';
-  element?: 'profilePicture' | 'default';
+  element?: 'profilePicture' | 'organizationLogo' | 'default';
   label?: string;
   identifierVariables: Record<string, any>;
   currentFile: string | null;
@@ -38,6 +39,7 @@ const UnifiedFileUploader: React.FC<UnifiedFileUploaderProps> = ({
   element = 'profilePicture',
   label,
   identifierVariables,
+  currentFile,
   updateFileMutation,
   onFileUpdated,
   refetchQueries = [],
@@ -50,6 +52,7 @@ const UnifiedFileUploader: React.FC<UnifiedFileUploaderProps> = ({
 }) => {
   const { t } = useTranslation(translationNamespace);
   const [showSavedNotification, setShowSavedNotification] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -63,12 +66,13 @@ const UnifiedFileUploader: React.FC<UnifiedFileUploaderProps> = ({
     },
     onCompleted: (data) => {
       const updatedUser = data?.update_User_by_pk;
+      const updatedOrganization = data?.update_Organization_by_pk;
 
-      if (updatedUser?.picture) {
+      if (updatedUser?.picture || updatedOrganization?.logo) {
         if (onFileUpdated) onFileUpdated(data);
         setShowSavedNotification(true);
       } else {
-        console.error('Update file failed: No picture field in response');
+        console.error('Update file failed: No picture/logo field in response');
         handleError(t('operation_failed'));
       }
     },
@@ -77,6 +81,7 @@ const UnifiedFileUploader: React.FC<UnifiedFileUploaderProps> = ({
 
   const { data: sessionData } = useSession();
   const [saveUserProfileImage] = useRoleMutation(SAVE_USER_PROFILE_IMAGE);
+  const [saveOrganizationLogo] = useRoleMutation(SAVE_ORGANIZATION_LOGO);
 
   const handleError = useCallback((message: string) => {
     setErrorMessage(message);
@@ -93,8 +98,10 @@ const UnifiedFileUploader: React.FC<UnifiedFileUploaderProps> = ({
       const selectedFile = event.target.files?.[0];
       if (selectedFile) {
         try {
+          setIsUploading(true);
           if (selectedFile.size > maxFileSize) {
             handleError(t('file_uploader.file_size_exceeds_limit', { maxFileSize: maxFileSize / 1024 / 1024 }));
+            setIsUploading(false);
             return;
           }
 
@@ -125,16 +132,55 @@ const UnifiedFileUploader: React.FC<UnifiedFileUploaderProps> = ({
             } else {
               throw new Error(uploadResult?.messageKey || 'IMAGE_SAVE_ERROR');
             }
+          } else if (element === 'organizationLogo') {
+            const base64File = await new Promise<string>((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.readAsDataURL(selectedFile);
+            });
+
+            const saveResult = await saveOrganizationLogo({
+              variables: {
+                base64File: base64File.split(',')[1],
+                fileName: selectedFile.name,
+                organizationId: identifierVariables.organizationId,
+              },
+            });
+
+            const uploadResult = saveResult.data?.saveOrganizationLogo;
+
+            if (uploadResult?.success) {
+              await updateFile({
+                variables: {
+                  ...identifierVariables,
+                  logo: uploadResult.filePath,
+                },
+              });
+            } else {
+              throw new Error(uploadResult?.messageKey || 'IMAGE_SAVE_ERROR');
+            }
           } else {
             await updateFile({ variables: { ...identifierVariables, file: selectedFile } });
           }
+          setIsUploading(false);
         } catch (error) {
           console.error('File upload error:', error);
           handleError(t(error instanceof Error ? error.message : 'IMAGE_SAVE_ERROR'));
+          setIsUploading(false);
         }
       }
     },
-    [updateFile, identifierVariables, maxFileSize, t, handleError, element, saveUserProfileImage, sessionData]
+    [
+      updateFile,
+      identifierVariables,
+      maxFileSize,
+      t,
+      handleError,
+      element,
+      saveUserProfileImage,
+      saveOrganizationLogo,
+      sessionData,
+    ]
   );
 
   const baseClass = 'w-full px-3 py-3 mb-8 text-gray-500 rounded bg-edu-light-gray';
@@ -146,28 +192,70 @@ const UnifiedFileUploader: React.FC<UnifiedFileUploaderProps> = ({
     }
   }, []);
 
-  const renderProfilePicture = () => (
-    <div className="h-40 flex items-center mb-6 w-80 relative">
-      <UserCard className="flex items-center" key={`userCard`} user={user} size="large" />
-      <Tooltip title={t('file_uploader.upload_new_profile_picture')} placement="top">
-        <IconButton
-          onClick={handleIconClick}
-          className="absolute top-2 left-2 bg-white hover:bg-gray-200 shadow-md transition-colors duration-200"
-          size="small"
-        >
-          <MdPhotoCamera size="1.5em" className="text-gray-800" />
-        </IconButton>
-      </Tooltip>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept={acceptedFileTypes}
-        onChange={handleFileChange}
-        style={{ display: 'none' }}
-        id="profile-picture-input"
-      />
-    </div>
-  );
+  const renderImageUpload = (
+    imageUrl: string | null,
+    altText: string,
+    tooltipText: string,
+    inputId: string,
+    size: 'small' | 'large' = 'large',
+    borderRadius: 'rounded' | 'rounded-full' = 'rounded-full'
+  ) => {
+    const sizeClasses = size === 'small' ? 'w-16 h-16' : 'w-40 h-40';
+    const containerClasses = size === 'small' ? 'h-16 w-16' : 'h-40 w-80';
+    const marginClasses = size === 'small' ? 'mb-2' : 'mb-6';
+
+    return (
+      <div className={`${containerClasses} flex items-center ${marginClasses} relative`}>
+        {imageUrl ? (
+          <div className="relative">
+            <img
+              src={imageUrl}
+              alt={altText}
+              className={`${sizeClasses} object-cover ${borderRadius} border border-gray-300`}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+            <Tooltip title={tooltipText} placement="top">
+              <IconButton
+                onClick={handleIconClick}
+                className="absolute top-2 left-2 bg-white hover:bg-gray-200 shadow-md transition-colors duration-200"
+                size="small"
+              >
+                <MdPhotoCamera size={size === 'small' ? '1em' : '1.5em'} className="text-gray-800" />
+              </IconButton>
+            </Tooltip>
+          </div>
+        ) : (
+          <div
+            className={`${sizeClasses} bg-gray-100 border-2 border-dashed border-gray-300 ${borderRadius} flex items-center justify-center`}
+          >
+            <span className="text-gray-400 text-xs text-center">No image</span>
+          </div>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={acceptedFileTypes}
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+          id={inputId}
+        />
+      </div>
+    );
+  };
+
+  const renderProfilePicture = () => {
+    const imageUrl = user?.picture ? getPublicUrl(user.picture) : null;
+    return renderImageUpload(
+      imageUrl,
+      'Profile picture',
+      t('file_uploader.upload_new_profile_picture'),
+      'profile-picture-input',
+      'large',
+      'rounded-full'
+    );
+  };
 
   const renderDefault = () => (
     <div className={`${finalClassName}`}>
@@ -207,6 +295,51 @@ const UnifiedFileUploader: React.FC<UnifiedFileUploaderProps> = ({
     </div>
   );
 
+  const renderOrganizationLogo = () => (
+    <div className="col-span-10 flex mt-3">
+      <div className="w-full">
+        {label && (
+          <div
+            className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-standard"
+            style={{
+              color: 'rgb(34, 34, 34)',
+              fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+              fontWeight: 400,
+              fontSize: '0.75rem',
+              lineHeight: '1.4375em',
+              letterSpacing: '0.00938em',
+              padding: 0,
+              position: 'relative',
+              display: 'block',
+              transformOrigin: 'top left',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              maxWidth: '100%',
+              marginBottom: '4px',
+            }}
+          >
+            {t(label)}
+          </div>
+        )}
+        {renderImageUpload(
+          currentFile ? getPublicUrl(currentFile) : null,
+          'Organization logo',
+          t('file_uploader.upload_new_logo'),
+          'organization-logo-input',
+          'small',
+          'rounded'
+        )}
+        {isUploading && <div className="text-sm text-blue-600 mt-1">{t('file_uploader.uploading')}...</div>}
+        {helpText && (
+          <Tooltip title={t(helpText)} placement="top">
+            <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled, marginLeft: '8px' }} />
+          </Tooltip>
+        )}
+      </div>
+    </div>
+  );
+
   const renderMaterialUI = () => (
     <div className="col-span-10 flex flex-col mt-3">
       {label && <label className="mb-2">{t(label)}</label>}
@@ -235,7 +368,11 @@ const UnifiedFileUploader: React.FC<UnifiedFileUploaderProps> = ({
 
   return (
     <>
-      {variant === 'material' ? renderMaterialUI() : renderEduhub()}
+      {variant === 'material'
+        ? element === 'organizationLogo'
+          ? renderOrganizationLogo()
+          : renderMaterialUI()
+        : renderEduhub()}
       {isErrorDialogOpen && (
         <AlertMessageDialog alert={errorMessage} open={isErrorDialogOpen} onClose={handleCloseErrorDialog} />
       )}
