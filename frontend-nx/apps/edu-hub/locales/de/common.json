@@ -207,7 +207,9 @@
     "business_startup": "Business & Startup",
     "creative_social_sustainable": "Creative, Social & Sustainable",
     "degree": "Degrees",
-    "event": "Events"
+    "event": "Events",
+    "my_admin_courses": "Kurs-Administration",
+    "my_courses": "Meine Kurse"
   },
   "faq": {
     "title": "Häufig gestellte Fragen",
