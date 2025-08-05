@@ -60,8 +60,8 @@ const Home: FC = () => {
 
   const coursesGroupsAuthenticated = useMemo(
     () => [
-      { title: 'myAdminCourses', courses: myAdminCourses, isManaged: true },
-      { title: 'myCourses', courses: myCourses, isManaged: false },
+      { title: 'my_admin_courses', courses: myAdminCourses, isManaged: true },
+      { title: 'my_courses', courses: myCourses, isManaged: false },
     ],
     [myAdminCourses, myCourses]
   );
