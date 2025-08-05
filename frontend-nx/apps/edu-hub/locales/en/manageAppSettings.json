@@ -9,6 +9,10 @@
   "courseGroupOptions": "Course Groups Order",
   "timeZone": "Time Zone",
   "bannerSettings": "Banner Settings",
+  "faqSettings": "FAQ Settings",
+  "showFaqSection": "Show FAQ section on homepage",
+  "faqCollectionName": "Displayed FAQ Collection",
+  "faqCollectionPlaceholder": "Select FAQ collection",
   "save": "Save",
   "saving": "Saving...",
   "timeZones": {

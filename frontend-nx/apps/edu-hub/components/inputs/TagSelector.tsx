@@ -217,7 +217,9 @@ const TagSelector: React.FC<TagSelectorProps> = ({
         multiple
         id="tags-standard"
         options={options}
-        getOptionLabel={(option) => t(`${optionsTranslationPrefix}${option.name}`)}
+        getOptionLabel={(option) =>
+          optionsTranslationPrefix ? t(`${optionsTranslationPrefix}${option.name}`) : option.name
+        }
         renderInput={(params) => (
           <TextField
             {...params}

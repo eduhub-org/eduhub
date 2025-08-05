@@ -1,26 +1,89 @@
 {
-  "chat_link": {
-    "label": "Link zum Chat des Kurses",
-    "help_text": "Der Kurs-Channel muss zunächst händisch in Mattermost angelegt werden.",
-    "error_text": "Falsches Linkformat!"
+  "table_header": {
+    "published": "Veröffent- licht",
+    "title": "Titel",
+    "instructor": "Dozent",
+    "applications": "Bewerbungen",
+    "confirmed": "Bestätigt",
+    "unrated_rated_not_informed": "Unbewertet / Bewertet aber nicht informiert",
+    "application_end": "Bewerbungs- ende",
+    "program": "Programm",
+    "status": "Status"
   },
-  "ects": {
-    "label": "ECTS",
-    "help_text": "Aktuell sind nur Kurse mit '2,5', '5', '12,5' (für Degrees) oder 'NONE' erlaubt.",
-    "error_text": "Falsches ECTS Format!"
+  "view": "Anzeigen",
+  "not_published": "Nicht veröffentlicht",
+  "default_course_title": "Unbenannter Kurs",
+  "title": "Kurse verwalten",
+  "tile_slider_group": {
+    "label": "Kachel-Slider Gruppe",
+    "placeholder": "Kachel-Slider Gruppen auswählen"
+  },
+  "cover_image": {
+    "label": "Titelbild",
+    "upload_text": "Klicken um Titelbild hochzuladen"
+  },
+  "instructors": {
+    "label": "Kursleitung",
+    "add": "Kursleitung hinzufügen"
+  },
+  "registration_type": {
+    "label": "Anmeldeart",
+    "help_text": "Wähle aus, wie sich Teilnehmer für diesen Kurs anmelden können",
+    "options": {
+      "APPROVAL_WITH_INPUT": "Zulassung mit Bewerbungsprozess",
+      "DIRECT_CONFIRMATION": "Direkte Zulassung ohne Motivationstext",
+      "DIRECT_WITH_INPUT": "Direkte Zulassung mit Motivationstext",
+      "EXTERNAL_REGISTRATION": "Externe Anmeldung"
+    }
   },
   "external_registration_link": {
-    "label": "Externer Registrierungslink",
-    "help_text": "Wenn der Kurs oder die Veranstaltung nicht über EduHub verwaltet werden soll, gib hier einen Link zur externen Anmeldung an.",
-    "error_text": "Falsches Linkformat!"
+    "label": "Externe Anmeldung Link",
+    "help_text": "URL wo sich Teilnehmer extern anmelden können"
   },
-  "max_missed_sessions":{
-    "label": "Maximal erlaubte Fehltermine",
-    "help_text": "Standardmäßig ist der Wert auf 2 gesetzt, aber es sind alle Werte größer gleich 0 erlaubt.",
-    "error_text": "Falsches Fehltermin Format!"
+  "chat_link": {
+    "label": "Kurs-Chat Link",
+    "help_text": "Link zum Kurs-Chat oder zur Kommunikationsplattform"
   },
+  "ects": {
+    "label": "ECTS-Punkte",
+    "help_text": "Anzahl der ECTS-Punkte für diesen Kurs"
+  },
+  "max_missed_sessions": {
+    "label": "Maximal verpasste Sitzungen",
+    "help_text": "Maximale Anzahl von Sitzungen, die ein Teilnehmer verpassen kann"
+  },
+  "learning_goals": {
+    "label": "Lernziele",
+    "help_text": "Definiere, was die Teilnehmer nach Abschluss dieses Kurses erreichen werden. Schreibe jedes Lernziel in eine neue Zeile ohne Nummerierung. Verwende Handlungsverben wie 'verstehen', 'anwenden', 'analysieren', 'erstellen' (siehe: https://www.bloomstaxonomy.org).",
+    "placeholder": "Die Grundlagen des Themas verstehen\nSchlüsselkonzepte in praktischen Szenarien anwenden\nKomplexe Probleme und Lösungen analysieren\nInnovative Ansätze entwickeln"
+  },
+  "add_course_button": "Kurs hinzufügen",
   "delete_button": {
-    "delete_course_confirmation": "Soll der Kurs '{{title}}' wirklich gelöscht werden?",
+    "delete_course_confirmation": "Bist du sicher, dass du den Kurs '{{title}}' löschen möchtest?",
     "untitled_course": "Unbenannter Kurs"
+  },
+  "bulk_action": {
+    "publish": "Ausgewählte veröffentlichen",
+    "unpublish": "Ausgewählte zurückziehen",
+    "copy": "In Programm kopieren"
+  },
+  "copy_courses_to_program_dialog": {
+    "title": "Kurse in Programm kopieren",
+    "description": "Wähle das Zielprogramm aus, in das die Kurse kopiert werden sollen:",
+    "button": "Kurse kopieren"
+  },
+  "notifications": {
+    "course_added_success": "Kurs erfolgreich hinzugefügt",
+    "course_add_failed": "Fehler beim Hinzufügen des Kurses. Bitte versuche es erneut.",
+    "courses_published_success_singular": "{{count}} Kurs erfolgreich veröffentlicht",
+    "courses_published_success_plural": "{{count}} Kurse erfolgreich veröffentlicht",
+    "courses_unpublished_success_singular": "{{count}} Kurs erfolgreich zurückgezogen",
+    "courses_unpublished_success_plural": "{{count}} Kurse erfolgreich zurückgezogen",
+    "bulk_action_failed": "Fehler beim {{action}} der Kurse. Bitte versuche es erneut.",
+    "attendance_certificate_update_failed": "Fehler beim Aktualisieren der Teilnahmebescheinigung-Einstellung",
+    "achievement_certificate_update_failed": "Fehler beim Aktualisieren der Leistungsbescheinigung-Einstellung",
+    "application_end_update_failed": "Fehler beim Aktualisieren des Bewerbungsendes",
+    "courses_copied_success_singular": "{{count}} Kurs erfolgreich in {{programTitle}} kopiert",
+    "courses_copied_success_plural": "{{count}} Kurse erfolgreich in {{programTitle}} kopiert"
   }
 }

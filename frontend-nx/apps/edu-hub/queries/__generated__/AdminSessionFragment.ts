@@ -58,6 +58,14 @@ export interface AdminSessionFragment_SessionSpeakers_Expert_User {
    * The user's email address
    */
   email: string;
+  /**
+   * The user's postal/zip code
+   */
+  zipCode: string | null;
+  /**
+   * The user's country of residence
+   */
+  country: string | null;
 }
 
 export interface AdminSessionFragment_SessionSpeakers_Expert {

@@ -1,0 +1,40 @@
+table:
+  name: Country
+  schema: public
+array_relationships:
+  - name: Users
+    using:
+      foreign_key_constraint_on:
+        column: country
+        table:
+          name: User
+          schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - code
+        - name_en
+        - name_de
+      filter: {}
+  - role: user_access
+    permission:
+      columns:
+        - code
+        - name_en
+        - name_de
+      filter: {}
+  - role: instructor_access
+    permission:
+      columns:
+        - code
+        - name_en
+        - name_de
+      filter: {}
+  - role: admin-ras
+    permission:
+      columns:
+        - code
+        - name_en
+        - name_de
+      filter: {} 

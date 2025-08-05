@@ -60,10 +60,30 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
 
   const shouldShowCreateOption = useCallback(
     (searchValue = '') => {
-      return (
-        searchValue &&
-        !getFilteredOptions(searchValue).some((option) => t(option.label).toLowerCase() === searchValue.toLowerCase())
-      );
+      if (!searchValue) return false;
+
+      const searchLower = searchValue.toLowerCase();
+      const filteredOptions = getFilteredOptions(searchValue);
+
+      // Don't show create option if there's an exact name match
+      const hasExactNameMatch = filteredOptions.some((option) => t(option.label).toLowerCase() === searchLower);
+
+      // Don't show create option if there's an exact alias match
+      const hasExactAliasMatch = filteredOptions.some((option) => {
+        if (!option.aliases) return false;
+        return option.aliases.some((alias) => {
+          if (!alias) return false;
+          let aliasName = '';
+          if (typeof alias === 'string') {
+            aliasName = alias;
+          } else if (typeof alias === 'object' && 'name' in alias) {
+            aliasName = alias.name;
+          }
+          return aliasName.toLowerCase() === searchLower;
+        });
+      });
+
+      return !hasExactNameMatch && !hasExactAliasMatch;
     },
     [getFilteredOptions, t]
   );

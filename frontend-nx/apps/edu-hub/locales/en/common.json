@@ -42,6 +42,7 @@
     "achievement_templates": "Achievement Record Templates",
     "programs": "Programs",
     "organizations": "Organizations",
+    "email_templates": "Email Templates",
     "app_settings": "App Settings",
     "statistics": "Statistics",
     "logout": "Logout"
@@ -135,7 +136,8 @@
     "pagination_text": "Page {{currentPage}} of {{totalPage}}",
     "bulk_action": "Bulk Action",
     "apply": "Apply",
-    "none": "None"
+    "none": "None",
+    "items_per_page": "Items per page"
   },
   "table_grid_delete_button": {
     "confirm_delete": "Confirm Deletion",
@@ -162,7 +164,8 @@
     "no_results": "No results found"
   },
   "dropdown_selector": {
-    "create_option": "Create new entry \"{{option}}\""
+    "create_option": "Create new entry \"{{option}}\"",
+    "none_option": "-- None --"
   },
   "time_picker": {
     "select_time": "Select time",
@@ -178,6 +181,8 @@
     "session_expired_or_invalid": "Your session is invalid or has expired. Please log in again.",
     "authentication_error": "Authentication error"
   },
+  "tile_slider_unavailable": "Tile slider temporarily unavailable",
+  "no_description_available": "No description available",
   "error_handling": {
     "delete_restricted_by_relationship": "{{parent}} cannot be deleted when they are still associated with {{child}}. Please remove all {{child}} first.",
     "delete_restricted_by_relationships": "{{table}} cannot be deleted when they are associated with other records. Please remove those records first.",
@@ -196,5 +201,17 @@
       "achievement_options": "achievement options",
       "users": "users"
     }
+  },
+  "course_group_options": {
+    "tech_coding": "Tech & Coding",
+    "business_startup": "Business & Startup",
+    "creative_social_sustainable": "Creative, Social & Sustainable",
+    "degree": "Degrees",
+    "event": "Events"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "error_loading": "Error loading FAQs. Please try again later.",
+    "no_faqs_available": "No FAQs available."
   }
 }

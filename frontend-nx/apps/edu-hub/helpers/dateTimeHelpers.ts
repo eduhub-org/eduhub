@@ -11,7 +11,7 @@
  * - useFormatDateTime: Formats and optionally rounds time, returns a Date object
  */
 
-import { parse, parseISO } from 'date-fns';
+import { parseISO } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useAppSettings } from '../contexts/AppSettingsContext';
 

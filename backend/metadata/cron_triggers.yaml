@@ -23,3 +23,17 @@
     - name: secret
       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
   comment: Sends out questionaires if necessary
+- name: session_reminders_cron
+  webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+  schedule: "*/15 * * * *"
+  include_in_metadata: true
+  headers:
+    - name: Function-Name
+      value: sendSessionReminders
+    - name: Hasura-Secret
+      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+  retry_conf:
+    num_retries: 3
+    retry_interval_seconds: 60
+    timeout_seconds: 300
+  comment: "Automatically send session reminder emails every 15 minutes"

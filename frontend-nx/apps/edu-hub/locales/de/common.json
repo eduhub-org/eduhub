@@ -41,9 +41,10 @@
     "achievements": "Leistungsnachweise",
     "achievement_templates": "Leistungsnachweisvorlagen",
     "programs": "Programme",
+    "organizations": "Organisationen",
+    "email_templates": "E-Mail-Vorlagen",
     "app_settings": "App-Einstellungen",
     "statistics": "Statistiken",
-    "organizations": "Organisationen",
     "logout": "Logout"
   },
   "change-password": "Passwort oder E-Mail ändern",
@@ -135,7 +136,8 @@
     "pagination_text": "Seite {{currentPage}} von {{totalPage}}",
     "bulk_action": "Sammelaktion",
     "apply": "Ausführen",
-    "none": "Keine Aktion"
+    "none": "Keine Aktion",
+    "items_per_page": "Einträge pro Seite"
   },
   "table_grid_delete_button": {
     "confirm_delete": "Löschen bestätigen",
@@ -162,7 +164,8 @@
     "no_results": "Keine Ergebnisse gefunden"
   },
   "dropdown_selector": {
-    "create_option": "\"{{option}}\" neu hinzufügen"
+    "create_option": "\"{{option}}\" neu hinzufügen",
+    "none_option": "-- Keine Auswahl --"
   },
   "time_picker": {
     "select_time": "Zeit auswählen",
@@ -175,9 +178,11 @@
     "saved": "Gespeichert"
   },
   "authed_query": {
-    "session_expired_or_invalid": "Ihre Sitzung ist ungültig oder abgelaufen. Bitte melden Sie sich erneut an.",
+    "session_expired_or_invalid": "Deine Sitzung ist ungültig oder abgelaufen. Bitte melde dich erneut an.",
     "authentication_error": "Authentifizierungsfehler"
   },
+  "tile_slider_unavailable": "Kachel-Slider vorübergehend nicht verfügbar",
+  "no_description_available": "Keine Beschreibung verfügbar",
   "error_handling": {
     "delete_restricted_by_relationship": "{{parent}} können nicht gelöscht werden, wenn sie mit {{child}} verknüpft sind. Bitte lösche diese zuerst.",
     "delete_restricted_by_relationships": "{{table}} können nicht gelöscht werden, wenn sie mit anderen Einträgen verknüpft sind. Bitte lösche zuerst die anderen Einträge.",
@@ -196,5 +201,17 @@
       "achievement_options": "Leistungsnachweisoptionen",
       "users": "Benutzern"
     }
+  },
+  "course_group_options": {
+    "tech_coding": "Tech & Coding",
+    "business_startup": "Business & Startup",
+    "creative_social_sustainable": "Creative, Social & Sustainable",
+    "degree": "Degrees",
+    "event": "Events"
+  },
+  "faq": {
+    "title": "Häufig gestellte Fragen",
+    "error_loading": "Fehler beim Laden der FAQs. Bitte versuche es später erneut.",
+    "no_faqs_available": "Keine FAQs verfügbar."
   }
 }

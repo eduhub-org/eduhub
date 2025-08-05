@@ -1,6 +1,8 @@
 # EduHub :mortar_board:
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/edu-hub-project/application)
+[![Release](https://img.shields.io/github/v/release/edu-hub-project/application)](https://github.com/edu-hub-project/application/releases)
+[![Semantic Release](https://img.shields.io/badge/semantic--release-enabled-brightgreen)](https://github.com/semantic-release/semantic-release)
 
 A comprehensive education platform focusing on course applications, event registrations, learning communities, and more.
 
@@ -22,7 +24,14 @@ EduHub aims to centralize educational offerings. It enables users to apply and g
 
 ## :busts_in_silhouette: Contributing
 
-We welcome contributions from everyone. Please check out the technical details for the development [here](./docs/DEVELOPMENT_GUIDE.md).
+We welcome contributions from everyone. Please check out our [Contributing Guide](./CONTRIBUTING.md) for detailed information about:
+
+- Development workflow and branch structure
+- Conventional commit guidelines
+- Automated release process
+- Code style and testing requirements
+
+For technical development details, see [Development Guide](./docs/DEVELOPMENT_GUIDE.md).
 
 ## :computer: Tech Stack
 

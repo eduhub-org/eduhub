@@ -5,7 +5,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 import { useTableGrid } from '../../common/TableGrid/hooks';
-import CheckBoxSelector from '../../inputs/CheckBoxSelector';
+import CheckboxSelector from '../../inputs/CheckboxSelector';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { useAdminMutation } from '../../../hooks/authedMutation';
@@ -53,42 +53,44 @@ const ExpandableUserRow: FC<{
     <div>
       <div className="font-medium bg-edu-course-list grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
         <div className="pl-3 col-span-3">
-          <CheckBoxSelector
+          <CheckboxSelector
+            variant="eduhub"
             label={t('can_manage_events')}
-            itemId={row.id}
             checked={row.canManageEvents}
-            setCheckboxMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS}
+            updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_EVENTS}
+            identifierVariables={{ itemId: row.id }}
             refetchQueries={['GetAdminUsers']}
           />
         </div>
         <div className="pl-3 col-span-3">
-          <CheckBoxSelector
+          <CheckboxSelector
+            variant="eduhub"
             label={t('can_manage_courses')}
-            itemId={row.id}
             checked={row.canManageCourses}
-            setCheckboxMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES}
+            updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_COURSES}
+            identifierVariables={{ itemId: row.id }}
             refetchQueries={['GetAdminUsers']}
           />
         </div>
         <div className="pl-3 col-span-4">
-          <CheckBoxSelector
+          <CheckboxSelector
+            variant="eduhub"
             label={t('can_manage_users_and_settings')}
-            itemId={row.id}
             checked={row.canManageSettings}
-            setCheckboxMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS}
+            updateValueMutation={UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS}
+            identifierVariables={{ itemId: row.id }}
             refetchQueries={['GetAdminUsers']}
           />
         </div>
       </div>
       {isAdmin && (
         <div className="pl-3 col-span-3">
-          <CheckBoxSelector
+          <CheckboxSelector
+            variant="eduhub"
             label={t('is_super_admin')}
-            itemId={row.id}
             checked={isSuperAdmin}
-            onCheckedChange={handleAdminToggle}
+            onValueUpdated={handleAdminToggle}
             refetchQueries={['GetAdminUsers']}
-            immediateCommit={false}
           />
         </div>
       )}

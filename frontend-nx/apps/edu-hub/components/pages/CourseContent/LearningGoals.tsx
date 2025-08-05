@@ -7,13 +7,13 @@ interface LearningGoalsProps {
 }
 
 export const LearningGoals: FC<LearningGoalsProps> = ({ learningGoals }) => {
-  const { t } = useTranslation('course-page');
+  const { t } = useTranslation('course');
 
   return (
     <>
       {learningGoals !== null && learningGoals.trim() !== '' && (
         <>
-          <span className="text-3xl font-semibold mb-9">{t('youWillLearn')}</span>
+          <span className="text-3xl font-semibold mb-9">{t('learning.you_will_learn')}</span>
           <ul className="list-disc pb-12">
             {learningGoals
               .split('\n')

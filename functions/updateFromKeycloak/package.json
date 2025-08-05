@@ -1,6 +1,6 @@
 {
   "name": "updateFromKeycloak",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "dependencies": {
     "@keycloak/keycloak-admin-client": "^16.1.0",
     "body-parser": "1.20.3",

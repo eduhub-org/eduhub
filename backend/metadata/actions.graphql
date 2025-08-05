@@ -105,6 +105,10 @@ type Mutation {
   ): UpdateAdminStatusResult!
 }
 
+type Mutation {
+  sendSessionReminders: SendSessionRemindersResult!
+}
+
 type loadFileOutput {
   link: String!
 }
@@ -258,5 +262,21 @@ type resizedImagePath {
   size: Int!
   filePath: String!
   accessUrl: String!
+}
+
+type SendSessionRemindersResult {
+  success: Boolean!
+  messageKey: String!
+  error: String
+  totalEmailsSent: Int
+  processedSessions: [ProcessedSession!]
+  processedAt: String
+}
+
+type ProcessedSession {
+  sessionId: Int!
+  sessionTitle: String!
+  reminderType: String!
+  emailsSent: Int!
 }
 

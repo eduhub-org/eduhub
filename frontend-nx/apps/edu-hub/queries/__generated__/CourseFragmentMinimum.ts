@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseStatus_enum, Weekday_enum } from "./../../__generated__/globalTypes";
+import { CourseStatus_enum, Weekday_enum, CourseRegistrationType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: CourseFragmentMinimum
@@ -88,4 +88,5 @@ export interface CourseFragmentMinimum {
    * The time the course starts each week.
    */
   startTime: any | null;
+  registrationType: CourseRegistrationType_enum | null;
 }

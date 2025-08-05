@@ -34,6 +34,8 @@ export interface TableGridProps<T extends BaseRow> {
   onPageChange: (index: number) => void;
   searchFilter: string;
   onSearchFilterChange: (value: string) => void;
+  onPageSizeChange?: (size: number) => void;
+  availablePageSizes?: number[];
 }
 
 export interface UseTableGridProps<V> {

@@ -25,6 +25,8 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
   creatable = false,
   onOptionCreated,
   createOptionMutation,
+  nullable = false,
+  nullableLabel,
 }) => {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
@@ -33,6 +35,18 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
     onValueUpdated?.(newValue);
     return newValue;
   };
+
+  // Add nullable option if nullable is true
+  const enhancedOptions = nullable
+    ? [
+        {
+          label:
+            nullableLabel || (variant === 'eduhub' ? 'dropdown_selector.none_option' : 'dropdown_selector.none_option'),
+          value: '',
+        },
+        ...options,
+      ]
+    : options;
 
   const {
     localValue,
@@ -49,11 +63,12 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
     debouncedUpdateValue,
   } = useDropDownLogic(
     value,
-    options,
+    enhancedOptions,
     updateValueMutation || null,
     identifierVariables,
     handleMutationValueUpdate,
-    refetchQueries
+    refetchQueries,
+    nullable
   );
 
   const [createValue] = useRoleMutation(

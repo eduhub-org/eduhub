@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import { FC, useMemo } from 'react';
 import mysteryImg from '../../public/images/common/mystery.svg';
-import { Course_Course_by_pk_CourseInstructors_Expert_User } from '../../queries/__generated__/Course';
 import { isLinkFormat } from '../../helpers/util';
 import useTranslation from 'next-translate/useTranslation';
 import { getPublicImageUrl } from '../../helpers/filehandling';
@@ -20,9 +19,18 @@ const sizeConfigs: Record<Size, SizeConfig> = {
   large: { imageSize: 100, imageSolution: 400, fontSize: 'text-lg' },
 };
 
+// Create a more flexible user type that only includes the properties actually used by UserCard
+interface UserCardUser {
+  id: any;
+  firstName: string;
+  lastName: string;
+  picture: string | null;
+  externalProfile: string | null;
+}
+
 interface UserCardProps {
   className?: string;
-  user: Course_Course_by_pk_CourseInstructors_Expert_User;
+  user: UserCardUser;
   role?: string;
   size?: Size;
 }

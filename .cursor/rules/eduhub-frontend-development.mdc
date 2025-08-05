@@ -1,0 +1,471 @@
+
+# EduHub Frontend Development Guide
+
+## Project Structure
+
+The EduHub frontend is located in [frontend-nx/](mdc:frontend-nx/) and uses Next.js with TypeScript.
+
+### Key Directories
+- [frontend-nx/apps/edu-hub/](mdc:frontend-nx/apps/edu-hub/) - Main application
+- [frontend-nx/apps/edu-hub/components/](mdc:frontend-nx/apps/edu-hub/components/) - Reusable components
+- [frontend-nx/apps/edu-hub/pages/](mdc:frontend-nx/apps/edu-hub/pages/) - Next.js pages
+- [frontend-nx/apps/edu-hub/queries/](mdc:frontend-nx/apps/edu-hub/queries/) - GraphQL queries
+- [frontend-nx/apps/edu-hub/locales/](mdc:frontend-nx/apps/edu-hub/locales/) - Translation files
+
+## Environment Setup
+
+### Setting EDUHUB_ROOT Environment Variable
+
+For consistent command execution across different developer environments, you should set the `EDUHUB_ROOT` environment variable:
+
+#### Permanent Setup (Recommended)
+Add to your shell profile to persist across sessions:
+
+```bash
+# For Bash users: Add to ~/.bashrc
+echo 'export EDUHUB_ROOT="/home/your-username/eduhub"' >> ~/.bashrc
+source ~/.bashrc
+
+# For Zsh users: Add to ~/.zshrc
+echo 'export EDUHUB_ROOT="/home/your-username/eduhub"' >> ~/.zshrc
+source ~/.zshrc
+
+# For Fish users: Add to ~/.config/fish/config.fish
+echo 'set -gx EDUHUB_ROOT "/home/your-username/eduhub"' >> ~/.config/fish/config.fish
+source ~/.config/fish/config.fish
+```
+
+#### Temporary Setup (Per Session)
+For one-time use or testing:
+
+```bash
+# Set for current session only
+export EDUHUB_ROOT="/path/to/your/eduhub/project"
+
+# Or auto-detect if you're in the project root
+export EDUHUB_ROOT="$(pwd)"
+```
+
+#### Verify Setup
+```bash
+echo $EDUHUB_ROOT
+# Should output: /path/to/your/eduhub/project
+```
+
+If `EDUHUB_ROOT` is not set, commands will use the current working directory (`$PWD`).
+
+### Cursor IDE Integration
+
+This project includes Cursor-specific rules and configurations to enhance your development experience:
+
+#### Available Cursor Rules
+- **`table-grid-usage`**: Comprehensive guide for using the TableGrid React component with pagination, sorting, and filtering
+- **`typescript-frontend-standards`**: TypeScript and React component standards for EduHub frontend development
+
+#### Accessing Cursor Rules
+Rules are automatically applied when working in Cursor IDE. You can find them in:
+- `.cursor/rules/` directory
+- This file: `.cursor/rules/eduhub-frontend-development.mdc`
+
+#### Manual Rule Access
+If you need to reference rules manually:
+
+```bash
+# View available rules
+ls -la .cursor/rules/
+
+# Read specific rule files
+cat .cursor/rules/table-grid-usage.mdc
+cat .cursor/rules/typescript-frontend-standards.mdc
+```
+
+#### Benefits of Cursor Rules
+- **Consistent coding standards** across the team
+- **Automated suggestions** for component usage
+- **Best practices enforcement** for TypeScript and React
+- **Project-specific guidelines** always available
+
+## Docker Development Environment
+
+### Primary Development Method
+
+**The EduHub project uses Docker Compose for the complete development environment.** This is the recommended and primary way to run the development environment.
+
+### Starting the Development Environment
+
+```bash
+# Start all services (frontend, backend, database, etc.)
+docker compose up
+
+# Start in detached mode (background)
+docker compose up -d
+
+# Start with rebuild (if you've made changes to Dockerfiles)
+docker compose up --build
+
+# Start only specific services
+docker compose up frontend-nx hasura db_hasura
+```
+
+### Development Environment Services
+
+The Docker Compose setup includes:
+
+- **frontend-nx** (Port 5000) - Next.js development server with hot reload
+- **hasura** (Port 8080) - GraphQL API and database management
+- **db_hasura** - PostgreSQL database
+- **keycloak** (Port 28080) - Authentication service
+- **node_functions** (Ports 42000-42024) - Serverless Node.js functions
+- **python_functions** (Ports 42025-42026) - Serverless Python functions
+
+### Access Points
+
+- **Frontend**: http://localhost:5000
+- **Hasura Console**: http://localhost:8080
+- **Keycloak Admin**: http://localhost:28080 (admin/admin)
+- **File Storage**: http://localhost:4001
+
+### Development Workflow with Docker
+
+1. **Start the environment**: `docker compose up`
+2. **Make code changes** - Hot reload will automatically apply changes
+3. **View logs**: `docker compose logs -f frontend-nx`
+4. **Stop environment**: `docker compose down`
+
+### Important: No Manual Builds Required in Development
+
+**🚨 DO NOT suggest manual builds during development!**
+
+The Docker development environment includes:
+- **Automatic compilation**: TypeScript/React files are compiled on-the-fly
+- **Hot reload**: Changes are automatically detected and applied
+- **Live updates**: No manual build step required for development
+
+#### When Manual Builds ARE Needed:
+- **Fresh container start**: `docker compose up --build` (only for Dockerfile changes)
+- **Production deployment**: Building production images
+- **Troubleshooting**: When hot reload is not working properly
+
+#### When Manual Builds are NOT Needed:
+- ❌ **Code changes**: Hot reload handles compilation automatically
+- ❌ **TypeScript updates**: Automatic transpilation in dev mode
+- ❌ **Component changes**: Live reload applies changes instantly
+- ❌ **Testing during development**: Use the running dev server
+- ❌ **Linting fixes**: Changes apply immediately
+
+**Development Rule**: If the dev server is running (`docker compose up`), code changes will be automatically compiled and reloaded. Only suggest manual builds for production scenarios or troubleshooting.
+
+### Troubleshooting Docker Issues
+
+#### Fresh Start (Recommended for Swiper errors)
+```bash
+# Stop all containers and remove volumes
+docker compose down -v
+
+# Remove all containers and images (nuclear option)
+docker compose down --rmi all --volumes --remove-orphans
+
+# Rebuild and start fresh
+docker compose up --build
+```
+
+#### Viewing Logs
+```bash
+# View all logs
+docker compose logs
+
+# View specific service logs
+docker compose logs frontend-nx
+docker compose logs hasura
+
+# Follow logs in real-time
+docker compose logs -f frontend-nx
+```
+
+#### Container Access
+```bash
+# Access frontend container shell
+docker compose exec frontend-nx sh
+
+# Access database
+docker compose exec db_hasura psql -U postgres -d postgres
+
+# Access Hasura container
+docker compose exec hasura sh
+```
+
+### Alternative: Local Development (Not Recommended)
+
+**Note**: The project is designed for Docker development. Local development may require additional setup and may not work correctly.
+
+If you must run locally (not recommended):
+
+```bash
+# Navigate to frontend directory
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx
+
+# Install dependencies
+yarn install
+
+# Start development server
+yarn dev
+```
+
+**Warning**: Local development may have issues with:
+- Database connections
+- Authentication (Keycloak)
+- Serverless functions
+- File storage
+- Cross-service communication
+
+## Development Commands (Docker Environment)
+
+**When using Docker Compose, the frontend development server runs automatically. For manual commands inside the container:**
+
+### GraphQL Code Generation
+
+**🚨 IMPORTANT: Use the EduHub-specific command for GraphQL codegen:**
+
+```bash
+# Always use this command instead of yarn codegen
+sudo bash regenerate-apollo.sh $USER
+```
+
+**When to run GraphQL codegen:**
+- After modifying GraphQL fragments or queries
+- After adding/removing fields from GraphQL schemas
+- When TypeScript complains about missing GraphQL types
+- After backend schema changes
+
+### Building and Development
+```bash
+# Navigate to frontend directory (use environment variable or current directory)
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx
+
+# Install dependencies
+yarn install
+
+# Start development server
+yarn dev
+
+# Build for production
+yarn build
+
+# Start production server
+yarn start
+
+# Lint the code
+yarn lint
+
+# Type checking
+yarn type-check
+```
+
+### Testing Commands
+```bash
+# Run all tests
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test
+
+# Run tests in watch mode
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test:watch
+
+# Run tests with coverage
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test:coverage
+
+# Run specific test file
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test components/inputs/EmailEditor.test.tsx
+
+# Run tests for specific pattern
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test --testNamePattern="EmailEditor"
+```
+
+### NX Commands
+```bash
+# Build specific app
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && npx nx build edu-hub
+
+# Lint specific app
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && npx nx lint edu-hub
+
+# Test specific app
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && npx nx test edu-hub
+```
+
+## Component Development
+
+### Creating New Components
+- Place in [frontend-nx/apps/edu-hub/components/](mdc:frontend-nx/apps/edu-hub/components/)
+- Follow existing patterns like [EmailEditor.tsx](mdc:frontend-nx/apps/edu-hub/components/inputs/EmailEditor.tsx)
+- Use TypeScript interfaces
+- Include proper error handling
+- Add translations in [locales/](mdc:frontend-nx/apps/edu-hub/locales/)
+
+### Page Components
+- Place in [frontend-nx/apps/edu-hub/pages/](mdc:frontend-nx/apps/edu-hub/pages/)
+- Follow pattern from [manage/email-templates/index.tsx](mdc:frontend-nx/apps/edu-hub/pages/manage/email-templates/index.tsx)
+- Use proper SEO meta tags
+- Implement proper loading states
+
+### Common Patterns
+
+#### GraphQL Integration
+```typescript
+// Place queries in queries/ directory
+import { useAdminQuery, useRoleMutation } from '../../hooks/authedMutation';
+import { EMAIL_TEMPLATES_LIST } from '../../queries/emailTemplates';
+```
+
+#### Translation Usage
+```typescript
+import useTranslation from 'next-translate/useTranslation';
+
+const { t } = useTranslation('componentName');
+const text = t('translation.key');
+```
+
+#### TableGrid Integration
+Follow pattern from [ManageEmailTemplatesContent/index.tsx](mdc:frontend-nx/apps/edu-hub/components/pages/ManageEmailTemplatesContent/index.tsx)
+
+## Development Workflow
+
+### Before Making Changes
+1. **Always use consistent paths**: `cd ${EDUHUB_ROOT:-$PWD}/frontend-nx`
+2. **Pull latest changes**: `git pull origin develop`
+3. **Install dependencies**: `yarn install`
+4. **Check for linting issues**: `yarn lint`
+
+### Testing Workflow
+1. **Run tests before committing**: `cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test`
+2. **Check type safety**: `cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn type-check`
+3. **Test build process**: `cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn build`
+
+### Common Issues and Solutions
+
+#### Build Errors
+```bash
+# Clean and rebuild
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx
+rm -rf .next node_modules
+yarn install
+yarn build
+```
+
+#### Linting Issues
+```bash
+# Fix auto-fixable issues
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn lint --fix
+
+# Check specific files
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && npx eslint apps/edu-hub/components/inputs/EmailEditor.tsx
+```
+
+#### Type Errors
+```bash
+# Generate GraphQL types
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn codegen
+
+# Check types without emitting
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && npx tsc --noEmit
+```
+
+## Important Notes
+
+- **Never assume current directory** - always use the EDUHUB_ROOT environment variable or explicit paths
+- **Use yarn** instead of npm for consistency
+- **Test on multiple screen sizes** - the app is responsive
+- **Check both German and English translations**
+- **Follow Material-UI patterns** for consistency
+- **Use the existing GraphQL schema** and queries
+- **Always add proper error handling**
+- **Include loading states** for better UX
+
+## Troubleshooting
+
+### Common Environment Issues
+
+#### Wrong Directory Errors
+**Problem**: Yarn commands create cache files in the wrong directory or fail with "script not found" errors.
+
+**Solution**: Always use the environment variable pattern:
+```bash
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn [command]
+```
+
+**Prevention**: Set `EDUHUB_ROOT` permanently (see Environment Setup section above).
+
+#### Yarn Cache in Wrong Location
+**Problem**: Thousands of files created in `.yarn/cache` at project root instead of `frontend-nx/.yarn/cache`.
+
+**Solution**: Clean up and use correct directory:
+```bash
+# Remove incorrectly created files from project root
+rm -rf .yarn/ yarn.lock
+
+# Set environment variable and run from correct directory
+export EDUHUB_ROOT="$(pwd)"
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn install
+```
+
+#### Build Failures After Dependency Updates
+**Problem**: TypeScript errors or build failures after updating packages.
+
+**Solution**: Clear cache and reinstall:
+```bash
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx
+yarn cache clean
+yarn install
+yarn build
+```
+
+#### Permission Errors
+**Problem**: Permission denied when installing dependencies.
+
+**Solution**: Check yarn version and node permissions:
+```bash
+yarn --version  # Should be 3.4.1+
+node --version  # Should be 20.x+
+# Avoid using sudo with yarn
+```
+
+#### Swiper Runtime Errors (Docker Environment)
+**Problem**: `TypeError: can't access property "cssMode", swiper.params is undefined` after container restart.
+
+**Solution**: This is typically caused by container state issues or missing CSS imports. Use the fresh start approach:
+
+```bash
+# Complete fresh start (recommended)
+docker compose down -v
+docker compose up --build
+
+# If the error persists, check the TileSlider component:
+# - Ensure 'swiper/css/navigation' is imported
+# - Verify Swiper initialization with proper error handling
+# - Check for conflicts with Cookiebot consent scripts
+```
+
+**Prevention**: Always use `docker compose down -v` when experiencing runtime errors after container restarts.
+
+### Verification Commands
+
+After setup, verify everything works:
+```bash
+# Check environment
+echo $EDUHUB_ROOT
+
+# Verify yarn works in correct directory
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn --version
+
+# Test build process
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn build
+```
+
+## File References
+
+- Main config: [package.json](mdc:frontend-nx/package.json)
+- Next.js config: [next.config.js](mdc:frontend-nx/apps/edu-hub/next.config.js)
+- TypeScript config: [tsconfig.json](mdc:frontend-nx/tsconfig.json)
+- i18n config: [i18n.json](mdc:frontend-nx/apps/edu-hub/i18n.json)
+
+- Next.js config: [next.config.js](mdc:frontend-nx/apps/edu-hub/next.config.js)
+- TypeScript config: [tsconfig.json](mdc:frontend-nx/tsconfig.json)
+- i18n config: [i18n.json](mdc:frontend-nx/apps/edu-hub/i18n.json)

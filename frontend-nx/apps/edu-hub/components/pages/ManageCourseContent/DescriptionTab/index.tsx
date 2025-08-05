@@ -12,7 +12,6 @@ import {
   UPDATE_COURSE_HEADING_DESCRIPTION_1,
   UPDATE_COURSE_HEADING_DESCRIPTION_2,
   UPDATE_COURSE_LANGUAGE,
-  UPDATE_COURSE_LEARNING_GOALS,
   UPDATE_COURSE_MAX_PARTICIPANTS,
   UPDATE_COURSE_START_TIME,
   UPDATE_COURSE_WEEKDAY,
@@ -48,7 +47,6 @@ import {
 } from '../../../../queries/__generated__/InsertSessionAddress';
 import InputField from '../../../inputs/InputField';
 import DropDownSelector from '../../../inputs/DropDownSelector';
-import { useIsAdmin } from '../../../../hooks/authentication';
 import checkmark from '../../../../public/images/course/checkmark.svg';
 
 interface IProps {
@@ -59,7 +57,6 @@ interface IProps {
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const { error, handleError, resetError } = useErrorHandler();
   const { t } = useTranslation('course-page');
-  const isAdmin = useIsAdmin();
 
   const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_COURSE_LOCATION,
@@ -185,57 +182,40 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           currentText={course.tagline}
           maxLength={500}
         />
-        {isAdmin ? (
-          <InputField
-            variant="eduhub"
-            type="textarea"
-            value={course.learningGoals ?? ''}
-            updateValueMutation={UPDATE_COURSE_LEARNING_GOALS}
-            refetchQueries={['ManagedCourse']}
-            itemId={course.id}
-            label={t('learning_goals.label')}
-            placeholder={t('learning_goals.placeholder')}
-            helpText={t('learning_goals.help_text')}
-            maxLength={500}
-            className="h-64"
-            currentText={course.learningGoals ?? ''}
-          />
-        ) : (
-          <div className="mx-4 mb-4">
-            <div className="flex items-center mb-2">
-              <Tooltip title={t('learning_goals.help_text')} placement="top">
-                <HelpOutline style={{ cursor: 'pointer', marginRight: '5px', color: 'gray' }} />
-              </Tooltip>
-              <h3 className="text-gray-400 text-md">{t('learning_goals.label')}</h3>
-            </div>
-            <div className="p-4 h-64 overflow-y-auto text-white">
-              {course.learningGoals ? (
-                <ul className="list-none">
-                  {course.learningGoals
-                    .split('\n')
-                    .filter((goal) => goal.trim() !== '')
-                    .map((goal, index) => (
-                      <li key={index} className="pl-6 mb-6">
-                        <div className="flex">
-                          <img src={checkmark} alt="check mark" className="mr-2 inline-block" />
-                          <div className="ml-2">
-                            {goal.split('\n').map((line, i) => (
-                              <span key={i}>
-                                {line}
-                                <br />
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                </ul>
-              ) : (
-                <p className="text-gray-400 italic">{t('learning_goals.read_only_placeholder')}</p>
-              )}
-            </div>
+        <div className="mx-4 mb-4">
+          <div className="flex items-center mb-2">
+            <Tooltip title={t('learning_goals.help_text')} placement="top">
+              <HelpOutline style={{ cursor: 'pointer', marginRight: '5px', color: 'gray' }} />
+            </Tooltip>
+            <h3 className="text-gray-400 text-md">{t('learning_goals.label')}</h3>
           </div>
-        )}
+          <div className="p-4 h-64 overflow-y-auto text-white">
+            {course.learningGoals ? (
+              <ul className="list-none">
+                {course.learningGoals
+                  .split('\n')
+                  .filter((goal) => goal.trim() !== '')
+                  .map((goal, index) => (
+                    <li key={index} className="pl-6 mb-6">
+                      <div className="flex">
+                        <img src={checkmark} alt="check mark" className="mr-2 inline-block" />
+                        <div className="ml-2">
+                          {goal.split('\n').map((line, i) => (
+                            <span key={i}>
+                              {line}
+                              <br />
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+              </ul>
+            ) : (
+              <p className="text-gray-400 italic">{t('learning_goals.read_only_placeholder')}</p>
+            )}
+          </div>
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2">
         <div>

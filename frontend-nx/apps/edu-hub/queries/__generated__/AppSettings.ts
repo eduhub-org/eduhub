@@ -38,6 +38,8 @@ export interface AppSettings_AppSettings {
    */
   previewImageURL: string | null;
   timeZone: string;
+  showFaqSection: boolean;
+  faqCollectionName: string;
 }
 
 export interface AppSettings {

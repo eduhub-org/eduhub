@@ -8,6 +8,7 @@ interface UseTableGridProps<V> {
   query: DocumentNode;
   queryVariables?: V;
   pageSize?: number;
+  debounceMs?: number; // Configurable debounce time in milliseconds
   refetchFilter?: (searchFilter: string) => Record<string, any>;
 }
 
@@ -16,6 +17,7 @@ export function useTableGrid<V>({
   query,
   queryVariables = {} as V,
   pageSize = 15,
+  debounceMs = 300, // Default to 300ms
   refetchFilter,
 }: UseTableGridProps<V>) {
   const [searchFilter, setSearchFilter] = useState('');
@@ -31,14 +33,15 @@ export function useTableGrid<V>({
 
   const { data, loading, error, refetch } = queryResult;
 
-  const debouncedRefetch = useDebouncedCallback(refetch, 300);
+  const debouncedRefetch = useDebouncedCallback(refetch, debounceMs);
 
   useEffect(() => {
+    const refetchVariables = refetchFilter ? refetchFilter(searchFilter) : {};
     debouncedRefetch({
       offset: pageIndex * pageSize,
       limit: pageSize,
-      filter: refetchFilter ? refetchFilter(searchFilter) : {},
       ...queryVariables,
+      ...refetchVariables, // Merge refetchFilter result into queryVariables
     });
   }, [pageIndex, debouncedRefetch, searchFilter, queryVariables, pageSize, refetchFilter]);
 

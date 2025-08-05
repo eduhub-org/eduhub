@@ -87,6 +87,14 @@ export interface UsersByLastName_User {
    */
   occupation: UserOccupation_enum | null;
   /**
+   * The user's postal/zip code
+   */
+  zipCode: string | null;
+  /**
+   * The user's country of residence
+   */
+  country: string | null;
+  /**
    * An object relationship
    */
   Organization: UsersByLastName_User_Organization | null;

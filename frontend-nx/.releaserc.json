@@ -1,0 +1,76 @@
+{
+  "branches": [
+    {
+      "name": "production",
+      "channel": "latest"
+    },
+    {
+      "name": "staging", 
+      "prerelease": "rc",
+      "channel": "staging"
+    },
+    {
+      "name": "develop",
+      "prerelease": "dev",
+      "channel": "develop"
+    }
+  ],
+  "repositoryUrl": "https://github.com/edu-hub-project/application",
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "angular",
+        "presetConfig": {
+          "types": [
+            {"type": "feat", "section": "Features"},
+            {"type": "fix", "section": "Bug Fixes"},
+            {"type": "docs", "section": "Documentation"},
+            {"type": "style", "section": "Styles"},
+            {"type": "refactor", "section": "Code Refactoring"},
+            {"type": "perf", "section": "Performance Improvements"},
+            {"type": "test", "section": "Tests"},
+            {"type": "build", "section": "Build System"},
+            {"type": "ci", "section": "Continuous Integration"},
+            {"type": "chore", "section": "Chores"}
+          ]
+        }
+      }
+    ],
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "../CHANGELOG.md"
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "echo 'Updating version files for ${nextRelease.version}' && sed -i 's/\"version\": \"[^\"]*\"/\"version\": \"${nextRelease.version}\"/g' ../package.json && find ../functions -name 'package.json' -exec sed -i 's/\"version\": \"[^\"]*\"/\"version\": \"${nextRelease.version}\"/g' {} \\;",
+        "publishCmd": "echo 'Published ${nextRelease.version} on ${nextRelease.channel}'"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "../CHANGELOG.md",
+          "package.json",
+          "../package.json",
+          "../functions/*/package.json"
+        ],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "successComment": false,
+        "failTitle": false,
+        "releasedLabels": false,
+        "failComment": false
+      }
+    ]
+  ]
+}

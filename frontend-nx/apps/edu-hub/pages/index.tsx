@@ -8,6 +8,7 @@ import { ClientOnly } from '@opencampus/shared-components';
 import { Page } from '../components/layout/Page';
 import Loading from '../components/common/Loading';
 import TileSlider from '../components/common/TileSlider';
+import FaqSection from '../components/common/FaqSection';
 
 import { useAuthedQuery, useInstructorQuery } from '../hooks/authedQuery';
 import { useIsLoggedIn, useIsInstructor, useIsAdmin } from '../hooks/authentication';
@@ -15,10 +16,12 @@ import { useUserId } from '../hooks/user';
 
 import { COURSE_GROUP_OPTIONS } from '../queries/courseGroupOptions';
 import { COURSE_TILES, COURSES_BY_INSTRUCTOR, COURSES_ENROLLED_BY_USER } from '../queries/courseQueries';
+import { APP_SETTINGS } from '../queries/appSettings';
 import { CourseGroupOptions } from '../queries/__generated__/CourseGroupOptions';
 import { CourseTiles } from '../queries/__generated__/CourseTiles';
 import { CoursesByInstructor } from '../queries/__generated__/CoursesByInstructor';
 import { CoursesEnrolledByUser } from '../queries/__generated__/CoursesEnrolledByUser';
+import { AppSettings } from '../queries/__generated__/AppSettings';
 
 const Home: FC = () => {
   const { t } = useTranslation('start-page');
@@ -27,53 +30,71 @@ const Home: FC = () => {
   const isAdmin = useIsAdmin();
   const userId = useUserId();
 
-  const { data: adminCoursesData, loading: adminCoursesLoading } = useInstructorQuery<CoursesByInstructor>(COURSES_BY_INSTRUCTOR, {
-    variables: { userId },
-    skip: !isLoggedIn || !(isInstructor || isAdmin),
-  });
+  const { data: adminCoursesData, loading: adminCoursesLoading } = useInstructorQuery<CoursesByInstructor>(
+    COURSES_BY_INSTRUCTOR,
+    {
+      variables: { userId },
+      skip: !isLoggedIn || !(isInstructor || isAdmin),
+    }
+  );
 
-  const { data: enrolledCoursesData, loading: enrolledCoursesLoading } = useAuthedQuery<CoursesEnrolledByUser>(COURSES_ENROLLED_BY_USER, {
-    variables: { userId },
-    skip: !isLoggedIn,
-  });
+  const { data: enrolledCoursesData, loading: enrolledCoursesLoading } = useAuthedQuery<CoursesEnrolledByUser>(
+    COURSES_ENROLLED_BY_USER,
+    {
+      variables: { userId },
+      skip: !isLoggedIn,
+    }
+  );
 
   const { data: coursesData, loading: coursesLoading } = useQuery<CourseTiles>(COURSE_TILES);
 
   const { data: courseGroupOptionsData } = useAuthedQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS);
 
-const myAdminCourses = useMemo(() => adminCoursesData?.Course ?? [], [adminCoursesData]);
-const myCourses = useMemo(() => enrolledCoursesData?.Course ?? [], [enrolledCoursesData]);
-const publishedCourses = useMemo(() => coursesData?.Course ?? [], [coursesData]);
+  const { data: appSettingsData } = useQuery<AppSettings>(APP_SETTINGS, {
+    variables: { appName: 'edu' },
+  });
 
-  const coursesGroupsAuthenticated = useMemo(() => [
-    { title: 'myAdminCourses', courses: myAdminCourses, isManaged: true },
-    { title: 'myCourses', courses: myCourses, isManaged: false },
-  ], [myAdminCourses, myCourses]);
+  const myAdminCourses = useMemo(() => adminCoursesData?.Course ?? [], [adminCoursesData]);
+  const myCourses = useMemo(() => enrolledCoursesData?.Course ?? [], [enrolledCoursesData]);
+  const publishedCourses = useMemo(() => coursesData?.Course ?? [], [coursesData]);
 
-  const coursesGroups = useMemo(() => [1, 2, 3, 4, 5].map((order) => {
-    const filteredCourses = publishedCourses.filter((course) =>
-      course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.order === order)
-    );
-    const title = courseGroupOptionsData?.CourseGroupOption[order - 1]?.title;
-    return {
-      title,
-      courses: filteredCourses,
-    };
-  }), [publishedCourses, courseGroupOptionsData]);
+  const coursesGroupsAuthenticated = useMemo(
+    () => [
+      { title: 'myAdminCourses', courses: myAdminCourses, isManaged: true },
+      { title: 'myCourses', courses: myCourses, isManaged: false },
+    ],
+    [myAdminCourses, myCourses]
+  );
+
+  const coursesGroups = useMemo(
+    () =>
+      [1, 2, 3, 4, 5].map((order) => {
+        const filteredCourses = publishedCourses.filter((course) =>
+          course.CourseGroups.some((courseGroup) => courseGroup.CourseGroupOption.order === order)
+        );
+        const title = courseGroupOptionsData?.CourseGroupOption[order - 1]?.title;
+        return {
+          title,
+          courses: filteredCourses,
+        };
+      }),
+    [publishedCourses, courseGroupOptionsData]
+  );
 
   const renderCourseGroups = (groups, groupKey) => (
     <>
-      {groups.map((group, index) =>
-        group.courses.length > 0 && (
-          <Fragment key={`${groupKey}-${index}`}>
-            <h2 id={`sliderGroup${index + 1}`} className="text-2xl font-semibold text-left ml-3 md:ml-0">
-              {t(group.title)}
-            </h2>
-            <div className="mt-2 mb-12">
-              <TileSlider courses={group.courses} isManage={group.isManaged ?? false} />
-            </div>
-          </Fragment>
-        )
+      {groups.map(
+        (group, index) =>
+          group.courses.length > 0 && (
+            <Fragment key={`${groupKey}-${index}`}>
+              <h2 id={`sliderGroup${index + 1}`} className="text-2xl font-semibold text-left ml-3 md:ml-0">
+                {t(`common:course_group_options.${group.title}`)}
+              </h2>
+              <div className="mt-2 mb-12">
+                <TileSlider courses={group.courses} isManage={group.isManaged ?? false} />
+              </div>
+            </Fragment>
+          )
       )}
     </>
   );
@@ -111,6 +132,15 @@ const publishedCourses = useMemo(() => coursesData?.Course ?? [], [coursesData])
             </ClientOnly>
           )}
         </div>
+
+        {/* FAQ Section */}
+        {appSettingsData?.AppSettings[0]?.showFaqSection && (
+          <div className="max-w-screen-xl mx-auto px-3 md:px-16 py-16">
+            <ClientOnly>
+              <FaqSection collection={appSettingsData?.AppSettings[0]?.faqCollectionName || 'default'} />
+            </ClientOnly>
+          </div>
+        )}
       </Page>
     </>
   );

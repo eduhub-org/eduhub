@@ -1,6 +1,6 @@
 {
   "name": "callNodeFunction",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "type": "module",
   "dependencies": {
     "@google-cloud/storage": "^5.3.0",
@@ -13,13 +13,18 @@
   },
   "devDependencies": {
     "@google-cloud/functions-framework": "^3.1.2",
-    "npm-watch": "^0.6.0"
+    "npm-watch": "^0.6.0",
+    "jest": "^29.7.0",
+    "@jest/globals": "^29.7.0"
   },
   "watch": {
     "start": "*.js"
   },
   "scripts": {
     "watch": "npm-watch start",
-    "start": "npx @google-cloud/functions-framework --port 42022 --target=callNodeFunction"
+    "start": "npx @google-cloud/functions-framework --port 42022 --target=callNodeFunction",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage"
   }
 }

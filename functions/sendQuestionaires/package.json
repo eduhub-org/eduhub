@@ -1,6 +1,6 @@
 {
   "name": "sendQuestionaires",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "dependencies": {
     "body-parser": "1.20.3",
     "node-fetch": "2.6.7",

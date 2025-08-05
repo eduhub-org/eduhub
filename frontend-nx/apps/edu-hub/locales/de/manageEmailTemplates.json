@@ -1,0 +1,41 @@
+{
+  "headline": "E-Mail-Vorlagen",
+  "columns": {
+    "title": "Vorlagen-Typ",
+    "subject": "E-Mail-Betreffzeile",
+    "updated_at": "Zuletzt aktualisiert"
+  },
+  "template_types": {
+    "APPLICATION_RECEIVED": "Bewerbung erhalten",
+    "APPLICATION_CONFIRMED": "Bewerbung bestätigt",
+    "SESSION_REMINDER": "Sitzungserinnerung",
+    "INVITE": "Einladung",
+    "DECLINE": "Bewerbung abgelehnt",
+    "REGISTRATION_CONFIRMED": "Registrierung bestätigt"
+  },
+  "placeholders": {
+    "subject": "E-Mail-Betreff eingeben...",
+    "body": "Beginne hier mit deinem E-Mail-Inhalt. Nutze die Toolbar für Formatierung und schnelle Platzhalter..."
+  },
+  "help_text": {
+    "subject": "Die Betreffzeile, die im E-Mail-Posteingang des Empfängers angezeigt wird. Du kannst Platzhalter wie [User:Firstname] verwenden, um den Betreff zu personalisieren."
+  },
+  "expandable": {
+    "body_content": "E-Mail-Inhalt",
+    "trigger_description": "Wann wird diese E-Mail versendet?",
+    "keyword_placeholders": "Verfügbare Platzhalter",
+    "preview": "Vorschau",
+    "generate_preview": "Vorschau generieren",
+    "generating_preview": "Wird generiert..."
+  },
+  "triggers": {
+    "APPLICATION_RECEIVED": "Gesendet, wenn ein Benutzer sich für einen Kurs bewirbt",
+    "APPLICATION_CONFIRMED": "Gesendet, wenn die Teilnahme eines Benutzers bestätigt wird",
+    "INVITE": "Gesendet, wenn ein Admin Benutzer zu einem Kurs einlädt",
+    "DECLINE": "Gesendet, wenn ein Admin Bewerbungen ablehnt",
+    "REGISTRATION_CONFIRMED": "Gesendet, wenn sich ein Benutzer direkt für einen Kurs/eine Veranstaltung registriert",
+    "SESSION_REMINDER": "Gesendet vor Beginn der Sitzungen (24h, 1h, 15min vorher)"
+  },
+  "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage '{{title}}' löschen möchtest?",
+  "unknown_trigger": "Unbekannter Auslöser-Typ"
+} 

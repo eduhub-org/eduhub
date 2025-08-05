@@ -48,6 +48,14 @@ export interface User_User_by_pk {
    */
   picture: string | null;
   /**
+   * The user's postal/zip code
+   */
+  zipCode: string | null;
+  /**
+   * The user's country of residence
+   */
+  country: string | null;
+  /**
    * An object relationship
    */
   Organization: User_User_by_pk_Organization | null;
