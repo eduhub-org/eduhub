@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, AttendanceStatus_enum, AchievementRecordRating_enum, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum, CourseStatus_enum, CourseEnrollmentStatus_enum, MotivationRating_enum, AttendanceStatus_enum, AchievementRecordRating_enum, AchievementRecordType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ManagedCourse
@@ -278,6 +278,23 @@ export interface ManagedCourse_Course_by_pk_DegreeCourses {
    * An object relationship
    */
   Course: ManagedCourse_Course_by_pk_DegreeCourses_Course;
+}
+
+export interface ManagedCourse_Course_by_pk_CourseFundingOrganizations_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+  description: string | null;
+  type: OrganizationType_enum;
+}
+
+export interface ManagedCourse_Course_by_pk_CourseFundingOrganizations {
+  __typename: "CourseFundingOrganization";
+  id: number;
+  /**
+   * An object relationship
+   */
+  Organization: ManagedCourse_Course_by_pk_CourseFundingOrganizations_Organization;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances_Session {
@@ -599,6 +616,10 @@ export interface ManagedCourse_Course_by_pk {
    * An array relationship
    */
   DegreeCourses: ManagedCourse_Course_by_pk_DegreeCourses[];
+  /**
+   * An array relationship
+   */
+  CourseFundingOrganizations: ManagedCourse_Course_by_pk_CourseFundingOrganizations[];
   /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */

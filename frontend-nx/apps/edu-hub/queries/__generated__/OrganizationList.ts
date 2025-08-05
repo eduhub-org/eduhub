@@ -21,10 +21,6 @@ export interface OrganizationList_Organization {
   type: OrganizationType_enum;
   description: string | null;
   aliases: any | null;
-  /**
-   * Path to the organization logo image file
-   */
-  logo: string | null;
   created_at: any;
   /**
    * An array relationship

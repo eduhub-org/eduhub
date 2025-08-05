@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: CourseList
@@ -266,6 +266,23 @@ export interface CourseList_Course_DegreeCourses {
   Course: CourseList_Course_DegreeCourses_Course;
 }
 
+export interface CourseList_Course_CourseFundingOrganizations_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+  description: string | null;
+  type: OrganizationType_enum;
+}
+
+export interface CourseList_Course_CourseFundingOrganizations {
+  __typename: "CourseFundingOrganization";
+  id: number;
+  /**
+   * An object relationship
+   */
+  Organization: CourseList_Course_CourseFundingOrganizations_Organization;
+}
+
 export interface CourseList_Course {
   __typename: "Course";
   id: number;
@@ -386,6 +403,10 @@ export interface CourseList_Course {
    * An array relationship
    */
   DegreeCourses: CourseList_Course_DegreeCourses[];
+  /**
+   * An array relationship
+   */
+  CourseFundingOrganizations: CourseList_Course_CourseFundingOrganizations[];
 }
 
 export interface CourseList {

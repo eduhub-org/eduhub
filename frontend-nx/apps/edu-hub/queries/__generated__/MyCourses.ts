@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollmentStatus_enum, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollmentStatus_enum, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: MyCourses
@@ -270,6 +270,23 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_DegreeCourses {
   Course: MyCourses_User_by_pk_CourseEnrollments_Course_DegreeCourses_Course;
 }
 
+export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseFundingOrganizations_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+  description: string | null;
+  type: OrganizationType_enum;
+}
+
+export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseFundingOrganizations {
+  __typename: "CourseFundingOrganization";
+  id: number;
+  /**
+   * An object relationship
+   */
+  Organization: MyCourses_User_by_pk_CourseEnrollments_Course_CourseFundingOrganizations_Organization;
+}
+
 export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
@@ -419,6 +436,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course {
    * An array relationship
    */
   DegreeCourses: MyCourses_User_by_pk_CourseEnrollments_Course_DegreeCourses[];
+  /**
+   * An array relationship
+   */
+  CourseFundingOrganizations: MyCourses_User_by_pk_CourseEnrollments_Course_CourseFundingOrganizations[];
   /**
    * An array relationship
    */

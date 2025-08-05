@@ -95,6 +95,15 @@ export const COURSE_FRAGMENT = gql`
         }
       }
     }
+    CourseFundingOrganizations {
+      id
+      Organization {
+        id
+        name
+        description
+        type
+      }
+    }
 }
 `;
 
