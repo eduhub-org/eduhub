@@ -143,11 +143,18 @@
     "confirm_delete": "Confirm Deletion",
     "deletion_confirmation_question": "Are you sure you want to delete this entry?"
   },
-  "file_uploader": {
-    "upload_new_profile_picture": "Upload new profile picture",
-    "upload_file": "Upload file",
+  "image_uploader": {
+    "uploading": "Uploading...",
+    "removing": "Removing...",
     "file_size_exceeds_limit": "The file is too large. Please choose a file with a size of {{maxFileSize}}MB or less.",
-    "error_uploading_profile_picture": "Error uploading profile picture"
+    "upload_file": "Upload file",
+    "upload_new_profile_picture": "Upload new profile picture",
+    "upload_new_logo": "Upload new logo",
+    "remove_profile_picture": "Remove profile picture",
+    "remove_logo": "Remove logo",
+    "remove_image": "Remove image",
+    "remove_image_error": "Error removing image",
+    "upload_error": "Error uploading image"
   },
   "input_field": {
     "invalid_link_format": "Invalid link format",

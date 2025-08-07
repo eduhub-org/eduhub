@@ -18,7 +18,7 @@ export const ORGANIZATION_LIST = gql`
       type
       description
       aliases
-      # logo  # Commented out until logo field is available in schema
+      logo
       created_at
       Users {
         id

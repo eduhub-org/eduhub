@@ -101,7 +101,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         try {
           setIsUploading(true);
           if (selectedFile.size > maxFileSize) {
-            handleError(t('file_uploader.file_size_exceeds_limit', { maxFileSize: maxFileSize / 1024 / 1024 }));
+            handleError(t('image_uploader.file_size_exceeds_limit', { maxFileSize: maxFileSize / 1024 / 1024 }));
             setIsUploading(false);
             return;
           }
@@ -226,7 +226,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       setIsRemoving(false);
     } catch (error) {
       console.error('Remove image error:', error);
-      handleError(t('file_uploader.remove_image_error'));
+      handleError(t('image_uploader.remove_image_error'));
       setIsRemoving(false);
     }
   }, [updateFile, identifierVariables, element, onFileUpdated, handleError, t]);
@@ -264,7 +264,14 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
                 <MdPhotoCamera size={size === 'small' ? '1em' : '1.5em'} className="text-gray-800" />
               </IconButton>
             </Tooltip>
-            <Tooltip title={t('file_uploader.remove_image')} placement="top">
+            <Tooltip
+              title={
+                element === 'organizationLogo'
+                  ? t('image_uploader.remove_logo')
+                  : t('image_uploader.remove_profile_picture')
+              }
+              placement="top"
+            >
               <IconButton
                 onClick={handleRemoveImage}
                 className="absolute top-1 right-1 bg-white hover:bg-red-100 shadow-md transition-colors duration-200"
@@ -304,7 +311,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     return renderImageUpload(
       imageUrl,
       'Profile picture',
-      t('file_uploader.upload_new_profile_picture'),
+      t('image_uploader.upload_new_profile_picture'),
       'profile-picture-input',
       'large',
       'rounded-full'
@@ -379,13 +386,13 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         {renderImageUpload(
           currentFile ? getPublicUrl(currentFile) : null,
           'Organization logo',
-          t('file_uploader.upload_new_logo'),
+          t('image_uploader.upload_new_logo'),
           'organization-logo-input',
           'small',
           'rounded'
         )}
-        {isUploading && <div className="text-sm text-blue-600 mt-1">{t('file_uploader.uploading')}...</div>}
-        {isRemoving && <div className="text-sm text-red-600 mt-1">{t('file_uploader.removing')}...</div>}
+        {isUploading && <div className="text-sm text-blue-600 mt-1">{t('image_uploader.uploading')}...</div>}
+        {isRemoving && <div className="text-sm text-red-600 mt-1">{t('image_uploader.removing')}...</div>}
         {helpText && (
           <Tooltip title={t(helpText)} placement="top">
             <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled, marginLeft: '8px' }} />
@@ -409,7 +416,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         />
         <label htmlFor="file-input">
           <Button variant="contained" component="span" startIcon={<CloudUpload />} style={{ marginRight: '10px' }}>
-            {t('file_uploader.upload_file')}
+            {t('image_uploader.upload_file')}
           </Button>
         </label>
         {helpText && (

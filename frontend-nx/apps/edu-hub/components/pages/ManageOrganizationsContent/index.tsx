@@ -9,7 +9,7 @@ import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
-import UnifiedFileUploader from '../../inputs/UnifiedFileUploader';
+import ImageUploader from '../../inputs/ImageUploader';
 import { useRoleQuery } from '../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { PageBlock } from '../../common/PageBlock';
@@ -104,7 +104,7 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
         refetchQueries={['OrganizationList']}
       />
       <div className="mt-6">
-        <UnifiedFileUploader
+        <ImageUploader
           variant="material"
           element="organizationLogo"
           label={t('organization.logo')}

@@ -143,11 +143,18 @@
     "confirm_delete": "Löschen bestätigen",
     "deletion_confirmation_question": "Bist du sicher, dass du diesen Eintrag löschen möchtest?"
   },
-  "file_uploader": {
-    "upload_new_profile_picture": "Neues Profilbild hochladen",
-    "upload_file": "Datei hochladen",
+  "image_uploader": {
+    "uploading": "Hochladen...",
+    "removing": "Entfernen...",
     "file_size_exceeds_limit": "Die Datei ist zu groß. Bitte wähle eine Datei mit einer Größe von {{maxFileSize}}MB oder weniger.",
-    "error_uploading_profile_picture": "Fehler beim Hochladen des Profilbildes"
+    "upload_file": "Datei hochladen",
+    "upload_new_profile_picture": "Neues Profilbild hochladen",
+    "upload_new_logo": "Neues Logo hochladen",
+    "remove_profile_picture": "Profilbild entfernen",
+    "remove_logo": "Logo entfernen",
+    "remove_image": "Bild entfernen",
+    "remove_image_error": "Fehler beim Entfernen des Bildes",
+    "upload_error": "Fehler beim Hochladen des Bildes"
   },
   "input_field": {
     "invalid_link_format": "Ungültiges Link-Format",

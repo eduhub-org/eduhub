@@ -573,6 +573,7 @@ export enum CourseGroupOption_update_column {
   created_at = "created_at",
   id = "id",
   order = "order",
+  sliderGroup = "sliderGroup",
   title = "title",
   updated_at = "updated_at",
 }
@@ -988,6 +989,7 @@ export enum Organization_select_column {
   created_at = "created_at",
   description = "description",
   id = "id",
+  logo = "logo",
   name = "name",
   type = "type",
   updated_at = "updated_at",
@@ -1001,6 +1003,7 @@ export enum Organization_update_column {
   created_at = "created_at",
   description = "description",
   id = "id",
+  logo = "logo",
   name = "name",
   type = "type",
   updated_at = "updated_at",
@@ -4095,6 +4098,7 @@ export interface CourseGroupOption_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   order?: Int_comparison_exp | null;
+  sliderGroup?: Boolean_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
@@ -4107,6 +4111,7 @@ export interface CourseGroupOption_insert_input {
   created_at?: any | null;
   id?: number | null;
   order?: number | null;
+  sliderGroup?: boolean | null;
   title?: string | null;
   updated_at?: any | null;
 }
@@ -5821,6 +5826,7 @@ export interface Organization_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   description?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  logo?: String_comparison_exp | null;
   name?: String_comparison_exp | null;
   type?: OrganizationType_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -5838,6 +5844,7 @@ export interface Organization_insert_input {
   created_at?: any | null;
   description?: string | null;
   id?: number | null;
+  logo?: string | null;
   name?: string | null;
   type?: OrganizationType_enum | null;
   updated_at?: any | null;
@@ -5850,6 +5857,7 @@ export interface Organization_max_order_by {
   created_at?: order_by | null;
   description?: order_by | null;
   id?: order_by | null;
+  logo?: order_by | null;
   name?: order_by | null;
   updated_at?: order_by | null;
 }
@@ -5861,6 +5869,7 @@ export interface Organization_min_order_by {
   created_at?: order_by | null;
   description?: order_by | null;
   id?: order_by | null;
+  logo?: order_by | null;
   name?: order_by | null;
   updated_at?: order_by | null;
 }
@@ -5894,6 +5903,7 @@ export interface Organization_order_by {
   created_at?: order_by | null;
   description?: order_by | null;
   id?: order_by | null;
+  logo?: order_by | null;
   name?: order_by | null;
   type?: order_by | null;
   updated_at?: order_by | null;
