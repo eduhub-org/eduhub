@@ -88,6 +88,23 @@ def handle_moochub_data(page=1, per_page=25):
                     id
                     locationOption
                 }
+                CourseGroups {
+                    CourseGroupOption {
+                        id
+                        title
+                        sliderGroup
+                    }
+                }
+                CourseFundingOrganizations {
+                    id
+                    Organization {
+                        id
+                        name
+                        description
+                        type
+                        logo
+                    }
+                }
             }
         }"""
 
@@ -103,14 +120,15 @@ def handle_moochub_data(page=1, per_page=25):
             if course["Program"]["shortTitle"] not in ["EVENTS", "DEGREES"]
         ]
 
-        # Transform to MOOCHub schema
+        # Transform to MOOCHub schema - one entry per course location
         transformed_data = []
         for course in courses["data"]["Course"]:
-            # Determine courseMode - "online" if ONLINE exists, otherwise "onsite"
-            course_mode = ["online"] if any(
-                loc["locationOption"] == "ONLINE" 
-                for loc in course["CourseLocations"]
-            ) else ["onsite"]
+            # Collect metadata tags (sliderGroup = false)
+            metadata_tags = []
+            for group in course.get("CourseGroups", []):
+                group_option = group.get("CourseGroupOption", {})
+                if not group_option.get("sliderGroup"):
+                    metadata_tags.append(group_option.get("title", ""))
             
             # Build HTML description
             description_parts = []
@@ -142,73 +160,158 @@ def handle_moochub_data(page=1, per_page=25):
                 html_content = markdown.markdown(course["contentDescriptionField2"])
                 description_parts.append(html_content)
 
-            attributes = {
-                "name": course["title"],
-                "courseCode": str(course["id"]),
-                "learningResourceType": {
-                    "identifier": "https://w3id.org/kim/hcrt/course",
-                    "type": "Concept",
-                    "inScheme": "https://w3id.org/kim/hcrt/scheme"
-                },
-                "courseMode": course_mode,
-                "inLanguage": [course["language"].lower()],
-                "startDate": [f"{course['applicationEnd']}T00:00:00Z"] if course["applicationEnd"] else None,
-                "url": f"{api_base_url}/course/{course['id']}",
-                "description": "".join(description_parts),
-                "publisher": {
-                    "name": "opencampus.sh",
-                    "type": "Organization",
-                    "url": "https://edu.opencampus.sh"
-                },
-                "license": [{
-                    "identifier": "CC-BY-NC-4.0",
-                    "url": "https://creativecommons.org/licenses/by-nc/4.0/legalcode.en",
-                    "contentUrl": None
-                }],
-                "creator": [{
-                    "name": "opencampus.sh",
-                    "type": "Organization",
-                    "url": "https://edu.opencampus.sh"
-                }]
-            }
-            
-            if course["coverImage"]:
-                # Construct URL based on environment
-                image_url = (
-                    f"http://localhost:{storage_port}/{bucket_name}/{course['coverImage']}"
-                    if env == "development"
-                    else f"https://storage.googleapis.com/{bucket_name}/{course['coverImage']}"
-                )
-                attributes["image"] = {
-                    "description": "© Jan Konitzki / opencampus.sh",
-                    "type": "ImageObject",
-                    "contentUrl": image_url,
+            # Create one entry per course location
+            for location in course["CourseLocations"]:
+                # Determine courseMode based on location
+                course_mode = ["online"] if location["locationOption"] == "ONLINE" else ["onsite"]
+                
+                # Base attributes
+                attributes = {
+                    "name": course["title"],
+                    "courseCode": str(course["id"]),
+                    "learningResourceType": {
+                        "identifier": "https://w3id.org/kim/hcrt/course",
+                        "type": "Concept",
+                        "inScheme": "https://w3id.org/kim/hcrt/scheme"
+                    },
+                    "courseMode": course_mode,
+                    "inLanguage": [course["language"].lower()],
+                    "startDate": [f"{course['applicationEnd']}T00:00:00Z"] if course["applicationEnd"] else None,
+                    "description": "".join(description_parts),
+                    "publisher": {
+                        "name": "opencampus.sh",
+                        "type": "Organization",
+                        "url": "https://edu.opencampus.sh"
+                    },
                     "license": [{
-                        "identifier": "proprietary",
-                        "url": None,
+                        "identifier": "CC-BY-NC-4.0",
+                        "url": "https://creativecommons.org/licenses/by-nc/4.0/legalcode.en",
                         "contentUrl": None
+                    }],
+                    "creator": [{
+                        "name": "opencampus.sh",
+                        "type": "Organization",
+                        "url": "https://edu.opencampus.sh"
                     }]
                 }
-            
-            transformed_course = {
-                "id": generate_uuid_from_id(course["id"]),
-                "type": "Course",
-                "attributes": attributes
-            }
-            
-            # Convert learning goals to teaches array
-            if course["learningGoals"]:
-                goals = [goal.strip() for goal in course["learningGoals"].split('\n') if goal.strip()]
-                transformed_course["attributes"]["teaches"] = [{
-                    "name": [{
-                        "inLanguage": course["language"].lower(),
-                        "name": goal
-                    }],
-                    "educationalFramework": "GRETA",
-                    "educationalFrameworkVersion": "1.0"
-                } for goal in goals]
-            
-            transformed_data.append(transformed_course)
+                
+                # Set URL based on location type with MOOCHub tracking parameters
+                moochub_params = "source=moochub&provider=opencampus-sh&feed_version=3.0.1"
+                if location["locationOption"] == "ONLINE":
+                    # For online courses, use the course's existing URL with MOOCHub tracking
+                    attributes["url"] = f"{api_base_url}/course/{course['id']}?{moochub_params}"
+                else:
+                    # For physical locations, use the course URL but add location-specific attributes
+                    attributes["url"] = f"{api_base_url}/course/{course['id']}?{moochub_params}"
+                    
+                    # Add custom attributes for physical locations
+                    # Note: These are provider-specific extensions to the schema
+                    custom_attrs = {}
+                    
+                    # learning_region
+                    custom_attrs["learning_region"] = location["locationOption"]
+                    
+                    # learning_location and learning_zone logic
+                    group_titles = [group.get("CourseGroupOption", {}).get("title", "") for group in course.get("CourseGroups", [])]
+                    
+                    # Check for Starterkitchen or COBL
+                    if "Starterkitchen" in group_titles:
+                        custom_attrs["learning_location"] = "Starterkitchen"
+                        # Check for Eventraum or Konferenzraum
+                        if "Eventraum" in group_titles:
+                            custom_attrs["learning_zone"] = "Eventraum"
+                        elif "Konferenzraum" in group_titles:
+                            custom_attrs["learning_zone"] = "Konferenzraum"
+                    elif "COBL" in group_titles:
+                        custom_attrs["learning_location"] = "COBL"
+                        # Check for Café, Loft, or Club
+                        if "Café" in group_titles:
+                            custom_attrs["learning_zone"] = "Café"
+                        elif "Loft" in group_titles:
+                            custom_attrs["learning_zone"] = "Loft"
+                        elif "Club" in group_titles:
+                            custom_attrs["learning_zone"] = "Club"
+                    
+                    # Add custom attributes to the main attributes object
+                    # These are provider-specific extensions and may not be validated by the schema
+                    for key, value in custom_attrs.items():
+                        attributes[key] = value
+                
+                # Note: metadata_tags are collected but not included in the feed
+                # They are used internally for determining funding and other custom attributes
+                
+                # Add funding information as custom attribute
+                # This is a provider-specific extension to indicate course funding sources
+                funding_organizations = []
+                
+                # Get funding organizations from CourseFundingOrganizations table
+                for funding_org in course.get("CourseFundingOrganizations", []):
+                    organization = funding_org.get("Organization", {})
+                    if organization:
+                        funding_org_data = {
+                            "name": organization.get("name", ""),
+                            "type": organization.get("type", "OTHER"),
+                            "description": organization.get("description", "")
+                        }
+                        
+                        # Add logo if available
+                        if organization.get("logo"):
+                            # Construct logo URL based on environment
+                            logo_url = (
+                                f"http://localhost:{storage_port}/{bucket_name}/{organization['logo']}"
+                                if env == "development"
+                                else f"https://storage.googleapis.com/{bucket_name}/{organization['logo']}"
+                            )
+                            funding_org_data["logo"] = {
+                                "type": "ImageObject",
+                                "contentUrl": logo_url
+                            }
+                        
+                        funding_organizations.append(funding_org_data)
+                
+                # Add funding array if any organizations are found
+                if funding_organizations:
+                    attributes["funding"] = funding_organizations
+                
+                if course["coverImage"]:
+                    # Construct URL based on environment
+                    image_url = (
+                        f"http://localhost:{storage_port}/{bucket_name}/{course['coverImage']}"
+                        if env == "development"
+                        else f"https://storage.googleapis.com/{bucket_name}/{course['coverImage']}"
+                    )
+                    attributes["image"] = {
+                        "description": "© Jan Konitzki / opencampus.sh",
+                        "type": "ImageObject",
+                        "contentUrl": image_url,
+                        "license": [{
+                            "identifier": "proprietary",
+                            "url": None,
+                            "contentUrl": None
+                        }]
+                    }
+                
+                # Generate unique ID for this course-location combination
+                location_id = f"{course['id']}-{location['id']}"
+                transformed_course = {
+                    "id": generate_uuid_from_id(location_id),
+                    "type": "Course",
+                    "attributes": attributes
+                }
+                
+                # Convert learning goals to teaches array
+                if course["learningGoals"]:
+                    goals = [goal.strip() for goal in course["learningGoals"].split('\n') if goal.strip()]
+                    transformed_course["attributes"]["teaches"] = [{
+                        "name": [{
+                            "inLanguage": course["language"].lower(),
+                            "name": goal
+                        }],
+                        "educationalFramework": "GRETA",
+                        "educationalFrameworkVersion": "1.0"
+                    } for goal in goals]
+                
+                transformed_data.append(transformed_course)
 
         # Implement pagination
         start_idx = (page - 1) * per_page
@@ -241,6 +344,163 @@ def handle_moochub_data(page=1, per_page=25):
     except Exception as e:
         logging.error(f"Error in handle_moochub_data: {str(e)}")
         return {'error': str(e)}, 500
+
+def handle_moochub_schema():
+    """Handle requests for MOOCHub schema documentation"""
+    import json
+    from pathlib import Path
+    
+    try:
+        # Load the base MOOCHub schema
+        schema_path = Path(__file__).parent.parent / "callPythonFunction" / "pythonFunctions" / "moochub-schema.json"
+        with open(schema_path, 'r') as f:
+            base_schema = json.load(f)
+        
+        # Create a copy of the base schema to modify
+        extended_schema = base_schema.copy()
+        
+        # Add our custom attributes to the course attributes properties
+        if "properties" in extended_schema and "data" in extended_schema["properties"]:
+            data_props = extended_schema["properties"]["data"]
+            if "items" in data_props and "properties" in data_props["items"]:
+                course_props = data_props["items"]["properties"]
+                if "attributes" in course_props and "properties" in course_props["attributes"]:
+                    # Add our custom attributes to the course attributes
+                    course_props["attributes"]["properties"].update({
+                        "learning_region": {
+                            "type": "string",
+                            "description": "Physical location region where the course takes place (only for onsite courses)",
+                            "example": "KIEL"
+                        },
+                        "learning_location": {
+                            "type": "string",
+                            "description": "Specific learning location within the region (only for onsite courses)",
+                            "example": "Starterkitchen"
+                        },
+                        "learning_zone": {
+                            "type": "string",
+                            "description": "Specific zone within the learning location (only for onsite courses)",
+                            "example": "Eventraum"
+                        },
+                        "funding": {
+                            "type": "array",
+                            "description": "Array of funding organizations supporting the course",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Name of the funding organization"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "description": "Organization type",
+                                        "enum": ["UNIVERSITY", "RESEARCH_INSTITUTE", "PUBLIC_SECTOR", "NON_PROFIT_ORGANIZATION", "CORPORATION", "SCHOOL", "FREELANCER", "OTHER"]
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "description": "Detailed description of the organization"
+                                    },
+                                    "logo": {
+                                        "type": "object",
+                                        "description": "Organization logo image",
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "description": "Image object type"
+                                            },
+                                            "contentUrl": {
+                                                "type": "string",
+                                                "description": "URL to the logo image"
+                                            }
+                                        }
+                                    }
+                                },
+                                "required": ["name", "type", "description"]
+                            }
+                        }
+                    })
+        
+        # Create the response with integrated schema
+        schema_response = {
+            "provider": "opencampus.sh",
+            "version": "1.0",
+            "description": "Complete MOOCHub schema with opencampus.sh custom extensions integrated",
+            "base_schema_url": "https://github.com/moochub/schema/releases/tag/v3.0.1",
+            "custom_extensions": {
+                "learning_region": {
+                    "type": "string", 
+                    "description": "Physical location region where the course takes place (only for onsite courses)",
+                    "example": "KIEL"
+                },
+                "learning_location": {
+                    "type": "string",
+                    "description": "Specific learning location within the region (only for onsite courses)",
+                    "example": "Starterkitchen"
+                },
+                "learning_zone": {
+                    "type": "string",
+                    "description": "Specific zone within the learning location (only for onsite courses)",
+                    "example": "Eventraum"
+                },
+                "funding": {
+                    "type": "array",
+                    "description": "Array of funding organizations supporting the course",
+                    "structure": {
+                        "name": "string - Name of the funding organization",
+                        "type": "string - One of: UNIVERSITY, RESEARCH_INSTITUTE, PUBLIC_SECTOR, NON_PROFIT_ORGANIZATION, CORPORATION, SCHOOL, FREELANCER, OTHER",
+                        "description": "string - Detailed description of the organization",
+                        "logo": "object - Organization logo with type and contentUrl (optional)"
+                    },
+                    "example": [
+                        {
+                            "name": "DLC",
+                            "type": "PUBLIC_SECTOR",
+                            "description": "Digital Learning Campus - A funding program for digital education initiatives",
+                            "logo": {
+                                "type": "ImageObject",
+                                "contentUrl": "https://storage.googleapis.com/eduhub-bucket/organizations/dlc-logo.png"
+                            }
+                        }
+                    ]
+                }
+            },
+            "full_schema": extended_schema
+        }
+        
+        return schema_response, 200
+        
+    except Exception as e:
+        logging.error(f"Error loading schema: {str(e)}")
+        return {'error': 'Failed to load schema documentation'}, 500
+
+def validate_moochub_schema(feed_data):
+    """
+    Validate the MOOCHub feed data against the local schema
+    """
+    import json
+    from jsonschema import validate, ValidationError
+    from pathlib import Path
+    
+    try:
+        # Load the local schema
+        schema_path = Path(__file__).parent.parent / "callPythonFunction" / "pythonFunctions" / "moochub-schema.json"
+        with open(schema_path, 'r') as f:
+            schema = json.load(f)
+        
+        # Validate the feed data
+        validate(instance=feed_data, schema=schema)
+        print("✅ MOOCHub feed is valid according to schema v3.0.1")
+        return True
+        
+    except ValidationError as e:
+        print(f"❌ MOOCHub feed validation failed:")
+        print(f"  - {e.message}")
+        print(f"    Path: {' -> '.join(str(p) for p in e.path)}")
+        return False
+    except Exception as e:
+        print(f"❌ Unexpected error: {e}")
+        return False
 
 def validate_pagination(page, per_page):
     try:
@@ -275,9 +535,19 @@ def handle_request(request):
     if requested_version not in ['3.0.1', '3.0.0']:
         return (jsonify({'error': 'Unsupported API version'}), 406, get_cors_headers())
 
-    path = request.path.strip('/').split('/')[0]
+    path_parts = request.path.strip('/').split('/')
+    path = path_parts[0]
     
     if path == 'moochub':
+        # Check if this is a schema request
+        if len(path_parts) > 1 and path_parts[1] == 'schema':
+            result = handle_moochub_schema()
+            if isinstance(result, tuple):
+                data, status = result
+                return (jsonify(data), status, get_cors_headers())
+            return (jsonify(result), 200, get_cors_headers())
+        
+        # Regular feed request
         # Validate pagination parameters
         page = request.args.get('page', 1)
         per_page = request.args.get('per_page', 25)

@@ -6,6 +6,13 @@ object_relationships:
     using:
       foreign_key_constraint_on: type
 array_relationships:
+  - name: CourseFundingOrganizations
+    using:
+      foreign_key_constraint_on:
+        column: organizationId
+        table:
+          name: CourseFundingOrganization
+          schema: public
   - name: OrganizationAdmins
     using:
       foreign_key_constraint_on:
@@ -29,6 +36,7 @@ insert_permissions:
         - created_at
         - description
         - id
+        - logo
         - name
         - type
         - updated_at
@@ -40,8 +48,20 @@ select_permissions:
         - created_at
         - description
         - id
+        - logo
         - name
         - type
         - updated_at
       filter: {}
       allow_aggregations: true
+update_permissions:
+  - role: user_access
+    permission:
+      columns:
+        - aliases
+        - description
+        - logo
+        - name
+        - type
+      filter: {}
+      check: {}

@@ -16,6 +16,7 @@ select_permissions:
         - id
         - title
         - order
+        - sliderGroup
         - created_at
         - updated_at
       filter: {}

@@ -4,6 +4,7 @@ import {
   ADMIN_COURSE_FRAGMENT,
   COURSE_FRAGMENT,
   COURSE_FRAGMENT_MINIMUM,
+  COURSE_FRAGMENT_ANONYMOUS,
 } from './courseFragment';
 import { ADMIN_ENROLLMENT_FRAGMENT } from './enrollmentFragment';
 import { ADMIN_SESSION_FRAGMENT } from './sessionFragement';
@@ -15,6 +16,15 @@ export const COURSE = gql`
   query Course($id: Int!) {
     Course_by_pk(id: $id) {
       ...CourseFragment
+    }
+  }
+`;
+
+export const COURSE_ANONYMOUS = gql`
+  ${COURSE_FRAGMENT_ANONYMOUS}
+  query CourseAnonymous($id: Int!) {
+    Course_by_pk(id: $id) {
+      ...CourseFragmentAnonymous
     }
   }
 `;

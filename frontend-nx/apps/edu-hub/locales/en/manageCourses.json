@@ -26,6 +26,10 @@
     "label": "Instructors",
     "add": "Add Instructor"
   },
+  "funding_organizations": {
+    "label": "Funding Organizations",
+    "add": "Add Funding Organization"
+  },
   "registration_type": {
     "label": "Registration Type",
     "help_text": "Select how participants can register for this course",

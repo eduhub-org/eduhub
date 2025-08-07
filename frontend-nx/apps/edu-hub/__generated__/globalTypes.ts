@@ -529,6 +529,36 @@ export enum CourseEnrollment_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "CourseFundingOrganization"
+ */
+export enum CourseFundingOrganization_constraint {
+  CourseFundingOrganization_courseId_organizationId_key = "CourseFundingOrganization_courseId_organizationId_key",
+  CourseFundingOrganization_pkey = "CourseFundingOrganization_pkey",
+}
+
+/**
+ * select columns of table "CourseFundingOrganization"
+ */
+export enum CourseFundingOrganization_select_column {
+  courseId = "courseId",
+  created_at = "created_at",
+  id = "id",
+  organizationId = "organizationId",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "CourseFundingOrganization"
+ */
+export enum CourseFundingOrganization_update_column {
+  courseId = "courseId",
+  created_at = "created_at",
+  id = "id",
+  organizationId = "organizationId",
+  updated_at = "updated_at",
+}
+
+/**
  * unique or primary key constraints on table "CourseGroupOption"
  */
 export enum CourseGroupOption_constraint {
@@ -543,6 +573,7 @@ export enum CourseGroupOption_update_column {
   created_at = "created_at",
   id = "id",
   order = "order",
+  sliderGroup = "sliderGroup",
   title = "title",
   updated_at = "updated_at",
 }
@@ -958,6 +989,7 @@ export enum Organization_select_column {
   created_at = "created_at",
   description = "description",
   id = "id",
+  logo = "logo",
   name = "name",
   type = "type",
   updated_at = "updated_at",
@@ -971,6 +1003,7 @@ export enum Organization_update_column {
   created_at = "created_at",
   description = "description",
   id = "id",
+  logo = "logo",
   name = "name",
   type = "type",
   updated_at = "updated_at",
@@ -3885,6 +3918,174 @@ export interface CourseEnrollment_variance_order_by {
   id?: order_by | null;
 }
 
+export interface CourseFundingOrganization_aggregate_bool_exp {
+  count?: CourseFundingOrganization_aggregate_bool_exp_count | null;
+}
+
+export interface CourseFundingOrganization_aggregate_bool_exp_count {
+  arguments?: CourseFundingOrganization_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: CourseFundingOrganization_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "CourseFundingOrganization"
+ */
+export interface CourseFundingOrganization_aggregate_order_by {
+  avg?: CourseFundingOrganization_avg_order_by | null;
+  count?: order_by | null;
+  max?: CourseFundingOrganization_max_order_by | null;
+  min?: CourseFundingOrganization_min_order_by | null;
+  stddev?: CourseFundingOrganization_stddev_order_by | null;
+  stddev_pop?: CourseFundingOrganization_stddev_pop_order_by | null;
+  stddev_samp?: CourseFundingOrganization_stddev_samp_order_by | null;
+  sum?: CourseFundingOrganization_sum_order_by | null;
+  var_pop?: CourseFundingOrganization_var_pop_order_by | null;
+  var_samp?: CourseFundingOrganization_var_samp_order_by | null;
+  variance?: CourseFundingOrganization_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "CourseFundingOrganization"
+ */
+export interface CourseFundingOrganization_arr_rel_insert_input {
+  data: CourseFundingOrganization_insert_input[];
+  on_conflict?: CourseFundingOrganization_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "CourseFundingOrganization"
+ */
+export interface CourseFundingOrganization_avg_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "CourseFundingOrganization". All fields are combined with a logical 'AND'.
+ */
+export interface CourseFundingOrganization_bool_exp {
+  Course?: Course_bool_exp | null;
+  Organization?: Organization_bool_exp | null;
+  _and?: CourseFundingOrganization_bool_exp[] | null;
+  _not?: CourseFundingOrganization_bool_exp | null;
+  _or?: CourseFundingOrganization_bool_exp[] | null;
+  courseId?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  organizationId?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "CourseFundingOrganization"
+ */
+export interface CourseFundingOrganization_insert_input {
+  Course?: Course_obj_rel_insert_input | null;
+  Organization?: Organization_obj_rel_insert_input | null;
+  courseId?: number | null;
+  created_at?: any | null;
+  id?: number | null;
+  organizationId?: number | null;
+  updated_at?: any | null;
+}
+
+/**
+ * order by max() on columns of table "CourseFundingOrganization"
+ */
+export interface CourseFundingOrganization_max_order_by {
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "CourseFundingOrganization"
+ */
+export interface CourseFundingOrganization_min_order_by {
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * on_conflict condition type for table "CourseFundingOrganization"
+ */
+export interface CourseFundingOrganization_on_conflict {
+  constraint: CourseFundingOrganization_constraint;
+  update_columns: CourseFundingOrganization_update_column[];
+  where?: CourseFundingOrganization_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "CourseFundingOrganization"
+ */
+export interface CourseFundingOrganization_stddev_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "CourseFundingOrganization"
+ */
+export interface CourseFundingOrganization_stddev_pop_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "CourseFundingOrganization"
+ */
+export interface CourseFundingOrganization_stddev_samp_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "CourseFundingOrganization"
+ */
+export interface CourseFundingOrganization_sum_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "CourseFundingOrganization"
+ */
+export interface CourseFundingOrganization_var_pop_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "CourseFundingOrganization"
+ */
+export interface CourseFundingOrganization_var_samp_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "CourseFundingOrganization"
+ */
+export interface CourseFundingOrganization_variance_order_by {
+  courseId?: order_by | null;
+  id?: order_by | null;
+  organizationId?: order_by | null;
+}
+
 /**
  * Boolean expression to filter rows from the table "CourseGroupOption". All fields are combined with a logical 'AND'.
  */
@@ -3897,6 +4098,7 @@ export interface CourseGroupOption_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   order?: Int_comparison_exp | null;
+  sliderGroup?: Boolean_comparison_exp | null;
   title?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
@@ -3909,6 +4111,7 @@ export interface CourseGroupOption_insert_input {
   created_at?: any | null;
   id?: number | null;
   order?: number | null;
+  sliderGroup?: boolean | null;
   title?: string | null;
   updated_at?: any | null;
 }
@@ -4626,6 +4829,8 @@ export interface Course_bool_exp {
   CourseDegrees_aggregate?: CourseDegree_aggregate_bool_exp | null;
   CourseEnrollments?: CourseEnrollment_bool_exp | null;
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_bool_exp | null;
+  CourseFundingOrganizations?: CourseFundingOrganization_bool_exp | null;
+  CourseFundingOrganizations_aggregate?: CourseFundingOrganization_aggregate_bool_exp | null;
   CourseGroups?: CourseGroup_bool_exp | null;
   CourseGroups_aggregate?: CourseGroup_aggregate_bool_exp | null;
   CourseInstructors?: CourseInstructor_bool_exp | null;
@@ -4681,6 +4886,7 @@ export interface Course_insert_input {
   AchievementOptionCourses?: AchievementOptionCourse_arr_rel_insert_input | null;
   CourseDegrees?: CourseDegree_arr_rel_insert_input | null;
   CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
+  CourseFundingOrganizations?: CourseFundingOrganization_arr_rel_insert_input | null;
   CourseGroups?: CourseGroup_arr_rel_insert_input | null;
   CourseInstructors?: CourseInstructor_arr_rel_insert_input | null;
   CourseLocations?: CourseLocation_arr_rel_insert_input | null;
@@ -4797,6 +5003,7 @@ export interface Course_order_by {
   AchievementOptionCourses_aggregate?: AchievementOptionCourse_aggregate_order_by | null;
   CourseDegrees_aggregate?: CourseDegree_aggregate_order_by | null;
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
+  CourseFundingOrganizations_aggregate?: CourseFundingOrganization_aggregate_order_by | null;
   CourseGroups_aggregate?: CourseGroup_aggregate_order_by | null;
   CourseInstructors_aggregate?: CourseInstructor_aggregate_order_by | null;
   CourseLocations_aggregate?: CourseLocation_aggregate_order_by | null;
@@ -5605,6 +5812,8 @@ export interface Organization_avg_order_by {
  * Boolean expression to filter rows from the table "Organization". All fields are combined with a logical 'AND'.
  */
 export interface Organization_bool_exp {
+  CourseFundingOrganizations?: CourseFundingOrganization_bool_exp | null;
+  CourseFundingOrganizations_aggregate?: CourseFundingOrganization_aggregate_bool_exp | null;
   OrganizationAdmins?: OrganizationAdmin_bool_exp | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_bool_exp | null;
   OrganizationType?: OrganizationType_bool_exp | null;
@@ -5617,6 +5826,7 @@ export interface Organization_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   description?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  logo?: String_comparison_exp | null;
   name?: String_comparison_exp | null;
   type?: OrganizationType_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -5626,6 +5836,7 @@ export interface Organization_bool_exp {
  * input type for inserting data into table "Organization"
  */
 export interface Organization_insert_input {
+  CourseFundingOrganizations?: CourseFundingOrganization_arr_rel_insert_input | null;
   OrganizationAdmins?: OrganizationAdmin_arr_rel_insert_input | null;
   OrganizationType?: OrganizationType_obj_rel_insert_input | null;
   Users?: User_arr_rel_insert_input | null;
@@ -5633,6 +5844,7 @@ export interface Organization_insert_input {
   created_at?: any | null;
   description?: string | null;
   id?: number | null;
+  logo?: string | null;
   name?: string | null;
   type?: OrganizationType_enum | null;
   updated_at?: any | null;
@@ -5645,6 +5857,7 @@ export interface Organization_max_order_by {
   created_at?: order_by | null;
   description?: order_by | null;
   id?: order_by | null;
+  logo?: order_by | null;
   name?: order_by | null;
   updated_at?: order_by | null;
 }
@@ -5656,6 +5869,7 @@ export interface Organization_min_order_by {
   created_at?: order_by | null;
   description?: order_by | null;
   id?: order_by | null;
+  logo?: order_by | null;
   name?: order_by | null;
   updated_at?: order_by | null;
 }
@@ -5681,6 +5895,7 @@ export interface Organization_on_conflict {
  * Ordering options when selecting data from "Organization".
  */
 export interface Organization_order_by {
+  CourseFundingOrganizations_aggregate?: CourseFundingOrganization_aggregate_order_by | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_order_by | null;
   OrganizationType?: OrganizationType_order_by | null;
   Users_aggregate?: User_aggregate_order_by | null;
@@ -5688,6 +5903,7 @@ export interface Organization_order_by {
   created_at?: order_by | null;
   description?: order_by | null;
   id?: order_by | null;
+  logo?: order_by | null;
   name?: order_by | null;
   type?: order_by | null;
   updated_at?: order_by | null;
