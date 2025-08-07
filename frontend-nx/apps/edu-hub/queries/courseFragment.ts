@@ -102,6 +102,7 @@ export const COURSE_FRAGMENT = gql`
         name
         description
         type
+        logo
       }
     }
 }

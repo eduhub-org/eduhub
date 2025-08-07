@@ -276,6 +276,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseFundingOrga
   name: string;
   description: string | null;
   type: OrganizationType_enum;
+  /**
+   * Path to the organization logo image file
+   */
+  logo: string | null;
 }
 
 export interface MyCourses_User_by_pk_CourseEnrollments_Course_CourseFundingOrganizations {

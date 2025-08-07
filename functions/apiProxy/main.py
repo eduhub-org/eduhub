@@ -95,6 +95,16 @@ def handle_moochub_data(page=1, per_page=25):
                         sliderGroup
                     }
                 }
+                CourseFundingOrganizations {
+                    id
+                    Organization {
+                        id
+                        name
+                        description
+                        type
+                        logo
+                    }
+                }
             }
         }"""
 
@@ -238,8 +248,33 @@ def handle_moochub_data(page=1, per_page=25):
                 # This is a provider-specific extension to indicate course funding sources
                 funding_organizations = []
                 
-                # Check for DLC funding
-                if "DLC" in metadata_tags:
+                # Get funding organizations from CourseFundingOrganizations table
+                for funding_org in course.get("CourseFundingOrganizations", []):
+                    organization = funding_org.get("Organization", {})
+                    if organization:
+                        funding_org_data = {
+                            "name": organization.get("name", ""),
+                            "type": organization.get("type", "OTHER"),
+                            "description": organization.get("description", "")
+                        }
+                        
+                        # Add logo if available
+                        if organization.get("logo"):
+                            # Construct logo URL based on environment
+                            logo_url = (
+                                f"http://localhost:{storage_port}/{bucket_name}/{organization['logo']}"
+                                if env == "development"
+                                else f"https://storage.googleapis.com/{bucket_name}/{organization['logo']}"
+                            )
+                            funding_org_data["logo"] = {
+                                "type": "ImageObject",
+                                "contentUrl": logo_url
+                            }
+                        
+                        funding_organizations.append(funding_org_data)
+                
+                # Fallback: Check for DLC funding (legacy logic)
+                if not funding_organizations and "DLC" in metadata_tags:
                     funding_organizations.append({
                         "name": "DLC",
                         "type": "PUBLIC_SECTOR",
@@ -377,6 +412,20 @@ def handle_moochub_schema():
                                     "description": {
                                         "type": "string",
                                         "description": "Detailed description of the organization"
+                                    },
+                                    "logo": {
+                                        "type": "object",
+                                        "description": "Organization logo image",
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "description": "Image object type"
+                                            },
+                                            "contentUrl": {
+                                                "type": "string",
+                                                "description": "URL to the logo image"
+                                            }
+                                        }
                                     }
                                 },
                                 "required": ["name", "type", "description"]
@@ -412,13 +461,18 @@ def handle_moochub_schema():
                     "structure": {
                         "name": "string - Name of the funding organization",
                         "type": "string - One of: UNIVERSITY, RESEARCH_INSTITUTE, PUBLIC_SECTOR, NON_PROFIT_ORGANIZATION, CORPORATION, SCHOOL, FREELANCER, OTHER",
-                        "description": "string - Detailed description of the organization"
+                        "description": "string - Detailed description of the organization",
+                        "logo": "object - Organization logo with type and contentUrl (optional)"
                     },
                     "example": [
                         {
                             "name": "DLC",
                             "type": "PUBLIC_SECTOR",
-                            "description": "Digital Learning Campus - A funding program for digital education initiatives"
+                            "description": "Digital Learning Campus - A funding program for digital education initiatives",
+                            "logo": {
+                                "type": "ImageObject",
+                                "contentUrl": "https://storage.googleapis.com/eduhub-bucket/organizations/dlc-logo.png"
+                            }
                         }
                     ]
                 }

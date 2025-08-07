@@ -272,6 +272,10 @@ export interface AdminCourseFragment_CourseFundingOrganizations_Organization {
   name: string;
   description: string | null;
   type: OrganizationType_enum;
+  /**
+   * Path to the organization logo image file
+   */
+  logo: string | null;
 }
 
 export interface AdminCourseFragment_CourseFundingOrganizations {

@@ -272,6 +272,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
   name: string;
   description: string | null;
   type: OrganizationType_enum;
+  /**
+   * Path to the organization logo image file
+   */
+  logo: string | null;
 }
 
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseFundingOrganizations {

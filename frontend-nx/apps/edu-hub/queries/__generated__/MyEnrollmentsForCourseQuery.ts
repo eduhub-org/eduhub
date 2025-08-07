@@ -272,6 +272,10 @@ export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseFundi
   name: string;
   description: string | null;
   type: OrganizationType_enum;
+  /**
+   * Path to the organization logo image file
+   */
+  logo: string | null;
 }
 
 export interface MyEnrollmentsForCourseQuery_CourseEnrollment_Course_CourseFundingOrganizations {
