@@ -27,7 +27,6 @@ type ImageUploaderProps = {
   refetchQueries?: string[];
   helpText?: string;
   errorText?: string;
-  translationNamespace?: string;
   acceptedFileTypes?: string;
   maxFileSize?: number;
   className?: string;
@@ -44,13 +43,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   onFileUpdated,
   refetchQueries = [],
   helpText,
-  translationNamespace,
   acceptedFileTypes = '*',
   maxFileSize = 5 * 1024 * 1024, // 5MB default
   className = '',
   user,
 }) => {
-  const { t } = useTranslation(translationNamespace);
+  const { t } = useTranslation();
   const [showSavedNotification, setShowSavedNotification] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
@@ -69,7 +67,11 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       const updatedUser = data?.update_User_by_pk;
       const updatedOrganization = data?.update_Organization_by_pk;
 
-      if (updatedUser?.picture || updatedOrganization?.logo) {
+      // Check if the update was successful (either picture/logo was set or explicitly set to null for deletion)
+      const hasUserUpdate = updatedUser && 'picture' in updatedUser;
+      const hasOrganizationUpdate = updatedOrganization && 'logo' in updatedOrganization;
+
+      if (hasUserUpdate || hasOrganizationUpdate) {
         if (onFileUpdated) onFileUpdated(data);
         setShowSavedNotification(true);
       } else {
