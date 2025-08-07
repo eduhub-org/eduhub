@@ -27,7 +27,7 @@ type ImageUploaderProps = {
   refetchQueries?: string[];
   helpText?: string;
   errorText?: string;
-  acceptedFileTypes?: string;
+   acceptedFileTypes?: string;
   maxFileSize?: number;
   className?: string;
   user?: any; // Add user prop for UserCard
