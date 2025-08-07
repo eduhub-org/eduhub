@@ -1324,6 +1324,7 @@ SELECT pg_catalog.setval('public."Attendence_Id_seq"', 64, true);
 SELECT pg_catalog.setval('public."CourseAddress_id_seq"', 9, true);
 SELECT pg_catalog.setval('public."CourseDegree_id_seq"', 6, true);
 SELECT pg_catalog.setval('public."CourseGroup_id_seq"', 15, true);
+SELECT pg_catalog.setval('public."CourseGroupOption_id_seq"', 13, true);
 SELECT pg_catalog.setval('public."CourseInstructor_Id_seq"', 1, true);
 SELECT pg_catalog.setval('public."Course_Id_seq"', 9, true);
 SELECT pg_catalog.setval('public."Date_Id_seq"', 96, true);
