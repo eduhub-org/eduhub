@@ -42,15 +42,15 @@ export const SelectOrganizationDialog: FC<IProps> = ({ onClose, open, title }) =
   const { data } = useAuthedQuery(ORGANIZATION_LIST, {
     variables: {
       limit: 100,
-      filter: searchValue.length >= 2 ? {
-        _or: [
-          { name: { _ilike: `%${searchValue}%` } },
-          { description: { _ilike: `%${searchValue}%` } },
-        ]
-      } : {},
-      order_by: { name: 'asc' }
+      filter:
+        searchValue.length >= 2
+          ? {
+              _or: [{ name: { _ilike: `%${searchValue}%` } }, { description: { _ilike: `%${searchValue}%` } }],
+            }
+          : {},
+      order_by: { name: 'asc' },
     },
-    skip: !open
+    skip: !open,
   });
 
   const organizations = data?.Organization || [];
@@ -67,11 +67,11 @@ export const SelectOrganizationDialog: FC<IProps> = ({ onClose, open, title }) =
       </DialogTitle>
 
       <DialogContent>
-        <div className="mb-4">{t('type_organization_name_minimum_2_letters')}</div>
+        <div className="mb-4">{t('organization_dialog.type_organization_name_minimum_2_letters')}</div>
 
         <div className="mb-4">
           <input
-            placeholder={t('search_organizations')}
+            placeholder={t('organization_dialog.search_organizations')}
             className="w-full border border-solid border-gray-300 rounded px-3 py-2"
             type="text"
             value={searchValue}
@@ -87,21 +87,15 @@ export const SelectOrganizationDialog: FC<IProps> = ({ onClose, open, title }) =
               onClick={() => handleConfirm(organization)}
             >
               <div className="font-medium">{organization.name}</div>
-              {organization.description && (
-                <div className="text-sm text-gray-600 mt-1">{organization.description}</div>
-              )}
+              {organization.description && <div className="text-sm text-gray-600 mt-1">{organization.description}</div>}
               <div className="text-xs text-gray-500 mt-1">{organization.type}</div>
             </div>
           ))}
           {organizations.length === 0 && searchValue.length >= 2 && (
-            <div className="p-4 text-center text-gray-500">
-              {t('no_organizations_found')}
-            </div>
+            <div className="p-4 text-center text-gray-500">{t('organization_dialog.no_organizations_found')}</div>
           )}
           {searchValue.length < 2 && (
-            <div className="p-4 text-center text-gray-500">
-              {t('type_at_least_2_characters')}
-            </div>
+            <div className="p-4 text-center text-gray-500">{t('organization_dialog.type_at_least_2_characters')}</div>
           )}
         </div>
 
@@ -114,4 +108,4 @@ export const SelectOrganizationDialog: FC<IProps> = ({ onClose, open, title }) =
       </DialogContent>
     </Dialog>
   );
-}; 
+};

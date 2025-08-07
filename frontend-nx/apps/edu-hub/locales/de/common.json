@@ -220,5 +220,11 @@
     "title": "Häufig gestellte Fragen",
     "error_loading": "Fehler beim Laden der FAQs. Bitte versuche es später erneut.",
     "no_faqs_available": "Keine FAQs verfügbar."
+  },
+  "organization_dialog": {
+    "type_organization_name_minimum_2_letters": "Gib einen Organisationsnamen ein (mindestens 2 Buchstaben).",
+    "search_organizations": "Organisationen suchen",
+    "no_organizations_found": "Keine Organisationen gefunden",
+    "type_at_least_2_characters": "Gib mindestens 2 Zeichen ein"
   }
 }

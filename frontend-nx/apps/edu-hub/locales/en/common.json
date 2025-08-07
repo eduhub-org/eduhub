@@ -220,5 +220,11 @@
     "title": "Frequently Asked Questions",
     "error_loading": "Error loading FAQs. Please try again later.",
     "no_faqs_available": "No FAQs available."
+  },
+  "organization_dialog": {
+    "type_organization_name_minimum_2_letters": "Type an organization name (minimum 2 letters).",
+    "search_organizations": "Search organizations",
+    "no_organizations_found": "No organizations found",
+    "type_at_least_2_characters": "Type at least 2 characters"
   }
 }

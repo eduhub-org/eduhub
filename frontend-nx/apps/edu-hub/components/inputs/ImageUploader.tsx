@@ -333,7 +333,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         className="cursor-pointer flex items-center justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
       >
         <CloudUpload className="mr-2" />
-        {t('file_uploader.upload_file')}
+        {t('image_uploader.upload_file')}
       </label>
     </div>
   );
@@ -443,7 +443,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         open={showSavedNotification}
         autoHideDuration={2000}
         onClose={() => setShowSavedNotification(false)}
-        message={t('Saved')}
+        message={t('notification_snackbar.saved')}
       />
     </>
   );
