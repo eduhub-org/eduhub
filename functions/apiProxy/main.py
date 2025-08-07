@@ -127,12 +127,8 @@ def handle_moochub_data(page=1, per_page=25):
             metadata_tags = []
             for group in course.get("CourseGroups", []):
                 group_option = group.get("CourseGroupOption", {})
-                if group_option.get("sliderGroup") == False:
+                if not group_option.get("sliderGroup"):
                     metadata_tags.append(group_option.get("title", ""))
-            
-            # Add DLC tag if present
-            if "DLC" in metadata_tags:
-                metadata_tags.append("DLC")
             
             # Build HTML description
             description_parts = []
@@ -272,14 +268,6 @@ def handle_moochub_data(page=1, per_page=25):
                             }
                         
                         funding_organizations.append(funding_org_data)
-                
-                # Fallback: Check for DLC funding (legacy logic)
-                if not funding_organizations and "DLC" in metadata_tags:
-                    funding_organizations.append({
-                        "name": "DLC",
-                        "type": "PUBLIC_SECTOR",
-                        "description": "Digital Learning Campus - A funding program for digital education initiatives"
-                    })
                 
                 # Add funding array if any organizations are found
                 if funding_organizations:
