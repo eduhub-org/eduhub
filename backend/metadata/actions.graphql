@@ -93,6 +93,14 @@ type Mutation {
 }
 
 type Mutation {
+  saveOrganizationLogo(
+    base64file: String!
+    filename: String!
+    organizationid: Int!
+  ): saveImageResult!
+}
+
+type Mutation {
   updateFromKeycloak(
     userid: ID!
   ): result

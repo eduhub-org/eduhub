@@ -22,6 +22,21 @@ import { SaveCourseImage, SaveCourseImageVariables } from '../../../queries/__ge
 import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
 import { CourseRegistrationType_enum } from '../../../__generated__/globalTypes';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
+import { SelectOrganizationDialog } from '../../common/dialogs/SelectOrganizationDialog';
+import {
+  INSERT_COURSE_FUNDING_ORGANIZATION,
+  DELETE_COURSE_FUNDING_ORGANIZATION,
+} from '../../../queries/mutateCourseFundingOrganization';
+import {
+  InsertCourseFundingOrganization,
+  InsertCourseFundingOrganizationVariables,
+} from '../../../queries/__generated__/InsertCourseFundingOrganization';
+import {
+  DeleteCourseFundingOrganization,
+  DeleteCourseFundingOrganizationVariables,
+} from '../../../queries/__generated__/DeleteCourseFundingOrganization';
+import { OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
+import EntityListManager from '../../inputs/EntityListManager';
 import { getPublicImageUrl, parseFileUploadEvent } from '../../../helpers/filehandling';
 import useTranslation from 'next-translate/useTranslation';
 import TagSelector from '../../inputs/TagSelector';
@@ -62,8 +77,51 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     return `${firstName} ${lastName}`;
   };
 
+  // Entity render functions for EntityListManager
+  const renderInstructor = useCallback(
+    (instructor: any, onDelete: (id: number) => void) => (
+      <div className="flex items-center justify-between bg-gray-50 p-2 rounded">
+        <div className="flex-1">
+          <div className="font-medium">
+            {makeFullName(instructor.Expert.User.firstName, instructor.Expert.User.lastName ?? '')}
+            {instructor.Expert.User.email && (
+              <span className="text-sm text-gray-600 ml-1">({instructor.Expert.User.email})</span>
+            )}
+          </div>
+        </div>
+        <button onClick={() => onDelete(instructor.Expert.id)} className="text-red-500 hover:text-red-700 p-1">
+          ×
+        </button>
+      </div>
+    ),
+    []
+  );
+
+  const renderFundingOrganization = useCallback(
+    (fundingOrg: any, onDelete: (id: number) => void) => (
+      <div className="flex items-center justify-between bg-gray-50 p-2 rounded">
+        <div className="flex-1">
+          <div className="font-medium">
+            {fundingOrg.Organization.name}
+            {fundingOrg.Organization.description && (
+              <div className="text-sm text-gray-600 mt-1">{fundingOrg.Organization.description}</div>
+            )}
+            <div className="text-xs text-gray-500 mt-1">{fundingOrg.Organization.type}</div>
+          </div>
+        </div>
+        <button onClick={() => onDelete(fundingOrg.Organization.id)} className="text-red-500 hover:text-red-700 p-1">
+          ×
+        </button>
+      </div>
+    ),
+    []
+  );
+
   // Instructor management state
   const [instructorDialogOpen, setInstructorDialogOpen] = useState(false);
+
+  // Funding organization management state
+  const [fundingOrgDialogOpen, setFundingOrgDialogOpen] = useState(false);
 
   // Instructor management mutations
   const [insertCourseInstructor] = useAdminMutation<InsertCourseInstructor, InsertCourseInstructorVariables>(
@@ -81,6 +139,21 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   );
 
   const [insertExpertMutation] = useAdminMutation<InsertExpert, InsertExpertVariables>(INSERT_EXPERT, {
+    refetchQueries: ['AdminCourseList'],
+  });
+
+  // Funding organization management mutations
+  const [insertCourseFundingOrg] = useAdminMutation<
+    InsertCourseFundingOrganization,
+    InsertCourseFundingOrganizationVariables
+  >(INSERT_COURSE_FUNDING_ORGANIZATION, {
+    refetchQueries: ['AdminCourseList'],
+  });
+
+  const [deleteCourseFundingOrg] = useAdminMutation<
+    DeleteCourseFundingOrganization,
+    DeleteCourseFundingOrganizationVariables
+  >(DELETE_COURSE_FUNDING_ORGANIZATION, {
     refetchQueries: ['AdminCourseList'],
   });
 
@@ -174,6 +247,63 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
       closeInstructorDialog();
     },
     [insertExpertMutation, course, insertCourseInstructor, closeInstructorDialog, handleError, t]
+  );
+
+  // Funding organization management functions
+  const openFundingOrgDialog = useCallback(() => {
+    setFundingOrgDialogOpen(true);
+  }, []);
+
+  const closeFundingOrgDialog = useCallback(() => {
+    setFundingOrgDialogOpen(false);
+  }, []);
+
+  const deleteFundingOrgFromCourse = useCallback(
+    async (orgId: number) => {
+      const response = await deleteCourseFundingOrg({
+        variables: {
+          courseId: course.id,
+          organizationId: orgId,
+        },
+      });
+
+      if (response.errors) {
+        handleError(response.errors?.[0]?.message || t('operation_failed'));
+        return;
+      }
+    },
+    [deleteCourseFundingOrg, course.id, handleError, t]
+  );
+
+  const addFundingOrgHandler = useCallback(
+    async (confirmed: boolean, organization: OrganizationList_Organization | null) => {
+      if (!confirmed || organization == null) {
+        closeFundingOrgDialog();
+        return;
+      }
+
+      // Check if organization is already associated with the course
+      if (course.CourseFundingOrganizations?.some((cfo) => cfo.Organization.id === organization.id)) {
+        closeFundingOrgDialog();
+        return;
+      }
+
+      const response = await insertCourseFundingOrg({
+        variables: {
+          courseId: course.id,
+          organizationId: organization.id,
+        },
+      });
+
+      if (response.errors) {
+        handleError(response.errors?.[0]?.message || t('operation_failed'));
+        closeFundingOrgDialog();
+        return;
+      }
+
+      closeFundingOrgDialog();
+    },
+    [insertCourseFundingOrg, course, closeFundingOrgDialog, handleError, t]
   );
 
   const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
@@ -341,30 +471,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             <div>
               <h4 className="text-sm font-medium text-gray-700 mb-2">{t('manageCourses:instructors.label')}</h4>
               <div className="space-y-2">
-                {course.CourseInstructors.map((courseInstructor, index) => (
-                  <div
-                    key={`${course.id}-${courseInstructor.Expert.id}-${index}`}
-                    className="flex items-center justify-between bg-gray-50 p-2 rounded"
-                  >
-                    <div className="flex-1">
-                      <div className="font-medium">
-                        {makeFullName(
-                          courseInstructor.Expert.User.firstName,
-                          courseInstructor.Expert.User.lastName ?? ''
-                        )}
-                        {courseInstructor.Expert.User.email && (
-                          <span className="text-sm text-gray-600 ml-1">({courseInstructor.Expert.User.email})</span>
-                        )}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => deleteInstructorFromCourse(courseInstructor.Expert.id)}
-                      className="text-red-500 hover:text-red-700 p-1"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
+                {course.CourseInstructors.map((courseInstructor, index) =>
+                  renderInstructor(courseInstructor, deleteInstructorFromCourse)
+                )}
                 <button
                   onClick={openInstructorDialog}
                   className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 p-2 w-full"
@@ -375,7 +484,36 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               </div>
             </div>
 
-            {/* 2. Types of Available Certificates */}
+            {/* 2. Funding Organizations */}
+            <EntityListManager
+              variant="material"
+              label={t('manageCourses:funding_organizations.label')}
+              addButtonText={t('manageCourses:funding_organizations.add')}
+              itemId={course.id}
+              entities={course.CourseFundingOrganizations || []}
+              renderEntity={renderFundingOrganization}
+              selectionDialog={
+                <SelectOrganizationDialog
+                  onClose={addFundingOrgHandler}
+                  open={fundingOrgDialogOpen}
+                  title={t('manageCourses:funding_organizations.add')}
+                />
+              }
+              dialogOpen={fundingOrgDialogOpen}
+              onOpenDialog={openFundingOrgDialog}
+              onCloseDialog={closeFundingOrgDialog}
+              onEntitySelected={addFundingOrgHandler}
+              insertEntityMutation={INSERT_COURSE_FUNDING_ORGANIZATION}
+              deleteEntityMutation={DELETE_COURSE_FUNDING_ORGANIZATION}
+              buildInsertVariables={(courseId, organization) => ({
+                courseId,
+                organizationId: organization.id,
+              })}
+              buildDeleteVariables={(courseId, organizationId) => ({ courseId, organizationId })}
+              refetchQueries={['AdminCourseList']}
+            />
+
+            {/* 3. Types of Available Certificates */}
             <div>
               <h4 className="text-sm font-medium text-gray-700 mb-2">{t('possible-certificates')}</h4>
               <div className="space-y-2">
@@ -417,7 +555,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               </div>
             </div>
 
-            {/* 3. Maximum Number of Allowed Missing Sessions */}
+            {/* 4. Maximum Number of Allowed Missing Sessions */}
             <InputField
               variant="material"
               type="number"
@@ -431,7 +569,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               min={0}
             />
 
-            {/* 4. Learning Goals */}
+            {/* 5. Learning Goals */}
             <InputField
               variant="eduhub"
               type="textarea"
@@ -447,7 +585,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               currentText={course.learningGoals ?? ''}
             />
 
-            {/* 5. Link to the Chat of the Course */}
+            {/* 6. Link to the Chat of the Course */}
             <InputField
               variant="material"
               type="link"

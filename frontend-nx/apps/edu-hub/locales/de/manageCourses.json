@@ -26,6 +26,10 @@
     "label": "Kursleitung",
     "add": "Kursleitung hinzufügen"
   },
+  "funding_organizations": {
+    "label": "Förderorganisationen",
+    "add": "Förderorganisation hinzufügen"
+  },
   "registration_type": {
     "label": "Anmeldeart",
     "help_text": "Wähle aus, wie sich Teilnehmer für diesen Kurs anmelden können",

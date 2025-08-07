@@ -1,0 +1,21 @@
+table:
+  name: CourseFundingOrganization
+  schema: public
+object_relationships:
+  - name: Course
+    using:
+      foreign_key_constraint_on: courseId
+  - name: Organization
+    using:
+      foreign_key_constraint_on: organizationId
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - courseId
+        - organizationId
+        - created_at
+        - updated_at
+      filter: {}
+      limit: 10 

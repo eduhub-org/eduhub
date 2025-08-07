@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { COURSE_INSTRUCTOR_FRAGMENT } from "./courseInstructorFragment";
+import { COURSE_INSTRUCTOR_FRAGMENT, COURSE_INSTRUCTOR_FRAGMENT_ANONYMOUS } from "./courseInstructorFragment";
 import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from "./programFragment";
 import { ENROLLMENT_FRAGMENT } from "./enrollmentFragment";
 
@@ -95,6 +95,16 @@ export const COURSE_FRAGMENT = gql`
         }
       }
     }
+    CourseFundingOrganizations {
+      id
+      Organization {
+        id
+        name
+        description
+        type
+        logo
+      }
+    }
 }
 `;
 
@@ -140,4 +150,84 @@ export const COURSE_FRAGMENT_MINIMUM = gql`
     startTime
     registrationType
   }
+`;
+
+export const COURSE_FRAGMENT_ANONYMOUS = gql`
+  ${SESSION_FRAGMENT}
+  ${COURSE_INSTRUCTOR_FRAGMENT_ANONYMOUS}
+  ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
+  ${ENROLLMENT_FRAGMENT}
+  fragment CourseFragmentAnonymous on Course {
+    id
+    ects
+    tagline
+    weekDay
+    cost
+    published
+    applicationEnd
+    coverImage
+    language
+    maxMissedSessions
+    chatLink
+    title
+    achievementCertificatePossible
+    attendanceCertificatePossible
+    programId
+    maxParticipants
+    learningGoals
+    headingDescriptionField1
+    contentDescriptionField1
+    headingDescriptionField2
+    contentDescriptionField2
+    externalRegistrationLink
+    registrationType
+    startTime
+    endTime
+    Sessions (order_by: { startDateTime: asc }) {
+      ...SessionFragment
+    }
+    CourseInstructors(order_by: { id: desc }) {
+      ...CourseInstructorFragmentAnonymous
+    }
+    CourseLocations {
+      id
+      defaultSessionAddress
+      locationOption
+    }
+    Program {
+      ...ProgramFragmentMinimumProperties
+    }
+    CourseGroups {
+      id
+      CourseGroupOption {
+        id
+        title
+        order
+      }
+    }
+    DegreeCourses {
+      id
+      courseId
+      Course {
+        id
+        title
+        published
+        ects
+        Program {
+          id
+          published
+        }
+      }
+    }
+    CourseFundingOrganizations {
+      id
+      Organization {
+        id
+        name
+        description
+        type
+        logo
+      }
+    }
+}
 `;

@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL fragment: AdminCourseFragment
@@ -266,6 +266,27 @@ export interface AdminCourseFragment_DegreeCourses {
   Course: AdminCourseFragment_DegreeCourses_Course;
 }
 
+export interface AdminCourseFragment_CourseFundingOrganizations_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+  description: string | null;
+  type: OrganizationType_enum;
+  /**
+   * Path to the organization logo image file
+   */
+  logo: string | null;
+}
+
+export interface AdminCourseFragment_CourseFundingOrganizations {
+  __typename: "CourseFundingOrganization";
+  id: number;
+  /**
+   * An object relationship
+   */
+  Organization: AdminCourseFragment_CourseFundingOrganizations_Organization;
+}
+
 export interface AdminCourseFragment {
   __typename: "Course";
   id: number;
@@ -386,6 +407,10 @@ export interface AdminCourseFragment {
    * An array relationship
    */
   DegreeCourses: AdminCourseFragment_DegreeCourses[];
+  /**
+   * An array relationship
+   */
+  CourseFundingOrganizations: AdminCourseFragment_CourseFundingOrganizations[];
   /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
