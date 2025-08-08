@@ -552,8 +552,15 @@ def handle_request(request):
         if len(path_parts) > 1 and path_parts[1] == 'schema':
             result = handle_moochub_schema()
             if isinstance(result, tuple):
-                data, status = result
-                return (jsonify(data), status, get_cors_headers())
+                # Support (data, status) and (data, status, headers)
+                if len(result) == 3:
+                    data, status, extra_headers = result
+                    headers = get_cors_headers()
+                    headers.update(extra_headers)
+                    return (jsonify(data), status, headers)
+                else:
+                    data, status = result
+                    return (jsonify(data), status, get_cors_headers())
             return (jsonify(result), 200, get_cors_headers())
         
         # Regular feed request
@@ -565,8 +572,15 @@ def handle_request(request):
             
         result = handle_moochub_data(int(page), int(per_page))
         if isinstance(result, tuple):
-            data, status = result
-            return (jsonify(data), status, get_cors_headers())
+            # Support (data, status) and (data, status, headers)
+            if len(result) == 3:
+                data, status, extra_headers = result
+                headers = get_cors_headers()
+                headers.update(extra_headers)
+                return (jsonify(data), status, headers)
+            else:
+                data, status = result
+                return (jsonify(data), status, get_cors_headers())
         return (jsonify(result), 200, get_cors_headers())
     
     elif path == 'participants':
@@ -574,8 +588,15 @@ def handle_request(request):
         if len(path_parts) > 1 and path_parts[1] == 'schema':
             result = handle_participants_schema()
             if isinstance(result, tuple):
-                data, status = result
-                return (jsonify(data), status, get_cors_headers())
+                # Support (data, status) and (data, status, headers)
+                if len(result) == 3:
+                    data, status, extra_headers = result
+                    headers = get_cors_headers()
+                    headers.update(extra_headers)
+                    return (jsonify(data), status, headers)
+                else:
+                    data, status = result
+                    return (jsonify(data), status, get_cors_headers())
             return (jsonify(result), 200, get_cors_headers())
         
         # Simple test endpoint first
@@ -586,8 +607,15 @@ def handle_request(request):
         try:
             result = handle_participants_request(request)
             if isinstance(result, tuple):
-                data, status = result
-                return (jsonify(data), status, get_cors_headers())
+                # Support (data, status) and (data, status, headers)
+                if len(result) == 3:
+                    data, status, extra_headers = result
+                    headers = get_cors_headers()
+                    headers.update(extra_headers)
+                    return (jsonify(data), status, headers)
+                else:
+                    data, status = result
+                    return (jsonify(data), status, get_cors_headers())
             return (jsonify(result), 200, get_cors_headers())
         except Exception as e:
             print(f"DEBUG: Main handler error: {str(e)}")

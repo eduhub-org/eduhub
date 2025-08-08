@@ -1,6 +1,21 @@
 """
-Security Handler for EduHub Participant Data API
-Provides comprehensive security features including rate limiting, audit logging, and validation
+Security Handler for the API proxy.
+
+This module centralizes small, practical security utilities used by the
+participants API and the MOOCHub feed:
+  - Lightweight request validation (headers, method, size)
+  - Minimal anomaly detection
+  - Simple, in-memory rate limiting (org and IP)
+  - Optional IP allow-list (per organization)
+  - Audit logging helper
+  - Response header hardening
+
+Notes:
+- This does not replace proper authentication/authorization. Auth is handled
+  by the route handlers (API key/JWT). Validation here only checks presence
+  and basic shape of headers.
+- State (rate limits, audit log) is in-memory and intended for development or
+  small-scale deployments. For production, back with Redis or a database.
 """
 
 import os
@@ -23,7 +38,7 @@ logger = logging.getLogger(__name__)
 
 
 class SecurityLevel(Enum):
-    """Security levels for different organization types"""
+    """Security levels for different organization types (used for rate limits)."""
     BASIC = "basic"
     STANDARD = "standard"
     PREMIUM = "premium"
@@ -51,7 +66,7 @@ class IPRestrictionConfig:
 
 
 class SecurityHandler:
-    """Comprehensive security handler for the participant data API"""
+    """Pragmatic security utilities scoped for this API proxy."""
     
     def __init__(self):
         # Rate limiting storage (in production, use Redis or database)
@@ -69,29 +84,12 @@ class SecurityHandler:
         # IP restriction configurations by organization
         self.ip_restrictions = {}
         
-        # Cloud provider IP ranges (common ones)
-        self.cloud_provider_ranges = {
-            'aws': [
-                '3.5.140.0/22', '18.130.0.0/16', '18.168.0.0/14', '18.200.0.0/16',
-                '35.176.0.0/13', '35.184.0.0/13', '52.0.0.0/8', '54.0.0.0/8'
-            ],
-            'azure': [
-                '13.64.0.0/11', '13.104.0.0/14', '20.36.0.0/14', '20.40.0.0/13',
-                '20.48.0.0/12', '20.64.0.0/10', '40.64.0.0/10', '51.104.0.0/15'
-            ],
-            'gcp': [
-                '8.8.8.0/24', '8.34.208.0/20', '8.35.192.0/20', '8.8.4.0/24',
-                '34.64.0.0/10', '35.184.0.0/13', '35.192.0.0/14', '35.196.0.0/15'
-            ]
-        }
-        
-        # Suspicious activity patterns
+        # Suspicious activity patterns (kept intentionally minimal to avoid
+        # false positives while still catching obvious abuse)
         self.suspicious_patterns = [
-            r'(\d{1,3}\.){3}\d{1,3}',  # IP addresses in requests
-            r'<script',  # XSS attempts
-            r'javascript:',  # JavaScript injection
-            r'union\s+select',  # SQL injection attempts
-            r'exec\s*\('  # Command injection
+            r'<script',           # XSS attempts
+            r'javascript:',       # JavaScript injection in URLs
+            r'union\s+select',   # Simple SQL injection signature
         ]
         
         # Compile patterns for efficiency
@@ -105,9 +103,12 @@ class SecurityHandler:
         logger.info(f"IP restrictions configured for organization {organization_id}: {config}")
     
     def validate_ip_address(self, client_ip: str, organization_id: int) -> Tuple[bool, str]:
-        """
-        Validate if client IP is allowed for the organization
-        Returns (is_allowed, reason)
+        """Check if a client IP is allowed for an organization.
+
+        Behavior:
+        - If no config or disabled: allow.
+        - If enabled: require match against explicit IPs or CIDR ranges.
+        Returns (is_allowed, reason).
         """
         # Get IP restriction config for organization
         config = self.ip_restrictions.get(organization_id)
@@ -139,17 +140,6 @@ class SecurityHandler:
                     except ValueError:
                         logger.warning(f"Invalid CIDR range: {cidr}")
             
-            # Check cloud provider ranges
-            if config.allow_cloud_providers:
-                for provider, ranges in self.cloud_provider_ranges.items():
-                    for cidr in ranges:
-                        try:
-                            network = ipaddress.ip_network(cidr, strict=False)
-                            if ip_obj in network:
-                                return True, f"IP in {provider} range: {cidr}"
-                        except ValueError:
-                            continue
-            
             # If strict mode is enabled, block all non-whitelisted IPs
             if config.strict_mode:
                 return False, "IP not in whitelist (strict mode enabled)"
@@ -164,17 +154,24 @@ class SecurityHandler:
             return False, "IP validation error"
     
     def validate_request(self, request) -> Tuple[bool, List[str]]:
-        """
-        Comprehensive request validation
-        Returns (is_valid, list_of_violations)
+        """Lightweight request validation.
+
+        Checks:
+        - Presence of a recognized auth header (X-API-Key or Authorization: Bearer ...)
+        - Presence and minimum length of User-Agent
+        - Allowed HTTP method (GET, POST, OPTIONS)
+        - Request size <= 1MB
+        - No obvious attack patterns in serialized request
+
+        Returns (is_valid, violations).
         """
         violations = []
         
-        # Check for required headers
-        required_headers = ['X-API-Key', 'User-Agent']
-        for header in required_headers:
-            if not request.headers.get(header):
-                violations.append(f"Missing required header: {header}")
+        # Check for any supported auth header (auth verification is done elsewhere)
+        api_key_present = bool(request.headers.get('X-API-Key'))
+        bearer_present = request.headers.get('Authorization', '').startswith('Bearer ')
+        if not (api_key_present or bearer_present):
+            violations.append("Missing required header: X-API-Key or Authorization")
         
         # Validate User-Agent
         user_agent = request.headers.get('User-Agent', '')
@@ -208,9 +205,10 @@ class SecurityHandler:
     
     def check_rate_limit(self, organization_id: int, security_level: SecurityLevel, 
                         client_ip: str) -> Tuple[bool, Dict[str, Any]]:
-        """
-        Enhanced rate limiting with per-organization and per-IP limits
-        Returns (allowed, rate_limit_info)
+        """Simple in-memory rate limiting.
+
+        Applies per-organization, per-IP, and a small burst window limit.
+        Returns (allowed, info).
         """
         config = self.rate_limits[security_level]
         current_time = time.time()
@@ -257,7 +255,7 @@ class SecurityHandler:
     
     def _check_single_rate_limit(self, key: str, config: RateLimitConfig, 
                                 current_time: float) -> Tuple[bool, Dict[str, Any]]:
-        """Check rate limit for a single key"""
+        """Check rate limit counters for a single key."""
         if key not in self.rate_limit_store:
             self.rate_limit_store[key] = {
                 'hourly': {'count': 0, 'window_start': current_time},
@@ -296,9 +294,7 @@ class SecurityHandler:
     def log_audit_event(self, event_type: str, organization_id: int, 
                        client_ip: str, request_data: Dict[str, Any], 
                        success: bool, details: Optional[str] = None):
-        """
-        Comprehensive audit logging for security and compliance
-        """
+        """Append an audit entry and emit a structured log line."""
         audit_entry = {
             'timestamp': datetime.utcnow().isoformat(),
             'event_type': event_type,
@@ -328,7 +324,7 @@ class SecurityHandler:
         return hashlib.sha256(data.encode()).hexdigest()[:16]
     
     def _send_to_external_logging(self, audit_entry: Dict[str, Any]):
-        """Send audit entries to external logging service (placeholder)"""
+        """Placeholder for forwarding audit entries to external logging (e.g., GCP)."""
         # In production, implement:
         # - Cloud Logging (GCP)
         # - Splunk
@@ -338,10 +334,7 @@ class SecurityHandler:
     
     def detect_anomalies(self, organization_id: int, client_ip: str, 
                         request_data: Dict[str, Any]) -> List[str]:
-        """
-        Detect suspicious or anomalous behavior
-        Returns list of detected anomalies
-        """
+        """Very lightweight anomaly signals for observability, not blocking."""
         anomalies = []
         
         # Check for unusual access patterns
@@ -379,9 +372,7 @@ class SecurityHandler:
     
     def sanitize_response_data(self, data: Dict[str, Any], 
                              security_level: SecurityLevel) -> Dict[str, Any]:
-        """
-        Sanitize response data based on security level
-        """
+        """Remove obviously sensitive fields for basic level (defense-in-depth)."""
         sanitized = data.copy()
         
         # Remove sensitive fields for lower security levels
@@ -391,19 +382,10 @@ class SecurityHandler:
                 if field in sanitized:
                     del sanitized[field]
         
-        # Add security headers
-        sanitized['_security'] = {
-            'level': security_level.value,
-            'timestamp': datetime.utcnow().isoformat(),
-            'data_retention': '24h'
-        }
-        
         return sanitized
     
     def generate_security_headers(self, rate_limit_info: Dict[str, Any]) -> Dict[str, str]:
-        """
-        Generate security headers for response
-        """
+        """Return a set of standard hardening headers and rate-limit hints."""
         headers = {
             'X-Content-Type-Options': 'nosniff',
             'X-Frame-Options': 'DENY',
@@ -411,6 +393,7 @@ class SecurityHandler:
             'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
             'Content-Security-Policy': "default-src 'self'",
             'Referrer-Policy': 'strict-origin-when-cross-origin',
+            'Cache-Control': 'no-store',
             'X-Rate-Limit-Remaining': str(rate_limit_info.get('remaining', 'unknown')),
             'X-Rate-Limit-Reset': str(rate_limit_info.get('reset_time', '')),
             'X-Security-Level': 'participant-data-api'

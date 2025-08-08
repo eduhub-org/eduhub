@@ -6,6 +6,7 @@ Provides participant enrollment and completion status for courses
 import os
 import logging
 import hashlib
+import time
 from datetime import datetime, timedelta
 from flask import jsonify
 try:
@@ -228,51 +229,91 @@ def get_organization_funded_courses(organization_id, eduhub_client):
     """
     Get list of courses funded by the organization
     """
-    query = """
-    query GetOrganizationCourses($orgId: Int!) {
+    variables = {"orgId": organization_id}
+    
+    # Primary approach: read from junction table and follow object relationship to Course
+    primary_query = """
+    query GetOrganizationCoursesPrimary($orgId: Int!) {
         CourseFundingOrganization(where: {organizationId: {_eq: $orgId}}) {
             Course {
                 id
                 title
-                description
+                tagline
                 ects
                 language
-                startDate
-                endDate
+                applicationEnd
                 programId
                 achievementCertificatePossible
                 attendanceCertificatePossible
+                Sessions {
+                    id
+                    startDateTime
+                    endDateTime
+                }
                 Program {
                     id
                     title
                     shortTitle
-                    eqfLevel
                 }
             }
         }
     }
     """
     
-    variables = {"orgId": organization_id}
-    result = eduhub_client.send_query(query, variables)
+    result = eduhub_client.send_query(primary_query, variables)
+    courses: list = []
     
-    # Check for GraphQL errors
-    if not isinstance(result, dict):
-        logging.error(f"GraphQL query failed: {result}")
-        return []
+    def _valid_result(res: dict) -> bool:
+        return isinstance(res, dict) and ("data" in res) and ("errors" not in res)
     
-    if "errors" in result:
-        logging.error(f"GraphQL errors: {result['errors']}")
-        return []
+    if _valid_result(result):
+        try:
+            for funding_relation in result["data"].get("CourseFundingOrganization", []):
+                course = funding_relation.get("Course")
+                if course:
+                    courses.append(course)
+        except Exception as e:
+            logging.warning(f"Primary course funding query parsing failed: {str(e)}")
+    else:
+        logging.warning(f"Primary course funding query failed or returned errors: {result}")
     
-    if "data" not in result:
-        logging.error(f"GraphQL response missing data: {result}")
-        return []
-    
-    courses = []
-    for funding_relation in result["data"]["CourseFundingOrganization"]:
-        course = funding_relation["Course"]
-        courses.append(course)
+    # Fallback approach: query Course and filter using array relationship CourseFundingOrganizations
+    if not courses:
+        fallback_query = """
+        query GetOrganizationCoursesFallback($orgId: Int!) {
+            Course(where: {CourseFundingOrganizations: {organizationId: {_eq: $orgId}}}) {
+                id
+                title
+                tagline
+                ects
+                language
+                applicationEnd
+                programId
+                achievementCertificatePossible
+                attendanceCertificatePossible
+                Sessions {
+                    id
+                    startDateTime
+                    endDateTime
+                }
+                Program {
+                    id
+                    title
+                    shortTitle
+                }
+            }
+        }
+        """
+        fb_result = eduhub_client.send_query(fallback_query, variables)
+        if _valid_result(fb_result):
+            try:
+                courses = fb_result["data"].get("Course", [])
+            except Exception as e:
+                logging.error(f"Fallback course funding query parsing failed: {str(e)}")
+                courses = []
+        else:
+            logging.error(f"Fallback course funding query failed or returned errors: {fb_result}")
+            courses = []
     
     return courses
 
@@ -291,24 +332,15 @@ def get_course_participants(course_id, auth_info, eduhub_client):
             attendanceCertificateURL
             User {
                 id
-                firstName
-                lastName
-                email
-                matriculationNumber
-                Organization {
-                    id
-                    name
-                }
+                occupation
             }
         }
         Course_by_pk(id: $courseId) {
             id
             title
-            description
+            tagline
             ects
             language
-            startDate
-            endDate
             maxMissedSessions
             Sessions {
                 id
@@ -319,7 +351,6 @@ def get_course_participants(course_id, auth_info, eduhub_client):
                 id
                 title
                 shortTitle
-                eqfLevel
             }
         }
     }
@@ -371,11 +402,6 @@ def process_participant_data(enrollment, user, attendance_data, course_info, aut
     """
     Process participant data based on access permissions
     """
-    # Calculate attendance rate
-    user_attendance = [a for a in attendance_data if a["userId"] == user["id"]]
-    total_sessions = len(course_info.get("Sessions", []))
-    attended_sessions = len([a for a in user_attendance if a["status"] == "ATTENDED"])
-    attendance_rate = attended_sessions / total_sessions if total_sessions > 0 else 0
     
     # Determine completion status
     has_achievement_cert = bool(enrollment.get("achievementCertificateURL"))
@@ -383,44 +409,18 @@ def process_participant_data(enrollment, user, attendance_data, course_info, aut
     
     # Base participant data
     participant = {
-        "id": hash_user_id(user["id"]) if not auth_info["can_access_pii"] else user["id"],
+        "id": hash_user_id(user["id"]),
         "enrollmentStatus": enrollment["status"],
         "enrollmentDate": enrollment["created_at"],
         "completionStatus": {
-            "hasAttended": attendance_rate >= 0.8,  # 80% attendance requirement
-            "attendanceRate": round(attendance_rate, 2),
             "hasAchievementCertificate": has_achievement_cert,
             "hasAttendanceCertificate": has_attendance_cert
         }
     }
     
-    # Add PII data if permitted
-    if auth_info["can_access_pii"]:
-        participant.update({
-            "fullName": f"{user['firstName']} {user['lastName']}",
-            "givenName": user["firstName"],
-            "familyName": user["lastName"],
-            "email": user["email"]
-        })
-        
-        if user.get("matriculationNumber"):
-            participant["identifier"] = [{
-                "type": "matriculationNumber",
-                "value": user["matriculationNumber"]
-            }]
-    
-    # Add organization info
-    if user.get("Organization"):
-        participant["organization"] = {
-            "id": user["Organization"]["id"],
-            "name": user["Organization"]["name"]
-        }
-    
-    # Add completion date if certificates exist
-    if has_achievement_cert or has_attendance_cert:
-        # Use enrollment updated date as proxy for completion
-        participant["completionStatus"]["completionDate"] = enrollment.get("updated_at")
-        participant["completionStatus"]["certificateIssuedDate"] = enrollment.get("updated_at")
+    # Add occupation status instead of organization/PII
+    if user.get("occupation"):
+        participant["occupationStatus"] = user["occupation"]
     
     # Add learning achievements
     achievements = []
@@ -428,16 +428,14 @@ def process_participant_data(enrollment, user, attendance_data, course_info, aut
         achievements.append({
             "id": f"urn:achievement:attendance:{enrollment['id']}",
             "title": f"Attendance Certificate - {course_info['title']}",
-            "type": "attendance",
-            "issuanceDate": enrollment.get("updated_at")
+            "type": "attendance"
         })
     
     if has_achievement_cert:
         achievements.append({
             "id": f"urn:achievement:completion:{enrollment['id']}",
             "title": f"Achievement Certificate - {course_info['title']}",
-            "type": "achievement", 
-            "issuanceDate": enrollment.get("updated_at")
+            "type": "achievement"
         })
     
     if achievements:
@@ -607,30 +605,29 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
         )
         return {'error': 'Course not found'}, 404
     
-    # Build ELM-compliant response
+    # Build response
     response = {
-        "@context": [
-            "https://europa.eu/europass/elm/context/v3",
-            "https://eduhub.org/context/participant-data/v1"
-        ],
         "type": "ParticipantDataReport",
         "id": f"urn:report:course:{course_id}:{datetime.utcnow().isoformat()}",
         "provider": {
-            "id": "did:web:eduhub.org",
-            "name": "EduHub Learning Platform", 
-            "type": "EducationalOrganization",
-            "location": {
-                "address": "TU Berlin, Berlin, Germany",
+            "id": "did:web:edu.opencampus.sh",
+            "name": "opencampus.sh",
+            "type": "Nonprofit",
+            "legalName": "Campus Business Box e.V.",
+            "websiteUrl": "https://edu.opencampus.sh",
+            "contactEmail": "team@opencampus.sh",
+            "address": {
+                "streetAddress": "Wissenschaftszentrum Kiel, Fraunhoferstr. 13",
+                "postalCode": "24118",
+                "locality": "Kiel",
                 "country": "DE"
             }
         },
         "learningOpportunity": {
             "id": f"urn:course:{course_id}",
             "title": course_info["title"],
-            "description": course_info.get("description"),
+            "summary": course_info.get("tagline"),
             "type": "Course",
-            "startDate": course_info.get("startDate"),
-            "endDate": course_info.get("endDate"), 
             "language": [course_info.get("language", "en")],
             "fundingOrganization": {
                 "id": auth_info["organization_id"],
@@ -638,14 +635,7 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
             }
         },
         "participants": participants,
-        "generatedAt": datetime.utcnow().isoformat(),
-        "validUntil": (datetime.utcnow() + timedelta(hours=24)).isoformat(),
-        "accessPermissions": {
-            "organizationId": auth_info["organization_id"],
-            "dataLevel": auth_info["access_level"],
-            "includePII": auth_info["can_access_pii"],
-            "securityLevel": auth_info["security_level"].value
-        }
+        "generatedAt": datetime.utcnow().isoformat()
     }
     
     # Add ECTS credits if available
@@ -655,9 +645,7 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
             "point": float(course_info["ects"])
         }]
     
-    # Add EQF level if available
-    if course_info.get("Program") and course_info["Program"].get("eqfLevel"):
-        response["learningOpportunity"]["eqfLevel"] = course_info["Program"]["eqfLevel"]
+    # No eqfLevel field in Program; omit
     
     # Sanitize response data based on security level
     sanitized_response = security_handler.sanitize_response_data(response, auth_info["security_level"])
@@ -666,6 +654,10 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
     security_headers = security_handler.generate_security_headers({
         'remaining': 'unlimited',  # This would come from rate limiting
         'reset_time': datetime.utcnow().timestamp() + 3600
+    })
+    security_headers.update({
+        'X-Access-Level': auth_info.get('access_level', 'basic'),
+        'X-Data-Retention': '24h'
     })
     
     # Log successful data access
@@ -703,28 +695,28 @@ def handle_organization_courses(auth_info, eduhub_client, client_ip, request_dat
         course_list.append(course_summary)
     
     response = {
-        "@context": [
-            "https://europa.eu/europass/elm/context/v3",
-            "https://eduhub.org/context/participant-data/v1"
-        ],
         "type": "CourseListReport",
         "id": f"urn:report:org:{auth_info['organization_id']}:{datetime.utcnow().isoformat()}",
         "provider": {
-            "id": "did:web:eduhub.org",
-            "name": "EduHub Learning Platform",
-            "type": "EducationalOrganization"
+            "id": "did:web:edu.opencampus.sh",
+            "name": "opencampus.sh",
+            "type": "Nonprofit",
+            "legalName": "Campus Business Box e.V.",
+            "websiteUrl": "https://edu.opencampus.sh",
+            "contactEmail": "team@opencampus.sh",
+            "address": {
+                "streetAddress": "Wissenschaftszentrum Kiel, Fraunhoferstr. 13",
+                "postalCode": "24118",
+                "locality": "Kiel",
+                "country": "DE"
+            }
         },
         "fundingOrganization": {
             "id": auth_info["organization_id"],
             "name": auth_info["organization_name"]
         },
         "courses": course_list,
-        "generatedAt": datetime.utcnow().isoformat(),
-        "accessPermissions": {
-            "organizationId": auth_info["organization_id"],
-            "dataLevel": auth_info["access_level"],
-            "securityLevel": auth_info["security_level"].value
-        }
+        "generatedAt": datetime.utcnow().isoformat()
     }
     
     # Sanitize response data based on security level
@@ -734,6 +726,10 @@ def handle_organization_courses(auth_info, eduhub_client, client_ip, request_dat
     security_headers = security_handler.generate_security_headers({
         'remaining': 'unlimited',  # This would come from rate limiting
         'reset_time': datetime.utcnow().timestamp() + 3600
+    })
+    security_headers.update({
+        'X-Access-Level': auth_info.get('access_level', 'basic'),
+        'X-Data-Retention': '24h'
     })
     
     # Log successful data access
