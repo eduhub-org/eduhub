@@ -117,7 +117,6 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
           }}
           acceptedFileTypes="image/*"
           maxFileSize={2 * 1024 * 1024} // 2MB for logos
-          translationNamespace="manageOrganizations"
         />
       </div>
     </div>
