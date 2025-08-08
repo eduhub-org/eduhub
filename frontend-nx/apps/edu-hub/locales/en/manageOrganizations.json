@@ -11,6 +11,42 @@
     "new_organization": "New Organization",
     "default_description": "Description"
   },
+  "api_key": {
+    "title": "API Key Management",
+    "description": "Generate and manage API keys for participant data access",
+    "action": {
+      "generate": "Generate API Key",
+      "generating": "Generating...",
+      "regenerate": "Regenerate Key",
+      "regenerating": "Regenerating...",
+      "revoke": "Revoke Key",
+      "revoking": "Revoking..."
+    },
+    "confirm": {
+      "regenerate": "Are you sure you want to regenerate the API key? This will invalidate the existing key immediately.",
+      "revoke": "Are you sure you want to revoke the API key? This will immediately disable access for this organization."
+    },
+    "dialog": {
+      "title": "API Key Generation",
+      "warning": {
+        "title": "Important Security Notice",
+        "description": "This API key will only be shown once. Please copy it immediately and store it securely. You will not be able to view it again."
+      },
+      "key_label": "Your API Key",
+      "copy": "Copy",
+      "saving": "Saving…",
+      "confirm_saved": "I have stored the key securely",
+      "usage": {
+        "title": "How to Use",
+        "header": "Include this header in your API requests:",
+        "example": "Example API call:"
+      }
+    },
+    "error": {
+      "generate_failed": "Failed to generate API key. Please try again.",
+      "revoke_failed": "Failed to revoke API key. Please try again."
+    }
+  },
   "action": {
     "add": "Add Organization",
     "delete_confirmation": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the organization \"{{name}}\"?"
@@ -70,6 +106,9 @@
     "FREELANCER": "Freelancer",
     "OTHER": "Other"
   },
-
+  "common": {
+    "close": "Close",
+    "cancel": "Cancel"
+  },
   "deletion_confirmation_question": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the organization {{name}}?"
 }

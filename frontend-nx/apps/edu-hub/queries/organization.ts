@@ -19,6 +19,7 @@ export const ORGANIZATION_LIST = gql`
       description
       aliases
       logo
+      apiKeyHash
       created_at
       Users {
         id
@@ -98,6 +99,18 @@ export const CREATE_ORGANIZATION = gql`
     insert_Organization_one(object: {name: $value, type: OTHER}) {
       id
       type
+    }
+  }
+`;
+
+export const UPDATE_ORGANIZATION_API_KEY_HASH = gql`
+  mutation UpdateOrganizationApiKeyHash($id: Int!, $apiKeyHash: String) {
+    update_Organization_by_pk(
+      pk_columns: { id: $id }
+      _set: { apiKeyHash: $apiKeyHash }
+    ) {
+      id
+      apiKeyHash
     }
   }
 `;

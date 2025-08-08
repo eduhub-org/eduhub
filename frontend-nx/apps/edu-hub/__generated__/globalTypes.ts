@@ -986,6 +986,7 @@ export enum Organization_constraint {
  */
 export enum Organization_select_column {
   aliases = "aliases",
+  apiKeyHash = "apiKeyHash",
   created_at = "created_at",
   description = "description",
   id = "id",
@@ -1000,6 +1001,7 @@ export enum Organization_select_column {
  */
 export enum Organization_update_column {
   aliases = "aliases",
+  apiKeyHash = "apiKeyHash",
   created_at = "created_at",
   description = "description",
   id = "id",
@@ -5823,6 +5825,7 @@ export interface Organization_bool_exp {
   _not?: Organization_bool_exp | null;
   _or?: Organization_bool_exp[] | null;
   aliases?: jsonb_comparison_exp | null;
+  apiKeyHash?: String_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   description?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
@@ -5841,6 +5844,7 @@ export interface Organization_insert_input {
   OrganizationType?: OrganizationType_obj_rel_insert_input | null;
   Users?: User_arr_rel_insert_input | null;
   aliases?: any | null;
+  apiKeyHash?: string | null;
   created_at?: any | null;
   description?: string | null;
   id?: number | null;
@@ -5854,6 +5858,7 @@ export interface Organization_insert_input {
  * order by max() on columns of table "Organization"
  */
 export interface Organization_max_order_by {
+  apiKeyHash?: order_by | null;
   created_at?: order_by | null;
   description?: order_by | null;
   id?: order_by | null;
@@ -5866,6 +5871,7 @@ export interface Organization_max_order_by {
  * order by min() on columns of table "Organization"
  */
 export interface Organization_min_order_by {
+  apiKeyHash?: order_by | null;
   created_at?: order_by | null;
   description?: order_by | null;
   id?: order_by | null;
@@ -5900,6 +5906,7 @@ export interface Organization_order_by {
   OrganizationType?: OrganizationType_order_by | null;
   Users_aggregate?: User_aggregate_order_by | null;
   aliases?: order_by | null;
+  apiKeyHash?: order_by | null;
   created_at?: order_by | null;
   description?: order_by | null;
   id?: order_by | null;
