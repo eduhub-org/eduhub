@@ -195,7 +195,7 @@ def authenticate_api_key(api_key):
         raise ValueError("Invalid API key format")
     except Exception as e:
         logging.error(f"API key authentication error: {str(e)}")
-        raise ValueError("Authentication failed")
+        raise ValueError("Authentication failed") from e
 
 
 def authenticate_jwt(token):
@@ -207,10 +207,18 @@ def authenticate_jwt(token):
     import base64
     import json
     
+    # Helper to pad base64url strings safely to a multiple of 4
+    def _pad_base64url(segment: str) -> str:
+        missing = (-len(segment)) % 4
+        return segment + ('=' * missing)
+
     try:
         # Decode JWT payload (without verification for demo)
         parts = token.split('.')
-        payload = base64.urlsafe_b64decode(parts[1] + '==')
+        if len(parts) < 2:
+            raise ValueError("Malformed JWT: missing payload segment")
+        payload_b64 = _pad_base64url(parts[1])
+        payload = base64.urlsafe_b64decode(payload_b64)
         claims = json.loads(payload)
         
         # Map security_level claim (string) to SecurityLevel enum; default to BASIC
@@ -229,8 +237,8 @@ def authenticate_jwt(token):
             'course_access': claims.get('course_access', []),
             'security_level': security_level
         }
-    except Exception:
-        raise ValueError("Invalid JWT token")
+    except Exception as err:
+        raise ValueError("Invalid JWT token") from err
 
 
 def get_organization_funded_courses(organization_id, eduhub_client):

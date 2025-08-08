@@ -181,12 +181,16 @@ class SecurityHandler:
         # Check for suspicious patterns in request
         request_data = {
             'path': request.path,
-            'query_string': request.query_string.decode('utf-8'),
+            'query_string': request.query_string.decode('utf-8', errors='replace'),
             'headers': dict(request.headers),
             'method': request.method
         }
         
-        request_str = json.dumps(request_data, sort_keys=True)
+        # Serialize defensively; fall back to repr on non-JSON-serializable content
+        try:
+            request_str = json.dumps(request_data, sort_keys=True)
+        except Exception:
+            request_str = repr(request_data)
         for pattern in self.compiled_patterns:
             if pattern.search(request_str):
                 violations.append(f"Suspicious pattern detected: {pattern.pattern}")
