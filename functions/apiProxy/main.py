@@ -5,6 +5,15 @@ from api_clients.eduhub_client import EduHubClient
 import uuid
 from datetime import datetime
 import markdown
+try:
+    from participant_data_handler import handle_participants_request, handle_participants_schema
+except ImportError:
+    # Fallback for when module is loaded from different context
+    import sys
+    import os
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, current_dir)
+    from participant_data_handler import handle_participants_request, handle_participants_schema
 
 # Rate limiting configuration - 100 requests per hour per IP
 RATE_LIMIT = 60
@@ -559,5 +568,29 @@ def handle_request(request):
             data, status = result
             return (jsonify(data), status, get_cors_headers())
         return (jsonify(result), 200, get_cors_headers())
+    
+    elif path == 'participants':
+        # Check if this is a schema request
+        if len(path_parts) > 1 and path_parts[1] == 'schema':
+            result = handle_participants_schema()
+            if isinstance(result, tuple):
+                data, status = result
+                return (jsonify(data), status, get_cors_headers())
+            return (jsonify(result), 200, get_cors_headers())
+        
+        # Simple test endpoint first
+        if len(path_parts) > 1 and path_parts[1] == 'test':
+            return (jsonify({'status': 'participants endpoint working', 'path': request.path}), 200, get_cors_headers())
+        
+        # Handle participant data request
+        try:
+            result = handle_participants_request(request)
+            if isinstance(result, tuple):
+                data, status = result
+                return (jsonify(data), status, get_cors_headers())
+            return (jsonify(result), 200, get_cors_headers())
+        except Exception as e:
+            print(f"DEBUG: Main handler error: {str(e)}")
+            return (jsonify({'error': f'Handler error: {str(e)}'}), 500, get_cors_headers())
     
     return (jsonify({'error': 'Not found'}), 404, get_cors_headers())
