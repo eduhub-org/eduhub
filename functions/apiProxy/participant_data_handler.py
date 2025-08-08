@@ -7,11 +7,11 @@ import os
 import logging
 import hashlib
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from flask import jsonify
 try:
     from api_clients.eduhub_client import EduHubClient
-    from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input
+    from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input, SecurityLevel
 except ImportError:
     # Fallback for when module is loaded from different context
     import sys
@@ -19,7 +19,7 @@ except ImportError:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     sys.path.insert(0, current_dir)
     from api_clients.eduhub_client import EduHubClient
-    from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input
+    from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input, SecurityLevel
 
 
 def authenticate_organization_access(request):
@@ -106,7 +106,7 @@ def authenticate_organization_access(request):
         security_handler.log_audit_event(
             'auth_failed', 0, client_ip, request_data, False, str(e)
         )
-        raise e
+        raise
 
 
 def authenticate_api_key(api_key):
@@ -213,13 +213,21 @@ def authenticate_jwt(token):
         payload = base64.urlsafe_b64decode(parts[1] + '==')
         claims = json.loads(payload)
         
+        # Map security_level claim (string) to SecurityLevel enum; default to BASIC
+        level_str = str(claims.get('security_level', 'basic')).lower()
+        try:
+            security_level = SecurityLevel(level_str)
+        except Exception:
+            security_level = SecurityLevel.BASIC
+
         return {
             'organization_id': claims.get('organization_id'),
             'organization_name': claims.get('organization_name'),
             'access_level': claims.get('access_level', 'basic'),
             'can_access_pii': claims.get('pii_access', False),
             'can_access_grades': claims.get('grade_access', False),
-            'course_access': claims.get('course_access', [])
+            'course_access': claims.get('course_access', []),
+            'security_level': security_level
         }
     except Exception:
         raise ValueError("Invalid JWT token")
@@ -608,7 +616,7 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
     # Build response
     response = {
         "type": "ParticipantDataReport",
-        "id": f"urn:report:course:{course_id}:{datetime.utcnow().isoformat()}",
+        "id": f"urn:report:course:{course_id}:{datetime.now(UTC).isoformat()}",
         "provider": {
             "id": "did:web:edu.opencampus.sh",
             "name": "opencampus.sh",
@@ -635,7 +643,7 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
             }
         },
         "participants": participants,
-        "generatedAt": datetime.utcnow().isoformat()
+        "generatedAt": datetime.now(UTC).isoformat()
     }
     
     # Add ECTS credits if available
@@ -653,7 +661,7 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
     # Generate security headers
     security_headers = security_handler.generate_security_headers({
         'remaining': 'unlimited',  # This would come from rate limiting
-        'reset_time': datetime.utcnow().timestamp() + 3600
+        'reset_time': datetime.now(UTC).timestamp() + 3600
     })
     security_headers.update({
         'X-Access-Level': auth_info.get('access_level', 'basic'),
@@ -696,7 +704,7 @@ def handle_organization_courses(auth_info, eduhub_client, client_ip, request_dat
     
     response = {
         "type": "CourseListReport",
-        "id": f"urn:report:org:{auth_info['organization_id']}:{datetime.utcnow().isoformat()}",
+        "id": f"urn:report:org:{auth_info['organization_id']}:{datetime.now(UTC).isoformat()}",
         "provider": {
             "id": "did:web:edu.opencampus.sh",
             "name": "opencampus.sh",
@@ -716,7 +724,7 @@ def handle_organization_courses(auth_info, eduhub_client, client_ip, request_dat
             "name": auth_info["organization_name"]
         },
         "courses": course_list,
-        "generatedAt": datetime.utcnow().isoformat()
+        "generatedAt": datetime.now(UTC).isoformat()
     }
     
     # Sanitize response data based on security level
@@ -725,7 +733,7 @@ def handle_organization_courses(auth_info, eduhub_client, client_ip, request_dat
     # Generate security headers
     security_headers = security_handler.generate_security_headers({
         'remaining': 'unlimited',  # This would come from rate limiting
-        'reset_time': datetime.utcnow().timestamp() + 3600
+        'reset_time': datetime.now(UTC).timestamp() + 3600
     })
     security_headers.update({
         'X-Access-Level': auth_info.get('access_level', 'basic'),

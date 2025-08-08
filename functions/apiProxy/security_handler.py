@@ -26,7 +26,7 @@ import hmac
 import time
 import re
 import ipaddress
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from typing import Dict, List, Optional, Tuple, Any, Set
 from dataclasses import dataclass
 from enum import Enum
@@ -296,7 +296,7 @@ class SecurityHandler:
                        success: bool, details: Optional[str] = None):
         """Append an audit entry and emit a structured log line."""
         audit_entry = {
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(UTC).isoformat(),
             'event_type': event_type,
             'organization_id': organization_id,
             'client_ip': client_ip,
@@ -345,7 +345,7 @@ class SecurityHandler:
             anomalies.append("High frequency requests detected")
         
         # Unusual time patterns (outside business hours)
-        current_hour = datetime.utcnow().hour
+        current_hour = datetime.now(UTC).hour
         if current_hour < 6 or current_hour > 22:  # Outside 6 AM - 10 PM UTC
             anomalies.append("Access outside normal business hours")
         
@@ -362,7 +362,7 @@ class SecurityHandler:
     def _get_recent_requests(self, organization_id: int, client_ip: str, 
                            window_minutes: int = 60) -> List[Dict[str, Any]]:
         """Get recent requests for anomaly detection"""
-        cutoff_time = datetime.utcnow() - timedelta(minutes=window_minutes)
+        cutoff_time = datetime.now(UTC) - timedelta(minutes=window_minutes)
         return [
             entry for entry in self.audit_log
             if (entry['organization_id'] == organization_id and 
