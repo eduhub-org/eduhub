@@ -30,6 +30,7 @@ import { UPDATE_USER_ORGANIZATION_ID } from '../../../queries/updateUser';
 import CreatableTagSelector from '../../inputs/CreatableTagSelector';
 import { OrganizationType_enum } from '../../../__generated__/globalTypes';
 import { MergeOrganizationsDialog } from './MergeOrganizationsDialog';
+import { ApiKeyManager } from './ApiKeyManager';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 
@@ -119,6 +120,7 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
           maxFileSize={2 * 1024 * 1024} // 2MB for logos
         />
       </div>
+      <ApiKeyManager organization={row} onError={onError} />
     </div>
   );
 };

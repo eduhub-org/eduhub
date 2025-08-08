@@ -33,6 +33,7 @@ insert_permissions:
       check: {}
       columns:
         - aliases
+        - apiKeyHash
         - created_at
         - description
         - id
@@ -54,11 +55,26 @@ select_permissions:
         - updated_at
       filter: {}
       allow_aggregations: true
+  - role: user_access
+    permission:
+      columns:
+        - aliases
+        - apiKeyHash
+        - created_at
+        - description
+        - id
+        - logo
+        - name
+        - type
+        - updated_at
+      filter: {}
+      allow_aggregations: true
 update_permissions:
   - role: user_access
     permission:
       columns:
         - aliases
+        - apiKeyHash
         - description
         - logo
         - name
