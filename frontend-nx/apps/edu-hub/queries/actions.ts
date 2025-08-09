@@ -149,6 +149,31 @@ export const SAVE_USER_PROFILE_IMAGE = gql`
   }
 `;
 
+export const SAVE_ORGANIZATION_LOGO = gql`
+  mutation SaveOrganizationLogo(
+    $base64File: String!
+    $fileName: String!
+    $organizationId: Int!
+  ) {
+    saveOrganizationLogo(
+      base64file: $base64File
+      filename: $fileName
+      organizationid: $organizationId
+    ) {
+      success
+      messageKey
+      error
+      filePath
+      accessUrl
+      resizedPaths {
+        size
+        filePath
+        accessUrl
+      }
+    }
+  }
+`;
+
 export const SAVE_COURSE_IMAGE = gql`
   mutation SaveCourseImage(
     $base64File: String!

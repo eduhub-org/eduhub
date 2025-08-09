@@ -21,6 +21,14 @@ export interface OrganizationList_Organization {
   type: OrganizationType_enum;
   description: string | null;
   aliases: any | null;
+  /**
+   * Path to the organization logo image file
+   */
+  logo: string | null;
+  /**
+   * SHA-256 hash of the organization API key for participant data access. Plain text keys are never stored.
+   */
+  apiKeyHash: string | null;
   created_at: any;
   /**
    * An array relationship

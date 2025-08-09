@@ -1287,6 +1287,21 @@ INSERT INTO public."MailLog" (id, subject, content, "to", "from", cc, bcc, creat
 INSERT INTO public."OrganizationAdmin" (id, "userId", "organizationId", "canManageCourses", "canManageEvents", "canManageSettings", updated_at, created_at) VALUES (1, '11111111-1111-1111-1111-111111111111', 42, true, false, false, '2025-01-22 14:13:53.101281+00', '2025-01-22 14:13:53.101281+00');
 INSERT INTO public."OrganizationAdmin" (id, "userId", "organizationId", "canManageCourses", "canManageEvents", "canManageSettings", updated_at, created_at) VALUES (2, '11111111-1111-1111-1111-111111111111', 67, false, true, false, '2025-01-22 14:16:03.261301+00', '2025-01-22 14:16:03.261301+00');
 INSERT INTO public."OrganizationAdmin" (id, "userId", "organizationId", "canManageCourses", "canManageEvents", "canManageSettings", updated_at, created_at) VALUES (3, '33333333-3333-3333-3333-333333333333', 67, false, true, true, '2025-01-22 14:16:21.054925+00', '2025-01-22 14:16:21.054925+00');
+
+-- Add new CourseGroupOption entries for MOOCHub feed generation (development seed data)
+-- DLC tag for metadata
+INSERT INTO public."CourseGroupOption"("id", "title", "order", "sliderGroup", "created_at", "updated_at") VALUES (6, E'DLC', 6, false, NOW(), NOW());
+
+-- Learning location group options (metadata tags)
+INSERT INTO public."CourseGroupOption"("id", "title", "order", "sliderGroup", "created_at", "updated_at") VALUES (7, E'Starterkitchen', 7, false, NOW(), NOW());
+INSERT INTO public."CourseGroupOption"("id", "title", "order", "sliderGroup", "created_at", "updated_at") VALUES (8, E'COBL', 8, false, NOW(), NOW());
+
+-- Learning zone group options (metadata tags)
+INSERT INTO public."CourseGroupOption"("id", "title", "order", "sliderGroup", "created_at", "updated_at") VALUES (9, E'Eventraum', 9, false, NOW(), NOW());
+INSERT INTO public."CourseGroupOption"("id", "title", "order", "sliderGroup", "created_at", "updated_at") VALUES (10, E'Konferenzraum', 10, false, NOW(), NOW());
+INSERT INTO public."CourseGroupOption"("id", "title", "order", "sliderGroup", "created_at", "updated_at") VALUES (11, E'Café', 11, false, NOW(), NOW());
+INSERT INTO public."CourseGroupOption"("id", "title", "order", "sliderGroup", "created_at", "updated_at") VALUES (12, E'Loft', 12, false, NOW(), NOW());
+INSERT INTO public."CourseGroupOption"("id", "title", "order", "sliderGroup", "created_at", "updated_at") VALUES (13, E'Club', 13, false, NOW(), NOW());
 INSERT INTO public."SessionAddress" (id, created_at, updated_at, "sessionId", address, "courseLocationId") VALUES (1, '2024-11-25 15:38:22.482944+00', '2024-11-25 15:38:22.482944+00', 29, '', 1);
 INSERT INTO public."SessionAddress" (id, created_at, updated_at, "sessionId", address, "courseLocationId") VALUES (2, '2024-11-25 15:38:22.482944+00', '2024-11-25 15:38:22.482944+00', 29, '', 2);
 INSERT INTO public."SessionAddress" (id, created_at, updated_at, "sessionId", address, "courseLocationId") VALUES (3, '2024-11-25 15:38:22.73501+00', '2024-11-25 15:38:22.73501+00', 30, '', 1);
@@ -1309,6 +1324,7 @@ SELECT pg_catalog.setval('public."Attendence_Id_seq"', 64, true);
 SELECT pg_catalog.setval('public."CourseAddress_id_seq"', 9, true);
 SELECT pg_catalog.setval('public."CourseDegree_id_seq"', 6, true);
 SELECT pg_catalog.setval('public."CourseGroup_id_seq"', 15, true);
+SELECT pg_catalog.setval('public."CourseGroupOption_id_seq"', 13, true);
 SELECT pg_catalog.setval('public."CourseInstructor_Id_seq"', 1, true);
 SELECT pg_catalog.setval('public."Course_Id_seq"', 9, true);
 SELECT pg_catalog.setval('public."Date_Id_seq"', 96, true);

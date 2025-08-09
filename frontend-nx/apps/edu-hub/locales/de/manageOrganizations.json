@@ -7,8 +7,45 @@
     "users": "Nutzer",
     "aliases": "Alias",
     "description": "Beschreibung",
+    "logo": "Logo",
     "new_organization": "Neue Organisation",
     "default_description": "Beschreibung"
+  },
+  "api_key": {
+    "title": "API-Schlüssel Verwaltung",
+    "description": "API-Schlüssel für Teilnehmerdaten-Zugriff generieren und verwalten",
+    "action": {
+      "generate": "API-Schlüssel generieren",
+      "generating": "Ich generiere...",
+      "regenerate": "Schlüssel neu generieren",
+      "regenerating": "Ich generiere neu...",
+      "revoke": "Schlüssel entfernen",
+      "revoking": "Ich entferne..."
+    },
+    "confirm": {
+      "regenerate": "Bist du sicher, dass du den API-Schlüssel neu generieren möchtest? Dadurch wird der bestehende Schlüssel sofort ungültig.",
+      "revoke": "Bist du sicher, dass du den API-Schlüssel entfernen möchtest? Dadurch wird der Zugriff für diese Organisation sofort deaktiviert."
+    },
+    "dialog": {
+      "title": "API-Schlüssel Generierung",
+      "warning": {
+        "title": "Wichtiger Sicherheitshinweis",
+        "description": "Dieser API-Schlüssel wird nur einmal angezeigt. Bitte kopiere ihn sofort und speichere ihn sicher. Du wirst ihn später nicht erneut einsehen können."
+      },
+      "key_label": "Dein API-Schlüssel",
+      "copy": "Kopieren",
+      "saving": "Speichere…",
+      "confirm_saved": "Ich habe den Schlüssel sicher gespeichert",
+      "usage": {
+        "title": "Verwendung",
+        "header": "Füge diesen Header in deine API-Anfragen ein:",
+        "example": "Beispiel API-Aufruf:"
+      }
+    },
+    "error": {
+      "generate_failed": "API-Schlüssel konnte nicht generiert werden. Bitte versuche es erneut.",
+      "revoke_failed": "API-Schlüssel konnte nicht entfernt werden. Bitte versuche es erneut."
+    }
   },
   "action": {
     "add": "Organisation hinzufügen",
@@ -22,7 +59,7 @@
     "merge": {
       "label": "Organisationen zusammenführen",
       "title": "Organisationen zusammenführen",
-      "description": "Wählen Sie die Organisation aus, zu der die ausgewählten Organisationen zusammengeführt werden sollen.",
+      "description": "Wähle die Organisation aus, zu der die ausgewählten Organisationen zusammengeführt werden sollen.",
       "select_target": {
         "label": "Zielorganisation",
         "placeholder": "Zielorganisation auswählen"
@@ -31,14 +68,14 @@
       "preview_title": "Zusammenführungsvorschau",
       "target_organization": "Zielorganisation",
       "organizations_to_merge": "Zusammenzuführende Organisationen",
-      "total_users_affected": "Betroffene Nutzer insgesamt",
+      "total_users_affected": "Insgesamt betroffene Nutzer",
       "aliases_to_add": "Hinzuzufügende Aliase",
       "type_change_warning": "Typänderung",
       "will_become_university": "Die Zielorganisation wird zum Universitätstyp geändert",
       "deletion_warning": "Warnung",
       "organizations_will_be_deleted_one": "1 Organisation wird dauerhaft gelöscht",
       "organizations_will_be_deleted_other": "{{count}} Organisationen werden dauerhaft gelöscht",
-      "no_organizations_selected": "Keine Organisationen zum Zusammenführen ausgewählt"
+      "no_organizations_selected": "Keine Organisationen für die Zusammenführung ausgewählt"
     }
   },
   "input": {
@@ -48,26 +85,30 @@
   },
   "error": {
     "loading": "Fehler beim Laden der Organisationen",
-    "duplicate_organization_name": "Eine Organisation mit dem Standardnamen existiert noch. Bitte benenne oder lösche diese zuerst.",
-    "general": "Ein Fehler trat auf, während die Organisation hinzugefügt wurde. Bitte versuchen Sie es erneut.",
-    "network": "Ein Netzwerkfehler trat auf. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
-    "unexpected": "Ein unerwarteter Fehler trat auf. Bitte versuchen Sie es später erneut.",
+    "duplicate_organization_name": "Eine Organisation mit dem Standardnamen existiert noch. Bitte benenne diese zuerst um oder lösche sie.",
+    "general": "Beim Hinzufügen der Organisation ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+    "network": "Ein Netzwerkfehler ist aufgetreten. Bitte überprüfe deine Verbindung und versuche es erneut.",
+    "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es später erneut.",
     "bulk_delete_failed": "Fehler beim Löschen der ausgewählten Organisationen",
     "merge_failed": "Fehler beim Zusammenführen der Organisationen",
-    "alias_already_exists": "Der Alias \"{{alias}}\" existiert bereits in der Organisation \"{{organization}}\". Bitte wählen Sie einen anderen Namen oder wählen Sie die bestehende Organisation aus.",
-    "alias_duplicate_error": "Dieser Alias existiert bereits in einer anderen Organisation. Bitte wählen Sie einen anderen Namen.",
-    "alias_update_failed": "Fehler beim Aktualisieren der Organisationsaliase. Bitte versuchen Sie es erneut.",
-    "alias_unexpected_error": "Ein unerwarteter Fehler ist beim Aktualisieren der Aliase aufgetreten. Bitte versuchen Sie es erneut."
+    "alias_already_exists": "Der Alias \"{{alias}}\" existiert bereits in der Organisation \"{{organization}}\". Bitte wähle einen anderen Namen oder wähle die bestehende Organisation aus.",
+    "alias_duplicate_error": "Dieser Alias existiert bereits in einer anderen Organisation. Bitte wähle einen anderen Namen.",
+    "alias_update_failed": "Fehler beim Aktualisieren der Organisationsaliase. Bitte versuche es erneut.",
+    "alias_unexpected_error": "Beim Aktualisieren der Aliase ist ein unerwarteter Fehler aufgetreten. Bitte versuche es erneut."
   },
   "type_selection": {
     "UNIVERSITY": "Universität",
     "RESEARCH_INSTITUTE": "Forschungsinstitut",
     "PUBLIC_SECTOR": "Öffentlicher Sektor",
-    "NON_PROFIT_ORGANIZATION": "Gemeinnützige Organisation",
+    "NON_PROFIT_ORGANIZATION": "Non-Profit-Organisation",
     "CORPORATION": "Unternehmen",
     "SCHOOL": "Schule",
-    "FREELANCER": "Freiberuflich/Selbständig",
-    "OTHER": "Sonstige"
+    "FREELANCER": "Freiberufler",
+    "OTHER": "Sonstiges"
   },
-  "deletion_confirmation_question": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the organization {{name}}?"
+  "common": {
+    "close": "Schließen",
+    "cancel": "Abbrechen"
+  },
+  "deletion_confirmation_question": "Das Löschen einer Organisation ist nur möglich, wenn keine Benutzer mit dieser Organisation verknüpft sind.\nBist du sicher, dass du die Organisation {{name}} löschen möchtest?"
 }

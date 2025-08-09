@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Course_bool_exp, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { Course_bool_exp, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: AdminCourseList
@@ -267,6 +267,27 @@ export interface AdminCourseList_Course_DegreeCourses {
   Course: AdminCourseList_Course_DegreeCourses_Course;
 }
 
+export interface AdminCourseList_Course_CourseFundingOrganizations_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+  description: string | null;
+  type: OrganizationType_enum;
+  /**
+   * Path to the organization logo image file
+   */
+  logo: string | null;
+}
+
+export interface AdminCourseList_Course_CourseFundingOrganizations {
+  __typename: "CourseFundingOrganization";
+  id: number;
+  /**
+   * An object relationship
+   */
+  Organization: AdminCourseList_Course_CourseFundingOrganizations_Organization;
+}
+
 export interface AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus {
   __typename: "CourseEnrollmentStatus";
   value: string;
@@ -444,6 +465,10 @@ export interface AdminCourseList_Course {
    * An array relationship
    */
   DegreeCourses: AdminCourseList_Course_DegreeCourses[];
+  /**
+   * An array relationship
+   */
+  CourseFundingOrganizations: AdminCourseList_Course_CourseFundingOrganizations[];
   /**
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */

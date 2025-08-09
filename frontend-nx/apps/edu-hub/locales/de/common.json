@@ -143,11 +143,18 @@
     "confirm_delete": "Löschen bestätigen",
     "deletion_confirmation_question": "Bist du sicher, dass du diesen Eintrag löschen möchtest?"
   },
-  "file_uploader": {
-    "upload_new_profile_picture": "Neues Profilbild hochladen",
-    "upload_file": "Datei hochladen",
+  "image_uploader": {
+    "uploading": "Hochladen...",
+    "removing": "Entfernen...",
     "file_size_exceeds_limit": "Die Datei ist zu groß. Bitte wähle eine Datei mit einer Größe von {{maxFileSize}}MB oder weniger.",
-    "error_uploading_profile_picture": "Fehler beim Hochladen des Profilbildes"
+    "upload_file": "Datei hochladen",
+    "upload_new_profile_picture": "Neues Profilbild hochladen",
+    "upload_new_logo": "Neues Logo hochladen",
+    "remove_profile_picture": "Profilbild entfernen",
+    "remove_logo": "Logo entfernen",
+    "remove_image": "Bild entfernen",
+    "remove_image_error": "Fehler beim Entfernen des Bildes",
+    "upload_error": "Fehler beim Hochladen des Bildes"
   },
   "input_field": {
     "invalid_link_format": "Ungültiges Link-Format",
@@ -215,5 +222,11 @@
     "title": "Häufig gestellte Fragen",
     "error_loading": "Fehler beim Laden der FAQs. Bitte versuche es später erneut.",
     "no_faqs_available": "Keine FAQs verfügbar."
+  },
+  "organization_dialog": {
+    "type_organization_name_minimum_2_letters": "Gib einen Organisationsnamen ein (mindestens 2 Buchstaben).",
+    "search_organizations": "Organisationen suchen",
+    "no_organizations_found": "Keine Organisationen gefunden",
+    "type_at_least_2_characters": "Gib mindestens 2 Zeichen ein"
   }
 }

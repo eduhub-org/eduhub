@@ -4,7 +4,7 @@ import useTranslation from 'next-translate/useTranslation';
 import { useRouter } from 'next/router';
 
 import { Button } from '../../common/Button';
-import UnifiedFileUploader from '../../inputs/UnifiedFileUploader';
+import ImageUploader from '../../inputs/ImageUploader';
 
 import { useRoleQuery } from '../../../hooks/authedQuery';
 
@@ -118,7 +118,7 @@ const ProfileContent: FC = () => {
   return (
     <div className="px-3 mt-20">
       <>
-        <UnifiedFileUploader
+        <ImageUploader
           variant="eduhub"
           element="profilePicture"
           identifierVariables={{ userId: sessionData?.profile?.sub }}

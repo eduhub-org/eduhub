@@ -17,3 +17,20 @@ export const COURSE_INSTRUCTOR_FRAGMENT = gql`
     }
   }
 `;
+
+export const COURSE_INSTRUCTOR_FRAGMENT_ANONYMOUS = gql`
+  fragment CourseInstructorFragmentAnonymous on CourseInstructor {
+    id
+    Expert {
+      id
+      description
+      User {
+        id
+        firstName
+        lastName
+        picture
+        externalProfile
+      }
+    }
+  }
+`;

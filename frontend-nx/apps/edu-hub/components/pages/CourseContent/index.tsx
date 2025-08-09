@@ -9,7 +9,7 @@ import { CourseWithEnrollment } from '../../../queries/__generated__/CourseWithE
 import { COURSE_WITH_ENROLLMENT } from '../../../queries/courseWithEnrollment';
 import { CourseEnrollmentStatus_enum, CourseRegistrationType_enum } from '../../../__generated__/globalTypes';
 import { useIsLoggedIn } from '../../../hooks/authentication';
-import { COURSE } from '../../../queries/course';
+import { COURSE, COURSE_ANONYMOUS } from '../../../queries/course';
 import { Course, CourseVariables } from '../../../queries/__generated__/Course';
 import { getCourseEnrollment } from '../../../helpers/util';
 import { ContentRow } from '../../common/ContentRow';
@@ -62,7 +62,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
 
   // Query for unauthorized course data
   const [getCoursesUnauthorized, { data: unauthorizedCourseData, loading: getCoursesUnauthorizedLoading }] =
-    useLazyRoleQuery<Course, CourseVariables>(COURSE, {
+    useLazyRoleQuery<Course, CourseVariables>(COURSE_ANONYMOUS, {
       variables: {
         id,
       },
