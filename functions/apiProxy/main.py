@@ -44,6 +44,8 @@ def get_cors_headers():
         'Access-Control-Allow-Headers': 'Content-Type, Accept-Version',
         'Access-Control-Max-Age': '3600',
         'Content-Type': 'application/vnd.api+json',
+        'Cache-Control': 'no-store',
+        'Pragma': 'no-cache',
         'X-API-Version': '3.0.1',
         'X-Rate-Limit-Limit': str(RATE_LIMIT),
         'X-Rate-Limit-Window': str(RATE_WINDOW)
@@ -360,8 +362,8 @@ def handle_moochub_schema():
     from pathlib import Path
     
     try:
-        # Load the base MOOCHub schema
-        schema_path = Path(__file__).parent.parent / "callPythonFunction" / "pythonFunctions" / "moochub-schema.json"
+        # Load the base MOOCHub schema from local copy
+        schema_path = Path(__file__).parent / "moochub-schema.json"
         with open(schema_path, 'r') as f:
             base_schema = json.load(f)
         
@@ -492,8 +494,8 @@ def validate_moochub_schema(feed_data):
     from pathlib import Path
     
     try:
-        # Load the local schema
-        schema_path = Path(__file__).parent.parent / "callPythonFunction" / "pythonFunctions" / "moochub-schema.json"
+        # Load the local schema from local copy
+        schema_path = Path(__file__).parent / "moochub-schema.json"
         with open(schema_path, 'r') as f:
             schema = json.load(f)
         
@@ -547,6 +549,36 @@ def handle_request(request):
     path_parts = request.path.strip('/').split('/')
     path = path_parts[0]
     
+    # Top-level health endpoint (recommended standard)
+    if path == 'health':
+        db_status = 'unknown'
+        hasura_config = 'missing'
+        try:
+            if os.getenv('HASURA_ENDPOINT') and os.getenv('HASURA_ADMIN_SECRET'):
+                hasura_config = 'configured'
+            # Try to initialize client (non-blocking check)
+            try:
+                _ = EduHubClient()
+                db_status = 'connected'
+            except ValueError as ve:
+                # Likely missing config
+                db_status = 'unconfigured' if 'HASURA' in str(ve) else 'error'
+            except Exception:
+                db_status = 'error'
+        except Exception:
+            db_status = 'error'
+
+        health_payload = {
+            'status': 'healthy' if db_status in ['connected', 'unconfigured'] else 'degraded',
+            'timestamp': datetime.utcnow().isoformat() + 'Z',
+            'version': '3.0.1',
+            'services': {
+                'database': db_status,
+                'hasura_config': hasura_config
+            }
+        }
+        return (jsonify(health_payload), 200, get_cors_headers())
+
     if path == 'moochub':
         # Check if this is a schema request
         if len(path_parts) > 1 and path_parts[1] == 'schema':

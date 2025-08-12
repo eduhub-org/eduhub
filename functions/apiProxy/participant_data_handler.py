@@ -767,20 +767,86 @@ def handle_participants_schema():
     
     schema = {
         "$schema": "https://json-schema.org/draft/2019-09/schema",
-        "$id": "https://eduhub.org/schemas/elm-participant-data/v1.0.0",
-        "title": "ELM Participant Data Schema",
-        "description": "JSON Schema for European Learning Model (ELM) compliant participant data",
+        "$id": "https://edu.opencampus.sh/schemas/participant-data/v1.0.0",
+        "title": "EduHub ELM-Compliant Participant Data API",
+        "description": "RESTful API providing secure, privacy-preserving access to participant enrollment and completion data for courses funded by partner organizations. Implements European Learning Model (ELM) standards with privacy-first design - no PII is exposed, participant identities are cryptographically hashed.",
         "version": "1.0.0",
         "type": "object",
-        "endpoints": {
-            "courses": "/participants - List organization's funded courses",
-            "participants": "/participants/courses/{course_id} - Get course participants",
-            "schema": "/participants/schema - This schema definition"
+        "api": {
+            "authentication": {
+                "type": "API Key",
+                "header": "X-API-Key",
+                "format": "edh_live_org{organization_id}_sk_{secret}",
+                "required_headers": ["User-Agent"],
+                "optional_headers": {
+                    "Accept-Version": "3.0.1 (default if omitted)"
+                }
+            },
+            "base_url": "Function endpoint varies by deployment",
+            "endpoints": {
+                "list_courses": {
+                    "method": "GET",
+                    "path": "/participants",
+                    "description": "List all courses funded by the authenticated organization",
+                    "response_type": "CourseListReport"
+                },
+                "get_participants": {
+                    "method": "GET", 
+                    "path": "/participants/courses/{course_id}",
+                    "description": "Get participant enrollment and completion data for a specific funded course",
+                    "response_type": "ParticipantDataReport"
+                },
+                "get_schema": {
+                    "method": "GET",
+                    "path": "/participants/schema", 
+                    "description": "This schema definition for the Participant Data API",
+                    "response_type": "Schema"
+                }
+            },
+            "recommended_endpoints": {
+                "health_check": {
+                    "method": "GET",
+                    "path": "/health",
+                    "description": "Dedicated health check endpoint (recommended to implement separately)",
+                    "note": "Currently available as /participants/test but should be moved to /health"
+                }
+            }
         },
-        "environment_status": {
-            "hasura_endpoint": hasura_endpoint,
-            "hasura_admin_secret": hasura_secret,
-            "note": "For Docker development, use 'hasura:8080'. For local development, use 'localhost:8080'"
+        "data_model": {
+            "privacy_policy": "No personally identifiable information (PII) is returned. Participant IDs are stable cryptographic hashes. Only enrollment status, completion certificates, and occupation category are provided.",
+            "participant_data": {
+                "id": "urn:hash:{first_16_chars_of_sha256} - Privacy-preserving stable identifier",
+                "enrollmentStatus": "Enum: ENROLLED, COMPLETED, DROPPED, etc.",
+                "enrollmentDate": "ISO 8601 timestamp of enrollment",
+                "occupationStatus": "Optional occupation category (STUDENT, EMPLOYEE, etc.)",
+                "completionStatus": {
+                    "hasAchievementCertificate": "Boolean - indicates completion certificate was issued",
+                    "hasAttendanceCertificate": "Boolean - indicates attendance certificate was issued"
+                },
+                "learningAchievements": "Optional array of certificate records with URNs and types"
+            },
+            "course_data": {
+                "id": "Numeric course identifier",
+                "title": "Course title",
+                "summary": "Course description/tagline", 
+                "language": "Array of ISO language codes",
+                "creditPoints": "Optional ECTS credit points",
+                "fundingOrganization": "Organization that funds this course"
+            }
+        },
+        "security": {
+            "rate_limiting": "Enforced per organization and security level",
+            "ip_restrictions": "Optional IP allowlisting per organization", 
+            "audit_logging": "All access attempts logged with client IP and request details",
+            "data_retention": "Response data should not be cached longer than 24 hours",
+            "security_headers": "Includes CSP, HSTS, X-Frame-Options, etc."
+        },
+        "errors": {
+            "401": "Invalid or missing API key", 
+            "403": "Access denied - course not funded by your organization",
+            "404": "Course not found",
+            "429": "Rate limit exceeded", 
+            "503": "Service unavailable - database connection issues"
         }
     }
     
