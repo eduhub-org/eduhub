@@ -765,7 +765,7 @@ def handle_participants_schema():
     
     schema = {
         "$schema": "https://json-schema.org/draft/2019-09/schema",
-        "$id": "https://edu.opencampus.sh/schemas/participant-data/v1.0.0",
+        "$id": "https://api-edu.opencampus.sh/schemas/participant-data-v1.0.0.json",
         "title": "EduHub ELM-Compliant Participant Data API",
         "description": "RESTful API providing secure, privacy-preserving access to participant enrollment and completion data for courses funded by partner organizations. Implements European Learning Model (ELM) standards with privacy-first design - no PII is exposed, participant identities are cryptographically hashed.",
         "version": "1.0.0",
@@ -805,8 +805,7 @@ def handle_participants_schema():
                 "health_check": {
                     "method": "GET",
                     "path": "/health",
-                    "description": "Dedicated health check endpoint (recommended to implement separately)",
-                    "note": "Currently available as /participants/test but should be moved to /health"
+                    "description": "Dedicated health check endpoint"
                 }
             }
         },
@@ -845,7 +844,9 @@ def handle_participants_schema():
             "404": "Course not found",
             "429": "Rate limit exceeded", 
             "503": "Service unavailable - database connection issues"
-        }
+        },
+        "schema_url": "/schemas/participant-data-v1.0.0.json",
+        "schema_latest_url": "/schemas/participant-data/latest.json"
     }
     
     return schema, 200

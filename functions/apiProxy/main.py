@@ -438,6 +438,8 @@ def handle_moochub_schema():
             "version": "1.0",
             "description": "Complete MOOCHub schema with opencampus.sh custom extensions integrated",
             "base_schema_url": "https://github.com/moochub/schema/releases/tag/v3.0.1",
+            "schema_url": "/schemas/moochub-opencampus-extensions-v1.0.0.json",
+            "schema_latest_url": "/schemas/moochub/latest.json",
             "custom_extensions": {
                 "learning_region": {
                     "type": "string", 
@@ -578,6 +580,107 @@ def handle_request(request):
             }
         }
         return (jsonify(health_payload), 200, get_cors_headers())
+
+    # Serve static JSON schemas under /schemas
+    if path == 'schemas':
+        from pathlib import Path
+        import json
+        import re
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        schemas_dir = Path(current_dir) / 'schemas'
+        filename = '/'.join(path_parts[1:])  # e.g., participant-data-v1.0.0.json or participant-data/latest.json
+
+        # Index listing at /schemas: show all versioned schemas with metadata
+        if not filename:
+            try:
+                candidates = list(schemas_dir.glob('*.json'))
+                entries = []
+                latest_map = {}
+                # Compute latest per schema family (e.g., participant-data)
+                family_versions = {}
+                for p in candidates:
+                    m = re.match(r'^(?P<family>.+)-v(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)\.json$', p.name)
+                    if not m:
+                        continue
+                    family = m.group('family')
+                    version = (int(m.group('major')), int(m.group('minor')), int(m.group('patch')))
+                    family_versions.setdefault(family, []).append((version, p))
+                # Determine latest per family
+                for family, vers in family_versions.items():
+                    latest_p = max(vers, key=lambda x: x[0])[1]
+                    latest_map[family] = latest_p.name
+                # Build entries with basic metadata
+                for family, vers in family_versions.items():
+                    for version, p in sorted(vers, key=lambda x: x[0], reverse=True):
+                        try:
+                            with open(p, 'r') as f:
+                                data = json.load(f)
+                            entries.append({
+                                'name': p.name,
+                                'family': family,
+                                'version': f"{version[0]}.{version[1]}.{version[2]}",
+                                'url': f"/schemas/{p.name}",
+                                'id': data.get('$id'),
+                                'latest': p.name == latest_map.get(family)
+                            })
+                        except Exception:
+                            entries.append({
+                                'name': p.name,
+                                'family': family,
+                                'version': f"{version[0]}.{version[1]}.{version[2]}",
+                                'url': f"/schemas/{p.name}",
+                                'id': None,
+                                'latest': p.name == latest_map.get(family)
+                            })
+                payload = {
+                    'schemas': entries,
+                    'latest': { fam: f"/schemas/{fname}" for fam, fname in latest_map.items() }
+                }
+                return (jsonify(payload), 200, get_cors_headers())
+            except Exception as e:
+                logging.error(f"Failed to list schemas: {e}")
+                return (jsonify({'error': 'Failed to list schemas'}), 500, get_cors_headers())
+
+        # Handle latest pointer
+        if filename in ['participant-data/latest.json', 'moochub/latest.json']:
+            try:
+                family = filename.split('/')[0]  # 'participant-data' or 'moochub'
+                pattern = 'participant-data-v*.json' if family == 'participant-data' else 'moochub-*.json'
+                candidates = list(schemas_dir.glob(pattern))
+                versions = []
+                for p in candidates:
+                    if family == 'participant-data':
+                        m = re.search(r'participant-data-v(\d+)\.(\d+)\.(\d+)\.json$', p.name)
+                        if m:
+                            versions.append(((int(m.group(1)), int(m.group(2)), int(m.group(3))), p.name))
+                    else:
+                        # Accept both moochub-vX.Y.Z.json and moochub-opencampus-extensions-vX.Y.Z.json
+                        m = re.search(r'-v(\d+)\.(\d+)\.(\d+)\.json$', p.name)
+                        if m:
+                            versions.append(((int(m.group(1)), int(m.group(2)), int(m.group(3))), p.name))
+                if not versions:
+                    return (jsonify({'error': 'No schema versions available'}), 404, get_cors_headers())
+                latest_name = max(versions, key=lambda x: x[0])[1]
+                headers = get_cors_headers()
+                headers['Location'] = f"/schemas/{latest_name}"
+                return ('', 302, headers)
+            except Exception as e:
+                logging.error(f"Failed to resolve latest schema: {e}")
+                return (jsonify({'error': 'Failed to resolve latest schema'}), 500, get_cors_headers())
+
+        schema_path = schemas_dir / filename
+        if schema_path.exists() and schema_path.is_file():
+            try:
+                with open(schema_path, 'r') as f:
+                    data = json.load(f)
+                headers = get_cors_headers()
+                headers['Content-Type'] = 'application/schema+json; charset=utf-8'
+                headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+                return (jsonify(data), 200, headers)
+            except Exception as e:
+                logging.error(f"Failed to load schema {schema_path}: {e}")
+                return (jsonify({'error': 'Failed to load schema'}), 500, get_cors_headers())
+        return (jsonify({'error': 'Schema not found'}), 404, get_cors_headers())
 
     if path == 'moochub':
         # Check if this is a schema request
