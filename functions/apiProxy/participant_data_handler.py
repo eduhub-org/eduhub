@@ -533,7 +533,6 @@ def handle_participants_request(request):
             else:
                 raise e
         except Exception as e:
-            logging.error("EduHub client error: %s", str(e))
             logging.error(f"EduHub client initialization error: {str(e)}")
             return {
                 'error': 'Database connection error',
@@ -589,7 +588,6 @@ def handle_participants_request(request):
         logging.warning("Authentication error: %s", str(e))
         return {'error': str(e)}, 401
     except Exception as e:
-        logging.exception("Unexpected error during participant data request: %s", str(e))
         logging.error(f"Participant data request error: {str(e)}")
         return {'error': 'Internal server error'}, 500
 
