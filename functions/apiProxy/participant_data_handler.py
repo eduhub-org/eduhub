@@ -7,8 +7,7 @@ import os
 import logging
 import hashlib
 import time
-from datetime import datetime, timedelta, UTC
-from flask import jsonify
+from datetime import datetime, UTC
 try:
     from api_clients.eduhub_client import EduHubClient
     from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input, SecurityLevel
@@ -144,7 +143,6 @@ def authenticate_api_key(api_key):
         """
         
         # Generate hash of the provided API key
-        import hashlib
         api_key_hash = hashlib.sha256(sanitized_key.encode()).hexdigest()
         
         variables = {
@@ -191,7 +189,7 @@ def authenticate_api_key(api_key):
         
     except (IndexError, ValueError) as e:
         if "Database" in str(e):
-            raise e
+            raise
         raise ValueError("Invalid API key format")
     except Exception as e:
         logging.error(f"API key authentication error: {str(e)}")
@@ -472,7 +470,7 @@ def handle_participants_request(request):
     Main handler for participant data requests with comprehensive security
     """
     try:
-        print("DEBUG: Starting participant data request")  # Debug output
+        logging.debug("Starting participant data request")
         
         # Get client IP for security tracking
         client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
@@ -489,7 +487,7 @@ def handle_participants_request(request):
         
         # Authenticate and get organization permissions
         auth_info = authenticate_organization_access(request)
-        print(f"DEBUG: Authentication successful for org {auth_info['organization_id']}")  # Debug output
+        logging.debug("Authentication successful for org %s", auth_info['organization_id'])
         
         # Check rate limiting based on security level
         rate_allowed, rate_info = security_handler.check_rate_limit(
@@ -520,7 +518,7 @@ def handle_participants_request(request):
                 request_data, False, f"Anomalies detected: {', '.join(anomalies)}"
             )
             # Log anomalies but don't block the request (monitoring only)
-            print(f"DEBUG: Anomalies detected: {anomalies}")
+            logging.debug("Anomalies detected: %s", anomalies)
         
         # Initialize EduHub client - handle missing environment gracefully
         try:
@@ -535,7 +533,7 @@ def handle_participants_request(request):
             else:
                 raise e
         except Exception as e:
-            print(f"DEBUG: EduHub client error: {str(e)}")  # Debug output
+            logging.error("EduHub client error: %s", str(e))
             logging.error(f"EduHub client initialization error: {str(e)}")
             return {
                 'error': 'Database connection error',
@@ -588,10 +586,10 @@ def handle_participants_request(request):
             return handle_organization_courses(auth_info, eduhub_client, client_ip, request_data)
             
     except ValueError as e:
-        print(f"DEBUG: Authentication error: {str(e)}")  # Debug output
+        logging.warning("Authentication error: %s", str(e))
         return {'error': str(e)}, 401
     except Exception as e:
-        print(f"DEBUG: Unexpected error: {str(e)}")  # Debug output
+        logging.exception("Unexpected error during participant data request: %s", str(e))
         logging.error(f"Participant data request error: {str(e)}")
         return {'error': 'Internal server error'}, 500
 
@@ -859,7 +857,6 @@ def generate_api_key(organization_id, eduhub_client):
     Returns the generated API key (should be shown only once to the user)
     """
     import secrets
-    import hashlib
     
     # Generate a secure random secret
     secret = secrets.token_hex(16)  # 32 character hex string
