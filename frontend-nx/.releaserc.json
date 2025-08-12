@@ -15,7 +15,6 @@
       "channel": "develop"
     }
   ],
-  "repositoryUrl": "https://github.com/edu-hub-project/application",
   "plugins": [
     "@semantic-release/commit-analyzer",
     [
@@ -47,7 +46,7 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "echo 'Updating version files for ${nextRelease.version}' && sed -i 's/\"version\": \"[^\"]*\"/\"version\": \"${nextRelease.version}\"/g' ../package.json && find ../functions -name 'package.json' -exec sed -i 's/\"version\": \"[^\"]*\"/\"version\": \"${nextRelease.version}\"/g' {} \\;",
+        "prepareCmd": "echo 'Updating version files for ${nextRelease.version}' && sed -i 's/\"version\": \"[^\"]*\"/\"version\": \"${nextRelease.version}\"/g' ../package.json && find ../functions -name 'package.json' -exec sed -i 's/\"version\": \"[^\"]*\"/\"version\": \"${nextRelease.version}\"/g' {} \\; && echo '${nextRelease.version}' > ../VERSION && echo '{\"version\":\"${nextRelease.version}\",\"channel\":\"${nextRelease.channel}\"}' > apps/edu-hub/public/version.json",
         "publishCmd": "echo 'Published ${nextRelease.version} on ${nextRelease.channel}'"
       }
     ],
@@ -58,7 +57,9 @@
           "../CHANGELOG.md",
           "package.json",
           "../package.json",
-          "../functions/*/package.json"
+          "../functions/*/package.json",
+          "../VERSION",
+          "apps/edu-hub/public/version.json"
         ],
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
