@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "https://api-edu.opencampus.sh/schemas/moochub-opencampus-extensions-v1.0.0.json",
+  "title": "MOOCHub Schema Extensions for opencampus.sh",
+  "description": "Provider-specific extensions used by opencampus.sh in its MOOCHub feed",
+  "type": "object",
+  "properties": {
+    "learning_region": {
+      "type": "string",
+      "description": "Physical location region where the course takes place (only for onsite courses)",
+      "example": "KIEL"
+    },
+    "learning_location": {
+      "type": "string",
+      "description": "Specific learning location within the region (only for onsite courses)",
+      "example": "Starterkitchen"
+    },
+    "learning_zone": {
+      "type": "string",
+      "description": "Specific zone within the learning location (only for onsite courses)",
+      "example": "Eventraum"
+    },
+    "funding": {
+      "type": "array",
+      "description": "Array of funding organizations supporting the course",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Name of the funding organization" },
+          "type": {
+            "type": "string",
+            "description": "Organization type",
+            "enum": [
+              "UNIVERSITY",
+              "RESEARCH_INSTITUTE",
+              "PUBLIC_SECTOR",
+              "NON_PROFIT_ORGANIZATION",
+              "CORPORATION",
+              "SCHOOL",
+              "FREELANCER",
+              "OTHER"
+            ]
+          },
+          "description": { "type": "string", "description": "Detailed description of the organization" },
+          "logo": {
+            "type": "object",
+            "description": "Organization logo image",
+            "properties": {
+              "type": { "type": "string", "description": "Image object type", "const": "ImageObject" },
+              "contentUrl": { "type": "string", "description": "URL to the logo image" }
+            },
+            "required": ["type", "contentUrl"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["name", "type", "description"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": true
+}
+

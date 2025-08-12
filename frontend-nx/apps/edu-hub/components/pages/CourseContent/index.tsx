@@ -9,7 +9,7 @@ import { CourseWithEnrollment } from '../../../queries/__generated__/CourseWithE
 import { COURSE_WITH_ENROLLMENT } from '../../../queries/courseWithEnrollment';
 import { CourseEnrollmentStatus_enum, CourseRegistrationType_enum } from '../../../__generated__/globalTypes';
 import { useIsLoggedIn } from '../../../hooks/authentication';
-import { COURSE, COURSE_ANONYMOUS } from '../../../queries/course';
+import { COURSE_ANONYMOUS } from '../../../queries/course';
 import { Course, CourseVariables } from '../../../queries/__generated__/Course';
 import { getCourseEnrollment } from '../../../helpers/util';
 import { ContentRow } from '../../common/ContentRow';

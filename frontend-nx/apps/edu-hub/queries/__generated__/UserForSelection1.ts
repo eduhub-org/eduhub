@@ -27,6 +27,7 @@ export interface UserForSelection1_User {
    * The user's email address
    */
   email: string;
+  updated_at: any | null;
   /**
    * An array relationship
    */

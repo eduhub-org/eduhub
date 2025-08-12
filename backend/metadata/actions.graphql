@@ -85,6 +85,14 @@ type Mutation {
 }
 
 type Mutation {
+  saveOrganizationLogo(
+    base64file: String!
+    filename: String!
+    organizationid: Int!
+  ): saveImageResult!
+}
+
+type Mutation {
   saveUserProfileImage(
     base64file: String!
     filename: String!
@@ -93,11 +101,7 @@ type Mutation {
 }
 
 type Mutation {
-  saveOrganizationLogo(
-    base64file: String!
-    filename: String!
-    organizationid: Int!
-  ): saveImageResult!
+  sendSessionReminders: SendSessionRemindersResult!
 }
 
 type Mutation {
@@ -111,10 +115,6 @@ type Mutation {
     userId: String!
     isAdmin: Boolean!
   ): UpdateAdminStatusResult!
-}
-
-type Mutation {
-  sendSessionReminders: SendSessionRemindersResult!
 }
 
 type loadFileOutput {

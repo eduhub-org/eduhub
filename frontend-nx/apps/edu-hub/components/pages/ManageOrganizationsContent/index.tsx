@@ -146,11 +146,13 @@ const ManageOrganizationsContent: FC = () => {
     query: ORGANIZATION_LIST,
     pageSize: 15,
     refetchFilter: (searchFilter) => ({
-      _or: [
-        { name: { _ilike: `%${searchFilter}%` } },
-        { description: { _ilike: `%${searchFilter}%` } },
-        { aliases: { _contains: searchFilter } },
-      ],
+      filter: {
+        _or: [
+          { name: { _ilike: `%${searchFilter}%` } },
+          { description: { _ilike: `%${searchFilter}%` } },
+          { aliases: { _contains: searchFilter } },
+        ],
+      },
     }),
   });
 

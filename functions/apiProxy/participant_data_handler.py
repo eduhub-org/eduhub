@@ -7,8 +7,7 @@ import os
 import logging
 import hashlib
 import time
-from datetime import datetime, timedelta, UTC
-from flask import jsonify
+from datetime import datetime, UTC
 try:
     from api_clients.eduhub_client import EduHubClient
     from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input, SecurityLevel
@@ -144,7 +143,6 @@ def authenticate_api_key(api_key):
         """
         
         # Generate hash of the provided API key
-        import hashlib
         api_key_hash = hashlib.sha256(sanitized_key.encode()).hexdigest()
         
         variables = {
@@ -191,7 +189,7 @@ def authenticate_api_key(api_key):
         
     except (IndexError, ValueError) as e:
         if "Database" in str(e):
-            raise e
+            raise
         raise ValueError("Invalid API key format")
     except Exception as e:
         logging.error(f"API key authentication error: {str(e)}")
@@ -472,7 +470,7 @@ def handle_participants_request(request):
     Main handler for participant data requests with comprehensive security
     """
     try:
-        print("DEBUG: Starting participant data request")  # Debug output
+        logging.debug("Starting participant data request")
         
         # Get client IP for security tracking
         client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
@@ -489,7 +487,7 @@ def handle_participants_request(request):
         
         # Authenticate and get organization permissions
         auth_info = authenticate_organization_access(request)
-        print(f"DEBUG: Authentication successful for org {auth_info['organization_id']}")  # Debug output
+        logging.debug("Authentication successful for org %s", auth_info['organization_id'])
         
         # Check rate limiting based on security level
         rate_allowed, rate_info = security_handler.check_rate_limit(
@@ -520,7 +518,7 @@ def handle_participants_request(request):
                 request_data, False, f"Anomalies detected: {', '.join(anomalies)}"
             )
             # Log anomalies but don't block the request (monitoring only)
-            print(f"DEBUG: Anomalies detected: {anomalies}")
+            logging.debug("Anomalies detected: %s", anomalies)
         
         # Initialize EduHub client - handle missing environment gracefully
         try:
@@ -535,7 +533,6 @@ def handle_participants_request(request):
             else:
                 raise e
         except Exception as e:
-            print(f"DEBUG: EduHub client error: {str(e)}")  # Debug output
             logging.error(f"EduHub client initialization error: {str(e)}")
             return {
                 'error': 'Database connection error',
@@ -588,10 +585,9 @@ def handle_participants_request(request):
             return handle_organization_courses(auth_info, eduhub_client, client_ip, request_data)
             
     except ValueError as e:
-        print(f"DEBUG: Authentication error: {str(e)}")  # Debug output
+        logging.warning("Authentication error: %s", str(e))
         return {'error': str(e)}, 401
     except Exception as e:
-        print(f"DEBUG: Unexpected error: {str(e)}")  # Debug output
         logging.error(f"Participant data request error: {str(e)}")
         return {'error': 'Internal server error'}, 500
 
@@ -767,21 +763,88 @@ def handle_participants_schema():
     
     schema = {
         "$schema": "https://json-schema.org/draft/2019-09/schema",
-        "$id": "https://eduhub.org/schemas/elm-participant-data/v1.0.0",
-        "title": "ELM Participant Data Schema",
-        "description": "JSON Schema for European Learning Model (ELM) compliant participant data",
+        "$id": "https://api-edu.opencampus.sh/schemas/participant-data-v1.0.0.json",
+        "title": "EduHub ELM-Compliant Participant Data API",
+        "description": "RESTful API providing secure, privacy-preserving access to participant enrollment and completion data for courses funded by partner organizations. Implements European Learning Model (ELM) standards with privacy-first design - no PII is exposed, participant identities are cryptographically hashed.",
         "version": "1.0.0",
         "type": "object",
-        "endpoints": {
-            "courses": "/participants - List organization's funded courses",
-            "participants": "/participants/courses/{course_id} - Get course participants",
-            "schema": "/participants/schema - This schema definition"
+        "api": {
+            "authentication": {
+                "type": "API Key",
+                "header": "X-API-Key",
+                "format": "edh_live_org{organization_id}_sk_{secret}",
+                "required_headers": ["User-Agent"],
+                "optional_headers": {
+                    "Accept-Version": "3.0.1 (default if omitted)"
+                }
+            },
+            "base_url": "Function endpoint varies by deployment",
+            "endpoints": {
+                "list_courses": {
+                    "method": "GET",
+                    "path": "/participants",
+                    "description": "List all courses funded by the authenticated organization",
+                    "response_type": "CourseListReport"
+                },
+                "get_participants": {
+                    "method": "GET", 
+                    "path": "/participants/courses/{course_id}",
+                    "description": "Get participant enrollment and completion data for a specific funded course",
+                    "response_type": "ParticipantDataReport"
+                },
+                "get_schema": {
+                    "method": "GET",
+                    "path": "/participants/schema", 
+                    "description": "This schema definition for the Participant Data API",
+                    "response_type": "Schema"
+                }
+            },
+            "recommended_endpoints": {
+                "health_check": {
+                    "method": "GET",
+                    "path": "/health",
+                    "description": "Dedicated health check endpoint"
+                }
+            }
         },
-        "environment_status": {
-            "hasura_endpoint": hasura_endpoint,
-            "hasura_admin_secret": hasura_secret,
-            "note": "For Docker development, use 'hasura:8080'. For local development, use 'localhost:8080'"
-        }
+        "data_model": {
+            "privacy_policy": "No personally identifiable information (PII) is returned. Participant IDs are stable cryptographic hashes. Only enrollment status, completion certificates, and occupation category are provided.",
+            "participant_data": {
+                "id": "urn:hash:{first_16_chars_of_sha256} - Privacy-preserving stable identifier",
+                "enrollmentStatus": "Enum: ENROLLED, COMPLETED, DROPPED, etc.",
+                "enrollmentDate": "ISO 8601 timestamp of enrollment",
+                "occupationStatus": "Optional occupation category (STUDENT, EMPLOYEE, etc.)",
+                "completionStatus": {
+                    "hasAchievementCertificate": "Boolean - indicates completion certificate was issued",
+                    "hasAttendanceCertificate": "Boolean - indicates attendance certificate was issued"
+                },
+                "learningAchievements": "Optional array of certificate records with URNs and types"
+            },
+            "course_data": {
+                "id": "Numeric course identifier",
+                "title": "Course title",
+                "summary": "Course description/tagline", 
+                "language": "Array of ISO language codes",
+                "creditPoints": "Optional ECTS credit points",
+                "fundingOrganization": "Organization that funds this course"
+            }
+        },
+        "security": {
+            "rate_limiting": "Enforced per organization and security level",
+            "ip_restrictions": "Optional IP allowlisting per organization", 
+            "audit_logging": "All access attempts logged with client IP and request details",
+            "data_retention": "Response data should not be cached longer than 24 hours",
+            "security_headers": "Includes CSP, HSTS, X-Frame-Options, etc."
+        },
+        "errors": {
+            "401": "Invalid or missing API key", 
+            "403": "Access denied - course not funded by your organization",
+            "404": "Course not found",
+            "429": "Rate limit exceeded", 
+            "503": "Service unavailable - database connection issues"
+        },
+        "schema_url": "/schemas/participant-data-v1.0.0.json",
+        "schema_latest_url": "/schemas/participant-data/latest.json"
     }
     
     return schema, 200
@@ -793,7 +856,6 @@ def generate_api_key(organization_id, eduhub_client):
     Returns the generated API key (should be shown only once to the user)
     """
     import secrets
-    import hashlib
     
     # Generate a secure random secret
     secret = secrets.token_hex(16)  # 32 character hex string

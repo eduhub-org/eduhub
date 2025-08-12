@@ -48,7 +48,7 @@ export const INSERT_EXPERT = gql`
 export const USER_SELECTION_ONE_PARAM = gql`
   query UserForSelection1($searchValue: String!) {
     User(
-      order_by: { lastName: asc }
+      order_by: [{ lastName: asc }, { firstName: asc }, { updated_at: desc }]
       where: {
         _and: [
           {
@@ -68,6 +68,7 @@ export const USER_SELECTION_ONE_PARAM = gql`
       firstName
       lastName
       email
+      updated_at
       Experts {
         id
       }
@@ -78,7 +79,7 @@ export const USER_SELECTION_ONE_PARAM = gql`
 export const USER_SELECTION_TWO_PARAMS = gql`
   query UserForSelection2($searchValue1: String!, $searchValue2: String!) {
     User(
-      order_by: { lastName: asc }
+      order_by: [{ lastName: asc }, { firstName: asc }, { updated_at: desc }]
       where: {
         _and: [
           {
@@ -99,6 +100,7 @@ export const USER_SELECTION_TWO_PARAMS = gql`
       firstName
       lastName
       email
+      updated_at
       Experts {
         id
       }
