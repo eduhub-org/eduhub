@@ -122,6 +122,7 @@ select_permissions:
         - organizationId
         - picture
         - status
+        - updated_at
         - zipCode
       filter:
         id:

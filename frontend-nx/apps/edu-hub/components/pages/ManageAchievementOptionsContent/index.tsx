@@ -50,7 +50,10 @@ const ManageAchievementOptionsContent: FC<{
     achievementRecordTypes: props.achievementRecordTypes,
     refetchAchievementOptions: refetch,
     programID: defaultProgram,
-    setProgramID: () => {},
+    setProgramID: (newProgramId: number) => {
+      // Update when program filtering is implemented
+      console.debug('Program ID set', newProgramId);
+    },
     userProfile: props.userProfile,
     userId: props.userId,
     setAlertMessage,

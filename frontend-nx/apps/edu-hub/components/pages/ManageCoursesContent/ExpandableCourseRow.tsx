@@ -471,7 +471,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             <div>
               <h4 className="text-sm font-medium text-gray-700 mb-2">{t('manageCourses:instructors.label')}</h4>
               <div className="space-y-2">
-                {course.CourseInstructors.map((courseInstructor, index) =>
+                {course.CourseInstructors.map((courseInstructor) =>
                   renderInstructor(courseInstructor, deleteInstructorFromCourse)
                 )}
                 <button
