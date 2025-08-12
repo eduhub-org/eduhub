@@ -1,4 +1,4 @@
-import { CircularProgress, IconButton } from '@mui/material';
+import { IconButton } from '@mui/material';
 import { Button } from '@mui/material';
 import { MdAddCircle } from 'react-icons/md';
 import { IUserProfile } from '../../../hooks/user';
@@ -8,19 +8,15 @@ import { MdDelete, MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md
 import { makeFullName } from '../../../helpers/util';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { ACHIEVEMENT_OPTIONS } from '../../../queries/achievementOption';
-import { PROGRAMS_WITH_MINIMUM_PROPERTIES } from '../../../queries/programList';
 import {
   AchievementOptionList,
   AchievementOptionListVariables,
   AchievementOptionList_AchievementOption,
 } from '../../../queries/__generated__/AchievementOptionList';
-import { Programs, Programs_Program } from '../../../queries/__generated__/Programs';
-import { StaticComponentProperty } from '../../../types/UIComponents';
 import { AlertMessageDialog } from '../../common/dialogs/AlertMessageDialog';
 import AddButton from '../../common/AddButton';
 import EhTag from '../../common/EhTag';
 import TagWithTwoText from '../../common/TagWithTwoText';
-import { ProgramsMenubar } from '../../layout/ProgramsMenubar';
 import AchievementsHelper, { AchievementContext, IPropsDashBoard } from './AchievementsHelper';
 import AddAchievementOption from './AddAchievementOption';
 import EditAchievementOption from './EditAchievementOption';
@@ -31,25 +27,13 @@ const ManageAchievementOptionsContent: FC<{
   achievementRecordTypes: string[];
 }> = (props) => {
   const defaultProgram = -1; // All tab
-  const [currentProgramId, setCurrentProgramId] = useState(defaultProgram);
   const [alertMessage, setAlertMessage] = useState('');
   const [achievements, setAchievements] = useState([] as AchievementOptionList_AchievementOption[]);
   const achievementsRequest = useAdminQuery<AchievementOptionList, AchievementOptionListVariables>(
     ACHIEVEMENT_OPTIONS,
     {
       variables: {
-        where:
-          currentProgramId > -1
-            ? {
-                AchievementOptionCourses: {
-                  Course: {
-                    Program: {
-                      id: { _eq: currentProgramId },
-                    },
-                  },
-                },
-              }
-            : {},
+        where: {},
       },
     }
   );
@@ -66,7 +50,7 @@ const ManageAchievementOptionsContent: FC<{
     achievementRecordTypes: props.achievementRecordTypes,
     refetchAchievementOptions: refetch,
     programID: defaultProgram,
-    setProgramID: setCurrentProgramId,
+    setProgramID: () => {},
     userProfile: props.userProfile,
     userId: props.userId,
     setAlertMessage,
@@ -98,15 +82,8 @@ interface IPropsContent {
 
 const DashboardContent: FC<IPropsContent> = ({ options }) => {
   const context = useContext(AchievementContext);
-  const [programs, setPrograms] = useState([] as Programs_Program[]);
 
   const [showNewAchievementView, setShowNewAchievementView] = useState(false);
-  const onProgramFilterChange = useCallback(
-    (menu: StaticComponentProperty) => {
-      context.setProgramID(menu.key);
-    },
-    [context]
-  );
 
   const onSuccessAddEdit = useCallback(
     (success: boolean) => {
@@ -118,35 +95,13 @@ const DashboardContent: FC<IPropsContent> = ({ options }) => {
     [context, setShowNewAchievementView]
   );
 
-  const programsRequest = useAdminQuery<Programs>(PROGRAMS_WITH_MINIMUM_PROPERTIES);
-
-  if (programsRequest.error) {
-    console.log(programsRequest.error);
-  }
-  if (programsRequest.loading) {
-    <CircularProgress />;
-  }
-
-  useEffect(() => {
-    const p = [...(programsRequest?.data?.Program || [])];
-    setPrograms(p);
-  }, [programsRequest?.data?.Program]);
-
   const addNewAchievement = useCallback(() => {
     setShowNewAchievementView(!showNewAchievementView);
   }, [setShowNewAchievementView, showNewAchievementView]);
   const { t } = useTranslation('course-page');
   return (
     <div className="w-full">
-      <div className="flex justify-between mb-5">
-        {!programsRequest.loading && !programsRequest.error && (
-          <ProgramsMenubar
-            programs={programs}
-            defaultProgramId={context.programID}
-            onTabClicked={onProgramFilterChange}
-          />
-        )}
-      </div>
+      <div className="flex justify-between mb-5" />
       <div className="flex flex-col space-y-1">
         <div className="flex justify-start mt-8  text-white">
           <Button onClick={addNewAchievement} startIcon={<MdAddCircle />} color="inherit">
