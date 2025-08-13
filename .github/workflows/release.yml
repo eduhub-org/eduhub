@@ -15,6 +15,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     if: ${{ github.ref_name == 'production' || github.ref_name == 'staging' || github.ref_name == 'develop' }}
 
     steps:
@@ -40,4 +41,3 @@ jobs:
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          timeout-minutes: 20

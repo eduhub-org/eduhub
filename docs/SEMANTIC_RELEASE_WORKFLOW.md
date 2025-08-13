@@ -124,13 +124,31 @@ git push origin staging
 ```
 
 #### Option B: Squash Merge
+If you squash, the PR's individual commit types are lost. The single squash commit message determines the release bump.
+
+Use a message that reflects the aggregate changes:
+
 ```bash
 git checkout staging
 git pull origin staging
 git merge --squash develop
-git commit -m "chore: prepare staging release candidate from develop"
+
+# Choose ONE of the following based on the changes included
+# Only fixes included → patch
+git commit -m "fix(release): prepare staging release candidate from develop"
+
+# Features included (or you want at least a minor) → minor
+# git commit -m "feat(release): prepare staging release candidate from develop"
+
+# Breaking change included → major
+# git commit -m "feat(release)!: prepare staging release candidate from develop" -m "BREAKING CHANGE: describe the breaking change"
+
 git push origin staging
 ```
+
+Notes:
+- Prefer "Create a merge commit" to preserve individual commit history so semantic-release can infer the correct bump automatically.
+- Only use `feat(release)` for squash merges when you intentionally want a minor bump regardless of underlying commits.
 
 #### Option C: Via GitHub UI
 When merging the PR in GitHub:
@@ -148,8 +166,15 @@ Develop
 
 **✅ USE conventional commit format:**
 ```
+# Preserve history (merge commit)
 chore: merge develop into staging for release candidate
-chore: prepare staging release with latest develop changes
+
+# Squash merge examples (pick one based on content)
+fix(release): prepare staging release candidate from develop
+feat(release): prepare staging release candidate from develop
+feat(release)!: prepare staging release candidate from develop
+
+BREAKING CHANGE: describe the breaking change
 ```
 
 **Result:** Merging to `staging` will trigger a release candidate (e.g., `1.3.0-rc.1`)
@@ -167,7 +192,16 @@ gh pr create --base production --head staging \
 ```bash
 git checkout production
 git pull origin production
+
+# Preserve history (recommended)
 git merge staging -m "chore: promote staging to production release"
+
+# If you must squash, select a message matching the intended bump:
+# git merge --squash staging
+# git commit -m "fix(release): promote staging to production"
+# git commit -m "feat(release): promote staging to production"
+# git commit -m "feat(release)!: promote staging to production" -m "BREAKING CHANGE: describe the breaking change"
+
 git push origin production
 ```
 
