@@ -11,7 +11,6 @@ import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import Snackbar from '@mui/material/Snackbar';
 import { IconButton } from '@mui/material';
 import { MdPhotoCamera } from 'react-icons/md';
-// import UserCard from '../common/UserCard';
 import { SAVE_USER_PROFILE_IMAGE, SAVE_ORGANIZATION_LOGO } from '../../queries/actions';
 import { useSession } from 'next-auth/react';
 import { getPublicUrl } from '../../helpers/filehandling';
