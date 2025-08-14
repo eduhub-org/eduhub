@@ -45,7 +45,9 @@ const ManageAchievementTemplatesContent: FC = () => {
     query: ACHIEVEMENT_DOCUMENTATION_TEMPLATES,
     pageSize,
     refetchFilter: (searchFilter) => ({
-      _or: [{ title: { _ilike: `%${searchFilter}%` } }],
+      filter: {
+        _or: [{ title: { _ilike: `%${searchFilter}%` } }],
+      },
     }),
   });
 

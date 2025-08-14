@@ -61,11 +61,13 @@ const ManageUsersContent: FC = () => {
     query: USERS_BY_LAST_NAME,
     pageSize: pageSize,
     refetchFilter: (searchFilter) => ({
-      _or: [
-        { lastName: { _ilike: `%${searchFilter}%` } },
-        { firstName: { _ilike: `%${searchFilter}%` } },
-        { email: { _ilike: `%${searchFilter}%` } },
-      ],
+      filter: {
+        _or: [
+          { lastName: { _ilike: `%${searchFilter}%` } },
+          { firstName: { _ilike: `%${searchFilter}%` } },
+          { email: { _ilike: `%${searchFilter}%` } },
+        ],
+      },
     }),
   });
 
