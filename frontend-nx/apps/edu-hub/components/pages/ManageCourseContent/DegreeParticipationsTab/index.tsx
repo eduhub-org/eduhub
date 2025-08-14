@@ -39,8 +39,10 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     },
     pageSize,
     refetchFilter: (searchFilter) => ({
-      User: {
-        _or: [{ firstName: { _ilike: `%${searchFilter}%` } }, { lastName: { _ilike: `%${searchFilter}%` } }],
+      filter: {
+        User: {
+          _or: [{ firstName: { _ilike: `%${searchFilter}%` } }, { lastName: { _ilike: `%${searchFilter}%` } }],
+        },
       },
     }),
   });

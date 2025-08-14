@@ -16,7 +16,6 @@
 - "!include public_Country.yaml"
 - "!include public_Course.yaml"
 - "!include public_CourseDegree.yaml"
-- "!include public_CourseFundingOrganization.yaml"
 - "!include public_CourseEnrollment.yaml"
 - "!include public_CourseEnrollmentStatus.yaml"
 - "!include public_CourseFundingOrganization.yaml"
