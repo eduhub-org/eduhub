@@ -18,11 +18,9 @@ Notes:
   small-scale deployments. For production, back with Redis or a database.
 """
 
-import os
 import json
 import logging
 import hashlib
-import hmac
 import time
 import re
 import ipaddress
@@ -30,7 +28,6 @@ from datetime import datetime, timedelta, UTC
 from typing import Dict, List, Optional, Tuple, Any, Set
 from dataclasses import dataclass
 from enum import Enum
-import secrets
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

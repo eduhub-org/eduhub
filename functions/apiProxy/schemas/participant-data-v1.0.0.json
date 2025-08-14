@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "https://api-edu.opencampus.sh/schemas/participant-data-v1.0.0.json",
+  "title": "EduHub Participant Data API Schema",
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/$defs/CourseListReport" },
+    { "$ref": "#/$defs/ParticipantDataReport" }
+  ],
+  "$defs": {
+    "CompletionStatus": {
+      "type": "object",
+      "properties": {
+        "hasAchievementCertificate": { "type": "boolean" },
+        "hasAttendanceCertificate": { "type": "boolean" }
+      },
+      "required": ["hasAchievementCertificate", "hasAttendanceCertificate"],
+      "additionalProperties": false
+    },
+    "LearningAchievement": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "type": { "type": "string", "enum": ["attendance", "achievement"] }
+      },
+      "required": ["id", "title", "type"],
+      "additionalProperties": false
+    },
+    "Participant": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "pattern": "^urn:hash:[a-f0-9]{16}$" },
+        "enrollmentStatus": { "type": "string", "enum": ["ENROLLED", "COMPLETED", "DROPPED", "CANCELLED"] },
+        "enrollmentDate": { "type": "string", "format": "date-time" },
+        "occupationStatus": { "type": "string" },
+        "completionStatus": { "$ref": "#/$defs/CompletionStatus" },
+        "learningAchievements": { "type": "array", "items": { "$ref": "#/$defs/LearningAchievement" } }
+      },
+      "required": ["id", "enrollmentStatus", "enrollmentDate", "completionStatus"],
+      "additionalProperties": false
+    },
+    "FundingOrganization": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" }
+      },
+      "required": ["id", "name"],
+      "additionalProperties": false
+    },
+    "LearningOpportunity": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "summary": { "type": "string" },
+        "type": { "type": "string", "const": "Course" },
+        "language": { "type": "array", "items": { "type": "string" } },
+        "creditPoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": { "framework": { "type": "string" }, "point": { "type": "number" } },
+            "required": ["framework", "point"],
+            "additionalProperties": false
+          }
+        },
+        "fundingOrganization": { "$ref": "#/$defs/FundingOrganization" }
+      },
+      "required": ["id", "title", "type", "language", "fundingOrganization"],
+      "additionalProperties": false
+    },
+    "ParticipantDataReport": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "const": "ParticipantDataReport" },
+        "id": { "type": "string" },
+        "provider": { "type": "object" },
+        "learningOpportunity": { "$ref": "#/$defs/LearningOpportunity" },
+        "participants": { "type": "array", "items": { "$ref": "#/$defs/Participant" } },
+        "generatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "id", "provider", "learningOpportunity", "participants", "generatedAt"],
+      "additionalProperties": true
+    },
+    "CourseSummary": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "startDate": { "type": "string" },
+        "endDate": { "type": "string" },
+        "participantDataEndpoint": { "type": "string" },
+        "creditPoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": { "framework": { "type": "string" }, "point": { "type": "number" } },
+            "required": ["framework", "point"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["id", "title", "participantDataEndpoint"],
+      "additionalProperties": true
+    },
+    "CourseListReport": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "const": "CourseListReport" },
+        "id": { "type": "string" },
+        "provider": { "type": "object" },
+        "fundingOrganization": { "$ref": "#/$defs/FundingOrganization" },
+        "courses": { "type": "array", "items": { "$ref": "#/$defs/CourseSummary" } },
+        "generatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "id", "provider", "fundingOrganization", "courses", "generatedAt"],
+      "additionalProperties": true
+    }
+  }
+}
+

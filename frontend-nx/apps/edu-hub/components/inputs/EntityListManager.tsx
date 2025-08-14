@@ -157,7 +157,6 @@ const EntityListManager = <TEntity, TSelectedEntity>({
   dialogOpen,
   onOpenDialog,
   onCloseDialog,
-  onEntitySelected,
   insertEntityMutation,
   deleteEntityMutation,
   buildInsertVariables,

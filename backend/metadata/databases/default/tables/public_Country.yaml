@@ -10,14 +10,14 @@ array_relationships:
           name: User
           schema: public
 select_permissions:
-  - role: anonymous
+  - role: admin-ras
     permission:
       columns:
         - code
         - name_en
         - name_de
       filter: {}
-  - role: user_access
+  - role: anonymous
     permission:
       columns:
         - code
@@ -31,10 +31,10 @@ select_permissions:
         - name_en
         - name_de
       filter: {}
-  - role: admin-ras
+  - role: user_access
     permission:
       columns:
         - code
         - name_en
         - name_de
-      filter: {} 
+      filter: {}

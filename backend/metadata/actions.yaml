@@ -162,26 +162,6 @@ actions:
           value: '[460, 640, 768, 1024, 1280, 1536]'
     permissions:
       - role: instructor_access
-  - name: saveUserProfileImage
-    definition:
-      kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
-      headers:
-        - name: secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: bucket
-          value_from_env: HASURA_BUCKET
-        - name: name
-          value: saveImage
-        - name: file-path
-          value: users/user-${userid}/public/profile_image/${filename}
-        - name: is-public
-          value: "true"
-        - name: sizes
-          value: '[64, 400]'
-    permissions:
-      - role: instructor_access
-      - role: user_access
   - name: saveOrganizationLogo
     definition:
       kind: synchronous
@@ -202,6 +182,38 @@ actions:
     permissions:
       - role: instructor_access
       - role: admin-ras
+  - name: saveUserProfileImage
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+        - name: name
+          value: saveImage
+        - name: file-path
+          value: users/user-${userid}/public/profile_image/${filename}
+        - name: is-public
+          value: "true"
+        - name: sizes
+          value: '[64, 400]'
+    permissions:
+      - role: instructor_access
+      - role: user_access
+  - name: sendSessionReminders
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: Function-Name
+          value: sendSessionReminders
+        - name: Hasura-Secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    permissions:
+      - role: admin-ras
+      - role: instructor_access
   - name: updateFromKeycloak
     definition:
       kind: synchronous
@@ -225,18 +237,6 @@ actions:
           value_from_env: HASURA_BUCKET
         - name: name
           value: setUserAdmin
-  - name: sendSessionReminders
-    definition:
-      kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
-      headers:
-        - name: Function-Name
-          value: sendSessionReminders
-        - name: Hasura-Secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-    permissions:
-      - role: admin-ras
-      - role: instructor_access
 custom_types:
   enums: []
   input_objects: []
@@ -267,27 +267,5 @@ custom_types:
     - name: saveImageResult
     - name: resizedImagePath
     - name: SendSessionRemindersResult
-      fields:
-        - name: success
-          type: Boolean!
-        - name: messageKey
-          type: String!
-        - name: error
-          type: String
-        - name: totalEmailsSent
-          type: Int
-        - name: processedSessions
-          type: '[ProcessedSession!]'
-        - name: processedAt
-          type: String
     - name: ProcessedSession
-      fields:
-        - name: sessionId
-          type: Int!
-        - name: sessionTitle
-          type: String!
-        - name: reminderType
-          type: String!
-        - name: emailsSent
-          type: Int!
   scalars: []
