@@ -122,12 +122,14 @@ const ManageAdminUsersContent: FC = () => {
     query: ORGANIZATION_ADMIN_LIST,
     pageSize: 15,
     refetchFilter: (searchFilter) => ({
-      _or: [
-        { User: { lastName: { _ilike: `%${searchFilter}%` } } },
-        { User: { firstName: { _ilike: `%${searchFilter}%` } } },
-        { User: { email: { _ilike: `%${searchFilter}%` } } },
-        { Organization: { name: { _ilike: `%${searchFilter}%` } } },
-      ],
+      filter: {
+        _or: [
+          { User: { lastName: { _ilike: `%${searchFilter}%` } } },
+          { User: { firstName: { _ilike: `%${searchFilter}%` } } },
+          { User: { email: { _ilike: `%${searchFilter}%` } } },
+          { Organization: { name: { _ilike: `%${searchFilter}%` } } },
+        ],
+      },
     }),
   });
 

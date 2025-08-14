@@ -6,7 +6,7 @@ object_relationships:
     using:
       foreign_key_constraint_on: type
 array_relationships:
-  - name: CourseFundingOrganizations
+  - name: FundedCourses
     using:
       foreign_key_constraint_on:
         column: organizationId

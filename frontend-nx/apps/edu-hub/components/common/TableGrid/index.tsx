@@ -280,20 +280,20 @@ const TableGrid = <T extends BaseRow>({
 
       {/* Header row */}
       <div className="flex items-center mb-1 text-white py-2">
-        <div className="flex-grow flex gap-3">
+        <div className={`flex-grow flex gap-3 ${!showCheckbox ? 'pl-3' : ''}`}>
           {table.getHeaderGroups().map((headerGroup) => (
             <React.Fragment key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <div
                   key={header.id}
-                  className={`${header.column.columnDef.meta?.className} relative flex items-center justify-center h-12 px-2`}
+                  className={`${header.column.columnDef.meta?.className} relative flex items-center h-12`}
                   style={{
                     width: `${header.getSize()}px`,
                     flexShrink: 0,
                   }}
                   onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
                 >
-                  <div className="flex items-center justify-center w-full h-full text-center">
+                  <div className="flex items-center w-full h-full">
                     {header.column.columnDef.header === '' ? null : (
                       <div className="flex items-center">
                         {header.column.id === 'selection'
@@ -327,7 +327,7 @@ const TableGrid = <T extends BaseRow>({
             {/* Primary Row */}
             <div className={`flex items-stretch ${expandedRows.has(row.original.id) ? 'mb-0' : 'mb-1'}`}>
               <div className="flex-grow bg-edu-light-gray py-2">
-                <div className="flex items-center gap-3">
+                <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}>
                   {row.getVisibleCells().map((cell) => (
                     <div
                       key={cell.id}
@@ -372,7 +372,7 @@ const TableGrid = <T extends BaseRow>({
             {/* Expandable Second Row */}
             {expandedRows.has(row.original.id) && expandableRowComponent && (
               <div className="flex mb-1">
-                <div className="flex-grow bg-edu-light-gray py-2">
+                <div className={`flex-grow bg-edu-light-gray py-2 ${!showCheckbox ? 'pl-3' : ''}`}>
                   <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
                 </div>
                 <div className="w-10 flex-shrink-0"></div>

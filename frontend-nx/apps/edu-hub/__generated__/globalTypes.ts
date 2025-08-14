@@ -5814,8 +5814,8 @@ export interface Organization_avg_order_by {
  * Boolean expression to filter rows from the table "Organization". All fields are combined with a logical 'AND'.
  */
 export interface Organization_bool_exp {
-  CourseFundingOrganizations?: CourseFundingOrganization_bool_exp | null;
-  CourseFundingOrganizations_aggregate?: CourseFundingOrganization_aggregate_bool_exp | null;
+  FundedCourses?: CourseFundingOrganization_bool_exp | null;
+  FundedCourses_aggregate?: CourseFundingOrganization_aggregate_bool_exp | null;
   OrganizationAdmins?: OrganizationAdmin_bool_exp | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_bool_exp | null;
   OrganizationType?: OrganizationType_bool_exp | null;
@@ -5839,7 +5839,7 @@ export interface Organization_bool_exp {
  * input type for inserting data into table "Organization"
  */
 export interface Organization_insert_input {
-  CourseFundingOrganizations?: CourseFundingOrganization_arr_rel_insert_input | null;
+  FundedCourses?: CourseFundingOrganization_arr_rel_insert_input | null;
   OrganizationAdmins?: OrganizationAdmin_arr_rel_insert_input | null;
   OrganizationType?: OrganizationType_obj_rel_insert_input | null;
   Users?: User_arr_rel_insert_input | null;
@@ -5901,7 +5901,7 @@ export interface Organization_on_conflict {
  * Ordering options when selecting data from "Organization".
  */
 export interface Organization_order_by {
-  CourseFundingOrganizations_aggregate?: CourseFundingOrganization_aggregate_order_by | null;
+  FundedCourses_aggregate?: CourseFundingOrganization_aggregate_order_by | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_order_by | null;
   OrganizationType?: OrganizationType_order_by | null;
   Users_aggregate?: User_aggregate_order_by | null;

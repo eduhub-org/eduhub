@@ -67,13 +67,6 @@ array_relationships:
         table:
           name: CourseLocation
           schema: public
-  - name: CourseFundingOrganizations
-    using:
-      foreign_key_constraint_on:
-        column: courseId
-        table:
-          name: CourseFundingOrganization
-          schema: public
   - name: DegreeCourses
     using:
       foreign_key_constraint_on:
