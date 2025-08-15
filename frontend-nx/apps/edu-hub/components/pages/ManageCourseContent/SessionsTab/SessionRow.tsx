@@ -4,8 +4,7 @@ import {
   ManagedCourseVariables,
   ManagedCourse_Course_by_pk_Sessions,
 } from '../../../../queries/__generated__/ManagedCourse';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import OptimisticDatePicker from '../../../../components/inputs/OptimisticDatePicker';
 import { DebounceInput } from 'react-debounce-input';
 import { eventTargetValueMapper, useRoleMutation } from '../../../../hooks/authedMutation';
 
@@ -61,7 +60,7 @@ export const SessionRow: FC<IProps> = ({
   onSetTitle,
   onDeleteSpeaker,
 }) => {
-  const { t, lang } = useTranslation('course-page');
+  const { t } = useTranslation('course-page');
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
@@ -120,14 +119,14 @@ export const SessionRow: FC<IProps> = ({
   const [updateSessionEndTime] = useRoleMutation(UPDATE_SESSION_END_TIME);
 
   const handleSetDate = useCallback(
-    (event: Date | null) => {
+    async (event: Date | null) => {
       if (session != null && event) {
         // Update both start and end datetime with the new date but keep original times
         const newStartDate = copyDateTime(event, session.startDateTime);
         const newEndDate = copyDateTime(event, session.endDateTime);
 
         // Update start time directly
-        updateSessionStartTime({
+        await updateSessionStartTime({
           variables: {
             sessionId: session.id,
             value: newStartDate.toISOString(),
@@ -135,15 +134,15 @@ export const SessionRow: FC<IProps> = ({
         });
 
         // Update end time directly
-        updateSessionEndTime({
+        await updateSessionEndTime({
           variables: {
             sessionId: session.id,
             value: newEndDate.toISOString(),
           },
         });
 
-        // Optionally refresh data
-        qResult.refetch();
+        // Refresh data after both mutations complete
+        await qResult.refetch();
       }
     },
     [session, updateSessionStartTime, updateSessionEndTime, qResult]
@@ -207,14 +206,13 @@ export const SessionRow: FC<IProps> = ({
         )}
         {session && (
           <div className="p-3 col-span-3">
-            <DatePicker
+            <OptimisticDatePicker
               minDate={lectureStart}
               maxDate={lectureEnd}
-              dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
               className="w-full bg-edu-light-gray"
-              selected={session.startDateTime}
+              value={session.startDateTime}
               onChange={handleSetDate}
-              locale={lang}
+              showLoading={true}
             />
           </div>
         )}
