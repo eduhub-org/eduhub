@@ -3,16 +3,6 @@
     {
       "name": "production",
       "channel": "latest"
-    },
-    {
-      "name": "staging", 
-      "prerelease": "rc",
-      "channel": "staging"
-    },
-    {
-      "name": "develop",
-      "prerelease": "dev",
-      "channel": "develop"
     }
   ],
   "plugins": [

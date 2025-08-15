@@ -25,12 +25,12 @@ EduHub uses an automated release management system built on semantic-release for
 ### 1. Development Phase
 - Create feature branch from `develop`
 - Make changes using conventional commits
-- Push commits → triggers `0.x.x-dev.x` releases
+- Push commits → no automated releases (cleaner version history)
 - Automatic deployment to development environment
 
 ### 2. Staging Phase
 - Create PR from `develop` to `staging`
-- Review and merge → triggers `0.x.x-rc.x` release candidate
+- Review and merge → no automated releases (focus on production readiness)
 - Test thoroughly on staging environment
 - If issues found, fix on `develop` and create new PR
 
@@ -38,6 +38,7 @@ EduHub uses an automated release management system built on semantic-release for
 - Create PR from `staging` to `production`
 - Final review and merge → triggers `0.x.x` production release
 - Monitor production deployment
+- **Only phase that creates semantic versions**
 
 ## Version Synchronization
 

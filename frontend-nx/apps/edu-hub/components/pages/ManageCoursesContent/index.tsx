@@ -178,12 +178,16 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const [updateAttendanceCertificatePossible] = useAdminMutation<
     UpdateCourseAttendanceCertificatePossible,
     UpdateCourseAttendanceCertificatePossibleVariables
-  >(UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE);
+  >(UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE, {
+    refetchQueries: ['AdminCourseList'],
+  });
 
   const [updateAchievementCertificatePossible] = useAdminMutation<
     UpdateCourseAchievementCertificatePossible,
     UpdateCourseAchievementCertificatePossibleVariables
-  >(UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE);
+  >(UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE, {
+    refetchQueries: ['AdminCourseList'],
+  });
 
   const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
 
@@ -381,31 +385,54 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
       if (confirmed && targetProgram && coursesToCopy.length > 0) {
         try {
           // Prepare course data for copying
-          const coursesToInsert = coursesToCopy.map((course) => ({
-            title: `${course.title} (Copy)`,
-            tagline: course.tagline || '',
-            language: course.language || 'DE',
-            applicationEnd: course.applicationEnd || new Date().toISOString().split('T')[0], // Required field
-            cost: course.cost,
-            ects: course.ects,
-            maxMissedSessions: course.maxMissedSessions || 0,
-            maxParticipants: course.maxParticipants,
-            learningGoals: course.learningGoals,
-            headingDescriptionField1: course.headingDescriptionField1,
-            contentDescriptionField1: course.contentDescriptionField1,
-            headingDescriptionField2: course.headingDescriptionField2,
-            contentDescriptionField2: course.contentDescriptionField2,
-            achievementCertificatePossible: course.achievementCertificatePossible,
-            attendanceCertificatePossible: course.attendanceCertificatePossible,
-            weekDay: course.weekDay || 'NONE',
-            startTime: course.startTime,
-            endTime: course.endTime,
-            registrationType: course.registrationType,
-            externalRegistrationLink: course.externalRegistrationLink,
-            programId: targetProgram.id,
-            published: false, // Always start as unpublished
-            // Note: We don't copy sessions, enrollments, or other related data
-          }));
+          const coursesToInsert = coursesToCopy.map((course) => {
+            // Use target program's default application deadline if available, otherwise use current date
+            const defaultApplicationEnd = targetProgram.defaultApplicationEnd
+              ? targetProgram.defaultApplicationEnd
+              : new Date().toISOString().split('T')[0];
+
+            // Copy tile slider groups (CourseGroups)
+            const courseGroups =
+              course.CourseGroups?.map((cg) => ({
+                groupOptionId: cg.groupOptionId,
+              })) || [];
+
+            // Copy degree relationships (CourseDegrees)
+            const courseDegrees =
+              course.CourseDegrees?.map((cd) => ({
+                degreeCourseId: cd.degreeCourseId,
+              })) || [];
+
+            return {
+              title: course.title,
+              tagline: course.tagline || '',
+              language: course.language || 'DE',
+              applicationEnd: defaultApplicationEnd,
+              cost: course.cost,
+              ects: course.ects,
+              maxMissedSessions: course.maxMissedSessions || 0,
+              maxParticipants: course.maxParticipants,
+              learningGoals: course.learningGoals,
+              headingDescriptionField1: course.headingDescriptionField1,
+              contentDescriptionField1: course.contentDescriptionField1,
+              headingDescriptionField2: course.headingDescriptionField2,
+              contentDescriptionField2: course.contentDescriptionField2,
+              achievementCertificatePossible: course.achievementCertificatePossible,
+              attendanceCertificatePossible: course.attendanceCertificatePossible,
+              weekDay: course.weekDay || 'NONE',
+              startTime: course.startTime,
+              endTime: course.endTime,
+              registrationType: course.registrationType,
+              externalRegistrationLink: course.externalRegistrationLink,
+              programId: targetProgram.id,
+              published: false, // Always start as unpublished
+              // Copy tile slider groups
+              CourseGroups: courseGroups.length > 0 ? { data: courseGroups } : undefined,
+              // Copy degree relationships
+              CourseDegrees: courseDegrees.length > 0 ? { data: courseDegrees } : undefined,
+              // Note: We don't copy sessions, enrollments, or other related data
+            };
+          });
 
           await copyCourses({
             variables: {

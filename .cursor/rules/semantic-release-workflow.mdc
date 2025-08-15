@@ -10,12 +10,12 @@ EduHub uses automated semantic versioning with a three-branch workflow for consi
 
 - **`develop`** - Main development branch
   - All feature branches merge here
-  - Creates development releases: `0.1.0-dev.1`, `0.1.0-dev.2`, etc.
+  - No automated releases (reduces version noise)
   - Automatically deployed to development environment
 
 - **`staging`** - Pre-production testing branch  
-  - PRs from `develop` to `staging` for release candidates
-  - Creates release candidate versions: `0.1.0-rc.1`, `0.1.0-rc.2`, etc.
+  - PRs from `develop` to `staging` for testing
+  - No automated releases (focus on production-ready code)
   - Automatically deployed to staging environment
   - Used for final testing before production
 
@@ -23,6 +23,7 @@ EduHub uses automated semantic versioning with a three-branch workflow for consi
   - PRs from `staging` to `production` for final releases
   - Creates final release versions: `0.1.0`, `0.2.0`, etc.
   - Automatically deployed to production environment
+  - **Only branch that triggers semantic releases**
 
 ## Configuration Files
 
