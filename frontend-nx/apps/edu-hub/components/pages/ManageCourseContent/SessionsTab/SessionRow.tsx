@@ -60,11 +60,12 @@ export const SessionRow: FC<IProps> = ({
   onSetTitle,
   onDeleteSpeaker,
 }) => {
-  const { t } = useTranslation('course-page');
+  const { t, lang } = useTranslation('course-page');
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
+
   const handleDelete = useCallback(() => {
     if (session != null) {
       const now = new Date();
@@ -213,6 +214,7 @@ export const SessionRow: FC<IProps> = ({
               value={session.startDateTime}
               onChange={handleSetDate}
               showLoading={true}
+              showWeekends={true}
             />
           </div>
         )}
