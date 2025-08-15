@@ -404,7 +404,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
               })) || [];
 
             return {
-              title: `${course.title} (Copy)`,
+              title: course.title,
               tagline: course.tagline || '',
               language: course.language || 'DE',
               applicationEnd: defaultApplicationEnd,
