@@ -178,12 +178,16 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const [updateAttendanceCertificatePossible] = useAdminMutation<
     UpdateCourseAttendanceCertificatePossible,
     UpdateCourseAttendanceCertificatePossibleVariables
-  >(UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE);
+  >(UPDATE_COURSE_ATTENDANCE_CERTIFICATE_POSSIBLE, {
+    refetchQueries: ['AdminCourseList'],
+  });
 
   const [updateAchievementCertificatePossible] = useAdminMutation<
     UpdateCourseAchievementCertificatePossible,
     UpdateCourseAchievementCertificatePossibleVariables
-  >(UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE);
+  >(UPDATE_COURSE_ACHIEVEMENT_CERTIFICATE_POSSIBLE, {
+    refetchQueries: ['AdminCourseList'],
+  });
 
   const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
 
