@@ -6,8 +6,10 @@ This document describes the proper process for creating Pull Requests (PRs) and 
 
 Our repository uses semantic-release for automated versioning and releases. The branching strategy is:
 - `develop` - Main development branch
-- `staging` - Pre-release testing branch (triggers pre-release versions)
+- `staging` - Pre-release testing branch (no automated releases)
 - `production` - Production release branch (triggers stable releases)
+
+**Note:** As of recent changes, automated releases are only created for the `production` branch to reduce version noise and focus on meaningful releases.
 
 ## Branch Configuration
 
@@ -18,20 +20,12 @@ Current semantic-release configuration:
     {
       "name": "production",
       "channel": "latest"
-    },
-    {
-      "name": "staging", 
-      "prerelease": "rc",
-      "channel": "staging"
-    },
-    {
-      "name": "develop",
-      "prerelease": "dev", 
-      "channel": "develop"
     }
   ]
 }
 ```
+
+**Simplified Approach:** Only the `production` branch triggers automated releases. This reduces version noise and ensures that only tested, production-ready code gets version numbers.
 
 ## Conventional Commit Format
 
@@ -101,7 +95,7 @@ git merge feature/user-authentication -m "feat: add user authentication system"
 git push origin develop
 ```
 
-**Note:** Merging to `develop` will trigger a dev pre-release (e.g., `1.2.3-dev.1`)
+**Note:** Merging to `develop` will not trigger any releases. Only production merges create versions.
 
 ### 3. Creating PR from Develop to Staging
 
@@ -177,7 +171,7 @@ feat(release)!: prepare staging release candidate from develop
 BREAKING CHANGE: describe the breaking change
 ```
 
-**Result:** Merging to `staging` will trigger a release candidate (e.g., `1.3.0-rc.1`)
+**Result:** Merging to `staging` will not trigger any releases. This allows for thorough testing without creating version noise.
 
 ### 5. Creating PR from Staging to Production
 
