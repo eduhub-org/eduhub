@@ -1,4 +1,4 @@
-import React, { useState, useCallback, ChangeEvent } from 'react';
+import React, { useState, useCallback, ChangeEvent, useEffect } from 'react';
 import { DocumentNode } from 'graphql';
 import { useDebouncedCallback } from 'use-debounce';
 import { useRoleMutation } from '../../hooks/authedMutation';
@@ -42,12 +42,17 @@ const TimePicker: React.FC<TimePickerProps> = ({
     return formatTimeString(val);
   };
 
-  const [originalDateTime] = useState<Date | null>(currentValue instanceof Date ? currentValue : null);
+  const originalDateTime = currentValue instanceof Date ? currentValue : null;
 
   const [value, setValue] = useState<string | null>(currentValue ? formatTimeValue(currentValue) : null);
   const [errorMessage, setErrorMessage] = useState('');
   const { error, handleError, resetError } = useErrorHandler();
   const [showSavedNotification, setShowSavedNotification] = useState(false);
+
+  // Update display value when currentValue changes (e.g., after date picker changes)
+  useEffect(() => {
+    setValue(currentValue ? formatTimeValue(currentValue) : null);
+  }, [currentValue, formatTimeValue]);
 
   const [updateValue] = useRoleMutation(updateValueMutation, {
     onError: (error) => handleError(t(error.message)),
