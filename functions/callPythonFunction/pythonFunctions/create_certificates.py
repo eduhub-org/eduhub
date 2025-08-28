@@ -59,12 +59,13 @@ class CertificateCreator:
             CertificateError: If there's an error in the certificate creation process
         """
         # Use cached templates if provided, otherwise fetch them
-        template_image_url = self.fetch_template_image()
-        template_text = self.fetch_template_text()
+        
         successful_count = 0
 
         for i, enrollment in enumerate(self.enrollments, 1):
             try:
+                template_image_url = self.fetch_template_image()
+                template_text = self.fetch_template_text()
                 pdf_url = self.generate_and_save_certificate_to_gcs(template_image_url, template_text, enrollment)
                 self.eduhub_client.update_course_enrollment_record(enrollment["User"]["id"], enrollment["Course"]["id"], pdf_url, self.certificate_type)
                 successful_count += 1
