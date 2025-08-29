@@ -65,7 +65,7 @@ class CertificateCreator:
         for i, enrollment in enumerate(self.enrollments, 1):
             try:
                 template_image_url = self.fetch_template_image()
-                template_text = self.fetch_template_text()
+                template_text = self.fetch_template_text(enrollment)
                 pdf_url = self.generate_and_save_certificate_to_gcs(template_image_url, template_text, enrollment)
                 self.eduhub_client.update_course_enrollment_record(enrollment["User"]["id"], enrollment["Course"]["id"], pdf_url, self.certificate_type)
                 successful_count += 1
@@ -188,7 +188,7 @@ class CertificateCreator:
             logging.error(error_msg)
             raise CertificateError(error_msg, "TEMPLATE_FETCH_ERROR")
 
-    def fetch_template_text(self):
+    def fetch_template_text(self, enrollment):
         """
         Fetches the HTML template text for the certificate.
 
@@ -207,7 +207,7 @@ class CertificateCreator:
                 if not self.enrollments[0].get('User', {}).get('AchievementRecordAuthors'):
                     raise CertificateError("No achievement record found for user", 
                                           "ACHIEVEMENT_RECORD_NOT_FOUND")
-                record_type = self.enrollments[0]['User']['AchievementRecordAuthors'][0]['AchievementRecord']['AchievementOption']['recordType']
+                record_type = enrollment['User']['AchievementRecordAuthors'][0]['AchievementRecord']['AchievementOption']['recordType']
             else:  # attendance certificate
                 record_type = "DOCUMENTATION"  # or whatever the correct record type is for attendance
             
