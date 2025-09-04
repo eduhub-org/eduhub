@@ -179,7 +179,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           placeholder={t('short_description.placeholder')}
           helpText={t('short_description.help_text')}
           className="h-64"
-          currentText={course.tagline}
           maxLength={500}
         />
         <div className="mx-4 mb-4">
@@ -230,7 +229,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             placeholder={t('info_block_1_title.placeholder')}
             helpText={t('info_block_1_title.help_text')}
             className="mb-0"
-            currentText={course.headingDescriptionField1 ?? ''}
           />
           <InputField
             variant="eduhub"
@@ -242,7 +240,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             placeholder={t('info_block_1_content.placeholder')}
             maxLength={10000}
             className="h-64"
-            currentText={course.contentDescriptionField1 ?? ''}
           />
         </div>
         <div>
@@ -257,7 +254,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             helpText={t('info_block_2_title.help_text')}
             placeholder={t('info_block_2_title.placeholder')}
             className="mb-0"
-            currentText={course.headingDescriptionField2 ?? ''}
           />
           <InputField
             variant="eduhub"
@@ -269,7 +265,6 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             placeholder={t('info_block_2_content.placeholder')}
             maxLength={10000}
             className="h-64"
-            currentText={course.contentDescriptionField2 ?? ''}
           />
         </div>
       </div>
