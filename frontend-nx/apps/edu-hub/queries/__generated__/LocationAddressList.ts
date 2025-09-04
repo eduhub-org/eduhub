@@ -15,6 +15,16 @@ export interface LocationAddressList_LocationAddress_LocationOption {
   comment: string | null;
 }
 
+export interface LocationAddressList_LocationAddress_SessionAddresses_aggregate_aggregate {
+  __typename: "SessionAddress_aggregate_fields";
+  count: number;
+}
+
+export interface LocationAddressList_LocationAddress_SessionAddresses_aggregate {
+  __typename: "SessionAddress_aggregate";
+  aggregate: LocationAddressList_LocationAddress_SessionAddresses_aggregate_aggregate | null;
+}
+
 export interface LocationAddressList_LocationAddress {
   __typename: "LocationAddress";
   id: number;
@@ -44,6 +54,10 @@ export interface LocationAddressList_LocationAddress {
    * An object relationship
    */
   LocationOption: LocationAddressList_LocationAddress_LocationOption;
+  /**
+   * An aggregate relationship
+   */
+  SessionAddresses_aggregate: LocationAddressList_LocationAddress_SessionAddresses_aggregate;
 }
 
 export interface LocationAddressList_LocationAddress_aggregate_aggregate {

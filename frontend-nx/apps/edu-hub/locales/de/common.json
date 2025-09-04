@@ -202,6 +202,8 @@
       "organization": "Organisationen",
       "program": "Programme",
       "achievement": "Leistungsnachweise",
+      "locationaddress": "Veranstaltungsadressen",
+      "session_addresses": "Adressen von Veranstaltungsterinen",
       "courses": "Kursen",
       "course_enrollments": "Anmeldungen",
       "course_groups": "Kursgruppen",

@@ -25,6 +25,11 @@ export const LOCATION_ADDRESS_LIST = gql`
         value
         comment
       }
+      SessionAddresses_aggregate {
+        aggregate {
+          count
+        }
+      }
     }
     LocationAddress_aggregate(where: $filter) {
       aggregate {

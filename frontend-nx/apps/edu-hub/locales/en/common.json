@@ -202,6 +202,8 @@
       "organization": "Organizations",
       "program": "Programs",
       "achievement": "Achievement records",
+      "locationaddress": "Location addresses",
+      "session_addresses": "session addresses",
       "courses": "courses",
       "course_enrollments": "enrollments",
       "course_groups": "course groups",
