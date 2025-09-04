@@ -124,7 +124,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
         <div className="text-gray-400">
           {label && (
             <div className="flex justify-between mb-2">
-              <div className="flex items-center">{t(label)}</div>
+              <div className="flex items-center">{label}</div>
             </div>
           )}
           <div>
@@ -144,7 +144,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
       <NotificationSnackbar
         open={showSavedNotification}
         onClose={() => setShowSavedNotification(false)}
-        message="saved"
+        message={t('notification_snackbar.saved')}
       />
     </>
   );
