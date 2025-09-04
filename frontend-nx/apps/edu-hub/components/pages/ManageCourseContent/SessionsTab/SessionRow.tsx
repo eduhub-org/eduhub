@@ -258,7 +258,7 @@ export const SessionRow: FC<IProps> = ({
             />
           )}
         </div>
-        <div className="p-3 col-span-7">
+        <div className="pt-3 col-span-7">
           {!session && <>{t('external_speakers')}</>}
           {session && (
             <div className="">

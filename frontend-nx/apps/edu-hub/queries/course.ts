@@ -238,13 +238,14 @@ export const INSERT_SESSION_WITH_ADDRESSES = gql`
 export const UPDATE_SESSION_ADDRESS = gql`
   mutation UpdateSessionAddress(
     $itemId: Int!
-    $text: String!
+    $value: Int
   ) {
     update_SessionAddress_by_pk(
       pk_columns: { id: $itemId }
-      _set: { address: $text }
+      _set: { locationAddressId: $value }
     ) {
       id
+      locationAddressId
     }
   }
 `;

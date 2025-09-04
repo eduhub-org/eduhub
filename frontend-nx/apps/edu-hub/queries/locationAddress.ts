@@ -137,3 +137,13 @@ export const LOCATION_ADDRESS_BY_LOCATION_OPTION = gql`
     }
   }
 `;
+
+export const CREATE_LOCATION_ADDRESS = gql`
+  mutation CreateLocationAddress($value: String!, $locationOptionId: LocationOption_enum!) {
+    insert_LocationAddress_one(object: {shortLabel: $value, address: $value, locationOptionId: $locationOptionId}) {
+      id
+      shortLabel
+      address
+    }
+  }
+`;
