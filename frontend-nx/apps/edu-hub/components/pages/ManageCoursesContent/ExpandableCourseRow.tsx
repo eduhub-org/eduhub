@@ -582,7 +582,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               helpText={t('manageCourses:learning_goals.help_text')}
               maxLength={500}
               className="h-32"
-              currentText={course.learningGoals ?? ''}
             />
 
             {/* 6. Link to the Chat of the Course */}
