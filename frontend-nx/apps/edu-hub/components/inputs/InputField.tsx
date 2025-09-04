@@ -348,8 +348,8 @@ const InputField: React.FC<InputFieldProps> = ({
       <TextField
         className={hasBlurred && errorMessage ? 'w-3/4' : 'w-full'}
         variant="standard"
-        label={label ? t(label) : undefined}
-        placeholder={t(placeholder || '')}
+        label={label}
+        placeholder={placeholder}
         value={localText}
         onChange={handleTextChange}
         onBlur={handleBlur}
@@ -361,7 +361,7 @@ const InputField: React.FC<InputFieldProps> = ({
             style: { color: hasBlurred && errorMessage ? 'red' : 'inherit' },
             endAdornment: (
               <InputAdornment position="end">
-                <Tooltip title={t(helpText || '')} placement="top">
+                <Tooltip title={helpText || ''} placement="top">
                   <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled }} />
                 </Tooltip>
               </InputAdornment>
@@ -374,7 +374,7 @@ const InputField: React.FC<InputFieldProps> = ({
       <NotificationSnackbar
         open={showSavedNotification}
         onClose={() => setShowSavedNotification(false)}
-        message="notification_snackbar.saved"
+        message={t('notification_snackbar.saved')}
       />
     </div>
   );
@@ -418,7 +418,7 @@ const InputField: React.FC<InputFieldProps> = ({
               onChange={handleTextChange}
               onBlur={handleBlur}
               maxLength={maxLength}
-              placeholder={t(placeholder || '')}
+              placeholder={placeholder}
               min={type === 'number' ? min : undefined}
               max={type === 'number' ? max : undefined}
               step={type === 'number' ? 1 : undefined}
@@ -436,7 +436,7 @@ const InputField: React.FC<InputFieldProps> = ({
       <NotificationSnackbar
         open={showSavedNotification}
         onClose={() => setShowSavedNotification(false)}
-        message="notification_snackbar.saved"
+        message={t('notification_snackbar.saved')}
       />
     </div>
   );
@@ -449,7 +449,7 @@ const InputField: React.FC<InputFieldProps> = ({
       <NotificationSnackbar
         open={showSavedNotification}
         onClose={() => setShowSavedNotification(false)}
-        message="notification_snackbar.saved"
+        message={t('notification_snackbar.saved')}
       />
     </>
   );

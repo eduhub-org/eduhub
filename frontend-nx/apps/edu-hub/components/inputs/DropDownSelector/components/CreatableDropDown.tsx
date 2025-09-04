@@ -41,7 +41,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
   const getFilteredOptions = useCallback(
     (searchValue = '') => {
       return localOptions.filter((option) => {
-        const labelMatch = t(option.label).toLowerCase().includes(searchValue.toLowerCase());
+        const labelMatch = option.label.toLowerCase().includes(searchValue.toLowerCase());
         const aliasMatch = option.aliases?.some((alias) => {
           if (!alias) return false;
           if (typeof alias === 'object' && 'name' in alias) {
@@ -66,7 +66,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
       const filteredOptions = getFilteredOptions(searchValue);
 
       // Don't show create option if there's an exact name match
-      const hasExactNameMatch = filteredOptions.some((option) => t(option.label).toLowerCase() === searchLower);
+      const hasExactNameMatch = filteredOptions.some((option) => option.label.toLowerCase() === searchLower);
 
       // Don't show create option if there's an exact alias match
       const hasExactAliasMatch = filteredOptions.some((option) => {
@@ -165,7 +165,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
         className={
           variant === 'eduhub' ? `${className} ${errorMessage ? 'border-red-500' : ''}` : 'w-full p-2 border rounded'
         }
-        placeholder={placeholder || t(label || '')}
+        placeholder={placeholder || label}
       />
       {isOpen && (
         <div
@@ -183,7 +183,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
               onMouseEnter={() => setHighlightedIndex(index)}
               onMouseLeave={() => setHighlightedIndex(-1)}
             >
-              {t(option.label)}
+              {option.label}
             </div>
           ))}
           {shouldShowCreateOption(inputValue) && (
