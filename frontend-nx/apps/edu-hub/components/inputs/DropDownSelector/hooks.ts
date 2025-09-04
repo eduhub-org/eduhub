@@ -92,10 +92,8 @@ export const useDropDownLogic = (
   );
 
   useEffect(() => {
-    if (value !== localValue) {
-      setLocalValue(value);
-    }
-  }, [value, localValue]);
+    setLocalValue(value);
+  }, [value]);
 
   useEffect(() => {
     setLocalOptions(options);
