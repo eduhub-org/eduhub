@@ -1,9 +1,14 @@
 import useTranslation from 'next-translate/useTranslation';
-import { FC } from 'react';
+import { FC, useState, useMemo } from 'react';
 import { ManagedCourse_Course_by_pk_Sessions_SessionAddresses } from '../../../../queries/__generated__/ManagedCourse';
 import { UPDATE_SESSION_ADDRESS } from '../../../../queries/course';
-import InputField from '../../../inputs/InputField';
+import { LOCATION_ADDRESS_BY_LOCATION_OPTION, CREATE_LOCATION_ADDRESS } from '../../../../queries/locationAddress';
+import { useRoleQuery } from '../../../../hooks/authedQuery';
+import DropDownSelector from '../../../inputs/DropDownSelector';
 import { isLinkFormat } from '../../../../helpers/util';
+import { LocationOption_enum } from '../../../../__generated__/globalTypes';
+import { Tooltip } from '@mui/material';
+import { HelpOutline } from '@mui/icons-material';
 
 interface SessionAddressesIProps {
   address: ManagedCourse_Course_by_pk_Sessions_SessionAddresses | null;
@@ -17,32 +22,80 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
   const sessionAddress = address?.address || defaultSessionAddress;
   const isOnline = address?.CourseLocation?.locationOption === 'ONLINE';
   const isValidLink = isLinkFormat(sessionAddress);
+  
+  // Get the current locationAddressId if it exists
+  const currentLocationAddressId = (address as any)?.locationAddressId || null;
 
   const label = isOnline
     ? t('sessionAddress.online.label')
-    : t('sessionAddress.offline.label') + t('common:location.' + address?.CourseLocation?.locationOption);
-  const value = isOnline ? (isValidLink ? sessionAddress : t('sessionAddress.online.placeholder')) : sessionAddress;
-  const placeholder = isOnline ? null : t('sessionAddress.offline.placeholder');
+    : t('common:location.' + address?.CourseLocation?.locationOption);
 
+  // Query location addresses for the selected location option
+  const { data: addressData } = useRoleQuery(LOCATION_ADDRESS_BY_LOCATION_OPTION, {
+    variables: {
+      locationOptionId: address?.CourseLocation?.locationOption as LocationOption_enum,
+      searchFilter: '%',
+    },
+    skip: !address?.CourseLocation?.locationOption || isOnline,
+  });
+
+  // Transform addresses for dropdown options
+  const addressOptions = useMemo(() => {
+    if (!addressData?.LocationAddress) return [];
+    
+    return addressData.LocationAddress.map((addr: any) => ({
+      label: addr.shortLabel,
+      value: addr.id.toString(),
+      aliases: addr.aliases || [],
+    }));
+  }, [addressData]);
+
+
+  // For online sessions, show the link as read-only
+  if (isOnline) {
+    const value = isValidLink ? sessionAddress : t('sessionAddress.online.placeholder');
+    return (
+      <div className="mb-2 flex items-center">
+        <span className="mr-4 min-w-0 flex-shrink-0">{label}:</span>
+        <span className="text-gray-800 flex-1">{value}</span>
+        <Tooltip title={t('sessionAddress.online.placeholder')} placement="top">
+          <HelpOutline
+            style={{
+              cursor: 'pointer',
+              color: '#666',
+              marginLeft: '8px',
+              fontSize: '20px',
+            }}
+          />
+        </Tooltip>
+      </div>
+    );
+  }
+
+  // For offline sessions, use the enhanced dropdown selector
   return (
-    <div className="mb-2">
-      <span>{label}:</span>
-      {isOnline ? (
-        <div className="h-2 mb-0 ml-16">{value}</div>
-      ) : (
-        <InputField
-          variant="eduhub"
-          type="input"
+    <div className="mb-2 flex items-center">
+      <span className="mr-8 min-w-0 flex-shrink-0">{label}:</span>
+      <div className="flex-1 mb-2 min-w-0">
+        <DropDownSelector
+          variant="material"
+          label=""
+          placeholder={t('sessionAddress.offline.placeholder')}
+          helpText={t('sessionAddress.offline.placeholder')}
+          value={currentLocationAddressId?.toString() || ''}
+          options={addressOptions}
           updateValueMutation={UPDATE_SESSION_ADDRESS}
-          refetchQueries={refetchQueries}
-          itemId={address.id}
-          placeholder={placeholder}
-          value={value}
-          className="h-2 mb-0 ml-11 w-1/2"
-          showCharacterCount={false}
-          invertColors={true}
+          identifierVariables={{ 
+            itemId: address?.id,
+            locationOptionId: address?.CourseLocation?.locationOption 
+          }}
+          creatable={true}
+          createOptionMutation={CREATE_LOCATION_ADDRESS}
+          refetchQueries={[...refetchQueries, 'LocationAddressByLocationOption']}
+          nullable={true}
+          nullableLabel={t('sessionAddress.no_address_selected')}
         />
-      )}
+      </div>
     </div>
   );
 };

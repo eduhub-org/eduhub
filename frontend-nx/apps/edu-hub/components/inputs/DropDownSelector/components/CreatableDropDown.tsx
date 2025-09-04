@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { Add as AddIcon } from '@mui/icons-material';
+import { Add as AddIcon, HelpOutline } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
 import useTranslation from 'next-translate/useTranslation';
 import { Option } from '../types';
 import { SelectChangeEvent } from '@mui/material';
@@ -13,6 +14,7 @@ type CreatableDropDownProps = {
   label?: string;
   localOptions: Option[];
   errorMessage?: string;
+  helpText?: string;
   onInputChange: (value: string) => void;
   onValueChange: (event: SelectChangeEvent<string> | React.ChangeEvent<HTMLSelectElement>) => void;
   onCreateOption: () => void;
@@ -28,6 +30,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
   label,
   localOptions,
   errorMessage,
+  helpText,
   onInputChange,
   onValueChange,
   onCreateOption,
@@ -136,37 +139,51 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
 
   return (
     <div className="relative">
-      <input
-        type="text"
-        value={isCleared ? '' : inputValue || (localValue ? getLabelForValue(localValue) : '')}
-        onChange={(e) => {
-          onInputChange(e.target.value);
-          if (!e.target.value) {
-            handleValueChange(null);
-            setIsCleared(true);
-          } else {
-            setIsCleared(false);
+      <div className="flex items-center">
+        <input
+          type="text"
+          value={isCleared ? '' : inputValue || (localValue ? getLabelForValue(localValue) : '')}
+          onChange={(e) => {
+            onInputChange(e.target.value);
+            if (!e.target.value) {
+              handleValueChange(null);
+              setIsCleared(true);
+            } else {
+              setIsCleared(false);
+            }
+            setIsOpen(true);
+            setHighlightedIndex(-1);
+          }}
+          onKeyDown={handleKeyDown}
+          onFocus={() => {
+            setIsOpen(true);
+            if (!inputValue && !isCleared) {
+              onInputChange(getLabelForValue(localValue));
+            }
+          }}
+          onBlur={() => {
+            if (variant === 'eduhub') {
+              setTimeout(() => setIsOpen(false), 200);
+            }
+          }}
+          className={
+            variant === 'eduhub' ? `${className} ${errorMessage ? 'border-red-500' : ''}` : 'w-full p-2 border rounded'
           }
-          setIsOpen(true);
-          setHighlightedIndex(-1);
-        }}
-        onKeyDown={handleKeyDown}
-        onFocus={() => {
-          setIsOpen(true);
-          if (!inputValue && !isCleared) {
-            onInputChange(getLabelForValue(localValue));
-          }
-        }}
-        onBlur={() => {
-          if (variant === 'eduhub') {
-            setTimeout(() => setIsOpen(false), 200);
-          }
-        }}
-        className={
-          variant === 'eduhub' ? `${className} ${errorMessage ? 'border-red-500' : ''}` : 'w-full p-2 border rounded'
-        }
-        placeholder={placeholder || label}
-      />
+          placeholder={placeholder || label}
+        />
+        {helpText && (
+          <Tooltip title={helpText} placement="top">
+            <HelpOutline
+              style={{
+                cursor: 'pointer',
+                color: '#666',
+                marginLeft: '8px',
+                fontSize: '20px',
+              }}
+            />
+          </Tooltip>
+        )}
+      </div>
       {isOpen && (
         <div
           className={`absolute w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto ${

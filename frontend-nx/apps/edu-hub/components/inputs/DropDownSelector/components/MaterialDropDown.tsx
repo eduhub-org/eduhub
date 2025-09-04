@@ -68,6 +68,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
             label={label}
             localOptions={localOptions}
             errorMessage={errorMessage}
+            helpText={helpText}
             onInputChange={onInputChange}
             onValueChange={onValueChange}
             onCreateOption={onCreateOption}
@@ -97,7 +98,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
             endAdornment={
               helpText && (
                 <InputAdornment position="end">
-                  <Tooltip title={t(helpText)} placement="top">
+                  <Tooltip title={helpText} placement="top">
                     <HelpOutline
                       style={{
                         cursor: 'pointer',

@@ -178,16 +178,17 @@
   },
   "sessionAddress": {
     "online": {
-      "label": "Link to the online event",
+      "label": "Online",
       "placeholder": "Please enter a valid link in the \"Description\" tab."
     },
     "offline": {
       "label": "Address for on-site participation in ",
-      "placeholder": "Define a default address in the \"Description\" tab."
+      "placeholder": "Select a default address in the \"Description\" tab or select a specific address here."
     },
     "select_address": "Select Address",
     "select_online_link": "Select Online Link",
     "search_addresses": "Search addresses...",
+    "no_address_selected": "No address selected",
     "search_links": "Search links...",
     "create_new_address": "Create New Address",
     "create_new_link": "Create New Link",
@@ -215,7 +216,6 @@
   "confirmed_invitations": "Invitations (confirmed):",
   "bulk_action_publish": "Publish Selected",
   "bulk_action_unpublish": "Unpublish Selected",
-  "published": "Published",
   "not_published": "Not Published",
   "view_course": "View Course",
   "view": "View",

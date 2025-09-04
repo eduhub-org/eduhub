@@ -172,25 +172,26 @@
 
   "sessionAddress": {
     "online": {
-      "label": "Link zur Online-Veranstaltung",
+      "label": "Online",
       "placeholder": "Bitte gib im Tab \"Beschreibung\" einen gültigen Link ein."
     },
     "offline": {
       "label": "Adresse zur Vor-Ort-Teilnahme in ",
-      "placeholder": "Definiere im Tab \"Beschreibung\" eine Standardaddresse."
+      "placeholder": "Wähle im Tab \"Beschreibung\" eine Standardaddresse oder wähle hier eine spezifische Adresse aus."
     },
     "select_address": "Adresse auswählen",
     "select_online_link": "Online-Link auswählen",
     "search_addresses": "Adressen suchen...",
+    "no_address_selected": "Keine Adresse ausgewählt",
     "search_links": "Links suchen...",
     "create_new_address": "Neue Adresse erstellen",
     "create_new_link": "Neuen Link erstellen",
     "link_label": "Link-Name",
-    "link_label_placeholder": "z.B. Hauptsitzungsraum, Workshop-Link",
+    "link_label_placeholder": "z.B. Haupt-Meetingraum, Workshop-Link",
     "link_url": "URL",
-    "link_url_placeholder": "https://beispiel.com/meeting-raum",
+    "link_url_placeholder": "https://example.com/meeting-room",
     "aliases": "Aliase",
-    "aliases_help": "Gib Aliase ein und drücke Enter, um sie hinzuzufügen",
+    "aliases_help": "Aliase eingeben und Enter drücken, um sie hinzuzufügen",
     "legacy_address": "Legacy-Adresse (schreibgeschützt)",
     "select_location_option_first": "Bitte wähle zuerst eine Standortoption aus",
     "location_mismatch_error": "Die ausgewählte Adresse passt nicht zur Standortoption dieser Session. Bitte wähle eine Adresse aus, die zum richtigen Standort gehört."

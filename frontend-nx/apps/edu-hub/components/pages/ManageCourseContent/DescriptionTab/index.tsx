@@ -61,14 +61,14 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_COURSE_LOCATION,
     {
-      onError: (error) => handleError(t(error.message)),
+      onError: (error) => handleError(error.message),
     }
   );
 
   const [insertSessionAddress] = useRoleMutation<InsertSessionAddress, InsertSessionAddressVariables>(
     INSERT_SESSION_ADDRESS,
     {
-      onError: (error) => handleError(t(error.message)),
+      onError: (error) => handleError(error.message),
     }
   );
 

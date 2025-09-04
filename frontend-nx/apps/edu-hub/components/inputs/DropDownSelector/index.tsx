@@ -114,7 +114,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
             value: inputValue,
           },
           onCompleted: (data) => {
-            const newValue = data?.createOption?.value || data?.insert_Organization_one?.id;
+            const newValue = data?.createOption?.value || data?.insert_Organization_one?.id || data?.insert_LocationAddress_one?.id;
             if (newValue) {
               const newValueStr = newValue.toString();
               onOptionCreated?.(newValueStr);
