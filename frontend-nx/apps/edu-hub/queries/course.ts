@@ -249,6 +249,21 @@ export const UPDATE_SESSION_ADDRESS = gql`
   }
 `;
 
+export const UPDATE_SESSION_ADDRESS_LOCATION = gql`
+  mutation UpdateSessionAddressLocation(
+    $itemId: Int!
+    $locationAddressId: Int
+  ) {
+    update_SessionAddress_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { locationAddressId: $locationAddressId }
+    ) {
+      id
+      locationAddressId
+    }
+  }
+`;
+
 export const DELETE_SESSION_ADDRESSES_BY_COURSE_AND_LOCATION = gql`
   mutation DeleteSessionAddressesByCourseAndLocation(
     $courseId: Int!,

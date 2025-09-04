@@ -851,6 +851,42 @@ export enum Language_update_column {
 }
 
 /**
+ * unique or primary key constraints on table "LocationAddress"
+ */
+export enum LocationAddress_constraint {
+  LocationAddress_locationOptionId_shortLabel_key = "LocationAddress_locationOptionId_shortLabel_key",
+  LocationAddress_pkey = "LocationAddress_pkey",
+}
+
+/**
+ * select columns of table "LocationAddress"
+ */
+export enum LocationAddress_select_column {
+  address = "address",
+  aliases = "aliases",
+  created_at = "created_at",
+  description = "description",
+  id = "id",
+  locationOptionId = "locationOptionId",
+  shortLabel = "shortLabel",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "LocationAddress"
+ */
+export enum LocationAddress_update_column {
+  address = "address",
+  aliases = "aliases",
+  created_at = "created_at",
+  description = "description",
+  id = "id",
+  locationOptionId = "locationOptionId",
+  shortLabel = "shortLabel",
+  updated_at = "updated_at",
+}
+
+/**
  * unique or primary key constraints on table "LocationOption"
  */
 export enum LocationOption_constraint {
@@ -1364,6 +1400,7 @@ export enum SessionAddress_select_column {
   courseLocationId = "courseLocationId",
   created_at = "created_at",
   id = "id",
+  locationAddressId = "locationAddressId",
   sessionId = "sessionId",
   updated_at = "updated_at",
 }
@@ -1376,6 +1413,7 @@ export enum SessionAddress_update_column {
   courseLocationId = "courseLocationId",
   created_at = "created_at",
   id = "id",
+  locationAddressId = "locationAddressId",
   sessionId = "sessionId",
   updated_at = "updated_at",
 }
@@ -5377,10 +5415,197 @@ export interface Language_order_by {
   value?: order_by | null;
 }
 
+export interface LocationAddress_aggregate_bool_exp {
+  count?: LocationAddress_aggregate_bool_exp_count | null;
+}
+
+export interface LocationAddress_aggregate_bool_exp_count {
+  arguments?: LocationAddress_select_column[] | null;
+  distinct?: boolean | null;
+  filter?: LocationAddress_bool_exp | null;
+  predicate: Int_comparison_exp;
+}
+
+/**
+ * order by aggregate values of table "LocationAddress"
+ */
+export interface LocationAddress_aggregate_order_by {
+  avg?: LocationAddress_avg_order_by | null;
+  count?: order_by | null;
+  max?: LocationAddress_max_order_by | null;
+  min?: LocationAddress_min_order_by | null;
+  stddev?: LocationAddress_stddev_order_by | null;
+  stddev_pop?: LocationAddress_stddev_pop_order_by | null;
+  stddev_samp?: LocationAddress_stddev_samp_order_by | null;
+  sum?: LocationAddress_sum_order_by | null;
+  var_pop?: LocationAddress_var_pop_order_by | null;
+  var_samp?: LocationAddress_var_samp_order_by | null;
+  variance?: LocationAddress_variance_order_by | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "LocationAddress"
+ */
+export interface LocationAddress_arr_rel_insert_input {
+  data: LocationAddress_insert_input[];
+  on_conflict?: LocationAddress_on_conflict | null;
+}
+
+/**
+ * order by avg() on columns of table "LocationAddress"
+ */
+export interface LocationAddress_avg_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "LocationAddress". All fields are combined with a logical 'AND'.
+ */
+export interface LocationAddress_bool_exp {
+  LocationOption?: LocationOption_bool_exp | null;
+  SessionAddresses?: SessionAddress_bool_exp | null;
+  SessionAddresses_aggregate?: SessionAddress_aggregate_bool_exp | null;
+  _and?: LocationAddress_bool_exp[] | null;
+  _not?: LocationAddress_bool_exp | null;
+  _or?: LocationAddress_bool_exp[] | null;
+  address?: String_comparison_exp | null;
+  aliases?: jsonb_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  description?: String_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  locationOptionId?: LocationOption_enum_comparison_exp | null;
+  shortLabel?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "LocationAddress"
+ */
+export interface LocationAddress_insert_input {
+  LocationOption?: LocationOption_obj_rel_insert_input | null;
+  SessionAddresses?: SessionAddress_arr_rel_insert_input | null;
+  address?: string | null;
+  aliases?: any | null;
+  created_at?: any | null;
+  description?: string | null;
+  id?: number | null;
+  locationOptionId?: LocationOption_enum | null;
+  shortLabel?: string | null;
+  updated_at?: any | null;
+}
+
+/**
+ * order by max() on columns of table "LocationAddress"
+ */
+export interface LocationAddress_max_order_by {
+  address?: order_by | null;
+  created_at?: order_by | null;
+  description?: order_by | null;
+  id?: order_by | null;
+  shortLabel?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "LocationAddress"
+ */
+export interface LocationAddress_min_order_by {
+  address?: order_by | null;
+  created_at?: order_by | null;
+  description?: order_by | null;
+  id?: order_by | null;
+  shortLabel?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "LocationAddress"
+ */
+export interface LocationAddress_obj_rel_insert_input {
+  data: LocationAddress_insert_input;
+  on_conflict?: LocationAddress_on_conflict | null;
+}
+
+/**
+ * on_conflict condition type for table "LocationAddress"
+ */
+export interface LocationAddress_on_conflict {
+  constraint: LocationAddress_constraint;
+  update_columns: LocationAddress_update_column[];
+  where?: LocationAddress_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "LocationAddress".
+ */
+export interface LocationAddress_order_by {
+  LocationOption?: LocationOption_order_by | null;
+  SessionAddresses_aggregate?: SessionAddress_aggregate_order_by | null;
+  address?: order_by | null;
+  aliases?: order_by | null;
+  created_at?: order_by | null;
+  description?: order_by | null;
+  id?: order_by | null;
+  locationOptionId?: order_by | null;
+  shortLabel?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by stddev() on columns of table "LocationAddress"
+ */
+export interface LocationAddress_stddev_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "LocationAddress"
+ */
+export interface LocationAddress_stddev_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "LocationAddress"
+ */
+export interface LocationAddress_stddev_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "LocationAddress"
+ */
+export interface LocationAddress_sum_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "LocationAddress"
+ */
+export interface LocationAddress_var_pop_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "LocationAddress"
+ */
+export interface LocationAddress_var_samp_order_by {
+  id?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "LocationAddress"
+ */
+export interface LocationAddress_variance_order_by {
+  id?: order_by | null;
+}
+
 /**
  * Boolean expression to filter rows from the table "LocationOption". All fields are combined with a logical 'AND'.
  */
 export interface LocationOption_bool_exp {
+  LocationAddresses?: LocationAddress_bool_exp | null;
+  LocationAddresses_aggregate?: LocationAddress_aggregate_bool_exp | null;
   Locations?: CourseLocation_bool_exp | null;
   Locations_aggregate?: CourseLocation_aggregate_bool_exp | null;
   _and?: LocationOption_bool_exp[] | null;
@@ -5405,6 +5630,7 @@ export interface LocationOption_enum_comparison_exp {
  * input type for inserting data into table "LocationOption"
  */
 export interface LocationOption_insert_input {
+  LocationAddresses?: LocationAddress_arr_rel_insert_input | null;
   Locations?: CourseLocation_arr_rel_insert_input | null;
   comment?: string | null;
   value?: string | null;
@@ -5425,6 +5651,16 @@ export interface LocationOption_on_conflict {
   constraint: LocationOption_constraint;
   update_columns: LocationOption_update_column[];
   where?: LocationOption_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "LocationOption".
+ */
+export interface LocationOption_order_by {
+  LocationAddresses_aggregate?: LocationAddress_aggregate_order_by | null;
+  Locations_aggregate?: CourseLocation_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
 }
 
 /**
@@ -7042,6 +7278,23 @@ export interface SessionAddress_aggregate_bool_exp_count {
 }
 
 /**
+ * order by aggregate values of table "SessionAddress"
+ */
+export interface SessionAddress_aggregate_order_by {
+  avg?: SessionAddress_avg_order_by | null;
+  count?: order_by | null;
+  max?: SessionAddress_max_order_by | null;
+  min?: SessionAddress_min_order_by | null;
+  stddev?: SessionAddress_stddev_order_by | null;
+  stddev_pop?: SessionAddress_stddev_pop_order_by | null;
+  stddev_samp?: SessionAddress_stddev_samp_order_by | null;
+  sum?: SessionAddress_sum_order_by | null;
+  var_pop?: SessionAddress_var_pop_order_by | null;
+  var_samp?: SessionAddress_var_samp_order_by | null;
+  variance?: SessionAddress_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "SessionAddress"
  */
 export interface SessionAddress_arr_rel_insert_input {
@@ -7050,10 +7303,21 @@ export interface SessionAddress_arr_rel_insert_input {
 }
 
 /**
+ * order by avg() on columns of table "SessionAddress"
+ */
+export interface SessionAddress_avg_order_by {
+  courseLocationId?: order_by | null;
+  id?: order_by | null;
+  locationAddressId?: order_by | null;
+  sessionId?: order_by | null;
+}
+
+/**
  * Boolean expression to filter rows from the table "SessionAddress". All fields are combined with a logical 'AND'.
  */
 export interface SessionAddress_bool_exp {
   CourseLocation?: CourseLocation_bool_exp | null;
+  LocationAddress?: LocationAddress_bool_exp | null;
   Session?: Session_bool_exp | null;
   _and?: SessionAddress_bool_exp[] | null;
   _not?: SessionAddress_bool_exp | null;
@@ -7062,6 +7326,7 @@ export interface SessionAddress_bool_exp {
   courseLocationId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
+  locationAddressId?: Int_comparison_exp | null;
   sessionId?: Int_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
@@ -7071,13 +7336,41 @@ export interface SessionAddress_bool_exp {
  */
 export interface SessionAddress_insert_input {
   CourseLocation?: CourseLocation_obj_rel_insert_input | null;
+  LocationAddress?: LocationAddress_obj_rel_insert_input | null;
   Session?: Session_obj_rel_insert_input | null;
   address?: string | null;
   courseLocationId?: number | null;
   created_at?: any | null;
   id?: number | null;
+  locationAddressId?: number | null;
   sessionId?: number | null;
   updated_at?: any | null;
+}
+
+/**
+ * order by max() on columns of table "SessionAddress"
+ */
+export interface SessionAddress_max_order_by {
+  address?: order_by | null;
+  courseLocationId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  locationAddressId?: order_by | null;
+  sessionId?: order_by | null;
+  updated_at?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "SessionAddress"
+ */
+export interface SessionAddress_min_order_by {
+  address?: order_by | null;
+  courseLocationId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  locationAddressId?: order_by | null;
+  sessionId?: order_by | null;
+  updated_at?: order_by | null;
 }
 
 /**
@@ -7087,6 +7380,76 @@ export interface SessionAddress_on_conflict {
   constraint: SessionAddress_constraint;
   update_columns: SessionAddress_update_column[];
   where?: SessionAddress_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "SessionAddress"
+ */
+export interface SessionAddress_stddev_order_by {
+  courseLocationId?: order_by | null;
+  id?: order_by | null;
+  locationAddressId?: order_by | null;
+  sessionId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "SessionAddress"
+ */
+export interface SessionAddress_stddev_pop_order_by {
+  courseLocationId?: order_by | null;
+  id?: order_by | null;
+  locationAddressId?: order_by | null;
+  sessionId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "SessionAddress"
+ */
+export interface SessionAddress_stddev_samp_order_by {
+  courseLocationId?: order_by | null;
+  id?: order_by | null;
+  locationAddressId?: order_by | null;
+  sessionId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "SessionAddress"
+ */
+export interface SessionAddress_sum_order_by {
+  courseLocationId?: order_by | null;
+  id?: order_by | null;
+  locationAddressId?: order_by | null;
+  sessionId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "SessionAddress"
+ */
+export interface SessionAddress_var_pop_order_by {
+  courseLocationId?: order_by | null;
+  id?: order_by | null;
+  locationAddressId?: order_by | null;
+  sessionId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "SessionAddress"
+ */
+export interface SessionAddress_var_samp_order_by {
+  courseLocationId?: order_by | null;
+  id?: order_by | null;
+  locationAddressId?: order_by | null;
+  sessionId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "SessionAddress"
+ */
+export interface SessionAddress_variance_order_by {
+  courseLocationId?: order_by | null;
+  id?: order_by | null;
+  locationAddressId?: order_by | null;
+  sessionId?: order_by | null;
 }
 
 export interface SessionSpeaker_aggregate_bool_exp {
