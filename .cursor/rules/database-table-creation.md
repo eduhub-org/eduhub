@@ -1,10 +1,12 @@
 ---
-description: Guide for adding new database tables and columns to EduHub
-globs: 
-alwaysApply: false
+description: "Guide for adding new database tables and columns to EduHub"
+globs: ["**/migrations/**/*.sql", "**/metadata/**/*.yaml", "**/queries/**/*.ts"]
+alwaysApply: true
 ---
 
 # Database Table and Column Creation Guide
+
+> **Related Rules**: [GraphQL Integration Patterns](graphql-integration-patterns.mdc) | [Conventional Commits](conventional-commits.mdc) | [Release Management](release-management.mdc)
 
 This guide covers the complete process for adding new database tables and columns to the EduHub project, following established naming conventions and integration patterns.
 

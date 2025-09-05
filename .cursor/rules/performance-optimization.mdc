@@ -1,0 +1,723 @@
+---
+description: "Performance optimization patterns, caching strategies, and bundle optimization for EduHub"
+globs: ["**/performance/**", "**/cache/**", "**/*performance*", "**/webpack*", "**/next.config.js", "**/*optimization*"]
+alwaysApply: true
+---
+
+# Performance Optimization Guide
+
+> **Related Rules**: [Frontend Component Patterns](frontend-component-patterns.mdc) | [GraphQL Integration](graphql-integration-patterns.mdc) | [Component Architecture](component-architecture.mdc) | [TableGrid Advanced Patterns](table-grid-advanced-patterns.mdc)
+
+This guide covers performance optimization strategies for the EduHub application, including frontend optimization, caching strategies, and database performance.
+
+## Frontend Performance Optimization
+
+### React Component Optimization
+
+#### Memoization Patterns
+```typescript
+// ✅ GOOD: Memoize expensive calculations
+const CourseStatistics: React.FC<{ enrollments: Enrollment[] }> = ({ enrollments }) => {
+  const statistics = useMemo(() => {
+    return {
+      totalEnrolled: enrollments.length,
+      activeEnrollments: enrollments.filter(e => e.status === 'ACTIVE').length,
+      completionRate: calculateCompletionRate(enrollments),
+    };
+  }, [enrollments]);
+
+  return <StatisticsDisplay stats={statistics} />;
+};
+
+// ✅ GOOD: Memoize callback functions
+const CourseList: React.FC<{ courses: Course[] }> = ({ courses }) => {
+  const handleCourseSelect = useCallback((courseId: string) => {
+    // Handle selection logic
+    onCourseSelect(courseId);
+  }, [onCourseSelect]);
+
+  const handleEnrollmentUpdate = useCallback((courseId: string, enrollment: Enrollment) => {
+    // Update enrollment logic
+    updateEnrollment(courseId, enrollment);
+  }, [updateEnrollment]);
+
+  return (
+    <div>
+      {courses.map(course => (
+        <CourseCard
+          key={course.id}
+          course={course}
+          onSelect={handleCourseSelect}
+          onEnrollmentUpdate={handleEnrollmentUpdate}
+        />
+      ))}
+    </div>
+  );
+};
+```
+
+#### Component Memoization
+```typescript
+// ✅ GOOD: Memoize components with complex rendering
+const CourseCard: React.FC<CourseCardProps> = React.memo(({ course, onSelect, onEnrollmentUpdate }) => {
+  return (
+    <div className="course-card">
+      <h3>{course.title}</h3>
+      <p>{course.description}</p>
+      <Button onClick={() => onSelect(course.id)}>
+        Select Course
+      </Button>
+    </div>
+  );
+});
+
+// ✅ GOOD: Custom comparison for complex props
+const UserList: React.FC<UserListProps> = React.memo(({ users, filters }) => {
+  // Component implementation
+}, (prevProps, nextProps) => {
+  // Custom comparison logic
+  return (
+    prevProps.users.length === nextProps.users.length &&
+    JSON.stringify(prevProps.filters) === JSON.stringify(nextProps.filters)
+  );
+});
+```
+
+#### Lazy Loading Components
+```typescript
+// ✅ GOOD: Lazy load heavy components
+const HeavyStatisticsPanel = lazy(() => import('./HeavyStatisticsPanel'));
+const ChartComponents = lazy(() => import('./ChartComponents'));
+
+const Dashboard: React.FC = () => {
+  const [showStatistics, setShowStatistics] = useState(false);
+
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      
+      {showStatistics && (
+        <Suspense fallback={<div>Loading statistics...</div>}>
+          <HeavyStatisticsPanel />
+        </Suspense>
+      )}
+      
+      <Suspense fallback={<div>Loading charts...</div>}>
+        <ChartComponents />
+      </Suspense>
+    </div>
+  );
+};
+```
+
+### Virtual Scrolling for Large Lists
+
+#### TableGrid Virtual Scrolling
+```typescript
+// ✅ GOOD: Use pagination for large datasets
+const LargeCourseList: React.FC = () => {
+  const [pageSize, setPageSize] = useState(50);
+  const [pageIndex, setPageIndex] = useState(0);
+
+  const { data, loading, error } = useTableGrid({
+    queryHook: useAdminQuery,
+    query: COURSE_LIST_QUERY,
+    pageSize,
+    refetchFilter: useCallback((searchTerm: string) => ({
+      where: searchTerm ? { title: { _ilike: `%${searchTerm}%` } } : {},
+    }), []),
+  });
+
+  return (
+    <TableGrid
+      data={data?.Course || []}
+      loading={loading}
+      error={error}
+      pageSize={pageSize}
+      onPageSizeChange={setPageSize}
+      pageIndex={pageIndex}
+      onPageChange={setPageIndex}
+      totalCount={data?.Course_aggregate?.aggregate?.count || 0}
+      // ✅ Use reasonable page sizes for performance
+      availablePageSizes={[10, 25, 50, 100]}
+    />
+  );
+};
+```
+
+#### Custom Virtual Scrolling
+```typescript
+// For very large lists that don't fit in TableGrid
+const VirtualizedList: React.FC<{ items: any[]; itemHeight: number }> = ({
+  items,
+  itemHeight,
+}) => {
+  const [scrollTop, setScrollTop] = useState(0);
+  const containerHeight = 400;
+  const visibleCount = Math.ceil(containerHeight / itemHeight);
+  const startIndex = Math.floor(scrollTop / itemHeight);
+  const endIndex = Math.min(startIndex + visibleCount, items.length);
+
+  const visibleItems = items.slice(startIndex, endIndex);
+
+  return (
+    <div
+      style={{ height: containerHeight, overflow: 'auto' }}
+      onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
+    >
+      <div style={{ height: items.length * itemHeight, position: 'relative' }}>
+        {visibleItems.map((item, index) => (
+          <div
+            key={startIndex + index}
+            style={{
+              position: 'absolute',
+              top: (startIndex + index) * itemHeight,
+              height: itemHeight,
+              width: '100%',
+            }}
+          >
+            <ItemComponent item={item} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+```
+
+## Bundle Optimization
+
+### Next.js Configuration
+```javascript
+// next.config.js
+const nextConfig = {
+  // ✅ GOOD: Enable compression
+  compress: true,
+  
+  // ✅ GOOD: Optimize images
+  images: {
+    domains: ['localhost', 'your-cdn-domain.com'],
+    formats: ['image/webp', 'image/avif'],
+  },
+  
+  // ✅ GOOD: Bundle analyzer (development only)
+  webpack: (config, { dev, isServer }) => {
+    if (dev && !isServer) {
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+      config.plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'server',
+          openAnalyzer: false,
+        })
+      );
+    }
+    
+    return config;
+  },
+  
+  // ✅ GOOD: Optimize chunks
+  experimental: {
+    optimizeCss: true,
+    scrollRestoration: true,
+  },
+};
+```
+
+### Dynamic Imports for Code Splitting
+```typescript
+// ✅ GOOD: Dynamic imports for large dependencies
+const loadChartLibrary = async () => {
+  const { Chart } = await import('chart.js');
+  return Chart;
+};
+
+// ✅ GOOD: Dynamic imports for features
+const AdminPanel = dynamic(() => import('./AdminPanel'), {
+  loading: () => <LoadingSpinner />,
+  ssr: false, // Don't server-side render heavy components
+});
+
+// ✅ GOOD: Conditional loading
+const ConditionalComponent: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
+  if (!isAdmin) return null;
+  
+  const AdminFeatures = dynamic(() => import('./AdminFeatures'));
+  return <AdminFeatures />;
+};
+```
+
+### Image Optimization
+```typescript
+// ✅ GOOD: Next.js Image component with optimization
+import Image from 'next/image';
+
+const OptimizedImage: React.FC<{ src: string; alt: string }> = ({ src, alt }) => (
+  <Image
+    src={src}
+    alt={alt}
+    width={400}
+    height={300}
+    placeholder="blur"
+    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+    priority={false}
+    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+  />
+);
+```
+
+## GraphQL Performance Optimization
+
+### Query Optimization
+
+#### Efficient Query Structure
+```typescript
+// ✅ GOOD: Use fragments to avoid duplicating fields
+const COURSE_FRAGMENT = gql`
+  fragment CourseDetails on Course {
+    id
+    title
+    description
+    startTime
+    endTime
+    maxParticipants
+    status
+  }
+`;
+
+const COURSE_LIST_QUERY = gql`
+  ${COURSE_FRAGMENT}
+  query CourseList($limit: Int!, $offset: Int!, $where: Course_bool_exp) {
+    Course(limit: $limit, offset: $offset, where: $where, order_by: { createdAt: desc }) {
+      ...CourseDetails
+      instructor {
+        id
+        firstName
+        lastName
+      }
+    }
+    Course_aggregate(where: $where) {
+      aggregate {
+        count
+      }
+    }
+  }
+`;
+
+// ✅ GOOD: Separate minimal query for lists
+const COURSE_LIST_MINIMAL = gql`
+  query CourseListMinimal($limit: Int!, $offset: Int!) {
+    Course(limit: $limit, offset: $offset) {
+      id
+      title
+      status
+      startTime
+    }
+  }
+`;
+```
+
+#### Pagination and Limiting
+```typescript
+// ✅ GOOD: Always use pagination for lists
+const useCourseList = (pageSize: number = 50) => {
+  const [pageIndex, setPageIndex] = useState(0);
+  
+  const { data, loading, error } = useAdminQuery(COURSE_LIST_QUERY, {
+    variables: {
+      limit: pageSize,
+      offset: pageIndex * pageSize,
+    },
+    // ✅ GOOD: Cache policy for lists
+    fetchPolicy: 'cache-and-network',
+  });
+
+  return {
+    courses: data?.Course || [],
+    totalCount: data?.Course_aggregate?.aggregate?.count || 0,
+    pageIndex,
+    setPageIndex,
+    loading,
+    error,
+  };
+};
+```
+
+### Apollo Client Caching
+
+#### Cache Configuration
+```typescript
+// apolloClient.ts
+import { InMemoryCache } from '@apollo/client';
+
+const cache = new InMemoryCache({
+  typePolicies: {
+    Course: {
+      fields: {
+        // ✅ GOOD: Pagination caching
+        Course: {
+          keyArgs: ['where'],
+          merge(existing = [], incoming, { args }) {
+            const { offset = 0 } = args;
+            const merged = existing ? existing.slice() : [];
+            
+            for (let i = 0; i < incoming.length; ++i) {
+              merged[offset + i] = incoming[i];
+            }
+            
+            return merged;
+          },
+        },
+      },
+    },
+    Query: {
+      fields: {
+        // ✅ GOOD: Cache list queries separately
+        courseList: {
+          keyArgs: ['filters'],
+          merge(existing, incoming) {
+            return incoming;
+          },
+        },
+      },
+    },
+  },
+});
+```
+
+#### Smart Cache Updates
+```typescript
+// ✅ GOOD: Update cache after mutations
+const useUpdateCourse = () => {
+  const [updateCourseMutation] = useRoleMutation(UPDATE_COURSE_MUTATION, {
+    update: (cache, { data }) => {
+      if (!data?.update_Course_by_pk) return;
+
+      // Update individual cache entry
+      cache.modify({
+        id: cache.identify({ __typename: 'Course', id: data.update_Course_by_pk.id }),
+        fields: {
+          title: () => data.update_Course_by_pk.title,
+          description: () => data.update_Course_by_pk.description,
+          updatedAt: () => new Date().toISOString(),
+        },
+      });
+
+      // ✅ GOOD: Invalidate related list queries
+      cache.evict({ fieldName: 'Course' });
+    },
+  });
+
+  return updateCourseMutation;
+};
+```
+
+#### Query Deduplication
+```typescript
+// ✅ GOOD: Avoid duplicate queries
+const useCourseData = (courseId: string) => {
+  return useAdminQuery(COURSE_DETAIL_QUERY, {
+    variables: { id: courseId },
+    skip: !courseId,
+    // ✅ GOOD: Return cached data immediately
+    returnPartialData: true,
+    // ✅ GOOD: Deduplicate identical queries
+    notifyOnNetworkStatusChange: false,
+  });
+};
+```
+
+## Database Performance
+
+### Query Optimization
+
+#### Efficient Hasura Queries
+```sql
+-- ✅ GOOD: Use proper indexes
+CREATE INDEX idx_course_status_start_time ON Course(status, start_time);
+CREATE INDEX idx_enrollment_user_course ON CourseEnrollment(user_id, course_id);
+CREATE INDEX idx_user_email ON User(email) WHERE email IS NOT NULL;
+
+-- ✅ GOOD: Optimize frequently used queries
+CREATE INDEX idx_course_search ON Course USING gin(to_tsvector('english', title || ' ' || description));
+```
+
+#### Aggregation Optimization
+```typescript
+// ✅ GOOD: Use aggregation fields efficiently
+const COURSE_STATISTICS = gql`
+  query CourseStatistics($courseId: Int!) {
+    Course_by_pk(id: $courseId) {
+      id
+      title
+      # ✅ GOOD: Get counts through aggregation
+      enrollments_aggregate {
+        aggregate {
+          count
+        }
+      }
+      sessions_aggregate {
+        aggregate {
+          count
+        }
+      }
+    }
+  }
+`;
+```
+
+### Connection Pooling and Caching
+
+#### Database Connection Management
+```yaml
+# hasura/docker-compose.yml
+services:
+  hasura:
+    environment:
+      # ✅ GOOD: Connection pool settings
+      HASURA_GRAPHQL_DATABASE_URL: postgres://user:pass@db:5432/dbname?sslmode=disable&pool_max_conns=10&pool_min_conns=2
+      # ✅ GOOD: Query timeout
+      HASURA_GRAPHQL_PG_TIMEOUT: 180
+```
+
+#### Redis Caching (if used)
+```typescript
+// Example Redis caching for expensive queries
+const getCachedCourseStatistics = async (courseId: string) => {
+  const cacheKey = `course_stats_${courseId}`;
+  
+  // Try cache first
+  let stats = await redis.get(cacheKey);
+  if (stats) {
+    return JSON.parse(stats);
+  }
+  
+  // Calculate and cache
+  stats = await calculateCourseStatistics(courseId);
+  await redis.setex(cacheKey, 300, JSON.stringify(stats)); // 5-minute cache
+  
+  return stats;
+};
+```
+
+## Image and Asset Optimization
+
+### Image Loading Strategies
+```typescript
+// ✅ GOOD: Progressive image loading
+const ProgressiveImage: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageSrc, setImageSrc] = useState('');
+
+  useEffect(() => {
+    const img = new window.Image();
+    img.onload = () => {
+      setImageSrc(src);
+      setImageLoaded(true);
+    };
+    img.src = src;
+  }, [src]);
+
+  return (
+    <div className="relative">
+      {!imageLoaded && (
+        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+      )}
+      {imageSrc && (
+        <img
+          src={imageSrc}
+          alt={alt}
+          className={`transition-opacity duration-300 ${
+            imageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          onLoad={() => setImageLoaded(true)}
+        />
+      )}
+    </div>
+  );
+};
+```
+
+### Asset Preloading
+```typescript
+// ✅ GOOD: Preload critical resources
+const preloadCriticalAssets = () => {
+  // Preload critical images
+  const criticalImages = ['/logo.svg', '/hero-image.jpg'];
+  criticalImages.forEach(src => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = src;
+    document.head.appendChild(link);
+  });
+
+  // Preload critical fonts
+  const criticalFonts = ['/fonts/inter-var.woff2'];
+  criticalFonts.forEach(src => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'font';
+    link.type = 'font/woff2';
+    link.href = src;
+    link.crossOrigin = 'anonymous';
+    document.head.appendChild(link);
+  });
+};
+```
+
+## Performance Monitoring
+
+### Client-Side Performance Tracking
+```typescript
+// utils/performance.ts
+export const measurePerformance = (name: string, fn: () => void) => {
+  const start = performance.now();
+  fn();
+  const end = performance.now();
+  
+  console.log(`${name} took ${end - start} milliseconds`);
+  
+  // Send to analytics if needed
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'timing_complete', {
+      name: name,
+      value: Math.round(end - start),
+    });
+  }
+};
+
+// Usage
+const handleHeavyOperation = () => {
+  measurePerformance('heavy-calculation', () => {
+    // Heavy operation
+    performHeavyCalculation();
+  });
+};
+```
+
+### React DevTools Profiler Integration
+```typescript
+// ✅ GOOD: Wrap components for profiling
+const ProfiledComponent: React.FC<ComponentProps> = (props) => {
+  return (
+    <Profiler id="ComponentName" onRender={onRenderCallback}>
+      <Component {...props} />
+    </Profiler>
+  );
+};
+
+const onRenderCallback = (
+  id: string,
+  phase: 'mount' | 'update',
+  actualDuration: number,
+  baseDuration: number,
+  startTime: number,
+  commitTime: number
+) => {
+  console.log('Component render:', {
+    id,
+    phase,
+    actualDuration,
+    baseDuration,
+  });
+};
+```
+
+### Core Web Vitals Tracking
+```typescript
+// utils/webVitals.ts
+import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
+
+export const reportWebVitals = () => {
+  getCLS(console.log);
+  getFID(console.log);
+  getFCP(console.log);
+  getLCP(console.log);
+  getTTFB(console.log);
+};
+
+// In _app.tsx
+export function reportWebVitals(metric: any) {
+  console.log(metric);
+  
+  // Send to analytics
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', metric.name, {
+      value: Math.round(metric.value),
+      event_category: 'Web Vitals',
+      event_label: metric.id,
+      non_interaction: true,
+    });
+  }
+}
+```
+
+## Performance Best Practices
+
+### ✅ DO:
+1. **Use React.memo** for components with expensive rendering
+2. **Implement proper pagination** for large data sets
+3. **Use useMemo and useCallback** for expensive calculations
+4. **Lazy load heavy components** that aren't immediately visible
+5. **Optimize images** with Next.js Image component
+6. **Cache GraphQL queries** appropriately
+7. **Use proper database indexes** for frequently queried fields
+8. **Monitor performance metrics** and Core Web Vitals
+9. **Preload critical resources** for better user experience
+10. **Use virtual scrolling** for very large lists
+
+### ❌ AVOID:
+1. **Don't over-memoize** every component unnecessarily
+2. **Don't load all data at once** for large datasets
+3. **Don't ignore bundle size** - monitor and optimize
+4. **Don't skip image optimization** for user-uploaded content
+5. **Don't create memory leaks** with uncleared timers/subscriptions
+6. **Don't render large lists** without pagination or virtualization
+7. **Don't ignore database query performance** - use EXPLAIN ANALYZE
+8. **Don't skip error boundaries** for performance-critical components
+9. **Don't use inline functions** in render methods unnecessarily
+10. **Don't ignore loading states** - always provide user feedback
+
+## Performance Testing
+
+### Load Testing Components
+```typescript
+// __tests__/performance/LargeList.test.tsx
+describe('Performance Tests', () => {
+  it('should render large lists efficiently', async () => {
+    const largeDataset = Array.from({ length: 1000 }, (_, i) => ({
+      id: i,
+      title: `Item ${i}`,
+      description: `Description for item ${i}`,
+    }));
+
+    const start = performance.now();
+    
+    render(<TableGrid data={largeDataset} columns={columns} />);
+    
+    const end = performance.now();
+    const renderTime = end - start;
+    
+    // Should render within reasonable time
+    expect(renderTime).toBeLessThan(100); // 100ms threshold
+  });
+});
+```
+
+### Memory Leak Testing
+```typescript
+// __tests__/performance/memoryLeaks.test.tsx
+describe('Memory Leak Tests', () => {
+  it('should clean up subscriptions', () => {
+    const { unmount } = render(<ComponentWithSubscription />);
+    
+    // Check for cleanup
+    unmount();
+    
+    // Verify no lingering subscriptions
+    expect(mockSubscription.unsubscribe).toHaveBeenCalled();
+  });
+});
+```
+
+This comprehensive performance guide ensures optimal application speed, efficient resource usage, and excellent user experience in EduHub.

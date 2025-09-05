@@ -1,0 +1,287 @@
+---
+description: "Basic TableGrid component usage, setup, pagination, and page size configuration for EduHub"
+globs: ["**/TableGrid/**", "**/*table*", "**/*grid*", "**/components/common/**"]
+alwaysApply: true
+---
+
+# TableGrid Basic Usage Guide
+
+> **Related Rules**: [TableGrid Advanced Patterns](table-grid-advanced-patterns.mdc) | [TableGrid Column Configuration](table-grid-column-configuration.mdc) | [Component Architecture](component-architecture.mdc) | [GraphQL Integration](graphql-integration-patterns.mdc)
+
+The `TableGrid` component ([frontend-nx/apps/edu-hub/components/common/TableGrid/index.tsx](mdc:frontend-nx/apps/edu-hub/components/common/TableGrid/index.tsx)) is a reusable component for displaying data in a sortable, filterable, and paginated table.
+
+Refer to [frontend-nx/apps/edu-hub/components/common/TableGrid/types.ts](mdc:frontend-nx/apps/edu-hub/components/common/TableGrid/types.ts) for all available `TableGridProps`.
+
+## Key Features
+
+*   Global text search
+*   Column sorting
+*   Expandable rows
+*   Bulk actions
+*   Row deletion
+*   Pagination
+*   Page size selection
+
+## Basic Setup
+
+### Required Props for Basic Usage:
+
+*   `data`: Array of data objects to display
+*   `columns`: Array of column definitions
+*   `loading`: Boolean indicating if data is being fetched
+*   `error`: Error object if data fetching failed
+
+### Basic Example:
+
+```typescript
+import { FC, useMemo } from 'react';
+import TableGrid from '../common/TableGrid';
+import { ColumnDef } from '@tanstack/react-table';
+
+interface MyDataRow {
+  id: number;
+  name: string;
+  email: string;
+}
+
+const MyComponent: FC = () => {
+  const data: MyDataRow[] = [
+    { id: 1, name: 'John Doe', email: 'john@example.com' },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
+  ];
+
+  const columns = useMemo<ColumnDef<MyDataRow>[]>(() => [
+    {
+      header: 'ID',
+      accessorKey: 'id',
+      size: 80,
+    },
+    {
+      header: 'Name',
+      accessorKey: 'name',
+      size: 200,
+    },
+    {
+      header: 'Email',
+      accessorKey: 'email',
+      size: 250,
+    },
+  ], []);
+
+  return (
+    <TableGrid<MyDataRow>
+      columns={columns}
+      data={data}
+      loading={false}
+      error={null}
+    />
+  );
+};
+```
+
+## Pagination and Page Size
+
+### Required Props for Pagination:
+
+*   `totalCount`: Total number of items in the dataset
+*   `pageIndex`: Current page index (0-based)
+*   `onPageChange`: Function to handle page changes
+*   `pageSize`: Number of items per page
+*   `onPageSizeChange`: Function to handle page size changes
+
+### Optional Pagination Props:
+
+*   `enablePagination`: Boolean, defaults to `true`
+*   `availablePageSizes`: Array of page size options (defaults to `[10, 20, 50, 100, 500]`)
+
+### Pagination Example:
+
+```typescript
+import { useState, FC, useMemo } from 'react';
+import TableGrid from '../common/TableGrid';
+
+const MyComponent: FC = () => {
+  // State for pagination
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(20);
+
+  const handlePageChange = (newIndex: number) => {
+    setPageIndex(newIndex);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPageIndex(0); // Reset to first page when page size changes
+  };
+
+  return (
+    <TableGrid<MyDataRow>
+      columns={columns}
+      data={currentPageData}
+      loading={loading}
+      error={error}
+      
+      // Pagination props
+      enablePagination={true}
+      totalCount={totalCount}
+      pageIndex={pageIndex}
+      onPageChange={handlePageChange}
+      pageSize={pageSize}
+      onPageSizeChange={handlePageSizeChange}
+      availablePageSizes={[10, 20, 50, 100]}
+    />
+  );
+};
+```
+
+## Column Configuration
+
+### Basic Column Properties:
+
+*   `header`: Column header text
+*   `accessorKey`: Data property key
+*   `size`: Column width in pixels (default: 150px)
+*   `minSize`: Minimum column width (default: 50px)
+*   `maxSize`: Maximum column width (default: 800px)
+
+### Column Sizing Guidelines:
+
+1. **Status/Icon Columns**: 50-100px (narrow indicators)
+2. **Numeric Columns**: 80-150px (IDs, counts, dates)
+3. **Content Columns**: 200-500px (titles, descriptions)
+4. **Action Columns**: 100-200px (buttons, links)
+
+### Column Examples:
+
+```typescript
+const columns = useMemo<ColumnDef<MyDataRow>[]>(() => [
+  {
+    header: 'Status',
+    accessorKey: 'status',
+    size: 80,        // Compact for status indicators
+  },
+  {
+    header: 'Title',
+    accessorKey: 'title', 
+    size: 400,       // Generous for main content
+    minSize: 300,    // Prevent excessive shrinking
+    maxSize: 600,    // Prevent excessive growing
+  },
+  {
+    header: 'Count',
+    accessorKey: 'count',
+    size: 100,       // Narrow for numeric data
+  },
+], []);
+```
+
+## Search Functionality
+
+### Search Props:
+
+*   `searchFilter`: Current search term
+*   `onSearchFilterChange`: Function to handle search changes
+
+### Search Example:
+
+```typescript
+const MyComponent: FC = () => {
+  const [searchFilter, setSearchFilter] = useState('');
+
+  return (
+    <TableGrid<MyDataRow>
+      columns={columns}
+      data={filteredData}
+      loading={loading}
+      error={error}
+      
+      // Search props
+      searchFilter={searchFilter}
+      onSearchFilterChange={setSearchFilter}
+      
+      // Pagination props
+      totalCount={totalCount}
+      pageIndex={pageIndex}
+      onPageChange={setPageIndex}
+      pageSize={pageSize}
+      onPageSizeChange={handlePageSizeChange}
+    />
+  );
+};
+```
+
+## Error Handling
+
+### Error Display:
+
+```typescript
+const MyComponent: FC = () => {
+  const { data, loading, error } = useAdminQuery(MY_QUERY);
+
+  if (error) {
+    return <ErrorMessageDialog error={error} />;
+  }
+
+  return (
+    <TableGrid<MyDataRow>
+      columns={columns}
+      data={data?.items || []}
+      loading={loading}
+      error={error}
+      // ... other props
+    />
+  );
+};
+```
+
+## Translations
+
+### Required Translation Keys:
+
+*   `common:table_grid.items_per_page` - Page size selector label
+*   `common:table_grid.pagination_text` - Pagination text
+
+### Translation Example:
+
+```json
+// locales/de/common.json
+{
+  "table_grid": {
+    "items_per_page": "Einträge pro Seite",
+    "pagination_text": "Zeige {start} bis {end} von {total} Einträgen"
+  }
+}
+```
+
+## Best Practices
+
+### ✅ DO:
+1. **Use TypeScript interfaces** for data row types
+2. **Memoize column definitions** to prevent unnecessary re-renders
+3. **Reset page index** when page size changes
+4. **Handle loading and error states** properly
+5. **Use appropriate column sizes** based on content type
+6. **Provide meaningful column headers** with translations
+
+### ❌ AVOID:
+1. **Don't manage offset manually** - let TableGrid handle pagination
+2. **Don't use legacy `meta.width`** - use `size` property instead
+3. **Don't forget error handling** - always handle GraphQL errors
+4. **Don't skip memoization** - memoize expensive calculations
+5. **Don't hardcode page sizes** - make them configurable
+
+## Common Issues
+
+### Page Size Selector Truncation:
+If the page size selector label is truncated, adjust the `minWidth` in the TableGrid component's `FormControl` styling.
+
+### Missing Translations:
+Ensure all required translation keys are defined in both German and English locale files.
+
+### Performance Issues:
+- Memoize column definitions
+- Use appropriate page sizes
+- Implement proper loading states
+- Consider virtual scrolling for large datasets
+
+This basic guide covers the essential TableGrid usage patterns. For advanced features like GraphQL integration, custom filtering, and complex state management, refer to the [TableGrid Advanced Patterns](table-grid-advanced-patterns.mdc) guide.

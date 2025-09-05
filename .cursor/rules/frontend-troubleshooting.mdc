@@ -1,0 +1,292 @@
+---
+description: "Frontend troubleshooting guide for common issues, Docker problems, and development environment fixes"
+globs: ["**/docker-compose.yml", "**/Dockerfile*", "**/frontend-nx/**", "**/.env*"]
+alwaysApply: true
+---
+
+# Frontend Troubleshooting
+
+> **Related Rules**: [Frontend Environment Setup](frontend-environment-setup.mdc) | [Frontend Development Commands](frontend-development-commands.mdc) | [Frontend Component Patterns](frontend-component-patterns.mdc)
+
+## Docker Environment Issues
+
+### Fresh Start (Recommended for Swiper errors)
+```bash
+# Stop all containers and remove volumes
+docker compose down -v
+
+# Remove all containers and images (nuclear option)
+docker compose down --rmi all --volumes --remove-orphans
+
+# Rebuild and start fresh
+docker compose up --build
+```
+
+### Viewing Logs
+```bash
+# View all logs
+docker compose logs
+
+# View specific service logs
+docker compose logs frontend-nx
+docker compose logs hasura
+
+# Follow logs in real-time
+docker compose logs -f frontend-nx
+```
+
+### Swiper Runtime Errors (Docker Environment)
+**Problem**: `TypeError: can't access property "cssMode", swiper.params is undefined` after container restart.
+
+**Solution**: This is typically caused by container state issues or missing CSS imports. Use the fresh start approach:
+
+```bash
+# Complete fresh start (recommended)
+docker compose down -v
+docker compose up --build
+
+# If the error persists, check the TileSlider component:
+# - Ensure 'swiper/css/navigation' is imported
+# - Verify Swiper initialization with proper error handling
+# - Check for conflicts with Cookiebot consent scripts
+```
+
+**Prevention**: Always use `docker compose down -v` when experiencing runtime errors after container restarts.
+
+## Common Environment Issues
+
+### Wrong Directory Errors
+**Problem**: Yarn commands create cache files in the wrong directory or fail with "script not found" errors.
+
+**Solution**: Always use the environment variable pattern:
+```bash
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn [command]
+```
+
+**Prevention**: Set `EDUHUB_ROOT` permanently (see Environment Setup section in frontend-environment-setup.mdc).
+
+### Yarn Cache in Wrong Location
+**Problem**: Thousands of files created in `.yarn/cache` at project root instead of `frontend-nx/.yarn/cache`.
+
+**Solution**: Clean up and use correct directory:
+```bash
+# Remove incorrectly created files from project root
+rm -rf .yarn/ yarn.lock
+
+# Set environment variable and run from correct directory
+export EDUHUB_ROOT="$(pwd)"
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn install
+```
+
+### Build Failures After Dependency Updates
+**Problem**: TypeScript errors or build failures after updating packages.
+
+**Solution**: Clear cache and reinstall:
+```bash
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx
+yarn cache clean
+yarn install
+yarn build
+```
+
+### Permission Errors
+**Problem**: Permission denied when installing dependencies.
+
+**Solution**: Check yarn version and node permissions:
+```bash
+yarn --version  # Should be 3.4.1+
+node --version  # Should be 20.x+
+# Avoid using sudo with yarn
+```
+
+## Development Issues
+
+### Hot Reload Not Working
+**Problem**: Changes to TypeScript/React files don't automatically reload.
+
+**Solutions**:
+1. **Check if dev server is running**: `docker compose logs frontend-nx`
+2. **Restart the frontend container**: `docker compose restart frontend-nx`
+3. **Full restart**: `docker compose down && docker compose up`
+
+### TypeScript Errors Not Clearing
+**Problem**: TypeScript errors persist even after fixing the code.
+
+**Solutions**:
+1. **Restart TypeScript service** in your IDE
+2. **Clear Next.js cache**: `rm -rf .next`
+3. **Regenerate GraphQL types**: `sudo bash regenerate-apollo.sh $USER`
+
+### GraphQL Schema Issues
+**Problem**: GraphQL queries fail or types are missing.
+
+**Solutions**:
+1. **Check Hasura is running**: `docker compose logs hasura`
+2. **Apply metadata**: `hasura metadata apply` (from backend directory)
+3. **Regenerate types**: `sudo bash regenerate-apollo.sh $USER`
+
+### Authentication Issues
+**Problem**: Login/logout not working or Keycloak errors.
+
+**Solutions**:
+1. **Check Keycloak is running**: `docker compose logs keycloak`
+2. **Access Keycloak admin**: http://localhost:28080 (admin/admin)
+3. **Check realm configuration** in Keycloak admin console
+
+## Performance Issues
+
+### Slow Build Times
+**Problem**: Builds take too long or hang.
+
+**Solutions**:
+1. **Increase Docker resources** (memory/CPU)
+2. **Use build cache**: `docker compose up --build`
+3. **Check for infinite loops** in useEffect hooks
+
+### Memory Issues
+**Problem**: Out of memory errors during development.
+
+**Solutions**:
+1. **Increase Docker memory limit**
+2. **Close unused containers**: `docker compose down`
+3. **Clear Docker cache**: `docker system prune`
+
+## Network Issues
+
+### Port Conflicts
+**Problem**: Port already in use errors.
+
+**Solutions**:
+1. **Check what's using the port**: `lsof -i :5000`
+2. **Kill the process**: `kill -9 <PID>`
+3. **Use different ports** in docker-compose.yml
+
+### Database Connection Issues
+**Problem**: Can't connect to database or Hasura.
+
+**Solutions**:
+1. **Check database is running**: `docker compose logs db_hasura`
+2. **Reset database**: `docker compose down -v && docker compose up`
+3. **Check connection strings** in environment variables
+
+## File System Issues
+
+### Permission Denied Errors
+**Problem**: Can't write to files or directories.
+
+**Solutions**:
+1. **Check file ownership**: `ls -la`
+2. **Fix permissions**: `chmod 755 <directory>`
+3. **Use correct user**: `docker compose exec frontend-nx whoami`
+
+### File Not Found Errors
+**Problem**: Files missing or paths incorrect.
+
+**Solutions**:
+1. **Check file exists**: `ls -la <path>`
+2. **Use absolute paths**: `${EDUHUB_ROOT:-$PWD}/frontend-nx`
+3. **Verify working directory**: `pwd`
+
+## Quick Diagnostic Commands
+
+### System Status
+```bash
+# Check all containers
+docker compose ps
+
+# Check container health
+docker compose logs --tail=50 frontend-nx
+
+# Check disk space
+df -h
+
+# Check memory usage
+free -h
+```
+
+### Frontend Specific
+```bash
+# Check if dev server is responding
+curl http://localhost:5000
+
+# Check TypeScript compilation
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && npx tsc --noEmit
+
+# Check linting
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn lint
+```
+
+### Database Specific
+```bash
+# Check database connection
+docker compose exec db_hasura psql -U postgres -d postgres -c "SELECT 1;"
+
+# Check Hasura health
+curl http://localhost:8080/healthz
+
+# Check Keycloak health
+curl http://localhost:28080/health
+```
+
+## Emergency Recovery
+
+### Complete Reset
+If nothing else works, perform a complete reset:
+
+```bash
+# Stop everything
+docker compose down -v
+
+# Remove all containers and images
+docker compose down --rmi all --volumes --remove-orphans
+
+# Clean Docker system
+docker system prune -a
+
+# Rebuild from scratch
+docker compose up --build
+```
+
+### Backup Important Data
+Before doing a complete reset, backup any important data:
+
+```bash
+# Backup database
+docker compose exec db_hasura pg_dump -U postgres postgres > backup.sql
+
+# Backup uploaded files
+docker compose exec frontend-nx tar -czf /tmp/uploads.tar.gz /app/public/uploads
+```
+
+## Getting Help
+
+### Log Collection
+When reporting issues, collect these logs:
+
+```bash
+# System information
+docker --version
+docker compose --version
+node --version
+yarn --version
+
+# Container logs
+docker compose logs frontend-nx > frontend.log
+docker compose logs hasura > hasura.log
+docker compose logs db_hasura > database.log
+
+# System resources
+df -h > disk-usage.txt
+free -h > memory-usage.txt
+```
+
+### Common Error Messages and Solutions
+
+| Error Message | Likely Cause | Solution |
+|---------------|--------------|----------|
+| `Port 5000 is already in use` | Another service using port | Kill process or change port |
+| `Cannot find module` | Missing dependencies | Run `yarn install` |
+| `TypeError: swiper.params is undefined` | Swiper initialization issue | Restart containers |
+| `GraphQL error: relation does not exist` | Database schema issue | Apply migrations |
+| `Permission denied` | File permission issue | Fix file ownership |
+| `Out of memory` | Insufficient resources | Increase Docker memory |
