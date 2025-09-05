@@ -1,7 +1,7 @@
 ---
 description: "Basic TableGrid component usage, setup, pagination, and page size configuration for EduHub"
-globs: ["**/TableGrid/**", "**/*table*", "**/*grid*", "**/components/common/**"]
-alwaysApply: true
+globs: ["**/TableGrid/**", "**/*table*", "**/*grid*", "**/components/common/TableGrid/**"]
+alwaysApply: false
 ---
 
 # TableGrid Basic Usage Guide

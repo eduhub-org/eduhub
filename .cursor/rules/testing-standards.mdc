@@ -1,7 +1,7 @@
 ---
 description: "Testing standards, patterns, and best practices for EduHub codebase including Jest, React Testing Library, and integration testing"
-globs: ["**/*.test.*", "**/*.spec.*", "**/__tests__/**", "**/jest.config.*", "**/test/**"]
-alwaysApply: true
+globs: ["**/*.test.*", "**/*.spec.*", "**/__tests__/**", "**/jest.config.*", "**/test/**", "**/jest.setup.*"]
+alwaysApply: false
 ---
 
 # Testing Standards

@@ -1,7 +1,7 @@
 ---
 description: "Frontend environment setup, Docker configuration, and development environment for EduHub"
-globs: ["**/docker-compose.yml", "**/Dockerfile*", "**/frontend-nx/**", "**/.env*"]
-alwaysApply: true
+globs: ["**/docker-compose.yml", "**/Dockerfile*", "**/frontend-nx/**", "**/.env*", "**/Dockerfile-dev*"]
+alwaysApply: false
 ---
 
 # Frontend Environment Setup

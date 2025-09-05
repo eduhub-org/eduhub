@@ -1,7 +1,7 @@
 ---
 description: "GraphQL integration patterns, query/mutation structure, error handling, and caching strategies for EduHub"
-globs: ["**/queries/**", "**/hooks/**", "**/*.ts", "**/*.tsx"]
-alwaysApply: true
+globs: ["**/queries/**", "**/hooks/authedMutation.ts", "**/*graphql*", "**/*apollo*", "**/hooks/authedQuery.ts"]
+alwaysApply: false
 ---
 
 # GraphQL Integration Patterns

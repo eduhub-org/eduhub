@@ -1,7 +1,7 @@
 ---
 description: "Frontend development commands, build workflows, and testing procedures for EduHub"
-globs: ["**/package.json", "**/yarn.lock", "**/nx.json", "**/.github/workflows/**"]
-alwaysApply: true
+globs: ["**/package.json", "**/yarn.lock", "**/nx.json", "**/.github/workflows/**", "**/frontend-nx/**"]
+alwaysApply: false
 ---
 
 # Frontend Development Commands

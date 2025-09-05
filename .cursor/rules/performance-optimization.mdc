@@ -1,7 +1,7 @@
 ---
 description: "Performance optimization patterns, caching strategies, and bundle optimization for EduHub"
-globs: ["**/performance/**", "**/cache/**", "**/*performance*", "**/webpack*", "**/next.config.js", "**/*optimization*"]
-alwaysApply: true
+globs: ["**/performance/**", "**/cache/**", "**/*performance*", "**/webpack*", "**/next.config.js", "**/*optimization*", "**/bundle*"]
+alwaysApply: false
 ---
 
 # Performance Optimization Guide

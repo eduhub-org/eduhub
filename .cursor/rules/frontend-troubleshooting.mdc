@@ -1,7 +1,7 @@
 ---
 description: "Frontend troubleshooting guide for common issues, Docker problems, and development environment fixes"
-globs: ["**/docker-compose.yml", "**/Dockerfile*", "**/frontend-nx/**", "**/.env*"]
-alwaysApply: true
+globs: ["**/docker-compose.yml", "**/Dockerfile*", "**/frontend-nx/**", "**/.env*", "**/Dockerfile-dev*"]
+alwaysApply: false
 ---
 
 # Frontend Troubleshooting
