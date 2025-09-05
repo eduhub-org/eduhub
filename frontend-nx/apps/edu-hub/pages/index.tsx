@@ -24,7 +24,7 @@ import { CoursesEnrolledByUser } from '../queries/__generated__/CoursesEnrolledB
 import { AppSettings } from '../queries/__generated__/AppSettings';
 
 const Home: FC = () => {
-  const { t } = useTranslation('start-page');
+  const { t, lang } = useTranslation('start-page');
   const isLoggedIn = useIsLoggedIn();
   const isInstructor = useIsInstructor();
   const isAdmin = useIsAdmin();
@@ -104,10 +104,78 @@ const Home: FC = () => {
   return (
     <>
       <Head>
+        {/* Basic Meta Tags */}
         <title>EduHub | opencampus.sh</title>
+        <meta name="description" content={t('seo.metaDescription')} />
+        <meta name="keywords" content={t('seo.keywords')} />
+        <meta name="author" content="opencampus.sh" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://edu.opencampus.sh" />
         <link rel="icon" href="/favicon.png" />
+        
+        {/* Open Graph Meta Tags */}
+        <meta property="og:type" content="website" />
         <meta property="og:title" content="EduHub | opencampus.sh" />
+        <meta property="og:description" content={t('seo.ogDescription')} />
+        <meta property="og:url" content="https://edu.opencampus.sh" />
+        <meta property="og:site_name" content="EduHub" />
         <meta property="og:image" content="https://edu.opencampus.sh/images/edu_WISE23_HeaderWebsitePreview.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="EduHub Learning Platform - Tech, Business and Creative Courses" />
+        <meta property="og:locale" content={lang === 'de' ? 'de_DE' : 'en_US'} />
+        
+        {/* Twitter Card Meta Tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="EduHub | opencampus.sh" />
+        <meta name="twitter:description" content={t('seo.twitterDescription')} />
+        <meta name="twitter:image" content="https://edu.opencampus.sh/images/edu_WISE23_HeaderWebsitePreview.png" />
+        <meta name="twitter:image:alt" content="EduHub Learning Platform - Tech, Business and Creative Courses" />
+        <meta name="twitter:site" content="@opencampus_sh" />
+        <meta name="twitter:creator" content="@opencampus_sh" />
+        
+        {/* Additional SEO Meta Tags */}
+        <meta name="theme-color" content="#0F0F0F" />
+        <meta name="msapplication-TileColor" content="#0F0F0F" />
+        <meta name="apple-mobile-web-app-title" content="EduHub" />
+        <meta name="application-name" content="EduHub" />
+        
+        {/* Structured Data - JSON-LD */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "EducationalOrganization",
+              "name": "EduHub",
+              "alternateName": "EduHub by opencampus.sh",
+              "url": "https://edu.opencampus.sh",
+              "logo": "https://edu.opencampus.sh/favicon.png",
+              "description": t('seo.metaDescription'),
+              "founder": {
+                "@type": "Organization",
+                "name": "Campus Business Box e.V. // opencampus.sh"
+              },
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Fraunhoferstr. 13",
+                "addressLocality": "Kiel",
+                "postalCode": "24118",
+                "addressCountry": "DE"
+              },
+              "sameAs": [
+                "https://www.instagram.com/opencampus_sh/",
+                "https://de-de.facebook.com/opencampus.sh/",
+                "https://twitter.com/opencampus_sh"
+              ],
+              "offers": {
+                "@type": "Offer",
+                "category": "Educational Courses",
+                "description": "Online courses in technology, business, and creative fields"
+              }
+            })
+          }}
+        />
       </Head>
       <Page className="text-white">
         <div
