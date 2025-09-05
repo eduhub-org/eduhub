@@ -1,257 +1,294 @@
-# EduHub Email System Development Guide
-
-## System Overview
-
-The EduHub email system is **fully automated** using Hasura event triggers. No manual email sending from the frontend.
-
-### Core Components
-
-1. **[functions/callNodeFunction/sendEnrollmentEmail/index.js](mdc:functions/callNodeFunction/sendEnrollmentEmail/index.js)** - Sends emails on enrollment status changes
-2. **[functions/callNodeFunction/sendSessionReminders/index.js](mdc:functions/callNodeFunction/sendSessionReminders/index.js)** - Sends reminders for FIRST sessions only
-3. **[backend/metadata/databases/default/tables/public_CourseEnrollment.yaml](mdc:backend/metadata/databases/default/tables/public_CourseEnrollment.yaml)** - Event trigger configuration
-4. **[backend/metadata/cron_triggers.yaml](mdc:backend/metadata/cron_triggers.yaml)** - Session reminder scheduling
-
-## Email Function Development Rules
-
-### Function Structure
-```javascript
-export default async function functionName(req, logger) {
-  logger.info("########## Function Name ##########");
-  
-  try {
-    // Input validation
-    // GraphQL client setup
-    // Business logic
-    // Email template processing
-    // Variable replacement
-    // MailLog insertion
-    
-    return {
-      success: true,
-      messageKey: 'SUCCESS_KEY',
-      // ... other response fields
-    };
-  } catch (error) {
-    logger.error(`Error: ${error.message}`, { error });
-    return {
-      success: false,
-      error: error.message,
-      messageKey: 'ERROR_KEY'
-    };
-  }
-}
-```
-
-### Status Mapping (sendEnrollmentEmail)
-- `APPLIED` → `APPLICATION_RECEIVED` template
-- `CONFIRMED` → `APPLICATION_CONFIRMED` template  
-- `INVITED` → `INVITE` template
-- `REJECTED` → `DECLINE` template
-- `REGISTERED` → `REGISTRATION_CONFIRMED` template
-
-### Session Reminders (sendSessionReminders)
-- **CRITICAL**: Only send reminders for the FIRST session in each course
-- Three reminder windows: 24h, 1h, 15m (with tolerance)
-- Use MailLog metadata for duplicate prevention
-- Filter: `sessionInWindow.id === firstSessionInCourse.id`
-
-### Variable Replacement System
-
-**CRITICAL**: Use the centralized email template variable system from `emailTemplateVariables.js`:
-
-```javascript
-import { createEnrollmentVariableReplacer, createSessionVariableReplacer } from '../emailTemplateVariables.js';
-
-// For enrollment emails
-const replaceVariables = createEnrollmentVariableReplacer(enrollmentDetails, formatDate);
-
-// For session reminders  
-const replaceVariables = createSessionVariableReplacer(session, enrollment, {
-  startDateTime: sessionStart.toLocaleString(),
-  duration,
-  reminderText,
-  reminderTime
-});
-```
-
-**Benefits**:
-- ✅ Centralized variable management
-- ✅ Automatic locale-based date formatting  
-- ✅ Template validation
-- ✅ Type safety and error prevention
-- ✅ Single source of truth
-
-## Testing Guidelines
-
-### Test File Structure
-```
-functions/callNodeFunction/
-├── functionName/
-│   ├── __tests__/functionName.test.js
-│   └── index.js
-└── __tests__/
-    ├── helpers/mockData.js
-    └── integration.test.js
-```
-
-### Test Setup Pattern
-```javascript
-import { jest } from '@jest/globals';
-
-const mockLogger = {
-  info: jest.fn(),
-  debug: jest.fn(),
-  error: jest.fn(),
-  warn: jest.fn()
-};
-
-describe('FunctionName', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('should load and be a function', async () => {
-    const { default: functionName } = await import('../index.js');
-    expect(typeof functionName).toBe('function');
-  });
-});
-```
-
-### Testing Commands
-```bash
-cd functions/callNodeFunction
-
-# Run all tests
-npm test
-
-# Run with coverage  
-npm run test:coverage
-
-# Watch mode for development
-npm run test:watch
-
-# Run specific test
-npm test -- --testNamePattern="should handle DELETE operations"
-```
-
-### Mock Data Usage
-Use shared mock data from **[functions/callNodeFunction/__tests__/helpers/mockData.js](mdc:functions/callNodeFunction/__tests__/helpers/mockData.js)**:
-```javascript
-import {
-  mockUsers,
-  mockCourses,
-  mockSessions,
-  createHasuraEventRequest
-} from './helpers/mockData.js';
-```
-
-## Frontend Integration Rules
-
-### ApplicationsTab Component
-**[frontend-nx/apps/edu-hub/components/pages/ManageCourseContent/ApplicationsTab/index.tsx](mdc:frontend-nx/apps/edu-hub/components/pages/ManageCourseContent/ApplicationsTab/index.tsx)** should:
-
-- ✅ Update enrollment status only
-- ❌ NOT send emails manually
-- ❌ NOT use `insertMailLogMutation`
-- ✅ Let event triggers handle emails automatically
-
-### Simplified Flow
-```typescript
-const handleSendInvitesAndRejections = async () => {
-  // 1. Update enrollment statuses to INVITED/REJECTED
-  await updateEnrollmentStatuses(decisions);
-  
-  // 2. Event triggers fire automatically
-  // 3. Emails sent via sendEnrollmentEmail function
-  // 4. No manual email logic needed
-};
-```
-
-## Database Schema Considerations
-
-### Event Trigger Requirements
-- Trigger on `status` column changes in `CourseEnrollment` table
-- Must include `old` and `new` data in trigger payload
-- Function called via `callNodeFunction` action
-
-### MailLog Metadata Structure
-```json
-{
-  "type": "ENROLLMENT_STATUS_EMAIL" | "SESSION_REMINDER",
-  "enrollmentId": number,
-  "userId": string,
-  "courseId": number,
-  "status": string,
-  "reminderType": "24_HOURS" | "1_HOUR" | "15_MINUTES", // for reminders only
-  "sessionId": number, // for reminders only
-  "sentAt": string
-}
-```
-
-## Common Pitfalls to Avoid
-
-1. **❌ Don't send emails manually from frontend**
-2. **❌ Don't send reminders for all sessions** (only first session)
-3. **❌ Don't forget duplicate prevention** (check MailLog metadata)
-4. **❌ Don't hardcode email templates** (use database templates)
-5. **❌ Don't forget error handling** (always return proper response format)
-6. **❌ Don't use manual variable replacement** (use centralized system)
-7. **❌ Don't hardcode date formats** (use timezone-based formatting)
-8. **✅ Always use centralized variable replacement functions**
-9. **✅ Always log start and completion messages**
-10. **✅ Always include metadata in MailLog for tracking**
-11. **✅ Always validate templates against known variables**
-
-## Email Template Variables Reference
-
-**IMPORTANT**: All variables are managed centrally in `emailTemplateVariables.js`. See **[`functions/callNodeFunction/EMAIL_TEMPLATE_VARIABLES.md`](functions/callNodeFunction/EMAIL_TEMPLATE_VARIABLES.md)** for complete documentation.
-
-### Quick Reference
-
-#### User Variables (All emails)
-- `[User:Firstname]` - User's first name
-- `[User:LastName]` - User's last name  
-
-#### Course Variables (Enrollment emails)
-- `[Enrollment:CourseId--Course:Name]` - Course title
-- `[Course:StartTime]` - Course start date (auto-formatted by timezone)
-- `[Course:EndTime]` - Course end date (auto-formatted by timezone)
-
-#### Enrollment Variables (Enrollment emails)
-- `[Enrollment:CreatedAt]` - Application date (auto-formatted)
-- `[Enrollment:ExpirationDate]` - Invitation expiration (auto-formatted)
-- `[Enrollment:CourseLink]` - Link to course page
-
-#### Session Variables (Reminder emails)
-- `[Session:Title]` - Session title
-- `[Session:StartDateTime]` - Session start time
-- `[Session:Duration]` - Session duration (calculated)
-- `[Session:ReminderText]` - "starts tomorrow", "starts in 1 hour", etc.
-- `[Session:ReminderTime]` - "tomorrow", "in 1 hour", etc.
-
-### Date Formatting
-All dates automatically formatted by app timezone:
-- **Europe/Berlin** → `15. Januar 2024`
-- **Europe/London** → `15 January 2024`  
-- **America/New_York** → `January 15, 2024`
-
-## Performance Considerations
-
-- Use GraphQL query limits and filters effectively
-- Implement proper pagination for large datasets
-- Use MailLog metadata queries efficiently to prevent duplicates
-- Handle timeouts gracefully (default: 10 seconds for tests)
-
-## Deployment Checklist
-
-1. ✅ Email templates exist in database
-2. ✅ Event triggers configured correctly  
-3. ✅ Cron jobs scheduled for session reminders
-4. ✅ Environment variables set properly
-5. ✅ Tests passing (`npm test`)
-6. ✅ Coverage folder added to `.gitignore`
-7. ✅ Frontend uses status updates only (no manual emails)
-description:
-globs:
-alwaysApply: false
 ---
+description: "Email system configuration and usage patterns for EduHub"
+globs: ["**/functions/sendMail/**", "**/functions/callNodeFunction/**", "**/emailTemplates/**", "**/*email*"]
+alwaysApply: true
+---
+
+# EduHub Email System
+
+> **Related Rules**: [Testing Standards](testing-standards.mdc) | [Database Table Creation](database-table-creation.md) | [Conventional Commits](conventional-commits.mdc)
+
+EduHub uses a serverless email system with multiple functions for different types of email notifications and templates.
+
+## Email Architecture
+
+### Email Function Structure
+```
+functions/
+├── sendMail/                    # Core email sending function
+│   ├── index.js                # Main email handler
+│   └── package.json           # Dependencies
+├── callNodeFunction/           # Email template processing
+│   ├── sendEnrollmentEmail/    # Course enrollment emails
+│   ├── sendSessionReminders/   # Session reminder emails
+│   ├── emailTemplateVariables.js  # Template variable definitions
+│   └── EMAIL_TEMPLATE_VARIABLES.md # Documentation
+└── callPythonFunction/         # Python email functions
+```
+
+### Email Types and Functions
+
+#### 1. Course Enrollment Emails
+**Function**: `callNodeFunction/sendEnrollmentEmail/`
+- **Trigger**: User enrollment in courses
+- **Templates**: Application received, approval notifications, rejection notifications
+- **Variables**: `{{courseTitle}}`, `{{firstName}}`, `{{lastName}}`, `{{applicationDate}}`
+
+#### 2. Session Reminder Emails
+**Function**: `callNodeFunction/sendSessionReminders/`
+- **Trigger**: Scheduled reminders before course sessions
+- **Templates**: Session reminders, cancellation notifications
+- **Variables**: `{{sessionTitle}}`, `{{sessionDate}}`, `{{sessionTime}}`, `{{location}}`
+
+#### 3. General Notifications
+**Function**: `sendMail/`
+- **Trigger**: Manual or system-triggered notifications
+- **Templates**: Custom email content
+- **Variables**: Dynamic based on content
+
+## Email Template System
+
+### Template Structure
+```javascript
+// Example template object
+const emailTemplate = {
+  name: 'APPLICATION_RECEIVED',
+  subject: 'Application Received - {{courseTitle}}',
+  content: `
+    Dear {{firstName}},
+    
+    Your application for {{courseTitle}} has been received and is under review.
+    
+    Best regards,
+    EduHub Team
+  `,
+  variables: ['firstName', 'lastName', 'courseTitle', 'applicationDate']
+};
+```
+
+### Available Template Variables
+See [EMAIL_TEMPLATE_VARIABLES.md](mdc:functions/callNodeFunction/EMAIL_TEMPLATE_VARIABLES.md) for complete list:
+
+**User Variables**:
+- `{{firstName}}`, `{{lastName}}`, `{{email}}`
+- `{{userId}}`, `{{userProfile}}`
+
+**Course Variables**:
+- `{{courseTitle}}`, `{{courseDescription}}`
+- `{{instructorName}}`, `{{courseStartDate}}`
+- `{{applicationDeadline}}`, `{{maxParticipants}}`
+
+**Session Variables**:
+- `{{sessionTitle}}`, `{{sessionDate}}`, `{{sessionTime}}`
+- `{{sessionLocation}}`, `{{sessionDescription}}`
+- `{{meetingLink}}`, `{{sessionDuration}}`
+
+**System Variables**:
+- `{{currentDate}}`, `{{portalUrl}}`
+- `{{supportEmail}}`, `{{organizationName}}`
+
+## Email Function Usage
+
+### Sending Enrollment Emails
+```javascript
+// GraphQL mutation trigger
+const { data } = await client.mutate({
+  mutation: SEND_ENROLLMENT_EMAIL,
+  variables: {
+    userId: user.id,
+    courseId: course.id,
+    emailType: 'APPLICATION_RECEIVED'
+  }
+});
+```
+
+### Sending Session Reminders
+```javascript
+// Scheduled function call
+const reminderResult = await callNodeFunction({
+  functionName: 'sendSessionReminders',
+  payload: {
+    sessionId: session.id,
+    reminderType: 'SESSION_REMINDER_24H'
+  }
+});
+```
+
+### Custom Email Sending
+```javascript
+// Direct sendMail function usage
+const emailResult = await sendMail({
+  to: user.email,
+  subject: 'Custom Notification',
+  content: 'Email content with {{variable}} substitution',
+  variables: {
+    variable: 'actual value'
+  }
+});
+```
+
+## Email Configuration
+
+### SMTP Settings
+Email configuration is managed through environment variables:
+- `SMTP_HOST`: Email server hostname
+- `SMTP_PORT`: Email server port (usually 587 for TLS)
+- `SMTP_USER`: Authentication username
+- `SMTP_PASSWORD`: Authentication password
+- `SMTP_FROM`: Default sender email address
+
+### Template Management
+Templates are stored in the database and can be managed through:
+1. **Admin Interface**: Web-based template editor
+2. **Database Direct**: SQL updates to email_templates table
+3. **Migration Scripts**: Version-controlled template updates
+
+## Testing Email Functions
+
+### Unit Testing
+```javascript
+// Example test for email function
+describe('sendEnrollmentEmail', () => {
+  it('should send application received email', async () => {
+    const mockUser = { id: 1, firstName: 'John', email: 'john@example.com' };
+    const mockCourse = { id: 1, title: 'Test Course' };
+    
+    const result = await sendEnrollmentEmail({
+      user: mockUser,
+      course: mockCourse,
+      emailType: 'APPLICATION_RECEIVED'
+    });
+    
+    expect(result.success).toBe(true);
+    expect(result.emailSent).toBe(true);
+  });
+});
+```
+
+### Integration Testing
+```javascript
+// Test with actual email templates
+describe('Email Template Integration', () => {
+  it('should process template variables correctly', async () => {
+    const template = await getEmailTemplate('APPLICATION_RECEIVED');
+    const processedContent = processTemplateVariables(template.content, {
+      firstName: 'John',
+      courseTitle: 'Test Course'
+    });
+    
+    expect(processedContent).toContain('Dear John');
+    expect(processedContent).toContain('Test Course');
+  });
+});
+```
+
+## Error Handling
+
+### Email Sending Errors
+```javascript
+const sendEmailWithRetry = async (emailData, maxRetries = 3) => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await sendMail(emailData);
+      return { success: true, result };
+    } catch (error) {
+      console.error(`Email attempt ${attempt} failed:`, error.message);
+      
+      if (attempt === maxRetries) {
+        return {
+          success: false,
+          error: error.message,
+          attempts: attempt
+        };
+      }
+      
+      // Wait before retry (exponential backoff)
+      await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempt)));
+    }
+  }
+};
+```
+
+### Template Processing Errors
+```javascript
+const safeTemplateProcessing = (template, variables) => {
+  try {
+    return processTemplateVariables(template, variables);
+  } catch (error) {
+    console.error('Template processing error:', error);
+    // Return template with unprocessed variables as fallback
+    return template;
+  }
+};
+```
+
+## Monitoring and Logging
+
+### Email Delivery Tracking
+```javascript
+// Log email sending attempts
+const logEmailAttempt = (emailData, result) => {
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    recipient: emailData.to,
+    subject: emailData.subject,
+    success: result.success,
+    error: result.error || null,
+    templateUsed: emailData.templateName || null
+  };
+  
+  console.log('Email attempt:', JSON.stringify(logEntry));
+};
+```
+
+### Email Analytics
+Track email effectiveness through:
+1. **Delivery rates**: Successful vs failed sends
+2. **Template usage**: Most commonly used templates
+3. **Error patterns**: Common failure reasons
+4. **Response times**: Email processing duration
+
+## Best Practices
+
+### Template Design
+1. **Use semantic variable names**: `{{courseTitle}}` not `{{ct}}`
+2. **Provide fallback content**: Handle missing variables gracefully
+3. **Test with real data**: Use production-like test data
+4. **Keep templates maintainable**: Avoid complex logic in templates
+5. **Version control templates**: Track template changes through migrations
+
+### Function Development
+1. **Validate input parameters**: Check required fields before processing
+2. **Implement proper error handling**: Use try-catch and meaningful error messages
+3. **Log important events**: Track email sends, failures, and processing times
+4. **Use environment variables**: Keep configuration flexible
+5. **Test thoroughly**: Unit tests, integration tests, and manual testing
+
+### Security Considerations
+1. **Validate email addresses**: Prevent injection attacks
+2. **Sanitize template variables**: Escape user input in templates
+3. **Protect SMTP credentials**: Use secure environment variable storage
+4. **Rate limiting**: Prevent email spam through throttling
+5. **Authentication**: Verify sender authorization for sensitive emails
+
+## Common Issues and Solutions
+
+### Email Not Sending
+1. **Check SMTP configuration**: Verify credentials and server settings
+2. **Validate recipient email**: Ensure email format is correct
+3. **Check function logs**: Review error messages in function logs
+4. **Test connectivity**: Ensure network access to SMTP server
+
+### Template Variables Not Replaced
+1. **Verify variable names**: Ensure exact match with template variables
+2. **Check variable data**: Confirm variables contain expected values
+3. **Review template syntax**: Ensure proper `{{variable}}` format
+4. **Test template processing**: Isolate template processing for debugging
+
+### Function Timeout Issues
+1. **Optimize template processing**: Reduce complex template operations
+2. **Implement async operations**: Use proper async/await patterns
+3. **Add timeout handling**: Set reasonable timeout limits
+4. **Monitor function performance**: Track execution times
+
+This comprehensive email system enables reliable, templated email communication throughout the EduHub platform while maintaining flexibility and monitoring capabilities.

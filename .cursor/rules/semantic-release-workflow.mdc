@@ -1,8 +1,12 @@
 ---
 description: "Semantic release workflow, branch strategy, and automated versioning process for EduHub"
+globs: ["**/*"]
+alwaysApply: true
 ---
 
 # Semantic Release Workflow
+
+> **Related Rules**: [Conventional Commits](conventional-commits.mdc) | [Release Management](release-management.mdc) | [Database Table Creation](database-table-creation.md)
 
 EduHub uses automated semantic versioning with a three-branch workflow for consistent release management.
 

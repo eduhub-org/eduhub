@@ -1,9 +1,12 @@
 ---
-globs: .git/*,*.md,*.json
 description: "Conventional commit standards and their semantic versioning impact"
+globs: ["**/*.md", "**/package.json", "**/.releaserc.json", "**/CHANGELOG.md"]
+alwaysApply: true
 ---
 
 # Conventional Commits Standards
+
+> **Related Rules**: [Release Management](release-management.mdc) | [Semantic Release Workflow](semantic-release-workflow.mdc) | [Database Table Creation](database-table-creation.md)
 
 EduHub uses [Conventional Commits](https://www.conventionalcommits.org/) for automated version management and changelog generation.
 

@@ -1,0 +1,845 @@
+---
+description: "Testing standards, patterns, and best practices for EduHub codebase including Jest, React Testing Library, and integration testing"
+globs: ["**/*.test.*", "**/*.spec.*", "**/__tests__/**", "**/jest.config.*", "**/test/**"]
+alwaysApply: true
+---
+
+# Testing Standards
+
+> **Related Rules**: [Frontend Component Patterns](frontend-component-patterns.mdc) | [Component Architecture](component-architecture.mdc) | [GraphQL Integration](graphql-integration-patterns.mdc) | [Frontend Development Commands](frontend-development-commands.mdc)
+
+This guide establishes testing standards, patterns, and best practices for the EduHub codebase across frontend, backend, and serverless functions.
+
+## Testing Framework Overview
+
+### Frontend Testing
+- **Framework**: Jest + React Testing Library
+- **Configuration**: NX-based Jest configuration
+- **Coverage**: Component testing, integration testing, unit testing
+- **Related**: See [Frontend Development Commands](frontend-development-commands.mdc) for test commands
+
+### Backend/Serverless Testing
+- **Framework**: Jest (Node.js environment)
+- **Configuration**: Custom Jest configuration for serverless functions
+- **Coverage**: Function testing, API testing, integration testing
+
+## Test Structure and Organization
+
+### Directory Structure
+
+```
+project/
+├── __tests__/                    # Shared test utilities and mocks
+│   ├── helpers/
+│   │   ├── mockData.js          # Shared mock data
+│   │   ├── testUtils.js         # Test utilities
+│   │   └── setup.js             # Test setup
+│   └── fixtures/                # Test fixtures
+├── components/
+│   ├── MyComponent.tsx
+│   └── MyComponent.test.tsx     # Co-located test files
+├── functions/
+│   ├── myFunction/
+│   │   ├── index.js
+│   │   └── __tests__/
+│   │       └── myFunction.test.js
+└── jest.config.js               # Jest configuration
+```
+
+### File Naming Conventions
+
+- **Test Files**: `*.test.ts`, `*.test.tsx`, `*.test.js`
+- **Spec Files**: `*.spec.ts`, `*.spec.tsx`, `*.spec.js`
+- **Test Directories**: `__tests__/` for grouped tests
+- **Mock Files**: `__mocks__/` for manual mocks
+
+## Frontend Testing Standards
+
+### Component Testing with React Testing Library
+
+#### Basic Component Test Structure
+
+```typescript
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MockedProvider } from '@apollo/client/testing';
+import { useSession } from 'next-auth/react';
+import MyComponent from './MyComponent';
+
+// Mock external dependencies
+jest.mock('next-auth/react');
+jest.mock('next-translate/useTranslation', () => () => ({
+  t: (key: string) => key,
+}));
+
+const mockSession = {
+  user: { id: '1', email: 'test@example.com' },
+  expires: '2025-01-01',
+};
+
+describe('MyComponent', () => {
+  beforeEach(() => {
+    (useSession as jest.Mock).mockReturnValue({
+      data: mockSession,
+      status: 'authenticated',
+    });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should render component with required props', () => {
+    render(<MyComponent id={1} />);
+    
+    expect(screen.getByText('Expected Text')).toBeInTheDocument();
+  });
+
+  it('should handle user interactions correctly', async () => {
+    render(<MyComponent id={1} />);
+    
+    const button = screen.getByRole('button', { name: /submit/i });
+    fireEvent.click(button);
+    
+    await waitFor(() => {
+      expect(screen.getByText('Success message')).toBeInTheDocument();
+    });
+  });
+
+  it('should display error state when data loading fails', () => {
+    render(<MyComponent id={1} />);
+    
+    // Simulate error state
+    expect(screen.getByText('Error loading data')).toBeInTheDocument();
+  });
+});
+```
+
+#### GraphQL Component Testing
+
+```typescript
+import { MockedProvider } from '@apollo/client/testing';
+import { render, screen, waitFor } from '@testing-library/react';
+import { GET_COURSE_QUERY } from '../../queries/course';
+import CourseComponent from './CourseComponent';
+
+const mocks = [
+  {
+    request: {
+      query: GET_COURSE_QUERY,
+      variables: { id: 1 },
+    },
+    result: {
+      data: {
+        Course_by_pk: {
+          id: 1,
+          title: 'Test Course',
+          description: 'Test Description',
+        },
+      },
+    },
+  },
+];
+
+describe('CourseComponent', () => {
+  it('should render course data when query succeeds', async () => {
+    render(
+      <MockedProvider mocks={mocks} addTypename={false}>
+        <CourseComponent id={1} />
+      </MockedProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Test Course')).toBeInTheDocument();
+    });
+  });
+
+  it('should handle GraphQL errors gracefully', async () => {
+    const errorMocks = [
+      {
+        request: {
+          query: GET_COURSE_QUERY,
+          variables: { id: 1 },
+        },
+        error: new Error('GraphQL error'),
+      },
+    ];
+
+    render(
+      <MockedProvider mocks={errorMocks} addTypename={false}>
+        <CourseComponent id={1} />
+      </MockedProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Error loading course')).toBeInTheDocument();
+    });
+  });
+});
+```
+
+#### Custom Hook Testing
+
+```typescript
+import { renderHook, act } from '@testing-library/react';
+import { useRegistrationHandler } from './useRegistrationHandler';
+
+describe('useRegistrationHandler', () => {
+  it('should handle successful registration', async () => {
+    const mockCourse = { id: 1, title: 'Test Course' };
+    const mockOnSuccess = jest.fn();
+
+    const { result } = renderHook(() =>
+      useRegistrationHandler({
+        course: mockCourse,
+        onSuccess: mockOnSuccess,
+      })
+    );
+
+    await act(async () => {
+      await result.current.handleRegistration({
+        motivationLetter: 'Test motivation',
+      });
+    });
+
+    expect(mockOnSuccess).toHaveBeenCalled();
+    expect(result.current.isLoading).toBe(false);
+  });
+
+  it('should handle registration errors', async () => {
+    const mockCourse = { id: 1, title: 'Test Course' };
+    const mockOnError = jest.fn();
+
+    const { result } = renderHook(() =>
+      useRegistrationHandler({
+        course: mockCourse,
+        onError: mockOnError,
+      })
+    );
+
+    // Mock GraphQL error
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    await act(async () => {
+      await result.current.handleRegistration({
+        motivationLetter: 'Test motivation',
+      });
+    });
+
+    expect(mockOnError).toHaveBeenCalled();
+  });
+});
+```
+
+### TableGrid Testing
+
+```typescript
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MockedProvider } from '@apollo/client/testing';
+import TableGrid from '../common/TableGrid';
+import { COURSE_LIST_QUERY } from '../../queries/courseList';
+
+const mockData = [
+  { id: 1, title: 'Course 1', status: 'ACTIVE' },
+  { id: 2, title: 'Course 2', status: 'INACTIVE' },
+];
+
+const mocks = [
+  {
+    request: {
+      query: COURSE_LIST_QUERY,
+      variables: { limit: 20, offset: 0 },
+    },
+    result: {
+      data: {
+        Course: mockData,
+        Course_aggregate: { aggregate: { count: 2 } },
+      },
+    },
+  },
+];
+
+describe('TableGrid', () => {
+  it('should render table with data', async () => {
+    render(
+      <MockedProvider mocks={mocks} addTypename={false}>
+        <TableGrid
+          columns={columns}
+          data={mockData}
+          loading={false}
+          error={null}
+          totalCount={2}
+          pageIndex={0}
+          onPageChange={jest.fn()}
+          pageSize={20}
+          onPageSizeChange={jest.fn()}
+        />
+      </MockedProvider>
+    );
+
+    expect(screen.getByText('Course 1')).toBeInTheDocument();
+    expect(screen.getByText('Course 2')).toBeInTheDocument();
+  });
+
+  it('should handle pagination correctly', async () => {
+    const mockOnPageChange = jest.fn();
+    
+    render(
+      <TableGrid
+        columns={columns}
+        data={mockData}
+        loading={false}
+        error={null}
+        totalCount={50}
+        pageIndex={0}
+        onPageChange={mockOnPageChange}
+        pageSize={20}
+        onPageSizeChange={jest.fn()}
+      />
+    );
+
+    const nextButton = screen.getByRole('button', { name: /next/i });
+    fireEvent.click(nextButton);
+
+    expect(mockOnPageChange).toHaveBeenCalledWith(1);
+  });
+
+  it('should handle search functionality', async () => {
+    render(
+      <TableGrid
+        columns={columns}
+        data={mockData}
+        loading={false}
+        error={null}
+        searchFilter=""
+        onSearchFilterChange={jest.fn()}
+        totalCount={2}
+        pageIndex={0}
+        onPageChange={jest.fn()}
+        pageSize={20}
+        onPageSizeChange={jest.fn()}
+      />
+    );
+
+    const searchInput = screen.getByPlaceholderText(/search/i);
+    fireEvent.change(searchInput, { target: { value: 'Course 1' } });
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument();
+      expect(screen.queryByText('Course 2')).not.toBeInTheDocument();
+    });
+  });
+});
+```
+
+## Backend/Serverless Testing Standards
+
+### Function Testing Structure
+
+```javascript
+import { jest } from '@jest/globals';
+
+// Mock external dependencies
+const mockLogger = {
+  info: jest.fn(),
+  debug: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn()
+};
+
+describe('myFunction', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should be a function', async () => {
+    const { default: myFunction } = await import('../index.js');
+    expect(typeof myFunction).toBe('function');
+  });
+
+  it('should handle successful execution', async () => {
+    const { default: myFunction } = await import('../index.js');
+    
+    const req = {
+      body: {
+        // Test request data
+      }
+    };
+
+    const result = await myFunction(req, mockLogger);
+    
+    expect(result.success).toBe(true);
+    expect(result.data).toBeDefined();
+  });
+
+  it('should handle errors gracefully', async () => {
+    const { default: myFunction } = await import('../index.js');
+    
+    const req = {
+      body: {
+        // Invalid request data
+      }
+    };
+
+    const result = await myFunction(req, mockLogger);
+    
+    expect(result.success).toBe(false);
+    expect(result.error).toBeDefined();
+    expect(mockLogger.error).toHaveBeenCalled();
+  });
+});
+```
+
+### GraphQL Integration Testing
+
+```javascript
+import { jest } from '@jest/globals';
+
+// Mock GraphQL client
+const mockGraphQLClient = {
+  request: jest.fn(),
+};
+
+describe('GraphQL Integration', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should fetch user data successfully', async () => {
+    const mockUserData = {
+      User: {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@example.com'
+      }
+    };
+
+    mockGraphQLClient.request.mockResolvedValue(mockUserData);
+
+    const result = await fetchUserData('1');
+    
+    expect(result).toEqual(mockUserData);
+    expect(mockGraphQLClient.request).toHaveBeenCalledWith(
+      expect.stringContaining('query'),
+      { userId: '1' }
+    );
+  });
+
+  it('should handle GraphQL errors', async () => {
+    const mockError = new Error('GraphQL error');
+    mockGraphQLClient.request.mockRejectedValue(mockError);
+
+    await expect(fetchUserData('1')).rejects.toThrow('GraphQL error');
+  });
+});
+```
+
+## Mock Data and Test Utilities
+
+### Shared Mock Data
+
+```javascript
+// __tests__/helpers/mockData.js
+export const mockUsers = {
+  user1: {
+    id: 'user-123',
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john.doe@example.com'
+  },
+  user2: {
+    id: 'user-456',
+    firstName: 'Jane',
+    lastName: 'Smith',
+    email: 'jane.smith@example.com'
+  }
+};
+
+export const mockCourses = {
+  course1: {
+    id: 101,
+    title: 'Introduction to Programming',
+    startTime: '2024-02-01T09:00:00Z',
+    endTime: '2024-04-01T17:00:00Z'
+  }
+};
+
+export const mockSessions = {
+  session1: {
+    id: 1,
+    title: 'Session 1: Getting Started',
+    startDateTime: '2024-01-16T10:00:00Z',
+    endDateTime: '2024-01-16T12:00:00Z'
+  }
+};
+
+export const mockEmailTemplates = {
+  APPLICATION_RECEIVED: {
+    id: 1,
+    name: 'APPLICATION_RECEIVED',
+    subject: 'Application Received - {{courseTitle}}',
+    content: 'Dear {{firstName}}, your application for {{courseTitle}} has been received.'
+  }
+};
+```
+
+### Test Utilities
+
+```javascript
+// __tests__/helpers/testUtils.js
+export const createMockRequest = (body) => ({
+  body,
+  headers: {},
+  method: 'POST'
+});
+
+export const createMockResponse = () => {
+  const res = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn().mockReturnThis(),
+    send: jest.fn().mockReturnThis(),
+  };
+  return res;
+};
+
+export const waitForAsync = () => new Promise(resolve => setTimeout(resolve, 0));
+
+export const mockDate = (dateString) => {
+  const mockDate = new Date(dateString);
+  jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+  return mockDate;
+};
+```
+
+## Test Configuration
+
+### Jest Configuration (Frontend)
+
+```javascript
+// jest.config.js
+export default {
+  displayName: 'edu-hub',
+  preset: '../../jest.preset.js',
+  transform: {
+    '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
+    '^.+\\.[tj]sx?$': ['babel-jest', { presets: ['@nx/next/babel'] }],
+  },
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+  coverageDirectory: '../../coverage/apps/edu-hub',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  testEnvironment: 'jsdom',
+  moduleNameMapping: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+};
+```
+
+### Jest Configuration (Backend)
+
+```javascript
+// jest.config.js
+export default {
+  testEnvironment: 'node',
+  transform: {},
+  testTimeout: 10000,
+  testMatch: [
+    '**/__tests__/**/*.test.js',
+    '**/?(*.)+(spec|test).js'
+  ],
+  collectCoverageFrom: [
+    '**/*.js',
+    '!**/node_modules/**',
+    '!**/*.test.js',
+    '!**/jest.config.js'
+  ],
+  coverageReporters: ['text', 'lcov', 'html'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js']
+};
+```
+
+## Testing Best Practices
+
+### Test Naming Conventions
+
+```javascript
+// ✅ GOOD: Descriptive test names
+describe('Registration Component', () => {
+  it('should display registration button for eligible users', () => {
+    // Test implementation
+  });
+
+  it('should show modal when registration button is clicked', () => {
+    // Test implementation
+  });
+
+  it('should handle registration errors gracefully', () => {
+    // Test implementation
+  });
+});
+
+// ❌ AVOID: Vague test names
+describe('Component', () => {
+  it('should work', () => {
+    // Test implementation
+  });
+});
+```
+
+### Test Structure (AAA Pattern)
+
+```javascript
+describe('User Registration', () => {
+  it('should register user successfully', async () => {
+    // Arrange
+    const mockUser = { email: 'test@example.com', password: 'password123' };
+    const mockResponse = { success: true, userId: '123' };
+    jest.spyOn(api, 'registerUser').mockResolvedValue(mockResponse);
+
+    // Act
+    const result = await registerUser(mockUser);
+
+    // Assert
+    expect(result).toEqual(mockResponse);
+    expect(api.registerUser).toHaveBeenCalledWith(mockUser);
+  });
+});
+```
+
+### Error Testing
+
+```javascript
+describe('Error Handling', () => {
+  it('should handle network errors', async () => {
+    const networkError = new Error('Network error');
+    jest.spyOn(api, 'fetchData').mockRejectedValue(networkError);
+
+    await expect(fetchData()).rejects.toThrow('Network error');
+  });
+
+  it('should display error message to user', async () => {
+    const { default: Component } = await import('./Component');
+    
+    render(<Component />);
+    
+    // Simulate error state
+    fireEvent.click(screen.getByText('Trigger Error'));
+    
+    await waitFor(() => {
+      expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+    });
+  });
+});
+```
+
+### Async Testing
+
+```javascript
+describe('Async Operations', () => {
+  it('should handle loading states', async () => {
+    const { default: Component } = await import('./Component');
+    
+    render(<Component />);
+    
+    // Check loading state
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    
+    // Wait for data to load
+    await waitFor(() => {
+      expect(screen.getByText('Data loaded')).toBeInTheDocument();
+    });
+    
+    // Loading state should be gone
+    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+  });
+});
+```
+
+## Coverage Requirements
+
+### Minimum Coverage Targets
+
+- **Statements**: 80%
+- **Branches**: 75%
+- **Functions**: 80%
+- **Lines**: 80%
+
+### Coverage Configuration
+
+```javascript
+// jest.config.js
+export default {
+  collectCoverageFrom: [
+    'src/**/*.{js,jsx,ts,tsx}',
+    '!src/**/*.d.ts',
+    '!src/**/*.stories.{js,jsx,ts,tsx}',
+    '!src/**/index.{js,jsx,ts,tsx}',
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 75,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+  },
+};
+```
+
+## Continuous Integration
+
+### GitHub Actions Test Workflow
+
+```yaml
+# .github/workflows/test.yml
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Run tests
+        run: yarn test --coverage --watchAll=false
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+```
+
+## Testing Commands
+
+### Frontend Testing Commands
+
+```bash
+# Run all tests
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test
+
+# Run tests in watch mode
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test:watch
+
+# Run tests with coverage
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test:coverage
+
+# Run specific test file
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test components/inputs/EmailEditor.test.tsx
+
+# Run tests for specific pattern
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test --testNamePattern="EmailEditor"
+```
+
+### Backend Testing Commands
+
+```bash
+# Run all tests
+cd functions/callNodeFunction && npm test
+
+# Run tests in watch mode
+cd functions/callNodeFunction && npm run test:watch
+
+# Run tests with coverage
+cd functions/callNodeFunction && npm run test:coverage
+
+# Run specific test file
+cd functions/callNodeFunction && npm test sendEnrollmentEmail.test.js
+
+# Run tests in verbose mode
+cd functions/callNodeFunction && VERBOSE=1 npm test
+```
+
+## Quality Assurance Checklist
+
+### Before Committing Tests
+
+- [ ] **Test Coverage**: All new code has corresponding tests
+- [ ] **Test Names**: Descriptive test names following conventions
+- [ ] **Mock Data**: Proper mocking of external dependencies
+- [ ] **Error Cases**: Both success and error scenarios tested
+- [ ] **Async Handling**: Proper handling of async operations
+- [ ] **Cleanup**: Proper cleanup in `afterEach`/`afterAll`
+- [ ] **Performance**: Tests run quickly and don't timeout
+- [ ] **CI Compatibility**: Tests pass in CI environment
+
+### Test Review Checklist
+
+- [ ] **Readability**: Tests are easy to understand
+- [ ] **Maintainability**: Tests won't break with minor changes
+- [ ] **Reliability**: Tests are deterministic and stable
+- [ ] **Coverage**: Important code paths are tested
+- [ ] **Edge Cases**: Boundary conditions are tested
+- [ ] **Integration**: Component interactions are tested
+- [ ] **Accessibility**: UI tests include accessibility checks
+
+## Common Testing Anti-Patterns
+
+### ❌ Avoid These Patterns
+
+```javascript
+// ❌ Testing implementation details
+it('should call setState', () => {
+  const component = shallow(<MyComponent />);
+  component.instance().setState({ data: 'test' });
+  expect(component.state().data).toBe('test');
+});
+
+// ❌ Over-mocking
+it('should render component', () => {
+  jest.mock('../../hooks/useAuth', () => ({
+    useAuth: () => ({ user: null, loading: false })
+  }));
+  // Too many mocks make tests brittle
+});
+
+// ❌ Testing multiple things in one test
+it('should handle user interaction and API call and error handling', () => {
+  // This test is doing too much
+});
+
+// ❌ Not cleaning up
+it('should set up timers', () => {
+  jest.useFakeTimers();
+  // Missing jest.useRealTimers() in afterEach
+});
+```
+
+### ✅ Use These Patterns Instead
+
+```javascript
+// ✅ Testing behavior, not implementation
+it('should display user data when loaded', () => {
+  render(<UserProfile userId="123" />);
+  expect(screen.getByText('John Doe')).toBeInTheDocument();
+});
+
+// ✅ Minimal mocking
+it('should render component', () => {
+  render(<MyComponent />);
+  expect(screen.getByRole('button')).toBeInTheDocument();
+});
+
+// ✅ Focused tests
+it('should handle user click', () => {
+  render(<MyComponent />);
+  fireEvent.click(screen.getByRole('button'));
+  expect(screen.getByText('Clicked')).toBeInTheDocument();
+});
+
+// ✅ Proper cleanup
+afterEach(() => {
+  jest.useRealTimers();
+  jest.clearAllMocks();
+});
+```
+
+This comprehensive testing standards guide ensures consistent, maintainable, and reliable testing across the EduHub codebase.
