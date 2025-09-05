@@ -1,7 +1,7 @@
 ---
 description: "Advanced TableGrid patterns including useTableGrid hook, GraphQL integration, search filtering, and state management"
-globs: ["**/TableGrid/**", "**/hooks/**", "**/*table*", "**/*grid*"]
-alwaysApply: true
+globs: ["**/TableGrid/**", "**/hooks/useTableGrid*", "**/*table*", "**/*grid*", "**/components/common/TableGrid/**"]
+alwaysApply: false
 ---
 
 # TableGrid Advanced Patterns

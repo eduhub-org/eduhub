@@ -1,7 +1,7 @@
 ---
 description: "TableGrid column configuration, sizing, layout control, and migration from legacy patterns"
-globs: ["**/TableGrid/**", "**/*table*", "**/*grid*", "**/columns/**"]
-alwaysApply: true
+globs: ["**/TableGrid/**", "**/*table*", "**/*grid*", "**/columns/**", "**/components/common/TableGrid/**"]
+alwaysApply: false
 ---
 
 # TableGrid Column Configuration

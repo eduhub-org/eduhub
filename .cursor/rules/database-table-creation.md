@@ -1,7 +1,7 @@
 ---
 description: "Guide for adding new database tables and columns to EduHub"
-globs: ["**/migrations/**/*.sql", "**/metadata/**/*.yaml", "**/queries/**/*.ts"]
-alwaysApply: true
+globs: ["**/migrations/**/*.sql", "**/metadata/**/*.yaml", "**/queries/**/*.ts", "**/backend/migrations/**", "**/backend/metadata/**"]
+alwaysApply: false
 ---
 
 # Database Table and Column Creation Guide

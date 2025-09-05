@@ -1,7 +1,7 @@
 ---
 description: "DevOps practices, monitoring, logging, deployment, and observability for EduHub"
-globs: ["**/.github/workflows/**", "**/docker-compose.yml", "**/Dockerfile*", "**/infrastructure/**", "**/*monitoring*", "**/*logging*", "**/*deployment*"]
-alwaysApply: true
+globs: ["**/.github/workflows/**", "**/docker-compose.yml", "**/Dockerfile*", "**/infrastructure/**", "**/*monitoring*", "**/*logging*", "**/*deployment*", "**/*devops*"]
+alwaysApply: false
 ---
 
 # DevOps and Monitoring Guide

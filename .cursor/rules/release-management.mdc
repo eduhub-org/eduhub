@@ -1,7 +1,7 @@
 ---
 description: "Release management process, version control, and deployment workflow"
-globs: ["**/*"]
-alwaysApply: true
+globs: ["**/.github/workflows/**", "**/.releaserc.json", "**/CHANGELOG.md", "**/package.json", "**/frontend-nx/package.json"]
+alwaysApply: false
 ---
 
 # Release Management Process

@@ -1,7 +1,7 @@
 ---
 description: "Conventional commit standards and their semantic versioning impact"
-globs: ["**/*.md", "**/package.json", "**/.releaserc.json", "**/CHANGELOG.md"]
-alwaysApply: true
+globs: ["**/*.md", "**/package.json", "**/.releaserc.json", "**/CHANGELOG.md", "**/.github/workflows/**"]
+alwaysApply: false
 ---
 
 # Conventional Commits Standards

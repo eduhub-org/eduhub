@@ -1,7 +1,7 @@
 ---
 description: "Semantic release workflow, branch strategy, and automated versioning process for EduHub"
-globs: ["**/*"]
-alwaysApply: true
+globs: ["**/.github/workflows/**", "**/.releaserc.json", "**/CHANGELOG.md", "**/package.json", "**/frontend-nx/package.json"]
+alwaysApply: false
 ---
 
 # Semantic Release Workflow
