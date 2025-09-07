@@ -9,11 +9,10 @@ RUN corepack enable
 WORKDIR /opt/app
 
 COPY package.json /opt/app
-COPY yarn.lock /opt/app
-COPY .yarn/ /opt/app/.yarn
-COPY .yarnrc.yml /opt/app
+COPY pnpm-lock.yaml /opt/app
 
-RUN yarn --immutable
+RUN corepack enable pnpm
+RUN pnpm install --frozen-lockfile
 
 # 2. Rebuild the source code only when needed
 FROM node:18-alpine AS builder
