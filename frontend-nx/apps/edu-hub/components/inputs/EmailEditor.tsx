@@ -18,7 +18,8 @@ import CharacterCount from '@tiptap/extension-character-count';
 import DOMPurify from 'dompurify';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
-import { gql } from 'graphql-tag';
+import { gql } from '@apollo/client';
+import useTranslation from 'next-translate/useTranslation';
 
 interface EmailEditorProps {
   itemId: number;
@@ -43,6 +44,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
   className = '',
   templateType,
 }) => {
+  const { t } = useTranslation('common');
   const [isHtmlMode, setIsHtmlMode] = useState(false);
   const [showSavedNotification, setShowSavedNotification] = useState(false);
 

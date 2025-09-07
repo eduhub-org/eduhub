@@ -80,7 +80,6 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
             value={localValue}
             onChange={handleChange}
             onBlur={onBlur}
-            placeholder={placeholder}
             displayEmpty
             style={{
               color: hasBlurred && errorMessage ? 'red' : 'inherit',

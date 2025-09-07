@@ -17,7 +17,7 @@ import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 import { isLinkFormat, isECTSFormat } from '../../helpers/util';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
-import { gql } from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 /**
  * InputField Component

@@ -14,7 +14,7 @@ import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
-import { gql } from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 /**
  * TagSelector Component
