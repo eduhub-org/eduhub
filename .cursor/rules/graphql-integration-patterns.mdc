@@ -12,20 +12,106 @@ alwaysApply: false
 ### Query Organization
 
 #### File Structure
+
+**Recommended Structure (Implemented in Phase 1):**
 ```
 frontend-nx/apps/edu-hub/queries/
-├── fragments/           # Reusable GraphQL fragments
-│   ├── userFragment.ts
-│   ├── courseFragment.ts
-│   └── sessionFragment.ts
-├── queries/            # Read operations
-│   ├── user.ts
-│   ├── courseList.ts
-│   └── myCourses.ts
-└── mutations/          # Write operations
-    ├── mutateCourse.ts
-    └── insertUser.ts
+├── __generated__/          # Auto-generated TypeScript types (from codegen)
+├── fragments/             # Reusable GraphQL fragments
+│   ├── user/
+│   │   ├── index.ts       # Re-exports user fragments
+│   │   └── userFragment.ts
+│   ├── course/
+│   │   ├── index.ts       # Re-exports course fragments
+│   │   ├── courseFragment.ts
+│   │   └── courseInstructorFragment.ts
+│   ├── program/
+│   │   └── index.ts
+│   ├── session/
+│   │   └── index.ts
+│   ├── enrollment/
+│   │   └── index.ts
+│   ├── achievement/
+│   │   └── index.ts
+│   └── index.ts           # Main fragments index
+├── queries/              # Read operations
+│   ├── user/
+│   │   ├── index.ts       # Re-exports user queries
+│   │   ├── user.ts
+│   │   └── expert.ts
+│   ├── course/
+│   │   ├── index.ts       # Re-exports course queries
+│   │   ├── courseList.ts
+│   │   ├── myCourses.ts
+│   │   └── courseWithEnrollment.ts
+│   ├── program/
+│   │   └── index.ts
+│   ├── enrollment/
+│   │   └── index.ts
+│   ├── achievement/
+│   │   └── index.ts
+│   ├── organization/
+│   │   └── index.ts
+│   └── index.ts           # Main queries index
+├── mutations/            # Write operations
+│   ├── user/
+│   │   ├── index.ts       # Re-exports user mutations
+│   │   ├── insertUser.ts
+│   │   └── updateUser.ts
+│   ├── course/
+│   │   ├── index.ts       # Re-exports course mutations
+│   │   ├── mutateCourse.ts
+│   │   └── copyCourse.ts
+│   ├── program/
+│   │   └── index.ts
+│   ├── enrollment/
+│   │   └── index.ts
+│   ├── achievement/
+│   │   └── index.ts
+│   ├── organization/
+│   │   └── index.ts
+│   └── index.ts           # Main mutations index
+├── index.ts              # Main GraphQL operations index
+└── [legacy files]        # Original flat structure (backward compatibility)
 ```
+
+**Migration Status:**
+- ✅ **Phase 1 Complete**: Organized directory structure with index files
+- 🔄 **Phase 2 Pending**: Move files to organized subdirectories  
+- 🔄 **Phase 3 Pending**: Remove legacy flat structure
+
+**Current Usage:**
+```typescript
+// New organized approach (recommended)
+import { USER_FRAGMENT } from 'queries/fragments/user';
+import { COURSE_LIST } from 'queries/queries/course';
+import { INSERT_USER } from 'queries/mutations/user';
+
+// Namespace imports for better organization
+import { Fragments, Queries, Mutations } from 'queries';
+const userFragment = Fragments.User.USER_FRAGMENT;
+
+// Legacy approach (still works - backward compatibility)
+import { USER_FRAGMENT, COURSE_LIST, INSERT_USER } from 'queries';
+```
+
+#### Migration Guidelines
+
+**For New Code:**
+- Use the organized structure: `queries/fragments/user`, `queries/queries/course`, etc.
+- Prefer namespace imports for better organization
+- Follow domain-based organization (user, course, program, etc.)
+
+**For Existing Code:**
+- Legacy imports continue to work (backward compatibility maintained)
+- Gradually migrate to organized imports when touching files
+- No urgent need to update existing imports
+
+**File Placement Rules:**
+- **Fragments**: `fragments/{domain}/` - Reusable field sets
+- **Queries**: `queries/{domain}/` - Read operations  
+- **Mutations**: `mutations/{domain}/` - Write operations
+- **Cross-domain**: Use `queries/` or `mutations/` root for system-wide operations
 
 #### Fragment Pattern
 **Always use fragments for reusable field sets:**
