@@ -31,10 +31,7 @@ import {
   InsertCourseFundingOrganization,
   InsertCourseFundingOrganizationVariables,
 } from '../../../queries/__generated__/InsertCourseFundingOrganization';
-import {
-  DeleteCourseFundingOrganization,
-  DeleteCourseFundingOrganizationVariables,
-} from '../../../queries/__generated__/DeleteCourseFundingOrganization';
+// Note: DeleteCourseFundingOrganization types removed as they were unused
 import { OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
 import EntityListManager from '../../inputs/EntityListManager';
 import { getPublicImageUrl, parseFileUploadEvent } from '../../../helpers/filehandling';
@@ -150,12 +147,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     refetchQueries: ['AdminCourseList'],
   });
 
-  const [deleteCourseFundingOrg] = useAdminMutation<
-    DeleteCourseFundingOrganization,
-    DeleteCourseFundingOrganizationVariables
-  >(DELETE_COURSE_FUNDING_ORGANIZATION, {
-    refetchQueries: ['AdminCourseList'],
-  });
+  // Note: deleteCourseFundingOrg mutation is used by EntitySelector component
 
   // Image upload functionality
   const imageUploadRef = useRef<any>(null);
@@ -258,22 +250,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     setFundingOrgDialogOpen(false);
   }, []);
 
-  const deleteFundingOrgFromCourse = useCallback(
-    async (orgId: number) => {
-      const response = await deleteCourseFundingOrg({
-        variables: {
-          courseId: course.id,
-          organizationId: orgId,
-        },
-      });
-
-      if (response.errors) {
-        handleError(response.errors?.[0]?.message || t('operation_failed'));
-        return;
-      }
-    },
-    [deleteCourseFundingOrg, course.id, handleError, t]
-  );
+  // Note: deleteFundingOrgFromCourse function removed as it was unused
 
   const addFundingOrgHandler = useCallback(
     async (confirmed: boolean, organization: OrganizationList_Organization | null) => {

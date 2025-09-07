@@ -42,7 +42,7 @@ function generatePlainApiKey(organizationId: number): string {
       .map((b) => b.toString(16).padStart(2, '0'))
       .join('');
     return `edh_live_org${organizationId}_sk_${secret}`;
-  } catch (e) {
+  } catch {
     // Last-resort fallback
     const secret = `${Date.now().toString(16)}${Math.random().toString(16).slice(2, 18)}`.slice(0, 32);
     return `edh_live_org${organizationId}_sk_${secret}`;
@@ -89,7 +89,7 @@ export const ApiKeyManager: React.FC<Props> = ({ organization, onError }) => {
     } finally {
       setPending(false);
     }
-  }, [organization.id, t, onError]);
+  }, [organization.id, t, onError, hasExistingKey]);
 
   const persistHash = useCallback(async () => {
     if (!generatedKey) return;

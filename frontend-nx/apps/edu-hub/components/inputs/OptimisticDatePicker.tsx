@@ -227,6 +227,7 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
   disabled = false,
   showHolidays = true,
   showWeekends = false,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   highlightDates = [],
   excludeDates = [],
   minDate,
@@ -304,33 +305,8 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
     return highlights;
   }, [autoHolidays, showWeekends]);
 
-  // Process all highlights into highlight dates format that react-datepicker expects
-  const processedHighlightDates = React.useMemo(() => {
-    const processed: any[] = [...highlightDates];
-
-    if (allHighlights.length > 0) {
-      // Group highlights by className
-      const highlightGroups = allHighlights.reduce(
-        (groups, highlight) => {
-          const className = highlight.className || 'holiday';
-          if (!groups[className]) {
-            groups[className] = [];
-          }
-          groups[className].push(highlight.date);
-          return groups;
-        },
-        {} as { [key: string]: Date[] }
-      );
-
-      // Convert to react-datepicker highlightDates format
-      // react-datepicker expects: [{ "css-class-name": [date1, date2] }]
-      Object.entries(highlightGroups).forEach(([className, dates]) => {
-        processed.push({ [className]: dates });
-      });
-    }
-
-    return processed;
-  }, [allHighlights, highlightDates]);
+  // Note: processedHighlightDates was removed as it was unused
+  // If highlighting is needed in the future, it should be implemented
 
   // Apply highlighting styles via direct DOM manipulation after calendar renders
   useEffect(() => {

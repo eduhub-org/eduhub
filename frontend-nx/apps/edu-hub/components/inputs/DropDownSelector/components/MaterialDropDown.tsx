@@ -7,7 +7,6 @@ import Tooltip from '@mui/material/Tooltip';
 import InputAdornment from '@mui/material/InputAdornment';
 import { HelpOutline } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
-import useTranslation from 'next-translate/useTranslation';
 import { Option } from '../types';
 import { CreatableDropDown } from './CreatableDropDown';
 
@@ -44,7 +43,6 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
   onCreateOption,
   getLabelForValue,
 }) => {
-  const { t } = useTranslation();
   const theme = useTheme();
 
   const handleChange = (event: SelectChangeEvent<string>) => {

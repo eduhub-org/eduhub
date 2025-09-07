@@ -58,7 +58,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
         return labelMatch || aliasMatch;
       });
     },
-    [localOptions, t]
+    [localOptions]
   );
 
   const shouldShowCreateOption = useCallback(
@@ -88,7 +88,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
 
       return !hasExactNameMatch && !hasExactAliasMatch;
     },
-    [getFilteredOptions, t]
+    [getFilteredOptions]
   );
 
   const handleValueChange = (value: string | null) => {

@@ -8,6 +8,11 @@ BEGIN
     -- Only validate if locationAddressId is being set (not null)
     -- Use explicit quoting to handle case sensitivity properly
     IF NEW."locationAddressId" IS NOT NULL THEN
+        -- Check if courseLocationId is null - cannot set locationAddressId without courseLocationId
+        IF NEW."courseLocationId" IS NULL THEN
+            RAISE EXCEPTION 'Cannot set locationAddressId when courseLocationId is NULL';
+        END IF;
+        
         -- Check if the LocationAddress.locationOptionId matches the CourseLocation.locationOption
         IF NOT EXISTS (
             SELECT 1 
