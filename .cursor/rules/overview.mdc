@@ -5,11 +5,18 @@ alwaysApply: true
 ### EduHub Monorepo Overview
 
 - **Project**: EduHub — educational platform for course management, registration, and learning. Repo: [eduhub/eduhub](https://github.com/eduhub/eduhub)
-- **Monorepo**: Nx workspace with frontend and backend separation. Root configs: [package.json](mdc:package.json), [nx.json](mdc:frontend-nx/nx.json)
+- **Monorepo**: Nx workspace with frontend and backend separation. Root configs: [package.json](mdc:package.json), [pnpm-workspace.yaml](mdc:pnpm-workspace.yaml), [nx.json](mdc:frontend-nx/nx.json)
 - **Frontend**: Next.js app in `frontend-nx/apps/edu-hub` with TypeScript, Material-UI, GraphQL, i18n. Components organized by feature in [frontend-nx/apps/edu-hub/components/](mdc:frontend-nx/apps/edu-hub/components/)
 - **Backend**: Hasura GraphQL API with PostgreSQL. Schema and migrations in [backend/migrations/](mdc:backend/migrations/), metadata in [backend/metadata/](mdc:backend/metadata/)
 - **Authentication**: Keycloak integration with SSO support. Configuration in [keycloak/](mdc:keycloak/)
 - **Functions**: Serverless functions for email, notifications, and integrations in [functions/](mdc:functions/)
+
+### Package Management Strategy
+
+- **Frontend**: Uses **pnpm workspace** for optimal performance, disk space efficiency, and dependency management
+- **Functions**: Individual **npm packages** for Google Cloud Functions deployment compatibility
+- **Root**: pnpm workspace coordinator with [pnpm-workspace.yaml](mdc:pnpm-workspace.yaml)
+- **Lockfiles**: `pnpm-lock.yaml` (root), individual `package-lock.json` files for functions
 
 ### Apps
 
@@ -31,17 +38,17 @@ alwaysApply: true
 
 - **Frontend**: Next.js, React, TypeScript, Material-UI, Apollo GraphQL, next-translate
 - **Backend**: Hasura GraphQL, PostgreSQL, Keycloak, Node.js/Python functions
-- **Development**: Docker, Nx workspace, Yarn, Jest, ESLint, Prettier
+- **Development**: Docker, Nx workspace, pnpm, Jest, ESLint, Prettier
 
 ### Development Commands
 
 ```bash
 # Frontend development
 cd frontend-nx
-yarn dev                 # Start development server
-yarn build               # Build for production
-yarn test                # Run tests
-yarn lint                # Lint code
+pnpm dev                 # Start development server
+pnpm build               # Build for production
+pnpm test                # Run tests
+pnpm lint                # Lint code
 
 # Backend development
 cd backend
@@ -73,6 +80,7 @@ docker-compose up        # Start all services
 ### Essentials for every prompt
 
 - **Tech stack**: Next.js, React, TypeScript, Material-UI, Apollo GraphQL, Hasura, PostgreSQL, Keycloak
+- **Package management**: pnpm (frontend), npm (functions) - use correct manager for each context
 - **Component organization**: Feature-oriented, check existing components first
 - **Translations**: German "Du" form mandatory, English fallbacks
 - **Error handling**: Comprehensive error boundaries and user feedback

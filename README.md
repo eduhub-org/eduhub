@@ -14,13 +14,59 @@ EduHub aims to centralize educational offerings. It enables users to apply and g
 
 ![EduHub Screenshot](https://github.com/edu-hub-project/application/assets/24397546/234637f5-1c99-474e-a5c7-1f6f0fc280b8)
 
+## :file_folder: Project Structure
+
+EduHub follows a **monorepo structure** using pnpm workspaces:
+
+```
+eduhub/
+├── frontend-nx/           # Next.js applications (Nx workspace)
+│   ├── apps/
+│   │   ├── edu-hub/      # Main education platform
+│   │   └── rent-a-scientist/ # Secondary app
+│   └── libs/             # Shared frontend libraries
+├── functions/            # Serverless functions (Google Cloud)
+│   ├── callNodeFunction/ # Node.js functions
+│   ├── callPythonFunction/ # Python functions
+│   └── apiProxy/         # API gateway functions
+├── backend/              # Hasura GraphQL + PostgreSQL
+├── keycloak/             # Authentication service
+└── infrastructure/       # Terraform IaC
+```
+
+### Package Management Strategy
+- **Frontend**: pnpm workspace for optimal performance and disk space
+- **Functions**: Individual npm packages for Google Cloud Functions compatibility
+- **Root**: pnpm workspace coordinator
+
 ## :rocket: Quick Start
 
-1. Install [Docker](https://docs.docker.com/engine/install/).
-2. Clone this repository.
-3. Run `docker compose up`.
-4. Open `localhost:5000` in your browser.
-5. Log in as **admin@example.com** with password **dev**.
+1. **Install Dependencies**
+   ```bash
+   # Install Docker
+   curl -fsSL https://get.docker.com | sh
+   
+   # Install pnpm
+   corepack enable pnpm
+   ```
+
+2. **Clone and Setup**
+   ```bash
+   git clone https://github.com/edu-hub-project/application.git
+   cd application
+   pnpm install
+   ```
+
+3. **Start Development Environment**
+   ```bash
+   docker compose up
+   ```
+
+4. **Access Application**
+   - Frontend: http://localhost:5000
+   - Login: **admin@example.com** / **dev**
+   - Hasura Console: http://localhost:8080
+   - Keycloak Admin: http://localhost:28080 (admin/admin)
 
 ## :busts_in_silhouette: Contributing
 
@@ -35,12 +81,21 @@ For technical development details, see [Development Guide](./docs/DEVELOPMENT_GU
 
 ## :computer: Tech Stack
 
-- [Keycloak](https://www.keycloak.org/)
-- [Hasura](https://hasura.io/)
-- [Apollo](https://www.apollographql.com/)
-- [React](https://reactjs.org/)
-- [Tailwind](https://tailwindcss.com/)
-- [Python](https://www.python.org/) & [Node.js](https://nodejs.org/en/) (Serverless Functions)
+### Core Technologies
+- **Frontend**: [Next.js](https://nextjs.org/) + [React](https://reactjs.org/) + [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Material-UI](https://mui.com/) + [Tailwind CSS](https://tailwindcss.com/)
+- **State Management**: [Apollo GraphQL Client](https://www.apollographql.com/)
+- **Backend**: [Hasura GraphQL](https://hasura.io/) + [PostgreSQL](https://www.postgresql.org/)
+- **Authentication**: [Keycloak](https://www.keycloak.org/) + [NextAuth.js](https://next-auth.js.org/)
+- **Functions**: [Python](https://www.python.org/) & [Node.js](https://nodejs.org/en/) (Google Cloud Functions)
+- **Build System**: [Nx](https://nx.dev/) + [pnpm](https://pnpm.io/) workspaces
+
+### Development Tools
+- **Package Manager**: pnpm (frontend) + npm (functions)
+- **Code Quality**: ESLint + Prettier + TypeScript strict mode
+- **Testing**: Jest + React Testing Library + Playwright
+- **CI/CD**: GitHub Actions + Semantic Release
+- **Deployment**: Docker + Google Cloud Platform
 
 ## :memo: License
 

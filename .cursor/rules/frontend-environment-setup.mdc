@@ -152,10 +152,10 @@ If you must run locally (not recommended):
 cd ${EDUHUB_ROOT:-$PWD}/frontend-nx
 
 # Install dependencies
-yarn install
+pnpm install
 
 # Start development server
-yarn dev
+pnpm dev
 ```
 
 **Warning**: Local development may have issues with:

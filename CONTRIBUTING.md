@@ -116,9 +116,9 @@ Common scopes in our project:
 
 3. **Test Your Changes**: Ensure all tests pass
    ```bash
-   cd frontend-nx
-   yarn test
-   yarn build
+   # From project root or frontend-nx directory
+   pnpm test
+   pnpm build
    ```
 
 4. **Create Pull Request**: Target the `develop` branch
@@ -173,8 +173,12 @@ Versions are automatically determined based on commit messages:
 
 2. **Install Dependencies**
    ```bash
+   # From project root (recommended)
+   pnpm install
+   
+   # Or from frontend directory
    cd frontend-nx
-   yarn install
+   pnpm install
    ```
 
 3. **Start Development Environment**

@@ -323,7 +323,7 @@ Before writing any component code, ask:
 ## Important Notes
 
 - **Never assume current directory** - always use the EDUHUB_ROOT environment variable or explicit paths
-- **Use yarn** instead of npm for consistency
+- **Use pnpm** for package management (frontend) - functions use npm for GCP compatibility
 - **Test on multiple screen sizes** - the app is responsive
 - **Check both German and English translations**
 - **Follow Material-UI patterns** for consistency

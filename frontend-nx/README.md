@@ -15,23 +15,43 @@ These capabilities include generating applications, libraries, etc as well as th
 Below are our core plugins:
 
 - [React](https://reactjs.org)
-  - `npm install --save-dev @nx/react`
+  - `pnpm add -D @nx/react`
 - Web (no framework frontends)
-  - `npm install --save-dev @nx/web`
+  - `pnpm add -D @nx/web`
 - [Angular](https://angular.io)
-  - `npm install --save-dev @nrwl/angular`
+  - `pnpm add -D @nrwl/angular`
 - [Nest](https://nestjs.com)
-  - `npm install --save-dev @nrwl/nest`
+  - `pnpm add -D @nrwl/nest`
 - [Express](https://expressjs.com)
-  - `npm install --save-dev @nrwl/express`
+  - `pnpm add -D @nrwl/express`
 - [Node](https://nodejs.org)
-  - `npm install --save-dev @nrwl/node`
+  - `pnpm add -D @nrwl/node`
 
 There are also many [community plugins](https://nx.dev/community) you could add.
 
+## Package Management
+
+This workspace uses **pnpm** for package management. All commands should use pnpm instead of npm or yarn.
+
+```bash
+# Install dependencies
+pnpm install
+
+# Add new packages
+pnpm add <package>          # Runtime dependency
+pnpm add -D <package>       # Dev dependency
+
+# Remove packages
+pnpm remove <package>
+
+# Update packages
+pnpm update                 # All packages
+pnpm update <package>       # Specific package
+```
+
 ## Generate an application
 
-Run `nx g @nx/react:app my-app` to generate an application.
+Run `pnpm nx g @nx/react:app my-app` to generate an application.
 
 > You can use any of the plugins above to generate applications as well.
 
@@ -39,7 +59,7 @@ When using Nx, you can create multiple applications and libraries in the same wo
 
 ## Generate a library
 
-Run `nx g @nx/react:lib my-lib` to generate a library.
+Run `pnpm nx g @nx/react:lib my-lib` to generate a library.
 
 > You can also use any of the plugins above to generate libraries as well.
 
@@ -47,7 +67,7 @@ Libraries are shareable across libraries and applications. They can be imported 
 
 ## Development server
 
-Run `nx serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
+Run `pnpm nx serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
 
 ## Code scaffolding
 

@@ -139,5 +139,5 @@
     "typescript": "~5.5.4",
     "unused-exports": "^0.0.6-beta"
   },
-  "packageManager": "yarn@3.4.1"
+  "packageManager": "pnpm@10.15.1"
 }

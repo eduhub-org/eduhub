@@ -705,13 +705,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          cache: 'yarn'
+          cache: 'pnpm'
       
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
       
       - name: Run tests
-        run: yarn test --coverage --watchAll=false
+        run: pnpm test --coverage --watchAll=false
       
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -723,19 +723,19 @@ jobs:
 
 ```bash
 # Run all tests
-cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && pnpm test
 
 # Run tests in watch mode
-cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test:watch
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && pnpm test:watch
 
 # Run tests with coverage
-cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test:coverage
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && pnpm test:coverage
 
 # Run specific test file
-cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test components/inputs/EmailEditor.test.tsx
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && pnpm test components/inputs/EmailEditor.test.tsx
 
 # Run tests for specific pattern
-cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && yarn test --testNamePattern="EmailEditor"
+cd ${EDUHUB_ROOT:-$PWD}/frontend-nx && pnpm test --testNamePattern="EmailEditor"
 ```
 
 ### Backend Testing Commands
