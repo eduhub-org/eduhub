@@ -1,6 +1,5 @@
 ---
-description: "TableGrid column configuration, sizing, layout control, and migration from legacy patterns"
-globs: ["**/TableGrid/**", "**/*table*", "**/*grid*", "**/columns/**", "**/components/common/TableGrid/**"]
+description: "Apply when configuring table columns, setting column sizing and layouts, customizing column behavior, or migrating from legacy table patterns to TableGrid in EduHub"
 alwaysApply: false
 ---
 

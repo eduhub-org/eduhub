@@ -1,6 +1,5 @@
 ---
-description: "Basic TableGrid component usage, setup, pagination, and page size configuration for EduHub"
-globs: ["**/TableGrid/**", "**/*table*", "**/*grid*", "**/components/common/TableGrid/**"]
+description: "Apply when implementing data tables, setting up pagination, configuring table grids, or working with the TableGrid component in EduHub"
 alwaysApply: false
 ---
 

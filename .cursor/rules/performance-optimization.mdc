@@ -1,6 +1,5 @@
 ---
-description: "Performance optimization patterns, caching strategies, and bundle optimization for EduHub"
-globs: ["**/performance/**", "**/cache/**", "**/*performance*", "**/webpack*", "**/next.config.js", "**/*optimization*", "**/bundle*"]
+description: "Apply when optimizing performance, implementing caching strategies, reducing bundle size, improving load times, or addressing performance bottlenecks in EduHub"
 alwaysApply: false
 ---
 

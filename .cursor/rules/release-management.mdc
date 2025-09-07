@@ -1,9 +1,6 @@
 ---
-description: "Release management process, version control, and deployment workflow"
-globs: ["**/.github/workflows/**", "**/.releaserc.json", "**/CHANGELOG.md", "**/package.json", "**/frontend-nx/package.json"]
 alwaysApply: false
 ---
-
 # Release Management Process
 
 > **Related Rules**: [Conventional Commits](conventional-commits.mdc) | [Semantic Release Workflow](semantic-release-workflow.mdc) | [Database Table Creation](database-table-creation.md)

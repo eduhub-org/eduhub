@@ -1,12 +1,11 @@
 ---
-description: "Testing standards, patterns, and best practices for EduHub codebase including Jest, React Testing Library, and integration testing"
-globs: ["**/*.test.*", "**/*.spec.*", "**/__tests__/**", "**/jest.config.*", "**/test/**", "**/jest.setup.*"]
+description: "Apply when writing tests, setting up test configurations, implementing testing strategies, or establishing testing patterns for components, hooks, and integration testing in EduHub"
 alwaysApply: false
 ---
 
 # Testing Standards
 
-> **Related Rules**: [Frontend Component Patterns](frontend-component-patterns.mdc) | [Component Architecture](component-architecture.mdc) | [GraphQL Integration](graphql-integration-patterns.mdc) | [Frontend Development Commands](frontend-development-commands.mdc)
+> **Related Rules**: [Frontend Component Patterns](frontend-component-patterns.mdc) | [Component Architecture](component-architecture.mdc) | [GraphQL Integration](graphql-integration-patterns.mdc) | [Frontend Environment Setup](frontend-environment-setup.mdc)
 
 This guide establishes testing standards, patterns, and best practices for the EduHub codebase across frontend, backend, and serverless functions.
 

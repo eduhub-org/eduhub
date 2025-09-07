@@ -1,6 +1,5 @@
 ---
-description: "Security patterns, authentication, authorization, and Keycloak integration for EduHub"
-globs: ["**/auth/**", "**/keycloak/**", "**/hooks/authedMutation.ts", "**/*auth*", "**/*security*", "**/*jwt*", "**/hooks/authedQuery.ts"]
+description: "Apply when implementing authentication, authorization, security patterns, Keycloak integration, JWT handling, or any security-related features in EduHub"
 alwaysApply: false
 ---
 

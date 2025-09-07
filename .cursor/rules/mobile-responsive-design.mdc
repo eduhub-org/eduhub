@@ -1,6 +1,5 @@
 ---
-description: "Mobile and responsive design patterns for EduHub components, layouts, and TableGrid"
-globs: ["**/components/**", "**/styles/**", "**/*.css", "**/*.scss", "**/mobile/**", "**/responsive/**", "**/*mobile*", "**/*responsive*"]
+description: "Apply when implementing responsive layouts, mobile-first design, creating mobile-friendly components, or ensuring cross-device compatibility in EduHub"
 alwaysApply: false
 ---
 

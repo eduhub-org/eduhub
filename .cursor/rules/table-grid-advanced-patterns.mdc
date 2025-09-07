@@ -1,6 +1,5 @@
 ---
-description: "Advanced TableGrid patterns including useTableGrid hook, GraphQL integration, search filtering, and state management"
-globs: ["**/TableGrid/**", "**/hooks/useTableGrid*", "**/*table*", "**/*grid*", "**/components/common/TableGrid/**"]
+description: "Apply when implementing advanced table features like custom hooks (useTableGrid), complex filtering, search functionality, state management, or GraphQL integration with TableGrid in EduHub"
 alwaysApply: false
 ---
 

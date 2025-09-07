@@ -1,12 +1,10 @@
 ---
 description: "Frontend environment setup, Docker configuration, and development environment for EduHub"
-globs: ["**/docker-compose.yml", "**/Dockerfile*", "**/frontend-nx/**", "**/.env*", "**/Dockerfile-dev*"]
 alwaysApply: false
 ---
-
 # Frontend Environment Setup
 
-> **Related Rules**: [Frontend Development Commands](frontend-development-commands.mdc) | [Frontend Troubleshooting](frontend-troubleshooting.mdc) | [Frontend Component Patterns](frontend-component-patterns.mdc)
+> **Related Rules**: [Frontend Component Patterns](frontend-component-patterns.mdc)
 
 ## Project Structure
 
