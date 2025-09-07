@@ -1,7 +1,6 @@
 ---
-description: "Component architecture patterns, design decisions, and organizational principles for EduHub frontend"
-globs: ["**/components/**", "**/*.tsx", "**/*.ts"]
-alwaysApply: true
+description: "Apply when working on component design, architecture decisions, organizing component structure, creating new components, or refactoring existing component hierarchies in the EduHub frontend"
+alwaysApply: false
 ---
 
 # Component Architecture Guide

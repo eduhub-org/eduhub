@@ -2,75 +2,80 @@
 
 This directory contains comprehensive development rules and guidelines for the EduHub project. Each rule is designed to ensure consistency, quality, and best practices across the codebase.
 
+## Overview Rule
+
+- **[Overview](overview.mdc)**: Core project overview, tech stack, and essential patterns (always applied)
+
 ## Rule Categories
 
 ### 🎨 Frontend Development
-| Rule | Description | Triggers On |
+| Rule | Description | Applied When |
 |------|-------------|-------------|
-| [Frontend Environment Setup](frontend-environment-setup.mdc) | Docker setup, environment configuration, and development environment | `docker-compose.yml`, `Dockerfile*`, `frontend-nx/**` |
-| [Frontend Development Commands](frontend-development-commands.mdc) | Build workflows, testing procedures, and development commands | `package.json`, `yarn.lock`, `nx.json`, `.github/workflows/**` |
-| [Frontend Troubleshooting](frontend-troubleshooting.mdc) | Common issues, Docker problems, and environment fixes | `docker-compose.yml`, `Dockerfile*`, `frontend-nx/**` |
-| [Frontend Component Patterns](frontend-component-patterns.mdc) | TypeScript standards, React patterns, and component reuse | `*.ts`, `*.tsx`, `components/**`, `pages/**` |
-| [Component Architecture](component-architecture.mdc) | Component design decisions, organization, and architectural patterns | `components/**`, `*.tsx`, `*.ts` |
+| [Frontend Environment Setup](frontend-environment-setup.mdc) | Docker setup, environment configuration, and development environment | Working with Docker, environment setup, or development configuration |
+| [Frontend Development Commands](frontend-development-commands.mdc) | Build workflows, testing procedures, and development commands | Working with build processes, testing, or development workflows |
+| [Frontend Troubleshooting](frontend-troubleshooting.mdc) | Common issues, Docker problems, and environment fixes | Troubleshooting development environment or Docker issues |
+| [Frontend Component Patterns](frontend-component-patterns.mdc) | TypeScript standards, React patterns, and component reuse | Working with TypeScript, React components, or frontend patterns |
+| [Component Architecture](component-architecture.mdc) | Component design decisions, organization, and architectural patterns | Designing components, organizing code, or architectural decisions |
 
 ### 📊 Data & Tables
-| Rule | Description | Triggers On |
+| Rule | Description | Applied When |
 |------|-------------|-------------|
-| [TableGrid Basic Usage](table-grid-basic-usage.mdc) | Basic TableGrid setup, pagination, and page size configuration | `TableGrid/**`, `*table*`, `*grid*`, `components/common/**` |
-| [TableGrid Advanced Patterns](table-grid-advanced-patterns.mdc) | useTableGrid hook, GraphQL integration, and complex filtering | `TableGrid/**`, `hooks/**`, `*table*`, `*grid*` |
-| [TableGrid Column Configuration](table-grid-column-configuration.mdc) | Column sizing, layout control, and migration from legacy patterns | `TableGrid/**`, `*table*`, `*grid*`, `columns/**` |
+| [TableGrid Basic Usage](table-grid-basic-usage.mdc) | Basic TableGrid setup, pagination, and page size configuration | Working with data tables, pagination, or basic TableGrid setup |
+| [TableGrid Advanced Patterns](table-grid-advanced-patterns.mdc) | useTableGrid hook, GraphQL integration, and complex filtering | Advanced table features, hooks, or complex data filtering |
+| [TableGrid Column Configuration](table-grid-column-configuration.mdc) | Column sizing, layout control, and migration from legacy patterns | Configuring table columns, sizing, or migrating table layouts |
 
 ### 🔗 GraphQL & Backend
-| Rule | Description | Triggers On |
+| Rule | Description | Applied When |
 |------|-------------|-------------|
-| [GraphQL Integration Patterns](graphql-integration-patterns.mdc) | Query/mutation structure, error handling, and caching strategies | `queries/**`, `hooks/**`, `*.ts`, `*.tsx` |
-| [Database Table Creation](database-table-creation.md) | Adding new tables, columns, and Hasura metadata configuration | `migrations/**/*.sql`, `metadata/**/*.yaml`, `queries/**/*.ts` |
+| [GraphQL Integration Patterns](graphql-integration-patterns.mdc) | Query/mutation structure, error handling, and caching strategies | Working with GraphQL queries, mutations, or data fetching |
+| [Database Table Creation](database-table-creation.md) | Adding new tables, columns, and Hasura metadata configuration | Creating database tables, migrations, or Hasura metadata |
 
 ### 🌐 Internationalization
-| Rule | Description | Triggers On |
+| Rule | Description | Applied When |
 |------|-------------|-------------|
-| [Translation Implementation](translation-implementation.mdc) | German 'Du' form requirements and component-based organization | `locales/**`, `*translation*`, `*i18n*` |
+| [Translation Implementation](translation-implementation.mdc) | German 'Du' form requirements and component-based organization | Working with translations, i18n, or localization |
 
 ### 🧪 Testing & Quality
-| Rule | Description | Triggers On |
+| Rule | Description | Applied When |
 |------|-------------|-------------|
-| [Testing Standards](testing-standards.mdc) | Jest, React Testing Library, and integration testing patterns | `*.test.*`, `*.spec.*`, `__tests__/**`, `jest.config.*` |
+| [Testing Standards](testing-standards.mdc) | Jest, React Testing Library, and integration testing patterns | Writing tests, test configuration, or testing strategies |
 
 ### 📧 Email System
-| Rule | Description | Triggers On |
+| Rule | Description | Applied When |
 |------|-------------|-------------|
-| [EduHub Email System](eduhub-email-system.mdc) | Email system configuration and usage patterns | `functions/sendMail/**`, `functions/callNodeFunction/**`, `emailTemplates/**` |
+| [EduHub Email System](eduhub-email-system.mdc) | Email system configuration and usage patterns | Working with email functionality, templates, or email services |
 
 ### 🔐 Security & Performance
-| Rule | Description | Triggers On |
+| Rule | Description | Applied When |
 |------|-------------|-------------|
-| [Security and Authentication](security-authentication.mdc) | Security patterns, authentication, authorization, and Keycloak integration | `**/auth/**`, `**/keycloak/**`, `hooks/authedMutation.ts`, `**/*auth*` |
-| [Performance Optimization](performance-optimization.mdc) | Performance optimization patterns, caching strategies, and bundle optimization | `**/*performance*`, `**/*cache*`, `webpack*`, `next.config.js` |
+| [Security and Authentication](security-authentication.mdc) | Security patterns, authentication, authorization, and Keycloak integration | Working with authentication, security, or authorization |
+| [Performance Optimization](performance-optimization.mdc) | Performance optimization patterns, caching strategies, and bundle optimization | Optimizing performance, caching, or bundle size |
 
 ### 📱 UI/UX Design
-| Rule | Description | Triggers On |
+| Rule | Description | Applied When |
 |------|-------------|-------------|
-| [Mobile and Responsive Design](mobile-responsive-design.mdc) | Mobile and responsive design patterns for components, layouts, and TableGrid | `**/components/**`, `**/styles/**`, `**/*.css`, `**/*mobile*` |
+| [Mobile and Responsive Design](mobile-responsive-design.mdc) | Mobile and responsive design patterns for components, layouts, and TableGrid | Working with responsive design, mobile layouts, or UI/UX |
 
 ### 🚀 DevOps & Operations
-| Rule | Description | Triggers On |
+| Rule | Description | Applied When |
 |------|-------------|-------------|
-| [DevOps and Monitoring](devops-monitoring.mdc) | DevOps practices, monitoring, logging, deployment, and observability | `.github/workflows/**`, `docker-compose.yml`, `Dockerfile*`, `infrastructure/**` |
+| [DevOps and Monitoring](devops-monitoring.mdc) | DevOps practices, monitoring, logging, deployment, and observability | Working with deployment, monitoring, or DevOps processes |
 
 ### 🚀 Release Management
-| Rule | Description | Triggers On |
+| Rule | Description | Applied When |
 |------|-------------|-------------|
-| [Conventional Commits](conventional-commits.mdc) | Commit message standards and semantic versioning impact | `*.md`, `package.json`, `.releaserc.json`, `CHANGELOG.md` |
-| [Release Management](release-management.mdc) | Release process, version control, and deployment workflow | All files |
-| [Semantic Release Workflow](semantic-release-workflow.mdc) | Branch strategy and automated versioning process | All files |
+| [Conventional Commits](conventional-commits.mdc) | Commit message standards and semantic versioning impact | Working with commits, versioning, or release processes |
+| [Release Management](release-management.mdc) | Release process, version control, and deployment workflow | Managing releases, version control, or deployment workflows |
+| [Semantic Release Workflow](semantic-release-workflow.mdc) | Branch strategy and automated versioning process | Working with branch strategies or automated versioning |
 
 ## Quick Start Guide
 
 ### For New Developers
-1. **Start with**: [Frontend Environment Setup](frontend-environment-setup.mdc)
-2. **Learn patterns**: [Frontend Component Patterns](frontend-component-patterns.mdc)
-3. **Understand architecture**: [Component Architecture](component-architecture.mdc)
-4. **Set up testing**: [Testing Standards](testing-standards.mdc)
+1. **Start with**: [Overview](overview.mdc) - Core project understanding
+2. **Environment setup**: [Frontend Environment Setup](frontend-environment-setup.mdc)
+3. **Learn patterns**: [Frontend Component Patterns](frontend-component-patterns.mdc)
+4. **Understand architecture**: [Component Architecture](component-architecture.mdc)
+5. **Set up testing**: [Testing Standards](testing-standards.mdc)
 
 ### For Frontend Development
 1. **Component work**: [Frontend Component Patterns](frontend-component-patterns.mdc) + [Component Architecture](component-architecture.mdc)
@@ -132,24 +137,22 @@ All rules follow a standardized metadata format:
 ```yaml
 ---
 description: "Brief description of the rule's purpose and scope"
-globs: ["**/pattern1/**", "**/pattern2/**", "**/*.ext"]
-alwaysApply: true
+alwaysApply: false
 ---
 ```
 
 ### Metadata Fields
 
 - **`description`**: Clear, concise description of what the rule covers
-- **`globs`**: Array of file patterns that trigger this rule
-- **`alwaysApply`**: Boolean indicating if the rule should be automatically applied
+- **`alwaysApply`**: Only the overview rule uses `true`; all other rules use `false` for intelligent context-based application
 
-### Globs Patterns
+### Intelligent Application
 
-- **`**/components/**`**: All files in components directories
-- **`**/*.ts`**: All TypeScript files
-- **`**/TableGrid/**`**: All files in TableGrid directories
-- **`**/*test*`**: All test-related files
-- **`**/migrations/**/*.sql`**: SQL migration files
+Rules are applied based on context and content analysis rather than file patterns:
+
+- **Context-aware**: Rules activate when working on relevant topics or tasks
+- **Content-based**: Rules trigger based on the nature of the work being performed
+- **Semantic understanding**: AI determines when rules are relevant to the current task
 
 ## Contributing to Rules
 
@@ -175,16 +178,17 @@ alwaysApply: true
 
 ## Troubleshooting
 
-### Rule Not Triggering
-1. Check if `alwaysApply: true` is set
-2. Verify glob patterns match your files
-3. Ensure file paths are correct
-4. Check for typos in metadata
+### Rule Not Applying
+1. Check if the rule description matches your task context
+2. Ensure the rule content is relevant to your specific work
+3. Review if the rule scope is appropriate for your task
+4. Consider if the task requires a different rule or approach
 
-### Too Many Rules Triggering
-1. Make glob patterns more specific
-2. Consider if `alwaysApply: false` is more appropriate
-3. Review rule scope and split if too broad
+### Too Many Rules Applying
+1. Review rule descriptions and scope
+2. Consider if rules are too general or overlapping
+3. Split rules if they cover too many different topics
+4. Ensure rules are focused on specific domains
 
 ### Missing Cross-References
 1. Identify related rules

@@ -1,6 +1,5 @@
 ---
-description: "GraphQL integration patterns, query/mutation structure, error handling, and caching strategies for EduHub"
-globs: ["**/queries/**", "**/hooks/authedMutation.ts", "**/*graphql*", "**/*apollo*", "**/hooks/authedQuery.ts"]
+description: "Apply when working with GraphQL queries, mutations, implementing data fetching patterns, handling GraphQL errors, or integrating with Apollo Client in EduHub"
 alwaysApply: false
 ---
 
@@ -121,6 +120,9 @@ export const UPDATE_COURSE = gql`
 
 #### Available Hooks
 ```typescript
+// For role-based operations (MOST COMMONLY USED)
+const { data, loading, error } = useRoleQuery(QUERY, options);
+
 // For admin operations
 const { data, loading, error } = useAdminQuery(QUERY, options);
 
@@ -131,6 +133,7 @@ const { data, loading, error } = useInstructorQuery(QUERY, options);
 const { data, loading, error } = useAuthedQuery(QUERY, options);
 
 // For role-based mutations
+const [mutation] = useRoleMutation(MUTATION, options);
 const [mutation] = useAdminMutation(MUTATION, options);
 const [mutation] = useInstructorMutation(MUTATION, options);
 const [mutation] = useAuthedMutation(MUTATION, options);
@@ -161,6 +164,43 @@ const MyComponent = () => {
   });
 };
 ```
+
+#### Why useRoleQuery is Most Common
+
+**`useRoleQuery` is the primary hook used throughout EduHub** because it provides dynamic role-based authorization:
+
+```typescript
+// Automatically uses current user's role (admin, instructor, participant)
+const { data, loading, error } = useRoleQuery<CourseList>(COURSE_LIST);
+
+// Can override role when needed
+const { data } = useRoleQuery(QUERY, {
+  context: { role: AuthRoles.admin }
+});
+```
+
+**Key Benefits:**
+- **Automatic Role Detection**: Uses `useCurrentRole()` to determine the appropriate Hasura role
+- **Flexible**: Can override role via context when needed
+- **Secure**: Automatically sets correct `x-hasura-role` header
+- **Convenient**: Single hook handles most authorization scenarios
+
+**Usage Statistics in EduHub:**
+- `useRoleQuery`: 55+ usages (most common)
+- `useAdminQuery`: 20+ usages (admin-specific)
+- `useInstructorQuery`: 4+ usages (instructor-specific)
+- `useAuthedQuery`: 15+ usages (basic auth)
+
+**Common Pattern - TableGrid Integration:**
+```typescript
+// Most TableGrid components use useRoleQuery
+const tableConfig = {
+  queryHook: useRoleQuery, // Dynamic role-based queries
+  // ...other config
+};
+```
+
+This pattern allows components to work across different user roles without hardcoding permissions.
 
 ## Error Handling Patterns
 

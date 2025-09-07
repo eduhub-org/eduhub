@@ -1,6 +1,5 @@
 ---
-description: "Email system configuration and usage patterns for EduHub"
-globs: ["**/functions/sendMail/**", "**/functions/callNodeFunction/**", "**/emailTemplates/**", "**/*email*", "**/functions/sendEnrollmentEmail/**"]
+description: "Apply when working with email functionality, configuring email templates, implementing email sending features, or debugging email-related issues in EduHub"
 alwaysApply: false
 ---
 

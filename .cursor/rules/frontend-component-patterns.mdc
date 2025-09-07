@@ -1,7 +1,6 @@
 ---
-description: "TypeScript and React component standards, patterns, and reuse guidelines for EduHub frontend"
-globs: ["**/*.ts", "**/*.tsx", "**/components/**", "**/pages/**"]
-alwaysApply: true
+description: "Apply when writing TypeScript/React code, implementing component patterns, following coding standards, choosing between existing components, or establishing frontend development practices in EduHub"
+alwaysApply: false
 ---
 
 # Frontend Component Patterns & TypeScript Standards

@@ -1,7 +1,6 @@
 ---
-description: "Translation implementation guide with German 'Du' form requirements and component-based organization"
-globs: ["**/locales/**", "**/*translation*", "**/*i18n*"]
-alwaysApply: true
+description: "Apply when working with translations, implementing internationalization (i18n), adding new text content that needs translation, working with locale files, or ensuring German 'Du' form compliance in EduHub"
+alwaysApply: false
 ---
 # Translation Implementation Guide
 
