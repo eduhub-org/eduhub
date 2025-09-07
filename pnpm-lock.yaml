@@ -142,9 +142,6 @@ importers:
       papaparse:
         specifier: ^5.4.1
         version: 5.5.3
-      playwright:
-        specifier: ^1.55.0
-        version: 1.55.0
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -365,6 +362,9 @@ importers:
       nx:
         specifier: 19.6.4
         version: 19.6.4
+      playwright:
+        specifier: ^1.55.0
+        version: 1.55.0
       postcss:
         specifier: 8.4.44
         version: 8.4.44

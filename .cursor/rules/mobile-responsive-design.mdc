@@ -79,6 +79,7 @@ const isDesktop = useMediaQuery('(min-width: 1024px)');
 const useCourseColumns = () => {
   const isMobile = useMediaQuery('(max-width: 768px)');
   const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1024px)');
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   return useMemo<ColumnDef<Course>[]>(() => {
     const baseColumns: ColumnDef<Course>[] = [
@@ -131,7 +132,7 @@ const useCourseColumns = () => {
     }
 
     return baseColumns;
-  }, [isMobile, isTablet]);
+  }, [isMobile, isTablet, isDesktop]);
 };
 ```
 

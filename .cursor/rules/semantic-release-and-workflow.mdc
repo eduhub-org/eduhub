@@ -1,0 +1,192 @@
+---
+alwaysApply: false
+---
+# Semantic Release and Workflow Management
+
+> **Related Rules**: [Conventional Commits and PRs](conventional-commits-and-prs.mdc) | [Database Table Creation](database-table-creation.md)
+
+EduHub uses automated semantic versioning with a three-branch workflow and comprehensive release management for consistent, reliable deployments.
+
+## Branch Structure and Workflow
+
+- **`develop`** - Main development branch
+  - All feature branches merge here
+  - No automated releases (reduces version noise)
+  - Automatically deployed to development environment
+
+- **`staging`** - Pre-production testing branch  
+  - PRs from `develop` to `staging` for testing
+  - No automated releases (focus on production-ready code)
+  - Automatically deployed to staging environment
+  - Used for final testing before production
+
+- **`production`** - Production releases
+  - PRs from `staging` to `production` for final releases
+  - Creates final release versions: `0.1.0`, `0.2.0`, etc.
+  - Automatically deployed to production environment
+  - **Only branch that triggers semantic releases**
+
+## Release Workflow Steps
+
+### 1. Development Phase
+- Create feature branch from `develop`
+- Make changes using conventional commits
+- Create PR to `develop` with title: `chore: merge [feature-branch] into develop`
+- Push commits → no automated releases (cleaner version history)
+- Automatic deployment to development environment
+
+### 2. Staging Phase
+- Create PR from `develop` to `staging`
+- PR title: `chore: merge develop into staging for release candidate`
+- Review and merge → no automated releases (focus on production readiness)
+- Test thoroughly on staging environment
+- If issues found, fix on `develop` and create new PR
+
+### 3. Production Phase
+- Create PR from `staging` to `production`
+- PR title: `chore: promote staging to production release`
+- Final review and merge → triggers `0.x.x` production release
+- Monitor production deployment
+- **Only phase that creates semantic versions**
+
+## Project Structure for Releases
+
+```
+/
+├── frontend-nx/                 # Main frontend application
+│   ├── package.json            # Primary version source
+│   └── .releaserc.json         # Semantic release config
+├── functions/                   # Serverless functions
+│   └── */package.json          # Auto-synced versions
+├── package.json                # Root workspace package
+├── CHANGELOG.md                # Auto-generated
+└── .github/workflows/release.yml
+```
+
+## Configuration Files
+
+- **[frontend-nx/.releaserc.json](mdc:frontend-nx/.releaserc.json)** - Semantic release configuration
+- **[.github/workflows/release.yml](mdc:.github/workflows/release.yml)** - GitHub Actions workflow
+- **[docs/SEMANTIC_RELEASE_WORKFLOW.md](mdc:docs/SEMANTIC_RELEASE_WORKFLOW.md)** - Detailed workflow documentation
+- **[CONTRIBUTING.md](mdc:CONTRIBUTING.md)** - Contribution guidelines with commit conventions
+
+## Conventional Commits and Version Impact
+
+### Version Bumping Types
+- `feat:` - New feature → **MINOR** version bump (0.1.0 → 0.2.0)
+- `fix:` - Bug fix → **PATCH** version bump (0.1.0 → 0.1.1)
+- `perf:` - Performance improvement → **PATCH** version bump
+- `BREAKING CHANGE:` - Breaking change → **MAJOR** version bump (0.1.0 → 1.0.0)
+
+### Non-Version Bumping Types (appear in changelog)
+- `chore:` - Maintenance tasks
+- `docs:` - Documentation changes
+- `style:` - Code style changes
+- `refactor:` - Code refactoring
+- `test:` - Adding tests
+- `build:` - Build system changes
+- `ci:` - CI configuration changes
+
+## Version Management and Synchronization
+
+Semantic release automatically updates versions in:
+- `frontend-nx/package.json` (main frontend package)
+- `package.json` (root workspace package)
+- All `functions/*/package.json` files (serverless functions)
+- `CHANGELOG.md` (auto-generated changelog)
+
+### Workspace Version Synchronization
+
+**Critical for Monorepo Setup**: EduHub uses pnpm workspaces, requiring version alignment:
+
+- **Semantic-release runs from `frontend-nx`** directory and auto-updates `frontend-nx/package.json`
+- **Root `package.json` is manually updated** via `prepareCmd` to prevent version drift
+- **All function packages sync** to the same version for consistency
+- **Prevents workspace resolution issues** and noisy diffs
+
+**Never manually edit version numbers** - the automated system keeps everything synchronized.
+
+### Serverless Functions Synchronization
+All function packages in [functions/](mdc:functions/) directory:
+- `functions/echo/package.json`
+- `functions/addKeycloakRole/package.json`
+- `functions/callPythonFunction/package.json`
+- `functions/sendMail/package.json`
+- And others...
+
+## Merge Commit Guidelines
+
+When merging to any branch:
+
+### ✅ Use conventional commit format for merge commits:
+```bash
+chore: merge feature/oauth2-integration into develop
+chore: merge develop into staging for release candidate
+chore: promote staging to production release
+```
+
+### ❌ Avoid GitHub's default merge messages:
+```bash
+Merge pull request #123 from org/develop
+```
+
+**Important**: Semantic-release analyzes ALL commits in a merge to determine version bumps, not just the merge commit message. Use `chore:` for merge commits because the actual features/fixes are documented in individual commits.
+
+## GitHub Actions Integration
+
+The **[release workflow](mdc:.github/workflows/release.yml)** handles:
+- Dependency installation in `frontend-nx`
+- Semantic release execution
+- Version updates across all files
+- GitHub release creation
+- Tag generation
+
+## Automated Processes
+
+- **Changelog Generation**: Automatic based on conventional commits
+- **GitHub Releases**: Created with release notes
+- **Git Tags**: Applied with proper versioning
+- **Version Bumping**: Based on commit message types
+- **Deployment**: Automatic to respective environments
+
+## Best Practices
+
+1. **Always use conventional commits** for proper versioning
+2. **Test thoroughly on staging** before production
+3. **Keep PRs focused** for easier release tracking
+4. **Document breaking changes** clearly in commit footers
+5. **Monitor production** after releases
+6. **Use feature flags** for risky changes
+7. **Use `chore:` for all PR titles** (individual commits drive versioning)
+
+## Monitoring and Rollbacks
+
+- Monitor deployments after each release
+- Use GitHub release notes for change tracking
+- Staging environment mirrors production for testing
+- Emergency rollbacks should be rare with proper testing
+
+## Manual Override (Emergency Only)
+
+If manual intervention is needed:
+1. Never edit version numbers directly
+2. Use `git revert` for problematic releases
+3. Fix issues on `develop` branch first
+4. Follow normal PR process
+5. Document emergency procedures in commit messages
+
+## Troubleshooting
+
+- Check GitHub Actions logs for release failures
+- Verify conventional commit format for version issues
+- Ensure all tests pass before merging to staging/production
+- Contact maintainers for release pipeline issues
+
+## Important Notes
+
+- Semantic release runs from the `frontend-nx` directory in the monorepo
+- The workflow requires conventional commit format for proper version determination
+- All version updates happen automatically - do not manually edit version numbers
+- The `[skip ci]` flag is automatically added to release commits to prevent infinite loops
+- PR titles are for organization/tracking, not version determination
+- Individual feature/fix commits within PRs drive the actual version bumps

@@ -41,9 +41,10 @@ functions/
 
 #### 3. General Notifications
 **Function**: `sendMail/`
-- **Trigger**: Manual or system-triggered notifications
+- **Trigger**: **Backend-only** - Must be invoked via backend processes, Hasura event triggers, or server-side functions
 - **Templates**: Custom email content
 - **Variables**: Dynamic based on content
+- **⚠️ Important**: Never call `sendMail` directly from frontend/client-side code
 
 ## Email Template System
 
@@ -114,16 +115,60 @@ const reminderResult = await callNodeFunction({
 ```
 
 ### Custom Email Sending
+
+**⚠️ Backend-Only Invocation Required**
+
+The `sendMail` function must only be invoked through backend processes or Hasura event triggers. Never call it directly from frontend code.
+
+#### Backend API Approach
 ```javascript
-// Direct sendMail function usage
-const emailResult = await sendMail({
-  to: user.email,
-  subject: 'Custom Notification',
-  content: 'Email content with {{variable}} substitution',
-  variables: {
-    variable: 'actual value'
+// Backend API endpoint (server-side only)
+app.post('/api/send-notification', async (req, res) => {
+  try {
+    const emailResult = await sendMail({
+      to: req.body.email,
+      subject: 'Custom Notification',
+      content: 'Email content with {{variable}} substitution',
+      variables: {
+        variable: req.body.variableValue
+      }
+    });
+    res.json({ success: true, result: emailResult });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 });
+```
+
+#### Hasura Event Trigger Approach
+```javascript
+// Hasura event trigger handler (server-side only)
+const handleEmailTrigger = async (event) => {
+  const { user_email, notification_type, variables } = event.payload;
+  
+  const emailResult = await sendMail({
+    to: user_email,
+    subject: getSubjectForType(notification_type),
+    content: getTemplateForType(notification_type),
+    variables: variables
+  });
+  
+  return { success: true, emailSent: emailResult.success };
+};
+```
+
+#### Frontend Integration (Correct Approach)
+```javascript
+// Frontend calls backend API, not sendMail directly
+const sendNotificationEmail = async (emailData) => {
+  const response = await fetch('/api/send-notification', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(emailData)
+  });
+  
+  return await response.json();
+};
 ```
 
 ## Email Configuration

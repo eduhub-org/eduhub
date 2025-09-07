@@ -1,10 +1,10 @@
 ---
-description: "Conventional commit standards and their semantic versioning impact"
+description: "Conventional commit standards, PR workflow, and their semantic versioning impact"
 alwaysApply: false
 ---
-# Conventional Commits Standards
+# Conventional Commits and PRs
 
-> **Related Rules**: [Release Management](release-management.mdc) | [Semantic Release Workflow](semantic-release-workflow.mdc) | [Database Table Creation](database-table-creation.md)
+> **Related Rules**: [Semantic Release and Workflow](semantic-release-and-workflow.mdc) | [Database Table Creation](database-table-creation.md)
 
 EduHub uses [Conventional Commits](https://www.conventionalcommits.org/) for automated version management and changelog generation.
 
@@ -121,6 +121,41 @@ wip
 - **develop**: `feat: new login flow` → `0.1.0-dev.1`
 - **staging**: Same commit via PR → `0.1.0-rc.1`  
 - **production**: Same commit via PR → `0.1.0`
+
+## Pull Request Workflow
+
+EduHub uses a three-branch workflow for consistent release management. Follow these guidelines for creating PRs:
+
+### Feature Development → Develop
+- **Source**: Feature branches (`feature/user-auth`, `fix/table-pagination`, etc.)
+- **Target**: `develop` branch
+- **PR Title**: `chore: merge [feature-branch-name] into develop`
+- **Examples**:
+  ```bash
+  chore: merge feature/oauth2-integration into develop
+  chore: merge fix/table-pagination into develop
+  chore: merge docs/api-updates into develop
+  ```
+
+### Develop → Staging (Release Candidates)
+- **Source**: `develop` branch
+- **Target**: `staging` branch
+- **PR Title**: `chore: merge develop into staging for release candidate`
+- **Purpose**: Deploy to staging environment for final testing
+- **No automated releases** (focus on production-ready code)
+
+### Staging → Production (Final Releases)
+- **Source**: `staging` branch
+- **Target**: `production` branch
+- **PR Title**: `chore: promote staging to production release`
+- **Purpose**: Deploy to production and trigger semantic release
+- **Only branch that creates final releases**: `0.1.0`, `0.2.0`, etc.
+
+### Important PR Guidelines
+- Use `chore:` for ALL branch promotion PRs (feature→develop, develop→staging, staging→production)
+- Semantic-release analyzes ALL commits in the merge, not just the PR title
+- Individual feature/fix commits drive the actual version bumps
+- PR titles are for organization/tracking, not version determination
 
 ## Release Notes
 
