@@ -1,9 +1,10 @@
 import { gql } from "@apollo/client";
-import { COURSE_INSTRUCTOR_FRAGMENT, COURSE_INSTRUCTOR_FRAGMENT_ANONYMOUS } from "./courseInstructorFragment";
+import { COURSE_ENROLLMENT_FRAGMENT } from "./courseEnrollmentFragment";
+import { COURSE_INSTRUCTOR_FRAGMENT_ANONYMOUS } from "./courseInstructorFragment";
 import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from "./programFragment";
 import { ENROLLMENT_FRAGMENT } from "./enrollmentFragment";
 
-import { SESSION_FRAGMENT } from './sessionFragement';
+import { SESSION_FRAGMENT } from './sessionFragment';
 
 
 export const COURSE_TILE_FRAGMENT_ANONYMOUS = gql`
@@ -30,7 +31,7 @@ export const COURSE_TILE_FRAGMENT_ANONYMOUS = gql`
 
 export const COURSE_FRAGMENT = gql`
   ${SESSION_FRAGMENT}
-  ${COURSE_INSTRUCTOR_FRAGMENT}
+  ${COURSE_ENROLLMENT_FRAGMENT}
   ${PROGRAM_FRAGMENT_MINIMUM_PROPERTIES}
   ${ENROLLMENT_FRAGMENT}
   fragment CourseFragment on Course {
@@ -63,7 +64,7 @@ export const COURSE_FRAGMENT = gql`
       ...SessionFragment
     }
     CourseInstructors(order_by: { id: desc }) {
-      ...CourseInstructorFragment
+      ...CourseEnrollmentFragment
     }
     CourseLocations {
       id

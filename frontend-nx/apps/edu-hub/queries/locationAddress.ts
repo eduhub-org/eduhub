@@ -5,7 +5,7 @@ export const LOCATION_ADDRESS_LIST = gql`
     $limit: Int = 15
     $offset: Int = 0
     $filter: LocationAddress_bool_exp = {}
-    $order_by: [LocationAddress_order_by!] = {created_at: desc}
+    $order_by: [LocationAddress_order_by!] = [{created_at: desc}]
   ) {
     LocationAddress(
       limit: $limit

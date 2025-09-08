@@ -3,7 +3,7 @@ import { gql } from '@apollo/client';
 import { COURSE_FRAGMENT } from './courseFragment';
 import { ENROLLMENT_FRAGMENT } from './enrollmentFragment';
 import { USER_PROGRAM_FRAGMENT } from './programFragment';
-import { SESSION_FRAGMENT } from './sessionFragement';
+import { SESSION_FRAGMENT } from './sessionFragment';
 
 export const COURSE_WITH_ENROLLMENT = gql`
   ${COURSE_FRAGMENT}

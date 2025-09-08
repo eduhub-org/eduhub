@@ -15,7 +15,7 @@ export * from './courseFragements';
 export * from './courseInstructorFragment';
 export * from './courseEnrollmentFragment';
 export * from './programFragment';
-export * from './sessionFragement';
+export * from './sessionFragment';
 export * from './enrollmentFragment';
 export * from './achievementRecordFragment';
 export * from './achievementOptionFragment';

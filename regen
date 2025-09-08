@@ -10,7 +10,16 @@ set -e  # Exit on any error
 # Get the target user (either provided as argument or current user)
 TARGET_USER=${1:-$USER}
 
-echo "Regenerating Apollo GraphQL code for user: $TARGET_USER"
+# Validate TARGET_USER exists and get its UID:GID
+if ! id "$TARGET_USER" >/dev/null 2>&1; then
+    echo "Error: User '$TARGET_USER' does not exist!"
+    echo "Please provide a valid username or run without arguments to use current user."
+    exit 1
+fi
+
+TARGET_UID_GID=$(id -u "$TARGET_USER"):$(id -g "$TARGET_USER")
+
+echo "Regenerating Apollo GraphQL code for user: $TARGET_USER (UID:GID: $TARGET_UID_GID)"
 echo "Make sure the frontend-nx container is running!"
 
 # Check if the eduhub-frontend-nx container is running
@@ -21,17 +30,17 @@ if ! docker ps --format "table {{.Names}}" | grep -q "^eduhub-frontend-nx$"; the
     exit 1
 fi
 
-# Run the codegen inside the container as the current user
-# This ensures we can access containers started by the regular user
+# Run the codegen inside the container as the target user
+# This ensures we can access containers started by the specified user
 echo "Running Apollo codegen in container..."
 
 # Check if pnpm is available in the container, otherwise fall back to npx
-if docker exec -i -u "$(id -u):$(id -g)" eduhub-frontend-nx which pnpm >/dev/null 2>&1; then
+if docker exec -i -u "$TARGET_UID_GID" eduhub-frontend-nx which pnpm >/dev/null 2>&1; then
     echo "Using pnpm to run the generator..."
-    docker exec -i -u "$(id -u):$(id -g)" eduhub-frontend-nx pnpm exec -- nx run edu-hub:apollo
+    docker exec -i -u "$TARGET_UID_GID" eduhub-frontend-nx pnpm exec -- nx run edu-hub:apollo
 else
     echo "pnpm not available, falling back to npx..."
-    docker exec -i -u "$(id -u):$(id -g)" eduhub-frontend-nx npx nx run edu-hub:apollo
+    docker exec -i -u "$TARGET_UID_GID" eduhub-frontend-nx npx nx run edu-hub:apollo
 fi
 
 # Check if any files were created with wrong permissions and fix them

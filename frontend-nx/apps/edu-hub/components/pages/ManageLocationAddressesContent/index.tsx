@@ -159,7 +159,7 @@ const ManageLocationAddressesContent: FC = () => {
           { shortLabel: { _ilike: `%${searchFilter}%` } },
           { address: { _ilike: `%${searchFilter}%` } },
           { description: { _ilike: `%${searchFilter}%` } },
-          { aliases: { _contains: searchFilter } },
+          ...(searchFilter ? [{ aliases: { _contains: [searchFilter] } }] : []),
         ],
       },
     }),

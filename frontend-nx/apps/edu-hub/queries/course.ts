@@ -7,7 +7,7 @@ import {
   COURSE_FRAGMENT_ANONYMOUS,
 } from './courseFragment';
 import { ADMIN_ENROLLMENT_FRAGMENT } from './enrollmentFragment';
-import { ADMIN_SESSION_FRAGMENT } from './sessionFragement';
+import { ADMIN_SESSION_FRAGMENT } from './sessionFragment';
 import { USER_FRAGMENT } from './userFragment';
 import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from './programFragment';
 
