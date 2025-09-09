@@ -1,0 +1,57 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+CONTRIBUTING.md
+docs/
+*.md
+
+# Development files
+.env*
+.vscode/
+.idea/
+*.log
+*.tmp
+
+# Test files
+test-results/
+coverage/
+.nyc_output/
+
+# Node modules (will be installed in container)
+node_modules/
+frontend-nx/node_modules/
+functions/*/node_modules/
+
+# Build artifacts
+dist/
+build/
+.next/
+out/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+
+# Lock files (will be copied explicitly)
+# pnpm-lock.yaml
+# package-lock.json
+
+# Infrastructure
+infrastructure/
+
+# Scripts
+scripts/
+regen
