@@ -47,7 +47,7 @@ ENV NEXT_PUBLIC_STORAGE_BUCKET_URL=${NEXT_PUBLIC_STORAGE_BUCKET_URL}
 RUN corepack enable
 ARG PNPM_VERSION=10.15.1
 RUN corepack prepare pnpm@${PNPM_VERSION} --activate
-RUN pnpm nx run edu-hub:build
+RUN pnpm exec nx run edu-hub:build
 
 # 3. Production image, copy all the files and run next
 FROM node:18-alpine AS runner
