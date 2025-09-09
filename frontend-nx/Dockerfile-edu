@@ -17,7 +17,7 @@ COPY pnpm-lock.yaml /opt/app/
 COPY frontend-nx/package.json /opt/app/frontend-nx/
 
 RUN corepack enable pnpm
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts=false
 
 # 2. Rebuild the source code only when needed
 FROM node:18-alpine AS builder
