@@ -1,5 +1,5 @@
 # Fixed version to node 16, as node 17 is not supported by some dependencies
-# 1. Install dependencies only when needed
+# 1. Fetch dependencies to warm the pnpm store
 FROM node:18-alpine AS deps
 
 RUN apk add --no-cache libc6-compat
@@ -18,14 +18,31 @@ COPY frontend-nx/package.json /opt/app/frontend-nx/
 
 ARG PNPM_VERSION=10.15.1
 RUN corepack prepare pnpm@${PNPM_VERSION} --activate
-RUN pnpm install --frozen-lockfile --ignore-scripts=false
+
+# Only fetch packages to warm the store (no install)
+RUN pnpm fetch
 
 # 2. Rebuild the source code only when needed
 FROM node:18-alpine AS builder
 
 WORKDIR /opt/app
 
-COPY --from=deps /opt/app/node_modules ./node_modules
+# Copy workspace configuration files
+COPY pnpm-workspace.yaml /opt/app/
+COPY package.json /opt/app/
+COPY pnpm-lock.yaml /opt/app/
+
+# Copy frontend-nx package.json to maintain workspace structure
+COPY frontend-nx/package.json /opt/app/frontend-nx/
+
+# Copy the warmed pnpm store from deps stage
+COPY --from=deps /opt/app/node_modules/.pnpm ./node_modules/.pnpm
+
+RUN corepack enable
+ARG PNPM_VERSION=10.15.1
+RUN corepack prepare pnpm@${PNPM_VERSION} --activate
+
+# Copy source code
 COPY . .
 
 ARG NEXT_PUBLIC_AUTH_URL
@@ -43,16 +60,14 @@ ENV NEXT_PUBLIC_HELP_DOCS_URL=${NEXT_PUBLIC_HELP_DOCS_URL}
 ARG NEXT_PUBLIC_STORAGE_BUCKET_URL
 ENV NEXT_PUBLIC_STORAGE_BUCKET_URL=${NEXT_PUBLIC_STORAGE_BUCKET_URL}
 
+# Disable Nx daemon in containers/CI
+ENV NX_DAEMON=false
 
-RUN corepack enable
-ARG PNPM_VERSION=10.15.1
-RUN corepack prepare pnpm@${PNPM_VERSION} --activate
+# Re-materialize the correct node_modules layout using the warmed store
+RUN pnpm install --frozen-lockfile --prefer-offline
 
 # Switch to the workspace root to match CI behavior
 WORKDIR /opt/app/frontend-nx
-
-# Disable Nx daemon in containers/CI
-ENV NX_DAEMON=false
 
 # Run the build exactly like the CI Action
 RUN pnpm exec nx run edu-hub:build
