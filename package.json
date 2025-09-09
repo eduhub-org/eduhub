@@ -10,5 +10,21 @@
       "frontend-nx"
     ]
   },
+  "devDependencies": {
+    "nx": "19.6.4"
+  },
+  "pnpm": {
+    "allowedScripts": {
+      "nx": true,
+      "sharp": true,
+      "@parcel/watcher": true,
+      "core-js": true,
+      "core-js-pure": true,
+      "cypress": true,
+      "next-translate-plugin": true,
+      "unrs-resolver": true,
+      "yarn": true
+    }
+  },
   "packageManager": "pnpm@10.15.1"
 }
