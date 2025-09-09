@@ -14,7 +14,7 @@ COPY package.json /opt/app/
 COPY pnpm-lock.yaml /opt/app/
 
 # Copy frontend-nx package.json to maintain workspace structure
-COPY package.json /opt/app/frontend-nx/
+COPY frontend-nx/package.json /opt/app/frontend-nx/
 
 RUN corepack enable pnpm
 RUN pnpm install --frozen-lockfile
