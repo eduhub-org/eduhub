@@ -75,23 +75,21 @@ RUN pnpm exec nx run edu-hub:build
 # 3. Production image, copy all the files and run next
 FROM node:18-alpine AS runner
 
-WORKDIR /opt/app
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    PORT=25000
 
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+WORKDIR /opt/app
 
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
+# standalone output already includes only the needed node_modules
 COPY --from=builder --chown=nextjs:nodejs /opt/app/frontend-nx/dist/apps/edu-hub/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /opt/app/frontend-nx/dist/apps/edu-hub/.next/static ./dist/apps/edu-hub/.next/static
 COPY --from=builder --chown=nextjs:nodejs /opt/app/frontend-nx/dist/apps/edu-hub/public ./apps/edu-hub/public
-# Temporary fix to fix image generation
-# https://github.com/vercel/next.js/issues/48077
-# COPY --from=builder /opt/app/frontend-nx/dist/apps/edu-hub/package.json ./package.json
-COPY --from=builder --chown=nextjs:nodejs /opt/app/node_modules/next/dist/compiled/jest-worker ./node_modules/next/dist/compiled/jest-worker
 
 WORKDIR /opt/app/apps/edu-hub
 
@@ -99,7 +97,4 @@ USER nextjs
 
 EXPOSE 25000
 
-ENV PORT=25000
-
-# CMD [ "node", "server.js" ]
-CMD [ "node", "server.js" ]
+CMD ["node", "server.js"]
