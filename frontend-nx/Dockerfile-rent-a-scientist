@@ -33,6 +33,8 @@ ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_AUTH_URL=${NEXT_PUBLIC_AUTH_URL}
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
+ARG PNPM_VERSION=10.15.1
+RUN corepack prepare pnpm@${PNPM_VERSION} --activate
 RUN npx nx run rent-a-scientist:build
 
 # 3. Production image, copy all the files and run next
