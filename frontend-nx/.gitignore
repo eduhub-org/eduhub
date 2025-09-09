@@ -17,6 +17,9 @@ node_modules
 !.yarn/sdks
 !.yarn/versions
 
+#pnpm
+.pnpm-store/
+
 # IDEs and editors
 /.idea
 .project

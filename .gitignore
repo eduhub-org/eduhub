@@ -6,6 +6,9 @@ docker-compose.env
 frontend.env
 node_modules
 
+# pnpm
+.pnpm-store/
+
 reminder.log
 
 *.code-workspace
