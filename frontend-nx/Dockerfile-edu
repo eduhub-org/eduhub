@@ -47,6 +47,14 @@ ENV NEXT_PUBLIC_STORAGE_BUCKET_URL=${NEXT_PUBLIC_STORAGE_BUCKET_URL}
 RUN corepack enable
 ARG PNPM_VERSION=10.15.1
 RUN corepack prepare pnpm@${PNPM_VERSION} --activate
+
+# Switch to the workspace root to match CI behavior
+WORKDIR /opt/app/frontend-nx
+
+# Disable Nx daemon in containers/CI
+ENV NX_DAEMON=false
+
+# Run the build exactly like the CI Action
 RUN pnpm exec nx run edu-hub:build
 
 # 3. Production image, copy all the files and run next
