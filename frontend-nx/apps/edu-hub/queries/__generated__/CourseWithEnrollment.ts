@@ -30,6 +30,10 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionAddresses {
    */
   address: string;
   /**
+   * Foreign key to LocationAddress. Replaces the free-text address field with a structured address reference. Nullable during migration period.
+   */
+  locationAddressId: number | null;
+  /**
    * An object relationship
    */
   CourseLocation: CourseWithEnrollment_Course_by_pk_Sessions_SessionAddresses_CourseLocation | null;

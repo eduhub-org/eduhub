@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import { COURSE_INSTRUCTOR_FRAGMENT } from './courseEnrollmentFragment';
+import { COURSE_ENROLLMENT_FRAGMENT } from './courseEnrollmentFragment';
 import { USER_FRAGMENT } from './userFragment';
 
 export const INSERT_SINGLE_ATTENDANCE = gql`
@@ -23,7 +23,7 @@ export const UPDATE_ATTENDANCE = gql`
 `;
 
 export const COURSE_ENROLLMENTS = gql`
-  ${COURSE_INSTRUCTOR_FRAGMENT}
+  ${COURSE_ENROLLMENT_FRAGMENT}
   query CourseEnrollmentQuery(
     $where: CourseEnrollment_bool_exp! = {}
     $limit: Int = null
@@ -41,7 +41,7 @@ export const COURSE_ENROLLMENTS = gql`
 `;
 
 export const COURSE_ENROLLMENTS_WITH_USER = gql`
-  ${COURSE_INSTRUCTOR_FRAGMENT}
+  ${COURSE_ENROLLMENT_FRAGMENT}
   ${USER_FRAGMENT}
   query CourseEnrollmentWithUserQuery(
     $where: CourseEnrollment_bool_exp! = {}

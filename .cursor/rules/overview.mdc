@@ -1,0 +1,89 @@
+---
+alwaysApply: true
+---
+
+### EduHub Monorepo Overview
+
+- **Project**: EduHub — educational platform for course management, registration, and learning. Repo: [eduhub/eduhub](https://github.com/eduhub/eduhub)
+- **Monorepo**: Nx workspace with frontend and backend separation. Root configs: [package.json](mdc:package.json), [pnpm-workspace.yaml](mdc:pnpm-workspace.yaml), [nx.json](mdc:frontend-nx/nx.json)
+- **Frontend**: Next.js app in `frontend-nx/apps/edu-hub` with TypeScript, Material-UI, GraphQL, i18n. Components organized by feature in [frontend-nx/apps/edu-hub/components/](mdc:frontend-nx/apps/edu-hub/components/)
+- **Backend**: Hasura GraphQL API with PostgreSQL. Schema and migrations in [backend/migrations/](mdc:backend/migrations/), metadata in [backend/metadata/](mdc:backend/metadata/)
+- **Authentication**: Keycloak integration with SSO support. Configuration in [keycloak/](mdc:keycloak/)
+- **Functions**: Serverless functions for email, notifications, and integrations in [functions/](mdc:functions/)
+
+### Package Management Strategy
+
+- **Frontend**: Uses **pnpm workspace** for optimal performance, disk space efficiency, and dependency management
+- **Functions**: Individual **npm packages** for Google Cloud Functions deployment compatibility
+- **Root**: pnpm workspace coordinator with [pnpm-workspace.yaml](mdc:pnpm-workspace.yaml)
+- **Lockfiles**: `pnpm-lock.yaml` (root), individual `package-lock.json` files for functions
+
+### Apps
+
+- **frontend-nx/apps/edu-hub**: Main Next.js application (UI, components, pages, GraphQL integration, i18n)
+- **frontend-nx/apps/rent-a-scientist**: Secondary application for scientist booking platform
+
+### Key Directories
+
+- **frontend-nx/apps/edu-hub/components/**: Feature-oriented component organization
+  - `common/`: Shared reusable components (dialogs, TableGrid, buttons)
+  - `inputs/`: Form input components (CreatableTagSelector, DropDownSelector, InputField)
+  - `pages/`: Page-specific components organized by feature
+- **frontend-nx/apps/edu-hub/locales/**: Internationalization files (German "Du" form required)
+- **backend/migrations/**: Database schema migrations
+- **backend/metadata/**: Hasura GraphQL metadata and permissions
+- **functions/**: Serverless functions for backend operations
+
+### Tech Stack
+
+- **Frontend**: Next.js, React, TypeScript, Material-UI, Apollo GraphQL, next-translate
+- **Backend**: Hasura GraphQL, PostgreSQL, Keycloak, Node.js/Python functions
+- **Development**: Docker, Nx workspace, pnpm, Jest, ESLint, Prettier
+
+### Development Commands
+
+```bash
+# Frontend development
+cd frontend-nx
+pnpm dev                 # Start development server
+pnpm build               # Build for production
+pnpm test                # Run tests
+pnpm lint                # Lint code
+
+# Backend development
+cd backend
+docker-compose up        # Start Hasura and PostgreSQL
+hasura console           # Open Hasura console
+
+# Full stack
+docker-compose up        # Start all services
+```
+
+### Component Architecture Principles
+
+- **Feature-oriented organization**: Components grouped by business functionality
+- **Component reuse**: Always check existing components before creating new ones
+- **TypeScript-first**: Strict typing for all components and interfaces
+- **GraphQL integration**: Apollo Client with proper error handling
+- **Internationalization**: German "Du" form, English translations
+- **Material-UI patterns**: Consistent design system usage
+
+### Key Development Patterns
+
+- **Component reuse**: Check `components/common/dialogs/`, `components/inputs/`, `components/common/` first
+- **Error handling**: Use `ErrorMessageDialog`, `QuestionConfirmationDialog`, `NotificationSnackbar`
+- **Data tables**: Use `TableGrid` component with pagination, sorting, filtering
+- **Form inputs**: Use `CreatableTagSelector`, `DropDownSelector`, `InputField`
+- **Translations**: Use `useTranslation` hook with snake_case keys
+- **GraphQL**: Use `useAdminQuery`, `useRoleMutation` with proper error handling
+
+### Essentials for every prompt
+
+- **Tech stack**: Next.js, React, TypeScript, Material-UI, Apollo GraphQL, Hasura, PostgreSQL, Keycloak
+- **Package management**: pnpm (frontend), npm (functions) - use correct manager for each context
+- **Component organization**: Feature-oriented, check existing components first
+- **Translations**: German "Du" form mandatory, English fallbacks
+- **Error handling**: Comprehensive error boundaries and user feedback
+- **Testing**: Jest, React Testing Library, component behavior testing
+
+For deeper details, consult component-specific rules and [frontend-nx/apps/edu-hub/](mdc:frontend-nx/apps/edu-hub/) structure.

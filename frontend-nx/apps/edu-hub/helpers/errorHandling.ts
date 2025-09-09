@@ -45,6 +45,12 @@ const knownRelationships: TableRelationship[] = [
     constraintName: 'User_organizationId_fkey',
     userFriendlyNameKey: 'error_handling.entities.users'
   },
+  {
+    parentTable: 'LocationAddress',
+    childTable: 'SessionAddress',
+    constraintName: 'SessionAddress_locationAddressId_fkey',
+    userFriendlyNameKey: 'error_handling.entities.session_addresses'
+  },
   // Add other relationships as needed
 ];
 
@@ -52,7 +58,29 @@ const knownRelationships: TableRelationship[] = [
  * Parses a foreign key constraint error and returns a user-friendly message
  */
 export const handleForeignKeyError = (error: ApolloError, t: (key: string, options?: any) => string): string => {
-  const errorMessage = error.message;
+  // Extract the actual database error message from the GraphQL error structure
+  let errorMessage = error.message;
+  
+  // Check if the error has nested database error information
+  if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+    const graphQLError = error.graphQLErrors[0];
+    if (graphQLError.extensions?.internal?.error?.message) {
+      errorMessage = graphQLError.extensions.internal.error.message;
+    }
+  }
+  
+  // Check for specific database constraint error messages
+  if (errorMessage.includes('Cannot delete') && errorMessage.includes('because it is referenced by')) {
+    // Handle specific constraint error messages like:
+    // "Cannot delete LocationAddress (ID: 15) because it is referenced by 1 SessionAddress record(s)."
+    const locationAddressMatch = errorMessage.match(/Cannot delete LocationAddress.*because it is referenced by (\d+) SessionAddress record\(s\)/);
+    if (locationAddressMatch) {
+      return t('error_handling.delete_restricted_by_relationship', {
+        parent: t('error_handling.entities.locationaddress'),
+        child: t('error_handling.entities.session_addresses')
+      });
+    }
+  }
   
   // Check if it's a foreign key violation
   if (errorMessage.includes('Foreign key violation') || errorMessage.includes('violates foreign key constraint')) {

@@ -1,0 +1,27 @@
+module.exports = {
+  "locales": ["en", "de"],
+  "defaultLocale": "de",
+  "pages": {
+    "*": [
+      "common",
+      "course",
+      "achievements-page",
+      "course-admin-page",
+      "course-page",
+      "statistics",
+      "manageAchievementTemplates",
+      "manageAdminUsers",
+      "manageAppSettings",
+      "manageCourse",
+      "manageCourses",
+      "managePrograms",
+      "manageUsers",
+      "manageOrganizations",
+      "manageLocationAddresses",
+      "manageEmailTemplates",
+      "profile",
+      "start-page"
+    ]
+  },
+  "defaultNS": "common"
+};

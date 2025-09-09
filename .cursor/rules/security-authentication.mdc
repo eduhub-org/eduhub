@@ -1,0 +1,725 @@
+---
+description: "Apply when implementing authentication, authorization, security patterns, Keycloak integration, JWT handling, or any security-related features in EduHub"
+alwaysApply: false
+---
+
+# Security and Authentication Patterns
+
+> **Related Rules**: [Frontend Component Patterns](frontend-component-patterns.mdc) | [GraphQL Integration](graphql-integration-patterns.mdc) | [Testing Standards](testing-standards.mdc) | [Database Table Creation](database-table-creation.md)
+
+EduHub uses Keycloak for authentication and role-based authorization with GraphQL integration.
+
+## Authentication Architecture
+
+### Keycloak Integration
+```
+keycloak/
+├── imports/                    # Realm configurations
+│   └── edu-hub-realm.json     # Production realm
+├── imports-dev/               # Development configurations
+│   ├── edu-hub.json          # Development realm
+│   └── master.json           # Master realm
+├── themes/                   # Custom themes
+│   └── edu-hub/             # EduHub branded theme
+└── Dockerfile               # Keycloak container setup
+```
+
+### Authentication Flow
+1. **User Login** → Keycloak authentication
+2. **JWT Token** → Issued by Keycloak with roles
+3. **Frontend Storage** → NextAuth.js session management
+4. **GraphQL Requests** → Bearer token authentication
+5. **Role Verification** → Hasura permission system
+
+## Frontend Authentication Patterns
+
+### NextAuth.js Configuration
+
+#### Session Management
+```typescript
+// pages/api/auth/[...nextauth].ts
+import NextAuth from 'next-auth';
+import KeycloakProvider from 'next-auth/providers/keycloak';
+
+export default NextAuth({
+  providers: [
+    KeycloakProvider({
+      clientId: process.env.KEYCLOAK_CLIENT_ID,
+      clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
+      issuer: process.env.KEYCLOAK_ISSUER,
+    }),
+  ],
+  callbacks: {
+    async jwt({ token, account, profile }) {
+      if (account) {
+        token.accessToken = account.access_token;
+        token.roles = profile?.realm_access?.roles || [];
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.accessToken = token.accessToken;
+      session.user.roles = token.roles;
+      return session;
+    },
+  },
+});
+```
+
+#### Authentication Hooks
+```typescript
+// hooks/useAuth.ts
+import { useSession, signIn, signOut } from 'next-auth/react';
+
+export const useAuth = () => {
+  const { data: session, status } = useSession();
+
+  return {
+    user: session?.user,
+    isAuthenticated: status === 'authenticated',
+    isLoading: status === 'loading',
+    roles: session?.user?.roles || [],
+    signIn,
+    signOut,
+  };
+};
+
+// Check if user is logged in
+export const useIsLoggedIn = () => {
+  const { isAuthenticated } = useAuth();
+  return { isLoggedIn: isAuthenticated };
+};
+```
+
+### Role-Based Authorization
+
+#### Available Roles
+- **ADMIN**: Full system access
+- **INSTRUCTOR**: Course management and instruction
+- **PARTICIPANT**: Course participation
+- **EXPERT**: Special expert privileges
+
+#### Role Checking Patterns
+```typescript
+// hooks/useRoles.ts
+import { useAuth } from './useAuth';
+
+export const useHasRole = (requiredRole: string) => {
+  const { roles } = useAuth();
+  return roles.includes(requiredRole);
+};
+
+export const useIsAdmin = () => useHasRole('ADMIN');
+export const useIsInstructor = () => useHasRole('INSTRUCTOR');
+export const useIsParticipant = () => useHasRole('PARTICIPANT');
+
+// Multi-role checking
+export const useHasAnyRole = (requiredRoles: string[]) => {
+  const { roles } = useAuth();
+  return requiredRoles.some(role => roles.includes(role));
+};
+```
+
+#### Protected Route Patterns
+```typescript
+// components/ProtectedRoute.tsx
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requiredRole?: string;
+  requiredRoles?: string[];
+  fallback?: React.ReactNode;
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  requiredRole,
+  requiredRoles,
+  fallback = <AccessDenied />
+}) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  const hasRequiredRole = requiredRole ? useHasRole(requiredRole) : true;
+  const hasAnyRequiredRole = requiredRoles ? useHasAnyRole(requiredRoles) : true;
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!isAuthenticated) {
+    return <LoginPrompt />;
+  }
+
+  if (!hasRequiredRole || !hasAnyRequiredRole) {
+    return fallback;
+  }
+
+  return <>{children}</>;
+};
+
+// Usage
+const AdminPage = () => (
+  <ProtectedRoute requiredRole="ADMIN">
+    <AdminDashboard />
+  </ProtectedRoute>
+);
+```
+
+### Component-Level Security
+
+#### Conditional Rendering Based on Roles
+```typescript
+const CourseActions: React.FC<{ course: Course }> = ({ course }) => {
+  const isAdmin = useIsAdmin();
+  const isInstructor = useIsInstructor();
+  const canEdit = isAdmin || (isInstructor && course.instructorId === user.id);
+
+  return (
+    <div>
+      {canEdit && (
+        <Button onClick={handleEdit}>
+          Edit Course
+        </Button>
+      )}
+      
+      {isAdmin && (
+        <Button onClick={handleDelete} variant="danger">
+          Delete Course
+        </Button>
+      )}
+    </div>
+  );
+};
+```
+
+#### Higher-Order Component for Authorization
+```typescript
+// hoc/withAuth.tsx
+const withAuth = <P extends object>(
+  WrappedComponent: React.ComponentType<P>,
+  requiredRole?: string
+) => {
+  return (props: P) => {
+    const { isAuthenticated, isLoading } = useAuth();
+    const hasRole = requiredRole ? useHasRole(requiredRole) : true;
+
+    if (isLoading) {
+      return <LoadingSpinner />;
+    }
+
+    if (!isAuthenticated) {
+      return <LoginPrompt />;
+    }
+
+    if (!hasRole) {
+      return <AccessDenied />;
+    }
+
+    return <WrappedComponent {...props} />;
+  };
+};
+
+// Usage
+const AdminDashboard = withAuth(DashboardComponent, 'ADMIN');
+```
+
+## GraphQL Security Integration
+
+### Authenticated Query Hooks
+
+#### Role-Based Query Hooks
+```typescript
+// hooks/authedMutation.ts - Key patterns
+export const useAdminQuery = <T = any>(
+  query: DocumentNode,
+  options?: QueryHookOptions<T>
+) => {
+  const { isAuthenticated, roles } = useAuth();
+  
+  if (!isAuthenticated || !roles.includes('ADMIN')) {
+    throw new Error('Admin access required');
+  }
+  
+  return useQuery(query, {
+    ...options,
+    context: {
+      headers: {
+        authorization: `Bearer ${session?.accessToken}`,
+      },
+    },
+  });
+};
+
+export const useInstructorQuery = <T = any>(
+  query: DocumentNode,
+  options?: QueryHookOptions<T>
+) => {
+  const { isAuthenticated, roles } = useAuth();
+  
+  if (!isAuthenticated || !roles.includes('INSTRUCTOR')) {
+    throw new Error('Instructor access required');
+  }
+  
+  return useQuery(query, options);
+};
+
+export const useAuthedQuery = <T = any>(
+  query: DocumentNode,
+  options?: QueryHookOptions<T>
+) => {
+  const { isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) {
+    throw new Error('Authentication required');
+  }
+  
+  return useQuery(query, options);
+};
+```
+
+#### Mutation Security
+```typescript
+export const useRoleMutation = <T = any>(
+  mutation: DocumentNode,
+  options?: MutationHookOptions<T>
+) => {
+  const { session } = useSession();
+  
+  return useMutation(mutation, {
+    ...options,
+    context: {
+      headers: {
+        authorization: `Bearer ${session?.accessToken}`,
+      },
+    },
+    onError: (error) => {
+      if (error.message.includes('JWTExpired')) {
+        signOut();
+      }
+      options?.onError?.(error);
+    },
+  });
+};
+```
+
+### JWT Token Handling
+
+#### Token Validation
+```typescript
+// utils/tokenValidation.ts
+export const isTokenExpired = (token: string): boolean => {
+  try {
+    const decoded = jwt_decode<{ exp: number }>(token);
+    const currentTime = Date.now() / 1000;
+    return decoded.exp < currentTime;
+  } catch (error) {
+    return true;
+  }
+};
+
+export const getTokenRoles = (token: string): string[] => {
+  try {
+    const decoded = jwt_decode<{ realm_access: { roles: string[] } }>(token);
+    return decoded.realm_access?.roles || [];
+  } catch (error) {
+    return [];
+  }
+};
+```
+
+#### Token Refresh Handling
+```typescript
+// hooks/useTokenRefresh.ts
+export const useTokenRefresh = () => {
+  const { data: session, update } = useSession();
+  
+  useEffect(() => {
+    if (session?.accessToken && isTokenExpired(session.accessToken)) {
+      // Attempt to refresh token
+      update();
+    }
+  }, [session, update]);
+
+  return {
+    refreshToken: () => update(),
+    isTokenValid: session?.accessToken ? !isTokenExpired(session.accessToken) : false,
+  };
+};
+```
+
+## Backend Security Patterns
+
+### Hasura Permissions
+
+#### Role-Based Table Permissions
+```yaml
+# metadata/databases/default/tables/public_Course.yaml
+table:
+  name: Course
+  schema: public
+select_permissions:
+  - role: ADMIN
+    permission:
+      columns: "*"
+      filter: {}
+  - role: INSTRUCTOR
+    permission:
+      columns: "*"
+      filter:
+        _or:
+          - instructorId: { _eq: "X-Hasura-User-Id" }
+          - status: { _eq: "PUBLISHED" }
+  - role: PARTICIPANT
+    permission:
+      columns: ["id", "title", "description", "startTime", "endTime"]
+      filter:
+        status: { _eq: "PUBLISHED" }
+```
+
+#### Custom Permissions with Functions
+```sql
+-- Custom permission function
+CREATE OR REPLACE FUNCTION check_course_instructor(course_row Course, hasura_session json)
+RETURNS boolean AS $$
+BEGIN
+  RETURN (
+    hasura_session ->> 'x-hasura-role' = 'ADMIN' OR
+    (hasura_session ->> 'x-hasura-role' = 'INSTRUCTOR' AND 
+     course_row.instructor_id = (hasura_session ->> 'x-hasura-user-id')::uuid)
+  );
+END;
+$$ LANGUAGE plpgsql STABLE;
+```
+
+### Serverless Function Security
+
+#### Function Authentication
+```javascript
+// functions/middleware/auth.js
+const verifyJWT = (token) => {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return { valid: true, payload: decoded };
+  } catch (error) {
+    return { valid: false, error: error.message };
+  }
+};
+
+const requireAuth = (handler) => {
+  return async (req, res) => {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing or invalid authorization header' });
+    }
+    
+    const token = authHeader.split(' ')[1];
+    const { valid, payload, error } = verifyJWT(token);
+    
+    if (!valid) {
+      return res.status(401).json({ error: 'Invalid token', details: error });
+    }
+    
+    req.user = payload;
+    return handler(req, res);
+  };
+};
+
+// Usage
+export default requireAuth(async (req, res) => {
+  // Protected function logic
+  console.log('Authenticated user:', req.user);
+});
+```
+
+#### Role-Based Function Access
+```javascript
+const requireRole = (requiredRole) => {
+  return (handler) => {
+    return async (req, res) => {
+      const userRoles = req.user?.realm_access?.roles || [];
+      
+      if (!userRoles.includes(requiredRole)) {
+        return res.status(403).json({ 
+          error: 'Insufficient permissions',
+          required: requiredRole,
+          userRoles 
+        });
+      }
+      
+      return handler(req, res);
+    };
+  };
+};
+
+// Usage
+export default requireAuth(
+  requireRole('ADMIN')(async (req, res) => {
+    // Admin-only function logic
+  })
+);
+```
+
+## Security Best Practices
+
+### Frontend Security
+
+#### Input Validation
+```typescript
+// utils/validation.ts
+import { z } from 'zod';
+
+export const CourseSchema = z.object({
+  title: z.string().min(1).max(255),
+  description: z.string().max(1000),
+  startTime: z.string().datetime(),
+  endTime: z.string().datetime(),
+});
+
+export const validateCourseInput = (data: unknown) => {
+  try {
+    return CourseSchema.parse(data);
+  } catch (error) {
+    throw new Error(`Invalid course data: ${error.message}`);
+  }
+};
+```
+
+#### XSS Prevention
+```typescript
+// utils/sanitization.ts
+import DOMPurify from 'dompurify';
+
+export const sanitizeHTML = (dirty: string): string => {
+  return DOMPurify.sanitize(dirty, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li'],
+    ALLOWED_ATTR: [],
+  });
+};
+
+// Usage in components
+const SafeContent: React.FC<{ content: string }> = ({ content }) => (
+  <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(content) }} />
+);
+```
+
+#### CSRF Protection
+```typescript
+// utils/csrf.ts
+export const generateCSRFToken = (): string => {
+  return crypto.randomBytes(32).toString('hex');
+};
+
+export const validateCSRFToken = (token: string, sessionToken: string): boolean => {
+  return token === sessionToken;
+};
+```
+
+### Backend Security
+
+#### Database Security
+```sql
+-- Row Level Security (RLS)
+ALTER TABLE Course ENABLE ROW LEVEL SECURITY;
+
+-- Policy for instructors
+CREATE POLICY instructor_course_policy ON Course
+  FOR ALL
+  TO instructor
+  USING (instructor_id = current_setting('hasura.user_id')::uuid);
+
+-- Policy for participants
+CREATE POLICY participant_course_policy ON Course
+  FOR SELECT
+  TO participant
+  USING (status = 'PUBLISHED');
+```
+
+#### API Rate Limiting
+```javascript
+// middleware/rateLimit.js
+const rateLimit = require('express-rate-limit');
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+module.exports = { apiLimiter };
+```
+
+## Error Handling and Security
+
+### Authentication Error Handling
+```typescript
+// utils/authErrors.ts
+export class AuthenticationError extends Error {
+  constructor(message: string, public code: string) {
+    super(message);
+    this.name = 'AuthenticationError';
+  }
+}
+
+export class AuthorizationError extends Error {
+  constructor(message: string, public requiredRole: string) {
+    super(message);
+    this.name = 'AuthorizationError';
+  }
+}
+
+// Error handler
+export const handleAuthError = (error: Error) => {
+  if (error instanceof AuthenticationError) {
+    signOut();
+    return 'Please log in to continue';
+  }
+  
+  if (error instanceof AuthorizationError) {
+    return `Access denied. Required role: ${error.requiredRole}`;
+  }
+  
+  return 'An unexpected error occurred';
+};
+```
+
+### Secure Logging
+```typescript
+// utils/secureLogging.ts
+const sensitiveFields = ['password', 'token', 'email', 'ssn'];
+
+export const sanitizeLogData = (data: any): any => {
+  if (typeof data !== 'object' || data === null) {
+    return data;
+  }
+  
+  const sanitized = { ...data };
+  
+  Object.keys(sanitized).forEach(key => {
+    if (sensitiveFields.some(field => key.toLowerCase().includes(field))) {
+      sanitized[key] = '[REDACTED]';
+    } else if (typeof sanitized[key] === 'object') {
+      sanitized[key] = sanitizeLogData(sanitized[key]);
+    }
+  });
+  
+  return sanitized;
+};
+
+export const secureLog = (level: string, message: string, data?: any) => {
+  console[level](message, data ? sanitizeLogData(data) : '');
+};
+```
+
+## Testing Security
+
+### Authentication Testing
+```typescript
+// __tests__/auth.test.tsx
+import { render, screen } from '@testing-library/react';
+import { useSession } from 'next-auth/react';
+import ProtectedComponent from '../ProtectedComponent';
+
+jest.mock('next-auth/react');
+
+describe('Authentication', () => {
+  it('should redirect unauthenticated users', () => {
+    (useSession as jest.Mock).mockReturnValue({
+      data: null,
+      status: 'unauthenticated',
+    });
+
+    render(<ProtectedComponent />);
+    
+    expect(screen.getByText('Please log in')).toBeInTheDocument();
+  });
+
+  it('should show content for authenticated users', () => {
+    (useSession as jest.Mock).mockReturnValue({
+      data: { user: { id: '1', roles: ['PARTICIPANT'] } },
+      status: 'authenticated',
+    });
+
+    render(<ProtectedComponent />);
+    
+    expect(screen.getByText('Protected content')).toBeInTheDocument();
+  });
+});
+```
+
+### Authorization Testing
+```typescript
+describe('Authorization', () => {
+  it('should deny access without required role', () => {
+    (useSession as jest.Mock).mockReturnValue({
+      data: { user: { id: '1', roles: ['PARTICIPANT'] } },
+      status: 'authenticated',
+    });
+
+    render(<AdminOnlyComponent />);
+    
+    expect(screen.getByText('Access denied')).toBeInTheDocument();
+  });
+
+  it('should allow access with required role', () => {
+    (useSession as jest.Mock).mockReturnValue({
+      data: { user: { id: '1', roles: ['ADMIN'] } },
+      status: 'authenticated',
+    });
+
+    render(<AdminOnlyComponent />);
+    
+    expect(screen.getByText('Admin dashboard')).toBeInTheDocument();
+  });
+});
+```
+
+## Common Security Issues and Solutions
+
+### Token Expiration Handling
+```typescript
+// Handle expired tokens gracefully
+const handleExpiredToken = (error: ApolloError) => {
+  if (error.message.includes('JWTExpired')) {
+    signOut({ callbackUrl: '/login?message=session-expired' });
+  }
+};
+```
+
+### Permission Errors
+```typescript
+// Handle permission errors
+const handlePermissionError = (error: ApolloError) => {
+  if (error.message.includes('permission')) {
+    // Log security event
+    secureLog('warn', 'Permission denied', {
+      userId: session?.user?.id,
+      action: 'attempted unauthorized access',
+    });
+    
+    // Show user-friendly message
+    showErrorMessage('You do not have permission to perform this action');
+  }
+};
+```
+
+### Secure File Uploads
+```typescript
+// File upload validation
+const validateFileUpload = (file: File): boolean => {
+  const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+  const maxSize = 10 * 1024 * 1024; // 10MB
+  
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error('File type not allowed');
+  }
+  
+  if (file.size > maxSize) {
+    throw new Error('File too large');
+  }
+  
+  return true;
+};
+```
+
+This comprehensive security guide ensures proper authentication, authorization, and security practices throughout the EduHub application.

@@ -37,9 +37,14 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install yarn dependencies
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.1
+
+      - name: Install pnpm dependencies
         working-directory: frontend-nx
-        run: yarn install --immutable
+        run: pnpm install --frozen-lockfile
 
       - name: Type check edu hub
         working-directory: frontend-nx

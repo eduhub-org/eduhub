@@ -14,7 +14,7 @@ import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
-import { gql } from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 /**
  * TagSelector Component
@@ -297,7 +297,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
       <NotificationSnackbar
         open={showSavedNotification}
         onClose={() => setShowSavedNotification(false)}
-        message="notification_snackbar.saved"
+        message={t('notification_snackbar.saved')}
       />
     </>
   );

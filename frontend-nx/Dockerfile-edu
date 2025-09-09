@@ -8,12 +8,16 @@ RUN corepack enable
 
 WORKDIR /opt/app
 
-COPY package.json /opt/app
-COPY yarn.lock /opt/app
-COPY .yarn/ /opt/app/.yarn
-COPY .yarnrc.yml /opt/app
+# Copy workspace configuration files
+COPY pnpm-workspace.yaml /opt/app/
+COPY package.json /opt/app/
+COPY pnpm-lock.yaml /opt/app/
 
-RUN yarn --immutable
+# Copy frontend-nx package.json to maintain workspace structure
+COPY package.json /opt/app/frontend-nx/
+
+RUN corepack enable pnpm
+RUN pnpm install --frozen-lockfile
 
 # 2. Rebuild the source code only when needed
 FROM node:18-alpine AS builder
@@ -39,7 +43,8 @@ ARG NEXT_PUBLIC_STORAGE_BUCKET_URL
 ENV NEXT_PUBLIC_STORAGE_BUCKET_URL=${NEXT_PUBLIC_STORAGE_BUCKET_URL}
 
 
-RUN npx nx run edu-hub:build
+RUN corepack enable pnpm
+RUN pnpm nx run edu-hub:build
 
 # 3. Production image, copy all the files and run next
 FROM node:18-alpine AS runner

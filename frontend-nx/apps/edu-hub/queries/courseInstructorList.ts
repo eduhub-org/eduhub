@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client";
-import { COURSE_INSTRUCTOR_FRAGMENT } from "./courseInstructorFragment";
+import { COURSE_ENROLLMENT_FRAGMENT } from "./courseEnrollmentFragment";
 
 export const COURSE_INSTRUCTOR_LIST = gql`
-  ${COURSE_INSTRUCTOR_FRAGMENT}
+  ${COURSE_ENROLLMENT_FRAGMENT}
   query CourseInstructorList {
     CourseInstructor {
-      ...CourseInstructorFragment
+      ...CourseEnrollmentFragment
     }
   }
 `;

@@ -7,7 +7,7 @@ import {
   COURSE_FRAGMENT_ANONYMOUS,
 } from './courseFragment';
 import { ADMIN_ENROLLMENT_FRAGMENT } from './enrollmentFragment';
-import { ADMIN_SESSION_FRAGMENT } from './sessionFragement';
+import { ADMIN_SESSION_FRAGMENT } from './sessionFragment';
 import { USER_FRAGMENT } from './userFragment';
 import { PROGRAM_FRAGMENT_MINIMUM_PROPERTIES } from './programFragment';
 
@@ -238,13 +238,29 @@ export const INSERT_SESSION_WITH_ADDRESSES = gql`
 export const UPDATE_SESSION_ADDRESS = gql`
   mutation UpdateSessionAddress(
     $itemId: Int!
-    $text: String!
+    $value: Int
   ) {
     update_SessionAddress_by_pk(
       pk_columns: { id: $itemId }
-      _set: { address: $text }
+      _set: { locationAddressId: $value }
     ) {
       id
+      locationAddressId
+    }
+  }
+`;
+
+export const UPDATE_SESSION_ADDRESS_LOCATION = gql`
+  mutation UpdateSessionAddressLocation(
+    $itemId: Int!
+    $locationAddressId: Int
+  ) {
+    update_SessionAddress_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { locationAddressId: $locationAddressId }
+    ) {
+      id
+      locationAddressId
     }
   }
 `;

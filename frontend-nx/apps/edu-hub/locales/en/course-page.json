@@ -150,7 +150,8 @@
   "end_time": "End Time",
   "short_description": {
     "label": "Short Description",
-    "help_text": "This text will appear on the course tile and as a tagline on the course page."
+    "help_text": "This text will appear on the course tile and as a tagline on the course page.",
+    "placeholder": "Enter a brief description of the course..."
   },
   "learning_goals": {
     "label": "Learning Goals",
@@ -177,13 +178,29 @@
   },
   "sessionAddress": {
     "online": {
-      "label": "Link to the online event",
+      "label": "Online",
       "placeholder": "Please enter a valid link in the \"Description\" tab."
     },
     "offline": {
       "label": "Address for on-site participation in ",
-      "placeholder": "Define a default address in the \"Description\" tab."
-    }
+      "placeholder": "Select a default address in the \"Description\" tab or select a specific address here."
+    },
+    "select_address": "Select Address",
+    "select_online_link": "Select Online Link",
+    "search_addresses": "Search addresses...",
+    "no_address_selected": "No address selected",
+    "search_links": "Search links...",
+    "create_new_address": "Create New Address",
+    "create_new_link": "Create New Link",
+    "link_label": "Link Name",
+    "link_label_placeholder": "e.g., Main Meeting Room, Workshop Link",
+    "link_url": "URL",
+    "link_url_placeholder": "https://example.com/meeting-room",
+    "aliases": "Aliases",
+    "aliases_help": "Enter aliases and press Enter to add them",
+    "legacy_address": "Legacy Address (read-only)",
+    "select_location_option_first": "Please select a location option first",
+    "location_mismatch_error": "The selected address does not match the location option for this session. Please select an address that belongs to the correct location."
   },
   "date": "Date",
   "title": "Title",
@@ -199,11 +216,11 @@
   "confirmed_invitations": "Invitations (confirmed):",
   "bulk_action_publish": "Publish Selected",
   "bulk_action_unpublish": "Unpublish Selected",
-  "published": "Published",
   "not_published": "Not Published",
   "view_course": "View Course",
   "view": "View",
   "confirmed": "Confirmed",
   "unrated_rated_not_informed": "Unrated / Rated but not informed",
-  "bulk_action_copy": "Copy to Program"
+  "bulk_action_copy": "Copy to Program",
+  "Uniqueness violation. duplicate key value violates unique constraint \"CourseAddress_pkey\"": "A location address with this configuration already exists for this course."
 }

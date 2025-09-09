@@ -1,0 +1,612 @@
+---
+description: "Apply when working with GraphQL queries, mutations, implementing data fetching patterns, handling GraphQL errors, or integrating with Apollo Client in EduHub"
+alwaysApply: false
+---
+
+# GraphQL Integration Patterns
+
+> **Related Rules**: [Frontend Component Patterns](frontend-component-patterns.mdc) | [Component Architecture](component-architecture.mdc) | [Testing Standards](testing-standards.mdc) | [Database Table Creation](database-table-creation.md)
+
+## Query and Mutation Structure
+
+### Query Organization
+
+#### File Structure
+
+**Recommended Structure (Implemented in Phase 1):**
+```
+frontend-nx/apps/edu-hub/queries/
+├── __generated__/          # Auto-generated TypeScript types (from codegen)
+├── fragments/             # Reusable GraphQL fragments
+│   ├── user/
+│   │   ├── index.ts       # Re-exports user fragments
+│   │   └── userFragment.ts
+│   ├── course/
+│   │   ├── index.ts       # Re-exports course fragments
+│   │   ├── courseFragment.ts
+│   │   └── courseInstructorFragment.ts
+│   ├── program/
+│   │   └── index.ts
+│   ├── session/
+│   │   └── index.ts
+│   ├── enrollment/
+│   │   └── index.ts
+│   ├── achievement/
+│   │   └── index.ts
+│   └── index.ts           # Main fragments index
+├── queries/              # Read operations
+│   ├── user/
+│   │   ├── index.ts       # Re-exports user queries
+│   │   ├── user.ts
+│   │   └── expert.ts
+│   ├── course/
+│   │   ├── index.ts       # Re-exports course queries
+│   │   ├── courseList.ts
+│   │   ├── myCourses.ts
+│   │   └── courseWithEnrollment.ts
+│   ├── program/
+│   │   └── index.ts
+│   ├── enrollment/
+│   │   └── index.ts
+│   ├── achievement/
+│   │   └── index.ts
+│   ├── organization/
+│   │   └── index.ts
+│   └── index.ts           # Main queries index
+├── mutations/            # Write operations
+│   ├── user/
+│   │   ├── index.ts       # Re-exports user mutations
+│   │   ├── insertUser.ts
+│   │   └── updateUser.ts
+│   ├── course/
+│   │   ├── index.ts       # Re-exports course mutations
+│   │   ├── mutateCourse.ts
+│   │   └── copyCourse.ts
+│   ├── program/
+│   │   └── index.ts
+│   ├── enrollment/
+│   │   └── index.ts
+│   ├── achievement/
+│   │   └── index.ts
+│   ├── organization/
+│   │   └── index.ts
+│   └── index.ts           # Main mutations index
+├── index.ts              # Main GraphQL operations index
+└── [legacy files]        # Original flat structure (backward compatibility)
+```
+
+**Migration Status:**
+- ✅ **Phase 1 Complete**: Organized directory structure with index files
+- 🔄 **Phase 2 Pending**: Move files to organized subdirectories  
+- 🔄 **Phase 3 Pending**: Remove legacy flat structure
+
+**Current Usage:**
+```typescript
+// New organized approach (recommended)
+import { USER_FRAGMENT } from 'queries/fragments/user';
+import { COURSE_LIST } from 'queries/queries/course';
+import { INSERT_USER } from 'queries/mutations/user';
+
+// Namespace imports for better organization
+import { Fragments, Queries, Mutations } from 'queries';
+const userFragment = Fragments.User.USER_FRAGMENT;
+
+// Legacy approach (still works - backward compatibility)
+import { USER_FRAGMENT, COURSE_LIST, INSERT_USER } from 'queries';
+```
+
+#### Migration Guidelines
+
+**For New Code:**
+- Use the organized structure: `queries/fragments/user`, `queries/queries/course`, etc.
+- Prefer namespace imports for better organization
+- Follow domain-based organization (user, course, program, etc.)
+
+**For Existing Code:**
+- Legacy imports continue to work (backward compatibility maintained)
+- Gradually migrate to organized imports when touching files
+- No urgent need to update existing imports
+
+**File Placement Rules:**
+- **Fragments**: `fragments/{domain}/` - Reusable field sets
+- **Queries**: `queries/{domain}/` - Read operations  
+- **Mutations**: `mutations/{domain}/` - Write operations
+- **Cross-domain**: Use `queries/` or `mutations/` root for system-wide operations
+
+#### Fragment Pattern
+**Always use fragments for reusable field sets:**
+
+```typescript
+// ✅ GOOD: Reusable fragment
+export const USER_FRAGMENT = gql`
+  fragment UserFragment on User {
+    id
+    firstName
+    lastName
+    email
+    picture
+    externalProfile
+    zipCode
+    country
+  }
+`;
+
+// ✅ GOOD: Use fragment in queries
+export const USER_LIST = gql`
+  ${USER_FRAGMENT}
+  query UserList {
+    User(where: { status: { _eq: ACTIVE } }) {
+      ...UserFragment
+    }
+  }
+`;
+```
+
+#### Query Naming Conventions
+- **Queries**: `ENTITY_LIST`, `ENTITY_BY_ID`, `MY_ENTITIES`
+- **Mutations**: `INSERT_ENTITY`, `UPDATE_ENTITY`, `DELETE_ENTITY`
+- **Fragments**: `ENTITY_FRAGMENT`, `ENTITY_FRAGMENT_MINIMUM`
+
+### Mutation Patterns
+
+#### Insert Pattern
+```typescript
+export const INSERT_COURSE = gql`
+  mutation InsertCourseWithLocation(
+    $title: String!, 
+    $applicationEnd: date!, 
+    $maxMissedSessions: Int!, 
+    $programId: Int!,
+    $locationOption: LocationOption_enum!
+  ) {
+    insert_Course(objects: {
+      title: $title
+      tagline: ""
+      language: "DE"
+      applicationEnd: $applicationEnd
+      maxMissedSessions: $maxMissedSessions
+      programId: $programId
+      CourseLocations: {
+        data: {
+          locationOption: $locationOption
+          defaultSessionAddress: ""
+        }
+      }
+    }) {
+      affected_rows
+      returning {
+        id
+        CourseLocations {
+          id
+        }
+      }
+    }
+  }
+`;
+```
+
+#### Update Pattern
+```typescript
+export const UPDATE_COURSE = gql`
+  mutation UpdateCourse($id: Int!, $updates: Course_set_input!) {
+    update_Course_by_pk(pk_columns: { id: $id }, _set: $updates) {
+      id
+      title
+      updated_at
+    }
+  }
+`;
+```
+
+## Authentication and Authorization
+
+> **💡 Tip**: See [Frontend Component Patterns](frontend-component-patterns.mdc) for component integration examples and [Testing Standards](testing-standards.mdc) for GraphQL testing patterns.
+
+### Role-Based Hooks
+
+#### Available Hooks
+```typescript
+// For role-based operations (MOST COMMONLY USED)
+const { data, loading, error } = useRoleQuery(QUERY, options);
+
+// For admin operations
+const { data, loading, error } = useAdminQuery(QUERY, options);
+
+// For instructor operations  
+const { data, loading, error } = useInstructorQuery(QUERY, options);
+
+// For authenticated user operations
+const { data, loading, error } = useAuthedQuery(QUERY, options);
+
+// For role-based mutations
+const [mutation] = useRoleMutation(MUTATION, options);
+const [mutation] = useAdminMutation(MUTATION, options);
+const [mutation] = useInstructorMutation(MUTATION, options);
+const [mutation] = useAuthedMutation(MUTATION, options);
+```
+
+#### Hook Usage Pattern
+```typescript
+import { useAdminQuery, useRoleMutation } from '../../hooks/authedMutation';
+
+const MyComponent = () => {
+  // Query with proper typing
+  const { data, loading, error } = useAdminQuery<QueryResult>(QUERY, {
+    variables: { id },
+    skip: !id, // Skip query if no ID
+  });
+
+  // Mutation with error handling
+  const [mutation] = useRoleMutation<MutationResult>(MUTATION, {
+    onCompleted: (data) => {
+      // Handle success
+      refetch(); // Refetch related queries
+    },
+    onError: (error) => {
+      console.error('Mutation error:', error);
+      // Handle error
+    },
+    refetchQueries: ['QueryName'], // Auto-refetch
+  });
+};
+```
+
+#### Why useRoleQuery is Most Common
+
+**`useRoleQuery` is the primary hook used throughout EduHub** because it provides dynamic role-based authorization:
+
+```typescript
+// Automatically uses current user's role (admin, instructor, participant)
+const { data, loading, error } = useRoleQuery<CourseList>(COURSE_LIST);
+
+// Can override role when needed
+const { data } = useRoleQuery(QUERY, {
+  context: { role: AuthRoles.admin }
+});
+```
+
+**Key Benefits:**
+- **Automatic Role Detection**: Uses `useCurrentRole()` to determine the appropriate Hasura role
+- **Flexible**: Can override role via context when needed
+- **Secure**: Automatically sets correct `x-hasura-role` header
+- **Convenient**: Single hook handles most authorization scenarios
+
+**Usage Statistics in EduHub:**
+- `useRoleQuery`: 55+ usages (most common)
+- `useAdminQuery`: 20+ usages (admin-specific)
+- `useInstructorQuery`: 4+ usages (instructor-specific)
+- `useAuthedQuery`: 15+ usages (basic auth)
+
+**Common Pattern - TableGrid Integration:**
+```typescript
+// Most TableGrid components use useRoleQuery
+const tableConfig = {
+  queryHook: useRoleQuery, // Dynamic role-based queries
+  // ...other config
+};
+```
+
+This pattern allows components to work across different user roles without hardcoding permissions.
+
+## Error Handling Patterns
+
+### Standard Error Handling
+
+#### Component-Level Error Handling
+```typescript
+import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
+
+const MyComponent = () => {
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorOpen, setErrorOpen] = useState(false);
+
+  const [mutation] = useRoleMutation(MUTATION, {
+    onError: (error) => {
+      console.error('GraphQL Error:', error);
+      setErrorMessage(error.message);
+      setErrorOpen(true);
+    },
+  });
+
+  return (
+    <>
+      {/* Component content */}
+      <ErrorMessageDialog
+        errorMessage={errorMessage}
+        open={errorOpen}
+        onClose={() => setErrorOpen(false)}
+      />
+    </>
+  );
+};
+```
+
+#### Specific Error Handling
+```typescript
+// Handle specific constraint errors
+const handleAliasError = useCallback(
+  (error: ApolloError) => {
+    // Check for duplicate alias constraint error
+    if (error.message.includes('already exists in organization')) {
+      const match = error.message.match(/Alias "([^"]+)" already exists in organization "([^"]+)"/);
+      if (match) {
+        const [, aliasName, orgName] = match;
+        onError(
+          t('error.alias_already_exists', {
+            alias: aliasName,
+            organization: orgName,
+          })
+        );
+        return;
+      }
+      onError(t('error.alias_duplicate_error'));
+      return;
+    }
+    // Default error message
+    onError(t('error.alias_update_failed'));
+  },
+  [onError, t]
+);
+```
+
+### Authentication Error Handling
+```typescript
+const useErrorHandler = () => {
+  const { t } = useTranslation();
+
+  return (error) => {
+    console.log('error handler error: ', error);
+    if (error.message.includes('JWTExpired') || error.message.includes('JWSInvalidSignature')) {
+      alert(t("authed_query.session_expired_or_invalid"));
+      signOut();
+    } else {
+      alert(t("authed_query.authentication_error") + ": " + error);
+    }
+  };
+};
+```
+
+## Caching Strategies
+
+### Apollo Client Cache Management
+
+#### Refetch Patterns
+```typescript
+// Manual refetch
+const { data, loading, refetch } = useAdminQuery(QUERY);
+await refetch();
+
+// Auto-refetch after mutations
+const [mutation] = useRoleMutation(MUTATION, {
+  refetchQueries: ['QueryName', 'AnotherQuery'],
+});
+
+// Conditional refetch
+const [mutation] = useRoleMutation(MUTATION, {
+  onCompleted: (data) => {
+    if (data.success) {
+      refetch();
+    }
+  },
+});
+```
+
+#### Cache Updates
+```typescript
+// Update cache after mutation
+const [mutation] = useRoleMutation(MUTATION, {
+  update: (cache, { data }) => {
+    // Update specific cache entry
+    cache.modify({
+      id: cache.identify({ __typename: 'Course', id: courseId }),
+      fields: {
+        title: () => data.updateCourse.title,
+      },
+    });
+  },
+});
+```
+
+## Component Integration Patterns
+
+### Input Field Integration
+```typescript
+// Standard input field with GraphQL mutation
+<InputField
+  variant="material"
+  type="text"
+  label={t('course.title')}
+  value={course.title}
+  updateValueMutation={UPDATE_COURSE_TITLE}
+  itemId={course.id}
+  onValueUpdated={(data) => {
+    // Handle successful update
+    showSuccessMessage(t('course.title_updated'));
+  }}
+  refetchQueries={['CourseList', 'CourseDetails']}
+/>
+```
+
+### Table Integration with useTableGrid
+```typescript
+const { data, loading, error, searchFilter, pageIndex, setSearchFilter, setPageIndex } = useTableGrid({
+  queryHook: useAdminQuery,
+  query: COURSE_LIST,
+  queryVariables: filter,
+  pageSize: filter.limit || 50,
+  debounceMs: 1000,
+  refetchFilter: useCallback(
+    (searchTerm) => {
+      const searchWhere = searchTerm ? { title: { _ilike: `%${searchTerm}%` } } : {};
+      return {
+        where: {
+          ...filter.where,
+          ...searchWhere,
+        },
+      };
+    },
+    [filter.where]
+  ),
+});
+```
+
+### Optimistic Updates
+```typescript
+const [mutation] = useRoleMutation(MUTATION, {
+  optimisticResponse: {
+    updateCourse: {
+      __typename: 'Course',
+      id: courseId,
+      title: newTitle,
+    },
+  },
+  update: (cache, { data }) => {
+    // Update cache with optimistic response
+    cache.modify({
+      id: cache.identify({ __typename: 'Course', id: courseId }),
+      fields: {
+        title: () => newTitle,
+      },
+    });
+  },
+});
+```
+
+## Type Safety
+
+### TypeScript Integration
+```typescript
+// Define query result types
+interface CourseListResult {
+  Course: Course[];
+  Course_aggregate: {
+    aggregate: {
+      count: number;
+    };
+  };
+}
+
+// Use typed queries
+const { data, loading, error } = useAdminQuery<CourseListResult>(COURSE_LIST, {
+  variables: { limit: 50, offset: 0 },
+});
+
+// Type-safe data access
+const courses = data?.Course || [];
+const totalCount = data?.Course_aggregate?.aggregate?.count || 0;
+```
+
+### Generated Types
+```bash
+# Regenerate GraphQL types after schema changes
+sudo bash regenerate-apollo.sh $USER
+```
+
+## Best Practices
+
+### Query Optimization
+1. **Use fragments** for reusable field sets
+2. **Limit fields** to only what's needed
+3. **Use pagination** for large datasets
+4. **Implement proper loading states**
+5. **Handle errors gracefully**
+
+### Mutation Best Practices
+1. **Always handle errors** in mutations
+2. **Provide user feedback** for success/failure
+3. **Refetch related queries** after mutations
+4. **Use optimistic updates** for better UX
+5. **Validate input** before sending mutations
+
+### Performance Considerations
+1. **Use debouncing** for search queries
+2. **Implement proper caching** strategies
+3. **Avoid over-fetching** data
+4. **Use lazy queries** for optional data
+5. **Monitor query performance**
+
+### Security
+1. **Use role-based hooks** for authorization
+2. **Validate user permissions** on mutations
+3. **Handle authentication errors** properly
+4. **Sanitize user input** before mutations
+5. **Use proper error messages** (don't expose sensitive info)
+
+## Common Patterns
+
+### List with Pagination
+```typescript
+const { data, loading, error } = useAdminQuery(ENTITY_LIST, {
+  variables: {
+    limit: pageSize,
+    offset: pageIndex * pageSize,
+    where: filters,
+  },
+});
+```
+
+### Single Entity Fetch
+```typescript
+const { data, loading, error } = useAdminQuery(ENTITY_BY_ID, {
+  variables: { id },
+  skip: !id,
+});
+```
+
+### Conditional Queries
+```typescript
+const { data, loading, error } = useAdminQuery(QUERY, {
+  variables: { id },
+  skip: !shouldFetch, // Skip based on condition
+});
+```
+
+### Mutation with Loading State
+```typescript
+const [mutation, { loading }] = useRoleMutation(MUTATION);
+
+const handleSubmit = async () => {
+  try {
+    await mutation({
+      variables: { input },
+    });
+    // Handle success
+  } catch (error) {
+    // Handle error
+  }
+};
+```
+
+## Troubleshooting
+
+### Common Issues
+1. **Missing refetchQueries** - Add to mutation options
+2. **Incorrect variable types** - Check GraphQL schema
+3. **Authentication errors** - Use proper role-based hooks
+4. **Cache inconsistencies** - Use proper cache updates
+5. **Type errors** - Regenerate GraphQL types
+
+### Debug Tools
+```typescript
+// Enable Apollo DevTools
+const client = new ApolloClient({
+  uri: process.env.NEXT_PUBLIC_HASURA_URL,
+  cache: new InMemoryCache(),
+  connectToDevTools: process.env.NODE_ENV === 'development',
+});
+```
+
+### Error Debugging
+```typescript
+// Log detailed error information
+const [mutation] = useRoleMutation(MUTATION, {
+  onError: (error) => {
+    console.error('GraphQL Error Details:', {
+      message: error.message,
+      graphQLErrors: error.graphQLErrors,
+      networkError: error.networkError,
+      extraInfo: error.extraInfo,
+    });
+  },
+});
+```

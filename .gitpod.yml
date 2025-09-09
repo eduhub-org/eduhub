@@ -12,7 +12,7 @@ tasks:
       # Install frontend dependencies
       if [ -d "frontend-nx" ]; then
         cd frontend-nx &&
-        yarn install --ignore-engines &&
+        pnpm install --frozen-lockfile &&
         cd ..
       else
         echo "frontend-nx directory not found!"
@@ -33,7 +33,7 @@ tasks:
         cd frontend-nx &&
         export NEXT_PUBLIC_STORAGE_BUCKET_URL=https://4001-${GITPOD_WORKSPACE_URL#https://}/emulated-bucket &&
         export NEXT_PUBLIC_ENVIRONMENT=development &&
-        yarn dev
+        pnpm dev
       else
         echo "frontend-nx directory not found!"
       fi

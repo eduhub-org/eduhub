@@ -129,6 +129,7 @@
     "jest-worker": "^29.7.0",
     "next-translate-plugin": "^2.6.2",
     "nx": "19.6.4",
+    "playwright": "^1.55.0",
     "postcss": "8.4.44",
     "prettier": "^3.3.3",
     "semantic-release": "^21.1.2",
@@ -138,5 +139,5 @@
     "typescript": "~5.5.4",
     "unused-exports": "^0.0.6-beta"
   },
-  "packageManager": "yarn@3.4.1"
+  "packageManager": "pnpm@10.15.1"
 }

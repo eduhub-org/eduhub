@@ -17,6 +17,7 @@
       "managePrograms",
       "manageUsers",
       "manageOrganizations",
+      "manageLocationAddresses",
       "manageEmailTemplates",
       "profile",
       "start-page"

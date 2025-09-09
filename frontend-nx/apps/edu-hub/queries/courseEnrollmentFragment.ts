@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-export const COURSE_INSTRUCTOR_FRAGMENT = gql`
+export const COURSE_ENROLLMENT_FRAGMENT = gql`
   fragment CourseEnrollmentFragment on CourseEnrollment {
     id
     courseId

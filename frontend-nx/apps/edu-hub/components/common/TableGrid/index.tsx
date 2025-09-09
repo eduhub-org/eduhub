@@ -162,7 +162,7 @@ const TableGrid = <T extends BaseRow>({
     const dataColumns = columns.map((col) => ({
       ...col,
       // Backward compatibility: convert meta.width to size if size is not specified
-      size: col.size || (col.meta?.width ? col.meta.width * 100 : undefined),
+      size: col.size || ((col.meta as any)?.width ? (col.meta as any).width * 100 : undefined),
     }));
     return [...selectionColumn, ...dataColumns];
   }, [columns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, data, isAllSelected, isSomeSelected]);
@@ -286,7 +286,7 @@ const TableGrid = <T extends BaseRow>({
               {headerGroup.headers.map((header) => (
                 <div
                   key={header.id}
-                  className={`${header.column.columnDef.meta?.className} relative flex items-center h-12`}
+                  className={`${(header.column.columnDef.meta as any)?.className} relative flex items-center h-12`}
                   style={{
                     width: `${header.getSize()}px`,
                     flexShrink: 0,
@@ -331,7 +331,7 @@ const TableGrid = <T extends BaseRow>({
                   {row.getVisibleCells().map((cell) => (
                     <div
                       key={cell.id}
-                      className={`${cell.column.columnDef.meta?.className}`}
+                      className={`${(cell.column.columnDef.meta as any)?.className}`}
                       style={{
                         width: `${cell.column.getSize()}px`,
                         flexShrink: 0,

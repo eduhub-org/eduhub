@@ -114,7 +114,52 @@ To persist changes you made to the keycloak configuration export the edu-hub rea
   4. Your local git should highlight changes in the file `./keycloak/imports-dev/edu-hub.json` now
   #This step checks if there are any changes in the configuration file
 
-## Updating frontend-nx packages
-- use `yarn upgrade-interactive` script to check for package updates
-- if package version are explicitly locked in, please check for potential issues or comments while upgrading
+## Package Management
+
+### Frontend Dependencies
+EduHub uses **pnpm** as the package manager for optimal performance and disk space efficiency.
+
+#### Installing Dependencies
+```bash
+# From project root - installs all workspace dependencies
+pnpm install
+
+# From frontend-nx directory - also works
+cd frontend-nx && pnpm install
+```
+
+#### Common Commands
+```bash
+# Development
+pnpm dev                 # Start development servers
+pnpm build               # Build for production
+pnpm test                # Run tests
+pnpm lint                # Lint code
+
+# Package Management
+pnpm add <package>       # Add dependency
+pnpm add -D <package>    # Add dev dependency
+pnpm remove <package>    # Remove dependency
+pnpm update              # Update all packages
+pnpm update <package>    # Update specific package
+```
+
+#### Workspace Structure
+- **Root** (`/`): Workspace coordinator with `pnpm-workspace.yaml`
+- **Frontend** (`/frontend-nx`): Next.js application with all dependencies
+- **Functions** (`/functions/*`): Individual npm packages (for Google Cloud Functions compatibility)
+
+#### Updating Packages
+```bash
+# Check for updates interactively
+pnpm update --interactive
+
+# Update specific packages
+pnpm update @mui/material @emotion/react
+
+# Check outdated packages
+pnpm outdated
+```
+
+**Note**: Functions in `/functions/*` still use npm for Google Cloud Functions deployment compatibility.
 

@@ -85,7 +85,7 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
             >
               {localOptions.map((option, index) => (
                 <option key={index} value={option.value}>
-                  {t(option.label)}
+                  {option.label}
                 </option>
               ))}
             </select>

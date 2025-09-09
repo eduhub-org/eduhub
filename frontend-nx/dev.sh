@@ -13,7 +13,7 @@ socat tcp-listen:4001,reuseaddr,fork tcp:node_functions:4001 &
 # proxy access to python_functions
 socat tcp-listen:42025,reuseaddr,fork tcp:python_functions:42025 &
 # make sure all libraries exist
-yarn
+pnpm install
 # start the development servers for edu-hub and rent-a-scientist
-npx nx run edu-hub:serve &
-npx nx run rent-a-scientist:serve
+pnpm nx run edu-hub:serve &
+pnpm nx run rent-a-scientist:serve

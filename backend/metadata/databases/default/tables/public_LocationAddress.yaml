@@ -1,0 +1,87 @@
+table:
+  name: LocationAddress
+  schema: public
+object_relationships:
+  - name: LocationOption
+    using:
+      foreign_key_constraint_on: locationOptionId
+array_relationships:
+  - name: SessionAddresses
+    using:
+      foreign_key_constraint_on:
+        column: locationAddressId
+        table:
+          name: SessionAddress
+          schema: public
+insert_permissions:
+  - role: instructor_access
+    permission:
+      check: {}
+      columns:
+        - locationOptionId
+        - shortLabel
+        - address
+        - description
+        - aliases
+  - role: user_access
+    permission:
+      check: {}
+      columns:
+        - locationOptionId
+        - shortLabel
+        - address
+        - description
+        - aliases
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - locationOptionId
+        - shortLabel
+        - address
+        - description
+        - aliases
+        - created_at
+        - updated_at
+      filter: {}
+      allow_aggregations: true
+  - role: user_access
+    permission:
+      columns:
+        - id
+        - locationOptionId
+        - shortLabel
+        - address
+        - description
+        - aliases
+        - created_at
+        - updated_at
+      filter: {}
+      allow_aggregations: true
+update_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - shortLabel
+        - address
+        - description
+        - aliases
+      filter: {}
+      check: {}
+  - role: user_access
+    permission:
+      columns:
+        - shortLabel
+        - address
+        - description
+        - aliases
+      filter: {}
+      check: {}
+delete_permissions:
+  - role: instructor_access
+    permission:
+      filter: {}
+  - role: user_access
+    permission:
+      filter: {}

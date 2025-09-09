@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Regenerate Apollo GraphQL code and fix file permissions
+# 
+# Usage: ./regen [username]
+# If no username is provided, it will use the current user
+
+set -e  # Exit on any error
+
+# Get the target user (either provided as argument or current user)
+TARGET_USER=${1:-$USER}
+
+# Validate TARGET_USER exists and get its UID:GID
+if ! id "$TARGET_USER" >/dev/null 2>&1; then
+    echo "Error: User '$TARGET_USER' does not exist!"
+    echo "Please provide a valid username or run without arguments to use current user."
+    exit 1
+fi
+
+TARGET_UID_GID=$(id -u "$TARGET_USER"):$(id -g "$TARGET_USER")
+
+echo "Regenerating Apollo GraphQL code for user: $TARGET_USER (UID:GID: $TARGET_UID_GID)"
+echo "Make sure the frontend-nx container is running!"
+
+# Check if the eduhub-frontend-nx container is running
+echo "Checking if eduhub-frontend-nx container is running..."
+if ! docker ps --format "table {{.Names}}" | grep -q "^eduhub-frontend-nx$"; then
+    echo "Error: eduhub-frontend-nx container is not running!"
+    echo "Please start the container first with: docker-compose up -d"
+    exit 1
+fi
+
+# Run the codegen inside the container as the target user
+# This ensures we can access containers started by the specified user
+echo "Running Apollo codegen in container..."
+
+# Check if pnpm is available in the container, otherwise fall back to npx
+if docker exec -i -u "$TARGET_UID_GID" eduhub-frontend-nx which pnpm >/dev/null 2>&1; then
+    echo "Using pnpm to run the generator..."
+    docker exec -i -u "$TARGET_UID_GID" eduhub-frontend-nx pnpm exec -- nx run edu-hub:apollo
+else
+    echo "pnpm not available, falling back to npx..."
+    docker exec -i -u "$TARGET_UID_GID" eduhub-frontend-nx npx nx run edu-hub:apollo
+fi
+
+# Check if any files were created with wrong permissions and fix them
+echo "Checking for permission issues..."
+
+# Find files owned by root in the current directory
+ROOT_FILES=$(find . -user root 2>/dev/null | head -10)
+
+if [ -n "$ROOT_FILES" ]; then
+    echo "Found files owned by root. Fixing permissions..."
+    echo "You may need to enter your password to fix permissions:"
+    sudo chown $TARGET_USER:$TARGET_USER -R .
+    echo "Permissions fixed!"
+else
+    echo "No permission issues found. All files are already owned by $TARGET_USER"
+fi
+
+echo "Apollo code regeneration completed successfully!"
