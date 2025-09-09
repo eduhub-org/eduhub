@@ -44,7 +44,8 @@ ARG NEXT_PUBLIC_STORAGE_BUCKET_URL
 ENV NEXT_PUBLIC_STORAGE_BUCKET_URL=${NEXT_PUBLIC_STORAGE_BUCKET_URL}
 
 
-RUN corepack enable pnpm
+ARG PNPM_VERSION=10.15.1
+RUN corepack prepare pnpm@${PNPM_VERSION} --activate
 RUN pnpm nx run edu-hub:build
 
 # 3. Production image, copy all the files and run next
@@ -53,7 +54,7 @@ FROM node:18-alpine AS runner
 WORKDIR /opt/app
 
 ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
@@ -74,7 +75,7 @@ USER nextjs
 
 EXPOSE 25000
 
-ENV PORT 25000
+ENV PORT=25000
 
 # CMD [ "node", "server.js" ]
 CMD [ "node", "server.js" ]
