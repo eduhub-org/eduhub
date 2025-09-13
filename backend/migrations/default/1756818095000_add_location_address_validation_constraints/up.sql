@@ -3,6 +3,10 @@
 CREATE INDEX IF NOT EXISTS idx_session_address_location_address_id
   ON "public"."SessionAddress" ("locationAddressId");
 
+-- Drop existing constraint and recreate with deferrable option
+ALTER TABLE "public"."SessionAddress"
+  DROP CONSTRAINT IF EXISTS "SessionAddress_locationAddressId_fkey";
+
 ALTER TABLE "public"."SessionAddress"
   ADD CONSTRAINT "SessionAddress_locationAddressId_fkey"
   FOREIGN KEY ("locationAddressId")
@@ -12,6 +16,10 @@ ALTER TABLE "public"."SessionAddress"
 -- Also add the standard FK to CourseLocation (not necessarily deferred)
 CREATE INDEX IF NOT EXISTS idx_session_address_course_location_id
   ON "public"."SessionAddress" ("courseLocationId");
+
+-- Drop existing constraint and recreate (if needed)
+ALTER TABLE "public"."SessionAddress"
+  DROP CONSTRAINT IF EXISTS "SessionAddress_courseLocationId_fkey";
 
 ALTER TABLE "public"."SessionAddress"
   ADD CONSTRAINT "SessionAddress_courseLocationId_fkey"

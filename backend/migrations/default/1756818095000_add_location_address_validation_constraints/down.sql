@@ -9,12 +9,24 @@ DROP FUNCTION IF EXISTS guard_course_location_option_updates();
 DROP TRIGGER IF EXISTS validate_session_address_location_consistency_trigger ON "public"."SessionAddress";
 DROP FUNCTION IF EXISTS validate_session_address_location_consistency();
 
--- Drop FKs
+-- Drop FKs and restore original constraints
 ALTER TABLE "public"."SessionAddress"
   DROP CONSTRAINT IF EXISTS "SessionAddress_locationAddressId_fkey";
 
+-- Restore original SessionAddress_locationAddressId_fkey constraint
+ALTER TABLE "public"."SessionAddress"
+  ADD CONSTRAINT "SessionAddress_locationAddressId_fkey"
+  FOREIGN KEY ("locationAddressId") REFERENCES "public"."LocationAddress"("id")
+  ON UPDATE RESTRICT ON DELETE SET NULL;
+
 ALTER TABLE "public"."SessionAddress"
   DROP CONSTRAINT IF EXISTS "SessionAddress_courseLocationId_fkey";
+
+-- Restore original SessionAddress_courseLocationId_fkey constraint  
+ALTER TABLE "public"."SessionAddress"
+  ADD CONSTRAINT "SessionAddress_courseLocationId_fkey"
+  FOREIGN KEY ("courseLocationId") REFERENCES "public"."CourseLocation"("id")
+  ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Drop helper indexes (optional; keep if shared)
 DROP INDEX IF EXISTS idx_session_address_location_address_id;
