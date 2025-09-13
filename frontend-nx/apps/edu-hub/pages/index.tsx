@@ -1,8 +1,9 @@
 import Head from 'next/head';
 import { FC, Fragment, useMemo } from 'react';
+import { GetStaticProps } from 'next';
 
 import { useQuery } from '@apollo/client';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ClientOnly } from '@opencampus/shared-components';
 
 import { Page } from '../components/layout/Page';
@@ -24,7 +25,9 @@ import { CoursesEnrolledByUser } from '../queries/__generated__/CoursesEnrolledB
 import { AppSettings } from '../queries/__generated__/AppSettings';
 
 const Home: FC = () => {
-  const { t, lang } = useTranslation('start-page');
+  const t = useTranslations('start-page');
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
   const isLoggedIn = useIsLoggedIn();
   const isInstructor = useIsInstructor();
   const isAdmin = useIsAdmin();
@@ -88,7 +91,7 @@ const Home: FC = () => {
           group.courses.length > 0 && (
             <Fragment key={`${groupKey}-${index}`}>
               <h2 id={`sliderGroup${index + 1}`} className="text-2xl font-semibold text-left ml-3 md:ml-0">
-                {t(`common:course_group_options.${group.title}`)}
+                {tCommon(`course_group_options.${group.title}`)}
               </h2>
               <div className="mt-2 mb-12">
                 <TileSlider courses={group.courses} isManage={group.isManaged ?? false} />
@@ -123,7 +126,7 @@ const Home: FC = () => {
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content="EduHub Learning Platform - Tech, Business and Creative Courses" />
-        <meta property="og:locale" content={lang === 'de' ? 'de_DE' : 'en_US'} />
+        <meta property="og:locale" content={locale === 'de' ? 'de_DE' : 'en_US'} />
         
         {/* Twitter Card Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
@@ -212,6 +215,34 @@ const Home: FC = () => {
       </Page>
     </>
   );
+};
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  // This ensures that the messages are loaded server-side
+  // and available to the NextIntlClientProvider in _app.tsx
+  try {
+    const messages = {
+      common: (await import(`../locales/${locale}/common.json`)).default,
+      'start-page': (await import(`../locales/${locale}/start-page.json`)).default,
+      course: (await import(`../locales/${locale}/course.json`)).default,
+    };
+
+    return {
+      props: {
+        messages,
+      },
+      // Enable ISR - regenerate the page at most once every hour
+      revalidate: 3600,
+    };
+  } catch (error) {
+    console.error(`Failed to load messages for locale ${locale}:`, error);
+    return {
+      props: {
+        messages: {},
+      },
+      revalidate: 3600,
+    };
+  }
 };
 
 export default Home;

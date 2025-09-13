@@ -9,11 +9,10 @@ import * as fbq from '../lib/fpixel';
 import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
-
 import { registerLocale, setDefaultLocale } from 'react-datepicker';
 import { de } from 'date-fns/locale/de';
 import { enUS } from 'date-fns/locale/en-US';
-import useTranslation from 'next-translate/useTranslation';
+import { NextIntlClientProvider } from 'next-intl';
 
 import { AppSettingsProvider } from '../contexts/AppSettingsContext';
 
@@ -33,20 +32,18 @@ import { client } from '../config/apollo';
 
 import '../styles/globals.css';
 
-interface InitialProps {
-  cookies: unknown;
-}
 
-// @ts-expect-error Typing does not work correctly here because of getInitialProps
-const MyApp: FC<AppProps & InitialProps> & {
-  getInitialProps: (ctx: AppContext) => Promise<Record<string, unknown>>;
-} = ({ Component, pageProps }) => {
-  const { lang } = useTranslation();
-  setDefaultLocale(lang);
-
+const MyApp: FC<AppProps> = ({ Component, pageProps = {} }) => {
   const router = useRouter();
-
   const [isFBPixelLoaded, setFBPixelLoaded] = useState(false);
+  
+  // Extract locale from router (next-intl routing)
+  const locale = router.locale || 'de';
+  
+  useEffect(() => {
+    // Set datepicker locale based on current locale
+    setDefaultLocale(locale);
+  }, [locale]);
 
   useEffect(() => {
     if (isFBPixelLoaded && typeof window.fbq === 'function') {
@@ -65,52 +62,59 @@ const MyApp: FC<AppProps & InitialProps> & {
   }, [router.events, isFBPixelLoaded]);
 
   return (
-    <SessionProvider session={pageProps.session}>
+    <SessionProvider session={pageProps?.session}>
       <ApolloProvider client={client}>
         <AppCacheProvider {...pageProps}>
           <ThemeProvider theme={theme}>
-            <AppSettingsProvider>
-              {/* Global Site Code Pixel - Facebook Pixel */}
-              <Script
-                id="fb-pixel"
-                data-cookieconsent="marketing"
-                strategy="afterInteractive"
-                type="text/plain"
-                onLoad={() => setFBPixelLoaded(true)}
-                dangerouslySetInnerHTML={{
-                  __html: `
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '1775867059535400');
-            fbq('track', 'PageView');
-          `,
-                }}
-              />
+            <NextIntlClientProvider 
+              locale={locale} 
+              messages={pageProps.messages}
+              timeZone="Europe/Berlin"
+            >
+              <AppSettingsProvider>
+                {/* Global Site Code Pixel - Facebook Pixel */}
+                <Script
+                  id="fb-pixel"
+                  data-cookieconsent="marketing"
+                  strategy="afterInteractive"
+                  type="text/plain"
+                  onLoad={() => setFBPixelLoaded(true)}
+                  dangerouslySetInnerHTML={{
+                    __html: `
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window, document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init', '1775867059535400');
+              fbq('track', 'PageView');
+            `,
+                  }}
+                />
 
-              <Script
-                id="plausible-analytics"
-                data-domain="edu.opencampus.sh"
-                src="https://plausible.io/js/script.js"
-                strategy="afterInteractive"
-                data-cookieconsent="statistics"
-                type="text/plain"
-              />
-              <Head>
-                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-              </Head>
-              <Component {...pageProps} />
-            </AppSettingsProvider>
+                <Script
+                  id="plausible-analytics"
+                  data-domain="edu.opencampus.sh"
+                  src="https://plausible.io/js/script.js"
+                  strategy="afterInteractive"
+                  data-cookieconsent="statistics"
+                  type="text/plain"
+                />
+                <Head>
+                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                </Head>
+                <Component {...pageProps} />
+              </AppSettingsProvider>
+            </NextIntlClientProvider>
           </ThemeProvider>
         </AppCacheProvider>
       </ApolloProvider>
     </SessionProvider>
   );
 };
+
 
 export default MyApp;

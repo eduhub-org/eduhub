@@ -2,10 +2,10 @@
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { withNx } = require('@nx/next/plugins/with-nx');
-
-const nextTranslate = require('next-translate-plugin');
-
+const createNextIntlPlugin = require('next-intl/plugin');
 const path = require('path');
+
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 /**
  * @type {import('@nx/next/plugins/with-nx').WithNxOptions}
@@ -26,6 +26,4 @@ const nextConfig = {
   },
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-module.exports = withNx(nextTranslate(nextConfig));
+module.exports = withNx(withNextIntl(nextConfig));
