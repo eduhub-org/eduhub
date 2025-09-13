@@ -1,11 +1,11 @@
 import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 
 import { Button } from '../common/Button';
 
 export const RegisterButton: FC = () => {
-  const { t } = useTranslation('common');
+  const t = useTranslations('common');
   const router = useRouter();
 
   const register = useCallback(() => {

@@ -23,7 +23,7 @@ import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/Ma
 import Locations from './Locations';
 import { Button } from '@mui/material';
 import { MdAddCircle } from 'react-icons/md';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import DropdownSelector from '../../../inputs/DropDownSelector';
 import TimePicker from '../../../inputs/TimePicker';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
@@ -56,7 +56,7 @@ interface IProps {
 
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const { error, handleError, resetError } = useErrorHandler();
-  const { t } = useTranslation('course-page');
+  const t = useTranslations('course-page');
 
   const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_COURSE_LOCATION,

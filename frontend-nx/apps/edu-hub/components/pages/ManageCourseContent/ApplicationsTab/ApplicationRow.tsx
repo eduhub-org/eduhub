@@ -1,4 +1,4 @@
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback, useState } from 'react';
 import { GoDotFill } from 'react-icons/go';
 import { IoIosArrowDown, IoIosArrowUp, IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
@@ -27,7 +27,7 @@ const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments | nu
 };
 
 export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelected, onSelectRow }) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const displayDate = useDisplayDate();
 
   const handleToggleRowSelected = useCallback(() => {

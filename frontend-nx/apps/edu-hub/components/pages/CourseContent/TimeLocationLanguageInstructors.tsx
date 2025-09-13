@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { FC } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations } from 'next-intl';
 
 import { useStartTimeString, useEndTimeString, getWeekdayString } from '../../../helpers/dateTimeHelpers';
 import languageIcon from '../../../public/images/course/language.svg';
@@ -14,8 +14,8 @@ interface IProps {
 }
 
 export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
-  const { t } = useTranslation(); // used to get weekday and language
-  const { t: tCourse } = useTranslation('course');
+  const t = useTranslations('common'); // used to get weekday and language
+  const tCourse = useTranslations('course');
 
   const getStartTimeString = useStartTimeString();
   const getEndTimeString = useEndTimeString();
@@ -23,8 +23,28 @@ export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
   const startTime = getStartTimeString(course.startTime);
   const endTime = getEndTimeString(course.endTime);
 
-  // Get ECTS translations object to handle keys with dots/commas
-  const ectsTranslations = tCourse('ects', {}, { returnObjects: true }) as Record<string, string>;
+  // Get ECTS translation for the specific course ECTS value
+  const getEctsTranslation = (ectsValue: string) => {
+    try {
+      // Convert values with dots/commas to valid translation keys
+      const normalizedKey = ectsValue
+        .replace('.', 'dot')
+        .replace(',', '_');
+      
+      // Try the translation key
+      const translatedValue = tCourse(`ects.${normalizedKey}`);
+      
+      // Check if the translation actually worked (next-intl returns the key if translation is missing)
+      if (translatedValue === `ects.${normalizedKey}`) {
+        // If translation key is returned, fallback to original value
+        return ectsValue;
+      }
+      
+      return translatedValue;
+    } catch (error) {
+      return ectsValue; // fallback to original value
+    }
+  };
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center mx-6 lg:mx-0 mb-9 rounded-2xl lg:max-w-md bg-gray-100 p-12 sm:p-24">
@@ -41,7 +61,7 @@ export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
             </>
           )}
         </span>
-        <span className="text-sm mt-2 text-center">{ectsTranslations[course.ects] || course.ects}</span>
+        <span className="text-sm mt-2 text-center">{getEctsTranslation(course.ects)}</span>
         <div className="flex justify-center">
           <Image src={pinIcon} alt="Location" width={32} height={43} />
         </div>

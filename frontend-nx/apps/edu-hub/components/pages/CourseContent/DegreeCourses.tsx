@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import NextLink from 'next/link';
 import MuiLink from '@mui/material/Link';
 import { useUser } from '../../../../edu-hub/hooks/user';
@@ -16,7 +16,7 @@ const isPublished = (degreeCourse) => degreeCourse?.Course?.published && degreeC
 export const CurrentDegreeCourses: FC<{
   degreeCourses: Course_Course_by_pk_DegreeCourses[];
 }> = ({ degreeCourses }) => {
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
   const currentDegreeCourses = degreeCourses.filter(isPublished);
 
   return (
@@ -42,7 +42,7 @@ export const CurrentDegreeCourses: FC<{
 };
 
 export const CompletedDegreeCourses: FC<{ degreeCourseId: number }> = ({ degreeCourseId }) => {
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
   const { id: userId } = useUser();
   const { data } = useRoleQuery<CompletedDegreeEnrollments, CompletedDegreeEnrollmentsVariables>(
     COMPLETED_DEGREE_ENROLLMENTS,

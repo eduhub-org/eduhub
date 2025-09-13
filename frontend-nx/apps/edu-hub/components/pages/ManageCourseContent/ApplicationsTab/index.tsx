@@ -29,7 +29,7 @@ import {
   UpdateEnrollmentStatus,
   UpdateEnrollmentStatusVariables,
 } from '../../../../queries/__generated__/UpdateEnrollmentStatus';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import AddButton from '../../../common/AddButton';
 import Modal from '../../../common/Modal';
 import AddParticipantsForm from './AddParticipantsForm';
@@ -44,7 +44,8 @@ const nextWeek = new Date();
 nextWeek.setDate(nextWeek.getDate() + 7);
 
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
-  const { t, lang } = useTranslation('manageCourse');
+  const t = useTranslations('manageCourse');
+  const { locale } = useLocale();
 
   const applicationStats = useMemo(() => {
     console.log(course.CourseEnrollments);
@@ -268,11 +269,11 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             <div className="mr-3">{t('course-page:invitation-deadline')}:</div>
             <div className="ml-3">
               <DatePicker
-                dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
+                dateFormat={locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
                 selected={inviteExpireDate}
                 onChange={handleSetInviteExpireDate}
                 minDate={now}
-                locale={lang}
+                locale={locale}
               />
             </div>
           </div>

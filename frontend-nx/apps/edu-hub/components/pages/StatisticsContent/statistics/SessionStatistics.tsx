@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { TimeSeriesLineChart } from '../../../common/charts/TimeSeriesLineChart';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { PROGRAM_STATISTICS } from '../../../../queries/programList';
@@ -16,7 +16,7 @@ interface ChartDataPoint {
 }
 
 export const SessionStatistics: FC = () => {
-  const { t } = useTranslation('statistics');
+  const t = useTranslations('statistics');
   const [selectedTypes, setSelectedTypes] = useState<{ id: number; name: string }[]>([]);
 
   const { data: typeData } = useRoleQuery<ProgramTypesList>(PROGRAM_TYPES);

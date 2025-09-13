@@ -22,7 +22,7 @@ import {
 import { ACHIEVEMENT_RECORDS_WITH_AUTHORS } from '../../../../queries/achievementRecord';
 //import { Link } from '@mui/material';
 import { MinAchievementOption } from '../../../../helpers/achievement';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 interface IContext {
   achievementRecordUploadDeadline: any;
   courseTitle: string;
@@ -40,7 +40,8 @@ interface IProps {
 }
 
 const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadline, courseTitle }) => {
-  const { t, lang } = useTranslation('course');
+  const t = useTranslations('course');
+  const { locale } = useLocale();
   const user = useUser();
   const userId = useUserId();
   const profile = useKeycloakUserProfile();
@@ -131,7 +132,7 @@ const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadli
           {myRecords && myRecords.documentationUrl && myRecords.documentationUrl !== 'pending_upload' ? (
             <p>
               {t('achievement.last_record_upload', {
-                dateTime: formattedDateWithTime(new Date(myRecords.created_at), lang),
+                dateTime: formattedDateWithTime(new Date(myRecords.created_at), locale),
                 fullName: makeFullName(profile.firstName, profile.lastName),
                 achievementRecordTitle: myRecords.AchievementOption.title,
                 achievementRecordFileName: myRecords.documentationUrl.substring(

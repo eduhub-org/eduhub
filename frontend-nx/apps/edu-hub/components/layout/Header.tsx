@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { FC, MouseEvent, useCallback, useState } from 'react';
+import { useRouter } from 'next/router';
 
 import { useIsLoggedIn } from '../../hooks/authentication';
 import { useUser } from '../../hooks/user';
@@ -12,13 +13,15 @@ import { Menu } from './Menu';
 import { RegisterButton } from './RegisterButton';
 import { ClientOnly } from '@opencampus/shared-components';
 import { OnlyDesktop } from '@opencampus/shared-components';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import UserCard from '../common/UserCard';
 
 export const Header: FC = () => {
   const isLoggedIn = useIsLoggedIn();
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [menuAnchorElement, setMenuAnchorElement] = useState<HTMLElement>();
+  const router = useRouter();
+  const locale = useLocale();
 
   const user = useUser();
 
@@ -27,24 +30,12 @@ export const Header: FC = () => {
     setMenuVisible(true);
   }, []);
 
-  const { lang } = useTranslation();
-  const isEnglish = lang === 'en';
+  const changeLocale = useCallback((newLocale: string) => {
+    const { pathname, asPath, query } = router;
+    router.push({ pathname, query }, asPath, { locale: newLocale });
+  }, [router]);
 
-  const changeLanguage = (lng: string) => {
-    const currentUrl = window.location.href;
-    const urlParts = currentUrl.split('/');
-    const hasLanguageCode = urlParts.length > 3 && urlParts[3].length === 2;
-
-    let newUrl;
-    if (hasLanguageCode) {
-      urlParts[3] = lng;
-      newUrl = urlParts.join('/');
-    } else {
-      newUrl = `/${lng}${window.location.pathname}`;
-    }
-
-    window.location.href = newUrl;
-  };
+  const isEnglish = locale === 'en';
 
   return (
     <header className="w-full absolute top-0 left-0 bg-edu-bg-gray bg-opacity-50">
@@ -62,12 +53,12 @@ export const Header: FC = () => {
           </Link>
         </div>
         <div className="mr-2 text-white flex items-center">
-          <button onClick={() => changeLanguage('en')} className={`mr-2 ${isEnglish ? 'font-bold' : 'font-light'}`}>
+          <button onClick={() => changeLocale('en')} className={`mr-2 ${isEnglish ? 'font-bold' : 'font-light'}`}>
             EN
           </button>
           |
           <button
-            onClick={() => changeLanguage('de')}
+            onClick={() => changeLocale('de')}
             className={`mr-6 ml-2 ${isEnglish ? 'font-light' : 'font-bold'}`}
           >
             DE

@@ -35,7 +35,7 @@ import {
 import { OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
 import EntityListManager from '../../inputs/EntityListManager';
 import { getPublicImageUrl, parseFileUploadEvent } from '../../../helpers/filehandling';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import TagSelector from '../../inputs/TagSelector';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
@@ -66,7 +66,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   onSetAttendanceCertificatePossible,
   onSetAchievementCertificatePossible,
 }) => {
-  const { t } = useTranslation('course-page');
+  const t = useTranslations('course-page');
   const { error, handleError, resetError } = useErrorHandler();
 
   // Helper function

@@ -1,6 +1,5 @@
 import { FC } from 'react';
-import useTranslation from 'next-translate/useTranslation';
-import Trans from 'next-translate/Trans';
+import { useTranslations, useLocale } from 'next-intl';
 import { MdInfoOutline } from 'react-icons/md';
 
 import { CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
@@ -42,7 +41,8 @@ interface RegistrationButtonProps {
  * @returns JSX element representing the registration button and deadline info
  */
 export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, registrationType, onClick }) => {
-  const { t, lang } = useTranslation('course');
+  const t = useTranslations('course');
+  const locale = useLocale();
   const config = getRegistrationTypeConfig(registrationType);
 
   // Check if application period has ended
@@ -59,19 +59,18 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
           <div className="text-amber-800">
             <h3 className="font-semibold text-lg mb-2">{t('status.application_period_ended_title')}</h3>
             <div className="text-sm leading-relaxed">
-              <Trans
-                i18nKey="course:status.application_period_ended"
-                components={{
-                  a: (
-                    <a
-                      href="https://opencampus.substack.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline hover:text-amber-900 transition-colors font-medium"
-                    />
-                  ),
-                }}
-              />
+              {t.rich('status.application_period_ended', {
+                a: (chunks) => (
+                  <a
+                    href="https://opencampus.substack.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-amber-900 transition-colors font-medium"
+                  >
+                    {chunks}
+                  </a>
+                ),
+              })}
             </div>
           </div>
         </div>
@@ -110,7 +109,7 @@ export const RegistrationButton: FC<RegistrationButtonProps> = ({ course, regist
       <div className="text-center">
         <div className="text-xs text-white/90 mb-1">{t('registration.application_deadline')}</div>
         <div className="text-sm font-medium text-white">
-          {course.applicationEnd?.toLocaleDateString(lang, {
+          {course.applicationEnd?.toLocaleDateString(locale, {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',

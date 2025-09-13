@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
 import { UPDATE_ORGANIZATION_API_KEY_HASH } from '../../../queries/organization';
@@ -50,7 +50,7 @@ function generatePlainApiKey(organizationId: number): string {
 }
 
 export const ApiKeyManager: React.FC<Props> = ({ organization, onError }) => {
-  const { t } = useTranslation('manageOrganizations');
+  const t = useTranslations('manageOrganizations');
   const [showDialog, setShowDialog] = useState(false);
   const [pending, setPending] = useState(false);
   const [pendingStore, setPendingStore] = useState(false);

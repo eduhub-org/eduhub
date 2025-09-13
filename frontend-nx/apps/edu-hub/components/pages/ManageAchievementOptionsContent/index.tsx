@@ -2,7 +2,7 @@ import { IconButton } from '@mui/material';
 import { Button } from '@mui/material';
 import { MdAddCircle } from 'react-icons/md';
 import { IUserProfile } from '../../../hooks/user';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { MdDelete, MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
 import { makeFullName } from '../../../helpers/util';
@@ -101,7 +101,7 @@ const DashboardContent: FC<IPropsContent> = ({ options }) => {
   const addNewAchievement = useCallback(() => {
     setShowNewAchievementView(!showNewAchievementView);
   }, [setShowNewAchievementView, showNewAchievementView]);
-  const { t } = useTranslation('course-page');
+  const t = useTranslations('course-page');
   return (
     <div className="w-full">
       <div className="flex justify-between mb-5" />

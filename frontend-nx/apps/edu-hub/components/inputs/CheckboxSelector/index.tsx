@@ -3,7 +3,7 @@ import { useCheckboxLogic } from './hooks';
 import { CheckboxSelectorProps } from './types';
 import { MaterialCheckbox } from './components/MaterialCheckbox';
 import { EduhubCheckbox } from './components/EduhubCheckbox';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 
@@ -19,7 +19,7 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
   identifierVariables,
   disabled = false,
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const handleMutationValueUpdate = (newValue: boolean) => {
     onValueUpdated?.(newValue);

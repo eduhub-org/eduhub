@@ -1,4 +1,4 @@
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback, useState } from 'react';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
@@ -69,7 +69,7 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  * @returns {any} the component
  */
 export const ManageCourseContent: FC<Props> = ({ courseId }) => {
-  const { t } = useTranslation('manageCourse');
+  const t = useTranslations('manageCourse');
 
   const qResult = useRoleQuery<ManagedCourse, ManagedCourseVariables>(MANAGED_COURSE, {
     variables: {

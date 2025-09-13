@@ -3,7 +3,7 @@ import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { DocumentNode } from 'graphql';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import Tooltip from '@mui/material/Tooltip';
 import { HelpOutline } from '@mui/icons-material';
 import { prioritizeClasses } from '../../helpers/util';
@@ -95,7 +95,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
 }) => {
   const [tags, setTags] = useState<TagOption[]>(values.map((tag) => ({ value: tag })));
   const [inputValue, setInputValue] = useState('');
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   useEffect(() => {
     setTags(values.map((tag) => ({ value: tag })));

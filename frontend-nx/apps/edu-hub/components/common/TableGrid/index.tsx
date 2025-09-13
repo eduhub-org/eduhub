@@ -1,7 +1,7 @@
 import { BaseRow, TableGridProps } from './types';
 import React, { useState, useMemo, useCallback } from 'react';
 import { TextField, Checkbox, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
 import { MdArrowBack, MdArrowForward } from 'react-icons/md';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
@@ -67,7 +67,7 @@ const TableGrid = <T extends BaseRow>({
     console.warn('TableGrid: onPageSizeChange prop is required when enablePagination is true');
   }
 
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [sorting, setSorting] = useState<SortingState>([]);
 

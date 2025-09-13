@@ -4,7 +4,7 @@ import { DropDownSelectorProps } from './types';
 import { MaterialDropDown } from './components/MaterialDropDown';
 import { EduhubDropDown } from './components/EduhubDropDown';
 import { useRoleMutation } from '../../../hooks/authedMutation';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import { gql } from '@apollo/client';
@@ -28,7 +28,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
   nullable = false,
   nullableLabel,
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [inputValue, setInputValue] = useState('');
 
   const handleMutationValueUpdate = (newValue: string) => {

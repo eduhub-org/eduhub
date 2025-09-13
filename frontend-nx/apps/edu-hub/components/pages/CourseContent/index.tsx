@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 
 import Onboarding from './Onboarding';
@@ -30,7 +30,7 @@ import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { getRegistrationTypeConfig } from './Registration/types';
 
 const CourseContent: FC<{ id: number }> = ({ id }) => {
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
   const isLoggedIn = useIsLoggedIn();
   const userId = useUserId();
   const [resetValues, setResetValues] = useState(null);

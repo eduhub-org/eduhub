@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { Dispatch, SetStateAction } from 'react';
 import { useEffect } from 'react';
 import { useRoleQuery } from '../../hooks/authedQuery';
@@ -35,7 +35,7 @@ export const CertificateDownload: FC<IProps> = ({
     hideAttendanceButton: hideAttendanceCertificateButton
   });
 
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleQueryError = (error: string) => {

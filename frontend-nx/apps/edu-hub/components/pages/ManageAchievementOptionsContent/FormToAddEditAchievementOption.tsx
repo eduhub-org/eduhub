@@ -1,6 +1,5 @@
 import { CircularProgress } from '@mui/material';
-import { Translate } from 'next-translate';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback, useContext, useReducer, useState } from 'react';
 import { MdAddCircle } from 'react-icons/md';
 import {
@@ -129,8 +128,8 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
   );
   /* #endregion */
 
-  const tCommon: Translate = context.t;
-  const { t } = useTranslation('course-page');
+  const tCommon = context.t;
+  const t = useTranslations('course-page');
 
   return (
     <>

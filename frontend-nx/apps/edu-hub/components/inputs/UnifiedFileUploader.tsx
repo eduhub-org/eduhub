@@ -5,7 +5,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { HelpOutline, CloudUpload } from '@mui/icons-material';
 import Button from '@mui/material/Button';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { prioritizeClasses } from '../../helpers/util';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
 import Snackbar from '@mui/material/Snackbar';
@@ -49,7 +49,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   className = '',
   user,
 }) => {
-  const { t } = useTranslation(translationNamespace);
+  const t = useTranslations(translationNamespace);
   const [showSavedNotification, setShowSavedNotification] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);

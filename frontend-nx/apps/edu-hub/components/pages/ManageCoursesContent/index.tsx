@@ -30,7 +30,7 @@ import { useAdminQuery } from '../../../hooks/authedQuery';
 import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
 import ExpandableCourseRow from './ExpandableCourseRow';
 import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import draftPie from '../../../public/images/course/status/draft.svg';
 import readyForPublicationPie from '../../../public/images/course/status/ready-for-publication.svg';
 import readyForApplicationPie from '../../../public/images/course/status/ready-for-application.svg';
@@ -61,7 +61,8 @@ interface IProps {
 }
 
 const ManageCoursesContent: FC<IProps> = ({ programs }) => {
-  const { t, lang } = useTranslation('manageCourses');
+  const t = useTranslations('manageCourses');
+  const { locale } = useLocale();
 
   // Calculate default program
   const sortedPrograms = useMemo(() => {
@@ -619,10 +620,10 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
               {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
               <DatePicker
                 className="w-full text-center bg-transparent text-sm p-1 rounded"
-                dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
+                dateFormat={locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
                 selected={endDate}
                 onChange={handleApplicationEndChange(row.original)}
-                locale={lang}
+                locale={locale}
                 placeholderText="-"
               />
             </div>
@@ -637,7 +638,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         cell: ({ row }) => <div className="text-center">{courseStatus(row.original.status)}</div>,
       },
     ],
-    [t, handleApplicationEndChange, lang, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed]
+    [t, handleApplicationEndChange, locale, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed]
   );
 
   const handlePageSizeChange = useCallback(

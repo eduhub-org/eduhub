@@ -1,5 +1,5 @@
 import { FC, ReactNode, useMemo, useCallback, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
@@ -27,7 +27,7 @@ const ExpandableUserRow: FC<{
   isSuperAdmin: boolean;
   onAdminStatusChange: () => void;
 }> = ({ row, isSuperAdmin, onAdminStatusChange }) => {
-  const { t } = useTranslation('manageAdminUsers');
+  const t = useTranslations('manageAdminUsers');
   const isAdmin = useIsAdmin();
 
   const [setAdminStatus] = useAdminMutation(UPDATE_USER_ADMIN_STATUS);
@@ -99,7 +99,7 @@ const ExpandableUserRow: FC<{
 };
 
 const ManageAdminUsersContent: FC = () => {
-  const { t } = useTranslation('manageAdminUsers');
+  const t = useTranslations('manageAdminUsers');
   const [adminUserIds, setAdminUserIds] = useState<string[]>([]);
   const [adminError, setAdminError] = useState<Error | null>(null);
 

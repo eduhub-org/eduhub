@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 
 import { useAuthedMutation } from '../../../hooks/authedMutation';
@@ -43,7 +43,7 @@ interface OnboardingProps {
 }
 
 const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, setResetValues }) => {
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
   const userId = useUserId();
   const [showDeclineDialog, setShowDeclineDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

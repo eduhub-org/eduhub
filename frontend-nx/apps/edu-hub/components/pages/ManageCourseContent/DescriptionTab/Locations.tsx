@@ -1,5 +1,5 @@
 import { QueryResult } from '@apollo/client';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback } from 'react';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
 import DropDownSelector from '../../../inputs/DropDownSelector';
@@ -20,7 +20,7 @@ interface LocationsIProps {
 }
 
 export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
-  const { t } = useTranslation('course-page');
+  const t = useTranslations('course-page');
 
   const queryLocationOptions = useRoleQuery<LocationOptions>(LOCATION_OPTIONS);
   if (queryLocationOptions.error) {

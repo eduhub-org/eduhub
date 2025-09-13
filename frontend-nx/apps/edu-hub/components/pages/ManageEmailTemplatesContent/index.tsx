@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useCallback, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 import DOMPurify from 'dompurify';
 
@@ -36,7 +36,7 @@ interface EmailTemplateRow {
 
 // Expandable row component with full functionality
 const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }) => {
-  const { t } = useTranslation('manageEmailTemplates');
+  const t = useTranslations('manageEmailTemplates');
   const [preview, setPreview] = useState<string>('');
   const [showPreview, setShowPreview] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -160,7 +160,7 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
 };
 
 const ManageEmailTemplatesContent: FC = () => {
-  const { t } = useTranslation('manageEmailTemplates');
+  const t = useTranslations('manageEmailTemplates');
 
   const { data, loading, error, searchFilter, setSearchFilter } = useTableGrid({
     queryHook: useAdminQuery,

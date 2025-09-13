@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { IconButton } from '@mui/material';
 import { MdDelete } from 'react-icons/md';
 
@@ -30,7 +30,7 @@ const TableGridDeleteButton = ({
 
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   // If no question is provided, use the default one
   const confirmationQuestion =

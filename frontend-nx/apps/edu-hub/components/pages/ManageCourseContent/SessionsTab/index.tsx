@@ -28,7 +28,7 @@ import {
   DeleteSessionSpeaker,
   DeleteSessionSpeakerVariables,
 } from '../../../../queries/__generated__/DeleteSessionSpeaker';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { SessionAddress_insert_input } from '../../../../__generated__/globalTypes';
 
 interface IProps {
@@ -37,7 +37,7 @@ interface IProps {
 }
 
 export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const courseSessions = useMemo(() => {
     const result = [...course.Sessions];

@@ -1,5 +1,5 @@
 import { FC, useMemo, useCallback, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
@@ -37,7 +37,7 @@ import { ApolloError } from '@apollo/client';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 
 const ManageAchievementTemplatesContent: FC = () => {
-  const { t } = useTranslation('manageAchievementTemplates');
+  const t = useTranslations('manageAchievementTemplates');
   const pageSize = 15;
 
   const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter, refetch } = useTableGrid({

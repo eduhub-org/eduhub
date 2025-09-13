@@ -1,4 +1,4 @@
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useMemo } from 'react';
 import { ManagedCourse_Course_by_pk_Sessions_SessionAddresses } from '../../../../queries/__generated__/ManagedCourse';
 import { UPDATE_SESSION_ADDRESS } from '../../../../queries/course';
@@ -16,7 +16,7 @@ interface SessionAddressesIProps {
 }
 
 export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQueries }) => {
-  const { t } = useTranslation('course-page');
+  const t = useTranslations('course-page');
 
   const defaultSessionAddress = address?.CourseLocation?.defaultSessionAddress;
   const sessionAddress = address?.address || defaultSessionAddress;

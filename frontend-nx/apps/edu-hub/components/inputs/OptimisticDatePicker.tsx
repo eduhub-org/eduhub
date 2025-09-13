@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useState, useEffect, useMemo } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { getHolidaysByLocale } from './holidayUtils';
 
 // Beautiful highlighting styles for calendar days
@@ -204,7 +204,7 @@ export interface OptimisticDatePickerProps {
  * ## Holiday Support
  *
  * Holidays are automatically detected based on the app's configured locale:
- * - **German locale (lang='de')**: German holidays (Pfingstmontag, Fronleichnam, etc.)
+ * - **German locale (locale='de')**: German holidays (Pfingstmontag, Fronleichnam, etc.)
  * - **Other locales**: US holidays (Independence Day, Thanksgiving, etc.)
  *
  * Holiday coverage includes current year + next year to handle academic terms.
@@ -244,7 +244,7 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
   required,
   tabIndex,
 }) => {
-  const { lang } = useTranslation();
+  const { locale } = useLocale();
 
   // Inject styles when component mounts
   useEffect(() => {
@@ -258,15 +258,15 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
     }
 
     // Auto-generate holidays for current and next year based on app's configured locale
-    // lang comes from useTranslation and represents the app's language setting (from i18n.json)
+    // locale comes from useTranslation and represents the app's language setting (from i18n.json)
     const currentYear = new Date().getFullYear();
-    const locale = lang === 'de' ? 'de' : 'us'; // Map app locale to holiday locale
+    const locale = locale === 'de' ? 'de' : 'us'; // Map app locale to holiday locale
 
     return [
       ...getHolidaysByLocale({ year: currentYear, locale }),
       ...getHolidaysByLocale({ year: currentYear + 1, locale }),
     ];
-  }, [showHolidays, lang]);
+  }, [showHolidays, locale]);
 
   // Local optimistic state
   const [optimisticValue, setOptimisticValue] = useState<Date | null>(null);
@@ -646,8 +646,8 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
         onChange={handleDateChange as any}
         disabled={isDisabled}
         className={finalClassName}
-        locale={propLocale || lang}
-        dateFormat={dateFormat || (lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy')}
+        locale={propLocale || locale}
+        dateFormat={dateFormat || (locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy')}
         minDate={minDate}
         maxDate={maxDate}
         placeholderText={placeholderText}

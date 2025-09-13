@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ChangeEvent, FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
@@ -78,7 +78,7 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
 
   const users = [...(result1.data?.User || []), ...(result2.data?.User || [])];
 
-  const { t } = useTranslation();
+  const t = useTranslations();
   return (
     <Dialog open={open} onClose={handleCancel}>
       <DialogTitle>

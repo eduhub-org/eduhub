@@ -57,10 +57,10 @@ import {
   UpdateProgramParticipationCertVisible,
   UpdateProgramParticipationCertVisibleVariables,
 } from '../../../queries/__generated__/UpdateProgramParticipationCertVisible';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 
 export const ManageProgramsContent: FC = () => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const qResult = useAdminQuery<ProgramList>(PROGRAM_LIST);
 
   if (qResult.error) {

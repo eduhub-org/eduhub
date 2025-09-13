@@ -1,5 +1,5 @@
 import { useRoleMutation } from '../../../../hooks/authedMutation';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '../../../common/Button';
 import { CREATE_CERTIFICATES } from '../../../../queries/actions';
 import {
@@ -35,7 +35,7 @@ export const GenerateCertificatesButton: React.FC<Props> = ({
     });
   }, [userEnrollments, course, certificateType]);
 
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 

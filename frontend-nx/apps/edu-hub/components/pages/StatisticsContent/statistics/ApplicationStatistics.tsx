@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { MULTI_PROGRAM_ENROLLMENTS } from '../../../../queries/multiProgramEnrollments';
 import { MultiProgramEnrollments } from '../../../../queries/__generated__/MultiProgramEnrollments';
@@ -10,7 +10,7 @@ import { ProgramStatistics } from '../../../../queries/__generated__/ProgramStat
 import Loading from '../../../common/Loading';
 
 export const ApplicationStatistics: FC = () => {
-  const { t } = useTranslation('statistics');
+  const t = useTranslations('statistics');
   const [selectedPrograms, setSelectedPrograms] = useState<{ id: number; name: string }[]>([]);
 
   // Query for program list (for selector)

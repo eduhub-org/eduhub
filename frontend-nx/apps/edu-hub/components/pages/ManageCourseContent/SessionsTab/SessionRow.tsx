@@ -23,7 +23,7 @@ import {
   InsertNewSessionSpeakerVariables,
 } from '../../../../queries/__generated__/InsertNewSessionSpeaker';
 import EhMultipleTag from '../../../common/EhMultipleTag';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import DeleteButton from '../../../../components/common/DeleteButton';
 import SessionAddresses from './SessionAddresses';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
@@ -60,7 +60,7 @@ export const SessionRow: FC<IProps> = ({
   onSetTitle,
   onDeleteSpeaker,
 }) => {
-  const { t } = useTranslation('course-page');
+  const t = useTranslations('course-page');
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);

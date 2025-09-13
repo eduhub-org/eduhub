@@ -20,7 +20,7 @@ import { UserForSelection1_User } from '../../../queries/__generated__/UserForSe
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import EhTag from '../../common/EhTag';
 
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface IPropsInstructorColumn {
   programs: Programs_Program[];
@@ -117,7 +117,7 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
     },
     [insertExpertMutation, refetchCourses, course, insertCourseInstructor]
   );
-  const { t } = useTranslation('course-page');
+  const t = useTranslations('course-page');
   const makeFullName = (firstName: string, lastName: string): string => {
     return `${firstName} ${lastName}`;
   };

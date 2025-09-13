@@ -1,5 +1,5 @@
 import React, { FC, useState, ErrorInfo, ReactNode } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { Page } from '../../layout/Page';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { ApplicationStatistics } from './statistics/ApplicationStatistics';
@@ -35,7 +35,7 @@ class ErrorBoundary extends React.Component<{ children: ReactNode }, { hasError:
 type StatisticType = 'APPLICATIONS' | 'COURSES' | 'SESSIONS' | 'ATTENDANCES' | 'CERTIFICATES';
 
 const StatisticsContent: FC = () => {
-  const { t } = useTranslation('statistics');
+  const t = useTranslations('statistics');
   const [selectedStatistic, setSelectedStatistic] = useState<StatisticType>('APPLICATIONS');
 
   const STATISTIC_TYPES: { value: StatisticType; label: string }[] = [

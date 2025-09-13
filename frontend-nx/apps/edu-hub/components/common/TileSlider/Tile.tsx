@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { FC, useEffect, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
 import languageIcon from '../../../public/images/course/language.svg';
@@ -20,7 +20,7 @@ interface TileProps {
 }
 
 export const Tile: FC<TileProps> = ({ course, isManage }) => {
-  const { t } = useTranslation('common');
+  const t = useTranslations('common');
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
   // Needed for legacy reasons: For cases where the image in the optimal image size does not exist but only the original image size

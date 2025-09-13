@@ -1,6 +1,6 @@
 import { LazyQueryResult, QueryResult } from '@apollo/client';
 import { ACHIEVEMENT_OPTION_COURSES } from '../../../../queries/achievementOption';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import { Dispatch, FC, SetStateAction, useCallback, useState } from 'react';
 import { useIsAdmin } from '../../../../hooks/authentication';
@@ -151,7 +151,7 @@ type ExtendedEnrollment = ManagedCourse_Course_by_pk_CourseEnrollments & {
 };
 
 const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const isAdmin = useIsAdmin();
   const [refetchAchievementCertificates, setRefetchAchievementCertificates] = useState(false);
   const [refetchAttendanceCertificates, setRefetchAttendanceCertificates] = useState(false);
@@ -330,7 +330,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
   setRefetchAchievementCertificates,
   setRefetchAttendanceCertificates,
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [showDetails, setShowDetails] = useState(false);
   const [documentationUrlLoaded, setDocumentationUrlLoaded] = useState(false);
 
@@ -528,7 +528,8 @@ interface IPropsShowDetails {
   qResult: QueryResult<any, any>;
 }
 const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocumentationResult, qResult }) => {
-  const { t, lang } = useTranslation();
+  const t = useTranslations();
+  const { locale } = useLocale();
   const [setAchievementRecord] = useRoleMutation<UpdateAchievementRecordByPk, UpdateAchievementRecordByPkVariables>(
     UPDATE_AN_ACHIEVEMENT_RECORD
   );
@@ -592,7 +593,7 @@ const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocum
                   <div className="mb-3">
                     {`${t('manageCourse:lastRecordUpload')}: ${formattedDateWithTime(
                       new Date(enrollment.mostRecentRecord.created_at),
-                      lang
+                      locale
                     )}`}
                   </div>
                   <Button

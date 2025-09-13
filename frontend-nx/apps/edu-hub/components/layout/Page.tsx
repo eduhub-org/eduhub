@@ -1,6 +1,6 @@
 import { FC, ReactNode, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { Transition } from '@headlessui/react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -19,7 +19,7 @@ type PageProps = {
 export const Page: FC<PageProps> = ({ children, className }) => {
   const { data: session, status } = useSession();
   const logout = useLogout();
-  const { lang } = useTranslation();
+  const { locale } = useLocale();
   const {
     bannerBackgroundColor,
     bannerFontColor,
@@ -47,10 +47,10 @@ export const Page: FC<PageProps> = ({ children, className }) => {
 
   useEffect(() => {
     if (bannerTextDe && bannerTextEn) {
-      if (lang === 'de') handleBanner('bannerContentDe', bannerTextDe);
-      else if (lang === 'en') handleBanner('bannerContentEn', bannerTextEn);
+      if (locale === 'de') handleBanner('bannerContentDe', bannerTextDe);
+      else if (locale === 'en') handleBanner('bannerContentEn', bannerTextEn);
     }
-  }, [lang, bannerTextDe, bannerTextEn]);
+  }, [locale, bannerTextDe, bannerTextEn]);
 
   useEffect(() => {
     if (status !== 'loading' && session?.error === 'RefreshAccessTokenError') logout();

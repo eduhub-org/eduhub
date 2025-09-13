@@ -19,7 +19,7 @@ import DOMPurify from 'dompurify';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 import { gql } from '@apollo/client';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface EmailEditorProps {
   itemId: number;
@@ -44,7 +44,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
   className = '',
   templateType,
 }) => {
-  const { t } = useTranslation('common');
+  const t = useTranslations('common');
   const [isHtmlMode, setIsHtmlMode] = useState(false);
   const [showSavedNotification, setShowSavedNotification] = useState(false);
 

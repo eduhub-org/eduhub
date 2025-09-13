@@ -1,5 +1,5 @@
 import { FC, ReactNode, useMemo, useCallback, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
@@ -14,7 +14,7 @@ import CommonPageHeader from '../../common/CommonPageHeader';
 import NavigationButton from '../../common/NavigationButton';
 
 const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
-  const { t } = useTranslation('manageUsers');
+  const t = useTranslations('manageUsers');
   return (
     <div>
       <div className="font-medium bg-edu-course-list grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
@@ -48,7 +48,7 @@ const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
 };
 
 const ManageUsersContent: FC = () => {
-  const { t } = useTranslation('manageUsers');
+  const t = useTranslations('manageUsers');
   const [pageSize, setPageSize] = useState(20);
 
   const handlePageSizeChange = (newPageSize: number) => {

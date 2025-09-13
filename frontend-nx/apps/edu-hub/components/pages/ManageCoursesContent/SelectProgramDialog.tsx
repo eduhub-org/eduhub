@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { Programs_Program } from '../../../queries/__generated__/Programs';
@@ -13,7 +13,7 @@ interface SelectProgramDialogProps {
 }
 
 export const SelectProgramDialog: FC<SelectProgramDialogProps> = ({ open, programs, onClose, title }) => {
-  const { t } = useTranslation('manageCourses');
+  const t = useTranslations('manageCourses');
   const [selectedProgram, setSelectedProgram] = useState<Programs_Program | null>(null);
 
   const handleCancel = useCallback(() => {

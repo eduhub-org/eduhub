@@ -1,5 +1,5 @@
 import { Dialog, DialogTitle } from '@mui/material';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback } from 'react';
 import { MdClose } from 'react-icons/md';
 
@@ -14,7 +14,7 @@ interface AlertProps {
 
 export const AlertMessageDialog: FC<AlertProps> = ({ alert, confirmationText = 'OK', open, onClose }) => {
   const handleClose = useCallback(() => onClose(), [onClose]);
-  const { t } = useTranslation();
+  const t = useTranslations();
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>
