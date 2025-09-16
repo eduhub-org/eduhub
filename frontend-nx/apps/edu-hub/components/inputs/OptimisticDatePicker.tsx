@@ -244,7 +244,7 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
   required,
   tabIndex,
 }) => {
-  const { locale } = useLocale();
+  const locale = useLocale();
 
   // Inject styles when component mounts
   useEffect(() => {
@@ -260,11 +260,11 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
     // Auto-generate holidays for current and next year based on app's configured locale
     // locale comes from useTranslation and represents the app's language setting (from i18n.json)
     const currentYear = new Date().getFullYear();
-    const locale = locale === 'de' ? 'de' : 'us'; // Map app locale to holiday locale
+    const holidayLocale = locale === 'de' ? 'de' : 'us'; // Map app locale to holiday locale
 
     return [
-      ...getHolidaysByLocale({ year: currentYear, locale }),
-      ...getHolidaysByLocale({ year: currentYear + 1, locale }),
+      ...getHolidaysByLocale({ year: currentYear, locale: holidayLocale }),
+      ...getHolidaysByLocale({ year: currentYear + 1, locale: holidayLocale }),
     ];
   }, [showHolidays, locale]);
 

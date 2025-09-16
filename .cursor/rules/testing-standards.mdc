@@ -688,34 +688,67 @@ export default {
 
 ### GitHub Actions Test Workflow
 
-```yaml
-# .github/workflows/test.yml
-name: Tests
+The EduHub project uses an optimized parallel workflow in `frontend-code-checks.yml`:
 
-on: [push, pull_request]
+```yaml
+# .github/workflows/frontend-code-checks.yml
+name: Frontend Quality Checks
+
+on:
+  push:
+    paths: [frontend-nx/**]
+    branches: ["**", "!staging", "!production"]
+  pull_request:
+    paths: [frontend-nx/**]
+    branches: [develop]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    
+  # Shared setup - builds once, caches for all other jobs
+  setup:
+    name: "Setup & Build"
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-      
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      
-      - name: Run tests
-        run: pnpm test --coverage --watchAll=false
-      
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v4
+      - name: Cache dependencies & build
+        uses: actions/cache@v4
+      - run: pnpm install --frozen-lockfile
+      - run: npx nx run edu-hub:build
+
+  # Parallel job 1: Linting (fast ~2min)
+  lint:
+    needs: setup
+    steps:
+      - name: Restore cache
+      - run: npx nx run edu-hub:lint
+
+  # Parallel job 2: Critical tests (fast ~3min)  
+  critical-tests:
+    needs: setup
+    steps:
+      - name: Restore cache
+      - run: pnpm test -- TimeLocationLanguageInstructors.test.tsx
+
+  # Parallel job 3: Full test suite (~6min)
+  test-suite:
+    needs: setup
+    steps:
+      - name: Restore cache
+      - run: pnpm test:ci
       - name: Upload coverage
-        uses: codecov/codecov-action@v3
+
+  # Quality gate - ensures all pass
+  quality-gate:
+    needs: [setup, lint, critical-tests, test-suite]
+    steps:
+      - name: Check all jobs status
 ```
+
+**Performance**: This parallel approach reduces CI time from ~11 minutes to ~6 minutes (45% faster) by running linting, critical tests, and full test suite simultaneously.
+
+### Integration with EduHub Workflows
+
+**Important**: When creating new critical component tests (especially for components that handle user data or could cause runtime errors), ensure they are included in the existing `frontend-code-checks.yml` GitHub Actions workflow. Critical tests should be added to this workflow to run automatically on every push and pull request to prevent production incidents.
 
 ## Testing Commands
 

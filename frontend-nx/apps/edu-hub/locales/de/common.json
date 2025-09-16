@@ -195,6 +195,7 @@
     "delete_restricted_by_relationship": "{{parent}} können nicht gelöscht werden, wenn sie mit {{child}} verknüpft sind. Bitte lösche diese zuerst.",
     "delete_restricted_by_relationships": "{{table}} können nicht gelöscht werden, wenn sie mit anderen Einträgen verknüpft sind. Bitte lösche zuerst die anderen Einträge.",
     "generic_error": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",
+    "uniqueness_violation": "Dieser Eintrag existiert bereits. Bitte verwende einen anderen Wert.",
     "entities": {
       "course": "Kurse",
       "courseenrollment": "Anmeldungen",
@@ -226,6 +227,7 @@
     "error_loading": "Fehler beim Laden der FAQs. Bitte versuche es später erneut.",
     "no_faqs_available": "Keine FAQs verfügbar."
   },
+  "no_courses_available": "Momentan sind keine Kurse verfügbar.",
   "organization_dialog": {
     "type_organization_name_minimum_2_letters": "Gib einen Organisationsnamen ein (mindestens 2 Buchstaben).",
     "search_organizations": "Organisationen suchen",

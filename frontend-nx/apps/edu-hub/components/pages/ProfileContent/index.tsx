@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations, useLocale } from 'next-intl';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '../../common/Button';
 import ImageUploader from '../../inputs/ImageUploader';

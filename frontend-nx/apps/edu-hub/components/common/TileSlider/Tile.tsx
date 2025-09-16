@@ -3,7 +3,9 @@ import Link from 'next/link';
 import { FC, useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
+import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
+import { CoursesByInstructor_Course } from '../../../queries/__generated__/CoursesByInstructor';
 import languageIcon from '../../../public/images/course/language.svg';
 import locationIcon from '../../../public/images/course/pin.svg';
 import { getTileImage } from '../../../helpers/imageHandling';
@@ -12,7 +14,7 @@ import {
 } from '../../../helpers/dateTimeHelpers';
 import React from 'react';
 
-type CourseType = CourseList_Course | CoursesEnrolledByUser_Course;
+type CourseType = CourseList_Course | CourseTiles_Course | CoursesEnrolledByUser_Course | CoursesByInstructor_Course;
 
 interface TileProps {
   course: CourseType;

@@ -1,0 +1,71 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Code Checks edu-hub
+
+on:
+  push:
+    paths:
+      - frontend-nx/**
+    branches:
+      - "**"
+      - "!staging"
+      - "!production"
+  pull_request:
+    paths:
+      - frontend-nx/**
+    branches:
+      - develop
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && !contains(github.event.head_commit.message, 'Merge pull request'))
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.1
+
+      - name: Install pnpm dependencies
+        working-directory: frontend-nx
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check edu hub
+        working-directory: frontend-nx
+        run: npx nx run edu-hub:build
+
+      # - name: Type check rent-a-scientist
+      #   working-directory: frontend-nx
+      #   run: npx nx run rent-a-scientist:build
+
+      - name: Check linting edu hub
+        working-directory: frontend-nx
+        run: npx nx run edu-hub:lint
+
+      # - name: Check linting rent-a-scientist
+      #   working-directory: frontend-nx
+      #   run: npx nx run rent-a-scientist:lint
+
+      - name: Run critical component tests
+        working-directory: frontend-nx
+        run: pnpm test -- TimeLocationLanguageInstructors.test.tsx
+
+      - name: Run full test suite
+        working-directory: frontend-nx
+        run: pnpm test:ci

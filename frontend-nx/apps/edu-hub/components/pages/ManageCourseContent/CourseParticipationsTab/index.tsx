@@ -529,7 +529,7 @@ interface IPropsShowDetails {
 }
 const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocumentationResult, qResult }) => {
   const t = useTranslations();
-  const { locale } = useLocale();
+  const locale = useLocale();
   const [setAchievementRecord] = useRoleMutation<UpdateAchievementRecordByPk, UpdateAchievementRecordByPkVariables>(
     UPDATE_AN_ACHIEVEMENT_RECORD
   );

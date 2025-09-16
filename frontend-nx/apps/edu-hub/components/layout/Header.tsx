@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { FC, MouseEvent, useCallback, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 
 import { useIsLoggedIn } from '../../hooks/authentication';
 import { useUser } from '../../hooks/user';
@@ -21,6 +21,7 @@ export const Header: FC = () => {
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [menuAnchorElement, setMenuAnchorElement] = useState<HTMLElement>();
   const router = useRouter();
+  const pathname = usePathname();
   const locale = useLocale();
 
   const user = useUser();
@@ -31,9 +32,11 @@ export const Header: FC = () => {
   }, []);
 
   const changeLocale = useCallback((newLocale: string) => {
-    const { pathname, asPath, query } = router;
-    router.push({ pathname, query }, asPath, { locale: newLocale });
-  }, [router]);
+    // Remove current locale from pathname if it exists
+    const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}/, '');
+    // Navigate to the same path with new locale
+    router.push(`/${newLocale}${pathWithoutLocale}`);
+  }, [router, pathname]);
 
   const isEnglish = locale === 'en';
 
@@ -70,7 +73,7 @@ export const Header: FC = () => {
               <div className="flex">
                 <div className="flex">
                   <div className="cursor-pointer" onClick={openMenu}>
-                    <UserCard className="flex items-center" key={`avatar`} user={user} size={`small`} />
+                    {user && <UserCard className="flex items-center" key={`avatar`} user={user} size={`small`} />}
                   </div>
                   {menuAnchorElement ? (
                     <Menu isVisible={isMenuVisible} setVisible={setMenuVisible} anchorElement={menuAnchorElement} />

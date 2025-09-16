@@ -17,6 +17,7 @@ alwaysApply: true
 - **Functions**: Individual **npm packages** for Google Cloud Functions deployment compatibility
 - **Root**: pnpm workspace coordinator with [pnpm-workspace.yaml](mdc:pnpm-workspace.yaml)
 - **Lockfiles**: `pnpm-lock.yaml` (root), individual `package-lock.json` files for functions
+- **IMPORTANT**: Always run `pnpm install` from root directory only - never from `frontend-nx/` to avoid duplicate lock files
 
 ### Apps
 
@@ -39,6 +40,32 @@ alwaysApply: true
 - **Frontend**: Next.js, React, TypeScript, Material-UI, Apollo GraphQL, next-translate
 - **Backend**: Hasura GraphQL, PostgreSQL, Keycloak, Node.js/Python functions
 - **Development**: Docker, Nx workspace, pnpm, Jest, ESLint, Prettier
+
+### Development Environment Containers
+
+When running locally with `docker-compose up`, the following containers are started:
+
+- **eduhub** (frontend-nx): Next.js development server
+  - Ports: 5000:4200 (edu-hub), 5001:4201 (rent-a-scientist)
+  - Serves the main EduHub application and secondary rent-a-scientist app
+- **python-functions**: Python serverless functions container
+  - Ports: 42025:42025, 42026:42026
+  - Handles API proxy, data processing, and Python-based cloud functions
+- **db_hasura**: PostgreSQL database
+  - Internal port: 5432
+  - Stores all application data, user information, and course content
+- **keycloak**: Authentication and identity management
+  - Port: 28080:8080
+  - Provides SSO, user authentication, and authorization services
+- **node-functions**: Node.js serverless functions container
+  - Ports: 42000-42024:42000-42024, 4001:4001
+  - Handles email sending, file storage, certificates, and Node.js cloud functions
+- **hasura**: GraphQL API engine
+  - Port: 8080:8080
+  - Provides GraphQL API layer over PostgreSQL with real-time subscriptions
+- **frontend-nx**: Next.js applications container
+  - Port: 5000:4200 (main), 5001:4201 (secondary)
+  - Development server for both EduHub and Rent-a-Scientist applications
 
 ### Development Commands
 

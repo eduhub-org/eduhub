@@ -1,5 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { getSession } from 'next-auth/react';
+import { loadCommonMessages } from './messages';
 
 interface WithAuthRedirectOptions {
   redirectTo?: string;
@@ -27,11 +28,32 @@ export const withAuthRedirect = ({ redirectTo = '/', forceLoginParam = 'force_lo
         }
       }
 
+      // Load messages for the current locale
+      const locale = context.locale || 'de';
+      const messages = await loadCommonMessages(locale);
+
       if (gssp) {
-        return gssp(context);
+        const result = await gssp(context);
+        if ('props' in result) {
+          return {
+            ...result,
+            props: {
+              ...result.props,
+              messages: {
+                ...messages,
+                ...result.props.messages,
+              },
+            },
+          };
+        }
+        return result;
       }
 
-      return { props: {} };
+      return { 
+        props: { 
+          messages 
+        } 
+      };
     };
 };
 

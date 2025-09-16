@@ -123,30 +123,10 @@ exports.updateFromKeycloak = async (req, res) => {
         }
       }
       
-      //if user is supposed to have admin role check if it has, if not add it
-      let findAdminResponse;
+      //if user is supposed to have admin role - Admin table was removed, role is now managed via Keycloak only
+      // The admin role is handled through Keycloak JWT claims and does not require a database table
       if (admin_role != null) { 
-        await client
-          .query({
-            query: "query($id : uuid!) { Admin(where: {userId: {_eq: $id}}) { id } }",
-            variables: { id: userid },
-          })
-          .then((response) => {
-            findAdminResponse = response.data.Admin;
-          })
-          .catch((error) => console.error(error));
-        if (!findAdminResponse || (findAdminResponse.length == 0)) {
-          await client
-          .query({
-            query:
-              "mutation($id : uuid!) { insert_Admin(objects: {userId: $id}) { returning { id } } }",
-            variables: {
-              id: userid
-            },
-          })
-          .then((response) => {})
-          .catch((error) => console.error(error));
-        }
+        console.log(`User ${userid} has admin role in Keycloak - no database entry needed`);
       }
 
       return res.json({

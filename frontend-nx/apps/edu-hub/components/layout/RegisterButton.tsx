@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 
@@ -6,7 +5,6 @@ import { Button } from '../common/Button';
 
 export const RegisterButton: FC = () => {
   const t = useTranslations('common');
-  const router = useRouter();
 
   const register = useCallback(() => {
     const url = `${
@@ -16,8 +14,8 @@ export const RegisterButton: FC = () => {
     )}&response_type=code`;
 
     if (!url) return;
-    router.push(new URL(url));
-  }, [router]);
+    window.location.href = url;
+  }, []);
 
   return (
     <Button onClick={register} filled inverted>

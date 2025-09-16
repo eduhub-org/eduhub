@@ -44,7 +44,7 @@ interface AttendanceEntryProps {
 const { NO_INFO, ATTENDED, MISSED } = AttendanceStatus_enum;
 
 const AttendanceEntry: FC<AttendanceEntryProps> = ({ session }) => {
-  const { locale } = useLocale();
+  const locale = useLocale();
 
   const lastAttendanceRecord =
     session.Attendances.length > 0

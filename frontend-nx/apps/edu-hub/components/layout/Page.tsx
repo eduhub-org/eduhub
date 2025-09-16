@@ -19,7 +19,7 @@ type PageProps = {
 export const Page: FC<PageProps> = ({ children, className }) => {
   const { data: session, status } = useSession();
   const logout = useLogout();
-  const { locale } = useLocale();
+  const locale = useLocale();
   const {
     bannerBackgroundColor,
     bannerFontColor,

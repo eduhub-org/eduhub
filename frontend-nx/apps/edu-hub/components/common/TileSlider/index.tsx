@@ -6,13 +6,18 @@ import 'swiper/css/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
+import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
+import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
+import { CoursesByInstructor_Course } from '../../../queries/__generated__/CoursesByInstructor';
 import { Tile } from './Tile';
 
 import sliderNextArrow from '../../../public/images/common/slider-next-arrow.svg';
 import sliderPreviousArrow from '../../../public/images/common/slider-previous-arrow.svg';
 
+type CourseType = CourseList_Course | CourseTiles_Course | CoursesEnrolledByUser_Course | CoursesByInstructor_Course;
+
 interface TileSliderProps {
-  courses: CourseList_Course[];
+  courses: CourseType[];
   isManage: boolean;
 }
 

@@ -45,7 +45,7 @@ nextWeek.setDate(nextWeek.getDate() + 7);
 
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
-  const { locale } = useLocale();
+  const locale = useLocale();
 
   const applicationStats = useMemo(() => {
     console.log(course.CourseEnrollments);
@@ -53,7 +53,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     const approvedApplications = course.CourseEnrollments.filter(
       (enrollment) => enrollment.motivationRating === 'INVITE'
     ).length;
-    const invitedApplicants = course.CourseEnrollments.filter(
+    const invitedApplicants = course.CojurseEnrollments.filter(
       (enrollment) => enrollment.status === 'INVITED' || enrollment.status === 'CONFIRMED'
     ).length;
     const confirmedApplicants = course.CourseEnrollments.filter(

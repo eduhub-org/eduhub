@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { signOut } from 'next-auth/react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const useLogout = () => {
   const router = useRouter();

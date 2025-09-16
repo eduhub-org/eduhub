@@ -55,7 +55,7 @@ const FaqItemComponent: FC<FaqItemProps> = ({ faq }) => {
 
 const FaqSection: FC<FaqSectionProps> = ({ collection = 'default', className = '' }) => {
   const t = useTranslations('common');
-  const { locale } = useLocale();
+  const locale = useLocale();
 
   const { data, loading, error } = useQuery<GetFaqsByCollectionAndLang>(GET_FAQS_BY_COLLECTION_AND_LANG, {
     variables: {

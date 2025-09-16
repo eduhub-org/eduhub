@@ -23,7 +23,7 @@ export interface ExtendedDegreeParticipantsEnrollment
 
 export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ course }) => {
   const t = useTranslations('manageCourse');
-  const { locale } = useLocale();
+  const locale = useLocale();
 
   const [pageSize, setPageSize] = useState(20);
 

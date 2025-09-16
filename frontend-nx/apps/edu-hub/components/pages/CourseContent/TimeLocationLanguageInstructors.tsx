@@ -80,7 +80,11 @@ export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
       </div>
       <div className="mt-16 justify-start">
         {course.CourseInstructors.map((instructor, index) => (
-          <UserCard className="flex items-center mb-6" key={`instructor-${index}`} user={instructor.Expert.User} />
+          <UserCard 
+            className="flex items-center mb-6" 
+            key={`instructor-${index}`} 
+            user={instructor.Expert?.User || null} 
+          />
         ))}
       </div>
     </div>

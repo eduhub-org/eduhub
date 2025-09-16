@@ -208,5 +208,7 @@
   "accepted_applications": "Bewerbungen (angenommen):",
   "total_invitations": "Einladungen (gesamt):",
   "confirmed_invitations": "Einladungen (bestätigt):",
-  "Uniqueness violation. duplicate key value violates unique constraint \"CourseAddress_pkey\"": "Eine Standortadresse mit dieser Konfiguration existiert bereits für diesen Kurs."
+  "errors": {
+    "uniqueness_violation_course_address_pkey": "Eine Standortadresse mit dieser Konfiguration existiert bereits für diesen Kurs."
+  }
 }

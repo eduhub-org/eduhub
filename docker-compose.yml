@@ -18,6 +18,7 @@ services:
       - hasura
       - keycloak
     environment:
+      NEXT_PUBLIC_API_URL: http://hasura:8080/v1/graphql
       NEXT_PUBLIC_HELP_DOCS_URL: https://opencampus.gitbook.io/faq/
       NEXT_PUBLIC_STORAGE_BUCKET_URL: ${GITPOD_WORKSPACE_URL:-http://localhost}:4001/emulated-bucket
       NEXT_PUBLIC_ENVIRONMENT: development

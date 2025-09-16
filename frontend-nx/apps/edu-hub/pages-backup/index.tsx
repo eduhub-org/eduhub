@@ -218,31 +218,19 @@ const Home: FC = () => {
 };
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  // This ensures that the messages are loaded server-side
-  // and available to the NextIntlClientProvider in _app.tsx
-  try {
-    const messages = {
-      common: (await import(`../locales/${locale}/common.json`)).default,
-      'start-page': (await import(`../locales/${locale}/start-page.json`)).default,
-      course: (await import(`../locales/${locale}/course.json`)).default,
-    };
+  // Import the helper function
+  const { loadMessages } = await import('../helpers/messages');
+  
+  // Load all messages for this locale
+  const messages = await loadMessages(locale || 'de');
 
-    return {
-      props: {
-        messages,
-      },
-      // Enable ISR - regenerate the page at most once every hour
-      revalidate: 3600,
-    };
-  } catch (error) {
-    console.error(`Failed to load messages for locale ${locale}:`, error);
-    return {
-      props: {
-        messages: {},
-      },
-      revalidate: 3600,
-    };
-  }
+  return {
+    props: {
+      messages,
+    },
+    // Enable ISR - regenerate the page at most once every hour
+    revalidate: 3600,
+  };
 };
 
 export default Home;

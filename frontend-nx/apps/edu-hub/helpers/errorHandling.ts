@@ -55,9 +55,9 @@ const knownRelationships: TableRelationship[] = [
 ];
 
 /**
- * Parses a foreign key constraint error and returns a user-friendly message
+ * Parses database errors and returns user-friendly messages
  */
-export const handleForeignKeyError = (error: ApolloError, t: (key: string, options?: any) => string): string => {
+export const handleDatabaseError = (error: ApolloError, t: (key: string, options?: any) => string): string => {
   // Extract the actual database error message from the GraphQL error structure
   let errorMessage = error.message;
   
@@ -67,6 +67,17 @@ export const handleForeignKeyError = (error: ApolloError, t: (key: string, optio
     if (graphQLError.extensions?.internal?.error?.message) {
       errorMessage = graphQLError.extensions.internal.error.message;
     }
+  }
+  
+  // Handle uniqueness constraint violations
+  if (errorMessage.includes('duplicate key value violates unique constraint')) {
+    // Handle CourseAddress_pkey constraint specifically
+    if (errorMessage.includes('CourseAddress_pkey')) {
+      return t('course-page:errors.uniqueness_violation_course_address_pkey');
+    }
+    
+    // Generic uniqueness violation message
+    return t('error_handling.uniqueness_violation');
   }
   
   // Check for specific database constraint error messages
@@ -116,3 +127,28 @@ export const handleForeignKeyError = (error: ApolloError, t: (key: string, optio
   // Return a generic error message for other error types
   return t('error_handling.generic_error');
 };
+
+/**
+ * Translates error messages, handling both direct translation keys and database errors
+ */
+export const translateErrorMessage = (error: ApolloError, t: (key: string, options?: any) => string): string => {
+  // First try to handle as a database error
+  const databaseErrorMessage = handleDatabaseError(error, t);
+  if (databaseErrorMessage !== t('error_handling.generic_error')) {
+    return databaseErrorMessage;
+  }
+  
+  // If not a recognized database error, try to translate the message directly
+  try {
+    return t(error.message);
+  } catch {
+    // If translation fails, return the original message
+    return error.message;
+  }
+};
+
+/**
+ * Legacy function name for backward compatibility
+ * @deprecated Use handleDatabaseError instead
+ */
+export const handleForeignKeyError = handleDatabaseError;

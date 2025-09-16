@@ -195,6 +195,7 @@
     "delete_restricted_by_relationship": "{{parent}} cannot be deleted when they are still associated with {{child}}. Please remove all {{child}} first.",
     "delete_restricted_by_relationships": "{{table}} cannot be deleted when they are associated with other records. Please remove those records first.",
     "generic_error": "An error occurred. Please try again later.",
+    "uniqueness_violation": "This entry already exists. Please use a different value.",
     "entities": {
       "course": "Courses",
       "courseenrollment": "Enrollments",
@@ -226,6 +227,7 @@
     "error_loading": "Error loading FAQs. Please try again later.",
     "no_faqs_available": "No FAQs available."
   },
+  "no_courses_available": "No courses available at the moment.",
   "organization_dialog": {
     "type_organization_name_minimum_2_letters": "Type an organization name (minimum 2 letters).",
     "search_organizations": "Search organizations",

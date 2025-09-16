@@ -41,7 +41,7 @@ interface IProps {
 
 const AchievementRecord: FC<IProps> = ({ courseId, achievementRecordUploadDeadline, courseTitle }) => {
   const t = useTranslations('course');
-  const { locale } = useLocale();
+  const locale = useLocale();
   const user = useUser();
   const userId = useUserId();
   const profile = useKeycloakUserProfile();

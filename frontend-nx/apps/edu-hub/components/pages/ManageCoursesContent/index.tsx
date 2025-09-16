@@ -62,7 +62,7 @@ interface IProps {
 
 const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const t = useTranslations('manageCourses');
-  const { locale } = useLocale();
+  const locale = useLocale();
 
   // Calculate default program
   const sortedPrograms = useMemo(() => {

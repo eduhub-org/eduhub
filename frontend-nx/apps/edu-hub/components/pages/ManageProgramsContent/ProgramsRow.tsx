@@ -235,7 +235,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   );
 
   const t = useTranslations('managePrograms');
-  const { locale } = useLocale();
+  const locale = useLocale();
 
   const achievementCertificateTemplateName = program.achievementCertificateTemplateURL
     ? path.basename(program.achievementCertificateTemplateURL)

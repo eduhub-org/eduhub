@@ -1,3 +1,5 @@
+'use client';
+
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { useSession, signOut } from 'next-auth/react';
 import { useTranslations, useLocale } from 'next-intl';
@@ -7,7 +9,7 @@ import { useCurrentRole } from './authentication';
 import { AuthRoles } from '../types/enums';
 
 const useErrorHandler = () => {
-  const t = useTranslations();
+  const t = useTranslations('common');
 
   return (error) => {
     console.log('error handler error: ', error);

@@ -5,7 +5,7 @@ const { withNx } = require('@nx/next/plugins/with-nx');
 const createNextIntlPlugin = require('next-intl/plugin');
 const path = require('path');
 
-const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
+const withNextIntl = createNextIntlPlugin(path.join(__dirname, 'i18n/request.ts'));
 
 /**
  * @type {import('@nx/next/plugins/with-nx').WithNxOptions}
@@ -23,6 +23,18 @@ const nextConfig = {
   experimental: {
     // https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
     outputFileTracingRoot: path.join(__dirname, '../../'),
+  },
+  // App Router doesn't use built-in i18n - next-intl handles it
+  
+  // Improve hot reloading in Docker
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+      };
+    }
+    return config;
   },
 };
 
