@@ -120,7 +120,7 @@ The test suite uses comprehensive mock data including:
 ### Environment Variables
 
 Test environment automatically sets:
-- `HASURA_GRAPHQL_ENDPOINT=http://localhost:8080/v1/graphql`
+- `HASURA_ENDPOINT=http://localhost:8080/v1/graphql`
 - `HASURA_ADMIN_SECRET=test-admin-secret`
 - `FRONTEND_URL=https://test.edu.opencampus.sh`
 

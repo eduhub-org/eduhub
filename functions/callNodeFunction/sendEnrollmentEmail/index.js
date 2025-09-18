@@ -38,7 +38,7 @@ export default async function sendEnrollmentEmail(req, logger) {
     }
 
     // Create GraphQL client
-    const client = new GraphQLClient(process.env.HASURA_GRAPHQL_ENDPOINT, {
+    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
       headers: {
         'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
       },
@@ -192,7 +192,6 @@ export default async function sendEnrollmentEmail(req, logger) {
         $cc: String
         $bcc: String
         $status: String!
-        $metadata: jsonb
       ) {
         insert_MailLog_one(
           object: {
@@ -203,7 +202,6 @@ export default async function sendEnrollmentEmail(req, logger) {
             cc: $cc
             bcc: $bcc
             status: $status
-            metadata: $metadata
           }
         ) {
           id
@@ -218,18 +216,7 @@ export default async function sendEnrollmentEmail(req, logger) {
       to: enrollmentDetails.User.email,
       cc: template.cc,
       bcc: template.bcc,
-      status: 'READY_TO_SEND',
-      metadata: {
-        type: 'ENROLLMENT_STATUS',
-        enrollmentId: enrollment.id,
-        userId: enrollmentDetails.User.id,
-        courseId: enrollmentDetails.Course.id,
-        statusChange: {
-          from: oldEnrollment?.status || null,
-          to: enrollment.status
-        },
-        sentAt: new Date().toISOString()
-      }
+      status: 'READY_TO_SEND'
     });
 
     logger.info(`Email queued for enrollment ${enrollment.id}, status: ${enrollment.status}, mailId: ${mailResult.insert_MailLog_one.id}`);
