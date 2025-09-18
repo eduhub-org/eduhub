@@ -43,7 +43,7 @@ export default async function sendSessionReminders(req, logger) {
 
   try {
     // Create GraphQL client
-    const client = new GraphQLClient(process.env.HASURA_GRAPHQL_ENDPOINT, {
+    const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
       headers: {
         'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
       },
@@ -252,7 +252,7 @@ export default async function sendSessionReminders(req, logger) {
           const emailSubject = replaceVariables(template.subject);
           const emailContent = replaceVariables(template.content);
 
-          // Insert email into MailLog with metadata for tracking
+          // Insert email into MailLog for sending
           const INSERT_MAIL_LOG = gql`
             mutation InsertMailLog(
               $subject: String!
@@ -262,7 +262,6 @@ export default async function sendSessionReminders(req, logger) {
               $cc: String
               $bcc: String
               $status: String!
-              $metadata: jsonb
             ) {
               insert_MailLog_one(
                 object: {
@@ -273,7 +272,6 @@ export default async function sendSessionReminders(req, logger) {
                   cc: $cc
                   bcc: $bcc
                   status: $status
-                  metadata: $metadata
                 }
               ) {
                 id
@@ -288,16 +286,7 @@ export default async function sendSessionReminders(req, logger) {
             to: enrollment.User.email,
             cc: template.cc,
             bcc: template.bcc,
-            status: 'READY_TO_SEND',
-            metadata: {
-              type: 'SESSION_REMINDER',
-              reminderType: window.type,
-              sessionId: session.id,
-              userId: enrollment.User.id,
-              courseId: session.Course.id,
-              sessionStartTime: session.startDateTime,
-              sentAt: new Date().toISOString()
-            }
+            status: 'READY_TO_SEND'
           });
 
           totalEmailsSent++;
