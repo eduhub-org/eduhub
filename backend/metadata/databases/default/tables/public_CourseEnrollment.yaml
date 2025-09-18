@@ -124,6 +124,7 @@ event_triggers:
         columns: '*'
       update:
         columns:
+          - invitationExpirationDate
           - status
     retry_conf:
       interval_sec: 3660
@@ -131,7 +132,7 @@ event_triggers:
       timeout_sec: 600
     webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
     headers:
-      - name: Function-Name
+      - name: name
         value: sendEnrollmentEmail
-      - name: Hasura-Secret
+      - name: secret
         value_from_env: HASURA_CLOUD_FUNCTION_SECRET

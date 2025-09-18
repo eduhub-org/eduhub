@@ -118,7 +118,7 @@ The following environment variables should already be set in your EduHub deploym
 
 ```bash
 # Existing variables (should already be set)
-HASURA_GRAPHQL_ENDPOINT=https://your-hasura-endpoint.com/v1/graphql
+HASURA_ENDPOINT=https://your-hasura-endpoint.com/v1/graphql
 HASURA_ADMIN_SECRET=your-admin-secret
 HASURA_CLOUD_FUNCTION_SECRET=your-function-secret
 CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION=https://your-region-your-project.cloudfunctions.net/callNodeFunction
