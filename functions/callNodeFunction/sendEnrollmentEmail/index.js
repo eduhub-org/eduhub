@@ -2,7 +2,7 @@ import { gql, GraphQLClient } from 'graphql-request';
 import { createEnrollmentVariableReplacer } from '../emailTemplateVariables.js';
 
 /**
- * Sends enrollment status emails when CourseEnrollment status changes
+ * Sends enrollment status emails when CourseEnrollment status or invitationExpirationDate changes
  * 
  * @param {Object} req - Request object from Hasura event trigger
  * @param {Object} logger - Winston logger instance
@@ -27,15 +27,6 @@ export default async function sendEnrollmentEmail(req, logger) {
 
     const enrollment = data.new;
     const oldEnrollment = data.old;
-
-    // For updates, only send email if status actually changed
-    if (op === 'UPDATE' && oldEnrollment && oldEnrollment.status === enrollment.status) {
-      return {
-        success: true,
-        messageKey: 'STATUS_UNCHANGED',
-        message: 'Status unchanged, no email needed'
-      };
-    }
 
     // Create GraphQL client
     const client = new GraphQLClient(process.env.HASURA_ENDPOINT, {
@@ -219,7 +210,7 @@ export default async function sendEnrollmentEmail(req, logger) {
       status: 'READY_TO_SEND'
     });
 
-    logger.info(`Email queued for enrollment ${enrollment.id}, status: ${enrollment.status}, mailId: ${mailResult.insert_MailLog_one.id}`);
+    logger.info(`Email queued for enrollment ${enrollment.id}, status: ${enrollment.status}, operation: ${op}, mailId: ${mailResult.insert_MailLog_one.id}`);
     
     return {
       success: true,
