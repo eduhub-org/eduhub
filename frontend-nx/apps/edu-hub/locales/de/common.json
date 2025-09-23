@@ -228,5 +228,14 @@
     "search_organizations": "Organisationen suchen",
     "no_organizations_found": "Keine Organisationen gefunden",
     "type_at_least_2_characters": "Gib mindestens 2 Zeichen ein"
+  },
+  "link_dialog": {
+    "add_link": "Link hinzufügen",
+    "edit_link": "Link bearbeiten",
+    "update_link": "Link aktualisieren",
+    "remove_link": "Link entfernen",
+    "url_label": "URL",
+    "url_placeholder": "URL eingeben (z.B. https://example.com oder [Enrollment:CourseLink])",
+    "url_help": "Sie können Template-Variablen wie [Enrollment:CourseLink] verwenden oder eine normale URL eingeben"
   }
 }

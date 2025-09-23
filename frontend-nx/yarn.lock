@@ -6385,6 +6385,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tiptap/extension-link@npm:^2.26.2":
+  version: 2.26.2
+  resolution: "@tiptap/extension-link@npm:2.26.2"
+  dependencies:
+    linkifyjs: ^4.2.0
+  peerDependencies:
+    "@tiptap/core": ^2.7.0
+    "@tiptap/pm": ^2.7.0
+  checksum: 0b6401a7be874c3bfb99210daa49fa997b161d01ec2dd539c7ad0fc04dec4ac89027c1a11a2f1e1b6d7eee99f6c6f6eaa30b8211b5a407ba9907ce80e2bd5c0c
+  languageName: node
+  linkType: hard
+
 "@tiptap/extension-list-item@npm:^2.26.1":
   version: 2.26.1
   resolution: "@tiptap/extension-list-item@npm:2.26.1"
@@ -17391,6 +17403,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"linkifyjs@npm:^4.2.0":
+  version: 4.3.2
+  resolution: "linkifyjs@npm:4.3.2"
+  checksum: 9fb57de4b6758f24f399a42a29e0c0e90285105f1f6860cb1bb0be05fc2bf291251d0dfefb08ee4e1e89154d39230aed54b5e91358f040ffa46c31a804413952
+  languageName: node
+  linkType: hard
+
 "listr-silent-renderer@npm:^1.1.1":
   version: 1.1.1
   resolution: "listr-silent-renderer@npm:1.1.1"
@@ -20119,6 +20138,7 @@ __metadata:
     "@tanstack/react-table": ^8.20.5
     "@testing-library/react": 16.0.1
     "@tiptap/extension-character-count": ^2.14.0
+    "@tiptap/extension-link": ^2.26.2
     "@tiptap/extension-placeholder": ^2.14.0
     "@tiptap/react": ^2.14.0
     "@tiptap/starter-kit": ^2.0.0-beta.194

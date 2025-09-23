@@ -9,16 +9,31 @@ import {
   FormatListNumbered,
   Code,
   Visibility,
+  Link as LinkIcon,
 } from '@mui/icons-material';
 import { useDebouncedCallback } from 'use-debounce';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
+import Link from '@tiptap/extension-link';
 import DOMPurify from 'dompurify';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
+import { LinkDialog } from '../common/dialogs/LinkDialog';
 import { gql } from 'graphql-tag';
+
+// Configure DOMPurify to allow links while maintaining security
+const sanitizeWithLinks = (content: string): string => {
+  return DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: [
+      'p', 'br', 'strong', 'b', 'em', 'i', 'u', 'ul', 'ol', 'li', 'a',
+      'span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote'
+    ],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'style'],
+    ALLOW_DATA_ATTR: false,
+  });
+};
 
 interface EmailEditorProps {
   itemId: number;
@@ -45,6 +60,8 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
 }) => {
   const [isHtmlMode, setIsHtmlMode] = useState(false);
   const [showSavedNotification, setShowSavedNotification] = useState(false);
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [currentLinkUrl, setCurrentLinkUrl] = useState('');
 
   const [updateContent] = useRoleMutation(
     updateValueMutation ||
@@ -65,7 +82,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
 
   const debouncedUpdate = useDebouncedCallback((newContent: string) => {
     // Sanitize content before saving to database
-    const sanitizedContent = DOMPurify.sanitize(newContent);
+    const sanitizedContent = sanitizeWithLinks(newContent);
 
     if (updateValueMutation) {
       updateContent({ variables: { id: itemId, content: sanitizedContent } });
@@ -79,6 +96,12 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
     extensions: [
       StarterKit.configure({
         heading: false, // Disable headings as they are not needed
+      }),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-blue-600 hover:text-blue-800 underline',
+        },
       }),
       Placeholder.configure({
         placeholder,
@@ -109,7 +132,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
   const handleHtmlContentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = event.target.value;
     // Sanitize HTML content before setting it
-    const sanitizedContent = DOMPurify.sanitize(newContent);
+    const sanitizedContent = sanitizeWithLinks(newContent);
     setHtmlContent(sanitizedContent);
     if (editor) {
       editor.commands.setContent(sanitizedContent, false);
@@ -140,6 +163,31 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
     },
     [editor, isHtmlMode, htmlContent]
   );
+
+  const setLink = useCallback(() => {
+    if (!editor) return;
+
+    const previousUrl = editor.getAttributes('link').href || '';
+    setCurrentLinkUrl(previousUrl);
+    setLinkDialogOpen(true);
+  }, [editor]);
+
+  const handleLinkConfirm = useCallback((url: string) => {
+    if (!editor) return;
+
+    if (url.trim() === '') {
+      // Remove link if URL is empty
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    } else {
+      // Add or update link
+      editor.chain().focus().extendMarkRange('link').setLink({ href: url.trim() }).run();
+    }
+  }, [editor]);
+
+  const handleLinkRemove = useCallback(() => {
+    if (!editor) return;
+    editor.chain().focus().extendMarkRange('link').unsetLink().run();
+  }, [editor]);
 
   const formatButtons = [
     { command: 'toggleBold', icon: <FormatBold />, title: 'Bold (Ctrl+B)' },
@@ -233,6 +281,16 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
               </IconButton>
             ))}
 
+            {/* Link Button */}
+            <IconButton
+              size="small"
+              onClick={setLink}
+              color={editor.isActive('link') ? 'primary' : 'default'}
+              title="Add/Edit Link"
+            >
+              <LinkIcon />
+            </IconButton>
+
             <Divider orientation="vertical" flexItem />
           </>
         )}
@@ -277,6 +335,15 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
         open={showSavedNotification}
         onClose={() => setShowSavedNotification(false)}
         message="notification_snackbar.saved"
+      />
+
+      <LinkDialog
+        open={linkDialogOpen}
+        onClose={() => setLinkDialogOpen(false)}
+        onConfirm={handleLinkConfirm}
+        onRemove={handleLinkRemove}
+        initialUrl={currentLinkUrl}
+        hasExistingLink={!!currentLinkUrl}
       />
     </div>
   );
