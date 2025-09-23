@@ -1,5 +1,5 @@
 import useTranslation from 'next-translate/useTranslation';
-import { FC, useState, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import { ManagedCourse_Course_by_pk_Sessions_SessionAddresses } from '../../../../queries/__generated__/ManagedCourse';
 import { UPDATE_SESSION_ADDRESS } from '../../../../queries/course';
 import { LOCATION_ADDRESS_BY_LOCATION_OPTION, CREATE_LOCATION_ADDRESS } from '../../../../queries/locationAddress';
