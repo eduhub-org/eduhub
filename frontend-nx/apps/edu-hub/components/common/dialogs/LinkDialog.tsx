@@ -73,6 +73,7 @@ export const LinkDialog: React.FC<LinkDialogProps> = ({
             variant="material"
             type="input"
             placeholder={t('link_dialog.url_placeholder')}
+            itemId={0} // Dummy ID since we're using local-only mode
             value={url}
             onValueUpdated={(data) => setUrl(data.text || '')}
             helpText={t('link_dialog.url_help')}
