@@ -60,7 +60,7 @@ export const SessionRow: FC<IProps> = ({
   onSetTitle,
   onDeleteSpeaker,
 }) => {
-  const { t, lang } = useTranslation('course-page');
+  const { t } = useTranslation('course-page');
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);

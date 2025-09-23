@@ -38,9 +38,9 @@ const TimePicker: React.FC<TimePickerProps> = ({
   const formatTimeString = useFormatTimeString();
   const formatTime = useFormatTime();
 
-  const formatTimeValue = (val: Date | string | null): string => {
+  const formatTimeValue = useCallback((val: Date | string | null): string => {
     return formatTimeString(val);
-  };
+  }, [formatTimeString]);
 
   const originalDateTime = currentValue instanceof Date ? currentValue : null;
 

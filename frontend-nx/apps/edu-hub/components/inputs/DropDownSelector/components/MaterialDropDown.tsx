@@ -44,7 +44,6 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
   onCreateOption,
   getLabelForValue,
 }) => {
-  const { t } = useTranslation();
   const theme = useTheme();
 
   const handleChange = (event: SelectChangeEvent<string>) => {

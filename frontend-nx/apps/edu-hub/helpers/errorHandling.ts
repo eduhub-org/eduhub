@@ -75,7 +75,6 @@ export const handleForeignKeyError = (error: ApolloError, t: (key: string, optio
     // "Cannot delete LocationAddress (ID: 15) because it is referenced by 1 SessionAddress record(s)."
     const locationAddressMatch = errorMessage.match(/Cannot delete LocationAddress.*because it is referenced by (\d+) SessionAddress record\(s\)/);
     if (locationAddressMatch) {
-      const count = locationAddressMatch[1];
       return t('error_handling.delete_restricted_by_relationship', {
         parent: t('error_handling.entities.locationaddress'),
         child: t('error_handling.entities.session_addresses')
