@@ -1,0 +1,508 @@
+---
+description: "Apply when implementing advanced table features like custom hooks (useTableGrid), complex filtering, search functionality, state management, or GraphQL integration with TableGrid in EduHub"
+alwaysApply: false
+---
+
+# TableGrid Advanced Patterns
+
+> **Related Rules**: [TableGrid Basic Usage](table-grid-basic-usage.mdc) | [TableGrid Column Configuration](table-grid-column-configuration.mdc) | [GraphQL Integration](graphql-integration-patterns.mdc) | [Component Architecture](component-architecture.mdc)
+
+This guide covers advanced TableGrid usage patterns including the `useTableGrid` hook, GraphQL integration, complex filtering, and state management.
+
+## useTableGrid Hook
+
+The `useTableGrid` hook ([frontend-nx/apps/edu-hub/components/common/TableGrid/hooks/index.ts](mdc:frontend-nx/apps/edu-hub/components/common/TableGrid/hooks/index.ts)) provides data fetching, search, and pagination state management for TableGrid.
+
+### Hook Interface:
+
+```typescript
+interface UseTableGridProps<V> {
+  queryHook: (query: DocumentNode, options?: QueryHookOptions) => QueryResult;
+  query: DocumentNode;
+  queryVariables?: V;
+  pageSize?: number;
+  debounceMs?: number;
+  refetchFilter?: (searchFilter: string) => Record<string, any>;
+}
+```
+
+### Basic Hook Usage:
+
+```typescript
+import { useTableGrid } from '../common/TableGrid/hooks';
+import { useAdminQuery } from '../../hooks/authedMutation';
+import { MY_QUERY } from '../../queries/myQuery';
+
+const MyComponent: FC = () => {
+  const { data, loading, error, searchFilter, pageIndex, setSearchFilter, setPageIndex } = useTableGrid({
+    queryHook: useAdminQuery,
+    query: MY_QUERY,
+    queryVariables: { programId: 1 },
+    pageSize: 20,
+    debounceMs: 500,
+  });
+
+  return (
+    <TableGrid
+      data={data?.items || []}
+      loading={loading}
+      error={error}
+      searchFilter={searchFilter}
+      onSearchFilterChange={setSearchFilter}
+      pageIndex={pageIndex}
+      onPageChange={setPageIndex}
+      // ... other props
+    />
+  );
+};
+```
+
+## GraphQL Integration
+
+### Query Structure:
+
+```typescript
+// GraphQL query with pagination and aggregation
+export const COURSE_LIST = gql`
+  query CourseList($limit: Int!, $offset: Int!, $where: Course_bool_exp) {
+    Course(limit: $limit, offset: $offset, where: $where, order_by: { createdAt: desc }) {
+      id
+      title
+      description
+      createdAt
+    }
+    Course_aggregate(where: $where) {
+      aggregate {
+        count
+      }
+    }
+  }
+`;
+```
+
+### Hook Integration:
+
+```typescript
+const MyComponent: FC = () => {
+  const { data, loading, error, searchFilter, pageIndex, setSearchFilter, setPageIndex } = useTableGrid({
+    queryHook: useAdminQuery,
+    query: COURSE_LIST,
+    queryVariables: { programId: selectedProgramId },
+    pageSize: 50,
+    refetchFilter: useCallback(
+      (searchTerm: string) => {
+        const searchWhere = searchTerm ? { title: { _ilike: `%${searchTerm}%` } } : {};
+        return {
+          where: {
+            programId: { _eq: selectedProgramId },
+            ...searchWhere,
+          },
+        };
+      },
+      [selectedProgramId]
+    ),
+  });
+
+  const courses = data?.Course || [];
+  const totalCount = data?.Course_aggregate?.aggregate?.count || 0;
+
+  return (
+    <TableGrid
+      data={courses}
+      loading={loading}
+      error={error}
+      totalCount={totalCount}
+      searchFilter={searchFilter}
+      onSearchFilterChange={setSearchFilter}
+      pageIndex={pageIndex}
+      onPageChange={setPageIndex}
+      // ... other props
+    />
+  );
+};
+```
+
+## Advanced Search and Filtering
+
+### Multi-Field Search:
+
+```typescript
+const { searchFilter, setSearchFilter } = useTableGrid({
+  queryHook: useAdminQuery,
+  query: USER_LIST,
+  queryVariables: { role: 'STUDENT' },
+  refetchFilter: useCallback(
+    (searchTerm: string) => {
+      if (!searchTerm) return {};
+      
+      return {
+        where: {
+          _or: [
+            { firstName: { _ilike: `%${searchTerm}%` } },
+            { lastName: { _ilike: `%${searchTerm}%` } },
+            { email: { _ilike: `%${searchTerm}%` } },
+          ],
+        },
+      };
+    },
+    []
+  ),
+});
+```
+
+### Complex Filtering with Multiple Conditions:
+
+```typescript
+const MyComponent: FC = () => {
+  const [filters, setFilters] = useState({
+    programId: null,
+    status: 'ACTIVE',
+    dateRange: null,
+  });
+
+  const { data, loading, error, searchFilter, pageIndex, setSearchFilter, setPageIndex } = useTableGrid({
+    queryHook: useAdminQuery,
+    query: COURSE_LIST,
+    queryVariables: filters,
+    pageSize: 25,
+    refetchFilter: useCallback(
+      (searchTerm: string) => {
+        const searchWhere = searchTerm ? { title: { _ilike: `%${searchTerm}%` } } : {};
+        const dateWhere = filters.dateRange ? {
+          createdAt: {
+            _gte: filters.dateRange.start,
+            _lte: filters.dateRange.end,
+          },
+        } : {};
+
+        return {
+          where: {
+            ...filters,
+            ...searchWhere,
+            ...dateWhere,
+          },
+        };
+      },
+      [filters]
+    ),
+  });
+
+  const handleFilterChange = useCallback((newFilters) => {
+    setFilters(newFilters);
+    setPageIndex(0); // Reset pagination when filters change
+  }, [setPageIndex]);
+
+  return (
+    <div>
+      <FilterControls filters={filters} onFilterChange={handleFilterChange} />
+      <TableGrid
+        data={data?.Course || []}
+        loading={loading}
+        error={error}
+        searchFilter={searchFilter}
+        onSearchFilterChange={setSearchFilter}
+        pageIndex={pageIndex}
+        onPageChange={setPageIndex}
+        // ... other props
+      />
+    </div>
+  );
+};
+```
+
+## State Management Patterns
+
+### Synchronized Page Size:
+
+```typescript
+const MyComponent: FC = () => {
+  const [pageSize, setPageSize] = useState(20);
+
+  const { pageIndex, setPageIndex } = useTableGrid({
+    queryHook: useAdminQuery,
+    query: MY_QUERY,
+    pageSize: pageSize, // ✅ Synchronized
+    queryVariables: { programId: 1 },
+  });
+
+  const handlePageSizeChange = useCallback((newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPageIndex(0); // ✅ Reset pagination
+  }, [setPageIndex]);
+
+  return (
+    <TableGrid
+      pageSize={pageSize} // ✅ Same value
+      onPageSizeChange={handlePageSizeChange}
+      pageIndex={pageIndex}
+      onPageChange={setPageIndex}
+      // ... other props
+    />
+  );
+};
+```
+
+### Filter State Management:
+
+```typescript
+const MyComponent: FC = () => {
+  const [baseFilter, setBaseFilter] = useState({
+    programId: 1,
+    status: 'ACTIVE',
+  });
+
+  const { data, loading, error, searchFilter, pageIndex, setSearchFilter, setPageIndex } = useTableGrid({
+    queryHook: useAdminQuery,
+    query: COURSE_LIST,
+    queryVariables: baseFilter,
+    pageSize: 30,
+    refetchFilter: useCallback(
+      (searchTerm: string) => {
+        const searchWhere = searchTerm ? { title: { _ilike: `%${searchTerm}%` } } : {};
+        return {
+          where: {
+            ...baseFilter,
+            ...searchWhere,
+          },
+        };
+      },
+      [baseFilter]
+    ),
+  });
+
+  const handleBaseFilterChange = useCallback((newFilter) => {
+    setBaseFilter(newFilter);
+    setPageIndex(0); // ✅ Reset pagination
+    setSearchFilter(''); // ✅ Clear search
+  }, [setPageIndex, setSearchFilter]);
+
+  return (
+    <div>
+      <FilterControls filter={baseFilter} onFilterChange={handleBaseFilterChange} />
+      <TableGrid
+        data={data?.Course || []}
+        loading={loading}
+        error={error}
+        searchFilter={searchFilter}
+        onSearchFilterChange={setSearchFilter}
+        pageIndex={pageIndex}
+        onPageChange={setPageIndex}
+        // ... other props
+      />
+    </div>
+  );
+};
+```
+
+## Debounce Configuration
+
+### Configurable Debounce Timing:
+
+```typescript
+// Fast response for simple queries
+const { searchFilter, setSearchFilter } = useTableGrid({
+  queryHook: useAdminQuery,
+  query: SIMPLE_QUERY,
+  debounceMs: 300, // ✅ Fast response
+  // ... other props
+});
+
+// Slower response for complex queries
+const { searchFilter, setSearchFilter } = useTableGrid({
+  queryHook: useAdminQuery,
+  query: COMPLEX_QUERY,
+  debounceMs: 1000, // ✅ Conservative for expensive queries
+  // ... other props
+});
+```
+
+### Recommended Debounce Times:
+
+- **300ms**: Default, good for most cases
+- **600ms**: Slower typing, less aggressive
+- **1000ms**: Very conservative, good for expensive queries
+
+## Error Handling
+
+### GraphQL Error Handling:
+
+```typescript
+const MyComponent: FC = () => {
+  const { data, loading, error, searchFilter, pageIndex, setSearchFilter, setPageIndex } = useTableGrid({
+    queryHook: useAdminQuery,
+    query: MY_QUERY,
+    queryVariables: { programId: 1 },
+    onError: (error) => {
+      console.error('TableGrid query error:', error);
+      // Handle specific error types
+      if (error.message.includes('permission')) {
+        showPermissionError();
+      } else {
+        showGenericError();
+      }
+    },
+  });
+
+  if (error) {
+    return <ErrorMessageDialog error={error} />;
+  }
+
+  return (
+    <TableGrid
+      data={data?.items || []}
+      loading={loading}
+      error={error}
+      searchFilter={searchFilter}
+      onSearchFilterChange={setSearchFilter}
+      pageIndex={pageIndex}
+      onPageChange={setPageIndex}
+      // ... other props
+    />
+  );
+};
+```
+
+## Performance Optimization
+
+### Memoized Column Definitions:
+
+```typescript
+const MyComponent: FC = () => {
+  const columns = useMemo<ColumnDef<MyDataRow>[]>(() => [
+    {
+      header: 'ID',
+      accessorKey: 'id',
+      size: 80,
+    },
+    {
+      header: 'Title',
+      accessorKey: 'title',
+      size: 300,
+      cell: ({ row }) => (
+        <InputField
+          value={row.original.title}
+          onChange={(value) => handleTitleUpdate(row.original.id, value)}
+        />
+      ),
+    },
+  ], []); // ✅ Empty dependency array for static columns
+
+  return (
+    <TableGrid
+      columns={columns}
+      // ... other props
+    />
+  );
+};
+```
+
+### Optimized Refetch Filter:
+
+```typescript
+const MyComponent: FC = () => {
+  const [filters, setFilters] = useState({ programId: 1 });
+
+  const refetchFilter = useCallback(
+    (searchTerm: string) => {
+      const searchWhere = searchTerm ? { title: { _ilike: `%${searchTerm}%` } } : {};
+      return {
+        where: {
+          ...filters,
+          ...searchWhere,
+        },
+      };
+    },
+    [filters] // ✅ Only recreate when filters change
+  );
+
+  const { data, loading, error } = useTableGrid({
+    queryHook: useAdminQuery,
+    query: MY_QUERY,
+    queryVariables: filters,
+    refetchFilter,
+  });
+
+  // ... rest of component
+};
+```
+
+## Common Pitfalls and Solutions
+
+### ❌ Wrong: Offset Conflicts
+
+```typescript
+// Don't manage offset manually
+const [filter, setFilter] = useState({
+  limit: 50,
+  offset: 0, // ❌ This conflicts with useTableGrid
+  where: { programId: 1 }
+});
+```
+
+### ✅ Correct: Let useTableGrid Handle Offset
+
+```typescript
+// Let useTableGrid calculate offset
+const [filter, setFilter] = useState({
+  limit: 50,
+  // ✅ No offset property
+  where: { programId: 1 }
+});
+
+// useTableGrid calculates: offset = pageIndex * pageSize
+```
+
+### ❌ Wrong: Unsynchronized Page Size
+
+```typescript
+const { pageIndex, setPageIndex } = useTableGrid({
+  pageSize: 20, // ❌ Hardcoded value
+});
+
+return (
+  <TableGrid
+    pageSize={50} // ❌ Different value!
+    pageIndex={pageIndex}
+    onPageChange={setPageIndex}
+  />
+);
+```
+
+### ✅ Correct: Synchronized Page Size
+
+```typescript
+const [pageSize, setPageSize] = useState(20);
+
+const { pageIndex, setPageIndex } = useTableGrid({
+  pageSize: pageSize, // ✅ Same value
+});
+
+return (
+  <TableGrid
+    pageSize={pageSize} // ✅ Same value
+    pageIndex={pageIndex}
+    onPageChange={setPageIndex}
+  />
+);
+```
+
+## Best Practices Summary
+
+### ✅ DO:
+1. **Use `useTableGrid` hook** for data fetching and state management
+2. **Synchronize page size** between hook and component
+3. **Reset pagination** when filters change
+4. **Memoize expensive calculations** and callbacks
+5. **Handle errors gracefully** with proper error boundaries
+6. **Use appropriate debounce timing** based on query complexity
+7. **Combine search with existing filters** using `refetchFilter`
+
+### ❌ AVOID:
+1. **Don't manage offset manually** - let useTableGrid handle it
+2. **Don't create offset conflicts** with hardcoded values
+3. **Don't forget to reset pagination** when filters change
+4. **Don't skip memoization** for expensive operations
+5. **Don't ignore error handling** - always handle GraphQL errors
+6. **Don't use hardcoded page sizes** - make them configurable
+
+This advanced guide covers complex TableGrid usage patterns. For basic setup and configuration, refer to the [TableGrid Basic Usage](table-grid-basic-usage.mdc) guide.

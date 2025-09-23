@@ -203,7 +203,7 @@ const CreatableTagSelector: React.FC<CreatableTagSelectorProps> = ({
         <div className="flex justify-between mb-2">
           <div className="flex items-center">
             {helpText && (
-              <Tooltip title={t(helpText)} placement="top">
+              <Tooltip title={helpText} placement="top">
                 <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
               </Tooltip>
             )}

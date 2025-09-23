@@ -5,5 +5,11 @@
   "learnSubheadline": "Hier wieder ein super Text",
   "registerNow": "jetzt registrieren",
   "headline": "Updates für",
-  "subheadline": "deinen Weg"
+  "subheadline": "deinen Weg",
+  "seo": {
+    "metaDescription": "EduHub von opencampus.sh – Deine Plattform für Tech-, Business- und Kreativkurse. Lerne Programmierung, Unternehmertum und mehr in unserer Community of Learning.",
+    "ogDescription": "Starte deine Lernreise mit EduHub von opencampus.sh! Werde Teil einer aktiven Community und entdecke Expertenkurse in Tech, Business und Kreativität.",
+    "twitterDescription": "Lerne Programmierung, Business & Kreativität mit EduHub von opencampus.sh. Werde Teil unserer Community und starte noch heute!",
+    "keywords": "Online-Kurse, Tech-Kurse, Business-Kurse, Kreativkurse, Programmierung, Coding, Unternehmertum, Startup, Nachhaltigkeit, Weiterbildung, opencampus, EduHub, Lernplattform"
+  }
 }

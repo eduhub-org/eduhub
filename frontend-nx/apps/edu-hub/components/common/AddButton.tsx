@@ -1,6 +1,5 @@
 import React from 'react';
 import { MdAddCircle } from 'react-icons/md';
-import useTranslation from 'next-translate/useTranslation';
 import { Button } from './Button'; // Ihre benutzerdefinierte Button-Komponente
 
 // Size Option
@@ -8,22 +7,19 @@ type ButtonSize = 'small' | 'medium' | 'large';
 
 // Different possible props
 interface AddButtonProps {
-  title?: string;
+  title: string; // Made mandatory since all usages provide translated titles
   onClick: () => void;
-  translationNamespace?: string;
   size?: ButtonSize;
   className?: string;
 }
 
 const AddButton: React.FC<AddButtonProps> = ({
-  title = "Add Participants",
+  title,
   onClick,
-  translationNamespace,
   size = 'medium',
   className,
   ...rest
 }) => {
-  const { t } = useTranslation(translationNamespace);
 
   // class specific Sizes
   const sizeClasses = {
@@ -40,7 +36,7 @@ const AddButton: React.FC<AddButtonProps> = ({
       {...rest}
     >
       <MdAddCircle className="mr-2" />
-      {t(title)}
+      {title}
     </Button>
   );
 };

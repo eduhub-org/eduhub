@@ -1,13 +1,11 @@
 import React from 'react';
 import Snackbar from '@mui/material/Snackbar';
-import useTranslation from 'next-translate/useTranslation';
 
 interface NotificationSnackbarProps {
   open: boolean;
   onClose: () => void;
-  message: string;
+  message: string; // Expected to be already translated
   duration?: number;
-  translationNamespace?: string;
 }
 
 const NotificationSnackbar: React.FC<NotificationSnackbarProps> = ({
@@ -15,17 +13,14 @@ const NotificationSnackbar: React.FC<NotificationSnackbarProps> = ({
   onClose,
   message,
   duration = 2000,
-  translationNamespace,
 }) => {
-  const { t } = useTranslation(translationNamespace);
-
   return (
     <Snackbar
       anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       open={open}
       autoHideDuration={duration}
       onClose={onClose}
-      message={t(message)}
+      message={message}
     />
   );
 };

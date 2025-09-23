@@ -297,7 +297,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
       <NotificationSnackbar
         open={showSavedNotification}
         onClose={() => setShowSavedNotification(false)}
-        message="notification_snackbar.saved"
+        message={t('notification_snackbar.saved')}
       />
     </>
   );
