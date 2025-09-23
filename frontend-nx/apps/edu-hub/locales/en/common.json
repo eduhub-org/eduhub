@@ -228,5 +228,14 @@
     "search_organizations": "Search organizations",
     "no_organizations_found": "No organizations found",
     "type_at_least_2_characters": "Type at least 2 characters"
+  },
+  "link_dialog": {
+    "add_link": "Add Link",
+    "edit_link": "Edit Link",
+    "update_link": "Update Link",
+    "remove_link": "Remove Link",
+    "url_label": "URL",
+    "url_placeholder": "Enter URL (e.g., https://example.com or [Enrollment:CourseLink])",
+    "url_help": "You can use template variables like [Enrollment:CourseLink] or enter a regular URL"
   }
 }
