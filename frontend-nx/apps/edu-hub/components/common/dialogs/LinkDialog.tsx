@@ -84,7 +84,7 @@ export const LinkDialog: React.FC<LinkDialogProps> = ({
         <div className="flex justify-between">
           <div className="flex gap-2">
             {hasExistingLink && onRemove && (
-              <Button onClick={handleRemove} variant="outlined" color="error">
+              <Button onClick={handleRemove} className="text-red-600 border-red-600 hover:border-red-400">
                 {t('link_dialog.remove_link')}
               </Button>
             )}
