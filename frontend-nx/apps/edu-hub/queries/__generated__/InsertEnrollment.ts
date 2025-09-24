@@ -30,6 +30,10 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessi
    */
   address: string;
   /**
+   * Foreign key to LocationAddress. Replaces the free-text address field with a structured address reference. Nullable during migration period.
+   */
+  locationAddressId: number | null;
+  /**
    * An object relationship
    */
   CourseLocation: InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessions_SessionAddresses_CourseLocation | null;

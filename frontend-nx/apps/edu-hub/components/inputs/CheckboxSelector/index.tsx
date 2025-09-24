@@ -56,7 +56,6 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
         open={showSavedNotification}
         onClose={() => setShowSavedNotification(false)}
         message={t('notification_snackbar.saved')}
-        translationNamespace="common"
       />
 
       <ErrorMessageDialog errorMessage={error?.message || ''} open={!!error} onClose={resetError} />

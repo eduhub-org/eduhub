@@ -1,0 +1,845 @@
+---
+description: "Apply when implementing responsive layouts, mobile-first design, creating mobile-friendly components, or ensuring cross-device compatibility in EduHub"
+alwaysApply: false
+---
+
+# Mobile and Responsive Design Guide
+
+> **Related Rules**: [Component Architecture](component-architecture.mdc) | [TableGrid Basic Usage](table-grid-basic-usage.mdc) | [TableGrid Column Configuration](table-grid-column-configuration.mdc) | [Frontend Component Patterns](frontend-component-patterns.mdc)
+
+This guide covers responsive design patterns, mobile optimization, and best practices for creating adaptive user interfaces in EduHub.
+
+## Responsive Design Principles
+
+### Mobile-First Approach
+```scss
+// ✅ GOOD: Mobile-first CSS approach
+.course-card {
+  // Base styles for mobile
+  padding: 1rem;
+  margin-bottom: 1rem;
+  
+  // Tablet and up
+  @media (min-width: 768px) {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  // Desktop and up
+  @media (min-width: 1024px) {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto 2rem;
+  }
+}
+```
+
+### Breakpoint System
+```typescript
+// utils/breakpoints.ts
+export const breakpoints = {
+  xs: '0px',
+  sm: '640px',
+  md: '768px',
+  lg: '1024px',
+  xl: '1280px',
+  '2xl': '1536px',
+} as const;
+
+export const useMediaQuery = (query: string) => {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    const updateMatch = () => setMatches(media.matches);
+    
+    updateMatch();
+    media.addEventListener('change', updateMatch);
+    
+    return () => media.removeEventListener('change', updateMatch);
+  }, [query]);
+
+  return matches;
+};
+
+// Usage
+const isMobile = useMediaQuery('(max-width: 768px)');
+const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1024px)');
+const isDesktop = useMediaQuery('(min-width: 1024px)');
+```
+
+## Responsive TableGrid Design
+
+### Mobile TableGrid Patterns
+
+#### Responsive Column Configuration
+```typescript
+// ✅ GOOD: Mobile-aware column definitions
+const useCourseColumns = () => {
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1024px)');
+
+  return useMemo<ColumnDef<Course>[]>(() => {
+    const baseColumns: ColumnDef<Course>[] = [
+      {
+        header: 'Course',
+        accessorKey: 'title',
+        size: isMobile ? 200 : isTablet ? 250 : 300,
+        minSize: isMobile ? 150 : 200,
+        cell: ({ row }) => (
+          <div className="course-cell">
+            <div className="font-medium text-sm md:text-base">
+              {row.original.title}
+            </div>
+            {/* Show additional info on mobile */}
+            {isMobile && (
+              <div className="text-xs text-gray-500 mt-1">
+                {formatDate(row.original.startTime)}
+              </div>
+            )}
+          </div>
+        ),
+      },
+    ];
+
+    // Add columns based on screen size
+    if (!isMobile) {
+      baseColumns.push({
+        header: 'Start Date',
+        accessorKey: 'startTime',
+        size: isTablet ? 120 : 150,
+        cell: ({ row }) => (
+          <span className="text-sm">
+            {formatDate(row.original.startTime)}
+          </span>
+        ),
+      });
+    }
+
+    if (isDesktop) {
+      baseColumns.push({
+        header: 'Description',
+        accessorKey: 'description',
+        size: 300,
+        cell: ({ row }) => (
+          <div className="truncate text-sm">
+            {row.original.description}
+          </div>
+        ),
+      });
+    }
+
+    return baseColumns;
+  }, [isMobile, isTablet]);
+};
+```
+
+#### Mobile-Optimized TableGrid Component
+```typescript
+// components/common/ResponsiveTableGrid.tsx
+interface ResponsiveTableGridProps<T> extends TableGridProps<T> {
+  mobileCardRenderer?: (item: T) => React.ReactNode;
+  tabletColumns?: ColumnDef<T>[];
+  desktopColumns?: ColumnDef<T>[];
+}
+
+const ResponsiveTableGrid = <T extends Record<string, any>>({
+  data,
+  columns,
+  mobileCardRenderer,
+  tabletColumns,
+  desktopColumns,
+  ...props
+}: ResponsiveTableGridProps<T>) => {
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1024px)');
+
+  // Mobile: Use card layout
+  if (isMobile && mobileCardRenderer) {
+    return (
+      <div className="space-y-4">
+        {data.map((item, index) => (
+          <div key={index} className="mobile-card">
+            {mobileCardRenderer(item)}
+          </div>
+        ))}
+        {/* Mobile pagination */}
+        <MobilePagination {...props} />
+      </div>
+    );
+  }
+
+  // Tablet/Desktop: Use appropriate columns
+  const responsiveColumns = isTablet && tabletColumns 
+    ? tabletColumns 
+    : !isMobile && desktopColumns 
+    ? desktopColumns 
+    : columns;
+
+  return (
+    <TableGrid
+      {...props}
+      data={data}
+      columns={responsiveColumns}
+      className={`responsive-table ${isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop'}`}
+    />
+  );
+};
+```
+
+#### Mobile Card Renderer Pattern
+```typescript
+// Mobile card layout for course list
+const CourseCardRenderer: React.FC<{ course: Course }> = ({ course }) => (
+  <div className="bg-white p-4 rounded-lg shadow border">
+    <div className="flex justify-between items-start mb-2">
+      <h3 className="font-medium text-lg">{course.title}</h3>
+      <StatusBadge status={course.status} />
+    </div>
+    
+    <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+      {course.description}
+    </p>
+    
+    <div className="flex justify-between items-center text-sm text-gray-500">
+      <span>{formatDate(course.startTime)}</span>
+      <span>{course.maxParticipants} max</span>
+    </div>
+    
+    <div className="flex gap-2 mt-3">
+      <Button size="sm" className="flex-1">
+        View Details
+      </Button>
+      {canEdit && (
+        <Button size="sm" variant="outline">
+          Edit
+        </Button>
+      )}
+    </div>
+  </div>
+);
+```
+
+### Responsive Pagination
+```typescript
+// Mobile-optimized pagination
+const MobilePagination: React.FC<PaginationProps> = ({
+  pageIndex,
+  pageSize,
+  totalCount,
+  onPageChange,
+  onPageSizeChange,
+}) => {
+  const totalPages = Math.ceil(totalCount / pageSize);
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
+  if (isMobile) {
+    return (
+      <div className="flex flex-col gap-3">
+        {/* Simple prev/next for mobile */}
+        <div className="flex justify-between items-center">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={pageIndex === 0}
+            onClick={() => onPageChange(pageIndex - 1)}
+          >
+            Previous
+          </Button>
+          
+          <span className="text-sm text-gray-600">
+            Page {pageIndex + 1} of {totalPages}
+          </span>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={pageIndex >= totalPages - 1}
+            onClick={() => onPageChange(pageIndex + 1)}
+          >
+            Next
+          </Button>
+        </div>
+        
+        {/* Mobile page size selector */}
+        <div className="flex justify-center">
+          <select
+            value={pageSize}
+            onChange={(e) => onPageSizeChange(Number(e.target.value))}
+            className="text-sm border rounded px-2 py-1"
+          >
+            <option value={10}>10 per page</option>
+            <option value={25}>25 per page</option>
+            <option value={50}>50 per page</option>
+          </select>
+        </div>
+      </div>
+    );
+  }
+
+  // Full pagination for desktop
+  return <FullPagination {...props} />;
+};
+```
+
+## Responsive Component Patterns
+
+### Adaptive Layouts
+
+#### Responsive Grid Layouts
+```typescript
+// ✅ GOOD: Responsive grid with CSS Grid
+const CourseGrid: React.FC<{ courses: Course[] }> = ({ courses }) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    {courses.map(course => (
+      <CourseCard key={course.id} course={course} />
+    ))}
+  </div>
+);
+
+// ✅ GOOD: Dynamic grid based on screen size
+const DynamicGrid: React.FC<{ items: any[] }> = ({ items }) => {
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1024px)');
+  
+  const columns = isMobile ? 1 : isTablet ? 2 : 3;
+  
+  return (
+    <div 
+      className="grid gap-4"
+      style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
+    >
+      {items.map((item, index) => (
+        <ItemCard key={index} item={item} />
+      ))}
+    </div>
+  );
+};
+```
+
+#### Responsive Sidebar Layouts
+```typescript
+const ResponsiveLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
+  return (
+    <div className="flex h-screen bg-gray-100">
+      {/* Mobile: Overlay sidebar */}
+      {isMobile && (
+        <>
+          {/* Backdrop */}
+          {sidebarOpen && (
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-50 z-40"
+              onClick={() => setSidebarOpen(false)}
+            />
+          )}
+          
+          {/* Sidebar */}
+          <div className={`
+            fixed inset-y-0 left-0 z-50 w-64 bg-white transform transition-transform
+            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          `}>
+            <Sidebar onClose={() => setSidebarOpen(false)} />
+          </div>
+        </>
+      )}
+
+      {/* Desktop: Static sidebar */}
+      {!isMobile && (
+        <div className="w-64 bg-white border-r">
+          <Sidebar />
+        </div>
+      )}
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Mobile header with menu button */}
+        {isMobile && (
+          <header className="bg-white border-b px-4 py-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 rounded-md text-gray-600"
+            >
+              <MenuIcon size={24} />
+            </button>
+          </header>
+        )}
+        
+        <main className="flex-1 overflow-auto p-4">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+};
+```
+
+### Responsive Forms
+
+#### Mobile-Optimized Form Layouts
+```typescript
+const ResponsiveForm: React.FC = () => {
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
+  return (
+    <form className={`space-y-4 ${isMobile ? 'p-4' : 'p-6 max-w-2xl mx-auto'}`}>
+      {/* Full width on mobile, two columns on desktop */}
+      <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
+        <InputField
+          label="First Name"
+          name="firstName"
+          className="w-full"
+        />
+        <InputField
+          label="Last Name"
+          name="lastName"
+          className="w-full"
+        />
+      </div>
+
+      {/* Always full width */}
+      <InputField
+        label="Email"
+        name="email"
+        type="email"
+        className="w-full"
+      />
+
+      {/* Responsive textarea */}
+      <div>
+        <label className="block text-sm font-medium mb-2">
+          Description
+        </label>
+        <textarea
+          className={`w-full border rounded-md px-3 py-2 ${
+            isMobile ? 'min-h-[100px]' : 'min-h-[120px]'
+          }`}
+          placeholder="Enter description..."
+        />
+      </div>
+
+      {/* Mobile: Stack buttons, Desktop: Inline */}
+      <div className={`flex gap-3 ${isMobile ? 'flex-col' : 'flex-row justify-end'}`}>
+        <Button variant="outline" className={isMobile ? 'w-full' : ''}>
+          Cancel
+        </Button>
+        <Button className={isMobile ? 'w-full' : ''}>
+          Submit
+        </Button>
+      </div>
+    </form>
+  );
+};
+```
+
+### Responsive Navigation
+
+#### Mobile Navigation Menu
+```typescript
+const ResponsiveNavigation: React.FC = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
+  const navigationItems = [
+    { href: '/courses', label: 'Courses' },
+    { href: '/instructors', label: 'Instructors' },
+    { href: '/about', label: 'About' },
+    { href: '/contact', label: 'Contact' },
+  ];
+
+  if (isMobile) {
+    return (
+      <>
+        {/* Mobile header */}
+        <header className="bg-white border-b px-4 py-3 flex justify-between items-center">
+          <div className="font-bold text-xl">EduHub</div>
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 rounded-md"
+          >
+            {mobileMenuOpen ? <XIcon size={24} /> : <MenuIcon size={24} />}
+          </button>
+        </header>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <nav className="bg-white border-b">
+            <div className="px-4 py-2 space-y-1">
+              {navigationItems.map(item => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </nav>
+        )}
+      </>
+    );
+  }
+
+  // Desktop navigation
+  return (
+    <header className="bg-white border-b">
+      <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="font-bold text-xl">EduHub</div>
+        
+        <nav className="hidden md:flex space-x-8">
+          {navigationItems.map(item => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </header>
+  );
+};
+```
+
+## Touch and Mobile Interactions
+
+### Touch-Friendly Controls
+```typescript
+// ✅ GOOD: Touch-friendly button sizes
+const TouchFriendlyButton: React.FC<ButtonProps> = ({ 
+  children, 
+  size = 'default',
+  ...props 
+}) => {
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  
+  const sizeClasses = {
+    small: isMobile ? 'px-4 py-3 text-sm' : 'px-3 py-2 text-sm',
+    default: isMobile ? 'px-6 py-4 text-base' : 'px-4 py-2 text-base',
+    large: isMobile ? 'px-8 py-5 text-lg' : 'px-6 py-3 text-lg',
+  };
+
+  return (
+    <button
+      className={`
+        rounded-md font-medium transition-colors
+        ${sizeClasses[size]}
+        touch-manipulation
+        select-none
+      `}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
+```
+
+### Swipe Gestures
+```typescript
+// Custom hook for swipe gestures
+const useSwipeGesture = (onSwipeLeft?: () => void, onSwipeRight?: () => void) => {
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(0);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && onSwipeLeft) {
+      onSwipeLeft();
+    } else if (isRightSwipe && onSwipeRight) {
+      onSwipeRight();
+    }
+  };
+
+  return {
+    onTouchStart,
+    onTouchMove,
+    onTouchEnd,
+  };
+};
+
+// Usage in mobile card carousel
+const MobileCardCarousel: React.FC<{ items: any[] }> = ({ items }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  const swipeHandlers = useSwipeGesture(
+    () => setCurrentIndex(prev => Math.min(prev + 1, items.length - 1)),
+    () => setCurrentIndex(prev => Math.max(prev - 1, 0))
+  );
+
+  return (
+    <div 
+      className="relative overflow-hidden"
+      {...swipeHandlers}
+    >
+      <div 
+        className="flex transition-transform duration-300"
+        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+      >
+        {items.map((item, index) => (
+          <div key={index} className="w-full flex-shrink-0">
+            <ItemCard item={item} />
+          </div>
+        ))}
+      </div>
+      
+      {/* Pagination dots */}
+      <div className="flex justify-center mt-4 space-x-2">
+        {items.map((_, index) => (
+          <button
+            key={index}
+            className={`w-2 h-2 rounded-full ${
+              index === currentIndex ? 'bg-blue-600' : 'bg-gray-300'
+            }`}
+            onClick={() => setCurrentIndex(index)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+```
+
+## Performance Optimization for Mobile
+
+### Image Optimization for Different Screen Sizes
+```typescript
+const ResponsiveImage: React.FC<{
+  src: string;
+  alt: string;
+  sizes?: string;
+}> = ({ src, alt, sizes = '100vw' }) => {
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      sizes={sizes}
+      quality={75}
+      placeholder="blur"
+      className="w-full h-auto"
+      style={{
+        maxWidth: '100%',
+        height: 'auto',
+      }}
+    />
+  );
+};
+
+// Different image sizes for different breakpoints
+const HeroImage: React.FC = () => (
+  <ResponsiveImage
+    src="/hero.jpg"
+    alt="Hero image"
+    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+  />
+);
+```
+
+### Lazy Loading for Mobile
+```typescript
+const LazyMobileComponent: React.FC = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
+  useEffect(() => {
+    if (!isMobile) {
+      setIsVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [isMobile]);
+
+  return (
+    <div ref={ref} className="min-h-[200px]">
+      {isVisible ? (
+        <HeavyComponent />
+      ) : (
+        <div className="flex items-center justify-center h-48">
+          <LoadingSpinner />
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+## Testing Responsive Components
+
+### Viewport Testing
+```typescript
+// __tests__/responsive.test.tsx
+import { render, screen } from '@testing-library/react';
+import { ResponsiveComponent } from '../ResponsiveComponent';
+
+// Mock matchMedia
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
+describe('ResponsiveComponent', () => {
+  it('renders mobile layout on small screens', () => {
+    // Mock mobile viewport
+    window.matchMedia = jest.fn().mockImplementation(query => ({
+      matches: query === '(max-width: 768px)',
+      media: query,
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    }));
+
+    render(<ResponsiveComponent />);
+    
+    expect(screen.getByTestId('mobile-layout')).toBeInTheDocument();
+    expect(screen.queryByTestId('desktop-layout')).not.toBeInTheDocument();
+  });
+
+  it('renders desktop layout on large screens', () => {
+    // Mock desktop viewport
+    window.matchMedia = jest.fn().mockImplementation(query => ({
+      matches: query === '(min-width: 1024px)',
+      media: query,
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    }));
+
+    render(<ResponsiveComponent />);
+    
+    expect(screen.getByTestId('desktop-layout')).toBeInTheDocument();
+    expect(screen.queryByTestId('mobile-layout')).not.toBeInTheDocument();
+  });
+});
+```
+
+## Accessibility in Responsive Design
+
+### Mobile Accessibility
+```typescript
+const AccessibleMobileComponent: React.FC = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
+  return (
+    <nav role="navigation" aria-label="Main navigation">
+      {isMobile && (
+        <button
+          aria-expanded={menuOpen}
+          aria-controls="mobile-menu"
+          aria-label="Toggle navigation menu"
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="p-2 text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <MenuIcon size={24} />
+        </button>
+      )}
+      
+      <div
+        id="mobile-menu"
+        className={`${
+          isMobile 
+            ? menuOpen 
+              ? 'block' 
+              : 'hidden' 
+            : 'block'
+        }`}
+        aria-hidden={isMobile && !menuOpen}
+      >
+        <ul className="space-y-2">
+          <li>
+            <a 
+              href="/courses" 
+              className="block p-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+            >
+              Courses
+            </a>
+          </li>
+          {/* More navigation items */}
+        </ul>
+      </div>
+    </nav>
+  );
+};
+```
+
+## Best Practices Summary
+
+### ✅ DO:
+1. **Use mobile-first CSS** approach for better performance
+2. **Test on real devices** not just browser dev tools
+3. **Optimize touch targets** (minimum 44px)
+4. **Implement proper breakpoints** for different screen sizes
+5. **Use responsive images** with appropriate sizes
+6. **Consider thumb-friendly navigation** on mobile
+7. **Optimize TableGrid** for mobile with card layouts
+8. **Test accessibility** across all screen sizes
+9. **Implement proper loading states** for mobile connections
+10. **Use CSS Grid and Flexbox** for responsive layouts
+
+### ❌ AVOID:
+1. **Don't rely only on CSS media queries** - use JavaScript for complex responsive behavior
+2. **Don't ignore touch interactions** on mobile devices
+3. **Don't make text too small** on mobile screens
+4. **Don't forget about landscape mode** on mobile devices
+5. **Don't overload mobile views** with too much information
+6. **Don't forget to test forms** on mobile keyboards
+7. **Don't ignore network conditions** on mobile
+8. **Don't use hover effects** as the only interaction method
+9. **Don't forget about safe areas** on notched devices
+10. **Don't assume fast connections** on mobile devices
+
+This comprehensive responsive design guide ensures EduHub provides an excellent user experience across all devices and screen sizes.

@@ -1,9 +1,11 @@
 ---
-globs: "*.ts,*.tsx"
-description: "TypeScript and React component standards for EduHub frontend"
+description: "Apply when writing TypeScript/React code, implementing component patterns, following coding standards, choosing between existing components, or establishing frontend development practices in EduHub"
+alwaysApply: false
 ---
 
-# TypeScript Frontend Standards
+# Frontend Component Patterns & TypeScript Standards
+
+> **Related Rules**: [Component Architecture](component-architecture.mdc) | [GraphQL Integration](graphql-integration-patterns.mdc) | [Testing Standards](testing-standards.mdc) | [Translation Implementation](translation-implementation.mdc)
 
 ## Code Quality Rules
 
@@ -79,6 +81,8 @@ const processedData = useMemo(() => {
 - **Export components as default** unless multiple exports needed
 
 ## Component Reuse Guidelines
+
+> **💡 Tip**: See [Component Architecture](component-architecture.mdc) for detailed component organization patterns and [TableGrid Usage](table-grid-basic-usage.mdc) for data table components.
 
 ### MANDATORY: Check Existing Components First
 
@@ -156,7 +160,7 @@ const OrganizationAliases = () => {
 ### Component Decision Matrix
 
 | Need | Check First | Use If Available |
-|------|-------------|------------------|
+|---|----|---|
 | Error display | `ErrorMessageDialog` | ✅ Standard error dialog |
 | User confirmation | `QuestionConfirmationDialog` | ✅ Yes/no confirmation |
 | Custom modal | `BaseDialog` | ✅ Flexible dialog wrapper |
@@ -193,6 +197,21 @@ const ExtendedTagSelector: React.FC<ExtendedTagSelectorProps> = ({
   return <CreatableTagSelector {...baseProps} />;
 };
 ```
+
+## Component Development
+
+### Creating New Components
+- Place in [frontend-nx/apps/edu-hub/components/](mdc:frontend-nx/apps/edu-hub/components/)
+- Follow existing patterns like [EmailEditor.tsx](mdc:frontend-nx/apps/edu-hub/components/inputs/EmailEditor.tsx)
+- Use TypeScript interfaces
+- Include proper error handling
+- Add translations in [locales/](mdc:frontend-nx/apps/edu-hub/locales/)
+
+### Page Components
+- Place in [frontend-nx/apps/edu-hub/pages/](mdc:frontend-nx/apps/edu-hub/pages/)
+- Follow pattern from [manage/email-templates/index.tsx](mdc:frontend-nx/apps/edu-hub/pages/manage/email-templates/index.tsx)
+- Use proper SEO meta tags
+- Implement proper loading states
 
 ## Common Patterns
 
@@ -279,57 +298,6 @@ import { TableGrid } from '../common/TableGrid';
 import { Button } from '../common/Button';
 ```
 
-## Development Commands
-
-### Standard Development Workflow
-
-Before committing code, always run these commands to ensure quality:
-
-```bash
-# Install dependencies (use immutable flag for consistent installs)
-yarn install --immutable
-
-# Build the project to check for TypeScript errors and build issues
-npx nx run edu-hub:build
-
-# Run linting to check code style and potential issues
-npx nx run edu-hub:lint
-```
-
-### Pre-commit Checklist
-
-Before committing any frontend changes:
-
-1. ✅ **Dependencies are up to date**
-   ```bash
-   yarn install --immutable
-   ```
-
-2. ✅ **Project builds successfully**
-   ```bash
-   npx nx run edu-hub:build
-   ```
-
-3. ✅ **Linting passes without errors**
-   ```bash
-   npx nx run edu-hub:lint
-   ```
-
-4. ✅ **All TypeScript errors are resolved**
-   - Check the build output for any type errors
-   - Ensure all components have proper TypeScript interfaces
-
-5. ✅ **Code follows component reuse guidelines**
-   - Checked existing components before creating new ones
-   - Used appropriate dialog, input, and common components
-
-### CI/CD Integration
-
-These same commands are used in the GitHub Actions workflow (`.github/workflows/frontend-code-checks.yml`) to ensure:
-- Consistent builds across environments
-- Automated quality checks on pull requests
-- Early detection of build and linting issues
-
 ## Component Usage Checklist
 
 Before writing any component code, ask:
@@ -351,3 +319,14 @@ Before writing any component code, ask:
 4. ✅ **Can I extend an existing component** instead of creating new?
 
 5. ✅ **Is this truly unique functionality** that warrants a new component?
+
+## Important Notes
+
+- **Never assume current directory** - always use the EDUHUB_ROOT environment variable or explicit paths
+- **Use yarn** instead of npm for consistency
+- **Test on multiple screen sizes** - the app is responsive
+- **Check both German and English translations**
+- **Follow Material-UI patterns** for consistency
+- **Use the existing GraphQL schema** and queries
+- **Always add proper error handling**
+- **Include loading states** for better UX

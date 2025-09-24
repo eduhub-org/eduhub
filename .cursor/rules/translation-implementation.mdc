@@ -1,9 +1,10 @@
 ---
-description: 
-globs: 
+description: "Apply when working with translations, implementing internationalization (i18n), adding new text content that needs translation, working with locale files, or ensuring German 'Du' form compliance in EduHub"
 alwaysApply: false
 ---
 # Translation Implementation Guide
+
+> **Related Rules**: [Frontend Component Patterns](frontend-component-patterns.mdc) | [Component Architecture](component-architecture.mdc) | [Testing Standards](testing-standards.mdc)
 
 This guide covers how to implement translations in the EduHub project following established conventions and component-based organization.
 
@@ -160,6 +161,8 @@ const errorMsg = t('errors.motivation_letter_required');
 3. **Add to both German and English** files simultaneously
 4. **Maintain consistent grouping** within the JSON structure
 5. **MANDATORY: Use informal "Du" in ALL German translations**
+
+> **💡 Tip**: See [Frontend Component Patterns](frontend-component-patterns.mdc) for component integration examples and [Testing Standards](testing-standards.mdc) for translation testing.
 
 ### Accessing Nested Translations
 ```typescript

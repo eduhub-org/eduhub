@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useDropDownLogic } from './hooks';
 import { DropDownSelectorProps } from './types';
 import { MaterialDropDown } from './components/MaterialDropDown';
@@ -37,16 +37,18 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
   };
 
   // Add nullable option if nullable is true
-  const enhancedOptions = nullable
-    ? [
-        {
-          label:
-            nullableLabel || (variant === 'eduhub' ? 'dropdown_selector.none_option' : 'dropdown_selector.none_option'),
-          value: '',
-        },
-        ...options,
-      ]
-    : options;
+  const enhancedOptions = useMemo(() => {
+    return nullable
+      ? [
+          {
+            label:
+              nullableLabel || (variant === 'eduhub' ? 'dropdown_selector.none_option' : 'dropdown_selector.none_option'),
+            value: '',
+          },
+          ...options,
+        ]
+      : options;
+  }, [nullable, nullableLabel, variant, options]);
 
   const {
     localValue,
@@ -98,9 +100,9 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
     (value?: string) => {
       if (!value) return '';
       const option = localOptions.find((opt) => opt.value === value);
-      return option ? t(option.label) : '';
+      return option ? option.label : '';
     },
-    [localOptions, t]
+    [localOptions]
   );
 
   const handleCreateOption = useCallback(() => {
@@ -112,7 +114,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
             value: inputValue,
           },
           onCompleted: (data) => {
-            const newValue = data?.createOption?.value || data?.insert_Organization_one?.id;
+            const newValue = data?.createOption?.value || data?.insert_Organization_one?.id || data?.insert_LocationAddress_one?.id;
             if (newValue) {
               const newValueStr = newValue.toString();
               onOptionCreated?.(newValueStr);
@@ -184,7 +186,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
       <NotificationSnackbar
         open={showSavedNotification}
         onClose={() => setShowSavedNotification(false)}
-        message="notification_snackbar.saved"
+        message={t('notification_snackbar.saved')}
       />
       <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />
     </>

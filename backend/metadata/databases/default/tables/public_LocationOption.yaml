@@ -12,6 +12,13 @@ array_relationships:
         remote_table:
           name: CourseLocation
           schema: public
+  - name: LocationAddresses
+    using:
+      foreign_key_constraint_on:
+        column: locationOptionId
+        table:
+          name: LocationAddress
+          schema: public
 select_permissions:
   - role: anonymous
     permission:
