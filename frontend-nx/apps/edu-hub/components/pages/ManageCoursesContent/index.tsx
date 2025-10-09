@@ -299,10 +299,12 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const courseGroupOptions = useMemo(() => {
     if (data && !loading && !error) {
       return (
-        data.CourseGroupOption?.map((option) => ({
-          id: option.id,
-          name: t(`common:course_group_options.${option.title}`),
-        })) || []
+        data.CourseGroupOption
+          ?.filter((option) => option.sliderGroup)
+          .map((option) => ({
+            id: option.id,
+            name: t(`common:course_group_options.${option.title}`),
+          })) || []
       );
     } else {
       return [];

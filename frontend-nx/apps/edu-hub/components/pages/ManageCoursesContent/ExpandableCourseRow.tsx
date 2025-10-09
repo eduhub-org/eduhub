@@ -332,7 +332,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
   const registrationTypeOptions = Object.values(CourseRegistrationType_enum).map((type) => ({
     value: type,
-    label: `manageCourses:registration_type.options.${type}`,
+    label: t(`manageCourses:registration_type.options.${type}`),
   }));
 
   const isExternalRegistration = course.registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION;

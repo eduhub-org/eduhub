@@ -510,6 +510,10 @@ export interface AdminCourseList_CourseGroupOption {
   id: number;
   title: string;
   order: number;
+  /**
+   * Indicates whether this group option is used in UI sliders (true) or as metadata tags (false)
+   */
+  sliderGroup: boolean | null;
 }
 
 export interface AdminCourseList {
