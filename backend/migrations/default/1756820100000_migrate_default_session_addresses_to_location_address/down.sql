@@ -13,8 +13,10 @@ WHERE "defaultSessionAddressId" IS NOT NULL;
 -- DELETE FROM "public"."LocationAddress" 
 -- WHERE "description" = 'Migrated from CourseLocation.defaultSessionAddress';
 
-RAISE NOTICE 'Migration rollback completed. CourseLocation.defaultSessionAddressId set to NULL.';
-RAISE NOTICE 'LocationAddress records were NOT deleted to preserve data integrity.';
-RAISE NOTICE 'Review and manually clean up LocationAddress table if needed.';
+DO $$ BEGIN
+    RAISE NOTICE 'Migration rollback completed. CourseLocation.defaultSessionAddressId set to NULL.';
+    RAISE NOTICE 'LocationAddress records were NOT deleted to preserve data integrity.';
+    RAISE NOTICE 'Review and manually clean up LocationAddress table if needed.';
+END $$;
 
 
