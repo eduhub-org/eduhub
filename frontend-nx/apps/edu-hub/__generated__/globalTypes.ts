@@ -4561,6 +4561,7 @@ export interface CourseLocation_avg_order_by {
  */
 export interface CourseLocation_bool_exp {
   Course?: Course_bool_exp | null;
+  DefaultSessionAddress?: LocationAddress_bool_exp | null;
   LocationOption?: LocationOption_bool_exp | null;
   _and?: CourseLocation_bool_exp[] | null;
   _not?: CourseLocation_bool_exp | null;
@@ -4579,6 +4580,7 @@ export interface CourseLocation_bool_exp {
  */
 export interface CourseLocation_insert_input {
   Course?: Course_obj_rel_insert_input | null;
+  DefaultSessionAddress?: LocationAddress_obj_rel_insert_input | null;
   LocationOption?: LocationOption_obj_rel_insert_input | null;
   courseId?: number | null;
   created_at?: any | null;
@@ -5476,6 +5478,8 @@ export interface LocationAddress_avg_order_by {
  * Boolean expression to filter rows from the table "LocationAddress". All fields are combined with a logical 'AND'.
  */
 export interface LocationAddress_bool_exp {
+  CourseLocations?: CourseLocation_bool_exp | null;
+  CourseLocations_aggregate?: CourseLocation_aggregate_bool_exp | null;
   LocationOption?: LocationOption_bool_exp | null;
   SessionAddresses?: SessionAddress_bool_exp | null;
   SessionAddresses_aggregate?: SessionAddress_aggregate_bool_exp | null;
@@ -5496,6 +5500,7 @@ export interface LocationAddress_bool_exp {
  * input type for inserting data into table "LocationAddress"
  */
 export interface LocationAddress_insert_input {
+  CourseLocations?: CourseLocation_arr_rel_insert_input | null;
   LocationOption?: LocationOption_obj_rel_insert_input | null;
   SessionAddresses?: SessionAddress_arr_rel_insert_input | null;
   address?: string | null;
@@ -5553,6 +5558,7 @@ export interface LocationAddress_on_conflict {
  * Ordering options when selecting data from "LocationAddress".
  */
 export interface LocationAddress_order_by {
+  CourseLocations_aggregate?: CourseLocation_aggregate_order_by | null;
   LocationOption?: LocationOption_order_by | null;
   SessionAddresses_aggregate?: SessionAddress_aggregate_order_by | null;
   address?: order_by | null;

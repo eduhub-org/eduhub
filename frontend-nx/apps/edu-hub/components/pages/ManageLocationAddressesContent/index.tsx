@@ -27,32 +27,13 @@ import CreatableTagSelector from '../../inputs/CreatableTagSelector';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { LocationOption_enum } from '../../../__generated__/globalTypes';
+import {
+  LocationAddressList_LocationAddress,
+  LocationAddressList_LocationOption,
+} from '../../../queries/__generated__/LocationAddressList';
 
-// TODO: Replace with actual generated types once GraphQL schema is deployed
-type LocationAddressListLocationAddress = {
-  id: number;
-  locationOptionId: LocationOption_enum;
-  shortLabel: string;
-  address: string;
-  description?: string;
-  aliases?: string[] | null;
-  created_at: string;
-  updated_at: string;
-  LocationOption: {
-    value: string;
-    comment?: string;
-  };
-  SessionAddresses_aggregate: {
-    aggregate: {
-      count: number;
-    };
-  };
-};
-
-type LocationOption = {
-  value: string;
-  comment?: string;
-};
+type LocationAddressListLocationAddress = LocationAddressList_LocationAddress;
+type LocationOption = LocationAddressList_LocationOption;
 
 type ExpandableRowProps = {
   row: LocationAddressListLocationAddress;
@@ -234,7 +215,11 @@ const ManageLocationAddressesContent: FC = () => {
       },
       {
         id: 'usageCount',
-        accessorFn: (row) => row.SessionAddresses_aggregate.aggregate.count,
+        accessorFn: (row) => {
+          const sessionCount = row.SessionAddresses_aggregate.aggregate?.count || 0;
+          const courseLocationCount = row.CourseLocations_aggregate.aggregate?.count || 0;
+          return sessionCount + courseLocationCount;
+        },
         header: t('locationAddress.usageCount'),
         meta: { width: 1 },
         cell: ({ getValue }) => <div className="px-4 py-2">{getValue<number>()}</div>,
