@@ -1,6 +1,8 @@
 import React, { FC, useState, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import useTranslation from 'next-translate/useTranslation';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { MdExpandMore, MdExpandLess } from 'react-icons/md';
 
 import { GET_FAQS_BY_COLLECTION_AND_LANG } from '../../queries/faqQueries';
@@ -46,7 +48,14 @@ const FaqItemComponent: FC<FaqItemProps> = ({ faq }) => {
       </button>
       {isExpanded && (
         <div className="px-4 pb-4 border-t border-gray-700">
-          <div className="pt-4 text-gray-200 leading-relaxed whitespace-pre-line">{faq.answer}</div>
+          <div className="pt-4 text-gray-200 leading-relaxed">
+            <ReactMarkdown 
+              className="prose prose-invert max-w-none"
+              remarkPlugins={[remarkGfm]}
+            >
+              {faq.answer}
+            </ReactMarkdown>
+          </div>
         </div>
       )}
     </div>
