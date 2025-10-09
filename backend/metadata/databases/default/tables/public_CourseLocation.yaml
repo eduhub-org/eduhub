@@ -27,6 +27,7 @@ insert_permissions:
       columns:
         - courseId
         - defaultSessionAddress
+        - defaultSessionAddressId
         - id
         - locationOption
 select_permissions:
@@ -35,6 +36,7 @@ select_permissions:
       columns:
         - courseId
         - defaultSessionAddress
+        - defaultSessionAddressId
         - id
         - locationOption
       filter: {}
@@ -45,6 +47,7 @@ select_permissions:
         - courseId
         - created_at
         - defaultSessionAddress
+        - defaultSessionAddressId
         - id
         - locationOption
         - updated_at
@@ -56,6 +59,7 @@ update_permissions:
       columns:
         - courseId
         - defaultSessionAddress
+        - defaultSessionAddressId
         - locationOption
       filter:
         Course:

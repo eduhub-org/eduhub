@@ -147,3 +147,14 @@ export const CREATE_LOCATION_ADDRESS = gql`
     }
   }
 `;
+
+export const LOCATION_ADDRESSES_BY_IDS = gql`
+  query LocationAddressesByIds($ids: [Int!]!) {
+    LocationAddress(where: { id: { _in: $ids } }) {
+      id
+      shortLabel
+      address
+      locationOptionId
+    }
+  }
+`;

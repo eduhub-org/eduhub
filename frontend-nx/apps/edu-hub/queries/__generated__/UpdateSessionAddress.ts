@@ -10,6 +10,10 @@
 export interface UpdateSessionAddress_update_SessionAddress_by_pk {
   __typename: "SessionAddress";
   id: number;
+  /**
+   * Foreign key to LocationAddress. Replaces the free-text address field with a structured address reference. Nullable during migration period.
+   */
+  locationAddressId: number | null;
 }
 
 export interface UpdateSessionAddress {
@@ -21,5 +25,5 @@ export interface UpdateSessionAddress {
 
 export interface UpdateSessionAddressVariables {
   itemId: number;
-  text: string;
+  value?: number | null;
 }

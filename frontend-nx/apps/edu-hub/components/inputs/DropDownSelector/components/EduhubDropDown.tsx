@@ -50,17 +50,19 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
   return (
     <div className="px-2">
       <div className={className || 'text-gray-400'}>
-        <div className="flex justify-between mb-2">
-          <div className="flex items-center">
-            {helpText && (
-              <Tooltip title={t(helpText)} placement="top">
-                <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
-              </Tooltip>
-            )}
-            {label}
+        {label && (
+          <div className="flex justify-between mb-2">
+            <div className="flex items-center">
+              {helpText && (
+                <Tooltip title={t(helpText)} placement="top">
+                  <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
+                </Tooltip>
+              )}
+              {label}
+            </div>
           </div>
-        </div>
-        <div>
+        )}
+        <div className="relative">
           {creatable && onInputChange && onCreateOption && getLabelForValue ? (
             <CreatableDropDown
               inputValue={inputValue || ''}
@@ -89,6 +91,13 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
                 </option>
               ))}
             </select>
+          )}
+          {!label && helpText && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+              <Tooltip title={t(helpText)} placement="top">
+                <HelpOutline style={{ cursor: 'pointer', pointerEvents: 'auto' }} />
+              </Tooltip>
+            </div>
           )}
         </div>
       </div>

@@ -640,7 +640,7 @@ export enum CourseInstructor_update_column {
  * unique or primary key constraints on table "CourseLocation"
  */
 export enum CourseLocation_constraint {
-  CourseAddress_pkey = "CourseAddress_pkey",
+  CourseLocation_pkey = "CourseLocation_pkey",
   unique_courseid_locationoption = "unique_courseid_locationoption",
 }
 
@@ -651,6 +651,7 @@ export enum CourseLocation_select_column {
   courseId = "courseId",
   created_at = "created_at",
   defaultSessionAddress = "defaultSessionAddress",
+  defaultSessionAddressId = "defaultSessionAddressId",
   id = "id",
   locationOption = "locationOption",
   updated_at = "updated_at",
@@ -663,6 +664,7 @@ export enum CourseLocation_update_column {
   courseId = "courseId",
   created_at = "created_at",
   defaultSessionAddress = "defaultSessionAddress",
+  defaultSessionAddressId = "defaultSessionAddressId",
   id = "id",
   locationOption = "locationOption",
   updated_at = "updated_at",
@@ -4550,6 +4552,7 @@ export interface CourseLocation_arr_rel_insert_input {
  */
 export interface CourseLocation_avg_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4565,6 +4568,7 @@ export interface CourseLocation_bool_exp {
   courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   defaultSessionAddress?: String_comparison_exp | null;
+  defaultSessionAddressId?: Int_comparison_exp | null;
   id?: Int_comparison_exp | null;
   locationOption?: LocationOption_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -4579,6 +4583,7 @@ export interface CourseLocation_insert_input {
   courseId?: number | null;
   created_at?: any | null;
   defaultSessionAddress?: string | null;
+  defaultSessionAddressId?: number | null;
   id?: number | null;
   locationOption?: LocationOption_enum | null;
   updated_at?: any | null;
@@ -4591,6 +4596,7 @@ export interface CourseLocation_max_order_by {
   courseId?: order_by | null;
   created_at?: order_by | null;
   defaultSessionAddress?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
   updated_at?: order_by | null;
 }
@@ -4602,6 +4608,7 @@ export interface CourseLocation_min_order_by {
   courseId?: order_by | null;
   created_at?: order_by | null;
   defaultSessionAddress?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
   updated_at?: order_by | null;
 }
@@ -4628,6 +4635,7 @@ export interface CourseLocation_on_conflict {
  */
 export interface CourseLocation_stddev_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4636,6 +4644,7 @@ export interface CourseLocation_stddev_order_by {
  */
 export interface CourseLocation_stddev_pop_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4644,6 +4653,7 @@ export interface CourseLocation_stddev_pop_order_by {
  */
 export interface CourseLocation_stddev_samp_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4652,6 +4662,7 @@ export interface CourseLocation_stddev_samp_order_by {
  */
 export interface CourseLocation_sum_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4660,6 +4671,7 @@ export interface CourseLocation_sum_order_by {
  */
 export interface CourseLocation_var_pop_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4668,6 +4680,7 @@ export interface CourseLocation_var_pop_order_by {
  */
 export interface CourseLocation_var_samp_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4676,6 +4689,7 @@ export interface CourseLocation_var_samp_order_by {
  */
 export interface CourseLocation_variance_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 

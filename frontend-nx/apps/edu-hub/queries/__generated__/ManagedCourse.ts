@@ -20,6 +20,10 @@ export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses_CourseLoca
    * Will be used as default for any new session address.
    */
   defaultSessionAddress: string | null;
+  /**
+   * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
+   */
+  defaultSessionAddressId: number | null;
 }
 
 export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses {
@@ -181,6 +185,10 @@ export interface ManagedCourse_Course_by_pk_CourseLocations {
    * Either 'ONLINE' or one of the possible given offline locations
    */
   locationOption: LocationOption_enum | null;
+  /**
+   * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
+   */
+  defaultSessionAddressId: number | null;
 }
 
 export interface ManagedCourse_Course_by_pk_Program {

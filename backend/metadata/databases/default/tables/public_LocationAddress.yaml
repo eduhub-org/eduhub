@@ -46,6 +46,19 @@ select_permissions:
         - updated_at
       filter: {}
       allow_aggregations: true
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - locationOptionId
+        - shortLabel
+        - address
+        - description
+        - aliases
+        - created_at
+        - updated_at
+      filter: {}
+      allow_aggregations: true
   - role: user_access
     permission:
       columns:
