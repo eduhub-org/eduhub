@@ -61,7 +61,7 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
   // Custom nullable label that shows the default address if one exists
   const nullableLabel = useMemo(() => {
     if (defaultAddressLabel) {
-      return `${defaultAddressLabel} (${t('sessionAddress.default')})`;
+      return `${defaultAddressLabel} (${t('sessionAddress.default_address')})`;
     }
     return t('sessionAddress.no_address_selected');
   }, [defaultAddressLabel, t]);

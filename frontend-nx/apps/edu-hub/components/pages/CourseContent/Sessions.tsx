@@ -1,4 +1,4 @@
-import { FC, useMemo, useState, useEffect } from 'react';
+import { FC, useMemo, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
@@ -61,12 +61,6 @@ export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLogge
     return map;
   }, [addressData]);
 
-  // Debugging: Log sessions data
-  useEffect(() => {
-    console.log('Sessions data:', sessions);
-    console.log('Address IDs:', addressIds);
-    console.log('Address data:', addressData);
-  }, [sessions, addressIds, addressData]);
 
   return (
     <>
@@ -102,13 +96,6 @@ export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLogge
                       const locationAddressId = (sessionAddress as any).locationAddressId;
                       const defaultSessionAddressId = (CourseLocation as any)?.defaultSessionAddressId;
 
-                      // Debugging: Log SessionAddress details
-                      console.log(
-                        `Session ${index}, Address ${addressIndex}:`,
-                        'locationAddressId:', locationAddressId,
-                        'defaultSessionAddressId:', defaultSessionAddressId,
-                        'legacy address:', address
-                      );
 
                       // Get the address to display using the new ID-based system
                       let displayAddress = '';

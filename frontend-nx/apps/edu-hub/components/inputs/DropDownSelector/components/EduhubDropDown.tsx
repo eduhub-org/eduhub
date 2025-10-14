@@ -40,7 +40,7 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
   getLabelForValue,
 }) => {
   const { t } = useTranslation();
-  const baseClass = 'w-full px-3 py-3 text-gray-500 rounded bg-edu-light-gray';
+  const baseClass = 'w-full pl-3 pr-10 py-3 text-gray-500 rounded bg-edu-light-gray';
   const finalClassName = `${baseClass} ${className}`;
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {

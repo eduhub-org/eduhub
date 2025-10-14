@@ -84,41 +84,43 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
           />
         </div>
       )}
-      <div className="col-span-7">
-        {isOnline ? (
-          <InputField
-            variant="eduhub"
-            type="link"
-            updateValueMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
-            refetchQueries={['ManagedCourse']}
-            itemId={location.id}
-            placeholder={t(address_placeholder)}
-            value={location?.defaultSessionAddress || ''}
-            className="mb-5"
-            showCharacterCount={false}
-          />
-        ) : (
-          <DropDownSelector
-            variant="eduhub"
-            label=""
-            placeholder={t(address_placeholder)}
-            helpText={t(address_placeholder)}
-            value={currentDefaultSessionAddressId?.toString() || ''}
-            options={addressOptions}
-            updateValueMutation={UPDATE_COURSE_DEFAULT_SESSION_ADDRESS_ID}
-            identifierVariables={{ 
-              itemId: location.id,
-              locationOptionId: location?.locationOption 
-            }}
-            creatable={true}
-            createOptionMutation={CREATE_LOCATION_ADDRESS}
-            refetchQueries={['ManagedCourse', 'LocationAddressByLocationOption']}
-            nullable={true}
-            nullableLabel={t('sessionAddress.no_address_selected')}
-            className="mb-2"
-          />
-        )}
-      </div>
+      {location && (
+        <div className="col-span-7">
+          {isOnline ? (
+            <InputField
+              variant="eduhub"
+              type="link"
+              updateValueMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
+              refetchQueries={['ManagedCourse']}
+              itemId={location.id}
+              placeholder={t(address_placeholder)}
+              value={location?.defaultSessionAddress || ''}
+              className="mb-5"
+              showCharacterCount={false}
+            />
+          ) : (
+            <DropDownSelector
+              variant="eduhub"
+              label=""
+              placeholder={t(address_placeholder)}
+              helpText={t(address_placeholder)}
+              value={currentDefaultSessionAddressId?.toString() || ''}
+              options={addressOptions}
+              updateValueMutation={UPDATE_COURSE_DEFAULT_SESSION_ADDRESS_ID}
+              identifierVariables={{ 
+                itemId: location.id,
+                locationOptionId: location?.locationOption 
+              }}
+              creatable={true}
+              createOptionMutation={CREATE_LOCATION_ADDRESS}
+              refetchQueries={['ManagedCourse', 'LocationAddressByLocationOption']}
+              nullable={true}
+              nullableLabel={t('sessionAddress.no_address_selected')}
+              className="mb-2"
+            />
+          )}
+        </div>
+      )}
       <div>{location && <DeleteButton handleDelete={handleDelete} />}</div>
     </div>
   );
