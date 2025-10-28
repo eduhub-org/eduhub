@@ -166,6 +166,7 @@ const ManageLocationAddressesContent: FC = () => {
       {
         accessorKey: 'shortLabel',
         header: t('locationAddress.shortLabel'),
+        enableSorting: true,
         meta: { width: 2 },
         cell: ({ getValue, row }) => (
           <InputField
@@ -183,6 +184,7 @@ const ManageLocationAddressesContent: FC = () => {
       {
         accessorKey: 'address',
         header: t('locationAddress.address'),
+        enableSorting: true,
         meta: { width: 4 },
         cell: ({ getValue, row }) => (
           <InputField
@@ -200,6 +202,7 @@ const ManageLocationAddressesContent: FC = () => {
       {
         accessorKey: 'locationOption',
         header: t('locationAddress.locationOption'),
+        enableSorting: true,
         meta: { width: 2 },
         cell: ({ getValue, row }) => (
           <DropDownSelector
@@ -220,6 +223,7 @@ const ManageLocationAddressesContent: FC = () => {
           return sessionCount + courseLocationCount;
         },
         header: t('locationAddress.usageCount'),
+        enableSorting: true,
         meta: { width: 1 },
         cell: ({ getValue }) => <div className="px-4 py-2">{getValue<number>()}</div>,
       },
