@@ -5,12 +5,12 @@ object_relationships:
   - name: CourseLocation
     using:
       foreign_key_constraint_on: courseLocationId
-  - name: Session
-    using:
-      foreign_key_constraint_on: sessionId
   - name: LocationAddress
     using:
       foreign_key_constraint_on: locationAddressId
+  - name: Session
+    using:
+      foreign_key_constraint_on: sessionId
 insert_permissions:
   - role: instructor_access
     permission:

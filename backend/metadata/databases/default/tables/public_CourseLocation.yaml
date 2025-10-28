@@ -32,9 +32,10 @@ insert_permissions:
               - defaultSessionAddressId:
                   _is_null: true
               - DefaultSessionAddress:
-                  LocationOption:
-                    value:
-                      _ceq: locationOption
+                  locationOption:
+                    _ceq:
+                      - $
+                      - locationOption
       columns:
         - courseId
         - defaultSessionAddress
@@ -84,9 +85,10 @@ update_permissions:
           - defaultSessionAddressId:
               _is_null: true
           - DefaultSessionAddress:
-              LocationOption:
-                value:
-                  _ceq: locationOption
+              locationOption:
+                _ceq:
+                  - $
+                  - locationOption
 delete_permissions:
   - role: instructor_access
     permission:

@@ -9,8 +9,8 @@ import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
-import { useRoleQuery } from '../../../hooks/authedQuery';
-import { useRoleMutation } from '../../../hooks/authedMutation';
+import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useAdminMutation } from '../../../hooks/authedMutation';
 import { PageBlock } from '../../common/PageBlock';
 
 import {
@@ -42,7 +42,7 @@ type ExpandableRowProps = {
 
 const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement => {
   const { t } = useTranslation('manageLocationAddresses');
-  useRoleQuery(LOCATION_ADDRESS_LIST);
+  useAdminQuery(LOCATION_ADDRESS_LIST);
 
   // Handle location address alias errors specifically
   const handleAliasError = useCallback(
@@ -132,7 +132,7 @@ const ManageLocationAddressesContent: FC = () => {
     setSearchFilter,
     refetch: debouncedRefetch,
   } = useTableGrid({
-    queryHook: useRoleQuery,
+    queryHook: useAdminQuery,
     query: LOCATION_ADDRESS_LIST,
     pageSize: pageSize,
     refetchFilter: (searchFilter) => ({
@@ -147,8 +147,8 @@ const ManageLocationAddressesContent: FC = () => {
     }),
   });
 
-  const [insertLocationAddress] = useRoleMutation(INSERT_LOCATION_ADDRESS);
-  const [deleteLocationAddress] = useRoleMutation(DELETE_LOCATION_ADDRESS);
+  const [insertLocationAddress] = useAdminMutation(INSERT_LOCATION_ADDRESS);
+  const [deleteLocationAddress] = useAdminMutation(DELETE_LOCATION_ADDRESS);
 
   const locationOptions = useMemo(
     () =>
@@ -183,7 +183,7 @@ const ManageLocationAddressesContent: FC = () => {
         header: t('locationAddress.address_or_link'),
         meta: { width: 4 },
         cell: ({ getValue, row }) => {
-          const isOnline = row.original.locationOptionId === 'ONLINE';
+          const isOnline = row.original.locationOption === 'ONLINE';
           return (
             <InputField
               variant="material"
@@ -199,7 +199,7 @@ const ManageLocationAddressesContent: FC = () => {
         },
       },
       {
-        accessorKey: 'locationOptionId',
+        accessorKey: 'locationOption',
         header: t('locationAddress.locationOption'),
         meta: { width: 2 },
         cell: ({ getValue, row }) => (
@@ -235,7 +235,7 @@ const ManageLocationAddressesContent: FC = () => {
           insertInput: {
             shortLabel: t('locationAddress.new_address'),
             address: t('locationAddress.default_address'),
-            locationOptionId: (locationOptions[0]?.value || 'KIEL') as LocationOption_enum,
+            locationOption: (locationOptions[0]?.value || 'KIEL') as LocationOption_enum,
             description: t('locationAddress.default_description'),
           },
         },

@@ -15,7 +15,7 @@ export interface InsertLocationAddress_insert_LocationAddress_one {
   /**
    * Foreign key to LocationOption. Each address must belong to exactly one location option.
    */
-  locationOptionId: LocationOption_enum;
+  locationOption: LocationOption_enum;
   /**
    * Concise label shown in lists and typeahead (e.g., "Room 2.12", "Main Building").
    */

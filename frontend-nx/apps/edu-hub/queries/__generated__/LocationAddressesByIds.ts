@@ -23,7 +23,7 @@ export interface LocationAddressesByIds_LocationAddress {
   /**
    * Foreign key to LocationOption. Each address must belong to exactly one location option.
    */
-  locationOptionId: LocationOption_enum;
+  locationOption: LocationOption_enum;
 }
 
 export interface LocationAddressesByIds {

@@ -34,7 +34,7 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
   // Query location addresses for the selected location option
   const { data: addressData } = useRoleQuery(LOCATION_ADDRESS_BY_LOCATION_OPTION, {
     variables: {
-      locationOptionId: address?.CourseLocation?.locationOption as LocationOption_enum,
+      locationOption: address?.CourseLocation?.locationOption as LocationOption_enum,
       searchFilter: '%',
     },
     skip: !address?.CourseLocation?.locationOption || isOnline,
@@ -103,7 +103,7 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
           updateValueMutation={UPDATE_SESSION_ADDRESS}
           identifierVariables={{ 
             itemId: address?.id,
-            locationOptionId: address?.CourseLocation?.locationOption 
+            locationOption: address?.CourseLocation?.locationOption 
           }}
           creatable={true}
           createOptionMutation={CREATE_LOCATION_ADDRESS}

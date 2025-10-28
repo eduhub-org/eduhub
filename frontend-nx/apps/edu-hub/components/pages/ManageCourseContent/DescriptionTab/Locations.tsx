@@ -52,7 +52,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
   // Query location addresses for the selected location option (skip for ONLINE)
   const { data: addressData } = useRoleQuery(LOCATION_ADDRESS_BY_LOCATION_OPTION, {
     variables: {
-      locationOptionId: location?.locationOption as LocationOption_enum,
+      locationOption: location?.locationOption as LocationOption_enum,
       searchFilter: '%',
     },
     skip: !location?.locationOption || isOnline,
@@ -109,7 +109,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
               updateValueMutation={UPDATE_COURSE_DEFAULT_SESSION_ADDRESS_ID}
               identifierVariables={{ 
                 itemId: location.id,
-                locationOptionId: location?.locationOption 
+                locationOption: location?.locationOption 
               }}
               creatable={true}
               createOptionMutation={CREATE_LOCATION_ADDRESS}

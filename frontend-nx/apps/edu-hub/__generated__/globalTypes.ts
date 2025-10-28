@@ -869,7 +869,7 @@ export enum LocationAddress_select_column {
   created_at = "created_at",
   description = "description",
   id = "id",
-  locationOptionId = "locationOptionId",
+  locationOption = "locationOption",
   shortLabel = "shortLabel",
   updated_at = "updated_at",
 }
@@ -883,7 +883,7 @@ export enum LocationAddress_update_column {
   created_at = "created_at",
   description = "description",
   id = "id",
-  locationOptionId = "locationOptionId",
+  locationOption = "locationOption",
   shortLabel = "shortLabel",
   updated_at = "updated_at",
 }
@@ -5491,7 +5491,7 @@ export interface LocationAddress_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   description?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
-  locationOptionId?: LocationOption_enum_comparison_exp | null;
+  locationOption?: LocationOption_enum_comparison_exp | null;
   shortLabel?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
@@ -5508,7 +5508,7 @@ export interface LocationAddress_insert_input {
   created_at?: any | null;
   description?: string | null;
   id?: number | null;
-  locationOptionId?: LocationOption_enum | null;
+  locationOption?: LocationOption_enum | null;
   shortLabel?: string | null;
   updated_at?: any | null;
 }
@@ -5566,7 +5566,7 @@ export interface LocationAddress_order_by {
   created_at?: order_by | null;
   description?: order_by | null;
   id?: order_by | null;
-  locationOptionId?: order_by | null;
+  locationOption?: order_by | null;
   shortLabel?: order_by | null;
   updated_at?: order_by | null;
 }
