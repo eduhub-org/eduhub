@@ -137,6 +137,7 @@ const ManageLocationAddressesContent: FC = () => {
     pageSize: pageSize,
     refetchFilter: (searchFilter) => ({
       filter: {
+        locationOption: { _neq: 'ONLINE' },
         _or: [
           { shortLabel: { _ilike: `%${searchFilter}%` } },
           { address: { _ilike: `%${searchFilter}%` } },
@@ -152,10 +153,11 @@ const ManageLocationAddressesContent: FC = () => {
 
   const locationOptions = useMemo(
     () =>
-      data?.LocationOption?.map((option: LocationOption) => ({
-        value: option.value,
-        label: t(`common:location.${option.value}`),
-      })) || [],
+      data?.LocationOption?.filter((option: LocationOption) => option.value !== 'ONLINE')
+        .map((option: LocationOption) => ({
+          value: option.value,
+          label: t(`common:location.${option.value}`),
+        })) || [],
     [data, t]
   );
 
@@ -180,23 +182,20 @@ const ManageLocationAddressesContent: FC = () => {
       },
       {
         accessorKey: 'address',
-        header: t('locationAddress.address_or_link'),
+        header: t('locationAddress.address'),
         meta: { width: 4 },
-        cell: ({ getValue, row }) => {
-          const isOnline = row.original.locationOption === 'ONLINE';
-          return (
-            <InputField
-              variant="material"
-              type={isOnline ? "input" : "textarea"}
-              placeholder={isOnline ? t('input.enter_link') : t('input.enter_address')}
-              helpText={isOnline ? t('help.link') : t('help.address')}
-              itemId={row.original.id}
-              value={getValue<string>()}
-              updateValueMutation={UPDATE_LOCATION_ADDRESS_ADDRESS}
-              refetchQueries={['LocationAddressList']}
-            />
-          );
-        },
+        cell: ({ getValue, row }) => (
+          <InputField
+            variant="material"
+            type="textarea"
+            placeholder={t('input.enter_address')}
+            helpText={t('help.address')}
+            itemId={row.original.id}
+            value={getValue<string>()}
+            updateValueMutation={UPDATE_LOCATION_ADDRESS_ADDRESS}
+            refetchQueries={['LocationAddressList']}
+          />
+        ),
       },
       {
         accessorKey: 'locationOption',
