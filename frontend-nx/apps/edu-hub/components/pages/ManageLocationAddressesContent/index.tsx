@@ -42,7 +42,6 @@ type ExpandableRowProps = {
 
 const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement => {
   const { t } = useTranslation('manageLocationAddresses');
-  useAdminQuery(LOCATION_ADDRESS_LIST);
 
   // Handle location address alias errors specifically
   const handleAliasError = useCallback(
