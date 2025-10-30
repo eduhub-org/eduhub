@@ -165,39 +165,25 @@ const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => 
   ];
 
   const participationEnrollments: ExtendedEnrollment[] = [...(course.CourseEnrollments || [])]
-    .filter((enrollment) => {
-      console.log('enrollment.status', enrollment.status);
-      console.log('enrollment.userId', enrollment.userId);
-      console.log('enrollment.courseId', enrollment.courseId);
-      return enrollment.status === 'CONFIRMED';
-    })
+    .filter((enrollment) => enrollment.status === 'CONFIRMED')
     .sort((a, b) => a.User.lastName.localeCompare(b.User.lastName))
     .map((enrollment) => {
       // get all records for this enrollment, with additional filtering by courseId
       const allRecords = course.AchievementOptionCourses.flatMap((courseOption) => {
-        console.log('courseOption', courseOption);
         return courseOption.AchievementOption.AchievementRecords.filter((record) => {
-          console.log('record.courseId', record.courseId);
-          console.log('course.id', course.id);
           return (
-            record.AchievementRecordAuthors.some((author) => {
-              console.log('author.userId', author.userId);
-              console.log('enrollment.User.id', enrollment.User.id);
-              return author.userId === enrollment.User.id;
-            }) && record.courseId === course.id
+            record.AchievementRecordAuthors.some((author) => author.userId === enrollment.User.id) &&
+            record.courseId === course.id
           );
         });
       });
 
-      // find most recent record for this enrollment
+      // find most recent record for this enrollment based on created_at timestamp
+      // sort by created_at descending and take the first one to ensure consistency
       const mostRecentRecord =
         allRecords.length > 0
-          ? allRecords.reduce((prevRecord, currRecord) =>
-              new Date(currRecord.created_at) > new Date(prevRecord.created_at) ? currRecord : prevRecord
-            )
+          ? allRecords.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
           : null;
-
-      console.log('mostRecentRecord', mostRecentRecord);
 
       // return a new object that combines the enrollment and its most recent record
       return {
