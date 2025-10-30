@@ -5,6 +5,9 @@ object_relationships:
   - name: Course
     using:
       foreign_key_constraint_on: courseId
+  - name: DefaultSessionAddress
+    using:
+      foreign_key_constraint_on: defaultSessionAddressId
   - name: LocationOption
     using:
       manual_configuration:
@@ -18,15 +21,25 @@ insert_permissions:
   - role: instructor_access
     permission:
       check:
-        Course:
-          CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
+        _and:
+          - Course:
+              CourseInstructors:
+                Expert:
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
+          - _or:
+              - defaultSessionAddressId:
+                  _is_null: true
+              - DefaultSessionAddress:
+                  locationOption:
+                    _ceq:
+                      - $
+                      - locationOption
       columns:
         - courseId
         - defaultSessionAddress
+        - defaultSessionAddressId
         - id
         - locationOption
 select_permissions:
@@ -35,6 +48,7 @@ select_permissions:
       columns:
         - courseId
         - defaultSessionAddress
+        - defaultSessionAddressId
         - id
         - locationOption
       filter: {}
@@ -45,6 +59,7 @@ select_permissions:
         - courseId
         - created_at
         - defaultSessionAddress
+        - defaultSessionAddressId
         - id
         - locationOption
         - updated_at
@@ -56,6 +71,7 @@ update_permissions:
       columns:
         - courseId
         - defaultSessionAddress
+        - defaultSessionAddressId
         - locationOption
       filter:
         Course:
@@ -64,7 +80,15 @@ update_permissions:
               User:
                 id:
                   _eq: X-Hasura-User-Id
-      check: null
+      check:
+        _or:
+          - defaultSessionAddressId:
+              _is_null: true
+          - DefaultSessionAddress:
+              locationOption:
+                _ceq:
+                  - $
+                  - locationOption
 delete_permissions:
   - role: instructor_access
     permission:

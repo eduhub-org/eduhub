@@ -14,7 +14,7 @@ export const LOCATION_ADDRESS_LIST = gql`
       order_by: $order_by
     ) {
       id
-      locationOptionId
+      locationOption
       shortLabel
       address
       description
@@ -26,6 +26,11 @@ export const LOCATION_ADDRESS_LIST = gql`
         comment
       }
       SessionAddresses_aggregate {
+        aggregate {
+          count
+        }
+      }
+      CourseLocations_aggregate {
         aggregate {
           count
         }
@@ -47,7 +52,7 @@ export const INSERT_LOCATION_ADDRESS = gql`
   mutation InsertLocationAddress($insertInput: LocationAddress_insert_input!) {
     insert_LocationAddress_one(object: $insertInput) {
       id
-      locationOptionId
+      locationOption
       shortLabel
       address
       description
@@ -99,10 +104,10 @@ export const UPDATE_LOCATION_ADDRESS_LOCATION_OPTION = gql`
   mutation UpdateLocationAddressLocationOption($id: Int!, $value: LocationOption_enum!) {
     update_LocationAddress_by_pk(
       pk_columns: { id: $id },
-      _set: { locationOptionId: $value }
+      _set: { locationOption: $value }
     ) {
       id
-      locationOptionId
+      locationOption
     }
   }
 `;
@@ -117,12 +122,12 @@ export const DELETE_LOCATION_ADDRESS = gql`
 
 export const LOCATION_ADDRESS_BY_LOCATION_OPTION = gql`
   query LocationAddressByLocationOption(
-    $locationOptionId: LocationOption_enum!
+    $locationOption: LocationOption_enum!
     $searchFilter: String = ""
   ) {
     LocationAddress(
       where: {
-        locationOptionId: { _eq: $locationOptionId }
+        locationOption: { _eq: $locationOption }
         _or: [
           { shortLabel: { _ilike: $searchFilter } }
           { address: { _ilike: $searchFilter } }
@@ -139,11 +144,22 @@ export const LOCATION_ADDRESS_BY_LOCATION_OPTION = gql`
 `;
 
 export const CREATE_LOCATION_ADDRESS = gql`
-  mutation CreateLocationAddress($value: String!, $locationOptionId: LocationOption_enum!) {
-    insert_LocationAddress_one(object: {shortLabel: $value, address: $value, locationOptionId: $locationOptionId}) {
+  mutation CreateLocationAddress($value: String!, $locationOption: LocationOption_enum!) {
+    insert_LocationAddress_one(object: {shortLabel: $value, address: $value, locationOption: $locationOption}) {
       id
       shortLabel
       address
+    }
+  }
+`;
+
+export const LOCATION_ADDRESSES_BY_IDS = gql`
+  query LocationAddressesByIds($ids: [Int!]!) {
+    LocationAddress(where: { id: { _in: $ids } }) {
+      id
+      shortLabel
+      address
+      locationOption
     }
   }
 `;

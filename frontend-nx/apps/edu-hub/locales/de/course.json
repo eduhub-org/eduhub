@@ -8,7 +8,8 @@
     "to_course_chat": "ZUM CHAT",
     "to_online_meeting": "ZUM ONLINE-MEETING",
     "speaker": "Referent:in",
-    "link_will_be_provided_soon": "[Link wird hier in Kürze bereitgestellt]"
+    "link_will_be_provided_soon": "(Link wird hier in Kürze bereitgestellt)",
+    "address_will_be_provided_soon": "(Adresse wird hier in Kürze angegeben)"
   },
   "ects": {
     "NONE": "OHNE",

@@ -15,7 +15,7 @@ export interface UpdateLocationAddressLocationOption_update_LocationAddress_by_p
   /**
    * Foreign key to LocationOption. Each address must belong to exactly one location option.
    */
-  locationOptionId: LocationOption_enum;
+  locationOption: LocationOption_enum;
 }
 
 export interface UpdateLocationAddressLocationOption {

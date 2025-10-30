@@ -1343,3 +1343,4 @@ SELECT pg_catalog.setval('public."Semester_Id_seq"', 7, true);
 SELECT pg_catalog.setval('public."SessionAddress_id_seq"', 12, true);
 SELECT pg_catalog.setval('public."SessionSpeaker_id_seq"', 1, false);
 SELECT pg_catalog.setval('public."User_Id_seq"', 1, false);
+SELECT pg_catalog.setval('public."CourseLocation_id_seq"', COALESCE((SELECT MAX(id) FROM public."CourseLocation"), 1));

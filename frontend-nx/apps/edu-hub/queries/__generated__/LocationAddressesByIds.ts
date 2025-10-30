@@ -6,10 +6,10 @@
 import { LocationOption_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL query operation: LocationAddressByLocationOption
+// GraphQL query operation: LocationAddressesByIds
 // ====================================================
 
-export interface LocationAddressByLocationOption_LocationAddress {
+export interface LocationAddressesByIds_LocationAddress {
   __typename: "LocationAddress";
   id: number;
   /**
@@ -21,19 +21,18 @@ export interface LocationAddressByLocationOption_LocationAddress {
    */
   address: string;
   /**
-   * JSON array of alias strings used for autocomplete filtering and search.
+   * Foreign key to LocationOption. Each address must belong to exactly one location option.
    */
-  aliases: any | null;
+  locationOption: LocationOption_enum;
 }
 
-export interface LocationAddressByLocationOption {
+export interface LocationAddressesByIds {
   /**
    * fetch data from the table: "LocationAddress"
    */
-  LocationAddress: LocationAddressByLocationOption_LocationAddress[];
+  LocationAddress: LocationAddressesByIds_LocationAddress[];
 }
 
-export interface LocationAddressByLocationOptionVariables {
-  locationOption: LocationOption_enum;
-  searchFilter?: string | null;
+export interface LocationAddressesByIdsVariables {
+  ids: number[];
 }

@@ -640,7 +640,7 @@ export enum CourseInstructor_update_column {
  * unique or primary key constraints on table "CourseLocation"
  */
 export enum CourseLocation_constraint {
-  CourseAddress_pkey = "CourseAddress_pkey",
+  CourseLocation_pkey = "CourseLocation_pkey",
   unique_courseid_locationoption = "unique_courseid_locationoption",
 }
 
@@ -651,6 +651,7 @@ export enum CourseLocation_select_column {
   courseId = "courseId",
   created_at = "created_at",
   defaultSessionAddress = "defaultSessionAddress",
+  defaultSessionAddressId = "defaultSessionAddressId",
   id = "id",
   locationOption = "locationOption",
   updated_at = "updated_at",
@@ -663,6 +664,7 @@ export enum CourseLocation_update_column {
   courseId = "courseId",
   created_at = "created_at",
   defaultSessionAddress = "defaultSessionAddress",
+  defaultSessionAddressId = "defaultSessionAddressId",
   id = "id",
   locationOption = "locationOption",
   updated_at = "updated_at",
@@ -867,7 +869,7 @@ export enum LocationAddress_select_column {
   created_at = "created_at",
   description = "description",
   id = "id",
-  locationOptionId = "locationOptionId",
+  locationOption = "locationOption",
   shortLabel = "shortLabel",
   updated_at = "updated_at",
 }
@@ -881,7 +883,7 @@ export enum LocationAddress_update_column {
   created_at = "created_at",
   description = "description",
   id = "id",
-  locationOptionId = "locationOptionId",
+  locationOption = "locationOption",
   shortLabel = "shortLabel",
   updated_at = "updated_at",
 }
@@ -4550,6 +4552,7 @@ export interface CourseLocation_arr_rel_insert_input {
  */
 export interface CourseLocation_avg_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4558,6 +4561,7 @@ export interface CourseLocation_avg_order_by {
  */
 export interface CourseLocation_bool_exp {
   Course?: Course_bool_exp | null;
+  DefaultSessionAddress?: LocationAddress_bool_exp | null;
   LocationOption?: LocationOption_bool_exp | null;
   _and?: CourseLocation_bool_exp[] | null;
   _not?: CourseLocation_bool_exp | null;
@@ -4565,6 +4569,7 @@ export interface CourseLocation_bool_exp {
   courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   defaultSessionAddress?: String_comparison_exp | null;
+  defaultSessionAddressId?: Int_comparison_exp | null;
   id?: Int_comparison_exp | null;
   locationOption?: LocationOption_enum_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
@@ -4575,10 +4580,12 @@ export interface CourseLocation_bool_exp {
  */
 export interface CourseLocation_insert_input {
   Course?: Course_obj_rel_insert_input | null;
+  DefaultSessionAddress?: LocationAddress_obj_rel_insert_input | null;
   LocationOption?: LocationOption_obj_rel_insert_input | null;
   courseId?: number | null;
   created_at?: any | null;
   defaultSessionAddress?: string | null;
+  defaultSessionAddressId?: number | null;
   id?: number | null;
   locationOption?: LocationOption_enum | null;
   updated_at?: any | null;
@@ -4591,6 +4598,7 @@ export interface CourseLocation_max_order_by {
   courseId?: order_by | null;
   created_at?: order_by | null;
   defaultSessionAddress?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
   updated_at?: order_by | null;
 }
@@ -4602,6 +4610,7 @@ export interface CourseLocation_min_order_by {
   courseId?: order_by | null;
   created_at?: order_by | null;
   defaultSessionAddress?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
   updated_at?: order_by | null;
 }
@@ -4628,6 +4637,7 @@ export interface CourseLocation_on_conflict {
  */
 export interface CourseLocation_stddev_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4636,6 +4646,7 @@ export interface CourseLocation_stddev_order_by {
  */
 export interface CourseLocation_stddev_pop_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4644,6 +4655,7 @@ export interface CourseLocation_stddev_pop_order_by {
  */
 export interface CourseLocation_stddev_samp_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4652,6 +4664,7 @@ export interface CourseLocation_stddev_samp_order_by {
  */
 export interface CourseLocation_sum_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4660,6 +4673,7 @@ export interface CourseLocation_sum_order_by {
  */
 export interface CourseLocation_var_pop_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4668,6 +4682,7 @@ export interface CourseLocation_var_pop_order_by {
  */
 export interface CourseLocation_var_samp_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4676,6 +4691,7 @@ export interface CourseLocation_var_samp_order_by {
  */
 export interface CourseLocation_variance_order_by {
   courseId?: order_by | null;
+  defaultSessionAddressId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -5462,6 +5478,8 @@ export interface LocationAddress_avg_order_by {
  * Boolean expression to filter rows from the table "LocationAddress". All fields are combined with a logical 'AND'.
  */
 export interface LocationAddress_bool_exp {
+  CourseLocations?: CourseLocation_bool_exp | null;
+  CourseLocations_aggregate?: CourseLocation_aggregate_bool_exp | null;
   LocationOption?: LocationOption_bool_exp | null;
   SessionAddresses?: SessionAddress_bool_exp | null;
   SessionAddresses_aggregate?: SessionAddress_aggregate_bool_exp | null;
@@ -5473,7 +5491,7 @@ export interface LocationAddress_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   description?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
-  locationOptionId?: LocationOption_enum_comparison_exp | null;
+  locationOption?: LocationOption_enum_comparison_exp | null;
   shortLabel?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
 }
@@ -5482,6 +5500,7 @@ export interface LocationAddress_bool_exp {
  * input type for inserting data into table "LocationAddress"
  */
 export interface LocationAddress_insert_input {
+  CourseLocations?: CourseLocation_arr_rel_insert_input | null;
   LocationOption?: LocationOption_obj_rel_insert_input | null;
   SessionAddresses?: SessionAddress_arr_rel_insert_input | null;
   address?: string | null;
@@ -5489,7 +5508,7 @@ export interface LocationAddress_insert_input {
   created_at?: any | null;
   description?: string | null;
   id?: number | null;
-  locationOptionId?: LocationOption_enum | null;
+  locationOption?: LocationOption_enum | null;
   shortLabel?: string | null;
   updated_at?: any | null;
 }
@@ -5539,6 +5558,7 @@ export interface LocationAddress_on_conflict {
  * Ordering options when selecting data from "LocationAddress".
  */
 export interface LocationAddress_order_by {
+  CourseLocations_aggregate?: CourseLocation_aggregate_order_by | null;
   LocationOption?: LocationOption_order_by | null;
   SessionAddresses_aggregate?: SessionAddress_aggregate_order_by | null;
   address?: order_by | null;
@@ -5546,7 +5566,7 @@ export interface LocationAddress_order_by {
   created_at?: order_by | null;
   description?: order_by | null;
   id?: order_by | null;
-  locationOptionId?: order_by | null;
+  locationOption?: order_by | null;
   shortLabel?: order_by | null;
   updated_at?: order_by | null;
 }

@@ -8,7 +8,8 @@
     "to_course_chat": "GO TO CHAT",
     "to_online_meeting": "GO TO ONLINE MEETING",
   "speaker": "Speaker",
-    "link_will_be_provided_soon": "[Link will be provided here soon]"
+    "link_will_be_provided_soon": "(Link will be provided here soon)",
+    "address_will_be_provided_soon": "(Address will be provided here soon)"
   },
   "ects": {
     "NONE": "NONE",

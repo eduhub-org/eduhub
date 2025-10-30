@@ -18,6 +18,7 @@ export const SESSION_FRAGMENT = gql`
         id
         locationOption
         defaultSessionAddress
+        defaultSessionAddressId
       }
     }
     SessionSpeakers {
