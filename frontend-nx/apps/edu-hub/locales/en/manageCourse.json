@@ -27,6 +27,11 @@
   "certificate": "Certificate",
   "projectTitle": "Project title",
   "lastRecordUpload": "Upload Date",
+  "generate_achievement_certificates": "Generate Achievement Certificates",
+  "delete_achievement_certificates": "Delete Achievement Certificates",
+  "no_certificates_deleted": "No certificates were deleted",
+  "certificate_deleted_singular": "{{count}} achievement certificate was deleted",
+  "certificates_deleted_plural": "{{count}} achievement certificates were deleted",
   "max_participants": {
     "label": "Max. Teilnehmendenanzahl",
     "placeholder": "Max. Teilnehmendenanzahl",

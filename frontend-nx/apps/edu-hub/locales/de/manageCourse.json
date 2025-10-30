@@ -27,6 +27,11 @@
   "certificate": "Zertifikat",
   "projectTitle": "Projekttitel",
   "lastRecordUpload": "Upload Datum",
+  "generate_achievement_certificates": "Leistungsnachweise generieren",
+  "delete_achievement_certificates": "Leistungsnachweise löschen",
+  "no_certificates_deleted": "Es wurden keine Zertifikate gelöscht",
+  "certificate_deleted_singular": "{{count}} Leistungsnachweis wurde gelöscht",
+  "certificates_deleted_plural": "{{count}} Leistungsnachweise wurden gelöscht",
   "max_participants": {
     "label": "Max. Teilnehmendenanzahl",
     "placeholder": "Max. Teilnehmendenanzahl",
