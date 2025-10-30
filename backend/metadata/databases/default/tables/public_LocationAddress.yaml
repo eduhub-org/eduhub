@@ -21,15 +21,6 @@ array_relationships:
           name: SessionAddress
           schema: public
 insert_permissions:
-  - role: admin
-    permission:
-      check: {}
-      columns:
-        - locationOption
-        - shortLabel
-        - address
-        - description
-        - aliases
   - role: instructor_access
     permission:
       check: {}
@@ -49,19 +40,6 @@ insert_permissions:
         - description
         - aliases
 select_permissions:
-  - role: admin
-    permission:
-      columns:
-        - id
-        - locationOption
-        - shortLabel
-        - address
-        - description
-        - aliases
-        - created_at
-        - updated_at
-      filter: {}
-      allow_aggregations: true
   - role: anonymous
     permission:
       columns:
@@ -102,16 +80,6 @@ select_permissions:
       filter: {}
       allow_aggregations: true
 update_permissions:
-  - role: admin
-    permission:
-      columns:
-        - locationOption
-        - shortLabel
-        - address
-        - description
-        - aliases
-      filter: {}
-      check: {}
   - role: instructor_access
     permission:
       columns:
@@ -131,9 +99,6 @@ update_permissions:
       filter: {}
       check: {}
 delete_permissions:
-  - role: admin
-    permission:
-      filter: {}
   - role: instructor_access
     permission:
       filter: {}
