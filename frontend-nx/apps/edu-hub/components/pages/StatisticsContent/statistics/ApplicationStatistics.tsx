@@ -29,7 +29,7 @@ export const ApplicationStatistics: FC = () => {
   // Transform programs data for tag selector, sorted by application start date (future/upcoming first)
   const programOptions = useMemo(
     () =>
-      programListData?.Program
+      (programListData?.Program ?? [])
         .slice() // Create a copy to avoid mutating the original array
         .sort((a, b) => {
           // Sort by applicationStart in descending order (most recent/future first)
@@ -45,7 +45,7 @@ export const ApplicationStatistics: FC = () => {
         .map((program) => ({
           id: program.id,
           name: program.title,
-        })) || [],
+        })),
     [programListData]
   );
 
