@@ -54,7 +54,9 @@ services:
 
   python_functions:
     container_name: eduhub-python-functions
-    image: python:3.11-slim-bullseye
+    build:
+      context: ./functions
+      dockerfile: Dockerfile
     working_dir: /functions
     volumes:
       - ./functions:/functions
