@@ -23,7 +23,8 @@
         },
         "daily": "Daily Applications",
         "cumulative": "Cumulative Applications",
-        "no_data_available": "No data available"
+        "no_data_available": "No data available",
+        "use_actual_dates": "Use Calendar Date on X-Axis"
     },
     "course_statistics": {
         "label": "Course Statistics",
