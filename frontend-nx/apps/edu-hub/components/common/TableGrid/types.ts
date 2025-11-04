@@ -9,6 +9,7 @@ export interface BaseRow {
 export interface BulkAction {
   value: string;
   label: string;
+  group?: string; // Optional group name for grouping menu items
 }
 
 export interface TableGridProps<T extends BaseRow> {

@@ -1,6 +1,6 @@
 import { BaseRow, TableGridProps } from './types';
 import React, { useState, useMemo, useCallback } from 'react';
-import { TextField, Checkbox, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
+import { TextField, Checkbox, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent, ListSubheader, Divider } from '@mui/material';
 import useTranslation from 'next-translate/useTranslation';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
 import { MdArrowBack, MdArrowForward } from 'react-icons/md';
@@ -20,7 +20,7 @@ import AddButton from '../AddButton';
 import { useBulkActions } from './hooks';
 import TableGridDeleteButton from './components/TableGridDeleteButton';
 
-const TableGrid = <T extends BaseRow>({
+const TableGrid = <T extends BaseRow,>({
   addButtonText,
   data,
   columns,
@@ -237,11 +237,26 @@ const TableGrid = <T extends BaseRow>({
                 <MenuItem value="">
                   <em>{t('common:table_grid.none')}</em>
                 </MenuItem>
-                {bulkActions.map((action) => (
-                  <MenuItem key={action.value} value={action.value}>
-                    {action.label}
-                  </MenuItem>
-                ))}
+                {bulkActions.reduce((acc, action, index) => {
+                  // Add group header if this is the first item in a group
+                  if (action.group && (index === 0 || bulkActions[index - 1]?.group !== action.group)) {
+                    // Add divider before group (always add divider before groups, except for the first group)
+                    if (index > 0) {
+                      acc.push(<Divider key={`divider-before-${action.value}`} sx={{ borderColor: 'rgba(0, 0, 0, 0.12)' }} />);
+                    }
+                    acc.push(
+                      <ListSubheader key={`group-${action.group}`} sx={{ color: 'rgba(0, 0, 0, 0.6)', backgroundColor: 'rgba(0, 0, 0, 0.04)', fontWeight: 600, fontSize: '0.75rem', lineHeight: 1.5 }}>
+                        {action.group}
+                      </ListSubheader>
+                    );
+                  }
+                  acc.push(
+                    <MenuItem key={action.value} value={action.value} sx={{ pl: action.group ? 3 : 1 }}>
+                      {action.label}
+                    </MenuItem>
+                  );
+                  return acc;
+                }, [] as React.ReactNode[])}
               </Select>
             </FormControl>
           )}
@@ -322,7 +337,10 @@ const TableGrid = <T extends BaseRow>({
       {/* Data Rows */}
       {!loading &&
         !error &&
-        table.getRowModel().rows.map((row) => (
+        (enablePagination
+          ? table.getRowModel().rows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize)
+          : table.getRowModel().rows
+        ).map((row) => (
           <React.Fragment key={row.id}>
             {/* Primary Row */}
             <div className={`flex items-stretch ${expandedRows.has(row.original.id) ? 'mb-0' : 'mb-1'}`}>
@@ -354,7 +372,7 @@ const TableGrid = <T extends BaseRow>({
                 </div>
               )}
               {deleteMutation && (
-                <div className="w-20 flex-shrink-0 flex items-center justify-center py-2 pl-4">
+                <div className="w-20 flex-shrink-0 flex items-center justify-center">
                   <TableGridDeleteButton
                     deleteMutation={deleteMutation}
                     id={row.original.id}
@@ -369,13 +387,13 @@ const TableGrid = <T extends BaseRow>({
                 </div>
               )}
             </div>
-            {/* Expandable Second Row */}
-            {expandedRows.has(row.original.id) && expandableRowComponent && (
-              <div className="flex mb-1">
-                <div className={`flex-grow bg-edu-light-gray py-2 ${!showCheckbox ? 'pl-3' : ''}`}>
+            {/* Expandable Row */}
+            {expandableRowComponent && expandedRows.has(row.original.id) && (
+              <div className="flex items-stretch mb-1">
+                <div className="flex-grow bg-edu-light-gray py-2">
                   <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
                 </div>
-                <div className="w-10 flex-shrink-0"></div>
+                {expandableRowComponent && <div className="w-10 flex-shrink-0"></div>}
                 {deleteMutation && <div className="w-20 flex-shrink-0"></div>}
               </div>
             )}

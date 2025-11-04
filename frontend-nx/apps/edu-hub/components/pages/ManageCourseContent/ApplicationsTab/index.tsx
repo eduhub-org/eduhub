@@ -1,14 +1,12 @@
 import { QueryResult } from '@apollo/client';
 import { FC, useCallback, useMemo, useState } from 'react';
-import { Button } from '../../../common/Button';
-
 import {
   ManagedCourse_Course_by_pk,
   ManagedCourse_Course_by_pk_CourseEnrollments,
 } from '../../../../queries/__generated__/ManagedCourse';
-import { ApplicationRow } from './ApplicationRow';
 import Dot from '../../../common/Dot';
-import { OnlyAdmin } from '../../../common/OnlyLoggedIn';
+import { OnlyAdmin, OnlyInstructor } from '../../../common/OnlyLoggedIn';
+import { useIsInstructor } from '../../../../hooks/authentication';
 import {
   identityEventMapper,
   pickIdPkMapper,
@@ -33,6 +31,14 @@ import useTranslation from 'next-translate/useTranslation';
 import AddButton from '../../../common/AddButton';
 import Modal from '../../../common/Modal';
 import AddParticipantsForm from './AddParticipantsForm';
+import TableGrid from '../../../common/TableGrid';
+import { ColumnDef } from '@tanstack/react-table';
+import { GoDotFill } from 'react-icons/go';
+import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
+import { MotivationRating_enum, CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
+import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
+import { BulkAction } from '../../../common/TableGrid/types';
+import { ApolloError } from '@apollo/client';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -40,14 +46,20 @@ interface IProps {
 }
 
 const now = new Date();
-const nextWeek = new Date();
-nextWeek.setDate(nextWeek.getDate() + 7);
+
+const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) => {
+  if (enrollment.invitationExpirationDate == null) {
+    return false;
+  }
+  return new Date(enrollment.invitationExpirationDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
+};
 
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const { t, lang } = useTranslation('manageCourse');
+  const displayDate = useDisplayDate();
+  const isInstructor = useIsInstructor();
 
   const applicationStats = useMemo(() => {
-    console.log(course.CourseEnrollments);
     const totalApplications = course.CourseEnrollments.length;
     const approvedApplications = course.CourseEnrollments.filter(
       (enrollment) => enrollment.motivationRating === 'INVITE'
@@ -83,77 +95,122 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     </>
   );
 
-  const [selectedEnrollments, setSelectedEnrollments] = useState([] as number[]);
-
-  const [inviteExpireDate, setInviteExpireDate] = useState(nextWeek);
-  const handleSetInviteExpireDate = useCallback(
-    (d: Date | null) => {
-      setInviteExpireDate(d || new Date());
-    },
-    [setInviteExpireDate]
-  );
-  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
-  const handleCloseInviteDialog = useCallback(() => {
-    setIsInviteDialogOpen(false);
-  }, [setIsInviteDialogOpen]);
-  const handleOpenInviteDialog = useCallback(() => {
-    setIsInviteDialogOpen(true);
-  }, [setIsInviteDialogOpen]);
-
   const [updateEnrollmentStatus] = useRoleMutation<UpdateEnrollmentStatus, UpdateEnrollmentStatusVariables>(
     UPDATE_ENROLLMENT_STATUS
   );
-  const handleSendInvitesAndRejections = useCallback(async () => {
-    const relevantEnrollments = selectedEnrollments
-      .map((eid) => {
-        const ce = course.CourseEnrollments.find((e) => e.id === eid);
-        return ce;
-      })
-      .filter(
-        (x) => x != null && ['APPLIED', 'INVITED', 'REJECTED'].includes(x.status)
-      ) as ManagedCourse_Course_by_pk_CourseEnrollments[];
+
+  // Calculate default invitation expiration date (3 days before first session, or 3 days from now)
+  const getDefaultInviteExpireDate = useCallback(() => {
+    if (course.Sessions && course.Sessions.length > 0) {
+      const firstSession = course.Sessions[0];
+      const firstSessionDate = new Date(firstSession.startDateTime);
+      const defaultDate = new Date(firstSessionDate);
+      defaultDate.setDate(defaultDate.getDate() - 3);
+      // Make sure it's not in the past
+      return defaultDate < now ? new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000) : defaultDate;
+    }
+    // If no sessions, default to 3 days from now
+    const defaultDate = new Date();
+    defaultDate.setDate(defaultDate.getDate() + 3);
+    return defaultDate;
+  }, [course.Sessions]);
+
+  const [inviteExpireDate, setInviteExpireDate] = useState(() => getDefaultInviteExpireDate());
+  const handleSetInviteExpireDate = useCallback(
+    (d: Date | null) => {
+      setInviteExpireDate(d || getDefaultInviteExpireDate());
+    },
+    [getDefaultInviteExpireDate]
+  );
+
+  // Dialog state for invitations
+  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+  const [inviteDialogData, setInviteDialogData] = useState<{
+    enrollmentsToSend: ManagedCourse_Course_by_pk_CourseEnrollments[];
+    selectedCount?: number;
+    identifiedCount: number;
+    actionType: 'selected' | 'all';
+  } | null>(null);
+
+  const handleOpenInviteDialog = useCallback(
+    (enrollmentsToSend: ManagedCourse_Course_by_pk_CourseEnrollments[], selectedCount: number | undefined, identifiedCount: number, actionType: 'selected' | 'all') => {
+      setInviteDialogData({ enrollmentsToSend, selectedCount, identifiedCount, actionType });
+      setInviteExpireDate(getDefaultInviteExpireDate());
+      setIsInviteDialogOpen(true);
+    },
+    [getDefaultInviteExpireDate]
+  );
+
+  const handleCloseInviteDialog = useCallback(() => {
+    setIsInviteDialogOpen(false);
+    setInviteDialogData(null);
+  }, []);
+
+  const handleSendInvitations = useCallback(async () => {
+    if (!inviteDialogData) return;
 
     try {
-      for (const enrollment of relevantEnrollments) {
-        let newStatus;
-        if (enrollment.motivationRating === 'INVITE') {
-          newStatus = 'INVITED';
-        } else if (enrollment.motivationRating === 'DECLINE') {
-          newStatus = 'REJECTED';
-        } else {
-          continue;
-        }
-
-        // Update enrollment status - email will be sent automatically via event trigger
+      for (const enrollment of inviteDialogData.enrollmentsToSend) {
         await updateEnrollmentStatus({
           variables: {
             enrollmentId: enrollment.id,
-            expire: newStatus === 'INVITED' ? inviteExpireDate : null,
-            status: newStatus,
+            expire: inviteExpireDate,
+            status: CourseEnrollmentStatus_enum.INVITED,
           },
         });
       }
     } finally {
       qResult.refetch();
-      setIsInviteDialogOpen(false);
-      setSelectedEnrollments([]);
+      handleCloseInviteDialog();
     }
-  }, [selectedEnrollments, updateEnrollmentStatus, qResult, setIsInviteDialogOpen, inviteExpireDate, course]);
+  }, [inviteDialogData, inviteExpireDate, updateEnrollmentStatus, qResult, handleCloseInviteDialog]);
 
-  const handleSelectRow = useCallback(
-    (enrollmentId: number, selected: boolean) => {
-      if (selected) {
-        if (!selectedEnrollments.includes(enrollmentId)) {
-          const copy = [...selectedEnrollments];
-          copy.push(enrollmentId);
-          setSelectedEnrollments(copy);
-        }
-      } else {
-        setSelectedEnrollments(selectedEnrollments.filter((id) => id !== enrollmentId));
-      }
+  // Dialog state for rejections
+  const [isRejectionDialogOpen, setIsRejectionDialogOpen] = useState(false);
+  const [rejectionDialogData, setRejectionDialogData] = useState<{
+    enrollmentsToSend: ManagedCourse_Course_by_pk_CourseEnrollments[];
+    selectedCount?: number;
+    identifiedCount: number;
+    actionType: 'selected' | 'all';
+  } | null>(null);
+
+  const handleOpenRejectionDialog = useCallback(
+    (enrollmentsToSend: ManagedCourse_Course_by_pk_CourseEnrollments[], selectedCount: number | undefined, identifiedCount: number, actionType: 'selected' | 'all') => {
+      setRejectionDialogData({ enrollmentsToSend, selectedCount, identifiedCount, actionType });
+      setIsRejectionDialogOpen(true);
     },
-    [selectedEnrollments, setSelectedEnrollments]
+    []
   );
+
+  const handleCloseRejectionDialog = useCallback(() => {
+    setIsRejectionDialogOpen(false);
+    setRejectionDialogData(null);
+  }, []);
+
+  const handleSendRejections = useCallback(async () => {
+    if (!rejectionDialogData) return;
+
+    try {
+      for (const enrollment of rejectionDialogData.enrollmentsToSend) {
+        await updateEnrollmentStatus({
+          variables: {
+            enrollmentId: enrollment.id,
+            expire: null,
+            status: CourseEnrollmentStatus_enum.REJECTED,
+          },
+        });
+      }
+    } finally {
+      qResult.refetch();
+      handleCloseRejectionDialog();
+    }
+  }, [rejectionDialogData, updateEnrollmentStatus, qResult, handleCloseRejectionDialog]);
+
+  // Dialog state for "no selection" warning
+  const [isNoSelectionDialogOpen, setIsNoSelectionDialogOpen] = useState(false);
+  const handleCloseNoSelectionDialog = useCallback(() => {
+    setIsNoSelectionDialogOpen(false);
+  }, []);
 
   const setEnrollmentRating = useUpdateCallback2<UpdateEnrollmentRating, UpdateEnrollmentRatingVariables>(
     UPDATE_ENROLLMENT_RATING,
@@ -170,17 +227,452 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     return result;
   }, [course]);
 
-  const getEmailsOfConfirmedApplications = () => {
-    return courseEnrollments
-      .filter((enrollment) => enrollment.status === 'CONFIRMED')
-      .map((enrollment) => enrollment.User.email)
-      .join(',');
-  };
-
   const [isAddParticipantsModalOpen, setAddParticipantsModalOpen] = useState(false);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(20);
+  const [searchFilter, setSearchFilter] = useState('');
 
   const openAddParticipantsModal = () => setAddParticipantsModalOpen(true);
   const closeAddParticipantsModal = () => setAddParticipantsModalOpen(false);
+
+  // Filter enrollments (TableGrid will handle sorting and pagination)
+  const filteredEnrollments = useMemo(() => {
+    let filtered = courseEnrollments;
+    
+    if (searchFilter) {
+      const searchLower = searchFilter.toLowerCase();
+      filtered = filtered.filter((enrollment) => {
+        return (
+          enrollment.User.firstName.toLowerCase().includes(searchLower) ||
+          enrollment.User.lastName.toLowerCase().includes(searchLower) ||
+          enrollment.User.email.toLowerCase().includes(searchLower) ||
+          enrollment.motivationLetter.toLowerCase().includes(searchLower)
+        );
+      });
+    }
+    
+    return filtered;
+  }, [courseEnrollments, searchFilter]);
+
+  // Bulk actions handler
+  const handleBulkEmailAction = useCallback(
+    (action: string, selectedRows: ManagedCourse_Course_by_pk_CourseEnrollments[]) => {
+      let targetEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[] = [];
+
+      // Handle invitation actions
+      if (action === 'send_invitations_selected') {
+        if (selectedRows.length === 0) {
+          setIsNoSelectionDialogOpen(true);
+          return;
+        }
+        const enrollmentsToSend = selectedRows.filter(
+          (e) => e.motivationRating === 'INVITE' && ['APPLIED', 'INVITED', 'REJECTED'].includes(e.status)
+        );
+        if (enrollmentsToSend.length > 0) {
+          handleOpenInviteDialog(enrollmentsToSend, selectedRows.length, enrollmentsToSend.length, 'selected');
+        }
+        return;
+      } else if (action === 'send_invitations_all') {
+        const enrollmentsToSend = courseEnrollments.filter(
+          (e) => e.motivationRating === 'INVITE' && ['APPLIED', 'INVITED', 'REJECTED'].includes(e.status)
+        );
+        if (enrollmentsToSend.length > 0) {
+          handleOpenInviteDialog(enrollmentsToSend, undefined, enrollmentsToSend.length, 'all');
+        }
+        return;
+      }
+
+      // Handle rejection actions
+      if (action === 'send_rejections_selected') {
+        if (selectedRows.length === 0) {
+          setIsNoSelectionDialogOpen(true);
+          return;
+        }
+        const enrollmentsToSend = selectedRows.filter(
+          (e) => e.motivationRating === 'DECLINE' && ['APPLIED', 'INVITED', 'REJECTED'].includes(e.status)
+        );
+        if (enrollmentsToSend.length > 0) {
+          handleOpenRejectionDialog(enrollmentsToSend, selectedRows.length, enrollmentsToSend.length, 'selected');
+        }
+        return;
+      } else if (action === 'send_rejections_all') {
+        const enrollmentsToSend = courseEnrollments.filter(
+          (e) => e.motivationRating === 'DECLINE' && ['APPLIED', 'INVITED', 'REJECTED'].includes(e.status)
+        );
+        if (enrollmentsToSend.length > 0) {
+          handleOpenRejectionDialog(enrollmentsToSend, undefined, enrollmentsToSend.length, 'all');
+        }
+        return;
+      }
+
+      // Handle email actions (existing)
+      if (action === 'email_selected') {
+        targetEnrollments = selectedRows;
+      } else if (action.startsWith('email_status_')) {
+        const status = action.replace('email_status_', '') as CourseEnrollmentStatus_enum;
+        targetEnrollments = courseEnrollments.filter((e) => e.status === status);
+      } else if (action.startsWith('email_rating_')) {
+        const rating = action.replace('email_rating_', '') as MotivationRating_enum;
+        targetEnrollments = courseEnrollments.filter((e) => e.motivationRating === rating);
+      }
+
+      if (targetEnrollments.length === 0) {
+        return;
+      }
+
+      const emails = targetEnrollments.map((e) => e.User.email).filter(Boolean).join(',');
+      if (emails) {
+        window.location.href = `mailto:?bcc=${emails}`;
+      }
+    },
+    [courseEnrollments, handleOpenInviteDialog, handleOpenRejectionDialog, setIsNoSelectionDialogOpen]
+  );
+
+  const bulkActions: BulkAction[] = useMemo(() => {
+    const actions: BulkAction[] = [
+      { value: 'email_selected', label: t('email_selected') },
+    ];
+
+    // Invitation actions - only for instructors
+    if (isInstructor && courseEnrollments.some((e) => e.motivationRating === 'INVITE')) {
+      actions.push({
+        value: 'send_invitations_selected',
+        label: t('send_invitations_selected'),
+        group: t('send_invitations'),
+      });
+      actions.push({
+        value: 'send_invitations_all',
+        label: t('send_invitations_all'),
+        group: t('send_invitations'),
+      });
+    }
+
+    // Rejection actions - only for instructors
+    if (isInstructor && courseEnrollments.some((e) => e.motivationRating === 'DECLINE')) {
+      actions.push({
+        value: 'send_rejections_selected',
+        label: t('send_rejections_selected'),
+        group: t('send_rejections'),
+      });
+      actions.push({
+        value: 'send_rejections_all',
+        label: t('send_rejections_all'),
+        group: t('send_rejections'),
+      });
+    }
+
+    // Email by status
+    if (courseEnrollments.some((e) => e.status === 'CONFIRMED')) {
+      actions.push({
+        value: 'email_status_CONFIRMED',
+        label: t('email_all_confirmed'),
+        group: t('email_all_by_status'),
+      });
+    }
+    if (courseEnrollments.some((e) => e.status === 'INVITED')) {
+      actions.push({
+        value: 'email_status_INVITED',
+        label: t('email_all_invited'),
+        group: t('email_all_by_status'),
+      });
+    }
+    if (courseEnrollments.some((e) => e.status === 'APPLIED')) {
+      actions.push({
+        value: 'email_status_APPLIED',
+        label: t('email_all_applied'),
+        group: t('email_all_by_status'),
+      });
+    }
+    if (courseEnrollments.some((e) => e.status === 'REJECTED')) {
+      actions.push({
+        value: 'email_status_REJECTED',
+        label: t('email_all_rejected'),
+        group: t('email_all_by_status'),
+      });
+    }
+
+    // Email by rating
+    if (courseEnrollments.some((e) => e.motivationRating === 'INVITE')) {
+      actions.push({
+        value: 'email_rating_INVITE',
+        label: t('email_all_invite_rating'),
+        group: t('email_all_by_rating'),
+      });
+    }
+    if (courseEnrollments.some((e) => e.motivationRating === 'DECLINE')) {
+      actions.push({
+        value: 'email_rating_DECLINE',
+        label: t('email_all_decline_rating'),
+        group: t('email_all_by_rating'),
+      });
+    }
+    if (courseEnrollments.some((e) => e.motivationRating === 'REVIEW')) {
+      actions.push({
+        value: 'email_rating_REVIEW',
+        label: t('email_all_review_rating'),
+        group: t('email_all_by_rating'),
+      });
+    }
+
+    return actions;
+  }, [courseEnrollments, t, isInstructor]);
+
+  // Rating sort function
+  const ratingSortFn = useCallback((a: MotivationRating_enum, b: MotivationRating_enum) => {
+    const order: Record<MotivationRating_enum, number> = {
+      UNRATED: 0,
+      REVIEW: 1,
+      DECLINE: 2,
+      INVITE: 3,
+    };
+    return order[a] - order[b];
+  }, []);
+
+  // Status sort function
+  const statusSortFn = useCallback((a: CourseEnrollmentStatus_enum, b: CourseEnrollmentStatus_enum) => {
+    const order: Record<CourseEnrollmentStatus_enum, number> = {
+      APPLIED: 0,
+      INVITED: 1,
+      CONFIRMED: 2,
+      COMPLETED: 3,
+      REJECTED: 4,
+      ABORTED: 5,
+      CANCELLED: 6,
+      REGISTERED: 7,
+    };
+    return order[a] - order[b];
+  }, []);
+
+  // Columns definition
+  const columns = useMemo<ColumnDef<ManagedCourse_Course_by_pk_CourseEnrollments>[]>(
+    () => [
+      {
+        header: t('first_name'),
+        accessorKey: 'User.firstName',
+        size: 200,
+        enableSorting: true,
+        cell: ({ row }) => row.original.User.firstName,
+      },
+      {
+        header: t('last_name'),
+        accessorKey: 'User.lastName',
+        size: 200,
+        enableSorting: true,
+        cell: ({ row }) => row.original.User.lastName,
+      },
+      {
+        header: t('organization'),
+        accessorKey: 'User.Organization.name',
+        size: 300,
+        enableSorting: true,
+        cell: ({ row }) => {
+          const orgName = (row.original.User as any).Organization?.name;
+          return (
+            <div className="truncate" title={orgName || ''}>
+              {orgName || '-'}
+            </div>
+          );
+        },
+      },
+      {
+        header: t('course-page:evaluation'),
+        accessorKey: 'motivationRating',
+        size: 100,
+        enableSorting: true,
+        sortingFn: (rowA, rowB) => {
+          return ratingSortFn(
+            rowA.original.motivationRating,
+            rowB.original.motivationRating
+          );
+        },
+        cell: ({ row }) => {
+          const rating = row.original.motivationRating;
+          return (
+            <div className="text-center">
+              {rating === 'UNRATED' && <Dot color="grey" />}
+              {rating === 'INVITE' && <Dot color="lightgreen" />}
+              {rating === 'REVIEW' && <Dot color="orange" />}
+              {rating === 'DECLINE' && <Dot color="red" />}
+            </div>
+          );
+        },
+      },
+      {
+        header: t('status'),
+        accessorKey: 'status',
+        size: 100,
+        enableSorting: true,
+        sortingFn: (rowA, rowB) => {
+          return statusSortFn(rowA.original.status, rowB.original.status);
+        },
+        cell: ({ row }) => {
+          const enrollment = row.original;
+          const expired = isExpired(enrollment);
+          return (
+            <div className="text-center">
+              {!expired && enrollment.status === 'APPLIED' && (
+                <GoDotFill className="inline" title={t('course-page:applied')} color="grey" size="2.5em" />
+              )}
+              {!expired && enrollment.status === 'INVITED' && (
+                <IoIosCheckmarkCircle className="inline" title={t('course-page:invited')} color="grey" size="1.5em" />
+              )}
+              {(enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED') && (
+                <IoIosCheckmarkCircle
+                  className="inline"
+                  title={t('course-page:invitation-confirmed')}
+                  color="lightgreen"
+                  size="1.5em"
+                />
+              )}
+              {enrollment.status === 'ABORTED' && (
+                <IoIosCheckmarkCircle title={t('course-page:aborted')} color="red" size="1.5em" className="inline" />
+              )}
+              {enrollment.status === 'REJECTED' && (
+                <IoIosCloseCircle title={t('course-page:rejected')} color="red" size="1.5em" className="inline" />
+              )}
+              {enrollment.status === 'CANCELLED' && (
+                <IoIosCloseCircle title={t('course-page:cancelled')} color="red" size="1.5em" className="inline" />
+              )}
+              {expired && (enrollment.status === 'APPLIED' || enrollment.status === 'INVITED') && (
+                <IoIosCloseCircle
+                  className="inline"
+                  title={t('course-page:invitation-expired')}
+                  color="grey"
+                  size="1.5em"
+                />
+              )}
+            </div>
+          );
+        },
+      },
+    ],
+    [t, ratingSortFn, statusSortFn]
+  );
+
+  // Expandable row component
+  const ExpandableApplicationRow = ({ row: enrollment }: { row: ManagedCourse_Course_by_pk_CourseEnrollments }) => {
+    const setUnrated = useCallback(() => {
+      setEnrollmentRating(enrollment, MotivationRating_enum.UNRATED);
+    }, [enrollment]);
+
+    const setInvite = useCallback(() => {
+      setEnrollmentRating(enrollment, MotivationRating_enum.INVITE);
+    }, [enrollment]);
+
+    const setReview = useCallback(() => {
+      setEnrollmentRating(enrollment, MotivationRating_enum.REVIEW);
+    }, [enrollment]);
+
+    const setDecline = useCallback(() => {
+      setEnrollmentRating(enrollment, MotivationRating_enum.DECLINE);
+    }, [enrollment]);
+
+    // Access Organization from the User object (will be available after GraphQL regeneration)
+    const orgName = (enrollment.User as any).Organization?.name;
+
+    return (
+      <div className="pt-5 pb-5">
+        <div className="flex items-start gap-3 pl-3">
+          {/* Email and Application History - aligned with firstName/lastName columns (400px total) */}
+          <div style={{ width: '400px', flexShrink: 0 }}>
+            <div className="mb-4">
+              <div className="text-sm font-medium text-gray-700 mb-1">{t('email')}</div>
+              <div className="text-gray-900 break-words font-medium pl-4" title={enrollment.User.email}>
+                {enrollment.User.email}
+              </div>
+            </div>
+            <div>
+              <div className="text-sm font-medium text-gray-700 mb-2">{t('application_history')}</div>
+              <div className="space-y-1">
+                {enrollment.User.CourseEnrollments.length > 0 && enrollment.User.CourseEnrollments.filter(e => e.courseId !== enrollment.courseId).length === 0 ? (
+                  <div className="text-sm text-gray-500 italic pl-4">{t('course-page:no-applications-present')}</div>
+                ) : (
+                  enrollment.User.CourseEnrollments.map((pastEnrollment, index) => {
+                    if (pastEnrollment.courseId === enrollment.courseId) {
+                      return null;
+                    }
+                    // Format ECTS if available (only for courses with achievement certificates)
+                    let ectsInfo = '';
+                    const pastEnrollmentAny = pastEnrollment as any;
+                    if (pastEnrollmentAny.achievementCertificateURL && pastEnrollmentAny.Course?.ects) {
+                      let ects = pastEnrollmentAny.Course.ects.replace(',', '.');
+                      ects = isNaN(parseFloat(ects)) ? '0' : parseFloat(ects).toString();
+                      ectsInfo = `; ${ects} ECTS`;
+                    }
+                    return (
+                      <div
+                        key={index}
+                        className="text-sm text-gray-900 whitespace-normal break-words pl-4"
+                      >
+                        {pastEnrollment.Course?.title} ({pastEnrollment.Course?.Program.shortTitle}{ectsInfo})
+                        {orgName ? ` - ${orgName}` : ''} - {t(pastEnrollment.status)}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Motivation Letter - aligned with organization column (300px) */}
+          <div style={{ width: '300px', flexShrink: 0 }}>
+            <div className="mb-4">
+              <div className="text-sm font-medium text-gray-700 mb-1">{t('course-page:application')}</div>
+              <div className="text-gray-900 whitespace-pre-wrap break-words pl-4">{enrollment.motivationLetter || '-'}</div>
+            </div>
+          </div>
+
+          {/* Rating Controls - aligned with evaluation column (100px) */}
+          <div style={{ width: '100px', flexShrink: 0 }}>
+            <div className="mb-4">
+              <div className="text-sm font-medium text-gray-700 mb-2">{t('course-page:evaluation')}</div>
+              <div className="flex gap-2 pl-4">
+                <Dot
+                  onClick={setUnrated}
+                  className="cursor-pointer"
+                  color="grey"
+                  size={enrollment.motivationRating === 'UNRATED' ? 'LARGE' : 'DEFAULT'}
+                />
+                <Dot
+                  onClick={setInvite}
+                  className="cursor-pointer"
+                  color="lightgreen"
+                  size={enrollment.motivationRating === 'INVITE' ? 'LARGE' : 'DEFAULT'}
+                />
+                <Dot
+                  onClick={setReview}
+                  className="cursor-pointer"
+                  color="orange"
+                  size={enrollment.motivationRating === 'REVIEW' ? 'LARGE' : 'DEFAULT'}
+                />
+                <Dot
+                  onClick={setDecline}
+                  className="cursor-pointer"
+                  color="red"
+                  size={enrollment.motivationRating === 'DECLINE' ? 'LARGE' : 'DEFAULT'}
+                />
+              </div>
+            </div>
+
+            {enrollment.status === 'INVITED' && (
+              <div className="mt-4">
+                <div className="text-sm font-medium text-gray-700 mb-1">{t('course-page:invitation-deadline')}</div>
+                <div className="text-gray-900 font-medium pl-4">{displayDate(enrollment.invitationExpirationDate)}</div>
+              </div>
+            )}
+          </div>
+
+          {/* Empty space for status column (100px) */}
+          <div style={{ width: '100px', flexShrink: 0 }}></div>
+        </div>
+      </div>
+    );
+  };
+
+  const handlePageSizeChange = useCallback((newSize: number) => {
+    setPageSize(newSize);
+    setPageIndex(0);
+  }, []);
 
   return (
     <>
@@ -195,90 +687,178 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         >
           <AddParticipantsForm courseId={course.id} onSubmit={closeAddParticipantsModal} />
         </Modal>
-      </OnlyAdmin>{' '}
+      </OnlyAdmin>
+
+      {/* Statistics Cards */}
+      {courseEnrollments.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-edu-light-gray p-4 rounded-lg">
+            <div className="text-gray-600 text-sm mb-1">{t('statistics_applications_total')}</div>
+            <div className="text-gray-900 text-2xl font-semibold">{applicationStats.totalApplications}</div>
+          </div>
+          <div className="bg-edu-light-gray p-4 rounded-lg">
+            <div className="text-gray-600 text-sm mb-1">{t('statistics_applications_accepted')}</div>
+            <div className="text-gray-900 text-2xl font-semibold">{applicationStats.approvedApplications}</div>
+          </div>
+          <div className="bg-edu-light-gray p-4 rounded-lg">
+            <div className="text-gray-600 text-sm mb-1">{t('statistics_invitations_total')}</div>
+            <div className="text-gray-900 text-2xl font-semibold">{applicationStats.invitedApplicants}</div>
+          </div>
+          <div className="bg-edu-light-gray p-4 rounded-lg">
+            <div className="text-gray-600 text-sm mb-1">{t('statistics_invitations_confirmed')}</div>
+            <div className="text-gray-900 text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
+          </div>
+        </div>
+      )}
+
       <div>
         {courseEnrollments.length > 0 ? (
           <>
-            <div className="text-gray-400">
-              <ApplicationRow
-                enrollment={null}
-                onSetRating={setEnrollmentRating}
-                onSelectRow={handleSelectRow}
-                isRowSelected={false}
+            <OnlyInstructor>
+              <TableGrid<ManagedCourse_Course_by_pk_CourseEnrollments>
+                columns={columns}
+                data={filteredEnrollments}
+                loading={false}
+                error={null as ApolloError}
+                expandableRowComponent={ExpandableApplicationRow}
+                bulkActions={bulkActions}
+                onBulkAction={handleBulkEmailAction}
+                enablePagination={true}
+                totalCount={filteredEnrollments.length}
+                pageIndex={pageIndex}
+                onPageChange={setPageIndex}
+                pageSize={pageSize}
+                onPageSizeChange={handlePageSizeChange}
+                searchFilter={searchFilter}
+                onSearchFilterChange={setSearchFilter}
+                refetchQueries={[]}
               />
-            </div>
-            {courseEnrollments.map((enrollment) => (
-              <ApplicationRow
-                key={enrollment.id}
-                enrollment={enrollment}
-                onSetRating={setEnrollmentRating}
-                onSelectRow={handleSelectRow}
-                isRowSelected={selectedEnrollments.includes(enrollment.id)}
-              />
-            ))}
-
-            <div className="mt-6 mb-6 text-gray-300 text-lg grid grid-cols-[max-content_auto] gap-x-8 gap-y-1">
-              <p className="font-semibold">{t('course-page:total_applications')}</p>
-              <p className="font-normal">{applicationStats.totalApplications}</p>
-
-              <p className="font-semibold">{t('course-page:accepted_applications')}</p>
-              <p className="font-normal">{applicationStats.approvedApplications}</p>
-
-              <p className="font-semibold">{t('course-page:total_invitations')}</p>
-              <p className="font-normal">{applicationStats.invitedApplicants}</p>
-
-              <p className="font-semibold">{t('course-page:confirmed_invitations')}</p>
-              <p className="font-normal">{applicationStats.confirmedApplicants}</p>
-            </div>
+            </OnlyInstructor>
 
             <div className="mt-6 mb-3">{infoDots}</div>
-
-            <OnlyAdmin>
-              <div className="flex justify-end mb-6">
-                <OldButton onClick={handleOpenInviteDialog} filled inverted>
-                  {t('course-page:send-invitations')}
-                </OldButton>
-              </div>
-            </OnlyAdmin>
           </>
         ) : (
           <p className="m-auto text-center mb-14 text-gray-400">{t('course-page:no-applications-present')}</p>
         )}
-        <Button
-          as="a"
-          href={`mailto:?bcc=${getEmailsOfConfirmedApplications()}`}
-          className="bg-edu-course-current rounded-full py-2 px-4 text-gray-900"
-          filled
-        >
-          {t('course-page:email-confirmed-applicants')}
-        </Button>{' '}
       </div>
-      <Dialog className="h" open={isInviteDialogOpen} onClose={handleCloseInviteDialog}>
+
+      {/* Invitation Dialog */}
+      <Dialog open={isInviteDialogOpen} onClose={handleCloseInviteDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
-          <div className="grid grid-cols-2">
-            <div> {t('course-page:invite-applicants')} </div>
-            <div className="cursor-pointer flex justify-end">
-              <MdClose onClick={handleCloseInviteDialog} />
+          <div className="flex justify-between items-center">
+            <div className="text-xl font-semibold">{t('send_invitations_dialog_title')}</div>
+            <div className="cursor-pointer" onClick={handleCloseInviteDialog}>
+              <MdClose className="w-6 h-6" />
             </div>
           </div>
         </DialogTitle>
+        <div className="px-6 pb-6">
+          {inviteDialogData && (
+            <>
+              <div className="mb-6">
+                <p className="text-gray-700 mb-4">
+                  {inviteDialogData.actionType === 'selected' ? (
+                    inviteDialogData.selectedCount !== undefined && inviteDialogData.selectedCount > 0 ? (
+                      inviteDialogData.identifiedCount === 1
+                        ? t('send_invitations_selected_count_singular', { selected: inviteDialogData.selectedCount, identified: inviteDialogData.identifiedCount })
+                        : t('send_invitations_selected_count_plural', { selected: inviteDialogData.selectedCount, identified: inviteDialogData.identifiedCount })
+                    ) : (
+                      t('send_invitations_selected_count_plural', { selected: 0, identified: inviteDialogData.identifiedCount })
+                    )
+                  ) : (
+                    inviteDialogData.identifiedCount === 1
+                      ? t('send_invitations_all_count_singular', { count: inviteDialogData.identifiedCount })
+                      : t('send_invitations_all_count_plural', { count: inviteDialogData.identifiedCount })
+                  )}
+                </p>
+                <div className="flex flex-col gap-4">
+                  <label className="text-sm font-medium text-gray-700">
+                    {t('course-page:invitation-deadline')}
+                  </label>
+                  <DatePicker
+                    dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
+                    selected={inviteExpireDate}
+                    onChange={handleSetInviteExpireDate}
+                    minDate={now}
+                    locale={lang}
+                    className="w-full p-2 border border-gray-300 rounded"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3">
+                <OldButton onClick={handleCloseInviteDialog} inverted>
+                  {t('common:cancel')}
+                </OldButton>
+                <OldButton onClick={handleSendInvitations} filled>
+                  {t('send_invitations_confirm')}
+                </OldButton>
+              </div>
+            </>
+          )}
+        </div>
+      </Dialog>
 
-        <div className="m-16">
-          <div className="grid grid-cols-2 h-64">
-            <div className="mr-3">{t('course-page:invitation-deadline')}:</div>
-            <div className="ml-3">
-              <DatePicker
-                dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
-                selected={inviteExpireDate}
-                onChange={handleSetInviteExpireDate}
-                minDate={now}
-                locale={lang}
-              />
+      {/* Rejection Dialog */}
+      <Dialog open={isRejectionDialogOpen} onClose={handleCloseRejectionDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <div className="flex justify-between items-center">
+            <div className="text-xl font-semibold">{t('send_rejections_dialog_title')}</div>
+            <div className="cursor-pointer" onClick={handleCloseRejectionDialog}>
+              <MdClose className="w-6 h-6" />
             </div>
           </div>
+        </DialogTitle>
+        <div className="px-6 pb-6">
+          {rejectionDialogData && (
+            <>
+              <div className="mb-6">
+                <p className="text-gray-700">
+                  {rejectionDialogData.actionType === 'selected' ? (
+                    rejectionDialogData.selectedCount !== undefined && rejectionDialogData.selectedCount > 0 ? (
+                      rejectionDialogData.identifiedCount === 1
+                        ? t('send_rejections_selected_count_singular', { selected: rejectionDialogData.selectedCount, identified: rejectionDialogData.identifiedCount })
+                        : t('send_rejections_selected_count_plural', { selected: rejectionDialogData.selectedCount, identified: rejectionDialogData.identifiedCount })
+                    ) : (
+                      t('send_rejections_selected_count_plural', { selected: 0, identified: rejectionDialogData.identifiedCount })
+                    )
+                  ) : (
+                    rejectionDialogData.identifiedCount === 1
+                      ? t('send_rejections_all_count_singular', { count: rejectionDialogData.identifiedCount })
+                      : t('send_rejections_all_count_plural', { count: rejectionDialogData.identifiedCount })
+                  )}
+                </p>
+              </div>
+              <div className="flex justify-end gap-3">
+                <OldButton onClick={handleCloseRejectionDialog} inverted>
+                  {t('common:cancel')}
+                </OldButton>
+                <OldButton onClick={handleSendRejections} filled>
+                  {t('send_rejections_confirm')}
+                </OldButton>
+              </div>
+            </>
+          )}
+        </div>
+      </Dialog>
 
-          <div className="flex justify-center mt-16">
-            <OldButton onClick={handleSendInvitesAndRejections}>{t('course-page:invite')}</OldButton>
+      {/* No Selection Dialog */}
+      <Dialog open={isNoSelectionDialogOpen} onClose={handleCloseNoSelectionDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <div className="flex justify-between items-center">
+            <div className="text-xl font-semibold">{t('no_selection_dialog_title')}</div>
+            <div className="cursor-pointer" onClick={handleCloseNoSelectionDialog}>
+              <MdClose className="w-6 h-6" />
+            </div>
+          </div>
+        </DialogTitle>
+        <div className="px-6 pb-6">
+          <div className="mb-6">
+            <p className="text-gray-700">{t('select_applicants_first')}</p>
+          </div>
+          <div className="flex justify-end gap-3">
+            <OldButton onClick={handleCloseNoSelectionDialog} filled>
+              {t('common:confirm')}
+            </OldButton>
           </div>
         </div>
       </Dialog>

@@ -65,13 +65,20 @@ export const MANAGED_COURSE = gql`
           CourseEnrollments {
             status
             courseId
+            achievementCertificateURL
+            attendanceCertificateURL
             Course {
               id
               title
+              ects
               Program {
                 shortTitle
               }
             }
+          }
+          Organization {
+            id
+            name
           }
         }
       }
