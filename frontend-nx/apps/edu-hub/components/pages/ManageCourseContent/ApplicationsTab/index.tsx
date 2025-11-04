@@ -246,7 +246,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           enrollment.User.firstName.toLowerCase().includes(searchLower) ||
           enrollment.User.lastName.toLowerCase().includes(searchLower) ||
           enrollment.User.email.toLowerCase().includes(searchLower) ||
-          enrollment.motivationLetter.toLowerCase().includes(searchLower)
+          (enrollment.motivationLetter || '').toLowerCase().includes(searchLower)
         );
       });
     }

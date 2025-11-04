@@ -1,5 +1,5 @@
 import { ApolloError, DocumentNode } from '@apollo/client';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, SortingState } from '@tanstack/react-table';
 import { ReactElement } from 'react';
 
 export interface BaseRow {
@@ -37,6 +37,8 @@ export interface TableGridProps<T extends BaseRow> {
   onSearchFilterChange: (value: string) => void;
   onPageSizeChange?: (size: number) => void;
   availablePageSizes?: number[];
+  sorting?: SortingState;
+  onSortingChange?: (sorting: SortingState | ((prev: SortingState) => SortingState)) => void;
 }
 
 export interface UseTableGridProps<V> {
@@ -45,6 +47,7 @@ export interface UseTableGridProps<V> {
   queryVariables?: V;
   pageSize?: number;
   refetchFilter?: (searchFilter: string) => Record<string, any>;
+  sortColumnMapper?: (columnId: string) => string | null;
 } 
 
 export interface TableGridDeleteButtonProps {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { DocumentNode } from '@apollo/client';
+import { SortingState } from '@tanstack/react-table';
 import { BaseRow, BulkAction } from './types';
 
 interface UseTableGridProps<V> {
@@ -10,6 +11,41 @@ interface UseTableGridProps<V> {
   pageSize?: number;
   debounceMs?: number; // Configurable debounce time in milliseconds
   refetchFilter?: (searchFilter: string) => Record<string, any>;
+  sortColumnMapper?: (columnId: string) => string | null; // Maps column accessorKey to GraphQL field name
+}
+
+/**
+ * Converts TanStack Table SortingState to Hasura order_by format
+ * @param sorting - TanStack Table sorting state (e.g., [{ id: 'name', desc: false }])
+ * @param sortColumnMapper - Optional function to map column IDs to GraphQL field names
+ * @returns Hasura order_by format (e.g., [{ name: 'asc' }])
+ */
+function convertSortingToOrderBy(
+  sorting: SortingState,
+  sortColumnMapper?: (columnId: string) => string | null
+): Record<string, string>[] | undefined {
+  if (!sorting || sorting.length === 0) {
+    return undefined;
+  }
+
+  const orderBy = sorting
+    .map((sort) => {
+      const columnId = sort.id;
+      const graphqlFieldName = sortColumnMapper ? sortColumnMapper(columnId) : columnId;
+      
+      // Skip if mapper returns null (unsupported column for server-side sorting)
+      if (!graphqlFieldName) {
+        return null;
+      }
+
+      return {
+        [graphqlFieldName]: sort.desc ? 'desc' : 'asc',
+      };
+    })
+    .filter((orderBy): orderBy is Record<string, string> => orderBy !== null);
+
+  // Return undefined if no valid sort orders (instead of empty array)
+  return orderBy.length > 0 ? orderBy : undefined;
 }
 
 export function useTableGrid<V>({
@@ -19,15 +55,23 @@ export function useTableGrid<V>({
   pageSize = 15,
   debounceMs = 300, // Default to 300ms
   refetchFilter,
+  sortColumnMapper,
 }: UseTableGridProps<V>) {
   const [searchFilter, setSearchFilter] = useState('');
   const [pageIndex, setPageIndex] = useState(0);
+  const [sorting, setSorting] = useState<SortingState>([]);
+
+  // Convert sorting state to Hasura order_by format
+  const orderBy = useMemo(() => {
+    return convertSortingToOrderBy(sorting, sortColumnMapper);
+  }, [sorting, sortColumnMapper]);
 
   const queryResult = queryHook(query, {
     variables: {
       offset: pageIndex * pageSize,
       limit: pageSize,
       ...queryVariables,
+      ...(orderBy && { order_by: orderBy }),
     },
   });
 
@@ -42,8 +86,9 @@ export function useTableGrid<V>({
       limit: pageSize,
       ...queryVariables,
       ...refetchVariables, // Merge refetchFilter result into queryVariables
+      ...(orderBy && { order_by: orderBy }),
     });
-  }, [pageIndex, debouncedRefetch, searchFilter, queryVariables, pageSize, refetchFilter]);
+  }, [pageIndex, debouncedRefetch, searchFilter, queryVariables, pageSize, refetchFilter, orderBy]);
 
   const handleSetSearchFilter = useCallback((value: string) => {
     setSearchFilter(value);
@@ -52,6 +97,11 @@ export function useTableGrid<V>({
 
   const handleSetPageIndex = useCallback((index: number) => {
     setPageIndex(index);
+  }, []);
+
+  const handleSetSorting = useCallback((updater: SortingState | ((prev: SortingState) => SortingState)) => {
+    setSorting(updater);
+    setPageIndex(0); // Reset to first page when sorting changes
   }, []);
 
   return {
@@ -63,6 +113,8 @@ export function useTableGrid<V>({
     pageIndex,
     setSearchFilter: handleSetSearchFilter,
     setPageIndex: handleSetPageIndex,
+    sorting,
+    setSorting: handleSetSorting,
   };
 }
 

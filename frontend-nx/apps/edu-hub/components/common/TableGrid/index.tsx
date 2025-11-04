@@ -44,6 +44,8 @@ const TableGrid = <T extends BaseRow,>({
   bulkActions = [],
   onPageSizeChange,
   availablePageSizes = [10, 20, 50, 100, 500],
+  sorting: externalSorting,
+  onSortingChange: externalOnSortingChange,
 }: TableGridProps<T>) => {
   const onGlobalFilterChange = useCallback(
     (value: string) => {
@@ -69,7 +71,22 @@ const TableGrid = <T extends BaseRow,>({
 
   const { t } = useTranslation();
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [internalSorting, setInternalSorting] = useState<SortingState>([]);
+  
+  // Use external sorting if provided (server-side sorting), otherwise use internal (client-side sorting)
+  const sorting = externalSorting !== undefined ? externalSorting : internalSorting;
+  const isServerSideSorting = externalSorting !== undefined && externalOnSortingChange !== undefined;
+  
+  const handleSortingChange = useCallback(
+    (updater: SortingState | ((prev: SortingState) => SortingState)) => {
+      if (isServerSideSorting && externalOnSortingChange) {
+        externalOnSortingChange(updater);
+      } else {
+        setInternalSorting(updater);
+      }
+    },
+    [isServerSideSorting, externalOnSortingChange]
+  );
 
   const showCheckbox = bulkActions.length > 0;
 
@@ -167,6 +184,24 @@ const TableGrid = <T extends BaseRow,>({
     return [...selectionColumn, ...dataColumns];
   }, [columns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, data, isAllSelected, isSomeSelected]);
 
+  // Calculate total width of main row content for expandable row alignment
+  const mainRowContentWidth = useMemo(() => {
+    const totalColumnWidth = memoizedColumns.reduce((sum, col) => {
+      const colSize = col.size || 150; // Default size if not specified
+      return sum + colSize;
+    }, 0);
+    
+    // Add gaps between columns (gap-3 = 12px)
+    const gapSize = 12; // gap-3 in Tailwind
+    const gapCount = Math.max(0, memoizedColumns.length - 1);
+    const totalGapWidth = gapCount * gapSize;
+    
+    // Add left padding if no checkbox (pl-3 = 12px)
+    const leftPadding = showCheckbox ? 0 : 12;
+    
+    return totalColumnWidth + totalGapWidth + leftPadding;
+  }, [memoizedColumns, showCheckbox]);
+
   const table = useReactTable({
     data,
     defaultColumn: {
@@ -179,6 +214,7 @@ const TableGrid = <T extends BaseRow,>({
     filterFns: { fuzzy: fuzzyFilter },
     manualPagination: enablePagination,
     manualFiltering: true,
+    manualSorting: isServerSideSorting, // Enable manual sorting when server-side sorting is used
     enableColumnResizing: true,
     columnResizeMode: 'onChange',
     state: {
@@ -188,9 +224,9 @@ const TableGrid = <T extends BaseRow,>({
     },
     globalFilterFn: fuzzyFilter,
     onGlobalFilterChange: onGlobalFilterChange,
-    onSortingChange: setSorting,
+    onSortingChange: handleSortingChange,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    ...(!isServerSideSorting && { getSortedRowModel: getSortedRowModel() }), // Only use client-side sorting when not using server-side sorting
     debugTable: true,
     getRowId: (row) => row.id.toString(),
     enableRowSelection: true,
@@ -337,7 +373,11 @@ const TableGrid = <T extends BaseRow,>({
       {/* Data Rows */}
       {!loading &&
         !error &&
-        (enablePagination
+        // When server-side sorting is enabled, pagination is also server-side
+        // Don't slice - data is already paginated by the server
+        // When server-side sorting is NOT enabled but pagination is enabled,
+        // we slice for client-side pagination (backward compatibility)
+        (enablePagination && !isServerSideSorting
           ? table.getRowModel().rows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize)
           : table.getRowModel().rows
         ).map((row) => (
@@ -390,7 +430,10 @@ const TableGrid = <T extends BaseRow,>({
             {/* Expandable Row */}
             {expandableRowComponent && expandedRows.has(row.original.id) && (
               <div className="flex items-stretch mb-1">
-                <div className="flex-grow bg-edu-light-gray py-2">
+                <div 
+                  className={`flex-grow bg-edu-light-gray py-2 ${!showCheckbox ? 'pl-3' : ''}`}
+                  style={{ minWidth: `${mainRowContentWidth}px` }}
+                >
                   <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
                 </div>
                 {expandableRowComponent && <div className="w-10 flex-shrink-0"></div>}
