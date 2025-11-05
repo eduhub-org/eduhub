@@ -5,8 +5,8 @@ import {
   ManagedCourse_Course_by_pk_CourseEnrollments,
 } from '../../../../queries/__generated__/ManagedCourse';
 import Dot from '../../../common/Dot';
-import { OnlyAdmin, OnlyInstructor } from '../../../common/OnlyLoggedIn';
-import { useIsInstructor } from '../../../../hooks/authentication';
+import { OnlyInstructor } from '../../../common/OnlyLoggedIn';
+import { useIsInstructor, useIsAdmin } from '../../../../hooks/authentication';
 import {
   identityEventMapper,
   pickIdPkMapper,
@@ -19,7 +19,9 @@ import {
 } from '../../../../queries/__generated__/UpdateEnrollmentRating';
 import { UPDATE_ENROLLMENT_STATUS, UPDATE_ENROLLMENT_RATING } from '../../../../queries/insertEnrollment';
 import { Button as OldButton } from '../../../common/Button';
-import { Dialog, DialogTitle } from '@mui/material';
+import { Dialog, DialogTitle, Tooltip } from '@mui/material';
+import { HelpOutline } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 import { MdClose } from 'react-icons/md';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -28,7 +30,6 @@ import {
   UpdateEnrollmentStatusVariables,
 } from '../../../../queries/__generated__/UpdateEnrollmentStatus';
 import useTranslation from 'next-translate/useTranslation';
-import AddButton from '../../../common/AddButton';
 import Modal from '../../../common/Modal';
 import AddParticipantsForm from './AddParticipantsForm';
 import TableGrid from '../../../common/TableGrid';
@@ -58,6 +59,8 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const { t, lang } = useTranslation('manageCourse');
   const displayDate = useDisplayDate();
   const isInstructor = useIsInstructor();
+  const isAdmin = useIsAdmin();
+  const theme = useTheme();
 
   const applicationStats = useMemo(() => {
     const totalApplications = course.CourseEnrollments.length;
@@ -74,25 +77,23 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   }, [course.CourseEnrollments]);
 
   const infoDots = (
-    <>
-      <div className="text-gray-400">{t('course-page:application-rating')}</div>
-      <div className="grid grid-cols-6 text-gray-400">
-        <div>
-          <Dot color="lightgreen" /> {t('course-page:invite')}
+    <div className="text-gray-400 text-sm">
+      <div className="mb-1">{t('course-page:application-rating')}</div>
+      <div className="flex gap-4 text-gray-400">
+        <div className="flex items-center gap-1">
+          <Dot color="lightgreen" /> <span>{t('course-page:invite')}</span>
         </div>
-        <div>
-          <Dot color="orange" /> {t('course-page:unclear')}
+        <div className="flex items-center gap-1">
+          <Dot color="orange" /> <span>{t('course-page:unclear')}</span>
         </div>
-        <div>
-          <Dot color="red" /> {t('course-page:reject')}
+        <div className="flex items-center gap-1">
+          <Dot color="red" /> <span>{t('course-page:reject')}</span>
         </div>
-        <div>
-          <Dot color="grey" /> {t('course-page:not-rated')}
+        <div className="flex items-center gap-1">
+          <Dot color="grey" /> <span>{t('course-page:not-rated')}</span>
         </div>
-        <div />
-        <div />
       </div>
-    </>
+    </div>
   );
 
   const [updateEnrollmentStatus] = useRoleMutation<UpdateEnrollmentStatus, UpdateEnrollmentStatusVariables>(
@@ -330,20 +331,20 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
   const bulkActions: BulkAction[] = useMemo(() => {
     const actions: BulkAction[] = [
-      { value: 'email_selected', label: t('email_selected') },
+      { value: 'email_selected', label: t('bulk_actions.email_selected') },
     ];
 
     // Invitation actions - only for instructors
     if (isInstructor && courseEnrollments.some((e) => e.motivationRating === 'INVITE')) {
       actions.push({
         value: 'send_invitations_selected',
-        label: t('send_invitations_selected'),
-        group: t('send_invitations'),
+        label: t('bulk_actions.send_invitations_selected'),
+        group: t('bulk_actions.send_invitations'),
       });
       actions.push({
         value: 'send_invitations_all',
-        label: t('send_invitations_all'),
-        group: t('send_invitations'),
+        label: t('bulk_actions.send_invitations_all'),
+        group: t('bulk_actions.send_invitations'),
       });
     }
 
@@ -351,13 +352,13 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     if (isInstructor && courseEnrollments.some((e) => e.motivationRating === 'DECLINE')) {
       actions.push({
         value: 'send_rejections_selected',
-        label: t('send_rejections_selected'),
-        group: t('send_rejections'),
+        label: t('bulk_actions.send_rejections_selected'),
+        group: t('bulk_actions.send_rejections'),
       });
       actions.push({
         value: 'send_rejections_all',
-        label: t('send_rejections_all'),
-        group: t('send_rejections'),
+        label: t('bulk_actions.send_rejections_all'),
+        group: t('bulk_actions.send_rejections'),
       });
     }
 
@@ -365,29 +366,29 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     if (courseEnrollments.some((e) => e.status === 'CONFIRMED')) {
       actions.push({
         value: 'email_status_CONFIRMED',
-        label: t('email_all_confirmed'),
-        group: t('email_all_by_status'),
+        label: t('bulk_actions.email_all_confirmed'),
+        group: t('bulk_actions.email_all_by_status'),
       });
     }
     if (courseEnrollments.some((e) => e.status === 'INVITED')) {
       actions.push({
         value: 'email_status_INVITED',
-        label: t('email_all_invited'),
-        group: t('email_all_by_status'),
+        label: t('bulk_actions.email_all_invited'),
+        group: t('bulk_actions.email_all_by_status'),
       });
     }
     if (courseEnrollments.some((e) => e.status === 'APPLIED')) {
       actions.push({
         value: 'email_status_APPLIED',
-        label: t('email_all_applied'),
-        group: t('email_all_by_status'),
+        label: t('bulk_actions.email_all_applied'),
+        group: t('bulk_actions.email_all_by_status'),
       });
     }
     if (courseEnrollments.some((e) => e.status === 'REJECTED')) {
       actions.push({
         value: 'email_status_REJECTED',
-        label: t('email_all_rejected'),
-        group: t('email_all_by_status'),
+        label: t('bulk_actions.email_all_rejected'),
+        group: t('bulk_actions.email_all_by_status'),
       });
     }
 
@@ -395,22 +396,22 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     if (courseEnrollments.some((e) => e.motivationRating === 'INVITE')) {
       actions.push({
         value: 'email_rating_INVITE',
-        label: t('email_all_invite_rating'),
-        group: t('email_all_by_rating'),
+        label: t('bulk_actions.email_all_invite_rating'),
+        group: t('bulk_actions.email_all_by_rating'),
       });
     }
     if (courseEnrollments.some((e) => e.motivationRating === 'DECLINE')) {
       actions.push({
         value: 'email_rating_DECLINE',
-        label: t('email_all_decline_rating'),
-        group: t('email_all_by_rating'),
+        label: t('bulk_actions.email_all_decline_rating'),
+        group: t('bulk_actions.email_all_by_rating'),
       });
     }
     if (courseEnrollments.some((e) => e.motivationRating === 'REVIEW')) {
       actions.push({
         value: 'email_rating_REVIEW',
-        label: t('email_all_review_rating'),
-        group: t('email_all_by_rating'),
+        label: t('bulk_actions.email_all_review_rating'),
+        group: t('bulk_actions.email_all_by_rating'),
       });
     }
 
@@ -544,6 +545,9 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             </div>
           );
         },
+        meta: {
+          className: 'ml-auto',
+        },
       },
     ],
     [t, ratingSortFn, statusSortFn]
@@ -614,56 +618,87 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             </div>
           </div>
 
-          {/* Motivation Letter - aligned with organization column (300px) */}
-          <div style={{ width: '300px', flexShrink: 0 }}>
+          {/* Motivation Letter - flexible width to maximize space */}
+          <div className="flex-grow min-w-0">
             <div className="mb-4">
               <div className="text-sm font-medium text-gray-700 mb-1">{t('course-page:application')}</div>
               <div className="text-gray-900 whitespace-pre-wrap break-words pl-4">{enrollment.motivationLetter || '-'}</div>
             </div>
           </div>
 
-          {/* Rating Controls - aligned with evaluation column (100px) */}
-          <div style={{ width: '100px', flexShrink: 0 }}>
+          {/* Rating Controls - aligned with status column at right edge */}
+          <div style={{ width: '100px', flexShrink: 0 }} className="ml-auto">
             <div className="mb-4">
-              <div className="text-sm font-medium text-gray-700 mb-2">{t('course-page:evaluation')}</div>
+              <div className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                {t('course-page:evaluation')}
+                <Tooltip title={t('application_status_tooltip')} placement="top">
+                  <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled }} />
+                </Tooltip>
+              </div>
               <div className="flex gap-2 pl-4">
-                <Dot
+                <button
                   onClick={setUnrated}
-                  className="cursor-pointer"
-                  color="grey"
-                  size={enrollment.motivationRating === 'UNRATED' ? 'LARGE' : 'DEFAULT'}
-                />
-                <Dot
+                  className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                  title={t('course-page:not-rated')}
+                  aria-label={t('course-page:not-rated')}
+                >
+                  <Dot
+                    color="grey"
+                    size={enrollment.motivationRating === 'UNRATED' ? 'LARGE' : 'DEFAULT'}
+                    className="block"
+                  />
+                </button>
+                <button
                   onClick={setInvite}
-                  className="cursor-pointer"
-                  color="lightgreen"
-                  size={enrollment.motivationRating === 'INVITE' ? 'LARGE' : 'DEFAULT'}
-                />
-                <Dot
+                  className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                  title={t('course-page:invite')}
+                  aria-label={t('course-page:invite')}
+                >
+                  <Dot
+                    color="lightgreen"
+                    size={enrollment.motivationRating === 'INVITE' ? 'LARGE' : 'DEFAULT'}
+                    className="block"
+                  />
+                </button>
+                <button
                   onClick={setReview}
-                  className="cursor-pointer"
-                  color="orange"
-                  size={enrollment.motivationRating === 'REVIEW' ? 'LARGE' : 'DEFAULT'}
-                />
-                <Dot
+                  className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                  title={t('course-page:unclear')}
+                  aria-label={t('course-page:unclear')}
+                >
+                  <Dot
+                    color="orange"
+                    size={enrollment.motivationRating === 'REVIEW' ? 'LARGE' : 'DEFAULT'}
+                    className="block"
+                  />
+                </button>
+                <button
                   onClick={setDecline}
-                  className="cursor-pointer"
-                  color="red"
-                  size={enrollment.motivationRating === 'DECLINE' ? 'LARGE' : 'DEFAULT'}
-                />
+                  className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                  title={t('course-page:reject')}
+                  aria-label={t('course-page:reject')}
+                >
+                  <Dot
+                    color="red"
+                    size={enrollment.motivationRating === 'DECLINE' ? 'LARGE' : 'DEFAULT'}
+                    className="block"
+                  />
+                </button>
               </div>
             </div>
 
             {enrollment.status === 'INVITED' && (
               <div className="mt-4">
-                <div className="text-sm font-medium text-gray-700 mb-1">{t('course-page:invitation-deadline')}</div>
+                <div className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                  {t('course-page:invitation-deadline')}
+                  <Tooltip title={t('application_deadline_tooltip')} placement="top">
+                    <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled }} />
+                  </Tooltip>
+                </div>
                 <div className="text-gray-900 font-medium pl-4">{displayDate(enrollment.invitationExpirationDate)}</div>
               </div>
             )}
           </div>
-
-          {/* Empty space for status column (100px) */}
-          <div style={{ width: '100px', flexShrink: 0 }}></div>
         </div>
       </div>
     );
@@ -676,18 +711,14 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
   return (
     <>
-      <OnlyAdmin>
-        <div className="flex justify-start mt-4 mb-4 text-white">
-          <AddButton title={t('add_participants')} onClick={openAddParticipantsModal} />
-        </div>
-        <Modal
-          isOpen={isAddParticipantsModalOpen}
-          onClose={closeAddParticipantsModal}
-          title={t('manageCourse:add_participants')}
-        >
-          <AddParticipantsForm courseId={course.id} onSubmit={closeAddParticipantsModal} />
-        </Modal>
-      </OnlyAdmin>
+      {/* Add Participants Modal - accessible to all, but button only shown to admins */}
+      <Modal
+        isOpen={isAddParticipantsModalOpen}
+        onClose={closeAddParticipantsModal}
+        title={t('manageCourse:add_participants')}
+      >
+        <AddParticipantsForm courseId={course.id} onSubmit={closeAddParticipantsModal} />
+      </Modal>
 
       {/* Statistics Cards */}
       {courseEnrollments.length > 0 && (
@@ -732,10 +763,14 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                 searchFilter={searchFilter}
                 onSearchFilterChange={setSearchFilter}
                 refetchQueries={[]}
+                {...(isAdmin && {
+                  addButtonText: t('add_participants'),
+                  onAddButtonClick: openAddParticipantsModal,
+                })}
               />
             </OnlyInstructor>
 
-            <div className="mt-6 mb-3">{infoDots}</div>
+            <div className="-mt-8 mb-3">{infoDots}</div>
           </>
         ) : (
           <p className="m-auto text-center mb-14 text-gray-400">{t('course-page:no-applications-present')}</p>
@@ -746,7 +781,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       <Dialog open={isInviteDialogOpen} onClose={handleCloseInviteDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
           <div className="flex justify-between items-center">
-            <div className="text-xl font-semibold">{t('send_invitations_dialog_title')}</div>
+            <div className="text-xl font-semibold">{t('bulk_actions.send_invitations_dialog_title')}</div>
             <div className="cursor-pointer" onClick={handleCloseInviteDialog}>
               <MdClose className="w-6 h-6" />
             </div>
@@ -760,15 +795,15 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                   {inviteDialogData.actionType === 'selected' ? (
                     inviteDialogData.selectedCount !== undefined && inviteDialogData.selectedCount > 0 ? (
                       inviteDialogData.identifiedCount === 1
-                        ? t('send_invitations_selected_count_singular', { selected: inviteDialogData.selectedCount, identified: inviteDialogData.identifiedCount })
-                        : t('send_invitations_selected_count_plural', { selected: inviteDialogData.selectedCount, identified: inviteDialogData.identifiedCount })
+                        ? t('bulk_actions.send_invitations_selected_count_singular', { selected: inviteDialogData.selectedCount, identified: inviteDialogData.identifiedCount })
+                        : t('bulk_actions.send_invitations_selected_count_plural', { selected: inviteDialogData.selectedCount, identified: inviteDialogData.identifiedCount })
                     ) : (
-                      t('send_invitations_selected_count_plural', { selected: 0, identified: inviteDialogData.identifiedCount })
+                      t('bulk_actions.send_invitations_selected_count_plural', { selected: 0, identified: inviteDialogData.identifiedCount })
                     )
                   ) : (
                     inviteDialogData.identifiedCount === 1
-                      ? t('send_invitations_all_count_singular', { count: inviteDialogData.identifiedCount })
-                      : t('send_invitations_all_count_plural', { count: inviteDialogData.identifiedCount })
+                      ? t('bulk_actions.send_invitations_all_count_singular', { count: inviteDialogData.identifiedCount })
+                      : t('bulk_actions.send_invitations_all_count_plural', { count: inviteDialogData.identifiedCount })
                   )}
                 </p>
                 <div className="flex flex-col gap-4">
@@ -790,7 +825,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                   {t('common:cancel')}
                 </OldButton>
                 <OldButton onClick={handleSendInvitations} filled>
-                  {t('send_invitations_confirm')}
+                  {t('bulk_actions.send_invitations_confirm')}
                 </OldButton>
               </div>
             </>
@@ -802,7 +837,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       <Dialog open={isRejectionDialogOpen} onClose={handleCloseRejectionDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
           <div className="flex justify-between items-center">
-            <div className="text-xl font-semibold">{t('send_rejections_dialog_title')}</div>
+            <div className="text-xl font-semibold">{t('bulk_actions.send_rejections_dialog_title')}</div>
             <div className="cursor-pointer" onClick={handleCloseRejectionDialog}>
               <MdClose className="w-6 h-6" />
             </div>
@@ -816,15 +851,15 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                   {rejectionDialogData.actionType === 'selected' ? (
                     rejectionDialogData.selectedCount !== undefined && rejectionDialogData.selectedCount > 0 ? (
                       rejectionDialogData.identifiedCount === 1
-                        ? t('send_rejections_selected_count_singular', { selected: rejectionDialogData.selectedCount, identified: rejectionDialogData.identifiedCount })
-                        : t('send_rejections_selected_count_plural', { selected: rejectionDialogData.selectedCount, identified: rejectionDialogData.identifiedCount })
+                        ? t('bulk_actions.send_rejections_selected_count_singular', { selected: rejectionDialogData.selectedCount, identified: rejectionDialogData.identifiedCount })
+                        : t('bulk_actions.send_rejections_selected_count_plural', { selected: rejectionDialogData.selectedCount, identified: rejectionDialogData.identifiedCount })
                     ) : (
-                      t('send_rejections_selected_count_plural', { selected: 0, identified: rejectionDialogData.identifiedCount })
+                      t('bulk_actions.send_rejections_selected_count_plural', { selected: 0, identified: rejectionDialogData.identifiedCount })
                     )
                   ) : (
                     rejectionDialogData.identifiedCount === 1
-                      ? t('send_rejections_all_count_singular', { count: rejectionDialogData.identifiedCount })
-                      : t('send_rejections_all_count_plural', { count: rejectionDialogData.identifiedCount })
+                      ? t('bulk_actions.send_rejections_all_count_singular', { count: rejectionDialogData.identifiedCount })
+                      : t('bulk_actions.send_rejections_all_count_plural', { count: rejectionDialogData.identifiedCount })
                   )}
                 </p>
               </div>
@@ -833,7 +868,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                   {t('common:cancel')}
                 </OldButton>
                 <OldButton onClick={handleSendRejections} filled>
-                  {t('send_rejections_confirm')}
+                  {t('bulk_actions.send_rejections_confirm')}
                 </OldButton>
               </div>
             </>
@@ -845,7 +880,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       <Dialog open={isNoSelectionDialogOpen} onClose={handleCloseNoSelectionDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
           <div className="flex justify-between items-center">
-            <div className="text-xl font-semibold">{t('no_selection_dialog_title')}</div>
+            <div className="text-xl font-semibold">{t('bulk_actions.no_selection_dialog_title')}</div>
             <div className="cursor-pointer" onClick={handleCloseNoSelectionDialog}>
               <MdClose className="w-6 h-6" />
             </div>
