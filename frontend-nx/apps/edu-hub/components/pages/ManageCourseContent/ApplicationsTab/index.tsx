@@ -618,16 +618,17 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             </div>
           </div>
 
-          {/* Motivation Letter - flexible width to maximize space */}
-          <div className="flex-grow min-w-0">
+          {/* Motivation Letter - calculated width to fit remaining space */}
+          {/* Total available: 960px (mainRowContentWidth), minus: 400px (email) + 100px (rating) + 24px (2 gaps) + 12px (padding) = 424px */}
+          <div style={{ width: '424px', flexShrink: 0 }}>
             <div className="mb-4">
               <div className="text-sm font-medium text-gray-700 mb-1">{t('course-page:application')}</div>
               <div className="text-gray-900 whitespace-pre-wrap break-words pl-4">{enrollment.motivationLetter || '-'}</div>
             </div>
           </div>
 
-          {/* Rating Controls - aligned with status column at right edge */}
-          <div style={{ width: '100px', flexShrink: 0 }} className="ml-auto">
+          {/* Rating Controls - aligned with motivationRating column (100px) */}
+          <div style={{ width: '100px', flexShrink: 0 }}>
             <div className="mb-4">
               <div className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
                 {t('course-page:evaluation')}
