@@ -440,15 +440,22 @@ class CertificateCreator:
                         raise CertificateError("Missing required course or learning goals data", "MISSING_COURSE_DATA")
                     
                     learning_goals = [goal.strip() for goal in enrollment["Course"]["learningGoals"].split("\n") if goal.strip()]
+                    # Handle both string and numeric ECTS values
+                    ects_value = enrollment["Course"]["ects"]
+                    if isinstance(ects_value, str):
+                        ects_float = float(ects_value.replace(",", "."))
+                    else:
+                        ects_float = float(ects_value)
+                    
                     return {
                         "full_name": f"{enrollment['User']['firstName'].upper()} {enrollment['User']['lastName'].upper()}",
                         "course_name": enrollment["Course"]["title"],
                         "semester": enrollment["Course"]["Program"]["title"],
                         "template": image,
-                        "ECTS": str(float(enrollment["Course"]["ects"].replace(",", ".")) * 30),
+                        "ECTS": str(ects_float * 30),
                         "learningGoalsList": learning_goals,
                         "praxisprojekt": enrollment["User"]["AchievementRecordAuthors"][0]["AchievementRecord"]["AchievementOption"]["title"]
-                    }       
+                    }
             
             else:
                 raise CertificateError(f"Invalid certificate type: {self.certificate_type}", "INVALID_CERTIFICATE_TYPE")
