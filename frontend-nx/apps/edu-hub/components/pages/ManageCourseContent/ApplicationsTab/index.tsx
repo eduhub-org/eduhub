@@ -40,13 +40,12 @@ import { MotivationRating_enum, CourseEnrollmentStatus_enum } from '../../../../
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { BulkAction } from '../../../common/TableGrid/types';
 import { ApolloError } from '@apollo/client';
+import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
   qResult: QueryResult<any, any>;
 }
-
-const now = new Date();
 
 const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) => {
   if (enrollment.invitationExpirationDate == null) {
@@ -102,6 +101,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
   // Calculate default invitation expiration date (3 days before first session, or 3 days from now)
   const getDefaultInviteExpireDate = useCallback(() => {
+    const now = new Date();
     if (course.Sessions && course.Sessions.length > 0) {
       const firstSession = course.Sessions[0];
       const firstSessionDate = new Date(firstSession.startDateTime);
@@ -142,9 +142,12 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     [getDefaultInviteExpireDate]
   );
 
+  const [inviteError, setInviteError] = useState<string | null>(null);
+
   const handleCloseInviteDialog = useCallback(() => {
     setIsInviteDialogOpen(false);
     setInviteDialogData(null);
+    setInviteError(null);
   }, []);
 
   const handleSendInvitations = useCallback(async () => {
@@ -160,11 +163,21 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           },
         });
       }
-    } finally {
+      // Only refetch and close on success
       qResult.refetch();
       handleCloseInviteDialog();
+    } catch (error) {
+      const errorMessage = error instanceof ApolloError 
+        ? error.message 
+        : error instanceof Error 
+        ? error.message 
+        : String(error);
+      setInviteError(
+        t('bulk_actions.send_invitations_error', { error: errorMessage }) || 
+        `Failed to send invitations: ${errorMessage}`
+      );
     }
-  }, [inviteDialogData, inviteExpireDate, updateEnrollmentStatus, qResult, handleCloseInviteDialog]);
+  }, [inviteDialogData, inviteExpireDate, updateEnrollmentStatus, qResult, handleCloseInviteDialog, t]);
 
   // Dialog state for rejections
   const [isRejectionDialogOpen, setIsRejectionDialogOpen] = useState(false);
@@ -183,9 +196,12 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
     []
   );
 
+  const [rejectionError, setRejectionError] = useState<string | null>(null);
+
   const handleCloseRejectionDialog = useCallback(() => {
     setIsRejectionDialogOpen(false);
     setRejectionDialogData(null);
+    setRejectionError(null);
   }, []);
 
   const handleSendRejections = useCallback(async () => {
@@ -201,11 +217,21 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           },
         });
       }
-    } finally {
+      // Only refetch and close on success
       qResult.refetch();
       handleCloseRejectionDialog();
+    } catch (error) {
+      const errorMessage = error instanceof ApolloError 
+        ? error.message 
+        : error instanceof Error 
+        ? error.message 
+        : String(error);
+      setRejectionError(
+        t('bulk_actions.send_rejections_error', { error: errorMessage }) || 
+        `Failed to send rejections: ${errorMessage}`
+      );
     }
-  }, [rejectionDialogData, updateEnrollmentStatus, qResult, handleCloseRejectionDialog]);
+  }, [rejectionDialogData, updateEnrollmentStatus, qResult, handleCloseRejectionDialog, t]);
 
   // Dialog state for "no selection" warning
   const [isNoSelectionDialogOpen, setIsNoSelectionDialogOpen] = useState(false);
@@ -467,7 +493,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         size: 300,
         enableSorting: true,
         cell: ({ row }) => {
-          const orgName = (row.original.User as any).Organization?.name;
+          const orgName = row.original.User.Organization?.name;
           return (
             <div className="truncate" title={orgName || ''}>
               {orgName || '-'}
@@ -571,8 +597,8 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       setEnrollmentRating(enrollment, MotivationRating_enum.DECLINE);
     }, [enrollment]);
 
-    // Access Organization from the User object (will be available after GraphQL regeneration)
-    const orgName = (enrollment.User as any).Organization?.name;
+    // Access Organization from the User object
+    const orgName = enrollment.User.Organization?.name;
 
     return (
       <div className="pt-5 pb-5">
@@ -597,9 +623,8 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                     }
                     // Format ECTS if available (only for courses with achievement certificates)
                     let ectsInfo = '';
-                    const pastEnrollmentAny = pastEnrollment as any;
-                    if (pastEnrollmentAny.achievementCertificateURL && pastEnrollmentAny.Course?.ects) {
-                      let ects = pastEnrollmentAny.Course.ects.replace(',', '.');
+                    if (pastEnrollment.achievementCertificateURL && pastEnrollment.Course?.ects) {
+                      let ects = pastEnrollment.Course.ects.replace(',', '.');
                       ects = isNaN(parseFloat(ects)) ? '0' : parseFloat(ects).toString();
                       ectsInfo = `; ${ects} ECTS`;
                     }
@@ -815,7 +840,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                     dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
                     selected={inviteExpireDate}
                     onChange={handleSetInviteExpireDate}
-                    minDate={now}
+                    minDate={new Date()}
                     locale={lang}
                     className="w-full p-2 border border-gray-300 rounded"
                   />
@@ -898,6 +923,18 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           </div>
         </div>
       </Dialog>
+
+      {/* Error Dialogs */}
+      <ErrorMessageDialog
+        errorMessage={inviteError || ''}
+        open={!!inviteError}
+        onClose={() => setInviteError(null)}
+      />
+      <ErrorMessageDialog
+        errorMessage={rejectionError || ''}
+        open={!!rejectionError}
+        onClose={() => setRejectionError(null)}
+      />
     </>
   );
 };

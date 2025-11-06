@@ -10,5 +10,9 @@ export const USER_FRAGMENT = gql`
     externalProfile
     zipCode
     country
+    Organization {
+      id
+      name
+    }
   }
 `;

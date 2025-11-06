@@ -82,6 +82,12 @@ export interface AchievementOptionList_AchievementOption_AchievementOptionCourse
   Course: AchievementOptionList_AchievementOption_AchievementOptionCourses_Course;
 }
 
+export interface AchievementOptionList_AchievementOption_AchievementOptionMentors_User_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
 export interface AchievementOptionList_AchievementOption_AchievementOptionMentors_User {
   __typename: "User";
   id: any;
@@ -113,6 +119,10 @@ export interface AchievementOptionList_AchievementOption_AchievementOptionMentor
    * The user's country of residence
    */
   country: string | null;
+  /**
+   * An object relationship
+   */
+  Organization: AchievementOptionList_AchievementOption_AchievementOptionMentors_User_Organization | null;
 }
 
 export interface AchievementOptionList_AchievementOption_AchievementOptionMentors {

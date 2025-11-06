@@ -9,6 +9,12 @@ import { CourseEnrollment_bool_exp, CourseEnrollmentStatus_enum } from "./../../
 // GraphQL query operation: CourseEnrollmentWithUserQuery
 // ====================================================
 
+export interface CourseEnrollmentWithUserQuery_CourseEnrollment_User_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
 export interface CourseEnrollmentWithUserQuery_CourseEnrollment_User {
   __typename: "User";
   id: any;
@@ -40,6 +46,10 @@ export interface CourseEnrollmentWithUserQuery_CourseEnrollment_User {
    * The user's country of residence
    */
   country: string | null;
+  /**
+   * An object relationship
+   */
+  Organization: CourseEnrollmentWithUserQuery_CourseEnrollment_User_Organization | null;
 }
 
 export interface CourseEnrollmentWithUserQuery_CourseEnrollment {

@@ -22,6 +22,12 @@ export interface AchievementRecordListWithAuthors_AchievementRecord_AchievementO
   recordType: AchievementRecordType_enum;
 }
 
+export interface AchievementRecordListWithAuthors_AchievementRecord_AchievementRecordAuthors_User_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
 export interface AchievementRecordListWithAuthors_AchievementRecord_AchievementRecordAuthors_User {
   __typename: "User";
   id: any;
@@ -53,6 +59,10 @@ export interface AchievementRecordListWithAuthors_AchievementRecord_AchievementR
    * The user's country of residence
    */
   country: string | null;
+  /**
+   * An object relationship
+   */
+  Organization: AchievementRecordListWithAuthors_AchievementRecord_AchievementRecordAuthors_User_Organization | null;
 }
 
 export interface AchievementRecordListWithAuthors_AchievementRecord_AchievementRecordAuthors {
