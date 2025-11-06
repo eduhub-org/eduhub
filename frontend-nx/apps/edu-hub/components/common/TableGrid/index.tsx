@@ -184,23 +184,6 @@ const TableGrid = <T extends BaseRow,>({
     return [...selectionColumn, ...dataColumns];
   }, [columns, showCheckbox, toggleRowSelection, selectedRowIds, toggleAllRows, data, isAllSelected, isSomeSelected]);
 
-  // Calculate total width of main row content for expandable row alignment
-  const mainRowContentWidth = useMemo(() => {
-    const totalColumnWidth = memoizedColumns.reduce((sum, col) => {
-      const colSize = col.size || 150; // Default size if not specified
-      return sum + colSize;
-    }, 0);
-    
-    // Add gaps between columns (gap-3 = 12px)
-    const gapSize = 12; // gap-3 in Tailwind
-    const gapCount = Math.max(0, memoizedColumns.length - 1);
-    const totalGapWidth = gapCount * gapSize;
-    
-    // Add left padding if no checkbox (pl-3 = 12px)
-    const leftPadding = showCheckbox ? 0 : 12;
-    
-    return totalColumnWidth + totalGapWidth + leftPadding;
-  }, [memoizedColumns, showCheckbox]);
 
   const table = useReactTable({
     data,
@@ -234,6 +217,44 @@ const TableGrid = <T extends BaseRow,>({
   });
 
   const totalPages = Math.ceil((totalCount || 0) / pageSize);
+
+  // Calculate total width of main row content for proper alignment and scrolling
+  // Use cell column sizes (from data rows) to avoid sort arrow width issues in headers
+  // Calculate directly (not memoized) to ensure it updates when columns are resized
+  const headerGroups = table.getHeaderGroups();
+  const rows = table.getRowModel().rows;
+  
+  const mainRowContentWidth = (() => {
+    if (headerGroups.length === 0) return 0;
+    
+    // Use cell column sizes from first row if available (avoids sort arrow width in headers)
+    // Otherwise fall back to header sizes
+    let totalColumnWidth = 0;
+    if (rows.length > 0) {
+      totalColumnWidth = rows[0].getVisibleCells().reduce((sum, cell) => {
+        return sum + cell.column.getSize();
+      }, 0);
+    } else {
+      totalColumnWidth = headerGroups[0].headers.reduce((sum, header) => {
+        return sum + header.getSize();
+      }, 0);
+    }
+    
+    // Add gaps between columns (gap-3 = 12px)
+    const gapSize = 12; // gap-3 in Tailwind
+    const columnCount = rows.length > 0 ? rows[0].getVisibleCells().length : headerGroups[0].headers.length;
+    const gapCount = Math.max(0, columnCount - 1);
+    const totalGapWidth = gapCount * gapSize;
+    
+    // Add left padding if no checkbox (pl-3 = 12px)
+    const leftPadding = showCheckbox ? 0 : 12;
+    
+    // Add action column widths (w-10 = 40px, w-20 = 80px)
+    const expandButtonWidth = expandableRowComponent ? 40 : 0;
+    const deleteButtonWidth = deleteMutation ? 80 : 0;
+    
+    return totalColumnWidth + totalGapWidth + leftPadding + expandButtonWidth + deleteButtonWidth;
+  })();
 
   return (
     <div>
@@ -329,9 +350,12 @@ const TableGrid = <T extends BaseRow,>({
         )}
       </div>
 
-      {/* Header row */}
-      <div className="flex items-center mb-1 text-white py-2">
-        <div className={`flex-grow flex gap-3 ${!showCheckbox ? 'pl-3' : ''}`}>
+      {/* Table Container with horizontal scroll */}
+      <div className="overflow-x-auto">
+        <div style={{ minWidth: `${mainRowContentWidth}px` }}>
+          {/* Header row */}
+          <div className="flex items-center mb-1 text-white py-2">
+        <div className={`flex-grow flex gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
           {table.getHeaderGroups().map((headerGroup) => (
             <React.Fragment key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
@@ -385,7 +409,7 @@ const TableGrid = <T extends BaseRow,>({
             {/* Primary Row */}
             <div className={`flex items-stretch ${expandedRows.has(row.original.id) ? 'mb-0' : 'mb-1'}`}>
               <div className="flex-grow bg-edu-light-gray py-2">
-                <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`}>
+                <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
                   {row.getVisibleCells().map((cell) => (
                     <div
                       key={cell.id}
@@ -430,11 +454,10 @@ const TableGrid = <T extends BaseRow,>({
             {/* Expandable Row */}
             {expandableRowComponent && expandedRows.has(row.original.id) && (
               <div className="flex items-stretch mb-1">
-                <div 
-                  className={`flex-grow bg-edu-light-gray py-2 ${!showCheckbox ? 'pl-3' : ''}`}
-                  style={{ minWidth: `${mainRowContentWidth}px` }}
-                >
-                  <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
+                <div className="flex-grow bg-edu-light-gray py-2 overflow-x-auto">
+                  <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
+                    <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
+                  </div>
                 </div>
                 {expandableRowComponent && <div className="w-10 flex-shrink-0"></div>}
                 {deleteMutation && <div className="w-20 flex-shrink-0"></div>}
@@ -442,6 +465,8 @@ const TableGrid = <T extends BaseRow,>({
             )}
           </React.Fragment>
         ))}
+        </div>
+      </div>
 
       {/* Pagination */}
       {!loading && !error && enablePagination && totalCount > 0 && (
