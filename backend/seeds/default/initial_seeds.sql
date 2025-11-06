@@ -1319,6 +1319,202 @@ INSERT INTO public."SessionAddress" (id, created_at, updated_at, "sessionId", ad
 INSERT INTO public."SessionAddress" (id, created_at, updated_at, "sessionId", address, "courseLocationId") VALUES (10, '2024-12-30 10:15:39.648192+00', '2024-12-30 10:15:39.648192+00', 38, '', 9);
 INSERT INTO public."SessionAddress" (id, created_at, updated_at, "sessionId", address, "courseLocationId") VALUES (11, '2024-12-30 10:16:04.499158+00', '2024-12-30 10:16:04.499158+00', 39, '', 8);
 INSERT INTO public."SessionAddress" (id, created_at, updated_at, "sessionId", address, "courseLocationId") VALUES (12, '2024-12-30 10:16:04.499158+00', '2024-12-30 10:16:04.499158+00', 39, '', 9);
+-- ============================================
+-- Degree-Teilnahmen und Zertifikats-Konfiguration
+-- ============================================
+
+-- User 11111111-1111-1111-1111-111111111111 belegt Kurse 1, 2, 4
+INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES 
+(500, 1, '11111111-1111-1111-1111-111111111111', 'COMPLETED', 'Ich habe diesen Kurs im Rahmen des Degree-Programms erfolgreich abgeschlossen.', 'REVIEW', NULL, NULL, '2024-01-15 10:00:00+00', '2024-03-20 14:30:00+00', NULL),
+(501, 2, '11111111-1111-1111-1111-111111111111', 'CONFIRMED', 'Dieser Kurs ist Teil meines Degree-Studiengangs.', 'UNRATED', NULL, NULL, '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00', NULL),
+(502, 4, '11111111-1111-1111-1111-111111111111', 'APPLIED', 'Ich möchte an diesem Kurs teilnehmen.', 'UNRATED', NULL, NULL, '2024-03-10 11:00:00+00', '2024-03-10 11:00:00+00', NULL)
+ON CONFLICT ON CONSTRAINT "uniqueUserCourse" DO NOTHING;
+
+-- User 22222222-2222-2222-2222-222222222222 belegt Kurse 5, 301
+INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES 
+(503, 5, '22222222-2222-2222-2222-222222222222', 'CONFIRMED', 'Teilnahme am Degree-Programm Kurs 5.', 'REVIEW', NULL, NULL, '2024-02-20 16:00:00+00', '2024-02-20 16:00:00+00', NULL),
+(504, 301, '22222222-2222-2222-2222-222222222222', 'INVITED', 'Teilnahme am Degree-Programm Kurs 301.', 'INVITE', NULL, NULL, '2024-02-15 14:00:00+00', '2024-02-15 14:00:00+00', '2024-04-15 23:59:59+00')
+ON CONFLICT ON CONSTRAINT "uniqueUserCourse" DO NOTHING;
+
+-- User 33333333-3333-3333-3333-333333333333 belegt Kurse 1, 2, 4, 5
+-- (301 hat User 3 bereits - siehe ID 450 in initial_seeds.sql)
+INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES 
+(505, 1, '33333333-3333-3333-3333-333333333333', 'APPLIED', 'Bewerbung für diesen Kurs im Degree-Programm.', 'UNRATED', NULL, NULL, '2024-03-12 15:00:00+00', '2024-03-12 15:00:00+00', NULL),
+(506, 2, '33333333-3333-3333-3333-333333333333', 'CONFIRMED', 'Teilnahme am Degree-Programm Kurs 2.', 'UNRATED', NULL, NULL, '2024-03-05 13:00:00+00', '2024-03-05 13:00:00+00', NULL),
+(507, 4, '33333333-3333-3333-3333-333333333333', 'COMPLETED', 'Kurs erfolgreich abgeschlossen.', 'REVIEW', NULL, NULL, '2024-01-20 10:00:00+00', '2024-03-25 16:00:00+00', NULL),
+(508, 5, '33333333-3333-3333-3333-333333333333', 'ABORTED', 'Teilnahme am Kurs abgebrochen.', 'DECLINE', NULL, NULL, '2024-02-25 12:00:00+00', '2024-03-01 09:00:00+00', NULL)
+ON CONFLICT ON CONSTRAINT "uniqueUserCourse" DO NOTHING;
+
+-- CourseEnrollments für den Degree-Course selbst (Course id=7)
+INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES 
+(509, 7, '11111111-1111-1111-1111-111111111111', 'CONFIRMED', 'Teilnahme am Degree-Programm "This is A degree".', 'UNRATED', NULL, NULL, '2024-01-10 09:00:00+00', '2024-01-10 09:00:00+00', NULL),
+(510, 7, '22222222-2222-2222-2222-222222222222', 'CONFIRMED', 'Teilnahme am Degree-Programm "This is A degree".', 'UNRATED', NULL, NULL, '2024-02-01 10:00:00+00', '2024-02-01 10:00:00+00', NULL),
+(511, 7, '33333333-3333-3333-3333-333333333333', 'CONFIRMED', 'Teilnahme am Degree-Programm "This is A degree".', 'UNRATED', NULL, NULL, '2024-02-15 11:00:00+00', '2024-02-15 11:00:00+00', NULL)
+ON CONFLICT ON CONSTRAINT "uniqueUserCourse" DO NOTHING;
+
+-- Achievement Certificates für CourseEnrollments aktualisieren
+-- User 33333333-3333-3333-3333-333333333333: Achievement Certificates für Course 1, 2, 4
+UPDATE public."CourseEnrollment" 
+SET "achievementCertificateURL" = '33333333-3333-3333-3333-333333333333/1/achievement_certificate.pdf'
+WHERE "userId" = '33333333-3333-3333-3333-333333333333' AND "courseId" = 1;
+
+UPDATE public."CourseEnrollment" 
+SET "achievementCertificateURL" = '33333333-3333-3333-3333-333333333333/2/achievement_certificate.pdf'
+WHERE "userId" = '33333333-3333-3333-3333-333333333333' AND "courseId" = 2;
+
+UPDATE public."CourseEnrollment" 
+SET "achievementCertificateURL" = '33333333-3333-3333-3333-333333333333/4/achievement_certificate.pdf'
+WHERE "userId" = '33333333-3333-3333-3333-333333333333' AND "courseId" = 4;
+
+-- User 11111111-1111-1111-1111-111111111111: Achievement Certificate für Course 1
+UPDATE public."CourseEnrollment" 
+SET "achievementCertificateURL" = '11111111-1111-1111-1111-111111111111/1/achievement_certificate.pdf'
+WHERE "userId" = '11111111-1111-1111-1111-111111111111' AND "courseId" = 1;
+-- Event für User 33333333-3333-3333-3333-333333333333
+-- Event-Kurs (Kurs 8) dem Degree (Kurs 7) zuordnen
+INSERT INTO public."CourseDegree" (id, "courseId", "degreeCourseId", created_at, updated_at) 
+SELECT 
+  (SELECT COALESCE(MAX(id), 0) + 1 FROM public."CourseDegree"), 
+  8, 
+  7, 
+  now(), 
+  now()
+WHERE NOT EXISTS (
+  SELECT 1 FROM public."CourseDegree" 
+  WHERE "courseId" = 8 AND "degreeCourseId" = 7
+);
+
+-- User 33333333-3333-3333-3333-333333333333 für Event-Kurs 8 einschreiben
+INSERT INTO public."CourseEnrollment" (
+  id, 
+  "courseId", 
+  "userId", 
+  status, 
+  "motivationLetter", 
+  "motivationRating", 
+  "achievementCertificateURL", 
+  "attendanceCertificateURL", 
+  created_at, 
+  updated_at, 
+  "invitationExpirationDate"
+) 
+SELECT 
+  (SELECT COALESCE(MAX(id), 0) + 1 FROM public."CourseEnrollment"),
+  8,
+  '33333333-3333-3333-3333-333333333333',
+  'CONFIRMED',
+  'Teilnahme am Event im Rahmen des Degree-Programms.',
+  'UNRATED',
+  NULL,
+  NULL,
+  now(),
+  now(),
+  NULL
+WHERE NOT EXISTS (
+  SELECT 1 FROM public."CourseEnrollment" 
+  WHERE "userId" = '33333333-3333-3333-3333-333333333333' AND "courseId" = 8
+);
+
+-- Program 2: AchievementCertificateTemplateURL setzen
+UPDATE public."Program" 
+SET "achievementCertificateTemplateURL" = 'programid_2/participation_certificate_template/degree.png'
+WHERE id = 2;
+
+-- CertificateTemplateText für Degree erstellen
+INSERT INTO public."CertificateTemplateText" (
+  id, 
+  title, 
+  html, 
+  created_at, 
+  updated_at, 
+  "certificateType", 
+  "recordType"
+) VALUES (
+  3,
+  'degree achievement certificate',
+  '<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Document Title</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    <style type="text/css">
+        @page {
+            size: a4 landscape;
+            background-image: url("{{ template }}");
+            background-position: center center;
+            background-size: cover;
+            @frame content_frame {
+                left: 85mm;
+                width: 195mm;
+                top: 60mm;
+                height: 140mm;
+            }
+        }
+        body, html {
+            font-family: ''Lato'', sans-serif !important;
+            margin: 0;
+            padding: 0;
+            width: 297mm;
+            height: 210mm;
+        }
+        .big {
+            font-size: 7mm;
+            font-weight: bold;
+            color: #777;
+        }
+        .small {
+            font-size: 4.2mm;
+            color: #777;
+        }
+        p {
+            margin-top: 3mm;
+            margin-bottom: 3mm;
+        }
+    </style>
+</head>
+<body>
+    <span class="big">{{ full_name }}</span>
+    <p class="small">
+        has met the degree''s minimum requirements of completing 12.5 ECTS and participating in at least one hackathon by successfully completing the following degree components:
+    </p>
+    <p class="small">
+    {% for participation in successful_participations %}
+    // {{ participation }}<br>
+    {% endfor %}
+    </p>
+</body>
+</html>',
+  now(),
+  now(),
+  'ACHIEVEMENT',
+  'DOCUMENTATION'
+)
+ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title,
+  html = EXCLUDED.html,
+  updated_at = now(),
+  "certificateType" = EXCLUDED."certificateType",
+  "recordType" = EXCLUDED."recordType";
+
+-- CertificateTemplateProgram: Program 2 mit Template 3 verknüpfen
+INSERT INTO public."CertificateTemplateProgram" (
+  id, 
+  "programId", 
+  "certificateTemplateText"
+) VALUES (
+  3,
+  2,
+  3
+)
+ON CONFLICT (id) DO UPDATE SET
+  "programId" = EXCLUDED."programId",
+  "certificateTemplateText" = EXCLUDED."certificateTemplateText";
+
+-- Sequenz-Resets für neue Einträge (am Ende, nach allen INSERTs)
+SELECT pg_catalog.setval('public."CourseEnrollment_id_seq"', COALESCE((SELECT MAX(id) FROM public."CourseEnrollment"), 511), true);
+SELECT pg_catalog.setval('public."CourseDegree_id_seq"', COALESCE((SELECT MAX(id) FROM public."CourseDegree"), 6), true);
+SELECT pg_catalog.setval('public."CertificateTemplateText_id_seq"', COALESCE((SELECT MAX(id) FROM public."CertificateTemplateText"), 3), true);
+SELECT pg_catalog.setval('public."CertificateTemplateProgram_id_seq"', COALESCE((SELECT MAX(id) FROM public."CertificateTemplateProgram"), 3), true);
 SELECT pg_catalog.setval('public."AchievementDocumentationTemplate_id_seq"', 1, false);
 SELECT pg_catalog.setval('public."AchievementOptionCourse_id_seq"', 7, true);
 SELECT pg_catalog.setval('public."AchievementOptionMentor_id_seq"', 1, false);
@@ -1327,7 +1523,7 @@ SELECT pg_catalog.setval('public."AchievementRecordAuthor_id_seq"', 1, true);
 SELECT pg_catalog.setval('public."AchievementRecord_id_seq"', 7, true);
 SELECT pg_catalog.setval('public."Attendence_Id_seq"', 64, true);
 SELECT pg_catalog.setval('public."CourseAddress_id_seq"', 9, true);
-SELECT pg_catalog.setval('public."CourseDegree_id_seq"', 6, true);
+-- CourseDegree_id_seq wird bereits dynamisch oben gesetzt (Zeile 1523)
 SELECT pg_catalog.setval('public."CourseGroup_id_seq"', 15, true);
 SELECT pg_catalog.setval('public."CourseGroupOption_id_seq"', 13, true);
 SELECT pg_catalog.setval('public."CourseInstructor_Id_seq"', 1, true);
