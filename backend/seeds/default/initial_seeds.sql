@@ -1323,21 +1323,18 @@ INSERT INTO public."SessionAddress" (id, created_at, updated_at, "sessionId", ad
 -- Degree-Teilnahmen und Zertifikats-Konfiguration
 -- ============================================
 
--- CourseEnrollments für User im Degree (Course id=7)
--- Die Kurse des Degrees sind: 1, 2, 4, 5, 301
--- Bunte Mischung an Kursen und Status-Werten
--- Jeder User kann nur einmal pro Kurs eingeschrieben sein!
-
 -- User 11111111-1111-1111-1111-111111111111 belegt Kurse 1, 2, 4
 INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES 
 (500, 1, '11111111-1111-1111-1111-111111111111', 'COMPLETED', 'Ich habe diesen Kurs im Rahmen des Degree-Programms erfolgreich abgeschlossen.', 'REVIEW', NULL, NULL, '2024-01-15 10:00:00+00', '2024-03-20 14:30:00+00', NULL),
 (501, 2, '11111111-1111-1111-1111-111111111111', 'CONFIRMED', 'Dieser Kurs ist Teil meines Degree-Studiengangs.', 'UNRATED', NULL, NULL, '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00', NULL),
-(502, 4, '11111111-1111-1111-1111-111111111111', 'APPLIED', 'Ich möchte an diesem Kurs teilnehmen.', 'UNRATED', NULL, NULL, '2024-03-10 11:00:00+00', '2024-03-10 11:00:00+00', NULL);
+(502, 4, '11111111-1111-1111-1111-111111111111', 'APPLIED', 'Ich möchte an diesem Kurs teilnehmen.', 'UNRATED', NULL, NULL, '2024-03-10 11:00:00+00', '2024-03-10 11:00:00+00', NULL)
+ON CONFLICT ON CONSTRAINT "uniqueUserCourse" DO NOTHING;
 
 -- User 22222222-2222-2222-2222-222222222222 belegt Kurse 5, 301
 INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES 
 (503, 5, '22222222-2222-2222-2222-222222222222', 'CONFIRMED', 'Teilnahme am Degree-Programm Kurs 5.', 'REVIEW', NULL, NULL, '2024-02-20 16:00:00+00', '2024-02-20 16:00:00+00', NULL),
-(504, 301, '22222222-2222-2222-2222-222222222222', 'INVITED', 'Teilnahme am Degree-Programm Kurs 301.', 'INVITE', NULL, NULL, '2024-02-15 14:00:00+00', '2024-02-15 14:00:00+00', '2024-04-15 23:59:59+00');
+(504, 301, '22222222-2222-2222-2222-222222222222', 'INVITED', 'Teilnahme am Degree-Programm Kurs 301.', 'INVITE', NULL, NULL, '2024-02-15 14:00:00+00', '2024-02-15 14:00:00+00', '2024-04-15 23:59:59+00')
+ON CONFLICT ON CONSTRAINT "uniqueUserCourse" DO NOTHING;
 
 -- User 33333333-3333-3333-3333-333333333333 belegt Kurse 1, 2, 4, 5
 -- (301 hat User 3 bereits - siehe ID 450 in initial_seeds.sql)
@@ -1345,13 +1342,15 @@ INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motiva
 (505, 1, '33333333-3333-3333-3333-333333333333', 'APPLIED', 'Bewerbung für diesen Kurs im Degree-Programm.', 'UNRATED', NULL, NULL, '2024-03-12 15:00:00+00', '2024-03-12 15:00:00+00', NULL),
 (506, 2, '33333333-3333-3333-3333-333333333333', 'CONFIRMED', 'Teilnahme am Degree-Programm Kurs 2.', 'UNRATED', NULL, NULL, '2024-03-05 13:00:00+00', '2024-03-05 13:00:00+00', NULL),
 (507, 4, '33333333-3333-3333-3333-333333333333', 'COMPLETED', 'Kurs erfolgreich abgeschlossen.', 'REVIEW', NULL, NULL, '2024-01-20 10:00:00+00', '2024-03-25 16:00:00+00', NULL),
-(508, 5, '33333333-3333-3333-3333-333333333333', 'ABORTED', 'Teilnahme am Kurs abgebrochen.', 'DECLINE', NULL, NULL, '2024-02-25 12:00:00+00', '2024-03-01 09:00:00+00', NULL);
+(508, 5, '33333333-3333-3333-3333-333333333333', 'ABORTED', 'Teilnahme am Kurs abgebrochen.', 'DECLINE', NULL, NULL, '2024-02-25 12:00:00+00', '2024-03-01 09:00:00+00', NULL)
+ON CONFLICT ON CONSTRAINT "uniqueUserCourse" DO NOTHING;
 
 -- CourseEnrollments für den Degree-Course selbst (Course id=7)
 INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES 
 (509, 7, '11111111-1111-1111-1111-111111111111', 'CONFIRMED', 'Teilnahme am Degree-Programm "This is A degree".', 'UNRATED', NULL, NULL, '2024-01-10 09:00:00+00', '2024-01-10 09:00:00+00', NULL),
 (510, 7, '22222222-2222-2222-2222-222222222222', 'CONFIRMED', 'Teilnahme am Degree-Programm "This is A degree".', 'UNRATED', NULL, NULL, '2024-02-01 10:00:00+00', '2024-02-01 10:00:00+00', NULL),
-(511, 7, '33333333-3333-3333-3333-333333333333', 'CONFIRMED', 'Teilnahme am Degree-Programm "This is A degree".', 'UNRATED', NULL, NULL, '2024-02-15 11:00:00+00', '2024-02-15 11:00:00+00', NULL);
+(511, 7, '33333333-3333-3333-3333-333333333333', 'CONFIRMED', 'Teilnahme am Degree-Programm "This is A degree".', 'UNRATED', NULL, NULL, '2024-02-15 11:00:00+00', '2024-02-15 11:00:00+00', NULL)
+ON CONFLICT ON CONSTRAINT "uniqueUserCourse" DO NOTHING;
 
 -- Achievement Certificates für CourseEnrollments aktualisieren
 -- User 33333333-3333-3333-3333-333333333333: Achievement Certificates für Course 1, 2, 4
@@ -1524,7 +1523,7 @@ SELECT pg_catalog.setval('public."AchievementRecordAuthor_id_seq"', 1, true);
 SELECT pg_catalog.setval('public."AchievementRecord_id_seq"', 7, true);
 SELECT pg_catalog.setval('public."Attendence_Id_seq"', 64, true);
 SELECT pg_catalog.setval('public."CourseAddress_id_seq"', 9, true);
-SELECT pg_catalog.setval('public."CourseDegree_id_seq"', 6, true);
+-- CourseDegree_id_seq wird bereits dynamisch oben gesetzt (Zeile 1523)
 SELECT pg_catalog.setval('public."CourseGroup_id_seq"', 15, true);
 SELECT pg_catalog.setval('public."CourseGroupOption_id_seq"', 13, true);
 SELECT pg_catalog.setval('public."CourseInstructor_Id_seq"', 1, true);
