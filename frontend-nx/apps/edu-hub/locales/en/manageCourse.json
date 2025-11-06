@@ -50,6 +50,8 @@
     "send_rejections_all_count_singular": "{{count}} person with red rating was identified and will be notified of their rejection for this course.",
     "send_rejections_all_count_plural": "{{count}} persons with red rating were identified and will be notified of their rejection for this course.",
     "send_rejections_confirm": "Send Rejections",
+    "send_invitations_error": "Failed to send invitations: {{error}}",
+    "send_rejections_error": "Failed to send rejections: {{error}}",
     "no_selection_dialog_title": "No Selection"
   },
   "statistics_applications_total": "Total Applications",

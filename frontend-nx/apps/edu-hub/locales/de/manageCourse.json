@@ -50,6 +50,8 @@
     "send_rejections_all_count_singular": "{{count}} Person mit roter Bewertung wurde identifiziert und wird über ihre Ablehnung für diesen Kurs informiert.",
     "send_rejections_all_count_plural": "{{count}} Personen mit roter Bewertung wurden identifiziert und werden über ihre Ablehnung für diesen Kurs informiert.",
     "send_rejections_confirm": "Ablehnungen senden",
+    "send_invitations_error": "Fehler beim Senden der Einladungen: {{error}}",
+    "send_rejections_error": "Fehler beim Senden der Ablehnungen: {{error}}",
     "no_selection_dialog_title": "Keine Auswahl"
   },
   "statistics_applications_total": "Bewerbungen gesamt",
