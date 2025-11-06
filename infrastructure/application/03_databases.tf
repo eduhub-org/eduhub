@@ -16,7 +16,6 @@ resource "google_sql_database_instance" "default" {
     }
     backup_configuration {
       enabled                        = var.enable_db_backup
-      binary_log_enabled             = var.enable_db_backup
       start_time                     = "02:00"
       point_in_time_recovery_enabled = var.enable_db_backup
       backup_retention_settings {
