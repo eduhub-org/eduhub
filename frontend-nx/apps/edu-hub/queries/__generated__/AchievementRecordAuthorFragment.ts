@@ -7,6 +7,12 @@
 // GraphQL fragment: AchievementRecordAuthorFragment
 // ====================================================
 
+export interface AchievementRecordAuthorFragment_User_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
 export interface AchievementRecordAuthorFragment_User {
   __typename: "User";
   id: any;
@@ -38,6 +44,10 @@ export interface AchievementRecordAuthorFragment_User {
    * The user's country of residence
    */
   country: string | null;
+  /**
+   * An object relationship
+   */
+  Organization: AchievementRecordAuthorFragment_User_Organization | null;
 }
 
 export interface AchievementRecordAuthorFragment {

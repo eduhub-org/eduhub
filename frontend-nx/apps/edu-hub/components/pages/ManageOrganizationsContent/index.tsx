@@ -147,6 +147,8 @@ const ManageOrganizationsContent: FC = () => {
     searchFilter,
     setSearchFilter,
     refetch: debouncedRefetch,
+    sorting,
+    setSorting,
   } = useTableGrid({
     queryHook: useRoleQuery,
     query: ORGANIZATION_LIST,
@@ -160,6 +162,21 @@ const ManageOrganizationsContent: FC = () => {
         ],
       },
     }),
+    sortColumnMapper: (columnId) => {
+      // Map column accessorKey to GraphQL field names
+      switch (columnId) {
+        case 'name':
+          return 'name';
+        case 'type':
+          return 'type';
+        case 'userCount':
+          // For userCount, we can't sort by aggregate directly in Hasura order_by
+          // Return null to skip server-side sorting for this column (falls back to client-side if needed)
+          return null;
+        default:
+          return columnId;
+      }
+    },
   });
 
   const [insertOrganization] = useRoleMutation<InsertOrganization, InsertOrganizationVariables>(INSERT_ORGANIZATION);
@@ -405,6 +422,8 @@ const ManageOrganizationsContent: FC = () => {
               onPageSizeChange={handlePageSizeChange}
               searchFilter={searchFilter}
               onSearchFilterChange={setSearchFilter}
+              sorting={sorting}
+              onSortingChange={setSorting}
               deleteMutation={DELETE_ORGANIZATION}
               error={queryError}
               loading={loading}

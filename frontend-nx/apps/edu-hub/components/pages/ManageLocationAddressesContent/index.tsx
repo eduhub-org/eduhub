@@ -116,11 +116,6 @@ const ManageLocationAddressesContent: FC = () => {
   const [selectedRowsForBulkAction, setSelectedRowsForBulkAction] = useState<LocationAddressListLocationAddress[]>([]);
   const [pageSize, setPageSize] = useState(20);
 
-  const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize);
-    setPageIndex(0); // Reset to first page when page size changes
-  };
-
   const {
     data,
     loading,
@@ -130,6 +125,8 @@ const ManageLocationAddressesContent: FC = () => {
     searchFilter,
     setSearchFilter,
     refetch: debouncedRefetch,
+    sorting,
+    setSorting,
   } = useTableGrid({
     queryHook: useAdminQuery,
     query: LOCATION_ADDRESS_LIST,
@@ -145,7 +142,29 @@ const ManageLocationAddressesContent: FC = () => {
         ],
       },
     }),
+    sortColumnMapper: (columnId) => {
+      // Map column accessorKey to GraphQL field names
+      switch (columnId) {
+        case 'shortLabel':
+          return 'shortLabel';
+        case 'address':
+          return 'address';
+        case 'locationOption':
+          return 'locationOption';
+        case 'usageCount':
+          // For usageCount, we can't sort by aggregate directly in Hasura order_by
+          // Return null to skip server-side sorting for this column (falls back to client-side if needed)
+          return null;
+        default:
+          return columnId;
+      }
+    },
   });
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPageIndex(0); // Reset to first page when page size changes
+  };
 
   const [insertLocationAddress] = useAdminMutation(INSERT_LOCATION_ADDRESS);
   const [deleteLocationAddress] = useAdminMutation(DELETE_LOCATION_ADDRESS);
@@ -320,6 +339,8 @@ const ManageLocationAddressesContent: FC = () => {
               onPageSizeChange={handlePageSizeChange}
               searchFilter={searchFilter}
               onSearchFilterChange={setSearchFilter}
+              sorting={sorting}
+              onSortingChange={setSorting}
               deleteMutation={DELETE_LOCATION_ADDRESS}
               error={queryError}
               loading={loading}

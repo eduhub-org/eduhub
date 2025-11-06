@@ -43,6 +43,12 @@ export interface AdminSessionFragment_SessionAddresses {
   CourseLocation: AdminSessionFragment_SessionAddresses_CourseLocation | null;
 }
 
+export interface AdminSessionFragment_SessionSpeakers_Expert_User_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
 export interface AdminSessionFragment_SessionSpeakers_Expert_User {
   __typename: "User";
   id: any;
@@ -74,6 +80,10 @@ export interface AdminSessionFragment_SessionSpeakers_Expert_User {
    * The user's country of residence
    */
   country: string | null;
+  /**
+   * An object relationship
+   */
+  Organization: AdminSessionFragment_SessionSpeakers_Expert_User_Organization | null;
 }
 
 export interface AdminSessionFragment_SessionSpeakers_Expert {
