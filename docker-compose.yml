@@ -22,6 +22,11 @@ services:
       NEXT_PUBLIC_STORAGE_BUCKET_URL: ${GITPOD_WORKSPACE_URL:-http://localhost}:4001/emulated-bucket
       NEXT_PUBLIC_ENVIRONMENT: development
       MM_URL: "https://chat.opencampus.sh"
+      # Enable file watching in Docker environment
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      # Fix IPv6 localhost resolution for image loading
+      NODE_OPTIONS: "--dns-result-order=ipv4first"
 
   node_functions:
     container_name: eduhub-node-functions
@@ -49,7 +54,9 @@ services:
 
   python_functions:
     container_name: eduhub-python-functions
-    image: python:3.11-slim-bullseye
+    build:
+      context: ./functions
+      dockerfile: Dockerfile
     working_dir: /functions
     volumes:
       - ./functions:/functions

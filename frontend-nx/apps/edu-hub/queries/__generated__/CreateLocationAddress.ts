@@ -31,5 +31,5 @@ export interface CreateLocationAddress {
 
 export interface CreateLocationAddressVariables {
   value: string;
-  locationOptionId: LocationOption_enum;
+  locationOption: LocationOption_enum;
 }

@@ -9,8 +9,8 @@ import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
-import { useRoleQuery } from '../../../hooks/authedQuery';
-import { useRoleMutation } from '../../../hooks/authedMutation';
+import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useAdminMutation } from '../../../hooks/authedMutation';
 import { PageBlock } from '../../common/PageBlock';
 
 import {
@@ -27,32 +27,13 @@ import CreatableTagSelector from '../../inputs/CreatableTagSelector';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { LocationOption_enum } from '../../../__generated__/globalTypes';
+import {
+  LocationAddressList_LocationAddress,
+  LocationAddressList_LocationOption,
+} from '../../../queries/__generated__/LocationAddressList';
 
-// TODO: Replace with actual generated types once GraphQL schema is deployed
-type LocationAddressListLocationAddress = {
-  id: number;
-  locationOptionId: LocationOption_enum;
-  shortLabel: string;
-  address: string;
-  description?: string;
-  aliases?: string[] | null;
-  created_at: string;
-  updated_at: string;
-  LocationOption: {
-    value: string;
-    comment?: string;
-  };
-  SessionAddresses_aggregate: {
-    aggregate: {
-      count: number;
-    };
-  };
-};
-
-type LocationOption = {
-  value: string;
-  comment?: string;
-};
+type LocationAddressListLocationAddress = LocationAddressList_LocationAddress;
+type LocationOption = LocationAddressList_LocationOption;
 
 type ExpandableRowProps = {
   row: LocationAddressListLocationAddress;
@@ -61,7 +42,6 @@ type ExpandableRowProps = {
 
 const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement => {
   const { t } = useTranslation('manageLocationAddresses');
-  useRoleQuery(LOCATION_ADDRESS_LIST);
 
   // Handle location address alias errors specifically
   const handleAliasError = useCallback(
@@ -136,11 +116,6 @@ const ManageLocationAddressesContent: FC = () => {
   const [selectedRowsForBulkAction, setSelectedRowsForBulkAction] = useState<LocationAddressListLocationAddress[]>([]);
   const [pageSize, setPageSize] = useState(20);
 
-  const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize);
-    setPageIndex(0); // Reset to first page when page size changes
-  };
-
   const {
     data,
     loading,
@@ -150,12 +125,15 @@ const ManageLocationAddressesContent: FC = () => {
     searchFilter,
     setSearchFilter,
     refetch: debouncedRefetch,
+    sorting,
+    setSorting,
   } = useTableGrid({
-    queryHook: useRoleQuery,
+    queryHook: useAdminQuery,
     query: LOCATION_ADDRESS_LIST,
     pageSize: pageSize,
     refetchFilter: (searchFilter) => ({
       filter: {
+        locationOption: { _neq: 'ONLINE' },
         _or: [
           { shortLabel: { _ilike: `%${searchFilter}%` } },
           { address: { _ilike: `%${searchFilter}%` } },
@@ -164,17 +142,40 @@ const ManageLocationAddressesContent: FC = () => {
         ],
       },
     }),
+    sortColumnMapper: (columnId) => {
+      // Map column accessorKey to GraphQL field names
+      switch (columnId) {
+        case 'shortLabel':
+          return 'shortLabel';
+        case 'address':
+          return 'address';
+        case 'locationOption':
+          return 'locationOption';
+        case 'usageCount':
+          // For usageCount, we can't sort by aggregate directly in Hasura order_by
+          // Return null to skip server-side sorting for this column (falls back to client-side if needed)
+          return null;
+        default:
+          return columnId;
+      }
+    },
   });
 
-  const [insertLocationAddress] = useRoleMutation(INSERT_LOCATION_ADDRESS);
-  const [deleteLocationAddress] = useRoleMutation(DELETE_LOCATION_ADDRESS);
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPageIndex(0); // Reset to first page when page size changes
+  };
+
+  const [insertLocationAddress] = useAdminMutation(INSERT_LOCATION_ADDRESS);
+  const [deleteLocationAddress] = useAdminMutation(DELETE_LOCATION_ADDRESS);
 
   const locationOptions = useMemo(
     () =>
-      data?.LocationOption?.map((option: LocationOption) => ({
-        value: option.value,
-        label: t(`common:location.${option.value}`),
-      })) || [],
+      data?.LocationOption?.filter((option: LocationOption) => option.value !== 'ONLINE')
+        .map((option: LocationOption) => ({
+          value: option.value,
+          label: t(`common:location.${option.value}`),
+        })) || [],
     [data, t]
   );
 
@@ -183,6 +184,7 @@ const ManageLocationAddressesContent: FC = () => {
       {
         accessorKey: 'shortLabel',
         header: t('locationAddress.shortLabel'),
+        enableSorting: true,
         meta: { width: 2 },
         cell: ({ getValue, row }) => (
           <InputField
@@ -199,27 +201,26 @@ const ManageLocationAddressesContent: FC = () => {
       },
       {
         accessorKey: 'address',
-        header: t('locationAddress.address_or_link'),
+        header: t('locationAddress.address'),
+        enableSorting: true,
         meta: { width: 4 },
-        cell: ({ getValue, row }) => {
-          const isOnline = row.original.locationOptionId === 'ONLINE';
-          return (
-            <InputField
-              variant="material"
-              type={isOnline ? "input" : "textarea"}
-              placeholder={isOnline ? t('input.enter_link') : t('input.enter_address')}
-              helpText={isOnline ? t('help.link') : t('help.address')}
-              itemId={row.original.id}
-              value={getValue<string>()}
-              updateValueMutation={UPDATE_LOCATION_ADDRESS_ADDRESS}
-              refetchQueries={['LocationAddressList']}
-            />
-          );
-        },
+        cell: ({ getValue, row }) => (
+          <InputField
+            variant="material"
+            type="textarea"
+            placeholder={t('input.enter_address')}
+            helpText={t('help.address')}
+            itemId={row.original.id}
+            value={getValue<string>()}
+            updateValueMutation={UPDATE_LOCATION_ADDRESS_ADDRESS}
+            refetchQueries={['LocationAddressList']}
+          />
+        ),
       },
       {
-        accessorKey: 'locationOptionId',
+        accessorKey: 'locationOption',
         header: t('locationAddress.locationOption'),
+        enableSorting: true,
         meta: { width: 2 },
         cell: ({ getValue, row }) => (
           <DropDownSelector
@@ -234,8 +235,13 @@ const ManageLocationAddressesContent: FC = () => {
       },
       {
         id: 'usageCount',
-        accessorFn: (row) => row.SessionAddresses_aggregate.aggregate.count,
+        accessorFn: (row) => {
+          const sessionCount = row.SessionAddresses_aggregate.aggregate?.count || 0;
+          const courseLocationCount = row.CourseLocations_aggregate.aggregate?.count || 0;
+          return sessionCount + courseLocationCount;
+        },
         header: t('locationAddress.usageCount'),
+        enableSorting: true,
         meta: { width: 1 },
         cell: ({ getValue }) => <div className="px-4 py-2">{getValue<number>()}</div>,
       },
@@ -250,7 +256,7 @@ const ManageLocationAddressesContent: FC = () => {
           insertInput: {
             shortLabel: t('locationAddress.new_address'),
             address: t('locationAddress.default_address'),
-            locationOptionId: (locationOptions[0]?.value || 'KIEL') as LocationOption_enum,
+            locationOption: (locationOptions[0]?.value || 'KIEL') as LocationOption_enum,
             description: t('locationAddress.default_description'),
           },
         },
@@ -333,6 +339,8 @@ const ManageLocationAddressesContent: FC = () => {
               onPageSizeChange={handlePageSizeChange}
               searchFilter={searchFilter}
               onSearchFilterChange={setSearchFilter}
+              sorting={sorting}
+              onSortingChange={setSorting}
               deleteMutation={DELETE_LOCATION_ADDRESS}
               error={queryError}
               loading={loading}

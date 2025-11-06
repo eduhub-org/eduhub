@@ -20,6 +20,10 @@ export interface MyCourses_User_by_pk_CourseEnrollments_Course_Sessions_SessionA
    * Will be used as default for any new session address.
    */
   defaultSessionAddress: string | null;
+  /**
+   * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
+   */
+  defaultSessionAddressId: number | null;
 }
 
 export interface MyCourses_User_by_pk_CourseEnrollments_Course_Sessions_SessionAddresses {

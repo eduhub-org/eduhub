@@ -131,6 +131,12 @@ const ManageOrganizationsContent: FC = () => {
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
   const [selectedRowsForBulkAction, setSelectedRowsForBulkAction] = useState<OrganizationList_Organization[]>([]);
   const [mergeDialogOpen, setMergeDialogOpen] = useState(false);
+  const [pageSize, setPageSize] = useState(20);
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPageIndex(0); // Reset to first page when page size changes
+  };
 
   const {
     data,
@@ -141,10 +147,12 @@ const ManageOrganizationsContent: FC = () => {
     searchFilter,
     setSearchFilter,
     refetch: debouncedRefetch,
+    sorting,
+    setSorting,
   } = useTableGrid({
     queryHook: useRoleQuery,
     query: ORGANIZATION_LIST,
-    pageSize: 15,
+    pageSize: pageSize,
     refetchFilter: (searchFilter) => ({
       filter: {
         _or: [
@@ -154,6 +162,21 @@ const ManageOrganizationsContent: FC = () => {
         ],
       },
     }),
+    sortColumnMapper: (columnId) => {
+      // Map column accessorKey to GraphQL field names
+      switch (columnId) {
+        case 'name':
+          return 'name';
+        case 'type':
+          return 'type';
+        case 'userCount':
+          // For userCount, we can't sort by aggregate directly in Hasura order_by
+          // Return null to skip server-side sorting for this column (falls back to client-side if needed)
+          return null;
+        default:
+          return columnId;
+      }
+    },
   });
 
   const [insertOrganization] = useRoleMutation<InsertOrganization, InsertOrganizationVariables>(INSERT_ORGANIZATION);
@@ -173,6 +196,7 @@ const ManageOrganizationsContent: FC = () => {
       {
         accessorKey: 'name',
         header: t('organization.name'),
+        enableSorting: true,
         meta: { width: 3 },
         cell: ({ getValue, row }) => (
           <InputField
@@ -205,6 +229,7 @@ const ManageOrganizationsContent: FC = () => {
         id: 'userCount',
         accessorFn: (row) => row.Users?.length ?? 0,
         header: t('organization.user_count'),
+        enableSorting: true,
         meta: { width: 2 },
         cell: ({ getValue }) => <div className="px-4 py-2">{getValue<number>()}</div>,
       },
@@ -393,8 +418,12 @@ const ManageOrganizationsContent: FC = () => {
               totalCount={data?.Organization_aggregate?.aggregate?.count || 0}
               pageIndex={pageIndex}
               onPageChange={setPageIndex}
+              pageSize={pageSize}
+              onPageSizeChange={handlePageSizeChange}
               searchFilter={searchFilter}
               onSearchFilterChange={setSearchFilter}
+              sorting={sorting}
+              onSortingChange={setSorting}
               deleteMutation={DELETE_ORGANIZATION}
               error={queryError}
               loading={loading}

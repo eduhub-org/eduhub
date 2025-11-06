@@ -16,6 +16,7 @@ import { enUS } from 'date-fns/locale/en-US';
 import useTranslation from 'next-translate/useTranslation';
 
 import { AppSettingsProvider } from '../contexts/AppSettingsContext';
+import { AuthErrorProvider } from '../contexts/AuthErrorContext';
 
 const theme = createTheme();
 
@@ -69,9 +70,10 @@ const MyApp: FC<AppProps & InitialProps> & {
       <ApolloProvider client={client}>
         <AppCacheProvider {...pageProps}>
           <ThemeProvider theme={theme}>
-            <AppSettingsProvider>
-              {/* Global Site Code Pixel - Facebook Pixel */}
-              <Script
+            <AuthErrorProvider>
+              <AppSettingsProvider>
+                {/* Global Site Code Pixel - Facebook Pixel */}
+                <Script
                 id="fb-pixel"
                 data-cookieconsent="marketing"
                 strategy="afterInteractive"
@@ -101,11 +103,12 @@ const MyApp: FC<AppProps & InitialProps> & {
                 data-cookieconsent="statistics"
                 type="text/plain"
               />
-              <Head>
-                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-              </Head>
-              <Component {...pageProps} />
-            </AppSettingsProvider>
+                <Head>
+                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                </Head>
+                <Component {...pageProps} />
+              </AppSettingsProvider>
+            </AuthErrorProvider>
           </ThemeProvider>
         </AppCacheProvider>
       </ApolloProvider>

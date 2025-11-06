@@ -3,6 +3,13 @@ table:
   schema: public
 is_enum: true
 array_relationships:
+  - name: LocationAddresses
+    using:
+      foreign_key_constraint_on:
+        column: locationOption
+        table:
+          name: LocationAddress
+          schema: public
   - name: Locations
     using:
       manual_configuration:
@@ -11,13 +18,6 @@ array_relationships:
         insertion_order: null
         remote_table:
           name: CourseLocation
-          schema: public
-  - name: LocationAddresses
-    using:
-      foreign_key_constraint_on:
-        column: locationOptionId
-        table:
-          name: LocationAddress
           schema: public
 select_permissions:
   - role: anonymous

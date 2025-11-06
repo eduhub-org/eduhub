@@ -34,6 +34,6 @@ export interface LocationAddressByLocationOption {
 }
 
 export interface LocationAddressByLocationOptionVariables {
-  locationOptionId: LocationOption_enum;
+  locationOption: LocationOption_enum;
   searchFilter?: string | null;
 }

@@ -25,13 +25,23 @@ export interface LocationAddressList_LocationAddress_SessionAddresses_aggregate 
   aggregate: LocationAddressList_LocationAddress_SessionAddresses_aggregate_aggregate | null;
 }
 
+export interface LocationAddressList_LocationAddress_CourseLocations_aggregate_aggregate {
+  __typename: "CourseLocation_aggregate_fields";
+  count: number;
+}
+
+export interface LocationAddressList_LocationAddress_CourseLocations_aggregate {
+  __typename: "CourseLocation_aggregate";
+  aggregate: LocationAddressList_LocationAddress_CourseLocations_aggregate_aggregate | null;
+}
+
 export interface LocationAddressList_LocationAddress {
   __typename: "LocationAddress";
   id: number;
   /**
    * Foreign key to LocationOption. Each address must belong to exactly one location option.
    */
-  locationOptionId: LocationOption_enum;
+  locationOption: LocationOption_enum;
   /**
    * Concise label shown in lists and typeahead (e.g., "Room 2.12", "Main Building").
    */
@@ -58,6 +68,10 @@ export interface LocationAddressList_LocationAddress {
    * An aggregate relationship
    */
   SessionAddresses_aggregate: LocationAddressList_LocationAddress_SessionAddresses_aggregate;
+  /**
+   * An aggregate relationship
+   */
+  CourseLocations_aggregate: LocationAddressList_LocationAddress_CourseLocations_aggregate;
 }
 
 export interface LocationAddressList_LocationAddress_aggregate_aggregate {

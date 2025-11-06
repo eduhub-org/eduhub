@@ -86,9 +86,9 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
 
   // Menubar configuration
   const allTabId = -1;
-  const maxOtherPrograms = 3;
+  const maxOtherPrograms = 6;
 
-  // Create programs list for menubar: EVENTS + DEGREES + 3 most recent others + All
+  // Create programs list for menubar: EVENTS + DEGREES + 6 most recent others + All
   const menubarPrograms: Programs_Program[] = useMemo(() => {
     const programs: Programs_Program[] = [];
 
@@ -109,13 +109,13 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     // Add "All" option as a pseudo-program
     programs.push({
       id: allTabId,
-      shortTitle: 'All',
-      title: 'All',
+      shortTitle: t('all_programs'),
+      title: t('all_programs'),
       __typename: 'Program',
     } as Programs_Program);
 
     return programs;
-  }, [sortedPrograms, allTabId, maxOtherPrograms]);
+  }, [sortedPrograms, allTabId, maxOtherPrograms, t]);
 
   // Derive current program ID from filter (single source of truth)
   const currentProgramId = filter.where?.programId?._eq ?? allTabId;
@@ -299,10 +299,12 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const courseGroupOptions = useMemo(() => {
     if (data && !loading && !error) {
       return (
-        data.CourseGroupOption?.map((option) => ({
-          id: option.id,
-          name: t(`common:course_group_options.${option.title}`),
-        })) || []
+        data.CourseGroupOption
+          ?.filter((option) => option.sliderGroup)
+          .map((option) => ({
+            id: option.id,
+            name: t(`common:course_group_options.${option.title}`),
+          })) || []
       );
     } else {
       return [];

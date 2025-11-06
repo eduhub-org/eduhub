@@ -20,6 +20,10 @@ export interface AdminSessionFragment_SessionAddresses_CourseLocation {
    * Will be used as default for any new session address.
    */
   defaultSessionAddress: string | null;
+  /**
+   * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
+   */
+  defaultSessionAddressId: number | null;
 }
 
 export interface AdminSessionFragment_SessionAddresses {
@@ -37,6 +41,12 @@ export interface AdminSessionFragment_SessionAddresses {
    * An object relationship
    */
   CourseLocation: AdminSessionFragment_SessionAddresses_CourseLocation | null;
+}
+
+export interface AdminSessionFragment_SessionSpeakers_Expert_User_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
 }
 
 export interface AdminSessionFragment_SessionSpeakers_Expert_User {
@@ -70,6 +80,10 @@ export interface AdminSessionFragment_SessionSpeakers_Expert_User {
    * The user's country of residence
    */
   country: string | null;
+  /**
+   * An object relationship
+   */
+  Organization: AdminSessionFragment_SessionSpeakers_Expert_User_Organization | null;
 }
 
 export interface AdminSessionFragment_SessionSpeakers_Expert {

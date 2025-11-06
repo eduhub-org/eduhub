@@ -4,8 +4,15 @@ table:
 object_relationships:
   - name: LocationOption
     using:
-      foreign_key_constraint_on: locationOptionId
+      foreign_key_constraint_on: locationOption
 array_relationships:
+  - name: CourseLocations
+    using:
+      foreign_key_constraint_on:
+        column: defaultSessionAddressId
+        table:
+          name: CourseLocation
+          schema: public
   - name: SessionAddresses
     using:
       foreign_key_constraint_on:
@@ -18,7 +25,7 @@ insert_permissions:
     permission:
       check: {}
       columns:
-        - locationOptionId
+        - locationOption
         - shortLabel
         - address
         - description
@@ -27,7 +34,7 @@ insert_permissions:
     permission:
       check: {}
       columns:
-        - locationOptionId
+        - locationOption
         - shortLabel
         - address
         - description
@@ -37,7 +44,20 @@ select_permissions:
     permission:
       columns:
         - id
-        - locationOptionId
+        - locationOption
+        - shortLabel
+        - address
+        - description
+        - aliases
+        - created_at
+        - updated_at
+      filter: {}
+      allow_aggregations: true
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - locationOption
         - shortLabel
         - address
         - description
@@ -50,7 +70,7 @@ select_permissions:
     permission:
       columns:
         - id
-        - locationOptionId
+        - locationOption
         - shortLabel
         - address
         - description

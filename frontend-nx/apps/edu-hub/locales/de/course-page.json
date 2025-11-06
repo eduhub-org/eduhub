@@ -186,6 +186,7 @@
     "search_links": "Links suchen...",
     "create_new_address": "Neue Adresse erstellen",
     "create_new_link": "Neuen Link erstellen",
+    "default_address": "Standard",
     "link_label": "Link-Name",
     "link_label_placeholder": "z.B. Haupt-Meetingraum, Workshop-Link",
     "link_url": "URL",

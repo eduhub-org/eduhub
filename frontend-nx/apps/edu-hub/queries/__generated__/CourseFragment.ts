@@ -20,6 +20,10 @@ export interface CourseFragment_Sessions_SessionAddresses_CourseLocation {
    * Will be used as default for any new session address.
    */
   defaultSessionAddress: string | null;
+  /**
+   * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
+   */
+  defaultSessionAddressId: number | null;
 }
 
 export interface CourseFragment_Sessions_SessionAddresses {

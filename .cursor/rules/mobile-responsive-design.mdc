@@ -279,7 +279,15 @@ const MobilePagination: React.FC<PaginationProps> = ({
   }
 
   // Full pagination for desktop
-  return <FullPagination {...props} />;
+  return (
+    <FullPagination
+      pageIndex={pageIndex}
+      pageSize={pageSize}
+      totalCount={totalCount}
+      onPageChange={onPageChange}
+      onPageSizeChange={onPageSizeChange}
+    />
+  );
 };
 ```
 
