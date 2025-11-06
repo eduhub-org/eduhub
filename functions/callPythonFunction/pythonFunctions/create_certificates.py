@@ -17,7 +17,7 @@ class CertificateError(Exception):
 
 class CertificateCreator:
     """
-    The `CertificateCreator` class generates certificates for course enrollments by retrieving the necessary template images and html-texts, preparing the content for each certificate based on the enrollment data and then converting HTML templates into PDF certificates. These PDFs are then uploaded to Google Cloud Storage (GCS) and the URLs of the created certificates are updated in the course enrollment records. The class handles attendance certificates, achievement certificates, and degree certificates (which are a special type of achievement certificate for Program ID 13).
+    The `CertificateCreator` class generates certificates for course enrollments by retrieving the necessary template images and html-texts, preparing the content for each certificate based on the enrollment data and then converting HTML templates into PDF certificates. These PDFs are then uploaded to Google Cloud Storage (GCS) and the URLs of the created certificates are updated in the course enrollment records. The class handles attendance certificates, achievement certificates, and degree certificates (which are a special type of achievement certificate for Programs with shortTitle "DEGREES").
     """
     def __init__(self, arguments, enrollments=None, edu_hub_client=None):
         """
@@ -45,24 +45,24 @@ class CertificateCreator:
         if not self.enrollments:
             raise CertificateError("No enrollments found", "NO_ENROLLMENTS_FOUND")
 
-        # Check if this is a degree certificate (Program ID 13)
+        # Check if this is a degree certificate (Program shortTitle "DEGREES")
         self.is_degree = self._is_degree_certificate()
         
         logging.info(f"Processing {len(self.enrollments)} enrollments for certificate creation")
         if self.is_degree:
-            logging.info("Detected degree certificate (Program ID 2)")
+            logging.info("Detected degree certificate (Program shortTitle: DEGREES)")
 
     def _is_degree_certificate(self):
         """
-        Checks if this is a degree certificate by verifying if the program ID is 13.
+        Checks if this is a degree certificate by verifying if the program shortTitle is "DEGREES".
         
         Returns:
-            bool: True if this is a degree certificate (Program ID 13), False otherwise
+            bool: True if this is a degree certificate (Program shortTitle "DEGREES"), False otherwise
         """
         try:
             if self.enrollments and len(self.enrollments) > 0:
-                program_id = self.enrollments[0].get('Course', {}).get('Program', {}).get('id')
-                return program_id == 2
+                program_short_title = self.enrollments[0].get('Course', {}).get('Program', {}).get('shortTitle')
+                return program_short_title == "DEGREES"
             return False
         except Exception as e:
             logging.warning(f"Could not determine if this is a degree certificate: {e}")
