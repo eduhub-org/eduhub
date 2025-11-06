@@ -18,14 +18,14 @@ interface UseTableGridProps<V> {
  * Converts TanStack Table SortingState to Hasura order_by format
  * @param sorting - TanStack Table sorting state (e.g., [{ id: 'name', desc: false }])
  * @param sortColumnMapper - Optional function to map column IDs to GraphQL field names
- * @returns Hasura order_by format (e.g., [{ name: 'asc' }])
+ * @returns Hasura order_by format (e.g., [{ name: 'asc' }]) or empty array to clear sorting
  */
 function convertSortingToOrderBy(
   sorting: SortingState,
   sortColumnMapper?: (columnId: string) => string | null
-): Record<string, string>[] | undefined {
+): Record<string, string>[] {
   if (!sorting || sorting.length === 0) {
-    return undefined;
+    return [];
   }
 
   const orderBy = sorting
@@ -44,8 +44,8 @@ function convertSortingToOrderBy(
     })
     .filter((orderBy): orderBy is Record<string, string> => orderBy !== null);
 
-  // Return undefined if no valid sort orders (instead of empty array)
-  return orderBy.length > 0 ? orderBy : undefined;
+  // Always return an array (empty if no valid sort orders) to clear server-side sort state
+  return orderBy;
 }
 
 export function useTableGrid<V>({
@@ -71,7 +71,7 @@ export function useTableGrid<V>({
       offset: pageIndex * pageSize,
       limit: pageSize,
       ...queryVariables,
-      ...(orderBy && { order_by: orderBy }),
+      order_by: orderBy,
     },
   });
 
@@ -86,7 +86,7 @@ export function useTableGrid<V>({
       limit: pageSize,
       ...queryVariables,
       ...refetchVariables, // Merge refetchFilter result into queryVariables
-      ...(orderBy && { order_by: orderBy }),
+      order_by: orderBy,
     });
   }, [pageIndex, debouncedRefetch, searchFilter, queryVariables, pageSize, refetchFilter, orderBy]);
 
