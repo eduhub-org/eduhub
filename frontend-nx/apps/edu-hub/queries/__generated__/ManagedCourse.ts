@@ -20,6 +20,10 @@ export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses_CourseLoca
    * Will be used as default for any new session address.
    */
   defaultSessionAddress: string | null;
+  /**
+   * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
+   */
+  defaultSessionAddressId: number | null;
 }
 
 export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses {
@@ -30,9 +34,19 @@ export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses {
    */
   address: string;
   /**
+   * Foreign key to LocationAddress. Replaces the free-text address field with a structured address reference. Nullable during migration period.
+   */
+  locationAddressId: number | null;
+  /**
    * An object relationship
    */
   CourseLocation: ManagedCourse_Course_by_pk_Sessions_SessionAddresses_CourseLocation | null;
+}
+
+export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
 }
 
 export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User {
@@ -66,6 +80,10 @@ export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User
    * The user's country of residence
    */
   country: string | null;
+  /**
+   * An object relationship
+   */
+  Organization: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User_Organization | null;
 }
 
 export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert {
@@ -177,6 +195,10 @@ export interface ManagedCourse_Course_by_pk_CourseLocations {
    * Either 'ONLINE' or one of the possible given offline locations
    */
   locationOption: LocationOption_enum | null;
+  /**
+   * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
+   */
+  defaultSessionAddressId: number | null;
 }
 
 export interface ManagedCourse_Course_by_pk_Program {
@@ -301,6 +323,12 @@ export interface ManagedCourse_Course_by_pk_CourseFundingOrganizations {
   Organization: ManagedCourse_Course_by_pk_CourseFundingOrganizations_Organization;
 }
 
+export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Attendances_Session {
   __typename: "Session";
   id: number;
@@ -335,6 +363,10 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollm
    */
   title: string;
   /**
+   * The number of ECTS of the course (only editable by an admin user))
+   */
+  ects: string;
+  /**
    * An object relationship
    */
   Program: ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollments_Course_Program;
@@ -350,6 +382,14 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_CourseEnrollm
    * The ID of the course of this enrollment from the given user
    */
   courseId: number;
+  /**
+   * URL to the file containing the user's achievement certificate (if he obtained one)
+   */
+  achievementCertificateURL: string | null;
+  /**
+   * URL to the file containing the user's attendance certificate (if he obtained one)
+   */
+  attendanceCertificateURL: string | null;
   /**
    * An object relationship
    */
@@ -387,6 +427,10 @@ export interface ManagedCourse_Course_by_pk_CourseEnrollments_User {
    * The user's country of residence
    */
   country: string | null;
+  /**
+   * An object relationship
+   */
+  Organization: ManagedCourse_Course_by_pk_CourseEnrollments_User_Organization | null;
   /**
    * An array relationship
    */

@@ -94,6 +94,7 @@ export const ADMIN_COURSE_LIST = gql`
       id
       title
       order
+      sliderGroup
     }
   }
 `;

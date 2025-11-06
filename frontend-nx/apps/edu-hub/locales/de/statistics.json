@@ -23,7 +23,8 @@
         },
         "daily": "Tägliche Bewerbungen",
         "cumulative": "Kumulierte Bewerbungen",
-        "no_data_available": "Keine Daten verfügbar"
+        "no_data_available": "Keine Daten verfügbar",
+        "use_actual_dates": "Nutze das Kalender-Datum auf der X-Achse"
     },
     "course_statistics": {
         "label": "Kursstatistiken",

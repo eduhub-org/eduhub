@@ -143,7 +143,8 @@
   "end_time": "Endzeit",
   "short_description": {
     "label": "Kurzbeschreibung",
-    "help_text": "Dieser Text erscheint auf der Kachel des Kurses und als Tagline auf der Kursseite."
+    "help_text": "Dieser Text erscheint auf der Kachel des Kurses und als Tagline auf der Kursseite.",
+    "placeholder": "Geben Sie eine kurze Beschreibung des Kurses ein..."
   },
   "learning_goals": {
     "label": "Lernziele",
@@ -171,13 +172,30 @@
 
   "sessionAddress": {
     "online": {
-      "label": "Link zur Online-Veranstaltung",
+      "label": "Online",
       "placeholder": "Bitte gib im Tab \"Beschreibung\" einen gültigen Link ein."
     },
     "offline": {
       "label": "Adresse zur Vor-Ort-Teilnahme in ",
-      "placeholder": "Definiere im Tab \"Beschreibung\" eine Standardaddresse."
-    }
+      "placeholder": "Wähle im Tab \"Beschreibung\" eine Standardaddresse oder wähle hier eine spezifische Adresse aus."
+    },
+    "select_address": "Adresse auswählen",
+    "select_online_link": "Online-Link auswählen",
+    "search_addresses": "Adressen suchen...",
+    "no_address_selected": "Keine Adresse ausgewählt",
+    "search_links": "Links suchen...",
+    "create_new_address": "Neue Adresse erstellen",
+    "create_new_link": "Neuen Link erstellen",
+    "default_address": "Standard",
+    "link_label": "Link-Name",
+    "link_label_placeholder": "z.B. Haupt-Meetingraum, Workshop-Link",
+    "link_url": "URL",
+    "link_url_placeholder": "https://example.com/meeting-room",
+    "aliases": "Aliase",
+    "aliases_help": "Aliase eingeben und Enter drücken, um sie hinzuzufügen",
+    "legacy_address": "Legacy-Adresse (schreibgeschützt)",
+    "select_location_option_first": "Bitte wähle zuerst eine Standortoption aus",
+    "location_mismatch_error": "Die ausgewählte Adresse passt nicht zur Standortoption dieser Session. Bitte wähle eine Adresse aus, die zum richtigen Standort gehört."
   },
   "date": "Datum",
   "title": "Titel",
@@ -190,5 +208,6 @@
   "total_applications": "Bewerbungen (gesamt):",
   "accepted_applications": "Bewerbungen (angenommen):",
   "total_invitations": "Einladungen (gesamt):",
-  "confirmed_invitations": "Einladungen (bestätigt):"
+  "confirmed_invitations": "Einladungen (bestätigt):",
+  "Uniqueness violation. duplicate key value violates unique constraint \"CourseAddress_pkey\"": "Eine Standortadresse mit dieser Konfiguration existiert bereits für diesen Kurs."
 }

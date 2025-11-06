@@ -53,6 +53,10 @@ export interface MultiProgramEnrollments_Program {
    */
   shortTitle: string | null;
   /**
+   * The default application deadline for a course. It can be changed on the course level.
+   */
+  defaultApplicationEnd: any | null;
+  /**
    * An array relationship
    */
   Courses: MultiProgramEnrollments_Program_Courses[];

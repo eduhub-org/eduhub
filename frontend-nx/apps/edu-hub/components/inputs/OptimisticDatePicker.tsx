@@ -305,7 +305,7 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
   }, [autoHolidays, showWeekends]);
 
   // Process all highlights into highlight dates format that react-datepicker expects
-  const processedHighlightDates = React.useMemo(() => {
+  React.useMemo(() => {
     const processed: any[] = [...highlightDates];
 
     if (allHighlights.length > 0) {

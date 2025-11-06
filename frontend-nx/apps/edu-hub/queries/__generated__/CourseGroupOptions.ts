@@ -12,6 +12,10 @@ export interface CourseGroupOptions_CourseGroupOption {
   id: number;
   order: number;
   title: string;
+  /**
+   * Indicates whether this group option is used in UI sliders (true) or as metadata tags (false)
+   */
+  sliderGroup: boolean | null;
 }
 
 export interface CourseGroupOptions {

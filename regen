@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Regenerate Apollo GraphQL code and fix file permissions
+# 
+# Usage: ./regen [username]
+# If no username is provided, it will use the current user
+
+set -e  # Exit on any error
+
+# Get the target user (either provided as argument or current user)
+TARGET_USER=${1:-$USER}
+
+echo "Regenerating Apollo GraphQL code for user: $TARGET_USER"
+echo "Make sure the frontend-nx container is running!"
+
+# Run the codegen inside the container as the current user
+# This ensures we can access containers started by the regular user
+echo "Running Apollo codegen in container..."
+docker exec -ti eduhub-frontend-nx npx nx run edu-hub:apollo
+
+# Check if any files were created with wrong permissions and fix them
+echo "Checking for permission issues..."
+
+# Find files owned by root in the current directory
+ROOT_FILES=$(find . -user root 2>/dev/null | head -10)
+
+if [ -n "$ROOT_FILES" ]; then
+    echo "Found files owned by root. Fixing permissions..."
+    echo "You may need to enter your password to fix permissions:"
+    sudo chown $TARGET_USER:$TARGET_USER -R .
+    echo "Permissions fixed!"
+else
+    echo "No permission issues found. All files are already owned by $TARGET_USER"
+fi
+
+echo "Apollo code regeneration completed successfully!"

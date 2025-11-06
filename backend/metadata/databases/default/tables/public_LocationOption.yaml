@@ -3,6 +3,13 @@ table:
   schema: public
 is_enum: true
 array_relationships:
+  - name: LocationAddresses
+    using:
+      foreign_key_constraint_on:
+        column: locationOption
+        table:
+          name: LocationAddress
+          schema: public
   - name: Locations
     using:
       manual_configuration:

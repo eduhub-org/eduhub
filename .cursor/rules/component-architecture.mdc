@@ -1,0 +1,538 @@
+---
+description: "Apply when working on component design, architecture decisions, organizing component structure, creating new components, or refactoring existing component hierarchies in the EduHub frontend"
+alwaysApply: false
+---
+
+# Component Architecture Guide
+
+> **Related Rules**: [Frontend Component Patterns](frontend-component-patterns.mdc) | [GraphQL Integration](graphql-integration-patterns.mdc) | [Testing Standards](testing-standards.mdc) | [TableGrid Usage](table-grid-basic-usage.mdc)
+
+## Component Organization Principles
+
+### Directory Structure
+```
+components/
+├── common/                    # Shared, reusable components
+│   ├── dialogs/              # Modal and dialog components
+│   ├── TableGrid/            # Data table with pagination
+│   ├── Button.tsx            # Standard button component
+│   ├── UserCard.tsx          # User display component
+│   └── Modal.tsx             # Base modal wrapper
+├── inputs/                   # Form input components
+│   ├── InputField.tsx        # Standard text input
+│   ├── DropDownSelector/     # Dropdown with search
+│   ├── CreatableTagSelector.tsx # Tag input with creation
+│   └── OptimisticDatePicker.tsx # Date picker with optimistic updates
+├── layout/                   # Layout and navigation components
+│   ├── Page.tsx              # Main page wrapper
+│   ├── Header.tsx            # Site header
+│   └── Footer.tsx            # Site footer
+└── pages/                    # Page-specific components
+    ├── CourseContent/        # Feature-oriented organization
+    │   ├── Registration/     # Registration feature
+    │   │   ├── index.tsx     # Main component
+    │   │   ├── types.ts      # Type definitions
+    │   │   ├── hooks/        # Feature-specific hooks
+    │   │   └── README.md     # Feature documentation
+    │   └── AchievementRecord/ # Achievement feature
+    └── ManageCourseContent/  # Management features
+```
+
+## Component Design Patterns
+
+### 1. Feature-Oriented Architecture
+
+**✅ GOOD: Feature-based organization**
+```
+CourseContent/
+├── Registration/             # Complete registration feature
+│   ├── index.tsx            # Main orchestrator
+│   ├── types.ts             # Feature types
+│   ├── RegistrationButton.tsx
+│   ├── RegistrationModal.tsx
+│   ├── RegistrationStatus.tsx
+│   └── hooks/
+│       └── useRegistrationHandler.ts
+└── AchievementRecord/        # Achievement feature
+    ├── index.tsx
+    ├── UploadModal.tsx
+    └── hooks/
+```
+
+**❌ AVOID: Technology-based organization**
+```
+components/
+├── buttons/
+├── modals/
+├── forms/
+└── hooks/
+```
+
+### 2. Component Composition Patterns
+
+#### Container/Presentational Pattern
+```typescript
+// Container: Handles data and logic
+const CourseContent: FC<{ id: number }> = ({ id }) => {
+  const { data, loading, error } = useAdminQuery(COURSE_QUERY, {
+    variables: { id }
+  });
+
+  if (loading) return <CircularProgress />;
+  if (error) return <ErrorMessageDialog error={error} />;
+
+  return (
+    <div>
+      <CourseHeader course={data.course} />
+      <CourseSessions sessions={data.sessions} />
+      <Registration course={data.course} />
+    </div>
+  );
+};
+
+// Presentational: Pure UI components
+const CourseHeader: FC<{ course: Course }> = ({ course }) => (
+  <div className="course-header">
+    <h1>{course.title}</h1>
+    <p>{course.description}</p>
+  </div>
+);
+```
+
+#### Compound Component Pattern
+```typescript
+// Main component with sub-components
+const Registration = {
+  Main: RegistrationMain,
+  Button: RegistrationButton,
+  Modal: RegistrationModal,
+  Status: RegistrationStatus,
+};
+
+// Usage
+<Registration.Main course={course}>
+  <Registration.Button />
+  <Registration.Status />
+</Registration.Main>
+```
+
+### 3. Component Interface Design
+
+#### Props Interface Patterns
+```typescript
+// ✅ GOOD: Clear, specific interfaces
+interface RegistrationProps {
+  course: Course_Course_by_pk;
+  courseEnrollment?: CourseWithEnrollment_Course_by_pk_CourseEnrollments;
+  onRegistrationSuccess?: () => void;
+}
+
+// ✅ GOOD: Generic with constraints
+interface EntityListManagerProps<TEntity, TSelectedEntity> {
+  entities: TEntity[];
+  selectedEntities: TSelectedEntity[];
+  onSelectionChange: (entities: TSelectedEntity[]) => void;
+  renderEntity: (entity: TEntity) => ReactNode;
+}
+
+// ❌ AVOID: Vague or overly generic props
+interface ComponentProps {
+  data: any;
+  config: any;
+  options?: any;
+}
+```
+
+#### Component Variants
+```typescript
+// ✅ GOOD: Variant-based design
+interface ButtonProps {
+  variant: 'primary' | 'secondary' | 'danger';
+  size: 'small' | 'medium' | 'large';
+  disabled?: boolean;
+  children: ReactNode;
+}
+
+// ✅ GOOD: Polymorphic components
+interface UserCardProps {
+  user: User;
+  size: 'small' | 'medium' | 'large';
+  showRole?: boolean;
+  className?: string;
+}
+```
+
+### 4. State Management Patterns
+
+#### Local State for UI
+```typescript
+const RegistrationModal: FC<Props> = ({ isOpen, onClose }) => {
+  const [motivationLetter, setMotivationLetter] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // UI state stays local
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      await submitRegistration({ motivationLetter });
+      onClose();
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+};
+```
+
+#### Server State with GraphQL
+```typescript
+const CourseContent: FC<{ id: number }> = ({ id }) => {
+  // Server state managed by Apollo
+  const { data, loading, error } = useAdminQuery(COURSE_QUERY, {
+    variables: { id },
+    errorPolicy: 'all'
+  });
+
+  // Derived state
+  const isEnrolled = useMemo(() => 
+    data?.course?.enrollments?.some(e => e.userId === currentUserId),
+    [data, currentUserId]
+  );
+};
+```
+
+#### Custom Hooks for Complex Logic
+```typescript
+// ✅ GOOD: Extract complex logic to custom hooks
+const useRegistrationHandler = ({
+  course,
+  onSuccess
+}: UseRegistrationHandlerProps) => {
+  const [mutation] = useRoleMutation(ENROLL_MUTATION);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleRegistration = useCallback(async (data: RegistrationData) => {
+    setIsLoading(true);
+    try {
+      await mutation({ variables: { courseId: course.id, ...data } });
+      onSuccess?.();
+    } catch (error) {
+      // Handle error
+    } finally {
+      setIsLoading(false);
+    }
+  }, [mutation, course.id, onSuccess]);
+
+  return { handleRegistration, isLoading };
+};
+```
+
+## Component Reuse Guidelines
+
+### 1. Component Decision Matrix
+
+| Need | Check First | Use If Available |
+|------|-------------|------------------|
+| **Error Display** | `ErrorMessageDialog` | ✅ Standard error dialog |
+| **User Confirmation** | `QuestionConfirmationDialog` | ✅ Yes/no confirmation |
+| **Custom Modal** | `BaseDialog` | ✅ Flexible dialog wrapper |
+| **Toast Notification** | `NotificationSnackbar` | ✅ Temporary notifications |
+| **Tag/Alias Input** | `CreatableTagSelector` | ✅ Supports creation + selection |
+| **Dropdown Selection** | `DropDownSelector` | ✅ Standard dropdown with options |
+| **Data Table** | `TableGrid` | ✅ Pagination, sorting, filtering |
+| **Text Input** | `InputField` | ✅ Standard form input |
+| **Button** | `Button` | ✅ Consistent styling |
+| **User Display** | `UserCard` | ✅ User profile display |
+
+### 2. Component Extension Patterns
+
+#### Composition over Inheritance
+```typescript
+// ✅ GOOD: Compose existing components
+const CourseRegistration: FC<Props> = ({ course }) => (
+  <BaseDialog open={isOpen} onClose={onClose}>
+    <InputField
+      label={t('motivation_letter')}
+      value={motivationLetter}
+      onChange={setMotivationLetter}
+    />
+    <Button variant="primary" onClick={handleSubmit}>
+      {t('submit_application')}
+    </Button>
+  </BaseDialog>
+);
+
+// ❌ AVOID: Extending components through inheritance
+class CustomDialog extends BaseDialog {
+  // Don't do this
+}
+```
+
+#### Higher-Order Components for Cross-Cutting Concerns
+```typescript
+// ✅ GOOD: HOC for authentication
+const withAuth = <P extends object>(Component: React.ComponentType<P>) => {
+  return (props: P) => {
+    const { isLoggedIn } = useIsLoggedIn();
+    
+    if (!isLoggedIn) {
+      return <LoginPrompt />;
+    }
+    
+    return <Component {...props} />;
+  };
+};
+
+// Usage
+const ProtectedCourseContent = withAuth(CourseContent);
+```
+
+### 3. Component Testing Patterns
+
+#### Component Testing Structure
+```typescript
+// Component.test.tsx
+describe('Registration Component', () => {
+  const mockCourse = { id: 1, title: 'Test Course' };
+  
+  it('renders registration button for eligible users', () => {
+    render(<Registration course={mockCourse} />);
+    expect(screen.getByText('Apply Now')).toBeInTheDocument();
+  });
+  
+  it('shows modal when button is clicked', async () => {
+    render(<Registration course={mockCourse} />);
+    fireEvent.click(screen.getByText('Apply Now'));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+});
+```
+
+## Performance Optimization
+
+### 1. Memoization Patterns
+```typescript
+// ✅ GOOD: Memoize expensive calculations
+const CourseContent: FC<Props> = ({ course, enrollments }) => {
+  const enrollmentStats = useMemo(() => {
+    return calculateEnrollmentStats(enrollments);
+  }, [enrollments]);
+
+  const handleEnrollmentChange = useCallback((enrollment: Enrollment) => {
+    // Handle enrollment change
+  }, []);
+
+  return (
+    <div>
+      <EnrollmentStats stats={enrollmentStats} />
+      <EnrollmentList onChange={handleEnrollmentChange} />
+    </div>
+  );
+};
+```
+
+### 2. Lazy Loading
+```typescript
+// ✅ GOOD: Lazy load heavy components
+const HeavyStatistics = lazy(() => import('./HeavyStatistics'));
+
+const CourseContent: FC<Props> = ({ course }) => {
+  const [showStats, setShowStats] = useState(false);
+
+  return (
+    <div>
+      <button onClick={() => setShowStats(true)}>
+        Show Statistics
+      </button>
+      {showStats && (
+        <Suspense fallback={<CircularProgress />}>
+          <HeavyStatistics courseId={course.id} />
+        </Suspense>
+      )}
+    </div>
+  );
+};
+```
+
+## Error Handling Patterns
+
+### 1. Error Boundaries
+```typescript
+// ✅ GOOD: Component-level error boundaries
+class ErrorBoundary extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(): State {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Component error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorMessageDialog error="Something went wrong" />;
+    }
+
+    return this.props.children;
+  }
+}
+```
+
+### 2. Graceful Degradation
+```typescript
+// ✅ GOOD: Handle missing data gracefully
+const CourseContent: FC<Props> = ({ course }) => {
+  if (!course) {
+    return <div>Course not found</div>;
+  }
+
+  return (
+    <div>
+      <h1>{course.title || 'Untitled Course'}</h1>
+      {course.description && <p>{course.description}</p>}
+      {course.sessions?.length > 0 ? (
+        <SessionsList sessions={course.sessions} />
+      ) : (
+        <div>No sessions scheduled</div>
+      )}
+    </div>
+  );
+};
+```
+
+## Accessibility Patterns
+
+### 1. Semantic HTML
+```typescript
+// ✅ GOOD: Use semantic elements
+const CourseContent: FC<Props> = ({ course }) => (
+  <main>
+    <header>
+      <h1>{course.title}</h1>
+      <p>{course.description}</p>
+    </header>
+    
+    <section aria-labelledby="sessions-heading">
+      <h2 id="sessions-heading">Course Sessions</h2>
+      <SessionsList sessions={course.sessions} />
+    </section>
+    
+    <aside>
+      <Registration course={course} />
+    </aside>
+  </main>
+);
+```
+
+### 2. ARIA Labels and Roles
+```typescript
+// ✅ GOOD: Proper ARIA attributes
+const RegistrationModal: FC<Props> = ({ isOpen, onClose }) => (
+  <Dialog
+    open={isOpen}
+    onClose={onClose}
+    aria-labelledby="registration-title"
+    aria-describedby="registration-description"
+  >
+    <DialogTitle id="registration-title">
+      Course Registration
+    </DialogTitle>
+    <DialogContent>
+      <p id="registration-description">
+        Please fill out the form below to register for this course.
+      </p>
+      {/* Form content */}
+    </DialogContent>
+  </Dialog>
+);
+```
+
+## Documentation Patterns
+
+### 1. Component Documentation
+```typescript
+/**
+ * Registration Component
+ * 
+ * Handles course registration flow with multiple registration types:
+ * - APPROVAL_WITH_INPUT: Requires motivation letter and approval
+ * - DIRECT_WITH_INPUT: Direct registration with input form
+ * - EXTERNAL_REGISTRATION: Redirects to external registration
+ * 
+ * @param course - Course data including registration type
+ * @param courseEnrollment - User's existing enrollment if any
+ * @param onRegistrationSuccess - Callback fired on successful registration
+ */
+const Registration: FC<RegistrationProps> = ({
+  course,
+  courseEnrollment,
+  onRegistrationSuccess
+}) => {
+  // Component implementation
+};
+```
+
+### 2. Feature Documentation
+```markdown
+# Registration Component System
+
+## Architecture
+Feature-oriented approach with clear separation of concerns:
+- Main orchestrator component
+- Specialized sub-components
+- Custom hooks for business logic
+- Type definitions in separate file
+
+## Registration Types
+- APPROVAL_WITH_INPUT: Approval process with motivation letter
+- DIRECT_WITH_INPUT: Direct registration with input form
+- EXTERNAL_REGISTRATION: External registration link
+```
+
+## Best Practices Summary
+
+### ✅ DO:
+1. **Organize by feature**, not by technology
+2. **Use composition** over inheritance
+3. **Extract complex logic** to custom hooks
+4. **Provide clear interfaces** with TypeScript
+5. **Handle errors gracefully** with proper fallbacks
+6. **Document components** with JSDoc and README files
+7. **Test component behavior** not implementation details
+8. **Use semantic HTML** for accessibility
+9. **Memoize expensive calculations** and callbacks
+10. **Check existing components** before creating new ones
+
+### ❌ AVOID:
+1. **Deep component nesting** (max 3-4 levels)
+2. **Props drilling** (use context or state management)
+3. **Inline styles** (use CSS classes or styled-components)
+4. **Direct DOM manipulation** (use React patterns)
+5. **Large component files** (split into smaller components)
+6. **Tight coupling** between components
+7. **Missing error boundaries** for complex components
+8. **Accessibility violations** (missing ARIA labels, semantic HTML)
+9. **Performance anti-patterns** (unnecessary re-renders)
+10. **Duplicate component logic** (extract to shared utilities)
+
+## Component Lifecycle Guidelines
+
+### When to Create New Components:
+1. **Reusability**: Component will be used in multiple places
+2. **Complexity**: Component has more than 100 lines of JSX
+3. **Responsibility**: Component has a single, clear responsibility
+4. **Testing**: Component needs isolated testing
+5. **State Management**: Component manages its own state
+
+### When to Refactor Existing Components:
+1. **Size**: Component exceeds 200 lines
+2. **Props**: Component accepts more than 5 props
+3. **Conditional Rendering**: Too many conditional branches
+4. **Side Effects**: Multiple useEffect hooks with different concerns
+5. **Performance**: Component re-renders unnecessarily
+
+This architecture guide ensures consistent, maintainable, and scalable component development in EduHub.

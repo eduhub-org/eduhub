@@ -31,10 +31,6 @@ import {
   InsertCourseFundingOrganization,
   InsertCourseFundingOrganizationVariables,
 } from '../../../queries/__generated__/InsertCourseFundingOrganization';
-import {
-  DeleteCourseFundingOrganization,
-  DeleteCourseFundingOrganizationVariables,
-} from '../../../queries/__generated__/DeleteCourseFundingOrganization';
 import { OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
 import EntityListManager from '../../inputs/EntityListManager';
 import { getPublicImageUrl, parseFileUploadEvent } from '../../../helpers/filehandling';
@@ -150,12 +146,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     refetchQueries: ['AdminCourseList'],
   });
 
-  const [deleteCourseFundingOrg] = useAdminMutation<
-    DeleteCourseFundingOrganization,
-    DeleteCourseFundingOrganizationVariables
-  >(DELETE_COURSE_FUNDING_ORGANIZATION, {
-    refetchQueries: ['AdminCourseList'],
-  });
 
   // Image upload functionality
   const imageUploadRef = useRef<any>(null);
@@ -258,23 +248,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     setFundingOrgDialogOpen(false);
   }, []);
 
-  const deleteFundingOrgFromCourse = useCallback(
-    async (orgId: number) => {
-      const response = await deleteCourseFundingOrg({
-        variables: {
-          courseId: course.id,
-          organizationId: orgId,
-        },
-      });
-
-      if (response.errors) {
-        handleError(response.errors?.[0]?.message || t('operation_failed'));
-        return;
-      }
-    },
-    [deleteCourseFundingOrg, course.id, handleError, t]
-  );
-
   const addFundingOrgHandler = useCallback(
     async (confirmed: boolean, organization: OrganizationList_Organization | null) => {
       if (!confirmed || organization == null) {
@@ -359,7 +332,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
   const registrationTypeOptions = Object.values(CourseRegistrationType_enum).map((type) => ({
     value: type,
-    label: `manageCourses:registration_type.options.${type}`,
+    label: t(`manageCourses:registration_type.options.${type}`),
   }));
 
   const isExternalRegistration = course.registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION;
@@ -582,7 +555,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               helpText={t('manageCourses:learning_goals.help_text')}
               maxLength={500}
               className="h-32"
-              currentText={course.learningGoals ?? ''}
             />
 
             {/* 6. Link to the Chat of the Course */}

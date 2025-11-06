@@ -49,6 +49,7 @@ select_permissions:
         - achievementOptionId
         - courseId
         - coverImageUrl
+        - created_at
         - csvResults
         - description
         - documentationUrl

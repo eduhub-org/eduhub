@@ -1,0 +1,52 @@
+{
+  "headline": "Location Addresses",
+  "locationAddress": {
+    "shortLabel": "Short Label",
+    "address": "Address",
+    "address_or_link": "Address / Link",
+    "description": "Description",
+    "aliases": "Aliases",
+    "locationOption": "Location",
+    "usageCount": "Usage Count",
+    "new_address": "New Address",
+    "default_address": "Address details",
+    "default_description": "Description"
+  },
+  "input": {
+    "enter_short_label": "Enter short label",
+    "enter_address": "Enter full address",
+    "enter_link": "Enter complete link",
+    "enter_description": "Enter description",
+    "enter_alias": "Enter alias"
+  },
+  "help": {
+    "short_label": "A brief, unique identifier for this location (e.g., 'Main Campus', 'Building A')",
+    "address": "Complete physical address including street, city, and postal code",
+    "link": "Full URL for online sessions (e.g., 'https://zoom.us/j/123456789')",
+    "description": "Additional details about this location to help users understand its purpose",
+    "aliases": "Alternative names that can be used to reference this location"
+  },
+  "action": {
+    "add": "Add Address",
+    "delete_confirmation": "Are you sure you want to delete the location address \"{{name}}\"?"
+  },
+  "bulk_action": {
+    "delete": {
+      "label": "Delete",
+      "description": "Are you sure you want to delete {{count}} location address(es)?"
+    }
+  },
+  "error": {
+    "alias_already_exists": "Alias \"{{alias}}\" already exists in location address \"{{address}}\"",
+    "alias_duplicate_error": "This alias already exists for another location address",
+    "alias_update_failed": "Failed to update aliases",
+    "duplicate_location_address": "A location address with this short label already exists for this location option",
+    "bulk_delete_failed": "Failed to delete location addresses",
+    "unexpected": "An unexpected error occurred"
+  },
+  "type_selection": {
+    "KIEL": "Kiel",
+    "ONLINE": "Online",
+    "HEIDE": "Heide"
+  }
+}

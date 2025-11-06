@@ -92,6 +92,13 @@ const ManageAppSettingsContent: FC = () => {
   const { data: courseGroupOptionsData } = useAdminQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS);
   const { data: faqCollectionsData } = useAdminQuery<FaqCollections>(FAQ_COLLECTIONS);
 
+  // Filter course group options to only show slider groups
+  const sliderGroupOptions = useMemo(() => {
+    return (
+      courseGroupOptionsData?.CourseGroupOption.filter((option) => option.sliderGroup) ?? []
+    );
+  }, [courseGroupOptionsData]);
+
   const faqCollectionOptions = useMemo(() => {
     return (
       faqCollectionsData?.FaqCollection.map((collection) => ({
@@ -128,9 +135,9 @@ const ManageAppSettingsContent: FC = () => {
   };
 
   const onDragEnd = async (result) => {
-    if (!result.destination || !courseGroupOptionsData) return;
+    if (!result.destination || !sliderGroupOptions) return;
 
-    const reorderedItems = Array.from(courseGroupOptionsData.CourseGroupOption);
+    const reorderedItems = Array.from(sliderGroupOptions);
     const [movedItem] = reorderedItems.splice(result.source.index, 1);
     reorderedItems.splice(result.destination.index, 0, movedItem);
 
@@ -233,7 +240,7 @@ const ManageAppSettingsContent: FC = () => {
               <Droppable droppableId="courseGroupOptions">
                 {(provided) => (
                   <div {...provided.droppableProps} ref={provided.innerRef}>
-                    {courseGroupOptionsData?.CourseGroupOption.map((option, index) => (
+                    {sliderGroupOptions.map((option, index) => (
                       <Draggable key={option.id} draggableId={String(option.id)} index={index}>
                         {(provided) => (
                           <div

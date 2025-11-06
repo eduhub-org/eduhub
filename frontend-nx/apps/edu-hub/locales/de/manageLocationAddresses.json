@@ -1,0 +1,52 @@
+{
+  "headline": "Veranstaltungsadressen",
+  "locationAddress": {
+    "shortLabel": "Kurzes Label",
+    "address": "Adresse",
+    "address_or_link": "Adresse / Link",
+    "description": "Beschreibung",
+    "aliases": "Aliase",
+    "locationOption": "Standort",
+    "usageCount": "Verwendungen",
+    "new_address": "Neue Adresse",
+    "default_address": "Adressdetails",
+    "default_description": "Beschreibung"
+  },
+  "input": {
+    "enter_short_label": "Kurzes Label eingeben",
+    "enter_address": "Vollständige Adresse eingeben",
+    "enter_link": "Vollständigen Link eingeben",
+    "enter_description": "Beschreibung eingeben",
+    "enter_alias": "Alias eingeben"
+  },
+  "help": {
+    "short_label": "Ein kurzer, eindeutiger Bezeichner für diesen Standort (z.B. 'Hauptcampus', 'Gebäude A')",
+    "address": "Vollständige physische Adresse inklusive Straße, Stadt und Postleitzahl",
+    "link": "Vollständige URL für Online-Sitzungen (z.B. 'https://zoom.us/j/123456789')",
+    "description": "Zusätzliche Details zu diesem Standort, um Benutzern den Zweck zu erklären",
+    "aliases": "Alternative Namen, die zur Referenzierung dieses Standorts verwendet werden können"
+  },
+  "action": {
+    "add": "Adresse hinzufügen",
+    "delete_confirmation": "Bist du sicher, dass du die Standortadresse \"{{name}}\" löschen möchtest?"
+  },
+  "bulk_action": {
+    "delete": {
+      "label": "Löschen",
+      "description": "Bist du sicher, dass du {{count}} Standortadresse(n) löschen möchtest?"
+    }
+  },
+  "error": {
+    "alias_already_exists": "Alias \"{{alias}}\" existiert bereits in Standortadresse \"{{address}}\"",
+    "alias_duplicate_error": "Dieser Alias existiert bereits für eine andere Standortadresse",
+    "alias_update_failed": "Fehler beim Aktualisieren der Aliase",
+    "duplicate_location_address": "Eine Standortadresse mit diesem kurzen Label existiert bereits für diese Standortoption",
+    "bulk_delete_failed": "Fehler beim Löschen der Standortadressen",
+    "unexpected": "Ein unerwarteter Fehler ist aufgetreten"
+  },
+  "type_selection": {
+    "KIEL": "Kiel",
+    "ONLINE": "Online",
+    "HEIDE": "Heide"
+  }
+}

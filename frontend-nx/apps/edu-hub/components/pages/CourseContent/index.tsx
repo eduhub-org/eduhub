@@ -210,7 +210,11 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 <PageBlock classname="flex-1 text-white space-y-6">
                   <LearningGoals learningGoals={course.learningGoals} />
                   {!isDegreeCourse ? (
-                    <Sessions sessions={course.Sessions} isLoggedInParticipant={isLoggedInParticipant} />
+                    <Sessions 
+                      sessions={course.Sessions} 
+                      courseLocations={course.CourseLocations}
+                      isLoggedInParticipant={isLoggedInParticipant} 
+                    />
                   ) : (
                     <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
                   )}

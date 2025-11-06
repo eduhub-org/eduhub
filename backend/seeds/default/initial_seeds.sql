@@ -1,4 +1,9 @@
 SET check_function_bodies = false;
+
+-- Reset counter for organization table   in case of re-seeding
+SELECT pg_catalog.setval('public."Organization_id_seq"', 1, false);
+
+
 INSERT INTO public."AchievementOption" (id, title, description, "recordType", "evaluationScriptUrl", created_at, updated_at, "csvTemplateUrl", "showScoreAuthors", published, "achievementDocumentationTemplateId") VALUES (1, 'online course project', 'Vivamus rutrum congue volutpat. Fusce quis convallis elit, id dictum lacus. Nam volutpat suscipit dapibus. Aliquam nunc diam, fringilla in laoreet eget, luctus quis libero.', 'ONLINE_COURSE', NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', NULL, NULL, true, NULL);
 INSERT INTO public."AchievementOption" (id, title, description, "recordType", "evaluationScriptUrl", created_at, updated_at, "csvTemplateUrl", "showScoreAuthors", published, "achievementDocumentationTemplateId") VALUES (2, 'regular project', 'Vivamus rutrum congue volutpat. Fusce quis convallis elit, id dictum lacus. Nam volutpat suscipit dapibus. Aliquam nunc diam, fringilla in laoreet eget, luctus quis libero.', 'ONLINE_COURSE', NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', NULL, NULL, true, NULL);
 INSERT INTO public."AchievementOption" (id, title, description, "recordType", "evaluationScriptUrl", created_at, updated_at, "csvTemplateUrl", "showScoreAuthors", published, "achievementDocumentationTemplateId") VALUES (3, 'online course project present', 'Vivamus rutrum congue volutpat. Fusce quis convallis elit, id dictum lacus. Nam volutpat suscipit dapibus. Aliquam nunc diam, fringilla in laoreet eget, luctus quis libero.', 'ONLINE_COURSE', NULL, '2022-12-19 13:40:34.079378+00', '2022-12-19 13:55:01.645233+00', NULL, NULL, true, NULL);
@@ -163,9 +168,9 @@ INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicat
 INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "visibilityAttendanceCertificate", "visibilityAchievementCertificate", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, "attendanceCertificateTemplateTextId", "achievementCertificateTemplateTextId", type) VALUES (3, 'Events', '2023-04-01', '2024-03-13', '2023-03-13', '2023-12-31', '2023-08-01', false, NULL, NULL, NULL, false, false, NULL, NULL, 'EVENTS', 2, true, NULL, NULL, 'EVENTS');
 INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "visibilityAttendanceCertificate", "visibilityAchievementCertificate", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, "attendanceCertificateTemplateTextId", "achievementCertificateTemplateTextId", type) VALUES (2, 'Degrees', '2023-04-17', '2024-06-30', NULL, '2023-04-16', NULL, false, NULL, NULL, NULL, false, false, NULL, NULL, 'DEGREES', 2, true, NULL, NULL, 'DEGREES');
 INSERT INTO public."Program" (id, title, "lectureStart", "lectureEnd", "applicationStart", "defaultApplicationEnd", "achievementRecordUploadDeadline", visibility, "startQuestionnaire", "speakerQuestionnaire", "closingQuestionnaire", "visibilityAttendanceCertificate", "visibilityAchievementCertificate", "attendanceCertificateTemplateURL", "achievementCertificateTemplateURL", "shortTitle", "defaultMaxMissedSessions", published, "attendanceCertificateTemplateTextId", "achievementCertificateTemplateTextId", type) VALUES (5, 'Current Semester', '2024-10-02', '2025-04-02', '2024-09-02', '2024-10-02', '2025-04-02', false, 'https://survey.opencampus.sh/', '', 'https://survey.opencampus.sh/', false, false, 'programs/program-5/private/attendance-certificate-template/sprotte.jpg', 'programs/program-5/private/achievement-certificate-template/sprotte.jpg', 'PRESENT', 2, true, NULL, NULL, 'COURSES');
-INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES (6, 'Present Course 3', 'APPLICANTS_INVITED', '3', 'Sed leo libero, bibendum non viverra et, suscipit at quam. Fusce augue est, molestie ut dapibus quis, accumsan at lectus. In id malesuada quam', 'DE', '2025-01-02', '120€', true, true, 2, 'MONDAY', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 5, 'test', 'test', 'test', 'test', 'test', 'https://chat.opencampus.sh', 20, '22:00:02.674', '11:45:01.513', true, NULL, 'APPROVAL_WITH_INPUT');
-INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES (7, 'This is a Degree', 'APPLICANTS_INVITED', '12,5', 'Sed leo libero, bibendum non viverra et, suscipit at quam. Fusce augue est, molestie ut dapibus quis, accumsan at lectus. In id malesuada quam', 'DE', '2024-12-02', '0', true, false, 2, 'NONE', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 2, 'headingDescriptionField1', 'headingDescriptionField2', 'Content Description Field 1', 'Content Description Field 2', 'Lerning Goal 1\nLerning Goal 2', 'https://chat.opencampus.sh', 200, '22:00:02.674', '11:45:01.513', true, NULL, 'APPROVAL_WITH_INPUT');
-INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES (8, 'This is an Event', 'APPLICANTS_INVITED', 'NONE', 'Sed leo libero, bibendum non viverra et, suscipit at quam. Fusce augue est, molestie ut dapibus quis, accumsan at lectus. In id malesuada quam', 'DE', '2024-12-02', '0', false, true, 2, 'NONE', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 3, 'headingDescriptionField1', 'headingDescriptionField2', 'Content Description Field 1', 'Content Description Field 2', 'Lerning Goal 1\nLerning Goal 2', NULL, 200, '22:00:02.674', '11:45:01.513', true, NULL, 'APPROVAL_WITH_INPUT');
+INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES (6, 'Present Course 3', 'APPLICANTS_INVITED', '3', 'Sed leo libero, bibendum non viverra et, suscipit at quam. Fusce augue est, molestie ut dapibus quis, accumsan at lectus. In id malesuada quam', 'DE', '2025-01-02', '120€', true, true, 2, 'MONDAY', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 5, 'test', 'test', 'test', 'test', 'test', 'https://chat.opencampus.sh', 20, '14:00:00', '11:45:00', true, NULL, 'APPROVAL_WITH_INPUT');
+INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES (7, 'This is a Degree', 'APPLICANTS_INVITED', '12,5', 'Sed leo libero, bibendum non viverra et, suscipit at quam. Fusce augue est, molestie ut dapibus quis, accumsan at lectus. In id malesuada quam', 'DE', '2024-12-02', '0', true, false, 2, 'NONE', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 2, 'headingDescriptionField1', 'headingDescriptionField2', 'Content Description Field 1', 'Content Description Field 2', 'Lerning Goal 1\nLerning Goal 2', 'https://chat.opencampus.sh', 200, '18:00:00', '20:00:00', true, NULL, 'APPROVAL_WITH_INPUT');
+INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES (8, 'This is an Event', 'APPLICANTS_INVITED', 'NONE', 'Sed leo libero, bibendum non viverra et, suscipit at quam. Fusce augue est, molestie ut dapibus quis, accumsan at lectus. In id malesuada quam', 'DE', '2024-12-02', '0', false, true, 2, 'NONE', NULL, '2022-12-17 22:19:57.676901+00', '2022-12-19 13:55:11.89556+00', 3, 'headingDescriptionField1', 'headingDescriptionField2', 'Content Description Field 1', 'Content Description Field 2', 'Lerning Goal 1\nLerning Goal 2', NULL, 200, '14:00:00', '12:00:00', true, NULL, 'APPROVAL_WITH_INPUT');
 INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES (5, 'Present Course 2', 'APPLICANTS_INVITED', '2.5', '', 'EN', '2025-01-02', '', false, false, 2, 'NONE', NULL, '2022-12-17 22:19:57.676901+00', '2024-11-25 15:43:19.890591+00', 5, NULL, NULL, NULL, NULL, NULL, NULL, 20, NULL, NULL, true, NULL, 'APPROVAL_WITH_INPUT');
 INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES (4, 'Present Course 1', 'APPLICANTS_INVITED', '5', 'Integer ornare mauris feugiat malesuada auctor. Integer id justo sit amet metus tristique tincidunt. Donec eu commodo nulla. Donec eros elit, pretium vel nisi', 'DE', '2025-01-02', 'NO_COST', true, true, 2, 'TUESDAY', 'http://localhost:4001/emulated-bucket/public/courseid_4/cover_image/cover_image.jpg', '2022-12-17 22:19:57.676901+00', '2024-11-25 15:36:09.754231+00', 5, 'Morbi sed', 'Sed quis', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam lacinia sapien quis tellus posuere egestas dignissim a quam. Quisque viverra purus vel cursus pulvinar. Nam maximus, ex vel egestas volutpat, libero metus interdum urna, ac tincidunt nisi sem a ligula. Etiam lacus dui, consequat feugiat dui vel, rhoncus sagittis elit. Proin convallis placerat magna eu maximus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus aliquam euismod diam, nec varius odio semper egestas. Duis ornare luctus mauris, ac scelerisque massa euismod sed. Aliquam lacinia tortor in faucibus dapibus. Ut suscipit tempus nunc vitae aliquet. Sed gravida hendrerit fringilla. Nulla ullamcorper purus eget libero maximus cursus. Ut non iaculis nibh, quis feugiat mi. Quisque gravida lectus enim, ultrices aliquam erat venenatis in. Donec id nisi ullamcorper, rutrum libero et, ullamcorper felis. ', 'Integer ornare mauris feugiat malesuada auctor. Integer id justo sit amet metus tristique tincidunt. Donec eu commodo nulla. Donec eros elit, pretium vel nisi at, euismod pulvinar nisi. Vivamus sit amet felis consequat felis iaculis sodales. Proin volutpat nisl sit amet magna congue, ut auctor orci laoreet. Nullam consectetur ut libero ac congue. Phasellus posuere est quis interdum fermentum. Morbi laoreet purus id diam vestibulum faucibus. Curabitur sollicitudin tortor nec accumsan lacinia. Donec ut dui vitae elit dictum pretium. Sed vel tincidunt leo, in pretium risus. Nunc velit nibh, imperdiet ac libero a, semper accumsan mauris. In vulputate eu neque eget mattis. Nulla auctor sodales cursus. Nunc eu nibh vel turpis interdum blandit eu sed nisi.', 'Sed quis sapien eget urna mattis imperdiet sed ut turpis. Aenean id sem nunc. Praesent efficitur ex in nunc tincidunt, vel lobortis metus feugiat. Quisque ultricies justo non sollicitudin porttitor. Praesent sit amet condimentum velit, a congue velit. Nullam rutrum at nisl sed interdum. Ut ut felis id nulla porttitor imperdiet. Nullam convallis lorem in ex luctus, nec lacinia massa lacinia. Suspendisse pretium sed dolor sit amet iaculis. ', 'https://chat.opencampus.sh', 20, '21:00:00', '19:00:00', true, NULL, 'APPROVAL_WITH_INPUT');
 INSERT INTO public."Course" (id, title, status, ects, tagline, language, "applicationEnd", cost, "achievementCertificatePossible", "attendanceCertificatePossible", "maxMissedSessions", "weekDay", "coverImage", created_at, updated_at, "programId", "headingDescriptionField1", "headingDescriptionField2", "contentDescriptionField1", "contentDescriptionField2", "learningGoals", "chatLink", "maxParticipants", "endTime", "startTime", published, "externalRegistrationLink", "registrationType") VALUES (1, 'Past Course 1', 'APPLICANTS_INVITED', '5', 'Integer ornare mauris feugiat malesuada auctor. Integer id justo sit amet metus tristique tincidunt. Donec eu commodo nulla. Donec eros elit, pretium vel nisi', 'DE', '2024-05-02', 'NO_COST', true, true, 2, 'TUESDAY', 'http://localhost:4001/emulated-bucket/public/courseid_1/cover_image/cover_image.jpg', '2022-12-17 22:19:57.676901+00', '2024-11-25 15:38:17.18885+00', 4, 'Morbi sed', 'Sed quis', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam lacinia sapien quis tellus posuere egestas dignissim a quam. Quisque viverra purus vel cursus pulvinar. Nam maximus, ex vel egestas volutpat, libero metus interdum urna, ac tincidunt nisi sem a ligula. Etiam lacus dui, consequat feugiat dui vel, rhoncus sagittis elit. Proin convallis placerat magna eu maximus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus aliquam euismod diam, nec varius odio semper egestas. Duis ornare luctus mauris, ac scelerisque massa euismod sed. Aliquam lacinia tortor in faucibus dapibus. Ut suscipit tempus nunc vitae aliquet. Sed gravida hendrerit fringilla. Nulla ullamcorper purus eget libero maximus cursus. Ut non iaculis nibh, quis feugiat mi. Quisque gravida lectus enim, ultrices aliquam erat venenatis in. Donec id nisi ullamcorper, rutrum libero et, ullamcorper felis. ', 'Integer ornare mauris feugiat malesuada auctor. Integer id justo sit amet metus tristique tincidunt. Donec eu commodo nulla. Donec eros elit, pretium vel nisi at, euismod pulvinar nisi. Vivamus sit amet felis consequat felis iaculis sodales. Proin volutpat nisl sit amet magna congue, ut auctor orci laoreet. Nullam consectetur ut libero ac congue. Phasellus posuere est quis interdum fermentum. Morbi laoreet purus id diam vestibulum faucibus. Curabitur sollicitudin tortor nec accumsan lacinia. Donec ut dui vitae elit dictum pretium. Sed vel tincidunt leo, in pretium risus. Nunc velit nibh, imperdiet ac libero a, semper accumsan mauris. In vulputate eu neque eget mattis. Nulla auctor sodales cursus. Nunc eu nibh vel turpis interdum blandit eu sed nisi.', 'Sed quis sapien eget urna mattis imperdiet sed ut turpis. Aenean id sem nunc. Praesent efficitur ex in nunc tincidunt, vel lobortis metus feugiat. Quisque ultricies justo non sollicitudin porttitor. Praesent sit amet condimentum velit, a congue velit. Nullam rutrum at nisl sed interdum. Ut ut felis id nulla porttitor imperdiet. Nullam convallis lorem in ex luctus, nec lacinia massa lacinia. Suspendisse pretium sed dolor sit amet iaculis. ', 'https://chat.opencampus.sh', 20, '20:00:00', '18:00:00', true, NULL, 'APPROVAL_WITH_INPUT');
@@ -1314,6 +1319,202 @@ INSERT INTO public."SessionAddress" (id, created_at, updated_at, "sessionId", ad
 INSERT INTO public."SessionAddress" (id, created_at, updated_at, "sessionId", address, "courseLocationId") VALUES (10, '2024-12-30 10:15:39.648192+00', '2024-12-30 10:15:39.648192+00', 38, '', 9);
 INSERT INTO public."SessionAddress" (id, created_at, updated_at, "sessionId", address, "courseLocationId") VALUES (11, '2024-12-30 10:16:04.499158+00', '2024-12-30 10:16:04.499158+00', 39, '', 8);
 INSERT INTO public."SessionAddress" (id, created_at, updated_at, "sessionId", address, "courseLocationId") VALUES (12, '2024-12-30 10:16:04.499158+00', '2024-12-30 10:16:04.499158+00', 39, '', 9);
+-- ============================================
+-- Degree-Teilnahmen und Zertifikats-Konfiguration
+-- ============================================
+
+-- User 11111111-1111-1111-1111-111111111111 belegt Kurse 1, 2, 4
+INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES 
+(500, 1, '11111111-1111-1111-1111-111111111111', 'COMPLETED', 'Ich habe diesen Kurs im Rahmen des Degree-Programms erfolgreich abgeschlossen.', 'REVIEW', NULL, NULL, '2024-01-15 10:00:00+00', '2024-03-20 14:30:00+00', NULL),
+(501, 2, '11111111-1111-1111-1111-111111111111', 'CONFIRMED', 'Dieser Kurs ist Teil meines Degree-Studiengangs.', 'UNRATED', NULL, NULL, '2024-02-01 09:00:00+00', '2024-02-01 09:00:00+00', NULL),
+(502, 4, '11111111-1111-1111-1111-111111111111', 'APPLIED', 'Ich möchte an diesem Kurs teilnehmen.', 'UNRATED', NULL, NULL, '2024-03-10 11:00:00+00', '2024-03-10 11:00:00+00', NULL)
+ON CONFLICT ON CONSTRAINT "uniqueUserCourse" DO NOTHING;
+
+-- User 22222222-2222-2222-2222-222222222222 belegt Kurse 5, 301
+INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES 
+(503, 5, '22222222-2222-2222-2222-222222222222', 'CONFIRMED', 'Teilnahme am Degree-Programm Kurs 5.', 'REVIEW', NULL, NULL, '2024-02-20 16:00:00+00', '2024-02-20 16:00:00+00', NULL),
+(504, 301, '22222222-2222-2222-2222-222222222222', 'INVITED', 'Teilnahme am Degree-Programm Kurs 301.', 'INVITE', NULL, NULL, '2024-02-15 14:00:00+00', '2024-02-15 14:00:00+00', '2024-04-15 23:59:59+00')
+ON CONFLICT ON CONSTRAINT "uniqueUserCourse" DO NOTHING;
+
+-- User 33333333-3333-3333-3333-333333333333 belegt Kurse 1, 2, 4, 5
+-- (301 hat User 3 bereits - siehe ID 450 in initial_seeds.sql)
+INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES 
+(505, 1, '33333333-3333-3333-3333-333333333333', 'APPLIED', 'Bewerbung für diesen Kurs im Degree-Programm.', 'UNRATED', NULL, NULL, '2024-03-12 15:00:00+00', '2024-03-12 15:00:00+00', NULL),
+(506, 2, '33333333-3333-3333-3333-333333333333', 'CONFIRMED', 'Teilnahme am Degree-Programm Kurs 2.', 'UNRATED', NULL, NULL, '2024-03-05 13:00:00+00', '2024-03-05 13:00:00+00', NULL),
+(507, 4, '33333333-3333-3333-3333-333333333333', 'COMPLETED', 'Kurs erfolgreich abgeschlossen.', 'REVIEW', NULL, NULL, '2024-01-20 10:00:00+00', '2024-03-25 16:00:00+00', NULL),
+(508, 5, '33333333-3333-3333-3333-333333333333', 'ABORTED', 'Teilnahme am Kurs abgebrochen.', 'DECLINE', NULL, NULL, '2024-02-25 12:00:00+00', '2024-03-01 09:00:00+00', NULL)
+ON CONFLICT ON CONSTRAINT "uniqueUserCourse" DO NOTHING;
+
+-- CourseEnrollments für den Degree-Course selbst (Course id=7)
+INSERT INTO public."CourseEnrollment" (id, "courseId", "userId", status, "motivationLetter", "motivationRating", "achievementCertificateURL", "attendanceCertificateURL", created_at, updated_at, "invitationExpirationDate") VALUES 
+(509, 7, '11111111-1111-1111-1111-111111111111', 'CONFIRMED', 'Teilnahme am Degree-Programm "This is A degree".', 'UNRATED', NULL, NULL, '2024-01-10 09:00:00+00', '2024-01-10 09:00:00+00', NULL),
+(510, 7, '22222222-2222-2222-2222-222222222222', 'CONFIRMED', 'Teilnahme am Degree-Programm "This is A degree".', 'UNRATED', NULL, NULL, '2024-02-01 10:00:00+00', '2024-02-01 10:00:00+00', NULL),
+(511, 7, '33333333-3333-3333-3333-333333333333', 'CONFIRMED', 'Teilnahme am Degree-Programm "This is A degree".', 'UNRATED', NULL, NULL, '2024-02-15 11:00:00+00', '2024-02-15 11:00:00+00', NULL)
+ON CONFLICT ON CONSTRAINT "uniqueUserCourse" DO NOTHING;
+
+-- Achievement Certificates für CourseEnrollments aktualisieren
+-- User 33333333-3333-3333-3333-333333333333: Achievement Certificates für Course 1, 2, 4
+UPDATE public."CourseEnrollment" 
+SET "achievementCertificateURL" = '33333333-3333-3333-3333-333333333333/1/achievement_certificate.pdf'
+WHERE "userId" = '33333333-3333-3333-3333-333333333333' AND "courseId" = 1;
+
+UPDATE public."CourseEnrollment" 
+SET "achievementCertificateURL" = '33333333-3333-3333-3333-333333333333/2/achievement_certificate.pdf'
+WHERE "userId" = '33333333-3333-3333-3333-333333333333' AND "courseId" = 2;
+
+UPDATE public."CourseEnrollment" 
+SET "achievementCertificateURL" = '33333333-3333-3333-3333-333333333333/4/achievement_certificate.pdf'
+WHERE "userId" = '33333333-3333-3333-3333-333333333333' AND "courseId" = 4;
+
+-- User 11111111-1111-1111-1111-111111111111: Achievement Certificate für Course 1
+UPDATE public."CourseEnrollment" 
+SET "achievementCertificateURL" = '11111111-1111-1111-1111-111111111111/1/achievement_certificate.pdf'
+WHERE "userId" = '11111111-1111-1111-1111-111111111111' AND "courseId" = 1;
+-- Event für User 33333333-3333-3333-3333-333333333333
+-- Event-Kurs (Kurs 8) dem Degree (Kurs 7) zuordnen
+INSERT INTO public."CourseDegree" (id, "courseId", "degreeCourseId", created_at, updated_at) 
+SELECT 
+  (SELECT COALESCE(MAX(id), 0) + 1 FROM public."CourseDegree"), 
+  8, 
+  7, 
+  now(), 
+  now()
+WHERE NOT EXISTS (
+  SELECT 1 FROM public."CourseDegree" 
+  WHERE "courseId" = 8 AND "degreeCourseId" = 7
+);
+
+-- User 33333333-3333-3333-3333-333333333333 für Event-Kurs 8 einschreiben
+INSERT INTO public."CourseEnrollment" (
+  id, 
+  "courseId", 
+  "userId", 
+  status, 
+  "motivationLetter", 
+  "motivationRating", 
+  "achievementCertificateURL", 
+  "attendanceCertificateURL", 
+  created_at, 
+  updated_at, 
+  "invitationExpirationDate"
+) 
+SELECT 
+  (SELECT COALESCE(MAX(id), 0) + 1 FROM public."CourseEnrollment"),
+  8,
+  '33333333-3333-3333-3333-333333333333',
+  'CONFIRMED',
+  'Teilnahme am Event im Rahmen des Degree-Programms.',
+  'UNRATED',
+  NULL,
+  NULL,
+  now(),
+  now(),
+  NULL
+WHERE NOT EXISTS (
+  SELECT 1 FROM public."CourseEnrollment" 
+  WHERE "userId" = '33333333-3333-3333-3333-333333333333' AND "courseId" = 8
+);
+
+-- Program 2: AchievementCertificateTemplateURL setzen
+UPDATE public."Program" 
+SET "achievementCertificateTemplateURL" = 'programid_2/participation_certificate_template/degree.png'
+WHERE id = 2;
+
+-- CertificateTemplateText für Degree erstellen
+INSERT INTO public."CertificateTemplateText" (
+  id, 
+  title, 
+  html, 
+  created_at, 
+  updated_at, 
+  "certificateType", 
+  "recordType"
+) VALUES (
+  3,
+  'degree achievement certificate',
+  '<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Document Title</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    <style type="text/css">
+        @page {
+            size: a4 landscape;
+            background-image: url("{{ template }}");
+            background-position: center center;
+            background-size: cover;
+            @frame content_frame {
+                left: 85mm;
+                width: 195mm;
+                top: 60mm;
+                height: 140mm;
+            }
+        }
+        body, html {
+            font-family: ''Lato'', sans-serif !important;
+            margin: 0;
+            padding: 0;
+            width: 297mm;
+            height: 210mm;
+        }
+        .big {
+            font-size: 7mm;
+            font-weight: bold;
+            color: #777;
+        }
+        .small {
+            font-size: 4.2mm;
+            color: #777;
+        }
+        p {
+            margin-top: 3mm;
+            margin-bottom: 3mm;
+        }
+    </style>
+</head>
+<body>
+    <span class="big">{{ full_name }}</span>
+    <p class="small">
+        has met the degree''s minimum requirements of completing 12.5 ECTS and participating in at least one hackathon by successfully completing the following degree components:
+    </p>
+    <p class="small">
+    {% for participation in successful_participations %}
+    // {{ participation }}<br>
+    {% endfor %}
+    </p>
+</body>
+</html>',
+  now(),
+  now(),
+  'ACHIEVEMENT',
+  'DOCUMENTATION'
+)
+ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title,
+  html = EXCLUDED.html,
+  updated_at = now(),
+  "certificateType" = EXCLUDED."certificateType",
+  "recordType" = EXCLUDED."recordType";
+
+-- CertificateTemplateProgram: Program 2 mit Template 3 verknüpfen
+INSERT INTO public."CertificateTemplateProgram" (
+  id, 
+  "programId", 
+  "certificateTemplateText"
+) VALUES (
+  3,
+  2,
+  3
+)
+ON CONFLICT (id) DO UPDATE SET
+  "programId" = EXCLUDED."programId",
+  "certificateTemplateText" = EXCLUDED."certificateTemplateText";
+
+-- Sequenz-Resets für neue Einträge (am Ende, nach allen INSERTs)
+SELECT pg_catalog.setval('public."CourseEnrollment_id_seq"', COALESCE((SELECT MAX(id) FROM public."CourseEnrollment"), 511), true);
+SELECT pg_catalog.setval('public."CourseDegree_id_seq"', COALESCE((SELECT MAX(id) FROM public."CourseDegree"), 6), true);
+SELECT pg_catalog.setval('public."CertificateTemplateText_id_seq"', COALESCE((SELECT MAX(id) FROM public."CertificateTemplateText"), 3), true);
+SELECT pg_catalog.setval('public."CertificateTemplateProgram_id_seq"', COALESCE((SELECT MAX(id) FROM public."CertificateTemplateProgram"), 3), true);
 SELECT pg_catalog.setval('public."AchievementDocumentationTemplate_id_seq"', 1, false);
 SELECT pg_catalog.setval('public."AchievementOptionCourse_id_seq"', 7, true);
 SELECT pg_catalog.setval('public."AchievementOptionMentor_id_seq"', 1, false);
@@ -1322,7 +1523,7 @@ SELECT pg_catalog.setval('public."AchievementRecordAuthor_id_seq"', 1, true);
 SELECT pg_catalog.setval('public."AchievementRecord_id_seq"', 7, true);
 SELECT pg_catalog.setval('public."Attendence_Id_seq"', 64, true);
 SELECT pg_catalog.setval('public."CourseAddress_id_seq"', 9, true);
-SELECT pg_catalog.setval('public."CourseDegree_id_seq"', 6, true);
+-- CourseDegree_id_seq wird bereits dynamisch oben gesetzt (Zeile 1523)
 SELECT pg_catalog.setval('public."CourseGroup_id_seq"', 15, true);
 SELECT pg_catalog.setval('public."CourseGroupOption_id_seq"', 13, true);
 SELECT pg_catalog.setval('public."CourseInstructor_Id_seq"', 1, true);
@@ -1338,3 +1539,4 @@ SELECT pg_catalog.setval('public."Semester_Id_seq"', 7, true);
 SELECT pg_catalog.setval('public."SessionAddress_id_seq"', 12, true);
 SELECT pg_catalog.setval('public."SessionSpeaker_id_seq"', 1, false);
 SELECT pg_catalog.setval('public."User_Id_seq"', 1, false);
+SELECT pg_catalog.setval('public."CourseLocation_id_seq"', COALESCE((SELECT MAX(id) FROM public."CourseLocation"), 1));

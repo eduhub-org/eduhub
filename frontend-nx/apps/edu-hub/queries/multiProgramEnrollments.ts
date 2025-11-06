@@ -6,6 +6,7 @@ export const MULTI_PROGRAM_ENROLLMENTS = gql`
       id
       title
       shortTitle
+      defaultApplicationEnd
       Courses {
         id
         title

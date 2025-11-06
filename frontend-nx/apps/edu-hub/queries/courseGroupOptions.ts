@@ -6,6 +6,7 @@ export const COURSE_GROUP_OPTIONS = gql`
       id
       order
       title
+      sliderGroup
     }
   }
 `;

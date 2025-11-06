@@ -20,6 +20,10 @@ export interface CourseList_Course_Sessions_SessionAddresses_CourseLocation {
    * Will be used as default for any new session address.
    */
   defaultSessionAddress: string | null;
+  /**
+   * References a LocationAddress that serves as the default for sessions in this course location. Replaces the legacy text-based defaultSessionAddress field.
+   */
+  defaultSessionAddressId: number | null;
 }
 
 export interface CourseList_Course_Sessions_SessionAddresses {
@@ -29,6 +33,10 @@ export interface CourseList_Course_Sessions_SessionAddresses {
    * Where the session will take place; might be an offline or online location which is provided according to the provided type
    */
   address: string;
+  /**
+   * Foreign key to LocationAddress. Replaces the free-text address field with a structured address reference. Nullable during migration period.
+   */
+  locationAddressId: number | null;
   /**
    * An object relationship
    */

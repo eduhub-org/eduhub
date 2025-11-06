@@ -7,6 +7,12 @@
 // GraphQL fragment: UserFragment
 // ====================================================
 
+export interface UserFragment_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
 export interface UserFragment {
   __typename: "User";
   id: any;
@@ -38,4 +44,8 @@ export interface UserFragment {
    * The user's country of residence
    */
   country: string | null;
+  /**
+   * An object relationship
+   */
+  Organization: UserFragment_Organization | null;
 }

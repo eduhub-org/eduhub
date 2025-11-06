@@ -30,6 +30,7 @@
 - "!include public_FaqCollection.yaml"
 - "!include public_FaqTranslation.yaml"
 - "!include public_Language.yaml"
+- "!include public_LocationAddress.yaml"
 - "!include public_LocationOption.yaml"
 - "!include public_MailLog.yaml"
 - "!include public_MailStatus.yaml"

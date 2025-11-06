@@ -65,19 +65,27 @@ export const MANAGED_COURSE = gql`
           CourseEnrollments {
             status
             courseId
+            achievementCertificateURL
+            attendanceCertificateURL
             Course {
               id
               title
+              ects
               Program {
                 shortTitle
               }
             }
+          }
+          Organization {
+            id
+            name
           }
         }
       }
       CourseLocations {
         id
         defaultSessionAddress
+        defaultSessionAddressId
         locationOption
       }
       Sessions(order_by: { startDateTime: asc }) {
@@ -238,13 +246,29 @@ export const INSERT_SESSION_WITH_ADDRESSES = gql`
 export const UPDATE_SESSION_ADDRESS = gql`
   mutation UpdateSessionAddress(
     $itemId: Int!
-    $text: String!
+    $value: Int
   ) {
     update_SessionAddress_by_pk(
       pk_columns: { id: $itemId }
-      _set: { address: $text }
+      _set: { locationAddressId: $value }
     ) {
       id
+      locationAddressId
+    }
+  }
+`;
+
+export const UPDATE_SESSION_ADDRESS_LOCATION = gql`
+  mutation UpdateSessionAddressLocation(
+    $itemId: Int!
+    $locationAddressId: Int
+  ) {
+    update_SessionAddress_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { locationAddressId: $locationAddressId }
+    ) {
+      id
+      locationAddressId
     }
   }
 `;
@@ -316,6 +340,21 @@ export const UPDATE_COURSE_SESSION_DEFAULT_ADDRESS = gql`
       _set: { defaultSessionAddress: $text }
     ) {
       id
+    }
+  }
+`;
+
+export const UPDATE_COURSE_DEFAULT_SESSION_ADDRESS_ID = gql`
+  mutation UpdateCourseDefaultSessionAddressId(
+    $itemId: Int!
+    $value: Int
+  ) {
+    update_CourseLocation_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { defaultSessionAddressId: $value }
+    ) {
+      id
+      defaultSessionAddressId
     }
   }
 `;

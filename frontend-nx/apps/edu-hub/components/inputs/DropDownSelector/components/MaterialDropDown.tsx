@@ -44,7 +44,6 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
   onCreateOption,
   getLabelForValue,
 }) => {
-  const { t } = useTranslation();
   const theme = useTheme();
 
   const handleChange = (event: SelectChangeEvent<string>) => {
@@ -56,7 +55,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
       <FormControl variant="standard" className={hasBlurred && errorMessage ? 'w-3/4' : 'w-full'}>
         {label && (
           <InputLabel id={`${label}-label`} style={{ color: hasBlurred && errorMessage ? 'red' : 'rgb(34, 34, 34)' }}>
-            {t(label)}
+            {label}
           </InputLabel>
         )}
         {creatable && onInputChange && onCreateOption && getLabelForValue ? (
@@ -68,6 +67,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
             label={label}
             localOptions={localOptions}
             errorMessage={errorMessage}
+            helpText={helpText}
             onInputChange={onInputChange}
             onValueChange={onValueChange}
             onCreateOption={onCreateOption}
@@ -97,7 +97,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
             endAdornment={
               helpText && (
                 <InputAdornment position="end">
-                  <Tooltip title={t(helpText)} placement="top">
+                  <Tooltip title={helpText} placement="top">
                     <HelpOutline
                       style={{
                         cursor: 'pointer',
@@ -117,7 +117,7 @@ export const MaterialDropDown: React.FC<MaterialDropDownProps> = ({
             )}
             {localOptions.map((option) => (
               <MenuItem key={option.value} value={option.value}>
-                {t(option.label)}
+                {option.label}
               </MenuItem>
             ))}
           </Select>

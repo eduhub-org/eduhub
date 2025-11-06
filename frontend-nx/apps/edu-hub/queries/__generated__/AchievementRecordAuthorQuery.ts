@@ -9,6 +9,12 @@ import { AchievementRecordAuthor_bool_exp, AchievementRecordAuthor_order_by } fr
 // GraphQL query operation: AchievementRecordAuthorQuery
 // ====================================================
 
+export interface AchievementRecordAuthorQuery_AchievementRecordAuthor_User_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
 export interface AchievementRecordAuthorQuery_AchievementRecordAuthor_User {
   __typename: "User";
   id: any;
@@ -40,6 +46,10 @@ export interface AchievementRecordAuthorQuery_AchievementRecordAuthor_User {
    * The user's country of residence
    */
   country: string | null;
+  /**
+   * An object relationship
+   */
+  Organization: AchievementRecordAuthorQuery_AchievementRecordAuthor_User_Organization | null;
 }
 
 export interface AchievementRecordAuthorQuery_AchievementRecordAuthor {

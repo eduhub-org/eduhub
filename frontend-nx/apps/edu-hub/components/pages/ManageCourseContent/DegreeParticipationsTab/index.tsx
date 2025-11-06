@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { ColumnDef } from '@tanstack/react-table';
 import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
@@ -8,6 +8,11 @@ import { DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments 
 import { DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS } from '../../../../queries/courseDegree';
 import { CertificateDownload } from '../../../common/CertificateDownload';
 import { useTableGrid } from '../../../common/TableGrid/hooks';
+import { useRoleMutation } from '../../../../hooks/authedMutation';
+import { CREATE_CERTIFICATES } from '../../../../queries/actions';
+import { REMOVE_ACHIEVEMENT_CERTIFICATES } from '../../../../queries/courseEnrollment';
+import { BulkAction } from '../../../common/TableGrid/types';
+import NotificationSnackbar from '../../../common/dialogs/NotificationSnackbar';
 
 interface DegreeParticipationsTabIProps {
   course: ManagedCourse_Course_by_pk;
@@ -25,11 +30,16 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
   const { t, lang } = useTranslation('manageCourse');
 
   const [pageSize, setPageSize] = useState(20);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);
     setPageIndex(0);
   };
+
+  const [createCertificates] = useRoleMutation(CREATE_CERTIFICATES);
+  const [removeAchievementCertificates] = useRoleMutation(REMOVE_ACHIEVEMENT_CERTIFICATES);
 
   const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter } = useTableGrid({
     queryHook: useRoleQuery,
@@ -155,67 +165,141 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       };
     });
 
+  // Bulk actions for certificate management
+  const bulkActions: BulkAction[] = useMemo(
+    () => [
+      {
+        value: 'generate-achievement-certificates',
+        label: t('generate_achievement_certificates'),
+      },
+      {
+        value: 'delete-achievement-certificates',
+        label: t('delete_achievement_certificates'),
+      },
+    ],
+    [t]
+  );
+
+  // Handle bulk actions
+  const handleBulkAction = useCallback(
+    async (action: string, selectedRows: ExtendedDegreeParticipantsEnrollment[]) => {
+      if (action === 'generate-achievement-certificates') {
+        try {
+          const userIds = selectedRows.map((row) => row.User.id);
+
+          const response = await createCertificates({
+            variables: {
+              courseId: course.id,
+              userIds,
+              certificateType: 'achievement',
+            },
+          });
+
+          const result = response.data.createCertificates;
+
+          if (!result.success) {
+            throw new Error(result.error || t(`errors:${result.messageKey}`));
+          }
+
+          const certCount = result.count;
+          const successTranslationKey =
+            certCount <= 1
+              ? `course-page:${certCount === 0 ? 'no-' : '1-'}certificate-generated`
+              : 'course-page:certificates-generated';
+
+          setSnackbarMessage(t(successTranslationKey, { number: certCount }));
+          setSnackbarOpen(true);
+
+          // Refetch data to update the table
+          setPageIndex(pageIndex); // This triggers a refetch via useTableGrid
+        } catch (err) {
+          console.error('Certificate generation error:', err);
+          setSnackbarMessage(err.message || t('errors:certificate_generation_failed'));
+          setSnackbarOpen(true);
+        }
+      } else if (action === 'delete-achievement-certificates') {
+        try {
+          const enrollmentIds = selectedRows.map((row) => row.id);
+
+          const response = await removeAchievementCertificates({
+            variables: {
+              enrollmentIds,
+            },
+          });
+
+          const affectedRows = response.data?.update_CourseEnrollment?.affected_rows || 0;
+
+          const successTranslationKey =
+            affectedRows <= 1
+              ? affectedRows === 0
+                ? 'manageCourse:no_certificates_deleted'
+                : 'manageCourse:certificate_deleted_singular'
+              : 'manageCourse:certificates_deleted_plural';
+
+          setSnackbarMessage(t(successTranslationKey, { count: affectedRows }));
+          setSnackbarOpen(true);
+
+          // Refetch data to update the table
+          setPageIndex(pageIndex); // This triggers a refetch via useTableGrid
+        } catch (err) {
+          console.error('Certificate deletion error:', err);
+          setSnackbarMessage(err.message || t('common:error_handling.certificate_deletion_failed'));
+          setSnackbarOpen(true);
+        }
+      }
+    },
+    [course.id, createCertificates, removeAchievementCertificates, t, setPageIndex, pageIndex]
+  );
+
   const columns = useMemo<ColumnDef<ExtendedDegreeParticipantsEnrollment>[]>(
     () => [
       {
         header: t('name'),
         accessorKey: 'name',
         enableSorting: true,
-        className: '',
-        meta: {
-          width: 3,
-        },
+        size: 200,
+        minSize: 150,
         cell: ({ getValue }) => <div className="uppercase">{getValue<string>()}</div>,
       },
       {
         header: t('participations'),
-        accessorKey: 'participations', // Use the flattened summary string
-        meta: {
-          width: 4,
-        },
-        cell: ({ getValue }) => <div style={{ whiteSpace: 'pre-line' }}>{getValue<string>()}</div>, // Display the summary string with multiline support
+        accessorKey: 'participations',
+        size: 400,
+        minSize: 300,
+        maxSize: 600,
+        cell: ({ getValue }) => <div style={{ whiteSpace: 'pre-line' }}>{getValue<string>()}</div>,
       },
       {
         header: t('lastApplication'),
         accessorKey: 'lastApplication',
-        meta: {
-          className: 'text-center',
-          width: 1,
-        },
+        size: 150,
+        minSize: 120,
       },
       {
         header: t('status'),
         accessorKey: 'status',
-        meta: {
-          className: 'text-center',
-          width: 1,
-        },
+        size: 120,
+        minSize: 100,
       },
       {
         header: t('ectsTotal'),
         accessorKey: 'ectsTotal',
-        meta: {
-          className: 'text-center',
-          width: 1,
-        },
+        size: 120,
+        minSize: 100,
         enableSorting: true,
       },
       {
         header: t('attendedEvents'),
         accessorKey: 'attendedEvents',
-        meta: {
-          className: 'text-center',
-          width: 1,
-        },
+        size: 150,
+        minSize: 120,
       },
       {
         header: t('certificate'),
         accessorKey: 'certificate',
         accessorFn: (row) => row,
-        meta: {
-          className: 'text-center',
-          width: 1,
-        },
+        size: 150,
+        minSize: 120,
         cell: ({ getValue }) => (
           <div>
             <CertificateDownload courseEnrollment={getValue<ExtendedDegreeParticipantsEnrollment>()} manageView />
@@ -240,8 +324,15 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         onSearchFilterChange={setSearchFilter}
         error={error}
         loading={loading}
-        showCheckbox={false}
+        showCheckbox={true}
+        bulkActions={bulkActions}
+        onBulkAction={handleBulkAction}
         refetchQueries={['DegreeParticipantsWithDegreeEnrollments']}
+      />
+      <NotificationSnackbar
+        open={snackbarOpen}
+        onClose={() => setSnackbarOpen(false)}
+        message={snackbarMessage}
       />
     </>
   );
