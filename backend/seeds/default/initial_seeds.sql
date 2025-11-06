@@ -1369,9 +1369,8 @@ WHERE "userId" = '33333333-3333-3333-3333-333333333333' AND "courseId" = 4;
 
 -- User 11111111-1111-1111-1111-111111111111: Achievement Certificate für Course 1
 UPDATE public."CourseEnrollment" 
-SET "achievementCertificateURL" = '111111111111/1/achievement_certificate.pdf'
+SET "achievementCertificateURL" = '11111111-1111-1111-1111-111111111111/1/achievement_certificate.pdf'
 WHERE "userId" = '11111111-1111-1111-1111-111111111111' AND "courseId" = 1;
-
 -- Event für User 33333333-3333-3333-3333-333333333333
 -- Event-Kurs (Kurs 8) dem Degree (Kurs 7) zuordnen
 INSERT INTO public."CourseDegree" (id, "courseId", "degreeCourseId", created_at, updated_at) 
