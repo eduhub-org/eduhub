@@ -129,7 +129,7 @@ To create an accurate summary:
 
 ## Example
 
-See [v1.4.0-release-summary.md](mdc:v1.4.0-release-summary.md) for a complete example following these guidelines.
+Release summaries are typically created for Slack announcements or GitHub Release notes and are not stored in the repository. When creating a summary, follow the structure template above and ensure it adheres to the formatting guidelines for your target platform (Slack, GitHub, etc.).
 
 ## Review Checklist
 
