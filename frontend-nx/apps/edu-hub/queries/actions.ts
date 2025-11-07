@@ -125,7 +125,7 @@ export const GET_SIGNED_URL = gql`
 `;
 
 export const MAKE_CERTIFICATE_PUBLIC = gql`
-  query MakeCertificatePublic($certificatePath: String!) {
+  mutation MakeCertificatePublic($certificatePath: String!) {
     makeCertificatePublic(certificatePath: $certificatePath) {
       success
       messageKey

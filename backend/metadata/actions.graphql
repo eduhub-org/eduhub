@@ -30,7 +30,7 @@ type Query {
   ): getSignedUrlOutput
 }
 
-type Query {
+type Mutation {
   makeCertificatePublic(
     certificatePath: String!
   ): makeCertificatePublicOutput

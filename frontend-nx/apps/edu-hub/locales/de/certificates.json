@@ -5,6 +5,7 @@
   "no_certificates_description": "Du hast noch keine Zertifikate erhalten. Schließe Kurse ab und erreiche Deine Lernziele, um Zertifikate zu erhalten, die Deine Erfolge zeigen!",
   "browse_courses": "Kurse durchsuchen",
   "linkedin_sharing_warning": "Um Dein Zertifikat auf LinkedIn zu teilen, muss es öffentlich zugänglich gemacht werden. Das bedeutet, dass jeder mit dem Link Dein Zertifikat einsehen kann. Möchtest Du fortfahren?",
+  "select_certificate_to_share": "Wähle aus, welches Zertifikat Du teilen möchtest:",
   "make_public_confirm": "Öffentlich machen und teilen",
   "share_on_linkedin": "Auf LinkedIn teilen",
   "achievement_certificate": "Leistungsnachweis",

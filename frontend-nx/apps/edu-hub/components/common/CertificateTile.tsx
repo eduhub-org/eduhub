@@ -1,11 +1,12 @@
 import React, { FC, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
-import { School as SchoolIcon, Event as EventIcon } from '@mui/icons-material';
+import { GetApp } from '@mui/icons-material';
 import { TileBase } from './TileSlider/TileBase';
-import { useRoleQuery, useLazyRoleQuery } from '../../hooks/authedQuery';
+import { useRoleQuery } from '../../hooks/authedQuery';
+import { useRoleMutation } from '../../hooks/authedMutation';
 import { GET_SIGNED_URL, MAKE_CERTIFICATE_PUBLIC } from '../../queries/actions';
 import { GetSignedUrl, GetSignedUrlVariables } from '../../queries/__generated__/GetSignedUrl';
-import { MakeCertificatePublic, MakeCertificatePublicVariables } from '../../queries/__generated__/MakeCertificatePublic';
+// import { MakeCertificatePublic, MakeCertificatePublicVariables } from '../../queries/__generated__/MakeCertificatePublic';
 import { Button } from './Button';
 import { LinkedInSharingDialog } from './dialogs/LinkedInSharingDialog';
 import { ErrorMessageDialog } from './dialogs/ErrorMessageDialog';
@@ -17,8 +18,8 @@ interface CertificateTileProps {
 
 export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
   const { t } = useTranslation('certificates');
+  const { t: tCommon } = useTranslation('common');
   const [linkedInDialogOpen, setLinkedInDialogOpen] = useState(false);
-  const [selectedCertificateType, setSelectedCertificateType] = useState<'achievement' | 'attendance' | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
   const course = enrollment.Course;
@@ -46,11 +47,10 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
     skip: !enrollment.attendanceCertificateURL,
   });
 
-  // Lazy query for making certificate public
-  const [makeCertificatePublic, { loading: makingPublic }] = useLazyRoleQuery<
-    MakeCertificatePublic,
-    MakeCertificatePublicVariables
-  >(MAKE_CERTIFICATE_PUBLIC);
+  // Mutation for making certificate public
+  const [makeCertificatePublic, { loading: makingPublic }] = useRoleMutation<any, { certificatePath: string }>(
+    MAKE_CERTIFICATE_PUBLIC
+  );
 
   const handleCertificateClick = (type: 'achievement' | 'attendance') => {
     const url = type === 'achievement' 
@@ -62,15 +62,12 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
     }
   };
 
-  const handleLinkedInClick = (type: 'achievement' | 'attendance') => {
-    setSelectedCertificateType(type);
+  const handleLinkedInClick = () => {
     setLinkedInDialogOpen(true);
   };
 
-  const handleLinkedInConfirm = async () => {
-    if (!selectedCertificateType) return;
-
-    const certificatePath = selectedCertificateType === 'achievement'
+  const handleLinkedInConfirm = async (selectedType: 'achievement' | 'attendance') => {
+    const certificatePath = selectedType === 'achievement'
       ? enrollment.achievementCertificateURL
       : enrollment.attendanceCertificateURL;
 
@@ -92,16 +89,17 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
       } else {
         setErrorMessage(result?.data?.makeCertificatePublic?.error || t('errorMessages:linkedin_share_error', {}, { fallback: 'Failed to share certificate on LinkedIn' }));
       }
-    } catch (error) {
-      setErrorMessage(t('errorMessages:linkedin_share_error', {}, { fallback: 'Failed to share certificate on LinkedIn' }));
+    } catch (error: any) {
+      console.error('LinkedIn share error:', error);
+      setErrorMessage(error?.message || t('errorMessages:linkedin_share_error', {}, { fallback: 'Failed to share certificate on LinkedIn' }));
     } finally {
       setLinkedInDialogOpen(false);
-      setSelectedCertificateType(null);
     }
   };
 
   const hasAchievement = !!enrollment.achievementCertificateURL;
   const hasAttendance = !!enrollment.attendanceCertificateURL;
+  const hasAnyCertificate = hasAchievement || hasAttendance;
 
   return (
     <>
@@ -111,57 +109,46 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
       >
         <div className="flex flex-col h-full justify-between">
           <div className="flex flex-col gap-3">
-            {/* Certificate Icons */}
-            <div className="flex gap-4 items-center">
-              {hasAchievement && (
-                <button
-                  onClick={() => handleCertificateClick('achievement')}
-                  className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                  title={t('achievement_certificate')}
-                  disabled={achievementLoading}
-                >
-                  <SchoolIcon className="text-edu-black" fontSize="large" />
-                </button>
-              )}
-              {hasAttendance && (
-                <button
-                  onClick={() => handleCertificateClick('attendance')}
-                  className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                  title={t('attendance_certificate')}
-                  disabled={attendanceLoading}
-                >
-                  <EventIcon className="text-edu-black" fontSize="large" />
-                </button>
-              )}
-            </div>
-
-            {/* LinkedIn Share Buttons */}
+            {/* Download Certificate Buttons */}
             {hasAchievement && (
               <Button
                 filled
-                onClick={() => handleLinkedInClick('achievement')}
-                disabled={makingPublic}
-                className="text-sm"
+                onClick={() => handleCertificateClick('achievement')}
+                disabled={achievementLoading}
+                className="flex items-center justify-center gap-2 text-sm py-2 px-3"
               >
-                {t('share_on_linkedin')} - {t('achievement_certificate')}
+                <GetApp fontSize="small" />
+                {t('achievement_certificate')}
               </Button>
             )}
             {hasAttendance && (
               <Button
                 filled
-                onClick={() => handleLinkedInClick('attendance')}
-                disabled={makingPublic}
-                className="text-sm"
+                onClick={() => handleCertificateClick('attendance')}
+                disabled={attendanceLoading}
+                className="flex items-center justify-center gap-2 text-sm py-2 px-3"
               >
-                {t('share_on_linkedin')} - {t('attendance_certificate')}
+                <GetApp fontSize="small" />
+                {t('attendance_certificate')}
+              </Button>
+            )}
+
+            {/* Single LinkedIn Share Button */}
+            {hasAnyCertificate && (
+              <Button
+                onClick={handleLinkedInClick}
+                disabled={makingPublic}
+                className="text-xs py-1 px-2"
+              >
+                {t('share_on_linkedin')}
               </Button>
             )}
           </div>
 
           {/* Program Title at bottom */}
-          {program && (
-            <div className="text-xs tracking-wider mt-auto">
-              {!program.published && program.title}
+          {program && program.title && (
+            <div className="text-xs tracking-wider mt-auto text-right">
+              {program.title}
             </div>
           )}
         </div>
@@ -171,9 +158,10 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
         open={linkedInDialogOpen}
         onClose={() => {
           setLinkedInDialogOpen(false);
-          setSelectedCertificateType(null);
         }}
         onConfirm={handleLinkedInConfirm}
+        hasAchievement={hasAchievement}
+        hasAttendance={hasAttendance}
       />
 
       {errorMessage && (

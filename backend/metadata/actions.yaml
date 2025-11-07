@@ -62,7 +62,7 @@ actions:
     comment: Gets a signed url for a file in the Google Storage Bucket
   - name: makeCertificatePublic
     definition:
-      kind: ""
+      kind: synchronous
       handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
       headers:
         - name: secret
