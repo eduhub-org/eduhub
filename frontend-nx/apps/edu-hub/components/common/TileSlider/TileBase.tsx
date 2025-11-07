@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { FC, useEffect, useState, ReactNode } from 'react';
+import { FC, useEffect, useState, ReactNode, memo } from 'react';
 import { getTileImage } from '../../../helpers/imageHandling';
 
 interface TileBaseProps {
@@ -10,15 +10,32 @@ interface TileBaseProps {
   className?: string;
 }
 
-export const TileBase: FC<TileBaseProps> = ({ coverImage: coverImageProp, title, children, onClick, className = '' }) => {
-  const [coverImage, setCoverImage] = useState<string | null>(null);
+const TileBaseComponent: FC<TileBaseProps> = ({ coverImage: coverImageProp, title, children, onClick, className = '' }) => {
+  // Initialize with placeholder immediately to prevent layout shifts
+  const [coverImage, setCoverImage] = useState<string>('https://picsum.photos/240/144');
 
   useEffect(() => {
+    let isMounted = true;
+    
     const loadCoverImage = async () => {
-      const img = await getTileImage(coverImageProp);
-      setCoverImage(img);
+      if (coverImageProp) {
+        try {
+          const img = await getTileImage(coverImageProp);
+          if (isMounted) {
+            setCoverImage(img);
+          }
+        } catch (error) {
+          // Keep placeholder on error
+          console.warn('Failed to load tile image:', error);
+        }
+      }
     };
+    
     loadCoverImage();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [coverImageProp]);
 
   return (
@@ -49,4 +66,7 @@ export const TileBase: FC<TileBaseProps> = ({ coverImage: coverImageProp, title,
     </div>
   );
 };
+
+// Memoize to prevent unnecessary re-renders that could interfere with Swiper
+export const TileBase = memo(TileBaseComponent);
 

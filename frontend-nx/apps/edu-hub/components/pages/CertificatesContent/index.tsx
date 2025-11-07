@@ -9,6 +9,7 @@ import { MyCertificates, MyCertificatesVariables } from '../../../queries/__gene
 import { CertificateTile } from '../../common/CertificateTile';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import { Button } from '../../common/Button';
+import { PageBlock } from '../../common/PageBlock';
 import { useState } from 'react';
 
 const CertificatesContent: FC = () => {
@@ -53,32 +54,42 @@ const CertificatesContent: FC = () => {
 
   if (enrollments.length === 0) {
     return (
-      <div className="px-3 mt-20 max-w-screen-xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">{t('title')}</h1>
-        <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-          <div className="max-w-2xl">
-            <p className="text-xl mb-4 text-gray-700">{t('no_certificates_title')}</p>
-            <p className="text-lg mb-8 text-gray-600">{t('no_certificates_description')}</p>
-            <Link href="/">
-              <Button filled className="text-lg px-8 py-3">
-                {t('browse_courses')}
-              </Button>
-            </Link>
+      <PageBlock>
+        <div className="max-w-screen-xl mx-auto mt-20">
+          <div className="flex flex-row mb-12 text-white">
+            <h1 className="text-4xl font-bold mt-24">{t('title')}</h1>
+          </div>
+          <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+            <div className="max-w-2xl">
+              <p className="text-xl mb-4 text-white">{t('no_certificates_title')}</p>
+              <p className="text-lg mb-8 text-gray-300">{t('no_certificates_description')}</p>
+              <Link href="/">
+                <Button filled className="text-lg px-8 py-3">
+                  {t('browse_courses')}
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      </PageBlock>
     );
   }
 
   return (
-    <div className="px-3 mt-20 max-w-screen-xl mx-auto">
-      <h1 className="text-4xl font-bold mb-8">{t('title')}</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {enrollments.map((enrollment) => (
-          <CertificateTile key={enrollment.id} enrollment={enrollment} />
-        ))}
+    <PageBlock>
+      <div className="max-w-screen-xl mx-auto mt-20">
+        <div className="flex flex-row mb-12 text-white">
+          <h1 className="text-4xl font-bold mt-24">{t('title')}</h1>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {enrollments.map((enrollment) => (
+            <div key={enrollment.id} className="w-full max-w-[325px]">
+              <CertificateTile enrollment={enrollment} />
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </PageBlock>
   );
 };
 
