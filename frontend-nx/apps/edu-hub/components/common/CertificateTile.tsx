@@ -6,7 +6,7 @@ import { useRoleQuery } from '../../hooks/authedQuery';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import { GET_SIGNED_URL, MAKE_CERTIFICATE_PUBLIC } from '../../queries/actions';
 import { GetSignedUrl, GetSignedUrlVariables } from '../../queries/__generated__/GetSignedUrl';
-// import { MakeCertificatePublic, MakeCertificatePublicVariables } from '../../queries/__generated__/MakeCertificatePublic';
+import { MakeCertificatePublic, MakeCertificatePublicVariables } from '../../queries/__generated__/MakeCertificatePublic';
 import { Button } from './Button';
 import { LinkedInSharingDialog } from './dialogs/LinkedInSharingDialog';
 import { ErrorMessageDialog } from './dialogs/ErrorMessageDialog';
@@ -48,7 +48,7 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
   });
 
   // Mutation for making certificate public
-  const [makeCertificatePublic, { loading: makingPublic }] = useRoleMutation<any, { certificatePath: string }>(
+  const [makeCertificatePublic, { loading: makingPublic }] = useRoleMutation<MakeCertificatePublic, MakeCertificatePublicVariables>(
     MAKE_CERTIFICATE_PUBLIC
   );
 

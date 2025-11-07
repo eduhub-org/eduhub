@@ -70,8 +70,7 @@ const makeCertificatePublic = async (req) => {
       };
     } else {
       // In production, use actual Storage API
-      const storageInstance = new Storage();
-      const bucket = storageInstance.bucket(bucketName);
+      const bucket = storage.bucket(bucketName);
       const file = bucket.file(certificatePath);
       
       // Check if file already is public
