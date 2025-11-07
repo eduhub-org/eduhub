@@ -1,0 +1,145 @@
+---
+description: "Guidelines for writing user-friendly version update summaries for non-technical audiences"
+alwaysApply: false
+---
+
+# Version Update Summary Guidelines
+
+> **Related Rules**: [Release Management](release-management.mdc) | [Conventional Commits](conventional-commits.mdc) | [Semantic Release Workflow](semantic-release-workflow.mdc)
+
+When creating version update summaries for non-technical audiences (e.g., Slack announcements, user newsletters), follow these guidelines to ensure clear, accessible communication.
+
+## Audience Considerations
+
+- **Focus on features, not fixes**: Non-technical users care about what they can do, not what bugs were fixed
+- **Use plain language**: Avoid technical jargon, commit hashes, and implementation details
+- **Emphasize benefits**: Explain how features help users accomplish their tasks
+- **Group related changes**: Organize features by functional area for easier scanning
+
+## Formatting for Slack
+
+Slack uses a simplified markdown syntax. Use these formatting rules:
+
+### Headers
+- Use `*bold text*` for section headers (not `##`)
+- Example: `*🎓 Certificate Management*`
+
+### Bold Text
+- Use single asterisks: `*text*` (not `**text**`)
+- Example: `*Bulk certificate actions:*`
+
+### Lists
+- Use bullet points `•` instead of dashes `-`
+- Keep list items concise and scannable
+- Use bold for feature names followed by a colon
+
+### Emojis
+- Use emojis to make sections visually distinct and easier to scan
+- Common categories:
+  - 🎓 Education/Certificates
+  - 📧 Communication/Email
+  - 📍 Location/Addresses
+  - 📊 Analytics/Statistics
+  - 🎯 Course Management
+  - 💬 Content/FAQ
+  - 🌐 User Experience
+
+### Other Formatting
+- Remove horizontal rules (`---`) - not well supported in Slack
+- Keep paragraphs short (2-3 sentences max)
+- Use line breaks between sections for readability
+
+## Structure Template
+
+```
+*[Product Name] Version [X.Y.Z] - What's New*
+
+*Released:* [Date]
+
+[Opening paragraph: Brief, enthusiastic introduction]
+
+*[Emoji] [Feature Category 1]*
+
+• *Feature name:* Brief description focusing on user benefit
+• *Feature name:* Brief description focusing on user benefit
+
+*[Emoji] [Feature Category 2]*
+
+• *Feature name:* Brief description focusing on user benefit
+
+[Closing paragraph: Summary of overall improvements]
+```
+
+## Content Guidelines
+
+### What to Include
+
+✅ **User-facing features** - New capabilities users can access
+✅ **UI/UX improvements** - Changes that affect how users interact with the platform
+✅ **Workflow enhancements** - Features that make tasks easier or faster
+✅ **New management pages** - New areas of the platform
+✅ **Bulk actions** - Time-saving features for managing multiple items
+✅ **Filtering/sorting improvements** - Better ways to find and organize data
+
+### What to Exclude
+
+❌ **Bug fixes** - Unless they significantly impact user experience
+❌ **Technical improvements** - Code refactoring, performance optimizations (unless user-visible)
+❌ **Internal tooling** - Developer scripts, CI/CD changes
+❌ **Commit hashes** - Never reference specific commits
+❌ **Implementation details** - How something works, only what it does
+❌ **Breaking changes** - Handle separately with migration guidance
+
+## Gathering Information
+
+To create an accurate summary:
+
+1. **Check the GitHub release page** for the version tag
+2. **Review actual commits** between versions:
+   ```bash
+   git log v[X.Y.Z-1]..v[X.Y.Z] --pretty=format:"%h %s" --no-merges
+   ```
+3. **Filter for features only**:
+   ```bash
+   git log v[X.Y.Z-1]..v[X.Y.Z] --pretty=format:"%h %s" --grep="^feat" --no-merges
+   ```
+4. **Examine commit details** for features that might not be obvious from commit messages
+5. **Group related features** by functional area
+
+## Writing Tips
+
+### Feature Descriptions
+
+- **Start with the action**: "Generate certificates" not "Certificate generation functionality"
+- **Include context**: "for multiple participants at once" helps users understand the benefit
+- **Be specific**: "from 3 to 6" is clearer than "increased"
+- **Use active voice**: "Administrators can now..." not "It is now possible to..."
+
+### Tone
+
+- **Enthusiastic but professional**: "We're excited to share..." sets a positive tone
+- **Confident**: "These updates focus on..." shows clear direction
+- **User-focused**: Always frame from the user's perspective
+
+### Length
+
+- **Keep it scannable**: Use bullet points, not paragraphs
+- **Be concise**: One line per feature, two lines maximum
+- **Prioritize**: Most impactful features first within each category
+
+## Example
+
+See [v1.4.0-release-summary.md](mdc:v1.4.0-release-summary.md) for a complete example following these guidelines.
+
+## Review Checklist
+
+Before publishing, ensure:
+
+- [ ] All user-facing features are included
+- [ ] No technical jargon or commit references
+- [ ] Formatting works in Slack (test if possible)
+- [ ] Features are grouped logically
+- [ ] Each feature explains the user benefit
+- [ ] Tone is appropriate for the audience
+- [ ] No bug fixes included (unless user-impacting)
+- [ ] Emojis enhance readability without being excessive

@@ -67,6 +67,7 @@ This directory contains comprehensive development rules and guidelines for the E
 | [Conventional Commits](conventional-commits.mdc) | Commit message standards and semantic versioning impact | Working with commits, versioning, or release processes |
 | [Release Management](release-management.mdc) | Release process, version control, and deployment workflow | Managing releases, version control, or deployment workflows |
 | [Semantic Release Workflow](semantic-release-workflow.mdc) | Branch strategy and automated versioning process | Working with branch strategies or automated versioning |
+| [Version Update Summaries](version-update-summaries.mdc) | Guidelines for writing user-friendly release announcements | Creating version update summaries for non-technical audiences |
 
 ## Quick Start Guide
 
@@ -103,6 +104,7 @@ This directory contains comprehensive development rules and guidelines for the E
 1. **Commits**: [Conventional Commits](conventional-commits.mdc)
 2. **Releases**: [Release Management](release-management.mdc)
 3. **Workflow**: [Semantic Release Workflow](semantic-release-workflow.mdc)
+4. **Announcements**: [Version Update Summaries](version-update-summaries.mdc)
 
 ## Rule Relationships
 
@@ -125,6 +127,7 @@ graph TD
     L --> M[Conventional Commits]
     M --> N[Release Management]
     N --> O[Semantic Release Workflow]
+    N --> Q[Version Update Summaries]
     
     P[EduHub Email System] --> H
     P --> L
