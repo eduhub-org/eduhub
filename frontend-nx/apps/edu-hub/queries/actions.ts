@@ -124,6 +124,17 @@ export const GET_SIGNED_URL = gql`
   }
 `;
 
+export const MAKE_CERTIFICATE_PUBLIC = gql`
+  query MakeCertificatePublic($certificatePath: String!) {
+    makeCertificatePublic(certificatePath: $certificatePath) {
+      success
+      messageKey
+      error
+      publicUrl
+    }
+  }
+`;
+
 export const SAVE_USER_PROFILE_IMAGE = gql`
   mutation SaveUserProfileImage(
     $base64File: String!

@@ -1,0 +1,18 @@
+{
+  "title": "Meine Zertifikate",
+  "no_certificates": "Du hast noch keine Zertifikate.",
+  "no_certificates_title": "Noch keine Zertifikate",
+  "no_certificates_description": "Du hast noch keine Zertifikate erhalten. Schließe Kurse ab und erreiche Deine Lernziele, um Zertifikate zu erhalten, die Deine Erfolge zeigen!",
+  "browse_courses": "Kurse durchsuchen",
+  "linkedin_sharing_warning": "Um Dein Zertifikat auf LinkedIn zu teilen, muss es öffentlich zugänglich gemacht werden. Das bedeutet, dass jeder mit dem Link Dein Zertifikat einsehen kann. Möchtest Du fortfahren?",
+  "make_public_confirm": "Öffentlich machen und teilen",
+  "share_on_linkedin": "Auf LinkedIn teilen",
+  "achievement_certificate": "Leistungsnachweis",
+  "attendance_certificate": "Teilnahmebescheinigung",
+  "not_authenticated": "Du musst angemeldet sein, um Deine Zertifikate anzusehen.",
+  "errorMessages": {
+    "certificate_not_found": "Zertifikat nicht gefunden",
+    "linkedin_share_error": "Zertifikat konnte nicht auf LinkedIn geteilt werden. Bitte versuche es später erneut."
+  }
+}
+

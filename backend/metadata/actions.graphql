@@ -31,6 +31,12 @@ type Query {
 }
 
 type Query {
+  makeCertificatePublic(
+    certificatePath: String!
+  ): makeCertificatePublicOutput
+}
+
+type Query {
   loadParticipationData(
     programId: Int!
   ): LoadParticipationDataResult!
@@ -179,6 +185,13 @@ type Image {
 
 type getSignedUrlOutput {
   link: String!
+}
+
+type makeCertificatePublicOutput {
+  success: Boolean!
+  messageKey: String!
+  error: String
+  publicUrl: String
 }
 
 type DeleteUserResult {
