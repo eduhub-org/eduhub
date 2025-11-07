@@ -3,7 +3,7 @@ alwaysApply: false
 ---
 # Release Management Process
 
-> **Related Rules**: [Conventional Commits](conventional-commits.mdc) | [Semantic Release Workflow](semantic-release-workflow.mdc) | [Database Table Creation](database-table-creation.md)
+> **Related Rules**: [Conventional Commits](conventional-commits.mdc) | [Semantic Release Workflow](semantic-release-workflow.mdc) | [Version Update Summaries](version-update-summaries.mdc) | [Database Table Creation](database-table-creation.md)
 
 EduHub uses an automated release management system built on semantic-release for consistent and reliable deployments.
 
