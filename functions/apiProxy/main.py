@@ -23,37 +23,37 @@ request_counts = {}  # In-memory storage for rate limiting
 # Hardcoded location address mapping
 LOCATION_ADDRESS_MAPPING = {
     320: {
-        "learning_zone": "Eventraum",
+        "name": "Eventraum",
         "streetAddress": "Kuhnkestr. 6",
         "city": "Kiel",
         "description": "Starterkitchen by opencampus.sh"
     },
     321: {
-        "learning_zone": "Konferenzraum",
+        "name": "Konferenzraum",
         "streetAddress": "Kuhnkestr. 6",
         "city": "Kiel",
         "description": "Starterkitchen by opencampus.sh"
     },
     322: {
-        "learning_zone": "Café",
+        "name": "Café",
         "streetAddress": "Legienstraße 40",
         "city": "Kiel",
         "description": "COBL by opencampus.sh"
     },
     323: {
-        "learning_zone": "Loft",
+        "name": "Loft",
         "streetAddress": "Legienstraße 40",
         "city": "Kiel",
         "description": "COBL by opencampus.sh"
     },
     324: {
-        "learning_zone": "Club",
+        "name": "Club",
         "streetAddress": "Legienstraße 40",
         "city": "Kiel",
         "description": "COBL by opencampus.sh"
     },
     325: {
-        "learning_zone": "FabLab",
+        "name": "FabLab",
         "streetAddress": "Fraunhoferstraße 2-4",
         "city": "Kiel",
         "description": "FabLab.SH by opencampus.sh"
@@ -275,7 +275,7 @@ def handle_moochub_data(page=1, per_page=25):
                     if address_id in LOCATION_ADDRESS_MAPPING:
                         location_data = LOCATION_ADDRESS_MAPPING[address_id]
                         attributes["contentLocation"] = {
-                            "name": location_data["learning_zone"],
+                            "name": location_data["name"],
                             "address": {
                                 "streetAddress": location_data["streetAddress"],
                                 "city": location_data["city"],
