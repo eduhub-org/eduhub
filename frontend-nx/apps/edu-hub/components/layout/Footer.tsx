@@ -57,6 +57,7 @@ export const Footer: FC = () => {
                   alt="Förder Logo" 
                   width={400} 
                   height={80}
+                  priority
                   unoptimized
                   className="w-full h-full object-contain"
                 />
