@@ -6,6 +6,15 @@ import axios from 'axios';
 import type { JWT } from 'next-auth/jwt';
 import type { IKeycloakRefreshTokenApiResponse } from './keycloakRefreshToken';
 
+// Validate HASURA_ADMIN_SECRET at module load time
+// This ensures the secret is set and prevents hard-coded fallbacks
+const HASURA_ADMIN_SECRET = process.env.HASURA_ADMIN_SECRET;
+if (!HASURA_ADMIN_SECRET) {
+  throw new Error(
+    'HASURA_ADMIN_SECRET environment variable is required but not set. Application cannot start without it.'
+  );
+}
+
 const UPDATE_USER = gql`
   mutation update_User($id: ID!) {
     updateFromKeycloak(userid: $id) {

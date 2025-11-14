@@ -16,6 +16,28 @@ export const COURSE_TILES = gql`
   }
 `;
 
+export const COURSE_TILES_BY_ORGANIZATION = gql`
+  ${COURSE_TILE_FRAGMENT}
+  query CourseTilesByOrganization($organizationId: Int!) {
+    Course(
+      order_by: { updated_at: desc }
+      where: {
+        CourseFundingOrganizations: {
+          organizationId: { _eq: $organizationId }
+        }
+      }
+    ) {
+      ...CourseTileFragment
+      CourseGroups {
+        CourseGroupOption {
+          order
+          title
+        }
+      }
+    }
+  }
+`;
+
 export const COURSES_BY_INSTRUCTOR = gql`
   ${COURSE_TILE_FRAGMENT}
   query CoursesByInstructor($userId: uuid!) {
