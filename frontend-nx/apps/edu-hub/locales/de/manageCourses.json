@@ -10,7 +10,7 @@
     "program": "Programm",
     "status": "Status",
     "email_templates": "Vorlagen",
-    "has_custom_templates": "Dieser Kurs hat {{count}} kurs-spezifische E-Mail-Vorlage(n)"
+    "has_custom_templates": "Dieser Kurs hat kursspezifische E-Mail-Vorlagen"
   },
   "view": "Anzeigen",
   "view_course": "Kurs anzeigen",

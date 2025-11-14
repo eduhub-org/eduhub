@@ -10,7 +10,7 @@
     "program": "Program",
     "status": "Status",
     "email_templates": "Templates",
-    "has_custom_templates": "This course has {{count}} custom email template(s)"
+    "has_custom_templates": "This course has custom email templates"
   },
   "view": "View",
   "view_course": "View Course",

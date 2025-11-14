@@ -28,8 +28,9 @@ import TableGrid from '../../common/TableGrid';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
-import { EMAIL_TEMPLATES_LIST } from '../../../queries/emailTemplates';
+import { GET_COURSE_TEMPLATES_COUNT } from '../../../queries/emailTemplates';
 import ExpandableCourseRow from './ExpandableCourseRow';
+import { useParallelQueries } from '../../../hooks/useParallelQueries';
 import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
 import useTranslation from 'next-translate/useTranslation';
 import draftPie from '../../../public/images/course/status/draft.svg';
@@ -149,26 +150,17 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     ),
   });
 
-  // Query course-specific email templates to show indicators
-  const { data: templatesData } = useAdminQuery(EMAIL_TEMPLATES_LIST, {
-    variables: {
-      filter: {
-        courseId: { _neq: -1 }, // Only get course-specific templates (not defaults)
-      },
-      limit: 1000, // Get all course-specific templates
-    },
-  });
+  const courses: AdminCourseList_Course[] = useMemo(() => data?.Course || [], [data?.Course]);
+  const totalCount = data?.Course_aggregate?.aggregate?.count || 0;
 
-  // Create a map of courseId -> template count
-  const courseTemplateCounts = useMemo(() => {
-    const counts = new Map<number, number>();
-    templatesData?.MailTemplate?.forEach((template) => {
-      if (template.courseId && template.courseId !== -1) {
-        counts.set(template.courseId, (counts.get(template.courseId) || 0) + 1);
-      }
-    });
-    return counts;
-  }, [templatesData]);
+  // Fetch template counts for visible courses using parallel queries hook
+  const courseIds = useMemo(() => courses.map((course) => course.id), [courses]);
+  const courseTemplateCounts = useParallelQueries(
+    GET_COURSE_TEMPLATES_COUNT,
+    courseIds,
+    (courseId) => ({ courseId }),
+    (result) => result.data?.MailTemplate_aggregate?.aggregate?.count || 0
+  );
 
   // Handle program tab clicks (moved after useTableGrid to access setPageIndex)
   const handleTabClick = useCallback(
@@ -194,9 +186,6 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const [successMessage, setSuccessMessage] = useState('');
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
-  const courses: AdminCourseList_Course[] = data?.Course || [];
-  const totalCount = data?.Course_aggregate?.aggregate?.count || 0;
 
   const [updateAttendanceCertificatePossible] = useAdminMutation<
     UpdateCourseAttendanceCertificatePossible,
@@ -669,9 +658,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
               {hasCustomTemplates && (
                 <MdMarkEmailRead
                   className="w-4 h-4 text-blue-600 ml-1"
-                  title={t('table_header.has_custom_templates', {
-                    count: templateCount,
-                  })}
+                  title={t('table_header.has_custom_templates')}
                 />
               )}
             </div>

@@ -29,11 +29,12 @@ const CourseEmailTemplates: FC = () => {
   const { t } = useTranslation('manageEmailTemplates');
 
   const courseIdNumber = courseId ? parseInt(courseId as string, 10) : null;
+  const isValidCourseId = courseIdNumber !== null && Number.isInteger(courseIdNumber) && courseIdNumber > 0;
   const [templatesCreated, setTemplatesCreated] = useState(false);
 
   const { data, loading, error } = useAdminQuery<ManagedCourse>(MANAGED_COURSE, {
     variables: { id: courseIdNumber || 0 },
-    skip: !courseIdNumber,
+    skip: !isValidCourseId,
   });
 
   // Check if course has templates
@@ -41,7 +42,7 @@ const CourseEmailTemplates: FC = () => {
     GET_COURSE_TEMPLATES_COUNT,
     {
       variables: { courseId: courseIdNumber || 0 },
-      skip: !courseIdNumber,
+      skip: !isValidCourseId,
     }
   );
 
@@ -85,6 +86,7 @@ const CourseEmailTemplates: FC = () => {
   useEffect(() => {
     const createTemplatesFromDefaults = async () => {
       if (
+        !isValidCourseId ||
         !courseIdNumber ||
         !defaultTemplatesData?.MailTemplate ||
         templatesCreated ||
@@ -142,6 +144,7 @@ const CourseEmailTemplates: FC = () => {
 
     createTemplatesFromDefaults();
   }, [
+    isValidCourseId,
     courseIdNumber,
     defaultTemplatesData,
     templatesCountData,
@@ -156,7 +159,20 @@ const CourseEmailTemplates: FC = () => {
     return <div>Waiting for authentication!</div>;
   }
 
-  if (loading || !courseIdNumber) {
+  if (!isValidCourseId) {
+    return (
+      <Page>
+        <div className="min-h-[77vh] flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold mb-4">Invalid Course ID</h2>
+            <p className="text-gray-600 mb-4">The course ID in the URL is invalid.</p>
+          </div>
+        </div>
+      </Page>
+    );
+  }
+
+  if (loading) {
     return <Loading />;
   }
 
