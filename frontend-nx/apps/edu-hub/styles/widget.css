@@ -1,0 +1,76 @@
+/* Widget-specific global styles - scoped to widget routes */
+body.widget-page {
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  background-color: transparent !important;
+  overflow-x: hidden;
+}
+
+html.widget-page {
+  background: transparent !important;
+  background-color: transparent !important;
+  overflow-x: hidden;
+}
+
+/* Override any background colors from global styles - target body with class */
+body.widget-page.bg-edu-bg-gray {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Ensure all container divs are transparent on widget pages */
+body.widget-page div[class*="bg-"]:not([class*="bg-white"]):not([class*="bg-transparent"]) {
+  background-color: transparent !important;
+}
+
+/* Specifically override the main container */
+body.widget-page div[class*="min-h-[435px]"] {
+  background-color: transparent !important;
+}
+
+/* Hide Cookiebot cookie consent banner/button on widget pages */
+body.widget-page #Cookiebot,
+body.widget-page #CybotCookiebotDialog,
+body.widget-page #CybotCookiebotDialogBody,
+body.widget-page .Cookiebot,
+body.widget-page .cookiebot,
+body.widget-page [id*="cookiebot"],
+body.widget-page [class*="cookiebot"],
+body.widget-page [id*="Cookiebot"],
+body.widget-page [class*="Cookiebot"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Make swiper-wrapper background fully transparent for widget and ensure width */
+body.widget-page .swiper-wrapper {
+  background-color: transparent !important;
+  width: 100% !important;
+}
+
+/* Ensure no overflow on swiper container */
+body.widget-page .swiper {
+  overflow: visible !important;
+  width: 100% !important;
+}
+
+/* Remove any padding/margin that might cause width mismatch */
+body.widget-page #__next {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  background: transparent !important;
+}
+
+/* Add subtle soft shadow to tiles in widget for visibility on all backgrounds */
+body.widget-page .swiper-slide > a > div,
+body.widget-page .swiper-slide a > div,
+body.widget-page .swiper-slide a div.rounded-2xl {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
