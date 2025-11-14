@@ -1,15 +1,19 @@
 import { FC, useState } from 'react';
 import Head from 'next/head';
-import useTranslation from 'next-translate/useTranslation';
+
+type ValidationState = {
+  status: 'idle' | 'validating' | 'success' | 'error';
+  message?: string;
+  organizationId?: string;
+  organizationName?: string;
+};
 
 const WidgetTestPage: FC = () => {
-  const { t } = useTranslation('common');
   const [group, setGroup] = useState('');
   const [lang, setLang] = useState('de');
   const [apiKey, setApiKey] = useState('');
   const [apiKeyForValidation, setApiKeyForValidation] = useState('');
-  const [validationResult, setValidationResult] = useState<string | null>(null);
-  const [validating, setValidating] = useState(false);
+  const [validationState, setValidationState] = useState<ValidationState>({ status: 'idle' });
 
   const buildWidgetUrl = (includeApiKey?: boolean, customGroup?: string, customLang?: string) => {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5000';
@@ -35,12 +39,14 @@ const WidgetTestPage: FC = () => {
 
   const handleValidateApiKey = async () => {
     if (!apiKeyForValidation) {
-      setValidationResult('<p style="color:red;">Please enter an API key</p>');
+      setValidationState({
+        status: 'error',
+        message: 'Please enter an API key',
+      });
       return;
     }
 
-    setValidating(true);
-    setValidationResult('<p>Validating...</p>');
+    setValidationState({ status: 'validating', message: 'Validating...' });
 
     try {
       const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5000';
@@ -55,24 +61,23 @@ const WidgetTestPage: FC = () => {
       const data = await response.json();
 
       if (data.valid) {
-        setValidationResult(`
-          <p style="color:green;"><strong>✓ Valid API Key</strong></p>
-          <p><strong>Organization ID:</strong> ${data.organizationId}</p>
-          <p><strong>Organization Name:</strong> ${data.organizationName || 'N/A'}</p>
-        `);
+        setValidationState({
+          status: 'success',
+          message: 'Valid API Key',
+          organizationId: data.organizationId,
+          organizationName: data.organizationName || 'N/A',
+        });
       } else {
-        setValidationResult(`
-          <p style="color:red;"><strong>✗ Invalid API Key</strong></p>
-          <p><strong>Error:</strong> ${data.error || 'Unknown error'}</p>
-        `);
+        setValidationState({
+          status: 'error',
+          message: data.error || 'Unknown error',
+        });
       }
     } catch (error: any) {
-      setValidationResult(`
-        <p style="color:red;"><strong>✗ Validation Failed</strong></p>
-        <p><strong>Error:</strong> ${error.message}</p>
-      `);
-    } finally {
-      setValidating(false);
+      setValidationState({
+        status: 'error',
+        message: error.message || 'Validation failed',
+      });
     }
   };
 
@@ -179,25 +184,46 @@ const WidgetTestPage: FC = () => {
             />
             <button 
               onClick={handleValidateApiKey}
-              disabled={validating}
+              disabled={validationState.status === 'validating'}
               style={{ 
                 padding: '8px 16px', 
-                background: validating ? '#ccc' : '#007bff', 
+                background: validationState.status === 'validating' ? '#ccc' : '#007bff', 
                 color: 'white', 
                 border: 'none', 
                 borderRadius: '4px', 
-                cursor: validating ? 'not-allowed' : 'pointer',
+                cursor: validationState.status === 'validating' ? 'not-allowed' : 'pointer',
                 marginLeft: '10px'
               }}
             >
-              {validating ? 'Validating...' : 'Validate API Key'}
+              {validationState.status === 'validating' ? 'Validating...' : 'Validate API Key'}
             </button>
           </div>
-          {validationResult && (
-            <div 
-              style={{ marginTop: '10px', padding: '10px', background: '#f8f9fa', borderRadius: '4px' }}
-              dangerouslySetInnerHTML={{ __html: validationResult }}
-            />
+          {validationState.status !== 'idle' && (
+            <div style={{ marginTop: '10px', padding: '10px', background: '#f8f9fa', borderRadius: '4px' }}>
+              {validationState.status === 'validating' && (
+                <p>{validationState.message}</p>
+              )}
+              {validationState.status === 'success' && (
+                <>
+                  <p style={{ color: 'green', fontWeight: 'bold' }}>✓ {validationState.message}</p>
+                  {validationState.organizationId && (
+                    <p>
+                      <strong>Organization ID:</strong> {validationState.organizationId}
+                    </p>
+                  )}
+                  {validationState.organizationName && (
+                    <p>
+                      <strong>Organization Name:</strong> {validationState.organizationName}
+                    </p>
+                  )}
+                </>
+              )}
+              {validationState.status === 'error' && (
+                <p style={{ color: 'red', fontWeight: 'bold' }}>
+                  ✗ {validationState.message || 'Validation failed'}
+                </p>
+              )}
+            </div>
           )}
         </div>
 
