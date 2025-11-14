@@ -1,8 +1,9 @@
 import React, { FC, useRef, useState, memo, useEffect } from 'react';
-import { Navigation } from 'swiper/modules';
+import { Navigation, Mousewheel } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import 'swiper/css/mousewheel';
 import useTranslation from 'next-translate/useTranslation';
 
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
@@ -117,6 +118,26 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
     return () => clearTimeout(timeout);
   }, [isSwiperReady, hasError, isClient]);
 
+  // Prevent browser navigation on horizontal scroll
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const container = containerRef.current;
+    
+    const handleWheel = (e: WheelEvent) => {
+      // Only prevent default for horizontal scrolling
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        e.preventDefault();
+      }
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
+
   // Don't render Swiper if no courses
   if (!courses || courses.length === 0) {
     return <div className="relative h-[431px]" ref={containerRef} />;
@@ -153,11 +174,15 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
   }
 
   return (
-    <div className={`relative ${isWidget ? 'h-[435px] bg-transparent overflow-hidden' : 'h-[431px]'}`} ref={containerRef}>
+    <div 
+      className={`relative ${isWidget ? 'h-[435px] bg-transparent overflow-hidden' : 'h-[431px]'}`} 
+      ref={containerRef}
+      style={{ overscrollBehaviorX: 'contain' }}
+    >
       <Swiper
         className={isWidget ? '!overflow-visible' : ''}
         ref={swiperRef}
-        modules={[Navigation]}
+        modules={[Navigation, Mousewheel]}
         breakpoints={breakpoints}
         spaceBetween={COMMON_SPACE_BETWEEN}
         slidesPerView={'auto'}
@@ -165,6 +190,11 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
         slidesOffsetAfter={13}
         onSlideChange={handleSlideChange}
         navigation
+        mousewheel={{
+          forceToAxis: true,
+          sensitivity: 1,
+          releaseOnEdges: false,
+        }}
         onInit={(swiper) => {
           try {
             // Ensure swiper is properly initialized
