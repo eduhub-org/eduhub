@@ -56,12 +56,9 @@ import {
   GET_DEFAULT_TEMPLATES,
   INSERT_EMAIL_TEMPLATE,
 } from '../../../queries/emailTemplates';
-import {
-  GetCourseTemplatesCount,
-  GetDefaultTemplates,
-  InsertEmailTemplate,
-  InsertEmailTemplateVariables,
-} from '../../../queries/__generated__';
+import { GetCourseTemplatesCount } from '../../../queries/__generated__/GetCourseTemplatesCount';
+import { GetDefaultTemplates } from '../../../queries/__generated__/GetDefaultTemplates';
+import { InsertEmailTemplate, InsertEmailTemplateVariables } from '../../../queries/__generated__/InsertEmailTemplate';
 
 interface ExpandableCourseRowProps {
   course: AdminCourseList_Course;

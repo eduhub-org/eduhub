@@ -17,12 +17,9 @@ import {
   INSERT_EMAIL_TEMPLATE,
   EMAIL_TEMPLATES_LIST,
 } from '../../../../../queries/emailTemplates';
-import {
-  GetDefaultTemplates,
-  GetCourseTemplatesCount,
-  InsertEmailTemplate,
-  InsertEmailTemplateVariables,
-} from '../../../../../queries/__generated__';
+import { GetDefaultTemplates } from '../../../../../queries/__generated__/GetDefaultTemplates';
+import { GetCourseTemplatesCount } from '../../../../../queries/__generated__/GetCourseTemplatesCount';
+import { InsertEmailTemplate, InsertEmailTemplateVariables } from '../../../../../queries/__generated__/InsertEmailTemplate';
 
 const CourseEmailTemplates: FC = () => {
   const router = useRouter();
