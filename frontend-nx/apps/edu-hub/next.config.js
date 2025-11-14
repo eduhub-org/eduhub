@@ -18,7 +18,33 @@ const nextConfig = {
   },
   output: 'standalone',
   images: {
-    domains: ['picsum.photos', 'images.unsplash.com', 'storage.googleapis.com', 'localhost'],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '4001',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+      },
+    ],
   },
   experimental: {
     // https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
