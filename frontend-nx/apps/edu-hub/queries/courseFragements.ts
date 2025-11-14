@@ -10,6 +10,7 @@ export const COURSE_TILE_FRAGMENT = gql`
     weekDay
     startTime
     endTime
+    published
     Program {
       published
       title

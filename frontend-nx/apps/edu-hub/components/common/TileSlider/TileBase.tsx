@@ -8,9 +8,10 @@ interface TileBaseProps {
   children: ReactNode;
   onClick?: () => void;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-const TileBaseComponent: FC<TileBaseProps> = ({ coverImage: coverImageProp, title, children, onClick, className = '' }) => {
+const TileBaseComponent: FC<TileBaseProps> = ({ coverImage: coverImageProp, title, children, onClick, className = '', style }) => {
   // Initialize with placeholder immediately to prevent layout shifts
   const [coverImage, setCoverImage] = useState<string>('https://picsum.photos/240/144');
 
@@ -42,6 +43,7 @@ const TileBaseComponent: FC<TileBaseProps> = ({ coverImage: coverImageProp, titl
     <div 
       className={`flex flex-col rounded-2xl overflow-hidden font-medium text-edu-black ${onClick ? 'cursor-pointer' : ''} ${className}`}
       onClick={onClick}
+      style={style}
     >
       <div className="relative h-[230px] flex justify-start items-end">
         <div

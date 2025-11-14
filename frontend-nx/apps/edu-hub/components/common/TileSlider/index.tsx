@@ -7,6 +7,7 @@ import useTranslation from 'next-translate/useTranslation';
 
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { Tile } from './Tile';
+import { TileWidget } from './TileWidget';
 
 import sliderNextArrow from '../../../public/images/common/slider-next-arrow.svg';
 import sliderPreviousArrow from '../../../public/images/common/slider-previous-arrow.svg';
@@ -14,6 +15,7 @@ import sliderPreviousArrow from '../../../public/images/common/slider-previous-a
 interface TileSliderProps {
   courses: CourseList_Course[];
   isManage: boolean;
+  isWidget?: boolean;
 }
 
 interface NavButtonProps {
@@ -42,6 +44,7 @@ const NavButton: FC<NavButtonProps> = ({ idSuffix, className, visible, onClick, 
 );
 
 const LazyTile = memo(Tile);
+const LazyTileWidget = memo(TileWidget);
 const COMMON_SPACE_BETWEEN = 11;
 const COMMON_OFFSET = 12;
 
@@ -54,7 +57,7 @@ const breakpoints = {
   1536: { spaceBetween: COMMON_SPACE_BETWEEN },
 };
 
-const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
+const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }) => {
   const { t } = useTranslation('common');
   const swiperRef = useRef(null);
   const containerRef = useRef(null);
@@ -150,8 +153,9 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
   }
 
   return (
-    <div className="relative h-[431px]" ref={containerRef}>
+    <div className={`relative ${isWidget ? 'h-[435px] bg-transparent overflow-hidden' : 'h-[431px]'}`} ref={containerRef}>
       <Swiper
+        className={isWidget ? '!overflow-visible' : ''}
         ref={swiperRef}
         modules={[Navigation]}
         breakpoints={breakpoints}
@@ -192,7 +196,11 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
       >
         {courses.map((course) => (
           <SwiperSlide key={course.id} className="whitespace-normal !h-[431px] !w-[275px] xs:!w-[325px]">
-            <LazyTile course={course} isManage={isManage} />
+            {isWidget ? (
+              <LazyTileWidget course={course} />
+            ) : (
+              <LazyTile course={course} isManage={isManage} />
+            )}
           </SwiperSlide>
         ))}
       </Swiper>
