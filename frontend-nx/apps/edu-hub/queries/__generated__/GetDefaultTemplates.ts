@@ -4,12 +4,16 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: MailTemplates
+// GraphQL query operation: GetDefaultTemplates
 // ====================================================
 
-export interface MailTemplates_MailTemplate {
+export interface GetDefaultTemplates_MailTemplate {
   __typename: "MailTemplate";
   id: number;
+  /**
+   * Mail template type
+   */
+  type: string | null;
   /**
    * The subject of the email
    */
@@ -30,16 +34,11 @@ export interface MailTemplates_MailTemplate {
    * Mail adresses that are receiving a blind carbon copy
    */
   bcc: string | null;
-  /**
-   * Mail template type
-   */
-  type: string | null;
-  courseId: number | null;
 }
 
-export interface MailTemplates {
+export interface GetDefaultTemplates {
   /**
    * fetch data from the table: "MailTemplate"
    */
-  MailTemplate: MailTemplates_MailTemplate[];
+  MailTemplate: GetDefaultTemplates_MailTemplate[];
 }

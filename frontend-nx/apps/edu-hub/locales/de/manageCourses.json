@@ -8,9 +8,14 @@
     "unrated_rated_not_informed": "Unbewertet / Bewertet aber nicht informiert",
     "application_end": "Bewerbungs- ende",
     "program": "Programm",
-    "status": "Status"
+    "status": "Status",
+    "email_templates": "Vorlagen",
+    "has_custom_templates": "Dieser Kurs hat {{count}} kurs-spezifische E-Mail-Vorlage(n)"
   },
   "view": "Anzeigen",
+  "view_course": "Kurs anzeigen",
+  "close": "Schließen",
+  "cancel": "Abbrechen",
   "not_published": "Nicht veröffentlicht",
   "default_course_title": "Unbenannter Kurs",
   "title": "Kurse verwalten",
@@ -48,6 +53,13 @@
   "chat_link": {
     "label": "Kurs-Chat Link",
     "help_text": "Link zum Kurs-Chat oder zur Kommunikationsplattform"
+  },
+  "email_templates": {
+    "label": "E-Mail-Vorlagen",
+    "manage_button": "E-Mail-Vorlagen verwalten",
+    "create_button": "E-Mail-Vorlagen erstellen",
+    "edit_button": "E-Mail-Vorlagen bearbeiten",
+    "external_registration_note": "E-Mail-Vorlagen sind für externe Anmeldungen nicht verfügbar."
   },
   "ects": {
     "label": "ECTS-Punkte",

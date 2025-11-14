@@ -3,13 +3,20 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { MailTemplate_insert_input } from "./../../__generated__/globalTypes";
+
 // ====================================================
-// GraphQL query operation: MailTemplates
+// GraphQL mutation operation: InsertEmailTemplate
 // ====================================================
 
-export interface MailTemplates_MailTemplate {
+export interface InsertEmailTemplate_insert_MailTemplate_one {
   __typename: "MailTemplate";
   id: number;
+  /**
+   * Mail template type
+   */
+  type: string | null;
+  courseId: number | null;
   /**
    * The subject of the email
    */
@@ -30,16 +37,15 @@ export interface MailTemplates_MailTemplate {
    * Mail adresses that are receiving a blind carbon copy
    */
   bcc: string | null;
-  /**
-   * Mail template type
-   */
-  type: string | null;
-  courseId: number | null;
 }
 
-export interface MailTemplates {
+export interface InsertEmailTemplate {
   /**
-   * fetch data from the table: "MailTemplate"
+   * insert a single row into the table: "MailTemplate"
    */
-  MailTemplate: MailTemplates_MailTemplate[];
+  insert_MailTemplate_one: InsertEmailTemplate_insert_MailTemplate_one | null;
+}
+
+export interface InsertEmailTemplateVariables {
+  object: MailTemplate_insert_input;
 }

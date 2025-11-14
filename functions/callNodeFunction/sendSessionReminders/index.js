@@ -176,10 +176,21 @@ export default async function sendSessionReminders(req, logger) {
       });
 
       // Get email template for reminders
+      // First try course-specific template, then fall back to default template
       const GET_EMAIL_TEMPLATE = gql`
-        query GetEmailTemplate($title: String!) {
-          MailTemplate(where: { title: { _eq: $title } }) {
+        query GetEmailTemplate($type: String!, $courseId: Int) {
+          MailTemplate(
+            where: {
+              _and: [
+                { type: { _eq: $type } }
+                { courseId: { _eq: $courseId } }
+              ]
+            }
+            limit: 1
+          ) {
             id
+            type
+            courseId
             subject
             content
             from
@@ -189,12 +200,25 @@ export default async function sendSessionReminders(req, logger) {
         }
       `;
 
-      const templateData = await client.request(GET_EMAIL_TEMPLATE, {
-        title: 'SESSION_REMINDER'
+      // Get courseId from the first session (all sessions in this batch belong to the same course)
+      const courseId = validSessions.length > 0 ? validSessions[0].Course?.id : null;
+
+      // First try to get course-specific template
+      let templateData = await client.request(GET_EMAIL_TEMPLATE, {
+        type: 'SESSION_REMINDER',
+        courseId: courseId
       });
 
+      // If no course-specific template found, fall back to default template (courseId = -1)
       if (!templateData?.MailTemplate?.length) {
-        logger.error('SESSION_REMINDER email template not found');
+        templateData = await client.request(GET_EMAIL_TEMPLATE, {
+          type: 'SESSION_REMINDER',
+          courseId: -1
+        });
+      }
+
+      if (!templateData?.MailTemplate?.length) {
+        logger.error(`SESSION_REMINDER email template not found for courseId: ${courseId || 'default'}`);
         continue;
       }
 

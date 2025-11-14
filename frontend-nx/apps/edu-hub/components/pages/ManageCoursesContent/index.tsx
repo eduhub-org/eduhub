@@ -28,6 +28,7 @@ import TableGrid from '../../common/TableGrid';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
+import { EMAIL_TEMPLATES_LIST } from '../../../queries/emailTemplates';
 import ExpandableCourseRow from './ExpandableCourseRow';
 import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
 import useTranslation from 'next-translate/useTranslation';
@@ -50,6 +51,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { SelectProgramDialog } from './SelectProgramDialog';
 import { COPY_COURSES_TO_PROGRAM } from '../../../queries/copyCourse';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
+import { MdMarkEmailRead } from 'react-icons/md';
 
 // Header imports
 import CommonPageHeader from '../../common/CommonPageHeader';
@@ -146,6 +148,27 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
       [filter.where] // Update when program filter changes
     ),
   });
+
+  // Query course-specific email templates to show indicators
+  const { data: templatesData } = useAdminQuery(EMAIL_TEMPLATES_LIST, {
+    variables: {
+      filter: {
+        courseId: { _neq: -1 }, // Only get course-specific templates (not defaults)
+      },
+      limit: 1000, // Get all course-specific templates
+    },
+  });
+
+  // Create a map of courseId -> template count
+  const courseTemplateCounts = useMemo(() => {
+    const counts = new Map<number, number>();
+    templatesData?.MailTemplate?.forEach((template) => {
+      if (template.courseId && template.courseId !== -1) {
+        counts.set(template.courseId, (counts.get(template.courseId) || 0) + 1);
+      }
+    });
+    return counts;
+  }, [templatesData]);
 
   // Handle program tab clicks (moved after useTableGrid to access setPageIndex)
   const handleTabClick = useCallback(
@@ -636,10 +659,27 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         accessorKey: 'status',
         size: 80,
         meta: { className: 'text-center' },
-        cell: ({ row }) => <div className="text-center">{courseStatus(row.original.status)}</div>,
+        cell: ({ row }) => {
+          const templateCount = courseTemplateCounts.get(row.original.id) || 0;
+          const hasCustomTemplates = templateCount > 0;
+
+          return (
+            <div className="flex items-center justify-center gap-1">
+              <div className="text-center">{courseStatus(row.original.status)}</div>
+              {hasCustomTemplates && (
+                <MdMarkEmailRead
+                  className="w-4 h-4 text-blue-600 ml-1"
+                  title={t('table_header.has_custom_templates', {
+                    count: templateCount,
+                  })}
+                />
+              )}
+            </div>
+          );
+        },
       },
     ],
-    [t, handleApplicationEndChange, lang, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed]
+    [t, handleApplicationEndChange, lang, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed, courseTemplateCounts]
   );
 
   const handlePageSizeChange = useCallback(

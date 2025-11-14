@@ -8,9 +8,14 @@
     "unrated_rated_not_informed": "Unrated / Rated but not informed",
     "application_end": "Application End",
     "program": "Program",
-    "status": "Status"
+    "status": "Status",
+    "email_templates": "Templates",
+    "has_custom_templates": "This course has {{count}} custom email template(s)"
   },
   "view": "View",
+  "view_course": "View Course",
+  "close": "Close",
+  "cancel": "Cancel",
   "not_published": "Not Published",
   "default_course_title": "Untitled Course",
   "title": "Manage Courses",
@@ -48,6 +53,13 @@
   "chat_link": {
     "label": "Course Chat Link",
     "help_text": "Link to the course chat or communication platform"
+  },
+  "email_templates": {
+    "label": "Email Templates",
+    "manage_button": "Manage Email Templates",
+    "create_button": "Create Email Templates",
+    "edit_button": "Edit Email Templates",
+    "external_registration_note": "Email templates are not available for external registration courses."
   },
   "ects": {
     "label": "ECTS Credits",

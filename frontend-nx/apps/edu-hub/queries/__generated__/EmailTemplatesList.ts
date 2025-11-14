@@ -13,9 +13,10 @@ export interface EmailTemplatesList_MailTemplate {
   __typename: "MailTemplate";
   id: number;
   /**
-   * Title of the mail template (to provide basic info on what it's used for)
+   * Mail template type
    */
-  title: string | null;
+  type: string | null;
+  courseId: number | null;
   /**
    * The subject of the email
    */
