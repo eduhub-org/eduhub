@@ -2,11 +2,29 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { GraphQLClient, gql } from 'graphql-request';
 import crypto from 'crypto';
 
+// Validate HASURA_ADMIN_SECRET at module load time
+const HASURA_ADMIN_SECRET = process.env.HASURA_ADMIN_SECRET;
+if (!HASURA_ADMIN_SECRET) {
+  throw new Error(
+    'HASURA_ADMIN_SECRET environment variable is required but not set. Application cannot start without it.'
+  );
+}
+
 interface ValidateApiKeyResponse {
   valid: boolean;
   organizationId?: number;
   organizationName?: string;
   error?: string;
+}
+
+interface Organization {
+  id: number;
+  name: string;
+  type: string;
+}
+
+interface ValidateApiKeyQueryResponse {
+  Organization: Organization[];
 }
 
 const VALIDATE_API_KEY_QUERY = gql`
@@ -50,10 +68,27 @@ const validateApiKey = async (
 
     // Extract organization ID from API key
     const parts = apiKey.split('_');
-    if (parts.length < 3) {
+    // Expected format: edh_live_org123_sk_abcdef1234567890 (5 parts)
+    if (parts.length !== 5) {
       return response.status(400).json({
         valid: false,
         error: 'Invalid API key format',
+      });
+    }
+
+    // Validate secret key prefix
+    if (parts[3] !== 'sk') {
+      return response.status(400).json({
+        valid: false,
+        error: 'Invalid API key format: missing secret key prefix',
+      });
+    }
+
+    // Validate secret key portion exists and is not empty
+    if (!parts[4] || parts[4].trim().length === 0) {
+      return response.status(400).json({
+        valid: false,
+        error: 'Invalid API key format: missing secret key',
       });
     }
 
@@ -75,15 +110,18 @@ const validateApiKey = async (
       process.env.GRAPHQL_URI || 'http://hasura:8080/v1/graphql',
       {
         headers: {
-          'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET || 'myadminsecretkey',
+          'x-hasura-admin-secret': HASURA_ADMIN_SECRET,
         },
       }
     );
 
-    const data = await graphQLClient.request(VALIDATE_API_KEY_QUERY, {
-      orgId: organizationId,
-      apiKeyHash,
-    });
+    const data = await graphQLClient.request<ValidateApiKeyQueryResponse>(
+      VALIDATE_API_KEY_QUERY,
+      {
+        orgId: organizationId,
+        apiKeyHash,
+      }
+    );
 
     const organizations = data.Organization;
 
