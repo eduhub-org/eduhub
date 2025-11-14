@@ -8,13 +8,14 @@ import useTranslation from 'next-translate/useTranslation';
 
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
+import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
 import { Tile } from './Tile';
 import { TileWidget } from './TileWidget';
 
 import sliderNextArrow from '../../../public/images/common/slider-next-arrow.svg';
 import sliderPreviousArrow from '../../../public/images/common/slider-previous-arrow.svg';
 
-type CourseType = CourseList_Course | CourseTiles_Course;
+type CourseType = CourseList_Course | CourseTiles_Course | CoursesEnrolledByUser_Course;
 
 interface TileSliderProps {
   courses: CourseType[];
