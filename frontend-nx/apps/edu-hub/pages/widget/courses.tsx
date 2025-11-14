@@ -9,9 +9,7 @@ import { client } from '../../config/apollo';
 import TileSlider from '../../components/common/TileSlider';
 import Loading from '../../components/common/Loading';
 import { COURSE_TILES, COURSE_TILES_BY_ORGANIZATION } from '../../queries/courseQueries';
-import { COURSE_GROUP_OPTIONS } from '../../queries/courseGroupOptions';
-import { CourseTiles } from '../../queries/__generated__/CourseTiles';
-import { CourseGroupOptions } from '../../queries/__generated__/CourseGroupOptions';
+import { CourseTiles, CourseTiles_Course } from '../../queries/__generated__/CourseTiles';
 
 // Type for organization-filtered courses (same structure as CourseTiles)
 type CourseTilesByOrganization = CourseTiles;
@@ -60,6 +58,9 @@ const WidgetCourses: FC = () => {
           setApiKeyError(data.error || 'Invalid API key');
         }
       } catch (error) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.error(error);
+        }
         setApiKeyError('Failed to validate API key');
       } finally {
         setApiKeyValidating(false);
@@ -85,16 +86,6 @@ const WidgetCourses: FC = () => {
     }
   );
 
-  // Fetch course group options
-  const { data: courseGroupOptionsData } = useQuery<CourseGroupOptions>(COURSE_GROUP_OPTIONS, {
-    client,
-    context: {
-      headers: {
-        'x-hasura-role': 'anonymous', // Explicitly set anonymous role for widget
-      },
-    },
-  });
-
   // Filter courses by group if specified
   const filteredCourses = useMemo(() => {
     const courses = coursesData?.Course ?? [];
@@ -114,25 +105,30 @@ const WidgetCourses: FC = () => {
   }, [coursesData, group]);
 
   // Filter only published courses
+  // Note: CourseTiles_Course type doesn't include 'published' in generated types,
+  // but the GraphQL fragment includes it, so we use type assertion
   const publishedCourses = useMemo(() => {
     return filteredCourses.filter(
-      (course) => course.published === true && course.Program?.published === true
+      (course) => {
+        const courseWithPublished = course as CourseTiles_Course & { published?: boolean };
+        return courseWithPublished.published === true && course.Program?.published === true;
+      }
     );
   }, [filteredCourses]);
 
   const isLoading = coursesLoading || apiKeyValidating;
   const hasError = coursesError || apiKeyError;
 
-  // Force transparent background on body and html
+  // Add widget-page class to body and html for scoped CSS
   useEffect(() => {
-    // Set inline styles to override any CSS classes
     if (typeof document !== 'undefined') {
-      document.body.style.backgroundColor = 'transparent';
-      document.body.style.background = 'transparent';
-      if (document.documentElement) {
-        document.documentElement.style.backgroundColor = 'transparent';
-        document.documentElement.style.background = 'transparent';
-      }
+      document.body.classList.add('widget-page');
+      document.documentElement.classList.add('widget-page');
+      
+      return () => {
+        document.body.classList.remove('widget-page');
+        document.documentElement.classList.remove('widget-page');
+      };
     }
   }, []);
 
@@ -182,77 +178,9 @@ const WidgetCourses: FC = () => {
     <>
       <Head>
         <meta name="robots" content="noindex, nofollow" />
-        <style jsx global>{`
-          body {
-            margin: 0;
-            padding: 0;
-            background: transparent !important;
-            background-color: transparent !important;
-            overflow-x: hidden;
-          }
-          html {
-            background: transparent !important;
-            background-color: transparent !important;
-            overflow-x: hidden;
-          }
-          /* Override any background colors from global styles - target body with class */
-          body.bg-edu-bg-gray {
-            background: transparent !important;
-            background-color: transparent !important;
-          }
-          /* Ensure all container divs are transparent */
-          div[class*="bg-"]:not([class*="bg-white"]):not([class*="bg-transparent"]) {
-            background-color: transparent !important;
-          }
-          /* Specifically override the main container */
-          div.min-h-\\[440px\\],
-          div.min-h-\\[435px\\] {
-            background-color: transparent !important;
-          }
-          /* Hide Cookiebot cookie consent banner/button on widget pages */
-          #Cookiebot,
-          #CybotCookiebotDialog,
-          #CybotCookiebotDialogBody,
-          .Cookiebot,
-          .cookiebot,
-          [id*="cookiebot"],
-          [class*="cookiebot"],
-          [id*="Cookiebot"],
-          [class*="Cookiebot"] {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            height: 0 !important;
-            width: 0 !important;
-            overflow: hidden !important;
-          }
-          /* Make swiper-wrapper background fully transparent for widget and ensure width */
-          .swiper-wrapper {
-            background-color: transparent !important;
-            width: 100% !important;
-          }
-          /* Ensure no overflow on swiper container */
-          .swiper {
-            overflow: visible !important;
-            width: 100% !important;
-          }
-          /* Remove any padding/margin that might cause width mismatch */
-          #__next {
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-            background: transparent !important;
-          }
-          /* Add subtle soft shadow to tiles in widget for visibility on all backgrounds */
-          .swiper-slide > a > div,
-          .swiper-slide a > div,
-          .swiper-slide a div.rounded-2xl {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-          }
-        `}</style>
       </Head>
       <ClientOnly>
-        <div className="min-h-[440px] h-[440px] bg-transparent overflow-hidden flex items-center">
+        <div className="min-h-[435px] h-[435px] bg-transparent overflow-hidden flex items-center">
           {isLoading ? (
             <div className="flex items-center justify-center w-full h-full">
               <Loading />

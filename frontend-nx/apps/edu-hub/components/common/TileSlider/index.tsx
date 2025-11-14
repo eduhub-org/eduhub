@@ -7,14 +7,17 @@ import 'swiper/css/mousewheel';
 import useTranslation from 'next-translate/useTranslation';
 
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
+import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
 import { Tile } from './Tile';
 import { TileWidget } from './TileWidget';
 
 import sliderNextArrow from '../../../public/images/common/slider-next-arrow.svg';
 import sliderPreviousArrow from '../../../public/images/common/slider-previous-arrow.svg';
 
+type CourseType = CourseList_Course | CourseTiles_Course;
+
 interface TileSliderProps {
-  courses: CourseList_Course[];
+  courses: CourseType[];
   isManage: boolean;
   isWidget?: boolean;
 }
@@ -26,6 +29,7 @@ interface NavButtonProps {
   onClick: () => void;
   imgSrc: string;
   imgAlt: string;
+  isWidget?: boolean;
 }
 
 const buttonStyles = {
@@ -33,10 +37,10 @@ const buttonStyles = {
     'linear-gradient(0deg, rgba(15, 15, 15, 0.7), rgba(15, 15, 15, 0.7)), linear-gradient(270deg, rgba(34, 34, 34, 0.5) 0%, rgba(255, 253, 253, 0) 105.56%)',
 };
 
-const NavButton: FC<NavButtonProps> = ({ idSuffix, className, visible, onClick, imgSrc, imgAlt }) => (
+const NavButton: FC<NavButtonProps> = ({ idSuffix, className, visible, onClick, imgSrc, imgAlt, isWidget = false }) => (
   <button
     id={idSuffix}
-    className={`${className} w-10 h-[431px] ${!visible ? 'hidden' : ''}`}
+    className={`${className} w-10 ${isWidget ? 'h-[435px]' : 'h-[431px]'} ${!visible ? 'hidden' : ''}`}
     style={buttonStyles}
     onClick={onClick}
   >
@@ -243,6 +247,7 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
             onClick={swiperPrev}
             imgSrc={sliderPreviousArrow}
             imgAlt="Previous"
+            isWidget={isWidget}
           />
           <NavButton
             idSuffix={`next-${idSuffix}`}
@@ -251,6 +256,7 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }
             onClick={swiperNext}
             imgSrc={sliderNextArrow}
             imgAlt="Next"
+            isWidget={isWidget}
           />
         </>
       )}

@@ -3,6 +3,7 @@ import { FC } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
+import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
 import languageIcon from '../../../public/images/course/language.svg';
 import locationIcon from '../../../public/images/course/pin.svg';
 import {
@@ -11,7 +12,7 @@ import {
 import React from 'react';
 import { TileBase } from './TileBase';
 
-type CourseType = CourseList_Course | CoursesEnrolledByUser_Course;
+type CourseType = CourseList_Course | CoursesEnrolledByUser_Course | CourseTiles_Course;
 
 interface TileWidgetProps {
   course: CourseType;
