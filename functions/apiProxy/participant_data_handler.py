@@ -21,6 +21,26 @@ except ImportError:
     from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input, SecurityLevel
 
 
+def safe_float_convert(value):
+    """
+    Safely convert a value to float, handling both comma and period decimal separators.
+    This is needed for ECTS values that may use German decimal format (comma instead of period).
+    
+    Args:
+        value: The value to convert (string or numeric)
+        
+    Returns:
+        float: The converted float value
+        
+    Raises:
+        ValueError: If the value cannot be converted to float
+    """
+    if isinstance(value, str):
+        return float(value.replace(",", "."))
+    else:
+        return float(value)
+
+
 def authenticate_organization_access(request):
     """
     Authenticate third-party organization access using API key or JWT
@@ -654,7 +674,7 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
     if course_info.get("ects"):
         response["learningOpportunity"]["creditPoints"] = [{
             "framework": "ECTS",
-            "point": float(course_info["ects"])
+            "point": safe_float_convert(course_info["ects"])
         }]
     
     # No eqfLevel field in Program; omit
@@ -701,7 +721,7 @@ def handle_organization_courses(auth_info, eduhub_client, client_ip, request_dat
         if course.get("ects"):
             course_summary["creditPoints"] = [{
                 "framework": "ECTS", 
-                "point": float(course["ects"])
+                "point": safe_float_convert(course["ects"])
             }]
             
         course_list.append(course_summary)

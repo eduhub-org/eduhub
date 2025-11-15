@@ -20,7 +20,8 @@
       "manageLocationAddresses",
       "manageEmailTemplates",
       "profile",
-      "start-page"
+      "start-page",
+      "certificates"
     ]
   },
   "defaultNS": "common"

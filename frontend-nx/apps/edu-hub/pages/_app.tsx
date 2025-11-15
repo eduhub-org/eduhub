@@ -33,6 +33,7 @@ if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'production') {
 import { client } from '../config/apollo';
 
 import '../styles/globals.css';
+import '../styles/widget.css';
 
 interface InitialProps {
   cookies: unknown;

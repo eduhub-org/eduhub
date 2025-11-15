@@ -27,6 +27,9 @@ services:
       WATCHPACK_POLLING: "true"
       # Fix IPv6 localhost resolution for image loading
       NODE_OPTIONS: "--dns-result-order=ipv4first"
+      # Hasura configuration
+      HASURA_ADMIN_SECRET: myadminsecretkey
+      GRAPHQL_URI: http://hasura:8080/v1/graphql
 
   node_functions:
     container_name: eduhub-node-functions

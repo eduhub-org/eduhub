@@ -35,6 +35,7 @@
   "end": "Ende",
   "menu": {
     "profile": "Mein Profil",
+    "my_certificates": "Meine Zertifikate",
     "faq": "FAQ",
     "user": "Benutzer",
     "courses": "Kurse",
@@ -241,5 +242,11 @@
     "url_label": "URL",
     "url_placeholder": "URL eingeben (z.B. https://example.com oder [Enrollment:CourseLink])",
     "url_help": "Sie können Template-Variablen wie [Enrollment:CourseLink] verwenden oder eine normale URL eingeben"
-  }
+  },
+  "widget_error_loading_courses": "Fehler beim Laden der Kurse",
+  "widget_no_courses_available": "Keine Kurse verfügbar",
+  "page_not_found": "Seite nicht gefunden",
+  "page_not_found_description": "Die Seite, die du suchst, existiert leider nicht. Sie wurde möglicherweise verschoben oder gelöscht.",
+  "back_to_home": "Zur Startseite",
+  "go_back": "Zurück"
 }

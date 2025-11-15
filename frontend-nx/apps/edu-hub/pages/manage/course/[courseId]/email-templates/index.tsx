@@ -1,0 +1,216 @@
+import Head from 'next/head';
+import { FC, useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/router';
+import { Page } from '../../../../../components/layout/Page';
+import { useIsAdmin, useIsLoggedIn } from '../../../../../hooks/authentication';
+import { useAdminQuery } from '../../../../../hooks/authedQuery';
+import { useAdminMutation } from '../../../../../hooks/authedMutation';
+import useTranslation from 'next-translate/useTranslation';
+import Loading from '../../../../../components/common/Loading';
+import { MANAGED_COURSE } from '../../../../../queries/course';
+import { ManagedCourse } from '../../../../../queries/__generated__/ManagedCourse';
+import ManageEmailTemplatesContent from '../../../../../components/pages/ManageEmailTemplatesContent';
+import { CourseRegistrationType_enum } from '../../../../../__generated__/globalTypes';
+import {
+  GET_DEFAULT_TEMPLATES,
+  GET_COURSE_TEMPLATES_COUNT,
+  INSERT_EMAIL_TEMPLATE,
+  EMAIL_TEMPLATES_LIST,
+} from '../../../../../queries/emailTemplates';
+import { GetDefaultTemplates } from '../../../../../queries/__generated__/GetDefaultTemplates';
+import { GetCourseTemplatesCount } from '../../../../../queries/__generated__/GetCourseTemplatesCount';
+import { InsertEmailTemplate, InsertEmailTemplateVariables } from '../../../../../queries/__generated__/InsertEmailTemplate';
+
+const CourseEmailTemplates: FC = () => {
+  const router = useRouter();
+  const { courseId } = router.query;
+  const isAdmin = useIsAdmin();
+  const isLoggedIn = useIsLoggedIn();
+  const { t } = useTranslation('manageEmailTemplates');
+
+  const courseIdNumber = courseId ? parseInt(courseId as string, 10) : null;
+  const isValidCourseId = courseIdNumber !== null && Number.isInteger(courseIdNumber) && courseIdNumber > 0;
+  const [templatesCreated, setTemplatesCreated] = useState(false);
+
+  const { data, loading, error } = useAdminQuery<ManagedCourse>(MANAGED_COURSE, {
+    variables: { id: courseIdNumber || 0 },
+    skip: !isValidCourseId,
+  });
+
+  // Check if course has templates
+  const { data: templatesCountData, refetch: refetchTemplatesCount } = useAdminQuery<GetCourseTemplatesCount>(
+    GET_COURSE_TEMPLATES_COUNT,
+    {
+      variables: { courseId: courseIdNumber || 0 },
+      skip: !isValidCourseId,
+    }
+  );
+
+  // Get default templates
+  const { data: defaultTemplatesData } = useAdminQuery<GetDefaultTemplates>(GET_DEFAULT_TEMPLATES);
+
+  const [insertEmailTemplate] = useAdminMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
+    INSERT_EMAIL_TEMPLATE
+  );
+
+  // Determine available template types based on registration type
+  const getAvailableTemplates = useCallback((registrationType: CourseRegistrationType_enum | null): string[] => {
+    const allTemplates = [
+      'APPLICATION_RECEIVED',
+      'APPLICATION_CONFIRMED',
+      'SESSION_REMINDER',
+      'INVITE',
+      'DECLINE',
+      'REGISTRATION_CONFIRMED',
+    ];
+
+    if (!registrationType || registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION) {
+      return []; // No templates for external registration
+    }
+
+    if (
+      registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT ||
+      registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION
+    ) {
+      return ['REGISTRATION_CONFIRMED', 'SESSION_REMINDER'];
+    }
+
+    if (registrationType === CourseRegistrationType_enum.APPROVAL_WITH_INPUT) {
+      return allTemplates.filter((t) => t !== 'REGISTRATION_CONFIRMED');
+    }
+
+    return [];
+  }, []);
+
+  // Create templates from defaults if they don't exist
+  useEffect(() => {
+    const createTemplatesFromDefaults = async () => {
+      if (
+        !isValidCourseId ||
+        !courseIdNumber ||
+        !defaultTemplatesData?.MailTemplate ||
+        templatesCreated ||
+        (templatesCountData?.MailTemplate_aggregate?.aggregate?.count || 0) > 0
+      ) {
+        return;
+      }
+
+      const course = data?.Course_by_pk;
+      if (!course) return;
+
+      const availableTemplateTypes = getAvailableTemplates(course.registrationType);
+      if (availableTemplateTypes.length === 0) return;
+
+      try {
+        // Create templates for available types from defaults
+        for (const defaultTemplate of defaultTemplatesData.MailTemplate) {
+          if (availableTemplateTypes.includes(defaultTemplate.type || '')) {
+            try {
+              await insertEmailTemplate({
+                variables: {
+                  object: {
+                    type: defaultTemplate.type,
+                    courseId: courseIdNumber,
+                    subject: defaultTemplate.subject,
+                    content: defaultTemplate.content,
+                    from: defaultTemplate.from,
+                    cc: defaultTemplate.cc,
+                    bcc: defaultTemplate.bcc,
+                  },
+                },
+                refetchQueries: ['GetCourseTemplatesCount', 'EmailTemplatesList'],
+              });
+            } catch (insertError: any) {
+              // If template already exists (unique constraint violation), that's okay
+              // This can happen if templates were created in another tab/session
+              if (
+                insertError?.message?.includes('Uniqueness violation') ||
+                insertError?.message?.includes('duplicate key')
+              ) {
+                console.log(`Template ${defaultTemplate.type} already exists for course ${courseIdNumber}`);
+              } else {
+                // Re-throw other errors
+                throw insertError;
+              }
+            }
+          }
+        }
+        setTemplatesCreated(true);
+        refetchTemplatesCount();
+      } catch (err) {
+        console.error('Error creating templates from defaults:', err);
+      }
+    };
+
+    createTemplatesFromDefaults();
+  }, [
+    isValidCourseId,
+    courseIdNumber,
+    defaultTemplatesData,
+    templatesCountData,
+    templatesCreated,
+    data,
+    insertEmailTemplate,
+    refetchTemplatesCount,
+    getAvailableTemplates,
+  ]);
+
+  if (!isLoggedIn || !isAdmin) {
+    return <div>Waiting for authentication!</div>;
+  }
+
+  if (!isValidCourseId) {
+    return (
+      <Page>
+        <div className="min-h-[77vh] flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold mb-4">Invalid Course ID</h2>
+            <p className="text-gray-600 mb-4">The course ID in the URL is invalid.</p>
+          </div>
+        </div>
+      </Page>
+    );
+  }
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error || !data?.Course_by_pk) {
+    return <div>Course not found</div>;
+  }
+
+  const course = data.Course_by_pk;
+  const availableTemplateTypes = getAvailableTemplates(course.registrationType);
+
+  return (
+    <>
+      <Head>
+        <title>EduHub | {course.title} - Email Templates</title>
+        <link rel="icon" href="/favicon.png" />
+      </Head>
+      <Page>
+        <div className="min-h-[77vh]">
+          <ManageEmailTemplatesContent
+            courseId={courseIdNumber}
+            courseTitle={course.title}
+            explanatoryText={(() => {
+              try {
+                const key = 'course_specific_explanation';
+                const translation = t(key);
+                return translation !== key ? translation : 'These email templates are specific to this course and will override the default templates when sending emails for this course.';
+              } catch (error) {
+                return 'These email templates are specific to this course and will override the default templates when sending emails for this course.';
+              }
+            })()}
+            showBackButton={true}
+            availableTemplateTypes={availableTemplateTypes}
+          />
+        </div>
+      </Page>
+    </>
+  );
+};
+
+export default CourseEmailTemplates;
+

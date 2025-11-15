@@ -52,11 +52,11 @@ export const Header: FC = () => {
         <div className="flex-grow w-full items-center">
           <Link href={`/`}>
             <div className="flex cursor-pointer">
-              <div className="flex items-center">
-                <Image src={ocLogo} alt="EduHub logo" width={34} height={34} priority />
+              <div className="flex items-center w-[34px] h-[34px]">
+                <Image src={ocLogo} alt="EduHub logo" width={34} height={34} priority unoptimized className="w-full h-full object-contain" />
               </div>
-              <div className="flex items-center ml-2">
-                <Image src={eduhubLogo} alt="EduHub name" width={46} height={33} priority />
+              <div className="flex items-center ml-2 w-[46px] h-[33px]">
+                <Image src={eduhubLogo} alt="EduHub name" width={46} height={33} priority unoptimized className="w-full h-full object-contain" />
               </div>
             </div>
           </Link>
