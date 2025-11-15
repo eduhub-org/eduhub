@@ -161,6 +161,7 @@ def handle_moochub_data(page=1, per_page=25):
                         description
                         type
                         logo
+                        aliases
                     }
                 }
             }
@@ -219,12 +220,27 @@ def handle_moochub_data(page=1, per_page=25):
                 description_parts.append(html_content)
 
             # Check for Digital Learning Campus funding organization to add keywords
+            # Matches organization name or aliases that normalize to "DLC" or "DIGITAL LEARNING CAMPUS"
             has_dlc_funding = False
             for funding_org in course.get("CourseFundingOrganizations", []):
                 organization = funding_org.get("Organization", {})
-                if organization.get("name", "").upper() == "DIGITAL LEARNING CAMPUS":
+                
+                # Normalize organization name
+                org_name_normalized = organization.get("name", "").strip().upper()
+                if org_name_normalized in ("DIGITAL LEARNING CAMPUS", "DLC"):
                     has_dlc_funding = True
                     break
+                
+                # Check aliases if present
+                aliases = organization.get("aliases")
+                if aliases and isinstance(aliases, list):
+                    for alias in aliases:
+                        alias_normalized = str(alias).strip().upper() if alias else ""
+                        if alias_normalized in ("DIGITAL LEARNING CAMPUS", "DLC"):
+                            has_dlc_funding = True
+                            break
+                    if has_dlc_funding:
+                        break
             
             # Create one entry per course location
             for location in course["CourseLocations"]:
@@ -463,7 +479,7 @@ def handle_moochub_schema():
             "custom_extensions": {
                 "keywords": {
                     "type": "array",
-                    "description": "Keywords array used to identify course characteristics. Courses with funding organization 'Digital Learning Campus' are tagged with ['DLC-Original']",
+                    "description": "Keywords array used to identify course characteristics. Courses with funding organization name or alias matching 'Digital Learning Campus' or 'DLC' (case-insensitive, normalized) are tagged with ['DLC-Original']. The stored keyword value is 'DLC-Original' regardless of whether the organization name uses the short form 'DLC' or the full form 'Digital Learning Campus'.",
                     "example": ["DLC-Original"]
                 },
                 "funding": {
