@@ -218,12 +218,12 @@ def handle_moochub_data(page=1, per_page=25):
                 html_content = markdown.markdown(course["contentDescriptionField2"])
                 description_parts.append(html_content)
 
-            # Check for DLC CourseGroup to add keywords
-            has_dlc_group = False
-            for group in course.get("CourseGroups", []):
-                group_option = group.get("CourseGroupOption", {})
-                if group_option.get("title", "").upper() == "DLC":
-                    has_dlc_group = True
+            # Check for Digital Learning Campus funding organization to add keywords
+            has_dlc_funding = False
+            for funding_org in course.get("CourseFundingOrganizations", []):
+                organization = funding_org.get("Organization", {})
+                if organization.get("name", "").upper() == "DIGITAL LEARNING CAMPUS":
+                    has_dlc_funding = True
                     break
             
             # Create one entry per course location
@@ -261,8 +261,8 @@ def handle_moochub_data(page=1, per_page=25):
                     }]
                 }
                 
-                # Add keywords for DLC Original courses
-                if has_dlc_group:
+                # Add keywords for DLC Original courses (courses with Digital Learning Campus funding)
+                if has_dlc_funding:
                     attributes["keywords"] = ["DLC-Original"]
                 
                 # Set URL based on location type with MOOCHub tracking parameters
@@ -463,7 +463,7 @@ def handle_moochub_schema():
             "custom_extensions": {
                 "keywords": {
                     "type": "array",
-                    "description": "Keywords array used to identify course characteristics. Courses with 'DLC' CourseGroup are tagged with ['DLC-Original']",
+                    "description": "Keywords array used to identify course characteristics. Courses with funding organization 'Digital Learning Campus' are tagged with ['DLC-Original']",
                     "example": ["DLC-Original"]
                 },
                 "funding": {
