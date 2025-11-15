@@ -161,6 +161,7 @@ def handle_moochub_data(page=1, per_page=25):
                         description
                         type
                         logo
+                        aliases
                     }
                 }
             }
@@ -218,13 +219,28 @@ def handle_moochub_data(page=1, per_page=25):
                 html_content = markdown.markdown(course["contentDescriptionField2"])
                 description_parts.append(html_content)
 
-            # Check for DLC CourseGroup to add keywords
-            has_dlc_group = False
-            for group in course.get("CourseGroups", []):
-                group_option = group.get("CourseGroupOption", {})
-                if group_option.get("title", "").upper() == "DLC":
-                    has_dlc_group = True
+            # Check for Digital Learning Campus funding organization to add keywords
+            # Matches organization name or aliases that normalize to "DLC" or "DIGITAL LEARNING CAMPUS"
+            has_dlc_funding = False
+            for funding_org in course.get("CourseFundingOrganizations", []):
+                organization = funding_org.get("Organization", {})
+                
+                # Normalize organization name
+                org_name_normalized = organization.get("name", "").strip().upper()
+                if org_name_normalized in ("DIGITAL LEARNING CAMPUS", "DLC"):
+                    has_dlc_funding = True
                     break
+                
+                # Check aliases if present
+                aliases = organization.get("aliases")
+                if aliases and isinstance(aliases, list):
+                    for alias in aliases:
+                        alias_normalized = str(alias).strip().upper() if alias else ""
+                        if alias_normalized in ("DIGITAL LEARNING CAMPUS", "DLC"):
+                            has_dlc_funding = True
+                            break
+                    if has_dlc_funding:
+                        break
             
             # Create one entry per course location
             for location in course["CourseLocations"]:
@@ -261,8 +277,8 @@ def handle_moochub_data(page=1, per_page=25):
                     }]
                 }
                 
-                # Add keywords for DLC Original courses
-                if has_dlc_group:
+                # Add keywords for DLC Original courses (courses with Digital Learning Campus funding)
+                if has_dlc_funding:
                     attributes["keywords"] = ["DLC-Original"]
                 
                 # Set URL based on location type with MOOCHub tracking parameters
@@ -463,7 +479,7 @@ def handle_moochub_schema():
             "custom_extensions": {
                 "keywords": {
                     "type": "array",
-                    "description": "Keywords array used to identify course characteristics. Courses with 'DLC' CourseGroup are tagged with ['DLC-Original']",
+                    "description": "Keywords array used to identify course characteristics. Courses with funding organization name or alias matching 'Digital Learning Campus' or 'DLC' (case-insensitive, normalized) are tagged with ['DLC-Original']. The stored keyword value is 'DLC-Original' regardless of whether the organization name uses the short form 'DLC' or the full form 'Digital Learning Campus'.",
                     "example": ["DLC-Original"]
                 },
                 "funding": {
