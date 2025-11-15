@@ -200,32 +200,52 @@ export default async function sendSessionReminders(req, logger) {
         }
       `;
 
-      // Get courseId from the first session (all sessions in this batch belong to the same course)
-      const courseId = validSessions.length > 0 ? validSessions[0].Course?.id : null;
-
-      // First try to get course-specific template
-      let templateData = await client.request(GET_EMAIL_TEMPLATE, {
-        type: 'SESSION_REMINDER',
-        courseId: courseId
-      });
-
-      // If no course-specific template found, fall back to default template (courseId = -1)
-      if (!templateData?.MailTemplate?.length) {
-        templateData = await client.request(GET_EMAIL_TEMPLATE, {
-          type: 'SESSION_REMINDER',
-          courseId: -1
-        });
-      }
-
-      if (!templateData?.MailTemplate?.length) {
-        logger.error(`SESSION_REMINDER email template not found for courseId: ${courseId || 'default'}`);
-        continue;
-      }
-
-      const template = templateData.MailTemplate[0];
+      // In-memory cache for templates keyed by courseId to avoid repeated network calls
+      const templateCache = new Map();
 
       // Process each session
       for (const session of validSessions) {
+        // Derive courseId from the current session
+        const courseId = session.Course?.id;
+
+        // Get template for this course (with caching)
+        let template = templateCache.get(courseId);
+        
+        if (!template) {
+          // First try to get course-specific template
+          let templateData = await client.request(GET_EMAIL_TEMPLATE, {
+            type: 'SESSION_REMINDER',
+            courseId: courseId
+          });
+
+          // If no course-specific template found, fall back to default template (courseId = -1)
+          if (!templateData?.MailTemplate?.length) {
+            // Check if default template is already cached
+            const defaultTemplate = templateCache.get(-1);
+            if (defaultTemplate) {
+              template = defaultTemplate;
+            } else {
+              templateData = await client.request(GET_EMAIL_TEMPLATE, {
+                type: 'SESSION_REMINDER',
+                courseId: -1
+              });
+              
+              if (!templateData?.MailTemplate?.length) {
+                logger.error(`SESSION_REMINDER email template not found for courseId: ${courseId || 'default'}`);
+                continue; // Skip this session if no template found
+              }
+              
+              template = templateData.MailTemplate[0];
+              // Cache the default template
+              templateCache.set(-1, template);
+            }
+          } else {
+            template = templateData.MailTemplate[0];
+          }
+          
+          // Cache the template for this courseId (either course-specific or default)
+          templateCache.set(courseId, template);
+        }
         let sessionEmailsSent = 0;
 
         for (const enrollment of session.Course.CourseEnrollments) {
