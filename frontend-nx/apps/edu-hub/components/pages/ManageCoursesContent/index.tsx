@@ -303,7 +303,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
           ?.filter((option) => option.sliderGroup)
           .map((option) => ({
             id: option.id,
-            name: t(`common:course_group_options.${option.title}`),
+            name: option.title ? t(`common:course_group_options.${option.title}`) : '—',
           })) || []
       );
     } else {

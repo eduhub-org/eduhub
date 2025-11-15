@@ -41,22 +41,25 @@ export const Footer: FC = () => {
             </span>
            
             <div className="flex flex-col sm:flex-row items-center sm:items-end gap-8 sm:gap-4 bg-white p-8 sm:p-4 rounded">
-              <div className="flex items-end">
+              <div className="flex items-end w-[200px] h-[80px]">
                 <Image 
                   src={dlcLogo} 
                   alt="DLC Logo" 
                   width={200} 
                   height={80}
-                  className="object-contain"
+                  unoptimized
+                  className="w-full h-full object-contain"
                 />
               </div>
-              <div className="flex items-end">
+              <div className="flex items-end w-[400px] h-[80px]">
                 <Image 
                   src={foerderLogo} 
                   alt="Förder Logo" 
                   width={400} 
                   height={80}
-                  className="object-contain"
+                  priority
+                  unoptimized
+                  className="w-full h-full object-contain"
                 />
               </div>
             </div>
@@ -67,13 +70,13 @@ export const Footer: FC = () => {
           <span className="text-sm font-light">© 2010 — {new Date().getFullYear()}</span>
           <div className="flex items-center">
             <a href="https://www.instagram.com/opencampus_sh/" target="_blank" rel="noopener noreferrer">
-              <div className="flex items-center">
-                <Image src={instagramIcon} alt="Instagram" width={23} height={23} />
+              <div className="flex items-center w-[23px] h-[23px]">
+                <Image src={instagramIcon} alt="Instagram" width={23} height={23} unoptimized className="w-full h-full object-contain" />
               </div>
             </a>
             <a href="https://de-de.facebook.com/opencampus.sh/" target="_blank" rel="noopener noreferrer">
-              <div className="ml-6 sm:ml-20 sm:mr-10 flex items-center">
-                <Image src={facebookIcon} alt="Facebook" width={23} height={23} />
+              <div className="ml-6 sm:ml-20 sm:mr-10 flex items-center w-[23px] h-[23px]">
+                <Image src={facebookIcon} alt="Facebook" width={23} height={23} unoptimized className="w-full h-full object-contain" />
               </div>
             </a>
           </div>

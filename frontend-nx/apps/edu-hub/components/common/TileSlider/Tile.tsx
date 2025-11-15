@@ -32,14 +32,18 @@ export const Tile: FC<TileProps> = ({ course, isManage }) => {
             ? getWeekdayStartAndEndString(course, t)
             : null}{' '}
           <div className="flex items-center">
-            <Image src={languageIcon} alt="language icon" width={16} height={16} className="mr-1" />
+            <div className="w-4 h-4 mr-1">
+              <Image src={languageIcon} alt="language icon" width={16} height={16} unoptimized className="w-full h-full object-contain" />
+            </div>
             {t(course.language)}
           </div>
         </div>
         <span className="text-lg mb-auto line-clamp-3">{course.tagline}</span>
         <div className="flex justify-between text-xs items-center tracking-wider">
           <div className="flex uppercase">
-            <Image src={locationIcon} alt="location icon" width={12} height={12} className="mr-1" />
+            <div className="w-3 h-3 mr-1">
+              <Image src={locationIcon} alt="location icon" width={12} height={12} unoptimized className="w-full h-full object-contain" />
+            </div>
             {course.CourseLocations.map((location, index) => (
               <React.Fragment key={index}>
                 {location.locationOption}

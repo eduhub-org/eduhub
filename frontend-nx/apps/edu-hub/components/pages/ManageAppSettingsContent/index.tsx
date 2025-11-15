@@ -250,7 +250,7 @@ const ManageAppSettingsContent: FC = () => {
                             className="p-4 border border-gray-300 rounded mb-2 bg-white flex justify-between items-center"
                           >
                             <h2 className="text-xl font-semibold">
-                              {t(`common:course_group_options.${option.title}`)}
+                              {option.title ? t(`common:course_group_options.${option.title}`) : '—'}
                             </h2>
                             <span className="text-gray-500">{index + 1}</span>
                           </div>

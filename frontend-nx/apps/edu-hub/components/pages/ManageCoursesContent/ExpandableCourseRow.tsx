@@ -320,7 +320,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
   const currentCourseGroups = course.CourseGroups.map((group) => ({
     id: group.CourseGroupOption.id,
-    name: t(`common:course_group_options.${group.CourseGroupOption.title}`),
+    name: group.CourseGroupOption.title
+      ? t(`common:course_group_options.${group.CourseGroupOption.title}`)
+      : '—',
   }));
 
   const currentCourseDegrees = course.CourseDegrees.map((degree) => ({
