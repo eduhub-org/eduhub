@@ -28,7 +28,9 @@ import TableGrid from '../../common/TableGrid';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
+import { GET_COURSE_TEMPLATES_COUNT } from '../../../queries/emailTemplates';
 import ExpandableCourseRow from './ExpandableCourseRow';
+import { useParallelQueries } from '../../../hooks/useParallelQueries';
 import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
 import useTranslation from 'next-translate/useTranslation';
 import draftPie from '../../../public/images/course/status/draft.svg';
@@ -50,6 +52,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { SelectProgramDialog } from './SelectProgramDialog';
 import { COPY_COURSES_TO_PROGRAM } from '../../../queries/copyCourse';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
+import { MdMarkEmailRead } from 'react-icons/md';
 
 // Header imports
 import CommonPageHeader from '../../common/CommonPageHeader';
@@ -147,6 +150,18 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     ),
   });
 
+  const courses: AdminCourseList_Course[] = useMemo(() => data?.Course || [], [data?.Course]);
+  const totalCount = data?.Course_aggregate?.aggregate?.count || 0;
+
+  // Fetch template counts for visible courses using parallel queries hook
+  const courseIds = useMemo(() => courses.map((course) => course.id), [courses]);
+  const courseTemplateCounts = useParallelQueries(
+    GET_COURSE_TEMPLATES_COUNT,
+    courseIds,
+    (courseId) => ({ courseId }),
+    (result) => result.data?.MailTemplate_aggregate?.aggregate?.count || 0
+  );
+
   // Handle program tab clicks (moved after useTableGrid to access setPageIndex)
   const handleTabClick = useCallback(
     (property: StaticComponentProperty) => {
@@ -171,9 +186,6 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const [successMessage, setSuccessMessage] = useState('');
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
-  const courses: AdminCourseList_Course[] = data?.Course || [];
-  const totalCount = data?.Course_aggregate?.aggregate?.count || 0;
 
   const [updateAttendanceCertificatePossible] = useAdminMutation<
     UpdateCourseAttendanceCertificatePossible,
@@ -636,10 +648,25 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         accessorKey: 'status',
         size: 80,
         meta: { className: 'text-center' },
-        cell: ({ row }) => <div className="text-center">{courseStatus(row.original.status)}</div>,
+        cell: ({ row }) => {
+          const templateCount = courseTemplateCounts.get(row.original.id) || 0;
+          const hasCustomTemplates = templateCount > 0;
+
+          return (
+            <div className="flex items-center justify-center gap-1">
+              <div className="text-center">{courseStatus(row.original.status)}</div>
+              {hasCustomTemplates && (
+                <MdMarkEmailRead
+                  className="w-4 h-4 text-blue-600 ml-1"
+                  title={t('table_header.has_custom_templates')}
+                />
+              )}
+            </div>
+          );
+        },
       },
     ],
-    [t, handleApplicationEndChange, lang, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed]
+    [t, handleApplicationEndChange, lang, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed, courseTemplateCounts]
   );
 
   const handlePageSizeChange = useCallback(

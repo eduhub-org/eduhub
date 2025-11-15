@@ -176,10 +176,21 @@ export default async function sendSessionReminders(req, logger) {
       });
 
       // Get email template for reminders
+      // First try course-specific template, then fall back to default template
       const GET_EMAIL_TEMPLATE = gql`
-        query GetEmailTemplate($title: String!) {
-          MailTemplate(where: { title: { _eq: $title } }) {
+        query GetEmailTemplate($type: String!, $courseId: Int) {
+          MailTemplate(
+            where: {
+              _and: [
+                { type: { _eq: $type } }
+                { courseId: { _eq: $courseId } }
+              ]
+            }
+            limit: 1
+          ) {
             id
+            type
+            courseId
             subject
             content
             from
@@ -189,19 +200,52 @@ export default async function sendSessionReminders(req, logger) {
         }
       `;
 
-      const templateData = await client.request(GET_EMAIL_TEMPLATE, {
-        title: 'SESSION_REMINDER'
-      });
-
-      if (!templateData?.MailTemplate?.length) {
-        logger.error('SESSION_REMINDER email template not found');
-        continue;
-      }
-
-      const template = templateData.MailTemplate[0];
+      // In-memory cache for templates keyed by courseId to avoid repeated network calls
+      const templateCache = new Map();
 
       // Process each session
       for (const session of validSessions) {
+        // Derive courseId from the current session
+        const courseId = session.Course?.id;
+
+        // Get template for this course (with caching)
+        let template = templateCache.get(courseId);
+        
+        if (!template) {
+          // First try to get course-specific template
+          let templateData = await client.request(GET_EMAIL_TEMPLATE, {
+            type: 'SESSION_REMINDER',
+            courseId: courseId
+          });
+
+          // If no course-specific template found, fall back to default template (courseId = -1)
+          if (!templateData?.MailTemplate?.length) {
+            // Check if default template is already cached
+            const defaultTemplate = templateCache.get(-1);
+            if (defaultTemplate) {
+              template = defaultTemplate;
+            } else {
+              templateData = await client.request(GET_EMAIL_TEMPLATE, {
+                type: 'SESSION_REMINDER',
+                courseId: -1
+              });
+              
+              if (!templateData?.MailTemplate?.length) {
+                logger.error(`SESSION_REMINDER email template not found for courseId: ${courseId || 'default'}`);
+                continue; // Skip this session if no template found
+              }
+              
+              template = templateData.MailTemplate[0];
+              // Cache the default template
+              templateCache.set(-1, template);
+            }
+          } else {
+            template = templateData.MailTemplate[0];
+          }
+          
+          // Cache the template for this courseId (either course-specific or default)
+          templateCache.set(courseId, template);
+        }
         let sessionEmailsSent = 0;
 
         for (const enrollment of session.Course.CourseEnrollments) {

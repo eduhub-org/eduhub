@@ -6,10 +6,10 @@
 import { Weekday_enum, LocationOption_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL fragment: CourseTileFragment
+// GraphQL query operation: CourseTilesByOrganization
 // ====================================================
 
-export interface CourseTileFragment_Program {
+export interface CourseTilesByOrganization_Course_Program {
   __typename: "Program";
   /**
    * Decides whether the courses of this program can be published or not. (Courses are ony published if the filed publised in the Course table is also set to true.)
@@ -21,7 +21,7 @@ export interface CourseTileFragment_Program {
   title: string;
 }
 
-export interface CourseTileFragment_CourseLocations {
+export interface CourseTilesByOrganization_Course_CourseLocations {
   __typename: "CourseLocation";
   /**
    * Either 'ONLINE' or one of the possible given offline locations
@@ -29,7 +29,21 @@ export interface CourseTileFragment_CourseLocations {
   locationOption: LocationOption_enum | null;
 }
 
-export interface CourseTileFragment {
+export interface CourseTilesByOrganization_Course_CourseGroups_CourseGroupOption {
+  __typename: "CourseGroupOption";
+  order: number;
+  title: string;
+}
+
+export interface CourseTilesByOrganization_Course_CourseGroups {
+  __typename: "CourseGroup";
+  /**
+   * An object relationship
+   */
+  CourseGroupOption: CourseTilesByOrganization_Course_CourseGroups_CourseGroupOption;
+}
+
+export interface CourseTilesByOrganization_Course {
   __typename: "Course";
   id: number;
   /**
@@ -67,9 +81,24 @@ export interface CourseTileFragment {
   /**
    * An object relationship
    */
-  Program: CourseTileFragment_Program;
+  Program: CourseTilesByOrganization_Course_Program;
   /**
    * An array relationship
    */
-  CourseLocations: CourseTileFragment_CourseLocations[];
+  CourseLocations: CourseTilesByOrganization_Course_CourseLocations[];
+  /**
+   * An array relationship
+   */
+  CourseGroups: CourseTilesByOrganization_Course_CourseGroups[];
+}
+
+export interface CourseTilesByOrganization {
+  /**
+   * fetch data from the table: "Course"
+   */
+  Course: CourseTilesByOrganization_Course[];
+}
+
+export interface CourseTilesByOrganizationVariables {
+  organizationId: number;
 }

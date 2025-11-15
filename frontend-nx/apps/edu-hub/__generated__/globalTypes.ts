@@ -5693,12 +5693,29 @@ export interface MailTemplate_bool_exp {
   bcc?: String_comparison_exp | null;
   cc?: String_comparison_exp | null;
   content?: String_comparison_exp | null;
+  courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   from?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   subject?: String_comparison_exp | null;
-  title?: String_comparison_exp | null;
+  type?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "MailTemplate"
+ */
+export interface MailTemplate_insert_input {
+  bcc?: string | null;
+  cc?: string | null;
+  content?: string | null;
+  courseId?: number | null;
+  created_at?: any | null;
+  from?: string | null;
+  id?: number | null;
+  subject?: string | null;
+  type?: string | null;
+  updated_at?: any | null;
 }
 
 /**
@@ -5708,11 +5725,12 @@ export interface MailTemplate_order_by {
   bcc?: order_by | null;
   cc?: order_by | null;
   content?: order_by | null;
+  courseId?: order_by | null;
   created_at?: order_by | null;
   from?: order_by | null;
   id?: order_by | null;
   subject?: order_by | null;
-  title?: order_by | null;
+  type?: order_by | null;
   updated_at?: order_by | null;
 }
 

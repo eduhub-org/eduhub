@@ -1,5 +1,9 @@
 {
   "headline": "Email Templates",
+  "headline_default": "Default Email Templates",
+  "default_templates_explanation": "These are the default email templates used app-wide. You can also define course-specific templates in the manage courses view by clicking on the corresponding button in the expandable row of the course.",
+  "course_specific_explanation": "These email templates are specific to this course and will override the default templates when sending emails for this course.",
+  "back_to_courses": "Back to Courses",
   "columns": {
     "title": "Template Type",
     "subject": "Email Subject Line",

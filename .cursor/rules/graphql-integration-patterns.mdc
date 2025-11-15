@@ -491,6 +491,73 @@ const handleSubmit = async () => {
 };
 ```
 
+### Parallel Queries for Multiple Entities
+
+**When to use**: When you need to fetch data for multiple entities (e.g., courses, users) where each entity requires a separate query. Instead of using multiple `useQuery` hooks (which can cause performance issues with many entities), use `useParallelQueries` to batch all queries and execute them in parallel.
+
+**Benefits**:
+- **Performance**: Executes all queries in parallel using `Promise.all`, significantly faster than sequential queries
+- **Efficiency**: Only fetches what's needed, avoids over-fetching with bulk queries
+- **Scalability**: Works efficiently regardless of the number of entities
+- **Cache-friendly**: Uses Apollo's cache-first policy for optimal performance
+
+**Hook**: `useParallelQueries` from `hooks/useParallelQueries.ts`
+
+```typescript
+import { useParallelQueries } from '../../../hooks/useParallelQueries';
+import { GET_COURSE_TEMPLATES_COUNT } from '../../../queries/emailTemplates';
+
+// Fetch template counts for multiple courses
+const courseIds = useMemo(() => courses.map((course) => course.id), [courses]);
+const courseTemplateCounts = useParallelQueries(
+  GET_COURSE_TEMPLATES_COUNT,
+  courseIds,
+  (courseId) => ({ courseId }), // Generate variables for each ID
+  (result) => result.data?.MailTemplate_aggregate?.aggregate?.count || 0, // Extract data
+  AuthRoles.admin // Optional: specify role (defaults to admin)
+);
+
+// Use the results
+const templateCount = courseTemplateCounts.get(courseId) || 0;
+```
+
+**Parameters**:
+1. `query`: GraphQL query document (DocumentNode)
+2. `ids`: Array of IDs to fetch data for
+3. `getVariables`: Function that takes an ID and returns query variables object
+4. `extractData`: Function that extracts the desired data from each query result
+5. `role`: Optional Hasura role (defaults to `AuthRoles.admin`)
+
+**Returns**: `Map<ID, Data>` - Map of ID to extracted data
+
+**Example Use Cases**:
+- Fetching template counts for multiple courses
+- Fetching user details for multiple user IDs
+- Fetching enrollment counts for multiple courses
+- Any scenario where you need per-entity data but have many entities
+
+**When NOT to use**:
+- When you can fetch all data in a single query (prefer single query)
+- When you only need data for 1-2 entities (use individual `useQuery` hooks)
+- When the data structure doesn't map well to per-entity queries
+
+**Performance Comparison**:
+```typescript
+// ❌ BAD: Sequential queries (slow with many courses)
+const { data: count1 } = useAdminQuery(GET_COURSE_TEMPLATES_COUNT, { variables: { courseId: 1 } });
+const { data: count2 } = useAdminQuery(GET_COURSE_TEMPLATES_COUNT, { variables: { courseId: 2 } });
+// ... 50 more queries = 50 sequential network requests
+
+// ✅ GOOD: Parallel queries (fast)
+const courseTemplateCounts = useParallelQueries(
+  GET_COURSE_TEMPLATES_COUNT,
+  courseIds, // [1, 2, ..., 50]
+  (courseId) => ({ courseId }),
+  (result) => result.data?.MailTemplate_aggregate?.aggregate?.count || 0
+);
+// All 50 queries execute in parallel = 1 network round trip
+```
+
 ## Troubleshooting
 
 ### Common Issues
