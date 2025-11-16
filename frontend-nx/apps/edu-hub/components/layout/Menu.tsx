@@ -3,6 +3,7 @@ import MaterialMenu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
 import { useIsAdmin } from '../../hooks/authentication';
 import useTranslation from 'next-translate/useTranslation';
@@ -23,11 +24,13 @@ const StyledMenu = styled(MaterialMenu)(() => ({
 }));
 
 export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
+  const router = useRouter();
   const hideMenu = useCallback(() => setVisible(false), [setVisible]);
 
-  const closeMenu = useCallback(() => {
+  const handleNavigation = useCallback((href: string) => {
     setVisible(false);
-  }, [setVisible]);
+    router.push(href);
+  }, [router, setVisible]);
 
   const isAdmin = useIsAdmin();
 
@@ -51,99 +54,75 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
         horizontal: 'right',
       }}
     >
-      <MenuItem onClick={closeMenu}>
-        <Link className="w-full text-lg" href="/profile">
-          {t('menu.profile')}
-        </Link>
+      <MenuItem onClick={() => handleNavigation('/profile')}>
+        <span className="w-full text-lg">{t('menu.profile')}</span>
       </MenuItem>
 
-      <MenuItem onClick={closeMenu}>
-        <Link className="w-full text-lg" href="/my-certificates">
-          {t('menu.my_certificates')}
-        </Link>
+      <MenuItem onClick={() => handleNavigation('/my-certificates')}>
+        <span className="w-full text-lg">{t('menu.my_certificates')}</span>
       </MenuItem>
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/courses">
-            {t('menu.courses')}
-          </Link>
+        <MenuItem onClick={() => handleNavigation('/manage/courses')}>
+          <span className="w-full text-lg">{t('menu.courses')}</span>
         </MenuItem>
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/programs">
-            {t('menu.programs')}
-          </Link>
+        <MenuItem onClick={() => handleNavigation('/manage/programs')}>
+          <span className="w-full text-lg">{t('menu.programs')}</span>
         </MenuItem>
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/users">
-            {t('menu.user')}
-          </Link>
+        <MenuItem onClick={() => handleNavigation('/manage/users')}>
+          <span className="w-full text-lg">{t('menu.user')}</span>
         </MenuItem>
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/organizations">
-            {t('menu.organizations')}
-          </Link>
+        <MenuItem onClick={() => handleNavigation('/manage/organizations')}>
+          <span className="w-full text-lg">{t('menu.organizations')}</span>
         </MenuItem>
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/location-addresses">
-            {t('menu.location_addresses')}
-          </Link>
+        <MenuItem onClick={() => handleNavigation('/manage/location-addresses')}>
+          <span className="w-full text-lg">{t('menu.location_addresses')}</span>
         </MenuItem>
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/achievement-options">
-            {t('menu.achievements')}
-          </Link>
+        <MenuItem onClick={() => handleNavigation('/manage/achievement-options')}>
+          <span className="w-full text-lg">{t('menu.achievements')}</span>
         </MenuItem>
       )}
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/achievement-templates">
-            {t('menu.achievement_templates')}
-          </Link>
+        <MenuItem onClick={() => handleNavigation('/manage/achievement-templates')}>
+          <span className="w-full text-lg">{t('menu.achievement_templates')}</span>
         </MenuItem>
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/statistics">
-            {t('menu.statistics')}
-          </Link>
+        <MenuItem onClick={() => handleNavigation('/statistics')}>
+          <span className="w-full text-lg">{t('menu.statistics')}</span>
         </MenuItem>
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/email-templates">
-            {t('menu.email_templates')}
-          </Link>
+        <MenuItem onClick={() => handleNavigation('/manage/email-templates')}>
+          <span className="w-full text-lg">{t('menu.email_templates')}</span>
         </MenuItem>
       )}
 
       {isAdmin && (
-        <MenuItem onClick={closeMenu}>
-          <Link className="w-full text-lg" href="/manage/app-settings">
-            {t('menu.app_settings')}
-          </Link>
+        <MenuItem onClick={() => handleNavigation('/manage/app-settings')}>
+          <span className="w-full text-lg">{t('menu.app_settings')}</span>
         </MenuItem>
       )}
 
-      <MenuItem onClick={closeMenu}>
-        <Link className="w-full text-lg" href="https://opencampus.gitbook.io/faq/" target="_blank">
+      <MenuItem onClick={hideMenu}>
+        <Link className="w-full text-lg" href="https://opencampus.gitbook.io/faq/" target="_blank" rel="noopener noreferrer">
           {t('menu.faq')}
         </Link>
       </MenuItem>

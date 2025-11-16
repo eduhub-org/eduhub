@@ -25,7 +25,7 @@ export const Tile: FC<TileProps> = ({ course, isManage }) => {
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
   return (
-    <Link href={isManage ? `/manage/course/${course.id}` : `/course/${course.id}`}>
+    <Link href={isManage ? `/manage/course/${course.id}` : `/course/${course.id}`} style={{ display: 'block' }}>
       <TileBase coverImage={course?.coverImage} title={course.title}>
         <div className="flex justify-between mb-3 text-sm tracking-wider">
           {course.weekDay !== 'NONE' && course.startTime && course.endTime

@@ -95,10 +95,9 @@ const nextConfig = {
     // @ts-expect-error - TypeScript has trouble inferring literal types when pushing to arrays in JS files
     remotePatterns: buildRemotePatterns(),
   },
-  experimental: {
-    // https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
-    outputFileTracingRoot: path.join(__dirname, '../../'),
-  },
+  // https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
+  // In Next.js 15, outputFileTracingRoot moved out of experimental to root config
+  outputFileTracingRoot: path.join(__dirname, '../../'),
   async headers() {
     return [
       {
