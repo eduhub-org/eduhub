@@ -77,9 +77,10 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     });
   }, [programs]);
 
-  const defaultProgramId = sortedPrograms.find(
-    (program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES'
-  )?.id;
+  const defaultProgramId = useMemo(
+    () => sortedPrograms.find((program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES')?.id,
+    [sortedPrograms]
+  );
 
   // Filter state management (single source of truth)
   const [filter, setFilter] = useState<AdminCourseListVariables>({
@@ -155,11 +156,16 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
 
   // Fetch template counts for visible courses using parallel queries hook
   const courseIds = useMemo(() => courses.map((course) => course.id), [courses]);
+  const getTemplateVariables = useCallback((courseId: number) => ({ courseId }), []);
+  const extractTemplateCount = useCallback(
+    (result: any) => result.data?.MailTemplate_aggregate?.aggregate?.count || 0,
+    []
+  );
   const courseTemplateCounts = useParallelQueries(
     GET_COURSE_TEMPLATES_COUNT,
     courseIds,
-    (courseId) => ({ courseId }),
-    (result) => result.data?.MailTemplate_aggregate?.aggregate?.count || 0
+    getTemplateVariables,
+    extractTemplateCount
   );
 
   // Handle program tab clicks (moved after useTableGrid to access setPageIndex)

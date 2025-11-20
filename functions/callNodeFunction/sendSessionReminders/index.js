@@ -218,16 +218,37 @@ export default async function sendSessionReminders(req, logger) {
             courseId: courseId
           });
 
-          // If no course-specific template found, fall back to default template (courseId = -1)
+          // If no course-specific template found, fall back to default template (courseId = NULL)
           if (!templateData?.MailTemplate?.length) {
             // Check if default template is already cached
-            const defaultTemplate = templateCache.get(-1);
+            const defaultTemplate = templateCache.get(null);
             if (defaultTemplate) {
               template = defaultTemplate;
             } else {
-              templateData = await client.request(GET_EMAIL_TEMPLATE, {
-                type: 'SESSION_REMINDER',
-                courseId: -1
+              const GET_DEFAULT_TEMPLATE = gql`
+                query GetDefaultTemplate($type: String!) {
+                  MailTemplate(
+                    where: {
+                      _and: [
+                        { type: { _eq: $type } }
+                        { courseId: { _is_null: true } }
+                      ]
+                    }
+                    limit: 1
+                  ) {
+                    id
+                    type
+                    courseId
+                    subject
+                    content
+                    from
+                    cc
+                    bcc
+                  }
+                }
+              `;
+              templateData = await client.request(GET_DEFAULT_TEMPLATE, {
+                type: 'SESSION_REMINDER'
               });
               
               if (!templateData?.MailTemplate?.length) {
@@ -237,7 +258,7 @@ export default async function sendSessionReminders(req, logger) {
               
               template = templateData.MailTemplate[0];
               // Cache the default template
-              templateCache.set(-1, template);
+              templateCache.set(null, template);
             }
           } else {
             template = templateData.MailTemplate[0];

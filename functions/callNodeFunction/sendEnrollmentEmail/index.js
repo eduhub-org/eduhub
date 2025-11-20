@@ -134,11 +134,32 @@ export default async function sendEnrollmentEmail(req, logger) {
       courseId: courseId
     });
 
-    // If no course-specific template found, fall back to default template (courseId = -1)
+    // If no course-specific template found, fall back to default template (courseId = NULL)
     if (!templateData?.MailTemplate?.length) {
-      templateData = await client.request(GET_EMAIL_TEMPLATE, {
-        type: templateType,
-        courseId: -1
+      const GET_DEFAULT_TEMPLATE = gql`
+        query GetDefaultTemplate($type: String!) {
+          MailTemplate(
+            where: {
+              _and: [
+                { type: { _eq: $type } }
+                { courseId: { _is_null: true } }
+              ]
+            }
+            limit: 1
+          ) {
+            id
+            type
+            courseId
+            subject
+            content
+            from
+            cc
+            bcc
+          }
+        }
+      `;
+      templateData = await client.request(GET_DEFAULT_TEMPLATE, {
+        type: templateType
       });
     }
 

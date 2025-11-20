@@ -9,7 +9,7 @@ import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 import InputField from '../../inputs/InputField';
 import EmailEditor from '../../inputs/EmailEditor';
-import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useRoleQuery } from '../../../hooks/authedQuery';
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useTableGrid } from '../../common/TableGrid/hooks';
@@ -192,22 +192,24 @@ const ManageEmailTemplatesContent: FC<ManageEmailTemplatesContentProps> = ({
   const { t } = useTranslation('manageEmailTemplates');
   const router = useRouter();
 
-  // Determine the courseId to filter by (default templates use -1)
-  const filterCourseId = courseId !== undefined ? courseId : -1;
+  // Determine the courseId to filter by (default templates use NULL)
+  const filterCourseId = courseId !== undefined ? courseId : null;
 
   const { data, loading, error, searchFilter, setSearchFilter } = useTableGrid({
-    queryHook: useAdminQuery,
+    queryHook: useRoleQuery,
     query: EMAIL_TEMPLATES_LIST,
     pageSize: 50, // Fixed page size since pagination is disabled
     queryVariables: {
-      filter: {
-        courseId: { _eq: filterCourseId },
-      },
+      filter: filterCourseId !== null
+        ? { courseId: { _eq: filterCourseId } }
+        : { courseId: { _is_null: true } },
     },
     refetchFilter: (searchFilter: string) => ({
       filter: {
         _and: [
-          { courseId: { _eq: filterCourseId } },
+          filterCourseId !== null
+            ? { courseId: { _eq: filterCourseId } }
+            : { courseId: { _is_null: true } },
           {
             _or: [{ type: { _ilike: `%${searchFilter}%` } }, { subject: { _ilike: `%${searchFilter}%` } }],
           },

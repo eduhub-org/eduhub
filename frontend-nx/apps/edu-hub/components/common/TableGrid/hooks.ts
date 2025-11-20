@@ -11,38 +11,75 @@ interface UseTableGridProps<V> {
   pageSize?: number;
   debounceMs?: number; // Configurable debounce time in milliseconds
   refetchFilter?: (searchFilter: string) => Record<string, any>;
-  sortColumnMapper?: (columnId: string) => string | null; // Maps column accessorKey to GraphQL field name
+  sortColumnMapper?: (columnId: string) => string | Record<string, any> | null; // Maps column accessorKey to GraphQL field name or nested structure
+}
+
+/**
+ * Recursively merges sort direction into a nested object structure, replacing null values
+ * @param obj - The nested object structure from sortColumnMapper
+ * @param direction - The sort direction ('asc' or 'desc')
+ * @returns The object with direction filled in
+ */
+function mergeSortDirection(obj: Record<string, any>, direction: string): Record<string, any> {
+  const result: Record<string, any> = {};
+  
+  for (const [key, value] of Object.entries(obj)) {
+    if (value === null) {
+      // Replace null with direction
+      result[key] = direction;
+    } else if (typeof value === 'object' && !Array.isArray(value)) {
+      // Recursively process nested objects
+      result[key] = mergeSortDirection(value, direction);
+    } else {
+      // Keep other values as-is
+      result[key] = value;
+    }
+  }
+  
+  return result;
 }
 
 /**
  * Converts TanStack Table SortingState to Hasura order_by format
  * @param sorting - TanStack Table sorting state (e.g., [{ id: 'name', desc: false }])
- * @param sortColumnMapper - Optional function to map column IDs to GraphQL field names
- * @returns Hasura order_by format (e.g., [{ name: 'asc' }]) or empty array to clear sorting
+ * @param sortColumnMapper - Optional function to map column IDs to GraphQL field names or nested structures
+ * @returns Hasura order_by format (e.g., [{ name: 'asc' }] or [{ Users_aggregate: { aggregate: { count: 'asc' } } }]) or empty array to clear sorting
  */
 function convertSortingToOrderBy(
   sorting: SortingState,
-  sortColumnMapper?: (columnId: string) => string | null
-): Record<string, string>[] {
+  sortColumnMapper?: (columnId: string) => string | Record<string, any> | null
+): Record<string, any>[] {
   if (!sorting || sorting.length === 0) {
     return [];
   }
 
+  const direction = (desc: boolean) => (desc ? 'desc' : 'asc');
+
   const orderBy = sorting
     .map((sort) => {
       const columnId = sort.id;
-      const graphqlFieldName = sortColumnMapper ? sortColumnMapper(columnId) : columnId;
+      const mappedField = sortColumnMapper ? sortColumnMapper(columnId) : columnId;
       
       // Skip if mapper returns null (unsupported column for server-side sorting)
-      if (!graphqlFieldName) {
+      if (!mappedField) {
         return null;
       }
 
-      return {
-        [graphqlFieldName]: sort.desc ? 'desc' : 'asc',
-      };
+      // Handle string (simple field name)
+      if (typeof mappedField === 'string') {
+        return {
+          [mappedField]: direction(sort.desc),
+        };
+      }
+
+      // Handle object (nested structure)
+      if (typeof mappedField === 'object' && mappedField !== null) {
+        return mergeSortDirection(mappedField, direction(sort.desc));
+      }
+
+      return null;
     })
-    .filter((orderBy): orderBy is Record<string, string> => orderBy !== null);
+    .filter((orderBy): orderBy is Record<string, any> => orderBy !== null);
 
   // Always return an array (empty if no valid sort orders) to clear server-side sort state
   return orderBy;
