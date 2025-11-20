@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useApolloClient, DocumentNode } from '@apollo/client';
 import { useSession } from 'next-auth/react';
 import { AuthRoles } from '../types/enums';
@@ -53,8 +53,23 @@ export const useParallelQueries = <TId, TData>(
   const memoizedGetVariables = useCallback(getVariables, [getVariables]);
   const memoizedExtractData = useCallback(extractData, [extractData]);
 
+  // Create a stable string representation of IDs for comparison
+  // This prevents infinite loops when the array reference changes but values are the same
+  const idsKey = useMemo(() => {
+    if (ids.length === 0) return '';
+    // Sort and stringify to create a stable key (order doesn't matter for fetching)
+    return JSON.stringify([...ids].sort());
+  }, [ids]);
+
+  // Store current ids in a ref so we can access the latest value in the effect
+  // without including it in the dependency array
+  const idsRef = useRef<TId[]>(ids);
+  idsRef.current = ids;
+
   useEffect(() => {
-    if (ids.length === 0) {
+    const currentIds = idsRef.current;
+
+    if (currentIds.length === 0) {
       setDataMap(new Map());
       return;
     }
@@ -71,7 +86,7 @@ export const useParallelQueries = <TId, TData>(
           : undefined;
 
         // Fetch all queries in parallel
-        const promises = ids.map((id) =>
+        const promises = currentIds.map((id) =>
           client.query({
             query,
             variables: memoizedGetVariables(id),
@@ -85,7 +100,7 @@ export const useParallelQueries = <TId, TData>(
         // Build map from results
         const map = new Map<TId, TData>();
         results.forEach((result, index) => {
-          const id = ids[index];
+          const id = currentIds[index];
           const data = memoizedExtractData(result);
           map.set(id, data);
         });
@@ -99,7 +114,9 @@ export const useParallelQueries = <TId, TData>(
     };
 
     fetchData();
-  }, [ids, client, accessToken, query, memoizedGetVariables, memoizedExtractData, role]);
+    // Only depend on idsKey (stable string representation) and other stable dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idsKey, client, accessToken, query, memoizedGetVariables, memoizedExtractData, role]);
 
   return dataMap;
 };

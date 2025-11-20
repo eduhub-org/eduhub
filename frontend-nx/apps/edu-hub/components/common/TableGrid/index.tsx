@@ -210,7 +210,7 @@ const TableGrid = <T extends BaseRow,>({
     onSortingChange: handleSortingChange,
     getCoreRowModel: getCoreRowModel(),
     ...(!isServerSideSorting && { getSortedRowModel: getSortedRowModel() }), // Only use client-side sorting when not using server-side sorting
-    debugTable: true,
+    debugTable: false, // Set to true only for debugging table issues
     getRowId: (row) => row.id.toString(),
     enableRowSelection: true,
     enableMultiRowSelection: true,

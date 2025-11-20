@@ -21,7 +21,7 @@ const EmailTemplates: FC = () => {
         <div className="min-h-[77vh]">
           {isLoggedIn && isAdmin && (
             <ManageEmailTemplatesContent
-              courseId={-1}
+              courseId={undefined}
               explanatoryText={t('default_templates_explanation', {
                 fallback: 'These are the default email templates used app-wide. You can also define course-specific templates in the manage courses view.',
               })}

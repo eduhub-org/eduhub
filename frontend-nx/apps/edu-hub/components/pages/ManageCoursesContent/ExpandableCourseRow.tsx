@@ -1,7 +1,8 @@
-import { FC, useCallback, useRef, useState } from 'react';
+import { FC, Fragment, useCallback, useMemo, useRef, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdUpload, MdAddCircle, MdEmail } from 'react-icons/md';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
 import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
@@ -455,7 +456,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     name: t(degree.DegreeCourse.title),
   }));
 
-  const coverImage = getPublicImageUrl(course?.coverImage, 460);
+  const coverImage = useMemo(() => getPublicImageUrl(course?.coverImage, 460), [course?.coverImage]);
 
   const registrationTypeOptions = Object.values(CourseRegistrationType_enum).map((type) => ({
     value: type,
@@ -530,10 +531,13 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 <div className="flex flex-col items-center justify-center space-y-2">
                   {coverImage ? (
                     <div className="relative">
-                      <img
+                      <Image
                         src={coverImage}
                         alt="course cover"
-                        className="w-40 h-24 object-contain rounded bg-gray-100"
+                        width={160}
+                        height={96}
+                        className="object-contain rounded bg-gray-100"
+                        style={{ width: '160px', height: '96px' }}
                       />
                       <button
                         onClick={handleImageUploadClick}
@@ -569,9 +573,11 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             <div>
               <h4 className="text-sm font-medium text-gray-700 mb-2">{t('manageCourses:instructors.label')}</h4>
               <div className="space-y-2">
-                {course.CourseInstructors.map((courseInstructor) =>
-                  renderInstructor(courseInstructor, deleteInstructorFromCourse)
-                )}
+                {course.CourseInstructors.map((courseInstructor) => (
+                  <Fragment key={courseInstructor.Expert.id}>
+                    {renderInstructor(courseInstructor, deleteInstructorFromCourse)}
+                  </Fragment>
+                ))}
                 <button
                   onClick={openInstructorDialog}
                   className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 p-2 w-full"
@@ -744,3 +750,4 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 };
 
 export default ExpandableCourseRow;
+
