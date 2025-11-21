@@ -85,7 +85,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
 
   // Filter state management (single source of truth)
   const [filter, setFilter] = useState<AdminCourseListVariables>({
-    limit: QUERY_LIMIT,
+    limit: 100,
     where: { programId: { _eq: defaultProgramId } },
   });
 
