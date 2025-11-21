@@ -26,6 +26,7 @@ import {
 import CreatableTagSelector from '../../inputs/CreatableTagSelector';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useTableGrid } from '../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import { LocationOption_enum } from '../../../__generated__/globalTypes';
 import {
   LocationAddressList_LocationAddress,
@@ -131,17 +132,21 @@ const ManageLocationAddressesContent: FC = () => {
     queryHook: useAdminQuery,
     query: LOCATION_ADDRESS_LIST,
     pageSize: pageSize,
-    refetchFilter: (searchFilter) => ({
-      filter: {
-        locationOption: { _neq: 'ONLINE' },
-        _or: [
-          { shortLabel: { _ilike: `%${searchFilter}%` } },
-          { address: { _ilike: `%${searchFilter}%` } },
-          { description: { _ilike: `%${searchFilter}%` } },
-          { aliases: { _contains: searchFilter } },
-        ],
-      },
-    }),
+    refetchFilter: (searchFilter) => {
+      const searchCondition = createMultiWordSearchCondition(
+        searchFilter,
+        ['shortLabel', 'address', 'description', 'aliases'],
+        {
+          arrayFields: ['aliases'],
+        }
+      );
+      return {
+        filter: {
+          locationOption: { _neq: 'ONLINE' },
+          ...searchCondition,
+        },
+      };
+    },
     sortColumnMapper: (columnId) => {
       // Map column accessorKey to GraphQL field names
       switch (columnId) {
