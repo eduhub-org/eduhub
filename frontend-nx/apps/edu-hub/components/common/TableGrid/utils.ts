@@ -6,7 +6,7 @@
  */
 function createNestedFieldCondition(fieldPath: string, value: any): Record<string, any> {
   const parts = fieldPath.split('.');
-  let result: Record<string, any> = {};
+  const result: Record<string, any> = {};
   let current = result;
 
   for (let i = 0; i < parts.length; i++) {
