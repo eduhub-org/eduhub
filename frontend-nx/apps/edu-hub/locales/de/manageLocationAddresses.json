@@ -54,7 +54,10 @@
       "deletion_warning": "Warnung",
       "addresses_will_be_deleted_one": "1 Standortadresse wird dauerhaft gelöscht",
       "addresses_will_be_deleted_other": "{{count}} Standortadressen werden dauerhaft gelöscht",
-      "no_addresses_selected": "Keine Standortadressen für die Zusammenführung ausgewählt"
+      "no_addresses_selected": "Keine Standortadressen für die Zusammenführung ausgewählt",
+      "location_mismatch_warning": "Standort-Konflikt",
+      "location_mismatch_description_one": "Zusammenführung nicht möglich: 1 Adresse hat eine andere Standortoption als die Zieladresse ({{targetLocation}}). Alle Adressen müssen die gleiche Standortoption haben, um zusammengeführt zu werden.",
+      "location_mismatch_description_other": "Zusammenführung nicht möglich: {{count}} Adressen haben eine andere Standortoption als die Zieladresse ({{targetLocation}}). Alle Adressen müssen die gleiche Standortoption haben, um zusammengeführt zu werden."
     }
   },
   "error": {

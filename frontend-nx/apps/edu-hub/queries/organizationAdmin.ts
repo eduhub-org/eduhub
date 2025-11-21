@@ -88,3 +88,34 @@ export const UPDATE_ORGANIZATION_ADMIN_CAN_MANAGE_SETTINGS = gql`
     }
   }
 `;
+
+export const UPDATE_ORGANIZATION_ADMIN_ORGANIZATION_ID = gql`
+  mutation UpdateOrganizationAdminOrganizationId($id: Int!, $organizationId: Int!) {
+    update_OrganizationAdmin_by_pk(
+      pk_columns: { id: $id },
+      _set: { organizationId: $organizationId }
+    ) {
+      id
+      organizationId
+    }
+  }
+`;
+
+export const ORGANIZATION_ADMINS_BY_ORGANIZATION_ID = gql`
+  query OrganizationAdminsByOrganizationId($organizationIds: [Int!]!) {
+    OrganizationAdmin(where: { organizationId: { _in: $organizationIds } }) {
+      id
+      userId
+      organizationId
+      canManageEvents
+      canManageCourses
+      canManageSettings
+      User {
+        id
+        firstName
+        lastName
+        email
+      }
+    }
+  }
+`;

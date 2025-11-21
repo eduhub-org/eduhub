@@ -1,10 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import { BaseDialog } from '../../common/dialogs/BaseDialog';
-import { useRoleQuery } from '../../../hooks/authedQuery';
+import { useRoleQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { ORGANIZATION_LIST } from '../../../queries/organization';
 import { OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
+import { ORGANIZATION_ADMINS_BY_ORGANIZATION_ID } from '../../../queries/organizationAdmin';
+import { COURSE_FUNDING_ORGANIZATIONS_BY_ORGANIZATION_ID } from '../../../queries/mutateCourseFundingOrganization';
 
 interface MergeOrganizationsDialogProps {
   open: boolean;
@@ -21,6 +23,9 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
 }) => {
   const { t } = useTranslation('manageOrganizations');
   const [selectedTargetOrg, setSelectedTargetOrg] = useState<string>('');
+  const [organizationAdmins, setOrganizationAdmins] = useState<any[]>([]);
+  const [courseFundingOrgs, setCourseFundingOrgs] = useState<any[]>([]);
+  const [loadingRelatedData, setLoadingRelatedData] = useState(false);
 
   const { data } = useRoleQuery(ORGANIZATION_LIST, {
     variables: {
@@ -28,6 +33,42 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
       order_by: [{ name: 'asc' }],
     },
   });
+
+  const [fetchOrganizationAdmins] = useLazyRoleQuery(ORGANIZATION_ADMINS_BY_ORGANIZATION_ID);
+  const [fetchCourseFundingOrgs] = useLazyRoleQuery(COURSE_FUNDING_ORGANIZATIONS_BY_ORGANIZATION_ID);
+
+  // Fetch related data when organizations are selected
+  useEffect(() => {
+    if (selectedOrganizations.length > 0 && selectedTargetOrg) {
+      const orgsToMerge = selectedOrganizations.filter(
+        (org) => org.id !== parseInt(selectedTargetOrg, 10)
+      );
+      const orgIds = orgsToMerge.map((org) => org.id);
+
+      if (orgIds.length > 0) {
+        setLoadingRelatedData(true);
+        Promise.all([
+          fetchOrganizationAdmins({ variables: { organizationIds: orgIds } }),
+          fetchCourseFundingOrgs({ variables: { organizationIds: orgIds } }),
+        ])
+          .then(([adminsResult, fundingResult]) => {
+            setOrganizationAdmins(adminsResult.data?.OrganizationAdmin || []);
+            setCourseFundingOrgs(fundingResult.data?.CourseFundingOrganization || []);
+            setLoadingRelatedData(false);
+          })
+          .catch((error) => {
+            console.error('Error fetching related data:', error);
+            setLoadingRelatedData(false);
+          });
+      } else {
+        setOrganizationAdmins([]);
+        setCourseFundingOrgs([]);
+      }
+    } else {
+      setOrganizationAdmins([]);
+      setCourseFundingOrgs([]);
+    }
+  }, [selectedOrganizations, selectedTargetOrg, fetchOrganizationAdmins, fetchCourseFundingOrgs]);
 
   const organizationOptions = data?.Organization?.map((org) => ({
     value: org.id.toString(),
@@ -88,6 +129,13 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
     const hasUniversityType = orgsToMerge.some((org) => org.type === 'UNIVERSITY') || targetOrg.type === 'UNIVERSITY';
     const willChangeToUniversity = hasUniversityType && targetOrg.type !== 'UNIVERSITY';
 
+    // Check for API keys - count organizations with apiKeyHash defined
+    const orgsWithApiKeys = [
+      ...orgsToMerge.filter((org) => org.apiKeyHash != null && org.apiKeyHash !== ''),
+      ...(targetOrg.apiKeyHash != null && targetOrg.apiKeyHash !== '' ? [targetOrg] : []),
+    ];
+    const hasMultipleApiKeys = orgsWithApiKeys.length > 1;
+
     return {
       targetOrg,
       orgsToMerge,
@@ -96,24 +144,27 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
       addedAliases,
       willChangeToUniversity,
       totalOrgsToDelete: orgsToMerge.length,
+      orgsWithApiKeys,
+      hasMultipleApiKeys,
     };
   }, [selectedTargetOrg, selectedOrganizations, data]);
 
   const handleConfirm = () => {
     const targetOrg = data?.Organization?.find((org) => org.id === parseInt(selectedTargetOrg, 10));
-    if (targetOrg) {
+    if (targetOrg && mergePreview && !mergePreview.hasMultipleApiKeys) {
       onConfirm(selectedTargetOrg, targetOrg);
     }
   };
 
   const confirmButtonText = t('bulk_action.merge.confirm_merge');
+  const confirmDisabled = !selectedTargetOrg || (mergePreview?.hasMultipleApiKeys ?? false);
 
   return (
     <BaseDialog
       open={open}
       onClose={onClose}
       onConfirm={handleConfirm}
-      confirmDisabled={!selectedTargetOrg}
+      confirmDisabled={confirmDisabled}
       confirmText={confirmButtonText}
     >
       <div className="space-y-4">
@@ -137,6 +188,22 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
             <div className="text-sm font-medium mb-3">{t('bulk_action.merge.preview_title')}</div>
 
             <div className="space-y-2 text-sm">
+              {mergePreview.hasMultipleApiKeys && (
+                <div className="pb-2 mb-3 border-b border-red-200">
+                  <span className="font-medium text-red-600">{t('bulk_action.merge.api_key_warning')}:</span>{' '}
+                  {t('bulk_action.merge.api_key_conflict_description', {
+                    count: mergePreview.orgsWithApiKeys.length,
+                  })}
+                  <ul className="ml-4 mt-1">
+                    {mergePreview.orgsWithApiKeys.map((org) => (
+                      <li key={org.id} className="text-red-600">
+                        • {org.name}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               <div>
                 <span className="font-medium">{t('bulk_action.merge.target_organization')}:</span>{' '}
                 <span className="text-blue-600">{mergePreview.targetOrg.name}</span>
@@ -181,6 +248,49 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
                 <div className="text-amber-600">
                   <span className="font-medium">⚠️ {t('bulk_action.merge.type_change_warning')}:</span>{' '}
                   {t('bulk_action.merge.will_become_university')}
+                </div>
+              )}
+
+              {loadingRelatedData && (
+                <div className="text-gray-500 text-sm">{t('bulk_action.merge.loading_related_data')}</div>
+              )}
+
+              {!loadingRelatedData && organizationAdmins.length > 0 && (
+                <div>
+                  <span className="font-medium">{t('bulk_action.merge.organization_admins_affected')}:</span>{' '}
+                  <span className="text-orange-600">{organizationAdmins.length}</span>
+                  <ul className="ml-4 mt-1 text-xs text-gray-600">
+                    {organizationAdmins.slice(0, 5).map((admin: any) => {
+                      const userName = admin.User
+                        ? `${admin.User.firstName} ${admin.User.lastName}`.trim() || admin.User.email
+                        : admin.userId.substring(0, 8) + '...';
+                      return <li key={admin.id}>• {userName}</li>;
+                    })}
+                    {organizationAdmins.length > 5 && (
+                      <li className="text-gray-500">
+                        ... {t('bulk_action.merge.and_more', { count: organizationAdmins.length - 5 })}
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              )}
+
+              {!loadingRelatedData && courseFundingOrgs.length > 0 && (
+                <div>
+                  <span className="font-medium">{t('bulk_action.merge.funding_organizations_affected')}:</span>{' '}
+                  <span className="text-orange-600">{courseFundingOrgs.length}</span>
+                  <ul className="ml-4 mt-1 text-xs text-gray-600">
+                    {courseFundingOrgs.slice(0, 5).map((funding: any) => (
+                      <li key={funding.id}>
+                        • {funding.Course?.title || `${t('bulk_action.merge.course_id')} ${funding.courseId}`}
+                      </li>
+                    ))}
+                    {courseFundingOrgs.length > 5 && (
+                      <li className="text-gray-500">
+                        ... {t('bulk_action.merge.and_more', { count: courseFundingOrgs.length - 5 })}
+                      </li>
+                    )}
+                  </ul>
                 </div>
               )}
 

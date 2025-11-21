@@ -53,6 +53,12 @@ export const MergeLocationAddressesDialog: React.FC<MergeLocationAddressesDialog
 
     const addressesToMerge = selectedAddresses.filter((addr) => addr.id !== parseInt(selectedTargetAddress, 10));
 
+    // Check if all addresses have the same locationOption
+    const targetLocationOption = targetAddr.locationOption;
+    const addressesWithDifferentLocation = addressesToMerge.filter(
+      (addr) => addr.locationOption !== targetLocationOption
+    );
+
     // Calculate total usage affected
     const totalUsageAffected = addressesToMerge.reduce((sum, addr) => {
       const sessionCount = addr.SessionAddresses_aggregate?.aggregate?.count || 0;
@@ -99,24 +105,27 @@ export const MergeLocationAddressesDialog: React.FC<MergeLocationAddressesDialog
       aliasesToMerge,
       addedAliases,
       totalAddressesToDelete: addressesToMerge.length,
+      addressesWithDifferentLocation,
+      hasLocationMismatch: addressesWithDifferentLocation.length > 0,
     };
   }, [selectedTargetAddress, selectedAddresses, data]);
 
   const handleConfirm = () => {
     const targetAddr = data?.LocationAddress?.find((addr) => addr.id === parseInt(selectedTargetAddress, 10));
-    if (targetAddr) {
+    if (targetAddr && mergePreview && !mergePreview.hasLocationMismatch) {
       onConfirm(selectedTargetAddress, targetAddr);
     }
   };
 
   const confirmButtonText = t('bulk_action.merge.confirm_merge');
+  const confirmDisabled = !selectedTargetAddress || (mergePreview?.hasLocationMismatch ?? false);
 
   return (
     <BaseDialog
       open={open}
       onClose={onClose}
       onConfirm={handleConfirm}
-      confirmDisabled={!selectedTargetAddress}
+      confirmDisabled={confirmDisabled}
       confirmText={confirmButtonText}
     >
       <div className="space-y-4">
@@ -183,6 +192,27 @@ export const MergeLocationAddressesDialog: React.FC<MergeLocationAddressesDialog
                       </span>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {mergePreview.hasLocationMismatch && (
+                <div className="pt-2 mt-3 border-t border-gray-200">
+                  <span className="font-medium text-red-600">{t('bulk_action.merge.location_mismatch_warning')}:</span>{' '}
+                  {mergePreview.addressesWithDifferentLocation.length === 1
+                    ? t('bulk_action.merge.location_mismatch_description_one', {
+                        targetLocation: t(`common:location.${mergePreview.targetAddr.locationOption}`),
+                      })
+                    : t('bulk_action.merge.location_mismatch_description_other', {
+                        targetLocation: t(`common:location.${mergePreview.targetAddr.locationOption}`),
+                        count: mergePreview.addressesWithDifferentLocation.length,
+                      })}
+                  <ul className="ml-4 mt-1">
+                    {mergePreview.addressesWithDifferentLocation.map((addr) => (
+                      <li key={addr.id} className="text-red-600">
+                        • {addr.shortLabel} ({t(`common:location.${addr.locationOption}`)})
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
 

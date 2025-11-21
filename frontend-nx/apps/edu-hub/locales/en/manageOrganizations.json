@@ -75,7 +75,15 @@
       "deletion_warning": "Warning",
       "organizations_will_be_deleted_one": "1 organization will be permanently deleted",
       "organizations_will_be_deleted_other": "{{count}} organizations will be permanently deleted",
-      "no_organizations_selected": "No organizations selected for merging"
+      "no_organizations_selected": "No organizations selected for merging",
+      "api_key_warning": "API Key Conflict",
+      "api_key_conflict_description": "Cannot merge: {{count}} organization(s) have API keys defined. Only one organization can have an API key. Please revoke API keys from all but one organization before merging.",
+      "loading_related_data": "Loading related data...",
+      "organization_admins_affected": "Organization admins affected",
+      "funding_organizations_affected": "Course funding relationships affected",
+      "admin_user_id": "User",
+      "course_id": "Course",
+      "and_more": "... and {{count}} more"
     }
   },
   "input": {

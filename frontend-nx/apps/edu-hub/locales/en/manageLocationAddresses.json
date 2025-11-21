@@ -54,7 +54,10 @@
       "deletion_warning": "Warning",
       "addresses_will_be_deleted_one": "1 location address will be permanently deleted",
       "addresses_will_be_deleted_other": "{{count}} location addresses will be permanently deleted",
-      "no_addresses_selected": "No location addresses selected for merging"
+      "no_addresses_selected": "No location addresses selected for merging",
+      "location_mismatch_warning": "Location Mismatch",
+      "location_mismatch_description_one": "Cannot merge: 1 address has a different location option than the target address ({{targetLocation}}). All addresses must have the same location option to merge.",
+      "location_mismatch_description_other": "Cannot merge: {{count}} addresses have a different location option than the target address ({{targetLocation}}). All addresses must have the same location option to merge."
     }
   },
   "error": {

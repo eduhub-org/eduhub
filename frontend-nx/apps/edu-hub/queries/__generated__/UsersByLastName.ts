@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { User_bool_exp, UserOccupation_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
+import { User_bool_exp, User_order_by, UserOccupation_enum, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: UsersByLastName
@@ -129,4 +129,5 @@ export interface UsersByLastNameVariables {
   limit?: number | null;
   offset?: number | null;
   filter?: User_bool_exp | null;
+  order_by?: User_order_by | null;
 }

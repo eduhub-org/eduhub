@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { Course_bool_exp, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
+import { Course_bool_exp, Course_order_by, Weekday_enum, CourseRegistrationType_enum, LocationOption_enum, ProgramType_enum, OrganizationType_enum, CourseStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: AdminCourseList
@@ -535,4 +535,5 @@ export interface AdminCourseListVariables {
   where: Course_bool_exp;
   limit?: number | null;
   offset?: number | null;
+  order_by?: Course_order_by | null;
 }

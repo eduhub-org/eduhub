@@ -5,7 +5,7 @@ export const LOCATION_ADDRESS_LIST = gql`
     $limit: Int = 15
     $offset: Int = 0
     $filter: LocationAddress_bool_exp = {}
-    $order_by: [LocationAddress_order_by!] = {created_at: desc}
+    $order_by: [LocationAddress_order_by!] = {updated_at: desc}
   ) {
     LocationAddress(
       limit: $limit
@@ -169,6 +169,11 @@ export const SESSION_ADDRESSES_BY_LOCATION_ADDRESS_ID = gql`
     SessionAddress(where: { locationAddressId: { _in: $locationAddressIds } }) {
       id
       locationAddressId
+      courseLocationId
+      CourseLocation {
+        id
+        locationOption
+      }
     }
   }
 `;

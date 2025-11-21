@@ -29,6 +29,11 @@ import { UPDATE_SESSION_ADDRESS_LOCATION, UPDATE_COURSE_DEFAULT_SESSION_ADDRESS_
 import { MergeLocationAddressesDialog } from './MergeLocationAddressesDialog';
 import CreatableTagSelector from '../../inputs/CreatableTagSelector';
 import CommonPageHeader from '../../common/CommonPageHeader';
+import {
+  buildExistingAliasesSet,
+  normalizeAndFilterAliases,
+  combineAliases,
+} from '../../../helpers/aliasUtils';
 import { useTableGrid } from '../../common/TableGrid/hooks';
 import { LocationOption_enum } from '../../../__generated__/globalTypes';
 import {
@@ -324,85 +329,156 @@ const ManageLocationAddressesContent: FC = () => {
     async (targetAddressId: string, targetAddress: LocationAddressListLocationAddress) => {
       setMergeDialogOpen(false);
       try {
-        const targetAddressExistingAliases = targetAddress?.aliases || [];
         const addressesToMerge = selectedRowsForBulkAction.filter(
           (addr) => addr.id !== parseInt(targetAddressId, 10)
         );
 
-        // Get all aliases from selected addresses and their shortLabels
-        const aliasesToMerge = addressesToMerge.flatMap((addr) => {
-          const addrAliases = Array.isArray(addr.aliases)
-            ? addr.aliases
-                .filter((alias) => alias != null)
-                .map((alias) => {
-                  if (typeof alias === 'string') return alias;
-                  if (typeof alias === 'object' && alias !== null && 'name' in alias) return alias.name;
-                  return null;
-                })
-                .filter((alias): alias is string => alias !== null)
-            : [];
+        // Build set of address IDs being merged (for conflict checking)
+        const addressIdsBeingMerged = new Set([
+          parseInt(targetAddressId, 10),
+          ...addressesToMerge.map((addr) => addr.id),
+        ]);
 
-          return [...addrAliases, addr.shortLabel];
-        });
+        // Build set of aliases that already exist in other addresses (not being merged)
+        const allAddresses = data?.LocationAddress || [];
+        const existingAliasesInOtherAddresses = buildExistingAliasesSet(
+          allAddresses,
+          addressIdsBeingMerged
+        );
 
-        // Combine existing target aliases with new aliases, removing duplicates
-        const combinedAliases = Array.from(new Set([...targetAddressExistingAliases, ...aliasesToMerge]));
+        // Normalize target address aliases (excluding conflicts)
+        const targetAddressExistingAliases = normalizeAndFilterAliases(
+          targetAddress,
+          existingAliasesInOtherAddresses
+        );
+
+        // Normalize aliases from addresses being merged (including their shortLabels, excluding conflicts)
+        const aliasesToMerge = addressesToMerge.flatMap((addr) =>
+          normalizeAndFilterAliases(addr, existingAliasesInOtherAddresses, [addr.shortLabel])
+        );
+
+        // Combine normalized target aliases with new aliases, removing duplicates
+        const combinedAliases = combineAliases(
+          targetAddressExistingAliases,
+          aliasesToMerge,
+          existingAliasesInOtherAddresses
+        );
 
         // Update aliases first
-        await updateLocationAddressAliases({
-          variables: {
-            id: parseInt(targetAddressId, 10),
-            tags: combinedAliases,
-          },
-        });
+        try {
+          await updateLocationAddressAliases({
+            variables: {
+              id: parseInt(targetAddressId, 10),
+              tags: combinedAliases,
+            },
+          });
+        } catch (aliasError) {
+          console.error('Error updating aliases:', aliasError);
+          throw new Error(`Failed to update aliases: ${aliasError instanceof Error ? aliasError.message : String(aliasError)}`);
+        }
 
         // Get IDs of addresses being merged
         const addressesToMergeIds = addressesToMerge.map((addr) => addr.id);
 
         // Query SessionAddresses that reference addresses being merged
-        const sessionAddressesResult = await fetchSessionAddresses({
-          variables: {
-            locationAddressIds: addressesToMergeIds,
-          },
-        });
+        if (addressesToMergeIds.length > 0) {
+          const sessionAddressesResult = await fetchSessionAddresses({
+            variables: {
+              locationAddressIds: addressesToMergeIds,
+            },
+          });
 
-        // Update SessionAddresses to point to target address
-        if (sessionAddressesResult.data?.SessionAddress) {
-          await Promise.all(
-            sessionAddressesResult.data.SessionAddress.map((sessionAddr: any) =>
-              updateSessionAddressLocation({
-                variables: {
-                  itemId: sessionAddr.id,
-                  locationAddressId: parseInt(targetAddressId, 10),
-                },
-              })
-            )
-          );
-        }
+          // Check for query errors
+          if (sessionAddressesResult.error) {
+            throw new Error(`Failed to fetch SessionAddresses: ${sessionAddressesResult.error.message}`);
+          }
 
-        // Query CourseLocations that reference addresses being merged
-        const courseLocationsResult = await fetchCourseLocations({
-          variables: {
-            locationAddressIds: addressesToMergeIds,
-          },
-        });
+          // Update SessionAddresses to point to target address
+          // Only update SessionAddresses where the CourseLocation's locationOption matches the target address's locationOption
+          if (sessionAddressesResult.data?.SessionAddress && sessionAddressesResult.data.SessionAddress.length > 0) {
+            try {
+              const targetLocationOption = targetAddress.locationOption;
+              const sessionAddressesToUpdate = sessionAddressesResult.data.SessionAddress.filter(
+                (sessionAddr: any) =>
+                  sessionAddr.CourseLocation?.locationOption === targetLocationOption
+              );
 
-        // Update CourseLocations to point to target address
-        if (courseLocationsResult.data?.CourseLocation) {
-          await Promise.all(
-            courseLocationsResult.data.CourseLocation.map((courseLoc: any) =>
-              updateCourseDefaultSessionAddressId({
-                variables: {
-                  itemId: courseLoc.id,
-                  value: parseInt(targetAddressId, 10),
-                },
-              })
-            )
-          );
+              if (sessionAddressesToUpdate.length > 0) {
+                await Promise.all(
+                  sessionAddressesToUpdate.map((sessionAddr: any) =>
+                    updateSessionAddressLocation({
+                      variables: {
+                        itemId: sessionAddr.id,
+                        locationAddressId: parseInt(targetAddressId, 10),
+                      },
+                    })
+                  )
+                );
+              }
+
+              // For SessionAddresses with mismatched locationOptions, set locationAddressId to null
+              const sessionAddressesToNullify = sessionAddressesResult.data.SessionAddress.filter(
+                (sessionAddr: any) =>
+                  sessionAddr.CourseLocation?.locationOption !== targetLocationOption
+              );
+
+              if (sessionAddressesToNullify.length > 0) {
+                await Promise.all(
+                  sessionAddressesToNullify.map((sessionAddr: any) =>
+                    updateSessionAddressLocation({
+                      variables: {
+                        itemId: sessionAddr.id,
+                        locationAddressId: null,
+                      },
+                    })
+                  )
+                );
+              }
+            } catch (sessionError) {
+              console.error('Error updating SessionAddresses:', sessionError);
+              throw new Error(`Failed to update SessionAddresses: ${sessionError instanceof Error ? sessionError.message : String(sessionError)}`);
+            }
+          }
+
+          // Query CourseLocations that reference addresses being merged
+          const courseLocationsResult = await fetchCourseLocations({
+            variables: {
+              locationAddressIds: addressesToMergeIds,
+            },
+          });
+
+          // Check for query errors
+          if (courseLocationsResult.error) {
+            throw new Error(`Failed to fetch CourseLocations: ${courseLocationsResult.error.message}`);
+          }
+
+          // Update CourseLocations to point to target address
+          if (courseLocationsResult.data?.CourseLocation && courseLocationsResult.data.CourseLocation.length > 0) {
+            try {
+              await Promise.all(
+                courseLocationsResult.data.CourseLocation.map((courseLoc: any) =>
+                  updateCourseDefaultSessionAddressId({
+                    variables: {
+                      itemId: courseLoc.id,
+                      value: parseInt(targetAddressId, 10),
+                    },
+                  })
+                )
+              );
+            } catch (courseLocError) {
+              console.error('Error updating CourseLocations:', courseLocError);
+              throw new Error(`Failed to update CourseLocations: ${courseLocError instanceof Error ? courseLocError.message : String(courseLocError)}`);
+            }
+          }
         }
 
         // Delete all selected addresses except the target one
-        await Promise.all(addressesToMerge.map((addr) => deleteLocationAddress({ variables: { id: addr.id } })));
+        try {
+          await Promise.all(addressesToMerge.map((addr) => deleteLocationAddress({ variables: { id: addr.id } })));
+        } catch (deleteError) {
+          console.error('Error deleting location addresses:', deleteError);
+          throw new Error(`Failed to delete location addresses: ${deleteError instanceof Error ? deleteError.message : String(deleteError)}`);
+        }
 
         // Show success notification
         setError(null);
@@ -428,6 +504,7 @@ const ManageLocationAddressesContent: FC = () => {
       fetchSessionAddresses,
       fetchCourseLocations,
       debouncedRefetch,
+      data,
       t,
     ]
   );
