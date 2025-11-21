@@ -111,7 +111,7 @@ export const INSERT_EMAIL_TEMPLATE = gql`
 
 export const GET_DEFAULT_TEMPLATES = gql`
   query GetDefaultTemplates {
-    MailTemplate(where: { courseId: { _eq: -1 } }) {
+    MailTemplate(where: { courseId: { _is_null: true } }) {
       id
       type
       subject

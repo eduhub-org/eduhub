@@ -5687,6 +5687,7 @@ export interface LocationOption_order_by {
  * Boolean expression to filter rows from the table "MailTemplate". All fields are combined with a logical 'AND'.
  */
 export interface MailTemplate_bool_exp {
+  Course?: Course_bool_exp | null;
   _and?: MailTemplate_bool_exp[] | null;
   _not?: MailTemplate_bool_exp | null;
   _or?: MailTemplate_bool_exp[] | null;
@@ -5706,6 +5707,7 @@ export interface MailTemplate_bool_exp {
  * input type for inserting data into table "MailTemplate"
  */
 export interface MailTemplate_insert_input {
+  Course?: Course_obj_rel_insert_input | null;
   bcc?: string | null;
   cc?: string | null;
   content?: string | null;
@@ -5722,6 +5724,7 @@ export interface MailTemplate_insert_input {
  * Ordering options when selecting data from "MailTemplate".
  */
 export interface MailTemplate_order_by {
+  Course?: Course_order_by | null;
   bcc?: order_by | null;
   cc?: order_by | null;
   content?: order_by | null;

@@ -3,8 +3,8 @@ import { FC, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { Page } from '../../../../../components/layout/Page';
 import { useIsAdmin, useIsLoggedIn } from '../../../../../hooks/authentication';
-import { useAdminQuery } from '../../../../../hooks/authedQuery';
-import { useAdminMutation } from '../../../../../hooks/authedMutation';
+import { useRoleQuery } from '../../../../../hooks/authedQuery';
+import { useRoleMutation } from '../../../../../hooks/authedMutation';
 import useTranslation from 'next-translate/useTranslation';
 import Loading from '../../../../../components/common/Loading';
 import { MANAGED_COURSE } from '../../../../../queries/course';
@@ -32,13 +32,13 @@ const CourseEmailTemplates: FC = () => {
   const isValidCourseId = courseIdNumber !== null && Number.isInteger(courseIdNumber) && courseIdNumber > 0;
   const [templatesCreated, setTemplatesCreated] = useState(false);
 
-  const { data, loading, error } = useAdminQuery<ManagedCourse>(MANAGED_COURSE, {
+  const { data, loading, error } = useRoleQuery<ManagedCourse>(MANAGED_COURSE, {
     variables: { id: courseIdNumber || 0 },
     skip: !isValidCourseId,
   });
 
   // Check if course has templates
-  const { data: templatesCountData, refetch: refetchTemplatesCount } = useAdminQuery<GetCourseTemplatesCount>(
+  const { data: templatesCountData, refetch: refetchTemplatesCount } = useRoleQuery<GetCourseTemplatesCount>(
     GET_COURSE_TEMPLATES_COUNT,
     {
       variables: { courseId: courseIdNumber || 0 },
@@ -47,9 +47,9 @@ const CourseEmailTemplates: FC = () => {
   );
 
   // Get default templates
-  const { data: defaultTemplatesData } = useAdminQuery<GetDefaultTemplates>(GET_DEFAULT_TEMPLATES);
+  const { data: defaultTemplatesData } = useRoleQuery<GetDefaultTemplates>(GET_DEFAULT_TEMPLATES);
 
-  const [insertEmailTemplate] = useAdminMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
+  const [insertEmailTemplate] = useRoleMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
     INSERT_EMAIL_TEMPLATE
   );
 

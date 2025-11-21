@@ -47,7 +47,7 @@ export interface UseTableGridProps<V> {
   queryVariables?: V;
   pageSize?: number;
   refetchFilter?: (searchFilter: string) => Record<string, any>;
-  sortColumnMapper?: (columnId: string) => string | null;
+  sortColumnMapper?: (columnId: string) => string | Record<string, any> | null;
 } 
 
 export interface TableGridDeleteButtonProps {

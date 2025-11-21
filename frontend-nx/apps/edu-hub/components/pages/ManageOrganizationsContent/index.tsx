@@ -170,9 +170,9 @@ const ManageOrganizationsContent: FC = () => {
         case 'type':
           return 'type';
         case 'userCount':
-          // For userCount, we can't sort by aggregate directly in Hasura order_by
-          // Return null to skip server-side sorting for this column (falls back to client-side if needed)
-          return null;
+          // Return nested structure for aggregate field sorting
+          // The null placeholder will be replaced with 'asc' or 'desc' by convertSortingToOrderBy
+          return { Users_aggregate: { count: null } };
         default:
           return columnId;
       }
