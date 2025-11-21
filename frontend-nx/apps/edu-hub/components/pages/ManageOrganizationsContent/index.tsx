@@ -33,6 +33,7 @@ import { MergeOrganizationsDialog } from './MergeOrganizationsDialog';
 import { ApiKeyManager } from './ApiKeyManager';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useTableGrid } from '../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 
 type ExpandableRowProps = {
   row: OrganizationList_Organization;
@@ -153,15 +154,14 @@ const ManageOrganizationsContent: FC = () => {
     queryHook: useRoleQuery,
     query: ORGANIZATION_LIST,
     pageSize: pageSize,
-    refetchFilter: (searchFilter) => ({
-      filter: {
-        _or: [
-          { name: { _ilike: `%${searchFilter}%` } },
-          { description: { _ilike: `%${searchFilter}%` } },
-          { aliases: { _contains: searchFilter } },
-        ],
-      },
-    }),
+    refetchFilter: (searchFilter) => {
+      const searchCondition = createMultiWordSearchCondition(searchFilter, ['name', 'description', 'aliases'], {
+        arrayFields: ['aliases'],
+      });
+      return {
+        filter: searchCondition,
+      };
+    },
     sortColumnMapper: (columnId) => {
       // Map column accessorKey to GraphQL field names
       switch (columnId) {

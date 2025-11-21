@@ -13,6 +13,7 @@ import { useRoleQuery } from '../../../hooks/authedQuery';
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useTableGrid } from '../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import { Button } from '../../common/Button';
 
 import {
@@ -204,18 +205,19 @@ const ManageEmailTemplatesContent: FC<ManageEmailTemplatesContentProps> = ({
         ? { courseId: { _eq: filterCourseId } }
         : { courseId: { _is_null: true } },
     },
-    refetchFilter: (searchFilter: string) => ({
-      filter: {
-        _and: [
-          filterCourseId !== null
-            ? { courseId: { _eq: filterCourseId } }
-            : { courseId: { _is_null: true } },
-          {
-            _or: [{ type: { _ilike: `%${searchFilter}%` } }, { subject: { _ilike: `%${searchFilter}%` } }],
-          },
-        ],
-      },
-    }),
+    refetchFilter: (searchFilter: string) => {
+      const searchCondition = createMultiWordSearchCondition(searchFilter, ['type', 'subject']);
+      return {
+        filter: {
+          _and: [
+            filterCourseId !== null
+              ? { courseId: { _eq: filterCourseId } }
+              : { courseId: { _is_null: true } },
+            ...(Object.keys(searchCondition).length > 0 ? [searchCondition] : []),
+          ],
+        },
+      };
+    },
   });
 
   let emailTemplates: EmailTemplateRow[] = data?.MailTemplate || [];

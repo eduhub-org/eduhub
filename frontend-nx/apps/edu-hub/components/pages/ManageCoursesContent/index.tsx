@@ -26,6 +26,7 @@ import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
 
 import TableGrid from '../../common/TableGrid';
 import { useTableGrid } from '../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
 import { GET_COURSE_TEMPLATES_COUNT } from '../../../queries/emailTemplates';
@@ -84,7 +85,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
 
   // Filter state management (single source of truth)
   const [filter, setFilter] = useState<AdminCourseListVariables>({
-    limit: QUERY_LIMIT,
+    limit: 100,
     where: { programId: { _eq: defaultProgramId } },
   });
 
@@ -139,11 +140,11 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     refetchFilter: useCallback(
       (searchTerm: string) => {
         // Return the complete queryVariables including search
-        const searchWhere = searchTerm ? { title: { _ilike: `%${searchTerm}%` } } : {};
+        const searchCondition = createMultiWordSearchCondition(searchTerm, ['title']);
         return {
           where: {
             ...filter.where, // Include current program filter
-            ...searchWhere, // Add search filter
+            ...searchCondition, // Add multi-word search filter
           },
         };
       },
