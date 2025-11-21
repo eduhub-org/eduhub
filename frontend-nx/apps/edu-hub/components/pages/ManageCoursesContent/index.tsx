@@ -31,7 +31,7 @@ import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
 import { GET_COURSE_TEMPLATES_COUNT } from '../../../queries/emailTemplates';
 import ExpandableCourseRow from './ExpandableCourseRow';
 import { useParallelQueries } from '../../../hooks/useParallelQueries';
-import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum, order_by } from '../../../__generated__/globalTypes';
 import useTranslation from 'next-translate/useTranslation';
 import draftPie from '../../../public/images/course/status/draft.svg';
 import readyForPublicationPie from '../../../public/images/course/status/ready-for-publication.svg';
@@ -86,6 +86,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const [filter, setFilter] = useState<AdminCourseListVariables>({
     limit: QUERY_LIMIT,
     where: { programId: { _eq: defaultProgramId } },
+    order_by: { id: order_by.desc },
   });
 
   // Menubar configuration
