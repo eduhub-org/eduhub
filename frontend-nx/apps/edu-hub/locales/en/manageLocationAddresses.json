@@ -8,6 +8,8 @@
     "aliases": "Aliases",
     "locationOption": "Location",
     "usageCount": "Usage Count",
+    "usageCount_one": "Usage",
+    "usageCount_other": "Usages",
     "new_address": "New Address",
     "default_address": "Address details",
     "default_description": "Description"
@@ -34,6 +36,25 @@
     "delete": {
       "label": "Delete",
       "description": "Are you sure you want to delete {{count}} location address(es)?"
+    },
+    "merge": {
+      "label": "Merge location addresses",
+      "title": "Merge Location Addresses",
+      "description": "Select the location address to which the selected addresses should be merged.",
+      "select_target": {
+        "label": "Target address",
+        "placeholder": "Select target address"
+      },
+      "confirm_merge": "Merge Location Addresses",
+      "preview_title": "Merge Preview",
+      "target_address": "Target Address",
+      "addresses_to_merge": "Addresses to merge",
+      "total_usage_affected": "Total usage affected",
+      "aliases_to_add": "Aliases to be added",
+      "deletion_warning": "Warning",
+      "addresses_will_be_deleted_one": "1 location address will be permanently deleted",
+      "addresses_will_be_deleted_other": "{{count}} location addresses will be permanently deleted",
+      "no_addresses_selected": "No location addresses selected for merging"
     }
   },
   "error": {
@@ -42,6 +63,7 @@
     "alias_update_failed": "Failed to update aliases",
     "duplicate_location_address": "A location address with this short label already exists for this location option",
     "bulk_delete_failed": "Failed to delete location addresses",
+    "merge_failed": "Error merging location addresses",
     "unexpected": "An unexpected error occurred"
   },
   "type_selection": {

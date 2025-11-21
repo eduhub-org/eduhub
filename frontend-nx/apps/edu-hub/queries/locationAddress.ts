@@ -163,3 +163,21 @@ export const LOCATION_ADDRESSES_BY_IDS = gql`
     }
   }
 `;
+
+export const SESSION_ADDRESSES_BY_LOCATION_ADDRESS_ID = gql`
+  query SessionAddressesByLocationAddressId($locationAddressIds: [Int!]!) {
+    SessionAddress(where: { locationAddressId: { _in: $locationAddressIds } }) {
+      id
+      locationAddressId
+    }
+  }
+`;
+
+export const COURSE_LOCATIONS_BY_DEFAULT_SESSION_ADDRESS_ID = gql`
+  query CourseLocationsByDefaultSessionAddressId($locationAddressIds: [Int!]!) {
+    CourseLocation(where: { defaultSessionAddressId: { _in: $locationAddressIds } }) {
+      id
+      defaultSessionAddressId
+    }
+  }
+`;
