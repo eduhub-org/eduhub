@@ -48,12 +48,14 @@ export const DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS = gql`
     $limit: Int = 15
     $offset: Int = 0
     $filter: CourseEnrollment_bool_exp = {}
+    $order_by: [CourseEnrollment_order_by!] = {updated_at: desc}
   ) {
     Course_by_pk(id: $degreeCourseId) {
       CourseEnrollments(
         limit: $limit
         offset: $offset
         where: $filter
+        order_by: $order_by
       ) {
         id
         status

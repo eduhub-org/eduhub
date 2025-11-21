@@ -381,7 +381,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
               marginBottom: '4px',
             }}
           >
-            {t(label)}
+            {label}
           </div>
         )}
         {renderImageUpload(
@@ -405,7 +405,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
 
   const renderMaterialUI = () => (
     <div className="col-span-10 flex flex-col mt-3">
-      {label && <label className="mb-2">{t(label)}</label>}
+      {label && <label className="mb-2">{label}</label>}
       <div className="flex items-center">
         <input
           ref={fileInputRef}

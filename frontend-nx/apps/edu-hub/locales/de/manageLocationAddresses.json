@@ -8,6 +8,8 @@
     "aliases": "Aliase",
     "locationOption": "Standort",
     "usageCount": "Verwendungen",
+    "usageCount_one": "Verwendung",
+    "usageCount_other": "Verwendungen",
     "new_address": "Neue Adresse",
     "default_address": "Adressdetails",
     "default_description": "Beschreibung"
@@ -34,6 +36,28 @@
     "delete": {
       "label": "Löschen",
       "description": "Bist du sicher, dass du {{count}} Standortadresse(n) löschen möchtest?"
+    },
+    "merge": {
+      "label": "Standortadressen zusammenführen",
+      "title": "Standortadressen zusammenführen",
+      "description": "Wähle die Standortadresse aus, zu der die ausgewählten Adressen zusammengeführt werden sollen.",
+      "select_target": {
+        "label": "Zieladresse",
+        "placeholder": "Zieladresse auswählen"
+      },
+      "confirm_merge": "Standortadressen zusammenführen",
+      "preview_title": "Zusammenführungsvorschau",
+      "target_address": "Zieladresse",
+      "addresses_to_merge": "Zusammenzuführende Adressen",
+      "total_usage_affected": "Insgesamt betroffene Verwendungen",
+      "aliases_to_add": "Hinzuzufügende Aliase",
+      "deletion_warning": "Warnung",
+      "addresses_will_be_deleted_one": "1 Standortadresse wird dauerhaft gelöscht",
+      "addresses_will_be_deleted_other": "{{count}} Standortadressen werden dauerhaft gelöscht",
+      "no_addresses_selected": "Keine Standortadressen für die Zusammenführung ausgewählt",
+      "location_mismatch_warning": "Standort-Konflikt",
+      "location_mismatch_description_one": "Zusammenführung nicht möglich: 1 Adresse hat eine andere Standortoption als die Zieladresse ({{targetLocation}}). Alle Adressen müssen die gleiche Standortoption haben, um zusammengeführt zu werden.",
+      "location_mismatch_description_other": "Zusammenführung nicht möglich: {{count}} Adressen haben eine andere Standortoption als die Zieladresse ({{targetLocation}}). Alle Adressen müssen die gleiche Standortoption haben, um zusammengeführt zu werden."
     }
   },
   "error": {
@@ -42,6 +66,7 @@
     "alias_update_failed": "Fehler beim Aktualisieren der Aliase",
     "duplicate_location_address": "Eine Standortadresse mit diesem kurzen Label existiert bereits für diese Standortoption",
     "bulk_delete_failed": "Fehler beim Löschen der Standortadressen",
+    "merge_failed": "Fehler beim Zusammenführen der Standortadressen",
     "unexpected": "Ein unerwarteter Fehler ist aufgetreten"
   },
   "type_selection": {

@@ -28,6 +28,7 @@ const CourseListDialog: FC<IProps> = (props) => {
     props.onClose(false, null);
   }, [props]);
 
+  // Uses default order_by: {updated_at: desc} from ADMIN_COURSE_LIST query
   const courseListRequest = useAdminQuery<AdminCourseList, AdminCourseListVariables>(ADMIN_COURSE_LIST, {
     variables: {
       limit: QUERY_LIMIT,
