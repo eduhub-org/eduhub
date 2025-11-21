@@ -263,7 +263,9 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
                     {organizationAdmins.slice(0, 5).map((admin: any) => {
                       const userName = admin.User
                         ? `${admin.User.firstName} ${admin.User.lastName}`.trim() || admin.User.email
-                        : admin.userId.substring(0, 8) + '...';
+                        : admin.userId != null
+                          ? String(admin.userId).substring(0, 8) + '...'
+                          : t('bulk_action.merge.unknown_user') || 'Unknown user';
                       return <li key={admin.id}>• {userName}</li>;
                     })}
                     {organizationAdmins.length > 5 && (
