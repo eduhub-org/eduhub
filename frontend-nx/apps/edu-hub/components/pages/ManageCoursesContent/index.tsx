@@ -26,12 +26,13 @@ import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
 
 import TableGrid from '../../common/TableGrid';
 import { useTableGrid } from '../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
 import { GET_COURSE_TEMPLATES_COUNT } from '../../../queries/emailTemplates';
 import ExpandableCourseRow from './ExpandableCourseRow';
 import { useParallelQueries } from '../../../hooks/useParallelQueries';
-import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
+import { CourseEnrollmentStatus_enum, order_by } from '../../../__generated__/globalTypes';
 import useTranslation from 'next-translate/useTranslation';
 import draftPie from '../../../public/images/course/status/draft.svg';
 import readyForPublicationPie from '../../../public/images/course/status/ready-for-publication.svg';
@@ -84,8 +85,9 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
 
   // Filter state management (single source of truth)
   const [filter, setFilter] = useState<AdminCourseListVariables>({
-    limit: QUERY_LIMIT,
+    limit: 100,
     where: { programId: { _eq: defaultProgramId } },
+    order_by: { id: order_by.desc },
   });
 
   // Menubar configuration
@@ -139,11 +141,11 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     refetchFilter: useCallback(
       (searchTerm: string) => {
         // Return the complete queryVariables including search
-        const searchWhere = searchTerm ? { title: { _ilike: `%${searchTerm}%` } } : {};
+        const searchCondition = createMultiWordSearchCondition(searchTerm, ['title']);
         return {
           where: {
             ...filter.where, // Include current program filter
-            ...searchWhere, // Add search filter
+            ...searchCondition, // Add multi-word search filter
           },
         };
       },

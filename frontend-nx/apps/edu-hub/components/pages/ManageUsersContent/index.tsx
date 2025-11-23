@@ -5,6 +5,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 import { useTableGrid } from '../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { USERS_BY_LAST_NAME, DELETE_USER } from '../../../queries/user';
@@ -60,15 +61,12 @@ const ManageUsersContent: FC = () => {
     queryHook: useAdminQuery,
     query: USERS_BY_LAST_NAME,
     pageSize: pageSize,
-    refetchFilter: (searchFilter) => ({
-      filter: {
-        _or: [
-          { lastName: { _ilike: `%${searchFilter}%` } },
-          { firstName: { _ilike: `%${searchFilter}%` } },
-          { email: { _ilike: `%${searchFilter}%` } },
-        ],
-      },
-    }),
+    refetchFilter: (searchFilter) => {
+      const searchCondition = createMultiWordSearchCondition(searchFilter, ['lastName', 'firstName', 'email']);
+      return {
+        filter: searchCondition,
+      };
+    },
   });
 
   const columns = useMemo<ColumnDef<UsersByLastName_User>[]>(

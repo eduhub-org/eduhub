@@ -5,7 +5,7 @@ export const ACHIEVEMENT_DOCUMENTATION_TEMPLATES = gql`
     $limit: Int = 15
     $offset: Int = 0
     $filter: AchievementDocumentationTemplate_bool_exp = {}
-    $order_by: [AchievementDocumentationTemplate_order_by!] = {title: asc}
+    $order_by: [AchievementDocumentationTemplate_order_by!] = {updated_at: desc}
   ) {
     AchievementDocumentationTemplate(
       limit: $limit

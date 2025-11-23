@@ -26,4 +26,18 @@ export const DELETE_COURSE_FUNDING_ORGANIZATION = gql`
       affected_rows
     }
   }
+`;
+
+export const COURSE_FUNDING_ORGANIZATIONS_BY_ORGANIZATION_ID = gql`
+  query CourseFundingOrganizationsByOrganizationId($organizationIds: [Int!]!) {
+    CourseFundingOrganization(where: { organizationId: { _in: $organizationIds } }) {
+      id
+      organizationId
+      courseId
+      Course {
+        id
+        title
+      }
+    }
+  }
 `; 

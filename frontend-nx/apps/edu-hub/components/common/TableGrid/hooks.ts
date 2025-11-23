@@ -1,18 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
-import { DocumentNode } from '@apollo/client';
 import { SortingState } from '@tanstack/react-table';
-import { BaseRow, BulkAction } from './types';
-
-interface UseTableGridProps<V> {
-  queryHook: any; // useRoleQuery or useAdminQuery
-  query: DocumentNode;
-  queryVariables?: V;
-  pageSize?: number;
-  debounceMs?: number; // Configurable debounce time in milliseconds
-  refetchFilter?: (searchFilter: string) => Record<string, any>;
-  sortColumnMapper?: (columnId: string) => string | Record<string, any> | null; // Maps column accessorKey to GraphQL field name or nested structure
-}
+import { BaseRow, BulkAction, UseTableGridProps } from './types';
 
 /**
  * Recursively merges sort direction into a nested object structure, replacing null values
@@ -93,15 +82,19 @@ export function useTableGrid<V>({
   debounceMs = 300, // Default to 300ms
   refetchFilter,
   sortColumnMapper,
+  defaultSort = [{ updated_at: 'desc' }], // Default to updated_at desc if not specified
 }: UseTableGridProps<V>) {
   const [searchFilter, setSearchFilter] = useState('');
   const [pageIndex, setPageIndex] = useState(0);
   const [sorting, setSorting] = useState<SortingState>([]);
 
   // Convert sorting state to Hasura order_by format
+  // Use defaultSort when no user sorting is applied
   const orderBy = useMemo(() => {
-    return convertSortingToOrderBy(sorting, sortColumnMapper);
-  }, [sorting, sortColumnMapper]);
+    const userSort = convertSortingToOrderBy(sorting, sortColumnMapper);
+    // If user has applied sorting, use it; otherwise use defaultSort
+    return userSort.length > 0 ? userSort : (defaultSort || []);
+  }, [sorting, sortColumnMapper, defaultSort]);
 
   const queryResult = queryHook(query, {
     variables: {

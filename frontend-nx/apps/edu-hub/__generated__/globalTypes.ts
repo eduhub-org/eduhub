@@ -3776,6 +3776,15 @@ export interface CourseEnrollmentStatus_on_conflict {
   where?: CourseEnrollmentStatus_bool_exp | null;
 }
 
+/**
+ * Ordering options when selecting data from "CourseEnrollmentStatus".
+ */
+export interface CourseEnrollmentStatus_order_by {
+  CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
 export interface CourseEnrollment_aggregate_bool_exp {
   count?: CourseEnrollment_aggregate_bool_exp_count | null;
 }
@@ -3902,6 +3911,27 @@ export interface CourseEnrollment_on_conflict {
   constraint: CourseEnrollment_constraint;
   update_columns: CourseEnrollment_update_column[];
   where?: CourseEnrollment_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "CourseEnrollment".
+ */
+export interface CourseEnrollment_order_by {
+  Course?: Course_order_by | null;
+  CourseEnrollmentStatus?: CourseEnrollmentStatus_order_by | null;
+  MotivationRating?: MotivationRating_order_by | null;
+  User?: User_order_by | null;
+  achievementCertificateURL?: order_by | null;
+  attendanceCertificateURL?: order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  invitationExpirationDate?: order_by | null;
+  motivationLetter?: order_by | null;
+  motivationRating?: order_by | null;
+  status?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
 }
 
 /**
@@ -5785,6 +5815,15 @@ export interface MotivationRating_on_conflict {
   constraint: MotivationRating_constraint;
   update_columns: MotivationRating_update_column[];
   where?: MotivationRating_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "MotivationRating".
+ */
+export interface MotivationRating_order_by {
+  Enrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
 }
 
 export interface OrganizationAdmin_aggregate_bool_exp {

@@ -5,6 +5,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 import { useTableGrid } from '../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
@@ -121,16 +122,17 @@ const ManageAdminUsersContent: FC = () => {
     queryHook: useAdminQuery,
     query: ORGANIZATION_ADMIN_LIST,
     pageSize: 15,
-    refetchFilter: (searchFilter) => ({
-      filter: {
-        _or: [
-          { User: { lastName: { _ilike: `%${searchFilter}%` } } },
-          { User: { firstName: { _ilike: `%${searchFilter}%` } } },
-          { User: { email: { _ilike: `%${searchFilter}%` } } },
-          { Organization: { name: { _ilike: `%${searchFilter}%` } } },
-        ],
-      },
-    }),
+    refetchFilter: (searchFilter) => {
+      const searchCondition = createMultiWordSearchCondition(searchFilter, [
+        'User.lastName',
+        'User.firstName',
+        'User.email',
+        'Organization.name',
+      ]);
+      return {
+        filter: searchCondition,
+      };
+    },
   });
 
   const columns = useMemo<ColumnDef<OrganizationAdminList_OrganizationAdmin>[]>(
