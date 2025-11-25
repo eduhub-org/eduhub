@@ -1,11 +1,12 @@
 import KcAdminClient from "@keycloak/keycloak-admin-client";
 import { GraphQLClient, gql } from 'graphql-request';
 import { queueEmail } from '../lib/queueEmail.js';
+import { createVariableReplacer } from '../emailTemplateVariables.js';
 import { logger } from '../index.js';
 
 /**
  * Creates a new user in both Keycloak and Hasura
- * Schedules welcome email to be sent overnight
+ * Optionally sends welcome email immediately if sendEmail is true
  * 
  * @param {Object} req - Request object from Hasura action
  * @param {Object} logger - Winston logger instance
@@ -15,7 +16,7 @@ export default async function createUser(req, logger) {
   logger.info("########## Create User ##########");
   logger.debug(`Request body: ${JSON.stringify(req.body)}`);
 
-  const { firstName, lastName, email } = req.body.input;
+  const { firstName, lastName, email, sendEmail } = req.body.input;
 
   // Validate input
   if (!firstName || !lastName || !email) {
@@ -161,41 +162,59 @@ export default async function createUser(req, logger) {
       }
     }
 
-    // Schedule welcome email to be sent overnight (next day at 2 AM)
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(2, 0, 0, 0); // 2 AM next day
-    const scheduledAt = tomorrow;
-
     const portalUrl = process.env.FRONTEND_URL || 'https://edu.opencampus.sh';
 
-    // Queue the welcome email
-    const emailResult = await queueEmail({
-      templateType: 'USER_CREATED',
-      recipientEmail: email,
-      replacerData: {
+    let emailQueued = false;
+    
+    // Queue the welcome email only if sendEmail is true
+    if (sendEmail) {
+      // Create variable replacer function
+      const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('de-DE', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      };
+
+      const variableReplacer = createVariableReplacer({
         user: { firstName, lastName },
         passwordResetLink,
         portalUrl
-      },
-      status: 'SCHEDULED',
-      scheduledAt: scheduledAt,
-      logger: logger
-    });
+      }, formatDate);
 
-    if (!emailResult.success) {
-      logger.error(`Failed to queue welcome email: ${emailResult.error}`);
-      // Don't fail the user creation if email queuing fails
-    } else {
-      logger.info(`Queued welcome email for user ${email}, scheduled for ${scheduledAt.toISOString()}`);
+      // Also handle custom template variables for password reset link and portal URL
+      const customReplacer = (text) => {
+        if (!text) return text;
+        let result = variableReplacer(text);
+        result = result.replaceAll('{{passwordResetLink}}', passwordResetLink);
+        result = result.replaceAll('{{portalUrl}}', portalUrl);
+        return result;
+      };
+
+      const emailResult = await queueEmail({
+        templateType: 'USER_CREATED',
+        variableReplacer: customReplacer,
+        recipientEmail: email,
+        courseId: null,
+        client: graphqlClient,
+        logger: logger
+      });
+
+      if (!emailResult.success) {
+        logger.error(`Failed to queue welcome email: ${emailResult.error}`);
+        // Don't fail the user creation if email queuing fails
+      } else {
+        emailQueued = true;
+        logger.info(`Queued welcome email for user ${email}`);
+      }
     }
 
     return {
       success: true,
       userId: hasuraUserId,
       keycloakUserId: keycloakUserId,
-      emailQueued: emailResult.success,
-      scheduledAt: scheduledAt.toISOString(),
+      emailQueued: emailQueued,
       messageKey: 'CREATE_USER_SUCCESS'
     };
 

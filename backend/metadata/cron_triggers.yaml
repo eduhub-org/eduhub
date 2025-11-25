@@ -39,19 +39,3 @@
 #     - name: Hasura-Secret
 #       value_from_env: HASURA_CLOUD_FUNCTION_SECRET
 #   comment: Automatically send session reminder emails every 15 minutes (DISABLED - commented out)
-- name: process_scheduled_emails
-  webhook: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
-  schedule: '0 2 * * *'
-  include_in_metadata: true
-  payload: {}
-  retry_conf:
-    num_retries: 3
-    retry_interval_seconds: 60
-    timeout_seconds: 600
-    tolerance_seconds: 3600
-  headers:
-    - name: Function-Name
-      value: processScheduledEmails
-    - name: Hasura-Secret
-      value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-  comment: Process scheduled emails daily at 2 AM

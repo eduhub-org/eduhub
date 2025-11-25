@@ -1,7 +1,7 @@
 const { gql, GraphQLClient } = require('graphql-request');
 
 /**
- * Generic function to queue emails with optional scheduling
+ * Generic function to queue emails
  * Handles template fetching, variable replacement, and MailLog insertion
  * 
  * @param {Object} params - Email queueing parameters
@@ -9,7 +9,6 @@ const { gql, GraphQLClient } = require('graphql-request');
  * @param {Function} params.variableReplacer - Function to replace template variables
  * @param {string} params.recipientEmail - Recipient email address
  * @param {number|null} params.courseId - Optional course ID for course-specific templates
- * @param {Date|null} params.scheduledAt - Optional scheduled send time (for delayed emails)
  * @param {GraphQLClient} params.client - GraphQL client instance
  * @param {Object} params.logger - Logger instance
  * @returns {Promise<Object>} Result with mailId and success status
@@ -19,7 +18,6 @@ async function queueEmail({
   variableReplacer,
   recipientEmail,
   courseId = null,
-  scheduledAt = null,
   client,
   logger
 }) {
@@ -108,7 +106,6 @@ async function queueEmail({
         $cc: String
         $bcc: String
         $status: String!
-        $scheduledAt: timestamptz
       ) {
         insert_MailLog_one(
           object: {
@@ -119,7 +116,6 @@ async function queueEmail({
             cc: $cc
             bcc: $bcc
             status: $status
-            scheduledAt: $scheduledAt
           }
         ) {
           id
@@ -134,17 +130,15 @@ async function queueEmail({
       to: recipientEmail,
       cc: template.cc,
       bcc: template.bcc,
-      status: 'UNSENT',
-      scheduledAt: scheduledAt ? scheduledAt.toISOString() : null
+      status: 'READY_TO_SEND'
     });
 
-    logger.info(`Email queued: template=${templateType}, recipient=${recipientEmail}, scheduledAt=${scheduledAt || 'immediate'}, mailId=${mailResult.insert_MailLog_one.id}`);
+    logger.info(`Email queued: template=${templateType}, recipient=${recipientEmail}, mailId=${mailResult.insert_MailLog_one.id}`);
     
     return {
       success: true,
       messageKey: 'EMAIL_QUEUED_SUCCESS',
-      mailId: mailResult.insert_MailLog_one.id,
-      scheduledAt: scheduledAt
+      mailId: mailResult.insert_MailLog_one.id
     };
 
   } catch (error) {

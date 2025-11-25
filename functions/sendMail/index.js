@@ -14,24 +14,7 @@ exports.sendMail = async (req, res) => {
   }
 
   // Extract email parameters from the Hasura event payload
-  const { subject, content, to, replyTo, cc, bcc, scheduledAt } = req.body.event.data.new;
-  
-  // Check if email is scheduled for future sending
-  if (scheduledAt) {
-    const scheduledTime = new Date(scheduledAt);
-    const now = new Date();
-    
-    if (scheduledTime > now) {
-      // Email is scheduled for future, skip sending now
-      console.log(`Email scheduled for ${scheduledAt}, skipping immediate send`);
-      return res.json({ 
-        success: true, 
-        skipped: true, 
-        reason: 'scheduled',
-        scheduledAt 
-      });
-    }
-  }
+  const { subject, content, to, replyTo, cc, bcc } = req.body.event.data.new;
   
   // Get mail tag from headers or use default
   const mailTag = req.headers.mailTag || 'eduhub'; // default if not provided

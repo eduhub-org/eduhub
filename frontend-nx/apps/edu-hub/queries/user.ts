@@ -215,13 +215,12 @@ export const USER_OCCUPATION = gql`
 `;
 
 export const CREATE_USER = gql`
-  mutation CreateUser($firstName: String!, $lastName: String!, $email: String!) {
-    createUser(firstName: $firstName, lastName: $lastName, email: $email) {
+  mutation CreateUser($firstName: String!, $lastName: String!, $email: String!, $sendEmail: Boolean!) {
+    createUser(firstName: $firstName, lastName: $lastName, email: $email, sendEmail: $sendEmail) {
       success
       userId
       keycloakUserId
       emailQueued
-      scheduledAt
       error
       messageKey
     }

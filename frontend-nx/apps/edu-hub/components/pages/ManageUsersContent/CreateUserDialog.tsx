@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dialog, DialogTitle } from '@mui/material';
+import { Dialog, DialogTitle, Checkbox, FormControlLabel } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import { Button } from '../../common/Button';
 import InputField from '../../inputs/InputField';
@@ -24,6 +24,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [sendEmail, setSendEmail] = useState(true); // Default to true
   const [error, setError] = useState<string | null>(null);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
 
@@ -35,6 +36,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
         setFirstName('');
         setLastName('');
         setEmail('');
+        setSendEmail(true);
         // Close dialog after a short delay
         setTimeout(() => {
           onClose();
@@ -81,6 +83,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim().toLowerCase(),
+        sendEmail: sendEmail,
       },
     });
   };
@@ -90,6 +93,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
       setFirstName('');
       setLastName('');
       setEmail('');
+      setSendEmail(true);
       setError(null);
       onClose();
     }
@@ -161,13 +165,22 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
               />
             </div>
 
+            <div className="mt-4">
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={sendEmail}
+                    onChange={(e) => setSendEmail(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label={t('send_welcome_email')}
+              />
+            </div>
+
             {error && (
               <div className="text-red-600 text-sm mt-2">{error}</div>
             )}
-
-            <div className="text-sm text-gray-600 mt-4">
-              {t('email_scheduled_notice')}
-            </div>
           </div>
 
           <div className="flex justify-end gap-2">
