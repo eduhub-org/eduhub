@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Dialog, DialogTitle } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import { Button } from '../Button';
 import useTranslation from 'next-translate/useTranslation';
@@ -30,7 +30,20 @@ export const BaseDialog: React.FC<BaseDialogProps> = ({
   const { t } = useTranslation();
 
   return (
-    <Dialog open={open} onClose={onClose} aria-labelledby="confirmation-dialog-title" maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      aria-labelledby="confirmation-dialog-title"
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          maxHeight: '90vh',
+          display: 'flex',
+          flexDirection: 'column',
+        },
+      }}
+    >
       <DialogTitle id="confirmation-dialog-title">
         <div className="flex justify-between items-center">
           <span>{t('confirmation')}</span>
@@ -44,9 +57,25 @@ export const BaseDialog: React.FC<BaseDialogProps> = ({
         </div>
       </DialogTitle>
 
-      <div className="px-6 pb-6">
-        <div className="mb-8 whitespace-pre-line">{children}</div>
-        <div className="grid grid-cols-2">
+      <DialogContent
+        sx={{
+          overflowY: 'auto',
+          flex: '1 1 auto',
+          px: 3,
+        }}
+      >
+        <div className="whitespace-pre-line">{children}</div>
+      </DialogContent>
+
+      <DialogActions
+        sx={{
+          px: 3,
+          pb: 2,
+          pt: 1,
+          flexShrink: 0,
+        }}
+      >
+        <div className="grid grid-cols-2 w-full gap-2">
           {showCancel && (
             <div>
               <Button onClick={onCancel || onClose}>{cancelText || t('cancel')}</Button>
@@ -58,7 +87,7 @@ export const BaseDialog: React.FC<BaseDialogProps> = ({
             </Button>
           </div>
         </div>
-      </div>
+      </DialogActions>
     </Dialog>
   );
 };

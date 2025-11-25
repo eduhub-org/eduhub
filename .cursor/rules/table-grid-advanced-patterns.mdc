@@ -150,6 +150,78 @@ const { searchFilter, setSearchFilter } = useTableGrid({
 });
 ```
 
+### Multi-Word Search:
+
+The `createMultiWordSearchCondition` utility function splits search queries by whitespace and ensures each word matches individually. This allows users to search for "john doe" and find results where "john" and "doe" appear anywhere in the searched fields (not necessarily together).
+
+**Utility Function**: `frontend-nx/apps/edu-hub/components/common/TableGrid/utils.ts`
+
+#### Multi-Field Multi-Word Search:
+
+```typescript
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
+
+const { searchFilter, setSearchFilter } = useTableGrid({
+  queryHook: useAdminQuery,
+  query: USER_LIST,
+  refetchFilter: (searchFilter) => {
+    const searchCondition = createMultiWordSearchCondition(searchFilter, ['firstName', 'lastName', 'email']);
+    return {
+      filter: searchCondition,
+    };
+  },
+});
+```
+
+**How it works**: Searching "john doe" will match records where:
+- "john" appears in firstName, lastName, or email AND
+- "doe" appears in firstName, lastName, or email
+
+The search is case-insensitive and uses PostgreSQL's `_ilike` operator.
+
+#### Single-Field Multi-Word Search:
+
+```typescript
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
+
+const { searchFilter, setSearchFilter } = useTableGrid({
+  queryHook: useAdminQuery,
+  query: COURSE_LIST,
+  refetchFilter: (searchFilter) => {
+    const searchCondition = createMultiWordSearchCondition(searchFilter, ['title']);
+    return {
+      where: searchCondition,
+    };
+  },
+});
+```
+
+**How it works**: Searching "machine learning" will match records where the title field contains both "machine" AND "learning" (case-insensitive).
+
+#### Combining Multi-Word Search with Other Filters:
+
+```typescript
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
+
+const { searchFilter, setSearchFilter } = useTableGrid({
+  queryHook: useAdminQuery,
+  query: USER_LIST,
+  queryVariables: { programId: selectedProgramId },
+  refetchFilter: useCallback(
+    (searchFilter) => {
+      const searchCondition = createMultiWordSearchCondition(searchFilter, ['firstName', 'lastName', 'email']);
+      return {
+        where: {
+          programId: { _eq: selectedProgramId },
+          ...searchCondition,
+        },
+      };
+    },
+    [selectedProgramId]
+  ),
+});
+```
+
 ### Complex Filtering with Multiple Conditions:
 
 ```typescript

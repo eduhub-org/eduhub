@@ -5,7 +5,7 @@ export const LOCATION_ADDRESS_LIST = gql`
     $limit: Int = 15
     $offset: Int = 0
     $filter: LocationAddress_bool_exp = {}
-    $order_by: [LocationAddress_order_by!] = {created_at: desc}
+    $order_by: [LocationAddress_order_by!] = {updated_at: desc}
   ) {
     LocationAddress(
       limit: $limit
@@ -160,6 +160,29 @@ export const LOCATION_ADDRESSES_BY_IDS = gql`
       shortLabel
       address
       locationOption
+    }
+  }
+`;
+
+export const SESSION_ADDRESSES_BY_LOCATION_ADDRESS_ID = gql`
+  query SessionAddressesByLocationAddressId($locationAddressIds: [Int!]!) {
+    SessionAddress(where: { locationAddressId: { _in: $locationAddressIds } }) {
+      id
+      locationAddressId
+      courseLocationId
+      CourseLocation {
+        id
+        locationOption
+      }
+    }
+  }
+`;
+
+export const COURSE_LOCATIONS_BY_DEFAULT_SESSION_ADDRESS_ID = gql`
+  query CourseLocationsByDefaultSessionAddressId($locationAddressIds: [Int!]!) {
+    CourseLocation(where: { defaultSessionAddressId: { _in: $locationAddressIds } }) {
+      id
+      defaultSessionAddressId
     }
   }
 `;

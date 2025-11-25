@@ -104,6 +104,29 @@ export const useAdminQuery: typeof useQuery = (query, passedOptions) => {
   return useQuery(query, { ...options, onError: errorHandler });
 };
 
+export const useAdminLazyQuery: typeof useLazyQuery = (query, passedOptions) => {
+  const { data } = useSession();
+  const accessToken = data?.accessToken;
+
+  const options = accessToken
+    ? {
+        ...passedOptions,
+        context: {
+          ...passedOptions?.context,
+          headers: {
+            ...passedOptions?.context?.headers,
+            'x-hasura-role': AuthRoles.admin,
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      }
+    : passedOptions;
+
+  const errorHandler = useErrorHandler();
+
+  return useLazyQuery(query, { ...options, onError: errorHandler });
+};
+
 export const useInstructorQuery: typeof useQuery = (query, passedOptions) => {
   const { data } = useSession();
   const accessToken = data?.accessToken;

@@ -38,9 +38,10 @@ export const ADMIN_COURSE_LIST = gql`
     $where: Course_bool_exp! = {}
     $limit: Int = null
     $offset: Int = 0
+    $order_by: [Course_order_by!] = [{updated_at: desc}]
   ) {
     Course(
-      order_by: { id: desc }
+      order_by: $order_by
       where: $where
       limit: $limit
       offset: $offset
