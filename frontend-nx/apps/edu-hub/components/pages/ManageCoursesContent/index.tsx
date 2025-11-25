@@ -87,7 +87,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const [filter, setFilter] = useState<AdminCourseListVariables>({
     limit: 100,
     where: { programId: { _eq: defaultProgramId } },
-    order_by: { id: order_by.desc },
+    order_by: [{ id: order_by.desc }],
   });
 
   // Menubar configuration

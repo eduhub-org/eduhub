@@ -129,5 +129,5 @@ export interface UsersByLastNameVariables {
   limit?: number | null;
   offset?: number | null;
   filter?: User_bool_exp | null;
-  order_by?: User_order_by | null;
+  order_by?: User_order_by[] | null;
 }
