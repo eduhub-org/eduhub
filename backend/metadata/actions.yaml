@@ -251,6 +251,18 @@ actions:
           value_from_env: HASURA_BUCKET
         - name: name
           value: setUserAdmin
+  - name: createUser
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: createUser
+    permissions:
+      - role: admin-ras
+    comment: Creates a new user in Keycloak and Hasura, schedules welcome email
 custom_types:
   enums: []
   input_objects: []
@@ -282,4 +294,5 @@ custom_types:
     - name: resizedImagePath
     - name: SendSessionRemindersResult
     - name: ProcessedSession
+    - name: CreateUserResult
   scalars: []

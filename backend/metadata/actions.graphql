@@ -123,6 +123,24 @@ type Mutation {
   ): UpdateAdminStatusResult!
 }
 
+type Mutation {
+  createUser(
+    firstName: String!
+    lastName: String!
+    email: String!
+  ): CreateUserResult!
+}
+
+type CreateUserResult {
+  success: Boolean!
+  userId: uuid
+  keycloakUserId: String
+  emailQueued: Boolean
+  scheduledAt: String
+  error: String
+  messageKey: String!
+}
+
 type loadFileOutput {
   link: String!
 }

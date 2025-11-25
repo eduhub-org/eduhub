@@ -27,6 +27,7 @@ insert_permissions:
         - templateId
         - from
         - subject
+        - scheduledAt
 select_permissions:
   - role: admin-ras
     permission:
@@ -42,6 +43,7 @@ select_permissions:
         - templateId
         - from
         - subject
+        - scheduledAt
       filter: {}
 update_permissions:
   - role: admin-ras
@@ -58,6 +60,7 @@ update_permissions:
         - templateId
         - from
         - subject
+        - scheduledAt
       filter: {}
       check: {}
 delete_permissions:

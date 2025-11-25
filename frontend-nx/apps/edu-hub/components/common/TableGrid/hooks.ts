@@ -3,6 +3,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { DocumentNode } from '@apollo/client';
 import { SortingState } from '@tanstack/react-table';
 import { BaseRow, BulkAction } from './types';
+import { mergeSortDirection } from './utils';
 
 interface UseTableGridProps<V> {
   queryHook: any; // useRoleQuery or useAdminQuery
@@ -12,31 +13,6 @@ interface UseTableGridProps<V> {
   debounceMs?: number; // Configurable debounce time in milliseconds
   refetchFilter?: (searchFilter: string) => Record<string, any>;
   sortColumnMapper?: (columnId: string) => string | Record<string, any> | null; // Maps column accessorKey to GraphQL field name or nested structure
-}
-
-/**
- * Recursively merges sort direction into a nested object structure, replacing null values
- * @param obj - The nested object structure from sortColumnMapper
- * @param direction - The sort direction ('asc' or 'desc')
- * @returns The object with direction filled in
- */
-function mergeSortDirection(obj: Record<string, any>, direction: string): Record<string, any> {
-  const result: Record<string, any> = {};
-  
-  for (const [key, value] of Object.entries(obj)) {
-    if (value === null) {
-      // Replace null with direction
-      result[key] = direction;
-    } else if (typeof value === 'object' && !Array.isArray(value)) {
-      // Recursively process nested objects
-      result[key] = mergeSortDirection(value, direction);
-    } else {
-      // Keep other values as-is
-      result[key] = value;
-    }
-  }
-  
-  return result;
 }
 
 /**

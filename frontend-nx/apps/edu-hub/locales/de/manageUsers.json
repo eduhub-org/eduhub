@@ -22,5 +22,18 @@
     "profile_picture_removal": "Entfernung des Profilbilds",
     "certificate_anonymization": "Anonymisierung der Zertifikate"
   },
-  "manage_admins": "Admin-Benutzer verwalten"
+  "manage_admins": "Admin-Benutzer verwalten",
+  "create_user": "Benutzer erstellen",
+  "create_user_dialog_title": "Neuen Benutzer erstellen",
+  "create_user_success": "Benutzer wurde erfolgreich erstellt. Die Willkommens-E-Mail wird über Nacht versendet.",
+  "create_user_error": "Fehler beim Erstellen des Benutzers",
+  "create_user_error_first_name_required": "Vorname ist erforderlich",
+  "create_user_error_last_name_required": "Nachname ist erforderlich",
+  "create_user_error_email_required": "E-Mail ist erforderlich",
+  "create_user_error_email_invalid": "Ungültige E-Mail-Adresse",
+  "email_scheduled_notice": "Hinweis: Die Willkommens-E-Mail wird über Nacht (um 2 Uhr) versendet, damit fehlerhaft erstellte Benutzer vorher gelöscht werden können.",
+  "first_name_placeholder": "Vorname eingeben",
+  "last_name_placeholder": "Nachname eingeben",
+  "email_placeholder": "E-Mail-Adresse eingeben",
+  "creating": "Wird erstellt..."
 }

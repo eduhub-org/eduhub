@@ -12,6 +12,8 @@ import { UsersByLastName_User } from '../../../queries/__generated__/UsersByLast
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import NavigationButton from '../../common/NavigationButton';
+import { Button } from '../../common/Button';
+import { CreateUserDialog } from './CreateUserDialog';
 
 const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
   const { t } = useTranslation('manageUsers');
@@ -50,13 +52,14 @@ const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
 const ManageUsersContent: FC = () => {
   const { t } = useTranslation('manageUsers');
   const [pageSize, setPageSize] = useState(20);
+  const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);
     setPageIndex(0); // Reset to first page when page size changes
   };
 
-  const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter } = useTableGrid({
+  const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter, refetch } = useTableGrid({
     queryHook: useAdminQuery,
     query: USERS_BY_LAST_NAME,
     pageSize: pageSize,
@@ -119,9 +122,14 @@ const ManageUsersContent: FC = () => {
           <div>
             <div className="flex justify-between items-center">
               <CommonPageHeader headline={t('headline')} />
-              <NavigationButton href="/manage/admin-users" filled inverted>
-                {t('manageUsers:manage_admins')}
-              </NavigationButton>
+              <div className="flex gap-2">
+                <Button onClick={() => setCreateUserDialogOpen(true)} filled>
+                  {t('create_user')}
+                </Button>
+                <NavigationButton href="/manage/admin-users" filled inverted>
+                  {t('manageUsers:manage_admins')}
+                </NavigationButton>
+              </div>
             </div>
             <TableGrid
               columns={columns}
@@ -144,6 +152,13 @@ const ManageUsersContent: FC = () => {
           </div>
         )}
       </div>
+      <CreateUserDialog
+        open={createUserDialogOpen}
+        onClose={() => setCreateUserDialogOpen(false)}
+        onSuccess={() => {
+          refetch();
+        }}
+      />
     </PageBlock>
   );
 };
