@@ -43,11 +43,11 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
           onSuccess(); // Trigger refetch
         }, 1500);
       } else {
-        setError(data?.createUser?.error || t('create_user_error'));
+        setError(data?.createUser?.error || t('create_user.error'));
       }
     },
     onError: (err) => {
-      setError(err.message || t('create_user_error'));
+      setError(err.message || t('create_user.error'));
     },
   });
 
@@ -57,24 +57,24 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
 
     // Validate inputs
     if (!firstName.trim()) {
-      setError(t('create_user_error_first_name_required'));
+      setError(t('create_user.error_first_name_required'));
       return;
     }
 
     if (!lastName.trim()) {
-      setError(t('create_user_error_last_name_required'));
+      setError(t('create_user.error_last_name_required'));
       return;
     }
 
     if (!email.trim()) {
-      setError(t('create_user_error_email_required'));
+      setError(t('create_user.error_email_required'));
       return;
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      setError(t('create_user_error_email_invalid'));
+      setError(t('create_user.error_email_invalid'));
       return;
     }
 
@@ -112,7 +112,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
       >
         <DialogTitle id="create-user-dialog-title">
           <div className="flex justify-between items-center">
-            <span>{t('create_user_dialog_title')}</span>
+            <span>{t('create_user.dialog_title')}</span>
             <button
               onClick={handleClose}
               className="p-1 rounded-full hover:bg-gray-200 transition-colors"
@@ -131,7 +131,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
                 variant="material"
                 type="input"
                 label={t('first_name')}
-                placeholder={t('first_name_placeholder')}
+                placeholder={t('create_user.first_name_placeholder')}
                 itemId={0}
                 value={firstName}
                 onValueUpdated={(data) => setFirstName(data.text || '')}
@@ -144,7 +144,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
                 variant="material"
                 type="input"
                 label={t('last_name')}
-                placeholder={t('last_name_placeholder')}
+                placeholder={t('create_user.last_name_placeholder')}
                 itemId={0}
                 value={lastName}
                 onValueUpdated={(data) => setLastName(data.text || '')}
@@ -157,7 +157,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
                 variant="material"
                 type="email"
                 label={t('email')}
-                placeholder={t('email_placeholder')}
+                placeholder={t('create_user.email_placeholder')}
                 itemId={0}
                 value={email}
                 onValueUpdated={(data) => setEmail(data.text || '')}
@@ -174,7 +174,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
                     color="primary"
                   />
                 }
-                label={t('send_welcome_email')}
+                label={t('create_user.send_welcome_email')}
               />
             </div>
 
@@ -185,14 +185,14 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
 
           <div className="flex justify-end gap-2">
             <Button onClick={handleClose} disabled={loading}>
-              {t('cancel')}
+              {t('create_user.cancel')}
             </Button>
             <Button
               filled
               onClick={handleSubmit}
               disabled={!isFormValid || loading}
             >
-              {loading ? t('creating') : t('create_user')}
+              {loading ? t('create_user.creating') : t('create_user.button')}
             </Button>
           </div>
         </div>
@@ -201,7 +201,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
       <NotificationSnackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message={t('create_user_success')}
+        message={t('create_user.success')}
       />
 
       <ErrorMessageDialog

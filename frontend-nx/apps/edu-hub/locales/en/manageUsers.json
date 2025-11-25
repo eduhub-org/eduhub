@@ -23,18 +23,20 @@
     "certificate_anonymization": "Certificate anonymization"
   },
   "manage_admins": "Manage admins",
-  "create_user": "Create User",
-  "create_user_dialog_title": "Create New User",
-  "create_user_success": "User created successfully.",
-  "create_user_error": "Error creating user",
-  "send_welcome_email": "Send welcome email",
-  "create_user_error_first_name_required": "First name is required",
-  "create_user_error_last_name_required": "Last name is required",
-  "create_user_error_email_required": "Email is required",
-  "create_user_error_email_invalid": "Invalid email address",
-  "email_scheduled_notice": "Note: The welcome email will be sent overnight (at 2 AM) to allow deletion of erroneously created users before the email is sent.",
-  "first_name_placeholder": "Enter first name",
-  "last_name_placeholder": "Enter last name",
-  "email_placeholder": "Enter email address",
-  "creating": "Creating..."
+  "create_user": {
+    "button": "Create User",
+    "dialog_title": "Create New User",
+    "success": "User created successfully.",
+    "error": "Error creating user",
+    "error_first_name_required": "First name is required",
+    "error_last_name_required": "Last name is required",
+    "error_email_required": "Email is required",
+    "error_email_invalid": "Invalid email address",
+    "send_welcome_email": "Send welcome email",
+    "creating": "Creating...",
+    "cancel": "Cancel",
+    "first_name_placeholder": "Enter first name",
+    "last_name_placeholder": "Enter last name",
+    "email_placeholder": "Enter email address"
+  }
 }

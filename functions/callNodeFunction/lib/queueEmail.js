@@ -151,5 +151,5 @@ async function queueEmail({
   }
 }
 
-module.exports = { queueEmail };
+export { queueEmail };
 

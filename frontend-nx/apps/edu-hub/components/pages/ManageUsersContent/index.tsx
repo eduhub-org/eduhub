@@ -12,7 +12,6 @@ import { UsersByLastName_User } from '../../../queries/__generated__/UsersByLast
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import NavigationButton from '../../common/NavigationButton';
-import { Button } from '../../common/Button';
 import { CreateUserDialog } from './CreateUserDialog';
 
 const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
@@ -120,16 +119,11 @@ const ManageUsersContent: FC = () => {
         {loading && <Loading />}
         {!loading && !error && (
           <div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-4">
               <CommonPageHeader headline={t('headline')} />
-              <div className="flex gap-2">
-                <Button onClick={() => setCreateUserDialogOpen(true)} filled>
-                  {t('create_user')}
-                </Button>
-                <NavigationButton href="/manage/admin-users" filled inverted>
-                  {t('manageUsers:manage_admins')}
-                </NavigationButton>
-              </div>
+              <NavigationButton href="/manage/admin-users" filled inverted>
+                {t('manageUsers:manage_admins')}
+              </NavigationButton>
             </div>
             <TableGrid
               columns={columns}
@@ -148,6 +142,8 @@ const ManageUsersContent: FC = () => {
               refetchQueries={['UsersByLastName']}
               generateDeletionConfirmationQuestion={generateDeletionConfirmation}
               expandableRowComponent={({ row }) => <ExpandableUserRow row={row} />}
+              addButtonText={t('create_user.button')}
+              onAddButtonClick={() => setCreateUserDialogOpen(true)}
             />
           </div>
         )}
