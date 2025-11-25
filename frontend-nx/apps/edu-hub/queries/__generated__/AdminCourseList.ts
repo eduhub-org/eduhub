@@ -535,5 +535,5 @@ export interface AdminCourseListVariables {
   where: Course_bool_exp;
   limit?: number | null;
   offset?: number | null;
-  order_by?: Course_order_by | null;
+  order_by?: Course_order_by[] | null;
 }
