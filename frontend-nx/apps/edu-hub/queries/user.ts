@@ -113,11 +113,12 @@ export const USERS_BY_LAST_NAME = gql`
     $limit: Int = 10
     $offset: Int = 0
     $filter: User_bool_exp = {}
+    $order_by: [User_order_by!] = [{updated_at: desc}]
   ) {
     User(
       limit: $limit
       offset: $offset
-      order_by: { lastName: asc }
+      order_by: $order_by
       where: { _and: [{ status: { _eq: ACTIVE } }, $filter] }
     ) {
       id

@@ -42,11 +42,11 @@ export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
           )}
         </span>
         <span className="text-sm mt-2 text-center">{ectsTranslations[course.ects] || course.ects}</span>
-        <div className="flex justify-center">
-          <Image src={pinIcon} alt="Location" width={32} height={43} />
+        <div className="flex justify-center w-8 h-[43px]">
+          <Image src={pinIcon} alt="Location" width={32} height={43} unoptimized className="w-full h-full object-contain" />
         </div>
-        <div className="flex justify-center">
-          <Image src={languageIcon} alt="Language" width={47} height={40} />
+        <div className="flex justify-center w-[47px] h-10">
+          <Image src={languageIcon} alt="Language" width={47} height={40} unoptimized className="w-full h-full object-contain" />
         </div>
         <span className="text-sm mt-2 text-center">
           {course.CourseLocations.map((location, index) => (

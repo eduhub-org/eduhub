@@ -8,6 +8,7 @@ import { DegreeParticipantsWithDegreeEnrollments_Course_by_pk_CourseEnrollments 
 import { DEGREE_PARTICIPANTS_WITH_DEGREE_ENROLLMENTS } from '../../../../queries/courseDegree';
 import { CertificateDownload } from '../../../common/CertificateDownload';
 import { useTableGrid } from '../../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../../common/TableGrid/utils';
 import { useRoleMutation } from '../../../../hooks/authedMutation';
 import { CREATE_CERTIFICATES } from '../../../../queries/actions';
 import { REMOVE_ACHIEVEMENT_CERTIFICATES } from '../../../../queries/courseEnrollment';
@@ -48,13 +49,12 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
       degreeCourseId: course?.id,
     },
     pageSize,
-    refetchFilter: (searchFilter) => ({
-      filter: {
-        User: {
-          _or: [{ firstName: { _ilike: `%${searchFilter}%` } }, { lastName: { _ilike: `%${searchFilter}%` } }],
-        },
-      },
-    }),
+    refetchFilter: (searchFilter) => {
+      const searchCondition = createMultiWordSearchCondition(searchFilter, ['User.firstName', 'User.lastName']);
+      return {
+        filter: searchCondition,
+      };
+    },
   });
 
   const degreeParticipantsEnrollments =

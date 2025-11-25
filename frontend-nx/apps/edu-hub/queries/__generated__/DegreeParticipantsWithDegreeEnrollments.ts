@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { CourseEnrollment_bool_exp, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
+import { CourseEnrollment_bool_exp, CourseEnrollment_order_by, CourseEnrollmentStatus_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: DegreeParticipantsWithDegreeEnrollments
@@ -137,4 +137,5 @@ export interface DegreeParticipantsWithDegreeEnrollmentsVariables {
   limit?: number | null;
   offset?: number | null;
   filter?: CourseEnrollment_bool_exp | null;
+  order_by?: CourseEnrollment_order_by[] | null;
 }

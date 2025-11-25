@@ -9,7 +9,8 @@ export const MAIL_TEMPLATES = gql`
       from
       cc
       bcc
-      title
+      type
+      courseId
     }
   }
 `;

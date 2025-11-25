@@ -61,6 +61,10 @@ export interface CoursesByInstructor_Course {
    */
   endTime: any | null;
   /**
+   * Decides whether the course is published for all users or not.
+   */
+  published: boolean;
+  /**
    * An object relationship
    */
   Program: CoursesByInstructor_Course_Program;

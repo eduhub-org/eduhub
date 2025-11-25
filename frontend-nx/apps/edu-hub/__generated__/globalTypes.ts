@@ -3776,6 +3776,15 @@ export interface CourseEnrollmentStatus_on_conflict {
   where?: CourseEnrollmentStatus_bool_exp | null;
 }
 
+/**
+ * Ordering options when selecting data from "CourseEnrollmentStatus".
+ */
+export interface CourseEnrollmentStatus_order_by {
+  CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
+}
+
 export interface CourseEnrollment_aggregate_bool_exp {
   count?: CourseEnrollment_aggregate_bool_exp_count | null;
 }
@@ -3902,6 +3911,27 @@ export interface CourseEnrollment_on_conflict {
   constraint: CourseEnrollment_constraint;
   update_columns: CourseEnrollment_update_column[];
   where?: CourseEnrollment_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "CourseEnrollment".
+ */
+export interface CourseEnrollment_order_by {
+  Course?: Course_order_by | null;
+  CourseEnrollmentStatus?: CourseEnrollmentStatus_order_by | null;
+  MotivationRating?: MotivationRating_order_by | null;
+  User?: User_order_by | null;
+  achievementCertificateURL?: order_by | null;
+  attendanceCertificateURL?: order_by | null;
+  courseId?: order_by | null;
+  created_at?: order_by | null;
+  id?: order_by | null;
+  invitationExpirationDate?: order_by | null;
+  motivationLetter?: order_by | null;
+  motivationRating?: order_by | null;
+  status?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
 }
 
 /**
@@ -5687,32 +5717,53 @@ export interface LocationOption_order_by {
  * Boolean expression to filter rows from the table "MailTemplate". All fields are combined with a logical 'AND'.
  */
 export interface MailTemplate_bool_exp {
+  Course?: Course_bool_exp | null;
   _and?: MailTemplate_bool_exp[] | null;
   _not?: MailTemplate_bool_exp | null;
   _or?: MailTemplate_bool_exp[] | null;
   bcc?: String_comparison_exp | null;
   cc?: String_comparison_exp | null;
   content?: String_comparison_exp | null;
+  courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
   from?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
   subject?: String_comparison_exp | null;
-  title?: String_comparison_exp | null;
+  type?: String_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "MailTemplate"
+ */
+export interface MailTemplate_insert_input {
+  Course?: Course_obj_rel_insert_input | null;
+  bcc?: string | null;
+  cc?: string | null;
+  content?: string | null;
+  courseId?: number | null;
+  created_at?: any | null;
+  from?: string | null;
+  id?: number | null;
+  subject?: string | null;
+  type?: string | null;
+  updated_at?: any | null;
 }
 
 /**
  * Ordering options when selecting data from "MailTemplate".
  */
 export interface MailTemplate_order_by {
+  Course?: Course_order_by | null;
   bcc?: order_by | null;
   cc?: order_by | null;
   content?: order_by | null;
+  courseId?: order_by | null;
   created_at?: order_by | null;
   from?: order_by | null;
   id?: order_by | null;
   subject?: order_by | null;
-  title?: order_by | null;
+  type?: order_by | null;
   updated_at?: order_by | null;
 }
 
@@ -5764,6 +5815,15 @@ export interface MotivationRating_on_conflict {
   constraint: MotivationRating_constraint;
   update_columns: MotivationRating_update_column[];
   where?: MotivationRating_bool_exp | null;
+}
+
+/**
+ * Ordering options when selecting data from "MotivationRating".
+ */
+export interface MotivationRating_order_by {
+  Enrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
+  comment?: order_by | null;
+  value?: order_by | null;
 }
 
 export interface OrganizationAdmin_aggregate_bool_exp {

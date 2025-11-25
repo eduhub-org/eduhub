@@ -75,7 +75,15 @@
       "deletion_warning": "Warnung",
       "organizations_will_be_deleted_one": "1 Organisation wird dauerhaft gelöscht",
       "organizations_will_be_deleted_other": "{{count}} Organisationen werden dauerhaft gelöscht",
-      "no_organizations_selected": "Keine Organisationen für die Zusammenführung ausgewählt"
+      "no_organizations_selected": "Keine Organisationen für die Zusammenführung ausgewählt",
+      "api_key_warning": "API-Schlüssel-Konflikt",
+      "api_key_conflict_description": "Zusammenführung nicht möglich: {{count}} Organisation(en) haben API-Schlüssel definiert. Nur eine Organisation kann einen API-Schlüssel haben. Bitte widerrufe die API-Schlüssel von allen Organisationen außer einer, bevor du zusammenführst.",
+      "loading_related_data": "Lade zugehörige Daten...",
+      "organization_admins_affected": "Betroffene Organisationsadministratoren",
+      "funding_organizations_affected": "Betroffene Kursfinanzierungsbeziehungen",
+      "admin_user_id": "Nutzer",
+      "course_id": "Kurs",
+      "and_more": "... und {{count}} weitere"
     }
   },
   "input": {

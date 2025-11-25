@@ -2,15 +2,19 @@ import React, { FC, useMemo, useCallback, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { ColumnDef } from '@tanstack/react-table';
 import DOMPurify from 'dompurify';
+import { useRouter } from 'next/router';
+import { MdPreview, MdArrowBack } from 'react-icons/md';
 
 import TableGrid from '../../common/TableGrid';
 import Loading from '../../common/Loading';
 import InputField from '../../inputs/InputField';
 import EmailEditor from '../../inputs/EmailEditor';
-import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useRoleQuery } from '../../../hooks/authedQuery';
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useTableGrid } from '../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
+import { Button } from '../../common/Button';
 
 import {
   EMAIL_TEMPLATES_LIST,
@@ -18,13 +22,25 @@ import {
   UPDATE_EMAIL_TEMPLATE_CONTENT,
   DELETE_EMAIL_TEMPLATE,
 } from '../../../queries/emailTemplates';
-import { Button } from '@mui/material';
-import { MdPreview } from 'react-icons/md';
+
+// Helper function to safely get translation with fallback
+const getTranslation = (t: (key: string) => string, key: string, fallback: string): string => {
+  try {
+    const translation = t(key);
+    // If translation returns the same key, it means translation doesn't exist
+    return translation !== key ? translation : fallback;
+  } catch (error) {
+    // If translation throws an error, return fallback
+    console.warn(`Translation error for key "${key}":`, error);
+    return fallback;
+  }
+};
 
 // Define interface for email template row
 interface EmailTemplateRow {
   id: number;
-  title: string;
+  type: string;
+  courseId?: number | null;
   subject: string;
   content: string;
   from: string;
@@ -34,6 +50,15 @@ interface EmailTemplateRow {
   updated_at: string;
 }
 
+// Props interface for the component
+interface ManageEmailTemplatesContentProps {
+  courseId?: number;
+  courseTitle?: string;
+  explanatoryText?: string;
+  showBackButton?: boolean;
+  availableTemplateTypes?: string[];
+}
+
 // Expandable row component with full functionality
 const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }) => {
   const { t } = useTranslation('manageEmailTemplates');
@@ -41,7 +66,7 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
   const [showPreview, setShowPreview] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
 
-  const triggerDescription = t(`triggers.${row.title}`, { fallback: t('unknown_trigger') });
+  const triggerDescription = getTranslation(t, `triggers.${row.type}`, t('unknown_trigger'));
 
   const handlePreview = async () => {
     setPreviewLoading(true);
@@ -130,7 +155,7 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
           placeholder={t('placeholders.body')}
           maxLength={5000}
           className="w-full"
-          templateType={row.title}
+          templateType={row.type}
         />
       </div>
 
@@ -139,12 +164,11 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
         <div className="flex items-center gap-4 mb-2">
           <h4 className="text-lg font-semibold text-gray-800">{t('expandable.preview')}</h4>
           <Button
-            variant="outlined"
-            size="small"
-            startIcon={<MdPreview />}
             onClick={handlePreview}
             disabled={previewLoading}
+            className="flex items-center gap-2"
           >
+            <MdPreview className="w-5 h-5" />
             {previewLoading ? t('expandable.generating_preview') : t('expandable.generate_preview')}
           </Button>
         </div>
@@ -159,30 +183,62 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
   );
 };
 
-const ManageEmailTemplatesContent: FC = () => {
+const ManageEmailTemplatesContent: FC<ManageEmailTemplatesContentProps> = ({
+  courseId,
+  courseTitle,
+  explanatoryText,
+  showBackButton = false,
+  availableTemplateTypes,
+}) => {
   const { t } = useTranslation('manageEmailTemplates');
+  const router = useRouter();
+
+  // Determine the courseId to filter by (default templates use NULL)
+  const filterCourseId = courseId !== undefined ? courseId : null;
 
   const { data, loading, error, searchFilter, setSearchFilter } = useTableGrid({
-    queryHook: useAdminQuery,
+    queryHook: useRoleQuery,
     query: EMAIL_TEMPLATES_LIST,
     pageSize: 50, // Fixed page size since pagination is disabled
-    queryVariables: {},
-    refetchFilter: (searchFilter: string) => ({
-      where: {
-        _or: [{ title: { _ilike: `%${searchFilter}%` } }, { subject: { _ilike: `%${searchFilter}%` } }],
-      },
-    }),
+    queryVariables: {
+      filter: filterCourseId !== null
+        ? { courseId: { _eq: filterCourseId } }
+        : { courseId: { _is_null: true } },
+    },
+    refetchFilter: (searchFilter: string) => {
+      const searchCondition = createMultiWordSearchCondition(searchFilter, ['type', 'subject']);
+      return {
+        filter: {
+          _and: [
+            filterCourseId !== null
+              ? { courseId: { _eq: filterCourseId } }
+              : { courseId: { _is_null: true } },
+            ...(Object.keys(searchCondition).length > 0 ? [searchCondition] : []),
+          ],
+        },
+      };
+    },
   });
 
-  const emailTemplates: EmailTemplateRow[] = data?.MailTemplate || [];
-  const totalCount = data?.MailTemplate_aggregate?.aggregate?.count || 0;
+  let emailTemplates: EmailTemplateRow[] = data?.MailTemplate || [];
+
+  // Filter by available template types if provided
+  if (availableTemplateTypes && availableTemplateTypes.length > 0) {
+    emailTemplates = emailTemplates.filter((template) => availableTemplateTypes.includes(template.type));
+  }
+
+  const totalCount = emailTemplates.length;
 
   const generateDeletionConfirmation = useCallback(
     (row: EmailTemplateRow) => {
-      return t('delete_confirmation', { title: row.title });
+      return t('delete_confirmation', { title: row.type });
     },
     [t]
   );
+
+  const handleBackToCourses = useCallback(() => {
+    router.push('/manage/courses');
+  }, [router]);
 
   // No-op function for disabled pagination
   const handlePageChange = useCallback(() => {
@@ -193,12 +249,12 @@ const ManageEmailTemplatesContent: FC = () => {
     () => [
       {
         header: t('columns.title'),
-        accessorKey: 'title',
+        accessorKey: 'type',
         meta: { width: 2, className: 'whitespace-nowrap' },
         cell: ({ row }) => (
           <div className="flex items-center h-full py-3">
             <div className="w-full px-3 text-base text-gray-900 font-medium">
-              {t(`template_types.${row.original.title}`, { fallback: row.original.title })}
+              {getTranslation(t, `template_types.${row.original.type}`, row.original.type)}
             </div>
           </div>
         ),
@@ -237,12 +293,32 @@ const ManageEmailTemplatesContent: FC = () => {
     [t]
   );
 
+  // Determine headline
+  const headline = courseTitle
+    ? `${courseTitle} - ${t('headline')}`
+    : getTranslation(t, 'headline_default', t('headline'));
+
   if (loading) return <Loading />;
 
   return (
     <PageBlock>
       <div className="max-w-screen-xl mx-auto mt-20">
-        <CommonPageHeader headline={t('headline')} />
+        <div className="mb-4">
+          <CommonPageHeader headline={headline} />
+          {explanatoryText && (
+            <p className="text-gray-200 mt-2 mb-4">{explanatoryText}</p>
+          )}
+          {showBackButton && (
+            <Button
+              onClick={handleBackToCourses}
+              className="mt-4 flex items-center gap-2"
+              filled
+            >
+              <MdArrowBack className="w-5 h-5" />
+              {getTranslation(t, 'back_to_courses', 'Back to Courses')}
+            </Button>
+          )}
+        </div>
         <TableGrid
           columns={columns}
           data={emailTemplates}
@@ -254,7 +330,7 @@ const ManageEmailTemplatesContent: FC = () => {
           onSearchFilterChange={setSearchFilter}
           deleteMutation={DELETE_EMAIL_TEMPLATE}
           deleteIdType="number"
-          error={error}
+          error={error as any}
           loading={loading}
           refetchQueries={['EmailTemplatesList']}
           generateDeletionConfirmationQuestion={generateDeletionConfirmation}

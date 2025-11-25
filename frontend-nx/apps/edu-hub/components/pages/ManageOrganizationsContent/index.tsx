@@ -10,7 +10,7 @@ import Loading from '../../common/Loading';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import ImageUploader from '../../inputs/ImageUploader';
-import { useRoleQuery } from '../../../hooks/authedQuery';
+import { useRoleQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { PageBlock } from '../../common/PageBlock';
 
@@ -24,15 +24,27 @@ import {
   UPDATE_ORGANIZATION_DESCRIPTION,
   DELETE_ORGANIZATION,
   UPDATE_ORGANIZATION_ALIASES,
+  UPDATE_ORGANIZATION_API_KEY_HASH,
 } from '../../../queries/organization';
 import { UPDATE_ORGANIZATION_LOGO } from '../../../queries/updateOrganization';
 import { UPDATE_USER_ORGANIZATION_ID } from '../../../queries/updateUser';
+import {
+  UPDATE_ORGANIZATION_ADMIN_ORGANIZATION_ID,
+  DELETE_ORGANIZATION_ADMIN,
+  ORGANIZATION_ADMINS_BY_ORGANIZATION_ID,
+} from '../../../queries/organizationAdmin';
+import {
+  buildExistingAliasesSet,
+  normalizeAndFilterAliases,
+  combineAliases,
+} from '../../../helpers/aliasUtils';
 import CreatableTagSelector from '../../inputs/CreatableTagSelector';
 import { OrganizationType_enum } from '../../../__generated__/globalTypes';
 import { MergeOrganizationsDialog } from './MergeOrganizationsDialog';
 import { ApiKeyManager } from './ApiKeyManager';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import { useTableGrid } from '../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 
 type ExpandableRowProps = {
   row: OrganizationList_Organization;
@@ -153,15 +165,14 @@ const ManageOrganizationsContent: FC = () => {
     queryHook: useRoleQuery,
     query: ORGANIZATION_LIST,
     pageSize: pageSize,
-    refetchFilter: (searchFilter) => ({
-      filter: {
-        _or: [
-          { name: { _ilike: `%${searchFilter}%` } },
-          { description: { _ilike: `%${searchFilter}%` } },
-          { aliases: { _contains: searchFilter } },
-        ],
-      },
-    }),
+    refetchFilter: (searchFilter) => {
+      const searchCondition = createMultiWordSearchCondition(searchFilter, ['name', 'description', 'aliases'], {
+        arrayFields: ['aliases'],
+      });
+      return {
+        filter: searchCondition,
+      };
+    },
     sortColumnMapper: (columnId) => {
       // Map column accessorKey to GraphQL field names
       switch (columnId) {
@@ -170,9 +181,9 @@ const ManageOrganizationsContent: FC = () => {
         case 'type':
           return 'type';
         case 'userCount':
-          // For userCount, we can't sort by aggregate directly in Hasura order_by
-          // Return null to skip server-side sorting for this column (falls back to client-side if needed)
-          return null;
+          // Return nested structure for aggregate field sorting
+          // The null placeholder will be replaced with 'asc' or 'desc' by convertSortingToOrderBy
+          return { Users_aggregate: { count: null } };
         default:
           return columnId;
       }
@@ -184,6 +195,10 @@ const ManageOrganizationsContent: FC = () => {
   const [updateOrganizationAliases] = useRoleMutation(UPDATE_ORGANIZATION_ALIASES);
   const [updateOrganizationType] = useRoleMutation(UPDATE_ORGANIZATION_TYPE);
   const [updateUserOrganizationId] = useRoleMutation(UPDATE_USER_ORGANIZATION_ID);
+  const [updateOrganizationApiKeyHash] = useRoleMutation(UPDATE_ORGANIZATION_API_KEY_HASH);
+  const [updateOrganizationAdminOrganizationId] = useRoleMutation(UPDATE_ORGANIZATION_ADMIN_ORGANIZATION_ID);
+  const [deleteOrganizationAdmin] = useRoleMutation(DELETE_ORGANIZATION_ADMIN);
+  const [fetchOrganizationAdmins] = useLazyRoleQuery(ORGANIZATION_ADMINS_BY_ORGANIZATION_ID);
 
   const organizationTypes = useMemo(
     () =>
@@ -297,66 +312,193 @@ const ManageOrganizationsContent: FC = () => {
     async (targetOrgId: string, targetOrg: OrganizationList_Organization) => {
       setMergeDialogOpen(false);
       try {
-        const targetOrgExistingAliases = targetOrg?.aliases || [];
         const orgsToMerge = selectedRowsForBulkAction.filter((org) => org.id !== parseInt(targetOrgId, 10));
+
+        // Build set of organization IDs being merged (for conflict checking)
+        const orgIdsBeingMerged = new Set([parseInt(targetOrgId, 10), ...orgsToMerge.map((org) => org.id)]);
+        
+        // Build set of aliases that already exist in other organizations (not being merged)
+        const allOrgs = data?.Organization || [];
+        const existingAliasesInOtherOrgs = buildExistingAliasesSet(allOrgs, orgIdsBeingMerged);
+
+        // Normalize target organization aliases (excluding conflicts)
+        const targetOrgExistingAliases = normalizeAndFilterAliases(targetOrg, existingAliasesInOtherOrgs);
 
         // Check if any organization being merged is a university
         const hasUniversityType =
           orgsToMerge.some((org) => org.type === 'UNIVERSITY') || targetOrg.type === 'UNIVERSITY';
 
-        // Get all aliases from selected organizations and their names
-        const aliasesToMerge = orgsToMerge.flatMap((org) => {
-          const orgAliases = Array.isArray(org.aliases)
-            ? org.aliases
-                .filter((alias) => alias != null)
-                .map((alias) => {
-                  if (typeof alias === 'string') return alias;
-                  if (typeof alias === 'object' && alias !== null && 'name' in alias) return alias.name;
-                  return null;
-                })
-                .filter((alias): alias is string => alias !== null)
-            : [];
+        // Normalize aliases from organizations being merged (including their names, excluding conflicts)
+        const aliasesToMerge = orgsToMerge.flatMap((org) =>
+          normalizeAndFilterAliases(org, existingAliasesInOtherOrgs, [org.name])
+        );
 
-          return [...orgAliases, org.name];
-        });
+        // Combine normalized target aliases with new aliases, removing duplicates
+        const safeAliases = combineAliases(targetOrgExistingAliases, aliasesToMerge, existingAliasesInOtherOrgs);
 
-        // Combine existing target aliases with new aliases, removing duplicates
-        const combinedAliases = Array.from(new Set([...targetOrgExistingAliases, ...aliasesToMerge]));
+        // Before updating target aliases, clear aliases from organizations being merged
+        // This frees up the aliases so they can be assigned to the target without conflicts
+        try {
+          await Promise.all(
+            orgsToMerge.map(async (org) => {
+              // Clear aliases from this organization to free them up
+              await updateOrganizationAliases({
+                variables: {
+                  id: org.id,
+                  tags: [],
+                },
+              });
+            })
+          );
+        } catch (clearError) {
+          console.error('Error clearing aliases from merged organizations:', clearError);
+          // Continue anyway - this is just to free up aliases, not critical
+        }
+
+        // Check for API keys - if target doesn't have one but a merged org does, transfer it
+        const orgsWithApiKeys = orgsToMerge.filter((org) => org.apiKeyHash != null && org.apiKeyHash !== '');
+        const targetHasApiKey = targetOrg.apiKeyHash != null && targetOrg.apiKeyHash !== '';
+        const shouldTransferApiKey = !targetHasApiKey && orgsWithApiKeys.length === 1;
 
         // Prepare updates - aliases first
-        await updateOrganizationAliases({
-          variables: {
-            id: parseInt(targetOrgId, 10),
-            tags: combinedAliases,
-          },
-        });
+        try {
+          await updateOrganizationAliases({
+            variables: {
+              id: parseInt(targetOrgId, 10),
+              tags: safeAliases,
+            },
+          });
+        } catch (aliasError) {
+          console.error('Error updating aliases:', aliasError);
+          throw new Error(`Failed to update aliases: ${aliasError instanceof Error ? aliasError.message : String(aliasError)}`);
+        }
+
+        // Transfer API key if needed (target doesn't have one, exactly one merged org has one)
+        if (shouldTransferApiKey) {
+          try {
+            await updateOrganizationApiKeyHash({
+              variables: {
+                id: parseInt(targetOrgId, 10),
+                apiKeyHash: orgsWithApiKeys[0].apiKeyHash,
+              },
+            });
+          } catch (apiKeyError) {
+            console.error('Error transferring API key:', apiKeyError);
+            throw new Error(`Failed to transfer API key: ${apiKeyError instanceof Error ? apiKeyError.message : String(apiKeyError)}`);
+          }
+        }
 
         // Update organization type to UNIVERSITY if any merged org is a university and target isn't already
         if (hasUniversityType && targetOrg.type !== 'UNIVERSITY') {
-          await updateOrganizationType({
-            variables: {
-              id: parseInt(targetOrgId, 10),
-              value: 'UNIVERSITY',
-            },
-          });
+          try {
+            await updateOrganizationType({
+              variables: {
+                id: parseInt(targetOrgId, 10),
+                value: 'UNIVERSITY',
+              },
+            });
+          } catch (typeError) {
+            console.error('Error updating organization type:', typeError);
+            throw new Error(`Failed to update organization type: ${typeError instanceof Error ? typeError.message : String(typeError)}`);
+          }
         }
 
         // Update all users to the new organization
-        await Promise.all(
-          orgsToMerge.flatMap((org) =>
-            (org.Users || []).map((user) =>
-              updateUserOrganizationId({
-                variables: {
-                  userId: user.id,
-                  value: parseInt(targetOrgId, 10),
-                },
-              })
+        try {
+          await Promise.all(
+            orgsToMerge.flatMap((org) =>
+              (org.Users || []).map((user) =>
+                updateUserOrganizationId({
+                  variables: {
+                    userId: user.id,
+                    value: parseInt(targetOrgId, 10),
+                  },
+                })
+              )
             )
-          )
-        );
+          );
+        } catch (userError) {
+          console.error('Error updating users:', userError);
+          throw new Error(`Failed to update users: ${userError instanceof Error ? userError.message : String(userError)}`);
+        }
+
+        // Get IDs of organizations being merged
+        const orgsToMergeIds = orgsToMerge.map((org) => org.id);
+
+        // Query OrganizationAdmins that reference organizations being merged
+        if (orgsToMergeIds.length > 0) {
+          const organizationAdminsResult = await fetchOrganizationAdmins({
+            variables: {
+              organizationIds: orgsToMergeIds,
+            },
+          });
+
+          // Check for query errors
+          if (organizationAdminsResult.error) {
+            throw new Error(`Failed to fetch OrganizationAdmins: ${organizationAdminsResult.error.message}`);
+          }
+
+          // Query target organization's admins to check for duplicates
+          const targetOrgAdminsResult = await fetchOrganizationAdmins({
+            variables: {
+              organizationIds: [parseInt(targetOrgId, 10)],
+            },
+          });
+
+          // Check for query errors
+          if (targetOrgAdminsResult.error) {
+            throw new Error(`Failed to fetch target organization admins: ${targetOrgAdminsResult.error.message}`);
+          }
+
+          const targetOrgAdminUserIds = new Set(
+            targetOrgAdminsResult.data?.OrganizationAdmin?.map((admin: any) => admin.userId) || []
+          );
+
+          // Track userIds we've already processed to avoid duplicates within the merge set
+          const processedUserIds = new Set<string>();
+
+          // Update or delete OrganizationAdmins
+          // Process sequentially to avoid unique constraint violations when multiple admins have the same userId
+          if (organizationAdminsResult.data?.OrganizationAdmin && organizationAdminsResult.data.OrganizationAdmin.length > 0) {
+            try {
+              for (const admin of organizationAdminsResult.data.OrganizationAdmin) {
+                try {
+                  // If user is already admin of target org OR we've already processed this userId, delete the duplicate
+                  // Otherwise, update to point to target organization
+                  if (targetOrgAdminUserIds.has(admin.userId) || processedUserIds.has(admin.userId)) {
+                    await deleteOrganizationAdmin({
+                      variables: {
+                        id: admin.id,
+                      },
+                    });
+                  } else {
+                    processedUserIds.add(admin.userId);
+                    await updateOrganizationAdminOrganizationId({
+                      variables: {
+                        id: admin.id,
+                        organizationId: parseInt(targetOrgId, 10),
+                      },
+                    });
+                  }
+                } catch (adminOpError) {
+                  console.error(`Error processing OrganizationAdmin ${admin.id}:`, adminOpError);
+                  throw adminOpError;
+                }
+              }
+            } catch (adminError) {
+              console.error('Error updating OrganizationAdmins:', adminError);
+              throw new Error(`Failed to update OrganizationAdmins: ${adminError instanceof Error ? adminError.message : String(adminError)}`);
+            }
+          }
+        }
 
         // Delete all selected organizations except the target one
-        await Promise.all(orgsToMerge.map((org) => deleteOrganization({ variables: { id: org.id } })));
+        try {
+          await Promise.all(orgsToMerge.map((org) => deleteOrganization({ variables: { id: org.id } })));
+        } catch (deleteError) {
+          console.error('Error deleting organizations:', deleteError);
+          throw new Error(`Failed to delete organizations: ${deleteError instanceof Error ? deleteError.message : String(deleteError)}`);
+        }
 
         // Show success notification
         setError(null);
@@ -380,6 +522,10 @@ const ManageOrganizationsContent: FC = () => {
       updateOrganizationAliases,
       updateOrganizationType,
       updateUserOrganizationId,
+      updateOrganizationAdminOrganizationId,
+      deleteOrganizationAdmin,
+      fetchOrganizationAdmins,
+      updateOrganizationApiKeyHash,
       debouncedRefetch,
       t,
     ]

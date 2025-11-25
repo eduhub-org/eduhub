@@ -46,8 +46,10 @@ export interface UseTableGridProps<V> {
   query: DocumentNode;
   queryVariables?: V;
   pageSize?: number;
+  debounceMs?: number; // Configurable debounce time in milliseconds
   refetchFilter?: (searchFilter: string) => Record<string, any>;
-  sortColumnMapper?: (columnId: string) => string | null;
+  sortColumnMapper?: (columnId: string) => string | Record<string, any> | null;
+  defaultSort?: Record<string, any>[]; // Default sort when no user sorting is applied
 } 
 
 export interface TableGridDeleteButtonProps {

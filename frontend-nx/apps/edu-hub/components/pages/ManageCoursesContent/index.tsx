@@ -26,10 +26,13 @@ import { DELETE_A_COURSE } from '../../../queries/mutateCourse';
 
 import TableGrid from '../../common/TableGrid';
 import { useTableGrid } from '../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 import { ADMIN_COURSE_LIST } from '../../../queries/courseList';
+import { GET_COURSE_TEMPLATES_COUNT } from '../../../queries/emailTemplates';
 import ExpandableCourseRow from './ExpandableCourseRow';
-import { CourseEnrollmentStatus_enum } from '../../../__generated__/globalTypes';
+import { useParallelQueries } from '../../../hooks/useParallelQueries';
+import { CourseEnrollmentStatus_enum, order_by } from '../../../__generated__/globalTypes';
 import useTranslation from 'next-translate/useTranslation';
 import draftPie from '../../../public/images/course/status/draft.svg';
 import readyForPublicationPie from '../../../public/images/course/status/ready-for-publication.svg';
@@ -50,6 +53,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { SelectProgramDialog } from './SelectProgramDialog';
 import { COPY_COURSES_TO_PROGRAM } from '../../../queries/copyCourse';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
+import { MdMarkEmailRead } from 'react-icons/md';
 
 // Header imports
 import CommonPageHeader from '../../common/CommonPageHeader';
@@ -74,14 +78,16 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     });
   }, [programs]);
 
-  const defaultProgramId = sortedPrograms.find(
-    (program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES'
-  )?.id;
+  const defaultProgramId = useMemo(
+    () => sortedPrograms.find((program) => program.shortTitle !== 'EVENTS' && program.shortTitle !== 'DEGREES')?.id,
+    [sortedPrograms]
+  );
 
   // Filter state management (single source of truth)
   const [filter, setFilter] = useState<AdminCourseListVariables>({
-    limit: QUERY_LIMIT,
+    limit: 100,
     where: { programId: { _eq: defaultProgramId } },
+    order_by: { id: order_by.desc },
   });
 
   // Menubar configuration
@@ -135,17 +141,34 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
     refetchFilter: useCallback(
       (searchTerm: string) => {
         // Return the complete queryVariables including search
-        const searchWhere = searchTerm ? { title: { _ilike: `%${searchTerm}%` } } : {};
+        const searchCondition = createMultiWordSearchCondition(searchTerm, ['title']);
         return {
           where: {
             ...filter.where, // Include current program filter
-            ...searchWhere, // Add search filter
+            ...searchCondition, // Add multi-word search filter
           },
         };
       },
       [filter.where] // Update when program filter changes
     ),
   });
+
+  const courses: AdminCourseList_Course[] = useMemo(() => data?.Course || [], [data?.Course]);
+  const totalCount = data?.Course_aggregate?.aggregate?.count || 0;
+
+  // Fetch template counts for visible courses using parallel queries hook
+  const courseIds = useMemo(() => courses.map((course) => course.id), [courses]);
+  const getTemplateVariables = useCallback((courseId: number) => ({ courseId }), []);
+  const extractTemplateCount = useCallback(
+    (result: any) => result.data?.MailTemplate_aggregate?.aggregate?.count || 0,
+    []
+  );
+  const courseTemplateCounts = useParallelQueries(
+    GET_COURSE_TEMPLATES_COUNT,
+    courseIds,
+    getTemplateVariables,
+    extractTemplateCount
+  );
 
   // Handle program tab clicks (moved after useTableGrid to access setPageIndex)
   const handleTabClick = useCallback(
@@ -171,9 +194,6 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const [successMessage, setSuccessMessage] = useState('');
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
-  const courses: AdminCourseList_Course[] = data?.Course || [];
-  const totalCount = data?.Course_aggregate?.aggregate?.count || 0;
 
   const [updateAttendanceCertificatePossible] = useAdminMutation<
     UpdateCourseAttendanceCertificatePossible,
@@ -303,7 +323,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
           ?.filter((option) => option.sliderGroup)
           .map((option) => ({
             id: option.id,
-            name: t(`common:course_group_options.${option.title}`),
+            name: option.title ? t(`common:course_group_options.${option.title}`) : '—',
           })) || []
       );
     } else {
@@ -636,10 +656,25 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         accessorKey: 'status',
         size: 80,
         meta: { className: 'text-center' },
-        cell: ({ row }) => <div className="text-center">{courseStatus(row.original.status)}</div>,
+        cell: ({ row }) => {
+          const templateCount = courseTemplateCounts.get(row.original.id) || 0;
+          const hasCustomTemplates = templateCount > 0;
+
+          return (
+            <div className="flex items-center justify-center gap-1">
+              <div className="text-center">{courseStatus(row.original.status)}</div>
+              {hasCustomTemplates && (
+                <MdMarkEmailRead
+                  className="w-4 h-4 text-blue-600 ml-1"
+                  title={t('table_header.has_custom_templates')}
+                />
+              )}
+            </div>
+          );
+        },
       },
     ],
-    [t, handleApplicationEndChange, lang, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed]
+    [t, handleApplicationEndChange, lang, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed, courseTemplateCounts]
   );
 
   const handlePageSizeChange = useCallback(

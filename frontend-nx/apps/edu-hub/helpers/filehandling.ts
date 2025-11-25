@@ -26,7 +26,7 @@ export const getPublicUrl = (filePath: string): string | null  => {
     log.debug(`Returning constructed public URL: ${publicUrl}`);
     return publicUrl;
   } else {
-    log.debug('File is not public, returning null.');
+    // File is not public, return null (expected behavior for non-public files)
     return null;
   }
 }

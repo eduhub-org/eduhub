@@ -30,6 +30,7 @@ export interface OrganizationList_Organization {
    */
   apiKeyHash: string | null;
   created_at: any;
+  updated_at: any;
   /**
    * An array relationship
    */

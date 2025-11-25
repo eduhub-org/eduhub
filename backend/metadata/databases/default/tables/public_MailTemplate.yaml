@@ -1,3 +1,30 @@
 table:
   name: MailTemplate
   schema: public
+object_relationships:
+  - name: Course
+    using:
+      foreign_key_constraint_on: courseId
+select_permissions:
+  - role: instructor_access
+    permission:
+      columns:
+        - id
+        - type
+        - courseId
+        - subject
+        - content
+        - from
+        - cc
+        - bcc
+        - created_at
+        - updated_at
+      filter:
+        _or:
+          - courseId:
+              _is_null: true
+          - Course:
+              CourseInstructors:
+                Expert:
+                  userId:
+                    _eq: X-Hasura-User-Id

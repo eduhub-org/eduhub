@@ -1,6 +1,8 @@
-import { FC, useCallback, useRef, useState } from 'react';
+import { FC, Fragment, useCallback, useMemo, useRef, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdUpload, MdAddCircle } from 'react-icons/md';
+import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdUpload, MdAddCircle, MdEmail } from 'react-icons/md';
+import { useRouter } from 'next/router';
+import Image from 'next/image';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
 import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
@@ -49,6 +51,15 @@ import {
 import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
+import { useAdminQuery } from '../../../hooks/authedQuery';
+import {
+  GET_COURSE_TEMPLATES_COUNT,
+  GET_DEFAULT_TEMPLATES,
+  INSERT_EMAIL_TEMPLATE,
+} from '../../../queries/emailTemplates';
+import { GetCourseTemplatesCount } from '../../../queries/__generated__/GetCourseTemplatesCount';
+import { GetDefaultTemplates } from '../../../queries/__generated__/GetDefaultTemplates';
+import { InsertEmailTemplate, InsertEmailTemplateVariables } from '../../../queries/__generated__/InsertEmailTemplate';
 
 interface ExpandableCourseRowProps {
   course: AdminCourseList_Course;
@@ -66,7 +77,122 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   onSetAchievementCertificatePossible,
 }) => {
   const { t } = useTranslation('course-page');
+  const router = useRouter();
   const { error, handleError, resetError } = useErrorHandler();
+
+  // Check if course has custom email templates
+  const { data: templatesCountData, refetch: refetchTemplatesCount } = useAdminQuery<GetCourseTemplatesCount>(
+    GET_COURSE_TEMPLATES_COUNT,
+    {
+      variables: { courseId: course.id },
+    }
+  );
+  const hasCustomTemplates = (templatesCountData?.MailTemplate_aggregate?.aggregate?.count || 0) > 0;
+
+  // Get default templates
+  const { data: defaultTemplatesData } = useAdminQuery<GetDefaultTemplates>(GET_DEFAULT_TEMPLATES);
+
+  const [insertEmailTemplate] = useAdminMutation<InsertEmailTemplate, InsertEmailTemplateVariables>(
+    INSERT_EMAIL_TEMPLATE
+  );
+
+  const isExternalRegistration = course.registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION;
+
+  // Determine available template types based on registration type
+  const getAvailableTemplates = useCallback((): string[] => {
+    const allTemplates = [
+      'APPLICATION_RECEIVED',
+      'APPLICATION_CONFIRMED',
+      'SESSION_REMINDER',
+      'INVITE',
+      'DECLINE',
+      'REGISTRATION_CONFIRMED',
+    ];
+
+    if (!course.registrationType || course.registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION) {
+      return []; // No templates for external registration
+    }
+
+    if (
+      course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT ||
+      course.registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION
+    ) {
+      return ['REGISTRATION_CONFIRMED', 'SESSION_REMINDER'];
+    }
+
+    if (course.registrationType === CourseRegistrationType_enum.APPROVAL_WITH_INPUT) {
+      return allTemplates.filter((t) => t !== 'REGISTRATION_CONFIRMED');
+    }
+
+    return [];
+  }, [course.registrationType]);
+
+  // Handle button click - create templates if needed, then navigate
+  const handleManageEmailTemplates = useCallback(async () => {
+    if (isExternalRegistration) {
+      return;
+    }
+
+    // If templates don't exist, create them from defaults
+    if (!hasCustomTemplates && defaultTemplatesData?.MailTemplate) {
+      const availableTemplateTypes = getAvailableTemplates();
+      if (availableTemplateTypes.length > 0) {
+        try {
+          // Create templates for available types from defaults
+          for (const defaultTemplate of defaultTemplatesData.MailTemplate) {
+            if (availableTemplateTypes.includes(defaultTemplate.type || '')) {
+              try {
+                await insertEmailTemplate({
+                  variables: {
+                    object: {
+                      type: defaultTemplate.type,
+                      courseId: course.id,
+                      subject: defaultTemplate.subject,
+                      content: defaultTemplate.content,
+                      from: defaultTemplate.from,
+                      cc: defaultTemplate.cc,
+                      bcc: defaultTemplate.bcc,
+                    },
+                  },
+                  refetchQueries: ['GetCourseTemplatesCount', 'AdminCourseList'],
+                });
+              } catch (insertError: any) {
+                // If template already exists (unique constraint violation), that's okay
+                // This can happen if templates were created in another tab/session
+                if (
+                  insertError?.message?.includes('Uniqueness violation') ||
+                  insertError?.message?.includes('duplicate key')
+                ) {
+                  console.log(`Template ${defaultTemplate.type} already exists for course ${course.id}`);
+                } else {
+                  // Re-throw other errors to be caught by outer catch
+                  throw insertError;
+                }
+              }
+            }
+          }
+          refetchTemplatesCount();
+        } catch (err) {
+          console.error('Error creating templates from defaults:', err);
+          handleError(err);
+          return;
+        }
+      }
+    }
+
+    // Navigate to course-specific templates page
+    router.push(`/manage/course/${course.id}/email-templates`);
+  }, [
+    isExternalRegistration,
+    hasCustomTemplates,
+    defaultTemplatesData,
+    getAvailableTemplates,
+    insertEmailTemplate,
+    course.id,
+    refetchTemplatesCount,
+    router,
+    handleError,
+  ]);
 
   // Helper function
   const makeFullName = (firstName: string, lastName: string): string => {
@@ -320,7 +446,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
   const currentCourseGroups = course.CourseGroups.map((group) => ({
     id: group.CourseGroupOption.id,
-    name: t(`common:course_group_options.${group.CourseGroupOption.title}`),
+    name: group.CourseGroupOption.title
+      ? t(`common:course_group_options.${group.CourseGroupOption.title}`)
+      : '—',
   }));
 
   const currentCourseDegrees = course.CourseDegrees.map((degree) => ({
@@ -328,14 +456,12 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     name: t(degree.DegreeCourse.title),
   }));
 
-  const coverImage = getPublicImageUrl(course?.coverImage, 460);
+  const coverImage = useMemo(() => getPublicImageUrl(course?.coverImage, 460), [course?.coverImage]);
 
   const registrationTypeOptions = Object.values(CourseRegistrationType_enum).map((type) => ({
     value: type,
     label: t(`manageCourses:registration_type.options.${type}`),
   }));
-
-  const isExternalRegistration = course.registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION;
 
   return (
     <>
@@ -405,10 +531,13 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 <div className="flex flex-col items-center justify-center space-y-2">
                   {coverImage ? (
                     <div className="relative">
-                      <img
+                      <Image
                         src={coverImage}
                         alt="course cover"
-                        className="w-40 h-24 object-contain rounded bg-gray-100"
+                        width={160}
+                        height={96}
+                        className="object-contain rounded bg-gray-100"
+                        style={{ width: '160px', height: '96px' }}
                       />
                       <button
                         onClick={handleImageUploadClick}
@@ -444,9 +573,11 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             <div>
               <h4 className="text-sm font-medium text-gray-700 mb-2">{t('manageCourses:instructors.label')}</h4>
               <div className="space-y-2">
-                {course.CourseInstructors.map((courseInstructor) =>
-                  renderInstructor(courseInstructor, deleteInstructorFromCourse)
-                )}
+                {course.CourseInstructors.map((courseInstructor) => (
+                  <Fragment key={courseInstructor.Expert.id}>
+                    {renderInstructor(courseInstructor, deleteInstructorFromCourse)}
+                  </Fragment>
+                ))}
                 <button
                   onClick={openInstructorDialog}
                   className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 p-2 w-full"
@@ -569,6 +700,36 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               refetchQueries={['AdminCourseList']}
               helpText={t('manageCourses:chat_link.help_text')}
             />
+
+            {/* 7. Manage Course Email Templates */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">
+                {t('manageCourses:email_templates.label', { fallback: 'Email Templates' })}
+              </h4>
+              <button
+                onClick={handleManageEmailTemplates}
+                disabled={isExternalRegistration}
+                className={`flex items-center space-x-2 px-4 py-2 rounded ${
+                  isExternalRegistration
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                } transition-colors`}
+              >
+                <MdEmail className="w-5 h-5" />
+                <span>
+                  {hasCustomTemplates
+                    ? t('manageCourses:email_templates.edit_button', { fallback: 'Edit Email Templates' })
+                    : t('manageCourses:email_templates.create_button', { fallback: 'Create Email Templates' })}
+                </span>
+              </button>
+              {isExternalRegistration && (
+                <p className="text-sm text-gray-500 mt-1">
+                  {t('manageCourses:email_templates.external_registration_note', {
+                    fallback: 'Email templates are not available for external registration courses.',
+                  })}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -589,3 +750,4 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 };
 
 export default ExpandableCourseRow;
+

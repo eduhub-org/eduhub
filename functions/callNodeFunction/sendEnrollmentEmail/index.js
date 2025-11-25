@@ -75,10 +75,21 @@ export default async function sendEnrollmentEmail(req, logger) {
     const enrollmentDetails = enrollmentData.CourseEnrollment_by_pk;
 
     // Get appropriate email template based on status
+    // First try course-specific template, then fall back to default template
     const GET_EMAIL_TEMPLATE = gql`
-      query GetEmailTemplate($title: String!) {
-        MailTemplate(where: { title: { _eq: $title } }) {
+      query GetEmailTemplate($type: String!, $courseId: Int) {
+        MailTemplate(
+          where: {
+            _and: [
+              { type: { _eq: $type } }
+              { courseId: { _eq: $courseId } }
+            ]
+          }
+          limit: 1
+        ) {
           id
+          type
+          courseId
           subject
           content
           from
@@ -88,22 +99,22 @@ export default async function sendEnrollmentEmail(req, logger) {
       }
     `;
 
-    let templateTitle;
+    let templateType;
     switch (enrollment.status) {
       case 'APPLIED':
-        templateTitle = 'APPLICATION_RECEIVED';
+        templateType = 'APPLICATION_RECEIVED';
         break;
       case 'CONFIRMED':
-        templateTitle = 'APPLICATION_CONFIRMED';
+        templateType = 'APPLICATION_CONFIRMED';
         break;
       case 'INVITED':
-        templateTitle = 'INVITE';
+        templateType = 'INVITE';
         break;
       case 'REJECTED':
-        templateTitle = 'DECLINE';
+        templateType = 'DECLINE';
         break;
       case 'REGISTERED':
-        templateTitle = 'REGISTRATION_CONFIRMED';
+        templateType = 'REGISTRATION_CONFIRMED';
         break;
       default:
         // Don't send emails for other status changes
@@ -114,15 +125,49 @@ export default async function sendEnrollmentEmail(req, logger) {
         };
     }
 
-    const templateData = await client.request(GET_EMAIL_TEMPLATE, {
-      title: templateTitle
+    // Get courseId from enrollment
+    const courseId = enrollmentDetails.Course?.id;
+
+    // First try to get course-specific template
+    let templateData = await client.request(GET_EMAIL_TEMPLATE, {
+      type: templateType,
+      courseId: courseId
     });
 
+    // If no course-specific template found, fall back to default template (courseId = NULL)
     if (!templateData?.MailTemplate?.length) {
-      logger.error(`Email template not found: ${templateTitle}`);
+      const GET_DEFAULT_TEMPLATE = gql`
+        query GetDefaultTemplate($type: String!) {
+          MailTemplate(
+            where: {
+              _and: [
+                { type: { _eq: $type } }
+                { courseId: { _is_null: true } }
+              ]
+            }
+            limit: 1
+          ) {
+            id
+            type
+            courseId
+            subject
+            content
+            from
+            cc
+            bcc
+          }
+        }
+      `;
+      templateData = await client.request(GET_DEFAULT_TEMPLATE, {
+        type: templateType
+      });
+    }
+
+    if (!templateData?.MailTemplate?.length) {
+      logger.error(`Email template not found: ${templateType} for courseId: ${courseId || 'default'}`);
       return {
         success: false,
-        error: `Email template not found: ${templateTitle}`,
+        error: `Email template not found: ${templateType}`,
         messageKey: 'TEMPLATE_NOT_FOUND'
       };
     }

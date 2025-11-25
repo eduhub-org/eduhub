@@ -1,19 +1,26 @@
 import React, { FC, useRef, useState, memo, useEffect } from 'react';
-import { Navigation } from 'swiper/modules';
+import { Navigation, Mousewheel } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import 'swiper/css/mousewheel';
 import useTranslation from 'next-translate/useTranslation';
 
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
+import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
+import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
 import { Tile } from './Tile';
+import { TileWidget } from './TileWidget';
 
 import sliderNextArrow from '../../../public/images/common/slider-next-arrow.svg';
 import sliderPreviousArrow from '../../../public/images/common/slider-previous-arrow.svg';
 
+type CourseType = CourseList_Course | CourseTiles_Course | CoursesEnrolledByUser_Course;
+
 interface TileSliderProps {
-  courses: CourseList_Course[];
+  courses: CourseType[];
   isManage: boolean;
+  isWidget?: boolean;
 }
 
 interface NavButtonProps {
@@ -23,6 +30,7 @@ interface NavButtonProps {
   onClick: () => void;
   imgSrc: string;
   imgAlt: string;
+  isWidget?: boolean;
 }
 
 const buttonStyles = {
@@ -30,10 +38,10 @@ const buttonStyles = {
     'linear-gradient(0deg, rgba(15, 15, 15, 0.7), rgba(15, 15, 15, 0.7)), linear-gradient(270deg, rgba(34, 34, 34, 0.5) 0%, rgba(255, 253, 253, 0) 105.56%)',
 };
 
-const NavButton: FC<NavButtonProps> = ({ idSuffix, className, visible, onClick, imgSrc, imgAlt }) => (
+const NavButton: FC<NavButtonProps> = ({ idSuffix, className, visible, onClick, imgSrc, imgAlt, isWidget = false }) => (
   <button
     id={idSuffix}
-    className={`${className} w-10 h-[431px] ${!visible ? 'hidden' : ''}`}
+    className={`${className} w-10 ${isWidget ? 'h-[435px]' : 'h-[431px]'} ${!visible ? 'hidden' : ''}`}
     style={buttonStyles}
     onClick={onClick}
   >
@@ -42,6 +50,7 @@ const NavButton: FC<NavButtonProps> = ({ idSuffix, className, visible, onClick, 
 );
 
 const LazyTile = memo(Tile);
+const LazyTileWidget = memo(TileWidget);
 const COMMON_SPACE_BETWEEN = 11;
 const COMMON_OFFSET = 12;
 
@@ -54,7 +63,7 @@ const breakpoints = {
   1536: { spaceBetween: COMMON_SPACE_BETWEEN },
 };
 
-const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
+const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }) => {
   const { t } = useTranslation('common');
   const swiperRef = useRef(null);
   const containerRef = useRef(null);
@@ -114,6 +123,26 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
     return () => clearTimeout(timeout);
   }, [isSwiperReady, hasError, isClient]);
 
+  // Prevent browser navigation on horizontal scroll
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const container = containerRef.current;
+    
+    const handleWheel = (e: WheelEvent) => {
+      // Only prevent default for horizontal scrolling
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        e.preventDefault();
+      }
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
+
   // Don't render Swiper if no courses
   if (!courses || courses.length === 0) {
     return <div className="relative h-[431px]" ref={containerRef} />;
@@ -150,10 +179,15 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
   }
 
   return (
-    <div className="relative h-[431px]" ref={containerRef}>
+    <div 
+      className={`relative ${isWidget ? 'h-[435px] bg-transparent overflow-hidden' : 'h-[431px]'}`} 
+      ref={containerRef}
+      style={{ overscrollBehaviorX: 'contain' }}
+    >
       <Swiper
+        className={isWidget ? '!overflow-visible' : ''}
         ref={swiperRef}
-        modules={[Navigation]}
+        modules={[Navigation, Mousewheel]}
         breakpoints={breakpoints}
         spaceBetween={COMMON_SPACE_BETWEEN}
         slidesPerView={'auto'}
@@ -161,6 +195,11 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
         slidesOffsetAfter={13}
         onSlideChange={handleSlideChange}
         navigation
+        mousewheel={{
+          forceToAxis: true,
+          sensitivity: 1,
+          releaseOnEdges: false,
+        }}
         onInit={(swiper) => {
           try {
             // Ensure swiper is properly initialized
@@ -192,7 +231,11 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
       >
         {courses.map((course) => (
           <SwiperSlide key={course.id} className="whitespace-normal !h-[431px] !w-[275px] xs:!w-[325px]">
-            <LazyTile course={course} isManage={isManage} />
+            {isWidget ? (
+              <LazyTileWidget course={course} />
+            ) : (
+              <LazyTile course={course} isManage={isManage} />
+            )}
           </SwiperSlide>
         ))}
       </Swiper>
@@ -205,6 +248,7 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
             onClick={swiperPrev}
             imgSrc={sliderPreviousArrow}
             imgAlt="Previous"
+            isWidget={isWidget}
           />
           <NavButton
             idSuffix={`next-${idSuffix}`}
@@ -213,6 +257,7 @@ const TileSlider: FC<TileSliderProps> = ({ courses, isManage }) => {
             onClick={swiperNext}
             imgSrc={sliderNextArrow}
             imgAlt="Next"
+            isWidget={isWidget}
           />
         </>
       )}

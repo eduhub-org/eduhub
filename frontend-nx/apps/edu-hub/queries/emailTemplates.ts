@@ -14,7 +14,8 @@ export const EMAIL_TEMPLATES_LIST = gql`
       order_by: $order_by
     ) {
       id
-      title
+      type
+      courseId
       subject
       content
       from
@@ -91,4 +92,43 @@ export const DELETE_EMAIL_TEMPLATE = gql`
       id
     }
   }
-`; 
+`;
+
+export const INSERT_EMAIL_TEMPLATE = gql`
+  mutation InsertEmailTemplate($object: MailTemplate_insert_input!) {
+    insert_MailTemplate_one(object: $object) {
+      id
+      type
+      courseId
+      subject
+      content
+      from
+      cc
+      bcc
+    }
+  }
+`;
+
+export const GET_DEFAULT_TEMPLATES = gql`
+  query GetDefaultTemplates {
+    MailTemplate(where: { courseId: { _is_null: true } }) {
+      id
+      type
+      subject
+      content
+      from
+      cc
+      bcc
+    }
+  }
+`;
+
+export const GET_COURSE_TEMPLATES_COUNT = gql`
+  query GetCourseTemplatesCount($courseId: Int!) {
+    MailTemplate_aggregate(where: { courseId: { _eq: $courseId } }) {
+      aggregate {
+        count
+      }
+    }
+  }
+`;

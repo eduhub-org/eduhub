@@ -90,7 +90,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       const baseLink = course?.coverImage;
       const optimalImageLink = await getBackgroundImage(baseLink);
       setBackgroundImage(optimalImageLink);
-      console.log('optimalImageLink: ', optimalImageLink);
     };
 
     fetchBackgroundImage();

@@ -35,6 +35,7 @@
   "end": "End",
   "menu": {
     "profile": "My Profile",
+    "my_certificates": "My Certificates",
     "faq": "FAQ",
     "user": "User",
     "courses": "Courses",
@@ -241,5 +242,11 @@
     "url_label": "URL",
     "url_placeholder": "Enter URL (e.g., https://example.com or [Enrollment:CourseLink])",
     "url_help": "You can use template variables like [Enrollment:CourseLink] or enter a regular URL"
-  }
+  },
+  "widget_error_loading_courses": "Error loading courses",
+  "widget_no_courses_available": "No courses available",
+  "page_not_found": "Page not found",
+  "page_not_found_description": "The page you're looking for doesn't exist. It may have been moved or deleted.",
+  "back_to_home": "Back to home",
+  "go_back": "Go back"
 }

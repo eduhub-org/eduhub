@@ -1,5 +1,9 @@
 {
   "headline": "E-Mail-Vorlagen",
+  "headline_default": "Standard-E-Mail-Vorlagen",
+  "default_templates_explanation": "Dies sind die Standard-E-Mail-Vorlagen, die app-weit verwendet werden. Du kannst auch kurs-spezifische Vorlagen in der Kursverwaltung definieren, indem du auf den entsprechenden Button in der erweiterbaren Zeile des Kurses klickst.",
+  "course_specific_explanation": "Diese E-Mail-Vorlagen sind spezifisch für diesen Kurs und überschreiben die Standard-Vorlagen beim Versenden von E-Mails für diesen Kurs.",
+  "back_to_courses": "Zurück zu Kursen",
   "columns": {
     "title": "Vorlagen-Typ",
     "subject": "E-Mail-Betreffzeile",

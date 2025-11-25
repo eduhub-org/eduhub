@@ -1,8 +1,8 @@
 ## https://blog.nrwl.io/create-a-next-js-web-app-with-nx-bcf2ab54613
 
-FROM node:18-alpine
+FROM node:18-bullseye-slim
 
-RUN apk add --no-cache libc6-compat socat
+RUN apt-get update && apt-get install -y socat && rm -rf /var/lib/apt/lists/*
 
 RUN corepack enable
 

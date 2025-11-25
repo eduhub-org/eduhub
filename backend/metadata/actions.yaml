@@ -60,6 +60,20 @@ actions:
     permissions:
       - role: user_access
     comment: Gets a signed url for a file in the Google Storage Bucket
+  - name: makeCertificatePublic
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: bucket
+          value_from_env: HASURA_BUCKET
+        - name: name
+          value: makeCertificatePublic
+    permissions:
+      - role: user_access
+    comment: Makes a certificate file public in storage bucket for LinkedIn sharing
   - name: loadParticipationData
     definition:
       kind: ""

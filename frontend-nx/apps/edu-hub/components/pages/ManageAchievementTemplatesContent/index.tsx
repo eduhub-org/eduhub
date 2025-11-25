@@ -35,6 +35,7 @@ import {
 import FileDownload from '../../inputs/FileDownload';
 import { ApolloError } from '@apollo/client';
 import { useTableGrid } from '../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 
 const ManageAchievementTemplatesContent: FC = () => {
   const { t } = useTranslation('manageAchievementTemplates');
@@ -44,11 +45,12 @@ const ManageAchievementTemplatesContent: FC = () => {
     queryHook: useAdminQuery,
     query: ACHIEVEMENT_DOCUMENTATION_TEMPLATES,
     pageSize,
-    refetchFilter: (searchFilter) => ({
-      filter: {
-        _or: [{ title: { _ilike: `%${searchFilter}%` } }],
-      },
-    }),
+    refetchFilter: (searchFilter) => {
+      const searchCondition = createMultiWordSearchCondition(searchFilter, ['title']);
+      return {
+        filter: searchCondition,
+      };
+    },
   });
 
   const [insertAchievementDocumentationTemplate] = useAdminMutation<
