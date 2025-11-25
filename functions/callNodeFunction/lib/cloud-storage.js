@@ -87,7 +87,10 @@ export const buildCloudStorage = (Storage) => {
         }
       },
       setPublic: async (path, bucketName) => {
-        logger.debug(`[Emulated] Set public: ${bucketName}/${getRelativePath(path)}`);
+        path = getRelativePath(path);
+        logger.debug(`[Emulated] Set public: ${bucketName}/${path}`);
+        const publicUrl = `http://localhost:${process.env.STORAGE_PORT}/${bucketName}/${path}`;
+        return publicUrl;
       },
       setPrivate: async (path, bucketName) => {
         logger.debug(`[Emulated] Set private: ${bucketName}/${getRelativePath(path)}`);
@@ -166,7 +169,19 @@ export const buildCloudStorage = (Storage) => {
         path = getRelativePath(path);
         const bucket = storage.bucket(bucketName);
         const file = bucket.file(path);
-        await file.makePublic();
+        
+        // Check if file already is public
+        const [isPublic] = await file.isPublic();
+        
+        if (!isPublic) {
+          await file.makePublic();
+          logger.debug(`Setting file ${path} to public`);
+        } else {
+          logger.debug(`File ${path} already public`);
+        }
+        
+        const publicUrl = await file.publicUrl();
+        return publicUrl;
       },
       setPrivate: async (path, bucketName) => {
         path = getRelativePath(path);

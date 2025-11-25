@@ -56,41 +56,17 @@ const makeCertificatePublic = async (req) => {
       };
     }
 
-    // Make the certificate public and get public URL
+    // Make the certificate public and get public URL using the storage wrapper
     const bucketName = req.headers.bucket;
+    const publicUrl = await storage.setPublic(certificatePath, bucketName);
     
-    if (process.env.ENVIRONMENT === "development") {
-      // In development/emulated mode, just return a mock public URL
-      logger.debug(`[Emulated] Making certificate public: ${bucketName}/${certificatePath}`);
-      const publicUrl = `http://localhost:${process.env.STORAGE_PORT}/${bucketName}/${certificatePath}`;
-      return {
-        success: true,
-        messageKey: "CERTIFICATE_MADE_PUBLIC",
-        publicUrl
-      };
-    } else {
-      // In production, use actual Storage API
-      const bucket = storage.bucket(bucketName);
-      const file = bucket.file(certificatePath);
-      
-      // Check if file already is public
-      const [isPublic] = await file.isPublic();
-      
-      if (!isPublic) {
-        await file.makePublic();
-        logger.info("Certificate made public", { certificatePath, userRole, userUUID });
-      } else {
-        logger.debug("Certificate already public", { certificatePath });
-      }
-      
-      const publicUrl = await file.publicUrl();
-      
-      return {
-        success: true,
-        messageKey: "CERTIFICATE_MADE_PUBLIC",
-        publicUrl
-      };
-    }
+    logger.info("Certificate made public", { certificatePath, userRole, userUUID, publicUrl });
+    
+    return {
+      success: true,
+      messageKey: "CERTIFICATE_MADE_PUBLIC",
+      publicUrl
+    };
   } catch (error) {
     logger.error("Error making certificate public", { 
       error: error.message, 
