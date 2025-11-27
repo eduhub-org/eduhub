@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { SortingState } from '@tanstack/react-table';
 import { BaseRow, BulkAction, UseTableGridProps } from './types';
+import { mergeSortDirection } from './utils';
 
 /**
  * Converts TanStack Table SortingState to Hasura order_by format
