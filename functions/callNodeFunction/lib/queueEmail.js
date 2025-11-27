@@ -21,6 +21,57 @@ async function queueEmail({
   client,
   logger
 }) {
+  // Validate required inputs
+  if (!templateType || typeof templateType !== 'string' || templateType.trim() === '') {
+    return {
+      success: false,
+      error: 'templateType is required and must be a non-empty string',
+      messageKey: 'INVALID_TEMPLATE_TYPE'
+    };
+  }
+
+  if (typeof variableReplacer !== 'function') {
+    return {
+      success: false,
+      error: 'variableReplacer is required and must be a function',
+      messageKey: 'INVALID_VARIABLE_REPLACER'
+    };
+  }
+
+  if (!recipientEmail || typeof recipientEmail !== 'string' || recipientEmail.trim() === '') {
+    return {
+      success: false,
+      error: 'recipientEmail is required and must be a non-empty string',
+      messageKey: 'INVALID_RECIPIENT_EMAIL'
+    };
+  }
+
+  // Basic email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(recipientEmail.trim())) {
+    return {
+      success: false,
+      error: 'recipientEmail must be a valid email address',
+      messageKey: 'INVALID_EMAIL_FORMAT'
+    };
+  }
+
+  if (!client || typeof client !== 'object' || typeof client.request !== 'function') {
+    return {
+      success: false,
+      error: 'client is required and must be an object with a request method',
+      messageKey: 'INVALID_CLIENT'
+    };
+  }
+
+  if (!logger || typeof logger !== 'object' || typeof logger.error !== 'function' || typeof logger.info !== 'function') {
+    return {
+      success: false,
+      error: 'logger is required and must be an object with error and info methods',
+      messageKey: 'INVALID_LOGGER'
+    };
+  }
+
   try {
     // Get email template (course-specific or default)
     const GET_EMAIL_TEMPLATE = gql`

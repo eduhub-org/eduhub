@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogTitle, Checkbox, FormControlLabel } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import { Button } from '../../common/Button';
@@ -25,8 +25,20 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [sendEmail, setSendEmail] = useState(true); // Default to true
-  const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clear timeout on unmount or when dialog closes
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, []);
 
   const [createUser, { loading }] = useAdminMutation(CREATE_USER, {
     onCompleted: (data) => {
@@ -37,44 +49,50 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
         setLastName('');
         setEmail('');
         setSendEmail(true);
+        // Clear any existing timeout
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
         // Close dialog after a short delay
-        setTimeout(() => {
+        timeoutRef.current = setTimeout(() => {
+          timeoutRef.current = null;
           onClose();
           onSuccess(); // Trigger refetch
         }, 1500);
       } else {
-        setError(data?.createUser?.error || t('create_user.error'));
+        setServerError(data?.createUser?.error || t('create_user.error'));
       }
     },
     onError: (err) => {
-      setError(err.message || t('create_user.error'));
+      setServerError(err.message || t('create_user.error'));
     },
   });
 
   const handleSubmit = () => {
-    // Reset error
-    setError(null);
+    // Reset errors
+    setValidationError(null);
+    setServerError(null);
 
     // Validate inputs
     if (!firstName.trim()) {
-      setError(t('create_user.error_first_name_required'));
+      setValidationError(t('create_user.error_first_name_required'));
       return;
     }
 
     if (!lastName.trim()) {
-      setError(t('create_user.error_last_name_required'));
+      setValidationError(t('create_user.error_last_name_required'));
       return;
     }
 
     if (!email.trim()) {
-      setError(t('create_user.error_email_required'));
+      setValidationError(t('create_user.error_email_required'));
       return;
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      setError(t('create_user.error_email_invalid'));
+      setValidationError(t('create_user.error_email_invalid'));
       return;
     }
 
@@ -90,11 +108,17 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
 
   const handleClose = () => {
     if (!loading) {
+      // Clear timeout if dialog is closed early
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
       setFirstName('');
       setLastName('');
       setEmail('');
       setSendEmail(true);
-      setError(null);
+      setValidationError(null);
+      setServerError(null);
       onClose();
     }
   };
@@ -178,8 +202,8 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
               />
             </div>
 
-            {error && (
-              <div className="text-red-600 text-sm mt-2">{error}</div>
+            {validationError && (
+              <div className="text-red-600 text-sm mt-2">{validationError}</div>
             )}
           </div>
 
@@ -205,9 +229,9 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
       />
 
       <ErrorMessageDialog
-        errorMessage={error}
-        open={!!error}
-        onClose={() => setError(null)}
+        errorMessage={serverError}
+        open={!!serverError}
+        onClose={() => setServerError(null)}
       />
     </>
   );

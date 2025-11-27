@@ -141,25 +141,35 @@ export default async function createUser(req, logger) {
     logger.info(`Created Hasura user: ${hasuraUserId}`);
 
     // Assign default 'user' role in Keycloak
-    const hasura_client = await kcAdminClient.clients.find({
-      clientId: 'hasura',
-      first: 1,
-    });
+    // If role assignment fails, throw error to trigger rollback
+    try {
+      const hasura_client = await kcAdminClient.clients.find({
+        clientId: 'hasura',
+        first: 1,
+      });
 
-    if (hasura_client && hasura_client.length > 0) {
+      if (!hasura_client || hasura_client.length === 0) {
+        throw new Error('Hasura client not found in Keycloak');
+      }
+
       const userRole = await kcAdminClient.clients.findRole({
         clientUniqueId: hasura_client[0].id,
         roleName: 'user'
       });
 
-      if (userRole) {
-        await kcAdminClient.users.addClientRoleMappings({
-          id: keycloakUserId,
-          clientUniqueId: hasura_client[0].id,
-          roles: [userRole]
-        });
-        logger.info(`Assigned 'user' role to Keycloak user: ${keycloakUserId}`);
+      if (!userRole) {
+        throw new Error('User role not found in Keycloak');
       }
+
+      await kcAdminClient.users.addClientRoleMappings({
+        id: keycloakUserId,
+        clientUniqueId: hasura_client[0].id,
+        roles: [userRole]
+      });
+      logger.info(`Assigned 'user' role to Keycloak user: ${keycloakUserId}`);
+    } catch (roleError) {
+      logger.error(`Failed to assign 'user' role: ${roleError.message}`);
+      throw new Error(`Failed to assign user role: ${roleError.message}`);
     }
 
     const portalUrl = process.env.FRONTEND_URL || 'https://edu.opencampus.sh';
@@ -219,6 +229,7 @@ export default async function createUser(req, logger) {
     };
 
   } catch (error) {
+    // Log full error details server-side
     logger.error(`Error creating user: ${error.message}`, { error: error.stack });
 
     // Rollback: Delete user from Keycloak if created
@@ -248,9 +259,10 @@ export default async function createUser(req, logger) {
       }
     }
 
+    // Return generic error to client, don't leak internal details
     return {
       success: false,
-      error: error.message,
+      error: null,
       messageKey: 'USER_CREATION_FAILED'
     };
   }
