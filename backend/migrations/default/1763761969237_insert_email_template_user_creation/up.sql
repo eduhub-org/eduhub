@@ -29,14 +29,14 @@ BEGIN
   <p>Dein Account wurde für die EduHub-Plattform erstellt. Du kannst jetzt ein Passwort für deinen Account festlegen und dich anmelden.</p>
   
   <p>Um dein Passwort zu setzen, klicke bitte auf den folgenden Link:</p>
-  <p><a href="{{passwordResetLink}}">Passwort setzen</a></p>
+  <p><a href="[System:PasswordResetLink]">Passwort setzen</a></p>
   
   <p>Falls der Link nicht funktioniert, kopiere diese URL in deinen Browser:</p>
-  <p>{{passwordResetLink}}</p>
+  <p>[System:PasswordResetLink]</p>
   
   <p>Die Passwort-Setzung ist optional. Du kannst den Account auch ohne Passwort nutzen, falls du nur als Referent oder eingeladene Person tätig bist.</p>
   
-  <p>Du kannst dich hier anmelden: <a href="{{portalUrl}}">{{portalUrl}}</a></p>
+  <p>Du kannst dich hier anmelden: <a href="[System:PortalUrl]">[System:PortalUrl]</a></p>
   
   <p>Viele Grüße,<br>Dein EduHub Team</p>
 </body>

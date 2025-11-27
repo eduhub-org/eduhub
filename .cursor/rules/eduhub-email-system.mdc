@@ -31,13 +31,13 @@ functions/
 **Function**: `callNodeFunction/sendEnrollmentEmail/`
 - **Trigger**: User enrollment in courses
 - **Templates**: Application received, approval notifications, rejection notifications
-- **Variables**: `{{courseTitle}}`, `{{firstName}}`, `{{lastName}}`, `{{applicationDate}}`
+- **Variables**: `[Enrollment:CourseId--Course:Name]`, `[User:Firstname]`, `[User:LastName]`, `[Enrollment:CreatedAt]`
 
 #### 2. Session Reminder Emails
 **Function**: `callNodeFunction/sendSessionReminders/`
 - **Trigger**: Scheduled reminders before course sessions
 - **Templates**: Session reminders, cancellation notifications
-- **Variables**: `{{sessionTitle}}`, `{{sessionDate}}`, `{{sessionTime}}`, `{{location}}`
+- **Variables**: `[Session:Title]`, `[Session:StartDateTime]`, `[Session:Duration]`, `[Session:ReminderText]`
 
 #### 3. General Notifications
 **Function**: `sendMail/`
@@ -52,16 +52,16 @@ functions/
 // Example template object
 const emailTemplate = {
   name: 'APPLICATION_RECEIVED',
-  subject: 'Application Received - {{courseTitle}}',
+  subject: 'Application Received - [Enrollment:CourseId--Course:Name]',
   content: `
-    Dear {{firstName}},
+    Dear [User:Firstname] [User:LastName],
     
-    Your application for {{courseTitle}} has been received and is under review.
+    Your application for [Enrollment:CourseId--Course:Name] has been received and is under review.
     
     Best regards,
     EduHub Team
   `,
-  variables: ['firstName', 'lastName', 'courseTitle', 'applicationDate']
+  variables: ['[User:Firstname]', '[User:LastName]', '[Enrollment:CourseId--Course:Name]', '[Enrollment:CreatedAt]']
 };
 ```
 
@@ -69,22 +69,24 @@ const emailTemplate = {
 See [EMAIL_TEMPLATE_VARIABLES.md](mdc:functions/callNodeFunction/EMAIL_TEMPLATE_VARIABLES.md) for complete list:
 
 **User Variables**:
-- `{{firstName}}`, `{{lastName}}`, `{{email}}`
-- `{{userId}}`, `{{userProfile}}`
+- `[User:Firstname]`, `[User:LastName]`
 
 **Course Variables**:
-- `{{courseTitle}}`, `{{courseDescription}}`
-- `{{instructorName}}`, `{{courseStartDate}}`
-- `{{applicationDeadline}}`, `{{maxParticipants}}`
+- `[Enrollment:CourseId--Course:Name]` (Course title)
+- `[Course:StartTime]`, `[Course:EndTime]`
+
+**Enrollment Variables**:
+- `[Enrollment:CreatedAt]` (Application/enrollment date)
+- `[Enrollment:ExpirationDate]` (Invitation expiration date)
+- `[Enrollment:CourseLink]` (Link to course page)
 
 **Session Variables**:
-- `{{sessionTitle}}`, `{{sessionDate}}`, `{{sessionTime}}`
-- `{{sessionLocation}}`, `{{sessionDescription}}`
-- `{{meetingLink}}`, `{{sessionDuration}}`
+- `[Session:Title]`, `[Session:StartDateTime]`, `[Session:Duration]`
+- `[Session:ReminderText]`, `[Session:ReminderTime]`
 
 **System Variables**:
-- `{{currentDate}}`, `{{portalUrl}}`
-- `{{supportEmail}}`, `{{organizationName}}`
+- `[System:PasswordResetLink]` (Password reset link for user creation)
+- `[System:PortalUrl]` (Portal URL)
 
 ## Email Function Usage
 
@@ -119,9 +121,9 @@ const reminderResult = await callNodeFunction({
 const emailResult = await sendMail({
   to: user.email,
   subject: 'Custom Notification',
-  content: 'Email content with {{variable}} substitution',
+  content: 'Email content with [User:Firstname] substitution',
   variables: {
-    variable: 'actual value'
+    '[User:Firstname]': 'John'
   }
 });
 ```
@@ -250,11 +252,12 @@ Track email effectiveness through:
 ## Best Practices
 
 ### Template Design
-1. **Use semantic variable names**: `{{courseTitle}}` not `{{ct}}`
-2. **Provide fallback content**: Handle missing variables gracefully
-3. **Test with real data**: Use production-like test data
-4. **Keep templates maintainable**: Avoid complex logic in templates
-5. **Version control templates**: Track template changes through migrations
+1. **Use semantic variable names**: `[Enrollment:CourseId--Course:Name]` not `[Course]`
+2. **Use bracket notation**: All template variables use brackets `[Category:Name]` format, not curly braces
+3. **Provide fallback content**: Handle missing variables gracefully
+4. **Test with real data**: Use production-like test data
+5. **Keep templates maintainable**: Avoid complex logic in templates
+6. **Version control templates**: Track template changes through migrations
 
 ### Function Development
 1. **Validate input parameters**: Check required fields before processing
@@ -281,7 +284,7 @@ Track email effectiveness through:
 ### Template Variables Not Replaced
 1. **Verify variable names**: Ensure exact match with template variables
 2. **Check variable data**: Confirm variables contain expected values
-3. **Review template syntax**: Ensure proper `{{variable}}` format
+3. **Review template syntax**: Ensure proper `[Category:Name]` bracket format (not curly braces)
 4. **Test template processing**: Isolate template processing for debugging
 
 ### Function Timeout Issues
