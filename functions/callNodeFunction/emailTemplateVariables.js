@@ -6,6 +6,24 @@
  */
 
 /**
+ * Escapes HTML special characters to prevent XSS attacks
+ * @param {string} text - Text to escape
+ * @returns {string} Escaped text
+ */
+export function escapeHtml(text) {
+  if (!text || typeof text !== 'string') {
+    return text || '';
+  }
+  
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/**
  * Registry of all available email template variables
  * Organized by category for better maintainability
  */
@@ -89,6 +107,20 @@ export const EMAIL_VARIABLES = {
       example: 'tomorrow',
       categories: ['session']
     }
+  },
+
+  // System-related variables
+  SYSTEM: {
+    '[System:PasswordResetLink]': {
+      description: 'Password reset link for user account creation',
+      example: 'https://keycloak.example.com/realms/edu-hub/login-actions/reset-credentials?client_id=hasura',
+      categories: ['general']
+    },
+    '[System:PortalUrl]': {
+      description: 'Portal URL for user login',
+      example: 'https://edu.opencampus.sh',
+      categories: ['general']
+    }
   }
 };
 
@@ -156,9 +188,12 @@ export function createVariableReplacer(data, formatDate) {
     let result = text;
     
     // User variables - always attempt replacement
+    // Escape user-supplied personal data to prevent XSS
+    const firstName = escapeHtml(data.user?.firstName || '');
+    const lastName = escapeHtml(data.user?.lastName || '');
     result = result
-      .replaceAll('[User:Firstname]', data.user?.firstName || '')
-      .replaceAll('[User:LastName]', data.user?.lastName || '');
+      .replaceAll('[User:Firstname]', firstName)
+      .replaceAll('[User:LastName]', lastName);
     
     // Course variables - always attempt replacement  
     result = result

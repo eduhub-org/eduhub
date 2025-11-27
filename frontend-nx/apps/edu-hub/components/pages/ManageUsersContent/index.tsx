@@ -13,6 +13,7 @@ import { UsersByLastName_User } from '../../../queries/__generated__/UsersByLast
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import NavigationButton from '../../common/NavigationButton';
+import { CreateUserDialog } from './CreateUserDialog';
 
 const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
   const { t } = useTranslation('manageUsers');
@@ -51,13 +52,14 @@ const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
 const ManageUsersContent: FC = () => {
   const { t } = useTranslation('manageUsers');
   const [pageSize, setPageSize] = useState(20);
+  const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);
     setPageIndex(0); // Reset to first page when page size changes
   };
 
-  const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter } = useTableGrid({
+  const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter, refetch } = useTableGrid({
     queryHook: useAdminQuery,
     query: USERS_BY_LAST_NAME,
     pageSize: pageSize,
@@ -115,7 +117,7 @@ const ManageUsersContent: FC = () => {
         {loading && <Loading />}
         {!loading && !error && (
           <div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-4">
               <CommonPageHeader headline={t('headline')} />
               <NavigationButton href="/manage/admin-users" filled inverted>
                 {t('manageUsers:manage_admins')}
@@ -138,10 +140,19 @@ const ManageUsersContent: FC = () => {
               refetchQueries={['UsersByLastName']}
               generateDeletionConfirmationQuestion={generateDeletionConfirmation}
               expandableRowComponent={({ row }) => <ExpandableUserRow row={row} />}
+              addButtonText={t('create_user.button')}
+              onAddButtonClick={() => setCreateUserDialogOpen(true)}
             />
           </div>
         )}
       </div>
+      <CreateUserDialog
+        open={createUserDialogOpen}
+        onClose={() => setCreateUserDialogOpen(false)}
+        onSuccess={() => {
+          refetch();
+        }}
+      />
     </PageBlock>
   );
 };

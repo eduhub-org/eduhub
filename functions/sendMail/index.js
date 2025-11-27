@@ -15,6 +15,7 @@ exports.sendMail = async (req, res) => {
 
   // Extract email parameters from the Hasura event payload
   const { subject, content, to, replyTo, cc, bcc } = req.body.event.data.new;
+  
   // Get mail tag from headers or use default
   const mailTag = req.headers.mailTag || 'eduhub'; // default if not provided
 

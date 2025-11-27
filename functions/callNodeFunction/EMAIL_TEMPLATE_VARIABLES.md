@@ -64,6 +64,17 @@ The email template variable system is centralized in `emailTemplateVariables.js`
 - **`[Session:ReminderTime]`**: Dynamic time text based on timing
   - Examples: `tomorrow`, `in 1 hour`, `in 15 minutes`
 
+### System Variables
+*Available in: general emails (e.g., user creation)*
+
+- **`[System:PasswordResetLink]`**: Password reset link for user account creation
+  - Example: `https://keycloak.example.com/realms/edu-hub/login-actions/reset-credentials?client_id=hasura`
+  - Available in: user creation emails
+
+- **`[System:PortalUrl]`**: Portal URL for user login
+  - Example: `https://edu.opencampus.sh`
+  - Available in: user creation emails
+
 ## Date Formatting
 
 All date variables are automatically formatted based on the app's timezone setting:
@@ -104,6 +115,21 @@ The timezone is retrieved from the `AppSettings` table and mapped to appropriate
   <p>Session starts: [Session:StartDateTime]</p>
   <p>Duration: [Session:Duration]</p>
   <p>Course page: <a href="[Enrollment:CourseLink]">[Enrollment:CourseLink]</a></p>
+</body>
+</html>
+```
+
+### For User Creation Emails
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+  <p>Hello [User:Firstname] [User:LastName],</p>
+  <p>Your account has been created for the EduHub platform.</p>
+  <p>To set your password, please click on the following link:</p>
+  <p><a href="[System:PasswordResetLink]">Set Password</a></p>
+  <p>You can log in here: <a href="[System:PortalUrl]">[System:PortalUrl]</a></p>
 </body>
 </html>
 ```

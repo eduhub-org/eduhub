@@ -15,7 +15,8 @@
     "SESSION_REMINDER": "Sitzungserinnerung",
     "INVITE": "Einladung",
     "DECLINE": "Bewerbung abgelehnt",
-    "REGISTRATION_CONFIRMED": "Registrierung bestätigt"
+    "REGISTRATION_CONFIRMED": "Registrierung bestätigt",
+    "USER_CREATED": "Benutzer erstellt"
   },
   "placeholders": {
     "subject": "E-Mail-Betreff eingeben...",
@@ -38,7 +39,8 @@
     "INVITE": "Gesendet, wenn ein Admin Benutzer zu einem Kurs einlädt",
     "DECLINE": "Gesendet, wenn ein Admin Bewerbungen ablehnt",
     "REGISTRATION_CONFIRMED": "Gesendet, wenn sich ein Benutzer direkt für einen Kurs/eine Veranstaltung registriert",
-    "SESSION_REMINDER": "Gesendet vor Beginn der Sitzungen (24h, 1h, 15min vorher)"
+    "SESSION_REMINDER": "Gesendet vor Beginn der Sitzungen (24h, 1h, 15min vorher)",
+    "USER_CREATED": "Gesendet, wenn ein neues Benutzerkonto erstellt wird"
   },
   "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage '{{title}}' löschen möchtest?",
   "unknown_trigger": "Unbekannter Auslöser-Typ"
