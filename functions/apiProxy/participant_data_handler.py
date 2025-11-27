@@ -30,15 +30,32 @@ def safe_float_convert(value):
         value: The value to convert (string or numeric)
         
     Returns:
-        float: The converted float value
+        float or None: The converted float value, or None if value is invalid/empty/NONE
         
     Raises:
-        ValueError: If the value cannot be converted to float
+        ValueError: If the value cannot be converted to float (only for unexpected errors)
     """
-    if isinstance(value, str):
-        return float(value.replace(",", "."))
-    else:
-        return float(value)
+    # Handle None values
+    if value is None:
+        return None
+    
+    # Handle empty strings
+    if isinstance(value, str) and value.strip() == "":
+        return None
+    
+    # Handle "NONE" string (case-insensitive)
+    if isinstance(value, str) and value.strip().upper() == "NONE":
+        return None
+    
+    # Convert valid numeric strings and numbers
+    try:
+        if isinstance(value, str):
+            return float(value.replace(",", "."))
+        else:
+            return float(value)
+    except (ValueError, TypeError):
+        # Return None for any conversion failures instead of raising
+        return None
 
 
 def authenticate_organization_access(request):
@@ -670,11 +687,12 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
         "generatedAt": datetime.now(UTC).isoformat()
     }
     
-    # Add ECTS credits if available
-    if course_info.get("ects"):
+    # Add ECTS credits if available and valid
+    ects_value = safe_float_convert(course_info.get("ects"))
+    if ects_value is not None:
         response["learningOpportunity"]["creditPoints"] = [{
             "framework": "ECTS",
-            "point": safe_float_convert(course_info["ects"])
+            "point": ects_value
         }]
     
     # No eqfLevel field in Program; omit
@@ -718,10 +736,12 @@ def handle_organization_courses(auth_info, eduhub_client, client_ip, request_dat
             "participantDataEndpoint": f"/participants/courses/{course['id']}"
         }
         
-        if course.get("ects"):
+        # Only add creditPoints if ECTS value is valid and convertible
+        ects_value = safe_float_convert(course.get("ects"))
+        if ects_value is not None:
             course_summary["creditPoints"] = [{
                 "framework": "ECTS", 
-                "point": safe_float_convert(course["ects"])
+                "point": ects_value
             }]
             
         course_list.append(course_summary)
