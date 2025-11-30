@@ -1,34 +1,59 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogTitle, Checkbox, FormControlLabel } from '@mui/material';
 import { MdClose } from 'react-icons/md';
-import { Button } from '../../common/Button';
+import { Button } from '../Button';
 import InputField from '../../inputs/InputField';
 import useTranslation from 'next-translate/useTranslation';
-import { useAdminMutation } from '../../../hooks/authedMutation';
+import { useRoleMutation } from '../../../hooks/authedMutation';
 import { CREATE_USER } from '../../../queries/user';
-import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
-import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
+import NotificationSnackbar from './NotificationSnackbar';
+import { ErrorMessageDialog } from './ErrorMessageDialog';
+import { CreateUser } from '../../../queries/__generated__/CreateUser';
+
+type CreateUserVariables = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  sendEmail: boolean;
+};
 
 interface CreateUserDialogProps {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  onUserCreated?: (userId: string, firstName: string, lastName: string, email: string) => void;
+  initialFirstName?: string;
+  initialLastName?: string;
+  initialEmail?: string;
 }
 
 export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
   open,
   onClose,
   onSuccess,
+  onUserCreated,
+  initialFirstName = '',
+  initialLastName = '',
+  initialEmail = '',
 }) => {
   const { t } = useTranslation('manageUsers');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState(initialFirstName);
+  const [lastName, setLastName] = useState(initialLastName);
+  const [email, setEmail] = useState(initialEmail);
   const [sendEmail, setSendEmail] = useState(true); // Default to true
   const [validationError, setValidationError] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Update form fields when initial values change
+  useEffect(() => {
+    if (open) {
+      setFirstName(initialFirstName);
+      setLastName(initialLastName);
+      setEmail(initialEmail);
+    }
+  }, [open, initialFirstName, initialLastName, initialEmail]);
 
   // Clear timeout on unmount or when dialog closes
   useEffect(() => {
@@ -40,10 +65,21 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
     };
   }, []);
 
-  const [createUser, { loading }] = useAdminMutation(CREATE_USER, {
+  const [createUser, { loading }] = useRoleMutation<CreateUser, CreateUserVariables>(CREATE_USER, {
     onCompleted: (data) => {
       if (data?.createUser?.success) {
         setShowSuccessNotification(true);
+        
+        // Call onUserCreated callback if provided
+        if (onUserCreated && data.createUser.userId) {
+          onUserCreated(
+            data.createUser.userId,
+            firstName.trim(),
+            lastName.trim(),
+            email.trim()
+          );
+        }
+        
         // Reset form
         setFirstName('');
         setLastName('');
@@ -140,7 +176,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
             <button
               onClick={handleClose}
               className="p-1 rounded-full hover:bg-gray-200 transition-colors"
-              aria-label={t('close')}
+              aria-label={t('common:close')}
               disabled={loading}
             >
               <MdClose className="text-xl" />

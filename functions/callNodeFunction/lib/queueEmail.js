@@ -1,4 +1,4 @@
-const { gql, GraphQLClient } = require('graphql-request');
+import { gql, GraphQLClient } from 'graphql-request';
 
 /**
  * Generic function to queue emails
