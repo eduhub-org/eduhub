@@ -11,6 +11,7 @@ from datetime import datetime, UTC
 try:
     from api_clients.eduhub_client import EduHubClient
     from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input, SecurityLevel
+    from course_id_utils import generate_course_hash_id
 except ImportError:
     # Fallback for when module is loaded from different context
     import sys
@@ -19,6 +20,64 @@ except ImportError:
     sys.path.insert(0, current_dir)
     from api_clients.eduhub_client import EduHubClient
     from security_handler import security_handler, get_security_level_for_organization, validate_and_sanitize_input, SecurityLevel
+    from course_id_utils import generate_course_hash_id
+
+
+def select_priority_location(course_locations):
+    """
+    Select the priority location from a list of course locations.
+    Priority order: ONLINE > KIEL > HEIDE > (any other location)
+    
+    Args:
+        course_locations: List of location dictionaries with 'id' and 'locationOption' keys
+        
+    Returns:
+        Selected location dictionary or None if no locations exist
+    """
+    if not course_locations:
+        return None
+    
+    # Priority order: ONLINE > KIEL > HEIDE > others
+    priority_order = ['ONLINE', 'KIEL', 'HEIDE']
+    
+    # First, try to find locations in priority order
+    for priority in priority_order:
+        for location in course_locations:
+            if location.get('locationOption') == priority:
+                return location
+    
+    # If no priority location found, return the first available location
+    return course_locations[0]
+
+
+def resolve_course_id_from_url(course_id_param, org_courses):
+    """
+    Resolve course ID from URL parameter.
+    Accepts both internal course IDs (integers) and hash IDs (UUIDs).
+    Returns the internal course ID for database queries.
+    
+    Args:
+        course_id_param: Course ID from URL (can be integer or UUID string)
+        org_courses: List of courses with hashId and _internalId fields
+        
+    Returns:
+        Internal course ID (integer) or None if not found
+    """
+    # Try to parse as integer (internal ID)
+    try:
+        internal_id = int(course_id_param)
+        # Verify it exists in org_courses
+        for course in org_courses:
+            if course.get("_internalId") == internal_id or course.get("id") == internal_id:
+                return internal_id
+        return None
+    except (ValueError, TypeError):
+        # Not an integer, try as hash ID (UUID)
+        # Look up hash ID in org_courses
+        for course in org_courses:
+            if course.get("hashId") == course_id_param:
+                return course.get("_internalId") or course.get("id")
+        return None
 
 
 def safe_float_convert(value):
@@ -296,6 +355,10 @@ def get_organization_funded_courses(organization_id, eduhub_client):
                 programId
                 achievementCertificatePossible
                 attendanceCertificatePossible
+                CourseLocations {
+                    id
+                    locationOption
+                }
                 Sessions {
                     id
                     startDateTime
@@ -322,6 +385,29 @@ def get_organization_funded_courses(organization_id, eduhub_client):
             for funding_relation in result["data"].get("CourseFundingOrganization", []):
                 course = funding_relation.get("Course")
                 if course:
+                    # Select priority location and generate hash ID
+                    course_locations = course.get("CourseLocations", [])
+                    selected_location = select_priority_location(course_locations)
+                    
+                    # Generate hash ID using course_id-location_id format (matching MOOCHub API)
+                    if selected_location:
+                        location_id = selected_location["id"]
+                        course_id = course["id"]
+                        hash_id = generate_course_hash_id(course_id, location_id)
+                        
+                        # Store hash ID and location info for future use
+                        course["hashId"] = hash_id
+                        course["selectedLocation"] = selected_location
+                        # Keep internal ID for backward compatibility with URL lookups
+                        course["_internalId"] = course_id
+                    else:
+                        # Fallback: use course ID only if no locations exist
+                        course_id = course["id"]
+                        hash_id = generate_course_hash_id(course_id)
+                        course["hashId"] = hash_id
+                        course["selectedLocation"] = None
+                        course["_internalId"] = course_id
+                    
                     courses.append(course)
         except Exception as e:
             logging.warning(f"Primary course funding query parsing failed: {str(e)}")
@@ -342,6 +428,10 @@ def get_organization_funded_courses(organization_id, eduhub_client):
                 programId
                 achievementCertificatePossible
                 attendanceCertificatePossible
+                CourseLocations {
+                    id
+                    locationOption
+                }
                 Sessions {
                     id
                     startDateTime
@@ -359,6 +449,24 @@ def get_organization_funded_courses(organization_id, eduhub_client):
         if _valid_result(fb_result):
             try:
                 courses = fb_result["data"].get("Course", [])
+                # Process locations and generate hash IDs for fallback results
+                for course in courses:
+                    course_locations = course.get("CourseLocations", [])
+                    selected_location = select_priority_location(course_locations)
+                    
+                    if selected_location:
+                        location_id = selected_location["id"]
+                        course_id = course["id"]
+                        hash_id = generate_course_hash_id(course_id, location_id)
+                        course["hashId"] = hash_id
+                        course["selectedLocation"] = selected_location
+                        course["_internalId"] = course_id
+                    else:
+                        course_id = course["id"]
+                        hash_id = generate_course_hash_id(course_id)
+                        course["hashId"] = hash_id
+                        course["selectedLocation"] = None
+                        course["_internalId"] = course_id
             except Exception as e:
                 logging.error(f"Fallback course funding query parsing failed: {str(e)}")
                 courses = []
@@ -393,6 +501,10 @@ def get_course_participants(course_id, auth_info, eduhub_client):
             ects
             language
             maxMissedSessions
+            CourseLocations {
+                id
+                locationOption
+            }
             Sessions {
                 id
                 startDateTime
@@ -433,7 +545,30 @@ def get_course_participants(course_id, auth_info, eduhub_client):
     attendance_result = eduhub_client.send_query(attendance_query, variables)
     attendance_data = attendance_result["data"]["Attendance"]
     
+    # Select priority location and generate hash ID for the course
+    course_locations = course_info.get("CourseLocations", [])
+    selected_location = select_priority_location(course_locations)
+    
+    if selected_location:
+        location_id = selected_location["id"]
+        course_id = course_info["id"]
+        hash_id = generate_course_hash_id(course_id, location_id)
+        course_info["hashId"] = hash_id
+        course_info["selectedLocation"] = selected_location
+    else:
+        # Fallback: use course ID only if no locations exist
+        course_id = course_info["id"]
+        hash_id = generate_course_hash_id(course_id)
+        course_info["hashId"] = hash_id
+        course_info["selectedLocation"] = None
+    
+    # Keep internal ID for backward compatibility
+    course_info["_internalId"] = course_id
+    
     # Process participants
+    # TODO: Future enhancement - add participantLocation field to each participant
+    # This will indicate which location the participant is enrolled in
+    # The selectedLocation is stored in course_info for this future use
     participants = []
     for enrollment in enrollments:
         user = enrollment["User"]
@@ -451,7 +586,12 @@ def get_course_participants(course_id, auth_info, eduhub_client):
 
 def process_participant_data(enrollment, user, attendance_data, course_info, auth_info):
     """
-    Process participant data based on access permissions
+    Process participant data based on access permissions.
+    
+    Note: course_info contains selectedLocation field for future participant location tracking.
+    TODO: Add participantLocation field to participant object to indicate which location
+    the participant is enrolled in. The selectedLocation from course_info can be used
+    as a default, but individual participant locations may differ.
     """
     
     # Determine completion status
@@ -459,6 +599,9 @@ def process_participant_data(enrollment, user, attendance_data, course_info, aut
     has_attendance_cert = bool(enrollment.get("attendanceCertificateURL"))
     
     # Base participant data
+    # TODO: Future enhancement - add participantLocation field to indicate which location
+    # the participant is enrolled in. Use course_info["selectedLocation"] as reference.
+    # Example: "participantLocation": {"id": location_id, "locationOption": "ONLINE"}
     participant = {
         "id": hash_user_id(user["id"]),
         "enrollmentStatus": enrollment["status"],
@@ -635,7 +778,8 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
     """
     # Verify organization has access to this course
     org_courses = get_organization_funded_courses(auth_info['organization_id'], eduhub_client)
-    course_ids = [course['id'] for course in org_courses]
+    # Use _internalId if available (from our processing), otherwise use 'id' (from GraphQL)
+    course_ids = [course.get('_internalId') or course.get('id') for course in org_courses]
     
     if course_id not in course_ids:
         security_handler.log_audit_event(
@@ -654,10 +798,16 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
         )
         return {'error': 'Course not found'}, 404
     
-    # Build response
+    # Get hash ID (generated in get_course_participants)
+    hash_id = course_info.get("hashId")
+    if not hash_id:
+        # Fallback if hash ID wasn't generated (shouldn't happen, but safety check)
+        hash_id = generate_course_hash_id(course_id)
+    
+    # Build response using hash ID instead of internal course ID
     response = {
         "type": "ParticipantDataReport",
-        "id": f"urn:report:course:{course_id}:{datetime.now(UTC).isoformat()}",
+        "id": f"urn:report:course:{hash_id}:{datetime.now(UTC).isoformat()}",
         "provider": {
             "id": "did:web:edu.opencampus.sh",
             "name": "opencampus.sh",
@@ -673,7 +823,7 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
             }
         },
         "learningOpportunity": {
-            "id": f"urn:course:{course_id}",
+            "id": f"urn:course:{hash_id}",
             "title": course_info["title"],
             "summary": course_info.get("tagline"),
             "type": "Course",
@@ -727,13 +877,20 @@ def handle_organization_courses(auth_info, eduhub_client, client_ip, request_dat
     
     course_list = []
     for course in org_courses:
+        # Use hash ID instead of internal course ID
+        hash_id = course.get("hashId")
+        if not hash_id:
+            # Fallback if hash ID wasn't generated (shouldn't happen, but safety check)
+            course_id = course.get("_internalId") or course.get("id")
+            hash_id = generate_course_hash_id(course_id)
+        
         course_summary = {
-            "id": course["id"],
+            "id": hash_id,
             "title": course["title"],
             "description": course.get("description"),
             "startDate": course.get("startDate"),
             "endDate": course.get("endDate"),
-            "participantDataEndpoint": f"/participants/courses/{course['id']}"
+            "participantDataEndpoint": f"/participants/courses/{hash_id}"
         }
         
         # Only add creditPoints if ECTS value is valid and convertible
@@ -829,7 +986,7 @@ def handle_participants_schema():
                 "get_participants": {
                     "method": "GET", 
                     "path": "/participants/courses/{course_id}",
-                    "description": "Get participant enrollment and completion data for a specific funded course",
+                    "description": "Get participant enrollment and completion data for a specific funded course. Accepts internal course ID (integer) for backward compatibility. Returns hash ID (UUID) in response.",
                     "response_type": "ParticipantDataReport"
                 },
                 "get_schema": {
@@ -861,7 +1018,7 @@ def handle_participants_schema():
                 "learningAchievements": "Optional array of certificate records with URNs and types"
             },
             "course_data": {
-                "id": "Numeric course identifier",
+                "id": "UUID v5 hash identifier (format: urn:course:{uuid}) - matches MOOCHub API format. Generated from course_id-location_id combination using priority: ONLINE > KIEL > HEIDE",
                 "title": "Course title",
                 "summary": "Course description/tagline", 
                 "language": "Array of ISO language codes",

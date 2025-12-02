@@ -2,9 +2,9 @@ import os
 from flask import jsonify
 import logging
 from api_clients.eduhub_client import EduHubClient
-import uuid
 from datetime import datetime
 import markdown
+from course_id_utils import generate_course_hash_id
 try:
     from participant_data_handler import handle_participants_request, handle_participants_schema
 except ImportError:
@@ -14,10 +14,11 @@ except ImportError:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     sys.path.insert(0, current_dir)
     from participant_data_handler import handle_participants_request, handle_participants_schema
+    from course_id_utils import generate_course_hash_id
 
 # Rate limiting configuration - 100 requests per hour per IP
 RATE_LIMIT = 60
-RATE_WINDOW = 3600  # 1 hour in seconds
+RATE_WINDOW = 60  # 1 minute in seconds
 request_counts = {}  # In-memory storage for rate limiting
 
 # Hardcoded location address mapping
@@ -91,14 +92,6 @@ def get_cors_headers():
         'X-Rate-Limit-Window': str(RATE_WINDOW)
     }
     return headers
-
-def generate_uuid_from_id(id_str):
-    """Generate a consistent UUID from a string ID by using it as a namespace."""
-    # Use a fixed namespace UUID (version 5, SHA-1)
-    # This is a randomly generated UUID that we'll use as our namespace
-    NAMESPACE_UUID = uuid.UUID('fb7eec39-2d36-4c2f-a6b7-87568c8976b2')
-    # Generate a UUID using the course ID string
-    return str(uuid.uuid5(NAMESPACE_UUID, str(id_str)))
 
 def handle_moochub_data(page=1, per_page=25):
     try:
@@ -354,9 +347,8 @@ def handle_moochub_data(page=1, per_page=25):
                     }
                 
                 # Generate unique ID for this course-location combination
-                location_id = f"{course['id']}-{location['id']}"
                 transformed_course = {
-                    "id": generate_uuid_from_id(location_id),
+                    "id": generate_course_hash_id(course['id'], location['id']),
                     "type": "Course",
                     "attributes": attributes
                 }

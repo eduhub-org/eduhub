@@ -116,4 +116,22 @@ curl -s \
   http://localhost:42026/participants/courses/302
 ```
 
+#### Development and Testing
+
+For local development and testing, use the development API key:
+
+**Development API Key:** `edh_live_org160_sk_056afe290cadf18e2b2d7482c5f4e5a5`
+
+This key is configured in the development database seed data and is safe to use for local testing. The development server runs on `http://localhost:42026`.
+
+**Example development request:**
+```bash
+curl -X GET "http://localhost:42026/participants" \
+  -H "X-API-Key: edh_live_org160_sk_056afe290cadf18e2b2d7482c5f4e5a5" \
+  -H "User-Agent: EduHub-Client/1.0" \
+  -H "Accept-Version: 3.0.1"
+```
+
+**Note:** The development API key only works with the local development server. For production access, contact the EduHub team to obtain a production API key.
+
 
