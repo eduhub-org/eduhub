@@ -127,6 +127,7 @@
   "select_time": "Select time",
   "close": "Close",
   "ok": "OK",
+  "loading": "Loading...",
   "user_card": {
     "speaker": "Speaker",
     "external_profile": "Homepage",

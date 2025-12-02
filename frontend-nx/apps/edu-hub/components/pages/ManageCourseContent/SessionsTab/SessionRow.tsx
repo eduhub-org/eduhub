@@ -269,6 +269,8 @@ export const SessionRow: FC<IProps> = ({
     [fetchUserByEmail, handleNewSpeaker, session]
   );
 
+  const parsedSearchValues = parseSearchValue(searchValueForNewUser);
+
   return (
     <div>
       <div className={`grid grid-cols-24 gap-3 mb-1 ${session != null ? 'bg-edu-light-gray' : ''}`}>
@@ -381,7 +383,9 @@ export const SessionRow: FC<IProps> = ({
           // Refetch handled in handleUserCreated
         }}
         onUserCreated={handleUserCreated}
-        {...parseSearchValue(searchValueForNewUser)}
+        initialFirstName={parsedSearchValues.firstName}
+        initialLastName={parsedSearchValues.lastName}
+        initialEmail={parsedSearchValues.email}
       />
 
       {/* Confirmation Dialog for Deletion */}

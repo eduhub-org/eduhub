@@ -135,7 +135,7 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
             </div>
           )}
           {isLoading && hasSearched && (
-            <div className="text-gray-500 mt-4">Loading...</div>
+            <div className="text-gray-500 mt-4">{t('common:loading')}</div>
           )}
         </div>
 

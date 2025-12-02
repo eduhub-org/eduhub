@@ -127,6 +127,7 @@
   "select_time": "Zeit auswählen",
   "close": "Schließen",
   "ok": "OK",
+  "loading": "Lädt...",
   "user_card": {
     "speaker": "Referent:in",
     "external_profile": "Homepage",

@@ -13,7 +13,6 @@ export interface CreateUser_createUser {
   userId: any | null;
   keycloakUserId: string | null;
   emailQueued: boolean | null;
-  scheduledAt: string | null;
   error: string | null;
   messageKey: string;
 }
@@ -29,4 +28,5 @@ export interface CreateUserVariables {
   firstName: string;
   lastName: string;
   email: string;
+  sendEmail: boolean;
 }
