@@ -262,6 +262,7 @@ actions:
           value: createUser
     permissions:
       - role: admin-ras
+      - role: instructor_access
     comment: Creates a new user in Keycloak and Hasura, schedules welcome email
 custom_types:
   enums: []

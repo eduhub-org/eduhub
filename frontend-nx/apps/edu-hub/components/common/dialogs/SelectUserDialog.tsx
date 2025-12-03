@@ -18,6 +18,8 @@ interface IProps {
   title: string;
   onClose: (confirmed: boolean, user: UserForSelection1_User | null) => void;
   open: boolean;
+  onAddNewUser?: (searchValue: string) => void;
+  showAddNewUserOption?: boolean;
 }
 
 const getSearchVars = (searchValue: string) => {
@@ -37,7 +39,7 @@ const getSearchVars = (searchValue: string) => {
 
 // Search user by some search value (partial name or email)
 // then select the user from a select
-export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
+export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUser, showAddNewUserOption = false }) => {
   const [searchValue, setSearchValue] = useState('');
   const handleNewInput = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -77,6 +79,16 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
   });
 
   const users = [...(result1.data?.User || []), ...(result2.data?.User || [])];
+  const isLoading = result1.loading || result2.loading;
+  const hasSearched = searchValue.length >= 3;
+  const showNoResults = hasSearched && !isLoading && users.length === 0;
+  const shouldShowAddNewUser = showAddNewUserOption && onAddNewUser && showNoResults;
+
+  const handleAddNewUser = useCallback(() => {
+    if (onAddNewUser) {
+      onAddNewUser(searchValue);
+    }
+  }, [onAddNewUser, searchValue]);
 
   const { t } = useTranslation();
   return (
@@ -104,9 +116,27 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title }) => {
         </div>
 
         <div className="h-[32rem] w-[26rem] overflow-auto">
-          {users.map((user) => (
-            <SelectUserRow user={user} key={user.id} onClick={handleConfirm} />
-          ))}
+          {users.length > 0 && (
+            <>
+              {users.map((user) => (
+                <SelectUserRow user={user} key={user.id} onClick={handleConfirm} />
+              ))}
+            </>
+          )}
+          {showNoResults && shouldShowAddNewUser && (
+            <div className="mt-4">
+              <div className="text-gray-500 mb-2">{t('common:no_users_found')}</div>
+              <div
+                onClick={handleAddNewUser}
+                className="w-full truncate mt-2 mb-2 cursor-pointer bg-blue-50 hover:bg-blue-100 p-3 rounded text-blue-600 font-medium"
+              >
+                {t('common:add_new_user')}
+              </div>
+            </div>
+          )}
+          {isLoading && hasSearched && (
+            <div className="text-gray-500 mt-4">{t('common:loading')}</div>
+          )}
         </div>
 
         <div className="grid grid-cols-2 mb-2">

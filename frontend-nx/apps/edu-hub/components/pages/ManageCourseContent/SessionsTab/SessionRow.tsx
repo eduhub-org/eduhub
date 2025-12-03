@@ -15,13 +15,18 @@ import {
 } from '../../../../queries/course';
 import { QueryResult } from '@apollo/client';
 import { SelectUserDialog } from '../../../common/dialogs/SelectUserDialog';
+import { CreateUserDialog } from '../../../common/dialogs/CreateUserDialog';
 import { UserForSelection1_User } from '../../../../queries/__generated__/UserForSelection1';
 import { InsertExpert, InsertExpertVariables } from '../../../../queries/__generated__/InsertExpert';
-import { INSERT_EXPERT } from '../../../../queries/user';
+import { INSERT_EXPERT, USER_SELECTION_ONE_PARAM } from '../../../../queries/user';
 import {
   InsertNewSessionSpeaker,
   InsertNewSessionSpeakerVariables,
 } from '../../../../queries/__generated__/InsertNewSessionSpeaker';
+import {
+  UserForSelection1,
+  UserForSelection1Variables,
+} from '../../../../queries/__generated__/UserForSelection1';
 import EhMultipleTag from '../../../common/EhMultipleTag';
 import useTranslation from 'next-translate/useTranslation';
 import DeleteButton from '../../../../components/common/DeleteButton';
@@ -30,6 +35,7 @@ import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 import { useIsAdmin, useIsInstructor } from '../../../../hooks/authentication';
+import { useLazyRoleQuery } from '../../../../hooks/authedQuery';
 import TimePicker from '../../../../components/inputs/TimePicker';
 
 const copyDateTime = (target: Date, source: Date) => {
@@ -155,6 +161,10 @@ export const SessionRow: FC<IProps> = ({
   }));
 
   const [addSpeakerOpen, setAddSpeakerOpen] = useState(false);
+  const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
+  const [searchValueForNewUser, setSearchValueForNewUser] = useState('');
+  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
+
   const openAddSpeaker = useCallback(() => {
     setAddSpeakerOpen(true);
   }, [setAddSpeakerOpen]);
@@ -162,6 +172,9 @@ export const SessionRow: FC<IProps> = ({
   const [insertExpertMutation] = useRoleMutation<InsertExpert, InsertExpertVariables>(INSERT_EXPERT);
   const [insertSessionSpeaker] = useRoleMutation<InsertNewSessionSpeaker, InsertNewSessionSpeakerVariables>(
     INSERT_NEW_SESSION_SPEAKER
+  );
+  const [fetchUserByEmail] = useLazyRoleQuery<UserForSelection1, UserForSelection1Variables>(
+    USER_SELECTION_ONE_PARAM
   );
 
   const handleNewSpeaker = useCallback(
@@ -195,6 +208,68 @@ export const SessionRow: FC<IProps> = ({
     },
     [session, insertExpertMutation, insertSessionSpeaker, qResult]
   );
+
+  const handleAddNewUser = useCallback(
+    (searchValue: string) => {
+      setSearchValueForNewUser(searchValue);
+      setAddSpeakerOpen(false);
+      setCreateUserDialogOpen(true);
+    },
+    []
+  );
+
+  const parseSearchValue = useCallback((searchValue: string) => {
+    const trimmed = searchValue.trim();
+    const parts = trimmed.split(' ');
+    if (parts.length >= 2) {
+      return {
+        firstName: parts[0],
+        lastName: parts.slice(1).join(' '),
+        email: '',
+      };
+    } else if (trimmed.includes('@')) {
+      return {
+        firstName: '',
+        lastName: '',
+        email: trimmed,
+      };
+    } else {
+      return {
+        firstName: trimmed,
+        lastName: '',
+        email: '',
+      };
+    }
+  }, []);
+
+  const handleUserCreated = useCallback(
+    async (userId: string, firstName: string, lastName: string, email: string) => {
+      setPendingUserId(userId);
+      setCreateUserDialogOpen(false);
+
+      // Fetch the newly created user to get the full UserForSelection1_User structure
+      try {
+        const { data } = await fetchUserByEmail({
+          variables: {
+            searchValue: `%${email}%`,
+          },
+        });
+
+        const newUser = data?.User?.find((u) => u.id === userId);
+        if (newUser && session) {
+          // Auto-select the new user as speaker
+          await handleNewSpeaker(true, newUser);
+        }
+      } catch (error) {
+        console.error('Error fetching new user:', error);
+      } finally {
+        setPendingUserId(null);
+      }
+    },
+    [fetchUserByEmail, handleNewSpeaker, session]
+  );
+
+  const parsedSearchValues = parseSearchValue(searchValueForNewUser);
 
   return (
     <div>
@@ -290,7 +365,28 @@ export const SessionRow: FC<IProps> = ({
         )}
       </div>
 
-      <SelectUserDialog onClose={handleNewSpeaker} open={addSpeakerOpen} title={t('add_external_speaker')} />
+      <SelectUserDialog
+        onClose={handleNewSpeaker}
+        open={addSpeakerOpen}
+        title={t('add_external_speaker')}
+        onAddNewUser={handleAddNewUser}
+        showAddNewUserOption={true}
+      />
+
+      <CreateUserDialog
+        open={createUserDialogOpen}
+        onClose={() => {
+          setCreateUserDialogOpen(false);
+          setSearchValueForNewUser('');
+        }}
+        onSuccess={() => {
+          // Refetch handled in handleUserCreated
+        }}
+        onUserCreated={handleUserCreated}
+        initialFirstName={parsedSearchValues.firstName}
+        initialLastName={parsedSearchValues.lastName}
+        initialEmail={parsedSearchValues.email}
+      />
 
       {/* Confirmation Dialog for Deletion */}
       <QuestionConfirmationDialog

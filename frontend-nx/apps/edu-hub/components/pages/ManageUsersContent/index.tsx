@@ -13,7 +13,7 @@ import { UsersByLastName_User } from '../../../queries/__generated__/UsersByLast
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 import NavigationButton from '../../common/NavigationButton';
-import { CreateUserDialog } from './CreateUserDialog';
+import { CreateUserDialog } from '../../common/dialogs/CreateUserDialog';
 
 const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
   const { t } = useTranslation('manageUsers');

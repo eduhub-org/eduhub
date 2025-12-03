@@ -24,7 +24,7 @@ exports.sendMail = async (req, res) => {
     from: `noreply@${process.env.MAILGUN_DOMAIN}`,
     to,
     // Prepend '[STAGING]' to subject in staging environment
-    subject: process.env.NODE_ENV === 'staging' ? '[STAGING] ' + subject : subject,
+    subject: process.env.ENVIRONMENT === 'staging' ? '[STAGING] ' + subject : subject,
     text: content,
     html: content, // Support both plain text and HTML formats
     'o:tag': [mailTag], // Add tags for email categorization and tracking
@@ -37,7 +37,7 @@ exports.sendMail = async (req, res) => {
   if (bcc) msg.bcc = bcc;
 
   try {
-    switch (process.env.NODE_ENV) {
+    switch (process.env.ENVIRONMENT) {
       case 'development':
         // Development mode: Log all email attempts without actually sending
         console.log('Development email:', {

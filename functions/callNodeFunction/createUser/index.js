@@ -140,36 +140,56 @@ export default async function createUser(req, logger) {
     hasuraUserId = hasuraUserResult.insert_User_one.id;
     logger.info(`Created Hasura user: ${hasuraUserId}`);
 
-    // Assign default 'user' role in Keycloak
-    // If role assignment fails, throw error to trigger rollback
-    try {
-      const hasura_client = await kcAdminClient.clients.find({
-        clientId: 'hasura',
-        first: 1,
-      });
+    // Assign default 'user' role in Keycloak - REQUIRED for user to access the system
+    // If role assignment fails, rollback user creation
+    const hasura_client = await kcAdminClient.clients.find({
+      clientId: 'hasura',
+      first: 1,
+    });
 
-      if (!hasura_client || hasura_client.length === 0) {
-        throw new Error('Hasura client not found in Keycloak');
+    if (!hasura_client || hasura_client.length === 0) {
+      throw new Error('Hasura client not found in Keycloak');
+    }
+
+    // List available client roles for the user (this includes all assignable roles)
+    const availableRoles = await kcAdminClient.users.listAvailableClientRoleMappings({
+      id: keycloakUserId,
+      clientUniqueId: hasura_client[0].id,
+    });
+
+    const userRole = availableRoles.find(role => role.name === 'user');
+
+    if (!userRole) {
+      // Fallback: try listing all client roles directly
+      try {
+        const allClientRoles = await kcAdminClient.clients.listRoles({
+          id: hasura_client[0].id,
+        });
+        const foundRole = allClientRoles.find(role => role.name === 'user');
+        
+        if (!foundRole) {
+          throw new Error(`User role not found in Keycloak hasura client. Available roles: ${allClientRoles.map(r => r.name).join(', ')}`);
+        }
+        
+        // Assign using the found role
+        await kcAdminClient.users.addClientRoleMappings({
+          id: keycloakUserId,
+          clientUniqueId: hasura_client[0].id,
+          roles: [foundRole]
+        });
+        logger.info(`Assigned 'user' role to Keycloak user: ${keycloakUserId} (via listRoles)`);
+      } catch (fallbackError) {
+        logger.error(`Failed to assign role via fallback method: ${fallbackError.message}`);
+        throw new Error(`User role not found in Keycloak hasura client. User cannot be created without a role. Error: ${fallbackError.message}`);
       }
-
-      const userRole = await kcAdminClient.clients.findRole({
-        clientUniqueId: hasura_client[0].id,
-        roleName: 'user'
-      });
-
-      if (!userRole) {
-        throw new Error('User role not found in Keycloak');
-      }
-
+    } else {
+      // Assign the role to the user
       await kcAdminClient.users.addClientRoleMappings({
         id: keycloakUserId,
         clientUniqueId: hasura_client[0].id,
         roles: [userRole]
       });
       logger.info(`Assigned 'user' role to Keycloak user: ${keycloakUserId}`);
-    } catch (roleError) {
-      logger.error(`Failed to assign 'user' role: ${roleError.message}`);
-      throw new Error(`Failed to assign user role: ${roleError.message}`);
     }
 
     const portalUrl = process.env.FRONTEND_URL || 'https://edu.opencampus.sh';
@@ -259,10 +279,14 @@ export default async function createUser(req, logger) {
       }
     }
 
-    // Return generic error to client, don't leak internal details
+    // Return error message to client for debugging (in development) but sanitize sensitive info
+    const errorMessage = process.env.ENVIRONMENT === 'development' 
+      ? error.message 
+      : 'An error occurred while creating the user. Please check the server logs for details.';
+
     return {
       success: false,
-      error: null,
+      error: errorMessage,
       messageKey: 'USER_CREATION_FAILED'
     };
   }
