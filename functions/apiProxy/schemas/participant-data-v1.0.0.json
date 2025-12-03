@@ -52,7 +52,7 @@
     "LearningOpportunity": {
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
+        "id": { "type": "string", "pattern": "^urn:course:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
         "title": { "type": "string" },
         "summary": { "type": "string" },
         "type": { "type": "string", "const": "Course" },
@@ -75,7 +75,7 @@
       "type": "object",
       "properties": {
         "type": { "type": "string", "const": "ParticipantDataReport" },
-        "id": { "type": "string" },
+        "id": { "type": "string", "pattern": "^urn:report:course:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:" },
         "provider": { "type": "object" },
         "learningOpportunity": { "$ref": "#/$defs/LearningOpportunity" },
         "participants": { "type": "array", "items": { "$ref": "#/$defs/Participant" } },
@@ -87,7 +87,7 @@
     "CourseSummary": {
       "type": "object",
       "properties": {
-        "id": { "type": "integer" },
+        "id": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
         "title": { "type": "string" },
         "description": { "type": "string" },
         "startDate": { "type": "string" },
