@@ -47,7 +47,12 @@ def handle_request():
 def handle_api_proxy(subpath):
     # Use absolute path based on the current file's location
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    api_proxy_path = os.path.join(current_dir, "apiProxy", "main.py")
+    api_proxy_dir = os.path.join(current_dir, "apiProxy")
+    api_proxy_path = os.path.join(api_proxy_dir, "main.py")
+    
+    # Add apiProxy directory to sys.path so relative imports work
+    if api_proxy_dir not in sys.path:
+        sys.path.insert(0, api_proxy_dir)
     
     # Force-reload modules to pick up code changes without restarting the dev server
     import importlib
@@ -58,6 +63,7 @@ def handle_api_proxy(subpath):
         "participant_data_handler",
         "security_handler",
         "api_clients.eduhub_client",
+        "course_id_utils",
     ]:
         if mod_name in _sys.modules:
             _sys.modules.pop(mod_name, None)
