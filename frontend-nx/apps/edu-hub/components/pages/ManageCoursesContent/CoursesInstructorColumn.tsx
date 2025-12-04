@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useState, useMemo } from 'react';
 import { MdAddCircle } from 'react-icons/md';
 import { QueryResult } from '@apollo/client';
 
@@ -225,15 +225,15 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
       try {
         const { data } = await fetchUserByEmail({
           variables: {
-            limit: 100,
+            limit: 1,
             filter: {
-              _or: [{ id: { _eq: userId } }, { email: { _ilike: `%${email}%` } }],
+              id: { _eq: userId },
             },
             order_by: [{ lastName: order_by.asc }, { firstName: order_by.asc }],
           },
         });
 
-        const newUser = data?.User?.find((u) => u.id === userId);
+        const newUser = data?.User?.[0];
         if (newUser) {
           // Auto-select the new user as instructor
           await addInstructorHandler(true, newUser);
@@ -248,7 +248,10 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
     [fetchUserByEmail, addInstructorHandler, showErrorSnackbarMessage, extractErrorMessage]
   );
 
-  const parsedSearchValues = parseSearchValue(searchValueForNewUser);
+  const parsedSearchValues = useMemo(
+    () => parseSearchValue(searchValueForNewUser),
+    [parseSearchValue, searchValueForNewUser]
+  );
   const { t } = useTranslation('course-page');
   const makeFullName = (firstName: string, lastName: string): string => {
     return `${firstName} ${lastName}`;
