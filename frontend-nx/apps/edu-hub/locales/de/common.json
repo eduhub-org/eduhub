@@ -119,9 +119,6 @@
     "HEIDE": "Heide"
   },
   "type_name_or_email_minimum_3_letters": "Gib mindestens 3 Buchstaben ein.",
-  "type_name_or_email_minimum_2_letters": "Gib einen Namen oder eine E-Mail ein (mindestens 2 Buchstaben).",
-  "add_new_user": "Neuen Benutzer hinzufügen",
-  "no_users_found": "Keine Benutzer gefunden",
   "select_user_dialog": {
     "type_name_or_email_minimum_2_letters": "Gib einen Namen oder eine E-Mail ein (mindestens 2 Buchstaben).",
     "no_users_found": "Keine Benutzer gefunden",
