@@ -13,7 +13,7 @@ import {
 } from '../../../helpers/achievement';
 import { makeFullName } from '../../../helpers/util';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
-import { UserForSelection1_User } from '../../../queries/__generated__/UserForSelection1';
+import { UserSelectionWithFilter_User } from '../../../queries/__generated__/UserSelectionWithFilter';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import EhTagStingId from '../../common/EhTagStingId';
 import TagWithTwoText from '../../common/TagWithTwoText';
@@ -57,7 +57,7 @@ const FormToAddEditAchievementOption: FC<IPropsAddEditAchievementTempData> = (pr
   }, [setShowCourseListDialog]);
 
   const addAchievementMentorHandler = useCallback(
-    async (confirmed: boolean, user: UserForSelection1_User | null) => {
+    async (confirmed: boolean, user: UserSelectionWithFilter_User | null) => {
       if (user && !state.mentors.find((u) => u.userId === user.id)) {
         const newMentor: TempAchievementOptionMentor = {
           userId: user.id,

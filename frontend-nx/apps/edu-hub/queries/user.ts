@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { USER_FRAGMENT } from "./userFragment";
 
 export const USER_LIST = gql`
   query UserList {
@@ -224,6 +225,27 @@ export const CREATE_USER = gql`
       emailQueued
       error
       messageKey
+    }
+  }
+`;
+
+export const USER_SELECTION_WITH_FILTER = gql`
+  ${USER_FRAGMENT}
+  query UserSelectionWithFilter(
+    $limit: Int = 100
+    $filter: User_bool_exp = {}
+    $order_by: [User_order_by!] = [{ lastName: asc }, { firstName: asc }]
+  ) {
+    User(
+      limit: $limit
+      where: { _and: [{ status: { _eq: ACTIVE } }, $filter] }
+      order_by: $order_by
+    ) {
+      ...UserFragment
+      updated_at
+      Experts {
+        id
+      }
     }
   }
 `;
