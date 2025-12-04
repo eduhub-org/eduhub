@@ -116,12 +116,13 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
           {showNoResults && shouldShowAddNewUser && (
             <div className="p-4">
               <div className="text-gray-500 mb-2 text-center">{t('common:select_user_dialog.no_users_found')}</div>
-              <div
+              <button
+                type="button"
                 onClick={handleAddNewUser}
                 className="w-full cursor-pointer bg-blue-50 hover:bg-blue-100 p-3 rounded text-blue-600 font-medium text-center"
               >
                 {t('common:select_user_dialog.add_new_user')}
-              </div>
+              </button>
             </div>
           )}
           {showNoResults && !shouldShowAddNewUser && (
