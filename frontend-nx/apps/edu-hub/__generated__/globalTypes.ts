@@ -308,6 +308,7 @@ export enum Attendance_select_column {
   endDateTime = "endDateTime",
   id = "id",
   interruptionCount = "interruptionCount",
+  location = "location",
   recordedName = "recordedName",
   sessionId = "sessionId",
   source = "source",
@@ -326,6 +327,7 @@ export enum Attendance_update_column {
   endDateTime = "endDateTime",
   id = "id",
   interruptionCount = "interruptionCount",
+  location = "location",
   recordedName = "recordedName",
   sessionId = "sessionId",
   source = "source",
@@ -504,6 +506,7 @@ export enum CourseEnrollment_select_column {
   created_at = "created_at",
   id = "id",
   invitationExpirationDate = "invitationExpirationDate",
+  location = "location",
   motivationLetter = "motivationLetter",
   motivationRating = "motivationRating",
   status = "status",
@@ -521,6 +524,7 @@ export enum CourseEnrollment_update_column {
   created_at = "created_at",
   id = "id",
   invitationExpirationDate = "invitationExpirationDate",
+  location = "location",
   motivationLetter = "motivationLetter",
   motivationRating = "motivationRating",
   status = "status",
@@ -3041,6 +3045,7 @@ export interface Attendance_bool_exp {
   endDateTime?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   interruptionCount?: Int_comparison_exp | null;
+  location?: String_comparison_exp | null;
   recordedName?: String_comparison_exp | null;
   sessionId?: Int_comparison_exp | null;
   source?: String_comparison_exp | null;
@@ -3063,6 +3068,7 @@ export interface Attendance_insert_input {
   endDateTime?: any | null;
   id?: number | null;
   interruptionCount?: number | null;
+  location?: string | null;
   recordedName?: string | null;
   sessionId?: number | null;
   source?: string | null;
@@ -3081,6 +3087,7 @@ export interface Attendance_max_order_by {
   endDateTime?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
+  location?: order_by | null;
   recordedName?: order_by | null;
   sessionId?: order_by | null;
   source?: order_by | null;
@@ -3098,6 +3105,7 @@ export interface Attendance_min_order_by {
   endDateTime?: order_by | null;
   id?: order_by | null;
   interruptionCount?: order_by | null;
+  location?: order_by | null;
   recordedName?: order_by | null;
   sessionId?: order_by | null;
   source?: order_by | null;
@@ -3124,6 +3132,7 @@ export interface Attendance_set_input {
   endDateTime?: any | null;
   id?: number | null;
   interruptionCount?: number | null;
+  location?: string | null;
   recordedName?: string | null;
   sessionId?: number | null;
   source?: string | null;
@@ -3835,6 +3844,7 @@ export interface CourseEnrollment_avg_order_by {
 export interface CourseEnrollment_bool_exp {
   Course?: Course_bool_exp | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_bool_exp | null;
+  LocationOption?: LocationOption_bool_exp | null;
   MotivationRating?: MotivationRating_bool_exp | null;
   User?: User_bool_exp | null;
   _and?: CourseEnrollment_bool_exp[] | null;
@@ -3846,6 +3856,7 @@ export interface CourseEnrollment_bool_exp {
   created_at?: timestamptz_comparison_exp | null;
   id?: Int_comparison_exp | null;
   invitationExpirationDate?: date_comparison_exp | null;
+  location?: LocationOption_enum_comparison_exp | null;
   motivationLetter?: String_comparison_exp | null;
   motivationRating?: MotivationRating_enum_comparison_exp | null;
   status?: CourseEnrollmentStatus_enum_comparison_exp | null;
@@ -3859,6 +3870,7 @@ export interface CourseEnrollment_bool_exp {
 export interface CourseEnrollment_insert_input {
   Course?: Course_obj_rel_insert_input | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_obj_rel_insert_input | null;
+  LocationOption?: LocationOption_obj_rel_insert_input | null;
   MotivationRating?: MotivationRating_obj_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
   achievementCertificateURL?: string | null;
@@ -3867,6 +3879,7 @@ export interface CourseEnrollment_insert_input {
   created_at?: any | null;
   id?: number | null;
   invitationExpirationDate?: any | null;
+  location?: LocationOption_enum | null;
   motivationLetter?: string | null;
   motivationRating?: MotivationRating_enum | null;
   status?: CourseEnrollmentStatus_enum | null;
@@ -3919,6 +3932,7 @@ export interface CourseEnrollment_on_conflict {
 export interface CourseEnrollment_order_by {
   Course?: Course_order_by | null;
   CourseEnrollmentStatus?: CourseEnrollmentStatus_order_by | null;
+  LocationOption?: LocationOption_order_by | null;
   MotivationRating?: MotivationRating_order_by | null;
   User?: User_order_by | null;
   achievementCertificateURL?: order_by | null;
@@ -3927,6 +3941,7 @@ export interface CourseEnrollment_order_by {
   created_at?: order_by | null;
   id?: order_by | null;
   invitationExpirationDate?: order_by | null;
+  location?: order_by | null;
   motivationLetter?: order_by | null;
   motivationRating?: order_by | null;
   status?: order_by | null;
