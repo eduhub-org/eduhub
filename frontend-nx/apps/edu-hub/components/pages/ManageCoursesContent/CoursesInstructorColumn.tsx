@@ -1,6 +1,6 @@
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useState, useMemo } from 'react';
 import { MdAddCircle } from 'react-icons/md';
-import { QueryResult } from '@apollo/client';
+import { ApolloError } from '@apollo/client';
 
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../../queries/mutateCourseInstructor';
@@ -15,11 +15,10 @@ import {
   InsertCourseInstructorVariables,
 } from '../../../queries/__generated__/InsertCourseInstructor';
 import { InsertExpert, InsertExpertVariables } from '../../../queries/__generated__/InsertExpert';
-import { Programs_Program } from '../../../queries/__generated__/Programs';
-import { UserSelectionWithFilter_User } from '../../../queries/__generated__/UserSelectionWithFilter';
 import {
   UserSelectionWithFilter,
   UserSelectionWithFilterVariables,
+  UserSelectionWithFilter_User,
 } from '../../../queries/__generated__/UserSelectionWithFilter';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import { CreateUserDialog } from '../../common/dialogs/CreateUserDialog';
@@ -27,16 +26,12 @@ import EhTag from '../../common/EhTag';
 import { useLazyRoleQuery } from '../../../hooks/authedQuery';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
-import { ApolloError } from '@apollo/client';
 
 import useTranslation from 'next-translate/useTranslation';
 import { order_by } from '../../../__generated__/globalTypes';
 
 interface IPropsInstructorColumn {
-  programs: Programs_Program[];
   course: AdminCourseList_Course;
-  t: any;
-  qResult: QueryResult<any>;
   refetchCourses: () => void;
 }
 
@@ -49,18 +44,27 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   // Helper function to extract readable error message from GraphQL errors
-  const extractErrorMessage = useCallback((error: ApolloError | Error | any): string => {
-    if (error?.message) {
+  const extractErrorMessage = useCallback((error: unknown): string => {
+    // Check if it's an Error instance
+    if (error instanceof Error) {
       return error.message;
     }
-    if (error?.graphQLErrors && error.graphQLErrors.length > 0) {
-      return error.graphQLErrors.map((e: any) => e.message).join(', ');
+    // Check if it's an ApolloError
+    if (error && typeof error === 'object' && 'graphQLErrors' in error) {
+      const apolloError = error as ApolloError;
+      if (apolloError.graphQLErrors && apolloError.graphQLErrors.length > 0) {
+        return apolloError.graphQLErrors.map((e) => e.message).join(', ');
+      }
+      if (apolloError.networkError) {
+        return apolloError.networkError.message || 'Network error occurred';
+      }
+      if (apolloError.message) {
+        return apolloError.message;
+      }
     }
-    if (error?.networkError) {
-      return error.networkError.message || 'Network error occurred';
-    }
+    // Check if it's an array of errors
     if (Array.isArray(error)) {
-      return error.map((e: any) => e.message || String(e)).join(', ');
+      return error.map((e) => (e && typeof e === 'object' && 'message' in e ? String(e.message) : String(e))).join(', ');
     }
     return 'An unexpected error occurred';
   }, []);
@@ -218,22 +222,23 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
   }, []);
 
   const handleUserCreated = useCallback(
-    async (userId: string, firstName: string, lastName: string, email: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async (userId: string, _firstName: string, _lastName: string, _email: string) => {
       setCreateUserDialogOpen(false);
 
       // Fetch the newly created user to get the full UserSelectionWithFilter_User structure
       try {
         const { data } = await fetchUserByEmail({
           variables: {
-            limit: 100,
+            limit: 1,
             filter: {
-              _or: [{ id: { _eq: userId } }, { email: { _ilike: `%${email}%` } }],
+              id: { _eq: userId },
             },
             order_by: [{ lastName: order_by.asc }, { firstName: order_by.asc }],
           },
         });
 
-        const newUser = data?.User?.find((u) => u.id === userId);
+        const newUser = data?.User?.[0];
         if (newUser) {
           // Auto-select the new user as instructor
           await addInstructorHandler(true, newUser);
@@ -248,7 +253,10 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
     [fetchUserByEmail, addInstructorHandler, showErrorSnackbarMessage, extractErrorMessage]
   );
 
-  const parsedSearchValues = parseSearchValue(searchValueForNewUser);
+  const parsedSearchValues = useMemo(
+    () => parseSearchValue(searchValueForNewUser),
+    [parseSearchValue, searchValueForNewUser]
+  );
   const { t } = useTranslation('course-page');
   const makeFullName = (firstName: string, lastName: string): string => {
     return `${firstName} ${lastName}`;

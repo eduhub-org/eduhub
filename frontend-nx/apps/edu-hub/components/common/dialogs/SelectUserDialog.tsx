@@ -93,7 +93,7 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
       </DialogTitle>
 
       <DialogContent>
-        <div className="mb-4">{t('type_name_or_email_minimum_2_letters')}</div>
+        <div className="mb-4">{t('common:select_user_dialog.type_name_or_email_minimum_2_letters')}</div>
 
         <div className="mb-4">
           <input
@@ -115,29 +115,30 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
           )}
           {showNoResults && shouldShowAddNewUser && (
             <div className="p-4">
-              <div className="text-gray-500 mb-2 text-center">{t('common:no_users_found')}</div>
-              <div
+              <div className="text-gray-500 mb-2 text-center">{t('common:select_user_dialog.no_users_found')}</div>
+              <button
+                type="button"
                 onClick={handleAddNewUser}
                 className="w-full cursor-pointer bg-blue-50 hover:bg-blue-100 p-3 rounded text-blue-600 font-medium text-center"
               >
-                {t('common:add_new_user')}
-              </div>
+                {t('common:select_user_dialog.add_new_user')}
+              </button>
             </div>
           )}
           {showNoResults && !shouldShowAddNewUser && (
-            <div className="p-4 text-center text-gray-500">{t('common:no_users_found')}</div>
+            <div className="p-4 text-center text-gray-500">{t('common:select_user_dialog.no_users_found')}</div>
           )}
           {loading && hasSearched && (
             <div className="p-4 text-center text-gray-500">{t('common:loading')}</div>
           )}
           {searchValue.trim().length < 2 && (
-            <div className="p-4 text-center text-gray-500">{t('type_name_or_email_minimum_2_letters')}</div>
+            <div className="p-4 text-center text-gray-500">{t('common:select_user_dialog.type_name_or_email_minimum_2_letters')}</div>
           )}
         </div>
 
         <div className="grid grid-cols-2 mt-4">
           <div>
-            <Button onClick={handleCancel}>{t('cancel')}</Button>
+            <Button onClick={handleCancel}>{t('common:cancel')}</Button>
           </div>
           <div />
         </div>
