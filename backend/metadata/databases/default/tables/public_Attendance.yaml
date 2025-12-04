@@ -36,6 +36,7 @@ insert_permissions:
         - source
         - status
         - userId
+        - location
 select_permissions:
   - role: instructor_access
     permission:
@@ -52,6 +53,7 @@ select_permissions:
         - userId
         - recordedName
         - source
+        - location
       filter:
         Session:
           Course:
@@ -75,6 +77,7 @@ select_permissions:
         - userId
         - recordedName
         - source
+        - location
       filter:
         User:
           id:
@@ -90,6 +93,7 @@ update_permissions:
         - startDateTime
         - status
         - totalAttendanceTime
+        - location
       filter:
         Session:
           Course:

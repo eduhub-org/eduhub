@@ -8,15 +8,15 @@ object_relationships:
   - name: CourseEnrollmentStatus
     using:
       foreign_key_constraint_on: status
+  - name: LocationOption
+    using:
+      foreign_key_constraint_on: location
   - name: MotivationRating
     using:
       foreign_key_constraint_on: motivationRating
   - name: User
     using:
       foreign_key_constraint_on: userId
-  - name: LocationOption
-    using:
-      foreign_key_constraint_on: location
 insert_permissions:
   - role: user_access
     permission:

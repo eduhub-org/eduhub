@@ -20,6 +20,15 @@ type Mutation {
   ): CreateCertificatesResult!
 }
 
+type Mutation {
+  createUser(
+    firstName: String!
+    lastName: String!
+    email: String!
+    sendEmail: Boolean!
+  ): CreateUserResult!
+}
+
 type Query {
   getAdminUsers: GetAdminUsersResult!
 }
@@ -30,16 +39,16 @@ type Query {
   ): getSignedUrlOutput
 }
 
-type Mutation {
-  makeCertificatePublic(
-    certificatePath: String!
-  ): makeCertificatePublicOutput
-}
-
 type Query {
   loadParticipationData(
     programId: Int!
   ): LoadParticipationDataResult!
+}
+
+type Mutation {
+  makeCertificatePublic(
+    certificatePath: String!
+  ): makeCertificatePublicOutput
 }
 
 type Mutation {
@@ -121,15 +130,6 @@ type Mutation {
     userId: String!
     isAdmin: Boolean!
   ): UpdateAdminStatusResult!
-}
-
-type Mutation {
-  createUser(
-    firstName: String!
-    lastName: String!
-    email: String!
-    sendEmail: Boolean!
-  ): CreateUserResult!
 }
 
 type CreateUserResult {

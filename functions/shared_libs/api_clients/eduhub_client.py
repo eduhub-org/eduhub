@@ -283,13 +283,14 @@ class EduHubClient:
             if course_participant_attendance.get("duration").iloc[0] is None
             else int(course_participant_attendance.get("duration").iloc[0]),
             "userId": course_participant_attendance.get("userId").iloc[0],
+            "location": course_participant_attendance.get("location").iloc[0],
         }
         mutation = """mutation($leaveDateTime: timestamptz, $interruptionCount: Int, $recordedName: String,
                                $sessionId: Int, $source: String, $joinDateTime: timestamptz, $status: AttendanceStatus_enum,
-                               $totalAttendanceTime: Int, $userId: uuid) {
+                               $totalAttendanceTime: Int, $userId: uuid, $location: String) {
             insert_Attendance(objects: {endDateTime: $leaveDateTime, interruptionCount: $interruptionCount,
             recordedName: $recordedName, sessionId: $sessionId, source: $source, startDateTime: $joinDateTime,
-            status: $status, totalAttendanceTime: $totalAttendanceTime, userId: $userId}) {
+            status: $status, totalAttendanceTime: $totalAttendanceTime, userId: $userId, location: $location}) {
                 returning {
                     id
                     created_at
@@ -303,6 +304,7 @@ class EduHubClient:
                     totalAttendanceTime
                     updated_at
                     userId
+                    location
                 }
             }
         }"""

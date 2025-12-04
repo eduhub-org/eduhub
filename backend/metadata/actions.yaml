@@ -35,6 +35,19 @@ actions:
         - name: Function-Name
           value: create_certificates
     comment: createCertificates
+  - name: createUser
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: createUser
+    permissions:
+      - role: admin-ras
+      - role: instructor_access
+    comment: Creates a new user in Keycloak and Hasura, schedules welcome email
   - name: getAdminUsers
     definition:
       kind: ""
@@ -60,6 +73,16 @@ actions:
     permissions:
       - role: user_access
     comment: Gets a signed url for a file in the Google Storage Bucket
+  - name: loadParticipationData
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
+      headers:
+        - name: Function-Name
+          value: load_participation_data
+        - name: Hasura-Secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+    comment: loadParticipationData
   - name: makeCertificatePublic
     definition:
       kind: synchronous
@@ -74,16 +97,6 @@ actions:
     permissions:
       - role: user_access
     comment: Makes a certificate file public in storage bucket for LinkedIn sharing
-  - name: loadParticipationData
-    definition:
-      kind: ""
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_PYTHON_FUNCTION}}'
-      headers:
-        - name: Function-Name
-          value: load_participation_data
-        - name: Hasura-Secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-    comment: loadParticipationData
   - name: saveAchievementCertificateTemplate
     definition:
       kind: synchronous
@@ -251,23 +264,11 @@ actions:
           value_from_env: HASURA_BUCKET
         - name: name
           value: setUserAdmin
-  - name: createUser
-    definition:
-      kind: synchronous
-      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
-      headers:
-        - name: secret
-          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
-        - name: name
-          value: createUser
-    permissions:
-      - role: admin-ras
-      - role: instructor_access
-    comment: Creates a new user in Keycloak and Hasura, schedules welcome email
 custom_types:
   enums: []
   input_objects: []
   objects:
+    - name: CreateUserResult
     - name: loadFileOutput
     - name: result
     - name: saveFileOutput
@@ -280,6 +281,7 @@ custom_types:
     - name: MoocHubImage
     - name: Image
     - name: getSignedUrlOutput
+    - name: makeCertificatePublicOutput
     - name: DeleteUserResult
     - name: AnonymizeUserResult
     - name: AnonymizationSteps
@@ -295,5 +297,4 @@ custom_types:
     - name: resizedImagePath
     - name: SendSessionRemindersResult
     - name: ProcessedSession
-    - name: CreateUserResult
   scalars: []

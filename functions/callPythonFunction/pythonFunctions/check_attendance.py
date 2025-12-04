@@ -73,6 +73,7 @@ def check_attendance(arguments):
                             f"############# Zoom Attendance Data\n{zoom_attendance}"
                         )
                         zoom_attendance["source"] = "ZOOM"
+                        zoom_attendance["location"] = "ZOOM"  # Store ZOOM as location, will be mapped to ONLINE later
                         attendance_data = pd.concat([attendance_data, zoom_attendance])
                     except Exception as e:
                         logging.error(f"Error while getting Zoom attendance: {e}")
@@ -202,6 +203,9 @@ def get_offline_session_attendance(session, location):
         session_attendances["interruptionCount"] = None
         session_attendances["duration"] = None
         session_attendances["leaveDateTime"] = None
+        
+        # Store raw LimeSurvey Place values (mapping to LocationOption will be done in update_enrollment_locations)
+        # Location column already contains the Place value from LimeSurvey (renamed from "Place" to "location" above)
 
         return session_attendances
 
@@ -224,9 +228,12 @@ def prepare_participant_attendance_data(participant, attendance_data, session_id
                     "score": None,
                     "status": "MISSED",
                     "recordedName": None,
+                    "location": None,
                 }
             ]
         )
+        # participant_attendance is already a DataFrame (MISSED case), return it directly
+        return participant_attendance
     else:
         # Matching participant's name with the names in the attendance data
         attendance_data["score"] = [
@@ -264,7 +271,8 @@ def prepare_participant_attendance_data(participant, attendance_data, session_id
         else:
             participant_attendance["status"] = "MISSED"
             participant_attendance["recordedName"] = participant_attendance["name"]
-    return pd.DataFrame([participant_attendance.to_dict()])
+        # Convert Series to dict and wrap in DataFrame
+        return pd.DataFrame([participant_attendance.to_dict()])
 
     # Other potential functions are fuzz.ratio() and fuzz.partial_ratio()
     # For testing purposes:
