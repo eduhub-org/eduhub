@@ -1,9 +1,9 @@
 import { FC, useCallback } from "react";
-import { UserForSelection1_User } from "../../../queries/__generated__/UserForSelection1";
+import { UserSelectionWithFilter_User } from "../../../queries/__generated__/UserSelectionWithFilter";
 
 interface IProps {
-  user: UserForSelection1_User;
-  onClick: (user: UserForSelection1_User) => any;
+  user: UserSelectionWithFilter_User;
+  onClick: (user: UserSelectionWithFilter_User) => any;
 }
 
 const SelectUserRow: FC<IProps> = ({ user, onClick }) => {
@@ -14,9 +14,10 @@ const SelectUserRow: FC<IProps> = ({ user, onClick }) => {
   return (
     <div
       onClick={handleClick}
-      className="w-full truncate mt-2 mb-2 cursor-pointer even:bg-edu-light-gray"
+      className="p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
     >
-      {`${user.firstName} ${user.lastName} (${user.email})`}
+      <div className="font-medium">{`${user.firstName} ${user.lastName}`}</div>
+      {user.email && <div className="text-sm text-gray-600 mt-1">{user.email}</div>}
     </div>
   );
 };
