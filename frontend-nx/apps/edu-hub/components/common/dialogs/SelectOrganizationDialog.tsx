@@ -1,11 +1,12 @@
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import useTranslation from 'next-translate/useTranslation';
-import { ChangeEvent, FC, useCallback, useState } from 'react';
+import { ChangeEvent, FC, useCallback, useState, useMemo } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
 import { ORGANIZATION_LIST } from '../../../queries/organization';
 import { OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
 import { Button } from '../Button';
+import { createMultiWordSearchCondition } from '../../../helpers/searchUtils';
 
 interface IProps {
   title: string;
@@ -13,7 +14,7 @@ interface IProps {
   open: boolean;
 }
 
-// Search organization by name or description
+// Search organization by name, description, or aliases
 export const SelectOrganizationDialog: FC<IProps> = ({ onClose, open, title }) => {
   const [searchValue, setSearchValue] = useState('');
   const { t } = useTranslation();
@@ -22,7 +23,7 @@ export const SelectOrganizationDialog: FC<IProps> = ({ onClose, open, title }) =
     (event: ChangeEvent<HTMLInputElement>) => {
       setSearchValue(event.target.value);
     },
-    [setSearchValue]
+    []
   );
 
   const handleCancel = useCallback(() => {
@@ -38,16 +39,21 @@ export const SelectOrganizationDialog: FC<IProps> = ({ onClose, open, title }) =
     [onClose]
   );
 
+  // Create filter condition using multi-word search with aliases support
+  const filter = useMemo(() => {
+    if (searchValue.trim().length < 2) {
+      return {};
+    }
+    return createMultiWordSearchCondition(searchValue.trim(), ['name', 'description', 'aliases'], {
+      arrayFields: ['aliases'],
+    });
+  }, [searchValue]);
+
   // Query organizations with search filter
   const { data } = useAuthedQuery(ORGANIZATION_LIST, {
     variables: {
       limit: 100,
-      filter:
-        searchValue.length >= 2
-          ? {
-              _or: [{ name: { _ilike: `%${searchValue}%` } }, { description: { _ilike: `%${searchValue}%` } }],
-            }
-          : {},
+      filter,
       order_by: { name: 'asc' },
     },
     skip: !open,

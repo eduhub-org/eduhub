@@ -16,22 +16,22 @@ import {
 import { QueryResult } from '@apollo/client';
 import { SelectUserDialog } from '../../../common/dialogs/SelectUserDialog';
 import { CreateUserDialog } from '../../../common/dialogs/CreateUserDialog';
-import { UserForSelection1_User } from '../../../../queries/__generated__/UserForSelection1';
+import { UserSelectionWithFilter_User } from '../../../../queries/__generated__/UserSelectionWithFilter';
 import { InsertExpert, InsertExpertVariables } from '../../../../queries/__generated__/InsertExpert';
-import { INSERT_EXPERT, USER_SELECTION_ONE_PARAM } from '../../../../queries/user';
+import { INSERT_EXPERT, USER_SELECTION_WITH_FILTER } from '../../../../queries/user';
 import {
   InsertNewSessionSpeaker,
   InsertNewSessionSpeakerVariables,
 } from '../../../../queries/__generated__/InsertNewSessionSpeaker';
 import {
-  UserForSelection1,
-  UserForSelection1Variables,
-} from '../../../../queries/__generated__/UserForSelection1';
+  UserSelectionWithFilter,
+  UserSelectionWithFilterVariables,
+} from '../../../../queries/__generated__/UserSelectionWithFilter';
 import EhMultipleTag from '../../../common/EhMultipleTag';
 import useTranslation from 'next-translate/useTranslation';
 import DeleteButton from '../../../../components/common/DeleteButton';
 import SessionAddresses from './SessionAddresses';
-import { LocationOption_enum } from '../../../../__generated__/globalTypes';
+import { LocationOption_enum, order_by } from '../../../../__generated__/globalTypes';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
 import { QuestionConfirmationDialog } from '../../../common/dialogs/QuestionConfirmationDialog';
 import { useIsAdmin, useIsInstructor } from '../../../../hooks/authentication';
@@ -173,12 +173,12 @@ export const SessionRow: FC<IProps> = ({
   const [insertSessionSpeaker] = useRoleMutation<InsertNewSessionSpeaker, InsertNewSessionSpeakerVariables>(
     INSERT_NEW_SESSION_SPEAKER
   );
-  const [fetchUserByEmail] = useLazyRoleQuery<UserForSelection1, UserForSelection1Variables>(
-    USER_SELECTION_ONE_PARAM
+  const [fetchUserByEmail] = useLazyRoleQuery<UserSelectionWithFilter, UserSelectionWithFilterVariables>(
+    USER_SELECTION_WITH_FILTER
   );
 
   const handleNewSpeaker = useCallback(
-    async (confirmed: boolean, user: UserForSelection1_User | null) => {
+    async (confirmed: boolean, user: UserSelectionWithFilter_User | null) => {
       if (confirmed && user != null && session != null) {
         let expertId = -1;
 
@@ -247,11 +247,15 @@ export const SessionRow: FC<IProps> = ({
       setPendingUserId(userId);
       setCreateUserDialogOpen(false);
 
-      // Fetch the newly created user to get the full UserForSelection1_User structure
+      // Fetch the newly created user to get the full UserSelectionWithFilter_User structure
       try {
         const { data } = await fetchUserByEmail({
           variables: {
-            searchValue: `%${email}%`,
+            limit: 100,
+            filter: {
+              _or: [{ id: { _eq: userId } }, { email: { _ilike: `%${email}%` } }],
+            },
+            order_by: [{ lastName: order_by.asc }, { firstName: order_by.asc }],
           },
         });
 

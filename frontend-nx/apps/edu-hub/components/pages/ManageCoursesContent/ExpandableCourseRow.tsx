@@ -8,7 +8,7 @@ import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
 import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
 import { INSERT_COURSE_DEGREE_TAG, DELETE_COURSE_DEGREE_TAG } from '../../../queries/courseDegree';
 import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../../queries/mutateCourseInstructor';
-import { INSERT_EXPERT } from '../../../queries/user';
+import { INSERT_EXPERT, USER_SELECTION_WITH_FILTER } from '../../../queries/user';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
 import {
   DeleteCourseInstructor,
@@ -19,12 +19,17 @@ import {
   InsertCourseInstructorVariables,
 } from '../../../queries/__generated__/InsertCourseInstructor';
 import { InsertExpert, InsertExpertVariables } from '../../../queries/__generated__/InsertExpert';
-import { UserForSelection1_User } from '../../../queries/__generated__/UserForSelection1';
+import {
+  UserSelectionWithFilter,
+  UserSelectionWithFilterVariables,
+  UserSelectionWithFilter_User,
+} from '../../../queries/__generated__/UserSelectionWithFilter';
 import { SaveCourseImage, SaveCourseImageVariables } from '../../../queries/__generated__/SaveCourseImage';
 import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
-import { CourseRegistrationType_enum } from '../../../__generated__/globalTypes';
+import { CourseRegistrationType_enum, order_by } from '../../../__generated__/globalTypes';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import { SelectOrganizationDialog } from '../../common/dialogs/SelectOrganizationDialog';
+import { CreateUserDialog } from '../../common/dialogs/CreateUserDialog';
 import {
   INSERT_COURSE_FUNDING_ORGANIZATION,
   DELETE_COURSE_FUNDING_ORGANIZATION,
@@ -51,7 +56,7 @@ import {
 import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
-import { useAdminQuery } from '../../../hooks/authedQuery';
+import { useAdminQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import {
   GET_COURSE_TEMPLATES_COUNT,
   GET_DEFAULT_TEMPLATES,
@@ -241,6 +246,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
   // Instructor management state
   const [instructorDialogOpen, setInstructorDialogOpen] = useState(false);
+  const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
+  const [searchValueForNewUser, setSearchValueForNewUser] = useState('');
 
   // Funding organization management state
   const [fundingOrgDialogOpen, setFundingOrgDialogOpen] = useState(false);
@@ -263,6 +270,10 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const [insertExpertMutation] = useAdminMutation<InsertExpert, InsertExpertVariables>(INSERT_EXPERT, {
     refetchQueries: ['AdminCourseList'],
   });
+
+  const [fetchUserByEmail] = useLazyRoleQuery<UserSelectionWithFilter, UserSelectionWithFilterVariables>(
+    USER_SELECTION_WITH_FILTER
+  );
 
   // Funding organization management mutations
   const [insertCourseFundingOrg] = useAdminMutation<
@@ -314,7 +325,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   );
 
   const addInstructorHandler = useCallback(
-    async (confirmed: boolean, user: UserForSelection1_User | null) => {
+    async (confirmed: boolean, user: UserSelectionWithFilter_User | null) => {
       if (!confirmed || user == null) {
         closeInstructorDialog();
         return;
@@ -364,6 +375,72 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     },
     [insertExpertMutation, course, insertCourseInstructor, closeInstructorDialog, handleError, t]
   );
+
+  const handleAddNewUser = useCallback(
+    (searchValue: string) => {
+      setSearchValueForNewUser(searchValue);
+      setInstructorDialogOpen(false);
+      setCreateUserDialogOpen(true);
+    },
+    []
+  );
+
+  const parseSearchValue = useCallback((searchValue: string) => {
+    const trimmed = searchValue.trim();
+    const parts = trimmed.split(' ');
+    if (parts.length >= 2) {
+      return {
+        firstName: parts[0],
+        lastName: parts.slice(1).join(' '),
+        email: '',
+      };
+    } else if (trimmed.includes('@')) {
+      return {
+        firstName: '',
+        lastName: '',
+        email: trimmed,
+      };
+    } else {
+      return {
+        firstName: trimmed,
+        lastName: '',
+        email: '',
+      };
+    }
+  }, []);
+
+  const handleUserCreated = useCallback(
+    async (userId: string, firstName: string, lastName: string, email: string) => {
+      setCreateUserDialogOpen(false);
+
+      // Fetch the newly created user to get the full UserSelectionWithFilter_User structure
+      try {
+        const { data } = await fetchUserByEmail({
+          variables: {
+            limit: 100,
+            filter: {
+              _or: [{ id: { _eq: userId } }, { email: { _ilike: `%${email}%` } }],
+            },
+            order_by: [{ lastName: order_by.asc }, { firstName: order_by.asc }],
+          },
+        });
+
+        const newUser = data?.User?.find((u) => u.id === userId);
+        if (newUser) {
+          // Auto-select the new user as instructor
+          await addInstructorHandler(true, newUser);
+        }
+      } catch (error) {
+        console.error('Error fetching new user:', error);
+        handleError(t('operation_failed'));
+      } finally {
+        setSearchValueForNewUser('');
+      }
+    },
+    [fetchUserByEmail, addInstructorHandler, handleError, t]
+  );
+
+  const parsedSearchValues = parseSearchValue(searchValueForNewUser);
 
   // Funding organization management functions
   const openFundingOrgDialog = useCallback(() => {
@@ -740,8 +817,26 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
           onClose={addInstructorHandler}
           open={instructorDialogOpen}
           title={t('manageCourses:instructors.add')}
+          onAddNewUser={handleAddNewUser}
+          showAddNewUserOption={true}
         />
       )}
+
+      {/* Create User Dialog */}
+      <CreateUserDialog
+        open={createUserDialogOpen}
+        onClose={() => {
+          setCreateUserDialogOpen(false);
+          setSearchValueForNewUser('');
+        }}
+        onSuccess={() => {
+          // Refetch handled in handleUserCreated
+        }}
+        onUserCreated={handleUserCreated}
+        initialFirstName={parsedSearchValues.firstName}
+        initialLastName={parsedSearchValues.lastName}
+        initialEmail={parsedSearchValues.email}
+      />
 
       {/* Error Message Dialog */}
       {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}

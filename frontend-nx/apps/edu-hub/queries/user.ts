@@ -227,3 +227,26 @@ export const CREATE_USER = gql`
     }
   }
 `;
+
+export const USER_SELECTION_WITH_FILTER = gql`
+  query UserSelectionWithFilter(
+    $limit: Int = 100
+    $filter: User_bool_exp = {}
+    $order_by: [User_order_by!] = [{ lastName: asc }, { firstName: asc }]
+  ) {
+    User(
+      limit: $limit
+      where: { _and: [{ status: { _eq: ACTIVE } }, $filter] }
+      order_by: $order_by
+    ) {
+      id
+      firstName
+      lastName
+      email
+      updated_at
+      Experts {
+        id
+      }
+    }
+  }
+`;

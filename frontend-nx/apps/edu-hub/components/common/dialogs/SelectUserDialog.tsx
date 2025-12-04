@@ -1,87 +1,78 @@
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import useTranslation from 'next-translate/useTranslation';
-import { ChangeEvent, FC, useCallback, useState } from 'react';
+import { ChangeEvent, FC, useCallback, useState, useMemo } from 'react';
 import { MdClose } from 'react-icons/md';
-import { useAuthedQuery } from '../../../hooks/authedQuery';
-import { USER_SELECTION_ONE_PARAM, USER_SELECTION_TWO_PARAMS } from '../../../queries/user';
+import { useRoleQuery } from '../../../hooks/authedQuery';
+import { USER_SELECTION_WITH_FILTER } from '../../../queries/user';
 import {
-  UserForSelection1,
-  UserForSelection1Variables,
-  UserForSelection1_User,
-} from '../../../queries/__generated__/UserForSelection1';
-import { UserForSelection2, UserForSelection2Variables } from '../../../queries/__generated__/UserForSelection2';
+  UserSelectionWithFilter,
+  UserSelectionWithFilterVariables,
+  UserSelectionWithFilter_User,
+} from '../../../queries/__generated__/UserSelectionWithFilter';
+import { createMultiWordSearchCondition } from '../../../helpers/searchUtils';
+import { order_by } from '../../../__generated__/globalTypes';
 
 import { Button } from '../Button';
 import SelectUserRow from './SelectUserRow';
 
 interface IProps {
   title: string;
-  onClose: (confirmed: boolean, user: UserForSelection1_User | null) => void;
+  onClose: (confirmed: boolean, user: UserSelectionWithFilter_User | null) => void;
   open: boolean;
   onAddNewUser?: (searchValue: string) => void;
   showAddNewUserOption?: boolean;
 }
 
-const getSearchVars = (searchValue: string) => {
-  const split = searchValue.split(' ');
-  if (split.length > 1) {
-    return {
-      searchValue1: `%${split[0]}%`,
-      searchValue2: `%${split[1]}%`,
-    };
-  } else {
-    return {
-      searchValue1: `%${searchValue}%`,
-      searchValue2: '',
-    };
-  }
-};
-
 // Search user by some search value (partial name or email)
 // then select the user from a select
 export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUser, showAddNewUserOption = false }) => {
   const [searchValue, setSearchValue] = useState('');
+  const { t } = useTranslation();
+
   const handleNewInput = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       setSearchValue(event.target.value);
     },
-    [setSearchValue]
+    []
   );
 
   const handleCancel = useCallback(() => {
     setSearchValue('');
     onClose(false, null);
   }, [onClose]);
+
   const handleConfirm = useCallback(
-    (user: UserForSelection1_User) => {
+    (user: UserSelectionWithFilter_User) => {
       setSearchValue('');
       onClose(true, user);
     },
     [onClose]
   );
 
-  // I can't figure out to do a single graphql query
-  // that handles search hits on firstName and lastName together and separately.
-  // Thus I have defined two query types and they are used depending on the provided input
+  // Create filter condition using multi-word search
+  const filter = useMemo(() => {
+    if (searchValue.trim().length < 2) {
+      return {};
+    }
+    return createMultiWordSearchCondition(searchValue.trim(), ['firstName', 'lastName', 'email']);
+  }, [searchValue]);
 
-  // in case there is no space just search with the full value
-  const result1 = useAuthedQuery<UserForSelection1, UserForSelection1Variables>(USER_SELECTION_ONE_PARAM, {
-    variables: {
-      searchValue: `%${searchValue.trim()}%`,
-    },
-    skip: searchValue.length < 3 || searchValue.trim().includes(' '),
-  });
-  // in case there is a space search for a user that has a fitting first and last name
-  // by splitting the search string
-  const result2 = useAuthedQuery<UserForSelection2, UserForSelection2Variables>(USER_SELECTION_TWO_PARAMS, {
-    variables: getSearchVars(searchValue.trim()),
-    skip: searchValue.length < 3 || !searchValue.trim().includes(' '),
-  });
+  // Query users with dynamic filter - uses current user's role (admin/instructor) to access email column
+  const { data, loading } = useRoleQuery<UserSelectionWithFilter, UserSelectionWithFilterVariables>(
+    USER_SELECTION_WITH_FILTER,
+    {
+      variables: {
+        limit: 100,
+        filter,
+        order_by: [{ lastName: order_by.asc }, { firstName: order_by.asc }],
+      },
+      skip: !open,
+    }
+  );
 
-  const users = [...(result1.data?.User || []), ...(result2.data?.User || [])];
-  const isLoading = result1.loading || result2.loading;
-  const hasSearched = searchValue.length >= 3;
-  const showNoResults = hasSearched && !isLoading && users.length === 0;
+  const users = data?.User || [];
+  const hasSearched = searchValue.trim().length >= 2;
+  const showNoResults = hasSearched && !loading && users.length === 0;
   const shouldShowAddNewUser = showAddNewUserOption && onAddNewUser && showNoResults;
 
   const handleAddNewUser = useCallback(() => {
@@ -90,9 +81,8 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
     }
   }, [onAddNewUser, searchValue]);
 
-  const { t } = useTranslation();
   return (
-    <Dialog open={open} onClose={handleCancel}>
+    <Dialog open={open} onClose={handleCancel} maxWidth="md" fullWidth>
       <DialogTitle>
         <div className="grid grid-cols-2">
           <div>{title}</div>
@@ -103,19 +93,19 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
       </DialogTitle>
 
       <DialogContent>
-        <div>{t('type_name_or_email_minimum_3_letters')}</div>
+        <div className="mb-4">{t('type_name_or_email_minimum_2_letters', { fallback: 'Type a name or email (minimum 2 letters).' })}</div>
 
-        <div>
+        <div className="mb-4">
           <input
-            placeholder="Suchwert"
-            className="mb-2 w-full border border-solid"
+            placeholder={t('common:search')}
+            className="w-full border border-solid border-gray-300 rounded px-3 py-2"
             type="text"
             value={searchValue}
             onChange={handleNewInput}
           />
         </div>
 
-        <div className="h-[32rem] w-[26rem] overflow-auto">
+        <div className="h-[32rem] overflow-auto border border-gray-200 rounded">
           {users.length > 0 && (
             <>
               {users.map((user) => (
@@ -124,22 +114,28 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
             </>
           )}
           {showNoResults && shouldShowAddNewUser && (
-            <div className="mt-4">
-              <div className="text-gray-500 mb-2">{t('common:no_users_found')}</div>
+            <div className="p-4">
+              <div className="text-gray-500 mb-2 text-center">{t('common:no_users_found')}</div>
               <div
                 onClick={handleAddNewUser}
-                className="w-full truncate mt-2 mb-2 cursor-pointer bg-blue-50 hover:bg-blue-100 p-3 rounded text-blue-600 font-medium"
+                className="w-full cursor-pointer bg-blue-50 hover:bg-blue-100 p-3 rounded text-blue-600 font-medium text-center"
               >
                 {t('common:add_new_user')}
               </div>
             </div>
           )}
-          {isLoading && hasSearched && (
-            <div className="text-gray-500 mt-4">{t('common:loading')}</div>
+          {showNoResults && !shouldShowAddNewUser && (
+            <div className="p-4 text-center text-gray-500">{t('common:no_users_found')}</div>
+          )}
+          {loading && hasSearched && (
+            <div className="p-4 text-center text-gray-500">{t('common:loading')}</div>
+          )}
+          {searchValue.trim().length < 2 && (
+            <div className="p-4 text-center text-gray-500">{t('type_name_or_email_minimum_2_letters', { fallback: 'Type at least 2 characters' })}</div>
           )}
         </div>
 
-        <div className="grid grid-cols-2 mb-2">
+        <div className="grid grid-cols-2 mt-4">
           <div>
             <Button onClick={handleCancel}>{t('cancel')}</Button>
           </div>

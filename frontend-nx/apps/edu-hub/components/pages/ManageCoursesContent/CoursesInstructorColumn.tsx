@@ -4,7 +4,7 @@ import { QueryResult } from '@apollo/client';
 
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../../queries/mutateCourseInstructor';
-import { INSERT_EXPERT } from '../../../queries/user';
+import { INSERT_EXPERT, USER_SELECTION_WITH_FILTER } from '../../../queries/user';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
 import {
   DeleteCourseInstructor,
@@ -16,11 +16,18 @@ import {
 } from '../../../queries/__generated__/InsertCourseInstructor';
 import { InsertExpert, InsertExpertVariables } from '../../../queries/__generated__/InsertExpert';
 import { Programs_Program } from '../../../queries/__generated__/Programs';
-import { UserForSelection1_User } from '../../../queries/__generated__/UserForSelection1';
+import { UserSelectionWithFilter_User } from '../../../queries/__generated__/UserSelectionWithFilter';
+import {
+  UserSelectionWithFilter,
+  UserSelectionWithFilterVariables,
+} from '../../../queries/__generated__/UserSelectionWithFilter';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
+import { CreateUserDialog } from '../../common/dialogs/CreateUserDialog';
 import EhTag from '../../common/EhTag';
+import { useLazyRoleQuery } from '../../../hooks/authedQuery';
 
 import useTranslation from 'next-translate/useTranslation';
+import { order_by } from '../../../__generated__/globalTypes';
 
 interface IPropsInstructorColumn {
   programs: Programs_Program[];
@@ -32,6 +39,8 @@ interface IPropsInstructorColumn {
 
 export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCourses }) => {
   const [openInstructorDialog, setOpenInstructorDialog] = useState(false);
+  const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
+  const [searchValueForNewUser, setSearchValueForNewUser] = useState('');
 
   /* # region GraphQLAPIs */
   const [insertCourseInstructor] = useAdminMutation<InsertCourseInstructor, InsertCourseInstructorVariables>(
@@ -43,6 +52,10 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
   );
 
   const [insertExpertMutation] = useAdminMutation<InsertExpert, InsertExpertVariables>(INSERT_EXPERT);
+
+  const [fetchUserByEmail] = useLazyRoleQuery<UserSelectionWithFilter, UserSelectionWithFilterVariables>(
+    USER_SELECTION_WITH_FILTER
+  );
 
   /* # endregion */
 
@@ -70,7 +83,7 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
   );
 
   const addInstructorHandler = useCallback(
-    async (confirmed: boolean, user: UserForSelection1_User | null) => {
+    async (confirmed: boolean, user: UserSelectionWithFilter_User | null) => {
       if (!confirmed || user == null) {
         setOpenInstructorDialog(false);
         return;
@@ -117,6 +130,71 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
     },
     [insertExpertMutation, refetchCourses, course, insertCourseInstructor]
   );
+
+  const handleAddNewUser = useCallback(
+    (searchValue: string) => {
+      setSearchValueForNewUser(searchValue);
+      setOpenInstructorDialog(false);
+      setCreateUserDialogOpen(true);
+    },
+    []
+  );
+
+  const parseSearchValue = useCallback((searchValue: string) => {
+    const trimmed = searchValue.trim();
+    const parts = trimmed.split(' ');
+    if (parts.length >= 2) {
+      return {
+        firstName: parts[0],
+        lastName: parts.slice(1).join(' '),
+        email: '',
+      };
+    } else if (trimmed.includes('@')) {
+      return {
+        firstName: '',
+        lastName: '',
+        email: trimmed,
+      };
+    } else {
+      return {
+        firstName: trimmed,
+        lastName: '',
+        email: '',
+      };
+    }
+  }, []);
+
+  const handleUserCreated = useCallback(
+    async (userId: string, firstName: string, lastName: string, email: string) => {
+      setCreateUserDialogOpen(false);
+
+      // Fetch the newly created user to get the full UserSelectionWithFilter_User structure
+      try {
+        const { data } = await fetchUserByEmail({
+          variables: {
+            limit: 100,
+            filter: {
+              _or: [{ id: { _eq: userId } }, { email: { _ilike: `%${email}%` } }],
+            },
+            order_by: [{ lastName: order_by.asc }, { firstName: order_by.asc }],
+          },
+        });
+
+        const newUser = data?.User?.find((u) => u.id === userId);
+        if (newUser) {
+          // Auto-select the new user as instructor
+          await addInstructorHandler(true, newUser);
+        }
+      } catch (error) {
+        console.error('Error fetching new user:', error);
+      } finally {
+        setSearchValueForNewUser('');
+      }
+    },
+    [fetchUserByEmail, addInstructorHandler]
+  );
+
+  const parsedSearchValues = parseSearchValue(searchValueForNewUser);
   const { t } = useTranslation('course-page');
   const makeFullName = (firstName: string, lastName: string): string => {
     return `${firstName} ${lastName}`;
@@ -147,8 +225,29 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
         />
       </div>
       {openInstructorDialog && (
-        <SelectUserDialog onClose={addInstructorHandler} open={openInstructorDialog} title={t('add-instructors')} />
+        <SelectUserDialog
+          onClose={addInstructorHandler}
+          open={openInstructorDialog}
+          title={t('add-instructors')}
+          onAddNewUser={handleAddNewUser}
+          showAddNewUserOption={true}
+        />
       )}
+
+      <CreateUserDialog
+        open={createUserDialogOpen}
+        onClose={() => {
+          setCreateUserDialogOpen(false);
+          setSearchValueForNewUser('');
+        }}
+        onSuccess={() => {
+          // Refetch handled in handleUserCreated
+        }}
+        onUserCreated={handleUserCreated}
+        initialFirstName={parsedSearchValues.firstName}
+        initialLastName={parsedSearchValues.lastName}
+        initialEmail={parsedSearchValues.email}
+      />
     </div>
   );
 };
