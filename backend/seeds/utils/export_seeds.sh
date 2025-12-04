@@ -36,7 +36,10 @@ tables=$(docker exec -e PGPASSWORD=$PG_PASSWORD $CONTAINER_NAME psql -U postgres
         'AppSettings', \
         'CourseGroupOption', \
         'CourseRegistrationType', \
-        'ProgramType'\
+        'ProgramType', \
+        'Country', \
+        'MailTemplate', \
+        'MailTemplateType'\
     );" | grep -v '^\s*$')
 
 echo "Found tables (excluding enum tables):"
@@ -66,8 +69,33 @@ if [ $? -eq 0 ]; then
     if [ ! -z "$latest_seed" ]; then
         # Rename the file inside the container
         docker exec -w /hasura $CONTAINER_NAME mv "$latest_seed" "seeds/default/$SEED_NAME.sql"
+        
+        # Post-process: Remove data created by migrations
+        echo "Removing migration-created data from seed file..."
+        docker exec -w /hasura $CONTAINER_NAME bash -c "
+            seed_file=\"seeds/default/$SEED_NAME.sql\"
+            
+            # Remove FAQ data created by migrations
+            # Migration 1753957404053 creates FaqCollection with name='default' (id=1)
+            # Migration 1753957404056 creates Faq entries with ids 1-3 and FaqTranslation entries with ids 1-6
+            sed -i \"/INSERT INTO public.\\\"FaqCollection\\\" (id, name.*VALUES (1, 'default'/d\" \"\$seed_file\"
+            sed -i \"/INSERT INTO public.\\\"Faq\\\" (id, \\\"collectionId\\\".*VALUES (1, 1,/d\" \"\$seed_file\"
+            sed -i \"/INSERT INTO public.\\\"Faq\\\" (id, \\\"collectionId\\\".*VALUES (2, 1,/d\" \"\$seed_file\"
+            sed -i \"/INSERT INTO public.\\\"Faq\\\" (id, \\\"collectionId\\\".*VALUES (3, 1,/d\" \"\$seed_file\"
+            sed -i \"/INSERT INTO public.\\\"FaqTranslation\\\" (id, \\\"faqId\\\".*VALUES (1, /d\" \"\$seed_file\"
+            sed -i \"/INSERT INTO public.\\\"FaqTranslation\\\" (id, \\\"faqId\\\".*VALUES (2, /d\" \"\$seed_file\"
+            sed -i \"/INSERT INTO public.\\\"FaqTranslation\\\" (id, \\\"faqId\\\".*VALUES (3, /d\" \"\$seed_file\"
+            sed -i \"/INSERT INTO public.\\\"FaqTranslation\\\" (id, \\\"faqId\\\".*VALUES (4, /d\" \"\$seed_file\"
+            sed -i \"/INSERT INTO public.\\\"FaqTranslation\\\" (id, \\\"faqId\\\".*VALUES (5, /d\" \"\$seed_file\"
+            sed -i \"/INSERT INTO public.\\\"FaqTranslation\\\" (id, \\\"faqId\\\".*VALUES (6, /d\" \"\$seed_file\"
+            sed -i \"/SELECT pg_catalog.setval('public.\\\"FaqCollection_id_seq\\\"'/d\" \"\$seed_file\"
+            sed -i \"/SELECT pg_catalog.setval('public.\\\"Faq_id_seq\\\"'/d\" \"\$seed_file\"
+            sed -i \"/SELECT pg_catalog.setval('public.\\\"FaqTranslation_id_seq\\\"'/d\" \"\$seed_file\"
+        "
+        
         echo "Successfully created and renamed database snapshot to: $SEED_NAME.sql"
         echo "Note: This is a snapshot of the current database state."
+        echo "Note: FAQ data created by migrations has been excluded to prevent conflicts."
     else
         echo "Warning: Could not find the created seed file"
     fi

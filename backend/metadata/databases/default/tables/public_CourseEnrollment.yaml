@@ -8,6 +8,9 @@ object_relationships:
   - name: CourseEnrollmentStatus
     using:
       foreign_key_constraint_on: status
+  - name: LocationOption
+    using:
+      foreign_key_constraint_on: location
   - name: MotivationRating
     using:
       foreign_key_constraint_on: motivationRating
@@ -23,6 +26,7 @@ insert_permissions:
         - motivationLetter
         - status
         - userId
+        - location
 select_permissions:
   - role: instructor_access
     permission:
@@ -38,6 +42,7 @@ select_permissions:
         - created_at
         - updated_at
         - invitationExpirationDate
+        - location
       filter: {}
   - role: user_access
     permission:
@@ -50,6 +55,7 @@ select_permissions:
         - motivationLetter
         - status
         - userId
+        - location
       filter:
         _and:
           - userId:
@@ -64,6 +70,7 @@ select_permissions:
         - courseId
         - id
         - userId
+        - location
       filter: {}
 update_permissions:
   - role: instructor_access
@@ -72,6 +79,7 @@ update_permissions:
         - invitationExpirationDate
         - motivationRating
         - status
+        - location
       filter:
         _or:
           - Course:
@@ -88,6 +96,7 @@ update_permissions:
         - invitationExpirationDate
         - motivationRating
         - status
+        - location
       filter:
         _or:
           - Course:

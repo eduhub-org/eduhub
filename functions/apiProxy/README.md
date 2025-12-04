@@ -6,8 +6,8 @@
 
 #### Endpoints
 - Participants API
-  - GET `/participants` — list courses funded for the authenticated organization
-  - GET `/participants/courses/{course_id}` — participant data for a funded course
+  - GET `/participants` — list courses funded for the authenticated organization (returns one course entry per location, each with a unique hash ID UUID)
+  - GET `/participants/courses/{course_id}` — participant data for a funded course-location combination. Accepts hash ID (UUID) as primary format, or integer course ID for backward compatibility. When hash ID is used, participants are filtered by the specific location.
   - GET `/participants/schema` — brief schema/info and environment diagnostics
   - GET `/participants/test` — simple health check for the participants router
 - MOOCHub feed
@@ -31,6 +31,14 @@
 - `occupationStatus` is included when available.
 - Completion data only signals presence of certificates (no dates or rates).
 
+#### Course identification and location-based filtering
+- **Hash IDs (UUIDs)** are the primary course identifier format, matching MOOCHub API
+- Each course-location combination has a unique hash ID (UUID v5)
+- Course listing returns **one entry per location** (not one per course)
+- When requesting participants using a hash ID, results are filtered to the specific location
+- Integer course IDs are accepted for backward compatibility but will use the first available location
+- Hash IDs are generated from `course_id-location_id` combination
+
 #### Response examples
 - List funded courses
 ```json
@@ -53,7 +61,7 @@
   },
   "fundingOrganization": { "id": 353, "name": "…" },
   "courses": [
-    { "id": 302, "title": "…", "participantDataEndpoint": "/participants/courses/302" }
+    { "id": "39aa0df1-4936-5686-80a5-35d196a03520", "title": "…", "participantDataEndpoint": "/participants/courses/39aa0df1-4936-5686-80a5-35d196a03520" }
   ],
   "generatedAt": "2025-08-08T10:30:00Z"
 }
@@ -63,7 +71,7 @@
 ```json
 {
   "type": "ParticipantDataReport",
-  "id": "urn:report:course:302:2025-08-08T10:30:00Z",
+  "id": "urn:report:course:39aa0df1-4936-5686-80a5-35d196a03520:2025-08-08T10:30:00Z",
   "provider": {
     "id": "did:web:edu.opencampus.sh",
     "name": "opencampus.sh",
@@ -79,7 +87,7 @@
     }
   },
   "learningOpportunity": {
-    "id": "urn:course:302",
+    "id": "urn:course:39aa0df1-4936-5686-80a5-35d196a03520",
     "title": "…",
     "summary": "…",
     "language": ["de"],
@@ -113,7 +121,25 @@
 curl -s \
   -H "X-API-Key: edh_live_org353_sk_***" \
   -H "User-Agent: PartnerClient/1.0" \
-  http://localhost:42026/participants/courses/302
+  http://localhost:42026/participants/courses/39aa0df1-4936-5686-80a5-35d196a03520
 ```
+
+#### Development and Testing
+
+For local development and testing, use the development API key:
+
+**Development API Key:** `edh_live_org160_sk_056afe290cadf18e2b2d7482c5f4e5a5`
+
+This key is configured in the development database seed data and is safe to use for local testing. The development server runs on `http://localhost:42026`.
+
+**Example development request:**
+```bash
+curl -X GET "http://localhost:42026/participants" \
+  -H "X-API-Key: edh_live_org160_sk_056afe290cadf18e2b2d7482c5f4e5a5" \
+  -H "User-Agent: EduHub-Client/1.0" \
+  -H "Accept-Version: 3.0.1"
+```
+
+**Note:** The development API key only works with the local development server. For production access, contact the EduHub team to obtain a production API key.
 
 

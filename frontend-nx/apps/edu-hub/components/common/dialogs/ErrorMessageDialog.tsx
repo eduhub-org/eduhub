@@ -33,6 +33,9 @@ export const ErrorMessageDialog: FC<ErrorProps> = ({ errorMessage, open, onClose
       aria-labelledby="error-dialog-title"
       aria-describedby="error-dialog-description"
       keepMounted
+      sx={{
+        zIndex: 1400, // Higher than default Dialog z-index (1300) to appear above other dialogs
+      }}
     >
       <DialogTitle id="error-dialog-title">
         <div className="grid grid-cols-2">
