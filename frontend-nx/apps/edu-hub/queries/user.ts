@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { USER_FRAGMENT } from "./userFragment";
 
 export const USER_LIST = gql`
   query UserList {
@@ -229,6 +230,7 @@ export const CREATE_USER = gql`
 `;
 
 export const USER_SELECTION_WITH_FILTER = gql`
+  ${USER_FRAGMENT}
   query UserSelectionWithFilter(
     $limit: Int = 100
     $filter: User_bool_exp = {}
@@ -239,10 +241,7 @@ export const USER_SELECTION_WITH_FILTER = gql`
       where: { _and: [{ status: { _eq: ACTIVE } }, $filter] }
       order_by: $order_by
     ) {
-      id
-      firstName
-      lastName
-      email
+      ...UserFragment
       updated_at
       Experts {
         id

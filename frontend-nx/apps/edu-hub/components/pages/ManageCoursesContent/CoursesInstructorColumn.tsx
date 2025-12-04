@@ -25,6 +25,9 @@ import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import { CreateUserDialog } from '../../common/dialogs/CreateUserDialog';
 import EhTag from '../../common/EhTag';
 import { useLazyRoleQuery } from '../../../hooks/authedQuery';
+import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
+import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
+import { ApolloError } from '@apollo/client';
 
 import useTranslation from 'next-translate/useTranslation';
 import { order_by } from '../../../__generated__/globalTypes';
@@ -41,17 +44,64 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
   const [openInstructorDialog, setOpenInstructorDialog] = useState(false);
   const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
   const [searchValueForNewUser, setSearchValueForNewUser] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+
+  // Helper function to extract readable error message from GraphQL errors
+  const extractErrorMessage = useCallback((error: ApolloError | Error | any): string => {
+    if (error?.message) {
+      return error.message;
+    }
+    if (error?.graphQLErrors && error.graphQLErrors.length > 0) {
+      return error.graphQLErrors.map((e: any) => e.message).join(', ');
+    }
+    if (error?.networkError) {
+      return error.networkError.message || 'Network error occurred';
+    }
+    if (Array.isArray(error)) {
+      return error.map((e: any) => e.message || String(e)).join(', ');
+    }
+    return 'An unexpected error occurred';
+  }, []);
+
+  // Helper function to show error dialog
+  const showError = useCallback((message: string) => {
+    console.error('Error:', message);
+    setErrorMessage(message);
+  }, []);
+
+  // Helper function to show error snackbar
+  const showErrorSnackbarMessage = useCallback((message: string) => {
+    console.error('Error:', message);
+    setSnackbarMessage(message);
+    setShowErrorSnackbar(true);
+  }, []);
 
   /* # region GraphQLAPIs */
   const [insertCourseInstructor] = useAdminMutation<InsertCourseInstructor, InsertCourseInstructorVariables>(
-    INSERT_A_COURSEINSTRUCTOR
+    INSERT_A_COURSEINSTRUCTOR,
+    {
+      onError: (error) => {
+        showError(extractErrorMessage(error));
+      },
+    }
   );
 
   const [deleteInstructorAPI] = useAdminMutation<DeleteCourseInstructor, DeleteCourseInstructorVariables>(
-    DELETE_COURSE_INSRTRUCTOR
+    DELETE_COURSE_INSRTRUCTOR,
+    {
+      onError: (error) => {
+        showError(extractErrorMessage(error));
+      },
+    }
   );
 
-  const [insertExpertMutation] = useAdminMutation<InsertExpert, InsertExpertVariables>(INSERT_EXPERT);
+  const [insertExpertMutation] = useAdminMutation<InsertExpert, InsertExpertVariables>(INSERT_EXPERT, {
+    onError: (error) => {
+      showError(extractErrorMessage(error));
+    },
+  });
 
   const [fetchUserByEmail] = useLazyRoleQuery<UserSelectionWithFilter, UserSelectionWithFilterVariables>(
     USER_SELECTION_WITH_FILTER
@@ -74,12 +124,13 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
       });
 
       if (response.errors) {
-        console.log(response.errors);
+        console.error('Error deleting instructor:', response.errors);
+        showError(extractErrorMessage(response.errors));
         return;
       }
       refetchCourses();
     },
-    [deleteInstructorAPI, refetchCourses, course]
+    [deleteInstructorAPI, refetchCourses, course, showError, extractErrorMessage]
   );
 
   const addInstructorHandler = useCallback(
@@ -99,7 +150,8 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
           },
         });
         if (newExpert.errors) {
-          console.log(newExpert.errors);
+          console.error('Error inserting expert:', newExpert.errors);
+          showError(extractErrorMessage(newExpert.errors));
           setOpenInstructorDialog(false);
           return;
         }
@@ -121,14 +173,15 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
         },
       });
       if (response.errors) {
-        console.log(response.errors);
+        console.error('Error inserting course instructor:', response.errors);
+        showError(extractErrorMessage(response.errors));
         setOpenInstructorDialog(false);
         return;
       }
       refetchCourses();
       setOpenInstructorDialog(false);
     },
-    [insertExpertMutation, refetchCourses, course, insertCourseInstructor]
+    [insertExpertMutation, refetchCourses, course, insertCourseInstructor, showError, extractErrorMessage]
   );
 
   const handleAddNewUser = useCallback(
@@ -187,11 +240,12 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
         }
       } catch (error) {
         console.error('Error fetching new user:', error);
+        showErrorSnackbarMessage(extractErrorMessage(error));
       } finally {
         setSearchValueForNewUser('');
       }
     },
-    [fetchUserByEmail, addInstructorHandler]
+    [fetchUserByEmail, addInstructorHandler, showErrorSnackbarMessage, extractErrorMessage]
   );
 
   const parsedSearchValues = parseSearchValue(searchValueForNewUser);
@@ -247,6 +301,18 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
         initialFirstName={parsedSearchValues.firstName}
         initialLastName={parsedSearchValues.lastName}
         initialEmail={parsedSearchValues.email}
+      />
+
+      <ErrorMessageDialog
+        errorMessage={errorMessage || ''}
+        open={!!errorMessage}
+        onClose={() => setErrorMessage(null)}
+      />
+
+      <NotificationSnackbar
+        open={showErrorSnackbar}
+        onClose={() => setShowErrorSnackbar(false)}
+        message={snackbarMessage}
       />
     </div>
   );

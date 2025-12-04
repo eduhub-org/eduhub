@@ -51,7 +51,7 @@ function createNestedFieldCondition(fieldPath: string, value: any): Record<strin
  * 
  * @example
  * // Array field with _contains
- * createMultiWordSearchCondition('alias1 alias2', ['name', 'description'], { arrayFields: ['aliases'] })
+ * createMultiWordSearchCondition('alias1 alias2', ['name', 'description', 'aliases'], { arrayFields: ['aliases'] })
  * // Returns: { _and: [{ _or: [{ name: { _ilike: '%alias1%' } }, { description: { _ilike: '%alias1%' } }, { aliases: { _contains: 'alias1' } }] }, { _or: [{ name: { _ilike: '%alias2%' } }, { description: { _ilike: '%alias2%' } }, { aliases: { _contains: 'alias2' } }] }] }
  */
 export function createMultiWordSearchCondition(

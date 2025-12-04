@@ -93,7 +93,7 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
       </DialogTitle>
 
       <DialogContent>
-        <div className="mb-4">{t('type_name_or_email_minimum_2_letters', { fallback: 'Type a name or email (minimum 2 letters).' })}</div>
+        <div className="mb-4">{t('type_name_or_email_minimum_2_letters')}</div>
 
         <div className="mb-4">
           <input
@@ -131,7 +131,7 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
             <div className="p-4 text-center text-gray-500">{t('common:loading')}</div>
           )}
           {searchValue.trim().length < 2 && (
-            <div className="p-4 text-center text-gray-500">{t('type_name_or_email_minimum_2_letters', { fallback: 'Type at least 2 characters' })}</div>
+            <div className="p-4 text-center text-gray-500">{t('type_name_or_email_minimum_2_letters')}</div>
           )}
         </div>
 

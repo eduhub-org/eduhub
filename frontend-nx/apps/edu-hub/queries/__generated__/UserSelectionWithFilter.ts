@@ -9,6 +9,12 @@ import { User_bool_exp, User_order_by } from "./../../__generated__/globalTypes"
 // GraphQL query operation: UserSelectionWithFilter
 // ====================================================
 
+export interface UserSelectionWithFilter_User_Organization {
+  __typename: "Organization";
+  id: number;
+  name: string;
+}
+
 export interface UserSelectionWithFilter_User_Experts {
   __typename: "Expert";
   id: number;
@@ -29,6 +35,26 @@ export interface UserSelectionWithFilter_User {
    * The user's email address
    */
   email: string;
+  /**
+   * The user's profile picture
+   */
+  picture: string | null;
+  /**
+   * A link to an external profile, for example in LinkedIn or Xing
+   */
+  externalProfile: string | null;
+  /**
+   * The user's postal/zip code
+   */
+  zipCode: string | null;
+  /**
+   * The user's country of residence
+   */
+  country: string | null;
+  /**
+   * An object relationship
+   */
+  Organization: UserSelectionWithFilter_User_Organization | null;
   updated_at: any | null;
   /**
    * An array relationship
