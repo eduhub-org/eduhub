@@ -1,4 +1,3 @@
-import os
 import logging
 from datetime import datetime, timedelta, timezone
 from api_clients import EduHubClient
@@ -42,13 +41,7 @@ def update_enrollment_locations(arguments):
         now = datetime.now(timezone.utc)
         twenty_four_hours_ago = now - timedelta(hours=24)
         # Format for GraphQL (ISO 8601 format with timezone)
-        time_threshold = twenty_four_hours_ago.strftime("%Y-%m-%dT%H:%M:%S%z")
-        # Ensure timezone format is correct (replace +0000 with +00:00)
-        if time_threshold.endswith('+0000'):
-            time_threshold = time_threshold[:-5] + '+00:00'
-        elif not time_threshold.endswith('+00:00') and not time_threshold.endswith('Z'):
-            # Add timezone if not present
-            time_threshold = time_threshold + "+00:00"
+        time_threshold = twenty_four_hours_ago.isoformat()
         
         logging.info(f"Querying sessions that ended after {time_threshold}")
         
@@ -322,9 +315,7 @@ def update_enrollment_locations(arguments):
         }
         
     except Exception as e:
-        logging.error(f"Error updating enrollment locations: {str(e)}")
-        import traceback
-        logging.error(traceback.format_exc())
+        logging.exception("Error updating enrollment locations: %s", e)
         return {
             "success": False,
             "error": str(e)

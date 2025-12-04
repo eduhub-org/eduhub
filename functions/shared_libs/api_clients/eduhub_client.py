@@ -269,6 +269,14 @@ class EduHubClient:
         
 
     def insert_attendance(self, course_participant_attendance):
+        # Safely extract location value with fallback to None
+        location_value = None
+        location_series = course_participant_attendance.get("location")
+        if location_series is not None and not location_series.empty:
+            raw_location = location_series.iloc[0]
+            if pd.notnull(raw_location):
+                location_value = str(raw_location)
+
         variables = {
             "leaveDateTime": course_participant_attendance.get("leaveDateTime").iloc[0],
             "interruptionCount": None
@@ -283,7 +291,7 @@ class EduHubClient:
             if course_participant_attendance.get("duration").iloc[0] is None
             else int(course_participant_attendance.get("duration").iloc[0]),
             "userId": course_participant_attendance.get("userId").iloc[0],
-            "location": course_participant_attendance.get("location").iloc[0],
+            "location": location_value,
         }
         mutation = """mutation($leaveDateTime: timestamptz, $interruptionCount: Int, $recordedName: String,
                                $sessionId: Int, $source: String, $joinDateTime: timestamptz, $status: AttendanceStatus_enum,
