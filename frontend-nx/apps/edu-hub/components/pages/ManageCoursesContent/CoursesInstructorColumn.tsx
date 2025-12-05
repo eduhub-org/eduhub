@@ -21,7 +21,7 @@ import {
 } from '../../../queries/__generated__/UserSelectionWithFilter';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import { CreateUserDialog } from '../../common/dialogs/CreateUserDialog';
-import EhTag from '../../common/EhTag';
+import EhTagStingId from '../../common/EhTagStingId';
 import { useLazyRoleQuery } from '../../../hooks/authedQuery';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
@@ -128,6 +128,16 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
       refetchCourses();
     },
     [deleteInstructorAPI, refetchCourses, course, showError, extractErrorMessage]
+  );
+
+  const handleDelete = useCallback(
+    (id: string) => {
+      void deleteInstructorFromACourse(id).catch((err) => {
+        console.error('Error deleting instructor:', err);
+        showError(extractErrorMessage(err));
+      });
+    },
+    [deleteInstructorFromACourse, showError, extractErrorMessage]
   );
 
   const addInstructorHandler = useCallback(
@@ -240,16 +250,14 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
       {
         // we need to show just one instructor in main ui
         course.CourseInstructors.length > 0 && (
-          <EhTag
+          <EhTagStingId
             key={`${course.id}-${course.CourseInstructors[0].User.id}`}
-            requestDeleteTag={deleteInstructorFromACourse}
-            tag={{
-              display: makeFullName(
-                course.CourseInstructors[0].User.firstName,
-                course.CourseInstructors[0].User.lastName ?? ' '
-              ),
-              id: course.CourseInstructors[0].User.id,
-            }}
+            requestDeleteTag={handleDelete}
+            title={makeFullName(
+              course.CourseInstructors[0].User.firstName,
+              course.CourseInstructors[0].User.lastName ?? ' '
+            )}
+            id={course.CourseInstructors[0].User.id}
           />
         )
       }
