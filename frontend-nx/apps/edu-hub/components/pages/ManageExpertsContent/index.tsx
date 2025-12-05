@@ -132,27 +132,21 @@ const ManageExpertsContent: FC = () => {
         header: t('first_name'),
         accessorKey: 'firstName',
         enableSorting: true,
-        meta: {
-          width: 3,
-        },
+        size: 300,
         cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
       },
       {
         header: t('last_name'),
         accessorKey: 'lastName',
         enableSorting: true,
-        meta: {
-          width: 3,
-        },
+        size: 300,
         cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
       },
       {
         header: t('email'),
         accessorKey: 'email',
         enableSorting: true,
-        meta: {
-          width: 3,
-        },
+        size: 300,
         cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
       },
     ],

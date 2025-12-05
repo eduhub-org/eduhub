@@ -26,10 +26,6 @@ export interface ExpertsByLastName_User_CourseInstructors_Course {
    */
   title: string;
   /**
-   * Shown below the title on the course page
-   */
-  tagline: string;
-  /**
    * Content of the first course description field
    */
   contentDescriptionField1: string | null;
