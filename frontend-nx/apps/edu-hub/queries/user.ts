@@ -34,17 +34,6 @@ export const USER = gql`
   }
 `;
 
-export const INSERT_EXPERT = gql`
-  mutation InsertExpert($userId: uuid!) {
-    insert_Expert(objects: { userId: $userId }) {
-      affected_rows
-      returning {
-        id
-      }
-    }
-  }
-`;
-
 // two versions of this to support the common case of filtering by first and last name together!
 export const USER_SELECTION_ONE_PARAM = gql`
   query UserForSelection1($searchValue: String!) {
@@ -70,9 +59,6 @@ export const USER_SELECTION_ONE_PARAM = gql`
       lastName
       email
       updated_at
-      Experts {
-        id
-      }
     }
   }
 `;
@@ -102,9 +88,6 @@ export const USER_SELECTION_TWO_PARAMS = gql`
       lastName
       email
       updated_at
-      Experts {
-        id
-      }
     }
   }
 `;
@@ -154,38 +137,6 @@ export const USERS_BY_LAST_NAME = gql`
     User_aggregate(where: $filter) {
       aggregate {
         count
-      }
-    }
-  }
-`;
-
-/**
- * Order by default lastName
- */
-export const USERS_WITH_EXPERT_ID = gql`
-  query UsersWithExpertId(
-    $userOrderBy: User_order_by = { lastName: asc }
-    $limit: Int = null
-    $offset: Int = 0
-    $where: User_bool_exp = {}
-  ) {
-    User_aggregate(where: $where) {
-      aggregate {
-        count
-      }
-    }
-    User(
-      order_by: [$userOrderBy]
-      where: { _and: [{ status: { _eq: ACTIVE } }, $where] }
-      limit: $limit
-      offset: $offset
-    ) {
-      id
-      firstName
-      lastName
-      email
-      Experts {
-        id
       }
     }
   }
@@ -243,9 +194,6 @@ export const USER_SELECTION_WITH_FILTER = gql`
     ) {
       ...UserFragment
       updated_at
-      Experts {
-        id
-      }
     }
   }
 `;

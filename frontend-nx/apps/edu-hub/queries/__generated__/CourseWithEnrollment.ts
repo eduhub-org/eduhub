@@ -43,7 +43,7 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionAddresses {
   CourseLocation: CourseWithEnrollment_Course_by_pk_Sessions_SessionAddresses_CourseLocation | null;
 }
 
-export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionSpeakers_Expert_User {
+export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionSpeakers_User {
   __typename: "User";
   id: any;
   /**
@@ -64,20 +64,13 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionSpeakers_Expe
   externalProfile: string | null;
 }
 
-export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionSpeakers_Expert {
-  __typename: "Expert";
-  /**
-   * An object relationship
-   */
-  User: CourseWithEnrollment_Course_by_pk_Sessions_SessionSpeakers_Expert_User;
-}
-
 export interface CourseWithEnrollment_Course_by_pk_Sessions_SessionSpeakers {
   __typename: "SessionSpeaker";
+  id: number;
   /**
    * An object relationship
    */
-  Expert: CourseWithEnrollment_Course_by_pk_Sessions_SessionSpeakers_Expert;
+  User: CourseWithEnrollment_Course_by_pk_Sessions_SessionSpeakers_User;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_Sessions_Attendances {
@@ -127,7 +120,7 @@ export interface CourseWithEnrollment_Course_by_pk_Sessions {
   Attendances: CourseWithEnrollment_Course_by_pk_Sessions_Attendances[];
 }
 
-export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Expert_User {
+export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_User {
   __typename: "User";
   id: any;
   /**
@@ -152,26 +145,13 @@ export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Expert_User
   email: string;
 }
 
-export interface CourseWithEnrollment_Course_by_pk_CourseInstructors_Expert {
-  __typename: "Expert";
-  id: number;
-  /**
-   * A short description on the expert's background
-   */
-  description: string | null;
-  /**
-   * An object relationship
-   */
-  User: CourseWithEnrollment_Course_by_pk_CourseInstructors_Expert_User;
-}
-
 export interface CourseWithEnrollment_Course_by_pk_CourseInstructors {
   __typename: "CourseInstructor";
   id: number;
   /**
    * An object relationship
    */
-  Expert: CourseWithEnrollment_Course_by_pk_CourseInstructors_Expert;
+  User: CourseWithEnrollment_Course_by_pk_CourseInstructors_User;
 }
 
 export interface CourseWithEnrollment_Course_by_pk_CourseLocations {

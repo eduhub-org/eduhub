@@ -7,11 +7,6 @@
 // GraphQL query operation: UserForSelection1
 // ====================================================
 
-export interface UserForSelection1_User_Experts {
-  __typename: "Expert";
-  id: number;
-}
-
 export interface UserForSelection1_User {
   __typename: "User";
   id: any;
@@ -28,10 +23,6 @@ export interface UserForSelection1_User {
    */
   email: string;
   updated_at: any | null;
-  /**
-   * An array relationship
-   */
-  Experts: UserForSelection1_User_Experts[];
 }
 
 export interface UserForSelection1 {

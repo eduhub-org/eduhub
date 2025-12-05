@@ -5,17 +5,61 @@ object_relationships:
   - name: Course
     using:
       foreign_key_constraint_on: courseId
-  - name: Expert
+  - name: User
     using:
-      foreign_key_constraint_on: expertId
+      foreign_key_constraint_on: userId
 select_permissions:
   - role: anonymous
     permission:
       columns:
         - id
         - courseId
-        - expertId
+        - userId
         - created_at
         - updated_at
       filter: {}
       limit: 10
+insert_permissions:
+  - role: instructor_access
+    permission:
+      check:
+        Course:
+          CourseInstructors:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+      columns:
+        - courseId
+        - userId
+delete_permissions:
+  - role: instructor_access
+    permission:
+      filter:
+        Course:
+          CourseInstructors:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+event_triggers:
+  - name: add_keycloak_instructor_role
+    definition:
+      enable_manual: false
+      insert:
+        columns: '*'
+    retry_conf:
+      interval_sec: 10
+      num_retries: 0
+      timeout_sec: 60
+    webhook_from_env: CLOUD_FUNCTION_LINK_ADD_KEYCLOAK_ROLE
+    headers:
+      - name: secret
+        value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+      - name: role
+        value: instructor
+    cleanup_config:
+      batch_size: 10000
+      clean_invocation_logs: false
+      clear_older_than: 168
+      paused: true
+      schedule: 0 0 * * *
+      timeout: 60

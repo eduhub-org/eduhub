@@ -33,5 +33,5 @@ export interface InsertCourseInstructor {
 
 export interface InsertCourseInstructorVariables {
   courseId: number;
-  expertId: number;
+  userId: any;
 }

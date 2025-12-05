@@ -117,13 +117,6 @@ export const client = new ApolloClient({
           },
         },
       },
-      Expert: {
-        fields: {
-          User: {
-            merge: (_, incoming) => incoming,
-          },
-        },
-      },
     },
   }),
 });

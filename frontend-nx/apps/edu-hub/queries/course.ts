@@ -178,9 +178,9 @@ export const UPDATE_SESSION_END_TIME = gql`
 `;
 
 export const INSERT_NEW_SESSION_SPEAKER = gql`
-  mutation InsertNewSessionSpeaker($sessionId: Int!, $expertId: Int!) {
+  mutation InsertNewSessionSpeaker($sessionId: Int!, $userId: uuid!) {
     insert_SessionSpeaker(
-      objects: { sessionId: $sessionId, expertId: $expertId }
+      objects: { sessionId: $sessionId, userId: $userId }
     ) {
       affected_rows
       returning {

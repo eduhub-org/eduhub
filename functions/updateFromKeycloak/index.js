@@ -50,7 +50,6 @@ exports.updateFromKeycloak = async (req, res) => {
     });
     
     const admin_role = roles.filter(it => it.name === 'admin')[0];
-    const instructor_role = roles.filter(it => it.name === 'instructor')[0];
 
     //get user from hasura
     let findUserResponse;
@@ -97,31 +96,8 @@ exports.updateFromKeycloak = async (req, res) => {
           .catch((error) => console.error(error));
       }
       
-      //if user is supposed to have instructor role check if it has, if not add it
-      let findInstructorResponse;
-      if (instructor_role != null) { 
-        await client
-          .query({
-            query: "query($id : uuid!) { Expert(where: {userId: {_eq: $id}}) { id } }",
-            variables: { id: userid },
-          })
-          .then((response) => {
-            findInstructorResponse = response.data.Expert;
-          })
-          .catch((error) => console.error(error));
-        if (!findInstructorResponse || (findInstructorResponse.length == 0)) {
-          await client
-          .query({
-            query:
-              "mutation($id : uuid!) { insert_Expert(objects: {userId: $id}) { returning { id } } }",
-            variables: {
-              id: userid
-            },
-          })
-          .then((response) => {})
-          .catch((error) => console.error(error));
-        }
-      }
+      // Note: Instructor role is now automatically assigned via event trigger when
+      // a user is added as a CourseInstructor. The Expert table has been removed.
       
       //if user is supposed to have admin role check if it has, if not add it
       let findAdminResponse;

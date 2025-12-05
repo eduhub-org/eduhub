@@ -33,5 +33,5 @@ export interface InsertNewSessionSpeaker {
 
 export interface InsertNewSessionSpeakerVariables {
   sessionId: number;
-  expertId: number;
+  userId: any;
 }

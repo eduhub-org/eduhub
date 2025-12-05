@@ -27,10 +27,9 @@ insert_permissions:
         Session:
           Course:
             CourseInstructors:
-              Expert:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
       columns:
         - sessionId
         - source
@@ -58,10 +57,9 @@ select_permissions:
         Session:
           Course:
             CourseInstructors:
-              Expert:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
   - role: user_access
     permission:
       columns:
@@ -98,8 +96,7 @@ update_permissions:
         Session:
           Course:
             CourseInstructors:
-              Expert:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
       check: {}

@@ -44,10 +44,9 @@ insert_permissions:
           - AchievementOptionCourses:
               Course:
                 CourseInstructors:
-                  Expert:
-                    User:
-                      id:
-                        _eq: X-Hasura-User-Id
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
           - AchievementOptionMentors:
               User:
                 id:
@@ -102,10 +101,9 @@ update_permissions:
           - AchievementOptionCourses:
               Course:
                 CourseInstructors:
-                  Expert:
-                    User:
-                      id:
-                        _eq: X-Hasura-User-Id
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
           - AchievementOptionMentors:
               User:
                 id:
@@ -119,10 +117,9 @@ delete_permissions:
           - AchievementOptionCourses:
               Course:
                 CourseInstructors:
-                  Expert:
-                    User:
-                      id:
-                        _eq: X-Hasura-User-Id
+                  User:
+                    id:
+                      _eq: X-Hasura-User-Id
           - AchievementOptionMentors:
               User:
                 id:
