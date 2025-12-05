@@ -6,7 +6,7 @@ import EhTag, { TagElement } from './EhTag';
 interface IProps {
   tags: TagElement[];
   requestAddTag: () => void;
-  requestDeleteTag: (id: number) => void;
+  requestDeleteTag: (id: number | string) => void;
 }
 
 const EhMultipleTag: FC<IProps> = ({ tags, requestAddTag, requestDeleteTag }) => {

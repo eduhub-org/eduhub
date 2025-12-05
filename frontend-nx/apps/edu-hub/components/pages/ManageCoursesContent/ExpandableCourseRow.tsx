@@ -8,7 +8,7 @@ import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
 import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
 import { INSERT_COURSE_DEGREE_TAG, DELETE_COURSE_DEGREE_TAG } from '../../../queries/courseDegree';
 import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../../queries/mutateCourseInstructor';
-import { INSERT_EXPERT, USER_SELECTION_WITH_FILTER } from '../../../queries/user';
+import { USER_SELECTION_WITH_FILTER } from '../../../queries/user';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
 import {
   DeleteCourseInstructor,
@@ -18,7 +18,6 @@ import {
   InsertCourseInstructor,
   InsertCourseInstructorVariables,
 } from '../../../queries/__generated__/InsertCourseInstructor';
-import { InsertExpert, InsertExpertVariables } from '../../../queries/__generated__/InsertExpert';
 import {
   UserSelectionWithFilter,
   UserSelectionWithFilterVariables,
@@ -206,17 +205,17 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
   // Entity render functions for EntityListManager
   const renderInstructor = useCallback(
-    (instructor: any, onDelete: (id: number) => void) => (
+    (instructor: any, onDelete: (id: string) => void) => (
       <div className="flex items-center justify-between bg-gray-50 p-2 rounded">
         <div className="flex-1">
           <div className="font-medium">
-            {makeFullName(instructor.Expert.User.firstName, instructor.Expert.User.lastName ?? '')}
-            {instructor.Expert.User.email && (
-              <span className="text-sm text-gray-600 ml-1">({instructor.Expert.User.email})</span>
+            {makeFullName(instructor.User.firstName, instructor.User.lastName ?? '')}
+            {instructor.User.email && (
+              <span className="text-sm text-gray-600 ml-1">({instructor.User.email})</span>
             )}
           </div>
         </div>
-        <button onClick={() => onDelete(instructor.Expert.id)} className="text-red-500 hover:text-red-700 p-1">
+        <button onClick={() => onDelete(instructor.User.id)} className="text-red-500 hover:text-red-700 p-1">
           ×
         </button>
       </div>
@@ -267,10 +266,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     }
   );
 
-  const [insertExpertMutation] = useAdminMutation<InsertExpert, InsertExpertVariables>(INSERT_EXPERT, {
-    refetchQueries: ['AdminCourseList'],
-  });
-
   const [fetchUserByEmail] = useLazyRoleQuery<UserSelectionWithFilter, UserSelectionWithFilterVariables>(
     USER_SELECTION_WITH_FILTER
   );
@@ -308,11 +303,11 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   }, []);
 
   const deleteInstructorFromCourse = useCallback(
-    async (expertId: number) => {
+    async (userId: string) => {
       const response = await deleteInstructorAPI({
         variables: {
           courseId: course.id,
-          expertId,
+          userId,
         },
       });
 
@@ -331,29 +326,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
         return;
       }
 
-      let expertId = -1;
-      if (user.Experts.length > 0) {
-        expertId = user.Experts[0].id;
-      } else {
-        const newExpert = await insertExpertMutation({
-          variables: {
-            userId: user.id,
-          },
-        });
-        if (newExpert.errors) {
-          handleError(newExpert.errors?.[0]?.message || t('operation_failed'));
-          closeInstructorDialog();
-          return;
-        }
-        expertId = newExpert.data?.insert_Expert?.returning[0]?.id || -1;
-      }
-
-      if (expertId === -1) {
-        closeInstructorDialog();
-        return;
-      }
-
-      if (course.CourseInstructors.some((expert) => expert.Expert.id === expertId)) {
+      // Check if user is already an instructor for this course
+      if (course.CourseInstructors.some((instructor) => instructor.User.id === user.id)) {
         closeInstructorDialog();
         return;
       }
@@ -361,7 +335,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
       const response = await insertCourseInstructor({
         variables: {
           courseId: course.id,
-          expertId,
+          userId: user.id,
         },
       });
 
@@ -373,7 +347,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
       closeInstructorDialog();
     },
-    [insertExpertMutation, course, insertCourseInstructor, closeInstructorDialog, handleError, t]
+    [course, insertCourseInstructor, closeInstructorDialog, handleError, t]
   );
 
   const handleAddNewUser = useCallback(
@@ -698,7 +672,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses:instructors.label')}</h4>
               <div className="space-y-2">
                 {course.CourseInstructors.map((courseInstructor) => (
-                  <Fragment key={courseInstructor.Expert.id}>
+                  <Fragment key={courseInstructor.User.id}>
                     {renderInstructor(courseInstructor, deleteInstructorFromCourse)}
                   </Fragment>
                 ))}
@@ -856,4 +830,3 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 };
 
 export default ExpandableCourseRow;
-

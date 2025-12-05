@@ -624,9 +624,9 @@ export enum CourseInstructor_constraint {
 export enum CourseInstructor_select_column {
   courseId = "courseId",
   created_at = "created_at",
-  expertId = "expertId",
   id = "id",
   updated_at = "updated_at",
+  userId = "userId",
 }
 
 /**
@@ -635,9 +635,9 @@ export enum CourseInstructor_select_column {
 export enum CourseInstructor_update_column {
   courseId = "courseId",
   created_at = "created_at",
-  expertId = "expertId",
   id = "id",
   updated_at = "updated_at",
+  userId = "userId",
 }
 
 /**
@@ -810,35 +810,6 @@ export enum Course_update_column {
   title = "title",
   updated_at = "updated_at",
   weekDay = "weekDay",
-}
-
-/**
- * unique or primary key constraints on table "Expert"
- */
-export enum Expert_constraint {
-  Instructor_pkey = "Instructor_pkey",
-}
-
-/**
- * select columns of table "Expert"
- */
-export enum Expert_select_column {
-  created_at = "created_at",
-  description = "description",
-  id = "id",
-  updated_at = "updated_at",
-  userId = "userId",
-}
-
-/**
- * update columns of table "Expert"
- */
-export enum Expert_update_column {
-  created_at = "created_at",
-  description = "description",
-  id = "id",
-  updated_at = "updated_at",
-  userId = "userId",
 }
 
 /**
@@ -1436,10 +1407,10 @@ export enum SessionSpeaker_constraint {
  */
 export enum SessionSpeaker_select_column {
   created_at = "created_at",
-  expertId = "expertId",
   id = "id",
   sessionId = "sessionId",
   updated_at = "updated_at",
+  userId = "userId",
 }
 
 /**
@@ -1447,10 +1418,10 @@ export enum SessionSpeaker_select_column {
  */
 export enum SessionSpeaker_update_column {
   created_at = "created_at",
-  expertId = "expertId",
   id = "id",
   sessionId = "sessionId",
   updated_at = "updated_at",
+  userId = "userId",
 }
 
 /**
@@ -4429,7 +4400,6 @@ export interface CourseInstructor_arr_rel_insert_input {
  */
 export interface CourseInstructor_avg_order_by {
   courseId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4438,15 +4408,15 @@ export interface CourseInstructor_avg_order_by {
  */
 export interface CourseInstructor_bool_exp {
   Course?: Course_bool_exp | null;
-  Expert?: Expert_bool_exp | null;
+  User?: User_bool_exp | null;
   _and?: CourseInstructor_bool_exp[] | null;
   _not?: CourseInstructor_bool_exp | null;
   _or?: CourseInstructor_bool_exp[] | null;
   courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
-  expertId?: Int_comparison_exp | null;
   id?: Int_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
+  userId?: uuid_comparison_exp | null;
 }
 
 /**
@@ -4454,12 +4424,12 @@ export interface CourseInstructor_bool_exp {
  */
 export interface CourseInstructor_insert_input {
   Course?: Course_obj_rel_insert_input | null;
-  Expert?: Expert_obj_rel_insert_input | null;
+  User?: User_obj_rel_insert_input | null;
   courseId?: number | null;
   created_at?: any | null;
-  expertId?: number | null;
   id?: number | null;
   updated_at?: any | null;
+  userId?: any | null;
 }
 
 /**
@@ -4468,9 +4438,9 @@ export interface CourseInstructor_insert_input {
 export interface CourseInstructor_max_order_by {
   courseId?: order_by | null;
   created_at?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
   updated_at?: order_by | null;
+  userId?: order_by | null;
 }
 
 /**
@@ -4479,9 +4449,9 @@ export interface CourseInstructor_max_order_by {
 export interface CourseInstructor_min_order_by {
   courseId?: order_by | null;
   created_at?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
   updated_at?: order_by | null;
+  userId?: order_by | null;
 }
 
 /**
@@ -4498,7 +4468,6 @@ export interface CourseInstructor_on_conflict {
  */
 export interface CourseInstructor_stddev_order_by {
   courseId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4507,7 +4476,6 @@ export interface CourseInstructor_stddev_order_by {
  */
 export interface CourseInstructor_stddev_pop_order_by {
   courseId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4516,7 +4484,6 @@ export interface CourseInstructor_stddev_pop_order_by {
  */
 export interface CourseInstructor_stddev_samp_order_by {
   courseId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4525,7 +4492,6 @@ export interface CourseInstructor_stddev_samp_order_by {
  */
 export interface CourseInstructor_sum_order_by {
   courseId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4534,7 +4500,6 @@ export interface CourseInstructor_sum_order_by {
  */
 export interface CourseInstructor_var_pop_order_by {
   courseId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4543,7 +4508,6 @@ export interface CourseInstructor_var_pop_order_by {
  */
 export interface CourseInstructor_var_samp_order_by {
   courseId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -4552,7 +4516,6 @@ export interface CourseInstructor_var_samp_order_by {
  */
 export interface CourseInstructor_variance_order_by {
   courseId?: order_by | null;
-  expertId?: order_by | null;
   id?: order_by | null;
 }
 
@@ -5247,170 +5210,6 @@ export interface Course_variance_order_by {
   maxMissedSessions?: order_by | null;
   maxParticipants?: order_by | null;
   programId?: order_by | null;
-}
-
-export interface Expert_aggregate_bool_exp {
-  count?: Expert_aggregate_bool_exp_count | null;
-}
-
-export interface Expert_aggregate_bool_exp_count {
-  arguments?: Expert_select_column[] | null;
-  distinct?: boolean | null;
-  filter?: Expert_bool_exp | null;
-  predicate: Int_comparison_exp;
-}
-
-/**
- * order by aggregate values of table "Expert"
- */
-export interface Expert_aggregate_order_by {
-  avg?: Expert_avg_order_by | null;
-  count?: order_by | null;
-  max?: Expert_max_order_by | null;
-  min?: Expert_min_order_by | null;
-  stddev?: Expert_stddev_order_by | null;
-  stddev_pop?: Expert_stddev_pop_order_by | null;
-  stddev_samp?: Expert_stddev_samp_order_by | null;
-  sum?: Expert_sum_order_by | null;
-  var_pop?: Expert_var_pop_order_by | null;
-  var_samp?: Expert_var_samp_order_by | null;
-  variance?: Expert_variance_order_by | null;
-}
-
-/**
- * input type for inserting array relation for remote table "Expert"
- */
-export interface Expert_arr_rel_insert_input {
-  data: Expert_insert_input[];
-  on_conflict?: Expert_on_conflict | null;
-}
-
-/**
- * order by avg() on columns of table "Expert"
- */
-export interface Expert_avg_order_by {
-  id?: order_by | null;
-}
-
-/**
- * Boolean expression to filter rows from the table "Expert". All fields are combined with a logical 'AND'.
- */
-export interface Expert_bool_exp {
-  CourseInstructors?: CourseInstructor_bool_exp | null;
-  CourseInstructors_aggregate?: CourseInstructor_aggregate_bool_exp | null;
-  SessionSpeakers?: SessionSpeaker_bool_exp | null;
-  SessionSpeakers_aggregate?: SessionSpeaker_aggregate_bool_exp | null;
-  User?: User_bool_exp | null;
-  _and?: Expert_bool_exp[] | null;
-  _not?: Expert_bool_exp | null;
-  _or?: Expert_bool_exp[] | null;
-  created_at?: timestamptz_comparison_exp | null;
-  description?: String_comparison_exp | null;
-  id?: Int_comparison_exp | null;
-  updated_at?: timestamptz_comparison_exp | null;
-  userId?: uuid_comparison_exp | null;
-}
-
-/**
- * input type for inserting data into table "Expert"
- */
-export interface Expert_insert_input {
-  CourseInstructors?: CourseInstructor_arr_rel_insert_input | null;
-  SessionSpeakers?: SessionSpeaker_arr_rel_insert_input | null;
-  User?: User_obj_rel_insert_input | null;
-  created_at?: any | null;
-  description?: string | null;
-  id?: number | null;
-  updated_at?: any | null;
-  userId?: any | null;
-}
-
-/**
- * order by max() on columns of table "Expert"
- */
-export interface Expert_max_order_by {
-  created_at?: order_by | null;
-  description?: order_by | null;
-  id?: order_by | null;
-  updated_at?: order_by | null;
-  userId?: order_by | null;
-}
-
-/**
- * order by min() on columns of table "Expert"
- */
-export interface Expert_min_order_by {
-  created_at?: order_by | null;
-  description?: order_by | null;
-  id?: order_by | null;
-  updated_at?: order_by | null;
-  userId?: order_by | null;
-}
-
-/**
- * input type for inserting object relation for remote table "Expert"
- */
-export interface Expert_obj_rel_insert_input {
-  data: Expert_insert_input;
-  on_conflict?: Expert_on_conflict | null;
-}
-
-/**
- * on_conflict condition type for table "Expert"
- */
-export interface Expert_on_conflict {
-  constraint: Expert_constraint;
-  update_columns: Expert_update_column[];
-  where?: Expert_bool_exp | null;
-}
-
-/**
- * order by stddev() on columns of table "Expert"
- */
-export interface Expert_stddev_order_by {
-  id?: order_by | null;
-}
-
-/**
- * order by stddev_pop() on columns of table "Expert"
- */
-export interface Expert_stddev_pop_order_by {
-  id?: order_by | null;
-}
-
-/**
- * order by stddev_samp() on columns of table "Expert"
- */
-export interface Expert_stddev_samp_order_by {
-  id?: order_by | null;
-}
-
-/**
- * order by sum() on columns of table "Expert"
- */
-export interface Expert_sum_order_by {
-  id?: order_by | null;
-}
-
-/**
- * order by var_pop() on columns of table "Expert"
- */
-export interface Expert_var_pop_order_by {
-  id?: order_by | null;
-}
-
-/**
- * order by var_samp() on columns of table "Expert"
- */
-export interface Expert_var_samp_order_by {
-  id?: order_by | null;
-}
-
-/**
- * order by variance() on columns of table "Expert"
- */
-export interface Expert_variance_order_by {
-  id?: order_by | null;
 }
 
 /**
@@ -7559,6 +7358,23 @@ export interface SessionSpeaker_aggregate_bool_exp_count {
 }
 
 /**
+ * order by aggregate values of table "SessionSpeaker"
+ */
+export interface SessionSpeaker_aggregate_order_by {
+  avg?: SessionSpeaker_avg_order_by | null;
+  count?: order_by | null;
+  max?: SessionSpeaker_max_order_by | null;
+  min?: SessionSpeaker_min_order_by | null;
+  stddev?: SessionSpeaker_stddev_order_by | null;
+  stddev_pop?: SessionSpeaker_stddev_pop_order_by | null;
+  stddev_samp?: SessionSpeaker_stddev_samp_order_by | null;
+  sum?: SessionSpeaker_sum_order_by | null;
+  var_pop?: SessionSpeaker_var_pop_order_by | null;
+  var_samp?: SessionSpeaker_var_samp_order_by | null;
+  variance?: SessionSpeaker_variance_order_by | null;
+}
+
+/**
  * input type for inserting array relation for remote table "SessionSpeaker"
  */
 export interface SessionSpeaker_arr_rel_insert_input {
@@ -7567,32 +7383,62 @@ export interface SessionSpeaker_arr_rel_insert_input {
 }
 
 /**
+ * order by avg() on columns of table "SessionSpeaker"
+ */
+export interface SessionSpeaker_avg_order_by {
+  id?: order_by | null;
+  sessionId?: order_by | null;
+}
+
+/**
  * Boolean expression to filter rows from the table "SessionSpeaker". All fields are combined with a logical 'AND'.
  */
 export interface SessionSpeaker_bool_exp {
-  Expert?: Expert_bool_exp | null;
   Session?: Session_bool_exp | null;
+  User?: User_bool_exp | null;
   _and?: SessionSpeaker_bool_exp[] | null;
   _not?: SessionSpeaker_bool_exp | null;
   _or?: SessionSpeaker_bool_exp[] | null;
   created_at?: timestamptz_comparison_exp | null;
-  expertId?: Int_comparison_exp | null;
   id?: Int_comparison_exp | null;
   sessionId?: Int_comparison_exp | null;
   updated_at?: timestamptz_comparison_exp | null;
+  userId?: uuid_comparison_exp | null;
 }
 
 /**
  * input type for inserting data into table "SessionSpeaker"
  */
 export interface SessionSpeaker_insert_input {
-  Expert?: Expert_obj_rel_insert_input | null;
   Session?: Session_obj_rel_insert_input | null;
+  User?: User_obj_rel_insert_input | null;
   created_at?: any | null;
-  expertId?: number | null;
   id?: number | null;
   sessionId?: number | null;
   updated_at?: any | null;
+  userId?: any | null;
+}
+
+/**
+ * order by max() on columns of table "SessionSpeaker"
+ */
+export interface SessionSpeaker_max_order_by {
+  created_at?: order_by | null;
+  id?: order_by | null;
+  sessionId?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
+}
+
+/**
+ * order by min() on columns of table "SessionSpeaker"
+ */
+export interface SessionSpeaker_min_order_by {
+  created_at?: order_by | null;
+  id?: order_by | null;
+  sessionId?: order_by | null;
+  updated_at?: order_by | null;
+  userId?: order_by | null;
 }
 
 /**
@@ -7602,6 +7448,62 @@ export interface SessionSpeaker_on_conflict {
   constraint: SessionSpeaker_constraint;
   update_columns: SessionSpeaker_update_column[];
   where?: SessionSpeaker_bool_exp | null;
+}
+
+/**
+ * order by stddev() on columns of table "SessionSpeaker"
+ */
+export interface SessionSpeaker_stddev_order_by {
+  id?: order_by | null;
+  sessionId?: order_by | null;
+}
+
+/**
+ * order by stddev_pop() on columns of table "SessionSpeaker"
+ */
+export interface SessionSpeaker_stddev_pop_order_by {
+  id?: order_by | null;
+  sessionId?: order_by | null;
+}
+
+/**
+ * order by stddev_samp() on columns of table "SessionSpeaker"
+ */
+export interface SessionSpeaker_stddev_samp_order_by {
+  id?: order_by | null;
+  sessionId?: order_by | null;
+}
+
+/**
+ * order by sum() on columns of table "SessionSpeaker"
+ */
+export interface SessionSpeaker_sum_order_by {
+  id?: order_by | null;
+  sessionId?: order_by | null;
+}
+
+/**
+ * order by var_pop() on columns of table "SessionSpeaker"
+ */
+export interface SessionSpeaker_var_pop_order_by {
+  id?: order_by | null;
+  sessionId?: order_by | null;
+}
+
+/**
+ * order by var_samp() on columns of table "SessionSpeaker"
+ */
+export interface SessionSpeaker_var_samp_order_by {
+  id?: order_by | null;
+  sessionId?: order_by | null;
+}
+
+/**
+ * order by variance() on columns of table "SessionSpeaker"
+ */
+export interface SessionSpeaker_variance_order_by {
+  id?: order_by | null;
+  sessionId?: order_by | null;
 }
 
 export interface Session_aggregate_bool_exp {
@@ -8070,11 +7972,13 @@ export interface User_bool_exp {
   Country?: Country_bool_exp | null;
   CourseEnrollments?: CourseEnrollment_bool_exp | null;
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_bool_exp | null;
-  Experts?: Expert_bool_exp | null;
-  Experts_aggregate?: Expert_aggregate_bool_exp | null;
+  CourseInstructors?: CourseInstructor_bool_exp | null;
+  CourseInstructors_aggregate?: CourseInstructor_aggregate_bool_exp | null;
   Organization?: Organization_bool_exp | null;
   OrganizationAdmins?: OrganizationAdmin_bool_exp | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_bool_exp | null;
+  SessionSpeakers?: SessionSpeaker_bool_exp | null;
+  SessionSpeakers_aggregate?: SessionSpeaker_aggregate_bool_exp | null;
   UserOccupation?: UserOccupation_bool_exp | null;
   UserStatus?: UserStatus_bool_exp | null;
   _and?: User_bool_exp[] | null;
@@ -8108,9 +8012,10 @@ export interface User_insert_input {
   Attendances?: Attendance_arr_rel_insert_input | null;
   Country?: Country_obj_rel_insert_input | null;
   CourseEnrollments?: CourseEnrollment_arr_rel_insert_input | null;
-  Experts?: Expert_arr_rel_insert_input | null;
+  CourseInstructors?: CourseInstructor_arr_rel_insert_input | null;
   Organization?: Organization_obj_rel_insert_input | null;
   OrganizationAdmins?: OrganizationAdmin_arr_rel_insert_input | null;
+  SessionSpeakers?: SessionSpeaker_arr_rel_insert_input | null;
   UserOccupation?: UserOccupation_obj_rel_insert_input | null;
   UserStatus?: UserStatus_obj_rel_insert_input | null;
   anonymousId?: string | null;
@@ -8198,9 +8103,10 @@ export interface User_order_by {
   Attendances_aggregate?: Attendance_aggregate_order_by | null;
   Country?: Country_order_by | null;
   CourseEnrollments_aggregate?: CourseEnrollment_aggregate_order_by | null;
-  Experts_aggregate?: Expert_aggregate_order_by | null;
+  CourseInstructors_aggregate?: CourseInstructor_aggregate_order_by | null;
   Organization?: Organization_order_by | null;
   OrganizationAdmins_aggregate?: OrganizationAdmin_aggregate_order_by | null;
+  SessionSpeakers_aggregate?: SessionSpeaker_aggregate_order_by | null;
   UserOccupation?: UserOccupation_order_by | null;
   UserStatus?: UserStatus_order_by | null;
   anonymousId?: order_by | null;

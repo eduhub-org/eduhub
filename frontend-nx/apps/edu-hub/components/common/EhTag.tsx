@@ -1,13 +1,13 @@
 import { FC, useCallback } from 'react';
 
 export interface TagElement {
-  id: number | undefined;
+  id: number | string | undefined;
   display: string;
 }
 
 interface IProps {
   tag: TagElement;
-  requestDeleteTag?: (id: number) => void;
+  requestDeleteTag?: (id: number | string) => void;
 }
 
 const EhTag: FC<IProps> = ({ tag, requestDeleteTag }) => {

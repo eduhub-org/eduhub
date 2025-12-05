@@ -16,10 +16,9 @@ insert_permissions:
           AchievementOptionCourses:
             Course:
               CourseInstructors:
-                Expert:
-                  User:
-                    id:
-                      _eq: X-Hasura-User-Id
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
       columns:
         - achievementOptionId
         - id
@@ -44,10 +43,9 @@ update_permissions:
           AchievementOptionCourses:
             Course:
               CourseInstructors:
-                Expert:
-                  User:
-                    id:
-                      _eq: X-Hasura-User-Id
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
       check: null
 delete_permissions:
   - role: instructor_access
@@ -57,7 +55,6 @@ delete_permissions:
           AchievementOptionCourses:
             Course:
               CourseInstructors:
-                Expert:
-                  User:
-                    id:
-                      _eq: X-Hasura-User-Id
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id

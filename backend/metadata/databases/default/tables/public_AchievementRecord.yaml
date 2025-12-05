@@ -63,10 +63,9 @@ select_permissions:
               AchievementOptionCourses:
                 Course:
                   CourseInstructors:
-                    Expert:
-                      User:
-                        id:
-                          _eq: X-Hasura-User-Id
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
           - AchievementOption:
               AchievementOptionMentors:
                 User:
@@ -105,10 +104,9 @@ update_permissions:
               AchievementOptionCourses:
                 Course:
                   CourseInstructors:
-                    Expert:
-                      User:
-                        id:
-                          _eq: X-Hasura-User-Id
+                    User:
+                      id:
+                        _eq: X-Hasura-User-Id
           - AchievementOption:
               AchievementOptionMentors:
                 User:

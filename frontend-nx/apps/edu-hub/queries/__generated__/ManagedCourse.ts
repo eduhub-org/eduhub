@@ -43,13 +43,13 @@ export interface ManagedCourse_Course_by_pk_Sessions_SessionAddresses {
   CourseLocation: ManagedCourse_Course_by_pk_Sessions_SessionAddresses_CourseLocation | null;
 }
 
-export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User_Organization {
+export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_User_Organization {
   __typename: "Organization";
   id: number;
   name: string;
 }
 
-export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User {
+export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_User {
   __typename: "User";
   id: any;
   /**
@@ -83,25 +83,16 @@ export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User
   /**
    * An object relationship
    */
-  Organization: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User_Organization | null;
-}
-
-export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert {
-  __typename: "Expert";
-  /**
-   * An object relationship
-   */
-  User: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert_User;
-  id: number;
+  Organization: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_User_Organization | null;
 }
 
 export interface ManagedCourse_Course_by_pk_Sessions_SessionSpeakers {
   __typename: "SessionSpeaker";
+  id: number;
   /**
    * An object relationship
    */
-  Expert: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_Expert;
-  id: number;
+  User: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers_User;
 }
 
 export interface ManagedCourse_Course_by_pk_Sessions {
@@ -137,7 +128,7 @@ export interface ManagedCourse_Course_by_pk_Sessions {
   SessionSpeakers: ManagedCourse_Course_by_pk_Sessions_SessionSpeakers[];
 }
 
-export interface ManagedCourse_Course_by_pk_CourseInstructors_Expert_User {
+export interface ManagedCourse_Course_by_pk_CourseInstructors_User {
   __typename: "User";
   id: any;
   /**
@@ -162,26 +153,13 @@ export interface ManagedCourse_Course_by_pk_CourseInstructors_Expert_User {
   email: string;
 }
 
-export interface ManagedCourse_Course_by_pk_CourseInstructors_Expert {
-  __typename: "Expert";
-  id: number;
-  /**
-   * A short description on the expert's background
-   */
-  description: string | null;
-  /**
-   * An object relationship
-   */
-  User: ManagedCourse_Course_by_pk_CourseInstructors_Expert_User;
-}
-
 export interface ManagedCourse_Course_by_pk_CourseInstructors {
   __typename: "CourseInstructor";
   id: number;
   /**
    * An object relationship
    */
-  Expert: ManagedCourse_Course_by_pk_CourseInstructors_Expert;
+  User: ManagedCourse_Course_by_pk_CourseInstructors_User;
 }
 
 export interface ManagedCourse_Course_by_pk_CourseLocations {

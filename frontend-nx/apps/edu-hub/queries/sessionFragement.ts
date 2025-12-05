@@ -22,14 +22,13 @@ export const SESSION_FRAGMENT = gql`
       }
     }
     SessionSpeakers {
-      Expert {
-        User {
-          id
-          firstName
-          lastName
-          picture
-          externalProfile
-        }
+      id
+      User {
+        id
+        firstName
+        lastName
+        picture
+        externalProfile
       }
     }
   }
@@ -42,11 +41,8 @@ export const ADMIN_SESSION_FRAGMENT = gql`
     ...SessionFragment
     SessionSpeakers {
       id
-      Expert {
-        id
-        User {
-          ...UserFragment
-        }
+      User {
+        ...UserFragment
       }
     }
   }

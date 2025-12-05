@@ -15,11 +15,6 @@ export interface UserSelectionWithFilter_User_Organization {
   name: string;
 }
 
-export interface UserSelectionWithFilter_User_Experts {
-  __typename: "Expert";
-  id: number;
-}
-
 export interface UserSelectionWithFilter_User {
   __typename: "User";
   id: any;
@@ -56,10 +51,6 @@ export interface UserSelectionWithFilter_User {
    */
   Organization: UserSelectionWithFilter_User_Organization | null;
   updated_at: any | null;
-  /**
-   * An array relationship
-   */
-  Experts: UserSelectionWithFilter_User_Experts[];
 }
 
 export interface UserSelectionWithFilter {

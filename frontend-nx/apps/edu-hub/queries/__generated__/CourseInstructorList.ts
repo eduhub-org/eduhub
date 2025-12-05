@@ -7,7 +7,7 @@
 // GraphQL query operation: CourseInstructorList
 // ====================================================
 
-export interface CourseInstructorList_CourseInstructor_Expert_User {
+export interface CourseInstructorList_CourseInstructor_User {
   __typename: "User";
   id: any;
   /**
@@ -32,26 +32,13 @@ export interface CourseInstructorList_CourseInstructor_Expert_User {
   email: string;
 }
 
-export interface CourseInstructorList_CourseInstructor_Expert {
-  __typename: "Expert";
-  id: number;
-  /**
-   * A short description on the expert's background
-   */
-  description: string | null;
-  /**
-   * An object relationship
-   */
-  User: CourseInstructorList_CourseInstructor_Expert_User;
-}
-
 export interface CourseInstructorList_CourseInstructor {
   __typename: "CourseInstructor";
   id: number;
   /**
    * An object relationship
    */
-  Expert: CourseInstructorList_CourseInstructor_Expert;
+  User: CourseInstructorList_CourseInstructor_User;
 }
 
 export interface CourseInstructorList {
