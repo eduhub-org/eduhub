@@ -84,9 +84,8 @@ update_permissions:
         _or:
           - Course:
               CourseInstructors:
-                Expert:
-                  userId:
-                    _eq: X-Hasura-User-Id
+                userId:
+                  _eq: X-Hasura-User-Id
           - userId:
               _eq: X-Hasura-User-Id
       check: {}
@@ -101,9 +100,8 @@ update_permissions:
         _or:
           - Course:
               CourseInstructors:
-                Expert:
-                  userId:
-                    _eq: X-Hasura-User-Id
+                userId:
+                  _eq: X-Hasura-User-Id
           - userId:
               _eq: X-Hasura-User-Id
       check: {}

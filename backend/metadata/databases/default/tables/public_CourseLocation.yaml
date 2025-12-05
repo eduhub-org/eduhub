@@ -24,10 +24,9 @@ insert_permissions:
         _and:
           - Course:
               CourseInstructors:
-                Expert:
-                  User:
-                    id:
-                      _eq: X-Hasura-User-Id
+                User:
+                  id:
+                    _eq: X-Hasura-User-Id
           - _or:
               - defaultSessionAddressId:
                   _is_null: true
@@ -76,10 +75,9 @@ update_permissions:
       filter:
         Course:
           CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
+            User:
+              id:
+                _eq: X-Hasura-User-Id
       check:
         _or:
           - defaultSessionAddressId:
@@ -95,7 +93,6 @@ delete_permissions:
       filter:
         Course:
           CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
+            User:
+              id:
+                _eq: X-Hasura-User-Id

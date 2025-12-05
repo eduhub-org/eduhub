@@ -24,5 +24,5 @@ export interface DeleteCourseInstructor {
 
 export interface DeleteCourseInstructorVariables {
   courseId: number;
-  expertId: number;
+  userId: any;
 }

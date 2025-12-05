@@ -17,8 +17,7 @@ import { QueryResult } from '@apollo/client';
 import { SelectUserDialog } from '../../../common/dialogs/SelectUserDialog';
 import { CreateUserDialog } from '../../../common/dialogs/CreateUserDialog';
 import { UserSelectionWithFilter_User } from '../../../../queries/__generated__/UserSelectionWithFilter';
-import { InsertExpert, InsertExpertVariables } from '../../../../queries/__generated__/InsertExpert';
-import { INSERT_EXPERT, USER_SELECTION_WITH_FILTER } from '../../../../queries/user';
+import { USER_SELECTION_WITH_FILTER } from '../../../../queries/user';
 import {
   InsertNewSessionSpeaker,
   InsertNewSessionSpeakerVariables,
@@ -157,7 +156,7 @@ export const SessionRow: FC<IProps> = ({
 
   const speakerTags = (session?.SessionSpeakers || []).map((x) => ({
     id: x.id,
-    display: [x.Expert.User.firstName, x.Expert.User.lastName].join(' '),
+    display: [x.User.firstName, x.User.lastName].join(' '),
   }));
 
   const [addSpeakerOpen, setAddSpeakerOpen] = useState(false);
@@ -169,7 +168,6 @@ export const SessionRow: FC<IProps> = ({
     setAddSpeakerOpen(true);
   }, [setAddSpeakerOpen]);
 
-  const [insertExpertMutation] = useRoleMutation<InsertExpert, InsertExpertVariables>(INSERT_EXPERT);
   const [insertSessionSpeaker] = useRoleMutation<InsertNewSessionSpeaker, InsertNewSessionSpeakerVariables>(
     INSERT_NEW_SESSION_SPEAKER
   );
@@ -180,33 +178,18 @@ export const SessionRow: FC<IProps> = ({
   const handleNewSpeaker = useCallback(
     async (confirmed: boolean, user: UserSelectionWithFilter_User | null) => {
       if (confirmed && user != null && session != null) {
-        let expertId = -1;
-
-        if (user.Experts.length === 0) {
-          const newExpert = await insertExpertMutation({
-            variables: {
-              userId: user.id,
-            },
-          });
-          expertId = newExpert.data?.insert_Expert?.returning[0]?.id || -1;
-        } else {
-          expertId = user.Experts[0].id;
-        }
-
-        if (expertId !== -1) {
-          await insertSessionSpeaker({
-            variables: {
-              expertId,
-              sessionId: session.id,
-            },
-          });
-        }
+        await insertSessionSpeaker({
+          variables: {
+            userId: user.id,
+            sessionId: session.id,
+          },
+        });
 
         qResult.refetch();
       }
       setAddSpeakerOpen(false);
     },
-    [session, insertExpertMutation, insertSessionSpeaker, qResult]
+    [session, insertSessionSpeaker, qResult]
   );
 
   const handleAddNewUser = useCallback(

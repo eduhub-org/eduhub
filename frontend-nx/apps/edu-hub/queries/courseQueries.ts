@@ -45,10 +45,8 @@ export const COURSES_BY_INSTRUCTOR = gql`
       order_by: { applicationEnd: desc }
       where: {
         CourseInstructors: {
-          Expert: {
-            User: {
-              id: { _eq: $userId }
-            }
+          User: {
+            id: { _eq: $userId }
           }
         }
       }

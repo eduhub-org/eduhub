@@ -7,7 +7,7 @@
 // GraphQL fragment: CourseInstructorFragment
 // ====================================================
 
-export interface CourseInstructorFragment_Expert_User {
+export interface CourseInstructorFragment_User {
   __typename: "User";
   id: any;
   /**
@@ -32,24 +32,11 @@ export interface CourseInstructorFragment_Expert_User {
   email: string;
 }
 
-export interface CourseInstructorFragment_Expert {
-  __typename: "Expert";
-  id: number;
-  /**
-   * A short description on the expert's background
-   */
-  description: string | null;
-  /**
-   * An object relationship
-   */
-  User: CourseInstructorFragment_Expert_User;
-}
-
 export interface CourseInstructorFragment {
   __typename: "CourseInstructor";
   id: number;
   /**
    * An object relationship
    */
-  Expert: CourseInstructorFragment_Expert;
+  User: CourseInstructorFragment_User;
 }

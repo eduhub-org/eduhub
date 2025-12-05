@@ -4,7 +4,7 @@ import { ApolloError } from '@apollo/client';
 
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { DELETE_COURSE_INSRTRUCTOR, INSERT_A_COURSEINSTRUCTOR } from '../../../queries/mutateCourseInstructor';
-import { INSERT_EXPERT, USER_SELECTION_WITH_FILTER } from '../../../queries/user';
+import { USER_SELECTION_WITH_FILTER } from '../../../queries/user';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
 import {
   DeleteCourseInstructor,
@@ -14,7 +14,6 @@ import {
   InsertCourseInstructor,
   InsertCourseInstructorVariables,
 } from '../../../queries/__generated__/InsertCourseInstructor';
-import { InsertExpert, InsertExpertVariables } from '../../../queries/__generated__/InsertExpert';
 import {
   UserSelectionWithFilter,
   UserSelectionWithFilterVariables,
@@ -22,7 +21,7 @@ import {
 } from '../../../queries/__generated__/UserSelectionWithFilter';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import { CreateUserDialog } from '../../common/dialogs/CreateUserDialog';
-import EhTag from '../../common/EhTag';
+import EhTagStingId from '../../common/EhTagStingId';
 import { useLazyRoleQuery } from '../../../hooks/authedQuery';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
@@ -101,12 +100,6 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
     }
   );
 
-  const [insertExpertMutation] = useAdminMutation<InsertExpert, InsertExpertVariables>(INSERT_EXPERT, {
-    onError: (error) => {
-      showError(extractErrorMessage(error));
-    },
-  });
-
   const [fetchUserByEmail] = useLazyRoleQuery<UserSelectionWithFilter, UserSelectionWithFilterVariables>(
     USER_SELECTION_WITH_FILTER
   );
@@ -119,11 +112,11 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
   }, [setOpenInstructorDialog]);
 
   const deleteInstructorFromACourse = useCallback(
-    async (id: number) => {
+    async (userId: string) => {
       const response = await deleteInstructorAPI({
         variables: {
           courseId: course.id,
-          expertId: id,
+          userId,
         },
       });
 
@@ -137,6 +130,16 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
     [deleteInstructorAPI, refetchCourses, course, showError, extractErrorMessage]
   );
 
+  const handleDelete = useCallback(
+    (id: string) => {
+      void deleteInstructorFromACourse(id).catch((err) => {
+        console.error('Error deleting instructor:', err);
+        showError(extractErrorMessage(err));
+      });
+    },
+    [deleteInstructorFromACourse, showError, extractErrorMessage]
+  );
+
   const addInstructorHandler = useCallback(
     async (confirmed: boolean, user: UserSelectionWithFilter_User | null) => {
       if (!confirmed || user == null) {
@@ -144,36 +147,16 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
         return;
       }
 
-      let expertId = -1;
-      if (user.Experts.length > 0) {
-        expertId = user.Experts[0].id;
-      } else {
-        const newExpert = await insertExpertMutation({
-          variables: {
-            userId: user.id,
-          },
-        });
-        if (newExpert.errors) {
-          console.error('Error inserting expert:', newExpert.errors);
-          showError(extractErrorMessage(newExpert.errors));
-          setOpenInstructorDialog(false);
-          return;
-        }
-        expertId = newExpert.data?.insert_Expert?.returning[0]?.id || -1;
+      // Check if user is already an instructor for this course
+      if (course.CourseInstructors.some((instructor) => instructor.User.id === user.id)) {
+        setOpenInstructorDialog(false);
+        return;
       }
 
-      if (expertId === -1) {
-        setOpenInstructorDialog(false);
-        return;
-      }
-      if (course.CourseInstructors.some((expert) => expert.Expert.id === expertId)) {
-        setOpenInstructorDialog(false);
-        return;
-      }
       const response = await insertCourseInstructor({
         variables: {
           courseId: course.id,
-          expertId,
+          userId: user.id,
         },
       });
       if (response.errors) {
@@ -185,7 +168,7 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
       refetchCourses();
       setOpenInstructorDialog(false);
     },
-    [insertExpertMutation, refetchCourses, course, insertCourseInstructor, showError, extractErrorMessage]
+    [refetchCourses, course, insertCourseInstructor, showError, extractErrorMessage]
   );
 
   const handleAddNewUser = useCallback(
@@ -265,18 +248,16 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
   return (
     <div className="flex flex-row space-x-1 align-middle">
       {
-        // we need to show just one instructore in main ui
+        // we need to show just one instructor in main ui
         course.CourseInstructors.length > 0 && (
-          <EhTag
-            key={`${course.id}-${course.CourseInstructors[0].Expert.id}`}
-            requestDeleteTag={deleteInstructorFromACourse}
-            tag={{
-              display: makeFullName(
-                course.CourseInstructors[0].Expert.User.firstName,
-                course.CourseInstructors[0].Expert.User.lastName ?? ' '
-              ),
-              id: course.CourseInstructors[0].Expert.id,
-            }}
+          <EhTagStingId
+            key={`${course.id}-${course.CourseInstructors[0].User.id}`}
+            requestDeleteTag={handleDelete}
+            title={makeFullName(
+              course.CourseInstructors[0].User.firstName,
+              course.CourseInstructors[0].User.lastName ?? ' '
+            )}
+            id={course.CourseInstructors[0].User.id}
           />
         )
       }

@@ -19,6 +19,7 @@
       "manageOrganizations",
       "manageLocationAddresses",
       "manageEmailTemplates",
+      "manageExperts",
       "profile",
       "start-page",
       "certificates"

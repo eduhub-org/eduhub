@@ -171,7 +171,7 @@ export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLogge
                         <UserCard
                           key={speakerIndex}
                           className="flex items-center my-3"
-                          user={speaker.Expert.User}
+                          user={speaker.User}
                           role={t('general.speaker')}
                           size="medium"
                         />

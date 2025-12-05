@@ -43,7 +43,7 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessi
   CourseLocation: InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessions_SessionAddresses_CourseLocation | null;
 }
 
-export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessions_SessionSpeakers_Expert_User {
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessions_SessionSpeakers_User {
   __typename: "User";
   id: any;
   /**
@@ -64,20 +64,13 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessi
   externalProfile: string | null;
 }
 
-export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessions_SessionSpeakers_Expert {
-  __typename: "Expert";
-  /**
-   * An object relationship
-   */
-  User: InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessions_SessionSpeakers_Expert_User;
-}
-
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessions_SessionSpeakers {
   __typename: "SessionSpeaker";
+  id: number;
   /**
    * An object relationship
    */
-  Expert: InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessions_SessionSpeakers_Expert;
+  User: InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessions_SessionSpeakers_User;
 }
 
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessions {
@@ -113,7 +106,7 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessi
   SessionSpeakers: InsertEnrollment_insert_CourseEnrollment_returning_Course_Sessions_SessionSpeakers[];
 }
 
-export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors_Expert_User {
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors_User {
   __typename: "User";
   id: any;
   /**
@@ -138,26 +131,13 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
   email: string;
 }
 
-export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors_Expert {
-  __typename: "Expert";
-  id: number;
-  /**
-   * A short description on the expert's background
-   */
-  description: string | null;
-  /**
-   * An object relationship
-   */
-  User: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors_Expert_User;
-}
-
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors {
   __typename: "CourseInstructor";
   id: number;
   /**
    * An object relationship
    */
-  Expert: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors_Expert;
+  User: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseInstructors_User;
 }
 
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseLocations {

@@ -43,7 +43,7 @@ export interface SessionFragment_SessionAddresses {
   CourseLocation: SessionFragment_SessionAddresses_CourseLocation | null;
 }
 
-export interface SessionFragment_SessionSpeakers_Expert_User {
+export interface SessionFragment_SessionSpeakers_User {
   __typename: "User";
   id: any;
   /**
@@ -64,20 +64,13 @@ export interface SessionFragment_SessionSpeakers_Expert_User {
   externalProfile: string | null;
 }
 
-export interface SessionFragment_SessionSpeakers_Expert {
-  __typename: "Expert";
-  /**
-   * An object relationship
-   */
-  User: SessionFragment_SessionSpeakers_Expert_User;
-}
-
 export interface SessionFragment_SessionSpeakers {
   __typename: "SessionSpeaker";
+  id: number;
   /**
    * An object relationship
    */
-  Expert: SessionFragment_SessionSpeakers_Expert;
+  User: SessionFragment_SessionSpeakers_User;
 }
 
 export interface SessionFragment {
