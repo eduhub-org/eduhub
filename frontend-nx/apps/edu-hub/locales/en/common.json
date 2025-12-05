@@ -255,5 +255,9 @@
   "page_not_found": "Page not found",
   "page_not_found_description": "The page you're looking for doesn't exist. It may have been moved or deleted.",
   "back_to_home": "Back to home",
-  "go_back": "Go back"
+  "go_back": "Go back",
+  "auth": {
+    "please_log_in": "Please log in to access this page.",
+    "access_denied": "You do not have permission to access this page."
+  }
 }
