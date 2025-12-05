@@ -6,10 +6,10 @@
 import { User_bool_exp, User_order_by } from "./../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL query operation: ExpertsByLastName
+// GraphQL query operation: ExpertsList
 // ====================================================
 
-export interface ExpertsByLastName_User_CourseInstructors_Course_Program {
+export interface ExpertsList_User_CourseInstructors_Course_Program {
   __typename: "Program";
   id: number;
   /**
@@ -18,13 +18,17 @@ export interface ExpertsByLastName_User_CourseInstructors_Course_Program {
   shortTitle: string | null;
 }
 
-export interface ExpertsByLastName_User_CourseInstructors_Course {
+export interface ExpertsList_User_CourseInstructors_Course {
   __typename: "Course";
   id: number;
   /**
    * The title of the course (only editable by an admin user)
    */
   title: string;
+  /**
+   * Shown below the title on the course page
+   */
+  tagline: string;
   /**
    * Content of the first course description field
    */
@@ -44,19 +48,19 @@ export interface ExpertsByLastName_User_CourseInstructors_Course {
   /**
    * An object relationship
    */
-  Program: ExpertsByLastName_User_CourseInstructors_Course_Program;
+  Program: ExpertsList_User_CourseInstructors_Course_Program;
 }
 
-export interface ExpertsByLastName_User_CourseInstructors {
+export interface ExpertsList_User_CourseInstructors {
   __typename: "CourseInstructor";
   id: number;
   /**
    * An object relationship
    */
-  Course: ExpertsByLastName_User_CourseInstructors_Course;
+  Course: ExpertsList_User_CourseInstructors_Course;
 }
 
-export interface ExpertsByLastName_User_SessionSpeakers_Session_Course_Program {
+export interface ExpertsList_User_SessionSpeakers_Session_Course_Program {
   __typename: "Program";
   id: number;
   /**
@@ -65,7 +69,7 @@ export interface ExpertsByLastName_User_SessionSpeakers_Session_Course_Program {
   shortTitle: string | null;
 }
 
-export interface ExpertsByLastName_User_SessionSpeakers_Session_Course {
+export interface ExpertsList_User_SessionSpeakers_Session_Course {
   __typename: "Course";
   id: number;
   /**
@@ -75,10 +79,10 @@ export interface ExpertsByLastName_User_SessionSpeakers_Session_Course {
   /**
    * An object relationship
    */
-  Program: ExpertsByLastName_User_SessionSpeakers_Session_Course_Program;
+  Program: ExpertsList_User_SessionSpeakers_Session_Course_Program;
 }
 
-export interface ExpertsByLastName_User_SessionSpeakers_Session {
+export interface ExpertsList_User_SessionSpeakers_Session {
   __typename: "Session";
   id: number;
   /**
@@ -92,19 +96,19 @@ export interface ExpertsByLastName_User_SessionSpeakers_Session {
   /**
    * An object relationship
    */
-  Course: ExpertsByLastName_User_SessionSpeakers_Session_Course;
+  Course: ExpertsList_User_SessionSpeakers_Session_Course;
 }
 
-export interface ExpertsByLastName_User_SessionSpeakers {
+export interface ExpertsList_User_SessionSpeakers {
   __typename: "SessionSpeaker";
   id: number;
   /**
    * An object relationship
    */
-  Session: ExpertsByLastName_User_SessionSpeakers_Session;
+  Session: ExpertsList_User_SessionSpeakers_Session;
 }
 
-export interface ExpertsByLastName_User {
+export interface ExpertsList_User {
   __typename: "User";
   id: any;
   /**
@@ -122,35 +126,35 @@ export interface ExpertsByLastName_User {
   /**
    * An array relationship
    */
-  CourseInstructors: ExpertsByLastName_User_CourseInstructors[];
+  CourseInstructors: ExpertsList_User_CourseInstructors[];
   /**
    * An array relationship
    */
-  SessionSpeakers: ExpertsByLastName_User_SessionSpeakers[];
+  SessionSpeakers: ExpertsList_User_SessionSpeakers[];
 }
 
-export interface ExpertsByLastName_User_aggregate_aggregate {
+export interface ExpertsList_User_aggregate_aggregate {
   __typename: "User_aggregate_fields";
   count: number;
 }
 
-export interface ExpertsByLastName_User_aggregate {
+export interface ExpertsList_User_aggregate {
   __typename: "User_aggregate";
-  aggregate: ExpertsByLastName_User_aggregate_aggregate | null;
+  aggregate: ExpertsList_User_aggregate_aggregate | null;
 }
 
-export interface ExpertsByLastName {
+export interface ExpertsList {
   /**
    * fetch data from the table: "User"
    */
-  User: ExpertsByLastName_User[];
+  User: ExpertsList_User[];
   /**
    * fetch aggregated fields from the table: "User"
    */
-  User_aggregate: ExpertsByLastName_User_aggregate;
+  User_aggregate: ExpertsList_User_aggregate;
 }
 
-export interface ExpertsByLastNameVariables {
+export interface ExpertsListVariables {
   limit?: number | null;
   offset?: number | null;
   filter?: User_bool_exp | null;

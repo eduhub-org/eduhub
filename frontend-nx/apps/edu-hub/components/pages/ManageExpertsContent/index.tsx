@@ -1,4 +1,4 @@
-import { FC, ReactNode, useMemo, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import useTranslation from 'next-translate/useTranslation';
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -8,8 +8,8 @@ import { useTableGrid } from '../../common/TableGrid/hooks';
 import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
 
 import { useAdminQuery } from '../../../hooks/authedQuery';
-import { EXPERTS_BY_LAST_NAME } from '../../../queries/experts';
-import { ExpertsByLastName_User } from '../../../queries/__generated__/ExpertsByLastName';
+import { EXPERTS_LIST } from '../../../queries/experts';
+import { ExpertsList_User } from '../../../queries/__generated__/ExpertsList';
 import { PageBlock } from '../../common/PageBlock';
 import CommonPageHeader from '../../common/CommonPageHeader';
 
@@ -20,7 +20,7 @@ interface ExpertRole {
   sessionTitle?: string;
 }
 
-const ExpandableExpertRow: FC<{ row: ExpertsByLastName_User }> = ({ row }) => {
+const ExpandableExpertRow: FC<{ row: ExpertsList_User }> = ({ row }) => {
   const { t } = useTranslation('manageExperts');
 
   // Collect all roles for this user
@@ -63,7 +63,7 @@ const ExpandableExpertRow: FC<{ row: ExpertsByLastName_User }> = ({ row }) => {
 
   return (
     <div className="bg-edu-course-list">
-      <div className="grid grid-cols-12 gap-2 p-2 font-medium text-gray-700 border-b border-gray-200">
+      <div className="hidden md:grid md:grid-cols-12 gap-2 p-2 font-medium text-gray-700 border-b border-gray-200">
         <div className="col-span-4 pl-3">{t('course')}</div>
         <div className="col-span-2">{t('program')}</div>
         <div className="col-span-3">{t('role')}</div>
@@ -72,16 +72,16 @@ const ExpandableExpertRow: FC<{ row: ExpertsByLastName_User }> = ({ row }) => {
       {roles.map((role, index) => (
         <div
           key={index}
-          className="grid grid-cols-12 gap-2 p-2 text-gray-600 text-sm border-b border-gray-100 last:border-b-0"
+          className="flex flex-col md:grid md:grid-cols-12 gap-2 p-2 text-gray-600 text-sm border-b border-gray-100 last:border-b-0"
         >
-          <div className="col-span-4 pl-3 truncate" title={role.courseTitle}>
+          <div className="md:col-span-4 md:pl-3 truncate font-medium md:font-normal" title={role.courseTitle}>
             {role.courseTitle}
           </div>
-          <div className="col-span-2 truncate">{role.programShortTitle}</div>
-          <div className="col-span-3">
+          <div className="md:col-span-2 truncate text-xs md:text-sm">{role.programShortTitle}</div>
+          <div className="md:col-span-3 text-xs md:text-sm">
             {role.type === 'instructor' ? t('role_instructor') : t('role_speaker')}
           </div>
-          <div className="col-span-3 truncate" title={role.sessionTitle || ''}>
+          <div className="md:col-span-3 truncate text-xs md:text-sm" title={role.sessionTitle || ''}>
             {role.sessionTitle || '-'}
           </div>
         </div>
@@ -94,14 +94,9 @@ const ManageExpertsContent: FC = () => {
   const { t } = useTranslation('manageExperts');
   const [pageSize, setPageSize] = useState(20);
 
-  const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize);
-    setPageIndex(0);
-  };
-
   const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter } = useTableGrid({
     queryHook: useAdminQuery,
-    query: EXPERTS_BY_LAST_NAME,
+    query: EXPERTS_LIST,
     pageSize: pageSize,
     refetchFilter: (searchFilter) => {
       const searchCondition = createMultiWordSearchCondition(searchFilter, [
@@ -126,28 +121,30 @@ const ManageExpertsContent: FC = () => {
     },
   });
 
-  const columns = useMemo<ColumnDef<ExpertsByLastName_User>[]>(
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPageIndex(0);
+  };
+
+  const columns = useMemo<ColumnDef<ExpertsList_User>[]>(
     () => [
       {
         header: t('first_name'),
         accessorKey: 'firstName',
         enableSorting: true,
         size: 300,
-        cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
       },
       {
         header: t('last_name'),
         accessorKey: 'lastName',
         enableSorting: true,
         size: 300,
-        cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
       },
       {
         header: t('email'),
         accessorKey: 'email',
         enableSorting: true,
         size: 300,
-        cell: ({ getValue }) => <div>{getValue<ReactNode>()}</div>,
       },
     ],
     [t]
@@ -174,7 +171,7 @@ const ManageExpertsContent: FC = () => {
               onSearchFilterChange={setSearchFilter}
               error={error}
               loading={loading}
-              refetchQueries={['ExpertsByLastName']}
+              refetchQueries={['ExpertsList']}
               expandableRowComponent={({ row }) => <ExpandableExpertRow row={row} />}
             />
           </div>

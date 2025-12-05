@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
-export const EXPERTS_BY_LAST_NAME = gql`
-  query ExpertsByLastName(
+export const EXPERTS_LIST = gql`
+  query ExpertsList(
     $limit: Int = 10
     $offset: Int = 0
     $filter: User_bool_exp = {}
