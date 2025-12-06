@@ -38,6 +38,7 @@
     "my_certificates": "My Certificates",
     "faq": "FAQ",
     "user": "User",
+    "experts": "Experts",
     "courses": "Courses",
     "achievements": "Achievement Records",
     "achievement_templates": "Achievement Record Templates",
@@ -119,12 +120,18 @@
     "HEIDE": "Heide"
   },
   "type_name_or_email_minimum_3_letters": "Type a name or email (minimum 3 letters).",
+  "select_user_dialog": {
+    "type_name_or_email_minimum_2_letters": "Type a name or email (minimum 2 letters).",
+    "no_users_found": "No users found",
+    "add_new_user": "Add new user"
+  },
   "deletion_confirmation_question": "Are you sure you want to delete this entry?",
   "confirm_delete": "Confirm Deletion",
   "error": "Error",
   "select_time": "Select time",
   "close": "Close",
   "ok": "OK",
+  "loading": "Loading...",
   "user_card": {
     "speaker": "Speaker",
     "external_profile": "Homepage",
@@ -248,5 +255,9 @@
   "page_not_found": "Page not found",
   "page_not_found_description": "The page you're looking for doesn't exist. It may have been moved or deleted.",
   "back_to_home": "Back to home",
-  "go_back": "Go back"
+  "go_back": "Go back",
+  "auth": {
+    "please_log_in": "Please log in to access this page.",
+    "access_denied": "You do not have permission to access this page."
+  }
 }

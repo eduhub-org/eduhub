@@ -78,7 +78,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
   });
 
   const isAdmin = useIsAdmin();
-  const instructorIds = qResult?.data?.Course_by_pk?.CourseInstructors.map((ci) => ci.Expert.User.id);
+  const instructorIds = qResult?.data?.Course_by_pk?.CourseInstructors.map((ci) => ci.User.id);
   const isInstructorOfCourse = useIsUserIdInList(instructorIds);
 
   if (qResult.error) {

@@ -2,9 +2,9 @@ table:
   name: SessionSpeaker
   schema: public
 object_relationships:
-  - name: Expert
+  - name: User
     using:
-      foreign_key_constraint_on: expertId
+      foreign_key_constraint_on: userId
   - name: Session
     using:
       foreign_key_constraint_on: sessionId
@@ -15,12 +15,11 @@ insert_permissions:
         Session:
           Course:
             CourseInstructors:
-              Expert:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
       columns:
-        - expertId
+        - userId
         - sessionId
 select_permissions:
   - role: anonymous
@@ -29,23 +28,22 @@ select_permissions:
         - id
         - created_at
         - updated_at
-        - expertId
+        - userId
         - sessionId
       filter: {}
 update_permissions:
   - role: instructor_access
     permission:
       columns:
-        - expertId
+        - userId
         - sessionId
       filter:
         Session:
           Course:
             CourseInstructors:
-              Expert:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
       check: null
 delete_permissions:
   - role: instructor_access
@@ -54,7 +52,6 @@ delete_permissions:
         Session:
           Course:
             CourseInstructors:
-              Expert:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
+              User:
+                id:
+                  _eq: X-Hasura-User-Id

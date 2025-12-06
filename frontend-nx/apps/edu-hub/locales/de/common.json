@@ -38,6 +38,7 @@
     "my_certificates": "Meine Zertifikate",
     "faq": "FAQ",
     "user": "Benutzer",
+    "experts": "Experten",
     "courses": "Kurse",
     "achievements": "Leistungsnachweise",
     "achievement_templates": "Leistungsnachweisvorlagen",
@@ -119,12 +120,18 @@
     "HEIDE": "Heide"
   },
   "type_name_or_email_minimum_3_letters": "Gib mindestens 3 Buchstaben ein.",
+  "select_user_dialog": {
+    "type_name_or_email_minimum_2_letters": "Gib einen Namen oder eine E-Mail ein (mindestens 2 Buchstaben).",
+    "no_users_found": "Keine Benutzer gefunden",
+    "add_new_user": "Neuen Benutzer hinzufügen"
+  },
   "deletion_confirmation_question": "Bist du sicher, dass du diesen Eintrag löschen möchtest?",
   "confirm_delete": "Löschen bestätigen",
   "error": "Fehler",
   "select_time": "Zeit auswählen",
   "close": "Schließen",
   "ok": "OK",
+  "loading": "Lädt...",
   "user_card": {
     "speaker": "Referent:in",
     "external_profile": "Homepage",
@@ -248,5 +255,9 @@
   "page_not_found": "Seite nicht gefunden",
   "page_not_found_description": "Die Seite, die du suchst, existiert leider nicht. Sie wurde möglicherweise verschoben oder gelöscht.",
   "back_to_home": "Zur Startseite",
-  "go_back": "Zurück"
+  "go_back": "Zurück",
+  "auth": {
+    "please_log_in": "Bitte melde dich an, um auf diese Seite zuzugreifen.",
+    "access_denied": "Du hast keine Berechtigung, auf diese Seite zuzugreifen."
+  }
 }

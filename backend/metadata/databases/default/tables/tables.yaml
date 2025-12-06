@@ -25,7 +25,6 @@
 - "!include public_CourseLocation.yaml"
 - "!include public_CourseRegistrationType.yaml"
 - "!include public_CourseStatus.yaml"
-- "!include public_Expert.yaml"
 - "!include public_Faq.yaml"
 - "!include public_FaqCollection.yaml"
 - "!include public_FaqTranslation.yaml"

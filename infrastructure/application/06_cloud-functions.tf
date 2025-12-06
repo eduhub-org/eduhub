@@ -377,7 +377,7 @@ resource "google_cloudfunctions2_function" "send_mail" {
     environment_variables = {
       HASURA_MAIL_USER = var.hasura_mail_user
       MAILGUN_DOMAIN   = var.mailgun_domain
-      NODE_ENV         = var.environment
+      ENVIRONMENT      = var.environment
     }
 
     secret_environment_variables {

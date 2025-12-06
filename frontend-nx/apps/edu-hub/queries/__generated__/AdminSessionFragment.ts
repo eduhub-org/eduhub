@@ -43,13 +43,13 @@ export interface AdminSessionFragment_SessionAddresses {
   CourseLocation: AdminSessionFragment_SessionAddresses_CourseLocation | null;
 }
 
-export interface AdminSessionFragment_SessionSpeakers_Expert_User_Organization {
+export interface AdminSessionFragment_SessionSpeakers_User_Organization {
   __typename: "Organization";
   id: number;
   name: string;
 }
 
-export interface AdminSessionFragment_SessionSpeakers_Expert_User {
+export interface AdminSessionFragment_SessionSpeakers_User {
   __typename: "User";
   id: any;
   /**
@@ -83,25 +83,16 @@ export interface AdminSessionFragment_SessionSpeakers_Expert_User {
   /**
    * An object relationship
    */
-  Organization: AdminSessionFragment_SessionSpeakers_Expert_User_Organization | null;
-}
-
-export interface AdminSessionFragment_SessionSpeakers_Expert {
-  __typename: "Expert";
-  /**
-   * An object relationship
-   */
-  User: AdminSessionFragment_SessionSpeakers_Expert_User;
-  id: number;
+  Organization: AdminSessionFragment_SessionSpeakers_User_Organization | null;
 }
 
 export interface AdminSessionFragment_SessionSpeakers {
   __typename: "SessionSpeaker";
+  id: number;
   /**
    * An object relationship
    */
-  Expert: AdminSessionFragment_SessionSpeakers_Expert;
-  id: number;
+  User: AdminSessionFragment_SessionSpeakers_User;
 }
 
 export interface AdminSessionFragment {

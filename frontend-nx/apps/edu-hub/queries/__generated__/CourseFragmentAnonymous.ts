@@ -43,7 +43,7 @@ export interface CourseFragmentAnonymous_Sessions_SessionAddresses {
   CourseLocation: CourseFragmentAnonymous_Sessions_SessionAddresses_CourseLocation | null;
 }
 
-export interface CourseFragmentAnonymous_Sessions_SessionSpeakers_Expert_User {
+export interface CourseFragmentAnonymous_Sessions_SessionSpeakers_User {
   __typename: "User";
   id: any;
   /**
@@ -64,20 +64,13 @@ export interface CourseFragmentAnonymous_Sessions_SessionSpeakers_Expert_User {
   externalProfile: string | null;
 }
 
-export interface CourseFragmentAnonymous_Sessions_SessionSpeakers_Expert {
-  __typename: "Expert";
-  /**
-   * An object relationship
-   */
-  User: CourseFragmentAnonymous_Sessions_SessionSpeakers_Expert_User;
-}
-
 export interface CourseFragmentAnonymous_Sessions_SessionSpeakers {
   __typename: "SessionSpeaker";
+  id: number;
   /**
    * An object relationship
    */
-  Expert: CourseFragmentAnonymous_Sessions_SessionSpeakers_Expert;
+  User: CourseFragmentAnonymous_Sessions_SessionSpeakers_User;
 }
 
 export interface CourseFragmentAnonymous_Sessions {
@@ -113,7 +106,7 @@ export interface CourseFragmentAnonymous_Sessions {
   SessionSpeakers: CourseFragmentAnonymous_Sessions_SessionSpeakers[];
 }
 
-export interface CourseFragmentAnonymous_CourseInstructors_Expert_User {
+export interface CourseFragmentAnonymous_CourseInstructors_User {
   __typename: "User";
   id: any;
   /**
@@ -134,26 +127,13 @@ export interface CourseFragmentAnonymous_CourseInstructors_Expert_User {
   externalProfile: string | null;
 }
 
-export interface CourseFragmentAnonymous_CourseInstructors_Expert {
-  __typename: "Expert";
-  id: number;
-  /**
-   * A short description on the expert's background
-   */
-  description: string | null;
-  /**
-   * An object relationship
-   */
-  User: CourseFragmentAnonymous_CourseInstructors_Expert_User;
-}
-
 export interface CourseFragmentAnonymous_CourseInstructors {
   __typename: "CourseInstructor";
   id: number;
   /**
    * An object relationship
    */
-  Expert: CourseFragmentAnonymous_CourseInstructors_Expert;
+  User: CourseFragmentAnonymous_CourseInstructors_User;
 }
 
 export interface CourseFragmentAnonymous_CourseLocations {

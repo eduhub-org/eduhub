@@ -98,6 +98,10 @@ const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }
         '\\[Session:Duration\\]': '2 hours',
         '\\[Session:ReminderText\\]': 'starts tomorrow',
         '\\[Session:ReminderTime\\]': 'tomorrow',
+
+        // System variables
+        '\\[System:PasswordResetLink\\]': 'https://keycloak.example.com/realms/edu-hub/login-actions/reset-credentials?client_id=hasura',
+        '\\[System:PortalUrl\\]': 'https://edu.opencampus.sh',
       };
 
       // Apply replacements

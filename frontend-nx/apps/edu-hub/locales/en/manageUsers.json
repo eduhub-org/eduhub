@@ -22,5 +22,21 @@
     "profile_picture_removal": "Profile picture removal",
     "certificate_anonymization": "Certificate anonymization"
   },
-  "manage_admins": "Manage admins"
+  "manage_admins": "Manage admins",
+  "create_user": {
+    "button": "Create User",
+    "dialog_title": "Create New User",
+    "success": "User created successfully.",
+    "error": "Error creating user",
+    "error_first_name_required": "First name is required",
+    "error_last_name_required": "Last name is required",
+    "error_email_required": "Email is required",
+    "error_email_invalid": "Invalid email address",
+    "send_welcome_email": "Send welcome email",
+    "creating": "Creating...",
+    "cancel": "Cancel",
+    "first_name_placeholder": "Enter first name",
+    "last_name_placeholder": "Enter last name",
+    "email_placeholder": "Enter email address"
+  }
 }

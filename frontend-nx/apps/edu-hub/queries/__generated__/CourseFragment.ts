@@ -43,7 +43,7 @@ export interface CourseFragment_Sessions_SessionAddresses {
   CourseLocation: CourseFragment_Sessions_SessionAddresses_CourseLocation | null;
 }
 
-export interface CourseFragment_Sessions_SessionSpeakers_Expert_User {
+export interface CourseFragment_Sessions_SessionSpeakers_User {
   __typename: "User";
   id: any;
   /**
@@ -64,20 +64,13 @@ export interface CourseFragment_Sessions_SessionSpeakers_Expert_User {
   externalProfile: string | null;
 }
 
-export interface CourseFragment_Sessions_SessionSpeakers_Expert {
-  __typename: "Expert";
-  /**
-   * An object relationship
-   */
-  User: CourseFragment_Sessions_SessionSpeakers_Expert_User;
-}
-
 export interface CourseFragment_Sessions_SessionSpeakers {
   __typename: "SessionSpeaker";
+  id: number;
   /**
    * An object relationship
    */
-  Expert: CourseFragment_Sessions_SessionSpeakers_Expert;
+  User: CourseFragment_Sessions_SessionSpeakers_User;
 }
 
 export interface CourseFragment_Sessions {
@@ -113,7 +106,7 @@ export interface CourseFragment_Sessions {
   SessionSpeakers: CourseFragment_Sessions_SessionSpeakers[];
 }
 
-export interface CourseFragment_CourseInstructors_Expert_User {
+export interface CourseFragment_CourseInstructors_User {
   __typename: "User";
   id: any;
   /**
@@ -138,26 +131,13 @@ export interface CourseFragment_CourseInstructors_Expert_User {
   email: string;
 }
 
-export interface CourseFragment_CourseInstructors_Expert {
-  __typename: "Expert";
-  id: number;
-  /**
-   * A short description on the expert's background
-   */
-  description: string | null;
-  /**
-   * An object relationship
-   */
-  User: CourseFragment_CourseInstructors_Expert_User;
-}
-
 export interface CourseFragment_CourseInstructors {
   __typename: "CourseInstructor";
   id: number;
   /**
    * An object relationship
    */
-  Expert: CourseFragment_CourseInstructors_Expert;
+  User: CourseFragment_CourseInstructors_User;
 }
 
 export interface CourseFragment_CourseLocations {

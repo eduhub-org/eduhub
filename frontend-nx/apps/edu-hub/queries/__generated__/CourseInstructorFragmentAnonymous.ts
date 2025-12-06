@@ -7,7 +7,7 @@
 // GraphQL fragment: CourseInstructorFragmentAnonymous
 // ====================================================
 
-export interface CourseInstructorFragmentAnonymous_Expert_User {
+export interface CourseInstructorFragmentAnonymous_User {
   __typename: "User";
   id: any;
   /**
@@ -28,24 +28,11 @@ export interface CourseInstructorFragmentAnonymous_Expert_User {
   externalProfile: string | null;
 }
 
-export interface CourseInstructorFragmentAnonymous_Expert {
-  __typename: "Expert";
-  id: number;
-  /**
-   * A short description on the expert's background
-   */
-  description: string | null;
-  /**
-   * An object relationship
-   */
-  User: CourseInstructorFragmentAnonymous_Expert_User;
-}
-
 export interface CourseInstructorFragmentAnonymous {
   __typename: "CourseInstructor";
   id: number;
   /**
    * An object relationship
    */
-  Expert: CourseInstructorFragmentAnonymous_Expert;
+  User: CourseInstructorFragmentAnonymous_User;
 }

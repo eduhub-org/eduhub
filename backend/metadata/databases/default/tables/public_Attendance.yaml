@@ -27,15 +27,15 @@ insert_permissions:
         Session:
           Course:
             CourseInstructors:
-              Expert:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
       columns:
         - sessionId
         - source
         - status
         - userId
+        - location
 select_permissions:
   - role: instructor_access
     permission:
@@ -52,14 +52,14 @@ select_permissions:
         - userId
         - recordedName
         - source
+        - location
       filter:
         Session:
           Course:
             CourseInstructors:
-              Expert:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
   - role: user_access
     permission:
       columns:
@@ -75,6 +75,7 @@ select_permissions:
         - userId
         - recordedName
         - source
+        - location
       filter:
         User:
           id:
@@ -90,12 +91,12 @@ update_permissions:
         - startDateTime
         - status
         - totalAttendanceTime
+        - location
       filter:
         Session:
           Course:
             CourseInstructors:
-              Expert:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
+              User:
+                id:
+                  _eq: X-Hasura-User-Id
       check: {}

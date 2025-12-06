@@ -33,10 +33,9 @@ insert_permissions:
       check:
         Course:
           CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
+            User:
+              id:
+                _eq: X-Hasura-User-Id
       columns:
         - courseId
         - description
@@ -68,10 +67,9 @@ update_permissions:
       filter:
         Course:
           CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
+            User:
+              id:
+                _eq: X-Hasura-User-Id
       check: null
 delete_permissions:
   - role: instructor_access
@@ -79,7 +77,6 @@ delete_permissions:
       filter:
         Course:
           CourseInstructors:
-            Expert:
-              User:
-                id:
-                  _eq: X-Hasura-User-Id
+            User:
+              id:
+                _eq: X-Hasura-User-Id

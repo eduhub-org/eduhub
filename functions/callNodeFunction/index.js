@@ -10,6 +10,7 @@ import getAdminUsers from "./getAdminUsers/index.js";
 import sendEnrollmentEmail from "./sendEnrollmentEmail/index.js";
 import sendSessionReminders from "./sendSessionReminders/index.js";
 import makeCertificatePublic from "./makeCertificatePublic/index.js";
+import createUser from "./createUser/index.js";
 
 /**
  * Creates a logger instance with structured logging.
@@ -40,7 +41,8 @@ const functionMap = {
   getAdminUsers,
   sendEnrollmentEmail,
   sendSessionReminders,
-  makeCertificatePublic
+  makeCertificatePublic,
+  createUser
 };
 
 /**

@@ -43,12 +43,12 @@ array_relationships:
         table:
           name: CourseEnrollment
           schema: public
-  - name: Experts
+  - name: CourseInstructors
     using:
       foreign_key_constraint_on:
         column: userId
         table:
-          name: Expert
+          name: CourseInstructor
           schema: public
   - name: OrganizationAdmins
     using:
@@ -56,6 +56,13 @@ array_relationships:
         column: userId
         table:
           name: OrganizationAdmin
+          schema: public
+  - name: SessionSpeakers
+    using:
+      foreign_key_constraint_on:
+        column: userId
+        table:
+          name: SessionSpeaker
           schema: public
 select_permissions:
   - role: admin-ras

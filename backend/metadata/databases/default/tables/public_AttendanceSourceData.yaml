@@ -19,7 +19,6 @@ select_permissions:
         Session:
           Course:
             CourseInstructors:
-              Expert:
-                User:
-                  id:
-                    _eq: X-Hasura-User-Id
+              User:
+                id:
+                  _eq: X-Hasura-User-Id

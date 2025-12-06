@@ -43,7 +43,7 @@ export interface CourseAnonymous_Course_by_pk_Sessions_SessionAddresses {
   CourseLocation: CourseAnonymous_Course_by_pk_Sessions_SessionAddresses_CourseLocation | null;
 }
 
-export interface CourseAnonymous_Course_by_pk_Sessions_SessionSpeakers_Expert_User {
+export interface CourseAnonymous_Course_by_pk_Sessions_SessionSpeakers_User {
   __typename: "User";
   id: any;
   /**
@@ -64,20 +64,13 @@ export interface CourseAnonymous_Course_by_pk_Sessions_SessionSpeakers_Expert_Us
   externalProfile: string | null;
 }
 
-export interface CourseAnonymous_Course_by_pk_Sessions_SessionSpeakers_Expert {
-  __typename: "Expert";
-  /**
-   * An object relationship
-   */
-  User: CourseAnonymous_Course_by_pk_Sessions_SessionSpeakers_Expert_User;
-}
-
 export interface CourseAnonymous_Course_by_pk_Sessions_SessionSpeakers {
   __typename: "SessionSpeaker";
+  id: number;
   /**
    * An object relationship
    */
-  Expert: CourseAnonymous_Course_by_pk_Sessions_SessionSpeakers_Expert;
+  User: CourseAnonymous_Course_by_pk_Sessions_SessionSpeakers_User;
 }
 
 export interface CourseAnonymous_Course_by_pk_Sessions {
@@ -113,7 +106,7 @@ export interface CourseAnonymous_Course_by_pk_Sessions {
   SessionSpeakers: CourseAnonymous_Course_by_pk_Sessions_SessionSpeakers[];
 }
 
-export interface CourseAnonymous_Course_by_pk_CourseInstructors_Expert_User {
+export interface CourseAnonymous_Course_by_pk_CourseInstructors_User {
   __typename: "User";
   id: any;
   /**
@@ -134,26 +127,13 @@ export interface CourseAnonymous_Course_by_pk_CourseInstructors_Expert_User {
   externalProfile: string | null;
 }
 
-export interface CourseAnonymous_Course_by_pk_CourseInstructors_Expert {
-  __typename: "Expert";
-  id: number;
-  /**
-   * A short description on the expert's background
-   */
-  description: string | null;
-  /**
-   * An object relationship
-   */
-  User: CourseAnonymous_Course_by_pk_CourseInstructors_Expert_User;
-}
-
 export interface CourseAnonymous_Course_by_pk_CourseInstructors {
   __typename: "CourseInstructor";
   id: number;
   /**
    * An object relationship
    */
-  Expert: CourseAnonymous_Course_by_pk_CourseInstructors_Expert;
+  User: CourseAnonymous_Course_by_pk_CourseInstructors_User;
 }
 
 export interface CourseAnonymous_Course_by_pk_CourseLocations {

@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 
 export const INSERT_A_COURSEINSTRUCTOR = gql`
-  mutation InsertCourseInstructor($courseId: Int!, $expertId: Int!) {
+  mutation InsertCourseInstructor($courseId: Int!, $userId: uuid!) {
     insert_CourseInstructor(
-      objects: { courseId: $courseId, expertId: $expertId }
+      objects: { courseId: $courseId, userId: $userId }
     ) {
       affected_rows
       returning {
@@ -14,12 +14,12 @@ export const INSERT_A_COURSEINSTRUCTOR = gql`
 `;
 
 export const DELETE_COURSE_INSRTRUCTOR = gql`
-  mutation DeleteCourseInstructor($courseId: Int!, $expertId: Int!) {
+  mutation DeleteCourseInstructor($courseId: Int!, $userId: uuid!) {
     delete_CourseInstructor(
       where: {
         _and: [
           { courseId: { _eq: $courseId } }
-          { expertId: { _eq: $expertId } }
+          { userId: { _eq: $userId } }
         ]
       }
     ) {

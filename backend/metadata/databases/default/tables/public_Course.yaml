@@ -207,8 +207,7 @@ update_permissions:
         - weekDay
       filter:
         CourseInstructors:
-          Expert:
-            User:
-              id:
-                _eq: X-Hasura-User-Id
+          User:
+            id:
+              _eq: X-Hasura-User-Id
       check: null

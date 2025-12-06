@@ -15,6 +15,7 @@ exports.sendMail = async (req, res) => {
 
   // Extract email parameters from the Hasura event payload
   const { subject, content, to, replyTo, cc, bcc } = req.body.event.data.new;
+  
   // Get mail tag from headers or use default
   const mailTag = req.headers.mailTag || 'eduhub'; // default if not provided
 
@@ -23,7 +24,7 @@ exports.sendMail = async (req, res) => {
     from: `noreply@${process.env.MAILGUN_DOMAIN}`,
     to,
     // Prepend '[STAGING]' to subject in staging environment
-    subject: process.env.NODE_ENV === 'staging' ? '[STAGING] ' + subject : subject,
+    subject: process.env.ENVIRONMENT === 'staging' ? '[STAGING] ' + subject : subject,
     text: content,
     html: content, // Support both plain text and HTML formats
     'o:tag': [mailTag], // Add tags for email categorization and tracking
@@ -36,7 +37,7 @@ exports.sendMail = async (req, res) => {
   if (bcc) msg.bcc = bcc;
 
   try {
-    switch (process.env.NODE_ENV) {
+    switch (process.env.ENVIRONMENT) {
       case 'development':
         // Development mode: Log all email attempts without actually sending
         console.log('Development email:', {

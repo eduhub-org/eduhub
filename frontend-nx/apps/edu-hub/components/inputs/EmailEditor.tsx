@@ -202,8 +202,8 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
   // Define all available placeholders with their categories
   const ALL_PLACEHOLDERS = [
     // User variables (available in all contexts)
-    { text: '[User:Firstname]', label: 'User Firstname', categories: ['enrollment', 'session'] },
-    { text: '[User:LastName]', label: 'User Lastname', categories: ['enrollment', 'session'] },
+    { text: '[User:Firstname]', label: 'User Firstname', categories: ['enrollment', 'session', 'general'] },
+    { text: '[User:LastName]', label: 'User Lastname', categories: ['enrollment', 'session', 'general'] },
 
     // Course variables
     { text: '[Enrollment:CourseId--Course:Name]', label: 'Course Name', categories: ['enrollment', 'session'] },
@@ -221,6 +221,10 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
     { text: '[Session:Duration]', label: 'Session Duration', categories: ['session'] },
     { text: '[Session:ReminderText]', label: 'Reminder Text', categories: ['session'] },
     { text: '[Session:ReminderTime]', label: 'Reminder Time', categories: ['session'] },
+
+    // System variables (for general emails like user creation)
+    { text: '[System:PasswordResetLink]', label: 'Password Reset Link', categories: ['general'] },
+    { text: '[System:PortalUrl]', label: 'Portal URL', categories: ['general'] },
   ];
 
   // Determine template category based on template type
@@ -235,9 +239,11 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
       'DECLINE',
       'REGISTRATION_CONFIRMED',
     ];
+    const generalTemplates = ['USER_CREATED'];
 
     if (sessionTemplates.includes(templateType)) return 'session';
     if (enrollmentTemplates.includes(templateType)) return 'enrollment';
+    if (generalTemplates.includes(templateType)) return 'general';
 
     return 'enrollment'; // Default fallback
   };
