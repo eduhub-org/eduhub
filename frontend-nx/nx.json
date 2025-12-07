@@ -1,12 +1,8 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "namedInputs": {
-    "sharedGlobals": [
-      "{workspaceRoot}/.eslintrc.json"
-    ],
-    "default": [
-      "sharedGlobals"
-    ]
+    "sharedGlobals": ["{workspaceRoot}/.eslintrc.json"],
+    "default": ["sharedGlobals"]
   },
   "targetDefaults": {
     "build": {
@@ -46,5 +42,6 @@
   },
   "defaultProject": "edu-hub",
   "useInferencePlugins": false,
-  "defaultBase": "main"
+  "defaultBase": "main",
+  "useLegacyCache": true
 }
