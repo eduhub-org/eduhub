@@ -16,12 +16,14 @@ const nextConfig = {
   },
   output: 'standalone',
   images: {
-    domains: ['picsum.photos', 'images.unsplash.com'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'picsum.photos' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+    ],
   },
-  experimental: {
-    // https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
-    outputFileTracingRoot: path.join(__dirname, '../../'),
-  },
+  // https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
+  // Moved from experimental in Next.js 15
+  outputFileTracingRoot: path.join(__dirname, '../../'),
 };
 
 module.exports = withNx(nextConfig);

@@ -6,7 +6,7 @@ import { FC, useEffect, useState } from 'react';
 import Script from 'next/script';
 import { useRouter } from 'next/router';
 import * as fbq from '../lib/fpixel';
-import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
+import { AppCacheProvider } from '@mui/material-nextjs/v15-pagesRouter';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 
