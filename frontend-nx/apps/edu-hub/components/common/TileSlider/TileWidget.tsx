@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { FC } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
 import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
@@ -40,7 +40,7 @@ const getBaseUrl = (): string => {
 };
 
 export const TileWidget: FC<TileWidgetProps> = ({ course }) => {
-  const { t } = useTranslation('common');
+  const t = useTranslations('common');
   const getWeekdayStartAndEndString = useWeekdayStartAndEndString();
 
   const baseUrl = getBaseUrl();

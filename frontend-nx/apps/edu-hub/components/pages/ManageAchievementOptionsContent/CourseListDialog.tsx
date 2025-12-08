@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useAdminQuery } from '../../../hooks/authedQuery';
@@ -21,7 +21,7 @@ interface IProps {
 
 const CourseListDialog: FC<IProps> = (props) => {
   const [searchValue, setSearchValue] = useState('');
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const handleCancel = useCallback(() => {
     setSearchValue('');

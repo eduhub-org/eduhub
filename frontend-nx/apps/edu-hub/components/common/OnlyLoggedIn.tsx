@@ -1,5 +1,5 @@
 import { FC, ReactElement, ReactNode } from "react";
-import useTranslation from "next-translate/useTranslation";
+import { useTranslations, useLocale } from 'next-intl';
 
 import {
   useIsAdmin,
@@ -47,7 +47,7 @@ type OnlyAdminProps = {
 export const OnlyAdmin: FC<OnlyAdminProps> = ({ children, showFeedback = false }: OnlyAdminProps) => {
   const isLoggedIn = useIsLoggedIn();
   const isAdmin = useIsAdmin();
-  const { t } = useTranslation('common');
+  const t = useTranslations('common');
 
   if (isLoggedIn && isAdmin) {
     return <>{children}</>;

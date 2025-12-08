@@ -1,6 +1,6 @@
 import { signIn } from 'next-auth/react';
 import { FC } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '../common/Button';
 
 interface IProps {
@@ -13,7 +13,7 @@ const signInHandler = () => {
 };
 
 export const LoginButton: FC<IProps> = ({ className }) => {
-  const { t } = useTranslation('common');
+  const t = useTranslations('common');
   return (
     <Button onClick={signInHandler} className={className} filled>
       {t('loginButton')}

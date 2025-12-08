@@ -1,4 +1,4 @@
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback, useState } from 'react';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
@@ -69,7 +69,7 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  * @returns {any} the component
  */
 export const ManageCourseContent: FC<Props> = ({ courseId }) => {
-  const { t } = useTranslation('manageCourse');
+  const t = useTranslations('manageCourse');
 
   const qResult = useRoleQuery<ManagedCourse, ManagedCourseVariables>(MANAGED_COURSE, {
     variables: {
@@ -150,7 +150,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
   );
 
   if (course == null) {
-    return <div>{t('course-page:course-not-found', { courseId: courseId })}</div>;
+    return <div>{t('coursePage.course-not-found', { courseId: courseId })}</div>;
   }
 
   // If the user is neither an admin nor an instructor for this course return empty div
@@ -205,14 +205,14 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
         </div>
       </PageBlock>
       <QuestionConfirmationDialog
-        question={t('course-page:confirmation-push-the-course-to-next-status')}
-        confirmationText={t('course-page:set-status-high')}
+        question={t('coursePage.confirmation-push-the-course-to-next-status')}
+        confirmationText={t('coursePage.set-status-high')}
         onClose={() => handleUpgradeStatus(false)}
         onConfirm={() => handleUpgradeStatus(true)}
         open={isConfirmUpgradeStatusOpen}
       />
       <AlertMessageDialog
-        alert={t('course-page:please-fill-in-all-fields-to-proceed-further')}
+        alert={t('coursePage.please-fill-in-all-fields-to-proceed-further')}
         confirmationText={'OK'}
         onClose={handleCloseCantUpgrade}
         open={isCantUpgradeOpen}

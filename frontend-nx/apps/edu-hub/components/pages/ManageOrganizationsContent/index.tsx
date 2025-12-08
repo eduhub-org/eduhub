@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState, useCallback } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 import { ApolloError } from '@apollo/client';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
@@ -52,7 +52,7 @@ type ExpandableRowProps = {
 };
 
 const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement => {
-  const { t } = useTranslation('manageOrganizations');
+  const t = useTranslations('manageOrganizations');
   const { refetch } = useRoleQuery(ORGANIZATION_LIST);
 
   // Handle organization alias errors specifically
@@ -138,7 +138,7 @@ const ExpandableOrganizationRow: React.FC<ExpandableRowProps> = ({ row, onError 
 };
 
 const ManageOrganizationsContent: FC = () => {
-  const { t } = useTranslation('manageOrganizations');
+  const t = useTranslations('manageOrganizations');
   const [error, setError] = useState<string | null>(null);
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
   const [selectedRowsForBulkAction, setSelectedRowsForBulkAction] = useState<OrganizationList_Organization[]>([]);

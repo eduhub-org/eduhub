@@ -5,7 +5,7 @@ import {
   CourseEnrollmentWithUserQuery,
   CourseEnrollmentWithUserQueryVariables,
 } from '../../../queries/__generated__/CourseEnrollmentWithUserQuery';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { makeFullName } from '../../../helpers/util';
@@ -22,7 +22,7 @@ interface IProps {
 
 const EnrolledUserForACourseDialog: FC<IProps> = (props) => {
   const [searchValue, setSearchValue] = useState('');
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const handleCancel = useCallback(() => {
     setSearchValue('');

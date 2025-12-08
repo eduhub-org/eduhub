@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Add as AddIcon, HelpOutline } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { Option } from '../types';
 import { SelectChangeEvent } from '@mui/material';
 
@@ -36,7 +36,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
   onCreateOption,
   getLabelForValue,
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [isCleared, setIsCleared] = useState(false);

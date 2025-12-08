@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import { BaseDialog } from '../../common/dialogs/BaseDialog';
 import { useRoleQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
@@ -21,7 +21,7 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
   onConfirm,
   selectedOrganizations = [],
 }) => {
-  const { t } = useTranslation('manageOrganizations');
+  const t = useTranslations('manageOrganizations');
   const [selectedTargetOrg, setSelectedTargetOrg] = useState<string>('');
   const [organizationAdmins, setOrganizationAdmins] = useState<any[]>([]);
   const [courseFundingOrgs, setCourseFundingOrgs] = useState<any[]>([]);

@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useCallback, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 import DOMPurify from 'dompurify';
 import { useRouter } from 'next/router';
@@ -61,7 +61,7 @@ interface ManageEmailTemplatesContentProps {
 
 // Expandable row component with full functionality
 const ExpandableEmailTemplateRow: React.FC<{ row: EmailTemplateRow }> = ({ row }) => {
-  const { t } = useTranslation('manageEmailTemplates');
+  const t = useTranslations('manageEmailTemplates');
   const [preview, setPreview] = useState<string>('');
   const [showPreview, setShowPreview] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -194,7 +194,7 @@ const ManageEmailTemplatesContent: FC<ManageEmailTemplatesContentProps> = ({
   showBackButton = false,
   availableTemplateTypes,
 }) => {
-  const { t } = useTranslation('manageEmailTemplates');
+  const t = useTranslations('manageEmailTemplates');
   const router = useRouter();
 
   // Determine the courseId to filter by (default templates use NULL)

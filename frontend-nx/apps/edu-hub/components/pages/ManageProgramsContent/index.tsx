@@ -57,10 +57,10 @@ import {
   UpdateProgramParticipationCertVisible,
   UpdateProgramParticipationCertVisibleVariables,
 } from '../../../queries/__generated__/UpdateProgramParticipationCertVisible';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 
 export const ManageProgramsContent: FC = () => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const qResult = useAdminQuery<ProgramList>(PROGRAM_LIST);
 
   if (qResult.error) {
@@ -85,7 +85,7 @@ export const ManageProgramsContent: FC = () => {
     today.setHours(0);
     await insertProgram({
       variables: {
-        title: t('course-page:programs-default-title'),
+        title: t('coursePage.programs-default-title'),
         today: new Date(),
       },
     });
@@ -283,22 +283,22 @@ export const ManageProgramsContent: FC = () => {
       <div className="max-w-screen-xl mx-auto">
         <PageBlock>
           <div className="flex flex-row mb-12 text-white">
-            <h1 className="text-4xl font-bold mt-24">{t('course-page:programs-programs')}</h1>
+            <h1 className="text-4xl font-bold mt-24">{t('coursePage.programs-programs')}</h1>
           </div>
           <div className="flex justify-end mb-12 text-white">
             <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />} color="inherit">
-              {t('course-page:programs-add')}
+              {t('coursePage.programs-add')}
             </Button>
           </div>
           <div className="grid grid-cols-10 text-gray-400">
-            <p>{t('course-page:programs-published')}</p>
-            <div className="col-span-2">{t('course-page:programs-title')}</div>
-            <div>{t('course-page:programs-short-title')}</div>
-            <div>{t('course-page:programs-application-start')}</div>
-            <div>{t('course-page:programs-application-end')}</div>
-            <div>{t('course-page:programs-course-start')}</div>
-            <div>{t('course-page:programs-course-end')}</div>
-            <div>{t('course-page:programs-achievement-upload-deadline')}</div>
+            <p>{t('coursePage.programs-published')}</p>
+            <div className="col-span-2">{t('coursePage.programs-title')}</div>
+            <div>{t('coursePage.programs-short-title')}</div>
+            <div>{t('coursePage.programs-application-start')}</div>
+            <div>{t('coursePage.programs-application-end')}</div>
+            <div>{t('coursePage.programs-course-start')}</div>
+            <div>{t('coursePage.programs-course-end')}</div>
+            <div>{t('coursePage.programs-achievement-upload-deadline')}</div>
             <div>&nbsp;</div>
           </div>
           {programs != null &&
@@ -322,24 +322,24 @@ export const ManageProgramsContent: FC = () => {
             ))}
           <div className="flex justify-end mt-12 mb-12 text-white">
             <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />} color="inherit">
-              {t('course-page:programs-add')}
+              {t('coursePage.programs-add')}
             </Button>
           </div>
         </PageBlock>
         <QuestionConfirmationDialog
-          question={t('course-page:do-you-want-to-publish-the-program', {
+          question={t('coursePage.do-you-want-to-publish-the-program', {
             title: activeDialogProgram?.title,
           })}
-          confirmationText={t('course-page:publish')}
+          confirmationText={t('coursePage.publish')}
           onClose={() => handleMakeVisibleDialogClose(false)}
           onConfirm={() => handleMakeVisibleDialogClose(true)}
           open={confirmMakeVisibleOpen}
         />
         <QuestionConfirmationDialog
-          question={t('course-page:do-you-really-want-to-undo-the-publication-of-program', {
+          question={t('coursePage.do-you-really-want-to-undo-the-publication-of-program', {
             title: activeDialogProgram?.title,
           })}
-          confirmationText={t('course-page:withdraw')}
+          confirmationText={t('coursePage.withdraw')}
           onClose={() => handleMakeInvisibleDialogClose(false)}
           onConfirm={() => handleMakeInvisibleDialogClose(true)}
           open={confirmMakeInvisibleOpen}

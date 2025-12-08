@@ -23,7 +23,7 @@ import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/Ma
 import Locations from './Locations';
 import { Button } from '@mui/material';
 import { MdAddCircle } from 'react-icons/md';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import DropdownSelector from '../../../inputs/DropDownSelector';
 import TimePicker from '../../../inputs/TimePicker';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
@@ -56,7 +56,7 @@ interface IProps {
 
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const { error, handleError, resetError } = useErrorHandler();
-  const { t } = useTranslation('course-page');
+  const t = useTranslations('coursePage');
 
   const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_COURSE_LOCATION,
@@ -303,7 +303,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <div className="grid grid-cols-2">
           <DropdownSelector
             variant="eduhub"
-            label={t('common:language')}
+            label={t('common.language')}
             options={languageOptions}
             value={course.language}
             updateValueMutation={UPDATE_COURSE_LANGUAGE}
@@ -314,15 +314,15 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             <InputField
               variant="eduhub"
               type="number"
-              label={t('manageCourse:max_participants.label')}
+              label={t('manageCourse.max_participants.label')}
               value={course.maxParticipants?.toString() || '0'}
               itemId={course.id}
               updateValueMutation={UPDATE_COURSE_MAX_PARTICIPANTS}
               refetchQueries={['ManagedCourse']}
               min={0}
               onValueUpdated={() => qResult.refetch()}
-              placeholder={t('manageCourse:max_participants.placeholder')}
-              helpText={t('manageCourse:max_participants.help_text')}
+              placeholder={t('manageCourse.max_participants.placeholder')}
+              helpText={t('manageCourse.max_participants.help_text')}
             />
           </div>
         </div>
@@ -339,7 +339,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       </div>
       <div className="flex justify-start text-white">
         <Button onClick={handleInsertCourseLocation} startIcon={<MdAddCircle />} color="inherit">
-          {t('course-page:add-new-location')}
+          {t('coursePage.add-new-location')}
         </Button>
       </div>
       {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}

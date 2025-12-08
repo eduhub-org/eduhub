@@ -898,9 +898,7 @@ INSERT INTO public."CourseGroup" (id, "courseId", "groupOptionId", created_at, u
 INSERT INTO public."CourseGroup" (id, "courseId", "groupOptionId", created_at, updated_at) VALUES (13, 203, 3, '2025-01-10 23:39:27.128352+00', '2025-01-10 23:39:27.128352+00');
 INSERT INTO public."CourseGroup" (id, "courseId", "groupOptionId", created_at, updated_at) VALUES (14, 302, 1, '2025-01-10 23:39:48.061137+00', '2025-01-10 23:39:48.061137+00');
 INSERT INTO public."CourseGroup" (id, "courseId", "groupOptionId", created_at, updated_at) VALUES (15, 301, 3, '2025-01-10 23:39:57.485279+00', '2025-01-10 23:39:57.485279+00');
-INSERT INTO public."Expert" (id, "userId", description, created_at, updated_at) VALUES (1, '8914bee9-0549-44af-bcae-cafeec5ba92e', NULL, '2024-11-25 15:32:49.779961+00', '2024-11-25 15:32:49.779961+00');
-INSERT INTO public."Expert" (id, "userId", description, created_at, updated_at) VALUES (2, 'cccccccc-cccc-cccc-cccc-cccccccccccc', NULL, '2025-02-19 17:09:38.210944+00', '2025-02-20 09:12:06.08057+00');
-INSERT INTO public."CourseInstructor" (id, "courseId", "expertId", created_at, updated_at) VALUES (1, 302, 2, '2025-02-19 17:09:38.249734+00', '2025-02-19 17:09:38.249734+00');
+INSERT INTO public."CourseInstructor" (id, "courseId", "userId", created_at, updated_at) VALUES (1, 302, 'cccccccc-cccc-cccc-cccc-cccccccccccc', '2025-02-19 17:09:38.249734+00', '2025-02-19 17:09:38.249734+00');
 INSERT INTO public."CourseLocation" (id, "courseId", created_at, updated_at, "locationOption", "defaultSessionAddress", "defaultSessionAddressId") VALUES (1, 1, '2022-12-19 12:56:07.352338+00', '2022-12-19 12:56:12.475054+00', 'KIEL', 'Musterstraße 21, 22232 Kiel', NULL);
 INSERT INTO public."CourseLocation" (id, "courseId", created_at, updated_at, "locationOption", "defaultSessionAddress", "defaultSessionAddressId") VALUES (2, 1, '2022-12-19 12:56:07.352338+00', '2022-12-19 12:56:12.475054+00', 'ONLINE', 'https://zoom.us', NULL);
 INSERT INTO public."CourseLocation" (id, "courseId", created_at, updated_at, "locationOption", "defaultSessionAddress", "defaultSessionAddressId") VALUES (3, 2, '2022-12-19 12:56:07.352338+00', '2022-12-19 12:56:12.475054+00', 'KIEL', NULL, NULL);
@@ -1318,7 +1316,6 @@ SELECT pg_catalog.setval('public."CourseLocation_id_seq"', 9, true);
 SELECT pg_catalog.setval('public."Course_Id_seq"', 9, true);
 SELECT pg_catalog.setval('public."Date_Id_seq"', 96, true);
 SELECT pg_catalog.setval('public."Enrollment_Id_seq"', 1, false);
-SELECT pg_catalog.setval('public."Instructor_Id_seq"', 2, true);
 SELECT pg_catalog.setval('public."LocationAddress_id_seq"', 1, false);
 SELECT pg_catalog.setval('public."Mail_Id_seq"', 27, true);
 SELECT pg_catalog.setval('public."OrganizationAdmin_id_seq"', 3, true);

@@ -4,7 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/mousewheel';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';
@@ -64,7 +64,7 @@ const breakpoints = {
 };
 
 const TileSlider: FC<TileSliderProps> = ({ courses, isManage, isWidget = false }) => {
-  const { t } = useTranslation('common');
+  const t = useTranslations('common');
   const swiperRef = useRef(null);
   const containerRef = useRef(null);
   const [nextVisible, setNextVisible] = useState(true);

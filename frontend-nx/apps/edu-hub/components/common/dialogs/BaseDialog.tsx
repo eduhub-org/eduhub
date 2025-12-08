@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import { Button } from '../Button';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface BaseDialogProps {
   open: boolean;
@@ -27,7 +27,7 @@ export const BaseDialog: React.FC<BaseDialogProps> = ({
   cancelText,
   showCancel = true,
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslations('common');
 
   return (
     <Dialog

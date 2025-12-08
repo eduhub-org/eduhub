@@ -1,6 +1,6 @@
 import React, { FC, useState, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { MdExpandMore, MdExpandLess } from 'react-icons/md';
@@ -13,7 +13,7 @@ interface FaqItem {
   id: number;
   question: string;
   answer: string;
-  lang: string;
+  locale: string;
 }
 
 interface FaqSectionProps {
@@ -63,12 +63,13 @@ const FaqItemComponent: FC<FaqItemProps> = ({ faq }) => {
 };
 
 const FaqSection: FC<FaqSectionProps> = ({ collection = 'default', className = '' }) => {
-  const { t, lang } = useTranslation('common');
+  const t = useTranslations('common');
+  const locale = useLocale();
 
   const { data, loading, error } = useQuery<GetFaqsByCollectionAndLang>(GET_FAQS_BY_COLLECTION_AND_LANG, {
     variables: {
       collection,
-      lang: (lang || 'de').toUpperCase(),
+      locale: (locale || 'de').toUpperCase(),
     },
     errorPolicy: 'all',
   });
@@ -91,7 +92,7 @@ const FaqSection: FC<FaqSectionProps> = ({ collection = 'default', className = '
         id: faq.id,
         question: translation.question,
         answer: translation.answer,
-        lang: translation.lang,
+        locale: translation.lang,
       };
     }).filter(Boolean) as FaqItem[];
   }, [data]);

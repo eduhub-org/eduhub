@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ChangeEvent, FC, useCallback, useState, useMemo } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useAuthedQuery } from '../../../hooks/authedQuery';
@@ -17,7 +17,7 @@ interface IProps {
 // Search organization by name, description, or aliases
 export const SelectOrganizationDialog: FC<IProps> = ({ onClose, open, title }) => {
   const [searchValue, setSearchValue] = useState('');
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const handleNewInput = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {

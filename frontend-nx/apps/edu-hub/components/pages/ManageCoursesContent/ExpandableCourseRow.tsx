@@ -40,7 +40,7 @@ import {
 import { OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
 import EntityListManager from '../../inputs/EntityListManager';
 import { getPublicImageUrl, parseFileUploadEvent } from '../../../helpers/filehandling';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import TagSelector from '../../inputs/TagSelector';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
@@ -55,6 +55,7 @@ import {
 import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
+import { normalizeErrorKey } from '../../../helpers/errorHandling';
 import { useAdminQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import {
   GET_COURSE_TEMPLATES_COUNT,
@@ -80,7 +81,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   onSetAttendanceCertificatePossible,
   onSetAchievementCertificatePossible,
 }) => {
-  const { t } = useTranslation('course-page');
+  const t = useTranslations('coursePage');
   const router = useRouter();
   const { error, handleError, resetError } = useErrorHandler();
 
@@ -459,7 +460,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
 
   const [saveCourseImage] = useAdminMutation<SaveCourseImage, SaveCourseImageVariables>(SAVE_COURSE_IMAGE, {
-    onError: (error) => handleError(t(error.message)),
+    onError: (error) => handleError(t(normalizeErrorKey(error.message))),
     refetchQueries: ['AdminCourseList'],
   });
 
@@ -524,13 +525,13 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
               <DropDownSelector
                 variant="material"
-                label={t('manageCourses:registration_type.label')}
+                label={t('manageCourses.registration_type.label')}
                 value={course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT}
                 options={registrationTypeOptions}
                 updateValueMutation={UPDATE_COURSE_REGISTRATION_TYPE}
                 identifierVariables={{ itemId: course.id }}
                 refetchQueries={['AdminCourseList']}
-                helpText={t('manageCourses:registration_type.help_text')}
+                helpText={t('manageCourses.registration_type.help_text')}
               />
 
               {/* External Registration Link - Always reserve space */}
@@ -539,13 +540,13 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   <InputField
                     variant="material"
                     type="link"
-                    label={t('manageCourses:external_registration_link.label')}
-                    placeholder={t('manageCourses:external_registration_link.label')}
+                    label={t('manageCourses.external_registration_link.label')}
+                    placeholder={t('manageCourses.external_registration_link.label')}
                     itemId={course.id}
                     value={course.externalRegistrationLink || ''}
                     updateValueMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
                     refetchQueries={['AdminCourseList']}
-                    helpText={t('manageCourses:external_registration_link.help_text')}
+                    helpText={t('manageCourses.external_registration_link.help_text')}
                   />
                 )}
               </div>
@@ -555,8 +556,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
               <TagSelector
                 variant="material"
-                label={t('course-page:courseDegreeTitle')}
-                placeholder={t('course-page:courseDegree')}
+                label={t('coursePage.courseDegreeTitle')}
+                placeholder={t('coursePage.courseDegree')}
                 itemId={course.id}
                 values={currentCourseDegrees}
                 options={degreeCourses}
@@ -567,8 +568,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
               <TagSelector
                 variant="material"
-                label={t('manageCourses:tile_slider_group.label')}
-                placeholder={t('manageCourses:tile_slider_group.placeholder')}
+                label={t('manageCourses.tile_slider_group.label')}
+                placeholder={t('manageCourses.tile_slider_group.placeholder')}
                 itemId={course.id}
                 values={currentCourseGroups}
                 options={courseGroupOptions}
@@ -580,7 +581,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
             {/* 3. Cover Image Upload - Card Container */}
             <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses:cover_image.label')}</h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses.cover_image.label')}</h4>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-gray-400 transition-colors bg-gray-50">
                 <div className="flex flex-col items-center justify-center space-y-2">
                   {coverImage ? (
@@ -606,7 +607,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                       className="flex flex-col items-center space-y-2 text-gray-500 hover:text-gray-700"
                     >
                       <MdUpload className="w-8 h-8" />
-                      <span className="text-sm">{t('manageCourses:cover_image.upload_text')}</span>
+                      <span className="text-sm">{t('manageCourses.cover_image.upload_text')}</span>
                     </button>
                   )}
                 </div>
@@ -625,18 +626,18 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               <InputField
                 variant="material"
                 type="link"
-                label={t('manageCourses:chat_link.label')}
-                placeholder={t('manageCourses:chat_link.label')}
+                label={t('manageCourses.chat_link.label')}
+                placeholder={t('manageCourses.chat_link.label')}
                 itemId={course.id}
                 value={course.chatLink || ''}
                 updateValueMutation={UPDATE_COURSE_CHAT_LINK}
                 refetchQueries={['AdminCourseList']}
-                helpText={t('manageCourses:chat_link.help_text')}
+                helpText={t('manageCourses.chat_link.help_text')}
               />
 
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-2">
-                  {t('manageCourses:email_templates.label', { fallback: 'Email Templates' })}
+                  {t('manageCourses.email_templates.label')}
                 </h4>
                 <button
                   onClick={handleManageEmailTemplates}
@@ -650,15 +651,13 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   <MdEmail className="w-5 h-5" />
                   <span>
                     {hasCustomTemplates
-                      ? t('manageCourses:email_templates.edit_button', { fallback: 'Edit Email Templates' })
-                      : t('manageCourses:email_templates.create_button', { fallback: 'Create Email Templates' })}
+                      ? t('manageCourses.email_templates.edit_button')
+                      : t('manageCourses.email_templates.create_button')}
                   </span>
                 </button>
                 {isExternalRegistration && (
                   <p className="text-sm text-gray-500 mt-1">
-                    {t('manageCourses:email_templates.external_registration_note', {
-                      fallback: 'Email templates are not available for external registration courses.',
-                    })}
+                    {t('manageCourses.email_templates.external_registration_note')}
                   </p>
                 )}
               </div>
@@ -669,7 +668,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
           <div className="space-y-4 w-full min-w-0">
             {/* 1. List of Instructors - Card Container */}
             <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses:instructors.label')}</h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses.instructors.label')}</h4>
               <div className="space-y-2">
                 {course.CourseInstructors.map((courseInstructor) => (
                   <Fragment key={courseInstructor.User.id}>
@@ -681,7 +680,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 p-2 w-full rounded hover:bg-blue-50 transition-colors"
                 >
                   <MdAddCircle className="w-5 h-5" />
-                  <span>{t('manageCourses:instructors.add')}</span>
+                  <span>{t('manageCourses.instructors.add')}</span>
                 </button>
               </div>
             </div>
@@ -690,8 +689,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             <div className="bg-white border border-gray-200 rounded-lg p-4 w-full">
               <EntityListManager
                 variant="material"
-                label={t('manageCourses:funding_organizations.label')}
-                addButtonText={t('manageCourses:funding_organizations.add')}
+                label={t('manageCourses.funding_organizations.label')}
+                addButtonText={t('manageCourses.funding_organizations.add')}
                 itemId={course.id}
                 entities={course.CourseFundingOrganizations || []}
                 renderEntity={renderFundingOrganization}
@@ -699,7 +698,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   <SelectOrganizationDialog
                     onClose={addFundingOrgHandler}
                     open={fundingOrgDialogOpen}
-                    title={t('manageCourses:funding_organizations.add')}
+                    title={t('manageCourses.funding_organizations.add')}
                   />
                 }
                 dialogOpen={fundingOrgDialogOpen}
@@ -729,7 +728,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                       <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-gray-400" />
                     )}
                   </div>
-                  <span>{t('course-page:proof-of-participation')}</span>
+                  <span>{t('coursePage.proof-of-participation')}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="cursor-pointer" onClick={handleToggleAchievementCertificatePossible}>
@@ -739,20 +738,20 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                       <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-gray-400" />
                     )}
                   </div>
-                  <span>{t('course-page:performance-certificate')}</span>
+                  <span>{t('coursePage.performance-certificate')}</span>
                 </div>
                 {course.achievementCertificatePossible && (
                   <div className="ml-8 mt-2">
                     <InputField
                       variant="material"
                       type="ects"
-                      label={t('manageCourses:ects.label')}
-                      placeholder={t('manageCourses:ects.label')}
+                      label={t('manageCourses.ects.label')}
+                      placeholder={t('manageCourses.ects.label')}
                       itemId={course.id}
                       value={course.ects || ''}
                       updateValueMutation={UPDATE_COURSE_ECTS}
                       refetchQueries={['AdminCourseList']}
-                      helpText={t('manageCourses:ects.help_text')}
+                      helpText={t('manageCourses.ects.help_text')}
                     />
                   </div>
                 )}
@@ -765,13 +764,13 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               <InputField
                 variant="material"
                 type="number"
-                label={t('manageCourses:max_missed_sessions.label')}
-                placeholder={t('manageCourses:max_missed_sessions.label')}
+                label={t('manageCourses.max_missed_sessions.label')}
+                placeholder={t('manageCourses.max_missed_sessions.label')}
                 itemId={course.id}
                 value={String(course.maxMissedSessions ?? 2)}
                 updateValueMutation={UPDATE_COURSE_MAX_MISSED_SESSION}
                 refetchQueries={['AdminCourseList']}
-                helpText={t('manageCourses:max_missed_sessions.help_text')}
+                helpText={t('manageCourses.max_missed_sessions.help_text')}
                 min={0}
               />
             </div>
@@ -785,9 +784,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 updateValueMutation={UPDATE_COURSE_LEARNING_GOALS}
                 refetchQueries={['AdminCourseList']}
                 itemId={course.id}
-                label={t('manageCourses:learning_goals.label')}
-                placeholder={t('manageCourses:learning_goals.placeholder')}
-                helpText={t('manageCourses:learning_goals.help_text')}
+                label={t('manageCourses.learning_goals.label')}
+                placeholder={t('manageCourses.learning_goals.placeholder')}
+                helpText={t('manageCourses.learning_goals.help_text')}
                 maxLength={500}
                 className="h-32 !text-gray-700"
               />
@@ -801,7 +800,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
         <SelectUserDialog
           onClose={addInstructorHandler}
           open={instructorDialogOpen}
-          title={t('manageCourses:instructors.add')}
+          title={t('manageCourses.instructors.add')}
           onAddNewUser={handleAddNewUser}
           showAddNewUserOption={true}
         />

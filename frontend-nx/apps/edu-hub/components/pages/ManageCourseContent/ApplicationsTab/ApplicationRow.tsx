@@ -1,4 +1,4 @@
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback, useState } from 'react';
 import { GoDotFill } from 'react-icons/go';
 import { IoIosArrowDown, IoIosArrowUp, IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
@@ -27,7 +27,7 @@ const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments | nu
 };
 
 export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelected, onSelectRow }) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const displayDate = useDisplayDate();
 
   const handleToggleRowSelected = useCallback(() => {
@@ -72,8 +72,8 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
         <div className="grid grid-cols-24 mb-1">
           <div className="mr-3 ml-3 col-span-3">{t('firstName')}</div>
           <div className="mr-3 ml-3 col-span-3">{t('lastName')}</div>
-          <div className="mr-3 ml-3 col-span-12">{t('course-page:application')}</div>
-          <div className="mr-3 ml-3 col-span-2 text-center">{t('course-page:evaluation')}</div>
+          <div className="mr-3 ml-3 col-span-12">{t('coursePage.application')}</div>
+          <div className="mr-3 ml-3 col-span-2 text-center">{t('coursePage.evaluation')}</div>
           <div className="mr-3 ml-3 col-span-2 text-center">{t('status')}</div>
           <div className="col-span-1" />
           <div className="col-span-1" />
@@ -95,32 +95,32 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
             </div>
             <div className="mr-3 ml-3 col-span-2 text-center">
               {!isExpired(enrollment) && enrollment.status === 'APPLIED' && (
-                <GoDotFill className="inline" title={t('course-page:applied')} color="grey" size="2.5em" />
+                <GoDotFill className="inline" title={t('coursePage.applied')} color="grey" size="2.5em" />
               )}
               {!isExpired(enrollment) && enrollment.status === 'INVITED' && (
-                <IoIosCheckmarkCircle className="inline" title={t('course-page:invited')} color="grey" size="1.5em" />
+                <IoIosCheckmarkCircle className="inline" title={t('coursePage.invited')} color="grey" size="1.5em" />
               )}
               {(enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED') && (
                 <IoIosCheckmarkCircle
                   className="inline"
-                  title={t('course-page:invitation-confirmed')}
+                  title={t('coursePage.invitation-confirmed')}
                   color="lightgreen"
                   size="1.5em"
                 />
               )}
               {enrollment.status === 'ABORTED' && (
-                <IoIosCheckmarkCircle title={t('course-page:aborted')} color="red" size="1.5em" className="inline" />
+                <IoIosCheckmarkCircle title={t('coursePage.aborted')} color="red" size="1.5em" className="inline" />
               )}
               {enrollment.status === 'REJECTED' && (
-                <IoIosCloseCircle title={t('course-page:rejected')} color="red" size="1.5em" className="inline" />
+                <IoIosCloseCircle title={t('coursePage.rejected')} color="red" size="1.5em" className="inline" />
               )}
               {enrollment.status === 'CANCELLED' && (
-                <IoIosCloseCircle title={t('course-page:cancelled')} color="red" size="1.5em" className="inline" />
+                <IoIosCloseCircle title={t('coursePage.cancelled')} color="red" size="1.5em" className="inline" />
               )}
               {isExpired(enrollment) && (enrollment.status === 'APPLIED' || enrollment.status === 'INVITED') && (
                 <IoIosCloseCircle
                   className="inline"
-                  title={t('course-page:invitation-expired')}
+                  title={t('coursePage.invitation-expired')}
                   color="grey"
                   size="1.5em"
                 />
@@ -145,7 +145,7 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
               <div className="grid grid-cols-12 bg-edu-light-gray pt-5 pb-5">
                 <div className="mr-3 ml-3 col-span-3 truncate" title={enrollment.User.email}>
                   {enrollment.User.email}
-                  <p className="mt-4">{t('manageCourse:application_history')}</p>
+                  <p className="mt-4">{t('manageCourse.application_history')}</p>
                   {enrollment.User.CourseEnrollments.map((pastEnrollment, index) => {
                     if (pastEnrollment.courseId === enrollment.courseId) {
                       return null; // Skip rendering this enrollment
@@ -193,7 +193,7 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
 
                   {enrollment.status === 'INVITED' && (
                     <div className="mt-5">
-                      {`${t('course-page:invitation-deadline')}:`} <br />
+                      {`${t('coursePage.invitation-deadline')}:`} <br />
                       {displayDate(enrollment.invitationExpirationDate)}
                     </div>
                   )}

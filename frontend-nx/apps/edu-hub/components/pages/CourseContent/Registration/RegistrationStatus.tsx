@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { MdHourglassEmpty, MdCancel, MdError, MdMailOutline, MdAccessTime } from 'react-icons/md';
 
 import { CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
@@ -49,7 +49,7 @@ const StatusCard: FC<{
  * @returns JSX element with course resource buttons
  */
 const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
 
   const onlineLocation = course.CourseLocations?.find((location) => location.locationOption === 'ONLINE');
 
@@ -95,7 +95,7 @@ const CourseLinkInfos: FC<{ course: Course_Course_by_pk }> = ({ course }) => {
  * @returns JSX element representing the enrollment status and available actions
  */
 export const RegistrationStatus: FC<RegistrationStatusProps> = ({ courseEnrollment, course }) => {
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
 
   const status = courseEnrollment.status;
 

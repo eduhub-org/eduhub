@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { FC, useMemo } from 'react';
 import mysteryImg from '../../public/images/common/mystery.svg';
 import { isLinkFormat } from '../../helpers/util';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { getPublicImageUrl } from '../../helpers/filehandling';
 
 type Size = 'small' | 'medium' | 'large';
@@ -36,7 +36,7 @@ interface UserCardProps {
 }
 
 const UserCard: FC<UserCardProps> = ({ user, role, className, size = 'large' }) => {
-  const { t } = useTranslation('common');
+  const t = useTranslations('common');
 
   const { imageSize, imageSolution, fontSize } = sizeConfigs[size];
   const showName = size !== 'small';

@@ -1,6 +1,6 @@
 import { Dialog, DialogTitle, Slide } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback, forwardRef, ReactElement } from 'react';
 import { MdClose } from 'react-icons/md';
 
@@ -23,7 +23,7 @@ interface ErrorProps {
 
 export const ErrorMessageDialog: FC<ErrorProps> = ({ errorMessage, open, onClose }) => {
   const handleClose = useCallback(() => onClose(), [onClose]);
-  const { t } = useTranslation();
+  const t = useTranslations('common');
 
   return (
     <Dialog

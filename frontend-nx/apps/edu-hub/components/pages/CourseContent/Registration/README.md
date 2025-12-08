@@ -294,7 +294,7 @@ The Registration component is integrated into the main CourseContent component a
 ### Required Dependencies
 - `useSnackbar` hook from the common snackbar system
 - GraphQL mutations for enrollment operations
-- Translation system (`next-translate`) with `course` namespace
+- Translation system (`next-intl`) with `course` namespace
 - Material-UI components for modal and form elements
 - Profile-related mutations for user data updates (Onboarding)
 

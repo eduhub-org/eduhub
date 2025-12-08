@@ -29,7 +29,7 @@ import {
   UpdateEnrollmentStatus,
   UpdateEnrollmentStatusVariables,
 } from '../../../../queries/__generated__/UpdateEnrollmentStatus';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import Modal from '../../../common/Modal';
 import AddParticipantsForm from './AddParticipantsForm';
 import TableGrid from '../../../common/TableGrid';
@@ -55,7 +55,8 @@ const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) => 
 };
 
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
-  const { t, lang } = useTranslation('manageCourse');
+  const t = useTranslations('manageCourse');
+  const locale = useLocale();
   const displayDate = useDisplayDate();
   const isInstructor = useIsInstructor();
   const isAdmin = useIsAdmin();
@@ -77,19 +78,19 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
   const infoDots = (
     <div className="text-gray-400 text-sm">
-      <div className="mb-1">{t('course-page:application-rating')}</div>
+      <div className="mb-1">{t('coursePage.application-rating')}</div>
       <div className="flex gap-4 text-gray-400">
         <div className="flex items-center gap-1">
-          <Dot color="lightgreen" /> <span>{t('course-page:invite')}</span>
+          <Dot color="lightgreen" /> <span>{t('coursePage.invite')}</span>
         </div>
         <div className="flex items-center gap-1">
-          <Dot color="orange" /> <span>{t('course-page:unclear')}</span>
+          <Dot color="orange" /> <span>{t('coursePage.unclear')}</span>
         </div>
         <div className="flex items-center gap-1">
-          <Dot color="red" /> <span>{t('course-page:reject')}</span>
+          <Dot color="red" /> <span>{t('coursePage.reject')}</span>
         </div>
         <div className="flex items-center gap-1">
-          <Dot color="grey" /> <span>{t('course-page:not-rated')}</span>
+          <Dot color="grey" /> <span>{t('coursePage.not-rated')}</span>
         </div>
       </div>
     </div>
@@ -502,7 +503,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         },
       },
       {
-        header: t('course-page:evaluation'),
+        header: t('coursePage.evaluation'),
         accessorKey: 'motivationRating',
         size: 100,
         enableSorting: true,
@@ -538,32 +539,32 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           return (
             <div className="text-center">
               {!expired && enrollment.status === 'APPLIED' && (
-                <GoDotFill className="inline" title={t('course-page:applied')} color="grey" size="2.5em" />
+                <GoDotFill className="inline" title={t('coursePage.applied')} color="grey" size="2.5em" />
               )}
               {!expired && enrollment.status === 'INVITED' && (
-                <IoIosCheckmarkCircle className="inline" title={t('course-page:invited')} color="grey" size="1.5em" />
+                <IoIosCheckmarkCircle className="inline" title={t('coursePage.invited')} color="grey" size="1.5em" />
               )}
               {(enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED') && (
                 <IoIosCheckmarkCircle
                   className="inline"
-                  title={t('course-page:invitation-confirmed')}
+                  title={t('coursePage.invitation-confirmed')}
                   color="lightgreen"
                   size="1.5em"
                 />
               )}
               {enrollment.status === 'ABORTED' && (
-                <IoIosCheckmarkCircle title={t('course-page:aborted')} color="red" size="1.5em" className="inline" />
+                <IoIosCheckmarkCircle title={t('coursePage.aborted')} color="red" size="1.5em" className="inline" />
               )}
               {enrollment.status === 'REJECTED' && (
-                <IoIosCloseCircle title={t('course-page:rejected')} color="red" size="1.5em" className="inline" />
+                <IoIosCloseCircle title={t('coursePage.rejected')} color="red" size="1.5em" className="inline" />
               )}
               {enrollment.status === 'CANCELLED' && (
-                <IoIosCloseCircle title={t('course-page:cancelled')} color="red" size="1.5em" className="inline" />
+                <IoIosCloseCircle title={t('coursePage.cancelled')} color="red" size="1.5em" className="inline" />
               )}
               {expired && (enrollment.status === 'APPLIED' || enrollment.status === 'INVITED') && (
                 <IoIosCloseCircle
                   className="inline"
-                  title={t('course-page:invitation-expired')}
+                  title={t('coursePage.invitation-expired')}
                   color="grey"
                   size="1.5em"
                 />
@@ -615,7 +616,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
               <div className="text-sm font-medium text-gray-700 mb-2">{t('application_history')}</div>
               <div className="space-y-1">
                 {enrollment.User.CourseEnrollments.length > 0 && enrollment.User.CourseEnrollments.filter(e => e.courseId !== enrollment.courseId).length === 0 ? (
-                  <div className="text-sm text-gray-500 italic pl-4">{t('course-page:no-applications-present')}</div>
+                  <div className="text-sm text-gray-500 italic pl-4">{t('coursePage.no-applications-present')}</div>
                 ) : (
                   enrollment.User.CourseEnrollments.map((pastEnrollment, index) => {
                     if (pastEnrollment.courseId === enrollment.courseId) {
@@ -647,7 +648,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           {/* Total available: 960px (mainRowContentWidth), minus: 400px (email) + 100px (rating) + 24px (2 gaps) + 12px (padding) = 424px */}
           <div style={{ width: '424px', flexShrink: 0 }}>
             <div className="mb-4">
-              <div className="text-sm font-medium text-gray-700 mb-1">{t('course-page:application')}</div>
+              <div className="text-sm font-medium text-gray-700 mb-1">{t('coursePage.application')}</div>
               <div className="text-gray-900 whitespace-pre-wrap break-words pl-4">{enrollment.motivationLetter || '-'}</div>
             </div>
           </div>
@@ -656,7 +657,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           <div style={{ width: '100px', flexShrink: 0 }}>
             <div className="mb-4">
               <div className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
-                {t('course-page:evaluation')}
+                {t('coursePage.evaluation')}
                 <Tooltip title={t('application_status_tooltip')} placement="top">
                   <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled }} />
                 </Tooltip>
@@ -665,8 +666,8 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                 <button
                   onClick={setUnrated}
                   className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                  title={t('course-page:not-rated')}
-                  aria-label={t('course-page:not-rated')}
+                  title={t('coursePage.not-rated')}
+                  aria-label={t('coursePage.not-rated')}
                 >
                   <Dot
                     color="grey"
@@ -677,8 +678,8 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                 <button
                   onClick={setInvite}
                   className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                  title={t('course-page:invite')}
-                  aria-label={t('course-page:invite')}
+                  title={t('coursePage.invite')}
+                  aria-label={t('coursePage.invite')}
                 >
                   <Dot
                     color="lightgreen"
@@ -689,8 +690,8 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                 <button
                   onClick={setReview}
                   className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                  title={t('course-page:unclear')}
-                  aria-label={t('course-page:unclear')}
+                  title={t('coursePage.unclear')}
+                  aria-label={t('coursePage.unclear')}
                 >
                   <Dot
                     color="orange"
@@ -701,8 +702,8 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                 <button
                   onClick={setDecline}
                   className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                  title={t('course-page:reject')}
-                  aria-label={t('course-page:reject')}
+                  title={t('coursePage.reject')}
+                  aria-label={t('coursePage.reject')}
                 >
                   <Dot
                     color="red"
@@ -716,7 +717,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             {enrollment.status === 'INVITED' && (
               <div className="mt-4">
                 <div className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
-                  {t('course-page:invitation-deadline')}
+                  {t('coursePage.invitation-deadline')}
                   <Tooltip title={t('application_deadline_tooltip')} placement="top">
                     <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled }} />
                   </Tooltip>
@@ -741,7 +742,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       <Modal
         isOpen={isAddParticipantsModalOpen}
         onClose={closeAddParticipantsModal}
-        title={t('manageCourse:add_participants')}
+        title={t('manageCourse.add_participants')}
       >
         <AddParticipantsForm courseId={course.id} onSubmit={closeAddParticipantsModal} />
       </Modal>
@@ -799,7 +800,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             <div className="-mt-8 mb-3">{infoDots}</div>
           </>
         ) : (
-          <p className="m-auto text-center mb-14 text-gray-400">{t('course-page:no-applications-present')}</p>
+          <p className="m-auto text-center mb-14 text-gray-400">{t('coursePage.no-applications-present')}</p>
         )}
       </div>
 
@@ -834,21 +835,21 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                 </p>
                 <div className="flex flex-col gap-4">
                   <label className="text-sm font-medium text-gray-700">
-                    {t('course-page:invitation-deadline')}
+                    {t('coursePage.invitation-deadline')}
                   </label>
                   <DatePicker
-                    dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
+                    dateFormat={locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
                     selected={inviteExpireDate}
                     onChange={handleSetInviteExpireDate}
                     minDate={new Date()}
-                    locale={lang}
+                    locale={locale}
                     className="w-full p-2 border border-gray-300 rounded"
                   />
                 </div>
               </div>
               <div className="flex justify-end gap-3">
                 <OldButton onClick={handleCloseInviteDialog} inverted>
-                  {t('common:cancel')}
+                  {t('common.cancel')}
                 </OldButton>
                 <OldButton onClick={handleSendInvitations} filled>
                   {t('bulk_actions.send_invitations_confirm')}
@@ -891,7 +892,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
               </div>
               <div className="flex justify-end gap-3">
                 <OldButton onClick={handleCloseRejectionDialog} inverted>
-                  {t('common:cancel')}
+                  {t('common.cancel')}
                 </OldButton>
                 <OldButton onClick={handleSendRejections} filled>
                   {t('bulk_actions.send_rejections_confirm')}
@@ -918,7 +919,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           </div>
           <div className="flex justify-end gap-3">
             <OldButton onClick={handleCloseNoSelectionDialog} filled>
-              {t('common:confirm')}
+              {t('common.confirm')}
             </OldButton>
           </div>
         </div>
