@@ -43,7 +43,7 @@ const AchievementsHelper: FC<{
   context: IPropsDashBoard;
   children: ReactNode;
 }> = ({ context, children }) => {
-  const t = useTranslations();
+  const t = useTranslations('common');
   const [updateAchievement] = useAdminMutation<UpdateAnAchievementOption, UpdateAnAchievementOptionVariables>(
     UPDATE_AN_ACHIEVEMENT_OPTION
   );

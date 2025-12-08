@@ -87,7 +87,10 @@
     "courses": "Kurse",
     "achievement-record-type": "Typ der Projektdokumentation",
     "authors": "Autoren",
+    "mentors": "Mentoren",
     "documentation": "Dokumentation",
+    "add-new": "Neu hinzufügen",
+    "form-mandatory-field": "Pflichtfeld",
     "cover-picture": "Deckblatt",
     "download": "Herunterladen",
     "upload": "Hochladen",
@@ -280,7 +283,7 @@
       "NONE": "OHNE",
       "0,5": "0,5",
       "2,5": "2,5",
-      "2.5": "2,5",
+      "2_5": "2,5",
       "12,5": "12,5"
     },
     "degree_elements": {
@@ -600,7 +603,7 @@
     "accepted_applications": "Bewerbungen (angenommen):",
     "total_invitations": "Einladungen (gesamt):",
     "confirmed_invitations": "Einladungen (bestätigt):",
-    "Uniqueness violation. duplicate key value violates unique constraint \"CourseAddress_pkey\"": "Eine Standortadresse mit dieser Konfiguration existiert bereits für diesen Kurs."
+    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "Eine Standortadresse mit dieser Konfiguration existiert bereits für diesen Kurs."
   },
   "courseAdminPage": {
     "pageTitle": "Opencampus Kurse Kursleiter Sicht",

@@ -59,7 +59,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
   className = '',
   templateType,
 }) => {
-  const t = useTranslations();
+  const t = useTranslations('common');
   const [isHtmlMode, setIsHtmlMode] = useState(false);
   const [showSavedNotification, setShowSavedNotification] = useState(false);
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);

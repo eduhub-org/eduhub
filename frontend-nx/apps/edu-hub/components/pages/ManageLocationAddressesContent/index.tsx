@@ -121,6 +121,7 @@ const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({ row, onErr
 
 const ManageLocationAddressesContent: FC = () => {
   const t = useTranslations('manageLocationAddresses');
+  const tCommon = useTranslations('common');
   const [error, setError] = useState<string | null>(null);
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
   const [selectedRowsForBulkAction, setSelectedRowsForBulkAction] = useState<LocationAddressListLocationAddress[]>([]);
@@ -194,9 +195,9 @@ const ManageLocationAddressesContent: FC = () => {
       data?.LocationOption?.filter((option: LocationOption) => option.value !== 'ONLINE')
         .map((option: LocationOption) => ({
           value: option.value,
-          label: t(`common:location.${option.value}`),
+          label: tCommon(`location.${option.value}`),
         })) || [],
-    [data, t]
+    [data, tCommon]
   );
 
   const columns = useMemo<ColumnDef<LocationAddressListLocationAddress>[]>(

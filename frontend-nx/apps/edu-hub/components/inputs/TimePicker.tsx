@@ -34,7 +34,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
   className = '',
   saveAsDateTime = false,
 }) => {
-  const t = useTranslations();
+  const t = useTranslations('common');
   const formatTimeString = useFormatTimeString();
   const formatTime = useFormatTime();
 

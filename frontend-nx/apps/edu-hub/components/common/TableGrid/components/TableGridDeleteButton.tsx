@@ -30,7 +30,7 @@ const TableGridDeleteButton = ({
 
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const t = useTranslations();
+  const t = useTranslations('common');
 
   // If no question is provided, use the default one
   const confirmationQuestion =

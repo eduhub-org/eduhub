@@ -25,6 +25,7 @@ import { AppSettings } from '../queries/__generated__/AppSettings';
 
 const Home: FC = () => {
   const t = useTranslations('startPage');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
   const isLoggedIn = useIsLoggedIn();
   const isInstructor = useIsInstructor();
@@ -89,7 +90,7 @@ const Home: FC = () => {
           group.courses.length > 0 && (
             <Fragment key={`${groupKey}-${index}`}>
               <h2 id={`sliderGroup${index + 1}`} className="text-2xl font-semibold text-left ml-3 md:ml-0">
-                {group.title ? t(`common:course_group_options.${group.title}`) : '—'}
+                {group.title ? tCommon(`course_group_options.${group.title}`) : '—'}
               </h2>
               <div className="mt-2 mb-12">
                 <TileSlider courses={group.courses} isManage={group.isManaged ?? false} />

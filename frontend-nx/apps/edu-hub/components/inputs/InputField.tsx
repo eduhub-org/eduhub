@@ -197,9 +197,10 @@ const InputField: React.FC<InputFieldProps> = ({
   invertColors = false,
   min,
   max,
+  immediateUpdate, // Extract this prop to prevent it from being spread to DOM elements
   ...props
 }) => {
-  const t = useTranslations();
+  const t = useTranslations('common');
   const [localText, setLocalText] = useState(value);
   const [hasBlurred, setHasBlurred] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');

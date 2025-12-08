@@ -14,7 +14,7 @@ interface IProps {
 }
 
 export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
-  const t = useTranslations(); // used to get weekday and language
+  const t = useTranslations('common'); // used to get weekday and language
   const tCourse = useTranslations('course');
 
   const getStartTimeString = useStartTimeString();
@@ -25,6 +25,9 @@ export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
 
   // Get ECTS translations object to handle keys with dots/commas
   const ectsTranslations = tCourse.raw('ects') as Record<string, string>;
+  
+  // Normalize ECTS key (replace dots with underscores) for translation lookup
+  const normalizedEctsKey = course.ects?.replace(/\./g, '_') || course.ects;
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center mx-6 lg:mx-0 mb-9 rounded-2xl lg:max-w-md bg-gray-100 p-12 sm:p-24">
@@ -41,7 +44,7 @@ export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
             </>
           )}
         </span>
-        <span className="text-sm mt-2 text-center">{ectsTranslations[course.ects] || course.ects}</span>
+        <span className="text-sm mt-2 text-center">{ectsTranslations[normalizedEctsKey] || course.ects}</span>
         <div className="flex justify-center w-8 h-[43px]">
           <Image src={pinIcon} alt="Location" width={32} height={43} unoptimized className="w-full h-full object-contain" />
         </div>

@@ -19,7 +19,7 @@ const CheckboxSelector: React.FC<CheckboxSelectorProps> = ({
   identifierVariables,
   disabled = false,
 }) => {
-  const t = useTranslations();
+  const t = useTranslations('common');
 
   const handleMutationValueUpdate = (newValue: boolean) => {
     onValueUpdated?.(newValue);

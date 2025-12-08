@@ -87,7 +87,10 @@
     "courses": "Courses",
     "achievement-record-type": "Achievement record type",
     "authors": "Authors",
+    "mentors": "Mentors",
     "documentation": "Documentation",
+    "add-new": "Add new",
+    "form-mandatory-field": "Mandatory field",
     "cover-picture": "Cover image",
     "upload": "Upload",
     "download": "Download",
@@ -280,7 +283,7 @@
       "NONE": "NONE",
       "0,5": "0.5",
       "2,5": "2.5",
-      "2.5": "2.5",
+      "2_5": "2.5",
       "12,5": "12.5"
     },
     "degree_elements": {
@@ -615,7 +618,7 @@
     "confirmed": "Confirmed",
     "unrated_rated_not_informed": "Unrated / Rated but not informed",
     "bulk_action_copy": "Copy to Program",
-    "Uniqueness violation. duplicate key value violates unique constraint \"CourseAddress_pkey\"": "A location address with this configuration already exists for this course."
+    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "A location address with this configuration already exists for this course."
   },
   "courseAdminPage": {
     "pageTitle": "Opencampus Course Instructor View",

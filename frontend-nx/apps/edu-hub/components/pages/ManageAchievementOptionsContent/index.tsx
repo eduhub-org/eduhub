@@ -102,20 +102,21 @@ const DashboardContent: FC<IPropsContent> = ({ options }) => {
     setShowNewAchievementView(!showNewAchievementView);
   }, [setShowNewAchievementView, showNewAchievementView]);
   const t = useTranslations('coursePage');
+  const tCommon = useTranslations('common');
   return (
     <div className="w-full">
       <div className="flex justify-between mb-5" />
       <div className="flex flex-col space-y-1">
         <div className="flex justify-start mt-8  text-white">
           <Button onClick={addNewAchievement} startIcon={<MdAddCircle />} color="inherit">
-            {t('common.project-new-button')}
+            {tCommon('project-new-button')}
           </Button>
         </div>
 
         <div className="grid grid-cols-3 gap-5 pl-5">
-          <p>{t('tableHeaderTitle')}</p>
-          <p>{t('tableHeaderInstructor')}</p>
-          <p>{t('coursesHeadline') + ' & ' + t('tableHeaderProgram')}</p>
+          <p>{t('table-header-title')}</p>
+          <p>{t('table-header-instructor')}</p>
+          <p>{t('coursesHeadline') + ' & ' + t('table-header-program')}</p>
         </div>
         {(options.length === 0 || showNewAchievementView) && (
           <div className="flex bg-edu-light-gray">{<AddAchievementOption onSuccess={onSuccessAddEdit} />}</div>

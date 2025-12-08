@@ -31,7 +31,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
   const isAdmin = useIsAdmin();
 
-  const t = useTranslations();
+  const t = useTranslations('common');
 
   const logout = useLogout();
 

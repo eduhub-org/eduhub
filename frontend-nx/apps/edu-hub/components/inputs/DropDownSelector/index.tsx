@@ -28,7 +28,7 @@ const DropDownSelector: React.FC<DropDownSelectorProps> = ({
   nullable = false,
   nullableLabel,
 }) => {
-  const t = useTranslations();
+  const t = useTranslations('common');
   const [inputValue, setInputValue] = useState('');
 
   const handleMutationValueUpdate = (newValue: string) => {

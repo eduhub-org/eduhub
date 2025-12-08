@@ -23,7 +23,7 @@ interface ErrorProps {
 
 export const ErrorMessageDialog: FC<ErrorProps> = ({ errorMessage, open, onClose }) => {
   const handleClose = useCallback(() => onClose(), [onClose]);
-  const t = useTranslations();
+  const t = useTranslations('common');
 
   return (
     <Dialog

@@ -235,14 +235,15 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   );
 
   const t = useTranslations('managePrograms');
+  const tCoursePage = useTranslations('coursePage');
   const locale = useLocale();
 
   const achievementCertificateTemplateName = program.achievementCertificateTemplateURL
     ? path.basename(program.achievementCertificateTemplateURL)
-    : t('coursePage.no-template-uploaded-yet');
+    : tCoursePage('no-template-uploaded-yet');
   const attendanceCertificateTemplateName = program.attendanceCertificateTemplateURL
     ? path.basename(program.attendanceCertificateTemplateURL)
-    : t('coursePage.no-template-uploaded-yet');
+    : tCoursePage('no-template-uploaded-yet');
 
   return (
     <div>
@@ -342,8 +343,8 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
               id={program.id}
               refetchQueries={['ProgramList']}
               idType="number"
-              deletionConfirmationQuestion={t('managePrograms.delete_button.delete_program_confirmation', {
-                title: program.title || t('managePrograms.delete_button.untitled_program'),
+              deletionConfirmationQuestion={t('delete_button.delete_program_confirmation', {
+                title: program.title || t('delete_button.untitled_program'),
               })}
             />
           </div>

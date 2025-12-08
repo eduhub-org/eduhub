@@ -27,7 +27,7 @@ export const BaseDialog: React.FC<BaseDialogProps> = ({
   cancelText,
   showCancel = true,
 }) => {
-  const t = useTranslations();
+  const t = useTranslations('common');
 
   return (
     <Dialog

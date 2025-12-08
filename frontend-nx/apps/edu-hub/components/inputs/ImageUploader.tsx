@@ -47,7 +47,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   className = '',
   user,
 }) => {
-  const t = useTranslations();
+  const t = useTranslations('common');
   const [showSavedNotification, setShowSavedNotification] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);

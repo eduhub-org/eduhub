@@ -114,7 +114,7 @@ const ManageUsersContent: FC = () => {
             <div className="flex justify-between items-center mb-4">
               <CommonPageHeader headline={t('headline')} />
               <NavigationButton href="/manage/admin-users" filled inverted>
-                {t('manageUsers.manage_admins')}
+                {t('manage_admins')}
               </NavigationButton>
             </div>
             <TableGrid

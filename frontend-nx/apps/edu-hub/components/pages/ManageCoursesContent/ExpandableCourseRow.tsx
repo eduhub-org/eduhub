@@ -55,6 +55,7 @@ import {
 import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
+import { normalizeErrorKey } from '../../../helpers/errorHandling';
 import { useAdminQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import {
   GET_COURSE_TEMPLATES_COUNT,
@@ -459,7 +460,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
 
   const [saveCourseImage] = useAdminMutation<SaveCourseImage, SaveCourseImageVariables>(SAVE_COURSE_IMAGE, {
-    onError: (error) => handleError(t(error.message)),
+    onError: (error) => handleError(t(normalizeErrorKey(error.message))),
     refetchQueries: ['AdminCourseList'],
   });
 

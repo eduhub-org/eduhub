@@ -66,6 +66,8 @@ interface IProps {
 
 const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   const t = useTranslations('manageCourses');
+  const tCommon = useTranslations('common');
+  const tCoursePage = useTranslations('coursePage');
   const locale = useLocale();
 
   // Calculate default program
@@ -324,13 +326,13 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
           ?.filter((option) => option.sliderGroup)
           .map((option) => ({
             id: option.id,
-            name: option.title ? t(`common:course_group_options.${option.title}`) : '—',
+            name: option.title ? tCommon(`course_group_options.${option.title}`) : '—',
           })) || []
       );
     } else {
       return [];
     }
-  }, [t, data, loading, error]);
+  }, [tCommon, data, loading, error]);
 
   const degreeCoursesQuery = useRoleQuery<DegreeCourses>(DEGREE_COURSES);
   const degreeCourses = useMemo(() => {
@@ -696,7 +698,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
 
   return (
     <>
-      <CommonPageHeader headline={t('coursePage.coursesHeadline')} />
+      <CommonPageHeader headline={tCoursePage('coursesHeadline')} />
       <div className="flex justify-start mb-5 text-white">
         <ProgramsMenubar
           programs={menubarPrograms}

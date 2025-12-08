@@ -37,6 +37,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
   initialEmail = '',
 }) => {
   const t = useTranslations('manageUsers');
+  const tCommon = useTranslations('common');
   const [firstName, setFirstName] = useState(initialFirstName);
   const [lastName, setLastName] = useState(initialLastName);
   const [email, setEmail] = useState(initialEmail);
@@ -176,7 +177,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
             <button
               onClick={handleClose}
               className="p-1 rounded-full hover:bg-gray-200 transition-colors"
-              aria-label={t('common.close')}
+              aria-label={tCommon('close')}
               disabled={loading}
             >
               <MdClose className="text-xl" />
