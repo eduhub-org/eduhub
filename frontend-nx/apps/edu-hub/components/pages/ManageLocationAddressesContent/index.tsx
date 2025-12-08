@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState, useCallback } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 import { ApolloError } from '@apollo/client';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
@@ -51,7 +51,7 @@ type ExpandableRowProps = {
 };
 
 const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({ row, onError }): React.ReactElement => {
-  const { t } = useTranslation('manageLocationAddresses');
+  const t = useTranslations('manageLocationAddresses');
 
   // Handle location address alias errors specifically
   const handleAliasError = useCallback(
@@ -120,7 +120,7 @@ const ExpandableLocationAddressRow: React.FC<ExpandableRowProps> = ({ row, onErr
 };
 
 const ManageLocationAddressesContent: FC = () => {
-  const { t } = useTranslation('manageLocationAddresses');
+  const t = useTranslations('manageLocationAddresses');
   const [error, setError] = useState<string | null>(null);
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
   const [selectedRowsForBulkAction, setSelectedRowsForBulkAction] = useState<LocationAddressListLocationAddress[]>([]);

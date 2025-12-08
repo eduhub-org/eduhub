@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState, useCallback } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { Checkbox, FormControlLabel } from '@mui/material';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { MULTI_PROGRAM_ENROLLMENTS } from '../../../../queries/multiProgramEnrollments';
@@ -11,7 +11,7 @@ import { ProgramStatistics } from '../../../../queries/__generated__/ProgramStat
 import Loading from '../../../common/Loading';
 
 export const ApplicationStatistics: FC = () => {
-  const { t } = useTranslation('statistics');
+  const t = useTranslations('statistics');
   const [selectedPrograms, setSelectedPrograms] = useState<{ id: number; name: string }[]>([]);
   const [useActualDates, setUseActualDates] = useState(false);
 

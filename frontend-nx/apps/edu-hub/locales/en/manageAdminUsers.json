@@ -1,8 +1,0 @@
-{
-  "headline": "Admin Users",
-  "first_name": "First Name",
-  "last_name": "Last Name",
-  "email": "Email",
-  "organization": "Organization",
-  "deletion_confirmation_question": "Are you sure you want to delete the admin rights of {{firstName}} {{lastName}} for the organization {{organization}}?"
-}

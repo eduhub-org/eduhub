@@ -1,7 +1,7 @@
 import { FC, useMemo } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 import { Button } from '../../common/Button';
@@ -39,7 +39,7 @@ type Inputs = {
 
 const ManageAppSettingsContent: FC = () => {
   const { data: sessionData } = useSession();
-  const { t } = useTranslation('manageAppSettings');
+  const t = useTranslations('manageAppSettings');
 
   const timeZoneOptions = [
     { value: 'Europe/Berlin', label: t('time_zone.values.Europe/Berlin') },

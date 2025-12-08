@@ -1,5 +1,5 @@
 import { FC, ReactNode, useMemo, useCallback, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
@@ -16,7 +16,7 @@ import NavigationButton from '../../common/NavigationButton';
 import { CreateUserDialog } from '../../common/dialogs/CreateUserDialog';
 
 const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
-  const { t } = useTranslation('manageUsers');
+  const t = useTranslations('manageUsers');
   return (
     <div>
       <div className="font-medium bg-edu-course-list grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))]">
@@ -50,7 +50,7 @@ const ExpandableUserRow: FC<{ row: UsersByLastName_User }> = ({ row }) => {
 };
 
 const ManageUsersContent: FC = () => {
-  const { t } = useTranslation('manageUsers');
+  const t = useTranslations('manageUsers');
   const [pageSize, setPageSize] = useState(20);
   const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
 
@@ -114,7 +114,7 @@ const ManageUsersContent: FC = () => {
             <div className="flex justify-between items-center mb-4">
               <CommonPageHeader headline={t('headline')} />
               <NavigationButton href="/manage/admin-users" filled inverted>
-                {t('manageUsers:manage_admins')}
+                {t('manageUsers.manage_admins')}
               </NavigationButton>
             </div>
             <TableGrid

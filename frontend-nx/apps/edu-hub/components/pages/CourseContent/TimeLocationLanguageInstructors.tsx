@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { FC } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 
 import { useStartTimeString, useEndTimeString, getWeekdayString } from '../../../helpers/dateTimeHelpers';
 import languageIcon from '../../../public/images/course/language.svg';
@@ -14,8 +14,8 @@ interface IProps {
 }
 
 export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
-  const { t } = useTranslation(); // used to get weekday and language
-  const { t: tCourse } = useTranslation('course');
+  const t = useTranslations(); // used to get weekday and language
+  const tCourse = useTranslations('course');
 
   const getStartTimeString = useStartTimeString();
   const getEndTimeString = useEndTimeString();
@@ -24,7 +24,7 @@ export const TimeLocationLanguageInstructors: FC<IProps> = ({ course }) => {
   const endTime = getEndTimeString(course.endTime);
 
   // Get ECTS translations object to handle keys with dots/commas
-  const ectsTranslations = tCourse('ects', {}, { returnObjects: true }) as Record<string, string>;
+  const ectsTranslations = tCourse.raw('ects') as Record<string, string>;
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center mx-6 lg:mx-0 mb-9 rounded-2xl lg:max-w-md bg-gray-100 p-12 sm:p-24">

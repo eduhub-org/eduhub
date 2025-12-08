@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { FC, Fragment, useMemo } from 'react';
 
 import { useQuery } from '@apollo/client';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ClientOnly } from '@opencampus/shared-components';
 
 import { Page } from '../components/layout/Page';
@@ -24,7 +24,8 @@ import { CoursesEnrolledByUser } from '../queries/__generated__/CoursesEnrolledB
 import { AppSettings } from '../queries/__generated__/AppSettings';
 
 const Home: FC = () => {
-  const { t, lang } = useTranslation('start-page');
+  const t = useTranslations('startPage');
+  const locale = useLocale();
   const isLoggedIn = useIsLoggedIn();
   const isInstructor = useIsInstructor();
   const isAdmin = useIsAdmin();
@@ -123,7 +124,7 @@ const Home: FC = () => {
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content="EduHub Learning Platform - Tech, Business and Creative Courses" />
-        <meta property="og:locale" content={lang === 'de' ? 'de_DE' : 'en_US'} />
+        <meta property="og:locale" content={locale === 'de' ? 'de_DE' : 'en_US'} />
         
         {/* Twitter Card Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />

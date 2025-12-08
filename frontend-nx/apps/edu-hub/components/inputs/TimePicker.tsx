@@ -2,7 +2,7 @@ import React, { useState, useCallback, ChangeEvent, useEffect } from 'react';
 import { DocumentNode } from 'graphql';
 import { useDebouncedCallback } from 'use-debounce';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { prioritizeClasses } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
@@ -34,7 +34,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
   className = '',
   saveAsDateTime = false,
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const formatTimeString = useFormatTimeString();
   const formatTime = useFormatTime();
 

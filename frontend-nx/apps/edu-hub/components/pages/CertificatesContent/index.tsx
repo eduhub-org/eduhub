@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect, ErrorInfo, ReactNode } from 'react';
 import { useSession } from 'next-auth/react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 import Link from 'next/link';
 import { useRoleQuery } from '../../../hooks/authedQuery';
@@ -35,7 +35,7 @@ class ErrorBoundary extends React.Component<{ children: ReactNode }, { hasError:
 }
 
 const CertificatesContent: FC = () => {
-  const { t } = useTranslation('certificates');
+  const t = useTranslations('certificates');
   const { data: sessionData, status: sessionStatus } = useSession();
   const [showError, setShowError] = useState(false);
 
@@ -65,7 +65,7 @@ const CertificatesContent: FC = () => {
   }
 
   if (!sessionData?.profile?.sub) {
-    return <div>{t('not_authenticated', {}, { fallback: 'Not authenticated' })}</div>;
+    return <div>{t('not_authenticated')}</div>;
   }
 
   const enrollments = certificatesData?.CourseEnrollment || [];

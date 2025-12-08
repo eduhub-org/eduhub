@@ -1,12 +1,12 @@
 import Head from 'next/head';
 import { FC } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { Page } from '../../components/layout/Page';
 import { useIsLoggedIn } from '../../hooks/authentication';
 import CertificatesContent from '../../components/pages/CertificatesContent';
 
 const MyCertificates: FC = () => {
-  const { t } = useTranslation('certificates');
+  const t = useTranslations('certificates');
   const isLoggedIn = useIsLoggedIn();
 
   return (

@@ -2,7 +2,6 @@ import { createContext, FC, ReactNode, useCallback } from 'react';
 import { IUserProfile } from '../../../hooks/user';
 import { IPayload } from '../../../helpers/achievement';
 import { UploadFile } from '../../../helpers/filehandling';
-import { Translate } from 'next-translate';
 import { DELETE_AN_ACHIEVEMENT_OPTION, UPDATE_AN_ACHIEVEMENT_OPTION } from '../../../queries/mutateAchievement';
 import { AdminCourseList_Course } from '../../../queries/__generated__/AdminCourseList';
 import {
@@ -14,7 +13,7 @@ import {
   UpdateAnAchievementOptionVariables,
 } from '../../../queries/__generated__/UpdateAnAchievementOption';
 import { useAdminMutation } from '../../../hooks/authedMutation';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 
 export interface IPropsDashBoard {
   course?: AdminCourseList_Course;
@@ -34,7 +33,7 @@ export interface IContext extends IPropsDashBoard {
     onSuccess?: (success: boolean) => void
   ) => Promise<boolean>;
   uploadFile: (file: UploadFile, achievementOptionId: number, type: string) => Promise<string | undefined>;
-  t: Translate;
+  t: (key: string, values?: Record<string, unknown>) => string;
 
   onClickDeleteAnAchievement: (id: number) => Promise<boolean>;
 }
@@ -44,7 +43,7 @@ const AchievementsHelper: FC<{
   context: IPropsDashBoard;
   children: ReactNode;
 }> = ({ context, children }) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [updateAchievement] = useAdminMutation<UpdateAnAchievementOption, UpdateAnAchievementOptionVariables>(
     UPDATE_AN_ACHIEVEMENT_OPTION
   );

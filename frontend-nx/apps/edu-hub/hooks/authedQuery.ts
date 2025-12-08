@@ -1,6 +1,6 @@
 import { useQuery, useLazyQuery } from '@apollo/client';
 import { useSession } from 'next-auth/react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 
 import { useCurrentRole } from './authentication';
 import { useAuthError } from '../contexts/AuthErrorContext';
@@ -8,7 +8,7 @@ import { useAuthError } from '../contexts/AuthErrorContext';
 import { AuthRoles } from '../types/enums';
 
 const useErrorHandler = () => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { showAuthError } = useAuthError();
 
   return (error) => {

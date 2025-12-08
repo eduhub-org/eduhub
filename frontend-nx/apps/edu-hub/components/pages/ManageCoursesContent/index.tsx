@@ -33,7 +33,7 @@ import { GET_COURSE_TEMPLATES_COUNT } from '../../../queries/emailTemplates';
 import ExpandableCourseRow from './ExpandableCourseRow';
 import { useParallelQueries } from '../../../hooks/useParallelQueries';
 import { CourseEnrollmentStatus_enum, order_by } from '../../../__generated__/globalTypes';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import draftPie from '../../../public/images/course/status/draft.svg';
 import readyForPublicationPie from '../../../public/images/course/status/ready-for-publication.svg';
 import readyForApplicationPie from '../../../public/images/course/status/ready-for-application.svg';
@@ -65,7 +65,8 @@ interface IProps {
 }
 
 const ManageCoursesContent: FC<IProps> = ({ programs }) => {
-  const { t, lang } = useTranslation('manageCourses');
+  const t = useTranslations('manageCourses');
+  const locale = useLocale();
 
   // Calculate default program
   const sortedPrograms = useMemo(() => {
@@ -641,10 +642,10 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
               {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
               <DatePicker
                 className="w-full text-center bg-transparent text-sm p-1 rounded"
-                dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
+                dateFormat={locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
                 selected={endDate}
                 onChange={handleApplicationEndChange(row.original)}
-                locale={lang}
+                locale={locale}
                 placeholderText="-"
               />
             </div>
@@ -674,7 +675,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         },
       },
     ],
-    [t, handleApplicationEndChange, lang, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed, courseTemplateCounts]
+    [t, handleApplicationEndChange, locale, getApplicationsCount, getConfirmedCount, getUnratedAndRatedButNotInformed, courseTemplateCounts]
   );
 
   const handlePageSizeChange = useCallback(
@@ -695,7 +696,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
 
   return (
     <>
-      <CommonPageHeader headline={t('course-page:coursesHeadline')} />
+      <CommonPageHeader headline={t('coursePage.coursesHeadline')} />
       <div className="flex justify-start mb-5 text-white">
         <ProgramsMenubar
           programs={menubarPrograms}

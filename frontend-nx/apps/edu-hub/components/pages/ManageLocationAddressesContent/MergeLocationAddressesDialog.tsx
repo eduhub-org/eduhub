@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import { BaseDialog } from '../../common/dialogs/BaseDialog';
 import { useAdminQuery } from '../../../hooks/authedQuery';
@@ -19,7 +19,7 @@ export const MergeLocationAddressesDialog: React.FC<MergeLocationAddressesDialog
   onConfirm,
   selectedAddresses = [],
 }) => {
-  const { t } = useTranslation('manageLocationAddresses');
+  const t = useTranslations('manageLocationAddresses');
   const [selectedTargetAddress, setSelectedTargetAddress] = useState<string>('');
 
   const { data } = useAdminQuery(LOCATION_ADDRESS_LIST, {

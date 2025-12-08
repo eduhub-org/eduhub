@@ -12,7 +12,7 @@ import { Menu } from './Menu';
 import { RegisterButton } from './RegisterButton';
 import { ClientOnly } from '@opencampus/shared-components';
 import { OnlyDesktop } from '@opencampus/shared-components';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import UserCard from '../common/UserCard';
 
 export const Header: FC = () => {
@@ -27,8 +27,8 @@ export const Header: FC = () => {
     setMenuVisible(true);
   }, []);
 
-  const { lang } = useTranslation();
-  const isEnglish = lang === 'en';
+  const locale = useLocale();
+  const isEnglish = locale === 'en';
 
   const changeLanguage = (lng: string) => {
     const currentUrl = window.location.href;

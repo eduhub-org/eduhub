@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -10,7 +10,7 @@ interface IProps {
 }
 
 export const DescriptionFields: FC<IProps> = ({ course }) => {
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
 
   const isAchievementCertificatePossible = course.achievementCertificatePossible;
 

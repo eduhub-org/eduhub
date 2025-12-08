@@ -3,8 +3,6 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { withNx } = require('@nx/next/plugins/with-nx');
 
-const nextTranslate = require('next-translate-plugin');
-
 const path = require('path');
 
 /**
@@ -89,6 +87,10 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: true,
   },
+  i18n: {
+    locales: ['en', 'de'],
+    defaultLocale: 'de',
+  },
   output: 'standalone',
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -128,4 +130,4 @@ const nextConfig = {
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-module.exports = withNx(nextTranslate(nextConfig));
+module.exports = withNx(nextConfig);

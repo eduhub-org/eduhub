@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import checkmark from '../../../public/images/course/checkmark.svg';
 
 interface LearningGoalsProps {
@@ -7,7 +7,7 @@ interface LearningGoalsProps {
 }
 
 export const LearningGoals: FC<LearningGoalsProps> = ({ learningGoals }) => {
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
 
   return (
     <>

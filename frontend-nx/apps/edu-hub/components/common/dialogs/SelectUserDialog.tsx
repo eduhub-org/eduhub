@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ChangeEvent, FC, useCallback, useState, useMemo } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useRoleQuery } from '../../../hooks/authedQuery';
@@ -27,7 +27,7 @@ interface IProps {
 // then select the user from a select
 export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUser, showAddNewUserOption = false }) => {
   const [searchValue, setSearchValue] = useState('');
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const handleNewInput = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -93,11 +93,11 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
       </DialogTitle>
 
       <DialogContent>
-        <div className="mb-4">{t('common:select_user_dialog.type_name_or_email_minimum_2_letters')}</div>
+        <div className="mb-4">{t('common.select_user_dialog.type_name_or_email_minimum_2_letters')}</div>
 
         <div className="mb-4">
           <input
-            placeholder={t('common:search')}
+            placeholder={t('common.search')}
             className="w-full border border-solid border-gray-300 rounded px-3 py-2"
             type="text"
             value={searchValue}
@@ -115,30 +115,30 @@ export const SelectUserDialog: FC<IProps> = ({ onClose, open, title, onAddNewUse
           )}
           {showNoResults && shouldShowAddNewUser && (
             <div className="p-4">
-              <div className="text-gray-500 mb-2 text-center">{t('common:select_user_dialog.no_users_found')}</div>
+              <div className="text-gray-500 mb-2 text-center">{t('common.select_user_dialog.no_users_found')}</div>
               <button
                 type="button"
                 onClick={handleAddNewUser}
                 className="w-full cursor-pointer bg-blue-50 hover:bg-blue-100 p-3 rounded text-blue-600 font-medium text-center"
               >
-                {t('common:select_user_dialog.add_new_user')}
+                {t('common.select_user_dialog.add_new_user')}
               </button>
             </div>
           )}
           {showNoResults && !shouldShowAddNewUser && (
-            <div className="p-4 text-center text-gray-500">{t('common:select_user_dialog.no_users_found')}</div>
+            <div className="p-4 text-center text-gray-500">{t('common.select_user_dialog.no_users_found')}</div>
           )}
           {loading && hasSearched && (
-            <div className="p-4 text-center text-gray-500">{t('common:loading')}</div>
+            <div className="p-4 text-center text-gray-500">{t('common.loading')}</div>
           )}
           {searchValue.trim().length < 2 && (
-            <div className="p-4 text-center text-gray-500">{t('common:select_user_dialog.type_name_or_email_minimum_2_letters')}</div>
+            <div className="p-4 text-center text-gray-500">{t('common.select_user_dialog.type_name_or_email_minimum_2_letters')}</div>
           )}
         </div>
 
         <div className="grid grid-cols-2 mt-4">
           <div>
-            <Button onClick={handleCancel}>{t('common:cancel')}</Button>
+            <Button onClick={handleCancel}>{t('common.cancel')}</Button>
           </div>
           <div />
         </div>

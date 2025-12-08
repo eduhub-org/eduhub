@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tooltip } from '@mui/material';
 import { HelpOutline } from '@mui/icons-material';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { Option } from '../types';
 import { CreatableDropDown } from './CreatableDropDown';
 import { SelectChangeEvent } from '@mui/material';
@@ -39,7 +39,7 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
   onCreateOption,
   getLabelForValue,
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const baseClass = 'w-full pl-3 pr-10 py-3 text-gray-500 rounded bg-edu-light-gray';
   const finalClassName = `${baseClass} ${className}`;
 
