@@ -1,5 +1,5 @@
 import { FC, useMemo, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 
 import { Course_Course_by_pk_Sessions as Session, Course_Course_by_pk_CourseLocations as CourseLocation } from '../../../queries/__generated__/Course';
@@ -17,7 +17,7 @@ interface SessionsProps {
 }
 
 export const Sessions: FC<SessionsProps> = ({ sessions, courseLocations, isLoggedInParticipant }) => {
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
   const [showAllSessions, setShowAllSessions] = useState(false);
   const displayDate = useDisplayDate();
   const formatTimeString = useFormatTimeString();

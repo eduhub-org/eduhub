@@ -1,7 +1,7 @@
 import Document, { DocumentContext, DocumentInitialProps, Head, Html, Main, NextScript } from 'next/document';
 import Script from 'next/script';
-import { DocumentHeadTags, documentGetInitialProps } from '@mui/material-nextjs/v14-pagesRouter';
-import type { DocumentHeadTagsProps } from '@mui/material-nextjs/v14-pagesRouter';
+import { DocumentHeadTags, documentGetInitialProps } from '@mui/material-nextjs/v15-pagesRouter';
+import type { DocumentHeadTagsProps } from '@mui/material-nextjs/v15-pagesRouter';
 
 // Extend the props for MyDocument to include DocumentHeadTagsProps
 type MyDocumentProps = DocumentInitialProps & DocumentHeadTagsProps;

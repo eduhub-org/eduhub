@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BaseDialog } from './BaseDialog';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface LinkedInSharingDialogProps {
   open: boolean;
@@ -19,8 +19,8 @@ export const LinkedInSharingDialog: React.FC<LinkedInSharingDialogProps> = ({
   hasAchievement,
   hasAttendance,
 }) => {
-  const { t: tCertificates } = useTranslation('certificates');
-  const { t: tCommon } = useTranslation('common');
+  const tCertificates = useTranslations('certificates');
+  const tCommon = useTranslations('common');
   
   // Single selection - default to achievement if available, otherwise attendance
   const [selectedType, setSelectedType] = useState<'achievement' | 'attendance' | null>(null);

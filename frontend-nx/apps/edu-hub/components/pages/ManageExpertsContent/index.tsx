@@ -1,5 +1,5 @@
 import { FC, useMemo, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 
 import TableGrid from '../../common/TableGrid';
@@ -21,7 +21,7 @@ interface ExpertRole {
 }
 
 const ExpandableExpertRow: FC<{ row: ExpertsList_User }> = ({ row }) => {
-  const { t } = useTranslation('manageExperts');
+  const t = useTranslations('manageExperts');
 
   // Collect all roles for this user
   const roles: ExpertRole[] = useMemo(() => {
@@ -91,7 +91,7 @@ const ExpandableExpertRow: FC<{ row: ExpertsList_User }> = ({ row }) => {
 };
 
 const ManageExpertsContent: FC = () => {
-  const { t } = useTranslation('manageExperts');
+  const t = useTranslations('manageExperts');
   const [pageSize, setPageSize] = useState(20);
 
   const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter } = useTableGrid({

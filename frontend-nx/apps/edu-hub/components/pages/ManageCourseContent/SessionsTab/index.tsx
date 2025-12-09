@@ -28,7 +28,7 @@ import {
   DeleteSessionSpeaker,
   DeleteSessionSpeakerVariables,
 } from '../../../../queries/__generated__/DeleteSessionSpeaker';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { SessionAddress_insert_input } from '../../../../__generated__/globalTypes';
 
 interface IProps {
@@ -37,7 +37,7 @@ interface IProps {
 }
 
 export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const courseSessions = useMemo(() => {
     const result = [...course.Sessions];
@@ -138,7 +138,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     <div>
       <div className="flex justify-start mb-4 text-white">
         <Button onClick={insertSession} startIcon={<MdAddCircle />} color="inherit">
-          {t('course-page:add-session')}
+          {t('coursePage.add-session')}
         </Button>
       </div>
 
@@ -173,7 +173,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           startIcon={<MdAddCircle />}
           color="inherit"
         >
-          {t('course-page:add-session')}
+          {t('coursePage.add-session')}
         </Button>
       </div> */}
     </div>

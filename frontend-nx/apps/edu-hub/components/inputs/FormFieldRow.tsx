@@ -1,5 +1,5 @@
 import { useFormContext } from 'react-hook-form';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 
 import type { InputHTMLAttributes, SelectHTMLAttributes } from 'react';
 
@@ -31,7 +31,7 @@ const FormFieldRow = <FieldNames,>({
     register,
   } = useFormContext();
 
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   return (
     <div className={`relative ${formColor}`}>

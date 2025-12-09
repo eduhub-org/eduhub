@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { FC, useCallback } from 'react';
 import { useIsAdmin } from '../../hooks/authentication';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import useLogout from '../../hooks/logout';
 
 interface IProps {
@@ -31,7 +31,7 @@ export const Menu: FC<IProps> = ({ anchorElement, isVisible, setVisible }) => {
 
   const isAdmin = useIsAdmin();
 
-  const { t } = useTranslation();
+  const t = useTranslations('common');
 
   const logout = useLogout();
 

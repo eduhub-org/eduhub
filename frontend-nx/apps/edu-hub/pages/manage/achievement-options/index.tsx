@@ -1,4 +1,4 @@
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import Head from 'next/head';
 import { FC, useEffect, useState } from 'react';
 import ManageAchievementOptionsContent from '../../../components/pages/ManageAchievementOptionsContent';
@@ -17,7 +17,7 @@ const AchievementOptions: FC = () => {
   const isAdmin = useIsAdmin();
   const isLoggedIn = useIsLoggedIn();
   const isInstructor = useIsInstructor();
-  const { t } = useTranslation('achievements-page');
+  const t = useTranslations('achievementsPage');
   const userId = useUserId();
   const profile = useKeycloakUserProfile();
 

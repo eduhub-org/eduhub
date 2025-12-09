@@ -1,5 +1,5 @@
 import { Link, Tooltip } from '@mui/material';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback } from 'react';
 
 interface IPropsTagWithTwoText {
@@ -17,7 +17,7 @@ const TagWithTwoText: FC<IPropsTagWithTwoText> = (props) => {
     }
   }, [props]);
 
-  const { t } = useTranslation();
+  const t = useTranslations();
   return (
     <div className="flex justify-between rounded-full bg-edu-tag-color px-2 py-1">
       <div className="pr-1 w-full flex justify-between last:mb-0">

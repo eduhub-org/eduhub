@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import { BaseDialog } from '../../common/dialogs/BaseDialog';
 import { useAdminQuery } from '../../../hooks/authedQuery';
@@ -19,7 +19,8 @@ export const MergeLocationAddressesDialog: React.FC<MergeLocationAddressesDialog
   onConfirm,
   selectedAddresses = [],
 }) => {
-  const { t } = useTranslation('manageLocationAddresses');
+  const t = useTranslations('manageLocationAddresses');
+  const tCommon = useTranslations('common');
   const [selectedTargetAddress, setSelectedTargetAddress] = useState<string>('');
 
   const { data } = useAdminQuery(LOCATION_ADDRESS_LIST, {
@@ -167,7 +168,7 @@ export const MergeLocationAddressesDialog: React.FC<MergeLocationAddressesDialog
                       <li key={addr.id} className="text-gray-700">
                         • {addr.shortLabel}{' '}
                         <span className="text-gray-500">
-                          ({t(`common:location.${locationOption}`)}) ({usageCount} {t('locationAddress.usageCount', { count: usageCount })})
+                          ({tCommon(`location.${locationOption}`)}) ({usageCount} {t('locationAddress.usageCount', { count: usageCount })})
                         </span>
                       </li>
                     );
@@ -200,16 +201,16 @@ export const MergeLocationAddressesDialog: React.FC<MergeLocationAddressesDialog
                   <span className="font-medium text-red-600">{t('bulk_action.merge.location_mismatch_warning')}:</span>{' '}
                   {mergePreview.addressesWithDifferentLocation.length === 1
                     ? t('bulk_action.merge.location_mismatch_description_one', {
-                        targetLocation: t(`common:location.${mergePreview.targetAddr.locationOption}`),
+                        targetLocation: tCommon(`location.${mergePreview.targetAddr.locationOption}`),
                       })
                     : t('bulk_action.merge.location_mismatch_description_other', {
-                        targetLocation: t(`common:location.${mergePreview.targetAddr.locationOption}`),
+                        targetLocation: tCommon(`location.${mergePreview.targetAddr.locationOption}`),
                         count: mergePreview.addressesWithDifferentLocation.length,
                       })}
                   <ul className="ml-4 mt-1">
                     {mergePreview.addressesWithDifferentLocation.map((addr) => (
                       <li key={addr.id} className="text-red-600">
-                        • {addr.shortLabel} ({t(`common:location.${addr.locationOption}`)})
+                        • {addr.shortLabel} ({tCommon(`location.${addr.locationOption}`)})
                       </li>
                     ))}
                   </ul>

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { QueryResult } from '@apollo/client';
 import { CircularProgress, IconButton } from '@mui/material';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, MutableRefObject, useCallback, useRef } from 'react';
 
 import DatePicker from 'react-datepicker';
@@ -234,14 +234,16 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
     [saveAchievementCertificateTemplate, qResult, updateAchievementCertificationTemplate, program]
   );
 
-  const { t, lang } = useTranslation('managePrograms');
+  const t = useTranslations('managePrograms');
+  const tCoursePage = useTranslations('coursePage');
+  const locale = useLocale();
 
   const achievementCertificateTemplateName = program.achievementCertificateTemplateURL
     ? path.basename(program.achievementCertificateTemplateURL)
-    : t('course-page:no-template-uploaded-yet');
+    : tCoursePage('no-template-uploaded-yet');
   const attendanceCertificateTemplateName = program.attendanceCertificateTemplateURL
     ? path.basename(program.attendanceCertificateTemplateURL)
-    : t('course-page:no-template-uploaded-yet');
+    : tCoursePage('no-template-uploaded-yet');
 
   return (
     <div>
@@ -277,54 +279,54 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
             className="w-full bg-gray-100"
-            dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
+            dateFormat={locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
             selected={program.applicationStart || new Date()}
             onChange={handleSetApplicationStart}
-            locale={lang}
+            locale={locale}
           />
         </div>
 
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
+            dateFormat={locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
             className="w-full bg-gray-100"
             selected={program.defaultApplicationEnd || new Date()}
             onChange={handleSetApplicationEnd}
-            locale={lang}
+            locale={locale}
           />
         </div>
 
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
+            dateFormat={locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
             className="w-full bg-gray-100"
             selected={program.lectureStart || new Date()}
             onChange={handleSetLectureStart}
-            locale={lang}
+            locale={locale}
           />
         </div>
 
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
+            dateFormat={locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
             className="w-full bg-gray-100"
             selected={program.lectureEnd || new Date()}
             onChange={handleSetLectureEnd}
-            locale={lang}
+            locale={locale}
           />
         </div>
 
         <div>
           {/* @ts-ignore: https://github.com/Hacker0x01/react-datepicker/issues/3784 */}
           <DatePicker
-            dateFormat={lang === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
+            dateFormat={locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}
             className="w-full bg-gray-100"
             selected={program.achievementRecordUploadDeadline || new Date()}
             onChange={handleSetUploadData}
-            locale={lang}
+            locale={locale}
           />
         </div>
 
@@ -341,8 +343,8 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
               id={program.id}
               refetchQueries={['ProgramList']}
               idType="number"
-              deletionConfirmationQuestion={t('managePrograms:delete_button.delete_program_confirmation', {
-                title: program.title || t('managePrograms:delete_button.untitled_program'),
+              deletionConfirmationQuestion={t('delete_button.delete_program_confirmation', {
+                title: program.title || t('delete_button.untitled_program'),
               })}
             />
           </div>
@@ -390,7 +392,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
             </div>
 
             <div className="p-3">
-              {`${t('course-page:template')} ${t('course-page:proof-of-participation')}`}
+              {`${t('coursePage.template')} ${t('coursePage.proof-of-participation')}`}
 
               <IconButton onClick={handleUploadAttendanceTemplateClick}>
                 <MdUpload size="0.75em" />
@@ -405,7 +407,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
               />
             </div>
             <div className="p-3">
-              {`${t('course-page:template')} ${t('course-page:performance-certificate')}`}
+              {`${t('coursePage.template')} ${t('coursePage.performance-certificate')}`}
               <IconButton onClick={handleUploadAchievementTemplateClick}>
                 <MdUpload size="0.75em" />
               </IconButton>
@@ -419,25 +421,25 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
               />
             </div>
             <div className="p-3">
-              {`${t('course-page:show-certificates')}:`}
+              {`${t('coursePage.show-certificates')}:`}
               <div className="grid grid-cols-10">
                 <div className="cursor-pointer" onClick={handleToggleVisibilityAttendanceCertificate}>
                   {program.visibilityAttendanceCertificate && <MdCheckBox size="1.5em" />}
                   {!program.visibilityAttendanceCertificate && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
                 </div>
-                <div className="col-span-9">{t('course-page:proof-of-participation')}</div>
+                <div className="col-span-9">{t('coursePage.proof-of-participation')}</div>
               </div>
               <div className="grid grid-cols-10">
                 <div className="cursor-pointer" onClick={handleToggleVisibilityAchievementCertificate}>
                   {program.visibilityAchievementCertificate && <MdCheckBox size="1.5em" />}
                   {!program.visibilityAchievementCertificate && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
                 </div>
-                <div className="col-span-9">{t('course-page:performance-certificate')}</div>
+                <div className="col-span-9">{t('coursePage.performance-certificate')}</div>
               </div>
             </div>
             <div className="p-3">
               <Button as="button" onClick={handleLoadParticipationDataClick} disabled={loadParticipationDataLoading}>
-                {loadParticipationDataLoading ? <CircularProgress /> : t('course-page:participationDataGenerate')}
+                {loadParticipationDataLoading ? <CircularProgress /> : t('coursePage.participationDataGenerate')}
               </Button>
             </div>
             <div className="p-3">
@@ -449,7 +451,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
                   rel="noopener noreferrer"
                   className="block"
                 >
-                  {t('course-page:participationDataDownload')}
+                  {t('coursePage.participationDataDownload')}
                 </Button>
               )}
             </div>

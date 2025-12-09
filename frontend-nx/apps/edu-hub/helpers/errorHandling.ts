@@ -116,3 +116,26 @@ export const handleForeignKeyError = (error: ApolloError, t: (key: string, optio
   // Return a generic error message for other error types
   return t('error_handling.generic_error');
 };
+
+/**
+ * Normalizes an error message key by replacing dots with underscores
+ * This is needed because next-intl doesn't allow dots in translation keys
+ */
+export const normalizeErrorKey = (errorMessage: string): string => {
+  return errorMessage.replace(/\./g, '_');
+};
+
+/**
+ * Translates an error message, normalizing the key first if needed
+ * This handles error messages that may contain dots which are not allowed in translation keys
+ */
+export const translateErrorMessage = (errorMessage: string, t: (key: string, options?: any) => string): string => {
+  const normalizedKey = normalizeErrorKey(errorMessage);
+  // Try the normalized key first, fall back to the original message if not found
+  const translated = t(normalizedKey);
+  // If translation returns the key itself (meaning it wasn't found), try the original message
+  if (translated === normalizedKey && normalizedKey !== errorMessage) {
+    return t(errorMessage) || errorMessage;
+  }
+  return translated;
+};

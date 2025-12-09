@@ -1,7 +1,7 @@
 import { FC, useState, useCallback } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { MdClose } from 'react-icons/md';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 
 import { CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
@@ -64,7 +64,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
   onSubmit,
   isLoading,
 }) => {
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
   const [motivationLetter, setMotivationLetter] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);

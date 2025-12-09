@@ -8,7 +8,7 @@ import { HelpOutline } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { useDebouncedCallback } from 'use-debounce';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { prioritizeClasses } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';
@@ -115,7 +115,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   invertColors = false,
   optionsTranslationPrefix = '',
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslations('common');
   const [tags, setTags] = useState(values);
   const [hasBlurred, setHasBlurred] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');

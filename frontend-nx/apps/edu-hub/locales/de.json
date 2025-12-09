@@ -1,0 +1,1361 @@
+{
+  "common": {
+    "confirmation": "Bestätigung",
+    "warning": "Warnung",
+    "delete": "Löschen",
+    "loginButton": "Anmelden",
+    "registerButton": "Registrieren",
+    "language": "Sprache",
+    "next": "Weiter",
+    "image_of": "Bild von",
+    "DE": "DEUTSCH",
+    "EN": "ENGLISCH",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "first-name": "Vorname",
+    "last-name": "Nachname",
+    "email": "E-Mail",
+    "university": "Hochschule",
+    "NONE": "unregelmäßig",
+    "MONDAY": "MONTAG",
+    "TUESDAY": "DIENSTAG",
+    "WEDNESDAY": "MITTWOCH",
+    "THURSDAY": "DONNERSTAG",
+    "FRIDAY": "FREITAG",
+    "SATURDAY": "SAMSTAG",
+    "SUNDAY": "SONNTAG",
+    "place": "Ort",
+    "addresses": "Adressen",
+    "date": "Datum",
+    "start-time": "Startzeit",
+    "end-time": "Endzeit",
+    "description": "Beschreibung",
+    "speakers": "Referenten",
+    "status": "Status",
+    "start": "Start",
+    "end": "Ende",
+    "menu": {
+      "profile": "Mein Profil",
+      "my_certificates": "Meine Zertifikate",
+      "faq": "FAQ",
+      "user": "Benutzer",
+      "experts": "Experten",
+      "courses": "Kurse",
+      "achievements": "Leistungsnachweise",
+      "achievement_templates": "Leistungsnachweisvorlagen",
+      "programs": "Programme",
+      "organizations": "Organisationen",
+      "location_addresses": "Veranstaltungsadressen",
+      "email_templates": "E-Mail-Vorlagen",
+      "app_settings": "App-Einstellungen",
+      "statistics": "Statistiken",
+      "logout": "Logout"
+    },
+    "change-password": "Passwort oder E-Mail ändern",
+    "add": "Hinzufügen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "saving": "Speichern...",
+    "confirm": "Bestätigen",
+    "search": "Suche",
+    "profile-picture": "Profilbild",
+    "title": "Titel",
+    "new-title": "Neuer Titel",
+    "form-select-placeholder": "Undefiniert",
+    "ACADEMIA": "Wissenschaftliche:r Mitarbeitende:r",
+    "EMPLOYED": "Angestellte:r",
+    "OTHER": "Andere",
+    "RETIREE": "Rentner:in",
+    "SELFEMPLOYED": "Selbständige:r",
+    "STUDENT": "Student:in",
+    "UNEMPLOYED": "Arbeitssuchend",
+    "PUPIL": "Schüler:in",
+    "CAU_KIEL": "CAU Kiel",
+    "TEACHER": "Lehrkraft",
+    "DHSH": "Duale Hochschule Schleswig-Holstein",
+    "FH_FLENSBURG": "FH Flensburg",
+    "FH_KIEL": "FH Kiel",
+    "FH_WESTKUESTE": "FH Westküste",
+    "MUTHESIUS": "Muthesius Kunsthochschule",
+    "TH_LUEBECK": "TH Lübeck",
+    "UNI_FLENSBURG": "Uni Flensburg",
+    "UNI_LUEBECK": "Uni Lübeck",
+    "project-title": "Projektname",
+    "project-mentors": "Projektmentoren",
+    "project-description": "Projektbeschreibung",
+    "project-new-button": "Neues Projekt",
+    "courses": "Kurse",
+    "achievement-record-type": "Typ der Projektdokumentation",
+    "authors": "Autoren",
+    "mentors": "Mentoren",
+    "documentation": "Dokumentation",
+    "add-new": "Neu hinzufügen",
+    "form-mandatory-field": "Pflichtfeld",
+    "cover-picture": "Deckblatt",
+    "download": "Herunterladen",
+    "upload": "Hochladen",
+    "degrees": "Degrees",
+    "submit": "Speichern",
+    "CONFIRMED": "bestätigt",
+    "INVITED": "eingeladen",
+    "APPLIED": "beworben",
+    "REJECTED": "abgelehnt",
+    "ABORTED": "abgebrochen",
+    "COMPLETED": "abgeschlossen",
+    "CANCELED": "abgesagt",
+    "password": "Password",
+    "employmentStatus": "Aktuelle Tätigkeit",
+    "nameOfUniversity": "Name der Universität",
+    "matriculationNumber": "Matrikelnummer",
+    "otherUniversityLabel": {
+      "university": "Name der Universität",
+      "organization": "Name der Organisation",
+      "other": "Andere Beschäftigung",
+      "teacher": "Name der Schule"
+    },
+    "achievement-documentation-template": "Leistungsnachweisvorlage",
+    "preview": "Vorschau",
+    "edit_markdown": "Bearbeiten",
+    "markdown_info": "Markdown-Formatierung wird unterstützt.",
+    "markdown_guide": "Markdown Guide",
+    "location": {
+      "ONLINE": "Online",
+      "KIEL": "Kiel",
+      "HEIDE": "Heide"
+    },
+    "type_name_or_email_minimum_3_letters": "Gib mindestens 3 Buchstaben ein.",
+    "select_user_dialog": {
+      "type_name_or_email_minimum_2_letters": "Gib einen Namen oder eine E-Mail ein (mindestens 2 Buchstaben).",
+      "no_users_found": "Keine Benutzer gefunden",
+      "add_new_user": "Neuen Benutzer hinzufügen"
+    },
+    "deletion_confirmation_question": "Bist du sicher, dass du diesen Eintrag löschen möchtest?",
+    "confirm_delete": "Löschen bestätigen",
+    "error": "Fehler",
+    "select_time": "Zeit auswählen",
+    "close": "Schließen",
+    "ok": "OK",
+    "loading": "Lädt...",
+    "user_card": {
+      "speaker": "Referent:in",
+      "external_profile": "Homepage",
+      "linkedin_profile": "LinkedIn-Profil",
+      "xing_profile": "Xing-Profil"
+    },
+    "CreatableTagSelector": {
+      "add_tag": "\"{value}\" hinzufügen"
+    },
+    "table_grid": {
+      "pagination_text": "Seite {currentPage} von {totalPage}",
+      "bulk_action": "Sammelaktion",
+      "apply": "Ausführen",
+      "none": "Keine Aktion",
+      "items_per_page": "Einträge pro Seite"
+    },
+    "table_grid_delete_button": {
+      "confirm_delete": "Löschen bestätigen",
+      "deletion_confirmation_question": "Bist du sicher, dass du diesen Eintrag löschen möchtest?"
+    },
+    "image_uploader": {
+      "uploading": "Hochladen...",
+      "removing": "Entfernen...",
+      "file_size_exceeds_limit": "Die Datei ist zu groß. Bitte wähle eine Datei mit einer Größe von {maxFileSize}MB oder weniger.",
+      "upload_file": "Datei hochladen",
+      "upload_new_profile_picture": "Neues Profilbild hochladen",
+      "upload_new_logo": "Neues Logo hochladen",
+      "remove_profile_picture": "Profilbild entfernen",
+      "remove_logo": "Logo entfernen",
+      "remove_image": "Bild entfernen",
+      "remove_image_error": "Fehler beim Entfernen des Bildes",
+      "upload_error": "Fehler beim Hochladen des Bildes"
+    },
+    "input_field": {
+      "invalid_link_format": "Ungültiges Link-Format",
+      "invalid_email_format": "Ungültiges E-Mail-Format",
+      "invalid_ects_format": "Ungültiges ECTS-Format",
+      "invalid_minimum_integer": "Der Wert muss mindestens {min} sein",
+      "invalid_maximum_integer": "Der Wert muss höchstens {max} sein",
+      "invalid_minimum_maximum_integer": "Der Wert muss mindestens {min} und höchstens {max} sein",
+      "invalid_integer_format": "Der Wert muss eine ganze Zahl sein",
+      "invalid_input": "Ungültige Eingabe"
+    },
+    "server_side_combobox": {
+      "create_option": "\"{option}\" neu hinzufügen",
+      "no_results": "Keine Ergebnisse gefunden"
+    },
+    "dropdown_selector": {
+      "create_option": "\"{option}\" neu hinzufügen",
+      "none_option": "-- Keine Auswahl --"
+    },
+    "time_picker": {
+      "select_time": "Zeit auswählen",
+      "invalid_time": "Ungültige Zeit"
+    },
+    "tag_selector": {
+      "selection_required": "Bitte wähle mindestens einen Wert aus."
+    },
+    "notification_snackbar": {
+      "saved": "Gespeichert"
+    },
+    "authed_query": {
+      "session_expired_or_invalid": "Deine Sitzung ist ungültig oder abgelaufen. Bitte melde dich erneut an.",
+      "authentication_error": "Authentifizierungsfehler"
+    },
+    "tile_slider_unavailable": "Kachel-Slider vorübergehend nicht verfügbar",
+    "no_description_available": "Keine Beschreibung verfügbar",
+    "error_handling": {
+      "delete_restricted_by_relationship": "{parent} können nicht gelöscht werden, wenn sie mit {child} verknüpft sind. Bitte lösche diese zuerst.",
+      "delete_restricted_by_relationships": "{table} können nicht gelöscht werden, wenn sie mit anderen Einträgen verknüpft sind. Bitte lösche zuerst die anderen Einträge.",
+      "generic_error": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",
+      "certificate_deletion_failed": "Fehler beim Löschen der Leistungsnachweise. Bitte versuche es erneut.",
+      "entities": {
+        "course": "Kurse",
+        "courseenrollment": "Anmeldungen",
+        "coursegroup": "Kursgruppen",
+        "organization": "Organisationen",
+        "program": "Programme",
+        "achievement": "Leistungsnachweise",
+        "locationaddress": "Veranstaltungsadressen",
+        "session_addresses": "Adressen von Veranstaltungsterminen",
+        "courses": "Kursen",
+        "course_enrollments": "Anmeldungen",
+        "course_groups": "Kursgruppen",
+        "course_degrees": "Kurs-Degrees",
+        "achievement_options": "Leistungsnachweisoptionen",
+        "users": "Benutzern"
+      }
+    },
+    "course_group_options": {
+      "tech_coding": "Tech & Coding",
+      "business_startup": "Business & Startup",
+      "creative_social_sustainable": "Creative, Social & Sustainable",
+      "degree": "Degrees",
+      "event": "Events",
+      "my_admin_courses": "Kurs-Administration",
+      "my_courses": "Meine Kurse"
+    },
+    "faq": {
+      "title": "Häufig gestellte Fragen",
+      "error_loading": "Fehler beim Laden der FAQs. Bitte versuche es später erneut.",
+      "no_faqs_available": "Keine FAQs verfügbar."
+    },
+    "organization_dialog": {
+      "type_organization_name_minimum_2_letters": "Gib einen Organisationsnamen ein (mindestens 2 Buchstaben).",
+      "search_organizations": "Organisationen suchen",
+      "no_organizations_found": "Keine Organisationen gefunden",
+      "type_at_least_2_characters": "Gib mindestens 2 Zeichen ein"
+    },
+    "link_dialog": {
+      "add_link": "Link hinzufügen",
+      "edit_link": "Link bearbeiten",
+      "update_link": "Link aktualisieren",
+      "remove_link": "Link entfernen",
+      "url_label": "URL",
+      "url_placeholder": "URL eingeben (z.B. https://example.com oder [Enrollment:CourseLink])",
+      "url_help": "Sie können Template-Variablen wie [Enrollment:CourseLink] verwenden oder eine normale URL eingeben"
+    },
+    "widget_error_loading_courses": "Fehler beim Laden der Kurse",
+    "widget_no_courses_available": "Keine Kurse verfügbar",
+    "page_not_found": "Seite nicht gefunden",
+    "page_not_found_description": "Die Seite, die du suchst, existiert leider nicht. Sie wurde möglicherweise verschoben oder gelöscht.",
+    "back_to_home": "Zur Startseite",
+    "go_back": "Zurück",
+    "auth": {
+      "please_log_in": "Bitte melde dich an, um auf diese Seite zuzugreifen.",
+      "access_denied": "Du hast keine Berechtigung, auf diese Seite zuzugreifen."
+    }
+  },
+  "course": {
+    "general": {
+      "events": "Event",
+      "reject": "Teilnahme ablehnen",
+      "confirm": "Teilnahme bestätigen",
+      "ects": "ECTS",
+      "course_not_available": "Kurs nicht verfügbar",
+      "to_course_chat": "ZUM CHAT",
+      "to_online_meeting": "ZUM ONLINE-MEETING",
+      "speaker": "Referent:in",
+      "link_will_be_provided_soon": "(Link wird hier in Kürze bereitgestellt)",
+      "address_will_be_provided_soon": "(Adresse wird hier in Kürze angegeben)"
+    },
+    "ects": {
+      "5": "5",
+      "NONE": "OHNE",
+      "0,5": "0,5",
+      "2,5": "2,5",
+      "2_5": "2,5",
+      "12,5": "12,5"
+    },
+    "degree_elements": {
+      "completed_degree_elements": "Bisher abgeschlossene Elemente",
+      "no_degree_elements_completed": "Bisher hast Du keine Elemente abgeschlossen.",
+      "current_degree_elements": "Aktuelle Angebote im Rahmen des Degrees",
+      "no_degree_elements_available": "Aktuell gibt es keine laufenden Angebote zu diesem Degree."
+    },
+    "learning": {
+      "you_will_learn": "Du wirst lernen",
+      "general_achievement_certificate_conditions": "**Online-Teilnahme:**\nWenn eine Online-Teilnahme möglich ist, wird die Teilnahme nur dann als anwesend gewertet, wenn die Kamera eingeschaltet ist.\n\n**Semester Opening:**\nWir laden euch zum kursübergreifenden Semester Opening am 16. Oktober 2025 im COBL (Legienstraße 40, Kiel) ein! 💛\nHier bekommt ihr Einblicke hinter die Kulissen unserer OC-Community, lernt Kursleitungen und andere Kursteilnehmer:innen kennen und könnt in inspirierenden Sessions die Kieler Unternehmenslandschaft entdecken.\nZu allen Infos und zur Anmeldung geht es [HIER](https://forms.office.com/e/2TrRyRTCS5)."
+    },
+    "sessions": {
+      "show_all_sessions": "Alle Termine anzeigen",
+      "hide_sessions": "Termine einklappen",
+      "course_sessions": "Kurstermine"
+    },
+    "attendances": {
+      "attendances": "Anwesenheiten",
+      "max_missed_sessions": "Du darfst an maximal einem Termin fehlen",
+      "max_missed_sessions_plural": "Du darfst an maximal {count} Terminen fehlen",
+      "attendance_status": {
+        "ATTENDED": "Teilgenommen",
+        "MISSED": "Nicht teilgenommen",
+        "NO_INFO": "In Prüfung",
+        "PENDING": "Überprüfung ausstehend"
+      }
+    },
+    "achievement": {
+      "achievement_option": "Leistungsnachweis",
+      "achievement_record_upload_dead_line_text": "Du hast bis zum {date} Zeit einen Leistungsnachweis hochzuladen.",
+      "choose_achievement_option": "Wähle den Titel deines Leistungsnachweises aus.",
+      "selected_achievement_option": "Gewählter Leistungsnachweis",
+      "no_current_achievement_option": "Bisher wurde kein Leistungsnachweis eingreicht.",
+      "no_achievement_option": "Aktuell steht kein Leistungsnachweis für diesen Kurs zur Verfügung.",
+      "upload_achievement_record": "Neuen Nachweis hochladen",
+      "download_template": "Vorlage herunterladen",
+      "last_record_upload": "Der letzte Nachweis mit Dir als Autor wurde am {dateTime} von {fullName} zu \"{achievementRecordTitle}\" hochgeladen: {achievementRecordFileName}",
+      "no_existing_record_upload": "Es wurde bisher kein Nachweis mit Dir als Autor hochgeladen.",
+      "use_documentation_template": "Nutze folgende Vorlage zur Dokumentation:",
+      "achievement_option_not_selected": "Bitte wähle einen Leistungsnachweis aus.",
+      "authors": "Autoren",
+      "documentation": "Dokumentation",
+      "upload": "Hochladen",
+      "authors_missing": "Bitte Autoren hinzufügen!",
+      "documentation_missing": "Bitte Dokumentation hochladen!",
+      "file_name": "Dateiname",
+      "operation_failed": "Vorgang fehlgeschlagen",
+      "max_file_size": "Maximale Dateigröße: {size} MB",
+      "upload_achievement_record_modal": {
+        "file_too_large": "Die Datei ist zu groß. Die maximale Größe beträgt {size} MB."
+      }
+    },
+    "registration": {
+      "application_deadline": "Anmeldeschluss: ",
+      "apply_now": "Jetzt anmelden",
+      "register_external": "Über externen Link registrieren",
+      "register_with_payment": "Mit Zahlung registrieren",
+      "register_now": "Jetzt registrieren",
+      "accept_invitation": "Einladung annehmen",
+      "placeholder_motivation_letter": "Meine Motivation ..."
+    },
+    "status": {
+      "applied": "Deine Bewerbung ist in der Prüfung",
+      "aborted": "Du hast die Teilnahme abgebrochen",
+      "rejected": "Leider wurde deine Bewerbung abgelehnt",
+      "cancelled": "Du hast deine Einladung abgelehnt",
+      "invited": "Du wurdest eingeladen und musst deine Teilnahme bestätigen",
+      "invitation_expired": "Deine Einladung ist abgelaufen",
+      "application_period_ended": "Die Bewerbungsfrist  ist leider abgelaufen. Du kannst unseren <a>Newsletter</a> abonnieren, um über neue Angebote informiert zu bleiben.",
+      "application_period_ended_title": "Bewerbungsfrist abgelaufen"
+    },
+    "modal": {
+      "title_approval": "Bewerbung",
+      "title_direct": "Registrierung",
+      "title_with_payment": "Registrierung und Bezahlung",
+      "motivation_letter_label": "Motivationsschreiben",
+      "motivation_letter_placeholder": "Bitte erzähle uns, warum du teilnehmen möchtest...",
+      "payment_info": "Dieser Kurs kostet {cost}. Du wirst nach der Registrierung zur Zahlungsseite weitergeleitet.",
+      "accept_terms": "Ich akzeptiere die Allgemeinen Geschäftsbedingungen und die Datenschutzerklärung",
+      "cancel": "Abbrechen",
+      "close": "Schließen",
+      "submit": "Bewerbung absenden",
+      "proceed_to_payment": "Zur Zahlung",
+      "submitting": "Wird gesendet...",
+      "success_message_approval": "Deine Bewerbung wurde erfolgreich eingereicht. Du erhältst eine E-Mail-Benachrichtigung, sobald deine Bewerbung geprüft wurde.",
+      "success_message_direct": "Du wurdest erfolgreich für diesen Kurs registriert. Du erhältst in Kürze eine Bestätigungs-E-Mail."
+    },
+    "errors": {
+      "motivation_letter_required": "Bitte schreib uns, warum du an diesem Kurs teilnehmen möchtest",
+      "terms_required": "Bitte akzeptiere die Allgemeinen Geschäftsbedingungen",
+      "registration_failed": "Registrierung fehlgeschlagen. Bitte versuche es erneut."
+    },
+    "onboarding_modal": {
+      "decline_confirm_text": "Möchtest du die Einladung zu diesem Kurs wirklich ablehnen?",
+      "decline_button_text": "Ja",
+      "title": "Onboarding für Deine Kursteilnahme",
+      "congratulation": "Herzlichen Glückwunsch zur Einladung für die Teilnahme an diesem Kurs!",
+      "form_intro": "Bitte aktualisiere Deinen aktuellen Beschäftigungsstatus:",
+      "confirm_sufficient_time": "Bitte bestätige die Kursteilnahme nur, wenn Du Zeit hast, bis zum Ende am Kurs teilzunehmen.",
+      "important": "WICHTIG: KURSEINLADUNG BESTÄTIGEN!",
+      "mattermost_info_1": "Nach der Bestätigung gehe bitte direkt auf den Button zum Kurs-Chat.",
+      "mattermost_info_2": "Falls Du noch keinen Account in unserem Chat hast, musst Du Dich dort zunächst noch einmal anmelden.\nDer Kurs-Chat ist unser zentrales Kommunikationstool für die Kurse."
+    },
+    "success_messages": {
+      "success_title": "Bewerbung erfolgreich eingereicht!",
+      "success_body": "Du wirst spätestens ein bis zwei Tage nach Bewerbungsschluss über deine Zulassung informiert.",
+      "success_close_button_title": "Schließen"
+    }
+  },
+  "coursePage": {
+    "courseCosts": "Der Kurs kostet {price}",
+    "courseIsFree": "Der Kurs ist kostenfrei",
+    "courseGroups": "Kursgruppen",
+    "courseDegree": "Degrees",
+    "courseDegreeTitle": "Teil der folgenden Degrees",
+    "currentCourse": "laufender Kurs",
+    "openVideoCall": "zum Meeting",
+    "toCourseDescription": "zur Kursbeschreibung",
+    "coursesPageTitle": "Courses: opencampus.sh Edu Hub",
+    "coursesHeadline": "Kurse",
+    "courseSearchPlaceholder": "Search in title",
+    "addCourseText": "Add Course",
+    "addCourseFormTitle": "Kurs hinzufügen",
+    "table-header-published": "Veröffentlicht",
+    "table-header-title": "Titel",
+    "table-header-instructor": "Kursleitung",
+    "table-header-applications": "Bewerbungen",
+    "table-header-application-status": "Eingeladen/ Bestätigt/ Unbewertet",
+    "table-header-program": "Programm",
+    "table-header-status": "Status",
+    "paginationText": "Page {currentPage} of {totalPage}",
+    "no-course-taken": "Du hast noch keinen Kurs mit gemacht",
+    "discover-courses": "Discover Courses",
+    "your-courses": "Deine Kurse",
+    "course": "Kurs",
+    "no-instructor": "Es gibt keine Instruktoren!",
+    "course-title": "Titel des Kurses",
+    "course-instructor": "Kursleitung",
+    "semester": "Semester",
+    "create": "Anlegen",
+    "proof-of-participation": "Teilnahmenachweis",
+    "certificate-possible": "Mögliche Bescheinigungen",
+    "performance-certificate": "Leistungszertifikat",
+    "add-instructors": "Kursleitung hinzufügen",
+    "application": "Bewerbung",
+    "applied": "Beworben",
+    "evaluation": "Beurteilung",
+    "invited": "Eingeladen",
+    "invitation-confirmed": "Einladung bestätigt",
+    "aborted": "Abgebrochen",
+    "rejected": "Bewerbung abgelehnt",
+    "cancelled": "Einladung abgelehnt",
+    "invitation-expired": "Einladung abgelaufen",
+    "invitation-deadline": "Ablaufdatum Einladung",
+    "send-invitations": "Einladungen verschicken",
+    "invite-applicants": "Bewerber:innen einladen",
+    "course-not-found": "Kurs {courseId} wurde nicht gefunden!",
+    "confirmation-push-the-course-to-next-status": "Möchtest du den Kurs in den nächsten Status schieben?",
+    "please-fill-in-all-fields-to-proceed-further": "Bitte füllen Sie alle Felder aus, um fortzufahren!",
+    "set-status-high": "Status hochsetzen",
+    "add-new-location": "Ort hinzufügen",
+    "program": "Programm",
+    "programs": "Programme",
+    "published": "Published",
+    "do-you-want-to-publish-the-program": "Möchtest du das Programm {title} wirklich veröffentlichen?",
+    "do-you-really-want-to-undo-the-publication-of-program": "Möchtest du die Veröffentlichung des Programmes {title} wirklich zurücknehmen?",
+    "do-you-want-to-delete-the-program": "Möchtest du das Programm {title} wirklich löschen?",
+    "publish": "Veröffentlichen",
+    "withdraw": "Zurücknehmen",
+    "template": "Template",
+    "link-final-evaluation": "Link Abschluss-Evaluation",
+    "no-template-uploaded-yet": "Noch kein Template hochgeladen",
+    "show-certificates": "Bescheinigungen einblenden",
+    "add-session": "Termin hinzufügen",
+    "application-rating": "Einstufung der Bewerbungen:",
+    "not-rated": "Unbewertet",
+    "unclear": "Unklar",
+    "reject": "Ablehnen",
+    "invite": "Einladen",
+    "no-applications-present": "Es liegen noch keine Bewerbungen vor.",
+    "no-enrollments-present": "Es wurden noch keine Teilnehmenden zugelassen.",
+    "chat-link": "Chat Link:",
+    "possible-certificates": "Mögliche Bescheinigungen",
+    "add-course": "Kurs hinzufügen",
+    "programs-programs": "Programme",
+    "programs-add": "Programm hinzufügen",
+    "programs-default-title": "Neues Programm",
+    "programs-title": "Programmtitel",
+    "programs-published": "Veröffentlicht",
+    "programs-short-title": "Kurztitel",
+    "programs-application-start": "Bewerbungs-anfang",
+    "programs-application-end": "Bewerbungs-ende",
+    "programs-course-start": "Kursstart",
+    "programs-course-end": "Kursende",
+    "programs-achievement-upload-deadline": "Abgabeschluss Leistungsnachweise",
+    "day": "Tag",
+    "no-courses": "Dieses Programm enthält noch keine Kurse.",
+    "default-course-title": "Neuer Kurs",
+    "achievementCertificateDownload": "Dein Leistungszertifikat",
+    "attendanceCertificateDownload": "Deine Anwesenheitsbescheinigung",
+    "congrats-completion": "Herzlichen Glückwunsch zum Abschluss des Kurses!",
+    "add-session-address": "Neue Adresse",
+    "upgrade-status": "Kursstatus erhöhen und zum nächsten Tab wechseln",
+    "to-be-defined": "Der Ort bzw. die Adresse wird noch bekannt gegeben.",
+    "not-submitted": "nicht eingereicht",
+    "email-confirmed-applicants": "Email an bestätigte Bewerber:innen",
+    "application-end": "Bewerbungsende:",
+    "confirm-online-course-description": "Hiermit bestätigst du an den erforderlichen Online-Kursen teilgenommen zu haben. Dein Leistungsnachweis ist dein Reflexionsbogen. Bitte klicke <component>HIER</component>, um ihn auszufüllen. Bei Fragen wende dich bitte an deine Kursleitung.",
+    "confirm-online-course": "Bestätigen",
+    "online-course-confirmed": "Du hast am {dateTime} bestätigt an den erforderlichen Online-Kursen teilgenommen zu haben.",
+    "achievement-certificate-generation": "Leistungszertifikate ausstellen",
+    "attendance-certificate-generation": "Teilnahmenachweise ausstellen",
+    "no-certificate-generated": "Es wurden keine Zertifikate generiert.",
+    "certificates-generated": "Es wurden {number} Zertifikate generiert.",
+    "1-certificate-generated": "Es wurde ein Zertifikat generiert.",
+    "no-certificates-generated": "Es wurden keine Zertifikate generiert.",
+    "participationDataGenerate": "Teilnehmer:innen Daten generieren (CSV)",
+    "participationDataDownload": "Teilnehmer:innen Daten herunterladen (CSV)",
+    "selectTemplateDefaultLabel": "Vorlage auswählen",
+    "location": {
+      "label": "Veranstaltungsort",
+      "ONLINE": "Online",
+      "KIEL": "Kiel",
+      "HEIDE": "Heide"
+    },
+    "address": {
+      "label": "Link oder Adresse",
+      "placeholder": {
+        "online": "Dieser Link wird den Teilnehmenden für alle Online-Termine des Kurses mitgeteilt.",
+        "offline": "Diese Adresse kann ggf. bei der Erstellung der Einzeltermine angepasst werden."
+      },
+      "errorText": "Der eingegebene Link hat nicht das korrekte Format."
+    },
+    "max_participants": "Max. Teilehmendenanzahl",
+    "weekday": "Wochentag",
+    "weekdays": {
+      "NONE": "unregelmäßig",
+      "MONDAY": "Montag",
+      "TUESDAY": "Dienstag",
+      "WEDNESDAY": "Mittwoch",
+      "THURSDAY": "Donnerstag",
+      "FRIDAY": "Freitag",
+      "SATURDAY": "Samstag",
+      "SUNDAY": "Sonntag"
+    },
+    "languages": {
+      "DE": "Deutsch",
+      "EN": "Englisch"
+    },
+    "start_time": "Startzeit",
+    "end_time": "Endzeit",
+    "short_description": {
+      "label": "Kurzbeschreibung",
+      "help_text": "Dieser Text erscheint auf der Kachel des Kurses und als Tagline auf der Kursseite.",
+      "placeholder": "Geben Sie eine kurze Beschreibung des Kurses ein..."
+    },
+    "learning_goals": {
+      "label": "Lernziele",
+      "help_text": "Die Lernziele sind Teil des Leistungszertifikats und können nur durch die Programmleitung geändert werden. Wenn du Änderungen vorschlagen möchtest oder dir Fehler auffallen, wende dich bitte an diese.",
+      "placeholder": "Lernziel 1\nLernziel 2\nLernziel 3\nLernziel 4",
+      "read_only_placeholder": "Bitte kontaktiere die Programmleitung, um Lernziele zu vereinbaren und hier hinzuzufügen.",
+      "editable_in_table": "In der Kurstabelle bearbeitbar"
+    },
+    "info_block_1_title": {
+      "label": "Info-Block 1",
+      "help_text": "Für den Inhalt zu diesem Teil der Beschreibung orientiere dich bitte an den existierenden Kursen, um möglichst konsistent zu bleiben. Üblicherweise wird hier beschrieben, was die Teilnehmenden im Kurs erwartet (\"Was due bekommst\").",
+      "placeholder": "Titel"
+    },
+    "info_block_1_content": {
+      "placeholder": "Inhalt"
+    },
+    "info_block_2_title": {
+      "label": "Info-Block 2",
+      "help_text": "Für den Inhalt zu diesem Teil der Beschreibung orientiere dich bitte an den existierenden Kursen, damit wir möglichst konsistent sind. Üblicherweise lautet wird hier beschrieben, was von den Teilnehmenden an Mitarbeit oder Leitung erwartet wird (\"Was Du mitbringen solltest\").",
+      "placeholder": "Titel"
+    },
+    "info_block_2_content": {
+      "placeholder": "Inhalt"
+    },
+    "sessionAddress": {
+      "online": {
+        "label": "Online",
+        "placeholder": "Bitte gib im Tab \"Beschreibung\" einen gültigen Link ein."
+      },
+      "offline": {
+        "label": "Adresse zur Vor-Ort-Teilnahme in ",
+        "placeholder": "Wähle im Tab \"Beschreibung\" eine Standardaddresse oder wähle hier eine spezifische Adresse aus."
+      },
+      "select_address": "Adresse auswählen",
+      "select_online_link": "Online-Link auswählen",
+      "search_addresses": "Adressen suchen...",
+      "no_address_selected": "Keine Adresse ausgewählt",
+      "search_links": "Links suchen...",
+      "create_new_address": "Neue Adresse erstellen",
+      "create_new_link": "Neuen Link erstellen",
+      "default_address": "Standard",
+      "link_label": "Link-Name",
+      "link_label_placeholder": "z.B. Haupt-Meetingraum, Workshop-Link",
+      "link_url": "URL",
+      "link_url_placeholder": "https://example.com/meeting-room",
+      "aliases": "Aliase",
+      "aliases_help": "Aliase eingeben und Enter drücken, um sie hinzuzufügen",
+      "legacy_address": "Legacy-Adresse (schreibgeschützt)",
+      "select_location_option_first": "Bitte wähle zuerst eine Standortoption aus",
+      "location_mismatch_error": "Die ausgewählte Adresse passt nicht zur Standortoption dieser Session. Bitte wähle eine Adresse aus, die zum richtigen Standort gehört."
+    },
+    "date": "Datum",
+    "title": "Titel",
+    "external_speakers": "Externe Referenten",
+    "add_external_speaker": "Externen Referenten hinzufügen",
+    "session_title": "Titel des Termins",
+    "confirmDeleteSession": "Möchtest du den Termin wirklich löschen?",
+    "cannotDeletePastSession": "Du kannst keinen Termin der in der Vergangenheit liegt löschen! Solltest du den Termin wirklich löschen wollen, kontaktiere bitte einen Administrator.",
+    "delete": "Löschen",
+    "total_applications": "Bewerbungen (gesamt):",
+    "accepted_applications": "Bewerbungen (angenommen):",
+    "total_invitations": "Einladungen (gesamt):",
+    "confirmed_invitations": "Einladungen (bestätigt):",
+    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "Eine Standortadresse mit dieser Konfiguration existiert bereits für diesen Kurs."
+  },
+  "courseAdminPage": {
+    "pageTitle": "Opencampus Kurse Kursleiter Sicht",
+    "headline": "Kurse (Instruktor)"
+  },
+  "startPage": {
+    "browse": "browse",
+    "continueLearning": "Lieber weiterlernen!",
+    "findCourses": "Finde deine Kurse",
+    "learnSubheadline": "Hier wieder ein super Text",
+    "registerNow": "jetzt registrieren",
+    "headline": "Updates für",
+    "subheadline": "deinen Weg",
+    "seo": {
+      "metaDescription": "EduHub von opencampus.sh – Deine Plattform für Tech-, Business- und Kreativkurse. Lerne Programmierung, Unternehmertum und mehr in unserer Community of Learning.",
+      "ogDescription": "Starte deine Lernreise mit EduHub von opencampus.sh! Werde Teil einer aktiven Community und entdecke Expertenkurse in Tech, Business und Kreativität.",
+      "twitterDescription": "Lerne Programmierung, Business & Kreativität mit EduHub von opencampus.sh. Werde Teil unserer Community und starte noch heute!",
+      "keywords": "Online-Kurse, Tech-Kurse, Business-Kurse, Kreativkurse, Programmierung, Coding, Unternehmertum, Startup, Nachhaltigkeit, Weiterbildung, opencampus, EduHub, Lernplattform"
+    }
+  },
+  "achievementsPage": {
+    "title": "Achievements",
+    "page-header": "Leistungsnachweise",
+    "achievement-record": "Leistungsnachweise",
+    "achievement-record-admin": "Administration Leistungsnachweise",
+    "results": "Ergebnis",
+    "upload": "↑ Hochladen",
+    "description": "Beschreibung",
+    "mentors": "Mentor(en)",
+    "result": "Ergebnis",
+    "documentation": "Dokumentation",
+    "deadline": "Abgabeschluss",
+    "results-so-far": "Bisherige Ergebnisse",
+    "rank": "Rang",
+    "last-upload": "Letzter Upload",
+    "file-name": "Dateiname",
+    "last-submitted-documentation": "Zuletzt eingereichte Unterlagen",
+    "cover-image-required": "Deckblatt erforderlich",
+    "csv-file-missing": "CSV datei fehlt!",
+    "documentation-missing": "Bitte Dokumentation hochladen!",
+    "authors-missing": "Bitte Autoren hinzufügen!",
+    "upload-proof": "Leistungsnachweis hochladen",
+    "form-info-cover-image-size": "Optimal ist eine Größe von {width} x {height} Pixel.",
+    "form-info-documentations": "<component>Benutze diese Vorlage zum Hochladen der Dokumentation!</component>",
+    "uploadDocumentationTemplate": "Dokumentationsvorlage hochladen"
+  },
+  "statistics": {
+    "statistics": "Statistiken",
+    "select_statistics": {
+      "label": "Statistik auswählen",
+      "placeholder": "Statistik auswählen",
+      "options": {
+        "APPLICATIONS": "Bewerbungen",
+        "COURSES": "Kurse",
+        "SESSIONS": "Sessions",
+        "ATTENDANCES": "Anwesenheiten",
+        "CERTIFICATES": "Zertifikate"
+      }
+    },
+    "select_program_types": {
+      "label": "Filtere einen oder mehrere Programmtypen",
+      "placeholder": "Programmtypen auswählen"
+    },
+    "application_statistics": {
+      "label": "Bewerbungsstatistiken",
+      "select_programs": {
+        "label": "Wähle ein oder mehrere Programme oder Semester",
+        "placeholder": "Programm oder Semester hinzufügen"
+      },
+      "daily": "Tägliche Bewerbungen",
+      "cumulative": "Kumulierte Bewerbungen",
+      "no_data_available": "Keine Daten verfügbar",
+      "use_actual_dates": "Nutze das Kalender-Datum auf der X-Achse"
+    },
+    "course_statistics": {
+      "label": "Kursstatistiken",
+      "courses": "Kurse",
+      "cumulative": "Gesamtzahl der veröffentlichten Kurse",
+      "by_program": "Anzahl der Kurse nach Programm"
+    },
+    "session_statistics": {
+      "label": "Veranstaltungsstatistiken",
+      "sessions": "Veranstaltungen",
+      "cumulative": "Gesamtzahl der angebotenen Veranstaltungen",
+      "by_program": "Anzahl der Veranstaltungen nach Programm"
+    },
+    "attendance_statistics": {
+      "label": "Anwesenheitsstatistiken",
+      "attendances": "Anwesenheiten",
+      "cumulative": "Gesamtzahl der Anwesenheiten",
+      "by_program": "Anzahl der Anwesenheiten nach Programm"
+    },
+    "certificate_statistics": {
+      "label": "Zertifikatstatistiken",
+      "certificates": "Zertifikate",
+      "cumulative": "Gesamtzahl der Zertifikate",
+      "by_program": "Anzahl der Zertifikate nach Programm",
+      "attendance_certificates": "Anwesenheitszertifikate",
+      "achievement_certificates": "Leistungszertifikate"
+    }
+  },
+  "certificates": {
+    "title": "Meine Zertifikate",
+    "no_certificates": "Du hast noch keine Zertifikate.",
+    "no_certificates_title": "Noch keine Zertifikate",
+    "no_certificates_description": "Du hast noch keine Zertifikate erhalten. Schließe Kurse ab und erreiche Deine Lernziele, um Zertifikate zu erhalten, die Deine Erfolge zeigen!",
+    "browse_courses": "Kurse durchsuchen",
+    "linkedin_sharing_warning": "Um Dein Zertifikat auf LinkedIn zu teilen, muss es öffentlich zugänglich gemacht werden. Das bedeutet, dass jeder mit dem Link Dein Zertifikat einsehen kann. Möchtest Du fortfahren?",
+    "select_certificate_to_share": "Wähle aus, welches Zertifikat Du teilen möchtest:",
+    "make_public_confirm": "Öffentlich machen und teilen",
+    "share_on_linkedin": "Auf LinkedIn teilen",
+    "achievement_certificate": "Leistungsnachweis",
+    "attendance_certificate": "Teilnahmebescheinigung",
+    "not_authenticated": "Du musst angemeldet sein, um Deine Zertifikate anzusehen.",
+    "errorMessages": {
+      "certificate_not_found": "Zertifikat nicht gefunden",
+      "linkedin_share_error": "Zertifikat konnte nicht auf LinkedIn geteilt werden. Bitte versuche es später erneut."
+    }
+  },
+  "profile": {
+    "first_name": "Vorname",
+    "last_name": "Nachname",
+    "university": "Hochschule",
+    "university_enrollment_number": "Matrikelnummer",
+    "company": "Unternehmen",
+    "occupation": {
+      "label": "Beschäftigung",
+      "HIGH_SCHOOL_STUDENT": "Schüler:in",
+      "UNIVERSITY_STUDENT": "Student:in",
+      "EMPLOYED_FULL_TIME": "Vollzeit beschäftigt",
+      "EMPLOYED_PART_TIME": "Teilzeit beschäftigt",
+      "SELF_EMPLOYED": "Selbstständig",
+      "UNEMPLOYED": "Arbeitssuchend",
+      "RETIRED": "Im Ruhestand",
+      "RESEARCHER": "Wissenschaftliche:r Mitarbeiter:in",
+      "EDUCATOR": "Lehrkraft",
+      "HOMEMAKER": "Hausfrau/Hausmann",
+      "OTHER": "Sonstiges"
+    },
+    "organization": {
+      "label_base": "Organisation",
+      "label_school": "Schule",
+      "label_university": "Hochschule",
+      "label_company": "Unternehmen",
+      "label_research": "Hochschule/Forschungseinrichtung",
+      "label_education": "Schule",
+      "placeholder": "Auswählen oder neu hinzufügen"
+    },
+    "external_profile": "Link zu externem Profil (LinkedIn, XING, ...)",
+    "matriculation_number": "Matrikelnummer",
+    "matriculation_number_placeholder": "z.B. 12345678",
+    "zip_code": "Postleitzahl",
+    "zip_code_placeholder": "z.B. 12345 oder 10117",
+    "country": "Land",
+    "country_none": "-- Land auswählen --",
+    "occupation_none": "-- Beschäftigung auswählen --",
+    "external_profile_placeholder": "z.B. https://linkedin.com/in/deinname",
+    "change_password_or_email": "Passwort oder E-Mail ändern"
+  },
+  "programs": {
+    "add": "Programm hinzufügen",
+    "published": "Veröffentlicht",
+    "title": "Programmtitel",
+    "short-title": "Kurztitel",
+    "application-start": "Bewerbungsanfang",
+    "application-end": "Bewerbungsende",
+    "course-start": "Kursstart",
+    "course-end": "Kursende",
+    "achievement-upload-deadline": "Abgabeschluss Leistungsnachweise"
+  },
+  "manageCourses": {
+    "table_header": {
+      "published": "Veröffent- licht",
+      "title": "Titel",
+      "instructor": "Dozent",
+      "applications": "Bewerbungen",
+      "confirmed": "Bestätigt",
+      "unrated_rated_not_informed": "Unbewertet / Bewertet aber nicht informiert",
+      "application_end": "Bewerbungs- ende",
+      "program": "Programm",
+      "status": "Status",
+      "email_templates": "Vorlagen",
+      "has_custom_templates": "Dieser Kurs hat kursspezifische E-Mail-Vorlagen"
+    },
+    "view": "Anzeigen",
+    "view_course": "Kurs anzeigen",
+    "close": "Schließen",
+    "cancel": "Abbrechen",
+    "not_published": "Nicht veröffentlicht",
+    "default_course_title": "Unbenannter Kurs",
+    "title": "Kurse verwalten",
+    "all_programs": "Alle",
+    "tile_slider_group": {
+      "label": "Kachel-Slider Gruppe",
+      "placeholder": "Kachel-Slider Gruppen auswählen"
+    },
+    "cover_image": {
+      "label": "Titelbild",
+      "upload_text": "Klicken um Titelbild hochzuladen"
+    },
+    "instructors": {
+      "label": "Kursleitung",
+      "add": "Kursleitung hinzufügen"
+    },
+    "funding_organizations": {
+      "label": "Förderorganisationen",
+      "add": "Förderorganisation hinzufügen"
+    },
+    "registration_type": {
+      "label": "Anmeldeart",
+      "help_text": "Wähle aus, wie sich Teilnehmer für diesen Kurs anmelden können",
+      "options": {
+        "APPROVAL_WITH_INPUT": "Zulassung mit Bewerbungsprozess",
+        "DIRECT_CONFIRMATION": "Direkte Zulassung ohne Motivationstext",
+        "DIRECT_WITH_INPUT": "Direkte Zulassung mit Motivationstext",
+        "EXTERNAL_REGISTRATION": "Externe Anmeldung"
+      }
+    },
+    "external_registration_link": {
+      "label": "Externe Anmeldung Link",
+      "help_text": "URL wo sich Teilnehmer extern anmelden können"
+    },
+    "chat_link": {
+      "label": "Kurs-Chat Link",
+      "help_text": "Link zum Kurs-Chat oder zur Kommunikationsplattform"
+    },
+    "email_templates": {
+      "label": "E-Mail-Vorlagen",
+      "manage_button": "E-Mail-Vorlagen verwalten",
+      "create_button": "E-Mail-Vorlagen erstellen",
+      "edit_button": "E-Mail-Vorlagen bearbeiten",
+      "external_registration_note": "E-Mail-Vorlagen sind für externe Anmeldungen nicht verfügbar."
+    },
+    "ects": {
+      "label": "ECTS-Punkte",
+      "help_text": "Anzahl der ECTS-Punkte für diesen Kurs"
+    },
+    "max_missed_sessions": {
+      "label": "Maximal verpasste Sitzungen",
+      "help_text": "Maximale Anzahl von Sitzungen, die ein Teilnehmer verpassen kann"
+    },
+    "learning_goals": {
+      "label": "Lernziele",
+      "help_text": "Definiere, was die Teilnehmer nach Abschluss dieses Kurses erreichen werden. Schreibe jedes Lernziel in eine neue Zeile ohne Nummerierung. Verwende Handlungsverben wie 'verstehen', 'anwenden', 'analysieren', 'erstellen' (siehe: https://www.bloomstaxonomy.org).",
+      "placeholder": "Die Grundlagen des Themas verstehen\nSchlüsselkonzepte in praktischen Szenarien anwenden\nKomplexe Probleme und Lösungen analysieren\nInnovative Ansätze entwickeln"
+    },
+    "add_course_button": "Kurs hinzufügen",
+    "delete_button": {
+      "delete_course_confirmation": "Bist du sicher, dass du den Kurs '{title}' löschen möchtest?",
+      "untitled_course": "Unbenannter Kurs"
+    },
+    "bulk_action": {
+      "publish": "Ausgewählte veröffentlichen",
+      "unpublish": "Ausgewählte zurückziehen",
+      "copy": "In Programm kopieren"
+    },
+    "copy_courses_to_program_dialog": {
+      "title": "Kurse in Programm kopieren",
+      "description": "Wähle das Zielprogramm aus, in das die Kurse kopiert werden sollen:",
+      "button": "Kurse kopieren"
+    },
+    "notifications": {
+      "course_added_success": "Kurs erfolgreich hinzugefügt",
+      "course_add_failed": "Fehler beim Hinzufügen des Kurses. Bitte versuche es erneut.",
+      "courses_published_success_singular": "{count} Kurs erfolgreich veröffentlicht",
+      "courses_published_success_plural": "{count} Kurse erfolgreich veröffentlicht",
+      "courses_unpublished_success_singular": "{count} Kurs erfolgreich zurückgezogen",
+      "courses_unpublished_success_plural": "{count} Kurse erfolgreich zurückgezogen",
+      "bulk_action_failed": "Fehler beim {action} der Kurse. Bitte versuche es erneut.",
+      "attendance_certificate_update_failed": "Fehler beim Aktualisieren der Teilnahmebescheinigung-Einstellung",
+      "achievement_certificate_update_failed": "Fehler beim Aktualisieren der Leistungsbescheinigung-Einstellung",
+      "application_end_update_failed": "Fehler beim Aktualisieren des Bewerbungsendes",
+      "courses_copied_success_singular": "{count} Kurs erfolgreich in {programTitle} kopiert",
+      "courses_copied_success_plural": "{count} Kurse erfolgreich in {programTitle} kopiert"
+    }
+  },
+  "manageCourse": {
+    "description": "Beschreibung",
+    "sessions": "Termine",
+    "applications": "Bewerbungen",
+    "participations_and_achievements": "Teilnahmen & Leistungen",
+    "degree_participations": "Degree-Teilnahmen",
+    "attendances": "Teilnahmen",
+    "certificate_achievement": "Leistungsnachweis",
+    "certificates": "Zertifikat Download",
+    "attendance_certificate_download": "T",
+    "achievement_certificate_download": "L",
+    "add_participants": "Teilnehmende bearbeiten",
+    "selected_users": "Ausgewählte User",
+    "name_or_email": "Name oder E-Mail",
+    "add_as_confirmed": "als bestätigt hinzufügen oder ändern",
+    "add_as_applied": "als beworben hinzufügen oder ändern",
+    "add_as_invited": "als eingeladen hinzufügen oder ändern",
+    "add_as_aborted": "als abgebrochen hinzufügen oder ändern",
+    "add_user_error": "Bitte mindestens einen User auswählen!",
+    "application_history": "Bisherige Bewerbungen und Teilnahmen",
+    "email": "E-Mail",
+    "send_email_to_applicants": "E-Mail an Bewerber senden",
+    "select_applicants_first": "Bitte wähle zuerst Bewerber aus",
+    "bulk_actions": {
+      "email_selected": "E-Mail an Ausgewählte",
+      "email_all_confirmed": "E-Mail an alle Bestätigten",
+      "email_all_invited": "E-Mail an alle Eingeladenen",
+      "email_all_applied": "E-Mail an alle Beworbenen",
+      "email_all_rejected": "E-Mail an alle Abgelehnten",
+      "email_all_invite_rating": "E-Mail an alle mit Bewertung 'Einladen'",
+      "email_all_decline_rating": "E-Mail an alle mit Bewertung 'Ablehnen'",
+      "email_all_review_rating": "E-Mail an alle mit Bewertung 'Unklar'",
+      "email_all_by_status": "E-Mail an alle nach Status",
+      "email_all_by_rating": "E-Mail an alle nach Bewertung",
+      "send_invitations": "Einladungen senden",
+      "send_invitations_selected": "Einladungen an Ausgewählte senden",
+      "send_invitations_all": "Einladungen an alle mit grüner Bewertung senden",
+      "send_invitations_dialog_title": "Einladungen senden",
+      "send_invitations_selected_count_singular": "Von {selected} ausgewählten Teilnehmenden wurde {identified} Person mit grüner Bewertung identifiziert und wird über ihre Einladung für diesen Kurs informiert.",
+      "send_invitations_selected_count_plural": "Von {selected} ausgewählten Teilnehmenden wurden {identified} Personen mit grüner Bewertung identifiziert und werden über ihre Einladung für diesen Kurs informiert.",
+      "send_invitations_all_count_singular": "{count} Person mit grüner Bewertung wurde identifiziert und wird über ihre Einladung für diesen Kurs informiert.",
+      "send_invitations_all_count_plural": "{count} Personen mit grüner Bewertung wurden identifiziert und werden über ihre Einladung für diesen Kurs informiert.",
+      "send_invitations_confirm": "Einladungen senden",
+      "send_rejections": "Ablehnungen senden",
+      "send_rejections_selected": "Ablehnungen an Ausgewählte senden",
+      "send_rejections_all": "Ablehnungen an alle mit roter Bewertung senden",
+      "send_rejections_dialog_title": "Ablehnungen senden",
+      "send_rejections_selected_count_singular": "Von {selected} ausgewählten Teilnehmenden wurde {identified} Person mit roter Bewertung identifiziert und wird über ihre Ablehnung für diesen Kurs informiert.",
+      "send_rejections_selected_count_plural": "Von {selected} ausgewählten Teilnehmenden wurden {identified} Personen mit roter Bewertung identifiziert und werden über ihre Ablehnung für diesen Kurs informiert.",
+      "send_rejections_all_count_singular": "{count} Person mit roter Bewertung wurde identifiziert und wird über ihre Ablehnung für diesen Kurs informiert.",
+      "send_rejections_all_count_plural": "{count} Personen mit roter Bewertung wurden identifiziert und werden über ihre Ablehnung für diesen Kurs informiert.",
+      "send_rejections_confirm": "Ablehnungen senden",
+      "send_invitations_error": "Fehler beim Senden der Einladungen: {error}",
+      "send_rejections_error": "Fehler beim Senden der Ablehnungen: {error}",
+      "no_selection_dialog_title": "Keine Auswahl"
+    },
+    "statistics_applications_total": "Bewerbungen gesamt",
+    "statistics_applications_accepted": "Bewerbungen angenommen",
+    "statistics_invitations_total": "Einladungen gesamt",
+    "statistics_invitations_confirmed": "Einladungen bestätigt",
+    "name": "Name",
+    "first_name": "Vorname",
+    "last_name": "Nachname",
+    "organization": "Organisation",
+    "participations": "Teilnahmen",
+    "lastApplication": "Letzte Aktivität",
+    "status": "Status",
+    "ectsTotal": "ECTS Gesamt",
+    "attendedEvents": "Besuchte Events",
+    "certificate": "Zertifikat",
+    "projectTitle": "Projekttitel",
+    "lastRecordUpload": "Upload Datum",
+    "generate_achievement_certificates": "Leistungsnachweise generieren",
+    "delete_achievement_certificates": "Leistungsnachweise löschen",
+    "no_certificates_deleted": "Es wurden keine Zertifikate gelöscht",
+    "certificate_deleted_singular": "{count} Leistungsnachweis wurde gelöscht",
+    "certificates_deleted_plural": "{count} Leistungsnachweise wurden gelöscht",
+    "application_status_tooltip": "Klicke auf die Kreise, um die Bewertung zu ändern",
+    "application_deadline_tooltip": "Wenn du das Datum für die Bestätigungsfrist ändern möchtest, kannst du die Einladung erneut senden.",
+    "max_participants": {
+      "label": "Max. Teilnehmendenanzahl",
+      "placeholder": "Max. Teilnehmendenanzahl",
+      "help_text": "Die maximale Teilnehmendenanzahl diesnt als Information zur Zulassung."
+    }
+  },
+  "managePrograms": {
+    "title": {
+      "label": "Programmtitel",
+      "placeholder": "Neues Programm",
+      "help_text": "Der Name des Programms wie er auch den Teilnehmenden angezeigt wird.",
+      "error_text": "Der Name darf maximal 22 Zeichen lang sein."
+    },
+    "short_title": {
+      "label": "Kurzbezeichnung",
+      "placeholder": "KURZTITEL",
+      "help_text": "Die Kurzbezeichnung wird vor allem im Admin-Bereich verwendet. Sie sollte nicht länger als 10 Zeichen sein. Alle Buchstaben werden automatisch in Großbuchstaben umgewandelt.",
+      "error_text": "Die Kurzbezeichnung darf maximal 10 Zeichen lang sein."
+    },
+    "start_evaluation": {
+      "label": "Link Start-Evaluation",
+      "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
+      "help_text": "Der hier verlinkte Fragebogen wird den Teilnehmenden nach dem ersten Termin eines Kurses oder einer Veranstaltung per E-Mail zugeschickt.\n Der Titel des Programms und der Name des Kurses oder der Veranstaltung werden per URL-Parameter automatisch mitgegeben und können entsprechend in den Fragebogen übernommen werden.",
+      "error_text": "Ungültiges Linkformat!"
+    },
+    "speaker_evaluation": {
+      "label": "Link Speaker-Evaluation",
+      "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
+      "help_text": "Dieser Fragebogenlink wird den Teilnehmenden nach jedem Termin eines Kurses oder einer Veranstaltung, bei der ein externer Referent eingetragen ist, per E-Mail zugeschickt.\n Der Titel des Programms und der Name des Kurses oder der Veranstaltung werden per URL-Parameter automatisch mitgegeben und können entsprechend in den Fragebogen übernommen werden.",
+      "error_text": "Ungültiges Linkformat!"
+    },
+    "final_evaluation": {
+      "label": "Link Abschluss-Evaluation",
+      "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
+      "help_text": "Dieser Fragebogenlink wird den Teilnehmenden nach dem letzten Termin eines Kurses oder einer Veranstaltung per E-Mail zugeschickt.\n Der Titel des Programms und der Name des Kurses oder der Veranstaltung werden per URL-Parameter automatisch mitgegeben und können entsprechend in den Fragebogen übernommen werden.",
+      "error_text": "Ungültiges Linkformat!"
+    },
+    "delete_button": {
+      "delete_program_confirmation": "Soll das Programm '{title}' wirklich gelöscht werden?",
+      "untitled_program": "Unbenanntes Programm"
+    }
+  },
+  "manageUsers": {
+    "headline": "Benutzer",
+    "first_name": "Vorname",
+    "last_name": "Nachname",
+    "email": "E-Mail",
+    "occupation": "Beschäftigung",
+    "organization": "Organisation",
+    "matriculation_number": "Matrikelnummer",
+    "deletion_confirmation_question": "Bist du sicher, dass du den Account von {firstName} {lastName} löschen möchtest? Die folgenden Schritte werden ausgeführt:\n\n1. Löschung des Benutzerkontos aus dem Authentifizierungssystem\n2. Anonymisierung aller persönlichen Daten\n3. Löschung des Profilbildes\n4. Löschung der Motivationsbriefe\n5. Ersetzung der Zertifikate mit anonymisierten Versionen\n\nDieser Vorgang kann nicht rückgängig gemacht werden. Möchtest du mit der Löschung des Benutzerkontos von {firstName} {lastName} fortfahren?",
+    "anonymization": {
+      "ANONYMIZATION_SUCCESS": "Benutzerdaten wurden erfolgreich anonymisiert",
+      "ANONYMIZATION_PARTIAL_SUCCESS": "Benutzerdaten wurden teilweise anonymisiert",
+      "ANONYMIZATION_FAILED": "Anonymisierung der Benutzerdaten fehlgeschlagen",
+      "ERROR_MISSING_USER_ID": "Erforderliche Benutzer-ID fehlt",
+      "ERROR_SOME_STEPS_FAILED": "Einige Anonymisierungsschritte sind fehlgeschlagen",
+      "ERROR_GENERAL": "Ein unerwarteter Fehler ist aufgetreten"
+    },
+    "anonymization_steps": {
+      "keycloak_deletion": "Keycloak-Löschung",
+      "user_data_anonymization": "Anonymisierung der Benutzerdaten",
+      "motivation_letter_anonymization": "Anonymisierung der Motivationsbriefe",
+      "profile_picture_removal": "Entfernung des Profilbilds",
+      "certificate_anonymization": "Anonymisierung der Zertifikate"
+    },
+    "manage_admins": "Admin-Benutzer verwalten",
+    "create_user": {
+      "button": "Benutzer erstellen",
+      "dialog_title": "Neuen Benutzer erstellen",
+      "success": "Benutzer wurde erfolgreich erstellt.",
+      "error": "Fehler beim Erstellen des Benutzers",
+      "error_first_name_required": "Vorname ist erforderlich",
+      "error_last_name_required": "Nachname ist erforderlich",
+      "error_email_required": "E-Mail ist erforderlich",
+      "error_email_invalid": "Ungültige E-Mail-Adresse",
+      "send_welcome_email": "Willkommens-E-Mail senden",
+      "creating": "Wird erstellt...",
+      "cancel": "Abbrechen",
+      "first_name_placeholder": "Vorname eingeben",
+      "last_name_placeholder": "Nachname eingeben",
+      "email_placeholder": "E-Mail-Adresse eingeben"
+    }
+  },
+  "manageAdminUsers": {
+    "headline": "Admin-Benutzer",
+    "first_name": "Vorname",
+    "last_name": "Nachname",
+    "email": "E-Mail",
+    "organization": "Organisation",
+    "deletion_confirmation_question": "Bist du sicher, dass du die Administrationsrechte von {firstName} {lastName} für die Organisation {organization} löschen möchtest?",
+    "is_super_admin": "Ist Super-Admin",
+    "can_manage_events": "Kann Events verwalten",
+    "can_manage_courses": "Kann Kurse verwalten",
+    "can_manage_users_and_settings": "Kann Benutzer und Einstellungen verwalten"
+  },
+  "manageAppSettings": {
+    "app_settings": "App Einstellungen",
+    "background_image_url": "Hintergrundbild URL",
+    "preview_image_url": "Vorschaubild URL",
+    "save": "Speichern",
+    "saving": "Speichern...",
+    "banner": {
+      "label": "Banner Einstellungen",
+      "background_color": "News Banner Hintergrundfarbe",
+      "fontColor": "News Banner Textfarbe",
+      "text_de": "News Banner Text DE",
+      "text_en": "News Banner Text EN"
+    },
+    "course_group_options": "Kursgruppierungen Reihenfolge",
+    "faq": {
+      "label": "FAQ Einstellungen",
+      "show_section": "FAQ-Bereich auf der Startseite anzeigen",
+      "collection_name": "Angezeigte FAQ-Sammlung",
+      "collection_placeholder": "FAQ-Sammlung auswählen"
+    },
+    "time_zone": {
+      "label": "Zeitzone",
+      "values": {
+        "Europe/Berlin": "Berlin",
+        "Europe/London": "London",
+        "Europe/Paris": "Paris",
+        "UTC": "UTC",
+        "America/New_York": "New York",
+        "America/Los_Angeles": "Los Angeles",
+        "Asia/Tokyo": "Tokio"
+      },
+      "help_text": "Die Zeitzone wird verwendet, um die Datums- und Uhrzeiten in der Anwendung anzuzeigen. Generelle Zeiten wie die wiederkehrende Kurszeit, die nicht an einen konkreten Tag gebunden sind, werden immer in der ursprünglich angelegten Zeit angezeigt und nicht angepasst."
+    }
+  },
+  "manageExperts": {
+    "headline": "Experten",
+    "first_name": "Vorname",
+    "last_name": "Nachname",
+    "email": "E-Mail",
+    "course": "Kurs",
+    "program": "Programm",
+    "role": "Rolle",
+    "session": "Termin",
+    "role_instructor": "Kursleitung",
+    "role_speaker": "Referent:in",
+    "no_roles": "Keine Rollen zugewiesen"
+  },
+  "manageOrganizations": {
+    "headline": "Organisationen",
+    "organization": {
+      "name": "Name",
+      "type": "Typ",
+      "user_count": "Zugehörige Nutzer",
+      "users": "Nutzer",
+      "aliases": "Alias",
+      "description": "Beschreibung",
+      "logo": "Logo",
+      "new_organization": "Neue Organisation",
+      "default_description": "Beschreibung"
+    },
+    "api_key": {
+      "title": "API-Schlüssel Verwaltung",
+      "description": "API-Schlüssel für Teilnehmerdaten-Zugriff generieren und verwalten",
+      "action": {
+        "generate": "API-Schlüssel generieren",
+        "generating": "Ich generiere...",
+        "regenerate": "Schlüssel neu generieren",
+        "regenerating": "Ich generiere neu...",
+        "revoke": "Schlüssel entfernen",
+        "revoking": "Ich entferne..."
+      },
+      "confirm": {
+        "regenerate": "Bist du sicher, dass du den API-Schlüssel neu generieren möchtest? Dadurch wird der bestehende Schlüssel sofort ungültig.",
+        "revoke": "Bist du sicher, dass du den API-Schlüssel entfernen möchtest? Dadurch wird der Zugriff für diese Organisation sofort deaktiviert."
+      },
+      "dialog": {
+        "title": "API-Schlüssel Generierung",
+        "warning": {
+          "title": "Wichtiger Sicherheitshinweis",
+          "description": "Dieser API-Schlüssel wird nur einmal angezeigt. Bitte kopiere ihn sofort und speichere ihn sicher. Du wirst ihn später nicht erneut einsehen können."
+        },
+        "key_label": "Dein API-Schlüssel",
+        "copy": "Kopieren",
+        "saving": "Speichere…",
+        "confirm_saved": "Ich habe den Schlüssel sicher gespeichert",
+        "usage": {
+          "title": "Verwendung",
+          "header": "Füge diesen Header in deine API-Anfragen ein:",
+          "example": "Beispiel API-Aufruf:"
+        }
+      },
+      "error": {
+        "generate_failed": "API-Schlüssel konnte nicht generiert werden. Bitte versuche es erneut.",
+        "revoke_failed": "API-Schlüssel konnte nicht entfernt werden. Bitte versuche es erneut."
+      }
+    },
+    "action": {
+      "add": "Organisation hinzufügen",
+      "delete_confirmation": "Das Löschen einer Organisation ist nur möglich, wenn keine Benutzer mit dieser Organisation verknüpft sind.\nBist du sicher, dass du die Organisation \"{name}\" löschen möchtest?"
+    },
+    "bulk_action": {
+      "delete": {
+        "label": "Organisationen löschen",
+        "description": "Das Löschen einer Organisation ist nur möglich, wenn keine Benutzer mit dieser Organisation verknüpft sind.\nBist du sicher, dass du die {count} ausgewählten Organisationen löschen möchtest?"
+      },
+      "merge": {
+        "label": "Organisationen zusammenführen",
+        "title": "Organisationen zusammenführen",
+        "description": "Wähle die Organisation aus, zu der die ausgewählten Organisationen zusammengeführt werden sollen.",
+        "select_target": {
+          "label": "Zielorganisation",
+          "placeholder": "Zielorganisation auswählen"
+        },
+        "confirm_merge": "Organisationen zusammenführen",
+        "preview_title": "Zusammenführungsvorschau",
+        "target_organization": "Zielorganisation",
+        "organizations_to_merge": "Zusammenzuführende Organisationen",
+        "total_users_affected": "Insgesamt betroffene Nutzer",
+        "aliases_to_add": "Hinzuzufügende Aliase",
+        "type_change_warning": "Typänderung",
+        "will_become_university": "Die Zielorganisation wird zum Universitätstyp geändert",
+        "deletion_warning": "Warnung",
+        "organizations_will_be_deleted_one": "1 Organisation wird dauerhaft gelöscht",
+        "organizations_will_be_deleted_other": "{count} Organisationen werden dauerhaft gelöscht",
+        "no_organizations_selected": "Keine Organisationen für die Zusammenführung ausgewählt",
+        "api_key_warning": "API-Schlüssel-Konflikt",
+        "api_key_conflict_description": "Zusammenführung nicht möglich: {count} Organisation(en) haben API-Schlüssel definiert. Nur eine Organisation kann einen API-Schlüssel haben. Bitte widerrufe die API-Schlüssel von allen Organisationen außer einer, bevor du zusammenführst.",
+        "loading_related_data": "Lade zugehörige Daten...",
+        "organization_admins_affected": "Betroffene Organisationsadministratoren",
+        "funding_organizations_affected": "Betroffene Kursfinanzierungsbeziehungen",
+        "admin_user_id": "Nutzer",
+        "course_id": "Kurs",
+        "and_more": "... und {count} weitere"
+      }
+    },
+    "input": {
+      "enter_alias": "Organisationsalias eingeben",
+      "enter_description": "Organisationsbeschreibung eingeben",
+      "enter_name": "Organisationsname eingeben"
+    },
+    "error": {
+      "loading": "Fehler beim Laden der Organisationen",
+      "duplicate_organization_name": "Eine Organisation mit dem Standardnamen existiert noch. Bitte benenne diese zuerst um oder lösche sie.",
+      "general": "Beim Hinzufügen der Organisation ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+      "network": "Ein Netzwerkfehler ist aufgetreten. Bitte überprüfe deine Verbindung und versuche es erneut.",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es später erneut.",
+      "bulk_delete_failed": "Fehler beim Löschen der ausgewählten Organisationen",
+      "merge_failed": "Fehler beim Zusammenführen der Organisationen",
+      "alias_already_exists": "Der Alias \"{alias}\" existiert bereits in der Organisation \"{organization}\". Bitte wähle einen anderen Namen oder wähle die bestehende Organisation aus.",
+      "alias_duplicate_error": "Dieser Alias existiert bereits in einer anderen Organisation. Bitte wähle einen anderen Namen.",
+      "alias_update_failed": "Fehler beim Aktualisieren der Organisationsaliase. Bitte versuche es erneut.",
+      "alias_unexpected_error": "Beim Aktualisieren der Aliase ist ein unerwarteter Fehler aufgetreten. Bitte versuche es erneut."
+    },
+    "type_selection": {
+      "UNIVERSITY": "Universität",
+      "RESEARCH_INSTITUTE": "Forschungsinstitut",
+      "PUBLIC_SECTOR": "Öffentlicher Sektor",
+      "NON_PROFIT_ORGANIZATION": "Non-Profit-Organisation",
+      "CORPORATION": "Unternehmen",
+      "SCHOOL": "Schule",
+      "FREELANCER": "Freiberufler",
+      "OTHER": "Sonstiges"
+    },
+    "common": {
+      "close": "Schließen",
+      "cancel": "Abbrechen"
+    },
+    "deletion_confirmation_question": "Das Löschen einer Organisation ist nur möglich, wenn keine Benutzer mit dieser Organisation verknüpft sind.\nBist du sicher, dass du die Organisation {name} löschen möchtest?"
+  },
+  "manageLocationAddresses": {
+    "headline": "Veranstaltungsadressen",
+    "locationAddress": {
+      "shortLabel": "Kurzes Label",
+      "address": "Adresse",
+      "address_or_link": "Adresse / Link",
+      "description": "Beschreibung",
+      "aliases": "Aliase",
+      "locationOption": "Standort",
+      "usageCount": "Verwendungen",
+      "usageCount_one": "Verwendung",
+      "usageCount_other": "Verwendungen",
+      "new_address": "Neue Adresse",
+      "default_address": "Adressdetails",
+      "default_description": "Beschreibung"
+    },
+    "input": {
+      "enter_short_label": "Kurzes Label eingeben",
+      "enter_address": "Vollständige Adresse eingeben",
+      "enter_link": "Vollständigen Link eingeben",
+      "enter_description": "Beschreibung eingeben",
+      "enter_alias": "Alias eingeben"
+    },
+    "help": {
+      "short_label": "Ein kurzer, eindeutiger Bezeichner für diesen Standort (z.B. 'Hauptcampus', 'Gebäude A')",
+      "address": "Vollständige physische Adresse inklusive Straße, Stadt und Postleitzahl",
+      "link": "Vollständige URL für Online-Sitzungen (z.B. 'https://zoom.us/j/123456789')",
+      "description": "Zusätzliche Details zu diesem Standort, um Benutzern den Zweck zu erklären",
+      "aliases": "Alternative Namen, die zur Referenzierung dieses Standorts verwendet werden können"
+    },
+    "action": {
+      "add": "Adresse hinzufügen",
+      "delete_confirmation": "Bist du sicher, dass du die Standortadresse \"{name}\" löschen möchtest?"
+    },
+    "bulk_action": {
+      "delete": {
+        "label": "Löschen",
+        "description": "Bist du sicher, dass du {count} Standortadresse(n) löschen möchtest?"
+      },
+      "merge": {
+        "label": "Standortadressen zusammenführen",
+        "title": "Standortadressen zusammenführen",
+        "description": "Wähle die Standortadresse aus, zu der die ausgewählten Adressen zusammengeführt werden sollen.",
+        "select_target": {
+          "label": "Zieladresse",
+          "placeholder": "Zieladresse auswählen"
+        },
+        "confirm_merge": "Standortadressen zusammenführen",
+        "preview_title": "Zusammenführungsvorschau",
+        "target_address": "Zieladresse",
+        "addresses_to_merge": "Zusammenzuführende Adressen",
+        "total_usage_affected": "Insgesamt betroffene Verwendungen",
+        "aliases_to_add": "Hinzuzufügende Aliase",
+        "deletion_warning": "Warnung",
+        "addresses_will_be_deleted_one": "1 Standortadresse wird dauerhaft gelöscht",
+        "addresses_will_be_deleted_other": "{count} Standortadressen werden dauerhaft gelöscht",
+        "no_addresses_selected": "Keine Standortadressen für die Zusammenführung ausgewählt",
+        "location_mismatch_warning": "Standort-Konflikt",
+        "location_mismatch_description_one": "Zusammenführung nicht möglich: 1 Adresse hat eine andere Standortoption als die Zieladresse ({targetLocation}). Alle Adressen müssen die gleiche Standortoption haben, um zusammengeführt zu werden.",
+        "location_mismatch_description_other": "Zusammenführung nicht möglich: {count} Adressen haben eine andere Standortoption als die Zieladresse ({targetLocation}). Alle Adressen müssen die gleiche Standortoption haben, um zusammengeführt zu werden."
+      }
+    },
+    "error": {
+      "alias_already_exists": "Alias \"{alias}\" existiert bereits in Standortadresse \"{address}\"",
+      "alias_duplicate_error": "Dieser Alias existiert bereits für eine andere Standortadresse",
+      "alias_update_failed": "Fehler beim Aktualisieren der Aliase",
+      "duplicate_location_address": "Eine Standortadresse mit diesem kurzen Label existiert bereits für diese Standortoption",
+      "bulk_delete_failed": "Fehler beim Löschen der Standortadressen",
+      "merge_failed": "Fehler beim Zusammenführen der Standortadressen",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten"
+    },
+    "type_selection": {
+      "KIEL": "Kiel",
+      "ONLINE": "Online",
+      "HEIDE": "Heide"
+    }
+  },
+  "manageEmailTemplates": {
+    "headline": "E-Mail-Vorlagen",
+    "headline_default": "Standard-E-Mail-Vorlagen",
+    "default_templates_explanation": "Dies sind die Standard-E-Mail-Vorlagen, die app-weit verwendet werden. Du kannst auch kurs-spezifische Vorlagen in der Kursverwaltung definieren, indem du auf den entsprechenden Button in der erweiterbaren Zeile des Kurses klickst.",
+    "course_specific_explanation": "Diese E-Mail-Vorlagen sind spezifisch für diesen Kurs und überschreiben die Standard-Vorlagen beim Versenden von E-Mails für diesen Kurs.",
+    "back_to_courses": "Zurück zu Kursen",
+    "columns": {
+      "title": "Vorlagen-Typ",
+      "subject": "E-Mail-Betreffzeile",
+      "updated_at": "Zuletzt aktualisiert"
+    },
+    "template_types": {
+      "APPLICATION_RECEIVED": "Bewerbung erhalten",
+      "APPLICATION_CONFIRMED": "Bewerbung bestätigt",
+      "SESSION_REMINDER": "Sitzungserinnerung",
+      "INVITE": "Einladung",
+      "DECLINE": "Bewerbung abgelehnt",
+      "REGISTRATION_CONFIRMED": "Registrierung bestätigt",
+      "USER_CREATED": "Benutzer erstellt"
+    },
+    "placeholders": {
+      "subject": "E-Mail-Betreff eingeben...",
+      "body": "Beginne hier mit deinem E-Mail-Inhalt. Nutze die Toolbar für Formatierung und schnelle Platzhalter..."
+    },
+    "help_text": {
+      "subject": "Die Betreffzeile, die im E-Mail-Posteingang des Empfängers angezeigt wird. Du kannst Platzhalter wie [User:Firstname] verwenden, um den Betreff zu personalisieren."
+    },
+    "expandable": {
+      "body_content": "E-Mail-Inhalt",
+      "trigger_description": "Wann wird diese E-Mail versendet?",
+      "keyword_placeholders": "Verfügbare Platzhalter",
+      "preview": "Vorschau",
+      "generate_preview": "Vorschau generieren",
+      "generating_preview": "Wird generiert..."
+    },
+    "triggers": {
+      "APPLICATION_RECEIVED": "Gesendet, wenn ein Benutzer sich für einen Kurs bewirbt",
+      "APPLICATION_CONFIRMED": "Gesendet, wenn die Teilnahme eines Benutzers bestätigt wird",
+      "INVITE": "Gesendet, wenn ein Admin Benutzer zu einem Kurs einlädt",
+      "DECLINE": "Gesendet, wenn ein Admin Bewerbungen ablehnt",
+      "REGISTRATION_CONFIRMED": "Gesendet, wenn sich ein Benutzer direkt für einen Kurs/eine Veranstaltung registriert",
+      "SESSION_REMINDER": "Gesendet vor Beginn der Sitzungen (24h, 1h, 15min vorher)",
+      "USER_CREATED": "Gesendet, wenn ein neues Benutzerkonto erstellt wird"
+    },
+    "delete_confirmation": "Bist du sicher, dass du die E-Mail-Vorlage '{title}' löschen möchtest?",
+    "unknown_trigger": "Unbekannter Auslöser-Typ"
+  },
+  "manageAchievementTemplates": {
+    "error": {
+      "duplicate_element_name": "Ein Element mit dem Standardnamen existiert noch. Bitte benenne oder lösche dieses zuerst."
+    },
+    "addUserAchievementDocumentationTemplateText": "Vorlage hinzufügen",
+    "url": "Download",
+    "title": "Titel",
+    "delete": "Löschen",
+    "upload": "Upload"
+  }
+}

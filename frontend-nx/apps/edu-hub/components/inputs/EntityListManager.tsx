@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { DocumentNode } from 'graphql';
 import { MdAddCircle } from 'react-icons/md';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
@@ -168,7 +168,7 @@ const EntityListManager = <TEntity, TSelectedEntity>({
   className = '',
   invertColors = false,
 }: EntityListManagerProps<TEntity, TSelectedEntity>) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { error, handleError, resetError } = useErrorHandler();
   const [showSavedNotification, setShowSavedNotification] = useState(false);
 
@@ -304,7 +304,7 @@ const EntityListManager = <TEntity, TSelectedEntity>({
         <NotificationSnackbar
           open={showSavedNotification}
           onClose={() => setShowSavedNotification(false)}
-          message={t('common:saved')}
+          message={t('common.saved')}
         />
       )}
     </>
