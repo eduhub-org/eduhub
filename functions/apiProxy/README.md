@@ -61,7 +61,15 @@
   },
   "fundingOrganization": { "id": 353, "name": "…" },
   "courses": [
-    { "id": "39aa0df1-4936-5686-80a5-35d196a03520", "title": "…", "participantDataEndpoint": "/participants/courses/39aa0df1-4936-5686-80a5-35d196a03520" }
+    {
+      "id": "39aa0df1-4936-5686-80a5-35d196a03520",
+      "title": "…",
+      "description": "…",
+      "startDate": "2025-04-01T09:00:00+00:00",
+      "endDate": "2025-07-15T17:00:00+00:00",
+      "location": "ONLINE",
+      "participantDataEndpoint": "/participants/courses/39aa0df1-4936-5686-80a5-35d196a03520"
+    }
   ],
   "generatedAt": "2025-08-08T10:30:00Z"
 }
@@ -89,8 +97,10 @@
   "learningOpportunity": {
     "id": "urn:course:39aa0df1-4936-5686-80a5-35d196a03520",
     "title": "…",
-    "summary": "…",
+    "description": "…",
+    "type": "Course",
     "language": ["de"],
+    "location": "ONLINE",
     "fundingOrganization": { "id": 353, "name": "…" }
   },
   "participants": [

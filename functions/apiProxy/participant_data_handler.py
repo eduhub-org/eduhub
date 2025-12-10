@@ -1011,7 +1011,7 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
         "learningOpportunity": {
             "id": f"urn:course:{hash_id}",
             "title": course_info["title"],
-            "summary": course_info.get("tagline"),
+            "description": course_info.get("tagline"),
             "type": "Course",
             "language": [course_info.get("language", "en")],
             "fundingOrganization": {
@@ -1030,6 +1030,13 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
             "framework": "ECTS",
             "point": ects_value
         }]
+    
+    # Add location information if available
+    selected_location = course_info.get("selectedLocation")
+    if selected_location and isinstance(selected_location, dict):
+        location_option = selected_location.get("locationOption")
+        if location_option:
+            response["learningOpportunity"]["location"] = location_option
     
     # No eqfLevel field in Program; omit
     
@@ -1071,12 +1078,34 @@ def handle_organization_courses(auth_info, eduhub_client, client_ip, request_dat
             course_id = course.get("_internalId") or course.get("id")
             hash_id = generate_course_hash_id(course_id)
         
+        # Get location option from selectedLocation or locationOption field
+        selected_location = course.get("selectedLocation")
+        location_option = None
+        if selected_location and isinstance(selected_location, dict):
+            location_option = selected_location.get("locationOption")
+        elif course.get("locationOption"):
+            location_option = course.get("locationOption")
+        
+        # Extract startDate and endDate from Sessions
+        sessions = course.get("Sessions", [])
+        start_date = None
+        end_date = None
+        if sessions:
+            # Find earliest startDateTime and latest endDateTime
+            start_datetimes = [s.get("startDateTime") for s in sessions if s.get("startDateTime")]
+            end_datetimes = [s.get("endDateTime") for s in sessions if s.get("endDateTime")]
+            if start_datetimes:
+                start_date = min(start_datetimes)
+            if end_datetimes:
+                end_date = max(end_datetimes)
+        
         course_summary = {
             "id": hash_id,
             "title": course["title"],
-            "description": course.get("description"),
-            "startDate": course.get("startDate"),
-            "endDate": course.get("endDate"),
+            "description": course.get("tagline"),
+            "startDate": start_date,
+            "endDate": end_date,
+            "location": location_option,  # Location option used to generate hash ID
             "participantDataEndpoint": f"/participants/courses/{hash_id}"
         }
         
@@ -1147,10 +1176,10 @@ def handle_participants_schema():
     
     schema = {
         "$schema": "https://json-schema.org/draft/2019-09/schema",
-        "$id": "https://api-edu.opencampus.sh/schemas/participant-data-v1.0.0.json",
+        "$id": "https://api-edu.opencampus.sh/schemas/participant-data-v1.1.0.json",
         "title": "EduHub ELM-Compliant Participant Data API",
         "description": "RESTful API providing secure, privacy-preserving access to participant enrollment and completion data for courses funded by partner organizations. Implements European Learning Model (ELM) standards with privacy-first design - no PII is exposed, participant identities are cryptographically hashed.",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "type": "object",
         "api": {
             "authentication": {
@@ -1207,7 +1236,7 @@ def handle_participants_schema():
             "course_data": {
                 "id": "UUID v5 hash identifier (format: urn:course:{uuid}) - matches MOOCHub API format. Generated from course_id-location_id combination. Each course-location combination has a unique hash ID. One course entry is returned per location.",
                 "title": "Course title",
-                "summary": "Course description/tagline", 
+                "description": "Course description/tagline", 
                 "language": "Array of ISO language codes",
                 "creditPoints": "Optional ECTS credit points",
                 "fundingOrganization": "Organization that funds this course"
@@ -1227,7 +1256,7 @@ def handle_participants_schema():
             "429": "Rate limit exceeded", 
             "503": "Service unavailable - database connection issues"
         },
-        "schema_url": "/schemas/participant-data-v1.0.0.json",
+        "schema_url": "/schemas/participant-data-v1.1.0.json",
         "schema_latest_url": "/schemas/participant-data/latest.json"
     }
     
