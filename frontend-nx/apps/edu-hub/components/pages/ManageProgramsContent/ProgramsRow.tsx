@@ -22,6 +22,7 @@ import {
   UPDATE_START_QUESTIONAIRE,
   UPDATE_SPEAKER_QUESTIONAIRE,
   UPDATE_ClOSING_QUESTIONAIRE,
+  UPDATE_DEFAULT_ENROLLMENT_SURVEY,
 } from '../../../queries/updateProgram';
 import { ProgramList_Program } from '../../../queries/__generated__/ProgramList';
 import {
@@ -235,15 +236,14 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   );
 
   const t = useTranslations('managePrograms');
-  const tCoursePage = useTranslations('coursePage');
   const locale = useLocale();
 
   const achievementCertificateTemplateName = program.achievementCertificateTemplateURL
     ? path.basename(program.achievementCertificateTemplateURL)
-    : tCoursePage('no-template-uploaded-yet');
+    : t('certificates.no_template_uploaded_yet');
   const attendanceCertificateTemplateName = program.attendanceCertificateTemplateURL
     ? path.basename(program.attendanceCertificateTemplateURL)
-    : tCoursePage('no-template-uploaded-yet');
+    : t('certificates.no_template_uploaded_yet');
 
   return (
     <div>
@@ -353,7 +353,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
 
       {program.id === openProgramId && (
         <div className="mb-1">
-          <div className="grid grid-cols-3 bg-gray-100 p-10">
+          <div className="grid grid-cols-4 bg-gray-100 p-10">
             <div className="p-3">
               <span>{t('start_evaluation.label')}</span>
               <br />
@@ -390,9 +390,21 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
                 updateValueMutation={UPDATE_ClOSING_QUESTIONAIRE}
               />
             </div>
+            <div className="p-3">
+              <span>{t('default_enrollment_survey.label')}</span>
+              <br />
+              <InputField
+                variant="material"
+                type="link"
+                placeholder={t('default_enrollment_survey.placeholder')}
+                itemId={program.id}
+                value={program.defaultFormbricksEnrollmentSurveyUrl || ''}
+                updateValueMutation={UPDATE_DEFAULT_ENROLLMENT_SURVEY}
+              />
+            </div>
 
             <div className="p-3">
-              {`${t('coursePage.template')} ${t('coursePage.proof-of-participation')}`}
+              {`${t('certificates.template')} ${t('certificates.proof_of_participation')}`}
 
               <IconButton onClick={handleUploadAttendanceTemplateClick}>
                 <MdUpload size="0.75em" />
@@ -407,7 +419,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
               />
             </div>
             <div className="p-3">
-              {`${t('coursePage.template')} ${t('coursePage.performance-certificate')}`}
+              {`${t('certificates.template')} ${t('certificates.performance_certificate')}`}
               <IconButton onClick={handleUploadAchievementTemplateClick}>
                 <MdUpload size="0.75em" />
               </IconButton>
@@ -421,25 +433,25 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
               />
             </div>
             <div className="p-3">
-              {`${t('coursePage.show-certificates')}:`}
+              {`${t('certificates.show_certificates')}:`}
               <div className="grid grid-cols-10">
                 <div className="cursor-pointer" onClick={handleToggleVisibilityAttendanceCertificate}>
                   {program.visibilityAttendanceCertificate && <MdCheckBox size="1.5em" />}
                   {!program.visibilityAttendanceCertificate && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
                 </div>
-                <div className="col-span-9">{t('coursePage.proof-of-participation')}</div>
+                <div className="col-span-9">{t('certificates.proof_of_participation')}</div>
               </div>
               <div className="grid grid-cols-10">
                 <div className="cursor-pointer" onClick={handleToggleVisibilityAchievementCertificate}>
                   {program.visibilityAchievementCertificate && <MdCheckBox size="1.5em" />}
                   {!program.visibilityAchievementCertificate && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
                 </div>
-                <div className="col-span-9">{t('coursePage.performance-certificate')}</div>
+                <div className="col-span-9">{t('certificates.performance_certificate')}</div>
               </div>
             </div>
             <div className="p-3">
               <Button as="button" onClick={handleLoadParticipationDataClick} disabled={loadParticipationDataLoading}>
-                {loadParticipationDataLoading ? <CircularProgress /> : t('coursePage.participationDataGenerate')}
+                {loadParticipationDataLoading ? <CircularProgress /> : t('participation_data.generate')}
               </Button>
             </div>
             <div className="p-3">
@@ -451,7 +463,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
                   rel="noopener noreferrer"
                   className="block"
                 >
-                  {t('coursePage.participationDataDownload')}
+                  {t('participation_data.download')}
                 </Button>
               )}
             </div>

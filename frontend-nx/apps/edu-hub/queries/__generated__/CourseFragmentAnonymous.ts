@@ -189,6 +189,10 @@ export interface CourseFragmentAnonymous_Program {
    */
   visibilityAttendanceCertificate: boolean | null;
   type: ProgramType_enum;
+  /**
+   * Default Formbricks survey URL for course enrollments/applications. Courses can override this with their own formbricksEnrollmentSurveyUrl.
+   */
+  defaultFormbricksEnrollmentSurveyUrl: string | null;
 }
 
 export interface CourseFragmentAnonymous_CourseGroups_CourseGroupOption {
@@ -359,6 +363,10 @@ export interface CourseFragmentAnonymous {
    */
   externalRegistrationLink: string | null;
   registrationType: CourseRegistrationType_enum | null;
+  /**
+   * Full URL to the Formbricks survey for course enrollment/application (for iframe embedding). Overrides program default if set.
+   */
+  formbricksEnrollmentSurveyUrl: string | null;
   /**
    * The time the course starts each week.
    */

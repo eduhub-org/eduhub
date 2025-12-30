@@ -51,6 +51,7 @@ import {
   UPDATE_COURSE_MAX_MISSED_SESSION,
   UPDATE_COURSE_REGISTRATION_TYPE,
   UPDATE_COURSE_LEARNING_GOALS,
+  UPDATE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY,
 } from '../../../queries/course';
 import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
@@ -81,7 +82,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   onSetAttendanceCertificatePossible,
   onSetAchievementCertificatePossible,
 }) => {
-  const t = useTranslations('coursePage');
+  const t = useTranslations();
   const router = useRouter();
   const { error, handleError, resetError } = useErrorHandler();
 
@@ -499,7 +500,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const currentCourseGroups = course.CourseGroups.map((group) => ({
     id: group.CourseGroupOption.id,
     name: group.CourseGroupOption.title
-      ? t(`common:course_group_options.${group.CourseGroupOption.title}`)
+      ? t(`common.course_group_options.${group.CourseGroupOption.title}`)
       : '—',
   }));
 
@@ -512,7 +513,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
   const registrationTypeOptions = Object.values(CourseRegistrationType_enum).map((type) => ({
     value: type,
-    label: t(`manageCourses:registration_type.options.${type}`),
+    label: t(`manageCourses.registration_type.options.${type}`),
   }));
 
   return (
@@ -534,30 +535,52 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 helpText={t('manageCourses.registration_type.help_text')}
               />
 
-              {/* External Registration Link - Always reserve space */}
-              <div className="min-h-[80px]">
-                {isExternalRegistration && (
-                  <InputField
-                    variant="material"
-                    type="link"
-                    label={t('manageCourses.external_registration_link.label')}
-                    placeholder={t('manageCourses.external_registration_link.label')}
-                    itemId={course.id}
-                    value={course.externalRegistrationLink || ''}
-                    updateValueMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
-                    refetchQueries={['AdminCourseList']}
-                    helpText={t('manageCourses.external_registration_link.help_text')}
-                  />
-                )}
-              </div>
+              {/* External Registration Link */}
+              {isExternalRegistration && (
+                <InputField
+                  variant="material"
+                  type="link"
+                  label={t('manageCourses.external_registration_link.label')}
+                  placeholder={t('manageCourses.external_registration_link.label')}
+                  itemId={course.id}
+                  value={course.externalRegistrationLink || ''}
+                  updateValueMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
+                  refetchQueries={['AdminCourseList']}
+                  helpText={t('manageCourses.external_registration_link.help_text')}
+                />
+              )}
+
+              {/* Formbricks Survey Configuration - Show for courses that require input */}
+              {(course.registrationType === CourseRegistrationType_enum.APPROVAL_WITH_INPUT ||
+                course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT) && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="mb-4">
+                    <span>{t('manageCourse.formbricks.title')}</span>
+                    <br />
+                    <InputField
+                      variant="material"
+                      type="link"
+                      placeholder={course.Program?.defaultFormbricksEnrollmentSurveyUrl || t('manageCourse.formbricks.survey_url_helper')}
+                      itemId={course.id}
+                      value={course.formbricksEnrollmentSurveyUrl || ''}
+                      updateValueMutation={UPDATE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY}
+                      refetchQueries={['AdminCourseList']}
+                      helpText={`${t('manageCourse.formbricks.info_hidden_fields')}\n\n${t('manageCourse.formbricks.hidden_fields_required')}:\n• eduhubUserId - ${t('manageCourse.formbricks.hidden_field_userid_desc')}\n• eduhubCourseId - ${t('manageCourse.formbricks.hidden_field_courseid_desc')}\n• eduhubEnrollmentId - ${t('manageCourse.formbricks.hidden_field_enrollmentid_desc')} (${t('manageCourse.formbricks.optional')})\n\n${t('manageCourse.formbricks.hidden_fields_instructions')}\n\n${t('manageCourse.formbricks.enrollmentid_optional_reason')}`}
+                      onValueUpdated={() => {
+                        // Refetch handled via refetchQueries prop
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* 2. Course Organization - Card Container */}
             <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
               <TagSelector
                 variant="material"
-                label={t('coursePage.courseDegreeTitle')}
-                placeholder={t('coursePage.courseDegree')}
+                label={t('manageCourses.course_degree_title.label')}
+                placeholder={t('manageCourses.course_degree_title.placeholder')}
                 itemId={course.id}
                 values={currentCourseDegrees}
                 options={degreeCourses}
@@ -588,7 +611,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                     <div className="relative">
                       <Image
                         src={coverImage}
-                        alt="course cover"
+                        alt={t('manageCourses.cover_image.alt')}
                         width={160}
                         height={96}
                         className="object-contain rounded bg-gray-100"
@@ -718,7 +741,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
             {/* 3. Types of Available Certificates - Card Container */}
             <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('possible-certificates')}</h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses.possible_certificates.label')}</h4>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <div className="cursor-pointer" onClick={handleToggleAttendanceCertificatePossible}>
@@ -728,7 +751,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                       <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-gray-400" />
                     )}
                   </div>
-                  <span>{t('coursePage.proof-of-participation')}</span>
+                  <span>{t('manageCourses.possible_certificates.attendance_certificate')}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="cursor-pointer" onClick={handleToggleAchievementCertificatePossible}>
@@ -738,7 +761,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                       <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-gray-400" />
                     )}
                   </div>
-                  <span>{t('coursePage.performance-certificate')}</span>
+                  <span>{t('manageCourses.possible_certificates.achievement_certificate')}</span>
                 </div>
                 {course.achievementCertificatePossible && (
                   <div className="ml-8 mt-2">

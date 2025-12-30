@@ -39,7 +39,6 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
   onCreateOption,
   getLabelForValue,
 }) => {
-  const t = useTranslations();
   const baseClass = 'w-full pl-3 pr-10 py-3 text-gray-500 rounded bg-edu-light-gray';
   const finalClassName = `${baseClass} ${className}`;
 
@@ -54,7 +53,7 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
           <div className="flex justify-between mb-2">
             <div className="flex items-center">
               {helpText && (
-                <Tooltip title={t(helpText)} placement="top">
+                <Tooltip title={helpText} placement="top">
                   <HelpOutline style={{ cursor: 'pointer', marginRight: '5px' }} />
                 </Tooltip>
               )}
@@ -94,7 +93,7 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
           )}
           {!label && helpText && (
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              <Tooltip title={t(helpText)} placement="top">
+              <Tooltip title={helpText} placement="top">
                 <HelpOutline style={{ cursor: 'pointer', pointerEvents: 'auto' }} />
               </Tooltip>
             </div>

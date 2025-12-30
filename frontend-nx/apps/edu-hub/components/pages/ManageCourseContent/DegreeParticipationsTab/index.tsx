@@ -277,7 +277,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         minSize: 120,
       },
       {
-        header: t('status'),
+        header: t('status_label'),
         accessorKey: 'status',
         size: 120,
         minSize: 100,

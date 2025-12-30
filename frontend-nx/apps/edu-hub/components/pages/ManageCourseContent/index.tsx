@@ -150,7 +150,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
   );
 
   if (course == null) {
-    return <div>{t('coursePage.course-not-found', { courseId: courseId })}</div>;
+    return <div>{t('course_not_found', { courseId: courseId })}</div>;
   }
 
   // If the user is neither an admin nor an instructor for this course return empty div
@@ -205,14 +205,14 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
         </div>
       </PageBlock>
       <QuestionConfirmationDialog
-        question={t('coursePage.confirmation-push-the-course-to-next-status')}
-        confirmationText={t('coursePage.set-status-high')}
+        question={t('confirmation_push_course_to_next_status')}
+        confirmationText={t('set_status_high')}
         onClose={() => handleUpgradeStatus(false)}
         onConfirm={() => handleUpgradeStatus(true)}
         open={isConfirmUpgradeStatusOpen}
       />
       <AlertMessageDialog
-        alert={t('coursePage.please-fill-in-all-fields-to-proceed-further')}
+        alert={t('please_fill_all_fields')}
         confirmationText={'OK'}
         onClose={handleCloseCantUpgrade}
         open={isCantUpgradeOpen}

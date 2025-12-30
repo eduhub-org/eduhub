@@ -742,6 +742,7 @@ export enum Course_select_column {
   ects = "ects",
   endTime = "endTime",
   externalRegistrationLink = "externalRegistrationLink",
+  formbricksEnrollmentSurveyUrl = "formbricksEnrollmentSurveyUrl",
   headingDescriptionField1 = "headingDescriptionField1",
   headingDescriptionField2 = "headingDescriptionField2",
   id = "id",
@@ -794,6 +795,7 @@ export enum Course_update_column {
   ects = "ects",
   endTime = "endTime",
   externalRegistrationLink = "externalRegistrationLink",
+  formbricksEnrollmentSurveyUrl = "formbricksEnrollmentSurveyUrl",
   headingDescriptionField1 = "headingDescriptionField1",
   headingDescriptionField2 = "headingDescriptionField2",
   id = "id",
@@ -1065,6 +1067,7 @@ export enum Program_select_column {
   attendanceCertificateTemplateURL = "attendanceCertificateTemplateURL",
   closingQuestionnaire = "closingQuestionnaire",
   defaultApplicationEnd = "defaultApplicationEnd",
+  defaultFormbricksEnrollmentSurveyUrl = "defaultFormbricksEnrollmentSurveyUrl",
   defaultMaxMissedSessions = "defaultMaxMissedSessions",
   id = "id",
   lectureEnd = "lectureEnd",
@@ -1112,6 +1115,7 @@ export enum Program_update_column {
   attendanceCertificateTemplateURL = "attendanceCertificateTemplateURL",
   closingQuestionnaire = "closingQuestionnaire",
   defaultApplicationEnd = "defaultApplicationEnd",
+  defaultFormbricksEnrollmentSurveyUrl = "defaultFormbricksEnrollmentSurveyUrl",
   defaultMaxMissedSessions = "defaultMaxMissedSessions",
   id = "id",
   lectureEnd = "lectureEnd",
@@ -4925,6 +4929,7 @@ export interface Course_bool_exp {
   ects?: String_comparison_exp | null;
   endTime?: time_comparison_exp | null;
   externalRegistrationLink?: String_comparison_exp | null;
+  formbricksEnrollmentSurveyUrl?: String_comparison_exp | null;
   headingDescriptionField1?: String_comparison_exp | null;
   headingDescriptionField2?: String_comparison_exp | null;
   id?: Int_comparison_exp | null;
@@ -4973,6 +4978,7 @@ export interface Course_insert_input {
   ects?: string | null;
   endTime?: any | null;
   externalRegistrationLink?: string | null;
+  formbricksEnrollmentSurveyUrl?: string | null;
   headingDescriptionField1?: string | null;
   headingDescriptionField2?: string | null;
   id?: number | null;
@@ -5004,6 +5010,7 @@ export interface Course_max_order_by {
   created_at?: order_by | null;
   ects?: order_by | null;
   externalRegistrationLink?: order_by | null;
+  formbricksEnrollmentSurveyUrl?: order_by | null;
   headingDescriptionField1?: order_by | null;
   headingDescriptionField2?: order_by | null;
   id?: order_by | null;
@@ -5030,6 +5037,7 @@ export interface Course_min_order_by {
   created_at?: order_by | null;
   ects?: order_by | null;
   externalRegistrationLink?: order_by | null;
+  formbricksEnrollmentSurveyUrl?: order_by | null;
   headingDescriptionField1?: order_by | null;
   headingDescriptionField2?: order_by | null;
   id?: order_by | null;
@@ -5090,6 +5098,7 @@ export interface Course_order_by {
   ects?: order_by | null;
   endTime?: order_by | null;
   externalRegistrationLink?: order_by | null;
+  formbricksEnrollmentSurveyUrl?: order_by | null;
   headingDescriptionField1?: order_by | null;
   headingDescriptionField2?: order_by | null;
   id?: order_by | null;
@@ -5124,6 +5133,7 @@ export interface Course_set_input {
   ects?: string | null;
   endTime?: any | null;
   externalRegistrationLink?: string | null;
+  formbricksEnrollmentSurveyUrl?: string | null;
   headingDescriptionField1?: string | null;
   headingDescriptionField2?: string | null;
   id?: number | null;
@@ -6240,6 +6250,7 @@ export interface Program_bool_exp {
   attendanceCertificateTemplateURL?: String_comparison_exp | null;
   closingQuestionnaire?: String_comparison_exp | null;
   defaultApplicationEnd?: date_comparison_exp | null;
+  defaultFormbricksEnrollmentSurveyUrl?: String_comparison_exp | null;
   defaultMaxMissedSessions?: Int_comparison_exp | null;
   id?: Int_comparison_exp | null;
   lectureEnd?: date_comparison_exp | null;
@@ -6272,6 +6283,7 @@ export interface Program_insert_input {
   attendanceCertificateTemplateURL?: string | null;
   closingQuestionnaire?: string | null;
   defaultApplicationEnd?: any | null;
+  defaultFormbricksEnrollmentSurveyUrl?: string | null;
   defaultMaxMissedSessions?: number | null;
   id?: number | null;
   lectureEnd?: any | null;
@@ -6299,6 +6311,7 @@ export interface Program_max_order_by {
   attendanceCertificateTemplateURL?: order_by | null;
   closingQuestionnaire?: order_by | null;
   defaultApplicationEnd?: order_by | null;
+  defaultFormbricksEnrollmentSurveyUrl?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
   lectureEnd?: order_by | null;
@@ -6321,6 +6334,7 @@ export interface Program_min_order_by {
   attendanceCertificateTemplateURL?: order_by | null;
   closingQuestionnaire?: order_by | null;
   defaultApplicationEnd?: order_by | null;
+  defaultFormbricksEnrollmentSurveyUrl?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
   lectureEnd?: order_by | null;
@@ -6365,6 +6379,7 @@ export interface Program_order_by {
   attendanceCertificateTemplateURL?: order_by | null;
   closingQuestionnaire?: order_by | null;
   defaultApplicationEnd?: order_by | null;
+  defaultFormbricksEnrollmentSurveyUrl?: order_by | null;
   defaultMaxMissedSessions?: order_by | null;
   id?: order_by | null;
   lectureEnd?: order_by | null;

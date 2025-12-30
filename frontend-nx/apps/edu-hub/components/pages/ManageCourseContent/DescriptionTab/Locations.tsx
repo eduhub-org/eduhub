@@ -1,5 +1,5 @@
 import { QueryResult } from '@apollo/client';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { FC, useCallback, useMemo } from 'react';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
 import DropDownSelector from '../../../inputs/DropDownSelector';
@@ -23,7 +23,7 @@ interface LocationsIProps {
 }
 
 export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
-  const t = useTranslations('coursePage');
+  const t = useTranslations('manageCourse');
 
   const queryLocationOptions = useRoleQuery<LocationOptions>(LOCATION_OPTIONS);
   if (queryLocationOptions.error) {
@@ -40,11 +40,13 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
     }
   }, [location, onDelete]);
 
-  // locationOption dependent placeholder
-  const address_placeholder =
-    location?.locationOption === 'ONLINE' ? 'address.placeholder.online' : 'address.placeholder.offline';
-
   const isOnline = location?.locationOption === 'ONLINE';
+
+  // locationOption dependent placeholder (already translated)
+  const address_placeholder = useMemo(
+    () => (isOnline ? t('address.placeholder.online') : t('address.placeholder.offline')),
+    [isOnline, t]
+  );
 
   // Get the current defaultSessionAddressId if it exists
   const currentDefaultSessionAddressId = (location as any)?.defaultSessionAddressId || null;
@@ -93,7 +95,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
               updateValueMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
               refetchQueries={['ManagedCourse']}
               itemId={location.id}
-              placeholder={t(address_placeholder)}
+              placeholder={address_placeholder}
               value={location?.defaultSessionAddress || ''}
               className="mb-5"
               showCharacterCount={false}
@@ -102,8 +104,8 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
             <DropDownSelector
               variant="eduhub"
               label=""
-              placeholder={t(address_placeholder)}
-              helpText={t(address_placeholder)}
+              placeholder={address_placeholder}
+              helpText={address_placeholder}
               value={currentDefaultSessionAddressId?.toString() || ''}
               options={addressOptions}
               updateValueMutation={UPDATE_COURSE_DEFAULT_SESSION_ADDRESS_ID}

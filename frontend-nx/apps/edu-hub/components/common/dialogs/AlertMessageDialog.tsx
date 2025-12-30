@@ -14,7 +14,7 @@ interface AlertProps {
 
 export const AlertMessageDialog: FC<AlertProps> = ({ alert, confirmationText = 'OK', open, onClose }) => {
   const handleClose = useCallback(() => onClose(), [onClose]);
-  const t = useTranslations();
+  const t = useTranslations('common');
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>

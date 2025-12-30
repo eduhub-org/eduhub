@@ -36,7 +36,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
   onCreateOption,
   getLabelForValue,
 }) => {
-  const t = useTranslations();
+  const t = useTranslations('common');
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [isCleared, setIsCleared] = useState(false);

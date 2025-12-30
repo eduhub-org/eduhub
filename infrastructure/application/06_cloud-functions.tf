@@ -300,10 +300,10 @@ resource "google_cloudfunctions2_function" "call_node_function" {
 
   service_config {
     environment_variables = {
-      ENVIRONMENT     = var.environment
-      KEYCLOAK_USER   = var.keycloak_user
-      KEYCLOAK_URL    = "https://${local.keycloak_service_name}.opencampus.sh"
-      HASURA_ENDPOINT = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
+      ENVIRONMENT         = var.environment
+      KEYCLOAK_USER       = var.keycloak_user
+      KEYCLOAK_URL        = "https://${local.keycloak_service_name}.opencampus.sh"
+      HASURA_ENDPOINT     = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
     }
 
     secret_environment_variables {
@@ -327,11 +327,27 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       version    = "latest"
     }
 
-    max_instance_count = 20
-    available_memory   = "512M"
-    timeout_seconds    = 60
-    ingress_settings   = var.cloud_function_ingress_settings
+    secret_environment_variables {
+      key        = "FORMBRICKS_API_KEY"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.formbricks_api_key.secret_id
+      version    = "latest"
+    }
+
+    max_instance_count    = 20
+    available_memory      = "512M"
+    timeout_seconds       = 60
+    ingress_settings      = var.cloud_function_ingress_settings
+    service_account_email = google_service_account.custom_cloud_function_account.email
   }
+}
+
+# Make sure the Cloud Function's service account can access Formbricks secret
+resource "google_secret_manager_secret_iam_member" "call_node_function_formbricks_api_key" {
+  secret_id  = google_secret_manager_secret.formbricks_api_key.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.formbricks_api_key]
 }
 
 

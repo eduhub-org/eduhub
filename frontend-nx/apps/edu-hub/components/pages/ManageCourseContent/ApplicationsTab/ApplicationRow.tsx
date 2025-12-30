@@ -72,9 +72,9 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
         <div className="grid grid-cols-24 mb-1">
           <div className="mr-3 ml-3 col-span-3">{t('firstName')}</div>
           <div className="mr-3 ml-3 col-span-3">{t('lastName')}</div>
-          <div className="mr-3 ml-3 col-span-12">{t('coursePage.application')}</div>
-          <div className="mr-3 ml-3 col-span-2 text-center">{t('coursePage.evaluation')}</div>
-          <div className="mr-3 ml-3 col-span-2 text-center">{t('status')}</div>
+          <div className="mr-3 ml-3 col-span-12">{t('application')}</div>
+          <div className="mr-3 ml-3 col-span-2 text-center">{t('evaluation')}</div>
+          <div className="mr-3 ml-3 col-span-2 text-center">{t('status_label')}</div>
           <div className="col-span-1" />
           <div className="col-span-1" />
         </div>
@@ -95,32 +95,32 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
             </div>
             <div className="mr-3 ml-3 col-span-2 text-center">
               {!isExpired(enrollment) && enrollment.status === 'APPLIED' && (
-                <GoDotFill className="inline" title={t('coursePage.applied')} color="grey" size="2.5em" />
+                <GoDotFill className="inline" title={t('status.applied')} color="grey" size="2.5em" />
               )}
               {!isExpired(enrollment) && enrollment.status === 'INVITED' && (
-                <IoIosCheckmarkCircle className="inline" title={t('coursePage.invited')} color="grey" size="1.5em" />
+                <IoIosCheckmarkCircle className="inline" title={t('status.invited')} color="grey" size="1.5em" />
               )}
               {(enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED') && (
                 <IoIosCheckmarkCircle
                   className="inline"
-                  title={t('coursePage.invitation-confirmed')}
+                  title={t('status.invitation_confirmed')}
                   color="lightgreen"
                   size="1.5em"
                 />
               )}
               {enrollment.status === 'ABORTED' && (
-                <IoIosCheckmarkCircle title={t('coursePage.aborted')} color="red" size="1.5em" className="inline" />
+                <IoIosCheckmarkCircle title={t('status.aborted')} color="red" size="1.5em" className="inline" />
               )}
               {enrollment.status === 'REJECTED' && (
-                <IoIosCloseCircle title={t('coursePage.rejected')} color="red" size="1.5em" className="inline" />
+                <IoIosCloseCircle title={t('status.rejected')} color="red" size="1.5em" className="inline" />
               )}
               {enrollment.status === 'CANCELLED' && (
-                <IoIosCloseCircle title={t('coursePage.cancelled')} color="red" size="1.5em" className="inline" />
+                <IoIosCloseCircle title={t('status.cancelled')} color="red" size="1.5em" className="inline" />
               )}
               {isExpired(enrollment) && (enrollment.status === 'APPLIED' || enrollment.status === 'INVITED') && (
                 <IoIosCloseCircle
                   className="inline"
-                  title={t('coursePage.invitation-expired')}
+                  title={t('status.invitation_expired')}
                   color="grey"
                   size="1.5em"
                 />
@@ -193,7 +193,7 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
 
                   {enrollment.status === 'INVITED' && (
                     <div className="mt-5">
-                      {`${t('coursePage.invitation-deadline')}:`} <br />
+                      {`${t('invitation_deadline')}:`} <br />
                       {displayDate(enrollment.invitationExpirationDate)}
                     </div>
                   )}

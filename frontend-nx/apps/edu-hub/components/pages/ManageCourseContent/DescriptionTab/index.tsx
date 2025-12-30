@@ -56,7 +56,7 @@ interface IProps {
 
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const { error, handleError, resetError } = useErrorHandler();
-  const t = useTranslations('coursePage');
+  const t = useTranslations('manageCourse');
 
   const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_COURSE_LOCATION,
@@ -303,7 +303,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
         <div className="grid grid-cols-2">
           <DropdownSelector
             variant="eduhub"
-            label={t('common.language')}
+            label={t('language')}
             options={languageOptions}
             value={course.language}
             updateValueMutation={UPDATE_COURSE_LANGUAGE}
@@ -314,15 +314,15 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             <InputField
               variant="eduhub"
               type="number"
-              label={t('manageCourse.max_participants.label')}
+              label={t('max_participants.label')}
               value={course.maxParticipants?.toString() || '0'}
               itemId={course.id}
               updateValueMutation={UPDATE_COURSE_MAX_PARTICIPANTS}
               refetchQueries={['ManagedCourse']}
               min={0}
               onValueUpdated={() => qResult.refetch()}
-              placeholder={t('manageCourse.max_participants.placeholder')}
-              helpText={t('manageCourse.max_participants.help_text')}
+              placeholder={t('max_participants.placeholder')}
+              helpText={t('max_participants.help_text')}
             />
           </div>
         </div>
@@ -339,7 +339,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
       </div>
       <div className="flex justify-start text-white">
         <Button onClick={handleInsertCourseLocation} startIcon={<MdAddCircle />} color="inherit">
-          {t('coursePage.add-new-location')}
+          {t('add_new_location')}
         </Button>
       </div>
       {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}

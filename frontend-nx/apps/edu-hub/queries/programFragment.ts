@@ -13,6 +13,7 @@ export const PROGRAM_FRAGMENT_MINIMUM_PROPERTIES = gql`
     visibilityAchievementCertificate
     visibilityAttendanceCertificate
     type
+    defaultFormbricksEnrollmentSurveyUrl
   }
 `;
 export const USER_PROGRAM_FRAGMENT = gql`
@@ -48,5 +49,6 @@ export const ADMIN_PROGRAM_FRAGMENT = gql`
     visibility
     visibilityAchievementCertificate
     visibilityAttendanceCertificate
+    defaultFormbricksEnrollmentSurveyUrl
   }
 `;

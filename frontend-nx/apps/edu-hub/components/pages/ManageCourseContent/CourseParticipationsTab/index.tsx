@@ -277,7 +277,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => 
           )}
         </div>
       ) : (
-        <p className="m-auto text-center mb-14 text-gray-400">{t('coursePage.no-enrollments-present')}</p>
+        <p className="m-auto text-center mb-14 text-gray-400">{t('no_enrollments_present')}</p>
       )}
     </>
   );
@@ -456,7 +456,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
             {!enrollment.mostRecentRecord?.documentationUrl ||
             enrollment.mostRecentRecord.documentationUrl === 'pending_upload' ? (
               <div>
-                <p className={pStyle}> {t('coursePage.not-submitted')} </p>
+                <p className={pStyle}> {t('not_submitted')} </p>
               </div>
             ) : (
               <>

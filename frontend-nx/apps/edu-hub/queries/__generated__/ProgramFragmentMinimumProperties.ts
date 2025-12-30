@@ -49,4 +49,8 @@ export interface ProgramFragmentMinimumProperties {
    */
   visibilityAttendanceCertificate: boolean | null;
   type: ProgramType_enum;
+  /**
+   * Default Formbricks survey URL for course enrollments/applications. Courses can override this with their own formbricksEnrollmentSurveyUrl.
+   */
+  defaultFormbricksEnrollmentSurveyUrl: string | null;
 }

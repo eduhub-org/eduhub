@@ -102,7 +102,7 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, on
 
       <div className="flex justify-center my-8">
         <Button filled type="submit">
-          {t('common.submit')}
+          {t('submit')}
         </Button>
       </div>
     </form>
