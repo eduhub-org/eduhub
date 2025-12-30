@@ -205,8 +205,8 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
           const certCount = result.count;
           const successTranslationKey =
             certCount <= 1
-              ? `course-page:${certCount === 0 ? 'no-' : '1-'}certificate-generated`
-              : 'course-page:certificates-generated';
+              ? `coursePage.${certCount === 0 ? 'no-' : '1-'}certificate-generated`
+              : 'coursePage.certificates-generated';
 
           setSnackbarMessage(t(successTranslationKey, { number: certCount }));
           setSnackbarOpen(true);

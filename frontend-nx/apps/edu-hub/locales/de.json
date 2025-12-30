@@ -814,7 +814,7 @@
       "options": {
         "APPROVAL_WITH_INPUT": "Zulassung mit Fragebogen und Bewerbungsprozess",
         "DIRECT_CONFIRMATION": "Direkte Zulassung ohne Fragebogen",
-        "DIRECT_WITH_INPUT": "Direkte Zulassung ohne Fragebogen",
+        "DIRECT_WITH_INPUT": "Direkte Zulassung mit Fragebogen",
         "EXTERNAL_REGISTRATION": "Externe Anmeldung"
       }
     },

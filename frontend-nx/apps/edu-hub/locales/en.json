@@ -494,7 +494,7 @@
     "confirm-online-course": "Confirm",
     "online-course-confirmed": "You have confirmed on {dateTime} that you have participated in the required online courses.",
     "achievement-certificate-generation": "Generate Achievement Certificates",
-    "attendance-certificate-generation": "Generate Attendance Cartificates",
+    "attendance-certificate-generation": "Generate Attendance Certificates",
     "certificates-generated": "{number} certificates have been generated.",
     "1-certificate-generated": "One certificate has been generated.",
     "no-certificates-generated": "No certificates have been generated.",
@@ -830,7 +830,7 @@
       "options": {
         "APPROVAL_WITH_INPUT": "Approval Required with Questionnaire and Application Process",
         "DIRECT_CONFIRMATION": "Direct Confirmation without Questionnaire",
-        "DIRECT_WITH_INPUT": "Direct Confirmation without Questionnaire",
+        "DIRECT_WITH_INPUT": "Direct Confirmation with Questionnaire",
         "EXTERNAL_REGISTRATION": "External Registration"
       }
     },
