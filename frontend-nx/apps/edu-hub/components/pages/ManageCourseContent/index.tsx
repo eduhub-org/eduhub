@@ -18,6 +18,7 @@ import { ApplicationsTab } from './ApplicationsTab';
 import { CourseParticipationsTab } from './CourseParticipationsTab';
 import { DegreeParticipationsTab } from './DegreeParticipationsTab';
 import { useIsAdmin, useIsUserIdInList } from '../../../hooks/authentication';
+import { CourseRegistrationType_enum } from '../../../__generated__/globalTypes';
 
 interface Props {
   courseId: number;
@@ -52,6 +53,13 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
     default:
       return course.status;
   }
+};
+
+const isDirectRegistration = (registrationType: CourseRegistrationType_enum | null): boolean => {
+  return (
+    registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
+    registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT
+  );
 };
 
 /**
@@ -180,7 +188,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
 
             {course.externalRegistrationLink ? null : (
               <div className={`p-4 m-2 ${determineTabClasses(2, openTabIndex)}`} onClick={openTab2}>
-                {t('applications')}
+                {isDirectRegistration(course.registrationType) ? t('registrations') : t('applications')}
               </div>
             )}
 
