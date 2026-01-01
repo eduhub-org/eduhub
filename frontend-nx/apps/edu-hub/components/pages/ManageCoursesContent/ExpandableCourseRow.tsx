@@ -565,7 +565,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                       value={course.formbricksEnrollmentSurveyUrl || ''}
                       updateValueMutation={UPDATE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY}
                       refetchQueries={['AdminCourseList']}
-                      helpText={`${t('manageCourse.formbricks.info_hidden_fields')}\n\n${t('manageCourse.formbricks.hidden_fields_required')}:\n• eduhubUserId - ${t('manageCourse.formbricks.hidden_field_userid_desc')}\n• eduhubCourseId - ${t('manageCourse.formbricks.hidden_field_courseid_desc')}\n• eduhubEnrollmentId - ${t('manageCourse.formbricks.hidden_field_enrollmentid_desc')} (${t('manageCourse.formbricks.optional')})\n\n${t('manageCourse.formbricks.hidden_fields_instructions')}\n\n${t('manageCourse.formbricks.enrollmentid_optional_reason')}`}
+                      helpText={t('manageCourse.formbricks.help_text_hidden_fields')}
                       onValueUpdated={() => {
                         // Refetch handled via refetchQueries prop
                       }}
