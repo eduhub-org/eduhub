@@ -122,14 +122,14 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const [deleteCourseLocation] = useRoleMutation<DeleteCourseLocation, DeleteCourseLocationVariables>(
     DELETE_COURSE_LOCATION,
     {
-      onError: (error) => handleError(t(error.message)),
+      onError: (error) => handleError(error.message),
     }
   );
   const [DeleteSessionAddressesByCourseAndLocation] = useRoleMutation<
     DeleteSessionAddressesByCourseAndLocation,
     DeleteSessionAddressesByCourseAndLocationVariables
   >(DELETE_SESSION_ADDRESSES_BY_COURSE_AND_LOCATION, {
-    onError: (error) => handleError(t(error.message)),
+    onError: (error) => handleError(error.message),
   });
 
   const handleDeleteCourseLocation = async (location) => {

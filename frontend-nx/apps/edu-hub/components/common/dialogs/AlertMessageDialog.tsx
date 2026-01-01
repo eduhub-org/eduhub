@@ -20,8 +20,15 @@ export const AlertMessageDialog: FC<AlertProps> = ({ alert, confirmationText = '
       <DialogTitle>
         <div className="grid grid-cols-2">
           <div>{t('warning')}</div>
-          <div className="cursor-pointer flex justify-end">
-            <MdClose onClick={handleClose} />
+          <div className="flex justify-end">
+            <button
+              onClick={handleClose}
+              className="cursor-pointer"
+              aria-label={t('close')}
+              type="button"
+            >
+              <MdClose />
+            </button>
           </div>
         </div>
       </DialogTitle>
