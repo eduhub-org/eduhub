@@ -1087,6 +1087,16 @@
     "1-certificate-generated": "Es wurde ein Zertifikat generiert."
   },
   "managePrograms": {
+    "headline": "Programme",
+    "table_header": {
+      "published": "Veröffent- licht",
+      "application_start": "Bewerbungs- anfang",
+      "application_end": "Bewerbungs- ende",
+      "course_start": "Kursstart",
+      "course_end": "Kursende",
+      "achievement_upload_deadline": "Abgabeschluss Leistungs- nachweise",
+      "not_published": "Nicht veröffentlicht"
+    },
     "title": {
       "label": "Programmtitel",
       "placeholder": "Neues Programm",
@@ -1123,7 +1133,7 @@
       "help_text": "Standard Formbricks Survey für Kurseinschreibungen. Kurse können dies mit ihrer eigenen Einschreibungs-Survey URL überschreiben."
     },
     "delete_button": {
-      "delete_program_confirmation": "Soll das Programm '{title}' wirklich gelöscht werden?",
+      "delete_program_confirmation": "Bist du sicher, dass du das Programm '{title}' löschen möchtest?",
       "untitled_program": "Unbenanntes Programm"
     },
     "certificates": {
@@ -1137,24 +1147,17 @@
       "generate": "Teilnehmer:innen Daten generieren (CSV)",
       "download": "Teilnehmer:innen Daten herunterladen (CSV)"
     },
-    "table": {
-      "default_title": "Neues Programm",
-      "programs": "Programme",
-      "add": "Programm hinzufügen",
-      "published": "Veröffentlicht",
-      "title": "Programmtitel",
-      "short_title": "Kurztitel",
-      "application_start": "Bewerbungs-anfang",
-      "application_end": "Bewerbungs-ende",
-      "course_start": "Kursstart",
-      "course_end": "Kursende",
-      "achievement_upload_deadline": "Abgabeschluss Leistungsnachweise"
+    "add_program_button": "Programm hinzufügen",
+    "bulk_action": {
+      "publish": "Ausgewählte veröffentlichen",
+      "unpublish": "Ausgewählte zurückziehen"
     },
-    "actions": {
-      "publish": "Veröffentlichen",
-      "withdraw": "Zurücknehmen",
-      "publish_confirmation": "Möchtest du das Programm {title} wirklich veröffentlichen?",
-      "withdraw_confirmation": "Möchtest du die Veröffentlichung des Programmes {title} wirklich zurücknehmen?"
+    "notifications": {
+      "programs_published_success_singular": "Programm wurde erfolgreich veröffentlicht",
+      "programs_published_success_plural": "{count} Programme wurden erfolgreich veröffentlicht",
+      "programs_unpublished_success_singular": "Programm wurde erfolgreich zurückgezogen",
+      "programs_unpublished_success_plural": "{count} Programme wurden erfolgreich zurückgezogen",
+      "bulk_action_failed": "Massenaktion '{action}' ist fehlgeschlagen"
     }
   },
   "manageUsers": {

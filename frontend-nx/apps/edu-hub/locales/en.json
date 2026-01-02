@@ -1100,6 +1100,16 @@
     "please_fill_all_fields": "Please fill out all fields to proceed!"
   },
   "managePrograms": {
+    "headline": "Programs",
+    "table_header": {
+      "published": "Published",
+      "application_start": "Application Start",
+      "application_end": "Application End",
+      "course_start": "Course Start",
+      "course_end": "Course End",
+      "achievement_upload_deadline": "Deadline for Performance Record Upload",
+      "not_published": "Not Published"
+    },
     "title": {
       "label": "Program Title",
       "placeholder": "New Program",
@@ -1150,24 +1160,17 @@
       "generate": "Generate Participation Data (CSV)",
       "download": "Download Participation Data (CSV)"
     },
-    "table": {
-      "default_title": "New Program",
-      "programs": "Programs",
-      "add": "Add program",
-      "published": "Published",
-      "title": "Programtitle",
-      "short_title": "Short title",
-      "application_start": "Application-start",
-      "application_end": "Application-end",
-      "course_start": "Course start",
-      "course_end": "Course end",
-      "achievement_upload_deadline": "Deadline for performance record upload"
+    "add_program_button": "Add Program",
+    "bulk_action": {
+      "publish": "Publish Selected",
+      "unpublish": "Unpublish Selected"
     },
-    "actions": {
-      "publish": "Publish",
-      "withdraw": "Unpublish",
-      "publish_confirmation": "Do you really want to publish the program {title} ?",
-      "withdraw_confirmation": "Do you really want to unpublish {title} ?"
+    "notifications": {
+      "programs_published_success_singular": "Program was successfully published",
+      "programs_published_success_plural": "{count} programs were successfully published",
+      "programs_unpublished_success_singular": "Program was successfully unpublished",
+      "programs_unpublished_success_plural": "{count} programs were successfully unpublished",
+      "bulk_action_failed": "Bulk action '{action}' failed"
     }
   },
   "manageUsers": {

@@ -361,30 +361,30 @@ const TableGrid = <T extends BaseRow,>({
               {headerGroup.headers.map((header) => (
                 <div
                   key={header.id}
-                  className={`${header.column.columnDef.meta?.className} relative flex items-center h-12`}
+                  className={`${header.column.columnDef.meta?.className || ''} relative flex items-center h-12 ${header.column.getCanSort() ? 'cursor-pointer' : ''}`}
                   style={{
                     width: `${header.getSize()}px`,
                     flexShrink: 0,
                   }}
                   onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
                 >
-                  <div className="flex items-center w-full h-full">
-                    {header.column.columnDef.header === '' ? null : (
-                      <div className="flex items-center">
+                  {header.column.columnDef.header === '' ? null : (
+                    <div className="flex items-center w-full">
+                      <span className="flex-1 min-w-0">
                         {header.column.id === 'selection'
                           ? flexRender(header.column.columnDef.header, header.getContext())
                           : typeof header.column.columnDef.header === 'string'
                             ? header.column.columnDef.header
                             : flexRender(header.column.columnDef.header, header.getContext())}
-                        {header.column.getCanSort() && (
-                          <div className="flex flex-col items-center ml-1">
-                            <ArrowDropUp style={{ opacity: header.column.getIsSorted() === 'asc' ? 1 : 0.5 }} />
-                            <ArrowDropDown style={{ opacity: header.column.getIsSorted() === 'desc' ? 1 : 0.5 }} />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                      </span>
+                      {header.column.getCanSort() && (
+                        <div className="flex flex-col items-center ml-1 flex-shrink-0">
+                          <ArrowDropUp style={{ opacity: header.column.getIsSorted() === 'asc' ? 1 : 0.5, marginBottom: '-8px' }} />
+                          <ArrowDropDown style={{ opacity: header.column.getIsSorted() === 'desc' ? 1 : 0.5, marginTop: '-8px' }} />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </React.Fragment>

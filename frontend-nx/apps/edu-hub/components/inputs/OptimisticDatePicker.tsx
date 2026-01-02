@@ -664,7 +664,7 @@ export const OptimisticDatePicker: FC<OptimisticDatePickerProps> = ({
     .join(' ');
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <DatePicker
         selected={displayValue}
         onChange={handleDateChange as any}

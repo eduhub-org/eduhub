@@ -7,11 +7,16 @@ import {
 
 export const PROGRAM_LIST = gql`
   ${ADMIN_PROGRAM_FRAGMENT}
-  query ProgramList {
-    Program {
+  query ProgramList($limit: Int, $offset: Int, $order_by: [Program_order_by!], $where: Program_bool_exp) {
+    Program(limit: $limit, offset: $offset, order_by: $order_by, where: $where) {
       ...AdminProgramFragment
       Courses {
         id
+      }
+    }
+    Program_aggregate(where: $where) {
+      aggregate {
+        count
       }
     }
   }
