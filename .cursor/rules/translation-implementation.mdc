@@ -11,12 +11,25 @@ This guide covers how to implement translations in the EduHub project following 
 ## File Structure and Naming
 
 ### Translation Files
-- **Location**: `frontend-nx/apps/edu-hub/locales/{language}/`
+- **Location**: `frontend-nx/apps/edu-hub/locales/`
 - **Languages**: `de` (German), `en` (English)
-- **File naming**: Use Pascal-case matching the page/component name
-  - Example: `manageCourse.json` for manage/course components
+- **File structure**: **One file per language** (`de.json`, `en.json`)
+- **Organization**: Translations are organized into namespaces within each JSON file, organized by component/page names
 
-### Key Naming Convention
+### Naming Conventions
+
+#### Namespace Names (Top-Level Keys)
+- **Namespaces match component or page names** (camelCase or PascalCase depending on component naming)
+- Examples: `course`, `coursePage`, `common`, `auth`, `manageOrganizations`
+
+#### Group Names (Nested Within Namespaces)
+- **Component names**: Use PascalCase, matching the actual component name exactly
+  - Examples: `CreatableTagSelector`, `TableGrid`, `ImageUploader`, `InputField`, `Sessions`, `RegistrationModal`
+- **Logical groupings within components**: Use snake_case for grouping related translations
+  - Examples: `attendance_status`, `error_messages`, `general`, `common`, `modal`, `errors`
+- **Both patterns can coexist**: Component names (PascalCase) and logical groups (snake_case) can both be used as needed
+
+#### Translation Keys (Leaf Values)
 - **All translation keys MUST use snake_case**
 - Examples: `login_error_message`, `application_deadline`, `max_missed_sessions`
 
@@ -42,135 +55,191 @@ This guide covers how to implement translations in the EduHub project following 
 
 ## Component-Based Translation Organization
 
-### Main Course Translations ([course.json](mdc:frontend-nx/apps/edu-hub/locales/de/course.json))
+### Translation Structure
 
-Organize translations into logical groups based on component functionality:
+Translations are organized hierarchically:
+1. **Top-level namespaces** match component/page names (camelCase or PascalCase)
+2. **Nested groups** within namespaces can be:
+   - Component names (PascalCase) - e.g., `CreatableTagSelector`, `Sessions`
+   - Logical groupings (snake_case) - e.g., `attendance_status`, `error_messages`, `general`
+3. **Translation keys** use snake_case
+
+### Example Structure
 
 ```json
 {
-  "general": {
-    "events": "Event",
-    "reject": "Teilnahme ablehnen", 
-    "confirm": "Teilnahme bestätigen",
-    "ects": "ECTS",
-    "course_not_available": "Kurs nicht verfügbar",
-    "to_course_chat": "ZUM KURS-CHAT",
-    "to_online_meeting": "ZUM ONLINE-MEETING",
-    "speaker": "Referent:in",
-    "link_will_be_provided_soon": "[Link wird hier in Kürze bereitgestellt]"
-  },
-  "ects": {
-    "NONE": "OHNE",
-    "0,5": "0,5", 
-    "2,5": "2,5",
-    "5": "5",
-    "12,5": "12,5"
-  },
-  "degree_elements": {
-    "completed_degree_elements": "Bisher abgeschlossene Elemente",
-    "current_degree_elements": "Aktuelle Angebote im Rahmen des Degrees"
-  },
-  "learning": {
-    "you_will_learn": "Du wirst lernen",
-    "general_achievement_certificate_conditions": "Certificate conditions..."
-  },
-  "sessions": {
-    "show_all_sessions": "Alle Termine anzeigen",
-    "hide_sessions": "Termine einklappen", 
-    "course_sessions": "Kurstermine"
-  },
-  "attendances": {
-    "attendances": "Anwesenheiten",
-    "max_missed_sessions": "Du darfst an maximal einem Termin fehlen",
-    "attendance_status": {
-      "ATTENDED": "Teilgenommen",
-      "MISSED": "Nicht teilgenommen"
+  "common": {
+    "delete": "Delete",
+    "save": "Save",
+    "CreatableTagSelector": {
+      "add_tag": "Add \"{value}\""
+    },
+    "TableGrid": {
+      "pagination_text": "Page {currentPage} of {totalPage}",
+      "bulk_action": "Bulk Action"
+    },
+    "ImageUploader": {
+      "uploading": "Uploading...",
+      "upload_file": "Upload file"
     }
   },
-  "achievement": {
-    "achievement_option": "Leistungsnachweis",
-    "upload_achievement_record": "Neuen Nachweis hochladen",
-    "choose_achievement_option": "Wähle den Titel deines Leistungsnachweises aus"
+  "course": {
+    "Sessions": {
+      "show_all_sessions": "Alle Termine anzeigen",
+      "hide_sessions": "Termine einklappen",
+      "course_sessions": "Kurstermine"
+    },
+    "Attendances": {
+      "attendances": "Anwesenheiten",
+      "max_missed_sessions": "Du darfst an maximal einem Termin fehlen",
+      "attendance_status": {
+        "ATTENDED": "Teilgenommen",
+        "MISSED": "Nicht teilgenommen"
+      }
+    },
+    "RegistrationModal": {
+      "title_approval": "Für Kurs bewerben",
+      "motivation_letter_label": "Motivationsschreiben",
+      "cancel": "Abbrechen",
+      "errors": {
+        "motivation_letter_required": "Bitte gib ein Motivationsschreiben an",
+        "registration_failed": "Registrierung fehlgeschlagen"
+      }
+    },
+    "general": {
+      "events": "Event",
+      "ects": "ECTS",
+      "course_not_available": "Kurs nicht verfügbar"
+    }
   },
-  "registration": {
-    "application_deadline": "Bewerbungsschluss: ",
-    "apply_now": "Jetzt bewerben",
-    "sign_in_to_register": "Anmelden zur Registrierung"
-  },
-  "status": {
-    "applied": "Beworben",
-    "invited": "Eingeladen", 
-    "rejected": "Bewerbung abgelehnt"
-  },
-  "modal": {
-    "title_approval": "Für Kurs bewerben",
-    "motivation_letter_label": "Motivationsschreiben",
-    "cancel": "Abbrechen"
-  },
-  "errors": {
-    "motivation_letter_required": "Bitte gib ein Motivationsschreiben an",
-    "registration_failed": "Registrierung fehlgeschlagen"
+  "coursePage": {
+    "ManageCourseContent": {
+      "course_title": "Course title",
+      "course_instructor": "Course instructor"
+    }
   }
 }
 ```
+
+**Key Points**:
+- **Namespaces** (top-level): Match component/page names - `course`, `coursePage`, `common`
+- **Groups** (nested): 
+  - Component names use PascalCase - `CreatableTagSelector`, `TableGrid`, `Sessions`, `RegistrationModal`
+  - Logical groupings use snake_case - `attendance_status`, `error_messages`, `general`, `common`
+- **Keys** (leaf values): Use snake_case - `add_tag`, `pagination_text`, `show_all_sessions`
+- All translations are in a single file per language (`de.json`, `en.json`)
 
 ## Translation Usage in Components
 
 ### Import and Setup
 ```typescript
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations } from 'next-intl';
 
-const { t } = useTranslation('course'); // Use namespace matching filename
+const t = useTranslations('course'); // Use namespace (e.g., 'course', 'common', 'auth')
 ```
+
+**Important**: EduHub uses **next-intl** (not next-translate). The hook is `useTranslations` (plural) and returns the translation function directly.
 
 ### Accessing Grouped Translations
 ```typescript
-// General translations
-const buttonText = t('general.confirm');
-const ectsLabel = t('general.ects');
+const t = useTranslations('course');
 
-// ECTS values with bracket notation for keys containing dots/commas
-const { t: tCourse } = useTranslation('course');
-const ectsTranslations = tCourse('ects', { returnObjects: true });
-const ectsValue = ectsTranslations[course.ects]; // e.g., ectsTranslations['2,5']
+// Access translations organized by component name (PascalCase)
+const sessionsText = t('Sessions.show_all_sessions');
+const hideSessions = t('Sessions.hide_sessions');
 
-// Achievement translations
-const achievementTitle = t('achievement.achievement_option');
-const uploadText = t('achievement.upload_achievement_record');
+// Access logical groupings (snake_case) within components
+const attendanceStatus = t.raw('Attendances.attendance_status');
+const status = attendanceStatus['ATTENDED']; // "Teilgenommen"
 
-// Registration translations  
-const applyButton = t('registration.apply_now');
-const deadline = t('registration.application_deadline');
+// Access component-specific translations
+const modalTitle = t('RegistrationModal.title_approval');
+const motivationLabel = t('RegistrationModal.motivation_letter_label');
 
-// Status translations
-const statusText = t('status.applied');
+// Access logical groupings within components
+const errorMsg = t('RegistrationModal.errors.motivation_letter_required');
+const generalEvents = t('general.events');
 
-// Modal translations
-const modalTitle = t('modal.title_approval');
-const motivationLabel = t('modal.motivation_letter_label');
+// Access common component translations
+const tCommon = useTranslations('common');
+const addTagText = tCommon('CreatableTagSelector.add_tag');
+const paginationText = tCommon('TableGrid.pagination_text');
+```
 
-// Error messages
-const errorMsg = t('errors.motivation_letter_required');
+### Accessing Multiple Namespaces
+```typescript
+import { useTranslations } from 'next-intl';
+
+const tCommon = useTranslations('common');
+const tCourse = useTranslations('course');
+
+// Use translations from different namespaces
+const deleteButton = tCommon('delete');
+const courseTitle = tCourse('Sessions.show_all_sessions');
+```
+
+### Accessing Current Locale
+```typescript
+import { useLocale } from 'next-intl';
+
+const locale = useLocale(); // Returns 'de' or 'en'
+
+// Use locale for conditional logic or API calls
+if (locale === 'de') {
+  // German-specific logic
+}
 ```
 
 ## Best Practices
 
 ### Adding New Translations
-1. **Identify the component group** the translation belongs to
-2. **Use snake_case** for all keys
-3. **Add to both German and English** files simultaneously
-4. **Maintain consistent grouping** within the JSON structure
-5. **MANDATORY: Use informal "Du" in ALL German translations**
+1. **Identify the namespace** the translation belongs to (e.g., `course`, `common`, `auth`) - matches component/page name
+2. **Identify the organization level**:
+   - If it's component-specific: create a group with the component name in PascalCase (e.g., `TableGrid`, `RegistrationModal`)
+   - If it's a logical grouping: use snake_case (e.g., `attendance_status`, `error_messages`, `general`)
+3. **Use snake_case** for all translation keys (leaf values)
+4. **Add to both `de.json` and `en.json`** files simultaneously in the same namespace and group
+5. **Maintain component-based organization** - group translations by the component that uses them, with logical subgroups as needed
+6. **MANDATORY: Use informal "Du" in ALL German translations**
+7. **File structure**: All translations are in single files per language (`de.json`, `en.json`) organized by namespaces and groups
+
+**Examples**: 
+```json
+{
+  "common": {
+    "TableGrid": {
+      "pagination_text": "Page {currentPage} of {totalPage}",
+      "items_per_page": "Items per page"
+    }
+  },
+  "course": {
+    "RegistrationModal": {
+      "title_approval": "Für Kurs bewerben",
+      "errors": {
+        "motivation_letter_required": "Bitte gib ein Motivationsschreiben an"
+      }
+    },
+    "Attendances": {
+      "attendance_status": {
+        "ATTENDED": "Teilgenommen",
+        "MISSED": "Nicht teilgenommen"
+      }
+    }
+  }
+}
+```
 
 > **💡 Tip**: See [Frontend Component Patterns](frontend-component-patterns.mdc) for component integration examples and [Testing Standards](testing-standards.mdc) for translation testing.
 
 ### Accessing Nested Translations
 ```typescript
+const t = useTranslations('course');
+
 // For simple nested access
 const text = t('group.key');
 
-// For dynamic keys or keys with special characters
-const translations = t('group', { returnObjects: true });
+// For dynamic keys or keys with special characters, use .raw()
+const translations = t.raw('group');
 const value = translations[dynamicKey];
 ```
 
@@ -194,36 +263,69 @@ const missedSessions = t('attendances.max_missed_sessions', { count: maxMissed }
 ### CourseContent Structure
 ```
 frontend-nx/apps/edu-hub/components/pages/CourseContent/
-├── index.tsx                    # Uses: general.*, sessions.*
-├── LearningGoals.tsx           # Uses: learning.*
-├── DegreeCourses.tsx           # Uses: degree_elements.*
-├── TimeLocationLanguageInstructors.tsx # Uses: general.ects, ects.*
-├── Sessions.tsx                # Uses: sessions.*
+├── index.tsx                    # Uses: course.Sessions.*, course.Attendances.*
+├── LearningGoals.tsx           # Uses: course.LearningGoals.*
+├── DegreeCourses.tsx           # Uses: course.DegreeCourses.*
+├── Sessions.tsx                # Uses: course.Sessions.*
 ├── Registration/
-│   ├── index.tsx              # Uses: registration.*, status.*
-│   ├── RegistrationModal.tsx  # Uses: modal.*, errors.*
-│   └── RegistrationStatus.tsx # Uses: status.*, general.*
+│   ├── index.tsx              # Uses: course.Registration.*
+│   ├── RegistrationModal.tsx  # Uses: course.RegistrationModal.*
+│   └── RegistrationStatus.tsx # Uses: course.RegistrationStatus.*
 └── AchievementRecord/
-    ├── index.tsx              # Uses: achievement.*
-    └── UploadModal.tsx        # Uses: achievement.*, errors.*
+    ├── index.tsx              # Uses: course.AchievementRecord.*
+    └── UploadModal.tsx        # Uses: course.AchievementRecord.*
 ```
 
 ### Translation File Mapping
-- **CourseContent components** → `course.json`
-- **Management pages** → `course-page.json`  
-- **Authentication** → `auth.json`
-- **Common elements** → `common.json`
+- **CourseContent components** → `course` namespace with component groups (e.g., `course.Sessions.*`, `course.RegistrationModal.*`)
+- **Management pages** → `coursePage` namespace with component groups (e.g., `coursePage.ManageCourseContent.*`)
+- **Authentication** → `auth` namespace with component groups
+- **Common/shared components** → `common` namespace with component groups (e.g., `common.TableGrid.*`, `common.CreatableTagSelector.*`)
+
+**Structure**: `namespace.ComponentName.translation_key` where:
+- `namespace` = top-level namespace (matches page/feature name)
+- `ComponentName` = component name in PascalCase
+- `translation_key` = snake_case key
+
+All translations are stored in a single file per language (`de.json` or `en.json`) with namespaces as top-level keys and component names as nested groups.
 
 ## Migration Guidelines
 
-When consolidating translations:
-1. **Identify duplicate keys** across files
-2. **Move CourseContent translations** to `course.json` with proper grouping
-3. **Update component imports** to use new namespace
-4. **Convert keys to snake_case** if needed
+### Migrating from next-translate to next-intl
+1. **Update imports**: Change `import useTranslation from 'next-translate/useTranslation'` to `import { useTranslations } from 'next-intl'`
+2. **Update hook usage**: Change `const { t } = useTranslation('namespace')` to `const t = useTranslations('namespace')`
+3. **Update file structure**: Consolidate multiple translation files per language into single `de.json` and `en.json` files
+4. **Organize by namespaces**: Group translations into top-level namespace keys (e.g., `course`, `common`, `auth`) within each language file
+
+### When consolidating translations:
+1. **Identify duplicate keys** across namespaces
+2. **Organize by component**: Group translations under component names (PascalCase) within appropriate namespaces
+3. **Update component imports** to use `useTranslations` from `next-intl`
+4. **Convert keys to snake_case** if needed (translation keys only, not component group names)
 5. **CRITICAL: Convert ALL German translations to informal "Du" form**
-6. **Remove duplicates** from original files
+6. **Remove duplicates** from original namespaces
 7. **Test all affected components**
+
+**Example migration**:
+```json
+// Before (old structure)
+{
+  "course": {
+    "sessions": {
+      "show_all": "Show all"
+    }
+  }
+}
+
+// After (component-based structure)
+{
+  "course": {
+    "Sessions": {
+      "show_all": "Show all"
+    }
+  }
+}
+```
 
 ## Quality Assurance
 

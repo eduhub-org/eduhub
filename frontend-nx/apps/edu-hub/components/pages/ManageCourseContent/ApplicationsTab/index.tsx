@@ -36,11 +36,12 @@ import TableGrid from '../../../common/TableGrid';
 import { ColumnDef } from '@tanstack/react-table';
 import { GoDotFill } from 'react-icons/go';
 import { IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
-import { MotivationRating_enum, CourseEnrollmentStatus_enum } from '../../../../__generated__/globalTypes';
+import { MotivationRating_enum, CourseEnrollmentStatus_enum, CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
 import { useDisplayDate } from '../../../../helpers/dateTimeHelpers';
 import { BulkAction } from '../../../common/TableGrid/types';
 import { ApolloError } from '@apollo/client';
 import { ErrorMessageDialog } from '../../../common/dialogs/ErrorMessageDialog';
+import { FormbricksResponsesDisplay } from './FormbricksResponsesDisplay';
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
@@ -54,6 +55,13 @@ const isExpired = (enrollment: ManagedCourse_Course_by_pk_CourseEnrollments) => 
   return new Date(enrollment.invitationExpirationDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0);
 };
 
+const isDirectRegistration = (registrationType: CourseRegistrationType_enum | null): boolean => {
+  return (
+    registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
+    registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT
+  );
+};
+
 export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const t = useTranslations('manageCourse');
   const locale = useLocale();
@@ -62,6 +70,8 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
   const isAdmin = useIsAdmin();
   const theme = useTheme();
 
+  const isDirectReg = isDirectRegistration(course.registrationType);
+  
   const applicationStats = useMemo(() => {
     const totalApplications = course.CourseEnrollments.length;
     const approvedApplications = course.CourseEnrollments.filter(
@@ -71,26 +81,26 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       (enrollment) => enrollment.status === 'INVITED' || enrollment.status === 'CONFIRMED'
     ).length;
     const confirmedApplicants = course.CourseEnrollments.filter(
-      (enrollment) => enrollment.status === 'CONFIRMED'
+      (enrollment) => enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED'
     ).length;
     return { totalApplications, approvedApplications, invitedApplicants, confirmedApplicants };
   }, [course.CourseEnrollments]);
 
   const infoDots = (
     <div className="text-gray-400 text-sm">
-      <div className="mb-1">{t('coursePage.application-rating')}</div>
+      <div className="mb-1">{t('rating.label')}</div>
       <div className="flex gap-4 text-gray-400">
         <div className="flex items-center gap-1">
-          <Dot color="lightgreen" /> <span>{t('coursePage.invite')}</span>
+          <Dot color="lightgreen" /> <span>{t('rating.invite')}</span>
         </div>
         <div className="flex items-center gap-1">
-          <Dot color="orange" /> <span>{t('coursePage.unclear')}</span>
+          <Dot color="orange" /> <span>{t('rating.unclear')}</span>
         </div>
         <div className="flex items-center gap-1">
-          <Dot color="red" /> <span>{t('coursePage.reject')}</span>
+          <Dot color="red" /> <span>{t('rating.reject')}</span>
         </div>
         <div className="flex items-center gap-1">
-          <Dot color="grey" /> <span>{t('coursePage.not-rated')}</span>
+          <Dot color="grey" /> <span>{t('rating.not_rated')}</span>
         </div>
       </div>
     </div>
@@ -473,60 +483,67 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
   // Columns definition
   const columns = useMemo<ColumnDef<ManagedCourse_Course_by_pk_CourseEnrollments>[]>(
-    () => [
-      {
-        header: t('first_name'),
-        accessorKey: 'User.firstName',
-        size: 200,
-        enableSorting: true,
-        cell: ({ row }) => row.original.User.firstName,
-      },
-      {
-        header: t('last_name'),
-        accessorKey: 'User.lastName',
-        size: 200,
-        enableSorting: true,
-        cell: ({ row }) => row.original.User.lastName,
-      },
-      {
-        header: t('organization'),
-        accessorKey: 'User.Organization.name',
-        size: 300,
-        enableSorting: true,
-        cell: ({ row }) => {
-          const orgName = row.original.User.Organization?.name;
-          return (
-            <div className="truncate" title={orgName || ''}>
-              {orgName || '-'}
-            </div>
-          );
+    () => {
+      const baseColumns: ColumnDef<ManagedCourse_Course_by_pk_CourseEnrollments>[] = [
+        {
+          header: t('first_name'),
+          accessorKey: 'User.firstName',
+          size: 200,
+          enableSorting: true,
+          cell: ({ row }) => row.original.User.firstName,
         },
-      },
-      {
-        header: t('coursePage.evaluation'),
-        accessorKey: 'motivationRating',
-        size: 100,
-        enableSorting: true,
-        sortingFn: (rowA, rowB) => {
-          return ratingSortFn(
-            rowA.original.motivationRating,
-            rowB.original.motivationRating
-          );
+        {
+          header: t('last_name'),
+          accessorKey: 'User.lastName',
+          size: 200,
+          enableSorting: true,
+          cell: ({ row }) => row.original.User.lastName,
         },
-        cell: ({ row }) => {
-          const rating = row.original.motivationRating;
-          return (
-            <div className="text-center">
-              {rating === 'UNRATED' && <Dot color="grey" />}
-              {rating === 'INVITE' && <Dot color="lightgreen" />}
-              {rating === 'REVIEW' && <Dot color="orange" />}
-              {rating === 'DECLINE' && <Dot color="red" />}
-            </div>
-          );
+        {
+          header: t('organization'),
+          accessorKey: 'User.Organization.name',
+          size: 300,
+          enableSorting: true,
+          cell: ({ row }) => {
+            const orgName = row.original.User.Organization?.name;
+            return (
+              <div className="truncate" title={orgName || ''}>
+                {orgName || '-'}
+              </div>
+            );
+          },
         },
-      },
-      {
-        header: t('status'),
+      ];
+
+      // Only include evaluation column for non-direct registration types
+      if (!isDirectReg) {
+        baseColumns.push({
+          header: t('evaluation'),
+          accessorKey: 'motivationRating',
+          size: 100,
+          enableSorting: true,
+          sortingFn: (rowA, rowB) => {
+            return ratingSortFn(
+              rowA.original.motivationRating,
+              rowB.original.motivationRating
+            );
+          },
+          cell: ({ row }) => {
+            const rating = row.original.motivationRating;
+            return (
+              <div className="text-center">
+                {rating === 'UNRATED' && <Dot color="grey" />}
+                {rating === 'INVITE' && <Dot color="lightgreen" />}
+                {rating === 'REVIEW' && <Dot color="orange" />}
+                {rating === 'DECLINE' && <Dot color="red" />}
+              </div>
+            );
+          },
+        });
+      }
+
+      baseColumns.push({
+        header: t('status_label'),
         accessorKey: 'status',
         size: 100,
         enableSorting: true,
@@ -539,32 +556,32 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
           return (
             <div className="text-center">
               {!expired && enrollment.status === 'APPLIED' && (
-                <GoDotFill className="inline" title={t('coursePage.applied')} color="grey" size="2.5em" />
+                <GoDotFill className="inline" title={t('status.applied')} color="grey" size="2.5em" />
               )}
               {!expired && enrollment.status === 'INVITED' && (
-                <IoIosCheckmarkCircle className="inline" title={t('coursePage.invited')} color="grey" size="1.5em" />
+                <IoIosCheckmarkCircle className="inline" title={t('status.invited')} color="grey" size="1.5em" />
               )}
               {(enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED') && (
                 <IoIosCheckmarkCircle
                   className="inline"
-                  title={t('coursePage.invitation-confirmed')}
+                  title={t('status.invitation_confirmed')}
                   color="lightgreen"
                   size="1.5em"
                 />
               )}
               {enrollment.status === 'ABORTED' && (
-                <IoIosCheckmarkCircle title={t('coursePage.aborted')} color="red" size="1.5em" className="inline" />
+                <IoIosCheckmarkCircle title={t('status.aborted')} color="red" size="1.5em" className="inline" />
               )}
               {enrollment.status === 'REJECTED' && (
-                <IoIosCloseCircle title={t('coursePage.rejected')} color="red" size="1.5em" className="inline" />
+                <IoIosCloseCircle title={t('status.rejected')} color="red" size="1.5em" className="inline" />
               )}
               {enrollment.status === 'CANCELLED' && (
-                <IoIosCloseCircle title={t('coursePage.cancelled')} color="red" size="1.5em" className="inline" />
+                <IoIosCloseCircle title={t('status.cancelled')} color="red" size="1.5em" className="inline" />
               )}
               {expired && (enrollment.status === 'APPLIED' || enrollment.status === 'INVITED') && (
                 <IoIosCloseCircle
                   className="inline"
-                  title={t('coursePage.invitation-expired')}
+                  title={t('status.invitation_expired')}
                   color="grey"
                   size="1.5em"
                 />
@@ -575,9 +592,11 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
         meta: {
           className: 'ml-auto',
         },
-      },
-    ],
-    [t, ratingSortFn, statusSortFn]
+      });
+
+      return baseColumns;
+    },
+    [t, ratingSortFn, statusSortFn, isDirectReg]
   );
 
   // Expandable row component
@@ -600,6 +619,10 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
 
     // Access Organization from the User object
     const orgName = enrollment.User.Organization?.name;
+    
+    // Get effective Formbricks survey URL (course-level overrides program default)
+    const effectiveSurveyUrl = course.formbricksEnrollmentSurveyUrl || course.Program?.defaultFormbricksEnrollmentSurveyUrl || null;
+    const hasFormbricksSurvey = !!effectiveSurveyUrl;
 
     return (
       <div className="pt-5 pb-5">
@@ -613,10 +636,10 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
               </div>
             </div>
             <div>
-              <div className="text-sm font-medium text-gray-700 mb-2">{t('application_history')}</div>
+              <div className="text-sm font-medium text-gray-700 mb-2">{t('application_history.label')}</div>
               <div className="space-y-1">
                 {enrollment.User.CourseEnrollments.length > 0 && enrollment.User.CourseEnrollments.filter(e => e.courseId !== enrollment.courseId).length === 0 ? (
-                  <div className="text-sm text-gray-500 italic pl-4">{t('coursePage.no-applications-present')}</div>
+                  <div className="text-sm text-gray-500 italic pl-4">{t('no_applications_present')}</div>
                 ) : (
                   enrollment.User.CourseEnrollments.map((pastEnrollment, index) => {
                     if (pastEnrollment.courseId === enrollment.courseId) {
@@ -644,88 +667,103 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
             </div>
           </div>
 
-          {/* Motivation Letter - calculated width to fit remaining space */}
+          {/* Application Content - Formbricks or Motivation Letter */}
           {/* Total available: 960px (mainRowContentWidth), minus: 400px (email) + 100px (rating) + 24px (2 gaps) + 12px (padding) = 424px */}
           <div style={{ width: '424px', flexShrink: 0 }}>
             <div className="mb-4">
-              <div className="text-sm font-medium text-gray-700 mb-1">{t('coursePage.application')}</div>
-              <div className="text-gray-900 whitespace-pre-wrap break-words pl-4">{enrollment.motivationLetter || '-'}</div>
+              {hasFormbricksSurvey ? (
+                <FormbricksResponsesDisplay
+                  courseId={enrollment.courseId}
+                  userId={enrollment.userId}
+                  enrollmentId={enrollment.id}
+                  formbricksEnrollmentSurveyUrl={effectiveSurveyUrl!}
+                />
+              ) : (
+                <>
+                  <div className="text-sm font-medium text-gray-700 mb-1">{t('application')}</div>
+                  <div className="text-gray-900 whitespace-pre-wrap break-words pl-4">
+                    {enrollment.motivationLetter || '-'}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
-          {/* Rating Controls - aligned with motivationRating column (100px) */}
-          <div style={{ width: '100px', flexShrink: 0 }}>
-            <div className="mb-4">
-              <div className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
-                {t('coursePage.evaluation')}
-                <Tooltip title={t('application_status_tooltip')} placement="top">
-                  <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled }} />
-                </Tooltip>
-              </div>
-              <div className="flex gap-2 pl-4">
-                <button
-                  onClick={setUnrated}
-                  className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                  title={t('coursePage.not-rated')}
-                  aria-label={t('coursePage.not-rated')}
-                >
-                  <Dot
-                    color="grey"
-                    size={enrollment.motivationRating === 'UNRATED' ? 'LARGE' : 'DEFAULT'}
-                    className="block"
-                  />
-                </button>
-                <button
-                  onClick={setInvite}
-                  className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                  title={t('coursePage.invite')}
-                  aria-label={t('coursePage.invite')}
-                >
-                  <Dot
-                    color="lightgreen"
-                    size={enrollment.motivationRating === 'INVITE' ? 'LARGE' : 'DEFAULT'}
-                    className="block"
-                  />
-                </button>
-                <button
-                  onClick={setReview}
-                  className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                  title={t('coursePage.unclear')}
-                  aria-label={t('coursePage.unclear')}
-                >
-                  <Dot
-                    color="orange"
-                    size={enrollment.motivationRating === 'REVIEW' ? 'LARGE' : 'DEFAULT'}
-                    className="block"
-                  />
-                </button>
-                <button
-                  onClick={setDecline}
-                  className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                  title={t('coursePage.reject')}
-                  aria-label={t('coursePage.reject')}
-                >
-                  <Dot
-                    color="red"
-                    size={enrollment.motivationRating === 'DECLINE' ? 'LARGE' : 'DEFAULT'}
-                    className="block"
-                  />
-                </button>
-              </div>
-            </div>
-
-            {enrollment.status === 'INVITED' && (
-              <div className="mt-4">
-                <div className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
-                  {t('coursePage.invitation-deadline')}
-                  <Tooltip title={t('application_deadline_tooltip')} placement="top">
+          {/* Rating Controls - aligned with motivationRating column (100px) - only show for non-direct registration */}
+          {!isDirectReg && (
+            <div style={{ width: '100px', flexShrink: 0 }}>
+              <div className="mb-4">
+                <div className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                  {t('evaluation')}
+                  <Tooltip title={t('application_status_tooltip')} placement="top">
                     <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled }} />
                   </Tooltip>
                 </div>
-                <div className="text-gray-900 font-medium pl-4">{displayDate(enrollment.invitationExpirationDate)}</div>
+                <div className="flex gap-2 pl-4">
+                  <button
+                    onClick={setUnrated}
+                    className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    title={t('rating.not_rated')}
+                    aria-label={t('rating.not_rated')}
+                  >
+                    <Dot
+                      color="grey"
+                      size={enrollment.motivationRating === 'UNRATED' ? 'LARGE' : 'DEFAULT'}
+                      className="block"
+                    />
+                  </button>
+                  <button
+                    onClick={setInvite}
+                    className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    title={t('rating.invite')}
+                    aria-label={t('rating.invite')}
+                  >
+                    <Dot
+                      color="lightgreen"
+                      size={enrollment.motivationRating === 'INVITE' ? 'LARGE' : 'DEFAULT'}
+                      className="block"
+                    />
+                  </button>
+                  <button
+                    onClick={setReview}
+                    className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    title={t('rating.unclear')}
+                    aria-label={t('rating.unclear')}
+                  >
+                    <Dot
+                      color="orange"
+                      size={enrollment.motivationRating === 'REVIEW' ? 'LARGE' : 'DEFAULT'}
+                      className="block"
+                    />
+                  </button>
+                  <button
+                    onClick={setDecline}
+                    className="cursor-pointer hover:opacity-80 hover:scale-110 transition-all duration-200 p-1 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    title={t('rating.reject')}
+                    aria-label={t('rating.reject')}
+                  >
+                    <Dot
+                      color="red"
+                      size={enrollment.motivationRating === 'DECLINE' ? 'LARGE' : 'DEFAULT'}
+                      className="block"
+                    />
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
+
+              {enrollment.status === 'INVITED' && (
+                <div className="mt-4">
+                  <div className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                    {t('invitation_deadline')}
+                    <Tooltip title={t('application_deadline_tooltip')} placement="top">
+                      <HelpOutline style={{ cursor: 'pointer', color: theme.palette.text.disabled }} />
+                    </Tooltip>
+                  </div>
+                  <div className="text-gray-900 font-medium pl-4">{displayDate(enrollment.invitationExpirationDate)}</div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -742,36 +780,51 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
       <Modal
         isOpen={isAddParticipantsModalOpen}
         onClose={closeAddParticipantsModal}
-        title={t('manageCourse.add_participants')}
+        title={t('add_participants')}
       >
         <AddParticipantsForm courseId={course.id} onSubmit={closeAddParticipantsModal} />
       </Modal>
 
       {/* Statistics Cards */}
       {courseEnrollments.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-edu-light-gray p-4 rounded-lg">
-            <div className="text-gray-600 text-sm mb-1">{t('statistics_applications_total')}</div>
-            <div className="text-gray-900 text-2xl font-semibold">{applicationStats.totalApplications}</div>
-          </div>
-          <div className="bg-edu-light-gray p-4 rounded-lg">
-            <div className="text-gray-600 text-sm mb-1">{t('statistics_applications_accepted')}</div>
-            <div className="text-gray-900 text-2xl font-semibold">{applicationStats.approvedApplications}</div>
-          </div>
-          <div className="bg-edu-light-gray p-4 rounded-lg">
-            <div className="text-gray-600 text-sm mb-1">{t('statistics_invitations_total')}</div>
-            <div className="text-gray-900 text-2xl font-semibold">{applicationStats.invitedApplicants}</div>
-          </div>
-          <div className="bg-edu-light-gray p-4 rounded-lg">
-            <div className="text-gray-600 text-sm mb-1">{t('statistics_invitations_confirmed')}</div>
-            <div className="text-gray-900 text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
-          </div>
+        <div className={`grid grid-cols-1 md:grid-cols-2 ${isDirectReg ? 'lg:grid-cols-2' : 'lg:grid-cols-4'} gap-4 mb-6`}>
+          {isDirectReg ? (
+            <>
+              {/* Direct Registration: Show only total and confirmed registrations */}
+              <div className="bg-edu-light-gray p-4 rounded-lg">
+                <div className="text-gray-600 text-sm mb-1">{t('statistics_registrations_total')}</div>
+                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.totalApplications}</div>
+              </div>
+              <div className="bg-edu-light-gray p-4 rounded-lg">
+                <div className="text-gray-600 text-sm mb-1">{t('statistics_registrations_confirmed')}</div>
+                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Approval-based Registration: Show all 4 cards */}
+              <div className="bg-edu-light-gray p-4 rounded-lg">
+                <div className="text-gray-600 text-sm mb-1">{t('statistics_applications_total')}</div>
+                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.totalApplications}</div>
+              </div>
+              <div className="bg-edu-light-gray p-4 rounded-lg">
+                <div className="text-gray-600 text-sm mb-1">{t('statistics_applications_accepted')}</div>
+                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.approvedApplications}</div>
+              </div>
+              <div className="bg-edu-light-gray p-4 rounded-lg">
+                <div className="text-gray-600 text-sm mb-1">{t('statistics_invitations_total')}</div>
+                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.invitedApplicants}</div>
+              </div>
+              <div className="bg-edu-light-gray p-4 rounded-lg">
+                <div className="text-gray-600 text-sm mb-1">{t('statistics_invitations_confirmed')}</div>
+                <div className="text-gray-900 text-2xl font-semibold">{applicationStats.confirmedApplicants}</div>
+              </div>
+            </>
+          )}
         </div>
       )}
 
       <div>
-        {courseEnrollments.length > 0 ? (
-          <>
             <OnlyInstructor>
               <TableGrid<ManagedCourse_Course_by_pk_CourseEnrollments>
                 columns={columns}
@@ -797,11 +850,10 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
               />
             </OnlyInstructor>
 
-            <div className="-mt-8 mb-3">{infoDots}</div>
-          </>
-        ) : (
-          <p className="m-auto text-center mb-14 text-gray-400">{t('coursePage.no-applications-present')}</p>
-        )}
+            {filteredEnrollments.length > 0 && !isDirectReg && (
+              <div className="-mt-8 mb-3">{infoDots}</div>
+            )}
+
       </div>
 
       {/* Invitation Dialog */}
@@ -835,7 +887,7 @@ export const ApplicationsTab: FC<IProps> = ({ course, qResult }) => {
                 </p>
                 <div className="flex flex-col gap-4">
                   <label className="text-sm font-medium text-gray-700">
-                    {t('coursePage.invitation-deadline')}
+                    {t('invitation_deadline')}
                   </label>
                   <DatePicker
                     dateFormat={locale === 'de' ? 'dd.MM.yyyy' : 'MM/dd/yyyy'}

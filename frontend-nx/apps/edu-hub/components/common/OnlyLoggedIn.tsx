@@ -1,5 +1,5 @@
 import { FC, ReactElement, ReactNode } from "react";
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import {
   useIsAdmin,

@@ -234,6 +234,21 @@ resource "google_secret_manager_secret_version" "keycloak_ras_client_secret" {
   secret_data = var.keycloak_ras_client_secret
 }
 
+# ===== Formbricks API Key =====
+resource "google_secret_manager_secret" "formbricks_api_key" {
+  provider  = google-beta
+  secret_id = "formbricks-api-key"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "formbricks_api_key" {
+  provider    = google-beta
+  secret      = google_secret_manager_secret.formbricks_api_key.name
+  secret_data = var.formbricks_api_key
+}
+
 # =========================================================================================
 # IAM bindings for default compute engine service account
 # =========================================================================================
@@ -305,4 +320,11 @@ resource "google_secret_manager_secret_iam_member" "mailgun_api_key" {
   role       = "roles/secretmanager.secretAccessor"
   member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
   depends_on = [google_secret_manager_secret.mailgun_api_key]
+}
+
+resource "google_secret_manager_secret_iam_member" "formbricks_api_key" {
+  secret_id  = google_secret_manager_secret.formbricks_api_key.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${data.google_project.eduhub.number}-compute@developer.gserviceaccount.com"
+  depends_on = [google_secret_manager_secret.formbricks_api_key]
 }

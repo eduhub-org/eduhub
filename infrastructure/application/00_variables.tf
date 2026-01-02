@@ -266,3 +266,10 @@ variable "mm_token" {
   description = "The Admin Token from the Opencampus Mattermost Server"
   type        = string
 }
+
+# Formbricks Integration
+variable "formbricks_api_key" {
+  description = "API key for accessing the Formbricks Management API"
+  type        = string
+  sensitive   = true
+}

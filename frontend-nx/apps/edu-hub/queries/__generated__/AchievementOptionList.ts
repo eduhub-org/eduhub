@@ -55,6 +55,10 @@ export interface AchievementOptionList_AchievementOption_AchievementOptionCourse
    */
   visibilityAttendanceCertificate: boolean | null;
   type: ProgramType_enum;
+  /**
+   * Default Formbricks survey URL for course enrollments/applications. Courses can override this with their own formbricksEnrollmentSurveyUrl.
+   */
+  defaultFormbricksEnrollmentSurveyUrl: string | null;
 }
 
 export interface AchievementOptionList_AchievementOption_AchievementOptionCourses_Course {

@@ -16,7 +16,11 @@ import {
   INSERT_SESSION_WITH_ADDRESSES,
   UPDATE_SESSION_TITLE,
 } from '../../../../queries/course';
-import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
+import {
+  ManagedCourse,
+  ManagedCourseVariables,
+  ManagedCourse_Course_by_pk,
+} from '../../../../queries/__generated__/ManagedCourse';
 import { SessionRow } from './SessionRow';
 import { DeleteSession, DeleteSessionVariables } from '../../../../queries/__generated__/DeleteSession';
 import { UpdateSessionTitle, UpdateSessionTitleVariables } from '../../../../queries/__generated__/UpdateSessionTitle';
@@ -33,11 +37,11 @@ import { SessionAddress_insert_input } from '../../../../__generated__/globalTyp
 
 interface IProps {
   course: ManagedCourse_Course_by_pk;
-  qResult: QueryResult<any, any>;
+  qResult: QueryResult<ManagedCourse, ManagedCourseVariables>;
 }
 
 export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
-  const t = useTranslations();
+  const t = useTranslations("manageCourse");
 
   const courseSessions = useMemo(() => {
     const result = [...course.Sessions];
@@ -138,7 +142,7 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
     <div>
       <div className="flex justify-start mb-4 text-white">
         <Button onClick={insertSession} startIcon={<MdAddCircle />} color="inherit">
-          {t('coursePage.add-session')}
+          {t('add_session')}
         </Button>
       </div>
 
@@ -166,16 +170,6 @@ export const SessionsTab: FC<IProps> = ({ course, qResult }) => {
           qResult={qResult}
         />
       ))}
-
-      {/* <div className="flex justify-end mt-4 mb-4 text-white">
-        <Button
-          onClick={insertSession}
-          startIcon={<MdAddCircle />}
-          color="inherit"
-        >
-          {t('coursePage.add-session')}
-        </Button>
-      </div> */}
     </div>
   );
 };

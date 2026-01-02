@@ -185,7 +185,8 @@
     },
     "dropdown_selector": {
       "create_option": "Create new entry \"{option}\"",
-      "none_option": "-- None --"
+      "none_option": "-- None --",
+      "name_already_exists": "An entry with this name already exists."
     },
     "time_picker": {
       "select_time": "Select time",
@@ -375,7 +376,13 @@
     "errors": {
       "motivation_letter_required": "Please provide a motivation letter",
       "terms_required": "Please accept the Terms and Conditions",
-      "registration_failed": "Registration failed. Please try again."
+      "registration_failed": "Registration failed. Please try again.",
+      "complete_survey_first": "Please complete the questionnaire first."
+    },
+    "formbricks": {
+      "survey_title": "Application Questionnaire",
+      "survey_completed": "Thank you! Your questionnaire has been successfully submitted.",
+      "embed_error": "The questionnaire could not be loaded. Please try again later."
     },
     "onboarding_modal": {
       "decline_confirm_text": "Do you really want to decline the invitation to this course?",
@@ -457,15 +464,8 @@
     "program": "Program",
     "programs": "Programs",
     "published": "Published",
-    "do-you-want-to-publish-the-program": "Do you really want to publish the program {title} ?",
-    "do-you-really-want-to-undo-the-publication-of-program": "Do you really want to unpublish {title} ?",
     "do-you-want-to-delete-the-program": "Do you really want to delete {title} ?",
-    "publish": "Publish",
-    "withdraw": "Unpublish",
-    "template": "Template",
     "link-final-evaluation": "Link closing-Evaluation",
-    "no-template-uploaded-yet": "No tempate uploaded yet",
-    "show-certificates": "Show certificate",
     "default-address": "Default address for new Sessions",
     "add-session": "Add Session",
     "application-rating": "Application ratings:",
@@ -478,17 +478,6 @@
     "chat-link": "Chat Link:",
     "possible-certificates": "Possible certifications",
     "add-course": "Add course",
-    "programs-programs": "Programs",
-    "programs-add": "Add program",
-    "programs-default-title": "New Program",
-    "programs-title": "Programtitle",
-    "programs-published": "Published",
-    "programs-short-title": "Short title",
-    "programs-application-start": "Application-start",
-    "programs-application-end": "Application-end",
-    "programs-course-start": "Course start",
-    "programs-course-end": "Course end",
-    "programs-achievement-upload-deadline": "Deadline for performance record upload",
     "day": "Day",
     "no-courses": "This program has no courses.",
     "default-course-title": "New course",
@@ -505,12 +494,10 @@
     "confirm-online-course": "Confirm",
     "online-course-confirmed": "You have confirmed on {dateTime} that you have participated in the required online courses.",
     "achievement-certificate-generation": "Generate Achievement Certificates",
-    "attendance-certificate-generation": "Generate Attendance Cartificates",
+    "attendance-certificate-generation": "Generate Attendance Certificates",
     "certificates-generated": "{number} certificates have been generated.",
     "1-certificate-generated": "One certificate has been generated.",
     "no-certificates-generated": "No certificates have been generated.",
-    "participationDataGenerate": "Generate Participation Data (CSV)",
-    "participationDataDownload": "Download Participation Data (CSV)",
     "selectTemplateDefaultLabel": "Choose template",
     "location": {
       "label": "Location",
@@ -811,13 +798,18 @@
     "default_course_title": "Untitled Course",
     "title": "Manage Courses",
     "all_programs": "All",
+    "course_degree_title": {
+      "label": "Part of the following degrees",
+      "placeholder": "Select degrees"
+    },
     "tile_slider_group": {
       "label": "Tile Slider Group",
       "placeholder": "Select tile slider groups"
     },
     "cover_image": {
       "label": "Cover Image",
-      "upload_text": "Click to upload cover image"
+      "upload_text": "Click to upload cover image",
+      "alt": "Course cover image"
     },
     "instructors": {
       "label": "Instructors",
@@ -827,13 +819,18 @@
       "label": "Funding Organizations",
       "add": "Add Funding Organization"
     },
+    "possible_certificates": {
+      "label": "Possible Certificates",
+      "attendance_certificate": "Attendance Certificate",
+      "achievement_certificate": "Achievement Certificate"
+    },
     "registration_type": {
       "label": "Registration Type",
       "help_text": "Select how participants can register for this course",
       "options": {
-        "APPROVAL_WITH_INPUT": "Approval Required with Application",
-        "DIRECT_CONFIRMATION": "Direct Confirmation without Motivation Text",
-        "DIRECT_WITH_INPUT": "Direct Confirmation with Motivation Text",
+        "APPROVAL_WITH_INPUT": "Approval Required with Questionnaire and Application Process",
+        "DIRECT_CONFIRMATION": "Direct Confirmation without Questionnaire",
+        "DIRECT_WITH_INPUT": "Direct Confirmation with Questionnaire",
         "EXTERNAL_REGISTRATION": "External Registration"
       }
     },
@@ -899,6 +896,7 @@
     "description": "Description",
     "sessions": "Dates",
     "applications": "Applications",
+    "registrations": "Registrations",
     "participations_and_achievements": "Participations and Achievements",
     "degree_participations": "Degree Participations",
     "attendances": "Attendances",
@@ -906,6 +904,7 @@
     "certificates": "Certificate Download",
     "attendance_certificate_download": "Ach",
     "achievement_certificate_download": "Att",
+    "no_applications_present": "No applications present",
     "add_participants": "Add or Edit Participants",
     "selected_users": "Selected Users",
     "name_or_email": "Name or email",
@@ -914,8 +913,14 @@
     "add_as_invited": "add or change as invited",
     "add_as_aborted": "add or change as aborted",
     "add_user_error": "Please select at least one user!",
-    "application_history": "Previous Applications and Participations",
+    "submit": "Submit",
+    "application_history": {
+      "label": "Previous Applications and Participations",
+      "no_applications_present": "No applications present"
+    },
     "email": "Email",
+    "application": "Application",
+    "evaluation": "Evaluation",
     "send_email_to_applicants": "Send Email to Applicants",
     "select_applicants_first": "Please select applicants first",
     "bulk_actions": {
@@ -955,13 +960,15 @@
     "statistics_applications_accepted": "Accepted Applications",
     "statistics_invitations_total": "Total Invitations",
     "statistics_invitations_confirmed": "Confirmed Invitations",
+    "statistics_registrations_total": "Total Registrations",
+    "statistics_registrations_confirmed": "Confirmed Registrations",
     "name": "Name",
     "first_name": "First Name",
     "last_name": "Last Name",
     "organization": "Organization",
     "participations": "Participations",
     "lastApplication": "Last Activity",
-    "status": "Status",
+    "status_label": "Status",
     "ectsTotal": "Total ECTS",
     "attendedEvents": "Attended Events",
     "certificate": "Certificate",
@@ -975,10 +982,122 @@
     "application_status_tooltip": "Click on the circles to change the rating",
     "application_deadline_tooltip": "If you want to change the date for the Confirmation deadline you can resend the invitation.",
     "max_participants": {
-      "label": "Max. Teilnehmendenanzahl",
-      "placeholder": "Max. Teilnehmendenanzahl",
+      "label": "Maximum number of participants",
+      "placeholder": "Maximum number of participants",
       "help_text": "The maximum number of participants is used as information for admission."
-    }
+    },
+    "formbricks": {
+      "title": "Enrollment Questionnaire",
+      "description": "Link a Formbricks questionnaire that will be shown instead of the motivation letter during enrollment/application.",
+      "tooltip": "Applicants will fill out this questionnaire when registering for the course. Responses will be displayed in the applications overview.",
+      "survey_url_label": "Formbricks Enrollment Survey URL",
+      "survey_url_helper": "Paste the URL of your Formbricks Link Survey",
+      "survey_url_helper_with_default": "Paste the URL of your Formbricks Link Survey (leave empty to use program default)",
+      "survey_configured": "Questionnaire configured",
+      "open_survey": "Open questionnaire",
+      "remove_survey": "Remove questionnaire",
+      "invalid_url": "Please enter a valid Formbricks Survey URL",
+      "help_text_hidden_fields": "Important: You must configure Hidden Fields in your Formbricks survey!\n\nRequired Hidden Fields:\n• eduhubUserId - Automatically filled with EduHub user ID\n• eduhubCourseId - Automatically filled with course ID\n• eduhubEnrollmentId - Automatically filled with enrollment ID (optional)\n\nIn Formbricks: Edit Survey → Enable Hidden Fields → Add these field IDs. Without this configuration, responses cannot be properly matched.\n\nNote: eduhubEnrollmentId is optional because the enrollment is created AFTER the survey is completed during registration.",
+      "loading_responses": "Loading responses...",
+      "error_loading_responses": "Error loading questionnaire responses",
+      "no_responses": "No questionnaire responses available",
+      "questionnaire_responses": "Questionnaire Responses",
+      "incomplete_response": "Questionnaire not fully completed"
+    },
+    "common": {
+      "edit": "Edit",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "rating": {
+      "label": "Application ratings:",
+      "invite": "Invite",
+      "unclear": "Undecided",
+      "reject": "Reject",
+      "not_rated": "Unrated"
+    },
+    "status": {
+      "applied": "Applied",
+      "invited": "Invited",
+      "invitation_confirmed": "invitation confirmed",
+      "aborted": "aborted",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "invitation_expired": "Invitation expired"
+    },
+    "invitation_deadline": "Invitation deadline",
+    "course_not_found": "Course {courseId} could not be found!",
+    "add_session": "Add Session",
+    "location": {
+      "label": "Location",
+      "ONLINE": "Online",
+      "KIEL": "Kiel",
+      "HEIDE": "Heide"
+    },
+    "address": {
+      "label": "Link or Address",
+      "placeholder": {
+        "online": "This link will be provided to participants for all online sessions of the course.",
+        "offline": "This address can be adjusted when creating individual sessions if necessary."
+      },
+      "errorText": "The entered link does not have the correct format."
+    },
+    "sessionAddress": {
+      "no_address_selected": "No address selected"
+    },
+    "weekday": "Weekday",
+    "weekdays": {
+      "NONE": "Irregular",
+      "MONDAY": "Monday",
+      "TUESDAY": "Tuesday",
+      "WEDNESDAY": "Wednesday",
+      "THURSDAY": "Thursday",
+      "FRIDAY": "Friday",
+      "SATURDAY": "Saturday",
+      "SUNDAY": "Sunday"
+    },
+    "languages": {
+      "DE": "German",
+      "EN": "English"
+    },
+    "language": "Language",
+    "start_time": "Start Time",
+    "end_time": "End Time",
+    "short_description": {
+      "label": "Short Description",
+      "help_text": "This text will appear on the course tile and as a tagline on the course page.",
+      "placeholder": "Enter a brief description of the course..."
+    },
+    "learning_goals": {
+      "label": "Learning Goals",
+      "help_text": "The learning goals are part of the performance certificate and can only be changed by the program coordinator. If you would like to suggest changes or notice errors, please contact them.",
+      "placeholder": "Learning Goal 1\nLearning Goal 2\nLearning Goal 3\nLearning Goal 4",
+      "read_only_placeholder": "Please contact the program coordinator to agree on learning goals and have them added here.",
+      "editable_in_table": "Editable in courses table"
+    },
+    "info_block_1_title": {
+      "label": "Info Block 1",
+      "help_text": "For the content of this part of the description, please refer to existing courses to stay as consistent as possible. Typically, this section describes what participants can expect in the course ('What you will get').",
+      "placeholder": "Title"
+    },
+    "info_block_1_content": {
+      "placeholder": "Content"
+    },
+    "info_block_2_title": {
+      "label": "Info Block 2",
+      "help_text": "For the content of this part of the description, please refer to existing courses to ensure consistency. Typically, this section describes what participants are expected to contribute or lead ('What you should bring').",
+      "placeholder": "Title"
+    },
+    "info_block_2_content": {
+      "placeholder": "Content"
+    },
+    "add_new_location": "Add location",
+    "no_enrollments_present": "There are no enrollments yet.",
+    "not_submitted": "not submitted",
+    "confirmation_push_course_to_next_status": "Do you want to send the course to its next state?",
+    "set_status_high": "increase status",
+    "please_fill_all_fields": "Please fill out all fields to proceed!"
   },
   "managePrograms": {
     "title": {
@@ -1011,9 +1130,44 @@
       "help_text": "This questionnaire link will be sent to the participants by email after the last date of a course or event.\n The title of the program and the name of the course or event are automatically included as URL parameters and can be included in the questionnaire accordingly.",
       "error_text": "Invalid link format!"
     },
+    "default_enrollment_survey": {
+      "label": "Default Enrollment Survey",
+      "placeholder": "https://formbricks.example.com/s/surveyId",
+      "help_text": "Default Formbricks survey for course enrollments. Courses can override this with their own enrollment survey URL."
+    },
     "delete_button": {
       "delete_program_confirmation": "Are you sure you want to delete the program '{title}'?",
       "untitled_program": "Untitled Program"
+    },
+    "certificates": {
+      "template": "Template",
+      "proof_of_participation": "Proof of participation",
+      "performance_certificate": "Performance certificate",
+      "show_certificates": "Show certificate",
+      "no_template_uploaded_yet": "No template uploaded yet"
+    },
+    "participation_data": {
+      "generate": "Generate Participation Data (CSV)",
+      "download": "Download Participation Data (CSV)"
+    },
+    "table": {
+      "default_title": "New Program",
+      "programs": "Programs",
+      "add": "Add program",
+      "published": "Published",
+      "title": "Programtitle",
+      "short_title": "Short title",
+      "application_start": "Application-start",
+      "application_end": "Application-end",
+      "course_start": "Course start",
+      "course_end": "Course end",
+      "achievement_upload_deadline": "Deadline for performance record upload"
+    },
+    "actions": {
+      "publish": "Publish",
+      "withdraw": "Unpublish",
+      "publish_confirmation": "Do you really want to publish the program {title} ?",
+      "withdraw_confirmation": "Do you really want to unpublish {title} ?"
     }
   },
   "manageUsers": {

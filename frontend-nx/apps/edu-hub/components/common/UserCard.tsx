@@ -2,7 +2,7 @@ import Image from 'next/image';
 import { FC, useMemo } from 'react';
 import mysteryImg from '../../public/images/common/mystery.svg';
 import { isLinkFormat } from '../../helpers/util';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { getPublicImageUrl } from '../../helpers/filehandling';
 
 type Size = 'small' | 'medium' | 'large';

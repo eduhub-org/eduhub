@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { GetApp } from '@mui/icons-material';
 import { TileBase } from './TileSlider/TileBase';
 import { useRoleQuery } from '../../hooks/authedQuery';
@@ -18,7 +18,6 @@ interface CertificateTileProps {
 
 export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
   const t = useTranslations('certificates');
-  const tCommon = useTranslations('common');
   const [linkedInDialogOpen, setLinkedInDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 

@@ -36,7 +36,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
   onCreateOption,
   getLabelForValue,
 }) => {
-  const t = useTranslations();
+  const t = useTranslations('common');
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [isCleared, setIsCleared] = useState(false);
@@ -206,7 +206,7 @@ export const CreatableDropDown: React.FC<CreatableDropDownProps> = ({
           {shouldShowCreateOption(inputValue) && (
             <div
               className={`px-4 py-2 cursor-pointer text-blue-600 flex items-center ${
-                highlightedIndex === localOptions.length ? 'bg-gray-300' : 'hover:bg-gray-300'
+                highlightedIndex === getFilteredOptions(inputValue).length ? 'bg-gray-300' : 'hover:bg-gray-300'
               }`}
               onClick={onCreateOption}
             >

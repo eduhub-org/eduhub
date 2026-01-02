@@ -57,7 +57,7 @@ import {
   UpdateProgramParticipationCertVisible,
   UpdateProgramParticipationCertVisibleVariables,
 } from '../../../queries/__generated__/UpdateProgramParticipationCertVisible';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 export const ManageProgramsContent: FC = () => {
   const t = useTranslations();
@@ -85,7 +85,7 @@ export const ManageProgramsContent: FC = () => {
     today.setHours(0);
     await insertProgram({
       variables: {
-        title: t('coursePage.programs-default-title'),
+        title: t('table.default_title'),
         today: new Date(),
       },
     });
@@ -262,10 +262,10 @@ export const ManageProgramsContent: FC = () => {
   const handleTogglePublished = useCallback(
     (v: ProgramList_Program, isPublished: boolean) => {
       setActiveDialogProgram(v);
-      if (!isPublished) {
-        setConfirmMakeInvisibleOpen(true);
-      } else {
+      if (isPublished) {
         setConfirmMakeVisibleOpen(true);
+      } else {
+        setConfirmMakeInvisibleOpen(true);
       }
     },
     [setActiveDialogProgram, setConfirmMakeInvisibleOpen, setConfirmMakeVisibleOpen]
@@ -273,32 +273,31 @@ export const ManageProgramsContent: FC = () => {
 
   const handleOpenProgram = useCallback(
     (v: ProgramList_Program) => {
-      setOpenProgram(openProgram !== v.id ? v.id : -1);
+      setOpenProgram(openProgram === v.id ? -1 : v.id);
     },
     [setOpenProgram, openProgram]
   );
 
   return (
-    <>
-      <div className="max-w-screen-xl mx-auto">
+    <div className="max-w-screen-xl mx-auto">
         <PageBlock>
           <div className="flex flex-row mb-12 text-white">
-            <h1 className="text-4xl font-bold mt-24">{t('coursePage.programs-programs')}</h1>
+            <h1 className="text-4xl font-bold mt-24">{t('table.programs')}</h1>
           </div>
           <div className="flex justify-end mb-12 text-white">
             <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />} color="inherit">
-              {t('coursePage.programs-add')}
+              {t('table.add')}
             </Button>
           </div>
           <div className="grid grid-cols-10 text-gray-400">
-            <p>{t('coursePage.programs-published')}</p>
-            <div className="col-span-2">{t('coursePage.programs-title')}</div>
-            <div>{t('coursePage.programs-short-title')}</div>
-            <div>{t('coursePage.programs-application-start')}</div>
-            <div>{t('coursePage.programs-application-end')}</div>
-            <div>{t('coursePage.programs-course-start')}</div>
-            <div>{t('coursePage.programs-course-end')}</div>
-            <div>{t('coursePage.programs-achievement-upload-deadline')}</div>
+            <p>{t('table.published')}</p>
+            <div className="col-span-2">{t('table.title')}</div>
+            <div>{t('table.short_title')}</div>
+            <div>{t('table.application_start')}</div>
+            <div>{t('table.application_end')}</div>
+            <div>{t('table.course_start')}</div>
+            <div>{t('table.course_end')}</div>
+            <div>{t('table.achievement_upload_deadline')}</div>
             <div>&nbsp;</div>
           </div>
           {programs != null &&
@@ -322,29 +321,28 @@ export const ManageProgramsContent: FC = () => {
             ))}
           <div className="flex justify-end mt-12 mb-12 text-white">
             <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />} color="inherit">
-              {t('coursePage.programs-add')}
+              {t('table.add')}
             </Button>
           </div>
         </PageBlock>
         <QuestionConfirmationDialog
-          question={t('coursePage.do-you-want-to-publish-the-program', {
+          question={t('actions.publish_confirmation', {
             title: activeDialogProgram?.title,
           })}
-          confirmationText={t('coursePage.publish')}
+          confirmationText={t('actions.publish')}
           onClose={() => handleMakeVisibleDialogClose(false)}
           onConfirm={() => handleMakeVisibleDialogClose(true)}
           open={confirmMakeVisibleOpen}
         />
         <QuestionConfirmationDialog
-          question={t('coursePage.do-you-really-want-to-undo-the-publication-of-program', {
+          question={t('actions.withdraw_confirmation', {
             title: activeDialogProgram?.title,
           })}
-          confirmationText={t('coursePage.withdraw')}
+          confirmationText={t('actions.withdraw')}
           onClose={() => handleMakeInvisibleDialogClose(false)}
           onConfirm={() => handleMakeInvisibleDialogClose(true)}
           open={confirmMakeInvisibleOpen}
         />
-      </div>
-    </>
+    </div>
   );
 };

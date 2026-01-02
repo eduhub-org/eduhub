@@ -57,6 +57,7 @@ export const COURSE_FRAGMENT = gql`
     contentDescriptionField2
     externalRegistrationLink
     registrationType
+    formbricksEnrollmentSurveyUrl
     startTime
     endTime
     Sessions (order_by: { startDateTime: asc }) {
@@ -120,6 +121,7 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     attendanceCertificatePossible
     chatLink
     registrationType
+    formbricksEnrollmentSurveyUrl
     Program {
       ...ProgramFragmentMinimumProperties
     }
@@ -149,6 +151,7 @@ export const COURSE_FRAGMENT_MINIMUM = gql`
     endTime
     startTime
     registrationType
+    formbricksEnrollmentSurveyUrl
   }
 `;
 
@@ -181,6 +184,7 @@ export const COURSE_FRAGMENT_ANONYMOUS = gql`
     contentDescriptionField2
     externalRegistrationLink
     registrationType
+    formbricksEnrollmentSurveyUrl
     startTime
     endTime
     Sessions (order_by: { startDateTime: asc }) {

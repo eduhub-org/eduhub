@@ -83,6 +83,18 @@ actions:
         - name: Hasura-Secret
           value_from_env: HASURA_CLOUD_FUNCTION_SECRET
     comment: loadParticipationData
+  - name: getFormbricksResponses
+    definition:
+      kind: ""
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: getFormbricksResponses
+    permissions:
+      - role: instructor_access
+    comment: Fetches Formbricks survey responses for a course enrollment
   - name: makeCertificatePublic
     definition:
       kind: synchronous
@@ -297,4 +309,8 @@ custom_types:
     - name: resizedImagePath
     - name: SendSessionRemindersResult
     - name: ProcessedSession
+    - name: GetFormbricksResponsesResult
+    - name: FormbricksResponse
+    - name: FormbricksAnswer
+    - name: FormbricksSurvey
   scalars: []
