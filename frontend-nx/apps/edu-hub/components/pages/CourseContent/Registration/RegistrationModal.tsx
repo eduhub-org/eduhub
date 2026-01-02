@@ -125,7 +125,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     } else {
       setError(result.error || t('errors.registration_failed'));
     }
-  }, [config, motivationLetter, acceptTerms, onSubmit, t, closeModal]);
+  }, [config, motivationLetter, acceptTerms, onSubmit, t, closeModal, useFormbricks, formbricksSurveyCompleted]);
 
   const handleClose = useCallback(() => {
     if (!isLoading) {

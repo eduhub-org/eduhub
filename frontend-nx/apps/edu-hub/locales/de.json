@@ -536,7 +536,7 @@
     },
     "info_block_1_title": {
       "label": "Info-Block 1",
-      "help_text": "Für den Inhalt zu diesem Teil der Beschreibung orientiere dich bitte an den existierenden Kursen, um möglichst konsistent zu bleiben. Üblicherweise wird hier beschrieben, was die Teilnehmenden im Kurs erwartet (\"Was due bekommst\").",
+      "help_text": "Für den Inhalt zu diesem Teil der Beschreibung orientiere dich bitte an den existierenden Kursen, um möglichst konsistent zu bleiben. Üblicherweise wird hier beschrieben, was die Teilnehmenden im Kurs erwartet (\"Was du bekommst\").",
       "placeholder": "Titel"
     },
     "info_block_1_content": {
@@ -1062,7 +1062,7 @@
     },
     "info_block_1_title": {
       "label": "Info-Block 1",
-      "help_text": "Für den Inhalt zu diesem Teil der Beschreibung orientiere dich bitte an den existierenden Kursen, um möglichst konsistent zu bleiben. Üblicherweise wird hier beschrieben, was die Teilnehmenden im Kurs erwartet (\"Was due bekommst\").",
+      "help_text": "Für den Inhalt zu diesem Teil der Beschreibung orientiere dich bitte an den existierenden Kursen, um möglichst konsistent zu bleiben. Üblicherweise wird hier beschrieben, was die Teilnehmenden im Kurs erwartet (\"Was du bekommst\").",
       "placeholder": "Titel"
     },
     "info_block_1_content": {
@@ -1081,7 +1081,10 @@
     "not_submitted": "nicht eingereicht",
     "confirmation_push_course_to_next_status": "Möchtest du den Kurs in den nächsten Status schieben?",
     "set_status_high": "Status hochsetzen",
-    "please_fill_all_fields": "Bitte fülle alle Felder aus, um fortzufahren!"
+    "please_fill_all_fields": "Bitte fülle alle Felder aus, um fortzufahren!",
+    "no-certificate-generated": "Es wurden keine Zertifikate generiert.",
+    "certificates-generated": "Es wurden {number} Zertifikate generiert.",
+    "1-certificate-generated": "Es wurde ein Zertifikat generiert."
   },
   "managePrograms": {
     "title": {
@@ -1097,7 +1100,7 @@
       "error_text": "Die Kurzbezeichnung darf maximal 10 Zeichen lang sein."
     },
     "start_evaluation": {
-      "label": "Fraebogen Start-Evaluation",
+      "label": "Fragebogen Start-Evaluation",
       "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
       "help_text": "Der hier verlinkte Fragebogen wird den Teilnehmenden nach dem ersten Termin eines Kurses oder einer Veranstaltung per E-Mail zugeschickt.\n Der Titel des Programms und der Name des Kurses oder der Veranstaltung werden per URL-Parameter automatisch mitgegeben und können entsprechend in den Fragebogen übernommen werden.",
       "error_text": "Ungültiges Linkformat!"

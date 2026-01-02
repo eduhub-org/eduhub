@@ -197,7 +197,7 @@ export default async function getFormbricksResponses(req, logger) {
       // Must match userId and courseId (both required)
       // enrollmentId is optional: if provided in request AND in response, they must match
       // But if enrollmentId is not in response (common during registration), still allow match
-      const userIdMatches = responseUserId === userId;
+      const userIdMatches = responseUserId === String(userId);
       const courseIdMatches = responseCourseId === String(courseId);
       
       // Only check enrollmentId if BOTH are present (request has it AND response has it)

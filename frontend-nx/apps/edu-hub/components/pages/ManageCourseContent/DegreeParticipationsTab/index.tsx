@@ -207,10 +207,10 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
           let successTranslationKey: string;
           if (certCount <= 1) {
             successTranslationKey = certCount === 0
-              ? 'coursePage.no-certificate-generated'
-              : 'coursePage.1-certificate-generated';
+              ? 'no-certificate-generated'
+              : '1-certificate-generated';
           } else {
-            successTranslationKey = 'coursePage.certificates-generated';
+            successTranslationKey = 'certificates-generated';
           }
 
           setSnackbarMessage(t(successTranslationKey, { number: certCount }));
