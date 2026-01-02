@@ -81,6 +81,11 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
   const useFormbricks = hasFormbricksSurvey && config.requiresInput;
 
   const handleFormbricksComplete = useCallback(() => {
+    // Guard against duplicate submissions
+    if (isLoading || formbricksSurveyCompleted) {
+      return;
+    }
+    
     setFormbricksSurveyCompleted(true);
     // Auto-submit the form after survey completion
     onSubmit({
@@ -93,7 +98,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
         setError(result.error || t('errors.registration_failed'));
       }
     });
-  }, [onSubmit, closeModal, t]);
+  }, [onSubmit, closeModal, t, isLoading, formbricksSurveyCompleted]);
 
   const handleSubmit = useCallback(async () => {
     // If using Formbricks and survey not completed, don't allow submit
