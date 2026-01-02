@@ -334,7 +334,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           <div className="col-span-7">{t('address.label')}</div>
         </div>
         {courseLocations.map((loc) => (
-          <Locations key={loc.id} location={loc} onDelete={handleDeleteCourseLocation} refetchQuery={qResult} />
+          <Locations key={loc.id} location={loc} onDelete={handleDeleteCourseLocation} />
         ))}
       </div>
       <div className="flex justify-start text-white">

@@ -79,7 +79,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
             value={location.locationOption || 'ONLINE'}
             updateValueMutation={UPDATE_COURSE_LOCATION}
             identifierVariables={{ locationId: location.id }}
-            refetchQueries={['ManagedCourse']}
+            refetchQueries={['ManagedCourse', 'LocationAddressByLocationOption']}
             className="mb-2"
           />
         </div>
