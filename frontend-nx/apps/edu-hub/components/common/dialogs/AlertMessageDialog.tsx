@@ -1,5 +1,5 @@
 import { Dialog, DialogTitle } from '@mui/material';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { FC, useCallback } from 'react';
 import { MdClose } from 'react-icons/md';
 

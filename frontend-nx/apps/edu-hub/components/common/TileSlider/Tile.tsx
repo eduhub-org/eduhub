@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { FC } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CoursesEnrolledByUser_Course } from '../../../queries/__generated__/CoursesEnrolledByUser';
 import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';

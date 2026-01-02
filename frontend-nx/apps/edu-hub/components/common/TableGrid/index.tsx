@@ -1,7 +1,7 @@
 import { BaseRow, TableGridProps } from './types';
 import React, { useState, useMemo, useCallback } from 'react';
 import { TextField, Checkbox, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent, ListSubheader, Divider } from '@mui/material';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
 import { MdArrowBack, MdArrowForward } from 'react-icons/md';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';

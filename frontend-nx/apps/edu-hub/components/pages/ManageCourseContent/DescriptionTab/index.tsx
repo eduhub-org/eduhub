@@ -23,8 +23,8 @@ import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/Ma
 import Locations from './Locations';
 import { Button } from '@mui/material';
 import { MdAddCircle } from 'react-icons/md';
-import { useTranslations, useLocale } from 'next-intl';
-import DropdownSelector from '../../../inputs/DropDownSelector';
+import { useTranslations } from 'next-intl';
+import DropDownSelector from '../../../inputs/DropDownSelector';
 import TimePicker from '../../../inputs/TimePicker';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import useErrorHandler from '../../../../hooks/useErrorHandler';
@@ -46,7 +46,6 @@ import {
   InsertSessionAddressVariables,
 } from '../../../../queries/__generated__/InsertSessionAddress';
 import InputField from '../../../inputs/InputField';
-import DropDownSelector from '../../../inputs/DropDownSelector';
 import checkmark from '../../../../public/images/course/checkmark.svg';
 
 interface IProps {
@@ -194,21 +193,27 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
                 {course.learningGoals
                   .split('\n')
                   .filter((goal) => goal.trim() !== '')
-                  .map((goal, index) => (
-                    <li key={index} className="pl-6 mb-6">
-                      <div className="flex">
-                        <img src={checkmark} alt="check mark" className="mr-2 inline-block" />
-                        <div className="ml-2">
-                          {goal.split('\n').map((line, i) => (
-                            <span key={i}>
-                              {line}
-                              <br />
-                            </span>
-                          ))}
+                  .map((goal) => {
+                    const goalKey = goal.trim().substring(0, 50).replace(/\s+/g, '-');
+                    return (
+                      <li key={goalKey} className="pl-6 mb-6">
+                        <div className="flex">
+                          <img src={checkmark} alt="check mark" className="mr-2 inline-block" />
+                          <div className="ml-2">
+                            {goal.split('\n').map((line) => {
+                              const lineKey = `${goalKey}-${line.trim().substring(0, 20).replace(/\s+/g, '-')}`;
+                              return (
+                                <span key={lineKey}>
+                                  {line}
+                                  <br />
+                                </span>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    </li>
-                  ))}
+                      </li>
+                    );
+                  })}
               </ul>
             ) : (
               <p className="text-gray-400 italic">{t('learning_goals.read_only_placeholder')}</p>
@@ -301,7 +306,7 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           <div />
         </div>
         <div className="grid grid-cols-2">
-          <DropdownSelector
+          <DropDownSelector
             variant="eduhub"
             label={t('language')}
             options={languageOptions}

@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { FC, useEffect, useState, ReactNode, memo } from 'react';
 import { getTileImage } from '../../../helpers/imageHandling';
 

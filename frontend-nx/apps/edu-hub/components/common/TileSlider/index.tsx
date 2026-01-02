@@ -4,7 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/mousewheel';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import { CourseList_Course } from '../../../queries/__generated__/CourseList';
 import { CourseTiles_Course } from '../../../queries/__generated__/CourseTiles';

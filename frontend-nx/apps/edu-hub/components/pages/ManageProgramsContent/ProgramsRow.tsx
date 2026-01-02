@@ -50,8 +50,13 @@ import {
   UpdateProgramParticipationTemplate,
   UpdateProgramParticipationTemplateVariables,
 } from '../../../queries/__generated__/UpdateProgramParticipationTemplate';
-import path from 'node:path';
 import InputField from '../../inputs/InputField';
+
+// Helper function to extract basename from a path (replaces Node.js path.basename)
+const getBasename = (filePath: string): string => {
+  const parts = filePath.split('/');
+  return parts[parts.length - 1] || filePath;
+};
 import TableGridDeleteButton from '../../common/TableGrid/components/TableGridDeleteButton';
 
 interface ProgramsRowProps {
@@ -242,10 +247,10 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   const locale = useLocale();
 
   const achievementCertificateTemplateName = program.achievementCertificateTemplateURL
-    ? path.basename(program.achievementCertificateTemplateURL)
+    ? getBasename(program.achievementCertificateTemplateURL)
     : t('certificates.no_template_uploaded_yet');
   const attendanceCertificateTemplateName = program.attendanceCertificateTemplateURL
-    ? path.basename(program.attendanceCertificateTemplateURL)
+    ? getBasename(program.attendanceCertificateTemplateURL)
     : t('certificates.no_template_uploaded_yet');
 
   return (
