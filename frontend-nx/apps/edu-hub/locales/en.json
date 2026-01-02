@@ -169,6 +169,39 @@
       "remove_image_error": "Error removing image",
       "upload_error": "Error uploading image"
     },
+    "file_upload": {
+      "upload_text": "Click to upload file",
+      "upload_image_text": "Click to upload image",
+      "upload_pdf_text": "Click to upload PDF",
+      "uploading": "Uploading...",
+      "upload_success": "File uploaded successfully",
+      "upload_error": "Failed to upload file",
+      "file_too_large": "File size exceeds {maxSize}MB limit",
+      "invalid_file_type": "Invalid file type. Accepted types: {types}",
+      "image_alt": "Uploaded file preview",
+      "unknown_file_type": "Unknown file type",
+      "drag_drop_text": "Drop file here",
+      "click_or_drag": "Click to upload or drag and drop",
+      "remove": "Remove",
+      "replace": "Replace",
+      "download": "Download",
+      "file_size": "File size",
+      "accepted_types": "Accepted types",
+      "max_size": "Max. size",
+      "file_type": {
+        "pdf": "PDF Document",
+        "word_document": "Word Document",
+        "excel_spreadsheet": "Excel Spreadsheet",
+        "spreadsheet": "Spreadsheet",
+        "powerpoint": "PowerPoint",
+        "archive": "Archive",
+        "code_file": "Code File",
+        "text_file": "Text File",
+        "video_file": "Video File",
+        "audio_file": "Audio File",
+        "file": "File"
+      }
+    },
     "input_field": {
       "invalid_link_format": "Invalid link format",
       "invalid_email_format": "Invalid email format",
@@ -1154,7 +1187,8 @@
       "proof_of_participation": "Proof of participation",
       "performance_certificate": "Performance certificate",
       "show_certificates": "Show certificate",
-      "no_template_uploaded_yet": "No template uploaded yet"
+      "no_template_uploaded_yet": "No template uploaded yet",
+      "upload_template": "Click to upload template"
     },
     "participation_data": {
       "generate": "Generate Participation Data (CSV)",
