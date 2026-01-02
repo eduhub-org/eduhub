@@ -1,10 +1,8 @@
 import React from 'react';
-import { Tooltip } from '@mui/material';
+import { Tooltip, SelectChangeEvent } from '@mui/material';
 import { HelpOutline } from '@mui/icons-material';
-import { useTranslations, useLocale } from 'next-intl';
 import { Option } from '../types';
 import { CreatableDropDown } from './CreatableDropDown';
-import { SelectChangeEvent } from '@mui/material';
 
 type EduhubDropDownProps = {
   label?: string;
@@ -84,8 +82,8 @@ export const EduhubDropDown: React.FC<EduhubDropDownProps> = ({
               value={localValue}
               className={`${finalClassName} ${errorMessage ? 'border-red-500' : ''}`}
             >
-              {localOptions.map((option, index) => (
-                <option key={index} value={option.value}>
+              {localOptions.map((option) => (
+                <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}

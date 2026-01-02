@@ -1,4 +1,4 @@
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { FC, useCallback, useState } from 'react';
 import { GoDotFill } from 'react-icons/go';
 import { IoIosArrowDown, IoIosArrowUp, IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
@@ -60,11 +60,11 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
     }
   }, [onSetRating, enrollment]);
 
-  const [isRowOpen, setRowOpen] = useState(false);
+  const [isRowOpen, setIsRowOpen] = useState(false);
 
   const handleToggleRowOpen = useCallback(() => {
-    setRowOpen(!isRowOpen);
-  }, [isRowOpen, setRowOpen]);
+    setIsRowOpen(!isRowOpen);
+  }, [isRowOpen]);
 
   return (
     <>
@@ -126,17 +126,39 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
                 />
               )}
             </div>
-            <div className="col-span-1 cursor-pointer text-center" onClick={handleToggleRowOpen}>
+            <button
+              type="button"
+              className="col-span-1 cursor-pointer text-center focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+              onClick={handleToggleRowOpen}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleToggleRowOpen();
+                }
+              }}
+              aria-label={isRowOpen ? t('table.collapse') : t('table.expand')}
+            >
               {!isRowOpen && <IoIosArrowDown size="1.25em" className="inline" />}
               {isRowOpen && <IoIosArrowUp size="1.25em" className="inline" />}
-            </div>
+            </button>
 
             <div className="col-span-1 text-center">
               <OnlyAdmin>
-                <div className="cursor-pointer" onClick={handleToggleRowSelected}>
+                <button
+                  type="button"
+                  className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                  onClick={handleToggleRowSelected}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleToggleRowSelected();
+                    }
+                  }}
+                  aria-label={isRowSelected ? t('table.deselect') : t('table.select')}
+                >
                   {isRowSelected && <MdCheckBox className="inline" size="1.25em" />}
                   {!isRowSelected && <MdOutlineCheckBoxOutlineBlank className="inline" size="1.25em" />}
-                </div>
+                </button>
               </OnlyAdmin>
             </div>
           </div>
@@ -150,9 +172,11 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
                     if (pastEnrollment.courseId === enrollment.courseId) {
                       return null; // Skip rendering this enrollment
                     }
+                    // Use a combination of courseId and userId as key since id might not be available
+                    const uniqueKey = `${pastEnrollment.courseId}-${enrollment.userId}-${index}`;
                     return (
                       <p
-                        key={index}
+                        key={uniqueKey}
                         className="text-xs whitespace-normal break-words mt-2 pl-4"
                         style={{ textIndent: '-1rem' }}
                       >

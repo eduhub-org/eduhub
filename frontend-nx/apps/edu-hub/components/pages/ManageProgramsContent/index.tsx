@@ -57,7 +57,7 @@ import {
   UpdateProgramParticipationCertVisible,
   UpdateProgramParticipationCertVisibleVariables,
 } from '../../../queries/__generated__/UpdateProgramParticipationCertVisible';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 export const ManageProgramsContent: FC = () => {
   const t = useTranslations();
@@ -262,10 +262,10 @@ export const ManageProgramsContent: FC = () => {
   const handleTogglePublished = useCallback(
     (v: ProgramList_Program, isPublished: boolean) => {
       setActiveDialogProgram(v);
-      if (!isPublished) {
-        setConfirmMakeInvisibleOpen(true);
-      } else {
+      if (isPublished) {
         setConfirmMakeVisibleOpen(true);
+      } else {
+        setConfirmMakeInvisibleOpen(true);
       }
     },
     [setActiveDialogProgram, setConfirmMakeInvisibleOpen, setConfirmMakeVisibleOpen]
@@ -273,14 +273,13 @@ export const ManageProgramsContent: FC = () => {
 
   const handleOpenProgram = useCallback(
     (v: ProgramList_Program) => {
-      setOpenProgram(openProgram !== v.id ? v.id : -1);
+      setOpenProgram(openProgram === v.id ? -1 : v.id);
     },
     [setOpenProgram, openProgram]
   );
 
   return (
-    <>
-      <div className="max-w-screen-xl mx-auto">
+    <div className="max-w-screen-xl mx-auto">
         <PageBlock>
           <div className="flex flex-row mb-12 text-white">
             <h1 className="text-4xl font-bold mt-24">{t('table.programs')}</h1>
@@ -344,7 +343,6 @@ export const ManageProgramsContent: FC = () => {
           onConfirm={() => handleMakeInvisibleDialogClose(true)}
           open={confirmMakeInvisibleOpen}
         />
-      </div>
-    </>
+    </div>
   );
 };

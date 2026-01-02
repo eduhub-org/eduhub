@@ -1,4 +1,4 @@
-import { FC, useState, useCallback, useEffect } from 'react';
+import { FC, useState, useCallback } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import { useTranslations } from 'next-intl';

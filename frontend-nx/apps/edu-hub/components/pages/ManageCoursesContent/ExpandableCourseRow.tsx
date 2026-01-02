@@ -40,7 +40,7 @@ import {
 import { OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
 import EntityListManager from '../../inputs/EntityListManager';
 import { getPublicImageUrl, parseFileUploadEvent } from '../../../helpers/filehandling';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import TagSelector from '../../inputs/TagSelector';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
@@ -315,7 +315,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
       if (response.errors) {
         handleError(response.errors?.[0]?.message || t('operation_failed'));
-        return;
       }
     },
     [deleteInstructorAPI, course.id, handleError, t]
@@ -744,23 +743,45 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses.possible_certificates.label')}</h4>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
-                  <div className="cursor-pointer" onClick={handleToggleAttendanceCertificatePossible}>
+                  <button
+                    type="button"
+                    className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                    onClick={handleToggleAttendanceCertificatePossible}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleToggleAttendanceCertificatePossible();
+                      }
+                    }}
+                    aria-label={t('manageCourses.possible_certificates.attendance_certificate')}
+                  >
                     {course.attendanceCertificatePossible ? (
                       <MdCheckBox className="w-6 h-6 text-blue-600" />
                     ) : (
                       <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-gray-400" />
                     )}
-                  </div>
+                  </button>
                   <span>{t('manageCourses.possible_certificates.attendance_certificate')}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="cursor-pointer" onClick={handleToggleAchievementCertificatePossible}>
+                  <button
+                    type="button"
+                    className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                    onClick={handleToggleAchievementCertificatePossible}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleToggleAchievementCertificatePossible();
+                      }
+                    }}
+                    aria-label={t('manageCourses.possible_certificates.achievement_certificate')}
+                  >
                     {course.achievementCertificatePossible ? (
                       <MdCheckBox className="w-6 h-6 text-blue-600" />
                     ) : (
                       <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-gray-400" />
                     )}
-                  </div>
+                  </button>
                   <span>{t('manageCourses.possible_certificates.achievement_certificate')}</span>
                 </div>
                 {course.achievementCertificatePossible && (

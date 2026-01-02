@@ -74,7 +74,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     }
     const maxDate = courseEnrollments
       .map((enrollment) => new Date(enrollment.updated_at))
-      .reduce((maxDate, currentDate) => (currentDate > maxDate ? currentDate : maxDate));
+      .reduce((maxDate, currentDate) => Math.max(maxDate.getTime(), currentDate.getTime()) > maxDate.getTime() ? currentDate : maxDate);
     return maxDate.toLocaleString(locale); // Convert the Date object to a string
   };
 
@@ -85,7 +85,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     const totalEcts = courseEnrollments
       .filter((enrollment) => enrollment.achievementCertificateURL)
       .reduce((total, current) => {
-        const ects = parseFloat(current.Course.ects.replace(',', '.')) || 0;
+        const ects = Number.parseFloat(current.Course.ects.replace(',', '.')) || 0;
         return total + ects;
       }, 0);
     const formattedEcts =
@@ -125,7 +125,8 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
 
     const passed = passedEnrollments.map((ce) => {
       let ects = ce.Course.ects ? ce.Course.ects.replace(',', '.') : '0';
-      ects = isNaN(parseFloat(ects)) ? '0' : parseFloat(ects).toString();
+      const parsedEcts = Number.parseFloat(ects);
+      ects = Number.isNaN(parsedEcts) ? '0' : parsedEcts.toString();
       return `${ce.Course.title} (${ce.Course.Program.shortTitle}; ${ects} ECTS)`;
     });
 
@@ -203,10 +204,14 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
           }
 
           const certCount = result.count;
-          const successTranslationKey =
-            certCount <= 1
-              ? `coursePage.${certCount === 0 ? 'no-' : '1-'}certificate-generated`
-              : 'coursePage.certificates-generated';
+          let successTranslationKey: string;
+          if (certCount <= 1) {
+            successTranslationKey = certCount === 0
+              ? 'coursePage.no-certificate-generated'
+              : 'coursePage.1-certificate-generated';
+          } else {
+            successTranslationKey = 'coursePage.certificates-generated';
+          }
 
           setSnackbarMessage(t(successTranslationKey, { number: certCount }));
           setSnackbarOpen(true);
@@ -230,12 +235,14 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
 
           const affectedRows = response.data?.update_CourseEnrollment?.affected_rows || 0;
 
-          const successTranslationKey =
-            affectedRows <= 1
-              ? affectedRows === 0
-                ? 'manageCourse:no_certificates_deleted'
-                : 'manageCourse:certificate_deleted_singular'
-              : 'manageCourse:certificates_deleted_plural';
+          let successTranslationKey: string;
+          if (affectedRows <= 1) {
+            successTranslationKey = affectedRows === 0
+              ? 'manageCourse:no_certificates_deleted'
+              : 'manageCourse:certificate_deleted_singular';
+          } else {
+            successTranslationKey = 'manageCourse:certificates_deleted_plural';
+          }
 
           setSnackbarMessage(t(successTranslationKey, { count: affectedRows }));
           setSnackbarOpen(true);

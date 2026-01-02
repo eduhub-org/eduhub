@@ -87,10 +87,14 @@ export const GenerateCertificatesButton: React.FC<Props> = ({
       const certCount = result.count;
       console.log('Certificates Generated:', certCount);
 
-      const successTranslationKey =
-        certCount <= 1
-          ? `coursePage.${certCount === 0 ? 'no-' : '1-'}certificate-generated`
-          : 'coursePage.certificates-generated';
+      let successTranslationKey: string;
+      if (certCount <= 1) {
+        successTranslationKey = certCount === 0
+          ? 'coursePage.no-certificate-generated'
+          : 'coursePage.1-certificate-generated';
+      } else {
+        successTranslationKey = 'coursePage.certificates-generated';
+      }
 
       const translatedMessage = t(successTranslationKey, { number: certCount });
       console.log('Success Message:', translatedMessage);

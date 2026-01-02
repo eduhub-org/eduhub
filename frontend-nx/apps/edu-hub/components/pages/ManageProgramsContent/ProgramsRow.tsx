@@ -12,8 +12,11 @@ import { Button } from '../../common/Button';
 import { parseFileUploadEvent } from '../../../helpers/filehandling';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { useLazyRoleQuery } from '../../../hooks/authedQuery';
-import { SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE, SAVE_ATTENDANCE_CERTIFICATE_TEMPLATE } from '../../../queries/actions';
-import { LOAD_PARTICIPATION_DATA } from '../../../queries/actions';
+import {
+  SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
+  SAVE_ATTENDANCE_CERTIFICATE_TEMPLATE,
+  LOAD_PARTICIPATION_DATA,
+} from '../../../queries/actions';
 import {
   UPDATE_PROGRAM_SHORT_TITLE,
   UPDATE_PROGRAM_TITLE,
@@ -23,6 +26,7 @@ import {
   UPDATE_SPEAKER_QUESTIONAIRE,
   UPDATE_ClOSING_QUESTIONAIRE,
   UPDATE_DEFAULT_ENROLLMENT_SURVEY,
+  DELETE_PROGRAM,
 } from '../../../queries/updateProgram';
 import { ProgramList_Program } from '../../../queries/__generated__/ProgramList';
 import {
@@ -46,10 +50,9 @@ import {
   UpdateProgramParticipationTemplate,
   UpdateProgramParticipationTemplateVariables,
 } from '../../../queries/__generated__/UpdateProgramParticipationTemplate';
-import path from 'path';
+import path from 'node:path';
 import InputField from '../../inputs/InputField';
 import TableGridDeleteButton from '../../common/TableGrid/components/TableGridDeleteButton';
-import { DELETE_PROGRAM } from '../../../queries/updateProgram';
 
 interface ProgramsRowProps {
   program: ProgramList_Program;
@@ -196,9 +199,9 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
     variables: { programId: program.id },
   });
 
-  const handleLoadParticipationDataClick = () => {
+  const handleLoadParticipationDataClick = async () => {
     try {
-      loadParticipationData();
+      await loadParticipationData();
     } catch (error) {
       console.log('loadParticipationDataError', error);
     }
@@ -248,10 +251,21 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
   return (
     <div>
       <div className="grid grid-cols-10 mb-1 bg-gray-100">
-        <div className="flex justify-center cursor-pointer" onClick={handleTogglePublished}>
+        <button
+          type="button"
+          className="flex justify-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+          onClick={handleTogglePublished}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleTogglePublished();
+            }
+          }}
+          aria-label={program.published ? t('table.unpublish') : t('table.publish')}
+        >
           {!program.published && <MdCheckBoxOutlineBlank size="1.5em" />}
           {program.published && <MdCheckBox size="1.5em" />}
-        </div>
+        </button>
 
         <div className="col-span-2">
           <InputField
@@ -333,7 +347,7 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
         <div className="grid grid-cols-2">
           <div>
             <IconButton onClick={handleOpenProgram}>
-              {openProgramId !== program.id ? <IoIosArrowDown size="0.75em" /> : <IoIosArrowUp size="0.75em" />}
+              {openProgramId === program.id ? <IoIosArrowUp size="0.75em" /> : <IoIosArrowDown size="0.75em" />}
             </IconButton>
           </div>
 
@@ -435,17 +449,39 @@ export const ProgramsRow: FC<ProgramsRowProps> = ({
             <div className="p-3">
               {`${t('certificates.show_certificates')}:`}
               <div className="grid grid-cols-10">
-                <div className="cursor-pointer" onClick={handleToggleVisibilityAttendanceCertificate}>
+                <button
+                  type="button"
+                  className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                  onClick={handleToggleVisibilityAttendanceCertificate}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleToggleVisibilityAttendanceCertificate();
+                    }
+                  }}
+                  aria-label={t('certificates.proof_of_participation')}
+                >
                   {program.visibilityAttendanceCertificate && <MdCheckBox size="1.5em" />}
                   {!program.visibilityAttendanceCertificate && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
-                </div>
+                </button>
                 <div className="col-span-9">{t('certificates.proof_of_participation')}</div>
               </div>
               <div className="grid grid-cols-10">
-                <div className="cursor-pointer" onClick={handleToggleVisibilityAchievementCertificate}>
+                <button
+                  type="button"
+                  className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                  onClick={handleToggleVisibilityAchievementCertificate}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleToggleVisibilityAchievementCertificate();
+                    }
+                  }}
+                  aria-label={t('certificates.performance_certificate')}
+                >
                   {program.visibilityAchievementCertificate && <MdCheckBox size="1.5em" />}
                   {!program.visibilityAchievementCertificate && <MdOutlineCheckBoxOutlineBlank size="1.5em" />}
-                </div>
+                </button>
                 <div className="col-span-9">{t('certificates.performance_certificate')}</div>
               </div>
             </div>

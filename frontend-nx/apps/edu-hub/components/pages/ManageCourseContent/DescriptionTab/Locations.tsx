@@ -1,4 +1,3 @@
-import { QueryResult } from '@apollo/client';
 import { useTranslations } from 'next-intl';
 import { FC, useCallback, useMemo } from 'react';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
@@ -19,7 +18,6 @@ import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 interface LocationsIProps {
   location: ManagedCourse_Course_by_pk_CourseLocations | null;
   onDelete: (c: ManagedCourse_Course_by_pk_CourseLocations) => any;
-  refetchQuery: QueryResult<any, any>;
 }
 
 export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
@@ -49,12 +47,12 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
   );
 
   // Get the current defaultSessionAddressId if it exists
-  const currentDefaultSessionAddressId = (location as any)?.defaultSessionAddressId || null;
+  const currentDefaultSessionAddressId = location?.defaultSessionAddressId || null;
 
   // Query location addresses for the selected location option (skip for ONLINE)
   const { data: addressData } = useRoleQuery(LOCATION_ADDRESS_BY_LOCATION_OPTION, {
     variables: {
-      locationOption: location?.locationOption as LocationOption_enum,
+      locationOption: location?.locationOption ?? LocationOption_enum.ONLINE,
       searchFilter: '%',
     },
     skip: !location?.locationOption || isOnline,
