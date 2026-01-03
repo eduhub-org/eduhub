@@ -3,15 +3,14 @@ import Image from 'next/image';
 import { MdUpload, MdDownload, MdCloudUpload, MdDelete } from 'react-icons/md';
 import { CircularProgress, IconButton, Tooltip, LinearProgress } from '@mui/material';
 import { useAdminMutation } from '../../../hooks/authedMutation';
-import { getPublicImageUrl, parseFileUploadEvent, getPublicUrl } from '../../../helpers/filehandling';
+import { getPublicImageUrl, parseFileUploadEvent, getPublicUrl, UploadFile } from '../../../helpers/filehandling';
 import {
   detectFileType,
   getFilename,
-  formatFileSize,
   formatAcceptedTypes,
   formatMaxSize,
   getFileIcon,
-  FileTypeCategory,
+  validateMimeType,
 } from './utils';
 import { FileUploadFieldProps } from './types';
 import { useTranslations } from 'next-intl';
@@ -127,16 +126,38 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
   });
 
   // Process file upload
+  // Note: Server-side GraphQL mutation must independently validate MIME types
   const processFileUpload = useCallback(
-    async (file: File) => {
-      // Validate file size if specified
-      if (maxFileSize && file.size > maxFileSize) {
-        const maxSizeMB = (maxFileSize / 1024 / 1024).toFixed(2);
+    async (file: UploadFile, fileType?: string) => {
+      if (!file) return;
+
+      // Set default max file size to 10MB if not specified
+      const effectiveMaxFileSize = maxFileSize ?? 10 * 1024 * 1024;
+
+      // Validate file size
+      if (file.size > effectiveMaxFileSize) {
+        const maxSizeMB = (effectiveMaxFileSize / 1024 / 1024).toFixed(2);
         const errorMessage = t('file_upload.file_too_large', { maxSize: maxSizeMB });
+        setIsUploading(false);
+        setUploadProgress(0);
         if (onUploadError) {
           onUploadError(errorMessage);
         }
         return;
+      }
+
+      // Validate MIME type if file type is provided and acceptedFileTypes is not '*'
+      if (fileType && acceptedFileTypes !== '*') {
+        if (!validateMimeType(fileType, acceptedFileTypes)) {
+          const acceptedTypesText = formatAcceptedTypes(acceptedFileTypes);
+          const errorMessage = t('file_upload.invalid_file_type', { types: acceptedTypesText });
+          setIsUploading(false);
+          setUploadProgress(0);
+          if (onUploadError) {
+            onUploadError(errorMessage);
+          }
+          return;
+        }
       }
 
       setIsUploading(true);
@@ -235,7 +256,9 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
     async (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = await parseFileUploadEvent(event);
       if (!file) return;
-      await processFileUpload(file);
+      // Get the original File object to access its type property
+      const originalFile = event.target.files?.[0];
+      await processFileUpload(file, originalFile?.type);
     },
     [processFileUpload]
   );
@@ -272,20 +295,34 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
       dragCounterRef.current = 0;
 
       if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        const file = e.dataTransfer.files[0];
+        const droppedFile = e.dataTransfer.files[0];
+        
+        // Validate file type before processing (drag-and-drop bypasses file input accept attribute)
+        if (acceptedFileTypes !== '*') {
+          const fileType = droppedFile.type;
+          if (!validateMimeType(fileType, acceptedFileTypes)) {
+            const acceptedTypesText = formatAcceptedTypes(acceptedFileTypes);
+            const errorMessage = t('file_upload.invalid_file_type', { types: acceptedTypesText });
+            if (onUploadError) {
+              onUploadError(errorMessage);
+            }
+            return;
+          }
+        }
+
         // Create a mock event object for parseFileUploadEvent
         const mockEvent = {
           target: {
-            files: [file],
+            files: [droppedFile],
           },
         } as any;
         const parsedFile = await parseFileUploadEvent(mockEvent);
         if (parsedFile) {
-          await processFileUpload(parsedFile);
+          await processFileUpload(parsedFile, droppedFile.type);
         }
       }
     },
-    [processFileUpload]
+    [processFileUpload, acceptedFileTypes, onUploadError, t]
   );
 
   const handleDownloadClick = useCallback(() => {
@@ -367,11 +404,15 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
 
   const filename = useMemo(() => getFilename(currentFileUrl), [currentFileUrl]);
 
-  // Reset accessUrl when currentFileUrl changes (e.g., after refetch)
+  // Reset accessUrl when currentFileUrl changes to a different value
   // This ensures we use the stored accessUrl only for recently uploaded files
+  // and clears stale accessUrl when the component receives updated props
+  const previousFileUrlRef = useRef<string | null>(currentFileUrl);
   useEffect(() => {
-    if (!currentFileUrl) {
+    // Clear accessUrl if currentFileUrl changed to a different value (not just falsy)
+    if (previousFileUrlRef.current !== currentFileUrl) {
       setAccessUrl(null);
+      previousFileUrlRef.current = currentFileUrl;
     }
   }, [currentFileUrl]);
 

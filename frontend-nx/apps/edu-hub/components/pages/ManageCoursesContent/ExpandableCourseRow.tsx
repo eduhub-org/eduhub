@@ -1,4 +1,4 @@
-import { FC, Fragment, useCallback, useMemo, useState } from 'react';
+import { FC, Fragment, useCallback, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdAddCircle, MdEmail } from 'react-icons/md';
 import { useRouter } from 'next/router';
@@ -53,7 +53,7 @@ import {
 import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
-import { normalizeErrorKey } from '../../../helpers/errorHandling';
+import { translateErrorMessage } from '../../../helpers/errorHandling';
 import { useAdminQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import {
   GET_COURSE_TEMPLATES_COUNT,
@@ -573,7 +573,14 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 imageHeight={96}
                 showFileName={true}
                 refetchQueries={['AdminCourseList']}
-                onUploadError={(error) => handleError(t(normalizeErrorKey(error)))}
+                onUploadError={(error) => {
+                  // Normalize error key: lowercase and add file_upload namespace prefix
+                  const normalizedKey = error.toLowerCase().replaceAll('.', '_');
+                  const fileUploadKey = `file_upload.${normalizedKey}`;
+                  // Try file_upload namespace first, fall back to generic translation
+                  const translated = t(fileUploadKey) === fileUploadKey ? translateErrorMessage(error, t) : t(fileUploadKey);
+                  handleError(translated);
+                }}
               />
             </div>
 

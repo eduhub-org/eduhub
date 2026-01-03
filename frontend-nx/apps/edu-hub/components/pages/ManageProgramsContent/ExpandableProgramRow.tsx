@@ -2,7 +2,7 @@ import { FC, useCallback } from 'react';
 import { CircularProgress } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { useAdminMutation } from '../../../hooks/authedMutation';
-import { useAdminQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
+import { useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { ProgramList_Program } from '../../../queries/__generated__/ProgramList';
 import {
   SAVE_ACHIEVEMENT_CERTIFICATE_TEMPLATE,
@@ -28,7 +28,6 @@ import InputField from '../../inputs/InputField';
 import CheckboxSelector from '../../inputs/CheckboxSelector';
 import { Button } from '../../common/Button';
 import FileUploadField from '../../inputs/FileUploadField';
-import { PROGRAM_LIST } from '../../../queries/programList';
 import {
   UpdateProgramAchievementCertVisible,
   UpdateProgramAchievementCertVisibleVariables,
@@ -45,7 +44,6 @@ interface ExpandableProgramRowProps {
 
 const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
   const t = useTranslations('managePrograms');
-  const qResult = useAdminQuery(PROGRAM_LIST);
 
 
   const [
@@ -191,14 +189,13 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                   updateMutation={UPDATE_ATTENDANCE_CERTIFICATE_TEMPLATE}
                   identifierVariables={{ programId: program.id }}
                   updateFieldName="templatePath"
-                  acceptedFileTypes="image/*"
-                  maxFileSize={5 * 1024 * 1024}
+                  acceptedFileTypes=".pdf,.jpg,.jpeg,.png"
+                  maxFileSize={10 * 1024 * 1024}
                   uploadText={t('certificates.upload_template')}
                   imageWidth={160}
                   imageHeight={96}
                   showFileName={true}
                   refetchQueries={['ProgramList']}
-                  onUploadSuccess={() => qResult.refetch()}
                 />
               </div>
 
@@ -214,13 +211,12 @@ const ExpandableProgramRow: FC<ExpandableProgramRowProps> = ({ program }) => {
                   identifierVariables={{ programId: program.id }}
                   updateFieldName="templatePath"
                   acceptedFileTypes=".pdf,.jpg,.jpeg,.png"
-                  maxFileSize={20 * 1024 * 1024}
-                  uploadText={t('certificates.upload_template') || 'Click to upload template'}
+                  maxFileSize={10 * 1024 * 1024}
+                  uploadText={t('certificates.upload_template')}
                   imageWidth={160}
                   imageHeight={96}
                   showFileName={true}
                   refetchQueries={['ProgramList']}
-                  onUploadSuccess={() => qResult.refetch()}
                 />
               </div>
             </div>

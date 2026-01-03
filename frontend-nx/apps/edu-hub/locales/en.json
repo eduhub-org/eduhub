@@ -1140,7 +1140,7 @@
       "application_end": "Application End",
       "course_start": "Course Start",
       "course_end": "Course End",
-      "achievement_upload_deadline": "Deadline for Performance Record Upload",
+      "achievement_upload_deadline": "Deadline Perf. Record Upload",
       "not_published": "Not Published"
     },
     "title": {
@@ -1188,7 +1188,7 @@
       "performance_certificate": "Performance certificate",
       "show_certificates": "Show certificate",
       "no_template_uploaded_yet": "No template uploaded yet",
-      "upload_template": "Click to upload template"
+      "upload_template": "Click to upload template or drag and drop"
     },
     "participation_data": {
       "generate": "Generate Participation Data (CSV)",

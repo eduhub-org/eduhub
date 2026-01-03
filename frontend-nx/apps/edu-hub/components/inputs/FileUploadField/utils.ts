@@ -196,3 +196,84 @@ export const formatMaxSize = (maxFileSize?: number): string => {
   return formatFileSize(maxFileSize);
 };
 
+/**
+ * Normalizes acceptedFileTypes prop into an array of MIME type patterns.
+ * Converts extensions (e.g., ".pdf") to MIME types (e.g., "application/pdf").
+ * @param acceptedFileTypes - Accept attribute value (e.g., "image/*,.pdf" or "*")
+ * @returns Array of MIME type patterns (e.g., ["image/*", "application/pdf"])
+ */
+export const normalizeAcceptedTypesToMime = (acceptedFileTypes: string): string[] => {
+  if (acceptedFileTypes === '*' || !acceptedFileTypes) {
+    return []; // Empty array means accept all types
+  }
+
+  const mimeTypes: string[] = [];
+  const parts = acceptedFileTypes.split(',').map((s) => s.trim());
+
+  // Extension to MIME type mapping
+  const extensionToMime: Record<string, string> = {
+    '.pdf': 'application/pdf',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.gif': 'image/gif',
+    '.webp': 'image/webp',
+    '.svg': 'image/svg+xml',
+    '.doc': 'application/msword',
+    '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    '.xls': 'application/vnd.ms-excel',
+    '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    '.csv': 'text/csv',
+    '.ppt': 'application/vnd.ms-powerpoint',
+    '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  };
+
+  for (const part of parts) {
+    if (part.startsWith('.')) {
+      // Extension like .pdf - convert to MIME type
+      const mimeType = extensionToMime[part.toLowerCase()];
+      if (mimeType) {
+        mimeTypes.push(mimeType);
+      }
+    } else if (part.includes('/')) {
+      // Already a MIME type like image/png or image/*
+      mimeTypes.push(part);
+    }
+  }
+
+  return mimeTypes;
+};
+
+/**
+ * Validates if a file's MIME type matches the accepted file types.
+ * @param fileType - The file's MIME type (e.g., "image/jpeg")
+ * @param acceptedFileTypes - Accept attribute value (e.g., "image/*,.pdf")
+ * @returns true if the file type is accepted, false otherwise
+ */
+export const validateMimeType = (fileType: string, acceptedFileTypes: string): boolean => {
+  if (acceptedFileTypes === '*' || !acceptedFileTypes) {
+    return true; // Accept all types
+  }
+
+  const acceptedMimeTypes = normalizeAcceptedTypesToMime(acceptedFileTypes);
+  
+  // If no MIME types found after normalization, accept all
+  if (acceptedMimeTypes.length === 0) {
+    return true;
+  }
+
+  // Check if file type matches any accepted MIME type pattern
+  return acceptedMimeTypes.some((acceptedType) => {
+    if (acceptedType === fileType) {
+      return true; // Exact match
+    }
+    if (acceptedType.endsWith('/*')) {
+      // Wildcard match (e.g., "image/*" matches "image/jpeg")
+      const category = acceptedType.split('/')[0];
+      const fileCategory = fileType.split('/')[0];
+      return category === fileCategory;
+    }
+    return false;
+  });
+};
+

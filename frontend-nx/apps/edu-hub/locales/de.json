@@ -825,7 +825,7 @@
     },
     "cover_image": {
       "label": "Titelbild",
-      "upload_text": "Klicken um Titelbild hochzuladen",
+      "upload_text": "Klicken um Titelbild hochzuladen oder Datei hier ablegen",
       "alt": "Kurs-Titelbild"
     },
     "instructors": {
@@ -1175,7 +1175,7 @@
       "performance_certificate": "Leistungszertifikat",
       "show_certificates": "Bescheinigungen einblenden",
       "no_template_uploaded_yet": "Noch kein Template hochgeladen",
-      "upload_template": "Klicken, um Template hochzuladen"
+      "upload_template": "Klicken, um Template hochzuladen oder Datei hier ablegen"
     },
     "participation_data": {
       "generate": "Teilnehmer:innen Daten generieren (CSV)",
