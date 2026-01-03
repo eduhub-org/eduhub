@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { ProgramType_enum } from "./../../__generated__/globalTypes";
+import { Program_order_by, Program_bool_exp, ProgramType_enum } from "./../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: ProgramList
@@ -96,9 +96,30 @@ export interface ProgramList_Program {
   Courses: ProgramList_Program_Courses[];
 }
 
+export interface ProgramList_Program_aggregate_aggregate {
+  __typename: "Program_aggregate_fields";
+  count: number;
+}
+
+export interface ProgramList_Program_aggregate {
+  __typename: "Program_aggregate";
+  aggregate: ProgramList_Program_aggregate_aggregate | null;
+}
+
 export interface ProgramList {
   /**
    * fetch data from the table: "Program"
    */
   Program: ProgramList_Program[];
+  /**
+   * fetch aggregated fields from the table: "Program"
+   */
+  Program_aggregate: ProgramList_Program_aggregate;
+}
+
+export interface ProgramListVariables {
+  limit?: number | null;
+  offset?: number | null;
+  order_by?: Program_order_by[] | null;
+  where?: Program_bool_exp | null;
 }

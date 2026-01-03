@@ -1,8 +1,7 @@
-import { FC, Fragment, useCallback, useMemo, useRef, useState } from 'react';
+import { FC, Fragment, useCallback, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdUpload, MdAddCircle, MdEmail } from 'react-icons/md';
+import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdAddCircle, MdEmail } from 'react-icons/md';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
 import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
@@ -23,8 +22,6 @@ import {
   UserSelectionWithFilterVariables,
   UserSelectionWithFilter_User,
 } from '../../../queries/__generated__/UserSelectionWithFilter';
-import { SaveCourseImage, SaveCourseImageVariables } from '../../../queries/__generated__/SaveCourseImage';
-import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
 import { CourseRegistrationType_enum, order_by } from '../../../__generated__/globalTypes';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import { SelectOrganizationDialog } from '../../common/dialogs/SelectOrganizationDialog';
@@ -39,11 +36,11 @@ import {
 } from '../../../queries/__generated__/InsertCourseFundingOrganization';
 import { OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
 import EntityListManager from '../../inputs/EntityListManager';
-import { getPublicImageUrl, parseFileUploadEvent } from '../../../helpers/filehandling';
 import { useTranslations } from 'next-intl';
 import TagSelector from '../../inputs/TagSelector';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
+import FileUploadField from '../../inputs/FileUploadField';
 import {
   UPDATE_COURSE_CHAT_LINK,
   UPDATE_COURSE_ECTS,
@@ -56,7 +53,7 @@ import {
 import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
-import { normalizeErrorKey } from '../../../helpers/errorHandling';
+import { translateErrorMessage } from '../../../helpers/errorHandling';
 import { useAdminQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import {
   GET_COURSE_TEMPLATES_COUNT,
@@ -281,11 +278,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   });
 
 
-  // Image upload functionality
-  const imageUploadRef = useRef<any>(null);
-  const handleImageUploadClick = useCallback(() => {
-    imageUploadRef.current?.click();
-  }, [imageUploadRef]);
 
   const handleToggleAttendanceCertificatePossible = useCallback(() => {
     onSetAttendanceCertificatePossible(course, !course.attendanceCertificatePossible);
@@ -457,44 +449,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     [insertCourseFundingOrg, course, closeFundingOrgDialog, handleError, t]
   );
 
-  const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
-
-  const [saveCourseImage] = useAdminMutation<SaveCourseImage, SaveCourseImageVariables>(SAVE_COURSE_IMAGE, {
-    onError: (error) => handleError(t(normalizeErrorKey(error.message))),
-    refetchQueries: ['AdminCourseList'],
-  });
-
-  const handleUploadCourseImageEvent = useCallback(
-    async (event: any) => {
-      const ufile = await parseFileUploadEvent(event);
-
-      if (ufile != null) {
-        const result = await saveCourseImage({
-          variables: {
-            base64File: ufile.data,
-            fileName: ufile.name,
-            courseId: course.id,
-          },
-        });
-
-        const uploadResult = result.data?.saveCourseImage;
-        if (uploadResult?.success) {
-          await updateCourse({
-            variables: {
-              id: course.id,
-              changes: {
-                coverImage: uploadResult.filePath,
-              },
-            },
-            refetchQueries: ['AdminCourseList'],
-          });
-        } else {
-          handleError(t(uploadResult?.messageKey || 'operation-failed'));
-        }
-      }
-    },
-    [course.id, saveCourseImage, updateCourse, handleError, t]
-  );
 
   const currentCourseGroups = course.CourseGroups.map((group) => ({
     id: group.CourseGroupOption.id,
@@ -507,8 +461,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     id: degree.degreeCourseId,
     name: t(degree.DegreeCourse.title),
   }));
-
-  const coverImage = useMemo(() => getPublicImageUrl(course?.coverImage, 460), [course?.coverImage]);
 
   const registrationTypeOptions = Object.values(CourseRegistrationType_enum).map((type) => ({
     value: type,
@@ -604,42 +556,31 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             {/* 3. Cover Image Upload - Card Container */}
             <div className="bg-white border border-gray-200 rounded-lg p-4">
               <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses.cover_image.label')}</h4>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-gray-400 transition-colors bg-gray-50">
-                <div className="flex flex-col items-center justify-center space-y-2">
-                  {coverImage ? (
-                    <div className="relative">
-                      <Image
-                        src={coverImage}
-                        alt={t('manageCourses.cover_image.alt')}
-                        width={160}
-                        height={96}
-                        className="object-contain rounded bg-gray-100"
-                        style={{ width: '160px', height: '96px' }}
-                      />
-                      <button
-                        onClick={handleImageUploadClick}
-                        className="absolute inset-0 bg-black bg-opacity-50 text-white rounded flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
-                      >
-                        <MdUpload className="w-6 h-6" />
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={handleImageUploadClick}
-                      className="flex flex-col items-center space-y-2 text-gray-500 hover:text-gray-700"
-                    >
-                      <MdUpload className="w-8 h-8" />
-                      <span className="text-sm">{t('manageCourses.cover_image.upload_text')}</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-              <input
-                ref={imageUploadRef}
-                onChange={handleUploadCourseImageEvent}
-                className="hidden"
-                type="file"
-                accept="image/*"
+              <FileUploadField
+                variant="material"
+                currentFileUrl={course?.coverImage}
+                uploadMutation={SAVE_COURSE_IMAGE}
+                updateMutation={UPDATE_COURSE_PROPERTY}
+                identifierVariables={{ id: course.id }}
+                uploadIdentifierVariables={{ courseId: course.id }}
+                updateFieldName="coverImage"
+                useChangesObject={true}
+                acceptedFileTypes="image/*"
+                maxFileSize={5 * 1024 * 1024}
+                uploadText={t('manageCourses.cover_image.upload_text')}
+                altText={t('manageCourses.cover_image.alt')}
+                imageWidth={160}
+                imageHeight={96}
+                showFileName={true}
+                refetchQueries={['AdminCourseList']}
+                onUploadError={(error) => {
+                  // Normalize error key: lowercase and add file_upload namespace prefix
+                  const normalizedKey = error.toLowerCase().replaceAll('.', '_');
+                  const fileUploadKey = `file_upload.${normalizedKey}`;
+                  // Try file_upload namespace first, fall back to generic translation
+                  const translated = t(fileUploadKey) === fileUploadKey ? translateErrorMessage(error, t) : t(fileUploadKey);
+                  handleError(translated);
+                }}
               />
             </div>
 

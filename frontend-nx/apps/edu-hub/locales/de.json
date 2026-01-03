@@ -169,6 +169,39 @@
       "remove_image_error": "Fehler beim Entfernen des Bildes",
       "upload_error": "Fehler beim Hochladen des Bildes"
     },
+    "file_upload": {
+      "upload_text": "Klicken, um Datei hochzuladen",
+      "upload_image_text": "Klicken, um Bild hochzuladen",
+      "upload_pdf_text": "Klicken, um PDF hochzuladen",
+      "uploading": "Hochladen...",
+      "upload_success": "Datei erfolgreich hochgeladen",
+      "upload_error": "Fehler beim Hochladen der Datei",
+      "file_too_large": "Dateigröße überschreitet {maxSize}MB Limit",
+      "invalid_file_type": "Ungültiger Dateityp. Akzeptierte Typen: {types}",
+      "image_alt": "Hochgeladene Dateivorschau",
+      "unknown_file_type": "Unbekannter Dateityp",
+      "drag_drop_text": "Datei hier ablegen",
+      "click_or_drag": "Klicken zum Hochladen oder Datei hier ablegen",
+      "remove": "Entfernen",
+      "replace": "Ersetzen",
+      "download": "Herunterladen",
+      "file_size": "Dateigröße",
+      "accepted_types": "Akzeptierte Typen",
+      "max_size": "Max. Größe",
+      "file_type": {
+        "pdf": "PDF-Dokument",
+        "word_document": "Word-Dokument",
+        "excel_spreadsheet": "Excel-Tabelle",
+        "spreadsheet": "Tabelle",
+        "powerpoint": "PowerPoint",
+        "archive": "Archiv",
+        "code_file": "Code-Datei",
+        "text_file": "Textdatei",
+        "video_file": "Videodatei",
+        "audio_file": "Audiodatei",
+        "file": "Datei"
+      }
+    },
     "input_field": {
       "invalid_link_format": "Ungültiges Link-Format",
       "invalid_email_format": "Ungültiges E-Mail-Format",
@@ -792,7 +825,7 @@
     },
     "cover_image": {
       "label": "Titelbild",
-      "upload_text": "Klicken um Titelbild hochzuladen",
+      "upload_text": "Klicken um Titelbild hochzuladen oder Datei hier ablegen",
       "alt": "Kurs-Titelbild"
     },
     "instructors": {
@@ -1141,7 +1174,8 @@
       "proof_of_participation": "Teilnahmenachweis",
       "performance_certificate": "Leistungszertifikat",
       "show_certificates": "Bescheinigungen einblenden",
-      "no_template_uploaded_yet": "Noch kein Template hochgeladen"
+      "no_template_uploaded_yet": "Noch kein Template hochgeladen",
+      "upload_template": "Klicken, um Template hochzuladen oder Datei hier ablegen"
     },
     "participation_data": {
       "generate": "Teilnehmer:innen Daten generieren (CSV)",
