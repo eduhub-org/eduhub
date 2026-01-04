@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Dispatch, SetStateAction } from 'react';
 import { useEffect } from 'react';
 import { useRoleQuery } from '../../hooks/authedQuery';

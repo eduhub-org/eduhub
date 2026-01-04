@@ -1,4 +1,4 @@
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { FC, useCallback, useState } from 'react';
 import { GoDotFill } from 'react-icons/go';
 import { IoIosArrowDown, IoIosArrowUp, IoIosCheckmarkCircle, IoIosCloseCircle } from 'react-icons/io';
@@ -60,11 +60,11 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
     }
   }, [onSetRating, enrollment]);
 
-  const [isRowOpen, setRowOpen] = useState(false);
+  const [isRowOpen, setIsRowOpen] = useState(false);
 
   const handleToggleRowOpen = useCallback(() => {
-    setRowOpen(!isRowOpen);
-  }, [isRowOpen, setRowOpen]);
+    setIsRowOpen(!isRowOpen);
+  }, [isRowOpen]);
 
   return (
     <>
@@ -72,9 +72,9 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
         <div className="grid grid-cols-24 mb-1">
           <div className="mr-3 ml-3 col-span-3">{t('firstName')}</div>
           <div className="mr-3 ml-3 col-span-3">{t('lastName')}</div>
-          <div className="mr-3 ml-3 col-span-12">{t('coursePage.application')}</div>
-          <div className="mr-3 ml-3 col-span-2 text-center">{t('coursePage.evaluation')}</div>
-          <div className="mr-3 ml-3 col-span-2 text-center">{t('status')}</div>
+          <div className="mr-3 ml-3 col-span-12">{t('application')}</div>
+          <div className="mr-3 ml-3 col-span-2 text-center">{t('evaluation')}</div>
+          <div className="mr-3 ml-3 col-span-2 text-center">{t('status_label')}</div>
           <div className="col-span-1" />
           <div className="col-span-1" />
         </div>
@@ -95,48 +95,70 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
             </div>
             <div className="mr-3 ml-3 col-span-2 text-center">
               {!isExpired(enrollment) && enrollment.status === 'APPLIED' && (
-                <GoDotFill className="inline" title={t('coursePage.applied')} color="grey" size="2.5em" />
+                <GoDotFill className="inline" title={t('status.applied')} color="grey" size="2.5em" />
               )}
               {!isExpired(enrollment) && enrollment.status === 'INVITED' && (
-                <IoIosCheckmarkCircle className="inline" title={t('coursePage.invited')} color="grey" size="1.5em" />
+                <IoIosCheckmarkCircle className="inline" title={t('status.invited')} color="grey" size="1.5em" />
               )}
               {(enrollment.status === 'CONFIRMED' || enrollment.status === 'COMPLETED') && (
                 <IoIosCheckmarkCircle
                   className="inline"
-                  title={t('coursePage.invitation-confirmed')}
+                  title={t('status.invitation_confirmed')}
                   color="lightgreen"
                   size="1.5em"
                 />
               )}
               {enrollment.status === 'ABORTED' && (
-                <IoIosCheckmarkCircle title={t('coursePage.aborted')} color="red" size="1.5em" className="inline" />
+                <IoIosCheckmarkCircle title={t('status.aborted')} color="red" size="1.5em" className="inline" />
               )}
               {enrollment.status === 'REJECTED' && (
-                <IoIosCloseCircle title={t('coursePage.rejected')} color="red" size="1.5em" className="inline" />
+                <IoIosCloseCircle title={t('status.rejected')} color="red" size="1.5em" className="inline" />
               )}
               {enrollment.status === 'CANCELLED' && (
-                <IoIosCloseCircle title={t('coursePage.cancelled')} color="red" size="1.5em" className="inline" />
+                <IoIosCloseCircle title={t('status.cancelled')} color="red" size="1.5em" className="inline" />
               )}
               {isExpired(enrollment) && (enrollment.status === 'APPLIED' || enrollment.status === 'INVITED') && (
                 <IoIosCloseCircle
                   className="inline"
-                  title={t('coursePage.invitation-expired')}
+                  title={t('status.invitation_expired')}
                   color="grey"
                   size="1.5em"
                 />
               )}
             </div>
-            <div className="col-span-1 cursor-pointer text-center" onClick={handleToggleRowOpen}>
+            <button
+              type="button"
+              className="col-span-1 cursor-pointer text-center focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+              onClick={handleToggleRowOpen}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleToggleRowOpen();
+                }
+              }}
+              aria-label={isRowOpen ? t('table.collapse') : t('table.expand')}
+            >
               {!isRowOpen && <IoIosArrowDown size="1.25em" className="inline" />}
               {isRowOpen && <IoIosArrowUp size="1.25em" className="inline" />}
-            </div>
+            </button>
 
             <div className="col-span-1 text-center">
               <OnlyAdmin>
-                <div className="cursor-pointer" onClick={handleToggleRowSelected}>
+                <button
+                  type="button"
+                  className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                  onClick={handleToggleRowSelected}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleToggleRowSelected();
+                    }
+                  }}
+                  aria-label={isRowSelected ? t('table.deselect') : t('table.select')}
+                >
                   {isRowSelected && <MdCheckBox className="inline" size="1.25em" />}
                   {!isRowSelected && <MdOutlineCheckBoxOutlineBlank className="inline" size="1.25em" />}
-                </div>
+                </button>
               </OnlyAdmin>
             </div>
           </div>
@@ -150,9 +172,11 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
                     if (pastEnrollment.courseId === enrollment.courseId) {
                       return null; // Skip rendering this enrollment
                     }
+                    // Use a combination of courseId and userId as key since id might not be available
+                    const uniqueKey = `${pastEnrollment.courseId}-${enrollment.userId}-${index}`;
                     return (
                       <p
-                        key={index}
+                        key={uniqueKey}
                         className="text-xs whitespace-normal break-words mt-2 pl-4"
                         style={{ textIndent: '-1rem' }}
                       >
@@ -193,7 +217,7 @@ export const ApplicationRow: FC<IProps> = ({ enrollment, onSetRating, isRowSelec
 
                   {enrollment.status === 'INVITED' && (
                     <div className="mt-5">
-                      {`${t('coursePage.invitation-deadline')}:`} <br />
+                      {`${t('invitation_deadline')}:`} <br />
                       {displayDate(enrollment.invitationExpirationDate)}
                     </div>
                   )}

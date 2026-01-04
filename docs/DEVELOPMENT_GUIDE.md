@@ -8,6 +8,30 @@ For developing serverless functions, please refer to:
 - [Serverless Functions Guide](./docs/SERVERLESS_FUNCTIONS.md) - Complete guide for creating and maintaining serverless functions
 - [Function Templates](./docs/templates/FUNCTION_TEMPLATES.md) - Ready-to-use templates for new functions
 
+## 🔐 Environment Variables
+
+### Local Development Setup
+
+For local development with Docker Compose, create a `.env` file in the project root:
+
+1. **Copy the example file:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit `.env`** and add your actual values (see `.env.example` for required variables)
+
+3. **Docker Compose automatically loads** variables from `.env` when you run `docker compose up`
+
+**Important:** The `.env` file is gitignored and should never be committed. Always use `.env.example` as a template.
+
+### Available Environment Variables
+
+- **Formbricks Integration:**
+  - `FORMBRICKS_API_KEY` - API key for Formbricks Management API (get from Formbricks → Settings → Organization → API Keys)
+
+See `docs/FORMBRICKS_IMPLEMENTATION_SUMMARY.md` for detailed setup instructions.
+
 ## Ports
 
 - `4001` - File uploads

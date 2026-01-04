@@ -1,5 +1,4 @@
-import { QueryResult } from '@apollo/client';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { FC, useCallback, useMemo } from 'react';
 import { ManagedCourse_Course_by_pk_CourseLocations } from '../../../../queries/__generated__/ManagedCourse';
 import DropDownSelector from '../../../inputs/DropDownSelector';
@@ -19,11 +18,10 @@ import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 interface LocationsIProps {
   location: ManagedCourse_Course_by_pk_CourseLocations | null;
   onDelete: (c: ManagedCourse_Course_by_pk_CourseLocations) => any;
-  refetchQuery: QueryResult<any, any>;
 }
 
 export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
-  const t = useTranslations('coursePage');
+  const t = useTranslations('manageCourse');
 
   const queryLocationOptions = useRoleQuery<LocationOptions>(LOCATION_OPTIONS);
   if (queryLocationOptions.error) {
@@ -40,19 +38,21 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
     }
   }, [location, onDelete]);
 
-  // locationOption dependent placeholder
-  const address_placeholder =
-    location?.locationOption === 'ONLINE' ? 'address.placeholder.online' : 'address.placeholder.offline';
-
   const isOnline = location?.locationOption === 'ONLINE';
 
+  // locationOption dependent placeholder (already translated)
+  const address_placeholder = useMemo(
+    () => (isOnline ? t('address.placeholder.online') : t('address.placeholder.offline')),
+    [isOnline, t]
+  );
+
   // Get the current defaultSessionAddressId if it exists
-  const currentDefaultSessionAddressId = (location as any)?.defaultSessionAddressId || null;
+  const currentDefaultSessionAddressId = location?.defaultSessionAddressId || null;
 
   // Query location addresses for the selected location option (skip for ONLINE)
   const { data: addressData } = useRoleQuery(LOCATION_ADDRESS_BY_LOCATION_OPTION, {
     variables: {
-      locationOption: location?.locationOption as LocationOption_enum,
+      locationOption: location?.locationOption ?? LocationOption_enum.ONLINE,
       searchFilter: '%',
     },
     skip: !location?.locationOption || isOnline,
@@ -79,7 +79,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
             value={location.locationOption || 'ONLINE'}
             updateValueMutation={UPDATE_COURSE_LOCATION}
             identifierVariables={{ locationId: location.id }}
-            refetchQueries={['ManagedCourse']}
+            refetchQueries={['ManagedCourse', 'LocationAddressByLocationOption']}
             className="mb-2"
           />
         </div>
@@ -93,7 +93,7 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
               updateValueMutation={UPDATE_COURSE_SESSION_DEFAULT_ADDRESS}
               refetchQueries={['ManagedCourse']}
               itemId={location.id}
-              placeholder={t(address_placeholder)}
+              placeholder={address_placeholder}
               value={location?.defaultSessionAddress || ''}
               className="mb-5"
               showCharacterCount={false}
@@ -102,8 +102,8 @@ export const Locations: FC<LocationsIProps> = ({ location, onDelete }) => {
             <DropDownSelector
               variant="eduhub"
               label=""
-              placeholder={t(address_placeholder)}
-              helpText={t(address_placeholder)}
+              placeholder={address_placeholder}
+              helpText={address_placeholder}
               value={currentDefaultSessionAddressId?.toString() || ''}
               options={addressOptions}
               updateValueMutation={UPDATE_COURSE_DEFAULT_SESSION_ADDRESS_ID}

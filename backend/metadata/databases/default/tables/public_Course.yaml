@@ -112,6 +112,7 @@ select_permissions:
         - title
         - updated_at
         - weekDay
+        - formbricksEnrollmentSurveyUrl
       filter:
         _and:
           - Program:
@@ -149,6 +150,7 @@ select_permissions:
         - title
         - updated_at
         - weekDay
+        - formbricksEnrollmentSurveyUrl
       filter: {}
   - role: user_access
     permission:
@@ -179,6 +181,7 @@ select_permissions:
         - title
         - updated_at
         - weekDay
+        - formbricksEnrollmentSurveyUrl
       filter:
         CourseEnrollments:
           User:
@@ -205,6 +208,7 @@ update_permissions:
         - tagline
         - title
         - weekDay
+        - formbricksEnrollmentSurveyUrl
       filter:
         CourseInstructors:
           User:

@@ -89,4 +89,8 @@ export interface CourseFragmentMinimum {
    */
   startTime: any | null;
   registrationType: CourseRegistrationType_enum | null;
+  /**
+   * Full URL to the Formbricks survey for course enrollment/application (for iframe embedding). Overrides program default if set.
+   */
+  formbricksEnrollmentSurveyUrl: string | null;
 }

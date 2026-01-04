@@ -54,6 +54,7 @@ services:
       HASURA_ADMIN_SECRET: myadminsecretkey
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       LIBRARY_PATH: "../lib/cloud-storage.js"
+      FORMBRICKS_API_KEY: ${FORMBRICKS_API_KEY:-}
 
   python_functions:
     container_name: eduhub-python-functions

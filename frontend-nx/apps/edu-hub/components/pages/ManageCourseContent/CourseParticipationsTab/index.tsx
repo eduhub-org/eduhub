@@ -1,4 +1,4 @@
-import { LazyQueryResult, QueryResult } from '@apollo/client';
+import { QueryResult } from '@apollo/client';
 import { ACHIEVEMENT_OPTION_COURSES } from '../../../../queries/achievementOption';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
@@ -55,8 +55,7 @@ interface CourseParticipationsTabIProps {
 }
 export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ course, qResult }) => {
   return (
-    <>
-      <div className="flex flex-col space-y-2">
+    <div className="flex flex-col space-y-2">
         {/* The following component displays all avaiable achievement options for this
         cours (if available) and allows to delete them
         TODO (Issue #515):
@@ -65,7 +64,6 @@ export const CourseParticipationsTab: FC<CourseParticipationsTabIProps> = ({ cou
 
         <ParticipationList course={course} qResult={qResult} />
       </div>
-    </>
   );
 };
 
@@ -115,8 +113,8 @@ const CourseAchievementOptions: FC<IPropsCourseAchievementOptions> = (props) => 
     <>
       {achievementOptionsForACourse.loading && <Loading />}
       <div className="flex gap-2 items-center flex-wrap">
-        {list.map((data, index) => (
-          <div className="max-w-[30%]" key={index}>
+        {list.map((data) => (
+          <div className="max-w-[30%]" key={data.id}>
             <TagWithTwoText
               textLeft={`${data.AchievementOption.title} - ${data.id}`}
               onRemoveClick={queryDeleteAnAchievementCourseFromDB}
@@ -180,10 +178,10 @@ const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => 
 
       // find most recent record for this enrollment based on created_at timestamp
       // sort by created_at descending and take the first one to ensure consistency
-      const mostRecentRecord =
-        allRecords.length > 0
-          ? allRecords.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
-          : null;
+      const sortedRecords = allRecords.length > 0
+        ? [...allRecords].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        : [];
+      const mostRecentRecord = sortedRecords.length > 0 ? sortedRecords[0] : null;
 
       // return a new object that combines the enrollment and its most recent record
       return {
@@ -277,7 +275,7 @@ const ParticipationList: FC<IPropsParticipationList> = ({ course, qResult }) => 
           )}
         </div>
       ) : (
-        <p className="m-auto text-center mb-14 text-gray-400">{t('coursePage.no-enrollments-present')}</p>
+        <p className="m-auto text-center mb-14 text-gray-400">{t('no_enrollments_present')}</p>
       )}
     </>
   );
@@ -456,7 +454,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
             {!enrollment.mostRecentRecord?.documentationUrl ||
             enrollment.mostRecentRecord.documentationUrl === 'pending_upload' ? (
               <div>
-                <p className={pStyle}> {t('coursePage.not-submitted')} </p>
+                <p className={pStyle}> {t('not_submitted')} </p>
               </div>
             ) : (
               <>
@@ -485,11 +483,15 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
 
         <td className={tdStyle}>
           <div>
-            <button className="focus:ring-2 rounded-md focus:outline-none" role="button" aria-label="option">
+            <button
+              className="focus:ring-2 rounded-md focus:outline-none"
+              onClick={handleDetailsClick}
+              aria-label={showDetails ? t('table.collapse') : t('table.expand')}
+            >
               {showDetails ? (
-                <MdKeyboardArrowUp size={26} onClick={handleDetailsClick} />
+                <MdKeyboardArrowUp size={26} />
               ) : (
-                <MdKeyboardArrowDown size={26} onClick={handleDetailsClick} />
+                <MdKeyboardArrowDown size={26} />
               )}
             </button>
           </div>
@@ -510,7 +512,7 @@ const ParticipationRow: FC<IPropsParticipationRow> = ({
 /* #endregion */
 interface IPropsShowDetails {
   enrollment: ExtendedEnrollment;
-  achievementRecordDocumentationResult: LazyQueryResult<GetSignedUrl, GetSignedUrlVariables>;
+  achievementRecordDocumentationResult: QueryResult<GetSignedUrl, GetSignedUrlVariables>;
   qResult: QueryResult<any, any>;
 }
 const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocumentationResult, qResult }) => {
@@ -540,8 +542,7 @@ const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocum
         </td>
         <td colSpan={3} className={`${tdStyle} min-w-[260px]`}>
           <div className="flex flex-col">
-            {enrollment.mostRecentRecord &&
-              enrollment.mostRecentRecord.documentationUrl &&
+            {enrollment.mostRecentRecord?.documentationUrl &&
               enrollment.mostRecentRecord.documentationUrl !== 'pending_upload' && (
                 <>
                   <div className="flex items-center mb-3">
@@ -587,7 +588,7 @@ const ShowDetails: FC<IPropsShowDetails> = ({ enrollment, achievementRecordDocum
                     href={
                       achievementRecordDocumentationResult.loading
                         ? '#'
-                        : achievementRecordDocumentationResult?.data?.getSignedUrl?.link
+                        : achievementRecordDocumentationResult.data?.getSignedUrl?.link
                     }
                   >
                     {achievementRecordDocumentationResult.loading ? <CircularProgress /> : 'Download Documentation'}

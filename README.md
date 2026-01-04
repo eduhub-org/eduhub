@@ -18,9 +18,16 @@ EduHub aims to centralize educational offerings. It enables users to apply and g
 
 1. Install [Docker](https://docs.docker.com/engine/install/).
 2. Clone this repository.
-3. Run `docker compose up`.
-4. Open `localhost:5000` in your browser.
-5. Log in as **admin@example.com** with password **dev**.
+3. **Set up environment variables** (optional for basic setup, required for Formbricks integration):
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your Formbricks credentials if needed
+   ```
+4. Run `docker compose up`.
+5. Open `localhost:5000` in your browser.
+6. Log in as **admin@example.com** with password **dev**.
+
+> **Note:** See [Development Guide](./docs/DEVELOPMENT_GUIDE.md) for detailed environment variable setup.
 
 ## :busts_in_silhouette: Contributing
 

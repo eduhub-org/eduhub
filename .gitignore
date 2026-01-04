@@ -4,6 +4,7 @@
 hasura_keycloak.env
 docker-compose.env
 frontend.env
+.env
 node_modules
 
 reminder.log

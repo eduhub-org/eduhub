@@ -1,350 +1,404 @@
-import { FC, useCallback, useState } from 'react';
-import { MdAddCircle } from 'react-icons/md';
-
-import { PageBlock } from '../../common/PageBlock';
-import { QuestionConfirmationDialog } from '../../common/dialogs/QuestionConfirmationDialog';
+import { FC, useCallback, useMemo, useState } from 'react';
+import { CircularProgress } from '@mui/material';
+import { ColumnDef } from '@tanstack/react-table';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { useAdminQuery } from '../../../hooks/authedQuery';
 
-import { ProgramList, ProgramList_Program } from '../../../queries/__generated__/ProgramList';
+import { ProgramList_Program } from '../../../queries/__generated__/ProgramList';
 import { PROGRAM_LIST } from '../../../queries/programList';
-import 'react-datepicker/dist/react-datepicker.css';
+import { order_by } from '../../../__generated__/globalTypes';
 import {
   UpdateProgramPublished,
   UpdateProgramPublishedVariables,
 } from '../../../queries/__generated__/UpdateProgramPublished';
 import {
   INSERT_PROGRAM,
-  UPDATE_PROGRAM_ACHIEVEMENT_CERT_VISIBLE,
-  UPDATE_PROGRAM_APPLICATION_END,
-  UPDATE_PROGRAM_APPLICATION_START,
-  UPDATE_PROGRAM_LECTURE_END,
-  UPDATE_PROGRAM_LECTURE_START,
-  UPDATE_PROGRAM_PARTICIPATION_CERT_VISIBLE,
-  UPDATE_PROGRAM_UPLOAD_DEADLINE,
   UPDATE_PROGRAM_PUBLISHED,
+  DELETE_PROGRAM,
+  UPDATE_PROGRAM_APPLICATION_START,
+  UPDATE_PROGRAM_APPLICATION_END,
+  UPDATE_PROGRAM_LECTURE_START,
+  UPDATE_PROGRAM_LECTURE_END,
+  UPDATE_PROGRAM_UPLOAD_DEADLINE,
+  UPDATE_PROGRAM_TITLE,
 } from '../../../queries/updateProgram';
-import {
-  UpdateProgramApplicationStart,
-  UpdateProgramApplicationStartVariables,
-} from '../../../queries/__generated__/UpdateProgramApplicationStart';
-import {
-  UpdateProgramApplicationEnd,
-  UpdateProgramApplicationEndVariables,
-} from '../../../queries/__generated__/UpdateProgramApplicationEnd';
-import {
-  UpdateProgramLectureStart,
-  UpdateProgramLectureStartVariables,
-} from '../../../queries/__generated__/UpdateProgramLectureStart';
-import {
-  UpdateProgramLectureEnd,
-  UpdateProgramLectureEndVariables,
-} from '../../../queries/__generated__/UpdateProgramLectureEnd';
-import {
-  UpdateProgramUploadDeadline,
-  UpdateProgramUploadDeadlineVariables,
-} from '../../../queries/__generated__/UpdateProgramUploadDeadline';
-
-import { Button } from '@mui/material';
-
 import { InsertProgram, InsertProgramVariables } from '../../../queries/__generated__/InsertProgram';
-import { ProgramsRow } from './ProgramsRow';
-import {
-  UpdateProgramAchievementCertVisible,
-  UpdateProgramAchievementCertVisibleVariables,
-} from '../../../queries/__generated__/UpdateProgramAchievementCertVisible';
-import {
-  UpdateProgramParticipationCertVisible,
-  UpdateProgramParticipationCertVisibleVariables,
-} from '../../../queries/__generated__/UpdateProgramParticipationCertVisible';
-import { useTranslations, useLocale } from 'next-intl';
+
+import TableGrid from '../../common/TableGrid';
+import { useTableGrid } from '../../common/TableGrid/hooks';
+import { createMultiWordSearchCondition } from '../../common/TableGrid/utils';
+import InputField from '../../inputs/InputField';
+import DatePicker from '../../inputs/DatePicker';
+import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
+import CommonPageHeader from '../../common/CommonPageHeader';
+import ExpandableProgramRow from './ExpandableProgramRow';
+import { useTranslations } from 'next-intl';
+
+const QUERY_LIMIT = 100;
 
 export const ManageProgramsContent: FC = () => {
-  const t = useTranslations();
-  const qResult = useAdminQuery<ProgramList>(PROGRAM_LIST);
+  const t = useTranslations('managePrograms');
 
-  if (qResult.error) {
-    console.log('query programs error', qResult.error);
-  }
-
-  const ps = [...(qResult.data?.Program || [])];
-  ps.sort((a, b) => {
-    return b.id - a.id;
+  // Filter state management
+  const [filter] = useState({
+    limit: QUERY_LIMIT,
+    order_by: [{ id: order_by.desc }],
   });
 
-  const programs = ps;
-
-  const [openProgram, setOpenProgram] = useState(-1);
-
-  const [insertProgram] = useAdminMutation<InsertProgram, InsertProgramVariables>(INSERT_PROGRAM);
-  const insertDefaultProgram = useCallback(async () => {
-    const today = new Date();
-    today.setMilliseconds(0);
-    today.setSeconds(0);
-    today.setMinutes(0);
-    today.setHours(0);
-    await insertProgram({
-      variables: {
-        title: t('coursePage.programs-default-title'),
-        today: new Date(),
+  // Use TableGrid hook with server-side sorting
+  const { data, loading, error, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
+    queryHook: useAdminQuery,
+    query: PROGRAM_LIST,
+    queryVariables: filter,
+    pageSize: filter.limit || QUERY_LIMIT,
+    debounceMs: 1000,
+    defaultSort: [{ id: order_by.desc }],
+    sortColumnMapper: (columnId) => {
+      // Map table column IDs to GraphQL field names
+      const mapping: Record<string, string> = {
+        'title': 'title',
+        'applicationStart': 'applicationStart',
+        'applicationEnd': 'defaultApplicationEnd',
+        'lectureStart': 'lectureStart',
+        'lectureEnd': 'lectureEnd',
+        'achievementRecordUploadDeadline': 'achievementRecordUploadDeadline',
+        'published': 'published'
+      };
+      return mapping[columnId] || null;
+    },
+    refetchFilter: useCallback(
+      (searchTerm: string) => {
+        const searchCondition = createMultiWordSearchCondition(searchTerm, ['title']);
+        return {
+          where: {
+            ...searchCondition,
+          },
+        };
       },
-    });
-    qResult.refetch();
-  }, [insertProgram, t, qResult]);
+      []
+    ),
+  });
+
+  const programs: ProgramList_Program[] = useMemo(() => data?.Program || [], [data?.Program]);
+  const totalCount = data?.Program_aggregate?.aggregate?.count || 0;
+
+  // Notification state
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Mutations
+  const [insertProgram] = useAdminMutation<InsertProgram, InsertProgramVariables>(INSERT_PROGRAM, {
+    refetchQueries: ['ProgramList'],
+  });
 
   const [updatePublished] = useAdminMutation<UpdateProgramPublished, UpdateProgramPublishedVariables>(
-    UPDATE_PROGRAM_PUBLISHED
+    UPDATE_PROGRAM_PUBLISHED,
+    {
+      refetchQueries: ['ProgramList'],
+    }
   );
-  const setProgramPublished = useCallback(
-    async (p: ProgramList_Program, isPublished: boolean) => {
-      await updatePublished({
+
+  // Add program handler
+  const handleAddProgram = useCallback(async () => {
+    try {
+      await insertProgram({
         variables: {
-          programId: p.id,
-          published: isPublished,
+          title: t('title.placeholder'),
+          today: new Date(),
         },
       });
-      qResult.refetch();
-    },
-    [qResult, updatePublished]
-  );
 
-  const [updateApplicationStart] = useAdminMutation<
-    UpdateProgramApplicationStart,
-    UpdateProgramApplicationStartVariables
-  >(UPDATE_PROGRAM_APPLICATION_START);
-  const handleApplicationStart = useCallback(
-    async (p: ProgramList_Program, applicationStart: Date | null) => {
-      if (applicationStart != null) {
-        await updateApplicationStart({
-          variables: {
-            programId: p.id,
-            applicationStart,
-          },
-        });
+      setSuccessMessage(t('notifications.programs_published_success_singular'));
+      setShowSuccessNotification(true);
+    } catch (error) {
+      console.error('Error adding program:', error);
+      setErrorMessage(t('notifications.bulk_action_failed', { action: 'add' }));
+      setShowErrorNotification(true);
+    }
+  }, [insertProgram, t]);
 
-        qResult.refetch();
+  // Bulk action handlers
+  const handleBulkAction = useCallback(
+    async (action: string, selectedPrograms: ProgramList_Program[]) => {
+      const programIds = selectedPrograms.map((program) => program.id);
+
+      try {
+        if (action === 'publish') {
+          await Promise.all(
+            programIds.map((id) =>
+              updatePublished({
+                variables: { programId: id, published: true },
+              })
+            )
+          );
+          setSuccessMessage(
+            t(
+              selectedPrograms.length === 1
+                ? 'notifications.programs_published_success_singular'
+                : 'notifications.programs_published_success_plural',
+              {
+                count: selectedPrograms.length,
+              }
+            )
+          );
+          setShowSuccessNotification(true);
+        } else if (action === 'unpublish') {
+          await Promise.all(
+            programIds.map((id) =>
+              updatePublished({
+                variables: { programId: id, published: false },
+              })
+            )
+          );
+          setSuccessMessage(
+            t(
+              selectedPrograms.length === 1
+                ? 'notifications.programs_unpublished_success_singular'
+                : 'notifications.programs_unpublished_success_plural',
+              {
+                count: selectedPrograms.length,
+              }
+            )
+          );
+          setShowSuccessNotification(true);
+        }
+      } catch (error) {
+        console.error(`Error during bulk ${action} action:`, error);
+        setErrorMessage(t('notifications.bulk_action_failed', { action }));
+        setShowErrorNotification(true);
       }
     },
-    [qResult, updateApplicationStart]
+    [updatePublished, t]
   );
 
-  const [updateApplicationEnd] = useAdminMutation<UpdateProgramApplicationEnd, UpdateProgramApplicationEndVariables>(
-    UPDATE_PROGRAM_APPLICATION_END
-  );
-  const handleApplicationEnd = useCallback(
-    async (p: ProgramList_Program, applicationEnd: Date | null) => {
-      if (applicationEnd != null) {
-        await updateApplicationEnd({
-          variables: {
-            programId: p.id,
-            applicationEnd,
-          },
-        });
+  const bulkActions = [
+    { value: 'publish', label: t('bulk_action.publish') },
+    { value: 'unpublish', label: t('bulk_action.unpublish') },
+  ];
 
-        qResult.refetch();
-      }
-    },
-    [qResult, updateApplicationEnd]
-  );
-
-  const [updateLectureStart] = useAdminMutation<UpdateProgramLectureStart, UpdateProgramLectureStartVariables>(
-    UPDATE_PROGRAM_LECTURE_START
-  );
-  const handleLectureStart = useCallback(
-    async (p: ProgramList_Program, lectureStart: Date | null) => {
-      if (lectureStart != null) {
-        await updateLectureStart({
-          variables: {
-            programId: p.id,
-            lectureStart,
-          },
-        });
-        qResult.refetch();
-      }
-    },
-    [qResult, updateLectureStart]
-  );
-
-  const [updateLectureEnd] = useAdminMutation<UpdateProgramLectureEnd, UpdateProgramLectureEndVariables>(
-    UPDATE_PROGRAM_LECTURE_END
-  );
-  const handleLectureEnd = useCallback(
-    async (p: ProgramList_Program, lectureEnd: Date | null) => {
-      if (lectureEnd != null) {
-        await updateLectureEnd({
-          variables: {
-            programId: p.id,
-            lectureEnd,
-          },
-        });
-        qResult.refetch();
-      }
-    },
-    [qResult, updateLectureEnd]
-  );
-
-  const [updateUploadDeadline] = useAdminMutation<UpdateProgramUploadDeadline, UpdateProgramUploadDeadlineVariables>(
-    UPDATE_PROGRAM_UPLOAD_DEADLINE
-  );
-  const handleUploadDeadline = useCallback(
-    async (p: ProgramList_Program, deadline: Date | null) => {
-      if (deadline != null) {
-        await updateUploadDeadline({
-          variables: {
-            programId: p.id,
-            deadline,
-          },
-        });
-        qResult.refetch();
-      }
-    },
-    [qResult, updateUploadDeadline]
-  );
-
-  const [updateProgramAchievementCertVisible] = useAdminMutation<
-    UpdateProgramAchievementCertVisible,
-    UpdateProgramAchievementCertVisibleVariables
-  >(UPDATE_PROGRAM_ACHIEVEMENT_CERT_VISIBLE);
-  const handleProgramAchievementCertVisible = useCallback(
-    async (p: ProgramList_Program, isVisible: boolean) => {
-      await updateProgramAchievementCertVisible({
-        variables: {
-          programId: p.id,
-          isVisible,
+  // Define columns with sizes that fit within screen width
+  // Total column width: 70 + 280 + 130*5 = 1000px (plus gaps and action buttons ≈ 1150px)
+  const columns = useMemo<ColumnDef<ProgramList_Program>[]>(
+    () => [
+      {
+        header: t('table_header.published'),
+        accessorKey: 'published',
+        size: 70,
+        enableSorting: false,
+        meta: { className: 'text-center' },
+        cell: ({ row }) => (
+          <div className="flex justify-center">
+            <div
+              className={`w-3 h-3 rounded-full ${row.original.published ? 'bg-green-500' : 'bg-red-500'}`}
+              title={row.original.published ? t('table_header.published') : t('table_header.not_published')}
+            />
+          </div>
+        ),
+      },
+      {
+        header: t('title.label'),
+        accessorKey: 'title',
+        size: 280,
+        minSize: 200,
+        enableSorting: true,
+        cell: ({ row }) => (
+          <div className="w-full">
+            <InputField
+              variant="material"
+              type="input"
+              placeholder={t('title.placeholder')}
+              helpText={t('title.help_text')}
+              itemId={row.original.id}
+              value={row.original.title || ''}
+              updateValueMutation={UPDATE_PROGRAM_TITLE}
+              refetchQueries={['ProgramList']}
+            />
+          </div>
+        ),
+      },
+      {
+        header: t('table_header.application_start'),
+        accessorKey: 'applicationStart',
+        size: 130,
+        enableSorting: true,
+        meta: { className: 'text-center' },
+        cell: ({ row }) => {
+          const startDate = row.original.applicationStart ? new Date(row.original.applicationStart) : null;
+          return (
+            <div className="text-center w-full">
+              <DatePicker
+                variant="material"
+                itemId={row.original.id}
+                value={startDate}
+                updateValueMutation={UPDATE_PROGRAM_APPLICATION_START}
+                refetchQueries={['ProgramList']}
+                dateFieldName="applicationStart"
+                identifierVariables={{ programId: row.original.id }}
+              />
+            </div>
+          );
         },
-      });
-      qResult.refetch();
-    },
-    [qResult, updateProgramAchievementCertVisible]
-  );
-
-  const [updateProgramParticipationCertVisible] = useAdminMutation<
-    UpdateProgramParticipationCertVisible,
-    UpdateProgramParticipationCertVisibleVariables
-  >(UPDATE_PROGRAM_PARTICIPATION_CERT_VISIBLE);
-  const handleProgramAttendanceCertificateVisible = useCallback(
-    async (p: ProgramList_Program, isVisible: boolean) => {
-      await updateProgramParticipationCertVisible({
-        variables: {
-          programId: p.id,
-          isVisible,
+      },
+      {
+        header: t('table_header.application_end'),
+        accessorKey: 'applicationEnd',
+        size: 130,
+        enableSorting: true,
+        meta: { className: 'text-center' },
+        cell: ({ row }) => {
+          const endDate = row.original.defaultApplicationEnd ? new Date(row.original.defaultApplicationEnd) : null;
+          return (
+            <div className="text-center w-full">
+              <DatePicker
+                variant="material"
+                itemId={row.original.id}
+                value={endDate}
+                updateValueMutation={UPDATE_PROGRAM_APPLICATION_END}
+                refetchQueries={['ProgramList']}
+                dateFieldName="applicationEnd"
+                identifierVariables={{ programId: row.original.id }}
+              />
+            </div>
+          );
         },
-      });
-      qResult.refetch();
-    },
-    [qResult, updateProgramParticipationCertVisible]
+      },
+      {
+        header: t('table_header.course_start'),
+        accessorKey: 'lectureStart',
+        size: 130,
+        enableSorting: true,
+        meta: { className: 'text-center' },
+        cell: ({ row }) => {
+          const startDate = row.original.lectureStart ? new Date(row.original.lectureStart) : null;
+          return (
+            <div className="text-center w-full">
+              <DatePicker
+                variant="material"
+                itemId={row.original.id}
+                value={startDate}
+                updateValueMutation={UPDATE_PROGRAM_LECTURE_START}
+                refetchQueries={['ProgramList']}
+                dateFieldName="lectureStart"
+                identifierVariables={{ programId: row.original.id }}
+              />
+            </div>
+          );
+        },
+      },
+      {
+        header: t('table_header.course_end'),
+        accessorKey: 'lectureEnd',
+        size: 130,
+        enableSorting: true,
+        meta: { className: 'text-center' },
+        cell: ({ row }) => {
+          const endDate = row.original.lectureEnd ? new Date(row.original.lectureEnd) : null;
+          return (
+            <div className="text-center w-full">
+              <DatePicker
+                variant="material"
+                itemId={row.original.id}
+                value={endDate}
+                updateValueMutation={UPDATE_PROGRAM_LECTURE_END}
+                refetchQueries={['ProgramList']}
+                dateFieldName="lectureEnd"
+                identifierVariables={{ programId: row.original.id }}
+              />
+            </div>
+          );
+        },
+      },
+      {
+        header: t('table_header.achievement_upload_deadline'),
+        accessorKey: 'achievementRecordUploadDeadline',
+        size: 130,
+        minSize: 130,
+        enableSorting: true,
+        meta: { className: 'text-center' },
+        cell: ({ row }) => {
+          const deadline = row.original.achievementRecordUploadDeadline
+            ? new Date(row.original.achievementRecordUploadDeadline)
+            : null;
+          return (
+            <div className="text-center w-full">
+              <DatePicker
+                variant="material"
+                itemId={row.original.id}
+                value={deadline}
+                updateValueMutation={UPDATE_PROGRAM_UPLOAD_DEADLINE}
+                refetchQueries={['ProgramList']}
+                dateFieldName="deadline"
+                identifierVariables={{ programId: row.original.id }}
+              />
+            </div>
+          );
+        },
+      },
+    ],
+    [t]
   );
 
-  const [activeDialogProgram, setActiveDialogProgram] = useState<ProgramList_Program | null>(null);
-
-  const [confirmMakeVisibleOpen, setConfirmMakeVisibleOpen] = useState(false);
-  const handleMakeVisibleDialogClose = useCallback(
-    (confirm: boolean) => {
-      if (confirm && activeDialogProgram != null) {
-        setProgramPublished(activeDialogProgram, true);
-      }
-      setConfirmMakeVisibleOpen(false);
+  const handlePageSizeChange = useCallback(
+    () => {
+      // Page size change handled by useTableGrid
+      setPageIndex(0);
     },
-    [activeDialogProgram, setProgramPublished, setConfirmMakeVisibleOpen]
+    [setPageIndex]
   );
 
-  const [confirmMakeInvisibleOpen, setConfirmMakeInvisibleOpen] = useState(false);
-  const handleMakeInvisibleDialogClose = useCallback(
-    (confirm: boolean) => {
-      if (confirm && activeDialogProgram != null) {
-        setProgramPublished(activeDialogProgram, false);
-      }
-      setConfirmMakeInvisibleOpen(false);
-    },
-    [activeDialogProgram, setProgramPublished, setConfirmMakeInvisibleOpen]
-  );
-
-  const handleTogglePublished = useCallback(
-    (v: ProgramList_Program, isPublished: boolean) => {
-      setActiveDialogProgram(v);
-      if (!isPublished) {
-        setConfirmMakeInvisibleOpen(true);
-      } else {
-        setConfirmMakeVisibleOpen(true);
-      }
-    },
-    [setActiveDialogProgram, setConfirmMakeInvisibleOpen, setConfirmMakeVisibleOpen]
-  );
-
-  const handleOpenProgram = useCallback(
-    (v: ProgramList_Program) => {
-      setOpenProgram(openProgram !== v.id ? v.id : -1);
-    },
-    [setOpenProgram, openProgram]
-  );
+  if (loading) {
+    return <CircularProgress />;
+  }
 
   return (
-    <>
-      <div className="max-w-screen-xl mx-auto">
-        <PageBlock>
-          <div className="flex flex-row mb-12 text-white">
-            <h1 className="text-4xl font-bold mt-24">{t('coursePage.programs-programs')}</h1>
-          </div>
-          <div className="flex justify-end mb-12 text-white">
-            <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />} color="inherit">
-              {t('coursePage.programs-add')}
-            </Button>
-          </div>
-          <div className="grid grid-cols-10 text-gray-400">
-            <p>{t('coursePage.programs-published')}</p>
-            <div className="col-span-2">{t('coursePage.programs-title')}</div>
-            <div>{t('coursePage.programs-short-title')}</div>
-            <div>{t('coursePage.programs-application-start')}</div>
-            <div>{t('coursePage.programs-application-end')}</div>
-            <div>{t('coursePage.programs-course-start')}</div>
-            <div>{t('coursePage.programs-course-end')}</div>
-            <div>{t('coursePage.programs-achievement-upload-deadline')}</div>
-            <div>&nbsp;</div>
-          </div>
-          {programs != null &&
-            programs.length > 0 &&
-            programs.map((v) => (
-              <ProgramsRow
-                key={v.id}
-                program={v}
-                qResult={qResult}
-                openProgramId={openProgram}
-                onSetPublished={handleTogglePublished}
-                onSetApplicationStart={handleApplicationStart}
-                onSetApplicationEnd={handleApplicationEnd}
-                onSetLectureStart={handleLectureStart}
-                onSetLectureEnd={handleLectureEnd}
-                onSetUploadData={handleUploadDeadline}
-                onOpenProgram={handleOpenProgram}
-                onSetVisibilityAttendanceCertificate={handleProgramAttendanceCertificateVisible}
-                onSetVisibilityAchievementCertificate={handleProgramAchievementCertVisible}
-              />
-            ))}
-          <div className="flex justify-end mt-12 mb-12 text-white">
-            <Button onClick={insertDefaultProgram} startIcon={<MdAddCircle />} color="inherit">
-              {t('coursePage.programs-add')}
-            </Button>
-          </div>
-        </PageBlock>
-        <QuestionConfirmationDialog
-          question={t('coursePage.do-you-want-to-publish-the-program', {
-            title: activeDialogProgram?.title,
-          })}
-          confirmationText={t('coursePage.publish')}
-          onClose={() => handleMakeVisibleDialogClose(false)}
-          onConfirm={() => handleMakeVisibleDialogClose(true)}
-          open={confirmMakeVisibleOpen}
+    <div className="max-w-screen-xl mx-auto">
+      <CommonPageHeader headline={t('headline')} />
+      
+      <TableGrid<ProgramList_Program>
+        columns={columns}
+        data={programs}
+        loading={loading}
+        error={error}
+        enablePagination={true}
+        totalCount={totalCount}
+        pageIndex={pageIndex}
+        onPageChange={setPageIndex}
+        pageSize={filter.limit || QUERY_LIMIT}
+        onPageSizeChange={handlePageSizeChange}
+        searchFilter={searchFilter}
+        onSearchFilterChange={setSearchFilter}
+        sorting={sorting}
+        onSortingChange={setSorting}
+        refetchQueries={['ProgramList']}
+        bulkActions={bulkActions}
+        onBulkAction={handleBulkAction}
+        onAddButtonClick={handleAddProgram}
+        addButtonText={t('add_program_button')}
+        expandableRowComponent={(props) => <ExpandableProgramRow program={props.row} />}
+        deleteMutation={DELETE_PROGRAM}
+        deleteIdType="number"
+        generateDeletionConfirmationQuestion={(row) =>
+          t('delete_button.delete_program_confirmation', {
+            title: row.title || t('delete_button.untitled_program'),
+          })
+        }
+      />
+
+      <NotificationSnackbar
+        open={showSuccessNotification}
+        onClose={() => setShowSuccessNotification(false)}
+        message={successMessage}
+        duration={4000}
+      />
+
+      <NotificationSnackbar
+        open={showErrorNotification}
+        onClose={() => setShowErrorNotification(false)}
+        message={errorMessage}
+        duration={6000}
         />
-        <QuestionConfirmationDialog
-          question={t('coursePage.do-you-really-want-to-undo-the-publication-of-program', {
-            title: activeDialogProgram?.title,
-          })}
-          confirmationText={t('coursePage.withdraw')}
-          onClose={() => handleMakeInvisibleDialogClose(false)}
-          onConfirm={() => handleMakeInvisibleDialogClose(true)}
-          open={confirmMakeInvisibleOpen}
-        />
-      </div>
-    </>
+    </div>
   );
 };

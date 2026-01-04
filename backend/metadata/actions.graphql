@@ -45,6 +45,15 @@ type Query {
   ): LoadParticipationDataResult!
 }
 
+type Query {
+  getFormbricksResponses(
+    courseId: Int!
+    userId: uuid!
+    enrollmentId: Int
+    formbricksSurveyUrl: String!
+  ): GetFormbricksResponsesResult!
+}
+
 type Mutation {
   makeCertificatePublic(
     certificatePath: String!
@@ -317,5 +326,32 @@ type ProcessedSession {
   sessionTitle: String!
   reminderType: String!
   emailsSent: Int!
+}
+
+type GetFormbricksResponsesResult {
+  success: Boolean!
+  responses: [FormbricksResponse!]
+  survey: FormbricksSurvey
+  error: String
+  messageKey: String
+}
+
+type FormbricksResponse {
+  id: String!
+  createdAt: String!
+  finished: Boolean!
+  answers: [FormbricksAnswer!]!
+}
+
+type FormbricksAnswer {
+  questionId: String!
+  headline: String!
+  answer: String!
+  rawAnswer: String
+}
+
+type FormbricksSurvey {
+  id: String!
+  name: String!
 }
 

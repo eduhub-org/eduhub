@@ -169,6 +169,39 @@
       "remove_image_error": "Fehler beim Entfernen des Bildes",
       "upload_error": "Fehler beim Hochladen des Bildes"
     },
+    "file_upload": {
+      "upload_text": "Klicken, um Datei hochzuladen",
+      "upload_image_text": "Klicken, um Bild hochzuladen",
+      "upload_pdf_text": "Klicken, um PDF hochzuladen",
+      "uploading": "Hochladen...",
+      "upload_success": "Datei erfolgreich hochgeladen",
+      "upload_error": "Fehler beim Hochladen der Datei",
+      "file_too_large": "Dateigröße überschreitet {maxSize}MB Limit",
+      "invalid_file_type": "Ungültiger Dateityp. Akzeptierte Typen: {types}",
+      "image_alt": "Hochgeladene Dateivorschau",
+      "unknown_file_type": "Unbekannter Dateityp",
+      "drag_drop_text": "Datei hier ablegen",
+      "click_or_drag": "Klicken zum Hochladen oder Datei hier ablegen",
+      "remove": "Entfernen",
+      "replace": "Ersetzen",
+      "download": "Herunterladen",
+      "file_size": "Dateigröße",
+      "accepted_types": "Akzeptierte Typen",
+      "max_size": "Max. Größe",
+      "file_type": {
+        "pdf": "PDF-Dokument",
+        "word_document": "Word-Dokument",
+        "excel_spreadsheet": "Excel-Tabelle",
+        "spreadsheet": "Tabelle",
+        "powerpoint": "PowerPoint",
+        "archive": "Archiv",
+        "code_file": "Code-Datei",
+        "text_file": "Textdatei",
+        "video_file": "Videodatei",
+        "audio_file": "Audiodatei",
+        "file": "Datei"
+      }
+    },
     "input_field": {
       "invalid_link_format": "Ungültiges Link-Format",
       "invalid_email_format": "Ungültiges E-Mail-Format",
@@ -185,7 +218,8 @@
     },
     "dropdown_selector": {
       "create_option": "\"{option}\" neu hinzufügen",
-      "none_option": "-- Keine Auswahl --"
+      "none_option": "-- Keine Auswahl --",
+      "name_already_exists": "Ein Eintrag mit diesem Namen existiert bereits."
     },
     "time_picker": {
       "select_time": "Zeit auswählen",
@@ -375,7 +409,13 @@
     "errors": {
       "motivation_letter_required": "Bitte schreib uns, warum du an diesem Kurs teilnehmen möchtest",
       "terms_required": "Bitte akzeptiere die Allgemeinen Geschäftsbedingungen",
-      "registration_failed": "Registrierung fehlgeschlagen. Bitte versuche es erneut."
+      "registration_failed": "Registrierung fehlgeschlagen. Bitte versuche es erneut.",
+      "complete_survey_first": "Bitte fülle zuerst den Fragebogen vollständig aus."
+    },
+    "formbricks": {
+      "survey_title": "Bewerbungsfragebogen",
+      "survey_completed": "Vielen Dank! Dein Fragebogen wurde erfolgreich eingereicht.",
+      "embed_error": "Der Fragebogen konnte nicht geladen werden. Bitte versuche es später erneut."
     },
     "onboarding_modal": {
       "decline_confirm_text": "Möchtest du die Einladung zu diesem Kurs wirklich ablehnen?",
@@ -431,7 +471,6 @@
     "add-instructors": "Kursleitung hinzufügen",
     "application": "Bewerbung",
     "applied": "Beworben",
-    "evaluation": "Beurteilung",
     "invited": "Eingeladen",
     "invitation-confirmed": "Einladung bestätigt",
     "aborted": "Abgebrochen",
@@ -449,15 +488,8 @@
     "program": "Programm",
     "programs": "Programme",
     "published": "Published",
-    "do-you-want-to-publish-the-program": "Möchtest du das Programm {title} wirklich veröffentlichen?",
-    "do-you-really-want-to-undo-the-publication-of-program": "Möchtest du die Veröffentlichung des Programmes {title} wirklich zurücknehmen?",
     "do-you-want-to-delete-the-program": "Möchtest du das Programm {title} wirklich löschen?",
-    "publish": "Veröffentlichen",
-    "withdraw": "Zurücknehmen",
-    "template": "Template",
     "link-final-evaluation": "Link Abschluss-Evaluation",
-    "no-template-uploaded-yet": "Noch kein Template hochgeladen",
-    "show-certificates": "Bescheinigungen einblenden",
     "add-session": "Termin hinzufügen",
     "application-rating": "Einstufung der Bewerbungen:",
     "not-rated": "Unbewertet",
@@ -469,17 +501,6 @@
     "chat-link": "Chat Link:",
     "possible-certificates": "Mögliche Bescheinigungen",
     "add-course": "Kurs hinzufügen",
-    "programs-programs": "Programme",
-    "programs-add": "Programm hinzufügen",
-    "programs-default-title": "Neues Programm",
-    "programs-title": "Programmtitel",
-    "programs-published": "Veröffentlicht",
-    "programs-short-title": "Kurztitel",
-    "programs-application-start": "Bewerbungs-anfang",
-    "programs-application-end": "Bewerbungs-ende",
-    "programs-course-start": "Kursstart",
-    "programs-course-end": "Kursende",
-    "programs-achievement-upload-deadline": "Abgabeschluss Leistungsnachweise",
     "day": "Tag",
     "no-courses": "Dieses Programm enthält noch keine Kurse.",
     "default-course-title": "Neuer Kurs",
@@ -501,8 +522,6 @@
     "certificates-generated": "Es wurden {number} Zertifikate generiert.",
     "1-certificate-generated": "Es wurde ein Zertifikat generiert.",
     "no-certificates-generated": "Es wurden keine Zertifikate generiert.",
-    "participationDataGenerate": "Teilnehmer:innen Daten generieren (CSV)",
-    "participationDataDownload": "Teilnehmer:innen Daten herunterladen (CSV)",
     "selectTemplateDefaultLabel": "Vorlage auswählen",
     "location": {
       "label": "Veranstaltungsort",
@@ -550,7 +569,7 @@
     },
     "info_block_1_title": {
       "label": "Info-Block 1",
-      "help_text": "Für den Inhalt zu diesem Teil der Beschreibung orientiere dich bitte an den existierenden Kursen, um möglichst konsistent zu bleiben. Üblicherweise wird hier beschrieben, was die Teilnehmenden im Kurs erwartet (\"Was due bekommst\").",
+      "help_text": "Für den Inhalt zu diesem Teil der Beschreibung orientiere dich bitte an den existierenden Kursen, um möglichst konsistent zu bleiben. Üblicherweise wird hier beschrieben, was die Teilnehmenden im Kurs erwartet (\"Was du bekommst\").",
       "placeholder": "Titel"
     },
     "info_block_1_content": {
@@ -796,13 +815,18 @@
     "default_course_title": "Unbenannter Kurs",
     "title": "Kurse verwalten",
     "all_programs": "Alle",
+    "course_degree_title": {
+      "label": "Teil der folgenden Degrees",
+      "placeholder": "Degrees auswählen"
+    },
     "tile_slider_group": {
       "label": "Kachel-Slider Gruppe",
       "placeholder": "Kachel-Slider Gruppen auswählen"
     },
     "cover_image": {
       "label": "Titelbild",
-      "upload_text": "Klicken um Titelbild hochzuladen"
+      "upload_text": "Klicken um Titelbild hochzuladen oder Datei hier ablegen",
+      "alt": "Kurs-Titelbild"
     },
     "instructors": {
       "label": "Kursleitung",
@@ -812,13 +836,18 @@
       "label": "Förderorganisationen",
       "add": "Förderorganisation hinzufügen"
     },
+    "possible_certificates": {
+      "label": "Mögliche Bescheinigungen",
+      "attendance_certificate": "Teilnahmenachweis",
+      "achievement_certificate": "Leistungszertifikat"
+    },
     "registration_type": {
       "label": "Anmeldeart",
       "help_text": "Wähle aus, wie sich Teilnehmer für diesen Kurs anmelden können",
       "options": {
-        "APPROVAL_WITH_INPUT": "Zulassung mit Bewerbungsprozess",
-        "DIRECT_CONFIRMATION": "Direkte Zulassung ohne Motivationstext",
-        "DIRECT_WITH_INPUT": "Direkte Zulassung mit Motivationstext",
+        "APPROVAL_WITH_INPUT": "Zulassung mit Fragebogen und Bewerbungsprozess",
+        "DIRECT_CONFIRMATION": "Direkte Zulassung ohne Fragebogen",
+        "DIRECT_WITH_INPUT": "Direkte Zulassung mit Fragebogen",
         "EXTERNAL_REGISTRATION": "Externe Anmeldung"
       }
     },
@@ -884,6 +913,7 @@
     "description": "Beschreibung",
     "sessions": "Termine",
     "applications": "Bewerbungen",
+    "registrations": "Registrierungen",
     "participations_and_achievements": "Teilnahmen & Leistungen",
     "degree_participations": "Degree-Teilnahmen",
     "attendances": "Teilnahmen",
@@ -891,6 +921,7 @@
     "certificates": "Zertifikat Download",
     "attendance_certificate_download": "T",
     "achievement_certificate_download": "L",
+    "no_applications_present": "Keine Bewerbungen vorhanden",
     "add_participants": "Teilnehmende bearbeiten",
     "selected_users": "Ausgewählte User",
     "name_or_email": "Name oder E-Mail",
@@ -899,8 +930,14 @@
     "add_as_invited": "als eingeladen hinzufügen oder ändern",
     "add_as_aborted": "als abgebrochen hinzufügen oder ändern",
     "add_user_error": "Bitte mindestens einen User auswählen!",
-    "application_history": "Bisherige Bewerbungen und Teilnahmen",
+    "submit": "Absenden",
+    "application_history":  {
+      "label": "Bisherige Bewerbungen und Teilnahmen",
+      "no_applications_present": "Keine Bewerbungen vorhanden"
+    },
     "email": "E-Mail",
+    "application": "Bewerbung",
+    "evaluation": "Beurteilung",
     "send_email_to_applicants": "E-Mail an Bewerber senden",
     "select_applicants_first": "Bitte wähle zuerst Bewerber aus",
     "bulk_actions": {
@@ -940,13 +977,15 @@
     "statistics_applications_accepted": "Bewerbungen angenommen",
     "statistics_invitations_total": "Einladungen gesamt",
     "statistics_invitations_confirmed": "Einladungen bestätigt",
+    "statistics_registrations_total": "Registrierungen gesamt",
+    "statistics_registrations_confirmed": "Bestätigte Registrierungen",
     "name": "Name",
     "first_name": "Vorname",
     "last_name": "Nachname",
     "organization": "Organisation",
     "participations": "Teilnahmen",
     "lastApplication": "Letzte Aktivität",
-    "status": "Status",
+    "status_label": "Status",
     "ectsTotal": "ECTS Gesamt",
     "attendedEvents": "Besuchte Events",
     "certificate": "Zertifikat",
@@ -963,9 +1002,134 @@
       "label": "Max. Teilnehmendenanzahl",
       "placeholder": "Max. Teilnehmendenanzahl",
       "help_text": "Die maximale Teilnehmendenanzahl diesnt als Information zur Zulassung."
-    }
+    },
+    "formbricks": {
+      "title": "Fragebogen URL",
+      "description": "Verknüpfe einen Formbricks-Fragebogen, der anstelle des Motivationsschreibens bei der Einschreibung/Bewerbung angezeigt wird.",
+      "tooltip": "Bewerber füllen diesen Fragebogen aus, wenn sie sich für den Kurs anmelden. Die Antworten werden in der Bewerbungsübersicht angezeigt.",
+      "survey_url_label": "Formbricks Einschreibungs-Survey URL",
+      "survey_url_helper": "Füge die URL deines Formbricks Link-Surveys ein",
+      "survey_url_helper_with_default": "Füge die URL deines Formbricks Link-Surveys ein (leer lassen, um Programm-Standard zu verwenden)",
+      "survey_configured": "Fragebogen konfiguriert",
+      "open_survey": "Fragebogen öffnen",
+      "remove_survey": "Fragebogen entfernen",
+      "invalid_url": "Bitte gib eine gültige Formbricks Survey URL ein",
+      "help_text_hidden_fields": "Wichtig: Du musst Hidden Fields in deinem Formbricks Survey konfigurieren!\n\nErforderliche Hidden Fields:\n• eduhubUserId - Wird automatisch mit der EduHub Benutzer-ID befüllt\n• eduhubCourseId - Wird automatisch mit der Kurs-ID befüllt\n• eduhubEnrollmentId - Wird automatisch mit der Anmeldungs-ID befüllt (optional)\n\nIn Formbricks: Survey bearbeiten → Hidden Fields aktivieren → Diese Feld-IDs hinzufügen. Ohne diese Konfiguration können Antworten nicht korrekt zugeordnet werden.\n\nHinweis: eduhubEnrollmentId ist optional, da die Anmeldung erst nach Abschluss des Fragebogens erstellt wird.",
+      "loading_responses": "Lade Antworten...",
+      "error_loading_responses": "Fehler beim Laden der Fragebogen-Antworten",
+      "no_responses": "Keine Fragebogen-Antworten vorhanden",
+      "questionnaire_responses": "Fragebogen-Antworten",
+      "incomplete_response": "Fragebogen nicht vollständig ausgefüllt"
+    },
+    "common": {
+      "edit": "Bearbeiten",
+      "save": "Speichern",
+      "saving": "Speichere...",
+      "cancel": "Abbrechen"
+    },
+    "rating": {
+      "label": "Einstufung der Bewerbungen:",
+      "invite": "Einladen",
+      "unclear": "Unklar",
+      "reject": "Ablehnen",
+      "not_rated": "Unbewertet"
+    },
+    "status": {
+      "applied": "Beworben",
+      "invited": "Eingeladen",
+      "invitation_confirmed": "Einladung bestätigt",
+      "aborted": "Abgebrochen",
+      "rejected": "Bewerbung abgelehnt",
+      "cancelled": "Einladung abgelehnt",
+      "invitation_expired": "Einladung abgelaufen"
+    },
+    "invitation_deadline": "Ablaufdatum Einladung",
+    "course_not_found": "Kurs {courseId} wurde nicht gefunden!",
+    "add_session": "Termin hinzufügen",
+    "location": {
+      "label": "Veranstaltungsort",
+      "ONLINE": "Online",
+      "KIEL": "Kiel",
+      "HEIDE": "Heide"
+    },
+    "address": {
+      "label": "Link oder Adresse",
+      "placeholder": {
+        "online": "Dieser Link wird den Teilnehmenden für alle Online-Termine des Kurses mitgeteilt.",
+        "offline": "Diese Adresse kann ggf. bei der Erstellung der Einzeltermine angepasst werden."
+      },
+      "errorText": "Der eingegebene Link hat nicht das korrekte Format."
+    },
+    "sessionAddress": {
+      "no_address_selected": "Keine Adresse ausgewählt"
+    },
+    "weekday": "Wochentag",
+    "weekdays": {
+      "NONE": "unregelmäßig",
+      "MONDAY": "Montag",
+      "TUESDAY": "Dienstag",
+      "WEDNESDAY": "Mittwoch",
+      "THURSDAY": "Donnerstag",
+      "FRIDAY": "Freitag",
+      "SATURDAY": "Samstag",
+      "SUNDAY": "Sonntag"
+    },
+    "languages": {
+      "DE": "Deutsch",
+      "EN": "Englisch"
+    },
+    "language": "Sprache",
+    "start_time": "Startzeit",
+    "end_time": "Endzeit",
+    "short_description": {
+      "label": "Kurzbeschreibung",
+      "help_text": "Dieser Text erscheint auf der Kachel des Kurses und als Tagline auf der Kursseite.",
+      "placeholder": "Geben Sie eine kurze Beschreibung des Kurses ein..."
+    },
+    "learning_goals": {
+      "label": "Lernziele",
+      "help_text": "Die Lernziele sind Teil des Leistungszertifikats und können nur durch die Programmleitung geändert werden. Wenn du Änderungen vorschlagen möchtest oder dir Fehler auffallen, wende dich bitte an diese.",
+      "placeholder": "Lernziel 1\nLernziel 2\nLernziel 3\nLernziel 4",
+      "read_only_placeholder": "Bitte kontaktiere die Programmleitung, um Lernziele zu vereinbaren und hier hinzuzufügen.",
+      "editable_in_table": "In der Kurstabelle bearbeitbar"
+    },
+    "info_block_1_title": {
+      "label": "Info-Block 1",
+      "help_text": "Für den Inhalt zu diesem Teil der Beschreibung orientiere dich bitte an den existierenden Kursen, um möglichst konsistent zu bleiben. Üblicherweise wird hier beschrieben, was die Teilnehmenden im Kurs erwartet (\"Was du bekommst\").",
+      "placeholder": "Titel"
+    },
+    "info_block_1_content": {
+      "placeholder": "Inhalt"
+    },
+    "info_block_2_title": {
+      "label": "Info-Block 2",
+      "help_text": "Für den Inhalt zu diesem Teil der Beschreibung orientiere dich bitte an den existierenden Kursen, damit wir möglichst konsistent sind. Üblicherweise lautet wird hier beschrieben, was von den Teilnehmenden an Mitarbeit oder Leitung erwartet wird (\"Was Du mitbringen solltest\").",
+      "placeholder": "Titel"
+    },
+    "info_block_2_content": {
+      "placeholder": "Inhalt"
+    },
+    "add_new_location": "Ort hinzufügen",
+    "no_enrollments_present": "Es wurden noch keine Teilnehmenden zugelassen.",
+    "not_submitted": "nicht eingereicht",
+    "confirmation_push_course_to_next_status": "Möchtest du den Kurs in den nächsten Status schieben?",
+    "set_status_high": "Status hochsetzen",
+    "please_fill_all_fields": "Bitte fülle alle Felder aus, um fortzufahren!",
+    "no-certificate-generated": "Es wurden keine Zertifikate generiert.",
+    "certificates-generated": "Es wurden {number} Zertifikate generiert.",
+    "1-certificate-generated": "Es wurde ein Zertifikat generiert."
   },
   "managePrograms": {
+    "headline": "Programme",
+    "table_header": {
+      "published": "Veröffent- licht",
+      "application_start": "Bewerbungs- anfang",
+      "application_end": "Bewerbungs- ende",
+      "course_start": "Kursstart",
+      "course_end": "Kursende",
+      "achievement_upload_deadline": "Abgabeschluss Leistungs- nachweise",
+      "not_published": "Nicht veröffentlicht"
+    },
     "title": {
       "label": "Programmtitel",
       "placeholder": "Neues Programm",
@@ -979,26 +1143,55 @@
       "error_text": "Die Kurzbezeichnung darf maximal 10 Zeichen lang sein."
     },
     "start_evaluation": {
-      "label": "Link Start-Evaluation",
+      "label": "Fragebogen Start-Evaluation",
       "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
       "help_text": "Der hier verlinkte Fragebogen wird den Teilnehmenden nach dem ersten Termin eines Kurses oder einer Veranstaltung per E-Mail zugeschickt.\n Der Titel des Programms und der Name des Kurses oder der Veranstaltung werden per URL-Parameter automatisch mitgegeben und können entsprechend in den Fragebogen übernommen werden.",
       "error_text": "Ungültiges Linkformat!"
     },
     "speaker_evaluation": {
-      "label": "Link Speaker-Evaluation",
+      "label": "Fragebogen Speaker-Evaluation",
       "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
       "help_text": "Dieser Fragebogenlink wird den Teilnehmenden nach jedem Termin eines Kurses oder einer Veranstaltung, bei der ein externer Referent eingetragen ist, per E-Mail zugeschickt.\n Der Titel des Programms und der Name des Kurses oder der Veranstaltung werden per URL-Parameter automatisch mitgegeben und können entsprechend in den Fragebogen übernommen werden.",
       "error_text": "Ungültiges Linkformat!"
     },
     "final_evaluation": {
-      "label": "Link Abschluss-Evaluation",
+      "label": "Fragebogen Abschluss-Evaluation",
       "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
       "help_text": "Dieser Fragebogenlink wird den Teilnehmenden nach dem letzten Termin eines Kurses oder einer Veranstaltung per E-Mail zugeschickt.\n Der Titel des Programms und der Name des Kurses oder der Veranstaltung werden per URL-Parameter automatisch mitgegeben und können entsprechend in den Fragebogen übernommen werden.",
       "error_text": "Ungültiges Linkformat!"
     },
+    "default_enrollment_survey": {
+      "label": "Standard-Fragebogen für Bewerbungen oder Registrierungen",
+      "placeholder": "https://formbricks.example.com/s/surveyId",
+      "help_text": "Standard Formbricks Survey für Kurseinschreibungen. Kurse können dies mit ihrer eigenen Einschreibungs-Survey URL überschreiben."
+    },
     "delete_button": {
-      "delete_program_confirmation": "Soll das Programm '{title}' wirklich gelöscht werden?",
+      "delete_program_confirmation": "Bist du sicher, dass du das Programm '{title}' löschen möchtest?",
       "untitled_program": "Unbenanntes Programm"
+    },
+    "certificates": {
+      "template": "Template",
+      "proof_of_participation": "Teilnahmenachweis",
+      "performance_certificate": "Leistungszertifikat",
+      "show_certificates": "Bescheinigungen einblenden",
+      "no_template_uploaded_yet": "Noch kein Template hochgeladen",
+      "upload_template": "Klicken, um Template hochzuladen oder Datei hier ablegen"
+    },
+    "participation_data": {
+      "generate": "Teilnehmer:innen Daten generieren (CSV)",
+      "download": "Teilnehmer:innen Daten herunterladen (CSV)"
+    },
+    "add_program_button": "Programm hinzufügen",
+    "bulk_action": {
+      "publish": "Ausgewählte veröffentlichen",
+      "unpublish": "Ausgewählte zurückziehen"
+    },
+    "notifications": {
+      "programs_published_success_singular": "Programm wurde erfolgreich veröffentlicht",
+      "programs_published_success_plural": "{count} Programme wurden erfolgreich veröffentlicht",
+      "programs_unpublished_success_singular": "Programm wurde erfolgreich zurückgezogen",
+      "programs_unpublished_success_plural": "{count} Programme wurden erfolgreich zurückgezogen",
+      "bulk_action_failed": "Massenaktion '{action}' ist fehlgeschlagen"
     }
   },
   "manageUsers": {

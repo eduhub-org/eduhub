@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { IconButton } from '@mui/material';
 import { MdDelete } from 'react-icons/md';
 
