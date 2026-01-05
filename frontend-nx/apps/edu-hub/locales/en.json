@@ -235,6 +235,7 @@
       "session_expired_or_invalid": "Your session is invalid or has expired. Please log in again.",
       "authentication_error": "Authentication error"
     },
+    "session_expired_notification": "Your session has expired. Please log in again to continue.",
     "tile_slider_unavailable": "Tile slider temporarily unavailable",
     "no_description_available": "No description available",
     "error_handling": {

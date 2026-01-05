@@ -235,6 +235,7 @@
       "session_expired_or_invalid": "Deine Sitzung ist ungültig oder abgelaufen. Bitte melde dich erneut an.",
       "authentication_error": "Authentifizierungsfehler"
     },
+    "session_expired_notification": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an, um fortzufahren.",
     "tile_slider_unavailable": "Kachel-Slider vorübergehend nicht verfügbar",
     "no_description_available": "Keine Beschreibung verfügbar",
     "error_handling": {
