@@ -1,5 +1,6 @@
 import Head from 'next/head';
-import { FC, Fragment, useMemo } from 'react';
+import { FC, Fragment, useMemo, useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 import { useQuery } from '@apollo/client';
 import { useTranslations, useLocale } from 'next-intl';
@@ -9,6 +10,7 @@ import { Page } from '../components/layout/Page';
 import Loading from '../components/common/Loading';
 import TileSlider from '../components/common/TileSlider';
 import FaqSection from '../components/common/FaqSection';
+import NotificationSnackbar from '../components/common/dialogs/NotificationSnackbar';
 
 import { useAuthedQuery, useInstructorQuery } from '../hooks/authedQuery';
 import { useIsLoggedIn, useIsInstructor, useIsAdmin } from '../hooks/authentication';
@@ -27,10 +29,30 @@ const Home: FC = () => {
   const t = useTranslations('startPage');
   const tCommon = useTranslations('common');
   const locale = useLocale();
+  const router = useRouter();
   const isLoggedIn = useIsLoggedIn();
   const isInstructor = useIsInstructor();
   const isAdmin = useIsAdmin();
   const userId = useUserId();
+  
+  const [showSessionExpiredNotification, setShowSessionExpiredNotification] = useState(false);
+
+  // Check for session expired query parameter and show notification
+  useEffect(() => {
+    if (router.query.sessionExpired === 'true') {
+      setShowSessionExpiredNotification(true);
+      // Remove the query parameter from URL without reloading
+      const { sessionExpired, ...restQuery } = router.query;
+      router.replace(
+        {
+          pathname: router.pathname,
+          query: restQuery,
+        },
+        undefined,
+        { shallow: true }
+      );
+    }
+  }, [router]);
 
   const { data: adminCoursesData, loading: adminCoursesLoading } = useInstructorQuery<CoursesByInstructor>(
     COURSES_BY_INSTRUCTOR,
@@ -212,6 +234,14 @@ const Home: FC = () => {
           </div>
         )}
       </Page>
+
+      {/* Session Expired Notification */}
+      <NotificationSnackbar
+        open={showSessionExpiredNotification}
+        onClose={() => setShowSessionExpiredNotification(false)}
+        message={tCommon('session_expired_notification')}
+        duration={5000}
+      />
     </>
   );
 };
