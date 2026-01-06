@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState, FormEvent } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { Button } from '../../../common/Button';
 import TagSelector from '../../../inputs/TagSelector';
 import RadioButtonSelector from '../../../inputs/RadioButtonSelector';
@@ -16,7 +16,7 @@ interface AddParticipantsFormProps {
 }
 
 export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, onSubmit }) => {
-  const { t } = useTranslation('manageCourse');
+  const t = useTranslations('manageCourse');
 
   // State hooks
   const [selectedUserIds, setSelectedUserIds] = useState([]);
@@ -102,7 +102,7 @@ export const AddParticipantsForm: FC<AddParticipantsFormProps> = ({ courseId, on
 
       <div className="flex justify-center my-8">
         <Button filled type="submit">
-          {t('common:submit')}
+          {t('submit')}
         </Button>
       </div>
     </form>

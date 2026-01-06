@@ -1,5 +1,5 @@
 import { FC, useCallback, useMemo, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/ManagedCourse';
 import TableGrid from '../../../common/TableGrid';
@@ -28,7 +28,8 @@ export interface ExtendedDegreeParticipantsEnrollment
 }
 
 export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ course }) => {
-  const { t, lang } = useTranslation('manageCourse');
+  const t = useTranslations('manageCourse');
+  const locale = useLocale();
 
   const [pageSize, setPageSize] = useState(20);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -73,8 +74,8 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     }
     const maxDate = courseEnrollments
       .map((enrollment) => new Date(enrollment.updated_at))
-      .reduce((maxDate, currentDate) => (currentDate > maxDate ? currentDate : maxDate));
-    return maxDate.toLocaleString(lang); // Convert the Date object to a string
+      .reduce((maxDate, currentDate) => Math.max(maxDate.getTime(), currentDate.getTime()) > maxDate.getTime() ? currentDate : maxDate);
+    return maxDate.toLocaleString(locale); // Convert the Date object to a string
   };
 
   const getTotalECTS = (courseEnrollments) => {
@@ -84,13 +85,13 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
     const totalEcts = courseEnrollments
       .filter((enrollment) => enrollment.achievementCertificateURL)
       .reduce((total, current) => {
-        const ects = parseFloat(current.Course.ects.replace(',', '.')) || 0;
+        const ects = Number.parseFloat(current.Course.ects.replace(',', '.')) || 0;
         return total + ects;
       }, 0);
     const formattedEcts =
       totalEcts === 0
-        ? totalEcts.toLocaleString(lang, { maximumFractionDigits: 0 })
-        : totalEcts.toLocaleString(lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+        ? totalEcts.toLocaleString(locale, { maximumFractionDigits: 0 })
+        : totalEcts.toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
     return formattedEcts;
   };
 
@@ -124,7 +125,8 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
 
     const passed = passedEnrollments.map((ce) => {
       let ects = ce.Course.ects ? ce.Course.ects.replace(',', '.') : '0';
-      ects = isNaN(parseFloat(ects)) ? '0' : parseFloat(ects).toString();
+      const parsedEcts = Number.parseFloat(ects);
+      ects = Number.isNaN(parsedEcts) ? '0' : parsedEcts.toString();
       return `${ce.Course.title} (${ce.Course.Program.shortTitle}; ${ects} ECTS)`;
     });
 
@@ -202,10 +204,14 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
           }
 
           const certCount = result.count;
-          const successTranslationKey =
-            certCount <= 1
-              ? `course-page:${certCount === 0 ? 'no-' : '1-'}certificate-generated`
-              : 'course-page:certificates-generated';
+          let successTranslationKey: string;
+          if (certCount <= 1) {
+            successTranslationKey = certCount === 0
+              ? 'no-certificate-generated'
+              : '1-certificate-generated';
+          } else {
+            successTranslationKey = 'certificates-generated';
+          }
 
           setSnackbarMessage(t(successTranslationKey, { number: certCount }));
           setSnackbarOpen(true);
@@ -214,7 +220,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
           setPageIndex(pageIndex); // This triggers a refetch via useTableGrid
         } catch (err) {
           console.error('Certificate generation error:', err);
-          setSnackbarMessage(err.message || t('errors:certificate_generation_failed'));
+          setSnackbarMessage(err.message || t('errors.certificate_generation_failed'));
           setSnackbarOpen(true);
         }
       } else if (action === 'delete-achievement-certificates') {
@@ -229,12 +235,14 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
 
           const affectedRows = response.data?.update_CourseEnrollment?.affected_rows || 0;
 
-          const successTranslationKey =
-            affectedRows <= 1
-              ? affectedRows === 0
-                ? 'manageCourse:no_certificates_deleted'
-                : 'manageCourse:certificate_deleted_singular'
-              : 'manageCourse:certificates_deleted_plural';
+          let successTranslationKey: string;
+          if (affectedRows <= 1) {
+            successTranslationKey = affectedRows === 0
+              ? 'manageCourse:no_certificates_deleted'
+              : 'manageCourse:certificate_deleted_singular';
+          } else {
+            successTranslationKey = 'manageCourse:certificates_deleted_plural';
+          }
 
           setSnackbarMessage(t(successTranslationKey, { count: affectedRows }));
           setSnackbarOpen(true);
@@ -243,7 +251,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
           setPageIndex(pageIndex); // This triggers a refetch via useTableGrid
         } catch (err) {
           console.error('Certificate deletion error:', err);
-          setSnackbarMessage(err.message || t('common:error_handling.certificate_deletion_failed'));
+          setSnackbarMessage(err.message || t('common.error_handling.certificate_deletion_failed'));
           setSnackbarOpen(true);
         }
       }
@@ -276,7 +284,7 @@ export const DegreeParticipationsTab: FC<DegreeParticipationsTabIProps> = ({ cou
         minSize: 120,
       },
       {
-        header: t('status'),
+        header: t('status_label'),
         accessorKey: 'status',
         size: 120,
         minSize: 100,

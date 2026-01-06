@@ -327,11 +327,48 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       version    = "latest"
     }
 
-    max_instance_count = 20
-    available_memory   = "512M"
-    timeout_seconds    = 60
-    ingress_settings   = var.cloud_function_ingress_settings
+    secret_environment_variables {
+      key        = "FORMBRICKS_API_KEY"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.formbricks_api_key.secret_id
+      version    = "latest"
+    }
+
+    max_instance_count    = 20
+    available_memory      = "512M"
+    timeout_seconds       = 60
+    ingress_settings      = var.cloud_function_ingress_settings
+    service_account_email = google_service_account.custom_cloud_function_account.email
   }
+}
+
+# Make sure the Cloud Function's service account can access all required secrets
+resource "google_secret_manager_secret_iam_member" "call_node_function_formbricks_api_key" {
+  secret_id  = google_secret_manager_secret.formbricks_api_key.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.formbricks_api_key]
+}
+
+resource "google_secret_manager_secret_iam_member" "call_node_function_keycloak_pw" {
+  secret_id  = google_secret_manager_secret.keycloak_pw.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.keycloak_pw]
+}
+
+resource "google_secret_manager_secret_iam_member" "call_node_function_cloud_function_secret" {
+  secret_id  = google_secret_manager_secret.cloud_function.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.cloud_function]
+}
+
+resource "google_secret_manager_secret_iam_member" "call_node_function_hasura_admin_key" {
+  secret_id  = google_secret_manager_secret.hasura_graphql_admin_key.id
+  role       = "roles/secretmanager.secretAccessor"
+  member     = "serviceAccount:${google_service_account.custom_cloud_function_account.email}"
+  depends_on = [google_secret_manager_secret.hasura_graphql_admin_key]
 }
 
 

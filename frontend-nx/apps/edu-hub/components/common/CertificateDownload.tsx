@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations } from 'next-intl';
 import { Dispatch, SetStateAction } from 'react';
 import { useEffect } from 'react';
 import { useRoleQuery } from '../../hooks/authedQuery';
@@ -35,7 +35,7 @@ export const CertificateDownload: FC<IProps> = ({
     hideAttendanceButton: hideAttendanceCertificateButton
   });
 
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleQueryError = (error: string) => {
@@ -51,7 +51,7 @@ export const CertificateDownload: FC<IProps> = ({
       path: courseEnrollment?.achievementCertificateURL,
     },
     skip: !courseEnrollment?.achievementCertificateURL,
-    onError: () => handleQueryError(t('errorMessages:loadAchievementCertificateError')),
+    onError: () => handleQueryError(t('errorMessages.loadAchievementCertificateError')),
     onCompleted: (data) => {
       console.log('Achievement Certificate Query Completed:', {
         url: data?.getSignedUrl?.link,
@@ -68,7 +68,7 @@ export const CertificateDownload: FC<IProps> = ({
       path: courseEnrollment?.attendanceCertificateURL,
     },
     skip: !courseEnrollment?.attendanceCertificateURL,
-    onError: () => handleQueryError(t('errorMessages:loadAttendanceCertificateError')),
+    onError: () => handleQueryError(t('errorMessages.loadAttendanceCertificateError')),
     onCompleted: (data) => {
       console.log('Attendance Certificate Query Completed:', {
         url: data?.getSignedUrl?.link,
@@ -88,7 +88,7 @@ export const CertificateDownload: FC<IProps> = ({
       <div className={`flex gap-4 ${!manageView ? 'flex-col sm:px-24' : ''}`}>
         {loadAchievementCertificateData && !loadAchievementCertificateLoading && !hideAchievementCertificateButton && (
           <>
-            {!manageView && <h3 className="text-3xl font-medium">{t('course-page:congrats-completion')}</h3>}
+            {!manageView && <h3 className="text-3xl font-medium">{t('coursePage.congrats-completion')}</h3>}
             <Button
               as="a"
               filled
@@ -97,8 +97,8 @@ export const CertificateDownload: FC<IProps> = ({
               rel="noopener noreferrer"
             >
               {manageView
-                ? t('manageCourse:achievement_certificate_download')
-                : t('course-page:achievementCertificateDownload')}
+                ? t('manageCourse.achievement_certificate_download')
+                : t('coursePage.achievementCertificateDownload')}
             </Button>
           </>
         )}
@@ -111,8 +111,8 @@ export const CertificateDownload: FC<IProps> = ({
             rel="noopener noreferrer"
           >
             {manageView
-              ? t('manageCourse:attendance_certificate_download')
-              : t('course-page:attendanceCertificateDownload')}
+              ? t('manageCourse.attendance_certificate_download')
+              : t('coursePage.attendanceCertificateDownload')}
           </Button>
         )}
         {/* Error Message Dialog */}

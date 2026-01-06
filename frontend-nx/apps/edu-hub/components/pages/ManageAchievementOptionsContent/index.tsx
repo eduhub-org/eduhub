@@ -2,7 +2,7 @@ import { IconButton } from '@mui/material';
 import { Button } from '@mui/material';
 import { MdAddCircle } from 'react-icons/md';
 import { IUserProfile } from '../../../hooks/user';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { MdDelete, MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
 import { makeFullName } from '../../../helpers/util';
@@ -101,21 +101,22 @@ const DashboardContent: FC<IPropsContent> = ({ options }) => {
   const addNewAchievement = useCallback(() => {
     setShowNewAchievementView(!showNewAchievementView);
   }, [setShowNewAchievementView, showNewAchievementView]);
-  const { t } = useTranslation('course-page');
+  const t = useTranslations('coursePage');
+  const tCommon = useTranslations('common');
   return (
     <div className="w-full">
       <div className="flex justify-between mb-5" />
       <div className="flex flex-col space-y-1">
         <div className="flex justify-start mt-8  text-white">
           <Button onClick={addNewAchievement} startIcon={<MdAddCircle />} color="inherit">
-            {t('common:project-new-button')}
+            {tCommon('project-new-button')}
           </Button>
         </div>
 
         <div className="grid grid-cols-3 gap-5 pl-5">
-          <p>{t('tableHeaderTitle')}</p>
-          <p>{t('tableHeaderInstructor')}</p>
-          <p>{t('coursesHeadline') + ' & ' + t('tableHeaderProgram')}</p>
+          <p>{t('table-header-title')}</p>
+          <p>{t('table-header-instructor')}</p>
+          <p>{t('coursesHeadline') + ' & ' + t('table-header-program')}</p>
         </div>
         {(options.length === 0 || showNewAchievementView) && (
           <div className="flex bg-edu-light-gray">{<AddAchievementOption onSuccess={onSuccessAddEdit} />}</div>

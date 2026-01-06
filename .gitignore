@@ -4,8 +4,12 @@
 hasura_keycloak.env
 docker-compose.env
 frontend.env
+.env
 node_modules
 
 reminder.log
 
 *.code-workspace
+
+# Next.js generated files
+next-env.d.ts

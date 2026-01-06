@@ -1,0 +1,1558 @@
+{
+  "common": {
+    "confirmation": "Confirmation",
+    "warning": "Warning",
+    "delete": "Delete",
+    "loginButton": "Login",
+    "registerButton": "Register",
+    "language": "Language",
+    "next": "Next",
+    "image_of": "Image of",
+    "DE": "DEUTSCH",
+    "EN": "ENGLISCH",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "first-name": "Firstname",
+    "last-name": "Lastname",
+    "university": "University",
+    "NONE": "irregular",
+    "MONDAY": "MONDAY",
+    "TUESDAY": "TUESDAY",
+    "WEDNESDAY": "WEDNESDAY",
+    "THURSDAY": "THURSDAY",
+    "FRIDAY": "FRIDAY",
+    "SATURDAY": "SATURDAY",
+    "SUNDAY": "SUNDAY",
+    "place": "Location",
+    "addresses": "Addresses",
+    "date": "Date",
+    "start-time": "Start time",
+    "end-time": "End time",
+    "description": "Description",
+    "speakers": "Speaker",
+    "status": "Status",
+    "start": "Start",
+    "end": "End",
+    "menu": {
+      "profile": "My Profile",
+      "my_certificates": "My Certificates",
+      "faq": "FAQ",
+      "user": "User",
+      "experts": "Experts",
+      "courses": "Courses",
+      "achievements": "Achievement Records",
+      "achievement_templates": "Achievement Record Templates",
+      "programs": "Programs",
+      "organizations": "Organizations",
+      "location_addresses": "Location Addresses",
+      "email_templates": "Email Templates",
+      "app_settings": "App Settings",
+      "statistics": "Statistics",
+      "logout": "Logout"
+    },
+    "change-password": "Change email or password",
+    "add": "Add",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "confirm": "Confirm",
+    "search": "Search",
+    "profile-picture": "Profile image",
+    "title": "Title",
+    "new-title": "New Title",
+    "form-select-placeholder": "Undefined",
+    "ACADEMIA": "Researcher",
+    "EMPLOYED": "Employee",
+    "OTHER": "Other",
+    "RETIREE": "Retiree",
+    "SELFEMPLOYED": "Self Employed",
+    "STUDENT": "Student at university",
+    "UNEMPLOYED": "Unemployed",
+    "PUPIL": "Student in high school",
+    "CAU_KIEL": "CAU Kiel",
+    "TEACHER": "Teacher",
+    "DHSH": "Duale Hochschule Schleswig-Holstein",
+    "FH_FLENSBURG": "FH Flensburg",
+    "FH_KIEL": "FH Kiel",
+    "FH_WESTKUESTE": "FH Westküste",
+    "MUTHESIUS": "Muthesius Kunsthochschule",
+    "TH_LUEBECK": "TH Lübeck",
+    "UNI_FLENSBURG": "Uni Flensburg",
+    "UNI_LUEBECK": "Uni Lübeck",
+    "project-title": "Project title",
+    "project-mentors": "Project mentors",
+    "project-description": "Projekt description",
+    "project-new-button": "New project",
+    "courses": "Courses",
+    "achievement-record-type": "Achievement record type",
+    "authors": "Authors",
+    "mentors": "Mentors",
+    "documentation": "Documentation",
+    "add-new": "Add new",
+    "form-mandatory-field": "Mandatory field",
+    "cover-picture": "Cover image",
+    "upload": "Upload",
+    "download": "Download",
+    "degrees": "Degrees",
+    "submit": "submit",
+    "CONFIRMED": "confirmed",
+    "INVITED": "invited",
+    "APPLIED": "applied",
+    "REJECTED": "rejected",
+    "ABORTED": "aborted",
+    "COMPLETED": "completed",
+    "CANCELED": "canceled",
+    "password": "Password",
+    "employmentStatus": "Employment Status",
+    "nameOfUniversity": "Name of University",
+    "matriculationNumber": "Matriculation number",
+    "otherUniversityLabel": {
+      "university": "Name of the university",
+      "organization": "Name of the organization",
+      "other": "Other",
+      "teacher": "Name of the school"
+    },
+    "achievement-documentation-template": "Achievement Record Documentation Template",
+    "preview": "Preview",
+    "edit_markdown": "Edit",
+    "markdown_info": "Markdown formatting is supported.",
+    "markdown_guide": "Markdown Guide",
+    "location": {
+      "ONLINE": "Online",
+      "KIEL": "Kiel",
+      "HEIDE": "Heide"
+    },
+    "type_name_or_email_minimum_3_letters": "Type a name or email (minimum 3 letters).",
+    "select_user_dialog": {
+      "type_name_or_email_minimum_2_letters": "Type a name or email (minimum 2 letters).",
+      "no_users_found": "No users found",
+      "add_new_user": "Add new user"
+    },
+    "deletion_confirmation_question": "Are you sure you want to delete this entry?",
+    "confirm_delete": "Confirm Deletion",
+    "error": "Error",
+    "select_time": "Select time",
+    "close": "Close",
+    "ok": "OK",
+    "loading": "Loading...",
+    "user_card": {
+      "speaker": "Speaker",
+      "external_profile": "Homepage",
+      "linkedin_profile": "LinkedIn Profile",
+      "xing_profile": "Xing Profile"
+    },
+    "CreatableTagSelector": {
+      "add_tag": "Add \"{value}\""
+    },
+    "table_grid": {
+      "pagination_text": "Page {currentPage} of {totalPage}",
+      "bulk_action": "Bulk Action",
+      "apply": "Apply",
+      "none": "None",
+      "items_per_page": "Items per page"
+    },
+    "table_grid_delete_button": {
+      "confirm_delete": "Confirm Deletion",
+      "deletion_confirmation_question": "Are you sure you want to delete this entry?"
+    },
+    "image_uploader": {
+      "uploading": "Uploading...",
+      "removing": "Removing...",
+      "file_size_exceeds_limit": "The file is too large. Please choose a file with a size of {maxFileSize}MB or less.",
+      "upload_file": "Upload file",
+      "upload_new_profile_picture": "Upload new profile picture",
+      "upload_new_logo": "Upload new logo",
+      "remove_profile_picture": "Remove profile picture",
+      "remove_logo": "Remove logo",
+      "remove_image": "Remove image",
+      "remove_image_error": "Error removing image",
+      "upload_error": "Error uploading image"
+    },
+    "file_upload": {
+      "upload_text": "Click to upload file",
+      "upload_image_text": "Click to upload image",
+      "upload_pdf_text": "Click to upload PDF",
+      "uploading": "Uploading...",
+      "upload_success": "File uploaded successfully",
+      "upload_error": "Failed to upload file",
+      "file_too_large": "File size exceeds {maxSize}MB limit",
+      "invalid_file_type": "Invalid file type. Accepted types: {types}",
+      "image_alt": "Uploaded file preview",
+      "unknown_file_type": "Unknown file type",
+      "drag_drop_text": "Drop file here",
+      "click_or_drag": "Click to upload or drag and drop",
+      "remove": "Remove",
+      "replace": "Replace",
+      "download": "Download",
+      "file_size": "File size",
+      "accepted_types": "Accepted types",
+      "max_size": "Max. size",
+      "file_type": {
+        "pdf": "PDF Document",
+        "word_document": "Word Document",
+        "excel_spreadsheet": "Excel Spreadsheet",
+        "spreadsheet": "Spreadsheet",
+        "powerpoint": "PowerPoint",
+        "archive": "Archive",
+        "code_file": "Code File",
+        "text_file": "Text File",
+        "video_file": "Video File",
+        "audio_file": "Audio File",
+        "file": "File"
+      }
+    },
+    "input_field": {
+      "invalid_link_format": "Invalid link format",
+      "invalid_email_format": "Invalid email format",
+      "invalid_ects_format": "Invalid ECTS format",
+      "invalid_minimum_integer": "The value must be at least {min}",
+      "invalid_maximum_integer": "The value must be at most {max}",
+      "invalid_minimum_maximum_integer": "The value must be at least {min} and at most {max}",
+      "invalid_integer_format": "The value must be an integer",
+      "invalid_input": "Invalid input"
+    },
+    "server_side_combobox": {
+      "create_option": "Create new entry \"{option}\"",
+      "no_results": "No results found"
+    },
+    "dropdown_selector": {
+      "create_option": "Create new entry \"{option}\"",
+      "none_option": "-- None --",
+      "name_already_exists": "An entry with this name already exists."
+    },
+    "time_picker": {
+      "select_time": "Select time",
+      "invalid_time": "Invalid time"
+    },
+    "tag_selector": {
+      "selection_required": "Please select at least one tag."
+    },
+    "notification_snackbar": {
+      "saved": "Saved"
+    },
+    "authed_query": {
+      "session_expired_or_invalid": "Your session is invalid or has expired. Please log in again.",
+      "authentication_error": "Authentication error"
+    },
+    "session_expired_notification": "Your session has expired. Please log in again to continue.",
+    "tile_slider_unavailable": "Tile slider temporarily unavailable",
+    "no_description_available": "No description available",
+    "error_handling": {
+      "delete_restricted_by_relationship": "{parent} cannot be deleted when they are still associated with {child}. Please remove all {child} first.",
+      "delete_restricted_by_relationships": "{table} cannot be deleted when they are associated with other records. Please remove those records first.",
+      "generic_error": "An error occurred. Please try again later.",
+      "certificate_deletion_failed": "Failed to delete achievement certificates. Please try again.",
+      "entities": {
+        "course": "Courses",
+        "courseenrollment": "Enrollments",
+        "coursegroup": "Course groups",
+        "organization": "Organizations",
+        "program": "Programs",
+        "achievement": "Achievement records",
+        "locationaddress": "Location addresses",
+        "session_addresses": "session addresses",
+        "courses": "courses",
+        "course_enrollments": "enrollments",
+        "course_groups": "course groups",
+        "course_degrees": "course degrees",
+        "achievement_options": "achievement options",
+        "users": "users"
+      }
+    },
+    "course_group_options": {
+      "tech_coding": "Tech & Coding",
+      "business_startup": "Business & Startup",
+      "creative_social_sustainable": "Creative, Social & Sustainable",
+      "degree": "Degrees",
+      "event": "Events",
+      "my_admin_courses": "Course Administration",
+      "my_courses": "My Courses"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "error_loading": "Error loading FAQs. Please try again later.",
+      "no_faqs_available": "No FAQs available."
+    },
+    "organization_dialog": {
+      "type_organization_name_minimum_2_letters": "Type an organization name (minimum 2 letters).",
+      "search_organizations": "Search organizations",
+      "no_organizations_found": "No organizations found",
+      "type_at_least_2_characters": "Type at least 2 characters"
+    },
+    "link_dialog": {
+      "add_link": "Add Link",
+      "edit_link": "Edit Link",
+      "update_link": "Update Link",
+      "remove_link": "Remove Link",
+      "url_label": "URL",
+      "url_placeholder": "Enter URL (e.g., https://example.com or [Enrollment:CourseLink])",
+      "url_help": "You can use template variables like [Enrollment:CourseLink] or enter a regular URL"
+    },
+    "widget_error_loading_courses": "Error loading courses",
+    "widget_no_courses_available": "No courses available",
+    "page_not_found": "Page not found",
+    "page_not_found_description": "The page you're looking for doesn't exist. It may have been moved or deleted.",
+    "back_to_home": "Back to home",
+    "go_back": "Go back",
+    "auth": {
+      "please_log_in": "Please log in to access this page.",
+      "access_denied": "You do not have permission to access this page."
+    }
+  },
+  "course": {
+    "general": {
+      "events": "Event",
+      "reject": "Decline participation",
+      "confirm": "Confirm participation",
+      "ects": "ECTS",
+      "course_not_available": "Course not available",
+      "to_course_chat": "GO TO CHAT",
+      "to_online_meeting": "GO TO ONLINE MEETING",
+      "speaker": "Speaker",
+      "link_will_be_provided_soon": "(Link will be provided here soon)",
+      "address_will_be_provided_soon": "(Address will be provided here soon)"
+    },
+    "ects": {
+      "5": "5",
+      "NONE": "NONE",
+      "0,5": "0.5",
+      "2,5": "2.5",
+      "2_5": "2.5",
+      "12,5": "12.5"
+    },
+    "degree_elements": {
+      "completed_degree_elements": "Completed Degree Elements",
+      "no_degree_elements_completed": "You have not completed any Degree Elements yet.",
+      "current_degree_elements": "Current Offerings that are Part of the Degree",
+      "no_degree_elements_available": "Currently there are no ongoing offerings for this Degree."
+    },
+    "learning": {
+      "you_will_learn": "You will learn",
+      "general_achievement_certificate_conditions": "**Online Participation:**\nIf online participation is possible, attendances are only counted as present if the camera is continuously turned on!\n\n**Semester Opening:**\nWe invite you to the Semester Opening for all courses on October 16, 2025, at the COBL (Legienstraße 40, Kiel)! 💛\nHere you can get a glimpse behind the scenes of our OC community, get to know course instructors and other course participants and discover Kiel's corporate landscape in inspiring sessions.\nClick here for all information and to register: [HERE](https://forms.office.com/e/2TrRyRTCS5)."
+    },
+    "sessions": {
+      "show_all_sessions": "Show all sessions",
+      "hide_sessions": "Collapse sessions",
+      "course_sessions": "Course Sessions"
+    },
+    "attendances": {
+      "attendances": "Attendances",
+      "max_missed_sessions": "You may miss at most one session",
+      "max_missed_sessions_plural": "You may miss at most {count} sessions",
+      "attendance_status": {
+        "ATTENDED": "Attended",
+        "MISSED": "Missed",
+        "NO_INFO": "Under Review",
+        "PENDING": "Review Pending"
+      }
+    },
+    "achievement": {
+      "achievement_option": "Achievement Option",
+      "achievement_record_upload_dead_line_text": "You have until {date} to upload an achievement record.",
+      "choose_achievement_option": "Choose the title of your achievement record.",
+      "selected_achievement_option": "Selected Achievement Option",
+      "no_current_achievement_option": "No achievement record has been submitted yet.",
+      "no_achievement_option": "Currently no achievement option is available for this course.",
+      "upload_achievement_record": "Upload new record",
+      "download_template": "Download template",
+      "last_record_upload": "The last record with you as author was uploaded on {dateTime} by {fullName} for \"{achievementRecordTitle}\": {achievementRecordFileName}",
+      "no_existing_record_upload": "No record with you as author has been uploaded yet.",
+      "use_documentation_template": "Use the following template for documentation:",
+      "achievement_option_not_selected": "Please select an achievement option.",
+      "authors": "Authors",
+      "documentation": "Documentation",
+      "upload": "Upload",
+      "authors_missing": "Please add authors!",
+      "documentation_missing": "Please upload documentation!",
+      "file_name": "File name",
+      "operation_failed": "Operation failed",
+      "max_file_size": "Maximum file size: {size} MB",
+      "upload_achievement_record_modal": {
+        "file_too_large": "The file is too large. The maximum size is {size} MB."
+      }
+    },
+    "registration": {
+      "application_deadline": "Application deadline: ",
+      "apply_now": "Apply now",
+      "register_external": "Register via External Link",
+      "register_with_payment": "Register with Payment",
+      "register_now": "Register Now",
+      "accept_invitation": "Accept invitation",
+      "placeholder_motivation_letter": "My motivation ..."
+    },
+    "status": {
+      "applied": "Your application is under review",
+      "aborted": "You aborted the participation",
+      "rejected": "Unfortunately, your application has been rejected",
+      "cancelled": "Your invitation has been cancelled",
+      "invited": "You have been invited and need to confirm your participation",
+      "invitation_expired": "Your invitation has expired",
+      "application_period_ended": "Unfortunately, the application period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
+      "application_period_ended_title": "Application Period Ended"
+    },
+    "modal": {
+      "title_approval": "Application",
+      "title_direct": "Registration",
+      "title_with_payment": "Registration and Payment",
+      "motivation_letter_label": "Motivation Letter",
+      "motivation_letter_placeholder": "Please tell us why you want to participate in this course...",
+      "payment_info": "This course costs {cost}. You will be redirected to the payment page after registration.",
+      "accept_terms": "I accept the Terms and Conditions and Privacy Policy",
+      "cancel": "Cancel",
+      "close": "Close",
+      "submit": "Submit Application",
+      "proceed_to_payment": "Proceed to Payment",
+      "submitting": "Submitting...",
+      "success_message_approval": "Your application has been submitted successfully. You will receive an email notification once your application has been reviewed.",
+      "success_message_direct": "You have been successfully registered for this course. You will receive a confirmation email shortly."
+    },
+    "errors": {
+      "motivation_letter_required": "Please provide a motivation letter",
+      "terms_required": "Please accept the Terms and Conditions",
+      "registration_failed": "Registration failed. Please try again.",
+      "complete_survey_first": "Please complete the questionnaire first."
+    },
+    "formbricks": {
+      "survey_title": "Application Questionnaire",
+      "survey_completed": "Thank you! Your questionnaire has been successfully submitted.",
+      "embed_error": "The questionnaire could not be loaded. Please try again later."
+    },
+    "onboarding_modal": {
+      "decline_confirm_text": "Do you really want to decline the invitation to this course?",
+      "decline_button_text": "Yes",
+      "title": "Onboarding for your Course Participation",
+      "congratulation": "Congratulations, you are invited to participate in this course!",
+      "form_intro": "Please, update you current employment status:",
+      "confirm_sufficient_time": "Finally, confirm your course participation only if you have the time to fully attend the course until the end.",
+      "important": "IMPORTANT: CONFIRM COURSE INVITATION!",
+      "mattermost_info_1": "After confirmation, please click directly on the button to go to the course chat.",
+      "mattermost_info_2": "If you don't have an account in our chat yet, you will need to sign up there first. The course chat is our central communication tool for the courses."
+    },
+    "success_messages": {
+      "success_title": "You have successfully applied",
+      "success_body": "You will be informed about your admission no later than one to two days after the application deadline.",
+      "success_close_button_title": "Close"
+    }
+  },
+  "coursePage": {
+    "courseCosts": "This course costs {price}",
+    "courseIsFree": "This course is free of charge",
+    "courseGroups": "Course Groups",
+    "courseDegree": "Degrees",
+    "courseDegreeTitle": "Part of the following degrees",
+    "currentCourse": "Current course",
+    "openVideoCall": "to video call",
+    "toCourseDescription": "to course description",
+    "coursesPageTitle": "Courses: opencampus.sh Edu Hub",
+    "coursesHeadline": "Courses",
+    "courseSearchPlaceholder": "Search in title",
+    "addCourseText": "Add Course",
+    "addCourseFormTitle": "Add Course",
+    "table-header-published": "Published",
+    "table-header-title": "Title",
+    "table-header-instructor": "Course instructor",
+    "table-header-applications": "Applications",
+    "table-header-application-status": "Invided/ Confirmed/ Unrated",
+    "table-header-program": "Program",
+    "table-header-status": "Status",
+    "paginationText": "Page {currentPage} of {totalPage}",
+    "no-course-taken": "You have not participated in any course",
+    "discover-courses": "Discover Courses",
+    "your-courses": "My Courses",
+    "course": "Course",
+    "no-instructor": "There are no instructors",
+    "course-title": "Course title",
+    "course-instructor": "Course instructor",
+    "semester": "Semester",
+    "create": "Create",
+    "proof-of-participation": "Proof of participation",
+    "certificate-possible": "Possible certificates",
+    "performance-certificate": "Performance certificate",
+    "certificate-generation": "Create certificates",
+    "add-instructors": "Add Instructor",
+    "application": "Application",
+    "applied": "Applied",
+    "evaluation": "Evaluation",
+    "invited": "Invited",
+    "invitation-confirmed": "invitation confirmed",
+    "aborted": "aborted",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled",
+    "invitation-expired": "Invitation expired",
+    "invitation-deadline": "Invitation deadline",
+    "send-invitations": "Send invitations",
+    "invite-applicants": "invite applicant",
+    "course-not-found": "Course {courseId} could not be found!",
+    "confirmation-push-the-course-to-next-status": "Do you want to send the course to its next state?",
+    "please-fill-in-all-fields-to-proceed-further": "Please fill out all fields to proceed!",
+    "set-status-high": "increase status",
+    "max-n-characters": "max. {n} characters",
+    "short-description": "Short description",
+    "learning-goal": "Learning goals",
+    "title-info-block": "Titel Info Block",
+    "start-time": "Starting time",
+    "end-time": "Ending time",
+    "max-part-quantity": "Max. Part. count",
+    "add-new-location": "Add location",
+    "program": "Program",
+    "programs": "Programs",
+    "published": "Published",
+    "do-you-want-to-delete-the-program": "Do you really want to delete {title} ?",
+    "link-final-evaluation": "Link closing-Evaluation",
+    "default-address": "Default address for new Sessions",
+    "add-session": "Add Session",
+    "application-rating": "Application ratings:",
+    "not-rated": "Unrated",
+    "unclear": "Undecided",
+    "reject": "Reject",
+    "invite": "Invite",
+    "no-applications-present": "There are no applications yet.",
+    "no-enrollments-present": "There are no enrollments yet.",
+    "chat-link": "Chat Link:",
+    "possible-certificates": "Possible certifications",
+    "add-course": "Add course",
+    "day": "Day",
+    "no-courses": "This program has no courses.",
+    "default-course-title": "New course",
+    "achievementCertificateDownload": "Your achievement certificate",
+    "attendanceCertificateDownload": "Your attendance confirmation",
+    "congrats-completion": "Congratulations for finishing this course!",
+    "add-session-address": "New address",
+    "upgrade-status": "Update course status and switch to next tab.",
+    "to-be-defined": "Location still to be determined",
+    "not-submitted": "not submitted",
+    "email-confirmed-applicants": "E-Mail to confirmed applicants",
+    "application-end": "Application deadline:",
+    "confirm-online-course-description": "Hereby you confirm that you have participated in the required online courses. Your record of performance is your reflection sheet. You can find it <component>HERE</component>. If you have any questions, please contact your course leader.",
+    "confirm-online-course": "Confirm",
+    "online-course-confirmed": "You have confirmed on {dateTime} that you have participated in the required online courses.",
+    "achievement-certificate-generation": "Generate Achievement Certificates",
+    "attendance-certificate-generation": "Generate Attendance Certificates",
+    "certificates-generated": "{number} certificates have been generated.",
+    "1-certificate-generated": "One certificate has been generated.",
+    "no-certificates-generated": "No certificates have been generated.",
+    "selectTemplateDefaultLabel": "Choose template",
+    "location": {
+      "label": "Location",
+      "ONLINE": "Online",
+      "KIEL": "Kiel",
+      "HEIDE": "Heide"
+    },
+    "address": {
+      "label": "Link or Address",
+      "placeholder": {
+        "online": "This link will be provided to participants for all online sessions of the course.",
+        "offline": "This address can be adjusted when creating individual sessions if necessary."
+      },
+      "errorText": "The entered link does not have the correct format."
+    },
+    "weekday": "Weekday",
+    "weekdays": {
+      "NONE": "Irregular",
+      "MONDAY": "Monday",
+      "TUESDAY": "Tuesday",
+      "WEDNESDAY": "Wednesday",
+      "THURSDAY": "Thursday",
+      "FRIDAY": "Friday",
+      "SATURDAY": "Saturday",
+      "SUNDAY": "Sunday"
+    },
+    "languages": {
+      "DE": "German",
+      "EN": "English"
+    },
+    "start_time": "Start Time",
+    "end_time": "End Time",
+    "short_description": {
+      "label": "Short Description",
+      "help_text": "This text will appear on the course tile and as a tagline on the course page.",
+      "placeholder": "Enter a brief description of the course..."
+    },
+    "learning_goals": {
+      "label": "Learning Goals",
+      "help_text": "The learning goals are part of the performance certificate and can only be changed by the program coordinator. If you would like to suggest changes or notice errors, please contact them.",
+      "placeholder": "Learning Goal 1\nLearning Goal 2\nLearning Goal 3\nLearning Goal 4",
+      "read_only_placeholder": "Please contact the program coordinator to agree on learning goals and have them added here.",
+      "editable_in_table": "Editable in courses table"
+    },
+    "info_block_1_title": {
+      "label": "Info Block 1",
+      "help_text": "For the content of this part of the description, please refer to existing courses to stay as consistent as possible. Typically, this section describes what participants can expect in the course ('What you will get').",
+      "placeholder": "Title"
+    },
+    "info_block_1_content": {
+      "placeholder": "Content"
+    },
+    "info_block_2_title": {
+      "label": "Info Block 2",
+      "help_text": "For the content of this part of the description, please refer to existing courses to ensure consistency. Typically, this section describes what participants are expected to contribute or lead ('What you should bring').",
+      "placeholder": "Title"
+    },
+    "info_block_2_content": {
+      "placeholder": "Content"
+    },
+    "sessionAddress": {
+      "online": {
+        "label": "Online",
+        "placeholder": "Please enter a valid link in the \"Description\" tab."
+      },
+      "offline": {
+        "label": "Address for on-site participation in ",
+        "placeholder": "Select a default address in the \"Description\" tab or select a specific address here."
+      },
+      "select_address": "Select Address",
+      "select_online_link": "Select Online Link",
+      "search_addresses": "Search addresses...",
+      "no_address_selected": "No address selected",
+      "search_links": "Search links...",
+      "create_new_address": "Create New Address",
+      "create_new_link": "Create New Link",
+      "default_address": "Default",
+      "link_label": "Link Name",
+      "link_label_placeholder": "e.g., Main Meeting Room, Workshop Link",
+      "link_url": "URL",
+      "link_url_placeholder": "https://example.com/meeting-room",
+      "aliases": "Aliases",
+      "aliases_help": "Enter aliases and press Enter to add them",
+      "legacy_address": "Legacy Address (read-only)",
+      "select_location_option_first": "Please select a location option first",
+      "location_mismatch_error": "The selected address does not match the location option for this session. Please select an address that belongs to the correct location."
+    },
+    "date": "Date",
+    "title": "Title",
+    "external_speakers": "External Speakers",
+    "add_external_speaker": "Add External Speaker",
+    "session_title": "Session Title",
+    "confirmDeleteSession": "Do you really want to delete the session?",
+    "cannotDeletePastSession": "You cannot delete a session that is in the past! If you really want to delete the session, please contact an administrator.",
+    "delete": "Delete",
+    "total_applications": "Applications (total):",
+    "accepted_applications": "Applications (accepted):",
+    "total_invitations": "Invitations (total):",
+    "confirmed_invitations": "Invitations (confirmed):",
+    "bulk_action_publish": "Publish Selected",
+    "bulk_action_unpublish": "Unpublish Selected",
+    "not_published": "Not Published",
+    "view_course": "View Course",
+    "view": "View",
+    "confirmed": "Confirmed",
+    "unrated_rated_not_informed": "Unrated / Rated but not informed",
+    "bulk_action_copy": "Copy to Program",
+    "Uniqueness violation_ duplicate key value violates unique constraint \"CourseAddress_pkey\"": "A location address with this configuration already exists for this course."
+  },
+  "courseAdminPage": {
+    "pageTitle": "Opencampus Course Instructor View",
+    "headline": "Courses (Instructor)"
+  },
+  "startPage": {
+    "browse": "browse",
+    "continueLearning": "Continue Learning!",
+    "findCourses": "Find your courses",
+    "learnSubheadline": "subline",
+    "registerNow": "Register now",
+    "headline": "Start Hacking",
+    "subheadline": "Your Life",
+    "seo": {
+      "metaDescription": "EduHub by opencampus.sh – Your platform for tech, business, and creative courses. Learn coding, entrepreneurship, and more in our vibrant Community of Learning.",
+      "ogDescription": "Start your learning journey with EduHub by opencampus.sh! Join an active community and explore expert-led courses in tech, business, and creativity.",
+      "twitterDescription": "Learn coding, business & creativity with EduHub by opencampus.sh. Join our community and start today!",
+      "keywords": "online courses, tech courses, business courses, creative courses, programming, coding, entrepreneurship, startups, sustainability, lifelong learning, opencampus, EduHub, learning platform"
+    }
+  },
+  "achievementsPage": {
+    "title": "Achievements",
+    "page-header": "Performance records",
+    "achievement-record": "Performance records",
+    "achievement-record-admin": "Administration performance records",
+    "results": "Results",
+    "upload": "↑ Upload",
+    "description": "Description",
+    "mentors": "Mentors",
+    "result": "Result",
+    "documentation": "Documentation",
+    "deadline": "Deadline",
+    "results-so-far": "Current results",
+    "rank": "rank",
+    "last-upload": "Last upload",
+    "file-name": "Filename",
+    "last-submitted-documentation": "Last submitted documentation",
+    "cover-image-required": "Cover image required",
+    "csv-file-missing": "CSV file missing!",
+    "documentation-missing": "Please upload documentation!",
+    "authors-missing": "Please add some authors!",
+    "upload-proof": "Upload proof",
+    "form-info-cover-image-size": "Optimal size: {width} x {height} Pixel.",
+    "form-info-documentations": "<component>Use this template to upload the documentation!</component>",
+    "uploadDocumentationTemplate": "Upload documentation template"
+  },
+  "statistics": {
+    "statistics": "Statistics",
+    "select_statistics": {
+      "label": "Select Statistic",
+      "placeholder": "Select Statistic",
+      "options": {
+        "APPLICATIONS": "Applications",
+        "COURSES": "Courses",
+        "SESSIONS": "Sessions",
+        "ATTENDANCES": "Attendances",
+        "CERTIFICATES": "Certificates"
+      }
+    },
+    "select_program_types": {
+      "label": "Filter one or more Program Types",
+      "placeholder": "Select Program Types"
+    },
+    "application_statistics": {
+      "label": "Application Statistics",
+      "select_programs": {
+        "label": "Select one or more Programs or Semesters",
+        "placeholder": "Add Program or Semester"
+      },
+      "daily": "Daily Applications",
+      "cumulative": "Cumulative Applications",
+      "no_data_available": "No data available",
+      "use_actual_dates": "Use Calendar Date on X-Axis"
+    },
+    "course_statistics": {
+      "label": "Course Statistics",
+      "courses": "Courses",
+      "cumulative": "Total Number of Published Courses",
+      "by_program": "Number of Courses by Program"
+    },
+    "session_statistics": {
+      "label": "Session and Event Statistics",
+      "sessions": "Sessions or Events",
+      "cumulative": "Total Number of Offered Sessions or Events",
+      "by_program": "Number of Sessions or Events by Program"
+    },
+    "attendance_statistics": {
+      "label": "Attendance Statistics",
+      "attendances": "Attendances",
+      "cumulative": "Total Number of Offered Attendances",
+      "by_program": "Number of Attendances by Program"
+    },
+    "certificate_statistics": {
+      "label": "Certificate Statistics",
+      "certificates": "Certificates",
+      "cumulative": "Total Number of Offered Certificates",
+      "by_program": "Number of Certificates by Program",
+      "attendance_certificates": "Attendance Certificates",
+      "achievement_certificates": "Achievement Certificates"
+    }
+  },
+  "certificates": {
+    "title": "My Certificates",
+    "no_certificates": "You don't have any certificates yet.",
+    "no_certificates_title": "No certificates yet",
+    "no_certificates_description": "You haven't received any certificates yet. Complete courses and achieve your learning goals to earn certificates that showcase your accomplishments!",
+    "browse_courses": "Browse Courses",
+    "linkedin_sharing_warning": "To share your certificate on LinkedIn, it needs to be made publicly accessible. This means anyone with the link will be able to view your certificate. Do you want to continue?",
+    "select_certificate_to_share": "Select which certificate to share:",
+    "make_public_confirm": "Make Public and Share",
+    "share_on_linkedin": "Share on LinkedIn",
+    "achievement_certificate": "Achievement Certificate",
+    "attendance_certificate": "Attendance Certificate",
+    "not_authenticated": "You need to be logged in to view your certificates.",
+    "errorMessages": {
+      "certificate_not_found": "Certificate not found",
+      "linkedin_share_error": "Failed to share certificate on LinkedIn. Please try again later."
+    }
+  },
+  "profile": {
+    "first_name": "First name",
+    "last_name": "Last name",
+    "university": "University",
+    "university_enrollment_number": "Enrollment number",
+    "company": "Company",
+    "occupation": {
+      "label": "Occupation",
+      "HIGH_SCHOOL_STUDENT": "High school student",
+      "UNIVERSITY_STUDENT": "University student",
+      "EMPLOYED_FULL_TIME": "Full-time employed",
+      "EMPLOYED_PART_TIME": "Part-time employed",
+      "SELF_EMPLOYED": "Self-employed",
+      "UNEMPLOYED": "Unemployed",
+      "RETIRED": "Retired",
+      "RESEARCHER": "Researcher",
+      "EDUCATOR": "Educator",
+      "HOMEMAKER": "Housewife/Househusband",
+      "OTHER": "Other"
+    },
+    "organization": {
+      "label_base": "Organization",
+      "label_school": "School",
+      "label_university": "University",
+      "label_company": "Company",
+      "label_research": "University/Research institution",
+      "label_education": "School",
+      "placeholder": "Select or add new one"
+    },
+    "external_profile": "Link to external profile (LinkedIn, XING, ...)",
+    "matriculation_number": "Matriculation number",
+    "matriculation_number_placeholder": "e.g., 12345678",
+    "zip_code": "Zip/Postal code",
+    "zip_code_placeholder": "e.g., 12345 or SW1A 1AA",
+    "country": "Country",
+    "country_none": "-- Select Country --",
+    "occupation_none": "-- Select Occupation --",
+    "external_profile_placeholder": "e.g., https://linkedin.com/in/yourname",
+    "change_password_or_email": "Change password or email"
+  },
+  "programs": {
+    "add": "Add programm",
+    "published": "Published",
+    "title": "Program title",
+    "short-title": "Short title",
+    "application-start": "Application start",
+    "application-end": "Application deadline",
+    "course-start": "Course start",
+    "course-end": "Course end",
+    "achievement-upload-deadline": "Deadline achievement upload"
+  },
+  "manageCourses": {
+    "table_header": {
+      "published": "Published",
+      "title": "Title",
+      "instructor": "Instructor",
+      "applications": "Applications",
+      "confirmed": "Confirmed",
+      "unrated_rated_not_informed": "Unrated / Rated but not informed",
+      "application_end": "Application End",
+      "program": "Program",
+      "status": "Status",
+      "email_templates": "Templates",
+      "has_custom_templates": "This course has custom email templates"
+    },
+    "view": "View",
+    "view_course": "View Course",
+    "close": "Close",
+    "cancel": "Cancel",
+    "not_published": "Not Published",
+    "default_course_title": "Untitled Course",
+    "title": "Manage Courses",
+    "all_programs": "All",
+    "course_degree_title": {
+      "label": "Part of the following degrees",
+      "placeholder": "Select degrees"
+    },
+    "tile_slider_group": {
+      "label": "Tile Slider Group",
+      "placeholder": "Select tile slider groups"
+    },
+    "cover_image": {
+      "label": "Cover Image",
+      "upload_text": "Click to upload cover image",
+      "alt": "Course cover image"
+    },
+    "instructors": {
+      "label": "Instructors",
+      "add": "Add Instructor"
+    },
+    "funding_organizations": {
+      "label": "Funding Organizations",
+      "add": "Add Funding Organization"
+    },
+    "possible_certificates": {
+      "label": "Possible Certificates",
+      "attendance_certificate": "Attendance Certificate",
+      "achievement_certificate": "Achievement Certificate"
+    },
+    "registration_type": {
+      "label": "Registration Type",
+      "help_text": "Select how participants can register for this course",
+      "options": {
+        "APPROVAL_WITH_INPUT": "Approval Required with Questionnaire and Application Process",
+        "DIRECT_CONFIRMATION": "Direct Confirmation without Questionnaire",
+        "DIRECT_WITH_INPUT": "Direct Confirmation with Questionnaire",
+        "EXTERNAL_REGISTRATION": "External Registration"
+      }
+    },
+    "external_registration_link": {
+      "label": "External Registration Link",
+      "help_text": "URL where participants can register externally"
+    },
+    "chat_link": {
+      "label": "Course Chat Link",
+      "help_text": "Link to the course chat or communication platform"
+    },
+    "email_templates": {
+      "label": "Email Templates",
+      "manage_button": "Manage Email Templates",
+      "create_button": "Create Email Templates",
+      "edit_button": "Edit Email Templates",
+      "external_registration_note": "Email templates are not available for external registration courses."
+    },
+    "ects": {
+      "label": "ECTS Credits",
+      "help_text": "Number of ECTS credits for this course"
+    },
+    "max_missed_sessions": {
+      "label": "Maximum Missed Sessions",
+      "help_text": "Maximum number of sessions a participant can miss"
+    },
+    "learning_goals": {
+      "label": "Learning Goals",
+      "help_text": "Define what participants will achieve after completing this course. Write each learning goal on a new line without numbering. Use action verbs like 'understand', 'apply', 'analyze', 'create' (see: https://www.bloomstaxonomy.org).",
+      "placeholder": "Understand the fundamentals of the topic\nApply key concepts in practical scenarios\nAnalyze complex problems and solutions\nCreate innovative approaches"
+    },
+    "add_course_button": "Add Course",
+    "delete_button": {
+      "delete_course_confirmation": "Are you sure you want to delete the course '{title}'?",
+      "untitled_course": "Untitled Course"
+    },
+    "bulk_action": {
+      "publish": "Publish Selected",
+      "unpublish": "Unpublish Selected",
+      "copy": "Copy to Program"
+    },
+    "copy_courses_to_program_dialog": {
+      "title": "Copy Courses to Program",
+      "description": "Select the target program where the courses should be copied:",
+      "button": "Copy Courses"
+    },
+    "notifications": {
+      "course_added_success": "Course added successfully",
+      "course_add_failed": "Failed to add course. Please try again.",
+      "courses_published_success_singular": "Successfully published {count} course",
+      "courses_published_success_plural": "Successfully published {count} courses",
+      "courses_unpublished_success_singular": "Successfully unpublished {count} course",
+      "courses_unpublished_success_plural": "Successfully unpublished {count} courses",
+      "bulk_action_failed": "Failed to {action} courses. Please try again.",
+      "attendance_certificate_update_failed": "Failed to update attendance certificate setting",
+      "achievement_certificate_update_failed": "Failed to update achievement certificate setting",
+      "application_end_update_failed": "Failed to update application end date",
+      "courses_copied_success_singular": "Successfully copied {count} course to {programTitle}",
+      "courses_copied_success_plural": "Successfully copied {count} courses to {programTitle}"
+    }
+  },
+  "manageCourse": {
+    "description": "Description",
+    "sessions": "Dates",
+    "applications": "Applications",
+    "registrations": "Registrations",
+    "participations_and_achievements": "Participations and Achievements",
+    "degree_participations": "Degree Participations",
+    "attendances": "Attendances",
+    "certificate_achievement": "Certificate",
+    "certificates": "Certificate Download",
+    "attendance_certificate_download": "Ach",
+    "achievement_certificate_download": "Att",
+    "no_applications_present": "No applications present",
+    "add_participants": "Add or Edit Participants",
+    "selected_users": "Selected Users",
+    "name_or_email": "Name or email",
+    "add_as_confirmed": "add or change as confirmed",
+    "add_as_applied": "add or change as applied",
+    "add_as_invited": "add or change as invited",
+    "add_as_aborted": "add or change as aborted",
+    "add_user_error": "Please select at least one user!",
+    "submit": "Submit",
+    "application_history": {
+      "label": "Previous Applications and Participations",
+      "no_applications_present": "No applications present"
+    },
+    "email": "Email",
+    "application": "Application",
+    "evaluation": "Evaluation",
+    "send_email_to_applicants": "Send Email to Applicants",
+    "select_applicants_first": "Please select applicants first",
+    "bulk_actions": {
+      "email_selected": "Email Selected",
+      "email_all_confirmed": "Email all Confirmed",
+      "email_all_invited": "Email all Invited",
+      "email_all_applied": "Email all Applied",
+      "email_all_rejected": "Email all Rejected",
+      "email_all_invite_rating": "Email all with Rating 'Invite'",
+      "email_all_decline_rating": "Email all with Rating 'Decline'",
+      "email_all_review_rating": "Email all with Rating 'Review'",
+      "email_all_by_status": "Email all by Status",
+      "email_all_by_rating": "Email all by Rating",
+      "send_invitations": "Send Invitations",
+      "send_invitations_selected": "Send Invitations to Selected",
+      "send_invitations_all": "Send Invitations to all with Green Rating",
+      "send_invitations_dialog_title": "Send Invitations",
+      "send_invitations_selected_count_singular": "Of {selected} selected participants, {identified} person with green rating was identified and will be notified of their invitation for this course.",
+      "send_invitations_selected_count_plural": "Of {selected} selected participants, {identified} persons with green rating were identified and will be notified of their invitation for this course.",
+      "send_invitations_all_count_singular": "{count} person with green rating was identified and will be notified of their invitation for this course.",
+      "send_invitations_all_count_plural": "{count} persons with green rating were identified and will be notified of their invitation for this course.",
+      "send_invitations_confirm": "Send Invitations",
+      "send_rejections": "Send Rejections",
+      "send_rejections_selected": "Send Rejections to Selected",
+      "send_rejections_all": "Send Rejections to all with Red Rating",
+      "send_rejections_dialog_title": "Send Rejections",
+      "send_rejections_selected_count_singular": "Of {selected} selected participants, {identified} person with red rating was identified and will be notified of their rejection for this course.",
+      "send_rejections_selected_count_plural": "Of {selected} selected participants, {identified} persons with red rating were identified and will be notified of their rejection for this course.",
+      "send_rejections_all_count_singular": "{count} person with red rating was identified and will be notified of their rejection for this course.",
+      "send_rejections_all_count_plural": "{count} persons with red rating were identified and will be notified of their rejection for this course.",
+      "send_rejections_confirm": "Send Rejections",
+      "send_invitations_error": "Failed to send invitations: {error}",
+      "send_rejections_error": "Failed to send rejections: {error}",
+      "no_selection_dialog_title": "No Selection"
+    },
+    "statistics_applications_total": "Total Applications",
+    "statistics_applications_accepted": "Accepted Applications",
+    "statistics_invitations_total": "Total Invitations",
+    "statistics_invitations_confirmed": "Confirmed Invitations",
+    "statistics_registrations_total": "Total Registrations",
+    "statistics_registrations_confirmed": "Confirmed Registrations",
+    "name": "Name",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "organization": "Organization",
+    "participations": "Participations",
+    "lastApplication": "Last Activity",
+    "status_label": "Status",
+    "ectsTotal": "Total ECTS",
+    "attendedEvents": "Attended Events",
+    "certificate": "Certificate",
+    "projectTitle": "Project title",
+    "lastRecordUpload": "Upload Date",
+    "generate_achievement_certificates": "Generate Achievement Certificates",
+    "delete_achievement_certificates": "Delete Achievement Certificates",
+    "no_certificates_deleted": "No certificates were deleted",
+    "certificate_deleted_singular": "{count} achievement certificate was deleted",
+    "certificates_deleted_plural": "{count} achievement certificates were deleted",
+    "application_status_tooltip": "Click on the circles to change the rating",
+    "application_deadline_tooltip": "If you want to change the date for the Confirmation deadline you can resend the invitation.",
+    "max_participants": {
+      "label": "Maximum number of participants",
+      "placeholder": "Maximum number of participants",
+      "help_text": "The maximum number of participants is used as information for admission."
+    },
+    "formbricks": {
+      "title": "Enrollment Questionnaire",
+      "description": "Link a Formbricks questionnaire that will be shown instead of the motivation letter during enrollment/application.",
+      "tooltip": "Applicants will fill out this questionnaire when registering for the course. Responses will be displayed in the applications overview.",
+      "survey_url_label": "Formbricks Enrollment Survey URL",
+      "survey_url_helper": "Paste the URL of your Formbricks Link Survey",
+      "survey_url_helper_with_default": "Paste the URL of your Formbricks Link Survey (leave empty to use program default)",
+      "survey_configured": "Questionnaire configured",
+      "open_survey": "Open questionnaire",
+      "remove_survey": "Remove questionnaire",
+      "invalid_url": "Please enter a valid Formbricks Survey URL",
+      "help_text_hidden_fields": "Important: You must configure Hidden Fields in your Formbricks survey!\n\nRequired Hidden Fields:\n• eduhubUserId - Automatically filled with EduHub user ID\n• eduhubCourseId - Automatically filled with course ID\n• eduhubEnrollmentId - Automatically filled with enrollment ID (optional)\n\nIn Formbricks: Edit Survey → Enable Hidden Fields → Add these field IDs. Without this configuration, responses cannot be properly matched.\n\nNote: eduhubEnrollmentId is optional because the enrollment is created AFTER the survey is completed during registration.",
+      "loading_responses": "Loading responses...",
+      "error_loading_responses": "Error loading questionnaire responses",
+      "no_responses": "No questionnaire responses available",
+      "questionnaire_responses": "Questionnaire Responses",
+      "incomplete_response": "Questionnaire not fully completed"
+    },
+    "common": {
+      "edit": "Edit",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "rating": {
+      "label": "Application ratings:",
+      "invite": "Invite",
+      "unclear": "Undecided",
+      "reject": "Reject",
+      "not_rated": "Unrated"
+    },
+    "status": {
+      "applied": "Applied",
+      "invited": "Invited",
+      "invitation_confirmed": "invitation confirmed",
+      "aborted": "aborted",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "invitation_expired": "Invitation expired"
+    },
+    "invitation_deadline": "Invitation deadline",
+    "course_not_found": "Course {courseId} could not be found!",
+    "add_session": "Add Session",
+    "location": {
+      "label": "Location",
+      "ONLINE": "Online",
+      "KIEL": "Kiel",
+      "HEIDE": "Heide"
+    },
+    "address": {
+      "label": "Link or Address",
+      "placeholder": {
+        "online": "This link will be provided to participants for all online sessions of the course.",
+        "offline": "This address can be adjusted when creating individual sessions if necessary."
+      },
+      "errorText": "The entered link does not have the correct format."
+    },
+    "sessionAddress": {
+      "no_address_selected": "No address selected"
+    },
+    "weekday": "Weekday",
+    "weekdays": {
+      "NONE": "Irregular",
+      "MONDAY": "Monday",
+      "TUESDAY": "Tuesday",
+      "WEDNESDAY": "Wednesday",
+      "THURSDAY": "Thursday",
+      "FRIDAY": "Friday",
+      "SATURDAY": "Saturday",
+      "SUNDAY": "Sunday"
+    },
+    "languages": {
+      "DE": "German",
+      "EN": "English"
+    },
+    "language": "Language",
+    "start_time": "Start Time",
+    "end_time": "End Time",
+    "short_description": {
+      "label": "Short Description",
+      "help_text": "This text will appear on the course tile and as a tagline on the course page.",
+      "placeholder": "Enter a brief description of the course..."
+    },
+    "learning_goals": {
+      "label": "Learning Goals",
+      "help_text": "The learning goals are part of the performance certificate and can only be changed by the program coordinator. If you would like to suggest changes or notice errors, please contact them.",
+      "placeholder": "Learning Goal 1\nLearning Goal 2\nLearning Goal 3\nLearning Goal 4",
+      "read_only_placeholder": "Please contact the program coordinator to agree on learning goals and have them added here.",
+      "editable_in_table": "Editable in courses table"
+    },
+    "info_block_1_title": {
+      "label": "Info Block 1",
+      "help_text": "For the content of this part of the description, please refer to existing courses to stay as consistent as possible. Typically, this section describes what participants can expect in the course ('What you will get').",
+      "placeholder": "Title"
+    },
+    "info_block_1_content": {
+      "placeholder": "Content"
+    },
+    "info_block_2_title": {
+      "label": "Info Block 2",
+      "help_text": "For the content of this part of the description, please refer to existing courses to ensure consistency. Typically, this section describes what participants are expected to contribute or lead ('What you should bring').",
+      "placeholder": "Title"
+    },
+    "info_block_2_content": {
+      "placeholder": "Content"
+    },
+    "add_new_location": "Add location",
+    "no_enrollments_present": "There are no enrollments yet.",
+    "not_submitted": "not submitted",
+    "confirmation_push_course_to_next_status": "Do you want to send the course to its next state?",
+    "set_status_high": "increase status",
+    "please_fill_all_fields": "Please fill out all fields to proceed!"
+  },
+  "managePrograms": {
+    "headline": "Programs",
+    "table_header": {
+      "published": "Published",
+      "application_start": "Application Start",
+      "application_end": "Application End",
+      "course_start": "Course Start",
+      "course_end": "Course End",
+      "achievement_upload_deadline": "Deadline Perf. Record Upload",
+      "not_published": "Not Published"
+    },
+    "title": {
+      "label": "Program Title",
+      "placeholder": "New Program",
+      "help_text": "The name of the program as it will be displayed to the participants.",
+      "error_text": "The name can be a maximum of 22 characters long."
+    },
+    "short_title": {
+      "label": "Short Title",
+      "placeholder": "SHORTTITLE",
+      "help_text": "The short designation is mainly used in the admin area. It should not be longer than 10 characters. All letters are automatically converted to uppercase.",
+      "error_text": "The short designation can be a maximum of 10 characters long."
+    },
+    "start_evaluation": {
+      "label": "Start Evaluation Link",
+      "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
+      "help_text": "The questionnaire linked here will be sent to the participants by email after the first date of a course or event.\n The title of the program and the name of the course or event are automatically included as URL parameters and can be included in the questionnaire accordingly.",
+      "error_text": "Invalid link format!"
+    },
+    "speaker_evaluation": {
+      "label": "Speaker Evaluation Link",
+      "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
+      "help_text": "This questionnaire link will be sent to the participants by email after each date of a course or event where an external speaker is registered.\n The title of the program and the name of the course or event are automatically included as URL parameters and can be included in the questionnaire accordingly.",
+      "error_text": "Invalid link format!"
+    },
+    "final_evaluation": {
+      "label": "Final Evaluation Link",
+      "placeholder": "https://yourdomain.com/evaluation?program=PROGRAM&course=COURSE",
+      "help_text": "This questionnaire link will be sent to the participants by email after the last date of a course or event.\n The title of the program and the name of the course or event are automatically included as URL parameters and can be included in the questionnaire accordingly.",
+      "error_text": "Invalid link format!"
+    },
+    "default_enrollment_survey": {
+      "label": "Default Enrollment Survey",
+      "placeholder": "https://formbricks.example.com/s/surveyId",
+      "help_text": "Default Formbricks survey for course enrollments. Courses can override this with their own enrollment survey URL."
+    },
+    "delete_button": {
+      "delete_program_confirmation": "Are you sure you want to delete the program '{title}'?",
+      "untitled_program": "Untitled Program"
+    },
+    "certificates": {
+      "template": "Template",
+      "proof_of_participation": "Proof of participation",
+      "performance_certificate": "Performance certificate",
+      "show_certificates": "Show certificate",
+      "no_template_uploaded_yet": "No template uploaded yet",
+      "upload_template": "Click to upload template or drag and drop"
+    },
+    "participation_data": {
+      "generate": "Generate Participation Data (CSV)",
+      "download": "Download Participation Data (CSV)"
+    },
+    "add_program_button": "Add Program",
+    "bulk_action": {
+      "publish": "Publish Selected",
+      "unpublish": "Unpublish Selected"
+    },
+    "notifications": {
+      "programs_published_success_singular": "Program was successfully published",
+      "programs_published_success_plural": "{count} programs were successfully published",
+      "programs_unpublished_success_singular": "Program was successfully unpublished",
+      "programs_unpublished_success_plural": "{count} programs were successfully unpublished",
+      "bulk_action_failed": "Bulk action '{action}' failed"
+    }
+  },
+  "manageUsers": {
+    "headline": "Users",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "email": "Email",
+    "occupation": "Occupation",
+    "organization": "Organization",
+    "matriculation_number": "Matriculation number",
+    "deletion_confirmation_question": "Are you sure you want to delete the account of {firstName} {lastName}? The following steps will be performed:\n\n1. Deleting the user account from the authentication system\n2. Anonymizing all personal data\n3. Deleting the profile picture\n4. Deleting motivation letters\n5. Replacing the certificates with anonymized versions\n\nThis process cannot be undone. Do you want to proceed with deleting with deleting {firstName} {lastName}'s account?",
+    "anonymization": {
+      "ANONYMIZATION_SUCCESS": "User data anonymized successfully",
+      "ANONYMIZATION_PARTIAL_SUCCESS": "User data partially anonymized",
+      "ANONYMIZATION_FAILED": "Failed to anonymize user data",
+      "ERROR_MISSING_USER_ID": "Missing required user ID",
+      "ERROR_SOME_STEPS_FAILED": "Some anonymization steps failed",
+      "ERROR_GENERAL": "An unexpected error occurred"
+    },
+    "anonymization_steps": {
+      "keycloak_deletion": "Keycloak deletion",
+      "user_data_anonymization": "User data anonymization",
+      "motivation_letter_anonymization": "Motivation letter anonymization",
+      "profile_picture_removal": "Profile picture removal",
+      "certificate_anonymization": "Certificate anonymization"
+    },
+    "manage_admins": "Manage admins",
+    "create_user": {
+      "button": "Create User",
+      "dialog_title": "Create New User",
+      "success": "User created successfully.",
+      "error": "Error creating user",
+      "error_first_name_required": "First name is required",
+      "error_last_name_required": "Last name is required",
+      "error_email_required": "Email is required",
+      "error_email_invalid": "Invalid email address",
+      "send_welcome_email": "Send welcome email",
+      "creating": "Creating...",
+      "cancel": "Cancel",
+      "first_name_placeholder": "Enter first name",
+      "last_name_placeholder": "Enter last name",
+      "email_placeholder": "Enter email address"
+    }
+  },
+  "manageAdminUsers": {
+    "headline": "Admin Users",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "email": "Email",
+    "organization": "Organization",
+    "deletion_confirmation_question": "Are you sure you want to delete the admin rights of {firstName} {lastName} for the organization {organization}?"
+  },
+  "manageAppSettings": {
+    "backgroundImageURL": "Background image URL",
+    "bannerBackgroundColor": "News Banner background color",
+    "bannerFontColor": "News Banner text color",
+    "bannerTextDe": "News Banner Text DE",
+    "bannerTextEn": "News Banner Text EN",
+    "previewImageURL": "Default preview image URL",
+    "appSettings": "App Settings",
+    "courseGroupOptions": "Course Groups Order",
+    "timeZone": "Time Zone",
+    "bannerSettings": "Banner Settings",
+    "faqSettings": "FAQ Settings",
+    "showFaqSection": "Show FAQ section on homepage",
+    "faqCollectionName": "Displayed FAQ Collection",
+    "faqCollectionPlaceholder": "Select FAQ collection",
+    "save": "Save",
+    "saving": "Saving...",
+    "timeZones": {
+      "Europe/Berlin": "Berlin",
+      "Europe/London": "London",
+      "Europe/Paris": "Paris",
+      "UTC": "UTC",
+      "America/New_York": "New York",
+      "America/Los_Angeles": "Los Angeles",
+      "Asia/Tokyo": "Tokio"
+    },
+    "timeZoneHelpText": "The time zone is used to display dates and times in the application. General times like the recurring course time, which are not bound to a specific day, will always be displayed in the original time and not adjusted."
+  },
+  "manageExperts": {
+    "headline": "Experts",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "email": "Email",
+    "course": "Course",
+    "program": "Program",
+    "role": "Role",
+    "session": "Session",
+    "role_instructor": "Instructor",
+    "role_speaker": "Speaker",
+    "no_roles": "No roles assigned"
+  },
+  "manageOrganizations": {
+    "headline": "Organizations",
+    "organization": {
+      "name": "Name",
+      "type": "Type",
+      "user_count": "Affiliated Users",
+      "users": "users",
+      "aliases": "Aliases",
+      "description": "Description",
+      "logo": "Logo",
+      "new_organization": "New Organization",
+      "default_description": "Description"
+    },
+    "api_key": {
+      "title": "API Key Management",
+      "description": "Generate and manage API keys for participant data access",
+      "action": {
+        "generate": "Generate API Key",
+        "generating": "Generating...",
+        "regenerate": "Regenerate Key",
+        "regenerating": "Regenerating...",
+        "revoke": "Revoke Key",
+        "revoking": "Revoking..."
+      },
+      "confirm": {
+        "regenerate": "Are you sure you want to regenerate the API key? This will invalidate the existing key immediately.",
+        "revoke": "Are you sure you want to revoke the API key? This will immediately disable access for this organization."
+      },
+      "dialog": {
+        "title": "API Key Generation",
+        "warning": {
+          "title": "Important Security Notice",
+          "description": "This API key will only be shown once. Please copy it immediately and store it securely. You will not be able to view it again."
+        },
+        "key_label": "Your API Key",
+        "copy": "Copy",
+        "saving": "Saving…",
+        "confirm_saved": "I have stored the key securely",
+        "usage": {
+          "title": "How to Use",
+          "header": "Include this header in your API requests:",
+          "example": "Example API call:"
+        }
+      },
+      "error": {
+        "generate_failed": "Failed to generate API key. Please try again.",
+        "revoke_failed": "Failed to revoke API key. Please try again."
+      }
+    },
+    "action": {
+      "add": "Add Organization",
+      "delete_confirmation": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the organization \"{name}\"?"
+    },
+    "bulk_action": {
+      "delete": {
+        "label": "Delete organizations",
+        "confirmation": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the {count} selected organizations?"
+      },
+      "merge": {
+        "label": "Merge organizations",
+        "title": "Merge Organizations",
+        "description": "Select the organization to which the selected organizations should be merged.",
+        "select_target": {
+          "label": "Target organization",
+          "placeholder": "Select target organization"
+        },
+        "confirm_merge": "Merge Organizations",
+        "preview_title": "Merge Preview",
+        "target_organization": "Target Organization",
+        "organizations_to_merge": "Organizations to merge",
+        "total_users_affected": "Total users affected",
+        "aliases_to_add": "Aliases to be added",
+        "type_change_warning": "Type Change",
+        "will_become_university": "The target organization will be changed to University type",
+        "deletion_warning": "Warning",
+        "organizations_will_be_deleted_one": "1 organization will be permanently deleted",
+        "organizations_will_be_deleted_other": "{count} organizations will be permanently deleted",
+        "no_organizations_selected": "No organizations selected for merging",
+        "api_key_warning": "API Key Conflict",
+        "api_key_conflict_description": "Cannot merge: {count} organization(s) have API keys defined. Only one organization can have an API key. Please revoke API keys from all but one organization before merging.",
+        "loading_related_data": "Loading related data...",
+        "organization_admins_affected": "Organization admins affected",
+        "funding_organizations_affected": "Course funding relationships affected",
+        "admin_user_id": "User",
+        "course_id": "Course",
+        "and_more": "... and {count} more"
+      }
+    },
+    "input": {
+      "enter_alias": "Enter organization alias",
+      "enter_description": "Enter organization description",
+      "enter_name": "Enter organization name"
+    },
+    "error": {
+      "loading": "Error loading organizations",
+      "duplicate_organization_name": "An organization with the default name is still existing. Please rename or delete that one first.",
+      "general": "An error occurred while adding the organization. Please try again.",
+      "network": "A network error occurred. Please check your connection and try again.",
+      "unexpected": "An unexpected error occurred. Please try again later.",
+      "bulk_delete_failed": "Error deleting selected organizations",
+      "merge_failed": "Error merging organizations",
+      "alias_already_exists": "The alias \"{alias}\" already exists in organization \"{organization}\". Please choose a different name or select the existing organization instead.",
+      "alias_duplicate_error": "This alias already exists in another organization. Please choose a different name.",
+      "alias_update_failed": "Failed to update organization aliases. Please try again.",
+      "alias_unexpected_error": "An unexpected error occurred while updating aliases. Please try again."
+    },
+    "type_selection": {
+      "UNIVERSITY": "University",
+      "RESEARCH_INSTITUTE": "Research Institute",
+      "PUBLIC_SECTOR": "Public Sector",
+      "NON_PROFIT_ORGANIZATION": "Non-Profit Organization",
+      "CORPORATION": "Corporation",
+      "SCHOOL": "School",
+      "FREELANCER": "Freelancer",
+      "OTHER": "Other"
+    },
+    "common": {
+      "close": "Close",
+      "cancel": "Cancel"
+    },
+    "deletion_confirmation_question": "Deleting an organization is only possible if there are no users related to this organization.\nAre you sure you want to delete the organization {name}?"
+  },
+  "manageLocationAddresses": {
+    "headline": "Location Addresses",
+    "locationAddress": {
+      "shortLabel": "Short Label",
+      "address": "Address",
+      "address_or_link": "Address / Link",
+      "description": "Description",
+      "aliases": "Aliases",
+      "locationOption": "Location",
+      "usageCount": "Usage Count",
+      "usageCount_one": "Usage",
+      "usageCount_other": "Usages",
+      "new_address": "New Address",
+      "default_address": "Address details",
+      "default_description": "Description"
+    },
+    "input": {
+      "enter_short_label": "Enter short label",
+      "enter_address": "Enter full address",
+      "enter_link": "Enter complete link",
+      "enter_description": "Enter description",
+      "enter_alias": "Enter alias"
+    },
+    "help": {
+      "short_label": "A brief, unique identifier for this location (e.g., 'Main Campus', 'Building A')",
+      "address": "Complete physical address including street, city, and postal code",
+      "link": "Full URL for online sessions (e.g., 'https://zoom.us/j/123456789')",
+      "description": "Additional details about this location to help users understand its purpose",
+      "aliases": "Alternative names that can be used to reference this location"
+    },
+    "action": {
+      "add": "Add Address",
+      "delete_confirmation": "Are you sure you want to delete the location address \"{name}\"?"
+    },
+    "bulk_action": {
+      "delete": {
+        "label": "Delete",
+        "description": "Are you sure you want to delete {count} location address(es)?"
+      },
+      "merge": {
+        "label": "Merge location addresses",
+        "title": "Merge Location Addresses",
+        "description": "Select the location address to which the selected addresses should be merged.",
+        "select_target": {
+          "label": "Target address",
+          "placeholder": "Select target address"
+        },
+        "confirm_merge": "Merge Location Addresses",
+        "preview_title": "Merge Preview",
+        "target_address": "Target Address",
+        "addresses_to_merge": "Addresses to merge",
+        "total_usage_affected": "Total usage affected",
+        "aliases_to_add": "Aliases to be added",
+        "deletion_warning": "Warning",
+        "addresses_will_be_deleted_one": "1 location address will be permanently deleted",
+        "addresses_will_be_deleted_other": "{count} location addresses will be permanently deleted",
+        "no_addresses_selected": "No location addresses selected for merging",
+        "location_mismatch_warning": "Location Mismatch",
+        "location_mismatch_description_one": "Cannot merge: 1 address has a different location option than the target address ({targetLocation}). All addresses must have the same location option to merge.",
+        "location_mismatch_description_other": "Cannot merge: {count} addresses have a different location option than the target address ({targetLocation}). All addresses must have the same location option to merge."
+      }
+    },
+    "error": {
+      "alias_already_exists": "Alias \"{alias}\" already exists in location address \"{address}\"",
+      "alias_duplicate_error": "This alias already exists for another location address",
+      "alias_update_failed": "Failed to update aliases",
+      "duplicate_location_address": "A location address with this short label already exists for this location option",
+      "bulk_delete_failed": "Failed to delete location addresses",
+      "merge_failed": "Error merging location addresses",
+      "unexpected": "An unexpected error occurred"
+    },
+    "type_selection": {
+      "KIEL": "Kiel",
+      "ONLINE": "Online",
+      "HEIDE": "Heide"
+    }
+  },
+  "manageEmailTemplates": {
+    "headline": "Email Templates",
+    "headline_default": "Default Email Templates",
+    "default_templates_explanation": "These are the default email templates used app-wide. You can also define course-specific templates in the manage courses view by clicking on the corresponding button in the expandable row of the course.",
+    "course_specific_explanation": "These email templates are specific to this course and will override the default templates when sending emails for this course.",
+    "back_to_courses": "Back to Courses",
+    "columns": {
+      "title": "Template Type",
+      "subject": "Email Subject Line",
+      "updated_at": "Last Updated"
+    },
+    "template_types": {
+      "APPLICATION_RECEIVED": "Application Received",
+      "APPLICATION_CONFIRMED": "Application Confirmed",
+      "SESSION_REMINDER": "Session Reminder",
+      "INVITE": "Invitation",
+      "DECLINE": "Application Declined",
+      "REGISTRATION_CONFIRMED": "Registration Confirmed",
+      "USER_CREATED": "User Created"
+    },
+    "placeholders": {
+      "subject": "Enter email subject...",
+      "body": "Start typing your email content here. Use the toolbar for formatting and quick placeholders..."
+    },
+    "help_text": {
+      "subject": "The subject line that will appear in the recipient's email inbox. You can use placeholders like [User:Firstname] to personalize the subject."
+    },
+    "expandable": {
+      "body_content": "Email Content",
+      "trigger_description": "When is this email sent?",
+      "keyword_placeholders": "Available Placeholders",
+      "preview": "Preview",
+      "generate_preview": "Generate Preview",
+      "generating_preview": "Generating..."
+    },
+    "triggers": {
+      "APPLICATION_RECEIVED": "Sent when a user applies for a course",
+      "APPLICATION_CONFIRMED": "Sent when a user's participation is confirmed",
+      "INVITE": "Sent when admin invites users to a course",
+      "DECLINE": "Sent when admin rejects applications",
+      "REGISTRATION_CONFIRMED": "Sent when a user directly registers for a course/event",
+      "SESSION_REMINDER": "Sent before sessions start (24h, 1h, 15min before)",
+      "USER_CREATED": "Sent when a new user account is created"
+    },
+    "delete_confirmation": "Are you sure you want to delete the email template '{title}'?",
+    "unknown_trigger": "Unknown trigger type"
+  },
+  "manageAchievementTemplates": {
+    "error": {
+      "duplicate_element_name": "An element with the default name already exists. Please rename or delete it first."
+    },
+    "addUserAchievementDocumentationTemplateText": "Add template",
+    "url": "Download",
+    "title": "Title",
+    "delete": "Delete",
+    "upload": "Upload"
+  }
+}

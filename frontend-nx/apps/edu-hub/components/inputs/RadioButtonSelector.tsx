@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAdminMutation } from '../../hooks/authedMutation';
 import { DocumentNode } from 'graphql';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { gql } from '@apollo/client';
 import { Radio, RadioGroup, FormControlLabel, FormControl } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -40,7 +40,7 @@ const RadioButtonSelector: React.FC<RadioButtonSelectorProps> = ({
   translationNamespace,
 }) => {
   const [value, setValue] = useState(currentValue);
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const DUMMY_MUTATION = gql`
     mutation DummyMutation {

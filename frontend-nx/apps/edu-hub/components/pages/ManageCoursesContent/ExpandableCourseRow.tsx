@@ -1,8 +1,7 @@
-import { FC, Fragment, useCallback, useMemo, useRef, useState } from 'react';
+import { FC, Fragment, useCallback, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdUpload, MdAddCircle, MdEmail } from 'react-icons/md';
+import { MdCheckBox, MdOutlineCheckBoxOutlineBlank, MdAddCircle, MdEmail } from 'react-icons/md';
 import { useRouter } from 'next/router';
-import Image from 'next/image';
 import { useAdminMutation } from '../../../hooks/authedMutation';
 import { SAVE_COURSE_IMAGE } from '../../../queries/actions';
 import { INSERT_COURSE_GROUP_TAG, DELETE_COURSE_GROUP_TAG } from '../../../queries/courseGroup';
@@ -23,8 +22,6 @@ import {
   UserSelectionWithFilterVariables,
   UserSelectionWithFilter_User,
 } from '../../../queries/__generated__/UserSelectionWithFilter';
-import { SaveCourseImage, SaveCourseImageVariables } from '../../../queries/__generated__/SaveCourseImage';
-import { UpdateCourseByPk, UpdateCourseByPkVariables } from '../../../queries/__generated__/UpdateCourseByPk';
 import { CourseRegistrationType_enum, order_by } from '../../../__generated__/globalTypes';
 import { SelectUserDialog } from '../../common/dialogs/SelectUserDialog';
 import { SelectOrganizationDialog } from '../../common/dialogs/SelectOrganizationDialog';
@@ -39,11 +36,11 @@ import {
 } from '../../../queries/__generated__/InsertCourseFundingOrganization';
 import { OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
 import EntityListManager from '../../inputs/EntityListManager';
-import { getPublicImageUrl, parseFileUploadEvent } from '../../../helpers/filehandling';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations } from 'next-intl';
 import TagSelector from '../../inputs/TagSelector';
 import InputField from '../../inputs/InputField';
 import DropDownSelector from '../../inputs/DropDownSelector';
+import FileUploadField from '../../inputs/FileUploadField';
 import {
   UPDATE_COURSE_CHAT_LINK,
   UPDATE_COURSE_ECTS,
@@ -51,10 +48,12 @@ import {
   UPDATE_COURSE_MAX_MISSED_SESSION,
   UPDATE_COURSE_REGISTRATION_TYPE,
   UPDATE_COURSE_LEARNING_GOALS,
+  UPDATE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY,
 } from '../../../queries/course';
 import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
+import { translateErrorMessage } from '../../../helpers/errorHandling';
 import { useAdminQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import {
   GET_COURSE_TEMPLATES_COUNT,
@@ -80,7 +79,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   onSetAttendanceCertificatePossible,
   onSetAchievementCertificatePossible,
 }) => {
-  const { t } = useTranslation('course-page');
+  const t = useTranslations();
   const router = useRouter();
   const { error, handleError, resetError } = useErrorHandler();
 
@@ -279,11 +278,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   });
 
 
-  // Image upload functionality
-  const imageUploadRef = useRef<any>(null);
-  const handleImageUploadClick = useCallback(() => {
-    imageUploadRef.current?.click();
-  }, [imageUploadRef]);
 
   const handleToggleAttendanceCertificatePossible = useCallback(() => {
     onSetAttendanceCertificatePossible(course, !course.attendanceCertificatePossible);
@@ -313,7 +307,6 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
       if (response.errors) {
         handleError(response.errors?.[0]?.message || t('operation_failed'));
-        return;
       }
     },
     [deleteInstructorAPI, course.id, handleError, t]
@@ -456,49 +449,11 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     [insertCourseFundingOrg, course, closeFundingOrgDialog, handleError, t]
   );
 
-  const [updateCourse] = useAdminMutation<UpdateCourseByPk, UpdateCourseByPkVariables>(UPDATE_COURSE_PROPERTY);
-
-  const [saveCourseImage] = useAdminMutation<SaveCourseImage, SaveCourseImageVariables>(SAVE_COURSE_IMAGE, {
-    onError: (error) => handleError(t(error.message)),
-    refetchQueries: ['AdminCourseList'],
-  });
-
-  const handleUploadCourseImageEvent = useCallback(
-    async (event: any) => {
-      const ufile = await parseFileUploadEvent(event);
-
-      if (ufile != null) {
-        const result = await saveCourseImage({
-          variables: {
-            base64File: ufile.data,
-            fileName: ufile.name,
-            courseId: course.id,
-          },
-        });
-
-        const uploadResult = result.data?.saveCourseImage;
-        if (uploadResult?.success) {
-          await updateCourse({
-            variables: {
-              id: course.id,
-              changes: {
-                coverImage: uploadResult.filePath,
-              },
-            },
-            refetchQueries: ['AdminCourseList'],
-          });
-        } else {
-          handleError(t(uploadResult?.messageKey || 'operation-failed'));
-        }
-      }
-    },
-    [course.id, saveCourseImage, updateCourse, handleError, t]
-  );
 
   const currentCourseGroups = course.CourseGroups.map((group) => ({
     id: group.CourseGroupOption.id,
     name: group.CourseGroupOption.title
-      ? t(`common:course_group_options.${group.CourseGroupOption.title}`)
+      ? t(`common.course_group_options.${group.CourseGroupOption.title}`)
       : '—',
   }));
 
@@ -507,11 +462,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
     name: t(degree.DegreeCourse.title),
   }));
 
-  const coverImage = useMemo(() => getPublicImageUrl(course?.coverImage, 460), [course?.coverImage]);
-
   const registrationTypeOptions = Object.values(CourseRegistrationType_enum).map((type) => ({
     value: type,
-    label: t(`manageCourses:registration_type.options.${type}`),
+    label: t(`manageCourses.registration_type.options.${type}`),
   }));
 
   return (
@@ -524,39 +477,61 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
               <DropDownSelector
                 variant="material"
-                label={t('manageCourses:registration_type.label')}
+                label={t('manageCourses.registration_type.label')}
                 value={course.registrationType || CourseRegistrationType_enum.APPROVAL_WITH_INPUT}
                 options={registrationTypeOptions}
                 updateValueMutation={UPDATE_COURSE_REGISTRATION_TYPE}
                 identifierVariables={{ itemId: course.id }}
                 refetchQueries={['AdminCourseList']}
-                helpText={t('manageCourses:registration_type.help_text')}
+                helpText={t('manageCourses.registration_type.help_text')}
               />
 
-              {/* External Registration Link - Always reserve space */}
-              <div className="min-h-[80px]">
-                {isExternalRegistration && (
-                  <InputField
-                    variant="material"
-                    type="link"
-                    label={t('manageCourses:external_registration_link.label')}
-                    placeholder={t('manageCourses:external_registration_link.label')}
-                    itemId={course.id}
-                    value={course.externalRegistrationLink || ''}
-                    updateValueMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
-                    refetchQueries={['AdminCourseList']}
-                    helpText={t('manageCourses:external_registration_link.help_text')}
-                  />
-                )}
-              </div>
+              {/* External Registration Link */}
+              {isExternalRegistration && (
+                <InputField
+                  variant="material"
+                  type="link"
+                  label={t('manageCourses.external_registration_link.label')}
+                  placeholder={t('manageCourses.external_registration_link.label')}
+                  itemId={course.id}
+                  value={course.externalRegistrationLink || ''}
+                  updateValueMutation={UPDATE_COURSE_EXTERNAL_REGISTRATION_LINK}
+                  refetchQueries={['AdminCourseList']}
+                  helpText={t('manageCourses.external_registration_link.help_text')}
+                />
+              )}
+
+              {/* Formbricks Survey Configuration - Show for courses that require input */}
+              {(course.registrationType === CourseRegistrationType_enum.APPROVAL_WITH_INPUT ||
+                course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT) && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="mb-4">
+                    <span>{t('manageCourse.formbricks.title')}</span>
+                    <br />
+                    <InputField
+                      variant="material"
+                      type="link"
+                      placeholder={course.Program?.defaultFormbricksEnrollmentSurveyUrl || t('manageCourse.formbricks.survey_url_helper')}
+                      itemId={course.id}
+                      value={course.formbricksEnrollmentSurveyUrl || ''}
+                      updateValueMutation={UPDATE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY}
+                      refetchQueries={['AdminCourseList']}
+                      helpText={t('manageCourse.formbricks.help_text_hidden_fields')}
+                      onValueUpdated={() => {
+                        // Refetch handled via refetchQueries prop
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* 2. Course Organization - Card Container */}
             <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
               <TagSelector
                 variant="material"
-                label={t('course-page:courseDegreeTitle')}
-                placeholder={t('course-page:courseDegree')}
+                label={t('manageCourses.course_degree_title.label')}
+                placeholder={t('manageCourses.course_degree_title.placeholder')}
                 itemId={course.id}
                 values={currentCourseDegrees}
                 options={degreeCourses}
@@ -567,8 +542,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
               <TagSelector
                 variant="material"
-                label={t('manageCourses:tile_slider_group.label')}
-                placeholder={t('manageCourses:tile_slider_group.placeholder')}
+                label={t('manageCourses.tile_slider_group.label')}
+                placeholder={t('manageCourses.tile_slider_group.placeholder')}
                 itemId={course.id}
                 values={currentCourseGroups}
                 options={courseGroupOptions}
@@ -580,43 +555,32 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
             {/* 3. Cover Image Upload - Card Container */}
             <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses:cover_image.label')}</h4>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-gray-400 transition-colors bg-gray-50">
-                <div className="flex flex-col items-center justify-center space-y-2">
-                  {coverImage ? (
-                    <div className="relative">
-                      <Image
-                        src={coverImage}
-                        alt="course cover"
-                        width={160}
-                        height={96}
-                        className="object-contain rounded bg-gray-100"
-                        style={{ width: '160px', height: '96px' }}
-                      />
-                      <button
-                        onClick={handleImageUploadClick}
-                        className="absolute inset-0 bg-black bg-opacity-50 text-white rounded flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
-                      >
-                        <MdUpload className="w-6 h-6" />
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={handleImageUploadClick}
-                      className="flex flex-col items-center space-y-2 text-gray-500 hover:text-gray-700"
-                    >
-                      <MdUpload className="w-8 h-8" />
-                      <span className="text-sm">{t('manageCourses:cover_image.upload_text')}</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-              <input
-                ref={imageUploadRef}
-                onChange={handleUploadCourseImageEvent}
-                className="hidden"
-                type="file"
-                accept="image/*"
+              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses.cover_image.label')}</h4>
+              <FileUploadField
+                variant="material"
+                currentFileUrl={course?.coverImage}
+                uploadMutation={SAVE_COURSE_IMAGE}
+                updateMutation={UPDATE_COURSE_PROPERTY}
+                identifierVariables={{ id: course.id }}
+                uploadIdentifierVariables={{ courseId: course.id }}
+                updateFieldName="coverImage"
+                useChangesObject={true}
+                acceptedFileTypes="image/*"
+                maxFileSize={5 * 1024 * 1024}
+                uploadText={t('manageCourses.cover_image.upload_text')}
+                altText={t('manageCourses.cover_image.alt')}
+                imageWidth={160}
+                imageHeight={96}
+                showFileName={true}
+                refetchQueries={['AdminCourseList']}
+                onUploadError={(error) => {
+                  // Normalize error key: lowercase and add file_upload namespace prefix
+                  const normalizedKey = error.toLowerCase().replaceAll('.', '_');
+                  const fileUploadKey = `file_upload.${normalizedKey}`;
+                  // Try file_upload namespace first, fall back to generic translation
+                  const translated = t(fileUploadKey) === fileUploadKey ? translateErrorMessage(error, t) : t(fileUploadKey);
+                  handleError(translated);
+                }}
               />
             </div>
 
@@ -625,18 +589,18 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               <InputField
                 variant="material"
                 type="link"
-                label={t('manageCourses:chat_link.label')}
-                placeholder={t('manageCourses:chat_link.label')}
+                label={t('manageCourses.chat_link.label')}
+                placeholder={t('manageCourses.chat_link.label')}
                 itemId={course.id}
                 value={course.chatLink || ''}
                 updateValueMutation={UPDATE_COURSE_CHAT_LINK}
                 refetchQueries={['AdminCourseList']}
-                helpText={t('manageCourses:chat_link.help_text')}
+                helpText={t('manageCourses.chat_link.help_text')}
               />
 
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-2">
-                  {t('manageCourses:email_templates.label', { fallback: 'Email Templates' })}
+                  {t('manageCourses.email_templates.label')}
                 </h4>
                 <button
                   onClick={handleManageEmailTemplates}
@@ -650,15 +614,13 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   <MdEmail className="w-5 h-5" />
                   <span>
                     {hasCustomTemplates
-                      ? t('manageCourses:email_templates.edit_button', { fallback: 'Edit Email Templates' })
-                      : t('manageCourses:email_templates.create_button', { fallback: 'Create Email Templates' })}
+                      ? t('manageCourses.email_templates.edit_button')
+                      : t('manageCourses.email_templates.create_button')}
                   </span>
                 </button>
                 {isExternalRegistration && (
                   <p className="text-sm text-gray-500 mt-1">
-                    {t('manageCourses:email_templates.external_registration_note', {
-                      fallback: 'Email templates are not available for external registration courses.',
-                    })}
+                    {t('manageCourses.email_templates.external_registration_note')}
                   </p>
                 )}
               </div>
@@ -669,7 +631,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
           <div className="space-y-4 w-full min-w-0">
             {/* 1. List of Instructors - Card Container */}
             <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses:instructors.label')}</h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses.instructors.label')}</h4>
               <div className="space-y-2">
                 {course.CourseInstructors.map((courseInstructor) => (
                   <Fragment key={courseInstructor.User.id}>
@@ -681,7 +643,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 p-2 w-full rounded hover:bg-blue-50 transition-colors"
                 >
                   <MdAddCircle className="w-5 h-5" />
-                  <span>{t('manageCourses:instructors.add')}</span>
+                  <span>{t('manageCourses.instructors.add')}</span>
                 </button>
               </div>
             </div>
@@ -690,8 +652,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
             <div className="bg-white border border-gray-200 rounded-lg p-4 w-full">
               <EntityListManager
                 variant="material"
-                label={t('manageCourses:funding_organizations.label')}
-                addButtonText={t('manageCourses:funding_organizations.add')}
+                label={t('manageCourses.funding_organizations.label')}
+                addButtonText={t('manageCourses.funding_organizations.add')}
                 itemId={course.id}
                 entities={course.CourseFundingOrganizations || []}
                 renderEntity={renderFundingOrganization}
@@ -699,7 +661,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                   <SelectOrganizationDialog
                     onClose={addFundingOrgHandler}
                     open={fundingOrgDialogOpen}
-                    title={t('manageCourses:funding_organizations.add')}
+                    title={t('manageCourses.funding_organizations.add')}
                   />
                 }
                 dialogOpen={fundingOrgDialogOpen}
@@ -719,40 +681,62 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
             {/* 3. Types of Available Certificates - Card Container */}
             <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('possible-certificates')}</h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-3">{t('manageCourses.possible_certificates.label')}</h4>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
-                  <div className="cursor-pointer" onClick={handleToggleAttendanceCertificatePossible}>
+                  <button
+                    type="button"
+                    className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                    onClick={handleToggleAttendanceCertificatePossible}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleToggleAttendanceCertificatePossible();
+                      }
+                    }}
+                    aria-label={t('manageCourses.possible_certificates.attendance_certificate')}
+                  >
                     {course.attendanceCertificatePossible ? (
                       <MdCheckBox className="w-6 h-6 text-blue-600" />
                     ) : (
                       <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-gray-400" />
                     )}
-                  </div>
-                  <span>{t('course-page:proof-of-participation')}</span>
+                  </button>
+                  <span>{t('manageCourses.possible_certificates.attendance_certificate')}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="cursor-pointer" onClick={handleToggleAchievementCertificatePossible}>
+                  <button
+                    type="button"
+                    className="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                    onClick={handleToggleAchievementCertificatePossible}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleToggleAchievementCertificatePossible();
+                      }
+                    }}
+                    aria-label={t('manageCourses.possible_certificates.achievement_certificate')}
+                  >
                     {course.achievementCertificatePossible ? (
                       <MdCheckBox className="w-6 h-6 text-blue-600" />
                     ) : (
                       <MdOutlineCheckBoxOutlineBlank className="w-6 h-6 text-gray-400" />
                     )}
-                  </div>
-                  <span>{t('course-page:performance-certificate')}</span>
+                  </button>
+                  <span>{t('manageCourses.possible_certificates.achievement_certificate')}</span>
                 </div>
                 {course.achievementCertificatePossible && (
                   <div className="ml-8 mt-2">
                     <InputField
                       variant="material"
                       type="ects"
-                      label={t('manageCourses:ects.label')}
-                      placeholder={t('manageCourses:ects.label')}
+                      label={t('manageCourses.ects.label')}
+                      placeholder={t('manageCourses.ects.label')}
                       itemId={course.id}
                       value={course.ects || ''}
                       updateValueMutation={UPDATE_COURSE_ECTS}
                       refetchQueries={['AdminCourseList']}
-                      helpText={t('manageCourses:ects.help_text')}
+                      helpText={t('manageCourses.ects.help_text')}
                     />
                   </div>
                 )}
@@ -765,13 +749,13 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
               <InputField
                 variant="material"
                 type="number"
-                label={t('manageCourses:max_missed_sessions.label')}
-                placeholder={t('manageCourses:max_missed_sessions.label')}
+                label={t('manageCourses.max_missed_sessions.label')}
+                placeholder={t('manageCourses.max_missed_sessions.label')}
                 itemId={course.id}
                 value={String(course.maxMissedSessions ?? 2)}
                 updateValueMutation={UPDATE_COURSE_MAX_MISSED_SESSION}
                 refetchQueries={['AdminCourseList']}
-                helpText={t('manageCourses:max_missed_sessions.help_text')}
+                helpText={t('manageCourses.max_missed_sessions.help_text')}
                 min={0}
               />
             </div>
@@ -785,9 +769,9 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                 updateValueMutation={UPDATE_COURSE_LEARNING_GOALS}
                 refetchQueries={['AdminCourseList']}
                 itemId={course.id}
-                label={t('manageCourses:learning_goals.label')}
-                placeholder={t('manageCourses:learning_goals.placeholder')}
-                helpText={t('manageCourses:learning_goals.help_text')}
+                label={t('manageCourses.learning_goals.label')}
+                placeholder={t('manageCourses.learning_goals.placeholder')}
+                helpText={t('manageCourses.learning_goals.help_text')}
                 maxLength={500}
                 className="h-32 !text-gray-700"
               />
@@ -801,7 +785,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
         <SelectUserDialog
           onClose={addInstructorHandler}
           open={instructorDialogOpen}
-          title={t('manageCourses:instructors.add')}
+          title={t('manageCourses.instructors.add')}
           onAddNewUser={handleAddNewUser}
           showAddNewUserOption={true}
         />

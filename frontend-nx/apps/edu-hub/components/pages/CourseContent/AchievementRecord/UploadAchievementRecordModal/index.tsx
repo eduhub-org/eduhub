@@ -25,7 +25,7 @@ import {
 import { AchievementRecordRating_enum } from '../../../../../__generated__/globalTypes';
 import EhTagStingId from '../../../../common/EhTagStingId';
 import { AtLeastNameEmail, MinAchievementOption } from '../../../../../helpers/achievement';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 import { Button } from '../../../../common/Button';
 import EnrolledUserForACourseDialog from '../../../../common/dialogs/EnrolledUserForACourseDialog';
@@ -101,7 +101,7 @@ const UploadAchievementRecordModal: FC<IProps> = ({
     authors: [user],
   };
 
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
   const reducer = (state: State = initialState, action: Type) => {
     return { ...state, [action.type]: action.value };
   };

@@ -1,4 +1,4 @@
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC } from 'react';
 
 import { CourseWithEnrollment_Course_by_pk } from '../../../queries/__generated__/CourseWithEnrollment';
@@ -21,7 +21,7 @@ const getBgColor = (status) => {
 };
 
 const AttendanceStatusLegend: FC = () => {
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
   return (
     <div className="flex flex-wrap gap-4 mt-4">
       <div className="flex items-center">
@@ -44,7 +44,7 @@ interface AttendanceEntryProps {
 const { NO_INFO, ATTENDED, MISSED } = AttendanceStatus_enum;
 
 const AttendanceEntry: FC<AttendanceEntryProps> = ({ session }) => {
-  const { lang } = useTranslation();
+  const locale = useLocale();
 
   const lastAttendanceRecord =
     session.Attendances.length > 0
@@ -69,7 +69,7 @@ const AttendanceEntry: FC<AttendanceEntryProps> = ({ session }) => {
       // className={`text-sm bg-gray-200 text-center px-4 py-3 rounded`}
       className={`text-sm ${fontWeight} text-center px-4 py-3 ${bgColor} rounded`}
     >
-      {session.startDateTime.toLocaleDateString(lang, {
+      {session.startDateTime.toLocaleDateString(locale, {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
@@ -83,7 +83,7 @@ interface AttendancesProps {
 }
 
 export const Attendances: FC<AttendancesProps> = ({ course }) => {
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
 
   return (
     <div className="flex flex-col w-full md:w-1/2 mb-4 md:mb-0">

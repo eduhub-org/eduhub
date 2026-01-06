@@ -7,7 +7,7 @@ import { HelpOutline } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { useDebouncedCallback } from 'use-debounce';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { DebounceInput } from 'react-debounce-input';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -197,9 +197,10 @@ const InputField: React.FC<InputFieldProps> = ({
   invertColors = false,
   min,
   max,
+  immediateUpdate, // Extract this prop to prevent it from being spread to DOM elements
   ...props
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslations('common');
   const [localText, setLocalText] = useState(value);
   const [hasBlurred, setHasBlurred] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');

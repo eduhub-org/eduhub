@@ -27,7 +27,7 @@ import {
   UserSelectionWithFilterVariables,
 } from '../../../../queries/__generated__/UserSelectionWithFilter';
 import EhMultipleTag from '../../../common/EhMultipleTag';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import DeleteButton from '../../../../components/common/DeleteButton';
 import SessionAddresses from './SessionAddresses';
 import { LocationOption_enum, order_by } from '../../../../__generated__/globalTypes';
@@ -65,7 +65,7 @@ export const SessionRow: FC<IProps> = ({
   onSetTitle,
   onDeleteSpeaker,
 }) => {
-  const { t } = useTranslation('course-page');
+  const t = useTranslations('coursePage');
   const isAdmin = useIsAdmin();
   const isInstructor = useIsInstructor();
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);

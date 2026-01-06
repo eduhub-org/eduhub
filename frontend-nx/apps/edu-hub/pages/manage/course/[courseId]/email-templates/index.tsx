@@ -5,7 +5,7 @@ import { Page } from '../../../../../components/layout/Page';
 import { useIsAdmin, useIsLoggedIn } from '../../../../../hooks/authentication';
 import { useRoleQuery } from '../../../../../hooks/authedQuery';
 import { useRoleMutation } from '../../../../../hooks/authedMutation';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import Loading from '../../../../../components/common/Loading';
 import { MANAGED_COURSE } from '../../../../../queries/course';
 import { ManagedCourse } from '../../../../../queries/__generated__/ManagedCourse';
@@ -26,7 +26,7 @@ const CourseEmailTemplates: FC = () => {
   const { courseId } = router.query;
   const isAdmin = useIsAdmin();
   const isLoggedIn = useIsLoggedIn();
-  const { t } = useTranslation('manageEmailTemplates');
+  const t = useTranslations('manageEmailTemplates');
 
   const courseIdNumber = courseId ? parseInt(courseId as string, 10) : null;
   const isValidCourseId = courseIdNumber !== null && Number.isInteger(courseIdNumber) && courseIdNumber > 0;

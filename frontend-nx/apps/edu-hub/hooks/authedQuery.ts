@@ -1,6 +1,6 @@
 import { useQuery, useLazyQuery } from '@apollo/client';
-import { useSession } from 'next-auth/react';
-import useTranslation from 'next-translate/useTranslation';
+import { useSession, signOut } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 
 import { useCurrentRole } from './authentication';
 import { useAuthError } from '../contexts/AuthErrorContext';
@@ -8,17 +8,21 @@ import { useAuthError } from '../contexts/AuthErrorContext';
 import { AuthRoles } from '../types/enums';
 
 const useErrorHandler = () => {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const { showAuthError } = useAuthError();
 
   return (error) => {
     console.log('error handler error: ', error);
     if (error.message.includes('JWTExpired') || error.message.includes('JWSInvalidSignature')) {
-      // Show error and automatically sign out after user acknowledges
-      showAuthError(t("authed_query.session_expired_or_invalid"), true);
+      // For expired sessions, redirect immediately to login without showing a blocking dialog
+      console.info('Session expired, redirecting to login...');
+      signOut({ 
+        callbackUrl: '/?sessionExpired=true',
+        redirect: true 
+      });
     } else {
-      // Show error without signing out
-      showAuthError(t("authed_query.authentication_error") + ": " + error.message, false);
+      // Show error dialog for other authentication errors (without signing out)
+      showAuthError(t("common.authed_query.authentication_error") + ": " + error.message, false);
     }
   };
 };

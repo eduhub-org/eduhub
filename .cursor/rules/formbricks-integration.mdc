@@ -1,0 +1,495 @@
+---
+title: Formbricks Integration
+description: Apply when implementing Formbricks surveys, embedding surveys in registration flows, displaying survey responses, or configuring enrollment questionnaires in EduHub
+tags: [formbricks, surveys, enrollment, questionnaires, registration]
+---
+
+# Formbricks Integration Guidelines
+
+## When to Apply This Rule
+
+Apply when:
+- Implementing or modifying Formbricks survey embeds
+- Adding enrollment questionnaires to courses or programs
+- Displaying survey responses in the Applications tab
+- Modifying registration flows that include surveys
+- Debugging Formbricks API integration
+- Configuring hidden fields or survey URLs
+
+## Core Principles
+
+### 1. Survey Type Requirements
+- **Always use Link Surveys** (not App or Website surveys)
+- Link surveys are embeddable via iframe
+- App/Website surveys won't work in the registration modal
+
+### 2. Hidden Fields
+- **Required fields:** `eduhubUserId`, `eduhubCourseId`
+- **Optional field:** `eduhubEnrollmentId` (not available during registration)
+- **Use `eduhub*` prefix** to avoid conflicts with Formbricks internal variables
+- Configure hidden fields in Formbricks survey settings before using
+
+### 3. Survey URL Resolution
+```typescript
+// Program default can be overridden by course-specific URL
+const effectiveSurveyUrl = 
+  course.formbricksEnrollmentSurveyUrl || 
+  course.Program?.defaultFormbricksEnrollmentSurveyUrl || 
+  null;
+```
+
+### 4. Auto-submission Pattern
+- Registration auto-submits when survey is completed
+- Listen for `formbricksSurveyCompleted` postMessage event
+- Hide submit button when using Formbricks (auto-submit only)
+- Maintain backward compatibility with motivation letter for courses without surveys
+
+## Component Usage
+
+### FormbricksSurveyEmbed
+
+**When to use:**
+- Embedding surveys in registration modals
+- Displaying surveys in any dialog or page
+- Need to track survey completion
+
+**Required props:**
+```typescript
+<FormbricksSurveyEmbed
+  surveyUrl={effectiveSurveyUrl}
+  userId={userId}
+  courseId={course.id}
+  enrollmentId={enrollmentId} // Optional, omit during registration
+  onComplete={handleCompletion}
+  onError={handleError}
+  className="h-full"
+/>
+```
+
+**Key features:**
+- Automatically appends hidden fields to URL
+- Validates postMessage origin for security
+- Shows loading spinner while survey loads
+- Error handling with user-friendly messages
+
+**Security considerations:**
+```typescript
+// ALWAYS validate message origin
+const handleMessage = (event: MessageEvent) => {
+  try {
+    const surveyOrigin = new URL(surveyUrl).origin;
+    if (event.origin !== surveyOrigin) return;
+  } catch {
+    // Fail-secure: reject if origin can't be verified
+    return;
+  }
+  // Process message...
+};
+```
+
+### FormbricksResponsesDisplay
+
+**When to use:**
+- Displaying survey responses in Applications tab
+- Showing enrollment questionnaire answers
+- Replacing motivation letter display
+
+**Required props:**
+```typescript
+<FormbricksResponsesDisplay
+  courseId={courseId}
+  userId={userId}
+  enrollmentId={enrollmentId}
+  formbricksEnrollmentSurveyUrl={effectiveSurveyUrl}
+/>
+```
+
+**Key features:**
+- Fetches responses via `getFormbricksResponses` GraphQL action
+- Shows loading/error/empty states
+- Displays question headlines and answers
+- Indicates incomplete responses with warning
+
+## GraphQL Integration
+
+### Query Pattern
+
+```typescript
+import { GET_FORMBRICKS_RESPONSES } from '../../../../queries/formbricks';
+
+const { data, loading, error } = useRoleQuery<
+  GetFormbricksResponses, 
+  GetFormbricksResponsesVariables
+>(GET_FORMBRICKS_RESPONSES, {
+  variables: { 
+    courseId, 
+    userId, 
+    enrollmentId, 
+    formbricksSurveyUrl: effectiveSurveyUrl 
+  },
+  fetchPolicy: 'cache-first',
+  skip: !effectiveSurveyUrl,
+});
+```
+
+**Important:**
+- Use `cache-first` for performance (responses don't change frequently)
+- Skip query if no survey URL configured
+- Handle all states: loading, error, success, empty
+
+### Response Structure
+
+```typescript
+{
+  getFormbricksResponses: {
+    success: boolean
+    error?: string
+    responses: [{
+      id: string
+      createdAt: string
+      finished: boolean
+      answers: [{
+        questionId: string
+        headline: string
+        answer: string
+      }]
+    }]
+    survey: {
+      id: string
+      name: string
+    }
+  }
+}
+```
+
+## Registration Modal Integration
+
+### Detection Pattern
+
+```typescript
+// Determine if Formbricks should be used
+const effectiveSurveyUrl = 
+  course.formbricksEnrollmentSurveyUrl || 
+  course.Program?.defaultFormbricksEnrollmentSurveyUrl || 
+  null;
+
+const hasFormbricksSurvey = !!effectiveSurveyUrl;
+const useFormbricks = hasFormbricksSurvey && config.requiresInput;
+```
+
+### Conditional Rendering
+
+```typescript
+{/* Show Formbricks survey OR traditional motivation letter */}
+{useFormbricks ? (
+  <div className="flex-1" style={{ minHeight: '500px' }}>
+    <FormbricksSurveyEmbed
+      surveyUrl={effectiveSurveyUrl}
+      userId={userId}
+      courseId={course.id}
+      onComplete={handleFormbricksComplete}
+      onError={setError}
+    />
+  </div>
+) : config.requiresInput ? (
+  <textarea
+    value={motivationLetter}
+    onChange={(e) => setMotivationLetter(e.target.value)}
+    // ... traditional input props
+  />
+) : null}
+
+{/* Hide submit button when using Formbricks */}
+{!useFormbricks && (
+  <DialogActions>
+    {/* Submit button */}
+  </DialogActions>
+)}
+```
+
+### Auto-submission Handler
+
+```typescript
+const handleFormbricksComplete = useCallback(() => {
+  setFormbricksSurveyCompleted(true);
+  
+  // Auto-submit registration with placeholder text
+  onSubmit({
+    motivationLetter: '[Formbricks Survey Completed]',
+    acceptTerms: true,
+  }).then((result) => {
+    if (result.success) {
+      closeModal();
+    } else {
+      setError(result.error || t('errors.registration_failed'));
+    }
+  });
+}, [onSubmit, closeModal, t]);
+```
+
+## Error Handling
+
+### User-Facing Errors
+
+```typescript
+// Embed errors
+if (hasError) {
+  return (
+    <div className="flex items-center justify-center h-64 bg-red-50 rounded-md">
+      <p className="text-red-600">{t('course.formbricks.embed_error')}</p>
+    </div>
+  );
+}
+
+// Response fetch errors
+if (error || !data?.getFormbricksResponses?.success) {
+  return (
+    <div className="text-sm text-red-500">
+      {t('manageCourse.formbricks.error_loading_responses')}
+    </div>
+  );
+}
+```
+
+### Backend Errors
+
+**Common errors and solutions:**
+
+1. **"You can't use this method with this API key"**
+   - API key lacks project/environment access
+   - Solution: Edit API key in Formbricks, add project access
+
+2. **"Invalid Formbricks survey URL format"**
+   - Survey URL malformed or incorrect
+   - Solution: Use Link Survey URL format
+
+3. **"Formbricks API key missing"**
+   - `FORMBRICKS_API_KEY` not set
+   - Solution: Add to `.env` file, restart containers
+
+## Translation Keys
+
+**Course namespace (`course`):**
+```json
+{
+  "formbricks": {
+    "embed_error": "Fehler beim Laden des Fragebogens",
+    "survey_title": "Bewerbungsfragebogen",
+    "survey_completed": "Fragebogen erfolgreich ausgefüllt"
+  },
+  "errors": {
+    "complete_survey_first": "Bitte fülle den Fragebogen zuerst aus"
+  }
+}
+```
+
+**Manage Course namespace (`manageCourse`):**
+```json
+{
+  "formbricks": {
+    "loading_responses": "Lade Antworten...",
+    "error_loading_responses": "Fehler beim Laden der Antworten",
+    "no_responses": "Keine Antworten vorhanden",
+    "questionnaire_responses": "Fragebogen-Antworten",
+    "incomplete_response": "Unvollständig ausgefüllt"
+  }
+}
+```
+
+**Always:**
+- Use German "Du" form
+- Add both German and English translations
+- Use descriptive keys with `formbricks.` prefix
+
+## Database Fields
+
+### Course Table
+
+```sql
+-- Optional: Course-specific survey (overrides program default)
+formbricksEnrollmentSurveyUrl TEXT
+```
+
+### Program Table
+
+```sql
+-- Optional: Default survey for all courses in program
+defaultFormbricksEnrollmentSurveyUrl TEXT
+```
+
+**GraphQL fragments:**
+- Add to `CourseFragment` for course queries
+- Add to `ProgramFragment` for program queries
+
+## Environment Configuration
+
+### Development (.env)
+
+```bash
+# Required for fetching responses
+FORMBRICKS_API_KEY=fbk_your_api_key_here
+```
+
+### Production (Terraform)
+
+```hcl
+formbricks_api_key = "fbk_your_api_key_here"
+```
+
+## Testing Checklist
+
+### Registration Flow
+- [ ] Survey loads in modal (not motivation letter)
+- [ ] Hidden fields passed correctly in iframe URL
+- [ ] Survey questions appear and are interactive
+- [ ] Survey completion triggers auto-submit
+- [ ] Registration modal closes on success
+- [ ] Enrollment created in database
+- [ ] Error states handled gracefully
+
+### Response Display
+- [ ] Responses load in Applications tab
+- [ ] Question headlines displayed correctly
+- [ ] Answers formatted properly
+- [ ] Survey name appears in header
+- [ ] Incomplete responses show warning
+- [ ] Empty state shown when no responses
+- [ ] Loading/error states work
+
+### Backward Compatibility
+- [ ] Courses without surveys show motivation letter
+- [ ] Traditional flow still works
+- [ ] Mixed courses (some with surveys, some without) work
+
+## Common Mistakes to Avoid
+
+❌ **DON'T:**
+- Use App or Website surveys (only Link Surveys work)
+- Forget to configure hidden fields in Formbricks
+- Hardcode survey URLs in components
+- Skip origin validation in postMessage handlers
+- Show submit button when using Formbricks (auto-submit only)
+- Pass enrollmentId during registration (it doesn't exist yet)
+- Use motivation letter and Formbricks simultaneously
+
+✅ **DO:**
+- Always use Link Surveys
+- Configure hidden fields: `eduhubUserId`, `eduhubCourseId`, `eduhubEnrollmentId`
+- Use program defaults for survey URLs when possible
+- Validate postMessage origin for security
+- Auto-submit on survey completion
+- Handle all states: loading, error, empty, success
+- Maintain backward compatibility with motivation letters
+- Use `cache-first` fetch policy for responses
+
+## Debugging Tips
+
+### Survey Not Loading
+1. Check browser console for iframe errors
+2. Verify survey URL is correct and published
+3. Confirm survey is a Link Survey
+4. Check network tab for failed requests
+
+### Responses Not Showing
+1. Check backend logs: `docker compose logs node_functions -f`
+2. Verify API key permissions in Formbricks
+3. Test API key: `curl -H "x-api-key: $KEY" https://app.formbricks.com/api/v1/management/me`
+4. Confirm hidden fields configured in survey
+
+### GraphQL Action Errors
+1. Reload metadata: `hasura metadata reload`
+2. Restart Hasura: `docker compose restart hasura`
+3. Check action files exist in `backend/metadata/`
+
+## Performance Considerations
+
+- **Cache responses:** Use `fetchPolicy: 'cache-first'` for queries
+- **Lazy load:** Skip queries when survey URL not configured
+- **Minimize re-renders:** Use `useCallback` for handlers
+- **Loading states:** Show spinners to indicate progress
+- **Error boundaries:** Wrap components in error boundaries
+
+## Security Best Practices
+
+1. **Validate origins:** Always check postMessage event.origin
+2. **Prefix hidden fields:** Use `eduhub*` to avoid conflicts
+3. **Secure API keys:** Store in environment variables, never commit
+4. **Minimal permissions:** Use read-only API keys when possible
+5. **Input validation:** Validate survey URLs on backend
+
+## Related Files
+
+- `components/common/FormbricksSurveyEmbed.tsx` - Survey embed component
+- `components/pages/ManageCourseContent/ApplicationsTab/FormbricksResponsesDisplay.tsx` - Response display
+- `components/pages/CourseContent/Registration/RegistrationModal.tsx` - Registration integration
+- `queries/formbricks.ts` - GraphQL queries
+- `functions/callNodeFunction/getFormbricksResponses/index.js` - Backend function
+- `backend/metadata/actions.graphql` - GraphQL action definition
+- `docs/FORMBRICKS_INTEGRATION.md` - Complete documentation
+
+## Example Implementation
+
+### Adding Survey to New Registration Type
+
+```typescript
+// 1. Check for survey configuration
+const effectiveSurveyUrl = 
+  course.formbricksEnrollmentSurveyUrl || 
+  course.Program?.defaultFormbricksEnrollmentSurveyUrl;
+
+const useFormbricks = !!effectiveSurveyUrl && requiresInput;
+
+// 2. Conditional rendering
+{useFormbricks ? (
+  <FormbricksSurveyEmbed
+    surveyUrl={effectiveSurveyUrl}
+    userId={userId}
+    courseId={course.id}
+    onComplete={handleFormbricksComplete}
+    onError={setError}
+  />
+) : (
+  <textarea /* traditional input */ />
+)}
+
+// 3. Auto-submit handler
+const handleFormbricksComplete = useCallback(() => {
+  onSubmit({
+    motivationLetter: '[Formbricks Survey Completed]',
+    acceptTerms: true,
+  });
+}, [onSubmit]);
+```
+
+### Displaying Responses in New View
+
+```typescript
+import { FormbricksResponsesDisplay } from 'path/to/component';
+
+// In your component
+const effectiveSurveyUrl = 
+  enrollment.Course.formbricksEnrollmentSurveyUrl ||
+  enrollment.Course.Program?.defaultFormbricksEnrollmentSurveyUrl;
+
+{effectiveSurveyUrl ? (
+  <FormbricksResponsesDisplay
+    courseId={enrollment.courseId}
+    userId={enrollment.userId}
+    enrollmentId={enrollment.id}
+    formbricksEnrollmentSurveyUrl={effectiveSurveyUrl}
+  />
+) : (
+  <div>{enrollment.motivationLetter}</div>
+)}
+```
+
+## Summary
+
+The Formbricks integration replaces traditional motivation letters with structured surveys, providing:
+- Better user experience with modern question types
+- Easier data collection and analysis for course managers
+- Program-wide defaults with course-level overrides
+- Seamless integration with existing registration flows
+- Comprehensive error handling and security measures
+
+Always prefer Formbricks surveys over plain text inputs when collecting structured enrollment data.

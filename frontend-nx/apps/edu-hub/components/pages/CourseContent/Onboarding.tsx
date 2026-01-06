@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 
 import { useAuthedMutation } from '../../../hooks/authedMutation';
@@ -43,7 +43,7 @@ interface OnboardingProps {
 }
 
 const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, setResetValues }) => {
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
   const userId = useUserId();
   const [showDeclineDialog, setShowDeclineDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -89,19 +89,19 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
   const getOrganizationLabel = (occupation) => {
     switch (occupation) {
       case 'HIGH_SCHOOL_STUDENT':
-        return t('profile:organization.label_school');
+        return t('profile.organization.label_school');
       case 'UNIVERSITY_STUDENT':
-        return t('profile:organization.label_university');
+        return t('profile.organization.label_university');
       case 'EMPLOYED_FULL_TIME':
       case 'EMPLOYED_PART_TIME':
       case 'SELF_EMPLOYED':
-        return t('profile:organization.label_company');
+        return t('profile.organization.label_company');
       case 'RESEARCHER':
-        return t('profile:organization.label_research');
+        return t('profile.organization.label_research');
       case 'EDUCATOR':
-        return t('profile:organization.label_education');
+        return t('profile.organization.label_education');
       default:
-        return t('profile:organization.label_base');
+        return t('profile.organization.label_base');
     }
   };
 
@@ -154,7 +154,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
         <div className="w-full lg:w-1/2 lg:pr-3">
           <DropDownSelector
             variant="eduhub"
-            label={t('profile:occupation.label')}
+            label={t('profile.occupation.label')}
             value={userData?.User_by_pk?.occupation || ''}
             options={occupationOptions}
             updateValueMutation={UPDATE_USER_OCCUPATION}
@@ -168,7 +168,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
             creatable={true}
             label={getOrganizationLabel(userData?.User_by_pk?.occupation)}
             value={userData?.User_by_pk?.Organization?.id?.toString() || ''}
-            placeholder={t('profile:organization.placeholder')}
+            placeholder={t('profile.organization.placeholder')}
             options={organizationOptions}
             updateValueMutation={UPDATE_USER_ORGANIZATION_ID}
             identifierVariables={{ userId }}
@@ -182,7 +182,7 @@ const Onboarding: FC<OnboardingProps> = ({ course, enrollmentId, refetchCourse, 
           <InputField
             variant="eduhub"
             type="number"
-            label={t('profile:matriculation_number')}
+            label={t('profile.matriculation_number')}
             itemId={userData?.User_by_pk?.id}
             value={userData?.User_by_pk?.matriculationNumber || ''}
             updateValueMutation={UPDATE_USER_MATRICULATION_NUMBER}

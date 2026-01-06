@@ -1,4 +1,4 @@
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { FC, useCallback, useState } from 'react';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';
@@ -18,6 +18,7 @@ import { ApplicationsTab } from './ApplicationsTab';
 import { CourseParticipationsTab } from './CourseParticipationsTab';
 import { DegreeParticipationsTab } from './DegreeParticipationsTab';
 import { useIsAdmin, useIsUserIdInList } from '../../../hooks/authentication';
+import { CourseRegistrationType_enum } from '../../../__generated__/globalTypes';
 
 interface Props {
   courseId: number;
@@ -54,6 +55,13 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
   }
 };
 
+const isDirectRegistration = (registrationType: CourseRegistrationType_enum | null): boolean => {
+  return (
+    registrationType === CourseRegistrationType_enum.DIRECT_CONFIRMATION ||
+    registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT
+  );
+};
+
 /**
  *
  *  Course status behavior:
@@ -69,7 +77,7 @@ const getNextCourseStatus = (course: ManagedCourse_Course_by_pk) => {
  * @returns {any} the component
  */
 export const ManageCourseContent: FC<Props> = ({ courseId }) => {
-  const { t } = useTranslation('manageCourse');
+  const t = useTranslations('manageCourse');
 
   const qResult = useRoleQuery<ManagedCourse, ManagedCourseVariables>(MANAGED_COURSE, {
     variables: {
@@ -150,7 +158,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
   );
 
   if (course == null) {
-    return <div>{t('course-page:course-not-found', { courseId: courseId })}</div>;
+    return <div>{t('course_not_found', { courseId: courseId })}</div>;
   }
 
   // If the user is neither an admin nor an instructor for this course return empty div
@@ -180,7 +188,7 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
 
             {course.externalRegistrationLink ? null : (
               <div className={`p-4 m-2 ${determineTabClasses(2, openTabIndex)}`} onClick={openTab2}>
-                {t('applications')}
+                {isDirectRegistration(course.registrationType) ? t('registrations') : t('applications')}
               </div>
             )}
 
@@ -205,14 +213,14 @@ export const ManageCourseContent: FC<Props> = ({ courseId }) => {
         </div>
       </PageBlock>
       <QuestionConfirmationDialog
-        question={t('course-page:confirmation-push-the-course-to-next-status')}
-        confirmationText={t('course-page:set-status-high')}
+        question={t('confirmation_push_course_to_next_status')}
+        confirmationText={t('set_status_high')}
         onClose={() => handleUpgradeStatus(false)}
         onConfirm={() => handleUpgradeStatus(true)}
         open={isConfirmUpgradeStatusOpen}
       />
       <AlertMessageDialog
-        alert={t('course-page:please-fill-in-all-fields-to-proceed-further')}
+        alert={t('please_fill_all_fields')}
         confirmationText={'OK'}
         onClose={handleCloseCantUpgrade}
         open={isCantUpgradeOpen}

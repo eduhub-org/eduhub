@@ -1,5 +1,5 @@
 import { Dialog, DialogTitle } from '@mui/material';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations } from 'next-intl';
 import { FC, useCallback } from 'react';
 import { MdClose } from 'react-icons/md';
 
@@ -14,14 +14,21 @@ interface AlertProps {
 
 export const AlertMessageDialog: FC<AlertProps> = ({ alert, confirmationText = 'OK', open, onClose }) => {
   const handleClose = useCallback(() => onClose(), [onClose]);
-  const { t } = useTranslation();
+  const t = useTranslations('common');
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>
         <div className="grid grid-cols-2">
           <div>{t('warning')}</div>
-          <div className="cursor-pointer flex justify-end">
-            <MdClose onClick={handleClose} />
+          <div className="flex justify-end">
+            <button
+              onClick={handleClose}
+              className="cursor-pointer"
+              aria-label={t('close')}
+              type="button"
+            >
+              <MdClose />
+            </button>
           </div>
         </div>
       </DialogTitle>

@@ -23,8 +23,8 @@ import { ManagedCourse_Course_by_pk } from '../../../../queries/__generated__/Ma
 import Locations from './Locations';
 import { Button } from '@mui/material';
 import { MdAddCircle } from 'react-icons/md';
-import useTranslation from 'next-translate/useTranslation';
-import DropdownSelector from '../../../inputs/DropDownSelector';
+import { useTranslations } from 'next-intl';
+import DropDownSelector from '../../../inputs/DropDownSelector';
 import TimePicker from '../../../inputs/TimePicker';
 import { LocationOption_enum } from '../../../../__generated__/globalTypes';
 import useErrorHandler from '../../../../hooks/useErrorHandler';
@@ -46,7 +46,6 @@ import {
   InsertSessionAddressVariables,
 } from '../../../../queries/__generated__/InsertSessionAddress';
 import InputField from '../../../inputs/InputField';
-import DropDownSelector from '../../../inputs/DropDownSelector';
 import checkmark from '../../../../public/images/course/checkmark.svg';
 
 interface IProps {
@@ -56,7 +55,7 @@ interface IProps {
 
 export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const { error, handleError, resetError } = useErrorHandler();
-  const { t } = useTranslation('course-page');
+  const t = useTranslations('manageCourse');
 
   const [insertCourseLocation] = useRoleMutation<InsertCourseLocation, InsertCourseLocationVariables>(
     INSERT_COURSE_LOCATION,
@@ -122,14 +121,14 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
   const [deleteCourseLocation] = useRoleMutation<DeleteCourseLocation, DeleteCourseLocationVariables>(
     DELETE_COURSE_LOCATION,
     {
-      onError: (error) => handleError(t(error.message)),
+      onError: (error) => handleError(error.message),
     }
   );
   const [DeleteSessionAddressesByCourseAndLocation] = useRoleMutation<
     DeleteSessionAddressesByCourseAndLocation,
     DeleteSessionAddressesByCourseAndLocationVariables
   >(DELETE_SESSION_ADDRESSES_BY_COURSE_AND_LOCATION, {
-    onError: (error) => handleError(t(error.message)),
+    onError: (error) => handleError(error.message),
   });
 
   const handleDeleteCourseLocation = async (location) => {
@@ -194,21 +193,27 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
                 {course.learningGoals
                   .split('\n')
                   .filter((goal) => goal.trim() !== '')
-                  .map((goal, index) => (
-                    <li key={index} className="pl-6 mb-6">
-                      <div className="flex">
-                        <img src={checkmark} alt="check mark" className="mr-2 inline-block" />
-                        <div className="ml-2">
-                          {goal.split('\n').map((line, i) => (
-                            <span key={i}>
-                              {line}
-                              <br />
-                            </span>
-                          ))}
+                  .map((goal) => {
+                    const goalKey = goal.trim().substring(0, 50).replace(/\s+/g, '-');
+                    return (
+                      <li key={goalKey} className="pl-6 mb-6">
+                        <div className="flex">
+                          <img src={checkmark} alt="check mark" className="mr-2 inline-block" />
+                          <div className="ml-2">
+                            {goal.split('\n').map((line) => {
+                              const lineKey = `${goalKey}-${line.trim().substring(0, 20).replace(/\s+/g, '-')}`;
+                              return (
+                                <span key={lineKey}>
+                                  {line}
+                                  <br />
+                                </span>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    </li>
-                  ))}
+                      </li>
+                    );
+                  })}
               </ul>
             ) : (
               <p className="text-gray-400 italic">{t('learning_goals.read_only_placeholder')}</p>
@@ -301,9 +306,9 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           <div />
         </div>
         <div className="grid grid-cols-2">
-          <DropdownSelector
+          <DropDownSelector
             variant="eduhub"
-            label={t('common:language')}
+            label={t('language')}
             options={languageOptions}
             value={course.language}
             updateValueMutation={UPDATE_COURSE_LANGUAGE}
@@ -314,15 +319,15 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
             <InputField
               variant="eduhub"
               type="number"
-              label={t('manageCourse:max_participants.label')}
+              label={t('max_participants.label')}
               value={course.maxParticipants?.toString() || '0'}
               itemId={course.id}
               updateValueMutation={UPDATE_COURSE_MAX_PARTICIPANTS}
               refetchQueries={['ManagedCourse']}
               min={0}
               onValueUpdated={() => qResult.refetch()}
-              placeholder={t('manageCourse:max_participants.placeholder')}
-              helpText={t('manageCourse:max_participants.help_text')}
+              placeholder={t('max_participants.placeholder')}
+              helpText={t('max_participants.help_text')}
             />
           </div>
         </div>
@@ -334,12 +339,12 @@ export const DescriptionTab: FC<IProps> = ({ course, qResult }) => {
           <div className="col-span-7">{t('address.label')}</div>
         </div>
         {courseLocations.map((loc) => (
-          <Locations key={loc.id} location={loc} onDelete={handleDeleteCourseLocation} refetchQuery={qResult} />
+          <Locations key={loc.id} location={loc} onDelete={handleDeleteCourseLocation} />
         ))}
       </div>
       <div className="flex justify-start text-white">
         <Button onClick={handleInsertCourseLocation} startIcon={<MdAddCircle />} color="inherit">
-          {t('course-page:add-new-location')}
+          {t('add_new_location')}
         </Button>
       </div>
       {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}

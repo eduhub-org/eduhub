@@ -1,11 +1,13 @@
 import { FC, useState, useCallback } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { MdClose } from 'react-icons/md';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations } from 'next-intl';
 
 import { CourseRegistrationType_enum } from '../../../../__generated__/globalTypes';
 import { Course_Course_by_pk } from '../../../../queries/__generated__/Course';
 import { Button } from '../../../common/Button';
+import { FormbricksSurveyEmbed } from '../../../common/FormbricksSurveyEmbed';
+import { useUserId } from '../../../../hooks/user';
 import { getRegistrationTypeConfig, RegistrationFormData, RegistrationResult } from './types';
 
 /**
@@ -64,15 +66,48 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
   onSubmit,
   isLoading,
 }) => {
-  const { t } = useTranslation('course');
+  const t = useTranslations('course');
+  const userId = useUserId();
   const [motivationLetter, setMotivationLetter] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [formbricksSurveyCompleted, setFormbricksSurveyCompleted] = useState(false);
 
   const config = getRegistrationTypeConfig(registrationType);
+  
+  // Get effective Formbricks survey URL (course-level overrides program default)
+  const effectiveSurveyUrl = course.formbricksEnrollmentSurveyUrl || course.Program?.defaultFormbricksEnrollmentSurveyUrl || null;
+  const hasFormbricksSurvey = !!effectiveSurveyUrl;
+  const useFormbricks = hasFormbricksSurvey && config.requiresInput;
+
+  const handleFormbricksComplete = useCallback(() => {
+    // Guard against duplicate submissions
+    if (isLoading || formbricksSurveyCompleted) {
+      return;
+    }
+    
+    setFormbricksSurveyCompleted(true);
+    // Auto-submit the form after survey completion
+    onSubmit({
+      motivationLetter: '[Formbricks Survey Completed]',
+      acceptTerms: true,
+    }).then((result) => {
+      if (result.success) {
+        closeModal();
+      } else {
+        setError(result.error || t('errors.registration_failed'));
+      }
+    });
+  }, [onSubmit, closeModal, t, isLoading, formbricksSurveyCompleted]);
 
   const handleSubmit = useCallback(async () => {
-    if (config.requiresInput && !motivationLetter.trim()) {
+    // If using Formbricks and survey not completed, don't allow submit
+    if (useFormbricks && !formbricksSurveyCompleted) {
+      setError(t('errors.complete_survey_first'));
+      return;
+    }
+    
+    if (!useFormbricks && config.requiresInput && !motivationLetter.trim()) {
       setError(t('errors.motivation_letter_required'));
       return;
     }
@@ -95,7 +130,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     } else {
       setError(result.error || t('errors.registration_failed'));
     }
-  }, [config, motivationLetter, acceptTerms, onSubmit, t, closeModal]);
+  }, [config, motivationLetter, acceptTerms, onSubmit, t, closeModal, useFormbricks, formbricksSurveyCompleted]);
 
   const handleClose = useCallback(() => {
     if (!isLoading) {
@@ -104,6 +139,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
       setError(null);
       setMotivationLetter('');
       setAcceptTerms(false);
+      setFormbricksSurveyCompleted(false);
     }
   }, [isLoading, closeModal]);
 
@@ -117,19 +153,20 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
     return t('modal.title_approval');
   };
 
-  const isSubmitDisabled =
-    isLoading || (config.requiresInput && !motivationLetter.trim()) || (config.requiresPayment && !acceptTerms);
+  const isSubmitDisabled = useFormbricks 
+    ? isLoading || !formbricksSurveyCompleted
+    : isLoading || (config.requiresInput && !motivationLetter.trim()) || (config.requiresPayment && !acceptTerms);
 
   return (
     <Dialog
       open={visible}
       onClose={handleClose}
-      maxWidth="md"
+      maxWidth={useFormbricks ? 'lg' : 'md'}
       fullWidth
       PaperProps={{
         sx: {
           borderRadius: { xs: 0, sm: 2 },
-          minHeight: '480px',
+          minHeight: useFormbricks ? '80vh' : '480px',
           maxHeight: '90vh',
           margin: { xs: 0, sm: 2 },
           '@media (max-width: 600px)': {
@@ -156,12 +193,32 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
         </div>
       </DialogTitle>
 
-      <DialogContent sx={{ padding: { xs: '0 16px', sm: '0 24px' } }}>
+      <DialogContent sx={{ padding: { xs: '0 16px', sm: '0 24px' }, flex: 1, display: 'flex', flexDirection: 'column' }}>
         <div className="mb-4">
           <p className="text-gray-600 font-medium text-sm sm:text-base">{course.title}</p>
         </div>
 
-        {config.requiresInput && (
+        {/* Formbricks Survey Embed */}
+        {useFormbricks && userId && effectiveSurveyUrl && (
+          <div className="flex-1 mb-4" style={{ minHeight: '500px' }}>
+            <FormbricksSurveyEmbed
+              surveyUrl={effectiveSurveyUrl}
+              userId={userId}
+              courseId={course.id}
+              onComplete={handleFormbricksComplete}
+              onError={setError}
+              className="h-full"
+            />
+            {formbricksSurveyCompleted && (
+              <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
+                <p className="text-sm text-green-700">{t('formbricks.survey_completed')}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Traditional Motivation Letter Input */}
+        {!useFormbricks && config.requiresInput && (
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">{t('modal.motivation_letter_label')}</label>
             <textarea
@@ -200,6 +257,8 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
         )}
       </DialogContent>
 
+      {/* Hide submit button when using Formbricks - auto-submit on completion */}
+      {!useFormbricks && (
       <DialogActions sx={{ padding: { xs: '16px', sm: '24px' }, paddingTop: 0 }}>
         <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 w-full">
           <Button onClick={handleClose} disabled={isLoading} className="px-6 py-3 w-full sm:w-auto order-2 sm:order-1">
@@ -224,6 +283,7 @@ export const RegistrationModal: FC<RegistrationModalProps> = ({
           </Button>
         </div>
       </DialogActions>
+      )}
     </Dialog>
   );
 };

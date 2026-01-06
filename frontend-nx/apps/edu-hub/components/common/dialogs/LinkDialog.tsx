@@ -3,7 +3,7 @@ import { Dialog, DialogTitle } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import { Button } from '../Button';
 import InputField from '../../inputs/InputField';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface LinkDialogProps {
   open: boolean;
@@ -22,7 +22,7 @@ export const LinkDialog: React.FC<LinkDialogProps> = ({
   initialUrl = '',
   hasExistingLink = false,
 }) => {
-  const { t } = useTranslation('common');
+  const t = useTranslations('common');
   const [url, setUrl] = useState(initialUrl);
 
   // Reset URL when dialog opens/closes

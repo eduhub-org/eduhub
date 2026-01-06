@@ -606,3 +606,20 @@ export const UPDATE_COURSE_REGISTRATION_TYPE = gql`
     }
   }
 `;
+
+export const UPDATE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY = gql`
+  mutation UpdateCourseFormbricksEnrollmentSurvey(
+    $itemId: Int!
+    $text: String!
+  ) {
+    update_Course_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { 
+        formbricksEnrollmentSurveyUrl: $text
+      }
+    ) {
+      id
+      formbricksEnrollmentSurveyUrl
+    }
+  }
+`;

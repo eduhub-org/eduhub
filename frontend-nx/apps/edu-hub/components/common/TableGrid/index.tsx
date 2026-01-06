@@ -1,7 +1,7 @@
 import { BaseRow, TableGridProps } from './types';
 import React, { useState, useMemo, useCallback } from 'react';
 import { TextField, Checkbox, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent, ListSubheader, Divider } from '@mui/material';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations } from 'next-intl';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
 import { MdArrowBack, MdArrowForward } from 'react-icons/md';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
@@ -69,7 +69,7 @@ const TableGrid = <T extends BaseRow,>({
     console.warn('TableGrid: onPageSizeChange prop is required when enablePagination is true');
   }
 
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
   
@@ -268,13 +268,13 @@ const TableGrid = <T extends BaseRow,>({
           {showCheckbox && (
             <FormControl variant="outlined" size="small" sx={{ minWidth: 200 }}>
               <InputLabel id="bulk-action-label" sx={{ color: 'white' }}>
-                {t('common:table_grid.bulk_action')}
+                {t('common.table_grid.bulk_action')}
               </InputLabel>
               <Select
                 labelId="bulk-action-label"
                 value={bulkAction}
                 onChange={handleSelectChange}
-                label={t('common:table_grid.bulk_action')}
+                label={t('common.table_grid.bulk_action')}
                 sx={{
                   color: 'white',
                   '& .MuiOutlinedInput-notchedOutline': {
@@ -292,7 +292,7 @@ const TableGrid = <T extends BaseRow,>({
                 }}
               >
                 <MenuItem value="">
-                  <em>{t('common:table_grid.none')}</em>
+                  <em>{t('common.table_grid.none')}</em>
                 </MenuItem>
                 {bulkActions.reduce((acc, action, index) => {
                   // Add group header if this is the first item in a group
@@ -322,7 +322,7 @@ const TableGrid = <T extends BaseRow,>({
           <TextField
             value={searchFilter}
             onChange={(e) => onGlobalFilterChange(e.target.value)}
-            label={t('common:search')}
+            label={t('common.search')}
             variant="outlined"
             size="small"
             sx={{
@@ -361,30 +361,30 @@ const TableGrid = <T extends BaseRow,>({
               {headerGroup.headers.map((header) => (
                 <div
                   key={header.id}
-                  className={`${header.column.columnDef.meta?.className} relative flex items-center h-12`}
+                  className={`${header.column.columnDef.meta?.className || ''} relative flex items-center h-12 ${header.column.getCanSort() ? 'cursor-pointer' : ''}`}
                   style={{
                     width: `${header.getSize()}px`,
                     flexShrink: 0,
                   }}
                   onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
                 >
-                  <div className="flex items-center w-full h-full">
-                    {header.column.columnDef.header === '' ? null : (
-                      <div className="flex items-center">
+                  {header.column.columnDef.header === '' ? null : (
+                    <div className="flex items-center w-full">
+                      <span className="flex-1 min-w-0">
                         {header.column.id === 'selection'
                           ? flexRender(header.column.columnDef.header, header.getContext())
                           : typeof header.column.columnDef.header === 'string'
                             ? header.column.columnDef.header
                             : flexRender(header.column.columnDef.header, header.getContext())}
-                        {header.column.getCanSort() && (
-                          <div className="flex flex-col items-center ml-1">
-                            <ArrowDropUp style={{ opacity: header.column.getIsSorted() === 'asc' ? 1 : 0.5 }} />
-                            <ArrowDropDown style={{ opacity: header.column.getIsSorted() === 'desc' ? 1 : 0.5 }} />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                      </span>
+                      {header.column.getCanSort() && (
+                        <div className="flex flex-col items-center ml-1 flex-shrink-0">
+                          <ArrowDropUp style={{ opacity: header.column.getIsSorted() === 'asc' ? 1 : 0.5, marginBottom: '-8px' }} />
+                          <ArrowDropDown style={{ opacity: header.column.getIsSorted() === 'desc' ? 1 : 0.5, marginTop: '-8px' }} />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </React.Fragment>
@@ -397,74 +397,104 @@ const TableGrid = <T extends BaseRow,>({
       {/* Data Rows */}
       {!loading &&
         !error &&
-        // When server-side sorting is enabled, pagination is also server-side
-        // Don't slice - data is already paginated by the server
-        // When server-side sorting is NOT enabled but pagination is enabled,
-        // we slice for client-side pagination (backward compatibility)
-        (enablePagination && !isServerSideSorting
-          ? table.getRowModel().rows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize)
-          : table.getRowModel().rows
-        ).map((row) => (
-          <React.Fragment key={row.id}>
-            {/* Primary Row */}
-            <div className={`flex items-stretch ${expandedRows.has(row.original.id) ? 'mb-0' : 'mb-1'}`}>
-              <div className="flex-grow bg-edu-light-gray py-2">
-                <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
-                  {row.getVisibleCells().map((cell) => (
-                    <div
-                      key={cell.id}
-                      className={`${cell.column.columnDef.meta?.className}`}
-                      style={{
-                        width: `${cell.column.getSize()}px`,
-                        flexShrink: 0,
-                      }}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {/* Add expand/collapse button here */}
-              {expandableRowComponent && (
-                <div className="w-10 flex-shrink-0 flex items-stretch bg-gray-300">
-                  <button
-                    onClick={() => toggleRowExpansion(row.original.id)}
-                    className="w-full flex items-center justify-center hover:bg-gray-400 transition-colors duration-200"
-                  >
-                    {expandedRows.has(row.original.id) ? <IoIosArrowUp size={20} /> : <IoIosArrowDown size={20} />}
-                  </button>
-                </div>
-              )}
-              {deleteMutation && (
-                <div className="w-20 flex-shrink-0 flex items-center justify-center">
-                  <TableGridDeleteButton
-                    deleteMutation={deleteMutation}
-                    id={row.original.id}
-                    idType={deleteIdType}
-                    deletionConfirmationQuestion={
-                      generateDeletionConfirmationQuestion
-                        ? generateDeletionConfirmationQuestion(row.original)
-                        : undefined
-                    }
-                    refetchQueries={refetchQueries}
-                  />
-                </div>
-              )}
-            </div>
-            {/* Expandable Row */}
-            {expandableRowComponent && expandedRows.has(row.original.id) && (
+        (() => {
+          // When server-side sorting is enabled, pagination is also server-side
+          // Don't slice - data is already paginated by the server
+          // When server-side sorting is NOT enabled but pagination is enabled,
+          // we slice for client-side pagination (backward compatibility)
+          const rowsToDisplay = enablePagination && !isServerSideSorting
+            ? table.getRowModel().rows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize)
+            : table.getRowModel().rows;
+
+          // If there are no rows, render an empty row
+          if (rowsToDisplay.length === 0) {
+            return (
               <div className="flex items-stretch mb-1">
-                <div className="flex-grow bg-edu-light-gray py-2 overflow-x-auto">
+                <div className="flex-grow bg-edu-light-gray py-2">
                   <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
-                    <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
+                    {table.getHeaderGroups()[0]?.headers.map((header) => (
+                      <div
+                        key={header.id}
+                        className={`${header.column.columnDef.meta?.className}`}
+                        style={{
+                          width: `${header.getSize()}px`,
+                          flexShrink: 0,
+                        }}
+                      >
+                        <span className="text-gray-400">-</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                {expandableRowComponent && <div className="w-10 flex-shrink-0"></div>}
+                {expandableRowComponent && <div className="w-10 flex-shrink-0 bg-gray-300"></div>}
                 {deleteMutation && <div className="w-20 flex-shrink-0"></div>}
               </div>
-            )}
-          </React.Fragment>
-        ))}
+            );
+          }
+
+          // Otherwise, render the actual data rows
+          return rowsToDisplay.map((row) => (
+            <React.Fragment key={row.id}>
+              {/* Primary Row */}
+              <div className={`flex items-stretch ${expandedRows.has(row.original.id) ? 'mb-0' : 'mb-1'}`}>
+                <div className="flex-grow bg-edu-light-gray py-2">
+                  <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
+                    {row.getVisibleCells().map((cell) => (
+                      <div
+                        key={cell.id}
+                        className={`${cell.column.columnDef.meta?.className}`}
+                        style={{
+                          width: `${cell.column.getSize()}px`,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Add expand/collapse button here */}
+                {expandableRowComponent && (
+                  <div className="w-10 flex-shrink-0 flex items-stretch bg-gray-300">
+                    <button
+                      onClick={() => toggleRowExpansion(row.original.id)}
+                      className="w-full flex items-center justify-center hover:bg-gray-400 transition-colors duration-200"
+                    >
+                      {expandedRows.has(row.original.id) ? <IoIosArrowUp size={20} /> : <IoIosArrowDown size={20} />}
+                    </button>
+                  </div>
+                )}
+                {deleteMutation && (
+                  <div className="w-20 flex-shrink-0 flex items-center justify-center">
+                    <TableGridDeleteButton
+                      deleteMutation={deleteMutation}
+                      id={row.original.id}
+                      idType={deleteIdType}
+                      deletionConfirmationQuestion={
+                        generateDeletionConfirmationQuestion
+                          ? generateDeletionConfirmationQuestion(row.original)
+                          : undefined
+                      }
+                      refetchQueries={refetchQueries}
+                    />
+                  </div>
+                )}
+              </div>
+              {/* Expandable Row */}
+              {expandableRowComponent && expandedRows.has(row.original.id) && (
+                <div className="flex items-stretch mb-1">
+                  <div className="flex-grow bg-edu-light-gray py-2 overflow-x-auto">
+                    <div className={`flex items-center gap-3 ${!showCheckbox ? 'pl-3' : ''}`} style={{ minWidth: `${mainRowContentWidth - (expandableRowComponent ? 40 : 0) - (deleteMutation ? 80 : 0)}px` }}>
+                      <ExpandableRowComponent key={`expandableRow-${row.id}`} row={row.original} />
+                    </div>
+                  </div>
+                  {expandableRowComponent && <div className="w-10 flex-shrink-0"></div>}
+                  {deleteMutation && <div className="w-20 flex-shrink-0"></div>}
+                </div>
+              )}
+            </React.Fragment>
+          ));
+        })()}
         </div>
       </div>
 
@@ -475,13 +505,13 @@ const TableGrid = <T extends BaseRow,>({
             {onPageSizeChange && (
               <FormControl sx={{ m: 1, minWidth: 130 }} size="small">
                 <InputLabel id="page-size-select-label" sx={{ color: 'white' }}>
-                  {t('common:table_grid.items_per_page')}
+                  {t('common.table_grid.items_per_page')}
                 </InputLabel>
                 <Select
                   labelId="page-size-select-label"
                   id="page-size-select"
                   value={pageSize}
-                  label={t('common:table_grid.items_per_page')}
+                  label={t('common.table_grid.items_per_page')}
                   onChange={(e) => onPageSizeChange(Number(e.target.value))}
                   sx={{
                     color: 'white',
@@ -515,7 +545,7 @@ const TableGrid = <T extends BaseRow,>({
               />
             )}
             <p className="font-medium">
-              {t('common:table_grid.pagination_text', { currentPage: pageIndex + 1, totalPage: totalPages })}
+              {t('common.table_grid.pagination_text', { currentPage: pageIndex + 1, totalPage: totalPages })}
             </p>
             {pageIndex < totalPages - 1 && (
               <MdArrowForward

@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { GetApp } from '@mui/icons-material';
 import { Button } from '../common/Button';
 import { useSignedUrl } from '../../hooks/signedUrl';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 
 interface IProps {
@@ -13,7 +13,7 @@ interface IProps {
 }
 
 const FileDownload: FC<IProps> = ({ filePath, className, label, type = 'icon' }) => {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const { getSignedUrl, loading, error } = useSignedUrl(filePath);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
@@ -53,7 +53,7 @@ const FileDownload: FC<IProps> = ({ filePath, className, label, type = 'icon' })
     <>
       {type === 'button' ? (
         <Button onClick={handleDownload} disabled={loading} className={className} inverted>
-          <GetApp /> {label ? label : t('common:download')}
+          <GetApp /> {label ? label : t('common.download')}
         </Button>
       ) : (
         <button onClick={handleDownload} disabled={loading} className={className}>
@@ -65,7 +65,7 @@ const FileDownload: FC<IProps> = ({ filePath, className, label, type = 'icon' })
         <ErrorMessageDialog
           open={isErrorDialogOpen}
           onClose={handleCloseErrorDialog}
-          errorMessage={error?.message || t('common:error_occurred')}
+          errorMessage={error?.message || t('common.error_occurred')}
         />
       )}
     </>

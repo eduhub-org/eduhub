@@ -208,6 +208,20 @@ export const UPDATE_ClOSING_QUESTIONAIRE = gql`
   }
 `;
 
+export const UPDATE_DEFAULT_ENROLLMENT_SURVEY = gql`
+  mutation UpdateProgramDefaultEnrollmentSurvey(
+    $itemId: Int!
+    $text: String!
+  ) {
+    update_Program_by_pk(
+      pk_columns: { id: $itemId }
+      _set: { defaultFormbricksEnrollmentSurveyUrl: $text }
+    ) {
+      id
+    }
+  }
+`;
+
 export const UPDATE_PROGRAM_ACHIEVEMENT_CERT_VISIBLE = gql`
   mutation UpdateProgramAchievementCertVisible(
     $programId: Int!

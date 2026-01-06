@@ -3,8 +3,6 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { withNx } = require('@nx/next/plugins/with-nx');
 
-const nextTranslate = require('next-translate-plugin');
-
 const path = require('path');
 
 /**
@@ -89,16 +87,19 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: true,
   },
+  i18n: {
+    locales: ['en', 'de'],
+    defaultLocale: 'de',
+  },
   output: 'standalone',
   images: {
     formats: ['image/avif', 'image/webp'],
     // @ts-expect-error - TypeScript has trouble inferring literal types when pushing to arrays in JS files
     remotePatterns: buildRemotePatterns(),
   },
-  experimental: {
-    // https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
-    outputFileTracingRoot: path.join(__dirname, '../../'),
-  },
+  // https://nextjs.org/docs/advanced-features/output-file-tracing#caveats
+  // Moved from experimental in Next.js 15
+  outputFileTracingRoot: path.join(__dirname, '../../'),
   async headers() {
     return [
       {
@@ -129,4 +130,4 @@ const nextConfig = {
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-module.exports = withNx(nextTranslate(nextConfig));
+module.exports = withNx(nextConfig);

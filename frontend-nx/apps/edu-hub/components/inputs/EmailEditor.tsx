@@ -18,7 +18,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
 import Link from '@tiptap/extension-link';
 import DOMPurify from 'dompurify';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRoleMutation } from '../../hooks/authedMutation';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';
 import { LinkDialog } from '../common/dialogs/LinkDialog';
@@ -59,7 +59,7 @@ const EmailEditor: React.FC<EmailEditorProps> = ({
   className = '',
   templateType,
 }) => {
-  const { t } = useTranslation();
+  const t = useTranslations('common');
   const [isHtmlMode, setIsHtmlMode] = useState(false);
   const [showSavedNotification, setShowSavedNotification] = useState(false);
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);

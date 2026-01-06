@@ -3,7 +3,7 @@ import { Dialog, DialogTitle, Checkbox, FormControlLabel } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import { Button } from '../Button';
 import InputField from '../../inputs/InputField';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { CREATE_USER } from '../../../queries/user';
 import NotificationSnackbar from './NotificationSnackbar';
@@ -36,7 +36,8 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
   initialLastName = '',
   initialEmail = '',
 }) => {
-  const { t } = useTranslation('manageUsers');
+  const t = useTranslations('manageUsers');
+  const tCommon = useTranslations('common');
   const [firstName, setFirstName] = useState(initialFirstName);
   const [lastName, setLastName] = useState(initialLastName);
   const [email, setEmail] = useState(initialEmail);
@@ -176,7 +177,7 @@ export const CreateUserDialog: React.FC<CreateUserDialogProps> = ({
             <button
               onClick={handleClose}
               className="p-1 rounded-full hover:bg-gray-200 transition-colors"
-              aria-label={t('common:close')}
+              aria-label={tCommon('close')}
               disabled={loading}
             >
               <MdClose className="text-xl" />

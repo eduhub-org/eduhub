@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations } from 'next-intl';
 import { GetApp } from '@mui/icons-material';
 import { TileBase } from './TileSlider/TileBase';
 import { useRoleQuery } from '../../hooks/authedQuery';
@@ -17,8 +17,7 @@ interface CertificateTileProps {
 }
 
 export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
-  const { t } = useTranslation('certificates');
-  const { t: tCommon } = useTranslation('common');
+  const t = useTranslations('certificates');
   const [linkedInDialogOpen, setLinkedInDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -72,7 +71,7 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
       : enrollment.attendanceCertificateURL;
 
     if (!certificatePath) {
-      setErrorMessage(t('errorMessages:certificate_not_found', {}, { fallback: 'Certificate not found' }));
+      setErrorMessage(t('errorMessages.certificate_not_found'));
       setLinkedInDialogOpen(false);
       return;
     }
@@ -87,11 +86,11 @@ export const CertificateTile: FC<CertificateTileProps> = ({ enrollment }) => {
         const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(publicUrl)}`;
         window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
       } else {
-        setErrorMessage(result?.data?.makeCertificatePublic?.error || t('errorMessages:linkedin_share_error', {}, { fallback: 'Failed to share certificate on LinkedIn' }));
+        setErrorMessage(result?.data?.makeCertificatePublic?.error || t('errorMessages.linkedin_share_error'));
       }
     } catch (error: any) {
       console.error('LinkedIn share error:', error);
-      setErrorMessage(error?.message || t('errorMessages:linkedin_share_error', {}, { fallback: 'Failed to share certificate on LinkedIn' }));
+      setErrorMessage(error?.message || t('errorMessages.linkedin_share_error'));
     } finally {
       setLinkedInDialogOpen(false);
     }

@@ -11,6 +11,7 @@ import sendEnrollmentEmail from "./sendEnrollmentEmail/index.js";
 import sendSessionReminders from "./sendSessionReminders/index.js";
 import makeCertificatePublic from "./makeCertificatePublic/index.js";
 import createUser from "./createUser/index.js";
+import getFormbricksResponses from "./getFormbricksResponses/index.js";
 
 /**
  * Creates a logger instance with structured logging.
@@ -42,7 +43,8 @@ const functionMap = {
   sendEnrollmentEmail,
   sendSessionReminders,
   makeCertificatePublic,
-  createUser
+  createUser,
+  getFormbricksResponses
 };
 
 /**

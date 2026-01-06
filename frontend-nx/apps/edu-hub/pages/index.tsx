@@ -1,14 +1,16 @@
 import Head from 'next/head';
-import { FC, Fragment, useMemo } from 'react';
+import { FC, Fragment, useMemo, useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 import { useQuery } from '@apollo/client';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { ClientOnly } from '@opencampus/shared-components';
 
 import { Page } from '../components/layout/Page';
 import Loading from '../components/common/Loading';
 import TileSlider from '../components/common/TileSlider';
 import FaqSection from '../components/common/FaqSection';
+import NotificationSnackbar from '../components/common/dialogs/NotificationSnackbar';
 
 import { useAuthedQuery, useInstructorQuery } from '../hooks/authedQuery';
 import { useIsLoggedIn, useIsInstructor, useIsAdmin } from '../hooks/authentication';
@@ -24,11 +26,33 @@ import { CoursesEnrolledByUser } from '../queries/__generated__/CoursesEnrolledB
 import { AppSettings } from '../queries/__generated__/AppSettings';
 
 const Home: FC = () => {
-  const { t, lang } = useTranslation('start-page');
+  const t = useTranslations('startPage');
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
+  const router = useRouter();
   const isLoggedIn = useIsLoggedIn();
   const isInstructor = useIsInstructor();
   const isAdmin = useIsAdmin();
   const userId = useUserId();
+  
+  const [showSessionExpiredNotification, setShowSessionExpiredNotification] = useState(false);
+
+  // Check for session expired query parameter and show notification
+  useEffect(() => {
+    if (router.query.sessionExpired === 'true') {
+      setShowSessionExpiredNotification(true);
+      // Remove the query parameter from URL without reloading
+      const { sessionExpired, ...restQuery } = router.query;
+      router.replace(
+        {
+          pathname: router.pathname,
+          query: restQuery,
+        },
+        undefined,
+        { shallow: true }
+      );
+    }
+  }, [router]);
 
   const { data: adminCoursesData, loading: adminCoursesLoading } = useInstructorQuery<CoursesByInstructor>(
     COURSES_BY_INSTRUCTOR,
@@ -88,7 +112,7 @@ const Home: FC = () => {
           group.courses.length > 0 && (
             <Fragment key={`${groupKey}-${index}`}>
               <h2 id={`sliderGroup${index + 1}`} className="text-2xl font-semibold text-left ml-3 md:ml-0">
-                {group.title ? t(`common:course_group_options.${group.title}`) : '—'}
+                {group.title ? tCommon(`course_group_options.${group.title}`) : '—'}
               </h2>
               <div className="mt-2 mb-12">
                 <TileSlider courses={group.courses} isManage={group.isManaged ?? false} />
@@ -123,7 +147,7 @@ const Home: FC = () => {
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content="EduHub Learning Platform - Tech, Business and Creative Courses" />
-        <meta property="og:locale" content={lang === 'de' ? 'de_DE' : 'en_US'} />
+        <meta property="og:locale" content={locale === 'de' ? 'de_DE' : 'en_US'} />
         
         {/* Twitter Card Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
@@ -210,6 +234,14 @@ const Home: FC = () => {
           </div>
         )}
       </Page>
+
+      {/* Session Expired Notification */}
+      <NotificationSnackbar
+        open={showSessionExpiredNotification}
+        onClose={() => setShowSessionExpiredNotification(false)}
+        message={tCommon('session_expired_notification')}
+        duration={5000}
+      />
     </>
   );
 };

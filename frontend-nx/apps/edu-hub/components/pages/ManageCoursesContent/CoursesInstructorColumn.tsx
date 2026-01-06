@@ -26,7 +26,7 @@ import { useLazyRoleQuery } from '../../../hooks/authedQuery';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { order_by } from '../../../__generated__/globalTypes';
 
 interface IPropsInstructorColumn {
@@ -240,7 +240,7 @@ export const InstructorColumn: FC<IPropsInstructorColumn> = ({ course, refetchCo
     () => parseSearchValue(searchValueForNewUser),
     [parseSearchValue, searchValueForNewUser]
   );
-  const { t } = useTranslation('course-page');
+  const t = useTranslations('coursePage');
   const makeFullName = (firstName: string, lastName: string): string => {
     return `${firstName} ${lastName}`;
   };

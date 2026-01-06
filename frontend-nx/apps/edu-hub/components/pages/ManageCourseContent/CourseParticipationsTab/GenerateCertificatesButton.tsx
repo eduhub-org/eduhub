@@ -1,5 +1,5 @@
 import { useRoleMutation } from '../../../../hooks/authedMutation';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations } from 'next-intl';
 import { Button } from '../../../common/Button';
 import { CREATE_CERTIFICATES } from '../../../../queries/actions';
 import {
@@ -7,8 +7,7 @@ import {
   ManagedCourse_Course_by_pk_CourseEnrollments,
 } from '../../../../queries/__generated__/ManagedCourse';
 import { ApolloQueryResult } from '@apollo/client';
-import { Dispatch, SetStateAction, useState } from 'react';
-import { useEffect } from 'react';
+import { Dispatch, SetStateAction, useState, useEffect } from 'react';
 
 interface Props {
   userEnrollments: ManagedCourse_Course_by_pk_CourseEnrollments[];
@@ -35,7 +34,7 @@ export const GenerateCertificatesButton: React.FC<Props> = ({
     });
   }, [userEnrollments, course, certificateType]);
 
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -88,10 +87,14 @@ export const GenerateCertificatesButton: React.FC<Props> = ({
       const certCount = result.count;
       console.log('Certificates Generated:', certCount);
 
-      const successTranslationKey =
-        certCount <= 1
-          ? `course-page:${certCount === 0 ? 'no-' : '1-'}certificate-generated`
-          : 'course-page:certificates-generated';
+      let successTranslationKey: string;
+      if (certCount <= 1) {
+        successTranslationKey = certCount === 0
+          ? 'coursePage.no-certificate-generated'
+          : 'coursePage.1-certificate-generated';
+      } else {
+        successTranslationKey = 'coursePage.certificates-generated';
+      }
 
       const translatedMessage = t(successTranslationKey, { number: certCount });
       console.log('Success Message:', translatedMessage);
@@ -112,7 +115,7 @@ export const GenerateCertificatesButton: React.FC<Props> = ({
     }
   };
 
-  const buttonLabel = loading || error ? 'Loading...' : t(`course-page:${certificateType}-certificate-generation`);
+  const buttonLabel = loading || error ? 'Loading...' : t(`coursePage.${certificateType}-certificate-generation`);
 
   return (
     <div className="flex justify-end mt-10">

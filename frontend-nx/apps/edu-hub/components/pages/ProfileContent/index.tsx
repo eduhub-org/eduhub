@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/router';
 
 import { Button } from '../../common/Button';
@@ -30,7 +30,7 @@ import { UserOccupation } from '../../../queries/__generated__/UserOccupation';
 import { CREATE_ORGANIZATION, ORGANIZATION_LIST } from '../../../queries/organization';
 
 const ProfileContent: FC = () => {
-  const { t } = useTranslation('profile');
+  const t = useTranslations('profile');
   const { locale } = useRouter();
   const { data: sessionData, status: sessionStatus } = useSession();
   const [showError, setShowError] = useState(true);

@@ -4,8 +4,9 @@ import '@testing-library/jest-dom';
 import { Sessions } from '../Sessions';
 
 // Mock the hooks and dependencies
-jest.mock('next-translate/useTranslation', () => () => ({
-  t: (key: string) => key,
+jest.mock('next-intl', () => ({
+  useTranslations: () => (key: string) => key,
+  useLocale: () => 'de',
 }));
 
 jest.mock('../../../../helpers/dateTimeHelpers', () => ({

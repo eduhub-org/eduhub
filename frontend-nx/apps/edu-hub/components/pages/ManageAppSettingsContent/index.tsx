@@ -1,7 +1,7 @@
 import { FC, useMemo } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 import { Button } from '../../common/Button';
@@ -39,7 +39,8 @@ type Inputs = {
 
 const ManageAppSettingsContent: FC = () => {
   const { data: sessionData } = useSession();
-  const { t } = useTranslation('manageAppSettings');
+  const t = useTranslations('manageAppSettings');
+  const tCommon = useTranslations('common');
 
   const timeZoneOptions = [
     { value: 'Europe/Berlin', label: t('time_zone.values.Europe/Berlin') },
@@ -250,7 +251,7 @@ const ManageAppSettingsContent: FC = () => {
                             className="p-4 border border-gray-300 rounded mb-2 bg-white flex justify-between items-center"
                           >
                             <h2 className="text-xl font-semibold">
-                              {option.title ? t(`common:course_group_options.${option.title}`) : '—'}
+                              {option.title ? tCommon(`course_group_options.${option.title}`) : '—'}
                             </h2>
                             <span className="text-gray-500">{index + 1}</span>
                           </div>

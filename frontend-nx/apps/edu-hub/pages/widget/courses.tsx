@@ -1,7 +1,7 @@
 import { FC, useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useQuery } from '@apollo/client';
-import useTranslation from 'next-translate/useTranslation';
+import { useTranslations, useLocale } from 'next-intl';
 import Head from 'next/head';
 import { ClientOnly } from '@opencampus/shared-components';
 
@@ -16,8 +16,8 @@ type CourseTilesByOrganization = CourseTiles;
 
 const WidgetCourses: FC = () => {
   const router = useRouter();
-  const { group, lang, apiKey } = router.query;
-  const { t } = useTranslation('common');
+  const { group, locale, apiKey } = router.query;
+  const t = useTranslations('common');
 
   const [organizationId, setOrganizationId] = useState<number | null>(null);
   const [apiKeyValidating, setApiKeyValidating] = useState(false);
@@ -26,10 +26,10 @@ const WidgetCourses: FC = () => {
   // Set language if provided (only on client side)
   useEffect(() => {
     if (!router.isReady) return;
-    if (lang && (lang === 'de' || lang === 'en') && router.locale !== lang) {
-      router.push(router.pathname, router.asPath, { locale: lang as string, shallow: true });
+    if (locale && (locale === 'de' || locale === 'en') && router.locale !== locale) {
+      router.push(router.pathname, router.asPath, { locale: locale as string, shallow: true });
     }
-  }, [lang, router]);
+  }, [locale, router]);
 
   // Validate API key if provided (only on client side)
   useEffect(() => {
