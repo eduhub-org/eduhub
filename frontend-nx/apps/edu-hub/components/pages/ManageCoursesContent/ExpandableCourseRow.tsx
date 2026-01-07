@@ -49,7 +49,12 @@ import {
   UPDATE_COURSE_REGISTRATION_TYPE,
   UPDATE_COURSE_LEARNING_GOALS,
   UPDATE_COURSE_FORMBRICKS_ENROLLMENT_SURVEY,
+  UPDATE_COURSE_BASE_PRICE,
+  UPDATE_COURSE_CURRENCY,
 } from '../../../queries/course';
+import { VALIDATE_FORMBRICKS_SURVEY, SAVE_ADDON_MAPPINGS } from '../../../queries/stripe';
+import { AddonValidationDialog } from './AddonValidationDialog';
+import { Button } from '../../common/Button';
 import { UPDATE_COURSE_PROPERTY } from '../../../queries/mutateCourse';
 import useErrorHandler from '../../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
@@ -100,6 +105,74 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   );
 
   const isExternalRegistration = course.registrationType === CourseRegistrationType_enum.EXTERNAL_REGISTRATION;
+  
+  // Check if course requires payment
+  const requiresPayment = course.registrationType === 'DIRECT_WITH_INPUT_AND_PAYMENT' ||
+    course.registrationType === 'DIRECT_CONFIRMATION_AND_PAYMENT';
+
+  // Payment and add-on validation state
+  const [isValidationDialogOpen, setIsValidationDialogOpen] = useState(false);
+  const [addonQuestions, setAddonQuestions] = useState<any[]>([]);
+  const [isValidatingSurvey, setIsValidatingSurvey] = useState(false);
+  const [isSavingMappings, setIsSavingMappings] = useState(false);
+
+  const [validateSurvey] = useAdminMutation(VALIDATE_FORMBRICKS_SURVEY);
+  const [saveAddonMappings] = useAdminMutation(SAVE_ADDON_MAPPINGS);
+
+  // Handle survey validation
+  const handleValidateSurvey = useCallback(async () => {
+    const surveyUrl = course.formbricksEnrollmentSurveyUrl || course.Program?.defaultFormbricksEnrollmentSurveyUrl;
+    if (!surveyUrl) {
+      handleError(t('manageCourse.formbricks.no_survey_url'));
+      return;
+    }
+
+    setIsValidatingSurvey(true);
+    try {
+      const result = await validateSurvey({
+        variables: {
+          surveyUrl,
+          courseId: course.id,
+        },
+      });
+
+      if (result.data?.validateFormbricksSurvey?.success) {
+        setAddonQuestions(result.data.validateFormbricksSurvey.addonQuestions || []);
+        setIsValidationDialogOpen(true);
+      } else {
+        handleError(result.data?.validateFormbricksSurvey?.error || 'Validation failed');
+      }
+    } catch (err: any) {
+      handleError(err?.message || 'Validation failed');
+    } finally {
+      setIsValidatingSurvey(false);
+    }
+  }, [course, validateSurvey, handleError, t]);
+
+  // Handle saving add-on mappings
+  const handleSaveAddonMappings = useCallback(async (mappings: any[]) => {
+    setIsSavingMappings(true);
+    try {
+      const result = await saveAddonMappings({
+        variables: {
+          courseId: course.id,
+          mappings,
+        },
+        refetchQueries: ['AdminCourseList'],
+      });
+
+      if (result.data?.saveAddonMappings?.success) {
+        setIsValidationDialogOpen(false);
+        // Show success message or handle as needed
+      } else {
+        handleError(result.data?.saveAddonMappings?.error || 'Failed to save mappings');
+      }
+    } catch (err: any) {
+      handleError(err?.message || 'Failed to save mappings');
+    } finally {
+      setIsSavingMappings(false);
+    }
+  }, [course.id, saveAddonMappings, handleError]);
 
   // Determine available template types based on registration type
   const getAvailableTemplates = useCallback((): string[] => {
@@ -503,7 +576,8 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
               {/* Formbricks Survey Configuration - Show for courses that require input */}
               {(course.registrationType === CourseRegistrationType_enum.APPROVAL_WITH_INPUT ||
-                course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT) && (
+                course.registrationType === CourseRegistrationType_enum.DIRECT_WITH_INPUT ||
+                course.registrationType === 'DIRECT_WITH_INPUT_AND_PAYMENT') && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="mb-4">
                     <span>{t('manageCourse.formbricks.title')}</span>
@@ -521,6 +595,61 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
                         // Refetch handled via refetchQueries prop
                       }}
                     />
+                  </div>
+                </div>
+              )}
+
+              {/* Payment Configuration - Show for courses that require payment */}
+              {requiresPayment && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="space-y-4">
+                    <div>
+                      <span className="font-medium">{t('manageCourse.pricing.title')}</span>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <InputField
+                        variant="material"
+                        type="number"
+                        label={t('manageCourse.pricing.base_price')}
+                        placeholder="0"
+                        itemId={course.id}
+                        value={(course as any).basePrice?.toString() || '0'}
+                        updateValueMutation={UPDATE_COURSE_BASE_PRICE}
+                        refetchQueries={['AdminCourseList']}
+                        helpText={t('manageCourse.pricing.base_price_help')}
+                        min={0}
+                      />
+
+                      <DropDownSelector
+                        variant="material"
+                        label={t('manageCourse.pricing.currency')}
+                        value={(course as any).currency || 'EUR'}
+                        options={[
+                          { value: 'EUR', label: 'EUR (€)' },
+                          { value: 'USD', label: 'USD ($)' },
+                          { value: 'GBP', label: 'GBP (£)' },
+                        ]}
+                        updateValueMutation={UPDATE_COURSE_CURRENCY}
+                        identifierVariables={{ itemId: course.id }}
+                        refetchQueries={['AdminCourseList']}
+                      />
+                    </div>
+
+                    {/* Survey Validation - Show if survey URL exists */}
+                    {(course.formbricksEnrollmentSurveyUrl || course.Program?.defaultFormbricksEnrollmentSurveyUrl) && (
+                      <div className="mt-4">
+                        <Button
+                          onClick={handleValidateSurvey}
+                          disabled={isValidatingSurvey}
+                        >
+                          {isValidatingSurvey ? t('manageCourse.pricing.validating') : t('manageCourse.pricing.validate_addons')}
+                        </Button>
+                        <p className="text-sm text-gray-600 mt-2">
+                          {t('manageCourse.pricing.validate_help')}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -809,6 +938,15 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
 
       {/* Error Message Dialog */}
       {error && <ErrorMessageDialog errorMessage={error} open={!!error} onClose={resetError} />}
+      
+      <AddonValidationDialog
+        open={isValidationDialogOpen}
+        onClose={() => setIsValidationDialogOpen(false)}
+        onSave={handleSaveAddonMappings}
+        addonQuestions={addonQuestions}
+        courseId={course.id}
+        isLoading={isSavingMappings}
+      />
     </div>
   );
 };

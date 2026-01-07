@@ -43,6 +43,11 @@ select_permissions:
         - updated_at
         - invitationExpirationDate
         - location
+        - stripeCheckoutSessionId
+        - stripePaymentIntentId
+        - paymentStatus
+        - paymentAmount
+        - paymentCurrency
       filter: {}
   - role: user_access
     permission:
@@ -56,6 +61,11 @@ select_permissions:
         - status
         - userId
         - location
+        - stripeCheckoutSessionId
+        - stripePaymentIntentId
+        - paymentStatus
+        - paymentAmount
+        - paymentCurrency
       filter:
         _and:
           - userId:

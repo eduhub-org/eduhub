@@ -400,6 +400,20 @@
       "payment_info": "Dieser Kurs kostet {cost}. Du wirst nach der Registrierung zur Zahlungsseite weitergeleitet.",
       "accept_terms": "Ich akzeptiere die Allgemeinen Geschäftsbedingungen und die Datenschutzerklärung",
       "cancel": "Abbrechen",
+      "payment": {
+        "verifying": "Zahlung wird überprüft...",
+        "verifying_description": "Bitte warte einen Moment, während wir deine Zahlung bestätigen.",
+        "success_title": "Zahlung erfolgreich!",
+        "success_description": "Deine Zahlung wurde erfolgreich verarbeitet. Du wurdest für den Kurs angemeldet.",
+        "cancelled_title": "Zahlung abgebrochen",
+        "cancelled_description": "Die Zahlung wurde abgebrochen. Du kannst es später erneut versuchen.",
+        "error_verifying": "Fehler bei der Überprüfung",
+        "back_to_course": "Zurück zum Kurs",
+        "view_course": "Kurs ansehen",
+        "my_courses": "Meine Kurse",
+        "try_again": "Erneut versuchen",
+        "back_to_home": "Zurück zur Startseite"
+      },
       "close": "Schließen",
       "submit": "Bewerbung absenden",
       "proceed_to_payment": "Zur Zahlung",
@@ -849,7 +863,9 @@
         "APPROVAL_WITH_INPUT": "Zulassung mit Fragebogen und Bewerbungsprozess",
         "DIRECT_CONFIRMATION": "Direkte Zulassung ohne Fragebogen",
         "DIRECT_WITH_INPUT": "Direkte Zulassung mit Fragebogen",
-        "EXTERNAL_REGISTRATION": "Externe Anmeldung"
+        "EXTERNAL_REGISTRATION": "Externe Anmeldung",
+        "DIRECT_CONFIRMATION_AND_PAYMENT": "Direkte Zulassung mit Zahlung",
+        "DIRECT_WITH_INPUT_AND_PAYMENT": "Direkte Zulassung mit Fragebogen und Zahlung"
       }
     },
     "external_registration_link": {
@@ -1016,11 +1032,21 @@
       "remove_survey": "Fragebogen entfernen",
       "invalid_url": "Bitte gib eine gültige Formbricks Survey URL ein",
       "help_text_hidden_fields": "Wichtig: Du musst Hidden Fields in deinem Formbricks Survey konfigurieren!\n\nErforderliche Hidden Fields:\n• eduhubUserId - Wird automatisch mit der EduHub Benutzer-ID befüllt\n• eduhubCourseId - Wird automatisch mit der Kurs-ID befüllt\n• eduhubEnrollmentId - Wird automatisch mit der Anmeldungs-ID befüllt (optional)\n\nIn Formbricks: Survey bearbeiten → Hidden Fields aktivieren → Diese Feld-IDs hinzufügen. Ohne diese Konfiguration können Antworten nicht korrekt zugeordnet werden.\n\nHinweis: eduhubEnrollmentId ist optional, da die Anmeldung erst nach Abschluss des Fragebogens erstellt wird.",
+      "no_survey_url": "Keine Fragebogen-URL konfiguriert",
       "loading_responses": "Lade Antworten...",
       "error_loading_responses": "Fehler beim Laden der Fragebogen-Antworten",
       "no_responses": "Keine Fragebogen-Antworten vorhanden",
       "questionnaire_responses": "Fragebogen-Antworten",
       "incomplete_response": "Fragebogen nicht vollständig ausgefüllt"
+    },
+    "pricing": {
+      "title": "Preiseinstellungen",
+      "base_price": "Grundpreis (in Cent)",
+      "base_price_help": "Der Grundpreis für den Kurs in der kleinsten Währungseinheit (z.B. Cent für EUR)",
+      "currency": "Währung",
+      "validate_addons": "Add-Ons validieren",
+      "validating": "Validiere...",
+      "validate_help": "Analysiere den Fragebogen und extrahiere Add-On-Preise zur Validierung"
     },
     "common": {
       "edit": "Bearbeiten",

@@ -334,6 +334,20 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       version    = "latest"
     }
 
+    secret_environment_variables {
+      key        = "STRIPE_SECRET_KEY"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.stripe_secret_key.secret_id
+      version    = "latest"
+    }
+
+    secret_environment_variables {
+      key        = "STRIPE_WEBHOOK_SECRET"
+      project_id = var.project_id
+      secret     = google_secret_manager_secret.stripe_webhook_secret.secret_id
+      version    = "latest"
+    }
+
     max_instance_count    = 20
     available_memory      = "512M"
     timeout_seconds       = 60

@@ -273,3 +273,21 @@ variable "formbricks_api_key" {
   type        = string
   sensitive   = true
 }
+
+# Stripe Integration
+variable "stripe_secret_key" {
+  description = "Stripe secret API key for payment processing"
+  type        = string
+  sensitive   = true
+}
+
+variable "stripe_webhook_secret" {
+  description = "Stripe webhook signing secret for verifying webhook events"
+  type        = string
+  sensitive   = true
+}
+
+variable "stripe_publishable_key" {
+  description = "Stripe publishable API key (safe for frontend)"
+  type        = string
+}

@@ -276,6 +276,42 @@ actions:
           value_from_env: HASURA_BUCKET
         - name: name
           value: setUserAdmin
+  - name: validateFormbricksSurvey
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: validateFormbricksSurvey
+    permissions:
+      - role: instructor_access
+    comment: Validates a Formbricks survey and extracts add-on questions with pricing information
+  - name: saveAddonMappings
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: createStripeAddonPrices
+    permissions:
+      - role: instructor_access
+    comment: Saves validated add-on mappings and creates Stripe Products/Prices
+  - name: createStripeCheckout
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: createStripeCheckout
+    permissions:
+      - role: user_access
+    comment: Creates a Stripe Checkout Session for course enrollment with add-ons
 custom_types:
   enums: []
   input_objects: []
@@ -313,4 +349,14 @@ custom_types:
     - name: FormbricksResponse
     - name: FormbricksAnswer
     - name: FormbricksSurvey
+    - name: ValidateFormbricksSurveyResult
+    - name: AddonQuestion
+    - name: AddonWarning
+    - name: DetectedPrice
+    - name: SaveAddonMappingsResult
+    - name: StripePriceCreationResult
+    - name: StripePriceResult
+    - name: StripePriceSummary
+    - name: CreateStripeCheckoutResult
+    - name: CourseAddonMapping
   scalars: []

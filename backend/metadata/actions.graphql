@@ -141,6 +141,34 @@ type Mutation {
   ): UpdateAdminStatusResult!
 }
 
+type Mutation {
+  validateFormbricksSurvey(
+    surveyUrl: String!
+    courseId: Int!
+  ): ValidateFormbricksSurveyResult!
+}
+
+type Mutation {
+  saveAddonMappings(
+    courseId: Int!
+    mappings: [AddonMappingInput!]!
+  ): SaveAddonMappingsResult!
+}
+
+type Mutation {
+  createStripeCheckout(
+    courseId: Int!
+    enrollmentId: Int!
+    formbricksResponseId: String
+    successUrl: String!
+    cancelUrl: String!
+    userEmail: String
+    course: CourseInput
+    addonMappings: [AddonMappingInput!]
+    selectedAddons: [SelectedAddonInput!]
+  ): CreateStripeCheckoutResult!
+}
+
 type CreateUserResult {
   success: Boolean!
   userId: uuid
@@ -353,5 +381,121 @@ type FormbricksAnswer {
 type FormbricksSurvey {
   id: String!
   name: String!
+}
+
+type ValidateFormbricksSurveyResult {
+  success: Boolean!
+  surveyId: String
+  surveyTitle: String
+  addonQuestions: [AddonQuestion!]
+  requiresReview: Boolean
+  error: String
+  messageKey: String
+}
+
+type AddonQuestion {
+  questionId: String!
+  questionType: String!
+  questionText: String
+  extractedPrice: Int!
+  extractedCurrency: String!
+  confidence: String!
+  warnings: [AddonWarning!]
+  allDetectedPrices: [DetectedPrice!]
+  description: String!
+}
+
+type AddonWarning {
+  type: String!
+  message: String!
+  severity: String!
+}
+
+type DetectedPrice {
+  language: String!
+  priceInCents: Int!
+  currency: String!
+  originalText: String!
+}
+
+input AddonMappingInput {
+  questionId: String!
+  questionTextDe: String
+  questionTextEn: String
+  extractedPrice: Int!
+  validatedPrice: Int!
+  currency: String!
+  description: String!
+  stripeProductId: String
+  stripePriceId: String
+  confidence: String!
+}
+
+type SaveAddonMappingsResult {
+  success: Boolean!
+  messageKey: String!
+  error: String
+  stripeResults: StripePriceCreationResult
+}
+
+type StripePriceCreationResult {
+  success: Boolean!
+  results: [StripePriceResult!]!
+  summary: StripePriceSummary!
+}
+
+type StripePriceResult {
+  questionId: String!
+  stripeProductId: String
+  stripePriceId: String
+  success: Boolean!
+  error: String
+}
+
+type StripePriceSummary {
+  total: Int!
+  success: Int!
+  failures: Int!
+}
+
+type CreateStripeCheckoutResult {
+  success: Boolean!
+  checkoutUrl: String
+  sessionId: String
+  error: String
+  messageKey: String
+}
+
+type CourseAddonMapping {
+  id: Int!
+  courseId: Int!
+  questionId: String!
+  questionTextDe: String
+  questionTextEn: String
+  extractedPrice: Int!
+  validatedPrice: Int!
+  currency: String!
+  description: String!
+  stripeProductId: String
+  stripePriceId: String
+  confidence: String!
+  validatedAt: timestamptz
+  validatedBy: uuid
+  created_at: timestamptz!
+  updated_at: timestamptz!
+}
+
+input CourseInput {
+  id: Int!
+  title: String!
+  basePrice: Int
+  currency: String
+  stripeProductId: String
+  stripePriceId: String
+}
+
+input SelectedAddonInput {
+  questionId: String!
+  selected: Boolean!
 }
 

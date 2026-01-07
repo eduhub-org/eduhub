@@ -12,6 +12,10 @@ import sendSessionReminders from "./sendSessionReminders/index.js";
 import makeCertificatePublic from "./makeCertificatePublic/index.js";
 import createUser from "./createUser/index.js";
 import getFormbricksResponses from "./getFormbricksResponses/index.js";
+import validateFormbricksSurvey from "./validateFormbricksSurvey/index.js";
+import createStripeAddonPrices from "./createStripeAddonPrices/index.js";
+import createStripeCheckout from "./createStripeCheckout/index.js";
+import handleStripeWebhook from "./handleStripeWebhook/index.js";
 
 /**
  * Creates a logger instance with structured logging.
@@ -44,7 +48,11 @@ const functionMap = {
   sendSessionReminders,
   makeCertificatePublic,
   createUser,
-  getFormbricksResponses
+  getFormbricksResponses,
+  validateFormbricksSurvey,
+  createStripeAddonPrices,
+  createStripeCheckout,
+  handleStripeWebhook
 };
 
 /**

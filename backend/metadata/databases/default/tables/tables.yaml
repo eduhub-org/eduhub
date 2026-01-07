@@ -15,6 +15,7 @@
 - "!include public_CertificateType.yaml"
 - "!include public_Country.yaml"
 - "!include public_Course.yaml"
+- "!include public_CourseAddonMapping.yaml"
 - "!include public_CourseDegree.yaml"
 - "!include public_CourseEnrollment.yaml"
 - "!include public_CourseEnrollmentStatus.yaml"
