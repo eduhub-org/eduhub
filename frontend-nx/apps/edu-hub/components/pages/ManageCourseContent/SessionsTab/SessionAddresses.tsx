@@ -1,4 +1,4 @@
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { FC, useMemo } from 'react';
 import { ManagedCourse_Course_by_pk_Sessions_SessionAddresses } from '../../../../queries/__generated__/ManagedCourse';
 import { UPDATE_SESSION_ADDRESS } from '../../../../queries/course';
@@ -16,7 +16,8 @@ interface SessionAddressesIProps {
 }
 
 export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQueries }) => {
-  const t = useTranslations('coursePage');
+  const t = useTranslations('manageCourse.SessionsTab.sessionAddresses');
+  const tCommon = useTranslations('common');
 
   const defaultSessionAddress = address?.CourseLocation?.defaultSessionAddress;
   const defaultSessionAddressId = (address?.CourseLocation as any)?.defaultSessionAddressId;
@@ -28,8 +29,8 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
   const currentLocationAddressId = (address as any)?.locationAddressId || null;
 
   const label = isOnline
-    ? t('sessionAddress.online.label')
-    : t('common.location.' + address?.CourseLocation?.locationOption);
+    ? t('online.label')
+    : tCommon('location.' + address?.CourseLocation?.locationOption);
 
   // Query location addresses for the selected location option
   const { data: addressData } = useRoleQuery(LOCATION_ADDRESS_BY_LOCATION_OPTION, {
@@ -61,20 +62,20 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
   // Custom nullable label that shows the default address if one exists
   const nullableLabel = useMemo(() => {
     if (defaultAddressLabel) {
-      return `${defaultAddressLabel} (${t('sessionAddress.default_address')})`;
+      return `${defaultAddressLabel} (${t('default_address')})`;
     }
-    return t('sessionAddress.no_address_selected');
+    return t('no_address_selected');
   }, [defaultAddressLabel, t]);
 
 
   // For online sessions, show the link as read-only
   if (isOnline) {
-    const value = isValidLink ? sessionAddress : t('sessionAddress.online.placeholder');
+    const value = isValidLink ? sessionAddress : t('online.placeholder');
     return (
       <div className="mt-5 mb-2 flex items-center">
         <span className="w-24 flex-shrink-0">{label}:</span>
         <span className="text-gray-800 flex-1">{value}</span>
-        <Tooltip title={t('sessionAddress.online.placeholder')} placement="top">
+        <Tooltip title={t('online.placeholder')} placement="top">
           <HelpOutline
             style={{
               cursor: 'pointer',
@@ -96,8 +97,8 @@ export const SessionAddresses: FC<SessionAddressesIProps> = ({ address, refetchQ
         <DropDownSelector
           variant="material"
           label=""
-          placeholder={nullableLabel || t('sessionAddress.offline.placeholder')}
-          helpText={t('sessionAddress.offline.placeholder')}
+          placeholder={nullableLabel || t('offline.placeholder')}
+          helpText={t('offline.placeholder')}
           value={currentLocationAddressId?.toString() || ''}
           options={addressOptions}
           updateValueMutation={UPDATE_SESSION_ADDRESS}
