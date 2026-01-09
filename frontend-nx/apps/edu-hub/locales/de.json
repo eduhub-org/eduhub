@@ -584,33 +584,6 @@
     "info_block_2_content": {
       "placeholder": "Inhalt"
     },
-    "sessionAddress": {
-      "online": {
-        "label": "Online",
-        "placeholder": "Bitte gib im Tab \"Beschreibung\" einen gültigen Link ein."
-      },
-      "offline": {
-        "label": "Adresse zur Vor-Ort-Teilnahme in ",
-        "placeholder": "Wähle im Tab \"Beschreibung\" eine Standardaddresse oder wähle hier eine spezifische Adresse aus."
-      },
-      "select_address": "Adresse auswählen",
-      "select_online_link": "Online-Link auswählen",
-      "search_addresses": "Adressen suchen...",
-      "no_address_selected": "Keine Adresse ausgewählt",
-      "search_links": "Links suchen...",
-      "create_new_address": "Neue Adresse erstellen",
-      "create_new_link": "Neuen Link erstellen",
-      "default_address": "Standard",
-      "link_label": "Link-Name",
-      "link_label_placeholder": "z.B. Haupt-Meetingraum, Workshop-Link",
-      "link_url": "URL",
-      "link_url_placeholder": "https://example.com/meeting-room",
-      "aliases": "Aliase",
-      "aliases_help": "Aliase eingeben und Enter drücken, um sie hinzuzufügen",
-      "legacy_address": "Legacy-Adresse (schreibgeschützt)",
-      "select_location_option_first": "Bitte wähle zuerst eine Standortoption aus",
-      "location_mismatch_error": "Die ausgewählte Adresse passt nicht zur Standortoption dieser Session. Bitte wähle eine Adresse aus, die zum richtigen Standort gehört."
-    },
     "date": "Datum",
     "title": "Titel",
     "external_speakers": "Externe Referenten",
@@ -1047,6 +1020,35 @@
     "invitation_deadline": "Ablaufdatum Einladung",
     "course_not_found": "Kurs {courseId} wurde nicht gefunden!",
     "add_session": "Termin hinzufügen",
+    "SessionsTab": {
+      "sessionAddresses": {
+        "online": {
+          "label": "Online",
+          "placeholder": "Bitte gib im Tab \"Beschreibung\" einen gültigen Link ein."
+        },
+        "offline": {
+          "label": "Adresse zur Vor-Ort-Teilnahme in ",
+          "placeholder": "Wähle im Tab \"Beschreibung\" eine Standardaddresse oder wähle hier eine spezifische Adresse aus."
+        },
+        "select_address": "Adresse auswählen",
+        "select_online_link": "Online-Link auswählen",
+        "search_addresses": "Adressen suchen...",
+        "no_address_selected": "Keine Adresse ausgewählt",
+        "search_links": "Links suchen...",
+        "create_new_address": "Neue Adresse erstellen",
+        "create_new_link": "Neuen Link erstellen",
+        "default_address": "Standard",
+        "link_label": "Link-Name",
+        "link_label_placeholder": "z.B. Haupt-Meetingraum, Workshop-Link",
+        "link_url": "URL",
+        "link_url_placeholder": "https://example.com/meeting-room",
+        "aliases": "Aliase",
+        "aliases_help": "Aliase eingeben und Enter drücken, um sie hinzuzufügen",
+        "legacy_address": "Legacy-Adresse (schreibgeschützt)",
+        "select_location_option_first": "Bitte wähle zuerst eine Standortoption aus",
+        "location_mismatch_error": "Die ausgewählte Adresse passt nicht zur Standortoption dieser Session. Bitte wähle eine Adresse aus, die zum richtigen Standort gehört."
+      }
+    },
     "location": {
       "label": "Veranstaltungsort",
       "ONLINE": "Online",
@@ -1060,9 +1062,6 @@
         "offline": "Diese Adresse kann ggf. bei der Erstellung der Einzeltermine angepasst werden."
       },
       "errorText": "Der eingegebene Link hat nicht das korrekte Format."
-    },
-    "sessionAddress": {
-      "no_address_selected": "Keine Adresse ausgewählt"
     },
     "weekday": "Wochentag",
     "weekdays": {

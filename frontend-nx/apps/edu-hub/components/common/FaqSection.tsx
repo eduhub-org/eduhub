@@ -69,7 +69,7 @@ const FaqSection: FC<FaqSectionProps> = ({ collection = 'default', className = '
   const { data, loading, error } = useQuery<GetFaqsByCollectionAndLang>(GET_FAQS_BY_COLLECTION_AND_LANG, {
     variables: {
       collection,
-      locale: (locale || 'de').toUpperCase(),
+      lang: (locale || 'de').toUpperCase(),
     },
     errorPolicy: 'all',
   });

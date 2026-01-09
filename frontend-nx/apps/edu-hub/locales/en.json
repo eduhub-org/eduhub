@@ -592,33 +592,6 @@
     "info_block_2_content": {
       "placeholder": "Content"
     },
-    "sessionAddress": {
-      "online": {
-        "label": "Online",
-        "placeholder": "Please enter a valid link in the \"Description\" tab."
-      },
-      "offline": {
-        "label": "Address for on-site participation in ",
-        "placeholder": "Select a default address in the \"Description\" tab or select a specific address here."
-      },
-      "select_address": "Select Address",
-      "select_online_link": "Select Online Link",
-      "search_addresses": "Search addresses...",
-      "no_address_selected": "No address selected",
-      "search_links": "Search links...",
-      "create_new_address": "Create New Address",
-      "create_new_link": "Create New Link",
-      "default_address": "Default",
-      "link_label": "Link Name",
-      "link_label_placeholder": "e.g., Main Meeting Room, Workshop Link",
-      "link_url": "URL",
-      "link_url_placeholder": "https://example.com/meeting-room",
-      "aliases": "Aliases",
-      "aliases_help": "Enter aliases and press Enter to add them",
-      "legacy_address": "Legacy Address (read-only)",
-      "select_location_option_first": "Please select a location option first",
-      "location_mismatch_error": "The selected address does not match the location option for this session. Please select an address that belongs to the correct location."
-    },
     "date": "Date",
     "title": "Title",
     "external_speakers": "External Speakers",
@@ -1063,6 +1036,35 @@
     "invitation_deadline": "Invitation deadline",
     "course_not_found": "Course {courseId} could not be found!",
     "add_session": "Add Session",
+    "SessionsTab": {
+      "sessionAddresses": {
+        "online": {
+          "label": "Online",
+          "placeholder": "Please enter a valid link in the \"Description\" tab."
+        },
+        "offline": {
+          "label": "Address for on-site participation in ",
+          "placeholder": "Select a default address in the \"Description\" tab or select a specific address here."
+        },
+        "select_address": "Select Address",
+        "select_online_link": "Select Online Link",
+        "search_addresses": "Search addresses...",
+        "no_address_selected": "No address selected",
+        "search_links": "Search links...",
+        "create_new_address": "Create New Address",
+        "create_new_link": "Create New Link",
+        "default_address": "Default",
+        "link_label": "Link Name",
+        "link_label_placeholder": "e.g., Main Meeting Room, Workshop Link",
+        "link_url": "URL",
+        "link_url_placeholder": "https://example.com/meeting-room",
+        "aliases": "Aliases",
+        "aliases_help": "Enter aliases and press Enter to add them",
+        "legacy_address": "Legacy Address (read-only)",
+        "select_location_option_first": "Please select a location option first",
+        "location_mismatch_error": "The selected address does not match the location option for this session. Please select an address that belongs to the correct location."
+      }
+    },
     "location": {
       "label": "Location",
       "ONLINE": "Online",
@@ -1076,9 +1078,6 @@
         "offline": "This address can be adjusted when creating individual sessions if necessary."
       },
       "errorText": "The entered link does not have the correct format."
-    },
-    "sessionAddress": {
-      "no_address_selected": "No address selected"
     },
     "weekday": "Weekday",
     "weekdays": {

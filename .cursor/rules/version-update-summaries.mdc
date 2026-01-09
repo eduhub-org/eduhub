@@ -43,6 +43,7 @@ Slack uses a simplified markdown syntax. Use these formatting rules:
   - 🎯 Course Management
   - 💬 Content/FAQ
   - 🌐 User Experience
+  - 🔧 Technical Improvements
 
 ### Other Formatting
 - Remove horizontal rules (`---`) - not well supported in Slack
@@ -67,6 +68,13 @@ Slack uses a simplified markdown syntax. Use these formatting rules:
 
 • *Feature name:* Brief description focusing on user benefit
 
+*🔧 Technical Improvements*
+
+• *Framework/Library Update:* Brief explanation of what was upgraded and why it matters
+• *System Migration:* Brief explanation of technical changes and potential minor issues
+
+[Note about potential issues: Acknowledge scope of changes and invite reporting of issues]
+
 [Closing paragraph: Summary of overall improvements]
 ```
 
@@ -80,15 +88,15 @@ Slack uses a simplified markdown syntax. Use these formatting rules:
 ✅ **New management pages** - New areas of the platform
 ✅ **Bulk actions** - Time-saving features for managing multiple items
 ✅ **Filtering/sorting improvements** - Better ways to find and organize data
+✅ **Technical improvements** - Framework upgrades, library migrations, security updates (in dedicated section)
 
 ### What to Exclude
 
 ❌ **Bug fixes** - Unless they significantly impact user experience
-❌ **Technical improvements** - Code refactoring, performance optimizations (unless user-visible)
 ❌ **Internal tooling** - Developer scripts, CI/CD changes
 ❌ **Commit hashes** - Never reference specific commits
-❌ **Implementation details** - How something works, only what it does
-❌ **Breaking changes** - Handle separately with migration guidance
+❌ **Low-level implementation details** - How something works internally
+❌ **Code refactoring** - Unless it's part of a larger technical improvement (like framework migration)
 
 ## Gathering Information
 
@@ -103,8 +111,16 @@ To create an accurate summary:
    ```bash
    git log v[X.Y.Z-1]..v[X.Y.Z] --pretty=format:"%h %s" --grep="^feat" --no-merges
    ```
-4. **Examine commit details** for features that might not be obvious from commit messages
-5. **Group related features** by functional area
+4. **Check for breaking changes** (major version bumps):
+   ```bash
+   git log v[X.Y.Z-1]..v[X.Y.Z] --pretty=format:"%h|%s|%b" --no-merges | grep -i "BREAKING"
+   ```
+5. **Look for technical upgrades** (chore commits for framework/library updates):
+   ```bash
+   git log v[X.Y.Z-1]..v[X.Y.Z] --pretty=format:"%h %s" --grep="^chore.*upgrade\|^refactor.*migrate" --no-merges
+   ```
+6. **Examine commit details** for features that might not be obvious from commit messages
+7. **Group related features** by functional area
 
 ## Writing Tips
 
@@ -127,6 +143,55 @@ To create an accurate summary:
 - **Be concise**: One line per feature, two lines maximum
 - **Prioritize**: Most impactful features first within each category
 
+## Technical Improvements Section
+
+**Always include a "🔧 Technical Improvements" section** at the end of the feature sections (before the closing paragraph). This section should:
+
+### Purpose
+- Communicate important framework/library upgrades to users
+- Set expectations about potential minor issues from large technical changes
+- Build transparency and trust with users
+- Explain why technical changes matter (security, performance, maintainability)
+
+### What to Include
+- **Framework upgrades** (Next.js, React, major version bumps)
+- **Library migrations** (changing from one library to another, e.g., next-translate to next-intl)
+- **Security updates** that are significant
+- **Breaking changes** that triggered major version bumps
+
+### How to Write It
+
+1. **Explain the upgrade in plain language**:
+   - ❌ "Upgraded to Next.js 15.5.7"
+   - ✅ "We've upgraded to Next.js 15, which brings improved performance, better React Server Components support, and enhanced developer experience"
+
+2. **Explain why it matters**:
+   - Mention benefits: performance, security, modern features
+   - Use phrases like "ensures EduHub stays current" or "keeps the platform secure"
+
+3. **For migrations, explain the change**:
+   - ❌ "Migrated from next-translate to next-intl"
+   - ✅ "We've migrated from next-translate to next-intl, consolidating translation files and simplifying the translation system. This change improves maintainability and makes it easier to add new translations in the future."
+
+4. **Set expectations about potential issues**:
+   - Always include a disclaimer paragraph after listing technical improvements
+   - Acknowledge the scope of changes
+   - Mention potential minor issues (translation issues, display inconsistencies)
+   - Invite users to report issues
+   - Example: "These technical upgrades are important for keeping EduHub modern, secure, and maintainable. However, due to the scope of these changes—especially the [specific change]—you may occasionally encounter minor issues like [specific examples]. If you notice any [type] issues, please report them so we can address them quickly."
+
+### Example
+
+```
+*🔧 Technical Improvements*
+
+• *Next.js 15 Upgrade:* We've upgraded to Next.js 15, which brings improved performance, better React Server Components support, and enhanced developer experience. This upgrade ensures EduHub stays current with the latest web technologies and security updates.
+
+• *Translation System Modernization:* We've migrated from next-translate to next-intl, consolidating translation files and simplifying the translation system. This change improves maintainability and makes it easier to add new translations in the future.
+
+These technical upgrades are important for keeping EduHub modern, secure, and maintainable. However, due to the scope of these changes—especially the translation library migration—you may occasionally encounter minor issues like missing translations or small display inconsistencies. If you notice any translation issues, please report them so we can address them quickly.
+```
+
 ## Example
 
 Release summaries are typically created for Slack announcements or GitHub Release notes and are not stored in the repository. When creating a summary, follow the structure template above and ensure it adheres to the formatting guidelines for your target platform (Slack, GitHub, etc.).
@@ -136,6 +201,9 @@ Release summaries are typically created for Slack announcements or GitHub Releas
 Before publishing, ensure:
 
 - [ ] All user-facing features are included
+- [ ] Technical Improvements section is present and explains upgrades in plain language
+- [ ] Breaking changes (major version bumps) are explained in Technical Improvements
+- [ ] Expectations about potential issues are set (if applicable)
 - [ ] No technical jargon or commit references
 - [ ] Formatting works in Slack (test if possible)
 - [ ] Features are grouped logically
