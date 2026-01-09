@@ -46,6 +46,7 @@ export const VALIDATE_FORMBRICKS_SURVEY = gql`
       surveyTitle
       addonQuestions {
         questionId
+        choiceId
         questionType
         questionText
         extractedPrice

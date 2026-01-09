@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 
 interface AddonQuestion {
   questionId: string;
+  choiceId: string;
   questionType: string;
   questionText: Record<string, string>;
   extractedPrice: number;
@@ -20,6 +21,7 @@ interface AddonValidationDialogProps {
   onClose: () => void;
   onSave: (mappings: Array<{
     questionId: string;
+    choiceId: string;
     questionTextDe?: string;
     questionTextEn?: string;
     extractedPrice: number;
@@ -47,21 +49,27 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
     description: string;
   }>>({});
 
-  const handlePriceChange = (questionId: string, price: number) => {
+  const getMappingKey = (questionId: string, choiceId: string) => {
+    return `${questionId}:${choiceId}`;
+  };
+
+  const handlePriceChange = (questionId: string, choiceId: string, price: number) => {
+    const key = getMappingKey(questionId, choiceId);
     setValidatedMappings(prev => ({
       ...prev,
-      [questionId]: {
-        ...prev[questionId],
+      [key]: {
+        ...prev[key],
         validatedPrice: price,
       },
     }));
   };
 
-  const handleDescriptionChange = (questionId: string, description: string) => {
+  const handleDescriptionChange = (questionId: string, choiceId: string, description: string) => {
+    const key = getMappingKey(questionId, choiceId);
     setValidatedMappings(prev => ({
       ...prev,
-      [questionId]: {
-        ...prev[questionId],
+      [key]: {
+        ...prev[key],
         description,
       },
     }));
@@ -69,9 +77,11 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
 
   const handleSave = async () => {
     const mappings = addonQuestions.map(q => {
-      const validated = validatedMappings[q.questionId];
+      const key = getMappingKey(q.questionId, q.choiceId);
+      const validated = validatedMappings[key];
       return {
         questionId: q.questionId,
+        choiceId: q.choiceId,
         questionTextDe: q.questionText.de || q.questionText.default,
         questionTextEn: q.questionText.en || q.questionText.default,
         extractedPrice: q.extractedPrice,
@@ -127,13 +137,14 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
             <Typography>Keine Add-ons gefunden.</Typography>
           ) : (
             addonQuestions.map((question) => {
-              const validated = validatedMappings[question.questionId];
+              const key = getMappingKey(question.questionId, question.choiceId);
+              const validated = validatedMappings[key];
               const finalPrice = validated?.validatedPrice ?? question.extractedPrice;
               const finalDescription = validated?.description ?? question.description;
 
               return (
                 <Box
-                  key={question.questionId}
+                  key={key}
                   sx={{
                     border: '1px solid',
                     borderColor: 'divider',
@@ -163,7 +174,7 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
                       label="Preis (in Cent)"
                       type="number"
                       value={finalPrice}
-                      onChange={(e) => handlePriceChange(question.questionId, parseInt(e.target.value) || 0)}
+                      onChange={(e) => handlePriceChange(question.questionId, question.choiceId, parseInt(e.target.value) || 0)}
                       fullWidth
                       size="small"
                     />
@@ -171,13 +182,13 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
                     <TextField
                       label="Beschreibung"
                       value={finalDescription}
-                      onChange={(e) => handleDescriptionChange(question.questionId, e.target.value)}
+                      onChange={(e) => handleDescriptionChange(question.questionId, question.choiceId, e.target.value)}
                       fullWidth
                       size="small"
                     />
 
                     <Typography variant="caption" color="text.secondary">
-                      Frage-ID: {question.questionId}
+                      Frage-ID: {question.questionId} | Choice-ID: {question.choiceId}
                     </Typography>
                   </Box>
                 </Box>

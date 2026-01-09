@@ -395,6 +395,7 @@ type ValidateFormbricksSurveyResult {
 
 type AddonQuestion {
   questionId: String!
+  choiceId: String!
   questionType: String!
   questionText: String
   extractedPrice: Int!
@@ -420,6 +421,7 @@ type DetectedPrice {
 
 input AddonMappingInput {
   questionId: String!
+  choiceId: String!
   questionTextDe: String
   questionTextEn: String
   extractedPrice: Int!
@@ -446,6 +448,7 @@ type StripePriceCreationResult {
 
 type StripePriceResult {
   questionId: String!
+  choiceId: String!
   stripeProductId: String
   stripePriceId: String
   success: Boolean!
@@ -470,6 +473,7 @@ type CourseAddonMapping {
   id: Int!
   courseId: Int!
   questionId: String!
+  choiceId: String
   questionTextDe: String
   questionTextEn: String
   extractedPrice: Int!
@@ -496,6 +500,7 @@ input CourseInput {
 
 input SelectedAddonInput {
   questionId: String!
+  choiceId: String!
   selected: Boolean!
 }
 

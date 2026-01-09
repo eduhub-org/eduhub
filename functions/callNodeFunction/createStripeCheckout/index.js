@@ -13,6 +13,7 @@ const GET_COURSE_AND_ADDONS = `
       CourseAddonMappings {
         id
         questionId
+        choiceId
         validatedPrice
         currency
         stripeProductId
@@ -128,8 +129,10 @@ export default async function createStripeCheckout(req, logger) {
     if (course.CourseAddonMappings && Array.isArray(course.CourseAddonMappings)) {
       for (const addonMapping of course.CourseAddonMappings) {
         // Check if this addon was selected in the Formbricks response
+        // Match by both questionId and choiceId
         const isSelected = selectedAddons.some(
-          selected => selected.questionId === addonMapping.questionId
+          selected => selected.questionId === addonMapping.questionId &&
+                     selected.choiceId === addonMapping.choiceId
         );
 
         if (isSelected && addonMapping.stripePriceId) {

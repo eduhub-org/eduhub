@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+import { GraphQLClient } from 'graphql-request';
 
 /**
  * Creates Stripe Products and Prices programmatically for validated add-ons.
@@ -42,23 +43,53 @@ export default async function createStripeAddonPrices(req, logger) {
     }
 
     const stripe = new Stripe(stripeSecretKey);
+    
+    // Setup Hasura client for database operations
+    const hasuraClient = new GraphQLClient(process.env.HASURA_ENDPOINT, {
+      headers: {
+        'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET,
+      },
+    });
+
+    const INSERT_ADDON_MAPPING = `
+      mutation InsertAddonMapping($mapping: CourseAddonMapping_insert_input!) {
+        insert_CourseAddonMapping_one(object: $mapping, on_conflict: {
+          constraint: CourseAddonMapping_courseId_questionId_choiceId_key,
+          update_columns: [
+            extractedPrice,
+            validatedPrice,
+            currency,
+            description,
+            stripeProductId,
+            stripePriceId,
+            confidence,
+            validatedAt,
+            updated_at
+          ]
+        }) {
+          id
+        }
+      }
+    `;
+
     const results = [];
 
     for (const mapping of mappings) {
       const {
         questionId,
+        choiceId,
         description,
         validatedPrice,
         currency = 'eur'
       } = mapping;
 
-      if (!questionId || !description || validatedPrice === undefined) {
+      if (!questionId || !choiceId || !description || validatedPrice === undefined) {
         logger.warn('Skipping invalid mapping', { mapping });
         continue;
       }
 
-      // Create deterministic product ID: addon_{courseId}_{questionId}
-      const productId = `addon_${courseId}_${questionId}`;
+      // Create deterministic product ID: addon_{courseId}_{questionId}_{choiceId}
+      const productId = `addon_${courseId}_${questionId}_${choiceId}`;
 
       try {
         // Try to retrieve existing product
@@ -75,6 +106,7 @@ export default async function createStripeAddonPrices(req, logger) {
               metadata: {
                 courseId: String(courseId),
                 questionId: questionId,
+                choiceId: choiceId,
                 source: 'eduhub_formbricks'
               }
             });
@@ -117,6 +149,7 @@ export default async function createStripeAddonPrices(req, logger) {
             metadata: {
               courseId: String(courseId),
               questionId: questionId,
+              choiceId: choiceId,
               validatedAt: new Date().toISOString()
             }
           });
@@ -128,8 +161,47 @@ export default async function createStripeAddonPrices(req, logger) {
           });
         }
 
+        // Insert or update database record
+        try {
+          const questionTexts = typeof mapping.questionText === 'string' 
+            ? JSON.parse(mapping.questionText || '{}')
+            : mapping.questionText || {};
+
+          await hasuraClient.request(INSERT_ADDON_MAPPING, {
+            mapping: {
+              courseId,
+              questionId,
+              choiceId,
+              questionTextDe: questionTexts.de || questionTexts.default || null,
+              questionTextEn: questionTexts.en || questionTexts.default || null,
+              extractedPrice: mapping.extractedPrice,
+              validatedPrice: validatedPrice,
+              currency: currency.toUpperCase(),
+              description: description,
+              stripeProductId: product.id,
+              stripePriceId: priceId,
+              confidence: mapping.confidence || 'high',
+              validatedAt: new Date().toISOString(),
+            }
+          });
+
+          logger.debug('Inserted/updated addon mapping in database', {
+            courseId,
+            questionId,
+            choiceId
+          });
+        } catch (dbError) {
+          logger.error('Error inserting addon mapping into database', {
+            questionId,
+            choiceId,
+            error: dbError.message
+          });
+          // Continue even if DB insert fails - Stripe product/price was created
+        }
+
         results.push({
           questionId,
+          choiceId,
           stripeProductId: product.id,
           stripePriceId: priceId,
           success: true
@@ -138,12 +210,14 @@ export default async function createStripeAddonPrices(req, logger) {
       } catch (error) {
         logger.error('Error creating Stripe product/price', {
           questionId,
+          choiceId,
           error: error.message,
           stack: error.stack
         });
 
         results.push({
           questionId,
+          choiceId,
           success: false,
           error: error.message
         });
