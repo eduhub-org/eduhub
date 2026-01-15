@@ -51,7 +51,7 @@
     "type": "Nonprofit",
     "legalName": "Campus Business Box e.V.",
     "websiteUrl": "https://edu.opencampus.sh",
-    "contactEmail": "team@opencampus.sh",
+    "contactEmail": "edu@opencampus.sh",
     "address": {
       "streetAddress": "Wissenschaftszentrum Kiel, Fraunhoferstr. 13",
       "postalCode": "24118",
@@ -78,7 +78,7 @@
     "type": "Nonprofit",
     "legalName": "Campus Business Box e.V.",
     "websiteUrl": "https://edu.opencampus.sh",
-    "contactEmail": "team@opencampus.sh",
+    "contactEmail": "edu@opencampus.sh",
     "address": {
       "streetAddress": "Wissenschaftszentrum Kiel, Fraunhoferstr. 13",
       "postalCode": "24118",

@@ -24,7 +24,7 @@ const Impressum: FC = () => {
             <dt className="italic mt-2">Telefon</dt>
             <dd>0431.90894380</dd>
             <dt className="italic mt-2">Email</dt>
-            <a href="mailto:team@opencampus.sh">team @ opencampus.sh</a>
+            <a href="mailto:edu@opencampus.sh">edu @ opencampus.sh</a>
           </div>
           <div className="ml-12 mr-10 mt-4">
             <h2 className="text-2xl mb-2">Vorstand</h2>
@@ -149,7 +149,7 @@ const Impressum: FC = () => {
             Telefon: +49 (0) 431 9089 4380
             <br />
             Email:
-            <a href="mailto:team@opencampus.sh">team @ opencampus.sh</a>
+            <a href="mailto:edu@opencampus.sh">edu @ opencampus.sh</a>
           </p>{' '}
           <p>
             Verantwortliche Stelle ist die nat&uuml;rliche oder juristische Person, die allein oder gemeinsam mit

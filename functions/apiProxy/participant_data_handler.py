@@ -1000,7 +1000,7 @@ def handle_course_participants(course_id, auth_info, eduhub_client, client_ip, r
             "type": "Nonprofit",
             "legalName": "Campus Business Box e.V.",
             "websiteUrl": "https://edu.opencampus.sh",
-            "contactEmail": "team@opencampus.sh",
+            "contactEmail": "edu@opencampus.sh",
             "address": {
                 "streetAddress": "Wissenschaftszentrum Kiel, Fraunhoferstr. 13",
                 "postalCode": "24118",
@@ -1099,7 +1099,7 @@ def handle_organization_courses(auth_info, eduhub_client, client_ip, request_dat
             "type": "Nonprofit",
             "legalName": "Campus Business Box e.V.",
             "websiteUrl": "https://edu.opencampus.sh",
-            "contactEmail": "team@opencampus.sh",
+            "contactEmail": "edu@opencampus.sh",
             "address": {
                 "streetAddress": "Wissenschaftszentrum Kiel, Fraunhoferstr. 13",
                 "postalCode": "24118",
