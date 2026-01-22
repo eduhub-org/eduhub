@@ -279,6 +279,17 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_Cours
   Organization: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseFundingOrganizations_Organization;
 }
 
+export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseAddonMappings {
+  __typename: "CourseAddonMapping";
+  id: number;
+  description: string;
+  /**
+   * Admin-validated price (in cents), can override extracted price
+   */
+  validatedPrice: number;
+  currency: string;
+}
+
 export interface InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseEnrollments {
   __typename: "CourseEnrollment";
   /**
@@ -436,6 +447,18 @@ export interface InsertEnrollment_insert_CourseEnrollment_returning_Course {
    * An array relationship
    */
   CourseFundingOrganizations: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseFundingOrganizations[];
+  /**
+   * Base price in cents (e.g., 5000 = €50.00)
+   */
+  basePrice: number | null;
+  /**
+   * Currency code (EUR, USD, etc.)
+   */
+  currency: string | null;
+  /**
+   * An array relationship
+   */
+  CourseAddonMappings: InsertEnrollment_insert_CourseEnrollment_returning_Course_CourseAddonMappings[];
   /**
    * An array relationship
    */

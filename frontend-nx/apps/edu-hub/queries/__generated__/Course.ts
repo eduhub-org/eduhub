@@ -279,6 +279,17 @@ export interface Course_Course_by_pk_CourseFundingOrganizations {
   Organization: Course_Course_by_pk_CourseFundingOrganizations_Organization;
 }
 
+export interface Course_Course_by_pk_CourseAddonMappings {
+  __typename: "CourseAddonMapping";
+  id: number;
+  description: string;
+  /**
+   * Admin-validated price (in cents), can override extracted price
+   */
+  validatedPrice: number;
+  currency: string;
+}
+
 export interface Course_Course_by_pk {
   __typename: "Course";
   id: number;
@@ -407,6 +418,18 @@ export interface Course_Course_by_pk {
    * An array relationship
    */
   CourseFundingOrganizations: Course_Course_by_pk_CourseFundingOrganizations[];
+  /**
+   * Base price in cents (e.g., 5000 = €50.00)
+   */
+  basePrice: number | null;
+  /**
+   * Currency code (EUR, USD, etc.)
+   */
+  currency: string | null;
+  /**
+   * An array relationship
+   */
+  CourseAddonMappings: Course_Course_by_pk_CourseAddonMappings[];
 }
 
 export interface Course {

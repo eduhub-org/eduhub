@@ -305,6 +305,17 @@ export interface ManagedCourse_Course_by_pk_CourseFundingOrganizations {
   Organization: ManagedCourse_Course_by_pk_CourseFundingOrganizations_Organization;
 }
 
+export interface ManagedCourse_Course_by_pk_CourseAddonMappings {
+  __typename: "CourseAddonMapping";
+  id: number;
+  description: string;
+  /**
+   * Admin-validated price (in cents), can override extracted price
+   */
+  validatedPrice: number;
+  currency: string;
+}
+
 export interface ManagedCourse_Course_by_pk_CourseEnrollments_User_Organization {
   __typename: "Organization";
   id: number;
@@ -655,10 +666,6 @@ export interface ManagedCourse_Course_by_pk {
    */
   CourseFundingOrganizations: ManagedCourse_Course_by_pk_CourseFundingOrganizations[];
   /**
-   * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
-   */
-  status: CourseStatus_enum;
-  /**
    * Base price in cents (e.g., 5000 = €50.00)
    */
   basePrice: number | null;
@@ -666,6 +673,14 @@ export interface ManagedCourse_Course_by_pk {
    * Currency code (EUR, USD, etc.)
    */
   currency: string | null;
+  /**
+   * An array relationship
+   */
+  CourseAddonMappings: ManagedCourse_Course_by_pk_CourseAddonMappings[];
+  /**
+   * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
+   */
+  status: CourseStatus_enum;
   /**
    * Stripe Product ID for the base course price
    */

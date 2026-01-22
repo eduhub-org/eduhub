@@ -15,7 +15,7 @@ import { getCourseEnrollment } from '../../../helpers/util';
 import { ContentRow } from '../../common/ContentRow';
 import { PageBlock } from '../../common/PageBlock';
 import { DescriptionFields } from './DescriptionFields';
-import { TimeLocationLanguageInstructors } from './TimeLocationLanguageInstructors';
+import { InfoPanel } from './InfoPanel';
 import { useWeekdayStartAndEndString } from '../../../helpers/dateTimeHelpers';
 import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
@@ -220,7 +220,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                   )}
                 </PageBlock>
                 <div className="flex flex-1 justify-center items-center mx-6 lg:mx-0 lg:max-w-md pr-0 lg:pr-6 xl:pr-0 ">
-                  <TimeLocationLanguageInstructors course={course} />
+                  <InfoPanel course={course} />
                 </div>
               </ContentRow>
               <DescriptionFields course={course} />

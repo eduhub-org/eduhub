@@ -373,7 +373,8 @@
       }
     },
     "registration": {
-      "application_deadline": "Anmeldeschluss: ",
+      "application_deadline": "Bewerbungsschluss: ",
+      "registration_deadline": "Anmeldeschluss: ",
       "apply_now": "Jetzt anmelden",
       "register_external": "Über externen Link registrieren",
       "register_with_payment": "Mit Zahlung registrieren",
@@ -452,6 +453,10 @@
   "coursePage": {
     "courseCosts": "Der Kurs kostet {price}",
     "courseIsFree": "Der Kurs ist kostenfrei",
+    "price_label": "Kursgebühr",
+    "add_ons": "Zusatzoptionen",
+    "free_course": "Kostenfrei",
+    "starts_at": "Startet am",
     "courseGroups": "Kursgruppen",
     "courseDegree": "Degrees",
     "courseDegreeTitle": "Teil der folgenden Degrees",

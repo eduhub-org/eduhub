@@ -374,6 +374,7 @@
     },
     "registration": {
       "application_deadline": "Application deadline: ",
+      "registration_deadline": "Registration deadline: ",
       "apply_now": "Apply now",
       "register_external": "Register via External Link",
       "register_with_payment": "Register with Payment",
@@ -389,7 +390,9 @@
       "invited": "You have been invited and need to confirm your participation",
       "invitation_expired": "Your invitation has expired",
       "application_period_ended": "Unfortunately, the application period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
-      "application_period_ended_title": "Application Period Ended"
+      "application_period_ended_title": "Application Period Ended",
+      "registration_period_ended": "Unfortunately, the registration period has ended. You can subscribe to our <a>newsletter</a> to stay informed about new offers.",
+      "registration_period_ended_title": "Registration Period Ended"
     },
     "modal": {
       "title_approval": "Application",
@@ -452,6 +455,10 @@
   "coursePage": {
     "courseCosts": "This course costs {price}",
     "courseIsFree": "This course is free of charge",
+    "price_label": "Course Fee",
+    "add_ons": "Add-ons",
+    "free_course": "Free",
+    "starts_at": "Starts at",
     "courseGroups": "Course Groups",
     "courseDegree": "Degrees",
     "courseDegreeTitle": "Part of the following degrees",

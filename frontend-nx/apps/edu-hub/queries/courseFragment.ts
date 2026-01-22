@@ -106,6 +106,14 @@ export const COURSE_FRAGMENT = gql`
         logo
       }
     }
+    basePrice
+    currency
+    CourseAddonMappings {
+      id
+      description
+      validatedPrice
+      currency
+    }
 }
 `;
 
@@ -236,6 +244,14 @@ export const COURSE_FRAGMENT_ANONYMOUS = gql`
         type
         logo
       }
+    }
+    basePrice
+    currency
+    CourseAddonMappings {
+      id
+      description
+      validatedPrice
+      currency
     }
 }
 `;

@@ -280,6 +280,17 @@ export interface AdminCourseList_Course_CourseFundingOrganizations {
   Organization: AdminCourseList_Course_CourseFundingOrganizations_Organization;
 }
 
+export interface AdminCourseList_Course_CourseAddonMappings {
+  __typename: "CourseAddonMapping";
+  id: number;
+  description: string;
+  /**
+   * Admin-validated price (in cents), can override extracted price
+   */
+  validatedPrice: number;
+  currency: string;
+}
+
 export interface AdminCourseList_Course_CourseEnrollments_CourseEnrollmentStatus {
   __typename: "CourseEnrollmentStatus";
   value: string;
@@ -466,10 +477,6 @@ export interface AdminCourseList_Course {
    */
   CourseFundingOrganizations: AdminCourseList_Course_CourseFundingOrganizations[];
   /**
-   * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
-   */
-  status: CourseStatus_enum;
-  /**
    * Base price in cents (e.g., 5000 = €50.00)
    */
   basePrice: number | null;
@@ -477,6 +484,14 @@ export interface AdminCourseList_Course {
    * Currency code (EUR, USD, etc.)
    */
   currency: string | null;
+  /**
+   * An array relationship
+   */
+  CourseAddonMappings: AdminCourseList_Course_CourseAddonMappings[];
+  /**
+   * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
+   */
+  status: CourseStatus_enum;
   /**
    * Stripe Product ID for the base course price
    */
