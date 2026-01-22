@@ -121,10 +121,6 @@ export const PricingSummary: FC<PricingSummaryProps> = ({
       className={`bg-white border border-gray-200 rounded-lg p-4 ${className} overflow-hidden`}
       aria-label={t('pricing_summary.title')}
     >
-      <h4 className="text-sm font-medium text-gray-700 mb-3">
-        {t('pricing_summary.title')}
-      </h4>
-
       <div className="space-y-3 overflow-hidden">
         {/* Base Price with Stripe Status */}
         {basePriceValue > 0 && (

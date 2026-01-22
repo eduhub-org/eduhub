@@ -21,16 +21,18 @@ import { LearningGoals } from './LearningGoals';
 import { Sessions } from './Sessions';
 import { CompletedDegreeCourses, CurrentDegreeCourses } from './DegreeCourses';
 import { Registration } from './Registration';
+import PricingSummary from '../../common/PricingSummary';
+import { getRegistrationTypeConfig } from './Registration/types';
 import { getBackgroundImage } from '../../../helpers/imageHandling';
 import { Attendances } from './Attendances';
 import { CertificateDownload } from '../../common/CertificateDownload';
 import AchievementRecord from './AchievementRecord';
 import { useIsCourseWithEnrollment } from '../../../hooks/course';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
-import { getRegistrationTypeConfig } from './Registration/types';
 
 const CourseContent: FC<{ id: number }> = ({ id }) => {
   const t = useTranslations('course');
+  const tCoursePage = useTranslations('coursePage');
   const tCommon = useTranslations('common'); // Used for weekday translations
   const isLoggedIn = useIsLoggedIn();
   const userId = useUserId();
@@ -112,10 +114,6 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
     return config.requiresApproval ? t('modal.success_message_approval') : t('modal.success_message_direct');
   };
 
-  // Check if course is a degree course
-  const isDegreeCourse = course?.Program?.shortTitle === 'DEGREES';
-  const isEventCourse = course?.Program?.shortTitle === 'EVENTS';
-
   // Ensure course is defined before extracting its properties
   if (!course) {
     return (
@@ -124,6 +122,24 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
       </div>
     );
   }
+
+  // Check if course is a degree course
+  const isDegreeCourse = course.Program?.shortTitle === 'DEGREES';
+  const isEventCourse = course.Program?.shortTitle === 'EVENTS';
+
+  // Check if registration requires payment
+  const registrationConfig = course.registrationType 
+    ? getRegistrationTypeConfig(course.registrationType)
+    : null;
+  const requiresPayment = registrationConfig?.requiresPayment ?? false;
+
+  // Map CourseAddonMappings to AddonItem format for PricingSummary
+  const addonItems = course.CourseAddonMappings?.map((mapping) => ({
+    id: mapping.id,
+    description: mapping.description,
+    validatedPrice: mapping.validatedPrice,
+    currency: mapping.currency || course.currency || 'EUR',
+  })) || [];
 
   // Get the course enrollment of the current user (necessary for admins and instructors)
   const courseEnrollment = getCourseEnrollment(course, userId);
@@ -217,6 +233,19 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                     />
                   ) : (
                     <CurrentDegreeCourses degreeCourses={course.DegreeCourses} />
+                  )}
+                  {requiresPayment && (course.basePrice || course.basePrice === 0 || course.basePrice === null || addonItems.length > 0) && (
+                    <div className="mt-24">
+                      <span className="text-3xl font-semibold block mb-6">{tCoursePage('pricing_section_title')}</span>
+                      <PricingSummary
+                        basePrice={course.basePrice || 0}
+                        currency={course.currency || 'EUR'}
+                        addons={addonItems}
+                        showStripeStatus={false}
+                        showTotal={false}
+                        className="mb-24"
+                      />
+                    </div>
                   )}
                 </PageBlock>
                 <div className="flex flex-1 justify-center items-center mx-6 lg:mx-0 lg:max-w-md pr-0 lg:pr-6 xl:pr-0 ">

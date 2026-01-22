@@ -456,6 +456,8 @@
     "price_label": "Kursgebühr",
     "add_ons": "Zusatzoptionen",
     "free_course": "Kostenfrei",
+    "total": "Gesamt",
+    "pricing_section_title": "Preise",
     "starts_at": "Startet am",
     "courseGroups": "Kursgruppen",
     "courseDegree": "Degrees",

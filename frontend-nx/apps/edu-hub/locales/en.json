@@ -458,6 +458,8 @@
     "price_label": "Course Fee",
     "add_ons": "Add-ons",
     "free_course": "Free",
+    "total": "Total",
+    "pricing_section_title": "Prizing",
     "starts_at": "Starts at",
     "courseGroups": "Course Groups",
     "courseDegree": "Degrees",
