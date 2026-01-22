@@ -5,8 +5,8 @@ import { Box, Typography, CircularProgress, Button } from '@mui/material';
 import { CheckCircle, Error as ErrorIcon } from '@mui/icons-material';
 
 import { useAuthedQuery } from '../../../hooks/authedQuery';
-import { GET_COURSE } from '../../../queries/course';
-import { GetCourse, GetCourseVariables } from '../../../queries/__generated__/GetCourse';
+import { COURSE } from '../../../queries/course';
+import { Course, CourseVariables } from '../../../queries/__generated__/Course';
 
 /**
  * Payment success page that polls for webhook completion.
@@ -20,8 +20,8 @@ export default function PaymentSuccessPage() {
   const [polling, setPolling] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { data: courseData } = useAuthedQuery<GetCourse, GetCourseVariables>(
-    GET_COURSE,
+  const { data: courseData } = useAuthedQuery<Course, CourseVariables>(
+    COURSE,
     {
       variables: { id: parseInt(courseId as string) },
       skip: !courseId,
