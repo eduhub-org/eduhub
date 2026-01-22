@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { BaseDialog } from './BaseDialog';
+import { DialogShell } from './DialogShell';
+import { Button } from '../Button';
 import { useTranslations, useLocale } from 'next-intl';
 
 interface LinkedInSharingDialogProps {
@@ -48,14 +49,25 @@ export const LinkedInSharingDialog: React.FC<LinkedInSharingDialogProps> = ({
 
   const showSelection = hasAchievement && hasAttendance;
 
+  const actions = (
+    <div className="grid grid-cols-2 w-full gap-2">
+      <div>
+        <Button onClick={onCancel || onClose}>{tCommon('cancel')}</Button>
+      </div>
+      <div className="flex justify-end">
+        <Button filled onClick={handleConfirm}>
+          {tCertificates('make_public_confirm')}
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
-    <BaseDialog
+    <DialogShell
       open={open}
       onClose={onClose}
-      onConfirm={handleConfirm}
-      confirmText={tCertificates('make_public_confirm')}
-      onCancel={onCancel}
-      cancelText={tCommon('cancel')}
+      title={tCommon('confirmation')}
+      actions={actions}
     >
       <div className="flex flex-col gap-4">
         <p>{tCertificates('linkedin_sharing_warning')}</p>
@@ -94,7 +106,7 @@ export const LinkedInSharingDialog: React.FC<LinkedInSharingDialogProps> = ({
           </div>
         )}
       </div>
-    </BaseDialog>
+    </DialogShell>
   );
 };
 

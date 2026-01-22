@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import DropDownSelector from '../../inputs/DropDownSelector';
-import { BaseDialog } from '../../common/dialogs/BaseDialog';
+import { DialogShell } from '../../common/dialogs/DialogShell';
+import { Button } from '../../common/Button';
 import { useRoleQuery, useLazyRoleQuery } from '../../../hooks/authedQuery';
 import { ORGANIZATION_LIST } from '../../../queries/organization';
 import { OrganizationList_Organization } from '../../../queries/__generated__/OrganizationList';
@@ -158,14 +159,27 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
 
   const confirmButtonText = t('bulk_action.merge.confirm_merge');
   const confirmDisabled = !selectedTargetOrg || (mergePreview?.hasMultipleApiKeys ?? false);
+  const tCommon = useTranslations('common');
+
+  const actions = (
+    <div className="grid grid-cols-2 w-full gap-2">
+      <div>
+        <Button onClick={onClose}>{tCommon('cancel')}</Button>
+      </div>
+      <div className="flex justify-end">
+        <Button filled onClick={handleConfirm} disabled={confirmDisabled}>
+          {confirmButtonText}
+        </Button>
+      </div>
+    </div>
+  );
 
   return (
-    <BaseDialog
+    <DialogShell
       open={open}
       onClose={onClose}
-      onConfirm={handleConfirm}
-      confirmDisabled={confirmDisabled}
-      confirmText={confirmButtonText}
+      title={tCommon('confirmation')}
+      actions={actions}
     >
       <div className="space-y-4">
         <div className="text-lg font-medium">{t('bulk_action.merge.title')}</div>
@@ -312,6 +326,6 @@ export const MergeOrganizationsDialog: React.FC<MergeOrganizationsDialogProps> =
           <div className="text-amber-600 text-sm">{t('bulk_action.merge.no_organizations_selected')}</div>
         )}
       </div>
-    </BaseDialog>
+    </DialogShell>
   );
 };

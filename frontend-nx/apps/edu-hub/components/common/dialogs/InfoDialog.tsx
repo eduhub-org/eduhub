@@ -1,9 +1,8 @@
-import { Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { useTranslations } from 'next-intl';
-import { FC, ReactNode, useCallback } from 'react';
-import { MdClose } from 'react-icons/md';
+import { FC, ReactNode } from 'react';
 
 import { Button } from '../Button';
+import { DialogShell } from './DialogShell';
 
 interface InfoDialogProps {
   title: string;
@@ -20,53 +19,25 @@ export const InfoDialog: FC<InfoDialogProps> = ({
   onClose,
   closeText,
 }) => {
-  const handleClose = useCallback(() => onClose(), [onClose]);
   const t = useTranslations('common');
 
+  const actions = (
+    <div className="flex justify-end">
+      <Button filled onClick={onClose}>
+        {closeText || t('close')}
+      </Button>
+    </div>
+  );
+
   return (
-    <Dialog
+    <DialogShell
       open={open}
-      onClose={handleClose}
+      onClose={onClose}
+      title={title}
       maxWidth="md"
-      fullWidth
-      PaperProps={{
-        sx: {
-          maxHeight: '90vh',
-          display: 'flex',
-          flexDirection: 'column',
-        },
-      }}
+      actions={actions}
     >
-      <DialogTitle>
-        <div className="flex justify-between items-center">
-          <span>{title}</span>
-          <button
-            onClick={handleClose}
-            className="p-1 rounded-full hover:bg-gray-200 transition-colors"
-            aria-label={t('close')}
-            type="button"
-          >
-            <MdClose className="text-xl" />
-          </button>
-        </div>
-      </DialogTitle>
-
-      <DialogContent
-        sx={{
-          overflowY: 'auto',
-          flex: '1 1 auto',
-          px: 3,
-          py: 2,
-        }}
-      >
-        <div className="whitespace-pre-line text-sm text-gray-700">{content}</div>
-      </DialogContent>
-
-      <div className="px-6 pb-4 flex justify-end">
-        <Button filled onClick={handleClose}>
-          {closeText || t('close')}
-        </Button>
-      </div>
-    </Dialog>
+      <div className="whitespace-pre-line text-sm text-gray-700">{content}</div>
+    </DialogShell>
   );
 };
