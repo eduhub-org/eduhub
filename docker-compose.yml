@@ -30,6 +30,10 @@ services:
       # Hasura configuration
       HASURA_ADMIN_SECRET: myadminsecretkey
       GRAPHQL_URI: http://hasura:8080/v1/graphql
+      # Stripe configuration
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
 
   node_functions:
     container_name: eduhub-node-functions
@@ -55,6 +59,9 @@ services:
       HASURA_CLOUD_FUNCTION_SECRET: test1234
       LIBRARY_PATH: "../lib/cloud-storage.js"
       FORMBRICKS_API_KEY: ${FORMBRICKS_API_KEY:-}
+      # Stripe configuration
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
 
   python_functions:
     container_name: eduhub-python-functions

@@ -31,6 +31,7 @@ import { getRegistrationTypeConfig } from './Registration/types';
 
 const CourseContent: FC<{ id: number }> = ({ id }) => {
   const t = useTranslations('course');
+  const tCommon = useTranslations('common'); // Used for weekday translations
   const isLoggedIn = useIsLoggedIn();
   const userId = useUserId();
   const [resetValues, setResetValues] = useState(null);
@@ -165,7 +166,7 @@ const CourseContent: FC<{ id: number }> = ({ id }) => {
                 <ContentRow className="items-center">
                   <div className="flex flex-1 flex-col text-white mb-4 lg:mb-20">
                     {course.weekDay !== 'NONE' ? (
-                      <span className="text-xs">{getWeekdayStartAndEndString(course, t)}</span>
+                      <span className="text-xs">{getWeekdayStartAndEndString(course, tCommon)}</span>
                     ) : null}
                     <span className="text-2xl mt-2">{course.tagline}</span>
                   </div>

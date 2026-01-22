@@ -12,6 +12,10 @@ export interface GetCourseAddonMappings_CourseAddonMapping {
   id: number;
   courseId: number;
   questionId: string;
+  /**
+   * Formbricks choice ID for multiple choice questions (null for non-choice questions)
+   */
+  choiceId: string | null;
   questionTextDe: string | null;
   questionTextEn: string | null;
   /**

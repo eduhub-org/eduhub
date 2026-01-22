@@ -470,6 +470,22 @@ export interface AdminCourseList_Course {
    */
   status: CourseStatus_enum;
   /**
+   * Base price in cents (e.g., 5000 = €50.00)
+   */
+  basePrice: number | null;
+  /**
+   * Currency code (EUR, USD, etc.)
+   */
+  currency: string | null;
+  /**
+   * Stripe Product ID for the base course price
+   */
+  stripeProductId: string | null;
+  /**
+   * Stripe Price ID for the base course price
+   */
+  stripePriceId: string | null;
+  /**
    * An array relationship
    */
   CourseEnrollments: AdminCourseList_Course_CourseEnrollments[];

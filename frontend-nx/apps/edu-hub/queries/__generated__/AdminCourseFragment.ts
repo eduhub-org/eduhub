@@ -411,4 +411,20 @@ export interface AdminCourseFragment {
    * Shows whether the current status is DRAFT, READY_FOR_PUBLICATION, READY_FOR_APPLICATION, APPLICANTS_INVITED, or PARTICIPANTS_RATED, which is set in correspondance to the tabs completed on the course administration page
    */
   status: CourseStatus_enum;
+  /**
+   * Base price in cents (e.g., 5000 = €50.00)
+   */
+  basePrice: number | null;
+  /**
+   * Currency code (EUR, USD, etc.)
+   */
+  currency: string | null;
+  /**
+   * Stripe Product ID for the base course price
+   */
+  stripeProductId: string | null;
+  /**
+   * Stripe Price ID for the base course price
+   */
+  stripePriceId: string | null;
 }

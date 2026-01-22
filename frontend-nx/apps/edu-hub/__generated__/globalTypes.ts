@@ -437,7 +437,7 @@ export enum Country_update_column {
  * unique or primary key constraints on table "CourseAddonMapping"
  */
 export enum CourseAddonMapping_constraint {
-  CourseAddonMapping_courseId_questionId_key = "CourseAddonMapping_courseId_questionId_key",
+  CourseAddonMapping_courseId_questionId_choiceId_key = "CourseAddonMapping_courseId_questionId_choiceId_key",
   CourseAddonMapping_pkey = "CourseAddonMapping_pkey",
 }
 
@@ -445,6 +445,7 @@ export enum CourseAddonMapping_constraint {
  * select columns of table "CourseAddonMapping"
  */
 export enum CourseAddonMapping_select_column {
+  choiceId = "choiceId",
   confidence = "confidence",
   courseId = "courseId",
   created_at = "created_at",
@@ -467,6 +468,7 @@ export enum CourseAddonMapping_select_column {
  * update columns of table "CourseAddonMapping"
  */
 export enum CourseAddonMapping_update_column {
+  choiceId = "choiceId",
   confidence = "confidence",
   courseId = "courseId",
   created_at = "created_at",
@@ -2943,6 +2945,7 @@ export interface AchievementRecord_variance_order_by {
 }
 
 export interface AddonMappingInput {
+  choiceId: string;
   confidence: string;
   currency: string;
   description: string;
@@ -3682,6 +3685,7 @@ export interface CourseAddonMapping_bool_exp {
   _and?: CourseAddonMapping_bool_exp[] | null;
   _not?: CourseAddonMapping_bool_exp | null;
   _or?: CourseAddonMapping_bool_exp[] | null;
+  choiceId?: String_comparison_exp | null;
   confidence?: String_comparison_exp | null;
   courseId?: Int_comparison_exp | null;
   created_at?: timestamptz_comparison_exp | null;
@@ -3706,6 +3710,7 @@ export interface CourseAddonMapping_bool_exp {
 export interface CourseAddonMapping_insert_input {
   Course?: Course_obj_rel_insert_input | null;
   User?: User_obj_rel_insert_input | null;
+  choiceId?: string | null;
   confidence?: string | null;
   courseId?: number | null;
   created_at?: any | null;
@@ -3728,6 +3733,7 @@ export interface CourseAddonMapping_insert_input {
  * order by max() on columns of table "CourseAddonMapping"
  */
 export interface CourseAddonMapping_max_order_by {
+  choiceId?: order_by | null;
   confidence?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
@@ -3750,6 +3756,7 @@ export interface CourseAddonMapping_max_order_by {
  * order by min() on columns of table "CourseAddonMapping"
  */
 export interface CourseAddonMapping_min_order_by {
+  choiceId?: order_by | null;
   confidence?: order_by | null;
   courseId?: order_by | null;
   created_at?: order_by | null;
@@ -7559,6 +7566,7 @@ export interface Scientist_on_conflict {
 }
 
 export interface SelectedAddonInput {
+  choiceId: string;
   questionId: string;
   selected: boolean;
 }

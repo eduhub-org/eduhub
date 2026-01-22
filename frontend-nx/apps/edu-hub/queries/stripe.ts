@@ -88,6 +88,7 @@ export const SAVE_ADDON_MAPPINGS = gql`
         success
         results {
           questionId
+          choiceId
           stripeProductId
           stripePriceId
           success
@@ -103,12 +104,38 @@ export const SAVE_ADDON_MAPPINGS = gql`
   }
 `;
 
+export const CREATE_STRIPE_BASE_PRICE = gql`
+  mutation CreateStripeBasePrice(
+    $courseId: Int!
+    $basePrice: Int!
+    $currency: String
+    $courseTitle: String
+  ) {
+    createStripeBasePrice(
+      courseId: $courseId
+      basePrice: $basePrice
+      currency: $currency
+      courseTitle: $courseTitle
+    ) {
+      success
+      messageKey
+      stripeProductId
+      stripePriceId
+      productName
+      priceAmount
+      currency
+      error
+    }
+  }
+`;
+
 export const GET_COURSE_ADDON_MAPPINGS = gql`
   query GetCourseAddonMappings($courseId: Int!) {
     CourseAddonMapping(where: { courseId: { _eq: $courseId } }) {
       id
       courseId
       questionId
+      choiceId
       questionTextDe
       questionTextEn
       extractedPrice

@@ -300,6 +300,18 @@ actions:
     permissions:
       - role: instructor_access
     comment: Saves validated add-on mappings and creates Stripe Products/Prices
+  - name: createStripeBasePrice
+    definition:
+      kind: synchronous
+      handler: '{{CLOUD_FUNCTION_LINK_CALL_NODE_FUNCTION}}'
+      headers:
+        - name: secret
+          value_from_env: HASURA_CLOUD_FUNCTION_SECRET
+        - name: name
+          value: createStripeBasePrice
+    permissions:
+      - role: instructor_access
+    comment: Creates or updates Stripe Product and Price for a course's base price
   - name: createStripeCheckout
     definition:
       kind: synchronous
@@ -357,6 +369,7 @@ custom_types:
     - name: StripePriceCreationResult
     - name: StripePriceResult
     - name: StripePriceSummary
+    - name: CreateStripeBasePriceResult
     - name: CreateStripeCheckoutResult
     - name: CourseAddonMapping
   scalars: []

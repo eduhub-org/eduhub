@@ -25,6 +25,7 @@ export interface ValidateFormbricksSurvey_validateFormbricksSurvey_addonQuestion
 export interface ValidateFormbricksSurvey_validateFormbricksSurvey_addonQuestions {
   __typename: "AddonQuestion";
   questionId: string;
+  choiceId: string;
   questionType: string;
   questionText: string | null;
   extractedPrice: number;

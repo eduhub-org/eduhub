@@ -156,6 +156,15 @@ type Mutation {
 }
 
 type Mutation {
+  createStripeBasePrice(
+    courseId: Int!
+    basePrice: Int!
+    currency: String
+    courseTitle: String
+  ): CreateStripeBasePriceResult!
+}
+
+type Mutation {
   createStripeCheckout(
     courseId: Int!
     enrollmentId: Int!
@@ -459,6 +468,17 @@ type StripePriceSummary {
   total: Int!
   success: Int!
   failures: Int!
+}
+
+type CreateStripeBasePriceResult {
+  success: Boolean!
+  messageKey: String!
+  stripeProductId: String
+  stripePriceId: String
+  productName: String
+  priceAmount: Int
+  currency: String
+  error: String
 }
 
 type CreateStripeCheckoutResult {

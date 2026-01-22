@@ -12,6 +12,7 @@ import { AddonMappingInput } from "./../../__generated__/globalTypes";
 export interface SaveAddonMappings_saveAddonMappings_stripeResults_results {
   __typename: "StripePriceResult";
   questionId: string;
+  choiceId: string;
   stripeProductId: string | null;
   stripePriceId: string | null;
   success: boolean;

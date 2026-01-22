@@ -122,6 +122,10 @@ export const ADMIN_COURSE_FRAGMENT = gql`
     chatLink
     registrationType
     formbricksEnrollmentSurveyUrl
+    basePrice
+    currency
+    stripeProductId
+    stripePriceId
     Program {
       ...ProgramFragmentMinimumProperties
     }
