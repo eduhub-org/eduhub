@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState, useCallback } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Checkbox, FormControlLabel } from '@mui/material';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { MULTI_PROGRAM_ENROLLMENTS } from '../../../../queries/multiProgramEnrollments';

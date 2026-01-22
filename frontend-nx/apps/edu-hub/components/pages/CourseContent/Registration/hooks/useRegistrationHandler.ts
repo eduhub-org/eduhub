@@ -4,7 +4,6 @@ import { signIn } from 'next-auth/react';
 import { CourseRegistrationType_enum, CourseEnrollmentStatus_enum } from '../../../../../__generated__/globalTypes';
 import { Course_Course_by_pk } from '../../../../../queries/__generated__/Course';
 import { useAuthedMutation } from '../../../../../hooks/authedMutation';
-import { useAuthedQuery } from '../../../../../hooks/authedQuery';
 import { useUserId } from '../../../../../hooks/user';
 import { UPDATE_ENROLLMENT } from '../../../../../queries/insertEnrollment';
 import { UpdateEnrollment, UpdateEnrollmentVariables } from '../../../../../queries/__generated__/UpdateEnrollment';
@@ -143,8 +142,8 @@ export const useRegistrationHandler = ({
         }
 
         // 2. Get Formbricks response to extract selected add-ons
-        const effectiveSurveyUrl = course.formbricksEnrollmentSurveyUrl || course.Program?.defaultFormbricksEnrollmentSurveyUrl;
-        let selectedAddons: Array<{ questionId: string; selected: boolean }> = [];
+        // Note: Formbricks response will be fetched server-side in createStripeCheckout
+        // For now, we pass null and let the backend handle it
 
         // Note: Formbricks response will be fetched server-side in createStripeCheckout
         // For now, we pass null and let the backend handle it

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import DropDownSelector from '../../inputs/DropDownSelector';
 import { DialogShell } from '../../common/dialogs/DialogShell';
 import { Button } from '../../common/Button';

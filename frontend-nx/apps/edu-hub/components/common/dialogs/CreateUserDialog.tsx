@@ -3,7 +3,7 @@ import { Dialog, DialogTitle, Checkbox, FormControlLabel } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import { Button } from '../Button';
 import InputField from '../../inputs/InputField';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { CREATE_USER } from '../../../queries/user';
 import NotificationSnackbar from './NotificationSnackbar';

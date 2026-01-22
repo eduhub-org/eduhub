@@ -59,8 +59,8 @@ export const PricingSummary: FC<PricingSummaryProps> = ({
   basePrice,
   currency,
   stripeProductId,
-  stripePriceId: _stripePriceId, // Reserved for future use
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  stripePriceId: _stripePriceId, // Reserved for future use
   addons = [],
   showStripeStatus = false,
   showTotal = true,

@@ -1,4 +1,4 @@
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { FC, useMemo } from 'react';
 import { ManagedCourse_Course_by_pk_Sessions_SessionAddresses } from '../../../../queries/__generated__/ManagedCourse';
 import { UPDATE_SESSION_ADDRESS } from '../../../../queries/course';

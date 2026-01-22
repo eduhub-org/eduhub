@@ -2,7 +2,7 @@ import React, { useState, useCallback, ChangeEvent, useEffect } from 'react';
 import { DocumentNode } from 'graphql';
 import { useDebouncedCallback } from 'use-debounce';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { prioritizeClasses } from '../../helpers/util';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { AlertMessageDialog } from '../common/dialogs/AlertMessageDialog';

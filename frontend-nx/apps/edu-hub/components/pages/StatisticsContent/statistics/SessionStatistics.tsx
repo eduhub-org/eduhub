@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { TimeSeriesLineChart } from '../../../common/charts/TimeSeriesLineChart';
 import { useRoleQuery } from '../../../../hooks/authedQuery';
 import { PROGRAM_STATISTICS } from '../../../../queries/programList';

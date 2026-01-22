@@ -1,6 +1,6 @@
 import { signIn } from 'next-auth/react';
 import { FC } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Button } from '../common/Button';
 
 interface IProps {

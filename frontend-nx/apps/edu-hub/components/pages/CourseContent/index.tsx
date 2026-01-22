@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 
 import Onboarding from './Onboarding';

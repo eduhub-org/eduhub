@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import Head from 'next/head';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Page } from '../components/layout/Page';
 import { Button } from '../components/common/Button';
 

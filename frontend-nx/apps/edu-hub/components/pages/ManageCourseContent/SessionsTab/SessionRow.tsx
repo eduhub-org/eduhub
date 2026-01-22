@@ -27,7 +27,7 @@ import {
   UserSelectionWithFilterVariables,
 } from '../../../../queries/__generated__/UserSelectionWithFilter';
 import EhMultipleTag from '../../../common/EhMultipleTag';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import DeleteButton from '../../../../components/common/DeleteButton';
 import SessionAddresses from './SessionAddresses';
 import { LocationOption_enum, order_by } from '../../../../__generated__/globalTypes';
@@ -162,7 +162,7 @@ export const SessionRow: FC<IProps> = ({
   const [addSpeakerOpen, setAddSpeakerOpen] = useState(false);
   const [createUserDialogOpen, setCreateUserDialogOpen] = useState(false);
   const [searchValueForNewUser, setSearchValueForNewUser] = useState('');
-  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
+  const [_pendingUserId, setPendingUserId] = useState<string | null>(null);
 
   const openAddSpeaker = useCallback(() => {
     setAddSpeakerOpen(true);

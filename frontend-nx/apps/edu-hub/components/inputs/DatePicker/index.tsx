@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { useDatePickerLogic } from './hooks';
 import { DatePickerProps } from './types';
 import OptimisticDatePicker from '../OptimisticDatePicker';

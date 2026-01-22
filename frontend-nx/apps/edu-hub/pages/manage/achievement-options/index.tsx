@@ -1,4 +1,4 @@
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import Head from 'next/head';
 import { FC, useEffect, useState } from 'react';
 import ManageAchievementOptionsContent from '../../../components/pages/ManageAchievementOptionsContent';

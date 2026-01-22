@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Box, Typography, TextField, Chip, Alert } from '@mui/material';
 import { MdClose } from 'react-icons/md';
 import { Button } from '../../common/Button';
-import { useTranslations } from 'next-intl';
 
 interface AddonQuestion {
   questionId: string;
@@ -40,10 +39,9 @@ export const AddonValidationDialog: React.FC<AddonValidationDialogProps> = ({
   onClose,
   onSave,
   addonQuestions,
-  courseId,
+  courseId: _courseId, // eslint-disable-line @typescript-eslint/no-unused-vars
   isLoading = false,
 }) => {
-  const t = useTranslations('manageCourse');
   const [validatedMappings, setValidatedMappings] = useState<Record<string, {
     validatedPrice: number;
     description: string;

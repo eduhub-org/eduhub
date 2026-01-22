@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DialogShell } from './DialogShell';
 import { Button } from '../Button';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 interface LinkedInSharingDialogProps {
   open: boolean;

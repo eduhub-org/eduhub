@@ -3,7 +3,7 @@ import { FC, Fragment, useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import { useQuery } from '@apollo/client';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { ClientOnly } from '@opencampus/shared-components';
 
 import { Page } from '../components/layout/Page';
@@ -42,7 +42,7 @@ const Home: FC = () => {
     if (router.query.sessionExpired === 'true') {
       setShowSessionExpiredNotification(true);
       // Remove the query parameter from URL without reloading
-      const { sessionExpired, ...restQuery } = router.query;
+      const { sessionExpired: _sessionExpired, ...restQuery } = router.query;
       router.replace(
         {
           pathname: router.pathname,

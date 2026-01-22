@@ -7,7 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 import InputAdornment from '@mui/material/InputAdornment';
 import { HelpOutline } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Option } from '../types';
 import { CreatableDropDown } from './CreatableDropDown';
 

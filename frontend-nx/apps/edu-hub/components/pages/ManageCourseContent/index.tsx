@@ -1,4 +1,4 @@
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { FC, useCallback, useState } from 'react';
 import { useRoleMutation } from '../../../hooks/authedMutation';
 import { useRoleQuery } from '../../../hooks/authedQuery';

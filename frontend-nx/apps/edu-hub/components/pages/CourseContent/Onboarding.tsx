@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { CircularProgress } from '@mui/material';
 
 import { useAuthedMutation } from '../../../hooks/authedMutation';

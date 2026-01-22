@@ -130,7 +130,7 @@ const ExpandableCourseRow: FC<ExpandableCourseRowProps> = ({
   const [createStripeBasePrice] = useAdminMutation(CREATE_STRIPE_BASE_PRICE);
 
   // Fetch addon mappings for the course
-  const { data: addonMappingsData, loading: addonMappingsLoading, error: addonMappingsError, refetch: refetchAddonMappings } = useRoleQuery(GET_COURSE_ADDON_MAPPINGS, {
+  const { data: addonMappingsData, loading: _addonMappingsLoading, error: _addonMappingsError, refetch: refetchAddonMappings } = useRoleQuery(GET_COURSE_ADDON_MAPPINGS, {
     variables: { courseId: course.id },
     skip: !requiresPayment, // Only fetch for payment-enabled courses
   });

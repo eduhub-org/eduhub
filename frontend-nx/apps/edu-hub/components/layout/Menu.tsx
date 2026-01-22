@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { FC, useCallback } from 'react';
 import { useIsAdmin } from '../../hooks/authentication';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import useLogout from '../../hooks/logout';
 
 interface IProps {

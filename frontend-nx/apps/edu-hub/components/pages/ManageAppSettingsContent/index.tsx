@@ -1,7 +1,7 @@
 import { FC, useMemo } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useSession } from 'next-auth/react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 import { Button } from '../../common/Button';

@@ -4,7 +4,7 @@ import { DropDownSelectorProps } from './types';
 import { MaterialDropDown } from './components/MaterialDropDown';
 import { EduhubDropDown } from './components/EduhubDropDown';
 import { useRoleMutation } from '../../../hooks/authedMutation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import NotificationSnackbar from '../../common/dialogs/NotificationSnackbar';
 import { ErrorMessageDialog } from '../../common/dialogs/ErrorMessageDialog';
 import { gql } from '@apollo/client';

@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { DocumentNode } from 'graphql';
 import { MdAddCircle } from 'react-icons/md';
 import { useRoleMutation } from '../../hooks/authedMutation';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { ErrorMessageDialog } from '../common/dialogs/ErrorMessageDialog';
 import NotificationSnackbar from '../common/dialogs/NotificationSnackbar';

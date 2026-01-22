@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from '@mui/material';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { ChangeEvent, FC, useCallback, useState, useMemo } from 'react';
 import { MdClose } from 'react-icons/md';
 import { useAuthedQuery } from '../../../hooks/authedQuery';

@@ -1,5 +1,5 @@
 import { CircularProgress } from '@mui/material';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { FC, useCallback, useContext, useReducer, useState } from 'react';
 import { MdAddCircle } from 'react-icons/md';
 import {

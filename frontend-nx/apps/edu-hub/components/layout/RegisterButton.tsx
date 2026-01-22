@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '../common/Button';
 

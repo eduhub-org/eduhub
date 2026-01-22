@@ -1,5 +1,5 @@
 import { useFormContext } from 'react-hook-form';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import type { InputHTMLAttributes, SelectHTMLAttributes } from 'react';
 

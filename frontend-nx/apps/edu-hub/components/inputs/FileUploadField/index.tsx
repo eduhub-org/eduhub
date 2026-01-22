@@ -16,7 +16,6 @@ import { FileUploadFieldProps } from './types';
 import { useTranslations } from 'next-intl';
 
 export const FileUploadField: FC<FileUploadFieldProps> = ({
-  variant,
   currentFileUrl,
   uploadMutation,
   updateMutation,
@@ -245,6 +244,7 @@ export const FileUploadField: FC<FileUploadFieldProps> = ({
       updateFieldName,
       useChangesObject,
       maxFileSize,
+      acceptedFileTypes,
       onUploadSuccess,
       onUploadError,
       t,

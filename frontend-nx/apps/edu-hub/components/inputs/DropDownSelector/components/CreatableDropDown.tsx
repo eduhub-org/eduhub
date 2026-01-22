@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Add as AddIcon, HelpOutline } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Option } from '../types';
 import { SelectChangeEvent } from '@mui/material';
 

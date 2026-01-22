@@ -1,5 +1,5 @@
 import React, { FC, useMemo, useState, FormEvent } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Button } from '../../../common/Button';
 import TagSelector from '../../../inputs/TagSelector';
 import RadioButtonSelector from '../../../inputs/RadioButtonSelector';
