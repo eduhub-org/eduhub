@@ -19510,6 +19510,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash@npm:^4.17.23":
+  version: 4.17.23
+  resolution: "lodash@npm:4.17.23"
+  checksum: 7daad39758a72872e94651630fbb54ba76868f904211089721a64516ce865506a759d9ad3d8ff22a2a49a50a09db5d27c36f22762d21766e47e3ba918d6d7bab
+  languageName: node
+  linkType: hard
+
 "log-symbols@npm:^1.0.2":
   version: 1.0.2
   resolution: "log-symbols@npm:1.0.2"
@@ -22094,7 +22101,7 @@ __metadata:
     jsonexport: ^3.2.0
     keycloak-js: ^22.0.5
     kleur: ^4.1.5
-    lodash: ^4.17.21
+    lodash: ^4.17.23
     loglevel: ^1.9.1
     lucide-react: ^0.456.0
     next: ^15.5.9
