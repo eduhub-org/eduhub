@@ -135,12 +135,30 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
   }, []);
 
   // Use TableGrid hook with proper refetchFilter for search debouncing
-  const { data, loading, error, searchFilter, pageIndex, setSearchFilter, setPageIndex } = useTableGrid({
+  const { data, loading, error, searchFilter, pageIndex, sorting, setSearchFilter, setPageIndex, setSorting } = useTableGrid({
     queryHook: useAdminQuery,
     query: ADMIN_COURSE_LIST,
     queryVariables: filter,
     pageSize: filter.limit || QUERY_LIMIT, // Use actual page size for offset calculations
     debounceMs: 1000, // Increased debounce time for search
+    sortColumnMapper: (columnId) => {
+      // Map table column IDs to GraphQL field names
+      switch (columnId) {
+        case 'title':
+          return 'title';
+        case 'applications':
+          // Return nested structure for aggregate field sorting
+          return { CourseEnrollments_aggregate: { count: null } };
+        case 'confirmed':
+          // Note: This sorts by total enrollments, not filtered confirmed count
+          // For filtered aggregate sorting, a computed field would be needed in Hasura
+          return { CourseEnrollments_aggregate: { count: null } };
+        case 'applicationEnd':
+          return 'applicationEnd';
+        default:
+          return null;
+      }
+    },
     refetchFilter: useCallback(
       (searchTerm: string) => {
         // Return the complete queryVariables including search
@@ -588,6 +606,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         accessorKey: 'title',
         size: 320,
         minSize: 250,
+        enableSorting: true,
         cell: ({ row }) => (
           <div className="flex items-center space-x-2">
             <div className="flex-1">
@@ -615,6 +634,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         header: t('table_header.applications'),
         accessorKey: 'applications',
         size: 100,
+        enableSorting: true,
         meta: { className: 'text-center' },
         cell: ({ row }) => <div className="text-center">{getApplicationsCount(row.original)}</div>,
       },
@@ -622,6 +642,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         header: t('table_header.confirmed'),
         accessorKey: 'confirmed',
         size: 100,
+        enableSorting: true,
         meta: { className: 'text-center' },
         cell: ({ row }) => <div className="text-center">{getConfirmedCount(row.original)}</div>,
       },
@@ -636,6 +657,7 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         header: t('table_header.application_end'),
         accessorKey: 'applicationEnd',
         size: 110,
+        enableSorting: true,
         meta: { className: 'text-center' },
         cell: ({ row }) => {
           const endDate = row.original.applicationEnd ? new Date(row.original.applicationEnd) : null;
@@ -721,6 +743,8 @@ const ManageCoursesContent: FC<IProps> = ({ programs }) => {
         onPageSizeChange={handlePageSizeChange}
         searchFilter={searchFilter}
         onSearchFilterChange={setSearchFilter}
+        sorting={sorting}
+        onSortingChange={setSorting}
         refetchQueries={['AdminCourseList']}
         bulkActions={bulkActions}
         onBulkAction={handleBulkAction}

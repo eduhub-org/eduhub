@@ -59,10 +59,23 @@ const ManageUsersContent: FC = () => {
     setPageIndex(0); // Reset to first page when page size changes
   };
 
-  const { data, loading, error, pageIndex, setPageIndex, searchFilter, setSearchFilter, refetch } = useTableGrid({
+  const { data, loading, error, pageIndex, sorting, setPageIndex, setSorting, searchFilter, setSearchFilter, refetch } = useTableGrid({
     queryHook: useAdminQuery,
     query: USERS_BY_LAST_NAME,
     pageSize: pageSize,
+    sortColumnMapper: (columnId) => {
+      // Map table column IDs to GraphQL field names
+      switch (columnId) {
+        case 'firstName':
+          return 'firstName';
+        case 'lastName':
+          return 'lastName';
+        case 'email':
+          return 'email';
+        default:
+          return null;
+      }
+    },
     refetchFilter: (searchFilter) => {
       const searchCondition = createMultiWordSearchCondition(searchFilter, ['lastName', 'firstName', 'email']);
       return {
@@ -127,6 +140,8 @@ const ManageUsersContent: FC = () => {
               onPageSizeChange={handlePageSizeChange}
               searchFilter={searchFilter}
               onSearchFilterChange={setSearchFilter}
+              sorting={sorting}
+              onSortingChange={setSorting}
               deleteMutation={DELETE_USER}
               deleteIdType="uuidString"
               error={error}
