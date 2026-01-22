@@ -198,7 +198,7 @@ const CourseEmailTemplates: FC = () => {
                 const key = 'course_specific_explanation';
                 const translation = t(key);
                 return translation !== key ? translation : 'These email templates are specific to this course and will override the default templates when sending emails for this course.';
-              } catch (_error) {
+              } catch {
                 return 'These email templates are specific to this course and will override the default templates when sending emails for this course.';
               }
             })()}

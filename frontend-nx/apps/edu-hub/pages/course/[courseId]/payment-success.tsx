@@ -18,7 +18,6 @@ export default function PaymentSuccessPage() {
   const t = useTranslations('course');
   const { courseId, session_id } = router.query;
   const [polling, setPolling] = useState(true);
-  const [_paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const { data: courseData } = useAuthedQuery<GetCourse, GetCourseVariables>(
@@ -38,7 +37,6 @@ export default function PaymentSuccessPage() {
         // Check enrollment status via GraphQL
         // In a real implementation, you'd query CourseEnrollment with paymentStatus = 'COMPLETED'
         // For now, we'll simulate with a timeout
-        const _maxAttempts = 30; // 30 seconds max
         let attempts = 0;
 
         const checkPayment = async () => {
@@ -47,7 +45,6 @@ export default function PaymentSuccessPage() {
           // For now, assume success after 3 seconds
           if (attempts >= 3) {
             setPolling(false);
-            setPaymentConfirmed(true);
             clearInterval(pollInterval);
           }
         };
@@ -67,7 +64,6 @@ export default function PaymentSuccessPage() {
       if (polling) {
         setPolling(false);
         // If still polling, assume success (webhook might be delayed)
-        setPaymentConfirmed(true);
       }
     }, 30000);
 
