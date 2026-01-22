@@ -42,6 +42,7 @@ const Home: FC = () => {
     if (router.query.sessionExpired === 'true') {
       setShowSessionExpiredNotification(true);
       // Remove the query parameter from URL without reloading
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { sessionExpired, ...restQuery } = router.query;
       router.replace(
         {
