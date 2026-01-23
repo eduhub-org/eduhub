@@ -129,9 +129,10 @@ export default async function createStripeCheckout(req, logger) {
     if (course.CourseAddonMappings && Array.isArray(course.CourseAddonMappings)) {
       for (const addonMapping of course.CourseAddonMappings) {
         // Check if this addon was selected in the Formbricks response
-        // Match by both questionId and choiceId
+        // Match by both questionId and choiceId, and ensure selected flag is true
         const isSelected = selectedAddons.some(
-          selected => selected.questionId === addonMapping.questionId &&
+          selected => selected.selected === true &&
+                     selected.questionId === addonMapping.questionId &&
                      selected.choiceId === addonMapping.choiceId
         );
 

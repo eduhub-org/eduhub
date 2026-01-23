@@ -53,6 +53,12 @@ const handleStripeWebhook = async (
     return res.status(500).json({ error: 'Stripe not configured' });
   }
 
+  const hasuraAdminSecret = process.env.HASURA_ADMIN_SECRET;
+  if (!hasuraAdminSecret || hasuraAdminSecret.trim() === '') {
+    console.error('HASURA_ADMIN_SECRET is missing or empty');
+    return res.status(500).json({ error: 'Hasura configuration missing' });
+  }
+
   const stripe = new Stripe(stripeSecretKey);
   const sig = req.headers['stripe-signature'];
 
@@ -84,7 +90,7 @@ const handleStripeWebhook = async (
     process.env.GRAPHQL_URI || 'http://hasura:8080/v1/graphql',
     {
       headers: {
-        'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET || '',
+        'x-hasura-admin-secret': hasuraAdminSecret,
       },
     }
   );

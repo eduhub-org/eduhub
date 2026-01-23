@@ -16,7 +16,6 @@ import validateFormbricksSurvey from "./validateFormbricksSurvey/index.js";
 import createStripeAddonPrices from "./createStripeAddonPrices/index.js";
 import createStripeBasePrice from "./createStripeBasePrice/index.js";
 import createStripeCheckout from "./createStripeCheckout/index.js";
-import handleStripeWebhook from "./handleStripeWebhook/index.js";
 
 /**
  * Creates a logger instance with structured logging.
@@ -53,8 +52,7 @@ const functionMap = {
   validateFormbricksSurvey,
   createStripeAddonPrices,
   createStripeBasePrice,
-  createStripeCheckout,
-  handleStripeWebhook
+  createStripeCheckout
 };
 
 /**
@@ -77,6 +75,25 @@ const validateSecret = (hasuraSecret) => {
   }
   
   return { isValid: true };
+};
+
+/**
+ * Validates Hasura environment variables required for GraphQL client operations.
+ * Exits the process if validation fails.
+ */
+const validateHasuraConfig = () => {
+  const hasuraEndpoint = process.env.HASURA_ENDPOINT;
+  const hasuraAdminSecret = process.env.HASURA_ADMIN_SECRET;
+  
+  if (!hasuraEndpoint) {
+    logger.error('HASURA_ENDPOINT environment variable is missing');
+    process.exit(1);
+  }
+  
+  if (!hasuraAdminSecret) {
+    logger.error('HASURA_ADMIN_SECRET environment variable is missing');
+    process.exit(1);
+  }
 };
 
 /**
@@ -108,6 +125,9 @@ export const callNodeFunction = async (req, res) => {
     headers: req.headers,
     body: req.body
   });
+
+  // Validate Hasura configuration
+  validateHasuraConfig();
 
   // Validate secret
   const secretValidation = validateSecret(req.headers.secret);

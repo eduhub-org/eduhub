@@ -19,6 +19,11 @@ INSERT INTO "public"."PaymentStatus" ("value", "comment") VALUES
   ('FAILED', 'Payment failed'),
   ('REFUNDED', 'Payment was refunded');
 
+-- Add foreign key constraint on CourseEnrollment.paymentStatus
+ALTER TABLE "public"."CourseEnrollment"
+ADD CONSTRAINT "fk_courseenrollment_paymentstatus"
+FOREIGN KEY ("paymentStatus") REFERENCES "public"."PaymentStatus"("value");
+
 COMMENT ON COLUMN "public"."CourseEnrollment"."stripeCheckoutSessionId" IS 'Stripe Checkout Session ID';
 COMMENT ON COLUMN "public"."CourseEnrollment"."stripePaymentIntentId" IS 'Stripe Payment Intent ID';
 COMMENT ON COLUMN "public"."CourseEnrollment"."paymentStatus" IS 'Current payment status';

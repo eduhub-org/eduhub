@@ -23,11 +23,6 @@ EduHub integrates with [Stripe](https://stripe.com) to handle course enrollment 
 - Handles base course pricing and selected add-ons
 - Returns checkout URL for redirect
 
-**`handleStripeWebhook/index.js`**
-- Processes Stripe webhook events
-- Updates enrollment payment status
-- Handles payment failures and expired sessions
-
 **`createStripeAddonPrices/index.js`**
 - Creates Stripe products and prices for validated add-ons
 - Manages product/price lifecycle

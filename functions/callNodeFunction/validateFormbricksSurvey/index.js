@@ -362,7 +362,7 @@ export default async function validateFormbricksSurvey(req, logger) {
             questionId: question.id,
             choiceId: addonData.choiceId,
             questionType: question.type || 'unknown',
-            questionText: JSON.stringify(questionTexts),
+            questionText: questionTexts,
             extractedPrice: addonData.price,
             extractedCurrency: addonData.currency,
             confidence: addonData.confidence,

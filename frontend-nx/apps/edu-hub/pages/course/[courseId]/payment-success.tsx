@@ -31,21 +31,23 @@ export default function PaymentSuccessPage() {
   useEffect(() => {
     if (!session_id || !courseId) return;
 
+    let attempts = 0;
+    let timeoutId: NodeJS.Timeout;
+
     // Poll for payment confirmation
     const pollInterval = setInterval(async () => {
       try {
         // Check enrollment status via GraphQL
         // In a real implementation, you'd query CourseEnrollment with paymentStatus = 'COMPLETED'
         // For now, we'll simulate with a timeout
-        let attempts = 0;
-
         const checkPayment = async () => {
           attempts++;
           // TODO: Query enrollment status from GraphQL
-          // For now, assume success after 3 seconds
+          // For now, assume success after 3 attempts
           if (attempts >= 3) {
             setPolling(false);
             clearInterval(pollInterval);
+            clearTimeout(timeoutId);
           }
         };
 
@@ -55,20 +57,22 @@ export default function PaymentSuccessPage() {
         setPolling(false);
         setError('Failed to verify payment status');
         clearInterval(pollInterval);
+        clearTimeout(timeoutId);
       }
     }, 1000);
 
     // Stop polling after 30 seconds
-    setTimeout(() => {
+    timeoutId = setTimeout(() => {
       clearInterval(pollInterval);
-      if (polling) {
-        setPolling(false);
-        // If still polling, assume success (webhook might be delayed)
-      }
+      setPolling(false);
+      // If still polling, assume success (webhook might be delayed)
     }, 30000);
 
-    return () => clearInterval(pollInterval);
-  }, [session_id, courseId, polling]);
+    return () => {
+      clearInterval(pollInterval);
+      clearTimeout(timeoutId);
+    };
+  }, [session_id, courseId]);
 
   const course = courseData?.Course_by_pk;
 
