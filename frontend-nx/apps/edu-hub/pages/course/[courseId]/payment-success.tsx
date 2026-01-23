@@ -32,7 +32,6 @@ export default function PaymentSuccessPage() {
     if (!session_id || !courseId) return;
 
     let attempts = 0;
-    let timeoutId: NodeJS.Timeout;
 
     // Poll for payment confirmation
     const pollInterval = setInterval(async () => {
@@ -62,7 +61,7 @@ export default function PaymentSuccessPage() {
     }, 1000);
 
     // Stop polling after 30 seconds
-    timeoutId = setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       clearInterval(pollInterval);
       setPolling(false);
       // If still polling, assume success (webhook might be delayed)
