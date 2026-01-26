@@ -409,17 +409,12 @@ security_handler = SecurityHandler()
 
 def get_security_level_for_organization(organization_type: str) -> SecurityLevel:
     """
-    Determine security level based on organization type
-    """
-    security_mapping = {
-        'university': SecurityLevel.PREMIUM,
-        'company': SecurityLevel.STANDARD,
-        'government': SecurityLevel.ENTERPRISE,
-        'non_profit': SecurityLevel.BASIC,
-        'research': SecurityLevel.PREMIUM
-    }
+    Return ENTERPRISE security level for all organizations.
     
-    return security_mapping.get(organization_type, SecurityLevel.BASIC)
+    This provides generous rate limits (10,000/hour, 1,000/minute, 2,000 burst)
+    to all API consumers regardless of organization type.
+    """
+    return SecurityLevel.ENTERPRISE
 
 
 def validate_and_sanitize_input(data: Any, field_type: str) -> Tuple[bool, Any]:
