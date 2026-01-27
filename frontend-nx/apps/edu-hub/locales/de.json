@@ -390,7 +390,9 @@
       "invited": "Du wurdest eingeladen und musst deine Teilnahme bestätigen",
       "invitation_expired": "Deine Einladung ist abgelaufen",
       "application_period_ended": "Die Bewerbungsfrist  ist leider abgelaufen. Du kannst unseren <a>Newsletter</a> abonnieren, um über neue Angebote informiert zu bleiben.",
-      "application_period_ended_title": "Bewerbungsfrist abgelaufen"
+      "application_period_ended_title": "Bewerbungsfrist abgelaufen",
+      "registration_period_ended": "Die Anmeldefrist ist leider abgelaufen. Du kannst unseren <a>Newsletter</a> abonnieren, um über neue Angebote informiert zu bleiben.",
+      "registration_period_ended_title": "Anmeldefrist abgelaufen"
     },
     "modal": {
       "title_approval": "Bewerbung",
