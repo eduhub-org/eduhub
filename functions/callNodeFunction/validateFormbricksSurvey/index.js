@@ -340,13 +340,57 @@ export default async function validateFormbricksSurvey(req, logger) {
       surveyId: formbricksSurveyId
     });
 
-    const surveyResponse = await fetch(surveyUrl_api, {
-      method: 'GET',
-      headers: {
-        'x-api-key': formbricksApiKey,
-        'Content-Type': 'application/json'
+    // Create AbortController for timeout handling
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 10000); // 10 second timeout
+
+    let surveyResponse;
+    try {
+      surveyResponse = await fetch(surveyUrl_api, {
+        method: 'GET',
+        headers: {
+          'x-api-key': formbricksApiKey,
+          'Content-Type': 'application/json'
+        },
+        signal: controller.signal
+      });
+    } catch (error) {
+      // Clear timeout timer since fetch completed (with error)
+      clearTimeout(timeoutId);
+      
+      // Handle AbortError (timeout)
+      if (error.name === 'AbortError') {
+        logger.error('Formbricks request timed out after 10 seconds', {
+          surveyUrl: surveyUrl_api,
+          surveyId: formbricksSurveyId,
+          error: error.message
+        });
+        return {
+          success: false,
+          error: 'Formbricks request timed out after 10 seconds. Please check your network connection and try again.',
+          messageKey: 'FORMBRICKS_TIMEOUT'
+        };
       }
-    });
+      
+      // Handle other fetch errors
+      logger.error('Failed to fetch survey from Formbricks', {
+        surveyUrl: surveyUrl_api,
+        surveyId: formbricksSurveyId,
+        error: error.message,
+        errorName: error.name,
+        stack: error.stack
+      });
+      return {
+        success: false,
+        error: `Failed to fetch survey from Formbricks: ${error.message}`,
+        messageKey: 'FORMBRICKS_FETCH_ERROR'
+      };
+    }
+    
+    // Clear timeout timer since fetch completed successfully
+    clearTimeout(timeoutId);
 
     if (!surveyResponse.ok) {
       const errorText = await surveyResponse.text();

@@ -1074,7 +1074,7 @@
       "sync_now": "Jetzt synchronisieren"
     },
     "addons": {
-      "manage_hint": "Um Add-ons zu bearbeiten, nutze \"Umfrage validieren\" im Bereich Preiseinstellungen."
+      "manage_hint": "Um Add-ons zu bearbeiten, nutze \"Add-Ons validieren\" im Bereich Preiseinstellungen."
     },
     "common": {
       "edit": "Bearbeiten",

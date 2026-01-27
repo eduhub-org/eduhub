@@ -63,7 +63,12 @@ select_permissions:
 insert_permissions:
   - role: instructor_access
     permission:
-      check: {}
+      check:
+        Course:
+          CourseInstructors:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
       columns:
         - courseId
         - questionId
@@ -91,10 +96,20 @@ update_permissions:
         - confidence
         - validatedAt
         - validatedBy
-      filter: {}
-      check: {}
+      filter:
+        Course:
+          CourseInstructors:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
+      check: null
 delete_permissions:
   - role: instructor_access
     permission:
-      filter: {}
+      filter:
+        Course:
+          CourseInstructors:
+            User:
+              id:
+                _eq: X-Hasura-User-Id
 
