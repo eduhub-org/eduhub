@@ -25,8 +25,9 @@ const GET_COURSE_AND_ADDONS = `
 
 /**
  * Creates a Stripe Checkout Session for course enrollment with add-ons.
+ * Builds success and cancel URLs server-side from FRONTEND_URL for security.
  * 
- * @param {Object} req - Request object containing body with courseId, enrollmentId, formbricksResponseId, successUrl, cancelUrl, selectedAddons
+ * @param {Object} req - Request object containing body with courseId, enrollmentId, formbricksResponseId, selectedAddons
  * @param {Object} logger - Winston logger instance
  * @returns {Object} Checkout session URL
  */
@@ -39,8 +40,6 @@ export default async function createStripeCheckout(req, logger) {
       courseId,
       enrollmentId,
       formbricksResponseId,
-      successUrl,
-      cancelUrl,
       userEmail,
       selectedAddons = []
     } = req.body.input || req.body;
@@ -61,13 +60,20 @@ export default async function createStripeCheckout(req, logger) {
       };
     }
 
-    if (!successUrl || !cancelUrl) {
+    // Build URLs server-side from trusted FRONTEND_URL
+    const frontendUrl = process.env.FRONTEND_URL;
+    if (!frontendUrl) {
+      logger.error('FRONTEND_URL environment variable not configured');
       return {
         success: false,
-        error: 'Success and cancel URLs are required',
-        messageKey: 'MISSING_URLS'
+        error: 'Frontend URL not configured',
+        messageKey: 'FRONTEND_URL_NOT_CONFIGURED'
       };
     }
+
+    // Build success and cancel URLs server-side
+    const successUrl = `${frontendUrl}/course/${courseId}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${frontendUrl}/course/${courseId}/payment-cancelled`;
 
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeSecretKey) {
@@ -200,4 +206,3 @@ export default async function createStripeCheckout(req, logger) {
     };
   }
 }
-

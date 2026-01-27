@@ -304,6 +304,7 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       KEYCLOAK_USER   = var.keycloak_user
       KEYCLOAK_URL    = "https://${local.keycloak_service_name}.opencampus.sh"
       HASURA_ENDPOINT = "https://${local.hasura_service_name}.opencampus.sh/v1/graphql"
+      FRONTEND_URL    = "https://${local.eduhub_service_name}.opencampus.sh"
     }
 
     secret_environment_variables {
@@ -331,20 +332,6 @@ resource "google_cloudfunctions2_function" "call_node_function" {
       key        = "FORMBRICKS_API_KEY"
       project_id = var.project_id
       secret     = google_secret_manager_secret.formbricks_api_key.secret_id
-      version    = "latest"
-    }
-
-    secret_environment_variables {
-      key        = "STRIPE_SECRET_KEY"
-      project_id = var.project_id
-      secret     = google_secret_manager_secret.stripe_secret_key.secret_id
-      version    = "latest"
-    }
-
-    secret_environment_variables {
-      key        = "STRIPE_WEBHOOK_SECRET"
-      project_id = var.project_id
-      secret     = google_secret_manager_secret.stripe_webhook_secret.secret_id
       version    = "latest"
     }
 

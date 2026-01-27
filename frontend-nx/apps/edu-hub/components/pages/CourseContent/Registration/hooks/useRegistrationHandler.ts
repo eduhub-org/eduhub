@@ -149,16 +149,12 @@ export const useRegistrationHandler = ({
         // For now, we pass null and let the backend handle it
 
         // 3. Create Stripe Checkout session
-        const successUrl = `${window.location.origin}/course/${course.id}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
-        const cancelUrl = `${window.location.origin}/course/${course.id}/payment-cancelled`;
-
+        // URLs are now built server-side from FRONTEND_URL for security
         const checkoutResult = await createStripeCheckoutMutation({
           variables: {
             courseId: course.id,
             enrollmentId,
             formbricksResponseId: null, // Will be fetched server-side if needed
-            successUrl,
-            cancelUrl,
             userEmail: null, // Will be fetched from user context server-side
             course: null, // Will be fetched server-side from Hasura
             addonMappings: null, // Will be fetched server-side from Hasura

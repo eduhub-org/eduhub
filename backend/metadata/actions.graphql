@@ -169,8 +169,6 @@ type Mutation {
     courseId: Int!
     enrollmentId: Int!
     formbricksResponseId: String
-    successUrl: String!
-    cancelUrl: String!
     userEmail: String
     course: CourseInput
     addonMappings: [AddonMappingInput!]

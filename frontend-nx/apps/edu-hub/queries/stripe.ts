@@ -5,8 +5,6 @@ export const CREATE_STRIPE_CHECKOUT = gql`
     $courseId: Int!
     $enrollmentId: Int!
     $formbricksResponseId: String
-    $successUrl: String!
-    $cancelUrl: String!
     $userEmail: String
     $course: CourseInput
     $addonMappings: [AddonMappingInput!]
@@ -16,8 +14,6 @@ export const CREATE_STRIPE_CHECKOUT = gql`
       courseId: $courseId
       enrollmentId: $enrollmentId
       formbricksResponseId: $formbricksResponseId
-      successUrl: $successUrl
-      cancelUrl: $cancelUrl
       userEmail: $userEmail
       course: $course
       addonMappings: $addonMappings
