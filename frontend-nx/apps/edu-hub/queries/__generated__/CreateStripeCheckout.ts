@@ -29,8 +29,6 @@ export interface CreateStripeCheckoutVariables {
   courseId: number;
   enrollmentId: number;
   formbricksResponseId?: string | null;
-  successUrl: string;
-  cancelUrl: string;
   userEmail?: string | null;
   course?: CourseInput | null;
   addonMappings?: AddonMappingInput[] | null;

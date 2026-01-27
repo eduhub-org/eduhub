@@ -437,8 +437,9 @@ export enum Country_update_column {
  * unique or primary key constraints on table "CourseAddonMapping"
  */
 export enum CourseAddonMapping_constraint {
-  CourseAddonMapping_courseId_questionId_choiceId_key = "CourseAddonMapping_courseId_questionId_choiceId_key",
   CourseAddonMapping_pkey = "CourseAddonMapping_pkey",
+  CourseAddonMapping_unique_no_choice = "CourseAddonMapping_unique_no_choice",
+  CourseAddonMapping_unique_with_choice = "CourseAddonMapping_unique_with_choice",
 }
 
 /**
