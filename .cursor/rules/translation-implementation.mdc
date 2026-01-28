@@ -1,339 +1,51 @@
 ---
-description: "Apply when working with translations, implementing internationalization (i18n), adding new text content that needs translation, working with locale files, or ensuring German 'Du' form compliance in EduHub"
+description: "Apply when working with translations or i18n in EduHub. German MUST use informal 'Du' form."
+globs: "**/locales/**,**/*.tsx"
 alwaysApply: false
 ---
-# Translation Implementation Guide
 
-> **Related Rules**: [Frontend Component Patterns](frontend-component-patterns.mdc) | [Component Architecture](component-architecture.mdc) | [Testing Standards](testing-standards.mdc)
+# Translations (next-intl)
 
-This guide covers how to implement translations in the EduHub project following established conventions and component-based organization.
+## CRITICAL: German "Du" Form
 
-## File Structure and Naming
+**ALWAYS use informal "Du" in German translations:**
+- ✅ `"Du kannst..."` / `"Bitte gib..."` / `"Deine Bewerbung..."`
+- ❌ `"Sie können..."` / `"Bitte geben Sie..."` / `"Ihre Bewerbung..."`
 
-### Translation Files
-- **Location**: `frontend-nx/apps/edu-hub/locales/`
-- **Languages**: `de` (German), `en` (English)
-- **File structure**: **One file per language** (`de.json`, `en.json`)
-- **Organization**: Translations are organized into namespaces within each JSON file, organized by component/page names
+## File Structure
 
-### Naming Conventions
+- Location: `frontend-nx/apps/edu-hub/locales/`
+- Files: `de.json`, `en.json`
+- Structure: `namespace.ComponentName.translation_key`
 
-#### Namespace Names (Top-Level Keys)
-- **Namespaces match component or page names** (camelCase or PascalCase depending on component naming)
-- Examples: `course`, `coursePage`, `common`, `auth`, `manageOrganizations`
+## Usage
 
-#### Group Names (Nested Within Namespaces)
-- **Component names**: Use PascalCase, matching the actual component name exactly
-  - Examples: `CreatableTagSelector`, `TableGrid`, `ImageUploader`, `InputField`, `Sessions`, `RegistrationModal`
-- **Logical groupings within components**: Use snake_case for grouping related translations
-  - Examples: `attendance_status`, `error_messages`, `general`, `common`, `modal`, `errors`
-- **Both patterns can coexist**: Component names (PascalCase) and logical groups (snake_case) can both be used as needed
-
-#### Translation Keys (Leaf Values)
-- **All translation keys MUST use snake_case**
-- Examples: `login_error_message`, `application_deadline`, `max_missed_sessions`
-
-## Language Consistency Rules
-
-### German Translations - MANDATORY "Du" Usage
-- **ALWAYS use informal "Du" variant in German translations**
-- **NEVER use formal "Sie" variant**
-- This is a strict requirement for all German translations in the EduHub project
-- Examples:
-  - ✅ `"Du kannst unseren Newsletter abonnieren"`
-  - ❌ `"Sie können unseren Newsletter abonnieren"`
-  - ✅ `"Bitte gib ein Motivationsschreiben an"`
-  - ❌ `"Bitte geben Sie ein Motivationsschreiben an"`
-  - ✅ `"Du wirst nach der Registrierung weitergeleitet"`
-  - ❌ `"Sie werden nach der Registrierung weitergeleitet"`
-  - ✅ `"Deine Bewerbung wurde eingereicht"`
-  - ❌ `"Ihre Bewerbung wurde eingereicht"`
-
-### English Translations
-- Use clear, concise language
-- Maintain consistent terminology across components
-
-## Component-Based Translation Organization
-
-### Translation Structure
-
-Translations are organized hierarchically:
-1. **Top-level namespaces** match component/page names (camelCase or PascalCase)
-2. **Nested groups** within namespaces can be:
-   - Component names (PascalCase) - e.g., `CreatableTagSelector`, `Sessions`
-   - Logical groupings (snake_case) - e.g., `attendance_status`, `error_messages`, `general`
-3. **Translation keys** use snake_case
-
-### Example Structure
-
-```json
-{
-  "common": {
-    "delete": "Delete",
-    "save": "Save",
-    "CreatableTagSelector": {
-      "add_tag": "Add \"{value}\""
-    },
-    "TableGrid": {
-      "pagination_text": "Page {currentPage} of {totalPage}",
-      "bulk_action": "Bulk Action"
-    },
-    "ImageUploader": {
-      "uploading": "Uploading...",
-      "upload_file": "Upload file"
-    }
-  },
-  "course": {
-    "Sessions": {
-      "show_all_sessions": "Alle Termine anzeigen",
-      "hide_sessions": "Termine einklappen",
-      "course_sessions": "Kurstermine"
-    },
-    "Attendances": {
-      "attendances": "Anwesenheiten",
-      "max_missed_sessions": "Du darfst an maximal einem Termin fehlen",
-      "attendance_status": {
-        "ATTENDED": "Teilgenommen",
-        "MISSED": "Nicht teilgenommen"
-      }
-    },
-    "RegistrationModal": {
-      "title_approval": "Für Kurs bewerben",
-      "motivation_letter_label": "Motivationsschreiben",
-      "cancel": "Abbrechen",
-      "errors": {
-        "motivation_letter_required": "Bitte gib ein Motivationsschreiben an",
-        "registration_failed": "Registrierung fehlgeschlagen"
-      }
-    },
-    "general": {
-      "events": "Event",
-      "ects": "ECTS",
-      "course_not_available": "Kurs nicht verfügbar"
-    }
-  },
-  "coursePage": {
-    "ManageCourseContent": {
-      "course_title": "Course title",
-      "course_instructor": "Course instructor"
-    }
-  }
-}
-```
-
-**Key Points**:
-- **Namespaces** (top-level): Match component/page names - `course`, `coursePage`, `common`
-- **Groups** (nested): 
-  - Component names use PascalCase - `CreatableTagSelector`, `TableGrid`, `Sessions`, `RegistrationModal`
-  - Logical groupings use snake_case - `attendance_status`, `error_messages`, `general`, `common`
-- **Keys** (leaf values): Use snake_case - `add_tag`, `pagination_text`, `show_all_sessions`
-- All translations are in a single file per language (`de.json`, `en.json`)
-
-## Translation Usage in Components
-
-### Import and Setup
 ```typescript
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
-const t = useTranslations('course'); // Use namespace (e.g., 'course', 'common', 'auth')
-```
-
-**Important**: EduHub uses **next-intl** (not next-translate). The hook is `useTranslations` (plural) and returns the translation function directly.
-
-### Accessing Grouped Translations
-```typescript
 const t = useTranslations('course');
+const locale = useLocale(); // 'de' or 'en'
 
-// Access translations organized by component name (PascalCase)
-const sessionsText = t('Sessions.show_all_sessions');
-const hideSessions = t('Sessions.hide_sessions');
+// Access translations
+t('Sessions.show_all_sessions');
+t('RegistrationModal.errors.motivation_letter_required');
 
-// Access logical groupings (snake_case) within components
-const attendanceStatus = t.raw('Attendances.attendance_status');
-const status = attendanceStatus['ATTENDED']; // "Teilgenommen"
-
-// Access component-specific translations
-const modalTitle = t('RegistrationModal.title_approval');
-const motivationLabel = t('RegistrationModal.motivation_letter_label');
-
-// Access logical groupings within components
-const errorMsg = t('RegistrationModal.errors.motivation_letter_required');
-const generalEvents = t('general.events');
-
-// Access common component translations
+// Multiple namespaces
 const tCommon = useTranslations('common');
-const addTagText = tCommon('CreatableTagSelector.add_tag');
-const paginationText = tCommon('TableGrid.pagination_text');
+tCommon('TableGrid.pagination_text');
 ```
 
-### Accessing Multiple Namespaces
-```typescript
-import { useTranslations } from 'next-intl';
+## Naming Conventions
 
-const tCommon = useTranslations('common');
-const tCourse = useTranslations('course');
+| Level | Convention | Example |
+|-------|------------|---------|
+| Namespace | camelCase | `course`, `common`, `auth` |
+| Component group | PascalCase | `Sessions`, `RegistrationModal` |
+| Translation key | snake_case | `show_all_sessions` |
 
-// Use translations from different namespaces
-const deleteButton = tCommon('delete');
-const courseTitle = tCourse('Sessions.show_all_sessions');
-```
+## Adding Translations
 
-### Accessing Current Locale
-```typescript
-import { useLocale } from 'next-intl';
-
-const locale = useLocale(); // Returns 'de' or 'en'
-
-// Use locale for conditional logic or API calls
-if (locale === 'de') {
-  // German-specific logic
-}
-```
-
-## Best Practices
-
-### Adding New Translations
-1. **Identify the namespace** the translation belongs to (e.g., `course`, `common`, `auth`) - matches component/page name
-2. **Identify the organization level**:
-   - If it's component-specific: create a group with the component name in PascalCase (e.g., `TableGrid`, `RegistrationModal`)
-   - If it's a logical grouping: use snake_case (e.g., `attendance_status`, `error_messages`, `general`)
-3. **Use snake_case** for all translation keys (leaf values)
-4. **Add to both `de.json` and `en.json`** files simultaneously in the same namespace and group
-5. **Maintain component-based organization** - group translations by the component that uses them, with logical subgroups as needed
-6. **MANDATORY: Use informal "Du" in ALL German translations**
-7. **File structure**: All translations are in single files per language (`de.json`, `en.json`) organized by namespaces and groups
-
-**Examples**: 
-```json
-{
-  "common": {
-    "TableGrid": {
-      "pagination_text": "Page {currentPage} of {totalPage}",
-      "items_per_page": "Items per page"
-    }
-  },
-  "course": {
-    "RegistrationModal": {
-      "title_approval": "Für Kurs bewerben",
-      "errors": {
-        "motivation_letter_required": "Bitte gib ein Motivationsschreiben an"
-      }
-    },
-    "Attendances": {
-      "attendance_status": {
-        "ATTENDED": "Teilgenommen",
-        "MISSED": "Nicht teilgenommen"
-      }
-    }
-  }
-}
-```
-
-> **💡 Tip**: See [Frontend Component Patterns](frontend-component-patterns.mdc) for component integration examples and [Testing Standards](testing-standards.mdc) for translation testing.
-
-### Accessing Nested Translations
-```typescript
-const t = useTranslations('course');
-
-// For simple nested access
-const text = t('group.key');
-
-// For dynamic keys or keys with special characters, use .raw()
-const translations = t.raw('group');
-const value = translations[dynamicKey];
-```
-
-### Error Handling
-```typescript
-// Provide fallback for missing translations
-const text = t('group.key') || 'Fallback text';
-
-// Check if translation exists
-const hasTranslation = t('group.key') !== 'group.key';
-```
-
-### Pluralization
-```typescript
-// Use count parameter for plural forms
-const missedSessions = t('attendances.max_missed_sessions', { count: maxMissed });
-```
-
-## File Organization Examples
-
-### CourseContent Structure
-```
-frontend-nx/apps/edu-hub/components/pages/CourseContent/
-├── index.tsx                    # Uses: course.Sessions.*, course.Attendances.*
-├── LearningGoals.tsx           # Uses: course.LearningGoals.*
-├── DegreeCourses.tsx           # Uses: course.DegreeCourses.*
-├── Sessions.tsx                # Uses: course.Sessions.*
-├── Registration/
-│   ├── index.tsx              # Uses: course.Registration.*
-│   ├── RegistrationModal.tsx  # Uses: course.RegistrationModal.*
-│   └── RegistrationStatus.tsx # Uses: course.RegistrationStatus.*
-└── AchievementRecord/
-    ├── index.tsx              # Uses: course.AchievementRecord.*
-    └── UploadModal.tsx        # Uses: course.AchievementRecord.*
-```
-
-### Translation File Mapping
-- **CourseContent components** → `course` namespace with component groups (e.g., `course.Sessions.*`, `course.RegistrationModal.*`)
-- **Management pages** → `coursePage` namespace with component groups (e.g., `coursePage.ManageCourseContent.*`)
-- **Authentication** → `auth` namespace with component groups
-- **Common/shared components** → `common` namespace with component groups (e.g., `common.TableGrid.*`, `common.CreatableTagSelector.*`)
-
-**Structure**: `namespace.ComponentName.translation_key` where:
-- `namespace` = top-level namespace (matches page/feature name)
-- `ComponentName` = component name in PascalCase
-- `translation_key` = snake_case key
-
-All translations are stored in a single file per language (`de.json` or `en.json`) with namespaces as top-level keys and component names as nested groups.
-
-## Migration Guidelines
-
-### Migrating from next-translate to next-intl
-1. **Update imports**: Change `import useTranslation from 'next-translate/useTranslation'` to `import { useTranslations } from 'next-intl'`
-2. **Update hook usage**: Change `const { t } = useTranslation('namespace')` to `const t = useTranslations('namespace')`
-3. **Update file structure**: Consolidate multiple translation files per language into single `de.json` and `en.json` files
-4. **Organize by namespaces**: Group translations into top-level namespace keys (e.g., `course`, `common`, `auth`) within each language file
-
-### When consolidating translations:
-1. **Identify duplicate keys** across namespaces
-2. **Organize by component**: Group translations under component names (PascalCase) within appropriate namespaces
-3. **Update component imports** to use `useTranslations` from `next-intl`
-4. **Convert keys to snake_case** if needed (translation keys only, not component group names)
-5. **CRITICAL: Convert ALL German translations to informal "Du" form**
-6. **Remove duplicates** from original namespaces
-7. **Test all affected components**
-
-**Example migration**:
-```json
-// Before (old structure)
-{
-  "course": {
-    "sessions": {
-      "show_all": "Show all"
-    }
-  }
-}
-
-// After (component-based structure)
-{
-  "course": {
-    "Sessions": {
-      "show_all": "Show all"
-    }
-  }
-}
-```
-
-## Quality Assurance
-
-### German Translation Review
-When reviewing German translations, check for:
-- No formal "Sie/Ihnen/Ihre" pronouns
-- Consistent informal verb conjugations
-- Proper informal possessive pronouns (dein/deine)
-- Friendly, approachable tone throughout
-
-This structure ensures maintainable, organized translations that scale with component growth while maintaining consistency and the required informal tone across the application.
+1. Add to both `de.json` and `en.json`
+2. Use snake_case for keys
+3. German: Use "Du" form (mandatory)
+4. Group under component name (PascalCase)
