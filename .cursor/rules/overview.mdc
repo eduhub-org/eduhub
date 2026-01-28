@@ -70,6 +70,23 @@ docker-compose up        # Start all services
 - **Translations**: Use `useTranslation` hook with snake_case keys
 - **GraphQL**: Use `useAdminQuery`, `useRoleMutation` with proper error handling
 
+### Backend Schema Change Workflow (MANDATORY)
+
+When ANY task involves database schema changes (adding/removing columns, tables, constraints, etc.), you MUST complete ALL of these steps:
+
+1. **Create Migration Files**: Create SQL migration files in `backend/migrations/default/{timestamp}_{description}/` with both `up.sql` and `down.sql`. See [database-table-creation.md](mdc:database-table-creation.md) for templates.
+
+2. **Update Hasura Metadata**: If adding/removing tables or relationships, update files in `backend/metadata/databases/default/tables/`.
+
+3. **Update GraphQL Queries**: If the schema change affects existing queries, update the query files in `frontend-nx/apps/edu-hub/queries/`.
+
+4. **Regenerate TypeScript Types**: After ANY GraphQL-related changes, regenerate types by running:
+   ```bash
+   cd /home/steffen/git/eduhub/frontend-nx && GRAPHQL_URI=http://localhost:8080/v1/graphql yarn nx run edu-hub:apollo 2>&1 | tail -50
+   ```
+
+**IMPORTANT**: Never consider a schema-change task complete until migrations are created AND types are regenerated.
+
 ### Essentials for every prompt
 
 - **Tech stack**: Next.js, React, TypeScript, Material-UI, Apollo GraphQL, Hasura, PostgreSQL, Keycloak
@@ -77,5 +94,6 @@ docker-compose up        # Start all services
 - **Translations**: German "Du" form mandatory, English fallbacks
 - **Error handling**: Comprehensive error boundaries and user feedback
 - **Testing**: Jest, React Testing Library, component behavior testing
+- **Schema changes**: ALWAYS create migrations AND regenerate types (see workflow above)
 
 For deeper details, consult component-specific rules and [frontend-nx/apps/edu-hub/](mdc:frontend-nx/apps/edu-hub/) structure.
