@@ -6,27 +6,18 @@ description: Regenerate TypeScript types from GraphQL schema using Apollo codege
 
 ## Prerequisites
 
-- Backend (Hasura) must be running
-- Run `docker-compose up hasura` if not already running
+- Docker containers must be running (`docker-compose up`)
 
 ## Quick Command
 
 ```bash
-# From frontend-nx directory
-cd frontend-nx
-
-# Regenerate types for edu-hub
-yarn nx run edu-hub:apollo
-
-# Regenerate types for rent-a-scientist
-yarn nx run rent-a-scientist:apollo
+# From project root
+./regen
 ```
 
-## What This Does
-
-1. Clears existing generated types in `queries/__generated__/`
-2. Runs Apollo codegen against all `queries/**/*.ts` files
-3. Generates TypeScript types matching GraphQL operations
+This script:
+1. Runs Apollo codegen inside the Docker container
+2. Automatically fixes file permission issues (root-owned files)
 
 ## When to Run
 
@@ -36,28 +27,41 @@ Run codegen after:
 - Backend schema changes (new tables, columns, relationships)
 - Pulling changes that include query modifications
 
+## Alternative: Run Inside Container
+
+If you're already inside the container or prefer manual execution:
+
+```bash
+# From frontend-nx directory
+cd frontend-nx
+yarn nx run edu-hub:apollo
+
+# For rent-a-scientist app
+yarn nx run rent-a-scientist:apollo
+```
+
 ## Troubleshooting
 
-### "Cannot reach GraphQL endpoint"
-Ensure Hasura is running:
+### "Container not running"
+Start the containers first:
 ```bash
-docker-compose up hasura
+docker-compose up frontend-nx hasura
+```
+
+### Permission issues after codegen
+The `./regen` script handles this automatically. If running manually:
+```bash
+sudo chown $USER:$USER -R .
 ```
 
 ### Types not updating
 Clear and regenerate:
 ```bash
-rm -rf apps/edu-hub/queries/__generated__/*
-yarn nx run edu-hub:apollo
-```
-
-### Schema introspection fails
-Check Hasura is healthy:
-```bash
-curl http://localhost:8080/healthz
+rm -rf frontend-nx/apps/edu-hub/queries/__generated__/*
+./regen
 ```
 
 ## Generated Files Location
 
-- edu-hub: `apps/edu-hub/queries/__generated__/`
-- rent-a-scientist: `apps/rent-a-scientist/queries/__generated__/`
+- edu-hub: `frontend-nx/apps/edu-hub/queries/__generated__/`
+- rent-a-scientist: `frontend-nx/apps/rent-a-scientist/queries/__generated__/`
