@@ -18,5 +18,7 @@ export const ADMIN_ENROLLMENT_FRAGMENT = gql`
     ...EnrollmentFragment
     motivationLetter
     motivationRating
+    paymentStatus
+    stripePaymentIntentId
   }
 `;

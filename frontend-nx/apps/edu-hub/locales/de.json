@@ -913,6 +913,7 @@
     "sessions": "Termine",
     "applications": "Bewerbungen",
     "registrations": "Registrierungen",
+    "registrations_and_payments": "Registrierungen und Zahlungen",
     "participations_and_achievements": "Teilnahmen & Leistungen",
     "degree_participations": "Degree-Teilnahmen",
     "attendances": "Teilnahmen",
@@ -978,6 +979,13 @@
     "statistics_invitations_confirmed": "Einladungen bestätigt",
     "statistics_registrations_total": "Registrierungen gesamt",
     "statistics_registrations_confirmed": "Bestätigte Registrierungen",
+    "payment_status": "Zahlung",
+    "payment_status_values": {
+      "NONE": "Keine",
+      "PENDING": "Ausstehend",
+      "COMPLETED": "Bezahlt",
+      "FAILED": "Fehlgeschlagen"
+    },
     "name": "Name",
     "first_name": "Vorname",
     "last_name": "Nachname",
